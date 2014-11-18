@@ -1,0 +1,22 @@
+import os;
+Import('*')
+
+#Build the individual parts of sofmis
+smCore_files = Glob('smCore/*.cpp')
+smCollision_files = Glob('smCollision/*.cpp')
+smExternal_files = Glob('smExternal/*.cpp')
+smExternalDevices_files = Glob('smExternalDevices/*.cpp')
+smMesh_files = Glob('smMesh/*.cpp')
+smRendering_files = Glob('smRendering/*.cpp')
+smRenderEffects_files = Glob('smRenderEffects/*.cpp')
+smScripting_files = Glob('smScripting/*.cpp')
+smShader_files = Glob('smShader/*.cpp')
+smSimulators_files = Glob('smSimulators/*.cpp')
+smUtilities_files = Glob('smUtilities/*.cpp')
+smTools_files = Glob('smTools/*.cpp')
+src_files = smScripting_files + smCore_files + smUtilities_files + smExternal_files + smShader_files + smCollision_files + smExternalDevices_files + smMesh_files + smRendering_files + smSimulators_files + smRenderEffects_files+smTools_files
+#Assemble the parts into the sofmis library
+sofmis_lib = env.StaticLibrary('sofmis', src_files)
+
+#Install the program
+env.Alias("install", env.Install(install_dir, sofmis_lib))
