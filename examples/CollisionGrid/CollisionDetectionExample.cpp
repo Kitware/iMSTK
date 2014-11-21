@@ -60,7 +60,7 @@ CollisionDetectionExample::CollisionDetectionExample(){
 	smTextureManager::loadTexture("../../resources/textures/brick-normal.jpg","wallBumpImage");//ground wall bump image
 
 	///load a mesh
-	object1->mesh->loadMesh("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
+	object1->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
 	///texture attachment needed for fixed opengl rendering if texture is needed
 	object1->mesh->assignTexture("livertexture1");
  	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
@@ -75,7 +75,7 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	///the similiar routines for object2
 	object2=new smStaticSceneObject();
-	object2->mesh->loadMesh("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
+	object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
 	object2->mesh->translate(smVec3<smFloat>(2,0,0));
 
 	object2->mesh->assignTexture("livertexture2");

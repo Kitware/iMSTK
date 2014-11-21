@@ -61,7 +61,7 @@ AlphaMapExample::AlphaMapExample(){
 	smTextureManager::loadTexture("../../resources/textures/band.bmp","noOCC");
 	
 
-	object1->mesh->loadMesh("../../resources/models/gall_tissue.3DS",SM_FILETYPE_3DS); 
+	object1->mesh->loadMeshLegacy("../../resources/models/gall_tissue.3DS",SM_FILETYPE_3DS); 
 	
 	//object1->mesh->assignTexture("diffuse");
 	metalShader->attachTexture(object1->mesh->uniqueId,"norm","BumpTex");

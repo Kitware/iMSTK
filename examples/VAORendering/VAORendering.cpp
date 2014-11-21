@@ -78,7 +78,7 @@ VAORendering::VAORendering(){
 
 
 	///load 3DS mesh for mesh 
-	object1->mesh->loadMesh("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
+	object1->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
 
 	
 	//object1->mesh->assignTexture("livertexture1");
@@ -90,7 +90,7 @@ VAORendering::VAORendering(){
 	
 	///create a second static object
 	object2=new smStaticSceneObject();
-	object2->mesh->loadMesh("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
+	object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
 	object2->mesh->translate(smVec3<smFloat>(2,0,0));
 	///assigne a texture for fixed shading( not for shader enabled rendeirng)
 	object2->mesh->assignTexture("livertexture2");

@@ -68,7 +68,7 @@ void createPBDandFEM(){
 	pbdObject=new smPBDSurfaceSceneObject ();
 	pbdObject->renderDetail.colorDiffuse=smColor::colorWhite;
 	pbdObject->renderDetail.colorAmbient=smColor::colorWhite;
-	pbdObject->mesh->loadMesh("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
+	pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
 	//pbdObject->mesh->rotate(mat);
 	pbdObject->mesh->scale(smVec3<smFloat>(2.3,0.5,2));
 	pbdObject->mesh->translate(smVec3<smFloat>(11,25,0));

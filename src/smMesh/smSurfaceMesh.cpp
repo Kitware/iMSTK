@@ -2,13 +2,14 @@
 #include <map>
 using std::map;
 //assimp includes
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include <Importer.hpp>
+#include <scene.h>
+#include <postprocess.h>
 
 #include "smMesh/smSurfaceMesh.h"
+#include <io.h>
 
-///brief: constructor
+/// \brief constructor
 smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype,smErrorLog *log=NULL)
 {
 	this->log_SF=log;
@@ -17,12 +18,15 @@ smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype,smErrorLog *log=NULL)
 }
 
 
-///brief: destructor
+/// \brief destructor
 smSurfaceMesh::~smSurfaceMesh()
 {
 
 }
-///brief: loads the mesh based on the file type and initializes the normals
+
+
+
+/// \brief loads the mesh based on the file type and initializes the normals
 smBool smSurfaceMesh::loadMesh(smChar *fileName,smMeshFileType fileType)
 {
 	smBool ret = true;
@@ -39,6 +43,43 @@ smBool smSurfaceMesh::loadMesh(smChar *fileName,smMeshFileType fileType)
 	}
 	assert(ret);
 	
+	if (ret == false) {
+		if (log_SF != NULL)
+			log_SF->addError(this, "Error: Mesh file NOT FOUND");
+	}
+	if(ret){
+		initVertexNeighbors();  
+		this->updateTriangleNormals();
+		this->updateVertexNormals();
+
+		//edge information
+		this->calcNeighborsVertices();
+		this->calcEdges();
+		this->upadateAABB();
+	}
+	return ret;
+}
+
+/// \brief --Deprecated, use loadMesh() for new simulators--
+/// Loads the mesh based on the file type and initializes the normals
+smBool smSurfaceMesh::loadMeshLegacy(smChar *fileName,smMeshFileType fileType)
+{
+	smBool ret = true;
+
+	switch (fileType) {
+	case SM_FILETYPE_3DS:
+		Load3dsMesh(fileName);
+		break;
+	case SM_FILETYPE_OBJ:
+		ret = LoadMeshAssimp(fileName);
+		break;
+	default:
+		if(log_SF!=NULL)
+			log_SF->addError(this,"Error: Mesh file TYPE UNIDENTIFIED");
+		ret = false;
+	}
+	meshFileType = fileType;
+	assert(ret);
 	if (ret == false) {
 		if (log_SF != NULL)
 			log_SF->addError(this, "Error: Mesh file NOT FOUND");
@@ -132,4 +173,153 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
 	}
 
 	return true;
+}
+
+
+/// \brief reads the mesh file in .3ds format
+smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
+{
+	smInt i; //Index variable
+	FILE *l_file; //File pointer
+	smUShort l_chunk_id; //Chunk identifier
+	smUInt l_chunk_lenght; //Chunk lenght
+	smUShort l_qty; //Number of elements in each chunk
+	smUShort temp;
+	smChar l_char;	
+
+	if ((l_file=fopen (fileName, "rb"))== NULL) //Open the file
+		return 0; 
+
+	while (ftell (l_file) < filelength (_fileno (l_file))) //Loop to scan the whole file 
+	{		
+
+		fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
+		fread (&l_chunk_lenght, 4, 1, l_file); //Read the lenght of the chunk
+
+		switch (l_chunk_id)
+        {
+			//----------------- MAIN3DS -----------------
+			// Description: Main chunk, contains all the other chunks
+			// Chunk ID: 4d4d 
+			// Chunk Lenght: 0 + sub chunks
+			//-------------------------------------------
+			case 0x4d4d: 
+			break;    
+
+			//----------------- EDIT3DS -----------------
+			// Description: 3D Editor chunk, objects layout info 
+			// Chunk ID: 3d3d (hex)
+			// Chunk Lenght: 0 + sub chunks
+			//-------------------------------------------
+			case 0x3d3d:
+			break;
+			
+			//--------------- EDIT_OBJECT ---------------
+			// Description: Object block, info for each object
+			// Chunk ID: 4000 (hex)
+			// Chunk Lenght: len(object name) + sub chunks
+			//-------------------------------------------
+			case 0x4000: 
+				i=0;
+				do
+				{
+					fread (&l_char, 1, 1, l_file);
+					i++;
+                }while(l_char != '\0' && i<20);
+
+			break;
+
+			//--------------- OBJ_TRIMESH ---------------
+			// Description: Triangular mesh, contains chunks for 3d mesh info
+			// Chunk ID: 4100 (hex)
+			// Chunk Lenght: 0 + sub chunks
+			//-------------------------------------------
+			case 0x4100:
+			break;
+			
+			//--------------- TRI_VERTEXL ---------------
+			// Description: Vertices list
+			// Chunk ID: 4110 (hex)
+			// Chunk Lenght: 1 x unsigned short (number of vertices) 
+			//             + 3 x float (vertex coordinates) x (number of vertices)
+			//             + sub chunks
+			// Convert float to current real for precision
+			//-------------------------------------------
+			case 0x4110: 
+				fread (&l_qty, sizeof (smUShort), 1, l_file);
+				this->nbrVertices = l_qty;
+				this->vertices = new smVec3<smFloat>[l_qty];
+				this->origVerts = new smVec3<smFloat>[l_qty];
+				this->vertNormals = new smVec3<smFloat>[l_qty];
+				this->vertTangents = new smVec3<smFloat>[l_qty];
+				this->texCoord = new smTexCoord[l_qty];
+
+				for( smInt fpt = 0; fpt < this->nbrVertices; fpt++ ){
+					smFloat fTemp[3];
+					fread (fTemp, sizeof(smFloat),3, l_file);
+					this->vertices[fpt].x = (smFloat)fTemp[0];
+					this->vertices[fpt].y = (smFloat)fTemp[1];
+					this->vertices[fpt].z = (smFloat)fTemp[2];
+				}
+			break;
+
+			//--------------- TRI_FACEL1 ----------------
+			// Description: Polygons (faces) list
+			// Chunk ID: 4120 (hex)
+			// Chunk Lenght: 1 x unsigned short (number of polygons) 
+			//             + 3 x unsigned short (polygon points) x (number of polygons)
+			//             + sub chunks
+			//-------------------------------------------
+			case 0x4120:
+				fread (&l_qty, sizeof (smUShort), 1, l_file);
+				this->nbrTriangles = l_qty;
+				this->triangles = new smTriangle[l_qty];
+				this->triNormals = new smVec3<smFloat>[l_qty];
+				this->triTangents = new smVec3<smFloat>[l_qty];
+
+				for (i=0; i<l_qty; i++)
+				{		          
+					fread (&temp,sizeof (smUShort), 1, l_file);
+					this->triangles[i].vert[0]=temp;
+					
+					fread (&temp,sizeof (smUShort), 1, l_file);
+					this->triangles[i].vert[1]=temp;
+					
+					fread (&temp,sizeof (smUShort), 1, l_file);
+					this->triangles[i].vert[2]=temp;
+					fread (&temp, sizeof (smUShort), 1, l_file);
+				}
+			break;
+
+			//------------- TRI_MAPPINGCOORS ------------
+			// Description: Vertices list
+			// Chunk ID: 4140 (hex)
+			// Chunk Lenght: 1 x unsigned short (number of mapping points) 
+			//             + 2 x float (mapping coordinates) x (number of mapping points)
+			//             + sub chunks
+			//-------------------------------------------
+			case 0x4140:
+				fread (&l_qty, sizeof (smUShort), 1, l_file);				
+				for( smInt tpt = 0; tpt < l_qty; tpt++ ){
+					smFloat fTemp[2];
+					fread (fTemp, sizeof(smFloat),2, l_file);
+					this->texCoord[tpt].u = (smFloat)fTemp[0];
+					this->texCoord[tpt].v = (smFloat)fTemp[1];
+				}
+				isTextureCoordAvailable=true;
+
+			break;
+
+			//----------- Skip unknow chunks ------------
+			//We need to skip all the chunks that currently we don't use
+			//We use the chunk lenght information to set the file pointer
+			//to the same level next chunk
+			//-------------------------------------------
+			default:
+				 fseek(l_file, l_chunk_lenght-6, SEEK_CUR);
+        } 
+	}
+	fclose (l_file); // Closes the file stream
+
+ 	return 1; // Returns ok
 }
