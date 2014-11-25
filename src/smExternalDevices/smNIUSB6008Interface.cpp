@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <cassert>
-
 #include "smExternalDevices/smNIUSB6008Interface.h"
 
 #define DAQmxErrChk(functionCall) if( DAQmxFailed(error=(functionCall)) ) goto Error; else
@@ -14,19 +13,16 @@ int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEvent
 
 smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	int32       error=0;
-	char        errBuff[2048]={'\0'};
-	
+	int32  error=0;
+	char errBuff[2048]={'\0'};
 	NI_error = 0;
 	for(smInt i=0;i<2048;i++) NI_errBuff[i] = '\0';
 	initCount = 0;
 	NI_on = false;
-
 	count = 0;
 	taskHandle=0;
-
 	taskID = VBLaST_Task_ID;
+
 	getToolCalibrationData();
 	setTool();
 	
@@ -40,8 +36,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 	// DAQmx Configure Code
 	/*********************************************/
 	initNI_Error(DAQmxCreateTask("",&taskHandle));
-	//initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev2/ai0:1","",DAQmx_Val_Cfg_Default,-10.0,10.0,DAQmx_Val_Volts,NULL));
-	
+
 	switch(VBLaST_Task_ID){
 		case 1:	// peg transfer: dissect, dissect
 			//0 1
@@ -51,7 +46,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 		case 2:	// pattern cutting: dissect, shear
 			//0 2
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai0","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
-			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));			
+			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			break;
 		case 3: // ligating loop: ligating loop, shear, grasper
 			//2 3 4 
@@ -71,13 +66,11 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai7","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));	//DAQmx_Val_Cfg_Default
 			break;
 		case 6:
-			//initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai0","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
-			//initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai1","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));	  // stapler
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai3","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));	 //grasper
 
-		default:			
-			break;		
+		default:
+			break;
 	}
 
 	initNI_Error(DAQmxCfgSampClkTiming(taskHandle,"",1000.0,DAQmx_Val_Rising,DAQmx_Val_ContSamps,1000));
@@ -89,7 +82,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 	/*********************************************/
 	initNI_Error(DAQmxStartTask(taskHandle));
 	
-	if(initCount==0) {
+	if(initCount==0){
 		printf("NI DAQ USB-6008 is working \n");
 		NI_on = true;
 	}
@@ -101,14 +94,13 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 	}
 
 	NIUSB6008pipe = new smPipe("NIUSB6008_Data",sizeof(NIUSB6008Data),10);
-
 	aveData[0] = aveData[1] = 0.0;	
 }
 
-void smNIUSB6008Interface::getToolCalibrationData()
-{
-	FILE *fp_cali;	
-	
+/// \brief
+void smNIUSB6008Interface::getToolCalibrationData(){
+
+	FILE *fp_cali;
 	fp_cali = fopen("config/toolCalibrationNIUSB6008.txt", "r");
 	if (NULL == fp_cali) {
 		printf("NI DAQ USB-6008 configuration file not found: config/toolCalibrationNIUSB6008.txt");
@@ -119,16 +111,17 @@ void smNIUSB6008Interface::getToolCalibrationData()
 
 	for(smInt i=0; i<nbrRegTool; i++){
 		for(smInt j=0; j<5; j++){
-			fscanf(fp_cali, "%c", &regTool[i].type[j]);		
+			fscanf(fp_cali, "%c", &regTool[i].type[j]);
 		}
-		fscanf(fp_cali, " %f %f\n", &regTool[i].min, &regTool[i].max);		
+		fscanf(fp_cali, " %f %f\n", &regTool[i].min, &regTool[i].max);
 	}
-
 	fclose(fp_cali);
 }
 
+/// \brief
 void smNIUSB6008Interface::setTool()
 {
+
 	/*
 	 #AI    |    type
 	--------------------
@@ -141,11 +134,10 @@ void smNIUSB6008Interface::setTool()
 	  6     |    NEE_1
 	  7     |    KNO_0
 	*/
-	
 	smInt i, j, k, n;
 	FILE *fp;
 	fp = fopen("config/toolSetting.txt", "r");
-	if (NULL == fp) {
+	if (NULL == fp){
 		printf("Tool settings file not found: config/toolSetting.txt");
 		assert(fp);
 	}
@@ -168,14 +160,17 @@ void smNIUSB6008Interface::setTool()
 			break;
 		case 2:	// pattern cutting: dissect, shear
 			//0 2
-			nbrActiveChannel = 2;		
-			activeChannel[0] = 0; activeChannel[1] = 2;
+			nbrActiveChannel = 2;
+			activeChannel[0] = 0;
+			activeChannel[1] = 2;
 			getToolData(nbrActiveChannel, activeChannel);
 			break;
 		case 3: // ligating loop: ligating loop, shear, grasper
 			//2 3 4
 			nbrActiveChannel = 3;
-			activeChannel[0] = 2; activeChannel[1] = 3; activeChannel[2] = 4;
+			activeChannel[0] = 2;
+			activeChannel[1] = 3;
+			activeChannel[2] = 4;
 			getToolData(nbrActiveChannel, activeChannel);
 			break;
 		case 4: // intracorporeal suturing: needle driver, needle driver
@@ -183,25 +178,26 @@ void smNIUSB6008Interface::setTool()
 			nbrActiveChannel = 2;
 			break;
 		case 5:	// extracorporeal suturing: needle driver, needle driver, knot pusher
-			// 5 6 7 			
+			// 5 6 7 
 			nbrActiveChannel = 3;
 			break;
 		case 6:		//NOTES
 			nbrActiveChannel  = 2;
-			activeChannel[0] = 2;	activeChannel[1] = 3;
+			activeChannel[0] = 2
+			activeChannel[1] = 3;
 			getToolData(nbrActiveChannel, activeChannel);
 
-		default:			
-			break;		
+		default:
+			break;
 	}
-	
-		
 }
 
-void smNIUSB6008Interface::getToolData(smInt nc, smInt *ac)
-{
+/// \brief
+void smNIUSB6008Interface::getToolData(smInt nc, smInt *ac){
+
 	smInt i, j, k;
 	smInt cc=0;
+
 	for(i=0; i<nc; i++){
 		for(j=0;j<nbrRegTool;j++){
 			k = ac[i];
@@ -222,12 +218,11 @@ void smNIUSB6008Interface::getToolData(smInt nc, smInt *ac)
 
 	if(cc<nc){
 		printf("\n\ncheck tool serial numbers and setting\n");
-		while(1){}
 	}
 }
 
-void smNIUSB6008Interface::initNI_Error(int32 error)
-{
+/// \brief
+void smNIUSB6008Interface::initNI_Error(int32 error){
 	if(error<0){
 		if( DAQmxFailed(error) )
 			DAQmxGetExtendedErrorInfo(NI_errBuff,2048);
@@ -241,11 +236,12 @@ void smNIUSB6008Interface::initNI_Error(int32 error)
 		if( DAQmxFailed(error) )
 			printf("DAQmx Error: %s\n",NI_errBuff);
 		initCount++;
-	}	
+	}
 }
 
+/// \brief
 smNIUSB6008Interface::~smNIUSB6008Interface(){
-	
+
 	DAQmxStopTask(taskHandle);
 	DAQmxClearTask(taskHandle);
 	
@@ -253,104 +249,70 @@ smNIUSB6008Interface::~smNIUSB6008Interface(){
 	delete [] regTool;
 }
 
+/// \brief
 void smNIUSB6008Interface::sendDataToPipe(){
-	
+
 	NIUSB6008Data *pipeData;
 	pipeData = (NIUSB6008Data*)NIUSB6008pipe->beginWrite();
-	
 	smFloat tF;
 	smInt cid;
 	pipeData->on = NI_on;
 	
 	for(smInt i=0;i<nbrActiveChannel;i++){
-		
 		cid = activeChannel[i];
 		tF = (aveData[i] - installedTool[cid].min) * installedTool[cid].invRange;
 		if(tF<0.0) tF=0.0;
 		if(tF>1.0) tF=1.0;
 		pipeData->value[i] = tF;
-		//pipeData->value[i] = aveData[i];
 	}
-	
-	//printf("%f\n", aveData[1]);
-	//printf("%f %f\n", pipeData->value[0], pipeData->value[1]);
 
 	NIUSB6008pipe->endWrite(1);
 	NIUSB6008pipe->acknowledgeValueListeners();
 }
 
+/// \brief
 void smNIUSB6008Interface::run(){
 
 	while(1){
-		//simTime->start();
 		sendDataToPipe();
-		//printf("%f\n", simTime->now(SOFMIS_TIMER_INMILLISECONDS));
-		// sleep(100);
 	}
 }
 
+/// \brief
 int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEventType, uInt32 nSamples, void *callbackData)
 {
-	int32       error=0;
-	char        errBuff[2048]={'\0'};
-	int32       read=0;
+	int32 error=0;
+	char errBuff[2048]={'\0'};
+	int32 read=0;
 
 	smNIUSB6008Interface  *NIUSB6008Interface = static_cast<smNIUSB6008Interface *> (callbackData);
-		
+
 	/*********************************************/
 	// DAQmx Read Code
 	/*********************************************/
 
 	if(NIUSB6008Interface->taskID==1 || NIUSB6008Interface->taskID==2 || NIUSB6008Interface->taskID==4 || NIUSB6008Interface->taskID==6){
-		
 		DAQmxErrChk (DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 20, &read, NULL));
-
-
-
 	}
 
 	DAQmxErrChk (DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 10 * NIUSB6008Interface->nbrActiveChannel, &read, NULL));
-	//(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-	//printf("Acquired reading: %d %f %f\n",count++, sampdata[0], sampdata[1]);
-	
-	
+
 	if( read>0 ) {
-
 		if(read==10){
-
 			NIUSB6008Interface->aveData[0] = NIUSB6008Interface->aveData[1] = NIUSB6008Interface->aveData[2] = 0.0;
-
 			smInt i, j;
 			for(i=0;i<10;i++){
-
 				for(j=0; j<NIUSB6008Interface->nbrActiveChannel; j++){
-					
 					NIUSB6008Interface->aveData[j] += NIUSB6008Interface->sampdata[i + j * 10];
-
 				}
-				//NIUSB6008Interface->aveData[0] += NIUSB6008Interface->sampdata[i];
-				//NIUSB6008Interface->aveData[1] += NIUSB6008Interface->sampdata[i+10];
 			}
-			/*
-			for(i=0;i<2;i++){
-				NIUSB6008Interface->aveData[i]/=10.0;
-				//normalization
-			}
-			*/
 
 			for(i=0;i<NIUSB6008Interface->nbrActiveChannel;i++){
 				NIUSB6008Interface->aveData[i]/=10.0;
-				//normalization
-
-				
 			}
-
-			//printf("%f ", NIUSB6008Interface->aveData[0]);
-			//printf("\n");
 		}
-
 	}
-	
+
 Error:
 	if( DAQmxFailed(error) ) {
 		DAQmxGetExtendedErrorInfo(errBuff,2048);
@@ -364,10 +326,11 @@ Error:
 	return 0;
 }
 
-int32 CVICALLBACK DoneCallback(TaskHandle taskHandle, int32 status, void *callbackData)
-{
-	int32   error=0;
-	char    errBuff[2048]={'\0'};
+/// \brief
+int32 CVICALLBACK DoneCallback(TaskHandle taskHandle, int32 status, void *callbackData){
+
+	int32 error=0;
+	char errBuff[2048]={'\0'};
 
 	// Check to see if an error stopped the task.
 	DAQmxErrChk (status);
