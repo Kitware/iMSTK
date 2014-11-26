@@ -1,88 +1,60 @@
 /*
 ****************************************************
-SOFMIS LICENSE
-
+				SimMedTK LICENSE
 ****************************************************
 
-\author:    <http:\\acor.rpi.edu>
-SOFMIS TEAM IN ALPHABATIC ORDER
-Anderson Maciel, Ph.D.
-Ganesh Sankaranarayanan, Ph.D.
-Sreekanth A Venkata
-Suvranu De, Ph.D.
-Tansel Halic
-Zhonghua Lu
-
-\author:    Module by Tansel Halic
-
-
-\version    1.0
-\date       05/2009
-\bug	    None yet
-\brief	    This class is the simulator object. Each simulator should derive this.
-
-
-
-*****************************************************
+****************************************************
 */
+
 #include "smCollision/smCollisionModel.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
 #include <stack>
 #include "smCore/smEvent.h"
 
-
-
 template <typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
+
 	smVec3f center;
 	smFloat edge;
 	vector<smInt> triangles;
 
-
 	for(smInt i=0;i<mesh->nbrTriangles;i++)
 		triangles.push_back(i);
+
 	center=mesh->aabb.center();
-	edge=SOFMIS_MAX(SOFMIS_MAX(mesh->aabb.halfSizeX(),mesh->aabb.halfSizeY()),mesh->aabb.halfSizeZ());
+	edge=SOFMIS_MAX(SOFMIS_MAX(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
+                                                        mesh->aabb.halfSizeZ());
 	root.setCenter(center);
 	root.setLength(2*edge);
 	root.filled=true;
 
-	//root.cube.center=center;
-	//root.originalCubeCenter=center;
-	//root.cube.sideLength=2*edge;
 	treeAllLevels[0]=root;
-	//createTree(root,triangles,0);
 	createTree(treeAllLevels[0],triangles,0,0);
 	memcpy(initialTreeAllLevels,treeAllLevels,this->totalCells*sizeof(smSurfaceTreeCell));
 	triangles.clear();
 
-
 }
-
 
 //Destructor
 template<typename smSurfaceTreeCell>
 smSurfaceTree<smSurfaceTreeCell>::~smSurfaceTree(){
 	delete[]	treeAllLevels;
 	delete[]	levelStartIndex;
-
 }
-
 
 template<typename smSurfaceTreeCell>
 smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType){
 	mesh=p_mesh;
 	totalCells=0;
 	switch(p_treeType){
-				case SOFMIS_TREETYPE_OCTREE:
-					nbrDivision=SOFMIS_TREE_DIVISION_OCTREE;
-					break;
+		case SOFMIS_TREETYPE_OCTREE:
+			nbrDivision=SOFMIS_TREE_DIVISION_OCTREE;
+			break;
 	}
 
 	//set the total levels
 	currentLevel=maxLevel=p_maxLevels;
-	
 
 	//compute the total cells
 	for(smInt i=0;i<maxLevel;i++)
@@ -103,14 +75,12 @@ smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_ma
 	}
 	levelStartIndex[maxLevel-1].endIndex=totalCells;
 
-	//maxPrimPerCell=SOFMIS_OCTREE_TRIANGLECOUNT;
 	minTreeRenderLevel=0;
 	renderSurface=false;
 	enableShiftPos=false;
 	shiftScale=1.0;
 	enableTrianglePos=false;
 	renderOnlySurface=false;
-
 }
 
 template<typename smSurfaceTreeCell>
@@ -119,122 +89,27 @@ void smSurfaceTree<smSurfaceTreeCell>::initDraw(smDrawParam p_param){
 	smViewer *viewer;
 	viewer=p_param.rendererObject;
 	viewer->addText(QString("octree"));
-
-
-
 }
 
-//void smSurfaceTree::draw1(smDrawParam p_params){
-//	stack<smOctree*>tree;
-//	smOctree* current;
-//	glColor3fv(smColor::colorGreen.toGLColor());
-//	
-//	tree.push(&root);
-//	glEnable(GL_LIGHTING);
-//	glPushAttrib(GL_LIGHTING_BIT);
-//	glColor3fv(smColor::colorGreen.toGLColor());
-//	static smInt counter=0;
-//    counter=0;
-//	glColor3fv(smColor::colorBlue.toGLColor());	
-//	//smGLRenderer::drawAABB(mesh->aabb);
-//	while(tree.size()>0){
-//		current=tree.top();
-//		tree.pop();
-//		
-//		if(current->level==minTreeRenderLevel){
-//				glColor3fv(smColor::colorBlue.toGLColor());	
-//				   //smGLRenderer::drawAABB(current->aabb);
-//					glPushMatrix();
-//						glTranslatef(current->cube.center.x,current->cube.center.y,current->cube.center.z);
-//						
-//						glutWireCube(current->cube.sideLength);
-//					glPopMatrix();
-//
-//		}
-//					
-//		if(renderOnlySurface==false){		
-//			if(current->level==minTreeRenderLevel){
-//			
-//					
-//					glPushMatrix();
-//						glColor3fv(smColor::colorPink.toGLColor());
-//						glTranslatef(current->sphere.center.x,current->sphere.center.y,current->sphere.center.z);
-//						glutSolidSphere(current->sphere.radius,15,15);
-//	 				glPopMatrix();
-//					counter++;
-//			}
-//	
-//		}
-//			
-//	
-//	
-//     
-//		if(current->triagleIndices.size()>0&&this->renderSurface){
-//				//counter++;
-//				smGLRenderer::beginTriangles();
-//				glColor3fv(smColor::colorGreen.toGLColor());
-//				 for(smInt i=0;i<current->triagleIndices.size();i++){
-//					smGLRenderer::drawTriangle(mesh->vertices[mesh->triangles[current->triagleIndices[i]].vert[0]],
-//											   mesh->vertices[mesh->triangles[current->triagleIndices[i]].vert[1]],
-//											   mesh->vertices[mesh->triangles[current->triagleIndices[i]].vert[2]]);
-//				}
-//				smGLRenderer::endTriangles();
-//				
-//				
-//		}
-//	  for(smInt i=0;i<SOFMIS_OCTREE_CHILDREN;i++){
-//		
-//			
-//				if(current->children[i]!=NULL){
-//					tree.push(current->children[i]);
-//				
-//				}
-//			}	
-//
-//
-//		
-//	
-//	}
-//	
-//	glPopAttrib();
-//	glEnable(GL_LIGHTING);
-//	p_params.rendererObject->updateText("octree",QString("Total Spheres at Level:")+QString().setNum(counter));
-//
-//
-//
-//
-//
-//
-//
-//}
+template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
+                                                   ::draw(smDrawParam p_params){
 
-
-template<typename smSurfaceTreeCell>
-void smSurfaceTree<smSurfaceTreeCell>::draw(smDrawParam p_params){
 	smVec3f center;
 	smFloat length;
 	smSurfaceTreeCell* current;
 	glColor3fv(smColor::colorGreen.toGLColor());
-
 
 	glEnable(GL_LIGHTING);
 	glPushAttrib(GL_LIGHTING_BIT);
 	glColor3fv(smColor::colorGreen.toGLColor());
 	static smInt counter=0;
 	counter=0;
-	glColor3fv(smColor::colorBlue.toGLColor());	
-	//smGLRenderer::drawAABB(mesh->aabb);
+	glColor3fv(smColor::colorBlue.toGLColor());
 
+	if(renderOnlySurface==false){
+		for(smInt i=levelStartIndex[minTreeRenderLevel].startIndex;i<levelStartIndex[minTreeRenderLevel].endIndex;i++){
 
-
-
-
-	if(renderOnlySurface==false){		
-
-		for(smInt i=levelStartIndex[minTreeRenderLevel].startIndex;i<levelStartIndex[minTreeRenderLevel].endIndex;i++)
-		{	
-
-			current=&treeAllLevels[i];					
+			current=&treeAllLevels[i];
 			center=current->getCenter();
 			length=current->getLength();
 
@@ -247,60 +122,34 @@ void smSurfaceTree<smSurfaceTreeCell>::draw(smDrawParam p_params){
 				counter++;
 			}
 		}
-
-		
-		//Debugging Purpose
-	
-
-
-
 	}
-
-
-
-
-
-
-
-
 
 	glPopAttrib();
 	glEnable(GL_LIGHTING);
 	p_params.rendererObject->updateText("octree",QString("Total Spheres at Level:")+QString().setNum(counter));
-
-
-
-
-
-
-
 }
 
+template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
+                                                ::handleEvent(smEvent *p_event){
 
-template<typename smSurfaceTreeCell>
-void smSurfaceTree<smSurfaceTreeCell>::handleEvent(smEvent *p_event){
 	smKeyboardEventData *keyBoardData;
 
 	switch(p_event->eventType.eventTypeCode){
 
 				case SOFMIS_EVENTTYPE_KEYBOARD:
+					
 					keyBoardData=(smKeyboardEventData*)p_event->data;
-
-
-
-					if(keyBoardData->keyBoardKey==Qt::Key_Plus){					
+					if(keyBoardData->keyBoardKey==Qt::Key_Plus){
 						minTreeRenderLevel++;
+						
 						if(minTreeRenderLevel>maxLevel)
 							minTreeRenderLevel=maxLevel;
+
 						if(minTreeRenderLevel<0)
 							minTreeRenderLevel=0;
-						//cout<<minTreeRenderLevel<<endl;
 
 						currentLevel=minTreeRenderLevel;
-
-
 					}
-
 
 					if(keyBoardData->keyBoardKey==Qt::Key_Minus){
 						minTreeRenderLevel--;
@@ -308,123 +157,73 @@ void smSurfaceTree<smSurfaceTreeCell>::handleEvent(smEvent *p_event){
 							minTreeRenderLevel=maxLevel;
 						if(minTreeRenderLevel<0)
 							minTreeRenderLevel=0;
-						//cout<<minTreeRenderLevel<<endl;
 							currentLevel=minTreeRenderLevel;
 					}
 
-
-					if(keyBoardData->keyBoardKey==Qt::Key_R)						
+					if(keyBoardData->keyBoardKey==Qt::Key_R)
 						this->renderSurface=!this->renderSurface;
-					if(keyBoardData->keyBoardKey==Qt::Key_P)	
+
+					if(keyBoardData->keyBoardKey==Qt::Key_P)
 						this->enableShiftPos=!this->enableShiftPos;
-					/*
-					if(keyBoardData->keyBoardKey==Qt::Key_3){
-						shiftScale-=0.1;					
-						cout<<"ShiftScale:"<<shiftScale;
-					}
-					if(keyBoardData->keyBoardKey==Qt::Key_6){
-						shiftScale+=0.1;					
-						cout<<"ShiftScale:"<<shiftScale;
-					}
-					if(keyBoardData->keyBoardKey==Qt::Key_U){
-						enableTrianglePos=!enableTrianglePos;
-						cout<<"Triangle Pos:"<<enableTrianglePos<<endl;
-					}								
-					*/
-					if(keyBoardData->keyBoardKey==Qt::Key_K)						
+
+					if(keyBoardData->keyBoardKey==Qt::Key_K)
 						this->renderOnlySurface=!this->renderOnlySurface;
-					if(keyBoardData->keyBoardKey==Qt::Key_T)						
+
+					if(keyBoardData->keyBoardKey==Qt::Key_T)
 						updateStructure();
-
-
 
 					break;
 	}
-
-
 }
 
+template<typename smSurfaceTreeCell> smBool smSurfaceTree<smSurfaceTreeCell>::
+                  createTree(smSurfaceTreeCell &p_Node, vector<smInt> &p_triangles,
+                  smInt p_level, smInt p_siblingIndex){
 
-//void smSurfaceTree::updateStructure(){
-//	smOctree* current;
-//	stack<smOctree*>tree; 
-//	tree.push(&root);
-//	smVec3f clusterCenter;
-//	while(tree.size()>0){
-//		current=tree.top();
-//		
-//		
-//		tree.pop();
-//		computeClusterCenter(*current);
-//
-//
-//		for(smInt i=0;i<SOFMIS_OCTREE_CHILDREN;i++){
-//				if(current->children[i]!=NULL)
-//					tree.push(current->children[i]);
-//				
-//		}
-//	}
-//
-//}
-
-template<typename smSurfaceTreeCell>
-smBool smSurfaceTree<smSurfaceTreeCell>::createTree(smSurfaceTreeCell &p_Node,vector<smInt> &p_triangles,smInt p_level,smInt p_siblingIndex){
-	//smAABB aabb[SOFMIS_OCTREE_CHILDREN];
-	//smCube cubes[SOFMIS_OCTREE_CHILDREN];
 	smSurfaceTreeCell *subDividedNodes=new smSurfaceTreeCell[nbrDivision];
 	vector<smInt>**triangles;
-
 
 	if(p_level>=maxLevel)
 		return false;
 	p_Node.level=p_level;
 
-	//p_Node.sphere.center=p_Node.cube.center;
-	//p_Node.originalCubeCenter=p_Node.cube.center;
-	//p_Node.sphere.radius=(0.866025404*(p_Node.cube.sideLength));//*1.05+p_Node.cube.sideLength*p_level;
 	triangles=new vector<smInt>*[nbrDivision];
 
 	if(p_level==maxLevel-1){
+
 		smInt nbrTriangles=p_triangles.size();
-		//smVec3f clusterCentroid(0,0,0);
 		smFloat totalDistance=0.0;
 		for(smInt i=0;i<nbrTriangles;i++){
 
-			//clusterCentroid=clusterCentroid+mesh->vertices[mesh->triangles[p_triangles[i]].vert[0]]+mesh->vertices[mesh->triangles[p_triangles[i]].vert[1]]+mesh->vertices[mesh->triangles[p_triangles[i]].vert[2]];
 			p_Node.verticesIndices.insert(mesh->triangles[p_triangles[i]].vert[0]);
 			p_Node.verticesIndices.insert(mesh->triangles[p_triangles[i]].vert[1]);
 			p_Node.verticesIndices.insert(mesh->triangles[p_triangles[i]].vert[2]);
 		}
+
 		for(set<smInt>::iterator it=p_Node.verticesIndices.begin();it!=p_Node.verticesIndices.end();it++){
-		//	//clusterCentroid=clusterCentroid+mesh->vertices[*it];
 			totalDistance+=p_Node.cube.center.distance(mesh->vertices[*it]);
 		}
+
 		smFloat weightSum=0;
 		smFloat weight;
 		for(set<smInt>::iterator it=p_Node.verticesIndices.begin();it!=p_Node.verticesIndices.end();it++){
-
 			weight=1-(p_Node.getCenter().distance(mesh->vertices[*it])*p_Node.getCenter().distance(mesh->vertices[*it]))/(totalDistance*totalDistance);
 			weight=1-(p_Node.getCenter().distance(mesh->vertices[*it])*p_Node.getCenter().distance(mesh->vertices[*it]))/(totalDistance*totalDistance);
 			weightSum+=weight;
 			p_Node.weights.push_back(weight);
 		}
-		smInt counter=0;
 
-		for(set<smInt>::iterator it=p_Node.verticesIndices.begin();it!=p_Node.verticesIndices.end();it++)
-		{
+		smInt counter=0;
+		for(set<smInt>::iterator it=p_Node.verticesIndices.begin();it!=p_Node.verticesIndices.end();it++){
 			p_Node.weights[counter]=p_Node.weights[counter]/weightSum;
 			counter++;
 		}
+
 		delete[] subDividedNodes;
 		return true;
-
 	}
 
-
-
 	p_Node.subDivide(2.0,subDividedNodes);
-
-
 
 	for(smInt i=0;i<nbrDivision;i++){
 		triangles[i]=new vector<smInt>();
@@ -434,54 +233,33 @@ smBool smSurfaceTree<smSurfaceTreeCell>::createTree(smSurfaceTreeCell &p_Node,ve
 
 	smAABB tempAABB;
 
-
 	for(smInt i=0;i<p_triangles.size();i++){
 		for(smInt j=0;j<nbrDivision;j++){
-			//tempAABB.aabbMin=cubes[j].leftMinCorner();
-			//tempAABB.aabbMax=cubes[j].rightMaxCorner();		
-
-
-			if(subDividedNodes[j].isCollidedWithTri(mesh->vertices[mesh->triangles[p_triangles[i]].vert[0]],
-				mesh->vertices[mesh->triangles[p_triangles[i]].vert[1]],
-				mesh->vertices[mesh->triangles[p_triangles[i]].vert[2]]))
-			{	
-				//subDividedNodes[j].triangleIndices.insert(p_triangles[i]);
+			if(subDividedNodes[j].isCollidedWithTri(
+                        mesh->vertices[mesh->triangles[p_triangles[i]].vert[0]],
+                        mesh->vertices[mesh->triangles[p_triangles[i]].vert[1]],
+                        mesh->vertices[mesh->triangles[p_triangles[i]].vert[2]])){
 				triangles[j]->push_back(p_triangles[i]);
-
-			} 
-			/*if(subDividedNodes[j].isCollided(mesh->vertices[mesh->triangles[p_triangles[i]].vert[0]],
-			mesh->vertices[mesh->triangles[p_triangles[i]].vert[1]],
-			mesh->vertices[mesh->triangles[p_triangles[i]].vert[2]])){
-			subDividedNodes[j]->attach(p_triangles[i]);
-
-
-			}*/
-
+			}
 		}
-
 	}
+
 	smInt index;
 	smInt parentLevel=(p_level-1);
 	if(p_level==0)
 		parentLevel=0;
 
-
 	smInt offset=nbrDivision*(p_siblingIndex-levelStartIndex[parentLevel].startIndex);
 	if(p_level==0)
 		offset=0;
 
-	for(smInt j=0;j<nbrDivision;j++)
-	{
+	for(smInt j=0;j<nbrDivision;j++){
+
 		index=levelStartIndex[p_level].endIndex+offset+j;
-		//cout<<" p_siblingIndex:"<<p_siblingIndex<<" j:"<<j<<"Index:"<<index<<endl;
 		if(triangles[j]->size()>0){
-			//cout<<"INDEX:"<<index<<endl;
-			//if(index>totalCells)
-			//	cout<<"ERRORRR"<<endl;
 			treeAllLevels[index].copyShape(subDividedNodes[j]);	
 			treeAllLevels[index].level=p_level+1;
 			treeAllLevels[index].filled=true;
-			//octreeAllLevels[index].parent=&p_Node;
 			createTree(treeAllLevels[index],*triangles[j],p_level+1,j+levelStartIndex[p_level].startIndex+offset);
 		}
 		else
@@ -494,26 +272,23 @@ smBool smSurfaceTree<smSurfaceTreeCell>::createTree(smSurfaceTreeCell &p_Node,ve
 
 	delete[] subDividedNodes;
 	return true;
-
-
 }
 
-template <typename smSurfaceTreeCell>
-smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_LevelIterator(smInt p_level) 
-{
-    smSurfaceTreeIterator<smSurfaceTreeCell> iter(this);
+template <typename smSurfaceTreeCell> 
+                smSurfaceTreeIterator<smSurfaceTreeCell> smSurfaceTree<smSurfaceTreeCell>
+                ::get_LevelIterator(smInt p_level){
+
+	smSurfaceTreeIterator<smSurfaceTreeCell> iter(this);
 	iter.startIndex=iter.currentIndex=this->levelStartIndex[p_level].startIndex;
 	iter.endIndex=this->levelStartIndex[p_level].endIndex;
 	iter.currentLevel=p_level;
 	return iter;
 }
 
-
-
 template <typename smSurfaceTreeCell>
-smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_LevelIterator() 
-{
-    smSurfaceTreeIterator<smSurfaceTreeCell> iter(this);
+smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_LevelIterator(){
+
+	smSurfaceTreeIterator<smSurfaceTreeCell> iter(this);
 	iter.startIndex=iter.currentIndex=this->levelStartIndex[currentLevel].startIndex;
 	iter.endIndex=this->levelStartIndex[currentLevel].endIndex;
 	iter.currentLevel=currentLevel;
@@ -521,76 +296,42 @@ smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_
 }
 
 template <typename smSurfaceTreeCell>
-void smSurfaceTree<smSurfaceTreeCell>::updateStructure(){
-	smSurfaceTreeCell *current;
-	
-	for(smInt i=levelStartIndex[maxLevel-1].startIndex;i<levelStartIndex[maxLevel-1].endIndex;i++)
-	{	
+                       void smSurfaceTree<smSurfaceTreeCell>::updateStructure(){
 
-		current=&treeAllLevels[i];					
-		smInt nbrVertices=current->verticesIndices.size();	
+	smSurfaceTreeCell *current;
+	for(smInt i=levelStartIndex[maxLevel-1].startIndex;i<levelStartIndex[maxLevel-1].endIndex;i++){
+
+		current=&treeAllLevels[i];
+		smInt nbrVertices=current->verticesIndices.size();
 		smVec3f tempCenter(0,0,0);
 		smInt counter=0;
+		
 		if(current->filled){
-			for(set<smInt>::iterator it=current->verticesIndices.begin();it!=current->verticesIndices.end();it++)
-			{	
-
-				
+			for(set<smInt>::iterator it=current->verticesIndices.begin();
+                                       it!=current->verticesIndices.end();it++){
 				tempCenter=tempCenter+(mesh->vertices[*it]-mesh->origVerts[*it])*current->weights[counter];
 				counter++;
 			}
-			current->cube.center=tempCenter;//+p_current.originalCubeCenter;
+			current->cube.center=tempCenter;
 		}
 	}
-
-
-	
-
-	//p_current.sphere.center=p_current.cube.center;
-
-
-
 }
+
 template <typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::translateRot(){
+
 	smSurfaceTreeCell *current;
 	smSurfaceTreeCell *initial;
-	
-	for(smInt i=levelStartIndex[maxLevel-1].startIndex;i<levelStartIndex[maxLevel-1].endIndex;i++)
-	{	
 
-		current=&treeAllLevels[i];					
+	for(smInt i=levelStartIndex[maxLevel-1].startIndex;
+                                    i<levelStartIndex[maxLevel-1].endIndex;i++){
+
+		current=&treeAllLevels[i];
 		initial=&initialTreeAllLevels[i];
-		
-		
-		
+
 		if(current->filled){
 			current->cube.center=transRot*initial->cube.center;
-		
+
 		}
 	}
- 
-
-
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

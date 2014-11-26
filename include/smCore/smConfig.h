@@ -1,28 +1,9 @@
-/*****************************************************
-                  SOFMIS LICENSE
-
+/*
+****************************************************
+				SimMedTK LICENSE
 ****************************************************
 
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
-
-    \author:    Module by Tansel Halic
-                
-                
-    \version    1.0
-    \date       04/2009
-    \bug	    None yet
-    \brief	    This Module declares framework overall configuration params. It should be included by all
-                Header files in the framwork. Any definition that is not for all core framework 
-                should not be stated here.
-
-*****************************************************
+****************************************************
 */
 
 #ifndef SMCONFIG_H
@@ -48,29 +29,28 @@ using namespace std;
 
 #endif
 
-#define SOFMISVERSION    1.0
-#define SOFMISVERSION_TEXT  "SoFMIS Version 1.0-2009"
+#define SOFMISVERSION 1.0
+#define SOFMISVERSION_TEXT "SoFMIS Version 1.0-2009"
 
 #undef QT_NO_CAST_FROM_ASCII
 #undef QT_NO_CAST_TO_ASCII
 
 #include <QString>
-//#include <string>
 #include "float.h"
+
 ///General type definitions
-#define smInt			int        
-#define smFloat			float   
-#define smDouble		double 
+#define smInt			int
+#define smFloat			float
+#define smDouble		double
 #define smShort			short
-#define smChar			char		//note that smChar is used for pointer iteration over the memory block.Don't change this unless you know what you're doing
+#define smChar			char	//note that smChar is used for pointer iteration over the memory block.Don't change this unless you know what you're doing
 #define smBool			bool
 #define smLongInt		long int
 #define smLongDouble	long double
-//#define smString		string
-//#define smString    QString
+
 
 class smString:public QString{
-	public:
+public:
 	//smChar *c_str();
 	smString & operator=(smChar*p_param);
 };
@@ -78,18 +58,16 @@ class smString:public QString{
 
 #define smUInt32     uint32_t
 #define smUInt64     uint64_t
-#define smUInt       unsigned int        
-#define smUFloat     unsigned float   
-#define smUDouble    unsigned double 
+#define smUInt       unsigned int
+#define smUFloat     unsigned float
+#define smUDouble    unsigned double
 #define smUShort     unsigned short
 #define smUChar      unsigned char		//note that smChar is used for pointer iteration over the memory block.Don't change this unless you know what you're doing  
-#define smReal			smFloat  
+#define smReal			smFloat
 
 #define smLongInt	 long int
 #define smLongFloat	 long float
 #define smLongDouble long double
-
-
 
 ///Type declarations for OPENGL
 #define smGLReal		GLfloat
@@ -98,19 +76,15 @@ class smString:public QString{
 #define smGLInt			GLint
 #define smGLUInt		GLuint
 
-
 ///Type conversion to OPENGL
 #define smGLFloatType   GL_FLOAT
 #define smGLRealType    GL_FLOAT
 #define smGLIntType		GL_INT
 #define smGLUIntType	GL_UNSIGNED_INT
 #define smGLUShortType  GL_UNSIGNED_SHORT
-
 #define smMAXFLOAT		FLT_MAX
 
-
-enum SOFMIS_TYPEINFO
-{
+enum SOFMIS_TYPEINFO{
 	SOFMIS_TYPE_INT,
 	SOFMIS_TYPE_FLOAT,
 	SOFMIS_TYPE_DOUBLE,
@@ -130,11 +104,6 @@ enum SOFMIS_TYPEINFO
 	SOFMIS_TYPE_GLUINT
 };
 
-
-
-
-
-
 #define SOFMIS_MAX_FILENAME_LENGTH   500
 #define SOFMIS_MAX_ERRORLOG_TEXT     500
 #define SOFMIS_MAX_ERRORLOG          100
@@ -145,23 +114,23 @@ enum SOFMIS_TYPEINFO
 
 //Each class should have type of itself
 enum smClassType{
-    SOFMIS_RESERVED,           
-    SOFMIS_SMVEC3,           
-    SOFMIS_SMMATH,           
-    SOFMIS_SMATRIX33,        
-    SOFMIS_SMATRIX44,        
-    SOFMIS_SMSHADER,
-    SOFMIS_SMERRORLOG,
-    SOFMIS_SMDISPLAYTEXT,
-    SOFMIS_SMSCENEBOJECT,
-    SOFMIS_SMSCENE,
-    SOFMIS_SMSDK,
-    SOFMIS_SMDISPATHCER,
-    SOFMIS_SMVIEWER,
-    SOFMIS_SMSIMULATOR,
-    SOFMIS_SMCOLLISIONDETECTION,
-    SOFMIS_SMMESH,
-    SOFMIS_SMSTATICSCENEOBJECT,
+	SOFMIS_RESERVED,
+	SOFMIS_SMVEC3,
+	SOFMIS_SMMATH,
+	SOFMIS_SMATRIX33,
+	SOFMIS_SMATRIX44,
+	SOFMIS_SMSHADER,
+	SOFMIS_SMERRORLOG,
+	SOFMIS_SMDISPLAYTEXT,
+	SOFMIS_SMSCENEBOJECT,
+	SOFMIS_SMSCENE,
+	SOFMIS_SMSDK,
+	SOFMIS_SMDISPATHCER,
+	SOFMIS_SMVIEWER,
+	SOFMIS_SMSIMULATOR,
+	SOFMIS_SMCOLLISIONDETECTION,
+	SOFMIS_SMMESH,
+	SOFMIS_SMSTATICSCENEOBJECT,
 	SOFMIS_SMOBJECTSIMULATOR,
 	SOFMIS_SMPBDSIMULATOR,
 	SOFMIS_SMFEMSCENEOBJECT,
@@ -180,51 +149,44 @@ enum smClassType{
 	SOFMIS_SMPTSCENEOBJECT,
 	SOFMIS_SMLOOPSCENEOBJECT,
 	SOFMIS_SMLOOPBASESCENEOBJECT,
-
 	SOFMIS_SMTHREADSCENEOBJECT,
 	SOFMIS_SMVESSELSCENEOBJECT,
-	
 	SOFMIS_SMGAUZESCENEOBJECT,
 	SOFMIS_SMSPONGESCENEOBJECT,
-
 	SOFMIS_SMRIGIDNOTESCHOLYSCENEOBJECT,
-
 	SOFMIS_SMSOLDIERSCENEOBJECT
- };
+};
 
 ///these are the dispather return events
 enum smDispathcerResult{
-    SOFMIS_DISPATCHER_OK,
-    SOFMIS_DISPATCHER_ERROR,
+	SOFMIS_DISPATCHER_OK,
+	SOFMIS_DISPATCHER_ERROR,
 };
 
 ///caller should send when it calls 
 enum smCallerState{
-    SOFMIS_CALLERSTATE_BEGINFRAME,
-    SOFMIS_CALLERSTATE_ENDFRAME,
-    SOFMIS_CALLERSTATE_BEGINOBJECTFRAME,
-    SOFMIS_CALLERSTATE_ENDOBJECTFRAME,
+	SOFMIS_CALLERSTATE_BEGINFRAME,
+	SOFMIS_CALLERSTATE_ENDFRAME,
+	SOFMIS_CALLERSTATE_BEGINOBJECTFRAME,
+	SOFMIS_CALLERSTATE_ENDOBJECTFRAME,
 
 };
+
 ///Events of the dispatcher.not used and implemented yet.
 enum smDispatcherEvent{
-    SOFMIS_EVENT_UPDATESCENE,
+	SOFMIS_EVENT_UPDATESCENE,
 };
-
 
 enum smClassDrawOrder{
-  SOFMIS_DRAW_BEFOREOBJECTS,
-  SOFMIS_DRAW_AFTEROBJECTS
+	SOFMIS_DRAW_BEFOREOBJECTS,
+	SOFMIS_DRAW_AFTEROBJECTS
 };
 
-
 ///SOFMIS uses opengl now. So all API should have the definition.
-#define SOFMIS_OPENGL_SHADER  1
-
+#define SOFMIS_OPENGL_SHADER 1
 
 #undef _UNICODE
 #define NOMINMAX
-
 
 #ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
 	#define inline  __forceinline
@@ -235,17 +197,14 @@ enum smClassDrawOrder{
 #define SOFMIS_MIN(X,Y) (X<Y?X:Y)
 #define SOFMIS_MAX(X,Y) (X>Y?X:Y)
 
+ostream &operator<<(ostream &p_os,smString &p_param);
 
-
- ostream &operator<<(ostream &p_os,smString &p_param);
-
-
- class smSDK;
- class smViewer;
- class smScene;
- class smPipe;
- template<typename T> class smIndiceArray;
- typedef smIndiceArray<smPipe>  smIndiceArrayPipe;
+class smSDK;
+class smViewer;
+class smScene;
+class smPipe;
+template<typename T> class smIndiceArray;
+typedef smIndiceArray<smPipe>  smIndiceArrayPipe;
 
 #endif
 
