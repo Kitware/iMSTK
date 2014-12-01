@@ -25,13 +25,13 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 
 	getToolCalibrationData();
 	setTool();
-	
+
 	minValue[0] = -1.35;	minValue[1] = -1.35;
 	maxValue[0] = 3.60;		maxValue[1] = 3.60;
 
 	invRange[0] = 1.0/(maxValue[0]- minValue[0]);
 	invRange[1] = 1.0/(maxValue[1]- minValue[1]);
-	
+
 	/*********************************************/
 	// DAQmx Configure Code
 	/*********************************************/
@@ -49,18 +49,18 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			break;
 		case 3: // ligating loop: ligating loop, shear, grasper
-			//2 3 4 
+			//2 3 4
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai2","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai3","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai4","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			break;
 		case 4: // intracorporeal suturing: needle driver, needle driver
-			// 5 6 
+			// 5 6
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai5","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai6","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			break;
 		case 5:	// extracorporeal suturing: needle driver, needle driver, knot pusher
-			// 5 6 7 			
+			// 5 6 7
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai5","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai6","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));
 			initNI_Error(DAQmxCreateAIVoltageChan(taskHandle,"Dev1/ai7","",DAQmx_Val_RSE,-10.0,10.0,DAQmx_Val_Volts,NULL));	//DAQmx_Val_Cfg_Default
@@ -76,12 +76,12 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 	initNI_Error(DAQmxCfgSampClkTiming(taskHandle,"",1000.0,DAQmx_Val_Rising,DAQmx_Val_ContSamps,1000));
 	initNI_Error(DAQmxRegisterEveryNSamplesEvent(taskHandle,DAQmx_Val_Acquired_Into_Buffer,10,0,EveryNCallback,this));
 	initNI_Error(DAQmxRegisterDoneEvent(taskHandle,0,DoneCallback,this));
-	
+
 	/*********************************************/
 	// DAQmx Start Code
 	/*********************************************/
 	initNI_Error(DAQmxStartTask(taskHandle));
-	
+
 	if(initCount==0){
 		printf("NI DAQ USB-6008 is working \n");
 		NI_on = true;
@@ -94,7 +94,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID){
 	}
 
 	NIUSB6008pipe = new smPipe("NIUSB6008_Data",sizeof(NIUSB6008Data),10);
-	aveData[0] = aveData[1] = 0.0;	
+	aveData[0] = aveData[1] = 0.0;
 }
 
 /// \brief
@@ -174,16 +174,16 @@ void smNIUSB6008Interface::setTool()
 			getToolData(nbrActiveChannel, activeChannel);
 			break;
 		case 4: // intracorporeal suturing: needle driver, needle driver
-			// 5 6 
+			// 5 6
 			nbrActiveChannel = 2;
 			break;
 		case 5:	// extracorporeal suturing: needle driver, needle driver, knot pusher
-			// 5 6 7 
+			// 5 6 7
 			nbrActiveChannel = 3;
 			break;
 		case 6:		//NOTES
 			nbrActiveChannel  = 2;
-			activeChannel[0] = 2
+			activeChannel[0] = 2;
 			activeChannel[1] = 3;
 			getToolData(nbrActiveChannel, activeChannel);
 
@@ -244,7 +244,7 @@ smNIUSB6008Interface::~smNIUSB6008Interface(){
 
 	DAQmxStopTask(taskHandle);
 	DAQmxClearTask(taskHandle);
-	
+
 	delete NIUSB6008pipe;
 	delete [] regTool;
 }
@@ -257,7 +257,7 @@ void smNIUSB6008Interface::sendDataToPipe(){
 	smFloat tF;
 	smInt cid;
 	pipeData->on = NI_on;
-	
+
 	for(smInt i=0;i<nbrActiveChannel;i++){
 		cid = activeChannel[i];
 		tF = (aveData[i] - installedTool[cid].min) * installedTool[cid].invRange;
@@ -321,7 +321,7 @@ Error:
 		/*********************************************/
 		DAQmxStopTask(taskHandle);
 		DAQmxClearTask(taskHandle);
-		printf("DAQmx Error: %s\n",errBuff);		
+		printf("DAQmx Error: %s\n",errBuff);
 	}
 	return 0;
 }

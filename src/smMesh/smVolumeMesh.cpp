@@ -6,7 +6,7 @@ smVolumeMesh::smVolumeMesh(smMeshType p_meshtype, smErrorLog *log=NULL){
 
 	this->log_VM=log;
 	meshType = p_meshtype;
-	
+
 }
 
 /// \brief loads the specified volume mesh
@@ -172,7 +172,7 @@ smBool smVolumeMesh::getSurface(const smChar *fileName){
 	}
 
 	initVertexArrays(count);
-	
+
 	for(i=0; i<nbrTriangles; i++){
 		triangles[i].vert[0] = temp[surfaceRelation[i].vert[0]-1];
 		triangles[i].vert[1] = temp[surfaceRelation[i].vert[1]-1];
@@ -186,11 +186,11 @@ smBool smVolumeMesh::getSurface(const smChar *fileName){
 		if(onSurface[i]){
 			surfaceNodeIndex[count] = i;
 			count++;
-		}		
+		}
 	}
 
-	//copy the co-ordinates of the surface vertices	
-	initSurface();	
+	//copy the co-ordinates of the surface vertices
+	initSurface();
 
 	delete []temp;
 	delete []onSurface;
@@ -211,8 +211,8 @@ smBool smVolumeMesh::readBC(const smChar *fileName){
 	if(!fp)
 		return false;
 
-	smInt numNodes=311;/
-	
+	smInt numNodes=311;
+
 	for(i=0; i<numNodes; i++){
 		fscanf(fp,"%d",&number);
 		fixed[number-1] = true;
