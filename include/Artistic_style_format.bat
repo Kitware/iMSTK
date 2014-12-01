@@ -1,0 +1,1 @@
+cmd AStyle --mode=c --indent=tab --indent-classes --indent-cases --indent-namespaces --indent-preproc-block --delete-empty-lines --align-pointer=name --align-reference=name --max-code-length=92 --break-after-logical smViewer.cpp

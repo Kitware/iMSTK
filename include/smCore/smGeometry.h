@@ -1,35 +1,18 @@
 /*
 ****************************************************
-SOFMIS LICENSE
-
+				SimMedTK LICENSE
 ****************************************************
 
-\author:    <http:\\acor.rpi.edu>
-SOFMIS TEAM IN ALPHABATIC ORDER
-Anderson Maciel, Ph.D.
-Ganesh Sankaranarayanan, Ph.D.
-Sreekanth A Venkata
-Suvranu De, Ph.D.
-Tansel Halic
-Zhonghua Lu
-
-\author:    Module by Tansel Halic
-
-
-\version    1.0
-\date       04/2009
-\bug	    None yet
-\brief	    This Module has the data strutures and some utility functions. 
-
-*****************************************************
+****************************************************
 */
 
 #ifndef SMGEOMETRY_H
 #define SMGEOMETRY_H
+
 #include "smCore/smConfig.h"
 #include "smUtilities/smVec3.h"
 
-#define SMALL_NUM   0.00000001 
+#define SMALL_NUM 0.00000001 
 
 //forward declaration
 struct smSphere;
@@ -50,13 +33,15 @@ struct smAABB{
 		aabbMax.setValue(0,0,0);
 
 	}
+
 	inline smVec3f center(){
 		return smVec3f((aabbMin.x+aabbMax.x)/2.0,
 		               (aabbMin.y+aabbMax.y)/2.0,
 		               (aabbMin.z+aabbMax.z)/2.0);
 	}
-	static inline smBool checkOverlap( smAABB &p_aabbA,  smAABB &p_aabbB)
-	{
+
+	static inline smBool checkOverlap( smAABB &p_aabbA,  smAABB &p_aabbB){
+
 		if( p_aabbA.aabbMin.x > p_aabbB.aabbMax.x || 
 			p_aabbA.aabbMax.x < p_aabbB.aabbMin.x ||
 			p_aabbA.aabbMin.y > p_aabbB.aabbMax.y ||
@@ -67,11 +52,13 @@ struct smAABB{
 		else
 			return true;
 	}
+
 	inline smAABB &operator=(smAABB &p_aabb){
 		aabbMax=p_aabb.aabbMax;
 		aabbMin=p_aabb.aabbMin;
 		return *this;
 	}
+
 	inline smAABB &operator*(smFloat p_scale){
 		aabbMin=aabbMin*p_scale;
 		aabbMax=aabbMax*p_scale;
@@ -84,9 +71,11 @@ struct smAABB{
 	inline void subDivide(smInt p_division,smAABB *p_aabb){
 		subDivide(p_division,p_division,p_division,p_aabb);
 	}
+
 	inline smFloat halfSizeX(){
 		return (aabbMax.x-aabbMin.x)/2.0;
 	}
+
 	inline smFloat halfSizeY(){
 		return (aabbMax.y-aabbMin.y)/2.0;
 	}
@@ -124,8 +113,8 @@ public:
 	                      smVec3<smFloat> &p_tri2Point2,
 	                      smVec3<smFloat> &p_tri2Point3);
 
-	static inline bool checkOverlapAABBAABB( smAABB &aabbA,  smAABB &aabbB, smAABB &result)
-	{
+	static inline bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB, smAABB &result){
+
 		if( aabbA.aabbMin.x > aabbB.aabbMax.x || 
 			aabbA.aabbMax.x < aabbB.aabbMin.x ||
 			aabbA.aabbMin.y > aabbB.aabbMax.y ||
@@ -146,8 +135,8 @@ public:
 		}
 	}
 
-	static inline bool checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB)
-	{
+	static inline bool checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB){
+
 		if( aabbA.aabbMin.x > aabbB.aabbMax.x ||
 			aabbA.aabbMax.x < aabbB.aabbMin.x ||
 			aabbA.aabbMin.y > aabbB.aabbMax.y ||
@@ -159,8 +148,8 @@ public:
 			return true;
 	}
 
-	static inline bool checkOverlapAABBAABB( smAABB &aabbA,smVec3<smFloat> &p_vertex)
-	{
+	static inline bool checkOverlapAABBAABB( smAABB &aabbA,smVec3<smFloat> &p_vertex){
+
 		if( aabbA.aabbMin.x <= p_vertex.x &&	aabbA.aabbMax.x >= p_vertex.x &&
 			aabbA.aabbMin.y <= p_vertex.y &&	aabbA.aabbMax.y >= p_vertex.y &&
 			aabbA.aabbMin.z <= p_vertex.z &&	aabbA.aabbMax.z >= p_vertex.z )
@@ -177,6 +166,7 @@ public:
 	                           smVec3<smFloat> &p_interSection);
 
 	static smBool checkAABBTriangle(smAABB &p_aabb,smVec3f v1,smVec3f v2,smVec3f v3);
+
 	static inline smBool checkAABBPoint(smAABB &p_aabb,smVec3f p_v){
 		if (p_v.x >= p_aabb.aabbMin.x &&
 			p_v.y >= p_aabb.aabbMin.y &&
@@ -191,6 +181,7 @@ public:
 };
 
 struct smSphere{
+
 public:
 	smVec3f center;
 	smFloat radius;
@@ -199,6 +190,7 @@ public:
 		center.setValue(0,0,0);
 		radius=1.0;
 	}
+
 	inline smSphere(smVec3f p_center,smFloat p_radius){
 		radius=p_radius;
 		center=p_center;
@@ -206,6 +198,7 @@ public:
 };
 
 struct smCube{
+
 	smVec3f center;
 	smFloat sideLength;
 
@@ -233,25 +226,39 @@ struct smCube{
 					index++;
 				}
 	}
+
 	inline void expand(smFloat p_expansion){
 		sideLength=sideLength+sideLength*p_expansion;
 	}
+
 	inline smVec3f leftMinCorner(){
-		return smVec3f(center.x-sideLength*0.5,center.y-sideLength*0.5,center.z-sideLength*0.5);
+		return smVec3f(center.x-sideLength*0.5,
+                       center.y-sideLength*0.5,
+                       center.z-sideLength*0.5);
 	}
+
 	inline smVec3f rightMaxCorner(){
-		return smVec3f(center.x+sideLength*0.5,center.y+sideLength*0.5,center.z+sideLength*0.5);
+		return smVec3f(center.x+sideLength*0.5,
+                       center.y+sideLength*0.5,
+                       center.z+sideLength*0.5);
 	}
+
 	inline smSphere getCircumscribedSphere(){
 		return smSphere(center,0.866025*sideLength);
 	}
+
 	inline smSphere getInscribedSphere(){
 		return smSphere(center,sideLength*0.5);
 	}
+
 	inline smSphere getTangent2EdgeSphere(){
 		return smSphere(center,sideLength*0.707106);
 	}
 };
 
-int intersect3D_RayTriangleWithBarycentric( smVec3f P0, smVec3f P1, smVec3f V0, smVec3f V1, smVec3f V2, smVec3f *I,float &p_baryU, float &p_baryV, float &p_baryW,bool considerFrontFaceOnly);
+int intersect3D_RayTriangleWithBarycentric( smVec3f P0, smVec3f P1, smVec3f V0,
+                                            smVec3f V1, smVec3f V2, smVec3f *I,
+                                            float &p_baryU, float &p_baryV,
+                                            float &p_baryW,bool considerFrontFaceOnly);
+
 #endif

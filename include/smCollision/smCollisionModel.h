@@ -1,35 +1,15 @@
 /*
 ****************************************************
-SOFMIS LICENSE
-
+				SimMedTK LICENSE
 ****************************************************
 
-\author:    <http:\\acor.rpi.edu>
-SOFMIS TEAM IN ALPHABATIC ORDER
-Anderson Maciel, Ph.D.
-Ganesh Sankaranarayanan, Ph.D.
-Sreekanth A Venkata
-Suvranu De, Ph.D.
-Tansel Halic
-Zhonghua Lu
-
-\author:    Module by Tansel Halic
-
-
-\version    1.0
-\date       05/2009
-\bug	    None yet
-\brief	    This class is the simulator object. Each simulator should derive this.
-
-
-
-*****************************************************
+****************************************************
 */
+
 #ifndef SMCOLLISIONMODEL_H
 #define SMCOLLISIONMODEL_H
 
 #include <set>
-
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smEventHandler.h"
@@ -43,21 +23,21 @@ Zhonghua Lu
 class smEvent;
 class smSurfaceMesh;
 
-
-
-
-
-
 template <typename T>
 struct smSurfaceTreeCell{
+
 public:
-    smBool filled;
+	smBool filled;
 	smShort level;
+	set<smInt> verticesIndices;
+	vector<smFloat> weights;
+
 	smSurfaceTreeCell(){
+
 		filled=false;
 		level=0;
 	}
-	 
+
 	inline void subDivide(smInt p_divisionPerAxis,T*);
 	inline smBool isCollidedWithTri(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2);
 	inline smBool isCollidedWithPoint(smVec3f p_point);
@@ -67,105 +47,83 @@ public:
 	inline void copyShape(T &);
 	inline smVec3f getCenter()  const;
 	inline smFloat getLength();
-	set<smInt> verticesIndices;
-	vector<smFloat> weights;
-	//set<smInt> triangleIndices;
-
-
-	
-	
 };
+
 struct smOctreeCell:public smSurfaceTreeCell<smOctreeCell>{
-	   smCube cube;
-	   inline smVec3f getCenter() const 
-	   {
-		   return  cube.center;
 
-	   }
-	   inline void setCenter(smVec3f p_center){
-		   cube.center=p_center;
-	   }
-	   inline smFloat getLength(){
-		   return cube.sideLength;
-	   }
-	   inline void copyShape(smOctreeCell p_cell)	{
-		   cube=p_cell.cube;
-	   }
-	   inline void expand(smFloat p_expandScale){
-		   cube.expand(p_expandScale);
-	   
-	   }
-	   inline void setLength(smFloat p_length){
-		   cube.sideLength=p_length;
-	   }
-	   inline smBool isCollidedWithTri(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2){
-		   smAABB tempAABB;
-		   tempAABB.aabbMin=cube.leftMinCorner();
-		   tempAABB.aabbMax=cube.rightMaxCorner();
-		   return smCollisionUtils::checkAABBTriangle(tempAABB,p_v0,p_v1,p_v2);
-   
-	   }
-	   inline smBool isCollidedWithPoint(){
-	   
-	   }
-	   inline void subDivide(smInt p_divisionPerAxis,smOctreeCell *p_cells){
-		   smInt totalCubes=p_divisionPerAxis*p_divisionPerAxis*p_divisionPerAxis;
-		   smCube *tempCubes=new smCube[totalCubes];
-		   cube.subDivide(p_divisionPerAxis,tempCubes);
-		   for(smInt i=0;i<totalCubes;i++){
-			   p_cells[i].cube=tempCubes[i];
-		   }
+	smCube cube;
+	
+	inline smVec3f getCenter() const {
+		return  cube.center;
+	}
 
-	   
-	   
-	   }
-	   
+	inline void setCenter(smVec3f p_center){
+		cube.center=p_center;
+	}
+
+	inline smFloat getLength(){
+		return cube.sideLength;
+	}
+
+	inline void copyShape(smOctreeCell p_cell){
+		cube=p_cell.cube;
+	}
+
+	inline void expand(smFloat p_expandScale){
+		cube.expand(p_expandScale);
+	}
+
+	inline void setLength(smFloat p_length){
+		cube.sideLength=p_length;
+	}
+
+	inline smBool isCollidedWithTri(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2){
+		smAABB tempAABB;
+		tempAABB.aabbMin=cube.leftMinCorner();
+		tempAABB.aabbMax=cube.rightMaxCorner();
+		return smCollisionUtils::checkAABBTriangle(tempAABB,p_v0,p_v1,p_v2);
+	}
+
+	inline smBool isCollidedWithPoint(){
+	}
+
+	inline void subDivide(smInt p_divisionPerAxis,smOctreeCell *p_cells){
+
+		smInt totalCubes=p_divisionPerAxis*p_divisionPerAxis*p_divisionPerAxis;
+		smCube *tempCubes=new smCube[totalCubes];
+		cube.subDivide(p_divisionPerAxis,tempCubes);
+		for(smInt i=0;i<totalCubes;i++){
+			p_cells[i].cube=tempCubes[i];
+		}
+	}
 
 };
 
 
 
 struct smOctree:public smSurfaceTreeCell<smOctree>{
-	  smOctree(){
-		 /* for(smInt i=0;i<SOFMIS_OCTREE_CHILDREN;i++)
-			children[i]=NULL;*/
-		  triagleIndices.clear();
-		 
-		
-		  //parent=NULL;
-		  //clusterCentroid.setValue(0,0,0);
-		  //distanceFromCluster.setValue(0,0,0);
-		  filled=false;
-	
-	  }
-	  
 
-	 smCube cube;
-	 smVec3f originalCubeCenter;
-	 smSphere sphere;
-	 
-     vector<smInt> triagleIndices;
-	 set<smInt> verticesIndices;
-	 vector<smFloat> weights;
- 
-	 //smVec3f clusterCentroid;
-	 //smVec3f distanceFromCluster;
-	 
-	 inline void subDivide(smInt p_division, smOctreeCell *p_cells);
-	 inline smBool isCollided(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2);
-	 inline void expand(smFloat p_expansion);
+	smOctree(){
+		triagleIndices.clear();
+		filled=false;
+	}
 
+	smCube cube;
+	smVec3f originalCubeCenter;
+	smSphere sphere;
 
-														   
-															   
-	 
-	 
+	vector<smInt> triagleIndices;
+	set<smInt> verticesIndices;
+	vector<smFloat> weights;
+
+	inline void subDivide(smInt p_division, smOctreeCell *p_cells);
+	inline smBool isCollided(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2);
+	inline void expand(smFloat p_expansion);
 };
 
 struct smLevelIndex{
 	smInt startIndex;
 	smInt endIndex;
-
 };
 
 enum SOFMIS_TREETYPE{
@@ -174,18 +132,10 @@ enum SOFMIS_TREETYPE{
 };
 
 
-//
-//template <typename T>
-//struct smCollisionModelPrimIterator{
-//	inline operator++(){
-//
-//	}
-//
-//};
 template<typename smSurfaceTreeCell> class smSurfaceTree;
 
-template <typename T>
-class smCollisionModelIterator{
+template <typename T> class smCollisionModelIterator{
+
 public:
 	smInt startIndex;
 	smInt currentIndex;
@@ -196,13 +146,12 @@ public:
 	inline smInt end();
 	inline void operator++();
 	inline void operator--();
-	//inline T operator=() const;
 	inline T operator[](smInt p_index);
 };
 
 
-template<typename T>
-class smCollisionModel:public smCoreClass{
+template<typename T> class smCollisionModel:public smCoreClass{
+
 public:
 	inline void initStructure();
 	inline void reCreateStructure();
@@ -213,43 +162,45 @@ public:
 	smCollisionModelIterator<T>  get_LevelIterator() ;
 };
 
+template<typename smSurfaceTreeCell>struct smSurfaceTreeIterator:
+                             public smCollisionModelIterator<smSurfaceTreeCell>{
 
-template<typename smSurfaceTreeCell>
-struct smSurfaceTreeIterator: public smCollisionModelIterator<smSurfaceTreeCell>
-{
 	using smCollisionModelIterator<smSurfaceTreeCell>::startIndex;
 	using smCollisionModelIterator<smSurfaceTreeCell>::endIndex;
 	using smCollisionModelIterator<smSurfaceTreeCell>::currentIndex;
+
 public:
 	smSurfaceTree<smSurfaceTreeCell> *tree;
+
 	smSurfaceTreeIterator( smSurfaceTree<smSurfaceTreeCell> *  p_tree){
 		tree=p_tree;
-	
 	}
-	inline void operator++()
-	{
+
+	inline void operator++(){
 		currentIndex++;
 	}
-	inline void operator--()
-	{
+
+	inline void operator--(){
 		currentIndex--;
 	}
-	inline smSurfaceTreeCell& operator[](smInt p_index)const
-	{
+
+	inline smSurfaceTreeCell& operator[](smInt p_index)const{
 		return tree->treeAllLevels[p_index];
-	
 	}
+
 	inline void setLevel(smInt p_level){
 		startIndex = tree->levelStartIndex[p_level].startIndex;
 		endIndex = tree->levelStartIndex[p_level].endIndex;
-	
 	}
+
 	inline void resetIteration(){
 		currentIndex = startIndex;
 	}
+
 	inline smInt start(){
 		return startIndex;
 	}
+
 	inline smInt end(){
 		return endIndex;
 	}
@@ -257,15 +208,12 @@ public:
 	friend smSurfaceTree<smSurfaceTreeCell>;
 };
 
-template<typename smSurfaceTreeCell>
-class smSurfaceTree:public smCollisionModel<smSurfaceTreeCell>,public smEventHandler{
+template<typename smSurfaceTreeCell> class smSurfaceTree:
+                            public smCollisionModel<smSurfaceTreeCell>,public smEventHandler{
 
 	protected:
-		
 		smSurfaceMesh *mesh;
 		smInt nbrDivision;
-		
-		//smInt maxPrimPerCell;
 		smInt minTreeRenderLevel;
 		smBool renderSurface;
 		smBool enableShiftPos;
@@ -274,52 +222,33 @@ class smSurfaceTree:public smCollisionModel<smSurfaceTreeCell>,public smEventHan
 		smInt totalCells;
 		smLevelIndex *levelStartIndex;
 		smInt currentLevel;
-		smBool createTree(smSurfaceTreeCell &p_Node,vector<smInt> &p_triangles,smInt p_level, smInt p_siblingIndex);
-		
+		smBool createTree(smSurfaceTreeCell &p_Node, vector<smInt> &p_triangles,
+                          smInt p_level, smInt p_siblingIndex);
+
 	public:
-		
-
-		
 		smMatrix44 <smDouble> transRot;
-
 		smInt maxLevel;
-		//smOctree root;
 		smSurfaceTreeCell root;
 		smFloat shiftScale;
 
 		smSurfaceTreeCell *initialTreeAllLevels;
 		smSurfaceTreeCell *treeAllLevels;
-	   void initDraw(smDrawParam p_param);
+
+		void initDraw(smDrawParam p_param);
 		~smSurfaceTree();
-		
 		smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType);
-		
 		void initStructure();
-		
-	
 		smSurfaceTreeIterator<smSurfaceTreeCell>  get_LevelIterator(smInt p_level) ;
 		smSurfaceTreeIterator<smSurfaceTreeCell>  get_LevelIterator() ;
-		
-	
 
 		inline smUnifiedID getAttachedMeshID(){
 			return mesh->uniqueId;
 		}
 
-		
-		 virtual void draw(smDrawParam p_params);
-		 void handleEvent(smEvent *p_event);
-		 void updateStructure();
-		
+		virtual void draw(smDrawParam p_params);
+		void handleEvent(smEvent *p_event);
+		void updateStructure();
 		void translateRot();
-		
-
 };
 
-
-
-
-
 #endif
-
-

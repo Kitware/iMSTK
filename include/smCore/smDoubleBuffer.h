@@ -1,34 +1,14 @@
 /*
 ****************************************************
-                  SOFMIS LICENSE
-
+				SimMedTK LICENSE
 ****************************************************
 
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
-
-    \author:    Module by Tansel Halic
-                
-                
-    \version    1.0
-    \date       04/2009
-    \bug	    None yet
-    \brief	    This file implements the double buffer for the mutlithreaded environment.
-				The buffer is initialized for the reader and writer. The thread always writes wrtier buffer
-				that is returned by the beginWrite function. Then the buffers are swapped internally. This is simply 
-				Producer consumer type of buffer that aims to keep writer running all the time. 
-
-*****************************************************
+****************************************************
 */
 
 #ifndef	SMDOUBLEBUFFER_H
 #define SMDOUBLEBUFFER_H
+
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smUtilities/smDataStructs.h"
@@ -37,9 +17,8 @@
 #include <QMutex>
 #include <QWaitCondition>
 #include <iostream>
-using namespace std;
 
-//class smSDK;
+using namespace std;
 
 #define SOFMIS_PIPE_MAXLISTENERS 10
 
@@ -49,7 +28,6 @@ struct smBuffer{
 	smInt totalElements;
 	Template*buffer;
 };
-
 
 enum  smDoubleBufferReturn{
 	SOFMIS_DOUBLEBUFFER_NONEWDATA,
@@ -201,24 +179,27 @@ struct smPipeData{
 	volatile smUInt timeStamp;
 };
 
-
-
 struct smPipeRegisteration{
+
 	smPipeRegisteration(){
 		regType=SOFMIS_PIPE_BYREF;
 	}
+
 	smPipeRegisteration(smPipeRegType p_reg){
 		regType=p_reg;
 	}
+
 	smCoreClass *listenerObject;///pointer to the listener for future use
 	smPipeData  data;//information about the data.
 	smPipeRegType regType;//registration type. Will it be reference or value registration.
+
 	void print(){
 		if(regType==SOFMIS_PIPE_BYREF)
 			cout<<"Listener Object"<< " By Reference"<<endl;
 		if(regType==SOFMIS_PIPE_BYVALUE)
 			cout<<"Listener Object"<< " By Value"<<endl;
 	}
+
 };
 
 class smPipe:public smCoreClass{
@@ -227,7 +208,6 @@ protected:
 	smInt maxElements;
 	void *data;
 	smBool enabled;
-
 	smIndiceArray<smPipeRegisteration*> byRefs;
 	smIndiceArray<smPipeRegisteration*> byValue;
 
@@ -236,24 +216,27 @@ protected:
 	volatile smInt elementSize;
 
 public:
-	~smPipe()
-	{
+	~smPipe(){
 		smIndiceArrayIter<smPipeRegisteration*> iterValue(&byValue);
 		for(smInt i=iterValue.begin();i<iterValue.end();i++)
 			delete []iterValue[i]->data.dataLocation;
 	}
 
-	smPipe(QString p_name,smInt p_elementSize,smInt p_maxElements, smPipeType p_pipeType=SOFMIS_PIPE_TYPEANY):
-		byRefs(SOFMIS_PIPE_MAXLISTENERS),
-		byValue(SOFMIS_PIPE_MAXLISTENERS)
-	{
+	smPipe(QString p_name,smInt p_elementSize,smInt p_maxElements,
+                       smPipeType p_pipeType=SOFMIS_PIPE_TYPEANY):
+                       byRefs(SOFMIS_PIPE_MAXLISTENERS),
+                       byValue(SOFMIS_PIPE_MAXLISTENERS){
 		name=p_name;
 		maxElements=p_maxElements;
 		elementSize=p_elementSize;
 		data=new smChar[elementSize*maxElements]; //change it to memory block later on 
 		pipeType=p_pipeType;
 	}
-	inline smInt getElements(){return maxElements;}
+
+	inline smInt getElements(){
+		return maxElements;
+	}
+
 	inline volatile void *beginWrite(){
 		return data;
 	}
@@ -274,10 +257,10 @@ public:
 			p_pipeReg->data.dataReady=false;
 			p_pipeReg->data.nbrElements=0;
 			p_pipeReg->data.timeStamp=timeStamp;
-
 			return byValue.add(p_pipeReg);
 		}
 	}
+
 	///Acknowledge only raises the flag so that it will enable the listeners
 	inline void acknowledgeRefListeners(){
 		smIndiceArrayIter<smPipeRegisteration*> iterRef(&byRefs);
@@ -287,6 +270,7 @@ public:
 			(iterRef[i]->data.dataReady)=true;
 		}
 	}
+
 	///This is for copy-by-value listeners..With this, the data will be copied to the listener provided data location
 	inline void acknowledgeValueListeners(){
 		smIndiceArrayIter<smPipeRegisteration*> iter(&byValue);
@@ -296,6 +280,7 @@ public:
 			(iter[i]->data.dataReady)=true;
 		}
 	}
+
 	///For copy by value, the function checks
 	inline void checkAndCopyNewData(smInt p_handleByValue){
 		smPipeRegisteration *reg=byValue.getByRef(p_handleByValue);
@@ -304,10 +289,9 @@ public:
 		reg->data.nbrElements=currentElements;
 	}
 
-
 	///for copy by value usage
 	inline void copyData(smInt p_handleByValue){
-		memcpy(byValue.getByRef(p_handleByValue)->data.dataLocation,data,currentElements*elementSize);	
+		memcpy(byValue.getByRef(p_handleByValue)->data.dataLocation,data,currentElements*elementSize);
 		(byValue.getByRef(p_handleByValue)->data.nbrElements)=currentElements;
 	}
 
@@ -319,11 +303,9 @@ public:
 		byRefs.print();
 		byValue.print();
 	}
-
 };
 
 class smSecurePipe:public smPipe{
-
 
 };
 
