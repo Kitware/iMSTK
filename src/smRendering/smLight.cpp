@@ -5,8 +5,8 @@ smVec3<smFloat> smLight::defaultDir(0,0,-1.0);
 smVec3<smFloat> smLight::defaultUpDir(0,1,0.0);
 smVec3<smFloat> smLight::defaultTransDir(1,0,0.0);
 
-void smLight::updateDirection()
-{
+void smLight::updateDirection(){
+
 	smQuat<smFloat> rot;
 	smFloat angle;
 	smVec3<smFloat> dirNorm;

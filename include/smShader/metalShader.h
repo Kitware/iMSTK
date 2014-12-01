@@ -3,7 +3,6 @@
 
 #include "smShader/smShader.h"
 
-
 class MetalShader:public smShader, public smEventHandler{
 public:
 	smGLInt lightPower;
@@ -12,22 +11,16 @@ public:
 	smGLInt specularPower;
 	smGLFloat specularPowerValue;
 	smInt attrib;
-	//smErrorLog *log;
-	smGLInt  alphaMapGain;
+	smGLInt alphaMapGain;
 	smGLFloat alphaMapGainValue;
-	 smGLInt canGetShadowUniform;
+	smGLInt canGetShadowUniform;
 	
-	MetalShader(smChar *p_verteShaderFileName="shaders/VertexBumpMap1.cg",smChar *p_fragmentFileName="shaders/FragmentBumpMap1.cg"){
+	MetalShader(smChar *p_verteShaderFileName="shaders/VertexBumpMap1.cg",
+	            smChar *p_fragmentFileName="shaders/FragmentBumpMap1.cg"){
 		this->log=smSDK::getErrorLog();
 		this->log->isOutputtoConsoleEnabled=false;
 		this->checkErrorEnabled=true;
-		//smTextureManager::loadTexture
-		//setShaderFileName("shaders/VertexBumpMap1.cg",NULL,"shaders/FragmentBumpMap1.cg");
-		//setShaderFileName("shaders/VertexBumpMap2.cg",NULL,"shaders/FragmentBumpMap2.cg");//with shadow
 		setShaderFileName(p_verteShaderFileName,NULL,p_fragmentFileName);
-		
-		//setShaderFileName("shaders/V_Phong.glsl",NULL,"shaders/F_Phong.glsl");
-		//attrib=createAttrib("tangent");
 		createParam("DecalTex");
 		createParam("BumpTex");
 		createParam("SpecularTex");
@@ -38,203 +31,138 @@ public:
 		createParam("alphaMap");
 		createParam("alphaMapGain");
 		createParam("canGetShadow");
-
-		//for tangents
 		createAttrib("tangent");
 
 		//if the objtets are static we cannot change this value during runtime
 		specularPowerValue=5.0;
 		alphaMapGain=-1;
 		alphaMapGainValue=1.0;
-		//log=new smErrorLog();
-		//this->log=log;
 		this->checkErrorEnabled=true;
 		log->isOutputtoConsoleEnabled=true;
-		
-
-
-	 }
-	void attachMesh(smMesh* p_mesh,smChar *p_bump,smChar *p_decal,smChar *p_specular,smChar *p_OCC,smChar *p_disp){
-	  if(!attachTexture(p_mesh->uniqueId,p_bump,"BumpTex"))
-		  cout<<"Error in bump attachment for mesh:"<<p_mesh->name.toStdString().c_str()<<endl;
-
-	  attachTexture(p_mesh->uniqueId,p_decal,"DecalTex");
-	  attachTexture(p_mesh->uniqueId,p_specular,"SpecularTex");
-	  attachTexture(p_mesh->uniqueId,p_OCC,"OCCTex");
-	  attachTexture(p_mesh->uniqueId,p_disp,"DispTex");
-	
-	
 	}
+
+	void attachMesh(smMesh* p_mesh, smChar *p_bump,
+	                smChar *p_decal, smChar *p_specular,
+	                smChar *p_OCC, smChar *p_disp){
+		if(!attachTexture(p_mesh->uniqueId,p_bump,"BumpTex"))
+			cout<<"Error in bump attachment for mesh:"<<p_mesh->name.toStdString().c_str()<<endl;
+
+		attachTexture(p_mesh->uniqueId,p_decal,"DecalTex");
+		attachTexture(p_mesh->uniqueId,p_specular,"SpecularTex");
+		attachTexture(p_mesh->uniqueId,p_OCC,"OCCTex");
+		attachTexture(p_mesh->uniqueId,p_disp,"DispTex");
+	}
+
 	void attachMesh(smMesh* p_mesh,smChar *p_bump,smChar *p_decal,smChar *p_specular,smChar *p_OCC,smChar *p_disp,smChar *p_alphaMap){
-	  attachTexture(p_mesh->uniqueId,p_bump,"BumpTex");
-	  attachTexture(p_mesh->uniqueId,p_decal,"DecalTex");
-	  attachTexture(p_mesh->uniqueId,p_specular,"SpecularTex");
-	  attachTexture(p_mesh->uniqueId,p_OCC,"OCCTex");
-	  attachTexture(p_mesh->uniqueId,p_disp,"DispTex");
-	  attachTexture(p_mesh->uniqueId,p_alphaMap,"AlphaTex");
-	
-	
+		attachTexture(p_mesh->uniqueId,p_bump,"BumpTex");
+		attachTexture(p_mesh->uniqueId,p_decal,"DecalTex");
+		attachTexture(p_mesh->uniqueId,p_specular,"SpecularTex");
+		attachTexture(p_mesh->uniqueId,p_OCC,"OCCTex");
+		attachTexture(p_mesh->uniqueId,p_disp,"DispTex");
+		attachTexture(p_mesh->uniqueId,p_alphaMap,"AlphaTex");
 	}
+
 	void draw(smDrawParam p_param){
-		//this->checkShaderUpdate(2000);
-		//this->drawOrder=
+		//placeholder
 	}
+
 	virtual void initDraw(smDrawParam p_param){
 		smShader::initDraw(p_param);
 		specularPower=this->getFragmentShaderParam("specularPower");
 		alphaMapGain=this->getFragmentShaderParam("alphaMapGain");
 		this->tangentAttrib=this->getShaderAtrribParam("tangent");
 		canGetShadowUniform=getFragmentShaderParam("canGetShadow");
-	
-	}			  
+	}
+
 	virtual void predraw(smMesh *mesh){
-		
 		specularPowerValue=mesh->renderDetail.shininess;
-		//specularPower=this->getFragmentShaderParam("specularPower");
-		//glUniform1f(specularPower,specularPowerValue);
 		glUniform1fARB(specularPower,specularPowerValue);
 		glUniform1fARB(alphaMapGain,alphaMapGainValue);
 
 		if(mesh->renderDetail.canGetShadow)
-		   glUniform1fARB(canGetShadowUniform,1);
+			glUniform1fARB(canGetShadowUniform,1);
 		else
-		   glUniform1fARB(canGetShadowUniform,0);
+			glUniform1fARB(canGetShadowUniform,0);
+	}
 
-		//activeGLVertAttribs(attrib,mesh->vertTangents,mesh->nbrVertices);
-		
-	}   
-	
 	void handleEvent(smEvent *p_event){
 		smKeyboardEventData *keyBoardData;
 
-
 		switch(p_event->eventType.eventTypeCode){
-			case SOFMIS_EVENTTYPE_KEYBOARD:
-				keyBoardData = (smKeyboardEventData*)p_event->data;
-				if(keyBoardData->keyBoardKey==Qt::Key_Plus){
-				   specularPowerValue+=5;
-				   cout<<specularPowerValue<<endl;
-					
-				}
-				if(keyBoardData->keyBoardKey==Qt::Key_Minus){
-				   specularPowerValue-=5;
-				   cout<<specularPowerValue<<endl;
-					
-				}
-				break;
+		case SOFMIS_EVENTTYPE_KEYBOARD:
+			keyBoardData = (smKeyboardEventData*)p_event->data;
+			if(keyBoardData->keyBoardKey==Qt::Key_Plus){
+				specularPowerValue+=5;
+				cout<<specularPowerValue<<endl;
+			}
+
+			if(keyBoardData->keyBoardKey==Qt::Key_Minus){
+				specularPowerValue-=5;
+				cout<<specularPowerValue<<endl;
+			}
+
+			break;
 		}
+	}
 
-   }
-
-	virtual  void switchEnable(){
-	
+	virtual void switchEnable(){
+		//
 	}
 	virtual void switchDisable(){
-	
+		//
 	}
-	
 };
 
 class MetalShaderShadow:public MetalShader{
-   smGLInt shadowMapUniform;
-   smGLInt canGetShadowUniform;
-
-  
-
-
+	smGLInt shadowMapUniform;
+	smGLInt canGetShadowUniform;
 
 public:
-
-	MetalShaderShadow(smChar*p_vertexShaderFileName="shaders/MultipleShadowsVertexBumpMap2.cg",  smChar*p_fragmentShaderFileName="shaders/MultipleShadowsFragmentBumpMap2.cg"):
-	  MetalShader(p_vertexShaderFileName,p_fragmentShaderFileName)
+	MetalShaderShadow(smChar*p_vertexShaderFileName="shaders/MultipleShadowsVertexBumpMap2.cg",
+	                  smChar*p_fragmentShaderFileName="shaders/MultipleShadowsFragmentBumpMap2.cg"):
+	                  MetalShader(p_vertexShaderFileName,p_fragmentShaderFileName)
 	{
-		 createParam("ShadowMapTEST");
-	 	 createParam("canGetShadow");
-		
-		 
-	
-	
+		createParam("ShadowMapTEST");
+		createParam("canGetShadow");
 	}
 
-	
 	virtual void initDraw(smDrawParam p_param){
 		MetalShader::initDraw(p_param);
-		//shadowMapUniform=addFragmentShaderParam("ShadowMapTEST");
 		this->print();
 		shadowMapUniform=getFragmentShaderParam("ShadowMapTEST");
 		canGetShadowUniform=getFragmentShaderParam("canGetShadow");
-		
-		
-		
 	}
+
 	virtual void predraw(smMesh *p_mesh){
 		MetalShader::predraw(p_mesh);
-	
 		if(p_mesh->renderDetail.canGetShadow)
-		   glUniform1fARB(canGetShadowUniform,1);
+			glUniform1fARB(canGetShadowUniform,1);
 		else
-		   glUniform1fARB(canGetShadowUniform,0);
+			glUniform1fARB(canGetShadowUniform,0);
 		smTextureManager::activateTexture("depth",30,shadowMapUniform);
-
-
-		
-		
-
-	
-	
-	
 	}
+};
 
-
-}  ;
 class MetalShaderSoftShadow:public MetalShader{
-   smGLInt shadowMapUniform;
-   
 
+	smGLInt shadowMapUniform;
 public:
-
-	MetalShaderSoftShadow():MetalShader("shaders/SingleShadowVertexBumpMap2.cg","shaders/SingleShadowFragmentBumpMap2.cg")
-	{
-	 createParam("ShadowMapTEST");
-	
+	MetalShaderSoftShadow():
+	    MetalShader("shaders/SingleShadowVertexBumpMap2.cg",
+	                "shaders/SingleShadowFragmentBumpMap2.cg"){
+		createParam("ShadowMapTEST");
 	}
 
-	
 	virtual void initDraw(smDrawParam p_param){
 		MetalShader::initDraw(p_param);
-		//shadowMapUniform=addFragmentShaderParam("ShadowMapTEST");
 		this->print();
 		shadowMapUniform=getFragmentShaderParam("ShadowMapTEST");
-		
 	}
+
 	virtual void predraw(smMesh *p_mesh){
 		MetalShader::predraw(p_mesh);
 		smTextureManager::activateTexture("depth",30,shadowMapUniform);
-	
-	
-	
 	}
-
-
-} ;
-
-
-
-
-
-/*
-class SingleMetalShaderShadow:public MetalShaderShadow
-
-{
-	SingleMetalShaderShadow():MetalShaderShadow(){
-
-	
-	
-	}
-
-
-
 };
-*/
 
 #endif

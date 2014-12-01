@@ -1,26 +1,27 @@
 /*****************************************************
-                  SOFMIS LICENSE
+				  SOFMIS LICENSE
 
 ****************************************************
 
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
+	\author:    <http:\\acor.rpi.edu>
+				SOFMIS TEAM IN ALPHABATIC ORDER
+				Anderson Maciel, Ph.D.
+				Ganesh Sankaranarayanan, Ph.D.
+				Sreekanth A Venkata
+				Suvranu De, Ph.D.
+				Tansel Halic
+				Zhonghua Lu
 
-    \author:    Module by Tansel Halic
-                
-                
-    \version    1.0
-    \date       04/2009
-    \bug	    None yet
-    \brief	    This header includes the rendering parameters. For each module seperate rendering
+	\author:    Module by Tansel Halic
+				
+				
+	\version    1.0
+	\date       04/2009
+	\bug	    None yet
+	\brief	    This header includes the rendering parameters. For each module seperate rendering
 *****************************************************
 */
+
 #ifndef SMCONFIGRENDERING_H 
 #define SMCONFIGRENDERING_H 
 
@@ -30,6 +31,7 @@
 	#include <GL/glew.h>
 	#include <GL/glut.h>
 #endif
+
 #include <QString>
 #include <QVector>
 
@@ -38,10 +40,6 @@
 
 class smShader;
 
-
-
-
-
 ///this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects. 
 ///the value is in bytes
@@ -49,10 +47,8 @@ class smShader;
 #define SOFMIS_VBOBUFFER_INDEXSIZE	100000
 #define SOFMIS_VIEWER_MAXLIGHTS	32
 
-
 #define SOFMIS_MAX_TEXTURENBR 36
 #define SOFMIS_MAX_VBOBUFFERS 10
-
 
 ///The configuration for VBO
 enum smVBOType{
@@ -74,25 +70,23 @@ struct smColor{
 	union{
 		smFloat rgba[4];
 		struct{
-		  smFloat r;
-		  smFloat g;
-		  smFloat b;
-		  smFloat a;
+			smFloat r;
+			smFloat g;
+			smFloat b;
+			smFloat a;
 		};
 	};
-	
-    smColor(){
-        rgba[0]=0.8f;
-        rgba[1]=0.8f;
-        rgba[2]=0.8f;
-        rgba[3]=1.0f;
-    }
+	smColor(){
+		rgba[0]=0.8f;
+		rgba[1]=0.8f;
+		rgba[2]=0.8f;
+		rgba[3]=1.0f;
+	}
 	smColor(smFloat r,smFloat g,smFloat b,smFloat a=1.0){
 		rgba[0]=r;
 		rgba[1]=g;
 		rgba[2]=b;
 		rgba[3]=a;
-	
 	}
 
 	///Dark ratio. the valu is between 0 and 1.0
@@ -118,18 +112,20 @@ struct smColor{
 	}
 
 
-    smFloat operator()(smInt p_i){
-    if(p_i<0||p_i>3)
-         return -1;
-     return rgba[p_i];
-    }
-    smColor &operator=(smColor &p_color){
-        rgba[0]=p_color.rgba[0];      
-        rgba[1]=p_color.rgba[1];      
-        rgba[2]=p_color.rgba[2];      
-        rgba[3]=p_color.rgba[3];      
-     return *this;
-    }
+	smFloat operator()(smInt p_i){
+		if(p_i<0||p_i>3)
+			return -1;
+		return rgba[p_i];
+	}
+
+	smColor &operator=(smColor &p_color){
+		rgba[0]=p_color.rgba[0];      
+		rgba[1]=p_color.rgba[1];      
+		rgba[2]=p_color.rgba[2];      
+		rgba[3]=p_color.rgba[3];      
+		return *this;
+	}
+
 	smGLFloat* toGLColor(){
 		return (smGLFloat*)rgba;
 	}
@@ -139,8 +135,8 @@ struct smColor{
 		rgba[1]=p_green;
 		rgba[2]=p_blue;
 		rgba[3]=p_alpha;
-	
 	}
+
 	static smColor colorWhite;
 	static smColor colorBlue;
 	static smColor colorGreen;
@@ -148,12 +144,10 @@ struct smColor{
 	static smColor colorGray;
 	static smColor colorPink;
 	static smColor colorYellow;
-	
 };
 
 
 ///renderType. this shows how the render will be done
-
 #define    SOFMIS_RENDER_TEXTURE			(1<<1)
 #define    SOFMIS_RENDER_MATERIALCOLOR		(1<<2)
 #define    SOFMIS_RENDER_SHADOWS			(1<<3)
@@ -175,10 +169,6 @@ struct smColor{
 #define    SOFMIS_RENDER_VAO				(1<<18)
 #define    SOFMIS_RENDER_NONE				(1<<31)
 
-
-
-
-
 ///type definitions for variable viewerRenderDetail in smViewer 
 #define    SOFMIS_VIEWERRENDER_GLOBALAXIS						(1<<1)
 #define    SOFMIS_VIEWERRENDER_TEXT								(1<<2)
@@ -199,23 +189,22 @@ struct smColor{
 
 
 struct smViewerDetail{
-	   smUInt environment;
-	   smColor backGroundColor;
+	smUInt environment;
+	smColor backGroundColor;
 };
 
-struct smUnifiedID; 
+struct smUnifiedID;
 
 
 ///smRenderDetail has rendering options and features.
 ///It shows how the mesh should be rendered
 struct smRenderDetail{
 public:
-	smRenderDetail()/*:shaders(10)*/
-	{
+	smRenderDetail(){/*:shaders(10)*/
 		renderType=SOFMIS_RENDER_MATERIALCOLOR|SOFMIS_RENDER_FACES;
-        highLightColor.rgba[0]=1.0f;
-        highLightColor.rgba[1]=0.0f;
-        highLightColor.rgba[2]=0.0f;
+		highLightColor.rgba[0]=1.0f;
+		highLightColor.rgba[1]=0.0f;
+		highLightColor.rgba[2]=0.0f;
 		pointSize=1;
 		lineSize=1;
 		shadowColor.rgba[0]=0.0f;
@@ -231,17 +220,13 @@ public:
 		debugDraw=false;
 		castShadow=true;
 		canGetShadow=true;
-	
+	}
 
-
-
-        
-    }
-    smUInt	renderType;
-    smColor colorDiffuse;   
-	smColor colorAmbient;   
-	smColor colorSpecular;   
-    smColor highLightColor;
+	smUInt renderType;
+	smColor colorDiffuse;
+	smColor colorAmbient;
+	smColor colorSpecular;
+	smColor highLightColor;
 	smColor shadowColor;
 	smBool castShadow;
 	smBool canGetShadow;
@@ -250,31 +235,15 @@ public:
 	smFloat pointSize;
 	smFloat lineSize;
 	smFloat shininess;
-	smBool  debugDraw;
-	
+	smBool debugDraw;
+
 	void addShader(smUnifiedID p_shaderID);
 	void addVAO(smUnifiedID p_shaderID);
-	//void turnOn(smString p_name){
-	//	shaders.getByRef(p_name).enabled=true;
-	//}
-	//void turnOff(smShader *shader){
-	//	//shaders.getByRef(shader->name).enabled=false;
-	//}
-	//void assignShaderTexture(smInt p_textureId){
-	//	
-	//}
-	
-    vector <smUnifiedID >shaders;
+	vector <smUnifiedID >shaders;
 	vector<smChar>shaderEnable;
 
-	 vector <smUnifiedID>VAOs;
-	 vector<smChar>VAOEnable;
-
-	//smIndiceArray<smShaderAttachment> shaders;
-	
-	 
+	vector <smUnifiedID>VAOs;
+	vector<smChar>VAOEnable;
 };
-
-
 
 #endif

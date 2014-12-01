@@ -2,11 +2,9 @@
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
 MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper){
-
 	angle=0;
 	smMatrix33<smFloat> rot;
 	rot.rotAroundX(-SM_PI_HALF);
-	
 
 	smSurfaceMesh *mesh=new smSurfaceMesh(SMMESH_RIGID,NULL);
 	mesh->loadMesh(p_shaft,SM_FILETYPE_3DS);
@@ -29,7 +27,7 @@ MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper){
 	meshContainer.name="HookCauteryPivot";
 	meshContainer.mesh=mesh;
 	meshContainer.posOffsetPos.z=2;
-	
+
 	meshContainerLower.name="HookCauteryLower";
 	meshContainerLower.mesh=lowerMesh;
 	meshContainerLower.preOffsetPos.z=0.0;
@@ -44,43 +42,39 @@ MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper){
 	addMeshContainer(meshContainer.name,&meshContainerLower);
 	addMeshContainer(meshContainer.name,&meshContainerUpper);
 }
- void MyStylus::updateOpenClose(){
 
-	 if(buttonState[1]){
+void MyStylus::updateOpenClose(){
+	if(buttonState[1]){
+		if(angle<1.0)
+		angle+=0.000004;
+		else
+		angle =1.0;
+	}
 
-	  if(angle<1.0)
-	   angle+=0.000004;
-	  else
-	   angle =1.0;
-	 }
+	if(buttonState[0]){
+		if(angle>0.00001)
+			angle -=0.000004;
+		else
+			angle = 0.0;
+	}
 
+	cout<<angle<<endl;
+}
 
-	 if(buttonState[0]){
-
-	  if(angle>0.00001)
-	   angle -=0.000004;
-	  else
-	   angle = 0.0;
-	 }
-	 cout<<angle<<endl;
-
-
- }
+//This function is not fixed for a reason....I'll give you a hint...try to match the brackets
 void MyStylus::handleEvent(smEvent *p_event){
 
 	smHapticOutEventData *hapticEventData;
 	smKeyboardEventData *keyBoardData;
-	//smMeshContainer *containerLower;
-	//smMeshContainer *containerUpper;
-	smMeshContainer * containerLower=this->getMeshContainer("HookCauteryLower");
-	smMeshContainer * containerUpper=this->getMeshContainer("HookCauteryUpper");
-	
+	smMeshContainer *containerLower = this->getMeshContainer("HookCauteryLower");
+	smMeshContainer *containerUpper = this->getMeshContainer("HookCauteryUpper");
+
 	switch(p_event->eventType.eventTypeCode){
 		case SOFMIS_EVENTTYPE_HAPTICOUT:
-			
+
 				hapticEventData=(smHapticOutEventData *)p_event->data;
 				if(hapticEventData->deviceId==this->phantomID){
-					
+
 					transRot=hapticEventData->transform;
 
 					pos=hapticEventData->position;
@@ -93,49 +87,46 @@ void MyStylus::handleEvent(smEvent *p_event){
 					buttonState[3]=hapticEventData->buttonState[3];
 
 					updateOpenClose();
-		
+
 				    containerLower->offsetRotX=angle*25;
 					containerUpper->offsetRotX=-angle*25;
-					
-					
+
+
 			case SOFMIS_EVENTTYPE_KEYBOARD:
 					keyBoardData=(smKeyboardEventData*)p_event->data;
-					
-					
+
+
 
 					if(keyBoardData->keyBoardKey==Qt::Key_2){
-						
+
 							smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
 							this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
-							
+
 					}
 					if(keyBoardData->keyBoardKey==Qt::Key_1){
-						
+
 						   smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
 							this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
-							
+
 					}
-				break;		
-					
-					
+				break;
+
+
 
 			}
-			
+
 			break;
-		
-	
+
+
 	}
 
 
 }
 
 
- HookCautery::HookCautery(smChar *p_pivot){
-
-	
+HookCautery::HookCautery(smChar *p_pivot){
 	smMatrix33<smFloat> rot;
 	rot.rotAroundX(-SM_PI_HALF);
-	
 
 	smSurfaceMesh *mesh=new smSurfaceMesh(SMMESH_RIGID,NULL);
 	mesh->loadMesh(p_pivot,SM_FILETYPE_3DS);
@@ -143,105 +134,44 @@ void MyStylus::handleEvent(smEvent *p_event){
 	mesh->scale(smVec3<smFloat>(0.2,0.2,0.2));
 	mesh->rotate(rot);
 
-	
-
-	
 	meshContainer.name="HookCauteryPivot";
 	meshContainer.mesh=mesh;
 	meshContainer.posOffsetPos.z=2;
-	
-	
+
 	addMeshContainer(&meshContainer);
-	
 }
- void HookCautery::draw(smDrawParam p_param){
-	 smStylusRigidSceneObject::draw(p_param);
-	 //glutSolidCube(5.0);
 
- 
- 
- }
- void HookCautery::handleEvent(smEvent *p_event){
+void HookCautery::draw(smDrawParam p_param){
+	smStylusRigidSceneObject::draw(p_param);
+}
 
+void HookCautery::handleEvent(smEvent *p_event){
 	smHapticOutEventData *hapticEventData;
 	smKeyboardEventData *keyBoardData;
-	
-	
-	
+
 	switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_HAPTICOUT:
-			
-				hapticEventData=(smHapticOutEventData *)p_event->data;
-				if(hapticEventData->deviceId==this->phantomID){
-					
-					transRot=hapticEventData->transform;
-
-					pos=hapticEventData->position;
-
-					vel=hapticEventData->velocity;
-
-					buttonState[0]=hapticEventData->buttonState[0];
-					buttonState[1]=hapticEventData->buttonState[1];
-					buttonState[2]=hapticEventData->buttonState[2];
-					buttonState[3]=hapticEventData->buttonState[3];
-
-				
-		
-				    
-					
-					
-					
-					
-					
-
-				}
-			break;
-		case SOFMIS_EVENTTYPE_KEYBOARD:
-					keyBoardData=(smKeyboardEventData*)p_event->data;
-					
-					
-
-					if(keyBoardData->keyBoardKey==Qt::Key_1){
-						
-							smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-							this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
-							
-					}
-					if(keyBoardData->keyBoardKey==Qt::Key_2){
-						
-						   smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-							this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
-							
-					}
-				break;
-		
-	
+	case SOFMIS_EVENTTYPE_HAPTICOUT:
+		hapticEventData=(smHapticOutEventData *)p_event->data;
+		if(hapticEventData->deviceId==this->phantomID){
+			transRot=hapticEventData->transform;
+			pos=hapticEventData->position;
+			vel=hapticEventData->velocity;
+			buttonState[0]=hapticEventData->buttonState[0];
+			buttonState[1]=hapticEventData->buttonState[1];
+			buttonState[2]=hapticEventData->buttonState[2];
+			buttonState[3]=hapticEventData->buttonState[3];
+		}
+		break;
+	case SOFMIS_EVENTTYPE_KEYBOARD:
+		keyBoardData=(smKeyboardEventData*)p_event->data;
+		if(keyBoardData->keyBoardKey==Qt::Key_1){
+			smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
+			this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
+		}
+		if(keyBoardData->keyBoardKey==Qt::Key_2){
+			smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
+			this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
+		}
+		break;
 	}
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

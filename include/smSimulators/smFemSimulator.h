@@ -1,29 +1,7 @@
 /*
 ****************************************************
-SOFMIS LICENSE
-
+SIMMEDTK LICENSE
 ****************************************************
-
-\author:    <http:\\acor.rpi.edu>
-SOFMIS TEAM IN ALPHABATIC ORDER
-Anderson Maciel, Ph.D.
-Ganesh Sankaranarayanan, Ph.D.
-Sreekanth A Venkata
-Suvranu De, Ph.D.
-Tansel Halic
-Zhonghua Lu
-
-\author:    Module by Tansel Halic
-
-
-\version    1.0
-\date       05/2009
-\bug	    None yet
-\brief	    This class is the FEM simulator object.
-
-
-
-*****************************************************
 */
 
 #ifndef SMFEMSIMULATOR_H
@@ -34,35 +12,25 @@ Zhonghua Lu
 #include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 
-
-
 ///example simulator..the dummy simulator works on static scene objects for now..
 class smFemSimulator:public smObjectSimulator,public smEventHandler{
-
 private:
-	 smVec3<smFloat> hapticPosition; 
-	 smBool hapticButtonPressed;
-	 smEventDispatcher *eventDispatcher;
+	smVec3<smFloat> hapticPosition;
+	smBool hapticButtonPressed;
+	smEventDispatcher *eventDispatcher;
 
 public:
 	smFemSimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
-		
 		hapticButtonPressed=false;
-
-
 	}
 	void setDispatcher(smEventDispatcher *p_eventDispatcher){
-		 eventDispatcher=p_eventDispatcher;
-
-	
+		eventDispatcher=p_eventDispatcher;
 	}
-
 
 protected:
 	virtual void beginSim(){
-		//start the job
-			}
-																	  
+
+	}
 
 	virtual void initCustom(){
 		smClassType type;
@@ -73,21 +41,16 @@ protected:
 		for(smInt i=0;i<objectsSimulated.size();i++){
 			object=objectsSimulated[i];
 			type=object->getType();
-			switch(type){ 
-				case SOFMIS_SMFEMSCENEOBJECT:
-					femObject=(smFemSceneObject*)object;
-					object->memBlock->allocate<smVec3<smFloat>>(QString("fem"),femObject->v_mesh->nbrVertices);
-					object->memBlock->originaltoLocalBlock(QString("fem"),femObject->v_mesh->vertices,femObject->v_mesh->nbrVertices);
-					object->flags.isSimulatorInit=true;
-
-					break;
+			switch(type){
+			case SOFMIS_SMFEMSCENEOBJECT:
+				femObject=(smFemSceneObject*)object;
+				object->memBlock->allocate<smVec3<smFloat>>(QString("fem"),femObject->v_mesh->nbrVertices);
+				object->memBlock->originaltoLocalBlock(QString("fem"),femObject->v_mesh->vertices,femObject->v_mesh->nbrVertices);
+				object->flags.isSimulatorInit=true;
+				break;
 			}
-
-
 		}
-
 	}
-
 
 	//implement the deformation computation through fem here
 	virtual void run(){
@@ -97,24 +60,18 @@ protected:
 		smVolumeMesh *mesh;
 		static smInt pickedIndex=-1;
 		static smBool nodePicked=false;
-		smFloat minDisp=99999;	
+		smFloat minDisp=99999;
 		smEvent *eventForce;
 		smHapticInEventData *hapticData;
 		static smInt dofNumber=0;
 
-
 		beginSim();
 		for(smInt i=0;i<this->objectsSimulated.size();i++){
 			sceneObj=this->objectsSimulated[i];
-			
-				
-
 			//ensure that dummy simulator will work on static scene objects only.
 			if(sceneObj->getType()==SOFMIS_SMFEMSCENEOBJECT){
 				femSceneObject=(smFemSceneObject*)sceneObj;
 				mesh=femSceneObject->v_mesh;
-
-
 				femSceneObject->memBlock->getBlock(QString("fem"),(void**)&vertices);
 				if(!hapticButtonPressed){
 					pickedIndex=-1;
@@ -122,45 +79,31 @@ protected:
 				}
 
 				if(i==0&&hapticButtonPressed&&nodePicked==false){
-					
 					for(smInt i=0;i<mesh->nbrVertices;i++){
 						if((hapticPosition-mesh->origVerts[i]).module()<minDisp){
-
-						   pickedIndex=i;
-						   nodePicked=true;
-						   minDisp=(hapticPosition-mesh->origVerts[i]).module();
+							pickedIndex=i;
+							nodePicked=true;
+							minDisp=(hapticPosition-mesh->origVerts[i]).module();
 						}
-
 					}
-						
-
-					
-			
 				}
-				
+
 				if(i==0&&nodePicked&&hapticButtonPressed){
-					//cout<<"PickedIndex="<<pickedIndex<<endl;
-					
 					dofNumber = femSceneObject->ID(pickedIndex,0);
-
 					if(dofNumber !=0){
-					femSceneObject->pulledNode=pickedIndex;
-					femSceneObject->displacements(dofNumber-1,0)=hapticPosition.x-femSceneObject->v_mesh->origVerts[pickedIndex].x;
-					femSceneObject->displacements(dofNumber,0)=hapticPosition.y-femSceneObject->v_mesh->origVerts[pickedIndex].y;
-					femSceneObject->displacements(dofNumber+1,0)=hapticPosition.z-femSceneObject->v_mesh->origVerts[pickedIndex].z;
+						femSceneObject->pulledNode=pickedIndex;
+						femSceneObject->displacements(dofNumber-1,0)=hapticPosition.x-femSceneObject->v_mesh->origVerts[pickedIndex].x;
+						femSceneObject->displacements(dofNumber,0)=hapticPosition.y-femSceneObject->v_mesh->origVerts[pickedIndex].y;
+						femSceneObject->displacements(dofNumber+1,0)=hapticPosition.z-femSceneObject->v_mesh->origVerts[pickedIndex].z;
 					}
-
-
-				}else{
-				//femSceneObject->pulledNode=325;
-				femSceneObject->pulledNode=62;
-				smInt dofNumber = femSceneObject->ID(62,0);
-				femSceneObject->displacements(dofNumber-1,0)=0;
-				femSceneObject->displacements(dofNumber,0)=0;
-				femSceneObject->displacements(dofNumber+1,0)=0;
-				
 				}
-
+				else{
+					femSceneObject->pulledNode=62;
+					smInt dofNumber = femSceneObject->ID(62,0);
+					femSceneObject->displacements(dofNumber-1,0)=0;
+					femSceneObject->displacements(dofNumber,0)=0;
+					femSceneObject->displacements(dofNumber+1,0)=0;
+				}
 
 				if(femSceneObject->dynamicFem){
 					for(i=0;i<1;i++)
@@ -170,7 +113,6 @@ protected:
 					femSceneObject->calculateDisplacements_QStatic(vertices);
 
 				if(i==0){
-
 					eventForce=new smEvent();
 					eventForce->eventType=SOFMIS_EVENTTYPE_HAPTICIN;
 					hapticData=new smHapticInEventData();
@@ -185,25 +127,17 @@ protected:
 						hapticData->force.x=0;
 						hapticData->force.y=0;
 						hapticData->force.z=0;
-					
-					
 					}
 					eventForce->data=hapticData;
 					eventDispatcher->sendEventAndDelete(eventForce);
-	
 				}
-				
-
-			}					
-		}		
+			}
+		}
 		endSim();
-
 	}
-
 
 	void endSim(){
 		//end the job
-
 	}
 
 	///synchronize the buffers in the object..do not call by yourself.
@@ -222,16 +156,8 @@ protected:
 				femObject->memBlock->localtoOriginalBlock(QString("fem"),mesh->vertices,mesh->nbrVertices);
 				//femObject->v_mesh->updateTriangleNormals();
 				femObject->v_mesh->updateVertexNormals();
-				
-
-
 			}
-
-
-
 		}
-
-
 	}
 
 	void handleEvent(smEvent *p_event){
@@ -239,36 +165,23 @@ protected:
 		smHapticOutEventData *hapticEventData;
 
 		switch(p_event->eventType.eventTypeCode){
-			case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SOFMIS_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_F1)
 				printf("F1 Keyboard is pressed %c\n",keyBoardData->keyBoardKey);
 			break;
-		
-		
+
 		case SOFMIS_EVENTTYPE_HAPTICOUT:
 			hapticEventData=(smHapticOutEventData *)p_event->data;
 			if(hapticEventData->deviceId==1){
-			hapticPosition.x=hapticEventData->position.x;
-			hapticPosition.y=hapticEventData->position.y;
-			hapticPosition.z=hapticEventData->position.z;
-			hapticButtonPressed=hapticEventData->buttonState[0];
-			//cout<<"x,y,z="<<hapticButtonPressed<<endl;
+				hapticPosition.x=hapticEventData->position.x;
+				hapticPosition.y=hapticEventData->position.y;
+				hapticPosition.z=hapticEventData->position.z;
+				hapticButtonPressed=hapticEventData->buttonState[0];
 			}
-
 			break;
-	
-	
 		}
-
 	}
-
 };
-
-
-
-
-
-
 
 #endif

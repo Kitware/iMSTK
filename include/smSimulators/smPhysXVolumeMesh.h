@@ -5,12 +5,9 @@
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
 
-
-
 struct smPhysXLink{
-  smInt tetraIndex;
-  smFloat baryCetricDistance[4];
-
+	smInt tetraIndex;
+	smFloat baryCetricDistance[4];
 };
 
 struct smNeighborTetrasOfNode{
@@ -20,36 +17,23 @@ struct smNeighborTetrasOfNode{
 
 class smPhysXVolumeMesh:public smVolumeMesh{
 public:
+	smBool renderSurface;
+	smBool renderTetras;
+	vector<smPhysXLink> links;
+	smInt nbrLinks;
+	smSurfaceMesh *surfaceMesh;
+	vector<vector <smEdge>> tetraEdges;
+	smNeighborTetrasOfNode *neiTet;
+	smBool *drawTet;
+	smBool *removedNode;
 
-
-  smBool renderSurface;
-  smBool renderTetras;
-  vector<smPhysXLink> links;
-  smInt nbrLinks;
-  smSurfaceMesh *surfaceMesh;
-  
-  vector<vector <smEdge>> tetraEdges;
-  smNeighborTetrasOfNode *neiTet;
-  
-  smBool *drawTet;
-  smBool *removedNode;
-
-  
-
-public:
-  smPhysXVolumeMesh();
-  ~smPhysXVolumeMesh(void);
-  smBool loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMesh);
-  
-  ///reflect the motions on surfacemesh
-  void updateSurfaceVertices();
-  virtual void draw(smDrawParam p_params);
-  void createEdgeofTetras();
-  //void rotVolumeMesh(smMatrix33<smFloat> p_rot);
- 
-  void findNeighborTetrasOfNode();	//brute force search
+	smPhysXVolumeMesh();
+	~smPhysXVolumeMesh(void);
+	smBool loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMesh);
+	void updateSurfaceVertices();
+	virtual void draw(smDrawParam p_params);
+	void createEdgeofTetras();
+	void findNeighborTetrasOfNode(); //brute force search
 };
-
-
 
 #endif

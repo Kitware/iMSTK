@@ -24,8 +24,9 @@ Zhonghua Lu
 
 *****************************************************
 */
-#ifndef SMVIEWER_H 
-#define SMVIEWER_H 
+
+#ifndef SMVIEWER_H
+#define SMVIEWER_H
 #include <QGLViewer/qglviewer.h>
 #include <GL/glut.h>
 #include <QDrag>
@@ -53,18 +54,15 @@ Zhonghua Lu
 #include "smUtilities/smVec3.h"
 #include "smShader/SceneTextureShader.h"
 
-//includes are commented for successful compilation on my side..Tansel.9/11/2013
-//#include "smATC3DGInterface.h" // Trakstar
-
 //forward declaration
 class smSDK;
 class smOpenGLWindowStream;
 class MetalShader;
+
 class smCameraCollisionInterface{
 public:
 	virtual bool checkCameraCollision()=0;
-}; 
-
+};
 
 enum smRenderingStageType{
 	SMRENDERSTAGE_SHADOWPASS,
@@ -74,9 +72,8 @@ enum smRenderingStageType{
 };
 
 ///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
-class smViewer : public QGLViewer,public smModule,public smEventHandler{
+class smViewer : public QGLViewer, public smModule, public smEventHandler{
 protected:
-
 	vector<smCoreClass*> objectList;
 	smIndiceArray<smLight*> *lights;
 
@@ -89,12 +86,13 @@ protected:
 	smErrorLog *log;
 
 	//virtual void drawSurfaceMeshTriangles(smSurfaceMesh *p_surfaceMesh,smRenderDetail *renderDetail);
-	virtual void drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,smRenderDetail *renderDetail);
-
+	virtual void drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail);
 	virtual void drawSMStaticObject(smStaticSceneObject *p_smPhsyObject);
-	virtual void drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,smRenderDetail *renderDetail,smInt p_objectId,smVBOType p_VBOType);
+	virtual void drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,
+	                                         smRenderDetail *renderDetail,
+	                                         smInt p_objectId,
+	                                         smVBOType p_VBOType);
 	void drawSMDeformableObject(smPBDSurfaceSceneObject *p_smPhsyObject);
-	//virtual void drawPhysXObject(smPhysXObject *p_phsyXObject);
 	void drawFemObject(smFemSceneObject *p_smFEM);
 	void drawNormals(smMesh *p_mesh);
 	friend class smSDK;
@@ -116,7 +114,7 @@ protected:
 	smInt screenResolutionHeight;
 
 public:
-	smRenderingStageType renderStage; 
+	smRenderingStageType renderStage;
 	smBool boostViewer;
 
 	///if the camera motion is enabled from other external devices 
@@ -155,23 +153,22 @@ public:
 	smVec3d finalDeviceUpCameraDir;
 	smVec3d finalDeviceRightCameraDir;
 
-	// TrakStar ----------------------------------------------------------------------------------------------//
+	// TrakStar
 	///Pipe to receive the trakstar information
-#ifdef smATC3DGInterface__
-	smPipeRegisteration trakstarpipeReg;  //Trakstar
-	smFloat trakStar_caliRotMat[9];
-	smFloat trakStar_curRotMat[9];
-	smFloat trakStar_mvRotMat[9];
-	smVec3f trakStar_caliPos;
-	smVec3f trakStar_offPos;
-	smVec3f trakStar_curPos;
-	smBool trakStar_enable;
+	#ifdef smATC3DGInterface__
+		smPipeRegisteration trakstarpipeReg; //Trakstar
+		smFloat trakStar_caliRotMat[9];
+		smFloat trakStar_curRotMat[9];
+		smFloat trakStar_mvRotMat[9];
+		smVec3f trakStar_caliPos;
+		smVec3f trakStar_offPos;
+		smVec3f trakStar_curPos;
+		smBool trakStar_enable;
 
-	void processTrakstarData();
-#endif
-	// ------------------------------------------------------------------------------------------------------------//
+		void processTrakstarData();
+	#endif
 
-protected :
+protected:
 	void initDepthBuffer();
 	///Set the color and other viewer defaults
 	void setToDefaults();

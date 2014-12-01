@@ -13,8 +13,8 @@
                 Zhonghua Lu
 
     \author:    Module by Tansel Halic
-                
-                
+
+
     \version    1.0
     \date       04/2009
     \bug	    None yet
@@ -22,18 +22,14 @@
 
 *****************************************************/
 #ifndef SMUTILS_H
-#define SMUTILS_H 
+#define SMUTILS_H
 
 
 #define SM_CHECKGLERROR_DISPLAY(log,error)  smGLUtils::queryGLError(error);\
-											log->addError(this,error);\
-											log->printLastErr();\
-
+                                            log->addError(this,error);\
+                                            log->printLastErr();\
 
 #define SM_CHECKERROR(log,error) smGLUtils::queryGLError(error);\
-								 log->addError(this,error);\
-
-
-
+                                 log->addError(this,error);\
 
 #endif

@@ -6,20 +6,16 @@ QHash<smInt,smVAO *>  smVAO::VAOs;
 
 void smVAO::initBuffers(smDrawParam p_param){
 
-
 	///Create the Vertex Array Objects
-	glGenVertexArrays(1, &VAO);   
+	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
 
 	///Create Vertex Buffer Objects(VBOs)
 	glGenBuffers(totalNbrBuffers,bufferIndices);
 	assert(bufferIndices>0);
 
-
-
-	///Initialize and fille the VBOs
+	///Initialize and file the VBOs
 	for(smInt i=0;i<totalNbrBuffers;i++){
-
 		if(bufferInfo[i].arrayBufferType!=SMVBO_INDEX){
 			glBindBuffer(GL_ARRAY_BUFFER, bufferIndices[i]);
 			if(vboType==SOFMIS_VBO_STATIC)
@@ -35,10 +31,8 @@ void smVAO::initBuffers(smDrawParam p_param){
 			else if(vboType==SOFMIS_VBO_DYNAMIC)
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_DYNAMIC_DRAW);
 			indexBufferLocation=i;
-			
 			SM_CHECKERROR(log,error);
 			continue;
-
 		}
 
 		if(bufferInfo[i].arrayBufferType==SMVBO_POS){
@@ -46,50 +40,39 @@ void smVAO::initBuffers(smDrawParam p_param){
 			glVertexAttribPointer(bufferInfo[i].attributeIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			if(bindShaderObjects)
 				glBindAttribLocation(shader->getProgramObject(),bufferInfo[i].attributeIndex,bufferInfo[i].shaderAttribName.c_str());
-			
-	 		
 		}
 		else if( bufferInfo[i].arrayBufferType==SMVBO_NORMALS){
 			glEnableVertexAttribArray(bufferInfo[i].attributeIndex);
 			glVertexAttribPointer(bufferInfo[i].attributeIndex, 3, GL_FLOAT, GL_FALSE, 0, 0);
 			if(bindShaderObjects)
 				glBindAttribLocation(shader->getProgramObject(),bufferInfo[i].attributeIndex,bufferInfo[i].shaderAttribName.c_str());
-			
-			
 		}
 		else if(bufferInfo[i].arrayBufferType==SMVBO_TEXTURECOORDS||bufferInfo[i].arrayBufferType==SMVBO_VEC2F){
 			glEnableVertexAttribArray(bufferInfo[i].attributeIndex);
 			glVertexAttribPointer(bufferInfo[i].attributeIndex, 2, GL_FLOAT, GL_FALSE, 0, 0);
 			if(bindShaderObjects)
 				glBindAttribLocation(shader->getProgramObject(),bufferInfo[i].attributeIndex,bufferInfo[i].shaderAttribName.c_str());
-			
-			
 		}
 		else if(bufferInfo[i].arrayBufferType==SMVBO_VEC4F){
 			glEnableVertexAttribArray(bufferInfo[i].attributeIndex);
 			glVertexAttribPointer(bufferInfo[i].attributeIndex, 4, GL_FLOAT, GL_FALSE, 0, 0);
 			if(bindShaderObjects)
 				glBindAttribLocation(shader->getProgramObject(),bufferInfo[i].attributeIndex,bufferInfo[i].shaderAttribName.c_str());
-			
-			
-
 		}
 		shader->enableShader();
 		shader->disableShader();
 		//Check the error
 		SM_CHECKERROR(log,error);
-
 	}
-
-
 
 	///Go back to the default buffer state
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-
 }
+
 ///Updates the buffers. Call this function if there is change in the mesh. If it is a simulation mesh, it needs to be called in and very frame
- smBool smVAO::updateStreamData(){
+smBool smVAO::updateStreamData(){
+
 	if(this->vboType==SOFMIS_VBO_STATIC)
 		return false;
 
@@ -109,34 +92,21 @@ void smVAO::initBuffers(smDrawParam p_param){
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 			}
 		}
-		return true;	
-	
+		return true;
 	}
-
-
-
-
-
-
-
 }
- 
+
 void smVAO::draw(smDrawParam p_params){
+
 	float m[16];
 	float m1[16];
 	glPushAttrib(GL_ENABLE_BIT);
 		shader->enableShader();
 		shader->updateGLSLMatwithOPENGL();
-		//smTextureManager::activateTexture("livertexture1",0,2);
-		
 		enable();
 		updateStreamData();
 		glDrawElements(GL_TRIANGLES, bufferInfo[indexBufferLocation].nbrElements, GL_UNSIGNED_INT, bufferInfo[indexBufferLocation].attribPointer);
 		disable();
 		shader->disableShader();
 	glPopAttrib();
-	///Go back to the default buffer state
-	
-
-
 }
