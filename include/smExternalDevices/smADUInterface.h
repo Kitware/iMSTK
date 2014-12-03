@@ -64,13 +64,13 @@ public:
 	/// \brief !!
 	smInt *readAnalogInputs();
 
-	smInt sw; ///> !!
-	smBool updateFlag; ///> !!
-	void *deviceHandle; ///> !!
-	ADUDeviceCalibrationData *calibrationData; ///> calibration data
-	ADUDeviceData *deviceData; ///> device data
-	smChar *serialNumber; ///> serial number of the ADU device
-	smBool isOpened; ///> !!
+	smInt sw; ///< !!
+	smBool updateFlag; ///< !!
+	void *deviceHandle; ///< !!
+	ADUDeviceCalibrationData *calibrationData; ///< calibration data
+	ADUDeviceData *deviceData; ///< device data
+	smChar *serialNumber; ///< serial number of the ADU device
+	smBool isOpened; ///< !!
 
 	/// \brief !!
 	void init();
@@ -94,7 +94,7 @@ public:
 	void handleEvent(smEvent *p_event){};
 
 public:
-	smPipe *ADUpipe; ///> !!
+	smPipe *ADUpipe; ///< !!
 
 	/// \brief !!
 	void sendDataToPipe();

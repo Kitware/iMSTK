@@ -55,7 +55,7 @@ public:
 	} ;
 
 protected :
-	smBool driverInstalled; ///> true if device driver is installed
+	smBool driverInstalled; ///< true if device driver is installed
 };
 
 #endif

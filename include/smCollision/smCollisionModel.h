@@ -27,11 +27,12 @@ class smSurfaceMesh;
 template <typename T> struct smSurfaceTreeCell{
 
 public:
-	smBool filled;
-	smShort level;
-	set<smInt> verticesIndices;
-	vector<smFloat> weights;
+	smBool filled; ///< !!
+	smShort level; ///< level in the tree
+	set<smInt> verticesIndices; ///< indices of vertices
+	vector<smFloat> weights; ///< !!
 
+	/// \brief constructor
 	smSurfaceTreeCell(){
 
 		filled=false;
@@ -69,7 +70,7 @@ public:
 /// \brief cell of an octree
 struct smOctreeCell:public smSurfaceTreeCell<smOctreeCell>{
 
-	smCube cube;
+	smCube cube; ///< cube
 	
 	/// \brief get the center of the octree cell
 	inline smVec3f getCenter() const {
@@ -135,13 +136,13 @@ struct smOctree:public smSurfaceTreeCell<smOctree>{
 		filled=false;
 	}
 
-	smCube cube;
-	smVec3f originalCubeCenter;
-	smSphere sphere;
+	smCube cube; ///< cube
+	smVec3f originalCubeCenter; ///< original cube center
+	smSphere sphere; ///< !!
 
-	vector<smInt> triagleIndices;
-	set<smInt> verticesIndices;
-	vector<smFloat> weights;
+	vector<smInt> triagleIndices;  ///< triangle indices
+	set<smInt> verticesIndices;  ///< vertices indices
+	vector<smFloat> weights; /// !!
 
 	/// \brief subdivide octree
 	inline void subDivide(smInt p_division, smOctreeCell *p_cells);
@@ -168,14 +169,14 @@ enum SOFMIS_TREETYPE{
 
 template<typename smSurfaceTreeCell> class smSurfaceTree;
 
-/// \brief 
+/// \brief !!
 template <typename T> class smCollisionModelIterator{
 
 public:
-	smInt startIndex;
-	smInt currentIndex;
-	smInt currentLevel;
-	smInt endIndex;
+	smInt startIndex; ///<
+	smInt currentIndex; ///<
+	smInt currentLevel; ///<
+	smInt endIndex; ///<
 
 	inline smInt start();
 	inline smInt end();
@@ -188,12 +189,25 @@ public:
 template<typename T> class smCollisionModel:public smCoreClass{
 
 public:
+	/// \brief !!
 	inline void initStructure();
+
+	/// \brief !!
 	inline void reCreateStructure();
+
+	/// \brief !!
 	inline void updateStructure();
+
+	/// \brief !!
 	void translateRot(); 
+
+	/// \brief !!
 	inline void setTranslateRot(smMatrix44d &p_matrix);
+
+	/// \brief !!
 	smCollisionModelIterator<T>  get_LevelIterator(smInt p_level) ;
+
+	/// \brief !!
 	smCollisionModelIterator<T>  get_LevelIterator() ;
 };
 
@@ -256,27 +270,29 @@ template<typename smSurfaceTreeCell> class smSurfaceTree:
                             public smCollisionModel<smSurfaceTreeCell>,public smEventHandler{
 
 	protected:
-		smSurfaceMesh *mesh;
-		smInt nbrDivision;
-		smInt minTreeRenderLevel;
-		smBool renderSurface;
-		smBool enableShiftPos;
-		smBool enableTrianglePos;
-		smBool renderOnlySurface;
-		smInt totalCells;
-		smLevelIndex *levelStartIndex;
-		smInt currentLevel;
+		smSurfaceMesh *mesh; ///< surface mesh
+		smInt nbrDivision; ///< !!
+		smInt minTreeRenderLevel; ///< !!
+		smBool renderSurface; ///< !!
+		smBool enableShiftPos; ///< !!
+		smBool enableTrianglePos; ///< !!
+		smBool renderOnlySurface; ///< true if rendering only the surface
+		smInt totalCells; ///< number of total cells
+		smLevelIndex *levelStartIndex; ///<
+		smInt currentLevel; ///<
+
+		/// \brief creates the tree based on input triangles
 		smBool createTree(smSurfaceTreeCell &p_Node, vector<smInt> &p_triangles,
                           smInt p_level, smInt p_siblingIndex);
 
 	public:
-		smMatrix44 <smDouble> transRot;
-		smInt maxLevel;
-		smSurfaceTreeCell root;
-		smFloat shiftScale;
+		smMatrix44 <smDouble> transRot; ///< matrix for translation and rotation
+		smInt maxLevel; ///< max level of the tree
+		smSurfaceTreeCell root; ///< !!
+		smFloat shiftScale; ///< !!
 
-		smSurfaceTreeCell *initialTreeAllLevels;
-		smSurfaceTreeCell *treeAllLevels;
+		smSurfaceTreeCell *initialTreeAllLevels; ///< !!
+		smSurfaceTreeCell *treeAllLevels; ///< !!
 
 		/// \brief initialize the draw function related structures
 		void initDraw(smDrawParam p_param);

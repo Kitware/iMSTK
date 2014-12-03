@@ -16,30 +16,35 @@
 
 class smPipe;
 
+/// \brief holds the result of the PQP collision
 struct smPQPResult{
 	smVec3f point1;
 	smVec3f point2;
 	smFloat distance;
 };
 
+/// \brief 
 class smPQPSkeleton:public smCoreClass{
 
 public:
-	smMatrix33f mR;
-	smVec3f mT;
-	smMatrix44f mat;
+	smMatrix33f mR; ///< 
+	smVec3f mT; ///< 
+	smMatrix44f mat; ///< 
 
-	PQP_Model  *mPQPModel;
-	smSurfaceMesh *mMesh;
-	PQP_DistanceResult colRes;
-	smUnifiedID colMeshId;///stores the closest mesh id
-	smPQPSkeleton *colSkel;
+	PQP_Model  *mPQPModel; ///< PQP model
+	smSurfaceMesh *mMesh; ///< surface mesh
+	PQP_DistanceResult colRes; ///< PQP results
+	smUnifiedID colMeshId; ///< stores the closest mesh id
+	smPQPSkeleton *colSkel; ///< !!
+
+	/// \brief !! set the transforms
 	inline void setTransformation(smMatrix44d &p_trans){
 		mat=p_trans;
 		mR=p_trans;
 		mT=p_trans;
 	}
 
+	/// \brief initialize the PQP model using surface mesh
 	smPQPSkeleton(smSurfaceMesh *p_mesh){
 		mT.setValue(0,0,0);
 		mR.setIdentity();
@@ -62,12 +67,12 @@ class smPQPCollision:public smObjectSimulator,public smEventHandler{
 
 public:
 
-	smMatrix44d mat;
-	smVec3d pos;
-	smFloat minCollisionDistance;///The default value is 1.0
-	smBool  minCollisionHappened;
-	smUnifiedID   onlySpecificMeshId;//collision check is done only with a specific mesh if this is given. This will have the mesh id;
-	smPipe *pipePQP;
+	smMatrix44d mat; ///< !!
+	smVec3d pos; ///< !!
+	smFloat minCollisionDistance; ///< The default value is 1.0
+	smBool  minCollisionHappened; ///< 
+	smUnifiedID   onlySpecificMeshId; ///< collision check is done only with a specific mesh if this is given. This will have the mesh id;
+	smPipe *pipePQP; ///< !!
 
 	/// \brief constructor
 	smPQPCollision(  smErrorLog *p_errorLog=NULL,smInt maxColResult=500):smObjectSimulator(p_errorLog){
@@ -105,8 +110,8 @@ public:
 	virtual void run(){
 	}
 
-	vector<smPQPSkeleton *>mPQPSourceSkeletons;
-	vector<smPQPSkeleton *>mPQPDestinationSkeletons;
+	vector<smPQPSkeleton *>mPQPSourceSkeletons; ///< 
+	vector<smPQPSkeleton *>mPQPDestinationSkeletons; ///< 
 
 	/// \brief !!
 	void addDestinationMeshes(smSurfaceMesh *p_mesh){

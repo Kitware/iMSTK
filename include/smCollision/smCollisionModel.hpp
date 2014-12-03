@@ -12,6 +12,7 @@
 #include <stack>
 #include "smCore/smEvent.h"
 
+/// \brief initialize the surface tree structure
 template <typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
 
@@ -36,7 +37,7 @@ void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
 
 }
 
-/// \brief
+/// \brief destructor
 template<typename smSurfaceTreeCell>
 smSurfaceTree<smSurfaceTreeCell>::~smSurfaceTree(){
 	delete[]	treeAllLevels;
@@ -84,7 +85,7 @@ smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_ma
 	renderOnlySurface=false;
 }
 
-/// \brief
+/// \brief Initialize the drawing structures
 template<typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::initDraw(smDrawParam p_param){
 
@@ -93,7 +94,7 @@ void smSurfaceTree<smSurfaceTreeCell>::initDraw(smDrawParam p_param){
 	viewer->addText(QString("octree"));
 }
 
-/// \brief
+/// \brief draw the surface tree
 template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
                                                    ::draw(smDrawParam p_params){
 
@@ -132,7 +133,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
 	p_params.rendererObject->updateText("octree",QString("Total Spheres at Level:")+QString().setNum(counter));
 }
 
-/// \brief
+/// \brief handle key press events
 template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
                                                 ::handleEvent(smEvent *p_event){
 

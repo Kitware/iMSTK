@@ -21,8 +21,8 @@ const int SM_MAX_PHANTOM_DEVICES = 4;
 class smPhantomInterface: public smHapticInterface, public smEventHandler{
 
 protected:
-	smEvent *hapticEvent[SM_MAX_PHANTOM_DEVICES]; ///>
-	smHapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///>
+	smEvent *hapticEvent[SM_MAX_PHANTOM_DEVICES]; ///<
+	smHapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///<
 
 public:
 	smBool forceEnabled;
@@ -57,18 +57,18 @@ public:
 	/// \brief get phantom transformation
 	smInt getDeviceTransform(smMatrix44 <smDouble> *d_transform);
 
-	HHD dHandle[SM_MAX_PHANTOM_DEVICES]; ///> handles for devices available
-	smInt numPhantomDevices; ///> number of phantom devices
-	hduVector3Dd  position[SM_MAX_PHANTOM_DEVICES]; ///> position
-	hduVector3Dd  velocity[SM_MAX_PHANTOM_DEVICES]; ///> velocity
-	hduVector3Dd  angles[SM_MAX_PHANTOM_DEVICES]; ///> !! angles of arms
-	hduVector3Dd  force[SM_MAX_PHANTOM_DEVICES]; ///> force
-	hduVector3Dd  torque[SM_MAX_PHANTOM_DEVICES];  ///> torque (if any)
-	smDouble transform[SM_MAX_PHANTOM_DEVICES][16]; ///> transforms
-	hapticDeviceData_t hapticDeviceData[SM_MAX_PHANTOM_DEVICES]; ///> haptic device data
-	HDSchedulerHandle hapticCallbackHandle; ///> !!
+	HHD dHandle[SM_MAX_PHANTOM_DEVICES]; ///< handles for devices available
+	smInt numPhantomDevices; ///< number of phantom devices
+	hduVector3Dd  position[SM_MAX_PHANTOM_DEVICES]; ///< position
+	hduVector3Dd  velocity[SM_MAX_PHANTOM_DEVICES]; ///< velocity
+	hduVector3Dd  angles[SM_MAX_PHANTOM_DEVICES]; ///< !! angles of arms
+	hduVector3Dd  force[SM_MAX_PHANTOM_DEVICES]; ///< force
+	hduVector3Dd  torque[SM_MAX_PHANTOM_DEVICES];  ///< torque (if any)
+	smDouble transform[SM_MAX_PHANTOM_DEVICES][16]; ///< transforms
+	hapticDeviceData_t hapticDeviceData[SM_MAX_PHANTOM_DEVICES]; ///< haptic device data
+	HDSchedulerHandle hapticCallbackHandle; ///< !!
 
-	smString phantomDeviceNames[SM_MAX_PHANTOM_DEVICES]; ///> names of phantoms
+	smString phantomDeviceNames[SM_MAX_PHANTOM_DEVICES]; ///< names of phantoms
 
 	/// \brief empty functions for now
 	virtual void beginFrame(){		
@@ -78,7 +78,7 @@ public:
 	virtual void endFrame(){		
 	};
 
-	friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///> !!
+	friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///< !!
 
 	/// \brief handle events related to phantom omni
 	void handleEvent(smEvent *p_event);

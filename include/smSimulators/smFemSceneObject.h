@@ -1,6 +1,6 @@
 /*
 ****************************************************
-SIMMEDTK LICENSE
+			SIMMEDTK LICENSE
 ****************************************************
 */
 
@@ -25,29 +25,29 @@ using namespace Eigen;
 class smFemSceneObject:public smSceneObject {
 public:
 	//fem objetc has two representations: surface and volume
-	smVolumeMesh *v_mesh; ///> volume mesh
-	MatrixXf LM; ///> LM matrix of FEM 
-	MatrixXf ID; ///> ID matrix of FEM
-	smInt totalDof; ///> total degree of freedom of the fem mesh
-	smFloat dT; ///> time step
-	smFloat density; ///> density of material
-	smBool dynamicFem; ///> true if the mesh is to be evolved in time
-	smBool pullUp; ///> !!
-	MatrixXf stiffnessMatrix; ///> FEM stiffness matrix
-	MatrixXf Kinv; ///> inverse of FEM stiffness matrix
-	Matrix3f k33; ///> holds a 3x3 matrix used during FEM formulation
-	Matrix3f k33inv; ///> inverse of 3x3 matrix
-	VectorXf displacements; ///> displacement vector of the FEM
-	VectorXf temp_displacements; ///> temporary vector of displacements
-	VectorXf displacements_prev; ///> displacement vector at previous time step
-	VectorXf dymamic_temp; ///> !!
-	VectorXf componentMasses; ///> !! 
-	VectorXf fm; ///> !!
-	VectorXf fm_temp; ///> !!
-	VectorXf totalDisp; ///> total displacement till a given time t
-	VectorXf nodeMass; ///> nodal mass
-	VectorXf viscosity; ///> viscosity
-	smInt pulledNode; ///> ID of the node pulled by the user
+	smVolumeMesh *v_mesh; ///< volume mesh
+	MatrixXf LM; ///< LM matrix of FEM 
+	MatrixXf ID; ///< ID matrix of FEM
+	smInt totalDof; ///< total degree of freedom of the fem mesh
+	smFloat dT; ///< time step
+	smFloat density; ///< density of material
+	smBool dynamicFem; ///< true if the mesh is to be evolved in time
+	smBool pullUp; ///< !!
+	MatrixXf stiffnessMatrix; ///< FEM stiffness matrix
+	MatrixXf Kinv; ///< inverse of FEM stiffness matrix
+	Matrix3f k33; ///< holds a 3x3 matrix used during FEM formulation
+	Matrix3f k33inv; ///< inverse of 3x3 matrix
+	VectorXf displacements; ///< displacement vector of the FEM
+	VectorXf temp_displacements; ///< temporary vector of displacements
+	VectorXf displacements_prev; ///< displacement vector at previous time step
+	VectorXf dymamic_temp; ///< !!
+	VectorXf componentMasses; ///< !! 
+	VectorXf fm; ///< !!
+	VectorXf fm_temp; ///< !!
+	VectorXf totalDisp; ///< total displacement till a given time t
+	VectorXf nodeMass; ///< nodal mass
+	VectorXf viscosity; ///< viscosity
+	smInt pulledNode; ///< ID of the node pulled by the user
 
 	 /// \brief constructor
 	smFemSceneObject(smErrorLog *p_log=NULL){

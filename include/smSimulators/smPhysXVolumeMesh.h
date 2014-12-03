@@ -1,3 +1,9 @@
+/*
+****************************************************
+			SIMMEDTK LICENSE
+****************************************************
+*/
+
 #ifndef SMPHYSXVOLUMEMESH_H
 #define SMPHYSXVOLUMEMESH_H
 #include "smCore/smConfig.h"
@@ -20,15 +26,15 @@ struct smNeighborTetrasOfNode{
 /// \brief PhysX volume mesh
 class smPhysXVolumeMesh:public smVolumeMesh{
 public:
-	smBool renderSurface; ///> true if surface is to be rendered 
-	smBool renderTetras; ///> true if tetrahedra is to be rendered
-	vector<smPhysXLink> links; ///> !!
-	smInt nbrLinks; ///> !! number of links
-	smSurfaceMesh *surfaceMesh; ///> surface mesh
-	vector<vector <smEdge>> tetraEdges; ///> edges of tetrahedra
-	smNeighborTetrasOfNode *neiTet; ///> neighbor tetrahedra of a node
-	smBool *drawTet; ///> true for those tetra to be rendered
-	smBool *removedNode; ///> true for nodes to be removed
+	smBool renderSurface; ///< true if surface is to be rendered 
+	smBool renderTetras; ///< true if tetrahedra is to be rendered
+	vector<smPhysXLink> links; ///< !!
+	smInt nbrLinks; ///< !! number of links
+	smSurfaceMesh *surfaceMesh; ///< surface mesh
+	vector<vector <smEdge>> tetraEdges; ///< edges of tetrahedra
+	smNeighborTetrasOfNode *neiTet; ///< neighbor tetrahedra of a node
+	smBool *drawTet; ///< true for those tetra to be rendered
+	smBool *removedNode; ///< true for nodes to be removed
 
 	/// \brief constructor
 	smPhysXVolumeMesh();

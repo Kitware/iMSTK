@@ -49,14 +49,14 @@ public:
 	/// \brief destructor
 	~smATC3DGInterface();
 
-	CSystem tracker; ///> Configuation of the tracker system
-	CSensor *pSensor; ///>  Configuration of sensors
-	CXmtr *pXmtr; ///> Configuaration of the transmitter
-	int errorCode; ///> Returned error code for debug
-	double rate;  ///> tracker update rate -- if not set then it will be the device defualt
+	CSystem tracker; ///< Configuation of the tracker system
+	CSensor *pSensor; ///<  Configuration of sensors
+	CXmtr *pXmtr; ///< Configuaration of the transmitter
+	int errorCode; ///< Returned error code for debug
+	double rate;  ///< tracker update rate -- if not set then it will be the device defualt
 
-	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD *pRecord; ///> !!
-	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD record[32]; ///> !!
+	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD *pRecord; ///< !!
+	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD record[32]; ///< !!
 
 	/// \brief Open the 3DG device
 	void openATC3DGSystem();
@@ -98,7 +98,7 @@ public:
 	void handleEvent(smEvent *p_event){};
 
 public:
-	smPipe *ATC3DGpipe; ///> !!
+	smPipe *ATC3DGpipe; ///< !!
 
 	/// \brief !!
 	void sendDataToPipe();

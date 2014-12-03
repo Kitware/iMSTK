@@ -39,19 +39,19 @@ enum smAudioReturnType{
 /// \brief class to enable audio rendering
 class smAudio:public smCoreClass,public smEventHandler{
 
-	AudioDevicePtr device; ///> audio device
-	OutputStreamPtr sound; ///> !!
+	AudioDevicePtr device; ///< audio device
+	OutputStreamPtr sound; ///< !!
 
-	smErrorLog *log; ///> log for errors rendering audio
-	string referenceName; ///> !!
-	smAudioState state; ///> state of audio
-	smAudioState prevState; ///> state of audio in previous cycle
-	smFloat prevVolume; ///> state of audio volume in previous cycle
+	smErrorLog *log; ///< log for errors rendering audio
+	string referenceName; ///< !!
+	smAudioState state; ///< state of audio
+	smAudioState prevState; ///< state of audio in previous cycle
+	smFloat prevVolume; ///< state of audio volume in previous cycle
 
-	smFloat volume; ///> volume (max volume is 1.0)
+	smFloat volume; ///< volume (max volume is 1.0)
 
 public:
-	smBool continuousPlaying; ///> true if audio is to be played continuously
+	smBool continuousPlaying; ///< true if audio is to be played continuously
 
 	/// \brief constructor initialize various states
 	smAudio(char *fileName,string p_referenceName,smErrorLog *p_log=NULL ){

@@ -27,6 +27,7 @@ struct smOctreeCell;
 template<typename smSurfaceTreeCell> struct smSurfaceTreeIterator;
 typedef smHash<smCellPoint> smHashCellPoint;
 
+/// \brief 
 enum smCollisionSetting{
 	SOFMIS_COLISIONSETTING_MODEL2POINT,
 	SOFMIS_COLISIONSETTING_MODEL2TRIANGLE,
@@ -40,16 +41,15 @@ enum smCollisionSetting{
 
 inline unsigned int HASH(unsigned int p_SIZE, unsigned int p_x, unsigned int p_y, unsigned int p_z){
 	return ((( ((p_x)*HASH_P1) ^ ((p_y)*HASH_P2) ^ ((p_z)*HASH_P3))) % (p_SIZE));
-
 }
 
 /// \brief spatial hash
 class smSpatialHash:public smObjectSimulator{
 
 protected:
-	smFloat cellSizeX;
-	smFloat cellSizeY;
-	smFloat cellSizeZ;
+	smFloat cellSizeX; ///< cell size in x-direction
+	smFloat cellSizeY; ///< cell size in y-direction
+	smFloat cellSizeZ; ///< cell size in z-direction
 
 	//These structures below are Triangle2Triangle collisions
 
@@ -117,14 +117,18 @@ protected:
 	vector<smSurfaceTree<smOctreeCell>*> colModel;
 
 public:
-	smBool enableDuplicateFilter;
-	smPipe *pipe;
-	smPipe *pipeTriangles;
-	smPipe *pipeModelPoints;
+	smBool enableDuplicateFilter; ///< !!
+	smPipe *pipe; ///< !!
+	smPipe *pipeTriangles; ///< !!
+	smPipe *pipeModelPoints; ///< !!
 
+	/// \brief !!
 	void  findCandidatePoints(smMesh *p_mesh, smSurfaceTree<smOctreeCell> *p_colModel);
+
+	/// \brief !!
 	void computeCollisionModel2Points();
 
+	/// \brief destructor clear some memory
 	~smSpatialHash();
 
 	/// \brief !!
@@ -173,6 +177,7 @@ public:
 
 	/// \brief !!
 	virtual void beginSim(){
+
 		smObjectSimulator::beginSim();
 		//start the job
 		nbrTriCollisions=0;
@@ -193,6 +198,7 @@ public:
 
 	/// \brief !!
 	virtual void run(){
+		
 		smTimer timer;
 		timer.start();
 		beginSim();

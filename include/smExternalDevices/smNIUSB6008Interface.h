@@ -37,24 +37,24 @@ public:
 	smNIUSB6008Interface(int VBLaST_Task_ID);
 	~smNIUSB6008Interface();
 
-	smPipe *NIUSB6008pipe; ///>
-	int32 NI_error; ///>
-	char NI_errBuff[2048]; ///>
-	smInt initCount; ///>
-	smBool NI_on; ///>
-	float32 minValue[2]; ///>
-	float32 maxValue[2]; ///>
-	float32 invRange[2]; ///>
-	int32 count; ///>
-	float64 sampdata[30]; ///>
-	TaskHandle taskHandle; ///>
-	float64 aveData[3]; ///>
-	smInt nbrRegTool; ///>
-	toolData *regTool; ///>
-	smInt nbrTotalChannel; ///>
-	toolData installedTool[8]; ///> total number of AI channels of the device = 8
-	smInt nbrActiveChannel; ///>
-	smInt activeChannel[3]; ///> maximum number of active channel is 3s
+	smPipe *NIUSB6008pipe; ///<
+	int32 NI_error; ///<
+	char NI_errBuff[2048]; ///<
+	smInt initCount; ///<
+	smBool NI_on; ///<
+	float32 minValue[2]; ///<
+	float32 maxValue[2]; ///<
+	float32 invRange[2]; ///<
+	int32 count; ///<
+	float64 sampdata[30]; ///<
+	TaskHandle taskHandle; ///<
+	float64 aveData[3]; ///<
+	smInt nbrRegTool; ///<
+	toolData *regTool; ///<
+	smInt nbrTotalChannel; ///<
+	toolData installedTool[8]; ///< total number of AI channels of the device = 8
+	smInt nbrActiveChannel; ///<
+	smInt activeChannel[3]; ///< maximum number of active channel is 3s
 	smInt taskID;
 
 public:

@@ -51,21 +51,21 @@ public:
 		colModel=NULL;
 	}
 
-	smFloat offsetRotX; ///> offset in rotation in x-direction
-	smFloat offsetRotY; ///> offset in rotation in y-direction
-	smFloat offsetRotZ; ///> offset in rotation in z-direction
-	smVec3<smDouble> preOffsetPos; ///> !!
-	smVec3<smDouble> posOffsetPos; ///> !!
-	smMatrix44<smDouble> accumulatedMatrix; ///> !!
-	smMatrix44<smDouble> accumulatedDeviceMatrix; ///> !!
+	smFloat offsetRotX; ///< offset in rotation in x-direction
+	smFloat offsetRotY; ///< offset in rotation in y-direction
+	smFloat offsetRotZ; ///< offset in rotation in z-direction
+	smVec3<smDouble> preOffsetPos; ///< !!
+	smVec3<smDouble> posOffsetPos; ///< !!
+	smMatrix44<smDouble> accumulatedMatrix; ///< !!
+	smMatrix44<smDouble> accumulatedDeviceMatrix; ///< !!
 
-	smMatrix44<smDouble> currentMatrix; ///> !!
-	smMatrix44<smDouble> currentViewerMatrix; ///> !!
-	smMatrix44<smDouble> currentDeviceMatrix; ///> !!
-	smMatrix44<smDouble> tempCurrentMatrix; ///> !!
-	smMatrix44<smDouble> tempCurrentDeviceMatrix; ///> !!
-	smMesh * mesh; ///> mesh
-	smSurfaceTree<smOctreeCell> *colModel; ///> octree of surface
+	smMatrix44<smDouble> currentMatrix; ///< !!
+	smMatrix44<smDouble> currentViewerMatrix; ///< !!
+	smMatrix44<smDouble> currentDeviceMatrix; ///< !!
+	smMatrix44<smDouble> tempCurrentMatrix; ///< !!
+	smMatrix44<smDouble> tempCurrentDeviceMatrix; ///< !!
+	smMesh * mesh; ///< mesh
+	smSurfaceTree<smOctreeCell> *colModel; ///< octree of surface
 
 	/// \brief !!
 	inline void computeCurrentMatrix(){
@@ -95,20 +95,20 @@ struct smStylusPoints{
 		container=NULL;
 	}
 
-	smVec3 <smFloat> point; ///> co-ordinates of points on stylus
-	smMeshContainer *container; ///> !!
+	smVec3 <smFloat> point; ///< co-ordinates of points on stylus
+	smMeshContainer *container; ///< !!
 };
 
 /// \brief stylus object of the scene (typically used for laparascopic VR simulations)
 class smStylusSceneObject:public smSceneObject{
 
 public:
-	smVec3 <smDouble> pos; ///> position of stylus
-	smVec3 <smDouble> vel; ///> velocity of stylus
-	smMatrix33 <smDouble> rot; ///> rotation of stylus
-	smMatrix44 <smDouble> transRot; ///> !! translation and rotation matrix of stylus
-	smMatrix44 <smDouble> transRotDevice; ///> translation and rotation matrix of devide controlling the stylus
-	smBool toolEnabled; ///> !!
+	smVec3 <smDouble> pos; ///< position of stylus
+	smVec3 <smDouble> vel; ///< velocity of stylus
+	smMatrix33 <smDouble> rot; ///< rotation of stylus
+	smMatrix44 <smDouble> transRot; ///< !! translation and rotation matrix of stylus
+	smMatrix44 <smDouble> transRotDevice; ///< translation and rotation matrix of devide controlling the stylus
+	smBool toolEnabled; ///< !!
 
 	/// \brief constructor
 	smStylusSceneObject(smErrorLog *p_log=NULL);
@@ -129,9 +129,9 @@ public:
 class smStylusRigidSceneObject:public smStylusSceneObject,public smEventHandler{
 	QHash<QString,tree<smMeshContainer*>::iterator> indexIterators;
 public:
-	tree<smMeshContainer*> meshes; ///> meshes representing the stylus
-	tree<smMeshContainer*>::iterator rootIterator; ///> !!
-	volatile smBool updateViewerMatrixEnabled; ///> !!
+	tree<smMeshContainer*> meshes; ///< meshes representing the stylus
+	tree<smMeshContainer*>::iterator rootIterator; ///< !!
+	volatile smBool updateViewerMatrixEnabled; ///< !!
 
 	/// \brief to show the device tool..It is for debugging god object
 	smBool enableDeviceManipulatedTool;
@@ -146,7 +146,7 @@ public:
 	virtual void posTraverseCallBack(){
 	}
 
-	smBool posCallBackEnabledForEntireObject; ///> !!
+	smBool posCallBackEnabledForEntireObject; ///< !!
 
 	/// \brief !!
 	smStylusRigidSceneObject(smErrorLog *p_log=NULL);

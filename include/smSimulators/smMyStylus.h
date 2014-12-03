@@ -1,3 +1,8 @@
+/*
+****************************************************
+			SIMMEDTK LICENSE
+****************************************************
+*/
 
 #ifndef SMMYSTYLUS_H
 #define SMMYSTYLUS_H
@@ -9,11 +14,11 @@ class smMeshContainer;
 class MyStylus:public smStylusRigidSceneObject{
 
 public:
-	smInt phantomID; ///> ID fo phantom omni
-	smBool buttonState[2]; ///> state of the buttons
-	smFloat angle; ///> angle of the jaw (if applicable)
-	smFloat maxangle; ///> maximum angle of the jaw (if applicable)
-	smMeshContainer meshContainer,meshContainerLower,meshContainerUpper; ///> !!
+	smInt phantomID; ///< ID fo phantom omni
+	smBool buttonState[2]; ///< state of the buttons
+	smFloat angle; ///< angle of the jaw (if applicable)
+	smFloat maxangle; ///< maximum angle of the jaw (if applicable)
+	smMeshContainer meshContainer,meshContainerLower,meshContainerUpper; ///< !!
 
 	/// \brief handle keyboard and omni button presses 
 	void handleEvent(smEvent *p_event);
@@ -31,9 +36,9 @@ public:
 class HookCautery:public smStylusRigidSceneObject{
 
 public:
-	smInt phantomID; ///> ID of the phantom omni
-	smBool buttonState[2]; ///> state of the buttons
-	smMeshContainer meshContainer; ///> !!
+	smInt phantomID; ///< ID of the phantom omni
+	smBool buttonState[2]; ///< state of the buttons
+	smMeshContainer meshContainer; ///< !!
 
 	/// \brief handle keyboard and omni button presses 
 	void handleEvent(smEvent *p_event);

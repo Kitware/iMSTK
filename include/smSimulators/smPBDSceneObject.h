@@ -15,26 +15,26 @@
 class smPBDSceneObject:public smSceneObject {
 
 public:
-	smFloat dT; ///> size of time step
-	smFloat paraK; ///> !!
-	smFloat Damp; ///> damping values
-	smInt nbrMass; ///> number of masses
-	smInt **massIdx; ///> !!
-	smVec3<smFloat> *P; ///> !! position
-	smVec3<smFloat>  *V; ///> !! velocity
-	smVec3<smFloat>  *exF; ///> external force
-	smInt nbrSpr; ///> !! number of spheres
-	smFloat *L0; ///> !! Initial length
-	smBool *fixedMass; ///> true if masses are fixed
-	smInt nbrFixedMass; ///> number of fixed masses
-	smInt *listFixedMass; ///> list of IDs of masses that are fixed
+	smFloat dT; ///< size of time step
+	smFloat paraK; ///< !!
+	smFloat Damp; ///< damping values
+	smInt nbrMass; ///< number of masses
+	smInt **massIdx; ///< !!
+	smVec3<smFloat> *P; ///< !! position
+	smVec3<smFloat>  *V; ///< !! velocity
+	smVec3<smFloat>  *exF; ///< external force
+	smInt nbrSpr; ///< !! number of spheres
+	smFloat *L0; ///< !! Initial length
+	smBool *fixedMass; ///< true if masses are fixed
+	smInt nbrFixedMass; ///< number of fixed masses
+	smInt *listFixedMass; ///< list of IDs of masses that are fixed
 
-	smVec3<smFloat> ball_pos; ///> !! position of ball
-	smVec3<smFloat> ball_vel; ///> !! velocity of ball
-	smVec3<smFloat> ball_frc; ///> !! 
+	smVec3<smFloat> ball_pos; ///< !! position of ball
+	smVec3<smFloat> ball_vel; ///< !! velocity of ball
+	smVec3<smFloat> ball_frc; ///< !! 
 
-	smFloat ball_mass; ///> !! mass of ball
-	smFloat ball_rad; ///> !! radius of ball
+	smFloat ball_mass; ///< !! mass of ball
+	smFloat ball_rad; ///< !! radius of ball
 
 	/// \brief constructor
 	smPBDSceneObject(smErrorLog *p_log=NULL){
@@ -65,10 +65,10 @@ public:
 class smPBDSurfaceSceneObject:public smPBDSceneObject {
 
 public:
-	smSurfaceMesh *mesh; ///> surface mesh
-	smInt nbrTri; ///> number of surface triangles
-	smInt **triVertIdx; ///> !!
-	smInt **sprInTris; ///> triangles that include a spring
+	smSurfaceMesh *mesh; ///< surface mesh
+	smInt nbrTri; ///< number of surface triangles
+	smInt **triVertIdx; ///< !!
+	smInt **sprInTris; ///< triangles that include a spring
 
 	/// \brief constructor
 	smPBDSurfaceSceneObject(smErrorLog *p_log=NULL){

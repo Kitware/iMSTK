@@ -18,13 +18,13 @@ class smVolumeMesh:public smMesh{
 
 public:
 	/// push smMesh class specific errors here
-	smErrorLog *log_VM; ///> log the errors with volume mesh class
-	smInt nbrNodes; ///> total number of nodes of the volume mesh
-	smVec3<float> *nodes; ///> data of nodal co-ordinates
-	smInt nbrTetra; ///> number of tetrahedra
-	smTetrahedra *tetra; ///> tetrahedra data 
-	smInt *surfaceNodeIndex; ///> 
-	smBool *fixed; ///> indicates if the node is fixed or not
+	smErrorLog *log_VM; ///< log the errors with volume mesh class
+	smInt nbrNodes; ///< total number of nodes of the volume mesh
+	smVec3<float> *nodes; ///< data of nodal co-ordinates
+	smInt nbrTetra; ///< number of tetrahedra
+	smTetrahedra *tetra; ///< tetrahedra data 
+	smInt *surfaceNodeIndex; ///< 
+	smBool *fixed; ///< indicates if the node is fixed or not
 	
 	/// \brief constructor
 	smVolumeMesh(){

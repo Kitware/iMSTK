@@ -37,17 +37,17 @@
 /// \brief !!
 class smSpatialGridWorker:public smWorkerThread{
 
-	smLattice *latticePair;
-	smLattice *latticePair2;
+	smLattice *latticePair; ///< !!
+	smLattice *latticePair2; ///< !!
 
 public:
-	smMemoryBlock collisionPairs;
-	smCollidedTriangles *pairs;
-	smInt collidedPairs;
+	smMemoryBlock collisionPairs; ///< !!
+	smCollidedTriangles *pairs; ///< collided triangle pairs
+	smInt collidedPairs; ///< !!
 
 	///this is public for now
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES];
-	smInt totalLattices;
+	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///<
+	smInt totalLattices; ///< total number of lattices
 
 	/// \brief destructor
 	~smSpatialGridWorker(){
@@ -133,8 +133,7 @@ public:
 
 			collidedPairs=0;
 
-			for(smInt i=0;i<totalLattices;i++){
-			
+			for(smInt i=0;i<totalLattices;i++){			
 				latticeList[i]->indexReset();
 				latticeList[i]->updateBounds();
 				latticeList[i]->linkPrims();
@@ -212,20 +211,20 @@ public:
 class smSpatialGrid:public smCollisionDetection,QThread{
 
 private:
-	smSpatialGridWorker *workerThreads;
-	smInt totalThreads;
-	smSynchronization synch;
+	smSpatialGridWorker *workerThreads; ///< !!
+	smInt totalThreads; ///< number of total threads
+	smSynchronization synch; ///< !!
 
-	smVec3<smFloat> leftCorner;
-	smVec3<smFloat> rightCorner;
-	smInt xSeperation;
-	smInt ySeperation;
-	smInt zSeperation;
+	smVec3<smFloat> leftCorner; ///< left corner of the grid
+	smVec3<smFloat> rightCorner; ///< right corner of the grid
+	smInt xSeperation; ///< grid spacing in x-direction
+	smInt ySeperation; ///< grid spacing in y-direction
+	smInt zSeperation; ///< grid spacing in z-direction
 
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES];
-	smInt totalLattices;
-	smBool listUpdated;
-	QMutex mutex;
+	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///< 
+	smInt totalLattices; ///< total number of lattices
+	smBool listUpdated; ///< !!
+	QMutex mutex; ///< !!
 
 	/// \brief !!
 	void beginFrame(){
@@ -239,14 +238,15 @@ private:
 	}
 
 protected:
-	smInt maxPrims;
+	smInt maxPrims; ///< !! maximum primitives allowed
 
 public:
 
-	smPipe *pipe;
+	smPipe *pipe; ///< !!
 
 	/// \brief constructor
 	smSpatialGrid(smInt p_outOutputPrimSize=SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS):synch(1){
+
 		maxPrims=p_outOutputPrimSize;
 		totalThreads=1;
 		leftCorner=SOFMIS_SPATIALGRID_LEFTCORNER;
@@ -266,6 +266,7 @@ public:
 
 	/// \brief set the total number of threads for collision check
 	void setTotalThreads(smInt p_totalThreads){
+		
 		if(isInitialized!=false)
 			totalThreads=p_totalThreads;
 		synch.setWorkerCounter(p_totalThreads);
@@ -274,6 +275,7 @@ public:
 
 	/// \brief initialization
 	void init(){
+
 		smSceneObject *sceneObject;
 		smStaticSceneObject  *staticSceneObj;
 		smScene *scene;

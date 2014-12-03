@@ -58,16 +58,16 @@ struct smTextureAttachment{
 class smBaseMesh:public smCoreClass{
 
 public:
-	smCollisionGroup collisionGroup; ///> !!
-	smGLInt renderingID; ///> !!
-	smErrorLog *log; ///> record the log
-	smVec3<smFloat> *vertices; ///> vertices co-ordinate data at time t
-	smVec3<smFloat> * origVerts; ///> vertices co-ordinate data at time t=0
-	smInt  nbrVertices; ///> number of vertices 
-	smAABB aabb; ///> Axis aligned bounding box
-	smBool isTextureCoordAvailable; ///> true if the texture co-ordinate is available
-	smTexCoord *texCoord; ///> texture co-ordinates
-	vector<smTextureAttachment> textureIds; ///> !!
+	smCollisionGroup collisionGroup; ///< !!
+	smGLInt renderingID; ///< !!
+	smErrorLog *log; ///< record the log
+	smVec3<smFloat> *vertices; ///< vertices co-ordinate data at time t
+	smVec3<smFloat> * origVerts; ///< vertices co-ordinate data at time t=0
+	smInt  nbrVertices; ///< number of vertices 
+	smAABB aabb; ///< Axis aligned bounding box
+	smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
+	smTexCoord *texCoord; ///< texture co-ordinates
+	vector<smTextureAttachment> textureIds; ///< !!
 
 	/// \brief constructor
 	smBaseMesh();
@@ -106,18 +106,18 @@ class smMesh:public smBaseMesh{
 protected:
 
 public:
-	smInt  nbrTriangles; ///> number of triangles
-	smTriangle *triangles; ///> list of triangles
-	smTexCoord *texCoordForTrianglesOBJ; ///> !! tansel for OBJ
-	int	nbrTexCoordForTrainglesOBJ; ///> !! tansel for OBJ
-	smVec3<smFloat> *triNormals; ///> triangle normals
-	smVec3<smFloat> *vertNormals; ///> vertex normals
-	smVec3<smFloat> *triTangents; ///> triangle tangents
-	smVec3<smFloat> *vertTangents; ///> vertex tangents
-	smBool tangentChannel; ///> !!
-	vector< vector<smInt> > vertTriNeighbors; ///> list of neighbors for a trinagle
-	vector< vector<smInt> > vertVertNeighbors; ///> list of neighbors for a vertex
-	vector<smEdge> edges; ///> list of edges
+	smInt  nbrTriangles; ///< number of triangles
+	smTriangle *triangles; ///< list of triangles
+	smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
+	int	nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
+	smVec3<smFloat> *triNormals; ///< triangle normals
+	smVec3<smFloat> *vertNormals; ///< vertex normals
+	smVec3<smFloat> *triTangents; ///< triangle tangents
+	smVec3<smFloat> *vertTangents; ///< vertex tangents
+	smBool tangentChannel; ///< !!
+	vector< vector<smInt> > vertTriNeighbors; ///< list of neighbors for a trinagle
+	vector< vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
+	vector<smEdge> edges; ///< list of edges
 
 
 	///AABBB of the mesh.
@@ -125,10 +125,10 @@ public:
 	///Therefore it is initally NULL
 	smAABB *triAABBs;
 
-	smMeshType meshType; ///> type of mesh (rigid, deformable etc.)
-	smMeshFileType meshFileType; ///> type of input mesh
+	smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
+	smMeshFileType meshFileType; ///< type of input mesh
 
-	static QAtomicInt meshIdCounter; ///> !!
+	static QAtomicInt meshIdCounter; ///< !!
 
 public:
 	/// \brief constructor
@@ -237,9 +237,9 @@ struct smEdge{
 class smLineMesh:public smBaseMesh{
 
 public: 
-	smAABB *edgeAABBs;///> AABBs for the edges in the mesh
-	smEdge *edges;///> edges of the line mesh
-	smInt nbrEdges;///> number of edges of the line mesh
+	smAABB *edgeAABBs;///< AABBs for the edges in the mesh
+	smEdge *edges;///< edges of the line mesh
+	smInt nbrEdges;///< number of edges of the line mesh
 
 	/// \brief destructor
 	~smLineMesh(){
