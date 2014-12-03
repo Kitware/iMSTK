@@ -15,15 +15,25 @@
 class smSurfaceMesh:public smMesh{
 
 public:
-	///push smMesh class specific errors here
+	/// \brief push smMesh class specific errors here
 	smErrorLog *log_SF;
 
+	/// \brief constructor
 	smSurfaceMesh(smMeshType meshtype,smErrorLog *log);
+
+	/// \brief destructor
 	virtual ~smSurfaceMesh();
 
+	/// \brief load the surface mesh
 	smBool loadMesh(smChar *fileName,smMeshFileType fileType);
+
+	/// \brief load the surface mesh using in-house code
 	smBool loadMeshLegacy(smChar *fileName,smMeshFileType fileType);
+
+	/// \brief load the surface mesh from 3ds format
 	smBool Load3dsMesh(smChar *fileName);
+
+	/// \brief load surface meshes using assimp library
 	smBool LoadMeshAssimp(const smChar *fileName);
 };
 

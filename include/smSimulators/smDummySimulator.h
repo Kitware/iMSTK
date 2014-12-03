@@ -12,11 +12,12 @@
 #include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 
-///example simulator..the dummy simulator works on static scene objects for now..
+/// \brief Example simulator. This dummy simulator works on static scene objects for now.
 class smDummySimulator:public smObjectSimulator,public smEventHandler{
-public:
-	smDummySimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 
+public:
+	/// \brief constructor
+	smDummySimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 	}
 
 protected:
@@ -24,6 +25,7 @@ protected:
 		//start the job
 	}
 
+	/// \brief !!
 	virtual void initCustom(){
 		smClassType type;
 		smSceneObject *object;
@@ -44,6 +46,7 @@ protected:
 		}
 	}
 
+	/// \brief advance the simulator in time in a loop here
 	virtual void run(){
 		smSceneObject *sceneObj;
 		smStaticSceneObject *staticSceneObject;
@@ -67,11 +70,12 @@ protected:
 		endSim();
 	}
 
+	/// \brief !!
 	void endSim(){
 		//end the job
 	}
 
-	///synchronize the buffers in the object..do not call by yourself.
+	/// \brief synchronize the buffers in the object (do not call by yourself).
 	void syncBuffers(){
 		smSceneObject *sceneObj;
 		smStaticSceneObject *staticSceneObject;
@@ -89,6 +93,7 @@ protected:
 		}
 	}
 
+	/// \brief catch events such as key presses and other user inputs
 	void handleEvent(smEvent *p_event){
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){

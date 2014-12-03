@@ -18,65 +18,89 @@
 #include "smCore/smDoubleBuffer.h"
 #include "ATC3DG.h"		// ATC3DG API
 
-
+/// \brief !!
 class CSystem{
 public:
 	SYSTEM_CONFIGURATION	m_config;
 }; 
 
+/// \brief !!
 class CSensor{
 public:
 	SENSOR_CONFIGURATION	m_config;
 };
 
+/// \brief !!
 class CXmtr{
 public:
 	TRANSMITTER_CONFIGURATION m_config;
 };
 
+/// \brief interface class for ATC device
 class smATC3DGInterface: public smDeviceInterface, public QThread{
 
 public:
+	/// \brief constructor
 	smATC3DGInterface();
+
+	/// \brief constructor
 	smATC3DGInterface(double dataRate);//:rate(dataRate){}
+
+	/// \brief destructor
 	~smATC3DGInterface();
 
-	// Variables 
-	CSystem tracker; // Configuation of the tracker system
-	CSensor *pSensor; //  Configuration of sensors
-	CXmtr *pXmtr; // Configuaration of the transmitter
-	int errorCode; // Returned error code for debug
-	double rate;  // tracker update rate -- if not set then it will be the device defualt
+	CSystem tracker; ///> Configuation of the tracker system
+	CSensor *pSensor; ///>  Configuration of sensors
+	CXmtr *pXmtr; ///> Configuaration of the transmitter
+	int errorCode; ///> Returned error code for debug
+	double rate;  ///> tracker update rate -- if not set then it will be the device defualt
 
-	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD *pRecord;
-	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD record[32];
+	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD *pRecord; ///> !!
+	DOUBLE_POSITION_MATRIX_TIME_Q_RECORD record[32]; ///> !!
 
-	//Open the 3DG device
+	/// \brief Open the 3DG device
 	void openATC3DGSystem();
 
-	//Close the 3DG device
+	/// \brief Close the 3DG device
 	void closeATC3DGSystem();
 
-	/// Function to be called in a thread for getting device data
+	/// \brief Function to be called in a thread for getting device data
 	void runDevice();
 
+	/// \brief get errors if any
 	void errorHandler(int error);
+
+	/// \brief set the sensor data format
 	void setSensorDataFormat();
+
+	/// \brief get the data from sensor
 	void collectSensorData();
+
+	/// \brief !! nothing happens here
 	void init();
+
+	/// \brief !! start the ATC interface
 	void exec();
 
-	///empty functions for now
+	/// \brief empty functions for now
 	virtual void beginFrame(){};
 
-	///empty functions for now
+	/// \brief empty functions for now
 	virtual void endFrame(){};
+
+	/// \brief !! not used
 	void draw(smDrawParam p_params){};
+
+	/// \brief run the interface in a loop
 	void run();
+
+	/// \brief 
 	void handleEvent(smEvent *p_event){};
 
 public:
-	smPipe *ATC3DGpipe;
+	smPipe *ATC3DGpipe; ///> !!
+
+	/// \brief !!
 	void sendDataToPipe();
 };
 

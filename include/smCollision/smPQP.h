@@ -69,15 +69,18 @@ public:
 	smUnifiedID   onlySpecificMeshId;//collision check is done only with a specific mesh if this is given. This will have the mesh id;
 	smPipe *pipePQP;
 
+	/// \brief constructor
 	smPQPCollision(  smErrorLog *p_errorLog=NULL,smInt maxColResult=500):smObjectSimulator(p_errorLog){
 		minCollisionDistance=1.5;//default distance
 		onlySpecificMeshId.ID=-1;
 		pipePQP=new smPipe("col_PQP",sizeof(smPQPResult),maxColResult);
 	}
 
+	/// \brief !!
 	void initCustom(){
 	}
 
+	/// \brief rendering the collision meshes
 	void draw(smDrawParam p_params){
 
 		double matrixArray[16];
@@ -91,9 +94,11 @@ public:
 		glPopMatrix();
 	}
 
+	/// \brief !!
 	void initDraw(smDrawParam p_param){
 	}
 
+	/// \brief !!
 	void syncBuffers(){
 	}
 
@@ -103,17 +108,20 @@ public:
 	vector<smPQPSkeleton *>mPQPSourceSkeletons;
 	vector<smPQPSkeleton *>mPQPDestinationSkeletons;
 
+	/// \brief !!
 	void addDestinationMeshes(smSurfaceMesh *p_mesh){
 		smPQPSkeleton *pqpSkeleton=new smPQPSkeleton(p_mesh);
 		mPQPDestinationSkeletons.push_back(pqpSkeleton);
 	}
 
+	/// \brief !!
 	smPQPSkeleton* addSourceMeshes(smSurfaceMesh *p_mesh){
 		smPQPSkeleton *pqpSkeleton=new smPQPSkeleton(p_mesh);
 		mPQPSourceSkeletons.push_back(pqpSkeleton);
 		return pqpSkeleton;
 	}
 
+	/// \brief check the collision
 	void checkCollision(){
 
 		smInt nbrDestMeshes=mPQPDestinationSkeletons.size();
@@ -178,6 +186,7 @@ public:
 		pipePQP->acknowledgeValueListeners();
 	}
 
+	/// \brief !!
 	void smPQPCollision::handleEvent(smEvent *p_event){
 		smHapticOutEventData *hapticEventData;
 		smVec3d rightVector;

@@ -19,12 +19,12 @@
 
 #define SOFMIS_TREE_DIVISION_OCTREE 8
 
-//forward declaration..Oteherwise it doesn't compile
+//forward declaration..Otherwise it doesn't compile
 class smEvent;
 class smSurfaceMesh;
 
-template <typename T>
-struct smSurfaceTreeCell{
+/// \brief contains the cell of the surface tree structure
+template <typename T> struct smSurfaceTreeCell{
 
 public:
 	smBool filled;
@@ -38,45 +38,70 @@ public:
 		level=0;
 	}
 
+	/// \brief subdivide the cell of surface tree structure
 	inline void subDivide(smInt p_divisionPerAxis,T*);
+	
+	/// \brief checks if the cell collided with a triangle primitive
 	inline smBool isCollidedWithTri(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2);
+	
+	/// \brief checks if the cell contains the point primitive
 	inline smBool isCollidedWithPoint(smVec3f p_point);
+	
+	/// \brief !! expand the cell of the surface tree structure
 	inline void expand(smFloat p_expansion);
+	
+	/// \brief set the center of the cell of surface tree
 	inline void setCenter(smVec3f p_center);
+	
+	/// \brief set the length of the cell of surface tree
 	inline void setLength(smFloat);
+	
+	/// \brief !! copy the cell shape
 	inline void copyShape(T &);
+	
+	/// \brief get the center of the cell of surface tree
 	inline smVec3f getCenter()  const;
+	
+	/// \brief set the length of the cell of surface tree
 	inline smFloat getLength();
 };
 
+/// \brief cell of an octree
 struct smOctreeCell:public smSurfaceTreeCell<smOctreeCell>{
 
 	smCube cube;
 	
+	/// \brief get the center of the octree cell
 	inline smVec3f getCenter() const {
 		return  cube.center;
 	}
 
+	/// \brief set the center of the octree cell
 	inline void setCenter(smVec3f p_center){
 		cube.center=p_center;
 	}
 
+	/// \brief get the side length of the octree cell
 	inline smFloat getLength(){
 		return cube.sideLength;
 	}
 
+	/// \brief set the octree cell
 	inline void copyShape(smOctreeCell p_cell){
 		cube=p_cell.cube;
 	}
 
+	/// \brief !! expand the cell of the octree structure
 	inline void expand(smFloat p_expandScale){
 		cube.expand(p_expandScale);
 	}
 
+	/// \brief set the length of the octree cell
 	inline void setLength(smFloat p_length){
 		cube.sideLength=p_length;
 	}
 
+	/// \brief check if a triangle is intersecting the octree cell
 	inline smBool isCollidedWithTri(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2){
 		smAABB tempAABB;
 		tempAABB.aabbMin=cube.leftMinCorner();
@@ -84,9 +109,11 @@ struct smOctreeCell:public smSurfaceTreeCell<smOctreeCell>{
 		return smCollisionUtils::checkAABBTriangle(tempAABB,p_v0,p_v1,p_v2);
 	}
 
+	/// \brief check if a point lies inside an octree cell
 	inline smBool isCollidedWithPoint(){
 	}
 
+	/// \brief subdivide the cells of octree cells
 	inline void subDivide(smInt p_divisionPerAxis,smOctreeCell *p_cells){
 
 		smInt totalCubes=p_divisionPerAxis*p_divisionPerAxis*p_divisionPerAxis;
@@ -99,10 +126,10 @@ struct smOctreeCell:public smSurfaceTreeCell<smOctreeCell>{
 
 };
 
-
-
+/// \brief octree
 struct smOctree:public smSurfaceTreeCell<smOctree>{
 
+	/// \brief constructor
 	smOctree(){
 		triagleIndices.clear();
 		filled=false;
@@ -116,16 +143,23 @@ struct smOctree:public smSurfaceTreeCell<smOctree>{
 	set<smInt> verticesIndices;
 	vector<smFloat> weights;
 
+	/// \brief subdivide octree
 	inline void subDivide(smInt p_division, smOctreeCell *p_cells);
+
+	/// \brief !!
 	inline smBool isCollided(smVec3f p_v0,smVec3f p_v1,smVec3f p_v2);
+
+	/// \brief !!
 	inline void expand(smFloat p_expansion);
 };
 
+/// \brief !!
 struct smLevelIndex{
 	smInt startIndex;
 	smInt endIndex;
 };
 
+/// \brief !!
 enum SOFMIS_TREETYPE{
 	SOFMIS_TREETYPE_OCTREE,
 	SOFMIS_TREETYPE_CUSTOM
@@ -134,6 +168,7 @@ enum SOFMIS_TREETYPE{
 
 template<typename smSurfaceTreeCell> class smSurfaceTree;
 
+/// \brief 
 template <typename T> class smCollisionModelIterator{
 
 public:
@@ -149,7 +184,7 @@ public:
 	inline T operator[](smInt p_index);
 };
 
-
+/// \brief !!
 template<typename T> class smCollisionModel:public smCoreClass{
 
 public:
@@ -162,6 +197,7 @@ public:
 	smCollisionModelIterator<T>  get_LevelIterator() ;
 };
 
+/// \brief !!
 template<typename smSurfaceTreeCell>struct smSurfaceTreeIterator:
                              public smCollisionModelIterator<smSurfaceTreeCell>{
 
@@ -172,14 +208,17 @@ template<typename smSurfaceTreeCell>struct smSurfaceTreeIterator:
 public:
 	smSurfaceTree<smSurfaceTreeCell> *tree;
 
+	/// \brief 
 	smSurfaceTreeIterator( smSurfaceTree<smSurfaceTreeCell> *  p_tree){
 		tree=p_tree;
 	}
 
+	/// \brief up the index
 	inline void operator++(){
 		currentIndex++;
 	}
 
+	/// \brief lower the index
 	inline void operator--(){
 		currentIndex--;
 	}
@@ -188,19 +227,23 @@ public:
 		return tree->treeAllLevels[p_index];
 	}
 
+	/// \brief !!
 	inline void setLevel(smInt p_level){
 		startIndex = tree->levelStartIndex[p_level].startIndex;
 		endIndex = tree->levelStartIndex[p_level].endIndex;
 	}
 
+	/// \brief !!
 	inline void resetIteration(){
 		currentIndex = startIndex;
 	}
 
+	/// \brief !!
 	inline smInt start(){
 		return startIndex;
 	}
 
+	/// \brief !!
 	inline smInt end(){
 		return endIndex;
 	}
@@ -208,6 +251,7 @@ public:
 	friend smSurfaceTree<smSurfaceTreeCell>;
 };
 
+/// \brief !!
 template<typename smSurfaceTreeCell> class smSurfaceTree:
                             public smCollisionModel<smSurfaceTreeCell>,public smEventHandler{
 
@@ -234,20 +278,37 @@ template<typename smSurfaceTreeCell> class smSurfaceTree:
 		smSurfaceTreeCell *initialTreeAllLevels;
 		smSurfaceTreeCell *treeAllLevels;
 
+		/// \brief initialize the draw function related structures
 		void initDraw(smDrawParam p_param);
+
+		/// \brief destructor
 		~smSurfaceTree();
+
+		/// \brief constructor
 		smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType);
+		
+		/// \brief initialize the surface tree structure
 		void initStructure();
+
 		smSurfaceTreeIterator<smSurfaceTreeCell>  get_LevelIterator(smInt p_level) ;
+		
 		smSurfaceTreeIterator<smSurfaceTreeCell>  get_LevelIterator() ;
 
+		/// \brief !!
 		inline smUnifiedID getAttachedMeshID(){
 			return mesh->uniqueId;
 		}
 
+		/// \brief rendering the surface tree
 		virtual void draw(smDrawParam p_params);
+
+		/// \brief !!
 		void handleEvent(smEvent *p_event);
+		
+		/// \brief !! smSurfaceTree structure
 		void updateStructure();
+		
+		/// \brief !!
 		void translateRot();
 };
 

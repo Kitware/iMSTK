@@ -1,29 +1,7 @@
 /*
 ****************************************************
-                  SOFMIS LICENSE
-
+                  SIMMEDTK LICENSE
 ****************************************************
-
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
-
-    \author:    Module by Tansel Halic
-
-
-    \version    1.0
-    \date       05/2009
-    \bug	    None yet
-    \brief	    This class is the simulator object. Each simulator should derive this.
-
-
-
-*****************************************************
 */
 
 #ifndef SMTOOLSIMULATOR_H
@@ -36,22 +14,25 @@
 #include "smSimulators/smStylusObject.h"
 
 
-///example simulator..the dummy simulator works on static scene objects for now..
+/// \brief Example tool simulator
 class smToolSimulator:public smObjectSimulator,public smEventHandler{
-public:
-	smToolSimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 
+public:
+	/// \brief constructor
+	smToolSimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 	}
 
-protected:
+protected:	
+	/// \brief update everything related to tool
 	void updateTool(smStylusRigidSceneObject *p_tool);
 
+	/// \brief !!
 	virtual void initCustom(){
-
 	}
 
-	//test
+	/// \brief run the tool simulator in a loop here
 	virtual void run(){
+
 		smSceneObject *sceneObj;
 		smStylusRigidSceneObject *tool;
 
@@ -70,12 +51,13 @@ protected:
 		}
 	}
 
-	///synchronize the buffers in the object..do not call by yourself.
+	/// \brief synchronize the buffers in the object..do not call by yourself.
 	void syncBuffers(){
-
 	}
 
+	/// \brief handle the events such as button presses related to tool
 	void handleEvent(smEvent *p_event){
+
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){
 		case SOFMIS_EVENTTYPE_KEYBOARD:

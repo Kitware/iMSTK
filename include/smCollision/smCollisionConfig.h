@@ -13,6 +13,8 @@
 #include "smUtilities/smVec3.h"
 #include "smCore/smCoreClass.h"
 
+/// \brief Contains information related to the triangles that are present in a cell
+/// at any given point
 struct smCellTriangle{
 
 	smUInt primID;
@@ -33,11 +35,13 @@ struct smCellTriangle{
 	}
 };
 
+/// \brief Contains information related to the a line segments that are present in a cell
+/// at any given point
 struct smCellLine{
 
-	smUInt primID;//Edge id
-	smUnifiedID meshID;// smMeshLine id
-	smVec3<smFloat> vert[2];//Vertices 
+	smUInt primID; ///< Edge id
+	smUnifiedID meshID; ///< smMeshLine id
+	smVec3<smFloat> vert[2]; ///< Vertices 
 
 	inline  bool operator ==(unsigned int p_ID){
 		return (primID==p_ID?true:false);
@@ -52,11 +56,12 @@ struct smCellLine{
 	}
 };
 
+/// \brief !!
 struct smCellModel{
 
-	smUInt primID;//Model Prim id
-	smUnifiedID meshID;// smMeshLine id
-	smVec3<smFloat> center;//Vertices
+	smUInt primID; ///< Model Prim id
+	smUnifiedID meshID; ///< smMeshLine id
+	smVec3<smFloat> center; ///< Vertices
 	smFloat radius;
 
 	inline  bool operator ==(unsigned int p_ID){
@@ -73,11 +78,14 @@ struct smCellModel{
 	}
 };
 
+
+/// \brief Contains information related to the a verticess that are present in a cell
+/// at any given point
 struct smCellPoint{
 
-	smUInt primID;//Model Prim id
-	smUnifiedID meshID;// smMeshLine id
-	smVec3<smFloat> vert;//Vertices
+	smUInt primID; ///< Model Prim id
+	smUnifiedID meshID; ///< smMeshLine id
+	smVec3<smFloat> vert; ///< Vertices
 
 	inline  bool operator ==(unsigned int p_ID){
 		return (primID==p_ID?true:false);
@@ -93,6 +101,7 @@ struct smCellPoint{
 	}
 };
 
+/// \brief Contains triangle pair that have collided
 struct smCollidedTriangles{
 	smCellTriangle tri1;
 	smCellTriangle tri2;
@@ -100,18 +109,21 @@ struct smCollidedTriangles{
 	smShort point1,point2;
 };
 
+/// \brief Contains line pair that have collided
 struct smCollidedLineTris{
 	smCellTriangle tri;
 	smCellLine line;
 	smVec3<smFloat> intersection;
 };
 
+/// \brief Contains model-point pair that have collided
 struct smCollidedModelPoints{
 	smCellModel model;
 	smCellPoint point;
 	smFloat penetration;
 };
 
+/// \brief !!
 class smCollisionGroup{
 
 protected:
@@ -121,19 +133,19 @@ public:
 	smUInt64  groupId;
 	smUInt64  groupMask;
 
-	/// \brief 
+	/// \brief !!
 	smCollisionGroup(){
 		groupId=1;
 		groupMask=1;
 	}
 
-	/// \brief 
+	/// \brief !!
 	void setGroup(smUInt p_groupId){
 		groupId=1<<p_groupId;
 		groupMask=groupId;
 	}
 
-	/// \brief 
+	/// \brief !!
 	void permitCollision(smCollisionGroup &p_group){
 			groupMask=groupMask|(p_group.groupId);
 			p_group.groupMask=p_group.groupMask|(groupId);
@@ -141,14 +153,14 @@ public:
 			cout<<"GroupId:"<<groupId<<endl;
 	}
 
-	/// \brief 
+	/// \brief !!
 	void forbidCollision(smCollisionGroup &p_group){
 			groupMask=groupMask&(~p_group.groupId);
 			p_group.groupMask=p_group.groupMask&(~groupId);
 	}
 
 	/// \brief if the group is different then the function checks the group mask..
-	//if they're in the same group collision enabled
+	//  if they're in the same group collision enabled
 	inline smBool isCollisionPermitted(smCollisionGroup& p_group){
 		return ( (groupId&p_group.groupId)==0?((groupId&p_group.groupMask)==0? false:true):true);
 	}

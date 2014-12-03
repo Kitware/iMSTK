@@ -43,7 +43,7 @@ inline unsigned int HASH(unsigned int p_SIZE, unsigned int p_x, unsigned int p_y
 
 }
 
-///example simulator..the dummy simulator works on static scene objects for now..
+/// \brief spatial hash
 class smSpatialHash:public smObjectSimulator{
 
 protected:
@@ -53,56 +53,65 @@ protected:
 
 	//These structures below are Triangle2Triangle collisions
 
-	///Cells for triangles. It stores candidate triangles
+	/// \brief Cells for triangles. It stores candidate triangles
 	smHash<smCellTriangle> cells;
 
-	///structure that stores the meshes in the scene
+	/// \brief structure that stores the meshes in the scene
 	QVector<smMesh *> meshes;
 
-	///After the collision is cimpleted the result is written in here
+	/// \brief After the collision is cimpleted the result is written in here
 	smCollidedTriangles *collidedPrims;
 
-	///Number of collisions that triangles are stored.	
+	/// \brief Number of collisions that triangles are stored.	
 	smInt nbrTriCollisions;
 
-	///Line mesh structure that is added to collision detection engine
+	/// \brief Line mesh structure that is added to collision detection engine
 	QVector<smLineMesh *> lineMeshes;
 
-	///Lines that stored in the scene.
+	/// \brief Lines that stored in the scene.
 	smHash<smCellLine> cellLines;
 
-	///candidate triangles in the scene.
+	/// \brief candidate triangles in the scene.
 	smHash<smCellTriangle> cellsForTri2Line;
 
-	///candidate cells for collision model
+	/// \brief candidate cells for collision model
 	smHash<smCellModel> cellsForModel;
 
-	///candidate for Collision model to point 
+	/// \brief candidate for Collision model to point 
 	smHash<smCellPoint> cellsForModelPoints;
 
-	///The result is stored here.
+	/// \brief The result is stored here.
 	smCollidedLineTris *collidedLineTris;
 
-	///The number of collisions that for line to triangle.
+	/// \brief The number of collisions that for line to triangle.
 	smInt nbrLineTriCollisions;
 
-	//smHash<smCollisionGroup> collisionGroups;
+	/// \brief smHash<smCollisionGroup> collisionGroups;
 	
-	///the collision results are here
+	/// \brief the collision results are here
 	smCollidedModelPoints *collidedModelPoints;
 	
-	///the number of collisions for model to point
+	/// \brief the number of collisions for model to point
 	smInt nbrModelPointCollisions;
 
-	///For maximum collision output.
+	/// \brief For maximum collision output.
 	smInt maxPrims;
 
 	map<smInt,smInt> filteredList; 
 
+	 /// \brief adds triangle to hash
 	inline void addTriangle(smMesh *p_mesh,smInt p_triangleId,smHash<smCellTriangle> &p_cells);
+
+	/// \brief adds line to hash
 	inline void addLine(smLineMesh *p_mesh,smInt p_edgeId,smHash<smCellLine> &p_cells);
+
+	/// \brief adds point to hash
 	inline void addPoint(smMesh *p_mesh,smInt p_vertId,smHash<smCellPoint> p_cells);
-	inline void addOctreeCell( smSurfaceTree<smOctreeCell> *p_colModel,smHash<smCellModel> p_cells);
+
+	/// \brief adds octree cell to hash
+	inline void addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel, smHash<smCellModel> p_cells);
+
+	/// \brief !!
 	void reset();
 
 	vector<smSurfaceTree<smOctreeCell>*> colModel;
@@ -118,10 +127,19 @@ public:
 
 	~smSpatialHash();
 
+	/// \brief !!
 	void addCollisionModel(smSurfaceTree<smOctreeCell> *p_CollMode );
+	
+	/// \brief !!
 	void addMesh(smMesh *mesh);
+	
+	/// \brief !!
 	void addMesh(smLineMesh *p_mesh);
+	
+	/// \brief !!
 	void removeMesh(smMesh *p_mesh);
+
+	/// \brief !!
 	smSpatialHash(smErrorLog *p_errorLog,
 		smInt p_hashTableSize,
 		smFloat p_cellSizeX,
@@ -129,15 +147,31 @@ public:
 		smFloat p_cellSizeZ,
 		smInt p_outOutputPrimSize = SOFMIS_COLLISIONOUTPUTBUF_SIZE);
 
+	/// \brief !!
 	void draw();
+
+	/// \brief find the candidate triangle pairs for collision (broad phase collision)
 	smBool findCandidateTris(smMesh *p_mesh,smMesh  *p_mesh2);
+
+	/// \brief find the candidate line-triangle pairs for collision (broad phase collision)
 	smBool findCandidateTrisLines(smMesh *p_mesh,smLineMesh *p_mesh2);
+
+	/// \brief compute the collision between two triangles (narrow phase collision)
 	void computeCollisionTri2Tri();
+
+	/// \brief compute collision between a line segment and a triangle (narrow phase collision)
 	void computeCollisionLine2Tri();
+
+	/// \brief !!
 	void filterLine2TrisResults();
+
+	/// \brief !!
 	void draw(smDrawParam p_param);
+
+	/// \brief initialize the drawing structures
 	void initDraw(smDrawParam p_param);
 
+	/// \brief !!
 	virtual void beginSim(){
 		smObjectSimulator::beginSim();
 		//start the job
@@ -151,10 +185,13 @@ public:
 			meshes[i]->upadateAABB();
 	}
 
+	/// \brief !!
 	virtual void initCustom();
+
+	/// \brief !! compute the hash
 	inline void computeHash(smMesh *p_mesh,int *p_tris,int p_nbrTris);
 
-	//test
+	/// \brief !!
 	virtual void run(){
 		smTimer timer;
 		timer.start();
@@ -191,13 +228,14 @@ public:
 				endSim();
 	}
 
+	/// \brief !!
 	void endSim(){
 		//end the job
 		smObjectSimulator::endSim();
 		reset();
 	}
 
-	///synchronize the buffers in the object..do not call by yourself.
+	/// \brief !! synchronize the buffers in the object..do not call by yourself.
 	void syncBuffers(){
 	}
 

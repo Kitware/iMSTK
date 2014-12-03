@@ -16,6 +16,7 @@
 
 #define SM_MAX_BUTTONS 4
 
+/// \brief holds haptic device data
 struct hapticDeviceData_t {
 	smInt deviceID;
 	smString deviceName;
@@ -26,21 +27,56 @@ struct hapticDeviceData_t {
 	smBool buttonState[SM_MAX_BUTTONS];
 };
 
+/// \brief Absract base class for haptic device
 class smHapticInterface: public smDeviceInterface{
 
 public:
-	smHapticInterface();
-	virtual ~smHapticInterface(){};
-	virtual int openDevice(){ return SOFMIS_MSG_UNKNOWN;}
-	virtual int closeDevice() {return SOFMIS_MSG_UNKNOWN;}
-	virtual int startDevice(){ return SOFMIS_MSG_UNKNOWN;}
-	virtual int  getPosition(smVec3<smDouble> & d_pos) {return SOFMIS_MSG_UNKNOWN;}
-	virtual int getOreintation(smMatrix33 <smDouble> *d_rot) {return SOFMIS_MSG_UNKNOWN;}
-	virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform) {return SOFMIS_MSG_UNKNOWN;}
-	virtual int setForce (smVec3<smDouble> & force) {return SOFMIS_MSG_UNKNOWN;}
-	virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque) {return SOFMIS_MSG_UNKNOWN;}
 
-protected:
+	/// \brief constructor
+	smHapticInterface();
+
+	/// \brief destructor
+	virtual ~smHapticInterface(){};
+
+	/// \brief open haptic device
+	virtual int openDevice(){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief close haptic device
+	virtual int closeDevice(){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief start the haptic device 
+	virtual int startDevice(){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief get the position of the end effector the haptic device
+	virtual int  getPosition(smVec3<smDouble> & d_pos){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief get the orientation of the end effector the haptic device
+	virtual int getOreintation(smMatrix33 <smDouble> *d_rot){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief get the transform (position + orientation) of the end effector the haptic device
+	virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief set force to the haptic device
+	virtual int setForce (smVec3<smDouble> & force){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief set torque to the haptic device
+	virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque){
+		return SOFMIS_MSG_UNKNOWN;
+	}
 
 };
 
