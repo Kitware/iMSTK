@@ -1,4 +1,4 @@
-# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
+﻿# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
 # and below (NEWLIB) for an example for how to use it).
 
 set(sources_sofmis
@@ -23,12 +23,6 @@ set(sources_sofmis
 ./smCore/smTextureManager.cpp
 ./smExternal/framebufferObject.cpp
 ./smExternal/renderbuffer.cpp
-./smExternalDevices/smADUInterface.cpp
-./smExternalDevices/smATC3DGInterface.cpp
-./smExternalDevices/smDeviceInterface.cpp
-./smExternalDevices/smHapticInterface.cpp
-./smExternalDevices/smNIUSB6008Interface.cpp
-./smExternalDevices/smPhantomInterface.cpp
 ./smMesh/smImportExport.cpp
 ./smMesh/smLattice.cpp
 ./smMesh/smLatticeType.cpp
@@ -43,8 +37,6 @@ set(sources_sofmis
 ./smRendering/smRenderer.cpp
 ./smRendering/smVBO.cpp
 ./smRendering/smViewer.cpp
-./smScripting/smV8UI.cpp
-./smScripting/V8Scripting.cpp
 ./smShader/SceneTextureShader.cpp
 ./smShader/smShader.cpp
 ./smSimulators/smFemSceneObject.cpp
@@ -60,6 +52,19 @@ set(sources_sofmis
 ./smUtilities/smVec3.cpp
 )
 
+set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
+  ./smExternalDevices/smADUInterface.cpp
+  ./smExternalDevices/smATC3DGInterface.cpp
+  ./smExternalDevices/smDeviceInterface.cpp
+  ./smExternalDevices/smHapticInterface.cpp
+  ./smExternalDevices/smNIUSB6008Interface.cpp
+  ./smExternalDevices/smPhantomInterface.cpp
+)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set_source_files_properties(${sources_sofmis} PROPERTIES COMPILE_FLAGS -std=c++11)
+endif()
+
 add_library(sofmis
   ${sources_sofmis})
 
@@ -74,3 +79,11 @@ add_library(sofmis
 target_link_libraries(sofmis
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY})
+
+if(BUILD_EXTERNAL_DEVICES)
+add_library(externalDevices
+  ${SIMMEDTK_EXTERNAL_DEVICES_SOURCES})
+target_link_libraries(externalDevices
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY})
+endif()

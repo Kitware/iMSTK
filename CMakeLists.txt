@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+﻿cmake_minimum_required(VERSION 3.0)
 
 project(sofmis)
 
@@ -39,19 +39,21 @@ sofmis_find_package(Boost REQUIRED
   COMPONENTS
     thread
     system)
-sofmis_find_package(ADU REQUIRED)
-sofmis_find_package(ATC REQUIRED)
-sofmis_find_package(NIDAQ REQUIRED)
 sofmis_find_package(Audiere REQUIRED)
 sofmis_find_package(OpenHaptics REQUIRED)
 sofmis_find_package(V8 REQUIRED)
 sofmis_find_package(OpenCV REQUIRED)
 sofmis_find_package(ASSIMP MODULE REQUIRED)
 
+if(BUILD_EXTERNAL_DEVICES)
+  sofmis_find_package(ADU REQUIRED)
+  sofmis_find_package(ATC REQUIRED)
+  sofmis_find_package(NIDAQ REQUIRED)
+endif(BUILD_EXTERNAL_DEVICES)
+
 # Move these to the libraries which actually use them. This minimizes the number
 # of include paths per translation unit and makes it easier to see what requires
 # what.
-
 include_directories(SYSTEM
   "${QT_QTCORE_INCLUDE_DIR}"
   "${QT_QTGUI_INCLUDE_DIR}"
@@ -67,13 +69,16 @@ include_directories(SYSTEM "${QGLVIEWER_INCLUDE_DIRS}")
 include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
-include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
-include_directories(SYSTEM "${ATC_INCLUDE_DIR}")
-include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 include_directories(SYSTEM "${AUDIERE_INCLUDE_DIR}")
 include_directories(SYSTEM "${OPENHAPTICS_INCLUDE_DIR}")
 include_directories(SYSTEM "${V8_INCLUDE_DIR}")
 include_directories(SYSTEM "${OpenCV_INCLUDE_DIRS}")
 include_directories(SYSTEM "${ASSIMP_INCLUDE_DIRS}")
+
+if(BUILD_EXTERNAL_DEVICES)
+  include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
+  include_directories(SYSTEM "${ATC_INCLUDE_DIR}")
+  include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
+endif(BUILD_EXTERNAL_DEVICES)
 
 add_subdirectory(src)
