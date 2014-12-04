@@ -1,11 +1,19 @@
-find_path(OPENHAPTICS_INCLUDE_DIR
-  HD/hd.h)
+﻿find_path(OPENHAPTICS_INCLUDE_DIR
+  HL/hl.h HLU/hlu.h HD/hd.h HDU/hdu.h
+  PATHS /usr/include)
+
 find_library(OPENHAPTICS_hd_LIBRARY
   NAMES
-    hd)
+    HD)
 find_library(OPENHAPTICS_hdu_LIBRARY
   NAMES
-    hdu)
+    HDU)
+find_library(OPENHAPTICS_hl_LIBRARY
+  NAMES
+    HL)
+find_library(OPENHAPTICS_hlu_LIBRARY
+  NAMES
+    HLU)
 
 set(OPENHAPTICS_INCLUDE_DIRS "${OPENHAPTICS_INCLUDE_DIR}")
 set(OPENHAPTICS_LIBRARIES "${OPENHAPTICS_hd_LIBRARY}" "${OPENHAPTICS_hdu_LIBRARY}")
