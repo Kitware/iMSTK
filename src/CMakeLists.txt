@@ -1,4 +1,4 @@
-﻿# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
+# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
 # and below (NEWLIB) for an example for how to use it).
 
 set(sources_sofmis
@@ -36,6 +36,7 @@ set(sources_sofmis
 ./smRendering/smLight.cpp
 ./smRendering/smRenderer.cpp
 ./smRendering/smVBO.cpp
+./smRendering/smVAO.cpp
 ./smRendering/smViewer.cpp
 ./smShader/SceneTextureShader.cpp
 ./smShader/smShader.cpp
@@ -77,8 +78,29 @@ add_library(sofmis
 # TODO: There are a lot of missing libraries here; look at the available
 # variables in the cmake-gui.
 target_link_libraries(sofmis
+  ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY})
+  ${Boost_THREAD_LIBRARY}
+  Qt4::QtGui
+  Qt4::QtCore
+  Qt4::QtOpenGL
+  ${GLEW_LIBRARY}
+  ${GLUT_LIBRARY}
+  ${OPENGL_LIBRARIES}
+  ${OPENCV_LIBRARIES}
+  ${ADU_LIBRARY}
+  ${ASSIMP_LIBRARY}
+  ${ATC_LIBRARY}
+  ${AUDIERE_LIBRARY}
+  ${GLUT_glut_LIBRARY}
+  ${ILUT_LIBRARIES}
+  ${ILU_LIBRARIES}
+  ${IL_LIBRARIES}
+  ${NIDAQ_mx_LIBRARY}
+  ${DevIL_LIBRARY}
+  ${OPENHAPTICS_hd_LIBRARY}
+  ${OPENHAPTICS_hdu_LIBRARY}
+)
 
 if(BUILD_EXTERNAL_DEVICES)
 add_library(externalDevices

@@ -1,5 +1,5 @@
 find_path(ASSIMP_INCLUDE_DIR
-  assimp/config.h)
+  anim.h)
 find_library(ASSIMP_LIBRARY
   NAMES
     assimp)
