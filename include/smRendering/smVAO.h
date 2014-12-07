@@ -52,7 +52,7 @@ public:
 		arrayBufferType=SMVBO_POS;
 	}
 };
-
+/// \brief Vertex Array Object for fast rendering
 class smVAO:public smCoreClass{
 private:
 	GLuint vboDataId;
@@ -78,7 +78,7 @@ public:
 	static QHash<smInt,smVAO *>VAOs;
 	smMesh *mesh;
 
-	///need error log and totalBuffer Size
+	/// \brief need error log and totalBuffer Size
 	smVAO(smErrorLog *p_log, smVBOType p_vboType=SOFMIS_VBO_DYNAMIC, smBool p_bindShaderObjects=true){
 		this->log=p_log;
 		renderingError=false;
@@ -88,7 +88,7 @@ public:
 		indexBufferLocation=-1;
 		bindShaderObjects=p_bindShaderObjects;
 	}
-
+	/// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
 	void setBufferData(smVBOBufferType p_type,string p_ShaderAttribName, smInt p_nbrElements, void *p_ptr){
 		bufferInfo[totalNbrBuffers].arrayBufferType=p_type;
 		if(p_type==SMVBO_POS ||
@@ -111,7 +111,7 @@ public:
 		bufferInfo[totalNbrBuffers].shaderAttribName=p_ShaderAttribName;
 		totalNbrBuffers++;
 	}
-
+	/// \brief set the triangle information 
 	void setTriangleInfo(string p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr){
 		bufferInfo[totalNbrBuffers].arrayBufferType=SMVBO_INDEX;
 		bufferInfo[totalNbrBuffers].nbrElements=p_nbrTriangles*3;
@@ -121,7 +121,7 @@ public:
 		totalNbrBuffers++;
 	}
 
-	///uses default attrib location
+	/// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
 	smBool setBufferDataFromMesh(smMesh *p_mesh,
 	                             smShader *p_shader,
 	                             string p_POSITIONShaderName="Position",
@@ -179,29 +179,30 @@ public:
 		mesh=p_mesh;
 		return true;
 	}
-
+	/// \brief updates the buffer with data. It is important for meshes undergoes topology changes
 	smBool updateStreamData();
 	static void initVAOs(smDrawParam p_param){
 		foreach (smVAO *vao, VAOs)
 			vao->initBuffers(p_param);
 	}
-
+	/// \brief  init VAO buffers
 	void initBuffers(smDrawParam p_param);
+	/// \brief get VAO given the shader ID
 	static inline smVAO * getVAO(smUnifiedID p_shaderID){
 		return VAOs[p_shaderID.ID];
 	}
-
+	/// \brief  enable the vertex array object
 	inline void enable(){
 		glBindVertexArray(VAO);
 	}
-
+	/// \brief disable VAO
 	inline void disable(){
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
-
+	/// \brief draw VAO
 	void draw(smDrawParam p_params);
-
+	/// \brief constructor
 	~smVAO(){
 		glDeleteBuffers(totalNbrBuffers, bufferIndices);
 		glDeleteVertexArrays(1, &VAO);

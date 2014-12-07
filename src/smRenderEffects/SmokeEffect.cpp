@@ -49,7 +49,7 @@ GLint locFadeEffect;
 GLuint texName[SMOKE_TEXTURES];
 smTimer timer;
 
-/// \brief
+/// \brief legeacy code for printing the info for the shader
 void printInfoLog_Legacy(GLhandleARB obj){
 
 	int infologLength = 0;
@@ -66,7 +66,7 @@ void printInfoLog_Legacy(GLhandleARB obj){
 	}
 }
 
-/// \brief
+/// \brief for shader reading
 char* readStringFromFile(char *fn) {
 
 	FILE *fp;
@@ -121,12 +121,12 @@ public:
 		closed=false;
 	}
 
-	/// \brief
+	/// \brief stop frame loading
 	void stop(){
 		running=false;
 	}
 
-	/// \brief
+	/// \brief wait until closing completes
 	void closeAndWait(){
 		while(1){
 			if(closed==true)

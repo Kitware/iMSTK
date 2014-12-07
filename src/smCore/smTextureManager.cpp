@@ -90,7 +90,7 @@ smTextureReturnType smTextureManager::initGLTextures(){
 }
 
 /// \brief load the texture and associated it with reference name. 
-/// Also you could use texture Id for activatinghe texture
+/// Also you could use texture Id for activation of the texture
 smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName,
                     const smChar *p_textureReferenceName,smInt &p_textureId){
 
@@ -168,7 +168,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, cons
 	return SOFMIS_TEXTURE_OK;
 }
 
-/// \brief
+/// \brief load texture with given filename, texture reference name, parameter to flip the image or not
 smTextureReturnType smTextureManager::loadTexture(const smString p_fileName,
                        const smChar *p_textureReferenceName,smBool p_flipImage){
 
@@ -192,7 +192,7 @@ smTextureReturnType smTextureManager::findTextureId(const smChar *p_textureRefer
 
 }
 
-/// \brief
+/// \brief  activate the texture with given texture reference name
 GLuint smTextureManager::activateTexture(const smChar *p_textureReferenceName ){
 
 	smInt textureId;
@@ -205,7 +205,7 @@ GLuint smTextureManager::activateTexture(const smChar *p_textureReferenceName ){
 	return texture->textureGLId; 
 }
 
-/// \brief
+/// \brief activate the texture given the smTexture argument 
 GLuint smTextureManager::activateTexture(smTexture *p_texture){
 
 	glBindTexture(GL_TEXTURE_2D,p_texture->textureGLId);

@@ -146,6 +146,7 @@ protected:
 	void runRegisteredModules();
 
 	static smSDK sdk;
+	///holds the references to the entities in the framework
 	static smIndiceArray<smMeshHolder> *meshesRef;
 	static smIndiceArray<smModuleHolder> *modulesRef;
 	static smIndiceArray<smObjectSimulatorHolder> *objectSimulatorsRef;
@@ -185,10 +186,10 @@ protected:
 	}
 
 public:
-	//shutdowns all the modules
+	///shutdowns all the modules
 	void shutDown();
 
-	//for now both functions below are the same. But it maybe subject to change.
+	///for now both functions below are the same. But it maybe subject to change.
 	static smSDK * createSDK(){
 		return &sdk;
 	}

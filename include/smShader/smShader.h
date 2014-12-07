@@ -22,13 +22,16 @@ class smMesh;
 class smSurfaceMesh;
 
 struct smTextureShaderAssignment{
-	smGLInt textureShaderGLassignment;///the id that smShader creates...
-	smInt textureId;///Id from texture manager
-	QString shaderParamName;///The parameters that shaders use
+	/// \brief the id that smShader creates...
+	smGLInt textureShaderGLassignment;
+	/// \brief Id from texture manager
+	smInt textureId;
+	/// \brief The parameters that shaders use
+	QString shaderParamName;
 };
 
 
-///this is the generic shader class. It provides loading, initializing, binding, 
+/// \brief this is the generic shader class. It provides loading, initializing, binding, 
 ///enabling disabling current shader functionality.Also it provides frequent check of the shader code 
 ///to make shader development easy. 
 class smShader:public smCoreClass{
@@ -40,31 +43,31 @@ protected:
 	smChar vertexProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
 	smChar fragmentProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
 	smChar geometryProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
-	///Error Loging
+	/// \brief Error Loging
 	smErrorLog *log;
-	///stores the content of the vertex shader file
+	/// \brief stores the content of the vertex shader file
 	smChar *vertexShaderContent;
-	///stores the content of the fragment  shader file
+	/// \brief stores the content of the fragment  shader file
 	smChar *fragmentShaderContent;
-	///stores the content of the geometry shader file
+	/// \brief stores the content of the geometry shader file
 	smChar *geometryShaderContent;
-	///if the vertex shader exists this will be true
+	/// \brief if the vertex shader exists this will be true
 	smBool vertexProgramExist;
-	///if the fragment shader exists this will be true
+	/// \brief if the fragment shader exists this will be true
 	smBool fragmentProgramExist;
-	///if the geometry shader exists this will be true
+	/// \brief if the geometry shader exists this will be true
 	smBool geometryProgramExist;
-	///stores the parameters for vertex shader
+	/// \brief stores the parameters for vertex shader
 	QVector <smChar*>vertexShaderParamsString;
-	///stores the parameters for fragment shader
+	/// \brief stores the parameters for fragment shader
 	QVector <smChar*>fragmentShaderParamsString;
-	///stores the parameters for geometry shader
+	/// \brief stores the parameters for geometry shader
 	QVector <smChar*>geometryShaderParamsString;
-	///stores the attribute parameters
+	/// \brief stores the attribute parameters
 	QVector <smChar*>attribParamsString;
-	///error text for querying the opengl errors mostly
+	/// \brief error text for querying the opengl errors mostly
 	smChar errorText[SOFMIS_MAX_ERRORLOG_TEXT];
-	///time for periodically checnking the shader
+	/// \brief time for periodically checnking the shader
 	QTime time;
 	QMultiHash<smInt,smTextureShaderAssignment> texAssignments;
 	smChar modelViewMatrixName[SOFMIS_MAX_SHADERVARIABLENAME];
@@ -73,107 +76,109 @@ protected:
 	void getAttribAndParamLocations();
 
 	#ifdef SOFMIS_OPENGL_SHADER
-		///vertex shader object
+		/// \brief vertex shader object
 		GLhandleARB vertexShaderObject;
-		///fragment  shader object
+		/// \brief fragment  shader object
 		GLhandleARB fragmentShaderObject;
-		///fragment  shader object
+		/// \brief fragment  shader object
 		GLhandleARB geometryShaderObject;
-		///shader program object. 
+		/// \brief shader program object. 
 		GLhandleARB shaderProgramObject;
-		///stores the id of the parameters in vertex shader
+		/// \brief stores the id of the parameters in vertex shader
 		QVector <GLint>vertexShaderParams;
-		///stores the id of the parameters in fragment shader
+		/// \brief stores the id of the parameters in fragment shader
 		QVector <GLint>fragmentShaderParams;
-		///stores the id of the parameters in geometry shader
+		/// \brief stores the id of the parameters in geometry shader
 		QVector <GLint>geometryShaderParams;
 
-		///stores the id of the parameters in geometry shader
+		/// \brief stores the id of the parameters in geometry shader
 		QVector <GLint>attribShaderParams;
 
-		///creates GLSL vertex shader
+		/// \brief creates GLSL vertex shader
 		void createVertexShaderGLSL();
-		///creates GLSL fragment shader
+		/// \brief creates GLSL fragment shader
 		void createFragmentShaderGLSL();
-		///creates GLSL geometry shader
+		/// \brief creates GLSL geometry shader
 		void createGeometryShaderGLSL();
 
-		///reloads the vertex shader
+		/// \brief reloads the vertex shader
 		void reloadVertexShaderGLSL();
-		///reloads the fragment shader
+		/// \brief reloads the fragment shader
 		void reloadFragmentShaderGLSL();
-		///reloads the geometry shader
+		/// \brief reloads the geometry shader
 		void reloadGeometryShaderGLSL();
-
+		
+		/// \brief add vertex, fragment and geometry shaders
 		GLint addVertexShaderParamGLSL(smChar* p_paramVertex);
 		GLint addFragmentShaderParamGLSL(smChar* p_paramFragment);
 		GLint addGeometryShaderParamGLSL(smChar* p_paramGeometry);
 
 	public:
+		/// \brief returns the program object
 		GLuint getProgramObject(){
 			return shaderProgramObject;
 		}
-
+		/// \brief returns vertex shader object
 		GLuint getVertexShaderObject(){
 			return vertexShaderObject;
 		}
-
+		/// \brief retursn fragment shader object
 		GLuint getFragmentShaderObject(){
 			return fragmentShaderObject;
 		}
-
+		/// \brief returns geomtry shader object
 		GLuint getGeometryShaderObject(){
 			return geometryShaderObject;
 		}
 
-		///Attaches The texture ID to the mesh 
+		/// \brief Attaches The texture ID to the mesh 
 		void attachTexture(smUnifiedID p_meshID,smInt p_textureID);
 
-		///assigns the texture by name if you don't know the textureID
+		/// \brief assigns the texture by name if you don't know the textureID
 		smBool attachTexture(smUnifiedID p_meshID,smChar * const p_textureName, smChar * const p_textureShaderName);
 
 	protected:
-		///This stores the opengl binded texture id
+		/// \brief This stores the opengl binded texture id
 		QHash<QString,smGLInt>textureGLBind;
 		void autoGetTextureIds();
 	#endif
 
-///reloads all shaders
+/// \brief reloads all shaders
 smBool reLoadAllShaders();
-///check opengl error
+/// \brief check opengl error
 smBool checkGLError();
 
 public:
-	///if the error check is enabled or not. If it is checked, opengl errors are queried and if there is, they will be stored in logger
+	/// \brief if the error check is enabled or not. If it is checked, opengl errors are queried and if there is, they will be stored in logger
 	smBool checkErrorEnabled;
-	///constructor gets the error log class
+	/// \brief constructor gets the error log class
 	smShader(smErrorLog *log=NULL);
 
-	///initialized the shaders.
+	/// \brief initialized the shaders.
 	/// \param vertexProgFileName   vertex program file name
 	/// \param fragmentProgFileName fragment program file name
 	/// \param geometryProgFileName geometry program file name
 	smBool initShaders(smChar *vertexProgFileName,smChar *fragmentProgFileName,smChar *geometryProgFileName);
 
-	/// enables the shader
+	/// \brief  enables the shader
 	void enableShader();
 
-	/// disables the shader
+	/// \brief  disables the shader
 	void disableShader();
 
-	///Initialize the shader..This is called automatically.
+	/// \brief Initialize the shader..This is called automatically.
 	virtual void initDraw(smDrawParam p_param);
 
 	#ifdef SOFMIS_OPENGL_SHADER
-		///add parameter for Vertex Shader
+		/// \brief add parameter for Vertex Shader
 		GLint addVertexShaderParam(smChar* p_paramVertex);
-		///add parameter for Fragment Shader
+		/// \brief add parameter for Fragment Shader
 		GLint addFragmentShaderParam(smChar* p_paramFragment);
-		///add parameter for Geometry Shader
+		/// \brief add parameter for Geometry Shader
 		GLint addGeometryShaderParam(smChar* p_paramGeometry);
-		///add parameter for all Shaders
+		/// \brief add parameter for all Shaders
 		GLint addShaderParamForAll(smChar* p_paramName);
-		///attrib parameters for Shaders
+		/// \brief attrib parameters for Shaders
 		GLint addShaderParamAttrib(smChar* p_paramName);
 
 		void createTextureParam(smChar *p_textureNameInShaderCode);
@@ -200,10 +205,10 @@ public:
 			return true;
 		}
 
-		///holds the unitform location for projection matrix. That is needed in newer versions of GLSL 
+		/// \brief holds the unitform location for projection matrix. That is needed in newer versions of GLSL 
 		smGLInt projectionMatrix;
 
-		///holds the unitform location for modelview matrix. That is needed in newer versions of GLSL 
+		/// \brief holds the unitform location for modelview matrix. That is needed in newer versions of GLSL 
 		smGLInt modelViewMatrix;
 
 		inline void updateGLSLMatwithOPENGL(){
@@ -216,13 +221,13 @@ public:
 			glUniformMatrix4fv(projectionMatrix,1,true,(GLfloat*)proj.e);
 		}
 
-		///returns the shader attrrib param
+		/// \brief returns the shader attrrib param
 		smGLInt getShaderParamForAll(smChar *p_paramName);
 
-		///returns the fragment shader uniform param
+		/// \brief returns the fragment shader uniform param
 		smGLInt getFragmentShaderParam(smChar *p_paramName);
 
-		///returns the attrib location param
+		/// \brief returns the attrib location param
 		smGLInt getShaderAtrribParam(smChar *p_paramName);
 
 		void createParam( smChar * const p_param);
@@ -234,13 +239,13 @@ public:
 
 	#endif
 
-	///checks whether the shader routine is updated
+	/// \brief checks whether the shader routine is updated
 	smBool checkShaderUpdate(smInt milliseconds);
 	
-	///turn on/off the error checking
+	/// \brief turn on/off the error checking
 	void enableCheckingErrors(smBool p_checkError);
 
-	///cleans up of the shader objects
+	/// \brief cleans up of the shader objects
 	~smShader(){
 		#ifdef SOFMIS_OPENGL_SHADER
 			if(vertexProgramExist)
@@ -252,7 +257,7 @@ public:
 		#endif
 	}
 
-	//empty functions?
+	/// \brief void implementations for virtual functions. needs to be overwritten for any specific uniform bindings
 	virtual void predraw(smMesh *mesh){}
 	virtual void predraw(smSurfaceMesh *mesh){}
 	virtual void posdraw(smMesh *mesh){}
@@ -268,17 +273,17 @@ public:
 	void registerShader();
 	void print();
 
-	///stores the current Active shader.
+	/// \brief stores the current Active shader.
 	static smShader *currentShader;
 
-	//It is also used to save and restore the current shader is disabled for a while to use 
+	/// \brief  It is also used to save and restore the current shader is disabled for a while to use 
 	///default opengl rendering. The function saveAndDisableCurrent/restoreAndEnable perform save and restore the functions. 
 	static smShader * savedShader;
-	///if the currentShader is enabled or not
+	/// \brief if the currentShader is enabled or not
 	static smBool currentShaderEnabled;
-	///restores the shader from the last saved one
+	/// \brief restores the shader from the last saved one
 	static void restoreAndEnableCurrent();
-	///save the last active shader and disable it.
+	/// \brief save the last active shader and disable it.
 	static void saveAndDisableCurrent();
 };
 

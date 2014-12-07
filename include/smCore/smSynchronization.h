@@ -14,7 +14,7 @@
 #include <QWaitCondition>
 #include <QMutex>
 
-///Synchronization class for sync the start/end of multiple threads
+/// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor
 ///then each worker threads should call waitTaskStart function when the taks
 ///is completed they should call signalTaskDone 
@@ -40,7 +40,7 @@ public:
 		workerCounterUpdated=false;
 	}
 
-	///before starting tasks worker threads should wait
+	/// \brief before starting tasks worker threads should wait
 	void waitTaskStart(){
 		serverMutex.lock();
 		startedWorkerCounter++;
@@ -53,7 +53,7 @@ public:
 		serverMutex.unlock();
 	}
 
-	///when the task ends the worker should call this function
+	/// \brief when the task ends the worker should call this function
 	void signalTaskDone(){
 
 		serverMutex.lock();
@@ -65,7 +65,7 @@ public:
 		serverMutex.unlock();
 	}
 
-	///You could change the number of worker threads synchronization 
+	/// \brief You could change the number of worker threads synchronization 
 	///Call this function after in the main thread where orchestration is done.
 	void setWorkerCounter(smInt p_workerCounter){
 		newWorkerCounter=p_workerCounter;
@@ -76,7 +76,7 @@ public:
 		return totalWorkers;
 	}
 
-	///the server thread should call this for to start exeuction of the worker threads
+	/// \brief the server thread should call this for to start exeuction of the worker threads
 	void startTasks(){
 		serverMutex.lock();
 		if(workerCounterUpdated){
@@ -90,7 +90,7 @@ public:
 		serverMutex.unlock();
 	}
 
-	///this function is fore signalling the events after waking up the worker threads. 
+	/// \brief this function is fore signalling the events after waking up the worker threads. 
 	void startTasksandSignalEvent(smInt moduleId){
 
 		smEvent *eventSynch;

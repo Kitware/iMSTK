@@ -40,7 +40,7 @@
 
 class smShader;
 
-///this shows the Vertex Buffer Object Size
+/// \brief this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects. 
 ///the value is in bytes
 #define SOFMIS_VBOBUFFER_DATASIZE	500000
@@ -50,14 +50,14 @@ class smShader;
 #define SOFMIS_MAX_TEXTURENBR 36
 #define SOFMIS_MAX_VBOBUFFERS 10
 
-///The configuration for VBO
+/// \brief The configuration for VBO
 enum smVBOType{
 	SOFMIS_VBO_STATIC,
 	SOFMIS_VBO_NOINDICESCHANGE,
 	SOFMIS_VBO_DYNAMIC,
 };
 
-///Vertex Buffer Objects Return Types
+/// \brief Vertex Buffer Objects Return Types
 enum smVBOResult{
 	SOFMIS_VBO_OK,
 	SOFMIS_VBO_NODATAMEMORY,
@@ -89,7 +89,7 @@ struct smColor{
 		rgba[3]=a;
 	}
 
-	///Dark ratio. the valu is between 0 and 1.0
+	/// \brief Dark ratio. the valu is between 0 and 1.0
 	void darken(smFloat p_darkFactor){
 
 		rgba[0]=(rgba[1]-rgba[1]*(p_darkFactor));
@@ -99,7 +99,7 @@ struct smColor{
 		rgba[1]=(rgba[1]<0?0:rgba[1]);
 		rgba[2]=(rgba[2]<0?0:rgba[2]);
 	}
-
+	/// \brief lighten the color
 	void lighten(smFloat p_darkFactor){
 
 		rgba[0]=rgba[1]+rgba[1]*(p_darkFactor);
@@ -111,13 +111,13 @@ struct smColor{
 		rgba[2]=(rgba[2]<1.0?1.0:rgba[2]);
 	}
 
-
+	/// \brief returns the color value given with the index
 	smFloat operator()(smInt p_i){
 		if(p_i<0||p_i>3)
 			return -1;
 		return rgba[p_i];
 	}
-
+	/// \brief setting
 	smColor &operator=(smColor &p_color){
 		rgba[0]=p_color.rgba[0];      
 		rgba[1]=p_color.rgba[1];      
@@ -125,11 +125,11 @@ struct smColor{
 		rgba[3]=p_color.rgba[3];      
 		return *this;
 	}
-
+	/// \brief converts to gl color
 	smGLFloat* toGLColor(){
 		return (smGLFloat*)rgba;
 	}
-
+	/// \brief set RGB color
 	inline void setValue(smFloat p_red,smFloat p_green,smFloat p_blue,smFloat p_alpha){
 		rgba[0]=p_red;
 		rgba[1]=p_green;
@@ -147,7 +147,7 @@ struct smColor{
 };
 
 
-///renderType. this shows how the render will be done
+/// \brief renderType. this shows how the render will be done
 #define    SOFMIS_RENDER_TEXTURE			(1<<1)
 #define    SOFMIS_RENDER_MATERIALCOLOR		(1<<2)
 #define    SOFMIS_RENDER_SHADOWS			(1<<3)
@@ -169,7 +169,7 @@ struct smColor{
 #define    SOFMIS_RENDER_VAO				(1<<18)
 #define    SOFMIS_RENDER_NONE				(1<<31)
 
-///type definitions for variable viewerRenderDetail in smViewer 
+/// \brief type definitions for variable viewerRenderDetail in smViewer 
 #define    SOFMIS_VIEWERRENDER_GLOBALAXIS						(1<<1)
 #define    SOFMIS_VIEWERRENDER_TEXT								(1<<2)
 #define    SOFMIS_VIEWERRENDER_FADEBACKGROUND					(1<<3)
@@ -187,7 +187,7 @@ struct smColor{
 
 
 
-
+/// \brief viewer detail. legacy code
 struct smViewerDetail{
 	smUInt environment;
 	smColor backGroundColor;
@@ -196,7 +196,7 @@ struct smViewerDetail{
 struct smUnifiedID;
 
 
-///smRenderDetail has rendering options and features.
+/// \brief smRenderDetail has rendering options and features.
 ///It shows how the mesh should be rendered
 struct smRenderDetail{
 public:
@@ -221,28 +221,45 @@ public:
 		castShadow=true;
 		canGetShadow=true;
 	}
-
+	/// \brief render type
 	smUInt renderType;
+	/// \brief diffuse color
 	smColor colorDiffuse;
+	/// \brief ambient color
 	smColor colorAmbient;
+	/// \brief specular color
 	smColor colorSpecular;
+	/// \brief highlight color
 	smColor highLightColor;
+	/// \brief shadow color
 	smColor shadowColor;
+	/// \brief object can generate a shadow or not
 	smBool castShadow;
+	/// \brief object can get the shadow or not
 	smBool canGetShadow;
+	/// \brief normal color
 	smColor normalColor;
+	/// \brief wire frame color
 	smColor wireFrameColor;
+	/// \brief point size if rendering of vertices are enabled
 	smFloat pointSize;
+	/// \brief line width size 
 	smFloat lineSize;
+	/// \brief specular shinness
 	smFloat shininess;
+	/// \brief debug draw enabled or not
 	smBool debugDraw;
-
+	/// \brief attachment of shader
 	void addShader(smUnifiedID p_shaderID);
+	/// \brief attachment of VAO 
 	void addVAO(smUnifiedID p_shaderID);
+	/// \brief attached shaders 
 	vector <smUnifiedID >shaders;
+	/// \brief enable/disable any attached shader
 	vector<smChar>shaderEnable;
-
+	/// \brief stores  VAO IDs
 	vector <smUnifiedID>VAOs;
+	/// \brief enable/disable any attached VAO
 	vector<smChar>VAOEnable;
 };
 

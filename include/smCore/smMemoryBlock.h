@@ -1,6 +1,6 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
@@ -26,11 +26,12 @@ enum smMemReturnType{
 	SOFMIS_MEMORY_NOERROR
 };
 
-///Memory Block makes easy to allocate and associate particular memory.
-///it facilities the memory mamangement
+/// \brief Memory Block makes easy to allocate and associate particular memory.
+///		   it facilities the memory mamangement
 class smMemoryBlock:public smCoreClass{
 
 private:
+	/// \brief error log for reporting the error
 	smErrorLog *log;
 	QHash<QString ,void*> memoryBlocks;
 
@@ -46,14 +47,14 @@ public:
 		//this->log=smSDK::getErrorLog();
 	}
 
-	///alocate a class and returns p_returnedBlock as allocated memory and 
+	/// \brief alocate a class and returns p_returnedBlock as allocated memory and 
 	///return params are SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
 	template<class T> 
 	smMemReturnType allocate(QString &p_memoryBlockName,T**p_returnedBlock){
 		*p_returnedBlock=new T();
 		if(p_returnedBlock==NULL)
 			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
-		
+
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete [] *p_returnedBlock;
 			return SOFMIS_MEMORY_ALREADYALLOCATED;
@@ -64,14 +65,14 @@ public:
 		}
 	}
 
-	///alocate any c;asses and returns p_returnedBlock as allocated memory and 
+	/// \brief alocate any c;asses and returns p_returnedBlock as allocated memory and 
 	///return params are SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
 	template<class T> 
 	smMemReturnType allocate(QString &p_memoryBlockName,smInt nbr,T**p_returnedBlock){
 		*p_returnedBlock=new T[nbr];
 		if(p_returnedBlock==NULL)
 			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
-		
+
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete [] *p_returnedBlock;
 			return SOFMIS_MEMORY_ALREADYALLOCATED;
@@ -82,15 +83,15 @@ public:
 		}
 	}
 
-	///alocate any classes and returns p_returnedBlock as allocated memory
-	///returns	 SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
+	/// \brief alocate any classes and returns p_returnedBlock as allocated memory
+	///    returns	 SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
 	template <class T>
 	smMemReturnType allocate(const QString& p_memoryBlockName, const smInt &p_nbr){
 		T *allocatedMem;
 		allocatedMem=new T[p_nbr];
 		if(allocatedMem==NULL)
 			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
-		
+
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete []allocatedMem;
 			return SOFMIS_MEMORY_ALREADYALLOCATED;
@@ -101,7 +102,7 @@ public:
 		}
 	}
 
-	///alocate vectors and returns	SOFMIS_MEMORY_INVALIDPARAMS or SOFMIS_MEMORY_ALLOCATED based on block size given
+	/// \brief alocate vectors and returns	SOFMIS_MEMORY_INVALIDPARAMS or SOFMIS_MEMORY_ALLOCATED based on block size given
 	virtual smMemReturnType allocate(const QString &p_memoryBlockName, const smInt blockSize,void **p_returnedBlock){
 		if(blockSize<=0)
 			return SOFMIS_MEMORY_INVALIDPARAMS;
@@ -110,7 +111,7 @@ public:
 		return SOFMIS_MEMORY_ALLOCATED;
 	}
 
-	///deletes the block from memeory as well as in has container
+	/// \brief deletes the block from memeory as well as in has container
 	virtual smMemReturnType deleteMemory(QString & p_memoryBlockName){
 		void *memoryBlock;
 		if(memoryBlocks.contains(p_memoryBlockName)){
@@ -123,7 +124,7 @@ public:
 			return SOFMIS_MEMORY_NOMEMORYFOUND;
 	}
 
-	///gets  memory from the container via given block name. it returns SOFMIS_MEMORY_MEMORYFOUND or SOFMIS_MEMORY_NOMEMORYFOUND. 
+	/// \brief  gets  memory from the container via given block name. it returns SOFMIS_MEMORY_MEMORYFOUND or SOFMIS_MEMORY_NOMEMORYFOUND. 
 	virtual smMemReturnType getBlock(const QString &p_memoryBlockName,void **p_memoryPointer){
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			*p_memoryPointer=memoryBlocks[p_memoryBlockName];
@@ -133,6 +134,7 @@ public:
 			return SOFMIS_MEMORY_NOMEMORYFOUND;
 	}
 
+	/// \brief copy the allocated memory location to dst. p_nbr is the number of elements to be copied
 	template<class T>
 	smMemReturnType localtoOriginalBlock(const QString &p_memoryBlockName, T* dst, const smInt p_nbr){
 
@@ -140,34 +142,35 @@ public:
 		if(dst!=NULL){
 			src=(T*)memoryBlocks[p_memoryBlockName];
 			if(src!=NULL){
-		 		memcpy(dst,src,sizeof(T)*p_nbr);
+				memcpy(dst,src,sizeof(T)*p_nbr);
 				return	SOFMIS_MEMORY_NOERROR;
 			}
 			else
-				 return SOFMIS_MEMORY_INVALIDMEMORY;
+				return SOFMIS_MEMORY_INVALIDMEMORY;
 		}
 		else
 			return SOFMIS_MEMORY_INVALIDPARAMS;
 	}
 
+	/// \brief copy the src to allocated memory location. p_nbr is the number of elements
 	template<class T>
 	smMemReturnType originaltoLocalBlock(const QString &p_memoryBlockName, T *src,
-	                                     const smInt p_nbr){
+		const smInt p_nbr){
 
-		T *dst;
-		if(src!=NULL){
-			dst=(T*)memoryBlocks[p_memoryBlockName];
-			if(dst!=NULL){
-		 		memcpy(dst,src,sizeof(T)*p_nbr);
-				return	SOFMIS_MEMORY_NOERROR;
-			}else
-				return	SOFMIS_MEMORY_INVALIDMEMORY;
-		}
-		else
-			return SOFMIS_MEMORY_INVALIDPARAMS;
+			T *dst;
+			if(src!=NULL){
+				dst=(T*)memoryBlocks[p_memoryBlockName];
+				if(dst!=NULL){
+					memcpy(dst,src,sizeof(T)*p_nbr);
+					return	SOFMIS_MEMORY_NOERROR;
+				}else
+					return	SOFMIS_MEMORY_INVALIDMEMORY;
+			}
+			else
+				return SOFMIS_MEMORY_INVALIDPARAMS;
 	}
 
-	///lists the blocks within the container
+	/// \brief lists the blocks within the container
 	void listofBlocks(){
 		QHash<QString ,void*>::iterator iter = memoryBlocks.begin();
 		while (iter != memoryBlocks.end() ){
@@ -176,7 +179,7 @@ public:
 		}
 	}
 
-	//test the destructor
+	/// \brief  the destructor that deletes all the allocated memory locations
 	~smMemoryBlock(){
 		foreach (void*memoryPtr, memoryBlocks)
 			delete []memoryPtr;

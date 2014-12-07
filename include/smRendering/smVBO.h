@@ -13,30 +13,41 @@
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
 #include "assert.h"
-
+/// \brief VBO for rendering
 class smVBO:public smCoreClass{
 private:
+	/// \brief offsets for each mesh
 	smInt currentDataOffset;
 	smInt currentIndexOffset;
 	smInt sizeOfDataBuffer;
 	smInt sizeOfIndexBuffer;
+	/// \brief  VBO type
 	smVBOType vboType;
+	/// \brief  vertices, normals, tangets data buffer
 	GLuint vboDataId;
+	/// \brief index data
 	GLuint vboIndexId;
+	/// \brief  data offset keeps offset for each vertex
 	QHash<smInt,smInt> dataOffsetMap;
+	/// \brief  index maps
 	QHash<smInt,smInt> indexOffsetMap;
+	/// \brief  total number of vertices
 	QHash<smInt,smInt> numberofVertices;
+	/// \brief number of triangles 
 	QHash<smInt,smInt> numberofTriangles;
-
+	/// \brief  error log
 	smErrorLog *log;
+	/// \brief  rendering error 
 	smBool renderingError;
 
 public:
+	/// \brief  constructor. gets error log or NULL
 	smVBO(smErrorLog *p_log){
 		this->log=p_log;
 		renderingError=false;
 	}
 
+	/// \brief  init with given VBO type
 	void init(smVBOType p_vboType){
 		smChar error[200];
 		glGenBuffersARB(1,&vboDataId);
@@ -67,7 +78,7 @@ public:
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	}
-
+	/// \brief  add vertices to the data buffer
 	smVBOResult addVerticestoBuffer(smInt p_nbrVertices,smInt p_nbrTriangles,smInt p_objectId){
 		if(sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smTexCoord)*p_nbrVertices>sizeOfDataBuffer-currentDataOffset)
 			return SOFMIS_VBO_NODATAMEMORY;
@@ -84,18 +95,20 @@ public:
 		currentIndexOffset+=p_nbrTriangles*sizeof(smTriangle);
 		return SOFMIS_VBO_OK;
 	}
-
+	/// \brief update vertex data buffer
 	smVBOResult updateVertices(smVec3<smFloat> *p_vectors,smVec3<smFloat> *p_normals,smTexCoord *p_textureCoords, smInt p_objectId);
+	/// \brief update  triangle index
 	smVBOResult updateTriangleIndices(smInt *p_indices,smInt p_objectId);
+	/// \brief draw elements in VBO
 	smVBOResult drawElements(smInt p_objectId);
 
-	///update the static vertices initially
+	/// \brief update the static vertices initially
 	smVBOResult initStaticVertices(smVec3<smFloat> *p_vectors,smVec3<smFloat> *p_normals,smTexCoord *p_textureCoords, smInt p_objectId);
 	
-	///update the static triangle indices initially
+	/// \brief update the static triangle indices initially
 	smVBOResult initTriangleIndices(smInt *p_indices,smInt p_objectId);
 
-	///deletion of the VBO buffers
+	/// \brief deletion of the VBO buffers
 	~smVBO(){
 		glDeleteBuffersARB(1, &vboDataId);
 		glDeleteBuffersARB(1, &vboIndexId);

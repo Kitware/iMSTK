@@ -36,20 +36,21 @@
 //forward declaration
 class smSceneObject;
 
-///custom renderer for the object. 
+/// \brief custom renderer for the object. 
 ///you could draw with one custom renderer with multiple objects.
 ///This is the reason why the functions are taken objects.
 class smCustomRenderer:public smCoreClass{
 
 public:
-	///this function should be implemented based on objects
+	/// \briefthis function should be implemented based on objects
 	//virtual void init();
+	/// \brief draw pre, default and post draw routines
 	virtual void preDraw(smSceneObject* p_object);
 	virtual void draw(smSceneObject *p_object);
 	virtual void postDraw(smSceneObject* p_object);
 };
 
-///derive this class if you want to render a class in the viewer.
+/// \briefderive this class if you want to render a class in the viewer.
 class smCustomRenderInterface:public smInterface{
 
 	virtual void draw();
