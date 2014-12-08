@@ -46,13 +46,8 @@ macro (sofmis_find_package package)
   find_package(${package} ${ARGN})
 endmacro ()
 
-
 # Device options
-if(WIN32)
-  option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ON)
-else()
-  option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
-endif()
+option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
