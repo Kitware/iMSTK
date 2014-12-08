@@ -8,6 +8,19 @@ using std::map;
 #include <assimp/postprocess.h>
 #include "smMesh/smSurfaceMesh.h"
 
+#ifdef _WIN32
+#include "io.h"
+#else
+size_t filelength(const char * filename)
+{
+    struct stat st;
+    stat(filename, &st);
+    return st.st_size;
+}
+#endif
+
+
+
 /// \brief constructor
 smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype,smErrorLog *log=NULL){
 

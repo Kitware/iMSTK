@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+﻿cmake_minimum_required(VERSION 3.0)
 
 project(sofmis)
 
@@ -45,9 +45,26 @@ macro (sofmis_find_package package)
   find_package(${package} ${ARGN})
 endmacro ()
 
+
+# Device options
+if(WIN32)
+  option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ON)
+else()
+  option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
+endif()
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 find_package(Qt4 REQUIRED)
+
+set(QT_USE_QTOPENGL ON)
+set(QT_USE_QTGUI ON)
+set(QT_USE_QTCORE ON)
+
+include(${QT_USE_FILE})
+
+message("${QT_USE_FILE}")
+
 find_package(OpenGL REQUIRED)
 sofmis_find_package(GLEW REQUIRED)
 sofmis_find_package(GLUT REQUIRED)
