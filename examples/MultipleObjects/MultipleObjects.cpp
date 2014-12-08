@@ -5,10 +5,8 @@
 #include "smPBDSceneObject.h"
 #include "smPBDObjectSimulator.h"
 
-
-
-
 void createPBDandFEM(){
+
 	smSDK *sofmisSDK;
 	smFemSceneObject  *femobj;
 	smFemSimulator *femSim;
@@ -18,10 +16,10 @@ void createPBDandFEM(){
 	smSimulator *simulator;
 	smViewer *viewer;
 	smScene *scene1;
-	
+
 	///create rotation matrix
 	mat.rotAroundX(SM_PI);
-	
+
 	///SDK is singlenton class so create SDK and return SDK returns the same SDK
 	sofmisSDK=smSDK::getInstance();
 
@@ -34,9 +32,10 @@ void createPBDandFEM(){
 
 	//for cloth texture
 	smTextureManager::loadTexture("../../resources/textures/cloth.jpg","clothtexture");
-	
+
 	///create a FEM simulator
 	femSim=new smFemSimulator(sofmisSDK->getErrorLog());
+
 	///set the dispatcher for FEM. it will be used for sending events
 	femSim->setDispatcher(sofmisSDK->getEventDispatcher());
 	sofmisSDK->getEventDispatcher()->registerEventHandler(femSim,SOFMIS_EVENTTYPE_HAPTICOUT);
@@ -44,11 +43,10 @@ void createPBDandFEM(){
 	///create a position dynamics object
 	pbd=new smPBDObjectSimulator (sofmisSDK->getErrorLog());
 
-	
 	///create a FEM object
-	femobj=new smFemSceneObject();		
+	femobj=new smFemSceneObject();
 	femobj->v_mesh->LoadTetra("../../resources/models/cylinder_Mesh.txt");
-	femobj->v_mesh->getSurface("../../resources/models/cylinder_smesh.txt"); 	
+	femobj->v_mesh->getSurface("../../resources/models/cylinder_smesh.txt");
 	femobj->v_mesh->readBC("../../resources/models/cylinder_BC.txt");
 	femobj->v_mesh->scaleVolumeMesh(smVec3<smFloat>(1,1,1));
 	femobj->renderDetail.colorDiffuse=smColor::colorBlue;
@@ -69,6 +67,7 @@ void createPBDandFEM(){
 	pbdObject->renderDetail.colorDiffuse=smColor::colorWhite;
 	pbdObject->renderDetail.colorAmbient=smColor::colorWhite;
 	pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
+
 	//pbdObject->mesh->rotate(mat);
 	pbdObject->mesh->scale(smVec3<smFloat>(2.3,0.5,2));
 	pbdObject->mesh->translate(smVec3<smFloat>(11,25,0));
@@ -76,10 +75,12 @@ void createPBDandFEM(){
 	pbdObject->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
 	pbdObject->initMeshStructure();
 	pbdObject->InitSurfaceObject();
+
 	///find the corners and fixed it
 	pbdObject->findFixedCorners();
-	///you can use sphere shape to fix the vertices
-	//pbdObject->findFixedMassWrtSphere(smVec3f(11,23,0),5);
+
+	///can use sphere shape to fix the vertices
+	///pbdObject->findFixedMassWrtSphere(smVec3f(11,23,0),5);
 	///attach object to the simulator
 	pbdObject->attachObjectSimulator(pbd);
 
@@ -87,7 +88,6 @@ void createPBDandFEM(){
 	scene1=sofmisSDK->createScene();
 	scene1->addSceneObject(femobj);
 	scene1->addSceneObject(pbdObject);
-	
 
 	///create a simulator module and attache FEM and PBD
 	simulator=sofmisSDK->createSimulator();
@@ -99,14 +99,12 @@ void createPBDandFEM(){
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
 	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
 	viewer->camera()->setZClippingCoefficient(100);
-	
+
 	///run the SDK
 	sofmisSDK->run();
 }
 
-
 void main(){
-
 	///Example routines for creating the PBD and FEM
 	createPBDandFEM();
 }

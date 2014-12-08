@@ -1,15 +1,12 @@
 #include "CollisionDetectionExample.h"
-
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 #include "smMesh/smLattice.h"
 #include "smMesh/smLatticeTypes.h"
 #include "smCore/smEventData.h"
 
-
-
-
 void CollisionDetectionExample::initHapticCamMotion(){
+
 	hapticInterface = new smPhantomInterface();
 	hapticInterface->forceEnabled=false;//disable forces right now for all devices
 	hapticInterface->startDevice();
@@ -18,15 +15,12 @@ void CollisionDetectionExample::initHapticCamMotion(){
 	motionTrans->setMotionScale(0.1);
 	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
 	viewer->enableCameraMotion=true;
-
 }
 
 CollisionDetectionExample::CollisionDetectionExample(){
 
-	
 	motionTrans=NULL;
 	hapticInterface=NULL;
-
 
 	//initializes the spatial grid
 	spatGrid=new smSpatialGrid();
@@ -34,8 +28,8 @@ CollisionDetectionExample::CollisionDetectionExample(){
 	///create the sdk
 	sofmisSDK=smSDK::createSDK();
 	///create scene objects
-  	object1=new smStaticSceneObject();		
-	object2=new smStaticSceneObject();		
+	object1=new smStaticSceneObject();
+	object2=new smStaticSceneObject();
 
 	///create a 3D lattice for each object
 	lat= new smLattice();
@@ -61,15 +55,17 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	///load a mesh
 	object1->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS",SM_FILETYPE_3DS); 
+
 	///texture attachment needed for fixed opengl rendering if texture is needed
 	object1->mesh->assignTexture("livertexture1");
- 	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
 	object1->mesh->translate(7,0,0);
 	object1->renderDetail.lineSize=2;
 	object1->renderDetail.pointSize=5;
-	//object1->attachObjectSimulator(dummySim);
+
 	///add object1 to lattice
 	lat->addObject(object1);
+
 	///add lattice to the grid
 	spatGrid->addLattice(lat);
 
@@ -82,7 +78,6 @@ CollisionDetectionExample::CollisionDetectionExample(){
 	object2->renderDetail.shadowColor.rgba[0]=1.0;
 	object2->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
 
-	
 	lat2->addObject(object2);
 	spatGrid->addLattice(lat2);
 	spatGrid->pipe->registerListener(&this->myCollInformation);
@@ -91,7 +86,7 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	///register the module for spatial grid
 	sofmisSDK->registerModule(spatGrid);	
-	
+
 	//add object to the scene
 	scene1->addSceneObject(object1);
 	scene1->addSceneObject(object2);
@@ -103,35 +98,28 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	///create a viewer
 	viewer=sofmisSDK->createViewer();
+
 	//specify the viewer global settings
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
 	viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
 	viewer->camera()->setZClippingCoefficient(1000);
 	viewer->camera()->setZNearCoefficient(0.001);
 	viewer->list();
-    viewer->setWindowTitle("SOFMIS TEST");
-
-    
+	viewer->setWindowTitle("SOFMIS TEST");
 
 	///assign dispatcher
 	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
-	
+
 	///You can either add object to the viewer or add object to the scene. Draw function will be called
-	//viewer->addObject(lat2);
 	viewer->addObject(spatGrid);
 	viewer->addObject(this);
 
-	///if you want to move the camera with haptic
-	//initHapticCamMotion();//initiate the haptic motion with camera
-	
-
-
 	///run the simulation
-    sofmisSDK->run();
- }
+	sofmisSDK->run();
+}
 
-CollisionDetectionExample::~CollisionDetectionExample()
-{
+CollisionDetectionExample::~CollisionDetectionExample(){
+
 	delete object1;
 	delete object2;
 	delete scene1;
@@ -139,17 +127,18 @@ CollisionDetectionExample::~CollisionDetectionExample()
 	delete lat;
 	delete lat2;
 	delete spatGrid;
+
 	if(motionTrans!=NULL)
 		delete motionTrans;
+
 	if(hapticInterface!=NULL)
 		delete hapticInterface;
-
-
 }
 
 ///Draw collided triangles
 void CollisionDetectionExample::draw(smDrawParam p_params){
-	 smCollidedTriangles *tris;
+
+	smCollidedTriangles *tris;
 	if(myCollInformation.data.dataReady){
 		if(myCollInformation.data.nbrElements>0){
 			tris=(smCollidedTriangles *)myCollInformation.data.dataLocation;
@@ -162,16 +151,10 @@ void CollisionDetectionExample::draw(smDrawParam p_params){
 				glVertex3fv((GLfloat*)&tris[i].tri2.vert[0]);
 				glVertex3fv((GLfloat*)&tris[i].tri2.vert[1]);
 				glVertex3fv((GLfloat*)&tris[i].tri2.vert[2]);
-			
 			}
 			glEnd();
-		
-		
 		}
-	
-	
 	}
-
 
 }
 
@@ -179,5 +162,4 @@ void CollisionDetectionExample::draw(smDrawParam p_params){
 void main(){
 	CollisionDetectionExample *ex=new CollisionDetectionExample();
 	delete ex;
-	
 }

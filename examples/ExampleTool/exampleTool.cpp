@@ -1,7 +1,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smCoreClass.h"
-#include "smCore/smSceneObject.h"	
+#include "smCore/smSceneObject.h"
 #include "smCore/smSDK.h"
 #include "smCore/smStaticSceneObject.h"
 #include "smSimulators/smDummySimulator.h"
@@ -25,39 +25,30 @@
 using namespace std;
 
 
-class  myTool:public MyStylus{
+class myTool:public MyStylus{
+
 public:
-	myTool():MyStylus("../../resources/models/blunt_diss_pivot.3DS","../../resources/models/blunt_diss_upper.3DS","../../resources/models/blunt_diss_lower.3DS"){
-	
-	
-	
+
+	myTool():MyStylus("../../resources/models/blunt_diss_pivot.3DS",
+		"../../resources/models/blunt_diss_upper.3DS","../../resources/models/blunt_diss_lower.3DS"){
 	}
-	void  handleEvent(smEvent *p_event)
-	{
+
+	void  handleEvent(smEvent *p_event){s
 		MyStylus::handleEvent(p_event);
 		smKeyboardEventData *keyBoardData=(smKeyboardEventData*)p_event->data;
 					
 					if(keyBoardData->keyBoardKey==Qt::Key_U){
-					    meshContainer.posOffsetPos.z-=0.01;
-					    //meshContainerLower.preOffsetPos.z-=0.01;
-						//meshContainerUpper.preOffsetPos.z-=0.01;  
-						
-						
+						meshContainer.posOffsetPos.z-=0.01;
 					}
 					if(keyBoardData->keyBoardKey==Qt::Key_I){
 						meshContainer.posOffsetPos.z+=0.01;
-					    //meshContainerLower.preOffsetPos.z+=0.01;
-						//meshContainerUpper.preOffsetPos.z+=0.01;  
-						
-						
 					}
-	
 	}
-
-};	
+};
 
 
 void main(){
+
 	MyStylus *hapticStylus;
 	HookCautery *hapticStylus1;
 	smPhantomInterface * hapticInterface;
@@ -99,13 +90,12 @@ void main(){
 	smTextureManager::loadTexture("../../resources/textures/metalbump.bmp","bump");
 	smTextureManager::loadTexture("../../resources/textures/burn1024.bmp","specTex");///for OCC I'll use the same texture
 
-
-	
-
 	///create a grasper
 	hapticStylus=new myTool();
+
 	///assign device id
 	hapticStylus->phantomID=0;
+
 	///there are 3 containers by default. Assign a name and texture for each
 	hapticStylus->meshContainer.mesh->name="Pivot";
 	hapticStylus->meshContainerUpper.mesh->name="Upper";
@@ -113,23 +103,27 @@ void main(){
 	hapticStylus->meshContainer.mesh->assignTexture("metal");
 	hapticStylus->meshContainerLower.mesh->assignTexture("metal");
 	hapticStylus->meshContainerUpper.mesh->assignTexture("metal");
+
 	///cupdates the normals and tangents in case
 	hapticStylus->meshContainer.mesh->calcNeighborsVertices();
 	hapticStylus->meshContainer.mesh->calcTriangleTangents();
 	hapticStylus->meshContainer.mesh->updateVertexNormals();
+
 	///set the rendering details  
 	hapticStylus->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
-	
-		
+
 	///create another tool. This is a cautery tool that has  only a shaft 
 	hapticStylus1=new HookCautery();
+
 	///assign this to second phantom
 	hapticStylus1->phantomID=1;
+
 	//hapticStylus1->renderDetail.renderType=hapticStylus1->renderDetail.renderType|SOFMIS_RENDER_NONE;
 	hapticStylus1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
 
 	///creates tool simulator
 	toolSim= new smToolSimulator(smSDK::getErrorLog()); 
+
 	///define the execution of the simulator. 
 	toolSim->setExecutionType(SOFMIS_SIMEXECUTION_ASYNCMODE);
 
@@ -158,38 +152,34 @@ void main(){
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GLOBALAXIS|SOFMIS_VIEWERRENDER_RESTORELASTCAMSETTINGS;
 	viewer->camera()->setZClippingCoefficient(100);
 	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
-	
+
 	///add lights
 	viewer->addLight(&light);
 	viewer->addLight(&light2);
-
 
 	///register viewer with the  set of events 
 	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICOUT);
 	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICIN);
 	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
 
-
 	///create a phanotm interface
 	hapticInterface = new smPhantomInterface();
 	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+
 	///register tools for haptic out and keyboard events 
 	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SOFMIS_EVENTTYPE_HAPTICOUT);
 	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SOFMIS_EVENTTYPE_KEYBOARD);
 	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SOFMIS_EVENTTYPE_KEYBOARD);
 	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SOFMIS_EVENTTYPE_HAPTICOUT);
+
 	///register haptic module
 	sofmisSDK->registerModule(hapticInterface);
+
 	///we want to call haptic inteface draw routine too
 	viewer->addObject(hapticInterface);
 
 	///run  the SDK
 	sofmisSDK->run();
-
-
-
-	
-
 }
 
 
