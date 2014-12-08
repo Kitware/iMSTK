@@ -3,11 +3,10 @@
 using std::map;
 
 //assimp includes
-#include <Importer.hpp>
-#include <scene.h>
-#include <postprocess.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "smMesh/smSurfaceMesh.h"
-#include <io.h>
 
 /// \brief constructor
 smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype,smErrorLog *log=NULL){
