@@ -1,4 +1,4 @@
-# - Try to find Eigen3 lib
+﻿# - Try to find Eigen3 lib
 #
 # This module supports requiring a minimum version, e.g. you can do
 #   find_package(Eigen3 3.1.2)
@@ -61,7 +61,7 @@ if (EIGEN3_INCLUDE_DIR)
 
 else (EIGEN3_INCLUDE_DIR)
 
-  find_path(EIGEN3_INCLUDE_DIR NAMES eigen/Eigen
+  find_path(EIGEN3_INCLUDE_DIR NAMES Eigen
       PATHS
       ${CMAKE_INSTALL_PREFIX}/include
       ${KDE4_INCLUDE_DIR}

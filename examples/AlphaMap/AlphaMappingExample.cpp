@@ -42,8 +42,8 @@ AlphaMapExample::AlphaMapExample(){
 	scene1=sofmisSDK->createScene();
 
 	
-	TCHAR szEXEPath[2048];
-	cout << GetModuleFileName ( NULL, szEXEPath, 2048 );
+	//	TCHAR szEXEPath[2048];
+	//	cout << GetModuleFileName ( NULL, szEXEPath, 2048 );
 
 
 
@@ -141,7 +141,7 @@ void AlphaMapExample::draw(smDrawParam p_params){
 }
 
 //extern function 
-void main(){
+int main(){
 	AlphaMapExample *ex=new AlphaMapExample();
 	delete ex;
 	

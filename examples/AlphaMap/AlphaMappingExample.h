@@ -42,7 +42,7 @@ public:
 	
 	
 	}
-	void AlphaMapExample::draw(smDrawParam p_params);
+	void draw(smDrawParam p_params);
    ~AlphaMapExample();
 };
 

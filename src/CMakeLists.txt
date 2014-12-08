@@ -1,4 +1,4 @@
-# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
+﻿# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
 # and below (NEWLIB) for an example for how to use it).
 
 set(sources_sofmis
@@ -53,14 +53,19 @@ set(sources_sofmis
 ./smUtilities/smVec3.cpp
 )
 
+if(SIMMEDTK_USE_PHANTOM_OMNI)
+  set(sources_sofmis ${sources_sofmis}
+  ./smExternalDevices/smDeviceInterface.cpp
+  ./smExternalDevices/smHapticInterface.cpp
+  ./smExternalDevices/smPhantomInterface.cpp)
+endif()
+
 set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
   ./smExternalDevices/smADUInterface.cpp
   ./smExternalDevices/smATC3DGInterface.cpp
-  ./smExternalDevices/smDeviceInterface.cpp
-  ./smExternalDevices/smHapticInterface.cpp
   ./smExternalDevices/smNIUSB6008Interface.cpp
-  ./smExternalDevices/smPhantomInterface.cpp
 )
+
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   set_source_files_properties(${sources_sofmis} PROPERTIES COMPILE_FLAGS -std=c++11)
@@ -81,9 +86,7 @@ target_link_libraries(sofmis
   ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
-  Qt4::QtGui
-  Qt4::QtCore
-  Qt4::QtOpenGL
+  ${QT_LIBRARIES}
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
@@ -107,5 +110,22 @@ add_library(externalDevices
   ${SIMMEDTK_EXTERNAL_DEVICES_SOURCES})
 target_link_libraries(externalDevices
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY})
+  ${Boost_THREAD_LIBRARY}
+  ${QT_LIBRARIES}
+  ${GLEW_LIBRARY}
+  ${GLUT_LIBRARY}
+  ${OPENGL_LIBRARIES}
+  ${OPENCV_LIBRARIES}
+  ${ADU_LIBRARY}
+  ${ASSIMP_LIBRARY}
+  ${ATC_LIBRARY}
+  ${AUDIERE_LIBRARY}
+  ${GLUT_glut_LIBRARY}
+  ${ILUT_LIBRARIES}
+  ${ILU_LIBRARIES}
+  ${IL_LIBRARIES}
+  ${NIDAQ_mx_LIBRARY}
+  ${DevIL_LIBRARY}
+  ${OPENHAPTICS_hd_LIBRARY}
+  ${OPENHAPTICS_hdu_LIBRARY})
 endif()
