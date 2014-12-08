@@ -1,4 +1,4 @@
-/*
+﻿/*
 ****************************************************
 			SIMMEDTK LICENSE
 ****************************************************
@@ -44,7 +44,7 @@ public:
 	void handleEvent(smEvent *p_event);
 
 	/// \brief render the avatar
-	void HookCautery::draw(smDrawParam p_param);
+	void draw(smDrawParam p_param);
 
 	/// \brief constructor
 	HookCautery(smChar *p_pivot="../../resources/models/hook_cautery_new.3DS");
