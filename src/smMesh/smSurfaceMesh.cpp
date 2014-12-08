@@ -11,12 +11,20 @@ using std::map;
 #ifdef _WIN32
 #define fileno _fileno
 #include "io.h"
-#else
-size_t filelength(const char * filename)
+int Filelength(const char*, int id)
 {
-    struct stat st;
-    stat(filename, &st);
-    return st.st_size;
+  return filelength(id);
+}
+
+#else
+
+#include<sys/stat.h>
+
+size_t Filelength(const char * filename, int)
+{
+  struct stat st;
+  stat(filename, &st);
+  return st.st_size;
 }
 #endif
 
@@ -198,7 +206,7 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName){
 	if ((l_file=fopen (fileName, "rb"))== NULL) //Open the file
 		return 0; 
 
-	while (ftell (l_file) < filelength (fileno (l_file))) //Loop to scan the whole file
+	while (ftell (l_file) < Filelength (fileName, fileno (l_file))) //Loop to scan the whole file
 	{
 
 		fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
