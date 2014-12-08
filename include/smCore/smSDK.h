@@ -22,7 +22,7 @@
 #include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
-
+/// \brief maximum entities in the framework
 #define SOFMIS_SDK_MAXMESHES 100
 #define SOFMIS_SDK_MAXMODULES 100
 #define SOFMIS_SDK_MAXOBJECTSIMULATORS 100
@@ -33,7 +33,7 @@ class smMotionTransformer;
 class smPipe;
 template<typename T> class smIndiceArray;
 class smScene;
-
+/// \brief module registration
 enum smSDKReturnType{
 	SOFMIS_SDK_MODULEREGISTERED,
 	SOFMIS_SDK_MODULEREGISTEREDALREADY
@@ -41,7 +41,7 @@ enum smSDKReturnType{
 
 struct smBaseHolder{
 };
-
+/// \brief mesh holder
 struct smMeshHolder:public smBaseHolder{
 
 	smMeshHolder(){
@@ -54,7 +54,7 @@ struct smMeshHolder:public smBaseHolder{
 		return mesh==p_param.mesh;
 	}
 };
-
+/// \brief module holder
 struct smModuleHolder:public smBaseHolder{
 
 	smModuleHolder(){
@@ -67,7 +67,7 @@ struct smModuleHolder:public smBaseHolder{
 		return module==p_param.module;
 	}
 };
-
+/// \brief simulator holder
 struct smObjectSimulatorHolder:public smBaseHolder{
 
 	smObjectSimulatorHolder(){
@@ -80,7 +80,7 @@ struct smObjectSimulatorHolder:public smBaseHolder{
 		return objectSim==p_param.objectSim;
 	}
 };
-
+/// \brief scene holders
 struct smSceneHolder:public smBaseHolder{
 	smSceneHolder(){
 		scene=NULL;
@@ -92,7 +92,7 @@ struct smSceneHolder:public smBaseHolder{
 	}
 
 };
-
+/// \brief scene object holder
 struct smSceneObjectHolder:public smBaseHolder{
 
 	smSceneObjectHolder(){
@@ -105,7 +105,7 @@ struct smSceneObjectHolder:public smBaseHolder{
 	}
 
 };
-
+/// \brief pipe holder
 struct smPipeHolder:public smBaseHolder{
 
 	smPipe *pipe;
@@ -123,28 +123,35 @@ struct smPipeHolder:public smBaseHolder{
 	}
 
 };
-
+/// \brief SDK class. it is a singlenton class for each machine runs the framework
 class smSDK:public smCoreClass,public smEventHandler{
 
 protected:
 	///this id is incremented automatically when the scene is created.
 	smInt sceneIdCounter;
-
+	/// \brief pointer to the Qapplication
 	QApplication *application;
+	/// \brief pointers to the viewer, simulator
 	smViewer *viewer;
 	smSimulator *simulator;
+	/// \brief scene list
 	vector<smScene*>sceneList;
+	/// \brief error log
 	static smErrorLog *errorLog;
+	/// \brief dispatcher
 	smDispatcher *dispathcer;
+	/// \brief event dispather
 	smEventDispatcher *eventDispatcher;
 	smInt argc;
 	smChar argv;
 	smBool isModulesStarted;
-
+	/// \brief update scene list. not implemented
 	void updateSceneListAll();
+	/// \brief init registered modules
 	void initRegisteredModules();
+	/// \brief run the registered modules
 	void runRegisteredModules();
-
+	/// \brief singlenton sdk.
 	static smSDK sdk;
 	///holds the references to the entities in the framework
 	static smIndiceArray<smMeshHolder> *meshesRef;
@@ -155,9 +162,9 @@ protected:
 	static smIndiceArray<smSceneObjectHolder> *sceneObjectsRef;
 	static smIndiceArray<smMotionTransformer *> *motionTransRef;
 	static smIndiceArray<smPipeHolder>* pipesRef;
-
+	/// \brief destructor
 	~smSDK();
-
+	/// \brief constructor
 	smSDK(){
 		smInt argc=1;
 		smChar *argv[]={SOFMISVERSION_TEXT};
@@ -207,7 +214,7 @@ public:
 	///SDK creates scene
 	smScene *createScene();
 
-		///SDK returns logger for the system
+	///SDK returns logger for the system
 	static smErrorLog *getErrorLog(){
 		return errorLog;
 	};
@@ -236,10 +243,14 @@ public:
 
 	///release the scene from the SDK..not implemented yet
 	void releaseScene(smScene*);
+	/// \brief run the SDK
 	void run();
+	/// \brief add reference to a core class
 	static void addRef(smCoreClass* p_coreClass);
+	/// \brief removes reference on core class
 	static void removeRef(smCoreClass* p_coreClass);
 
+	/// \brief register functions
 	static smInt registerMesh(smBaseMesh*p_mesh){
 		smMeshHolder mh;
 		mh.mesh=p_mesh;
@@ -281,6 +292,8 @@ public:
 		p_sco->uniqueId.sdkID=sceneObjectsRef->checkAndAdd(sh);
 	}
 
+
+	/// \brief getter functions
 	inline static smBaseMesh* getMesh(smUnifiedID &p_unifiedID){
 		return (meshesRef->getByRef(p_unifiedID.sdkID).mesh);
 	}
@@ -312,20 +325,20 @@ public:
 	inline static smPipe* getPipeByName(QString p_name){
 		return (pipesRef->getByRef(p_name).pipe);
 	}
-
+	/// \brief register pipe
 	static void registerPipe(smPipe*p_pipe){
 		smPipeHolder ph;
 		ph.pipe=p_pipe;
 		p_pipe->uniqueId.sdkID=pipesRef->checkAndAdd(ph);
 	}
-
+	/// \brief create a pipe
 	inline static smPipe *createPipe(QString p_pipeName,smInt p_elementSize,smInt p_size){
 		smPipe *pipe;
 		pipe=new smPipe(p_pipeName,p_elementSize,p_size);
 		registerPipe(pipe);
 		return pipe;
 	}
-
+	/// \brief handle an event
 	void handleEvent(smEvent *p_event);
 
 };

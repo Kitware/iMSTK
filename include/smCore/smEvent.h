@@ -63,27 +63,36 @@ class smEventSource{
 class smEventBase{
 
 };
-
+/// \brief  event class. One method of message sending among the framework 
 class smEvent{
 
 public:
+	/// \brief  points to the data
 	void *data;
+	/// \brief priority of event
 	smEventPriority priority;
+	/// \brief  event type
 	smEventType eventType;
+	/// \brief  sender type
 	smSenderType senderType;
+	/// \brief  sender id
 	smInt senderId;
+	/// \brief constrcutor
 	smEvent();
+	/// \brief  destructor
 	~smEvent();
 
 private:
+	/// \brief  message ID
 	smInt messageId;
 	friend smEventDispatcher;
 
 };
-
+/// \brief stream event
 class smStreamEvent:public smEvent{
 
 	public:
+	/// \brief time stamp 
 	smInt timeStamp;
 	smStreamEvent(){
 	}

@@ -153,18 +153,18 @@ public:
 	}
 };
 
-
+/// \brief pipe registration type such as reference or a value
 enum smPipeRegType{
 	SOFMIS_PIPE_BYREF,
 	SOFMIS_PIPE_BYVALUE
 };
-
+/// \brief pipe type
 enum smPipeType{
 	SOFMIS_PIPE_TYPEREF,
 	SOFMIS_PIPE_TYPEVALUE,
 	SOFMIS_PIPE_TYPEANY
 };
-
+/// \brief holder for pipe data
 struct smPipeData{
 	smPipeData(){
 		dataLocation=NULL;
@@ -178,9 +178,9 @@ struct smPipeData{
 	volatile smBool dataReady;///flag is raised when the data is ready
 	volatile smUInt timeStamp;
 };
-
+/// \brief pipe registration holder
 struct smPipeRegisteration{
-
+	/// \brief constructor
 	smPipeRegisteration(){
 		regType=SOFMIS_PIPE_BYREF;
 	}
@@ -188,11 +188,11 @@ struct smPipeRegisteration{
 	smPipeRegisteration(smPipeRegType p_reg){
 		regType=p_reg;
 	}
-
+	
 	smCoreClass *listenerObject;///pointer to the listener for future use
-	smPipeData  data;//information about the data.
-	smPipeRegType regType;//registration type. Will it be reference or value registration.
-
+	smPipeData  data;///information about the data.
+	smPipeRegType regType;///registration type. Will it be reference or value registration.
+	/// \brief  print pipe registration information 
 	void print(){
 		if(regType==SOFMIS_PIPE_BYREF)
 			cout<<"Listener Object"<< " By Reference"<<endl;
@@ -201,27 +201,35 @@ struct smPipeRegisteration{
 	}
 
 };
-
+/// \brief pipe is used for communication among the entities in the framework 
 class smPipe:public smCoreClass{
 protected:
+	/// \brief  pipe stype
 	smPipeType pipeType;
+	/// \brief  number of elements
 	smInt maxElements;
+	/// \brief  pointer to the data
 	void *data;
+	/// \brief enable/disable
 	smBool enabled;
+	/// \brief indices to the objects that  register by reference
 	smIndiceArray<smPipeRegisteration*> byRefs;
+	/// \brief ndices to the objects that  register by value
 	smIndiceArray<smPipeRegisteration*> byValue;
-
+	/// \brief number of current elements in the pipe
 	volatile smInt currentElements;
 	volatile smUInt timeStamp;//For stamping the data
+	/// \brief element size
 	volatile smInt elementSize;
 
 public:
+	/// \brief  destructor
 	~smPipe(){
 		smIndiceArrayIter<smPipeRegisteration*> iterValue(&byValue);
 		for(smInt i=iterValue.begin();i<iterValue.end();i++)
 			delete []iterValue[i]->data.dataLocation;
 	}
-
+	/// \brief pipe constructor
 	smPipe(QString p_name,smInt p_elementSize,smInt p_maxElements,
                        smPipeType p_pipeType=SOFMIS_PIPE_TYPEANY):
                        byRefs(SOFMIS_PIPE_MAXLISTENERS),
@@ -232,21 +240,21 @@ public:
 		data=new smChar[elementSize*maxElements]; //change it to memory block later on 
 		pipeType=p_pipeType;
 	}
-
+	/// \brief get maximum number of elements
 	inline smInt getElements(){
 		return maxElements;
 	}
-
+	/// \brief  begin writing
 	inline volatile void *beginWrite(){
 		return data;
 	}
-
+	/// \brief  end writing
 	inline void endWrite(smInt p_elements){
 		currentElements=p_elements;
 		timeStamp++;
 		acknowledgeRefListeners();
 	}
-
+	/// \brief  register for the pipe
 	inline smInt registerListener(smPipeRegisteration *p_pipeReg){
 		if(p_pipeReg->regType==SOFMIS_PIPE_BYREF){
 			p_pipeReg->data.dataLocation=data;
@@ -298,13 +306,13 @@ public:
 	friend smBool operator==(smPipe &p_pipe,QString p_name){
 		return (p_pipe.name==p_name?true:false);
 	}
-
+	/// \brief print all the listeners (both reference  and value)
 	void print(){
 		byRefs.print();
 		byValue.print();
 	}
 };
-
+/// \brief secure pipe is for consumer-producer relation. not implemented yet
 class smSecurePipe:public smPipe{
 
 };

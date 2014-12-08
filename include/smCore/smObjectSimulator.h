@@ -19,6 +19,7 @@
 #include "smUtilities/smTimer.h"
 #include "smCore/smScheduler.h"
 
+/// \brief  thread priority definitions
 enum smThreadPriority{
 	SOFMIS_THREAD_IDLE=QThread::IdlePriority,
 	SOFMIS_THREAD_LOWPRIORITY=QThread::LowPriority,
@@ -71,22 +72,22 @@ public:
 		p_object->objectSim=this;
 		objectsSimulated.push_back(p_object);
 	}
-
+	/// \brief remove object from the simulator
 	virtual void removeObject(smSceneObject *p_object){
 	}
 
 	smObjectSimulator(smErrorLog *p_log);
-
+	/// \brief  set thread priority
 	void setPriority(smThreadPriority p_priority){
 		threadPriority=p_priority;
 	};
-
+	/// \brief  set execution type
 	void setExecutionType(smSimulatorExecutionType p_type){
 		if(execType!=p_type)
 			executionTypeStatusChanged=true;
 		execType=p_type;
 	}
-
+	/// \brief  get thread priority
 	smThreadPriority getPriority(){
 		return threadPriority;
 	}
@@ -96,7 +97,7 @@ protected:
 	vector <smSceneObject*> objectsSimulated;
 
 	virtual void initCustom()=0;
-
+	/// \brief  init simulator
 	void init(){
 		if(isObjectSimInitialized==false){
 			initCustom();
@@ -104,15 +105,16 @@ protected:
 			isObjectSimInitialized=true;
 		}
 	};
-
+	/// \brief  the actual implementation will reside here
 	virtual void run()=0; 
+	/// \brief  begining of simulator frame, this function is called
 	virtual void beginSim(){
 		frameCounter++;
 		timer.start();
 	};
-
+	/// \brief synchronization 
 	virtual void syncBuffers()=0;
-
+	/// \brief is called at the end of simulation frame.
 	virtual void endSim(){
 		timerPerFrame=timer.now(SOFMIS_TIMER_INMILLISECONDS);
 		totalTime+=timerPerFrame;
@@ -123,13 +125,15 @@ protected:
 			totalTime=0.0;
 		}
 	}
-
+	/// \brief updates scene list
 	virtual void updateSceneList(){
 	};
-
+	/// \brief  initialization routine for rendering
 	virtual void initDraw(smDrawParam p_params);
+	/// \brief  rendering of simulator. it is used for debugging purposes
 	virtual void draw(smDrawParam p_params);
-
+	/// \brief object simulator iterator. The default iteration is sequantial in the order of the insertion.
+	/// custom iteration requires extension of this class.
 	struct smObjectSimulatorObjectIter{
 
 	private:

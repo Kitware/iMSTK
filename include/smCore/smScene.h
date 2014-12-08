@@ -42,16 +42,23 @@ public:
 class smScene:public smCoreClass{
 
 private:
+	/// \brief number of total objects in the scene
 	smInt totalObjects;
+	/// \brief error logging
 	smErrorLog *log;
+	/// \brief scene list lock for thread safe manipulation of the scene
 	QMutex sceneList;
+	/// \brief reference counter to the scene 
 	smUInt referenceCounter;
+	/// \brief last updated time stampe
 	smUInt sceneUpdatedTimeStamp;
+	/// \brief scene objects addition queue 
 	vector<smSceneObject*> addQueue;
 	smIndiceArray<smSceneLocal*> sceneLocal;
 	QHash<smInt,smInt> sceneLocalIndex;
+	/// \brief scene objects storage
 	vector<smSceneObject*> sceneObjects;
-
+	/// \brief adds the objects in the local scene storage
 	void inline copySceneToLocal(smSceneLocal *p_local){
 		p_local->sceneObjects.clear();
 		
@@ -62,6 +69,7 @@ private:
 	}
 
 public: 
+	/// \brief iterator for scene object. The default iterates over the scene in the order of insertion. For scene graph, this iteration needs to be inherited and modified
 	struct smSceneIterator{
 		protected:
 			//smInt startIndex;
@@ -74,6 +82,7 @@ public:
 			sceneLocal=NULL;
 
 		}
+		/// \brief copy other scene to this current one.
 		inline void setScene(smScene *p_scene,smCoreClass *p_core){
 			
 			sceneLocal=p_scene->sceneLocal.getByRef(p_scene->sceneLocalIndex[p_core->uniqueId.ID]);
@@ -96,25 +105,26 @@ public:
 		inline smInt end(){
 			return endIndex;
 		}
-
+		/// \brief operator to increment the index to go to the next item in the scene
 		inline void operator++(){
 			currentIndex++;
 		}
+		/// \brief operator to decrement the index to go to the previous item in the scene
 		inline void operator--(){
 			currentIndex--;
 		}
-
+		/// \brief to access a particular entry in the scene with [] notation
 		inline smSceneObject* operator[](smInt p_index){
 			return sceneLocal->sceneObjects[p_index];
 		}
-
+			/// \brief to access a particular entry in the scene with () notation
 		inline smSceneObject* operator*(){
 			return sceneLocal->sceneObjects[currentIndex];
 		}
 	};
 
 	smScene(smErrorLog *p_log=NULL);
-
+    /// \brief add obejct to the scene, it is thread safe call.
 	void registerForScene(smCoreClass *p_sofmisObject){
 		smSceneLocal *local=new smSceneLocal();
 		local->id=p_sofmisObject->uniqueId.ID;
@@ -141,14 +151,14 @@ public:
 	///and the the list should be stored internally.
 	///The scene list removal will be taken care of later since the list should be update.
 	vector<smSceneObject*> getSceneObject();
-
+	/// \brief retursn scene id
 	smInt getSceneId();
-
+	/// \brief returns the total number of objects in the scene
 	inline smInt getTotalObjects();
 
 	///Same functionality as addSceneObject
 	smScene& operator +=(smSceneObject *p_sceneObject);
-
+	/// \brief add and remove references
 	void addRef();
 	void removeRef();
 	void copySceneObjects(smScene*p_scene);

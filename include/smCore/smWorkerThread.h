@@ -12,23 +12,28 @@
 #include "smCore/smCoreClass.h"
 #include "smCore/smSynchronization.h"
 #include <Qthread>
-
+/// \brief process(used as conceptual meaning) numbering scheme
 enum smProcessNumbering{
 	SOFMIS_PROCNUMSCHEME_X__,
 	SOFMIS_PROCNUMSCHEME_XY_,
 	SOFMIS_PROCNUMSCHEME_XYZ,
 };
-
+/// \brief process id 
 struct smProcessID{
 public:
+	/// \brief numbering scheme in x,y,z
 	smUShort x;
 	smUShort y;
 	smUShort z;
+
 	smUShort totalProcX;
 	smUShort totalProcY;
 	smUShort totalProcZ;
+	/// \brief data 
 	void *data;
+	/// \brief data size
 	smInt sizeOfData;
+	/// \brief numbering sceheme
 	smProcessNumbering numbScheme;
 
 	smProcessID(){
@@ -53,7 +58,7 @@ public:
 
 
 
-
+/// \brief process. Process is a atomic execution unit(thread).  
 class smProcess:public smCoreClass{
 
 protected:
@@ -89,10 +94,11 @@ public:
 		termination=true;
 	}
 };
-
+/// \brief worker thread extends process
 class smWorkerThread:public QThread,public smProcess{
 
 protected:
+	/// \brief for synchronization 
 	smSynchronization *synch;
 
 public:

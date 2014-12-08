@@ -26,10 +26,11 @@ struct smObjectInitFlags{
 	smBool isSimulatorInit;
 
 };
-
+/// \brief  scene object for visualization
 class smSceneObject:public smCoreClass{
-
+	/// \brief object simulator that will simulate the object
 	smObjectSimulator *objectSim;
+	/// \brief custom renderer 
 	smCustomRenderer *customRender;
 
 	friend class smSDK;
@@ -41,23 +42,27 @@ private:
 protected:
 
 public:
-
+	/// \brief memory block for allocations that will be made for the object
 	smMemoryBlock *memBlock;
+	/// \brief flags
 	smObjectInitFlags flags;
-
+	/// \brief constructor
 	smSceneObject();
-
+	/// \brief returns object id
 	smInt getObjectId(){
 		return uniqueId.ID;
 	}
-
+	/// \brief get unified object id
 	smUnifiedID getObjectUnifiedID(){
 		return uniqueId;
 	}
-
+	/// \brief attach simulator to the object. This function that needs to be called to associate the simulator to the object
 	virtual void attachObjectSimulator(smObjectSimulator *p_objectSim);
+	/// \brief to release the simulator
 	virtual void releaseObjectSimulator();
+	/// \brief get object simulator 
 	smObjectSimulator* getObjectSimulator();
+	/// \brief attach custome renderer for the object. If the default rendering is not helpful
 	void attachCustomRenderer(smCustomRenderer *p_customeRenderer);
 	void releaseCustomeRenderer();
 

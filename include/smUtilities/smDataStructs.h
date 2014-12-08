@@ -12,22 +12,28 @@ SIMMEDTK LICENSE
 
 template<typename T>
 class smIndiceArrayIter;
-
+/// \brief  inidice array for fast access to index
 template<typename T>
 class smIndiceArray{
 protected:
+	/// \brief  storage 
 	T *storage;
+	/// \brief  check if the slot is empty
 	smBool *isEmpty;
+	/// \brief  indices
 	smInt *indices;
+	/// \brief  number of elements
 	smInt nbrElements;
+	/// \brief  maximum storage
 	smInt maxStorage;
 public:
+	/// \brief  destructor
 	~smIndiceArray(){
 		delete [] indices;
 		delete [] storage;
 		delete [] isEmpty;
 	}
-
+	/// \brief constructor; gets maximum number of elements
 	inline smIndiceArray(smInt p_maxStorage){
 		maxStorage=p_maxStorage;
 		indices=new smInt[p_maxStorage];
@@ -37,7 +43,7 @@ public:
 			isEmpty[i]=true;
 		nbrElements=0;
 	}
-
+	/// \brief  add item
 	inline smInt add(T p_item){
 		smInt index=-1;
 		if(nbrElements<maxStorage){
@@ -57,7 +63,7 @@ public:
 		}
 		return index;
 	}
-
+	/// \brief check if the item exists, if not add 
 	inline smInt checkAndAdd(T p_item){
 		smInt index=-1;
 		if(nbrElements<maxStorage){
@@ -68,7 +74,7 @@ public:
 		}
 		return index;
 	}
-
+	/// \brief remove the element from array
 	inline smBool remove(smInt p_itemIndex){
 		smInt counter=0;
 		if(p_itemIndex>=0&&p_itemIndex<maxStorage){
@@ -86,6 +92,7 @@ public:
 			return false;
 	}
 
+	/// \brief replace the entry in p_index slot with p_item 
 	inline smBool replace(smInt p_index,T &p_item){
 		if(isEmpty[p_index]==false){
 			storage[p_index]=p_item;
@@ -93,11 +100,11 @@ public:
 		}
 		return false;
 	}
-
+	/// \brief get element by reference
 	inline T& getByRef(smInt p_index){
 		return storage[p_index];
 	}
-
+	/// \brief  get element by safe. If the element doesn't exist it will return false
 	inline smBool getByRefSafe(smInt p_index, T&p_item){
 		if(isEmpty[p_index])
 			return false;
@@ -107,7 +114,7 @@ public:
 			return true;
 		}
 	}
-
+	/// \brief get element by reference with string
 	inline T& getByRef(QString p_string){
 		for(smInt i=0;i<nbrElements;i++){
 			if(storage[indices[i]]==p_string){
@@ -115,15 +122,15 @@ public:
 			}
 		}
 	}
-
+	/// \brief for iterative access 
 	friend smIndiceArrayIter<T>;
-
+	/// \brief print the elements
 	inline void print(){
 		for(smInt i=0;i<nbrElements;i++){
 			storage[indices[i]]->print();
 		}
 	}
-
+	/// \brief operators
 	inline T& operator[](smInt p_index){
 		return storage[indices[p_index]];
 	}
@@ -131,7 +138,7 @@ public:
 	inline smInt size(){
 		return nbrElements;
 	}
-
+	/// \brief copy from another p_array
 	inline smBool copy(smIndiceArray &p_array){
 		if(maxStorage<p_array.maxStorage){
 			for(smInt j=0;j<maxStorage;j++)
@@ -147,15 +154,17 @@ public:
 	}
 };
 
+/// \brief  iteration
 template<class T>
 class smIndiceArrayIter{
 	smInt index;
 	smIndiceArray<T> *arrayPtr;
 public:
+	/// \brief constructor that require index array
 	smIndiceArrayIter(smIndiceArray<T> *p_array){
 		arrayPtr=p_array;
 	}
-
+	/// \brief  operators for accessing and iteration
 	T& operator[](smInt p_index){
 		return arrayPtr->storage[ arrayPtr->indices[p_index]];
 	}
@@ -185,9 +194,9 @@ public:
 		return arrayPtr->nbrElements;
 	}
 };
-
+/// \brief hash bucket size
 #define SOFMIS_HASHBUCKET_SIZE	10
-
+/// \brief a hash entry; bucket 
 template <class T>
 struct smEntryList{
 public:
@@ -200,15 +209,16 @@ public:
 	smUInt totalEntries;
 	smEntryList* p_entry;
 };
-
+/// \brief hash iterator
 template <class T>
 struct smHashIterator{
+	/// \brief  default initializaiton
 	smHashIterator(){
 		tableIndex=0;
 		currentIndex=0;
 		bucketStart=NULL;
 	}
-
+	/// \brief  to clone the has iterator
 	inline void clone(smHashIterator<T> &p_iterator){
 		tableIndex=p_iterator.tableIndex;
 		currentIndex=p_iterator.currentIndex;
@@ -221,7 +231,7 @@ struct smHashIterator{
 		currentIndex=p_iterator.currentIndex;
 		
 	}
-
+	/// \brief reseting the index for bucket iteration
 	inline void resetBucketIteration(){
 		currentIndex=0;
 		iterator=bucketStart;
@@ -237,7 +247,7 @@ struct smHashIterator{
 		return out;
 	}
 };
-
+/// \brief hash return codes
 enum SOFMIS_HASHRETURN_CODES{
 	SOFMIS_HASH_ENTRYREMOVED,
 	SOFMIS_HASH_ENTRYALREADYEXISTS,
@@ -247,23 +257,30 @@ enum SOFMIS_HASHRETURN_CODES{
 	SOFMIS_HASH_ALLOCATED_INSERTED,
 	SOFMIS_HASH_SUCCESS
 };
-
+/// \brief hash implementation. Table->
 template <class T>
 class smHash{
+	/// \brief primitive ids that is stored with entry list
 	smEntryList<T> *primitiveIDs;
+	/// \brief  current table index
 	smLongInt currentTableIndex;
+	/// \brief current entry index in the bucket
 	smLongInt currentEntryIndex;
+	/// \brief  current bucket pointer
 	smEntryList<T> *currentIterationBucket;
 public:
+	/// \brief  number of pritimives 
 	smLongInt num_prim;
+	/// \brief  table size
 	smLongInt tableSize;
 private:
+	/// \brief entries in the bucket
 	inline void moveEntriesInBucket(smEntryList<T> &p_Bucket,smInt p_entryIndex ){
 		for(unsigned smInt i=p_entryIndex;i<p_Bucket.totalEntries-1;i++)
 			p_Bucket.ID[i]=p_Bucket.ID[i+1];
 		p_Bucket.totalEntries--;
 	}
-
+	/// \brief check if the p_prim exists in the bucket
 	inline bool checkIdentical(smEntryList<T> &p_entry,T p_prim){
 		for(unsigned smInt i =0;i<p_entry.totalEntries;i++){
 			if(p_entry.ID[i]==p_prim)
@@ -271,7 +288,7 @@ private:
 		}
 		return false;
 	}
-
+	/// \brief find the bucket entry and update it
 	inline bool findandUpdateEntry(smEntryList<T> &p_startEntry,T &p_prim){
 		smEntryList<T> *currentBucket=&p_startEntry;
 		while(true){
@@ -286,7 +303,7 @@ private:
 			currentBucket=currentBucket->p_entry;
 		}
 	}
-
+	/// \brief clear buckets
 	inline void clearBuckets(smEntryList<T> &p_startEntry){
 		smEntryList<T> *currentBucket=&p_startEntry;
 		while(true){
@@ -298,6 +315,7 @@ private:
 	}
 
 public:
+	/// \brief initializes the table; entry
 	smHash(smInt p_tableSize){
 		tableSize=p_tableSize;
 		primitiveIDs=new smEntryList<T>[tableSize];
@@ -305,7 +323,8 @@ public:
 		currentTableIndex=0;
 		num_prim=0;
 	}
-
+	/// \brief  insert the entry; indicate as p_triangle. It can be any type not only a triangle
+	/// hashindex is the has number generated for the entry
 	inline SOFMIS_HASHRETURN_CODES insert(T p_triangle,smUInt hashIndex){
 		smEntryList<T> *currentBucket;
 		smEntryList<T> *prevBucket;
@@ -340,7 +359,7 @@ public:
 		num_prim++;
 		return SOFMIS_HASH_ENTRYINSERTED;
 	}
-
+	/// \brief check if there is an entry and index
 	inline SOFMIS_HASHRETURN_CODES checkAndInsert(T p_triangle,smUInt hashIndex){
 		smEntryList<T> *currentBucket;
 		smEntryList<T> *prevBucket;
@@ -380,13 +399,13 @@ public:
 		num_prim++;
 		return SOFMIS_HASH_ENTRYINSERTED;
 	}
-
+	/// \brief starts the iteration. reset the indices
 	inline void startIteration(){
 		currentTableIndex=0;
 		currentEntryIndex=0;
 		currentIterationBucket=&primitiveIDs[currentTableIndex];
 	}
-
+	/// \brief  go to next table index
 	inline bool next(smHashIterator<T> &p_iterator){
 		if(p_iterator.tableIndex>=tableSize)
 			return false;
@@ -397,7 +416,7 @@ public:
 		p_iterator.tableIndex++;
 		return true;
 	}
-
+	/// \brief  iterate over the next bucket item
 	inline bool nextBucketItem(smHashIterator<T> &p_iterator,T &p_prim){
 		while(true){
 			if(p_iterator.iterator==NULL){
@@ -419,7 +438,7 @@ public:
 			}
 		}
 	}
-
+	/// \brief proceed to next entry and return the element. it the bucket ends it will go to next table index
 	inline bool next(T &p_prim){
 		while(true){
 			if(currentTableIndex>=tableSize)
@@ -447,7 +466,7 @@ public:
 			currentTableIndex++;
 		}
 	}
-
+	/// \brief next element by getting reference to it
 	inline smBool nextByRef(T **p_prim){
 		while(true){
 			if(currentTableIndex>=tableSize)
@@ -475,7 +494,7 @@ public:
 			currentTableIndex++;
 		}
 	}
-
+	/// \brief  print all the content
 	inline void printContent(){
 		T prim;
 		startIteration();
@@ -483,7 +502,7 @@ public:
 			cout<<"Table:"<<currentTableIndex<<" Bucket Index:"<<currentEntryIndex<<" Prim:"<<prim<<endl;
 		}
 	}
-
+	/// \brief  clear all table, including the elements
 	void clearAll(){
 		for(smInt i=0;i<tableSize;i++){
 			clearBuckets(primitiveIDs[i]);
@@ -491,35 +510,38 @@ public:
 		num_prim=0;
 	}
 };
-
+/// \brief sliding  storage type
 enum smStorageSlideType{
 	SOFMIS_STORAGESLIDING_FRONTFIRST,
 	SOFMIS_STORAGESLIDING_LASTFIRST
 };
-
+/// \brief sliding storage window
 template<typename T>
 class smStorageSlidingWindow{
 private:
+	/// \brief  type
 	smStorageSlideType strorageType;
 public:
+	/// \brief  data
 	T *data;
+	/// \brief window size
 	unsigned int windowSize;
-
+	/// \brief constructor
 	~smStorageSlidingWindow(){
 		delete[] data;
 	}
-
+	/// \brief siding window storage. constructor  gets window size, type
 	smStorageSlidingWindow(int p_windowSize=10,smStorageSlideType p_type=SOFMIS_STORAGESLIDING_LASTFIRST){
 		data=new T[p_windowSize];
 		windowSize=p_windowSize;
 		memset(data,0,sizeof(T)*p_windowSize);
 		strorageType=p_type;
 	}
-
+	/// \brief storage type
 	inline smStorageSlideType getStorageType(){
 		return strorageType;
 	}
-
+	/// \brief  resize storage
 	inline void resize(int p_newSize){
 		T*tempData;
 		int index;
@@ -547,7 +569,7 @@ public:
 		data=tempData;
 		windowSize=p_newSize;
 	}
-
+	/// \brief add value
 	inline void add(T p_value){
 		if(strorageType==SOFMIS_STORAGESLIDING_LASTFIRST){
 			memcpy(data,&data[1],(windowSize-1)*sizeof(T));
@@ -560,11 +582,11 @@ public:
 			data[0]=p_value;
 		}
 	}
-
+	/// \brief  zero all the entries
 	inline void zeroed(){
 		memset(data,0,sizeof(T)*windowSize);
 	}
-
+	/// \brief  print all the elements
 	void print(){
 		for(int i=0;i<windowSize;i++){
 			cout<<data[i]<<" ";

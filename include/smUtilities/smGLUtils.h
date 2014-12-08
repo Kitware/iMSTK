@@ -15,34 +15,38 @@ SIMMEDTK LICENSE
 #include <GL/glut.h>
 #include <GL/glew.h>
 
+/// \brief stores the information about the ground
 struct smGroundRenderInfo;
 
+/// \brief opengl rendering utilities are here.
 class smGLUtils : public smCoreClass{
 public:
 	static smGroundRenderInfo groundRenderInfo;
 
 	static void init();
 
-	///checks the openGL error. if there is an error then it returns
-	///the error text otherwise it returns NULL
+	/// \brief checks the openGL error. if there is an error then it returns
+	/// \brief the error text otherwise it returns NULL
 	static bool queryGLError(smChar*err);
 
-	///taken from glProgramming.com.  Checks the extension.
+	/// \brief  taken from glProgramming.com.  Checks the extension.
 	static smBool QueryExtension(char *extName);
 
-	///fade background draw
+	/// \brief  fade background draw with a size groundRenderInfo.scale
 	static void fadeBackgroundDraw();
-
+	/// \brief draw a textured quad with 
 	static void drawTexturedPolygon();
-
+	/// \brief draw gorund
 	static void  drawGround();
 
+	/// \brief draw quad on screen with color and left, botton, right, top positions
 	static void drawQuadOnScreen(smColor p_color,
 	                             smFloat p_left,
 	                             smFloat p_bottom,
 	                             smFloat p_right,
 	                             smFloat p_top);
 
+	/// \brief draw unit quad
 	static inline void drawUnitQuadOnScreen(){
 		glBegin(GL_QUADS);
 			glNormal3f(0,0,1);
@@ -59,7 +63,7 @@ public:
 		glGetFloatv(GL_PROJECTION_MATRIX, m);
 		p_matrix.setMatrixFromOpenGL(m);
 	}
-
+	/// \brief to query current model view matrix. p_matrix will have the final values. 
 	template <typename T>
 	static inline void queryModelViewMatrix(smMatrix44<T> &p_matrix){
 		T m[16];

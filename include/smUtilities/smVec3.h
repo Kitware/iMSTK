@@ -11,39 +11,39 @@
 template<class T>
 class smMatrix44;
 
-///Vector class. It has all required functions for
+/// \brief Vector class. It has all required functions for
 ///vector-vector, vector-scalar operations.
 template <typename T>
 class smVec3{
 public:
 
-	///x component of the vector
+	/// \brief x component of the vector
 	T x;
-	///y component of the vector
+	/// \brief y component of the vector
 	T y;
-	///z component of the vector
+	/// \brief z component of the vector
 	T z;
 
-	///Default constructor
+	/// \brief Default constructor
 	inline smVec3(){
 		x=0.0;
 		y=0.0;
 		z=0.0;
 	}
 
-	///Member constructor
+	/// \brief Member constructor
 	inline smVec3(T p_x,T p_y, T p_z){
 		x=p_x;
 		y=p_y;
 		z=p_z;
 	}
 
-	/// length of the vector
+	/// \brief  length of the vector
 	inline T module() {
 		return (T)sqrt((x*x + y*y + z*z));
 	}
 
-	///generate the unit vector
+	/// \brief generate the unit vector
 	inline smVec3 unit(){
 		smVec3 ret;
 		T n=module();
@@ -52,14 +52,14 @@ public:
 		return ret;
 	};
 
-	///setter function for member x,y,z
+	/// \brief setter function for member x,y,z
 	inline void setValue(T p_x, T p_y, T p_z){
 		x = p_x;
 		y = p_y;
 		z = p_z;
 	}
 
-	///normalize the vector
+	/// \brief normalize the vector
 	inline void normalize(){
 		smFloat l =  module();
 		if (l==0) {
@@ -73,12 +73,12 @@ public:
 		z = z / l ;
 	}
 
-	///dot product of the two vectors
+	/// \brief dot product of the two vectors
 	inline T dot( smVec3<T> &p_v ) const {
 		return ( x * p_v.x + y * p_v.y + z * p_v.z );
 	}
 
-	///cross product of two vectors
+	/// \brief cross product of two vectors
 	inline smVec3 cross(smVec3 p_point) const{
 		smVec3 ret;
 		ret.x=y*p_point.z-z*p_point.y;
@@ -87,12 +87,12 @@ public:
 		return ret;
 	}
 
-	///distance between two vectors
+	/// \brief distance between two vectors
 	inline T distance(smVec3 &p_point){
 		return (*this-p_point).module();
 	}
 
-	///vector-scalar multiplication
+	/// \brief vector-scalar multiplication
 	inline smVec3 operator*(T p_f) const {
 		smVec3 mult;
 		mult.x = x * p_f;
@@ -121,7 +121,7 @@ public:
 		return smVec3(p_real / p_vector.x,p_real / p_vector.y,p_real / p_vector.z);
 	}
 
-	///vector divided by scalar
+	/// \brief vector divided by scalar
 	inline smVec3 operator/(T p_f) const {
 		smVec3 div;
 		div.x = x / p_f;
@@ -130,7 +130,7 @@ public:
 		return div;
 	}
 
-	///vector cross product with another vector
+	/// \brief vector cross product with another vector
 	inline smVec3 operator*( const smVec3 &p_v ) const {
 		smVec3 vv;
 		vv.x = y * p_v.z - (z * p_v.y);
@@ -139,7 +139,7 @@ public:
 		return ( vv );
 	}
 
-	///vector addition with another vector
+	/// \brief vector addition with another vector
 	inline smVec3 operator+( const smVec3 &p_v ) {
 		smVec3 vv;
 		vv.x = x + p_v.x;
@@ -148,7 +148,7 @@ public:
 		return (vv);
 	}
 
-	///vector subraction from another vector
+	/// \brief vector subraction from another vector
 	inline smVec3 operator-( const smVec3 &p_v ) {
 		smVec3 vv;
 		vv.x = x - p_v.x;
@@ -157,7 +157,7 @@ public:
 		return (vv);
 	}
 
-	///add vector and make it equal to itself
+	/// \brief add vector and make it equal to itself
 	inline smVec3 &operator+=( const smVec3 &p_v ) {
 		x += p_v.x;
 		y += p_v.y;
@@ -165,7 +165,7 @@ public:
 		return (*this);
 	}
 
-	///subtract vector make it equal to itself
+	/// \brief subtract vector make it equal to itself
 	inline smVec3 &operator-=( const smVec3 &p_v ) {
 		x -= p_v.x;
 		y -= p_v.y;
@@ -173,7 +173,7 @@ public:
 		return (*this);
 	}
 
-	///make it equal to itself
+	/// \brief make it equal to itself
 	template<typename K>
 	inline smVec3<T> &operator=( const smVec3<K> &p_v ){
 		x = p_v.x;
@@ -189,7 +189,7 @@ public:
 		acosf(dot(p_vec)/length);
 	}
 
-	///allows accesing elements with [] operator
+	/// \brief allows accesing elements with [] operator
 	///ex: vec[0]=12;
 	///be aware there is no index checking  due to prevent slowdowns.
 	inline volatile T &operator[](int i){
@@ -215,11 +215,11 @@ public:
 		return lessThan;
 	}
 
-	///returns the absolute value and returns the vector
+	/// \brief returns the absolute value and returns the vector
 	inline smVec3 absolute(){
 		return smVec3(abs(x),abs(y),abs(z));
 	}
-
+	/// \brief sets the translation components to the vector
 	template <class P>
 	inline smVec3<T> &operator=(smMatrix44<P> &p_m){
 		x=p_m.e[0][3];

@@ -35,26 +35,26 @@
 
 using namespace std;
 
-///smMatrix33
+/// \brief smMatrix33
 ///Matrix 3x3 Class which supports several matrix operations.
 ///Attention that indices of the matrix starts from 0
 template <class T>
 class smMatrix33{
 public:
-	///members of the matrix. they are column major
+	/// \brief members of the matrix. they are column major
 	T e[3][3];
 public:
-	///Default constructor creates identity matrix
+	/// \brief Default constructor creates identity matrix
 	inline smMatrix33(){
 		setIdentity();
 	}
-	///sets matrix to identity
+	/// \brief sets matrix to identity
 	inline void setIdentity(){
 		e[0][0]=1;e[0][1]=0;e[0][2]=0;
 		e[1][0]=0;e[1][1]=1;e[1][2]=0;
 		e[2][0]=0;e[2][1]=0;e[2][2]=1;
 	}
-	///returns the inverse of the matrix 
+	/// \brief returns the inverse of the matrix 
 	inline smMatrix33 getInverse(){
 		smMatrix33 ret;
 		smFloat det;
@@ -82,7 +82,7 @@ public:
 		return ret;
 	}
 
-	///returns the transpose of the matrix
+	/// \brief returns the transpose of the matrix
 	inline smMatrix33 getTranspose(){
 		smMatrix33 ret;
 		ret.e[0][0] = e[0][0]; ret.e[0][1] = e[1][0]; ret.e[0][2] = e[2][0];
@@ -111,7 +111,7 @@ public:
 		e[2][2]=p_m[10];
 	}
 
-	///gets the matrix convenient for opengl matrix array
+	/// \brief gets the matrix convenient for opengl matrix array
 	///Be aware that this doesn't do the normalization of the columns
 	inline void getMatrixForOpenGL(smFloat *p_m){
 		p_m[0]=e[0][0];
@@ -130,7 +130,7 @@ public:
 		p_m[11]=0.0;
 	}
 
-	///returns the determinant of the matrix
+	/// \brief returns the determinant of the matrix
 	inline smFloat getDeterminant(){
 		smFloat determinant;
 		determinant=e[0][0]*e[1][1]*e[2][2]
@@ -142,14 +142,14 @@ public:
 		return determinant;
 	}
 
-	///scales each component of the matrix
+	/// \brief scales each component of the matrix
 	inline void scale(T p_scalar){
 		e[0][0] = e[0][0]*p_scalar; e[0][1] = e[0][1]*p_scalar; e[0][2] = e[0][2]*p_scalar;
 		e[1][0] = e[1][0]*p_scalar; e[1][1] = e[1][1]*p_scalar; e[1][2] = e[1][2]*p_scalar;
 		e[2][0] = e[2][0]*p_scalar; e[2][1] = e[2][1]*p_scalar; e[2][2] = e[2][2]*p_scalar;
 	}
 
-	///operator for adding matrices
+	/// \brief operator for adding matrices
 	inline smMatrix33 operator+(const smMatrix33 &p_m){
 		smMatrix33 ret;
 		ret.e[0][0] = e[0][0]+p_m.e[0][0]; ret.e[0][1] = e[0][1]+p_m.e[0][1]; ret.e[0][2] = e[0][2]+p_m.e[0][2];
@@ -158,7 +158,7 @@ public:
 		return ret;
 	}
 
-	///operator for subtracting the matrices
+	/// \brief operator for subtracting the matrices
 	inline smMatrix33 operator-(const smMatrix33 &p_m){
 		smMatrix33 ret;
 		ret.e[0][0] = e[0][0]-p_m.e[0][0]; ret.e[0][1] = e[0][1]-p_m.e[0][1]; ret.e[0][2] = e[0][2]-p_m.e[0][2];
@@ -167,7 +167,7 @@ public:
 		return ret;
 	}
 
-	///multiplying the matrices
+	/// \brief multiplying the matrices
 	inline smMatrix33 operator*(const smMatrix33 &p_m)const{
 		smMatrix33 ret;
 
@@ -185,7 +185,7 @@ public:
 		return ret;
 	}
 
-	///Matrix equality operator
+	/// \brief Matrix assignment  operators
 	inline smMatrix33 &operator=(const smMatrix33 &p_m){
 		e[0][0]=p_m.e[0][0];e[0][1]=p_m.e[0][1];e[0][2]=p_m.e[0][2];
 		e[1][0]=p_m.e[1][0];e[1][1]=p_m.e[1][1];e[1][2]=p_m.e[1][2];
@@ -200,7 +200,7 @@ public:
 	}
 
 
-	///operator for Matrix scalar multiplcation
+	/// \brief operator for Matrix scalar multiplcation
 	inline smMatrix33 operator*(smFloat p_scalar){
 		smMatrix33 ret;
 		ret.e[0][0]=e[0][0]*p_scalar;ret.e[0][1]=e[0][1]*p_scalar;ret.e[0][2]=e[0][2]*p_scalar;
@@ -209,13 +209,13 @@ public:
 		return ret;
 	}
 
-	///operator()() loading. So one can access the elements by paranthesis
+	/// \brief operator()() loading. So one can access the elements by paranthesis
 	///ex: A(1,2)=12;
 	inline T &operator()(int i,int j){
 		return e[i][j];
 	}
 
-	///Transforms the smVector with the smMatrix
+	/// \brief Transforms the smVector with the smMatrix
 	template <class L>
 	inline smVec3<L> operator*(smVec3<L> p_v){
 		smVec3<L> ret;
@@ -225,7 +225,7 @@ public:
 		return ret;
 	}
 
-	///Set its values from array by colum major
+	/// \brief Set its values from array by colum major
 	/// \param p_array assumes that array contains column major values
 	/// Such as p_array[0], p_array[1], p_array[2], p_array[3] has (0,0), (1,0), (2,0), (0,1)
 	inline void setValuesbyColumnMajor(smFloat *p_array){
@@ -241,7 +241,7 @@ public:
 		e[1][2]=p_array[7];
 		e[2][2]=p_array[8];
 	}
-	///Set its values from array by colum major
+	/// \brief Set its values from array by colum major
 	/// \param p_array assumes that array contains column major values
 	/// Such as matrix (0,0), (1,0), (2,0), (0,1) will be stored in p_array[0], p_array[1], p_array[2], p_array[3]
 	inline void getValuesbyColumnMajor(smFloat *p_array){
@@ -258,7 +258,7 @@ public:
 		p_array[8]=e[2][2];
 	}
 
-	///get columns of the matrix with index starting from 0
+	/// \brief get columns of the matrix with index starting from 0
 	inline smVec3<T> getColumn(smInt p_index){
 		smVec3<T> ret;
 		ret.x=e[0][p_index];
@@ -267,7 +267,7 @@ public:
 		return ret;
 	}
 
-	///get rows of the matrix with index starting from 0
+	/// \brief get rows of the matrix with index starting from 0
 	inline smVec3<T> getRow(smInt p_index){
 		smVec3<T> ret;
 		ret.x=e[p_index][0];
@@ -276,7 +276,7 @@ public:
 		return ret;
 	}
 
-	///rotate around X axis.
+	/// \brief rotate around X axis.
 	///\param angle angle in Radians
 	inline void rotAroundX(smDouble angle){
 		smDouble c;
@@ -288,7 +288,7 @@ public:
 		e[2][0]=0;e[2][1]=s;e[2][2]=c;
 	}
 
-	///rotate around Y axis.
+	/// \brief rotate around Y axis.
 	///\param angle angle in Radians
 	inline void rotAroundY(smDouble angle){
 		smDouble c;
@@ -300,7 +300,7 @@ public:
 		e[2][0]=-s; e[2][1]=0;  e[2][2]=c;
 	}
 
-	///rotate around Z axis.
+	/// \brief rotate around Z axis.
 	///\param angle angle in Radians
 	inline void rotAroundZ(smDouble angle){
 		smDouble c;
@@ -311,13 +311,14 @@ public:
 		e[1][0]=s; e[1][1]=c;  e[1][2]=0;
 		e[2][0]=0; e[2][1]=0;  e[2][2]=1;
 	}
-
+	/// \brief putting matrix on console
 	friend ostream &operator<<( ostream &out, smMatrix33 &p ) {
 		out<<p.e[0][0]<<","<<p.e[0][1]<<","<<p.e[0][2]<<endl;
 		out<<p.e[1][0]<<","<<p.e[1][1]<<","<<p.e[1][2]<<endl;
 		out<<p.e[2][0]<<","<<p.e[2][1]<<","<<p.e[2][2]<<endl;
 		return out;
 	}
+	/// \brief  assign 4x4 matrix 3x3 matrix
 	template <class K>
 	inline smMatrix33<T> &operator=(smMatrix44<K> &p_m){
 		e[0][0]=p_m.e[0][0];e[0][1]=p_m.e[0][1];e[0][2]=p_m.e[0][2];

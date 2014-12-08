@@ -40,22 +40,22 @@ class smMatrix33;
 template<class T>
 class smVec3;
 
-///smMatrix44
+/// \brief smMatrix44
 ///Matrix 4x4 Class which supports several matrix operations.
 ///Attention that indices of the matrix starts from 0
 template <class T>
 class smMatrix44{
 public:
-	///members of the matrix.
+	/// \brief members of the matrix.
 	T e[4][4];
 
 public:
-	///Default constructore sets identity
+	/// \brief Default constructore sets identity
 	inline smMatrix44(){
 		setIdentity();
 	}
 
-	///sets the matrix to indetity matrix
+	/// \brief sets the matrix to indetity matrix
 	inline void setIdentity(){
 		e[0][0]=1;e[0][1]=0;e[0][2]=0;e[0][3]=0;
 		e[1][0]=0;e[1][1]=1;e[1][2]=0;e[1][3]=0;
@@ -63,7 +63,7 @@ public:
 		e[3][0]=0;e[3][1]=0;e[3][2]=0;e[3][3]=1;
 	}
 
-	///returns the transpose of the matrix
+	/// \brief returns the transpose of the matrix
 	inline smMatrix44 getTranspose(){
 		smMatrix44 ret;
 		ret.e[0][0] = e[0][0]; ret.e[0][1] = e[1][0]; ret.e[0][2] = e[2][0];ret.e[0][3] = e[3][0];
@@ -73,7 +73,7 @@ public:
 		return ret;
 	}
 
-	/// \fn  void setMatrixFromOpenGL(smFloat* p_m)
+	///  \fn  void setMatrixFromOpenGL(smFloat* p_m)
 	///  set rotation matrix 
 	/// \param p_m is the opengl matrix that is queried with glGet function
 	inline void setMatrixFromOpenGL(T* p_m){
@@ -133,13 +133,13 @@ public:
 		p_m[15]=e[3][3];
 	}
 
-	///operator()() loading. So one can access the elements by paranthesis
+	/// \brief operator()() loading. So one can access the elements by paranthesis
 	///ex: A(1,2)=12;
 	inline T &operator()(int i,int j){
 		return e[i][j];
 	}
 
-	///Set its values from array by colum major
+	/// \brief Set its values from array by colum major
 	/// \param p_array assumes that array contains column major values
 	/// Such as p_array[0], p_array[1], p_array[2], p_array[3] has (0,0), (1,0), (2,0), (0,1)
 	inline void setValuesbyColumnMajor(smFloat *p_array){
@@ -164,7 +164,7 @@ public:
 		e[3][3]=p_array[15];
 	}
 
-	///Set its values from array by colum major
+	/// \brief Set its values from array by colum major
 	/// \param p_array assumes that array contains column major values
 	/// Such as matrix (0,0), (1,0), (2,0), (0,1) will be stored in p_array[0], p_array[1], p_array[2], p_array[3]
 	inline void getValuesbyColumnMajor(smFloat *p_array){
@@ -189,7 +189,7 @@ public:
 		p_array[15]=e[3][3];
 	}
 
-	///get columns of the matrix with index starting from 0
+	/// \brief get columns of the matrix with index starting from 0
 	inline smVec3<T> getColumn(smInt p_index){
 		smVec3<T> ret;
 		ret.x=e[0][p_index];
@@ -198,7 +198,7 @@ public:
 		return ret;
 	}
 
-	///get rows of the matrix with index starting from 0
+	/// \brief get rows of the matrix with index starting from 0
 	inline smVec3<T> getRow(smInt p_index){
 		smVec3<T> ret;
 		ret.x=e[p_index][0];
@@ -207,14 +207,14 @@ public:
 		return ret;
 	}
 
-	///set row of the rotationa matrix with index starting from 0
+	/// \brief set row of the rotationa matrix with index starting from 0
 	inline void setColumn(smVec3<T> &p_vec,smInt p_columnIndex){
 		e[0][p_columnIndex]=p_vec.x;
 		e[1][p_columnIndex]=p_vec.y;
 		e[2][p_columnIndex]=p_vec.z;
 	}
 
-	///operator for adding matrices
+	/// \brief operator for adding matrices
 	inline smMatrix44 operator+(smMatrix44 &p_m){
 		smMatrix44 ret;
 		ret.e[0][0] = e[0][0]+p_m.e[0][0]; ret.e[0][1] = e[0][1]+p_m.e[0][1]; ret.e[0][2] = e[0][2]+p_m.e[0][2];ret.e[0][3] = e[0][3]+p_m.e[0][3];
@@ -225,7 +225,7 @@ public:
 		return ret;
 	}
 
-	///operator for subtracting the matrices
+	/// \brief operator for subtracting the matrices
 	inline smMatrix44 operator-(smMatrix44 &p_m){
 		smMatrix44 ret;
 		ret.e[0][0] = e[0][0]-p_m.e[0][0]; ret.e[0][1] = e[0][1]-p_m.e[0][1]; ret.e[0][2] = e[0][2]-p_m.e[0][2];ret.e[0][3] = e[0][3]-p_m.e[0][3];
@@ -236,7 +236,7 @@ public:
 	}
 
 
-	///returns the determinant of the matrix
+	/// \brief returns the determinant of the matrix
 	inline T getDeterminant(){
 		return (e[0][0] *e[1][1] - e[1][0] * e[0][1]) * (e[2][2] * e[3][3] - e[3][2] * e[2][3])
 			 - (e[0][0] *e[2][1] - e[2][0] * e[0][1]) * (e[1][2] * e[3][3] - e[3][2] * e[1][3])
@@ -246,7 +246,7 @@ public:
 			 + (e[2][0] *e[3][1] - e[3][0] * e[2][1]) * (e[0][2] * e[1][3] - e[1][2] * e[0][3]);
 	}
 
-	///calculates the invers of the 4x4 by matrix
+	/// \brief calculates the invers of the 4x4 by matrix
 	///if the matrix becomes singular in SM_MATRIX_PRECISION
 	///then it return identity matrix
 	inline smMatrix44 getInverse(){
@@ -280,7 +280,7 @@ public:
 		return ret;
 	}
 
-	///Matrix equality operator
+	/// \brief Matrix equality operator
 	template<class K>
 	inline smMatrix44 &operator=(smMatrix44<K> &p_m){
 		e[0][0]=p_m.e[0][0];e[0][1]=p_m.e[0][1];e[0][2]=p_m.e[0][2];e[0][3]=p_m.e[0][3];
@@ -290,7 +290,7 @@ public:
 		return *this;
 	}
 
-	///multiplying the matrices
+	/// \brief multiplying the matrices
 	template<class P>
 	inline smMatrix44 operator*(smMatrix44<P> &p_m) const{
 		smMatrix44 ret;
@@ -317,7 +317,7 @@ public:
 		return ret;
 	}
 
-	///operator for Matrix scalar multiplcation
+	/// \brief operator for Matrix scalar multiplcation
 	inline smMatrix44 operator*(smFloat p_scalar){
 		smMatrix44 ret;
 		ret.e[0][0]=e[0][0]*p_scalar;ret.e[0][1]=e[0][1]*p_scalar;ret.e[0][2]=e[0][2]*p_scalar;ret.e[0][3]=e[0][3]*p_scalar;

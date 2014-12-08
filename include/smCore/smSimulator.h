@@ -22,7 +22,7 @@ using namespace boost::threadpool;
 struct smSimulationMainParam{
 	vector<smScene*>sceneList;
 };
-
+/// \brief call back for simulator module. simulateMain is called in every simulation module frame.
 class smSimulationMain{
 
 public:
@@ -38,15 +38,22 @@ protected:
 
 	//QThreadPool *threadPool;
 	fifo_pool *simulatorThreadPool;//priority pool
+	/// \brief asynchronous thread pool
 	QThreadPool *asyncPool;
+	/// \brief  maximum number of threads
 	smInt maxThreadCount;
+	/// \brief  error log
 	smErrorLog *log;
+	/// \brief  module keeps track of frame number
 	smUInt frameCounter;
 
 	///Simulation main registration
 	smSimulationMain *main;
+	/// \brief  for updating the main in real-time. The change has effect after a frame is completed
 	smSimulationMain *changedMain;
+
 	volatile smInt  changedMainTimeStamp;
+	/// \brief time stampe when main callback is registered
 	volatile smInt  mainTimeStamp;
 
 public:
@@ -65,7 +72,7 @@ public:
 		}
 		isInitialized=true;
 	}
-
+	/// \brief constructor gets error log
 	smSimulator(smErrorLog *p_log){
 
 		type=SOFMIS_SMSIMULATOR;
@@ -93,15 +100,17 @@ public:
 
 	void  registerCollisionDetection(smObjectSimulator *p_collisionDetection);
 
-	///Registration of the Simulation main
+	///Registration of the Simulation main. It is called in each and every frame
 	void registerSimulationMain(smSimulationMain*p_main);
-
+	/// \brief launches the asynchronous threads
 	void startAsychThreads();
-
+	/// \brief the actual implementation of the simulator module resides in run function
 	void run();
+	/// \brief called at the beginning of  each and every frame
 	virtual void beginFrame();
+	/// \brief called at the end of each and every frame 
 	virtual void endFrame();
-
+	/// \brief this is called by SDK. it lanuches the simulator module
 	virtual void exec(){
 
 		if(isInitialized)

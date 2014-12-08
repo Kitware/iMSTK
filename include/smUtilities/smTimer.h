@@ -8,11 +8,11 @@
 #define SMTIMER_H
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-
+/// \brief definitions
 #define SMTIMER_FRAME_MILLISEC2SECONDS(X) ( (smLongDouble) (smLongDouble)X/1000.0)
 #define SMTIMER_FRAME_MICROSEC2SECONDS(X) ( (smLongDouble) (smLongDouble)X /1000000.0)
 
-
+/// \brief time in milliseconds or seconds
 enum smTimerType{
 	SOFMIS_TIMER_INMILLISECONDS,
 	SOFMIS_TIMER_INMICROSECONDS
@@ -21,22 +21,23 @@ enum smTimerType{
 #ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
 	#include <windows.h>
 #endif
-
+/// \brief timer class
 class smTimer:public smCoreClass{
 public:
+	/// \brief constructor
 	smTimer(){
 		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
 			QueryPerformanceFrequency(&m_liPerfFreq);
 		#endif
 		start();
 	}
-
+	/// \brief start the timer
 	inline 	void start(){
 		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
 			QueryPerformanceCounter(&m_liPerfStart);
 		#endif
 	}
-
+	/// \brief gets the time when now is called
 	inline smLongDouble now(smTimerType p_type ) // Returns # of microseconds since Start was called
 	{
 		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS

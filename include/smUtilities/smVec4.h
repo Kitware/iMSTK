@@ -1,6 +1,6 @@
 #ifndef SMVEC4_H
 #define SMVEC4_H
-
+/// \brief vector 4
 template <typename T>
 class smVec4{
 public:
