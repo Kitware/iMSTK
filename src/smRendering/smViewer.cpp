@@ -499,13 +499,15 @@ void smViewer::drawNormals(smMesh *p_mesh){
 	glBegin(GL_LINES);
 	for(smInt i=0;i<p_mesh->nbrVertices;i++){
 		glVertex3fv((smGLFloat*)&(p_mesh->vertices[i]));
-		glVertex3fv((smGLFloat*)&(p_mesh->vertices[i]+p_mesh->vertNormals[i]*5));
+		smVec3<float> vector = p_mesh->vertices[i]+p_mesh->vertNormals[i]*5;
+		glVertex3fv((smGLFloat*)&vector);
 	}
 	for(smInt i=0;i<p_mesh->nbrTriangles;i++){
 		baryCenter=p_mesh->vertices[p_mesh->triangles[i].vert[0]]+p_mesh->vertices[p_mesh->triangles[i].vert[1]]+p_mesh->vertices[p_mesh->triangles[i].vert[2]]	;
 		baryCenter=baryCenter/3.0;
 		glVertex3fv((smGLFloat*)&(baryCenter));
-		glVertex3fv((smGLFloat*)&(baryCenter+p_mesh->triNormals[i]*5));
+		smVec3<float> vector = baryCenter+p_mesh->triNormals[i]*5;
+		glVertex3fv((smGLFloat*)&vector);
 	}
 	glEnd();
 
