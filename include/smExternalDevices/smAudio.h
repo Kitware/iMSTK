@@ -9,12 +9,14 @@
 
 using namespace audiere;
 
+/// \brief contains state of the audio
 enum smAudioState{
 	SOFMIS_AUDIOSTATE_PLAYCONTINUOUS,
 	SOFMIS_AUDIOSTATE_PLAY,
 	SOFMIS_AUDIOSTATE_STOP
 };
 
+/// \brief contains data for audio rendering
 struct smAudioEventData{
 	string sound;
 	smAudioState state;
@@ -26,6 +28,7 @@ struct smAudioEventData{
 
 };
 
+/// \brief contains audio query states
 enum smAudioReturnType{
 	SOFMIS_AUDIO_PLAYING,
 	SOFMIS_AUDIO_STOPPED,
@@ -33,23 +36,24 @@ enum smAudioReturnType{
 	SOFMIS_AUDIO_SOUNDNOOP,
 };
 
+/// \brief class to enable audio rendering
 class smAudio:public smCoreClass,public smEventHandler{
 
-	AudioDevicePtr device;
-	OutputStreamPtr sound;
+	AudioDevicePtr device; ///< audio device
+	OutputStreamPtr sound; ///< !!
 
-	smErrorLog *log;
-	string referenceName;
-	smAudioState state;
-	smAudioState prevState;
-	smFloat prevVolume;
+	smErrorLog *log; ///< log for errors rendering audio
+	string referenceName; ///< !!
+	smAudioState state; ///< state of audio
+	smAudioState prevState; ///< state of audio in previous cycle
+	smFloat prevVolume; ///< state of audio volume in previous cycle
 
-	//max volume is 1.0
-	smFloat volume;
+	smFloat volume; ///< volume (max volume is 1.0)
 
 public:
-	smBool continuousPlaying;
+	smBool continuousPlaying; ///< true if audio is to be played continuously
 
+	/// \brief constructor initialize various states
 	smAudio(char *fileName,string p_referenceName,smErrorLog *p_log=NULL ){
 		device=AudioDevicePtr(OpenDevice());
 		sound=OutputStreamPtr(OpenSound(device,fileName, false));
@@ -62,12 +66,14 @@ public:
 		smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this,SOFMIS_EVENTTYPE_AUDIO);
 	}
 
+	/// \brief destructor
 	~smAudio(){
 		///clean up process
 		sound=0;
 		device=0;
 	}
 
+	/// \brief play the audio
 	smAudioReturnType play(){
 
 		if(sound==NULL){
@@ -113,6 +119,7 @@ public:
 
 	}
 
+	/// \brief stop the audio
 	void stop(){
 		if(sound!=NULL){
 			if(sound->isPlaying())
@@ -120,17 +127,20 @@ public:
 		}
 	}
 
+	/// \brief set the state of audio and continue playing
 	void setState(smAudioState p_state){
 		state=p_state;
 		play();
 		prevState=state;
 	}
 
+	/// \brief set volume of audio
 	void setVolume(smFloat p_volume){
 		if(p_volume>0.0&&p_volume<1.0)
 			volume=p_volume;
 	}
 
+	/// \brief gather input events and change states and volume if needed
 	void handleEvent(smEvent *p_event){
 		smAudioEventData *audioEvent;
 		if(p_event->eventType==SOFMIS_EVENTTYPE_AUDIO){

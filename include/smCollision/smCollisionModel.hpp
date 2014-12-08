@@ -12,6 +12,7 @@
 #include <stack>
 #include "smCore/smEvent.h"
 
+/// \brief initialize the surface tree structure
 template <typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
 
@@ -36,13 +37,14 @@ void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
 
 }
 
-//Destructor
+/// \brief destructor
 template<typename smSurfaceTreeCell>
 smSurfaceTree<smSurfaceTreeCell>::~smSurfaceTree(){
 	delete[]	treeAllLevels;
 	delete[]	levelStartIndex;
 }
 
+/// \brief
 template<typename smSurfaceTreeCell>
 smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType){
 	mesh=p_mesh;
@@ -83,6 +85,7 @@ smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_ma
 	renderOnlySurface=false;
 }
 
+/// \brief Initialize the drawing structures
 template<typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::initDraw(smDrawParam p_param){
 
@@ -91,6 +94,7 @@ void smSurfaceTree<smSurfaceTreeCell>::initDraw(smDrawParam p_param){
 	viewer->addText(QString("octree"));
 }
 
+/// \brief draw the surface tree
 template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
                                                    ::draw(smDrawParam p_params){
 
@@ -129,6 +133,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
 	p_params.rendererObject->updateText("octree",QString("Total Spheres at Level:")+QString().setNum(counter));
 }
 
+/// \brief handle key press events
 template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
                                                 ::handleEvent(smEvent *p_event){
 
@@ -176,6 +181,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
 	}
 }
 
+/// \brief create the surface tree
 template<typename smSurfaceTreeCell> smBool smSurfaceTree<smSurfaceTreeCell>::
                   createTree(smSurfaceTreeCell &p_Node, vector<smInt> &p_triangles,
                   smInt p_level, smInt p_siblingIndex){
@@ -274,6 +280,7 @@ template<typename smSurfaceTreeCell> smBool smSurfaceTree<smSurfaceTreeCell>::
 	return true;
 }
 
+/// \brief !!
 template <typename smSurfaceTreeCell> 
                 smSurfaceTreeIterator<smSurfaceTreeCell> smSurfaceTree<smSurfaceTreeCell>
                 ::get_LevelIterator(smInt p_level){
@@ -285,6 +292,7 @@ template <typename smSurfaceTreeCell>
 	return iter;
 }
 
+/// \brief !!
 template <typename smSurfaceTreeCell>
 smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_LevelIterator(){
 
@@ -295,6 +303,7 @@ smSurfaceTreeIterator<smSurfaceTreeCell>  smSurfaceTree<smSurfaceTreeCell>::get_
 	return iter;
 }
 
+/// \brief update the surface tree
 template <typename smSurfaceTreeCell>
                        void smSurfaceTree<smSurfaceTreeCell>::updateStructure(){
 
@@ -317,6 +326,7 @@ template <typename smSurfaceTreeCell>
 	}
 }
 
+/// \brief !!
 template <typename smSurfaceTreeCell>
 void smSurfaceTree<smSurfaceTreeCell>::translateRot(){
 

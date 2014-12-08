@@ -1,6 +1,6 @@
 /*
 ****************************************************
-SIMMEDTK LICENSE
+			SIMMEDTK LICENSE
 ****************************************************
 */
 
@@ -12,7 +12,7 @@ SIMMEDTK LICENSE
 #include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 
-///example simulator..the dummy simulator works on static scene objects for now..
+/// \brief Example FEM simulator
 class smFemSimulator:public smObjectSimulator,public smEventHandler{
 private:
 	smVec3<smFloat> hapticPosition;
@@ -20,19 +20,25 @@ private:
 	smEventDispatcher *eventDispatcher;
 
 public:
+	/// \brief constructor
 	smFemSimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 		hapticButtonPressed=false;
 	}
+
+	/// \brief !!
 	void setDispatcher(smEventDispatcher *p_eventDispatcher){
 		eventDispatcher=p_eventDispatcher;
 	}
 
 protected:
+	/// \brief !!
 	virtual void beginSim(){
 
 	}
 
+	/// \brief !!
 	virtual void initCustom(){
+
 		smClassType type;
 		smSceneObject *object;
 		smFemSceneObject *femObject;
@@ -52,8 +58,9 @@ protected:
 		}
 	}
 
-	//implement the deformation computation through fem here
+	/// \brief run the fem simulation in a loop here
 	virtual void run(){
+
 		smSceneObject *sceneObj;
 		smFemSceneObject *femSceneObject;
 		smVec3<smFloat> *vertices;
@@ -66,7 +73,9 @@ protected:
 		static smInt dofNumber=0;
 
 		beginSim();
+		
 		for(smInt i=0;i<this->objectsSimulated.size();i++){
+			
 			sceneObj=this->objectsSimulated[i];
 			//ensure that dummy simulator will work on static scene objects only.
 			if(sceneObj->getType()==SOFMIS_SMFEMSCENEOBJECT){
@@ -136,12 +145,14 @@ protected:
 		endSim();
 	}
 
+	/// \brief !!
 	void endSim(){
 		//end the job
 	}
 
-	///synchronize the buffers in the object..do not call by yourself.
+	/// \brief synchronize the buffers in the object (do not call by yourself).
 	void syncBuffers(){
+
 		smSceneObject *sceneObj;
 		smFemSceneObject *femObject;
 		smVec3<smFloat> *vertices;
@@ -154,13 +165,14 @@ protected:
 				femObject=(smFemSceneObject*)sceneObj;
 				mesh=femObject->v_mesh;
 				femObject->memBlock->localtoOriginalBlock(QString("fem"),mesh->vertices,mesh->nbrVertices);
-				//femObject->v_mesh->updateTriangleNormals();
 				femObject->v_mesh->updateVertexNormals();
 			}
 		}
 	}
 
+	/// \brief !!
 	void handleEvent(smEvent *p_event){
+
 		smKeyboardEventData *keyBoardData;
 		smHapticOutEventData *hapticEventData;
 

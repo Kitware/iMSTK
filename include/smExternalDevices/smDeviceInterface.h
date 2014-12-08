@@ -21,23 +21,41 @@ const int	SOFMIS_MSG_UNKNOWN = -2;
 const int 	SOFMIS_MSG_FAILURE = -1;
 const int	SOFMIS_MSG_SUCCESS =  0;
 
-/// Abstract interface class with virtual functions. Device specific implementation should be done by instantiating this class
+/// \brief Abstract base interface class with virtual functions. 
+/// Device specific implementation should be done by instantiating this class
 class smDeviceInterface: public smModule, smEventHandler {
 
 public:
+	/// \brief constructor
 	smDeviceInterface();
-	virtual ~smDeviceInterface(){};
-	virtual int openDevice(){ return SOFMIS_MSG_UNKNOWN;}
-	virtual int closeDevice() { return SOFMIS_MSG_UNKNOWN;}
 
-	/// For ADU Interface Device
-	virtual int write(void *Interfacehandle, smInt port, void *data) {return  SOFMIS_MSG_UNKNOWN; } ;
+	/// \brief destructor
+	virtual ~smDeviceInterface(){
 
-	/// FOR ADU Interface Device 
-	virtual int read(void *Interfacehandle, smInt port, void *data) { return SOFMIS_MSG_UNKNOWN; } ;
+	};
+
+	/// \brief open the device
+	virtual int openDevice(){ 
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief close the device
+	virtual int closeDevice(){
+		return SOFMIS_MSG_UNKNOWN;
+	}
+
+	/// \brief write data (for ADU interface device)
+	virtual int write(void *Interfacehandle, smInt port, void *data){
+		return  SOFMIS_MSG_UNKNOWN;
+	};
+
+	/// \brief read data (for ADU interface device)
+	virtual int read(void *Interfacehandle, smInt port, void *data){
+		return SOFMIS_MSG_UNKNOWN;
+	} ;
 
 protected :
-	smBool driverInstalled;
+	smBool driverInstalled; ///< true if device driver is installed
 };
 
 #endif

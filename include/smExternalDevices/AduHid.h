@@ -8,21 +8,18 @@ extern "C"
 {
 #endif
 
-typedef struct _ADU_DEVICE_ID
-{
+typedef struct _ADU_DEVICE_ID{
 	unsigned short iVendorId;
 	unsigned short iProductId;
 	char	szSerialNumber[7];
 } ADU_DEVICE_ID, *PADU_DEVICE_ID;
 
 // entry points for general use
-
 void __stdcall ShowAduDeviceList(ADU_DEVICE_ID* pAduDeviceId, 
                                  char* psPrompt);
 
 
 // entry points to support the ADU Device pipe
-
 void * __stdcall OpenAduDevice(unsigned long iTimeout);
 
 void * __stdcall OpenAduDeviceByProductId(int iProductId, 
@@ -71,8 +68,7 @@ int __stdcall WriteAdu232(void * hRS232,
 void __stdcall CloseAdu232(void * hRS232);
 
 
-// entry points to support the Streaming pipe
-
+// entry points to support the Streaming pipes
 void * __stdcall OpenAduStream(unsigned long iTimeout);
 
 void * __stdcall OpenAduStreamByProductId(int iProductId, 

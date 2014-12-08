@@ -11,68 +11,77 @@
 #include "smMesh/smSurfaceMesh.h"
 #include "smMesh/smMesh.h"
 
+/// \brief Position based dynamics (PBD) object
 class smPBDSceneObject:public smSceneObject {
+
 public:
-	smFloat dT;
-	smFloat paraK;
-	smFloat Damp;
-	smInt nbrMass;
-	smInt **massIdx;
-	smVec3<smFloat> *P;
-	smVec3<smFloat>  *V;
-	smVec3<smFloat>  *exF;
-	smInt nbrSpr;
-	smFloat *L0;
-	smBool *fixedMass;
-	smInt nbrFixedMass;
-	smInt *listFixedMass;
+	smFloat dT; ///< size of time step
+	smFloat paraK; ///< !!
+	smFloat Damp; ///< damping values
+	smInt nbrMass; ///< number of masses
+	smInt **massIdx; ///< !!
+	smVec3<smFloat> *P; ///< !! position
+	smVec3<smFloat>  *V; ///< !! velocity
+	smVec3<smFloat>  *exF; ///< external force
+	smInt nbrSpr; ///< !! number of spheres
+	smFloat *L0; ///< !! Initial length
+	smBool *fixedMass; ///< true if masses are fixed
+	smInt nbrFixedMass; ///< number of fixed masses
+	smInt *listFixedMass; ///< list of IDs of masses that are fixed
 
-	smVec3<smFloat> ball_pos;
-	smVec3<smFloat> ball_vel;
-	smVec3<smFloat> ball_frc;
+	smVec3<smFloat> ball_pos; ///< !! position of ball
+	smVec3<smFloat> ball_vel; ///< !! velocity of ball
+	smVec3<smFloat> ball_frc; ///< !! 
 
-	smFloat ball_mass;
-	smFloat ball_rad;
+	smFloat ball_mass; ///< !! mass of ball
+	smFloat ball_rad; ///< !! radius of ball
 
+	/// \brief constructor
 	smPBDSceneObject(smErrorLog *p_log=NULL){
 		type=SOFMIS_SMPBDSCENEOBJECT;
 	}
 
+	/// \brief !!
 	virtual smSceneObject*clone()
 	{
 		return this;
 	}
 
+	/// \brief !!
 	virtual void serialize(void *p_memoryBlock){
 
 	}
 
+	/// \brief !!
 	virtual void unSerialize(void *p_memoryBlock){
 
 	}
 
+	/// \brief find the masses that are fixed
 	void findFixedMass();
 };
 
+/// \brief Position based dynamics (PBD) object for surface mesh (eg. cloth)
 class smPBDSurfaceSceneObject:public smPBDSceneObject {
+
 public:
-	smSurfaceMesh *mesh;
+	smSurfaceMesh *mesh; ///< surface mesh
+	smInt nbrTri; ///< number of surface triangles
+	smInt **triVertIdx; ///< !!
+	smInt **sprInTris; ///< triangles that include a spring
 
-	smInt nbrTri;
-	smInt **triVertIdx;
-	smInt **sprInTris;		//which triangles include a spring
-
-
+	/// \brief constructor
 	smPBDSurfaceSceneObject(smErrorLog *p_log=NULL){
 		type=SOFMIS_SMPBDSURFACESCENEOBJECT;
 		mesh=new smSurfaceMesh(SMMESH_DEFORMABLE,p_log);
 	}
 
-	virtual smSceneObject*clone()
-	{
+	/// \brief !!
+	virtual smSceneObject*clone(){
 		return this;
 	}
 
+	/// \brief !!
 	virtual void serialize(void *p_memoryBlock){
 		smInt offset=0;
 		smChar *memoryBlock=(smChar*)p_memoryBlock;
@@ -81,10 +90,12 @@ public:
 		memcpy(memoryBlock,mesh->triangles,sizeof(smTriangle)*mesh->nbrTriangles);
 	}
 
+	/// \brief !!
 	virtual void unSerialize(void *p_memoryBlock){
 
 	}
 
+	/// \brief initialize the mesh structure
 	void initMeshStructure()
 	{
 		P = 0;
@@ -98,6 +109,7 @@ public:
 		Damp = 0.0;
 	}
 
+	/// \brief initialize surface PBD object
 	void InitSurfaceObject()
 	{
 		int i, j, k;
@@ -126,7 +138,7 @@ public:
 		mesh->allocateAABBTris();
 	}
 
-
+	/// \brief destructor
 	~smPBDSurfaceSceneObject(){
 		if(P != 0)
 			delete [] P;
@@ -140,9 +152,12 @@ public:
 			delete [] fixedMass;
 	}
 
+	/// \brief find the masses that will be fixed based on the spheres
 	void findFixedMassWrtSphere(smVec3f p_center, smFloat pos);
 
+	/// \brief find fixed corners
 	void findFixedCorners(){
+
 		nbrFixedMass = 2;
 		listFixedMass = new smInt[nbrFixedMass];
 		smVec3<smFloat> corner[2];
@@ -171,6 +186,7 @@ public:
 			delete [] listFixedMass;
 	}
 
+	/// \brief render the surface PBD object
 	virtual void draw(smDrawParam p_params);
 };
 

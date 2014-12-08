@@ -1,6 +1,6 @@
 /*
 ****************************************************
-SIMMEDTK LICENSE
+			SIMMEDTK LICENSE
 ****************************************************
 */
 
@@ -12,15 +12,19 @@ SIMMEDTK LICENSE
 #include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 
-///example simulator..the dummy simulator works on static scene objects for now..
+/// \brief Example Position based dynamics (PBD) simulator
 class smPBDObjectSimulator:public smObjectSimulator,public smEventHandler{
+
 public:
+
+	/// \brief constructor
 	smPBDObjectSimulator(smErrorLog *p_errorLog):smObjectSimulator(p_errorLog){
 		this->scheduleGroup.maxTargetFPS=100;
 		this->scheduleGroup.minTargetFPS=30;
 	}
 
 protected:
+	/// \brief initialize the PBD object
 	inline void initObject(smPBDSurfaceSceneObject *p_object){
 		if(p_object->flags.isSimulatorInit)
 			return;
@@ -28,6 +32,7 @@ protected:
 		p_object->memBlock->originaltoLocalBlock(QString("pos"),p_object->mesh->vertices,p_object->mesh->nbrVertices);
 		p_object->flags.isSimulatorInit=true;
 	}
+	/// \brief !!
 	virtual void initCustom(){
 		smClassType type;
 		smSceneObject *object;
@@ -46,7 +51,7 @@ protected:
 		}
 	}
 
-	//test
+	/// \brief advance PBD simulator in a loop here
 	virtual void run(){
 		smSceneObject *sceneObj;
 		smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
@@ -125,7 +130,7 @@ protected:
 		endSim();
 	}
 
-	///synchronize the buffers in the object..do not call by yourself.
+	/// \bried !! synchronize the buffers in the object..do not call by yourself.
 	void syncBuffers(){
 		smSceneObject *sceneObj;
 		smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
@@ -144,6 +149,7 @@ protected:
 		}
 	}
 
+	/// \brief handle key presses and other user events
 	void handleEvent(smEvent *p_event){
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){
@@ -155,6 +161,7 @@ protected:
 		}
 	}
 
+	/// \brief render the PBD objects
 	void draw(smDrawParam p_params);
 
 };

@@ -33,12 +33,14 @@
 #define SOFMIS_SMLATTICE_CELLACTIVEVERTICES		(1<<10)
 #define SOFMIS_SMLATTICE_CELLTRIANGLES			(1<<11)
 
+/// \brief !!
 enum smLatticeReturnType{
 	SOFMIS_LATTICE_OK,
 	SOFMIS_LATTICE_INVALIDPARAMS,
 	SOFMIS_LATTICE_INVALIDBOUNDS
 };
 
+/// \brief !! holds the collision primitive pairs 
 struct smCollisionPairs {
 	smUnifiedID objectIndex;
 	smUnifiedID objectIndex2;
@@ -46,11 +48,13 @@ struct smCollisionPairs {
 	smInt primIndex2;
 };
 
+/// \brief cell primitive
 struct smCellPrim{
 	smInt index;
 	smInt objectId;
 };
 
+/// \brief contains everything related to a cell
 class smCell{
 
 public:
@@ -68,6 +72,7 @@ public:
 	}
 };
 
+/// \brief !!
 class smLattice:public smCoreClass{
 
 public:
@@ -86,11 +91,12 @@ public:
 	smInt time;
 	smUnifiedID linkedObject;
 
-	//template <class smPrimitive>
+	/// \brief !!
 	void boundingBoxInit(){
 		aabb=new smAABB[mesh->nbrTriangles];
 	}
 
+	/// \brief constructor
 	smLattice (){
 		this->cells=NULL;
 		this->totalCells=0;
@@ -102,18 +108,31 @@ public:
 		this->zSeperation=0;
 	}
 
+	/// \brief get the size of the lattice cell side in x-direction
 	inline smFloat getXStep(){return xStep; }
+
+	/// \brief get the size of the lattice cell side in y-direction
 	inline smFloat getYStep(){return yStep; }
+
+	/// \brief get the size of the lattice cell side in z-direction
 	inline smFloat getZStep(){return zStep; }
+
+	/// \brief get the center of the lattice
 	inline smVec3<smFloat> getLatticeCenter(){return latticeCenter;}
+
+	/// \brief !! get the left corner of cell 0
 	inline smVec3<smFloat> getLeftMinCorner(){return cells[0].cellLeftCorner;}
+
+	/// \brief !! get the right corner of cell 0
 	inline smVec3<smFloat> getRightMaxCorner(){return cells[totalCells-1].cellRightCorner;}
 
+	/// \brief destructor
 	~smLattice(){
 		delete[] cells;
 		delete[] aabb;
 	}
 
+	/// \brief Initialize the lattice
 	smLatticeReturnType init(smVec3<smFloat> p_leftCorner,smVec3<smFloat> p_rightCorner,
                              smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation ){
 
@@ -173,6 +192,7 @@ public:
 				return SOFMIS_LATTICE_OK;
 	}
 
+	/// \brief !!
 	void indexReset(){
 
 		int traverseIndex=0;
@@ -185,9 +205,11 @@ public:
 				}
 	}
 
+	/// \brief !!
 	void inline isCellEmpty(smInt p_cellIndex){
 	}
 
+	/// \brief !!
 	inline virtual void  linkPrimitivetoCell(smInt p_primitiveIndex){
 
 		smInt minX;
@@ -223,6 +245,7 @@ public:
 				}
 	}
 
+	/// \brief update the bounds of the lattice
 	inline void updateBounds(smSurfaceMesh* p_mesh,smInt p_index){
 
 		//min
@@ -258,18 +281,20 @@ public:
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z); 
 	}
 
-
+	/// \brief update the bounds of the lattice
 	void updateBounds(){
 		smInt numberOfprimitives;
 		for(smInt i=0;i<mesh->nbrTriangles;i++)
 			updateBounds(mesh,i);
 	}
 
+	/// \brief !!
 	void linkPrims(){
 		for(smInt i=0;i<mesh->nbrTriangles;i++)
 			linkPrimitivetoCell(i);
 	}
 
+	/// \brief !!
 	void addObject(smSceneObject *obj){
 		smClassType objectType;
 		linkedObject=obj->getObjectUnifiedID();
@@ -282,6 +307,7 @@ public:
 		}
 	}
 
+	/// \brief render the lattice for visaulization
 	void draw(smDrawParam p_params){
 
 		int temp;

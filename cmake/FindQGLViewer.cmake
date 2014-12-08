@@ -2,7 +2,8 @@ find_path(QGLVIEWER_INCLUDE_DIR
   QGLViewer/qglviewer.h)
 find_library(QGLVIEWER_LIBRARY
   NAMES
-    QGLViewer2)
+    QGLViewer2
+    QGLViewer)
 
 set(QGLVIEWER_INCLUDE_DIRS "${QGLVIEWER_INCLUDE_DIR}")
 set(QGLVIEWER_LIBRARIES "${QGLVIEWER_LIBRARY}")

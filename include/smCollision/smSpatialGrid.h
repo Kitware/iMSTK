@@ -34,34 +34,40 @@
 #define SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS	1000
 #define SOFMIS_SPATIALGRID_TOTALLATTICES	500
 
+/// \brief !!
 class smSpatialGridWorker:public smWorkerThread{
 
-	smLattice *latticePair;
-	smLattice *latticePair2;
+	smLattice *latticePair; ///< !!
+	smLattice *latticePair2; ///< !!
 
 public:
-	smMemoryBlock collisionPairs;
-	smCollidedTriangles *pairs;
-	smInt collidedPairs;
+	smMemoryBlock collisionPairs; ///< !!
+	smCollidedTriangles *pairs; ///< collided triangle pairs
+	smInt collidedPairs; ///< !!
 
 	///this is public for now
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES];
-	smInt totalLattices;
+	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///<
+	smInt totalLattices; ///< total number of lattices
 
+	/// \brief destructor
 	~smSpatialGridWorker(){
 		collisionPairs.deleteMemory(QString("pairs"));
 	}
 
+	/// \brief constructor
 	smSpatialGridWorker(){
 		totalLattices=0;
 		collidedPairs=0;
 		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
 	}
+
+	/// \brief constructor
 	smSpatialGridWorker(smProcessID p_ID):smWorkerThread(p_ID){
 		totalLattices=0;
 		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
 	}
 
+	/// \brief !!
 	inline void checkNarrow(smLattice *p_latticeA, smLattice *p_latticeB, smInt p_primAIndex,smInt p_primBIndex){
 
 		smInt coPlanar;
@@ -109,6 +115,7 @@ public:
 		 }
 	}
 
+	/// \brief !!
 	inline void checkCells(smLattice *p_latticeA,smLattice *p_latticeB, smInt p_cellIndex){
 		
 		for(smInt i=0;i<p_latticeA->cells[p_cellIndex].lastPrimitiveIndex;i++)
@@ -121,12 +128,12 @@ public:
 			}
 	}
 
+	/// \brief collision workhorse function. This is where the collision happens
 	virtual void kernel(){
 
 			collidedPairs=0;
 
-			for(smInt i=0;i<totalLattices;i++){
-			
+			for(smInt i=0;i<totalLattices;i++){			
 				latticeList[i]->indexReset();
 				latticeList[i]->updateBounds();
 				latticeList[i]->linkPrims();
@@ -149,7 +156,7 @@ public:
 				}
 	}
 
-
+	/// \brief the collision is advanced here
 	virtual void run(){
 		while(true||!termination){
 			synch->waitTaskStart();
@@ -158,6 +165,7 @@ public:
 		}
 	}
 
+	/// \brief rendering for collision visualization
 	virtual void draw(){
 		smInt v[3];
 		smBaseMesh *baseMesh;
@@ -180,43 +188,49 @@ public:
 		glColor3fv((GLfloat*)&smColor::colorWhite);
 	}
 
+	/// \brief !!
 	inline static void beginTriangles(){
 		glBegin(GL_TRIANGLES);
 	}
 
+	/// \brief draws the triangle
 	inline static void drawTriangle(smVec3<smFloat> &p_1,smVec3<smFloat> &p_2,smVec3<smFloat> &p_3){
 		glVertex3fv((GLfloat*)&p_1);
 		glVertex3fv((GLfloat*)&p_2);
 		glVertex3fv((GLfloat*)&p_3);
 	}
 
+	/// \brief !!
 	inline static void endTriangles(){
 		glEnd();
 	}
 
 };
 
+/// \brief 
 class smSpatialGrid:public smCollisionDetection,QThread{
 
 private:
-	smSpatialGridWorker *workerThreads;
-	smInt totalThreads;
-	smSynchronization synch;
+	smSpatialGridWorker *workerThreads; ///< !!
+	smInt totalThreads; ///< number of total threads
+	smSynchronization synch; ///< !!
 
-	smVec3<smFloat> leftCorner;
-	smVec3<smFloat> rightCorner;
-	smInt xSeperation;
-	smInt ySeperation;
-	smInt zSeperation;
+	smVec3<smFloat> leftCorner; ///< left corner of the grid
+	smVec3<smFloat> rightCorner; ///< right corner of the grid
+	smInt xSeperation; ///< grid spacing in x-direction
+	smInt ySeperation; ///< grid spacing in y-direction
+	smInt zSeperation; ///< grid spacing in z-direction
 
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES];
-	smInt totalLattices;
-	smBool listUpdated;
-	QMutex mutex;
+	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///< 
+	smInt totalLattices; ///< total number of lattices
+	smBool listUpdated; ///< !!
+	QMutex mutex; ///< !!
 
+	/// \brief !!
 	void beginFrame(){
 	}
 
+	/// \brief !!
 	void startWorkers(){
 		for(smInt i=0;i<totalThreads;i++){
 			workerThreads[i].start();
@@ -224,13 +238,15 @@ private:
 	}
 
 protected:
-	smInt maxPrims;
+	smInt maxPrims; ///< !! maximum primitives allowed
 
 public:
 
-	smPipe *pipe;
+	smPipe *pipe; ///< !!
 
+	/// \brief constructor
 	smSpatialGrid(smInt p_outOutputPrimSize=SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS):synch(1){
+
 		maxPrims=p_outOutputPrimSize;
 		totalThreads=1;
 		leftCorner=SOFMIS_SPATIALGRID_LEFTCORNER;
@@ -248,14 +264,18 @@ public:
 	}
 
 
+	/// \brief set the total number of threads for collision check
 	void setTotalThreads(smInt p_totalThreads){
+		
 		if(isInitialized!=false)
 			totalThreads=p_totalThreads;
 		synch.setWorkerCounter(p_totalThreads);
 
 	}
 
+	/// \brief initialization
 	void init(){
+
 		smSceneObject *sceneObject;
 		smStaticSceneObject  *staticSceneObj;
 		smScene *scene;
@@ -281,6 +301,7 @@ public:
 		isInitialized=true;
 	}
 
+	/// \brief run the collision checks in a loop here
 	void run(){
 		smCollidedTriangles *tristrisHead,*tristrisCurrent;
 		smInt nbrTriTriCollisions=0;
@@ -308,6 +329,7 @@ public:
 		terminationCompleted=true;
 	}
 
+	/// \brief !!
 	void updateList(){
 
 		smLattice **tempLatticeList=new (smLattice*[SOFMIS_SPATIALGRID_TOTALLATTICES]);
@@ -336,10 +358,12 @@ public:
 		delete []tempLatticeList;
 	}
 
+	/// \brief !!
 	virtual void endFrame(){
 		updateList();
 	}
 
+	/// \brief !!
 	virtual void exec(){
 		if(isInitialized)
 			start();
@@ -349,7 +373,7 @@ public:
 		}
 	}
 
-	///This function adds lattice and it is  thread safe.
+	/// \brief This function adds lattice and it is  thread safe.
 	virtual smInt addLattice(smLattice *p_lat){
 
 		smSDK::addRef(p_lat);
@@ -365,6 +389,7 @@ public:
 		return totalLattices-1;
 	}
 
+	/// \brief This function removes lattice and it is  thread safe.
 	virtual void removeLattice(smLattice *p_lat,smInt p_listIndex){
 		smSDK::removeRef(p_lat);
 		mutex.lock();
@@ -374,6 +399,7 @@ public:
 		mutex.unlock();
 	}
 
+	/// \brief !! renders the workers threads
 	void draw(smDrawParam p_params){
 		for(smInt i=0;i<totalThreads;i++){
 			workerThreads[i].draw();
