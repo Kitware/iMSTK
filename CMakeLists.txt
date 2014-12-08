@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.0)
 
 project(sofmis)
+include(CTest)
 
 option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
