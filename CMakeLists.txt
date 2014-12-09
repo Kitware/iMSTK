@@ -86,7 +86,7 @@ if(BUILD_EXTERNAL_DEVICES)
 endif(BUILD_EXTERNAL_DEVICES)
 
 # Device options
-option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ${OpenHaptics_FOUND})
+option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ${OPENHAPTICS_FOUND})
 
 # Move these to the libraries which actually use them. This minimizes the number
 # of include paths per translation unit and makes it easier to see what requires
