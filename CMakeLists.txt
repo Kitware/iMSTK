@@ -46,8 +46,6 @@ macro (sofmis_find_package package)
   find_package(${package} ${ARGN})
 endmacro ()
 
-# Device options
-option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
@@ -86,6 +84,9 @@ if(BUILD_EXTERNAL_DEVICES)
   sofmis_find_package(ATC REQUIRED)
   sofmis_find_package(NIDAQ REQUIRED)
 endif(BUILD_EXTERNAL_DEVICES)
+
+# Device options
+option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ${OpenHaptics_FOUND})
 
 # Move these to the libraries which actually use them. This minimizes the number
 # of include paths per translation unit and makes it easier to see what requires
