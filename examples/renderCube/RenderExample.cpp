@@ -12,6 +12,8 @@ RenderExample::RenderExample()
 	//Create an instance of the SoFMIS framework/SDK
 	sofmisSDK = smSDK::createSDK();
 
+	//Create a new scene to work in
+	scene1 = sofmisSDK->createScene();
 
 	//Create a viewer to see the scene through
 	viewer = sofmisSDK->createViewer();
@@ -46,13 +48,10 @@ RenderExample::RenderExample()
 	//Note: This allows some default behavior like mouse and keyboard control
 	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
 
-	printf("***viewerRenderDetail: %#x\n", viewer->viewerRenderDetail);
 	sofmisSDK->getEventDispatcher()->registerEventHandler(viewer,SOFMIS_EVENTTYPE_KEYBOARD);
 
-	printf("****viewerRenderDetail: %#x\n", viewer->viewerRenderDetail);
 	//Run the simulator framework
 	sofmisSDK->run();
-	printf("*****viewerRenderDetail: %#x\n", viewer->viewerRenderDetail);
 }
 
 void renderExample() {

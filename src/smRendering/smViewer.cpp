@@ -177,7 +177,7 @@ void smViewer::init(){
 	smScene				*scene;
 	smStaticSceneObject *staticSceneObject;
 	smStylusRigidSceneObject *stylusObject;
-	smChar *errorText;
+	smChar *errorText = NULL;
 	smClassType objectType;
 	static smDrawParam param;
 	smIndiceArrayIter<smLight*> iter(lights);
