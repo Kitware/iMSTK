@@ -3,11 +3,32 @@
 using std::map;
 
 //assimp includes
-#include <Importer.hpp>
-#include <scene.h>
-#include <postprocess.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 #include "smMesh/smSurfaceMesh.h"
-#include <io.h>
+
+#ifdef _WIN32
+#define fileno _fileno
+#include "io.h"
+int Filelength(const char*, int id)
+{
+  return filelength(id);
+}
+
+#else
+
+#include<sys/stat.h>
+
+size_t Filelength(const char * filename, int)
+{
+  struct stat st;
+  stat(filename, &st);
+  return st.st_size;
+}
+#endif
+
+
 
 /// \brief constructor
 smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype,smErrorLog *log=NULL){
@@ -185,8 +206,8 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName){
 	if ((l_file=fopen (fileName, "rb"))== NULL) //Open the file
 		return 0; 
 
-	while (ftell (l_file) < filelength (_fileno (l_file))) //Loop to scan the whole file 
-	{		
+	while (ftell (l_file) < Filelength (fileName, fileno (l_file))) //Loop to scan the whole file
+	{
 
 		fread (&l_chunk_id, 2, 1, l_file); //Read the chunk header
 		fread (&l_chunk_lenght, 4, 1, l_file); //Read the lenght of the chunk

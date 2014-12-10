@@ -81,7 +81,7 @@ public:
 		offsetAngle_UpDirection=0;
 	}
 	/// \brief event handler
-	inline void smHapticCameraTrans::handleEvent(smEvent *p_event){
+	inline void handleEvent(smEvent *p_event){
 		smHapticOutEventData *hapticEventData;
 		smVec3d rightVector;
 		switch(p_event->eventType.eventTypeCode){

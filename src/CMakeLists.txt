@@ -23,12 +23,6 @@ set(sources_sofmis
 ./smCore/smTextureManager.cpp
 ./smExternal/framebufferObject.cpp
 ./smExternal/renderbuffer.cpp
-./smExternalDevices/smADUInterface.cpp
-./smExternalDevices/smATC3DGInterface.cpp
-./smExternalDevices/smDeviceInterface.cpp
-./smExternalDevices/smHapticInterface.cpp
-./smExternalDevices/smNIUSB6008Interface.cpp
-./smExternalDevices/smPhantomInterface.cpp
 ./smMesh/smImportExport.cpp
 ./smMesh/smLattice.cpp
 ./smMesh/smLatticeType.cpp
@@ -42,9 +36,8 @@ set(sources_sofmis
 ./smRendering/smLight.cpp
 ./smRendering/smRenderer.cpp
 ./smRendering/smVBO.cpp
+./smRendering/smVAO.cpp
 ./smRendering/smViewer.cpp
-./smScripting/smV8UI.cpp
-./smScripting/V8Scripting.cpp
 ./smShader/SceneTextureShader.cpp
 ./smShader/smShader.cpp
 ./smSimulators/smFemSceneObject.cpp
@@ -60,6 +53,24 @@ set(sources_sofmis
 ./smUtilities/smVec3.cpp
 )
 
+if(SIMMEDTK_USE_PHANTOM_OMNI)
+  set(sources_sofmis ${sources_sofmis}
+  ./smExternalDevices/smDeviceInterface.cpp
+  ./smExternalDevices/smHapticInterface.cpp
+  ./smExternalDevices/smPhantomInterface.cpp)
+endif()
+
+set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
+  ./smExternalDevices/smADUInterface.cpp
+  ./smExternalDevices/smATC3DGInterface.cpp
+  ./smExternalDevices/smNIUSB6008Interface.cpp
+)
+
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  set_source_files_properties(${sources_sofmis} PROPERTIES COMPILE_FLAGS -std=c++11)
+endif()
+
 add_library(sofmis
   ${sources_sofmis})
 
@@ -72,5 +83,49 @@ add_library(sofmis
 # TODO: There are a lot of missing libraries here; look at the available
 # variables in the cmake-gui.
 target_link_libraries(sofmis
+  ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY})
+  ${Boost_THREAD_LIBRARY}
+  ${QT_LIBRARIES}
+  ${GLEW_LIBRARY}
+  ${GLUT_LIBRARY}
+  ${OPENGL_LIBRARIES}
+  ${OPENCV_LIBRARIES}
+  ${ADU_LIBRARY}
+  ${ASSIMP_LIBRARY}
+  ${ATC_LIBRARY}
+  ${AUDIERE_LIBRARY}
+  ${GLUT_glut_LIBRARY}
+  ${ILUT_LIBRARIES}
+  ${ILU_LIBRARIES}
+  ${IL_LIBRARIES}
+  ${NIDAQ_mx_LIBRARY}
+  ${DevIL_LIBRARY}
+  ${OPENHAPTICS_hd_LIBRARY}
+  ${OPENHAPTICS_hdu_LIBRARY}
+)
+
+if(BUILD_EXTERNAL_DEVICES)
+add_library(externalDevices
+  ${SIMMEDTK_EXTERNAL_DEVICES_SOURCES})
+target_link_libraries(externalDevices
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  ${QT_LIBRARIES}
+  ${GLEW_LIBRARY}
+  ${GLUT_LIBRARY}
+  ${OPENGL_LIBRARIES}
+  ${OPENCV_LIBRARIES}
+  ${ADU_LIBRARY}
+  ${ASSIMP_LIBRARY}
+  ${ATC_LIBRARY}
+  ${AUDIERE_LIBRARY}
+  ${GLUT_glut_LIBRARY}
+  ${ILUT_LIBRARIES}
+  ${ILU_LIBRARIES}
+  ${IL_LIBRARIES}
+  ${NIDAQ_mx_LIBRARY}
+  ${DevIL_LIBRARY}
+  ${OPENHAPTICS_hd_LIBRARY}
+  ${OPENHAPTICS_hdu_LIBRARY})
+endif()
