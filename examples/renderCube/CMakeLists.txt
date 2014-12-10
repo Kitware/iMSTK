@@ -1,4 +1,4 @@
-﻿
+
 if(CMAKE_COMPILER_IS_GNUCXX)
   set_source_files_properties(main.cpp RenderExample.cpp PROPERTIES COMPILE_FLAGS -std=c++11)
 endif()

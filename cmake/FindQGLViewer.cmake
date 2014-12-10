@@ -1,4 +1,4 @@
-﻿find_path(QGLVIEWER_INCLUDE_DIR
+find_path(QGLVIEWER_INCLUDE_DIR
   QGLViewer/qglviewer.h)
 find_library(QGLVIEWER_LIBRARY
   NAMES

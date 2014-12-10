@@ -1,4 +1,4 @@
-﻿# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
+# TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
 # and below (NEWLIB) for an example for how to use it).
 
 set(sources_sofmis

@@ -1,4 +1,4 @@
-﻿find_path(OPENHAPTICS_INCLUDE_DIR
+find_path(OPENHAPTICS_INCLUDE_DIR
   HL/hl.h HLU/hlu.h HD/hd.h HDU/hdu.h
   PATHS /usr/include)
 

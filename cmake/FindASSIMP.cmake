@@ -1,4 +1,4 @@
-﻿find_path(ASSIMP_INCLUDE_DIR
+find_path(ASSIMP_INCLUDE_DIR
   assimp/config.h
   assimp/anim.h
   anim.h
