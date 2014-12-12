@@ -19,15 +19,11 @@ vegaFemExample::vegaFemExample(){
 	femSim->setDispatcher(sofmisSDK->getEventDispatcher());
 	sofmisSDK->getEventDispatcher()->registerEventHandler(femSim,SOFMIS_EVENTTYPE_HAPTICOUT);
 
-	printf("HERE 0\n");
-
 	/// create a Vega based FEM object and attach it to the fem simulator
 	femobj = new smVegaFemSceneObject(sofmisSDK->getErrorLog(),
 	                       "../../../resources/vega/asianDragon/asianDragon.config");
-	printf("HERE 1\n");
 	femobj->attachObjectSimulator(femSim);
 
-	printf("HERE 2\n");
 	/// add the FEM object to the scene
 	scene1->addSceneObject(femobj);
 
