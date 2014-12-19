@@ -83,21 +83,6 @@ smViewer::smViewer(smErrorLog *log){
 	cameraRadius=1.0;
 	prevState_collided=false;
 	checkCameraCollision=false;
-
-	//TRakstar
-	#ifdef smATC3DGInterface__
-	trakstarpipeReg.regType = SOFMIS_PIPE_BYREF;
-	trakstarpipeReg.listenerObject = this->vboDynamicObject;
-
-	trakStar_caliRotMat[0] = 1.0;	trakStar_caliRotMat[3] = 0.0;	trakStar_caliRotMat[6] = 0.0;
-	trakStar_caliRotMat[1] = 0.0;	trakStar_caliRotMat[4] = 1.0;	trakStar_caliRotMat[7] = 0.0;
-	trakStar_caliRotMat[2] = 0.0;	trakStar_caliRotMat[5] = 0.0;	trakStar_caliRotMat[8] = 1.0;
-
-	trakStar_caliPos.setValue(0.0,0.0,0.0);
-	trakStar_offPos.setValue(145,-123,-177);
-
-	trakStar_enable = false;
-	#endif
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -192,7 +177,7 @@ void smViewer::init(){
 
 	GLenum err = glewInit();
 	if (GLEW_OK != err){
-		/* Problem: glewInit failed, something is seriously wrong. 
+		/* Problem: glewInit failed, something is seriously wrong.
 		 * Most likely an OpenGL context is not created yet */
 		cout<< "Error:"<< glewGetErrorString(err)<<endl;
 	}
@@ -235,7 +220,7 @@ void smViewer::init(){
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
 	glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
 	glEnable(GL_MULTISAMPLE_ARB);
-	glShadeModel(GL_SMOOTH); 
+	glShadeModel(GL_SMOOTH);
 	glHint (GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
 	glFrontFace(GL_CCW);
 	glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
@@ -296,7 +281,7 @@ void smViewer::init(){
 			//sceneObject=scene->sceneObjects[j];
 			sceneObject=sceneIter[j];
 
-			//initialize the custom Render if there is any	
+			//initialize the custom Render if there is any
 			if(sceneObject->customRender!=NULL&&sceneObject->getType()!=SOFMIS_SMSHADER)
 				sceneObject->customRender->initDraw(param);
 
@@ -325,7 +310,7 @@ void smViewer::init(){
 }
 
 
-///draw the surface mesh triangles based on the rendering type	
+///draw the surface mesh triangles based on the rendering type
 ///problem is here
 //void smViewer::drawSurfaceMeshTriangles(smSurfaceMesh *p_surfaceMesh,smRenderDetail *renderDetail)
 void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail){
@@ -344,7 +329,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 	glLineWidth(renderDetail->lineSize);
 
 	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
-		glEnable (GL_BLEND); 
+		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
@@ -371,7 +356,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 
 	glVertexPointer(3,smGLRealType,0,p_surfaceMesh->vertices);
 	if(renderDetail->renderType&SOFMIS_RENDER_TEXTURE){
-		if(p_surfaceMesh->isMeshTextured())		
+		if(p_surfaceMesh->isMeshTextured())
 			glTexCoordPointer(2,smGLRealType,0,p_surfaceMesh->texCoord);
 	}
 
@@ -422,7 +407,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 	}
 
 	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
-		glDisable(GL_BLEND); 
+		glDisable(GL_BLEND);
 	}
 
 	glDisableClientState(GL_VERTEX_ARRAY);
@@ -461,7 +446,7 @@ void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,smRender
 	glLineWidth(renderDetail->lineSize);
 
 	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
-		glEnable (GL_BLEND); 
+		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
@@ -603,12 +588,12 @@ void smViewer::renderScene(smDrawParam p_param){
 	}
 
 	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_TRANSPARENCY){
-		glEnable(GL_BLEND); 
+		glEnable(GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable (GL_POLYGON_OFFSET_FILL);
 	}
 	else{
-		glDisable(GL_BLEND); 
+		glDisable(GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
@@ -645,7 +630,7 @@ void smViewer::renderScene(smDrawParam p_param){
 				}
 			}
 			else{
-				//If there is custom renderer first render the preDraw function. which is responsible for 
+				//If there is custom renderer first render the preDraw function. which is responsible for
 				//rendering before the default renderer takes place
 				if(sceneObject->customRender!=NULL)
 					sceneObject->customRender->preDraw(sceneObject);
@@ -654,7 +639,7 @@ void smViewer::renderScene(smDrawParam p_param){
 				sceneObject->draw(p_param);
 
 
-				//If there is custom renderer, render the postDraw function. which is responsible for 
+				//If there is custom renderer, render the postDraw function. which is responsible for
 				//rendering after the default renderer takes place
 				if(sceneObject->customRender!=NULL)
 					sceneObject->customRender->postDraw(sceneObject);
@@ -671,12 +656,12 @@ void setTextureMatrix(){
 	static double projection[16];
 
 	// This is matrix transform every coordinate x,y,z
-	// x = x* 0.5 + 0.5 
-	// y = y* 0.5 + 0.5 
-	// z = z* 0.5 + 0.5 
-	// Moving from unit cube [-1,1] to [0,1]  
-	const GLdouble bias[16] = {	
-		0.5, 0.0, 0.0, 0.0, 
+	// x = x* 0.5 + 0.5
+	// y = y* 0.5 + 0.5
+	// z = z* 0.5 + 0.5
+	// Moving from unit cube [-1,1] to [0,1]
+	const GLdouble bias[16] = {
+		0.5, 0.0, 0.0, 0.0,
 		0.0, 0.5, 0.0, 0.0,
 		0.0, 0.0, 0.5, 0.0,
 		0.5, 0.5, 0.5, 1.0};
@@ -686,7 +671,7 @@ void setTextureMatrix(){
 		glGetDoublev(GL_PROJECTION_MATRIX, projection);
 		glActiveTextureARB(GL_TEXTURE7);
 		glMatrixMode(GL_TEXTURE);
-		glLoadIdentity();	
+		glLoadIdentity();
 		glLoadMatrixd(bias);
 
 		// concatating all matrice into one.
@@ -816,7 +801,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param){
 
 	{ //why is this scoped?
 		glDisable( GL_CULL_FACE);
-		renderScene(p_param);	
+		renderScene(p_param);
 	}
 
 	if(renderandreflection!=NULL&&viewerRenderDetail&SOFMIS_VIEWERRENDER_DYNAMICREFLECTION)
@@ -842,15 +827,15 @@ inline void smViewer::adjustFPS(){
 		_unlimitedFPSVariableChanged=unlimitedFPSVariableChangedCurrent;
 		if(unlimitedFPSEnabled)
 			SetVSync(false);
-		else 
+		else
 			SetVSync(true);
 	}
 }
 
 smBool  smViewer::checkCameraCollisionWithScene(){
 
-	static bool collided=false; 
-	static bool prev_collided=false; 
+	static bool collided=false;
+	static bool prev_collided=false;
 	static smVec3f  lastCollidedHatpicPos(deviceCameraPos.x,deviceCameraPos.y,deviceCameraPos.z);
 	static smVec3f  proxy_hapticPos(deviceCameraPos.x,deviceCameraPos.y,deviceCameraPos.z);
 	static float radiusEffective=0;
@@ -907,7 +892,7 @@ smBool  smViewer::checkCameraCollisionWithScene(){
 		last_collisionNormal.normalize();
 	}
 	else{
-		proxy_hapticPos=hPos; 
+		proxy_hapticPos=hPos;
 		prev_collided=false;
 	}
 
@@ -947,37 +932,7 @@ void smViewer::draw(){
 	glClearColor(0.05f,0.1f,0.1f,1.0f);
 	glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT|GL_STENCIL_BUFFER_BIT);
 
-	#ifndef smATC3DGInterface__
-	if(enableCameraMotion){
-		finalDeviceCameraDir.setValue(deviceCameraDir.x,deviceCameraDir.y,deviceCameraDir.z);
-		finalDeviceUpCameraDir.setValue(deviceCameraUpDir.x,deviceCameraUpDir.y,deviceCameraUpDir.z);
-		finalDeviceRightCameraDir=finalDeviceCameraDir.cross(finalDeviceUpCameraDir);
-
-		finalDeviceRightCameraDir.normalize();
-		quat.fromAxisAngle(finalDeviceRightCameraDir,SM_DEGREES2RADIANS(offsetAngle_rightDirection));
-		finalDeviceCameraDir=quat.rotate(finalDeviceCameraDir);
-		finalDeviceUpCameraDir=quat.rotate(finalDeviceUpCameraDir);
-
-		if(!isCameraCollided||!checkCameraCollision){
-			camera()->setPosition(qglviewer::Vec(deviceCameraPos.x,deviceCameraPos.y,deviceCameraPos.z));
-		}
-
-		camera()->setViewDirection(qglviewer::Vec(finalDeviceCameraDir.x,finalDeviceCameraDir.y,finalDeviceCameraDir.z));
-		camera()->setUpVector(qglviewer::Vec(finalDeviceUpCameraDir.x,finalDeviceUpCameraDir.y,finalDeviceUpCameraDir.z));
-	}
-	#endif
-
 	enableLights();
-	#ifdef smATC3DGInterface__
-	if(trakStar_enable &&enableCameraMotion) {
-		if(!isCameraCollided||!checkCameraCollision){
-			camera()->setPosition(qglviewer::Vec(deviceCameraPos.x,deviceCameraPos.y,deviceCameraPos.z));
-		}
-		camera()->setViewDirection(qglviewer::Vec(deviceCameraDir.x,deviceCameraDir.y,deviceCameraDir.z));
-		camera()->setUpVector(qglviewer::Vec(deviceCameraUpDir.x,deviceCameraUpDir.y,deviceCameraUpDir.z));
-	}
-	#endif
-
 
 	glUseProgramObjectARB(0);
 	glDisable(GL_VERTEX_PROGRAM_ARB);
@@ -1071,19 +1026,6 @@ void smViewer::keyPressEvent(QKeyEvent *e){
 		smSDK::getInstance()->shutDown();
 		this->close();
 	}
-
-	#ifdef smATC3DGInterface__
-		if(e->key()==Qt::Key_T){
-			if(trakStar_enable) trakStar_enable = false;
-			else trakStar_enable = true;
-		}
-
-		if(e->key()==Qt::Key_7){
-			smVec3f refPos;
-			refPos.setValue(-12.0,  41.0, 113.0);
-			trakStar_caliPos = refPos - trakStar_curPos ;
-		}
-	#endif
 }
 
 void smViewer::addObject(smCoreClass *object){
@@ -1104,17 +1046,12 @@ void smViewer::handleEvent(smEvent *p_event){
 	smVec3<smDouble> transverseDir;
 	switch(p_event->eventType.eventTypeCode){
 	case SOFMIS_EVENTTYPE_HAPTICOUT:
-		hapticEventData=(smHapticOutEventData *)p_event->data;
-		if(hapticEventData->deviceId==0){
-			//Trakstar
-			#ifdef smATC3DGInterface__
-				if(trakStar_enable) processTrakstarData();
-			#endif
-		}
+		//left here as an example for implementation
+		//hapticEventData=(smHapticOutEventData *)p_event->data;
 		break;
 	case SOFMIS_EVENTTYPE_HAPTICIN:
-		hapticInEventData=(smHapticInEventData *)p_event->data;
-		hapticForce=hapticInEventData->force;
+		//left here as an example for implementation
+		//hapticInEventData=(smHapticInEventData *)p_event->data;
 		break;
 	case SOFMIS_EVENTTYPE_CAMERA_UPDATE:
 			cameraData=(smCameraEventData *)p_event->data;
@@ -1180,39 +1117,3 @@ void smViewer::addForm(QDialog *p_form){
 
 	forms.push_back(p_form);
 }
-
-#ifdef smATC3DGInterface__
-	void smViewer::processTrakstarData(){
-
-		DOUBLE_POSITION_MATRIX_TIME_STAMP_RECORD *trakstarData;
-		int numElements;
-
-		if(trakstarpipeReg.data.nbrElements > 0){
-			numElements = trakstarpipeReg.data.nbrElements;
-			trakstarData = (DOUBLE_POSITION_MATRIX_TIME_STAMP_RECORD *) trakstarpipeReg.data.dataLocation;
-
-			trakStar_curRotMat[0] = trakstarData[0].s[0][0];	trakStar_curRotMat[3] = trakstarData[0].s[1][0];	trakStar_curRotMat[6] = trakstarData[0].s[2][0];
-			trakStar_curRotMat[1] = trakstarData[0].s[0][1];	trakStar_curRotMat[4] = trakstarData[0].s[1][1];	trakStar_curRotMat[7] = trakstarData[0].s[2][1];
-			trakStar_curRotMat[2] = trakstarData[0].s[0][2];	trakStar_curRotMat[5] = trakstarData[0].s[1][2];	trakStar_curRotMat[8] = trakstarData[0].s[2][2];
-
-			trakStar_mvRotMat[0] = -trakStar_caliRotMat[0] * trakStar_curRotMat[1] - trakStar_caliRotMat[3] * trakStar_curRotMat[2] + trakStar_caliRotMat[6] * trakStar_curRotMat[0];
-			trakStar_mvRotMat[1] = -trakStar_caliRotMat[1] * trakStar_curRotMat[1] - trakStar_caliRotMat[4] * trakStar_curRotMat[2] + trakStar_caliRotMat[7] * trakStar_curRotMat[0];
-			trakStar_mvRotMat[2] = -trakStar_caliRotMat[2] * trakStar_curRotMat[1] - trakStar_caliRotMat[5] * trakStar_curRotMat[2] + trakStar_caliRotMat[8] * trakStar_curRotMat[0];
-			
-			trakStar_mvRotMat[3] = -trakStar_caliRotMat[0] * trakStar_curRotMat[4] - trakStar_caliRotMat[3] * trakStar_curRotMat[5] + trakStar_caliRotMat[6] * trakStar_curRotMat[3];
-			trakStar_mvRotMat[4] = -trakStar_caliRotMat[1] * trakStar_curRotMat[4] - trakStar_caliRotMat[4] * trakStar_curRotMat[5] + trakStar_caliRotMat[7] * trakStar_curRotMat[3];
-			trakStar_mvRotMat[5] = -trakStar_caliRotMat[2] * trakStar_curRotMat[4] - trakStar_caliRotMat[5] * trakStar_curRotMat[5] + trakStar_caliRotMat[8] * trakStar_curRotMat[3];
-			
-			trakStar_mvRotMat[6] = -trakStar_caliRotMat[0] * trakStar_curRotMat[7] - trakStar_caliRotMat[3] * trakStar_curRotMat[8] + trakStar_caliRotMat[6] * trakStar_curRotMat[6];
-			trakStar_mvRotMat[7] = -trakStar_caliRotMat[1] * trakStar_curRotMat[7] - trakStar_caliRotMat[4] * trakStar_curRotMat[8] + trakStar_caliRotMat[7] * trakStar_curRotMat[6];
-			trakStar_mvRotMat[8] = -trakStar_caliRotMat[2] * trakStar_curRotMat[7] - trakStar_caliRotMat[5] * trakStar_curRotMat[8] + trakStar_caliRotMat[8] * trakStar_curRotMat[6];
-
-			trakStar_curPos.setValue( -25.0 * trakstarData[0].y, -25.0 * trakstarData[0].z, 25.0 * trakstarData[0].x);
-			trakStar_curPos = trakStar_curPos + trakStar_offPos + trakStar_caliPos;
-
-			deviceCameraPos.setValue(trakStar_curPos.x,  trakStar_curPos.y,  trakStar_curPos.z);
-			deviceCameraDir.setValue(-trakStar_mvRotMat[0], -trakStar_mvRotMat[1], -trakStar_mvRotMat[2]);
-			deviceCameraUpDir.setValue(-trakStar_mvRotMat[6], -trakStar_mvRotMat[7], -trakStar_mvRotMat[8]);
-		}
-	}
-#endif

@@ -81,7 +81,6 @@ sofmis_find_package(ASSIMP MODULE REQUIRED)
 
 if(BUILD_EXTERNAL_DEVICES)
   sofmis_find_package(ADU REQUIRED)
-  sofmis_find_package(ATC REQUIRED)
   sofmis_find_package(NIDAQ REQUIRED)
 endif(BUILD_EXTERNAL_DEVICES)
 
@@ -115,7 +114,6 @@ include_directories(SYSTEM "${ASSIMP_INCLUDE_DIRS}")
 
 if(BUILD_EXTERNAL_DEVICES)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
-  include_directories(SYSTEM "${ATC_INCLUDE_DIR}")
   include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 endif(BUILD_EXTERNAL_DEVICES)
 

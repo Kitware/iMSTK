@@ -62,7 +62,6 @@ endif()
 
 set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
   ./smExternalDevices/smADUInterface.cpp
-  ./smExternalDevices/smATC3DGInterface.cpp
   ./smExternalDevices/smNIUSB6008Interface.cpp
 )
 
@@ -93,7 +92,6 @@ target_link_libraries(sofmis
   ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
-  ${ATC_LIBRARY}
   ${AUDIERE_LIBRARY}
   ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
@@ -118,7 +116,6 @@ target_link_libraries(externalDevices
   ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
-  ${ATC_LIBRARY}
   ${AUDIERE_LIBRARY}
   ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
