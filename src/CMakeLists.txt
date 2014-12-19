@@ -29,8 +29,6 @@ set(sources_sofmis
 ./smMesh/smMesh.cpp
 ./smMesh/smSurfaceMesh.cpp
 ./smMesh/smVolumeMesh.cpp
-./smRenderEffects/smEffectSim.cpp
-./smRenderEffects/SmokeEffect.cpp
 ./smRendering/smConfigRendering.cpp
 ./smRendering/smFrameBuffer.cpp
 ./smRendering/smLight.cpp
@@ -89,7 +87,6 @@ target_link_libraries(sofmis
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
-  ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
   ${AUDIERE_LIBRARY}
@@ -113,7 +110,6 @@ target_link_libraries(externalDevices
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
-  ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
   ${AUDIERE_LIBRARY}
