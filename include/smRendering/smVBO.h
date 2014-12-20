@@ -56,23 +56,23 @@ public:
 		assert(vboIndexId>0);
 
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-		if(p_vboType==SOFMIS_VBO_STATIC)
-			glBufferDataARB(GL_ARRAY_BUFFER_ARB, SOFMIS_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
-		else if(p_vboType==SOFMIS_VBO_DYNAMIC||p_vboType==SOFMIS_VBO_NOINDICESCHANGE)
-			glBufferDataARB(GL_ARRAY_BUFFER_ARB, SOFMIS_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
+		if(p_vboType==SIMMEDTK_VBO_STATIC)
+			glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
+		else if(p_vboType==SIMMEDTK_VBO_DYNAMIC||p_vboType==SIMMEDTK_VBO_NOINDICESCHANGE)
+			glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
 
 		SM_CHECKERROR(log,error)
 		glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
 
-		if(p_vboType==SOFMIS_VBO_STATIC||p_vboType==SOFMIS_VBO_NOINDICESCHANGE)
-			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SOFMIS_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
-		else if(p_vboType==SOFMIS_VBO_DYNAMIC)
-			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SOFMIS_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
+		if(p_vboType==SIMMEDTK_VBO_STATIC||p_vboType==SIMMEDTK_VBO_NOINDICESCHANGE)
+			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
+		else if(p_vboType==SIMMEDTK_VBO_DYNAMIC)
+			glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
 
 		SM_CHECKERROR(log,error)
 		vboType=p_vboType;
-		sizeOfDataBuffer=SOFMIS_VBOBUFFER_DATASIZE;
-		sizeOfIndexBuffer=SOFMIS_VBOBUFFER_INDEXSIZE;
+		sizeOfDataBuffer=SIMMEDTK_VBOBUFFER_DATASIZE;
+		sizeOfIndexBuffer=SIMMEDTK_VBOBUFFER_INDEXSIZE;
 		currentDataOffset=0;
 		currentIndexOffset=0;
 		glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
@@ -81,10 +81,10 @@ public:
 	/// \brief  add vertices to the data buffer
 	smVBOResult addVerticestoBuffer(smInt p_nbrVertices,smInt p_nbrTriangles,smInt p_objectId){
 		if(sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smTexCoord)*p_nbrVertices>sizeOfDataBuffer-currentDataOffset)
-			return SOFMIS_VBO_NODATAMEMORY;
+			return SIMMEDTK_VBO_NODATAMEMORY;
 
 		if(sizeof(smInt)*p_nbrTriangles*3>sizeOfIndexBuffer-currentIndexOffset)
-			return SOFMIS_VBO_NODATAMEMORY;
+			return SIMMEDTK_VBO_NODATAMEMORY;
 
 		dataOffsetMap[p_objectId]=currentDataOffset;
 		indexOffsetMap[p_objectId]=currentIndexOffset;
@@ -93,7 +93,7 @@ public:
 		///add the vertices and normals and the texture coordinates
 		currentDataOffset+=sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smVec3<smFloat>)*p_nbrVertices+sizeof(smTexCoord)*p_nbrVertices;
 		currentIndexOffset+=p_nbrTriangles*sizeof(smTriangle);
-		return SOFMIS_VBO_OK;
+		return SIMMEDTK_VBO_OK;
 	}
 	/// \brief update vertex data buffer
 	smVBOResult updateVertices(smVec3<smFloat> *p_vectors,smVec3<smFloat> *p_normals,smTexCoord *p_textureCoords, smInt p_objectId);

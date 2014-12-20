@@ -16,14 +16,14 @@ SimMedTK LICENSE
 #include <QHash>
 
 enum smMemReturnType{
-	SOFMIS_MEMORY_ALLOCATED,
-	SOFMIS_MEMORY_ALREADYALLOCATED,
-	SOFMIS_MEMORY_NOTENOUGHMEMORY,
-	SOFMIS_MEMORY_MEMORYFOUND,
-	SOFMIS_MEMORY_NOMEMORYFOUND,
-	SOFMIS_MEMORY_INVALIDPARAMS,
-	SOFMIS_MEMORY_INVALIDMEMORY,
-	SOFMIS_MEMORY_NOERROR
+	SIMMEDTK_MEMORY_ALLOCATED,
+	SIMMEDTK_MEMORY_ALREADYALLOCATED,
+	SIMMEDTK_MEMORY_NOTENOUGHMEMORY,
+	SIMMEDTK_MEMORY_MEMORYFOUND,
+	SIMMEDTK_MEMORY_NOMEMORYFOUND,
+	SIMMEDTK_MEMORY_INVALIDPARAMS,
+	SIMMEDTK_MEMORY_INVALIDMEMORY,
+	SIMMEDTK_MEMORY_NOERROR
 };
 
 /// \brief Memory Block makes easy to allocate and associate particular memory.
@@ -38,77 +38,77 @@ private:
 public:
 	///constructr needs logger in case
 	smMemoryBlock(smErrorLog *log){
-		type=SOFMIS_SMMEMORYBLOCK;		
+		type=SIMMEDTK_SMMEMORYBLOCK;		
 		this->log=log;
 	}
 
 	smMemoryBlock(){
-		type=SOFMIS_SMMEMORYBLOCK;		
+		type=SIMMEDTK_SMMEMORYBLOCK;		
 		//this->log=smSDK::getErrorLog();
 	}
 
 	/// \brief alocate a class and returns p_returnedBlock as allocated memory and 
-	///return params are SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
+	///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
 	template<class T> 
 	smMemReturnType allocate(QString &p_memoryBlockName,T**p_returnedBlock){
 		*p_returnedBlock=new T();
 		if(p_returnedBlock==NULL)
-			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
+			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
 
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete [] *p_returnedBlock;
-			return SOFMIS_MEMORY_ALREADYALLOCATED;
+			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
 		}
 		else{
 			memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-			return	SOFMIS_MEMORY_ALLOCATED;
+			return	SIMMEDTK_MEMORY_ALLOCATED;
 		}
 	}
 
 	/// \brief alocate any c;asses and returns p_returnedBlock as allocated memory and 
-	///return params are SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
+	///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
 	template<class T> 
 	smMemReturnType allocate(QString &p_memoryBlockName,smInt nbr,T**p_returnedBlock){
 		*p_returnedBlock=new T[nbr];
 		if(p_returnedBlock==NULL)
-			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
+			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
 
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete [] *p_returnedBlock;
-			return SOFMIS_MEMORY_ALREADYALLOCATED;
+			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
 		}
 		else{
 			memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-			return	SOFMIS_MEMORY_ALLOCATED;
+			return	SIMMEDTK_MEMORY_ALLOCATED;
 		}
 	}
 
 	/// \brief alocate any classes and returns p_returnedBlock as allocated memory
-	///    returns	 SOFMIS_MEMORY_ALLOCATED or SOFMIS_MEMORY_ALREADYALLOCATED or SOFMIS_MEMORY_INVALIDMEMORY
+	///    returns	 SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
 	template <class T>
 	smMemReturnType allocate(const QString& p_memoryBlockName, const smInt &p_nbr){
 		T *allocatedMem;
 		allocatedMem=new T[p_nbr];
 		if(allocatedMem==NULL)
-			return	SOFMIS_MEMORY_NOTENOUGHMEMORY;
+			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
 
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			delete []allocatedMem;
-			return SOFMIS_MEMORY_ALREADYALLOCATED;
+			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
 		}
 		else{
 			memoryBlocks[p_memoryBlockName]=allocatedMem;
-			return	SOFMIS_MEMORY_ALLOCATED;
+			return	SIMMEDTK_MEMORY_ALLOCATED;
 		}
 	}
 
-	/// \brief alocate vectors and returns	SOFMIS_MEMORY_INVALIDPARAMS or SOFMIS_MEMORY_ALLOCATED based on block size given
+	/// \brief alocate vectors and returns	SIMMEDTK_MEMORY_INVALIDPARAMS or SIMMEDTK_MEMORY_ALLOCATED based on block size given
 	virtual smMemReturnType allocate(const QString &p_memoryBlockName, const smInt blockSize,void **p_returnedBlock){
 		if(blockSize<=0)
-			return SOFMIS_MEMORY_INVALIDPARAMS;
+			return SIMMEDTK_MEMORY_INVALIDPARAMS;
 		*p_returnedBlock=new smChar[blockSize];
 		memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-		return SOFMIS_MEMORY_ALLOCATED;
+		return SIMMEDTK_MEMORY_ALLOCATED;
 	}
 
 	/// \brief deletes the block from memeory as well as in has container
@@ -118,20 +118,20 @@ public:
 			memoryBlock=memoryBlocks[p_memoryBlockName];
 			delete []memoryBlock;
 			memoryBlocks.remove(p_memoryBlockName);
-			return SOFMIS_MEMORY_NOERROR;
+			return SIMMEDTK_MEMORY_NOERROR;
 		}
 		else
-			return SOFMIS_MEMORY_NOMEMORYFOUND;
+			return SIMMEDTK_MEMORY_NOMEMORYFOUND;
 	}
 
-	/// \brief  gets  memory from the container via given block name. it returns SOFMIS_MEMORY_MEMORYFOUND or SOFMIS_MEMORY_NOMEMORYFOUND. 
+	/// \brief  gets  memory from the container via given block name. it returns SIMMEDTK_MEMORY_MEMORYFOUND or SIMMEDTK_MEMORY_NOMEMORYFOUND. 
 	virtual smMemReturnType getBlock(const QString &p_memoryBlockName,void **p_memoryPointer){
 		if(memoryBlocks.contains(p_memoryBlockName)){
 			*p_memoryPointer=memoryBlocks[p_memoryBlockName];
-			return	SOFMIS_MEMORY_MEMORYFOUND;
+			return	SIMMEDTK_MEMORY_MEMORYFOUND;
 		}
 		else
-			return SOFMIS_MEMORY_NOMEMORYFOUND;
+			return SIMMEDTK_MEMORY_NOMEMORYFOUND;
 	}
 
 	/// \brief copy the allocated memory location to dst. p_nbr is the number of elements to be copied
@@ -143,13 +143,13 @@ public:
 			src=(T*)memoryBlocks[p_memoryBlockName];
 			if(src!=NULL){
 				memcpy(dst,src,sizeof(T)*p_nbr);
-				return	SOFMIS_MEMORY_NOERROR;
+				return	SIMMEDTK_MEMORY_NOERROR;
 			}
 			else
-				return SOFMIS_MEMORY_INVALIDMEMORY;
+				return SIMMEDTK_MEMORY_INVALIDMEMORY;
 		}
 		else
-			return SOFMIS_MEMORY_INVALIDPARAMS;
+			return SIMMEDTK_MEMORY_INVALIDPARAMS;
 	}
 
 	/// \brief copy the src to allocated memory location. p_nbr is the number of elements
@@ -162,12 +162,12 @@ public:
 				dst=(T*)memoryBlocks[p_memoryBlockName];
 				if(dst!=NULL){
 					memcpy(dst,src,sizeof(T)*p_nbr);
-					return	SOFMIS_MEMORY_NOERROR;
+					return	SIMMEDTK_MEMORY_NOERROR;
 				}else
-					return	SOFMIS_MEMORY_INVALIDMEMORY;
+					return	SIMMEDTK_MEMORY_INVALIDMEMORY;
 			}
 			else
-				return SOFMIS_MEMORY_INVALIDPARAMS;
+				return SIMMEDTK_MEMORY_INVALIDPARAMS;
 	}
 
 	/// \brief lists the blocks within the container

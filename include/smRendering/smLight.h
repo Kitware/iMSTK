@@ -1,28 +1,8 @@
-/*
-****************************************************
-                  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
-
-    \author:    Module by Tansel Halic
-                
-                
-    \version    1.0
-    \date       05/2009
-    \bug	    None yet
-    \brief	    This file has basic light structures and definitions
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef  SMLIGHT_H
 #define  SMLIGHT_H
@@ -35,13 +15,13 @@
 class smLight;
 /// \brief light type; infinite or spotlight
 enum smLightType{
-	SOFMIS_LIGHT_SPOTLIGHT,
-	SOFMIS_LIGHT_INFINITELIGHT
+	SIMMEDTK_LIGHT_SPOTLIGHT,
+	SIMMEDTK_LIGHT_INFINITELIGHT
 };
 /// \brief location of the light type
 enum smLightLocationType{
-	SOFMIS_LIGHTPOS_EYE,
-	SOFMIS_LIGHTPOS_WORLD
+	SIMMEDTK_LIGHTPOS_EYE,
+	SIMMEDTK_LIGHTPOS_WORLD
 };
 /// \brief light position. light at inifinite position can be defined with w
 struct smLightPos{
@@ -61,7 +41,7 @@ public:
 ///infinite the cutoff angle is still in active. You could see sudden shade in the objects
 ///if you don't pay attention to the cut-off angle..If you want the scene to be fully lit
 ///set cut-off angle 180 degrees.
-///Also when the params SOFMIS_LIGHT_INFINITELIGHT,SOFMIS_LIGHTPOS_EYE are used, this means
+///Also when the params SIMMEDTK_LIGHT_INFINITELIGHT,SIMMEDTK_LIGHTPOS_EYE are used, this means
 //the light will be positioned with respect to eye coord and the light will be inifinite
 //Therefore, the light should be positioned with a slight offset respect to eye pos(0,0,0);
 ///such as (0,0.5,0)(like a head lamp) 
@@ -81,13 +61,13 @@ public:
 	smFloat attn_linear;
 	smFloat attn_quadratic;
 
-	smLight(QString p_name="", smLightType p_lightType=SOFMIS_LIGHT_INFINITELIGHT,
-	        smLightLocationType p_lightLocation=SOFMIS_LIGHTPOS_EYE){
+	smLight(QString p_name="", smLightType p_lightType=SIMMEDTK_LIGHT_INFINITELIGHT,
+	        smLightLocationType p_lightLocation=SIMMEDTK_LIGHTPOS_EYE){
 		name=p_name;
 		enabled=false;
 		previousState=false;
 		lightPos.pos.setValue(0,0,0);
-		if(p_lightType==SOFMIS_LIGHT_INFINITELIGHT)
+		if(p_lightType==SIMMEDTK_LIGHT_INFINITELIGHT)
 			lightPos.w=0.0;
 		else
 			lightPos.w=1.0;
@@ -117,7 +97,7 @@ public:
 	}
 	/// \brief set light type
 	inline void setType(smLightType p_lightType){
-		if(p_lightType==SOFMIS_LIGHT_INFINITELIGHT)
+		if(p_lightType==SIMMEDTK_LIGHT_INFINITELIGHT)
 			lightPos.w=0.0;
 		else
 			lightPos.w=1.0;

@@ -70,7 +70,7 @@ void MyStylus::handleEvent(smEvent *p_event){
 	smMeshContainer *containerUpper = this->getMeshContainer("HookCauteryUpper");
 
 	switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_HAPTICOUT:
+		case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 
 				hapticEventData=(smHapticOutEventData *)p_event->data;
 				if(hapticEventData->deviceId==this->phantomID){
@@ -92,21 +92,21 @@ void MyStylus::handleEvent(smEvent *p_event){
 					containerUpper->offsetRotX=-angle*25;
 
 
-			case SOFMIS_EVENTTYPE_KEYBOARD:
+			case SIMMEDTK_EVENTTYPE_KEYBOARD:
 					keyBoardData=(smKeyboardEventData*)p_event->data;
 
 
 
 					if(keyBoardData->keyBoardKey==Qt::Key_2){
 
-							smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-							this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
+							smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+							this->renderDetail.renderType=this->renderDetail.renderType|SIMMEDTK_RENDER_NONE;
 
 					}
 					if(keyBoardData->keyBoardKey==Qt::Key_1){
 
-						   smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-							this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
+						   smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+							this->renderDetail.renderType=this->renderDetail.renderType&(~SIMMEDTK_RENDER_NONE);
 
 					}
 				break;
@@ -150,7 +150,7 @@ void HookCautery::handleEvent(smEvent *p_event){
 	smKeyboardEventData *keyBoardData;
 
 	switch(p_event->eventType.eventTypeCode){
-	case SOFMIS_EVENTTYPE_HAPTICOUT:
+	case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 		hapticEventData=(smHapticOutEventData *)p_event->data;
 		if(hapticEventData->deviceId==this->phantomID){
 			transRot=hapticEventData->transform;
@@ -162,15 +162,15 @@ void HookCautery::handleEvent(smEvent *p_event){
 			buttonState[3]=hapticEventData->buttonState[3];
 		}
 		break;
-	case SOFMIS_EVENTTYPE_KEYBOARD:
+	case SIMMEDTK_EVENTTYPE_KEYBOARD:
 		keyBoardData=(smKeyboardEventData*)p_event->data;
 		if(keyBoardData->keyBoardKey==Qt::Key_1){
-			smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-			this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
+			smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+			this->renderDetail.renderType=this->renderDetail.renderType|SIMMEDTK_RENDER_NONE;
 		}
 		if(keyBoardData->keyBoardKey==Qt::Key_2){
-			smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-			this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
+			smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+			this->renderDetail.renderType=this->renderDetail.renderType&(~SIMMEDTK_RENDER_NONE);
 		}
 		break;
 	}

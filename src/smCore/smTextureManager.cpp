@@ -10,7 +10,7 @@ smBool smTextureManager::isInitializedGL=false;
 smBool smTextureManager::isDeleteImagesEnabled=false;
 smCallTextureCallBack smTextureManager::callback=NULL;
 void *smTextureManager::param=NULL;
-smChar texManagerError[SOFMIS_MAX_ERRORLOG_TEXT];
+smChar texManagerError[SIMMEDTK_MAX_ERRORLOG_TEXT];
 
 /// \brief
 smTextureReturnType smTextureManager::initGLTextures(){
@@ -25,12 +25,12 @@ smTextureReturnType smTextureManager::initGLTextures(){
 		texture=textures[i];
 
 		glEnable(GL_TEXTURE_2D);
-		if(texture->imageColorType==SOFMIS_IMAGECOLOR_DEPTH){
+		if(texture->imageColorType==SIMMEDTK_IMAGECOLOR_DEPTH){
 			initDepthTexture(texture);
 
 			continue;
 		}
-		if(texture->imageColorType==SOFMIS_IMAGECOLOR_OFFSCREENRGBA){
+		if(texture->imageColorType==SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA){
 			initColorTexture(texture);
 
 			continue;
@@ -50,10 +50,10 @@ smTextureReturnType smTextureManager::initGLTextures(){
 		data.bytePerPixel=texture->bitsPerPixel;
 		data.width=texture->width;
 		data.height=texture->height;
-		data.imageColorType=SOFMIS_IMAGECOLOR_RGB;
+		data.imageColorType=SIMMEDTK_IMAGECOLOR_RGB;
 		strcpy(data.fileName,texture->textureFileName);
 		if(ilGetInteger(IL_IMAGE_FORMAT)==IL_RGBA)
-			data.imageColorType=SOFMIS_IMAGECOLOR_RGBA;
+			data.imageColorType=SIMMEDTK_IMAGECOLOR_RGBA;
 		data.data=ilGetData();
 		if(callback!=NULL){
 			callback(&data,param);
@@ -66,7 +66,7 @@ smTextureReturnType smTextureManager::initGLTextures(){
                      0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, data.data);
 
 		if(texture->isTextureDataAvailable){
-			if(data.imageColorType==SOFMIS_IMAGECOLOR_RGBA){
+			if(data.imageColorType==SIMMEDTK_IMAGECOLOR_RGBA){
 				texture->mRGB=new unsigned char[4*texture->width*texture->height];
 				memcpy(texture->mRGB,data.data,4*texture->width*texture->height);
 			}
@@ -86,7 +86,7 @@ smTextureReturnType smTextureManager::initGLTextures(){
 	}
 	isInitializedGL=true;
 
-	return	SOFMIS_TEXTURE_OK;
+	return	SIMMEDTK_TEXTURE_OK;
 }
 
 /// \brief load the texture and associated it with reference name. 
@@ -99,7 +99,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName,
 	ILuint imageName;
 
 	if(!isInitialized)
-		return SOFMIS_TEXTURE_DRIVERNOTINITIALIZED;
+		return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
 	
 	ilGenImages(1,&imageName);
 	ilBindImage(imageName);
@@ -111,7 +111,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName,
 
 	if(error!=IL_NO_ERROR){
 		reportError();		
-		return SOFMIS_TEXTURE_IMAGELOADINGERROR;
+		return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
 	}
 
 	texture=new smTexture();
@@ -125,7 +125,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName,
 	p_textureId=activeTextures;
 	activeTextures++;
 
-	return SOFMIS_TEXTURE_OK;
+	return SIMMEDTK_TEXTURE_OK;
 }
 
 /// \brief
@@ -140,7 +140,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, cons
 
 	if(ilLoadImage(p_fileName)==IL_FALSE){
 		cout<<"[smTextureManager::loadTexture] Texture is not found"<<p_fileName<<endl;
-		return SOFMIS_TEXTURE_NOTFOUND;
+		return SIMMEDTK_TEXTURE_NOTFOUND;
 	}
 
 	if(p_flipImage)
@@ -151,7 +151,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, cons
 	error = ilGetError(); 
 	
 	if(error!=IL_NO_ERROR)
-		return SOFMIS_TEXTURE_IMAGELOADINGERROR;
+		return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
 
 	texture=new smTexture();
 	strcpy(texture->textureFileName,p_fileName);
@@ -165,7 +165,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, cons
 	textures.push_back(texture);
 	textureIndexId[p_textureReferenceName]=activeTextures;
 	activeTextures++;
-	return SOFMIS_TEXTURE_OK;
+	return SIMMEDTK_TEXTURE_OK;
 }
 
 /// \brief load texture with given filename, texture reference name, parameter to flip the image or not
@@ -183,11 +183,11 @@ smTextureReturnType smTextureManager::findTextureId(const smChar *p_textureRefer
 	smTexture *texture;
 	if(textureIndexId.contains(p_textureReferenceName)){
 		p_textureId=textureIndexId[p_textureReferenceName];
-		return	 SOFMIS_TEXTURE_OK;
+		return	 SIMMEDTK_TEXTURE_OK;
 	}
 	else{
 		p_textureId=0;
-		return SOFMIS_TEXTURE_NOTFOUND;
+		return SIMMEDTK_TEXTURE_NOTFOUND;
 	}
 
 }
@@ -353,7 +353,7 @@ void smTextureManager::createDepthTexture(const smChar *p_textureReferenceName,s
 	tex->width=p_width;
 	tex->GLtype=GL_TEXTURE_2D;
 	strcpy(tex->textureFileName,p_textureReferenceName);
-	tex->imageColorType=SOFMIS_IMAGECOLOR_DEPTH;
+	tex->imageColorType=SIMMEDTK_IMAGECOLOR_DEPTH;
 	textures.push_back(tex);
 	textureIndexId[p_textureReferenceName]=activeTextures;
 	activeTextures++;
@@ -398,7 +398,7 @@ void smTextureManager::createColorTexture(const smChar *p_textureReferenceName,s
 	tex->width=p_width;
 	tex->GLtype=GL_TEXTURE_2D;
 	strcpy(tex->textureFileName,p_textureReferenceName);
-	tex->imageColorType=SOFMIS_IMAGECOLOR_OFFSCREENRGBA;
+	tex->imageColorType=SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA;
 	textures.push_back(tex);
 	textureIndexId[p_textureReferenceName]=activeTextures;
 	activeTextures++;

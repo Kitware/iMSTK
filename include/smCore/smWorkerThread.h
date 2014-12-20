@@ -14,9 +14,9 @@
 #include <Qthread>
 /// \brief process(used as conceptual meaning) numbering scheme
 enum smProcessNumbering{
-	SOFMIS_PROCNUMSCHEME_X__,
-	SOFMIS_PROCNUMSCHEME_XY_,
-	SOFMIS_PROCNUMSCHEME_XYZ,
+	SIMMEDTK_PROCNUMSCHEME_X__,
+	SIMMEDTK_PROCNUMSCHEME_XY_,
+	SIMMEDTK_PROCNUMSCHEME_XYZ,
 };
 /// \brief process id 
 struct smProcessID{
@@ -39,7 +39,7 @@ public:
 	smProcessID(){
 		x=y=z=totalProcX=totalProcY=totalProcZ=sizeOfData=0;
 		data=NULL;
-		numbScheme=SOFMIS_PROCNUMSCHEME_X__;
+		numbScheme=SIMMEDTK_PROCNUMSCHEME_X__;
 	}
 
 	inline void operator=(smProcessID p_ID){
@@ -75,7 +75,7 @@ public:
 		id.totalProcZ=0;
 		id.data=NULL;
 		id.sizeOfData=0;
-		id.numbScheme=SOFMIS_PROCNUMSCHEME_X__;
+		id.numbScheme=SIMMEDTK_PROCNUMSCHEME_X__;
 		termination=false;
 	}
 

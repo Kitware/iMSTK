@@ -48,7 +48,7 @@ protected:
 			object=objectsSimulated[i];
 			type=object->getType();
 			switch(type){
-			case SOFMIS_SMFEMSCENEOBJECT:
+			case SIMMEDTK_SMFEMSCENEOBJECT:
 				femObject=(smFemSceneObject*)object;
 				object->memBlock->allocate<smVec3<smFloat>>(QString("fem"),femObject->v_mesh->nbrVertices);
 				object->memBlock->originaltoLocalBlock(QString("fem"),femObject->v_mesh->vertices,femObject->v_mesh->nbrVertices);
@@ -78,7 +78,7 @@ protected:
 			
 			sceneObj=this->objectsSimulated[i];
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMFEMSCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMFEMSCENEOBJECT){
 				femSceneObject=(smFemSceneObject*)sceneObj;
 				mesh=femSceneObject->v_mesh;
 				femSceneObject->memBlock->getBlock(QString("fem"),(void**)&vertices);
@@ -123,7 +123,7 @@ protected:
 
 				if(i==0){
 					eventForce=new smEvent();
-					eventForce->eventType=SOFMIS_EVENTTYPE_HAPTICIN;
+					eventForce->eventType=SIMMEDTK_EVENTTYPE_HAPTICIN;
 					hapticData=new smHapticInEventData();
 					hapticData->deviceId=1;
 					if(nodePicked&&dofNumber!=0){
@@ -161,7 +161,7 @@ protected:
 		for(smInt i=0;i<this->objectsSimulated.size();i++){
 			sceneObj=this->objectsSimulated[i];
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMFEMSCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMFEMSCENEOBJECT){
 				femObject=(smFemSceneObject*)sceneObj;
 				mesh=femObject->v_mesh;
 				femObject->memBlock->localtoOriginalBlock(QString("fem"),mesh->vertices,mesh->nbrVertices);
@@ -177,13 +177,13 @@ protected:
 		smHapticOutEventData *hapticEventData;
 
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_F1)
 				printf("F1 Keyboard is pressed %c\n",keyBoardData->keyBoardKey);
 			break;
 
-		case SOFMIS_EVENTTYPE_HAPTICOUT:
+		case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 			hapticEventData=(smHapticOutEventData *)p_event->data;
 			if(hapticEventData->deviceId==1){
 				hapticPosition.x=hapticEventData->position.x;

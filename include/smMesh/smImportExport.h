@@ -7,7 +7,7 @@
 
 /// \brief
 enum smExportOptions{
-	SOFMIS_EXPORT_ALL
+	SIMMEDTK_EXPORT_ALL
 };
 
 /// \brief class for importing and exporting meshes
@@ -15,7 +15,7 @@ class smImportExport:public smCoreClass{
 
 public:
 	static smBool convertToJSON(smMesh *mesh, char *outputFileName,
-                                    smExportOptions p_export=SOFMIS_EXPORT_ALL);
+                                    smExportOptions p_export=SIMMEDTK_EXPORT_ALL);
 };
 
 #endif

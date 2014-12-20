@@ -99,7 +99,7 @@ public:
 		smKeyboardEventData *keyBoardData;
 
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData = (smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_Plus){
 				specularPowerValue+=5;

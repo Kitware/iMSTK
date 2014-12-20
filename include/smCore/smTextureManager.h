@@ -21,22 +21,22 @@
 
 
 enum smTextureReturnType{
-	SOFMIS_TEXTURE_NOTFOUND,
-	SOFMIS_TEXTURE_IMAGELOADINGERROR,
-	SOFMIS_TEXTURE_DRIVERNOTINITIALIZED,
-	SOFMIS_TEXTURE_OK
+	SIMMEDTK_TEXTURE_NOTFOUND,
+	SIMMEDTK_TEXTURE_IMAGELOADINGERROR,
+	SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED,
+	SIMMEDTK_TEXTURE_OK
 };
 
 enum ImageColorType{
-	SOFMIS_IMAGECOLOR_RGB,
-	SOFMIS_IMAGECOLOR_RGBA,
-	SOFMIS_IMAGECOLOR_OFFSCREENRGBA,
-	SOFMIS_IMAGECOLOR_DEPTH
+	SIMMEDTK_IMAGECOLOR_RGB,
+	SIMMEDTK_IMAGECOLOR_RGBA,
+	SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA,
+	SIMMEDTK_IMAGECOLOR_DEPTH
 };
 /// \brief texture structure
 struct smTexture{
 	/// \brief texture file name
-	smChar textureFileName[SOFMIS_MAX_FILENAME_LENGTH];
+	smChar textureFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
 	/// \brief GL id
 	GLuint textureGLId;
 	/// \brief stores the width of the texture
@@ -60,7 +60,7 @@ struct smTexture{
 	/// \brief to make a copy of the texture. 
 	inline smTexture *copy(){
 		smTexture *myCopy=new smTexture();
-		memcpy(myCopy->textureFileName,this->textureFileName,SOFMIS_MAX_FILENAME_LENGTH);
+		memcpy(myCopy->textureFileName,this->textureFileName,SIMMEDTK_MAX_FILENAME_LENGTH);
 		myCopy->textureGLId=this->textureGLId;
 		myCopy->width=this->width;
 		myCopy->height=this->height;
@@ -71,7 +71,7 @@ struct smTexture{
 		myCopy->isTextureDataAvailable=this->isTextureDataAvailable;
 
 		if(this->isTextureDataAvailable){
-			if(this->imageColorType==SOFMIS_IMAGECOLOR_RGBA){
+			if(this->imageColorType==SIMMEDTK_IMAGECOLOR_RGBA){
 				myCopy->mRGB=new unsigned char[4*this->width*this->height];
 				memcpy(myCopy->mRGB,this->mRGB,4*this->width*this->height);
 			}
@@ -90,7 +90,7 @@ struct smImageData{
 	smInt height;
 	smInt bytePerPixel;
 	ImageColorType imageColorType;
-	smChar fileName[SOFMIS_MAX_FILENAME_LENGTH];
+	smChar fileName[SIMMEDTK_MAX_FILENAME_LENGTH];
 };
 /// \brief callback function
 typedef void (*smCallTextureCallBack)(smImageData *imageData,void *);
@@ -125,7 +125,7 @@ public:
 		iluInit();
 		ilutRenderer(ILUT_OPENGL);
 		ilutEnable(ILUT_OPENGL_CONV);
-		textures.resize(SOFMIS_MAX_TEXTURENBR);
+		textures.resize(SIMMEDTK_MAX_TEXTURENBR);
 		textures.clear();
 		activeTextures=0;
 		isDeleteImagesEnabled=true;

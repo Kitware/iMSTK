@@ -26,13 +26,13 @@
 #include "smGLRenderer.h"
 #include "smGeometry.h"
 
-#define SOFMIS_SPATIALGRID_LEFTCORNER	smVec3<smFloat>(-10,-10,-10)
-#define SOFMIS_SPATIALGRID_RIGHTCORNER  smVec3<smFloat>(10,10,10)
-#define SOFMIS_SPATIALGRID_XSEPERATION 10
-#define SOFMIS_SPATIALGRID_YSEPERATION 10
-#define SOFMIS_SPATIALGRID_ZSEPERATION 10
-#define SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS	1000
-#define SOFMIS_SPATIALGRID_TOTALLATTICES	500
+#define SIMMEDTK_SPATIALGRID_LEFTCORNER	smVec3<smFloat>(-10,-10,-10)
+#define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3<smFloat>(10,10,10)
+#define SIMMEDTK_SPATIALGRID_XSEPERATION 10
+#define SIMMEDTK_SPATIALGRID_YSEPERATION 10
+#define SIMMEDTK_SPATIALGRID_ZSEPERATION 10
+#define SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS	1000
+#define SIMMEDTK_SPATIALGRID_TOTALLATTICES	500
 
 /// \brief !!
 class smSpatialGridWorker:public smWorkerThread{
@@ -46,7 +46,7 @@ public:
 	smInt collidedPairs; ///< !!
 
 	///this is public for now
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///<
+	smLattice *latticeList[SIMMEDTK_SPATIALGRID_TOTALLATTICES]; ///<
 	smInt totalLattices; ///< total number of lattices
 
 	/// \brief destructor
@@ -58,13 +58,13 @@ public:
 	smSpatialGridWorker(){
 		totalLattices=0;
 		collidedPairs=0;
-		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
+		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
 	}
 
 	/// \brief constructor
 	smSpatialGridWorker(smProcessID p_ID):smWorkerThread(p_ID){
 		totalLattices=0;
-		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
+		collisionPairs.allocate<smCollidedTriangles>(QString("pairs"),SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS,&pairs);
 	}
 
 	/// \brief !!
@@ -175,7 +175,7 @@ public:
 		glColor3fv((GLfloat*)&smColor::colorRed);
 		for(smInt i=0;i<collidedPairs;i++){
 			baseMesh=smSDK::getMesh(pairs[i].tri1.meshID);//correct that later on
-			if(baseMesh->getType()==SOFMIS_SMMESH)
+			if(baseMesh->getType()==SIMMEDTK_SMMESH)
 				mesh=(smMesh*)baseMesh;
 
 			v[0]=mesh->triangles[pairs[i].tri1.primID].vert[0];
@@ -221,7 +221,7 @@ private:
 	smInt ySeperation; ///< grid spacing in y-direction
 	smInt zSeperation; ///< grid spacing in z-direction
 
-	smLattice *latticeList[SOFMIS_SPATIALGRID_TOTALLATTICES]; ///< 
+	smLattice *latticeList[SIMMEDTK_SPATIALGRID_TOTALLATTICES]; ///< 
 	smInt totalLattices; ///< total number of lattices
 	smBool listUpdated; ///< !!
 	QMutex mutex; ///< !!
@@ -245,18 +245,18 @@ public:
 	smPipe *pipe; ///< !!
 
 	/// \brief constructor
-	smSpatialGrid(smInt p_outOutputPrimSize=SOFMIS_SPATIALGRID_WORKER_COLLISIONPAIRS):synch(1){
+	smSpatialGrid(smInt p_outOutputPrimSize=SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS):synch(1){
 
 		maxPrims=p_outOutputPrimSize;
 		totalThreads=1;
-		leftCorner=SOFMIS_SPATIALGRID_LEFTCORNER;
-		rightCorner=SOFMIS_SPATIALGRID_RIGHTCORNER;
-		xSeperation=SOFMIS_SPATIALGRID_XSEPERATION;
-		ySeperation=SOFMIS_SPATIALGRID_YSEPERATION;
-		zSeperation=SOFMIS_SPATIALGRID_ZSEPERATION;
+		leftCorner=SIMMEDTK_SPATIALGRID_LEFTCORNER;
+		rightCorner=SIMMEDTK_SPATIALGRID_RIGHTCORNER;
+		xSeperation=SIMMEDTK_SPATIALGRID_XSEPERATION;
+		ySeperation=SIMMEDTK_SPATIALGRID_YSEPERATION;
+		zSeperation=SIMMEDTK_SPATIALGRID_ZSEPERATION;
 		totalLattices=0;
 
-		for(smInt i=0;i<SOFMIS_SPATIALGRID_TOTALLATTICES;i++)
+		for(smInt i=0;i<SIMMEDTK_SPATIALGRID_TOTALLATTICES;i++)
 			latticeList[i]=NULL;
 
 		listUpdated=false;
@@ -283,7 +283,7 @@ public:
 		smLattice *lattices;
 		smProcessID id;
 
-		id.numbScheme=SOFMIS_PROCNUMSCHEME_X__;
+		id.numbScheme=SIMMEDTK_PROCNUMSCHEME_X__;
 		QHash<smInt, smLattice*>::iterator latticeIterator;
 
 		if(isInitialized==true)
@@ -332,12 +332,12 @@ public:
 	/// \brief !!
 	void updateList(){
 
-		smLattice **tempLatticeList=new (smLattice*[SOFMIS_SPATIALGRID_TOTALLATTICES]);
+		smLattice **tempLatticeList=new (smLattice*[SIMMEDTK_SPATIALGRID_TOTALLATTICES]);
 		smInt index=0;
 		mutex.lock();
 
 		if(listUpdated==true){
-			for(smInt i=0;i<SOFMIS_SPATIALGRID_TOTALLATTICES;i++)
+			for(smInt i=0;i<SIMMEDTK_SPATIALGRID_TOTALLATTICES;i++)
 			{		
 				if(latticeList[i]!=NULL){
 					tempLatticeList[index]=latticeList[i];
@@ -345,10 +345,10 @@ public:
 				}
 			}
 
-			memcpy(&latticeList[0],&tempLatticeList[0],sizeof(smLattice*)*SOFMIS_SPATIALGRID_TOTALLATTICES);
+			memcpy(&latticeList[0],&tempLatticeList[0],sizeof(smLattice*)*SIMMEDTK_SPATIALGRID_TOTALLATTICES);
 			totalLattices=index;
 			for(smInt i=0;i<totalThreads;i++){
-				memcpy(&workerThreads[i].latticeList[0],tempLatticeList,sizeof(smLattice*)*SOFMIS_SPATIALGRID_TOTALLATTICES);
+				memcpy(&workerThreads[i].latticeList[0],tempLatticeList,sizeof(smLattice*)*SIMMEDTK_SPATIALGRID_TOTALLATTICES);
 				workerThreads[i].totalLattices=totalLattices;
 			}
 		}
@@ -380,10 +380,10 @@ public:
 		mutex.lock();
 		latticeList[totalLattices]=p_lat;
 		listUpdated=true;
-		p_lat->init(SOFMIS_SPATIALGRID_LEFTCORNER,SOFMIS_SPATIALGRID_RIGHTCORNER,
-			SOFMIS_SPATIALGRID_XSEPERATION,
-			SOFMIS_SPATIALGRID_YSEPERATION,
-			SOFMIS_SPATIALGRID_ZSEPERATION);
+		p_lat->init(SIMMEDTK_SPATIALGRID_LEFTCORNER,SIMMEDTK_SPATIALGRID_RIGHTCORNER,
+			SIMMEDTK_SPATIALGRID_XSEPERATION,
+			SIMMEDTK_SPATIALGRID_YSEPERATION,
+			SIMMEDTK_SPATIALGRID_ZSEPERATION);
 		totalLattices++;
 		mutex.unlock();
 		return totalLattices-1;

@@ -40,42 +40,42 @@ public:
 
 	/// \brief open haptic device
 	virtual int openDevice(){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief close haptic device
 	virtual int closeDevice(){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief start the haptic device 
 	virtual int startDevice(){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief get the position of the end effector the haptic device
 	virtual int  getPosition(smVec3<smDouble> & d_pos){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief get the orientation of the end effector the haptic device
 	virtual int getOreintation(smMatrix33 <smDouble> *d_rot){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief get the transform (position + orientation) of the end effector the haptic device
 	virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief set force to the haptic device
 	virtual int setForce (smVec3<smDouble> & force){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 	/// \brief set torque to the haptic device
 	virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque){
-		return SOFMIS_MSG_UNKNOWN;
+		return SIMMEDTK_MSG_UNKNOWN;
 	}
 
 };

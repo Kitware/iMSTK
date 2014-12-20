@@ -11,9 +11,9 @@ using namespace audiere;
 
 /// \brief contains state of the audio
 enum smAudioState{
-	SOFMIS_AUDIOSTATE_PLAYCONTINUOUS,
-	SOFMIS_AUDIOSTATE_PLAY,
-	SOFMIS_AUDIOSTATE_STOP
+	SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS,
+	SIMMEDTK_AUDIOSTATE_PLAY,
+	SIMMEDTK_AUDIOSTATE_STOP
 };
 
 /// \brief contains data for audio rendering
@@ -30,10 +30,10 @@ struct smAudioEventData{
 
 /// \brief contains audio query states
 enum smAudioReturnType{
-	SOFMIS_AUDIO_PLAYING,
-	SOFMIS_AUDIO_STOPPED,
-	SOFMIS_AUDIO_SOUNDERROR,
-	SOFMIS_AUDIO_SOUNDNOOP,
+	SIMMEDTK_AUDIO_PLAYING,
+	SIMMEDTK_AUDIO_STOPPED,
+	SIMMEDTK_AUDIO_SOUNDERROR,
+	SIMMEDTK_AUDIO_SOUNDNOOP,
 };
 
 /// \brief class to enable audio rendering
@@ -62,8 +62,8 @@ public:
 		log=p_log;
 		continuousPlaying=true;
 		referenceName=p_referenceName;
-		prevState=state=SOFMIS_AUDIOSTATE_STOP;
-		smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this,SOFMIS_EVENTTYPE_AUDIO);
+		prevState=state=SIMMEDTK_AUDIOSTATE_STOP;
+		smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this,SIMMEDTK_EVENTTYPE_AUDIO);
 	}
 
 	/// \brief destructor
@@ -80,42 +80,42 @@ public:
 			if(log!=NULL)
 				log->addError("Error in playing sound.Sound object is NULL");
 
-			return SOFMIS_AUDIO_SOUNDERROR;
+			return SIMMEDTK_AUDIO_SOUNDERROR;
 		}
 
 		switch(state){
-			case SOFMIS_AUDIOSTATE_PLAY:
+			case SIMMEDTK_AUDIOSTATE_PLAY:
 						if(sound->isPlaying())
 						{  
-							if(state==  SOFMIS_AUDIOSTATE_PLAY||state==  SOFMIS_AUDIOSTATE_PLAYCONTINUOUS)
-								return SOFMIS_AUDIO_PLAYING;
+							if(state==  SIMMEDTK_AUDIOSTATE_PLAY||state==  SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS)
+								return SIMMEDTK_AUDIO_PLAYING;
 
 						}
 						else{
 							  sound->setVolume(volume);
 							  sound->play();
-							  return SOFMIS_AUDIO_PLAYING;
+							  return SIMMEDTK_AUDIO_PLAYING;
 						}
 			
 				break;
 
-			case SOFMIS_AUDIOSTATE_STOP:
-					if(state==SOFMIS_AUDIOSTATE_STOP&&prevState==SOFMIS_AUDIOSTATE_STOP)
-						return SOFMIS_AUDIO_STOPPED;
-					if(state==SOFMIS_AUDIOSTATE_STOP&&prevState!=SOFMIS_AUDIOSTATE_STOP){
+			case SIMMEDTK_AUDIOSTATE_STOP:
+					if(state==SIMMEDTK_AUDIOSTATE_STOP&&prevState==SIMMEDTK_AUDIOSTATE_STOP)
+						return SIMMEDTK_AUDIO_STOPPED;
+					if(state==SIMMEDTK_AUDIOSTATE_STOP&&prevState!=SIMMEDTK_AUDIOSTATE_STOP){
 						sound->stop();
-						return	 SOFMIS_AUDIO_STOPPED;
+						return	 SIMMEDTK_AUDIO_STOPPED;
 					}
 
 
 				break;
 
-			case SOFMIS_AUDIOSTATE_PLAYCONTINUOUS:
+			case SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS:
 					sound->setRepeat(continuousPlaying);
-					return SOFMIS_AUDIO_PLAYING;
+					return SIMMEDTK_AUDIO_PLAYING;
 				break;
 		}
-		return SOFMIS_AUDIO_SOUNDNOOP;
+		return SIMMEDTK_AUDIO_SOUNDNOOP;
 
 	}
 
@@ -143,7 +143,7 @@ public:
 	/// \brief gather input events and change states and volume if needed
 	void handleEvent(smEvent *p_event){
 		smAudioEventData *audioEvent;
-		if(p_event->eventType==SOFMIS_EVENTTYPE_AUDIO){
+		if(p_event->eventType==SIMMEDTK_EVENTTYPE_AUDIO){
 			audioEvent=(smAudioEventData*)p_event->data;
 			if(audioEvent->sound.compare(referenceName)==0){
 				setVolume(audioEvent->volume);

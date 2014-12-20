@@ -8,7 +8,7 @@ struct smClassVariableInfo{
 	void *variablePtr;
 	QString className; 
 	QString variableName; 
-	SOFMIS_TYPEINFO type;
+	SIMMEDTK_TYPEINFO type;
 	smInt nbr;
 };
 
@@ -28,7 +28,7 @@ class smScriptingEngine:public  smCoreClass{
 public:
 
 	smScriptReturnCodes registerVariable(smCoreClass *p_coreClass,void *p_variablePtr,
-                                         SOFMIS_TYPEINFO p_typeInfo,
+                                         SIMMEDTK_TYPEINFO p_typeInfo,
                                          QString p_variableName, smInt p_nbr){
 
 		smScriptReturnCodes ret=SMSCRIPT_REG_OK;

@@ -12,14 +12,14 @@
 class smSimulator;
 
 enum smSchedulingPriority{
-	SOFMIS_SCHEDULING_HIGHRATE,
-	SOFMIS_SCHEDULING_AUTOSCHEDULE,
-	SOFMIS_SCHEDULING_BACKGROUND
+	SIMMEDTK_SCHEDULING_HIGHRATE,
+	SIMMEDTK_SCHEDULING_AUTOSCHEDULE,
+	SIMMEDTK_SCHEDULING_BACKGROUND
 };
 
 struct smScheduleGroup{
 
-	#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+	#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 	HANDLE threadHandle;
 	#endif
 
@@ -36,7 +36,7 @@ public:
 		minTargetFPS=maxTargetFPS=maxObservedFPS=minObservedFPS=0;
 
 		minObservedFPSThreadIndex=maxObservedFPSThreadIndex=0;
-		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+		#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 			threadHandle=GetCurrentThread();
 		#endif
 	}

@@ -1,33 +1,15 @@
 /*****************************************************
-				  SOFMIS LICENSE
-
+                  SIMMEDTK LICENSE
 ****************************************************
 
-	\author:    <http:\\acor.rpi.edu>
-				SOFMIS TEAM IN ALPHABATIC ORDER
-				Anderson Maciel, Ph.D.
-				Ganesh Sankaranarayanan, Ph.D.
-				Sreekanth A Venkata
-				Suvranu De, Ph.D.
-				Tansel Halic
-				Zhonghua Lu
-
-	\author:    Module by Tansel Halic
-				
-				
-	\version    1.0
-	\date       04/2009
-	\bug	    None yet
-	\brief	    This header includes the rendering parameters. For each module seperate rendering
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMCONFIGRENDERING_H 
 #define SMCONFIGRENDERING_H 
 
 #include "smCore/smConfig.h"
 
-#ifdef SOFMIS_RENDERER_OPENGL
+#ifdef SIMMEDTK_RENDERER_OPENGL
 	#include <GL/glew.h>
 	#include <GL/glut.h>
 #endif
@@ -43,27 +25,27 @@ class smShader;
 /// \brief this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects. 
 ///the value is in bytes
-#define SOFMIS_VBOBUFFER_DATASIZE	500000
-#define SOFMIS_VBOBUFFER_INDEXSIZE	100000
-#define SOFMIS_VIEWER_MAXLIGHTS	32
+#define SIMMEDTK_VBOBUFFER_DATASIZE	500000
+#define SIMMEDTK_VBOBUFFER_INDEXSIZE	100000
+#define SIMMEDTK_VIEWER_MAXLIGHTS	32
 
-#define SOFMIS_MAX_TEXTURENBR 36
-#define SOFMIS_MAX_VBOBUFFERS 10
+#define SIMMEDTK_MAX_TEXTURENBR 36
+#define SIMMEDTK_MAX_VBOBUFFERS 10
 
 /// \brief The configuration for VBO
 enum smVBOType{
-	SOFMIS_VBO_STATIC,
-	SOFMIS_VBO_NOINDICESCHANGE,
-	SOFMIS_VBO_DYNAMIC,
+	SIMMEDTK_VBO_STATIC,
+	SIMMEDTK_VBO_NOINDICESCHANGE,
+	SIMMEDTK_VBO_DYNAMIC,
 };
 
 /// \brief Vertex Buffer Objects Return Types
 enum smVBOResult{
-	SOFMIS_VBO_OK,
-	SOFMIS_VBO_NODATAMEMORY,
-	SOFMIS_VBO_NOINDEXMEMORY,
-	SOFMIS_VBO_INVALIDOPERATION,
-	SOFMIS_VBO_BUFFERPOINTERERROR
+	SIMMEDTK_VBO_OK,
+	SIMMEDTK_VBO_NODATAMEMORY,
+	SIMMEDTK_VBO_NOINDEXMEMORY,
+	SIMMEDTK_VBO_INVALIDOPERATION,
+	SIMMEDTK_VBO_BUFFERPOINTERERROR
 };
 
 struct smColor{
@@ -148,41 +130,41 @@ struct smColor{
 
 
 /// \brief renderType. this shows how the render will be done
-#define    SOFMIS_RENDER_TEXTURE			(1<<1)
-#define    SOFMIS_RENDER_MATERIALCOLOR		(1<<2)
-#define    SOFMIS_RENDER_SHADOWS			(1<<3)
-#define    SOFMIS_RENDER_COLORMAP			(1<<4)
-#define    SOFMIS_RENDER_WIREFRAME			(1<<5)
-#define    SOFMIS_RENDER_VERTICES			(1<<6)
-#define	   SOFMIS_RENDER_HIGHLIGHTVERTICES	(1<<7)
-#define    SOFMIS_RENDER_TRANSPARENT		(1<<8)
-#define    SOFMIS_RENDER_LOCALAXIS			(1<<9)
-#define    SOFMIS_RENDER_HIGHLIGHT			(1<<10)
-#define    SOFMIS_RENDER_TETRAS				(1<<11)
-#define    SOFMIS_RENDER_SURFACE			(1<<12)
-#define    SOFMIS_RENDER_CUSTOMRENDERONLY	(1<<13)
-#define    SOFMIS_RENDER_SHADERTEXTURE		(1<<14)
-#define    SOFMIS_RENDER_FACES				(1<<15)
+#define    SIMMEDTK_RENDER_TEXTURE			(1<<1)
+#define    SIMMEDTK_RENDER_MATERIALCOLOR		(1<<2)
+#define    SIMMEDTK_RENDER_SHADOWS			(1<<3)
+#define    SIMMEDTK_RENDER_COLORMAP			(1<<4)
+#define    SIMMEDTK_RENDER_WIREFRAME			(1<<5)
+#define    SIMMEDTK_RENDER_VERTICES			(1<<6)
+#define	   SIMMEDTK_RENDER_HIGHLIGHTVERTICES	(1<<7)
+#define    SIMMEDTK_RENDER_TRANSPARENT		(1<<8)
+#define    SIMMEDTK_RENDER_LOCALAXIS			(1<<9)
+#define    SIMMEDTK_RENDER_HIGHLIGHT			(1<<10)
+#define    SIMMEDTK_RENDER_TETRAS				(1<<11)
+#define    SIMMEDTK_RENDER_SURFACE			(1<<12)
+#define    SIMMEDTK_RENDER_CUSTOMRENDERONLY	(1<<13)
+#define    SIMMEDTK_RENDER_SHADERTEXTURE		(1<<14)
+#define    SIMMEDTK_RENDER_FACES				(1<<15)
 ///Renders Vertex Buffer Objects
-#define	   SOFMIS_RENDER_VBO				(1<<16)
-#define    SOFMIS_RENDER_NORMALS			(1<<17)
-#define    SOFMIS_RENDER_VAO				(1<<18)
-#define    SOFMIS_RENDER_NONE				(1<<31)
+#define	   SIMMEDTK_RENDER_VBO				(1<<16)
+#define    SIMMEDTK_RENDER_NORMALS			(1<<17)
+#define    SIMMEDTK_RENDER_VAO				(1<<18)
+#define    SIMMEDTK_RENDER_NONE				(1<<31)
 
 /// \brief type definitions for variable viewerRenderDetail in smViewer 
-#define    SOFMIS_VIEWERRENDER_GLOBALAXIS						(1<<1)
-#define    SOFMIS_VIEWERRENDER_TEXT								(1<<2)
-#define    SOFMIS_VIEWERRENDER_FADEBACKGROUND					(1<<3)
-#define    SOFMIS_VIEWERRENDER_FADEBACKGROUNDIMAGE				(1<<4)
-#define    SOFMIS_VIEWERRENDER_GROUND							(1<<5)
-#define    SOFMIS_VIEWERRENDER_VBO_ENABLED						(1<<6)
-#define    SOFMIS_VIEWERRENDER_WIREFRAMEALL						(1<<7)
-#define    SOFMIS_VIEWERRENDER_TRANSPARENCY						(1<<8)
-#define    SOFMIS_VIEWERRENDER_FULLSCREEN						(1<<9)
-#define    SOFMIS_VIEWERRENDER_RESTORELASTCAMSETTINGS			(1<<10)
-#define    SOFMIS_VIEWERRENDER_SOFTSHADOWS						(1<<11)
-#define    SOFMIS_VIEWERRENDER_DISABLE							(1<<12)
-#define    SOFMIS_VIEWERRENDER_DYNAMICREFLECTION				(1<<13)
+#define    SIMMEDTK_VIEWERRENDER_GLOBALAXIS						(1<<1)
+#define    SIMMEDTK_VIEWERRENDER_TEXT								(1<<2)
+#define    SIMMEDTK_VIEWERRENDER_FADEBACKGROUND					(1<<3)
+#define    SIMMEDTK_VIEWERRENDER_FADEBACKGROUNDIMAGE				(1<<4)
+#define    SIMMEDTK_VIEWERRENDER_GROUND							(1<<5)
+#define    SIMMEDTK_VIEWERRENDER_VBO_ENABLED						(1<<6)
+#define    SIMMEDTK_VIEWERRENDER_WIREFRAMEALL						(1<<7)
+#define    SIMMEDTK_VIEWERRENDER_TRANSPARENCY						(1<<8)
+#define    SIMMEDTK_VIEWERRENDER_FULLSCREEN						(1<<9)
+#define    SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS			(1<<10)
+#define    SIMMEDTK_VIEWERRENDER_SOFTSHADOWS						(1<<11)
+#define    SIMMEDTK_VIEWERRENDER_DISABLE							(1<<12)
+#define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION				(1<<13)
 
 
 
@@ -201,7 +183,7 @@ struct smUnifiedID;
 struct smRenderDetail{
 public:
 	smRenderDetail(){/*:shaders(10)*/
-		renderType=SOFMIS_RENDER_MATERIALCOLOR|SOFMIS_RENDER_FACES;
+		renderType=SIMMEDTK_RENDER_MATERIALCOLOR|SIMMEDTK_RENDER_FACES;
 		highLightColor.rgba[0]=1.0f;
 		highLightColor.rgba[1]=0.0f;
 		highLightColor.rgba[2]=0.0f;

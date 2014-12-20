@@ -110,7 +110,7 @@ public:
 	/// \brief constructor
 	smCoreClass():name(""){
 		referenceCounter=0;
-		drawOrder=SOFMIS_DRAW_BEFOREOBJECTS;
+		drawOrder=SIMMEDTK_DRAW_BEFOREOBJECTS;
 		uniqueId.generateUniqueID();
 		
 	}

@@ -80,46 +80,46 @@ smInt smPhantomInterface::startDevice(){
                                UserData, HD_DEFAULT_SCHEDULER_PRIORITY);
 		hapticTimer.start();
 		hdStartScheduler();
-		return SOFMIS_MSG_SUCCESS;
+		return SIMMEDTK_MSG_SUCCESS;
 
 	}
-	return SOFMIS_MSG_FAILURE;
+	return SIMMEDTK_MSG_FAILURE;
 }
 
 /// \brief
 int smPhantomInterface::openDevice(){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 /// \brief
 int smPhantomInterface::closeDevice(){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 /// \brief
 int smPhantomInterface::openDevice(smInt phantomNumber){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 /// \brief
 int smPhantomInterface::getPosition(smVec3 <smDouble> &d_pos){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 /// \brief
 int smPhantomInterface::getOreintation(smMatrix33 <smDouble> *d_rot){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 /// \brief
 int smPhantomInterface::getDeviceTransform(smMatrix44 <smDouble> *d_transform){
 
-return SOFMIS_MSG_UNKNOWN;
+return SIMMEDTK_MSG_UNKNOWN;
 }
 
 
@@ -202,9 +202,9 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData){
 		//phantomInterface->hapticEvent[count]=new smEvent();
 		//hapticEventData[count]=new smHapticOutEventData();
 		memcpy(phantomInterface->hapticEventData[count],(const void*)&phantomInterface->hapticDeviceData[count],sizeof(phantomInterface->hapticDeviceData[count]));
-		phantomInterface->hapticEvent[count]->eventType=SOFMIS_EVENTTYPE_HAPTICOUT;
+		phantomInterface->hapticEvent[count]->eventType=SIMMEDTK_EVENTTYPE_HAPTICOUT;
 		phantomInterface->hapticEvent[count]->senderId=phantomInterface->getModuleId();
-		phantomInterface->hapticEvent[count]->senderType=SOFMIS_SENDERTYPE_MODULE;
+		phantomInterface->hapticEvent[count]->senderType=SIMMEDTK_SENDERTYPE_MODULE;
 		//phantomInterface->hapticEvent[count]->data=phantomInterface->hapticEventData[count];
 		count++;
 	}
@@ -221,7 +221,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData){
 		return HD_CALLBACK_DONE;
 	}
 
-	timerPerFrame=hapticTimer.now(SOFMIS_TIMER_INMILLISECONDS);
+	timerPerFrame=hapticTimer.now(SIMMEDTK_TIMER_INMILLISECONDS);
 	frameCounter++;
 	if(SMTIMER_FRAME_MILLISEC2SECONDS(timerPerFrame)>=1.0){
 		hapticTimer.start();
@@ -237,7 +237,7 @@ void smPhantomInterface::handleEvent(smEvent *p_event){
 
 	smHapticInEventData *hapticEventData;
 	switch(p_event->eventType.eventTypeCode){
-		case  SOFMIS_EVENTTYPE_HAPTICIN:
+		case  SIMMEDTK_EVENTTYPE_HAPTICIN:
 			if(forceEnabled){
 				hapticEventData=(smHapticInEventData *)p_event->data;
 				force[hapticEventData->deviceId][0]=	hapticEventData->force.x;

@@ -137,7 +137,7 @@ protected:
 		totalTexts=p_totalTexts;
 		windowTexts=new smWindowData[totalTexts];
 		tagMap=new smInt[totalTexts];
-		drawOrder=SOFMIS_DRAW_AFTEROBJECTS;
+		drawOrder=SIMMEDTK_DRAW_AFTEROBJECTS;
 
 		for(smInt i=0;i<totalTexts;i++){
 			windowTexts[i].enabled=false;
@@ -256,7 +256,7 @@ public:
 	smWindowConsole(smInt p_totalTexts=5){
 		init(p_totalTexts);
 		backGroundColor.setValue(1.0,1.0,1.0,0.15);
-		smSDK::getInstance()->getEventDispatcher()->registerEventHandler( this,SOFMIS_EVENTTYPE_KEYBOARD);
+		smSDK::getInstance()->getEventDispatcher()->registerEventHandler( this,SIMMEDTK_EVENTTYPE_KEYBOARD);
 		left=0.0;
 		bottom=0.0;
 		right=1.0;
@@ -308,7 +308,7 @@ public:
 		smKeyboardEventData *keyBoardData;
 
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 
 			if(keyBoardData->keyBoardKey==Qt::Key_Return||keyBoardData->keyBoardKey==Qt::Key_Enter){

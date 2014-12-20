@@ -75,8 +75,8 @@ public:
 	smHapticCameraTrans(smInt p_deviceID=0){
 		deviceId=p_deviceID;
 		newEvent->data=new smCameraEventData();
-		newEvent->eventType=SOFMIS_EVENTTYPE_CAMERA_UPDATE;
-		dispatch->registerEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
+		newEvent->eventType=SIMMEDTK_EVENTTYPE_CAMERA_UPDATE;
+		dispatch->registerEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
 		offsetAngle_RightDirection=0;
 		offsetAngle_UpDirection=0;
 	}
@@ -85,7 +85,7 @@ public:
 		smHapticOutEventData *hapticEventData;
 		smVec3d rightVector;
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_HAPTICOUT:
+		case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 			if(!enabled)
 				return;
 
@@ -125,14 +125,14 @@ public:
 		deviceId=p_id;
 		lightIndex=0;
 		newEvent->data=new smLightMotionEventData();
-		newEvent->eventType=SOFMIS_EVENTTYPE_LIGHTPOS_UPDATE;
-		dispatch->registerEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
+		newEvent->eventType=SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE;
+		dispatch->registerEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
 	}
 	/// \brief handled event
 	inline void handleEvent(smEvent *p_event){
 		smHapticOutEventData *hapticEventData;
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_HAPTICOUT:
+		case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 			if(!enabled)
 				return;
 

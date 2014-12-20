@@ -62,12 +62,12 @@ void smStylusRigidSceneObject::initDraw(smDrawParam p_params){
 }
 
 smStylusSceneObject::smStylusSceneObject(smErrorLog *p_log){
-	type=SOFMIS_SMSTYLUSSCENEOBJECT;
+	type=SIMMEDTK_SMSTYLUSSCENEOBJECT;
 	toolEnabled=true;
 }
 
 smStylusRigidSceneObject::smStylusRigidSceneObject(smErrorLog *p_log){
-	type=SOFMIS_SMSTYLUSRIGIDSCENEOBJECT;
+	type=SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT;
 	updateViewerMatrixEnabled=true;
 	rootIterator=meshes.begin();
 	posCallBackEnabledForEntireObject=false;
@@ -75,7 +75,7 @@ smStylusRigidSceneObject::smStylusRigidSceneObject(smErrorLog *p_log){
 }
 
 smStylusDeformableSceneObject::smStylusDeformableSceneObject(smErrorLog *p_log){
-	type=SOFMIS_SMSTYLUSDEFORMABLESCENEOBJECT;
+	type=SIMMEDTK_SMSTYLUSDEFORMABLESCENEOBJECT;
 }
 
 smMeshContainer *smStylusRigidSceneObject::getMeshContainer(QString p_string) const{

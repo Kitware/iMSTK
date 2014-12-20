@@ -18,26 +18,26 @@
 #include "smCore/smStaticSceneObject.h"
 #include "smCore/smGeometry.h"
 
-#define SOFMIS_SPATIALGRID_MAXPRIMITIVES 500
-#define SOFMIS_SPATIALGRID_MAXCELLS 1000
-#define SOFMIS_SMLATTICE_NONE					(0)
-#define SOFMIS_SMLATTICE_ALL					(1<<1)
-#define SOFMIS_SMLATTICE_MINMAXPOINTS			(1<<2)
-#define SOFMIS_SMLATTICE_SEPERATIONLINES		(1<<3)
-#define SOFMIS_SMLATTICE_CELLS					(1<<4)
-#define SOFMIS_SMLATTICE_CELLCENTERS			(1<<5)
-#define SOFMIS_SMLATTICE_CELLPOINTS				(1<<6)
-#define SOFMIS_SMLATTICE_CELLPOINTSLINKS		(1<<7)
-#define SOFMIS_SMLATTICE_CENTER					(1<<8)
-#define SOFMIS_SMLATTICE_CELLVERTICES			(1<<9)
-#define SOFMIS_SMLATTICE_CELLACTIVEVERTICES		(1<<10)
-#define SOFMIS_SMLATTICE_CELLTRIANGLES			(1<<11)
+#define SIMMEDTK_SPATIALGRID_MAXPRIMITIVES 500
+#define SIMMEDTK_SPATIALGRID_MAXCELLS 1000
+#define SIMMEDTK_SMLATTICE_NONE					(0)
+#define SIMMEDTK_SMLATTICE_ALL					(1<<1)
+#define SIMMEDTK_SMLATTICE_MINMAXPOINTS			(1<<2)
+#define SIMMEDTK_SMLATTICE_SEPERATIONLINES		(1<<3)
+#define SIMMEDTK_SMLATTICE_CELLS					(1<<4)
+#define SIMMEDTK_SMLATTICE_CELLCENTERS			(1<<5)
+#define SIMMEDTK_SMLATTICE_CELLPOINTS				(1<<6)
+#define SIMMEDTK_SMLATTICE_CELLPOINTSLINKS		(1<<7)
+#define SIMMEDTK_SMLATTICE_CENTER					(1<<8)
+#define SIMMEDTK_SMLATTICE_CELLVERTICES			(1<<9)
+#define SIMMEDTK_SMLATTICE_CELLACTIVEVERTICES		(1<<10)
+#define SIMMEDTK_SMLATTICE_CELLTRIANGLES			(1<<11)
 
 /// \brief !!
 enum smLatticeReturnType{
-	SOFMIS_LATTICE_OK,
-	SOFMIS_LATTICE_INVALIDPARAMS,
-	SOFMIS_LATTICE_INVALIDBOUNDS
+	SIMMEDTK_LATTICE_OK,
+	SIMMEDTK_LATTICE_INVALIDPARAMS,
+	SIMMEDTK_LATTICE_INVALIDBOUNDS
 };
 
 /// \brief !! holds the collision primitive pairs 
@@ -63,7 +63,7 @@ public:
 	smVec3<smFloat> cellCenter;
 	smVec3<smFloat> cellLeftCorner;
 	smVec3<smFloat> cellRightCorner;
-	smCellPrim cellPrimitives[SOFMIS_SPATIALGRID_MAXPRIMITIVES];
+	smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
 	smInt lastPrimitiveIndex;
 	smInt timeStamp;
 	smBool isActive;
@@ -155,7 +155,7 @@ public:
 					index=x+z*xSeperation+y*xSeperation*zSeperation;
 					if(x<0||y<0|z<0||x>=xSeperation||y>=ySeperation||z>=zSeperation){
 						printf("Error index is out of bounds in createllatice function");
-						return SOFMIS_LATTICE_INVALIDBOUNDS;
+						return SIMMEDTK_LATTICE_INVALIDBOUNDS;
 					}
 					cells[index].id=index;	
 					cells[index].cellLeftCorner[0]=p_leftCorner[0]+x*xStep;
@@ -173,7 +173,7 @@ public:
 					cells[index].isActive=false;
 					cells[index].lastPrimitiveIndex=0;
 
-					for(smInt j=0;j<SOFMIS_SPATIALGRID_MAXPRIMITIVES;j++){
+					for(smInt j=0;j<SIMMEDTK_SPATIALGRID_MAXPRIMITIVES;j++){
 						cells[index].cellPrimitives[j].index=0;
 					}
 					counter++;
@@ -189,7 +189,7 @@ public:
 				this->latticeCenter[1]=(p_leftCorner[1]+p_rightCorner[1])/2.0;
 				this->latticeCenter[2]=(p_leftCorner[2]+p_rightCorner[2])/2.0;
 
-				return SOFMIS_LATTICE_OK;
+				return SIMMEDTK_LATTICE_OK;
 	}
 
 	/// \brief !!
@@ -236,7 +236,7 @@ public:
 					index=xIndex+zIndex*xSeperation+yIndex*xSeperation*zSeperation;
 					if(xIndex<0||yIndex<0|zIndex<0||xIndex>=xSeperation||yIndex>=ySeperation||zIndex>=zSeperation)
 						continue;
-					if(cells[index].lastPrimitiveIndex>=SOFMIS_SPATIALGRID_MAXPRIMITIVES){
+					if(cells[index].lastPrimitiveIndex>=SIMMEDTK_SPATIALGRID_MAXPRIMITIVES){
 						return;
 					}
 
@@ -249,35 +249,35 @@ public:
 	inline void updateBounds(smSurfaceMesh* p_mesh,smInt p_index){
 
 		//min
-		aabb[p_index].aabbMin.x=  SOFMIS_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
+		aabb[p_index].aabbMin.x=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
-		aabb[p_index].aabbMin.x = SOFMIS_MIN(aabb[p_index].aabbMin.x,
+		aabb[p_index].aabbMin.x = SIMMEDTK_MIN(aabb[p_index].aabbMin.x,
                                     p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x); 
 
-		aabb[p_index].aabbMin.y=  SOFMIS_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
+		aabb[p_index].aabbMin.y=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
-		aabb[p_index].aabbMin.y = SOFMIS_MIN(aabb[p_index].aabbMin.y,
+		aabb[p_index].aabbMin.y = SIMMEDTK_MIN(aabb[p_index].aabbMin.y,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y); 
 
-		aabb[p_index].aabbMin.z=  SOFMIS_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
+		aabb[p_index].aabbMin.z=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
-		aabb[p_index].aabbMin.z = SOFMIS_MIN(aabb[p_index].aabbMin.z,
+		aabb[p_index].aabbMin.z = SIMMEDTK_MIN(aabb[p_index].aabbMin.z,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z); 
 
 		//max
-		aabb[p_index].aabbMax.x=  SOFMIS_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
+		aabb[p_index].aabbMax.x=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
-		aabb[p_index].aabbMax.x = SOFMIS_MAX(aabb[p_index].aabbMax.x,
+		aabb[p_index].aabbMax.x = SIMMEDTK_MAX(aabb[p_index].aabbMax.x,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x); 
 
-		aabb[p_index].aabbMax.y=  SOFMIS_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
+		aabb[p_index].aabbMax.y=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
-		aabb[p_index].aabbMax.y = SOFMIS_MAX(aabb[p_index].aabbMax.y,
+		aabb[p_index].aabbMax.y = SIMMEDTK_MAX(aabb[p_index].aabbMax.y,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y); 
 
-		aabb[p_index].aabbMax.z=  SOFMIS_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
+		aabb[p_index].aabbMax.z=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
-		aabb[p_index].aabbMax.z = SOFMIS_MAX(aabb[p_index].aabbMax.z,
+		aabb[p_index].aabbMax.z = SIMMEDTK_MAX(aabb[p_index].aabbMax.z,
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z); 
 	}
 
@@ -301,7 +301,7 @@ public:
 		objectType=obj->getType();
 
 		switch(objectType){
-			case SOFMIS_SMSTATICSCENEOBJECT:
+			case SIMMEDTK_SMSTATICSCENEOBJECT:
 				mesh=((smStaticSceneObject*)obj)->mesh;
 			break;
 		}
@@ -314,15 +314,15 @@ public:
 		int index=0;
 		int index2=0;
 		smInt latticeMode;
-		latticeMode=SOFMIS_SMLATTICE_CELLPOINTSLINKS;
+		latticeMode=SIMMEDTK_SMLATTICE_CELLPOINTSLINKS;
 
-		if(cells==NULL||latticeMode==SOFMIS_SMLATTICE_NONE)
+		if(cells==NULL||latticeMode==SIMMEDTK_SMLATTICE_NONE)
 			return;
 
 		glMatrixMode(GL_MODELVIEW);
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat*)&smColor::colorYellow );
 
-		if(latticeMode&SOFMIS_SMLATTICE_SEPERATIONLINES)
+		if(latticeMode&SIMMEDTK_SMLATTICE_SEPERATIONLINES)
 		{	for(int j=0;j<ySeperation;j++){
 			glDisable(GL_LIGHTING);
 			glColor3fv((GLfloat*)&smColor::colorWhite);
@@ -355,14 +355,14 @@ public:
 		glPopMatrix();
 		}
 
-		if(latticeMode&SOFMIS_SMLATTICE_CELLPOINTS||SOFMIS_SMLATTICE_CELLPOINTSLINKS){
+		if(latticeMode&SIMMEDTK_SMLATTICE_CELLPOINTS||SIMMEDTK_SMLATTICE_CELLPOINTSLINKS){
 			for(int y=0;y<ySeperation;y++)
 				for(int z=0;z<zSeperation;z++)
 					for(int x=0;x<xSeperation;x++){
 
 						index=x+z*xSeperation+y*xSeperation*zSeperation;
 
-						if(latticeMode&SOFMIS_SMLATTICE_CELLPOINTSLINKS){
+						if(latticeMode&SIMMEDTK_SMLATTICE_CELLPOINTSLINKS){
 							glDisable(GL_LIGHTING);
 							glDisable(GL_TEXTURE_2D);
 
@@ -433,7 +433,7 @@ public:
 					}
 		}
 
-		if(latticeMode&SOFMIS_SMLATTICE_MINMAXPOINTS){
+		if(latticeMode&SIMMEDTK_SMLATTICE_MINMAXPOINTS){
 			glPushMatrix();
 				glPushMatrix();
 					glTranslatef(cells[0].cellLeftCorner[0],cells[0].cellLeftCorner[1],cells[0].cellLeftCorner[2]);

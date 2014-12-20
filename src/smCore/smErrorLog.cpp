@@ -17,7 +17,7 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text){
 	
 	textLength=strlen(p_text);
 	
-	if(textLength<SOFMIS_MAX_ERRORLOG_TEXT&textLength>0){
+	if(textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0){
 		mutex.lock();
 		if(isOutputtoConsoleEnabled)
 			cout<<p_text<<endl;
@@ -27,8 +27,8 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text){
 		lastError=errorCount;
 
 		errorCount++;
-		if(errorCount>=SOFMIS_MAX_ERRORLOG){
-			lastError=SOFMIS_MAX_ERRORLOG-1;
+		if(errorCount>=SIMMEDTK_MAX_ERRORLOG){
+			lastError=SIMMEDTK_MAX_ERRORLOG-1;
 			errorCount=0;
 		}
 		mutex.unlock();
@@ -51,15 +51,15 @@ smBool smErrorLog::addError(const smChar *p_text){
 
 	textLength=strlen(p_text);
 	
-	if(textLength<SOFMIS_MAX_ERRORLOG_TEXT&textLength>0){
+	if(textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0){
 		mutex.lock();
 		errorCount++;
 		strcpy(errors[errorCount],p_text);
 		timeStamp[errorCount]=time.elapsed();
 		lastError=errorCount;
 
-		if(errorCount>=SOFMIS_MAX_ERRORLOG){
-			lastError=SOFMIS_MAX_ERRORLOG-1;
+		if(errorCount>=SIMMEDTK_MAX_ERRORLOG){
+			lastError=SIMMEDTK_MAX_ERRORLOG-1;
 			errorCount=0;
 		}
 		mutex.unlock();
@@ -77,8 +77,8 @@ smBool smErrorLog::addError(const string p_text){
 void smErrorLog::cleanAllErrors(){
 
 	mutex.lock();
-	for(smInt i=0;i<SOFMIS_MAX_ERRORLOG;i++){
-		memset(errors[i],'\0',SOFMIS_MAX_ERRORLOG_TEXT);
+	for(smInt i=0;i<SIMMEDTK_MAX_ERRORLOG;i++){
+		memset(errors[i],'\0',SIMMEDTK_MAX_ERRORLOG_TEXT);
 	}
 	mutex.unlock();
 }

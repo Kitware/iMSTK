@@ -1,6 +1,6 @@
 #include "smCore/smConfig.h"
 
-#ifndef SOFMIS_OPERATINGSYSTEM_LINUX
+#ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -344,4 +344,4 @@ Error:
 	return 0;
 }
 
-#endif //ifndef SOFMIS_OPERATINGSYSTEM_LINUX
+#endif //ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX

@@ -33,7 +33,7 @@ public:
 
 	/// \param p_threadsForWorkers	choose the number of worker threads
 	smSynchronization(smInt p_threadsForWorkers){
-		type=	SOFMIS_SMSYNCHRONIZATION;
+		type=	SIMMEDTK_SMSYNCHRONIZATION;
 		totalWorkers=p_threadsForWorkers;
 		finishedWorkerCounter=0;
 		startedWorkerCounter=0;
@@ -95,9 +95,9 @@ public:
 
 		smEvent *eventSynch;
 		eventSynch=new smEvent();
-		eventSynch->eventType=SOFMIS_EVENTTYPE_SYNCH;
+		eventSynch->eventType=SIMMEDTK_EVENTTYPE_SYNCH;
 		eventSynch->senderId=moduleId;
-		eventSynch->senderType=SOFMIS_SENDERTYPE_EVENTSOURCE;
+		eventSynch->senderType=SIMMEDTK_SENDERTYPE_EVENTSOURCE;
 		serverMutex.lock();
 		taskStart.wakeAll();
 		taskDone.wait(&serverMutex);

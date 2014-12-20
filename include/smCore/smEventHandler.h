@@ -37,7 +37,7 @@ public:
 	smEventHandlerHolder(){
 		enabled=true;
 		handler=NULL;
-		registeredEventType=SOFMIS_EVENTTYPE_NONE;
+		registeredEventType=SIMMEDTK_EVENTTYPE_NONE;
 	}
 	smEventHandler *handler;
 	smEventType	 registeredEventType;
@@ -53,8 +53,8 @@ private:
 	vector<smEventHandlerHolder*>handlers;
 	/// \brief message id counter. used to assign an ID for each message
 	QAtomicInt messageId;
-	/// \brief event holder. holds SOFMIS_MAX_EVENTSBUFFER of number holder 
-	smEventHolder eventHolder[SOFMIS_MAX_EVENTSBUFFER];
+	/// \brief event holder. holds SIMMEDTK_MAX_EVENTSBUFFER of number holder 
+	smEventHolder eventHolder[SIMMEDTK_MAX_EVENTSBUFFER];
 
 public:
 	/// \brief constructor. Id is initialized to 1.
@@ -82,7 +82,7 @@ public:
 		int v=handlers.size();
 		for(smInt i=0;i<v;i++){
 			if(handlers[i]->enabled&&p_event->eventType==handlers[i]->registeredEventType||
-               handlers[i]->registeredEventType==SOFMIS_EVENTTYPE_ALL)
+               handlers[i]->registeredEventType==SIMMEDTK_EVENTTYPE_ALL)
 				handlers[i]->handler->handleEvent(p_event);
 		}
 	}

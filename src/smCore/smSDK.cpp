@@ -77,11 +77,11 @@ void smSDK::updateSceneListAll(){
 	QHash<smInt, smModule*>::iterator moduleIterator;
 }
 
-/// \brief Initialize all modules registered to the Sofmis SDK
+/// \brief Initialize all modules registered to the SimMedTK SDK
 void smSDK::initRegisteredModules(){
 
 	for(smInt i=0;i<modulesRef->size();i++)
-		if((*modulesRef)[i].module->getType()!=SOFMIS_SMVIEWER)
+		if((*modulesRef)[i].module->getType()!=SIMMEDTK_SMVIEWER)
 			(*modulesRef)[i].module->init();
 }
 
@@ -144,7 +144,7 @@ void smSDK::handleEvent(smEvent *p_event){
 
 	switch(p_event->eventType.eventTypeCode){
 
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_Escape)
 				terminateAll();

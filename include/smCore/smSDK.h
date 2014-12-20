@@ -23,11 +23,11 @@
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
 /// \brief maximum entities in the framework
-#define SOFMIS_SDK_MAXMESHES 100
-#define SOFMIS_SDK_MAXMODULES 100
-#define SOFMIS_SDK_MAXOBJECTSIMULATORS 100
-#define SOFMIS_SDK_MAXSCENES 100
-#define SOFMIS_SDK_MAXSCENEOBJTECTS 100
+#define SIMMEDTK_SDK_MAXMESHES 100
+#define SIMMEDTK_SDK_MAXMODULES 100
+#define SIMMEDTK_SDK_MAXOBJECTSIMULATORS 100
+#define SIMMEDTK_SDK_MAXSCENES 100
+#define SIMMEDTK_SDK_MAXSCENEOBJTECTS 100
 
 class smMotionTransformer;
 class smPipe;
@@ -35,8 +35,8 @@ template<typename T> class smIndiceArray;
 class smScene;
 /// \brief module registration
 enum smSDKReturnType{
-	SOFMIS_SDK_MODULEREGISTERED,
-	SOFMIS_SDK_MODULEREGISTEREDALREADY
+	SIMMEDTK_SDK_MODULEREGISTERED,
+	SIMMEDTK_SDK_MODULEREGISTEREDALREADY
 };
 
 struct smBaseHolder{
@@ -167,29 +167,29 @@ protected:
 	/// \brief constructor
 	smSDK(){
 		smInt argc=1;
-		smChar *argv[]={SOFMISVERSION_TEXT};
+		smChar *argv[]={SIMMEDTKVERSION_TEXT};
 		application=new QApplication(argc,argv);
 		errorLog=new smErrorLog();
 		dispathcer=new smDispatcher();
 		eventDispatcher= new smEventDispatcher();
-		eventDispatcher->registerEventHandler(this,SOFMIS_EVENTTYPE_KEYBOARD);
+		eventDispatcher->registerEventHandler(this,SIMMEDTK_EVENTTYPE_KEYBOARD);
 
 		sceneIdCounter=1;
 			//objectIdCounter=1;
 		isModulesStarted=false;
-		type=SOFMIS_SMSDK;
+		type=SIMMEDTK_SMSDK;
 		viewer=NULL;
 		simulator=NULL;
 		sceneList.clear();
 
 
-		meshesRef=new smIndiceArray<smMeshHolder>(SOFMIS_SDK_MAXMESHES);
-		modulesRef=new smIndiceArray<smModuleHolder>(SOFMIS_SDK_MAXMODULES) ;
-		objectSimulatorsRef=new smIndiceArray<smObjectSimulatorHolder>(SOFMIS_SDK_MAXOBJECTSIMULATORS);
-		collisionDetectorsRef=new smIndiceArray<smObjectSimulatorHolder>(SOFMIS_SDK_MAXOBJECTSIMULATORS) ;
-		scenesRef=new smIndiceArray<smSceneHolder>(SOFMIS_SDK_MAXSCENES);
-		sceneObjectsRef=new smIndiceArray<smSceneObjectHolder>(SOFMIS_SDK_MAXSCENEOBJTECTS);
-		pipesRef=new smIndiceArray<smPipeHolder>(SOFMIS_SDK_MAXSCENEOBJTECTS);
+		meshesRef=new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
+		modulesRef=new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
+		objectSimulatorsRef=new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
+		collisionDetectorsRef=new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
+		scenesRef=new smIndiceArray<smSceneHolder>(SIMMEDTK_SDK_MAXSCENES);
+		sceneObjectsRef=new smIndiceArray<smSceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
+		pipesRef=new smIndiceArray<smPipeHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
 	}
 
 public:
