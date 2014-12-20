@@ -10,10 +10,10 @@ void CollisionDetectionExample::initHapticCamMotion(){
 	hapticInterface = new smPhantomInterface();
 	hapticInterface->forceEnabled=false;//disable forces right now for all devices
 	hapticInterface->startDevice();
-	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	motionTrans=new	smHapticCameraTrans (0);
 	motionTrans->setMotionScale(0.1);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
 	viewer->enableCameraMotion=true;
 }
 
@@ -26,7 +26,7 @@ CollisionDetectionExample::CollisionDetectionExample(){
 	spatGrid=new smSpatialGrid();
 
 	///create the sdk
-	sofmisSDK=smSDK::createSDK();
+	simmedtkSDK=smSDK::createSDK();
 	///create scene objects
 	object1=new smStaticSceneObject();
 	object2=new smStaticSceneObject();
@@ -36,11 +36,11 @@ CollisionDetectionExample::CollisionDetectionExample(){
 	lat2= new smLattice();
 
 	///create a scene
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 
 	///dummy simulator. it translates the object
 	dummySim=new smDummySimulator(smSDK::getErrorLog());
-	sofmisSDK->getEventDispatcher()->registerEventHandler(dummySim,SOFMIS_EVENTTYPE_KEYBOARD);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(dummySim,SIMMEDTK_EVENTTYPE_KEYBOARD);
 
 	///init texture manager and give the texture file names to be loaded
 	smTextureManager::init(smSDK::getErrorLog());
@@ -58,7 +58,7 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	///texture attachment needed for fixed opengl rendering if texture is needed
 	object1->mesh->assignTexture("livertexture1");
-	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	object1->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 	object1->mesh->translate(7,0,0);
 	object1->renderDetail.lineSize=2;
 	object1->renderDetail.pointSize=5;
@@ -76,46 +76,46 @@ CollisionDetectionExample::CollisionDetectionExample(){
 
 	object2->mesh->assignTexture("livertexture2");
 	object2->renderDetail.shadowColor.rgba[0]=1.0;
-	object2->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	object2->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 
 	lat2->addObject(object2);
 	spatGrid->addLattice(lat2);
 	spatGrid->pipe->registerListener(&this->myCollInformation);
 	this->myCollInformation.listenerObject=&*this;
-	this->myCollInformation.regType=SOFMIS_PIPE_BYREF;
+	this->myCollInformation.regType=SIMMEDTK_PIPE_BYREF;
 
 	///register the module for spatial grid
-	sofmisSDK->registerModule(spatGrid);	
+	simmedtkSDK->registerModule(spatGrid);	
 
 	//add object to the scene
 	scene1->addSceneObject(object1);
 	scene1->addSceneObject(object2);
 
 	///create the simulator
-	simulator=sofmisSDK->createSimulator();
+	simulator=simmedtkSDK->createSimulator();
 	///attach the dummy simulator
 	simulator->registerObjectSimulator(dummySim);
 
 	///create a viewer
-	viewer=sofmisSDK->createViewer();
+	viewer=simmedtkSDK->createViewer();
 
 	//specify the viewer global settings
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GROUND;
 	viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
 	viewer->camera()->setZClippingCoefficient(1000);
 	viewer->camera()->setZNearCoefficient(0.001);
 	viewer->list();
-	viewer->setWindowTitle("SOFMIS TEST");
+	viewer->setWindowTitle("SimMedTK TEST");
 
 	///assign dispatcher
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
 	///You can either add object to the viewer or add object to the scene. Draw function will be called
 	viewer->addObject(spatGrid);
 	viewer->addObject(this);
 
 	///run the simulation
-	sofmisSDK->run();
+	simmedtkSDK->run();
 }
 
 CollisionDetectionExample::~CollisionDetectionExample(){

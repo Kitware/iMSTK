@@ -9,9 +9,9 @@
 
 CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash(){
 	///create the sdk
-	sofmisSDK=smSDK::createSDK();
+	simmedtkSDK=smSDK::createSDK();
 	///create scene
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 	
 	///intializes the spatial hashing
 	hash=new smSpatialHash(smSDK::getErrorLog(),10000,2,2,2);
@@ -26,7 +26,7 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash(){
 	
 
 	///init dispacther for events
-	sofmisSDK->getEventDispatcher()->registerEventHandler(dummySim,SOFMIS_EVENTTYPE_KEYBOARD);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(dummySim,SIMMEDTK_EVENTTYPE_KEYBOARD);
 
 	///init texture manager and specify the textures needed for the current application
 	smTextureManager::init(smSDK::getErrorLog());
@@ -47,7 +47,7 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash(){
 	///assign a texture
 	object1->mesh->assignTexture("livertexture1");
 	///set the rendering features
- 	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+ 	object1->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 	object1->mesh->translate(7,3,0);
 	object1->renderDetail.lineSize=2;
 	object1->renderDetail.pointSize=5;
@@ -62,12 +62,12 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash(){
 
 	object2->mesh->assignTexture("livertexture2");
 	object2->renderDetail.shadowColor.rgba[0]=1.0;
-	object2->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	object2->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 	hash->addMesh(object2->mesh);
 
 	///we want to get information with pipe
 	this->myCollInformation.listenerObject=&*this;
-	this->myCollInformation.regType=SOFMIS_PIPE_BYREF;
+	this->myCollInformation.regType=SIMMEDTK_PIPE_BYREF;
 
 	hash->pipeTriangles->registerListener(&this->myCollInformation);
 	
@@ -76,28 +76,28 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash(){
 	scene1->addSceneObject(object1);
 	scene1->addSceneObject(object2);
 	///create a simulator module
-	simulator=sofmisSDK->createSimulator();
+	simulator=simmedtkSDK->createSimulator();
 	simulator->registerObjectSimulator(dummySim);
 	simulator->registerCollisionDetection(hash);
 
 	///create a viewer
-	viewer=sofmisSDK->createViewer();	
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
+	viewer=simmedtkSDK->createViewer();	
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GROUND;
 	viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
 	viewer->camera()->setZClippingCoefficient(1000);
 	viewer->camera()->setZNearCoefficient(0.001);
 	viewer->list();
-    viewer->setWindowTitle("SOFMIS TEST");
+    viewer->setWindowTitle("SimMedTK TEST");
 
 	///we want viewer to render this object
 	viewer->addObject(this);
 
 	///set event distpacher to the viewer
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	simulator->registerSimulationMain(this);
 	
 	///run the SDK
-    sofmisSDK->run();
+    simmedtkSDK->run();
  }
 
 ///Draw the collided triangles. This will be called due to the function call viewer->addObject(this) 

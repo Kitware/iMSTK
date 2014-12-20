@@ -31,10 +31,10 @@ void VAORendering::initHapticCamMotion(){
 	hapticInterface = new smPhantomInterface();
 	hapticInterface->forceEnabled=false;//disable forces right now for all devices
 	hapticInterface->startDevice();
-	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	//motionTrans=new	smHapticCameraTrans (0);
 	//motionTrans->setMotionScale(0.1);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
 	//viewer->enableCameraMotion=true;
 
 }
@@ -51,18 +51,18 @@ VAORendering::VAORendering(){
 
 	
 	///create the SDK
-	sofmisSDK=smSDK::createSDK();
+	simmedtkSDK=smSDK::createSDK();
 	///create objects
   	object1=new smStaticSceneObject();		
 	object2=new smStaticSceneObject();		
 
 
 	///create a scene
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 	///create a dummy simulator
 	dummySim=new smDummySimulator(smSDK::getErrorLog());
 	///registers the dummy simulato with keyboard event
-	sofmisSDK->getEventDispatcher()->registerEventHandler(dummySim,SOFMIS_EVENTTYPE_KEYBOARD);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(dummySim,SIMMEDTK_EVENTTYPE_KEYBOARD);
 
 	///texture manager init and image loading
 	smTextureManager::init(smSDK::getErrorLog());
@@ -82,7 +82,7 @@ VAORendering::VAORendering(){
 
 	
 	//object1->mesh->assignTexture("livertexture1");
- 	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR|SOFMIS_RENDER_VAO);
+ 	object1->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR|SIMMEDTK_RENDER_VAO);
 	object1->mesh->translate(7,3,0);
 	object1->renderDetail.lineSize=2;
 	object1->renderDetail.pointSize=5;
@@ -95,7 +95,7 @@ VAORendering::VAORendering(){
 	///assigne a texture for fixed shading( not for shader enabled rendeirng)
 	object2->mesh->assignTexture("livertexture2");
 	object2->renderDetail.shadowColor.rgba[0]=1.0;
-	object2->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	object2->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 
 	
 	
@@ -104,18 +104,18 @@ VAORendering::VAORendering(){
 	//scene1->addSceneObject(object2);
 
 	///create a simulator module
-	simulator=sofmisSDK->createSimulator();
+	simulator=simmedtkSDK->createSimulator();
 	//simulator->registerObjectSimulator(dummySim);
 	simulator->registerSimulationMain(this);
 
 	///create viewer
-	viewer=sofmisSDK->createViewer();	
+	viewer=simmedtkSDK->createViewer();	
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail;
 	viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
 	viewer->camera()->setZClippingCoefficient(10000);
 	viewer->camera()->setZNearCoefficient(0.001);
 	viewer->list();
-    viewer->setWindowTitle("SOFMIS TEST");
+    viewer->setWindowTitle("SimMedTK TEST");
 
 
 	///creaate a shader
@@ -143,7 +143,7 @@ VAORendering::VAORendering(){
 	
 
 	///set viewer dispatcher
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	
 	//viewer->addObject(&lat2);
 	//viewer->addObject(spatGrid);
@@ -153,7 +153,7 @@ VAORendering::VAORendering(){
 	initHapticCamMotion();//initiate the haptic motion with camera
 	
 	///run the sdk
-    sofmisSDK->run();
+    simmedtkSDK->run();
  }
 
  ///clean up

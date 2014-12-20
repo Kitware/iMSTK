@@ -17,7 +17,7 @@ class VAORendering:public smSimulationMain,public smCoreClass{
 public:
 	smStaticSceneObject  *object1;
 	smStaticSceneObject  *object2;
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 	smScene *scene1;
 	smDummySimulator *dummySim;
 	smViewer *viewer;

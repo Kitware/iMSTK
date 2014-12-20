@@ -52,14 +52,14 @@ void main(){
 	MyStylus *hapticStylus;
 	HookCautery *hapticStylus1;
 	smPhantomInterface * hapticInterface;
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 	smScene *scene1;
 	smViewer *viewer;
 	smSimulator *simulator;
 	smToolSimulator *toolSim; 
 
 	///Initializes the lights
-	smLight light("light0",SOFMIS_LIGHT_INFINITELIGHT,SOFMIS_LIGHTPOS_EYE);
+	smLight light("light0",SIMMEDTK_LIGHT_INFINITELIGHT,SIMMEDTK_LIGHTPOS_EYE);
 	light.lightColorDiffuse.setValue(0.8,0.8,0.8,1);
 	light.lightColorAmbient.setValue(0.4,0.4,0.4,1);
 	light.lightColorSpecular.setValue(0.9,0.9,0.9,1);
@@ -71,7 +71,7 @@ void main(){
 	light.drawEnabled=false;
 
 
-	smLight light2("light1",SOFMIS_LIGHT_SPOTLIGHT,SOFMIS_LIGHTPOS_WORLD);
+	smLight light2("light1",SIMMEDTK_LIGHT_SPOTLIGHT,SIMMEDTK_LIGHTPOS_WORLD);
 	light2.lightColorDiffuse.setValue(0.4,0.4,0.4,1);
 	light2.lightColorAmbient.setValue(0.1,0.1,0.1,1);
 	light2.lightColorSpecular.setValue(0.1,0.1,0.1,1);
@@ -84,7 +84,7 @@ void main(){
 	light2.castShadow=true;
 
 	///init texture manager and load the textures
-	smTextureManager::init(sofmisSDK->getErrorLog());
+	smTextureManager::init(simmedtkSDK->getErrorLog());
 	smTextureManager::loadTexture("../../resources/textures/metal.bmp","metal",true);
 	smTextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp","hookCautery");
 	smTextureManager::loadTexture("../../resources/textures/metalbump.bmp","bump");
@@ -110,7 +110,7 @@ void main(){
 	hapticStylus->meshContainer.mesh->updateVertexNormals();
 
 	///set the rendering details  
-	hapticStylus->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	hapticStylus->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 
 	///create another tool. This is a cautery tool that has  only a shaft 
 	hapticStylus1=new HookCautery();
@@ -118,68 +118,68 @@ void main(){
 	///assign this to second phantom
 	hapticStylus1->phantomID=1;
 
-	//hapticStylus1->renderDetail.renderType=hapticStylus1->renderDetail.renderType|SOFMIS_RENDER_NONE;
-	hapticStylus1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	//hapticStylus1->renderDetail.renderType=hapticStylus1->renderDetail.renderType|SIMMEDTK_RENDER_NONE;
+	hapticStylus1->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 
 	///creates tool simulator
 	toolSim= new smToolSimulator(smSDK::getErrorLog()); 
 
 	///define the execution of the simulator. 
-	toolSim->setExecutionType(SOFMIS_SIMEXECUTION_ASYNCMODE);
+	toolSim->setExecutionType(SIMMEDTK_SIMEXECUTION_ASYNCMODE);
 
 	///assigns the tools to tool simulator
 	hapticStylus->attachObjectSimulator(toolSim);
 	hapticStylus1->attachObjectSimulator(toolSim);
 
 	///creates SDK
-	sofmisSDK=smSDK::createSDK();
+	simmedtkSDK=smSDK::createSDK();
 
 	///create a scene. 
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 	scene1->setName("Scene1");
 	scene1->addSceneObject(hapticStylus); 
 	scene1->addSceneObject(hapticStylus1);
 
 	///create the simulator module
-	simulator=sofmisSDK->createSimulator();
+	simulator=simmedtkSDK->createSimulator();
 	simulator->registerObjectSimulator(toolSim);
 
 	///creates viewer
-	viewer=sofmisSDK->createViewer();	
+	viewer=simmedtkSDK->createViewer();	
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail;
 	viewer->list();
-	viewer->setWindowTitle("SOFMIS TEST");
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GLOBALAXIS|SOFMIS_VIEWERRENDER_RESTORELASTCAMSETTINGS;
+	viewer->setWindowTitle("SimMedTK TEST");
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GLOBALAXIS|SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS;
 	viewer->camera()->setZClippingCoefficient(100);
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
 	///add lights
 	viewer->addLight(&light);
 	viewer->addLight(&light2);
 
 	///register viewer with the  set of events 
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICOUT);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICIN);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_HAPTICIN);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
 
 	///create a phanotm interface
 	hapticInterface = new smPhantomInterface();
-	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
 	///register tools for haptic out and keyboard events 
-	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SOFMIS_EVENTTYPE_HAPTICOUT);
-	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SOFMIS_EVENTTYPE_KEYBOARD);
-	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SOFMIS_EVENTTYPE_KEYBOARD);
-	sofmisSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SOFMIS_EVENTTYPE_HAPTICOUT);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(hapticStylus,SIMMEDTK_EVENTTYPE_KEYBOARD);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SIMMEDTK_EVENTTYPE_KEYBOARD);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(hapticStylus1,SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
 	///register haptic module
-	sofmisSDK->registerModule(hapticInterface);
+	simmedtkSDK->registerModule(hapticInterface);
 
 	///we want to call haptic inteface draw routine too
 	viewer->addObject(hapticInterface);
 
 	///run  the SDK
-	sofmisSDK->run();
+	simmedtkSDK->run();
 }
 
 

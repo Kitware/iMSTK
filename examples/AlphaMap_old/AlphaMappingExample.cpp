@@ -10,10 +10,10 @@ void AlphaMapExample::initHapticCamMotion(){
 	hapticInterface = new smPhantomInterface();
 	hapticInterface->forceEnabled=false;//disable forces right now for all devices
 	hapticInterface->startDevice();
-	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	motionTrans=new	smHapticCameraTrans (0);
 	motionTrans->setMotionScale(0.1);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
 	viewer->enableCameraMotion=true;
 
 }
@@ -24,12 +24,12 @@ AlphaMapExample::AlphaMapExample(){
 	motionTrans=NULL;
 	hapticInterface=NULL;
 
-	sofmisSDK=smSDK::createSDK();
+	simmedtkSDK=smSDK::createSDK();
 	object1=new smStaticSceneObject();
 
 	MetalShader *metalShader=new MetalShader();
 	metalShader->registerShader();
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 
 	smTextureManager::init(smSDK::getErrorLog());
 	smTextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg","groundImage");
@@ -51,8 +51,8 @@ AlphaMapExample::AlphaMapExample(){
 	metalShader->attachTexture(object1->mesh->uniqueId,"noOCC","OCCTex");
 	metalShader->attachTexture(object1->mesh->uniqueId,"alpha","AlphaTex");
 
-	object1->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|
-							SOFMIS_RENDER_MATERIALCOLOR|SOFMIS_RENDER_TRANSPARENT);
+	object1->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|
+							SIMMEDTK_RENDER_MATERIALCOLOR|SIMMEDTK_RENDER_TRANSPARENT);
 	object1->renderDetail.addShader(metalShader->uniqueId);
 	object1->mesh->translate(0,10,-100);
 	object1->mesh->scale(smVec3f(2,2,2));
@@ -62,19 +62,19 @@ AlphaMapExample::AlphaMapExample(){
 	/// add object to the scene
 	scene1->addSceneObject(object1);
 
-	viewer=sofmisSDK->createViewer();	
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
+	viewer=simmedtkSDK->createViewer();	
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GROUND;
 	viewer->list();
-	viewer->setWindowTitle("SOFMIS TEST");
+	viewer->setWindowTitle("SimMedTK TEST");
 
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	viewer->camera()->setZClippingCoefficient(1000);
 	viewer->camera()->setZNearCoefficient(0.001);
 	viewer->list();
 	viewer->addObject(this);
 	viewer->addObject(metalShader);
 
-	sofmisSDK->run();
+	simmedtkSDK->run();
 }
 
 /// \brief !!

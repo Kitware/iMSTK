@@ -17,7 +17,7 @@ class AlphaMapExample:public smSimulationMain,public smCoreClass{
 
 public:
 	smStaticSceneObject  *object1;
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 	smScene *scene1;
 	smViewer *viewer;
 
