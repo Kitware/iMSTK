@@ -117,14 +117,14 @@ public:
 	smRenderingStageType renderStage;
 	smBool boostViewer;
 
-	///if the camera motion is enabled from other external devices 
+	///if the camera motion is enabled from other external devices
 	smBool enableCameraMotion;
 
 	//it is public for now
 	smOpenGLWindowStream *windowOutput;
 	/// \brief Viewer settings
 	smUInt viewerRenderDetail;
-	/// \brief enable console display 
+	/// \brief enable console display
 	smBool consoleDisplay;
 	/// \brief camera collision enabled/disabled
 	bool isCameraCollided;
@@ -155,7 +155,7 @@ public:
 	void updateText(smInt p_handle,QString p_string);
 	/// \brief change window resolution
 	void setScreenResolution(smInt p_width,smInt p_height);
-	/// \brief set scene as texture 
+	/// \brief set scene as texture
 	void setSceneAsTextureShader(SceneTextureShader *p_shader);
 	smColor defaultDiffuseColor;
 	smColor defaultAmbientColor;
@@ -168,21 +168,6 @@ public:
 	smVec3d finalDeviceUpCameraDir;
 	smVec3d finalDeviceRightCameraDir;
 
-	/// \brief  TrakStar motion tracking
-	/// \brief Pipe to receive the trakstar information
-	#ifdef smATC3DGInterface__
-		smPipeRegisteration trakstarpipeReg; //Trakstar
-		smFloat trakStar_caliRotMat[9];
-		smFloat trakStar_curRotMat[9];
-		smFloat trakStar_mvRotMat[9];
-		smVec3f trakStar_caliPos;
-		smVec3f trakStar_offPos;
-		smVec3f trakStar_curPos;
-		smBool trakStar_enable;
-
-		void processTrakstarData();
-	#endif
-
 protected:
 	/// \brief
 	void initDepthBuffer();
@@ -190,7 +175,7 @@ protected:
 	void setToDefaults();
 	/// \brief Texture for shadow mapping
 	smGLUInt shadowMapTexture;
-	/// \brief called in the beginning of each frame 
+	/// \brief called in the beginning of each frame
 	virtual void beginFrame();
 	/// \brief called in the end of each frame
 	virtual void endFrame();
@@ -212,7 +197,7 @@ protected:
 	void handleEvent(smEvent *p_event);
 	/// \brief  enable attached lights
 	void enableLights();
-	/// \brief  scale for light drawing in the scene.  
+	/// \brief  scale for light drawing in the scene.
 	smFloat lightDrawScale;
 	//delete this..this is for demo..
 	smVec3<smDouble> hapticPosition;
@@ -221,7 +206,7 @@ protected:
 	void dropEvent(QDropEvent *event);
 	/// \brief  drag an object
 	void dragEnterEvent(QDragEnterEvent *event);
-	/// \brief  launches the the viewer. don't call sdk will call this 
+	/// \brief  launches the the viewer. don't call sdk will call this
 	virtual void exec();
 
 public:
@@ -234,7 +219,7 @@ public:
 	/// \brief  check if the camera is collided or not
 	smBool  checkCameraCollisionWithScene();
 	void addCollisionCheckMeshes(smMesh *mesh);
-	/// \brief  stores the  meshes that the collision check  will be performed with camera. 
+	/// \brief  stores the  meshes that the collision check  will be performed with camera.
 	vector<smMesh*> collisionMeshes;
 	/// \brief  camera effective radius
 	smFloat cameraRadius;
@@ -244,7 +229,7 @@ public:
 	smVec3f lastCamPos;
 	/// \brief   check camera is collided
 	smBool checkCameraCollision;
-	/// \brief  camera collision callback  
+	/// \brief  camera collision callback
 	smCameraCollisionInterface *notes_cameraCollision;
 	/// \brief   for dynamic reflection
 	MetalShader *renderandreflection;

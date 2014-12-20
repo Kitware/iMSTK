@@ -29,8 +29,6 @@ set(sources_sofmis
 ./smMesh/smMesh.cpp
 ./smMesh/smSurfaceMesh.cpp
 ./smMesh/smVolumeMesh.cpp
-./smRenderEffects/smEffectSim.cpp
-./smRenderEffects/SmokeEffect.cpp
 ./smRendering/smConfigRendering.cpp
 ./smRendering/smFrameBuffer.cpp
 ./smRendering/smLight.cpp
@@ -62,7 +60,6 @@ endif()
 
 set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
   ./smExternalDevices/smADUInterface.cpp
-  ./smExternalDevices/smATC3DGInterface.cpp
   ./smExternalDevices/smNIUSB6008Interface.cpp
 )
 
@@ -90,10 +87,8 @@ target_link_libraries(sofmis
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
-  ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
-  ${ATC_LIBRARY}
   ${AUDIERE_LIBRARY}
   ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
@@ -115,10 +110,8 @@ target_link_libraries(externalDevices
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
-  ${OPENCV_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
-  ${ATC_LIBRARY}
   ${AUDIERE_LIBRARY}
   ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
