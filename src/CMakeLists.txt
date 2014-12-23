@@ -47,9 +47,7 @@ volumetricMesh
 set(sources_sofmis
 ./smCollision/smSpatialHash.cpp
 ./smCore/smConfig.cpp
-./smCore/smCoreClass.cpp
 ./smCore/smDispatcher.cpp
-./smCore/smDoubleBuffer.cpp
 ./smCore/smErrorLog.cpp
 ./smCore/smEvent.cpp
 ./smCore/smEventHandler.cpp
@@ -87,10 +85,7 @@ set(sources_sofmis
 ./smSimulators/smToolSimulator.cpp
 # ./smSimulators/smVegaConfigFemObject.cpp
 # ./smSimulators/smVegaFemSceneObject.cpp
-./smUtilities/smDisplayText.cpp
 ./smUtilities/smGLUtils.cpp
-./smUtilities/smIOStream.cpp
-./smUtilities/smVec3.cpp
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)
