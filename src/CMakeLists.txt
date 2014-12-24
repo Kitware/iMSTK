@@ -61,7 +61,6 @@ set(sources_sofmis
 ./smCore/smScriptingEngine.cpp
 ./smCore/smSDK.cpp
 ./smCore/smSimulator.cpp
-./smCore/smSpatialGrid.c
 ./smCore/smStaticSceneObject.cpp
 ./smCore/smTextureManager.cpp
 ./smExternal/framebufferObject.cpp
