@@ -1,1 +1,0 @@
-#include "smMesh/smLattice.h"

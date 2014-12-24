@@ -47,9 +47,7 @@ volumetricMesh
 set(sources_sofmis
 ./smCollision/smSpatialHash.cpp
 ./smCore/smConfig.cpp
-./smCore/smCoreClass.cpp
 ./smCore/smDispatcher.cpp
-./smCore/smDoubleBuffer.cpp
 ./smCore/smErrorLog.cpp
 ./smCore/smEvent.cpp
 ./smCore/smEventHandler.cpp
@@ -61,14 +59,11 @@ set(sources_sofmis
 ./smCore/smScriptingEngine.cpp
 ./smCore/smSDK.cpp
 ./smCore/smSimulator.cpp
-./smCore/smSpatialGrid.cpp
 ./smCore/smStaticSceneObject.cpp
 ./smCore/smTextureManager.cpp
 ./smExternal/framebufferObject.cpp
 ./smExternal/renderbuffer.cpp
 ./smMesh/smImportExport.cpp
-./smMesh/smLattice.cpp
-./smMesh/smLatticeType.cpp
 ./smMesh/smMesh.cpp
 ./smMesh/smSurfaceMesh.cpp
 ./smMesh/smVolumeMesh.cpp
@@ -88,12 +83,9 @@ set(sources_sofmis
 ./smSimulators/smPhysXVolumeMesh.cpp
 ./smSimulators/smStylusObject.cpp
 ./smSimulators/smToolSimulator.cpp
-./smSimulators/smVegaConfigFemObject.cpp
-./smSimulators/smVegaFemSceneObject.cpp
-./smUtilities/smDisplayText.cpp
+# ./smSimulators/smVegaConfigFemObject.cpp
+# ./smSimulators/smVegaFemSceneObject.cpp
 ./smUtilities/smGLUtils.cpp
-./smUtilities/smIOStream.cpp
-./smUtilities/smVec3.cpp
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)
