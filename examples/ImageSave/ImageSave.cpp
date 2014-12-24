@@ -2,12 +2,12 @@
 
 class ImageExample:public smCoreClass{
 
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 public:
 
 	ImageExample(){
 		///create the SDK
-		sofmisSDK=smSDK::createSDK();
+		simmedtkSDK=smSDK::createSDK();
 
 		///Init the texture manager before using it
 		smTextureManager::init(smSDK::getErrorLog());
@@ -38,7 +38,7 @@ public:
 		cout<<"Bitmap Image is created"<<endl;
 
 		///run the sdk
-		sofmisSDK->run();
+		simmedtkSDK->run();
 	}
 };
 

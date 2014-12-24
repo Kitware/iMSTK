@@ -43,7 +43,7 @@ protected:
 			object=objectsSimulated[i];
 			type=object->getType();
 			switch(type){
-				case SOFMIS_SMPBDSURFACESCENEOBJECT:
+				case SIMMEDTK_SMPBDSURFACESCENEOBJECT:
 					pbdSurfaceSceneObject=(smPBDSurfaceSceneObject*)object;
 					initObject(pbdSurfaceSceneObject);
 					break;
@@ -67,7 +67,7 @@ protected:
 		for(smInt j=0;j<this->objectsSimulated.size();j++){
 			sceneObj=this->objectsSimulated[j];
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMPBDSURFACESCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMPBDSURFACESCENEOBJECT){
 				pbdSurfaceSceneObject=(smPBDSurfaceSceneObject*)sceneObj;
 				if(!pbdSurfaceSceneObject->flags.isSimulatorInit)
 					initObject(pbdSurfaceSceneObject);
@@ -139,7 +139,7 @@ protected:
 		for(smInt i=0;i<this->objectsSimulated.size();i++){
 			sceneObj=this->objectsSimulated[i];
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMPBDSURFACESCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMPBDSURFACESCENEOBJECT){
 				pbdSurfaceSceneObject=(smPBDSurfaceSceneObject*)sceneObj;
 				pbdSurfaceSceneObject->memBlock->localtoOriginalBlock(QString("pos"),pbdSurfaceSceneObject->mesh->vertices,pbdSurfaceSceneObject->mesh->nbrVertices);
 				pbdSurfaceSceneObject->mesh->updateTriangleNormals();
@@ -153,7 +153,7 @@ protected:
 	void handleEvent(smEvent *p_event){
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_F1)
 				printf("F1 Keyboard is pressed %c\n",keyBoardData->keyBoardKey);

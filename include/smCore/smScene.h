@@ -125,12 +125,12 @@ public:
 
 	smScene(smErrorLog *p_log=NULL);
     /// \brief add obejct to the scene, it is thread safe call.
-	void registerForScene(smCoreClass *p_sofmisObject){
+	void registerForScene(smCoreClass *p_simmedtkObject){
 		smSceneLocal *local=new smSceneLocal();
-		local->id=p_sofmisObject->uniqueId.ID;
+		local->id=p_simmedtkObject->uniqueId.ID;
 		sceneList.lock();
 		copySceneToLocal(local);
-		sceneLocalIndex[p_sofmisObject->uniqueId.ID]=sceneLocal.checkAndAdd(local);
+		sceneLocalIndex[p_simmedtkObject->uniqueId.ID]=sceneLocal.checkAndAdd(local);
 		sceneList.unlock();
 	}
 

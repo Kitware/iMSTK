@@ -32,21 +32,21 @@ smDispathcerResult smDispatcher::handle(smCoreClass *p_caller, smCallerState p_c
 	
 	switch(classType){
 		//handle for viewer
-		SOFMIS_SMVIEWER:
+		SIMMEDTK_SMVIEWER:
 		handleViewer(p_caller,p_callerState);
 		break;
 		//handle for simulator
-		SOFMIS_SMSIMULATOR:
+		SIMMEDTK_SMSIMULATOR:
 		handleSimulator(p_caller,p_callerState);
 
 		break;
 		//handle for collision detection
-		SOFMIS_SMCOLLISIONDETECTION:
+		SIMMEDTK_SMCOLLISIONDETECTION:
 		handleCollisionDetection(p_caller,p_callerState);
 		
 		break;
 	}
 
 	handleAll();
-	return SOFMIS_DISPATCHER_OK;
+	return SIMMEDTK_DISPATCHER_OK;
 }

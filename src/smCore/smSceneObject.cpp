@@ -34,7 +34,7 @@ void smSceneObject::releaseCustomeRenderer(){
 
 smSceneObject::smSceneObject(){
 	
-	type=SOFMIS_SMSCENEBOJECT;       
+	type=SIMMEDTK_SMSCENEBOJECT;       
 	objectSim=NULL;
 	customRender=NULL;
 	smSDK::registerSceneObject(this);

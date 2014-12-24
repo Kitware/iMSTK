@@ -21,8 +21,8 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
-#define SOFMIS_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
-#define SOFMIS_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
+#define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
+#define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
 
 struct smTexCoord;
 struct smTriangle;
@@ -89,7 +89,7 @@ public:
 	void assignTexture(smChar *p_referenceName){
 		smInt textureId;
 		smTextureAttachment attachment;
-		if(smTextureManager::findTextureId(p_referenceName,textureId)==SOFMIS_TEXTURE_OK){
+		if(smTextureManager::findTextureId(p_referenceName,textureId)==SIMMEDTK_TEXTURE_OK){
 			attachment.textureId=textureId;
 			textureIds.push_back(attachment);
 		}
@@ -314,22 +314,22 @@ public:
 
 		for(smInt i=0;i<nbrEdges;i++){
 			///min
-			edgeAABBs[i].aabbMin.x = SOFMIS_MIN(vertices[edges[i].vert[0]].x,vertices[edges[i].vert[1]].x );
-			edgeAABBs[i].aabbMin.y = SOFMIS_MIN(vertices[edges[i].vert[0]].y,vertices[edges[i].vert[1]].y );
-			edgeAABBs[i].aabbMin.z = SOFMIS_MIN(vertices[edges[i].vert[0]].z,vertices[edges[i].vert[1]].z );
+			edgeAABBs[i].aabbMin.x = SIMMEDTK_MIN(vertices[edges[i].vert[0]].x,vertices[edges[i].vert[1]].x );
+			edgeAABBs[i].aabbMin.y = SIMMEDTK_MIN(vertices[edges[i].vert[0]].y,vertices[edges[i].vert[1]].y );
+			edgeAABBs[i].aabbMin.z = SIMMEDTK_MIN(vertices[edges[i].vert[0]].z,vertices[edges[i].vert[1]].z );
 			edgeAABBs[i].aabbMin+=minEdgeOffset;
-			tempAABB.aabbMin.x=SOFMIS_MIN(tempAABB.aabbMin.x,edgeAABBs[i].aabbMin.x);
-			tempAABB.aabbMin.y=SOFMIS_MIN(tempAABB.aabbMin.y,edgeAABBs[i].aabbMin.y);
-			tempAABB.aabbMin.z=SOFMIS_MIN(tempAABB.aabbMin.z,edgeAABBs[i].aabbMin.z);
+			tempAABB.aabbMin.x=SIMMEDTK_MIN(tempAABB.aabbMin.x,edgeAABBs[i].aabbMin.x);
+			tempAABB.aabbMin.y=SIMMEDTK_MIN(tempAABB.aabbMin.y,edgeAABBs[i].aabbMin.y);
+			tempAABB.aabbMin.z=SIMMEDTK_MIN(tempAABB.aabbMin.z,edgeAABBs[i].aabbMin.z);
 
 			///max
-			edgeAABBs[i].aabbMax.x = SOFMIS_MAX(vertices[edges[i].vert[0]].x,vertices[edges[i].vert[1]].x );
-			edgeAABBs[i].aabbMax.y = SOFMIS_MAX(vertices[edges[i].vert[0]].y,vertices[edges[i].vert[1]].y );
-			edgeAABBs[i].aabbMax.z = SOFMIS_MAX(vertices[edges[i].vert[0]].z,vertices[edges[i].vert[1]].z );
+			edgeAABBs[i].aabbMax.x = SIMMEDTK_MAX(vertices[edges[i].vert[0]].x,vertices[edges[i].vert[1]].x );
+			edgeAABBs[i].aabbMax.y = SIMMEDTK_MAX(vertices[edges[i].vert[0]].y,vertices[edges[i].vert[1]].y );
+			edgeAABBs[i].aabbMax.z = SIMMEDTK_MAX(vertices[edges[i].vert[0]].z,vertices[edges[i].vert[1]].z );
 			edgeAABBs[i].aabbMax+=maxEdgeOffset;
-			tempAABB.aabbMax.x=SOFMIS_MAX(tempAABB.aabbMax.x,edgeAABBs[i].aabbMax.x);
-			tempAABB.aabbMax.y=SOFMIS_MAX(tempAABB.aabbMax.y,edgeAABBs[i].aabbMax.y);
-			tempAABB.aabbMax.z=SOFMIS_MAX(tempAABB.aabbMax.z,edgeAABBs[i].aabbMax.z);
+			tempAABB.aabbMax.x=SIMMEDTK_MAX(tempAABB.aabbMax.x,edgeAABBs[i].aabbMax.x);
+			tempAABB.aabbMax.y=SIMMEDTK_MAX(tempAABB.aabbMax.y,edgeAABBs[i].aabbMax.y);
+			tempAABB.aabbMax.z=SIMMEDTK_MAX(tempAABB.aabbMax.z,edgeAABBs[i].aabbMax.z);
 		}
 
 		tempAABB.aabbMin+=minOffset;

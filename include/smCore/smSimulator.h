@@ -75,7 +75,7 @@ public:
 	/// \brief constructor gets error log
 	smSimulator(smErrorLog *p_log){
 
-		type=SOFMIS_SMSIMULATOR;
+		type=SIMMEDTK_SMSIMULATOR;
 		isInitialized=false;
 		this->log=p_log;
 		frameCounter=0;
@@ -83,7 +83,7 @@ public:
 		changedMain=NULL;
 		changedMainTimeStamp=0;
 		mainTimeStamp=0;
-		maxThreadCount=SOFMIS_MAX(simulators.size(),collisionDetectors.size());
+		maxThreadCount=SIMMEDTK_MAX(simulators.size(),collisionDetectors.size());
 	}
 
 	void setMaxThreadCount(smInt p_threadMaxCount){

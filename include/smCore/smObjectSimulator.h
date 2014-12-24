@@ -21,16 +21,16 @@
 
 /// \brief  thread priority definitions
 enum smThreadPriority{
-	SOFMIS_THREAD_IDLE=QThread::IdlePriority,
-	SOFMIS_THREAD_LOWPRIORITY=QThread::LowPriority,
-	SOFMIS_THREAD_NORMALPRIORITY=QThread::NormalPriority,
-	SOFMIS_THREAD_HIGHESTPRIORITY=QThread::HighestPriority,
-	SOFMIS_THREAD_TIMECRITICAL=QThread::TimeCriticalPriority,
+	SIMMEDTK_THREAD_IDLE=QThread::IdlePriority,
+	SIMMEDTK_THREAD_LOWPRIORITY=QThread::LowPriority,
+	SIMMEDTK_THREAD_NORMALPRIORITY=QThread::NormalPriority,
+	SIMMEDTK_THREAD_HIGHESTPRIORITY=QThread::HighestPriority,
+	SIMMEDTK_THREAD_TIMECRITICAL=QThread::TimeCriticalPriority,
 };
 
 enum smSimulatorExecutionType{
-	SOFMIS_SIMEXECUTION_SYNCMODE,
-	SOFMIS_SIMEXECUTION_ASYNCMODE
+	SIMMEDTK_SIMEXECUTION_SYNCMODE,
+	SIMMEDTK_SIMEXECUTION_ASYNCMODE
 };
 
 //forward declarations
@@ -116,7 +116,7 @@ protected:
 	virtual void syncBuffers()=0;
 	/// \brief is called at the end of simulation frame.
 	virtual void endSim(){
-		timerPerFrame=timer.now(SOFMIS_TIMER_INMILLISECONDS);
+		timerPerFrame=timer.now(SIMMEDTK_TIMER_INMILLISECONDS);
 		totalTime+=timerPerFrame;
 
 		if(SMTIMER_FRAME_MILLISEC2SECONDS(totalTime)>1.0){

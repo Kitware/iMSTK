@@ -1,28 +1,8 @@
-/*
-****************************************************
-				  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-	\author:    <http:\\acor.rpi.edu>
-				SOFMIS TEAM IN ALPHABATIC ORDER
-				Anderson Maciel, Ph.D.
-				Ganesh Sankaranarayanan, Ph.D.
-				Sreekanth A Venkata
-				Suvranu De, Ph.D.
-				Tansel Halic
-				Zhonghua Lu
-
-	\author:    Module by Tansel Halic
-				
-				
-	\version    1.0
-	\date       04/2009
-	\bug	    None yet
-	\brief	    This Module is  Matrix 4x4 class. It provides Matrix operations specific to 4x4.
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMMATRIX44_H
 #define SMMATRIX44_H

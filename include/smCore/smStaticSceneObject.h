@@ -21,7 +21,7 @@ public:
 	smSurfaceMesh *mesh;
 	/// \brief constructor receives the error log
 	smStaticSceneObject(smErrorLog *p_log=NULL){
-		type=SOFMIS_SMSTATICSCENEOBJECT;
+		type=SIMMEDTK_SMSTATICSCENEOBJECT;
 		mesh=new smSurfaceMesh(SMMESH_RIGID,p_log);
 	}
 

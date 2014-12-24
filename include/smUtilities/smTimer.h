@@ -14,11 +14,11 @@
 
 /// \brief time in milliseconds or seconds
 enum smTimerType{
-	SOFMIS_TIMER_INMILLISECONDS,
-	SOFMIS_TIMER_INMICROSECONDS
+	SIMMEDTK_TIMER_INMILLISECONDS,
+	SIMMEDTK_TIMER_INMICROSECONDS
 };
 
-#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 	#include <windows.h>
 #endif
 /// \brief timer class
@@ -26,23 +26,23 @@ class smTimer:public smCoreClass{
 public:
 	/// \brief constructor
 	smTimer(){
-		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+		#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 			QueryPerformanceFrequency(&m_liPerfFreq);
 		#endif
 		start();
 	}
 	/// \brief start the timer
 	inline 	void start(){
-		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+		#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 			QueryPerformanceCounter(&m_liPerfStart);
 		#endif
 	}
 	/// \brief gets the time when now is called
 	inline smLongDouble now(smTimerType p_type ) // Returns # of microseconds since Start was called
 	{
-		#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+		#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 			smLongInt perSecond;
-				if(p_type==SOFMIS_TIMER_INMILLISECONDS)
+				if(p_type==SIMMEDTK_TIMER_INMILLISECONDS)
 					perSecond=1000; //timer for milliseconds
 				else
 					perSecond=1000000;//timer for microseconds
@@ -53,7 +53,7 @@ public:
 	}
 
 private:
-#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 	LARGE_INTEGER m_liPerfFreq;		// Counts per second
 	LARGE_INTEGER m_liPerfStart;	// Starting count
 	LARGE_INTEGER m_liPerfNow;	// Starting count

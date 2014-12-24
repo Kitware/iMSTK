@@ -1,29 +1,8 @@
-/*
-****************************************************
-				  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-	\author:    <http:\\acor.rpi.edu>
-				SOFMIS TEAM IN ALPHABATIC ORDER
-				Anderson Maciel, Ph.D.
-				Ganesh Sankaranarayanan, Ph.D.
-				Sreekanth A Venkata
-				Suvranu De, Ph.D.
-				Tansel Halic
-				Zhonghua Lu
-
-	\author:    Module by Tansel Halic
-				
-				
-	\version    1.0
-	\date       05/2009
-	\bug	    None yet
-	\brief	   this class is for custom rendering. The default rendering is most of the time is inadequate. This class should be derived and implemented
-				based on rendering requirements and attached to the object that will be rendered with this.  
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMCUSTOMRENDERER_H
 #define SMCUSTOMRENDERER_H

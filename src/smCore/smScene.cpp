@@ -1,9 +1,9 @@
 #include "smCore/smScene.h"
 #include "smCore/smSDK.h"
 
-smScene::smScene(smErrorLog *p_log):sceneLocal(SOFMIS_MAX_MODULES){
+smScene::smScene(smErrorLog *p_log):sceneLocal(SIMMEDTK_MAX_MODULES){
 
-	type=SOFMIS_SMSCENE;
+	type=SIMMEDTK_SMSCENE;
 	this->log=p_log;
 	totalObjects=0;
 	test=0;

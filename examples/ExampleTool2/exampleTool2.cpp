@@ -24,13 +24,13 @@ using namespace std;
 
 void main(){
 	smPhantomInterface * hapticInterface;
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 	smScene *scene1;
 	smViewer *viewer;
 	smSimulator *simulator;
 
 	///create lights
-	smLight light("Light0",SOFMIS_LIGHT_INFINITELIGHT,SOFMIS_LIGHTPOS_EYE);
+	smLight light("Light0",SIMMEDTK_LIGHT_INFINITELIGHT,SIMMEDTK_LIGHTPOS_EYE);
 	light.lightColorDiffuse.setValue(0.8,0.8,0.8,1);
 	light.lightColorAmbient.setValue(0.1,0.1,0.1,1);
 	light.lightColorSpecular.setValue(0.9,0.0,0.0,1);
@@ -41,7 +41,7 @@ void main(){
 	light.drawEnabled=true;
 
 
-	smLight light2("Light1",SOFMIS_LIGHT_SPOTLIGHT,SOFMIS_LIGHTPOS_WORLD);
+	smLight light2("Light1",SIMMEDTK_LIGHT_SPOTLIGHT,SIMMEDTK_LIGHTPOS_WORLD);
 	light2.lightColorDiffuse.setValue(0.4,0.4,0.4,1);
 	light2.lightColorAmbient.setValue(0.1,0.1,0.1,1);
 	light2.lightColorSpecular.setValue(0.1,0.1,0.1,1);
@@ -54,12 +54,12 @@ void main(){
 	light2.castShadow=true;
 
 	///Creat the SDK. SDK is a singleton object.
-	sofmisSDK=smSDK::createSDK();
-	scene1=sofmisSDK->createScene();
+	simmedtkSDK=smSDK::createSDK();
+	scene1=simmedtkSDK->createScene();
 	scene1->setName("Scene1");
 
 	///init texture manager and load the textures
-	smTextureManager::init(sofmisSDK->getErrorLog());
+	smTextureManager::init(simmedtkSDK->getErrorLog());
 	smTextureManager::loadTexture("../../resources/textures/metal.bmp","metal");
 	smTextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp","hookCautery");
 	smTextureManager::loadTexture("../../resources/textures/metalbump.bmp","bump");
@@ -109,53 +109,53 @@ void main(){
 	curvedTool->addMeshContainer(&curvedTool->meshContainer_pivot);
 	curvedTool->addMeshContainer(curvedTool->meshContainer_pivot.name, &curvedTool->meshContainer_lowerJaw);
 	curvedTool->addMeshContainer(curvedTool->meshContainer_pivot.name, &curvedTool->meshContainer_upperJaw);
-	curvedTool->renderDetail.renderType = (SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	curvedTool->renderDetail.renderType = (SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 	scene1->addSceneObject(curvedTool);
 
 	///Tool is attached to Tool simulator
 	curvedTool->attachObjectSimulator(toolSim);	
 
 	///A seperate thread will be spawned for the tool simulator
-	toolSim->setExecutionType(SOFMIS_SIMEXECUTION_ASYNCMODE);
+	toolSim->setExecutionType(SIMMEDTK_SIMEXECUTION_ASYNCMODE);
 
 	///create the main simulator
-	simulator = sofmisSDK->createSimulator();
+	simulator = simmedtkSDK->createSimulator();
 
 	///register the tool simulator with the simulator.
 	simulator->registerObjectSimulator(toolSim);
 
 	///create viewer
-	viewer=sofmisSDK->createViewer();
+	viewer=simmedtkSDK->createViewer();
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail;
 
 	viewer->list();
-	viewer->setWindowTitle("SOFMIS TEST");
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GLOBALAXIS|
-					SOFMIS_VIEWERRENDER_SOFTSHADOWS|SOFMIS_VIEWERRENDER_RESTORELASTCAMSETTINGS;
+	viewer->setWindowTitle("SimMedTK TEST");
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GLOBALAXIS|
+					SIMMEDTK_VIEWERRENDER_SOFTSHADOWS|SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS;
 	viewer->viewerRenderDetail=viewer->viewerRenderDetail;
 	viewer->camera()->setZClippingCoefficient(100);
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
 	///add lights for static opengl rendering
 	viewer->addLight(&light);
 	viewer->addLight(&light2);
 
 	///register event and event handlers
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICOUT);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_HAPTICIN);
-	sofmisSDK->getEventDispatcher()->registerEventHandler( viewer,SOFMIS_EVENTTYPE_CAMERA_UPDATE);
-	sofmisSDK->getEventDispatcher()->registerEventHandler(curvedTool, SOFMIS_EVENTTYPE_HAPTICOUT);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_HAPTICIN);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler( viewer,SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(curvedTool, SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
 	///create a phantom interface
 	hapticInterface = new smPhantomInterface();
 
 	///set dispacther. This will be used to distrubute events
-	hapticInterface->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
 	///register the haptic interface module
-	sofmisSDK->registerModule(hapticInterface);
+	simmedtkSDK->registerModule(hapticInterface);
 	viewer->addObject(hapticInterface);
 
 	///run the SDK. SDK will initiate all modules etc.
-	sofmisSDK->run();
+	simmedtkSDK->run();
 }

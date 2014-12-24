@@ -137,13 +137,13 @@ public:
 			return false;
 		}
 		else{
-			result.aabbMin.x=SOFMIS_MAX(aabbA.aabbMin.x,aabbB.aabbMin.x);
-			result.aabbMin.y=SOFMIS_MAX(aabbA.aabbMin.y,aabbB.aabbMin.y);
-			result.aabbMin.z=SOFMIS_MAX(aabbA.aabbMin.z,aabbB.aabbMin.z);
+			result.aabbMin.x=SIMMEDTK_MAX(aabbA.aabbMin.x,aabbB.aabbMin.x);
+			result.aabbMin.y=SIMMEDTK_MAX(aabbA.aabbMin.y,aabbB.aabbMin.y);
+			result.aabbMin.z=SIMMEDTK_MAX(aabbA.aabbMin.z,aabbB.aabbMin.z);
 
-			result.aabbMax.x=SOFMIS_MIN(aabbA.aabbMax.x,aabbB.aabbMax.x);
-			result.aabbMax.y=SOFMIS_MIN(aabbA.aabbMax.y,aabbB.aabbMax.y);
-			result.aabbMax.z=SOFMIS_MIN(aabbA.aabbMax.z,aabbB.aabbMax.z);
+			result.aabbMax.x=SIMMEDTK_MIN(aabbA.aabbMax.x,aabbB.aabbMax.x);
+			result.aabbMax.y=SIMMEDTK_MIN(aabbA.aabbMax.y,aabbB.aabbMax.y);
+			result.aabbMax.z=SIMMEDTK_MIN(aabbA.aabbMax.z,aabbB.aabbMax.z);
 			return true;
 		}
 	}

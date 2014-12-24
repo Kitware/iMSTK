@@ -18,17 +18,17 @@ void smVAO::initBuffers(smDrawParam p_param){
 	for(smInt i=0;i<totalNbrBuffers;i++){
 		if(bufferInfo[i].arrayBufferType!=SMVBO_INDEX){
 			glBindBuffer(GL_ARRAY_BUFFER, bufferIndices[i]);
-			if(vboType==SOFMIS_VBO_STATIC)
+			if(vboType==SIMMEDTK_VBO_STATIC)
 				glBufferData(GL_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_STATIC_DRAW);
-			else if(vboType==SOFMIS_VBO_DYNAMIC)
+			else if(vboType==SIMMEDTK_VBO_DYNAMIC)
 				glBufferData(GL_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_DYNAMIC_DRAW);
 		}
 		else{
 			///if it is index array, the buffer should be GL_ELEMENT_ARRAY_BUFFER 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIndices[i]);
-			if(vboType==SOFMIS_VBO_STATIC)
+			if(vboType==SIMMEDTK_VBO_STATIC)
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_STATIC_DRAW);
-			else if(vboType==SOFMIS_VBO_DYNAMIC)
+			else if(vboType==SIMMEDTK_VBO_DYNAMIC)
 				glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_DYNAMIC_DRAW);
 			indexBufferLocation=i;
 			SM_CHECKERROR(log,error);
@@ -73,10 +73,10 @@ void smVAO::initBuffers(smDrawParam p_param){
 ///Updates the buffers. Call this function if there is change in the mesh. If it is a simulation mesh, it needs to be called in and very frame
 smBool smVAO::updateStreamData(){
 
-	if(this->vboType==SOFMIS_VBO_STATIC)
+	if(this->vboType==SIMMEDTK_VBO_STATIC)
 		return false;
 
-	else if(vboType==SOFMIS_VBO_NOINDICESCHANGE||vboType==SOFMIS_VBO_DYNAMIC){
+	else if(vboType==SIMMEDTK_VBO_NOINDICESCHANGE||vboType==SIMMEDTK_VBO_DYNAMIC){
 		for(smInt i=0;i<totalNbrBuffers;i++){
 			if(bufferInfo[i].arrayBufferType!=SMVBO_INDEX){
 				glBindBuffer(GL_ARRAY_BUFFER, bufferIndices[i]);
@@ -85,7 +85,7 @@ smBool smVAO::updateStreamData(){
 				//if the buffer is not disabled, it won't show the the model
 				glBindBuffer(GL_ARRAY_BUFFER, 0);
 			}
-			if(vboType==SOFMIS_VBO_DYNAMIC&&bufferInfo[i].arrayBufferType==SMVBO_INDEX){
+			if(vboType==SIMMEDTK_VBO_DYNAMIC&&bufferInfo[i].arrayBufferType==SMVBO_INDEX){
 				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIndices[i]);
 				glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,bufferInfo[i].size, bufferInfo[i].attribPointer);
 				//if the buffer is not disabled, it won't show the the model

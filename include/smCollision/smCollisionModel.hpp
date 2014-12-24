@@ -24,7 +24,7 @@ void smSurfaceTree<smSurfaceTreeCell>::initStructure(){
 		triangles.push_back(i);
 
 	center=mesh->aabb.center();
-	edge=SOFMIS_MAX(SOFMIS_MAX(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
+	edge=SIMMEDTK_MAX(SIMMEDTK_MAX(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
                                                         mesh->aabb.halfSizeZ());
 	root.setCenter(center);
 	root.setLength(2*edge);
@@ -46,12 +46,12 @@ smSurfaceTree<smSurfaceTreeCell>::~smSurfaceTree(){
 
 /// \brief
 template<typename smSurfaceTreeCell>
-smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType){
+smSurfaceTree<smSurfaceTreeCell>::smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SIMMEDTK_TREETYPE p_treeType){
 	mesh=p_mesh;
 	totalCells=0;
 	switch(p_treeType){
-		case SOFMIS_TREETYPE_OCTREE:
-			nbrDivision=SOFMIS_TREE_DIVISION_OCTREE;
+		case SIMMEDTK_TREETYPE_OCTREE:
+			nbrDivision=SIMMEDTK_TREE_DIVISION_OCTREE;
 			break;
 	}
 
@@ -141,7 +141,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
 
 	switch(p_event->eventType.eventTypeCode){
 
-				case SOFMIS_EVENTTYPE_KEYBOARD:
+				case SIMMEDTK_EVENTTYPE_KEYBOARD:
 					
 					keyBoardData=(smKeyboardEventData*)p_event->data;
 					if(keyBoardData->keyBoardKey==Qt::Key_Plus){

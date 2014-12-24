@@ -20,7 +20,7 @@
 
 using namespace std;
 
-#define SOFMIS_PIPE_MAXLISTENERS 10
+#define SIMMEDTK_PIPE_MAXLISTENERS 10
 
 template <class Template>
 struct smBuffer{
@@ -30,9 +30,9 @@ struct smBuffer{
 };
 
 enum  smDoubleBufferReturn{
-	SOFMIS_DOUBLEBUFFER_NONEWDATA,
-	SOFMIS_DOUBLEBUFFER_NOMEMORY,
-	SOFMIS_DOUBLEBUFFER_OK
+	SIMMEDTK_DOUBLEBUFFER_NONEWDATA,
+	SIMMEDTK_DOUBLEBUFFER_NOMEMORY,
+	SIMMEDTK_DOUBLEBUFFER_OK
 };
 
 ///this class implementes memory buffer for multiple threads where there exists at least one writer
@@ -76,7 +76,7 @@ private:
 
 public:
 	smDoubleBuffer(){
-		type=SOFMIS_SMDOUBLEBUFFER;
+		type=SIMMEDTK_SMDOUBLEBUFFER;
 	}
 
 	/// \param p_bufferSize buffer size of the read/write buffers
@@ -120,10 +120,10 @@ public:
 			memcpy(*p_T,buffer[readerBuffer].buffer,buffer[readerBuffer].totalElements);
 				p_number=buffer[readerBuffer].totalElements;
 			lastReadFrameCounter=buffer[readerBuffer].frameCounter;
-			ret=SOFMIS_DOUBLEBUFFER_OK;
+			ret=SIMMEDTK_DOUBLEBUFFER_OK;
 		}
 		else
-			ret=SOFMIS_DOUBLEBUFFER_NONEWDATA;
+			ret=SIMMEDTK_DOUBLEBUFFER_NONEWDATA;
 		bufferLock.unlock();
 		return ret;
 	}
@@ -155,14 +155,14 @@ public:
 
 /// \brief pipe registration type such as reference or a value
 enum smPipeRegType{
-	SOFMIS_PIPE_BYREF,
-	SOFMIS_PIPE_BYVALUE
+	SIMMEDTK_PIPE_BYREF,
+	SIMMEDTK_PIPE_BYVALUE
 };
 /// \brief pipe type
 enum smPipeType{
-	SOFMIS_PIPE_TYPEREF,
-	SOFMIS_PIPE_TYPEVALUE,
-	SOFMIS_PIPE_TYPEANY
+	SIMMEDTK_PIPE_TYPEREF,
+	SIMMEDTK_PIPE_TYPEVALUE,
+	SIMMEDTK_PIPE_TYPEANY
 };
 /// \brief holder for pipe data
 struct smPipeData{
@@ -182,7 +182,7 @@ struct smPipeData{
 struct smPipeRegisteration{
 	/// \brief constructor
 	smPipeRegisteration(){
-		regType=SOFMIS_PIPE_BYREF;
+		regType=SIMMEDTK_PIPE_BYREF;
 	}
 
 	smPipeRegisteration(smPipeRegType p_reg){
@@ -194,9 +194,9 @@ struct smPipeRegisteration{
 	smPipeRegType regType;///registration type. Will it be reference or value registration.
 	/// \brief  print pipe registration information 
 	void print(){
-		if(regType==SOFMIS_PIPE_BYREF)
+		if(regType==SIMMEDTK_PIPE_BYREF)
 			cout<<"Listener Object"<< " By Reference"<<endl;
-		if(regType==SOFMIS_PIPE_BYVALUE)
+		if(regType==SIMMEDTK_PIPE_BYVALUE)
 			cout<<"Listener Object"<< " By Value"<<endl;
 	}
 
@@ -231,9 +231,9 @@ public:
 	}
 	/// \brief pipe constructor
 	smPipe(QString p_name,smInt p_elementSize,smInt p_maxElements,
-                       smPipeType p_pipeType=SOFMIS_PIPE_TYPEANY):
-                       byRefs(SOFMIS_PIPE_MAXLISTENERS),
-                       byValue(SOFMIS_PIPE_MAXLISTENERS){
+                       smPipeType p_pipeType=SIMMEDTK_PIPE_TYPEANY):
+                       byRefs(SIMMEDTK_PIPE_MAXLISTENERS),
+                       byValue(SIMMEDTK_PIPE_MAXLISTENERS){
 		name=p_name;
 		maxElements=p_maxElements;
 		elementSize=p_elementSize;
@@ -256,11 +256,11 @@ public:
 	}
 	/// \brief  register for the pipe
 	inline smInt registerListener(smPipeRegisteration *p_pipeReg){
-		if(p_pipeReg->regType==SOFMIS_PIPE_BYREF){
+		if(p_pipeReg->regType==SIMMEDTK_PIPE_BYREF){
 			p_pipeReg->data.dataLocation=data;
 			return byRefs.add(p_pipeReg);
 		}
-		else if(p_pipeReg->regType==SOFMIS_PIPE_BYVALUE){
+		else if(p_pipeReg->regType==SIMMEDTK_PIPE_BYVALUE){
 			p_pipeReg->data.dataLocation=new smChar[elementSize*maxElements];
 			p_pipeReg->data.dataReady=false;
 			p_pipeReg->data.nbrElements=0;

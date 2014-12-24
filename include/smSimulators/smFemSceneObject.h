@@ -51,7 +51,7 @@ public:
 
 	 /// \brief constructor
 	smFemSceneObject(smErrorLog *p_log=NULL){
-		type=SOFMIS_SMFEMSCENEOBJECT;
+		type=SIMMEDTK_SMFEMSCENEOBJECT;
 		v_mesh=new smVolumeMesh(SMMESH_DEFORMABLE,p_log);
 		pullUp=true;
 		dynamicFem=false;

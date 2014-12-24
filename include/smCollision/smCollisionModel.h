@@ -17,7 +17,7 @@
 #include "smUtilities/smMatrix44.h"
 #include "smCore/smGeometry.h"
 
-#define SOFMIS_TREE_DIVISION_OCTREE 8
+#define SIMMEDTK_TREE_DIVISION_OCTREE 8
 
 //forward declaration..Otherwise it doesn't compile
 class smEvent;
@@ -161,9 +161,9 @@ struct smLevelIndex{
 };
 
 /// \brief !!
-enum SOFMIS_TREETYPE{
-	SOFMIS_TREETYPE_OCTREE,
-	SOFMIS_TREETYPE_CUSTOM
+enum SIMMEDTK_TREETYPE{
+	SIMMEDTK_TREETYPE_OCTREE,
+	SIMMEDTK_TREETYPE_CUSTOM
 };
 
 
@@ -301,7 +301,7 @@ template<typename smSurfaceTreeCell> class smSurfaceTree:
 		~smSurfaceTree();
 
 		/// \brief constructor
-		smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SOFMIS_TREETYPE p_treeType);
+		smSurfaceTree(smSurfaceMesh *p_mesh,smInt p_maxLevels,SIMMEDTK_TREETYPE p_treeType);
 		
 		/// \brief initialize the surface tree structure
 		void initStructure();

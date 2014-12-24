@@ -1,30 +1,8 @@
-/*
-****************************************************
-				  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-	\author:    <http:\\acor.rpi.edu>
-				SOFMIS TEAM IN ALPHABATIC ORDER
-				Anderson Maciel, Ph.D.
-				Ganesh Sankaranarayanan, Ph.D.
-				Sreekanth A Venkata
-				Suvranu De, Ph.D.
-				Tansel Halic
-				Zhonghua Lu
-
-	\author:    Module by Tansel Halic
-				
-				
-	\version    1.0
-	\date       04/2009
-	\bug	    None yet
-	\brief	    This Module implements text viewing mechanism for the framework. It can be any text and can be dispplayed on both console
-				or on window text
-				
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMDISPLAYTEXT_H
 #define SMDISPLAYTEXT_H
@@ -45,7 +23,7 @@ enum SMDISPLAY_STREAM{
 /// \brief message type
 struct smDisplayMessage{
 	/// \brief text to display
-	smChar text[SOFMIS_MAX_DISPLAYTEXT];
+	smChar text[SIMMEDTK_MAX_DISPLAYTEXT];
 	/// \brief sender id. Id given my the framework
 	smInt  senderId;
 	/// \brief diplay output

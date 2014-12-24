@@ -16,13 +16,13 @@ void smSimulator::startAsychThreads(){
 
 	smInt asyncThreadNbr=0;
 	for(smInt i=0;i<simulators.size();i++){
-		if(simulators[i]->execType==SOFMIS_SIMEXECUTION_ASYNCMODE)
+		if(simulators[i]->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
 			asyncThreadNbr++;
 	}
 
 	asyncPool->setMaxThreadCount(asyncThreadNbr);
 	for(smInt i=0;i<simulators.size();i++){
-		if(simulators[i]->execType==SOFMIS_SIMEXECUTION_ASYNCMODE)
+		if(simulators[i]->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
 			asyncPool->start(simulators[i],simulators[i]->getPriority());
 	}
 }
@@ -59,7 +59,7 @@ void smSimulator::run(){
 
 		for(smInt i=0;i<this->simulators.size();i++){
 				objectSimulator=simulators[i];
-				if(objectSimulator->execType==SOFMIS_SIMEXECUTION_ASYNCMODE)
+				if(objectSimulator->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
 					continue;
 				if(objectSimulator->enabled==false)
 					continue;

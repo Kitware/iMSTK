@@ -40,9 +40,9 @@ public:
 protected:
 	static QHash<smInt,smShader *>shaders;
 
-	smChar vertexProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
-	smChar fragmentProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
-	smChar geometryProgFileName[SOFMIS_MAX_FILENAME_LENGTH];
+	smChar vertexProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
+	smChar fragmentProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
+	smChar geometryProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
 	/// \brief Error Loging
 	smErrorLog *log;
 	/// \brief stores the content of the vertex shader file
@@ -66,16 +66,16 @@ protected:
 	/// \brief stores the attribute parameters
 	QVector <smChar*>attribParamsString;
 	/// \brief error text for querying the opengl errors mostly
-	smChar errorText[SOFMIS_MAX_ERRORLOG_TEXT];
+	smChar errorText[SIMMEDTK_MAX_ERRORLOG_TEXT];
 	/// \brief time for periodically checnking the shader
 	QTime time;
 	QMultiHash<smInt,smTextureShaderAssignment> texAssignments;
-	smChar modelViewMatrixName[SOFMIS_MAX_SHADERVARIABLENAME];
-	smChar projectionMatrixName[SOFMIS_MAX_SHADERVARIABLENAME];
+	smChar modelViewMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
+	smChar projectionMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
 
 	void getAttribAndParamLocations();
 
-	#ifdef SOFMIS_OPENGL_SHADER
+	#ifdef SIMMEDTK_OPENGL_SHADER
 		/// \brief vertex shader object
 		GLhandleARB vertexShaderObject;
 		/// \brief fragment  shader object
@@ -169,7 +169,7 @@ public:
 	/// \brief Initialize the shader..This is called automatically.
 	virtual void initDraw(smDrawParam p_param);
 
-	#ifdef SOFMIS_OPENGL_SHADER
+	#ifdef SIMMEDTK_OPENGL_SHADER
 		/// \brief add parameter for Vertex Shader
 		GLint addVertexShaderParam(smChar* p_paramVertex);
 		/// \brief add parameter for Fragment Shader
@@ -185,7 +185,7 @@ public:
 
 		smBool setShaderFileName(smChar *p_vertexFileName,smChar *p_geometryFileName, smChar *p_fragmentFileName);
 		smBool setModelViewMatrixShaderName(smChar *p_modelviewMatrixName){
-			if(strlen(p_modelviewMatrixName)>SOFMIS_MAX_SHADERVARIABLENAME-1){
+			if(strlen(p_modelviewMatrixName)>SIMMEDTK_MAX_SHADERVARIABLENAME-1){
 				return false;
 			}
 			else
@@ -196,7 +196,7 @@ public:
 		}
 
 		smBool setProjectionMatrixShaderName(smChar *p_projectionName){
-			if(strlen(p_projectionName)>SOFMIS_MAX_SHADERVARIABLENAME-1){
+			if(strlen(p_projectionName)>SIMMEDTK_MAX_SHADERVARIABLENAME-1){
 				return false;
 			}
 			else
@@ -247,7 +247,7 @@ public:
 
 	/// \brief cleans up of the shader objects
 	~smShader(){
-		#ifdef SOFMIS_OPENGL_SHADER
+		#ifdef SIMMEDTK_OPENGL_SHADER
 			if(vertexProgramExist)
 				glDeleteObjectARB(vertexShaderObject);
 			if(fragmentProgramExist)

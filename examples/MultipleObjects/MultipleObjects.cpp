@@ -7,7 +7,7 @@
 
 void createPBDandFEM(){
 
-	smSDK *sofmisSDK;
+	smSDK *simmedtkSDK;
 	smFemSceneObject  *femobj;
 	smFemSimulator *femSim;
 	smPBDSurfaceSceneObject *pbdObject;
@@ -21,10 +21,10 @@ void createPBDandFEM(){
 	mat.rotAroundX(SM_PI);
 
 	///SDK is singlenton class so create SDK and return SDK returns the same SDK
-	sofmisSDK=smSDK::getInstance();
+	simmedtkSDK=smSDK::getInstance();
 
 	///init texture manager and load the textures
-	smTextureManager::init(sofmisSDK->getErrorLog());
+	smTextureManager::init(simmedtkSDK->getErrorLog());
 	smTextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg","groundImage");
 	smTextureManager::loadTexture("../../resources/textures/4351-normal.jpg","groundBumpImage");
 	smTextureManager::loadTexture("../../resources/textures/brick.jpg","wallImage");
@@ -34,14 +34,14 @@ void createPBDandFEM(){
 	smTextureManager::loadTexture("../../resources/textures/cloth.jpg","clothtexture");
 
 	///create a FEM simulator
-	femSim=new smFemSimulator(sofmisSDK->getErrorLog());
+	femSim=new smFemSimulator(simmedtkSDK->getErrorLog());
 
 	///set the dispatcher for FEM. it will be used for sending events
-	femSim->setDispatcher(sofmisSDK->getEventDispatcher());
-	sofmisSDK->getEventDispatcher()->registerEventHandler(femSim,SOFMIS_EVENTTYPE_HAPTICOUT);
+	femSim->setDispatcher(simmedtkSDK->getEventDispatcher());
+	simmedtkSDK->getEventDispatcher()->registerEventHandler(femSim,SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
 	///create a position dynamics object
-	pbd=new smPBDObjectSimulator (sofmisSDK->getErrorLog());
+	pbd=new smPBDObjectSimulator (simmedtkSDK->getErrorLog());
 
 	///create a FEM object
 	femobj=new smFemSceneObject();
@@ -55,7 +55,7 @@ void createPBDandFEM(){
 	femobj->v_mesh->rotate(mat);
 	femobj->v_mesh->scaleVolumeMesh(smVec3<smFloat>(0.5,0.5,1.0));
 	femobj->v_mesh->translateVolumeMesh(smVec3<smFloat>(20,15,20));
-	femobj->renderDetail.renderType=(SOFMIS_RENDER_MATERIALCOLOR|SOFMIS_RENDER_SHADOWS|SOFMIS_RENDER_FACES);
+	femobj->renderDetail.renderType=(SIMMEDTK_RENDER_MATERIALCOLOR|SIMMEDTK_RENDER_SHADOWS|SIMMEDTK_RENDER_FACES);
 	femobj->renderDetail.lineSize=1.0;	
 	femobj->renderDetail.pointSize=5;
 	femobj->buildLMmatrix();
@@ -72,7 +72,7 @@ void createPBDandFEM(){
 	pbdObject->mesh->scale(smVec3<smFloat>(2.3,0.5,2));
 	pbdObject->mesh->translate(smVec3<smFloat>(11,25,0));
 	pbdObject->mesh->assignTexture("clothtexture");
-	pbdObject->renderDetail.renderType=(SOFMIS_RENDER_FACES|SOFMIS_RENDER_TEXTURE|SOFMIS_RENDER_MATERIALCOLOR);
+	pbdObject->renderDetail.renderType=(SIMMEDTK_RENDER_FACES|SIMMEDTK_RENDER_TEXTURE|SIMMEDTK_RENDER_MATERIALCOLOR);
 	pbdObject->initMeshStructure();
 	pbdObject->InitSurfaceObject();
 
@@ -85,23 +85,23 @@ void createPBDandFEM(){
 	pbdObject->attachObjectSimulator(pbd);
 
 	///create a scene and add FEM and PDB 
-	scene1=sofmisSDK->createScene();
+	scene1=simmedtkSDK->createScene();
 	scene1->addSceneObject(femobj);
 	scene1->addSceneObject(pbdObject);
 
 	///create a simulator module and attache FEM and PBD
-	simulator=sofmisSDK->createSimulator();
+	simulator=simmedtkSDK->createSimulator();
 	simulator->registerObjectSimulator(femSim);
 	simulator->registerObjectSimulator(pbd);
 
 	///create a viewer
-	viewer=sofmisSDK->createViewer();
-	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SOFMIS_VIEWERRENDER_GROUND;
-	viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+	viewer=simmedtkSDK->createViewer();
+	viewer->viewerRenderDetail=viewer->viewerRenderDetail|SIMMEDTK_VIEWERRENDER_GROUND;
+	viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 	viewer->camera()->setZClippingCoefficient(100);
 
 	///run the SDK
-	sofmisSDK->run();
+	simmedtkSDK->run();
 }
 
 void main(){

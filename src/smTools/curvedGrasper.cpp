@@ -54,7 +54,7 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID, smChar *p_pivotModelFileName,smC
 
 	//for interface 
 	#ifdef smNIUSB6008DAQ
-		NIUSB6008pipeReg.regType = SOFMIS_PIPE_BYREF;
+		NIUSB6008pipeReg.regType = SIMMEDTK_PIPE_BYREF;
 		NIUSB6008pipeReg.listenerObject = this->mesh_lowerJaw;
 	#endif
 
@@ -70,7 +70,7 @@ void curvedGrasper::handleEvent(smEvent *p_event){
 	smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
 
 	switch(p_event->eventType.eventTypeCode){
-	case SOFMIS_EVENTTYPE_HAPTICOUT:
+	case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 		hapticEventData=(smHapticOutEventData *)p_event->data;
 		if(hapticEventData->deviceId==this->phantomID){
 			smVec3d pos1=hapticEventData->transform.getColumn(3);
@@ -86,15 +86,15 @@ void curvedGrasper::handleEvent(smEvent *p_event){
 			containerUpper->offsetRotY =  -angle/360.0;//-angle*maxangle;						
 		}
 		break;
-	case SOFMIS_EVENTTYPE_KEYBOARD:
+	case SIMMEDTK_EVENTTYPE_KEYBOARD:
 		keyBoardData=(smKeyboardEventData*)p_event->data;
 		if(keyBoardData->keyBoardKey==Qt::Key_1){
-				smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-				this->renderDetail.renderType=this->renderDetail.renderType|SOFMIS_RENDER_NONE;
+				smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+				this->renderDetail.renderType=this->renderDetail.renderType|SIMMEDTK_RENDER_NONE;
 		}
 		if(keyBoardData->keyBoardKey==Qt::Key_2){
-			smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SOFMIS_EVENTTYPE_HAPTICOUT);
-			this->renderDetail.renderType=this->renderDetail.renderType&(~SOFMIS_RENDER_NONE);
+			smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this,SIMMEDTK_EVENTTYPE_HAPTICOUT);
+			this->renderDetail.renderType=this->renderDetail.renderType&(~SIMMEDTK_RENDER_NONE);
 		}
 		break;
 	}

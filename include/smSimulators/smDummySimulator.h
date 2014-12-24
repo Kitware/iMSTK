@@ -36,7 +36,7 @@ protected:
 			object=objectsSimulated[i];
 			type=object->getType();
 			switch(type){
-				case SOFMIS_SMSTATICSCENEOBJECT:
+				case SIMMEDTK_SMSTATICSCENEOBJECT:
 					staticObject=(smStaticSceneObject*)object;
 					object->memBlock->allocate<smVec3<smFloat>>(QString("pos"),staticObject->mesh->nbrVertices);
 					object->memBlock->originaltoLocalBlock(QString("pos"),staticObject->mesh->vertices,staticObject->mesh->nbrVertices);
@@ -58,7 +58,7 @@ protected:
 			sceneObj=this->objectsSimulated[i];
 
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMSTATICSCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMSTATICSCENEOBJECT){
 				staticSceneObject=(smStaticSceneObject*)sceneObj;
 				mesh=staticSceneObject->mesh;
 				staticSceneObject->memBlock->getBlock(QString("pos"),(void**)&vertices);
@@ -85,7 +85,7 @@ protected:
 		for(smInt i=0;i<this->objectsSimulated.size();i++){
 			sceneObj=this->objectsSimulated[i];
 			//ensure that dummy simulator will work on static scene objects only.
-			if(sceneObj->getType()==SOFMIS_SMSTATICSCENEOBJECT){
+			if(sceneObj->getType()==SIMMEDTK_SMSTATICSCENEOBJECT){
 				staticSceneObject=(smStaticSceneObject*)sceneObj;
 				mesh=staticSceneObject->mesh;
 				staticSceneObject->memBlock->localtoOriginalBlock(QString("pos"),mesh->vertices,mesh->nbrVertices);
@@ -97,7 +97,7 @@ protected:
 	void handleEvent(smEvent *p_event){
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_F1)
 				printf("F1 Keyboard is pressed %c\n",keyBoardData->keyBoardKey);

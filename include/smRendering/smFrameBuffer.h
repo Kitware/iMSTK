@@ -1,28 +1,8 @@
-/*
-****************************************************
-                  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-    \author:    <http:\\acor.rpi.edu>
-                SOFMIS TEAM IN ALPHABATIC ORDER
-                Anderson Maciel, Ph.D.
-                Ganesh Sankaranarayanan, Ph.D.
-                Sreekanth A Venkata
-                Suvranu De, Ph.D.
-                Tansel Halic
-                Zhonghua Lu
-
-    \author:    Module by Tansel Halic
-                
-                
-    \version    1.0
-    \date       04/2009
-    \bug	    None yet
-    \brief	    This is framebuffer object for offline rendering or rendering to a texture
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMFRAMEBUFFEROBJECT_H
 #define SMFRAMEBUFFEROBJECT_H
@@ -39,16 +19,16 @@
 #include "smCore/smTextureManager.h"
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType{
-	SOFMIS_FBOIMAGE_COLOR,
-	SOFMIS_FBOIMAGE_DEPTH,
-	SOFMIS_FBOIMAGE_STENCIL
+	SIMMEDTK_FBOIMAGE_COLOR,
+	SIMMEDTK_FBOIMAGE_DEPTH,
+	SIMMEDTK_FBOIMAGE_STENCIL
 };
 /// \brief render buffer type
 enum smRenderBufferType{
-	SOFMIS_RENDERBUFFER_DEPTH=GL_DEPTH_COMPONENT,
-	SOFMIS_RENDERBUFFER_STENCIL=GL_STENCIL_INDEX,
-	SOFMIS_RENDERBUFFER_COLOR_RGBA=GL_RGBA,
-	SOFMIS_RENDERBUFFER_COLOR_RGB=GL_RGB
+	SIMMEDTK_RENDERBUFFER_DEPTH=GL_DEPTH_COMPONENT,
+	SIMMEDTK_RENDERBUFFER_STENCIL=GL_STENCIL_INDEX,
+	SIMMEDTK_RENDERBUFFER_COLOR_RGBA=GL_RGBA,
+	SIMMEDTK_RENDERBUFFER_COLOR_RGB=GL_RGB
 };
 /// \brief render buffer type used for frame buffer attachment
 class smRenderBuffer:public smCoreClass{
@@ -85,11 +65,11 @@ public:
 	}
 	/// \brief get attacnment id. returns GL binding
 	GLenum getGLAttachmentId(){
-		if(type==SOFMIS_RENDERBUFFER_DEPTH)
+		if(type==SIMMEDTK_RENDERBUFFER_DEPTH)
 			return GL_DEPTH_ATTACHMENT_EXT;
-		if(type==SOFMIS_RENDERBUFFER_STENCIL)
+		if(type==SIMMEDTK_RENDERBUFFER_STENCIL)
 			return GL_STENCIL_ATTACHMENT;
-		if(type==SOFMIS_RENDERBUFFER_COLOR_RGBA||type==SOFMIS_RENDERBUFFER_COLOR_RGB)
+		if(type==SIMMEDTK_RENDERBUFFER_COLOR_RGBA||type==SIMMEDTK_RENDERBUFFER_COLOR_RGB)
 			return GL_COLOR_ATTACHMENT0_EXT+attachmentOrder;
 	}
 	/// \brief returns buffer type
@@ -123,14 +103,14 @@ public:
 	/// \brief create a color buffer
 	smBool createColorBuffer(){
 		if(!isAllocated){
-			_rb.Set(SOFMIS_RENDERBUFFER_COLOR_RGBA,width,height);
+			_rb.Set(SIMMEDTK_RENDERBUFFER_COLOR_RGBA,width,height);
 		}
 		return false;
 	}
 	/// \brief create a stencil buffer
 	smBool createStencilBuffer(){
 		if(!isAllocated){
-			_rb.Set(SOFMIS_RENDERBUFFER_STENCIL,width,height);
+			_rb.Set(SIMMEDTK_RENDERBUFFER_STENCIL,width,height);
 		}
 		return false;
 	}

@@ -8,7 +8,7 @@ public:
 	RenderExample();
 	void simulateMain(smSimulationMainParam p_param) { };
 private:
-	smSDK* sofmisSDK;
+	smSDK* simmedtkSDK;
 	smScene *scene1;
 	smStaticSceneObject cube;
 	smViewer *viewer;

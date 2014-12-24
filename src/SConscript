@@ -1,7 +1,7 @@
 import os;
 Import('*')
 
-#Build the individual parts of sofmis
+#Build the individual parts of SimMedTK
 smCore_files = Glob('smCore/*.cpp')
 smCollision_files = Glob('smCollision/*.cpp')
 smExternal_files = Glob('smExternal/*.cpp')

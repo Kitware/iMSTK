@@ -3,7 +3,7 @@
 /// \brief Begin frame will be called before the cycle 
 void  smModule::beginModule(){
     
-	dispathcer->handle((smCoreClass*)this,SOFMIS_CALLERSTATE_BEGINFRAME);
+	dispathcer->handle((smCoreClass*)this,SIMMEDTK_CALLERSTATE_BEGINFRAME);
 	beginFrame();
 
 }
@@ -12,5 +12,5 @@ void  smModule::beginModule(){
 void  smModule::endModule(){
 
 	endFrame();
-	dispathcer->handle((smCoreClass*)this,SOFMIS_CALLERSTATE_ENDFRAME);
+	dispathcer->handle((smCoreClass*)this,SIMMEDTK_CALLERSTATE_ENDFRAME);
 }

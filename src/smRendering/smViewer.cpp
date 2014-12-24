@@ -17,7 +17,7 @@
 #include <QKeyEvent>
 #include <QDesktopWidget>
 
-#ifdef SOFMIS_OPERATINGSYSTEM_LINUX
+#ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 	#include <X11/Xlib.h>
 	#include <X11/Xutil.h>
 	#include <GL/glxew.h>
@@ -25,18 +25,18 @@
 	#include <GL/glx.h>
 #endif
 
-#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 	typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
 void SetVSync(bool sync){
 
-	#ifdef SOFMIS_OPERATINGSYSTEM_WINDOWS
+	#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 		PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
 		wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress("wglSwapIntervalEXT");
 		if( wglSwapIntervalEXT )
 			wglSwapIntervalEXT(sync);
-	#elif defined(SOFMIS_OPERATINGSYSTEM_LINUX)
+	#elif defined(SIMMEDTK_OPERATINGSYSTEM_LINUX)
 		Display *dpy = glXGetCurrentDisplay();
 		GLXDrawable drawable = glXGetCurrentDrawable();
 		unsigned int swap, maxSwap;
@@ -49,9 +49,9 @@ void SetVSync(bool sync){
 
 smViewer::smViewer(smErrorLog *log){
 
-	type=SOFMIS_SMVIEWER;
+	type=SIMMEDTK_SMVIEWER;
 	::QGLViewer();
-	viewerRenderDetail=SOFMIS_VIEWERRENDER_FADEBACKGROUND;
+	viewerRenderDetail=SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
 	shadowMatrix.setIdentity();
 	shadowMatrix(0,1)=0;
 	shadowMatrix(1,1)=0.0;
@@ -64,7 +64,7 @@ smViewer::smViewer(smErrorLog *log){
 
 	this->log=log;
 	consoleDisplay=false;
-	lights=new smIndiceArray<smLight*>(SOFMIS_VIEWER_MAXLIGHTS);
+	lights=new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
 	windowOutput=new smOpenGLWindowStream();
 	lightDrawScale=50;
 	enableCameraMotion=false;
@@ -189,10 +189,10 @@ void smViewer::init(){
 	setManipulatedFrame( (qglviewer::ManipulatedFrame*)camera()->frame() );
 	setAnimationPeriod(0); // as fast as possible
 	startAnimation();
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_RESTORELASTCAMSETTINGS)
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS)
 		restoreStateFromFile();
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_FULLSCREEN)
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_FULLSCREEN)
 		setFullScreen(true);
 
 	glEnable(GL_MULTISAMPLE);
@@ -228,7 +228,7 @@ void smViewer::init(){
 	setAcceptDrops(true);
 
 	for(smInt i=0;i<objectList.size();i++){
-		if(objectList[i]->getType()!=SOFMIS_SMSHADER)
+		if(objectList[i]->getType()!=SIMMEDTK_SMSHADER)
 			objectList[i]->initDraw(param);
 		else
 			continue;
@@ -238,7 +238,7 @@ void smViewer::init(){
 	smInt width=screenResolutionWidth;
 	smInt height=screenResolutionHeight;
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_SOFTSHADOWS){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_SOFTSHADOWS){
 		fbo=new smFrameBuffer();
 		fbo->setDim(2048,2048);
 		smTextureManager::createDepthTexture("depth",2048,2048);
@@ -254,7 +254,7 @@ void smViewer::init(){
 	smShader::initGLShaders(param);
 	smVAO::initVAOs(param);
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_SOFTSHADOWS){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_SOFTSHADOWS){
 		fbo->setDim(2048,2048);
 		fbo->attachDepthTexture(smTextureManager::getTexture("depth"));
 
@@ -282,15 +282,15 @@ void smViewer::init(){
 			sceneObject=sceneIter[j];
 
 			//initialize the custom Render if there is any
-			if(sceneObject->customRender!=NULL&&sceneObject->getType()!=SOFMIS_SMSHADER)
+			if(sceneObject->customRender!=NULL&&sceneObject->getType()!=SIMMEDTK_SMSHADER)
 				sceneObject->customRender->initDraw(param);
 
 			sceneObject->initDraw(param);
 
-			if(sceneObject->renderDetail.renderType&SOFMIS_RENDER_VBO&&viewerRenderDetail&SOFMIS_VIEWERRENDER_VBO_ENABLED){
+			if(sceneObject->renderDetail.renderType&SIMMEDTK_RENDER_VBO&&viewerRenderDetail&SIMMEDTK_VIEWERRENDER_VBO_ENABLED){
 				objectType=sceneObject->getType();
 				switch(objectType){
-				case SOFMIS_SMSTATICSCENEOBJECT:
+				case SIMMEDTK_SMSTATICSCENEOBJECT:
 					staticSceneObject=(smStaticSceneObject*)sceneObject;
 					break;
 				}
@@ -321,19 +321,19 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 	static smVec3<smFloat> yAxis(0,1,0);
 	static smVec3<smFloat> zAxis(0,0,1);
 
-	if(renderDetail->renderType&SOFMIS_RENDER_NONE)
+	if(renderDetail->renderType&SIMMEDTK_RENDER_NONE)
 		return;
 
 	glDisable(GL_TEXTURE_2D);
 	glPointSize(renderDetail->pointSize);
 	glLineWidth(renderDetail->lineSize);
 
-	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TRANSPARENT){
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_MATERIALCOLOR){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_MATERIALCOLOR){
 		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,  (smGLReal*)renderDetail->colorDiffuse.toGLColor());
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,(smGLReal*)renderDetail->colorSpecular.toGLColor());
 		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,(smGLReal*)renderDetail->colorAmbient.toGLColor());
@@ -341,7 +341,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_NORMAL_ARRAY);
-	if(renderDetail->renderType&SOFMIS_RENDER_TEXTURE){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TEXTURE){
 		if(p_surfaceMesh->isMeshTextured()){
 			glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 			for(smInt t=0;t<p_surfaceMesh->textureIds.size();t++){
@@ -351,20 +351,20 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 		}
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_COLORMAP)
+	if(renderDetail->renderType&SIMMEDTK_RENDER_COLORMAP)
 		glEnableClientState(GL_COLOR_ARRAY);
 
 	glVertexPointer(3,smGLRealType,0,p_surfaceMesh->vertices);
-	if(renderDetail->renderType&SOFMIS_RENDER_TEXTURE){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TEXTURE){
 		if(p_surfaceMesh->isMeshTextured())
 			glTexCoordPointer(2,smGLRealType,0,p_surfaceMesh->texCoord);
 	}
 
 	glNormalPointer(smGLRealType,0,p_surfaceMesh->vertNormals);
-	if(renderDetail->renderType&SOFMIS_RENDER_FACES)
+	if(renderDetail->renderType&SIMMEDTK_RENDER_FACES)
 		glDrawElements(GL_TRIANGLES,p_surfaceMesh->nbrTriangles*3,smGLUIntType,p_surfaceMesh->triangles);
 
-	if((renderDetail->renderType&(SOFMIS_RENDER_VERTICES))){
+	if((renderDetail->renderType&(SIMMEDTK_RENDER_VERTICES))){
 		glPolygonMode(GL_FRONT_AND_BACK,GL_POINT);
 		glDisable(GL_LIGHTING);
 		glDrawElements(GL_TRIANGLES,p_surfaceMesh->nbrTriangles*3,smGLUIntType,p_surfaceMesh->triangles);
@@ -373,7 +373,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_WIREFRAME||this->viewerRenderDetail&SOFMIS_VIEWERRENDER_WIREFRAMEALL){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_WIREFRAME||this->viewerRenderDetail&SIMMEDTK_VIEWERRENDER_WIREFRAMEALL){
 		glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 		glPolygonOffset (3.0, 2.0);
 		glDisable(GL_LIGHTING);
@@ -383,11 +383,11 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 		glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_LOCALAXIS){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_LOCALAXIS){
 		glEnable(GL_LIGHTING);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_SHADOWS){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_SHADOWS){
 		glMatrixMode(GL_MATRIX_MODE);
 		glPushMatrix();
 		glDisable(GL_LIGHTING);
@@ -399,20 +399,20 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 		glPopMatrix();
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_HIGHLIGHTVERTICES){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_HIGHLIGHTVERTICES){
 		glDisable(GL_LIGHTING);
 		glColor3fv((smGLReal*)&renderDetail->highLightColor);
 		glDrawArrays (GL_POINTS,0,p_surfaceMesh->nbrVertices);
 		glEnable(GL_LIGHTING);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TRANSPARENT){
 		glDisable(GL_BLEND);
 	}
 
 	glDisableClientState(GL_VERTEX_ARRAY);
 	glDisableClientState(GL_NORMAL_ARRAY);
-	if(renderDetail->renderType&SOFMIS_RENDER_TEXTURE){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TEXTURE){
 		if(p_surfaceMesh->isMeshTextured()){
 			glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 			for(smInt t=0;t<p_surfaceMesh->textureIds.size();t++){
@@ -422,7 +422,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 		}
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_COLORMAP)
+	if(renderDetail->renderType&SIMMEDTK_RENDER_COLORMAP)
 		glDisableClientState(GL_COLOR_ARRAY);
 
 	glEnable(GL_LIGHTING);
@@ -439,24 +439,24 @@ void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,smRender
 	static smVec3<smFloat> yAxis(0,1,0);
 	static smVec3<smFloat> zAxis(0,0,1);
 
-	if(renderDetail->renderType&SOFMIS_RENDER_NONE)
+	if(renderDetail->renderType&SIMMEDTK_RENDER_NONE)
 		return;
 
 	glPointSize(renderDetail->pointSize);
 	glLineWidth(renderDetail->lineSize);
 
-	if(renderDetail->renderType&SOFMIS_RENDER_TRANSPARENT){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_TRANSPARENT){
 		glEnable (GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_MATERIALCOLOR){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_MATERIALCOLOR){
 		glMaterialfv(GL_FRONT_AND_BACK,GL_DIFFUSE,  (smGLReal*)&renderDetail->colorDiffuse);
 		glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR, (smGLReal*)&renderDetail->colorSpecular);
 		glMaterialfv(GL_FRONT_AND_BACK,GL_AMBIENT,  (smGLReal*)&renderDetail->colorAmbient);
 	}
 
-	if(renderDetail->renderType&SOFMIS_RENDER_FACES){
+	if(renderDetail->renderType&SIMMEDTK_RENDER_FACES){
 		//placeholder
 	}
 
@@ -467,7 +467,7 @@ void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,smRender
 
 void smViewer::drawSMDeformableObject(smPBDSurfaceSceneObject *p_smPhsyObject){
 
-	if(p_smPhsyObject->renderDetail.renderType&SOFMIS_RENDER_VBO){
+	if(p_smPhsyObject->renderDetail.renderType&SIMMEDTK_RENDER_VBO){
 		//placeholder
 	}
 	else
@@ -502,7 +502,7 @@ void smViewer::drawNormals(smMesh *p_mesh){
 ///draw the static objects
 void smViewer::drawSMStaticObject(smStaticSceneObject *p_smPhsyObject){
 
-	if(p_smPhsyObject->renderDetail.renderType&SOFMIS_RENDER_VBO){
+	if(p_smPhsyObject->renderDetail.renderType&SIMMEDTK_RENDER_VBO){
 		//
 	}
 	else
@@ -516,7 +516,7 @@ void smViewer::drawSmLight(smLight *light){
 	light->updateDirection();
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
-	if(light->lightLocationType==SOFMIS_LIGHTPOS_EYE){
+	if(light->lightLocationType==SIMMEDTK_LIGHTPOS_EYE){
 		glLoadIdentity();
 	}
 	glTranslatef(light->lightPos.pos.x,
@@ -551,7 +551,7 @@ void smViewer::enableLights(){
 		glLightf(iter[i]->renderUsage, GL_LINEAR_ATTENUATION, iter[i]->attn_linear);
 		glLightf(iter[i]->renderUsage, GL_QUADRATIC_ATTENUATION,iter[i]->attn_quadratic);
 
-		if(iter[i]->lightLocationType==SOFMIS_LIGHTPOS_EYE){
+		if(iter[i]->lightLocationType==SIMMEDTK_LIGHTPOS_EYE){
 			glMatrixMode(GL_MODELVIEW);
 			glPushMatrix();
 				glLoadIdentity();
@@ -562,7 +562,7 @@ void smViewer::enableLights(){
 			glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
 		}
 
-		if(iter[i]->lightType==SOFMIS_LIGHT_SPOTLIGHT)
+		if(iter[i]->lightType==SIMMEDTK_LIGHT_SPOTLIGHT)
 			glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
 
 		glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION,dir);
@@ -581,13 +581,13 @@ void smViewer::renderScene(smDrawParam p_param){
 		glDisable( GL_CULL_FACE);
 	}
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_GLOBALAXIS){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_GLOBALAXIS){
 		glPushAttrib(GL_COLOR_BUFFER_BIT);
 		drawAxis(30);
 		glPopAttrib();
 	}
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_TRANSPARENCY){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_TRANSPARENCY){
 		glEnable(GL_BLEND);
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable (GL_POLYGON_OFFSET_FILL);
@@ -597,7 +597,7 @@ void smViewer::renderScene(smDrawParam p_param){
 		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_GROUND){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_GROUND){
 		glMatrixMode(GL_MODELVIEW);
 		glPushMatrix();
 		glColor3f(1,1,1);
@@ -616,13 +616,13 @@ void smViewer::renderScene(smDrawParam p_param){
 		for(smInt j=sceneIter.start();j<sceneIter.end();j++){
 			//sceneObject=sceneList[sceneIndex]->sceneObjects[j];
 			sceneObject=sceneIter[j];
-			if(sceneObject->renderDetail.renderType&SOFMIS_RENDER_NONE)
+			if(sceneObject->renderDetail.renderType&SIMMEDTK_RENDER_NONE)
 				continue;
 
 			glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT |GL_VIEWPORT_BIT);
 
 			//if the custom rendering enable only render this
-			if(sceneObject->renderDetail.renderType&SOFMIS_RENDER_CUSTOMRENDERONLY){
+			if(sceneObject->renderDetail.renderType&SIMMEDTK_RENDER_CUSTOMRENDERONLY){
 				if(sceneObject->customRender!=NULL){
 					sceneObject->customRender->preDraw(sceneObject);
 					sceneObject->customRender->draw(sceneObject);
@@ -764,7 +764,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param){
 	glMatrixMode(GL_MODELVIEW);
 
 	//back
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_DYNAMICREFLECTION){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION){
 		glPushAttrib(GL_LIGHTING_BIT|GL_ENABLE_BIT |GL_VIEWPORT_BIT);
 			glMatrixMode(GL_PROJECTION);
 			glPushMatrix();
@@ -796,7 +796,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param){
 	renderStage=SMRENDERSTAGE_FINALPASS;
 	glMatrixMode(GL_MODELVIEW);
 
-	if(renderandreflection!=NULL&&viewerRenderDetail&SOFMIS_VIEWERRENDER_DYNAMICREFLECTION)
+	if(renderandreflection!=NULL&&viewerRenderDetail&SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
 		renderandreflection->switchEnable();
 
 	{ //why is this scoped?
@@ -804,7 +804,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param){
 		renderScene(p_param);
 	}
 
-	if(renderandreflection!=NULL&&viewerRenderDetail&SOFMIS_VIEWERRENDER_DYNAMICREFLECTION)
+	if(renderandreflection!=NULL&&viewerRenderDetail&SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
 		renderandreflection->switchDisable();
 
 }
@@ -913,7 +913,7 @@ void smViewer::draw(){
 	static QFont font;
 	static smQuatd quat;
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_DISABLE)
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_DISABLE)
 		return;
 
 	font.setPixelSize(10);
@@ -925,7 +925,7 @@ void smViewer::draw(){
 
 	adjustFPS();
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_FULLSCREEN){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_FULLSCREEN){
 		glViewport(0,0,screenResolutionWidth,screenResolutionHeight);
 	}
 
@@ -938,17 +938,17 @@ void smViewer::draw(){
 	glDisable(GL_VERTEX_PROGRAM_ARB);
 	glDisable(GL_FRAGMENT_PROGRAM_ARB);
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_FADEBACKGROUND)
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
 		smGLUtils::fadeBackgroundDraw();
 
 	setToDefaults();
 
 	for(smInt i=0;i<objectList.size();i++){
-		if(objectList[i]->drawOrder==SOFMIS_DRAW_BEFOREOBJECTS);
+		if(objectList[i]->drawOrder==SIMMEDTK_DRAW_BEFOREOBJECTS);
 		objectList[i]->draw(param);
 	}
 
-	if(viewerRenderDetail&SOFMIS_VIEWERRENDER_SOFTSHADOWS){
+	if(viewerRenderDetail&SIMMEDTK_VIEWERRENDER_SOFTSHADOWS){
 		drawWithShadows(param);
 	}
 	else{
@@ -959,7 +959,7 @@ void smViewer::draw(){
 	//for font display
 	setToDefaults();
 	for(smInt i=0;i<objectList.size();i++){
-		if(objectList[i]->drawOrder==SOFMIS_DRAW_AFTEROBJECTS);
+		if(objectList[i]->drawOrder==SIMMEDTK_DRAW_AFTEROBJECTS);
 		objectList[i]->draw(param);
 	}
 
@@ -1001,9 +1001,9 @@ void smViewer::keyPressEvent(QKeyEvent *e){
 	smLight *light,*light1;
 
 	eventKeyboard=new smEvent();
-	eventKeyboard->eventType=SOFMIS_EVENTTYPE_KEYBOARD;
+	eventKeyboard->eventType=SIMMEDTK_EVENTTYPE_KEYBOARD;
 	eventKeyboard->senderId=this->getModuleId();
-	eventKeyboard->senderType=SOFMIS_SENDERTYPE_MODULE;
+	eventKeyboard->senderType=SIMMEDTK_SENDERTYPE_MODULE;
 	eventKeyboard->data=new smKeyboardEventData();
 	((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey=e->key();
 	if(eventDispatcher)
@@ -1019,7 +1019,7 @@ void smViewer::keyPressEvent(QKeyEvent *e){
 	}
 
 	if(e->key()==Qt::Key_W){
-		this->viewerRenderDetail=this->viewerRenderDetail&(~(this->viewerRenderDetail&SOFMIS_VIEWERRENDER_WIREFRAMEALL));
+		this->viewerRenderDetail=this->viewerRenderDetail&(~(this->viewerRenderDetail&SIMMEDTK_VIEWERRENDER_WIREFRAMEALL));
 	}
 
 	if(e->key()==Qt::Key_Escape){
@@ -1045,21 +1045,21 @@ void smViewer::handleEvent(smEvent *p_event){
 	smVec3<smDouble> lightUp;
 	smVec3<smDouble> transverseDir;
 	switch(p_event->eventType.eventTypeCode){
-	case SOFMIS_EVENTTYPE_HAPTICOUT:
+	case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 		//left here as an example for implementation
 		//hapticEventData=(smHapticOutEventData *)p_event->data;
 		break;
-	case SOFMIS_EVENTTYPE_HAPTICIN:
+	case SIMMEDTK_EVENTTYPE_HAPTICIN:
 		//left here as an example for implementation
 		//hapticInEventData=(smHapticInEventData *)p_event->data;
 		break;
-	case SOFMIS_EVENTTYPE_CAMERA_UPDATE:
+	case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
 			cameraData=(smCameraEventData *)p_event->data;
 			deviceCameraPos=cameraData->pos;
 			deviceCameraDir=cameraData->direction;
 			deviceCameraUpDir=cameraData->upDirection;
 		break;
-	case SOFMIS_EVENTTYPE_LIGHTPOS_UPDATE:
+	case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
 		lightPosData=(smLightMotionEventData*)p_event->data;
 		if(lights->size()<lightPosData->lightIndex){
 			light=lights->getByRef(lightPosData->lightIndex);

@@ -19,7 +19,7 @@
 #include <iostream>
 using namespace std;
 
-///This is class is for error storing of the whole SOFMIS system.
+///This is class is for error storing of the whole SimMedTK system.
 ///All errors should be reported to the instance of this class.
 ///the critcal part are implemented considering multiple inputs from different threads. Please
 ///read the function explanation for further details. 
@@ -33,10 +33,10 @@ private:
 	smInt lastError;
 
 	///erros are stored in buffer
-	smChar errors[SOFMIS_MAX_ERRORLOG][SOFMIS_MAX_ERRORLOG_TEXT];
+	smChar errors[SIMMEDTK_MAX_ERRORLOG][SIMMEDTK_MAX_ERRORLOG_TEXT];
 
 	///time stamps for the error registered in the buffer
-	smInt timeStamp[SOFMIS_MAX_ERRORLOG];
+	smInt timeStamp[SIMMEDTK_MAX_ERRORLOG];
 
 	///mutex to sync accesses
 	QMutex mutex;

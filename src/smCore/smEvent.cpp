@@ -3,7 +3,7 @@
 
 smEvent::smEvent(){
 
-	priority=SOFMIS_EVENTPRIORITY_NORMAL;
+	priority=SIMMEDTK_EVENTPRIORITY_NORMAL;
 }
 
 smEvent::~smEvent(){
@@ -13,7 +13,7 @@ smEvent::~smEvent(){
 
 smEventType::smEventType(){
 
-	 eventTypeCode=SOFMIS_EVENTTYPE_NONE;
+	 eventTypeCode=SIMMEDTK_EVENTTYPE_NONE;
 }
 
 smEventType::smEventType(smInt p_eventType){

@@ -38,7 +38,7 @@ public:
 
 	/// \brief constructor
 	smPBDSceneObject(smErrorLog *p_log=NULL){
-		type=SOFMIS_SMPBDSCENEOBJECT;
+		type=SIMMEDTK_SMPBDSCENEOBJECT;
 	}
 
 	/// \brief !!
@@ -72,7 +72,7 @@ public:
 
 	/// \brief constructor
 	smPBDSurfaceSceneObject(smErrorLog *p_log=NULL){
-		type=SOFMIS_SMPBDSURFACESCENEOBJECT;
+		type=SIMMEDTK_SMPBDSURFACESCENEOBJECT;
 		mesh=new smSurfaceMesh(SMMESH_DEFORMABLE,p_log);
 	}
 

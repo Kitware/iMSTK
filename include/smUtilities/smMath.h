@@ -1,28 +1,8 @@
-/*
-****************************************************
-				  SOFMIS LICENSE
-
+/*****************************************************
+                  SIMMEDTK LICENSE
 ****************************************************
 
-	\author:    <http:\\acor.rpi.edu>
-				SOFMIS TEAM IN ALPHABATIC ORDER
-				Anderson Maciel, Ph.D.
-				Ganesh Sankaranarayanan, Ph.D.
-				Sreekanth A Venkata
-				Suvranu De, Ph.D.
-				Tansel Halic
-				Zhonghua Lu
-
-	\author:    Module by Tansel Halic
-				
-				
-	\version    1.0
-	\date       04/2009
-	\bug	    None yet
-	\brief	    This Module is generic Math class. It provides general Math operations.
-
-*****************************************************
-*/
+*****************************************************/
 
 #ifndef SMMATH_H 
 #define SMMATH_H 
@@ -46,7 +26,7 @@ class smMath:smCoreClass{
 	public:
 
 		smMath(){
-			type=SOFMIS_SMMATH;
+			type=SIMMEDTK_SMMATH;
 		}
 	/// \brief computes power
 	static inline smInt pow(smInt p_base, smInt p_pow) {

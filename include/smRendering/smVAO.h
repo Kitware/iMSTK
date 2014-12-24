@@ -69,9 +69,9 @@ private:
 public:
 	GLuint VAO;
 	smInt totalNbrBuffers;
-	GLuint bufferIndices[SOFMIS_MAX_VBOBUFFERS];
+	GLuint bufferIndices[SIMMEDTK_MAX_VBOBUFFERS];
 	smInt indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
-	smVBOBufferEntryInfo bufferInfo[SOFMIS_MAX_VBOBUFFERS];
+	smVBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
 	smVBOType vboType;
 	smChar error[500];
 	///All VBOs are stored here
@@ -79,7 +79,7 @@ public:
 	smMesh *mesh;
 
 	/// \brief need error log and totalBuffer Size
-	smVAO(smErrorLog *p_log, smVBOType p_vboType=SOFMIS_VBO_DYNAMIC, smBool p_bindShaderObjects=true){
+	smVAO(smErrorLog *p_log, smVBOType p_vboType=SIMMEDTK_VBO_DYNAMIC, smBool p_bindShaderObjects=true){
 		this->log=p_log;
 		renderingError=false;
 		totalNbrBuffers=0;

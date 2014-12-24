@@ -41,7 +41,7 @@ protected:
 			for(smInt i=0;i<this->objectsSimulated.size();i++){
 				sceneObj=this->objectsSimulated[i];
 				//ensure that dummy simulator will work on static scene objects only.
-				if(sceneObj->getType()==SOFMIS_SMSTYLUSRIGIDSCENEOBJECT){
+				if(sceneObj->getType()==SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT){
 					tool=(smStylusRigidSceneObject*)sceneObj;
 					if(tool->toolEnabled)
 						updateTool(tool);
@@ -60,7 +60,7 @@ protected:
 
 		smKeyboardEventData *keyBoardData;
 		switch(p_event->eventType.eventTypeCode){
-		case SOFMIS_EVENTTYPE_KEYBOARD:
+		case SIMMEDTK_EVENTTYPE_KEYBOARD:
 			keyBoardData=(smKeyboardEventData*)p_event->data;
 			if(keyBoardData->keyBoardKey==Qt::Key_F1)
 				printf("F1 Keyboard is pressed %c\n",keyBoardData->keyBoardKey);

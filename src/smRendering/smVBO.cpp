@@ -6,8 +6,8 @@ smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p
 	smInt nbrVertices;
 	smFloat *baseBufferPtr;
 	smFloat *objectBufferPtr;
-	if(vboType==SOFMIS_VBO_STATIC)
-		return SOFMIS_VBO_INVALIDOPERATION;
+	if(vboType==SIMMEDTK_VBO_STATIC)
+		return SIMMEDTK_VBO_INVALIDOPERATION;
 
 	nbrVertices=numberofVertices[p_objectId];
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
@@ -16,7 +16,7 @@ smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p
 	if(objectBufferPtr==NULL){
 		log->addError(this,"VBO could not map the buffer");
 		renderingError=true;
-		return SOFMIS_VBO_BUFFERPOINTERERROR;
+		return SIMMEDTK_VBO_BUFFERPOINTERERROR;
 	}
 
 	//copy the buffers for vertices, normals and texture respectively
@@ -29,7 +29,7 @@ smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p
 
 	//unmap the buffer
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-	return SOFMIS_VBO_OK;
+	return SIMMEDTK_VBO_OK;
 }
 
 smVBOResult smVBO::updateTriangleIndices(smInt *p_indices,smInt p_objectId){
@@ -37,8 +37,8 @@ smVBOResult smVBO::updateTriangleIndices(smInt *p_indices,smInt p_objectId){
 	smFloat *baseBufferPtr;
 	smFloat *objectBufferPtr;
 
-	if(vboType==SOFMIS_VBO_STATIC|vboType==SOFMIS_VBO_DYNAMIC)
-		return SOFMIS_VBO_INVALIDOPERATION;
+	if(vboType==SIMMEDTK_VBO_STATIC|vboType==SIMMEDTK_VBO_DYNAMIC)
+		return SIMMEDTK_VBO_INVALIDOPERATION;
 
 	nbrTriangles=numberofTriangles[p_objectId];
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
@@ -47,13 +47,13 @@ smVBOResult smVBO::updateTriangleIndices(smInt *p_indices,smInt p_objectId){
 	if(objectBufferPtr==NULL){
 		log->addError(this,"VBO could not map the buffer");
 		renderingError=true;
-		return SOFMIS_VBO_BUFFERPOINTERERROR;
+		return SIMMEDTK_VBO_BUFFERPOINTERERROR;
 	}
 
 	memcpy(objectBufferPtr,p_indices,nbrTriangles*sizeof(smTriangle));
 	//unmap the buffer
 	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-	return SOFMIS_VBO_OK;
+	return SIMMEDTK_VBO_OK;
 }
 
 smVBOResult smVBO::drawElements(smInt p_objectId){
@@ -88,11 +88,11 @@ smVBOResult smVBO::drawElements(smInt p_objectId){
 	//return back to original buffer
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-	return SOFMIS_VBO_OK;
+	return SIMMEDTK_VBO_OK;
 }
 
 ///Static Binding of the buffers. It is mandatory to call this function
-/// this function must be called when the binding is SOFMIS_VBO_STATIC
+/// this function must be called when the binding is SIMMEDTK_VBO_STATIC
 smVBOResult smVBO::initStaticVertices(smVec3<smFloat> *p_vectors,
                                       smVec3<smFloat> *p_normals,
                                       smTexCoord *p_textureCoords,
@@ -103,8 +103,8 @@ smVBOResult smVBO::initStaticVertices(smVec3<smFloat> *p_vectors,
 	smFloat *objectBufferPtr;
 	smInt dataOffset;
 
-	if(vboType==SOFMIS_VBO_DYNAMIC)
-		return SOFMIS_VBO_INVALIDOPERATION;
+	if(vboType==SIMMEDTK_VBO_DYNAMIC)
+		return SIMMEDTK_VBO_INVALIDOPERATION;
 
 	dataOffset=dataOffsetMap[p_objectId];
 	nbrVertices=numberofVertices[p_objectId];
@@ -118,12 +118,12 @@ smVBOResult smVBO::initStaticVertices(smVec3<smFloat> *p_vectors,
 
 	//unmap the buffer
 	glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-	return SOFMIS_VBO_OK;
+	return SIMMEDTK_VBO_OK;
 }
 
 ///init Triangle Indices for the very first time for static objects
 ///this function must be called when the indices are not changing
-///SOFMIS_VBO_NOINDICESCHANGE
+///SIMMEDTK_VBO_NOINDICESCHANGE
 smVBOResult smVBO::initTriangleIndices(smInt *p_indices,smInt p_objectId){
 
 	smInt nbrTriangles;
@@ -131,8 +131,8 @@ smVBOResult smVBO::initTriangleIndices(smInt *p_indices,smInt p_objectId){
 	smFloat *objectBufferPtr;
 	smInt indexOffset;
 
-	if(vboType==SOFMIS_VBO_DYNAMIC)
-		return SOFMIS_VBO_INVALIDOPERATION;
+	if(vboType==SIMMEDTK_VBO_DYNAMIC)
+		return SIMMEDTK_VBO_INVALIDOPERATION;
 
 	nbrTriangles=numberofTriangles[p_objectId];
 	indexOffset=indexOffsetMap[p_objectId];
@@ -141,5 +141,5 @@ smVBOResult smVBO::initTriangleIndices(smInt *p_indices,smInt p_objectId){
 
 	//unmap the buffer
 	glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-	return SOFMIS_VBO_OK;
+	return SIMMEDTK_VBO_OK;
 }

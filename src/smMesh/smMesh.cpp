@@ -25,7 +25,7 @@ smMesh::smMesh(){
 	vertNormals=0;
 	triTangents=0;
 	vertTangents=0;
-	type=SOFMIS_SMMESH;
+	type=SIMMEDTK_SMMESH;
 	isTextureCoordAvailable=false;
 	tangentChannel=false;
 	triAABBs=NULL;
@@ -336,22 +336,22 @@ inline void smMesh::upadateAABB(){
 	smFloat maxz=-smMAXFLOAT;
 
 	for(smInt i=0;i<nbrVertices;i++){
-		minx=SOFMIS_MIN(vertices[i].x,minx);
-		miny=SOFMIS_MIN(vertices[i].y,miny);
-		minz=SOFMIS_MIN(vertices[i].z,minz);
+		minx=SIMMEDTK_MIN(vertices[i].x,minx);
+		miny=SIMMEDTK_MIN(vertices[i].y,miny);
+		minz=SIMMEDTK_MIN(vertices[i].z,minz);
 
-		maxx=SOFMIS_MAX(vertices[i].x,maxx);
-		maxy=SOFMIS_MAX(vertices[i].y,maxy);
-		maxz=SOFMIS_MAX(vertices[i].z,maxz);
+		maxx=SIMMEDTK_MAX(vertices[i].x,maxx);
+		maxy=SIMMEDTK_MAX(vertices[i].y,maxy);
+		maxz=SIMMEDTK_MAX(vertices[i].z,maxz);
 	}
 
-	aabb.aabbMin.x=minx-(maxx-minx)*SOFMIS_MESH_AABBSKINFACTOR;
-	aabb.aabbMin.y=miny-(maxy-miny)*SOFMIS_MESH_AABBSKINFACTOR;
-	aabb.aabbMin.z=minz-(maxz-minz)*SOFMIS_MESH_AABBSKINFACTOR;
+	aabb.aabbMin.x=minx-(maxx-minx)*SIMMEDTK_MESH_AABBSKINFACTOR;
+	aabb.aabbMin.y=miny-(maxy-miny)*SIMMEDTK_MESH_AABBSKINFACTOR;
+	aabb.aabbMin.z=minz-(maxz-minz)*SIMMEDTK_MESH_AABBSKINFACTOR;
 
-	aabb.aabbMax.x=maxx+(maxx-minx)*SOFMIS_MESH_AABBSKINFACTOR;
-	aabb.aabbMax.y=maxy+(maxy-miny)*SOFMIS_MESH_AABBSKINFACTOR;
-	aabb.aabbMax.z=maxz+(maxz-minz)*SOFMIS_MESH_AABBSKINFACTOR;
+	aabb.aabbMax.x=maxx+(maxx-minx)*SIMMEDTK_MESH_AABBSKINFACTOR;
+	aabb.aabbMax.y=maxy+(maxy-miny)*SIMMEDTK_MESH_AABBSKINFACTOR;
+	aabb.aabbMax.z=maxz+(maxz-minz)*SIMMEDTK_MESH_AABBSKINFACTOR;
 }
 
 /// \brief
@@ -360,7 +360,7 @@ void smMesh::calcEdges(){
 	smInt i, j, k;
 	smBool exist;
 	smEdge edge;
-	edges.reserve(SOFMIS_MESH_RESERVEDMAXEDGES);
+	edges.reserve(SIMMEDTK_MESH_RESERVEDMAXEDGES);
 	for(i=0; i<nbrVertices; i++){
 		for(j=0;j<vertVertNeighbors[i].size();j++){
 			if(vertVertNeighbors[i][j]>i){
@@ -435,7 +435,7 @@ void smMesh::draw(smDrawParam p_params){
 	if(viewer->renderStage==SMRENDERSTAGE_SHADOWPASS&&p_params.caller->renderDetail.castShadow==false)
 		return;
 smGLRenderer::drawSurfaceMeshTriangles(this,&p_params.caller->renderDetail,p_params);
-	if(p_params.caller->renderDetail.renderType&SOFMIS_RENDER_NORMALS)
+	if(p_params.caller->renderDetail.renderType&SIMMEDTK_RENDER_NORMALS)
 		smGLRenderer::drawNormals(this,p_params.caller->renderDetail.normalColor);
 }
 
@@ -453,29 +453,29 @@ void smMesh::updateTriangleAABB(){
 
 	for(smInt i=0;i<nbrTriangles;i++){
 		// min
-		triAABBs[i].aabbMin.x = SOFMIS_MIN(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x); 
-		triAABBs[i].aabbMin.x = SOFMIS_MIN(triAABBs[i].aabbMin.x ,   vertices[triangles[i].vert[2]].x);
-		tempAABB.aabbMin.x = SOFMIS_MIN(tempAABB.aabbMin.x,triAABBs[i].aabbMin.x);
+		triAABBs[i].aabbMin.x = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x); 
+		triAABBs[i].aabbMin.x = SIMMEDTK_MIN(triAABBs[i].aabbMin.x ,   vertices[triangles[i].vert[2]].x);
+		tempAABB.aabbMin.x = SIMMEDTK_MIN(tempAABB.aabbMin.x,triAABBs[i].aabbMin.x);
 
-		triAABBs[i].aabbMin.y = SOFMIS_MIN(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
-		triAABBs[i].aabbMin.y = SOFMIS_MIN(triAABBs[i].aabbMin.y ,   vertices[triangles[i].vert[2]].y);
-		tempAABB.aabbMin.y = SOFMIS_MIN(tempAABB.aabbMin.y,triAABBs[i].aabbMin.y);
+		triAABBs[i].aabbMin.y = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
+		triAABBs[i].aabbMin.y = SIMMEDTK_MIN(triAABBs[i].aabbMin.y ,   vertices[triangles[i].vert[2]].y);
+		tempAABB.aabbMin.y = SIMMEDTK_MIN(tempAABB.aabbMin.y,triAABBs[i].aabbMin.y);
 
-		triAABBs[i].aabbMin.z = SOFMIS_MIN(vertices[triangles[i].vert[0]].z, vertices[triangles[i].vert[1]].z);
-		triAABBs[i].aabbMin.z = SOFMIS_MIN(triAABBs[i].aabbMin.z ,   vertices[triangles[i].vert[2]].z);
-		tempAABB.aabbMin.z = SOFMIS_MIN(tempAABB.aabbMin.z,triAABBs[i].aabbMin.z);
+		triAABBs[i].aabbMin.z = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].z, vertices[triangles[i].vert[1]].z);
+		triAABBs[i].aabbMin.z = SIMMEDTK_MIN(triAABBs[i].aabbMin.z ,   vertices[triangles[i].vert[2]].z);
+		tempAABB.aabbMin.z = SIMMEDTK_MIN(tempAABB.aabbMin.z,triAABBs[i].aabbMin.z);
 
 		//max
-		triAABBs[i].aabbMax.x = SOFMIS_MAX(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x);
-		triAABBs[i].aabbMax.x = SOFMIS_MAX(triAABBs[i].aabbMax.x ,   vertices[triangles[i].vert[2]].x);
-		tempAABB.aabbMax.x = SOFMIS_MAX(tempAABB.aabbMax.x,triAABBs[i].aabbMax.x );
+		triAABBs[i].aabbMax.x = SIMMEDTK_MAX(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x);
+		triAABBs[i].aabbMax.x = SIMMEDTK_MAX(triAABBs[i].aabbMax.x ,   vertices[triangles[i].vert[2]].x);
+		tempAABB.aabbMax.x = SIMMEDTK_MAX(tempAABB.aabbMax.x,triAABBs[i].aabbMax.x );
 
-		triAABBs[i].aabbMax.y = SOFMIS_MAX(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
-		triAABBs[i].aabbMax.y = SOFMIS_MAX(triAABBs[i].aabbMax.y ,   vertices[triangles[i].vert[2]].y);
-		tempAABB.aabbMax.y = SOFMIS_MAX(tempAABB.aabbMax.y, triAABBs[i].aabbMax.y);
+		triAABBs[i].aabbMax.y = SIMMEDTK_MAX(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
+		triAABBs[i].aabbMax.y = SIMMEDTK_MAX(triAABBs[i].aabbMax.y ,   vertices[triangles[i].vert[2]].y);
+		tempAABB.aabbMax.y = SIMMEDTK_MAX(tempAABB.aabbMax.y, triAABBs[i].aabbMax.y);
 
-		triAABBs[i].aabbMax.z = SOFMIS_MAX(triAABBs[i].aabbMax.z,    vertices[triangles[i].vert[2]].z);
-		tempAABB.aabbMax.z = SOFMIS_MAX(tempAABB.aabbMax.z, triAABBs[i].aabbMax.z);
+		triAABBs[i].aabbMax.z = SIMMEDTK_MAX(triAABBs[i].aabbMax.z,    vertices[triangles[i].vert[2]].z);
+		tempAABB.aabbMax.z = SIMMEDTK_MAX(tempAABB.aabbMax.z, triAABBs[i].aabbMax.z);
 	}
 	aabb=tempAABB;
 }

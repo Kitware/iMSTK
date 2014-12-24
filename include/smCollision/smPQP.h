@@ -196,7 +196,7 @@ public:
 		smHapticOutEventData *hapticEventData;
 		smVec3d rightVector;
 		switch(p_event->eventType.eventTypeCode){
-			case SOFMIS_EVENTTYPE_HAPTICOUT:
+			case SIMMEDTK_EVENTTYPE_HAPTICOUT:
 				hapticEventData=(smHapticOutEventData *)p_event->data;
 
 				if(hapticEventData->deviceId==0){

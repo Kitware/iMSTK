@@ -19,9 +19,9 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log){
 	smSDK::registerObjectSim(this);
 	name=QString("objecSimulator")+QString().setNum(uniqueId.ID);
 
-	type=SOFMIS_SMOBJECTSIMULATOR;
+	type=SIMMEDTK_SMOBJECTSIMULATOR;
 	isObjectSimInitialized=false;
-	threadPriority=SOFMIS_THREAD_NORMALPRIORITY;
+	threadPriority=SIMMEDTK_THREAD_NORMALPRIORITY;
 	
 	objectsSimulated.clear();
 	
@@ -33,5 +33,5 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log){
 	timer.start();
 	enabled=false;
 	executionTypeStatusChanged=false;
-	execType=SOFMIS_SIMEXECUTION_SYNCMODE;
+	execType=SIMMEDTK_SIMEXECUTION_SYNCMODE;
 }

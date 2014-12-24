@@ -33,7 +33,7 @@ private:
 
 public:
 	smDispatcher(){
-		type=SOFMIS_SMDISPATHCER;
+		type=SIMMEDTK_SMDISPATHCER;
 	}
 
 public:

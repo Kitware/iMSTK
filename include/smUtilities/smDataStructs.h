@@ -195,7 +195,7 @@ public:
 	}
 };
 /// \brief hash bucket size
-#define SOFMIS_HASHBUCKET_SIZE	10
+#define SIMMEDTK_HASHBUCKET_SIZE	10
 /// \brief a hash entry; bucket 
 template <class T>
 struct smEntryList{
@@ -205,7 +205,7 @@ public:
 		p_entry=NULL;
 	}
 
-	T ID[SOFMIS_HASHBUCKET_SIZE];
+	T ID[SIMMEDTK_HASHBUCKET_SIZE];
 	smUInt totalEntries;
 	smEntryList* p_entry;
 };
@@ -248,14 +248,14 @@ struct smHashIterator{
 	}
 };
 /// \brief hash return codes
-enum SOFMIS_HASHRETURN_CODES{
-	SOFMIS_HASH_ENTRYREMOVED,
-	SOFMIS_HASH_ENTRYALREADYEXISTS,
-	SOFMIS_HASH_ENTRYOTEXIST,
-	SOFMIS_HASH_NOTBUCKETS,
-	SOFMIS_HASH_ENTRYINSERTED,
-	SOFMIS_HASH_ALLOCATED_INSERTED,
-	SOFMIS_HASH_SUCCESS
+enum SIMMEDTK_HASHRETURN_CODES{
+	SIMMEDTK_HASH_ENTRYREMOVED,
+	SIMMEDTK_HASH_ENTRYALREADYEXISTS,
+	SIMMEDTK_HASH_ENTRYOTEXIST,
+	SIMMEDTK_HASH_NOTBUCKETS,
+	SIMMEDTK_HASH_ENTRYINSERTED,
+	SIMMEDTK_HASH_ALLOCATED_INSERTED,
+	SIMMEDTK_HASH_SUCCESS
 };
 /// \brief hash implementation. Table->
 template <class T>
@@ -325,7 +325,7 @@ public:
 	}
 	/// \brief  insert the entry; indicate as p_triangle. It can be any type not only a triangle
 	/// hashindex is the has number generated for the entry
-	inline SOFMIS_HASHRETURN_CODES insert(T p_triangle,smUInt hashIndex){
+	inline SIMMEDTK_HASHRETURN_CODES insert(T p_triangle,smUInt hashIndex){
 		smEntryList<T> *currentBucket;
 		smEntryList<T> *prevBucket;
 		smEntryList<T> *emptySpace=NULL;
@@ -335,7 +335,7 @@ public:
 		while(true){
 			if(currentBucket==NULL)
 				break;
-			if(emptySpace==NULL&&currentBucket->totalEntries<SOFMIS_HASHBUCKET_SIZE){
+			if(emptySpace==NULL&&currentBucket->totalEntries<SIMMEDTK_HASHBUCKET_SIZE){
 				emptySpace=currentBucket;
 				break;
 			}
@@ -349,7 +349,7 @@ public:
 			prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries]=p_triangle;
 			prevBucket->p_entry->totalEntries++;
 			num_prim++;
-			return  SOFMIS_HASH_ALLOCATED_INSERTED;
+			return  SIMMEDTK_HASH_ALLOCATED_INSERTED;
 		}
 		else {
 			emptySpace->ID[emptySpace->totalEntries]=p_triangle;
@@ -357,10 +357,10 @@ public:
 		}
 
 		num_prim++;
-		return SOFMIS_HASH_ENTRYINSERTED;
+		return SIMMEDTK_HASH_ENTRYINSERTED;
 	}
 	/// \brief check if there is an entry and index
-	inline SOFMIS_HASHRETURN_CODES checkAndInsert(T p_triangle,smUInt hashIndex){
+	inline SIMMEDTK_HASHRETURN_CODES checkAndInsert(T p_triangle,smUInt hashIndex){
 		smEntryList<T> *currentBucket;
 		smEntryList<T> *prevBucket;
 		smEntryList<T> *emptySpace=NULL;
@@ -372,10 +372,10 @@ public:
 				break;
 
 			if(checkIdentical(*currentBucket,p_triangle)){
-				return SOFMIS_HASH_ENTRYALREADYEXISTS;
+				return SIMMEDTK_HASH_ENTRYALREADYEXISTS;
 			}
 
-			if(emptySpace==NULL&&currentBucket->totalEntries<SOFMIS_HASHBUCKET_SIZE){
+			if(emptySpace==NULL&&currentBucket->totalEntries<SIMMEDTK_HASHBUCKET_SIZE){
 				emptySpace=currentBucket;
 				break;
 			}
@@ -389,7 +389,7 @@ public:
 			prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries]=p_triangle;
 			prevBucket->p_entry->totalEntries++;
 			num_prim++;
-			return SOFMIS_HASH_ALLOCATED_INSERTED;
+			return SIMMEDTK_HASH_ALLOCATED_INSERTED;
 		}
 		else {
 			emptySpace->ID[emptySpace->totalEntries]=p_triangle;
@@ -397,7 +397,7 @@ public:
 		}
 
 		num_prim++;
-		return SOFMIS_HASH_ENTRYINSERTED;
+		return SIMMEDTK_HASH_ENTRYINSERTED;
 	}
 	/// \brief starts the iteration. reset the indices
 	inline void startIteration(){
@@ -512,8 +512,8 @@ public:
 };
 /// \brief sliding  storage type
 enum smStorageSlideType{
-	SOFMIS_STORAGESLIDING_FRONTFIRST,
-	SOFMIS_STORAGESLIDING_LASTFIRST
+	SIMMEDTK_STORAGESLIDING_FRONTFIRST,
+	SIMMEDTK_STORAGESLIDING_LASTFIRST
 };
 /// \brief sliding storage window
 template<typename T>
@@ -531,7 +531,7 @@ public:
 		delete[] data;
 	}
 	/// \brief siding window storage. constructor  gets window size, type
-	smStorageSlidingWindow(int p_windowSize=10,smStorageSlideType p_type=SOFMIS_STORAGESLIDING_LASTFIRST){
+	smStorageSlidingWindow(int p_windowSize=10,smStorageSlideType p_type=SIMMEDTK_STORAGESLIDING_LASTFIRST){
 		data=new T[p_windowSize];
 		windowSize=p_windowSize;
 		memset(data,0,sizeof(T)*p_windowSize);
@@ -552,7 +552,7 @@ public:
 		tempData=new T[p_newSize];
 		memset(tempData,0,sizeof(T)*p_newSize);
 
-		if(strorageType==SOFMIS_STORAGESLIDING_LASTFIRST){
+		if(strorageType==SIMMEDTK_STORAGESLIDING_LASTFIRST){
 			if(p_newSize>windowSize)
 				memcpy(tempData+p_newSize-windowSize,data,windowSize*sizeof(T));
 			else
@@ -571,7 +571,7 @@ public:
 	}
 	/// \brief add value
 	inline void add(T p_value){
-		if(strorageType==SOFMIS_STORAGESLIDING_LASTFIRST){
+		if(strorageType==SIMMEDTK_STORAGESLIDING_LASTFIRST){
 			memcpy(data,&data[1],(windowSize-1)*sizeof(T));
 			data[windowSize-1]=p_value;
 		}
