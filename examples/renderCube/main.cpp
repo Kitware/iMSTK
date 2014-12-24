@@ -2,6 +2,6 @@
 
 int main()
 {
-	renderExample();
-	return 0;
+    renderExample();
+    return 0;
 }

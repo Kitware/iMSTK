@@ -2,107 +2,142 @@
 #include <omp.h>
 
 /// \brief starts the tasks with the threads from thread pool
-void smSimulator::beginFrame(){
+void smSimulator::beginFrame()
+{
 
-	frameCounter++;
+    frameCounter++;
 }
 
 /// \brief waits until the frame ends
-void smSimulator::endFrame(){
+void smSimulator::endFrame()
+{
 
 }
 
-void smSimulator::startAsychThreads(){
+void smSimulator::startAsychThreads()
+{
 
-	smInt asyncThreadNbr=0;
-	for(smInt i=0;i<simulators.size();i++){
-		if(simulators[i]->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
-			asyncThreadNbr++;
-	}
+    smInt asyncThreadNbr = 0;
 
-	asyncPool->setMaxThreadCount(asyncThreadNbr);
-	for(smInt i=0;i<simulators.size();i++){
-		if(simulators[i]->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
-			asyncPool->start(simulators[i],simulators[i]->getPriority());
-	}
+    for (smInt i = 0; i < simulators.size(); i++)
+    {
+        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        {
+            asyncThreadNbr++;
+        }
+    }
+
+    asyncPool->setMaxThreadCount(asyncThreadNbr);
+
+    for (smInt i = 0; i < simulators.size(); i++)
+    {
+        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        {
+            asyncPool->start(simulators[i], simulators[i]->getPriority());
+        }
+    }
 }
 
 /// \brief the main simulation loop
-void smSimulator::run(){
+void smSimulator::run()
+{
 
-	smObjectSimulator *objectSimulator;
-	smInt nbrSims;
-	
-	if(isInitialized==false){
-		log->addError(this,"Simulator is not initialized.");
-		return;
-	}
+    smObjectSimulator *objectSimulator;
+    smInt nbrSims;
 
-	smSimulationMainParam param;
-	param.sceneList=sceneList;
-	
-	startAsychThreads();
-	simulatorThreadPool->size_controller().resize(this->simulators.size());
-	while(true&&this->terminateExecution==false){
-		beginModule();
-		if(main!=NULL)
-			main->simulateMain(param);
-		if(changedMainTimeStamp>mainTimeStamp){
-			
-			main=changedMain;
-			changedMainTimeStamp=mainTimeStamp;
-			
-		}
+    if (isInitialized == false)
+    {
+        log->addError(this, "Simulator is not initialized.");
+        return;
+    }
 
-		nbrSims=simulators.size();
-		smTimer timer;
+    smSimulationMainParam param;
+    param.sceneList = sceneList;
 
-		for(smInt i=0;i<this->simulators.size();i++){
-				objectSimulator=simulators[i];
-				if(objectSimulator->execType==SIMMEDTK_SIMEXECUTION_ASYNCMODE)
-					continue;
-				if(objectSimulator->enabled==false)
-					continue;
-				schedule(*simulatorThreadPool,boost::bind(&smObjectSimulator::run,objectSimulator));
-		}
-		simulatorThreadPool->wait();
-		
-		for(smInt i=0;i<this->simulators.size();i++){
-			objectSimulator=simulators[i];
-			objectSimulator->syncBuffers();
-		}
-		
-		timer.start();
-		
-		for(smInt i=0;i<this->collisionDetectors.size();i++){
-			objectSimulator=collisionDetectors[i];
-			schedule(*simulatorThreadPool,boost::bind(&smObjectSimulator::run,objectSimulator));
-		}
+    startAsychThreads();
+    simulatorThreadPool->size_controller().resize(this->simulators.size());
 
-		simulatorThreadPool->wait();
+    while (true && this->terminateExecution == false)
+    {
+        beginModule();
 
-		endModule();
-	}
-	asyncPool->waitForDone();
+        if (main != NULL)
+        {
+            main->simulateMain(param);
+        }
+
+        if (changedMainTimeStamp > mainTimeStamp)
+        {
+
+            main = changedMain;
+            changedMainTimeStamp = mainTimeStamp;
+
+        }
+
+        nbrSims = simulators.size();
+        smTimer timer;
+
+        for (smInt i = 0; i < this->simulators.size(); i++)
+        {
+            objectSimulator = simulators[i];
+
+            if (objectSimulator->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+            {
+                continue;
+            }
+
+            if (objectSimulator->enabled == false)
+            {
+                continue;
+            }
+
+            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+        }
+
+        simulatorThreadPool->wait();
+
+        for (smInt i = 0; i < this->simulators.size(); i++)
+        {
+            objectSimulator = simulators[i];
+            objectSimulator->syncBuffers();
+        }
+
+        timer.start();
+
+        for (smInt i = 0; i < this->collisionDetectors.size(); i++)
+        {
+            objectSimulator = collisionDetectors[i];
+            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+        }
+
+        simulatorThreadPool->wait();
+
+        endModule();
+    }
+
+    asyncPool->waitForDone();
 
 }
 
-/// \brief 
-void smSimulator::registerObjectSimulator(smObjectSimulator *objectSimulator){
+/// \brief
+void smSimulator::registerObjectSimulator(smObjectSimulator *objectSimulator)
+{
 
-	simulators.push_back(objectSimulator);
-	objectSimulator->enabled=true;
+    simulators.push_back(objectSimulator);
+    objectSimulator->enabled = true;
 }
 
-/// \brief 
-void smSimulator::registerCollisionDetection(smObjectSimulator *p_collisionDetection){
+/// \brief
+void smSimulator::registerCollisionDetection(smObjectSimulator *p_collisionDetection)
+{
 
-	collisionDetectors.push_back(p_collisionDetection);	
+    collisionDetectors.push_back(p_collisionDetection);
 }
 
-/// \brief 
-void smSimulator::registerSimulationMain(smSimulationMain*p_main){
+/// \brief
+void smSimulator::registerSimulationMain(smSimulationMain*p_main)
+{
 
-	changedMain=p_main;
-	this->changedMainTimeStamp++;
+    changedMain = p_main;
+    this->changedMainTimeStamp++;
 }

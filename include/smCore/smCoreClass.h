@@ -1,6 +1,6 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+                SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
@@ -19,136 +19,157 @@ class smCoreClass;
 class smObjectSimulator;
 class smViewer;
 
-/// \brief  viewer sends this to all objects to be rendered   
-struct smDrawParam{
-	smViewer    *rendererObject;
-	smCoreClass *caller;
-	void *data;
+/// \brief  viewer sends this to all objects to be rendered
+struct smDrawParam
+{
+    smViewer    *rendererObject;
+    smCoreClass *caller;
+    void *data;
 };
 
-/// \brief simulator calls object and sends this structure 
-struct smSimulationParam{
-	smObjectSimulator *objectSimulator;
-	void *caller;
-	void *data;
+/// \brief simulator calls object and sends this structure
+struct smSimulationParam
+{
+    smObjectSimulator *objectSimulator;
+    void *caller;
+    void *data;
 
 };
 
 /// \brief  This class indicates the unified id of all  objects in the framework
-struct smUnifiedID{
+struct smUnifiedID
+{
 
 private:
-	/// \brief  atomic integer counter that is used to assign a unique number for  each object
-	static QAtomicInt IDcounter;
-	/// \brief  sdk ID. for network use 
-	smShort sdkID;
+    /// \brief  atomic integer counter that is used to assign a unique number for  each object
+    static QAtomicInt IDcounter;
+    /// \brief  sdk ID. for network use
+    smShort sdkID;
 
 public:
-	/// \brief  unique ID 
-	smShort ID;
-	/// \brief   machine ID. for network use
-	smShort machineID;
+    /// \brief  unique ID
+    smShort ID;
+    /// \brief   machine ID. for network use
+    smShort machineID;
 
-	/// \brief  constructor
-	smUnifiedID(){
-		sdkID=-1;
-		machineID=-1;
+    /// \brief  constructor
+    smUnifiedID()
+    {
+        sdkID = -1;
+        machineID = -1;
 
-	}
+    }
 
-	/// \brief  generate unique ID
-	inline void generateUniqueID(){
-		ID=IDcounter.fetchAndAddOrdered(1);
-	}
+    /// \brief  generate unique ID
+    inline void generateUniqueID()
+    {
+        ID = IDcounter.fetchAndAddOrdered(1);
+    }
 
-	/// \brief  returns SDK id
-	inline smInt getSDKID()const{
-		return sdkID;
-	}
+    /// \brief  returns SDK id
+    inline smInt getSDKID()const
+    {
+        return sdkID;
+    }
 
-	/// \brief  set with another smUnifiedID 
-	inline void operator =(const smUnifiedID &p_id){
-		ID=p_id.ID;
-		sdkID=p_id.sdkID;
-		machineID=p_id.machineID;
-	}
-	/// \brief comparison with another smUnifiedID 
-	inline bool operator==(smUnifiedID &p_id){
-		return (ID==p_id.ID&&machineID==p_id.machineID);
-	}
-	/// \brief checks with ID. can be used to compare the object on the same machine
-	inline bool operator==(smInt &p_ID){
-		return (ID==p_ID);
-	}
-	/// \brief comparison with id
-	inline bool operator!=(smInt &p_ID){
-		return (ID!=p_ID);
-	}
+    /// \brief  set with another smUnifiedID
+    inline void operator =(const smUnifiedID &p_id)
+    {
+        ID = p_id.ID;
+        sdkID = p_id.sdkID;
+        machineID = p_id.machineID;
+    }
+    /// \brief comparison with another smUnifiedID
+    inline bool operator==(smUnifiedID &p_id)
+    {
+        return (ID == p_id.ID && machineID == p_id.machineID);
+    }
+    /// \brief checks with ID. can be used to compare the object on the same machine
+    inline bool operator==(smInt &p_ID)
+    {
+        return (ID == p_ID);
+    }
+    /// \brief comparison with id
+    inline bool operator!=(smInt &p_ID)
+    {
+        return (ID != p_ID);
+    }
 
-	friend smSDK;
+    friend smSDK;
 };
 
 /// \brief core class of all objects in framework
-class smCoreClass{
+class smCoreClass
+{
 
 protected:
-	/// \brief class type
-	smClassType type;
-	/// \brief reference counter to identify the count the usage
-	smInt referenceCounter;
+    /// \brief class type
+    smClassType type;
+    /// \brief reference counter to identify the count the usage
+    smInt referenceCounter;
 
 public:
-	/// \brief name of the class
-	QString name;
-	/// \brief unique ID
-	smUnifiedID uniqueId;
-	/// \brief renderDetail specifies visualization type
-	smRenderDetail renderDetail;
-	/// \brief draw order of the object
-	smClassDrawOrder drawOrder;
+    /// \brief name of the class
+    QString name;
+    /// \brief unique ID
+    smUnifiedID uniqueId;
+    /// \brief renderDetail specifies visualization type
+    smRenderDetail renderDetail;
+    /// \brief draw order of the object
+    smClassDrawOrder drawOrder;
 
-	/// \brief constructor
-	smCoreClass():name(""){
-		referenceCounter=0;
-		drawOrder=SIMMEDTK_DRAW_BEFOREOBJECTS;
-		uniqueId.generateUniqueID();
-		
-	}
-	/// \brief get type of the class
-	inline smClassType getType(){
-		return type;
-	}
+    /// \brief constructor
+    smCoreClass(): name("")
+    {
+        referenceCounter = 0;
+        drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
+        uniqueId.generateUniqueID();
 
-	/// \brief his function is called by the renderer. The p_params stores renderer pointers
-	virtual void initDraw(smDrawParam p_params){
-	}
-	/// \brief draw function is called for visualization the object
-	virtual void draw(smDrawParam p_params){
-	}
-	/// \brief initialization of simulation
-	virtual void initSimulate(smSimulationParam p_params){
-	}
-	/// \brief simulates the object
-	virtual void simulate(smSimulationParam p_params){
-	}
-	/// \brief print the object
-	virtual void print(){
-	}
-	/// \brief set the name of object
-	void setName(QString p_objectName){
-		name=p_objectName;
-	}
+    }
+    /// \brief get type of the class
+    inline smClassType getType()
+    {
+        return type;
+    }
 
-	/// \brief get the name of the object
-	QString getName(){
-		return name;
-	}
+    /// \brief his function is called by the renderer. The p_params stores renderer pointers
+    virtual void initDraw(smDrawParam p_params)
+    {
+    }
+    /// \brief draw function is called for visualization the object
+    virtual void draw(smDrawParam p_params)
+    {
+    }
+    /// \brief initialization of simulation
+    virtual void initSimulate(smSimulationParam p_params)
+    {
+    }
+    /// \brief simulates the object
+    virtual void simulate(smSimulationParam p_params)
+    {
+    }
+    /// \brief print the object
+    virtual void print()
+    {
+    }
+    /// \brief set the name of object
+    void setName(QString p_objectName)
+    {
+        name = p_objectName;
+    }
 
-	friend smSDK;
+    /// \brief get the name of the object
+    QString getName()
+    {
+        return name;
+    }
+
+    friend smSDK;
 };
 
 /// \brief for future use
-class smInterface{
+class smInterface
+{
 
 };
 

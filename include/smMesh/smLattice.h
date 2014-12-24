@@ -1,6 +1,6 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+                SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
@@ -20,437 +20,507 @@
 
 #define SIMMEDTK_SPATIALGRID_MAXPRIMITIVES 500
 #define SIMMEDTK_SPATIALGRID_MAXCELLS 1000
-#define SIMMEDTK_SMLATTICE_NONE					(0)
-#define SIMMEDTK_SMLATTICE_ALL					(1<<1)
-#define SIMMEDTK_SMLATTICE_MINMAXPOINTS			(1<<2)
-#define SIMMEDTK_SMLATTICE_SEPERATIONLINES		(1<<3)
-#define SIMMEDTK_SMLATTICE_CELLS					(1<<4)
-#define SIMMEDTK_SMLATTICE_CELLCENTERS			(1<<5)
-#define SIMMEDTK_SMLATTICE_CELLPOINTS				(1<<6)
-#define SIMMEDTK_SMLATTICE_CELLPOINTSLINKS		(1<<7)
-#define SIMMEDTK_SMLATTICE_CENTER					(1<<8)
-#define SIMMEDTK_SMLATTICE_CELLVERTICES			(1<<9)
-#define SIMMEDTK_SMLATTICE_CELLACTIVEVERTICES		(1<<10)
-#define SIMMEDTK_SMLATTICE_CELLTRIANGLES			(1<<11)
+#define SIMMEDTK_SMLATTICE_NONE                 (0)
+#define SIMMEDTK_SMLATTICE_ALL                  (1<<1)
+#define SIMMEDTK_SMLATTICE_MINMAXPOINTS         (1<<2)
+#define SIMMEDTK_SMLATTICE_SEPERATIONLINES      (1<<3)
+#define SIMMEDTK_SMLATTICE_CELLS                    (1<<4)
+#define SIMMEDTK_SMLATTICE_CELLCENTERS          (1<<5)
+#define SIMMEDTK_SMLATTICE_CELLPOINTS               (1<<6)
+#define SIMMEDTK_SMLATTICE_CELLPOINTSLINKS      (1<<7)
+#define SIMMEDTK_SMLATTICE_CENTER                   (1<<8)
+#define SIMMEDTK_SMLATTICE_CELLVERTICES         (1<<9)
+#define SIMMEDTK_SMLATTICE_CELLACTIVEVERTICES       (1<<10)
+#define SIMMEDTK_SMLATTICE_CELLTRIANGLES            (1<<11)
 
 /// \brief !!
-enum smLatticeReturnType{
-	SIMMEDTK_LATTICE_OK,
-	SIMMEDTK_LATTICE_INVALIDPARAMS,
-	SIMMEDTK_LATTICE_INVALIDBOUNDS
+enum smLatticeReturnType
+{
+    SIMMEDTK_LATTICE_OK,
+    SIMMEDTK_LATTICE_INVALIDPARAMS,
+    SIMMEDTK_LATTICE_INVALIDBOUNDS
 };
 
-/// \brief !! holds the collision primitive pairs 
-struct smCollisionPairs {
-	smUnifiedID objectIndex;
-	smUnifiedID objectIndex2;
-	smInt primIndex;
-	smInt primIndex2;
+/// \brief !! holds the collision primitive pairs
+struct smCollisionPairs
+{
+    smUnifiedID objectIndex;
+    smUnifiedID objectIndex2;
+    smInt primIndex;
+    smInt primIndex2;
 };
 
 /// \brief cell primitive
-struct smCellPrim{
-	smInt index;
-	smInt objectId;
+struct smCellPrim
+{
+    smInt index;
+    smInt objectId;
 };
 
 /// \brief contains everything related to a cell
-class smCell{
+class smCell
+{
 
 public:
-	smInt id;
-	smInt cellId[3];
-	smVec3<smFloat> cellCenter;
-	smVec3<smFloat> cellLeftCorner;
-	smVec3<smFloat> cellRightCorner;
-	smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
-	smInt lastPrimitiveIndex;
-	smInt timeStamp;
-	smBool isActive;
+    smInt id;
+    smInt cellId[3];
+    smVec3<smFloat> cellCenter;
+    smVec3<smFloat> cellLeftCorner;
+    smVec3<smFloat> cellRightCorner;
+    smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
+    smInt lastPrimitiveIndex;
+    smInt timeStamp;
+    smBool isActive;
 
-	smCell(){
-	}
+    smCell()
+    {
+    }
 };
 
 /// \brief !!
-class smLattice:public smCoreClass{
+class smLattice: public smCoreClass
+{
 
 public:
-	//these should be templated..Current design is based on the triangle
-	smAABB *aabb;
-	smSurfaceMesh *mesh;
-	smCell *cells;
-	smInt totalCells;
-	smInt xSeperation;
-	smInt ySeperation;
-	smInt zSeperation;
-	smFloat xStep;
-	smFloat yStep;
-	smFloat zStep;
-	smVec3<smFloat> latticeCenter;
-	smInt time;
-	smUnifiedID linkedObject;
+    //these should be templated..Current design is based on the triangle
+    smAABB *aabb;
+    smSurfaceMesh *mesh;
+    smCell *cells;
+    smInt totalCells;
+    smInt xSeperation;
+    smInt ySeperation;
+    smInt zSeperation;
+    smFloat xStep;
+    smFloat yStep;
+    smFloat zStep;
+    smVec3<smFloat> latticeCenter;
+    smInt time;
+    smUnifiedID linkedObject;
 
-	/// \brief !!
-	void boundingBoxInit(){
-		aabb=new smAABB[mesh->nbrTriangles];
-	}
+    /// \brief !!
+    void boundingBoxInit()
+    {
+        aabb = new smAABB[mesh->nbrTriangles];
+    }
 
-	/// \brief constructor
-	smLattice (){
-		this->cells=NULL;
-		this->totalCells=0;
-		this->xStep=0;
-		this->yStep=0;
-		this->zStep=0;
-		this->xSeperation=0;
-		this->ySeperation=0;
-		this->zSeperation=0;
-	}
+    /// \brief constructor
+    smLattice()
+    {
+        this->cells = NULL;
+        this->totalCells = 0;
+        this->xStep = 0;
+        this->yStep = 0;
+        this->zStep = 0;
+        this->xSeperation = 0;
+        this->ySeperation = 0;
+        this->zSeperation = 0;
+    }
 
-	/// \brief get the size of the lattice cell side in x-direction
-	inline smFloat getXStep(){return xStep; }
+    /// \brief get the size of the lattice cell side in x-direction
+    inline smFloat getXStep()
+    {
+        return xStep;
+    }
 
-	/// \brief get the size of the lattice cell side in y-direction
-	inline smFloat getYStep(){return yStep; }
+    /// \brief get the size of the lattice cell side in y-direction
+    inline smFloat getYStep()
+    {
+        return yStep;
+    }
 
-	/// \brief get the size of the lattice cell side in z-direction
-	inline smFloat getZStep(){return zStep; }
+    /// \brief get the size of the lattice cell side in z-direction
+    inline smFloat getZStep()
+    {
+        return zStep;
+    }
 
-	/// \brief get the center of the lattice
-	inline smVec3<smFloat> getLatticeCenter(){return latticeCenter;}
+    /// \brief get the center of the lattice
+    inline smVec3<smFloat> getLatticeCenter()
+    {
+        return latticeCenter;
+    }
 
-	/// \brief !! get the left corner of cell 0
-	inline smVec3<smFloat> getLeftMinCorner(){return cells[0].cellLeftCorner;}
+    /// \brief !! get the left corner of cell 0
+    inline smVec3<smFloat> getLeftMinCorner()
+    {
+        return cells[0].cellLeftCorner;
+    }
 
-	/// \brief !! get the right corner of cell 0
-	inline smVec3<smFloat> getRightMaxCorner(){return cells[totalCells-1].cellRightCorner;}
+    /// \brief !! get the right corner of cell 0
+    inline smVec3<smFloat> getRightMaxCorner()
+    {
+        return cells[totalCells - 1].cellRightCorner;
+    }
 
-	/// \brief destructor
-	~smLattice(){
-		delete[] cells;
-		delete[] aabb;
-	}
+    /// \brief destructor
+    ~smLattice()
+    {
+        delete[] cells;
+        delete[] aabb;
+    }
 
-	/// \brief Initialize the lattice
-	smLatticeReturnType init(smVec3<smFloat> p_leftCorner,smVec3<smFloat> p_rightCorner,
-                             smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation ){
+    /// \brief Initialize the lattice
+    smLatticeReturnType init(smVec3<smFloat> p_leftCorner, smVec3<smFloat> p_rightCorner,
+                             smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation)
+    {
 
-		smInt x,y,z;
-		smInt index;
+        smInt x, y, z;
+        smInt index;
 
-		xSeperation=p_xSeperation;
-		ySeperation=p_ySeperation;
-		zSeperation=p_zSeperation;
+        xSeperation = p_xSeperation;
+        ySeperation = p_ySeperation;
+        zSeperation = p_zSeperation;
 
-		boundingBoxInit();
-		cells=new smCell[xSeperation*ySeperation*zSeperation];
-		zStep= (p_rightCorner.z-p_leftCorner.z)/zSeperation;
-		yStep= (p_rightCorner.y-p_leftCorner.y)/ySeperation;
-		xStep= (p_rightCorner.x-p_leftCorner.x)/xSeperation;
-		smInt counter=0;
-		for( y=0;y<ySeperation;y++)
-			for( z=0;z<zSeperation;z++)
-				for( x=0;x<xSeperation;x++){
-					index=x+z*xSeperation+y*xSeperation*zSeperation;
-					if(x<0||y<0|z<0||x>=xSeperation||y>=ySeperation||z>=zSeperation){
-						printf("Error index is out of bounds in createllatice function");
-						return SIMMEDTK_LATTICE_INVALIDBOUNDS;
-					}
-					cells[index].id=index;	
-					cells[index].cellLeftCorner[0]=p_leftCorner[0]+x*xStep;
-					cells[index].cellLeftCorner[1]=p_leftCorner[1]+y*yStep;
-					cells[index].cellLeftCorner[2]=p_leftCorner[2]+z*zStep;
+        boundingBoxInit();
+        cells = new smCell[xSeperation * ySeperation * zSeperation];
+        zStep = (p_rightCorner.z - p_leftCorner.z) / zSeperation;
+        yStep = (p_rightCorner.y - p_leftCorner.y) / ySeperation;
+        xStep = (p_rightCorner.x - p_leftCorner.x) / xSeperation;
+        smInt counter = 0;
 
-					cells[index].cellRightCorner[0]=cells[index].cellLeftCorner[0]+xStep;
-					cells[index].cellRightCorner[1]=cells[index].cellLeftCorner[1]+yStep;
-					cells[index].cellRightCorner[2]=cells[index].cellLeftCorner[2]+zStep;
+        for (y = 0; y < ySeperation; y++)
+            for (z = 0; z < zSeperation; z++)
+                for (x = 0; x < xSeperation; x++)
+                {
+                    index = x + z * xSeperation + y * xSeperation * zSeperation;
+
+                    if (x < 0 || y < 0 | z < 0 || x >= xSeperation || y >= ySeperation || z >= zSeperation)
+                    {
+                        printf("Error index is out of bounds in createllatice function");
+                        return SIMMEDTK_LATTICE_INVALIDBOUNDS;
+                    }
+
+                    cells[index].id = index;
+                    cells[index].cellLeftCorner[0] = p_leftCorner[0] + x * xStep;
+                    cells[index].cellLeftCorner[1] = p_leftCorner[1] + y * yStep;
+                    cells[index].cellLeftCorner[2] = p_leftCorner[2] + z * zStep;
+
+                    cells[index].cellRightCorner[0] = cells[index].cellLeftCorner[0] + xStep;
+                    cells[index].cellRightCorner[1] = cells[index].cellLeftCorner[1] + yStep;
+                    cells[index].cellRightCorner[2] = cells[index].cellLeftCorner[2] + zStep;
 
 
-					cells[index].cellCenter[0]=(cells[index].cellLeftCorner[0]+cells[index].cellRightCorner[0])/2;
-					cells[index].cellCenter[1]=(cells[index].cellLeftCorner[1]+cells[index].cellRightCorner[1])/2;
-					cells[index].cellCenter[2]=(cells[index].cellLeftCorner[2]+cells[index].cellRightCorner[2])/2;
-					cells[index].isActive=false;
-					cells[index].lastPrimitiveIndex=0;
+                    cells[index].cellCenter[0] = (cells[index].cellLeftCorner[0] + cells[index].cellRightCorner[0]) / 2;
+                    cells[index].cellCenter[1] = (cells[index].cellLeftCorner[1] + cells[index].cellRightCorner[1]) / 2;
+                    cells[index].cellCenter[2] = (cells[index].cellLeftCorner[2] + cells[index].cellRightCorner[2]) / 2;
+                    cells[index].isActive = false;
+                    cells[index].lastPrimitiveIndex = 0;
 
-					for(smInt j=0;j<SIMMEDTK_SPATIALGRID_MAXPRIMITIVES;j++){
-						cells[index].cellPrimitives[j].index=0;
-					}
-					counter++;
-				}
-				this->totalCells=counter;
-				this->xStep=xStep;
-				this->yStep=yStep;
-				this->zStep=zStep;
-				this->xSeperation=xSeperation;
-				this->ySeperation=ySeperation;
-				this->zSeperation=zSeperation;
-				this->latticeCenter[0]=(p_leftCorner[0]+p_rightCorner[0])/2.0;
-				this->latticeCenter[1]=(p_leftCorner[1]+p_rightCorner[1])/2.0;
-				this->latticeCenter[2]=(p_leftCorner[2]+p_rightCorner[2])/2.0;
+                    for (smInt j = 0; j < SIMMEDTK_SPATIALGRID_MAXPRIMITIVES; j++)
+                    {
+                        cells[index].cellPrimitives[j].index = 0;
+                    }
 
-				return SIMMEDTK_LATTICE_OK;
-	}
+                    counter++;
+                }
 
-	/// \brief !!
-	void indexReset(){
+        this->totalCells = counter;
+        this->xStep = xStep;
+        this->yStep = yStep;
+        this->zStep = zStep;
+        this->xSeperation = xSeperation;
+        this->ySeperation = ySeperation;
+        this->zSeperation = zSeperation;
+        this->latticeCenter[0] = (p_leftCorner[0] + p_rightCorner[0]) / 2.0;
+        this->latticeCenter[1] = (p_leftCorner[1] + p_rightCorner[1]) / 2.0;
+        this->latticeCenter[2] = (p_leftCorner[2] + p_rightCorner[2]) / 2.0;
 
-		int traverseIndex=0;
+        return SIMMEDTK_LATTICE_OK;
+    }
 
-		for(int y=0;y<ySeperation;y++)
-			for(int z=0;z<zSeperation;z++)
-				for(int x=0;x<xSeperation;x++){
-					traverseIndex=x+z*xSeperation+y*xSeperation*zSeperation;
-					cells[traverseIndex].lastPrimitiveIndex=0;
-				}
-	}
+    /// \brief !!
+    void indexReset()
+    {
 
-	/// \brief !!
-	void inline isCellEmpty(smInt p_cellIndex){
-	}
+        int traverseIndex = 0;
 
-	/// \brief !!
-	inline virtual void  linkPrimitivetoCell(smInt p_primitiveIndex){
+        for (int y = 0; y < ySeperation; y++)
+            for (int z = 0; z < zSeperation; z++)
+                for (int x = 0; x < xSeperation; x++)
+                {
+                    traverseIndex = x + z * xSeperation + y * xSeperation * zSeperation;
+                    cells[traverseIndex].lastPrimitiveIndex = 0;
+                }
+    }
 
-		smInt minX;
-		smInt minY;
-		smInt minZ;
-		smInt maxX;
-		smInt maxY;
-		smInt maxZ;
-		smInt index;
-		smVec3<smFloat> leftCorner=getLeftMinCorner();
-		smVec3<smFloat> rightCorner=getRightMaxCorner();
+    /// \brief !!
+    void inline isCellEmpty(smInt p_cellIndex)
+    {
+    }
 
-		minX=(aabb[p_primitiveIndex].aabbMin.x-leftCorner[0])/xStep;
-		minY=(aabb[p_primitiveIndex].aabbMin.y-leftCorner[1])/yStep;
-		minZ=(aabb[p_primitiveIndex].aabbMin.z-leftCorner[2])/zStep;
+    /// \brief !!
+    inline virtual void  linkPrimitivetoCell(smInt p_primitiveIndex)
+    {
 
-		maxX=(aabb[p_primitiveIndex].aabbMax.x-leftCorner[0])/xStep;
-		maxY=(aabb[p_primitiveIndex].aabbMax.y-leftCorner[1])/yStep;
-		maxZ=(aabb[p_primitiveIndex].aabbMax.z-leftCorner[2])/zStep;
+        smInt minX;
+        smInt minY;
+        smInt minZ;
+        smInt maxX;
+        smInt maxY;
+        smInt maxZ;
+        smInt index;
+        smVec3<smFloat> leftCorner = getLeftMinCorner();
+        smVec3<smFloat> rightCorner = getRightMaxCorner();
 
-		for(smInt yIndex=minY;yIndex<=maxY;yIndex++)
-			for(smInt xIndex=minX;xIndex<=maxX;xIndex++)
-				for(smInt zIndex=minZ;zIndex<=maxZ;zIndex++){
-					index=xIndex+zIndex*xSeperation+yIndex*xSeperation*zSeperation;
-					if(xIndex<0||yIndex<0|zIndex<0||xIndex>=xSeperation||yIndex>=ySeperation||zIndex>=zSeperation)
-						continue;
-					if(cells[index].lastPrimitiveIndex>=SIMMEDTK_SPATIALGRID_MAXPRIMITIVES){
-						return;
-					}
+        minX = (aabb[p_primitiveIndex].aabbMin.x - leftCorner[0]) / xStep;
+        minY = (aabb[p_primitiveIndex].aabbMin.y - leftCorner[1]) / yStep;
+        minZ = (aabb[p_primitiveIndex].aabbMin.z - leftCorner[2]) / zStep;
 
-					cells[index].cellPrimitives[cells[index].lastPrimitiveIndex].index=p_primitiveIndex;
-					cells[index].lastPrimitiveIndex++;
-				}
-	}
+        maxX = (aabb[p_primitiveIndex].aabbMax.x - leftCorner[0]) / xStep;
+        maxY = (aabb[p_primitiveIndex].aabbMax.y - leftCorner[1]) / yStep;
+        maxZ = (aabb[p_primitiveIndex].aabbMax.z - leftCorner[2]) / zStep;
 
-	/// \brief update the bounds of the lattice
-	inline void updateBounds(smSurfaceMesh* p_mesh,smInt p_index){
+        for (smInt yIndex = minY; yIndex <= maxY; yIndex++)
+            for (smInt xIndex = minX; xIndex <= maxX; xIndex++)
+                for (smInt zIndex = minZ; zIndex <= maxZ; zIndex++)
+                {
+                    index = xIndex + zIndex * xSeperation + yIndex * xSeperation * zSeperation;
 
-		//min
-		aabb[p_index].aabbMin.x=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
-		aabb[p_index].aabbMin.x = SIMMEDTK_MIN(aabb[p_index].aabbMin.x,
-                                    p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x); 
+                    if (xIndex < 0 || yIndex < 0 | zIndex < 0 || xIndex >= xSeperation || yIndex >= ySeperation || zIndex >= zSeperation)
+                    {
+                        continue;
+                    }
 
-		aabb[p_index].aabbMin.y=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
-		aabb[p_index].aabbMin.y = SIMMEDTK_MIN(aabb[p_index].aabbMin.y,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y); 
+                    if (cells[index].lastPrimitiveIndex >= SIMMEDTK_SPATIALGRID_MAXPRIMITIVES)
+                    {
+                        return;
+                    }
 
-		aabb[p_index].aabbMin.z=  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
-		aabb[p_index].aabbMin.z = SIMMEDTK_MIN(aabb[p_index].aabbMin.z,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z); 
+                    cells[index].cellPrimitives[cells[index].lastPrimitiveIndex].index = p_primitiveIndex;
+                    cells[index].lastPrimitiveIndex++;
+                }
+    }
 
-		//max
-		aabb[p_index].aabbMax.x=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
-		aabb[p_index].aabbMax.x = SIMMEDTK_MAX(aabb[p_index].aabbMax.x,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x); 
+    /// \brief update the bounds of the lattice
+    inline void updateBounds(smSurfaceMesh* p_mesh, smInt p_index)
+    {
 
-		aabb[p_index].aabbMax.y=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
-		aabb[p_index].aabbMax.y = SIMMEDTK_MAX(aabb[p_index].aabbMax.y,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y); 
+        //min
+        aabb[p_index].aabbMin.x =  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
+        aabb[p_index].aabbMin.x = SIMMEDTK_MIN(aabb[p_index].aabbMin.x,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x);
 
-		aabb[p_index].aabbMax.z=  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
-		aabb[p_index].aabbMax.z = SIMMEDTK_MAX(aabb[p_index].aabbMax.z,
-                                            p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z); 
-	}
+        aabb[p_index].aabbMin.y =  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
+        aabb[p_index].aabbMin.y = SIMMEDTK_MIN(aabb[p_index].aabbMin.y,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y);
 
-	/// \brief update the bounds of the lattice
-	void updateBounds(){
-		smInt numberOfprimitives;
-		for(smInt i=0;i<mesh->nbrTriangles;i++)
-			updateBounds(mesh,i);
-	}
+        aabb[p_index].aabbMin.z =  SIMMEDTK_MIN(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
+        aabb[p_index].aabbMin.z = SIMMEDTK_MIN(aabb[p_index].aabbMin.z,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z);
 
-	/// \brief !!
-	void linkPrims(){
-		for(smInt i=0;i<mesh->nbrTriangles;i++)
-			linkPrimitivetoCell(i);
-	}
+        //max
+        aabb[p_index].aabbMax.x =  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].x,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].x);
+        aabb[p_index].aabbMax.x = SIMMEDTK_MAX(aabb[p_index].aabbMax.x,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].x);
 
-	/// \brief !!
-	void addObject(smSceneObject *obj){
-		smClassType objectType;
-		linkedObject=obj->getObjectUnifiedID();
-		objectType=obj->getType();
+        aabb[p_index].aabbMax.y =  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].y,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].y);
+        aabb[p_index].aabbMax.y = SIMMEDTK_MAX(aabb[p_index].aabbMax.y,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].y);
 
-		switch(objectType){
-			case SIMMEDTK_SMSTATICSCENEOBJECT:
-				mesh=((smStaticSceneObject*)obj)->mesh;
-			break;
-		}
-	}
+        aabb[p_index].aabbMax.z =  SIMMEDTK_MAX(p_mesh->vertices[p_mesh->triangles[p_index].vert[0]].z,
+                                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]].z);
+        aabb[p_index].aabbMax.z = SIMMEDTK_MAX(aabb[p_index].aabbMax.z,
+                                               p_mesh->vertices[p_mesh->triangles[p_index].vert[2]].z);
+    }
 
-	/// \brief render the lattice for visaulization
-	void draw(smDrawParam p_params){
+    /// \brief update the bounds of the lattice
+    void updateBounds()
+    {
+        smInt numberOfprimitives;
 
-		int temp;
-		int index=0;
-		int index2=0;
-		smInt latticeMode;
-		latticeMode=SIMMEDTK_SMLATTICE_CELLPOINTSLINKS;
+        for (smInt i = 0; i < mesh->nbrTriangles; i++)
+        {
+            updateBounds(mesh, i);
+        }
+    }
 
-		if(cells==NULL||latticeMode==SIMMEDTK_SMLATTICE_NONE)
-			return;
+    /// \brief !!
+    void linkPrims()
+    {
+        for (smInt i = 0; i < mesh->nbrTriangles; i++)
+        {
+            linkPrimitivetoCell(i);
+        }
+    }
 
-		glMatrixMode(GL_MODELVIEW);
-		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat*)&smColor::colorYellow );
+    /// \brief !!
+    void addObject(smSceneObject *obj)
+    {
+        smClassType objectType;
+        linkedObject = obj->getObjectUnifiedID();
+        objectType = obj->getType();
 
-		if(latticeMode&SIMMEDTK_SMLATTICE_SEPERATIONLINES)
-		{	for(int j=0;j<ySeperation;j++){
-			glDisable(GL_LIGHTING);
-			glColor3fv((GLfloat*)&smColor::colorWhite);
+        switch (objectType)
+        {
+        case SIMMEDTK_SMSTATICSCENEOBJECT:
+            mesh = ((smStaticSceneObject*)obj)->mesh;
+            break;
+        }
+    }
 
-			glBegin(GL_LINES);
-				for(int i=0;i<xSeperation;i++){
-					index=i+j*xSeperation*zSeperation;
-					index2=index+xSeperation*(zSeperation-1);
-					glVertex3f( cells[index].cellLeftCorner[0],
-                                cells[index].cellLeftCorner[1],
-                                cells[index].cellLeftCorner[2]-4*zStep);
-					glVertex3f(cells[index2].cellLeftCorner[0],
-                        cells[index2].cellLeftCorner[1],
-                        cells[index2].cellLeftCorner[2]+4*zStep);
-				}
+    /// \brief render the lattice for visaulization
+    void draw(smDrawParam p_params)
+    {
 
-				for(int i=0;i<zSeperation;i++){
-					index=i*xSeperation+j*xSeperation*zSeperation;
-					index2=index+(xSeperation-1);
-					glVertex3f( cells[index].cellLeftCorner[0]-4*xStep,
-                                cells[index].cellLeftCorner[1],
-                                cells[index].cellLeftCorner[2]);
-					glVertex3f(cells[index2].cellLeftCorner[0]+4*xStep,
-                                cells[index2].cellLeftCorner[1],
-                                cells[index2].cellLeftCorner[2]);
-				}
-			glEnd();
-		}
-		glEnable(GL_LIGHTING);
-		glPopMatrix();
-		}
+        int temp;
+        int index = 0;
+        int index2 = 0;
+        smInt latticeMode;
+        latticeMode = SIMMEDTK_SMLATTICE_CELLPOINTSLINKS;
 
-		if(latticeMode&SIMMEDTK_SMLATTICE_CELLPOINTS||SIMMEDTK_SMLATTICE_CELLPOINTSLINKS){
-			for(int y=0;y<ySeperation;y++)
-				for(int z=0;z<zSeperation;z++)
-					for(int x=0;x<xSeperation;x++){
+        if (cells == NULL || latticeMode == SIMMEDTK_SMLATTICE_NONE)
+        {
+            return;
+        }
 
-						index=x+z*xSeperation+y*xSeperation*zSeperation;
+        glMatrixMode(GL_MODELVIEW);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat*)&smColor::colorYellow);
 
-						if(latticeMode&SIMMEDTK_SMLATTICE_CELLPOINTSLINKS){
-							glDisable(GL_LIGHTING);
-							glDisable(GL_TEXTURE_2D);
+        if (latticeMode & SIMMEDTK_SMLATTICE_SEPERATIONLINES)
+        {
+            for (int j = 0; j < ySeperation; j++)
+            {
+                glDisable(GL_LIGHTING);
+                glColor3fv((GLfloat*)&smColor::colorWhite);
 
-							glEnable(GL_COLOR_MATERIAL);
+                glBegin(GL_LINES);
 
-							glBegin(GL_LINE_STRIP);
-								glColor3fv((GLfloat*)&smColor::colorWhite);
-								glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                            cells[index].cellLeftCorner[1],
-                                            cells[index].cellLeftCorner[2]);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                            cells[index].cellLeftCorner[1],
-                                            cells[index].cellLeftCorner[2]+zStep);
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                            cells[index].cellLeftCorner[1],
-                                            cells[index].cellLeftCorner[2]+zStep);
-								glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
+                for (int i = 0; i < xSeperation; i++)
+                {
+                    index = i + j * xSeperation * zSeperation;
+                    index2 = index + xSeperation * (zSeperation - 1);
+                    glVertex3f(cells[index].cellLeftCorner[0],
+                               cells[index].cellLeftCorner[1],
+                               cells[index].cellLeftCorner[2] - 4 * zStep);
+                    glVertex3f(cells[index2].cellLeftCorner[0],
+                               cells[index2].cellLeftCorner[1],
+                               cells[index2].cellLeftCorner[2] + 4 * zStep);
+                }
 
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]+zStep);
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]+zStep);
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]);
-							glEnd();
+                for (int i = 0; i < zSeperation; i++)
+                {
+                    index = i * xSeperation + j * xSeperation * zSeperation;
+                    index2 = index + (xSeperation - 1);
+                    glVertex3f(cells[index].cellLeftCorner[0] - 4 * xStep,
+                               cells[index].cellLeftCorner[1],
+                               cells[index].cellLeftCorner[2]);
+                    glVertex3f(cells[index2].cellLeftCorner[0] + 4 * xStep,
+                               cells[index2].cellLeftCorner[1],
+                               cells[index2].cellLeftCorner[2]);
+                }
 
-							glBegin(GL_LINES);
-								glColor3fv((GLfloat*)&smColor::colorWhite);
-								glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                            cells[index].cellLeftCorner[1]+yStep,
-                                            cells[index].cellLeftCorner[2]);
+                glEnd();
+            }
 
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2]);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                    cells[index].cellLeftCorner[1]+yStep,
-                                    cells[index].cellLeftCorner[2]);
+            glEnable(GL_LIGHTING);
+            glPopMatrix();
+        }
 
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2]+zStep);
-								glVertex3f(cells[index].cellLeftCorner[0]+xStep,
-                                    cells[index].cellLeftCorner[1]+yStep,
-                                    cells[index].cellLeftCorner[2]+zStep);
+        if (latticeMode & SIMMEDTK_SMLATTICE_CELLPOINTS || SIMMEDTK_SMLATTICE_CELLPOINTSLINKS)
+        {
+            for (int y = 0; y < ySeperation; y++)
+                for (int z = 0; z < zSeperation; z++)
+                    for (int x = 0; x < xSeperation; x++)
+                    {
 
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2]+zStep);
-								glVertex3f(cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1]+yStep,
-                                    cells[index].cellLeftCorner[2]+zStep);
-							glEnd();
+                        index = x + z * xSeperation + y * xSeperation * zSeperation;
 
-							glEnable(GL_LIGHTING);
-						}
-					}
-		}
+                        if (latticeMode & SIMMEDTK_SMLATTICE_CELLPOINTSLINKS)
+                        {
+                            glDisable(GL_LIGHTING);
+                            glDisable(GL_TEXTURE_2D);
 
-		if(latticeMode&SIMMEDTK_SMLATTICE_MINMAXPOINTS){
-			glPushMatrix();
-				glPushMatrix();
-					glTranslatef(cells[0].cellLeftCorner[0],cells[0].cellLeftCorner[1],cells[0].cellLeftCorner[2]);
-					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat*)&smColor::colorYellow);
-					glutSolidSphere(2,20,20);
-				glPopMatrix();
+                            glEnable(GL_COLOR_MATERIAL);
 
-				glPushMatrix();
-					glTranslatef(cells[this->totalCells-1].cellRightCorner[0],
-                                 cells[this->totalCells-1].cellRightCorner[1],
-                                 cells[this->totalCells-1].cellRightCorner[2]);
-					glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE,(GLfloat*)&smColor::colorRed );
-					glutSolidSphere(2,20,20);
-				glPopMatrix();
-			glPopMatrix();
-		}
-	}
+                            glBegin(GL_LINE_STRIP);
+                            glColor3fv((GLfloat*)&smColor::colorWhite);
+                            glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2]);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
+
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2]);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2]);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2]);
+                            glEnd();
+
+                            glBegin(GL_LINES);
+                            glColor3fv((GLfloat*)&smColor::colorWhite);
+                            glVertex3fv((GLfloat*)&cells[index].cellLeftCorner);
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2]);
+
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2]);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2]);
+
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3f(cells[index].cellLeftCorner[0] + xStep,
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2] + zStep);
+
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1],
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glVertex3f(cells[index].cellLeftCorner[0],
+                                       cells[index].cellLeftCorner[1] + yStep,
+                                       cells[index].cellLeftCorner[2] + zStep);
+                            glEnd();
+
+                            glEnable(GL_LIGHTING);
+                        }
+                    }
+        }
+
+        if (latticeMode & SIMMEDTK_SMLATTICE_MINMAXPOINTS)
+        {
+            glPushMatrix();
+            glPushMatrix();
+            glTranslatef(cells[0].cellLeftCorner[0], cells[0].cellLeftCorner[1], cells[0].cellLeftCorner[2]);
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat*)&smColor::colorYellow);
+            glutSolidSphere(2, 20, 20);
+            glPopMatrix();
+
+            glPushMatrix();
+            glTranslatef(cells[this->totalCells - 1].cellRightCorner[0],
+                         cells[this->totalCells - 1].cellRightCorner[1],
+                         cells[this->totalCells - 1].cellRightCorner[2]);
+            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat*)&smColor::colorRed);
+            glutSolidSphere(2, 20, 20);
+            glPopMatrix();
+            glPopMatrix();
+        }
+    }
 
 };
 

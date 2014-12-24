@@ -10,23 +10,24 @@
 #include "smSimulators/smDummySimulator.h"
 #include "smCollision/smSpatialHash.h"
 
-class CollisionDetectionExampleWithHash:public smSimulationMain, public smCoreClass{
+class CollisionDetectionExampleWithHash: public smSimulationMain, public smCoreClass
+{
 
 public:
-	smStaticSceneObject  *object1;
-	smStaticSceneObject  *object2;
-	smSDK* simmedtkSDK;
-	smScene *scene1;
-	smDummySimulator *dummySim;
-	smViewer *viewer;
-	smSimulator *simulator;
-	smSpatialHash *hash;
-	smPipeRegisteration myCollInformation;
+    smStaticSceneObject  *object1;
+    smStaticSceneObject  *object2;
+    smSDK* simmedtkSDK;
+    smScene *scene1;
+    smDummySimulator *dummySim;
+    smViewer *viewer;
+    smSimulator *simulator;
+    smSpatialHash *hash;
+    smPipeRegisteration myCollInformation;
 
-	CollisionDetectionExampleWithHash();
-	virtual void draw(smDrawParam p_params);
-	virtual void simulateMain(smSimulationMainParam p_param);
-	~CollisionDetectionExampleWithHash();
+    CollisionDetectionExampleWithHash();
+    virtual void draw(smDrawParam p_params);
+    virtual void simulateMain(smSimulationMainParam p_param);
+    ~CollisionDetectionExampleWithHash();
 };
 
 #endif

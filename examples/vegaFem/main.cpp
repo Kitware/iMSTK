@@ -1,6 +1,7 @@
 #include "vegaFemExample.h"
 
-int main(){
-	VegaFemExample();
-	return 0;
+int main()
+{
+    VegaFemExample();
+    return 0;
 }

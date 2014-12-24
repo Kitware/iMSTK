@@ -1,6 +1,6 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+                SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
@@ -17,66 +17,76 @@
 #define SM_MAX_BUTTONS 4
 
 /// \brief holds haptic device data
-struct hapticDeviceData_t {
-	smInt deviceID;
-	smString deviceName;
-	smVec3 <smDouble> position;
-	smVec3 <smDouble> velocity;
-	smVec3 <smDouble> angles;
-	smMatrix44 <smDouble> transform;
-	smBool buttonState[SM_MAX_BUTTONS];
+struct hapticDeviceData_t
+{
+    smInt deviceID;
+    smString deviceName;
+    smVec3 <smDouble> position;
+    smVec3 <smDouble> velocity;
+    smVec3 <smDouble> angles;
+    smMatrix44 <smDouble> transform;
+    smBool buttonState[SM_MAX_BUTTONS];
 };
 
 /// \brief Absract base class for haptic device
-class smHapticInterface: public smDeviceInterface{
+class smHapticInterface: public smDeviceInterface
+{
 
 public:
 
-	/// \brief constructor
-	smHapticInterface();
+    /// \brief constructor
+    smHapticInterface();
 
-	/// \brief destructor
-	virtual ~smHapticInterface(){};
+    /// \brief destructor
+    virtual ~smHapticInterface() {};
 
-	/// \brief open haptic device
-	virtual int openDevice(){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief open haptic device
+    virtual int openDevice()
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief close haptic device
-	virtual int closeDevice(){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief close haptic device
+    virtual int closeDevice()
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief start the haptic device 
-	virtual int startDevice(){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief start the haptic device
+    virtual int startDevice()
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief get the position of the end effector the haptic device
-	virtual int  getPosition(smVec3<smDouble> & d_pos){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief get the position of the end effector the haptic device
+    virtual int  getPosition(smVec3<smDouble> & d_pos)
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief get the orientation of the end effector the haptic device
-	virtual int getOreintation(smMatrix33 <smDouble> *d_rot){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief get the orientation of the end effector the haptic device
+    virtual int getOreintation(smMatrix33 <smDouble> *d_rot)
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief get the transform (position + orientation) of the end effector the haptic device
-	virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief get the transform (position + orientation) of the end effector the haptic device
+    virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform)
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief set force to the haptic device
-	virtual int setForce (smVec3<smDouble> & force){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief set force to the haptic device
+    virtual int setForce(smVec3<smDouble> & force)
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
-	/// \brief set torque to the haptic device
-	virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque){
-		return SIMMEDTK_MSG_UNKNOWN;
-	}
+    /// \brief set torque to the haptic device
+    virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque)
+    {
+        return SIMMEDTK_MSG_UNKNOWN;
+    }
 
 };
 

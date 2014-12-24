@@ -9,6 +9,7 @@
 #include "smExternalDevices/smDeviceInterface.h"
 
 
-smDeviceInterface::smDeviceInterface():driverInstalled(false){
+smDeviceInterface::smDeviceInterface(): driverInstalled(false)
+{
 
 }

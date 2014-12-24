@@ -1,12 +1,12 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+                SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
 */
 
-#ifndef SMSYNCHRONIZATION_H 
+#ifndef SMSYNCHRONIZATION_H
 #define SMSYNCHRONIZATION_H
 
 #include "smCore/smConfig.h"
@@ -17,92 +17,106 @@
 /// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor
 ///then each worker threads should call waitTaskStart function when the taks
-///is completed they should call signalTaskDone 
-class smSynchronization:public smCoreClass{
+///is completed they should call signalTaskDone
+class smSynchronization: public smCoreClass
+{
 
-	QWaitCondition taskDone;
-	QWaitCondition taskStart;
-	QMutex serverMutex;
-	smInt totalWorkers;
-	smInt finishedWorkerCounter;
-	smInt startedWorkerCounter;
-	smBool workerCounterUpdated;
-	smInt newWorkerCounter;
+    QWaitCondition taskDone;
+    QWaitCondition taskStart;
+    QMutex serverMutex;
+    smInt totalWorkers;
+    smInt finishedWorkerCounter;
+    smInt startedWorkerCounter;
+    smBool workerCounterUpdated;
+    smInt newWorkerCounter;
 
 public:
 
-	/// \param p_threadsForWorkers	choose the number of worker threads
-	smSynchronization(smInt p_threadsForWorkers){
-		type=	SIMMEDTK_SMSYNCHRONIZATION;
-		totalWorkers=p_threadsForWorkers;
-		finishedWorkerCounter=0;
-		startedWorkerCounter=0;
-		workerCounterUpdated=false;
-	}
+    /// \param p_threadsForWorkers  choose the number of worker threads
+    smSynchronization(smInt p_threadsForWorkers)
+    {
+        type =   SIMMEDTK_SMSYNCHRONIZATION;
+        totalWorkers = p_threadsForWorkers;
+        finishedWorkerCounter = 0;
+        startedWorkerCounter = 0;
+        workerCounterUpdated = false;
+    }
 
-	/// \brief before starting tasks worker threads should wait
-	void waitTaskStart(){
-		serverMutex.lock();
-		startedWorkerCounter++;
-		if(startedWorkerCounter==totalWorkers){
-			startedWorkerCounter=0;
-			taskDone.wakeAll();
-		}
+    /// \brief before starting tasks worker threads should wait
+    void waitTaskStart()
+    {
+        serverMutex.lock();
+        startedWorkerCounter++;
 
-		taskStart.wait(&serverMutex);
-		serverMutex.unlock();
-	}
+        if (startedWorkerCounter == totalWorkers)
+        {
+            startedWorkerCounter = 0;
+            taskDone.wakeAll();
+        }
 
-	/// \brief when the task ends the worker should call this function
-	void signalTaskDone(){
+        taskStart.wait(&serverMutex);
+        serverMutex.unlock();
+    }
 
-		serverMutex.lock();
-		finishedWorkerCounter++;
+    /// \brief when the task ends the worker should call this function
+    void signalTaskDone()
+    {
 
-		if(finishedWorkerCounter==totalWorkers){
-			finishedWorkerCounter=0;
-		}
-		serverMutex.unlock();
-	}
+        serverMutex.lock();
+        finishedWorkerCounter++;
 
-	/// \brief You could change the number of worker threads synchronization 
-	///Call this function after in the main thread where orchestration is done.
-	void setWorkerCounter(smInt p_workerCounter){
-		newWorkerCounter=p_workerCounter;
-		workerCounterUpdated=true;
-	}
+        if (finishedWorkerCounter == totalWorkers)
+        {
+            finishedWorkerCounter = 0;
+        }
 
-	smInt getTotalWorkers(){
-		return totalWorkers;
-	}
+        serverMutex.unlock();
+    }
 
-	/// \brief the server thread should call this for to start exeuction of the worker threads
-	void startTasks(){
-		serverMutex.lock();
-		if(workerCounterUpdated){
-			finishedWorkerCounter=newWorkerCounter;
-			workerCounterUpdated=false;
-		}
+    /// \brief You could change the number of worker threads synchronization
+    ///Call this function after in the main thread where orchestration is done.
+    void setWorkerCounter(smInt p_workerCounter)
+    {
+        newWorkerCounter = p_workerCounter;
+        workerCounterUpdated = true;
+    }
 
-		taskStart.wakeAll();
-		Sleep(100);
-		taskDone.wait(&serverMutex);
-		serverMutex.unlock();
-	}
+    smInt getTotalWorkers()
+    {
+        return totalWorkers;
+    }
 
-	/// \brief this function is fore signalling the events after waking up the worker threads. 
-	void startTasksandSignalEvent(smInt moduleId){
+    /// \brief the server thread should call this for to start exeuction of the worker threads
+    void startTasks()
+    {
+        serverMutex.lock();
 
-		smEvent *eventSynch;
-		eventSynch=new smEvent();
-		eventSynch->eventType=SIMMEDTK_EVENTTYPE_SYNCH;
-		eventSynch->senderId=moduleId;
-		eventSynch->senderType=SIMMEDTK_SENDERTYPE_EVENTSOURCE;
-		serverMutex.lock();
-		taskStart.wakeAll();
-		taskDone.wait(&serverMutex);
-		serverMutex.unlock();
-	}
+        if (workerCounterUpdated)
+        {
+            finishedWorkerCounter = newWorkerCounter;
+            workerCounterUpdated = false;
+        }
+
+        taskStart.wakeAll();
+        Sleep(100);
+        taskDone.wait(&serverMutex);
+        serverMutex.unlock();
+    }
+
+    /// \brief this function is fore signalling the events after waking up the worker threads.
+    void startTasksandSignalEvent(smInt moduleId)
+    {
+
+        smEvent *eventSynch;
+        eventSynch = new smEvent();
+        eventSynch->eventType = SIMMEDTK_EVENTTYPE_SYNCH;
+        eventSynch->senderId = moduleId;
+        eventSynch->senderType = SIMMEDTK_SENDERTYPE_EVENTSOURCE;
+        serverMutex.lock();
+        taskStart.wakeAll();
+        taskDone.wait(&serverMutex);
+        serverMutex.unlock();
+    }
 };
 
 #endif
