@@ -3,15 +3,16 @@
 
 #include "smCore/smSDK.h"
 
-class RenderExample : public smSimulationMain, public smCoreClass {
+class RenderExample : public smSimulationMain, public smCoreClass
+{
 public:
-	RenderExample();
-	void simulateMain(smSimulationMainParam p_param) { };
+    RenderExample();
+    void simulateMain(smSimulationMainParam p_param) { };
 private:
-	smSDK* simmedtkSDK;
-	smScene *scene1;
-	smStaticSceneObject cube;
-	smViewer *viewer;
+    smSDK* simmedtkSDK;
+    smScene *scene1;
+    smStaticSceneObject cube;
+    smViewer *viewer;
 };
 
 void renderExample();

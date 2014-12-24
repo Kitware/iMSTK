@@ -12,7 +12,8 @@
 #include "smCore/smModule.h"
 
 /// \brief !!
-class smCollisionDetection:public smModule{
+class smCollisionDetection: public smModule
+{
 
 };
 

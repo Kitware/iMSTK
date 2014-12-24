@@ -12,25 +12,27 @@
 #include "smUtilities/smMotionTransformer.h"
 #include "smShader/metalShader.h"
 
-class AlphaMapExample:public smSimulationMain,public smCoreClass{
+class AlphaMapExample: public smSimulationMain, public smCoreClass
+{
 
 public:
-	smStaticSceneObject  *object1;
-	smSDK* simmedtkSDK;
-	smScene *scene1;
-	smViewer *viewer;
+    smStaticSceneObject  *object1;
+    smSDK* simmedtkSDK;
+    smScene *scene1;
+    smViewer *viewer;
 
-	smPhantomInterface* hapticInterface;
-	smHapticCameraTrans *motionTrans;
+    smPhantomInterface* hapticInterface;
+    smHapticCameraTrans *motionTrans;
 
-	AlphaMapExample();
-	void initHapticCamMotion();
+    AlphaMapExample();
+    void initHapticCamMotion();
 
-	virtual void simulateMain(smSimulationMainParam p_param){
-	}
+    virtual void simulateMain(smSimulationMainParam p_param)
+    {
+    }
 
-	void AlphaMapExample::draw(smDrawParam p_params);
-	~AlphaMapExample();
+    void AlphaMapExample::draw(smDrawParam p_params);
+    ~AlphaMapExample();
 };
 
 #endif

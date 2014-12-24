@@ -1,5 +1,5 @@
-#ifndef SMMULTIPLEOBJECTS_H 
-#define SMMULTIPLEOBJECTS_H 
+#ifndef SMMULTIPLEOBJECTS_H
+#define SMMULTIPLEOBJECTS_H
 
 #include <GL/glew.h>
 #include "smCore/smConfig.h"

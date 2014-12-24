@@ -2,7 +2,7 @@
 ****************************************************
                   SimMedTK LICENSE
 ****************************************************
-    
+
 
 *****************************************************
 */
@@ -19,217 +19,254 @@
 using namespace std;
 
 /// \brief default constructor
-void smADUInterface::init(){
+void smADUInterface::init()
+{
 
 }
 
 /// \brief
-void smADUInterface::exec(){
+void smADUInterface::exec()
+{
 
-	this->start();
+    this->start();
 }
 
 /// \brief
-smADUInterface::smADUInterface(){
+smADUInterface::smADUInterface()
+{
 
-	serialNumber = new smChar[10];
-	isOpened = false;
-	calibrationData = new ADUDeviceCalibrationData();
-	deviceData = new ADUDeviceData();
-	serialNumber = "B02363";
+    serialNumber = new smChar[10];
+    isOpened = false;
+    calibrationData = new ADUDeviceCalibrationData();
+    deviceData = new ADUDeviceData();
+    serialNumber = "B02363";
 
-	calibrationData->minValue1=0;
-	calibrationData->maxValue1=1;
-	calibrationData->minValue2=0;
-	calibrationData->maxValue2=1;
+    calibrationData->minValue1 = 0;
+    calibrationData->maxValue1 = 1;
+    calibrationData->minValue2 = 0;
+    calibrationData->maxValue2 = 1;
 
-	if(openDevice(serialNumber)== SIMMEDTK_MSG_SUCCESS){
-		cout<<"ADU USB Device Opened Successfully"<<endl;
-	}
-	else
-		cout<<"Check the USB connection of the ADU device or the serial number: Couldn't initialize the device"<<endl;
+    if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
+    {
+        cout << "ADU USB Device Opened Successfully" << endl;
+    }
+    else
+    {
+        cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << endl;
+    }
 
-	ADUpipe = new smPipe("ADU_Data",sizeof(ADUDeviceData),10);
+    ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
 }
 
 /// \brief
-smADUInterface::smADUInterface(char *calibrationFile){
+smADUInterface::smADUInterface(char *calibrationFile)
+{
 
-// Read device serial number and calibration values 
-	serialNumber = new smChar[10];
-	isOpened = false;
-	calibrationData = new ADUDeviceCalibrationData();
-	deviceData = new ADUDeviceData();
-	ifstream reader;
-	reader.open(calibrationFile,ios::in);
+// Read device serial number and calibration values
+    serialNumber = new smChar[10];
+    isOpened = false;
+    calibrationData = new ADUDeviceCalibrationData();
+    deviceData = new ADUDeviceData();
+    ifstream reader;
+    reader.open(calibrationFile, ios::in);
 
-	if(!reader){
-		cout<<" ADU Device Calibration Data File Could Not Be Loaded For Reading"<<endl;
-		cout<<" Check the location for file : "<<deviceData<<endl;
-	}
+    if (!reader)
+    {
+        cout << " ADU Device Calibration Data File Could Not Be Loaded For Reading" << endl;
+        cout << " Check the location for file : " << deviceData << endl;
+    }
 
-	smChar buffer[100];
-	smInt i;
-	string t;
-	string s;
-	
-	while(!reader.eof()){
-		reader.getline(buffer,50);
+    smChar buffer[100];
+    smInt i;
+    string t;
+    string s;
 
-		t= buffer;
+    while (!reader.eof())
+    {
+        reader.getline(buffer, 50);
 
-		i = t.find("Serial Number:");
+        t = buffer;
 
-		if(i!=string::npos){
-			i = t.find(":");
-			s.assign(t,i+1,t.size());
-			strcpy(serialNumber, s.c_str());
-			//Debug 
-			cout<<"Serial Number of this device is"<<serialNumber<<endl;
-		}
-		else{
-			cout<<"Couldn't find the serial number for this ADU Device -- Check calibration file"<<endl;
-		}
+        i = t.find("Serial Number:");
 
-		s.clear();
-		i = t.find("AN0MIN:");
+        if (i != string::npos)
+        {
+            i = t.find(":");
+            s.assign(t, i + 1, t.size());
+            strcpy(serialNumber, s.c_str());
+            //Debug
+            cout << "Serial Number of this device is" << serialNumber << endl;
+        }
+        else
+        {
+            cout << "Couldn't find the serial number for this ADU Device -- Check calibration file" << endl;
+        }
 
-		if(i!=string::npos){
-			i= t.find(":");
-			s.assign(t,i+1,t.size());
-			calibrationData->minValue1 = atoi(s.c_str());
-		}
+        s.clear();
+        i = t.find("AN0MIN:");
 
-		s.clear();
-		i = t.find("AN0MAX:");
+        if (i != string::npos)
+        {
+            i = t.find(":");
+            s.assign(t, i + 1, t.size());
+            calibrationData->minValue1 = atoi(s.c_str());
+        }
 
-		if(i!=string::npos){
-			i= t.find(":");
-			s.assign(t,i+1,t.size());
-			calibrationData->maxValue1 = atoi(s.c_str());
-		}
+        s.clear();
+        i = t.find("AN0MAX:");
 
-		s.clear();
-		i = t.find("AN1MIN:");
+        if (i != string::npos)
+        {
+            i = t.find(":");
+            s.assign(t, i + 1, t.size());
+            calibrationData->maxValue1 = atoi(s.c_str());
+        }
 
-		if(i!=string::npos){
-			i= t.find(":");
-			s.assign(t,i+1,t.size());
-			calibrationData->minValue2 = atoi(s.c_str());
-		}
+        s.clear();
+        i = t.find("AN1MIN:");
 
-		s.clear();
-		i = t.find("AN1MAX:");
+        if (i != string::npos)
+        {
+            i = t.find(":");
+            s.assign(t, i + 1, t.size());
+            calibrationData->minValue2 = atoi(s.c_str());
+        }
 
-		if(i!=string::npos){
-			i= t.find(":");
-			s.assign(t,i+1,t.size());
-			calibrationData->maxValue2 = atoi(s.c_str());
-		}
-	}
+        s.clear();
+        i = t.find("AN1MAX:");
 
-	reader.close();
+        if (i != string::npos)
+        {
+            i = t.find(":");
+            s.assign(t, i + 1, t.size());
+            calibrationData->maxValue2 = atoi(s.c_str());
+        }
+    }
 
-	cout<< "Calibration values are : "<<calibrationData->minValue1<<" "
-        <<calibrationData->maxValue1<<" " <<calibrationData->minValue2
-        <<" "<<calibrationData->maxValue2<<endl;
+    reader.close();
 
-	if(openDevice(serialNumber)== SIMMEDTK_MSG_SUCCESS){
-		cout<<"ADU USB Device Opened Successfully"<<endl;
-	}
-	else
-		cout<<"Check the USB connection of the ADU device or the serial number: Couldn't initialize the device"<<endl;
+    cout << "Calibration values are : " << calibrationData->minValue1 << " "
+         << calibrationData->maxValue1 << " " << calibrationData->minValue2
+         << " " << calibrationData->maxValue2 << endl;
 
-	ADUpipe = new smPipe("ADU_Data",sizeof(ADUDeviceData),10);
-	sw = 0;
-	updateFlag = 0;
+    if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
+    {
+        cout << "ADU USB Device Opened Successfully" << endl;
+    }
+    else
+    {
+        cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << endl;
+    }
+
+    ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
+    sw = 0;
+    updateFlag = 0;
 }
 
 /// \brief
-smADUInterface::~smADUInterface(){
+smADUInterface::~smADUInterface()
+{
 
-	closeDevice();
+    closeDevice();
 }
 
 /// \brief
-smInt smADUInterface::openDevice(char *serialNumber){
+smInt smADUInterface::openDevice(char *serialNumber)
+{
 
-	deviceHandle = OpenAduDeviceBySerialNumber(serialNumber,0);
+    deviceHandle = OpenAduDeviceBySerialNumber(serialNumber, 0);
 
-	if( (*((int *)&deviceHandle ) ) >0 ){
-		isOpened = true;
-		return SIMMEDTK_MSG_SUCCESS;
-	} else{
-		isOpened = false;
-		return SIMMEDTK_MSG_FAILURE;
-	}
+    if ((*((int *)&deviceHandle)) > 0)
+    {
+        isOpened = true;
+        return SIMMEDTK_MSG_SUCCESS;
+    }
+    else
+    {
+        isOpened = false;
+        return SIMMEDTK_MSG_FAILURE;
+    }
 }
 
 /// \brief
-smInt smADUInterface::closeDevice(){
+smInt smADUInterface::closeDevice()
+{
 
-	CloseAduDevice(deviceHandle);
-	return 0;
+    CloseAduDevice(deviceHandle);
+    return 0;
 }
 
 /// \brief
-smInt* smADUInterface::readAnalogInputs(){
+smInt* smADUInterface::readAnalogInputs()
+{
 
-	return 0;
+    return 0;
 }
 
 /// \brief Support for two inputs
-smInt smADUInterface::readAnalogInput(int channel){
+smInt smADUInterface::readAnalogInput(int channel)
+{
 
-	smChar *command;
-	smChar data[8];
+    smChar *command;
+    smChar data[8];
 
-	if(channel == 0)
-		command = "RUN00";
-	else 
-		command = "RUN10";
+    if (channel == 0)
+    {
+        command = "RUN00";
+    }
+    else
+    {
+        command = "RUN10";
+    }
 
-	WriteAduDevice(deviceHandle, command, 5, 0, 0);
-	memset(data, 0, sizeof(data));
-	ReadAduDevice(deviceHandle, data, 5, 0, 0);
+    WriteAduDevice(deviceHandle, command, 5, 0, 0);
+    memset(data, 0, sizeof(data));
+    ReadAduDevice(deviceHandle, data, 5, 0, 0);
 
-	return atoi(data);
+    return atoi(data);
 }
 
 /// \brief
-void smADUInterface::runDevice(){
+void smADUInterface::runDevice()
+{
 
-	if(isOpened){
-		for(smInt i =0; i<2; i++) 
-			deviceData->anValue[i] = readAnalogInput(i);
+    if (isOpened)
+    {
+        for (smInt i = 0; i < 2; i++)
+        {
+            deviceData->anValue[i] = readAnalogInput(i);
+        }
 
-		updateFlag = !updateFlag;
-	}
+        updateFlag = !updateFlag;
+    }
 }
 
 /// \brief
-void smADUInterface::sendDataToPipe(){
+void smADUInterface::sendDataToPipe()
+{
 
-	ADUDeviceData *pipeData;
-	pipeData = (ADUDeviceData*)ADUpipe->beginWrite();
-	pipeData->calibration[0] = calibrationData->minValue1;
-	pipeData->calibration[1] = calibrationData->maxValue1;
-	pipeData->calibration[2] = calibrationData->minValue2;
-	pipeData->calibration[3] = calibrationData->maxValue2;
-	pipeData->anValue[0] = deviceData->anValue[0];
-	pipeData->anValue[1] = deviceData->anValue[1];
-	pipeData->deviceOpen = isOpened;
-	ADUpipe->endWrite(1);
-	ADUpipe->acknowledgeValueListeners();
+    ADUDeviceData *pipeData;
+    pipeData = (ADUDeviceData*)ADUpipe->beginWrite();
+    pipeData->calibration[0] = calibrationData->minValue1;
+    pipeData->calibration[1] = calibrationData->maxValue1;
+    pipeData->calibration[2] = calibrationData->minValue2;
+    pipeData->calibration[3] = calibrationData->maxValue2;
+    pipeData->anValue[0] = deviceData->anValue[0];
+    pipeData->anValue[1] = deviceData->anValue[1];
+    pipeData->deviceOpen = isOpened;
+    ADUpipe->endWrite(1);
+    ADUpipe->acknowledgeValueListeners();
 }
 
 /// \brief
-void smADUInterface::run(){
+void smADUInterface::run()
+{
 
-	while(1){
-		runDevice();
-		sendDataToPipe();
-	}
+    while (1)
+    {
+        runDevice();
+        sendDataToPipe();
+    }
 }
 
 #endif // WIN32

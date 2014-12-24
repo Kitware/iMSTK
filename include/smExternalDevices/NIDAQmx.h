@@ -13,7 +13,7 @@
 #define ___nidaqmx_h___
 
 #ifdef __cplusplus
-	extern "C" {
+extern "C" {
 #endif
 
 #ifdef __linux__
@@ -39,50 +39,50 @@
 // NI-DAQmx Typedefs
 #ifndef _NI_int8_DEFINED_
 #define _NI_int8_DEFINED_
-	typedef signed char        int8;
+typedef signed char        int8;
 #endif
 #ifndef _NI_uInt8_DEFINED_
 #define _NI_uInt8_DEFINED_
-	typedef unsigned char      uInt8;
+typedef unsigned char      uInt8;
 #endif
 #ifndef _NI_int16_DEFINED_
 #define _NI_int16_DEFINED_
-	typedef signed short       int16;
+typedef signed short       int16;
 #endif
 #ifndef _NI_uInt16_DEFINED_
 #define _NI_uInt16_DEFINED_
-	typedef unsigned short     uInt16;
+typedef unsigned short     uInt16;
 #endif
 #ifndef _NI_int32_DEFINED_
 #define _NI_int32_DEFINED_
-	typedef signed long        int32;
+typedef signed long        int32;
 #endif
 #ifndef _NI_uInt32_DEFINED_
 #define _NI_uInt32_DEFINED_
-	typedef unsigned long      uInt32;
+typedef unsigned long      uInt32;
 #endif
 #ifndef _NI_float32_DEFINED_
 #define _NI_float32_DEFINED_
-	typedef float              float32;
+typedef float              float32;
 #endif
 #ifndef _NI_float64_DEFINED_
 #define _NI_float64_DEFINED_
-	typedef double             float64;
+typedef double             float64;
 #endif
 #ifndef _NI_int64_DEFINED_
 #define _NI_int64_DEFINED_
 #ifdef __linux__
-	typedef long long int      int64;
+typedef long long int      int64;
 #else
-	typedef __int64            int64;
+typedef __int64            int64;
 #endif
 #endif
 #ifndef _NI_uInt64_DEFINED_
 #define _NI_uInt64_DEFINED_
 #ifdef __linux__
-	typedef unsigned long long uInt64;
+typedef unsigned long long uInt64;
 #else
-	typedef unsigned __int64   uInt64;
+typedef unsigned __int64   uInt64;
 #endif
 #endif
 
@@ -92,13 +92,13 @@ typedef void*              TaskHandle;
 typedef uInt32             CalHandle;
 
 #ifndef TRUE
- #define TRUE            (1L)
+#define TRUE            (1L)
 #endif
 #ifndef FALSE
- #define FALSE           (0L)
+#define FALSE           (0L)
 #endif
 #ifndef NULL
- #define NULL            (0L)
+#define NULL            (0L)
 #endif
 
 
@@ -1049,7 +1049,7 @@ typedef uInt32             CalHandle;
 
 // For backwards compatibility, the DAQmx_ReadWaitMode has to be defined because this was the original spelling
 // that has been later on corrected.
-#define DAQmx_ReadWaitMode	DAQmx_Read_WaitMode
+#define DAQmx_ReadWaitMode  DAQmx_Read_WaitMode
 
 /******************************************************************************
  *** NI-DAQmx Values **********************************************************
@@ -2196,135 +2196,135 @@ typedef uInt32             CalHandle;
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxLoadTask                  (const char taskName[], TaskHandle *taskHandle);
-int32 __CFUNC     DAQmxCreateTask                (const char taskName[], TaskHandle *taskHandle);
+int32 __CFUNC     DAQmxLoadTask(const char taskName[], TaskHandle *taskHandle);
+int32 __CFUNC     DAQmxCreateTask(const char taskName[], TaskHandle *taskHandle);
 // Channel Names must be valid channels already available in MAX. They are not created.
-int32 __CFUNC     DAQmxAddGlobalChansToTask      (TaskHandle taskHandle, const char channelNames[]);
+int32 __CFUNC     DAQmxAddGlobalChansToTask(TaskHandle taskHandle, const char channelNames[]);
 
-int32 __CFUNC     DAQmxStartTask                 (TaskHandle taskHandle);
-int32 __CFUNC     DAQmxStopTask                  (TaskHandle taskHandle);
+int32 __CFUNC     DAQmxStartTask(TaskHandle taskHandle);
+int32 __CFUNC     DAQmxStopTask(TaskHandle taskHandle);
 
-int32 __CFUNC     DAQmxClearTask                 (TaskHandle taskHandle);
+int32 __CFUNC     DAQmxClearTask(TaskHandle taskHandle);
 
-int32 __CFUNC     DAQmxWaitUntilTaskDone         (TaskHandle taskHandle, float64 timeToWait);
-int32 __CFUNC     DAQmxIsTaskDone                (TaskHandle taskHandle, bool32 *isTaskDone);
+int32 __CFUNC     DAQmxWaitUntilTaskDone(TaskHandle taskHandle, float64 timeToWait);
+int32 __CFUNC     DAQmxIsTaskDone(TaskHandle taskHandle, bool32 *isTaskDone);
 
-int32 __CFUNC     DAQmxTaskControl               (TaskHandle taskHandle, int32 action);
+int32 __CFUNC     DAQmxTaskControl(TaskHandle taskHandle, int32 action);
 
-int32 __CFUNC     DAQmxGetNthTaskChannel         (TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
+int32 __CFUNC     DAQmxGetNthTaskChannel(TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
 
-int32 __CFUNC     DAQmxGetNthTaskDevice          (TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
+int32 __CFUNC     DAQmxGetNthTaskDevice(TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
 
-int32 __CFUNC_C   DAQmxGetTaskAttribute          (TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxGetTaskAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
 
-typedef int32 (CVICALLBACK *DAQmxEveryNSamplesEventCallbackPtr)(TaskHandle taskHandle, int32 everyNsamplesEventType, uInt32 nSamples, void *callbackData);
-typedef int32 (CVICALLBACK *DAQmxDoneEventCallbackPtr)(TaskHandle taskHandle, int32 status, void *callbackData);
-typedef int32 (CVICALLBACK *DAQmxSignalEventCallbackPtr)(TaskHandle taskHandle, int32 signalID, void *callbackData);
+typedef int32(CVICALLBACK *DAQmxEveryNSamplesEventCallbackPtr)(TaskHandle taskHandle, int32 everyNsamplesEventType, uInt32 nSamples, void *callbackData);
+typedef int32(CVICALLBACK *DAQmxDoneEventCallbackPtr)(TaskHandle taskHandle, int32 status, void *callbackData);
+typedef int32(CVICALLBACK *DAQmxSignalEventCallbackPtr)(TaskHandle taskHandle, int32 signalID, void *callbackData);
 
 int32 __CFUNC     DAQmxRegisterEveryNSamplesEvent(TaskHandle task, int32 everyNsamplesEventType, uInt32 nSamples, uInt32 options, DAQmxEveryNSamplesEventCallbackPtr callbackFunction, void *callbackData);
-int32 __CFUNC     DAQmxRegisterDoneEvent         (TaskHandle task, uInt32 options, DAQmxDoneEventCallbackPtr callbackFunction, void *callbackData);
-int32 __CFUNC     DAQmxRegisterSignalEvent       (TaskHandle task, int32 signalID, uInt32 options, DAQmxSignalEventCallbackPtr callbackFunction, void *callbackData);
+int32 __CFUNC     DAQmxRegisterDoneEvent(TaskHandle task, uInt32 options, DAQmxDoneEventCallbackPtr callbackFunction, void *callbackData);
+int32 __CFUNC     DAQmxRegisterSignalEvent(TaskHandle task, int32 signalID, uInt32 options, DAQmxSignalEventCallbackPtr callbackFunction, void *callbackData);
 
 /******************************************************/
 /***        Channel Configuration/Creation          ***/
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxCreateAIVoltageChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAICurrentChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIVoltageRMSChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAICurrentRMSChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIThrmcplChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
-int32 __CFUNC     DAQmxCreateAIRTDChan           (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 rtdType, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 r0);
-int32 __CFUNC     DAQmxCreateAIThrmstrChanIex    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 a, float64 b, float64 c);
-int32 __CFUNC     DAQmxCreateAIThrmstrChanVex    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 a, float64 b, float64 c, float64 r1);
-int32 __CFUNC     DAQmxCreateAIFreqVoltageChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 thresholdLevel, float64 hysteresis, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIResistanceChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIStrainGageChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 strainConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 gageFactor, float64 initialBridgeVoltage, float64 nominalGageResistance, float64 poissonRatio, float64 leadWireResistance, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIRosetteStrainGageChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 rosetteType, float64 gageOrientation, const int32 rosetteMeasTypes[], uInt32 numRosetteMeasTypes, int32 strainConfig, int32 voltageExcitSource, float64 voltageExcitVal,float64 gageFactor, float64 nominalGageResistance,float64 poissonRatio,float64 leadWireResistance);
-int32 __CFUNC     DAQmxCreateAIForceBridgeTwoPointLinChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,float64 firstElectricalVal,float64 secondElectricalVal,int32	electricalUnits,float64 firstPhysicalVal,float64 secondPhysicalVal,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAICurrentChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIVoltageRMSChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAICurrentRMSChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIThrmcplChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 thermocoupleType, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+int32 __CFUNC     DAQmxCreateAIRTDChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 rtdType, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 r0);
+int32 __CFUNC     DAQmxCreateAIThrmstrChanIex(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, float64 a, float64 b, float64 c);
+int32 __CFUNC     DAQmxCreateAIThrmstrChanVex(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 a, float64 b, float64 c, float64 r1);
+int32 __CFUNC     DAQmxCreateAIFreqVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 thresholdLevel, float64 hysteresis, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIResistanceChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIStrainGageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 strainConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 gageFactor, float64 initialBridgeVoltage, float64 nominalGageResistance, float64 poissonRatio, float64 leadWireResistance, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIRosetteStrainGageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 rosetteType, float64 gageOrientation, const int32 rosetteMeasTypes[], uInt32 numRosetteMeasTypes, int32 strainConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 gageFactor, float64 nominalGageResistance, float64 poissonRatio, float64 leadWireResistance);
+int32 __CFUNC     DAQmxCreateAIForceBridgeTwoPointLinChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, float64 firstElectricalVal, float64 secondElectricalVal, int32    electricalUnits, float64 firstPhysicalVal, float64 secondPhysicalVal, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAIForceBridgeTableChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 electricalVals[],uInt32 numElectricalVals,int32	electricalUnits,const float64 physicalVals[],uInt32 numPhysicalVals,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIForceBridgeTableChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 electricalVals[], uInt32 numElectricalVals, int32   electricalUnits, const float64 physicalVals[], uInt32 numPhysicalVals, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAIForceBridgePolynomialChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 forwardCoeffs[],uInt32 numForwardCoeffs,const float64 reverseCoeffs[],uInt32 numReverseCoeffs,int32	electricalUnits,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIForceBridgePolynomialChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 forwardCoeffs[], uInt32 numForwardCoeffs, const float64 reverseCoeffs[], uInt32 numReverseCoeffs, int32  electricalUnits, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAIPressureBridgeTwoPointLinChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,float64 firstElectricalVal,float64 secondElectricalVal,int32	electricalUnits,float64 firstPhysicalVal,float64 secondPhysicalVal,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIPressureBridgeTwoPointLinChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, float64 firstElectricalVal, float64 secondElectricalVal, int32   electricalUnits, float64 firstPhysicalVal, float64 secondPhysicalVal, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAIPressureBridgeTableChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 electricalVals[],uInt32 numElectricalVals,int32	electricalUnits,const float64 physicalVals[],uInt32 numPhysicalVals,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIPressureBridgeTableChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 electricalVals[], uInt32 numElectricalVals, int32    electricalUnits, const float64 physicalVals[], uInt32 numPhysicalVals, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAIPressureBridgePolynomialChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 forwardCoeffs[],uInt32 numForwardCoeffs,const float64 reverseCoeffs[],uInt32 numReverseCoeffs,int32	electricalUnits,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIPressureBridgePolynomialChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 forwardCoeffs[], uInt32 numForwardCoeffs, const float64 reverseCoeffs[], uInt32 numReverseCoeffs, int32   electricalUnits, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAITorqueBridgeTwoPointLinChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,float64 firstElectricalVal,float64 secondElectricalVal,int32	electricalUnits,float64 firstPhysicalVal,float64 secondPhysicalVal,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAITorqueBridgeTwoPointLinChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, float64 firstElectricalVal, float64 secondElectricalVal, int32 electricalUnits, float64 firstPhysicalVal, float64 secondPhysicalVal, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAITorqueBridgeTableChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 electricalVals[],uInt32 numElectricalVals,int32	electricalUnits,const float64 physicalVals[],uInt32 numPhysicalVals,int32 physicalUnits,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAITorqueBridgeTableChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 electricalVals[], uInt32 numElectricalVals, int32  electricalUnits, const float64 physicalVals[], uInt32 numPhysicalVals, int32 physicalUnits, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAITorqueBridgePolynomialChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const float64 forwardCoeffs[],uInt32 numForwardCoeffs,const float64 reverseCoeffs[],uInt32 numReverseCoeffs,int32	electricalUnits,int32 physicalUnits,const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIBridgeChan    (TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 bridgeConfig,int32 voltageExcitSource,float64 voltageExcitVal,float64 nominalBridgeResistance,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAITorqueBridgePolynomialChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const float64 forwardCoeffs[], uInt32 numForwardCoeffs, const float64 reverseCoeffs[], uInt32 numReverseCoeffs, int32 electricalUnits, int32 physicalUnits, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIBridgeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 nominalBridgeResistance, const char customScaleName[]);
 int32 __CFUNC     DAQmxCreateAIVoltageChanWithExcit(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 bridgeConfig, int32 voltageExcitSource, float64 voltageExcitVal, bool32 useExcitForScaling, const char customScaleName[]);
 int32 __CFUNC     DAQmxCreateAITempBuiltInSensorChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 units);
-int32 __CFUNC     DAQmxCreateAIAccelChan         (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIVelocityIEPEChan  (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIForceIEPEChan         (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIMicrophoneChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, int32 units, float64 micSensitivity, float64 maxSndPressLevel, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIPosLVDTChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAIPosRVDTChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIAccelChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIVelocityIEPEChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIForceIEPEChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIMicrophoneChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, int32 units, float64 micSensitivity, float64 maxSndPressLevel, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIPosLVDTChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAIPosRVDTChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
 int32 __CFUNC     DAQmxCreateAIPosEddyCurrProxProbeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, float64 sensitivity, int32 sensitivityUnits, const char customScaleName[]);
 // Function DAQmxCreateAIDeviceTempChan is obsolete and has been replaced by DAQmxCreateAITempBuiltInSensorChan
-int32 __CFUNC     DAQmxCreateAIDeviceTempChan    (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 units);
+int32 __CFUNC     DAQmxCreateAIDeviceTempChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 units);
 
-int32 __CFUNC     DAQmxCreateTEDSAIVoltageChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAICurrentChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIThrmcplChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
-int32 __CFUNC     DAQmxCreateTEDSAIRTDChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal);
+int32 __CFUNC     DAQmxCreateTEDSAIVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAICurrentChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 shuntResistorLoc, float64 extShuntResistorVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIThrmcplChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 cjcSource, float64 cjcVal, const char cjcChannel[]);
+int32 __CFUNC     DAQmxCreateTEDSAIRTDChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal);
 int32 __CFUNC     DAQmxCreateTEDSAIThrmstrChanIex(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal);
 int32 __CFUNC     DAQmxCreateTEDSAIThrmstrChanVex(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 voltageExcitSource, float64 voltageExcitVal, float64 r1);
 int32 __CFUNC     DAQmxCreateTEDSAIResistanceChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 resistanceConfig, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
 int32 __CFUNC     DAQmxCreateTEDSAIStrainGageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, float64 initialBridgeVoltage, float64 leadWireResistance, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIForceBridgeChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 voltageExcitSource,float64 voltageExcitVal,const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIPressureBridgeChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 voltageExcitSource,float64 voltageExcitVal,	const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAITorqueBridgeChan(TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 voltageExcitSource,float64 voltageExcitVal,const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIBridgeChan    (TaskHandle taskHandle,const char physicalChannel[],const char nameToAssignToChannel[],float64 minVal,float64 maxVal,int32 units,int32 voltageExcitSource,float64 voltageExcitVal,const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIForceBridgeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIPressureBridgeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAITorqueBridgeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIBridgeChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, const char customScaleName[]);
 int32 __CFUNC     DAQmxCreateTEDSAIVoltageChanWithExcit(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIAccelChan     (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIForceIEPEChan     (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIAccelChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIForceIEPEChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, float64 minVal, float64 maxVal, int32 units, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
 
 int32 __CFUNC     DAQmxCreateTEDSAIMicrophoneChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 terminalConfig, int32 units, float64 maxSndPressLevel, int32 currentExcitSource, float64 currentExcitVal, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIPosLVDTChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateTEDSAIPosRVDTChan   (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIPosLVDTChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateTEDSAIPosRVDTChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 voltageExcitSource, float64 voltageExcitVal, float64 voltageExcitFreq, int32 ACExcitWireMode, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateAOVoltageChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAOCurrentChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateAOFuncGenChan       (TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 type, float64 freq, float64 amplitude, float64 offset);
+int32 __CFUNC     DAQmxCreateAOVoltageChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAOCurrentChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateAOFuncGenChan(TaskHandle taskHandle, const char physicalChannel[], const char nameToAssignToChannel[], int32 type, float64 freq, float64 amplitude, float64 offset);
 
-int32 __CFUNC     DAQmxCreateDIChan              (TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+int32 __CFUNC     DAQmxCreateDIChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
 
-int32 __CFUNC     DAQmxCreateDOChan              (TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
+int32 __CFUNC     DAQmxCreateDOChan(TaskHandle taskHandle, const char lines[], const char nameToAssignToLines[], int32 lineGrouping);
 
-int32 __CFUNC     DAQmxCreateCIFreqChan          (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCIPeriodChan        (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCICountEdgesChan    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection);
-int32 __CFUNC     DAQmxCreateCIPulseWidthChan    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCISemiPeriodChan    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCITwoEdgeSepChan       (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 firstEdge, int32 secondEdge, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCIPulseChanFreq        (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units);
-int32 __CFUNC     DAQmxCreateCIPulseChanTime        (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units);
-int32 __CFUNC     DAQmxCreateCIPulseChanTicks       (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], const char sourceTerminal[], float64 minVal, float64 maxVal);
-int32 __CFUNC     DAQmxCreateCILinEncoderChan    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, float64 distPerPulse, float64 initialPos, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCIAngEncoderChan    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, uInt32 pulsesPerRev, float64 initialAngle, const char customScaleName[]);
-int32 __CFUNC     DAQmxCreateCIGPSTimestampChan  (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 syncMethod, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCIFreqChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCIPeriodChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 edge, int32 measMethod, float64 measTime, uInt32 divisor, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCICountEdgesChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 edge, uInt32 initialCount, int32 countDirection);
+int32 __CFUNC     DAQmxCreateCIPulseWidthChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 startingEdge, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCISemiPeriodChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCITwoEdgeSepChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units, int32 firstEdge, int32 secondEdge, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCIPulseChanFreq(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units);
+int32 __CFUNC     DAQmxCreateCIPulseChanTime(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], float64 minVal, float64 maxVal, int32 units);
+int32 __CFUNC     DAQmxCreateCIPulseChanTicks(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], const char sourceTerminal[], float64 minVal, float64 maxVal);
+int32 __CFUNC     DAQmxCreateCILinEncoderChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, float64 distPerPulse, float64 initialPos, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCIAngEncoderChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 decodingType, bool32 ZidxEnable, float64 ZidxVal, int32 ZidxPhase, int32 units, uInt32 pulsesPerRev, float64 initialAngle, const char customScaleName[]);
+int32 __CFUNC     DAQmxCreateCIGPSTimestampChan(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 syncMethod, const char customScaleName[]);
 
-int32 __CFUNC     DAQmxCreateCOPulseChanFreq     (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle);
-int32 __CFUNC     DAQmxCreateCOPulseChanTime     (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 lowTime, float64 highTime);
-int32 __CFUNC     DAQmxCreateCOPulseChanTicks    (TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], const char sourceTerminal[], int32 idleState, int32 initialDelay, int32 lowTicks, int32 highTicks);
+int32 __CFUNC     DAQmxCreateCOPulseChanFreq(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 freq, float64 dutyCycle);
+int32 __CFUNC     DAQmxCreateCOPulseChanTime(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], int32 units, int32 idleState, float64 initialDelay, float64 lowTime, float64 highTime);
+int32 __CFUNC     DAQmxCreateCOPulseChanTicks(TaskHandle taskHandle, const char counter[], const char nameToAssignToChannel[], const char sourceTerminal[], int32 idleState, int32 initialDelay, int32 lowTicks, int32 highTicks);
 
-int32 __CFUNC     DAQmxGetAIChanCalCalDate       (TaskHandle taskHandle, const char channelName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
-int32 __CFUNC     DAQmxSetAIChanCalCalDate       (TaskHandle taskHandle, const char channelName[], uInt32 year, uInt32 month, uInt32 day, uInt32 hour, uInt32 minute);
-int32 __CFUNC     DAQmxGetAIChanCalExpDate       (TaskHandle taskHandle, const char channelName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
-int32 __CFUNC     DAQmxSetAIChanCalExpDate       (TaskHandle taskHandle, const char channelName[], uInt32 year, uInt32 month, uInt32 day, uInt32 hour, uInt32 minute);
+int32 __CFUNC     DAQmxGetAIChanCalCalDate(TaskHandle taskHandle, const char channelName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
+int32 __CFUNC     DAQmxSetAIChanCalCalDate(TaskHandle taskHandle, const char channelName[], uInt32 year, uInt32 month, uInt32 day, uInt32 hour, uInt32 minute);
+int32 __CFUNC     DAQmxGetAIChanCalExpDate(TaskHandle taskHandle, const char channelName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
+int32 __CFUNC     DAQmxSetAIChanCalExpDate(TaskHandle taskHandle, const char channelName[], uInt32 year, uInt32 month, uInt32 day, uInt32 hour, uInt32 minute);
 
-int32 __CFUNC_C   DAQmxGetChanAttribute          (TaskHandle taskHandle, const char channel[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetChanAttribute          (TaskHandle taskHandle, const char channel[], int32 attribute, ...);
-int32 __CFUNC     DAQmxResetChanAttribute        (TaskHandle taskHandle, const char channel[], int32 attribute);
+int32 __CFUNC_C   DAQmxGetChanAttribute(TaskHandle taskHandle, const char channel[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetChanAttribute(TaskHandle taskHandle, const char channel[], int32 attribute, ...);
+int32 __CFUNC     DAQmxResetChanAttribute(TaskHandle taskHandle, const char channel[], int32 attribute);
 
 
 /******************************************************/
@@ -2333,26 +2333,26 @@ int32 __CFUNC     DAQmxResetChanAttribute        (TaskHandle taskHandle, const c
 
 
 // (Analog/Counter Timing)
-int32 __CFUNC     DAQmxCfgSampClkTiming          (TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
+int32 __CFUNC     DAQmxCfgSampClkTiming(TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
 // (Digital Timing)
-int32 __CFUNC     DAQmxCfgHandshakingTiming      (TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan);
+int32 __CFUNC     DAQmxCfgHandshakingTiming(TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan);
 // (Burst Import Clock Timing)
 int32 __CFUNC     DAQmxCfgBurstHandshakingTimingImportClock(TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan, float64 sampleClkRate, const char sampleClkSrc[], int32 sampleClkActiveEdge, int32 pauseWhen, int32 readyEventActiveLevel);
 // (Burst Export Clock Timing)
 int32 __CFUNC     DAQmxCfgBurstHandshakingTimingExportClock(TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan, float64 sampleClkRate, const char sampleClkOutpTerm[], int32 sampleClkPulsePolarity, int32 pauseWhen, int32 readyEventActiveLevel);
-int32 __CFUNC     DAQmxCfgChangeDetectionTiming  (TaskHandle taskHandle, const char risingEdgeChan[], const char fallingEdgeChan[], int32 sampleMode, uInt64 sampsPerChan);
+int32 __CFUNC     DAQmxCfgChangeDetectionTiming(TaskHandle taskHandle, const char risingEdgeChan[], const char fallingEdgeChan[], int32 sampleMode, uInt64 sampsPerChan);
 // (Counter Timing)
-int32 __CFUNC     DAQmxCfgImplicitTiming         (TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan);
+int32 __CFUNC     DAQmxCfgImplicitTiming(TaskHandle taskHandle, int32 sampleMode, uInt64 sampsPerChan);
 // (Pipelined Sample Clock Timing)
-int32 __CFUNC     DAQmxCfgPipelinedSampClkTiming (TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
+int32 __CFUNC     DAQmxCfgPipelinedSampClkTiming(TaskHandle taskHandle, const char source[], float64 rate, int32 activeEdge, int32 sampleMode, uInt64 sampsPerChan);
 
-int32 __CFUNC_C   DAQmxGetTimingAttribute        (TaskHandle taskHandle, int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetTimingAttribute        (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetTimingAttribute      (TaskHandle taskHandle, int32 attribute);
+int32 __CFUNC_C   DAQmxGetTimingAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetTimingAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetTimingAttribute(TaskHandle taskHandle, int32 attribute);
 
-int32 __CFUNC_C   DAQmxGetTimingAttributeEx      (TaskHandle taskHandle, const char deviceNames[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetTimingAttributeEx      (TaskHandle taskHandle, const char deviceNames[], int32 attribute, ...);
-int32 __CFUNC     DAQmxResetTimingAttributeEx    (TaskHandle taskHandle, const char deviceNames[], int32 attribute);
+int32 __CFUNC_C   DAQmxGetTimingAttributeEx(TaskHandle taskHandle, const char deviceNames[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetTimingAttributeEx(TaskHandle taskHandle, const char deviceNames[], int32 attribute, ...);
+int32 __CFUNC     DAQmxResetTimingAttributeEx(TaskHandle taskHandle, const char deviceNames[], int32 attribute);
 
 
 /******************************************************/
@@ -2360,26 +2360,26 @@ int32 __CFUNC     DAQmxResetTimingAttributeEx    (TaskHandle taskHandle, const c
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxDisableStartTrig          (TaskHandle taskHandle);
-int32 __CFUNC     DAQmxCfgDigEdgeStartTrig       (TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge);
-int32 __CFUNC     DAQmxCfgAnlgEdgeStartTrig      (TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel);
-int32 __CFUNC     DAQmxCfgAnlgWindowStartTrig    (TaskHandle taskHandle, const char triggerSource[], int32 triggerWhen, float64 windowTop, float64 windowBottom);
-int32 __CFUNC     DAQmxCfgDigPatternStartTrig    (TaskHandle taskHandle, const char triggerSource[], const char triggerPattern[], int32 triggerWhen);
+int32 __CFUNC     DAQmxDisableStartTrig(TaskHandle taskHandle);
+int32 __CFUNC     DAQmxCfgDigEdgeStartTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge);
+int32 __CFUNC     DAQmxCfgAnlgEdgeStartTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel);
+int32 __CFUNC     DAQmxCfgAnlgWindowStartTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerWhen, float64 windowTop, float64 windowBottom);
+int32 __CFUNC     DAQmxCfgDigPatternStartTrig(TaskHandle taskHandle, const char triggerSource[], const char triggerPattern[], int32 triggerWhen);
 
-int32 __CFUNC     DAQmxDisableRefTrig            (TaskHandle taskHandle);
-int32 __CFUNC     DAQmxCfgDigEdgeRefTrig         (TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples);
-int32 __CFUNC     DAQmxCfgAnlgEdgeRefTrig        (TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples);
-int32 __CFUNC     DAQmxCfgAnlgWindowRefTrig      (TaskHandle taskHandle, const char triggerSource[], int32 triggerWhen, float64 windowTop, float64 windowBottom, uInt32 pretriggerSamples);
-int32 __CFUNC     DAQmxCfgDigPatternRefTrig      (TaskHandle taskHandle, const char triggerSource[], const char triggerPattern[], int32 triggerWhen, uInt32 pretriggerSamples);
+int32 __CFUNC     DAQmxDisableRefTrig(TaskHandle taskHandle);
+int32 __CFUNC     DAQmxCfgDigEdgeRefTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge, uInt32 pretriggerSamples);
+int32 __CFUNC     DAQmxCfgAnlgEdgeRefTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerSlope, float64 triggerLevel, uInt32 pretriggerSamples);
+int32 __CFUNC     DAQmxCfgAnlgWindowRefTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerWhen, float64 windowTop, float64 windowBottom, uInt32 pretriggerSamples);
+int32 __CFUNC     DAQmxCfgDigPatternRefTrig(TaskHandle taskHandle, const char triggerSource[], const char triggerPattern[], int32 triggerWhen, uInt32 pretriggerSamples);
 
-int32 __CFUNC     DAQmxDisableAdvTrig            (TaskHandle taskHandle);
-int32 __CFUNC     DAQmxCfgDigEdgeAdvTrig         (TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge);
+int32 __CFUNC     DAQmxDisableAdvTrig(TaskHandle taskHandle);
+int32 __CFUNC     DAQmxCfgDigEdgeAdvTrig(TaskHandle taskHandle, const char triggerSource[], int32 triggerEdge);
 
-int32 __CFUNC_C   DAQmxGetTrigAttribute          (TaskHandle taskHandle, int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetTrigAttribute          (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetTrigAttribute        (TaskHandle taskHandle, int32 attribute);
+int32 __CFUNC_C   DAQmxGetTrigAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetTrigAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetTrigAttribute(TaskHandle taskHandle, int32 attribute);
 
-int32 __CFUNC     DAQmxSendSoftwareTrigger       (TaskHandle taskHandle, int32 triggerID);
+int32 __CFUNC     DAQmxSendSoftwareTrigger(TaskHandle taskHandle, int32 triggerID);
 
 
 /******************************************************/
@@ -2387,50 +2387,50 @@ int32 __CFUNC     DAQmxSendSoftwareTrigger       (TaskHandle taskHandle, int32 t
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxReadAnalogF64             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadAnalogScalarF64       (TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved);
+int32 __CFUNC     DAQmxReadAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadAnalogScalarF64(TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadBinaryI16             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadBinaryI16(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadBinaryU16             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadBinaryU16(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadBinaryI32             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadBinaryI32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, int32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadBinaryU32             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadBinaryU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadDigitalU8             (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadDigitalU16            (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadDigitalU32            (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadDigitalScalarU32      (TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
-int32 __CFUNC     DAQmxReadDigitalLines          (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInBytes, int32 *sampsPerChanRead, int32 *numBytesPerSamp, bool32 *reserved);
+int32 __CFUNC     DAQmxReadDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadDigitalU16(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt16 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadDigitalScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
+int32 __CFUNC     DAQmxReadDigitalLines(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 fillMode, uInt8 readArray[], uInt32 arraySizeInBytes, int32 *sampsPerChanRead, int32 *numBytesPerSamp, bool32 *reserved);
 
-int32 __CFUNC     DAQmxReadCounterF64            (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCounterU32            (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCounterScalarF64      (TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCounterScalarU32      (TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
-
-
-
-int32 __CFUNC     DAQmxReadCtrFreq               (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, float64 readArrayFrequency[], float64 readArrayDutyCycle[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCtrTime               (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, float64 readArrayHighTime[], float64 readArrayLowTime[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCtrTicks              (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, uInt32 readArrayHighTicks[], uInt32 readArrayLowTicks[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
-
-int32 __CFUNC     DAQmxReadCtrFreqScalar         (TaskHandle taskHandle, float64 timeout, float64 *frequency, float64 *dutyCycle, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCtrTimeScalar         (TaskHandle taskHandle, float64 timeout, float64 *highTime, float64 *lowTime, bool32 *reserved);
-int32 __CFUNC     DAQmxReadCtrTicksScalar        (TaskHandle taskHandle, float64 timeout, uInt32 *highTicks, uInt32 *lowTicks, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCounterF64(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, float64 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCounterU32(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, uInt32 readArray[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCounterScalarF64(TaskHandle taskHandle, float64 timeout, float64 *value, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCounterScalarU32(TaskHandle taskHandle, float64 timeout, uInt32 *value, bool32 *reserved);
 
 
 
-int32 __CFUNC     DAQmxReadRaw                   (TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, void *readArray, uInt32 arraySizeInBytes, int32 *sampsRead, int32 *numBytesPerSamp, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCtrFreq(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, float64 readArrayFrequency[], float64 readArrayDutyCycle[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCtrTime(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, float64 readArrayHighTime[], float64 readArrayLowTime[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCtrTicks(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, bool32 interleaved, uInt32 readArrayHighTicks[], uInt32 readArrayLowTicks[], uInt32 arraySizeInSamps, int32 *sampsPerChanRead, bool32 *reserved);
 
-int32 __CFUNC     DAQmxGetNthTaskReadChannel     (TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
+int32 __CFUNC     DAQmxReadCtrFreqScalar(TaskHandle taskHandle, float64 timeout, float64 *frequency, float64 *dutyCycle, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCtrTimeScalar(TaskHandle taskHandle, float64 timeout, float64 *highTime, float64 *lowTime, bool32 *reserved);
+int32 __CFUNC     DAQmxReadCtrTicksScalar(TaskHandle taskHandle, float64 timeout, uInt32 *highTicks, uInt32 *lowTicks, bool32 *reserved);
 
-int32 __CFUNC_C   DAQmxGetReadAttribute          (TaskHandle taskHandle, int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetReadAttribute          (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetReadAttribute        (TaskHandle taskHandle, int32 attribute);
 
-int32 __CFUNC     DAQmxConfigureLogging          (TaskHandle taskHandle, const char filePath[], int32 loggingMode, const char groupName[], int32 operation);
-int32 __CFUNC     DAQmxStartNewFile              (TaskHandle taskHandle, const char filePath[]);
+
+int32 __CFUNC     DAQmxReadRaw(TaskHandle taskHandle, int32 numSampsPerChan, float64 timeout, void *readArray, uInt32 arraySizeInBytes, int32 *sampsRead, int32 *numBytesPerSamp, bool32 *reserved);
+
+int32 __CFUNC     DAQmxGetNthTaskReadChannel(TaskHandle taskHandle, uInt32 index, char buffer[], int32 bufferSize);
+
+int32 __CFUNC_C   DAQmxGetReadAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetReadAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetReadAttribute(TaskHandle taskHandle, int32 attribute);
+
+int32 __CFUNC     DAQmxConfigureLogging(TaskHandle taskHandle, const char filePath[], int32 loggingMode, const char groupName[], int32 operation);
+int32 __CFUNC     DAQmxStartNewFile(TaskHandle taskHandle, const char filePath[]);
 
 
 /******************************************************/
@@ -2438,32 +2438,32 @@ int32 __CFUNC     DAQmxStartNewFile              (TaskHandle taskHandle, const c
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxWriteAnalogF64            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteAnalogScalarF64      (TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 value, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteAnalogF64(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteAnalogScalarF64(TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 value, bool32 *reserved);
 
-int32 __CFUNC     DAQmxWriteBinaryI16            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const int16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteBinaryU16            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteBinaryI32            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const int32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteBinaryU32            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteBinaryI16(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const int16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteBinaryU16(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteBinaryI32(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const int32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteBinaryU32(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
 
-int32 __CFUNC     DAQmxWriteDigitalU8            (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteDigitalU16           (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteDigitalU32           (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteDigitalScalarU32     (TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteDigitalLines         (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteDigitalU8(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteDigitalU16(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt16 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteDigitalU32(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteDigitalScalarU32(TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 value, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteDigitalLines(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt8 writeArray[], int32 *sampsPerChanWritten, bool32 *reserved);
 
-int32 __CFUNC     DAQmxWriteCtrFreq              (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 frequency[], const float64 dutyCycle[], int32 *numSampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteCtrFreqScalar        (TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 frequency, float64 dutyCycle, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteCtrTime              (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 highTime[], const float64 lowTime[], int32 *numSampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteCtrTimeScalar        (TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 highTime, float64 lowTime, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteCtrTicks             (TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 highTicks[], const uInt32 lowTicks[], int32 *numSampsPerChanWritten, bool32 *reserved);
-int32 __CFUNC     DAQmxWriteCtrTicksScalar       (TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 highTicks, uInt32 lowTicks, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrFreq(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 frequency[], const float64 dutyCycle[], int32 *numSampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrFreqScalar(TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 frequency, float64 dutyCycle, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrTime(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const float64 highTime[], const float64 lowTime[], int32 *numSampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrTimeScalar(TaskHandle taskHandle, bool32 autoStart, float64 timeout, float64 highTime, float64 lowTime, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrTicks(TaskHandle taskHandle, int32 numSampsPerChan, bool32 autoStart, float64 timeout, bool32 dataLayout, const uInt32 highTicks[], const uInt32 lowTicks[], int32 *numSampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteCtrTicksScalar(TaskHandle taskHandle, bool32 autoStart, float64 timeout, uInt32 highTicks, uInt32 lowTicks, bool32 *reserved);
 
-int32 __CFUNC     DAQmxWriteRaw                  (TaskHandle taskHandle, int32 numSamps, bool32 autoStart, float64 timeout, const void *writeArray, int32 *sampsPerChanWritten, bool32 *reserved);
+int32 __CFUNC     DAQmxWriteRaw(TaskHandle taskHandle, int32 numSamps, bool32 autoStart, float64 timeout, const void *writeArray, int32 *sampsPerChanWritten, bool32 *reserved);
 
-int32 __CFUNC_C   DAQmxGetWriteAttribute         (TaskHandle taskHandle, int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetWriteAttribute         (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetWriteAttribute       (TaskHandle taskHandle, int32 attribute);
+int32 __CFUNC_C   DAQmxGetWriteAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetWriteAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetWriteAttribute(TaskHandle taskHandle, int32 attribute);
 
 
 /******************************************************/
@@ -2474,7 +2474,7 @@ int32 __CFUNC     DAQmxResetWriteAttribute       (TaskHandle taskHandle, int32 a
 // Software signals or events are not presently supported.
 
 // For possible values for parameter signalID see value set Signal in Values section above.
-int32 __CFUNC     DAQmxExportSignal              (TaskHandle taskHandle, int32 signalID, const char outputTerminal[]);
+int32 __CFUNC     DAQmxExportSignal(TaskHandle taskHandle, int32 signalID, const char outputTerminal[]);
 
 int32 __CFUNC_C   DAQmxGetExportedSignalAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
 int32 __CFUNC_C   DAQmxSetExportedSignalAttribute(TaskHandle taskHandle, int32 attribute, ...);
@@ -2486,14 +2486,14 @@ int32 __CFUNC     DAQmxResetExportedSignalAttribute(TaskHandle taskHandle, int32
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxCreateLinScale            (const char name[], float64 slope, float64 yIntercept, int32 preScaledUnits, const char scaledUnits[]);
-int32 __CFUNC     DAQmxCreateMapScale            (const char name[], float64 prescaledMin, float64 prescaledMax, float64 scaledMin, float64 scaledMax, int32 preScaledUnits, const char scaledUnits[]);
-int32 __CFUNC     DAQmxCreatePolynomialScale     (const char name[], const float64 forwardCoeffs[], uInt32 numForwardCoeffsIn, const float64 reverseCoeffs[], uInt32 numReverseCoeffsIn, int32 preScaledUnits, const char scaledUnits[]);
-int32 __CFUNC     DAQmxCreateTableScale          (const char name[], const float64 prescaledVals[], uInt32 numPrescaledValsIn, const float64 scaledVals[], uInt32 numScaledValsIn, int32 preScaledUnits, const char scaledUnits[]);
-int32 __CFUNC     DAQmxCalculateReversePolyCoeff (const float64 forwardCoeffs[], uInt32 numForwardCoeffsIn, float64 minValX, float64 maxValX, int32 numPointsToCompute, int32 reversePolyOrder, float64 reverseCoeffs[]);
+int32 __CFUNC     DAQmxCreateLinScale(const char name[], float64 slope, float64 yIntercept, int32 preScaledUnits, const char scaledUnits[]);
+int32 __CFUNC     DAQmxCreateMapScale(const char name[], float64 prescaledMin, float64 prescaledMax, float64 scaledMin, float64 scaledMax, int32 preScaledUnits, const char scaledUnits[]);
+int32 __CFUNC     DAQmxCreatePolynomialScale(const char name[], const float64 forwardCoeffs[], uInt32 numForwardCoeffsIn, const float64 reverseCoeffs[], uInt32 numReverseCoeffsIn, int32 preScaledUnits, const char scaledUnits[]);
+int32 __CFUNC     DAQmxCreateTableScale(const char name[], const float64 prescaledVals[], uInt32 numPrescaledValsIn, const float64 scaledVals[], uInt32 numScaledValsIn, int32 preScaledUnits, const char scaledUnits[]);
+int32 __CFUNC     DAQmxCalculateReversePolyCoeff(const float64 forwardCoeffs[], uInt32 numForwardCoeffsIn, float64 minValX, float64 maxValX, int32 numPointsToCompute, int32 reversePolyOrder, float64 reverseCoeffs[]);
 
-int32 __CFUNC_C   DAQmxGetScaleAttribute         (const char scaleName[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetScaleAttribute         (const char scaleName[], int32 attribute, ...);
+int32 __CFUNC_C   DAQmxGetScaleAttribute(const char scaleName[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetScaleAttribute(const char scaleName[], int32 attribute, ...);
 
 
 /******************************************************/
@@ -2501,25 +2501,25 @@ int32 __CFUNC_C   DAQmxSetScaleAttribute         (const char scaleName[], int32 
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxCfgInputBuffer            (TaskHandle taskHandle, uInt32 numSampsPerChan);
-int32 __CFUNC     DAQmxCfgOutputBuffer           (TaskHandle taskHandle, uInt32 numSampsPerChan);
+int32 __CFUNC     DAQmxCfgInputBuffer(TaskHandle taskHandle, uInt32 numSampsPerChan);
+int32 __CFUNC     DAQmxCfgOutputBuffer(TaskHandle taskHandle, uInt32 numSampsPerChan);
 
-int32 __CFUNC_C   DAQmxGetBufferAttribute        (TaskHandle taskHandle, int32 attribute, void *value);
-int32 __CFUNC_C   DAQmxSetBufferAttribute        (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetBufferAttribute      (TaskHandle taskHandle, int32 attribute);
+int32 __CFUNC_C   DAQmxGetBufferAttribute(TaskHandle taskHandle, int32 attribute, void *value);
+int32 __CFUNC_C   DAQmxSetBufferAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetBufferAttribute(TaskHandle taskHandle, int32 attribute);
 
 /******************************************************/
 /***                Switch Functions                ***/
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxSwitchCreateScanList      (const char scanList[], TaskHandle *taskHandle);
+int32 __CFUNC     DAQmxSwitchCreateScanList(const char scanList[], TaskHandle *taskHandle);
 
-int32 __CFUNC     DAQmxSwitchConnect             (const char switchChannel1[], const char switchChannel2[], bool32 waitForSettling);
-int32 __CFUNC     DAQmxSwitchConnectMulti        (const char connectionList[], bool32 waitForSettling);
-int32 __CFUNC     DAQmxSwitchDisconnect          (const char switchChannel1[], const char switchChannel2[], bool32 waitForSettling);
-int32 __CFUNC     DAQmxSwitchDisconnectMulti     (const char connectionList[], bool32 waitForSettling);
-int32 __CFUNC     DAQmxSwitchDisconnectAll       (const char deviceName[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchConnect(const char switchChannel1[], const char switchChannel2[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchConnectMulti(const char connectionList[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchDisconnect(const char switchChannel1[], const char switchChannel2[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchDisconnectMulti(const char connectionList[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchDisconnectAll(const char deviceName[], bool32 waitForSettling);
 
 // Switch Topologies
 #define DAQmx_Val_Switch_Topology_Configured_Topology             "Configured Topology"               // Configured Topology
@@ -2698,32 +2698,32 @@ int32 __CFUNC     DAQmxSwitchDisconnectAll       (const char deviceName[], bool3
 #define DAQmx_Val_Switch_Topology_2798_Dual_Transfer              "2798/Dual Transfer"                // 2798/Dual Transfer
 #define DAQmx_Val_Switch_Topology_2799_2_SPDT                     "2799/2-SPDT"                       // 2799/2-SPDT
 
-int32 __CFUNC     DAQmxSwitchSetTopologyAndReset (const char deviceName[], const char newTopology[]);
+int32 __CFUNC     DAQmxSwitchSetTopologyAndReset(const char deviceName[], const char newTopology[]);
 
 // For possible values of the output parameter pathStatus see value set SwitchPathType in Values section above.
-int32 __CFUNC     DAQmxSwitchFindPath            (const char switchChannel1[], const char switchChannel2[], char path[], uInt32 pathBufferSize, int32 *pathStatus);
+int32 __CFUNC     DAQmxSwitchFindPath(const char switchChannel1[], const char switchChannel2[], char path[], uInt32 pathBufferSize, int32 *pathStatus);
 
-int32 __CFUNC     DAQmxSwitchOpenRelays          (const char relayList[], bool32 waitForSettling);
-int32 __CFUNC     DAQmxSwitchCloseRelays         (const char relayList[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchOpenRelays(const char relayList[], bool32 waitForSettling);
+int32 __CFUNC     DAQmxSwitchCloseRelays(const char relayList[], bool32 waitForSettling);
 
-int32 __CFUNC     DAQmxSwitchGetSingleRelayCount (const char relayName[], uInt32 *count);
-int32 __CFUNC     DAQmxSwitchGetMultiRelayCount  (const char relayList[], uInt32 count[], uInt32 countArraySize, uInt32 *numRelayCountsRead);
+int32 __CFUNC     DAQmxSwitchGetSingleRelayCount(const char relayName[], uInt32 *count);
+int32 __CFUNC     DAQmxSwitchGetMultiRelayCount(const char relayList[], uInt32 count[], uInt32 countArraySize, uInt32 *numRelayCountsRead);
 // For possible values of the output parameter relayPos see value set RelayPos in Values section above.
-int32 __CFUNC     DAQmxSwitchGetSingleRelayPos   (const char relayName[], uInt32 *relayPos);
+int32 __CFUNC     DAQmxSwitchGetSingleRelayPos(const char relayName[], uInt32 *relayPos);
 // For possible values in the output array relayPos see value set RelayPos in Values section above.
-int32 __CFUNC     DAQmxSwitchGetMultiRelayPos    (const char relayList[], uInt32 relayPos[], uInt32 relayPosArraySize, uInt32 *numRelayPossRead);
+int32 __CFUNC     DAQmxSwitchGetMultiRelayPos(const char relayList[], uInt32 relayPos[], uInt32 relayPosArraySize, uInt32 *numRelayPossRead);
 
-int32 __CFUNC     DAQmxSwitchWaitForSettling     (const char deviceName[]);
+int32 __CFUNC     DAQmxSwitchWaitForSettling(const char deviceName[]);
 
-int32 __CFUNC_C   DAQmxGetSwitchChanAttribute    (const char switchChannelName[], int32 attribute, void *value);
-int32 __CFUNC_C   DAQmxSetSwitchChanAttribute    (const char switchChannelName[], int32 attribute, ...);
+int32 __CFUNC_C   DAQmxGetSwitchChanAttribute(const char switchChannelName[], int32 attribute, void *value);
+int32 __CFUNC_C   DAQmxSetSwitchChanAttribute(const char switchChannelName[], int32 attribute, ...);
 
-int32 __CFUNC_C   DAQmxGetSwitchDeviceAttribute  (const char deviceName[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetSwitchDeviceAttribute  (const char deviceName[], int32 attribute, ...);
+int32 __CFUNC_C   DAQmxGetSwitchDeviceAttribute(const char deviceName[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetSwitchDeviceAttribute(const char deviceName[], int32 attribute, ...);
 
-int32 __CFUNC_C   DAQmxGetSwitchScanAttribute    (TaskHandle taskHandle, int32 attribute, void *value);
-int32 __CFUNC_C   DAQmxSetSwitchScanAttribute    (TaskHandle taskHandle, int32 attribute, ...);
-int32 __CFUNC     DAQmxResetSwitchScanAttribute  (TaskHandle taskHandle, int32 attribute);
+int32 __CFUNC_C   DAQmxGetSwitchScanAttribute(TaskHandle taskHandle, int32 attribute, void *value);
+int32 __CFUNC_C   DAQmxSetSwitchScanAttribute(TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC     DAQmxResetSwitchScanAttribute(TaskHandle taskHandle, int32 attribute);
 
 
 /******************************************************/
@@ -2731,9 +2731,9 @@ int32 __CFUNC     DAQmxResetSwitchScanAttribute  (TaskHandle taskHandle, int32 a
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxConnectTerms              (const char sourceTerminal[], const char destinationTerminal[], int32 signalModifiers);
-int32 __CFUNC     DAQmxDisconnectTerms           (const char sourceTerminal[], const char destinationTerminal[]);
-int32 __CFUNC     DAQmxTristateOutputTerm        (const char outputTerminal[]);
+int32 __CFUNC     DAQmxConnectTerms(const char sourceTerminal[], const char destinationTerminal[], int32 signalModifiers);
+int32 __CFUNC     DAQmxDisconnectTerms(const char sourceTerminal[], const char destinationTerminal[]);
+int32 __CFUNC     DAQmxTristateOutputTerm(const char outputTerminal[]);
 
 
 /******************************************************/
@@ -2741,23 +2741,23 @@ int32 __CFUNC     DAQmxTristateOutputTerm        (const char outputTerminal[]);
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxResetDevice               (const char deviceName[]);
+int32 __CFUNC     DAQmxResetDevice(const char deviceName[]);
 
-int32 __CFUNC     DAQmxSelfTestDevice            (const char deviceName[]);
+int32 __CFUNC     DAQmxSelfTestDevice(const char deviceName[]);
 
-int32 __CFUNC_C   DAQmxGetDeviceAttribute        (const char deviceName[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxGetDeviceAttribute(const char deviceName[], int32 attribute, void *value, ...);
 
 /******************************************************/
 /***              Watchdog Timer                    ***/
 /******************************************************/
 
 
-int32 __CFUNC_C   DAQmxCreateWatchdogTimerTask   (const char deviceName[], const char taskName[], TaskHandle *taskHandle, float64 timeout, const char lines[], int32 expState, ...);
-int32 __CFUNC     DAQmxControlWatchdogTask       (TaskHandle taskHandle, int32 action);
+int32 __CFUNC_C   DAQmxCreateWatchdogTimerTask(const char deviceName[], const char taskName[], TaskHandle *taskHandle, float64 timeout, const char lines[], int32 expState, ...);
+int32 __CFUNC     DAQmxControlWatchdogTask(TaskHandle taskHandle, int32 action);
 
-int32 __CFUNC_C   DAQmxGetWatchdogAttribute      (TaskHandle taskHandle, const char lines[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetWatchdogAttribute      (TaskHandle taskHandle, const char lines[], int32 attribute, ...);
-int32 __CFUNC     DAQmxResetWatchdogAttribute    (TaskHandle taskHandle, const char lines[], int32 attribute);
+int32 __CFUNC_C   DAQmxGetWatchdogAttribute(TaskHandle taskHandle, const char lines[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetWatchdogAttribute(TaskHandle taskHandle, const char lines[], int32 attribute, ...);
+int32 __CFUNC     DAQmxResetWatchdogAttribute(TaskHandle taskHandle, const char lines[], int32 attribute);
 
 
 /******************************************************/
@@ -2765,55 +2765,55 @@ int32 __CFUNC     DAQmxResetWatchdogAttribute    (TaskHandle taskHandle, const c
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxSelfCal                   (const char deviceName[]);
+int32 __CFUNC     DAQmxSelfCal(const char deviceName[]);
 int32 __CFUNC     DAQmxPerformBridgeOffsetNullingCal(TaskHandle taskHandle, const char channel[]);
 int32 __CFUNC     DAQmxPerformBridgeOffsetNullingCalEx(TaskHandle taskHandle, const char channel[], bool32 skipUnsupportedChannels);
 int32 __CFUNC     DAQmxPerformThrmcplLeadOffsetNullingCal(TaskHandle taskHandle, const char channel[], bool32 skipUnsupportedChannels);
-int32 __CFUNC     DAQmxPerformStrainShuntCal     (TaskHandle taskHandle, const char channel[], float64 shuntResistorValue, int32 shuntResistorLocation, bool32 skipUnsupportedChannels);
-int32 __CFUNC     DAQmxPerformBridgeShuntCal     (TaskHandle taskHandle, const char channel[], float64 shuntResistorValue, int32 shuntResistorLocation, float64 bridgeResistance, bool32 skipUnsupportedChannels);
-int32 __CFUNC     DAQmxGetSelfCalLastDateAndTime (const char deviceName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
-int32 __CFUNC     DAQmxGetExtCalLastDateAndTime  (const char deviceName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
-int32 __CFUNC     DAQmxRestoreLastExtCalConst    (const char deviceName[]);
+int32 __CFUNC     DAQmxPerformStrainShuntCal(TaskHandle taskHandle, const char channel[], float64 shuntResistorValue, int32 shuntResistorLocation, bool32 skipUnsupportedChannels);
+int32 __CFUNC     DAQmxPerformBridgeShuntCal(TaskHandle taskHandle, const char channel[], float64 shuntResistorValue, int32 shuntResistorLocation, float64 bridgeResistance, bool32 skipUnsupportedChannels);
+int32 __CFUNC     DAQmxGetSelfCalLastDateAndTime(const char deviceName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
+int32 __CFUNC     DAQmxGetExtCalLastDateAndTime(const char deviceName[], uInt32 *year, uInt32 *month, uInt32 *day, uInt32 *hour, uInt32 *minute);
+int32 __CFUNC     DAQmxRestoreLastExtCalConst(const char deviceName[]);
 
-int32 __CFUNC     DAQmxESeriesCalAdjust          (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxMSeriesCalAdjust          (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxSSeriesCalAdjust          (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxSCBaseboardCalAdjust      (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxAOSeriesCalAdjust         (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxXSeriesCalAdjust          (CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxESeriesCalAdjust(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxMSeriesCalAdjust(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxSSeriesCalAdjust(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxSCBaseboardCalAdjust(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxAOSeriesCalAdjust(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxXSeriesCalAdjust(CalHandle calHandle, float64 referenceVoltage);
 
-int32 __CFUNC     DAQmxDeviceSupportsCal         (const char deviceName[], bool32 *calSupported);
+int32 __CFUNC     DAQmxDeviceSupportsCal(const char deviceName[], bool32 *calSupported);
 
-int32 __CFUNC_C   DAQmxGetCalInfoAttribute       (const char deviceName[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetCalInfoAttribute       (const char deviceName[], int32 attribute, ...);
+int32 __CFUNC_C   DAQmxGetCalInfoAttribute(const char deviceName[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetCalInfoAttribute(const char deviceName[], int32 attribute, ...);
 
-int32 __CFUNC     DAQmxInitExtCal                (const char deviceName[], const char password[], CalHandle *calHandle);
-int32 __CFUNC     DAQmxCloseExtCal               (CalHandle calHandle, int32 action);
-int32 __CFUNC     DAQmxChangeExtCalPassword      (const char deviceName[], const char password[], const char newPassword[]);
+int32 __CFUNC     DAQmxInitExtCal(const char deviceName[], const char password[], CalHandle *calHandle);
+int32 __CFUNC     DAQmxCloseExtCal(CalHandle calHandle, int32 action);
+int32 __CFUNC     DAQmxChangeExtCalPassword(const char deviceName[], const char password[], const char newPassword[]);
 
-int32 __CFUNC     DAQmxAdjustDSAAICal            (CalHandle calHandle, float64 referenceVoltage);
-int32 __CFUNC     DAQmxAdjustDSAAICalEx          (CalHandle calHandle, float64 referenceVoltage, bool32 inputsShorted);
-int32 __CFUNC     DAQmxAdjustDSAAICalWithGainAndCoupling (CalHandle calHandle, int32 coupling, float64 gain, float64 referenceVoltage);
-int32 __CFUNC     DAQmxAdjustDSAAOCal            (CalHandle calHandle, uInt32 channel, float64 requestedLowVoltage, float64 actualLowVoltage, float64 requestedHighVoltage, float64 actualHighVoltage, float64 gainSetting);
-int32 __CFUNC     DAQmxAdjustDSATimebaseCal      (CalHandle calHandle, float64 referenceFrequency);
+int32 __CFUNC     DAQmxAdjustDSAAICal(CalHandle calHandle, float64 referenceVoltage);
+int32 __CFUNC     DAQmxAdjustDSAAICalEx(CalHandle calHandle, float64 referenceVoltage, bool32 inputsShorted);
+int32 __CFUNC     DAQmxAdjustDSAAICalWithGainAndCoupling(CalHandle calHandle, int32 coupling, float64 gain, float64 referenceVoltage);
+int32 __CFUNC     DAQmxAdjustDSAAOCal(CalHandle calHandle, uInt32 channel, float64 requestedLowVoltage, float64 actualLowVoltage, float64 requestedHighVoltage, float64 actualHighVoltage, float64 gainSetting);
+int32 __CFUNC     DAQmxAdjustDSATimebaseCal(CalHandle calHandle, float64 referenceFrequency);
 
-int32 __CFUNC     DAQmxAdjust4204Cal             (CalHandle calHandle, const char channelNames[], float64 lowPassFreq, bool32 trackHoldEnabled, float64 inputVal);
-int32 __CFUNC     DAQmxAdjust4220Cal             (CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
-int32 __CFUNC     DAQmxAdjust4224Cal             (CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
+int32 __CFUNC     DAQmxAdjust4204Cal(CalHandle calHandle, const char channelNames[], float64 lowPassFreq, bool32 trackHoldEnabled, float64 inputVal);
+int32 __CFUNC     DAQmxAdjust4220Cal(CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
+int32 __CFUNC     DAQmxAdjust4224Cal(CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
 
 
 // Note: This function is obsolete and now always returns zero.
-int32 __CFUNC     DAQmxAdjust4225Cal             (CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
+int32 __CFUNC     DAQmxAdjust4225Cal(CalHandle calHandle, const char channelNames[], float64 gain, float64 inputVal);
 
-int32 __CFUNC     DAQmxSetup433xCal              (CalHandle calHandle, const char channelNames[], float64 excitationVoltage);
-int32 __CFUNC     DAQmxAdjust433xCal             (CalHandle calHandle, float64 refVoltage, float64 refExcitation, int32 shuntLocation);
-int32 __CFUNC     DAQmxAdjust4300Cal             (CalHandle calHandle, float64 refVoltage);
-int32 __CFUNC     DAQmxAdjust4353Cal             (CalHandle calHandle, const char channelNames[], float64 refVal);
-int32 __CFUNC     DAQmxAdjust4357Cal             (CalHandle calHandle, const char channelNames[], const float64 refVals[], int32 numRefVals);
-int32 __CFUNC     DAQmxConnectSCExpressCalAccChans             (CalHandle calHandle, const char channelNames[], const char connection[]);
-int32 __CFUNC     DAQmxDisconnectSCExpressCalAccChans          (CalHandle calHandle);
-int32 __CFUNC     DAQmxGetPossibleSCExpressCalAccConnections   (const char deviceName[], const char channelNames[], char *connections, uInt32 connectionsBufferSize);
-int32 __CFUNC     DAQmxSetSCExpressCalAccBridgeOutput          (CalHandle calHandle, float64 voltsPerVolt);
+int32 __CFUNC     DAQmxSetup433xCal(CalHandle calHandle, const char channelNames[], float64 excitationVoltage);
+int32 __CFUNC     DAQmxAdjust433xCal(CalHandle calHandle, float64 refVoltage, float64 refExcitation, int32 shuntLocation);
+int32 __CFUNC     DAQmxAdjust4300Cal(CalHandle calHandle, float64 refVoltage);
+int32 __CFUNC     DAQmxAdjust4353Cal(CalHandle calHandle, const char channelNames[], float64 refVal);
+int32 __CFUNC     DAQmxAdjust4357Cal(CalHandle calHandle, const char channelNames[], const float64 refVals[], int32 numRefVals);
+int32 __CFUNC     DAQmxConnectSCExpressCalAccChans(CalHandle calHandle, const char channelNames[], const char connection[]);
+int32 __CFUNC     DAQmxDisconnectSCExpressCalAccChans(CalHandle calHandle);
+int32 __CFUNC     DAQmxGetPossibleSCExpressCalAccConnections(const char deviceName[], const char channelNames[], char *connections, uInt32 connectionsBufferSize);
+int32 __CFUNC     DAQmxSetSCExpressCalAccBridgeOutput(CalHandle calHandle, float64 voltsPerVolt);
 
 int32 __CFUNC     DAQmxGet9201CalAdjustPoints(CalHandle calHandle, float64* adjustmentPoints, uInt32 bufferSize);
 int32 __CFUNC     DAQmxCSeriesSetCalTemp(CalHandle calHandle, float64 temperature);
@@ -2875,64 +2875,64 @@ int32 __CFUNC     DAQmxGet9269CalAdjustPoints(CalHandle calHandle, int32* adjust
 int32 __CFUNC     DAQmxSetup9269Cal(CalHandle calHandle, const char channelNames[], int32 value);
 int32 __CFUNC     DAQmxAdjust9269Cal(CalHandle calHandle, const char channelNames[], float64 value);
 
-int32 __CFUNC     DAQmxSetup1102Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1102Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1102Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1102Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1104Cal              (CalHandle calHandle, const char channelName[]);
-int32 __CFUNC     DAQmxAdjust1104Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1104Cal(CalHandle calHandle, const char channelName[]);
+int32 __CFUNC     DAQmxAdjust1104Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1112Cal              (CalHandle calHandle, const char channelName[]);
-int32 __CFUNC     DAQmxAdjust1112Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1112Cal(CalHandle calHandle, const char channelName[]);
+int32 __CFUNC     DAQmxAdjust1112Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1122Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1122Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1122Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1122Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1124Cal              (CalHandle calHandle, const char channelName[], int32 range, uInt32 dacValue);
-int32 __CFUNC     DAQmxAdjust1124Cal             (CalHandle calHandle, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1124Cal(CalHandle calHandle, const char channelName[], int32 range, uInt32 dacValue);
+int32 __CFUNC     DAQmxAdjust1124Cal(CalHandle calHandle, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1125Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1125Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1125Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1125Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1126Cal              (CalHandle calHandle, const char channelName[], float64 upperFreqLimit);
-int32 __CFUNC     DAQmxAdjust1126Cal             (CalHandle calHandle, float64 refFreq, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1126Cal(CalHandle calHandle, const char channelName[], float64 upperFreqLimit);
+int32 __CFUNC     DAQmxAdjust1126Cal(CalHandle calHandle, float64 refFreq, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1141Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1141Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
-int32 __CFUNC     DAQmxSetup1142Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1142Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
-int32 __CFUNC     DAQmxSetup1143Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1143Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1141Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1141Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1142Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1142Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1143Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1143Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
 
-int32 __CFUNC     DAQmxSetup1502Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1502Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1502Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1502Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1503Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1503Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
-int32 __CFUNC     DAQmxAdjust1503CurrentCal      (CalHandle calHandle, const char channelName[], float64 measCurrent);
+int32 __CFUNC     DAQmxSetup1503Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1503Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxAdjust1503CurrentCal(CalHandle calHandle, const char channelName[], float64 measCurrent);
 
-int32 __CFUNC     DAQmxSetup1520Cal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust1520Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1520Cal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust1520Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1521Cal              (CalHandle calHandle, const char channelName[]);
-int32 __CFUNC     DAQmxAdjust1521Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup1521Cal(CalHandle calHandle, const char channelName[]);
+int32 __CFUNC     DAQmxAdjust1521Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup153xCal              (CalHandle calHandle, const char channelName[], float64 gain);
-int32 __CFUNC     DAQmxAdjust153xCal             (CalHandle calHandle, float64 refVoltage, float64 measOutput);
+int32 __CFUNC     DAQmxSetup153xCal(CalHandle calHandle, const char channelName[], float64 gain);
+int32 __CFUNC     DAQmxAdjust153xCal(CalHandle calHandle, float64 refVoltage, float64 measOutput);
 
-int32 __CFUNC     DAQmxSetup1540Cal              (CalHandle calHandle, const char channelName[], float64 excitationVoltage, float64 excitationFreq);
-int32 __CFUNC     DAQmxAdjust1540Cal             (CalHandle calHandle, float64 refVoltage, float64 measOutput, int32 inputCalSource);
+int32 __CFUNC     DAQmxSetup1540Cal(CalHandle calHandle, const char channelName[], float64 excitationVoltage, float64 excitationFreq);
+int32 __CFUNC     DAQmxAdjust1540Cal(CalHandle calHandle, float64 refVoltage, float64 measOutput, int32 inputCalSource);
 
 
 /******************************************************/
 /***                     TEDS                       ***/
 /******************************************************/
 
-int32 __CFUNC     DAQmxConfigureTEDS             (const char physicalChannel[], const char filePath[]);
-int32 __CFUNC     DAQmxClearTEDS                 (const char physicalChannel[]);
-int32 __CFUNC     DAQmxWriteToTEDSFromArray      (const char physicalChannel[], const uInt8 bitStream[], uInt32 arraySize, int32 basicTEDSOptions);
-int32 __CFUNC     DAQmxWriteToTEDSFromFile       (const char physicalChannel[], const char filePath[], int32 basicTEDSOptions);
-int32 __CFUNC_C   DAQmxGetPhysicalChanAttribute  (const char physicalChannel[], int32 attribute, void *value, ...);
+int32 __CFUNC     DAQmxConfigureTEDS(const char physicalChannel[], const char filePath[]);
+int32 __CFUNC     DAQmxClearTEDS(const char physicalChannel[]);
+int32 __CFUNC     DAQmxWriteToTEDSFromArray(const char physicalChannel[], const uInt8 bitStream[], uInt32 arraySize, int32 basicTEDSOptions);
+int32 __CFUNC     DAQmxWriteToTEDSFromFile(const char physicalChannel[], const char filePath[], int32 basicTEDSOptions);
+int32 __CFUNC_C   DAQmxGetPhysicalChanAttribute(const char physicalChannel[], int32 attribute, void *value, ...);
 
 
 /******************************************************/
@@ -2940,27 +2940,27 @@ int32 __CFUNC_C   DAQmxGetPhysicalChanAttribute  (const char physicalChannel[], 
 /******************************************************/
 
 int32 __CFUNC     DAQmxWaitForNextSampleClock(TaskHandle taskHandle, float64 timeout, bool32 *isLate);
-int32 __CFUNC_C   DAQmxGetRealTimeAttribute  (TaskHandle taskHandle, int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetRealTimeAttribute  (TaskHandle taskHandle, int32 attribute, ...);
+int32 __CFUNC_C   DAQmxGetRealTimeAttribute(TaskHandle taskHandle, int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetRealTimeAttribute(TaskHandle taskHandle, int32 attribute, ...);
 int32 __CFUNC     DAQmxResetRealTimeAttribute(TaskHandle taskHandle, int32 attribute);
 
 // Note: This function is obsolete and now always returns zero.
-bool32 __CFUNC    DAQmxIsReadOrWriteLate     (int32 errorCode);
+bool32 __CFUNC    DAQmxIsReadOrWriteLate(int32 errorCode);
 
 
 /******************************************************/
 /***                   Storage                      ***/
 /******************************************************/
 
-int32 __CFUNC     DAQmxSaveTask                  (TaskHandle taskHandle, const char saveAs[], const char author[], uInt32 options);
-int32 __CFUNC     DAQmxSaveGlobalChan            (TaskHandle taskHandle, const char channelName[], const char saveAs[], const char author[], uInt32 options);
-int32 __CFUNC     DAQmxSaveScale                 (const char scaleName[], const char saveAs[], const char author[], uInt32 options);
-int32 __CFUNC     DAQmxDeleteSavedTask           (const char taskName[]);
-int32 __CFUNC     DAQmxDeleteSavedGlobalChan     (const char channelName[]);
-int32 __CFUNC     DAQmxDeleteSavedScale          (const char scaleName[]);
+int32 __CFUNC     DAQmxSaveTask(TaskHandle taskHandle, const char saveAs[], const char author[], uInt32 options);
+int32 __CFUNC     DAQmxSaveGlobalChan(TaskHandle taskHandle, const char channelName[], const char saveAs[], const char author[], uInt32 options);
+int32 __CFUNC     DAQmxSaveScale(const char scaleName[], const char saveAs[], const char author[], uInt32 options);
+int32 __CFUNC     DAQmxDeleteSavedTask(const char taskName[]);
+int32 __CFUNC     DAQmxDeleteSavedGlobalChan(const char channelName[]);
+int32 __CFUNC     DAQmxDeleteSavedScale(const char scaleName[]);
 
-int32 __CFUNC_C   DAQmxGetPersistedTaskAttribute (const char taskName[], int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxGetPersistedChanAttribute (const char channel[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxGetPersistedTaskAttribute(const char taskName[], int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxGetPersistedChanAttribute(const char channel[], int32 attribute, void *value, ...);
 int32 __CFUNC_C   DAQmxGetPersistedScaleAttribute(const char scaleName[], int32 attribute, void *value, ...);
 
 
@@ -2968,16 +2968,16 @@ int32 __CFUNC_C   DAQmxGetPersistedScaleAttribute(const char scaleName[], int32 
 /***              System Configuration              ***/
 /******************************************************/
 
-int32 __CFUNC_C   DAQmxGetSystemInfoAttribute    (int32 attribute, void *value, ...);
-int32 __CFUNC_C   DAQmxSetDigitalPowerUpStates   (const char deviceName[], const char channelNames[], int32 state, ...);
-int32 __CFUNC_C   DAQmxGetDigitalPowerUpStates   (const char deviceName[], const char channelName[], int32* state, ...);
-int32 __CFUNC_C   DAQmxSetDigitalPullUpPullDownStates   (const char deviceName[], const char channelName[], int32 state, ...);
-int32 __CFUNC_C   DAQmxGetDigitalPullUpPullDownStates   (const char deviceName[], const char channelName[], int32* state, ...);
-int32 __CFUNC_C   DAQmxSetAnalogPowerUpStates    (const char deviceName[], const char channelNames[], float64 state, int32 channelType, ...);
-int32 __CFUNC_C   DAQmxGetAnalogPowerUpStates    (const char deviceName[], const char channelName[], float64* state, int32 channelType, ...);
+int32 __CFUNC_C   DAQmxGetSystemInfoAttribute(int32 attribute, void *value, ...);
+int32 __CFUNC_C   DAQmxSetDigitalPowerUpStates(const char deviceName[], const char channelNames[], int32 state, ...);
+int32 __CFUNC_C   DAQmxGetDigitalPowerUpStates(const char deviceName[], const char channelName[], int32* state, ...);
+int32 __CFUNC_C   DAQmxSetDigitalPullUpPullDownStates(const char deviceName[], const char channelName[], int32 state, ...);
+int32 __CFUNC_C   DAQmxGetDigitalPullUpPullDownStates(const char deviceName[], const char channelName[], int32* state, ...);
+int32 __CFUNC_C   DAQmxSetAnalogPowerUpStates(const char deviceName[], const char channelNames[], float64 state, int32 channelType, ...);
+int32 __CFUNC_C   DAQmxGetAnalogPowerUpStates(const char deviceName[], const char channelName[], float64* state, int32 channelType, ...);
 int32 __CFUNC     DAQmxSetDigitalLogicFamilyPowerUpState(const char deviceName[], int32 logicFamily);
 int32 __CFUNC     DAQmxGetDigitalLogicFamilyPowerUpState(const char deviceName[], int32* logicFamily);
-int32 __CFUNC     DAQmxAddNetworkDevice(const char IPAddress[],const char deviceName[], bool32 attemptReservation, float64 timeout, char deviceNameOut[], uInt32 deviceNameOutBufferSize);
+int32 __CFUNC     DAQmxAddNetworkDevice(const char IPAddress[], const char deviceName[], bool32 attemptReservation, float64 timeout, char deviceNameOut[], uInt32 deviceNameOutBufferSize);
 int32 __CFUNC     DAQmxDeleteNetworkDevice(const char deviceName[]);
 int32 __CFUNC     DAQmxReserveNetworkDevice(const char deviceName[], bool32 overrideReservation);
 int32 __CFUNC     DAQmxUnreserveNetworkDevice(const char deviceName[]);
@@ -3001,8 +3001,8 @@ int32 __CFUNC DAQmxRemoveCDAQSyncConnection(const char portList[]);
 /******************************************************/
 
 
-int32 __CFUNC     DAQmxGetErrorString            (int32 errorCode, char errorString[], uInt32 bufferSize);
-int32 __CFUNC     DAQmxGetExtendedErrorInfo      (char errorString[], uInt32 bufferSize);
+int32 __CFUNC     DAQmxGetErrorString(int32 errorCode, char errorString[], uInt32 bufferSize);
+int32 __CFUNC     DAQmxGetExtendedErrorInfo(char errorString[], uInt32 bufferSize);
 
 
 /******************************************************************************
@@ -8246,7 +8246,7 @@ int32 __CFUNC DAQmxResetSampClkTimingResponseMode(TaskHandle taskHandle);
 
 
 #ifdef __cplusplus
-	}
+}
 #endif
 
 #endif // __nidaqmx_h__

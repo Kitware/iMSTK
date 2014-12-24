@@ -15,175 +15,233 @@ SimMedTK LICENSE
 #include "smCore/smErrorLog.h"
 #include <QHash>
 
-enum smMemReturnType{
-	SIMMEDTK_MEMORY_ALLOCATED,
-	SIMMEDTK_MEMORY_ALREADYALLOCATED,
-	SIMMEDTK_MEMORY_NOTENOUGHMEMORY,
-	SIMMEDTK_MEMORY_MEMORYFOUND,
-	SIMMEDTK_MEMORY_NOMEMORYFOUND,
-	SIMMEDTK_MEMORY_INVALIDPARAMS,
-	SIMMEDTK_MEMORY_INVALIDMEMORY,
-	SIMMEDTK_MEMORY_NOERROR
+enum smMemReturnType
+{
+    SIMMEDTK_MEMORY_ALLOCATED,
+    SIMMEDTK_MEMORY_ALREADYALLOCATED,
+    SIMMEDTK_MEMORY_NOTENOUGHMEMORY,
+    SIMMEDTK_MEMORY_MEMORYFOUND,
+    SIMMEDTK_MEMORY_NOMEMORYFOUND,
+    SIMMEDTK_MEMORY_INVALIDPARAMS,
+    SIMMEDTK_MEMORY_INVALIDMEMORY,
+    SIMMEDTK_MEMORY_NOERROR
 };
 
 /// \brief Memory Block makes easy to allocate and associate particular memory.
-///		   it facilities the memory mamangement
-class smMemoryBlock:public smCoreClass{
+///        it facilities the memory mamangement
+class smMemoryBlock: public smCoreClass
+{
 
 private:
-	/// \brief error log for reporting the error
-	smErrorLog *log;
-	QHash<QString ,void*> memoryBlocks;
+    /// \brief error log for reporting the error
+    smErrorLog *log;
+    QHash<QString , void*> memoryBlocks;
 
 public:
-	///constructr needs logger in case
-	smMemoryBlock(smErrorLog *log){
-		type=SIMMEDTK_SMMEMORYBLOCK;		
-		this->log=log;
-	}
+    ///constructr needs logger in case
+    smMemoryBlock(smErrorLog *log)
+    {
+        type = SIMMEDTK_SMMEMORYBLOCK;
+        this->log = log;
+    }
 
-	smMemoryBlock(){
-		type=SIMMEDTK_SMMEMORYBLOCK;		
-		//this->log=smSDK::getErrorLog();
-	}
+    smMemoryBlock()
+    {
+        type = SIMMEDTK_SMMEMORYBLOCK;
+        //this->log=smSDK::getErrorLog();
+    }
 
-	/// \brief alocate a class and returns p_returnedBlock as allocated memory and 
-	///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
-	template<class T> 
-	smMemReturnType allocate(QString &p_memoryBlockName,T**p_returnedBlock){
-		*p_returnedBlock=new T();
-		if(p_returnedBlock==NULL)
-			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+    /// \brief alocate a class and returns p_returnedBlock as allocated memory and
+    ///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
+    template<class T>
+    smMemReturnType allocate(QString &p_memoryBlockName, T**p_returnedBlock)
+    {
+        *p_returnedBlock = new T();
 
-		if(memoryBlocks.contains(p_memoryBlockName)){
-			delete [] *p_returnedBlock;
-			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
-		}
-		else{
-			memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-			return	SIMMEDTK_MEMORY_ALLOCATED;
-		}
-	}
+        if (p_returnedBlock == NULL)
+        {
+            return    SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+        }
 
-	/// \brief alocate any c;asses and returns p_returnedBlock as allocated memory and 
-	///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
-	template<class T> 
-	smMemReturnType allocate(QString &p_memoryBlockName,smInt nbr,T**p_returnedBlock){
-		*p_returnedBlock=new T[nbr];
-		if(p_returnedBlock==NULL)
-			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+        if (memoryBlocks.contains(p_memoryBlockName))
+        {
+            delete [] *p_returnedBlock;
+            return SIMMEDTK_MEMORY_ALREADYALLOCATED;
+        }
+        else
+        {
+            memoryBlocks[p_memoryBlockName] = *p_returnedBlock;
+            return  SIMMEDTK_MEMORY_ALLOCATED;
+        }
+    }
 
-		if(memoryBlocks.contains(p_memoryBlockName)){
-			delete [] *p_returnedBlock;
-			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
-		}
-		else{
-			memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-			return	SIMMEDTK_MEMORY_ALLOCATED;
-		}
-	}
+    /// \brief alocate any c;asses and returns p_returnedBlock as allocated memory and
+    ///return params are SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
+    template<class T>
+    smMemReturnType allocate(QString &p_memoryBlockName, smInt nbr, T**p_returnedBlock)
+    {
+        *p_returnedBlock = new T[nbr];
 
-	/// \brief alocate any classes and returns p_returnedBlock as allocated memory
-	///    returns	 SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
-	template <class T>
-	smMemReturnType allocate(const QString& p_memoryBlockName, const smInt &p_nbr){
-		T *allocatedMem;
-		allocatedMem=new T[p_nbr];
-		if(allocatedMem==NULL)
-			return	SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+        if (p_returnedBlock == NULL)
+        {
+            return    SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+        }
 
-		if(memoryBlocks.contains(p_memoryBlockName)){
-			delete []allocatedMem;
-			return SIMMEDTK_MEMORY_ALREADYALLOCATED;
-		}
-		else{
-			memoryBlocks[p_memoryBlockName]=allocatedMem;
-			return	SIMMEDTK_MEMORY_ALLOCATED;
-		}
-	}
+        if (memoryBlocks.contains(p_memoryBlockName))
+        {
+            delete [] *p_returnedBlock;
+            return SIMMEDTK_MEMORY_ALREADYALLOCATED;
+        }
+        else
+        {
+            memoryBlocks[p_memoryBlockName] = *p_returnedBlock;
+            return  SIMMEDTK_MEMORY_ALLOCATED;
+        }
+    }
 
-	/// \brief alocate vectors and returns	SIMMEDTK_MEMORY_INVALIDPARAMS or SIMMEDTK_MEMORY_ALLOCATED based on block size given
-	virtual smMemReturnType allocate(const QString &p_memoryBlockName, const smInt blockSize,void **p_returnedBlock){
-		if(blockSize<=0)
-			return SIMMEDTK_MEMORY_INVALIDPARAMS;
-		*p_returnedBlock=new smChar[blockSize];
-		memoryBlocks[p_memoryBlockName]=*p_returnedBlock;
-		return SIMMEDTK_MEMORY_ALLOCATED;
-	}
+    /// \brief alocate any classes and returns p_returnedBlock as allocated memory
+    ///    returns   SIMMEDTK_MEMORY_ALLOCATED or SIMMEDTK_MEMORY_ALREADYALLOCATED or SIMMEDTK_MEMORY_INVALIDMEMORY
+    template <class T>
+    smMemReturnType allocate(const QString& p_memoryBlockName, const smInt &p_nbr)
+    {
+        T *allocatedMem;
+        allocatedMem = new T[p_nbr];
 
-	/// \brief deletes the block from memeory as well as in has container
-	virtual smMemReturnType deleteMemory(QString & p_memoryBlockName){
-		void *memoryBlock;
-		if(memoryBlocks.contains(p_memoryBlockName)){
-			memoryBlock=memoryBlocks[p_memoryBlockName];
-			delete []memoryBlock;
-			memoryBlocks.remove(p_memoryBlockName);
-			return SIMMEDTK_MEMORY_NOERROR;
-		}
-		else
-			return SIMMEDTK_MEMORY_NOMEMORYFOUND;
-	}
+        if (allocatedMem == NULL)
+        {
+            return    SIMMEDTK_MEMORY_NOTENOUGHMEMORY;
+        }
 
-	/// \brief  gets  memory from the container via given block name. it returns SIMMEDTK_MEMORY_MEMORYFOUND or SIMMEDTK_MEMORY_NOMEMORYFOUND. 
-	virtual smMemReturnType getBlock(const QString &p_memoryBlockName,void **p_memoryPointer){
-		if(memoryBlocks.contains(p_memoryBlockName)){
-			*p_memoryPointer=memoryBlocks[p_memoryBlockName];
-			return	SIMMEDTK_MEMORY_MEMORYFOUND;
-		}
-		else
-			return SIMMEDTK_MEMORY_NOMEMORYFOUND;
-	}
+        if (memoryBlocks.contains(p_memoryBlockName))
+        {
+            delete []allocatedMem;
+            return SIMMEDTK_MEMORY_ALREADYALLOCATED;
+        }
+        else
+        {
+            memoryBlocks[p_memoryBlockName] = allocatedMem;
+            return  SIMMEDTK_MEMORY_ALLOCATED;
+        }
+    }
 
-	/// \brief copy the allocated memory location to dst. p_nbr is the number of elements to be copied
-	template<class T>
-	smMemReturnType localtoOriginalBlock(const QString &p_memoryBlockName, T* dst, const smInt p_nbr){
+    /// \brief alocate vectors and returns  SIMMEDTK_MEMORY_INVALIDPARAMS or SIMMEDTK_MEMORY_ALLOCATED based on block size given
+    virtual smMemReturnType allocate(const QString &p_memoryBlockName, const smInt blockSize, void **p_returnedBlock)
+    {
+        if (blockSize <= 0)
+        {
+            return SIMMEDTK_MEMORY_INVALIDPARAMS;
+        }
 
-		T *src;
-		if(dst!=NULL){
-			src=(T*)memoryBlocks[p_memoryBlockName];
-			if(src!=NULL){
-				memcpy(dst,src,sizeof(T)*p_nbr);
-				return	SIMMEDTK_MEMORY_NOERROR;
-			}
-			else
-				return SIMMEDTK_MEMORY_INVALIDMEMORY;
-		}
-		else
-			return SIMMEDTK_MEMORY_INVALIDPARAMS;
-	}
+        *p_returnedBlock = new smChar[blockSize];
+        memoryBlocks[p_memoryBlockName] = *p_returnedBlock;
+        return SIMMEDTK_MEMORY_ALLOCATED;
+    }
 
-	/// \brief copy the src to allocated memory location. p_nbr is the number of elements
-	template<class T>
-	smMemReturnType originaltoLocalBlock(const QString &p_memoryBlockName, T *src,
-		const smInt p_nbr){
+    /// \brief deletes the block from memeory as well as in has container
+    virtual smMemReturnType deleteMemory(QString & p_memoryBlockName)
+    {
+        void *memoryBlock;
 
-			T *dst;
-			if(src!=NULL){
-				dst=(T*)memoryBlocks[p_memoryBlockName];
-				if(dst!=NULL){
-					memcpy(dst,src,sizeof(T)*p_nbr);
-					return	SIMMEDTK_MEMORY_NOERROR;
-				}else
-					return	SIMMEDTK_MEMORY_INVALIDMEMORY;
-			}
-			else
-				return SIMMEDTK_MEMORY_INVALIDPARAMS;
-	}
+        if (memoryBlocks.contains(p_memoryBlockName))
+        {
+            memoryBlock = memoryBlocks[p_memoryBlockName];
+            delete []memoryBlock;
+            memoryBlocks.remove(p_memoryBlockName);
+            return SIMMEDTK_MEMORY_NOERROR;
+        }
+        else
+        {
+            return SIMMEDTK_MEMORY_NOMEMORYFOUND;
+        }
+    }
 
-	/// \brief lists the blocks within the container
-	void listofBlocks(){
-		QHash<QString ,void*>::iterator iter = memoryBlocks.begin();
-		while (iter != memoryBlocks.end() ){
-			cout << iter.value() << endl;
-			++iter;
-		}
-	}
+    /// \brief  gets  memory from the container via given block name. it returns SIMMEDTK_MEMORY_MEMORYFOUND or SIMMEDTK_MEMORY_NOMEMORYFOUND.
+    virtual smMemReturnType getBlock(const QString &p_memoryBlockName, void **p_memoryPointer)
+    {
+        if (memoryBlocks.contains(p_memoryBlockName))
+        {
+            *p_memoryPointer = memoryBlocks[p_memoryBlockName];
+            return  SIMMEDTK_MEMORY_MEMORYFOUND;
+        }
+        else
+        {
+            return SIMMEDTK_MEMORY_NOMEMORYFOUND;
+        }
+    }
 
-	/// \brief  the destructor that deletes all the allocated memory locations
-	~smMemoryBlock(){
-		foreach (void*memoryPtr, memoryBlocks)
-			delete []memoryPtr;
-	}
+    /// \brief copy the allocated memory location to dst. p_nbr is the number of elements to be copied
+    template<class T>
+    smMemReturnType localtoOriginalBlock(const QString &p_memoryBlockName, T* dst, const smInt p_nbr)
+    {
+
+        T *src;
+
+        if (dst != NULL)
+        {
+            src = (T*)memoryBlocks[p_memoryBlockName];
+
+            if (src != NULL)
+            {
+                memcpy(dst, src, sizeof(T)*p_nbr);
+                return  SIMMEDTK_MEMORY_NOERROR;
+            }
+            else
+            {
+                return SIMMEDTK_MEMORY_INVALIDMEMORY;
+            }
+        }
+        else
+        {
+            return SIMMEDTK_MEMORY_INVALIDPARAMS;
+        }
+    }
+
+    /// \brief copy the src to allocated memory location. p_nbr is the number of elements
+    template<class T>
+    smMemReturnType originaltoLocalBlock(const QString &p_memoryBlockName, T *src,
+                                         const smInt p_nbr)
+    {
+
+        T *dst;
+
+        if (src != NULL)
+        {
+            dst = (T*)memoryBlocks[p_memoryBlockName];
+
+            if (dst != NULL)
+            {
+                memcpy(dst, src, sizeof(T)*p_nbr);
+                return  SIMMEDTK_MEMORY_NOERROR;
+            }
+            else
+            {
+                return    SIMMEDTK_MEMORY_INVALIDMEMORY;
+            }
+        }
+        else
+        {
+            return SIMMEDTK_MEMORY_INVALIDPARAMS;
+        }
+    }
+
+    /// \brief lists the blocks within the container
+    void listofBlocks()
+    {
+        QHash<QString , void*>::iterator iter = memoryBlocks.begin();
+
+        while (iter != memoryBlocks.end())
+        {
+            cout << iter.value() << endl;
+            ++iter;
+        }
+    }
+
+    /// \brief  the destructor that deletes all the allocated memory locations
+    ~smMemoryBlock()
+    {
+        foreach(void*memoryPtr, memoryBlocks)
+        delete []memoryPtr;
+    }
 
 };
 

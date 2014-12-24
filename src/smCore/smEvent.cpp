@@ -1,38 +1,45 @@
 #include "smCore/smEvent.h"
 #include "smCore/smEventHandler.h"
 
-smEvent::smEvent(){
+smEvent::smEvent()
+{
 
-	priority=SIMMEDTK_EVENTPRIORITY_NORMAL;
+    priority = SIMMEDTK_EVENTPRIORITY_NORMAL;
 }
 
-smEvent::~smEvent(){
+smEvent::~smEvent()
+{
 
-	delete []data;
+    delete []data;
 }
 
-smEventType::smEventType(){
+smEventType::smEventType()
+{
 
-	 eventTypeCode=SIMMEDTK_EVENTTYPE_NONE;
+    eventTypeCode = SIMMEDTK_EVENTTYPE_NONE;
 }
 
-smEventType::smEventType(smInt p_eventType){
+smEventType::smEventType(smInt p_eventType)
+{
 
-	eventTypeCode=p_eventType;
+    eventTypeCode = p_eventType;
 }
 
-smEventType & smEventType::operator=(smInt p_eventTypeCode){
+smEventType & smEventType::operator=(smInt p_eventTypeCode)
+{
 
-	eventTypeCode=p_eventTypeCode;
-	return *this;
+    eventTypeCode = p_eventTypeCode;
+    return *this;
 }
 
-smBool smEventType::operator ==(smEventType &p_event){
+smBool smEventType::operator ==(smEventType &p_event)
+{
 
-	return(eventTypeCode==p_event.eventTypeCode?true:false);
+    return (eventTypeCode == p_event.eventTypeCode ? true : false);
 }
 
-smBool smEventType::operator ==(smInt p_eventTypeCode){
+smBool smEventType::operator ==(smInt p_eventTypeCode)
+{
 
-	return(eventTypeCode==p_eventTypeCode?true:false);
+    return (eventTypeCode == p_eventTypeCode ? true : false);
 }

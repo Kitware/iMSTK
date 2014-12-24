@@ -1,6 +1,6 @@
 /*
 ****************************************************
-				SimMedTK LICENSE
+                SimMedTK LICENSE
 ****************************************************
 
 ****************************************************
@@ -22,82 +22,85 @@
 #include "smUtilities/smTimer.h"
 
 /// \brief holds data for calibration of ADU device
-struct ADUDeviceCalibrationData{
-	smUInt maxValue1;
-	smUInt minValue1;
-	smUInt maxValue2;
-	smUInt minValue2;
+struct ADUDeviceCalibrationData
+{
+    smUInt maxValue1;
+    smUInt minValue1;
+    smUInt maxValue2;
+    smUInt minValue2;
 };
 
 /// \device Container for holding the device data
-struct ADUDeviceData{
-	smBool deviceOpen;
-	smUInt calibration[4];
-	smUInt anValue[3];
+struct ADUDeviceData
+{
+    smBool deviceOpen;
+    smUInt calibration[4];
+    smUInt anValue[3];
 };
 
 /// \device Interface class for the ADU device
-class smADUInterface: public smDeviceInterface, public QThread{
+class smADUInterface: public smDeviceInterface, public QThread
+{
 
 public:
-	/// \brief constructor
-	smADUInterface();
+    /// \brief constructor
+    smADUInterface();
 
-	/// \brief constructor Open the ADU device with all necessary data recorded in a file
-	smADUInterface(char *calibrationFile);
+    /// \brief constructor Open the ADU device with all necessary data recorded in a file
+    smADUInterface(char *calibrationFile);
 
-	/// \brief destructor
-	~smADUInterface();
+    /// \brief destructor
+    ~smADUInterface();
 
-	/// \brief Open the ADU device specified by the serial number
-	smInt openDevice(char *serialNumber);
+    /// \brief Open the ADU device specified by the serial number
+    smInt openDevice(char *serialNumber);
 
-	/// \brief Close the ADU device
-	smInt closeDevice();
+    /// \brief Close the ADU device
+    smInt closeDevice();
 
-	/// \brief Function to be called in a thread for getting device data
-	void runDevice();
+    /// \brief Function to be called in a thread for getting device data
+    void runDevice();
 
-	 /// \brief !!
-	smInt readAnalogInput(smInt channel);
-	 
-	/// \brief !!
-	smInt *readAnalogInputs();
+    /// \brief !!
+    smInt readAnalogInput(smInt channel);
 
-	smInt sw; ///< !!
-	smBool updateFlag; ///< !!
-	void *deviceHandle; ///< !!
-	ADUDeviceCalibrationData *calibrationData; ///< calibration data
-	ADUDeviceData *deviceData; ///< device data
-	smChar *serialNumber; ///< serial number of the ADU device
-	smBool isOpened; ///< !!
+    /// \brief !!
+    smInt *readAnalogInputs();
 
-	/// \brief !!
-	void init();
+    smInt sw; ///< !!
+    smBool updateFlag; ///< !!
+    void *deviceHandle; ///< !!
+    ADUDeviceCalibrationData *calibrationData; ///< calibration data
+    ADUDeviceData *deviceData; ///< device data
+    smChar *serialNumber; ///< serial number of the ADU device
+    smBool isOpened; ///< !!
 
-	/// \brief !!
-	void exec();
+    /// \brief !!
+    void init();
 
-	/// \briefempty functions for now
-	virtual void beginFrame(){};
+    /// \brief !!
+    void exec();
 
-	/// \brief empty functions for now
-	virtual void endFrame(){};
+    /// \briefempty functions for now
+    virtual void beginFrame() {};
 
-	/// \brief !!
-	void draw(smDrawParam p_params){};
+    /// \brief empty functions for now
+    virtual void endFrame() {};
 
-	/// \brief 
-	void run();
+    /// \brief !!
+    void draw(smDrawParam p_params) {};
 
-	/// \brief 
-	void handleEvent(smEvent *p_event){};
+    /// \brief
+    void run();
+
+    /// \brief
+    void handleEvent(smEvent *p_event) {};
 
 public:
-	smPipe *ADUpipe; ///< !!
+    smPipe *ADUpipe; ///< !!
 
-	/// \brief !!
-	void sendDataToPipe();
+    /// \brief !!
+    void sendDataToPipe();
 };
 
 #endif

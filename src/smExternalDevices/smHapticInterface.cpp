@@ -8,6 +8,7 @@
 
 #include "smExternalDevices/smHapticInterface.h"
 
-smHapticInterface::smHapticInterface(){
+smHapticInterface::smHapticInterface()
+{
 
 };
