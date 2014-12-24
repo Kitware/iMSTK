@@ -86,8 +86,8 @@ set(sources_sofmis
 ./smSimulators/smPhysXVolumeMesh.cpp
 ./smSimulators/smStylusObject.cpp
 ./smSimulators/smToolSimulator.cpp
-./smSimulators/smVegaConfigFemObject.cpp
-./smSimulators/smVegaFemSceneObject.cpp
+# ./smSimulators/smVegaConfigFemObject.cpp
+# ./smSimulators/smVegaFemSceneObject.cpp
 ./smUtilities/smDisplayText.cpp
 ./smUtilities/smGLUtils.cpp
 ./smUtilities/smIOStream.cpp
