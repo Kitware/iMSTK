@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -82,7 +82,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, string ConfigFile)
     secondaryDeformableObjectRenderingMesh_interpolation_vertices = NULL;
     secondaryDeformableObjectRenderingMesh_interpolation_weights = NULL;
 
-    type = SOFMIS_SMFEMSCENEOBJECT;
+    type = SIMMEDTK_SMFEMSCENEOBJECT;
 
     femConfig = new smVegaConfigFemObject();
 
@@ -90,7 +90,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, string ConfigFile)
     {
         femConfig->setFemObjConfuguration(ConfigFile);
         printf("VEGA: Initialized the VegaFemSceneObject and configured using file %s\n!",
-               ConfigFile);
+               ConfigFile.c_str());
     }
     else
     {

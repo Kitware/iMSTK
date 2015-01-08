@@ -44,7 +44,7 @@ stvk
 volumetricMesh
 )
 
-set(sources_sofmis
+set(sources_simmedtk
 ./smCollision/smSpatialHash.cpp
 ./smCore/smConfig.cpp
 ./smCore/smDispatcher.cpp
@@ -83,13 +83,13 @@ set(sources_sofmis
 ./smSimulators/smPhysXVolumeMesh.cpp
 ./smSimulators/smStylusObject.cpp
 ./smSimulators/smToolSimulator.cpp
-# ./smSimulators/smVegaConfigFemObject.cpp
-# ./smSimulators/smVegaFemSceneObject.cpp
+./smSimulators/smVegaConfigFemObject.cpp
+./smSimulators/smVegaFemSceneObject.cpp
 ./smUtilities/smGLUtils.cpp
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)
-  set(sources_sofmis ${sources_sofmis}
+  set(sources_simmedtk ${sources_simmedtk}
   ./smExternalDevices/smDeviceInterface.cpp
   ./smExternalDevices/smHapticInterface.cpp
   ./smExternalDevices/smPhantomInterface.cpp)
@@ -102,21 +102,26 @@ set(SIMMEDTK_EXTERNAL_DEVICES_SOURCES
 
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-  set_source_files_properties(${sources_sofmis} PROPERTIES COMPILE_FLAGS -std=c++11)
+  set_source_files_properties(${sources_simmedtk} PROPERTIES COMPILE_FLAGS -std=c++11)
 endif()
 
-add_library(sofmis
-  ${sources_sofmis})
+add_library(simmedtk
+  ${sources_simmedtk})
+
+target_include_directories(simmedtk
+  PUBLIC
+    ${VegaFEM_INCLUDE_DIRS}
+)
 
 # NEWLIB
-#add_library(sofmis
-#  dummy_source.cpp # Needed to get the language for the sofmis library. It can be empty.
+#add_library(simmedtk
+#  dummy_source.cpp # Needed to get the language for the simmedtk library. It can be empty.
 #  $<TARGET_OBJECTS:smCore> # For each library, add a line like this.
 #)
 
 # TODO: There are a lot of missing libraries here; look at the available
 # variables in the cmake-gui.
-target_link_libraries(sofmis
+target_link_libraries(simmedtk
   ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
@@ -133,9 +138,15 @@ target_link_libraries(sofmis
   ${IL_LIBRARIES}
   ${NIDAQ_mx_LIBRARY}
   ${DevIL_LIBRARY}
+  ${CMAKE_THREAD_LIBS_INIT}
+)
+
+if(SIMMEDTK_USE_PHANTOM_OMNI)
+target_link_libraries(simmedtk
   ${OPENHAPTICS_hd_LIBRARY}
   ${OPENHAPTICS_hdu_LIBRARY}
-)
+  )
+endif()
 
 if(BUILD_EXTERNAL_DEVICES)
 add_library(externalDevices

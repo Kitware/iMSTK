@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -39,7 +39,7 @@ using namespace std;
 #include <windows.h>
 #endif
 
-#include "configFile/configFile.h"
+#include "configFile.h"
 
 enum massSpringSystemSourceType { OBJ, TETMESH, CUBICMESH, CHAIN, NONE };
 enum deformableObjectType { STVK, COROTLINFEM, LINFEM, MASSSPRING, INVERTIBLEFEM, UNSPECIFIED };

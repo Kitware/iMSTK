@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -59,7 +59,7 @@ struct smUnifiedID
 
 private:
     /// \brief  atomic integer counter that is used to assign a unique number for  each object
-    static QAtomicInt IDcounter;
+    QAtomicInt IDcounter;
     /// \brief  sdk ID. for network use
     smShort sdkID;
 
