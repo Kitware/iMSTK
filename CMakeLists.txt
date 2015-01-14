@@ -111,6 +111,8 @@ include_directories(SYSTEM "${OPENHAPTICS_INCLUDE_DIR}")
 include_directories(SYSTEM "${V8_INCLUDE_DIR}")
 include_directories(SYSTEM "${ASSIMP_INCLUDE_DIRS}")
 # include_directories(SYSTEM "${VEGA_INCLUDE_DIRS}")
+include_directories(SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/glm")
+include_directories(SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/ext/glfw-3.0.4/include")
 
 if(BUILD_EXTERNAL_DEVICES)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
@@ -119,3 +121,4 @@ endif(BUILD_EXTERNAL_DEVICES)
 
 add_subdirectory(src)
 add_subdirectory(examples)
+add_subdirectory(ext/glfw-3.0.4)

@@ -53,8 +53,6 @@ public:
     static void drawNormals(smMesh *p_mesh, smColor p_color = smColor::colorBlue);
     /// \brief  draw line mesh
     static void drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail);
-    /// \brief draw coordinate system
-    static void drawCoordSystem(smViewer *viewer, QString p_name, smVec3<smFloat> p_pos, smVec3<smFloat> dirX, smVec3<smFloat> dirY, smVec3<smFloat> dirZ);
     /// \brief begin rendering triangle
     static void beginTriangles();
     /// \brief draw triangle

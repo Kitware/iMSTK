@@ -64,10 +64,17 @@ RenderExample::RenderExample()
     viewer->setWindowTitle("SimMedTK RENDER TEST");
     //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
     viewer->addObject(this);
+
+    //Set some viewer properties
+    viewer->setScreenResolution(800, 640);
     //Set some camera parameters
-    viewer->camera()->setZClippingCoefficient(1000);
-    viewer->camera()->setZNearCoefficient(0.001);
-    viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
+    viewer->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    viewer->camera.setFarClipDist(1000);
+    viewer->camera.setNearClipDist(0.001);
+    viewer->camera.setViewAngle(0.785398f); //45 degrees
+    viewer->camera.setCameraPos(0, 0, 5);
+    viewer->camera.setCameraFocus(0, 0, 0);
+    viewer->camera.setCameraUpVec(0, 1, 0);
 
     //Link up the event system between the viewer and the SimMedTK SDK
     //Note: This allows some default behavior like mouse and keyboard control

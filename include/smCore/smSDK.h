@@ -250,6 +250,9 @@ public:
     ///SDK creates viewer
     smViewer *createViewer();
 
+    ///SDK returns a pointer to the viewer
+    smViewer *getViewerInstance();
+
     ///SDK creates simualtor
     smSimulator *createSimulator();
 

@@ -83,7 +83,6 @@ smViewer::smViewer(smErrorLog *log)
 {
 
     type = SIMMEDTK_SMVIEWER;
-    ::QGLViewer();
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
     shadowMatrix.setIdentity();
     shadowMatrix(0, 1) = 0;
@@ -121,7 +120,6 @@ smViewer::smViewer(smErrorLog *log)
 ///affects the framebuffer size and depth buffer size
 void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 {
-
     this->screenResolutionHeight = p_height;
     this->screenResolutionWidth = p_width;
 }
@@ -205,10 +203,9 @@ void smViewer::init()
 {
 
     smSceneObject *sceneObject;
-    smScene             *scene;
+    smScene *scene;
     smStaticSceneObject *staticSceneObject;
     smStylusRigidSceneObject *stylusObject;
-    smChar *errorText = NULL;
     smClassType objectType;
     static smDrawParam param;
     smIndiceArrayIter<smLight*> iter(lights);
@@ -216,38 +213,10 @@ void smViewer::init()
     param.rendererObject = this;
     param.caller = this;
     param.data = NULL;
-    QGLViewer::init();
 
     if (isInitialized)
     {
         return;
-    }
-
-    GLenum err = glewInit();
-
-    if (GLEW_OK != err)
-    {
-        /* Problem: glewInit failed, something is seriously wrong.
-         * Most likely an OpenGL context is not created yet */
-        cout << "Error:" << glewGetErrorString(err) << endl;
-    }
-
-    smGLUtils::queryGLError(errorText);
-    setAutoBufferSwap(false);
-    smBool test = doubleBuffer();
-
-    setManipulatedFrame((qglviewer::ManipulatedFrame*)camera()->frame());
-    setAnimationPeriod(0); // as fast as possible
-    startAnimation();
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS)
-    {
-        restoreStateFromFile();
-    }
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
-    {
-        setFullScreen(true);
     }
 
     glEnable(GL_MULTISAMPLE);
@@ -280,8 +249,6 @@ void smViewer::init()
     glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
     glFrontFace(GL_CCW);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
-
-    setAcceptDrops(true);
 
     for (smInt i = 0; i < objectList.size(); i++)
     {
@@ -370,15 +337,11 @@ void smViewer::init()
         }//object traverse
     }//scene traverse
 
-    cout << "Screen Width:" << camera()->screenWidth() << endl;
-    cout << "Screen Height:" << camera()->screenHeight() << endl;
-    cout << "Screen Res:" << QApplication::desktop()->screen(1)->width() << endl;
+    //Generate the Projection and View Matricies
+    camera.genProjMat();
+    camera.genViewMat();
 
     isInitialized = true;
-
-    windowOutput->addText("VFPS", QString(""));
-    this->setFixedWidth(this->screenResolutionWidth);
-    this->setFixedHeight(this->screenResolutionHeight);
 }
 
 
@@ -634,35 +597,6 @@ void smViewer::drawSMStaticObject(smStaticSceneObject *p_smPhsyObject)
     }
 }
 
-void smViewer::drawSmLight(smLight *light)
-{
-
-    glEnable(GL_LIGHTING);
-    qglviewer::Vec origin(0, 0, 0);
-    light->updateDirection();
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-
-    if (light->lightLocationType == SIMMEDTK_LIGHTPOS_EYE)
-    {
-        glLoadIdentity();
-    }
-
-    glTranslatef(light->lightPos.pos.x,
-                 light->lightPos.pos.y,
-                 light->lightPos.pos.z);
-    glutSolidSphere(1.0, 15, 15);
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorBlue.toGLColor());
-    drawArrow(origin, origin + qglviewer::Vec(light->direction.x, light->direction.y, light->direction.z) * 10);
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-    drawArrow(origin, origin + qglviewer::Vec(light->upVector.x, light->upVector.y, light->upVector.z) * 10);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorGreen.toGLColor());
-    drawArrow(origin, origin + qglviewer::Vec(light->transverseDir.x, light->transverseDir.y, light->transverseDir.z) * 10);
-    glPopMatrix();
-}
-
 void smViewer::enableLights()
 {
 
@@ -706,11 +640,6 @@ void smViewer::enableLights()
         }
 
         glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
-
-        if (iter[i]->drawEnabled)
-        {
-            drawSmLight(iter[i]);
-        }
     }
 }
 
@@ -722,13 +651,6 @@ void smViewer::renderScene(smDrawParam p_param)
     if (this->renderStage == SMRENDERSTAGE_FINALPASS)
     {
         glDisable(GL_CULL_FACE);
-    }
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBALAXIS)
-    {
-        glPushAttrib(GL_COLOR_BUFFER_BIT);
-        drawAxis(30);
-        glPopAttrib();
     }
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_TRANSPARENCY)
@@ -881,7 +803,7 @@ void smViewer::renderTextureOnView()
 void smViewer::drawWithShadows(smDrawParam &p_param)
 {
 
-    smLight *light;
+    smLight *light = NULL;
 
     for (smInt i = 0; i < lights->size(); i++)
     {
@@ -903,18 +825,17 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
-    qglviewer::Camera *cam = camera();
-    qglviewer::Vec focusPosition = cam->viewDirection();
-    qglviewer::Vec upVector = cam->upVector();
-    light->upVector.setValue(upVector.x, upVector.y, upVector.z);
-    light->direction.setValue(focusPosition.x, focusPosition.y, focusPosition.z);
+
+    light->upVector.setValue(camera.up.x, camera.up.y, camera.up.z);
+    light->direction.setValue(camera.fp.x, camera.fp.y, camera.fp.z);
     light->updateDirection();
-    gluLookAt(light->lightPos.pos.x, light->lightPos.pos.y,
-              light->lightPos.pos.z, focusPosition.x, focusPosition.y,
-              focusPosition.z, upVector.x, upVector.y, upVector.z);
-    gluLookAt(cam->position().x, cam->position().y, cam->position().z,
-              cam->sceneCenter().x, cam->sceneCenter().y, cam->sceneCenter().z,
-              cam->upVector().x, cam->upVector().y, cam->upVector().z);
+    gluLookAt(light->lightPos.pos.x, light->lightPos.pos.y, light->lightPos.pos.z,
+              camera.fp.x, camera.fp.y, camera.fp.z,
+              camera.up.x, camera.up.y, camera.up.z);
+    gluLookAt(camera.pos.x, camera.pos.y, camera.pos.z,
+              0.0, 0.0, 0.0,
+              camera.up.x, camera.up.y, camera.up.z);
+
     fbo->enable();
     smTextureManager::activateTexture("depth");
     glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT); // for GL_DRAW_BUFFER and GL_READ_BUFFER
@@ -946,7 +867,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glLoadIdentity();
-        gluPerspective(120, camera()->aspectRatio(), camera()->zNear(), camera()->zFar());
+        gluPerspective(120, camera.ar, camera.nearClip, camera.farClip);
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
         glLoadIdentity();
@@ -1195,7 +1116,6 @@ void smViewer::draw()
     glDisable(GL_DEPTH_TEST);
     glActiveTexture(GL_TEXTURE0);
     glEnable(GL_TEXTURE_2D);
-    windowOutput->updateText("VFPS", fps.arg(currentFPS()));
     glPopAttrib();
 
     endModule();
@@ -1208,59 +1128,40 @@ void smViewer::beginFrame()
     if (terminateExecution == true)
     {
         terminationCompleted = true;
-        this->close();
     }
 
-    makeCurrent();
+    glfwMakeContextCurrent(window);
 }
 
 ///called by the module after each frame ends
 void smViewer::endFrame()
 {
-
-    swapBuffers();
+    glfwSwapBuffers(window);
 }
 
-
-
-void smViewer::keyPressEvent(QKeyEvent *e)
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-
     smEvent *eventKeyboard;
-    smLight *light, *light1;
+    smSDK *sdk = smSDK::getInstance();
+    smViewer *viewer = sdk->getViewerInstance();
+    if (viewer == NULL)
+    {
+        return;
+    }
 
     eventKeyboard = new smEvent();
     eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-    eventKeyboard->senderId = this->getModuleId();
+    eventKeyboard->senderId = viewer->getModuleId();
     eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventKeyboard->data = new smKeyboardEventData();
-    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = e->key();
+    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
+    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
 
-    if (eventDispatcher)
+    //This should be handled by smViewer's handleEvent() function
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     {
-        eventDispatcher->sendEventAndDelete(eventKeyboard);
-    }
-
-    if (e->key() == Qt::Key_C)
-    {
-        enableCameraMotion = !enableCameraMotion;
-    }
-
-    if (e->key() == Qt::Key_T)
-    {
-        checkCameraCollision = !checkCameraCollision;
-        cout << "checkCameraCollision" << checkCameraCollision << endl;
-    }
-
-    if (e->key() == Qt::Key_W)
-    {
-        this->viewerRenderDetail = this->viewerRenderDetail & (~(this->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_WIREFRAMEALL));
-    }
-
-    if (e->key() == Qt::Key_Escape)
-    {
-        smSDK::getInstance()->shutDown();
-        this->close();
+        glfwSetWindowShouldClose(window, GL_TRUE);
+        sdk->shutDown();
     }
 }
 
@@ -1333,47 +1234,64 @@ void smViewer::updateText(smInt p_handle, QString p_string)
     windowOutput->updateText(p_handle, p_string);
 }
 
-
-void smViewer::dropEvent(QDropEvent *event)
+void smViewer::setWindowTitle(string str)
 {
-
-    QString text;
-    QList<QUrl> urls = event->mimeData()->urls();
-
-    if (urls.isEmpty())
-    {
-        return;
-    }
-
-    QString fileName = urls.first().toLocalFile();
-
-    cout << fileName.toAscii().data() << endl;
-}
-
-
-void smViewer::dragEnterEvent(QDragEnterEvent *event)
-{
-
-    if (event->mimeData()->hasFormat("text/uri-list"))
-    {
-        printf("Dra accepted --------\n");
-        event->acceptProposedAction();
-    }
+    windowTitle = str;
 }
 
 void smViewer::exec()
 {
+    int count;
 
-    show();
-
-    for (smInt i = 0; i < forms.size(); i++)
+    // Init GLFW(OpenGL context)
+    if (!glfwInit())
     {
-        forms[i]->show();
+        exit(EXIT_FAILURE);
     }
+
+    // Init the rest of GLFW
+    GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
+    window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
+        windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+
+    glfwMakeContextCurrent(window);
+    glfwSetKeyCallback(window, key_callback);
+
+    // Init GLEW
+    GLenum err = glewInit();
+
+    if (GLEW_OK != err)
+    {
+        /* Problem: glewInit failed, something is seriously wrong.
+         * Most likely an OpenGL context is not created yet */
+        cout << "Error:" << glewGetErrorString(err) << endl;
+        assert(false);
+    }
+
+    // Init the viewer
+    this->init();
+
+    while (!terminateExecution) {
+        this->draw();
+        glfwPollEvents();
+    }
+
+    //Shutdown glfw
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
-void smViewer::addForm(QDialog *p_form)
+smInt smViewer::height(void)
 {
+    return screenResolutionHeight;
+}
 
-    forms.push_back(p_form);
+smInt smViewer::width(void)
+{
+    return screenResolutionWidth;
+}
+
+smFloat smViewer::aspectRatio(void)
+{
+    return screenResolutionHeight / screenResolutionWidth;
 }

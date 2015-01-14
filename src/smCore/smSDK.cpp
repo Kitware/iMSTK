@@ -85,6 +85,14 @@ smViewer *smSDK::createViewer()
     return viewer;
 }
 
+/// \brief Returns a pointer to the viewer object
+///
+/// \return Returns a pointer to the viewer object
+smViewer *smSDK::getViewerInstance()
+{
+    return this->viewer;
+}
+
 /// \brief
 smSimulator* smSDK::createSimulator()
 {
