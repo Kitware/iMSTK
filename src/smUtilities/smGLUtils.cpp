@@ -26,35 +26,6 @@
 #include "smUtilities/smGLUtils.h"
 #include "smShader/smShader.h"
 
-struct smGroundRenderInfo
-{
-    smChar groundImage[255];
-    smChar groundBumpImage[255];
-    smChar wallImage[255];
-    smChar wallBumpImage[255];
-    smGLInt attributeImage;
-    smGLInt attributeBumpImage;
-    smGLInt tangent;
-    smShader *bumpMappingShader;
-    smFloat scale;
-};
-
-smGroundRenderInfo smGLUtils::groundRenderInfo;
-
-void smGLUtils::init()
-{
-    groundRenderInfo.bumpMappingShader = new smShader(NULL);
-    groundRenderInfo.bumpMappingShader->initShaders("../../resources/shaders/VertexBumpMap.cg", "../../resources/shaders/FragmentBumpMap.cg", NULL);
-    groundRenderInfo.tangent = groundRenderInfo.bumpMappingShader->addShaderParamAttrib("tangent");
-    groundRenderInfo.attributeImage = groundRenderInfo.bumpMappingShader->addShaderParamForAll("DecalTex");
-    groundRenderInfo.attributeBumpImage = groundRenderInfo.bumpMappingShader->addShaderParamForAll("BumpTex");
-    smTextureManager::loadTexture(groundRenderInfo.groundImage, "groundImage");
-    smTextureManager::loadTexture(groundRenderInfo.groundBumpImage, "groundBumpImage");
-    smTextureManager::loadTexture(groundRenderInfo.wallImage, "wallImage");
-    smTextureManager::loadTexture(groundRenderInfo.wallBumpImage, "wallBumpImage");
-    groundRenderInfo.scale = 10;
-}
-
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
 bool smGLUtils::queryGLError(smChar*err)
@@ -137,95 +108,6 @@ void smGLUtils::fadeBackgroundDraw()
     glPopAttrib();
 }
 
-void smGLUtils::drawTexturedPolygon()
-{
-    static smFloat yOffset = -0.001;
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (smGLFloat*)&smColor::colorWhite);
-    glBegin(GL_QUADS);
-    glNormal3f(0, 1, 0);
-    glVertexAttrib3f(groundRenderInfo.tangent, 1, 0, 0);
-    glTexCoord2f(0, 1);
-    glVertex3f(-1 * groundRenderInfo.scale, yOffset, -1 * groundRenderInfo.scale);
-
-    glNormal3f(0, 1, 0);
-    glVertexAttrib3f(groundRenderInfo.tangent, 1, 0, 0);
-    glTexCoord2f(0, 0);
-    glVertex3f(-1 * groundRenderInfo.scale, yOffset, 1 * groundRenderInfo.scale);
-
-    glNormal3f(0, 1, 0);
-    glVertexAttrib3f(groundRenderInfo.tangent, 1, 0, 0);
-    glTexCoord2f(1, 0);
-    glVertex3f(1 * groundRenderInfo.scale, yOffset, 1 * groundRenderInfo.scale);
-
-    glNormal3f(0, 1, 0);
-    glVertexAttrib3f(groundRenderInfo.tangent, 1, 0, 0);
-    glTexCoord2f(1, 1);
-    glVertex3f(1 * groundRenderInfo.scale, yOffset, -1 * groundRenderInfo.scale);
-    glEnd();
-}
-
-void smGLUtils::drawGround()
-{
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    groundRenderInfo.bumpMappingShader->enableShader();
-
-    glEnable(GL_TEXTURE_2D);
-    glActiveTexture(GL_TEXTURE0);
-    smTextureManager::activateTexture("groundImage");
-    glUniform1iARB(groundRenderInfo.attributeImage, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    smTextureManager::activateTexture("groundBumpImage");
-    glUniform1iARB(groundRenderInfo.attributeBumpImage, 1);
-    glMatrixMode(GL_MODELVIEW);
-
-    glPushMatrix();
-
-    for (smInt i = -4; i < 5; i++)
-    {
-        glPushMatrix();
-        glTranslatef(2 * groundRenderInfo.scale * i, 0, 0);
-        drawTexturedPolygon();
-        glTranslatef(0, 0, groundRenderInfo.scale * 2);
-        drawTexturedPolygon();
-        glTranslatef(0, 0, groundRenderInfo.scale * 2);
-        drawTexturedPolygon();
-        glPopMatrix();
-    }
-
-    glTranslatef(0, groundRenderInfo.scale, -groundRenderInfo.scale);
-    glRotatef(90, 1, 0, 0);
-    glEnable(GL_TEXTURE_2D);
-
-    glActiveTexture(GL_TEXTURE0);
-    smTextureManager::activateTexture("wallImage");
-    glUniform1iARB(groundRenderInfo.attributeImage, 0);
-
-    glActiveTexture(GL_TEXTURE1);
-    smTextureManager::activateTexture("wallBumpImage");
-    glUniform1iARB(groundRenderInfo.attributeBumpImage, 1);
-
-    for (smInt i = -4; i < 5; i++)
-    {
-        glPushMatrix();
-        glTranslatef(2 * groundRenderInfo.scale * i, 0, 0);
-        drawTexturedPolygon();
-        glTranslatef(0, 0, -2 * groundRenderInfo.scale);
-        drawTexturedPolygon();
-        glPopMatrix();
-    }
-
-    glPopMatrix();
-
-    glActiveTexture(GL_TEXTURE0);
-    smTextureManager::disableTexture("groundImage");
-
-    glActiveTexture(GL_TEXTURE1);
-    smTextureManager::disableTexture("groundBumpImage");
-    groundRenderInfo.bumpMappingShader->disableShader();
-    glPopAttrib();
-}
-
 void smGLUtils::drawQuadOnScreen(smColor p_color, smFloat p_left,
                                  smFloat p_bottom, smFloat p_right,
                                  smFloat p_top)
@@ -260,14 +142,3 @@ void smGLUtils::drawQuadOnScreen(smColor p_color, smFloat p_left,
     glPopMatrix();
     glPopAttrib();
 }
-
-
-
-
-
-
-
-
-
-
-

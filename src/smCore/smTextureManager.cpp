@@ -26,6 +26,8 @@
 #include "smCore/smTextureManager.h"
 #include "smUtilities/smGLUtils.h"
 
+#include <cassert>
+
 smErrorLog* smTextureManager:: errorLog;
 vector<smTexture*>  smTextureManager:: textures;
 QHash<QString, smInt>  smTextureManager::textureIndexId;
@@ -42,9 +44,6 @@ smTextureReturnType smTextureManager::initGLTextures()
 {
 
     smTexture *texture;
-    ILubyte *test;
-    smInt temp;
-    ILboolean success;
     smImageData data;
 
     for (smInt i = 0; i < textures.size(); i++)
@@ -182,17 +181,19 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName,
 /// \brief
 smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, const smChar *p_textureReferenceName, smBool p_flipImage, bool deleteDataAfterLoaded)
 {
-
-    smTexture *texture;
+    smTexture *texture = NULL;
     ILenum error;
     ILuint imageName;
+
+    assert(p_fileName);
+    assert(p_textureReferenceName);
 
     ilGenImages(1, &imageName);
     ilBindImage(imageName);
 
     if (ilLoadImage(p_fileName) == IL_FALSE)
     {
-        cout << "[smTextureManager::loadTexture] Texture is not found" << p_fileName << endl;
+        cout << "[smTextureManager::loadTexture] Texture is not found \"" << p_fileName << "\"\n";
         return SIMMEDTK_TEXTURE_NOTFOUND;
     }
 
@@ -238,9 +239,6 @@ smTextureReturnType smTextureManager::loadTexture(const smString p_fileName,
 smTextureReturnType smTextureManager::findTextureId(const smChar *p_textureReferenceName,
         smInt &p_textureId)
 {
-    smInt textureId;
-    smTexture *texture;
-
     if (textureIndexId.contains(p_textureReferenceName))
     {
         p_textureId = textureIndexId[p_textureReferenceName];

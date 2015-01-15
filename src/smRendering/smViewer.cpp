@@ -37,8 +37,6 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
-#include <QGLViewer/vec.h>
-#include <QGLViewer/qglviewer.h>
 #include <QKeyEvent>
 #include <QDesktopWidget>
 
@@ -262,7 +260,6 @@ void smViewer::init()
         }
     }
 
-    smGLUtils::init();
     smInt width = screenResolutionWidth;
     smInt height = screenResolutionHeight;
 
@@ -665,16 +662,6 @@ void smViewer::renderScene(smDrawParam p_param)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GROUND)
-    {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glColor3f(1, 1, 1);
-        smGLUtils::drawGround();
-        glEnable(GL_LIGHTING);
-        glPopMatrix();
-    }
-
     smScene::smSceneIterator sceneIter;
 
     //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
@@ -1060,10 +1047,12 @@ void smViewer::draw()
 
     adjustFPS();
 
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
-    {
-        glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
-    }
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(camera.getProjMatRef());
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(camera.getViewMatRef());
+
+    glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
 
     glClearColor(0.05f, 0.1f, 0.1f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -1250,9 +1239,17 @@ void smViewer::exec()
     }
 
     // Init the rest of GLFW
-    GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
-    window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-        windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
+    {
+        GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
+        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
+            windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+    }
+    else
+    {
+        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
+            windowTitle.c_str(), NULL, NULL);
+    }
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);

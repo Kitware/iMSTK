@@ -98,7 +98,6 @@ AlphaMapExample::AlphaMapExample()
     scene1->addSceneObject(object1);
 
     viewer = simmedtkSDK->createViewer();
-    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_GROUND;
     viewer->list();
     viewer->setWindowTitle("SimMedTK TEST");
 

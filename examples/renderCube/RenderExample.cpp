@@ -65,6 +65,22 @@ RenderExample::RenderExample()
     //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
     viewer->addObject(this);
 
+    //Setup Scene lighting
+    smLight* light = new smLight("SceneLight1",
+                                 SIMMEDTK_LIGHT_SPOTLIGHT,
+                                 SIMMEDTK_LIGHTPOS_WORLD);
+    light->lightPos.pos.setValue(10.0, 10.0, 10.0);
+    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+    light->spotCutOffAngle = 60;
+    light->direction = smVec3f(0.0, 0.0, -1.0);
+    light->drawEnabled = false;
+    light->attn_constant = 1.0;
+    light->attn_linear = 0.0;
+    light->attn_quadratic = 0.0;
+    viewer->addLight(light);
+
     //Set some viewer properties
     viewer->setScreenResolution(800, 640);
     //Set some camera parameters
@@ -72,9 +88,11 @@ RenderExample::RenderExample()
     viewer->camera.setFarClipDist(1000);
     viewer->camera.setNearClipDist(0.001);
     viewer->camera.setViewAngle(0.785398f); //45 degrees
-    viewer->camera.setCameraPos(0, 0, 5);
+    viewer->camera.setCameraPos(3, 0, 5);
     viewer->camera.setCameraFocus(0, 0, 0);
     viewer->camera.setCameraUpVec(0, 1, 0);
+    //Uncomment the following line for fullscreen
+    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Link up the event system between the viewer and the SimMedTK SDK
     //Note: This allows some default behavior like mouse and keyboard control

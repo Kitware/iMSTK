@@ -166,10 +166,9 @@ class smSDK: public smCoreClass, public smEventHandler
 {
 
 protected:
+    bool shutdown; ///< Tells the SDK to terminate
     ///this id is incremented automatically when the scene is created.
     smInt sceneIdCounter;
-    /// \brief pointer to the Qapplication
-    QApplication *application;
     /// \brief pointers to the viewer, simulator
     smViewer *viewer;
     smSimulator *simulator;
@@ -206,9 +205,9 @@ protected:
     /// \brief constructor
     smSDK()
     {
+        shutdown = false;
         smInt argc = 1;
         smChar *argv[] = {SIMMEDTKVERSION_TEXT};
-        application = new QApplication(argc, argv);
         errorLog = new smErrorLog();
         dispathcer = new smDispatcher();
         eventDispatcher = new smEventDispatcher();

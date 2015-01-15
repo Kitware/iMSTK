@@ -28,6 +28,9 @@
 #include "smCore/smSDK.h"
 #include "smMesh/smMesh.h"
 
+#include <chrono>
+#include <thread>
+
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
 smErrorLog * smSDK::errorLog;
@@ -156,6 +159,7 @@ void smSDK::shutDown()
     {
         (*modulesRef)[i].module->terminateExecution = true;
     }
+    shutdown = true;
 }
 
 /// \brief runs the simulator
@@ -181,7 +185,9 @@ void smSDK::run()
     }
 
     runRegisteredModules();
-    application->exec();
+    while (!shutdown) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     terminateAll();
 }
 
