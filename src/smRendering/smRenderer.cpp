@@ -515,34 +515,6 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawCoordSystem(smViewer *viewer, QString p_name,
-                                   smVec3<smFloat> p_pos, smVec3<smFloat> dirX,
-                                   smVec3<smFloat> dirY, smVec3<smFloat> dirZ)
-{
-
-    qglviewer::Vec vec;
-    smFloat p_scale = 5.0;
-
-    dirX = dirX * p_scale + p_pos;
-    dirY = dirY * p_scale + p_pos;
-    dirZ = dirZ * p_scale + p_pos;
-    glPushAttrib(GL_TEXTURE_BIT);
-    vec = viewer->camera()->projectedCoordinatesOf(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z));
-    glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
-    viewer->drawText(vec.x, vec.y, p_name);
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirX.x, dirX.y, dirX.z), 0.1);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorGreen.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirY.x, dirY.y, dirY.z), 0.1);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorBlue.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirZ.x, dirZ.y, dirZ.z), 0.1);
-    glPopAttrib();
-}
-
-
-
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 

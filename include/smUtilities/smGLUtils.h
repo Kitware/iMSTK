@@ -40,10 +40,6 @@ struct smGroundRenderInfo;
 class smGLUtils : public smCoreClass
 {
 public:
-    static smGroundRenderInfo groundRenderInfo;
-
-    static void init();
-
     /// \brief checks the openGL error. if there is an error then it returns
     /// \brief the error text otherwise it returns NULL
     static bool queryGLError(smChar*err);
@@ -53,10 +49,6 @@ public:
 
     /// \brief  fade background draw with a size groundRenderInfo.scale
     static void fadeBackgroundDraw();
-    /// \brief draw a textured quad with
-    static void drawTexturedPolygon();
-    /// \brief draw gorund
-    static void  drawGround();
 
     /// \brief draw quad on screen with color and left, botton, right, top positions
     static void drawQuadOnScreen(smColor p_color,

@@ -28,6 +28,9 @@
 #include "smCore/smSDK.h"
 #include "smMesh/smMesh.h"
 
+#include <chrono>
+#include <thread>
+
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
 smErrorLog * smSDK::errorLog;
@@ -83,6 +86,14 @@ smViewer *smSDK::createViewer()
     }
 
     return viewer;
+}
+
+/// \brief Returns a pointer to the viewer object
+///
+/// \return Returns a pointer to the viewer object
+smViewer *smSDK::getViewerInstance()
+{
+    return this->viewer;
 }
 
 /// \brief
@@ -148,6 +159,7 @@ void smSDK::shutDown()
     {
         (*modulesRef)[i].module->terminateExecution = true;
     }
+    shutdown = true;
 }
 
 /// \brief runs the simulator
@@ -173,7 +185,9 @@ void smSDK::run()
     }
 
     runRegisteredModules();
-    application->exec();
+    while (!shutdown) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     terminateAll();
 }
 

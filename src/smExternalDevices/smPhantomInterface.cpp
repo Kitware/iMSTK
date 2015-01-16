@@ -307,18 +307,5 @@ void smPhantomInterface::handleEvent(smEvent *p_event)
 /// \brief
 void smPhantomInterface::draw(smDrawParam p_params)
 {
-
-    static smVec3<smFloat> xAxis;
-    static smVec3<smFloat> yAxis;
-    static smVec3<smFloat> zAxis;
-    static smVec3<smFloat> pos;
-
-    for (smInt i = 0; i < numPhantomDevices; i++)
-    {
-        pos = hapticDeviceData[i].position;
-        xAxis = hapticDeviceData[i].transform.getColumn(0);
-        yAxis = hapticDeviceData[i].transform.getColumn(1);
-        zAxis = hapticDeviceData[i].transform.getColumn(2);
-        smGLRenderer::drawCoordSystem(p_params.rendererObject, hapticDeviceData[i].deviceName, pos, xAxis, yAxis, zAxis);
-    }
+    //Nothing to draw
 }

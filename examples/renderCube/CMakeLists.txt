@@ -4,5 +4,5 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 add_executable(renderCube main.cpp  RenderExample.cpp RenderExample.h)
+target_link_libraries(renderCube glfw ${GLFW_LIBRARIES})
 target_link_libraries(renderCube sofmis)
-

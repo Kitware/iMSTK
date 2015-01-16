@@ -25,11 +25,7 @@
 
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
-#include <QGLViewer/qglviewer.h>
 #include <GL/glut.h>
-#include <QDrag>
-#include <QUrl>
-#include <QDialog>
 
 #include "smCore/smConfig.h"
 #include "smShader/smShader.h"
@@ -52,6 +48,9 @@
 #include "smUtilities/smVec3.h"
 #include "smShader/SceneTextureShader.h"
 
+#include "smRendering/smCamera.h"
+#include <GLFW/glfw3.h>
+
 //forward declaration
 class smSDK;
 class smOpenGLWindowStream;
@@ -72,7 +71,7 @@ enum smRenderingStageType
 };
 
 ///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
-class smViewer : public QGLViewer, public smModule, public smEventHandler
+class smViewer : public smModule, public smEventHandler
 {
 protected:
     vector<smCoreClass*> objectList;
@@ -108,7 +107,6 @@ protected:
     ///Shadow Shader
     smShader *shadow;
     smGLInt shadowMapUniform;
-    void drawSmLight(smLight *light);
     smInt unlimitedFPSVariableChanged;
     smBool unlimitedFPSEnabled;
     smInt screenResolutionWidth;
@@ -117,6 +115,13 @@ protected:
 public:
     smRenderingStageType renderStage;
     smBool boostViewer;
+
+    GLFWwindow* window;
+    smCamera camera;
+
+    smInt height(void);
+    smInt width(void);
+    smFloat aspectRatio(void);
 
     ///if the camera motion is enabled from other external devices
     smBool enableCameraMotion;
@@ -158,6 +163,9 @@ public:
     void setScreenResolution(smInt p_width, smInt p_height);
     /// \brief set scene as texture
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
+    /// \brief set the window title
+    void setWindowTitle(string);
+    string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
@@ -203,10 +211,6 @@ protected:
     //delete this..this is for demo..
     smVec3<smDouble> hapticPosition;
     smVec3<smDouble>  hapticForce;
-    /// \brief  drop an object
-    void dropEvent(QDropEvent *event);
-    /// \brief  drag an object
-    void dragEnterEvent(QDragEnterEvent *event);
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 
@@ -215,8 +219,6 @@ public:
     smVec3<smDouble> deviceCameraPos;
     smVec3<smDouble> deviceCameraDir;
     smVec3<smDouble> deviceCameraUpDir;
-    /// \brief  save camera position
-    qglviewer::Camera prevCamera;
     /// \brief  check if the camera is collided or not
     smBool  checkCameraCollisionWithScene();
     void addCollisionCheckMeshes(smMesh *mesh);

@@ -47,6 +47,7 @@ volumetricMesh
 set(sources_sofmis
 ./smCollision/smSpatialHash.cpp
 ./smCore/smConfig.cpp
+./smCore/smCoreClass.cpp
 ./smCore/smDispatcher.cpp
 ./smCore/smErrorLog.cpp
 ./smCore/smEvent.cpp
@@ -67,6 +68,7 @@ set(sources_sofmis
 ./smMesh/smMesh.cpp
 ./smMesh/smSurfaceMesh.cpp
 ./smMesh/smVolumeMesh.cpp
+./smRendering/smCamera.cpp
 ./smRendering/smConfigRendering.cpp
 ./smRendering/smFrameBuffer.cpp
 ./smRendering/smLight.cpp
