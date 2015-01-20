@@ -34,12 +34,11 @@
 #
 ###########################################################################
 #
-# VegaFEM
+# Assimp
 #
-
-set(proj VegaFEM)
-set(${proj}_TAG "9e7770f786019a3dd7446dc6d8fc9a6823a95a1a")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
+set(proj Assimp)
+set(${proj}_TAG "1c4a8e90177a61740a5665bc31ba027c4a65d4db")
+set(${proj}_REPOSITORY ${git_protocol}://github.com/assimp/assimp.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -49,8 +48,8 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
-  message(FATAL_ERROR "VegaFEM_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
+  message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
 set(${proj}_DEPENDENCIES "")
@@ -58,7 +57,7 @@ set(${proj}_DEPENDENCIES "")
 # Include dependent projects if any
 SimMedTKCheckDependencies(${proj})
 
-if(NOT DEFINED VegaFEM_DIR)
+if(NOT DEFINED ${proj}_DIR)
 
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
@@ -85,22 +84,17 @@ if(NOT DEFINED VegaFEM_DIR)
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
-      -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
-      -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
-      -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
-      -DGLEW_INCLUDE_DIR:PATH="${GLEW_INCLUDE_DIR}"
-      -DGLEW_LIBRARY:STRING="${GLEW_LIBRARY}"
-      -DGLUT_INCLUDE_DIR:PATH="${GLUT_INCLUDE_DIR}"
-      -DGLUT_LIBRARIES:STRING="${GLUT_LIBRARIES}"
+      -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
+      -DASSIMP_BUILD_TESTS:BOOL=OFF
+      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
-      ${VegaFEM_DEPENDENCIES}
+      ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/VegaFEM)
+  set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -Dassimp_DIR:PATH=${${proj}_DIR})

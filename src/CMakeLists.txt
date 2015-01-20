@@ -1,49 +1,6 @@
 # TODO: Make a CMakeLists.txt in each subdirectory (see smCore for an example
 # and below (NEWLIB) for an example for how to use it).
 
-set(vega_includes
-camera
-clothBW
-configFile
-corotationalLinearFEM
-elasticForceModel
-forceModel
-getopts
-glslPhong
-graph
-hashTable
-imageIO
-insertRows
-integrator
-integratorDense
-integratorSparse
-isotropicHyperelasticFEM
-lighting
-loadList
-massSpringSystem
-matrix
-matrixIO
-minivector
-modalMatrix
-objMesh
-objMeshGPUDeformer
-openGLHelper
-performanceCounter
-polarDecomposition
-quaternion
-reducedElasticForceModel
-reducedForceModel
-reducedStvk
-renderVolumetricMesh
-rigidBodyDynamics
-sceneObject
-sceneObjectReduced
-sparseMatrix
-sparseSolver
-stvk
-volumetricMesh
-)
-
 set(sources_simmedtk
 ./smCollision/smSpatialHash.cpp
 ./smCore/smConfig.cpp
@@ -108,10 +65,10 @@ endif()
 add_library(simmedtk
   ${sources_simmedtk})
 
-target_include_directories(simmedtk
-  PUBLIC
-    ${VegaFEM_INCLUDE_DIRS}
-)
+# target_include_directories(simmedtk
+#   PUBLIC
+#     ${VegaFEM_INCLUDE_DIRS}
+# )
 
 # NEWLIB
 #add_library(simmedtk
@@ -139,6 +96,19 @@ target_link_libraries(simmedtk
   ${NIDAQ_mx_LIBRARY}
   ${DevIL_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
+  VegaFEM::configFile
+  VegaFEM::vega-getopts
+  VegaFEM::sceneObject
+  VegaFEM::performanceCounter
+  VegaFEM::volumetricMesh
+  VegaFEM::stvk
+  VegaFEM::integratorSparse
+  VegaFEM::massSpringSystem
+  VegaFEM::corotationalLinearFEM
+  VegaFEM::elasticForceModel
+  VegaFEM::isotropicHyperelasticFEM
+  VegaFEM::loadList
+  
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)

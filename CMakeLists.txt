@@ -91,7 +91,7 @@ add_definitions(-DBOOST_ALL_NO_LIB=1)
 simmedtk_find_package(Audiere REQUIRED)
 simmedtk_find_package(OpenHaptics)
 simmedtk_find_package(V8 REQUIRED)
-simmedtk_find_package(ASSIMP MODULE REQUIRED)
+simmedtk_find_package(Assimp REQUIRED CONFIG)
 simmedtk_find_package(VegaFEM REQUIRED CONFIG)
 
 if(BUILD_EXTERNAL_DEVICES)

@@ -34,7 +34,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp DevIL)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -57,6 +57,7 @@ endif()
 include(ExternalProject)
 include(SimMedTKCheckDependencies)
 
+set(ep_install_dir ${CMAKE_BINARY_DIR}/SuperBuild/Install)
 set(ep_suffix "-cmake")
 set(ep_common_c_flags "${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS}")
 set(ep_common_cxx_flags "${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS}")
@@ -115,7 +116,8 @@ ExternalProject_Add(${proj}
     ${SimMedTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}
   SOURCE_DIR ${SimMedTK_SOURCE_DIR}
-  BINARY_DIR ${SimMedTK_BINARY_DIR}/SimMedTK-build
+  BINARY_DIR ${SimMedTK_BINARY_DIR}/SuperBuild/SimMedTK-build
+  PREFIX ${SimMedTK_BINARY_DIR}/SuperBuild/SimMedTK${ep_suffix}
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS
@@ -125,7 +127,7 @@ ExternalProject_Add(${proj}
 if(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
   set(simmedtk_build_cmd "$(MAKE)")
 else()
-  set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+  set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SuperBuild/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
 endif()
 
 #-----------------------------------------------------------------------------
@@ -140,7 +142,7 @@ endif()
 
 add_custom_target(SimMedTK-build ${SimMedTKBUILD_TARGET_ALL_OPTION}
   COMMAND ${simmedtk_build_cmd}
-  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
+  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SuperBuild/SimMedTK-build
   )
 add_dependencies(SimMedTK-build SimMedTK-Configure)
 
@@ -149,5 +151,5 @@ add_dependencies(SimMedTK-build SimMedTK-Configure)
 #
 add_custom_target(SimMedTK
   COMMAND ${simmedtk_build_cmd}
-  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
+  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SuperBuild/SimMedTK-build
   )
