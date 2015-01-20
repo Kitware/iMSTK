@@ -82,12 +82,14 @@ target_link_libraries(simmedtk
   ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
-  ${QT_LIBRARIES}
+  Qt4::QtOpenGL
+  Qt4::QtCore
+  Qt4::QtGui
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
   ${ADU_LIBRARY}
-  ${ASSIMP_LIBRARY}
+  ${ASSIMP_LIBRARIES}
   ${AUDIERE_LIBRARY}
   ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
@@ -108,7 +110,7 @@ target_link_libraries(simmedtk
   VegaFEM::elasticForceModel
   VegaFEM::isotropicHyperelasticFEM
   VegaFEM::loadList
-  
+
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)

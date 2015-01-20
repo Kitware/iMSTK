@@ -38,7 +38,7 @@
 #
 
 set(proj VegaFEM)
-set(${proj}_TAG "9e7770f786019a3dd7446dc6d8fc9a6823a95a1a")
+set(${proj}_TAG "6b06c92ee4fa1b208648d8bc8de542329e31cccc")
 set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
 
 # Make sure this file is included only once

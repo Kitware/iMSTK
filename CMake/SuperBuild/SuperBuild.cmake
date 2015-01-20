@@ -34,7 +34,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp DevIL)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment

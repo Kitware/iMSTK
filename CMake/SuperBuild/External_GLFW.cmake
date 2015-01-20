@@ -34,11 +34,12 @@
 #
 ###########################################################################
 #
-# Assimp
+# GLFW
 #
-set(proj Assimp)
-set(${proj}_TAG "1c4a8e90177a61740a5665bc31ba027c4a65d4db")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/assimp/assimp.git)
+
+set(proj GLFW)
+set(${proj}_TAG "4188c263e31ec3d5da99a77d939ab56bc199fda6")
+set(${proj}_REPOSITORY ${git_protocol}://github.com/glfw/glfw.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -49,7 +50,7 @@ set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
 if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
-  message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
+  message(FATAL_ERROR "GLFW_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
 set(${proj}_DEPENDENCIES "")
@@ -84,16 +85,14 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
-      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
+  set(${proj}_DIR ${ep_install_dir}/lib/cmake/glfw)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -Dglfw3_DIR:PATH=${${proj}_DIR})

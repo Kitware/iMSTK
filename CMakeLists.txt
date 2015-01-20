@@ -11,7 +11,7 @@ list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 include(SimMedTKMacros)
-  
+
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #
@@ -68,14 +68,7 @@ if(THREADS_FOUND)
   include_directories(${THREADS_PTHREADS_INCLUDE_DIR})
 endif()
 
-find_package(Qt4 REQUIRED)
-
-set(QT_USE_QTOPENGL ON)
-set(QT_USE_QTGUI ON)
-set(QT_USE_QTCORE ON)
-
-include(${QT_USE_FILE})
-
+find_package(Qt4 REQUIRED QtOpenGL QtCore QtGui)
 
 simmedtk_find_package(QGLViewer REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
@@ -93,6 +86,7 @@ simmedtk_find_package(OpenHaptics)
 simmedtk_find_package(V8 REQUIRED)
 simmedtk_find_package(Assimp REQUIRED CONFIG)
 simmedtk_find_package(VegaFEM REQUIRED CONFIG)
+simmedtk_find_package(glfw3 REQUIRED CONFIG)
 
 if(BUILD_EXTERNAL_DEVICES)
   simmedtk_find_package(ADU REQUIRED)
@@ -126,8 +120,9 @@ if(SIMMEDTK_USE_PHANTOM_OMNI)
   include_directories(SYSTEM "${OPENHAPTICS_INCLUDE_DIR}")
 endif()
 include_directories(SYSTEM "${V8_INCLUDE_DIR}")
+link_directories(${ASSIMP_LIBRARY_DIRS})
 include_directories(SYSTEM "${ASSIMP_INCLUDE_DIRS}")
-# include_directories(SYSTEM "${VegaFEM_INCLUDE_DIRS}")
+include_directories(SYSTEM "${GLFW3_INCLUDE_DIR}")
 
 if(BUILD_EXTERNAL_DEVICES)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
