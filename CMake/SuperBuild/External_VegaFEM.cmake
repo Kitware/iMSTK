@@ -37,10 +37,6 @@
 # VegaFEM
 #
 
-set(proj VegaFEM)
-set(${proj}_TAG "6b06c92ee4fa1b208648d8bc8de542329e31cccc")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
-
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
 if(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED)
@@ -53,32 +49,20 @@ if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
   message(FATAL_ERROR "VegaFEM_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(${proj}_DEPENDENCIES "")
+set(VegaFEM_DEPENDENCIES GLEW GLUT)
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(${proj})
+SimMedTKCheckDependencies(VegaFEM)
+
+set(proj VegaFEM)
+set(${proj}_TAG "6b06c92ee4fa1b208648d8bc8de542329e31cccc")
+set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
 
 if(NOT DEFINED VegaFEM_DIR)
 
-  set(VegaFEM_CMAKE_INCLUDE_PATH)
-  set(VegaFEM_CMAKE_LIBRARY_PATH)
-  set(GL_ARGUMENTS)
-  if(GLUT_INCLUDE_DIR AND GLUT_glut_LIBRARY)
-    get_filename_component(GLUT_INCLUDE_PREFIX "${GLUT_INCLUDE_DIR}" PATH)
-    get_filename_component(GLUT_LIB_PREFIX "${GLUT_glut_LIBRARY}" PATH)
-  endif()
-  if(GLEW_INCLUDE_DIR AND GLEW_LIBRARY)
-    get_filename_component(GLEW_INCLUDE_PREFIX "${GLEW_INCLUDE_DIR}" PATH)
-    get_filename_component(GLEW_LIB_PREFIX "${GLEW_LIBRARY}" PATH)
-  endif()
+  set(VegaFEM_CMAKE_INCLUDE_PATH -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include)
+  set(VegaFEM_CMAKE_LIBRARY_PATH -DCMAKE_LIBRARY_PATH:PATH=${ep_install_dir}/lib)
 
-  set(VegaFEM_CMAKE_INCLUDE_PATH "${GLUT_INCLUDE_PREFIX}${sep}${GLEW_INCLUDE_PREFIX}")
-  set(VegaFEM_CMAKE_LIBRARY_PATH "${GLUT_LIB_PREFIX}${sep}${GLEW_LIB_PREFIX}")
-
-  if(VegaFEM_CMAKE_INCLUDE_PATH AND VegaFEM_CMAKE_LIBRARY_PATH)
-    set(GL_ARGUMENTS -DCMAKE_INCLUDE_PATH=${VegaFEM_CMAKE_INCLUDE_PATH})
-    set(GL_ARGUMENTS ${GL_ARGUMENTS} -DCMAKE_LIBRARY_PATH=${VegaFEM_CMAKE_LIBRARY_PATH})
-  endif()
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
@@ -109,7 +93,8 @@ if(NOT DEFINED VegaFEM_DIR)
       -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
       -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
       -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
-      ${GL_ARGUMENTS}
+      ${VegaFEM_CMAKE_INCLUDE_PATH}
+      ${VegaFEM_CMAKE_LIBRARY_PATH}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${VegaFEM_DEPENDENCIES}

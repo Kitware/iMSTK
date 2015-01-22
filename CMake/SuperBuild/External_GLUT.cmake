@@ -34,10 +34,11 @@
 #
 ###########################################################################
 #
-# Assimp
+# GLUT
 #
-set(Assimp_TAG "27f37715824e0b0ac68b356dea259f57c831745f")
-set(Assimp_REPOSITORY ${git_protocol}://github.com/ricortiz/assimp.git)
+
+set(GLUT_TAG "b05e6ba4ce27b4c32981dcc5e34ed37a97695a06")
+set(GLUT_REPOSITORY ${git_protocol}://github.com/ricortiz/FreeGLUT.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -47,16 +48,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED Assimp_DIR AND NOT EXISTS ${Assimp_DIR})
-  message(FATAL_ERROR "Assimp_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED GLUT_DIR AND NOT EXISTS ${GLUT_DIR})
+  message(FATAL_ERROR "GLUT_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(Assimp_DEPENDENCIES "")
+set(GLUT_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Assimp)
+SimMedTKCheckDependencies(GLUT)
 
-set(proj Assimp)
+set(proj GLUT)
 
 if(NOT DEFINED ${proj}_DIR)
 
@@ -85,14 +86,12 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
-      -DASSIMP_BUILD_TESTS:BOOL=OFF
-      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
+      -DFREEGLUT_BUILD_DEMOS:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
+  set(${proj}_DIR ${ep_install_dir}/)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")

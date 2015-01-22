@@ -34,7 +34,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -78,6 +78,11 @@ set(sep "^^")
 # The item of this list should have the following form: -D<EP>_DIR:PATH=${<EP>_DIR}
 # where '<EP>' is an external project name.
 set(SimMedTK_SUPERBUILD_EP_ARGS)
+
+# Set directories where to find the external projects
+set(SimMedTK_SUPERBUILD_EP_ARGS
+  -DCMAKE_LIBRARY_PATH:PATH=$ep_install_dir}/lib
+  -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include)
 
 #-----------------------------------------------------------------------------
 # Check for the dependencies

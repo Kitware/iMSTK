@@ -10,8 +10,6 @@ mark_as_advanced(BUILD_SHARED_LIBS)
 list(INSERT CMAKE_MODULE_PATH 0
   "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
-include(SimMedTKMacros)
-
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
 #
@@ -37,10 +35,6 @@ if(NOT GIT_FOUND)
   message(FATAL_ERROR "error: Install Git and try to re-configure")
 endif()
 
-find_package(OpenGL REQUIRED)
-simmedtk_find_package(GLEW REQUIRED)
-simmedtk_find_package(GLUT REQUIRED)
-
 #-----------------------------------------------------------------------------
 # Superbuild script
 #
@@ -60,6 +54,16 @@ endif ()
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
+include(SimMedTKMacros)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(VegaFEM REQUIRED CONFIG)
+find_package(glfw3 REQUIRED CONFIG)
+find_package(Assimp REQUIRED CONFIG)
+find_package(Eigen3 REQUIRED)
+find_package(Qt4 REQUIRED QtOpenGL QtCore QtGui)
+
 if(WIN32)
   set(THREADS_USE_PTHREADS_WIN32 1)
 endif(WIN32)
@@ -67,8 +71,6 @@ simmedtk_find_package(PThreads REQUIRED)
 if(THREADS_FOUND)
   include_directories(${THREADS_PTHREADS_INCLUDE_DIR})
 endif()
-
-find_package(Qt4 REQUIRED QtOpenGL QtCore QtGui)
 
 simmedtk_find_package(QGLViewer REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
@@ -84,10 +86,6 @@ simmedtk_find_package(Audiere REQUIRED)
 simmedtk_find_package(OpenHaptics)
 simmedtk_find_package(V8 REQUIRED)
 
-find_package(VegaFEM REQUIRED CONFIG)
-find_package(glfw3 REQUIRED CONFIG)
-find_package(Assimp REQUIRED CONFIG)
-find_package(Eigen3 REQUIRED)
 
 if(BUILD_EXTERNAL_DEVICES)
   simmedtk_find_package(ADU REQUIRED)

@@ -34,10 +34,11 @@
 #
 ###########################################################################
 #
-# Assimp
+# GLEW
 #
-set(Assimp_TAG "27f37715824e0b0ac68b356dea259f57c831745f")
-set(Assimp_REPOSITORY ${git_protocol}://github.com/ricortiz/assimp.git)
+
+set(GLEW_TAG "636e4e6d760346f8a3fe8a260cca4d735289e9c7")
+set(GLEW_REPOSITORY ${git_protocol}://github.com/ricortiz/glew.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -47,16 +48,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED Assimp_DIR AND NOT EXISTS ${Assimp_DIR})
-  message(FATAL_ERROR "Assimp_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED GLEW_DIR AND NOT EXISTS ${GLEW_DIR})
+  message(FATAL_ERROR "GLEW_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(Assimp_DEPENDENCIES "")
+set(GLEW_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Assimp)
+SimMedTKCheckDependencies(GLEW)
 
-set(proj Assimp)
+set(proj GLEW)
 
 if(NOT DEFINED ${proj}_DIR)
 
@@ -85,14 +86,11 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
-      -DASSIMP_BUILD_TESTS:BOOL=OFF
-      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
+  set(${proj}_DIR ${ep_install_dir}/)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")

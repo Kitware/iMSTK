@@ -37,9 +37,8 @@
 # Eigen
 #
 
-set(proj Eigen)
-set(${proj}_SHA1 "b826f665bdfe31784795eef79c75540db71ab702")
-set(${proj}_URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.gz)
+set(Eigen_SHA1 "b826f665bdfe31784795eef79c75540db71ab702")
+set(Eigen_URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.gz)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -49,14 +48,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
-  message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED Eigen_DIR AND NOT EXISTS ${Eigen_DIR})
+  message(FATAL_ERROR "Eigen_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(${proj}_DEPENDENCIES "")
+set(Eigen_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(${proj})
+SimMedTKCheckDependencies(Eigen)
+
+set(proj Eigen)
 
 if(NOT DEFINED ${proj}_DIR)
 
