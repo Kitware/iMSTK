@@ -1048,8 +1048,10 @@ void smViewer::draw()
     adjustFPS();
 
     glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
     glLoadMatrixf(camera.getProjMatRef());
     glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
     glLoadMatrixf(camera.getViewMatRef());
 
     glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
@@ -1059,16 +1061,10 @@ void smViewer::draw()
 
     enableLights();
 
-    glUseProgramObjectARB(0);
-    glDisable(GL_VERTEX_PROGRAM_ARB);
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
     {
         smGLUtils::fadeBackgroundDraw();
     }
-
-    setToDefaults();
 
     for (smInt i = 0; i < objectList.size(); i++)
     {
@@ -1087,9 +1083,6 @@ void smViewer::draw()
         renderScene(param);
     }
 
-    //for font display
-    setToDefaults();
-
     for (smInt i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->drawOrder == SIMMEDTK_DRAW_AFTEROBJECTS);
@@ -1097,15 +1090,10 @@ void smViewer::draw()
         objectList[i]->draw(param);
     }
 
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glUseProgramObjectARB(0);
-    glDisable(GL_VERTEX_PROGRAM_ARB);
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
-    glPopAttrib();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
 
     endModule();
 }
