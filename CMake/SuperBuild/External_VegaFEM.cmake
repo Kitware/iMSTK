@@ -37,6 +37,9 @@
 # VegaFEM
 #
 
+set(VegaFEM_TAG "eb9d7c11de6c0f600a91a01362781624d4caf21e")
+set(VegaFEM_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
+
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
 if(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED)
@@ -55,8 +58,6 @@ set(VegaFEM_DEPENDENCIES GLEW GLUT)
 SimMedTKCheckDependencies(VegaFEM)
 
 set(proj VegaFEM)
-set(${proj}_TAG "6b06c92ee4fa1b208648d8bc8de542329e31cccc")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
 
 if(NOT DEFINED VegaFEM_DIR)
 
