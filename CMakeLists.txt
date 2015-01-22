@@ -74,7 +74,6 @@ simmedtk_find_package(QGLViewer REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 
-simmedtk_find_package(Eigen3 REQUIRED)
 simmedtk_find_package(Boost REQUIRED
   COMPONENTS
     thread
@@ -84,9 +83,11 @@ add_definitions(-DBOOST_ALL_NO_LIB=1)
 simmedtk_find_package(Audiere REQUIRED)
 simmedtk_find_package(OpenHaptics)
 simmedtk_find_package(V8 REQUIRED)
-simmedtk_find_package(Assimp REQUIRED CONFIG)
-simmedtk_find_package(VegaFEM REQUIRED CONFIG)
-simmedtk_find_package(glfw3 REQUIRED CONFIG)
+
+find_package(VegaFEM REQUIRED CONFIG)
+find_package(glfw3 REQUIRED CONFIG)
+find_package(Assimp REQUIRED CONFIG)
+find_package(Eigen3 REQUIRED)
 
 if(BUILD_EXTERNAL_DEVICES)
   simmedtk_find_package(ADU REQUIRED)

@@ -65,11 +65,6 @@ endif()
 add_library(simmedtk
   ${sources_simmedtk})
 
-# target_include_directories(simmedtk
-#   PUBLIC
-#     ${VegaFEM_INCLUDE_DIRS}
-# )
-
 # NEWLIB
 #add_library(simmedtk
 #  dummy_source.cpp # Needed to get the language for the simmedtk library. It can be empty.
@@ -82,9 +77,6 @@ target_link_libraries(simmedtk
   ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
-  Qt4::QtOpenGL
-  Qt4::QtCore
-  Qt4::QtGui
   ${GLEW_LIBRARY}
   ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
@@ -98,6 +90,9 @@ target_link_libraries(simmedtk
   ${NIDAQ_mx_LIBRARY}
   ${DevIL_LIBRARY}
   ${CMAKE_THREAD_LIBS_INIT}
+  Qt4::QtOpenGL
+  Qt4::QtCore
+  Qt4::QtGui
   VegaFEM::configFile
   VegaFEM::vega-getopts
   VegaFEM::sceneObject

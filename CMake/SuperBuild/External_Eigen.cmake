@@ -34,12 +34,12 @@
 #
 ###########################################################################
 #
-# VegaFEM
+# Eigen
 #
 
-set(proj VegaFEM)
-set(${proj}_TAG "6b06c92ee4fa1b208648d8bc8de542329e31cccc")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
+set(proj Eigen)
+set(${proj}_SHA1 "b826f665bdfe31784795eef79c75540db71ab702")
+set(${proj}_URL http://bitbucket.org/eigen/eigen/get/3.2.4.tar.gz)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -49,8 +49,8 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
-  message(FATAL_ERROR "VegaFEM_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
+  message(FATAL_ERROR "${proj}_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
 set(${proj}_DEPENDENCIES "")
@@ -58,27 +58,8 @@ set(${proj}_DEPENDENCIES "")
 # Include dependent projects if any
 SimMedTKCheckDependencies(${proj})
 
-if(NOT DEFINED VegaFEM_DIR)
+if(NOT DEFINED ${proj}_DIR)
 
-  set(VegaFEM_CMAKE_INCLUDE_PATH)
-  set(VegaFEM_CMAKE_LIBRARY_PATH)
-  set(GL_ARGUMENTS)
-  if(GLUT_INCLUDE_DIR AND GLUT_glut_LIBRARY)
-    get_filename_component(GLUT_INCLUDE_PREFIX "${GLUT_INCLUDE_DIR}" PATH)
-    get_filename_component(GLUT_LIB_PREFIX "${GLUT_glut_LIBRARY}" PATH)
-  endif()
-  if(GLEW_INCLUDE_DIR AND GLEW_LIBRARY)
-    get_filename_component(GLEW_INCLUDE_PREFIX "${GLEW_INCLUDE_DIR}" PATH)
-    get_filename_component(GLEW_LIB_PREFIX "${GLEW_LIBRARY}" PATH)
-  endif()
-
-  set(VegaFEM_CMAKE_INCLUDE_PATH "${GLUT_INCLUDE_PREFIX}${sep}${GLEW_INCLUDE_PREFIX}")
-  set(VegaFEM_CMAKE_LIBRARY_PATH "${GLUT_LIB_PREFIX}${sep}${GLEW_LIB_PREFIX}")
-
-  if(VegaFEM_CMAKE_INCLUDE_PATH AND VegaFEM_CMAKE_LIBRARY_PATH)
-    set(GL_ARGUMENTS -DCMAKE_INCLUDE_PATH=${VegaFEM_CMAKE_INCLUDE_PATH})
-    set(GL_ARGUMENTS ${GL_ARGUMENTS} -DCMAKE_LIBRARY_PATH=${VegaFEM_CMAKE_LIBRARY_PATH})
-  endif()
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
@@ -93,31 +74,28 @@ if(NOT DEFINED VegaFEM_DIR)
     SOURCE_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build
     PREFIX ${CMAKE_BINARY_DIR}/SuperBuild/${proj}${ep_suffix}
-    GIT_REPOSITORY ${${proj}_REPOSITORY}
-    GIT_TAG ${${proj}_TAG}
+    URL ${${proj}_URL}
+    URL_HASH SHA1=${${proj}_SHA1}
     UPDATE_COMMAND ""
 #     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
-    LIST_SEPARATOR ${sep}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
-      -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
-      -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
-      -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
-      ${GL_ARGUMENTS}
+      -DBUILD_TESTING:BOOL=ON
+      -DEIGEN_BUILD_PKGCONFIG:BOOL=OFF
+      -DEIGEN_INCLUDE_INSTALL_DIR:PATH=${ep_install_dir}/include
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
-      ${VegaFEM_DEPENDENCIES}
+      ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/VegaFEM)
+  set(${proj}_DIR ${ep_install_dir})
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DEIGEN3_INCLUDE_DIR:PATH=${ep_install_dir}/include)

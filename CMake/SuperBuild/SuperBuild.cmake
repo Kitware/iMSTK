@@ -34,7 +34,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -69,14 +69,18 @@ else()
   set(gen "${CMAKE_GENERATOR}")
 endif()
 
+# Use to pass list to the ExternalProject_Add CMAKE_ARGS directive:
+set(sep "^^")
+
 #-----------------------------------------------------------------------------
-# Include remote modules
-#
 # This variable will contain the list of CMake variable specific to each external project
-# that should passed to SimMedTK.
+# that SimMedTK depends on.
 # The item of this list should have the following form: -D<EP>_DIR:PATH=${<EP>_DIR}
 # where '<EP>' is an external project name.
 set(SimMedTK_SUPERBUILD_EP_ARGS)
+
+#-----------------------------------------------------------------------------
+# Check for the dependencies
 SimMedTKCheckDependencies(SimMedTK)
 
 #-----------------------------------------------------------------------------
