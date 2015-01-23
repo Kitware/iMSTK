@@ -102,6 +102,13 @@ if(APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
+# Set CMake Windows variable to pass down the external project
+set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
+if(WIN32)
+  list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+    -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE})
+endif(WIN32)
+#-----------------------------------------------------------------------------
 # SimMedTK Configure
 #
 SET(proj SimMedTK-Configure)
@@ -111,6 +118,7 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
     ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+    ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
     -DSimMedTK_SUPERBUILD:BOOL=OFF
 #     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
 #     -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
@@ -120,8 +128,8 @@ ExternalProject_Add(${proj}
 #     -DSimMedTK_INSTALL_LIB_DIR:STRING=${SimMedTK_INSTALL_LIB_DIR}
 #     -DSimMedTK_INSTALL_INCLUDE_DIR:STRING=${SimMedTK_INSTALL_INCLUDE_DIR}
 #     -DSimMedTK_INSTALL_DOC_DIR:STRING=${SimMedTK_INSTALL_DOC_DIR}
-    -DSimMedTK_BUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
 #     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+    -DSimMedTK_BUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}
     -DSimMedTK_C_FLAGS:STRING=${SimMedTK_C_FLAGS}
