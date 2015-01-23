@@ -37,8 +37,8 @@
 # GLUT
 #
 
-set(GLUT_TAG "e6b4035a02c3f3f75af3161d1c576ff9f9bdd0cf")
-set(GLUT_REPOSITORY ${git_protocol}://github.com/ricortiz/FreeGLUT.git)
+set(GLUT_TAG "5600276adafb4be05985c4799b32f03f00a0a9b0")
+set(GLUT_REPOSITORY ${git_protocol}://github.com/dcnieho/FreeGLUT.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -85,7 +85,7 @@ if(NOT DEFINED ${proj}_DIR)
     UPDATE_COMMAND ""
 #     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
-    CMAKE_ARGS
+    CONFIGURE_COMMAND ${CMAKE_COMMAND} ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/freeglut/freeglut
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}

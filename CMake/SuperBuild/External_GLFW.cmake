@@ -37,9 +37,8 @@
 # GLFW
 #
 
-set(proj GLFW)
-set(${proj}_TAG "4188c263e31ec3d5da99a77d939ab56bc199fda6")
-set(${proj}_REPOSITORY ${git_protocol}://github.com/glfw/glfw.git)
+set(GLFW_TAG "c87db1df6c0d2d956cfd78b206c3c4aefbca3cc7")
+set(GLFW_REPOSITORY ${git_protocol}://github.com/ricortiz/glfw.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -49,14 +48,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED ${proj}_DIR AND NOT EXISTS ${${proj}_DIR})
+if(DEFINED GLFW_DIR AND NOT EXISTS ${GLFW_DIR})
   message(FATAL_ERROR "GLFW_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(${proj}_DEPENDENCIES "")
+set(GLFW_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(${proj})
+SimMedTKCheckDependencies(GLFW)
+
+set(proj GLFW)
 
 if(NOT DEFINED ${proj}_DIR)
 

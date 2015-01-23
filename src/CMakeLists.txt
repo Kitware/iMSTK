@@ -77,13 +77,10 @@ target_link_libraries(simmedtk
   ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
-  ${GLEW_LIBRARY}
-  ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARIES}
   ${AUDIERE_LIBRARY}
-  ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
   ${ILU_LIBRARIES}
   ${IL_LIBRARIES}
@@ -106,6 +103,8 @@ target_link_libraries(simmedtk
   VegaFEM::isotropicHyperelasticFEM
   VegaFEM::loadList
   Threads::Threads
+  GLEW::GLEW
+  GLUT::GLUT
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)
@@ -122,13 +121,10 @@ target_link_libraries(externalDevices
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${QT_LIBRARIES}
-  ${GLEW_LIBRARY}
-  ${GLUT_LIBRARY}
   ${OPENGL_LIBRARIES}
   ${ADU_LIBRARY}
   ${ASSIMP_LIBRARY}
   ${AUDIERE_LIBRARY}
-  ${GLUT_glut_LIBRARY}
   ${ILUT_LIBRARIES}
   ${ILU_LIBRARIES}
   ${IL_LIBRARIES}
