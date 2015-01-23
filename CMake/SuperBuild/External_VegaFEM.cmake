@@ -53,6 +53,9 @@ if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
 endif()
 
 set(VegaFEM_DEPENDENCIES GLEW GLUT)
+if(WIN32)
+  list(APPEND VegaFEM_DEPENDENCIES PTHREAD)
+endif(WIN32)
 
 # Include dependent projects if any
 SimMedTKCheckDependencies(VegaFEM)
@@ -61,8 +64,13 @@ set(proj VegaFEM)
 
 if(NOT DEFINED VegaFEM_DIR)
 
-  set(VegaFEM_CMAKE_INCLUDE_PATH -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include)
-  set(VegaFEM_CMAKE_LIBRARY_PATH -DCMAKE_LIBRARY_PATH:PATH=${ep_install_dir}/lib)
+  set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
+  if(WIN32)
+    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+      -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include
+      -DCMAKE_LIBRARY_PATH:PATH=${ep_install_dir}/lib
+      -DCMAKE_REQUIRED_INCLUDES:STRING=${ep_install_dir}/include)
+  endif(WIN32)
 
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
@@ -94,8 +102,7 @@ if(NOT DEFINED VegaFEM_DIR)
       -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
       -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
       -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
-      ${VegaFEM_CMAKE_INCLUDE_PATH}
-      ${VegaFEM_CMAKE_LIBRARY_PATH}
+      ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${VegaFEM_DEPENDENCIES}

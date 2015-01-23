@@ -1,7 +1,6 @@
 
 add_executable(vegaFemExample main.cpp  vegaFemExample.cpp vegaFemExample.h)
-target_link_libraries(vegaFemExample simmedtk
-  ${QT_LIBRARIES})
+target_link_libraries(vegaFemExample simmedtk)
 
 target_include_directories(vegaFemExample
   PUBLIC

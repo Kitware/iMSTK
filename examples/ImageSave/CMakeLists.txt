@@ -1,7 +1,6 @@
 
 add_executable(ImageSave ImageSave.cpp ImageSave.h)
-target_link_libraries(ImageSave simmedtk
-  ${QT_LIBRARIES})
+target_link_libraries(ImageSave simmedtk)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(ImageSave

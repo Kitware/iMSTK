@@ -34,7 +34,10 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT DevIL)
+if(WIN32)
+  list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
+endif(WIN32)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -81,7 +84,7 @@ set(SimMedTK_SUPERBUILD_EP_ARGS)
 
 # Set directories where to find the external projects
 set(SimMedTK_SUPERBUILD_EP_ARGS
-  -DCMAKE_LIBRARY_PATH:PATH=$ep_install_dir}/lib
+  -DCMAKE_LIBRARY_PATH:PATH=${ep_install_dir}/lib
   -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include)
 
 #-----------------------------------------------------------------------------

@@ -34,7 +34,7 @@
 #
 ###########################################################################
 
-macro (simmedtk_find_package package)
+macro (simmedtk_find_package package_name)
   if (WIN32)
     # TODO: Eventually we won't be needing this
     set(CMAKE_INCLUDE_PATH
@@ -48,7 +48,7 @@ macro (simmedtk_find_package package)
       )
   endif (WIN32)
 
-  find_package(${package} ${ARGN})
+  find_package(${package_name} ${ARGN})
 endmacro ()
 
 function(simmedtk_install_library target)

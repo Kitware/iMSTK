@@ -34,10 +34,11 @@
 #
 ###########################################################################
 #
-# Assimp
+# PTHREAD
 #
-set(Assimp_TAG "a94e668486fd65bb2b16178a45ee72d14c93acf2")
-set(Assimp_REPOSITORY ${git_protocol}://github.com/ricortiz/assimp.git)
+
+set(PTHREAD_TAG "38821d529407dcb0b4661c6805d7b1bf83f3204d")
+set(PTHREAD_REPOSITORY ${git_protocol}://github.com/songdongsheng/libpthread.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -47,16 +48,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED Assimp_DIR AND NOT EXISTS ${Assimp_DIR})
-  message(FATAL_ERROR "Assimp_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED PTHREAD_DIR AND NOT EXISTS ${PTHREAD_DIR})
+  message(FATAL_ERROR "PTHREAD_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(Assimp_DEPENDENCIES "")
+set(PTHREAD_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Assimp)
+SimMedTKCheckDependencies(PTHREAD)
 
-set(proj Assimp)
+set(proj PTHREAD)
 
 if(NOT DEFINED ${proj}_DIR)
 
@@ -81,21 +82,18 @@ if(NOT DEFINED ${proj}_DIR)
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
-      -DASSIMP_BUILD_TESTS:BOOL=OFF
-      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
+  set(${proj}_DIR ${ep_install_dir})
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
 list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DCMAKE_REQUIRED_INCLUDES:PATH=${ep_install_dir}/include)

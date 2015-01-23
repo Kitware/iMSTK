@@ -105,7 +105,7 @@ target_link_libraries(simmedtk
   VegaFEM::elasticForceModel
   VegaFEM::isotropicHyperelasticFEM
   VegaFEM::loadList
-
+  Threads::Threads
 )
 
 if(SIMMEDTK_USE_PHANTOM_OMNI)
