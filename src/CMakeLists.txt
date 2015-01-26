@@ -119,7 +119,6 @@ add_library(sofmis
 # TODO: There are a lot of missing libraries here; look at the available
 # variables in the cmake-gui.
 target_link_libraries(sofmis
-  ${QGLVIEWER_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
   ${QT_LIBRARIES}
