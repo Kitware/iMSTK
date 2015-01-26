@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005, 
+  Copyright (c) 2005,
 	  Aaron Lefohn	  (lefohn@cs.ucdavis.edu)
 	  Robert Strzodka (strzodka@stanford.edu)
 	  Adam Moerschell (atmoerschell@ucdavis.edu)
@@ -9,40 +9,40 @@
   http://www.opensource.org/licenses/bsd-license.php for more detail.
 
   *************************************************************
-  Redistribution and use in source and binary forms, with or 
-  without modification, are permitted provided that the following 
+  Redistribution and use in source and binary forms, with or
+  without modification, are permitted provided that the following
   conditions are met:
 
-  Redistributions of source code must retain the above copyright notice, 
-  this list of conditions and the following disclaimer. 
+  Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
 
-  Redistributions in binary form must reproduce the above copyright notice, 
-  this list of conditions and the following disclaimer in the documentation 
-  and/or other materials provided with the distribution. 
+  Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
 
-  Neither the name of the University of Californa, Davis nor the names of 
-  the contributors may be used to endorse or promote products derived 
+  Neither the name of the University of Californa, Davis nor the names of
+  the contributors may be used to endorse or promote products derived
   from this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
-  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
   OF SUCH DAMAGE.
 */
 
 #ifndef UCDAVIS_FRAMEBUFFER_OBJECT_H
 #define UCDAVIS_FRAMEBUFFER_OBJECT_H
 
-#include <GL/glew.h>
+#include <smCore/smConfig.h>
 #include <iostream>
 
 /*!
@@ -59,9 +59,9 @@ share depth buffers between multiple sets of color buffers/textures and
 are a complete replacement for pbuffers.
 
 Performance Notes:
-  1) It is more efficient (but not required) to call Bind() 
+  1) It is more efficient (but not required) to call Bind()
      on an FBO before making multiple method calls. For example:
-		
+
       FramebufferObject fbo;
       fbo.Bind();
       fbo.AttachTexture(GL_TEXTURE_2D, texId0, GL_COLOR_ATTACHMENT0_EXT);
@@ -85,7 +85,7 @@ Performance Notes:
      and encourages rendundant Bind/Unbind coding. Binding an FBO is
      usually much faster than enabling/disabling a pbuffer, but is
      still a costly operation. When switching between multiple FBOs
-     and a visible OpenGL framebuffer, the following usage pattern 
+     and a visible OpenGL framebuffer, the following usage pattern
      is recommended:
 
       FramebufferObject fbo1, fbo2;
@@ -111,7 +111,7 @@ public:
   void Bind();
 
   /// Bind a texture to the "attachment" point of this FBO
-  virtual void AttachTexture( GLenum texTarget, 
+  virtual void AttachTexture( GLenum texTarget,
                               GLuint texId,
                               GLenum attachment = GL_COLOR_ATTACHMENT0_EXT,
                               int mipLevel      = 0,
@@ -120,8 +120,8 @@ public:
   /// Bind an array of textures to multiple "attachment" points of this FBO
   ///  - By default, the first 'numTextures' attachments are used,
   ///    starting with GL_COLOR_ATTACHMENT0_EXT
-  virtual void AttachTextures( int numTextures, 
-                               GLenum texTarget[], 
+  virtual void AttachTextures( int numTextures,
+                               GLenum texTarget[],
                                GLuint texId[],
                                GLenum attachment[] = NULL,
                                int mipLevel[]      = NULL,
@@ -154,8 +154,8 @@ public:
 #ifndef NDEBUG
   bool IsValid( std::ostream& ostr = std::cerr );
 #else
-  bool IsValid( std::ostream& ostr = std::cerr ) { 
-    return true; 
+  bool IsValid( std::ostream& ostr = std::cerr ) {
+    return true;
   }
 #endif
 
@@ -163,7 +163,7 @@ public:
     /// Is attached type GL_RENDERBUFFER_EXT or GL_TEXTURE?
     GLenum GetAttachedType( GLenum attachment );
 
-    /// What is the Id of Renderbuffer/texture currently 
+    /// What is the Id of Renderbuffer/texture currently
     /// attached to "attachement?"
     GLuint GetAttachedId( GLenum attachment );
 
@@ -197,7 +197,7 @@ public:
 protected:
   void  _GuardedBind();
   void  _GuardedUnbind();
-  void  _FramebufferTextureND( GLenum attachment, GLenum texTarget, 
+  void  _FramebufferTextureND( GLenum attachment, GLenum texTarget,
                                GLuint texId, int mipLevel, int zSlice );
   static GLuint _GenerateFboId();
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -30,12 +30,9 @@
 #include "smRendering/smConfigRendering.h"
 #include "smCore/smErrorLog.h"
 
-#include <GL/glew.h>
-#include <GL/glut.h>
 #include <IL/ilu.h>
 #include <IL/ilut.h>
 #include <QHash>
-
 
 enum smTextureReturnType
 {

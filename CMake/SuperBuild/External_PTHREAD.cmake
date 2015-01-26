@@ -78,13 +78,14 @@ if(NOT DEFINED ${proj}_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      ${OUTPUT_DIRECTORIES}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
@@ -95,5 +96,4 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DCMAKE_REQUIRED_INCLUDES:PATH=${ep_install_dir}/include)
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

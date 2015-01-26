@@ -26,6 +26,8 @@
 #include "smSimulators/smVegaConfigFemObject.h"
 #include "omp.h"
 
+#include "configFile.h"
+
 smVegaConfigFemObject::smVegaConfigFemObject()
 {
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -27,11 +27,6 @@
 #define SMCONFIGRENDERING_H
 
 #include "smCore/smConfig.h"
-
-#ifdef SIMMEDTK_RENDERER_OPENGL
-#include <GL/glew.h>
-#include <GL/glut.h>
-#endif
 
 #include <QString>
 #include <QVector>

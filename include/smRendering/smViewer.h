@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -26,7 +26,7 @@
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
 #include <QGLViewer/qglviewer.h>
-#include <GL/glut.h>
+// #include <GL/glut.h>
 #include <QDrag>
 #include <QUrl>
 #include <QDialog>

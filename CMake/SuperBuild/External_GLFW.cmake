@@ -78,22 +78,28 @@ if(NOT DEFINED ${proj}_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-      -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/SimMedTK-build
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DGLFW_CONFIG_PATH:PATH=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build
+      -DGLFW_BUILD_TESTS:BOOL=OFF
+      -DGLFW_BUILD_EXAMPLES:BOOL=OFF
+      -DGLFW_BUILD_DOCS:BOOL=OFF
+      -DGLFW_INSTALL:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/glfw)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -Dglfw3_DIR:PATH=${${proj}_DIR})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/src/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

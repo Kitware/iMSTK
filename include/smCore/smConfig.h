@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -28,6 +28,10 @@
 #undef _UNICODE
 #include <iostream>
 #include <cstdint>
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <GL/gl.h> // for GLfloat, etc.
+
 using namespace std;
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0
@@ -81,7 +85,7 @@ public:
 #define smUFloat     unsigned float
 #define smUDouble    unsigned double
 #define smUShort     unsigned short
-#define smUChar      unsigned char      //note that smChar is used for pointer iteration over the memory block.Don't change this unless you know what you're doing  
+#define smUChar      unsigned char      //note that smChar is used for pointer iteration over the memory block.Don't change this unless you know what you're doing
 #define smReal          smFloat
 
 #define smLongInt    long int
@@ -182,7 +186,8 @@ enum smClassType
     SIMMEDTK_SMGAUZESCENEOBJECT,
     SIMMEDTK_SMSPONGESCENEOBJECT,
     SIMMEDTK_SMRIGIDNOTESCHOLYSCENEOBJECT,
-    SIMMEDTK_SMSOLDIERSCENEOBJECT
+    SIMMEDTK_SMSOLDIERSCENEOBJECT,
+    SIMMEDTK_SMVEGAFEMSCENEOBJECT
 };
 
 /// \brief these are the dispather return events

@@ -1,0 +1,39 @@
+
+simmedtk_add_library(smRendering
+  SOURCES
+    smConfigRendering.cpp
+    smFrameBuffer.cpp
+    smLight.cpp
+    smRenderer.cpp
+    smVAO.cpp
+    smVBO.cpp
+    smViewer.cpp
+  PUBLIC_HEADERS
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smCustomRenderer.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smFrameBuffer.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smGLRenderer.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smLight.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
+)
+
+target_link_libraries(smRendering
+  PRIVATE
+    smCore
+    smExternal
+    smUtilities
+    smShader
+ PUBLIC
+    Qt4::QtGui
+    Qt4::QtOpenGL
+    QGLViewer::QGLViewer
+)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(smRendering
+    PRIVATE
+      -std=c++11
+  )
+endif()

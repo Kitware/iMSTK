@@ -37,8 +37,8 @@
 # GLUT
 #
 
-set(GLUT_TAG "5600276adafb4be05985c4799b32f03f00a0a9b0")
-set(GLUT_REPOSITORY ${git_protocol}://github.com/dcnieho/FreeGLUT.git)
+set(GLUT_TAG "f4cd139604ebdf63dd3ec2f4b40886bf2cd05294")
+set(GLUT_REPOSITORY ${git_protocol}://github.com/ricortiz/FreeGLUT.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -61,7 +61,7 @@ set(proj GLUT)
 
 if(NOT DEFINED ${proj}_DIR)
 
-  # Set CMake OSX variable to pass down the external project
+  # Set CMake OSX and Windows variables to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
@@ -83,7 +83,7 @@ if(NOT DEFINED ${proj}_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CONFIGURE_COMMAND ${CMAKE_COMMAND} ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/freeglut/freeglut
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -94,6 +94,7 @@ if(NOT DEFINED ${proj}_DIR)
       -DFREEGLUT_BUILD_DEMOS:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
+      ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
@@ -103,4 +104,4 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/freeglut/freeglut/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

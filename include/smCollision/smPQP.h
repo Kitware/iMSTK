@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -22,7 +22,7 @@
   *  \author
   *  \copyright Apache License, Version 2.0.
   */
- 
+
 #ifndef SMPQP_H
 #define SMPQP_H
 
@@ -35,7 +35,6 @@
 #include "smMesh/smMesh.h"
 #include "smCore/smDataStructs.h"
 #include "smCore/smPipe.h"
-#include <Qvector>
 #include "PQP.h"
 #include "smRendering/smGLRenderer.h"
 

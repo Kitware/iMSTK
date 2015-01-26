@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -27,7 +27,6 @@
 #define SMFRAMEBUFFEROBJECT_H
 
 #include <string.h>
-#include <GL/glew.h>
 #include <QVector>
 
 #include "smCore/smConfig.h"

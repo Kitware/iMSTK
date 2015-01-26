@@ -17,3 +17,10 @@ find_package_handle_standard_args(QGLViewer
 mark_as_advanced(
   QGLVIEWER_INCLUDE_DIR
   QGLVIEWER_LIBRARY)
+
+if(QGLVIEWER_FOUND AND NOT TARGET QGLViewer::QGLViewer)
+  add_library(QGLViewer::QGLViewer INTERFACE IMPORTED)
+  set_target_properties(QGLViewer::QGLViewer PROPERTIES
+    INTERFACE_LINK_LIBRARIES "${QGLVIEWER_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${QGLVIEWER_INCLUDE_DIR}")
+endif()

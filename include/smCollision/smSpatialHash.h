@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -26,7 +26,6 @@
 #ifndef SMSPATIALHASH_H
 #define SMSPATIALHASH_H
 
-#include <QVector>
 #include "smCore/smConfig.h"
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smObjectSimulator.h"

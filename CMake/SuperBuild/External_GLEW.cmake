@@ -37,7 +37,7 @@
 # GLEW
 #
 
-set(GLEW_TAG "636e4e6d760346f8a3fe8a260cca4d735289e9c7")
+set(GLEW_TAG "e1f9e4702fe7cf9f5babb50c21fcf5a4860f2844")
 set(GLEW_REPOSITORY ${git_protocol}://github.com/ricortiz/glew.git)
 
 # Make sure this file is included only once
@@ -78,7 +78,7 @@ if(NOT DEFINED ${proj}_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -87,6 +87,7 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
@@ -96,4 +97,4 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

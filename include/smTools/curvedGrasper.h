@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -28,7 +28,6 @@
 
 #include "smSimulators/smStylusObject.h"
 #include "smMesh/smSurfaceMesh.h"
-#include "smExternalDevices/smNIUSB6008Interface.h"
 /// \brief Cruver Grasper tool
 class curvedGrasper: public smStylusRigidSceneObject
 {
@@ -84,7 +83,7 @@ public:
 
 public:
     /// \brief rendering the curved grasper
-    void curvedGrasper::draw(smDrawParam p_params);
+    void draw(smDrawParam p_params);
     /// \brief event handler
     void handleEvent(smEvent *p_event);
     /// \brief for open and close motion

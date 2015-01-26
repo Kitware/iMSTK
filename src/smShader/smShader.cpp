@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -24,11 +24,10 @@
   */
 
 #include "smShader/smShader.h"
-#include "smUtilities/smGLUtils.h"
+#include "smCore/smTextureManager.h"
 #include <fstream>
 #include <iostream>
-#include <GL/glew.h>
-#include <GL/glut.h>
+// #include <GL/glut.h>
 using namespace std;
 
 QHash<smInt, smShader *> smShader::shaders;

@@ -1,0 +1,21 @@
+
+simmedtk_add_library(smExternal
+  SOURCES
+    framebufferObject.cpp
+    renderbuffer.cpp
+  PUBLIC_HEADERS
+    ${CMAKE_SOURCE_DIR}/include/smExternal/framebufferObject.h
+    ${CMAKE_SOURCE_DIR}/include/smExternal/renderbuffer.h
+)
+
+target_link_libraries(smExternal
+  PRIVATE
+    smCore
+)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(smExternal
+    PRIVATE
+      -std=c++11
+  )
+endif()

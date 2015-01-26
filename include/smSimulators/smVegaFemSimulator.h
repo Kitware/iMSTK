@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -77,7 +77,7 @@ protected:
 
             switch (type)
             {
-            case SOFMIS_SMVEGAFEMSCENEOBJECT:
+            case SIMMEDTK_SMVEGAFEMSCENEOBJECT:
                 object->flags.isSimulatorInit = true;
                 break;
             }
@@ -99,7 +99,7 @@ protected:
             sceneObj = this->objectsSimulated[i];
 
             //ensure that dummy simulator will work on static scene objects only.
-            if (sceneObj->getType() == SOFMIS_SMVEGAFEMSCENEOBJECT)
+            if (sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT)
             {
 
                 femSceneObject = (smVegaFemSceneObject*)sceneObj;
@@ -132,7 +132,7 @@ protected:
 
         switch (p_event->eventType.eventTypeCode)
         {
-        case SOFMIS_EVENTTYPE_KEYBOARD:
+        case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
             if (keyBoardData->keyBoardKey == Qt::Key_F1)
@@ -143,7 +143,7 @@ protected:
             break;
 
 
-        case SOFMIS_EVENTTYPE_HAPTICOUT:
+        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
             hapticEventData = (smHapticOutEventData *)p_event->data;
 
             if (hapticEventData->deviceId == 1)

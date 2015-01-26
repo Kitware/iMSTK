@@ -39,8 +39,6 @@ using namespace std;
 #include <windows.h>
 #endif
 
-#include "configFile.h"
-
 enum massSpringSystemSourceType { OBJ, TETMESH, CUBICMESH, CHAIN, NONE };
 enum deformableObjectType { STVK, COROTLINFEM, LINFEM, MASSSPRING, INVERTIBLEFEM, UNSPECIFIED };
 enum invertibleMaterialType { INV_STVK, INV_NEOHOOKEAN, INV_MOONEYRIVLIN, INV_NONE };
