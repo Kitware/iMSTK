@@ -640,86 +640,6 @@ void smViewer::enableLights()
     }
 }
 
-void smViewer::renderScene(smDrawParam p_param)
-{
-
-    smSceneObject *sceneObject;
-
-    if (this->renderStage == SMRENDERSTAGE_FINALPASS)
-    {
-        glDisable(GL_CULL_FACE);
-    }
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_TRANSPARENCY)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-    }
-    else
-    {
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    smScene::smSceneIterator sceneIter;
-
-    //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
-    //only current objects and their derived classes
-    for (smInt sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
-    {
-        sceneIter.setScene(sceneList[sceneIndex], this);
-
-        //cout<<"Render:"<<sceneList[sceneIndex]->test<<endl;
-        //for(smInt j=0;j<sceneList[sceneIndex]->totalObjects;j++)
-        for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
-        {
-            //sceneObject=sceneList[sceneIndex]->sceneObjects[j];
-            sceneObject = sceneIter[j];
-
-            if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
-            {
-                continue;
-            }
-
-            glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-
-            //if the custom rendering enable only render this
-            if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
-            {
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->preDraw(sceneObject);
-                    sceneObject->customRender->draw(sceneObject);
-                    sceneObject->customRender->postDraw(sceneObject);
-                }
-            }
-            else
-            {
-                //If there is custom renderer first render the preDraw function. which is responsible for
-                //rendering before the default renderer takes place
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->preDraw(sceneObject);
-                }
-
-                //drawSMStaticObject((smStaticSceneObject *)(sceneList.at(sceneIndex)->sceneObjects.at(j)));
-                sceneObject->draw(p_param);
-
-
-                //If there is custom renderer, render the postDraw function. which is responsible for
-                //rendering after the default renderer takes place
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->postDraw(sceneObject);
-                }
-            }
-
-            glPopAttrib();
-        }
-    }
-}
-
 void setTextureMatrix()
 {
 
@@ -787,9 +707,20 @@ void smViewer::renderTextureOnView()
     glPopAttrib();
 }
 
+void smViewer::renderSceneList(smDrawParam p_param)
+{
+    smScene::smSceneIterator sceneIter;
+
+    //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
+    //only current objects and their derived classes
+    for (smInt sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
+    {
+        smGLRenderer::renderScene(sceneList[sceneIndex], p_param);
+    }
+}
+
 void smViewer::drawWithShadows(smDrawParam &p_param)
 {
-
     smLight *light = NULL;
 
     for (smInt i = 0; i < lights->size(); i++)
@@ -834,7 +765,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glViewport(0, 0, fbo->getWidth(), fbo->getHeight());
-    renderScene(p_param);
+    renderSceneList(p_param);
     glPopAttrib();
     fbo->disable();
     setTextureMatrix();
@@ -842,61 +773,6 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glPopAttrib();
-
-    renderStage = SMRENDERSTAGE_FINALPASS;
-    renderStage = SMRENDERSTAGE_DPMAPPASS;
-    glMatrixMode(GL_MODELVIEW);
-
-    //back
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        gluPerspective(120, camera.ar, camera.nearClip, camera.farClip);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        gluLookAt(-35, 38.666, 19.7, 90.8, 10.25, 200.52, -0.1239, 0.955, -0.269577); ///perspective 120 cok iyi
-        backfbo->enable();
-        glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT); // for GL_DRAW_BUFFER and GL_READ_BUFFER
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glClearColor(0, 0, 0, 1);
-        glDepthRange(0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glViewport(0, 0, backfbo->getWidth(), backfbo->getHeight());
-        renderScene(p_param);
-        glPopAttrib();
-        backfbo->disable();
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glPopAttrib();
-    }
-
-    renderStage = SMRENDERSTAGE_FINALPASS;
-    glMatrixMode(GL_MODELVIEW);
-
-    if (renderandreflection != NULL && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        renderandreflection->switchEnable();
-    }
-
-    {
-        //why is this scoped?
-        glDisable(GL_CULL_FACE);
-        renderScene(p_param);
-    }
-
-    if (renderandreflection != NULL && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        renderandreflection->switchDisable();
-    }
-
 }
 
 
@@ -1047,12 +923,8 @@ void smViewer::draw()
 
     adjustFPS();
 
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadMatrixf(camera.getProjMatRef());
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadMatrixf(camera.getViewMatRef());
+    param.projMatrix = camera.getProjMatRef();
+    param.viewMatrix = camera.getViewMatRef();
 
     glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
 
@@ -1080,7 +952,7 @@ void smViewer::draw()
     else
     {
         glDisable(GL_CULL_FACE);
-        renderScene(param);
+        renderSceneList(param);
     }
 
     for (smInt i = 0; i < objectList.size(); i++)
@@ -1089,11 +961,6 @@ void smViewer::draw()
 
         objectList[i]->draw(param);
     }
-
-    glMatrixMode(GL_MODELVIEW);
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
 
     endModule();
 }

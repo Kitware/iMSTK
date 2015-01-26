@@ -178,6 +178,8 @@ public:
     smVec3d finalDeviceRightCameraDir;
 
 protected:
+    /// \brief Renders the internal sceneList
+    void renderSceneList(smDrawParam p_param);
     /// \brief
     void initDepthBuffer();
     /// \brief Set the color and other viewer defaults
@@ -192,8 +194,6 @@ protected:
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();
-    /// \brief render scene objects
-    virtual void renderScene(smDrawParam p_param);
     /// \brief draw with shadows enabled
     void drawWithShadows(smDrawParam &p_param);
     /// \brief render depth texture for debugging
