@@ -719,6 +719,23 @@ void smViewer::renderSceneList(smDrawParam p_param)
     }
 }
 
+void smViewer::renderScene(smScene* p_scene, smDrawParam p_param)
+{
+	this->beginFrame();
+	//Setup Viewport & Clear buffers
+	glViewport(0, 0, this->width(), this->height());
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	//Load View and Projection Matrices & Render Scene
+	smGLRenderer::renderScene(p_scene, p_param);
+	//swap buffers
+	this->endFrame();
+}
+
+void smViewer::registerScene(smScene *p_scene)
+{
+	p_scene->registerForScene(this);
+}
+
 void smViewer::drawWithShadows(smDrawParam &p_param)
 {
     smLight *light = NULL;
@@ -1124,7 +1141,7 @@ void smViewer::exec()
     this->init();
 
     while (!terminateExecution) {
-        this->draw();
+        //this->draw();
         glfwPollEvents();
     }
 

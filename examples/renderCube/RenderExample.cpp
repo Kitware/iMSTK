@@ -60,6 +60,9 @@ RenderExample::RenderExample()
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(&cube);
 
+	//Register the scene with the viewer
+	viewer->registerScene(scene1);
+
     //Setup the window title in the window manager
     viewer->setWindowTitle("SimMedTK RENDER TEST");
     //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
@@ -84,13 +87,15 @@ RenderExample::RenderExample()
     //Set some viewer properties
     viewer->setScreenResolution(800, 640);
     //Set some camera parameters
-    viewer->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    viewer->camera.setFarClipDist(1000);
-    viewer->camera.setNearClipDist(0.001);
-    viewer->camera.setViewAngle(0.785398f); //45 degrees
-    viewer->camera.setCameraPos(3, 0, 5);
-    viewer->camera.setCameraFocus(0, 0, 0);
-    viewer->camera.setCameraUpVec(0, 1, 0);
+    this->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    this->camera.setFarClipDist(1000);
+    this->camera.setNearClipDist(0.001);
+    this->camera.setViewAngle(0.785398f); //45 degrees
+    this->camera.setCameraPos(3, 0, 5);
+    this->camera.setCameraFocus(0, 0, 0);
+    this->camera.setCameraUpVec(0, 1, 0);
+	this->camera.genProjMat();
+	this->camera.genViewMat();
     //Uncomment the following line for fullscreen
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
@@ -102,6 +107,18 @@ RenderExample::RenderExample()
 
     //Run the simulator framework
     simmedtkSDK->run();
+}
+
+void RenderExample::simulateMain(smSimulationMainParam p_param)
+{
+	smDrawParam drawParams;
+	drawParams.rendererObject = this->viewer;
+	drawParams.caller = this;
+	drawParams.data = NULL;
+	drawParams.projMatrix = this->camera.getProjMatRef();
+	drawParams.viewMatrix = this->camera.getViewMatRef();
+
+	viewer->renderScene(scene1, drawParams);
 }
 
 void renderExample()

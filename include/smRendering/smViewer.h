@@ -71,7 +71,7 @@ enum smRenderingStageType
 };
 
 ///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
-class smViewer : public smModule, public smEventHandler
+class smViewer : public smModule, public smEventHandler, public smSceneRenderer
 {
 protected:
     vector<smCoreClass*> objectList;
@@ -165,6 +165,12 @@ public:
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
     /// \brief set the window title
     void setWindowTitle(string);
+	/// \brief render scene using the viewer
+	void renderScene(smScene* p_scene, smDrawParam p_param);
+	/// \brief register a scene to be rendered with the viewer
+	///
+	/// \detail This function MUST be called before the renderScene function
+	void registerScene(smScene *p_scene);
     string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;

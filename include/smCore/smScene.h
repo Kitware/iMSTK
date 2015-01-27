@@ -207,4 +207,13 @@ public:
     smInt test;
 };
 
+/// \brief Inherit this class to be able to render scenes
+///
+class smSceneRenderer
+{
+public:
+	virtual void registerScene(smScene *p_scene) = 0;
+	virtual void renderScene(smScene *p_scene, smDrawParam p_param) = 0;
+};
+
 #endif
