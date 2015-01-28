@@ -70,12 +70,27 @@ enum smRenderingStageType
     SMRENDERSTAGE_FINALPASS
 };
 
+enum smRenderTargetType
+{
+    SMRENDERTARGET_SCREEN,
+    SMRENDERTARGET_FBO
+};
+
+/// \brief Describes what to render and where the rendering should take place
+struct smRenderOperation
+{
+    smScene *scene; ///< The scene full of objects to render
+    smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
+    smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
+};
+
 ///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
-class smViewer : public smModule, public smEventHandler, public smSceneRenderer
+class smViewer : public smModule, public smEventHandler
 {
 protected:
     vector<smCoreClass*> objectList;
     smIndiceArray<smLight*> *lights;
+    vector<smRenderOperation> renderOperations;
 
     ///Vertex Buffer objects
     smVBO *vboDynamicObject;
@@ -165,12 +180,9 @@ public:
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
     /// \brief set the window title
     void setWindowTitle(string);
-	/// \brief render scene using the viewer
-	void renderScene(smScene* p_scene, smDrawParam p_param);
-	/// \brief register a scene to be rendered with the viewer
-	///
-	/// \detail This function MUST be called before the renderScene function
-	void registerScene(smScene *p_scene);
+    /// \brief Registers a scene for rendering with the viewer
+    void registerScene(smScene *p_scene, smRenderTargetType p_target, smFrameBuffer *p_fbo = NULL);
+
     string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
@@ -186,6 +198,14 @@ public:
 protected:
     /// \brief Renders the internal sceneList
     void renderSceneList(smDrawParam p_param);
+    /// \brief Processes a render operation
+    void processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Processes viewerRenderDetail options
+    void processViewerOptions();
+    /// \brief Renders the render operation to screen
+    void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Renders the render operation to an FBO
+    void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief
     void initDepthBuffer();
     /// \brief Set the color and other viewer defaults

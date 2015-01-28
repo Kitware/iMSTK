@@ -60,15 +60,40 @@ RenderExample::RenderExample()
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(&cube);
 
-	//Register the scene with the viewer
-	viewer->registerScene(scene1);
+    //Register the scene with the viewer, and setup render target
+    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, NULL);
 
     //Setup the window title in the window manager
     viewer->setWindowTitle("SimMedTK RENDER TEST");
+
     //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
     viewer->addObject(this);
 
-    //Setup Scene lighting
+    //Set some viewer properties
+    viewer->setScreenResolution(800, 640);
+
+    //Uncomment the following line for fullscreen
+    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+
+    //Setup lights
+    this->setupLights();
+
+    //Set some camera parameters
+    this->setupCamera();
+
+    //Link up the event system between the viewer and the SimMedTK SDK
+    //Note: This allows some default behavior like mouse and keyboard control
+    viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
+
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(viewer, SIMMEDTK_EVENTTYPE_KEYBOARD);
+
+    //Run the simulator framework
+    simmedtkSDK->run();
+}
+
+void RenderExample::setupLights()
+{
+     //Setup Scene lighting
     smLight* light = new smLight("SceneLight1",
                                  SIMMEDTK_LIGHT_SPOTLIGHT,
                                  SIMMEDTK_LIGHTPOS_WORLD);
@@ -83,42 +108,23 @@ RenderExample::RenderExample()
     light->attn_linear = 0.0;
     light->attn_quadratic = 0.0;
     viewer->addLight(light);
+}
 
-    //Set some viewer properties
-    viewer->setScreenResolution(800, 640);
-    //Set some camera parameters
-    this->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    this->camera.setFarClipDist(1000);
-    this->camera.setNearClipDist(0.001);
-    this->camera.setViewAngle(0.785398f); //45 degrees
-    this->camera.setCameraPos(3, 0, 5);
-    this->camera.setCameraFocus(0, 0, 0);
-    this->camera.setCameraUpVec(0, 1, 0);
-	this->camera.genProjMat();
-	this->camera.genViewMat();
-    //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
-
-    //Link up the event system between the viewer and the SimMedTK SDK
-    //Note: This allows some default behavior like mouse and keyboard control
-    viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
-
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(viewer, SIMMEDTK_EVENTTYPE_KEYBOARD);
-
-    //Run the simulator framework
-    simmedtkSDK->run();
+void RenderExample::setupCamera()
+{
+    viewer->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    viewer->camera.setFarClipDist(1000);
+    viewer->camera.setNearClipDist(0.001);
+    viewer->camera.setViewAngle(0.785398f); //45 degrees
+    viewer->camera.setCameraPos(3, 0, 5);
+    viewer->camera.setCameraFocus(0, 0, 0);
+    viewer->camera.setCameraUpVec(0, 1, 0);
+    viewer->camera.genProjMat();
+    viewer->camera.genViewMat();
 }
 
 void RenderExample::simulateMain(smSimulationMainParam p_param)
 {
-	smDrawParam drawParams;
-	drawParams.rendererObject = this->viewer;
-	drawParams.caller = this;
-	drawParams.data = NULL;
-	drawParams.projMatrix = this->camera.getProjMatRef();
-	drawParams.viewMatrix = this->camera.getViewMatRef();
-
-	viewer->renderScene(scene1, drawParams);
 }
 
 void renderExample()

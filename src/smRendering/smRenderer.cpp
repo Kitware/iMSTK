@@ -566,6 +566,7 @@ void smGLRenderer::renderScene(smScene* p_scene,
     smSceneObject *sceneObject;
     smScene::smSceneIterator sceneIter;
 
+    assert(p_scene);
     assert(p_param.projMatrix);
     assert(p_param.viewMatrix);
 

@@ -38,7 +38,9 @@ private:
     smScene *scene1;
     smStaticSceneObject cube;
     smViewer *viewer;
-	smCamera camera;
+
+    void setupLights();
+    void setupCamera();
 };
 
 void renderExample();

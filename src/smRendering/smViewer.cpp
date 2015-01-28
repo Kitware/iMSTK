@@ -719,21 +719,76 @@ void smViewer::renderSceneList(smDrawParam p_param)
     }
 }
 
-void smViewer::renderScene(smScene* p_scene, smDrawParam p_param)
+void smViewer::processViewerOptions()
 {
-	this->beginFrame();
-	//Setup Viewport & Clear buffers
-	glViewport(0, 0, this->width(), this->height());
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	//Load View and Projection Matrices & Render Scene
-	smGLRenderer::renderScene(p_scene, p_param);
-	//swap buffers
-	this->endFrame();
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
+    {
+        smGLUtils::fadeBackgroundDraw();
+    }
 }
 
-void smViewer::registerScene(smScene *p_scene)
+void smViewer::processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param)
 {
-	p_scene->registerForScene(this);
+    switch (p_rop.target)
+    {
+    case SMRENDERTARGET_SCREEN:
+        renderToScreen(p_rop, p_param);
+        break;
+    case SMRENDERTARGET_FBO:
+        renderToFBO(p_rop, p_param);
+        break;
+    default:
+        assert(0);
+    }
+}
+
+void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
+{
+    assert(p_rop.fbo);
+    //Enable FBO for rendering
+    p_rop.fbo->enable();
+    //Setup Viewport & Clear buffers
+    glViewport(0, 0, p_rop.fbo->getWidth(), p_rop.fbo->getHeight());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //Enable lights
+    enableLights();
+    processViewerOptions();
+    //Render Scene
+     smGLRenderer::renderScene(p_rop.scene, p_param);
+    //Disable FBO
+    p_rop.fbo->disable();
+}
+
+void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param)
+{
+    //Setup Viewport & Clear buffers
+    glViewport(0, 0, this->width(), this->height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //Enable lights
+    enableLights();
+    processViewerOptions();
+    //Render Scene
+    smGLRenderer::renderScene(p_rop.scene, p_param);
+}
+
+void smViewer::registerScene(smScene *p_scene, smRenderTargetType p_target, smFrameBuffer *p_fbo)
+{
+    smRenderOperation rop;
+
+    //sanity checks
+    assert(p_scene);
+    if (p_target == SMRENDERTARGET_FBO)
+    {
+        assert(p_fbo);
+    }
+
+    rop.target = p_target;
+    rop.scene = p_scene;
+    rop.fbo = p_fbo;
+
+    p_scene->registerForScene(this);
+    renderOperations.push_back(rop);
+
 }
 
 void smViewer::drawWithShadows(smDrawParam &p_param)
@@ -943,18 +998,6 @@ void smViewer::draw()
     param.projMatrix = camera.getProjMatRef();
     param.viewMatrix = camera.getViewMatRef();
 
-    glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
-
-    glClearColor(0.05f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    enableLights();
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
-    {
-        smGLUtils::fadeBackgroundDraw();
-    }
-
     for (smInt i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->drawOrder == SIMMEDTK_DRAW_BEFOREOBJECTS);
@@ -968,8 +1011,11 @@ void smViewer::draw()
     }
     else
     {
-        glDisable(GL_CULL_FACE);
-        renderSceneList(param);
+        //renderSceneList(param);
+        for (int i = 0; i < renderOperations.size(); i++)
+        {
+            processRenderOperation(renderOperations[i], param);
+        }
     }
 
     for (smInt i = 0; i < objectList.size(); i++)
@@ -1141,7 +1187,7 @@ void smViewer::exec()
     this->init();
 
     while (!terminateExecution) {
-        //this->draw();
+        this->draw();
         glfwPollEvents();
     }
 
