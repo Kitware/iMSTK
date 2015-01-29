@@ -77,6 +77,13 @@ void SetVSync(bool sync)
 #endif
 }
 
+smRenderOperation::smRenderOperation()
+{
+    fbo = NULL;
+    scene = NULL;
+    fboName = "";
+}
+
 smViewer::smViewer(smErrorLog *log)
 {
 
@@ -279,6 +286,8 @@ void smViewer::init()
     smTextureManager::initGLTextures();
     smShader::initGLShaders(param);
     smVAO::initVAOs(param);
+
+    initFboListItems();
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
     {
@@ -707,6 +716,65 @@ void smViewer::renderTextureOnView()
     glPopAttrib();
 }
 
+void smViewer::addFBO(const smString &p_fboName,
+                      smTexture *p_colorTex,
+                      smTexture *p_depthTex,
+                      smUInt p_width, smUInt p_height)
+{
+    smFboListItem item;
+
+    item.fboName = p_fboName;
+    item.width = p_width;
+    item.height = p_height;
+    if (p_colorTex)
+    {
+        item.colorTex = p_colorTex;
+    }
+    if (p_depthTex)
+    {
+        item.depthTex = p_depthTex;
+    }
+
+    this->fboListItems.push_back(item);
+}
+
+void smViewer::initFboListItems()
+{
+    for (int i = 0; i < this->fboListItems.size(); i++)
+    {
+        smFboListItem *item = &fboListItems[i];
+        item->fbo = new smFrameBuffer();
+        item->fbo->setDim(item->width, item->height);
+        if (item->colorTex)
+        {
+            item->fbo->attachColorTexture(item->colorTex, 0);
+        }
+        if (item->depthTex)
+        {
+            item->fbo->attachDepthTexture(item->depthTex);
+        }
+        for (int j = 0; j < renderOperations.size(); j++)
+        {
+            if (renderOperations[j].fboName == item->fboName)
+            {
+                renderOperations[j].fbo = item->fbo;
+            }
+        }
+    }
+}
+
+void smViewer::destroyFboListItems()
+{
+    for (int i = 0; i < this->fboListItems.size(); i++)
+    {
+        if (fboListItems[i].fbo)
+        {
+            delete (fboListItems[i].fbo);
+            fboListItems[i].fbo = NULL;
+        }
+    }
+}
+
 void smViewer::renderSceneList(smDrawParam p_param)
 {
     smScene::smSceneIterator sceneIter;
@@ -771,7 +839,9 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     smGLRenderer::renderScene(p_rop.scene, p_param);
 }
 
-void smViewer::registerScene(smScene *p_scene, smRenderTargetType p_target, smFrameBuffer *p_fbo)
+void smViewer::registerScene(smScene *p_scene,
+                             smRenderTargetType p_target,
+                             const smString &p_fboName)
 {
     smRenderOperation rop;
 
@@ -779,16 +849,16 @@ void smViewer::registerScene(smScene *p_scene, smRenderTargetType p_target, smFr
     assert(p_scene);
     if (p_target == SMRENDERTARGET_FBO)
     {
-        assert(p_fbo);
+        assert(p_fboName != "");
     }
 
     rop.target = p_target;
     rop.scene = p_scene;
-    rop.fbo = p_fbo;
+
+    rop.fboName = p_fboName;
 
     p_scene->registerForScene(this);
     renderOperations.push_back(rop);
-
 }
 
 void smViewer::drawWithShadows(smDrawParam &p_param)
@@ -1190,6 +1260,8 @@ void smViewer::exec()
         this->draw();
         glfwPollEvents();
     }
+
+    destroyFboListItems();
 
     //Shutdown glfw
     glfwDestroyWindow(window);

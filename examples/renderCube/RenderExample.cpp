@@ -61,7 +61,7 @@ RenderExample::RenderExample()
     scene1->addSceneObject(&cube);
 
     //Register the scene with the viewer, and setup render target
-    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, NULL);
+    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, "");
 
     //Setup the window title in the window manager
     viewer->setWindowTitle("SimMedTK RENDER TEST");
@@ -116,7 +116,7 @@ void RenderExample::setupCamera()
     viewer->camera.setFarClipDist(1000);
     viewer->camera.setNearClipDist(0.001);
     viewer->camera.setViewAngle(0.785398f); //45 degrees
-    viewer->camera.setCameraPos(3, 0, 5);
+    viewer->camera.setCameraPos(3, 3, 5);
     viewer->camera.setCameraFocus(0, 0, 0);
     viewer->camera.setCameraUpVec(0, 1, 0);
     viewer->camera.genProjMat();

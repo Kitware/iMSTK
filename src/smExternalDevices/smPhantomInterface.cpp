@@ -61,7 +61,7 @@ smPhantomInterface::smPhantomInterface()
 
     while (openDevice)
     {
-        dHandle[incr] = hdInitDevice(phantomDeviceNames[incr].toAscii().data());
+        dHandle[incr] = hdInitDevice(phantomDeviceNames[incr].data());
 
         if (HD_DEVICE_ERROR(error = hdGetError()))
         {

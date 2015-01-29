@@ -79,18 +79,31 @@ enum smRenderTargetType
 /// \brief Describes what to render and where the rendering should take place
 struct smRenderOperation
 {
+    smRenderOperation();
     smScene *scene; ///< The scene full of objects to render
     smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
+    smString fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
     smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
 };
 
-///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
+struct smFboListItem
+{
+    smString fboName; ///< String identification
+    smFrameBuffer* fbo; ///< The FBO pointer
+    smTexture *depthTex; ///< The FBO depth texture pointer
+    smTexture *colorTex; ///< The FBO color texture pointer
+    smUInt width; ///< The width of the FBO
+    smUInt height; ///< The height of the FBO
+};
+
+/// \brief Handles all rendering routines.
 class smViewer : public smModule, public smEventHandler
 {
 protected:
     vector<smCoreClass*> objectList;
     smIndiceArray<smLight*> *lights;
     vector<smRenderOperation> renderOperations;
+    vector<smFboListItem> fboListItems;
 
     ///Vertex Buffer objects
     smVBO *vboDynamicObject;
@@ -181,8 +194,19 @@ public:
     /// \brief set the window title
     void setWindowTitle(string);
     /// \brief Registers a scene for rendering with the viewer
-    void registerScene(smScene *p_scene, smRenderTargetType p_target, smFrameBuffer *p_fbo = NULL);
-
+    void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
+    /// \brief Adds an FBO to the viewer to allow rendering to it.
+    ///
+    /// \detail The FBO will be created an initialized in the viewer.
+    ///
+    /// \param p_fboName String to reference the FBO by
+    /// \param p_colorTex A texture that will contain the fbo's color texture.
+    /// \param p_depthTex A texture that will contain the fbo's depth texture.
+    /// \param p_width The width of the fbo
+    /// \param p_height The height of the fbo
+    void addFBO(const smString &p_fboName, 
+                smTexture *p_colorTex, smTexture *p_depthTex,
+                smUInt p_width, smUInt p_height);
     string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
@@ -206,6 +230,10 @@ protected:
     void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Renders the render operation to an FBO
     void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Initializes the FBOs in the FBO list
+    void initFboListItems();
+    /// \breif Destroys all the FBOs in the FBO list
+    void destroyFboListItems();
     /// \brief
     void initDepthBuffer();
     /// \brief Set the color and other viewer defaults
