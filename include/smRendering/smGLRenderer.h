@@ -28,11 +28,11 @@
 
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include <QGLViewer/qglviewer.h>
 
 #include "smCore/smConfig.h"
 #include "smUtilities/smVec3.h"
 #include "smCore/smCoreClass.h"
+#include "smCore/smSceneObject.h"
 
 class smMesh;
 class smAABB;
@@ -65,6 +65,17 @@ public:
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();
+    /// \brief Renders an smScene's objects
+    ///
+    /// \detail Requires the caller to have called registerForScene() on p_scene
+    /// \param p_scene The scene to render
+    /// \param p_param The drawing parameters
+    static void renderScene(smScene* p_scene, smDrawParam p_param);
+    /// \brief Renders a single smSceneObject
+    ///
+    /// \param p_sceneObject The scene object to render
+    /// \param p_param The drawing parameters
+    static void renderSceneObject(smSceneObject* p_sceneObject, smDrawParam p_param);
 };
 
 #endif

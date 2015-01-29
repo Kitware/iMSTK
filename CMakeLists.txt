@@ -51,8 +51,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 find_package(Qt4 REQUIRED)
 
-set(QT_USE_QTOPENGL ON)
-set(QT_USE_QTGUI ON)
 set(QT_USE_QTCORE ON)
 
 include(${QT_USE_FILE})
@@ -62,7 +60,6 @@ message("${QT_USE_FILE}")
 find_package(OpenGL REQUIRED)
 sofmis_find_package(GLEW REQUIRED)
 sofmis_find_package(GLUT REQUIRED)
-sofmis_find_package(QGLViewer REQUIRED)
 sofmis_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 
@@ -93,16 +90,12 @@ option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." ${OPENHAPTICS_FO
 
 include_directories(SYSTEM
   "${QT_QTCORE_INCLUDE_DIR}"
-  "${QT_QTGUI_INCLUDE_DIR}"
-  "${QT_QTXML_INCLUDE_DIR}"
-  "${QT_QTOPENGL_INCLUDE_DIR}"
   "${QT_HEADERS_DIR}")
 if (OPENGL_INCLUDE_DIR)
   include_directories(SYSTEM "${OPENGL_INCLUDE_DIR}")
 endif ()
 include_directories(SYSTEM "${GLEW_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLUT_INCLUDE_DIR}")
-include_directories(SYSTEM "${QGLVIEWER_INCLUDE_DIRS}")
 include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")

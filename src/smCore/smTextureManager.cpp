@@ -231,7 +231,7 @@ smTextureReturnType smTextureManager::loadTexture(const smString p_fileName,
         const smChar *p_textureReferenceName, smBool p_flipImage)
 {
 
-    return loadTexture(p_fileName.toAscii().data(), p_textureReferenceName, p_flipImage);
+    return loadTexture(p_fileName.data(), p_textureReferenceName, p_flipImage);
 }
 
 

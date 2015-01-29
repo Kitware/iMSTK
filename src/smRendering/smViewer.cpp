@@ -77,6 +77,13 @@ void SetVSync(bool sync)
 #endif
 }
 
+smRenderOperation::smRenderOperation()
+{
+    fbo = NULL;
+    scene = NULL;
+    fboName = "";
+}
+
 smViewer::smViewer(smErrorLog *log)
 {
 
@@ -279,6 +286,8 @@ void smViewer::init()
     smTextureManager::initGLTextures();
     smShader::initGLShaders(param);
     smVAO::initVAOs(param);
+
+    initFboListItems();
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
     {
@@ -640,86 +649,6 @@ void smViewer::enableLights()
     }
 }
 
-void smViewer::renderScene(smDrawParam p_param)
-{
-
-    smSceneObject *sceneObject;
-
-    if (this->renderStage == SMRENDERSTAGE_FINALPASS)
-    {
-        glDisable(GL_CULL_FACE);
-    }
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_TRANSPARENCY)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_POLYGON_OFFSET_FILL);
-    }
-    else
-    {
-        glDisable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    smScene::smSceneIterator sceneIter;
-
-    //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
-    //only current objects and their derived classes
-    for (smInt sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
-    {
-        sceneIter.setScene(sceneList[sceneIndex], this);
-
-        //cout<<"Render:"<<sceneList[sceneIndex]->test<<endl;
-        //for(smInt j=0;j<sceneList[sceneIndex]->totalObjects;j++)
-        for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
-        {
-            //sceneObject=sceneList[sceneIndex]->sceneObjects[j];
-            sceneObject = sceneIter[j];
-
-            if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
-            {
-                continue;
-            }
-
-            glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-
-            //if the custom rendering enable only render this
-            if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
-            {
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->preDraw(sceneObject);
-                    sceneObject->customRender->draw(sceneObject);
-                    sceneObject->customRender->postDraw(sceneObject);
-                }
-            }
-            else
-            {
-                //If there is custom renderer first render the preDraw function. which is responsible for
-                //rendering before the default renderer takes place
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->preDraw(sceneObject);
-                }
-
-                //drawSMStaticObject((smStaticSceneObject *)(sceneList.at(sceneIndex)->sceneObjects.at(j)));
-                sceneObject->draw(p_param);
-
-
-                //If there is custom renderer, render the postDraw function. which is responsible for
-                //rendering after the default renderer takes place
-                if (sceneObject->customRender != NULL)
-                {
-                    sceneObject->customRender->postDraw(sceneObject);
-                }
-            }
-
-            glPopAttrib();
-        }
-    }
-}
-
 void setTextureMatrix()
 {
 
@@ -787,9 +716,153 @@ void smViewer::renderTextureOnView()
     glPopAttrib();
 }
 
+void smViewer::addFBO(const smString &p_fboName,
+                      smTexture *p_colorTex,
+                      smTexture *p_depthTex,
+                      smUInt p_width, smUInt p_height)
+{
+    smFboListItem item;
+
+    item.fboName = p_fboName;
+    item.width = p_width;
+    item.height = p_height;
+    if (p_colorTex)
+    {
+        item.colorTex = p_colorTex;
+    }
+    if (p_depthTex)
+    {
+        item.depthTex = p_depthTex;
+    }
+
+    this->fboListItems.push_back(item);
+}
+
+void smViewer::initFboListItems()
+{
+    for (int i = 0; i < this->fboListItems.size(); i++)
+    {
+        smFboListItem *item = &fboListItems[i];
+        item->fbo = new smFrameBuffer();
+        item->fbo->setDim(item->width, item->height);
+        if (item->colorTex)
+        {
+            item->fbo->attachColorTexture(item->colorTex, 0);
+        }
+        if (item->depthTex)
+        {
+            item->fbo->attachDepthTexture(item->depthTex);
+        }
+        for (int j = 0; j < renderOperations.size(); j++)
+        {
+            if (renderOperations[j].fboName == item->fboName)
+            {
+                renderOperations[j].fbo = item->fbo;
+            }
+        }
+    }
+}
+
+void smViewer::destroyFboListItems()
+{
+    for (int i = 0; i < this->fboListItems.size(); i++)
+    {
+        if (fboListItems[i].fbo)
+        {
+            delete (fboListItems[i].fbo);
+            fboListItems[i].fbo = NULL;
+        }
+    }
+}
+
+void smViewer::renderSceneList(smDrawParam p_param)
+{
+    smScene::smSceneIterator sceneIter;
+
+    //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
+    //only current objects and their derived classes
+    for (smInt sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
+    {
+        smGLRenderer::renderScene(sceneList[sceneIndex], p_param);
+    }
+}
+
+void smViewer::processViewerOptions()
+{
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
+    {
+        smGLUtils::fadeBackgroundDraw();
+    }
+}
+
+void smViewer::processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param)
+{
+    switch (p_rop.target)
+    {
+    case SMRENDERTARGET_SCREEN:
+        renderToScreen(p_rop, p_param);
+        break;
+    case SMRENDERTARGET_FBO:
+        renderToFBO(p_rop, p_param);
+        break;
+    default:
+        assert(0);
+    }
+}
+
+void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
+{
+    assert(p_rop.fbo);
+    //Enable FBO for rendering
+    p_rop.fbo->enable();
+    //Setup Viewport & Clear buffers
+    glViewport(0, 0, p_rop.fbo->getWidth(), p_rop.fbo->getHeight());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //Enable lights
+    enableLights();
+    processViewerOptions();
+    //Render Scene
+     smGLRenderer::renderScene(p_rop.scene, p_param);
+    //Disable FBO
+    p_rop.fbo->disable();
+}
+
+void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param)
+{
+    //Setup Viewport & Clear buffers
+    glViewport(0, 0, this->width(), this->height());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    //Enable lights
+    enableLights();
+    processViewerOptions();
+    //Render Scene
+    smGLRenderer::renderScene(p_rop.scene, p_param);
+}
+
+void smViewer::registerScene(smScene *p_scene,
+                             smRenderTargetType p_target,
+                             const smString &p_fboName)
+{
+    smRenderOperation rop;
+
+    //sanity checks
+    assert(p_scene);
+    if (p_target == SMRENDERTARGET_FBO)
+    {
+        assert(p_fboName != "");
+    }
+
+    rop.target = p_target;
+    rop.scene = p_scene;
+
+    rop.fboName = p_fboName;
+
+    p_scene->registerForScene(this);
+    renderOperations.push_back(rop);
+}
+
 void smViewer::drawWithShadows(smDrawParam &p_param)
 {
-
     smLight *light = NULL;
 
     for (smInt i = 0; i < lights->size(); i++)
@@ -834,7 +907,7 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
     glViewport(0, 0, fbo->getWidth(), fbo->getHeight());
-    renderScene(p_param);
+    renderSceneList(p_param);
     glPopAttrib();
     fbo->disable();
     setTextureMatrix();
@@ -842,61 +915,6 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glPopAttrib();
-
-    renderStage = SMRENDERSTAGE_FINALPASS;
-    renderStage = SMRENDERSTAGE_DPMAPPASS;
-    glMatrixMode(GL_MODELVIEW);
-
-    //back
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        gluPerspective(120, camera.ar, camera.nearClip, camera.farClip);
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-        gluLookAt(-35, 38.666, 19.7, 90.8, 10.25, 200.52, -0.1239, 0.955, -0.269577); ///perspective 120 cok iyi
-        backfbo->enable();
-        glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT); // for GL_DRAW_BUFFER and GL_READ_BUFFER
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glClearColor(0, 0, 0, 1);
-        glDepthRange(0, 1);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glViewport(0, 0, backfbo->getWidth(), backfbo->getHeight());
-        renderScene(p_param);
-        glPopAttrib();
-        backfbo->disable();
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-        glPopAttrib();
-    }
-
-    renderStage = SMRENDERSTAGE_FINALPASS;
-    glMatrixMode(GL_MODELVIEW);
-
-    if (renderandreflection != NULL && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        renderandreflection->switchEnable();
-    }
-
-    {
-        //why is this scoped?
-        glDisable(GL_CULL_FACE);
-        renderScene(p_param);
-    }
-
-    if (renderandreflection != NULL && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION)
-    {
-        renderandreflection->switchDisable();
-    }
-
 }
 
 
@@ -1047,28 +1065,8 @@ void smViewer::draw()
 
     adjustFPS();
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(camera.getProjMatRef());
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(camera.getViewMatRef());
-
-    glViewport(0, 0, screenResolutionWidth, screenResolutionHeight);
-
-    glClearColor(0.05f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
-    enableLights();
-
-    glUseProgramObjectARB(0);
-    glDisable(GL_VERTEX_PROGRAM_ARB);
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
-    {
-        smGLUtils::fadeBackgroundDraw();
-    }
-
-    setToDefaults();
+    param.projMatrix = camera.getProjMatRef();
+    param.viewMatrix = camera.getViewMatRef();
 
     for (smInt i = 0; i < objectList.size(); i++)
     {
@@ -1083,12 +1081,12 @@ void smViewer::draw()
     }
     else
     {
-        glDisable(GL_CULL_FACE);
-        renderScene(param);
+        //renderSceneList(param);
+        for (int i = 0; i < renderOperations.size(); i++)
+        {
+            processRenderOperation(renderOperations[i], param);
+        }
     }
-
-    //for font display
-    setToDefaults();
 
     for (smInt i = 0; i < objectList.size(); i++)
     {
@@ -1096,16 +1094,6 @@ void smViewer::draw()
 
         objectList[i]->draw(param);
     }
-
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glUseProgramObjectARB(0);
-    glDisable(GL_VERTEX_PROGRAM_ARB);
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-    glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
-    glPopAttrib();
 
     endModule();
 }
@@ -1272,6 +1260,8 @@ void smViewer::exec()
         this->draw();
         glfwPollEvents();
     }
+
+    destroyFboListItems();
 
     //Shutdown glfw
     glfwDestroyWindow(window);

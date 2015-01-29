@@ -65,14 +65,7 @@ using namespace std;
 #define smBool          bool
 #define smLongInt       long int
 #define smLongDouble    long double
-
-/// \brief string. currently uses QString
-class smString: public QString
-{
-public:
-    //smChar *c_str();
-    smString & operator=(smChar*p_param);
-};
+#define smString        std::string
 
 /// \brief  unified variable declarations
 #define smUInt32     uint32_t

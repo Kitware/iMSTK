@@ -559,3 +559,71 @@ void smGLRenderer::enableDefaultGLRendering()
     glDisable(GL_FRAGMENT_PROGRAM_ARB);
     glUseProgramObjectARB(0);
 }
+
+void smGLRenderer::renderScene(smScene* p_scene,
+                               smDrawParam p_param)
+{
+    smSceneObject *sceneObject;
+    smScene::smSceneIterator sceneIter;
+
+    assert(p_scene);
+    assert(p_param.projMatrix);
+    assert(p_param.viewMatrix);
+
+    //Load View and Projection Matrices
+    // -- with new rendering techniques, these would be passed to a shader
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(p_param.projMatrix);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(p_param.viewMatrix);
+
+    sceneIter.setScene(p_scene, p_param.caller);
+
+    for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
+    {
+        renderSceneObject(sceneIter[j], p_param);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
+                                     smDrawParam p_param)
+{
+    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
+    {
+        return;
+    }
+
+    //if the custom rendering enable only render this
+    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
+    {
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->preDraw(p_sceneObject);
+            p_sceneObject->customRender->draw(p_sceneObject);
+            p_sceneObject->customRender->postDraw(p_sceneObject);
+        }
+    }
+    else
+    {
+        //If there is custom renderer first render the preDraw function. which is responsible for
+        //rendering before the default renderer takes place
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->preDraw(p_sceneObject);
+        }
+
+        p_sceneObject->draw(p_param);
+
+        //If there is custom renderer, render the postDraw function. which is responsible for
+        //rendering after the default renderer takes place
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->postDraw(p_sceneObject);
+        }
+    }
+}

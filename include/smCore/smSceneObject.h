@@ -49,8 +49,6 @@ class smSceneObject: public smCoreClass
 {
     /// \brief object simulator that will simulate the object
     smObjectSimulator *objectSim;
-    /// \brief custom renderer
-    smCustomRenderer *customRender;
 
     friend class smSDK;
     friend class smViewer;
@@ -61,6 +59,8 @@ private:
 protected:
 
 public:
+    /// \brief custom renderer
+    smCustomRenderer *customRender;
     /// \brief memory block for allocations that will be made for the object
     smMemoryBlock *memBlock;
     /// \brief flags
