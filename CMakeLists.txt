@@ -34,9 +34,9 @@ mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
 # Device options
-option(SIMMEDTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
-option(SIMMEDTK_USE_ADU "Use the adu device." OFF)
-option(SIMMEDTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
+option(SimMedTK_USE_ADU "Use the adu device." OFF)
+option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
 
 #-----------------------------------------------------------------------------
 # Output directories - this is where built library and executable
@@ -247,8 +247,8 @@ if(MSVC)
   set(msvc_suppressed_warnings
     "/wd4290" # C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
   )
-  set(msvc_other_flags 
-    " /EHsc" # Enable C++ Exceptions
+  set(msvc_other_flags
+    "/EHsc" # Enable C++ Exceptions
   )
   set(SimMedTK_CXX_FLAGS "${SimMedTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
@@ -271,14 +271,9 @@ endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 #-----------------------------------------------------------------------------
-# Find Pthreads
+# Find required packages
 #
-if(WIN32)
-  find_package(PThreads REQUIRED)
-else()
-  find_package(Threads REQUIRED)
-endif()
-
+find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
@@ -298,22 +293,23 @@ simmedtk_find_package(Boost REQUIRED
   COMPONENTS
     thread
     system)
+
 # do not allow boost to use auto-link library stuff
 add_definitions(-DBOOST_ALL_NO_LIB=1)
 
 simmedtk_find_package(Audiere REQUIRED)
 simmedtk_find_package(V8 REQUIRED)
 
-if(SIMMEDTK_USE_PHANTOM_OMNI)
+if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)
 endif()
 
-if(SIMMEDTK_USE_ADU)
+if(SimMedTK_USE_ADU)
   simmedtk_find_package(ADU REQUIRED)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
 endif()
 
-if(SIMMEDTK_USE_NIUSB6008)
+if(SimMedTK_USE_NIUSB6008)
   simmedtk_find_package(NIDAQ REQUIRED)
   include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 endif()
