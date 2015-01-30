@@ -1,24 +1,56 @@
 # include_directories for dependencies actually used here.
 
-set(smCore_sources
-  smCore/smConfig.cpp
-  smCore/smCoreClass.cpp
-  smCore/smDispatcher.cpp
-  smCore/smDoubleBuffer.cpp
-  smCore/smErrorLog.cpp
-  smCore/smEvent.cpp
-  smCore/smEventHandler.cpp
-  smCore/smGeometry.cpp
-  smCore/smModule.cpp
-  smCore/smObjectSimulator.cpp
-  smCore/smScene.cpp
-  smCore/smSceneObject.cpp
-  smCore/smScriptingEngine.cpp
-  smCore/smSDK.cpp
-  smCore/smSimulator.cpp
-  smCore/smSpatialGrid.cpp
-  smCore/smStaticSceneObject.cpp
-  smCore/smTextureManager.cpp)
+simmedtk_add_library(smCore
+  SOURCES
+    smConfig.cpp
+    smDispatcher.cpp
+    smErrorLog.cpp
+    smEvent.cpp
+    smEventHandler.cpp
+    smGeometry.cpp
+    smModule.cpp
+    smObjectSimulator.cpp
+    smScene.cpp
+    smSceneObject.cpp
+    smScriptingEngine.cpp
+    smSDK.cpp
+    smSimulator.cpp
+    smStaticSceneObject.cpp
+    smTextureManager.cpp
+  PUBLIC_HEADERS
+    smConfig.h
+    smCoreClass.h
+    smDispatcher.h
+    smDoubleBuffer.h
+    smErrorLog.h
+    smEventData.h
+    smEvent.h
+    smEventHandler.h
+    smGeometry.h
+    smMemoryBlock.h
+    smModule.h
+    smObjectSimulator.h
+    smPipe.h
+    smScene.h
+    smSceneObject.h
+    smScheduler.h
+    smScriptingEngine.h
+    smSDK.h
+    smSimulator.h
+    smStaticSceneObject.h
+    smSynchronization.h
+    smTextureManager.h
+    smWorkerThread.h
+)
 
-add_library(smCore OBJECT
-  ${smCore_sources})
+target_link_libraries(smCore
+  INTERFACE
+    Qt4::QtCore
+)
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(smCore
+    PRIVATE
+      -std=c++11
+  )
+endif()

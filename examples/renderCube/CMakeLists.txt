@@ -1,8 +1,10 @@
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set_source_files_properties(main.cpp RenderExample.cpp PROPERTIES COMPILE_FLAGS -std=c++11)
-endif()
-
 add_executable(renderCube main.cpp  RenderExample.cpp RenderExample.h)
-target_link_libraries(renderCube sofmis)
+target_link_libraries(renderCube simmedtk)
 
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(renderCube BEFORE
+    PRIVATE
+      -std=c++11
+  )
+endif()
