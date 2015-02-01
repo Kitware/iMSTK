@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -43,7 +43,7 @@ vegaFemExample::vegaFemExample()
 
     /// set the dispatcher for FEM. it will be used for sending events
     femSim->setDispatcher(sofmisSDK->getEventDispatcher());
-    sofmisSDK->getEventDispatcher()->registerEventHandler(femSim, SOFMIS_EVENTTYPE_HAPTICOUT);
+    sofmisSDK->getEventDispatcher()->registerEventHandler(femSim, SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
     /// create a Vega based FEM object and attach it to the fem simulator
     femobj = new smVegaFemSceneObject(sofmisSDK->getErrorLog(),
@@ -58,7 +58,7 @@ vegaFemExample::vegaFemExample()
     simulator->registerObjectSimulator(femSim);
 
     /// create a viewer
-    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SOFMIS_VIEWERRENDER_GROUND;
+    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_GROUND;
     viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
 
     //Set some camera parameters

@@ -1,4 +1,3 @@
-# include_directories for dependencies actually used here.
 
 simmedtk_add_library(smCore
   SOURCES
@@ -18,34 +17,47 @@ simmedtk_add_library(smCore
     smStaticSceneObject.cpp
     smTextureManager.cpp
   PUBLIC_HEADERS
-    smConfig.h
-    smCoreClass.h
-    smDispatcher.h
-    smDoubleBuffer.h
-    smErrorLog.h
-    smEventData.h
-    smEvent.h
-    smEventHandler.h
-    smGeometry.h
-    smMemoryBlock.h
-    smModule.h
-    smObjectSimulator.h
-    smPipe.h
-    smScene.h
-    smSceneObject.h
-    smScheduler.h
-    smScriptingEngine.h
-    smSDK.h
-    smSimulator.h
-    smStaticSceneObject.h
-    smSynchronization.h
-    smTextureManager.h
-    smWorkerThread.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smConfig.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smDispatcher.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smDoubleBuffer.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smErrorLog.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smEventData.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smEvent.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smEventHandler.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smGeometry.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smMemoryBlock.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smModule.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smObjectSimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smPipe.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smScene.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smScheduler.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smScriptingEngine.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smSDK.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smSimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smStaticSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smSynchronization.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smTextureManager.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smWorkerThread.h
 )
 
 target_link_libraries(smCore
-  INTERFACE
+  PUBLIC
+    GLEW::GLEW
+    GLUT::GLUT
+    QGLViewer::QGLViewer
+    ${OPENGL_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
     Qt4::QtCore
+    Qt4::QtGui
+    Qt4::QtOpenGL
+    Qt4::QtXml
+  INTERFACE
+    ${ILUT_LIBRARIES}
+    ${ILU_LIBRARIES}
+    ${IL_LIBRARIES}
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005, 
+  Copyright (c) 2005,
 	  Aaron Lefohn	(lefohn@cs.ucdavis.edu)
 	  Adam Moerschell (atmoerschell@ucdavis.edu)
   All rights reserved.
@@ -8,51 +8,52 @@
   http://www.opensource.org/licenses/bsd-license.php for more detail.
 
   *************************************************************
-  Redistribution and use in source and binary forms, with or 
-  without modification, are permitted provided that the following 
+  Redistribution and use in source and binary forms, with or
+  without modification, are permitted provided that the following
   conditions are met:
 
-  Redistributions of source code must retain the above copyright notice, 
-  this list of conditions and the following disclaimer. 
+  Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
 
-  Redistributions in binary form must reproduce the above copyright notice, 
-  this list of conditions and the following disclaimer in the documentation 
-  and/or other materials provided with the distribution. 
+  Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
 
-  Neither the name of the University of Californa, Davis nor the names of 
-  the contributors may be used to endorse or promote products derived 
+  Neither the name of the University of Californa, Davis nor the names of
+  the contributors may be used to endorse or promote products derived
   from this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
-  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
   OF SUCH DAMAGE.
 */
 
 #ifndef UCDAVIS_RENDER_BUFFER_H
 #define UCDAVIS_RENDER_BUFFER_H
 
+#include "smCore/smConfig.h"
 #include "framebufferObject.h"
 
 /*!
 Renderbuffer Class. This class encapsulates the Renderbuffer OpenGL
-object described in the FramebufferObject (FBO) OpenGL spec. 
+object described in the FramebufferObject (FBO) OpenGL spec.
 See the official spec at:
 	http://oss.sgi.com/projects/ogl-sample/registry/EXT/framebuffer_object.txt
 for complete details.
 
 A "Renderbuffer" is a chunk of GPU memory used by FramebufferObjects to
 represent "traditional" framebuffer memory (depth, stencil, and color buffers).
-By "traditional," we mean that the memory cannot be bound as a texture. 
+By "traditional," we mean that the memory cannot be bound as a texture.
 With respect to GPU shaders, Renderbuffer memory is "write-only." Framebuffer
 operations such as alpha blending, depth test, alpha test, stencil test, etc.
 read from this memory in post-fragement-shader (ROP) operations.
@@ -65,11 +66,11 @@ Usage Notes:
       Valid OpenGL internal formats beginning with:
         RGB, RGBA, DEPTH_COMPONENT
 
-      or a stencil buffer format (not currently supported 
+      or a stencil buffer format (not currently supported
       in NVIDIA drivers as of 7/1/05).
-        STENCIL_INDEX1_EXT 
-        STENCIL_INDEX4_EXT     
-        STENCIL_INDEX8_EXT     
+        STENCIL_INDEX1_EXT
+        STENCIL_INDEX4_EXT
+        STENCIL_INDEX8_EXT
         STENCIL_INDEX16_EXT
 */
 class Renderbuffer

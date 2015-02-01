@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -31,7 +31,7 @@
 #include "smExternalDevices/smADUInterface.h"
 #include <iostream>
 #include <fstream>
-#include "AduHid.h"
+#include "smExternalDevices/AduHid.h"
 
 using namespace std;
 

@@ -36,8 +36,8 @@
 #
 # Assimp
 #
-set(Assimp_TAG "a94e668486fd65bb2b16178a45ee72d14c93acf2")
-set(Assimp_REPOSITORY ${git_protocol}://github.com/ricortiz/assimp.git)
+set(Assimp_TAG "b700cd917f433801e594187af57d334b04a3c2ba")
+set(Assimp_REPOSITORY ${git_protocol}://github.com/assimp/assimp.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -77,7 +77,7 @@ if(NOT DEFINED ${proj}_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -87,8 +87,8 @@ if(NOT DEFINED ${proj}_DIR)
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
       -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
       -DASSIMP_BUILD_TESTS:BOOL=OFF
-      -DLIBRARY_OUTPUT_PATH:STRING=${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/lib
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
@@ -98,4 +98,4 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

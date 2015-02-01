@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -26,13 +26,10 @@
 #ifndef SMGLRENDERER_H
 #define SMGLRENDERER_H
 
-#include <GL/glew.h>
-#include <GL/glut.h>
-#include <QGLViewer/qglviewer.h>
-
 #include "smCore/smConfig.h"
 #include "smUtilities/smVec3.h"
 #include "smCore/smCoreClass.h"
+#include <QGLViewer/qglviewer.h>
 
 class smMesh;
 class smAABB;

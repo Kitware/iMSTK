@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -25,13 +25,11 @@
 
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
+
 #include "smCore/smConfig.h"
-#include "smCore/smTextureManager.h"
 #include "smUtilities/smVec3.h"
 #include "smUtilities/smMatrix33.h"
 #include "smUtilities/smMatrix44.h"
-#include <GL/glut.h>
-#include <GL/glew.h>
 
 /// \brief stores the information about the ground
 struct smGroundRenderInfo;

@@ -37,7 +37,7 @@
 # VegaFEM
 #
 
-set(VegaFEM_TAG "eb9d7c11de6c0f600a91a01362781624d4caf21e")
+set(VegaFEM_TAG "30500042f4a30ecc8b926a23267026b9d6d89fc8")
 set(VegaFEM_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
 
 # Make sure this file is included only once
@@ -64,14 +64,6 @@ set(proj VegaFEM)
 
 if(NOT DEFINED VegaFEM_DIR)
 
-  set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
-  if(WIN32)
-    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
-      -DCMAKE_INCLUDE_PATH:PATH=${ep_install_dir}/include
-      -DCMAKE_LIBRARY_PATH:PATH=${ep_install_dir}/lib
-      -DCMAKE_REQUIRED_INCLUDES:STRING=${ep_install_dir}/include)
-  endif(WIN32)
-
   # Set CMake OSX variable to pass down the external project
   set(CMAKE_OSX_EXTERNAL_PROJECT_ARGS)
   if(APPLE)
@@ -89,7 +81,7 @@ if(NOT DEFINED VegaFEM_DIR)
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
     LIST_SEPARATOR ${sep}
     CMAKE_ARGS
@@ -102,12 +94,15 @@ if(NOT DEFINED VegaFEM_DIR)
       -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
       -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
       -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
-      ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
+      -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
+      -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
+      -DCMAKE_REQUIRED_INCLUDES:STRING=${ep_install_dir}/include
+      ${OUTPUT_DIRECTORIES}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${VegaFEM_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir}/lib/cmake/VegaFEM)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/VegaFEM)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")

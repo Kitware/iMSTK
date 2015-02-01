@@ -73,12 +73,13 @@ if(NOT DEFINED ${proj}_DIR)
 #     message(STATUS "Adding project:${proj}")
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}
-    BINARY_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build
     PREFIX ${CMAKE_BINARY_DIR}/SuperBuild/${proj}${ep_suffix}
     URL ${${proj}_URL}
     URL_HASH SHA1=${${proj}_SHA1}
     UPDATE_COMMAND ""
-#     INSTALL_COMMAND ""
+    INSTALL_COMMAND ""
+    BUILD_COMMAND ""
+    CONFIGURE_COMMAND ""
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
@@ -93,10 +94,10 @@ if(NOT DEFINED ${proj}_DIR)
     DEPENDS
       ${${proj}_DEPENDENCIES}
     )
-  set(${proj}_DIR ${ep_install_dir})
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj})
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DEIGEN3_INCLUDE_DIR:PATH=${ep_install_dir}/include)
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

@@ -1,0 +1,58 @@
+
+simmedtk_add_library(smSimulators
+  SOURCES
+    smFemSceneObject.cpp
+    smMyStylus.cpp
+    smPBDObjectSimulator.cpp
+    smPBDSceneObject.cpp
+    smPhysXVolumeMesh.cpp
+    smStylusObject.cpp
+    smToolSimulator.cpp
+    smVegaConfigFemObject.cpp
+    smVegaFemSceneObject.cpp
+  PUBLIC_HEADERS
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smMyStylus.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDObjectSimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPhysXVolumeMesh.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smStylusObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smToolSimulator.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaConfigFemObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSimulator.h
+)
+
+target_link_libraries(smSimulators
+  PRIVATE
+    smCore
+  PUBLIC
+    VegaFEM::configFile
+    VegaFEM::vega-getopts
+    VegaFEM::sceneObject
+    VegaFEM::performanceCounter
+    VegaFEM::volumetricMesh
+    VegaFEM::stvk
+    VegaFEM::integratorSparse
+    VegaFEM::massSpringSystem
+    VegaFEM::corotationalLinearFEM
+    VegaFEM::elasticForceModel
+    VegaFEM::isotropicHyperelasticFEM
+    VegaFEM::loadList
+  INTERFACE
+    ${Boost_THREAD_LIBRARY}
+    )
+
+target_include_directories(smSimulators
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    )
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+  target_compile_options(smSimulators
+    PRIVATE
+      -std=c++11
+  )
+endif()

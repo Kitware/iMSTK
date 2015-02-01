@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -22,13 +22,11 @@
   *  \author
   *  \copyright Apache License, Version 2.0.
   */
- 
+
 #ifndef SMVBO_H
 #define SMVBO_H
 
 #include <QHash>
-#include <GL/glew.h>
-#include <GL/glut.h>
 
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"

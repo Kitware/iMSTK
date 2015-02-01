@@ -1,6 +1,12 @@
 
 add_executable(AlphaMap AlphaMappingExample.cpp  AlphaMappingExample.h)
-target_link_libraries(AlphaMap simmedtk)
+target_link_libraries(AlphaMap
+  smCore
+  smRendering
+  smShader
+  smExternalDevices
+  smMesh
+  )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(AlphaMap

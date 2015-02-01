@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2005, 
+  Copyright (c) 2005,
 	  Aaron Lefohn	  (lefohn@cs.ucdavis.edu)
 	  Robert Strzodka (strzodka@stanford.edu)
 	  Adam Moerschell (atmoerschell@ucdavis.edu)
@@ -9,38 +9,39 @@
   http://www.opensource.org/licenses/bsd-license.php for more detail.
 
   *************************************************************
-  Redistribution and use in source and binary forms, with or 
-  without modification, are permitted provided that the following 
+  Redistribution and use in source and binary forms, with or
+  without modification, are permitted provided that the following
   conditions are met:
 
-  Redistributions of source code must retain the above copyright notice, 
-  this list of conditions and the following disclaimer. 
+  Redistributions of source code must retain the above copyright notice,
+  this list of conditions and the following disclaimer.
 
-  Redistributions in binary form must reproduce the above copyright notice, 
-  this list of conditions and the following disclaimer in the documentation 
-  and/or other materials provided with the distribution. 
+  Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
 
-  Neither the name of the University of Californa, Davis nor the names of 
-  the contributors may be used to endorse or promote products derived 
+  Neither the name of the University of Californa, Davis nor the names of
+  the contributors may be used to endorse or promote products derived
   from this software without specific prior written permission.
 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
-  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS 
-  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL 
-  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
-  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL 
-  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE 
-  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, 
-  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
-  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY 
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+  THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+  INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+  GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
   OF SUCH DAMAGE.
 */
+#include <iostream>
 
 #include "smExternal/framebufferObject.h"
-#include <iostream>
+
 using namespace std;
 
 FramebufferObject::FramebufferObject()
@@ -52,23 +53,23 @@ FramebufferObject::FramebufferObject()
   _GuardedUnbind();
 }
 
-FramebufferObject::~FramebufferObject() 
+FramebufferObject::~FramebufferObject()
 {
   glDeleteFramebuffersEXT(1, &m_fboId);
 }
 
-void FramebufferObject::Bind() 
+void FramebufferObject::Bind()
 {
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, m_fboId);
 }
 
-void FramebufferObject::Disable() 
+void FramebufferObject::Disable()
 {
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 }
 
 void
-FramebufferObject::AttachTexture( GLenum texTarget, GLuint texId, 
+FramebufferObject::AttachTexture( GLenum texTarget, GLuint texId,
                                   GLenum attachment, int mipLevel, int zSlice )
 {
   _GuardedBind();
@@ -97,9 +98,9 @@ FramebufferObject::AttachTextures( int numTextures, GLenum texTarget[], GLuint t
                                   GLenum attachment[], int mipLevel[], int zSlice[] )
 {
   for(int i = 0; i < numTextures; ++i) {
-    AttachTexture( texTarget[i], texId[i], 
-                   attachment ? attachment[i] : (GL_COLOR_ATTACHMENT0_EXT + i), 
-                   mipLevel ? mipLevel[i] : 0, 
+    AttachTexture( texTarget[i], texId[i],
+                   attachment ? attachment[i] : (GL_COLOR_ATTACHMENT0_EXT + i),
+                   mipLevel ? mipLevel[i] : 0,
                    zSlice ? zSlice[i] : 0 );
   }
 }
@@ -113,7 +114,7 @@ FramebufferObject::AttachRenderBuffer( GLuint buffId, GLenum attachment )
   if( GetAttachedId(attachment) != buffId ) {
 #endif
 
-    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, attachment, 
+    glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, attachment,
                                  GL_RENDERBUFFER_EXT, buffId);
 
 #ifndef NDEBUG
@@ -132,7 +133,7 @@ void
 FramebufferObject::AttachRenderBuffers( int numBuffers, GLuint buffId[], GLenum attachment[] )
 {
   for(int i = 0; i < numBuffers; ++i) {
-    AttachRenderBuffer( buffId[i], 
+    AttachRenderBuffer( buffId[i],
                         attachment ? attachment[i] : (GL_COLOR_ATTACHMENT0_EXT + i) );
   }
 }
@@ -181,7 +182,7 @@ GLuint FramebufferObject::_GenerateFboId()
   return id;
 }
 
-void FramebufferObject::_GuardedBind() 
+void FramebufferObject::_GuardedBind()
 {
   // Only binds if m_fboId is different than the currently bound FBO
   glGetIntegerv( GL_FRAMEBUFFER_BINDING_EXT, &m_savedFboId );
@@ -190,7 +191,7 @@ void FramebufferObject::_GuardedBind()
   }
 }
 
-void FramebufferObject::_GuardedUnbind() 
+void FramebufferObject::_GuardedUnbind()
 {
   // Returns FBO binding to the previously enabled FBO
   if (m_fboId != (GLuint)m_savedFboId) {
@@ -225,9 +226,9 @@ bool FramebufferObject::IsValid( ostream& ostr )
 
   bool isOK = false;
 
-  GLenum status;                                            
+  GLenum status;
   status = glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
-  switch(status) {                                          
+  switch(status) {
   case GL_FRAMEBUFFER_COMPLETE_EXT: // Everything's OK
     isOK = true;
     break;
@@ -284,7 +285,7 @@ GLenum FramebufferObject::GetAttachedType( GLenum attachment )
   _GuardedBind();
   GLint type = 0;
   glGetFramebufferAttachmentParameterivEXT(GL_FRAMEBUFFER_EXT, attachment,
-                                           GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT, 
+                                           GL_FRAMEBUFFER_ATTACHMENT_OBJECT_TYPE_EXT,
                                            &type);
   _GuardedUnbind();
   return GLenum(type);
@@ -306,7 +307,7 @@ GLint FramebufferObject::GetAttachedMipLevel( GLenum attachment )
   _GuardedBind();
   GLint level = 0;
   glGetFramebufferAttachmentParameterivEXT(GL_FRAMEBUFFER_EXT, attachment,
-                                           GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT, 
+                                           GL_FRAMEBUFFER_ATTACHMENT_TEXTURE_LEVEL_EXT,
                                            &level);
   _GuardedUnbind();
   return level;
