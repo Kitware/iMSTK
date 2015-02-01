@@ -515,34 +515,6 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawCoordSystem(smViewer *viewer, QString p_name,
-                                   smVec3<smFloat> p_pos, smVec3<smFloat> dirX,
-                                   smVec3<smFloat> dirY, smVec3<smFloat> dirZ)
-{
-
-    qglviewer::Vec vec;
-    smFloat p_scale = 5.0;
-
-    dirX = dirX * p_scale + p_pos;
-    dirY = dirY * p_scale + p_pos;
-    dirZ = dirZ * p_scale + p_pos;
-    glPushAttrib(GL_TEXTURE_BIT);
-    vec = viewer->camera()->projectedCoordinatesOf(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z));
-    glActiveTexture(GL_TEXTURE0);
-    glEnable(GL_TEXTURE_2D);
-    viewer->drawText(vec.x, vec.y, p_name);
-
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirX.x, dirX.y, dirX.z), 0.1);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorGreen.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirY.x, dirY.y, dirY.z), 0.1);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorBlue.toGLColor());
-    viewer->drawArrow(qglviewer::Vec(p_pos.x, p_pos.y, p_pos.z), qglviewer::Vec(dirZ.x, dirZ.y, dirZ.z), 0.1);
-    glPopAttrib();
-}
-
-
-
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 
@@ -586,4 +558,72 @@ void smGLRenderer::enableDefaultGLRendering()
     glDisable(GL_VERTEX_PROGRAM_ARB);
     glDisable(GL_FRAGMENT_PROGRAM_ARB);
     glUseProgramObjectARB(0);
+}
+
+void smGLRenderer::renderScene(smScene* p_scene,
+                               smDrawParam p_param)
+{
+    smSceneObject *sceneObject;
+    smScene::smSceneIterator sceneIter;
+
+    assert(p_scene);
+    assert(p_param.projMatrix);
+    assert(p_param.viewMatrix);
+
+    //Load View and Projection Matrices
+    // -- with new rendering techniques, these would be passed to a shader
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(p_param.projMatrix);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(p_param.viewMatrix);
+
+    sceneIter.setScene(p_scene, p_param.caller);
+
+    for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
+    {
+        renderSceneObject(sceneIter[j], p_param);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
+void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
+                                     smDrawParam p_param)
+{
+    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
+    {
+        return;
+    }
+
+    //if the custom rendering enable only render this
+    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
+    {
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->preDraw(p_sceneObject);
+            p_sceneObject->customRender->draw(p_sceneObject);
+            p_sceneObject->customRender->postDraw(p_sceneObject);
+        }
+    }
+    else
+    {
+        //If there is custom renderer first render the preDraw function. which is responsible for
+        //rendering before the default renderer takes place
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->preDraw(p_sceneObject);
+        }
+
+        p_sceneObject->draw(p_param);
+
+        //If there is custom renderer, render the postDraw function. which is responsible for
+        //rendering after the default renderer takes place
+        if (p_sceneObject->customRender != NULL)
+        {
+            p_sceneObject->customRender->postDraw(p_sceneObject);
+        }
+    }
 }

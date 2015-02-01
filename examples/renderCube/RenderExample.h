@@ -32,12 +32,15 @@ class RenderExample : public smSimulationMain, public smCoreClass
 {
 public:
     RenderExample();
-    void simulateMain(smSimulationMainParam p_param) { };
+    void simulateMain(smSimulationMainParam p_param);
 private:
     smSDK* simmedtkSDK;
     smScene *scene1;
     smStaticSceneObject cube;
     smViewer *viewer;
+
+    void setupLights();
+    void setupCamera();
 };
 
 void renderExample();

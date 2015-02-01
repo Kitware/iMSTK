@@ -25,11 +25,6 @@
 
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
-#include <QGLViewer/qglviewer.h>
-// #include <GL/glut.h>
-#include <QDrag>
-#include <QUrl>
-#include <QDialog>
 
 #include "smCore/smConfig.h"
 #include "smShader/smShader.h"
@@ -52,6 +47,9 @@
 #include "smUtilities/smVec3.h"
 #include "smShader/SceneTextureShader.h"
 
+#include "smRendering/smCamera.h"
+#include <GLFW/glfw3.h>
+
 //forward declaration
 class smSDK;
 class smOpenGLWindowStream;
@@ -71,12 +69,40 @@ enum smRenderingStageType
     SMRENDERSTAGE_FINALPASS
 };
 
-///Viewer Class. Right now it is of type QGLViewer, which could be changed later on if needed.
-class smViewer : public QGLViewer, public smModule, public smEventHandler
+enum smRenderTargetType
+{
+    SMRENDERTARGET_SCREEN,
+    SMRENDERTARGET_FBO
+};
+
+/// \brief Describes what to render and where the rendering should take place
+struct smRenderOperation
+{
+    smRenderOperation();
+    smScene *scene; ///< The scene full of objects to render
+    smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
+    smString fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
+    smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
+};
+
+struct smFboListItem
+{
+    smString fboName; ///< String identification
+    smFrameBuffer* fbo; ///< The FBO pointer
+    smTexture *depthTex; ///< The FBO depth texture pointer
+    smTexture *colorTex; ///< The FBO color texture pointer
+    smUInt width; ///< The width of the FBO
+    smUInt height; ///< The height of the FBO
+};
+
+/// \brief Handles all rendering routines.
+class smViewer : public smModule, public smEventHandler
 {
 protected:
     vector<smCoreClass*> objectList;
     smIndiceArray<smLight*> *lights;
+    vector<smRenderOperation> renderOperations;
+    vector<smFboListItem> fboListItems;
 
     ///Vertex Buffer objects
     smVBO *vboDynamicObject;
@@ -118,6 +144,13 @@ public:
     smRenderingStageType renderStage;
     smBool boostViewer;
 
+    GLFWwindow* window;
+    smCamera camera;
+
+    smInt height(void);
+    smInt width(void);
+    smFloat aspectRatio(void);
+
     ///if the camera motion is enabled from other external devices
     smBool enableCameraMotion;
 
@@ -158,6 +191,23 @@ public:
     void setScreenResolution(smInt p_width, smInt p_height);
     /// \brief set scene as texture
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
+    /// \brief set the window title
+    void setWindowTitle(string);
+    /// \brief Registers a scene for rendering with the viewer
+    void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
+    /// \brief Adds an FBO to the viewer to allow rendering to it.
+    ///
+    /// \detail The FBO will be created an initialized in the viewer.
+    ///
+    /// \param p_fboName String to reference the FBO by
+    /// \param p_colorTex A texture that will contain the fbo's color texture.
+    /// \param p_depthTex A texture that will contain the fbo's depth texture.
+    /// \param p_width The width of the fbo
+    /// \param p_height The height of the fbo
+    void addFBO(const smString &p_fboName, 
+                smTexture *p_colorTex, smTexture *p_depthTex,
+                smUInt p_width, smUInt p_height);
+    string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
@@ -170,6 +220,20 @@ public:
     smVec3d finalDeviceRightCameraDir;
 
 protected:
+    /// \brief Renders the internal sceneList
+    void renderSceneList(smDrawParam p_param);
+    /// \brief Processes a render operation
+    void processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Processes viewerRenderDetail options
+    void processViewerOptions();
+    /// \brief Renders the render operation to screen
+    void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Renders the render operation to an FBO
+    void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
+    /// \brief Initializes the FBOs in the FBO list
+    void initFboListItems();
+    /// \breif Destroys all the FBOs in the FBO list
+    void destroyFboListItems();
     /// \brief
     void initDepthBuffer();
     /// \brief Set the color and other viewer defaults
@@ -184,8 +248,6 @@ protected:
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();
-    /// \brief render scene objects
-    virtual void renderScene(smDrawParam p_param);
     /// \brief draw with shadows enabled
     void drawWithShadows(smDrawParam &p_param);
     /// \brief render depth texture for debugging
@@ -203,10 +265,6 @@ protected:
     //delete this..this is for demo..
     smVec3<smDouble> hapticPosition;
     smVec3<smDouble>  hapticForce;
-    /// \brief  drop an object
-    void dropEvent(QDropEvent *event);
-    /// \brief  drag an object
-    void dragEnterEvent(QDragEnterEvent *event);
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 
@@ -215,8 +273,6 @@ public:
     smVec3<smDouble> deviceCameraPos;
     smVec3<smDouble> deviceCameraDir;
     smVec3<smDouble> deviceCameraUpDir;
-    /// \brief  save camera position
-    qglviewer::Camera prevCamera;
     /// \brief  check if the camera is collided or not
     smBool  checkCameraCollisionWithScene();
     void addCollisionCheckMeshes(smMesh *mesh);
