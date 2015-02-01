@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM)
 if(WIN32)
   list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
@@ -163,7 +163,7 @@ ExternalProject_Add(${proj}
 #     -DSimMedTK_INSTALL_LIB_DIR:STRING=${SimMedTK_INSTALL_LIB_DIR}
 #     -DSimMedTK_INSTALL_INCLUDE_DIR:STRING=${SimMedTK_INSTALL_INCLUDE_DIR}
 #     -DSimMedTK_INSTALL_DOC_DIR:STRING=${SimMedTK_INSTALL_DOC_DIR}
-#     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
+    -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
     -DSimMedTK_BUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}

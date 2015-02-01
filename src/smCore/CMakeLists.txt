@@ -54,6 +54,7 @@ target_link_libraries(smCore
     Qt4::QtGui
     Qt4::QtOpenGL
     Qt4::QtXml
+    glfw::glfw
   INTERFACE
     ${ILUT_LIBRARIES}
     ${ILU_LIBRARIES}

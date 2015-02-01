@@ -97,6 +97,12 @@ if(NOT DEFINED ${proj}_DIR)
       ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
+	LOG_DOWNLOAD 1            # Wrap download in script to log output
+	LOG_UPDATE 1              # Wrap update in script to log output
+	LOG_CONFIGURE 1           # Wrap configure in script to log output
+	LOG_BUILD 1               # Wrap build in script to log output
+	LOG_TEST 1                # Wrap test in script to log output
+	LOG_INSTALL 1             # Wrap install in script to log output   
     )
   set(${proj}_DIR ${ep_install_dir}/)
 

@@ -277,10 +277,12 @@ find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
+find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtOpenGL)
 find_package(VegaFEM REQUIRED CONFIG)
+
 
 include(SimMedTKMacros)
 
@@ -316,6 +318,7 @@ endif()
 
 include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
+include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------

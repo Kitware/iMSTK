@@ -1,7 +1,5 @@
 find_path(GLM_INCLUDE_DIR
-	glm.hpp
-  PATH_SUFFIXES
-	glm)
+	glm/glm.hpp)
 
 set(GLM_INCLUDE_DIRS "${GLM_INCLUDE_DIR}")
 
