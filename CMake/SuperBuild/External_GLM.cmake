@@ -76,6 +76,8 @@ if(NOT DEFINED ${proj}_DIR)
 
     DEPENDS
       ${${proj}_DEPENDENCIES}
+	LOG_DOWNLOAD 1            # Wrap download in script to log output
+	LOG_UPDATE 1              # Wrap update in script to log output
     )
   set(${proj}_DIR ${ep_install_dir})
 

@@ -93,6 +93,8 @@ if(NOT DEFINED ${proj}_DIR)
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
+	LOG_DOWNLOAD 1            # Wrap download in script to log output
+	LOG_UPDATE 1              # Wrap update in script to log output
     )
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj})
 

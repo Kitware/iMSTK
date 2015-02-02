@@ -103,8 +103,8 @@ if(NOT DEFINED VegaFEM_DIR)
       ${VegaFEM_DEPENDENCIES}
 	LOG_DOWNLOAD 1            # Wrap download in script to log output
 	LOG_UPDATE 1              # Wrap update in script to log output
-	LOG_CONFIGURE 1           # Wrap configure in script to log output
-	LOG_BUILD 1               # Wrap build in script to log output
+# 	LOG_CONFIGURE 1           # Wrap configure in script to log output
+# 	LOG_BUILD 1               # Wrap build in script to log output
 	LOG_TEST 1                # Wrap test in script to log output
 	LOG_INSTALL 1             # Wrap install in script to log output
     )
