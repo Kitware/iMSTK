@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM SFML)
 if(WIN32)
   list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
