@@ -33,8 +33,6 @@ target_link_libraries(smRendering
 )
 get_target_property(inc_prop glfw::glfw INTERFACE_INCLUDE_DIRECTORIES)
 get_target_property(link_prop glfw::glfw INTERFACE_LINK_LIBRARIES)
-message("INTERFACE_INCLUDE_DIRECTORIES=${inc_prop}")
-message("INTERFACE_LINK_LIBRARIES=${link_prop}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   target_compile_options(smRendering
