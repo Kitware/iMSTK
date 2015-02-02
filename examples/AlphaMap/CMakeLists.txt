@@ -7,10 +7,3 @@ target_link_libraries(AlphaMap
   smExternalDevices
   smMesh
   )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(AlphaMap
-    PRIVATE
-      -std=c++11
-  )
-endif()

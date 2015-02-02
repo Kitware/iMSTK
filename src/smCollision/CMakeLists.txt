@@ -15,10 +15,3 @@ target_link_libraries(smCollision
   PUBLIC
     smCore
 )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smCollision
-    PRIVATE
-      -std=c++11
-  )
-endif()

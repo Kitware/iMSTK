@@ -26,15 +26,4 @@ target_link_libraries(smRendering
     smExternal
     smUtilities
     smShader
- PUBLIC
-    Qt4::QtGui
-    Qt4::QtOpenGL
-    QGLViewer::QGLViewer
 )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smRendering
-    PRIVATE
-      -std=c++11
-  )
-endif()

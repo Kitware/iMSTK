@@ -46,7 +46,6 @@ target_link_libraries(smCore
   PUBLIC
     GLEW::GLEW
     GLUT::GLUT
-    QGLViewer::QGLViewer
     ${OPENGL_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
@@ -61,9 +60,4 @@ target_link_libraries(smCore
     ${IL_LIBRARIES}
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smCore
-    PRIVATE
-      -std=c++11
-  )
-endif()
+target_compile_features(smCore PUBLIC cxx_auto_type)
