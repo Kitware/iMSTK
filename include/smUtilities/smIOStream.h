@@ -292,6 +292,8 @@ public:
         smViewer *viewer = (smViewer *)p_params.rendererObject;
         glColor3fv(smColor::colorWhite.toGLColor());
 
+        /*
+        //This needs to be replaced by some opengl text api in the future
         for (smInt i = 0; i < totalTexts; i++)
         {
             if (windowTexts[i].enabled)
@@ -300,6 +302,7 @@ public:
             }
 
         }
+        */
     }
 };
 /// \brief window console
@@ -369,6 +372,7 @@ public:
         initialTextPositionY = viewer->height() - viewer->height() * top + font.pointSize();
         glColor3fv(smColor::colorWhite.toGLColor());
 
+        /*
         for (smInt i = currentIndex; i < currentIndex + totalTexts; i++)
         {
             drawIndex = i % totalTexts;
@@ -380,6 +384,7 @@ public:
         }
 
         viewer->drawText(0, viewer->height() - 10, ">>>" + enteredString, font);
+        */
     }
     /// \brief  handle events
     void handleEvent(smEvent *p_event)

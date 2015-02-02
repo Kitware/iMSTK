@@ -8,6 +8,7 @@ simmedtk_add_library(smRendering
     smVAO.cpp
     smVBO.cpp
     smViewer.cpp
+    smCamera.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smCustomRenderer.h

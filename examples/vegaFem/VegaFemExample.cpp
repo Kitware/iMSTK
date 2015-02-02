@@ -58,11 +58,8 @@ vegaFemExample::vegaFemExample()
     simulator->registerObjectSimulator(femSim);
 
     /// create a viewer
-    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_GROUND;
+    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
     viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
-
-    //Set some camera parameters
-    viewer->camera()->setZClippingCoefficient(100);
 
     /// run the SDK
     sofmisSDK->run();

@@ -23,7 +23,6 @@
   *  \copyright Apache License, Version 2.0.
   */
 
-#include <GL/glew.h>
 #include "smCore/smConfig.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smCoreClass.h"
