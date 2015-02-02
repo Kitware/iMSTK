@@ -1,6 +1,7 @@
 
+set(LIBRARY_SUFFIX)
 if( MSVC )
-  # in order to prevent DLL hell, each of the DLLs have to be suffixed with the major version and msvc prefix
+  # each of the DLLs are suffixed with the major version and msvc prefix
   if( MSVC70 OR MSVC71 )
     set(MSVC_PREFIX "vc70")
   elseif( MSVC80 )
