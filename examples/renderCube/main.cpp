@@ -32,6 +32,7 @@
 
 int main()
 {
+    /*
   // Request a 32-bits depth buffer when creating the window
   sf::ContextSettings contextSettings;
   contextSettings.depthBits = 32;
@@ -213,6 +214,7 @@ int main()
   glDeleteTextures(1, &texture);
 
   return EXIT_SUCCESS;
-//     renderExample();
-//     return 0;
+  */
+     renderExample();
+     return 0;
 }

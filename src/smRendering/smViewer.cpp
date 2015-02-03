@@ -52,29 +52,9 @@
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
-void SetVSync(bool sync)
+void smViewer::setVSync(bool sync)
 {
-
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
-    PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
-    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress("wglSwapIntervalEXT");
-
-    if (wglSwapIntervalEXT)
-    {
-        wglSwapIntervalEXT(sync);
-    }
-
-#elif defined(SIMMEDTK_OPERATINGSYSTEM_LINUX)
-    Display *dpy = glXGetCurrentDisplay();
-    GLXDrawable drawable = glXGetCurrentDrawable();
-    unsigned int swap, maxSwap;
-
-    if (drawable && dpy)
-    {
-        glXSwapIntervalEXT(dpy, drawable, sync);
-    }
-
-#endif
+    this->sfmlWindow.setVerticalSyncEnabled(true);
 }
 
 smRenderOperation::smRenderOperation()
@@ -940,11 +920,11 @@ inline void smViewer::adjustFPS()
 
         if (unlimitedFPSEnabled)
         {
-            SetVSync(false);
+            setVSync(false);
         }
         else
         {
-            SetVSync(true);
+            setVSync(true);
         }
     }
 }
@@ -1081,7 +1061,6 @@ void smViewer::draw()
     }
     else
     {
-        //renderSceneList(param);
         for (int i = 0; i < renderOperations.size(); i++)
         {
             processRenderOperation(renderOperations[i], param);
@@ -1107,37 +1086,41 @@ void smViewer::beginFrame()
         terminationCompleted = true;
     }
 
-    glfwMakeContextCurrent(window);
+    this->sfmlWindow.setActive(true); //activates opengl context
 }
 
 ///called by the module after each frame ends
 void smViewer::endFrame()
 {
-    glfwSwapBuffers(window);
+    this->sfmlWindow.display(); //swaps buffers
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void smViewer::processSFMLEvents(sf::Event p_event)
 {
-    smEvent *eventKeyboard;
     smSDK *sdk = smSDK::getInstance();
-    smViewer *viewer = sdk->getViewerInstance();
-    if (viewer == NULL)
-    {
-        return;
-    }
+    /* Need to integrate event system
+    smEvent *eventKeyboard;
 
     eventKeyboard = new smEvent();
     eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-    eventKeyboard->senderId = viewer->getModuleId();
+    eventKeyboard->senderId = this->getModuleId();
     eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventKeyboard->data = new smKeyboardEventData();
     ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
     sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
+    */
 
-    //This should be handled by smViewer's handleEvent() function
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    // Close window: exit
+    if (p_event.type == sf::Event::Closed)
     {
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        this->sfmlWindow.close();
+        sdk->shutDown();
+    }
+
+    // Escape key: exit
+    if ((p_event.type == sf::Event::KeyPressed) && (p_event.key.code == sf::Keyboard::Escape))
+    {
+        this->sfmlWindow.close();
         sdk->shutDown();
     }
 }
@@ -1211,7 +1194,7 @@ void smViewer::updateText(smInt p_handle, QString p_string)
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(string str)
+void smViewer::setWindowTitle(const string &str)
 {
     windowTitle = str;
 }
@@ -1220,27 +1203,21 @@ void smViewer::exec()
 {
     int count;
 
-    // Init GLFW(OpenGL context)
-    if (!glfwInit())
-    {
-        exit(EXIT_FAILURE);
-    }
+    // Init OpenGL context
+    sf::Context context;
 
-    // Init the rest of GLFW
+    // Init the rest of window system
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
     {
-        GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, sf::Style::Fullscreen);
     }
     else
     {
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), NULL, NULL);
+        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, (sf::Style::Titlebar | sf::Style::Close));
     }
 
-    glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
 
     // Init GLEW
     GLenum err = glewInit();
@@ -1256,16 +1233,17 @@ void smViewer::exec()
     // Init the viewer
     this->init();
 
-    while (!terminateExecution) {
+    while (!terminateExecution)
+    {
+        sf::Event event;
         this->draw();
-        glfwPollEvents();
+        while (this->sfmlWindow.pollEvent(event))
+        {
+            this->processSFMLEvents(event);
+        }
     }
 
     destroyFboListItems();
-
-    //Shutdown glfw
-    glfwDestroyWindow(window);
-    glfwTerminate();
 }
 
 smInt smViewer::height(void)

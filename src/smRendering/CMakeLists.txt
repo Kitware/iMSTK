@@ -28,8 +28,8 @@ target_link_libraries(smRendering
     smShader
  PUBLIC
     Qt4::QtGui
-    Qt4::QtOpenGL
-    QGLViewer::QGLViewer
+    sfml::window
+    sfml::system
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

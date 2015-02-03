@@ -48,7 +48,7 @@
 #include "smShader/SceneTextureShader.h"
 
 #include "smRendering/smCamera.h"
-#include <GLFW/glfw3.h>
+#include <SFML/Window.hpp>
 
 //forward declaration
 class smSDK;
@@ -144,7 +144,7 @@ public:
     smRenderingStageType renderStage;
     smBool boostViewer;
 
-    GLFWwindow* window;
+    sf::Window sfmlWindow;
     smCamera camera;
 
     smInt height(void);
@@ -192,7 +192,11 @@ public:
     /// \brief set scene as texture
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
     /// \brief set the window title
-    void setWindowTitle(string);
+    void setWindowTitle(const string &str);
+    /// \brief enable/disable VSync
+    void setVSync(bool sync);
+    /// \brief processes an SFML event
+    void processSFMLEvents(sf::Event p_event);
     /// \brief Registers a scene for rendering with the viewer
     void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.

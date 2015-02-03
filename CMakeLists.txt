@@ -288,7 +288,6 @@ find_package(VegaFEM REQUIRED CONFIG)
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
-simmedtk_find_package(QGLViewer REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 
@@ -321,6 +320,7 @@ include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
+include_directories(SYSTEM "${SFML_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # SimMedTK_SUPERBUILD_BINARY_DIR
