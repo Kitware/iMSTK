@@ -157,6 +157,10 @@ if(WIN32)
     list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
       -DBOOST_LIBRARYDIR:PATH=${BOOST_LIBRARYDIR})
   endif()
+  if( DEFINED SimMedTK_WINDOWS_DEPENDENCIES_DIR)
+    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+      -DSimMedTK_WINDOWS_DEPENDENCIES_DIR:PATH=${SimMedTK_WINDOWS_DEPENDENCIES_DIR})
+  endif()
 endif(WIN32)
 
 #-----------------------------------------------------------------------------

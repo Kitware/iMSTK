@@ -21,13 +21,13 @@ macro (simmedtk_find_package package_name)
   if (WIN32)
     # TODO: Eventually we won't be needing this
     set(CMAKE_INCLUDE_PATH
-      "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/${package_name}"
-      "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/${package_name}/include"
-      "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/lib${package_name}/include"
+      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}"
+      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/include"
+      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/include"
       )
     set(CMAKE_LIBRARY_PATH
-      "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/${package_name}/lib"
-      "${CMAKE_CURRENT_SOURCE_DIR}/dependencies/win32/release/lib${package_name}/lib"
+      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/lib"
+      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/lib"
       )
   endif (WIN32)
 
