@@ -60,4 +60,6 @@ target_link_libraries(smCore
     ${IL_LIBRARIES}
 )
 
-target_compile_features(smCore PUBLIC cxx_auto_type)
+if(NOT MSVC)
+  target_compile_features(smCore PUBLIC cxx_auto_type)
+endif()

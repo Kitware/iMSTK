@@ -34,6 +34,7 @@ mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
 # Device options
+#
 option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
