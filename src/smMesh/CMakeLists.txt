@@ -21,10 +21,3 @@ target_link_libraries(smMesh
     smCore
     smRendering
     )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smMesh
-    PRIVATE
-      -std=c++11
-  )
-endif()

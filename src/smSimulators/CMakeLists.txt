@@ -41,18 +41,9 @@ target_link_libraries(smSimulators
     VegaFEM::elasticForceModel
     VegaFEM::isotropicHyperelasticFEM
     VegaFEM::loadList
-  INTERFACE
-    ${Boost_THREAD_LIBRARY}
     )
 
 target_include_directories(smSimulators
   PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smSimulators
-    PRIVATE
-      -std=c++11
-  )
-endif()

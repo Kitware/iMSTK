@@ -12,10 +12,3 @@ target_link_libraries(smExternal
   PRIVATE
     smCore
 )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smExternal
-    PRIVATE
-      -std=c++11
-  )
-endif()
