@@ -220,6 +220,24 @@ public:
     smVec3d finalDeviceRightCameraDir;
 
 protected:
+    /// \brief Initializes OpenGL capabilities and flags
+    void initGLCaps();
+    /// \brief Initializes lights for rendering
+    void initLights();
+    /// \brief Initializes the internal objectList
+    void initObjects(smDrawParam p_param);
+    /// \brief Initializes FBOs, textures, shaders and VAOs
+    void initResources(smDrawParam p_param);
+    /// \brief Initializes scenes in the sceneList
+    void initScenes(smDrawParam p_param);
+    /// \brief Initializes the viewer's camera
+    void initCamera();
+    /// \brief Initilizes the OpenGL context, and window containing it
+    void initGLContext();
+    /// \brief Cleans up after initGLContext()
+    void destroyGLContext();
+    /// \brief Cleanup function called on exit to ensure resources are cleaned up
+    void cleanUp();
     /// \brief Renders the internal sceneList
     void renderSceneList(smDrawParam p_param);
     /// \brief Processes a render operation
