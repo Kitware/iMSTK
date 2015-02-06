@@ -39,6 +39,10 @@ option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
 
 #-----------------------------------------------------------------------------
+# Oculus Option - Disabled by default
+option(SimMedTK_USE_OCULUS "Build SimMedTK with Oculus Support" OFF)
+
+#-----------------------------------------------------------------------------
 # Output directories - this is where built library and executable
 # files will be placed after building but prior to install.  The
 # necessary variables change between single and multi configuration
@@ -283,11 +287,14 @@ find_package(Eigen3 REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtOpenGL)
 find_package(VegaFEM REQUIRED CONFIG)
 
+if(SimMedTK_USE_OCULUS)
+  find_package(Oculus REQUIRED)
+  include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
+endif()
 
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
-simmedtk_find_package(QGLViewer REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 

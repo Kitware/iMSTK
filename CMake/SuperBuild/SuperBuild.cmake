@@ -22,6 +22,10 @@ if(WIN32)
   list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
 
+if(SimMedTK_USE_OCULUS)
+  list(APPEND SimMedTK_DEPENDENCIES Oculus)
+endif(SimMedTK_USE_OCULUS)
+
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
 #           when you are adding a new external project dependency.
@@ -171,6 +175,7 @@ ExternalProject_Add(${proj}
     -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
     -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}
     -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
+    -DSimMedTK_USE_OCULUS:BOOL=${SimMedTK_USE_OCULUS}
     ${SimMedTK_OUTPUT_DIRECTORIES}
     ${SimMedTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}

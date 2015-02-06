@@ -8,6 +8,7 @@ simmedtk_add_library(smRendering
     smVAO.cpp
     smVBO.cpp
     smViewer.cpp
+    smOculusViewer.cpp
     smCamera.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
@@ -18,6 +19,7 @@ simmedtk_add_library(smRendering
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h
 )
 
 target_link_libraries(smRendering
@@ -29,7 +31,7 @@ target_link_libraries(smRendering
  PUBLIC
     Qt4::QtGui
     Qt4::QtOpenGL
-    QGLViewer::QGLViewer
+    $<$<BOOL:SimMedTK_USE_OCULUS>:Oculus::Oculus>
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

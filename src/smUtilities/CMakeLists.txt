@@ -9,8 +9,6 @@ simmedtk_add_library(smUtilities
 target_link_libraries(smUtilities
   PRIVATE
     smCore
-  INTERFACE
-    QGLViewer::QGLViewer
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

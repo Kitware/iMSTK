@@ -46,7 +46,6 @@ target_link_libraries(smCore
   PUBLIC
     GLEW::GLEW
     GLUT::GLUT
-    QGLViewer::QGLViewer
     ${OPENGL_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
