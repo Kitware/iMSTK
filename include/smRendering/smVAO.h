@@ -72,7 +72,7 @@ public:
     smVBOBufferEntryInfo()
     {
         shaderAttribLocation = -1;
-        attributeIndex - 1;
+        attributeIndex = 1;
         attribPointer = NULL;
         nbrElements = 0;
         arrayBufferType = SMVBO_POS;

@@ -26,6 +26,19 @@
 #ifndef SMCONFIG_H
 #define SMCONFIG_H
 #undef _UNICODE
+
+/// \brief Windows definition is here
+#ifdef _WIN32
+#define SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#endif
+#ifdef __linux__
+#define SIMMEDTK_OPERATINGSYSTEM_LINUX
+#endif
+
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#include <windows.h>
+#endif
+
 #include <iostream>
 #include <cstdint>
 #include <GL/glew.h>
@@ -35,13 +48,6 @@
 using namespace std;
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0
-/// \brief Windows definition is here
-#ifdef _WIN32
-#define SIMMEDTK_OPERATINGSYSTEM_WINDOWS
-#endif
-#ifdef __linux__
-#define SIMMEDTK_OPERATINGSYSTEM_LINUX
-#endif
 /// \brief defines the threading mechanism
 #define SIMMEDTK_THREAD_OPENMP
 //#define SIMMEDTK_THREAD_QTTHREAD
@@ -221,14 +227,12 @@ enum smClassDrawOrder
 #ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 #define inline  __forceinline
 #pragma inline_recursion(on)
-#pragma inline_depth( [255] )
+#pragma inline_depth(255)
 #endif
 /// \brief  fast min, max
 #define SIMMEDTK_MIN(X,Y) (X<Y?X:Y)
 /// \brief  fast min, max
 #define SIMMEDTK_MAX(X,Y) (X>Y?X:Y)
-/// \brief  operator overloading for smString
-ostream &operator<<(ostream &p_os, smString &p_param);
 
 class smSDK;
 class smViewer;

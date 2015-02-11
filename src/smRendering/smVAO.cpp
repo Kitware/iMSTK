@@ -160,6 +160,7 @@ smBool smVAO::updateStreamData()
 
         return true;
     }
+    return false;
 }
 
 void smVAO::draw(smDrawParam p_params)
