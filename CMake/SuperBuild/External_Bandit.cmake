@@ -17,11 +17,11 @@
 #
 ###########################################################################
 #
-# GLM
+# Bandit
 #
 
-set(GLM_TAG "fad35c4e87d3e72b8911266c9fac5c04f5ee70f7")
-set(GLM_REPOSITORY ${git_protocol}://github.com/g-truc/glm.git)
+set(Bandit_TAG "32246b1015196f4ecf235bba4625d0f15e866666")
+set(Bandit_REPOSITORY ${git_protocol}://github.com/joakimkarlsson/bandit.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -31,16 +31,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED GLM_DIR AND NOT EXISTS ${GLM_DIR})
-  message(FATAL_ERROR "GLM_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED Bandit_DIR AND NOT EXISTS ${Bandit_DIR})
+  message(FATAL_ERROR "Bandit_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(GLM_DEPENDENCIES "")
+set(Bandit_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(GLM)
+SimMedTKCheckDependencies(Bandit)
 
-set(proj GLM)
+set(proj Bandit)
 
 if(NOT DEFINED ${proj}_DIR)
 
@@ -56,7 +56,6 @@ if(NOT DEFINED ${proj}_DIR)
     BUILD_COMMAND ""
     CONFIGURE_COMMAND ""
     CMAKE_GENERATOR ${gen}
-
     DEPENDS
       ${${proj}_DEPENDENCIES}
 	LOG_DOWNLOAD 1            # Wrap download in script to log output

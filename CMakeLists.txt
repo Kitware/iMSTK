@@ -63,7 +63,6 @@ set(SimMedTK_VERSION_PATCH 1)
 # Testing
 #
 option(BUILD_TESTING "Test the project" ON)
-include(SimMedTKTesting)
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -201,6 +200,15 @@ include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
+
+#-----------------------------------------------------------------------------
+# Testing framework
+#
+if(BUILD_TESTING)
+  find_package(Bandit REQUIRED)
+  include_directories(${BANDIT_INCLUDE_DIR})
+  include(SimMedTKTesting)
+endif()
 
 #-----------------------------------------------------------------------------
 # SimMedTK_SUPERBUILD_BINARY_DIR

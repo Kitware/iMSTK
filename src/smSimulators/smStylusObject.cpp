@@ -23,8 +23,10 @@
 
 #include "smSimulators/smStylusObject.h"
 #include "smCollision/smCollisionModel.h"
-#include "smCollision/smCollisionModel.hpp"
+#include "smCollision/smSurfaceTree.h"
+#include "smCollision/smOctreeCell.h"
 #include "smMesh/smMesh.h"
+#include "smUtilities/smGLUtils.h"
 
 void smStylusRigidSceneObject::draw(smDrawParam p_params)
 {
