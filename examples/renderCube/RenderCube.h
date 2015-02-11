@@ -23,10 +23,26 @@
   *  \copyright Apache License, Version 2.0.
   */
 
-#include "RenderCube.h"
+#ifndef RENDER_CUBE_H
+#define RENDER_CUBE_H
 
-int main()
+#include "smCore/smSDK.h"
+
+class RenderCube : public smSimulationMain, public smCoreClass
 {
-    runRenderCube();
-    return 0;
-}
+public:
+    RenderCube();
+    void simulateMain(smSimulationMainParam p_param);
+private:
+    smSDK* simmedtkSDK;
+    smScene *scene1;
+    smStaticSceneObject cube;
+    smViewer viewer;
+
+    void setupLights();
+    void setupCamera();
+};
+
+void runRenderCube();
+
+#endif

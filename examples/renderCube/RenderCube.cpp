@@ -23,16 +23,16 @@
   *  \copyright Apache License, Version 2.0.
   */
 
+#include "RenderCube.h"
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
-#include "RenderExample.h"
 
-/// \brief A simple example of how to render and object using SimMedTK
+/// \brief A simple example of how to render an object using SimMedTK
 ///
 /// \detail This is the default constructor, however, this is where the main
 /// program runs.  This program will create a cube with a texture pattern
 /// numbering each side of the cube, that's all it does.
-RenderExample::RenderExample()
+RenderCube::RenderCube()
 {
     //Create an instance of the SimMedTK framework/SDK
     simmedtkSDK = smSDK::createSDK();
@@ -41,7 +41,8 @@ RenderExample::RenderExample()
     scene1 = simmedtkSDK->createScene();
 
     //Create a viewer to see the scene through
-    viewer = simmedtkSDK->createViewer();
+    //viewer = simmedtkSDK->createViewer();
+    simmedtkSDK->addViewer(&viewer);
 
     //Initialize the texture manager
     smTextureManager::init(smSDK::getErrorLog());
@@ -51,7 +52,6 @@ RenderExample::RenderExample()
 
     //Load the cube model
     cube.mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
-
     //Assign the previously loaded texture to the cube model
     cube.mesh->assignTexture("cubetex");
     //Tell SimMedTK to render the faces of the model, and the texture assigned
@@ -61,16 +61,16 @@ RenderExample::RenderExample()
     scene1->addSceneObject(&cube);
 
     //Register the scene with the viewer, and setup render target
-    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, "");
+    viewer.registerScene(scene1, SMRENDERTARGET_SCREEN, "");
 
     //Setup the window title in the window manager
-    viewer->setWindowTitle("SimMedTK RENDER TEST");
+    viewer.setWindowTitle("SimMedTK RENDER TEST");
 
     //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
-    viewer->addObject(this);
+    viewer.addObject(this);
 
     //Set some viewer properties
-    viewer->setScreenResolution(800, 640);
+    viewer.setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
@@ -83,15 +83,15 @@ RenderExample::RenderExample()
 
     //Link up the event system between the viewer and the SimMedTK SDK
     //Note: This allows some default behavior like mouse and keyboard control
-    viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
+    viewer.setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(viewer, SIMMEDTK_EVENTTYPE_KEYBOARD);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(&viewer, SIMMEDTK_EVENTTYPE_KEYBOARD);
 
     //Run the simulator framework
     simmedtkSDK->run();
 }
 
-void RenderExample::setupLights()
+void RenderCube::setupLights()
 {
      //Setup Scene lighting
     smLight* light = new smLight("SceneLight1",
@@ -107,28 +107,28 @@ void RenderExample::setupLights()
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;
     light->attn_quadratic = 0.0;
-    viewer->addLight(light);
+    viewer.addLight(light);
 }
 
-void RenderExample::setupCamera()
+void RenderCube::setupCamera()
 {
-    viewer->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    viewer->camera.setFarClipDist(1000);
-    viewer->camera.setNearClipDist(0.001);
-    viewer->camera.setViewAngle(0.785398f); //45 degrees
-    viewer->camera.setCameraPos(3, 3, 5);
-    viewer->camera.setCameraFocus(0, 0, 0);
-    viewer->camera.setCameraUpVec(0, 1, 0);
-    viewer->camera.genProjMat();
-    viewer->camera.genViewMat();
+    viewer.camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    viewer.camera.setFarClipDist(1000);
+    viewer.camera.setNearClipDist(0.001);
+    viewer.camera.setViewAngle(0.785398f); //45 degrees
+    viewer.camera.setCameraPos(3, 3, 5);
+    viewer.camera.setCameraFocus(0, 0, -1);
+    viewer.camera.setCameraUpVec(0, 1, 0);
+    viewer.camera.genProjMat();
+    viewer.camera.genViewMat();
 }
 
-void RenderExample::simulateMain(smSimulationMainParam p_param)
+void RenderCube::simulateMain(smSimulationMainParam p_param)
 {
 }
 
-void renderExample()
+void runRenderCube()
 {
-    RenderExample *re = new RenderExample();
-    delete re;
+    RenderCube *rc = new RenderCube();
+    delete rc;
 }

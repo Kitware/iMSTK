@@ -112,7 +112,7 @@ smRenderOperation::smRenderOperation()
     fboName = "";
 }
 
-smViewer::smViewer(smErrorLog *log)
+smViewer::smViewer()
 {
     type = SIMMEDTK_SMVIEWER;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
@@ -126,7 +126,7 @@ smViewer::smViewer(smErrorLog *log)
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
-    this->log = log;
+    this->log = NULL;
     consoleDisplay = false;
     lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
     windowOutput = new smOpenGLWindowStream();
@@ -171,8 +171,9 @@ smBool smViewer::setLight(smInt p_lightId, smLight *p_light)
     if (index > 0)
     {
         lights->getByRef(p_lightId)->renderUsage = GL_LIGHT0 + p_lightId;
-        return  index;
+        return true;
     }
+    return false;
 }
 
 void smViewer::refreshLights()

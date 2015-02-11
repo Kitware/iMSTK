@@ -67,25 +67,15 @@ smSDK::~smSDK()
 
 }
 
-/// \brief creates the viewer for the simulator
-smViewer *smSDK::createViewer()
+void smSDK::addViewer(smViewer* p_viewer)
 {
+    assert(p_viewer);
 
-    if (this->viewer == NULL)
-    {
+    this->viewer = p_viewer;
+    this->viewer->log = this->errorLog;
+    this->viewer->dispathcer = this->dispathcer;
 
-        viewer = new smViewer(errorLog);
-        viewer->dispathcer = dispathcer;
-
-        for (smInt j = 0; j < (*scenesRef).size(); j++)
-        {
-            viewer->sceneList.push_back((*scenesRef)[j].scene);
-        }
-
-        registerModule(viewer);
-    }
-
-    return viewer;
+    this->registerModule(p_viewer);
 }
 
 /// \brief Returns a pointer to the viewer object
@@ -168,16 +158,6 @@ void smSDK::run()
 
     updateSceneListAll();
     initRegisteredModules();
-
-    //previous code where explicit code written for all modules
-    if (viewer == NULL)
-    {
-        errorLog->addError(this, "smSDK:Viewer is not created");
-    }
-    else
-    {
-        viewer->exec();
-    }
 
     if (simulator != NULL)
     {

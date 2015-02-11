@@ -23,10 +23,27 @@
   *  \copyright Apache License, Version 2.0.
   */
 
-#include "RenderCube.h"
+#ifndef RENDER_CUBE_OCULUS_H
+#define RENDER_CUBE_OCULUS_H
 
-int main()
+#include "smCore/smSDK.h"
+#include "smRendering/smOculusViewer.h"
+
+class RenderCubeOculus : public smSimulationMain, public smCoreClass
 {
-    runRenderCube();
-    return 0;
-}
+public:
+    RenderCubeOculus();
+    void simulateMain(smSimulationMainParam p_param);
+private:
+    smSDK* simmedtkSDK;
+    smScene *scene1;
+    smStaticSceneObject cube;
+    smOculusViewer viewer;
+
+    void setupLights();
+    void setupCamera();
+};
+
+void runRenderCubeOculus();
+
+#endif

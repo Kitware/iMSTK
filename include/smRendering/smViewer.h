@@ -174,8 +174,8 @@ public:
     void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3<smFloat> p_direction);
     /// \brief disable vSync
     void setUnlimitedFPS(smBool p_enableFPS);
-    /// \brief constructor. requires error log.
-    smViewer(smErrorLog *log);
+    /// \brief default constructor
+    smViewer();
     /// \brief initialization for viewer
     virtual  void init();
     /// \brief for exit viewer
@@ -237,7 +237,7 @@ protected:
     /// \brief Cleans up after initGLContext()
     void destroyGLContext();
     /// \brief Cleanup function called on exit to ensure resources are cleaned up
-    void cleanUp();
+    virtual void cleanUp();
     /// \brief Renders the internal sceneList
     void renderSceneList(smDrawParam p_param);
     /// \brief Processes a render operation
@@ -245,7 +245,7 @@ protected:
     /// \brief Processes viewerRenderDetail options
     void processViewerOptions();
     /// \brief Renders the render operation to screen
-    void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    virtual void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Renders the render operation to an FBO
     void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Initializes the FBOs in the FBO list

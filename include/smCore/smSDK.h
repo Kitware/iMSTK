@@ -246,8 +246,9 @@ public:
         return &sdk;
     }
 
-    ///SDK creates viewer
-    smViewer *createViewer();
+    /// \brief Registers a viewer object with the SDK
+    ///
+    void addViewer(smViewer* p_viewer);
 
     ///SDK returns a pointer to the viewer
     smViewer *getViewerInstance();
