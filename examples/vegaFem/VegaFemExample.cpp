@@ -36,7 +36,7 @@ vegaFemExample::vegaFemExample()
     scene1 = sofmisSDK->createScene();
 
     //Create a viewer to see the scene
-    viewer = sofmisSDK->createViewer();
+    sofmisSDK->addViewer(&viewer);
 
     /// create a FEM simulator
     femSim = new smVegaFemSimulator(sofmisSDK->getErrorLog());
@@ -58,8 +58,8 @@ vegaFemExample::vegaFemExample()
     simulator->registerObjectSimulator(femSim);
 
     /// create a viewer
-    viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
-    viewer->setEventDispatcher(sofmisSDK->getEventDispatcher());
+    viewer.viewerRenderDetail = viewer.viewerRenderDetail | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
+    viewer.setEventDispatcher(sofmisSDK->getEventDispatcher());
 
     /// run the SDK
     sofmisSDK->run();

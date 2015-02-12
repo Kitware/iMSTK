@@ -37,12 +37,6 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
-#include <OVR.h>
-#include <Kernel/OVR_Types.h>
-#include <OVR_CAPI.h>
-#include <OVR_CAPI_GL.h>
-#include <CAPI/CAPI_HSWDisplay.h>
-
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
