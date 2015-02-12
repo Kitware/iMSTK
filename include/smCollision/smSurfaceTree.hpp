@@ -50,7 +50,6 @@ void smSurfaceTree<CellType>::initStructure()
     treeAllLevels[0] = root;
     this->createTree(treeAllLevels[0], triangles, 0, 0);
 	initialTreeAllLevels = treeAllLevels;
-    memcpy(initialTreeAllLevels, treeAllLevels, this->totalCells * sizeof(CellType));
 }
 
 /// \brief destructor
@@ -255,7 +254,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
 
         for (set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
-            totalDistance += Node.cube.center.distance(mesh->vertices[*it]);
+            totalDistance += Node.getCube().center.distance(mesh->vertices[*it]);
         }
 
         float weightSum = 0;
@@ -327,7 +326,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
             treeAllLevels[index].copyShape(subDividedNodes[j]);
             treeAllLevels[index].level = level + 1;
             treeAllLevels[index].filled = true;
-            createTree(treeAllLevels[index], triangles[j], level + 1, j + levelStartIndex[level][0] + offset);
+            createTree(treeAllLevels[index], triangleMatrix[j], level + 1, j + levelStartIndex[level][0] + offset);
         }
         else
         {

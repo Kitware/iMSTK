@@ -30,13 +30,13 @@
 extern inline int tri_tri_intersect(float V0[3], float V1[3], float V2[3],
                                     float U0[3], float U1[3], float U2[3]);
 
-extern inline int tri_tri_intersect_with_isectline_penetrationDepth(float V0[3],
+extern int tri_tri_intersect_with_isectline_penetrationDepth(float V0[3],
         float V1[3], float V2[3], float U0[3], float U1[3], float U2[3],
         int *coplanar, float isectpt1[3], float isectpt2[3],
         short &vSinglePoint, short &uSinglePoint, float point1[3],
         float point2[3]);
 
-extern inline int triBoxOverlap(float boxcenter[3], float boxhalfsize[3],
+extern int triBoxOverlap(float boxcenter[3], float boxhalfsize[3],
                                 float triverts[3][3]);
 
 void smAABB::subDivide(smFloat  p_length, smInt p_divison, smAABB *p_aabb)
