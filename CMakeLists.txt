@@ -165,6 +165,15 @@ find_package(Eigen3 REQUIRED)
 find_package(Qt4 REQUIRED QtCore QtOpenGL)
 find_package(VegaFEM REQUIRED CONFIG)
 
+#-----------------------------------------------------------------------------
+# Testing framework
+#
+if(BUILD_TESTING)
+  find_package(Bandit REQUIRED)
+  include_directories(${BANDIT_INCLUDE_DIR})
+  include(SimMedTKTesting)
+endif()
+
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
@@ -200,15 +209,6 @@ include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
 include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
-
-#-----------------------------------------------------------------------------
-# Testing framework
-#
-if(BUILD_TESTING)
-  find_package(Bandit REQUIRED)
-  include_directories(${BANDIT_INCLUDE_DIR})
-  include(SimMedTKTesting)
-endif()
 
 #-----------------------------------------------------------------------------
 # SimMedTK_SUPERBUILD_BINARY_DIR
