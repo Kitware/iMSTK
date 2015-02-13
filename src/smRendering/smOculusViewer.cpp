@@ -274,7 +274,7 @@ int smOculusViewer::initOculus(void)
     glCfg.OGL.Header.Multisample = 1;
 
 #if defined(OVR_OS_WIN32)
-    glCfg.OGL.Window = (void*)glfwGetWin32Window(window);
+    glCfg.OGL.Window = glfwGetWin32Window(window);
     glCfg.OGL.DC = wglGetCurrentDC();
 #elif defined(OVR_OS_LINUX)
     glCfg.OGL.Disp = glXGetCurrentDisplay();
