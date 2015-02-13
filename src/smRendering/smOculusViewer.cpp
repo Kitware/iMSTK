@@ -6,13 +6,48 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#ifdef WIN32
+    #define OVR_OS_WIN32
+#elif defined(__APPLE__)
+    #define OVR_OS_MAC
+#else
+    #define OVR_OS_LINUX
+    #include <X11/Xlib.h>
+    #include <GL/glx.h>
+#endif 
+
 #include <OVR.h>
 #include <OVR_CAPI_GL.h>
-//#include <CAPI/CAPI_HSWDisplay.h>
-//OVR_EXPORT void ovrhmd_EnableHSWDisplaySDKRender(ovrHmd hmd, ovrBool enable);
 
-void quat_to_matrix(const float *quat, float *mat);
-unsigned int next_pow2(unsigned int x);
+#if defined(WIN32)
+    #define GLFW_EXPOSE_NATIVE_WIN32
+    #define GLFW_EXPOSE_NATIVE_WGL
+#elif defined(__APPLE__)
+    #define GLFW_EXPOSE_NATIVE_COCOA
+    #define GLFW_EXPOSE_NATIVE_NSGL
+#else
+    #define GLFW_EXPOSE_NATIVE_X11
+    #define GLFW_EXPOSE_NATIVE_GLX
+#endif
+
+#include <GLFW/glfw3native.h>
+
+/// \brief Calculate the next power of two
+///
+/// \details Code from:
+/// http://nuclear.mutantstargoat.com/hg/oculus2/file/tip
+///
+/// \return Returns the next power of two
+static unsigned int next_pow2(unsigned int x)
+{
+    x -= 1;
+    x |= x >> 1;
+    x |= x >> 2;
+    x |= x >> 4;
+    x |= x >> 8;
+    x |= x >> 16;
+    return x + 1;
+}
 
 smOculusViewer::smOculusViewer() : smViewer()
 {
@@ -238,14 +273,13 @@ int smOculusViewer::initOculus(void)
     glCfg.OGL.Header.BackBufferSize = hmd->Resolution;
     glCfg.OGL.Header.Multisample = 1;
 
-#ifdef WIN32
-    //glCfg.OGL.Window = GetActiveWindow();
-    glCfg.OGL.Window = FindWindowA(NULL, windowTitle.c_str());
+#if defined(OVR_OS_WIN32)
+    glCfg.OGL.Window = (void*)glfwGetWin32Window(window);
     glCfg.OGL.DC = wglGetCurrentDC();
-#else
+#elif defined(OVR_OS_LINUX)
     glCfg.OGL.Disp = glXGetCurrentDisplay();
-    glCfg.OGL.Win = glXGetCurrentDrawable();
-#endif
+#endif 
+
 
     if (hmd->HmdCaps & ovrHmdCap_ExtendDesktop) {
         cout << "running in \"extended desktop\" mode\n";
@@ -258,7 +292,7 @@ int smOculusViewer::initOculus(void)
 #ifdef WIN32
         ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, 0, 0);
 #else
-        ovrHmd_AttachToWindow(hmd, (void*)glCfg.OGL.Win, 0, 0);
+        ovrHmd_AttachToWindow(hmd, (void*)glfwGetX11Window(window), 0, 0);
 #endif
         cout << "running in \"direct-hmd\" mode\n";
     }
@@ -332,46 +366,4 @@ void smOculusViewer::updateRenTarg(int width, int height)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     cout << "created render target: " << width << "x" << height
          << " (texture size: " << fbTexWidth << "x" << fbTexHeight << ")\n";
-}
-
-/// \brief Convert a quaternion to a rotation matrix
-///
-/// \details Code taken from:
-/// http://nuclear.mutantstargoat.com/hg/oculus2/file/tip
-static void quat_to_matrix(const float *quat, float *mat)
-{
-    mat[0] = 1.0 - 2.0 * quat[1] * quat[1] - 2.0 * quat[2] * quat[2];
-    mat[4] = 2.0 * quat[0] * quat[1] + 2.0 * quat[3] * quat[2];
-    mat[8] = 2.0 * quat[2] * quat[0] - 2.0 * quat[3] * quat[1];
-    mat[12] = 0.0f;
-
-    mat[1] = 2.0 * quat[0] * quat[1] - 2.0 * quat[3] * quat[2];
-    mat[5] = 1.0 - 2.0 * quat[0] * quat[0] - 2.0 * quat[2] * quat[2];
-    mat[9] = 2.0 * quat[1] * quat[2] + 2.0 * quat[3] * quat[0];
-    mat[13] = 0.0f;
-
-    mat[2] = 2.0 * quat[2] * quat[0] + 2.0 * quat[3] * quat[1];
-    mat[6] = 2.0 * quat[1] * quat[2] - 2.0 * quat[3] * quat[0];
-    mat[10] = 1.0 - 2.0 * quat[0] * quat[0] - 2.0 * quat[1] * quat[1];
-    mat[14] = 0.0f;
-
-    mat[3] = mat[7] = mat[11] = 0.0f;
-    mat[15] = 1.0f;
-}
-
-/// \brief Calculate the next power of two
-///
-/// \details Code from:
-/// http://nuclear.mutantstargoat.com/hg/oculus2/file/tip
-///
-/// \return Returns the next power of two
-static unsigned int next_pow2(unsigned int x)
-{
-    x -= 1;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return x + 1;
 }

@@ -5,6 +5,7 @@ target_link_libraries(vegaFemExample
   smRendering
   smSimulators
   smMesh
+  smShader
   )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
