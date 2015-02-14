@@ -41,7 +41,7 @@ private:
     smVegaFemSimulator *femSim;
     smMatrix33<smFloat> mat;
     smSimulator *simulator;
-    smViewer *viewer;
+    smViewer viewer;
     smScene *scene1;
 };
 

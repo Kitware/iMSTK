@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "smUtilities/smGLUtils.h"
-#include "smShader/smShader.h"
 #include "smCore/smTextureManager.h"
 
 ///checks the openGL error. if there is an error then it returns

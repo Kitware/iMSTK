@@ -5,4 +5,5 @@ target_link_libraries(vegaFemExample
   smRendering
   smSimulators
   smMesh
+  smShader
   )

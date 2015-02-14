@@ -172,8 +172,8 @@ public:
     void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3<smFloat> p_direction);
     /// \brief disable vSync
     void setUnlimitedFPS(smBool p_enableFPS);
-    /// \brief constructor. requires error log.
-    smViewer(smErrorLog *log);
+    /// \brief default constructor
+    smViewer();
     /// \brief initialization for viewer
     virtual  void init();
     /// \brief for exit viewer
@@ -218,6 +218,24 @@ public:
     smVec3d finalDeviceRightCameraDir;
 
 protected:
+    /// \brief Initializes OpenGL capabilities and flags
+    void initGLCaps();
+    /// \brief Initializes lights for rendering
+    void initLights();
+    /// \brief Initializes the internal objectList
+    void initObjects(smDrawParam p_param);
+    /// \brief Initializes FBOs, textures, shaders and VAOs
+    void initResources(smDrawParam p_param);
+    /// \brief Initializes scenes in the sceneList
+    void initScenes(smDrawParam p_param);
+    /// \brief Initializes the viewer's camera
+    void initCamera();
+    /// \brief Initilizes the OpenGL context, and window containing it
+    void initGLContext();
+    /// \brief Cleans up after initGLContext()
+    void destroyGLContext();
+    /// \brief Cleanup function called on exit to ensure resources are cleaned up
+    virtual void cleanUp();
     /// \brief Renders the internal sceneList
     void renderSceneList(smDrawParam p_param);
     /// \brief Processes a render operation
@@ -225,7 +243,7 @@ protected:
     /// \brief Processes viewerRenderDetail options
     void processViewerOptions();
     /// \brief Renders the render operation to screen
-    void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    virtual void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Renders the render operation to an FBO
     void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Initializes the FBOs in the FBO list

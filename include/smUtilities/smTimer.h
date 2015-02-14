@@ -23,6 +23,7 @@
 
 #ifndef SMTIMER_H
 #define SMTIMER_H
+
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 /// \brief definitions
@@ -36,9 +37,6 @@ enum smTimerType
     SIMMEDTK_TIMER_INMICROSECONDS
 };
 
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
-#include <windows.h>
-#endif
 /// \brief timer class
 class smTimer: public smCoreClass
 {
