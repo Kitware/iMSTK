@@ -1,6 +1,6 @@
 SimMedTK
 ======
 
-Medical simulation framework toolkit.
+Medical Simulation Toolkit.
 
 ```
