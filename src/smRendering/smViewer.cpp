@@ -75,26 +75,38 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 {
     smEvent *eventKeyboard;
     smSDK *sdk = smSDK::getInstance();
+    assert(sdk);
     smViewer *viewer = sdk->getViewerInstance();
-    if (viewer == NULL)
-    {
-        return;
-    }
+    assert(viewer);
+    smKeyboardEventData* kbData = NULL;
 
     eventKeyboard = new smEvent();
     eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
     eventKeyboard->senderId = viewer->getModuleId();
     eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventKeyboard->data = new smKeyboardEventData();
-    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
-    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
-
-    //This should be handled by smViewer's handleEvent() function
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    kbData = (smKeyboardEventData*)eventKeyboard->data;
+    kbData->keyBoardKey = GLFWKeyToSmKey(key);
+    if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
     {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-        sdk->shutDown();
+        kbData->pressed = true;
     }
+    else
+    {
+        kbData->pressed = false;
+    }
+
+    kbData->modKeys = smModKey::none;
+    if (mods & GLFW_MOD_SHIFT)
+        kbData->modKeys |= smModKey::shift;
+    if (mods & GLFW_MOD_CONTROL)
+        kbData->modKeys |= smModKey::control;
+    if (mods & GLFW_MOD_ALT)
+        kbData->modKeys |= smModKey::alt;
+    if (mods & GLFW_MOD_SUPER)
+        kbData->modKeys |= smModKey::super;
+
+    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
 }
 
 smRenderOperation::smRenderOperation()
@@ -777,8 +789,6 @@ void setTextureMatrix()
     glMatrixMode(GL_MODELVIEW);
 }
 
-
-
 void smViewer::renderTextureOnView()
 {
 
@@ -1194,12 +1204,6 @@ void smViewer::draw()
 ///called by the module before each frame starts
 void smViewer::beginFrame()
 {
-
-    if (terminateExecution == true)
-    {
-        terminationCompleted = true;
-    }
-
     glfwMakeContextCurrent(window);
 }
 
@@ -1218,11 +1222,6 @@ void smViewer::addObject(smCoreClass *object)
 
 void smViewer::handleEvent(smEvent *p_event)
 {
-
-    smHapticOutEventData *hapticEventData;
-    smHapticInEventData *hapticInEventData;
-    smCameraEventData *cameraData;
-    smLightMotionEventData *lightPosData;
     smLight *light;
     smVec3<smDouble> lightDir;
     smVec3<smDouble> lightUp;
@@ -1230,25 +1229,19 @@ void smViewer::handleEvent(smEvent *p_event)
 
     switch (p_event->eventType.eventTypeCode)
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        //left here as an example for implementation
-        //hapticEventData=(smHapticOutEventData *)p_event->data;
-        break;
-
-    case SIMMEDTK_EVENTTYPE_HAPTICIN:
-        //left here as an example for implementation
-        //hapticInEventData=(smHapticInEventData *)p_event->data;
-        break;
-
     case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
-        cameraData = (smCameraEventData *)p_event->data;
+    {
+        smCameraEventData *cameraData =
+            (smCameraEventData *)p_event->data;
         deviceCameraPos = cameraData->pos;
         deviceCameraDir = cameraData->direction;
         deviceCameraUpDir = cameraData->upDirection;
         break;
-
+    }
     case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
-        lightPosData = (smLightMotionEventData*)p_event->data;
+    {
+        smLightMotionEventData *lightPosData =
+            (smLightMotionEventData*)p_event->data;
 
         if (lights->size() < lightPosData->lightIndex)
         {
@@ -1256,7 +1249,9 @@ void smViewer::handleEvent(smEvent *p_event)
             light->lightPos.pos = lightPosData->pos;
             light->direction = lightPosData->direction;
         }
-
+        break;
+    }
+    default:
         break;
     }
 }
@@ -1300,6 +1295,9 @@ void smViewer::cleanUp()
 {
     destroyFboListItems();
     destroyGLContext();
+
+    //Must be set when all cleanup is done
+    terminationCompleted = true;
 }
 
 smInt smViewer::height(void)

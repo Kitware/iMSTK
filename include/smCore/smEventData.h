@@ -25,16 +25,19 @@
 #define SMEVENTDATA_H
 
 #include "smCore/smConfig.h"
+#include "smCore/smKey.h"
 #include "smUtilities/smVec3.h"
 #include "smUtilities/smMatrix44.h"
-#include <QKeyEvent>
 
+#include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
 using namespace std;
 
 /// \brief keyboard event data
 struct smKeyboardEventData
 {
-    smInt keyBoardKey;
+    smKey keyBoardKey; ///< Key that was pressed
+    smBool pressed; ///< if the key was pressed or released in this event
+    smModKey modKeys; ///< modifier keys.  See smModKey for values
 };
 
 /// \brief mouse event data

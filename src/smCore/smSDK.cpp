@@ -50,14 +50,20 @@ smIndiceArray<smMotionTransformer *> *smSDK::motionTransRef;
 smIndiceArray<smPipeHolder> *smSDK::pipesRef;
 
 /// \brief creates the scene of the simulator
-smScene  *smSDK::createScene()
+smScene *smSDK::createScene()
 {
-
     smScene*scene;
     scene = new smScene(errorLog);
     registerScene(scene);
     scene->setName(QString("Scene") + QString().setNum(scene->uniqueId.ID));
     return scene;
+}
+
+void smSDK::releaseScene(smScene* scene)
+{
+    assert(scene);
+    unRegisterScene(scene);
+    delete scene;
 }
 
 smSDK::~smSDK()
@@ -183,25 +189,4 @@ void smSDK::removeRef(smCoreClass* p_coreClass)
     objectRefMutex.lock();
     p_coreClass->referenceCounter--;
     objectRefMutex.unlock();
-}
-
-/// \brief
-void smSDK::handleEvent(smEvent *p_event)
-{
-
-    smKeyboardEventData *keyBoardData;
-
-    switch (p_event->eventType.eventTypeCode)
-    {
-
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        keyBoardData = (smKeyboardEventData*)p_event->data;
-
-        if (keyBoardData->keyBoardKey == Qt::Key_Escape)
-        {
-            terminateAll();
-        }
-
-        break;
-    }
 }

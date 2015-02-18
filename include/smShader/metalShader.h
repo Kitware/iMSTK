@@ -140,13 +140,13 @@ public:
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
-            if (keyBoardData->keyBoardKey == Qt::Key_Plus)
+            if (keyBoardData->keyBoardKey == smKey::Add)
             {
                 specularPowerValue += 5;
                 cout << specularPowerValue << endl;
             }
 
-            if (keyBoardData->keyBoardKey == Qt::Key_Minus)
+            if (keyBoardData->keyBoardKey == smKey::Subtract)
             {
                 specularPowerValue -= 5;
                 cout << specularPowerValue << endl;

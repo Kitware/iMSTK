@@ -160,7 +160,7 @@ struct smPipeHolder: public smBaseHolder
 
 };
 /// \brief SDK class. it is a singlenton class for each machine runs the framework
-class smSDK: public smCoreClass, public smEventHandler
+class smSDK: public smCoreClass
 {
 
 protected:
@@ -204,21 +204,16 @@ protected:
     smSDK()
     {
         shutdown = false;
-        smInt argc = 1;
-        smChar *argv[] = {SIMMEDTKVERSION_TEXT};
-        errorLog = new smErrorLog();
-        dispathcer = new smDispatcher();
-        eventDispatcher = new smEventDispatcher();
-        eventDispatcher->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-
         sceneIdCounter = 1;
-        //objectIdCounter=1;
         isModulesStarted = false;
         type = SIMMEDTK_SMSDK;
         viewer = NULL;
         simulator = NULL;
         sceneList.clear();
 
+        errorLog = new smErrorLog();
+        dispathcer = new smDispatcher();
+        eventDispatcher = new smEventDispatcher();
 
         meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
         modulesRef = new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
@@ -407,9 +402,6 @@ public:
         registerPipe(pipe);
         return pipe;
     }
-    /// \brief handle an event
-    void handleEvent(smEvent *p_event);
-
 };
 
 #endif
