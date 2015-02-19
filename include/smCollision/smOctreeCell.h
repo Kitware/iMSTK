@@ -32,13 +32,13 @@
 class smOctreeCell : public smSurfaceTreeCell<smOctreeCell>
 {
 protected:
-	using BaseType = smSurfaceTreeCell<smOctreeCell>;
-	using SelfType = smOctreeCell;
-	
+    using BaseType = smSurfaceTreeCell<smOctreeCell>;
+    using SelfType = smOctreeCell;
+
 public:
     smOctreeCell();
-	~smOctreeCell();
-  
+    ~smOctreeCell();
+
     enum { numberOfSubdivisions = 8 };
 
     /// \brief get a constant reference to the cell primitive
@@ -46,7 +46,7 @@ public:
 
     /// \brief get a reference to the cell primitive
     inline smCube &getCube();
-	
+
     /// \brief set the primitive
     inline void setCube(const smCube &other);
 

@@ -30,13 +30,6 @@
 // SimMedTK includes
 #include "smCollision/smOctreeCell.h"
 
-smOctreeCell::smOctreeCell() : BaseType()
-{
-
-}
-
-smOctreeCell::~smOctreeCell(){}
-
 smVec3f &smOctreeCell::getCenter() 
 {
     return  cube.center;

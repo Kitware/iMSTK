@@ -2,6 +2,7 @@
 simmedtk_add_library(smCollision
   SOURCES
     smSpatialHash.cpp
+    smOctreeCell.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionDetection.h
