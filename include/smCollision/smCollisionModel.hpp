@@ -178,7 +178,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
 
         keyBoardData = (smKeyboardEventData*)p_event->data;
 
-        if (keyBoardData->keyBoardKey == Qt::Key_Plus)
+        if (keyBoardData->keyBoardKey == smKey::Add)
         {
             minTreeRenderLevel++;
 
@@ -195,7 +195,7 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
             currentLevel = minTreeRenderLevel;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_Minus)
+        if (keyBoardData->keyBoardKey == smKey::Subtract)
         {
             minTreeRenderLevel--;
 
@@ -212,22 +212,22 @@ template<typename smSurfaceTreeCell> void smSurfaceTree<smSurfaceTreeCell>
             currentLevel = minTreeRenderLevel;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_R)
+        if (keyBoardData->keyBoardKey == smKey::R)
         {
             this->renderSurface = !this->renderSurface;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_P)
+        if (keyBoardData->keyBoardKey == smKey::P)
         {
             this->enableShiftPos = !this->enableShiftPos;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_K)
+        if (keyBoardData->keyBoardKey == smKey::K)
         {
             this->renderOnlySurface = !this->renderOnlySurface;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_T)
+        if (keyBoardData->keyBoardKey == smKey::T)
         {
             updateStructure();
         }
