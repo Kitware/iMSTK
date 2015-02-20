@@ -125,8 +125,6 @@ smViewer::smViewer()
     lightDrawScale = 50;
     enableCameraMotion = false;
 
-    boostViewer = false;
-
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;

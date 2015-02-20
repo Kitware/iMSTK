@@ -140,7 +140,6 @@ protected:
 
 public:
     smRenderingStageType renderStage;
-    smBool boostViewer;
 
     GLFWwindow* window;
     smCamera camera;
@@ -202,7 +201,7 @@ public:
     /// \param p_depthTex A texture that will contain the fbo's depth texture.
     /// \param p_width The width of the fbo
     /// \param p_height The height of the fbo
-    void addFBO(const smString &p_fboName, 
+    void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
     string windowTitle;

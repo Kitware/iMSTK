@@ -64,9 +64,8 @@ void smSimulator::startAsychThreads()
 /// \brief the main simulation loop
 void smSimulator::run()
 {
-
+    std::vector< std::future<int> > results;
     smObjectSimulator *objectSimulator;
-    smInt nbrSims;
 
     if (isInitialized == false)
     {
@@ -74,14 +73,16 @@ void smSimulator::run()
         return;
     }
 
+    results.reserve(this->simulators.size()); //make space for results
     smSimulationMainParam param;
     param.sceneList = sceneList;
 
     startAsychThreads();
-    simulatorThreadPool->size_controller().resize(this->simulators.size());
 
     while (true && this->terminateExecution == false)
     {
+        smTimer timer;
+
         beginModule();
 
         if (main != NULL)
@@ -97,9 +98,7 @@ void smSimulator::run()
 
         }
 
-        nbrSims = simulators.size();
-        smTimer timer;
-
+        results.clear();
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
             objectSimulator = simulators[i];
@@ -114,10 +113,18 @@ void smSimulator::run()
                 continue;
             }
 
-            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+            //start each simulator in it's own thread (as max threads allow...)
+            results.emplace_back(threadPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
         }
 
-        simulatorThreadPool->wait();
+        for (auto&& result : results)
+        { //Wait until there is a valid return value from each thread
+            result.get(); //waits for result value
+        }
 
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
@@ -127,13 +134,22 @@ void smSimulator::run()
 
         timer.start();
 
+        results.clear(); //clear the results buffer for new
         for (smInt i = 0; i < this->collisionDetectors.size(); i++)
         {
             objectSimulator = collisionDetectors[i];
-            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+            //start each simulator in it's own thread (as max threads allow...)
+            results.emplace_back(threadPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
         }
 
-        simulatorThreadPool->wait();
+        for (auto&& result : results)
+        { //Wait until there is a valid return value from each thread
+            result.get(); //waits for result value
+        }
 
         endModule();
     }
