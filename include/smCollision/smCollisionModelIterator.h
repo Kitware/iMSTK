@@ -21,43 +21,25 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SM_COLLISIONMODEL_H
-#define SM_COLLISIONMODEL_H
-
-// SimMedTK includes
-#include "smCore/smCoreClass.h"
-#include "smCollision/smCollisionModelIterator.h"
-#include "smUtilities/smMatrix44.h"
+#ifndef SM_SMCOLLISIONMODELITERATOR_H
+#define SM_SMCOLLISIONMODELITERATOR_H
 
 /// \brief !!
-template<typename T> 
-class smCollisionModel: public smCoreClass
+template <typename T>
+class smCollisionModelIterator
 {
-protected:
-	typedef smMatrix44<double> MatrixType;
-	
+
 public:
-    /// \brief !!
-    virtual void initStructure() = 0;
+    int startIndex; ///<
+    int currentIndex; ///<
+    int currentLevel; ///<
+    int endIndex; ///<
 
-    /// \brief !!
-    virtual void reCreateStructure() = 0;
-
-    /// \brief !!
-    virtual void updateStructure() = 0;
-
-    /// \brief !!
-    virtual void translateRot() = 0;
-
-    /// \brief !!
-    virtual void setTranslateRot(MatrixType &) = 0;
-
-    /// \brief !!
-    virtual smCollisionModelIterator<T> getLevelIterator(int level) = 0;
-
-    /// \brief !!
-    virtual smCollisionModelIterator<T> getLevelIterator() = 0;
+    inline int start();
+    inline int end();
+    inline void operator++();
+    inline void operator--();
+    inline T operator[](int p_index);
 };
-
 
 #endif

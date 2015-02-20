@@ -21,25 +21,30 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMSPATIALHASH_H
-#define SMSPATIALHASH_H
+#ifndef SM_SPATIALHASH_H
+#define SM_SPATIALHASH_H
 
-#include "smCore/smConfig.h"
-#include "smCollision/smCollisionConfig.h"
+// STD includes
+#include <map>
+
+// SimMedTK includes
 #include "smCore/smObjectSimulator.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
-#include "smCore/smEventData.h"
-#include "smMesh/smMesh.h"
 #include "smUtilities/smDataStructs.h"
-#include "smCore/smPipe.h"
 
+class smCellLine;
+class smCellModel;
+class smCellPoint;
+class smCellTriangle;
+class smCollidedLineTris;
+class smCollidedModelPoints;
+class smCollidedTriangles;
+class smLineMesh;
+class smMesh;
+class smOctreeCell;
 class smPipe;
-template<typename T> class smCollisionModel;
-template<typename smSurfaceTreeCell> class smSurfaceTree;
-struct smOctreeCell;
-template<typename smSurfaceTreeCell> struct smSurfaceTreeIterator;
-typedef smHash<smCellPoint> smHashCellPoint;
+
+template<typename CellType>
+class smSurfaceTree;
 
 /// \brief
 enum smCollisionSetting
@@ -54,9 +59,9 @@ enum smCollisionSetting
 #define HASH_P2 19349663
 #define HASH_P3 83492791
 
-inline unsigned int HASH(unsigned int p_SIZE, unsigned int p_x, unsigned int p_y, unsigned int p_z)
+inline unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z)
 {
-    return (((((p_x) * HASH_P1) ^ ((p_y) * HASH_P2) ^ ((p_z) * HASH_P3))) % (p_SIZE));
+    return (((((x) * HASH_P1) ^ ((y) * HASH_P2) ^ ((z) * HASH_P3))) % (SIZE));
 }
 
 /// \brief spatial hash
@@ -64,9 +69,9 @@ class smSpatialHash: public smObjectSimulator
 {
 
 protected:
-    smFloat cellSizeX; ///< cell size in x-direction
-    smFloat cellSizeY; ///< cell size in y-direction
-    smFloat cellSizeZ; ///< cell size in z-direction
+    float cellSizeX; ///< cell size in x-direction
+    float cellSizeY; ///< cell size in y-direction
+    float cellSizeZ; ///< cell size in z-direction
 
     //These structures below are Triangle2Triangle collisions
 
@@ -74,16 +79,16 @@ protected:
     smHash<smCellTriangle> cells;
 
     /// \brief structure that stores the meshes in the scene
-    QVector<smMesh *> meshes;
+    std::vector<smMesh *> meshes;
 
     /// \brief After the collision is cimpleted the result is written in here
     smCollidedTriangles *collidedPrims;
 
     /// \brief Number of collisions that triangles are stored.
-    smInt nbrTriCollisions;
+    int nbrTriCollisions;
 
     /// \brief Line mesh structure that is added to collision detection engine
-    QVector<smLineMesh *> lineMeshes;
+    std::vector<smLineMesh *> lineMeshes;
 
     /// \brief Lines that stored in the scene.
     smHash<smCellLine> cellLines;
@@ -101,7 +106,7 @@ protected:
     smCollidedLineTris *collidedLineTris;
 
     /// \brief The number of collisions that for line to triangle.
-    smInt nbrLineTriCollisions;
+    int nbrLineTriCollisions;
 
     /// \brief smHash<smCollisionGroup> collisionGroups;
 
@@ -109,38 +114,38 @@ protected:
     smCollidedModelPoints *collidedModelPoints;
 
     /// \brief the number of collisions for model to point
-    smInt nbrModelPointCollisions;
+    int nbrModelPointCollisions;
 
     /// \brief For maximum collision output.
-    smInt maxPrims;
+    int maxPrims;
 
-    map<smInt, smInt> filteredList;
+    std::map<int, int> filteredList;
 
     /// \brief adds triangle to hash
-    inline void addTriangle(smMesh *p_mesh, smInt p_triangleId, smHash<smCellTriangle> &p_cells);
+    inline void addTriangle(smMesh *mesh, int triangleId, smHash<smCellTriangle> &cells);
 
     /// \brief adds line to hash
-    inline void addLine(smLineMesh *p_mesh, smInt p_edgeId, smHash<smCellLine> &p_cells);
+    inline void addLine(smLineMesh *mesh, int edgeId, smHash<smCellLine> &cells);
 
     /// \brief adds point to hash
-    inline void addPoint(smMesh *p_mesh, smInt p_vertId, smHash<smCellPoint> p_cells);
+    inline void addPoint(smMesh *mesh, int vertId, smHash<smCellPoint> cells);
 
     /// \brief adds octree cell to hash
-    inline void addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel, smHash<smCellModel> p_cells);
+    inline void addOctreeCell(smSurfaceTree<smOctreeCell> *colModel, smHash<smCellModel> cells);
 
     /// \brief !!
     void reset();
 
-    vector<smSurfaceTree<smOctreeCell>*> colModel;
+    std::vector<smSurfaceTree<smOctreeCell>*> colModel;
 
 public:
-    smBool enableDuplicateFilter; ///< !!
+    bool enableDuplicateFilter; ///< !!
     smPipe *pipe; ///< !!
     smPipe *pipeTriangles; ///< !!
     smPipe *pipeModelPoints; ///< !!
 
     /// \brief !!
-    void  findCandidatePoints(smMesh *p_mesh, smSurfaceTree<smOctreeCell> *p_colModel);
+    void  findCandidatePoints(smMesh *mesh, smSurfaceTree<smOctreeCell> *colModel);
 
     /// \brief !!
     void computeCollisionModel2Points();
@@ -149,33 +154,33 @@ public:
     ~smSpatialHash();
 
     /// \brief !!
-    void addCollisionModel(smSurfaceTree<smOctreeCell> *p_CollMode);
+    void addCollisionModel(smSurfaceTree<smOctreeCell> *CollMode);
 
     /// \brief !!
     void addMesh(smMesh *mesh);
 
     /// \brief !!
-    void addMesh(smLineMesh *p_mesh);
+    void addMesh(smLineMesh *mesh);
 
     /// \brief !!
-    void removeMesh(smMesh *p_mesh);
+    void removeMesh(smMesh *mesh);
 
     /// \brief !!
-    smSpatialHash(smErrorLog *p_errorLog,
-                  smInt p_hashTableSize,
-                  smFloat p_cellSizeX,
-                  smFloat p_cellSizeY,
-                  smFloat p_cellSizeZ,
-                  smInt p_outOutputPrimSize = SIMMEDTK_COLLISIONOUTPUTBUF_SIZE);
+    smSpatialHash(smErrorLog *errorLog,
+                  int hashTableSize,
+                  float cellSizeX,
+                  float cellSizeY,
+                  float cellSizeZ,
+                  int outOutputPrimSize = SIMMEDTK_COLLISIONOUTPUTBUF_SIZE);
 
     /// \brief !!
     void draw();
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
-    smBool findCandidateTris(smMesh *p_mesh, smMesh  *p_mesh2);
+    bool findCandidateTris(smMesh *mesh, smMesh  *mesh2);
 
     /// \brief find the candidate line-triangle pairs for collision (broad phase collision)
-    smBool findCandidateTrisLines(smMesh *p_mesh, smLineMesh *p_mesh2);
+    bool findCandidateTrisLines(smMesh *mesh, smLineMesh *mesh2);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -187,99 +192,28 @@ public:
     void filterLine2TrisResults();
 
     /// \brief !!
-    void draw(smDrawParam p_param);
+    void draw(smDrawParam param);
 
     /// \brief initialize the drawing structures
-    void initDraw(smDrawParam p_param);
+    void initDraw(smDrawParam param);
 
     /// \brief !!
-    virtual void beginSim()
-    {
-
-        smObjectSimulator::beginSim();
-        //start the job
-        nbrTriCollisions = 0;
-        nbrLineTriCollisions = 0;
-        nbrModelPointCollisions = 0;
-
-        for (smInt i = 0; i < meshes.size(); i++)
-        {
-            meshes[i]->updateTriangleAABB();
-        }
-
-        for (smInt i = 0; i < lineMeshes.size(); i++)
-        {
-            meshes[i]->upadateAABB();
-        }
-    }
+    virtual void beginSim();
 
     /// \brief !!
     virtual void initCustom();
 
     /// \brief !! compute the hash
-    inline void computeHash(smMesh *p_mesh, int *p_tris, int p_nbrTris);
+    inline void computeHash(smMesh *mesh, int *tris, int nbrTris);
 
     /// \brief !!
-    virtual void run()
-    {
-
-        smTimer timer;
-        timer.start();
-        beginSim();
-
-        for (smInt i = 0; i < colModel.size(); i++)
-            for (smInt i = 0; i < meshes.size(); i++)
-            {
-                findCandidatePoints(meshes[i], colModel[i]);
-                addOctreeCell(colModel[i], cellsForModel);
-            }
-
-        ///Triangle-Triangle collision
-        for (smInt i = 0; i < meshes.size(); i++)
-        {
-            for (smInt j = i + 1; j < meshes.size(); j++)
-            {
-                if (meshes[i]->collisionGroup.isCollisionPermitted(meshes[j]->collisionGroup))
-                {
-                    if (findCandidateTris(meshes[i], meshes[j]) == false)
-                    {
-                        continue;
-                    }
-                }
-            }
-        }
-
-        ///Triangle-line Collision
-        for (smInt i = 0; i < meshes.size(); i++)
-            for (smInt j = 0; j < lineMeshes.size(); j++)
-            {
-                if (meshes[i]->collisionGroup.isCollisionPermitted(lineMeshes[j]->collisionGroup))
-                {
-                    if (findCandidateTrisLines(meshes[i], lineMeshes[j]) == false)
-                    {
-                        continue;
-                    }
-                }
-            }
-
-        computeCollisionTri2Tri();
-        computeCollisionLine2Tri();
-        computeCollisionModel2Points();
-        endSim();
-    }
+    virtual void run();
 
     /// \brief !!
-    void endSim()
-    {
-        //end the job
-        smObjectSimulator::endSim();
-        reset();
-    }
+    void endSim();
 
     /// \brief !! synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers()
-    {
-    }
+    void syncBuffers();
 
 };
 

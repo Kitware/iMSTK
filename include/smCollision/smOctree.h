@@ -21,43 +21,43 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SM_COLLISIONMODEL_H
-#define SM_COLLISIONMODEL_H
+#ifndef SM_SMOCTREE_H
+#define SM_SMOCTREE_H
 
 // SimMedTK includes
-#include "smCore/smCoreClass.h"
-#include "smCollision/smCollisionModelIterator.h"
-#include "smUtilities/smMatrix44.h"
+#include "smCollision/smSurfaceTreeCell.h"
+#include "smCollision/smOctreeCell.h"
+#include "smCore/smGeometry.h"
+#include "smUtilities/smVec3.h"
 
-/// \brief !!
-template<typename T> 
-class smCollisionModel: public smCoreClass
+
+/// \brief octree
+class smOctree: public smSurfaceTreeCell<smOctree>
 {
-protected:
-	typedef smMatrix44<double> MatrixType;
-	
 public:
-    /// \brief !!
-    virtual void initStructure() = 0;
+    /// \brief constructor
+    smOctree()
+    {
+        triagleIndices.clear();
+        filled = false;
+    }
+
+    smCube cube; ///< cube
+    smVec3f originalCubeCenter; ///< original cube center
+    smSphere sphere; ///< !!
+
+    std::vector<int> triagleIndices;  ///< triangle indices
+    std::set<int> verticesIndices;  ///< vertices indices
+    std::vector<float> weights; /// !!
+
+    /// \brief subdivide octree
+    inline void subDivide(const int divisionPerAxis, std::vector<smOctreeCell> &p_cells);
 
     /// \brief !!
-    virtual void reCreateStructure() = 0;
+    inline bool isCollided(const smVec3f &p_v0, const smVec3f &p_v1, const smVec3f &p_v2);
 
     /// \brief !!
-    virtual void updateStructure() = 0;
-
-    /// \brief !!
-    virtual void translateRot() = 0;
-
-    /// \brief !!
-    virtual void setTranslateRot(MatrixType &) = 0;
-
-    /// \brief !!
-    virtual smCollisionModelIterator<T> getLevelIterator(int level) = 0;
-
-    /// \brief !!
-    virtual smCollisionModelIterator<T> getLevelIterator() = 0;
+    inline void expand(const float p_expansion);
 };
-
 
 #endif

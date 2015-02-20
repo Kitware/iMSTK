@@ -180,6 +180,15 @@ if(SimMedTK_USE_OCULUS)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
 endif()
 
+#-----------------------------------------------------------------------------
+# Testing framework
+#
+if(BUILD_TESTING)
+  find_package(Bandit REQUIRED)
+  include_directories(${BANDIT_INCLUDE_DIR})
+  include(SimMedTKTesting)
+endif()
+
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
