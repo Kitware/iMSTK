@@ -35,9 +35,6 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
-#include <QKeyEvent>
-#include <QDesktopWidget>
-
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -52,7 +49,6 @@ typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 
 void SetVSync(bool sync)
 {
-
 #ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
     PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
     wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress("wglSwapIntervalEXT");
@@ -75,6 +71,32 @@ void SetVSync(bool sync)
 #endif
 }
 
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    smEvent *eventKeyboard;
+    smSDK *sdk = smSDK::getInstance();
+    smViewer *viewer = sdk->getViewerInstance();
+    if (viewer == NULL)
+    {
+        return;
+    }
+
+    eventKeyboard = new smEvent();
+    eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
+    eventKeyboard->senderId = viewer->getModuleId();
+    eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
+    eventKeyboard->data = new smKeyboardEventData();
+    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
+    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
+
+    //This should be handled by smViewer's handleEvent() function
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+    {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+        sdk->shutDown();
+    }
+}
+
 smRenderOperation::smRenderOperation()
 {
     fbo = NULL;
@@ -82,9 +104,8 @@ smRenderOperation::smRenderOperation()
     fboName = "";
 }
 
-smViewer::smViewer(smErrorLog *log)
+smViewer::smViewer()
 {
-
     type = SIMMEDTK_SMVIEWER;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
     shadowMatrix.setIdentity();
@@ -97,7 +118,7 @@ smViewer::smViewer(smErrorLog *log)
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
-    this->log = log;
+    this->log = NULL;
     consoleDisplay = false;
     lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
     windowOutput = new smOpenGLWindowStream();
@@ -129,7 +150,6 @@ void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 
 smInt smViewer::addLight(smLight *p_light)
 {
-
     smInt index = lights->add(p_light);
     lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
     lights->getByRef(index)->activate(true);
@@ -138,19 +158,18 @@ smInt smViewer::addLight(smLight *p_light)
 
 smBool smViewer::setLight(smInt p_lightId, smLight *p_light)
 {
-
     smInt index = lights->replace(p_lightId, p_light);
 
     if (index > 0)
     {
         lights->getByRef(p_lightId)->renderUsage = GL_LIGHT0 + p_lightId;
-        return  index;
+        return true;
     }
+    return false;
 }
 
 void smViewer::refreshLights()
 {
-
     smIndiceArrayIter<smLight*> iter(lights);
 
     for (smInt i = iter.begin(); i < iter.end(); iter++)
@@ -201,36 +220,42 @@ void smViewer::setUnlimitedFPS(smBool p_enableFPS)
     unlimitedFPSVariableChanged++;
 }
 
-///initialization of the viewer module
-void smViewer::init()
+void smViewer::initGLCaps()
 {
-
-    smSceneObject *sceneObject;
-    smScene *scene;
-    smStaticSceneObject *staticSceneObject;
-    smStylusRigidSceneObject *stylusObject;
-    smClassType objectType;
-    static smDrawParam param;
-    smIndiceArrayIter<smLight*> iter(lights);
-
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
-
-    if (isInitialized)
-    {
-        return;
-    }
-
+    //use multiple fragment samples in computing the final color of a pixel
     glEnable(GL_MULTISAMPLE);
-    glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
+    //do depth comparisons and update the depth buffer
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+    //cull polygons based on their winding in window coordinates
     glEnable(GL_CULL_FACE);
+    //DEPRECIATED AS OF v3.3 have one or more material parameters
+    // track the current color
+    glDisable(GL_COLOR_MATERIAL);
+    //DEPRECIATED AS OF v3.3 If enabled and no vertex shader is active,
+    // use the current lighting parameters to compute the vertex color or index
+    glEnable(GL_LIGHTING);
+    //DEPRECIATED AS OF v3.3 If enabled and no vertex shader is active,
+    // normal vectors are normalized to unit length after transformation and
+    // before lighting
     glEnable(GL_NORMALIZE);
+
+    //Fill the face of the polygon for all front and back facing polygons
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+    glFrontFace(GL_CCW);
+    //DEPRECIATED AS OF v3.3 Smooth shading
+    glShadeModel(GL_SMOOTH);
+    //DEPRECIATED AS OF v3.3 Specifies the specular component of a material
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
+}
+
+void smViewer::initLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
     // Create light components
     for (smInt i = iter.begin(); i < iter.end(); i++)
     {
@@ -243,31 +268,25 @@ void smViewer::init()
         glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
         glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
     }
+}
 
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_MULTISAMPLE_ARB);
-    glShadeModel(GL_SMOOTH);
-    glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
-    glFrontFace(GL_CCW);
-    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
-
+void smViewer::initObjects(smDrawParam p_param)
+{
     for (smInt i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
         {
-            objectList[i]->initDraw(param);
+            objectList[i]->initDraw(p_param);
         }
         else
         {
             continue;
         }
     }
+}
 
-    smInt width = screenResolutionWidth;
-    smInt height = screenResolutionHeight;
-
+void smViewer::initResources(smDrawParam p_param)
+{
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
     {
         fbo = new smFrameBuffer();
@@ -282,8 +301,8 @@ void smViewer::init()
     }
 
     smTextureManager::initGLTextures();
-    smShader::initGLShaders(param);
-    smVAO::initVAOs(param);
+    smShader::initGLShaders(p_param);
+    smVAO::initVAOs(p_param);
 
     initFboListItems();
 
@@ -304,7 +323,14 @@ void smViewer::init()
         smTextureManager::disableTexture("depth");
         smTextureManager::disableTexture("backmap");
     }
+}
 
+void smViewer::initScenes(smDrawParam p_param)
+{
+    smClassType objectType;
+    smStaticSceneObject *staticSceneObject;
+    smSceneObject *sceneObject;
+    smScene *scene;
     smScene::smSceneIterator sceneIter;
 
     //traverse all the scene and the objects in the scene
@@ -322,10 +348,10 @@ void smViewer::init()
             //initialize the custom Render if there is any
             if (sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER)
             {
-                sceneObject->customRender->initDraw(param);
+                sceneObject->customRender->initDraw(p_param);
             }
 
-            sceneObject->initDraw(param);
+            sceneObject->initDraw(p_param);
 
             if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_VBO && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_VBO_ENABLED)
             {
@@ -340,14 +366,83 @@ void smViewer::init()
             }//scene object is added in the vbo object.
         }//object traverse
     }//scene traverse
+}
 
+void smViewer::initCamera()
+{
     //Generate the Projection and View Matricies
     camera.genProjMat();
     camera.genViewMat();
+}
+
+void smViewer::initGLContext()
+{
+    int count;
+
+    // Init GLFW(OpenGL context)
+    if (!glfwInit())
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    // Init the rest of GLFW
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
+    {
+        GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
+        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
+            windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+    }
+    else
+    {
+        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
+            windowTitle.c_str(), NULL, NULL);
+    }
+
+    glfwMakeContextCurrent(window);
+    glfwSetKeyCallback(window, key_callback);
+
+    // Init GLEW
+    GLenum err = glewInit();
+
+    if (GLEW_OK != err)
+    {
+        /* Problem: glewInit failed, something is seriously wrong.
+         * Most likely an OpenGL context is not created yet */
+        cout << "Error:" << glewGetErrorString(err) << endl;
+        assert(false);
+    }
+}
+
+///initialization of the viewer module
+void smViewer::init()
+{
+    static smDrawParam param;
+
+    if (isInitialized)
+    {
+        return;
+    }
+
+    param.rendererObject = this;
+    param.caller = this;
+    param.data = NULL;
+
+    this->initGLContext();
+    this->initGLCaps();
+    this->initLights();
+    this->initObjects(param);
+    this->initResources(param);
+    this->initScenes(param);
 
     isInitialized = true;
 }
 
+void smViewer::destroyGLContext()
+{
+    //Shutdown glfw
+    glfwDestroyWindow(window);
+    glfwTerminate();
+}
 
 ///draw the surface mesh triangles based on the rendering type
 ///problem is here
@@ -1114,32 +1209,6 @@ void smViewer::endFrame()
     glfwSwapBuffers(window);
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    smEvent *eventKeyboard;
-    smSDK *sdk = smSDK::getInstance();
-    smViewer *viewer = sdk->getViewerInstance();
-    if (viewer == NULL)
-    {
-        return;
-    }
-
-    eventKeyboard = new smEvent();
-    eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-    eventKeyboard->senderId = viewer->getModuleId();
-    eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventKeyboard->data = new smKeyboardEventData();
-    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
-    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
-
-    //This should be handled by smViewer's handleEvent() function
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(window, GL_TRUE);
-        sdk->shutDown();
-    }
-}
-
 void smViewer::addObject(smCoreClass *object)
 {
 
@@ -1216,41 +1285,6 @@ void smViewer::setWindowTitle(string str)
 
 void smViewer::exec()
 {
-    int count;
-
-    // Init GLFW(OpenGL context)
-    if (!glfwInit())
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    // Init the rest of GLFW
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
-    {
-        GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), glfwMonitors[count - 1], NULL);
-    }
-    else
-    {
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), NULL, NULL);
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
-
-    // Init GLEW
-    GLenum err = glewInit();
-
-    if (GLEW_OK != err)
-    {
-        /* Problem: glewInit failed, something is seriously wrong.
-         * Most likely an OpenGL context is not created yet */
-        cout << "Error:" << glewGetErrorString(err) << endl;
-        assert(false);
-    }
-
     // Init the viewer
     this->init();
 
@@ -1259,11 +1293,13 @@ void smViewer::exec()
         glfwPollEvents();
     }
 
-    destroyFboListItems();
+    cleanUp();
+}
 
-    //Shutdown glfw
-    glfwDestroyWindow(window);
-    glfwTerminate();
+void smViewer::cleanUp()
+{
+    destroyFboListItems();
+    destroyGLContext();
 }
 
 smInt smViewer::height(void)

@@ -21,26 +21,26 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef RENDER_EXAMPLE_H
-#define RENDER_EXAMPLE_H
+#ifndef RENDER_CUBE_H
+#define RENDER_CUBE_H
 
 #include "smCore/smSDK.h"
 
-class RenderExample : public smSimulationMain, public smCoreClass
+class RenderCube : public smSimulationMain, public smCoreClass
 {
 public:
-    RenderExample();
+    RenderCube();
     void simulateMain(smSimulationMainParam p_param);
 private:
     smSDK* simmedtkSDK;
     smScene *scene1;
     smStaticSceneObject cube;
-    smViewer *viewer;
+    smViewer viewer;
 
     void setupLights();
     void setupCamera();
 };
 
-void renderExample();
+void runRenderCube();
 
 #endif

@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 #include <cstring>
 #include "smSimulators/smVegaConfigFemObject.h"
-
 #include "configFile.h"
 
 smVegaConfigFemObject::smVegaConfigFemObject()

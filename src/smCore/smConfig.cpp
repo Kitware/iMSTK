@@ -23,8 +23,3 @@
 
 #include "smCore/smConfig.h"
 
-ostream &operator<<(ostream &p_os, smString &p_param)
-{
-    p_os << p_param;
-    return p_os;
-}

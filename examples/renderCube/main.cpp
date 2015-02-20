@@ -21,10 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "RenderExample.h"
+#include "RenderCube.h"
 
 int main()
 {
-    renderExample();
+    runRenderCube();
     return 0;
 }
