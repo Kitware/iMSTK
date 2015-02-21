@@ -77,7 +77,10 @@ public:
         {
             return;
         }
-
+        if (maxThreadCount == 0)
+        {
+            maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        }
         threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
         asyncPool = new QThreadPool(this);
         smObjectSimulator *objectSimulator;
@@ -102,7 +105,7 @@ public:
         changedMain = NULL;
         changedMainTimeStamp = 0;
         mainTimeStamp = 0;
-        maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        maxThreadCount = 0;
     }
 
     void setMaxThreadCount(smInt p_threadMaxCount)
