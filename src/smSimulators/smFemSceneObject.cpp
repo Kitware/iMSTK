@@ -22,8 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "smSimulators/smFemSceneObject.h"
-#include "omp.h"
-
 
 //brief: build the LM matrix before the assembly of the stiffness matrix
 //For info LM, ID structures refer 'The Finite element method : linear static and

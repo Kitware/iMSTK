@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smSimulator.h"
-#include <omp.h>
 
 /// \brief starts the tasks with the threads from thread pool
 void smSimulator::beginFrame()

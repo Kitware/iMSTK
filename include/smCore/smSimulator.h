@@ -27,7 +27,6 @@
 #include <QThreadPool>
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
-#include <omp.h>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
 #include "smExternal/threadpool/boost/threadpool.hpp"

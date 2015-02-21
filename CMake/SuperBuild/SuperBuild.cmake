@@ -17,7 +17,11 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM )
+if(BUILD_TESTING)
+  list(APPEND SimMedTK_DEPENDENCIES Bandit)
+endif()
+
 if(WIN32)
   list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
@@ -193,6 +197,7 @@ ExternalProject_Add(${proj}
     -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
     -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}
     -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
+    -DBUILD_TESTING:BOOL=${BUILD_TESTING}
     -DSimMedTK_USE_OCULUS:BOOL=${SimMedTK_USE_OCULUS}
     ${SimMedTK_OUTPUT_DIRECTORIES}
     ${SimMedTK_SUPERBUILD_EP_ARGS}
