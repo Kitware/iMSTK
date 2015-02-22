@@ -79,14 +79,13 @@ RenderCube::RenderCube()
     //Set some camera parameters
     this->setupCamera();
 
-    //Link up the event system between the viewer and the SimMedTK SDK
-    //Note: This allows some default behavior like mouse and keyboard control
-    viewer.setEventDispatcher(simmedtkSDK->getEventDispatcher());
+    //Link up the event system between this object and the SimMedTK SDK
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
+}
 
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(&viewer, SIMMEDTK_EVENTTYPE_KEYBOARD);
-
-    //Run the simulator framework
-    simmedtkSDK->run();
+RenderCube::~RenderCube()
+{
+    simmedtkSDK->releaseScene(scene1);
 }
 
 void RenderCube::setupLights()
@@ -121,12 +120,90 @@ void RenderCube::setupCamera()
     viewer.camera.genViewMat();
 }
 
+void RenderCube::handleEvent(smEvent *p_event)
+{
+    switch (p_event->eventType.eventTypeCode)
+    {
+    case SIMMEDTK_EVENTTYPE_KEYBOARD:
+    {
+        smKeyboardEventData* kbData = 
+            (smKeyboardEventData*)p_event->data;
+        smKey key = kbData->keyBoardKey;
+        if (key == smKey::Escape && kbData->pressed)
+        {
+            //Tell the framework to shutdown
+            simmedtkSDK->shutDown();
+        }
+        else if (key == smKey::W && kbData->pressed)
+        {
+            smCamera cam = viewer.camera;
+            if (smModKey::shift == (kbData->modKeys & smModKey::shift))
+            {
+                //Move the camera up
+                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y + 1, cam.pos.z);
+                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y + 1, cam.fp.z);
+                viewer.camera.genViewMat();
+            }
+            else
+            {
+                //Move the camera forward
+                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z - 1);
+                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z - 1);
+                viewer.camera.genViewMat();
+            }
+        }
+        else if (key == smKey::A && kbData->pressed)
+        {
+            //Move the camera to the left
+            smCamera cam = viewer.camera;
+            viewer.camera.setCameraPos(cam.pos.x - 1, cam.pos.y, cam.pos.z);
+            viewer.camera.setCameraFocus(cam.fp.x - 1, cam.fp.y, cam.fp.z);
+            viewer.camera.genViewMat();
+        }
+        else if (key == smKey::S && kbData->pressed)
+        {
+            //Move the camera backward
+            smCamera cam = viewer.camera;
+            if (smModKey::shift == (kbData->modKeys & smModKey::shift))
+            {
+                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y - 1, cam.pos.z);
+                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y - 1, cam.fp.z);
+                viewer.camera.genViewMat();
+            }
+            else
+            {
+                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z + 1);
+                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z + 1);
+                viewer.camera.genViewMat();
+            }
+        }
+        else if (key == smKey::D && kbData->pressed)
+        {
+            //Move the camera to the right
+            smCamera cam = viewer.camera;
+            viewer.camera.setCameraPos(cam.pos.x + 1, cam.pos.y, cam.pos.z);
+            viewer.camera.setCameraFocus(cam.fp.x + 1, cam.fp.y, cam.fp.z);
+            viewer.camera.genViewMat();
+        }
+        break;
+    }
+    default:
+        break;
+    }
+}
+
 void RenderCube::simulateMain(smSimulationMainParam p_param)
 {
+    //Run the simulator framework
+    simmedtkSDK->run();
 }
 
 void runRenderCube()
 {
-    RenderCube *rc = new RenderCube();
-    delete rc;
+    smSimulationMainParam simulationParams;
+    RenderCube rc;
+
+    rc.simulateMain(simulationParams);
+
+    return;
 }

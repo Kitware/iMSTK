@@ -363,53 +363,12 @@ public:
     /// \brief  draw console
     virtual void draw(smDrawParam p_params)
     {
-        smInt drawIndex = 0;
-        smGLUtils::drawQuadOnScreen(backGroundColor, left, bottom, right, top);
-        smViewer *viewer = (smViewer *)p_params.rendererObject;
-
-        initialTextPositionY = viewer->height() - viewer->height() * top + font.pointSize();
-        glColor3fv(smColor::colorWhite.toGLColor());
-
-        /*
-        for (smInt i = currentIndex; i < currentIndex + totalTexts; i++)
-        {
-            drawIndex = i % totalTexts;
-
-            if (windowTexts[drawIndex].enabled)
-            {
-                viewer->drawText(windowTexts[drawIndex].windowString.x + initialTextPositionX, windowTexts[drawIndex].windowString.y + initialTextPositionY, windowTexts[drawIndex].windowString.string, font);
-            }
-        }
-
-        viewer->drawText(0, viewer->height() - 10, ">>>" + enteredString, font);
-        */
+        //All previous code was for drawing on-screen text
     }
     /// \brief  handle events
     void handleEvent(smEvent *p_event)
     {
-        smKeyboardEventData *keyBoardData;
-
-        switch (p_event->eventType.eventTypeCode)
-        {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = (smKeyboardEventData*)p_event->data;
-
-            if (keyBoardData->keyBoardKey == Qt::Key_Return || keyBoardData->keyBoardKey == Qt::Key_Enter)
-            {
-                this->addText("line1", enteredString);
-                enteredString = "";
-            }
-            else if (keyBoardData->keyBoardKey == Qt::Key_Delete || keyBoardData->keyBoardKey == Qt::Key_Backspace)
-            {
-                enteredString.chop(1);
-            }
-            else
-            {
-                enteredString.append(QChar(keyBoardData->keyBoardKey));
-            }
-
-            break;
-        }
+        //All previous code use interpreting keyboard events for on-screen text
     }
 };
 

@@ -26,11 +26,16 @@
 
 #include "smCore/smSDK.h"
 
-class RenderCube : public smSimulationMain, public smCoreClass
+class RenderCube
+    : public smSimulationMain,
+      public smCoreClass,
+      public smEventHandler
 {
 public:
     RenderCube();
+    ~RenderCube();
     void simulateMain(smSimulationMainParam p_param);
+    void handleEvent(smEvent *p_event);
 private:
     smSDK* simmedtkSDK;
     smScene *scene1;

@@ -270,8 +270,6 @@ protected:
     void renderTextureOnView();
     /// \brief draw console. legacy code
     void drawConsole();
-    /// \brief key press event. This is called when key is pressed
-    void keyPressEvent(QKeyEvent *e);
     /// \brief  event handler
     void handleEvent(smEvent *p_event);
     /// \brief  enable attached lights
@@ -306,10 +304,6 @@ public:
     smCameraCollisionInterface *notes_cameraCollision;
     /// \brief   for dynamic reflection
     MetalShader *renderandreflection;
-    /// \brief  forms that will be lauched for GUI
-    vector<QDialog *>forms;
-    /// \brief   adding form  the viewer.
-    void addForm(QDialog *p_form);
 };
 
 #endif

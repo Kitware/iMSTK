@@ -136,7 +136,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 
 
 
-            if (keyBoardData->keyBoardKey == Qt::Key_2)
+            if (keyBoardData->keyBoardKey == smKey::Num2)
             {
 
                 smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
@@ -144,7 +144,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 
             }
 
-            if (keyBoardData->keyBoardKey == Qt::Key_1)
+            if (keyBoardData->keyBoardKey == smKey::Num1)
             {
 
                 smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
@@ -216,13 +216,13 @@ void HookCautery::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
         keyBoardData = (smKeyboardEventData*)p_event->data;
 
-        if (keyBoardData->keyBoardKey == Qt::Key_1)
+        if (keyBoardData->keyBoardKey == smKey::Num1)
         {
             smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
             this->renderDetail.renderType = this->renderDetail.renderType | SIMMEDTK_RENDER_NONE;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_2)
+        if (keyBoardData->keyBoardKey == smKey::Num2)
         {
             smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
             this->renderDetail.renderType = this->renderDetail.renderType & (~SIMMEDTK_RENDER_NONE);

@@ -219,7 +219,7 @@ protected:
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
-            if (keyBoardData->keyBoardKey == Qt::Key_F1)
+            if (keyBoardData->keyBoardKey == smKey::F1)
             {
                 printf("F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey);
             }
