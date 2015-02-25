@@ -123,7 +123,7 @@ smStylusDeformableSceneObject::smStylusDeformableSceneObject(smErrorLog *p_log)
     type = SIMMEDTK_SMSTYLUSDEFORMABLESCENEOBJECT;
 }
 
-smMeshContainer *smStylusRigidSceneObject::getMeshContainer(QString p_string) const
+smMeshContainer *smStylusRigidSceneObject::getMeshContainer(smString p_string) const
 {
     tree<smMeshContainer*>::iterator iter = meshes.begin_leaf();
 

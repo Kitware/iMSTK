@@ -26,7 +26,6 @@
 
 #include "smCore/smConfig.h"
 
-#include <QString>
 #include <QVector>
 
 #include "math.h"

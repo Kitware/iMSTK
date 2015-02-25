@@ -28,6 +28,7 @@
 
 #include <chrono>
 #include <thread>
+#include <string>
 
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
@@ -55,7 +56,7 @@ smScene *smSDK::createScene()
     smScene*scene;
     scene = new smScene(errorLog);
     registerScene(scene);
-    scene->setName(QString("Scene") + QString().setNum(scene->uniqueId.ID));
+    scene->setName("Scene" + std::to_string(scene->uniqueId.ID));
     return scene;
 }
 

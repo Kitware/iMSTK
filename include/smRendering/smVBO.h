@@ -24,8 +24,6 @@
 #ifndef SMVBO_H
 #define SMVBO_H
 
-#include <QHash>
-
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
@@ -34,6 +32,8 @@
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
 #include "assert.h"
+
+#include <unordered_map>
 /// \brief VBO for rendering
 class smVBO: public smCoreClass
 {
@@ -50,13 +50,13 @@ private:
     /// \brief index data
     GLuint vboIndexId;
     /// \brief  data offset keeps offset for each vertex
-    QHash<smInt, smInt> dataOffsetMap;
+    std::unordered_map<smInt, smInt> dataOffsetMap;
     /// \brief  index maps
-    QHash<smInt, smInt> indexOffsetMap;
+    std::unordered_map<smInt, smInt> indexOffsetMap;
     /// \brief  total number of vertices
-    QHash<smInt, smInt> numberofVertices;
+    std::unordered_map<smInt, smInt> numberofVertices;
     /// \brief number of triangles
-    QHash<smInt, smInt> numberofTriangles;
+    std::unordered_map<smInt, smInt> numberofTriangles;
     /// \brief  error log
     smErrorLog *log;
     /// \brief  rendering error

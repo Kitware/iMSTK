@@ -49,7 +49,7 @@ public:
     /// \brief  draw line mesh
     static void drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail);
     /// \brief draw coordinate system
-    static void drawCoordSystem(smViewer *viewer, QString p_name, smVec3<smFloat> p_pos, smVec3<smFloat> dirX, smVec3<smFloat> dirY, smVec3<smFloat> dirZ);
+    static void drawCoordSystem(smViewer *viewer, smString p_name, smVec3<smFloat> p_pos, smVec3<smFloat> dirX, smVec3<smFloat> dirY, smVec3<smFloat> dirZ);
     /// \brief begin rendering triangle
     static void beginTriangles();
     /// \brief draw triangle

@@ -29,13 +29,13 @@ void smScriptingEngine::list()
 {
 
     cout << "List of Registered Variables" << endl;
-    foreach(smClassVariableInfo * info, registeredVariables)
+    for(auto& x: registeredVariables)
     {
-        cout << qPrintable(info->className) << "-->" << qPrintable(info->variableName) << endl;
+        cout << x.second->className << "-->" << x.second->variableName << endl;
     }
 
     cout << "List of Registered Classes" << endl;
 
-    foreach(smCoreClass * classInfo, registeredClasses)
-    cout << qPrintable(classInfo->getName()) << endl;
+    for(auto& x: registeredClasses)
+        cout << x.second->getName() << endl;
 }

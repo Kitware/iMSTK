@@ -343,8 +343,8 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
         case 0x4110:
             fread(&l_qty, sizeof(smUShort), 1, l_file);
             this->nbrVertices = l_qty;
-            this->vertices = new smVec3<smFloat>[l_qty];
-            this->origVerts = new smVec3<smFloat>[l_qty];
+            this->vertices.reserve(l_qty);
+            this->origVerts.reserve(l_qty);
             this->vertNormals = new smVec3<smFloat>[l_qty];
             this->vertTangents = new smVec3<smFloat>[l_qty];
             this->texCoord = new smTexCoord[l_qty];

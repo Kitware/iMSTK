@@ -28,7 +28,7 @@
 // #include <GL/glut.h>
 using namespace std;
 
-QHash<smInt, smShader *> smShader::shaders;
+std::unordered_map<smInt, smShader *> smShader::shaders;
 smShader *smShader ::currentShader = NULL;
 smShader *smShader ::savedShader = NULL;
 smBool smShader::currentShaderEnabled = false;
@@ -554,7 +554,7 @@ smGLInt smShader::addShaderParamForAll(smChar* p_paramName)
     geometryShaderParamsString.push_back(p_paramName);
     geometryShaderParams.push_back(param);
 
-    textureGLBind.insert(p_paramName, param);
+    textureGLBind[p_paramName] = param;
     return param;
 #endif
 }
@@ -563,11 +563,11 @@ smGLInt smShader::getShaderParamForAll(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        if (QString(vertexShaderParamsString[i]) == p_param)
+        if (vertexShaderParamsString[i] == p_param)
         {
             return vertexShaderParams[i];
         }
@@ -581,11 +581,11 @@ smGLInt smShader::getFragmentShaderParam(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
-        if (QString(fragmentShaderParamsString[i]) == p_param)
+        if (fragmentShaderParamsString[i] == p_param)
         {
             return fragmentShaderParams[i];
         }
@@ -599,11 +599,11 @@ smGLInt smShader::getShaderAtrribParam(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
-        if (QString(attribParamsString[i]) == p_param)
+        if (attribParamsString[i] == p_param)
         {
             return attribShaderParams[i];
         }
@@ -799,7 +799,7 @@ void smShader::attachTexture(smUnifiedID p_meshID, smInt p_textureID)
 
     smTextureShaderAssignment assign;
     assign.textureId = p_textureID;
-    texAssignments.insert(p_meshID.ID, assign);
+    texAssignments.insert( {p_meshID.ID, assign} );
 }
 
 smBool smShader::attachTexture(smUnifiedID p_meshID,
@@ -816,7 +816,7 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
     }
 
     assign.shaderParamName = p_textureShaderName;
-    texAssignments.insert(p_meshID.ID, assign);
+    texAssignments.insert( {p_meshID.ID, assign} );
 
     return true;
 }
@@ -824,11 +824,11 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
 void smShader::autoGetTextureIds()
 {
 
-    QMultiHash<smInt, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
+    std::unordered_multimap<smInt, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
 
     for (; i != texAssignments.end(); i++)
     {
-        i.value().textureShaderGLassignment = textureGLBind[i.value().shaderParamName];
+        i->second.textureShaderGLassignment = textureGLBind[i->second.shaderParamName];
     }
 }
 
@@ -960,19 +960,19 @@ void smShader::getAttribAndParamLocations()
 
 void smShader::initGLShaders(smDrawParam p_param)
 {
-    foreach(smShader * shader, shaders)
-    shader->initDraw(p_param);
+    for(auto& x : shaders)
+    x.second->initDraw(p_param);
 }
 
 void smShader::activeGLTextures(smUnifiedID p_id)
 {
     smInt counter = 0;
-    QList<smTextureShaderAssignment> values = texAssignments.values(p_id.ID) ;
+    auto range = texAssignments.equal_range(p_id.ID);
 
-    for (smInt i = 0; i < values.size(); i++)
+    for (auto i = range.first; i != range.second; i++)
     {
-        smTextureManager::activateTexture(values[i].textureId, counter);
-        glUniform1iARB(values[i].textureShaderGLassignment, counter);
+        smTextureManager::activateTexture(i->second.textureId, counter);
+        glUniform1iARB(i->second.textureShaderGLassignment, counter);
         counter++;
     }
 }
@@ -983,7 +983,7 @@ void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size)
 }
 void smShader::registerShader()
 {
-    shaders.insert(this->uniqueId.ID, this);
+    shaders[this->uniqueId.ID] = this;
 }
 
 void smShader::print()

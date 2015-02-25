@@ -26,7 +26,7 @@
 
 #include "smCore/smCoreClass.h"
 #include "smCore/smSynchronization.h"
-#include <Qthread>
+#include <QThread>
 /// \brief process(used as conceptual meaning) numbering scheme
 enum smProcessNumbering
 {

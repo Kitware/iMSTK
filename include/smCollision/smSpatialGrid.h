@@ -24,22 +24,22 @@
 #ifndef SMSPATIALGRID_H
 #define SMSPATIALGRID_H
 
-#include <Qthread>
-#include <Qvector>
-#include "smConfig.h"
-#include "smConfigRendering.h"
-#include "smCollisionDetection.h"
-#include "smCustomRenderer.h"
-#include "smScene.h"
-#include "smStaticSceneObject.h"
-#include "smSynchronization.h"
-#include "smWorkerThread.h"
-#include "smLattice.h"
-#include "smLatticeTypes.h"
-#include "smMemoryBlock.h"
-#include "smSDK.h"
-#include "smGLRenderer.h"
-#include "smGeometry.h"
+#include "smCore/smConfig.h"
+#include "smRendering/smConfigRendering.h"
+#include "smCollision/smCollisionDetection.h"
+#include "smRendering/smCustomRenderer.h"
+#include "smCore/smScene.h"
+#include "smCore/smStaticSceneObject.h"
+#include "smCore/smSynchronization.h"
+#include "smCore/smWorkerThread.h"
+#include "smMesh/smLattice.h"
+#include "smMesh/smLatticeTypes.h"
+#include "smCore/smSDK.h"
+#include "smRendering/smGLRenderer.h"
+#include "smCore/smGeometry.h"
+
+#include <QVector>
+#include <QThread>
 
 #define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3<smFloat>(-10,-10,-10)
 #define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3<smFloat>(10,10,10)
@@ -57,7 +57,6 @@ class smSpatialGridWorker: public smWorkerThread
     smLattice *latticePair2; ///< !!
 
 public:
-    smMemoryBlock collisionPairs; ///< !!
     smCollidedTriangles *pairs; ///< collided triangle pairs
     smInt collidedPairs; ///< !!
 
@@ -68,7 +67,6 @@ public:
     /// \brief destructor
     ~smSpatialGridWorker()
     {
-        collisionPairs.deleteMemory(QString("pairs"));
     }
 
     /// \brief constructor
@@ -76,14 +74,12 @@ public:
     {
         totalLattices = 0;
         collidedPairs = 0;
-        collisionPairs.allocate<smCollidedTriangles>(QString("pairs"), SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS, &pairs);
     }
 
     /// \brief constructor
     smSpatialGridWorker(smProcessID p_ID): smWorkerThread(p_ID)
     {
         totalLattices = 0;
-        collisionPairs.allocate<smCollidedTriangles>(QString("pairs"), SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS, &pairs);
     }
 
     /// \brief !!

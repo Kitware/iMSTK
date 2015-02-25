@@ -30,7 +30,7 @@
 
 #include <IL/ilu.h>
 #include <IL/ilut.h>
-#include <QHash>
+#include <unordered_map>
 
 enum smTextureReturnType
 {
@@ -122,7 +122,7 @@ class smTextureManager: public smCoreClass
 
     static smErrorLog *errorLog;
     static vector<smTexture*> textures;
-    static QHash<QString, smInt>textureIndexId;
+    static std::unordered_map<smString, smInt> textureIndexId;
     static smInt activeTextures;
     static smBool isInitialized;
     static smBool isInitializedGL;

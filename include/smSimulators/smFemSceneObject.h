@@ -34,7 +34,6 @@
 #include "smCore/smSceneObject.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
-#include "smCore/smMemoryBlock.h"
 using namespace Eigen;
 
 
@@ -121,11 +120,6 @@ public:
     /// \brief !!
     virtual void serialize(void *p_memoryBlock)
     {
-        smInt offset = 0;
-        smChar *memoryBlock = (smChar*)p_memoryBlock;
-        memcpy(memoryBlock, v_mesh->vertices, sizeof(v_mesh->vertices));
-        memoryBlock += sizeof(sizeof(v_mesh->vertices));
-        memcpy(memoryBlock, v_mesh->triangles, sizeof(smTriangle)*v_mesh->nbrTriangles);
     }
     /// \brief !!
     virtual void unSerialize(void *p_memoryBlock)

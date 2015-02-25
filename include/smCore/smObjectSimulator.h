@@ -26,13 +26,15 @@
 
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smCore/smMemoryBlock.h"
+#include "smCore/smSceneObject.h"
+#include "smCore/smScheduler.h"
+#include "smCore/smErrorLog.h"
+#include "smUtilities/smTimer.h"
+
+
 #include <QVector>
 #include <QThread>
 #include <QRunnable>
-#include "smCore/smSceneObject.h"
-#include "smUtilities/smTimer.h"
-#include "smCore/smScheduler.h"
 
 /// \brief  thread priority definitions
 enum smThreadPriority

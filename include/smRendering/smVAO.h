@@ -173,7 +173,7 @@ public:
 
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
         bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices;
+        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
         bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
         bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
         bufferInfo[totalNbrBuffers].shaderAttribName = p_POSITIONShaderName;

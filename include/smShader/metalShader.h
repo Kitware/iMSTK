@@ -82,7 +82,7 @@ public:
     {
         if (!attachTexture(p_mesh->uniqueId, p_bump, "BumpTex"))
         {
-            cout << "Error in bump attachment for mesh:" << p_mesh->name.toStdString().c_str() << endl;
+            cout << "Error in bump attachment for mesh:" << p_mesh->name << endl;
         }
 
         attachTexture(p_mesh->uniqueId, p_decal, "DecalTex");

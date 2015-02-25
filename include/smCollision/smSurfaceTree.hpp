@@ -26,6 +26,8 @@
 
 #include "smRendering/smViewer.h"
 
+#include <string>
+
 /// \brief initialize the surface tree structure
 template <typename CellType>
 void smSurfaceTree<CellType>::initStructure()
@@ -105,7 +107,7 @@ void smSurfaceTree<CellType>::initDraw(smDrawParam param)
 {
     smViewer *viewer;
     viewer = param.rendererObject;
-    viewer->addText(QString("octree"));
+    viewer->addText("octree");
 }
 
 /// \brief draw the surface tree
@@ -144,7 +146,7 @@ void smSurfaceTree<CellType>::draw(smDrawParam params)
 
     glPopAttrib();
     glEnable(GL_LIGHTING);
-    params.rendererObject->updateText("octree", QString("Total Spheres at Level:") + QString().setNum(counter));
+    params.rendererObject->updateText("octree", "Total Spheres at Level:" + std::to_string(counter));
 }
 
 /// \brief handle key press events

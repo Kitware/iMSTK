@@ -34,18 +34,12 @@ smBaseMesh::smBaseMesh()
 
 void smBaseMesh::updateOriginalVertsWithCurrent()
 {
-
-    for (smInt i = 0; i < nbrVertices; i++)
-    {
-        origVerts[i] = vertices[i];
-    }
+    origVerts = vertices;
 }
 
 /// \brief constructor
 smMesh::smMesh()
 {
-
-    vertices = 0;
     triangles = 0;
     texCoord = 0;
     triNormals = 0;
@@ -61,8 +55,6 @@ smMesh::smMesh()
 /// \brief destructor
 smMesh::~smMesh()
 {
-
-    delete [] vertices;
     delete [] triangles;
     delete [] texCoord;
     delete [] triNormals;
@@ -307,8 +299,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     }
 
     this->nbrVertices = nbr;
-    this->vertices = new smVec3<smFloat>[nbr];
-    this->origVerts = new smVec3<smFloat>[nbr];
+    this->vertices.reserve(nbr);
+    this->origVerts.reserve(nbr);
     this->vertNormals = new smVec3<smFloat>[nbr];
     this->vertTangents = new smVec3<smFloat>[nbr];
     this->texCoord = new smTexCoord[nbr];

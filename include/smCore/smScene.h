@@ -24,14 +24,16 @@
 #ifndef SMSCENE_H
 #define SMSCENE_H
 
-#include <QVector>
-#include <QMutex>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smDataStructs.h"
 #include "smCore/smDoubleBuffer.h"
+
+#include <QVector>
+#include <QMutex>
+#include <unordered_map>
 
 class smPipe;
 class smSDK;
@@ -74,7 +76,7 @@ private:
     /// \brief scene objects addition queue
     vector<smSceneObject*> addQueue;
     smIndiceArray<smSceneLocal*> sceneLocal;
-    QHash<smInt, smInt> sceneLocalIndex;
+    std::unordered_map<smInt, smInt> sceneLocalIndex;
     /// \brief scene objects storage
     vector<smSceneObject*> sceneObjects;
     /// \brief adds the objects in the local scene storage

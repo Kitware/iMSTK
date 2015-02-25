@@ -34,7 +34,6 @@ class smPBDObjectSimulator: public smObjectSimulator, public smEventHandler
 {
 
 public:
-
     /// \brief constructor
     smPBDObjectSimulator(smErrorLog *p_errorLog): smObjectSimulator(p_errorLog)
     {
@@ -51,8 +50,8 @@ protected:
             return;
         }
 
-        p_object->memBlock->allocate< smVec3<smFloat> >(QString("pos"), p_object->nbrMass);
-        p_object->memBlock->originaltoLocalBlock(QString("pos"), p_object->mesh->vertices, p_object->mesh->nbrVertices);
+        p_object->localVerts.reserve(p_object->mesh->nbrVertices);
+        p_object->localVerts = p_object->mesh->vertices;
         p_object->flags.isSimulatorInit = true;
     }
     /// \brief !!
@@ -109,7 +108,6 @@ protected:
                 }
 
                 mesh = pbdSurfaceSceneObject->mesh;
-                pbdSurfaceSceneObject->memBlock->getBlock(QString("pos"), (void**)&X);
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
@@ -131,7 +129,9 @@ protected:
 
                     if (!pbdSurfaceSceneObject->fixedMass[i])
                     {
-                        pbdSurfaceSceneObject->P[i] = X[i] + pbdSurfaceSceneObject->V[i] * pbdSurfaceSceneObject->dT;
+                        pbdSurfaceSceneObject->P[i] =
+                            pbdSurfaceSceneObject->localVerts[i] + 
+                            pbdSurfaceSceneObject->V[i] * pbdSurfaceSceneObject->dT;
                     }
                 }
 
@@ -173,11 +173,11 @@ protected:
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
-                    pbdSurfaceSceneObject->V[i] = (pbdSurfaceSceneObject->P[i] - X[i]) / pbdSurfaceSceneObject->dT;
+                    pbdSurfaceSceneObject->V[i] = (pbdSurfaceSceneObject->P[i] - pbdSurfaceSceneObject->localVerts[i]) / pbdSurfaceSceneObject->dT;
 
                     if (!pbdSurfaceSceneObject->fixedMass[i])
                     {
-                        X[i] = pbdSurfaceSceneObject->P[i];
+                        pbdSurfaceSceneObject->localVerts[i] = pbdSurfaceSceneObject->P[i];
                     }
                 }
             }
@@ -186,7 +186,7 @@ protected:
         endSim();
     }
 
-    /// \bried !! synchronize the buffers in the object..do not call by yourself.
+    /// \brief !! synchronize the buffers in the object..do not call by yourself.
     void syncBuffers()
     {
         smSceneObject *sceneObj;
@@ -201,7 +201,7 @@ protected:
             if (sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT)
             {
                 pbdSurfaceSceneObject = (smPBDSurfaceSceneObject*)sceneObj;
-                pbdSurfaceSceneObject->memBlock->localtoOriginalBlock(QString("pos"), pbdSurfaceSceneObject->mesh->vertices, pbdSurfaceSceneObject->mesh->nbrVertices);
+                pbdSurfaceSceneObject->mesh->vertices = pbdSurfaceSceneObject->localVerts;
                 pbdSurfaceSceneObject->mesh->updateTriangleNormals();
                 pbdSurfaceSceneObject->mesh->updateVertexNormals();
                 pbdSurfaceSceneObject->mesh->updateTriangleAABB();

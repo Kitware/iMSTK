@@ -29,6 +29,9 @@
 #include <QWaitCondition>
 #include <QMutex>
 
+#include <chrono>
+#include <thread>
+
 /// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor
 ///then each worker threads should call waitTaskStart function when the taks
@@ -113,7 +116,7 @@ public:
         }
 
         taskStart.wakeAll();
-        Sleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         taskDone.wait(&serverMutex);
         serverMutex.unlock();
     }

@@ -153,7 +153,7 @@ struct smPipeHolder: public smBaseHolder
         return pipe == p_param.pipe;
     }
 
-    inline friend smBool operator==(smPipeHolder &p_pipe, QString &p_name)
+    inline friend smBool operator==(smPipeHolder &p_pipe, smString &p_name)
     {
         return (*(p_pipe.pipe) == p_name);
     }
@@ -383,7 +383,7 @@ public:
         return (pipesRef->getByRef(p_unifiedID.sdkID).pipe);
     }
 
-    inline static smPipe* getPipeByName(QString p_name)
+    inline static smPipe* getPipeByName(smString p_name)
     {
         return (pipesRef->getByRef(p_name).pipe);
     }
@@ -395,7 +395,7 @@ public:
         p_pipe->uniqueId.sdkID = pipesRef->checkAndAdd(ph);
     }
     /// \brief create a pipe
-    inline static smPipe *createPipe(QString p_pipeName, smInt p_elementSize, smInt p_size)
+    inline static smPipe *createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
     {
         smPipe *pipe;
         pipe = new smPipe(p_pipeName, p_elementSize, p_size);

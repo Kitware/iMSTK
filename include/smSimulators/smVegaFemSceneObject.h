@@ -33,7 +33,6 @@
 #include "smCore/smErrorLog.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
-#include "smCore/smMemoryBlock.h"
 #include "smSimulators/smVegaConfigFemObject.h"
 
 // VEGA

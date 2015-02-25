@@ -278,7 +278,7 @@ public:
         }
     }
     /// \brief pipe constructor
-    smPipe(QString p_name, smInt p_elementSize, smInt p_maxElements,
+    smPipe(smString p_name, smInt p_elementSize, smInt p_maxElements,
            smPipeType p_pipeType = SIMMEDTK_PIPE_TYPEANY):
         byRefs(SIMMEDTK_PIPE_MAXLISTENERS),
         byValue(SIMMEDTK_PIPE_MAXLISTENERS)
@@ -370,7 +370,7 @@ public:
         (byValue.getByRef(p_handleByValue)->data.nbrElements) = currentElements;
     }
 
-    friend smBool operator==(smPipe &p_pipe, QString p_name)
+    friend smBool operator==(smPipe &p_pipe, smString p_name)
     {
         return (p_pipe.name == p_name ? true : false);
     }

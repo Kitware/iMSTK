@@ -28,7 +28,7 @@
 
 smErrorLog* smTextureManager:: errorLog;
 vector<smTexture*>  smTextureManager:: textures;
-QHash<QString, smInt>  smTextureManager::textureIndexId;
+std::unordered_map<smString, smInt>  smTextureManager::textureIndexId;
 smInt smTextureManager:: activeTextures;
 smBool smTextureManager::isInitialized = false;
 smBool smTextureManager::isInitializedGL = false;
@@ -237,7 +237,7 @@ smTextureReturnType smTextureManager::loadTexture(const smString p_fileName,
 smTextureReturnType smTextureManager::findTextureId(const smChar *p_textureReferenceName,
         smInt &p_textureId)
 {
-    if (textureIndexId.contains(p_textureReferenceName))
+    if (textureIndexId.count(p_textureReferenceName) > 0)
     {
         p_textureId = textureIndexId[p_textureReferenceName];
         return   SIMMEDTK_TEXTURE_OK;

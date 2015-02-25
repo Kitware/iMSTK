@@ -57,11 +57,7 @@ using namespace std;
 #define SIMMEDTKVERSION 1.0
 /// \brief version date
 #define SIMMEDTKVERSION_TEXT "SimMedTK Version 1.0-2009"
-/// \brief QT specific declarations
-#undef QT_NO_CAST_FROM_ASCII
-#undef QT_NO_CAST_TO_ASCII
 
-#include <QString>
 #include "float.h"
 
 /// \brief General type definitions

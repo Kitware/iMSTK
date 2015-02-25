@@ -23,11 +23,11 @@
 
 #ifndef SMCORECLASS_H
 #define SMCORECLASS_H
-#include <QString>
-#include <iostream>
 
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
+
+#include <iostream>
 
 class smSDK;
 class smCoreClass;
@@ -127,7 +127,7 @@ protected:
 
 public:
     /// \brief name of the class
-    QString name;
+    smString name;
     /// \brief unique ID
     smUnifiedID uniqueId;
     /// \brief renderDetail specifies visualization type
@@ -170,13 +170,13 @@ public:
     {
     }
     /// \brief set the name of object
-    void setName(QString p_objectName)
+    void setName(smString p_objectName)
     {
         name = p_objectName;
     }
 
     /// \brief get the name of the object
-    QString getName()
+    smString getName()
     {
         return name;
     }

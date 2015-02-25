@@ -63,8 +63,8 @@ protected:
             {
             case SIMMEDTK_SMSTATICSCENEOBJECT:
                 staticObject = (smStaticSceneObject*)object;
-                object->memBlock->allocate<smVec3<smFloat>>(QString("pos"), staticObject->mesh->nbrVertices);
-                object->memBlock->originaltoLocalBlock(QString("pos"), staticObject->mesh->vertices, staticObject->mesh->nbrVertices);
+                object->localVerts.reserve(staticObject->mesh->nbrVertices);
+                object->localVerts = staticObject->mesh->vertices;
                 object->flags.isSimulatorInit = true;
                 break;
             }
@@ -90,11 +90,10 @@ protected:
             {
                 staticSceneObject = (smStaticSceneObject*)sceneObj;
                 mesh = staticSceneObject->mesh;
-                staticSceneObject->memBlock->getBlock(QString("pos"), (void**)&vertices);
 
                 for (smInt vertIndex = 0; vertIndex < staticSceneObject->mesh->nbrVertices; vertIndex++)
                 {
-                    vertices[vertIndex].y = vertices[vertIndex].y + 0.000001;
+                    staticSceneObject->localVerts[vertIndex].y = staticSceneObject->localVerts[vertIndex].y + 0.000001;
                 }
             }
         }
@@ -113,7 +112,6 @@ protected:
     {
         smSceneObject *sceneObj;
         smStaticSceneObject *staticSceneObject;
-        smVec3<smFloat> *vertices;
         smMesh *mesh;
 
         for (smInt i = 0; i < this->objectsSimulated.size(); i++)
@@ -125,7 +123,7 @@ protected:
             {
                 staticSceneObject = (smStaticSceneObject*)sceneObj;
                 mesh = staticSceneObject->mesh;
-                staticSceneObject->memBlock->localtoOriginalBlock(QString("pos"), mesh->vertices, mesh->nbrVertices);
+                mesh->vertices = staticSceneObject->localVerts;
             }
         }
     }

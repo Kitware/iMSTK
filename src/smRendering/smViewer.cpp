@@ -512,7 +512,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices);
+    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
     {
@@ -1150,8 +1150,6 @@ void smViewer::draw()
 {
 
     static smDrawParam param;
-    static QString fps("FPS: %1");
-    static QFont font;
     static smQuatd quat;
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
@@ -1159,7 +1157,6 @@ void smViewer::draw()
         return;
     }
 
-    font.setPixelSize(10);
     param.rendererObject = this;
     param.caller = this;
     param.data = NULL;
@@ -1256,18 +1253,18 @@ void smViewer::handleEvent(smEvent *p_event)
     }
 }
 
-void smViewer::addText(QString p_tag)
+void smViewer::addText(smString p_tag)
 {
 
-    windowOutput->addText(p_tag, QString(""));
+    windowOutput->addText(p_tag, smString(""));
 }
 
-void smViewer::updateText(QString p_tag, QString p_string)
+void smViewer::updateText(smString p_tag, smString p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void smViewer::updateText(smInt p_handle, QString p_string)
+void smViewer::updateText(smInt p_handle, smString p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);

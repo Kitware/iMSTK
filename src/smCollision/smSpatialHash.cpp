@@ -420,15 +420,14 @@ void smSpatialHash::initDraw(smDrawParam p_param)
 
     smViewer *viewer;
     viewer = p_param.rendererObject;
-    viewer->addText(QString("smhash"));
+    viewer->addText("smhash");
 }
 
 void smSpatialHash::draw(smDrawParam p_param)
 {
 
     smViewer *viewer;
-    QString fps("Collision FPS: %1 TimePerFrame: %2");
-    fps = fps.arg(smDouble(this->FPS)).arg(smDouble(this->timerPerFrame));
+    smString fps("Collision FPS: " + std::to_string(this->FPS) + " TimePerFrame: " + std::to_string(this->timerPerFrame));
 
     viewer = p_param.rendererObject;
 

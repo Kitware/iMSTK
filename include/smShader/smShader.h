@@ -24,14 +24,16 @@
 #ifndef SMSHADER_H
 #define SMSHADER_H
 
-#include <string.h>
-#include <QVector>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
-#include <QMultiHash>
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smMatrix44.h"
+
+#include <string.h>
+#include <unordered_map>
+#include <list>
+#include <QVector>
 
 class smMesh;
 class smSurfaceMesh;
@@ -43,7 +45,7 @@ struct smTextureShaderAssignment
     /// \brief Id from texture manager
     smInt textureId;
     /// \brief The parameters that shaders use
-    QString shaderParamName;
+    smString shaderParamName;
 };
 
 
@@ -55,7 +57,7 @@ class smShader: public smCoreClass
 public:
     smGLInt tangentAttrib;
 protected:
-    static QHash<smInt, smShader *>shaders;
+    static std::unordered_map<smInt, smShader *> shaders;
 
     smChar vertexProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
     smChar fragmentProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
@@ -86,7 +88,7 @@ protected:
     smChar errorText[SIMMEDTK_MAX_ERRORLOG_TEXT];
     /// \brief time for periodically checnking the shader
     QTime time;
-    QMultiHash<smInt, smTextureShaderAssignment> texAssignments;
+    std::unordered_multimap<smInt, smTextureShaderAssignment> texAssignments;
     smChar modelViewMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
     smChar projectionMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
 
@@ -160,7 +162,7 @@ public:
 
 protected:
     /// \brief This stores the opengl binded texture id
-    QHash<QString, smGLInt>textureGLBind;
+    unordered_map<smString, smGLInt> textureGLBind;
     void autoGetTextureIds();
 #endif
 

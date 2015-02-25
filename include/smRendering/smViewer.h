@@ -181,10 +181,10 @@ public:
     /// \brief add object for rendering
     void addObject(smCoreClass *object);
     /// \brief add text for display
-    void addText(QString p_tag);
+    void addText(smString p_tag);
     /// \brief update text
-    void updateText(QString p_tag, QString p_string);
-    void updateText(smInt p_handle, QString p_string);
+    void updateText(smString p_tag, smString p_string);
+    void updateText(smInt p_handle, smString p_string);
     /// \brief change window resolution
     void setScreenResolution(smInt p_width, smInt p_height);
     /// \brief set scene as texture

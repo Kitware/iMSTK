@@ -170,7 +170,7 @@ public:
         }
     }
     /// \brief get element by reference with string
-    inline T& getByRef(QString p_string)
+    inline T& getByRef(smString p_string)
     {
         for (smInt i = 0; i < nbrElements; i++)
         {

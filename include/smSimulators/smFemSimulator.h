@@ -76,8 +76,8 @@ protected:
             {
             case SIMMEDTK_SMFEMSCENEOBJECT:
                 femObject = (smFemSceneObject*)object;
-                object->memBlock->allocate<smVec3<smFloat>>(QString("fem"), femObject->v_mesh->nbrVertices);
-                object->memBlock->originaltoLocalBlock(QString("fem"), femObject->v_mesh->vertices, femObject->v_mesh->nbrVertices);
+                object->localVerts.reserve(femObject->v_mesh->nbrVertices);
+                object->localVerts = femObject->v_mesh->vertices;
                 object->flags.isSimulatorInit = true;
                 break;
             }
@@ -111,7 +111,6 @@ protected:
             {
                 femSceneObject = (smFemSceneObject*)sceneObj;
                 mesh = femSceneObject->v_mesh;
-                femSceneObject->memBlock->getBlock(QString("fem"), (void**)&vertices);
 
                 if (!hapticButtonPressed)
                 {
@@ -157,12 +156,12 @@ protected:
                 {
                     for (i = 0; i < 1; i++)
                     {
-                        femSceneObject->calculateDisplacements_Dynamic(vertices);
+                        femSceneObject->calculateDisplacements_Dynamic(femSceneObject->localVerts.data());
                     }
                 }
                 else
                 {
-                    femSceneObject->calculateDisplacements_QStatic(vertices);
+                    femSceneObject->calculateDisplacements_QStatic(femSceneObject->localVerts.data());
                 }
 
                 if (i == 0)
@@ -207,7 +206,6 @@ protected:
 
         smSceneObject *sceneObj;
         smFemSceneObject *femObject;
-        smVec3<smFloat> *vertices;
         smVolumeMesh *mesh;
 
         for (smInt i = 0; i < this->objectsSimulated.size(); i++)
@@ -219,7 +217,7 @@ protected:
             {
                 femObject = (smFemSceneObject*)sceneObj;
                 mesh = femObject->v_mesh;
-                femObject->memBlock->localtoOriginalBlock(QString("fem"), mesh->vertices, mesh->nbrVertices);
+                mesh->vertices = femObject->localVerts;
                 femObject->v_mesh->updateVertexNormals();
             }
         }
