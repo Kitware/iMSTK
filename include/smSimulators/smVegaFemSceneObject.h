@@ -24,7 +24,6 @@
 #ifndef SMVEGAFEMSCENEOBJECT_H
 #define SMVEGAFEMSCENEOBJECT_H
 
-#include <QAtomicInt>
 #include "smCore/smConfig.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"

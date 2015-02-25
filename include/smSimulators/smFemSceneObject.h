@@ -24,9 +24,6 @@
 #ifndef SMFEMSCENEOBJECT_H
 #define SMFEMSCENEOBJECT_H
 
-#include <Eigen/Core>
-#include <Eigen/LU>
-#include <QAtomicInt>
 #include "smCore/smConfig.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
@@ -34,6 +31,9 @@
 #include "smCore/smSceneObject.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
+
+#include <Eigen/Core>
+#include <Eigen/LU>
 using namespace Eigen;
 
 

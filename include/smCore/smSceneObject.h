@@ -28,7 +28,6 @@
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
-#include <QAtomicInt>
 
 //forward class declaration
 class smObjectSimulator;

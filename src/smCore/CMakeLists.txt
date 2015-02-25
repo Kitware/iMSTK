@@ -2,6 +2,7 @@
 simmedtk_add_library(smCore
   SOURCES
     smConfig.cpp
+    smCoreClass.cpp
     smDispatcher.cpp
     smErrorLog.cpp
     smEvent.cpp

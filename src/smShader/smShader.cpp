@@ -129,7 +129,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        vertexShaderObject = NULL;
+        vertexShaderObject = 0;
         vertexProgramExist = false;
     }
 
@@ -174,7 +174,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        fragmentShaderObject = NULL;
+        fragmentShaderObject = 0;
         fragmentProgramExist = false;
     }
 
@@ -222,7 +222,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        geometryShaderObject = NULL;
+        geometryShaderObject = 0;
         geometryProgramExist = false;
     }
 
@@ -674,7 +674,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        vertexShaderObject = NULL;
+        vertexShaderObject = 0;
     }
 
     if (fragmentProgramExist == true)
@@ -718,7 +718,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        fragmentShaderObject = NULL;
+        fragmentShaderObject = 0;
     }
 
 
@@ -763,7 +763,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        geometryShaderObject = NULL;
+        geometryShaderObject = 0;
     }
 
     glLinkProgram(shaderProgramObject);
@@ -786,6 +786,7 @@ smBool smShader::checkShaderUpdate(smInt interval)
         time.start();
         return reLoadAllShaders();
     }
+    return true;
 }
 
 void smShader::enableCheckingErrors(smBool p_checkError)
@@ -847,7 +848,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(p_vertexFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("Vertex Shader File Name is very long");
                 return false;
@@ -861,7 +862,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(geometryProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("VertexGeometry Shader File Name is very long");
                 return false;
@@ -875,7 +876,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(fragmentProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("Fragment Shader File Name is very long");
                 return false;
@@ -961,7 +962,7 @@ void smShader::getAttribAndParamLocations()
 void smShader::initGLShaders(smDrawParam p_param)
 {
     for(auto& x : shaders)
-    x.second->initDraw(p_param);
+        x.second->initDraw(p_param);
 }
 
 void smShader::activeGLTextures(smUnifiedID p_id)

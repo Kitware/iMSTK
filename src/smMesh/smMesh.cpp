@@ -25,8 +25,6 @@
 #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
 
-QAtomicInt smMesh::meshIdCounter(1);
-
 smBaseMesh::smBaseMesh()
 {
     smSDK::registerMesh(this);

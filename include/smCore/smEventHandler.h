@@ -28,6 +28,8 @@
 #include "smCore/smEvent.h"
 #include "smCore/smDispatcher.h"
 
+#include <atomic>
+
 class smEvent;
 class smEventType;
 
@@ -71,7 +73,7 @@ private:
     /// \brief handlers in the dispatcher
     vector<smEventHandlerHolder*>handlers;
     /// \brief message id counter. used to assign an ID for each message
-    QAtomicInt messageId;
+    std::atomic_int messageId;
     /// \brief event holder. holds SIMMEDTK_MAX_EVENTSBUFFER of number holder
     smEventHolder eventHolder[SIMMEDTK_MAX_EVENTSBUFFER];
 

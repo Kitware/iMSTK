@@ -29,15 +29,16 @@
 
 #define SM_NIUSB6008_INTERFACE_H
 
-#include <qapplication.h>
-#include <QThread>
-#include <NIDAQmx.h>
 #include "smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
 #include "smUtilities/smTimer.h"
+
+#include <QApplication.h>
+#include <QThread>
+#include <NIDAQmx.h>
 
 /// \brief National Instruments USB6008 related data
 struct NIUSB6008Data

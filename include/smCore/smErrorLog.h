@@ -23,14 +23,14 @@
 
 #ifndef SMERRORLOG_H
 #define SMERRORLOG_H
-#include <iostream>
-#include <fstream>
+
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include <qmutex.h>
+
+#include <QMutex>
 #include <QTime>
 #include <string>
-
+#include <fstream>
 #include <iostream>
 using namespace std;
 

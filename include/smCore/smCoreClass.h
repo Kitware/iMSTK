@@ -27,7 +27,7 @@
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
 
-#include <QAtomicInt>
+#include <atomic>
 #include <iostream>
 
 class smSDK;
@@ -60,7 +60,7 @@ struct smUnifiedID
 
 private:
     /// \brief  atomic integer counter that is used to assign a unique number for  each object
-    QAtomicInt IDcounter;
+    static std::atomic_int IDcounter;
     /// \brief  sdk ID. for network use
     smShort sdkID;
 
@@ -75,13 +75,12 @@ public:
     {
         sdkID = -1;
         machineID = -1;
-
     }
 
     /// \brief  generate unique ID
     inline void generateUniqueID()
     {
-        ID = IDcounter.fetchAndAddOrdered(1);
+        ID = IDcounter.fetch_add(1);
     }
 
     /// \brief  returns SDK id

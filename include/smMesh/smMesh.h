@@ -33,7 +33,6 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
-#include <QAtomicInt>
 #include <vector>
 
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
@@ -144,20 +143,18 @@ public:
     smVec3<smFloat> *triTangents; ///< triangle tangents
     smVec3<smFloat> *vertTangents; ///< vertex tangents
     smBool tangentChannel; ///< !!
-    vector< vector<smInt> > vertTriNeighbors; ///< list of neighbors for a trinagle
+    vector< vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
     vector< vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
     vector<smEdge> edges; ///< list of edges
 
 
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
-    ///Therefore it is initally NULL
+    ///Therefore it is initially NULL
     smAABB *triAABBs;
 
     smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
     smMeshFileType meshFileType; ///< type of input mesh
-
-    static QAtomicInt meshIdCounter; ///< !!
 
 public:
     /// \brief constructor
@@ -169,7 +166,7 @@ public:
     /// \brief compute the neighbors of the vertex
     void getVertexNeighbors();
 
-    /// \brief compute the neighbors of the trinagle
+    /// \brief compute the neighbors of the triangle
     void getTriangleNeighbors();
 
     /// \brief initialize vertex arrays

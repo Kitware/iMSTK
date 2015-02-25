@@ -31,13 +31,12 @@
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
-
-#include "assert.h"
-#include <QHash>
-#include <QMultiHash>
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
 #include "smShader/smShader.h"
+
+#include "assert.h"
+#include <unordered_map>
 
 enum smVBOBufferType
 {
@@ -80,12 +79,6 @@ public:
 class smVAO: public smCoreClass
 {
 private:
-    GLuint vboDataId;
-    GLuint vboIndexId;
-    QHash<smInt, smInt> dataOffsetMap;
-    QHash<smInt, smInt> indexOffsetMap;
-    QHash<smInt, smInt> numberofVertices;
-    QHash<smInt, smInt> numberofTriangles;
     smErrorLog *log;
     smBool renderingError;
     smShader *shader;
@@ -100,7 +93,7 @@ public:
     smVBOType vboType;
     smChar error[500];
     ///All VBOs are stored here
-    static QHash<smInt, smVAO *>VAOs;
+    static std::unordered_map<smInt, smVAO *> VAOs;
     smMesh *mesh;
 
     /// \brief need error log and totalBuffer Size
@@ -110,7 +103,7 @@ public:
         renderingError = false;
         totalNbrBuffers = 0;
         vboType = p_vboType;
-        VAOs.insert(this->uniqueId.ID, this);
+        VAOs[this->uniqueId.ID] = this;
         indexBufferLocation = -1;
         bindShaderObjects = p_bindShaderObjects;
     }
@@ -221,8 +214,8 @@ public:
     smBool updateStreamData();
     static void initVAOs(smDrawParam p_param)
     {
-        foreach(smVAO * vao, VAOs)
-        vao->initBuffers(p_param);
+        for(auto& x: VAOs)
+            x.second->initBuffers(p_param);
     }
     /// \brief  init VAO buffers
     void initBuffers(smDrawParam p_param);

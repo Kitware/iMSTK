@@ -31,10 +31,11 @@
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
-#include <qapplication.h>
-#include <QThread>
 #include "smCore/smDoubleBuffer.h"
 #include "smUtilities/smTimer.h"
+
+#include <QApplication.h>
+#include <QThread>
 
 /// \brief holds data for calibration of ADU device
 struct ADUDeviceCalibrationData
