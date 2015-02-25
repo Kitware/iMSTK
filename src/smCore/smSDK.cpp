@@ -21,8 +21,6 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include <QMutex>
-
 #include "smCore/smSDK.h"
 #include "smMesh/smMesh.h"
 
@@ -33,12 +31,6 @@
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
 smErrorLog * smSDK::errorLog;
-
-/// \brief object reference counter mutex
-QMutex  objectRefMutex;
-
-/// \brief this mutex is for system global registration
-QMutex  globalRegisterMutex;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
 smIndiceArray<smModuleHolder> *smSDK::modulesRef;
@@ -176,15 +168,11 @@ void smSDK::run()
 /// \brief
 void smSDK::addRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter++;
-    objectRefMutex.unlock();
 }
 
 /// \brief
 void smSDK::removeRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter--;
-    objectRefMutex.unlock();
 }

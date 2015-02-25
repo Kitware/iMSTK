@@ -123,7 +123,7 @@ protected:
     /// \brief class type
     smClassType type;
     /// \brief reference counter to identify the count the usage
-    smInt referenceCounter;
+    std::atomic_int referenceCounter;
 
 public:
     /// \brief name of the class
@@ -136,9 +136,8 @@ public:
     smClassDrawOrder drawOrder;
 
     /// \brief constructor
-    smCoreClass(): name("")
+    smCoreClass(): name(""), referenceCounter(0)
     {
-        referenceCounter = 0;
         drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
         uniqueId.generateUniqueID();
 
