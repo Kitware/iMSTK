@@ -39,7 +39,6 @@ QMutex  objectRefMutex;
 
 /// \brief this mutex is for system global registration
 QMutex  globalRegisterMutex;
-QHash<smInt, smSceneObject*> sceneObjectList;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
 smIndiceArray<smModuleHolder> *smSDK::modulesRef;
@@ -114,8 +113,6 @@ smSimulator* smSDK::createSimulator()
 /// \brief
 void smSDK::updateSceneListAll()
 {
-
-    QHash<smInt, smModule*>::iterator moduleIterator;
 }
 
 /// \brief Initialize all modules registered to the SimMedTK SDK

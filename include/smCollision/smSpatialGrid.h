@@ -328,16 +328,9 @@ public:
     /// \brief initialization
     void init()
     {
-
-        smSceneObject *sceneObject;
-        smStaticSceneObject  *staticSceneObj;
-        smScene *scene;
-        smClassType objectType;
-        smLattice *lattices;
         smProcessID id;
 
         id.numbScheme = SIMMEDTK_PROCNUMSCHEME_X__;
-        QHash<smInt, smLattice*>::iterator latticeIterator;
 
         if (isInitialized == true)
         {

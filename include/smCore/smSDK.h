@@ -35,7 +35,6 @@
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
 
-#include <QHash>
 #include <QApplication>
 
 /// \brief maximum entities in the framework
