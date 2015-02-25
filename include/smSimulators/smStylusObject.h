@@ -33,7 +33,6 @@
 #include "smUtilities/smMath.h"
 #include "smExternal/tree.hh"
 
-#include <QStack>
 #include <unordered_map>
 
 template<typename T> class smCollisionModel;
