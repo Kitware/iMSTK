@@ -24,8 +24,6 @@
 #ifndef SMMESH_H
 #define SMMESH_H
 
-#include <QVector>
-#include <QAtomicInt>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
@@ -35,6 +33,7 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
+#include <QAtomicInt>
 #include <vector>
 
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value

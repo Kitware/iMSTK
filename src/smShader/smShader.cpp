@@ -919,7 +919,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, vertexShaderParamsString[i]);
-        vertexShaderParams.insert(i, param);
+        vertexShaderParams.push_back(param);
 
         if (textureGLBind[vertexShaderParamsString[i]] != -1)
         {
@@ -930,7 +930,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i]);
-        fragmentShaderParams.insert(i, param);
+        fragmentShaderParams.push_back(param);
         cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << endl;
 
         if (textureGLBind[fragmentShaderParamsString[i]] != -1)
@@ -942,7 +942,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < geometryShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, geometryShaderParamsString[i]);
-        geometryShaderParams.insert(i, param);
+        geometryShaderParams.push_back(param);
 
         if (textureGLBind[geometryShaderParamsString[i]] != -1)
         {
@@ -953,7 +953,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
         param = glGetAttribLocation(shaderProgramObject, attribParamsString[i]);
-        attribShaderParams.insert(i, param);
+        attribShaderParams.push_back(param);
     }
 }
 

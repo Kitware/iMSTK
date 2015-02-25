@@ -38,7 +38,6 @@
 #include "smRendering/smGLRenderer.h"
 #include "smCore/smGeometry.h"
 
-#include <QVector>
 #include <QThread>
 
 #define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3<smFloat>(-10,-10,-10)

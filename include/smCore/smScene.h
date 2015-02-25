@@ -31,7 +31,6 @@
 #include "smUtilities/smDataStructs.h"
 #include "smCore/smDoubleBuffer.h"
 
-#include <QVector>
 #include <QMutex>
 #include <unordered_map>
 

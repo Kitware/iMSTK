@@ -24,9 +24,6 @@
 #ifndef SMSDK_H
 #define SMSDK_H
 
-#include <QHash>
-#include <QVector>
-#include <QApplication>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smScene.h"
@@ -37,6 +34,10 @@
 #include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
+
+#include <QHash>
+#include <QApplication>
+
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
 #define SIMMEDTK_SDK_MAXMODULES 100
@@ -171,7 +172,7 @@ protected:
     smViewer *viewer;
     smSimulator *simulator;
     /// \brief scene list
-    vector<smScene*>sceneList;
+    vector<smScene*> sceneList;
     /// \brief error log
     static smErrorLog *errorLog;
     /// \brief dispatcher

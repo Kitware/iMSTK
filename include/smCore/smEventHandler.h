@@ -27,7 +27,6 @@
 #include "smCore/smCoreClass.h"
 #include "smCore/smEvent.h"
 #include "smCore/smDispatcher.h"
-#include <QVector>
 
 class smEvent;
 class smEventType;

@@ -26,10 +26,10 @@
 
 #include "smCore/smConfig.h"
 
-#include <QVector>
-
 #include "math.h"
 #include "smUtilities/smVec3.h"
+
+#include <vector>
 
 class smShader;
 
@@ -265,13 +265,13 @@ public:
     /// \brief attachment of VAO
     void addVAO(smUnifiedID p_shaderID);
     /// \brief attached shaders
-    vector <smUnifiedID >shaders;
+    std::vector <smUnifiedID >shaders;
     /// \brief enable/disable any attached shader
-    vector<smChar>shaderEnable;
+    std::vector<smChar>shaderEnable;
     /// \brief stores  VAO IDs
-    vector <smUnifiedID>VAOs;
+    std::vector <smUnifiedID>VAOs;
     /// \brief enable/disable any attached VAO
-    vector<smChar>VAOEnable;
+    std::vector<smChar>VAOEnable;
 };
 
 #endif

@@ -27,6 +27,7 @@
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
 
+#include <QAtomicInt>
 #include <iostream>
 
 class smSDK;

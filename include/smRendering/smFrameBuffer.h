@@ -24,15 +24,14 @@
 #ifndef SMFRAMEBUFFEROBJECT_H
 #define SMFRAMEBUFFEROBJECT_H
 
-#include <string.h>
-#include <QVector>
-
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smExternal/framebufferObject.h"
 #include "smExternal/renderbuffer.h"
 #include "smCore/smTextureManager.h"
+
+#include <string.h>
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType
 {

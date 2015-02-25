@@ -30,18 +30,18 @@
 #include "smSimulators/smDummySimulator.h"
 #include "smCore/smEventData.h"
 #include <GL/glew.h>
-#include <qapplication.h>
 #include "smCore/smTextureManager.h"
 #include "smExternalDevices/smPhantomInterface.h"
 #include "smSimulators/smStylusObject.h"
-#include <QVector>
-#include <iostream>
 #include "smSimulators/smMyStylus.h"
 #include "smCollision/smSpatialHash.h"
 #include "smUtilities/smMotionTransformer.h"
 #include "smShader/smShader.h"
 #include "smShader/metalShader.h"
 #include "smSimulators/smToolSimulator.h"
+
+#include <QApplication.h>
+#include <iostream>
 #include <stack>
 
 

@@ -31,8 +31,6 @@
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smTimer.h"
 
-
-#include <QVector>
 #include <QThread>
 #include <QRunnable>
 
