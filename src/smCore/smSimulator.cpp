@@ -36,34 +36,26 @@ void smSimulator::endFrame()
 
 }
 
-void smSimulator::startAsychThreads()
+void smSimulator::initAsyncThreadPool()
 {
-
-    smInt asyncThreadNbr = 0;
-
-    for (smInt i = 0; i < simulators.size(); i++)
-    {
-        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
-        {
-            asyncThreadNbr++;
-        }
-    }
-
-    asyncPool->setMaxThreadCount(asyncThreadNbr);
+    asyncThreadPoolSize = 0;
 
     for (smInt i = 0; i < simulators.size(); i++)
     {
         if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
         {
-            asyncPool->start(simulators[i], simulators[i]->getPriority());
+            asyncThreadPoolSize++;
         }
     }
+
+    asyncPool = std::unique_ptr<ThreadPool>(new ThreadPool(asyncThreadPoolSize));
 }
 
 /// \brief the main simulation loop
 void smSimulator::run()
 {
     std::vector< std::future<int> > results;
+    std::vector< std::future<int> > asyncResults;
     smObjectSimulator *objectSimulator;
 
     if (isInitialized == false)
@@ -76,12 +68,23 @@ void smSimulator::run()
     smSimulationMainParam param;
     param.sceneList = sceneList;
 
-    startAsychThreads();
+    //Start up async threads
+    asyncResults.reserve(this->asyncThreadPoolSize);
+    for (smInt i = 0; i < simulators.size(); i++)
+    {
+        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        {
+            objectSimulator = simulators[i];
+            asyncResults.emplace_back(asyncPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
+        }
+    }
 
     while (true && this->terminateExecution == false)
     {
-        smTimer timer;
-
         beginModule();
 
         if (main != NULL)
@@ -131,8 +134,6 @@ void smSimulator::run()
             objectSimulator->syncBuffers();
         }
 
-        timer.start();
-
         results.clear(); //clear the results buffer for new
         for (smInt i = 0; i < this->collisionDetectors.size(); i++)
         {
@@ -153,7 +154,10 @@ void smSimulator::run()
         endModule();
     }
 
-    asyncPool->waitForDone();
+    for (auto&& result : asyncResults)
+    { //Wait until there is a valid return value from each thread
+        result.get(); //waits for result value
+    }
 
 }
 

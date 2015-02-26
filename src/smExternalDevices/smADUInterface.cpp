@@ -42,8 +42,7 @@ void smADUInterface::init()
 /// \brief
 void smADUInterface::exec()
 {
-
-    this->start();
+    this->run();
 }
 
 /// \brief

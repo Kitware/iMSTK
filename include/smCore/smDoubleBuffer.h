@@ -28,7 +28,8 @@
 #include "smCore/smCoreClass.h"
 #include "smUtilities/smDataStructs.h"
 
-#include <stdlib.h>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <mutex>
 #include <condition_variable>

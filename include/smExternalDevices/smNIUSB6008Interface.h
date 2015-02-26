@@ -34,9 +34,7 @@
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
-#include "smUtilities/smTimer.h"
 
-#include <QThread>
 #include <NIDAQmx.h>
 
 /// \brief National Instruments USB6008 related data
@@ -56,7 +54,7 @@ struct toolData
 };
 
 /// \brief National Instruments USB6008 interface class
-class smNIUSB6008Interface: public smDeviceInterface, public QThread
+class smNIUSB6008Interface: public smDeviceInterface
 {
 
 public:
@@ -93,7 +91,7 @@ public:
     /// \brief start the device
     void exec()
     {
-        this->start();
+        this->run();
     };
 
     /// \brief !!

@@ -25,16 +25,6 @@
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 
-
-#include "smRendering/smGLRenderer.h"
-#include "smShader/smShader.h"
-#include "smCollision/smSpatialGrid.h"
-#include "smSimulators/smFemSimulator.h"
-#include "smSimulators/smStylusObject.h"
-#include "smSimulators/smDummySimulator.h"
-#include "smSimulators/smPBDObjectSimulator.h"
-#include "smCore/smTextureManager.h"
-
 /// \brief A simple example of how to render an object using SimMedTK
 ///
 /// \detail This is the default constructor, however, this is where the main

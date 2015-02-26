@@ -591,9 +591,6 @@ void smSpatialHash::addCollisionModel(smSurfaceTree<smOctreeCell> *p_CollMode)
 
 void smSpatialHash::run()
 {
-
-    smTimer timer;
-    timer.start();
     beginSim();
 
     for (smInt i = 0; i < colModel.size(); i++)

@@ -50,9 +50,6 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
     threadPriority = SIMMEDTK_THREAD_NORMALPRIORITY;
 
     objectsSimulated.clear();
-
-    //this statement is very important do not delete this
-    setAutoDelete(false);
     FPS = 0.0;
     frameCounter = 0;
     totalTime = 0.0;

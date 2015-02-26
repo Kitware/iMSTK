@@ -31,6 +31,7 @@
 #include <IL/ilu.h>
 #include <IL/ilut.h>
 #include <unordered_map>
+#include <cstring>
 
 enum smTextureReturnType
 {

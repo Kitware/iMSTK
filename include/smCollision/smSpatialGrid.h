@@ -38,7 +38,6 @@
 #include "smRendering/smGLRenderer.h"
 #include "smCore/smGeometry.h"
 
-#include <QThread>
 #include <mutex>
 
 #define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3<smFloat>(-10,-10,-10)
@@ -250,7 +249,7 @@ public:
 };
 
 /// \brief
-class smSpatialGrid: public smCollisionDetection, QThread
+class smSpatialGrid: public smCollisionDetection
 {
 
 private:
@@ -279,7 +278,7 @@ private:
     {
         for (smInt i = 0; i < totalThreads; i++)
         {
-            workerThreads[i].start();
+            workerThreads[i].run();
         }
     }
 
@@ -435,12 +434,12 @@ public:
     {
         if (isInitialized)
         {
-            start();
+            run();
         }
         else
         {
             init();
-            start();
+            run();
         }
     }
 

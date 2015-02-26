@@ -26,8 +26,8 @@
 
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
+#include "smUtilities/smTimer.h"
 
-#include <QTime>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -58,7 +58,7 @@ private:
     std::mutex logLock;
 
     ///get the timing
-    QTime time;
+    smTimer time;
 
 public:
     smBool isOutputtoConsoleEnabled;

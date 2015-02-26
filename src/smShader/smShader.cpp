@@ -25,7 +25,8 @@
 #include "smCore/smTextureManager.h"
 #include <fstream>
 #include <iostream>
-// #include <GL/glut.h>
+#include <chrono>
+
 using namespace std;
 
 std::unordered_map<smInt, smShader *> smShader::shaders;
@@ -780,8 +781,7 @@ smBool smShader::reLoadAllShaders()
 ///checks the shader source code within the given interval in milliseconds
 smBool smShader::checkShaderUpdate(smInt interval)
 {
-
-    if (time.elapsed() > interval)
+    if ((time.elapsed() * 1000) > interval)
     {
         time.start();
         return reLoadAllShaders();

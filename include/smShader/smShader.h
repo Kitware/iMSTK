@@ -29,6 +29,7 @@
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smMatrix44.h"
+#include "smUtilities/smTimer.h"
 
 #include <string.h>
 #include <unordered_map>
@@ -87,7 +88,7 @@ protected:
     /// \brief error text for querying the opengl errors mostly
     smChar errorText[SIMMEDTK_MAX_ERRORLOG_TEXT];
     /// \brief time for periodically checnking the shader
-    QTime time;
+    smTimer time;
     std::unordered_multimap<smInt, smTextureShaderAssignment> texAssignments;
     smChar modelViewMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
     smChar projectionMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];

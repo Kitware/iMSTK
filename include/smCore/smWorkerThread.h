@@ -26,7 +26,7 @@
 
 #include "smCore/smCoreClass.h"
 #include "smCore/smSynchronization.h"
-#include <QThread>
+
 /// \brief process(used as conceptual meaning) numbering scheme
 enum smProcessNumbering
 {
@@ -119,7 +119,7 @@ public:
     }
 };
 /// \brief worker thread extends process
-class smWorkerThread: public QThread, public smProcess
+class smWorkerThread: public smProcess
 {
 
 protected:

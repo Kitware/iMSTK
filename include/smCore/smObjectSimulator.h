@@ -31,17 +31,14 @@
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smTimer.h"
 
-#include <QThread>
-#include <QRunnable>
-
 /// \brief  thread priority definitions
 enum smThreadPriority
 {
-    SIMMEDTK_THREAD_IDLE = QThread::IdlePriority,
-    SIMMEDTK_THREAD_LOWPRIORITY = QThread::LowPriority,
-    SIMMEDTK_THREAD_NORMALPRIORITY = QThread::NormalPriority,
-    SIMMEDTK_THREAD_HIGHESTPRIORITY = QThread::HighestPriority,
-    SIMMEDTK_THREAD_TIMECRITICAL = QThread::TimeCriticalPriority,
+    SIMMEDTK_THREAD_IDLE,
+    SIMMEDTK_THREAD_LOWPRIORITY,
+    SIMMEDTK_THREAD_NORMALPRIORITY,
+    SIMMEDTK_THREAD_HIGHESTPRIORITY,
+    SIMMEDTK_THREAD_TIMECRITICAL,
 };
 
 enum smSimulatorExecutionType
@@ -60,7 +57,7 @@ struct smObjectSimulatorParam
 
 ///This is the major object simulator. Each object simulator should derive this class.
 ///you want particular object simualtor to work over an object just set pointer of the object. the rest will be taken care of the simulator and object simulator.
-class smObjectSimulator: public smCoreClass, QRunnable
+class smObjectSimulator: public smCoreClass
 {
 
     ///friend class since smSimulator is the encapsulates the other simulators.
@@ -147,10 +144,10 @@ protected:
     /// \brief is called at the end of simulation frame.
     virtual void endSim()
     {
-        timerPerFrame = timer.now(SIMMEDTK_TIMER_INMILLISECONDS);
+        timerPerFrame = timer.elapsed();
         totalTime += timerPerFrame;
 
-        if (SMTIMER_FRAME_MILLISEC2SECONDS(totalTime) > 1.0)
+        if (totalTime > 1.0)
         {
             FPS = frameCounter;
             frameCounter = 0.0;

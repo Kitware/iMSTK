@@ -26,8 +26,6 @@
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
 
-#include <QThread>
-#include <QThreadPool>
 #include <ThreadPool.h>
 
 struct smSimulationMainParam
@@ -42,7 +40,7 @@ public:
     virtual void simulateMain(smSimulationMainParam) = 0;
 };
 
-class smSimulator: public smModule, QThread
+class smSimulator: public smModule
 {
     friend class smSDK;
 
@@ -52,7 +50,7 @@ protected:
 
     std::unique_ptr<ThreadPool> threadPool;
     /// \brief asynchronous thread pool
-    QThreadPool *asyncPool;
+    std::unique_ptr<ThreadPool> asyncPool;
     /// \brief  maximum number of threads
     smInt maxThreadCount;
     /// \brief  error log
@@ -69,6 +67,11 @@ protected:
     /// \brief time stamp when main callback is registered
     volatile smInt  mainTimeStamp;
 
+private:
+    smInt asyncThreadPoolSize; ///< Tracks the number of threads the async threadpool is running
+    /// \brief Initializes up asynchronous threadpool
+    void initAsyncThreadPool();
+
 public:
     ///initializes all the simulators in the objects in the scene..
     void init()
@@ -83,14 +86,14 @@ public:
             maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
         }
         threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
-        asyncPool = new QThreadPool(this);
-        smObjectSimulator *objectSimulator;
 
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
-            objectSimulator = simulators[i];
+            smObjectSimulator *objectSimulator = simulators[i];
             objectSimulator->init();
         }
+
+        initAsyncThreadPool();
 
         isInitialized = true;
     }
@@ -107,6 +110,7 @@ public:
         changedMainTimeStamp = 0;
         mainTimeStamp = 0;
         maxThreadCount = 0;
+        asyncThreadPoolSize = 0;
     }
 
     void setMaxThreadCount(smInt p_threadMaxCount)
@@ -130,8 +134,6 @@ public:
 
     ///Registration of the Simulation main. It is called in each and every frame
     void registerSimulationMain(smSimulationMain*p_main);
-    /// \brief launches the asynchronous threads
-    void startAsychThreads();
     /// \brief the actual implementation of the simulator module resides in run function
     void run();
     /// \brief called at the beginning of  each and every frame
@@ -144,12 +146,12 @@ public:
 
         if (isInitialized)
         {
-            start();
+            run();
         }
         else
         {
             init();
-            start();
+            run();
         }
     }
 };

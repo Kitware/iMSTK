@@ -23,6 +23,9 @@
 
 #include "smCore/smErrorLog.h"
 
+#include <cstring>
+#include <chrono>
+
 smErrorLog::smErrorLog()
 {
 
@@ -54,7 +57,7 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
         }
 
         strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = time.elapsed();
+        timeStamp[errorCount] = (time.elapsed() * 1000);
         lastError = errorCount;
 
         errorCount++;
@@ -95,7 +98,7 @@ smBool smErrorLog::addError(const smChar *p_text)
         std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
         errorCount++;
         strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = time.elapsed();
+        timeStamp[errorCount] = (time.elapsed() * 1000);
         lastError = errorCount;
 
         if (errorCount >= SIMMEDTK_MAX_ERRORLOG)
