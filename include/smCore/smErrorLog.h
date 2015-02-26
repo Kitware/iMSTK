@@ -27,11 +27,11 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 
-#include <QMutex>
 #include <QTime>
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <mutex>
 using namespace std;
 
 ///This is class is for error storing of the whole SimMedTK system.
@@ -55,7 +55,7 @@ private:
     smInt timeStamp[SIMMEDTK_MAX_ERRORLOG];
 
     ///mutex to sync accesses
-    QMutex mutex;
+    std::mutex logLock;
 
     ///get the timing
     QTime time;

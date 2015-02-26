@@ -31,7 +31,7 @@
 #include "smUtilities/smDataStructs.h"
 #include "smCore/smDoubleBuffer.h"
 
-#include <QMutex>
+#include <mutex>
 #include <unordered_map>
 
 class smPipe;
@@ -67,7 +67,7 @@ private:
     /// \brief error logging
     smErrorLog *log;
     /// \brief scene list lock for thread safe manipulation of the scene
-    QMutex sceneList;
+    std::mutex sceneListLock;
     /// \brief reference counter to the scene
     smUInt referenceCounter;
     /// \brief last updated time stampe
@@ -116,10 +116,8 @@ public:
 
             if (p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
             {
-                p_scene->sceneList.lock();
+                std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
                 p_scene->copySceneToLocal(sceneLocal);
-                p_scene->sceneList.unlock();
-
             }
 
             endIndex = sceneLocal->sceneObjects.size();
@@ -164,10 +162,9 @@ public:
     {
         smSceneLocal *local = new smSceneLocal();
         local->id = p_simmedtkObject->uniqueId.ID;
-        sceneList.lock();
+        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
         copySceneToLocal(local);
         sceneLocalIndex[p_simmedtkObject->uniqueId.ID] = sceneLocal.checkAndAdd(local);
-        sceneList.unlock();
     }
 
     ///add physics in the scene
