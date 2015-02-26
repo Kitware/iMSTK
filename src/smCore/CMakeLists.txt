@@ -48,8 +48,6 @@ target_link_libraries(smCore
     GLEW::GLEW
     GLUT::GLUT
     ${OPENGL_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
     Qt4::QtCore
     Qt4::QtGui
     Qt4::QtOpenGL

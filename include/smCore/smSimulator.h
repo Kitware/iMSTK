@@ -23,15 +23,12 @@
 
 #ifndef SMSIMULATOR_H
 #define SMSIMULATOR_H
-#include <QThread>
-#include <QThreadPool>
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/tss.hpp>
-#include "smExternal/threadpool/boost/threadpool.hpp"
 
-using namespace boost::threadpool;
+#include <QThread>
+#include <QThreadPool>
+#include <ThreadPool.h>
 
 struct smSimulationMainParam
 {
@@ -53,8 +50,7 @@ protected:
     vector<smObjectSimulator*> simulators;
     vector<smObjectSimulator*> collisionDetectors;
 
-    //QThreadPool *threadPool;
-    fifo_pool *simulatorThreadPool;//priority pool
+    std::unique_ptr<ThreadPool> threadPool;
     /// \brief asynchronous thread pool
     QThreadPool *asyncPool;
     /// \brief  maximum number of threads
@@ -70,7 +66,7 @@ protected:
     smSimulationMain *changedMain;
 
     volatile smInt  changedMainTimeStamp;
-    /// \brief time stampe when main callback is registered
+    /// \brief time stamp when main callback is registered
     volatile smInt  mainTimeStamp;
 
 public:
@@ -82,8 +78,11 @@ public:
         {
             return;
         }
-
-        simulatorThreadPool = new  fifo_pool(maxThreadCount);
+        if (maxThreadCount == 0)
+        {
+            maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        }
+        threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
         asyncPool = new QThreadPool(this);
         smObjectSimulator *objectSimulator;
 
@@ -107,7 +106,7 @@ public:
         changedMain = NULL;
         changedMainTimeStamp = 0;
         mainTimeStamp = 0;
-        maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        maxThreadCount = 0;
     }
 
     void setMaxThreadCount(smInt p_threadMaxCount)
