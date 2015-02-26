@@ -172,7 +172,6 @@ find_package(GLFW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Qt4 REQUIRED QtCore QtOpenGL)
 find_package(VegaFEM REQUIRED CONFIG)
 find_package(ThreadPool REQUIRED)
 

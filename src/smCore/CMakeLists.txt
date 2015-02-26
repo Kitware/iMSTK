@@ -48,10 +48,6 @@ target_link_libraries(smCore
     GLEW::GLEW
     GLUT::GLUT
     ${OPENGL_LIBRARY}
-    Qt4::QtCore
-    Qt4::QtGui
-    Qt4::QtOpenGL
-    Qt4::QtXml
     glfw::glfw
   INTERFACE
     ${ILUT_LIBRARIES}
