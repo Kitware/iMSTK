@@ -34,7 +34,6 @@
 #include "smCore/smDoubleBuffer.h"
 #include "smUtilities/smTimer.h"
 
-#include <QApplication.h>
 #include <QThread>
 
 /// \brief holds data for calibration of ADU device

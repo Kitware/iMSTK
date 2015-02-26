@@ -40,7 +40,6 @@
 #include "smShader/metalShader.h"
 #include "smSimulators/smToolSimulator.h"
 
-#include <QApplication.h>
 #include <iostream>
 #include <stack>
 

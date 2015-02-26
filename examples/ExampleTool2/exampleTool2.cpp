@@ -39,7 +39,6 @@
 #include "smTools/curvedGrasper.h"
 #include "smShader/metalShader.h"
 
-#include <QApplication.h>
 #include <iostream>
 #include <stack>
 

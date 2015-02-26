@@ -35,8 +35,6 @@
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
 
-#include <QApplication>
-
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
 #define SIMMEDTK_SDK_MAXMODULES 100
