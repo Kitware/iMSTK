@@ -136,7 +136,7 @@ public:
     smClassDrawOrder drawOrder;
 
     /// \brief constructor
-    smCoreClass(): name(""), referenceCounter(0)
+    smCoreClass(): name("")
     {
         drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
         uniqueId.generateUniqueID();

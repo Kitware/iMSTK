@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include <iostream>
+#include <string>
 #include "smCore/smScriptingEngine.h"
 using namespace std;
 

@@ -216,9 +216,10 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
     //Get indexed vertex data
     for (int i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices[i].x = mesh->mVertices[i].x;
-        this->vertices[i].y = mesh->mVertices[i].y;
-        this->vertices[i].z = mesh->mVertices[i].z;
+        this->vertices.emplace_back(
+            smVec3f(mesh->mVertices[i].x,
+                    mesh->mVertices[i].y,
+                    mesh->mVertices[i].z));
     }
 
     //Get indexed texture coordinate data
