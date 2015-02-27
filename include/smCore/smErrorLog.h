@@ -32,7 +32,6 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
-using namespace std;
 
 ///This is class is for error storing of the whole SimMedTK system.
 ///All errors should be reported to the instance of this class.
@@ -66,9 +65,9 @@ public:
 
     ///add the error in the repository.It is thread safe. It can be called by multiple threads.
     smBool addError(smCoreClass *p_param, const smChar *p_text);
-    smBool addError(smCoreClass *p_param, const string p_text);
+    smBool addError(smCoreClass *p_param, const std::string p_text);
     smBool addError(const smChar *p_text);
-    smBool addError(const string p_text);
+    smBool addError(const std::string p_text);
 
     ///Clean up all the errors in the repository.It is thread safe.
     void cleanAllErrors();

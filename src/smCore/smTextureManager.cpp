@@ -27,7 +27,7 @@
 #include <cassert>
 
 smErrorLog* smTextureManager:: errorLog;
-vector<smTexture*>  smTextureManager:: textures;
+std::vector<smTexture*>  smTextureManager:: textures;
 std::unordered_map<smString, smInt>  smTextureManager::textureIndexId;
 smInt smTextureManager:: activeTextures;
 smBool smTextureManager::isInitialized = false;
@@ -191,7 +191,7 @@ smTextureReturnType smTextureManager::loadTexture(const smChar *p_fileName, cons
 
     if (ilLoadImage(p_fileName) == IL_FALSE)
     {
-        cout << "[smTextureManager::loadTexture] Texture is not found \"" << p_fileName << "\"\n";
+        std::cout << "[smTextureManager::loadTexture] Texture is not found \"" << p_fileName << "\"\n";
         return SIMMEDTK_TEXTURE_NOTFOUND;
     }
 

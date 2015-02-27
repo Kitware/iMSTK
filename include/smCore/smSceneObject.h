@@ -58,7 +58,7 @@ public:
     /// \brief custom renderer
     smCustomRenderer *customRender;
     /// \brief local copy of vertices
-    vector<smVec3f> localVerts;
+    std::vector<smVec3f> localVerts;
     /// \brief flags
     smObjectInitFlags flags;
     /// \brief constructor

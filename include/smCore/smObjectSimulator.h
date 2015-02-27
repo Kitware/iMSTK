@@ -118,7 +118,7 @@ public:
 
 protected:
     ///objects that are simulated by this will be added to the list
-    vector <smSceneObject*> objectsSimulated;
+    std::vector <smSceneObject*> objectsSimulated;
 
     virtual void initCustom() = 0;
     /// \brief  init simulator
@@ -173,7 +173,7 @@ protected:
         smShort currentIndex;
         smShort threadIndex;
     public:
-        smObjectSimulatorObjectIter(smScheduleGroup &p_group, vector <smSceneObject*> &p_objectsSimulated, smInt p_threadIndex)
+        smObjectSimulatorObjectIter(smScheduleGroup &p_group, std::vector <smSceneObject*> &p_objectsSimulated, smInt p_threadIndex)
         {
 
             smInt objectsPerThread;

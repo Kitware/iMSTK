@@ -122,7 +122,7 @@ class smTextureManager: public smCoreClass
 {
 
     static smErrorLog *errorLog;
-    static vector<smTexture*> textures;
+    static std::vector<smTexture*> textures;
     static std::unordered_map<smString, smInt> textureIndexId;
     static smInt activeTextures;
     static smBool isInitialized;

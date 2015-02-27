@@ -28,11 +28,15 @@
 #include "smCore/smCoreClass.h"
 
 #include <chrono>
-using namespace std::chrono;
+
 /// \brief timer class
 class smTimer: public smCoreClass
 {
 public:
+    using ClockType = std::chrono::high_resolution_clock;
+    using TimePointType = ClockType::time_point;
+    using DurationType = ClockType::duration;
+    using PeriodType = ClockType::period;
     /// \brief constructor
     smTimer()
     {
@@ -41,7 +45,7 @@ public:
     /// \brief start the timer
     inline  void start()
     {
-        begin = high_resolution_clock::now();
+        begin = ClockType::now();
     }
 
     /// \brief Gets the time passed between this call and start()
@@ -49,15 +53,15 @@ public:
     /// \return Returns the time in seconds
     inline smLongDouble elapsed()
     {
-        high_resolution_clock::time_point now = high_resolution_clock::now();
-        high_resolution_clock::duration delta = now - begin;
-        return (smLongDouble) (((smLongDouble)delta.count() *
-                                high_resolution_clock::period::num) /
-                               high_resolution_clock::period::den);
+        smLongDouble deltaSec;
+        TimePointType now = ClockType::now();
+        DurationType delta = now - begin;
+        deltaSec = (((smLongDouble)delta.count() * PeriodType::num) / PeriodType::den);
+        return deltaSec;
     }
 
 private:
-    high_resolution_clock::time_point begin;
+    TimePointType begin;
 };
 
 #endif

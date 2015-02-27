@@ -30,7 +30,7 @@
 
 struct smSimulationMainParam
 {
-    vector<smScene*>sceneList;
+    std::vector<smScene*>sceneList;
 };
 /// \brief call back for simulator module. simulateMain is called in every simulation module frame.
 class smSimulationMain
@@ -45,8 +45,8 @@ class smSimulator: public smModule
     friend class smSDK;
 
 protected:
-    vector<smObjectSimulator*> simulators;
-    vector<smObjectSimulator*> collisionDetectors;
+    std::vector<smObjectSimulator*> simulators;
+    std::vector<smObjectSimulator*> collisionDetectors;
 
     std::unique_ptr<ThreadPool> threadPool;
     /// \brief asynchronous thread pool

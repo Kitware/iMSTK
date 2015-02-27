@@ -162,7 +162,7 @@ public:
 
 protected:
     /// \brief This stores the opengl binded texture id
-    unordered_map<smString, smGLInt> textureGLBind;
+    std::unordered_map<smString, smGLInt> textureGLBind;
     void autoGetTextureIds();
 #endif
 

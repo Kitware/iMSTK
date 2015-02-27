@@ -24,6 +24,7 @@
 #include "smCore/smErrorLog.h"
 
 #include <cstring>
+#include <string>
 #include <chrono>
 
 smErrorLog::smErrorLog()
@@ -53,7 +54,7 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
 
         if (isOutputtoConsoleEnabled)
         {
-            cout << p_text << endl;
+            std::cout << p_text << "\n";
         }
 
         strcpy(errors[errorCount], p_text);
@@ -76,7 +77,7 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
     }
 }
 
-smBool smErrorLog::addError(smCoreClass *p_param, const string p_text)
+smBool smErrorLog::addError(smCoreClass *p_param, const std::string p_text)
 {
     return addError(p_param, p_text.c_str());
 }
@@ -115,7 +116,7 @@ smBool smErrorLog::addError(const smChar *p_text)
     }
 }
 
-smBool smErrorLog::addError(const string p_text)
+smBool smErrorLog::addError(const std::string p_text)
 {
     return addError(p_text.c_str());
 }
@@ -137,7 +138,7 @@ void smErrorLog::printLastErr()
 
     if (errorCount != -1)
     {
-        cout << "Last Error:" << errors[errorCount] << " Time:" << timeStamp[errorCount - 1] << " ms" << endl;
+        std::cout << "Last Error:" << errors[errorCount] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
     }
 }
 
@@ -145,5 +146,5 @@ void smErrorLog::printLastErr()
 void smErrorLog::printLastErrSafe()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-    cout << "Last Error:" << errors[errorCount - 1] << " Time:" << timeStamp[errorCount - 1] << " ms" << endl;
+    std::cout << "Last Error:" << errors[errorCount - 1] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
 }

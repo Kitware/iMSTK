@@ -169,7 +169,7 @@ protected:
     smViewer *viewer;
     smSimulator *simulator;
     /// \brief scene list
-    vector<smScene*> sceneList;
+    std::vector<smScene*> sceneList;
     /// \brief error log
     static smErrorLog *errorLog;
     /// \brief dispatcher

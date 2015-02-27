@@ -254,7 +254,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
             Node.verticesIndices.insert(mesh->triangles[triangles[i]].vert[2]);
         }
 
-        for (set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
+        for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
             totalDistance += Node.getCube().center.distance(mesh->vertices[*it]);
         }
@@ -262,7 +262,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
         float weightSum = 0;
         float weight;
 
-        for (set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
+        for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
             weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
             weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
@@ -272,7 +272,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
 
         int counter = 0;
 
-        for (set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
+        for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
             Node.weights[counter] = Node.weights[counter] / weightSum;
             counter++;
@@ -379,7 +379,7 @@ void smSurfaceTree<CellType>::updateStructure()
 
         if (current->filled)
         {
-            for (set<int>::iterator it = current->verticesIndices.begin();
+            for (std::set<int>::iterator it = current->verticesIndices.begin();
                     it != current->verticesIndices.end(); it++)
             {
                 tempCenter = tempCenter + (mesh->vertices[*it]-mesh->origVerts[*it]) * current->weights[counter];

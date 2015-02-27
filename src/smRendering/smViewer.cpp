@@ -321,13 +321,13 @@ void smViewer::initResources(smDrawParam p_param)
         fbo->setDim(2048, 2048);
         fbo->attachDepthTexture(smTextureManager::getTexture("depth"));
 
-        cout << "Checking the status of framebuffer for shadow" << endl;
+        std::cout << "Checking the status of framebuffer for shadow" << "\n";
         fbo->checkStatus();
 
         backfbo->setDim(1024, 1024);
         backfbo->attachColorTexture(smTextureManager::getTexture("backmap"), 0);
         backfbo->attachDepthTexture(smTextureManager::getTexture("backmapdepth"));
-        cout << "Checking the status of framebuffer for dualparaboloid backmap" << endl;
+        std::cout << "Checking the status of framebuffer for dualparaboloid backmap" << "\n";
         backfbo->checkStatus();
 
         smTextureManager::disableTexture("depth");
@@ -418,7 +418,7 @@ void smViewer::initGLContext()
     {
         /* Problem: glewInit failed, something is seriously wrong.
          * Most likely an OpenGL context is not created yet */
-        cout << "Error:" << glewGetErrorString(err) << endl;
+        std::cout << "Error:" << glewGetErrorString(err) << "\n";
         assert(false);
     }
 }
@@ -1268,7 +1268,7 @@ void smViewer::updateText(smInt p_handle, smString p_string)
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(string str)
+void smViewer::setWindowTitle(smString str)
 {
     windowTitle = str;
 }

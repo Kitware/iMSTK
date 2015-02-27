@@ -27,8 +27,6 @@
 #include <iostream>
 #include <chrono>
 
-using namespace std;
-
 std::unordered_map<smInt, smShader *> smShader::shaders;
 smShader *smShader ::currentShader = NULL;
 smShader *smShader ::savedShader = NULL;
@@ -71,9 +69,9 @@ smShader::smShader(smErrorLog *log)
 smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentProgFileName, smChar *p_geometryProgFileName)
 {
 
-    ifstream vertexShaderFile;
-    ifstream fragmentShaderFile;
-    ifstream geometryShaderFile;
+    std::ifstream vertexShaderFile;
+    std::ifstream fragmentShaderFile;
+    std::ifstream geometryShaderFile;
     smLongInt fileSize;
 
     if (glewIsSupported("GL_VERSION_2_0") == GL_FALSE)
@@ -95,13 +93,13 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (vertexShaderFile)
         {
             strcpy(this->vertexProgFileName, p_vertexProgFileName);
-            vertexShaderFile.seekg(0, ios::end);
+            vertexShaderFile.seekg(0, std::ios::end);
             fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, ios::beg);
+            vertexShaderFile.seekg(0, std::ios::beg);
             vertexShaderContent = new smChar [fileSize + 1];
             memset(vertexShaderContent, '\0', fileSize);
             vertexShaderFile.read(vertexShaderContent, fileSize);
-            cout << "[initShaders] " << p_vertexProgFileName;
+            std::cout << "[initShaders] " << p_vertexProgFileName;
         }
         else
         {
@@ -141,13 +139,13 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (fragmentShaderFile)
         {
             strcpy(this->fragmentProgFileName, p_fragmentProgFileName);
-            fragmentShaderFile.seekg(0, ios::end);
+            fragmentShaderFile.seekg(0, std::ios::end);
             fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, ios::beg);
+            fragmentShaderFile.seekg(0, std::ios::beg);
             fragmentShaderContent = new smChar [fileSize];
             memset(fragmentShaderContent, '\0', fileSize);
             fragmentShaderFile.read(fragmentShaderContent, fileSize);
-            cout << "[initShaders] " << p_fragmentProgFileName << endl;
+            std::cout << "[initShaders] " << p_fragmentProgFileName << "\n";
         }
         else
         {
@@ -186,9 +184,9 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (geometryShaderFile)
         {
             strcpy(this->geometryProgFileName, p_geometryProgFileName);
-            geometryShaderFile.seekg(0, ios::end);
+            geometryShaderFile.seekg(0, std::ios::end);
             fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, ios::beg);
+            geometryShaderFile.seekg(0, std::ios::beg);
             geometryShaderContent = new smChar [fileSize];
             memset(geometryShaderContent, '\0', fileSize);
             geometryShaderFile.read(geometryShaderContent, fileSize);
@@ -630,9 +628,9 @@ GLint smShader::addShaderParamAttrib(smChar* p_paramName)
 smBool smShader::reLoadAllShaders()
 {
 
-    ifstream vertexShaderFile;
-    ifstream fragmentShaderFile;
-    ifstream geometryShaderFile;
+    std::ifstream vertexShaderFile;
+    std::ifstream fragmentShaderFile;
+    std::ifstream geometryShaderFile;
     smLongInt fileSize;
 
     if (vertexProgramExist == true)
@@ -641,9 +639,9 @@ smBool smShader::reLoadAllShaders()
 
         if (vertexShaderFile)
         {
-            vertexShaderFile.seekg(0, ios::end);
+            vertexShaderFile.seekg(0, std::ios::end);
             fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, ios::beg);
+            vertexShaderFile.seekg(0, std::ios::beg);
             vertexShaderContent = new smChar [fileSize];
             memset(vertexShaderContent, '\0', fileSize);
             vertexShaderFile.read(vertexShaderContent, fileSize);
@@ -684,9 +682,9 @@ smBool smShader::reLoadAllShaders()
 
         if (fragmentShaderFile)
         {
-            fragmentShaderFile.seekg(0, ios::end);
+            fragmentShaderFile.seekg(0, std::ios::end);
             fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, ios::beg);
+            fragmentShaderFile.seekg(0, std::ios::beg);
             fragmentShaderContent = new smChar [fileSize];
             memset(fragmentShaderContent, '\0', fileSize);
             fragmentShaderFile.read(fragmentShaderContent, fileSize);
@@ -729,9 +727,9 @@ smBool smShader::reLoadAllShaders()
 
         if (geometryShaderFile)
         {
-            geometryShaderFile.seekg(0, ios::end);
+            geometryShaderFile.seekg(0, std::ios::end);
             fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, ios::beg);
+            geometryShaderFile.seekg(0, std::ios::beg);
             geometryShaderContent = new smChar [fileSize];
             memset(geometryShaderContent, '\0', fileSize);
             geometryShaderFile.read(geometryShaderContent, fileSize);
@@ -812,7 +810,7 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
 
     if (smTextureManager::findTextureId(p_textureName, assign.textureId) == SIMMEDTK_TEXTURE_NOTFOUND)
     {
-        cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID.ID <<  endl;
+        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID.ID <<  "\n";
         return false;
     }
 
@@ -932,7 +930,7 @@ void smShader::getAttribAndParamLocations()
     {
         param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i]);
         fragmentShaderParams.push_back(param);
-        cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << endl;
+        std::cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << "\n";
 
         if (textureGLBind[fragmentShaderParamsString[i]] != -1)
         {
@@ -991,6 +989,6 @@ void smShader::print()
 {
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        cout << "Param:" << vertexShaderParamsString[i] << endl;
+        std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }
 }

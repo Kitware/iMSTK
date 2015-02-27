@@ -27,9 +27,6 @@
 #include "smVec3.h"
 #include "smVec4.h"
 #include "smMath.h"
-#include <iostream>
-
-using namespace std;
 
 template<class T>
 class smMatrix33;
@@ -431,12 +428,12 @@ public:
         return ret;
     }
 
-    inline friend ostream &operator<<(ostream &out, smMatrix44<T> &p)
+    inline friend std::ostream &operator<<(std::ostream &out, smMatrix44<T> &p)
     {
-        out << p.e[0][0] << "," << p.e[0][1] << "," << p.e[0][2] << "," << p.e[0][3] << endl;
-        out << p.e[1][0] << "," << p.e[1][1] << "," << p.e[1][2] << "," << p.e[1][3] << endl;
-        out << p.e[2][0] << "," << p.e[2][1] << "," << p.e[2][2] << "," << p.e[2][3] << endl;
-        out << p.e[3][0] << "," << p.e[3][1] << "," << p.e[3][2] << "," << p.e[3][3] << endl;
+        out << p.e[0][0] << "," << p.e[0][1] << "," << p.e[0][2] << "," << p.e[0][3] << "\n";
+        out << p.e[1][0] << "," << p.e[1][1] << "," << p.e[1][2] << "," << p.e[1][3] << "\n";
+        out << p.e[2][0] << "," << p.e[2][1] << "," << p.e[2][2] << "," << p.e[2][3] << "\n";
+        out << p.e[3][0] << "," << p.e[3][1] << "," << p.e[3][2] << "," << p.e[3][3] << "\n";
         return out;
     }
 

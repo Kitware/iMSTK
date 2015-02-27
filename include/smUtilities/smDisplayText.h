@@ -24,9 +24,6 @@
 #define SMDISPLAYTEXT_H
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include <iostream>
-
-using namespace std;
 
 /// \brief  display type
 enum SMDISPLAY_STREAM
@@ -61,7 +58,7 @@ public:
         switch (message.outputStream)
         {
         case SMDISPLAY_CONSOLE:
-            cout << message.text << endl;
+            std::cout << message.text << endl;
         }
     }
 };

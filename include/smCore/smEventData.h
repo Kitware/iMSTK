@@ -30,7 +30,6 @@
 #include "smUtilities/smMatrix44.h"
 
 #include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
-using namespace std;
 
 /// \brief keyboard event data
 struct smKeyboardEventData

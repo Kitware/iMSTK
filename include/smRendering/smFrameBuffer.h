@@ -225,7 +225,7 @@ public:
     {
         if (p_texture == NULL)
         {
-            cout << "Error in frambuffer depth attachment" << endl;
+            std::cout << "Error in frambuffer depth attachment" << "\n";
         }
 
         _fbo.AttachTexture(p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT);

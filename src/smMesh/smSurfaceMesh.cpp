@@ -22,8 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include <assert.h>
-#include <map>
-using std::map;
 
 //assimp includes
 #include <assimp/Importer.hpp>
@@ -192,7 +190,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError(this, string("Error: Error loading mesh: ") + string(fileName));
+            log_SF->addError(this, "Error: Error loading mesh: " + smString(fileName));
         }
 
         return false;

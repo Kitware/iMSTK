@@ -71,7 +71,7 @@ private:
     /// \brief pointer to the event dispatcher
     smDispatcher *dispatcher;
     /// \brief handlers in the dispatcher
-    vector<smEventHandlerHolder*>handlers;
+    std::vector<smEventHandlerHolder*>handlers;
     /// \brief message id counter. used to assign an ID for each message
     std::atomic_int messageId;
     /// \brief event holder. holds SIMMEDTK_MAX_EVENTSBUFFER of number holder

@@ -78,7 +78,7 @@
 #include "matrixIO.h"
 
 #define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
-const string vega_string_none("__none");
+const smString vega_string_none("__none");
 
 /// \ Workhorse class for finite element object simulated using VEGA libraries.
 ///   Functionality: initialization, update of tangend stiffness, stepping in time
@@ -161,7 +161,7 @@ public:
     SceneObjectDeformable * secondaryDeformableObjectRenderingMesh;
 
     /// \brief Constructor
-    smVegaFemSceneObject(smErrorLog *p_log = NULL, string ConfigFile = vega_string_none);
+    smVegaFemSceneObject(smErrorLog *p_log = NULL, smString ConfigFile = vega_string_none);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();

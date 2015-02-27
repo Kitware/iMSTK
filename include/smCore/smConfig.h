@@ -43,7 +43,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h> // for GLfloat, etc.
 
-using namespace std;
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0
 /// \brief defines the threading mechanism

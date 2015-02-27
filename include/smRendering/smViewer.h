@@ -97,10 +97,10 @@ struct smFboListItem
 class smViewer : public smModule, public smEventHandler
 {
 protected:
-    vector<smCoreClass*> objectList;
+    std::vector<smCoreClass*> objectList;
     smIndiceArray<smLight*> *lights;
-    vector<smRenderOperation> renderOperations;
-    vector<smFboListItem> fboListItems;
+    std::vector<smRenderOperation> renderOperations;
+    std::vector<smFboListItem> fboListItems;
 
     ///Vertex Buffer objects
     smVBO *vboDynamicObject;
@@ -189,7 +189,7 @@ public:
     /// \brief set scene as texture
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
     /// \brief set the window title
-    void setWindowTitle(string);
+    void setWindowTitle(smString);
     /// \brief Registers a scene for rendering with the viewer
     void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
@@ -204,7 +204,7 @@ public:
     void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
-    string windowTitle;
+    smString windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
@@ -290,7 +290,7 @@ public:
     smBool  checkCameraCollisionWithScene();
     void addCollisionCheckMeshes(smMesh *mesh);
     /// \brief  stores the  meshes that the collision check  will be performed with camera.
-    vector<smMesh*> collisionMeshes;
+    std::vector<smMesh*> collisionMeshes;
     /// \brief  camera effective radius
     smFloat cameraRadius;
     /// \brief   previous state is collided.internal use

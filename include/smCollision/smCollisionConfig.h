@@ -47,7 +47,7 @@ struct smCellTriangle
         return (p_tri.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellTriangle &tri)
+    friend std::ostream &operator<<(std::ostream &out, smCellTriangle &tri)
     {
         out << tri.primID;
         return out;
@@ -72,7 +72,7 @@ struct smCellLine
         return (p_line.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellLine &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellLine &p)
     {
         out << p.primID;
         return out;
@@ -98,7 +98,7 @@ struct smCellModel
         return (p_model.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellModel &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellModel &p)
     {
         out << p.primID;
         return out;
@@ -125,7 +125,7 @@ struct smCellPoint
         return (p_point.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellPoint &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellPoint &p)
     {
         out << p.primID;
         return out;
@@ -187,8 +187,8 @@ public:
     {
         groupMask = groupMask | (p_group.groupId);
         p_group.groupMask = p_group.groupMask | (groupId);
-        cout << "Mask:" << groupMask << endl;
-        cout << "GroupId:" << groupId << endl;
+        std::cout << "Mask:" << groupMask << "\n";
+        std::cout << "GroupId:" << groupId << "\n";
     }
 
     /// \brief !!

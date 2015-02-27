@@ -43,7 +43,7 @@ smInt smScene::getTotalObjects()
     return totalObjects;
 }
 
-vector<smSceneObject*> smScene::getSceneObject()
+std::vector<smSceneObject*> smScene::getSceneObject()
 {
     std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     return sceneObjects;

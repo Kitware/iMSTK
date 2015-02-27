@@ -625,47 +625,47 @@ void smMesh::checkCorrectWinding()
 
             if (x[0] == p[0] && x[1] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[1] && x[1] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[2] && x[1] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[0] && x[2] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[1] && x[2] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[2] && x[2] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[0] && x[0] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[1] && x[0] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[2] && x[0] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
         }
     }

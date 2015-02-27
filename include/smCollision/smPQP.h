@@ -147,8 +147,8 @@ public:
     {
     }
 
-    vector<smPQPSkeleton *>mPQPSourceSkeletons; ///<
-    vector<smPQPSkeleton *>mPQPDestinationSkeletons; ///<
+    std::vector<smPQPSkeleton *>mPQPSourceSkeletons; ///<
+    std::vector<smPQPSkeleton *>mPQPDestinationSkeletons; ///<
 
     /// \brief !!
     void addDestinationMeshes(smSurfaceMesh *p_mesh)

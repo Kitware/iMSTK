@@ -67,8 +67,8 @@ smBool smPhysXVolumeMesh::loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMe
         return false;
     }
 
-    vector<smVec3f> tempNodes;
-    vector<smInt> tempIndices;
+    std::vector<smVec3f> tempNodes;
+    std::vector<smInt> tempIndices;
     smPhysXLink link;
 
     while (!feof(f))

@@ -24,19 +24,18 @@
 #include <iostream>
 #include <string>
 #include "smCore/smScriptingEngine.h"
-using namespace std;
 
 void smScriptingEngine::list()
 {
 
-    cout << "List of Registered Variables" << endl;
+    std::cout << "List of Registered Variables" << "\n";
     for(auto& x: registeredVariables)
     {
-        cout << x.second->className << "-->" << x.second->variableName << endl;
+        std::cout << x.second->className << "-->" << x.second->variableName << "\n";
     }
 
-    cout << "List of Registered Classes" << endl;
+    std::cout << "List of Registered Classes" << "\n";
 
     for(auto& x: registeredClasses)
-        cout << x.second->getName() << endl;
+        std::cout << x.second->getName() << "\n";
 }

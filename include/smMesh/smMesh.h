@@ -80,13 +80,13 @@ public:
     smCollisionGroup collisionGroup; ///< !!
     smGLInt renderingID; ///< !!
     smErrorLog *log; ///< record the log
-    vector<smVec3f> vertices; ///< vertices co-ordinate data at time t
-    vector<smVec3f> origVerts; ///< vertices co-ordinate data at time t=0
+    std::vector<smVec3f> vertices; ///< vertices co-ordinate data at time t
+    std::vector<smVec3f> origVerts; ///< vertices co-ordinate data at time t=0
     smInt  nbrVertices; ///< number of vertices
     smAABB aabb; ///< Axis aligned bounding box
     smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
     smTexCoord *texCoord; ///< texture co-ordinates
-    vector<smTextureAttachment> textureIds; ///< !!
+    std::vector<smTextureAttachment> textureIds; ///< !!
 
     /// \brief constructor
     smBaseMesh();
@@ -143,9 +143,9 @@ public:
     smVec3<smFloat> *triTangents; ///< triangle tangents
     smVec3<smFloat> *vertTangents; ///< vertex tangents
     smBool tangentChannel; ///< !!
-    vector< vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
-    vector< vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
-    vector<smEdge> edges; ///< list of edges
+    std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
+    std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
+    std::vector<smEdge> edges; ///< list of edges
 
 
     ///AABBB of the mesh.

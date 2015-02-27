@@ -52,7 +52,7 @@ public:
         return id == p_param.id;
     }
 
-    vector<smSceneObject*> sceneObjects;
+    std::vector<smSceneObject*> sceneObjects;
     smUInt sceneUpdatedTimeStamp;
 };
 
@@ -73,11 +73,11 @@ private:
     /// \brief last updated time stampe
     smUInt sceneUpdatedTimeStamp;
     /// \brief scene objects addition queue
-    vector<smSceneObject*> addQueue;
+    std::vector<smSceneObject*> addQueue;
     smIndiceArray<smSceneLocal*> sceneLocal;
     std::unordered_map<smInt, smInt> sceneLocalIndex;
     /// \brief scene objects storage
-    vector<smSceneObject*> sceneObjects;
+    std::vector<smSceneObject*> sceneObjects;
     /// \brief adds the objects in the local scene storage
     void inline copySceneToLocal(smSceneLocal *p_local)
     {
@@ -183,7 +183,7 @@ public:
     ///it should be called in the initialization of the viewer, simulation or any other module.
     ///and the the list should be stored internally.
     ///The scene list removal will be taken care of later since the list should be update.
-    vector<smSceneObject*> getSceneObject();
+    std::vector<smSceneObject*> getSceneObject();
     /// \brief retursn scene id
     smInt getSceneId();
     /// \brief returns the total number of objects in the scene

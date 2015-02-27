@@ -63,7 +63,7 @@ struct smVBOBufferEntryInfo
     ///total size of elements in bytes.
     smInt size;
     ///attribName in the shader
-    string   shaderAttribName;
+    smString   shaderAttribName;
     GLint    shaderAttribLocation;
 public:
     smVBOBufferEntryInfo()
@@ -108,7 +108,7 @@ public:
         bindShaderObjects = p_bindShaderObjects;
     }
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
-    void setBufferData(smVBOBufferType p_type, string p_ShaderAttribName, smInt p_nbrElements, void *p_ptr)
+    void setBufferData(smVBOBufferType p_type, smString p_ShaderAttribName, smInt p_nbrElements, void *p_ptr)
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = p_type;
 
@@ -136,7 +136,7 @@ public:
         totalNbrBuffers++;
     }
     /// \brief set the triangle information
-    void setTriangleInfo(string p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr)
+    void setTriangleInfo(smString p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr)
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
         bufferInfo[totalNbrBuffers].nbrElements = p_nbrTriangles * 3;
@@ -149,10 +149,10 @@ public:
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
     smBool setBufferDataFromMesh(smMesh *p_mesh,
                                  smShader *p_shader,
-                                 string p_POSITIONShaderName = "Position",
-                                 string p_NORMALShaderName = "Normal",
-                                 string p_TEXTURECOORDShaderName = "texCoords",
-                                 string p_TANGENTSName = "Tangents")
+                                 smString p_POSITIONShaderName = "Position",
+                                 smString p_NORMALShaderName = "Normal",
+                                 smString p_TEXTURECOORDShaderName = "texCoords",
+                                 smString p_TANGENTSName = "Tangents")
     {
 
         if (p_shader == NULL)

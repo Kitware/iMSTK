@@ -40,9 +40,6 @@
 #define SM_WINDOW_MAXSTRINGSIZE 255
 #define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
-/// \brief copy string
-using namespace std;
-
 /// \brief I/O stream
 class smIOStream: public smCoreClass
 {
@@ -62,14 +59,14 @@ public:
     /// \brief operator to print text
     virtual smIOStream& operator <<(smString p_string)
     {
-        cout << p_string;
+        std::cout << p_string;
         return *this;
     }
 
     /// \brief to  input from use
     virtual smIOStream& operator >>(smString &p_string)
     {
-        cin.get(inputBuffer, SM_CONSOLE_INPUTBUFFER - 1);
+        std::cin.get(inputBuffer, SM_CONSOLE_INPUTBUFFER - 1);
         inputBuffer[SM_CONSOLE_INPUTBUFFER - 1] = '\0';
         p_string = smString(inputBuffer);
         return *this;

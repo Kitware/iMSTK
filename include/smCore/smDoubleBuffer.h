@@ -33,7 +33,6 @@
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
-using namespace std;
 
 #define SIMMEDTK_PIPE_MAXLISTENERS 10
 
@@ -236,12 +235,12 @@ struct smPipeRegisteration
     {
         if (regType == SIMMEDTK_PIPE_BYREF)
         {
-            cout << "Listener Object" << " By Reference" << endl;
+            std::cout << "Listener Object" << " By Reference" << "\n";
         }
 
         if (regType == SIMMEDTK_PIPE_BYVALUE)
         {
-            cout << "Listener Object" << " By Value" << endl;
+            std::cout << "Listener Object" << " By Value" << "\n";
         }
     }
 

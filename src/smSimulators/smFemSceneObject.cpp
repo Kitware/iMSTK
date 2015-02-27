@@ -158,9 +158,9 @@ void smFemSceneObject::computeStiffness()
 
         if (!dynamicFem)
         {
-            cout << "Inverting";
+            std::cout << "Inverting";
             Kinv = stiffnessMatrix.inverse();
-            cout << "done" << endl;
+            std::cout << "done" << "\n";
             saveMatrix("models/Floppy_Kinv.dat", Kinv);
         }
     }
