@@ -31,8 +31,6 @@
 #include <fstream>
 #include "smExternalDevices/AduHid.h"
 
-using namespace std;
-
 /// \brief default constructor
 void smADUInterface::init()
 {
@@ -42,8 +40,7 @@ void smADUInterface::init()
 /// \brief
 void smADUInterface::exec()
 {
-
-    this->start();
+    this->run();
 }
 
 /// \brief
@@ -63,11 +60,11 @@ smADUInterface::smADUInterface()
 
     if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
     {
-        cout << "ADU USB Device Opened Successfully" << endl;
+        std::cout << "ADU USB Device Opened Successfully" << "\n";
     }
     else
     {
-        cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << endl;
+        std::cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << "\n";
     }
 
     ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
@@ -87,14 +84,14 @@ smADUInterface::smADUInterface(char *calibrationFile)
 
     if (!reader)
     {
-        cout << " ADU Device Calibration Data File Could Not Be Loaded For Reading" << endl;
-        cout << " Check the location for file : " << deviceData << endl;
+        std::cout << " ADU Device Calibration Data File Could Not Be Loaded For Reading" << "\n";
+        std::cout << " Check the location for file : " << deviceData << "\n";
     }
 
     smChar buffer[100];
     smInt i;
-    string t;
-    string s;
+    std::string t;
+    std::string s;
 
     while (!reader.eof())
     {
@@ -104,23 +101,23 @@ smADUInterface::smADUInterface(char *calibrationFile)
 
         i = t.find("Serial Number:");
 
-        if (i != string::npos)
+        if (i != std::string::npos)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
             strcpy(serialNumber, s.c_str());
             //Debug
-            cout << "Serial Number of this device is" << serialNumber << endl;
+            std::cout << "Serial Number of this device is" << serialNumber << "\n";
         }
         else
         {
-            cout << "Couldn't find the serial number for this ADU Device -- Check calibration file" << endl;
+            std::cout << "Couldn't find the serial number for this ADU Device -- Check calibration file" << "\n";
         }
 
         s.clear();
         i = t.find("AN0MIN:");
 
-        if (i != string::npos)
+        if (i != std::string::npos)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
@@ -130,7 +127,7 @@ smADUInterface::smADUInterface(char *calibrationFile)
         s.clear();
         i = t.find("AN0MAX:");
 
-        if (i != string::npos)
+        if (i != std::string::npos)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
@@ -140,7 +137,7 @@ smADUInterface::smADUInterface(char *calibrationFile)
         s.clear();
         i = t.find("AN1MIN:");
 
-        if (i != string::npos)
+        if (i != std::string::npos)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
@@ -150,7 +147,7 @@ smADUInterface::smADUInterface(char *calibrationFile)
         s.clear();
         i = t.find("AN1MAX:");
 
-        if (i != string::npos)
+        if (i != std::string::npos)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
@@ -160,17 +157,17 @@ smADUInterface::smADUInterface(char *calibrationFile)
 
     reader.close();
 
-    cout << "Calibration values are : " << calibrationData->minValue1 << " "
+    std::cout << "Calibration values are : " << calibrationData->minValue1 << " "
          << calibrationData->maxValue1 << " " << calibrationData->minValue2
-         << " " << calibrationData->maxValue2 << endl;
+         << " " << calibrationData->maxValue2 << "\n";
 
     if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
     {
-        cout << "ADU USB Device Opened Successfully" << endl;
+        std::cout << "ADU USB Device Opened Successfully" << "\n";
     }
     else
     {
-        cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << endl;
+        std::cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << "\n";
     }
 
     ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);

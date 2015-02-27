@@ -137,8 +137,6 @@ smViewer::smViewer()
     lightDrawScale = 50;
     enableCameraMotion = false;
 
-    boostViewer = false;
-
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
@@ -323,13 +321,13 @@ void smViewer::initResources(smDrawParam p_param)
         fbo->setDim(2048, 2048);
         fbo->attachDepthTexture(smTextureManager::getTexture("depth"));
 
-        cout << "Checking the status of framebuffer for shadow" << endl;
+        std::cout << "Checking the status of framebuffer for shadow" << "\n";
         fbo->checkStatus();
 
         backfbo->setDim(1024, 1024);
         backfbo->attachColorTexture(smTextureManager::getTexture("backmap"), 0);
         backfbo->attachDepthTexture(smTextureManager::getTexture("backmapdepth"));
-        cout << "Checking the status of framebuffer for dualparaboloid backmap" << endl;
+        std::cout << "Checking the status of framebuffer for dualparaboloid backmap" << "\n";
         backfbo->checkStatus();
 
         smTextureManager::disableTexture("depth");
@@ -420,7 +418,7 @@ void smViewer::initGLContext()
     {
         /* Problem: glewInit failed, something is seriously wrong.
          * Most likely an OpenGL context is not created yet */
-        cout << "Error:" << glewGetErrorString(err) << endl;
+        std::cout << "Error:" << glewGetErrorString(err) << "\n";
         assert(false);
     }
 }
@@ -512,7 +510,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices);
+    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
     {
@@ -1150,8 +1148,6 @@ void smViewer::draw()
 {
 
     static smDrawParam param;
-    static QString fps("FPS: %1");
-    static QFont font;
     static smQuatd quat;
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
@@ -1159,7 +1155,6 @@ void smViewer::draw()
         return;
     }
 
-    font.setPixelSize(10);
     param.rendererObject = this;
     param.caller = this;
     param.data = NULL;
@@ -1256,24 +1251,24 @@ void smViewer::handleEvent(smEvent *p_event)
     }
 }
 
-void smViewer::addText(QString p_tag)
+void smViewer::addText(smString p_tag)
 {
 
-    windowOutput->addText(p_tag, QString(""));
+    windowOutput->addText(p_tag, smString(""));
 }
 
-void smViewer::updateText(QString p_tag, QString p_string)
+void smViewer::updateText(smString p_tag, smString p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void smViewer::updateText(smInt p_handle, QString p_string)
+void smViewer::updateText(smInt p_handle, smString p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(string str)
+void smViewer::setWindowTitle(smString str)
 {
     windowTitle = str;
 }

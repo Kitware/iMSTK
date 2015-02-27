@@ -27,6 +27,8 @@
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
 
+#include <string>
+
 #define SMLIGHT_SPOTMAX 128
 
 class smLight;
@@ -75,7 +77,7 @@ public:
     smBool drawEnabled;
 
     smInt renderUsage;
-    QString name;
+    smString name;
     smLightLocationType lightLocationType;
     smLightType lightType;
 
@@ -83,7 +85,7 @@ public:
     smFloat attn_linear;
     smFloat attn_quadratic;
 
-    smLight(QString p_name = "", smLightType p_lightType = SIMMEDTK_LIGHT_INFINITELIGHT,
+    smLight(smString p_name = "", smLightType p_lightType = SIMMEDTK_LIGHT_INFINITELIGHT,
             smLightLocationType p_lightLocation = SIMMEDTK_LIGHTPOS_EYE)
     {
         name = p_name;

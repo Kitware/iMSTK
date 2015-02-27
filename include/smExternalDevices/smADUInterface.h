@@ -31,10 +31,7 @@
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
-#include <qapplication.h>
-#include <QThread>
 #include "smCore/smDoubleBuffer.h"
-#include "smUtilities/smTimer.h"
 
 /// \brief holds data for calibration of ADU device
 struct ADUDeviceCalibrationData
@@ -54,7 +51,7 @@ struct ADUDeviceData
 };
 
 /// \device Interface class for the ADU device
-class smADUInterface: public smDeviceInterface, public QThread
+class smADUInterface: public smDeviceInterface
 {
 
 public:

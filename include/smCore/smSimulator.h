@@ -23,19 +23,14 @@
 
 #ifndef SMSIMULATOR_H
 #define SMSIMULATOR_H
-#include <QThread>
-#include <QThreadPool>
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
-#include <boost/thread/thread.hpp>
-#include <boost/thread/tss.hpp>
-#include "smExternal/threadpool/boost/threadpool.hpp"
 
-using namespace boost::threadpool;
+#include <ThreadPool.h>
 
 struct smSimulationMainParam
 {
-    vector<smScene*>sceneList;
+    std::vector<smScene*>sceneList;
 };
 /// \brief call back for simulator module. simulateMain is called in every simulation module frame.
 class smSimulationMain
@@ -45,18 +40,17 @@ public:
     virtual void simulateMain(smSimulationMainParam) = 0;
 };
 
-class smSimulator: public smModule, QThread
+class smSimulator: public smModule
 {
     friend class smSDK;
 
 protected:
-    vector<smObjectSimulator*> simulators;
-    vector<smObjectSimulator*> collisionDetectors;
+    std::vector<smObjectSimulator*> simulators;
+    std::vector<smObjectSimulator*> collisionDetectors;
 
-    //QThreadPool *threadPool;
-    fifo_pool *simulatorThreadPool;//priority pool
+    std::unique_ptr<ThreadPool> threadPool;
     /// \brief asynchronous thread pool
-    QThreadPool *asyncPool;
+    std::unique_ptr<ThreadPool> asyncPool;
     /// \brief  maximum number of threads
     smInt maxThreadCount;
     /// \brief  error log
@@ -70,8 +64,13 @@ protected:
     smSimulationMain *changedMain;
 
     volatile smInt  changedMainTimeStamp;
-    /// \brief time stampe when main callback is registered
+    /// \brief time stamp when main callback is registered
     volatile smInt  mainTimeStamp;
+
+private:
+    smInt asyncThreadPoolSize; ///< Tracks the number of threads the async threadpool is running
+    /// \brief Initializes up asynchronous threadpool
+    void initAsyncThreadPool();
 
 public:
     ///initializes all the simulators in the objects in the scene..
@@ -82,16 +81,19 @@ public:
         {
             return;
         }
-
-        simulatorThreadPool = new  fifo_pool(maxThreadCount);
-        asyncPool = new QThreadPool(this);
-        smObjectSimulator *objectSimulator;
+        if (maxThreadCount == 0)
+        {
+            maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        }
+        threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
 
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
-            objectSimulator = simulators[i];
+            smObjectSimulator *objectSimulator = simulators[i];
             objectSimulator->init();
         }
+
+        initAsyncThreadPool();
 
         isInitialized = true;
     }
@@ -107,7 +109,8 @@ public:
         changedMain = NULL;
         changedMainTimeStamp = 0;
         mainTimeStamp = 0;
-        maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
+        maxThreadCount = 0;
+        asyncThreadPoolSize = 0;
     }
 
     void setMaxThreadCount(smInt p_threadMaxCount)
@@ -131,8 +134,6 @@ public:
 
     ///Registration of the Simulation main. It is called in each and every frame
     void registerSimulationMain(smSimulationMain*p_main);
-    /// \brief launches the asynchronous threads
-    void startAsychThreads();
     /// \brief the actual implementation of the simulator module resides in run function
     void run();
     /// \brief called at the beginning of  each and every frame
@@ -145,12 +146,12 @@ public:
 
         if (isInitialized)
         {
-            start();
+            run();
         }
         else
         {
             init();
-            start();
+            run();
         }
     }
 };

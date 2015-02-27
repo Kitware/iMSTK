@@ -34,8 +34,8 @@ void smObjectSimulator::initDraw(smDrawParam p_params)
 void smObjectSimulator::draw(smDrawParam p_params)
 {
 
-    QString fps(name + " FPS: %1");
-    p_params.rendererObject->updateText(name, fps.arg((smDouble)this->FPS));
+    smString fps(name + " FPS: " + std::to_string(this->FPS));
+    p_params.rendererObject->updateText(name, fps);
 }
 
 smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
@@ -43,16 +43,13 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
 
     this->log = p_log;
     smSDK::registerObjectSim(this);
-    name = QString("objecSimulator") + QString().setNum(uniqueId.ID);
+    name = "objecSimulator" + std::to_string(uniqueId.ID);
 
     type = SIMMEDTK_SMOBJECTSIMULATOR;
     isObjectSimInitialized = false;
     threadPriority = SIMMEDTK_THREAD_NORMALPRIORITY;
 
     objectsSimulated.clear();
-
-    //this statement is very important do not delete this
-    setAutoDelete(false);
     FPS = 0.0;
     frameCounter = 0;
     totalTime = 0.0;

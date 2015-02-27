@@ -49,7 +49,7 @@ protected:
     smBool terminationCompleted;
 
     ///scene list in the environment
-    vector<smScene*>sceneList;
+    std::vector<smScene*>sceneList;
     /// \brief call are made for begin module and end module before and after each frame
     virtual void beginModule();
     virtual void   endModule();

@@ -108,11 +108,6 @@ public:
     /// \brief !!
     virtual void serialize(void *p_memoryBlock)
     {
-        smInt offset = 0;
-        smChar *memoryBlock = (smChar*)p_memoryBlock;
-        memcpy(memoryBlock, mesh->vertices, sizeof(mesh->vertices));
-        memoryBlock += sizeof(sizeof(mesh->vertices));
-        memcpy(memoryBlock, mesh->triangles, sizeof(smTriangle)*mesh->nbrTriangles);
     }
 
     /// \brief !!

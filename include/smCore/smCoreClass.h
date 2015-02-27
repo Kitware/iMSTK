@@ -23,11 +23,12 @@
 
 #ifndef SMCORECLASS_H
 #define SMCORECLASS_H
-#include <QString>
-#include <iostream>
 
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
+
+#include <atomic>
+#include <iostream>
 
 class smSDK;
 class smCoreClass;
@@ -59,7 +60,7 @@ struct smUnifiedID
 
 private:
     /// \brief  atomic integer counter that is used to assign a unique number for  each object
-    QAtomicInt IDcounter;
+    static std::atomic_int IDcounter;
     /// \brief  sdk ID. for network use
     smShort sdkID;
 
@@ -74,13 +75,12 @@ public:
     {
         sdkID = -1;
         machineID = -1;
-
     }
 
     /// \brief  generate unique ID
     inline void generateUniqueID()
     {
-        ID = IDcounter.fetchAndAddOrdered(1);
+        ID = IDcounter.fetch_add(1);
     }
 
     /// \brief  returns SDK id
@@ -123,11 +123,11 @@ protected:
     /// \brief class type
     smClassType type;
     /// \brief reference counter to identify the count the usage
-    smInt referenceCounter;
+    std::atomic_int referenceCounter;
 
 public:
     /// \brief name of the class
-    QString name;
+    smString name;
     /// \brief unique ID
     smUnifiedID uniqueId;
     /// \brief renderDetail specifies visualization type
@@ -138,7 +138,6 @@ public:
     /// \brief constructor
     smCoreClass(): name("")
     {
-        referenceCounter = 0;
         drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
         uniqueId.generateUniqueID();
 
@@ -170,13 +169,13 @@ public:
     {
     }
     /// \brief set the name of object
-    void setName(QString p_objectName)
+    void setName(smString p_objectName)
     {
         name = p_objectName;
     }
 
     /// \brief get the name of the object
-    QString getName()
+    smString getName()
     {
         return name;
     }

@@ -25,13 +25,14 @@
 #define SMSCRIPTINGENGINE_H
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include <QHash>
+
+#include <unordered_map>
 
 struct smClassVariableInfo
 {
     void *variablePtr;
-    QString className;
-    QString variableName;
+    smString className;
+    smString variableName;
     SIMMEDTK_TYPEINFO type;
     smInt nbr;
 };
@@ -48,26 +49,26 @@ enum smScriptReturnCodes
 class smScriptingEngine: public  smCoreClass
 {
 
-    QHash <QString, smClassVariableInfo*> registeredVariables;
-    QHash <QString, smCoreClass*> registeredClasses;
+    std::unordered_map<smString, smClassVariableInfo*> registeredVariables;
+    std::unordered_map<smString, smCoreClass*> registeredClasses;
 
 public:
 
     smScriptReturnCodes registerVariable(smCoreClass *p_coreClass, void *p_variablePtr,
                                          SIMMEDTK_TYPEINFO p_typeInfo,
-                                         QString p_variableName, smInt p_nbr)
+                                         smString p_variableName, smInt p_nbr)
     {
 
         smScriptReturnCodes ret = SMSCRIPT_REG_OK;
-        QString nameID;
+        smString nameID;
         smClassVariableInfo *variableInfo = new smClassVariableInfo();
 
-        if (p_variableName.isEmpty())
+        if (p_variableName.size() == 0)
         {
             return SMSCRIPT_REG_VARIABLENAMEMISSING;
         }
 
-        if (p_coreClass->getName().isEmpty())
+        if (p_coreClass->getName().size() == 0)
         {
             return SMSCRIPT_REG_CLASSNAMEMISSING;
         }
@@ -78,18 +79,18 @@ public:
         variableInfo->variableName = p_variableName;
         nameID = p_coreClass->getName() + p_variableName;
 
-        if (!registeredVariables.contains(nameID))
+        if (!registeredVariables.count(nameID) == 0)
         {
-            registeredVariables.insert(nameID, variableInfo);
+            registeredVariables[nameID] = variableInfo;
         }
         else
         {
             ret = SMSCRIPT_REG_VARIABLENAMEEXISTS;
         }
 
-        if (!registeredClasses.contains(p_coreClass->getName()))
+        if (!registeredClasses.count(p_coreClass->getName()) == 0)
         {
-            registeredClasses.insert(p_coreClass->getName(), p_coreClass);
+            registeredClasses[p_coreClass->getName()] = p_coreClass;
         }
         else
         {

@@ -20,9 +20,11 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#include <cstring>
 #include "smSimulators/smVegaConfigFemObject.h"
 #include "configFile.h"
+
+#include <cstring>
+#include <string>
 
 smVegaConfigFemObject::smVegaConfigFemObject()
 {
@@ -60,8 +62,6 @@ smVegaConfigFemObject::smVegaConfigFemObject()
     singleStepMode = 0;
     lockScene = 0;
 
-    strcpy(invertibleMaterialString, "__none");
-
     massSpringSystemSource = NONE;
     deformableObject = UNSPECIFIED;
     invertibleMaterial = INV_NONE;
@@ -74,7 +74,7 @@ smVegaConfigFemObject::~smVegaConfigFemObject()
 }
 
 // Parse the configuration file
-void smVegaConfigFemObject::setFemObjConfuguration(string ConfigFilename)
+void smVegaConfigFemObject::setFemObjConfuguration(std::string ConfigFilename)
 {
 
     printf("VEGA: Parsing configuration file %s...\n", ConfigFilename.c_str());

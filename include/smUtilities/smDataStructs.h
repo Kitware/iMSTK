@@ -170,7 +170,7 @@ public:
         }
     }
     /// \brief get element by reference with string
-    inline T& getByRef(QString p_string)
+    inline T& getByRef(smString p_string)
     {
         for (smInt i = 0; i < nbrElements; i++)
         {
@@ -328,7 +328,7 @@ struct smHashIterator
     smInt tableIndex;
     smInt currentIndex;
 
-    friend ostream &operator<<(ostream &out, smHashIterator<T> &p)
+    friend std::ostream &operator<<(std::ostream &out, smHashIterator<T> &p)
     {
         out << "Table Index:" << p.tableIndex << " Current Bucket Index:" << p.currentIndex;
         return out;
@@ -655,7 +655,7 @@ public:
 
         while (next(prim))
         {
-            cout << "Table:" << currentTableIndex << " Bucket Index:" << currentEntryIndex << " Prim:" << prim << endl;
+            std::cout << "Table:" << currentTableIndex << " Bucket Index:" << currentEntryIndex << " Prim:" << prim << "\n";
         }
     }
     /// \brief  clear all table, including the elements
@@ -774,10 +774,10 @@ public:
     {
         for (int i = 0; i < windowSize; i++)
         {
-            cout << data[i] << " ";
+            std::cout << data[i] << " ";
         }
 
-        cout << endl;
+        std::cout << "\n";
     }
 };
 

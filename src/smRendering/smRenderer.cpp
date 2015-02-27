@@ -87,7 +87,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    glVertexPointer(3, smGLRealType, 0, p_lineMesh->vertices);
+    glVertexPointer(3, smGLRealType, 0, p_lineMesh->vertices.data());
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
     {
@@ -285,7 +285,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
 
     if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
     {
-        glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices);
+        glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
     }
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))

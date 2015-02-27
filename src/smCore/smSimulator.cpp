@@ -36,36 +36,27 @@ void smSimulator::endFrame()
 
 }
 
-void smSimulator::startAsychThreads()
+void smSimulator::initAsyncThreadPool()
 {
-
-    smInt asyncThreadNbr = 0;
-
-    for (smInt i = 0; i < simulators.size(); i++)
-    {
-        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
-        {
-            asyncThreadNbr++;
-        }
-    }
-
-    asyncPool->setMaxThreadCount(asyncThreadNbr);
+    asyncThreadPoolSize = 0;
 
     for (smInt i = 0; i < simulators.size(); i++)
     {
         if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
         {
-            asyncPool->start(simulators[i], simulators[i]->getPriority());
+            asyncThreadPoolSize++;
         }
     }
+
+    asyncPool = std::unique_ptr<ThreadPool>(new ThreadPool(asyncThreadPoolSize));
 }
 
 /// \brief the main simulation loop
 void smSimulator::run()
 {
-
+    std::vector< std::future<int> > results;
+    std::vector< std::future<int> > asyncResults;
     smObjectSimulator *objectSimulator;
-    smInt nbrSims;
 
     if (isInitialized == false)
     {
@@ -73,11 +64,24 @@ void smSimulator::run()
         return;
     }
 
+    results.reserve(this->simulators.size()); //make space for results
     smSimulationMainParam param;
     param.sceneList = sceneList;
 
-    startAsychThreads();
-    simulatorThreadPool->size_controller().resize(this->simulators.size());
+    //Start up async threads
+    asyncResults.reserve(this->asyncThreadPoolSize);
+    for (smInt i = 0; i < simulators.size(); i++)
+    {
+        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        {
+            objectSimulator = simulators[i];
+            asyncResults.emplace_back(asyncPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
+        }
+    }
 
     while (true && this->terminateExecution == false)
     {
@@ -96,9 +100,7 @@ void smSimulator::run()
 
         }
 
-        nbrSims = simulators.size();
-        smTimer timer;
-
+        results.clear();
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
             objectSimulator = simulators[i];
@@ -113,10 +115,18 @@ void smSimulator::run()
                 continue;
             }
 
-            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+            //start each simulator in it's own thread (as max threads allow...)
+            results.emplace_back(threadPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
         }
 
-        simulatorThreadPool->wait();
+        for (auto&& result : results)
+        { //Wait until there is a valid return value from each thread
+            result.get(); //waits for result value
+        }
 
         for (smInt i = 0; i < this->simulators.size(); i++)
         {
@@ -124,20 +134,30 @@ void smSimulator::run()
             objectSimulator->syncBuffers();
         }
 
-        timer.start();
-
+        results.clear(); //clear the results buffer for new
         for (smInt i = 0; i < this->collisionDetectors.size(); i++)
         {
             objectSimulator = collisionDetectors[i];
-            schedule(*simulatorThreadPool, boost::bind(&smObjectSimulator::run, objectSimulator));
+            //start each simulator in it's own thread (as max threads allow...)
+            results.emplace_back(threadPool->enqueue([objectSimulator]()
+                {
+                    objectSimulator->run();
+                    return 0; //this return is just so we have a results value
+                }));
         }
 
-        simulatorThreadPool->wait();
+        for (auto&& result : results)
+        { //Wait until there is a valid return value from each thread
+            result.get(); //waits for result value
+        }
 
         endModule();
     }
 
-    asyncPool->waitForDone();
+    for (auto&& result : asyncResults)
+    { //Wait until there is a valid return value from each thread
+        result.get(); //waits for result value
+    }
 
 }
 

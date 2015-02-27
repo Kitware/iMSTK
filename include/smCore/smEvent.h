@@ -27,7 +27,6 @@
 #include "smCore/smEventData.h"
 
 class smEventDispatcher;
-class smMemoryBlock;
 
 ///for asycnronous call
 enum smEventPriority
@@ -119,8 +118,6 @@ public:
     smStreamEvent()
     {
     }
-
-    virtual smBool allocate(smMemoryBlock *p_block) = 0;
 };
 
 #endif

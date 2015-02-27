@@ -24,15 +24,14 @@
 #ifndef SMFRAMEBUFFEROBJECT_H
 #define SMFRAMEBUFFEROBJECT_H
 
-#include <string.h>
-#include <QVector>
-
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smExternal/framebufferObject.h"
 #include "smExternal/renderbuffer.h"
 #include "smCore/smTextureManager.h"
+
+#include <string.h>
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType
 {
@@ -226,7 +225,7 @@ public:
     {
         if (p_texture == NULL)
         {
-            cout << "Error in frambuffer depth attachment" << endl;
+            std::cout << "Error in frambuffer depth attachment" << "\n";
         }
 
         _fbo.AttachTexture(p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT);

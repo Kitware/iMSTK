@@ -93,7 +93,7 @@ void MyStylus::updateOpenClose()
         }
     }
 
-    cout << angle << endl;
+    std::cout << angle << "\n";
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets

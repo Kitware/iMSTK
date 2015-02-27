@@ -67,8 +67,7 @@ smSceneObject::smSceneObject()
     objectSim = NULL;
     customRender = NULL;
     smSDK::registerSceneObject(this);
-    memBlock = new smMemoryBlock(NULL);
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;
-    name = QString("SceneObject") + QString().setNum(uniqueId.ID);
+    name = "SceneObject" + std::to_string(uniqueId.ID);
 }

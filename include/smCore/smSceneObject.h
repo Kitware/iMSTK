@@ -28,8 +28,6 @@
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
-#include "smCore/smMemoryBlock.h"
-#include <QAtomicInt>
 
 //forward class declaration
 class smObjectSimulator;
@@ -59,8 +57,8 @@ protected:
 public:
     /// \brief custom renderer
     smCustomRenderer *customRender;
-    /// \brief memory block for allocations that will be made for the object
-    smMemoryBlock *memBlock;
+    /// \brief local copy of vertices
+    std::vector<smVec3f> localVerts;
     /// \brief flags
     smObjectInitFlags flags;
     /// \brief constructor

@@ -28,9 +28,6 @@
 #include "smMatrix44.h"
 #include "smMath.h"
 #include "smCore/smCoreClass.h"
-#include <iostream>
-
-using namespace std;
 
 /// \brief smMatrix33
 ///Matrix 3x3 Class which supports several matrix operations.
@@ -408,11 +405,11 @@ public:
         e[2][2] = 1;
     }
     /// \brief putting matrix on console
-    friend ostream &operator<<(ostream &out, smMatrix33 &p)
+    friend std::ostream &operator<<(std::ostream &out, smMatrix33 &p)
     {
-        out << p.e[0][0] << "," << p.e[0][1] << "," << p.e[0][2] << endl;
-        out << p.e[1][0] << "," << p.e[1][1] << "," << p.e[1][2] << endl;
-        out << p.e[2][0] << "," << p.e[2][1] << "," << p.e[2][2] << endl;
+        out << p.e[0][0] << "," << p.e[0][1] << "," << p.e[0][2] << "\n";
+        out << p.e[1][0] << "," << p.e[1][1] << "," << p.e[1][2] << "\n";
+        out << p.e[2][0] << "," << p.e[2][1] << "," << p.e[2][2] << "\n";
         return out;
     }
     /// \brief  assign 4x4 matrix 3x3 matrix

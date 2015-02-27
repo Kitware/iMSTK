@@ -25,10 +25,9 @@
 #include "smCore/smTextureManager.h"
 #include <fstream>
 #include <iostream>
-// #include <GL/glut.h>
-using namespace std;
+#include <chrono>
 
-QHash<smInt, smShader *> smShader::shaders;
+std::unordered_map<smInt, smShader *> smShader::shaders;
 smShader *smShader ::currentShader = NULL;
 smShader *smShader ::savedShader = NULL;
 smBool smShader::currentShaderEnabled = false;
@@ -70,9 +69,9 @@ smShader::smShader(smErrorLog *log)
 smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentProgFileName, smChar *p_geometryProgFileName)
 {
 
-    ifstream vertexShaderFile;
-    ifstream fragmentShaderFile;
-    ifstream geometryShaderFile;
+    std::ifstream vertexShaderFile;
+    std::ifstream fragmentShaderFile;
+    std::ifstream geometryShaderFile;
     smLongInt fileSize;
 
     if (glewIsSupported("GL_VERSION_2_0") == GL_FALSE)
@@ -94,13 +93,13 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (vertexShaderFile)
         {
             strcpy(this->vertexProgFileName, p_vertexProgFileName);
-            vertexShaderFile.seekg(0, ios::end);
+            vertexShaderFile.seekg(0, std::ios::end);
             fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, ios::beg);
+            vertexShaderFile.seekg(0, std::ios::beg);
             vertexShaderContent = new smChar [fileSize + 1];
             memset(vertexShaderContent, '\0', fileSize);
             vertexShaderFile.read(vertexShaderContent, fileSize);
-            cout << "[initShaders] " << p_vertexProgFileName;
+            std::cout << "[initShaders] " << p_vertexProgFileName;
         }
         else
         {
@@ -129,7 +128,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        vertexShaderObject = NULL;
+        vertexShaderObject = 0;
         vertexProgramExist = false;
     }
 
@@ -140,13 +139,13 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (fragmentShaderFile)
         {
             strcpy(this->fragmentProgFileName, p_fragmentProgFileName);
-            fragmentShaderFile.seekg(0, ios::end);
+            fragmentShaderFile.seekg(0, std::ios::end);
             fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, ios::beg);
+            fragmentShaderFile.seekg(0, std::ios::beg);
             fragmentShaderContent = new smChar [fileSize];
             memset(fragmentShaderContent, '\0', fileSize);
             fragmentShaderFile.read(fragmentShaderContent, fileSize);
-            cout << "[initShaders] " << p_fragmentProgFileName << endl;
+            std::cout << "[initShaders] " << p_fragmentProgFileName << "\n";
         }
         else
         {
@@ -174,7 +173,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        fragmentShaderObject = NULL;
+        fragmentShaderObject = 0;
         fragmentProgramExist = false;
     }
 
@@ -185,9 +184,9 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         if (geometryShaderFile)
         {
             strcpy(this->geometryProgFileName, p_geometryProgFileName);
-            geometryShaderFile.seekg(0, ios::end);
+            geometryShaderFile.seekg(0, std::ios::end);
             fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, ios::beg);
+            geometryShaderFile.seekg(0, std::ios::beg);
             geometryShaderContent = new smChar [fileSize];
             memset(geometryShaderContent, '\0', fileSize);
             geometryShaderFile.read(geometryShaderContent, fileSize);
@@ -222,7 +221,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     }
     else
     {
-        geometryShaderObject = NULL;
+        geometryShaderObject = 0;
         geometryProgramExist = false;
     }
 
@@ -554,7 +553,7 @@ smGLInt smShader::addShaderParamForAll(smChar* p_paramName)
     geometryShaderParamsString.push_back(p_paramName);
     geometryShaderParams.push_back(param);
 
-    textureGLBind.insert(p_paramName, param);
+    textureGLBind[p_paramName] = param;
     return param;
 #endif
 }
@@ -563,11 +562,11 @@ smGLInt smShader::getShaderParamForAll(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        if (QString(vertexShaderParamsString[i]) == p_param)
+        if (vertexShaderParamsString[i] == p_param)
         {
             return vertexShaderParams[i];
         }
@@ -581,11 +580,11 @@ smGLInt smShader::getFragmentShaderParam(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
-        if (QString(fragmentShaderParamsString[i]) == p_param)
+        if (fragmentShaderParamsString[i] == p_param)
         {
             return fragmentShaderParams[i];
         }
@@ -599,11 +598,11 @@ smGLInt smShader::getShaderAtrribParam(smChar *p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    QString p_param(p_paramName);
+    smString p_param(p_paramName);
 
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
-        if (QString(attribParamsString[i]) == p_param)
+        if (attribParamsString[i] == p_param)
         {
             return attribShaderParams[i];
         }
@@ -629,9 +628,9 @@ GLint smShader::addShaderParamAttrib(smChar* p_paramName)
 smBool smShader::reLoadAllShaders()
 {
 
-    ifstream vertexShaderFile;
-    ifstream fragmentShaderFile;
-    ifstream geometryShaderFile;
+    std::ifstream vertexShaderFile;
+    std::ifstream fragmentShaderFile;
+    std::ifstream geometryShaderFile;
     smLongInt fileSize;
 
     if (vertexProgramExist == true)
@@ -640,9 +639,9 @@ smBool smShader::reLoadAllShaders()
 
         if (vertexShaderFile)
         {
-            vertexShaderFile.seekg(0, ios::end);
+            vertexShaderFile.seekg(0, std::ios::end);
             fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, ios::beg);
+            vertexShaderFile.seekg(0, std::ios::beg);
             vertexShaderContent = new smChar [fileSize];
             memset(vertexShaderContent, '\0', fileSize);
             vertexShaderFile.read(vertexShaderContent, fileSize);
@@ -674,7 +673,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        vertexShaderObject = NULL;
+        vertexShaderObject = 0;
     }
 
     if (fragmentProgramExist == true)
@@ -683,9 +682,9 @@ smBool smShader::reLoadAllShaders()
 
         if (fragmentShaderFile)
         {
-            fragmentShaderFile.seekg(0, ios::end);
+            fragmentShaderFile.seekg(0, std::ios::end);
             fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, ios::beg);
+            fragmentShaderFile.seekg(0, std::ios::beg);
             fragmentShaderContent = new smChar [fileSize];
             memset(fragmentShaderContent, '\0', fileSize);
             fragmentShaderFile.read(fragmentShaderContent, fileSize);
@@ -718,7 +717,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        fragmentShaderObject = NULL;
+        fragmentShaderObject = 0;
     }
 
 
@@ -728,9 +727,9 @@ smBool smShader::reLoadAllShaders()
 
         if (geometryShaderFile)
         {
-            geometryShaderFile.seekg(0, ios::end);
+            geometryShaderFile.seekg(0, std::ios::end);
             fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, ios::beg);
+            geometryShaderFile.seekg(0, std::ios::beg);
             geometryShaderContent = new smChar [fileSize];
             memset(geometryShaderContent, '\0', fileSize);
             geometryShaderFile.read(geometryShaderContent, fileSize);
@@ -763,7 +762,7 @@ smBool smShader::reLoadAllShaders()
     }
     else
     {
-        geometryShaderObject = NULL;
+        geometryShaderObject = 0;
     }
 
     glLinkProgram(shaderProgramObject);
@@ -780,12 +779,12 @@ smBool smShader::reLoadAllShaders()
 ///checks the shader source code within the given interval in milliseconds
 smBool smShader::checkShaderUpdate(smInt interval)
 {
-
-    if (time.elapsed() > interval)
+    if ((time.elapsed() * 1000) > interval)
     {
         time.start();
         return reLoadAllShaders();
     }
+    return true;
 }
 
 void smShader::enableCheckingErrors(smBool p_checkError)
@@ -799,7 +798,7 @@ void smShader::attachTexture(smUnifiedID p_meshID, smInt p_textureID)
 
     smTextureShaderAssignment assign;
     assign.textureId = p_textureID;
-    texAssignments.insert(p_meshID.ID, assign);
+    texAssignments.insert( {p_meshID.ID, assign} );
 }
 
 smBool smShader::attachTexture(smUnifiedID p_meshID,
@@ -811,12 +810,12 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
 
     if (smTextureManager::findTextureId(p_textureName, assign.textureId) == SIMMEDTK_TEXTURE_NOTFOUND)
     {
-        cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID.ID <<  endl;
+        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID.ID <<  "\n";
         return false;
     }
 
     assign.shaderParamName = p_textureShaderName;
-    texAssignments.insert(p_meshID.ID, assign);
+    texAssignments.insert( {p_meshID.ID, assign} );
 
     return true;
 }
@@ -824,11 +823,11 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
 void smShader::autoGetTextureIds()
 {
 
-    QMultiHash<smInt, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
+    std::unordered_multimap<smInt, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
 
     for (; i != texAssignments.end(); i++)
     {
-        i.value().textureShaderGLassignment = textureGLBind[i.value().shaderParamName];
+        i->second.textureShaderGLassignment = textureGLBind[i->second.shaderParamName];
     }
 }
 
@@ -847,7 +846,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(p_vertexFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("Vertex Shader File Name is very long");
                 return false;
@@ -861,7 +860,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(geometryProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("VertexGeometry Shader File Name is very long");
                 return false;
@@ -875,7 +874,7 @@ smBool smShader::setShaderFileName(smChar *p_vertexFileName,
     {
         if (strlen(fragmentProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
         {
-            if (!log == NULL)
+            if (log != NULL)
             {
                 log->addError("Fragment Shader File Name is very long");
                 return false;
@@ -919,7 +918,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, vertexShaderParamsString[i]);
-        vertexShaderParams.insert(i, param);
+        vertexShaderParams.push_back(param);
 
         if (textureGLBind[vertexShaderParamsString[i]] != -1)
         {
@@ -930,8 +929,8 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i]);
-        fragmentShaderParams.insert(i, param);
-        cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << endl;
+        fragmentShaderParams.push_back(param);
+        std::cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << "\n";
 
         if (textureGLBind[fragmentShaderParamsString[i]] != -1)
         {
@@ -942,7 +941,7 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < geometryShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, geometryShaderParamsString[i]);
-        geometryShaderParams.insert(i, param);
+        geometryShaderParams.push_back(param);
 
         if (textureGLBind[geometryShaderParamsString[i]] != -1)
         {
@@ -953,26 +952,26 @@ void smShader::getAttribAndParamLocations()
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
         param = glGetAttribLocation(shaderProgramObject, attribParamsString[i]);
-        attribShaderParams.insert(i, param);
+        attribShaderParams.push_back(param);
     }
 }
 
 
 void smShader::initGLShaders(smDrawParam p_param)
 {
-    foreach(smShader * shader, shaders)
-    shader->initDraw(p_param);
+    for(auto& x : shaders)
+        x.second->initDraw(p_param);
 }
 
 void smShader::activeGLTextures(smUnifiedID p_id)
 {
     smInt counter = 0;
-    QList<smTextureShaderAssignment> values = texAssignments.values(p_id.ID) ;
+    auto range = texAssignments.equal_range(p_id.ID);
 
-    for (smInt i = 0; i < values.size(); i++)
+    for (auto i = range.first; i != range.second; i++)
     {
-        smTextureManager::activateTexture(values[i].textureId, counter);
-        glUniform1iARB(values[i].textureShaderGLassignment, counter);
+        smTextureManager::activateTexture(i->second.textureId, counter);
+        glUniform1iARB(i->second.textureShaderGLassignment, counter);
         counter++;
     }
 }
@@ -983,13 +982,13 @@ void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size)
 }
 void smShader::registerShader()
 {
-    shaders.insert(this->uniqueId.ID, this);
+    shaders[this->uniqueId.ID] = this;
 }
 
 void smShader::print()
 {
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        cout << "Param:" << vertexShaderParamsString[i] << endl;
+        std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }
 }

@@ -31,7 +31,6 @@
 #include <cstdio>
 #include <cassert>
 #include <float.h>
-using namespace std;
 
 #ifdef WIN32
 #include <windows.h>
@@ -127,7 +126,7 @@ public:
     /// \brief Read the confiuration file to parse all the specifications of the FEM scene
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
-    void setFemObjConfuguration(string ConfigFile);
+    void setFemObjConfuguration(std::string ConfigFile);
 };
 
 #endif

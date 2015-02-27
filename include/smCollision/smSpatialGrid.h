@@ -24,22 +24,21 @@
 #ifndef SMSPATIALGRID_H
 #define SMSPATIALGRID_H
 
-#include <Qthread>
-#include <Qvector>
-#include "smConfig.h"
-#include "smConfigRendering.h"
-#include "smCollisionDetection.h"
-#include "smCustomRenderer.h"
-#include "smScene.h"
-#include "smStaticSceneObject.h"
-#include "smSynchronization.h"
-#include "smWorkerThread.h"
-#include "smLattice.h"
-#include "smLatticeTypes.h"
-#include "smMemoryBlock.h"
-#include "smSDK.h"
-#include "smGLRenderer.h"
-#include "smGeometry.h"
+#include "smCore/smConfig.h"
+#include "smRendering/smConfigRendering.h"
+#include "smCollision/smCollisionDetection.h"
+#include "smRendering/smCustomRenderer.h"
+#include "smCore/smScene.h"
+#include "smCore/smStaticSceneObject.h"
+#include "smCore/smSynchronization.h"
+#include "smCore/smWorkerThread.h"
+#include "smMesh/smLattice.h"
+#include "smMesh/smLatticeTypes.h"
+#include "smCore/smSDK.h"
+#include "smRendering/smGLRenderer.h"
+#include "smCore/smGeometry.h"
+
+#include <mutex>
 
 #define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3<smFloat>(-10,-10,-10)
 #define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3<smFloat>(10,10,10)
@@ -57,7 +56,6 @@ class smSpatialGridWorker: public smWorkerThread
     smLattice *latticePair2; ///< !!
 
 public:
-    smMemoryBlock collisionPairs; ///< !!
     smCollidedTriangles *pairs; ///< collided triangle pairs
     smInt collidedPairs; ///< !!
 
@@ -68,7 +66,6 @@ public:
     /// \brief destructor
     ~smSpatialGridWorker()
     {
-        collisionPairs.deleteMemory(QString("pairs"));
     }
 
     /// \brief constructor
@@ -76,14 +73,12 @@ public:
     {
         totalLattices = 0;
         collidedPairs = 0;
-        collisionPairs.allocate<smCollidedTriangles>(QString("pairs"), SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS, &pairs);
     }
 
     /// \brief constructor
     smSpatialGridWorker(smProcessID p_ID): smWorkerThread(p_ID)
     {
         totalLattices = 0;
-        collisionPairs.allocate<smCollidedTriangles>(QString("pairs"), SIMMEDTK_SPATIALGRID_WORKER_COLLISIONPAIRS, &pairs);
     }
 
     /// \brief !!
@@ -254,7 +249,7 @@ public:
 };
 
 /// \brief
-class smSpatialGrid: public smCollisionDetection, QThread
+class smSpatialGrid: public smCollisionDetection
 {
 
 private:
@@ -271,7 +266,7 @@ private:
     smLattice *latticeList[SIMMEDTK_SPATIALGRID_TOTALLATTICES]; ///<
     smInt totalLattices; ///< total number of lattices
     smBool listUpdated; ///< !!
-    QMutex mutex; ///< !!
+    std::mutex listLock; ///< !!
 
     /// \brief !!
     void beginFrame()
@@ -283,7 +278,7 @@ private:
     {
         for (smInt i = 0; i < totalThreads; i++)
         {
-            workerThreads[i].start();
+            workerThreads[i].run();
         }
     }
 
@@ -333,16 +328,9 @@ public:
     /// \brief initialization
     void init()
     {
-
-        smSceneObject *sceneObject;
-        smStaticSceneObject  *staticSceneObj;
-        smScene *scene;
-        smClassType objectType;
-        smLattice *lattices;
         smProcessID id;
 
         id.numbScheme = SIMMEDTK_PROCNUMSCHEME_X__;
-        QHash<smInt, smLattice*>::iterator latticeIterator;
 
         if (isInitialized == true)
         {
@@ -408,7 +396,7 @@ public:
 
         smLattice **tempLatticeList = new(smLattice*[SIMMEDTK_SPATIALGRID_TOTALLATTICES]);
         smInt index = 0;
-        mutex.lock();
+        std::lock_guard<std::mutex> lock(listLock); //Lock is released when leaves scope
 
         if (listUpdated == true)
         {
@@ -432,7 +420,6 @@ public:
         }
 
         listUpdated = false;
-        mutex.unlock();
         delete []tempLatticeList;
     }
 
@@ -447,12 +434,12 @@ public:
     {
         if (isInitialized)
         {
-            start();
+            run();
         }
         else
         {
             init();
-            start();
+            run();
         }
     }
 
@@ -461,7 +448,7 @@ public:
     {
 
         smSDK::addRef(p_lat);
-        mutex.lock();
+        std::lock_guard<std::mutex> lock(listLock); //Lock is released when leaves scope
         latticeList[totalLattices] = p_lat;
         listUpdated = true;
         p_lat->init(SIMMEDTK_SPATIALGRID_LEFTCORNER, SIMMEDTK_SPATIALGRID_RIGHTCORNER,
@@ -469,7 +456,6 @@ public:
                     SIMMEDTK_SPATIALGRID_YSEPERATION,
                     SIMMEDTK_SPATIALGRID_ZSEPERATION);
         totalLattices++;
-        mutex.unlock();
         return totalLattices - 1;
     }
 
@@ -477,11 +463,10 @@ public:
     virtual void removeLattice(smLattice *p_lat, smInt p_listIndex)
     {
         smSDK::removeRef(p_lat);
-        mutex.lock();
+        std::lock_guard<std::mutex> lock(listLock); //Lock is released when leaves scope
         latticeList[p_listIndex] = NULL;
         totalLattices--;
         listUpdated = true;
-        mutex.unlock();
     }
 
     /// \brief !! renders the workers threads

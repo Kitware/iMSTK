@@ -2,6 +2,7 @@
 simmedtk_add_library(smCore
   SOURCES
     smConfig.cpp
+    smCoreClass.cpp
     smDispatcher.cpp
     smErrorLog.cpp
     smEvent.cpp
@@ -47,12 +48,6 @@ target_link_libraries(smCore
     GLEW::GLEW
     GLUT::GLUT
     ${OPENGL_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    Qt4::QtCore
-    Qt4::QtGui
-    Qt4::QtOpenGL
-    Qt4::QtXml
     glfw::glfw
   INTERFACE
     ${ILUT_LIBRARIES}

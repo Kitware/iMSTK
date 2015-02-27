@@ -23,16 +23,15 @@
 
 #ifndef SMERRORLOG_H
 #define SMERRORLOG_H
-#include <iostream>
-#include <fstream>
+
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include <qmutex.h>
-#include <QTime>
-#include <string>
+#include "smUtilities/smTimer.h"
 
+#include <string>
+#include <fstream>
 #include <iostream>
-using namespace std;
+#include <mutex>
 
 ///This is class is for error storing of the whole SimMedTK system.
 ///All errors should be reported to the instance of this class.
@@ -55,10 +54,10 @@ private:
     smInt timeStamp[SIMMEDTK_MAX_ERRORLOG];
 
     ///mutex to sync accesses
-    QMutex mutex;
+    std::mutex logLock;
 
     ///get the timing
-    QTime time;
+    smTimer time;
 
 public:
     smBool isOutputtoConsoleEnabled;
@@ -66,9 +65,9 @@ public:
 
     ///add the error in the repository.It is thread safe. It can be called by multiple threads.
     smBool addError(smCoreClass *p_param, const smChar *p_text);
-    smBool addError(smCoreClass *p_param, const string p_text);
+    smBool addError(smCoreClass *p_param, const std::string p_text);
     smBool addError(const smChar *p_text);
-    smBool addError(const string p_text);
+    smBool addError(const std::string p_text);
 
     ///Clean up all the errors in the repository.It is thread safe.
     void cleanAllErrors();

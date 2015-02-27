@@ -25,8 +25,6 @@
 #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
 
-QAtomicInt smMesh::meshIdCounter(1);
-
 smBaseMesh::smBaseMesh()
 {
     smSDK::registerMesh(this);
@@ -34,18 +32,12 @@ smBaseMesh::smBaseMesh()
 
 void smBaseMesh::updateOriginalVertsWithCurrent()
 {
-
-    for (smInt i = 0; i < nbrVertices; i++)
-    {
-        origVerts[i] = vertices[i];
-    }
+    origVerts = vertices;
 }
 
 /// \brief constructor
 smMesh::smMesh()
 {
-
-    vertices = 0;
     triangles = 0;
     texCoord = 0;
     triNormals = 0;
@@ -61,8 +53,6 @@ smMesh::smMesh()
 /// \brief destructor
 smMesh::~smMesh()
 {
-
-    delete [] vertices;
     delete [] triangles;
     delete [] texCoord;
     delete [] triNormals;
@@ -307,8 +297,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     }
 
     this->nbrVertices = nbr;
-    this->vertices = new smVec3<smFloat>[nbr];
-    this->origVerts = new smVec3<smFloat>[nbr];
+    this->vertices.reserve(nbr);
+    this->origVerts.reserve(nbr);
     this->vertNormals = new smVec3<smFloat>[nbr];
     this->vertTangents = new smVec3<smFloat>[nbr];
     this->texCoord = new smTexCoord[nbr];
@@ -635,47 +625,47 @@ void smMesh::checkCorrectWinding()
 
             if (x[0] == p[0] && x[1] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[1] && x[1] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[2] && x[1] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[0] && x[2] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[1] && x[2] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[2] && x[2] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[0] && x[0] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[1] && x[0] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[2] && x[0] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
         }
     }

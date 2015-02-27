@@ -82,7 +82,7 @@ public:
     {
         if (!attachTexture(p_mesh->uniqueId, p_bump, "BumpTex"))
         {
-            cout << "Error in bump attachment for mesh:" << p_mesh->name.toStdString().c_str() << endl;
+            std::cout << "Error in bump attachment for mesh:" << p_mesh->name << "\n";
         }
 
         attachTexture(p_mesh->uniqueId, p_decal, "DecalTex");
@@ -143,13 +143,13 @@ public:
             if (keyBoardData->keyBoardKey == smKey::Add)
             {
                 specularPowerValue += 5;
-                cout << specularPowerValue << endl;
+                std::cout << specularPowerValue << "\n";
             }
 
             if (keyBoardData->keyBoardKey == smKey::Subtract)
             {
                 specularPowerValue -= 5;
-                cout << specularPowerValue << endl;
+                std::cout << specularPowerValue << "\n";
             }
 
             break;

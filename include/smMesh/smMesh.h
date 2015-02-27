@@ -24,17 +24,16 @@
 #ifndef SMMESH_H
 #define SMMESH_H
 
-#include <QVector>
-#include <QAtomicInt>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smTextureManager.h"
 #include "smUtilities/smVec3.h"
 #include "smUtilities/smMatrix33.h"
-#include "smCore/smMemoryBlock.h"
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
+
+#include <vector>
 
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
@@ -81,13 +80,13 @@ public:
     smCollisionGroup collisionGroup; ///< !!
     smGLInt renderingID; ///< !!
     smErrorLog *log; ///< record the log
-    smVec3<smFloat> *vertices; ///< vertices co-ordinate data at time t
-    smVec3<smFloat> * origVerts; ///< vertices co-ordinate data at time t=0
+    std::vector<smVec3f> vertices; ///< vertices co-ordinate data at time t
+    std::vector<smVec3f> origVerts; ///< vertices co-ordinate data at time t=0
     smInt  nbrVertices; ///< number of vertices
     smAABB aabb; ///< Axis aligned bounding box
     smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
     smTexCoord *texCoord; ///< texture co-ordinates
-    vector<smTextureAttachment> textureIds; ///< !!
+    std::vector<smTextureAttachment> textureIds; ///< !!
 
     /// \brief constructor
     smBaseMesh();
@@ -144,20 +143,18 @@ public:
     smVec3<smFloat> *triTangents; ///< triangle tangents
     smVec3<smFloat> *vertTangents; ///< vertex tangents
     smBool tangentChannel; ///< !!
-    vector< vector<smInt> > vertTriNeighbors; ///< list of neighbors for a trinagle
-    vector< vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
-    vector<smEdge> edges; ///< list of edges
+    std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
+    std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
+    std::vector<smEdge> edges; ///< list of edges
 
 
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
-    ///Therefore it is initally NULL
+    ///Therefore it is initially NULL
     smAABB *triAABBs;
 
     smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
     smMeshFileType meshFileType; ///< type of input mesh
-
-    static QAtomicInt meshIdCounter; ///< !!
 
 public:
     /// \brief constructor
@@ -169,7 +166,7 @@ public:
     /// \brief compute the neighbors of the vertex
     void getVertexNeighbors();
 
-    /// \brief compute the neighbors of the trinagle
+    /// \brief compute the neighbors of the triangle
     void getTriangleNeighbors();
 
     /// \brief initialize vertex arrays
@@ -279,8 +276,6 @@ public:
     /// \brief destructor
     ~smLineMesh()
     {
-        delete[]vertices;
-        delete[]origVerts;
         delete[]edgeAABBs;
         delete[]texCoord;
         delete[]edges;
@@ -290,8 +285,8 @@ public:
     smLineMesh(smInt p_nbrVertices): smBaseMesh()
     {
         nbrVertices = p_nbrVertices;
-        vertices = new smVec3<smFloat>[nbrVertices];
-        origVerts = new smVec3<smFloat>[nbrVertices];
+        vertices.reserve(nbrVertices);
+        origVerts.reserve(nbrVertices);
         edgeAABBs = new smAABB[nbrVertices - 1];
         texCoord = new smTexCoord[nbrVertices];
         edges = new smEdge[nbrVertices - 1];
@@ -304,8 +299,8 @@ public:
     smLineMesh(smInt p_nbrVertices, smBool autoEdge): smBaseMesh()
     {
         nbrVertices = p_nbrVertices;
-        vertices = new smVec3<smFloat>[nbrVertices];
-        origVerts = new smVec3<smFloat>[nbrVertices];
+        vertices.reserve(nbrVertices);
+        origVerts.reserve(nbrVertices);
         texCoord = new smTexCoord[nbrVertices];
 
         /// Edge AABB should be assigned by the instance

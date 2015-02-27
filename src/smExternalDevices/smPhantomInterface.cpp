@@ -268,10 +268,10 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
         return HD_CALLBACK_DONE;
     }
 
-    timerPerFrame = hapticTimer.now(SIMMEDTK_TIMER_INMILLISECONDS);
+    timerPerFrame = hapticTimer.elapsed();
     frameCounter++;
 
-    if (SMTIMER_FRAME_MILLISEC2SECONDS(timerPerFrame) >= 1.0)
+    if (timerPerFrame >= 1.0)
     {
         hapticTimer.start();
         frameCounter = 0;

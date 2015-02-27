@@ -22,20 +22,20 @@
 //---------------------------------------------------------------------------
 
 #include <iostream>
+#include <string>
 #include "smCore/smScriptingEngine.h"
-using namespace std;
 
 void smScriptingEngine::list()
 {
 
-    cout << "List of Registered Variables" << endl;
-    foreach(smClassVariableInfo * info, registeredVariables)
+    std::cout << "List of Registered Variables" << "\n";
+    for(auto& x: registeredVariables)
     {
-        cout << qPrintable(info->className) << "-->" << qPrintable(info->variableName) << endl;
+        std::cout << x.second->className << "-->" << x.second->variableName << "\n";
     }
 
-    cout << "List of Registered Classes" << endl;
+    std::cout << "List of Registered Classes" << "\n";
 
-    foreach(smCoreClass * classInfo, registeredClasses)
-    cout << qPrintable(classInfo->getName()) << endl;
+    for(auto& x: registeredClasses)
+        std::cout << x.second->getName() << "\n";
 }

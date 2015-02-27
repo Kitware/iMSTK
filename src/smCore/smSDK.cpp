@@ -21,24 +21,16 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include <QMutex>
-
 #include "smCore/smSDK.h"
 #include "smMesh/smMesh.h"
 
 #include <chrono>
 #include <thread>
+#include <string>
 
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
 smErrorLog * smSDK::errorLog;
-
-/// \brief object reference counter mutex
-QMutex  objectRefMutex;
-
-/// \brief this mutex is for system global registration
-QMutex  globalRegisterMutex;
-QHash<smInt, smSceneObject*> sceneObjectList;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
 smIndiceArray<smModuleHolder> *smSDK::modulesRef;
@@ -55,7 +47,7 @@ smScene *smSDK::createScene()
     smScene*scene;
     scene = new smScene(errorLog);
     registerScene(scene);
-    scene->setName(QString("Scene") + QString().setNum(scene->uniqueId.ID));
+    scene->setName("Scene" + std::to_string(scene->uniqueId.ID));
     return scene;
 }
 
@@ -113,8 +105,6 @@ smSimulator* smSDK::createSimulator()
 /// \brief
 void smSDK::updateSceneListAll()
 {
-
-    QHash<smInt, smModule*>::iterator moduleIterator;
 }
 
 /// \brief Initialize all modules registered to the SimMedTK SDK
@@ -178,15 +168,11 @@ void smSDK::run()
 /// \brief
 void smSDK::addRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter++;
-    objectRefMutex.unlock();
 }
 
 /// \brief
 void smSDK::removeRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter--;
-    objectRefMutex.unlock();
 }

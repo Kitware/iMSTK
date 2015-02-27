@@ -25,7 +25,7 @@
 #include "smShader/smShader.h"
 #include "smRendering/smViewer.h"
 
-QHash<smInt, smVAO *>  smVAO::VAOs;
+std::unordered_map<smInt, smVAO *>  smVAO::VAOs;
 
 void smVAO::initBuffers(smDrawParam p_param)
 {

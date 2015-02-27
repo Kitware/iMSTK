@@ -59,11 +59,11 @@ public:
 
         ///save the data in JPG format. file extension(jpg) specifies the file format
         smTextureManager::saveRGBImage(data1, 255, 255, "ImageExampletest.jpg");
-        cout << "RGB Image is created" << endl;
+        std::cout << "RGB Image is created" << "\n";
 
         ///save the file in binary format. the extension will be always bmp.
         smTextureManager::saveBinaryImage(data, 128, 128, "ImageExampletest.bmp");
-        cout << "Bitmap Image is created" << endl;
+        std::cout << "Bitmap Image is created" << "\n";
 
         ///run the sdk
         simmedtkSDK->run();

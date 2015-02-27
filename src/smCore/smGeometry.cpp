@@ -250,11 +250,11 @@ smBool smCollisionUtils::checkLineTri(smVec3<smFloat> &p_linePoint1,
             p_interSection[0] = p_linePoint1[0] + t * dir[0];
             p_interSection[1] = p_linePoint1[1] + t * dir[1];
             p_interSection[2] = p_linePoint1[2] + t * dir[2];
-            return (TRUE);
+            return (true);
         }
     }
 
-    return (FALSE);
+    return (false);
 }
 
 /// \brief If the point is in the triangle, it will also send the barycentric coord.
