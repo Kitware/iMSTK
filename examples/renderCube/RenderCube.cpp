@@ -217,7 +217,7 @@ void RenderCube::handleEvent(smEvent *p_event)
         smMouseMoveEventData* mpData = 
             (smMouseMoveEventData*)p_event->data;
         std::cout << "mpData: x: " << mpData->windowX
-            << "y: " << mpData->windowY << "\n";
+            << " y: " << mpData->windowY << "\n";
         break;
     }
     default:
