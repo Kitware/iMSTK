@@ -78,13 +78,13 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     assert(sdk);
     smViewer *viewer = sdk->getViewerInstance();
     assert(viewer);
-    smKeyboardEventData* kbData = NULL;
+    smKeyboardEventData* kbData = nullptr;
 
-    eventKeyboard = new smEvent();
+    eventKeyboard = new smEvent(); //Need to handle failure to allocate
     eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
     eventKeyboard->senderId = viewer->getModuleId();
     eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventKeyboard->data = new smKeyboardEventData();
+    eventKeyboard->data = new smKeyboardEventData(); //Need to handle failure to allocate
     kbData = (smKeyboardEventData*)eventKeyboard->data;
     kbData->keyBoardKey = GLFWKeyToSmKey(key);
     if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
@@ -107,6 +107,63 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
         kbData->modKeys |= smModKey::super;
 
     sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
+}
+
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+    smSDK *sdk = smSDK::getInstance();
+    assert(sdk);
+    smViewer *viewer = sdk->getViewerInstance();
+    assert(viewer);
+    smMouseButtonEventData* mbData = nullptr;
+
+    smEvent *eventMouseButton = new smEvent(); //Need to handle failure to allocate
+    eventMouseButton->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
+    eventMouseButton->senderId = viewer->getModuleId();
+    eventMouseButton->senderType = SIMMEDTK_SENDERTYPE_MODULE;
+    eventMouseButton->data = new smMouseButtonEventData(); //Need to handle failure to allocate
+    mbData = (smMouseButtonEventData*)eventMouseButton->data;
+
+    //Get the current cursor position
+    glfwGetCursorPos(window, &(mbData->windowX), &(mbData->windowY));
+
+    //
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+        mbData->mouseButton = smMouseButton::Left;
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        mbData->mouseButton = smMouseButton::Right;
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+        mbData->mouseButton = smMouseButton::Middle;
+    else
+        mbData->mouseButton = smMouseButton::Unknown;
+
+    if (action == GLFW_PRESS)
+        mbData->pressed = true;
+    else
+        mbData->pressed = false;
+
+    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseButton);
+}
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    smSDK *sdk = smSDK::getInstance();
+    assert(sdk);
+    smViewer *viewer = sdk->getViewerInstance();
+    assert(viewer);
+    smMouseMoveEventData* mpData = nullptr;
+
+    smEvent *eventMouseMove = new smEvent(); //Need to handle failure to allocate
+    eventMouseMove->eventType = SIMMEDTK_EVENTTYPE_MOUSE_MOVE;
+    eventMouseMove->senderId = viewer->getModuleId();
+    eventMouseMove->senderType = SIMMEDTK_SENDERTYPE_MODULE;
+    eventMouseMove->data = new smMouseMoveEventData(); //Need to handle failure to allocate
+    mpData = (smMouseMoveEventData*)eventMouseMove->data;
+
+    mpData->windowX = xpos;
+    mpData->windowY = ypos;
+
+    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseMove);
 }
 
 smRenderOperation::smRenderOperation()
@@ -410,6 +467,8 @@ void smViewer::initGLContext()
 
     glfwMakeContextCurrent(window);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
+    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Init GLEW
     GLenum err = glewInit();

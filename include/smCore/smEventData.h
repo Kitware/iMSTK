@@ -26,6 +26,7 @@
 
 #include "smCore/smConfig.h"
 #include "smCore/smKey.h"
+#include "smCore/smMouse.h"
 #include "smUtilities/smVec3.h"
 #include "smUtilities/smMatrix44.h"
 
@@ -40,12 +41,18 @@ struct smKeyboardEventData
 };
 
 /// \brief mouse event data
-struct smMouseEventData
+struct smMouseButtonEventData
 {
-    /// \brief window X coordinate
-    smInt windowX;
-    /// \brief window Y coorindate
-    smInt windowY;
+    smMouseButton mouseButton; ///<Which mouse button was pressed
+    smBool pressed; ///< if the button was pressed or released in this event
+    smDouble windowX; ///< window X coorindate relative to left edge
+    smDouble windowY; ///< window Y coorindate relative to top edge
+};
+
+struct smMouseMoveEventData
+{
+    smDouble windowX; ///< window X coorindate relative to left edge
+    smDouble windowY; ///< window Y coorindate relative to top edge
 };
 
 /// \brief object click event related

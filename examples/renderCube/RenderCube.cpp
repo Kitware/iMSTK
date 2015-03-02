@@ -81,6 +81,8 @@ RenderCube::RenderCube()
 
     //Link up the event system between this object and the SimMedTK SDK
     simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
 }
 
 RenderCube::~RenderCube()
@@ -185,6 +187,37 @@ void RenderCube::handleEvent(smEvent *p_event)
             viewer.camera.setCameraFocus(cam.fp.x + 1, cam.fp.y, cam.fp.z);
             viewer.camera.genViewMat();
         }
+        break;
+    }
+    case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
+    {
+        smMouseButtonEventData* mbData = 
+            (smMouseButtonEventData*)p_event->data;
+        std::cout << "mbData: button: ";
+        if (mbData->mouseButton == smMouseButton::Left)
+            std::cout << "Left";
+        else if (mbData->mouseButton == smMouseButton::Right)
+            std::cout << "Right";
+        else if (mbData->mouseButton == smMouseButton::Middle)
+            std::cout << "Middle";
+        else
+            std::cout << "Unknown";
+
+        std::cout << " pressed: ";
+        if(mbData->pressed)
+            std::cout << "true";
+        else
+            std::cout << "false";
+
+        std::cout << " x: " << mbData->windowX << " y: " << mbData->windowY << "\n";
+        break;
+    }
+    case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
+    {
+        smMouseMoveEventData* mpData = 
+            (smMouseMoveEventData*)p_event->data;
+        std::cout << "mpData: x: " << mpData->windowX
+            << "y: " << mpData->windowY << "\n";
         break;
     }
     default:
