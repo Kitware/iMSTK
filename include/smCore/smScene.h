@@ -111,18 +111,16 @@ public:
         /// \brief copy other scene to this current one.
         inline void setScene(smScene *p_scene, smCoreClass *p_core)
         {
-
+            std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
             sceneLocal = p_scene->sceneLocal.getByRef(p_scene->sceneLocalIndex[p_core->uniqueId.ID]);
 
             if (p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
             {
-                std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
                 p_scene->copySceneToLocal(sceneLocal);
             }
 
             endIndex = sceneLocal->sceneObjects.size();
             currentIndex = 0;
-
         }
 
         inline smInt start()

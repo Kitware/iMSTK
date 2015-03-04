@@ -219,6 +219,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
                     mesh->mVertices[i].y,
                     mesh->mVertices[i].z));
     }
+    this->origVerts = this->vertices;
 
     //Get indexed texture coordinate data
     if (isTextureCoordAvailable)
@@ -352,9 +353,7 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
             {
                 smFloat fTemp[3];
                 fread(fTemp, sizeof(smFloat), 3, l_file);
-                this->vertices[fpt].x = (smFloat)fTemp[0];
-                this->vertices[fpt].y = (smFloat)fTemp[1];
-                this->vertices[fpt].z = (smFloat)fTemp[2];
+                this->vertices.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
             }
 
             break;
@@ -419,7 +418,7 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
             fseek(l_file, l_chunk_lenght - 6, SEEK_CUR);
         }
     }
-
+    this->origVerts = this->vertices;
     fclose(l_file);  // Closes the file stream
 
     return 1; // Returns ok

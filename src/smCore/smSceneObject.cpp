@@ -64,8 +64,8 @@ smSceneObject::smSceneObject()
 {
 
     type = SIMMEDTK_SMSCENEBOJECT;
-    objectSim = NULL;
-    customRender = NULL;
+    objectSim = nullptr;
+    customRender = nullptr;
     smSDK::registerSceneObject(this);
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;

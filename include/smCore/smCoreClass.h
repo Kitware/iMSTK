@@ -142,6 +142,17 @@ public:
         uniqueId.generateUniqueID();
 
     }
+    smCoreClass(const smCoreClass &cc)
+    {
+        this->referenceCounter.store(
+            cc.referenceCounter.load(std::memory_order_relaxed),
+            std::memory_order_relaxed);
+        this->type = cc.type;
+        this->name = cc.name;
+        this->uniqueId = cc.uniqueId;
+        this->renderDetail = cc.renderDetail;
+        this->drawOrder = cc.drawOrder;
+    }
     /// \brief get type of the class
     inline smClassType getType()
     {

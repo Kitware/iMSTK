@@ -561,7 +561,6 @@ void smGLRenderer::enableDefaultGLRendering()
 void smGLRenderer::renderScene(smScene* p_scene,
                                smDrawParam p_param)
 {
-    smSceneObject *sceneObject;
     smScene::smSceneIterator sceneIter;
 
     assert(p_scene);
@@ -599,7 +598,7 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
     //if the custom rendering enable only render this
     if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
     {
-        if (p_sceneObject->customRender != NULL)
+        if (p_sceneObject->customRender != nullptr)
         {
             p_sceneObject->customRender->preDraw(p_sceneObject);
             p_sceneObject->customRender->draw(p_sceneObject);
@@ -610,7 +609,7 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
     {
         //If there is custom renderer first render the preDraw function. which is responsible for
         //rendering before the default renderer takes place
-        if (p_sceneObject->customRender != NULL)
+        if (p_sceneObject->customRender != nullptr)
         {
             p_sceneObject->customRender->preDraw(p_sceneObject);
         }
@@ -619,7 +618,7 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place
-        if (p_sceneObject->customRender != NULL)
+        if (p_sceneObject->customRender != nullptr)
         {
             p_sceneObject->customRender->postDraw(p_sceneObject);
         }
