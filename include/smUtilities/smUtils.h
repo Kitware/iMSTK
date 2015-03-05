@@ -26,10 +26,10 @@
 
 /// \brief query,  logs and diplays opengl error
 #define SM_CHECKGLERROR_DISPLAY(log,error)  smGLUtils::queryGLError(error);\
-                                            log->addError(this,error);\
-                                            log->printLastErr();\
+                                            log->addError(error);\
+                                            log->printLastErrUnsafe();\
 /// \brief query,  logs opengl error 
 #define SM_CHECKERROR(log,error) smGLUtils::queryGLError(error);\
-                                 log->addError(this,error);\
+                                 log->addError(error);\
  
 #endif

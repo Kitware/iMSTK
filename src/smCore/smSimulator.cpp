@@ -60,7 +60,7 @@ void smSimulator::run()
 
     if (isInitialized == false)
     {
-        log->addError(this, "Simulator is not initialized.");
+        log->addError("Simulator is not initialized.");
         return;
     }
 

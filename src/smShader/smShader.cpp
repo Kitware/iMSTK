@@ -78,7 +78,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
     {
         if (log != NULL)
         {
-            log->addError(this, "smShader:OpenGL 2.0 not supported");
+            log->addError("smShader:OpenGL 2.0 not supported");
         }
 
         return false;
@@ -105,7 +105,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Vertex shader file couldn't be opened");
+                log->addError("smShader:Vertex shader file couldn't be opened");
             }
 
             return false;
@@ -151,7 +151,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
+                log->addError("smShader:Fragment shader file couldn't be opened");
             }
 
             return false;
@@ -195,7 +195,7 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
+                log->addError("smShader:Fragment shader file couldn't be opened");
             }
 
             return false;
@@ -336,7 +336,7 @@ smBool smShader::checkGLError()
     {
         if (log != NULL)
         {
-            log->addError(this, errorText);
+            log->addError(errorText);
         }
 
         return false;
@@ -650,7 +650,7 @@ smBool smShader::reLoadAllShaders()
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Vertex shader file couldn't be opened");
+                log->addError("smShader:Vertex shader file couldn't be opened");
             }
 
             return false;
@@ -666,7 +666,7 @@ smBool smShader::reLoadAllShaders()
             if (smGLUtils::queryGLError(errorText))
                 if (log != NULL)
                 {
-                    log->addError(this, errorText);
+                    log->addError(errorText);
                 }
 
 #endif
@@ -693,7 +693,7 @@ smBool smShader::reLoadAllShaders()
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
+                log->addError("smShader:Fragment shader file couldn't be opened");
             }
 
             return false;
@@ -710,7 +710,7 @@ smBool smShader::reLoadAllShaders()
             if (smGLUtils::queryGLError(errorText))
                 if (log != NULL)
                 {
-                    log->addError(this, errorText);
+                    log->addError(errorText);
                 }
 
 #endif
@@ -738,7 +738,7 @@ smBool smShader::reLoadAllShaders()
         {
             if (log != NULL)
             {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
+                log->addError("smShader:Fragment shader file couldn't be opened");
             }
 
             return false;
@@ -755,7 +755,7 @@ smBool smShader::reLoadAllShaders()
             if (smGLUtils::queryGLError(errorText))
                 if (log != NULL)
                 {
-                    log->addError(this, errorText);
+                    log->addError(errorText);
                 }
 
 #endif
@@ -771,7 +771,7 @@ smBool smShader::reLoadAllShaders()
         if (smGLUtils::queryGLError(errorText))
             if (log != NULL)
             {
-                log->addError(this, errorText);
+                log->addError(errorText);
             }
 
     return true;

@@ -31,42 +31,31 @@ smErrorLog::smErrorLog()
 {
 
     time.start();
-    errorCount = -1;
-    isOutputtoConsoleEnabled = true;
+    consoleOutput = true;
 }
 
-///add the error in the repository.It is thread safe. It can be called by multiple threads.
-smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
+smBool smErrorLog::addError(const smString& p_text)
 {
-
-    smInt textLength;
-
-    if (p_text == NULL)
+    if (0 >= p_text.length())
     {
         return false;
     }
 
-    textLength = strlen(p_text);
-
-    if (textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0)
+    if (SIMMEDTK_MAX_ERRORLOG_TEXT > p_text.length())
     {
         std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
 
-        if (isOutputtoConsoleEnabled)
+        if (consoleOutput)
         {
             std::cout << p_text << "\n";
         }
 
-        strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = (time.elapsed() * 1000);
-        lastError = errorCount;
+        errors.push_back(p_text);
+        timeStamps.push_back(time.elapsed() * 1000);
 
-        errorCount++;
-
-        if (errorCount >= SIMMEDTK_MAX_ERRORLOG)
+        if (SIMMEDTK_MAX_ERRORLOG <= errors.size())
         {
-            lastError = SIMMEDTK_MAX_ERRORLOG - 1;
-            errorCount = 0;
+            errors.erase(errors.begin()); //Make room for new errors
         }
 
         return true;
@@ -75,76 +64,30 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
     {
         return false;
     }
-}
-
-smBool smErrorLog::addError(smCoreClass *p_param, const std::string p_text)
-{
-    return addError(p_param, p_text.c_str());
-}
-
-smBool smErrorLog::addError(const smChar *p_text)
-{
-
-    smInt textLength;
-
-    if (p_text == NULL)
-    {
-        return false;
-    }
-
-    textLength = strlen(p_text);
-
-    if (textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0)
-    {
-        std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-        errorCount++;
-        strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = (time.elapsed() * 1000);
-        lastError = errorCount;
-
-        if (errorCount >= SIMMEDTK_MAX_ERRORLOG)
-        {
-            lastError = SIMMEDTK_MAX_ERRORLOG - 1;
-            errorCount = 0;
-        }
-
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-smBool smErrorLog::addError(const std::string p_text)
-{
-    return addError(p_text.c_str());
 }
 
 ///Clean up all the errors in the repository.It is thread safe.
 void smErrorLog::cleanAllErrors()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-
-    for (smInt i = 0; i < SIMMEDTK_MAX_ERRORLOG; i++)
-    {
-        memset(errors[i], '\0', SIMMEDTK_MAX_ERRORLOG_TEXT);
-    }
+    errors.clear();
+    timeStamps.clear();
 }
 
 ///Print the last error.It is not thread safe.
-void smErrorLog::printLastErr()
+void smErrorLog::printLastErrUnsafe()
 {
-
-    if (errorCount != -1)
-    {
-        std::cout << "Last Error:" << errors[errorCount] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
-    }
+    std::cout << "Last Error:" << errors.back() << " Time:" << timeStamps.back() << " ms" << "\n";
 }
 
 ///Print  the last error in Thread Safe manner.
-void smErrorLog::printLastErrSafe()
+void smErrorLog::printLastErr()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-    std::cout << "Last Error:" << errors[errorCount - 1] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
+    printLastErr();
+}
+
+void smErrorLog::setConsoleOutput(smBool flag)
+{
+    consoleOutput = flag;
 }

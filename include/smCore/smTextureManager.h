@@ -137,7 +137,7 @@ class smTextureManager: public smCoreClass
 
         while ((error = ilGetError()) != IL_NO_ERROR)
         {
-            errorLog->addError((smChar *)iluErrorString(error));
+            errorLog->addError(smString((smChar *)iluErrorString(error)));
         }
     }
 

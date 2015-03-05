@@ -29,14 +29,12 @@ SceneTextureShader::SceneTextureShader(smChar *p_verteShaderFileName, smChar *p_
 {
 
     this->log = smSDK::getErrorLog();
-    this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
     createParam("depthTex");
     createParam("sceneTex");
     createParam("prevTex");
-    this->checkErrorEnabled = true;
-    log->isOutputtoConsoleEnabled = true;
+    this->log->setConsoleOutput(true);
     this->registerShader();
 }
 

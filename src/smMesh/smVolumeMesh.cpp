@@ -46,14 +46,14 @@ smBool smVolumeMesh::loadMesh(smChar *fileName, smMeshFileType fileType = SM_FIL
         if (ret == 0)
             if (log_VM != NULL)
             {
-                log_VM->addError(this, "Error: Mesh file NOT FOUND");
+                log_VM->addError("Error: Mesh file NOT FOUND");
             }
     }
     else
     {
         if (log_VM != NULL)
         {
-            log_VM->addError(this, "Error: Mesh file type unidentified");
+            log_VM->addError("Error: Mesh file type unidentified");
         }
 
         ret = 0;

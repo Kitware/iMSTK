@@ -52,8 +52,6 @@ public:
                 smChar *p_fragmentFileName = "shaders/FragmentBumpMap1.cg")
     {
         this->log = smSDK::getErrorLog();
-        this->log->isOutputtoConsoleEnabled = false;
-        this->checkErrorEnabled = true;
         setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
         createParam("DecalTex");
         createParam("BumpTex");
@@ -72,7 +70,7 @@ public:
         alphaMapGain = -1;
         alphaMapGainValue = 1.0;
         this->checkErrorEnabled = true;
-        log->isOutputtoConsoleEnabled = true;
+        this->log->setConsoleOutput(true);
     }
 
     /// \brief attach mesh to the shader
