@@ -52,7 +52,7 @@ enum ImageColorType
 struct smTexture
 {
     /// \brief texture file name
-    smChar textureFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
+    smString textureFileName;
     /// \brief GL id
     GLuint textureGLId;
     /// \brief stores the width of the texture
@@ -77,7 +77,7 @@ struct smTexture
     inline smTexture *copy()
     {
         smTexture *myCopy = new smTexture();
-        memcpy(myCopy->textureFileName, this->textureFileName, SIMMEDTK_MAX_FILENAME_LENGTH);
+        myCopy->textureFileName = this->textureFileName;
         myCopy->textureGLId = this->textureGLId;
         myCopy->width = this->width;
         myCopy->height = this->height;
@@ -112,7 +112,7 @@ struct smImageData
     smInt height;
     smInt bytePerPixel;
     ImageColorType imageColorType;
-    smChar fileName[SIMMEDTK_MAX_FILENAME_LENGTH];
+    smString fileName;
 };
 /// \brief callback function
 typedef void (*smCallTextureCallBack)(smImageData *imageData, void *);
@@ -160,47 +160,47 @@ public:
         callback = NULL;
     }
     /// \brief load textures with file name, reference that that is assigned to it, and returned texture id
-    static smTextureReturnType loadTexture(const smChar *p_fileName,
-                                           const smChar *p_textureReferenceName,
+    static smTextureReturnType loadTexture(const smString& p_fileName,
+                                           const smString& p_textureReferenceName,
                                            smInt &p_textureId);
 
-    static smTextureReturnType loadTexture(const smChar *p_fileName,
-                                           const smChar *p_textureReferenceName,
-                                           smBool p_flipImage = false,
-                                           bool deleteDataAfterLoaded = true);
+    static smTextureReturnType loadTexture(const smString& p_fileName,
+                                           const smString& p_textureReferenceName,
+                                           smBool p_flipImage,
+                                           smBool deleteDataAfterLoaded = true);
 
-    static smTextureReturnType loadTexture(const smString p_fileName,
-                                           const smChar *p_textureReferenceName,
+    static smTextureReturnType loadTexture(const smString&  p_fileName,
+                                           const smString& p_textureReferenceName,
                                            smBool p_flipImage = false);
 
-    static smTextureReturnType findTextureId(const smChar *p_textureReferenceName,
+    static smTextureReturnType findTextureId(const smString& p_textureReferenceName,
             smInt &p_textureId);
     /// \brief activate textures based on texture reference name, texture reference, texture id and GL order
     static GLuint activateTexture(smTexture *p_texture);
-    static GLuint activateTexture(const smChar *p_textureReferenceName);
+    static GLuint activateTexture(const smString& p_textureReferenceName);
     static GLuint activateTexture(smInt p_textureId);
 
-    static GLuint activateTexture(const smChar *p_textureReferenceName,
+    static GLuint activateTexture(const smString& p_textureReferenceName,
                                   smInt p_textureGLOrder);
 
     static GLuint activateTexture(smTexture *p_texture, smInt p_textureGLOrder,
                                   smInt p_shaderBindGLId);
 
-    static GLuint activateTexture(const smChar *p_textureReferenceName,
+    static GLuint activateTexture(const smString& p_textureReferenceName,
                                   smInt p_textureGLOrder, smInt p_shaderBindName);
 
     static GLuint activateTexture(smInt p_textureId, smInt p_textureGLOrder);
     static void  activateTextureGL(GLuint  p_textureId, smInt p_textureGLOrder);
     /// \brief disable textures
-    static GLuint disableTexture(const smChar *p_textureReferenceName);
+    static GLuint disableTexture(const smString& p_textureReferenceName);
 
-    static GLuint disableTexture(const smChar *p_textureReferenceName,
+    static GLuint disableTexture(const smString& p_textureReferenceName,
                                  smInt p_textureGLOrder);
 
     static GLuint disableTexture(smInt p_textureId);
 
     /// \brief functions return GL texture ID
-    static GLuint getOpenglTextureId(const smChar *p_textureReferenceName);
+    static GLuint getOpenglTextureId(const smString& p_textureReferenceName);
     static GLuint getOpenglTextureId(smInt p_textureId);
     /// \brief you can register your callback function when the image is loaded as a texture
     static void registerGLLoadingFunc(smCallTextureCallBack p_test, void *p_param = NULL)
@@ -209,33 +209,33 @@ public:
         param = p_param;
     }
     /// \brief to get texture with given texture reference name
-    static smTexture * getTexture(const smChar* p_textureReferenceName);
+    static smTexture * getTexture(const smString& p_textureReferenceName);
     /// \brief to create a depth texture
-    static void createDepthTexture(const smChar *p_textureReferenceName,
+    static void createDepthTexture(const smString& p_textureReferenceName,
                                    smInt p_width, smInt p_height);
 
     /// \brief to create a color texture
-    static void  createColorTexture(const smChar *p_textureReferenceName,
+    static void  createColorTexture(const smString& p_textureReferenceName,
                                     smInt p_width, smInt p_height);
     /// \brief initialize depth texture and color texture
     static void initDepthTexture(smTexture *p_texture);
     static void initColorTexture(smTexture *p_texture);
     /// \brief generate mip maps
     static void generateMipMaps(smInt p_textureId);
-    static void generateMipMaps(const smChar *p_textureReferenceName);
+    static void generateMipMaps(const smString& p_textureReferenceName);
     /// \brief to duplicate the texture
-    static void duplicateTexture(const smChar *p_textureReferenceName,
+    static void duplicateTexture(const smString& p_textureReferenceName,
                                  smTexture *p_texture, ImageColorType p_type);
 
     /// \brief copy the  texture specified with p_textureSourceName to the  texture specified with p_textureDestinationName
-    static void copyTexture(const smChar *p_textureDestinationName,
-                            const smChar *p_textureSourceName);
+    static void copyTexture(const smString& p_textureDestinationName,
+                            const smString& p_textureSourceName);
     /// \brief save binary image to a file
-    static void saveBinaryImage(smChar *p_binaryData, smInt p_width,
-                                smInt p_height, const smChar *p_fileName);
+    static void saveBinaryImage(void *p_binaryData, smInt p_width,
+                                smInt p_height, const smString& p_fileName);
     /// \brief save RGB image to a file
-    static void saveRGBImage(smChar *p_binaryData, smInt p_width,
-                             smInt p_height, smChar *p_fileName);
+    static void saveRGBImage(void *p_binaryData, smInt p_width,
+                             smInt p_height, const smString& p_fileName);
 };
 
 #endif

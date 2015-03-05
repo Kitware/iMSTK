@@ -25,7 +25,8 @@
 #include "smCore/smSDK.h"
 
 
-SceneTextureShader::SceneTextureShader(smChar *p_verteShaderFileName, smChar *p_fragmentFileName)
+SceneTextureShader::SceneTextureShader(const smString& p_verteShaderFileName,
+                                       const smString& p_fragmentFileName)
 {
 
     this->log = smSDK::getErrorLog();

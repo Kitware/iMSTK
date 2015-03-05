@@ -73,7 +73,7 @@ public:
     /// \brief  init with given VBO type
     void init(smVBOType p_vboType)
     {
-        smChar error[200];
+        smString error;
         glGenBuffersARB(1, &vboDataId);
         glGenBuffersARB(1, &vboIndexId);
         assert(vboDataId > 0);

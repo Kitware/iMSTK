@@ -26,7 +26,7 @@
 
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
-bool smGLUtils::queryGLError(smChar*err)
+bool smGLUtils::queryGLError(smString& err)
 {
     GLenum errCode;
     const GLubyte *errString;
@@ -35,20 +35,13 @@ bool smGLUtils::queryGLError(smChar*err)
     {
         errString = gluErrorString(errCode);
 
-        if (err != NULL)
-        {
-            sprintf(err, "OPENGL Error= %s\n", errString);
-        }
-        else
-        {
-            printf("OPENGL Error= %s\n", errString);
-        }
+        err = "OpenGL Error: " + smString((const smChar *)errString) + "\n";
 
-        return err;
+        return true;
     }
     else
     {
-        return NULL;
+        return false;
     }
 }
 
