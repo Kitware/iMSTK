@@ -2,6 +2,7 @@
 simmedtk_add_library(smCore
   SOURCES
     smConfig.cpp
+    smCoreClass.cpp
     smDispatcher.cpp
     smErrorLog.cpp
     smEvent.cpp
@@ -46,14 +47,7 @@ target_link_libraries(smCore
   PUBLIC
     GLEW::GLEW
     GLUT::GLUT
-    QGLViewer::QGLViewer
     ${OPENGL_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
-    Qt4::QtCore
-    Qt4::QtGui
-    Qt4::QtOpenGL
-    Qt4::QtXml
     glfw::glfw
   INTERFACE
     ${ILUT_LIBRARIES}
@@ -61,9 +55,6 @@ target_link_libraries(smCore
     ${IL_LIBRARIES}
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smCore
-    PRIVATE
-      -std=c++11
-  )
+if(NOT MSVC)
+  target_compile_features(smCore PUBLIC cxx_auto_type)
 endif()

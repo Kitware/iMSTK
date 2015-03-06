@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMDOUBLEBUFFER_H
 #define SMDOUBLEBUFFER_H
@@ -29,13 +27,12 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smUtilities/smDataStructs.h"
-#include <stdlib.h>
-#include <QThread>
-#include <QMutex>
-#include <QWaitCondition>
-#include <iostream>
 
-using namespace std;
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <mutex>
+#include <condition_variable>
 
 #define SIMMEDTK_PIPE_MAXLISTENERS 10
 
@@ -73,11 +70,11 @@ class smDoubleBuffer: public smCoreClass
 
     ///buffer access lock. This is used for the swapping the buffer or during the memory copy
     ///operation
-    QMutex bufferLock;
+    std::mutex bufferLock;
 
     ///wait condition is triggered when anyone waits the buffer to written. When the memory
     ///writing is completed then the event is triggered, any waiting
-    QWaitCondition readBufferReady;
+    std::condition_variable readBufferReady;
 
     ///if one thread reads
     smInt lastReadFrameCounter;
@@ -86,13 +83,14 @@ private:
     ///swap buffers
     void swapBuffers()
     {
-        bufferLock.lock();
+        std::unique_lock<std::mutex> uniLock(bufferLock, std::defer_lock);
+        uniLock.lock();
         buffer[writerBuffer].frameCounter++;
         readerBuffer = (++readerBuffer) % 2;
         writerBuffer = (++writerBuffer) % 2;
         buffer[writerBuffer].totalElements = 0;
         bufferLock.unlock();
-        readBufferReady.wakeAll();
+        readBufferReady.notify_all();
     }
 
 public:
@@ -140,7 +138,7 @@ public:
     smDoubleBufferReturn copyAvailableBuffer(Template **p_T, smInt &p_number, smInt lastRead)
     {
         smDoubleBufferReturn ret;
-        bufferLock.lock();
+        std::lock_guard<std::mutex> lock(bufferLock); //Lock is released when leaves scope
 
         if (buffer[readerBuffer].frameCounter > lastRead)
         {
@@ -154,18 +152,18 @@ public:
             ret = SIMMEDTK_DOUBLEBUFFER_NONEWDATA;
         }
 
-        bufferLock.unlock();
         return ret;
     }
     ///the same functionality as
     smInt  copyAvailableBuffer(Template **p_T, smInt &p_number)
     {
         smInt frameCounterReader;
-        bufferLock.lock();
+        std::lock_guard<std::mutex> lock(bufferLock); //Lock is released when leaves scope
+
         memcpy(*p_T, buffer[readerBuffer].buffer, buffer[readerBuffer].totalElements);
         p_number = buffer[readerBuffer].totalElements;
         frameCounterReader = buffer[readerBuffer].frameCounter;
-        bufferLock.unlock();
+
         return frameCounterReader;
     }
 
@@ -176,12 +174,13 @@ public:
     /// \param p_number has the total elements in the reader buffer. It is returned to the caller
     void copyLatestBuffer(Template *p_T, smInt &p_number)
     {
-        bufferLock.lock();
-        readBufferReady.wait(&bufferLock);
+        std::unique_lock<std::mutex> uniLock(bufferLock, std::defer_lock);
+        uniLock.lock();
+        readBufferReady.wait(uniLock);
         memcpy(p_T, buffer[readerBuffer].buffer, buffer[readerBuffer].totalElements);
         p_number = buffer[readerBuffer].totalElements;
         lastReadFrameCounter = buffer[readerBuffer].frameCounter;
-        bufferLock.unlock();
+        uniLock.unlock();
     }
 };
 
@@ -236,12 +235,12 @@ struct smPipeRegisteration
     {
         if (regType == SIMMEDTK_PIPE_BYREF)
         {
-            cout << "Listener Object" << " By Reference" << endl;
+            std::cout << "Listener Object" << " By Reference" << "\n";
         }
 
         if (regType == SIMMEDTK_PIPE_BYVALUE)
         {
-            cout << "Listener Object" << " By Value" << endl;
+            std::cout << "Listener Object" << " By Value" << "\n";
         }
     }
 
@@ -280,7 +279,7 @@ public:
         }
     }
     /// \brief pipe constructor
-    smPipe(QString p_name, smInt p_elementSize, smInt p_maxElements,
+    smPipe(smString p_name, smInt p_elementSize, smInt p_maxElements,
            smPipeType p_pipeType = SIMMEDTK_PIPE_TYPEANY):
         byRefs(SIMMEDTK_PIPE_MAXLISTENERS),
         byValue(SIMMEDTK_PIPE_MAXLISTENERS)
@@ -372,7 +371,7 @@ public:
         (byValue.getByRef(p_handleByValue)->data.nbrElements) = currentElements;
     }
 
-    friend smBool operator==(smPipe &p_pipe, QString p_name)
+    friend smBool operator==(smPipe &p_pipe, smString p_name)
     {
         return (p_pipe.name == p_name ? true : false);
     }

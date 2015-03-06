@@ -2,6 +2,7 @@
 simmedtk_add_library(smCollision
   SOURCES
     smSpatialHash.cpp
+    smOctreeCell.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionDetection.h
@@ -9,6 +10,7 @@ simmedtk_add_library(smCollision
     ${CMAKE_SOURCE_DIR}/include/smCollision/smPQP.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smSpatialGrid.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smSpatialHash.h
+    ${CMAKE_SOURCE_DIR}/include/smCollision/smOctreeCell.h
 )
 
 target_link_libraries(smCollision
@@ -16,9 +18,6 @@ target_link_libraries(smCollision
     smCore
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smCollision
-    PRIVATE
-      -std=c++11
-  )
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
 endif()

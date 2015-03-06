@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
  
 #include "smCore/smConfig.h"
 
@@ -31,15 +29,13 @@
 
 #define SM_NIUSB6008_INTERFACE_H
 
-#include <qapplication.h>
-#include <QThread>
-#include <NIDAQmx.h>
 #include "smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
-#include "smUtilities/smTimer.h"
+
+#include <NIDAQmx.h>
 
 /// \brief National Instruments USB6008 related data
 struct NIUSB6008Data
@@ -58,7 +54,7 @@ struct toolData
 };
 
 /// \brief National Instruments USB6008 interface class
-class smNIUSB6008Interface: public smDeviceInterface, public QThread
+class smNIUSB6008Interface: public smDeviceInterface
 {
 
 public:
@@ -95,7 +91,7 @@ public:
     /// \brief start the device
     void exec()
     {
-        this->start();
+        this->run();
     };
 
     /// \brief !!

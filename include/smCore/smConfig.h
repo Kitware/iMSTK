@@ -1,40 +1,30 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMCONFIG_H
 #define SMCONFIG_H
 #undef _UNICODE
-#include <iostream>
-#include <cstdint>
-#include <GL/glew.h>
-#include <GL/glut.h>
-#include <GL/gl.h> // for GLfloat, etc.
 
-using namespace std;
-/// \brief opengl rendering version
-#define SIMMEDTK_RENDERER_OPENGL    1.0
 /// \brief Windows definition is here
 #ifdef _WIN32
 #define SIMMEDTK_OPERATINGSYSTEM_WINDOWS
@@ -42,6 +32,19 @@ using namespace std;
 #ifdef __linux__
 #define SIMMEDTK_OPERATINGSYSTEM_LINUX
 #endif
+
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#include <windows.h>
+#endif
+
+#include <iostream>
+#include <cstdint>
+#include <GL/glew.h>
+#include <GL/glut.h>
+#include <GL/gl.h> // for GLfloat, etc.
+
+/// \brief opengl rendering version
+#define SIMMEDTK_RENDERER_OPENGL    1.0
 /// \brief defines the threading mechanism
 #define SIMMEDTK_THREAD_OPENMP
 //#define SIMMEDTK_THREAD_QTTHREAD
@@ -53,11 +56,7 @@ using namespace std;
 #define SIMMEDTKVERSION 1.0
 /// \brief version date
 #define SIMMEDTKVERSION_TEXT "SimMedTK Version 1.0-2009"
-/// \brief QT specific declarations
-#undef QT_NO_CAST_FROM_ASCII
-#undef QT_NO_CAST_TO_ASCII
 
-#include <QString>
 #include "float.h"
 
 /// \brief General type definitions
@@ -221,14 +220,12 @@ enum smClassDrawOrder
 #ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 #define inline  __forceinline
 #pragma inline_recursion(on)
-#pragma inline_depth( [255] )
+#pragma inline_depth(255)
 #endif
 /// \brief  fast min, max
 #define SIMMEDTK_MIN(X,Y) (X<Y?X:Y)
 /// \brief  fast min, max
 #define SIMMEDTK_MAX(X,Y) (X>Y?X:Y)
-/// \brief  operator overloading for smString
-ostream &operator<<(ostream &p_os, smString &p_param);
 
 class smSDK;
 class smViewer;

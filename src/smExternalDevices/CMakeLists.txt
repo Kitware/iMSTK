@@ -44,9 +44,3 @@ target_link_libraries(smExternalDevices
     ${EXTERNAL_DEVICES_TARGET_LIBRARIES}
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smExternalDevices
-    PRIVATE
-      -std=c++11
-  )
-endif()

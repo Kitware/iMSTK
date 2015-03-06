@@ -1,33 +1,29 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smMesh/smMesh.h"
 #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
-
-QAtomicInt smMesh::meshIdCounter(1);
 
 smBaseMesh::smBaseMesh()
 {
@@ -36,18 +32,12 @@ smBaseMesh::smBaseMesh()
 
 void smBaseMesh::updateOriginalVertsWithCurrent()
 {
-
-    for (smInt i = 0; i < nbrVertices; i++)
-    {
-        origVerts[i] = vertices[i];
-    }
+    origVerts = vertices;
 }
 
 /// \brief constructor
 smMesh::smMesh()
 {
-
-    vertices = 0;
     triangles = 0;
     texCoord = 0;
     triNormals = 0;
@@ -63,8 +53,6 @@ smMesh::smMesh()
 /// \brief destructor
 smMesh::~smMesh()
 {
-
-    delete [] vertices;
     delete [] triangles;
     delete [] texCoord;
     delete [] triNormals;
@@ -309,8 +297,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     }
 
     this->nbrVertices = nbr;
-    this->vertices = new smVec3<smFloat>[nbr];
-    this->origVerts = new smVec3<smFloat>[nbr];
+    this->vertices.reserve(nbr);
+    this->origVerts.reserve(nbr);
     this->vertNormals = new smVec3<smFloat>[nbr];
     this->vertTangents = new smVec3<smFloat>[nbr];
     this->texCoord = new smTexCoord[nbr];
@@ -637,47 +625,47 @@ void smMesh::checkCorrectWinding()
 
             if (x[0] == p[0] && x[1] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[1] && x[1] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[0] == p[2] && x[1] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[0] && x[2] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[1] && x[2] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[1] == p[2] && x[2] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[0] && x[0] == p[1])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[1] && x[0] == p[2])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
 
             if (x[2] == p[2] && x[0] == p[0])
             {
-                cout << "Wrong Winding Triangles:" << i << "," << j << endl;
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
             }
         }
     }

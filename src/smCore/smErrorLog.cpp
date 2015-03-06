@@ -1,29 +1,31 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCore/smErrorLog.h"
+
+#include <cstring>
+#include <string>
+#include <chrono>
 
 smErrorLog::smErrorLog()
 {
@@ -48,15 +50,15 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
 
     if (textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0)
     {
-        mutex.lock();
+        std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
 
         if (isOutputtoConsoleEnabled)
         {
-            cout << p_text << endl;
+            std::cout << p_text << "\n";
         }
 
         strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = time.elapsed();
+        timeStamp[errorCount] = (time.elapsed() * 1000);
         lastError = errorCount;
 
         errorCount++;
@@ -67,7 +69,6 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
             errorCount = 0;
         }
 
-        mutex.unlock();
         return true;
     }
     else
@@ -76,7 +77,7 @@ smBool smErrorLog::addError(smCoreClass *p_param, const smChar *p_text)
     }
 }
 
-smBool smErrorLog::addError(smCoreClass *p_param, const string p_text)
+smBool smErrorLog::addError(smCoreClass *p_param, const std::string p_text)
 {
     return addError(p_param, p_text.c_str());
 }
@@ -95,10 +96,10 @@ smBool smErrorLog::addError(const smChar *p_text)
 
     if (textLength<SIMMEDTK_MAX_ERRORLOG_TEXT&textLength>0)
     {
-        mutex.lock();
+        std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
         errorCount++;
         strcpy(errors[errorCount], p_text);
-        timeStamp[errorCount] = time.elapsed();
+        timeStamp[errorCount] = (time.elapsed() * 1000);
         lastError = errorCount;
 
         if (errorCount >= SIMMEDTK_MAX_ERRORLOG)
@@ -107,7 +108,6 @@ smBool smErrorLog::addError(const smChar *p_text)
             errorCount = 0;
         }
 
-        mutex.unlock();
         return true;
     }
     else
@@ -116,7 +116,7 @@ smBool smErrorLog::addError(const smChar *p_text)
     }
 }
 
-smBool smErrorLog::addError(const string p_text)
+smBool smErrorLog::addError(const std::string p_text)
 {
     return addError(p_text.c_str());
 }
@@ -124,15 +124,12 @@ smBool smErrorLog::addError(const string p_text)
 ///Clean up all the errors in the repository.It is thread safe.
 void smErrorLog::cleanAllErrors()
 {
-
-    mutex.lock();
+    std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
 
     for (smInt i = 0; i < SIMMEDTK_MAX_ERRORLOG; i++)
     {
         memset(errors[i], '\0', SIMMEDTK_MAX_ERRORLOG_TEXT);
     }
-
-    mutex.unlock();
 }
 
 ///Print the last error.It is not thread safe.
@@ -141,15 +138,13 @@ void smErrorLog::printLastErr()
 
     if (errorCount != -1)
     {
-        cout << "Last Error:" << errors[errorCount] << " Time:" << timeStamp[errorCount - 1] << " ms" << endl;
+        std::cout << "Last Error:" << errors[errorCount] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
     }
 }
 
 ///Print  the last error in Thread Safe manner.
 void smErrorLog::printLastErrSafe()
 {
-
-    mutex.lock();
-    cout << "Last Error:" << errors[errorCount - 1] << " Time:" << timeStamp[errorCount - 1] << " ms" << endl;
-    mutex.unlock();
+    std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
+    std::cout << "Last Error:" << errors[errorCount - 1] << " Time:" << timeStamp[errorCount - 1] << " ms" << "\n";
 }

@@ -1,39 +1,38 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMSCENE_H
 #define SMSCENE_H
 
-#include <QVector>
-#include <QMutex>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smDataStructs.h"
 #include "smCore/smDoubleBuffer.h"
+
+#include <mutex>
+#include <unordered_map>
 
 class smPipe;
 class smSDK;
@@ -53,7 +52,7 @@ public:
         return id == p_param.id;
     }
 
-    vector<smSceneObject*> sceneObjects;
+    std::vector<smSceneObject*> sceneObjects;
     smUInt sceneUpdatedTimeStamp;
 };
 
@@ -68,17 +67,17 @@ private:
     /// \brief error logging
     smErrorLog *log;
     /// \brief scene list lock for thread safe manipulation of the scene
-    QMutex sceneList;
+    std::mutex sceneListLock;
     /// \brief reference counter to the scene
     smUInt referenceCounter;
     /// \brief last updated time stampe
     smUInt sceneUpdatedTimeStamp;
     /// \brief scene objects addition queue
-    vector<smSceneObject*> addQueue;
+    std::vector<smSceneObject*> addQueue;
     smIndiceArray<smSceneLocal*> sceneLocal;
-    QHash<smInt, smInt> sceneLocalIndex;
+    std::unordered_map<smInt, smInt> sceneLocalIndex;
     /// \brief scene objects storage
-    vector<smSceneObject*> sceneObjects;
+    std::vector<smSceneObject*> sceneObjects;
     /// \brief adds the objects in the local scene storage
     void inline copySceneToLocal(smSceneLocal *p_local)
     {
@@ -117,10 +116,8 @@ public:
 
             if (p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
             {
-                p_scene->sceneList.lock();
+                std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
                 p_scene->copySceneToLocal(sceneLocal);
-                p_scene->sceneList.unlock();
-
             }
 
             endIndex = sceneLocal->sceneObjects.size();
@@ -165,10 +162,9 @@ public:
     {
         smSceneLocal *local = new smSceneLocal();
         local->id = p_simmedtkObject->uniqueId.ID;
-        sceneList.lock();
+        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
         copySceneToLocal(local);
         sceneLocalIndex[p_simmedtkObject->uniqueId.ID] = sceneLocal.checkAndAdd(local);
-        sceneList.unlock();
     }
 
     ///add physics in the scene
@@ -187,7 +183,7 @@ public:
     ///it should be called in the initialization of the viewer, simulation or any other module.
     ///and the the list should be stored internally.
     ///The scene list removal will be taken care of later since the list should be update.
-    vector<smSceneObject*> getSceneObject();
+    std::vector<smSceneObject*> getSceneObject();
     /// \brief retursn scene id
     smInt getSceneId();
     /// \brief returns the total number of objects in the scene

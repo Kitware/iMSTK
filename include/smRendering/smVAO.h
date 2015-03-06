@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMVAO_H
 #define SMVAO_H
@@ -33,13 +31,12 @@
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
-
-#include "assert.h"
-#include <QHash>
-#include <QMultiHash>
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
 #include "smShader/smShader.h"
+
+#include "assert.h"
+#include <unordered_map>
 
 enum smVBOBufferType
 {
@@ -66,13 +63,13 @@ struct smVBOBufferEntryInfo
     ///total size of elements in bytes.
     smInt size;
     ///attribName in the shader
-    string   shaderAttribName;
+    smString   shaderAttribName;
     GLint    shaderAttribLocation;
 public:
     smVBOBufferEntryInfo()
     {
         shaderAttribLocation = -1;
-        attributeIndex - 1;
+        attributeIndex = 1;
         attribPointer = NULL;
         nbrElements = 0;
         arrayBufferType = SMVBO_POS;
@@ -82,12 +79,6 @@ public:
 class smVAO: public smCoreClass
 {
 private:
-    GLuint vboDataId;
-    GLuint vboIndexId;
-    QHash<smInt, smInt> dataOffsetMap;
-    QHash<smInt, smInt> indexOffsetMap;
-    QHash<smInt, smInt> numberofVertices;
-    QHash<smInt, smInt> numberofTriangles;
     smErrorLog *log;
     smBool renderingError;
     smShader *shader;
@@ -102,7 +93,7 @@ public:
     smVBOType vboType;
     smChar error[500];
     ///All VBOs are stored here
-    static QHash<smInt, smVAO *>VAOs;
+    static std::unordered_map<smInt, smVAO *> VAOs;
     smMesh *mesh;
 
     /// \brief need error log and totalBuffer Size
@@ -112,12 +103,12 @@ public:
         renderingError = false;
         totalNbrBuffers = 0;
         vboType = p_vboType;
-        VAOs.insert(this->uniqueId.ID, this);
+        VAOs[this->uniqueId.ID] = this;
         indexBufferLocation = -1;
         bindShaderObjects = p_bindShaderObjects;
     }
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
-    void setBufferData(smVBOBufferType p_type, string p_ShaderAttribName, smInt p_nbrElements, void *p_ptr)
+    void setBufferData(smVBOBufferType p_type, smString p_ShaderAttribName, smInt p_nbrElements, void *p_ptr)
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = p_type;
 
@@ -145,7 +136,7 @@ public:
         totalNbrBuffers++;
     }
     /// \brief set the triangle information
-    void setTriangleInfo(string p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr)
+    void setTriangleInfo(smString p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr)
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
         bufferInfo[totalNbrBuffers].nbrElements = p_nbrTriangles * 3;
@@ -158,10 +149,10 @@ public:
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
     smBool setBufferDataFromMesh(smMesh *p_mesh,
                                  smShader *p_shader,
-                                 string p_POSITIONShaderName = "Position",
-                                 string p_NORMALShaderName = "Normal",
-                                 string p_TEXTURECOORDShaderName = "texCoords",
-                                 string p_TANGENTSName = "Tangents")
+                                 smString p_POSITIONShaderName = "Position",
+                                 smString p_NORMALShaderName = "Normal",
+                                 smString p_TEXTURECOORDShaderName = "texCoords",
+                                 smString p_TANGENTSName = "Tangents")
     {
 
         if (p_shader == NULL)
@@ -175,7 +166,7 @@ public:
 
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
         bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices;
+        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
         bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
         bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
         bufferInfo[totalNbrBuffers].shaderAttribName = p_POSITIONShaderName;
@@ -223,8 +214,8 @@ public:
     smBool updateStreamData();
     static void initVAOs(smDrawParam p_param)
     {
-        foreach(smVAO * vao, VAOs)
-        vao->initBuffers(p_param);
+        for(auto& x: VAOs)
+            x.second->initBuffers(p_param);
     }
     /// \brief  init VAO buffers
     void initBuffers(smDrawParam p_param);

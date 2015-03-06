@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
@@ -99,10 +97,10 @@ struct smFboListItem
 class smViewer : public smModule, public smEventHandler
 {
 protected:
-    vector<smCoreClass*> objectList;
+    std::vector<smCoreClass*> objectList;
     smIndiceArray<smLight*> *lights;
-    vector<smRenderOperation> renderOperations;
-    vector<smFboListItem> fboListItems;
+    std::vector<smRenderOperation> renderOperations;
+    std::vector<smFboListItem> fboListItems;
 
     ///Vertex Buffer objects
     smVBO *vboDynamicObject;
@@ -142,8 +140,8 @@ protected:
 
 public:
     smRenderingStageType renderStage;
-    smBool boostViewer;
 
+    std::unique_ptr<sf::Context> sfmlContext;
     sf::Window sfmlWindow;
     smCamera camera;
 
@@ -174,8 +172,8 @@ public:
     void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3<smFloat> p_direction);
     /// \brief disable vSync
     void setUnlimitedFPS(smBool p_enableFPS);
-    /// \brief constructor. requires error log.
-    smViewer(smErrorLog *log);
+    /// \brief default constructor
+    smViewer();
     /// \brief initialization for viewer
     virtual  void init();
     /// \brief for exit viewer
@@ -183,16 +181,16 @@ public:
     /// \brief add object for rendering
     void addObject(smCoreClass *object);
     /// \brief add text for display
-    void addText(QString p_tag);
+    void addText(smString p_tag);
     /// \brief update text
-    void updateText(QString p_tag, QString p_string);
-    void updateText(smInt p_handle, QString p_string);
+    void updateText(smString p_tag, smString p_string);
+    void updateText(smInt p_handle, smString p_string);
     /// \brief change window resolution
     void setScreenResolution(smInt p_width, smInt p_height);
     /// \brief set scene as texture
     void setSceneAsTextureShader(SceneTextureShader *p_shader);
     /// \brief set the window title
-    void setWindowTitle(const string &str);
+    void setWindowTitle(const smString &str);
     /// \brief enable/disable VSync
     void setVSync(bool sync);
     /// \brief processes an SFML event
@@ -208,10 +206,10 @@ public:
     /// \param p_depthTex A texture that will contain the fbo's depth texture.
     /// \param p_width The width of the fbo
     /// \param p_height The height of the fbo
-    void addFBO(const smString &p_fboName, 
+    void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
-    string windowTitle;
+    smString windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
@@ -224,6 +222,24 @@ public:
     smVec3d finalDeviceRightCameraDir;
 
 protected:
+    /// \brief Initializes OpenGL capabilities and flags
+    void initGLCaps();
+    /// \brief Initializes lights for rendering
+    void initLights();
+    /// \brief Initializes the internal objectList
+    void initObjects(smDrawParam p_param);
+    /// \brief Initializes FBOs, textures, shaders and VAOs
+    void initResources(smDrawParam p_param);
+    /// \brief Initializes scenes in the sceneList
+    void initScenes(smDrawParam p_param);
+    /// \brief Initializes the viewer's camera
+    void initCamera();
+    /// \brief Initilizes the OpenGL context, and window containing it
+    void initGLContext();
+    /// \brief Cleans up after initGLContext()
+    void destroyGLContext();
+    /// \brief Cleanup function called on exit to ensure resources are cleaned up
+    virtual void cleanUp();
     /// \brief Renders the internal sceneList
     void renderSceneList(smDrawParam p_param);
     /// \brief Processes a render operation
@@ -231,7 +247,7 @@ protected:
     /// \brief Processes viewerRenderDetail options
     void processViewerOptions();
     /// \brief Renders the render operation to screen
-    void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    virtual void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Renders the render operation to an FBO
     void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
     /// \brief Initializes the FBOs in the FBO list
@@ -258,8 +274,6 @@ protected:
     void renderTextureOnView();
     /// \brief draw console. legacy code
     void drawConsole();
-    /// \brief key press event. This is called when key is pressed
-    void keyPressEvent(QKeyEvent *e);
     /// \brief  event handler
     void handleEvent(smEvent *p_event);
     /// \brief  enable attached lights
@@ -281,7 +295,7 @@ public:
     smBool  checkCameraCollisionWithScene();
     void addCollisionCheckMeshes(smMesh *mesh);
     /// \brief  stores the  meshes that the collision check  will be performed with camera.
-    vector<smMesh*> collisionMeshes;
+    std::vector<smMesh*> collisionMeshes;
     /// \brief  camera effective radius
     smFloat cameraRadius;
     /// \brief   previous state is collided.internal use
@@ -294,10 +308,6 @@ public:
     smCameraCollisionInterface *notes_cameraCollision;
     /// \brief   for dynamic reflection
     MetalShader *renderandreflection;
-    /// \brief  forms that will be lauched for GUI
-    vector<QDialog *>forms;
-    /// \brief   adding form  the viewer.
-    void addForm(QDialog *p_form);
 };
 
 #endif

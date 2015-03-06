@@ -1,4 +1,17 @@
 
+set(OCULUS_VIEWER_SOURCES)
+set(OCULUS_VIEWER_INCLUDES)
+set(OCULUS_VIEWER_TARGET_LINK_LIBRARIES)
+
+if (SimMedTK_USE_OCULUS)
+  list(APPEND OCULUS_VIEWER_SOURCES
+    smOculusViewer.cpp)
+  list(APPEND OCULUS_VIEWER_INCLUDES
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h)
+  list(APPEND OCULUS_VIEWER_TARGET_LINK_LIBRARIES
+    Oculus::Oculus)
+endif(SimMedTK_USE_OCULUS)
+
 simmedtk_add_library(smRendering
   SOURCES
     smConfigRendering.cpp
@@ -8,6 +21,7 @@ simmedtk_add_library(smRendering
     smVAO.cpp
     smVBO.cpp
     smViewer.cpp
+    ${OCULUS_VIEWER_SOURCES}
     smCamera.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
@@ -18,6 +32,7 @@ simmedtk_add_library(smRendering
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
+    ${OCULUS_VIEWER_INCLUDES}
 )
 
 target_link_libraries(smRendering
@@ -27,14 +42,7 @@ target_link_libraries(smRendering
     smUtilities
     smShader
  PUBLIC
-    Qt4::QtGui
     sfml::window
     sfml::system
+    ${OCULUS_VIEWER_TARGET_LINK_LIBRARIES}
 )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smRendering
-    PRIVATE
-      -std=c++11
-  )
-endif()

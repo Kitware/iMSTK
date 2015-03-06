@@ -23,7 +23,7 @@
   *  \copyright Apache License, Version 2.0.
   */
 
-#include "RenderExample.h"
+#include "RenderCube.h"
 #include "SFML/Audio.hpp"
 #include "SFML/Graphics.hpp"
 #include "SFML/Network.hpp"
@@ -215,6 +215,6 @@ int main()
 
   return EXIT_SUCCESS;
   */
-     renderExample();
-     return 0;
+    runRenderCube();
+    return 0;
 }

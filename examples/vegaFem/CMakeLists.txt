@@ -5,11 +5,5 @@ target_link_libraries(vegaFemExample
   smRendering
   smSimulators
   smMesh
+  smShader
   )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(vegaFemExample
-    PRIVATE
-      -std=c++11
-  )
-endif()

@@ -1,4 +1,4 @@
-if(NOT WIN32)
+if(WIN32)
   find_path(PTHREAD_INCLUDE_DIR
       pthread.h
       )

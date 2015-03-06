@@ -1,45 +1,31 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCore/smGeometry.h"
 #include "smCore/smConfig.h"
 #include "smUtilities/smVec3.h"
 #include "smExternal/moller.h"
 #include "smExternal/moller2.h"
-
-extern inline int tri_tri_intersect(float V0[3], float V1[3], float V2[3],
-                                    float U0[3], float U1[3], float U2[3]);
-
-extern inline int tri_tri_intersect_with_isectline_penetrationDepth(float V0[3],
-        float V1[3], float V2[3], float U0[3], float U1[3], float U2[3],
-        int *coplanar, float isectpt1[3], float isectpt2[3],
-        short &vSinglePoint, short &uSinglePoint, float point1[3],
-        float point2[3]);
-
-extern inline int triBoxOverlap(float boxcenter[3], float boxhalfsize[3],
-                                float triverts[3][3]);
 
 void smAABB::subDivide(smFloat  p_length, smInt p_divison, smAABB *p_aabb)
 {
@@ -264,11 +250,11 @@ smBool smCollisionUtils::checkLineTri(smVec3<smFloat> &p_linePoint1,
             p_interSection[0] = p_linePoint1[0] + t * dir[0];
             p_interSection[1] = p_linePoint1[1] + t * dir[1];
             p_interSection[2] = p_linePoint1[2] + t * dir[2];
-            return (TRUE);
+            return (true);
         }
     }
 
-    return (FALSE);
+    return (false);
 }
 
 /// \brief If the point is in the triangle, it will also send the barycentric coord.

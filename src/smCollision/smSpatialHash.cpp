@@ -1,35 +1,30 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCollision/smSpatialHash.h"
-#include "smRendering/smGLRenderer.h"
-#include "smRendering/smViewer.h"
-#include "smCore/smDoubleBuffer.h"
+#include "smCollision/smSurfaceTree.h"
+#include "smCollision/smOctreeCell.h"
 #include "smCore/smSDK.h"
-#include "smCollision/smCollisionModel.hpp"
-#include "smCore/smGeometry.h"
 
 void smSpatialHash::reset()
 {
@@ -55,7 +50,7 @@ void smSpatialHash::removeMesh(smMesh *p_mesh)
     for (smInt i = 0; i < meshes.size(); i++)
         if (meshes[i]->uniqueId == p_mesh->uniqueId)
         {
-            meshes.remove(i);
+            meshes.erase(meshes.begin()+i);
         }
 }
 
@@ -90,9 +85,12 @@ smSpatialHash::smSpatialHash(smErrorLog *p_errorLog, smInt p_hashTableSize,
     nbrModelPointCollisions = 0;
 
     maxPrims = p_outOutputPrimSize;
+	
+	/////////////////////// FIXME: These are leacking. They are not deallocated in this class. ///////////
     pipe = new smPipe("col_hash_tri2line", sizeof(smCollidedLineTris), p_outOutputPrimSize);
     pipeTriangles = new smPipe("col_hash_tri2tri", sizeof(smCollidedTriangles), p_outOutputPrimSize);
     pipeModelPoints = new smPipe("col_hash_model2points", sizeof(smCollidedModelPoints), p_outOutputPrimSize);
+	///////////////////////////////////////////////// FIXME //////////////////////////////////////////////
     enableDuplicateFilter = false;
 }
 
@@ -422,15 +420,14 @@ void smSpatialHash::initDraw(smDrawParam p_param)
 
     smViewer *viewer;
     viewer = p_param.rendererObject;
-    viewer->addText(QString("smhash"));
+    viewer->addText("smhash");
 }
 
 void smSpatialHash::draw(smDrawParam p_param)
 {
 
     smViewer *viewer;
-    QString fps("Collision FPS: %1 TimePerFrame: %2");
-    fps = fps.arg(smDouble(this->FPS)).arg(smDouble(this->timerPerFrame));
+    smString fps("Collision FPS: " + std::to_string(this->FPS) + " TimePerFrame: " + std::to_string(this->timerPerFrame));
 
     viewer = p_param.rendererObject;
 
@@ -478,7 +475,7 @@ inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel
     smCellModel cellModel;
     smAABB temp;
 
-    smSurfaceTreeIterator<smOctreeCell> iter = p_colModel->get_LevelIterator();
+    smSurfaceTreeIterator<smOctreeCell> iter = p_colModel->getLevelIterator();
     cellModel.meshID = p_colModel->getAttachedMeshID();
 
     for (smInt i = iter.start(); i < iter.end(); i++)
@@ -486,8 +483,8 @@ inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel
         if (iter[i].filled)
         {
 
-            temp.aabbMin =  iter[i].cube.leftMinCorner();
-            temp.aabbMax =  iter[i].cube.rightMaxCorner();
+            temp.aabbMin =  iter[i].getCube().leftMinCorner();
+            temp.aabbMax =  iter[i].getCube().rightMaxCorner();
             xStartIndex = (smInt)(temp.aabbMin.x / cellSizeX);
             yStartIndex = (smInt)(temp.aabbMin.y / cellSizeY);
             zStartIndex = (smInt)(temp.aabbMin.z / cellSizeZ);
@@ -495,8 +492,8 @@ inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel
             yEndIndex = (smInt)(temp.aabbMax.y / cellSizeY);
             zEndIndex = (smInt)(temp.aabbMax.z / cellSizeZ);
             cellModel.primID = i;
-            cellModel.center = iter[i].cube.center;
-            cellModel.radius = iter[i].cube.getCircumscribedSphere().radius;
+            cellModel.center = iter[i].getCube().center;
+            cellModel.radius = iter[i].getCube().getCircumscribedSphere().radius;
 
             for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
                 for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
@@ -529,8 +526,8 @@ inline void smSpatialHash::addPoint(smMesh *p_mesh, smInt p_vertId, smHash<smCel
 void  smSpatialHash::findCandidatePoints(smMesh *p_mesh, smSurfaceTree<smOctreeCell> *p_colModel)
 {
     smAABB tempAABB;
-    tempAABB.aabbMin = p_colModel->root.cube.leftMinCorner();
-    tempAABB.aabbMax = p_colModel->root.cube.rightMaxCorner();
+    tempAABB.aabbMin = p_colModel->root.getCube().leftMinCorner();
+    tempAABB.aabbMax = p_colModel->root.getCube().rightMaxCorner();
 
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
@@ -590,4 +587,78 @@ void smSpatialHash::addCollisionModel(smSurfaceTree<smOctreeCell> *p_CollMode)
 {
 
     colModel.push_back(p_CollMode);
+}
+
+void smSpatialHash::run()
+{
+    beginSim();
+
+    for (smInt i = 0; i < colModel.size(); i++)
+        for (smInt i = 0; i < meshes.size(); i++)
+        {
+            findCandidatePoints(meshes[i], colModel[i]);
+            addOctreeCell(colModel[i], cellsForModel);
+        }
+
+    ///Triangle-Triangle collision
+    for (smInt i = 0; i < meshes.size(); i++)
+    {
+        for (smInt j = i + 1; j < meshes.size(); j++)
+        {
+            if (meshes[i]->collisionGroup.isCollisionPermitted(meshes[j]->collisionGroup))
+            {
+                if (findCandidateTris(meshes[i], meshes[j]) == false)
+                {
+                    continue;
+                }
+            }
+        }
+    }
+
+    ///Triangle-line Collision
+    for (smInt i = 0; i < meshes.size(); i++)
+        for (smInt j = 0; j < lineMeshes.size(); j++)
+        {
+            if (meshes[i]->collisionGroup.isCollisionPermitted(lineMeshes[j]->collisionGroup))
+            {
+                if (findCandidateTrisLines(meshes[i], lineMeshes[j]) == false)
+                {
+                    continue;
+                }
+            }
+        }
+
+    computeCollisionTri2Tri();
+    computeCollisionLine2Tri();
+    computeCollisionModel2Points();
+    endSim();
+}
+
+void smSpatialHash::beginSim()
+{
+
+    smObjectSimulator::beginSim();
+    //start the job
+    nbrTriCollisions = 0;
+    nbrLineTriCollisions = 0;
+    nbrModelPointCollisions = 0;
+
+    for (smInt i = 0; i < meshes.size(); i++)
+    {
+        meshes[i]->updateTriangleAABB();
+    }
+
+    for (smInt i = 0; i < lineMeshes.size(); i++)
+    {
+        meshes[i]->upadateAABB();
+    }
+}
+void smSpatialHash::endSim()
+{
+    //end the job
+    smObjectSimulator::endSim();
+    reset();
+}
+void smSpatialHash::syncBuffers()
+{
 }

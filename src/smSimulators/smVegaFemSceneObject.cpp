@@ -1,31 +1,29 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smSimulators/smVegaFemSceneObject.h"
 
-smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, string ConfigFile)
+smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, smString ConfigFile)
 {
 
     fps = 0.0;
@@ -1162,8 +1160,8 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
         f_ext[3 * pulledVertex + 2] += externalForce[2];
 
         // distribute force over the neighboring vertices
-        set<int> affectedVertices;
-        set<int> lastLayerVertices;
+        std::set<int> affectedVertices;
+        std::set<int> lastLayerVertices;
 
         affectedVertices.insert(pulledVertex);
         lastLayerVertices.insert(pulledVertex);
@@ -1173,9 +1171,9 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
             // linear kernel
             double forceMagnitude = 1.0 * (femConfig->forceNeighborhoodSize - j) / femConfig->forceNeighborhoodSize;
 
-            set<int> newAffectedVertices;
+            std::set<int> newAffectedVertices;
 
-            for (set<int> :: iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
+            for (std::set<int> :: iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
             {
                 // traverse all neighbors and check if they were already previously inserted
                 int vtx = *iter;
@@ -1195,7 +1193,7 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
 
             lastLayerVertices.clear();
 
-            for (set<int> :: iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
+            for (std::set<int> :: iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
             {
                 // apply force
                 f_ext[3 * *iter + 0] += forceMagnitude * externalForce[0];

@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smSimulators/smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
@@ -95,7 +93,7 @@ void MyStylus::updateOpenClose()
         }
     }
 
-    cout << angle << endl;
+    std::cout << angle << "\n";
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
@@ -138,7 +136,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 
 
 
-            if (keyBoardData->keyBoardKey == Qt::Key_2)
+            if (keyBoardData->keyBoardKey == smKey::Num2)
             {
 
                 smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
@@ -146,7 +144,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 
             }
 
-            if (keyBoardData->keyBoardKey == Qt::Key_1)
+            if (keyBoardData->keyBoardKey == smKey::Num1)
             {
 
                 smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
@@ -218,13 +216,13 @@ void HookCautery::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
         keyBoardData = (smKeyboardEventData*)p_event->data;
 
-        if (keyBoardData->keyBoardKey == Qt::Key_1)
+        if (keyBoardData->keyBoardKey == smKey::Num1)
         {
             smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
             this->renderDetail.renderType = this->renderDetail.renderType | SIMMEDTK_RENDER_NONE;
         }
 
-        if (keyBoardData->keyBoardKey == Qt::Key_2)
+        if (keyBoardData->keyBoardKey == smKey::Num2)
         {
             smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
             this->renderDetail.renderType = this->renderDetail.renderType & (~SIMMEDTK_RENDER_NONE);

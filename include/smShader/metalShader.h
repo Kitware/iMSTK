@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef METALSHADER_H
 #define METALSHADER_H
@@ -84,7 +82,7 @@ public:
     {
         if (!attachTexture(p_mesh->uniqueId, p_bump, "BumpTex"))
         {
-            cout << "Error in bump attachment for mesh:" << p_mesh->name.toStdString().c_str() << endl;
+            std::cout << "Error in bump attachment for mesh:" << p_mesh->name << "\n";
         }
 
         attachTexture(p_mesh->uniqueId, p_decal, "DecalTex");
@@ -142,16 +140,16 @@ public:
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
-            if (keyBoardData->keyBoardKey == Qt::Key_Plus)
+            if (keyBoardData->keyBoardKey == smKey::Add)
             {
                 specularPowerValue += 5;
-                cout << specularPowerValue << endl;
+                std::cout << specularPowerValue << "\n";
             }
 
-            if (keyBoardData->keyBoardKey == Qt::Key_Minus)
+            if (keyBoardData->keyBoardKey == smKey::Subtract)
             {
                 specularPowerValue -= 5;
-                cout << specularPowerValue << endl;
+                std::cout << specularPowerValue << "\n";
             }
 
             break;

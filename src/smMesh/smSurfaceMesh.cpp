@@ -1,31 +1,27 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include <assert.h>
-#include <map>
-using std::map;
 
 //assimp includes
 #include <assimp/Importer.hpp>
@@ -194,7 +190,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError(this, string("Error: Error loading mesh: ") + string(fileName));
+            log_SF->addError(this, "Error: Error loading mesh: " + smString(fileName));
         }
 
         return false;
@@ -218,9 +214,10 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
     //Get indexed vertex data
     for (int i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices[i].x = mesh->mVertices[i].x;
-        this->vertices[i].y = mesh->mVertices[i].y;
-        this->vertices[i].z = mesh->mVertices[i].z;
+        this->vertices.emplace_back(
+            smVec3f(mesh->mVertices[i].x,
+                    mesh->mVertices[i].y,
+                    mesh->mVertices[i].z));
     }
 
     //Get indexed texture coordinate data
@@ -345,8 +342,8 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
         case 0x4110:
             fread(&l_qty, sizeof(smUShort), 1, l_file);
             this->nbrVertices = l_qty;
-            this->vertices = new smVec3<smFloat>[l_qty];
-            this->origVerts = new smVec3<smFloat>[l_qty];
+            this->vertices.reserve(l_qty);
+            this->origVerts.reserve(l_qty);
             this->vertNormals = new smVec3<smFloat>[l_qty];
             this->vertTangents = new smVec3<smFloat>[l_qty];
             this->texCoord = new smTexCoord[l_qty];

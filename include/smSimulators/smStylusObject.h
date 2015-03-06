@@ -1,33 +1,28 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMSTYLUSOBJECT_H
 #define SMSTYLUSOBJECT_H
-
-#include <QVector>
-#include <QStack>
 
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
@@ -38,6 +33,8 @@
 #include "smUtilities/smMath.h"
 #include "smExternal/tree.hh"
 
+#include <unordered_map>
+
 template<typename T> class smCollisionModel;
 template<typename smSurfaceTreeCell> class smSurfaceTree;
 struct smOctreeCell;
@@ -46,10 +43,10 @@ struct smOctreeCell;
 struct smMeshContainer
 {
 public:
-    QString name;
+    smString name;
 
     /// \brief constructor
-    smMeshContainer(QString p_name = "")
+    smMeshContainer(smString p_name = "")
     {
         name = p_name;
         offsetRotX = 0.0;
@@ -62,7 +59,7 @@ public:
     }
 
     /// \brief constructor
-    smMeshContainer(QString p_name, smMesh *p_mesh, smVec3<smFloat> p_prePos, smVec3<smFloat> p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ)
+    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3<smFloat> p_prePos, smVec3<smFloat> p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ)
     {
         offsetRotX = p_offsetRotX;
         offsetRotY = p_offsetRotY;
@@ -156,7 +153,7 @@ public:
 /// \brief !!
 class smStylusRigidSceneObject: public smStylusSceneObject, public smEventHandler
 {
-    QHash<QString, tree<smMeshContainer*>::iterator> indexIterators;
+    std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
 public:
     tree<smMeshContainer*> meshes; ///< meshes representing the stylus
     tree<smMeshContainer*>::iterator rootIterator; ///< !!
@@ -196,18 +193,18 @@ public:
             iter = meshes.insert(rootIterator, p_meshContainer);
         }
 
-        indexIterators.insert(p_meshContainer->name, iter);
+        indexIterators[p_meshContainer->name] = iter;
         return iter;
     }
 
     /// \brief !!
-    smBool addMeshContainer(QString p_ParentName, smMeshContainer *p_meshContainer)
+    smBool addMeshContainer(smString p_ParentName, smMeshContainer *p_meshContainer)
     {
         tree<smMeshContainer*>::iterator iter;
 
         if (p_ParentName.size() > 0)
         {
-            if (indexIterators.contains(p_ParentName))
+            if (indexIterators.count(p_ParentName) > 0)
             {
                 iter = indexIterators[p_ParentName];
                 meshes.append_child(iter, p_meshContainer);
@@ -231,7 +228,7 @@ public:
     }
 
     /// \brief !!
-    smMeshContainer *getMeshContainer(QString p_string) const;
+    smMeshContainer *getMeshContainer(smString p_string) const;
 
     virtual void handleEvent(smEvent *p_event) {};
 

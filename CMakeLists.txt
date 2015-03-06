@@ -34,9 +34,15 @@ mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
 # Device options
+#
 option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+
+#-----------------------------------------------------------------------------
+# Oculus Option - Disabled by default
+#
+option(SimMedTK_USE_OCULUS "Build SimMedTK with Oculus Support" OFF)
 
 #-----------------------------------------------------------------------------
 # Output directories - this is where built library and executable
@@ -45,94 +51,7 @@ option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
 # build systems, so it is necessary to handle both cases on a
 # conditional basis.
 #
-set(RUNTIME_DIRNAME bin)
-set(LIBRARY_DIRNAME lib)
-set(ARCHIVE_DIRNAME lib)
-if(WIN32)
-  set(LIBRARY_DIRNAME bin)
-  set(ARCHIVE_DIRNAME bin)
-endif()
-
-if(NOT CMAKE_CONFIGURATION_TYPES)
-  foreach(type LIBRARY RUNTIME ARCHIVE)
-    # Make sure the directory exists
-    if(DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY
-        AND NOT EXISTS ${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY})
-      message(FATAL_ERROR "SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY is set to a non-existing directory [${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY}]")
-    endif()
-
-    if(SimMedTK_SUPERBUILD)
-      set(output_dir ${SimMedTK_BINARY_DIR}/${${type}_DIRNAME})
-      if(NOT DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY)
-        set(SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build/${${type}_DIRNAME})
-      endif()
-    else()
-      if(NOT DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY)
-        set(output_dir ${SimMedTK_BINARY_DIR}/${${type}_DIRNAME})
-      else()
-        set(output_dir ${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY})
-      endif()
-    endif()
-    set(CMAKE_${type}_OUTPUT_DIRECTORY ${output_dir} CACHE INTERNAL "Single output directory for building all libraries.")
-  endforeach()
-
-
-else()
-  # Multi-configuration is more difficult.  Not only do we need to
-  # properly set the output directories, but we also need to
-  # identify the "toplevel" directory for each configuration so
-  # we can place files, documentation, etc. in the correct
-  # relative positions.  Because files may be placed by CMake
-  # without a build target to put them in their proper relative build
-  # directory position using these paths, we must fully qualify them
-  # without using CMAKE_CFG_INTDIR.
-  #
-  # We define directories that may not be quite "standard"
-  # for a particular build tool - for example, native VS2010 projects use
-  # another directory to denote CPU type being compiled for - but CMake only
-  # supports multi-configuration setups having multiple configurations,
-  # not multiple compilers.
-  #
-  # One additional wrinkle we must watch for here is the case where
-  # a multi-configuration setup uses "." for its internal directory -
-  # if that's the case, we need to just set the various config output
-  # directories to the same value.
-  set(CFG_ROOT ${SimMedTK_BINARY_DIR})
-
-  foreach(CFG_TYPE ${CMAKE_CONFIGURATION_TYPES})
-    if(NOT "${CMAKE_CFG_INTDIR}" STREQUAL ".")
-      set(CFG_ROOT ${SimMedTK_BINARY_DIR}/${CFG_TYPE})
-    endif()
-    string(TOUPPER "${CFG_TYPE}" CFG_TYPE_UPPER)
-    foreach(type LIBRARY RUNTIME ARCHIVE)
-      if(DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}
-          AND NOT EXISTS ${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-        message(FATAL_ERROR "SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER} is set to a non-existing directory [${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}]")
-      endif()
-
-      if(SimMedTK_SUPERBUILD)
-        set(output_dir ${SimMedTK_BINARY_DIR}/${${type}_DIRNAME})
-        if(NOT DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER})
-          set(SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER} ${SimMedTK_BINARY_DIR}/SimMedTK-build/${${type}_DIRNAME})
-        endif()
-      else()
-        if(NOT DEFINED SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER})
-          set(output_dir ${SimMedTK_BINARY_DIR}/${${type}_DIRNAME})
-        else()
-          set(output_dir ${SimMedTK_CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-        endif()
-      endif()
-      set(CMAKE_${type}_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER} ${output_dir} CACHE INTERNAL "Single output directory for building ${CFG_TYPE} libraries.")
-    endforeach()
-
-    if(NOT SimMedTK_BINARY_DIR_${CFG_TYPE_UPPER})
-      set(SimMedTK_BINARY_DIR_${CFG_TYPE_UPPER} ${CFG_ROOT})
-    endif()
-
-    set(CMAKE_BINARY_DIR_${CFG_TYPE_UPPER} SimMedTK_BINARY_DIR_${CFG_TYPE_UPPER} CACHE INTERNAL "Toplevel binary dir for ${CFG_TYPE} building.")
-
-  endforeach()
-endif()
+include(SimMedTKOutputDirectories)
 
 #-----------------------------------------------------------------------------
 # Prerequisites
@@ -141,7 +60,6 @@ find_package(Git)
 if(NOT GIT_FOUND)
   message(FATAL_ERROR "error: Install Git and try to re-configure")
 endif()
-
 
 #-----------------------------------------------------------------------------
 # SimMedTK version number.  An even minor number corresponds to releases.
@@ -154,33 +72,7 @@ set(SimMedTK_VERSION_PATCH 1)
 # Testing
 #
 option(BUILD_TESTING "Test the project" ON)
-if(BUILD_TESTING)
-  enable_testing()
-  include(CTest)
-  set(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-
-  # Configuration for the CMake-generated test driver
-  set(CMAKE_TESTDRIVER_EXTRA_INCLUDES "
-#include <stdexcept>
-#if defined(WIN32)
-#  pragma warning(disable : 4996)
-#endif")
-  set(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "
-  try
-    {")
-  set(CMAKE_TESTDRIVER_AFTER_TESTMAIN "
-    }
-  catch( std::exception & excp )
-    {
-    fprintf(stderr, \"Test driver caught exception: [%s]\\n\", excp.what());
-    return EXIT_FAILURE;
-    }
-  catch( ... )
-    {
-    printf(\"Exception caught by the test driver\\n\");
-    return EXIT_FAILURE;
-    }")
-endif()
+include(SimMedTKTesting)
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -281,23 +173,28 @@ find_package(SFML REQUIRED)
 find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(Qt4 REQUIRED QtCore QtOpenGL)
 find_package(VegaFEM REQUIRED CONFIG)
+find_package(ThreadPool REQUIRED)
 
+if(SimMedTK_USE_OCULUS)
+  find_package(Oculus REQUIRED)
+  include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
+endif()
+
+#-----------------------------------------------------------------------------
+# Testing framework
+#
+if(BUILD_TESTING)
+  find_package(Bandit REQUIRED)
+  include_directories(${BANDIT_INCLUDE_DIR})
+  include(SimMedTKTesting)
+endif()
 
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
 simmedtk_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
-
-simmedtk_find_package(Boost REQUIRED
-  COMPONENTS
-    thread
-    system)
-
-# do not allow boost to use auto-link library stuff
-add_definitions(-DBOOST_ALL_NO_LIB=1)
 
 simmedtk_find_package(Audiere REQUIRED)
 simmedtk_find_package(V8 REQUIRED)
@@ -319,8 +216,8 @@ endif()
 include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
-include_directories(SYSTEM "${Boost_INCLUDE_DIR}")
 include_directories(SYSTEM "${SFML_INCLUDE_DIRS}")
+include_directories(SYSTEM "${ThreadPool_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
 # SimMedTK_SUPERBUILD_BINARY_DIR

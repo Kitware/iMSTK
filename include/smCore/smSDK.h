@@ -1,34 +1,29 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMSDK_H
 #define SMSDK_H
 
-#include <QHash>
-#include <QVector>
-#include <QApplication>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smScene.h"
@@ -39,6 +34,7 @@
 #include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructs.h"
+
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
 #define SIMMEDTK_SDK_MAXMODULES 100
@@ -155,14 +151,14 @@ struct smPipeHolder: public smBaseHolder
         return pipe == p_param.pipe;
     }
 
-    inline friend smBool operator==(smPipeHolder &p_pipe, QString &p_name)
+    inline friend smBool operator==(smPipeHolder &p_pipe, smString &p_name)
     {
         return (*(p_pipe.pipe) == p_name);
     }
 
 };
 /// \brief SDK class. it is a singlenton class for each machine runs the framework
-class smSDK: public smCoreClass, public smEventHandler
+class smSDK: public smCoreClass
 {
 
 protected:
@@ -173,7 +169,7 @@ protected:
     smViewer *viewer;
     smSimulator *simulator;
     /// \brief scene list
-    vector<smScene*>sceneList;
+    std::vector<smScene*> sceneList;
     /// \brief error log
     static smErrorLog *errorLog;
     /// \brief dispatcher
@@ -206,21 +202,16 @@ protected:
     smSDK()
     {
         shutdown = false;
-        smInt argc = 1;
-        smChar *argv[] = {SIMMEDTKVERSION_TEXT};
-        errorLog = new smErrorLog();
-        dispathcer = new smDispatcher();
-        eventDispatcher = new smEventDispatcher();
-        eventDispatcher->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-
         sceneIdCounter = 1;
-        //objectIdCounter=1;
         isModulesStarted = false;
         type = SIMMEDTK_SMSDK;
         viewer = NULL;
         simulator = NULL;
         sceneList.clear();
 
+        errorLog = new smErrorLog();
+        dispathcer = new smDispatcher();
+        eventDispatcher = new smEventDispatcher();
 
         meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
         modulesRef = new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
@@ -246,8 +237,9 @@ public:
         return &sdk;
     }
 
-    ///SDK creates viewer
-    smViewer *createViewer();
+    /// \brief Registers a viewer object with the SDK
+    ///
+    void addViewer(smViewer* p_viewer);
 
     ///SDK returns a pointer to the viewer
     smViewer *getViewerInstance();
@@ -389,7 +381,7 @@ public:
         return (pipesRef->getByRef(p_unifiedID.sdkID).pipe);
     }
 
-    inline static smPipe* getPipeByName(QString p_name)
+    inline static smPipe* getPipeByName(smString p_name)
     {
         return (pipesRef->getByRef(p_name).pipe);
     }
@@ -401,16 +393,13 @@ public:
         p_pipe->uniqueId.sdkID = pipesRef->checkAndAdd(ph);
     }
     /// \brief create a pipe
-    inline static smPipe *createPipe(QString p_pipeName, smInt p_elementSize, smInt p_size)
+    inline static smPipe *createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
     {
         smPipe *pipe;
         pipe = new smPipe(p_pipeName, p_elementSize, p_size);
         registerPipe(pipe);
         return pipe;
     }
-    /// \brief handle an event
-    void handleEvent(smEvent *p_event);
-
 };
 
 #endif

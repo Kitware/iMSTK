@@ -1,34 +1,31 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCore/smScene.h"
 #include "smCore/smSDK.h"
 
 smScene::smScene(smErrorLog *p_log): sceneLocal(SIMMEDTK_MAX_MODULES)
 {
-
     type = SIMMEDTK_SMSCENE;
     this->log = p_log;
     totalObjects = 0;
@@ -38,27 +35,22 @@ smScene::smScene(smErrorLog *p_log): sceneLocal(SIMMEDTK_MAX_MODULES)
 
 smInt smScene::getSceneId()
 {
-
     return uniqueId.ID;
 }
 
 smInt smScene::getTotalObjects()
 {
-
     return totalObjects;
 }
 
-vector<smSceneObject*> smScene::getSceneObject()
+std::vector<smSceneObject*> smScene::getSceneObject()
 {
-
-    sceneList.lock();
+    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     return sceneObjects;
-    sceneList.unlock();
 }
 
 smScene& smScene::operator +=(smSceneObject *p_sceneObject)
 {
-
     addSceneObject(p_sceneObject);
     return *this;
 }
@@ -66,24 +58,21 @@ smScene& smScene::operator +=(smSceneObject *p_sceneObject)
 
 void smScene::addSceneObject(smSceneObject *p_sceneObject)
 {
-
     if (p_sceneObject != NULL)
     {
-        sceneList.lock();
+        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
         sceneObjects.push_back(p_sceneObject);
         totalObjects = sceneObjects.size();
         sceneUpdatedTimeStamp++;
-        sceneList.unlock();
     }
 }
 
 /// \brief removes the scene object based on scene object id
 void smScene::removeSceneObject(smSceneObject *p_sceneObject)
 {
-
     if (p_sceneObject != NULL)
     {
-        sceneList.lock();
+        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
 
         for (smInt i = 0; i < sceneObjects.size(); i++)
         {
@@ -95,15 +84,13 @@ void smScene::removeSceneObject(smSceneObject *p_sceneObject)
         }
 
         sceneUpdatedTimeStamp++;
-        sceneList.unlock();
     }
 }
 
 /// \brief removes the object from the scene based on its object id
 void smScene::removeSceneObject(smInt p_sceneObjectId)
 {
-    sceneList.lock();
-
+    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     if (p_sceneObjectId >= 0 && p_sceneObjectId < sceneObjects.size())
     {
         for (smInt i = 0; i < sceneObjects.size(); i++)
@@ -118,25 +105,21 @@ void smScene::removeSceneObject(smInt p_sceneObjectId)
     }
 
     sceneUpdatedTimeStamp++;
-    sceneList.unlock();
-
 }
 
 /// \brief
 void smScene::addRef()
 {
-
-    sceneList.lock();
+    //Note: might want to replace with with an atomic variable
+    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     this->referenceCounter++;
-    sceneList.unlock();
 }
 
 void smScene::removeRef()
 {
-
-    sceneList.lock();
+    //Note: might want to replace with with an atomic variable
+    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     this->referenceCounter--;
-    sceneList.unlock();
 }
 
 void smScene::copySceneObjects(smScene*p_scene)

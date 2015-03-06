@@ -1,33 +1,28 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMFRAMEBUFFEROBJECT_H
 #define SMFRAMEBUFFEROBJECT_H
-
-#include <string.h>
-#include <QVector>
 
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
@@ -35,6 +30,8 @@
 #include "smExternal/framebufferObject.h"
 #include "smExternal/renderbuffer.h"
 #include "smCore/smTextureManager.h"
+
+#include <string.h>
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType
 {
@@ -228,7 +225,7 @@ public:
     {
         if (p_texture == NULL)
         {
-            cout << "Error in frambuffer depth attachment" << endl;
+            std::cout << "Error in frambuffer depth attachment" << "\n";
         }
 
         _fbo.AttachTexture(p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT);

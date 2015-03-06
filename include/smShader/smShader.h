@@ -1,39 +1,40 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
-
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMSHADER_H
 #define SMSHADER_H
 
-#include <string.h>
-#include <QVector>
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
-#include <QMultiHash>
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smMatrix44.h"
+#include "smUtilities/smTimer.h"
+
+#include <string.h>
+#include <unordered_map>
+#include <list>
+#include <vector>
 
 class smMesh;
 class smSurfaceMesh;
@@ -45,7 +46,7 @@ struct smTextureShaderAssignment
     /// \brief Id from texture manager
     smInt textureId;
     /// \brief The parameters that shaders use
-    QString shaderParamName;
+    smString shaderParamName;
 };
 
 
@@ -57,7 +58,7 @@ class smShader: public smCoreClass
 public:
     smGLInt tangentAttrib;
 protected:
-    static QHash<smInt, smShader *>shaders;
+    static std::unordered_map<smInt, smShader *> shaders;
 
     smChar vertexProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
     smChar fragmentProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
@@ -77,18 +78,18 @@ protected:
     /// \brief if the geometry shader exists this will be true
     smBool geometryProgramExist;
     /// \brief stores the parameters for vertex shader
-    QVector <smChar*>vertexShaderParamsString;
+    std::vector<smChar*> vertexShaderParamsString;
     /// \brief stores the parameters for fragment shader
-    QVector <smChar*>fragmentShaderParamsString;
+    std::vector<smChar*> fragmentShaderParamsString;
     /// \brief stores the parameters for geometry shader
-    QVector <smChar*>geometryShaderParamsString;
+    std::vector<smChar*> geometryShaderParamsString;
     /// \brief stores the attribute parameters
-    QVector <smChar*>attribParamsString;
+    std::vector<smChar*> attribParamsString;
     /// \brief error text for querying the opengl errors mostly
     smChar errorText[SIMMEDTK_MAX_ERRORLOG_TEXT];
     /// \brief time for periodically checnking the shader
-    QTime time;
-    QMultiHash<smInt, smTextureShaderAssignment> texAssignments;
+    smTimer time;
+    std::unordered_multimap<smInt, smTextureShaderAssignment> texAssignments;
     smChar modelViewMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
     smChar projectionMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
 
@@ -104,14 +105,13 @@ protected:
     /// \brief shader program object.
     GLhandleARB shaderProgramObject;
     /// \brief stores the id of the parameters in vertex shader
-    QVector <GLint>vertexShaderParams;
+    std::vector<GLint> vertexShaderParams;
     /// \brief stores the id of the parameters in fragment shader
-    QVector <GLint>fragmentShaderParams;
+    std::vector<GLint> fragmentShaderParams;
     /// \brief stores the id of the parameters in geometry shader
-    QVector <GLint>geometryShaderParams;
-
+    std::vector<GLint> geometryShaderParams;
     /// \brief stores the id of the parameters in geometry shader
-    QVector <GLint>attribShaderParams;
+    std::vector<GLint> attribShaderParams;
 
     /// \brief creates GLSL vertex shader
     void createVertexShaderGLSL();
@@ -162,7 +162,7 @@ public:
 
 protected:
     /// \brief This stores the opengl binded texture id
-    QHash<QString, smGLInt>textureGLBind;
+    std::unordered_map<smString, smGLInt> textureGLBind;
     void autoGetTextureIds();
 #endif
 

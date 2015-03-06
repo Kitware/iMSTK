@@ -1,3 +1,3 @@
 #include "smCore/smCoreClass.h"
 
-QAtomicInt smUnifiedID::IDcounter = 0;
+std::atomic_int smUnifiedID::IDcounter;

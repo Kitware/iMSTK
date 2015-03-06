@@ -13,10 +13,3 @@ target_link_libraries(smShader
   PRIVATE
     smCore
 )
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  target_compile_options(smShader
-    PRIVATE
-      -std=c++11
-  )
-endif()

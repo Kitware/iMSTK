@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCore/smConfig.h"
 #include "smCore/smSDK.h"
@@ -37,9 +35,6 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
-#include <QKeyEvent>
-#include <QDesktopWidget>
-
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -54,7 +49,7 @@ typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 
 void smViewer::setVSync(bool sync)
 {
-    this->sfmlWindow.setVerticalSyncEnabled(true);
+    this->sfmlWindow.setVerticalSyncEnabled(sync);
 }
 
 smRenderOperation::smRenderOperation()
@@ -64,9 +59,8 @@ smRenderOperation::smRenderOperation()
     fboName = "";
 }
 
-smViewer::smViewer(smErrorLog *log)
+smViewer::smViewer()
 {
-
     type = SIMMEDTK_SMVIEWER;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
     shadowMatrix.setIdentity();
@@ -79,14 +73,12 @@ smViewer::smViewer(smErrorLog *log)
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
-    this->log = log;
+    this->log = NULL;
     consoleDisplay = false;
     lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
     windowOutput = new smOpenGLWindowStream();
     lightDrawScale = 50;
     enableCameraMotion = false;
-
-    boostViewer = false;
 
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
@@ -111,7 +103,6 @@ void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 
 smInt smViewer::addLight(smLight *p_light)
 {
-
     smInt index = lights->add(p_light);
     lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
     lights->getByRef(index)->activate(true);
@@ -120,19 +111,18 @@ smInt smViewer::addLight(smLight *p_light)
 
 smBool smViewer::setLight(smInt p_lightId, smLight *p_light)
 {
-
     smInt index = lights->replace(p_lightId, p_light);
 
     if (index > 0)
     {
         lights->getByRef(p_lightId)->renderUsage = GL_LIGHT0 + p_lightId;
-        return  index;
+        return true;
     }
+    return false;
 }
 
 void smViewer::refreshLights()
 {
-
     smIndiceArrayIter<smLight*> iter(lights);
 
     for (smInt i = iter.begin(); i < iter.end(); iter++)
@@ -183,36 +173,42 @@ void smViewer::setUnlimitedFPS(smBool p_enableFPS)
     unlimitedFPSVariableChanged++;
 }
 
-///initialization of the viewer module
-void smViewer::init()
+void smViewer::initGLCaps()
 {
-
-    smSceneObject *sceneObject;
-    smScene *scene;
-    smStaticSceneObject *staticSceneObject;
-    smStylusRigidSceneObject *stylusObject;
-    smClassType objectType;
-    static smDrawParam param;
-    smIndiceArrayIter<smLight*> iter(lights);
-
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
-
-    if (isInitialized)
-    {
-        return;
-    }
-
+    //use multiple fragment samples in computing the final color of a pixel
     glEnable(GL_MULTISAMPLE);
-    glDisable(GL_COLOR_MATERIAL);
-    glEnable(GL_LIGHTING);
+    //do depth comparisons and update the depth buffer
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_LIGHTING);
+    //cull polygons based on their winding in window coordinates
     glEnable(GL_CULL_FACE);
+    //DEPRECIATED AS OF v3.3 have one or more material parameters
+    // track the current color
+    glDisable(GL_COLOR_MATERIAL);
+    //DEPRECIATED AS OF v3.3 If enabled and no vertex shader is active,
+    // use the current lighting parameters to compute the vertex color or index
+    glEnable(GL_LIGHTING);
+    //DEPRECIATED AS OF v3.3 If enabled and no vertex shader is active,
+    // normal vectors are normalized to unit length after transformation and
+    // before lighting
     glEnable(GL_NORMALIZE);
+
+    //Fill the face of the polygon for all front and back facing polygons
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
+    glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
+    glFrontFace(GL_CCW);
+    //DEPRECIATED AS OF v3.3 Smooth shading
+    glShadeModel(GL_SMOOTH);
+    //DEPRECIATED AS OF v3.3 Specifies the specular component of a material
+    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
+}
+
+void smViewer::initLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
     // Create light components
     for (smInt i = iter.begin(); i < iter.end(); i++)
     {
@@ -225,31 +221,25 @@ void smViewer::init()
         glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
         glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
     }
+}
 
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
-    glEnable(GL_MULTISAMPLE_ARB);
-    glShadeModel(GL_SMOOTH);
-    glHint(GL_MULTISAMPLE_FILTER_HINT_NV, GL_NICEST);
-    glFrontFace(GL_CCW);
-    glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
-
+void smViewer::initObjects(smDrawParam p_param)
+{
     for (smInt i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
         {
-            objectList[i]->initDraw(param);
+            objectList[i]->initDraw(p_param);
         }
         else
         {
             continue;
         }
     }
+}
 
-    smInt width = screenResolutionWidth;
-    smInt height = screenResolutionHeight;
-
+void smViewer::initResources(smDrawParam p_param)
+{
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
     {
         fbo = new smFrameBuffer();
@@ -264,8 +254,8 @@ void smViewer::init()
     }
 
     smTextureManager::initGLTextures();
-    smShader::initGLShaders(param);
-    smVAO::initVAOs(param);
+    smShader::initGLShaders(p_param);
+    smVAO::initVAOs(p_param);
 
     initFboListItems();
 
@@ -274,19 +264,26 @@ void smViewer::init()
         fbo->setDim(2048, 2048);
         fbo->attachDepthTexture(smTextureManager::getTexture("depth"));
 
-        cout << "Checking the status of framebuffer for shadow" << endl;
+        std::cout << "Checking the status of framebuffer for shadow" << "\n";
         fbo->checkStatus();
 
         backfbo->setDim(1024, 1024);
         backfbo->attachColorTexture(smTextureManager::getTexture("backmap"), 0);
         backfbo->attachDepthTexture(smTextureManager::getTexture("backmapdepth"));
-        cout << "Checking the status of framebuffer for dualparaboloid backmap" << endl;
+        std::cout << "Checking the status of framebuffer for dualparaboloid backmap" << "\n";
         backfbo->checkStatus();
 
         smTextureManager::disableTexture("depth");
         smTextureManager::disableTexture("backmap");
     }
+}
 
+void smViewer::initScenes(smDrawParam p_param)
+{
+    smClassType objectType;
+    smStaticSceneObject *staticSceneObject;
+    smSceneObject *sceneObject;
+    smScene *scene;
     smScene::smSceneIterator sceneIter;
 
     //traverse all the scene and the objects in the scene
@@ -304,10 +301,10 @@ void smViewer::init()
             //initialize the custom Render if there is any
             if (sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER)
             {
-                sceneObject->customRender->initDraw(param);
+                sceneObject->customRender->initDraw(p_param);
             }
 
-            sceneObject->initDraw(param);
+            sceneObject->initDraw(p_param);
 
             if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_VBO && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_VBO_ENABLED)
             {
@@ -322,14 +319,73 @@ void smViewer::init()
             }//scene object is added in the vbo object.
         }//object traverse
     }//scene traverse
+}
 
+void smViewer::initCamera()
+{
     //Generate the Projection and View Matricies
     camera.genProjMat();
     camera.genViewMat();
+}
+
+void smViewer::initGLContext()
+{
+
+    // Init OpenGL context
+    sfmlContext = std::unique_ptr<sf::Context>(new sf::Context);
+
+    // Init the rest of window system
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
+    {
+        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, sf::Style::Fullscreen);
+    }
+    else
+    {
+        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, (sf::Style::Titlebar | sf::Style::Close));
+    }
+
+    // Init GLEW
+    GLenum err = glewInit();
+
+    if (GLEW_OK != err)
+    {
+        /* Problem: glewInit failed, something is seriously wrong.
+         * Most likely an OpenGL context is not created yet */
+        std::cout << "Error:" << glewGetErrorString(err) << "\n";
+        assert(false);
+    }
+}
+
+///initialization of the viewer module
+void smViewer::init()
+{
+    static smDrawParam param;
+
+    if (isInitialized)
+    {
+        return;
+    }
+
+    param.rendererObject = this;
+    param.caller = this;
+    param.data = NULL;
+
+    this->initGLContext();
+    this->initGLCaps();
+    this->initLights();
+    this->initObjects(param);
+    this->initResources(param);
+    this->initScenes(param);
 
     isInitialized = true;
 }
 
+void smViewer::destroyGLContext()
+{
+    //nothing to do
+}
 
 ///draw the surface mesh triangles based on the rendering type
 ///problem is here
@@ -387,7 +443,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices);
+    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
     {
@@ -663,8 +719,6 @@ void setTextureMatrix()
     // Go back to normal matrix mode
     glMatrixMode(GL_MODELVIEW);
 }
-
-
 
 void smViewer::renderTextureOnView()
 {
@@ -1027,8 +1081,6 @@ void smViewer::draw()
 {
 
     static smDrawParam param;
-    static QString fps("FPS: %1");
-    static QFont font;
     static smQuatd quat;
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
@@ -1036,7 +1088,6 @@ void smViewer::draw()
         return;
     }
 
-    font.setPixelSize(10);
     param.rendererObject = this;
     param.caller = this;
     param.data = NULL;
@@ -1080,7 +1131,6 @@ void smViewer::draw()
 ///called by the module before each frame starts
 void smViewer::beginFrame()
 {
-
     if (terminateExecution == true)
     {
         terminationCompleted = true;
@@ -1134,11 +1184,6 @@ void smViewer::addObject(smCoreClass *object)
 
 void smViewer::handleEvent(smEvent *p_event)
 {
-
-    smHapticOutEventData *hapticEventData;
-    smHapticInEventData *hapticInEventData;
-    smCameraEventData *cameraData;
-    smLightMotionEventData *lightPosData;
     smLight *light;
     smVec3<smDouble> lightDir;
     smVec3<smDouble> lightUp;
@@ -1146,25 +1191,19 @@ void smViewer::handleEvent(smEvent *p_event)
 
     switch (p_event->eventType.eventTypeCode)
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        //left here as an example for implementation
-        //hapticEventData=(smHapticOutEventData *)p_event->data;
-        break;
-
-    case SIMMEDTK_EVENTTYPE_HAPTICIN:
-        //left here as an example for implementation
-        //hapticInEventData=(smHapticInEventData *)p_event->data;
-        break;
-
     case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
-        cameraData = (smCameraEventData *)p_event->data;
+    {
+        smCameraEventData *cameraData =
+            (smCameraEventData *)p_event->data;
         deviceCameraPos = cameraData->pos;
         deviceCameraDir = cameraData->direction;
         deviceCameraUpDir = cameraData->upDirection;
         break;
-
+    }
     case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
-        lightPosData = (smLightMotionEventData*)p_event->data;
+    {
+        smLightMotionEventData *lightPosData =
+            (smLightMotionEventData*)p_event->data;
 
         if (lights->size() < lightPosData->lightIndex)
         {
@@ -1172,64 +1211,37 @@ void smViewer::handleEvent(smEvent *p_event)
             light->lightPos.pos = lightPosData->pos;
             light->direction = lightPosData->direction;
         }
-
+        break;
+    }
+    default:
         break;
     }
 }
 
-void smViewer::addText(QString p_tag)
+void smViewer::addText(smString p_tag)
 {
 
-    windowOutput->addText(p_tag, QString(""));
+    windowOutput->addText(p_tag, smString(""));
 }
 
-void smViewer::updateText(QString p_tag, QString p_string)
+void smViewer::updateText(smString p_tag, smString p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void smViewer::updateText(smInt p_handle, QString p_string)
+void smViewer::updateText(smInt p_handle, smString p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(const string &str)
+void smViewer::setWindowTitle(const smString &str)
 {
     windowTitle = str;
 }
 
 void smViewer::exec()
 {
-    int count;
-
-    // Init OpenGL context
-    sf::Context context;
-
-    // Init the rest of window system
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
-    {
-        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
-                            windowTitle, sf::Style::Fullscreen);
-    }
-    else
-    {
-        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
-                            windowTitle, (sf::Style::Titlebar | sf::Style::Close));
-    }
-
-
-    // Init GLEW
-    GLenum err = glewInit();
-
-    if (GLEW_OK != err)
-    {
-        /* Problem: glewInit failed, something is seriously wrong.
-         * Most likely an OpenGL context is not created yet */
-        cout << "Error:" << glewGetErrorString(err) << endl;
-        assert(false);
-    }
-
     // Init the viewer
     this->init();
 
@@ -1243,7 +1255,16 @@ void smViewer::exec()
         }
     }
 
+    cleanUp();
+}
+
+void smViewer::cleanUp()
+{
     destroyFboListItems();
+    destroyGLContext();
+
+    //Must be set when all cleanup is done
+    terminationCompleted = true;
 }
 
 smInt smViewer::height(void)

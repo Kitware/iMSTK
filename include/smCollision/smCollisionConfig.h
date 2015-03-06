@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMCOLLISIONCONFIG_H
 #define SMCOLLISIONCONFIG_H
@@ -49,7 +47,7 @@ struct smCellTriangle
         return (p_tri.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellTriangle &tri)
+    friend std::ostream &operator<<(std::ostream &out, smCellTriangle &tri)
     {
         out << tri.primID;
         return out;
@@ -74,7 +72,7 @@ struct smCellLine
         return (p_line.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellLine &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellLine &p)
     {
         out << p.primID;
         return out;
@@ -100,7 +98,7 @@ struct smCellModel
         return (p_model.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellModel &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellModel &p)
     {
         out << p.primID;
         return out;
@@ -127,7 +125,7 @@ struct smCellPoint
         return (p_point.primID == primID ? true : false);
     }
 
-    friend ostream &operator<<(ostream &out, smCellPoint &p)
+    friend std::ostream &operator<<(std::ostream &out, smCellPoint &p)
     {
         out << p.primID;
         return out;
@@ -189,8 +187,8 @@ public:
     {
         groupMask = groupMask | (p_group.groupId);
         p_group.groupMask = p_group.groupMask | (groupId);
-        cout << "Mask:" << groupMask << endl;
-        cout << "GroupId:" << groupId << endl;
+        std::cout << "Mask:" << groupMask << "\n";
+        std::cout << "GroupId:" << groupId << "\n";
     }
 
     /// \brief !!

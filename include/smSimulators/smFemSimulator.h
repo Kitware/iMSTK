@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMFEMSIMULATOR_H
 #define SMFEMSIMULATOR_H
@@ -78,8 +76,8 @@ protected:
             {
             case SIMMEDTK_SMFEMSCENEOBJECT:
                 femObject = (smFemSceneObject*)object;
-                object->memBlock->allocate<smVec3<smFloat>>(QString("fem"), femObject->v_mesh->nbrVertices);
-                object->memBlock->originaltoLocalBlock(QString("fem"), femObject->v_mesh->vertices, femObject->v_mesh->nbrVertices);
+                object->localVerts.reserve(femObject->v_mesh->nbrVertices);
+                object->localVerts = femObject->v_mesh->vertices;
                 object->flags.isSimulatorInit = true;
                 break;
             }
@@ -113,7 +111,6 @@ protected:
             {
                 femSceneObject = (smFemSceneObject*)sceneObj;
                 mesh = femSceneObject->v_mesh;
-                femSceneObject->memBlock->getBlock(QString("fem"), (void**)&vertices);
 
                 if (!hapticButtonPressed)
                 {
@@ -159,12 +156,12 @@ protected:
                 {
                     for (i = 0; i < 1; i++)
                     {
-                        femSceneObject->calculateDisplacements_Dynamic(vertices);
+                        femSceneObject->calculateDisplacements_Dynamic(femSceneObject->localVerts.data());
                     }
                 }
                 else
                 {
-                    femSceneObject->calculateDisplacements_QStatic(vertices);
+                    femSceneObject->calculateDisplacements_QStatic(femSceneObject->localVerts.data());
                 }
 
                 if (i == 0)
@@ -209,7 +206,6 @@ protected:
 
         smSceneObject *sceneObj;
         smFemSceneObject *femObject;
-        smVec3<smFloat> *vertices;
         smVolumeMesh *mesh;
 
         for (smInt i = 0; i < this->objectsSimulated.size(); i++)
@@ -221,7 +217,7 @@ protected:
             {
                 femObject = (smFemSceneObject*)sceneObj;
                 mesh = femObject->v_mesh;
-                femObject->memBlock->localtoOriginalBlock(QString("fem"), mesh->vertices, mesh->nbrVertices);
+                mesh->vertices = femObject->localVerts;
                 femObject->v_mesh->updateVertexNormals();
             }
         }
@@ -239,7 +235,7 @@ protected:
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
-            if (keyBoardData->keyBoardKey == Qt::Key_F1)
+            if (keyBoardData->keyBoardKey == smKey::F1)
             {
                 printf("F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey);
             }

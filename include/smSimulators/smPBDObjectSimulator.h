@@ -1,27 +1,25 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMPBDOBJECTSIMULATOR_H
 #define SMPBDOBJECTSIMULATOR_H
@@ -36,7 +34,6 @@ class smPBDObjectSimulator: public smObjectSimulator, public smEventHandler
 {
 
 public:
-
     /// \brief constructor
     smPBDObjectSimulator(smErrorLog *p_errorLog): smObjectSimulator(p_errorLog)
     {
@@ -53,8 +50,8 @@ protected:
             return;
         }
 
-        p_object->memBlock->allocate< smVec3<smFloat> >(QString("pos"), p_object->nbrMass);
-        p_object->memBlock->originaltoLocalBlock(QString("pos"), p_object->mesh->vertices, p_object->mesh->nbrVertices);
+        p_object->localVerts.reserve(p_object->mesh->nbrVertices);
+        p_object->localVerts = p_object->mesh->vertices;
         p_object->flags.isSimulatorInit = true;
     }
     /// \brief !!
@@ -111,7 +108,6 @@ protected:
                 }
 
                 mesh = pbdSurfaceSceneObject->mesh;
-                pbdSurfaceSceneObject->memBlock->getBlock(QString("pos"), (void**)&X);
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
@@ -133,7 +129,9 @@ protected:
 
                     if (!pbdSurfaceSceneObject->fixedMass[i])
                     {
-                        pbdSurfaceSceneObject->P[i] = X[i] + pbdSurfaceSceneObject->V[i] * pbdSurfaceSceneObject->dT;
+                        pbdSurfaceSceneObject->P[i] =
+                            pbdSurfaceSceneObject->localVerts[i] + 
+                            pbdSurfaceSceneObject->V[i] * pbdSurfaceSceneObject->dT;
                     }
                 }
 
@@ -175,11 +173,11 @@ protected:
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
-                    pbdSurfaceSceneObject->V[i] = (pbdSurfaceSceneObject->P[i] - X[i]) / pbdSurfaceSceneObject->dT;
+                    pbdSurfaceSceneObject->V[i] = (pbdSurfaceSceneObject->P[i] - pbdSurfaceSceneObject->localVerts[i]) / pbdSurfaceSceneObject->dT;
 
                     if (!pbdSurfaceSceneObject->fixedMass[i])
                     {
-                        X[i] = pbdSurfaceSceneObject->P[i];
+                        pbdSurfaceSceneObject->localVerts[i] = pbdSurfaceSceneObject->P[i];
                     }
                 }
             }
@@ -188,7 +186,7 @@ protected:
         endSim();
     }
 
-    /// \bried !! synchronize the buffers in the object..do not call by yourself.
+    /// \brief !! synchronize the buffers in the object..do not call by yourself.
     void syncBuffers()
     {
         smSceneObject *sceneObj;
@@ -203,7 +201,7 @@ protected:
             if (sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT)
             {
                 pbdSurfaceSceneObject = (smPBDSurfaceSceneObject*)sceneObj;
-                pbdSurfaceSceneObject->memBlock->localtoOriginalBlock(QString("pos"), pbdSurfaceSceneObject->mesh->vertices, pbdSurfaceSceneObject->mesh->nbrVertices);
+                pbdSurfaceSceneObject->mesh->vertices = pbdSurfaceSceneObject->localVerts;
                 pbdSurfaceSceneObject->mesh->updateTriangleNormals();
                 pbdSurfaceSceneObject->mesh->updateVertexNormals();
                 pbdSurfaceSceneObject->mesh->updateTriangleAABB();
@@ -221,7 +219,7 @@ protected:
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
             keyBoardData = (smKeyboardEventData*)p_event->data;
 
-            if (keyBoardData->keyBoardKey == Qt::Key_F1)
+            if (keyBoardData->keyBoardKey == smKey::F1)
             {
                 printf("F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey);
             }

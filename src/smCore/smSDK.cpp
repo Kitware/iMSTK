@@ -1,46 +1,36 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
-
-#include <QMutex>
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #include "smCore/smSDK.h"
 #include "smMesh/smMesh.h"
 
 #include <chrono>
 #include <thread>
+#include <string>
 
 /// \brief SDK is singlenton class
 smSDK smSDK::sdk;
 smErrorLog * smSDK::errorLog;
-
-/// \brief object reference counter mutex
-QMutex  objectRefMutex;
-
-/// \brief this mutex is for system global registration
-QMutex  globalRegisterMutex;
-QHash<smInt, smSceneObject*> sceneObjectList;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
 smIndiceArray<smModuleHolder> *smSDK::modulesRef;
@@ -52,14 +42,20 @@ smIndiceArray<smMotionTransformer *> *smSDK::motionTransRef;
 smIndiceArray<smPipeHolder> *smSDK::pipesRef;
 
 /// \brief creates the scene of the simulator
-smScene  *smSDK::createScene()
+smScene *smSDK::createScene()
 {
-
     smScene*scene;
     scene = new smScene(errorLog);
     registerScene(scene);
-    scene->setName(QString("Scene") + QString().setNum(scene->uniqueId.ID));
+    scene->setName("Scene" + std::to_string(scene->uniqueId.ID));
     return scene;
+}
+
+void smSDK::releaseScene(smScene* scene)
+{
+    assert(scene);
+    unRegisterScene(scene);
+    delete scene;
 }
 
 smSDK::~smSDK()
@@ -67,25 +63,15 @@ smSDK::~smSDK()
 
 }
 
-/// \brief creates the viewer for the simulator
-smViewer *smSDK::createViewer()
+void smSDK::addViewer(smViewer* p_viewer)
 {
+    assert(p_viewer);
 
-    if (this->viewer == NULL)
-    {
+    this->viewer = p_viewer;
+    this->viewer->log = this->errorLog;
+    this->viewer->dispathcer = this->dispathcer;
 
-        viewer = new smViewer(errorLog);
-        viewer->dispathcer = dispathcer;
-
-        for (smInt j = 0; j < (*scenesRef).size(); j++)
-        {
-            viewer->sceneList.push_back((*scenesRef)[j].scene);
-        }
-
-        registerModule(viewer);
-    }
-
-    return viewer;
+    this->registerModule(p_viewer);
 }
 
 /// \brief Returns a pointer to the viewer object
@@ -119,8 +105,6 @@ smSimulator* smSDK::createSimulator()
 /// \brief
 void smSDK::updateSceneListAll()
 {
-
-    QHash<smInt, smModule*>::iterator moduleIterator;
 }
 
 /// \brief Initialize all modules registered to the SimMedTK SDK
@@ -169,16 +153,6 @@ void smSDK::run()
     updateSceneListAll();
     initRegisteredModules();
 
-    //previous code where explicit code written for all modules
-    if (viewer == NULL)
-    {
-        errorLog->addError(this, "smSDK:Viewer is not created");
-    }
-    else
-    {
-        viewer->exec();
-    }
-
     if (simulator != NULL)
     {
         simulator->exec();
@@ -194,36 +168,11 @@ void smSDK::run()
 /// \brief
 void smSDK::addRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter++;
-    objectRefMutex.unlock();
 }
 
 /// \brief
 void smSDK::removeRef(smCoreClass* p_coreClass)
 {
-    objectRefMutex.lock();
     p_coreClass->referenceCounter--;
-    objectRefMutex.unlock();
-}
-
-/// \brief
-void smSDK::handleEvent(smEvent *p_event)
-{
-
-    smKeyboardEventData *keyBoardData;
-
-    switch (p_event->eventType.eventTypeCode)
-    {
-
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        keyBoardData = (smKeyboardEventData*)p_event->data;
-
-        if (keyBoardData->keyBoardKey == Qt::Key_Escape)
-        {
-            terminateAll();
-        }
-
-        break;
-    }
 }

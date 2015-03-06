@@ -17,10 +17,18 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp GLFW Eigen GLEW GLUT GLM SFML)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW GLUT GLM ThreadPool)
+if(BUILD_TESTING)
+  list(APPEND SimMedTK_DEPENDENCIES Bandit)
+endif()
+
 if(WIN32)
   list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
+
+if(SimMedTK_USE_OCULUS)
+  list(APPEND SimMedTK_DEPENDENCIES Oculus)
+endif(SimMedTK_USE_OCULUS)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -141,8 +149,10 @@ endif()
 #
 set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
 if(WIN32)
-  list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
-    -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE})
+  if( DEFINED SimMedTK_WINDOWS_DEPENDENCIES_DIR)
+    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+      -DSimMedTK_WINDOWS_DEPENDENCIES_DIR:PATH=${SimMedTK_WINDOWS_DEPENDENCIES_DIR})
+  endif()
 endif(WIN32)
 
 #-----------------------------------------------------------------------------
@@ -171,6 +181,8 @@ ExternalProject_Add(${proj}
     -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
     -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}
     -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
+    -DBUILD_TESTING:BOOL=${BUILD_TESTING}
+    -DSimMedTK_USE_OCULUS:BOOL=${SimMedTK_USE_OCULUS}
     ${SimMedTK_OUTPUT_DIRECTORIES}
     ${SimMedTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}

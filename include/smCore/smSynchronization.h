@@ -1,35 +1,36 @@
-/*=========================================================================
- * Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- *                        Rensselaer Polytechnic Institute
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- /=========================================================================
- 
- /**
-  *  \brief
-  *  \details
-  *  \author
-  *  \author
-  *  \copyright Apache License, Version 2.0.
-  */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 #ifndef SMSYNCHRONIZATION_H
 #define SMSYNCHRONIZATION_H
 
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include <QWaitCondition>
-#include <QMutex>
+
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <thread>
 
 /// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor
@@ -38,9 +39,9 @@
 class smSynchronization: public smCoreClass
 {
 
-    QWaitCondition taskDone;
-    QWaitCondition taskStart;
-    QMutex serverMutex;
+    std::condition_variable taskDone;
+    std::condition_variable taskStart;
+    std::mutex serverMutex;
     smInt totalWorkers;
     smInt finishedWorkerCounter;
     smInt startedWorkerCounter;
@@ -62,32 +63,30 @@ public:
     /// \brief before starting tasks worker threads should wait
     void waitTaskStart()
     {
-        serverMutex.lock();
+        std::unique_lock<std::mutex> uniLock(serverMutex, std::defer_lock);
+        uniLock.lock();
         startedWorkerCounter++;
 
         if (startedWorkerCounter == totalWorkers)
         {
             startedWorkerCounter = 0;
-            taskDone.wakeAll();
+            taskDone.notify_all();
         }
 
-        taskStart.wait(&serverMutex);
-        serverMutex.unlock();
+        taskStart.wait(uniLock);
+        uniLock.lock();
     }
 
     /// \brief when the task ends the worker should call this function
     void signalTaskDone()
     {
-
-        serverMutex.lock();
+        std::lock_guard<std::mutex> lock(serverMutex); //Lock is released when leaves scope
         finishedWorkerCounter++;
 
         if (finishedWorkerCounter == totalWorkers)
         {
             finishedWorkerCounter = 0;
         }
-
-        serverMutex.unlock();
     }
 
     /// \brief You could change the number of worker threads synchronization
@@ -106,7 +105,8 @@ public:
     /// \brief the server thread should call this for to start exeuction of the worker threads
     void startTasks()
     {
-        serverMutex.lock();
+        std::unique_lock<std::mutex> uniLock(serverMutex, std::defer_lock);
+        uniLock.lock();
 
         if (workerCounterUpdated)
         {
@@ -114,10 +114,10 @@ public:
             workerCounterUpdated = false;
         }
 
-        taskStart.wakeAll();
-        Sleep(100);
-        taskDone.wait(&serverMutex);
-        serverMutex.unlock();
+        taskStart.notify_all();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        taskDone.wait(uniLock);
+        uniLock.unlock();
     }
 
     /// \brief this function is fore signalling the events after waking up the worker threads.
@@ -129,10 +129,12 @@ public:
         eventSynch->eventType = SIMMEDTK_EVENTTYPE_SYNCH;
         eventSynch->senderId = moduleId;
         eventSynch->senderType = SIMMEDTK_SENDERTYPE_EVENTSOURCE;
-        serverMutex.lock();
-        taskStart.wakeAll();
-        taskDone.wait(&serverMutex);
-        serverMutex.unlock();
+
+        std::unique_lock<std::mutex> uniLock(serverMutex, std::defer_lock);
+        uniLock.lock();
+        taskStart.notify_all();
+        taskDone.wait(uniLock);
+        uniLock.unlock();
     }
 };
 
