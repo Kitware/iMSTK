@@ -84,7 +84,7 @@ public:
     void *deviceHandle; ///< !!
     ADUDeviceCalibrationData *calibrationData; ///< calibration data
     ADUDeviceData *deviceData; ///< device data
-    smChar *serialNumber; ///< serial number of the ADU device
+    smString serialNumber; ///< serial number of the ADU device
     smBool isOpened; ///< !!
 
     /// \brief !!

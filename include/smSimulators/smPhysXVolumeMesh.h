@@ -63,7 +63,7 @@ public:
     ~smPhysXVolumeMesh(void);
 
     /// \brief load the tetrahedra file in the PhysX format
-    smBool loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMesh);
+    smBool loadTetFile(const smString& p_TetFileName, const smString& p_surfaceMesh);
 
     /// \brief !! update the surface vertices
     void updateSurfaceVertices();

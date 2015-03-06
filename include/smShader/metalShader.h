@@ -48,11 +48,11 @@ public:
     /// \brief to enable/disable to shadow on particular object.
     smGLInt canGetShadowUniform;
     /// \brief constructor that get vertex and fragment shader file name.
-    MetalShader(smChar *p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
-                smChar *p_fragmentFileName = "shaders/FragmentBumpMap1.cg")
+    MetalShader(const smString& p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
+                const smString& p_fragmentFileName = "shaders/FragmentBumpMap1.cg")
     {
         this->log = smSDK::getErrorLog();
-        setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
+        setShaderFileName(p_verteShaderFileName, "", p_fragmentFileName);
         createParam("DecalTex");
         createParam("BumpTex");
         createParam("SpecularTex");
@@ -74,9 +74,9 @@ public:
     }
 
     /// \brief attach mesh to the shader
-    void attachMesh(smMesh* p_mesh, smChar *p_bump,
-                    smChar *p_decal, smChar *p_specular,
-                    smChar *p_OCC, smChar *p_disp)
+    void attachMesh(smMesh* p_mesh, const smString& p_bump,
+                    const smString& p_decal, const smString& p_specular,
+                    const smString& p_OCC, const smString& p_disp)
     {
         if (!attachTexture(p_mesh->uniqueId, p_bump, "BumpTex"))
         {
@@ -89,7 +89,13 @@ public:
         attachTexture(p_mesh->uniqueId, p_disp, "DispTex");
     }
 
-    void attachMesh(smMesh* p_mesh, smChar *p_bump, smChar *p_decal, smChar *p_specular, smChar *p_OCC, smChar *p_disp, smChar *p_alphaMap)
+    void attachMesh(smMesh* p_mesh,
+                    const smString& p_bump,
+                    const smString& p_decal,
+                    const smString& p_specular,
+                    const smString& p_OCC,
+                    const smString& p_disp,
+                    const smString& p_alphaMap)
     {
         attachTexture(p_mesh->uniqueId, p_bump, "BumpTex");
         attachTexture(p_mesh->uniqueId, p_decal, "DecalTex");
@@ -173,8 +179,8 @@ class MetalShaderShadow: public MetalShader
 
 public:
     /// \brief MetalShader v
-    MetalShaderShadow(smChar*p_vertexShaderFileName = "shaders/MultipleShadowsVertexBumpMap2.cg",
-                      smChar*p_fragmentShaderFileName = "shaders/MultipleShadowsFragmentBumpMap2.cg"):
+    MetalShaderShadow(const smString& p_vertexShaderFileName = "shaders/MultipleShadowsVertexBumpMap2.cg",
+                      const smString& p_fragmentShaderFileName = "shaders/MultipleShadowsFragmentBumpMap2.cg"):
         MetalShader(p_vertexShaderFileName, p_fragmentShaderFileName)
     {
         createParam("ShadowMapTEST");

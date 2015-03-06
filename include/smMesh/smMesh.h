@@ -110,7 +110,7 @@ public:
     }
 
     /// \brief assign the texture
-    void assignTexture(smChar *p_referenceName)
+    void assignTexture(const smString& p_referenceName)
     {
         smInt textureId;
         smTextureAttachment attachment;
@@ -234,7 +234,7 @@ public:
     };
 
     /// \brief load the mesh
-    virtual smBool loadMesh(smChar *fileName, smMeshFileType fileType) = 0;
+    virtual smBool loadMesh(const smString& fileName, smMeshFileType fileType) = 0;
 
     /// \brief render the surface mesh
     virtual void draw(smDrawParam p_params);
