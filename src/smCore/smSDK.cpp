@@ -129,7 +129,7 @@ void smSDK::runRegisteredModules()
 
     for (smInt i = 0; i < modulesRef->size(); i++)
     {
-        (*modulesRef)[i].module->exec();
+        modules.emplace_back([i]{(*modulesRef)[i].module->exec();});
     }
 
     isModulesStarted = true;
@@ -149,7 +149,6 @@ void smSDK::shutDown()
 /// \brief runs the simulator
 void smSDK::run()
 {
-
     updateSceneListAll();
     initRegisteredModules();
 
@@ -162,7 +161,12 @@ void smSDK::run()
     while (!shutdown) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    terminateAll();
+    terminateAll(); //Tell framework threads to shutdown
+    //Wait for all threads to finish processing
+    for (size_t i = 0; i < modules.size(); ++i)
+    {
+        modules[i].join();
+    }
 }
 
 /// \brief

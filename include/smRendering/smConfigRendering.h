@@ -124,7 +124,7 @@ struct smColor
         return rgba[p_i];
     }
     /// \brief setting
-    smColor &operator=(smColor &p_color)
+    smColor &operator=(const smColor &p_color)
     {
         rgba[0] = p_color.rgba[0];
         rgba[1] = p_color.rgba[1];

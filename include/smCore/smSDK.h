@@ -163,19 +163,13 @@ class smSDK: public smCoreClass
 
 protected:
     bool shutdown; ///< Tells the SDK to terminate
-    ///this id is incremented automatically when the scene is created.
-    smInt sceneIdCounter;
-    /// \brief pointers to the viewer, simulator
-    smViewer *viewer;
-    smSimulator *simulator;
-    /// \brief scene list
-    std::vector<smScene*> sceneList;
-    /// \brief error log
-    static smErrorLog *errorLog;
-    /// \brief dispatcher
-    smDispatcher *dispathcer;
-    /// \brief event dispather
-    smEventDispatcher *eventDispatcher;
+    smInt sceneIdCounter; ///< this id is incremented when a scene is created
+    smViewer *viewer; ///< Reference to the sdk viewer object
+    smSimulator *simulator; ///< Reference to the sdk simulator object
+    std::vector<smScene*> sceneList; ///< scene list
+    static smErrorLog *errorLog; ///< error log
+    smDispatcher *dispathcer; ///< dispatcher
+    smEventDispatcher *eventDispatcher; ///< event dispatcher
     smInt argc;
     smChar argv;
     smBool isModulesStarted;
@@ -185,8 +179,7 @@ protected:
     void initRegisteredModules();
     /// \brief run the registered modules
     void runRegisteredModules();
-    /// \brief singlenton sdk.
-    static smSDK sdk;
+    static smSDK sdk; ///< singleton sdk.
     ///holds the references to the entities in the framework
     static smIndiceArray<smMeshHolder> *meshesRef;
     static smIndiceArray<smModuleHolder> *modulesRef;
@@ -196,6 +189,8 @@ protected:
     static smIndiceArray<smSceneObjectHolder> *sceneObjectsRef;
     static smIndiceArray<smMotionTransformer *> *motionTransRef;
     static smIndiceArray<smPipeHolder>* pipesRef;
+
+    std::vector<std::thread> modules; ///< Stores a list of running module threads
     /// \brief destructor
     ~smSDK();
     /// \brief constructor

@@ -24,11 +24,14 @@
 #include "smCore/smScene.h"
 #include "smCore/smSDK.h"
 
-smScene::smScene(smErrorLog *p_log): sceneLocal(SIMMEDTK_MAX_MODULES)
+smScene::smScene(smErrorLog *p_log) :
+    sceneLocal(SIMMEDTK_MAX_MODULES),
+    smCoreClass()
 {
     type = SIMMEDTK_SMSCENE;
     this->log = p_log;
     totalObjects = 0;
+    referenceCounter = 0;
     test = 0;
     sceneUpdatedTimeStamp = 0;
 }
