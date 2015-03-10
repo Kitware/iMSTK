@@ -59,13 +59,13 @@ public:
     smADUInterface();
 
     /// \brief constructor Open the ADU device with all necessary data recorded in a file
-    smADUInterface(char *calibrationFile);
+    smADUInterface(const smString& calibrationFile);
 
     /// \brief destructor
     ~smADUInterface();
 
     /// \brief Open the ADU device specified by the serial number
-    smInt openDevice(char *serialNumber);
+    smInt openDevice(const smString& serialNumber);
 
     /// \brief Close the ADU device
     smInt closeDevice();

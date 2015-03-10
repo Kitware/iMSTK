@@ -70,7 +70,7 @@ smADUInterface::smADUInterface()
 }
 
 /// \brief
-smADUInterface::smADUInterface(char *calibrationFile)
+smADUInterface::smADUInterface(const smString& calibrationFile)
 {
 
 // Read device serial number and calibration values
@@ -86,14 +86,14 @@ smADUInterface::smADUInterface(char *calibrationFile)
         std::cout << " Check the location for file : " << deviceData << "\n";
     }
 
-    smChar buffer[100];
+    smString buffer;
     smInt i;
     smString t;
     smString s;
 
     while (!reader.eof())
     {
-        reader.getline(buffer, 50);
+        getline(reader, buffer);
 
         t = buffer;
 
