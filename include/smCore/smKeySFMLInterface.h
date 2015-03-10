@@ -26,7 +26,7 @@
 
 #include "smCore/smKey.h"
 
-#include <GLFW/glfw3.h>
+#include <SFML/Window/Keyboard.hpp>
 #include <map>
 
 static const std::map<int, smKey> sfmlToSmKeyMap = {
