@@ -6,6 +6,7 @@ simmedtk_add_library(smCore
     smDispatcher.cpp
     smErrorLog.cpp
     smEvent.cpp
+    smEventData.cpp
     smEventHandler.cpp
     smGeometry.cpp
     smModule.cpp

@@ -23,6 +23,7 @@
 
 #include "smCore/smConfig.h"
 #include "smCore/smSDK.h"
+#include "smCore/smKeySFMLInterface.h"
 #include "smUtilities/smIOStream.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
@@ -1145,34 +1146,91 @@ void smViewer::endFrame()
     this->sfmlWindow.display(); //swaps buffers
 }
 
-void smViewer::processSFMLEvents(sf::Event p_event)
+void smViewer::processSFMLEvents(const sf::Event& p_event)
 {
+    smEvent *event = nullptr;
     smSDK *sdk = smSDK::getInstance();
-    /* Need to integrate event system
-    smEvent *eventKeyboard;
+    assert(sdk);
+    smViewer *viewer = sdk->getViewerInstance();
+    assert(viewer);
 
-    eventKeyboard = new smEvent();
-    eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-    eventKeyboard->senderId = this->getModuleId();
-    eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventKeyboard->data = new smKeyboardEventData();
-    ((smKeyboardEventData*)eventKeyboard->data)->keyBoardKey = key;
-    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
-    */
+    event = new smEvent();
+    assert(event);
+    event->senderId = this->getModuleId();
+    event->senderType = SIMMEDTK_SENDERTYPE_MODULE;
+    event->data = nullptr;
 
-    // Close window: exit
-    if (p_event.type == sf::Event::Closed)
+    switch(p_event.type)
     {
-        this->sfmlWindow.close();
-        sdk->shutDown();
+    case sf::Event::Closed:
+        event->eventType = SIMMEDTK_EVENTTYPE_TERMINATE;
+        break;
+    case sf::Event::KeyPressed:
+    case sf::Event::KeyReleased:
+        event->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
+        if (sf::Event::KeyPressed == p_event.type)
+        {
+            event->data =
+                new smKeyboardEventData(SFMLKeyToSmKey(p_event.key.code), true,
+                                        p_event.key.shift, p_event.key.control,
+                                        p_event.key.alt, p_event.key.system);
+        }
+        else if (sf::Event::KeyReleased == p_event.type)
+        {
+            event->data =
+                new smKeyboardEventData(SFMLKeyToSmKey(p_event.key.code), false,
+                                        p_event.key.shift, p_event.key.control,
+                                        p_event.key.alt, p_event.key.system);
+        }
+        else
+        {
+            delete event;
+            return;
+        }
+        assert(event->data);
+        break;
+    case sf::Event::MouseButtonPressed:
+    case sf::Event::MouseButtonReleased:
+    {
+        smMouseButton button;
+        if (sf::Mouse::Left == p_event.mouseButton.button)
+            button = smMouseButton::Left;
+        else if (sf::Mouse::Right == p_event.mouseButton.button)
+            button = smMouseButton::Right;
+        else if (sf::Mouse::Middle == p_event.mouseButton.button)
+            button = smMouseButton::Middle;
+        else
+            button = smMouseButton::Unknown;
+
+        if (sf::Event::MouseButtonPressed == p_event.type)
+        {
+            event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
+            event->data =
+                new smMouseButtonEventData(button, true, p_event.mouseButton.x,
+                                           p_event.mouseButton.y);
+        }
+        else if (sf::Event::MouseButtonReleased == p_event.type)
+        {
+            event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
+            event->data =
+                new smMouseButtonEventData(button, false, p_event.mouseButton.x,
+                                           p_event.mouseButton.y);
+        }
+        assert(event->data);
+        break;
+    }
+    case sf::Event::MouseMoved:
+        event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_MOVE;
+        event->data =
+            new smMouseMoveEventData(p_event.mouseMove.x, p_event.mouseMove.y);
+        assert(event->data);
+        break;
+    default:
+        delete event;
+        return;
     }
 
-    // Escape key: exit
-    if ((p_event.type == sf::Event::KeyPressed) && (p_event.key.code == sf::Keyboard::Escape))
-    {
-        this->sfmlWindow.close();
-        sdk->shutDown();
-    }
+    sdk->getEventDispatcher()->sendEventAndDelete(event);
 }
 
 void smViewer::addObject(smCoreClass *object)

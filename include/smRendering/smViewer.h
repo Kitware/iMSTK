@@ -193,8 +193,6 @@ public:
     void setWindowTitle(const smString &str);
     /// \brief enable/disable VSync
     void setVSync(bool sync);
-    /// \brief processes an SFML event
-    void processSFMLEvents(sf::Event p_event);
     /// \brief Registers a scene for rendering with the viewer
     void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
@@ -276,6 +274,8 @@ protected:
     void drawConsole();
     /// \brief  event handler
     void handleEvent(smEvent *p_event);
+    /// \brief processes an SFML event
+    void processSFMLEvents(const sf::Event& p_event);
     /// \brief  enable attached lights
     void enableLights();
     /// \brief  scale for light drawing in the scene.
