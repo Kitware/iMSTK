@@ -19,9 +19,8 @@
 #
 # VegaFEM
 #
-
-set(VegaFEM_TAG "30500042f4a30ecc8b926a23267026b9d6d89fc8")
-set(VegaFEM_REPOSITORY ${git_protocol}://github.com/ricortiz/VegaFEM-cmake.git)
+set(VegaFEM_TAG "8b815e9fef40be3e0b0449b2672e004f6b2ac9b3")
+set(VegaFEM_REPOSITORY git@bitbucket.org:simmedtk/vegafem-cmake.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)

@@ -21,7 +21,7 @@
 #
 
 set(GLEW_TAG "e1f9e4702fe7cf9f5babb50c21fcf5a4860f2844")
-set(GLEW_REPOSITORY ${git_protocol}://github.com/ricortiz/glew.git)
+set(GLEW_REPOSITORY git@bitbucket.org:simmedtk/glew.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -78,7 +78,7 @@ if(NOT DEFINED ${proj}_DIR)
 # 	LOG_CONFIGURE 1           # Wrap configure in script to log output
 # 	LOG_BUILD 1               # Wrap build in script to log output
 	LOG_TEST 1                # Wrap test in script to log output
-	LOG_INSTALL 1             # Wrap install in script to log output   
+	LOG_INSTALL 1             # Wrap install in script to log output
     )
   set(${proj}_DIR ${ep_install_dir}/)
 
