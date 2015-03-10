@@ -46,7 +46,7 @@ bool smGLUtils::queryGLError(smString& err)
 }
 
 ///taken from glProgramming.com.  Checks the extension.
-smBool smGLUtils::QueryExtension(char *extName)
+smBool smGLUtils::QueryExtension(const smString& extName)
 {
     char *p = (char *) glGetString(GL_EXTENSIONS);
     char *end = p + strlen(p);
@@ -55,7 +55,7 @@ smBool smGLUtils::QueryExtension(char *extName)
     {
         int n = strcspn(p, " ");
 
-        if ((strlen(extName) == n) && (strncmp(extName, p, n) == 0))
+        if ((extName.size() == n) && (strncmp(extName.c_str(), p, n) == 0))
         {
             return true;
         }

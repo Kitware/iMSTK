@@ -41,7 +41,7 @@ public:
     static bool queryGLError(smString& err);
 
     /// \brief  taken from glProgramming.com.  Checks the extension.
-    static smBool QueryExtension(char *extName);
+    static smBool QueryExtension(const smString& extName);
 
     /// \brief  fade background draw with a size groundRenderInfo.scale
     static void fadeBackgroundDraw();
