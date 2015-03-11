@@ -106,10 +106,10 @@ public:
     void assembleK(smInt element, MatrixXf k);
 
     /// \brief compute the displacements for quasi-static simulation
-    void calculateDisplacements_QStatic(smVec3<smFloat>*);
+    void calculateDisplacements_QStatic(smVec3f*);
 
     /// \brief compute the displacements for dynamic simulation
-    void calculateDisplacements_Dynamic(smVec3<smFloat> *vertices);
+    void calculateDisplacements_Dynamic(smVec3f *vertices);
 
     /// \brief !!
     void lumpMasses();

@@ -30,9 +30,7 @@
 
 void smStylusRigidSceneObject::draw(smDrawParam p_params)
 {
-    smDouble matrix[16];
-    smDouble matrixTransRot[16];
-    smMatrix44<smDouble> temp;
+    smMatrix44f viewMatrix;
 
 #pragma unroll
 
@@ -45,15 +43,14 @@ void smStylusRigidSceneObject::draw(smDrawParam p_params)
 
         if (i == 2 && enableDeviceManipulatedTool)
         {
-            temp = iter.node->data->currentDeviceMatrix;
+            viewMatrix = iter.node->data->currentDeviceMatrix;
         }
         else
         {
-            temp = iter.node->data->currentViewerMatrix;
+            viewMatrix = iter.node->data->currentViewerMatrix;
         }
 
-        temp.getMatrixForOpenGL(matrix);
-        glMultMatrixd(matrix);
+        glMultMatrixf(viewMatrix.data());
         glCallList(iter.node->data->mesh->renderingID);
         glPopMatrix();
         iter++;
@@ -64,15 +61,14 @@ void smStylusRigidSceneObject::draw(smDrawParam p_params)
 
             if (i == 2 && enableDeviceManipulatedTool)
             {
-                temp = iter.node->data->currentDeviceMatrix;
+                viewMatrix = iter.node->data->currentDeviceMatrix;
             }
             else
             {
-                temp = iter.node->data->currentViewerMatrix;
+                viewMatrix = iter.node->data->currentViewerMatrix;
             }
 
-            temp.getMatrixForOpenGL(matrix);
-            glMultMatrixd(matrix);
+            glMultMatrixf(viewMatrix.data());
             glCallList(iter.node->data->mesh->renderingID);
             glPopMatrix();
             iter++;

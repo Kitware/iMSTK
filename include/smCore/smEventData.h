@@ -24,11 +24,13 @@
 #ifndef SMEVENTDATA_H
 #define SMEVENTDATA_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smKey.h"
 #include "smCore/smMouse.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix44.h"
+
+#include "smUtilities/smMatrix.h"
+#include "smUtilities/smVector.h"
 
 #include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
 
@@ -59,7 +61,7 @@ struct smMouseMoveEventData
 struct smObjectClickedData
 {
     smInt objectId;
-    smVec3<smFloat> clickedPosition;
+    smVec3f clickedPosition;
 };
 
 /// \brief for synchronization use
@@ -75,13 +77,13 @@ struct smHapticOutEventData
     /// \brief device name
     smString deviceName;
     ///\brief  position
-    smVec3 <smDouble> position;
+    smVec3f position;
     /// \brief  velocity of the tip
-    smVec3 <smDouble> velocity;
+    smVec3f velocity;
     /// \brief angles
-    smVec3 <smDouble> angles;
+    smVec3f angles;
     /// \brief  transformation matrix
-    smMatrix44<smDouble> transform;
+    smMatrix44f transform;
     smBool buttonState[4];//will be chnage later on
 };
 /// \brief haptic that is sent to the device
@@ -90,9 +92,9 @@ struct smHapticInEventData
     /// \brief  device id
     smInt deviceId;
     /// \brief  force
-    smVec3 <smDouble> force;
+    smVec3f force;
     /// \brief  torque
-    smVec3 <smDouble> torque;
+    smVec3f torque;
 
 };
 /// \brief the collision that that has information of primitives corresponds to the objects.
@@ -107,11 +109,11 @@ struct smObjectHitData
 struct smCameraEventData
 {
     /// \brief  camera position
-    smVec3<smDouble> pos;
+    smVec3f pos;
     /// \brief direction
-    smVec3<smDouble> direction;
+    smVec3f direction;
     /// \brief  upward direction
-    smVec3<smDouble> upDirection;
+    smVec3f upDirection;
 };
 /// \brief  light motion evet data
 struct smLightMotionEventData
@@ -119,9 +121,9 @@ struct smLightMotionEventData
     /// \brief  light index
     smInt lightIndex;
     /// \brief  position
-    smVec3<smDouble> pos;
+    smVec3f pos;
     /// \brief view direction
-    smVec3<smDouble> direction;
+    smVec3f direction;
 };
 
 #endif

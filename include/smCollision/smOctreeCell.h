@@ -75,7 +75,7 @@ public:
     inline void setLength ( const float length );
 
     /// \brief check if a triangle is intersecting the octree cell
-    inline bool isCollidedWithTri ( const smVec3f &v0, const smVec3f &v1, const smVec3f &v2 );
+    inline bool isCollidedWithTri ( smVec3f &v0, smVec3f &v1, smVec3f &v2 );
 
     /// \brief check if a point lies inside an octree cell
     inline bool isCollidedWithPoint ();

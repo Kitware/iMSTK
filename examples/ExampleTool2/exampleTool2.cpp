@@ -60,7 +60,7 @@ void main()
     light.spotCutOffAngle = 180.0;
 
     light.lightPos.pos.setValue(0, 2.0, 0);
-    light.direction = smVec3<smFloat>(0.0, 0.0, 1.0);
+    light.direction = smVec3f(0.0, 0.0, 1.0);
     light.drawEnabled = true;
 
 
@@ -120,8 +120,8 @@ void main()
     curvedTool->mesh_lowerJaw->renderDetail.shininess = 5.0;
     curvedTool->mesh_upperJaw->renderDetail.shininess = 5.0;
     curvedTool->mesh_pivot->renderDetail.shininess = 5.0;
-    curvedTool->mesh_lowerJaw->scale(smVec3<float>(1.0, 1.0, 1.5));
-    curvedTool->mesh_upperJaw->scale(smVec3<float>(1.0, 1.0, 1.5));
+    curvedTool->mesh_lowerJaw->scale(smVec3f(1.0, 1.0, 1.5));
+    curvedTool->mesh_upperJaw->scale(smVec3f(1.0, 1.0, 1.5));
 
     ///Each mesh is attached with proper shader texture bindings
     metalShader->attachMesh(curvedTool->mesh_lowerJaw, "bump", "metal", "specTex", "specTex", "specTex");

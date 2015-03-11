@@ -30,7 +30,7 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
+#include "smUtilities/smVector.h"
 
 /// \brief contains the cell of the surface tree structure
 template <typename Derived>
@@ -109,7 +109,7 @@ public:
     {
         return derived()->getLength();
     }
-    
+
     /// \brief get the center of the cell of surface tree
     inline const smVec3f &getCenter()  const
     {

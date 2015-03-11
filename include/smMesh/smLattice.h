@@ -79,9 +79,9 @@ class smCell
 public:
     smInt id;
     smInt cellId[3];
-    smVec3<smFloat> cellCenter;
-    smVec3<smFloat> cellLeftCorner;
-    smVec3<smFloat> cellRightCorner;
+    smVec3f cellCenter;
+    smVec3f cellLeftCorner;
+    smVec3f cellRightCorner;
     smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
     smInt lastPrimitiveIndex;
     smInt timeStamp;
@@ -108,7 +108,7 @@ public:
     smFloat xStep;
     smFloat yStep;
     smFloat zStep;
-    smVec3<smFloat> latticeCenter;
+    smVec3f latticeCenter;
     smInt time;
     smUnifiedID linkedObject;
 
@@ -150,19 +150,19 @@ public:
     }
 
     /// \brief get the center of the lattice
-    inline smVec3<smFloat> getLatticeCenter()
+    inline smVec3f getLatticeCenter()
     {
         return latticeCenter;
     }
 
     /// \brief !! get the left corner of cell 0
-    inline smVec3<smFloat> getLeftMinCorner()
+    inline smVec3f getLeftMinCorner()
     {
         return cells[0].cellLeftCorner;
     }
 
     /// \brief !! get the right corner of cell 0
-    inline smVec3<smFloat> getRightMaxCorner()
+    inline smVec3f getRightMaxCorner()
     {
         return cells[totalCells - 1].cellRightCorner;
     }
@@ -175,7 +175,7 @@ public:
     }
 
     /// \brief Initialize the lattice
-    smLatticeReturnType init(smVec3<smFloat> p_leftCorner, smVec3<smFloat> p_rightCorner,
+    smLatticeReturnType init(smVec3f p_leftCorner, smVec3f p_rightCorner,
                              smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation)
     {
 
@@ -274,8 +274,8 @@ public:
         smInt maxY;
         smInt maxZ;
         smInt index;
-        smVec3<smFloat> leftCorner = getLeftMinCorner();
-        smVec3<smFloat> rightCorner = getRightMaxCorner();
+        smVec3f leftCorner = getLeftMinCorner();
+        smVec3f rightCorner = getRightMaxCorner();
 
         minX = (aabb[p_primitiveIndex].aabbMin.x - leftCorner[0]) / xStep;
         minY = (aabb[p_primitiveIndex].aabbMin.y - leftCorner[1]) / yStep;

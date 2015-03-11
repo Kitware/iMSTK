@@ -38,18 +38,18 @@ public:
     smFloat Damp; ///< damping values
     smInt nbrMass; ///< number of masses
     smInt **massIdx; ///< !!
-    smVec3<smFloat> *P; ///< !! position
-    smVec3<smFloat>  *V; ///< !! velocity
-    smVec3<smFloat>  *exF; ///< external force
+    smVec3f *P; ///< !! position
+    smVec3f  *V; ///< !! velocity
+    smVec3f  *exF; ///< external force
     smInt nbrSpr; ///< !! number of spheres
     smFloat *L0; ///< !! Initial length
     smBool *fixedMass; ///< true if masses are fixed
     smInt nbrFixedMass; ///< number of fixed masses
     smInt *listFixedMass; ///< list of IDs of masses that are fixed
 
-    smVec3<smFloat> ball_pos; ///< !! position of ball
-    smVec3<smFloat> ball_vel; ///< !! velocity of ball
-    smVec3<smFloat> ball_frc; ///< !!
+    smVec3f ball_pos; ///< !! position of ball
+    smVec3f ball_vel; ///< !! velocity of ball
+    smVec3f ball_frc; ///< !!
 
     smFloat ball_mass; ///< !! mass of ball
     smFloat ball_rad; ///< !! radius of ball
@@ -137,9 +137,9 @@ public:
         //surface mesh
         nbrMass = mesh->nbrVertices;
 
-        P = new smVec3<smFloat>[nbrMass];
-        V = new smVec3<smFloat>[nbrMass];
-        exF = new smVec3<smFloat>[nbrMass];
+        P = new smVec3f[nbrMass];
+        V = new smVec3f[nbrMass];
+        exF = new smVec3f[nbrMass];
         fixedMass = new bool[nbrMass];
 
         for (i = 0; i < nbrMass; i++)
@@ -157,7 +157,7 @@ public:
 
         for (i = 0; i < nbrSpr; i++)
         {
-            L0[i] = (mesh->vertices[mesh->edges[i].vert[0]] - mesh->vertices[mesh->edges[i].vert[1]]). module();
+            L0[i] = (mesh->vertices[mesh->edges[i].vert[0]] - mesh->vertices[mesh->edges[i].vert[1]]).norm();
         }
 
         mesh->allocateAABBTris();
@@ -201,11 +201,11 @@ public:
 
         nbrFixedMass = 2;
         listFixedMass = new smInt[nbrFixedMass];
-        smVec3<smFloat> corner[2];
+        smVec3f corner[2];
         smInt i, j;
         smFloat minmin, dist;
-        corner[0].setValue(mesh->aabb.aabbMax.x, mesh->aabb.aabbMax.y, mesh->aabb.aabbMax.z);
-        corner[1].setValue(mesh->aabb.aabbMin.x, mesh->aabb.aabbMax.y, mesh->aabb.aabbMax.z);
+        corner[0] = mesh->aabb.aabbMax;
+        corner[1] = mesh->aabb.aabbMin;
         listFixedMass[0] = -1;
         listFixedMass[1] = -1;
 
@@ -215,7 +215,7 @@ public:
 
             for (j = 0; j < mesh->nbrVertices; j++)
             {
-                dist = (corner[i] - mesh->vertices[j]).module();
+                dist = (corner[i] - mesh->vertices[j]).norm();
 
                 if (dist < minmin)
                 {

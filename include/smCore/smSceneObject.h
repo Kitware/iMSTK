@@ -24,6 +24,11 @@
 #ifndef SMSCENEOBJECT_H
 #define SMSCENEOBJECT_H
 
+// STD includes
+#include <vector>
+
+// SimMedTK includes
+#include "smUtilities/smVector.h"
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"

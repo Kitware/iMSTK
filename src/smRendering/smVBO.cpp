@@ -23,7 +23,7 @@
 
 #include "smRendering/smVBO.h"
 
-smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p_normals,
+smVBOResult smVBO::updateVertices(smVec3f *p_vectors, smVec3f *p_normals,
                                   smTexCoord *p_textureCoords, smInt p_objectId)
 {
 
@@ -49,10 +49,10 @@ smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p
     }
 
     //copy the buffers for vertices, normals and texture respectively
-    memcpy(objectBufferPtr, p_vectors, nbrVertices * sizeof(smVec3<smFloat>));
-    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3<smFloat>));
-    memcpy(objectBufferPtr, p_normals, nbrVertices * sizeof(smVec3<smFloat>));
-    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3<smFloat>));
+    memcpy(objectBufferPtr, p_vectors, nbrVertices * sizeof(smVec3f));
+    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3f));
+    memcpy(objectBufferPtr, p_normals, nbrVertices * sizeof(smVec3f));
+    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3f));
 
     if (p_textureCoords != NULL)
     {
@@ -107,7 +107,7 @@ smVBOResult smVBO::drawElements(smInt p_objectId)
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
     glVertexPointer(3, smGLRealType, 0, (void*)dataOffset);
-    glNormalPointer(smGLRealType, 0, (void*)(dataOffset + nbrVertices * sizeof(smVec3<smFloat>)));
+    glNormalPointer(smGLRealType, 0, (void*)(dataOffset + nbrVertices * sizeof(smVec3f)));
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
     glIndexPointer(smGLUIntType, 0, (void*)indexOffset);
 
@@ -134,8 +134,8 @@ smVBOResult smVBO::drawElements(smInt p_objectId)
 
 ///Static Binding of the buffers. It is mandatory to call this function
 /// this function must be called when the binding is SIMMEDTK_VBO_STATIC
-smVBOResult smVBO::initStaticVertices(smVec3<smFloat> *p_vectors,
-                                      smVec3<smFloat> *p_normals,
+smVBOResult smVBO::initStaticVertices(smVec3f *p_vectors,
+                                      smVec3f *p_normals,
                                       smTexCoord *p_textureCoords,
                                       smInt p_objectId)
 {
@@ -153,14 +153,14 @@ smVBOResult smVBO::initStaticVertices(smVec3<smFloat> *p_vectors,
     dataOffset = dataOffsetMap[p_objectId];
     nbrVertices = numberofVertices[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3<smFloat>), p_vectors);
-    dataOffset += nbrVertices * sizeof(smVec3<smFloat>);
-    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3<smFloat>), p_normals);
-    dataOffset += nbrVertices * sizeof(smVec3<smFloat>);
+    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_vectors);
+    dataOffset += nbrVertices * sizeof(smVec3f);
+    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_normals);
+    dataOffset += nbrVertices * sizeof(smVec3f);
 
     if (p_textureCoords != NULL)
     {
-        glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3<smFloat>), p_textureCoords);
+        glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_textureCoords);
     }
 
     //unmap the buffer

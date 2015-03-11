@@ -33,7 +33,7 @@
 class smFemSimulator: public smObjectSimulator, public smEventHandler
 {
 private:
-    smVec3<smFloat> hapticPosition;
+    smVec3f hapticPosition;
     smBool hapticButtonPressed;
     smEventDispatcher *eventDispatcher;
 
@@ -64,7 +64,7 @@ protected:
         smClassType type;
         smSceneObject *object;
         smFemSceneObject *femObject;
-        smVec3<smFloat> *newVertices;
+        smVec3f *newVertices;
 
         //do nothing for now
         for (smInt i = 0; i < objectsSimulated.size(); i++)
@@ -90,7 +90,7 @@ protected:
 
         smSceneObject *sceneObj;
         smFemSceneObject *femSceneObject;
-        smVec3<smFloat> *vertices;
+        smVec3f *vertices;
         smVolumeMesh *mesh;
         static smInt pickedIndex = -1;
         static smBool nodePicked = false;

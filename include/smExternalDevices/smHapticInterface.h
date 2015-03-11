@@ -74,7 +74,7 @@ public:
     }
 
     /// \brief get the position of the end effector the haptic device
-    virtual int  getPosition(smVec3<smDouble> & d_pos)
+    virtual int  getPosition(smVec3d & d_pos)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }
@@ -92,7 +92,7 @@ public:
     }
 
     /// \brief set force to the haptic device
-    virtual int setForce(smVec3<smDouble> & force)
+    virtual int setForce(smVec3d & force)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }

@@ -96,7 +96,7 @@ void RenderCube::setupLights()
     smLight* light = new smLight("SceneLight1",
                                  SIMMEDTK_LIGHT_SPOTLIGHT,
                                  SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.pos.setValue(10.0, 10.0, 10.0);
+    light->lightPos.pos << 10.0, 10.0, 10.0;
     light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
     light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
@@ -128,7 +128,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     {
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
     {
-        smKeyboardEventData* kbData = 
+        smKeyboardEventData* kbData =
             (smKeyboardEventData*)p_event->data;
         smKey key = kbData->keyBoardKey;
         if (key == smKey::Escape && kbData->pressed)
@@ -191,7 +191,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     }
     case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
     {
-        smMouseButtonEventData* mbData = 
+        smMouseButtonEventData* mbData =
             (smMouseButtonEventData*)p_event->data;
         std::cout << "mbData: button: ";
         if (mbData->mouseButton == smMouseButton::Left)
@@ -214,7 +214,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     }
     case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
     {
-        smMouseMoveEventData* mpData = 
+        smMouseMoveEventData* mpData =
             (smMouseMoveEventData*)p_event->data;
         std::cout << "mpData: x: " << mpData->windowX
             << " y: " << mpData->windowY << "\n";

@@ -197,38 +197,38 @@ void smFemSceneObject::lumpMasses()
 
     for (i = 0; i < v_mesh->nbrTetra; i++)
     {
-        node0(0) = v_mesh->nodes[0].x;
-        node0(1) = v_mesh->nodes[0].y;
-        node0(2) = v_mesh->nodes[0].z;
-        node1(0) = v_mesh->nodes[1].x;
-        node1(1) = v_mesh->nodes[1].y;
-        node1(2) = v_mesh->nodes[1].z;
-        node2(0) = v_mesh->nodes[2].x;
-        node2(1) = v_mesh->nodes[2].y;
-        node2(2) = v_mesh->nodes[2].z;
-        node3(0) = v_mesh->nodes[3].x;
-        node3(1) = v_mesh->nodes[3].y;
-        node3(2) = v_mesh->nodes[3].z;
+        node0(0) = v_mesh->nodes[0][0];
+        node0(1) = v_mesh->nodes[0][1];
+        node0(2) = v_mesh->nodes[0][2];
+        node1(0) = v_mesh->nodes[1][0];
+        node1(1) = v_mesh->nodes[1][1];
+        node1(2) = v_mesh->nodes[1][2];
+        node2(0) = v_mesh->nodes[2][0];
+        node2(1) = v_mesh->nodes[2][1];
+        node2(2) = v_mesh->nodes[2][2];
+        node3(0) = v_mesh->nodes[3][0];
+        node3(1) = v_mesh->nodes[3][1];
+        node3(2) = v_mesh->nodes[3][2];
 
-        centroid(0) = 0.25 * (v_mesh->nodes[0].x + v_mesh->nodes[1].x + v_mesh->nodes[2].x + v_mesh->nodes[3].x);
-        centroid(1) = 0.25 * (v_mesh->nodes[0].y + v_mesh->nodes[1].y + v_mesh->nodes[2].y + v_mesh->nodes[3].y);
-        centroid(2) = 0.25 * (v_mesh->nodes[0].z + v_mesh->nodes[1].z + v_mesh->nodes[2].z + v_mesh->nodes[3].z);
+        centroid(0) = 0.25 * (v_mesh->nodes[0][0] + v_mesh->nodes[1][0] + v_mesh->nodes[2][0] + v_mesh->nodes[3][0]);
+        centroid(1) = 0.25 * (v_mesh->nodes[0][1] + v_mesh->nodes[1][1] + v_mesh->nodes[2][1] + v_mesh->nodes[3][1]);
+        centroid(2) = 0.25 * (v_mesh->nodes[0][2] + v_mesh->nodes[1][2] + v_mesh->nodes[2][2] + v_mesh->nodes[3][2]);
 
-        face012(0) = (1.0 / 3) * (v_mesh->nodes[0].x + v_mesh->nodes[1].x + v_mesh->nodes[2].x);
-        face012(1) = (1.0 / 3) * (v_mesh->nodes[0].y + v_mesh->nodes[1].y + v_mesh->nodes[2].y);
-        face012(2) = (1.0 / 3) * (v_mesh->nodes[0].z + v_mesh->nodes[1].z + v_mesh->nodes[2].z);
+        face012(0) = (1.0 / 3) * (v_mesh->nodes[0][0] + v_mesh->nodes[1][0] + v_mesh->nodes[2][0]);
+        face012(1) = (1.0 / 3) * (v_mesh->nodes[0][1] + v_mesh->nodes[1][1] + v_mesh->nodes[2][1]);
+        face012(2) = (1.0 / 3) * (v_mesh->nodes[0][2] + v_mesh->nodes[1][2] + v_mesh->nodes[2][2]);
 
-        face023(0) = (1.0 / 3) * (v_mesh->nodes[0].x + v_mesh->nodes[2].x + v_mesh->nodes[3].x);
-        face023(1) = (1.0 / 3) * (v_mesh->nodes[0].y + v_mesh->nodes[2].y + v_mesh->nodes[3].y);
-        face023(2) = (1.0 / 3) * (v_mesh->nodes[0].z + v_mesh->nodes[2].z + v_mesh->nodes[3].z);
+        face023(0) = (1.0 / 3) * (v_mesh->nodes[0][0] + v_mesh->nodes[2][0] + v_mesh->nodes[3][0]);
+        face023(1) = (1.0 / 3) * (v_mesh->nodes[0][1] + v_mesh->nodes[2][1] + v_mesh->nodes[3][1]);
+        face023(2) = (1.0 / 3) * (v_mesh->nodes[0][2] + v_mesh->nodes[2][2] + v_mesh->nodes[3][2]);
 
-        face013(0) = (1.0 / 3) * (v_mesh->nodes[0].x + v_mesh->nodes[1].x + v_mesh->nodes[3].x);
-        face013(1) = (1.0 / 3) * (v_mesh->nodes[0].y + v_mesh->nodes[1].y + v_mesh->nodes[3].y);
-        face013(2) = (1.0 / 3) * (v_mesh->nodes[0].z + v_mesh->nodes[1].z + v_mesh->nodes[3].z);
+        face013(0) = (1.0 / 3) * (v_mesh->nodes[0][0] + v_mesh->nodes[1][0] + v_mesh->nodes[3][0]);
+        face013(1) = (1.0 / 3) * (v_mesh->nodes[0][1] + v_mesh->nodes[1][1] + v_mesh->nodes[3][1]);
+        face013(2) = (1.0 / 3) * (v_mesh->nodes[0][2] + v_mesh->nodes[1][2] + v_mesh->nodes[3][2]);
 
-        face123(0) = (1.0 / 3) * (v_mesh->nodes[3].x + v_mesh->nodes[1].x + v_mesh->nodes[2].x);
-        face123(1) = (1.0 / 3) * (v_mesh->nodes[3].y + v_mesh->nodes[1].y + v_mesh->nodes[2].y);
-        face123(2) = (1.0 / 3) * (v_mesh->nodes[3].z + v_mesh->nodes[1].z + v_mesh->nodes[2].z);
+        face123(0) = (1.0 / 3) * (v_mesh->nodes[3][0] + v_mesh->nodes[1][0] + v_mesh->nodes[2][0]);
+        face123(1) = (1.0 / 3) * (v_mesh->nodes[3][1] + v_mesh->nodes[1][1] + v_mesh->nodes[2][1]);
+        face123(2) = (1.0 / 3) * (v_mesh->nodes[3][2] + v_mesh->nodes[1][2] + v_mesh->nodes[2][2]);
 
         nodeMass(v_mesh->tetra[i].vert[0] - 1) = nodeMass(v_mesh->tetra[i].vert[0] - 1) + tetraVolume(node0, centroid, face012, face013);
         nodeMass(v_mesh->tetra[i].vert[0] - 1) = nodeMass(v_mesh->tetra[i].vert[0] - 1) + tetraVolume(node0, centroid, face023, face013);
@@ -360,22 +360,22 @@ smFloat smFemSceneObject::V(smInt xyz, smInt xyz123, smInt tet)
 {
     if (xyz == 1)
     {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1].x;
+        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][0];
     }
 
     if (xyz == 2)
     {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1].y;
+        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][1];
     }
 
     if (xyz == 3)
     {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1].z;
+        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][2];
     }
 }
 
 ///brief: compute the displacement using reanalysis technique
-void smFemSceneObject::calculateDisplacements_QStatic(smVec3<smFloat> *vertices)
+void smFemSceneObject::calculateDisplacements_QStatic(smVec3f *vertices)
 {
     smInt i;
     smInt dofNumber = ID(pulledNode, 0);
@@ -423,15 +423,15 @@ void smFemSceneObject::calculateDisplacements_QStatic(smVec3<smFloat> *vertices)
     {
         if (!v_mesh->fixed[i])
         {
-            vertices[i].x = v_mesh->origVerts[i].x + displacements(ID(i, 0) - 1, 0);
-            vertices[i].y = v_mesh->origVerts[i].y + displacements(ID(i, 1) - 1, 0);
-            vertices[i].z = v_mesh->origVerts[i].z + displacements(ID(i, 2) - 1, 0);
+            vertices[i][0] = v_mesh->origVerts[i][0] + displacements(ID(i, 0) - 1, 0);
+            vertices[i][1] = v_mesh->origVerts[i][1] + displacements(ID(i, 1) - 1, 0);
+            vertices[i][2] = v_mesh->origVerts[i][2] + displacements(ID(i, 2) - 1, 0);
         }
     }
 }
 
 ///brief:: calculates the displacements dy explicit dynamics using Central difference scheme
-void smFemSceneObject::calculateDisplacements_Dynamic(smVec3<smFloat> *vertices)
+void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
 {
     smInt i;
     pulledNode = 62; //to test//324
@@ -465,9 +465,9 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smVec3<smFloat> *vertices)
     {
         if (!v_mesh->fixed[i])
         {
-            vertices[i].x = v_mesh->origVerts[i].x + displacements(ID(i, 0) - 1, 0);
-            vertices[i].y = v_mesh->origVerts[i].y + displacements(ID(i, 1) - 1, 0);
-            vertices[i].z = v_mesh->origVerts[i].z + displacements(ID(i, 2) - 1, 0);
+            vertices[i][0] = v_mesh->origVerts[i][0] + displacements(ID(i, 0) - 1, 0);
+            vertices[i][1] = v_mesh->origVerts[i][1] + displacements(ID(i, 1) - 1, 0);
+            vertices[i][2] = v_mesh->origVerts[i][2] + displacements(ID(i, 2) - 1, 0);
         }
     }
 }

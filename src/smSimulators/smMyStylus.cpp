@@ -21,46 +21,50 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+// Eigen includes
+#include "Eigen/Geometry"
+
+// SimMedTK includes
 #include "smSimulators/smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
+
 MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper)
 {
     angle = 0;
-    smMatrix33<smFloat> rot;
-    rot.rotAroundX(-SM_PI_HALF);
+    smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_shaft, SM_FILETYPE_3DS);
     mesh->assignTexture("hookCautery");
-    mesh->scale(smVec3<smFloat>(0.2, 0.2, 0.2));
+    mesh->scale(smVec3f(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     smSurfaceMesh *lowerMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     lowerMesh->loadMesh(p_lower, SM_FILETYPE_3DS);
     lowerMesh->assignTexture("metal");
-    lowerMesh->scale(smVec3<smFloat>(0.2, 0.2, 0.2));
+    lowerMesh->scale(smVec3f(0.2, 0.2, 0.2));
     lowerMesh->rotate(rot);
 
     smSurfaceMesh *upperMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     upperMesh->loadMesh(p_upper, SM_FILETYPE_3DS);
     upperMesh->assignTexture("metal");
-    upperMesh->scale(smVec3<smFloat>(0.2, 0.2, 0.2));
+    upperMesh->scale(smVec3f(0.2, 0.2, 0.2));
     upperMesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
     meshContainer.mesh = mesh;
-    meshContainer.posOffsetPos.z = 2;
+    meshContainer.posOffsetPos[2] = 2;
 
     meshContainerLower.name = "HookCauteryLower";
     meshContainerLower.mesh = lowerMesh;
-    meshContainerLower.preOffsetPos.z = 0.0;
-    meshContainerLower.posOffsetPos.z = -3.5;
+    meshContainerLower.preOffsetPos[2] = 0.0;
+    meshContainerLower.posOffsetPos[2] = -3.5;
 
     meshContainerUpper.name = "HookCauteryUpper";
     meshContainerUpper.mesh = upperMesh;
-    meshContainerUpper.preOffsetPos.z = 0.0;
-    meshContainerUpper.posOffsetPos.z = -3.5;
+    meshContainerUpper.preOffsetPos[2] = 0.0;
+    meshContainerUpper.posOffsetPos[2] = -3.5;
 
     addMeshContainer(&meshContainer);
     addMeshContainer(meshContainer.name, &meshContainerLower);
@@ -169,18 +173,17 @@ void MyStylus::handleEvent(smEvent *p_event)
 
 HookCautery::HookCautery(smChar *p_pivot)
 {
-    smMatrix33<smFloat> rot;
-    rot.rotAroundX(-SM_PI_HALF);
+    smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_pivot, SM_FILETYPE_3DS);
     mesh->assignTexture("metal");
-    mesh->scale(smVec3<smFloat>(0.2, 0.2, 0.2));
+    mesh->scale(smVec3f(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
     meshContainer.mesh = mesh;
-    meshContainer.posOffsetPos.z = 2;
+    meshContainer.posOffsetPos[2] = 2;
 
     addMeshContainer(&meshContainer);
 }

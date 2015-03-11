@@ -24,10 +24,11 @@
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
 
+// SimMedTK includes
+#include "smCore/smCoreClass.h"
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix33.h"
-#include "smUtilities/smMatrix44.h"
+#include "smUtilities/smVector.h"
+#include "smUtilities/smMatrix.h"
 
 /// \brief stores the information about the ground
 struct smGroundRenderInfo;
@@ -69,20 +70,14 @@ public:
         glEnd();
     }
 
-    template <typename T>
-    static inline void queryProjectionMatrix(smMatrix44<T> &p_matrix)
+    static inline void queryProjectionMatrix(smMatrix44f &p_matrix)
     {
-        T m[16];
-        glGetFloatv(GL_PROJECTION_MATRIX, m);
-        p_matrix.setMatrixFromOpenGL(m);
+        glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
     }
     /// \brief to query current model view matrix. p_matrix will have the final values.
-    template <typename T>
-    static inline void queryModelViewMatrix(smMatrix44<T> &p_matrix)
+    static inline void queryModelViewMatrix(smMatrix44f &p_matrix)
     {
-        T m[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, m);
-        p_matrix.setMatrixFromOpenGL(m);
+        glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
     }
 };
 

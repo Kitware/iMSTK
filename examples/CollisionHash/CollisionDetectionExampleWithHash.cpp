@@ -82,7 +82,7 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash()
     ///initialize the scecond object
     object2 = new smStaticSceneObject();
     object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    object2->mesh->translate(smVec3<smFloat>(2, 0, 0));
+    object2->mesh->translate(smVec3f(2, 0, 0));
 
     object2->mesh->assignTexture("livertexture2");
     object2->renderDetail.shadowColor.rgba[0] = 1.0;

@@ -1,7 +1,7 @@
 set(Module Collision)
 
-add_executable(${Module}UnitTestRunner 
-  ${BANDIT_RUNNER} 
+add_executable(${Module}UnitTestRunner
+  ${BANDIT_RUNNER}
   SpatialHashSpec.cpp
   OctreeCellSpec.cpp
   )

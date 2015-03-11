@@ -21,5 +21,46 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smGeometry.h"
+#ifndef SMVECTOR_H
+#define SMVECTOR_H
 
+#include <Eigen/Core>
+
+
+// namespace SimMedTK
+// {
+// namespace Math
+// {
+
+/// A 2D vector of floats.
+typedef Eigen::Matrix<float,  2, 1>  smVec2f;
+
+/// A 3D vector of floats.
+typedef Eigen::Matrix<float,  3, 1>  smVec3f;
+
+/// A 4D vector of floats.
+typedef Eigen::Matrix<float,  4, 1>  smVec4f;
+
+/// A 6D vector of floats.
+typedef Eigen::Matrix<float,  6, 1>  smVec6f;
+
+/// A 2D vector of doubles.
+typedef Eigen::Matrix<double, 2, 1>  smVec2d;
+
+/// A 3D vector of doubles.
+typedef Eigen::Matrix<double, 3, 1>  smVec3d;
+
+/// A 4D vector of doubles.
+typedef Eigen::Matrix<double, 4, 1>  smVec4d;
+
+/// A 6D matrix of doubles.
+typedef Eigen::Matrix<double, 6, 1> smVec6d;
+
+/// A dynamic size column vector
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> smVector;
+
+
+// } // Math
+// } // SimMedTK
+
+#endif // SMVECTOR_H

@@ -24,16 +24,21 @@
 #ifndef SMSTYLUSOBJECT_H
 #define SMSTYLUSOBJECT_H
 
+// STD includes
+#include <unordered_map>
+
+// Eigen includes
+#include "Eigen/Geometry"
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
-#include "smUtilities/smVec3.h"
 #include "smUtilities/smMath.h"
 #include "smExternal/tree.hh"
 
-#include <unordered_map>
 
 template<typename T> class smCollisionModel;
 template<typename smSurfaceTreeCell> class smSurfaceTree;
@@ -52,14 +57,14 @@ public:
         offsetRotX = 0.0;
         offsetRotY = 0.0;
         offsetRotZ = 0.0;
-        preOffsetPos.setValue(0, 0, 0);
-        posOffsetPos.setValue(0, 0, 0);
+        preOffsetPos = smVec3f::Zero();
+        posOffsetPos = smVec3f::Zero();
         mesh = NULL;
         colModel = NULL;
     }
 
     /// \brief constructor
-    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3<smFloat> p_prePos, smVec3<smFloat> p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ)
+    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3f p_prePos, smVec3f p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ)
     {
         offsetRotX = p_offsetRotX;
         offsetRotY = p_offsetRotY;
@@ -73,51 +78,45 @@ public:
     smFloat offsetRotX; ///< offset in rotation in x-direction
     smFloat offsetRotY; ///< offset in rotation in y-direction
     smFloat offsetRotZ; ///< offset in rotation in z-direction
-    smVec3<smDouble> preOffsetPos; ///< !!
-    smVec3<smDouble> posOffsetPos; ///< !!
-    smMatrix44<smDouble> accumulatedMatrix; ///< !!
-    smMatrix44<smDouble> accumulatedDeviceMatrix; ///< !!
+    smVec3f preOffsetPos; ///< !!
+    smVec3f posOffsetPos; ///< !!
+    smMatrix44f accumulatedMatrix; ///< !!
+    smMatrix44f accumulatedDeviceMatrix; ///< !!
 
-    smMatrix44<smDouble> currentMatrix; ///< !!
-    smMatrix44<smDouble> currentViewerMatrix; ///< !!
-    smMatrix44<smDouble> currentDeviceMatrix; ///< !!
-    smMatrix44<smDouble> tempCurrentMatrix; ///< !!
-    smMatrix44<smDouble> tempCurrentDeviceMatrix; ///< !!
+    smMatrix44f currentMatrix; ///< !!
+    smMatrix44f currentViewerMatrix; ///< !!
+    smMatrix44f currentDeviceMatrix; ///< !!
+    smMatrix44f tempCurrentMatrix; ///< !!
+    smMatrix44f tempCurrentDeviceMatrix; ///< !!
     smMesh * mesh; ///< mesh
     smSurfaceTree<smOctreeCell> *colModel; ///< octree of surface
 
     /// \brief !!
     inline void computeCurrentMatrix()
     {
-        smMatrix33<smDouble> matX, matY, matZ;
-        smMatrix33<smDouble> res;
-        smMatrix44<smDouble> trans, trans1;
-        smMatrix44<smDouble> temp;
+        Eigen::Affine3f preTranslate(Eigen::Translation3f(preOffsetPos[0],preOffsetPos[1], preOffsetPos[2]));
+        Eigen::Affine3f posTranslate(Eigen::Translation3f(posOffsetPos[0], posOffsetPos[1], posOffsetPos[2]));
+        Eigen::Affine3f rx(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotX, smVec3f::UnitX())));
+        Eigen::Affine3f ry(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotY, smVec3f::UnitY())));
+        Eigen::Affine3f rz(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotZ, smVec3f::UnitZ())));
 
-        trans.setTranslation(preOffsetPos.x, preOffsetPos.y, preOffsetPos.z);
-        matX.rotAroundX(SM_PI_TWO * offsetRotX);
-        matY.rotAroundY(SM_PI_TWO * offsetRotY);
-        matZ.rotAroundZ(SM_PI_TWO * offsetRotZ);
-        trans1.setTranslation(posOffsetPos.x, posOffsetPos.y, posOffsetPos.z);
-
-        res = matX * matY * matZ;
-        tempCurrentMatrix = accumulatedMatrix * trans * res * trans1;
-        tempCurrentDeviceMatrix = accumulatedDeviceMatrix * trans * res * trans1;
+        smMatrix44f transform = (preTranslate * rx * ry *rz * posTranslate).matrix();
+        tempCurrentMatrix *= transform;
+        tempCurrentDeviceMatrix *= transform;
     }
 };
 
 /// \brief points on the stylus
 struct smStylusPoints
 {
-
     /// \brief constructor
     smStylusPoints()
     {
-        point.setValue(0, 0, 0);
+        point = smVec3f::Zero();
         container = NULL;
     }
 
-    smVec3 <smFloat> point; ///< co-ordinates of points on stylus
+    smVec3f point; ///< co-ordinates of points on stylus
     smMeshContainer *container; ///< !!
 };
 
@@ -126,11 +125,11 @@ class smStylusSceneObject: public smSceneObject
 {
 
 public:
-    smVec3 <smDouble> pos; ///< position of stylus
-    smVec3 <smDouble> vel; ///< velocity of stylus
-    smMatrix33 <smDouble> rot; ///< rotation of stylus
-    smMatrix44 <smDouble> transRot; ///< !! translation and rotation matrix of stylus
-    smMatrix44 <smDouble> transRotDevice; ///< translation and rotation matrix of devide controlling the stylus
+    smVec3f pos; ///< position of stylus
+    smVec3f vel; ///< velocity of stylus
+    smMatrix33d rot; ///< rotation of stylus
+    smMatrix44f transRot; ///< !! translation and rotation matrix of stylus
+    smMatrix44f transRotDevice; ///< translation and rotation matrix of devide controlling the stylus
     smBool toolEnabled; ///< !!
 
     /// \brief constructor

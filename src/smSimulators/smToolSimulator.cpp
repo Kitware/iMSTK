@@ -25,8 +25,8 @@
 
 void smToolSimulator::updateTool(smStylusRigidSceneObject *p_tool)
 {
-    smMatrix44<smDouble> tempMat, tempMatDevice;
-    smMatrix44<smDouble> mat;
+    smMatrix44f tempMat, tempMatDevice;
+    smMatrix44f mat;
     tree<smMeshContainer*>::pre_order_iterator iter = p_tool->meshes.begin();
     //update the Root node first
     iter.node->data->computeCurrentMatrix();

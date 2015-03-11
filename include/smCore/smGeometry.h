@@ -20,18 +20,17 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMGEOMETRY_H
 #define SMGEOMETRY_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
-
-/// \brief a small number used for accuracy in collision computation
-#define SMALL_NUM 0.00000001
+#include "smUtilities/smVector.h"
 
 //forward declaration
 struct smSphere;
+
 /// \brief  Simple Plane definition with unit normal and spatial location
 struct smPlane
 {
@@ -42,205 +41,140 @@ struct smPlane
 };
 
 /// \brief Axis Aligned bounding box declarions
-struct smAABB
+class smAABB
 {
+public:
     /// \brief minimum x,y,z point
-    smVec3<float> aabbMin;
+    smVec3f aabbMin;
+
     /// \brief maximum x,y,z point
-    smVec3<float> aabbMax;
+    smVec3f aabbMax;
 
     /// \brief constrcutor. The default is set to origin for aabbMin and aabbMax
     inline smAABB()
     {
-        aabbMin.setValue(0, 0, 0);
-        aabbMax.setValue(0, 0, 0);
-
+        this->aabbMin << 0, 0, 0;
+        this->aabbMax << 0, 0, 0;
     }
     /// \brief center of the AABB
-    inline smVec3f center()
+    inline smVec3f center() const
     {
-        return smVec3f((aabbMin.x + aabbMax.x) / 2.0,
-                       (aabbMin.y + aabbMax.y) / 2.0,
-                       (aabbMin.z + aabbMax.z) / 2.0);
+        smVec3f output;
+        output << 0.5f*(this->aabbMin[0] + this->aabbMax[0]),
+                  0.5f*(this->aabbMin[1] + this->aabbMax[1]),
+                  0.5f*(this->aabbMin[2] + this->aabbMax[2]);
+        return output;
     }
 
     /// \brief check if two AABB overlaps
-    static inline smBool checkOverlap(smAABB &p_aabbA,  smAABB &p_aabbB)
+    static inline smBool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB)
     {
 
-        if (p_aabbA.aabbMin.x > p_aabbB.aabbMax.x ||
-                p_aabbA.aabbMax.x < p_aabbB.aabbMin.x ||
-                p_aabbA.aabbMin.y > p_aabbB.aabbMax.y ||
-                p_aabbA.aabbMax.y < p_aabbB.aabbMin.y ||
-                p_aabbA.aabbMin.z > p_aabbB.aabbMax.z ||
-                p_aabbA.aabbMax.z < p_aabbB.aabbMin.z)
+        if (p_aabbA.aabbMin[0] > p_aabbB.aabbMax[0] ||
+            p_aabbA.aabbMax[0] < p_aabbB.aabbMin[0] ||
+            p_aabbA.aabbMin[1] > p_aabbB.aabbMax[1] ||
+            p_aabbA.aabbMax[1] < p_aabbB.aabbMin[1] ||
+            p_aabbA.aabbMin[2] > p_aabbB.aabbMax[2] ||
+            p_aabbA.aabbMax[2] < p_aabbB.aabbMin[2])
         {
             return false;
         }
-        else
-        {
-            return true;
-        }
+        return true;
     }
 
     /// \brief set  p_aabb to the current one
-    inline smAABB &operator=(smAABB &p_aabb)
+    inline smAABB &operator=(const smAABB &p_aabb)
     {
-        aabbMax = p_aabb.aabbMax;
-        aabbMin = p_aabb.aabbMin;
+        this->aabbMax = p_aabb.aabbMax;
+        this->aabbMin = p_aabb.aabbMin;
         return *this;
     }
 
     /// \brief scale the AABB
-    inline smAABB &operator*(smFloat p_scale)
+    inline smAABB &operator*(const smFloat p_scale)
     {
-        aabbMin = aabbMin * p_scale;
-        aabbMax = aabbMax * p_scale;
+        this->aabbMin *= p_scale;
+        this->aabbMax *= p_scale;
         return *this;
     }
+
     /// \brief sub divides p_length will be used to create the slices
-    void subDivide(smFloat  p_length , smInt p_divison, smAABB *p_aabb);
+    void subDivide(const smFloat p_length, const smInt p_divison, smAABB *p_aabb) const
+    {
+        smInt index = 0;
+
+        for (smInt ix = 0; ix < p_divison; ix++)
+            for (smInt iy = 0; iy < p_divison; iy++)
+                for (smInt iz = 0; iz < p_divison; iz++)
+                {
+                    p_aabb[index].aabbMin[0] = this->aabbMin[0] + p_length * ix;
+                    p_aabb[index].aabbMin[1] = this->aabbMin[1] + p_length * iy;
+                    p_aabb[index].aabbMin[2] = this->aabbMin[2] + p_length * iz;
+
+                    p_aabb[index].aabbMax[0] = p_aabb[index].aabbMin[0] + p_length;
+                    p_aabb[index].aabbMax[1] = p_aabb[index].aabbMin[1] + p_length;
+                    p_aabb[index].aabbMax[2] = p_aabb[index].aabbMin[2] + p_length;
+                    index++;
+                }
+    }
+
     /// \brief divides current AABB in x,y,z axes with specificed divisions. results are placed in p_aabb
-    void subDivide(smInt p_divisionX, smInt p_divisionY, smInt p_divisionZ , smAABB *p_aabb);
+    void subDivide(const smInt p_divisionX, const smInt p_divisionY, const smInt p_divisionZ, smAABB *p_aabb) const
+    {
+        smFloat stepX;
+        smFloat stepY;
+        smFloat stepZ;
+
+        stepX = (this->aabbMax[0] - this->aabbMin[0]) / p_divisionX;
+        stepY = (this->aabbMax[1] - this->aabbMin[1]) / p_divisionY;
+        stepZ = (this->aabbMax[2] - this->aabbMin[2]) / p_divisionZ;
+        smInt index = 0;
+
+        for (smInt ix = 0; ix < p_divisionX; ix++)
+            for (smInt iy = 0; iy < p_divisionY; iy++)
+                for (smInt iz = 0; iz < p_divisionZ; iz++)
+                {
+
+                    p_aabb[index].aabbMin[0] = this->aabbMin[0] + stepX * ix;
+                    p_aabb[index].aabbMin[1] = this->aabbMin[1] + stepY * iy;
+                    p_aabb[index].aabbMin[2] = this->aabbMin[2] + stepZ * iz;
+
+                    p_aabb[index].aabbMax[0] = p_aabb[index].aabbMin[0] + stepX;
+                    p_aabb[index].aabbMax[1] = p_aabb[index].aabbMin[1] + stepY;
+                    p_aabb[index].aabbMax[2] = p_aabb[index].aabbMin[2] + stepZ;
+                    index++;
+                }
+    }
+
     /// \brief divides current AABB in all axes with specificed p_division. results are placed in p_aabb
-    inline void subDivide(smInt p_division, smAABB *p_aabb)
+    inline void subDivide(const smInt p_division, smAABB *p_aabb) const
     {
         subDivide(p_division, p_division, p_division, p_aabb);
     }
+
     /// \brief returns half of X edge of AABB
-    inline smFloat halfSizeX()
+    inline smFloat halfSizeX() const
     {
-        return (aabbMax.x - aabbMin.x) / 2.0;
+        return .5*(aabbMax[0] - aabbMin[0]);
     }
+
     /// \brief returns half of Y edge of AABB
-    inline smFloat halfSizeY()
+    inline smFloat halfSizeY() const
     {
-        return (aabbMax.y - aabbMin.y) / 2.0;
+        return .5*(aabbMax[1] - aabbMin[1]);
     }
+
     /// \brief returns half of Z edge of AABB
-    inline smFloat halfSizeZ()
+    inline smFloat halfSizeZ() const
     {
-        return (aabbMax.z - aabbMin.z) / 2.0;
+        return .5*(aabbMax[2] - aabbMin[2]);
     }
+
     /// \brief expands aabb with p_factor
-    inline void expand(smFloat p_factor)
+    inline void expand(const smFloat &p_factor)
     {
-        aabbMin = aabbMin - (aabbMax - aabbMin) * p_factor / 2.0;
-        aabbMax = aabbMax + (aabbMax - aabbMin) * p_factor / 2.0;
-    }
-};
-
-/// \brief Collision utililites
-class smCollisionUtils
-{
-public:
-    /// \brief triangle and triangle collision retursn intersection and projection points
-    static smBool tri2tri(smVec3<smFloat> &p_tri1Point1,
-                          smVec3<smFloat> &p_tri1Point2,
-                          smVec3<smFloat> &p_tri1Point3,
-                          smVec3<smFloat> &p_tri2Point1,
-                          smVec3<smFloat> &p_tri2Point2,
-                          smVec3<smFloat> &p_tri2Point3,
-                          smInt &coplanar,
-                          smVec3<smFloat> &p_intersectionPoint1,
-                          smVec3<smFloat> &p_intersectionPoint2,
-                          smShort &p_tri1SinglePointIndex,
-                          smShort &p_tri2SinglePointIndex,
-                          smVec3<smFloat> &p_projPoint1,
-                          smVec3<smFloat> &p_projPoint2);
-
-    /// \brief checks if the two triangles intersect
-    static smBool tri2tri(smVec3<smFloat> &p_tri1Point1,
-                          smVec3<smFloat> &p_tri1Point2,
-                          smVec3<smFloat> &p_tri1Point3,
-                          smVec3<smFloat> &p_tri2Point1,
-                          smVec3<smFloat> &p_tri2Point2,
-                          smVec3<smFloat> &p_tri2Point3);
-
-    /// \brief check if the two AABB overlap returns encapsulating AABB of two
-    static inline bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB, smAABB &result)
-    {
-
-        if (aabbA.aabbMin.x > aabbB.aabbMax.x ||
-                aabbA.aabbMax.x < aabbB.aabbMin.x ||
-                aabbA.aabbMin.y > aabbB.aabbMax.y ||
-                aabbA.aabbMax.y < aabbB.aabbMin.y ||
-                aabbA.aabbMin.z > aabbB.aabbMax.z ||
-                aabbA.aabbMax.z < aabbB.aabbMin.z)
-        {
-            return false;
-        }
-        else
-        {
-            result.aabbMin.x = SIMMEDTK_MAX(aabbA.aabbMin.x, aabbB.aabbMin.x);
-            result.aabbMin.y = SIMMEDTK_MAX(aabbA.aabbMin.y, aabbB.aabbMin.y);
-            result.aabbMin.z = SIMMEDTK_MAX(aabbA.aabbMin.z, aabbB.aabbMin.z);
-
-            result.aabbMax.x = SIMMEDTK_MIN(aabbA.aabbMax.x, aabbB.aabbMax.x);
-            result.aabbMax.y = SIMMEDTK_MIN(aabbA.aabbMax.y, aabbB.aabbMax.y);
-            result.aabbMax.z = SIMMEDTK_MIN(aabbA.aabbMax.z, aabbB.aabbMax.z);
-            return true;
-        }
-    }
-    /// \brief check the AABBs overlap. returns true if they intersect
-    static inline bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB)
-    {
-
-        if (aabbA.aabbMin.x > aabbB.aabbMax.x ||
-                aabbA.aabbMax.x < aabbB.aabbMin.x ||
-                aabbA.aabbMin.y > aabbB.aabbMax.y ||
-                aabbA.aabbMax.y < aabbB.aabbMin.y ||
-                aabbA.aabbMin.z > aabbB.aabbMax.z ||
-                aabbA.aabbMax.z < aabbB.aabbMin.z)
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
-    }
-    /// \brief check if the point p_vertex is inside the AABB
-    static inline bool checkOverlapAABBAABB(smAABB &aabbA, smVec3<smFloat> &p_vertex)
-    {
-
-        if (aabbA.aabbMin.x <= p_vertex.x && aabbA.aabbMax.x >= p_vertex.x &&
-                aabbA.aabbMin.y <= p_vertex.y &&    aabbA.aabbMax.y >= p_vertex.y &&
-                aabbA.aabbMin.z <= p_vertex.z &&    aabbA.aabbMax.z >= p_vertex.z)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-    /// \brief  checks if the line intersects the tirangle. returns if it is true. the intersection is returned in  p_interSection
-    static smBool checkLineTri(smVec3<smFloat> &p_linePoint1,
-                               smVec3<smFloat> &p_linePoint2,
-                               smVec3<smFloat> &p_tri1Point1,
-                               smVec3<smFloat> &p_tri1Point2,
-                               smVec3<smFloat> &p_tri1Point3,
-                               smVec3<smFloat> &p_interSection);
-
-    /// \brief checks if the triangles points are within the AABB
-    static smBool checkAABBTriangle(smAABB &p_aabb, smVec3f v1, smVec3f v2, smVec3f v3);
-
-    static inline smBool checkAABBPoint(smAABB &p_aabb, smVec3f p_v)
-    {
-        if (p_v.x >= p_aabb.aabbMin.x &&
-                p_v.y >= p_aabb.aabbMin.y &&
-                p_v.z >= p_aabb.aabbMin.z  &&
-                p_v.x <=  p_aabb.aabbMax.x  &&
-                p_v.y <= p_aabb.aabbMax.y &&
-                p_v.z <= p_aabb.aabbMax.z)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        this->aabbMin -= .5*(this->aabbMax - this->aabbMin)*p_factor;
+        this->aabbMax += .5*(this->aabbMax - this->aabbMin)*p_factor;
     }
 };
 
@@ -256,7 +190,7 @@ public:
     /// \brief constructor
     inline smSphere()
     {
-        center.setValue(0, 0, 0);
+        center << 0, 0, 0;
         radius = 1.0;
     }
     /// \brief sphere constructor with center and radius
@@ -278,7 +212,7 @@ struct smCube
     /// \brief constructor
     inline smCube()
     {
-        center.setValue(0, 0, 0);
+        center << 0, 0, 0;
         sideLength = 1.0;
     }
     /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
@@ -287,15 +221,17 @@ struct smCube
         smVec3f minPoint;
         smFloat divLength = (sideLength / p_divisionPerAxis);
         smInt index = 0;
-        minPoint.setValue(center.x - sideLength * 0.5, center.y - sideLength * 0.5, center.z - sideLength * 0.5);
+        minPoint << center[0] - sideLength * 0.5,
+                    center[1] - sideLength * 0.5,
+                    center[2] - sideLength * 0.5;
 
         for (smInt ix = 0; ix < p_divisionPerAxis; ix++)
             for (smInt iy = 0; iy < p_divisionPerAxis; iy++)
                 for (smInt iz = 0; iz < p_divisionPerAxis; iz++)
                 {
-                    p_cube[index].center.x = minPoint.x + divLength * ix + divLength * 0.5;
-                    p_cube[index].center.y = minPoint.y + divLength * iy + divLength * 0.5;
-                    p_cube[index].center.z = minPoint.z + divLength * iz + divLength * 0.5;
+                    p_cube[index].center[0] = minPoint[0] + divLength * ix + divLength * 0.5;
+                    p_cube[index].center[1] = minPoint[1] + divLength * iy + divLength * 0.5;
+                    p_cube[index].center[2] = minPoint[2] + divLength * iz + divLength * 0.5;
                     p_cube[index].sideLength = divLength;
 
 
@@ -310,16 +246,16 @@ struct smCube
     /// \brief returns the left most corner
     inline smVec3f leftMinCorner()
     {
-        return smVec3f(center.x - sideLength * 0.5,
-                       center.y - sideLength * 0.5,
-                       center.z - sideLength * 0.5);
+        return smVec3f(center[0] - sideLength * 0.5,
+                       center[1] - sideLength * 0.5,
+                       center[2] - sideLength * 0.5);
     }
     /// \brief returns right most corner
     inline smVec3f rightMaxCorner()
     {
-        return smVec3f(center.x + sideLength * 0.5,
-                       center.y + sideLength * 0.5,
-                       center.z + sideLength * 0.5);
+        return smVec3f(center[0] + sideLength * 0.5,
+                       center[1] + sideLength * 0.5,
+                       center[2] + sideLength * 0.5);
     }
     /// \brief returns the smallest sphere encapsulates the cube
     inline smSphere getCircumscribedSphere()
@@ -337,10 +273,5 @@ struct smCube
         return smSphere(center, sideLength * 0.707106);
     }
 };
-/// \brief computes 3d ray intersction with triangle. The inserction point is given in barycentric coordinates.
-int intersect3D_RayTriangleWithBarycentric(smVec3f P0, smVec3f P1, smVec3f V0,
-        smVec3f V1, smVec3f V2, smVec3f *I,
-        float &p_baryU, float &p_baryV,
-        float &p_baryW, bool considerFrontFaceOnly);
 
 #endif
