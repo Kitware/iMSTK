@@ -24,7 +24,7 @@
 #include "smSimulators/smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
-MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper)
+MyStylus::MyStylus(const smString& p_shaft, const smString& p_lower, const smString& p_upper)
 {
     angle = 0;
     smMatrix33<smFloat> rot;
@@ -167,7 +167,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 }
 
 
-HookCautery::HookCautery(smChar *p_pivot)
+HookCautery::HookCautery(const smString& p_pivot)
 {
     smMatrix33<smFloat> rot;
     rot.rotAroundX(-SM_PI_HALF);

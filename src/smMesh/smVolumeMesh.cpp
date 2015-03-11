@@ -34,7 +34,7 @@ smVolumeMesh::smVolumeMesh(smMeshType p_meshtype, smErrorLog *log = NULL)
 }
 
 /// \brief loads the specified volume mesh
-smBool smVolumeMesh::loadMesh(smChar *fileName, smMeshFileType fileType = SM_FILETYPE_VOLUME)
+smBool smVolumeMesh::loadMesh(const smString& fileName, smMeshFileType fileType = SM_FILETYPE_VOLUME)
 {
 
     smBool ret;
@@ -46,14 +46,14 @@ smBool smVolumeMesh::loadMesh(smChar *fileName, smMeshFileType fileType = SM_FIL
         if (ret == 0)
             if (log_VM != NULL)
             {
-                log_VM->addError(this, "Error: Mesh file NOT FOUND");
+                log_VM->addError("Error: Mesh file NOT FOUND");
             }
     }
     else
     {
         if (log_VM != NULL)
         {
-            log_VM->addError(this, "Error: Mesh file type unidentified");
+            log_VM->addError("Error: Mesh file type unidentified");
         }
 
         ret = 0;
@@ -102,7 +102,7 @@ void smVolumeMesh::rotVolumeMesh(smMatrix33<smFloat> p_rot)
 
 /// \brief loads the tetra mesh from abacus
 ///Extensions to support other formats will come soon...
-smBool smVolumeMesh::LoadTetra(const smChar *fileName)
+smBool smVolumeMesh::LoadTetra(const smString& fileName)
 {
 
     smFloat number;
@@ -111,7 +111,7 @@ smBool smVolumeMesh::LoadTetra(const smChar *fileName)
     smChar stri[19];
     smInt i;
 
-    FILE *fp = fopen(fileName, "rb");
+    FILE *fp = fopen(fileName.c_str(), "rb");
 
     if (!fp)
     {
@@ -172,7 +172,7 @@ smBool smVolumeMesh::LoadTetra(const smChar *fileName)
 }
 
 /// \brief loads the surface vertices and triangles
-smBool smVolumeMesh::getSurface(const smChar *fileName)
+smBool smVolumeMesh::getSurface(const smString& fileName)
 {
 
     smFloat number;
@@ -184,7 +184,7 @@ smBool smVolumeMesh::getSurface(const smChar *fileName)
 
     initTriangleArrays(nbrTriangles);
 
-    FILE *fp = fopen(fileName, "rb");
+    FILE *fp = fopen(fileName.c_str(), "rb");
 
     if (!fp)
     {
@@ -273,7 +273,7 @@ smBool smVolumeMesh::getSurface(const smChar *fileName)
 
 /// \brief loads the tetra mesh from abacus
 ///Extensions to support other formats will come soon...
-smBool smVolumeMesh::readBC(const smChar *fileName)
+smBool smVolumeMesh::readBC(const smString& fileName)
 {
 
     smInt node;
@@ -281,7 +281,7 @@ smBool smVolumeMesh::readBC(const smChar *fileName)
     smChar comma;
     smInt i;
 
-    FILE *fp = fopen(fileName, "rb");
+    FILE *fp = fopen(fileName.c_str(), "rb");
 
     if (!fp)
     {

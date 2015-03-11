@@ -43,7 +43,7 @@ smVBOResult smVBO::updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p
 
     if (objectBufferPtr == NULL)
     {
-        log->addError(this, "VBO could not map the buffer");
+        log->addError("VBO could not map the buffer");
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
@@ -82,7 +82,7 @@ smVBOResult smVBO::updateTriangleIndices(smInt *p_indices, smInt p_objectId)
 
     if (objectBufferPtr == NULL)
     {
-        log->addError(this, "VBO could not map the buffer");
+        log->addError("VBO could not map the buffer");
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }

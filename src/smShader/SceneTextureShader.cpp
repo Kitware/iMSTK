@@ -25,18 +25,17 @@
 #include "smCore/smSDK.h"
 
 
-SceneTextureShader::SceneTextureShader(smChar *p_verteShaderFileName, smChar *p_fragmentFileName)
+SceneTextureShader::SceneTextureShader(const smString& p_verteShaderFileName,
+                                       const smString& p_fragmentFileName)
 {
 
     this->log = smSDK::getErrorLog();
-    this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
     createParam("depthTex");
     createParam("sceneTex");
     createParam("prevTex");
-    this->checkErrorEnabled = true;
-    log->isOutputtoConsoleEnabled = true;
+    this->log->setConsoleOutput(true);
     this->registerShader();
 }
 

@@ -33,6 +33,7 @@
 #include "smCore/smSDK.h"
 
 #include <iostream>
+#include <string>
 #include <unordered_map>
 
 /// \brief I/O definitions
@@ -51,7 +52,7 @@ public:
 /// \brief  console stream; for printing text on the console
 class smConsoleStream: public smIOStream
 {
-    smChar inputBuffer[SM_CONSOLE_INPUTBUFFER];
+    smString inputBuffer;
 public:
     smConsoleStream()
     {
@@ -66,9 +67,8 @@ public:
     /// \brief to  input from use
     virtual smIOStream& operator >>(smString &p_string)
     {
-        std::cin.get(inputBuffer, SM_CONSOLE_INPUTBUFFER - 1);
-        inputBuffer[SM_CONSOLE_INPUTBUFFER - 1] = '\0';
-        p_string = smString(inputBuffer);
+        std::getline(std::cin, inputBuffer);
+        p_string = inputBuffer;
         return *this;
     }
 };
