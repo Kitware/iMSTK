@@ -28,6 +28,7 @@
 #include "smCore/smEvent.h"
 #include "smCore/smEventHandler.h"
 #include "smUtilities/smQuaternion.h"
+
 /// \brief motion transformation type
 enum smMotionTransType
 {
@@ -50,11 +51,11 @@ protected:
     /// \brief device id that will be used
     smInt deviceId;
     /// \brief default directions
-    smVec3d defaultDirection;
-    smVec3d defaultUpDirection;
+    smVec3f defaultDirection;
+    smVec3f defaultUpDirection;
     /// \brief transformaed directions
-    smVec3d transFormedDirection;
-    smVec3d transFormedUpDirection;
+    smVec3f transFormedDirection;
+    smVec3f transFormedUpDirection;
     /// \brief event dispatcher
     smEventDispatcher *dispatch;
 public:
@@ -65,7 +66,7 @@ public:
     /// \brief sets the motion scale
     void setMotionScale(smFloat p_scale);
     /// \brief compute the transformation usign the p_mat. it transforms the default directions
-    void computeTransformation(smMatrix44d &p_mat);
+    void computeTransformation(smMatrix44f &p_mat);
     /// \brief send motion transformation event
     void sendEvent();
 };
@@ -74,7 +75,7 @@ class smHapticCameraTrans: public smHapticTrans
 {
 protected:
     /// \brief  quaternion
-    smQuaterniond quat;
+    smQuaternionf quat;
 public:
     /// \brief  any offset in the transverse (X) direction
     smDouble offsetAngle_RightDirection;

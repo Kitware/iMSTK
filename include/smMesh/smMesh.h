@@ -37,7 +37,6 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
-
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
 
@@ -99,7 +98,7 @@ public:
     void assignTexture(smInt p_textureId);
 
     /// \brief assign the texture
-    void assignTexture(smChar *p_referenceName);
+    void assignTexture(const smString& p_referenceName);
 
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
@@ -213,7 +212,7 @@ public:
     };
 
     /// \brief load the mesh
-    virtual smBool loadMesh(smChar *fileName, smMeshFileType fileType) = 0;
+    virtual smBool loadMesh(const smString& fileName, smMeshFileType fileType) = 0;
 
     /// \brief render the surface mesh
     virtual void draw(smDrawParam p_params);

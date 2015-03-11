@@ -21,7 +21,7 @@
 #
 
 set(Oculus_TAG "d4327f8e773dc9ce008717d4960629aabac97f8f")
-set(Oculus_REPOSITORY ${git_protocol}://github.com/ricortiz/OculusSDK.git)
+set(Oculus_REPOSITORY git@bitbucket.org:simmedtk/oculussdk.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)

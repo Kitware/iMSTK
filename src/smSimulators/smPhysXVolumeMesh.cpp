@@ -52,7 +52,7 @@ smPhysXVolumeMesh::~smPhysXVolumeMesh()
 }
 
 ///loads the .tet and .obj file
-smBool smPhysXVolumeMesh::loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMesh)
+smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smString& p_surfaceMesh)
 {
 
     static const smInt MESH_STRING_LEN = 256;
@@ -60,7 +60,7 @@ smBool smPhysXVolumeMesh::loadTetFile(smChar *p_TetFileName, smChar *p_surfaceMe
     smInt i0, i1, i2, i3;
     smVec3f v;
 
-    FILE *f = fopen(p_TetFileName, "r");
+    FILE *f = fopen(p_TetFileName.c_str(), "r");
 
     if (!f)
     {

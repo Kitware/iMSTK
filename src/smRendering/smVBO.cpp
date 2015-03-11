@@ -43,7 +43,7 @@ smVBOResult smVBO::updateVertices(smVec3f *p_vectors, smVec3f *p_normals,
 
     if (objectBufferPtr == NULL)
     {
-        log->addError(this, "VBO could not map the buffer");
+        log->addError("VBO could not map the buffer");
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
@@ -82,7 +82,7 @@ smVBOResult smVBO::updateTriangleIndices(smInt *p_indices, smInt p_objectId)
 
     if (objectBufferPtr == NULL)
     {
-        log->addError(this, "VBO could not map the buffer");
+        log->addError("VBO could not map the buffer");
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
@@ -200,43 +200,43 @@ smVBO::smVBO( smErrorLog *p_log )
 }
 void smVBO::init( smVBOType p_vboType )
 {
-    smChar error[200];
-    glGenBuffersARB( 1, &vboDataId );
-    glGenBuffersARB( 1, &vboIndexId );
-    assert( vboDataId > 0 );
-    assert( vboIndexId > 0 );
+    smString error;
+    glGenBuffersARB(1, &vboDataId);
+    glGenBuffersARB(1, &vboIndexId);
+    assert(vboDataId > 0);
+    assert(vboIndexId > 0);
 
-    glBindBufferARB( GL_ARRAY_BUFFER_ARB, vboDataId );
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
 
-    if ( p_vboType == SIMMEDTK_VBO_STATIC )
+    if (p_vboType == SIMMEDTK_VBO_STATIC)
     {
-        glBufferDataARB( GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW );
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
     }
-    else if ( p_vboType == SIMMEDTK_VBO_DYNAMIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE )
+    else if (p_vboType == SIMMEDTK_VBO_DYNAMIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
     {
-        glBufferDataARB( GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW );
-    }
-
-    SM_CHECKERROR( log, error )
-    glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId );
-
-    if ( p_vboType == SIMMEDTK_VBO_STATIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE )
-    {
-        glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW );
-    }
-    else if ( p_vboType == SIMMEDTK_VBO_DYNAMIC )
-    {
-        glBufferDataARB( GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW );
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
     }
 
-    SM_CHECKERROR( log, error )
+    SM_CHECKERROR(log, error)
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
+
+    if (p_vboType == SIMMEDTK_VBO_STATIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
+    {
+        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
+    }
+    else if (p_vboType == SIMMEDTK_VBO_DYNAMIC)
+    {
+        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
+    }
+
+    SM_CHECKERROR(log, error);
     vboType = p_vboType;
     sizeOfDataBuffer = SIMMEDTK_VBOBUFFER_DATASIZE;
     sizeOfIndexBuffer = SIMMEDTK_VBOBUFFER_INDEXSIZE;
     currentDataOffset = 0;
     currentIndexOffset = 0;
-    glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
-    glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+    glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 }
 smVBOResult smVBO::addVerticestoBuffer( int p_nbrVertices, int p_nbrTriangles, int p_objectId )
 {

@@ -40,7 +40,7 @@ class smImportExport: public smCoreClass
 {
 
 public:
-    static smBool convertToJSON(smMesh *mesh, char *outputFileName,
+    static smBool convertToJSON(smMesh *mesh, const smString& outputFileName,
                                 smExportOptions p_export = SIMMEDTK_EXPORT_ALL);
 };
 

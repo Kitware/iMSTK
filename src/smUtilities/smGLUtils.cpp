@@ -26,7 +26,7 @@
 
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
-bool smGLUtils::queryGLError(smChar*err)
+bool smGLUtils::queryGLError(smString& err)
 {
     GLenum errCode;
     const GLubyte *errString;
@@ -35,25 +35,18 @@ bool smGLUtils::queryGLError(smChar*err)
     {
         errString = gluErrorString(errCode);
 
-        if (err != NULL)
-        {
-            sprintf(err, "OPENGL Error= %s\n", errString);
-        }
-        else
-        {
-            printf("OPENGL Error= %s\n", errString);
-        }
+        err = "OpenGL Error: " + smString((const smChar *)errString) + "\n";
 
-        return err;
+        return true;
     }
     else
     {
-        return NULL;
+        return false;
     }
 }
 
 ///taken from glProgramming.com.  Checks the extension.
-smBool smGLUtils::QueryExtension(char *extName)
+smBool smGLUtils::QueryExtension(const smString& extName)
 {
     char *p = (char *) glGetString(GL_EXTENSIONS);
     char *end = p + strlen(p);
@@ -62,7 +55,7 @@ smBool smGLUtils::QueryExtension(char *extName)
     {
         int n = strcspn(p, " ");
 
-        if ((strlen(extName) == n) && (strncmp(extName, p, n) == 0))
+        if ((extName.size() == n) && (strncmp(extName.c_str(), p, n) == 0))
         {
             return true;
         }

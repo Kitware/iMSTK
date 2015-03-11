@@ -28,8 +28,9 @@
 #include "smSimulators/smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
+#include "smUtilities/smMatrix.h"
 
-MyStylus::MyStylus(smChar *p_shaft, smChar *p_lower, smChar *p_upper)
+MyStylus::MyStylus(const smString& p_shaft, const smString& p_lower, const smString& p_upper)
 {
     angle = 0;
     smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
@@ -171,7 +172,7 @@ void MyStylus::handleEvent(smEvent *p_event)
 }
 
 
-HookCautery::HookCautery(smChar *p_pivot)
+HookCautery::HookCautery(const smString& p_pivot)
 {
     smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
 

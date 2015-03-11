@@ -29,7 +29,7 @@ std::unordered_map<smInt, smVAO *>  smVAO::VAOs;
 
 void smVAO::initBuffers(smDrawParam p_param)
 {
-
+    smString error;
     ///Create the Vertex Array Objects
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);

@@ -37,7 +37,10 @@ void curvedGrasper::draw(smDrawParam p_params)
     glPopMatrix();
 }
 
-curvedGrasper::curvedGrasper(smInt p_PhantomID, smChar *p_pivotModelFileName, smChar *p_lowerModelFileName, smChar *p_upperModelFileName)
+curvedGrasper::curvedGrasper(smInt p_PhantomID,
+                             const smString& p_pivotModelFileName,
+                             const smString& p_lowerModelFileName,
+                             const smString& p_upperModelFileName)
 {
 
     angle = 0;

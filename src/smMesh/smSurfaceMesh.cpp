@@ -67,7 +67,7 @@ smSurfaceMesh::~smSurfaceMesh()
 }
 
 /// \brief loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMesh(smChar *fileName, smMeshFileType fileType)
+smBool smSurfaceMesh::loadMesh(const smString& fileName, smMeshFileType fileType)
 {
 
     smBool ret = true;
@@ -83,7 +83,7 @@ smBool smSurfaceMesh::loadMesh(smChar *fileName, smMeshFileType fileType)
     default:
         if (log_SF != NULL)
         {
-            log_SF->addError(this, "Error: Mesh file TYPE UNIDENTIFIED");
+            log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
         }
 
         ret = false;
@@ -95,7 +95,7 @@ smBool smSurfaceMesh::loadMesh(smChar *fileName, smMeshFileType fileType)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError(this, "Error: Mesh file NOT FOUND");
+            log_SF->addError("Error: Mesh file NOT FOUND");
         }
     }
 
@@ -116,7 +116,7 @@ smBool smSurfaceMesh::loadMesh(smChar *fileName, smMeshFileType fileType)
 
 /// \brief --Deprecated, use loadMesh() for new simulators--
 /// Loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMeshLegacy(smChar *fileName, smMeshFileType fileType)
+smBool smSurfaceMesh::loadMeshLegacy(const smString& fileName, smMeshFileType fileType)
 {
 
     smBool ret = true;
@@ -134,7 +134,7 @@ smBool smSurfaceMesh::loadMeshLegacy(smChar *fileName, smMeshFileType fileType)
     default:
         if (log_SF != NULL)
         {
-            log_SF->addError(this, "Error: Mesh file TYPE UNIDENTIFIED");
+            log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
         }
 
         ret = false;
@@ -147,7 +147,7 @@ smBool smSurfaceMesh::loadMeshLegacy(smChar *fileName, smMeshFileType fileType)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError(this, "Error: Mesh file NOT FOUND");
+            log_SF->addError("Error: Mesh file NOT FOUND");
         }
     }
 
@@ -167,7 +167,7 @@ smBool smSurfaceMesh::loadMeshLegacy(smChar *fileName, smMeshFileType fileType)
 }
 
 /// \brief
-smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
+smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
 {
 
     //Tell Assimp to not import any of the following from the mesh it loads
@@ -190,7 +190,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError(this, "Error: Error loading mesh: " + smString(fileName));
+            log_SF->addError("Error: Error loading mesh: " + smString(fileName));
         }
 
         return false;
@@ -219,6 +219,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
                     mesh->mVertices[i][1],
                     mesh->mVertices[i][2]));
     }
+    this->origVerts = this->vertices;
 
     //Get indexed texture coordinate data
     if (isTextureCoordAvailable)
@@ -228,7 +229,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
         {
             if (log_SF != NULL)
             {
-                log_SF->addError(this, "Error: Error loading mesh, non-two dimensional texture coordinate found.");
+                log_SF->addError("Error: Error loading mesh, non-two dimensional texture coordinate found.");
             }
 
             this->isTextureCoordAvailable = 0;
@@ -250,7 +251,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
         {
             if (log_SF != NULL)
             {
-                log_SF->addError(this, "Error: Error loading mesh, non-triangular face found.");
+                log_SF->addError("Error: Error loading mesh, non-triangular face found.");
             }
 
             //might want to consider an assert here also
@@ -266,7 +267,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smChar *fileName)
 }
 
 /// \brief reads the mesh file in .3ds format
-smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
+smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
 {
 
     smInt i; //Index variable
@@ -277,12 +278,12 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
     smUShort temp;
     smChar l_char;
 
-    if ((l_file = fopen(fileName, "rb")) == NULL) //Open the file
+    if ((l_file = fopen(fileName.c_str(), "rb")) == NULL) //Open the file
     {
         return 0;
     }
 
-    while (ftell(l_file) < Filelength(fileName, fileno(l_file)))    //Loop to scan the whole file
+    while (ftell(l_file) < Filelength(fileName.c_str(), fileno(l_file)))    //Loop to scan the whole file
     {
 
         fread(&l_chunk_id, 2, 1, l_file);  //Read the chunk header
@@ -352,9 +353,7 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
             {
                 smFloat fTemp[3];
                 fread(fTemp, sizeof(smFloat), 3, l_file);
-                this->vertices[fpt][0] = (smFloat)fTemp[0];
-                this->vertices[fpt][1] = (smFloat)fTemp[1];
-                this->vertices[fpt][2] = (smFloat)fTemp[2];
+                this->vertices.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
             }
 
             break;
@@ -419,7 +418,7 @@ smBool smSurfaceMesh::Load3dsMesh(smChar *fileName)
             fseek(l_file, l_chunk_lenght - 6, SEEK_CUR);
         }
     }
-
+    this->origVerts = this->vertices;
     fclose(l_file);  // Closes the file stream
 
     return 1; // Returns ok

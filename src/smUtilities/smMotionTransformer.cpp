@@ -27,9 +27,9 @@
 smHapticTrans::smHapticTrans()
 {
     newEvent = new smEvent();
-    defaultDirection.setValue(0, 0, -1);
-    defaultUpDirection.setValue(0, 1.0, 0);
-    dispatch = (smSDK::getInstance())->getEventDispatcher();
+    defaultDirection << 0, 0, -1;
+    defaultUpDirection << 0, 1.0, 0;
+    dispatch = smSDK::getInstance()->getEventDispatcher();
     motionScale = 1.0;
     enabled = true;
 }
@@ -41,10 +41,10 @@ void smHapticTrans::setMotionScale(smFloat p_scale)
 {
     motionScale = p_scale;
 }
-void smHapticTrans::computeTransformation(smMatrix44d& p_mat)
+void smHapticTrans::computeTransformation(smMatrix44f& p_mat)
 {
-    static smMatrix33<smDouble> mat;
-    mat = p_mat;
+    static smMatrix33f mat;
+    mat = p_mat.block<3,3>(0,0);
     transFormedDirection = (mat * defaultDirection);
     transFormedUpDirection = (mat * defaultUpDirection);
 }
@@ -64,7 +64,7 @@ smHapticCameraTrans::smHapticCameraTrans(smInt p_deviceID)
 void smHapticCameraTrans::handleEvent(smEvent* p_event)
 {
     smHapticOutEventData *hapticEventData;
-    smVec3d rightVector;
+    smVec3f rightVector;
 
     switch (p_event->eventType.eventTypeCode)
     {
@@ -86,10 +86,10 @@ void smHapticCameraTrans::handleEvent(smEvent* p_event)
             rightVector = transFormedDirection.cross(transFormedUpDirection);
             rightVector.normalize();
 
-            quat.fromAxisAngle(rightVector, SM_DEGREES2RADIANS(offsetAngle_RightDirection));
+            quat = getRotationQuaternion(float(SM_DEGREES2RADIANS(offsetAngle_RightDirection)), rightVector);
 
-            ((smCameraEventData*)newEvent->data)->direction = quat.rotate(((smCameraEventData*)newEvent->data)->direction);
-            ((smCameraEventData*)newEvent->data)->upDirection = quat.rotate(((smCameraEventData*)newEvent->data)->upDirection);
+            ((smCameraEventData*)newEvent->data)->direction = quat*((smCameraEventData*)newEvent->data)->direction;
+            ((smCameraEventData*)newEvent->data)->upDirection = quat*((smCameraEventData*)newEvent->data)->upDirection;
             sendEvent();
         }
 

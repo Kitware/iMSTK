@@ -20,7 +20,7 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-
+ 
 #ifndef SMIOSTREAM_H
 #define SMIOSTREAM_H
 
@@ -33,6 +33,7 @@
 #include "smCore/smSDK.h"
 
 #include <iostream>
+#include <string>
 #include <unordered_map>
 
 /// \brief I/O definitions
@@ -51,7 +52,7 @@ public:
 /// \brief  console stream; for printing text on the console
 class smConsoleStream: public smIOStream
 {
-    smChar inputBuffer[SM_CONSOLE_INPUTBUFFER];
+    smString inputBuffer;
 public:
     smConsoleStream();
     /// \brief operator to print text

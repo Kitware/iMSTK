@@ -29,57 +29,54 @@
 #include <fstream>
 #include <iostream>
 #include <mutex>
+#include <vector>
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smUtilities/smTimer.h"
 
-///This is class is for error storing of the whole SimMedTK system.
-///All errors should be reported to the instance of this class.
-///the critcal part are implemented considering multiple inputs from different threads. Please
-///read the function explanation for further details.
+/// \brief This is class is for error logging of the whole SimMedTK system.
+/// All errors should be reported to the instance of this class.
+/// Functions are thread-safe unless indicated.
 class smErrorLog: smCoreClass
 {
 
 private:
-    ///total number of errors
-    smInt errorCount;
-
-    ///last error index
-    smInt lastError;
-
-    ///erros are stored in buffer
-    smChar errors[SIMMEDTK_MAX_ERRORLOG][SIMMEDTK_MAX_ERRORLOG_TEXT];
-
-    ///time stamps for the error registered in the buffer
-    smInt timeStamp[SIMMEDTK_MAX_ERRORLOG];
-
-    ///mutex to sync accesses
-    std::mutex logLock;
-
-    ///get the timing
-    smTimer time;
+    std::vector<smString> errors; ///< error messages
+    std::vector<smInt> timeStamps; ///< time stamps for errors
+    std::mutex logLock; ///< mutex to sync access to logs
+    smTimer time; ///< Timer for timestamps
+    smBool consoleOutput; ///< Flag to print errors to stdout
 
 public:
     smBool isOutputtoConsoleEnabled;
     smErrorLog();
 
-    ///add the error in the repository.It is thread safe. It can be called by multiple threads.
-    smBool addError(smCoreClass *p_param, const smChar *p_text);
-    smBool addError(smCoreClass *p_param, const std::string p_text);
-    smBool addError(const smChar *p_text);
-    smBool addError(const std::string p_text);
+    /// \brief Add the error in the repository.It is thread safe. It can be called by multiple threads.
+    ///
+    /// \detail If the error message is longer than SIMMEDTK_MAX_ERRORLOG or
+    /// empty, function will return with error
+    /// \param p_text A string containing the error message
+    /// \return Returns true if the error was successfully logged, and false on error
+    smBool addError(const smString& p_text);
 
-    ///Clean up all the errors in the repository.It is thread safe.
+    /// \brief Clean up all the errors in the repository.
+    ///
     void cleanAllErrors();
 
-    ///Print the last error.It is not thread safe.
+    /// \brief Print the last error. It is not thread safe.
+    ///
+    void printLastErrUnsafe();
+
+    /// \brief Print the last error.
+    ///
     void printLastErr();
 
-    ///Print  the last error in Thread Safe manner.
-    void printLastErrSafe();
-
+    /// \brief Copy all errors logged to console
+    ///
+    /// \param flag Set true to enable, false to disable copy to console
+    void setConsoleOutput(smBool flag);
 };
 
 #endif

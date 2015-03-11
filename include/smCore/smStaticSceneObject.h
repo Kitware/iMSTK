@@ -33,12 +33,11 @@
 /// \brief static scene object
 class smStaticSceneObject: public smSceneObject
 {
-
 public:
     /// \brief static scene object contains a mesh
     smSurfaceMesh *mesh;
     /// \brief constructor receives the error log
-    smStaticSceneObject(smErrorLog *p_log = NULL)
+    smStaticSceneObject(smErrorLog *p_log = NULL) : smSceneObject()
     {
         type = SIMMEDTK_SMSTATICSCENEOBJECT;
         mesh = new smSurfaceMesh(SMMESH_RIGID, p_log);

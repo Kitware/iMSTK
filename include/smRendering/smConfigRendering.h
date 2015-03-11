@@ -189,13 +189,13 @@ public:
     /// \brief attachment of VAO
     void addVAO(smUnifiedID p_shaderID);
     /// \brief attached shaders
-    std::vector <smUnifiedID >shaders;
+    std::vector<smUnifiedID> shaders;
     /// \brief enable/disable any attached shader
-    std::vector<smChar>shaderEnable;
+    std::vector<smBool> shaderEnable;
     /// \brief stores  VAO IDs
-    std::vector <smUnifiedID>VAOs;
+    std::vector<smUnifiedID> VAOs;
     /// \brief enable/disable any attached VAO
-    std::vector<smChar>VAOEnable;
+    std::vector<smBool> VAOEnable;
 };
 
 #endif

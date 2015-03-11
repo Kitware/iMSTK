@@ -39,10 +39,10 @@ class smGLUtils : public smCoreClass
 public:
     /// \brief checks the openGL error. if there is an error then it returns
     /// \brief the error text otherwise it returns NULL
-    static bool queryGLError(smChar*err);
+    static bool queryGLError(smString& err);
 
     /// \brief  taken from glProgramming.com.  Checks the extension.
-    static smBool QueryExtension(char *extName);
+    static smBool QueryExtension(const smString& extName);
 
     /// \brief  fade background draw with a size groundRenderInfo.scale
     static void fadeBackgroundDraw();

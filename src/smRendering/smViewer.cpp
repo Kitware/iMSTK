@@ -27,7 +27,7 @@
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
 #include "smShader/smShader.h"
-#include "smShader/metalShader.h"
+#include "smShader/smMetalShader.h"
 #include "smShader/smSceneTextureShader.h"
 #include "smUtilities/smDataStructures.h"
 #include "smRendering/smVBO.h"

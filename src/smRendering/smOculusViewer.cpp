@@ -55,6 +55,8 @@
 
 #include <GLFW/glfw3native.h>
 
+#include <iostream>
+
 /// \brief Calculate the next power of two
 ///
 /// \details Code from:
@@ -205,11 +207,6 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
                             pose[eye].Orientation.z);
         glmView = glm::toMat4(tmpQuat) * glmView;
 
-        tmpVec = glm::vec3(eyeRdesc[eye].HmdToEyeViewOffset.x,
-                           eyeRdesc[eye].HmdToEyeViewOffset.y,
-                           eyeRdesc[eye].HmdToEyeViewOffset.z);
-        glmView = glm::translate(glmView, tmpVec);
-
         //translate the view matrix with the positional tracking
         if(ts.StatusFlags &
            (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
@@ -249,14 +246,14 @@ int smOculusViewer::initOculus(void)
     unsigned int flags;
 
     if (!(hmd = ovrHmd_Create(0))) {
-        cerr << "Failed to open Oculus HMD, falling back to virtual debug HMD\n";
+        std::cerr << "Failed to open Oculus HMD, falling back to virtual debug HMD\n";
         if (!(hmd = ovrHmd_CreateDebug(ovrHmd_DK2))) {
-            cerr << "Failed to create virtual debug HMD\n";
+            std::cerr << "Failed to create virtual debug HMD\n";
             return -1;
         }
     }
-    cout << "Initialized HMD: "
-         << hmd->Manufacturer << " - " << hmd->ProductName << "\n";
+    std::cout << "Initialized HMD: "
+              << hmd->Manufacturer << " - " << hmd->ProductName << "\n";
 
     //enable position and rotation tracking
     ovrHmd_ConfigureTracking(hmd,
@@ -305,7 +302,7 @@ int smOculusViewer::initOculus(void)
 
 
     if (hmd->HmdCaps & ovrHmdCap_ExtendDesktop) {
-        cout << "running in \"extended desktop\" mode\n";
+        std::cout << "running in \"extended desktop\" mode\n";
     }
     else {
         //to sucessfully draw to the HMD display in "direct-hmd" mode, we
@@ -317,7 +314,7 @@ int smOculusViewer::initOculus(void)
 #else
         ovrHmd_AttachToWindow(hmd, (void*)glfwGetX11Window(window), 0, 0);
 #endif
-        cout << "running in \"direct-hmd\" mode\n";
+        std::cout << "running in \"direct-hmd\" mode\n";
     }
 
     //enable low-persistence display and dynamic prediction for
@@ -333,7 +330,7 @@ int smOculusViewer::initOculus(void)
                      ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
     if (!ovrHmd_ConfigureRendering(hmd, &glCfg.Config, distortionCaps,
                                    hmd->DefaultEyeFov, eyeRdesc)) {
-        cerr << "failed to configure distortion renderer\n";
+        std::cerr << "failed to configure distortion renderer\n";
     }
 
     //disable the "health and safety warning"
@@ -383,10 +380,10 @@ void smOculusViewer::updateRenTarg(int width, int height)
                               GL_RENDERBUFFER, fbDepth);
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        cerr << "incomplete framebuffer!\n";
+        std::cerr << "incomplete framebuffer!\n";
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    cout << "created render target: " << width << "x" << height
-         << " (texture size: " << fbTexWidth << "x" << fbTexHeight << ")\n";
+    std::cout << "created render target: " << width << "x" << height
+              << " (texture size: " << fbTexWidth << "x" << fbTexHeight << ")\n";
 }

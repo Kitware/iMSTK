@@ -21,7 +21,7 @@
 #
 
 set(GLUT_TAG "f4cd139604ebdf63dd3ec2f4b40886bf2cd05294")
-set(GLUT_REPOSITORY ${git_protocol}://github.com/ricortiz/FreeGLUT.git)
+set(GLUT_REPOSITORY git@bitbucket.org:simmedtk/freeglut.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -85,7 +85,7 @@ if(NOT DEFINED ${proj}_DIR)
 # 	LOG_CONFIGURE 1           # Wrap configure in script to log output
 # 	LOG_BUILD 1               # Wrap build in script to log output
 	LOG_TEST 1                # Wrap test in script to log output
-	LOG_INSTALL 1             # Wrap install in script to log output   
+	LOG_INSTALL 1             # Wrap install in script to log output
     )
   set(${proj}_DIR ${ep_install_dir}/)
 

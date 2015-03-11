@@ -26,12 +26,12 @@
 #include "smCore/smSDK.h"
 
 /// \brief
-smBool smImportExport::convertToJSON(smMesh *p_mesh, smChar *p_outputFileName,
+smBool smImportExport::convertToJSON(smMesh *p_mesh, const smString& p_outputFileName,
                                      smExportOptions p_export)
 {
 
     FILE *file;
-    file = fopen(p_outputFileName, "w");
+    file = fopen(p_outputFileName.c_str(), "w");
     fprintf(file, "{ \n");
 
     if (file == NULL)

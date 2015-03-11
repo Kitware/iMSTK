@@ -21,7 +21,7 @@
 #
 
 set(GLFW_TAG "c87db1df6c0d2d956cfd78b206c3c4aefbca3cc7")
-set(GLFW_REPOSITORY ${git_protocol}://github.com/ricortiz/glfw.git)
+set(GLFW_REPOSITORY git@bitbucket.org:simmedtk/glfw.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -82,7 +82,7 @@ if(NOT DEFINED ${proj}_DIR)
 # 	LOG_CONFIGURE 1           # Wrap configure in script to log output
 # 	LOG_BUILD 1               # Wrap build in script to log output
 	LOG_TEST 1                # Wrap test in script to log output
-	LOG_INSTALL 1             # Wrap install in script to log output   
+	LOG_INSTALL 1             # Wrap install in script to log output
     )
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build)
 

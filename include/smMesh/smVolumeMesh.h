@@ -60,16 +60,16 @@ public:
     ~smVolumeMesh();
 
     /// \brief constructor
-    void GenerateTetra(smChar *fileName);
+    void GenerateTetra(const smString& fileName);
 
     /// \brief load tetrahedron
-    smBool LoadTetra(const smChar *fileName);
+    smBool LoadTetra(const smString& fileName);
 
     /// \brief load surface triangles
-    smBool getSurface(const smChar *fileName);
+    smBool getSurface(const smString& fileName);
 
     /// \brief read the boundary conditions
-    smBool readBC(const smChar *fileName);
+    smBool readBC(const smString& fileName);
 
     /// \brief initialize the surface mesh
     void initSurface();
@@ -87,7 +87,7 @@ public:
     void rotVolumeMesh(smMatrix33f p_rot);
 
     /// \brief load the mesh
-    smBool loadMesh(smChar *fileName, smMeshFileType fileType);
+    smBool loadMesh(const smString& fileName, smMeshFileType fileType);
 };
 
 #endif

@@ -85,7 +85,6 @@ public:
     smInt indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
     smVBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
     smVBOType vboType;
-    smChar error[500];
     ///All VBOs are stored here
     static std::unordered_map<smInt, smVAO *> VAOs;
     smMesh *mesh;

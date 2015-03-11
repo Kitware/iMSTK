@@ -34,7 +34,7 @@ class MyStylus: public smStylusRigidSceneObject
 {
 
 public:
-    smInt phantomID; ///< ID fo phantom omni
+    smInt phantomID; ///< ID for phantom omni
     smBool buttonState[2]; ///< state of the buttons
     smFloat angle; ///< angle of the jaw (if applicable)
     smFloat maxangle; ///< maximum angle of the jaw (if applicable)
@@ -44,9 +44,9 @@ public:
     void handleEvent(smEvent *p_event);
 
     /// \brief constructor
-    MyStylus(smChar *p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
-             smChar *p_lower = "../../resources/models/blunt_diss_lower.3DS",
-             smChar *p_upper = "../../resources/models/blunt_diss_upper.3DS");
+    MyStylus(const smString& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
+             const smString& p_lower = "../../resources/models/blunt_diss_lower.3DS",
+             const smString& p_upper = "../../resources/models/blunt_diss_upper.3DS");
 
     /// \brief update the closing and opening of jaws (if applicable)
     void updateOpenClose();
@@ -68,7 +68,7 @@ public:
     void draw(smDrawParam p_param);
 
     /// \brief constructor
-    HookCautery(smChar *p_pivot = "../../resources/models/hook_cautery_new.3DS");
+    HookCautery(const smString& p_pivot = "../../resources/models/hook_cautery_new.3DS");
 };
 
 #endif

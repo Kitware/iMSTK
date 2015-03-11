@@ -57,31 +57,54 @@ smShader::smShader(smErrorLog *log)
 {
 
     type = SIMMEDTK_SMSHADER;
-    memset(vertexProgFileName, '\0', SIMMEDTK_MAX_FILENAME_LENGTH);
-    memset(fragmentProgFileName, '\0', SIMMEDTK_MAX_FILENAME_LENGTH);
-    memset(geometryProgFileName, '\0', SIMMEDTK_MAX_FILENAME_LENGTH);
     this->log = log;
-    checkErrorEnabled = false;
+    checkErrorEnabled = true;
     time.start();
     setModelViewMatrixShaderName("ModelMatrix");
     setProjectionMatrixShaderName("ProjectionMatrix");
 }
 
+smBool smShader::readShaderContent(const smString& p_file, smString& p_content)
+{
+    std::ifstream file;
+    if ("" != p_file)
+    {
+        file.open(p_file);
+    }
+    else
+    {
+        return false;
+    }
+
+    if (file.fail())
+    {
+        if (nullptr != log)
+        {
+            log->addError("smShader: Shader file: " + p_file + " couldn't be opened");
+        }
+        return false;
+    }
+
+    file.seekg(0, std::ios::end);
+    p_content.resize(file.tellg());
+    file.seekg(0, std::ios::beg);
+    file.read(&p_content[0], p_content.size());
+
+    file.close();
+    return true;
+}
+
 ///this function gets the vertex,fragment and geometry shader fileNames respectively. if you don't use
 /// one of them just simply send NULL pointer as a parameter.
-smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentProgFileName, smChar *p_geometryProgFileName)
+smBool smShader::initShaders(const smString& p_vertexProgFileName,
+                             const smString& p_fragmentProgFileName,
+                             const smString& p_geometryProgFileName)
 {
-
-    std::ifstream vertexShaderFile;
-    std::ifstream fragmentShaderFile;
-    std::ifstream geometryShaderFile;
-    smLongInt fileSize;
-
     if (glewIsSupported("GL_VERSION_2_0") == GL_FALSE)
     {
         if (log != NULL)
         {
-            log->addError(this, "smShader:OpenGL 2.0 not supported");
+            log->addError("smShader:OpenGL 2.0 not supported");
         }
 
         return false;
@@ -89,45 +112,23 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
 
     shaderProgramObject = glCreateProgram();
 
-    if (p_vertexProgFileName != NULL && strlen(p_vertexProgFileName) > 0)
+    if ("" != p_vertexProgFileName)
     {
-        vertexShaderFile.open(p_vertexProgFileName);
-
-        if (vertexShaderFile)
+        if (readShaderContent(p_vertexProgFileName, this->vertexShaderContent))
         {
-            strcpy(this->vertexProgFileName, p_vertexProgFileName);
-            vertexShaderFile.seekg(0, std::ios::end);
-            fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, std::ios::beg);
-            vertexShaderContent = new smChar [fileSize + 1];
-            memset(vertexShaderContent, '\0', fileSize);
-            vertexShaderFile.read(vertexShaderContent, fileSize);
-            std::cout << "[initShaders] " << p_vertexProgFileName;
+            this->vertexProgFileName = p_vertexProgFileName;
         }
         else
         {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Vertex shader file couldn't be opened");
-            }
-
             return false;
         }
 
-        vertexShaderFile.close();
-
 #ifdef SIMMEDTK_OPENGL_SHADER
         createVertexShaderGLSL();
-        delete vertexShaderContent;
-
-        //check the opengl error.
-        if (checkErrorEnabled)
-        {
-            checkGLError();
-        }
-
-        vertexProgramExist = true;
+        vertexShaderContent.clear(); //No need for the contents anymore
+        checkGLError();
 #endif
+        vertexProgramExist = true;
     }
     else
     {
@@ -135,42 +136,20 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         vertexProgramExist = false;
     }
 
-    if (p_fragmentProgFileName != NULL && strlen(p_fragmentProgFileName) > 0)
+    if ("" != p_fragmentProgFileName)
     {
-        fragmentShaderFile.open(p_fragmentProgFileName);
-
-        if (fragmentShaderFile)
+        if (readShaderContent(p_fragmentProgFileName, this->fragmentShaderContent))
         {
-            strcpy(this->fragmentProgFileName, p_fragmentProgFileName);
-            fragmentShaderFile.seekg(0, std::ios::end);
-            fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, std::ios::beg);
-            fragmentShaderContent = new smChar [fileSize];
-            memset(fragmentShaderContent, '\0', fileSize);
-            fragmentShaderFile.read(fragmentShaderContent, fileSize);
-            std::cout << "[initShaders] " << p_fragmentProgFileName << "\n";
+            this->fragmentProgFileName = p_fragmentProgFileName;
         }
         else
         {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
-            }
-
             return false;
         }
-
-        fragmentShaderFile.close();
 #ifdef SIMMEDTK_OPENGL_SHADER
         createFragmentShaderGLSL();
-        delete fragmentShaderContent;
-
-        //check the opengl error.
-        if (checkErrorEnabled)
-        {
-            checkGLError();
-        }
-
+        fragmentShaderContent.clear();
+        checkGLError();
         fragmentProgramExist = true;
 #endif
     }
@@ -180,40 +159,20 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
         fragmentProgramExist = false;
     }
 
-    if (p_geometryProgFileName != NULL && strlen(p_geometryProgFileName) > 0)
+    if ("" != p_geometryProgFileName)
     {
-        geometryShaderFile.open(p_geometryProgFileName);
-
-        if (geometryShaderFile)
+        if (readShaderContent(p_geometryProgFileName, this->geometryShaderContent))
         {
-            strcpy(this->geometryProgFileName, p_geometryProgFileName);
-            geometryShaderFile.seekg(0, std::ios::end);
-            fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, std::ios::beg);
-            geometryShaderContent = new smChar [fileSize];
-            memset(geometryShaderContent, '\0', fileSize);
-            geometryShaderFile.read(geometryShaderContent, fileSize);
+            this->geometryProgFileName = p_geometryProgFileName;
         }
         else
         {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
-            }
-
             return false;
         }
-
-        geometryShaderFile.close();
 #ifdef SIMMEDTK_OPENGL_SHADER
         createGeometryShaderGLSL();
-        delete geometryShaderContent;
-
-        //check the opengl error.
-        if (checkErrorEnabled)
-        {
-            checkGLError();
-        }
+        geometryShaderContent.clear();
+        checkGLError();
 
         geometryProgramExist = true;
         //note that:based on geometry shader needw, the input and output parameters for geometry shader below may change
@@ -230,135 +189,88 @@ smBool smShader::initShaders(smChar *p_vertexProgFileName, smChar *p_fragmentPro
 
     glLinkProgram(shaderProgramObject);
     printInfoLog(shaderProgramObject);
-    modelViewMatrix = glGetUniformLocation(shaderProgramObject, modelViewMatrixName);
-    projectionMatrix = glGetUniformLocation(shaderProgramObject, projectionMatrixName);
+    modelViewMatrix = glGetUniformLocation(shaderProgramObject, modelViewMatrixName.data());
+    projectionMatrix = glGetUniformLocation(shaderProgramObject, projectionMatrixName.data());
 
     return true;
 }
 
+void smShader::createShaderGLSL(GLhandleARB &p_shaderObject,
+                                const GLhandleARB p_shaderProgramObject,
+                                const smString& p_shaderContent,
+                                GLenum p_shaderType)
+{
+    const char *shaderSrc = p_shaderContent.data();
+    p_shaderObject = glCreateShader(p_shaderType);
+    glShaderSource(p_shaderObject, 1, &shaderSrc, NULL);
+    glCompileShader(p_shaderObject);
+    printInfoLog(p_shaderObject);
+    checkGLError();
+
+    glAttachShader(p_shaderProgramObject, p_shaderObject);
+    checkGLError();
+}
+
 void smShader::createVertexShaderGLSL()
 {
-
-    vertexShaderObject = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShaderObject, 1, (const smChar**)&vertexShaderContent, NULL);
-    glCompileShader(vertexShaderObject);
-    printInfoLog(vertexShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
-
-    glAttachShader(shaderProgramObject, vertexShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+    createShaderGLSL(vertexShaderObject, shaderProgramObject,
+                     vertexShaderContent, GL_VERTEX_SHADER);
 }
 
 void smShader::createFragmentShaderGLSL()
 {
-
-    fragmentShaderObject = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShaderObject, 1, (const smChar**)&fragmentShaderContent, NULL);
-    glCompileShader(fragmentShaderObject);
-    printInfoLog(fragmentShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
-
-    glAttachShader(shaderProgramObject, fragmentShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+    createShaderGLSL(fragmentShaderObject, shaderProgramObject,
+                     fragmentShaderContent, GL_FRAGMENT_SHADER);
 }
 void smShader::createGeometryShaderGLSL()
 {
-
-    geometryShaderObject = glCreateShader(GL_GEOMETRY_SHADER_EXT);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
-
-    glShaderSource(geometryShaderObject, 1, (const smChar**)&geometryShaderContent, NULL);
-    glCompileShader(geometryShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
-
-    glAttachShader(shaderProgramObject, geometryShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+    createShaderGLSL(geometryShaderObject, shaderProgramObject,
+                     geometryShaderContent, GL_GEOMETRY_SHADER_EXT);
 }
 
-
+void smShader::reloadShaderGLSL(const GLhandleARB p_shaderObject,
+                                const smString& p_shaderContent)
+{
+    const char *shaderSrc = p_shaderContent.data();
+    glShaderSource(p_shaderObject, 1, &shaderSrc, NULL);
+    glCompileShader(p_shaderObject);
+    checkGLError();
+}
 
 void smShader::reloadVertexShaderGLSL()
 {
-
-    glShaderSource(vertexShaderObject, 1, (const smChar**)&vertexShaderContent, NULL);
-    glCompileShader(vertexShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+    reloadShaderGLSL(vertexShaderObject, vertexShaderContent);
 }
 
 void smShader::reloadFragmentShaderGLSL()
 {
+    reloadShaderGLSL(fragmentShaderObject, fragmentShaderContent);
+}
 
-    glShaderSource(fragmentShaderObject, 1, (const smChar**)&fragmentShaderContent, NULL);
-    glCompileShader(fragmentShaderObject);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+void smShader::reloadGeometryShaderGLSL()
+{
+    reloadShaderGLSL(geometryShaderObject, geometryShaderContent);
 }
 
 ///checks the opengl error
 smBool smShader::checkGLError()
 {
-
-    memset(errorText, '\0', SIMMEDTK_MAX_ERRORLOG_TEXT);
-
-    if (smGLUtils::queryGLError(errorText))
-    {
-        if (log != NULL)
-        {
-            log->addError(this, errorText);
-        }
-
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
-void smShader::reloadGeometryShaderGLSL()
-{
-
-    glShaderSource(geometryShaderObject, 1, (const smChar**)&geometryShaderContent, NULL);
-    glCompileShader(geometryShaderObject);
-
+    smString errorText;
     if (checkErrorEnabled)
     {
-        checkGLError();
+        if (smGLUtils::queryGLError(errorText))
+        {
+            if (log != NULL)
+            {
+                log->addError(errorText);
+            }
+
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 }
 
@@ -480,52 +392,45 @@ void smShader::saveAndDisableCurrent()
 #endif
 }
 
-smGLInt smShader::addVertexShaderParamGLSL(smChar* p_paramNameVertex)
+smGLInt smShader::addShaderParamGLSL(const smString& p_paramName,
+                                     const GLhandleARB p_shaderProgramObject,
+                                     std::vector<smString>& p_shaderParamsString,
+                                     std::vector<GLint>& p_shaderParams)
 {
-
     smGLInt param;
-    param = glGetUniformLocation(shaderProgramObject, p_paramNameVertex);
-    vertexShaderParamsString.push_back(p_paramNameVertex);
-    vertexShaderParams.push_back(param);
-
+    param = glGetUniformLocation(p_shaderProgramObject, p_paramName.data());
+    checkGLError();
+    p_shaderParamsString.push_back(p_paramName);
+    p_shaderParams.push_back(param);
     return param;
 }
 
-smGLInt smShader::addFragmentShaderParamGLSL(smChar* p_paramNameFragment)
+smGLInt smShader::addVertexShaderParamGLSL(const smString& p_paramNameVertex)
 {
-
-    smGLInt param;
-    param = glGetUniformLocation(shaderProgramObject, p_paramNameFragment);
-
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
-
-    fragmentShaderParamsString.push_back(p_paramNameFragment);
-    fragmentShaderParams.push_back(param);
-    return param;
+    return addShaderParamGLSL(p_paramNameVertex, shaderProgramObject,
+                              vertexShaderParamsString, vertexShaderParams);
 }
 
-smGLInt smShader::addGeometryShaderParamGLSL(smChar* p_paramNameGeometry)
+smGLInt smShader::addFragmentShaderParamGLSL(const smString& p_paramNameFragment)
 {
-
-    smGLInt param;
-    param = glGetUniformLocation(shaderProgramObject, p_paramNameGeometry);
-    geometryShaderParamsString.push_back(p_paramNameGeometry);
-    geometryShaderParams.push_back(param);
-
-    return param;
+    return addShaderParamGLSL(p_paramNameFragment, shaderProgramObject,
+                              fragmentShaderParamsString, fragmentShaderParams);
 }
 
-smGLInt smShader::addVertexShaderParam(smChar* p_paramNameVertex)
+smGLInt smShader::addGeometryShaderParamGLSL(const smString& p_paramNameGeometry)
+{
+    return addShaderParamGLSL(p_paramNameGeometry, shaderProgramObject,
+                              geometryShaderParamsString, geometryShaderParams);
+}
+
+smGLInt smShader::addVertexShaderParam(const smString& p_paramNameVertex)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     return addVertexShaderParamGLSL(p_paramNameVertex);
 #endif
 }
-smGLInt smShader::addFragmentShaderParam(smChar* p_paramNameFragment)
+smGLInt smShader::addFragmentShaderParam(const smString& p_paramNameFragment)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -533,7 +438,7 @@ smGLInt smShader::addFragmentShaderParam(smChar* p_paramNameFragment)
 #endif
 }
 
-smGLInt smShader::addGeometryShaderParam(smChar* p_paramNameGeometry)
+smGLInt smShader::addGeometryShaderParam(const smString& p_paramNameGeometry)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -541,12 +446,12 @@ smGLInt smShader::addGeometryShaderParam(smChar* p_paramNameGeometry)
 #endif
 }
 
-smGLInt smShader::addShaderParamForAll(smChar* p_paramName)
+smGLInt smShader::addShaderParamForAll(const smString& p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     smGLInt param;
-    param = glGetUniformLocation(shaderProgramObject, p_paramName);
+    param = glGetUniformLocation(shaderProgramObject, p_paramName.data());
     vertexShaderParamsString.push_back(p_paramName);
     vertexShaderParams.push_back(param);
 
@@ -561,15 +466,12 @@ smGLInt smShader::addShaderParamForAll(smChar* p_paramName)
 #endif
 }
 
-smGLInt smShader::getShaderParamForAll(smChar *p_paramName)
+smGLInt smShader::getShaderParamForAll(const smString& p_paramName)
 {
-
 #ifdef SIMMEDTK_OPENGL_SHADER
-    smString p_param(p_paramName);
-
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        if (vertexShaderParamsString[i] == p_param)
+        if (vertexShaderParamsString[i] == p_paramName)
         {
             return vertexShaderParams[i];
         }
@@ -579,15 +481,12 @@ smGLInt smShader::getShaderParamForAll(smChar *p_paramName)
 #endif
 }
 
-smGLInt smShader::getFragmentShaderParam(smChar *p_paramName)
+smGLInt smShader::getFragmentShaderParam(const smString& p_paramName)
 {
-
 #ifdef SIMMEDTK_OPENGL_SHADER
-    smString p_param(p_paramName);
-
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
-        if (fragmentShaderParamsString[i] == p_param)
+        if (fragmentShaderParamsString[i] == p_paramName)
         {
             return fragmentShaderParams[i];
         }
@@ -597,15 +496,12 @@ smGLInt smShader::getFragmentShaderParam(smChar *p_paramName)
 #endif
 }
 
-smGLInt smShader::getShaderAtrribParam(smChar *p_paramName)
+smGLInt smShader::getShaderAtrribParam(const smString& p_paramName)
 {
-
 #ifdef SIMMEDTK_OPENGL_SHADER
-    smString p_param(p_paramName);
-
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
-        if (attribParamsString[i] == p_param)
+        if (attribParamsString[i] == p_paramName)
         {
             return attribShaderParams[i];
         }
@@ -614,16 +510,13 @@ smGLInt smShader::getShaderAtrribParam(smChar *p_paramName)
     return -1;
 #endif
 }
-GLint smShader::addShaderParamAttrib(smChar* p_paramName)
+GLint smShader::addShaderParamAttrib(const smString& p_paramName)
 {
 
     smGLInt param;
-    param = glGetAttribLocationARB(shaderProgramObject, p_paramName);
+    param = glGetAttribLocationARB(shaderProgramObject, p_paramName.data());
 
-    if (checkErrorEnabled)
-    {
-        checkGLError();
-    }
+    checkGLError();
 
     return param;
 }
@@ -638,39 +531,15 @@ smBool smShader::reLoadAllShaders()
 
     if (vertexProgramExist == true)
     {
-        vertexShaderFile.open(vertexProgFileName);
-
-        if (vertexShaderFile)
+        if (false == readShaderContent(this->vertexProgFileName, this->vertexShaderContent))
         {
-            vertexShaderFile.seekg(0, std::ios::end);
-            fileSize = vertexShaderFile.tellg();
-            vertexShaderFile.seekg(0, std::ios::beg);
-            vertexShaderContent = new smChar [fileSize];
-            memset(vertexShaderContent, '\0', fileSize);
-            vertexShaderFile.read(vertexShaderContent, fileSize);
-        }
-        else
-        {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Vertex shader file couldn't be opened");
-            }
-
             return false;
         }
-
-        vertexShaderFile.close();
 #ifdef SIMMEDTK_OPENGL_SHADER
         reloadVertexShaderGLSL();
-        delete vertexShaderContent;
+        vertexShaderContent.clear();
 
-        //check the opengl error.
-        if (checkErrorEnabled)
-            if (smGLUtils::queryGLError(errorText))
-                if (log != NULL)
-                {
-                    log->addError(this, errorText);
-                }
+        checkGLError();
 
 #endif
     }
@@ -681,40 +550,15 @@ smBool smShader::reLoadAllShaders()
 
     if (fragmentProgramExist == true)
     {
-        fragmentShaderFile.open(fragmentProgFileName);
-
-        if (fragmentShaderFile)
+        if (false == readShaderContent(this->fragmentProgFileName, this->fragmentShaderContent))
         {
-            fragmentShaderFile.seekg(0, std::ios::end);
-            fileSize = fragmentShaderFile.tellg();
-            fragmentShaderFile.seekg(0, std::ios::beg);
-            fragmentShaderContent = new smChar [fileSize];
-            memset(fragmentShaderContent, '\0', fileSize);
-            fragmentShaderFile.read(fragmentShaderContent, fileSize);
-        }
-        else
-        {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
-            }
-
             return false;
         }
-
-        fragmentShaderFile.close();
-
 #ifdef SIMMEDTK_OPENGL_SHADER
         reloadFragmentShaderGLSL();
-        delete fragmentShaderContent;
+        fragmentShaderContent.clear();
 
-        //check the opengl error.
-        if (checkErrorEnabled)
-            if (smGLUtils::queryGLError(errorText))
-                if (log != NULL)
-                {
-                    log->addError(this, errorText);
-                }
+        checkGLError();
 
 #endif
     }
@@ -726,40 +570,15 @@ smBool smShader::reLoadAllShaders()
 
     if (geometryProgramExist == true)
     {
-        geometryShaderFile.open(geometryProgFileName);
-
-        if (geometryShaderFile)
+        if (false == readShaderContent(this->geometryProgFileName, this->geometryShaderContent))
         {
-            geometryShaderFile.seekg(0, std::ios::end);
-            fileSize = geometryShaderFile.tellg();
-            geometryShaderFile.seekg(0, std::ios::beg);
-            geometryShaderContent = new smChar [fileSize];
-            memset(geometryShaderContent, '\0', fileSize);
-            geometryShaderFile.read(geometryShaderContent, fileSize);
-        }
-        else
-        {
-            if (log != NULL)
-            {
-                log->addError(this, "smShader:Fragment shader file couldn't be opened");
-            }
-
             return false;
         }
-
-        geometryShaderFile.close();
-
 #ifdef SIMMEDTK_OPENGL_SHADER
         reloadGeometryShaderGLSL();
-        delete geometryShaderContent;
+        geometryShaderContent.clear();
 
-        //check the opengl error.
-        if (checkErrorEnabled)
-            if (smGLUtils::queryGLError(errorText))
-                if (log != NULL)
-                {
-                    log->addError(this, errorText);
-                }
+        checkGLError();
 
 #endif
     }
@@ -770,12 +589,7 @@ smBool smShader::reLoadAllShaders()
 
     glLinkProgram(shaderProgramObject);
 
-    if (checkErrorEnabled)
-        if (smGLUtils::queryGLError(errorText))
-            if (log != NULL)
-            {
-                log->addError(this, errorText);
-            }
+    checkGLError();
 
     return true;
 }
@@ -805,8 +619,8 @@ void smShader::attachTexture(smUnifiedID p_meshID, smInt p_textureID)
 }
 
 smBool smShader::attachTexture(smUnifiedID p_meshID,
-                               smChar * const p_textureName,
-                               smChar * const p_textureShaderName)
+                               const smString& p_textureName,
+                               const smString& p_textureShaderName)
 {
 
     smTextureShaderAssignment assign;
@@ -834,57 +648,57 @@ void smShader::autoGetTextureIds()
     }
 }
 
-void smShader::createTextureParam(smChar *p_textureNameInShaderCode)
+void smShader::createTextureParam(const smString& p_textureNameInShaderCode)
 {
 
     this->textureGLBind[p_textureNameInShaderCode] = -1;
 }
 
-smBool smShader::setShaderFileName(smChar *p_vertexFileName,
-                                   smChar *p_geometryFileName,
-                                   smChar *p_fragmentFileName)
+smBool smShader::setShaderFileName(const smString& p_vertexFileName,
+                                   const smString& p_geometryFileName,
+                                   const smString& p_fragmentFileName)
 {
 
-    if (p_vertexFileName != NULL)
+    if ("" != p_vertexFileName)
     {
-        if (strlen(p_vertexFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
+        if (SIMMEDTK_MAX_FILENAME_LENGTH < p_vertexFileName.length())
         {
-            if (log != NULL)
+            if (nullptr != log)
             {
-                log->addError("Vertex Shader File Name is very long");
+                log->addError("Vertex Shader filename is longer than max file length");
                 return false;
             }
         }
 
-        memcpy(vertexProgFileName, p_vertexFileName, SIMMEDTK_MAX_FILENAME_LENGTH);
+        vertexProgFileName = p_vertexFileName;
     }
 
-    if (p_geometryFileName != NULL)
+    if ("" != p_geometryFileName)
     {
-        if (strlen(geometryProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
+        if (SIMMEDTK_MAX_FILENAME_LENGTH < geometryProgFileName.length())
         {
-            if (log != NULL)
+            if (nullptr != log)
             {
-                log->addError("VertexGeometry Shader File Name is very long");
+                log->addError("Geometry Shader filename is longer than max file length");
                 return false;
             }
         }
 
-        memcpy(geometryProgFileName, p_geometryFileName, SIMMEDTK_MAX_FILENAME_LENGTH);
+        geometryProgFileName = p_geometryFileName;
     }
 
-    if (p_fragmentFileName != NULL)
+    if ("" != p_fragmentFileName)
     {
-        if (strlen(fragmentProgFileName) > SIMMEDTK_MAX_FILENAME_LENGTH)
+        if (SIMMEDTK_MAX_FILENAME_LENGTH < fragmentProgFileName.length())
         {
-            if (log != NULL)
+            if (nullptr != log)
             {
-                log->addError("Fragment Shader File Name is very long");
+                log->addError("Fragment Shader filename is longer than max file length");
                 return false;
             }
         }
 
-        memcpy(fragmentProgFileName, p_fragmentFileName, SIMMEDTK_MAX_FILENAME_LENGTH);
+        fragmentProgFileName = p_fragmentFileName;
     }
 
     return true;
@@ -898,16 +712,14 @@ void smShader::initDraw(smDrawParam p_param)
     autoGetTextureIds();
 }
 
-smInt smShader::createAttrib(smChar * const p_attrib)
+smInt smShader::createAttrib(const smString& p_attrib)
 {
-
     attribParamsString.push_back(p_attrib);
     return attribParamsString.size();
 }
 
-void smShader::createParam(smChar *const p_param)
+void smShader::createParam(const smString& p_param)
 {
-
     vertexShaderParamsString.push_back(p_param);
     fragmentShaderParamsString.push_back(p_param);
     geometryShaderParamsString.push_back(p_param);
@@ -920,7 +732,7 @@ void smShader::getAttribAndParamLocations()
 
     for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
     {
-        param = glGetUniformLocation(shaderProgramObject, vertexShaderParamsString[i]);
+        param = glGetUniformLocation(shaderProgramObject, vertexShaderParamsString[i].data());
         vertexShaderParams.push_back(param);
 
         if (textureGLBind[vertexShaderParamsString[i]] != -1)
@@ -931,7 +743,7 @@ void smShader::getAttribAndParamLocations()
 
     for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
     {
-        param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i]);
+        param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i].data());
         fragmentShaderParams.push_back(param);
         std::cout << "[smShader::getAttribAndParamLocations] " << fragmentShaderParamsString[i] << " " << param << "\n";
 
@@ -943,7 +755,7 @@ void smShader::getAttribAndParamLocations()
 
     for (smInt i = 0; i < geometryShaderParamsString.size(); i++)
     {
-        param = glGetUniformLocation(shaderProgramObject, geometryShaderParamsString[i]);
+        param = glGetUniformLocation(shaderProgramObject, geometryShaderParamsString[i].data());
         geometryShaderParams.push_back(param);
 
         if (textureGLBind[geometryShaderParamsString[i]] != -1)
@@ -954,7 +766,7 @@ void smShader::getAttribAndParamLocations()
 
     for (smInt i = 0; i < attribParamsString.size(); i++)
     {
-        param = glGetAttribLocation(shaderProgramObject, attribParamsString[i]);
+        param = glGetAttribLocation(shaderProgramObject, attribParamsString[i].data());
         attribShaderParams.push_back(param);
     }
 }
@@ -995,32 +807,32 @@ void smShader::print()
         std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }
 }
-bool smShader::setModelViewMatrixShaderName( char *p_modelviewMatrixName )
+bool smShader::setModelViewMatrixShaderName(const smString& p_modelviewMatrixName )
 {
-    if ( strlen( p_modelviewMatrixName ) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1 )
+    if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_modelviewMatrixName.length())
     {
         return false;
     }
     else
     {
-        strcpy( this->modelViewMatrixName, p_modelviewMatrixName );
+        this->modelViewMatrixName = p_modelviewMatrixName;
     }
 
-    createParam( modelViewMatrixName );
+    createParam(modelViewMatrixName);
     return true;
 }
-bool smShader::setProjectionMatrixShaderName( char *p_projectionName )
+bool smShader::setProjectionMatrixShaderName(const smString& p_projectionName)
 {
-    if ( strlen( p_projectionName ) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1 )
+    if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_projectionName.length())
     {
         return false;
     }
     else
     {
-        strcpy( this->projectionMatrixName, p_projectionName );
+        this->projectionMatrixName = p_projectionName;
     }
 
-    createParam( projectionMatrixName );
+    createParam(projectionMatrixName);
     return true;
 }
 void smShader::updateGLSLMatwithOPENGL()
@@ -1033,9 +845,9 @@ void smShader::updateGLSLMatwithOPENGL()
     glUniformMatrix4fv( modelViewMatrix, 1, true, model.data() );
     glUniformMatrix4fv( projectionMatrix, 1, true, proj.data() );
 }
-GLint smShader::queryUniformLocation( char *const p_param )
+GLint smShader::queryUniformLocation(const smString& p_param)
 {
-    return glGetUniformLocation( shaderProgramObject, p_param );
+    return glGetUniformLocation(shaderProgramObject, p_param.data());
 }
 smShader *smShader::getShader( smUnifiedID p_shaderID )
 {

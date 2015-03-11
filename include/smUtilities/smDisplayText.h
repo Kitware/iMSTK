@@ -40,7 +40,7 @@ enum SMDISPLAY_STREAM
 struct smDisplayMessage
 {
     /// \brief text to display
-    smChar text[SIMMEDTK_MAX_DISPLAYTEXT];
+    smString text;
     /// \brief sender id. Id given my the framework
     smInt  senderId;
     /// \brief diplay output

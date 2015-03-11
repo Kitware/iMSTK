@@ -715,18 +715,18 @@ void smBaseMesh::assignTexture( int p_textureId )
 
     if ( p_textureId > 0 )
     {
-        textureIds.push_back( attachment );
+        this->textureIds.push_back( attachment );
     }
 }
-void smBaseMesh::assignTexture( char *p_referenceName )
+void smBaseMesh::assignTexture(const smString& p_referenceName)
 {
     smInt textureId;
     smTextureAttachment attachment;
 
-    if ( smTextureManager::findTextureId( p_referenceName, textureId ) == SIMMEDTK_TEXTURE_OK )
+    if (smTextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
     {
         attachment.textureId = textureId;
-        textureIds.push_back( attachment );
+        this->textureIds.push_back(attachment);
     }
 }
 smLineMesh::smLineMesh( int p_nbrVertices ) : smBaseMesh()

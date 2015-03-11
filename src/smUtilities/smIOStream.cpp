@@ -32,11 +32,10 @@ smIOStream& smConsoleStream::operator<<(smString p_string)
     std::cout << p_string;
     return *this;
 }
-smIOStream& smConsoleStream::operator>>(smString& p_string)
+smIOStream& smConsoleStream::operator>>(smString &p_string)
 {
-    std::cin.get(inputBuffer, SM_CONSOLE_INPUTBUFFER - 1);
-    inputBuffer[SM_CONSOLE_INPUTBUFFER - 1] = '\0';
-    p_string = smString(inputBuffer);
+    std::getline(std::cin, inputBuffer);
+    p_string = inputBuffer;
     return *this;
 }
 smWindowString::smWindowString()
