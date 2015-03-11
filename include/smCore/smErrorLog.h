@@ -24,14 +24,16 @@
 #ifndef SMERRORLOG_H
 #define SMERRORLOG_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smCoreClass.h"
-#include "smUtilities/smTimer.h"
-
+// STL includes
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <mutex>
+
+// SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smCore/smCoreClass.h"
+#include "smUtilities/smTimer.h"
 
 ///This is class is for error storing of the whole SimMedTK system.
 ///All errors should be reported to the instance of this class.

@@ -23,6 +23,8 @@
 
 #ifndef SMDUMMYSIMULATOR_H
 #define SMDUMMYSIMULATOR_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smErrorLog.h"
@@ -35,117 +37,25 @@ class smDummySimulator: public smObjectSimulator, public smEventHandler
 
 public:
     /// \brief constructor
-    smDummySimulator(smErrorLog *p_errorLog): smObjectSimulator(p_errorLog)
-    {
-    }
+    smDummySimulator(smErrorLog *p_errorLog);
 
 protected:
-    virtual void beginSim()
-    {
-        //start the job
-    }
+    virtual void beginSim();
 
     /// \brief !!
-    virtual void initCustom()
-    {
-        smClassType type;
-        smSceneObject *object;
-        smStaticSceneObject *staticObject;
-        smVec3f *newVertices;
-
-        //do nothing for now
-        for (smInt i = 0; i < objectsSimulated.size(); i++)
-        {
-            object = objectsSimulated[i];
-            type = object->getType();
-
-            switch (type)
-            {
-            case SIMMEDTK_SMSTATICSCENEOBJECT:
-                staticObject = (smStaticSceneObject*)object;
-                object->localVerts.reserve(staticObject->mesh->nbrVertices);
-                object->localVerts = staticObject->mesh->vertices;
-                object->flags.isSimulatorInit = true;
-                break;
-            }
-        }
-    }
+    virtual void initCustom();
 
     /// \brief advance the simulator in time in a loop here
-    virtual void run()
-    {
-        smSceneObject *sceneObj;
-        smStaticSceneObject *staticSceneObject;
-        smVec3f *vertices;
-        smMesh *mesh;
-
-        beginSim();
-
-        for (smInt i = 0; i < this->objectsSimulated.size(); i++)
-        {
-            sceneObj = this->objectsSimulated[i];
-
-            //ensure that dummy simulator will work on static scene objects only.
-            if (sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
-            {
-                staticSceneObject = (smStaticSceneObject*)sceneObj;
-                mesh = staticSceneObject->mesh;
-
-                for (smInt vertIndex = 0; vertIndex < staticSceneObject->mesh->nbrVertices; vertIndex++)
-                {
-                    staticSceneObject->localVerts[vertIndex].y = staticSceneObject->localVerts[vertIndex].y + 0.000001;
-                }
-            }
-        }
-
-        endSim();
-    }
+    virtual void run();
 
     /// \brief !!
-    void endSim()
-    {
-        //end the job
-    }
+    void endSim();
 
     /// \brief synchronize the buffers in the object (do not call by yourself).
-    void syncBuffers()
-    {
-        smSceneObject *sceneObj;
-        smStaticSceneObject *staticSceneObject;
-        smMesh *mesh;
-
-        for (smInt i = 0; i < this->objectsSimulated.size(); i++)
-        {
-            sceneObj = this->objectsSimulated[i];
-
-            //ensure that dummy simulator will work on static scene objects only.
-            if (sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
-            {
-                staticSceneObject = (smStaticSceneObject*)sceneObj;
-                mesh = staticSceneObject->mesh;
-                mesh->vertices = staticSceneObject->localVerts;
-            }
-        }
-    }
+    void syncBuffers();
 
     /// \brief catch events such as key presses and other user inputs
-    void handleEvent(smEvent *p_event)
-    {
-        smKeyboardEventData *keyBoardData;
-
-        switch (p_event->eventType.eventTypeCode)
-        {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = (smKeyboardEventData*)p_event->data;
-
-            if (keyBoardData->keyBoardKey == smKey::F1)
-            {
-                printf("F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey);
-            }
-
-            break;
-        }
-    }
+    void handleEvent(smEvent *p_event);
 };
 
 #endif

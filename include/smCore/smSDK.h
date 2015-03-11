@@ -24,6 +24,7 @@
 #ifndef SMSDK_H
 #define SMSDK_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smScene.h"
@@ -33,7 +34,7 @@
 #include "smCore/smTextureManager.h"
 #include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
-#include "smUtilities/smDataStructs.h"
+#include "smUtilities/smDataStructures.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100

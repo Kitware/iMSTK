@@ -20,15 +20,17 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMEVENTHANDLER_H
 #define SMEVENTHANDLER_H
 
+// STL includes
+#include <atomic>
+
+// SimMedTK includes
 #include "smCore/smCoreClass.h"
 #include "smCore/smEvent.h"
 #include "smCore/smDispatcher.h"
-
-#include <atomic>
 
 class smEvent;
 class smEventType;
@@ -53,12 +55,7 @@ class smEventHandlerHolder
 {
 
 public:
-    smEventHandlerHolder()
-    {
-        enabled = true;
-        handler = NULL;
-        registeredEventType = SIMMEDTK_EVENTTYPE_NONE;
-    }
+    smEventHandlerHolder();
     smEventHandler *handler;
     smEventType  registeredEventType;
     smBool enabled;
@@ -100,19 +97,7 @@ public:
     /// \brief fetch event from the queue
     void fetchEvent();
     /// \brief this calls the handler in synchronization
-    inline void callHandlers(smEvent *p_event)
-    {
-        int v = handlers.size();
-
-        for (smInt i = 0; i < v; i++)
-        {
-            if (handlers[i]->enabled && p_event->eventType == handlers[i]->registeredEventType ||
-                    handlers[i]->registeredEventType == SIMMEDTK_EVENTTYPE_ALL)
-            {
-                handlers[i]->handler->handleEvent(p_event);
-            }
-        }
-    }
+    void callHandlers(smEvent *p_event);
 };
 
 #endif

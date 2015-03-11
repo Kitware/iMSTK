@@ -40,19 +40,19 @@
 #include "smCore/smEventHandler.h"
 #include "smSimulators/smPBDSceneObject.h"
 #include "smSimulators/smFemSceneObject.h"
-#include "smUtilities/smDataStructs.h"
+#include "smUtilities/smDataStructures.h"
 #include "smSimulators/smStylusObject.h"
 #include "smRendering/smLight.h"
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
-#include "smShader/SceneTextureShader.h"
 #include "smRendering/smCamera.h"
 
 
 //forward declaration
 class smSDK;
 class smOpenGLWindowStream;
-class MetalShader;
+class smMetalShader;
+class smSceneTextureShader;
 
 class smCameraCollisionInterface
 {
@@ -188,7 +188,7 @@ public:
     /// \brief change window resolution
     void setScreenResolution(smInt p_width, smInt p_height);
     /// \brief set scene as texture
-    void setSceneAsTextureShader(SceneTextureShader *p_shader);
+    void setSceneAsTextureShader(smSceneTextureShader *p_shader);
     /// \brief set the window title
     void setWindowTitle(smString);
     /// \brief Registers a scene for rendering with the viewer
@@ -303,7 +303,7 @@ public:
     /// \brief  camera collision callback
     smCameraCollisionInterface *notes_cameraCollision;
     /// \brief   for dynamic reflection
-    MetalShader *renderandreflection;
+    smMetalShader *renderandreflection;
 };
 
 #endif

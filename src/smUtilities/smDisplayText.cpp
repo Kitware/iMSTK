@@ -21,7 +21,17 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMLATTICETYPES_H
-#define SMLATTICETYPES_H
+// STL inlcudes
+#include <iostream>
 
-#endif
+// SimMedTK includes
+#include "smUtilities/smDisplayText.h"
+
+void smDisplayText::addText(smDisplayMessage message)
+{
+    switch (message.outputStream)
+    {
+    case SMDISPLAY_CONSOLE:
+        std::cout << message.text << std::endl;
+    }
+}

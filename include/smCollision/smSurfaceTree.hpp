@@ -263,13 +263,14 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
             totalDistance += (Node.getCube().center - mesh->vertices[*it]).norm();
         }
 
-        float weightSum = 0;
-        float weight;
+        smFloat weightSum = 0;
+        smFloat weight;
+        smFloat totalDistance2 = totalDistance * totalDistance;
 
         for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
-            weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
-            weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
+            // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
+            weight = 1-(Node.getCenter()-mesh->vertices[*it]).squaredNorm() / totalDistance2;
             weightSum += weight;
             Node.weights.push_back(weight);
         }

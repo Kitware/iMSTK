@@ -21,5 +21,22 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
+// SimMedTK includes
+#include "smUtilities/smTimer.h"
 
+smTimer::smTimer()
+{
+    start();
+}
+void smTimer::start()
+{
+    begin = ClockType::now();
+}
+smLongDouble smTimer::elapsed()
+{
+    smLongDouble deltaSec;
+    TimePointType now = ClockType::now();
+    DurationType delta = now - begin;
+    deltaSec = (((smLongDouble)delta.count() * PeriodType::num) / PeriodType::den);
+    return deltaSec;
+}

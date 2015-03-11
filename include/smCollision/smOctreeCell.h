@@ -42,52 +42,50 @@ public:
     enum { numberOfSubdivisions = 8 };
 
     /// \brief get a constant reference to the cell primitive
-    inline const smCube &getCube() const;
+    const smCube &getCube() const;
 
     /// \brief get a reference to the cell primitive
-    inline smCube &getCube();
+    smCube &getCube();
 
     /// \brief set the primitive
-    inline void setCube(const smCube &other);
+    void setCube(const smCube &other);
 
     /// \brief get the center of the octree cell
-    inline smVec3f &getCenter();
+    smVec3f &getCenter();
 
     /// \brief get constant reference to the center of the octree cell
-    inline const smVec3f &getCenter() const;
+    const smVec3f &getCenter() const;
 
     /// \brief set the center of the octree cell
-    inline void setCenter ( const smVec3f &center );
+    void setCenter ( const smVec3f &center );
 
     /// \brief get reference to the side length of the octree cell
-    inline float &getLength ();
+    float &getLength ();
 
     /// \brief get the side length of the octree cell
-    inline const float &getLength() const;
+    const float &getLength() const;
 
     /// \brief set the octree cell
-    inline void copyShape ( const smOctreeCell &cell );
+    void copyShape ( const smOctreeCell &cell );
 
     /// \brief !! expand the cell of the octree structure
-    inline void expand ( const float expandScale );
+    void expand ( const float expandScale );
 
     /// \brief set the length of the octree cell
-    inline void setLength ( const float length );
+    void setLength ( const float length );
 
     /// \brief check if a triangle is intersecting the octree cell
-    inline bool isCollidedWithTri ( smVec3f &v0, smVec3f &v1, smVec3f &v2 );
+    bool isCollidedWithTri ( smVec3f &v0, smVec3f &v1, smVec3f &v2 );
 
     /// \brief check if a point lies inside an octree cell
-    inline bool isCollidedWithPoint ();
+    bool isCollidedWithPoint ();
 
     /// \brief subdivide the cells of octree cells
-    inline void subDivide ( const int divisionPerAxis, std::vector<smOctreeCell> &cells );
+    void subDivide ( const int divisionPerAxis, std::vector<smOctreeCell> &cells );
 
 private:
     smCube cube; ///< cube
 };
-
-#include "smCollision/smOctreeCell.hpp"
 
 #endif
 

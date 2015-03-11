@@ -21,11 +21,14 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smShader/smShader.h"
-#include "smCore/smTextureManager.h"
+// STL includes
 #include <fstream>
 #include <iostream>
 #include <chrono>
+
+// SimMedTK includes
+#include "smShader/smShader.h"
+#include "smCore/smTextureManager.h"
 
 std::unordered_map<smInt, smShader *> smShader::shaders;
 smShader *smShader ::currentShader = NULL;
@@ -991,4 +994,50 @@ void smShader::print()
     {
         std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }
+}
+bool smShader::setModelViewMatrixShaderName( char *p_modelviewMatrixName )
+{
+    if ( strlen( p_modelviewMatrixName ) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1 )
+    {
+        return false;
+    }
+    else
+    {
+        strcpy( this->modelViewMatrixName, p_modelviewMatrixName );
+    }
+
+    createParam( modelViewMatrixName );
+    return true;
+}
+bool smShader::setProjectionMatrixShaderName( char *p_projectionName )
+{
+    if ( strlen( p_projectionName ) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1 )
+    {
+        return false;
+    }
+    else
+    {
+        strcpy( this->projectionMatrixName, p_projectionName );
+    }
+
+    createParam( projectionMatrixName );
+    return true;
+}
+void smShader::updateGLSLMatwithOPENGL()
+{
+    smMatrix44f proj, model;
+    smGLUtils::queryModelViewMatrix( model );
+    smGLUtils::queryProjectionMatrix( proj );
+
+    //as the our matrix is row major, we need transpose it. Transpose parameters are true
+    glUniformMatrix4fv( modelViewMatrix, 1, true, model.data() );
+    glUniformMatrix4fv( projectionMatrix, 1, true, proj.data() );
+}
+GLint smShader::queryUniformLocation( char *const p_param )
+{
+    return glGetUniformLocation( shaderProgramObject, p_param );
+}
+smShader *smShader::getShader( smUnifiedID p_shaderID )
+{
+    return shaders[p_shaderID.ID];
 }

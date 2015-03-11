@@ -57,7 +57,10 @@ typedef Eigen::Matrix<double, 4, 1>  smVec4d;
 typedef Eigen::Matrix<double, 6, 1> smVec6d;
 
 /// A dynamic size column vector
-typedef Eigen::Matrix<double, Eigen::Dynamic, 1> smVector;
+typedef Eigen::Matrix<float, Eigen::Dynamic, 1> smVectorf;
+
+/// A dynamic size column vector
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> smVectord;
 
 
 // } // Math

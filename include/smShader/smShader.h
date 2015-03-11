@@ -207,35 +207,9 @@ public:
     void createTextureParam(smChar *p_textureNameInShaderCode);
 
     smBool setShaderFileName(smChar *p_vertexFileName, smChar *p_geometryFileName, smChar *p_fragmentFileName);
-    smBool setModelViewMatrixShaderName(smChar *p_modelviewMatrixName)
-    {
-        if (strlen(p_modelviewMatrixName) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1)
-        {
-            return false;
-        }
-        else
-        {
-            strcpy(this->modelViewMatrixName, p_modelviewMatrixName);
-        }
+    smBool setModelViewMatrixShaderName(smChar *p_modelviewMatrixName);
 
-        createParam(modelViewMatrixName);
-        return true;
-    }
-
-    smBool setProjectionMatrixShaderName(smChar *p_projectionName)
-    {
-        if (strlen(p_projectionName) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1)
-        {
-            return false;
-        }
-        else
-        {
-            strcpy(this->projectionMatrixName, p_projectionName);
-        }
-
-        createParam(projectionMatrixName);
-        return true;
-    }
+    smBool setProjectionMatrixShaderName(smChar *p_projectionName);
 
     /// \brief holds the unitform location for projection matrix. That is needed in newer versions of GLSL
     smGLInt projectionMatrix;
@@ -243,16 +217,7 @@ public:
     /// \brief holds the unitform location for modelview matrix. That is needed in newer versions of GLSL
     smGLInt modelViewMatrix;
 
-    inline void updateGLSLMatwithOPENGL()
-    {
-        smMatrix44f proj, model;
-        smGLUtils::queryModelViewMatrix(model);
-        smGLUtils::queryProjectionMatrix(proj);
-
-        //as the our matrix is row major, we need transpose it. Transpose parameters are true
-        glUniformMatrix4fv(modelViewMatrix, 1, true, model.data());
-        glUniformMatrix4fv(projectionMatrix, 1, true, proj.data());
-    }
+    void updateGLSLMatwithOPENGL();
 
     /// \brief returns the shader attrrib param
     smGLInt getShaderParamForAll(smChar *p_paramName);
@@ -266,10 +231,7 @@ public:
     void createParam(smChar * const p_param);
     smInt createAttrib(smChar * const p_attrib);
 
-    smGLInt queryUniformLocation(smChar *const p_param)
-    {
-        return glGetUniformLocation(shaderProgramObject, p_param);
-    }
+    smGLInt queryUniformLocation(smChar *const p_param);
 
 #endif
 
@@ -308,10 +270,7 @@ public:
     virtual void posdraw(smMesh *mesh) {}
     virtual void posdraw(smSurfaceMesh *mesh) {}
 
-    static inline smShader * getShader(smUnifiedID p_shaderID)
-    {
-        return shaders[p_shaderID.ID];
-    }
+    static smShader * getShader(smUnifiedID p_shaderID);
 
     static void initGLShaders(smDrawParam p_param);
     void activeGLTextures(smUnifiedID p_id);

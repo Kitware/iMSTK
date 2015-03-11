@@ -28,10 +28,8 @@
 #include "smCore/smConfig.h"
 #include "smCore/smKey.h"
 #include "smCore/smMouse.h"
-
 #include "smUtilities/smMatrix.h"
 #include "smUtilities/smVector.h"
-
 #include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
 
 /// \brief keyboard event data

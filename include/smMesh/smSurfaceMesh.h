@@ -24,6 +24,7 @@
 #ifndef SMSURFACEMESH_H
 #define SMSURFACEMESH_H
 
+// SimMedTK includes
 #include "smMesh/smMesh.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.

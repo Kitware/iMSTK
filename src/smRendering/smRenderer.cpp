@@ -23,7 +23,7 @@
 
 #include "smRendering/smGLRenderer.h"
 #include "smMesh/smMesh.h"
-#include "smUtilities/smDataStructs.h"
+#include "smUtilities/smDataStructures.h"
 #include "smRendering/smViewer.h"
 #include "smUtilities/smQuaternion.h"
 #include "smRendering/smVAO.h"

@@ -24,10 +24,12 @@
 #ifndef SMSTATICSCENEOBJECT_H
 #define SMSTATICSCENEOBJECT_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smSceneObject.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smCoreClass.h"
+
 /// \brief static scene object
 class smStaticSceneObject: public smSceneObject
 {

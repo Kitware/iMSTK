@@ -24,6 +24,7 @@
 #ifndef SMCUSTOMRENDERER_H
 #define SMCUSTOMRENDERER_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
 #include "smCore/smCoreClass.h"

@@ -39,3 +39,29 @@ void  smModule::endModule()
     endFrame();
     dispathcer->handle((smCoreClass*)this, SIMMEDTK_CALLERSTATE_ENDFRAME);
 }
+void smModule::terminate()
+{
+    terminateExecution = true;
+}
+bool smModule::isTerminationDone()
+{
+    return terminationCompleted;
+}
+void smModule::waitTermination()
+{
+    while ( 1 )
+    {
+        if ( terminationCompleted == true )
+        {
+            break;
+        }
+    }
+}
+void smModule::setEventDispatcher( smEventDispatcher *p_dispathcer )
+{
+    eventDispatcher = p_dispathcer;
+}
+int smModule::getModuleId()
+{
+    return uniqueId.ID;
+}

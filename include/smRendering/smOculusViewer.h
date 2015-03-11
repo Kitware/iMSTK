@@ -24,10 +24,12 @@
 #ifndef SMOCULUSVIEWER_H
 #define SMOCULUSVIEWER_H
 
-#include "smRendering/smViewer.h"
-
+// OculusSDK includes
 #include <OVR.h>
 #include <OVR_CAPI_GL.h>
+
+// SimMedTK includes
+#include "smRendering/smViewer.h"
 
 /// \brief This viewer class allows content to be rendered to an Oculus Rift
 ///

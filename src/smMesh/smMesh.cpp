@@ -699,3 +699,171 @@ void smLineMesh::draw(smDrawParam p_params)
         }
     }
 }
+smTextureAttachment::smTextureAttachment()
+{
+}
+
+bool smBaseMesh::isMeshTextured()
+{
+    return isTextureCoordAvailable;
+}
+
+void smBaseMesh::assignTexture( int p_textureId )
+{
+    smTextureAttachment attachment;
+    attachment.textureId = p_textureId;
+
+    if ( p_textureId > 0 )
+    {
+        textureIds.push_back( attachment );
+    }
+}
+void smBaseMesh::assignTexture( char *p_referenceName )
+{
+    smInt textureId;
+    smTextureAttachment attachment;
+
+    if ( smTextureManager::findTextureId( p_referenceName, textureId ) == SIMMEDTK_TEXTURE_OK )
+    {
+        attachment.textureId = textureId;
+        textureIds.push_back( attachment );
+    }
+}
+smLineMesh::smLineMesh( int p_nbrVertices ) : smBaseMesh()
+{
+    nbrVertices = p_nbrVertices;
+    vertices.reserve( nbrVertices );
+    origVerts.reserve( nbrVertices );
+    edgeAABBs = new smAABB[nbrVertices - 1];
+    texCoord = new smTexCoord[nbrVertices];
+    edges = new smEdge[nbrVertices - 1];
+    nbrEdges = nbrVertices - 1;
+    isTextureCoordAvailable = false;
+    createAutoEdges();
+}
+smLineMesh::smLineMesh( int p_nbrVertices, bool autoEdge ) : smBaseMesh()
+{
+    nbrVertices = p_nbrVertices;
+    vertices.reserve( nbrVertices );
+    origVerts.reserve( nbrVertices );
+    texCoord = new smTexCoord[nbrVertices];
+
+    /// Edge AABB should be assigned by the instance
+    edgeAABBs = NULL;
+
+    /// Edges should be assigned by the instance
+    edges = NULL;
+
+    /// Number of edges should be assigned by the instance
+    nbrEdges = 0;
+
+    isTextureCoordAvailable = false;
+
+    if ( autoEdge )
+    {
+        createAutoEdges();
+    }
+}
+void smLineMesh::createAutoEdges()
+{
+    for ( smInt i = 0; i < nbrEdges; i++ )
+    {
+        edges[i].vert[0] = i;
+        edges[i].vert[1] = i + 1;
+    }
+}
+void smLineMesh::updateAABB()
+{
+    smAABB tempAABB;
+    smVec3f minOffset( -2.0, -2.0, -2.0 );
+    smVec3f maxOffset( 1.0, 1.0, 1.0 );
+    smVec3f minEdgeOffset( -0.1, -0.1, -0.1 );
+    smVec3f maxEdgeOffset( 0.1, 0.1, 0.1 );
+
+    tempAABB.aabbMin[0] = FLT_MAX;
+    tempAABB.aabbMin[1] = FLT_MAX;
+    tempAABB.aabbMin[2] = FLT_MAX;
+
+    tempAABB.aabbMax[0] = -FLT_MAX;
+    tempAABB.aabbMax[1] = -FLT_MAX;
+    tempAABB.aabbMax[2] = -FLT_MAX;
+
+    for ( smInt i = 0; i < nbrEdges; i++ )
+    {
+        ///min
+        edgeAABBs[i].aabbMin[0] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
+        edgeAABBs[i].aabbMin[1] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
+        edgeAABBs[i].aabbMin[2] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
+        edgeAABBs[i].aabbMin += minEdgeOffset;
+        tempAABB.aabbMin[0] = SIMMEDTK_MIN( tempAABB.aabbMin[0], edgeAABBs[i].aabbMin[0] );
+        tempAABB.aabbMin[1] = SIMMEDTK_MIN( tempAABB.aabbMin[1], edgeAABBs[i].aabbMin[1] );
+        tempAABB.aabbMin[2] = SIMMEDTK_MIN( tempAABB.aabbMin[2], edgeAABBs[i].aabbMin[2] );
+
+        ///max
+        edgeAABBs[i].aabbMax[0] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
+        edgeAABBs[i].aabbMax[1] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
+        edgeAABBs[i].aabbMax[2] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
+        edgeAABBs[i].aabbMax += maxEdgeOffset;
+        tempAABB.aabbMax[0] = SIMMEDTK_MAX( tempAABB.aabbMax[0], edgeAABBs[i].aabbMax[0] );
+        tempAABB.aabbMax[1] = SIMMEDTK_MAX( tempAABB.aabbMax[1], edgeAABBs[i].aabbMax[1] );
+        tempAABB.aabbMax[2] = SIMMEDTK_MAX( tempAABB.aabbMax[2], edgeAABBs[i].aabbMax[2] );
+    }
+
+    tempAABB.aabbMin += minOffset;
+    tempAABB.aabbMax += maxOffset;
+    aabb = tempAABB;
+}
+void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
+{
+
+    for ( smInt i = 0; i < nbrVertices; i++ )
+    {
+        vertices[i][0] = vertices[i][0] + p_offsetX;
+        vertices[i][1] = vertices[i][1] + p_offsetY;
+        vertices[i][2] = vertices[i][2] + p_offsetZ;
+    }
+
+    updateAABB();
+}
+void smLineMesh::translate( smVec3f p_offset )
+{
+
+    for ( smInt i = 0; i < nbrVertices; i++ )
+    {
+        vertices[i] = vertices[i] + p_offset;
+        origVerts[i] = origVerts[i] + p_offset;
+    }
+
+    updateAABB();
+}
+void smLineMesh::rotate( smMatrix33f p_rot )
+{
+
+    for ( smInt i = 0; i < nbrVertices; i++ )
+    {
+        vertices[i] = p_rot * vertices[i];
+        origVerts[i] = p_rot * origVerts[i];
+    }
+
+    updateAABB();
+}
+void smLineMesh::scale( smVec3f p_scaleFactors )
+{
+
+    for ( smInt i = 0; i < nbrVertices; i++ )
+    {
+        vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
+        vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
+        vertices[i][2] = vertices[i][2] * p_scaleFactors[2];
+
+        origVerts[i][0] = origVerts[i][0] * p_scaleFactors[0];
+        origVerts[i][1] = origVerts[i][1] * p_scaleFactors[1];
+        origVerts[i][2] = origVerts[i][2] * p_scaleFactors[2];
+    }
+
+    updateAABB();
+}
+bool smLineMesh::isMeshTextured()
+{
+    return isTextureCoordAvailable;
+}

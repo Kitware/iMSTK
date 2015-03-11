@@ -20,10 +20,11 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMIMPORTEXPORT_H
 #define SMIMPORTEXPORT_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smMesh/smMesh.h"

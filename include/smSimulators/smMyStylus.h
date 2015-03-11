@@ -24,7 +24,9 @@
 #ifndef SMMYSTYLUS_H
 #define SMMYSTYLUS_H
 
+// SimMedTK includes
 #include "smSimulators/smStylusObject.h"
+
 class smMeshContainer;
 
 /// \brief class for avatar controlled by phantom omni in virtual space

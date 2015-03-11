@@ -55,30 +55,11 @@ public:
                                  smFloat p_top);
 
     /// \brief draw unit quad
-    static inline void drawUnitQuadOnScreen()
-    {
-        glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-        glTexCoord2f(0, 0);
-        glVertex3f(-1, -1, -1);
-        glTexCoord2f(1, 0);
-        glVertex3f(1, -1, -1);
-        glTexCoord2f(1, 1);
-        glVertex3f(1, 1.0, -1);
-        glTexCoord2f(0, 1);
-        glVertex3f(-1, 1.0, -1);
-        glEnd();
-    }
+    static void drawUnitQuadOnScreen();
 
-    static inline void queryProjectionMatrix(smMatrix44f &p_matrix)
-    {
-        glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
-    }
+    static void queryProjectionMatrix(smMatrix44f &p_matrix);
     /// \brief to query current model view matrix. p_matrix will have the final values.
-    static inline void queryModelViewMatrix(smMatrix44f &p_matrix)
-    {
-        glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
-    }
+    static void queryModelViewMatrix(smMatrix44f &p_matrix);
 };
 
 #endif

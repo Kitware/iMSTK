@@ -24,14 +24,20 @@
 #ifndef SMTEXTUREMANAGER_H
 #define SMTEXTUREMANAGER_H
 
+// STL includes
+#include <unordered_map>
+#include <cstring>
+
+// DevIL includes
+#include <IL/ilu.h>
+#include <IL/ilut.h>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
 #include "smCore/smErrorLog.h"
 
-#include <IL/ilu.h>
-#include <IL/ilut.h>
-#include <unordered_map>
-#include <cstring>
+
 
 enum smTextureReturnType
 {

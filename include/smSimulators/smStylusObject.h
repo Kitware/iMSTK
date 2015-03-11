@@ -42,38 +42,19 @@
 
 template<typename T> class smCollisionModel;
 template<typename smSurfaceTreeCell> class smSurfaceTree;
-struct smOctreeCell;
+class smOctreeCell;
 
 /// \brief !!
-struct smMeshContainer
+class smMeshContainer
 {
 public:
     smString name;
 
     /// \brief constructor
-    smMeshContainer(smString p_name = "")
-    {
-        name = p_name;
-        offsetRotX = 0.0;
-        offsetRotY = 0.0;
-        offsetRotZ = 0.0;
-        preOffsetPos = smVec3f::Zero();
-        posOffsetPos = smVec3f::Zero();
-        mesh = NULL;
-        colModel = NULL;
-    }
+    smMeshContainer(smString p_name = "");
 
     /// \brief constructor
-    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3f p_prePos, smVec3f p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ)
-    {
-        offsetRotX = p_offsetRotX;
-        offsetRotY = p_offsetRotY;
-        offsetRotZ = p_offsetRotZ;
-        preOffsetPos = p_prePos;
-        posOffsetPos = p_posPos;
-        name = p_name;
-        colModel = NULL;
-    }
+    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3f p_prePos, smVec3f p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ);
 
     smFloat offsetRotX; ///< offset in rotation in x-direction
     smFloat offsetRotY; ///< offset in rotation in y-direction
@@ -92,29 +73,14 @@ public:
     smSurfaceTree<smOctreeCell> *colModel; ///< octree of surface
 
     /// \brief !!
-    inline void computeCurrentMatrix()
-    {
-        Eigen::Affine3f preTranslate(Eigen::Translation3f(preOffsetPos[0],preOffsetPos[1], preOffsetPos[2]));
-        Eigen::Affine3f posTranslate(Eigen::Translation3f(posOffsetPos[0], posOffsetPos[1], posOffsetPos[2]));
-        Eigen::Affine3f rx(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotX, smVec3f::UnitX())));
-        Eigen::Affine3f ry(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotY, smVec3f::UnitY())));
-        Eigen::Affine3f rz(Eigen::Affine3f(Eigen::AngleAxisf(SM_PI_TWO * offsetRotZ, smVec3f::UnitZ())));
-
-        smMatrix44f transform = (preTranslate * rx * ry *rz * posTranslate).matrix();
-        tempCurrentMatrix *= transform;
-        tempCurrentDeviceMatrix *= transform;
-    }
+    void computeCurrentMatrix();
 };
 
 /// \brief points on the stylus
 struct smStylusPoints
 {
     /// \brief constructor
-    smStylusPoints()
-    {
-        point = smVec3f::Zero();
-        container = NULL;
-    }
+    smStylusPoints();
 
     smVec3f point; ///< co-ordinates of points on stylus
     smMeshContainer *container; ///< !!
@@ -136,17 +102,13 @@ public:
     smStylusSceneObject(smErrorLog *p_log = NULL);
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock)
-    {
-    }
+    virtual void serialize(void *p_memoryBlock);
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock)
-    {
-    }
+    virtual void unSerialize(void *p_memoryBlock);
 
     /// \brief handle the events such as button presses related to stylus
-    virtual void handleEvent(smEvent *p_event) {};
+    virtual void handleEvent(smEvent *p_event);;
 };
 
 /// \brief !!
@@ -168,9 +130,7 @@ public:
     virtual void posTraverseCallBack(smMeshContainer &p_container);
 
     /// \brief Post Traverse callback for the entire object.
-    virtual void posTraverseCallBack()
-    {
-    }
+    virtual void posTraverseCallBack();
 
     smBool posCallBackEnabledForEntireObject; ///< !!
 
@@ -178,65 +138,21 @@ public:
     smStylusRigidSceneObject(smErrorLog *p_log = NULL);
 
     /// \brief !!
-    tree<smMeshContainer*>::iterator &addMeshContainer(smMeshContainer *p_meshContainer)
-    {
-        tree<smMeshContainer*>::iterator iter;
-
-        if (meshes.size() > 1)
-        {
-            iter = meshes.append_child(rootIterator, p_meshContainer);
-        }
-
-        else
-        {
-            iter = meshes.insert(rootIterator, p_meshContainer);
-        }
-
-        indexIterators[p_meshContainer->name] = iter;
-        return iter;
-    }
+    tree<smMeshContainer*>::iterator &addMeshContainer(smMeshContainer *p_meshContainer);
 
     /// \brief !!
-    smBool addMeshContainer(smString p_ParentName, smMeshContainer *p_meshContainer)
-    {
-        tree<smMeshContainer*>::iterator iter;
-
-        if (p_ParentName.size() > 0)
-        {
-            if (indexIterators.count(p_ParentName) > 0)
-            {
-                iter = indexIterators[p_ParentName];
-                meshes.append_child(iter, p_meshContainer);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            return false;
-        }
-    }
+    smBool addMeshContainer(smString p_ParentName, smMeshContainer *p_meshContainer);
 
     /// \brief !!
-    tree<smMeshContainer*>::iterator addMeshContainer(tree<smMeshContainer*>::iterator p_iterator, smMeshContainer *p_meshContainer)
-    {
-        return meshes.insert(p_iterator, p_meshContainer);
-    }
+    tree<smMeshContainer*>::iterator addMeshContainer(tree<smMeshContainer*>::iterator p_iterator, smMeshContainer *p_meshContainer);
 
     /// \brief !!
     smMeshContainer *getMeshContainer(smString p_string) const;
 
-    virtual void handleEvent(smEvent *p_event) {};
+    virtual void handleEvent(smEvent *p_event);
 
     /// \brief !!
-    smSceneObject *clone()
-    {
-        smStylusRigidSceneObject *ret = new smStylusRigidSceneObject();
-        return ret;
-    }
+    smSceneObject *clone();
 
     /// \brief !!
     virtual void initDraw(smDrawParam p_params);

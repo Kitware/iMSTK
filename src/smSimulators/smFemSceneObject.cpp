@@ -29,7 +29,7 @@
 void smFemSceneObject::buildLMmatrix()
 {
     smInt i, j;
-    ID = MatrixXf::Zero(v_mesh->nbrNodes, 3);
+    ID = smMatrixf::Zero(v_mesh->nbrNodes, 3);
 
     smInt dofID = 0;
 
@@ -52,7 +52,7 @@ void smFemSceneObject::buildLMmatrix()
 
     totalDof = dofID;
 
-    LM = MatrixXf::Zero(v_mesh->nbrTetra, 12);
+    LM = smMatrixf::Zero(v_mesh->nbrTetra, 12);
 
     smInt dof = 0;
 
@@ -67,15 +67,15 @@ void smFemSceneObject::buildLMmatrix()
     }
 
     //create arrays
-    fm_temp = VectorXf::Zero(totalDof);
-    fm = VectorXf::Zero(totalDof);
-    totalDisp = VectorXf::Zero(totalDof);
-    displacements = VectorXf::Zero(totalDof);
-    temp_displacements = VectorXf::Zero(totalDof);
-    displacements_prev = VectorXf::Zero(totalDof);
-    componentMasses = VectorXf::Zero(totalDof);
-    Kinv = MatrixXf::Zero(totalDof, totalDof);
-    stiffnessMatrix = MatrixXf::Zero(totalDof, totalDof);
+    fm_temp = smVectorf::Zero(totalDof);
+    fm = smVectorf::Zero(totalDof);
+    totalDisp = smVectorf::Zero(totalDof);
+    displacements = smVectorf::Zero(totalDof);
+    temp_displacements = smVectorf::Zero(totalDof);
+    displacements_prev = smVectorf::Zero(totalDof);
+    componentMasses = smVectorf::Zero(totalDof);
+    Kinv = smMatrixf::Zero(totalDof, totalDof);
+    stiffnessMatrix = smMatrixf::Zero(totalDof, totalDof);
 }
 
 //brief: computes the stiffness matrix, its inverse and saves it in external file.
@@ -106,12 +106,12 @@ void smFemSceneObject::computeStiffness()
         smFloat c2 = v / (1 - v);
         smFloat c3 = (1 - 2 * v) / (2 * (1 - v));
 
-        MatrixXf k_ele = MatrixXf::Zero(12, 12);
-        MatrixXf Ndash = MatrixXf::Zero(4, 3);
+        smMatrixf k_ele = smMatrixf::Zero(12, 12);
+        smMatrixf Ndash = smMatrixf::Zero(4, 3);
 
         smFloat vol, dd;
-        Matrix4f coff = Matrix4f::Zero();
-        Matrix4f coffinv = Matrix4f::Zero();
+        smMatrix44f coff = smMatrix44f::Zero();
+        smMatrix44f coffinv = smMatrix44f::Zero();
 
         for (i = 0; i < v_mesh->nbrTetra; i++)
         {
@@ -168,7 +168,7 @@ void smFemSceneObject::computeStiffness()
     //If the simulation is dynamic calculate the lumped mass matrix
     if (dynamicFem)
     {
-        dymamic_temp = VectorXf::Zero(totalDof);
+        dymamic_temp = smVectorf::Zero(totalDof);
         lumpMasses();
 
         for (i = 0; i < v_mesh->nbrNodes; i++)
@@ -190,10 +190,10 @@ void smFemSceneObject::computeStiffness()
 void smFemSceneObject::lumpMasses()
 {
     smInt i, j;
-    nodeMass = VectorXf::Zero(v_mesh->nbrNodes);
-    Vector3f centroid;
-    Vector3f node0, node1, node2, node3;
-    Vector3f face012, face023, face013, face123;
+    nodeMass = smVectorf::Zero(v_mesh->nbrNodes);
+    smVec3f centroid;
+    smVec3f node0, node1, node2, node3;
+    smVec3f face012, face023, face013, face123;
 
     for (i = 0; i < v_mesh->nbrTetra; i++)
     {
@@ -245,9 +245,9 @@ void smFemSceneObject::lumpMasses()
 }
 
 ///brief: volume of a tetra
-smFloat smFemSceneObject::tetraVolume(Vector3f &a, Vector3f &b, Vector3f &c, Vector3f &d)
+smFloat smFemSceneObject::tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3f &d)
 {
-    Matrix4f det;
+    smMatrix44f det;
     smFloat vol;
 
     det(0, 0) = a(0);
@@ -277,7 +277,7 @@ smFloat smFemSceneObject::tetraVolume(Vector3f &a, Vector3f &b, Vector3f &c, Vec
 }
 
 ///brief:reads matrix elements from an external file
-smBool smFemSceneObject::loadMatrix(const smChar *fname, MatrixXf &a)
+smBool smFemSceneObject::loadMatrix(const smChar *fname, smMatrixf &a)
 {
     FILE *p;
     smInt i, j;
@@ -305,7 +305,7 @@ smBool smFemSceneObject::loadMatrix(const smChar *fname, MatrixXf &a)
 }
 
 ///brief:saves the matrix to a external file
-smBool smFemSceneObject::saveMatrix(const smChar *fname, MatrixXf &a)
+smBool smFemSceneObject::saveMatrix(const smChar *fname, smMatrixf &a)
 {
     FILE *p;
     smInt i, j;
@@ -335,7 +335,7 @@ smBool smFemSceneObject::saveMatrix(const smChar *fname, MatrixXf &a)
 
 
 ///brief:assembles element stiffness to global stiffness
-void smFemSceneObject::assembleK(smInt element, MatrixXf k)
+void smFemSceneObject::assembleK(smInt element, smMatrixf k)
 {
     smInt i, j;
 
@@ -477,4 +477,28 @@ void smFemSceneObject::draw(smDrawParam p_params)
 {
     p_params.caller = this;
     this->v_mesh->draw(p_params);
+}
+smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
+{
+    type = SIMMEDTK_SMFEMSCENEOBJECT;
+    v_mesh = new smVolumeMesh( SMMESH_DEFORMABLE, p_log );
+    pullUp = true;
+    dynamicFem = false;
+
+    if ( dynamicFem )
+    {
+        dT = 0.02;
+        density = 500;
+    }
+}
+smSceneObject *smFemSceneObject::clone()
+{
+    return this;
+}
+void smFemSceneObject::serialize( void *p_memoryBlock )
+{
+}
+void smFemSceneObject::unSerialize( void *p_memoryBlock )
+{
+
 }

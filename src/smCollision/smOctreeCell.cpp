@@ -21,8 +21,12 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+// STD includes
+#include <cassert>
 
+// SimMedTK includes
 #include "smCollision/smOctreeCell.h"
+#include "smCollision/smCollisionMoller.h"
 
 smOctreeCell::smOctreeCell() : BaseType()
 {
@@ -32,4 +36,89 @@ smOctreeCell::smOctreeCell() : BaseType()
 smOctreeCell::~smOctreeCell()
 {
 
+}
+
+smVec3f &smOctreeCell::getCenter()
+{
+    return  cube.center;
+}
+
+const smVec3f &smOctreeCell::getCenter() const
+{
+    return  cube.center;
+}
+
+void smOctreeCell::setCenter( const smVec3f &center )
+{
+    cube.center = center;
+}
+
+float &smOctreeCell::getLength()
+{
+    return cube.sideLength;
+}
+
+const float &smOctreeCell::getLength() const
+{
+    return cube.sideLength;
+}
+
+void smOctreeCell::setLength( const float length )
+{
+    cube.sideLength = length;
+}
+
+void smOctreeCell::copyShape( const smOctreeCell &cell )
+{
+    cube = cell.cube;
+}
+
+void smOctreeCell::expand( const float expandScale )
+{
+    cube.expand( expandScale );
+}
+
+bool smOctreeCell::isCollidedWithTri( smVec3f &v0, smVec3f &v1, smVec3f &v2 )
+{
+    smAABB tempAABB;
+    tempAABB.aabbMin = cube.leftMinCorner();
+    tempAABB.aabbMax = cube.rightMaxCorner();
+    return smCollisionMoller::checkAABBTriangle( tempAABB, v0, v1, v2 );
+}
+
+bool smOctreeCell::isCollidedWithPoint()
+{
+    std::cerr << "Error::smOctreeCell::isCollidedWithPoint(): Function not implemented." << std::endl;
+    return 0;
+}
+
+void smOctreeCell::subDivide( const int divisionPerAxis, std::vector<smOctreeCell> &cells )
+{
+    size_t totalCubes = divisionPerAxis * divisionPerAxis * divisionPerAxis;
+
+    assert( cells.size() == totalCubes );
+
+    std::vector<smCube> cubes( totalCubes );
+    cube.subDivide( divisionPerAxis, cubes.data() );
+
+    for ( size_t i = 0; i < totalCubes; i++ )
+    {
+        cells[i].cube = cubes[i];
+    }
+}
+
+const smCube &smOctreeCell::getCube() const
+{
+    return cube;
+}
+
+smCube &smOctreeCell::getCube()
+{
+    return cube;
+}
+
+void smOctreeCell::setCube(const smCube &otherCube)
+{
+    this->cube.center = otherCube.center;
+    this->cube.sideLength = otherCube.sideLength;
 }

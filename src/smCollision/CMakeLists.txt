@@ -5,6 +5,8 @@ simmedtk_add_library(smCollision
     smOctreeCell.cpp
     smCollisionMoller.cpp
     smCollisionUtilities.cpp
+    smCollisionConfig.cpp
+    smOctreeCell.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionDetection.h

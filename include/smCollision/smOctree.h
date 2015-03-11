@@ -28,8 +28,6 @@
 #include "smCollision/smSurfaceTreeCell.h"
 #include "smCollision/smOctreeCell.h"
 #include "smCore/smGeometry.h"
-#include "smUtilities/smVec3.h"
-
 
 /// \brief octree
 class smOctree: public smSurfaceTreeCell<smOctree>

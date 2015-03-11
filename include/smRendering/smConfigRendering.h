@@ -74,77 +74,22 @@ struct smColor
             smFloat a;
         };
     };
-    smColor()
-    {
-        rgba[0] = 0.8f;
-        rgba[1] = 0.8f;
-        rgba[2] = 0.8f;
-        rgba[3] = 1.0f;
-    }
-    smColor(smFloat r, smFloat g, smFloat b, smFloat a = 1.0)
-    {
-        rgba[0] = r;
-        rgba[1] = g;
-        rgba[2] = b;
-        rgba[3] = a;
-    }
+    smColor();
+    smColor(smFloat r, smFloat g, smFloat b, smFloat a = 1.0);
 
     /// \brief Dark ratio. the valu is between 0 and 1.0
-    void darken(smFloat p_darkFactor)
-    {
-
-        rgba[0] = (rgba[1] - rgba[1] * (p_darkFactor));
-        rgba[1] = (rgba[2] - rgba[2] * (p_darkFactor));
-        rgba[2] = (rgba[3] - rgba[3] * (p_darkFactor));
-        rgba[0] = (rgba[0] < 0 ? 0 : rgba[0]);
-        rgba[1] = (rgba[1] < 0 ? 0 : rgba[1]);
-        rgba[2] = (rgba[2] < 0 ? 0 : rgba[2]);
-    }
+    void darken(smFloat p_darkFactor);
     /// \brief lighten the color
-    void lighten(smFloat p_darkFactor)
-    {
-
-        rgba[0] = rgba[1] + rgba[1] * (p_darkFactor);
-        rgba[1] = rgba[2] + rgba[2] * (p_darkFactor);
-        rgba[2] = rgba[3] + rgba[3] * (p_darkFactor);
-
-        rgba[0] = (rgba[0] > 1.0 ? 1.0 : rgba[0]);
-        rgba[1] = (rgba[1] < 1.0 ? 1.0 : rgba[1]);
-        rgba[2] = (rgba[2] < 1.0 ? 1.0 : rgba[2]);
-    }
+    void lighten(smFloat p_darkFactor);
 
     /// \brief returns the color value given with the index
-    smFloat operator()(smInt p_i)
-    {
-        if (p_i < 0 || p_i > 3)
-        {
-            return -1;
-        }
-
-        return rgba[p_i];
-    }
+    smFloat operator()(smInt p_i);
     /// \brief setting
-    smColor &operator=(smColor &p_color)
-    {
-        rgba[0] = p_color.rgba[0];
-        rgba[1] = p_color.rgba[1];
-        rgba[2] = p_color.rgba[2];
-        rgba[3] = p_color.rgba[3];
-        return *this;
-    }
+    smColor &operator=(smColor &p_color);
     /// \brief converts to gl color
-    smGLFloat* toGLColor()
-    {
-        return (smGLFloat*)rgba;
-    }
+    smGLFloat* toGLColor();
     /// \brief set RGB color
-    inline void setValue(smFloat p_red, smFloat p_green, smFloat p_blue, smFloat p_alpha)
-    {
-        rgba[0] = p_red;
-        rgba[1] = p_green;
-        rgba[2] = p_blue;
-        rgba[3] = p_alpha;
-    }
+    void setValue(smFloat p_red, smFloat p_green, smFloat p_blue, smFloat p_alpha);
 
     static smColor colorWhite;
     static smColor colorBlue;
@@ -210,28 +155,7 @@ struct smUnifiedID;
 struct smRenderDetail
 {
 public:
-    smRenderDetail() /*:shaders(10)*/
-    {
-        renderType = SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_FACES;
-        highLightColor.rgba[0] = 1.0f;
-        highLightColor.rgba[1] = 0.0f;
-        highLightColor.rgba[2] = 0.0f;
-        pointSize = 1;
-        lineSize = 1;
-        shadowColor.rgba[0] = 0.0f;
-        shadowColor.rgba[1] = 0.0f;
-        shadowColor.rgba[2] = 0.0f;
-        shadowColor.rgba[3] = 0.5f;
-        colorDiffuse = smColor::colorWhite;
-        colorAmbient = smColor::colorWhite;
-        colorSpecular = smColor::colorWhite;
-        normalColor = smColor::colorGreen;
-        wireFrameColor = smColor::colorBlue;
-        shininess = 50.0;
-        debugDraw = false;
-        castShadow = true;
-        canGetShadow = true;
-    }
+    smRenderDetail() /*:shaders(10)*/;
     /// \brief render type
     smUInt renderType;
     /// \brief diffuse color

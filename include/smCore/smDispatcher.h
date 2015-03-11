@@ -23,6 +23,8 @@
 
 #ifndef SMDISPATCHER_H
 #define SMDISPATCHER_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 
@@ -48,10 +50,7 @@ private:
     void  handleAll();
 
 public:
-    smDispatcher()
-    {
-        type = SIMMEDTK_SMDISPATHCER;
-    }
+    smDispatcher();
 
 public:
     ///handle all event and call corresponding events

@@ -53,7 +53,7 @@ AlphaMapExample::AlphaMapExample()
     simmedtkSDK = smSDK::createSDK();
     object1 = new smStaticSceneObject();
 
-    MetalShader *metalShader = new MetalShader("../../resources/shaders/VertexBumpMap1.cg",
+    smMetalShader *metalShader = new smMetalShader("../../resources/shaders/VertexBumpMap1.cg",
             "../../resources/shaders/FragmentBumpMap1.cg");
     metalShader->registerShader();
 

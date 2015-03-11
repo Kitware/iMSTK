@@ -53,10 +53,16 @@ typedef Eigen::Matrix<double, 4, 4> smMatrix44d;
 typedef Eigen::Matrix<double, 6, 6> smMatrix66d;
 
 /// A dynamic size diagonal matrix
-typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> smDiagonalMatrix;
+typedef Eigen::DiagonalMatrix<float, Eigen::Dynamic> smDiagonalMatrixf;
+
+/// A dynamic size diagonal matrix
+typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> smDiagonalMatrixd;
 
 /// A dynamic size matrix
-typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> smMatrix;
+typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> smMatrixf;
+
+/// A dynamic size matrix
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> smMatrixd;
 
 
 // } // Math
