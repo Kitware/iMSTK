@@ -27,7 +27,6 @@
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
 #include "smShader/smShader.h"
-#include "smUtilities/smQuat.h"
 #include "smShader/metalShader.h"
 #include "smShader/SceneTextureShader.h"
 #include "smUtilities/smDataStructs.h"
@@ -270,7 +269,7 @@ void smViewer::setLightPos(smInt p_lightId, smLightPos p_pos)
 
 void smViewer::setLightPos(smInt p_lightId,
                            smLightPos p_pos,
-                           smVec3<smFloat> p_direction)
+                           smVec3f p_direction)
 {
 
     smLight *temp;
@@ -519,11 +518,10 @@ void smViewer::destroyGLContext()
 void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail)
 {
 
-    static smFloat shadowMatrixGL[16];
-    static smVec3<smFloat> origin(0, 0, 0);
-    static smVec3<smFloat> xAxis(1, 0, 0);
-    static smVec3<smFloat> yAxis(0, 1, 0);
-    static smVec3<smFloat> zAxis(0, 0, 1);
+    static smVec3f origin(0, 0, 0);
+    static smVec3f xAxis(1, 0, 0);
+    static smVec3f yAxis(0, 1, 0);
+    static smVec3f zAxis(0, 0, 1);
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
     {
@@ -617,8 +615,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         glMatrixMode(GL_MATRIX_MODE);
         glPushMatrix();
         glDisable(GL_LIGHTING);
-        shadowMatrix.getMatrixForOpenGL(shadowMatrixGL);
-        glMultMatrixf((smGLReal*)shadowMatrixGL);
+        glMultMatrixf(shadowMatrix.data());
         glColor4fv((smGLFloat*)&renderDetail->shadowColor);
         glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         glEnable(GL_LIGHTING);
@@ -670,10 +667,10 @@ void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh, smRende
 {
 
     static smFloat shadowMatrixGL[16];
-    static smVec3<smFloat> origin(0, 0, 0);
-    static smVec3<smFloat> xAxis(1, 0, 0);
-    static smVec3<smFloat> yAxis(0, 1, 0);
-    static smVec3<smFloat> zAxis(0, 0, 1);
+    static smVec3f origin(0, 0, 0);
+    static smVec3f xAxis(1, 0, 0);
+    static smVec3f yAxis(0, 1, 0);
+    static smVec3f zAxis(0, 0, 1);
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
     {
@@ -726,15 +723,15 @@ void smViewer::drawNormals(smMesh *p_mesh)
 
     glDisable(GL_LIGHTING);
     glColor3fv((smGLFloat*)&smColor::colorBlue);
-    smVec3<smFloat>baryCenter;
+    smVec3f baryCenter;
     smGLFloat* tmp = NULL;
     glBegin(GL_LINES);
 
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
         glVertex3fv((smGLFloat*) & (p_mesh->vertices[i]));
-        smVec3<float> vector = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
-        glVertex3fv((smGLFloat*)&vector);
+        smVec3f vector = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
+        glVertex3fv(vector.data());
     }
 
     for (smInt i = 0; i < p_mesh->nbrTriangles; i++)
@@ -742,8 +739,8 @@ void smViewer::drawNormals(smMesh *p_mesh)
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
         glVertex3fv((smGLFloat*) & (baryCenter));
-        smVec3<float> vector = baryCenter + p_mesh->triNormals[i] * 5;
-        glVertex3fv((smGLFloat*)&vector);
+        smVec3f vector = baryCenter + p_mesh->triNormals[i] * 5;
+        glVertex3fv(vector.data());
     }
 
     glEnd();
@@ -1046,10 +1043,14 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
     glPushMatrix();
     glLoadIdentity();
 
-    light->upVector.setValue(camera.up.x, camera.up.y, camera.up.z);
-    light->direction.setValue(camera.fp.x, camera.fp.y, camera.fp.z);
+    light->upVector[0] = camera.up.x;
+    light->upVector[1] = camera.up.y;
+    light->upVector[2] = camera.up.z;
+    light->direction[0] = camera.fp.x;
+    light->direction[1] = camera.fp.y;
+    light->direction[2] = camera.fp.z;
     light->updateDirection();
-    gluLookAt(light->lightPos.pos.x, light->lightPos.pos.y, light->lightPos.pos.z,
+    gluLookAt(light->lightPos.pos[0], light->lightPos.pos[1], light->lightPos.pos[2],
               camera.fp.x, camera.fp.y, camera.fp.z,
               camera.up.x, camera.up.y, camera.up.z);
     gluLookAt(camera.pos.x, camera.pos.y, camera.pos.z,
@@ -1114,18 +1115,18 @@ smBool  smViewer::checkCameraCollisionWithScene()
 
     static bool collided = false;
     static bool prev_collided = false;
-    static smVec3f  lastCollidedHatpicPos(deviceCameraPos.x, deviceCameraPos.y, deviceCameraPos.z);
-    static smVec3f  proxy_hapticPos(deviceCameraPos.x, deviceCameraPos.y, deviceCameraPos.z);
+    static smVec3f  lastCollidedHatpicPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
+    static smVec3f  proxy_hapticPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
     static float radiusEffective = 0;
     static smVec3f  last_collisionNormal;
-    static smVec3f prevPosition(deviceCameraPos.x, deviceCameraPos.y, deviceCameraPos.z);
+    static smVec3f prevPosition(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
     static smFloat radiusMotion = 0;
 
     smVec3f collisionNormal(0, 0, 0);
     collided = false;
     radiusEffective = 0;
-    smVec3f hPos(deviceCameraPos.x, deviceCameraPos.y, deviceCameraPos.z);
-    radiusMotion = hPos.distance(prevPosition);
+    smVec3f hPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
+    radiusMotion = (hPos - prevPosition).norm();
     prevPosition = hPos;
 
     for (int i = 0; i < collisionMeshes.size(); i++)
@@ -1136,12 +1137,12 @@ smBool  smViewer::checkCameraCollisionWithScene()
 
         for (int j = 0; j < nbrVert; j++)
         {
-            distance = mesh->vertices[j].distance(hPos);
+            distance = (mesh->vertices[j]-hPos).norm();
 
             if (prev_collided)
             {
-                smVec3f  posVector = (hPos - lastCollidedHatpicPos);
-                float distance = posVector.module();
+                smVec3f  posVector = hPos - lastCollidedHatpicPos;
+                float distance = posVector.norm();
                 posVector.normalize();
 
                 if (posVector.dot(last_collisionNormal) < 0)
@@ -1207,7 +1208,6 @@ void smViewer::draw()
 {
 
     static smDrawParam param;
-    static smQuatd quat;
 
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
     {
@@ -1277,9 +1277,9 @@ void smViewer::addObject(smCoreClass *object)
 void smViewer::handleEvent(smEvent *p_event)
 {
     smLight *light;
-    smVec3<smDouble> lightDir;
-    smVec3<smDouble> lightUp;
-    smVec3<smDouble> transverseDir;
+    smVec3d lightDir;
+    smVec3d lightUp;
+    smVec3d transverseDir;
 
     switch (p_event->eventType.eventTypeCode)
     {

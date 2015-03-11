@@ -25,7 +25,7 @@
 #define SMCOLLISIONCONFIG_H
 
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
+#include "smUtilities/smVector.h"
 #include "smCore/smCoreClass.h"
 
 /// \brief Contains information related to the triangles that are present in a cell
@@ -35,7 +35,7 @@ struct smCellTriangle
 
     smUInt primID;
     smUnifiedID meshID;
-    smVec3<smFloat> vert[3];
+    smVec3f vert[3];
 
     inline bool operator ==(unsigned int p_ID)
     {
@@ -61,7 +61,7 @@ struct smCellLine
 
     smUInt primID; ///< Edge id
     smUnifiedID meshID; ///< smMeshLine id
-    smVec3<smFloat> vert[2]; ///< Vertices
+    smVec3f vert[2]; ///< Vertices
 
     inline  bool operator ==(unsigned int p_ID)
     {
@@ -85,7 +85,7 @@ struct smCellModel
 
     smUInt primID; ///< Model Prim id
     smUnifiedID meshID; ///< smMeshLine id
-    smVec3<smFloat> center; ///< Vertices
+    smVec3f center; ///< Vertices
     smFloat radius;
 
     inline  bool operator ==(unsigned int p_ID)
@@ -113,7 +113,7 @@ struct smCellPoint
 
     smUInt primID; ///< Model Prim id
     smUnifiedID meshID; ///< smMeshLine id
-    smVec3<smFloat> vert; ///< Vertices
+    smVec3f vert; ///< Vertices
 
     inline  bool operator ==(unsigned int p_ID)
     {
@@ -137,7 +137,7 @@ struct smCollidedTriangles
 {
     smCellTriangle tri1;
     smCellTriangle tri2;
-    smVec3<smFloat> proj1, proj2;
+    smVec3f proj1, proj2;
     smShort point1, point2;
 };
 
@@ -146,7 +146,7 @@ struct smCollidedLineTris
 {
     smCellTriangle tri;
     smCellLine line;
-    smVec3<smFloat> intersection;
+    smVec3f intersection;
 };
 
 /// \brief Contains model-point pair that have collided

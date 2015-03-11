@@ -25,7 +25,7 @@
 #include "smMesh/smMesh.h"
 #include "smUtilities/smDataStructs.h"
 #include "smRendering/smViewer.h"
-#include "smUtilities/smQuat.h"
+#include "smUtilities/smQuaternion.h"
 #include "smRendering/smVAO.h"
 
 smGLRenderer::smGLRenderer()
@@ -37,10 +37,10 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
 {
 
     static smFloat shadowMatrixGL[16];
-    static smVec3<smFloat> origin(0, 0, 0);
-    static smVec3<smFloat> xAxis(1, 0, 0);
-    static smVec3<smFloat> yAxis(0, 1, 0);
-    static smVec3<smFloat> zAxis(0, 0, 1);
+    static smVec3f origin(0, 0, 0);
+    static smVec3f xAxis(1, 0, 0);
+    static smVec3f yAxis(0, 1, 0);
+    static smVec3f zAxis(0, 0, 1);
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
     {
@@ -173,10 +173,10 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
 {
 
     static smFloat shadowMatrixGL[16];
-    static smVec3<smFloat> origin(0, 0, 0);
-    static smVec3<smFloat> xAxis(1, 0, 0);
-    static smVec3<smFloat> yAxis(0, 1, 0);
-    static smVec3<smFloat> zAxis(0, 0, 1);
+    static smVec3f origin(0, 0, 0);
+    static smVec3f xAxis(1, 0, 0);
+    static smVec3f yAxis(0, 1, 0);
+    static smVec3f zAxis(0, 0, 1);
     smShader *shader = NULL;
     smBool shaderEnabled = false;
     smVAO *vao;
@@ -447,7 +447,7 @@ void smGLRenderer::beginTriangles()
     glBegin(GL_TRIANGLES);
 }
 
-void smGLRenderer::drawTriangle(smVec3<smFloat> &p_1, smVec3<smFloat> &p_2, smVec3<smFloat> &p_3)
+void smGLRenderer::drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3)
 {
 
     glVertex3fv((GLfloat*)&p_1);
@@ -472,41 +472,41 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glLineWidth(1.0);
     glColor3fv(p_color.toGLColor());
     glBegin(GL_LINES);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMin.z);
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMin.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMin.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMax.z);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMax.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMax.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMax.z);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
 
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMin.y, aabb.aabbMax.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMax.z);
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMin.z);
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMin.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
 
-    glVertex3f(aabb.aabbMax.x, aabb.aabbMax.y, aabb.aabbMin.z);
-    glVertex3f(aabb.aabbMin.x, aabb.aabbMax.y, aabb.aabbMin.z);
+    glVertex3f(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    glVertex3f(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
     glEnd();
     glLineWidth(1.0);
     glEnable(GL_LIGHTING);
@@ -516,7 +516,6 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 
-    smQuat<smFloat> rot;
     smFloat angle;
     smVec3f axisOfRot;
     smVec3f defaultDir(0, 0, 1);
@@ -527,23 +526,23 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
                              };
     smVec3f tmp;
 
-    angle = acos(defaultDir.dot(p_plane.unitNormal));
+    angle = std::acos(defaultDir.dot(p_plane.unitNormal));
     axisOfRot = p_plane.unitNormal.cross(defaultDir);
-    axisOfRot.normalize();
+    axisOfRot.normalized();
 
-    rot.fromAxisAngle(axisOfRot, -angle);
+    smQuaternionf rot = getRotationQuaternion(-angle,axisOfRot);
 
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
     glColor3fv(p_color.toGLColor());
-    tmp = rot.rotate(planePoints[0]) + p_plane.pos;
-    glVertex3fv((smGLFloat*)&tmp);
-    tmp = rot.rotate(planePoints[1]) + p_plane.pos;
-    glVertex3fv((smGLFloat*)&tmp);
-    tmp = rot.rotate(planePoints[2]) + p_plane.pos;
-    glVertex3fv((smGLFloat*)&tmp);
-    tmp = rot.rotate(planePoints[3]) + p_plane.pos;
-    glVertex3fv((smGLFloat*)&tmp);
+    tmp = rot*planePoints[0] + p_plane.pos;
+    glVertex3fv(tmp.data());
+    tmp = rot*planePoints[1] + p_plane.pos;
+    glVertex3fv(tmp.data());
+    tmp = rot*planePoints[2] + p_plane.pos;
+    glVertex3fv(tmp.data());
+    tmp = rot*planePoints[3] + p_plane.pos;
+    glVertex3fv(tmp.data());
     glEnd();
     glEnable(GL_LIGHTING);
 }

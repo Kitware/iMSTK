@@ -51,7 +51,7 @@ protected:
         smClassType type;
         smSceneObject *object;
         smStaticSceneObject *staticObject;
-        smVec3<smFloat> *newVertices;
+        smVec3f *newVertices;
 
         //do nothing for now
         for (smInt i = 0; i < objectsSimulated.size(); i++)
@@ -76,7 +76,7 @@ protected:
     {
         smSceneObject *sceneObj;
         smStaticSceneObject *staticSceneObject;
-        smVec3<smFloat> *vertices;
+        smVec3f *vertices;
         smMesh *mesh;
 
         beginSim();

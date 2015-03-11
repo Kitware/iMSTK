@@ -21,25 +21,27 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smLight.h"
-#include "smUtilities/smQuat.h"
+// STD includes
+#include <cmath>
 
-smVec3<smFloat> smLight::defaultDir(0, 0, -1.0);
-smVec3<smFloat> smLight::defaultUpDir(0, 1, 0.0);
-smVec3<smFloat> smLight::defaultTransDir(1, 0, 0.0);
+// SimMedTK includes
+#include "smRendering/smLight.h"
+#include "smUtilities/smQuaternion.h"
+
+smVec3f smLight::defaultDir(0, 0, -1.0);
+smVec3f smLight::defaultUpDir(0, 1, 0.0);
+smVec3f smLight::defaultTransDir(1, 0, 0.0);
 
 void smLight::updateDirection()
 {
-
-    smQuat<smFloat> rot;
     smFloat angle;
-    smVec3<smFloat> dirNorm;
+    smVec3f dirNorm = direction.normalized();
 
-    dirNorm = direction.unit();
-    angle = acos(dirNorm.dot(defaultDir));
-    smVec3<smFloat> axisOfRot = dirNorm.cross(defaultDir);
-    axisOfRot.normalize();
-    rot.fromAxisAngle(axisOfRot, -angle);
-    upVector = rot.rotate(defaultUpDir);
-    transverseDir = rot.rotate(defaultTransDir);
+    angle = std::acos(dirNorm.dot(defaultDir));
+    smVec3f axisOfRot = dirNorm.cross(defaultDir).normalized();
+
+    smQuaternionf rot = getRotationQuaternion(-angle,axisOfRot);
+
+    upVector = rot*defaultUpDir;
+    transverseDir = rot*defaultTransDir;
 }

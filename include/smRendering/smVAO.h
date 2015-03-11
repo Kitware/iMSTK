@@ -24,10 +24,14 @@
 #ifndef SMVAO_H
 #define SMVAO_H
 
+// STL includes
+#include <cassert>
+#include <unordered_map>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smConfigRendering.h"
-#include "smUtilities/smVec3.h"
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
@@ -35,8 +39,6 @@
 #include "smRendering/smVAO.h"
 #include "smShader/smShader.h"
 
-#include "assert.h"
-#include <unordered_map>
 
 enum smVBOBufferType
 {

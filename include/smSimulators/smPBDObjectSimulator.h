@@ -60,7 +60,7 @@ protected:
         smClassType type;
         smSceneObject *object;
         smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-        smVec3<smFloat> *newVertices;
+        smVec3f *newVertices;
 
         //do nothing for now
         for (smInt i = 0; i < objectsSimulated.size(); i++)
@@ -83,11 +83,11 @@ protected:
     {
         smSceneObject *sceneObj;
         smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-        smVec3<smFloat> *X;
+        smVec3f *X;
         smMesh *mesh;
         smInt i;
         smFloat dist, lamda;
-        smVec3<smFloat> dirVec, dP;
+        smVec3f dirVec, dP;
         smInt count = 0;
         smInt a, b;
 
@@ -111,12 +111,12 @@ protected:
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
-                    pbdSurfaceSceneObject->exF[i].setValue(0.0, 0.0, 0.0);
+                    pbdSurfaceSceneObject->exF[i] = smVec3f::Zero();
                 }
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
                 {
-                    pbdSurfaceSceneObject->exF[i].y -= 1.0;
+                    pbdSurfaceSceneObject->exF[i][1] -= 1.0;
                 }
 
                 for (i = 0; i < pbdSurfaceSceneObject->nbrMass; i++)
@@ -130,7 +130,7 @@ protected:
                     if (!pbdSurfaceSceneObject->fixedMass[i])
                     {
                         pbdSurfaceSceneObject->P[i] =
-                            pbdSurfaceSceneObject->localVerts[i] + 
+                            pbdSurfaceSceneObject->localVerts[i] +
                             pbdSurfaceSceneObject->V[i] * pbdSurfaceSceneObject->dT;
                     }
                 }
@@ -144,7 +144,7 @@ protected:
                         a = pbdSurfaceSceneObject->mesh->edges[i].vert[0];
                         b = pbdSurfaceSceneObject->mesh->edges[i].vert[1];
                         dirVec = pbdSurfaceSceneObject->P[a] - pbdSurfaceSceneObject->P[b];
-                        dist = dirVec.module();
+                        dist = dirVec.norm();
                         dirVec = dirVec / dist;
                         lamda = 0.5 * (dist - pbdSurfaceSceneObject->L0[i]);
                         dP = dirVec * (lamda * pbdSurfaceSceneObject-> paraK);
@@ -191,7 +191,7 @@ protected:
     {
         smSceneObject *sceneObj;
         smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-        smVec3<smFloat> *vertices;
+        smVec3f *vertices;
 
         for (smInt i = 0; i < this->objectsSimulated.size(); i++)
         {

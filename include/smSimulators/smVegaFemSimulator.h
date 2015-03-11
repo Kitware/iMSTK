@@ -37,7 +37,7 @@ class smVegaFemSimulator: public smObjectSimulator, public smEventHandler
 {
 
 private:
-    smVec3<smFloat> hapticPosition; ///< position of the haptic device end effector
+    smVec3f hapticPosition; ///< position of the haptic device end effector
     smBool hapticButtonPressed; ///< true of the button is pressed
     smEventDispatcher *eventDispatcher; ///< !!
 
@@ -146,9 +146,9 @@ protected:
 
             if (hapticEventData->deviceId == 1)
             {
-                hapticPosition.x = hapticEventData->position.x;
-                hapticPosition.y = hapticEventData->position.y;
-                hapticPosition.z = hapticEventData->position.z;
+                hapticPosition[0] = hapticEventData->position[0];
+                hapticPosition[1] = hapticEventData->position[1];
+                hapticPosition[2] = hapticEventData->position[2];
                 hapticButtonPressed = hapticEventData->buttonState[0];
             }
 

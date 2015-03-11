@@ -21,18 +21,19 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+// Eigen includes
+#include "Eigen/Geometry"
+
+// SimMedTK includes
 #include "smTools/curvedGrasper.h"
 #include "smCore/smSDK.h"
 
 void curvedGrasper::draw(smDrawParam p_params)
 {
-
-    float matrix[16];
     smStylusRigidSceneObject::draw(p_params);
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
     glPushMatrix();
-    containerLower->currentMatrix.getMatrixForOpenGL(matrix);
-    glMultMatrixf(matrix);
+    glMultMatrixf(containerLower->currentMatrix.data());
     glPopMatrix();
 }
 
@@ -42,30 +43,30 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID, smChar *p_pivotModelFileName, sm
     angle = 0;
     maxangle = 10 * 3.14 / 360;
     this->phantomID = p_PhantomID;
-    smMatrix33<smFloat> rot;
 
+    smMatrix33f rot;
     mesh_pivot = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_pivot->loadMesh(p_pivotModelFileName, SM_FILETYPE_3DS);
-    mesh_pivot->scale(smVec3<smFloat>(0.5, 0.5, 0.5));
-    rot.rotAroundY(-SM_PI_HALF);
+    mesh_pivot->scale(smVec3f(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
     mesh_pivot->rotate(rot);
-    rot.rotAroundZ(-SM_PI_HALF);
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
     mesh_pivot->rotate(rot);
 
     mesh_upperJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_upperJaw->loadMesh(p_upperModelFileName, SM_FILETYPE_3DS);
-    mesh_upperJaw->scale(smVec3<smFloat>(0.5, 0.5, 0.5));
-    rot.rotAroundY(-SM_PI_HALF);
+    mesh_upperJaw->scale(smVec3f(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitY()).matrix();
     mesh_upperJaw->rotate(rot);
-    rot.rotAroundZ(-SM_PI_HALF);
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
     mesh_upperJaw->rotate(rot);
 
     mesh_lowerJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_lowerJaw->loadMesh(p_lowerModelFileName, SM_FILETYPE_3DS);
-    mesh_lowerJaw->scale(smVec3<smFloat>(0.5, 0.5, 0.5));
-    rot.rotAroundY(-SM_PI_HALF);
+    mesh_lowerJaw->scale(smVec3f(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitY()).matrix();
     mesh_lowerJaw->rotate(rot);
-    rot.rotAroundZ(-SM_PI_HALF);
+    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
     mesh_lowerJaw->rotate(rot);
 
     meshContainer_pivot.name = "curvedGrasperPivot";
@@ -88,10 +89,9 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID, smChar *p_pivotModelFileName, sm
 
 void curvedGrasper::handleEvent(smEvent *p_event)
 {
-
     smHapticOutEventData *hapticEventData;
     smKeyboardEventData *keyBoardData;
-    smMatrix44d godPosMat;
+    smMatrix44f godPosMat;
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
     smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
 
@@ -102,7 +102,7 @@ void curvedGrasper::handleEvent(smEvent *p_event)
 
         if (hapticEventData->deviceId == this->phantomID)
         {
-            smVec3d pos1 = hapticEventData->transform.getColumn(3);
+            smVec3f pos1 = hapticEventData->transform.col(3).head<3>();
             godPosMat = hapticEventData->transform;
             transRot = godPosMat;
             pos = hapticEventData->position;

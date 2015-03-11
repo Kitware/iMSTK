@@ -24,12 +24,12 @@
 #ifndef SMCONFIGRENDERING_H
 #define SMCONFIGRENDERING_H
 
-#include "smCore/smConfig.h"
-
-#include "math.h"
-#include "smUtilities/smVec3.h"
-
+// STL includes
+#include <cmath>
 #include <vector>
+
+// SimMedTK includes
+#include "smCore/smConfig.h"
 
 class smShader;
 

@@ -24,12 +24,10 @@
 #ifndef SMINTERFACE_H
 #define SMINTERFACE_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smModule.h"
 #include "smCore/smEventHandler.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix44.h"
-#include "smUtilities/smMatrix33.h"
 
 /// Declarations and constants for the device
 const int   SIMMEDTK_MSG_UNKNOWN = -2;

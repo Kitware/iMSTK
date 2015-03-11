@@ -21,19 +21,46 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEC4_H
-#define SMVEC4_H
-/// \brief vector 4
-template <typename T>
-class smVec4
-{
-public:
-    inline smVec4(): vec()
-    {
-        w = 1.0;
-    }
-    smVec3<T> vec;
-    T w;
-};
+#ifndef SMMATRIX_H
+#define SMMATRIX_H
 
-#endif
+#include <Eigen/Core>
+
+// namespace SimMedTK
+// {
+// namespace Math
+// {
+
+/// A 2x2 matrix of floats.
+typedef Eigen::Matrix<float,  2, 2> smMatrix22f;
+
+/// A 3x3 matrix of floats.
+typedef Eigen::Matrix<float,  3, 3> smMatrix33f;
+
+/// A 4x4 matrix of floats.
+typedef Eigen::Matrix<float,  4, 4> smMatrix44f;
+
+/// A 2x2 matrix of doubles.
+typedef Eigen::Matrix<double, 2, 2> smMatrix22d;
+
+/// A 3x3 matrix of doubles.
+typedef Eigen::Matrix<double, 3, 3> smMatrix33d;
+
+/// A 4x4 matrix of doubles.
+typedef Eigen::Matrix<double, 4, 4> smMatrix44d;
+
+/// A 6x6 matrix of doubles.
+typedef Eigen::Matrix<double, 6, 6> smMatrix66d;
+
+/// A dynamic size diagonal matrix
+typedef Eigen::DiagonalMatrix<double, Eigen::Dynamic> smDiagonalMatrix;
+
+/// A dynamic size matrix
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> smMatrix;
+
+
+// } // Math
+// } // SimMedTK
+
+
+#endif // SMMATRIX_H

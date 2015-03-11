@@ -28,8 +28,8 @@
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smTextureManager.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix33.h"
+#include "smUtilities/smVector.h"
+#include "smUtilities/smMatrix.h"
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
@@ -138,10 +138,10 @@ public:
     smTriangle *triangles; ///< list of triangles
     smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
-    smVec3<smFloat> *triNormals; ///< triangle normals
-    smVec3<smFloat> *vertNormals; ///< vertex normals
-    smVec3<smFloat> *triTangents; ///< triangle tangents
-    smVec3<smFloat> *vertTangents; ///< vertex tangents
+    smVec3f *triNormals; ///< triangle normals
+    smVec3f *vertNormals; ///< vertex normals
+    smVec3f *triTangents; ///< triangle tangents
+    smVec3f *vertTangents; ///< vertex tangents
     smBool tangentChannel; ///< !!
     std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
     std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
@@ -182,7 +182,7 @@ public:
     void allocateAABBTris();
 
     /// \brief compute the normal of a triangle
-    smVec3<smFloat> calculateTriangleNormal(smInt triNbr);
+    smVec3f calculateTriangleNormal(smInt triNbr);
 
     /// \brief update the normals of triangles after they moved
     void updateTriangleNormals();
@@ -200,10 +200,10 @@ public:
     void calcTriangleTangents();
 
     /// \brief compute the tangent give the three vertices
-    void calculateTangent(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t);
+    void calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t);
 
     /// \brief !!
-    void calculateTangent_test(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t);
+    void calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t);
 
     /// \brief find the neighbors of all vertices of mesh
     void calcNeighborsVertices();
@@ -215,13 +215,13 @@ public:
     void translate(smFloat, smFloat, smFloat);
 
     /// \brief translate the mesh
-    void translate(smVec3<smFloat> p_offset);
+    void translate(smVec3f p_offset);
 
     /// \brief scale the mesh
-    void scale(smVec3<smFloat> p_scaleFactors);
+    void scale(smVec3f p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(smMatrix33<smFloat> p_rot);
+    void rotate(const smMatrix33f &p_rot);
 
     /// \brief check if there is a consistent orientation of triangle vertices
     /// across the entire surface mesh
@@ -337,38 +337,38 @@ public:
     inline void updateAABB()
     {
         smAABB tempAABB;
-        smVec3<smFloat> minOffset(-2.0, -2.0, -2.0);
-        smVec3<smFloat> maxOffset(1.0, 1.0, 1.0);
-        smVec3<smFloat> minEdgeOffset(-0.1, -0.1, -0.1);
-        smVec3<smFloat> maxEdgeOffset(0.1, 0.1, 0.1);
+        smVec3f minOffset(-2.0, -2.0, -2.0);
+        smVec3f maxOffset(1.0, 1.0, 1.0);
+        smVec3f minEdgeOffset(-0.1, -0.1, -0.1);
+        smVec3f maxEdgeOffset(0.1, 0.1, 0.1);
 
-        tempAABB.aabbMin.x = FLT_MAX;
-        tempAABB.aabbMin.y = FLT_MAX;
-        tempAABB.aabbMin.z = FLT_MAX;
+        tempAABB.aabbMin[0] = FLT_MAX;
+        tempAABB.aabbMin[1] = FLT_MAX;
+        tempAABB.aabbMin[2] = FLT_MAX;
 
-        tempAABB.aabbMax.x = -FLT_MAX;
-        tempAABB.aabbMax.y = -FLT_MAX;
-        tempAABB.aabbMax.z = -FLT_MAX;
+        tempAABB.aabbMax[0] = -FLT_MAX;
+        tempAABB.aabbMax[1] = -FLT_MAX;
+        tempAABB.aabbMax[2] = -FLT_MAX;
 
         for (smInt i = 0; i < nbrEdges; i++)
         {
             ///min
-            edgeAABBs[i].aabbMin.x = SIMMEDTK_MIN(vertices[edges[i].vert[0]].x, vertices[edges[i].vert[1]].x);
-            edgeAABBs[i].aabbMin.y = SIMMEDTK_MIN(vertices[edges[i].vert[0]].y, vertices[edges[i].vert[1]].y);
-            edgeAABBs[i].aabbMin.z = SIMMEDTK_MIN(vertices[edges[i].vert[0]].z, vertices[edges[i].vert[1]].z);
+            edgeAABBs[i].aabbMin[0] = SIMMEDTK_MIN(vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0]);
+            edgeAABBs[i].aabbMin[1] = SIMMEDTK_MIN(vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1]);
+            edgeAABBs[i].aabbMin[2] = SIMMEDTK_MIN(vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2]);
             edgeAABBs[i].aabbMin += minEdgeOffset;
-            tempAABB.aabbMin.x = SIMMEDTK_MIN(tempAABB.aabbMin.x, edgeAABBs[i].aabbMin.x);
-            tempAABB.aabbMin.y = SIMMEDTK_MIN(tempAABB.aabbMin.y, edgeAABBs[i].aabbMin.y);
-            tempAABB.aabbMin.z = SIMMEDTK_MIN(tempAABB.aabbMin.z, edgeAABBs[i].aabbMin.z);
+            tempAABB.aabbMin[0] = SIMMEDTK_MIN(tempAABB.aabbMin[0], edgeAABBs[i].aabbMin[0]);
+            tempAABB.aabbMin[1] = SIMMEDTK_MIN(tempAABB.aabbMin[1], edgeAABBs[i].aabbMin[1]);
+            tempAABB.aabbMin[2] = SIMMEDTK_MIN(tempAABB.aabbMin[2], edgeAABBs[i].aabbMin[2]);
 
             ///max
-            edgeAABBs[i].aabbMax.x = SIMMEDTK_MAX(vertices[edges[i].vert[0]].x, vertices[edges[i].vert[1]].x);
-            edgeAABBs[i].aabbMax.y = SIMMEDTK_MAX(vertices[edges[i].vert[0]].y, vertices[edges[i].vert[1]].y);
-            edgeAABBs[i].aabbMax.z = SIMMEDTK_MAX(vertices[edges[i].vert[0]].z, vertices[edges[i].vert[1]].z);
+            edgeAABBs[i].aabbMax[0] = SIMMEDTK_MAX(vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0]);
+            edgeAABBs[i].aabbMax[1] = SIMMEDTK_MAX(vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1]);
+            edgeAABBs[i].aabbMax[2] = SIMMEDTK_MAX(vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2]);
             edgeAABBs[i].aabbMax += maxEdgeOffset;
-            tempAABB.aabbMax.x = SIMMEDTK_MAX(tempAABB.aabbMax.x, edgeAABBs[i].aabbMax.x);
-            tempAABB.aabbMax.y = SIMMEDTK_MAX(tempAABB.aabbMax.y, edgeAABBs[i].aabbMax.y);
-            tempAABB.aabbMax.z = SIMMEDTK_MAX(tempAABB.aabbMax.z, edgeAABBs[i].aabbMax.z);
+            tempAABB.aabbMax[0] = SIMMEDTK_MAX(tempAABB.aabbMax[0], edgeAABBs[i].aabbMax[0]);
+            tempAABB.aabbMax[1] = SIMMEDTK_MAX(tempAABB.aabbMax[1], edgeAABBs[i].aabbMax[1]);
+            tempAABB.aabbMax[2] = SIMMEDTK_MAX(tempAABB.aabbMax[2], edgeAABBs[i].aabbMax[2]);
         }
 
         tempAABB.aabbMin += minOffset;
@@ -382,16 +382,16 @@ public:
 
         for (smInt i = 0; i < nbrVertices; i++)
         {
-            vertices[i].x = vertices[i].x + p_offsetX;
-            vertices[i].y = vertices[i].y + p_offsetY;
-            vertices[i].z = vertices[i].z + p_offsetZ;
+            vertices[i][0] = vertices[i][0] + p_offsetX;
+            vertices[i][1] = vertices[i][1] + p_offsetY;
+            vertices[i][2] = vertices[i][2] + p_offsetZ;
         }
 
         updateAABB();
     }
 
     /// \brief translate the vertices of mesh
-    void translate(smVec3<smFloat> p_offset)
+    void translate(smVec3f p_offset)
     {
 
         for (smInt i = 0; i < nbrVertices; i++)
@@ -404,25 +404,25 @@ public:
     }
 
     /// \brief scale the mesh
-    void scale(smVec3<smFloat> p_scaleFactors)
+    void scale(smVec3f p_scaleFactors)
     {
 
         for (smInt i = 0; i < nbrVertices; i++)
         {
-            vertices[i].x = vertices[i].x * p_scaleFactors.x;
-            vertices[i].y = vertices[i].y * p_scaleFactors.y;
-            vertices[i].z = vertices[i].z * p_scaleFactors.z;
+            vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
+            vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
+            vertices[i][2] = vertices[i][2] * p_scaleFactors[2];
 
-            origVerts[i].x = origVerts[i].x * p_scaleFactors.x;
-            origVerts[i].y = origVerts[i].y * p_scaleFactors.y;
-            origVerts[i].z = origVerts[i].z * p_scaleFactors.z;
+            origVerts[i][0] = origVerts[i][0] * p_scaleFactors[0];
+            origVerts[i][1] = origVerts[i][1] * p_scaleFactors[1];
+            origVerts[i][2] = origVerts[i][2] * p_scaleFactors[2];
         }
 
         updateAABB();
     }
 
     /// \brief rotate the mesh
-    void rotate(smMatrix33<smFloat> p_rot)
+    void rotate(smMatrix33f p_rot)
     {
 
         for (smInt i = 0; i < nbrVertices; i++)

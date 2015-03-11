@@ -36,7 +36,7 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3f p_center, smFloat p
     for (smInt i = 0; i < mesh->nbrVertices; i++)
     {
 
-        dist = (p_center - mesh->vertices[i]).module();
+        dist = (p_center - mesh->vertices[i]).norm();
 
         if (dist < p_radius)
         {

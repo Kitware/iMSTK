@@ -24,6 +24,10 @@
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
 
+// GLFW includes
+#include "GLFW/glfw3.h"
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smShader/smShader.h"
 #include "smCore/smScene.h"
@@ -31,7 +35,6 @@
 #include "smCore/smModule.h"
 #include "smCore/smStaticSceneObject.h"
 #include "smUtilities/smGLUtils.h"
-#include "smUtilities/smMatrix44.h"
 #include "smRendering/smVBO.h"
 #include "smCore/smEventData.h"
 #include "smCore/smEventHandler.h"
@@ -42,11 +45,9 @@
 #include "smRendering/smLight.h"
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
-#include "smUtilities/smVec3.h"
 #include "smShader/SceneTextureShader.h"
-
 #include "smRendering/smCamera.h"
-#include <GLFW/glfw3.h>
+
 
 //forward declaration
 class smSDK;
@@ -121,7 +122,7 @@ protected:
     void drawFemObject(smFemSceneObject *p_smFEM);
     void drawNormals(smMesh *p_mesh);
     friend class smSDK;
-    smMatrix44<smFloat> shadowMatrix;
+    smMatrix44f shadowMatrix;
     smColor shadowColor;
 
     ///Frame Buffer for Shadow rendering
@@ -168,7 +169,7 @@ public:
     /// \brief update light information
     smBool updateLight(smInt p_lightId, smLight *p_light);
     void setLightPos(smInt p_lightId, smLightPos p_pos);
-    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3<smFloat> p_direction);
+    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
     /// \brief disable vSync
     void setUnlimitedFPS(smBool p_enableFPS);
     /// \brief default constructor
@@ -276,16 +277,16 @@ protected:
     /// \brief  scale for light drawing in the scene.
     smFloat lightDrawScale;
     //delete this..this is for demo..
-    smVec3<smDouble> hapticPosition;
-    smVec3<smDouble>  hapticForce;
+    smVec3f hapticPosition;
+    smVec3f  hapticForce;
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 
 public:
     /// \brief device camera position. This is used for manipulation of the camera with haptic device
-    smVec3<smDouble> deviceCameraPos;
-    smVec3<smDouble> deviceCameraDir;
-    smVec3<smDouble> deviceCameraUpDir;
+    smVec3f deviceCameraPos;
+    smVec3f deviceCameraDir;
+    smVec3f deviceCameraUpDir;
     /// \brief  check if the camera is collided or not
     smBool  checkCameraCollisionWithScene();
     void addCollisionCheckMeshes(smMesh *mesh);

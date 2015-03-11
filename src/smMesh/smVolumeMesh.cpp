@@ -63,7 +63,7 @@ smBool smVolumeMesh::loadMesh(smChar *fileName, smMeshFileType fileType = SM_FIL
 }
 
 /// \brief
-void smVolumeMesh::translateVolumeMesh(smVec3<smFloat> p_offset)
+void smVolumeMesh::translateVolumeMesh(smVec3f p_offset)
 {
 
     this->translate(p_offset);
@@ -75,21 +75,19 @@ void smVolumeMesh::translateVolumeMesh(smVec3<smFloat> p_offset)
 }
 
 /// \brief
-void smVolumeMesh::scaleVolumeMesh(smVec3<smFloat> p_offset)
+void smVolumeMesh::scaleVolumeMesh(smVec3f p_offset)
 {
 
     scale(p_offset);
 
     for (smInt i = 0; i < this->nbrNodes; i++)
     {
-        nodes[i].x = nodes[i].x * p_offset.x;
-        nodes[i].y = nodes[i].y * p_offset.y;
-        nodes[i].z = nodes[i].z * p_offset.z;
+        nodes[i] = nodes[i].cwiseProduct(p_offset);
     }
 }
 
 /// \brief
-void smVolumeMesh::rotVolumeMesh(smMatrix33<smFloat> p_rot)
+void smVolumeMesh::rotVolumeMesh(smMatrix33f p_rot)
 {
 
     rotate(p_rot);
@@ -120,7 +118,7 @@ smBool smVolumeMesh::LoadTetra(const smChar *fileName)
 
     fscanf(fp, "%f%c\n", &numnodes, &comma);
     nbrNodes = numnodes;
-    nodes = new smVec3<smFloat>[nbrNodes];
+    nodes = new smVec3f[nbrNodes];
     fixed = new smBool[nbrNodes];
 
     for (i = 0; i < nbrNodes; i++)
@@ -136,13 +134,13 @@ smBool smVolumeMesh::LoadTetra(const smChar *fileName)
         nodeNumber[i] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i].x = number;
+        nodes[i][0] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i].y = number;
+        nodes[i][1] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i].z = number;
+        nodes[i][2] = number;
         fscanf(fp, "\n");
     }
 
@@ -308,9 +306,9 @@ void smVolumeMesh::copySurface()
 
     for (i = 0; i < nbrVertices; i++)
     {
-        vertices[i].x = nodes[surfaceNodeIndex[i]].x;
-        vertices[i].y = nodes[surfaceNodeIndex[i]].y;
-        vertices[i].z = nodes[surfaceNodeIndex[i]].z;
+        vertices[i][0] = nodes[surfaceNodeIndex[i]][0];
+        vertices[i][1] = nodes[surfaceNodeIndex[i]][1];
+        vertices[i][2] = nodes[surfaceNodeIndex[i]][2];
     }
 
     updateTriangleNormals();
@@ -324,13 +322,13 @@ void smVolumeMesh::initSurface()
 
     for (i = 0; i < nbrVertices; i++)
     {
-        vertices[i].x = nodes[surfaceNodeIndex[i]].x;
-        vertices[i].y = nodes[surfaceNodeIndex[i]].y;
-        vertices[i].z = nodes[surfaceNodeIndex[i]].z;
+        vertices[i][0] = nodes[surfaceNodeIndex[i]][0];
+        vertices[i][1] = nodes[surfaceNodeIndex[i]][1];
+        vertices[i][2] = nodes[surfaceNodeIndex[i]][2];
 
-        origVerts[i].x = nodes[surfaceNodeIndex[i]].x;
-        origVerts[i].y = nodes[surfaceNodeIndex[i]].y;
-        origVerts[i].z = nodes[surfaceNodeIndex[i]].z;
+        origVerts[i][0] = nodes[surfaceNodeIndex[i]][0];
+        origVerts[i][1] = nodes[surfaceNodeIndex[i]][1];
+        origVerts[i][2] = nodes[surfaceNodeIndex[i]][2];
     }
 
     initVertexNeighbors();

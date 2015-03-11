@@ -24,17 +24,18 @@
 #ifndef SMSHADER_H
 #define SMSHADER_H
 
+// STL includes
+#include <unordered_map>
+#include <list>
+#include <string.h>
+#include <vector>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smGLUtils.h"
-#include "smUtilities/smMatrix44.h"
 #include "smUtilities/smTimer.h"
-
-#include <string.h>
-#include <unordered_map>
-#include <list>
-#include <vector>
 
 class smMesh;
 class smSurfaceMesh;
@@ -48,7 +49,6 @@ struct smTextureShaderAssignment
     /// \brief The parameters that shaders use
     smString shaderParamName;
 };
-
 
 /// \brief this is the generic shader class. It provides loading, initializing, binding,
 ///enabling disabling current shader functionality.Also it provides frequent check of the shader code
@@ -246,12 +246,12 @@ public:
     inline void updateGLSLMatwithOPENGL()
     {
         smMatrix44f proj, model;
-        smGLUtils::queryModelViewMatrix<float>(model);
-        smGLUtils::queryProjectionMatrix<float>(proj);
+        smGLUtils::queryModelViewMatrix(model);
+        smGLUtils::queryProjectionMatrix(proj);
 
         //as the our matrix is row major, we need transpose it. Transpose parameters are true
-        glUniformMatrix4fv(modelViewMatrix, 1, true, (GLfloat*)model.e);
-        glUniformMatrix4fv(projectionMatrix, 1, true, (GLfloat*)proj.e);
+        glUniformMatrix4fv(modelViewMatrix, 1, true, model.data());
+        glUniformMatrix4fv(projectionMatrix, 1, true, proj.data());
     }
 
     /// \brief returns the shader attrrib param

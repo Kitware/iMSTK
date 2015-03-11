@@ -29,8 +29,9 @@
 
 // SimMedTK includes
 #include "smCollision/smOctreeCell.h"
+#include "smCollision/smCollisionMoller.h"
 
-smVec3f &smOctreeCell::getCenter() 
+smVec3f &smOctreeCell::getCenter()
 {
     return  cube.center;
 }
@@ -70,12 +71,12 @@ void smOctreeCell::expand( const float expandScale )
     cube.expand( expandScale );
 }
 
-bool smOctreeCell::isCollidedWithTri( const smVec3f &v0, const smVec3f &v1, const smVec3f &v2 )
+bool smOctreeCell::isCollidedWithTri( smVec3f &v0, smVec3f &v1, smVec3f &v2 )
 {
     smAABB tempAABB;
     tempAABB.aabbMin = cube.leftMinCorner();
     tempAABB.aabbMax = cube.rightMaxCorner();
-    return smCollisionUtils::checkAABBTriangle( tempAABB, v0, v1, v2 );
+    return smCollisionMoller::checkAABBTriangle( tempAABB, v0, v1, v2 );
 }
 
 bool smOctreeCell::isCollidedWithPoint()

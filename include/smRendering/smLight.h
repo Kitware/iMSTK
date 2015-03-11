@@ -23,11 +23,15 @@
 
 #ifndef  SMLIGHT_H
 #define  SMLIGHT_H
+
+// STL includes
+#include <string>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
-
-#include <string>
+#include "smUtilities/smVector.h"
 
 #define SMLIGHT_SPOTMAX 128
 
@@ -48,12 +52,10 @@ enum smLightLocationType
 struct smLightPos
 {
 public:
-    smVec3<smFloat> pos;
+    smVec3f pos;
     smLightPos(smFloat p_x = 0.0, smFloat p_y = 0.0, smFloat p_z = 0.0, smFloat p_w = 1.0)
     {
-        pos.x = p_x;
-        pos.y = p_y;
-        pos.z = p_z;
+        pos << p_x, p_y, p_z;
     }
 
     smFloat w;
@@ -70,9 +72,11 @@ public:
 ///such as (0,0.5,0)(like a head lamp)
 struct smLight
 {
+
 protected:
     smBool enabled;
     smBool previousState;
+
 public:
     smBool drawEnabled;
 
@@ -91,7 +95,7 @@ public:
         name = p_name;
         enabled = false;
         previousState = false;
-        lightPos.pos.setValue(0, 0, 0);
+        lightPos.pos = smVec3f::Zero();
 
         if (p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT)
         {
@@ -105,11 +109,11 @@ public:
         lightType = p_lightType;
         lightLocationType = p_lightLocation;
 
-        direction = defaultDir;
+        direction << 0, 0, -1.0;
         upVector = defaultUpDir;
         transverseDir = defaultTransDir;
+        focusPosition << 0, 0, 0;
 
-        direction.setValue(0, 0, -1.0);
         spotCutOffAngle = 45.0;
         spotExp = 0.0;
         lightColorAmbient.setValue(0.2, 0.2, 0.2, 1.0);
@@ -121,7 +125,6 @@ public:
         shadowFarView = 4000;
         shadowRatio = 1.0;
         shadorAngle = 60;
-        focusPosition.setValue(0, 0, 0);
         attn_constant = 1.0;
         attn_linear = 0.0;
         attn_quadratic = 0.0;
@@ -155,7 +158,7 @@ public:
     smColor lightColorSpecular;
 
     smLightPos  lightPos;
-    //smVec3<smFloat> direction;
+    //smVec3f direction;
     //between 0-1.0
     /// \brief  higher spot exponents result in a more focused light source,
     //regardless of the spot cutoff angle. default is zeron
@@ -163,16 +166,16 @@ public:
     ///angle between 0-90 and 180 is also accepted
     smFloat spotCutOffAngle;
     /// \brief light direction, up vector, transverse direction, focus point
-    smVec3<smFloat> direction;
-    smVec3<smFloat> upVector;
-    smVec3<smFloat> transverseDir;
-    smVec3<smFloat> focusPosition;//it is for shadow
+    smVec3f direction;
+    smVec3f upVector;
+    smVec3f transverseDir;
+    smVec3f focusPosition;//it is for shadow
     /// \brief update light direction
     void updateDirection();
     /// \brief  default direction for light, upvector and transverse direction
-    static smVec3<smFloat> defaultDir;
-    static smVec3<smFloat> defaultUpDir;
-    static smVec3<smFloat> defaultTransDir;
+    static smVec3f defaultDir;
+    static smVec3f defaultUpDir;
+    static smVec3f defaultTransDir;
 
     /// \brief if the light casts shadow, this should be enabled. Unfortunately, we only support one light at a time for shadows
     smBool castShadow;

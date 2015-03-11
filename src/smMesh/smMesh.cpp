@@ -101,12 +101,12 @@ void CalculateTangentArray(smInt vertexCount, const smVec3f *vertex,
         const smTexCoord& w2 = texcoord[i2];
         const smTexCoord& w3 = texcoord[i3];
 
-        float x1 = v2.x - v1.x;
-        float x2 = v3.x - v1.x;
-        float y1 = v2.y - v1.y;
-        float y2 = v3.y - v1.y;
-        float z1 = v2.z - v1.z;
-        float z2 = v3.z - v1.z;
+        float x1 = v2[0] - v1[0];
+        float x2 = v3[0] - v1[0];
+        float y1 = v2[1] - v1[1];
+        float y2 = v3[1] - v1[1];
+        float z1 = v2[2] - v1[2];
+        float z2 = v3[2] - v1[2];
 
         float s1 = w2.u - w1.u;
         float s2 = w3.u - w1.u;
@@ -173,13 +173,13 @@ void smMesh::calcTriangleTangents()
     {
         for (smInt v = 0; v < nbrVertices; v++)
         {
-            vertTangents[v].x = vertTangents[v].y = vertTangents[v].z = 0;
+            vertTangents[v][0] = vertTangents[v][1] = vertTangents[v][2] = 0;
 
             for (t = 0; t < vertTriNeighbors[v].size(); t++)
             {
-                vertTangents[v].x += triTangents[(vertTriNeighbors[v])[t]].x;
-                vertTangents[v].y += triTangents[(vertTriNeighbors[v])[t]].y;
-                vertTangents[v].z += triTangents[(vertTriNeighbors[v])[t]].z;
+                vertTangents[v][0] += triTangents[(vertTriNeighbors[v])[t]][0];
+                vertTangents[v][1] += triTangents[(vertTriNeighbors[v])[t]][1];
+                vertTangents[v][2] += triTangents[(vertTriNeighbors[v])[t]][2];
             }
 
             vertTangents[v].normalize();
@@ -190,19 +190,19 @@ void smMesh::calcTriangleTangents()
 }
 
 /// \brief calucate the triangle tangent for rendering purposes
-void smMesh::calculateTangent(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t)
+void smMesh::calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t)
 {
 
-    smVec3<smFloat> v1;
-    smVec3<smFloat> v2;
+    smVec3f v1;
+    smVec3f v2;
 
-    v1.x = p2.x - p1.x;
-    v1.y = p2.y - p1.y;
-    v1.z = p2.z - p1.z;
+    v1[0] = p2[0] - p1[0];
+    v1[1] = p2[1] - p1[1];
+    v1[2] = p2[2] - p1[2];
 
-    v2.x = p3.x - p1.x;
-    v2.y = p3.y - p1.y;
-    v2.z = p3.z - p1.z;
+    v2[0] = p3[0] - p1[0];
+    v2[1] = p3[1] - p1[1];
+    v2[2] = p3[2] - p1[2];
 
     smFloat tt1 = t2.u - t1.u;
     smFloat tt2 = t3.u - t1.u;
@@ -210,27 +210,27 @@ void smMesh::calculateTangent(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<s
     smFloat bb1 = t2.v - t1.v;
     smFloat bb2 = t3.v - t1.v;
 
-    t.x = bb2 * v1.x - bb1 * v2.x;
-    t.y = bb2 * v1.y - bb1 * v2.y;
-    t.z = bb2 * v1.z - bb1 * v2.z;
+    t[0] = bb2 * v1[0] - bb1 * v2[0];
+    t[1] = bb2 * v1[1] - bb1 * v2[1];
+    t[2] = bb2 * v1[2] - bb1 * v2[2];
 
     t.normalize();
 }
 
 /// \brief
-void smMesh::calculateTangent_test(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t)
+void smMesh::calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t)
 {
 
-    smVec3<smFloat> v1;
-    smVec3<smFloat> v2;
+    smVec3f v1;
+    smVec3f v2;
 
-    v1.x = p2.x - p1.x;
-    v1.y = p2.y - p1.y;
-    v1.z = p2.z - p1.z;
+    v1[0] = p2[0] - p1[0];
+    v1[1] = p2[1] - p1[1];
+    v1[2] = p2[2] - p1[2];
 
-    v2.x = p3.x - p1.x;
-    v2.y = p3.y - p1.y;
-    v2.z = p3.z - p1.z;
+    v2[0] = p3[0] - p1[0];
+    v2[1] = p3[1] - p1[1];
+    v2[2] = p3[2] - p1[2];
 
     smFloat tt1 = t2.u - t1.u;
     smFloat tt2 = t3.u - t1.u;
@@ -238,9 +238,9 @@ void smMesh::calculateTangent_test(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smV
     smFloat bb1 = t2.v - t1.v;
     smFloat bb2 = t3.v - t1.v;
     float r = 1.0F / (tt1 * bb2 - tt2 * bb1);
-    t.x = (bb2 * v1.x - bb1 * v2.x) * r;
-    t.y = (bb2 * v1.y - bb1 * v2.y) * r;
-    t.z = (bb2 * v1.z - bb1 * v2.z) * r;
+    t[0] = (bb2 * v1[0] - bb1 * v2[0]) * r;
+    t[1] = (bb2 * v1[1] - bb1 * v2[1]) * r;
+    t[2] = (bb2 * v1[2] - bb1 * v2[2]) * r;
 }
 
 /// \brief calculates the normal of the vertex
@@ -248,7 +248,7 @@ void smMesh::updateVertexNormals()
 {
 
     smInt j;
-    smVec3<smFloat> temp(0.0, 0.0, 0.0);
+    smVec3f temp = smVec3f::Zero();
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
@@ -259,7 +259,7 @@ void smMesh::updateVertexNormals()
 
         vertNormals[i] = temp;
         vertNormals[i].normalize();
-        temp.setValue(0.0, 0.0, 0.0);
+        temp = smVec3f::Zero();
     }
 }
 
@@ -269,22 +269,22 @@ void smMesh::updateTriangleNormals()
 
     for (smInt i = 0; i < nbrTriangles; i++)
     {
-        triNormals[i] = calculateTriangleNormal(i).unit();
+        triNormals[i] = calculateTriangleNormal(i).normalized();
     }
 }
 
 /// \brief calculates the normal of a triangle
-smVec3<smFloat> smMesh::calculateTriangleNormal(smInt triNbr)
+smVec3f smMesh::calculateTriangleNormal(smInt triNbr)
 {
 
-    smVec3<smFloat> v[3];
+    smVec3f v[3];
     smTriangle temp = this->triangles[triNbr];
 
     v[0] = this->vertices[temp.vert[0]];
     v[1] = this->vertices[temp.vert[1]];
     v[2] = this->vertices[temp.vert[2]];
 
-    return (v[1] - v[0]).cross(v[2] - v[0]).unit();
+    return (v[1] - v[0]).cross(v[2] - v[0]).normalized();
 }
 
 /// \brief allocates vertices and related array
@@ -299,8 +299,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     this->nbrVertices = nbr;
     this->vertices.reserve(nbr);
     this->origVerts.reserve(nbr);
-    this->vertNormals = new smVec3<smFloat>[nbr];
-    this->vertTangents = new smVec3<smFloat>[nbr];
+    this->vertNormals = new smVec3f[nbr];
+    this->vertTangents = new smVec3f[nbr];
     this->texCoord = new smTexCoord[nbr];
     return true;
 }
@@ -317,8 +317,8 @@ smBool smMesh::initTriangleArrays(smInt nbr)
     this->nbrTriangles = nbr;
 
     this->triangles = new smTriangle[nbr];
-    this->triNormals = new smVec3<smFloat>[nbr];
-    this->triTangents = new smVec3<smFloat>[nbr];
+    this->triNormals = new smVec3f[nbr];
+    this->triTangents = new smVec3f[nbr];
     return true;
 }
 
@@ -421,22 +421,22 @@ inline void smMesh::upadateAABB()
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
-        minx = SIMMEDTK_MIN(vertices[i].x, minx);
-        miny = SIMMEDTK_MIN(vertices[i].y, miny);
-        minz = SIMMEDTK_MIN(vertices[i].z, minz);
+        minx = SIMMEDTK_MIN(vertices[i][0], minx);
+        miny = SIMMEDTK_MIN(vertices[i][1], miny);
+        minz = SIMMEDTK_MIN(vertices[i][2], minz);
 
-        maxx = SIMMEDTK_MAX(vertices[i].x, maxx);
-        maxy = SIMMEDTK_MAX(vertices[i].y, maxy);
-        maxz = SIMMEDTK_MAX(vertices[i].z, maxz);
+        maxx = SIMMEDTK_MAX(vertices[i][0], maxx);
+        maxy = SIMMEDTK_MAX(vertices[i][1], maxy);
+        maxz = SIMMEDTK_MAX(vertices[i][2], maxz);
     }
 
-    aabb.aabbMin.x = minx - (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMin.y = miny - (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMin.z = minz - (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMin[0] = minx - (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMin[1] = miny - (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMin[2] = minz - (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
 
-    aabb.aabbMax.x = maxx + (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMax.y = maxy + (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMax.z = maxz + (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMax[0] = maxx + (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMax[1] = maxy + (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    aabb.aabbMax[2] = maxz + (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
 }
 
 /// \brief
@@ -468,20 +468,20 @@ void smMesh::translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ)
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
-        vertices[i].x = vertices[i].x + p_offsetX;
-        vertices[i].y = vertices[i].y + p_offsetY;
-        vertices[i].z = vertices[i].z + p_offsetZ;
+        vertices[i][0] = vertices[i][0] + p_offsetX;
+        vertices[i][1] = vertices[i][1] + p_offsetY;
+        vertices[i][2] = vertices[i][2] + p_offsetZ;
 
-        origVerts[i].x = vertices[i].x + p_offsetX;
-        origVerts[i].y = vertices[i].y + p_offsetY;
-        origVerts[i].z = vertices[i].z + p_offsetZ;
+        origVerts[i][0] = vertices[i][0] + p_offsetX;
+        origVerts[i][1] = vertices[i][1] + p_offsetY;
+        origVerts[i][2] = vertices[i][2] + p_offsetZ;
     }
 
     upadateAABB();
 }
 
 /// \brief
-void smMesh::translate(smVec3<smFloat> p_offset)
+void smMesh::translate(smVec3f p_offset)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
@@ -494,25 +494,25 @@ void smMesh::translate(smVec3<smFloat> p_offset)
 }
 
 /// \brief
-void smMesh::scale(smVec3<smFloat> p_scaleFactors)
+void smMesh::scale(smVec3f p_scaleFactors)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
-        vertices[i].x = vertices[i].x * p_scaleFactors.x;
-        vertices[i].y = vertices[i].y * p_scaleFactors.y;
-        vertices[i].z = vertices[i].z * p_scaleFactors.z;
+        vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
+        vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
+        vertices[i][2] = vertices[i][2] * p_scaleFactors[2];
 
-        origVerts[i].x = origVerts[i].x * p_scaleFactors.x;
-        origVerts[i].y = origVerts[i].y * p_scaleFactors.y;
-        origVerts[i].z = origVerts[i].z * p_scaleFactors.z;
+        origVerts[i][0] = origVerts[i][0] * p_scaleFactors[0];
+        origVerts[i][1] = origVerts[i][1] * p_scaleFactors[1];
+        origVerts[i][2] = origVerts[i][2] * p_scaleFactors[2];
     }
 
     upadateAABB();
 }
 
 /// \brief
-void smMesh::rotate(smMatrix33<smFloat> p_rot)
+void smMesh::rotate(const smMatrix33f &p_rot)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
@@ -555,40 +555,40 @@ void smMesh::updateTriangleAABB()
 {
 
     smAABB tempAABB;
-    tempAABB.aabbMin.x = FLT_MAX;
-    tempAABB.aabbMin.y = FLT_MAX;
-    tempAABB.aabbMin.z = FLT_MAX;
+    tempAABB.aabbMin[0] = FLT_MAX;
+    tempAABB.aabbMin[1] = FLT_MAX;
+    tempAABB.aabbMin[2] = FLT_MAX;
 
-    tempAABB.aabbMax.x = -FLT_MAX;
-    tempAABB.aabbMax.y = -FLT_MAX;
-    tempAABB.aabbMax.z = -FLT_MAX;
+    tempAABB.aabbMax[0] = -FLT_MAX;
+    tempAABB.aabbMax[1] = -FLT_MAX;
+    tempAABB.aabbMax[2] = -FLT_MAX;
 
     for (smInt i = 0; i < nbrTriangles; i++)
     {
         // min
-        triAABBs[i].aabbMin.x = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x);
-        triAABBs[i].aabbMin.x = SIMMEDTK_MIN(triAABBs[i].aabbMin.x ,   vertices[triangles[i].vert[2]].x);
-        tempAABB.aabbMin.x = SIMMEDTK_MIN(tempAABB.aabbMin.x, triAABBs[i].aabbMin.x);
+        triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
+        triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(triAABBs[i].aabbMin[0] ,   vertices[triangles[i].vert[2]][0]);
+        tempAABB.aabbMin[0] = SIMMEDTK_MIN(tempAABB.aabbMin[0], triAABBs[i].aabbMin[0]);
 
-        triAABBs[i].aabbMin.y = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
-        triAABBs[i].aabbMin.y = SIMMEDTK_MIN(triAABBs[i].aabbMin.y ,   vertices[triangles[i].vert[2]].y);
-        tempAABB.aabbMin.y = SIMMEDTK_MIN(tempAABB.aabbMin.y, triAABBs[i].aabbMin.y);
+        triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
+        triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(triAABBs[i].aabbMin[1] ,   vertices[triangles[i].vert[2]][1]);
+        tempAABB.aabbMin[1] = SIMMEDTK_MIN(tempAABB.aabbMin[1], triAABBs[i].aabbMin[1]);
 
-        triAABBs[i].aabbMin.z = SIMMEDTK_MIN(vertices[triangles[i].vert[0]].z, vertices[triangles[i].vert[1]].z);
-        triAABBs[i].aabbMin.z = SIMMEDTK_MIN(triAABBs[i].aabbMin.z ,   vertices[triangles[i].vert[2]].z);
-        tempAABB.aabbMin.z = SIMMEDTK_MIN(tempAABB.aabbMin.z, triAABBs[i].aabbMin.z);
+        triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][2], vertices[triangles[i].vert[1]][2]);
+        triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(triAABBs[i].aabbMin[2] ,   vertices[triangles[i].vert[2]][2]);
+        tempAABB.aabbMin[2] = SIMMEDTK_MIN(tempAABB.aabbMin[2], triAABBs[i].aabbMin[2]);
 
         //max
-        triAABBs[i].aabbMax.x = SIMMEDTK_MAX(vertices[triangles[i].vert[0]].x, vertices[triangles[i].vert[1]].x);
-        triAABBs[i].aabbMax.x = SIMMEDTK_MAX(triAABBs[i].aabbMax.x ,   vertices[triangles[i].vert[2]].x);
-        tempAABB.aabbMax.x = SIMMEDTK_MAX(tempAABB.aabbMax.x, triAABBs[i].aabbMax.x);
+        triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
+        triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(triAABBs[i].aabbMax[0] ,   vertices[triangles[i].vert[2]][0]);
+        tempAABB.aabbMax[0] = SIMMEDTK_MAX(tempAABB.aabbMax[0], triAABBs[i].aabbMax[0]);
 
-        triAABBs[i].aabbMax.y = SIMMEDTK_MAX(vertices[triangles[i].vert[0]].y, vertices[triangles[i].vert[1]].y);
-        triAABBs[i].aabbMax.y = SIMMEDTK_MAX(triAABBs[i].aabbMax.y ,   vertices[triangles[i].vert[2]].y);
-        tempAABB.aabbMax.y = SIMMEDTK_MAX(tempAABB.aabbMax.y, triAABBs[i].aabbMax.y);
+        triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
+        triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(triAABBs[i].aabbMax[1] ,   vertices[triangles[i].vert[2]][1]);
+        tempAABB.aabbMax[1] = SIMMEDTK_MAX(tempAABB.aabbMax[1], triAABBs[i].aabbMax[1]);
 
-        triAABBs[i].aabbMax.z = SIMMEDTK_MAX(triAABBs[i].aabbMax.z,    vertices[triangles[i].vert[2]].z);
-        tempAABB.aabbMax.z = SIMMEDTK_MAX(tempAABB.aabbMax.z, triAABBs[i].aabbMax.z);
+        triAABBs[i].aabbMax[2] = SIMMEDTK_MAX(triAABBs[i].aabbMax[2],    vertices[triangles[i].vert[2]][2]);
+        tempAABB.aabbMax[2] = SIMMEDTK_MAX(tempAABB.aabbMax[2], triAABBs[i].aabbMax[2]);
     }
 
     aabb = tempAABB;
@@ -688,12 +688,12 @@ void smLineMesh::draw(smDrawParam p_params)
             smGLRenderer::draw(this->edgeAABBs[i]);
             glPushMatrix();
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorYellow.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMin.x, edgeAABBs[i].aabbMin.y, edgeAABBs[i].aabbMin.z);
+            glTranslatef(edgeAABBs[i].aabbMin[0], edgeAABBs[i].aabbMin[1], edgeAABBs[i].aabbMin[2]);
             glutSolidSphere(0.2, 15.0, 15.0);
             glPopMatrix();
             glPushMatrix();
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMax.x, edgeAABBs[i].aabbMax.y, edgeAABBs[i].aabbMax.z);
+            glTranslatef(edgeAABBs[i].aabbMax[0], edgeAABBs[i].aabbMax[1], edgeAABBs[i].aabbMax[2]);
             glutSolidSphere(0.2, 15.0, 15.0);
             glPopMatrix();
         }

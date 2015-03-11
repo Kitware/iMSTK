@@ -21,5 +21,18 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smGeometry.h"
+#ifndef SM_COLLISIONUTILITIES_H
+#define SM_COLLISIONUTILITIES_H
 
+// SimMedTK includes
+#include "smUtilities/smVector.h"
+
+/// \brief If the point is in the triangle, it will also send the barycentric coord.
+int intersect3D_RayTriangleWithBarycentric(smVec3f P0, smVec3f P1, smVec3f V0,
+        smVec3f V1, smVec3f V2, smVec3f *I,
+        float &p_baryU, float &p_baryV,
+        float &p_baryW,
+        bool considerFrontFaceOnly);
+
+
+#endif // SM_COLLISIONUTILITIES_H

@@ -27,7 +27,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
-#include "smUtilities/smVec3.h"
+#include "smUtilities/smVector.h"
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
@@ -114,7 +114,7 @@ public:
     /// \brief  add vertices to the data buffer
     smVBOResult addVerticestoBuffer(smInt p_nbrVertices, smInt p_nbrTriangles, smInt p_objectId)
     {
-        if (sizeof(smVec3<smFloat>)*p_nbrVertices + sizeof(smVec3<smFloat>)*p_nbrVertices + sizeof(smTexCoord)*p_nbrVertices > sizeOfDataBuffer - currentDataOffset)
+        if (sizeof(smVec3f)*p_nbrVertices + sizeof(smVec3f)*p_nbrVertices + sizeof(smTexCoord)*p_nbrVertices > sizeOfDataBuffer - currentDataOffset)
         {
             return SIMMEDTK_VBO_NODATAMEMORY;
         }
@@ -129,19 +129,19 @@ public:
         numberofVertices[p_objectId] = p_nbrVertices;
         numberofTriangles[p_objectId] = p_nbrTriangles;
         ///add the vertices and normals and the texture coordinates
-        currentDataOffset += sizeof(smVec3<smFloat>) * p_nbrVertices + sizeof(smVec3<smFloat>) * p_nbrVertices + sizeof(smTexCoord) * p_nbrVertices;
+        currentDataOffset += sizeof(smVec3f) * p_nbrVertices + sizeof(smVec3f) * p_nbrVertices + sizeof(smTexCoord) * p_nbrVertices;
         currentIndexOffset += p_nbrTriangles * sizeof(smTriangle);
         return SIMMEDTK_VBO_OK;
     }
     /// \brief update vertex data buffer
-    smVBOResult updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult updateVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
     /// \brief update  triangle index
     smVBOResult updateTriangleIndices(smInt *p_indices, smInt p_objectId);
     /// \brief draw elements in VBO
     smVBOResult drawElements(smInt p_objectId);
 
     /// \brief update the static vertices initially
-    smVBOResult initStaticVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult initStaticVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
 
     /// \brief update the static triangle indices initially
     smVBOResult initTriangleIndices(smInt *p_indices, smInt p_objectId);

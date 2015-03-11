@@ -40,8 +40,8 @@
 
 #include <mutex>
 
-#define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3<smFloat>(-10,-10,-10)
-#define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3<smFloat>(10,10,10)
+#define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3f(-10,-10,-10)
+#define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3f(10,10,10)
 #define SIMMEDTK_SPATIALGRID_XSEPERATION 10
 #define SIMMEDTK_SPATIALGRID_YSEPERATION 10
 #define SIMMEDTK_SPATIALGRID_ZSEPERATION 10
@@ -86,10 +86,10 @@ public:
     {
 
         smInt coPlanar;
-        smVec3<smFloat> interSectPoint1;
-        smVec3<smFloat> interSectPoint2;
-        smVec3<smFloat> projectedPoint1;
-        smVec3<smFloat> projectedPoint2;
+        smVec3f interSectPoint1;
+        smVec3f interSectPoint2;
+        smVec3f projectedPoint1;
+        smVec3f projectedPoint2;
         smShort singlePoint1;
         smShort singlePoint2;
 
@@ -233,7 +233,7 @@ public:
     }
 
     /// \brief draws the triangle
-    inline static void drawTriangle(smVec3<smFloat> &p_1, smVec3<smFloat> &p_2, smVec3<smFloat> &p_3)
+    inline static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3)
     {
         glVertex3fv((GLfloat*)&p_1);
         glVertex3fv((GLfloat*)&p_2);
@@ -257,8 +257,8 @@ private:
     smInt totalThreads; ///< number of total threads
     smSynchronization synch; ///< !!
 
-    smVec3<smFloat> leftCorner; ///< left corner of the grid
-    smVec3<smFloat> rightCorner; ///< right corner of the grid
+    smVec3f leftCorner; ///< left corner of the grid
+    smVec3f rightCorner; ///< right corner of the grid
     smInt xSeperation; ///< grid spacing in x-direction
     smInt ySeperation; ///< grid spacing in y-direction
     smInt zSeperation; ///< grid spacing in z-direction
