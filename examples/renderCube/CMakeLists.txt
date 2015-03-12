@@ -5,4 +5,9 @@ target_link_libraries(renderCube
   smRendering
   smShader
   smMesh
+  sfml::system
+  sfml::audio
+  sfml::graphics
+  sfml::network
+  sfml::window
   )
