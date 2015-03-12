@@ -43,7 +43,7 @@ enum smAudioState
 /// \brief contains data for audio rendering
 struct smAudioEventData
 {
-    string sound;
+    smString sound;
     smAudioState state;
     smFloat volume;
 
@@ -71,7 +71,7 @@ class smAudio: public smCoreClass, public smEventHandler
     OutputStreamPtr sound; ///< !!
 
     smErrorLog *log; ///< log for errors rendering audio
-    string referenceName; ///< !!
+    smString referenceName; ///< !!
     smAudioState state; ///< state of audio
     smAudioState prevState; ///< state of audio in previous cycle
     smFloat prevVolume; ///< state of audio volume in previous cycle
@@ -82,10 +82,12 @@ public:
     smBool continuousPlaying; ///< true if audio is to be played continuously
 
     /// \brief constructor initialize various states
-    smAudio(char *fileName, string p_referenceName, smErrorLog *p_log = NULL)
+    smAudio(const smString& fileName,
+            const smString& p_referenceName,
+            smErrorLog *p_log = NULL)
     {
         device = AudioDevicePtr(OpenDevice());
-        sound = OutputStreamPtr(OpenSound(device, fileName, false));
+        sound = OutputStreamPtr(OpenSound(device, fileName.c_str(), false));
         volume = 1.0f; //max volume
         prevVolume = 1.0f;
         log = p_log;
@@ -200,7 +202,7 @@ public:
         {
             audioEvent = (smAudioEventData*)p_event->data;
 
-            if (audioEvent->sound.compare(referenceName) == 0)
+            if (audioEvent->sound == referenceName)
             {
                 setVolume(audioEvent->volume);
                 setState(audioEvent->state);

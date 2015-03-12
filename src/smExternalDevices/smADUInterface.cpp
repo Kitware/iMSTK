@@ -29,6 +29,7 @@
 #include "smExternalDevices/smADUInterface.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "smExternalDevices/AduHid.h"
 
 /// \brief default constructor
@@ -46,8 +47,6 @@ void smADUInterface::exec()
 /// \brief
 smADUInterface::smADUInterface()
 {
-
-    serialNumber = new smChar[10];
     isOpened = false;
     calibrationData = new ADUDeviceCalibrationData();
     deviceData = new ADUDeviceData();
@@ -71,11 +70,10 @@ smADUInterface::smADUInterface()
 }
 
 /// \brief
-smADUInterface::smADUInterface(char *calibrationFile)
+smADUInterface::smADUInterface(const smString& calibrationFile)
 {
 
 // Read device serial number and calibration values
-    serialNumber = new smChar[10];
     isOpened = false;
     calibrationData = new ADUDeviceCalibrationData();
     deviceData = new ADUDeviceData();
@@ -88,14 +86,14 @@ smADUInterface::smADUInterface(char *calibrationFile)
         std::cout << " Check the location for file : " << deviceData << "\n";
     }
 
-    smChar buffer[100];
+    smString buffer;
     smInt i;
-    std::string t;
-    std::string s;
+    smString t;
+    smString s;
 
     while (!reader.eof())
     {
-        reader.getline(buffer, 50);
+        getline(reader, buffer);
 
         t = buffer;
 
@@ -105,7 +103,7 @@ smADUInterface::smADUInterface(char *calibrationFile)
         {
             i = t.find(":");
             s.assign(t, i + 1, t.size());
-            strcpy(serialNumber, s.c_str());
+            serialNumber = s;
             //Debug
             std::cout << "Serial Number of this device is" << serialNumber << "\n";
         }
@@ -183,10 +181,10 @@ smADUInterface::~smADUInterface()
 }
 
 /// \brief
-smInt smADUInterface::openDevice(char *serialNumber)
+smInt smADUInterface::openDevice(const smString& serialNumber)
 {
 
-    deviceHandle = OpenAduDeviceBySerialNumber(serialNumber, 0);
+    deviceHandle = OpenAduDeviceBySerialNumber(serialNumber.c_str(), 0);
 
     if ((*((int *)&deviceHandle)) > 0)
     {
@@ -219,7 +217,7 @@ smInt* smADUInterface::readAnalogInputs()
 smInt smADUInterface::readAnalogInput(int channel)
 {
 
-    smChar *command;
+    smString command;
     smChar data[8];
 
     if (channel == 0)
@@ -231,7 +229,7 @@ smInt smADUInterface::readAnalogInput(int channel)
         command = "RUN10";
     }
 
-    WriteAduDevice(deviceHandle, command, 5, 0, 0);
+    WriteAduDevice(deviceHandle, command.c_str(), 5, 0, 0);
     memset(data, 0, sizeof(data));
     ReadAduDevice(deviceHandle, data, 5, 0, 0);
 

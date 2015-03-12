@@ -41,16 +41,16 @@ public:
     virtual ~smSurfaceMesh();
 
     /// \brief load the surface mesh
-    smBool loadMesh(smChar *fileName, smMeshFileType fileType);
+    smBool loadMesh(const smString& fileName, smMeshFileType fileType);
 
     /// \brief load the surface mesh using in-house code
-    smBool loadMeshLegacy(smChar *fileName, smMeshFileType fileType);
+    smBool loadMeshLegacy(const smString& fileName, smMeshFileType fileType);
 
     /// \brief load the surface mesh from 3ds format
-    smBool Load3dsMesh(smChar *fileName);
+    smBool Load3dsMesh(const smString& fileName);
 
     /// \brief load surface meshes using assimp library
-    smBool LoadMeshAssimp(const smChar *fileName);
+    smBool LoadMeshAssimp(const smString& fileName);
 };
 
 #endif

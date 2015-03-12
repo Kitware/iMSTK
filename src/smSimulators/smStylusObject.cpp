@@ -84,7 +84,7 @@ void smStylusRigidSceneObject::draw(smDrawParam p_params)
 
 void smStylusRigidSceneObject::initDraw(smDrawParam p_params)
 {
-    smChar errorText[500];
+    smString errorText;
     p_params.caller = this;
     tree<smMeshContainer*>::pre_order_iterator iter = meshes.begin();
     smGLInt newList = glGenLists(meshes.size());

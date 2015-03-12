@@ -57,9 +57,9 @@ public:
 
     /// \brief constrcutor that gest hatpic device ID (e.g. 0 or 1), pivot, lower and upper mesh file names
     curvedGrasper(smInt ID,
-                  smChar * p_pivotModelFileName = "../../resources/models/curved_pivot.3DS",
-                  smChar *p_lowerModelFileName = "../../resources/models/curved_upper.3DS",
-                  smChar *p_upperModelFileName = "../../resources/models/curved_lower.3DS");
+                  const smString& p_pivotModelFileName = "../../resources/models/curved_pivot.3DS",
+                  const smString& p_lowerModelFileName = "../../resources/models/curved_upper.3DS",
+                  const smString& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief for jaw interface
     //smPipeRegisteration ADUpipeReg;

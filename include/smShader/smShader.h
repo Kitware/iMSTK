@@ -60,17 +60,17 @@ public:
 protected:
     static std::unordered_map<smInt, smShader *> shaders;
 
-    smChar vertexProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
-    smChar fragmentProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
-    smChar geometryProgFileName[SIMMEDTK_MAX_FILENAME_LENGTH];
     /// \brief Error Loging
     smErrorLog *log;
+    smString vertexProgFileName;
+    smString fragmentProgFileName;
+    smString geometryProgFileName;
     /// \brief stores the content of the vertex shader file
-    smChar *vertexShaderContent;
+    smString vertexShaderContent;
     /// \brief stores the content of the fragment  shader file
-    smChar *fragmentShaderContent;
+    smString fragmentShaderContent;
     /// \brief stores the content of the geometry shader file
-    smChar *geometryShaderContent;
+    smString geometryShaderContent;
     /// \brief if the vertex shader exists this will be true
     smBool vertexProgramExist;
     /// \brief if the fragment shader exists this will be true
@@ -78,20 +78,18 @@ protected:
     /// \brief if the geometry shader exists this will be true
     smBool geometryProgramExist;
     /// \brief stores the parameters for vertex shader
-    std::vector<smChar*> vertexShaderParamsString;
+    std::vector<smString> vertexShaderParamsString;
     /// \brief stores the parameters for fragment shader
-    std::vector<smChar*> fragmentShaderParamsString;
+    std::vector<smString> fragmentShaderParamsString;
     /// \brief stores the parameters for geometry shader
-    std::vector<smChar*> geometryShaderParamsString;
+    std::vector<smString> geometryShaderParamsString;
     /// \brief stores the attribute parameters
-    std::vector<smChar*> attribParamsString;
-    /// \brief error text for querying the opengl errors mostly
-    smChar errorText[SIMMEDTK_MAX_ERRORLOG_TEXT];
+    std::vector<smString> attribParamsString;
     /// \brief time for periodically checnking the shader
     smTimer time;
     std::unordered_multimap<smInt, smTextureShaderAssignment> texAssignments;
-    smChar modelViewMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
-    smChar projectionMatrixName[SIMMEDTK_MAX_SHADERVARIABLENAME];
+    smString modelViewMatrixName;
+    smString projectionMatrixName;
 
     void getAttribAndParamLocations();
 
@@ -127,10 +125,22 @@ protected:
     /// \brief reloads the geometry shader
     void reloadGeometryShaderGLSL();
 
+    /// \brief Retrieves a shader uniform value location and stores it
+    ///
+    /// \param p_paramName Name of the uniform value to find
+    /// \param p_shaderProgramObject Shader object to find the uniform in
+    /// \param p_shaderParamsString List of shader parameter names to append to
+    /// if the uniform variable is found
+    /// \param p_shaderParams List of shader parameter locations to append to
+    /// if the uniform variable is found
+    smGLInt addShaderParamGLSL(const smString& p_paramName,
+                               const GLhandleARB p_shaderProgramObject,
+                               std::vector<smString>& p_shaderParamsString,
+                               std::vector<GLint>& p_shaderParams);
     /// \brief add vertex, fragment and geometry shaders
-    GLint addVertexShaderParamGLSL(smChar* p_paramVertex);
-    GLint addFragmentShaderParamGLSL(smChar* p_paramFragment);
-    GLint addGeometryShaderParamGLSL(smChar* p_paramGeometry);
+    GLint addVertexShaderParamGLSL(const smString& p_paramVertex);
+    GLint addFragmentShaderParamGLSL(const smString& p_paramFragment);
+    GLint addGeometryShaderParamGLSL(const smString& p_paramGeometry);
 
 public:
     /// \brief returns the program object
@@ -158,7 +168,7 @@ public:
     void attachTexture(smUnifiedID p_meshID, smInt p_textureID);
 
     /// \brief assigns the texture by name if you don't know the textureID
-    smBool attachTexture(smUnifiedID p_meshID, smChar * const p_textureName, smChar * const p_textureShaderName);
+    smBool attachTexture(smUnifiedID p_meshID, const smString& p_textureName, const smString& p_textureShaderName);
 
 protected:
     /// \brief This stores the opengl binded texture id
@@ -166,6 +176,28 @@ protected:
     void autoGetTextureIds();
 #endif
 
+protected:
+    /// \brief Creates a shader object from shader content,
+    /// then adds the shader object to a program object for use
+    ///
+    /// \param p_shaderObject An empty shader handle to be assigned the value of
+    /// a newly created shader
+    /// \param p_shaderProgramObject A shader program to add the newly created
+    /// shader to
+    /// \param p_shaderContent A string containing the shader program
+    /// \param p_shaderType The type of shader, can be:
+    /// GL_COMPUTE_SHADER, GL_VERTEX_SHADER, GL_TESS_CONTROL_SHADER,
+    /// GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER
+    void createShaderGLSL(GLhandleARB &p_shaderObject,
+                          const GLhandleARB p_shaderProgramObject,
+                          const smString& p_shaderContent,
+                          GLenum p_shaderType);
+    /// \brief Reloads and recompiles the shader object
+    ///
+    /// \param p_shaderObject Shader handle to be reloaded
+    /// \param p_shaderContent A string containing the shader program
+    void reloadShaderGLSL(const GLhandleARB p_shaderObject,
+                          const smString& p_shaderContent);
 /// \brief reloads all shaders
     smBool reLoadAllShaders();
 /// \brief check opengl error
@@ -181,7 +213,9 @@ public:
     /// \param vertexProgFileName   vertex program file name
     /// \param fragmentProgFileName fragment program file name
     /// \param geometryProgFileName geometry program file name
-    smBool initShaders(smChar *vertexProgFileName, smChar *fragmentProgFileName, smChar *geometryProgFileName);
+    smBool initShaders(const smString& p_vertexProgFileName,
+                       const smString& p_fragmentProgFileName,
+                       const smString& p_geometryProgFileName);
 
     /// \brief  enables the shader
     void enableShader();
@@ -194,43 +228,46 @@ public:
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     /// \brief add parameter for Vertex Shader
-    GLint addVertexShaderParam(smChar* p_paramVertex);
+    GLint addVertexShaderParam(const smString& p_paramVertex);
     /// \brief add parameter for Fragment Shader
-    GLint addFragmentShaderParam(smChar* p_paramFragment);
+    GLint addFragmentShaderParam(const smString& p_paramFragment);
     /// \brief add parameter for Geometry Shader
-    GLint addGeometryShaderParam(smChar* p_paramGeometry);
+    GLint addGeometryShaderParam(const smString& p_paramGeometry);
     /// \brief add parameter for all Shaders
-    GLint addShaderParamForAll(smChar* p_paramName);
+    GLint addShaderParamForAll(const smString& p_paramName);
     /// \brief attrib parameters for Shaders
-    GLint addShaderParamAttrib(smChar* p_paramName);
+    GLint addShaderParamAttrib(const smString& p_paramName);
 
-    void createTextureParam(smChar *p_textureNameInShaderCode);
+    void createTextureParam(const smString& p_textureNameInShaderCode);
 
-    smBool setShaderFileName(smChar *p_vertexFileName, smChar *p_geometryFileName, smChar *p_fragmentFileName);
-    smBool setModelViewMatrixShaderName(smChar *p_modelviewMatrixName)
+    smBool setShaderFileName(const smString& p_vertexFileName,
+                             const smString& p_geometryFileName,
+                             const smString& p_fragmentFileName);
+
+    smBool setModelViewMatrixShaderName(const smString& p_modelviewMatrixName)
     {
-        if (strlen(p_modelviewMatrixName) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1)
+        if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_modelviewMatrixName.length())
         {
             return false;
         }
         else
         {
-            strcpy(this->modelViewMatrixName, p_modelviewMatrixName);
+            this->modelViewMatrixName = p_modelviewMatrixName;
         }
 
         createParam(modelViewMatrixName);
         return true;
     }
 
-    smBool setProjectionMatrixShaderName(smChar *p_projectionName)
+    smBool setProjectionMatrixShaderName(const smString& p_projectionName)
     {
-        if (strlen(p_projectionName) > SIMMEDTK_MAX_SHADERVARIABLENAME - 1)
+        if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_projectionName.length())
         {
             return false;
         }
         else
         {
-            strcpy(this->projectionMatrixName, p_projectionName);
+            this->projectionMatrixName = p_projectionName;
         }
 
         createParam(projectionMatrixName);
@@ -255,20 +292,20 @@ public:
     }
 
     /// \brief returns the shader attrrib param
-    smGLInt getShaderParamForAll(smChar *p_paramName);
+    smGLInt getShaderParamForAll(const smString& p_paramName);
 
     /// \brief returns the fragment shader uniform param
-    smGLInt getFragmentShaderParam(smChar *p_paramName);
+    smGLInt getFragmentShaderParam(const smString& p_paramName);
 
     /// \brief returns the attrib location param
-    smGLInt getShaderAtrribParam(smChar *p_paramName);
+    smGLInt getShaderAtrribParam(const smString& p_paramName);
 
-    void createParam(smChar * const p_param);
-    smInt createAttrib(smChar * const p_attrib);
+    void createParam(const smString& p_param);
+    smInt createAttrib(const smString& p_attrib);
 
-    smGLInt queryUniformLocation(smChar *const p_param)
+    smGLInt queryUniformLocation(const smString& p_param)
     {
-        return glGetUniformLocation(shaderProgramObject, p_param);
+        return glGetUniformLocation(shaderProgramObject, p_param.data());
     }
 
 #endif
@@ -313,6 +350,7 @@ public:
         return shaders[p_shaderID.ID];
     }
 
+    smBool readShaderContent(const smString& p_file, smString& p_content);
     static void initGLShaders(smDrawParam p_param);
     void activeGLTextures(smUnifiedID p_id);
     void activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size);
