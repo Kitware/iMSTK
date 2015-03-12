@@ -50,6 +50,7 @@ target_link_libraries(smCore
     GLUT::GLUT
     ${OPENGL_LIBRARY}
     glfw::glfw
+    sfml::graphics
   INTERFACE
     ${ILUT_LIBRARIES}
     ${ILU_LIBRARIES}
