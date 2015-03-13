@@ -33,7 +33,10 @@
 #define SIMMEDTK_OPERATINGSYSTEM_LINUX
 #endif
 
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS  
+#ifndef MINGW32
+    #define NOMINMAX
+#endif
 #include <windows.h>
 #endif
 
@@ -42,6 +45,10 @@
 #include <GL/glew.h>
 #include <GL/glut.h>
 #include <GL/gl.h> // for GLfloat, etc.
+
+// DevIL includes
+#include <IL/ilu.h>
+#include <IL/ilut.h>
 
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0

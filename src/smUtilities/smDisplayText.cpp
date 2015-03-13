@@ -21,11 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-// STL inlcudes
+#include "smUtilities/smDisplayText.h"
+
+// STL includes
 #include <iostream>
+#include <string>
 
 // SimMedTK includes
-#include "smUtilities/smDisplayText.h"
 
 void smDisplayText::addText(smDisplayMessage message)
 {

@@ -21,6 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "smSimulators/smVegaConfigFemObject.h"
+
 // VEGA includes
 #include "configFile.h"
 
@@ -28,9 +30,6 @@
 #include <cstring>
 #include <string>
 #include <limits>
-
-// SimMedTK includes
-#include "smSimulators/smVegaConfigFemObject.h"
 
 smVegaConfigFemObject::smVegaConfigFemObject()
 {

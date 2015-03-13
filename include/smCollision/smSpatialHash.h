@@ -59,10 +59,7 @@ enum smCollisionSetting
 #define HASH_P2 19349663
 #define HASH_P3 83492791
 
-unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z)
-{
-    return (((((x) * HASH_P1) ^ ((y) * HASH_P2) ^ ((z) * HASH_P3))) % (SIZE));
-}
+unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z);
 
 /// \brief spatial hash
 class smSpatialHash: public smObjectSimulator

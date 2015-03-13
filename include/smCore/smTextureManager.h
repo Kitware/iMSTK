@@ -28,16 +28,10 @@
 #include <unordered_map>
 #include <cstring>
 
-// DevIL includes
-#include <IL/ilu.h>
-#include <IL/ilut.h>
-
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smRendering/smConfigRendering.h"
 #include "smCore/smErrorLog.h"
-
-
 
 enum smTextureReturnType
 {
