@@ -49,12 +49,8 @@ target_link_libraries(smCore
     GLEW::GLEW
     GLUT::GLUT
     ${OPENGL_LIBRARY}
-    glfw::glfw
     sfml::graphics
   INTERFACE
-    ${ILUT_LIBRARIES}
-    ${ILU_LIBRARIES}
-    ${IL_LIBRARIES}
 )
 
 if(NOT MSVC)
