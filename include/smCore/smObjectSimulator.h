@@ -24,6 +24,7 @@
 #ifndef SMOBJECTSIMULATOR_H
 #define SMOBJECTSIMULATOR_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
@@ -84,84 +85,51 @@ public:
     smBool enabled;
 
     ///the function is reentrant it is not thread safe.
-    virtual void addObject(smSceneObject *p_object)
-    {
-        p_object->objectSim = this;
-        objectsSimulated.push_back(p_object);
-    }
+    virtual void addObject(smSceneObject *p_object);
+
     /// \brief remove object from the simulator
-    virtual void removeObject(smSceneObject *p_object)
-    {
-    }
+    virtual void removeObject(smSceneObject *p_object);
 
     smObjectSimulator(smErrorLog *p_log);
-    /// \brief  set thread priority
-    void setPriority(smThreadPriority p_priority)
-    {
-        threadPriority = p_priority;
-    };
-    /// \brief  set execution type
-    void setExecutionType(smSimulatorExecutionType p_type)
-    {
-        if (execType != p_type)
-        {
-            executionTypeStatusChanged = true;
-        }
 
-        execType = p_type;
-    }
+    /// \brief  set thread priority
+    void setPriority(smThreadPriority p_priority);
+    /// \brief  set execution type
+    void setExecutionType(smSimulatorExecutionType p_type);
+
     /// \brief  get thread priority
-    smThreadPriority getPriority()
-    {
-        return threadPriority;
-    }
+    smThreadPriority getPriority();
 
 protected:
     ///objects that are simulated by this will be added to the list
     std::vector <smSceneObject*> objectsSimulated;
 
     virtual void initCustom() = 0;
+
     /// \brief  init simulator
-    void init()
-    {
-        if (isObjectSimInitialized == false)
-        {
-            initCustom();
-            //make the simulator true..it is initialized
-            isObjectSimInitialized = true;
-        }
-    };
+    void init();
+
     /// \brief  the actual implementation will reside here
     virtual void run() = 0;
+
     /// \brief  begining of simulator frame, this function is called
-    virtual void beginSim()
-    {
-        frameCounter++;
-        timer.start();
-    };
+    virtual void beginSim();
+
     /// \brief synchronization
     virtual void syncBuffers() = 0;
-    /// \brief is called at the end of simulation frame.
-    virtual void endSim()
-    {
-        timerPerFrame = timer.elapsed();
-        totalTime += timerPerFrame;
 
-        if (totalTime > 1.0)
-        {
-            FPS = frameCounter;
-            frameCounter = 0.0;
-            totalTime = 0.0;
-        }
-    }
+    /// \brief is called at the end of simulation frame.
+    virtual void endSim();
+
     /// \brief updates scene list
-    virtual void updateSceneList()
-    {
-    };
+    virtual void updateSceneList();
+
     /// \brief  initialization routine for rendering
     virtual void initDraw(smDrawParam p_params);
+
     /// \brief  rendering of simulator. it is used for debugging purposes
     virtual void draw(smDrawParam p_params);
+
     /// \brief object simulator iterator. The default iteration is sequantial in the order of the insertion.
     /// custom iteration requires extension of this class.
     struct smObjectSimulatorObjectIter
@@ -173,58 +141,13 @@ protected:
         smShort currentIndex;
         smShort threadIndex;
     public:
-        smObjectSimulatorObjectIter(smScheduleGroup &p_group, std::vector <smSceneObject*> &p_objectsSimulated, smInt p_threadIndex)
-        {
+        smObjectSimulatorObjectIter(smScheduleGroup &p_group, std::vector <smSceneObject*> &p_objectsSimulated, smInt p_threadIndex);
 
-            smInt objectsPerThread;
-            smInt leap;
-            threadIndex = p_threadIndex;
-            smInt totalObjects = p_objectsSimulated.size();
-            leap = (totalObjects % p_group.totalThreads);
-            objectsPerThread = p_objectsSimulated.size() / (p_group.totalThreads);
+        inline void setThreadIndex(smShort p_threadIndex);
 
-            if (threadIndex == 0)
-            {
-                beginIndex = 0;
-                endIndex = objectsPerThread + (leap != 0 ? 1 : 0);
+        inline smInt begin();
 
-            }
-            else
-            {
-                beginIndex = objectsPerThread * threadIndex;
-
-                if (threadIndex < leap && leap != 0)
-                {
-                    beginIndex += threadIndex;
-                }
-                else
-                {
-                    beginIndex += leap;
-                }
-
-                endIndex = beginIndex + objectsPerThread;
-
-                if (endIndex < leap && leap != 0)
-                {
-                    endIndex++;
-                }
-            }
-        }
-
-        inline void setThreadIndex(smShort p_threadIndex)
-        {
-            threadIndex = p_threadIndex;
-        }
-
-        inline smInt begin()
-        {
-            return beginIndex;
-        }
-
-        inline smInt end()
-        {
-            return endIndex;
-        }
+        inline smInt end();
     };
 };
 

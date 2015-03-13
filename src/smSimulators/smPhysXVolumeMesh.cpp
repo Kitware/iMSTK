@@ -80,7 +80,7 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
 
         if (strncmp(s, "v ", 2) == 0)   // vertex
         {
-            sscanf(s, "v %f %f %f", &v.x, &v.y, &v.z);
+            sscanf(s, "v %f %f %f", &v[0], &v[1], &v[2]);
             tempNodes.push_back(v);
         }
         else if (strncmp(s, "t ", 2) == 0)      // tetra

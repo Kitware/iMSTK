@@ -24,16 +24,18 @@
 #ifndef SMMESH_H
 #define SMMESH_H
 
+// STL includes
+#include <vector>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smTextureManager.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix33.h"
+#include "smUtilities/smVector.h"
+#include "smUtilities/smMatrix.h"
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
-
-#include <vector>
 
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
@@ -66,9 +68,7 @@ class smShader;
 /// \brief !!
 struct smTextureAttachment
 {
-    smTextureAttachment()
-    {
-    }
+    smTextureAttachment();
     smInt textureId;
 };
 
@@ -92,35 +92,13 @@ public:
     smBaseMesh();
 
     /// \brief query if the mesh has textures available for rendering
-    inline smBool isMeshTextured()
-    {
-        return isTextureCoordAvailable;
-    }
+    smBool isMeshTextured();
 
     /// \brief assign the texture
-    void assignTexture(smInt p_textureId)
-    {
-        smTextureAttachment attachment;
-        attachment.textureId = p_textureId;
-
-        if (p_textureId > 0)
-        {
-            textureIds.push_back(attachment);
-        }
-    }
+    void assignTexture(smInt p_textureId);
 
     /// \brief assign the texture
-    void assignTexture(const smString& p_referenceName)
-    {
-        smInt textureId;
-        smTextureAttachment attachment;
-
-        if (smTextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
-        {
-            attachment.textureId = textureId;
-            textureIds.push_back(attachment);
-        }
-    }
+    void assignTexture(const smString& p_referenceName);
 
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
@@ -138,10 +116,10 @@ public:
     smTriangle *triangles; ///< list of triangles
     smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
-    smVec3<smFloat> *triNormals; ///< triangle normals
-    smVec3<smFloat> *vertNormals; ///< vertex normals
-    smVec3<smFloat> *triTangents; ///< triangle tangents
-    smVec3<smFloat> *vertTangents; ///< vertex tangents
+    smVec3f *triNormals; ///< triangle normals
+    smVec3f *vertNormals; ///< vertex normals
+    smVec3f *triTangents; ///< triangle tangents
+    smVec3f *vertTangents; ///< vertex tangents
     smBool tangentChannel; ///< !!
     std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
     std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
@@ -182,7 +160,7 @@ public:
     void allocateAABBTris();
 
     /// \brief compute the normal of a triangle
-    smVec3<smFloat> calculateTriangleNormal(smInt triNbr);
+    smVec3f calculateTriangleNormal(smInt triNbr);
 
     /// \brief update the normals of triangles after they moved
     void updateTriangleNormals();
@@ -200,10 +178,10 @@ public:
     void calcTriangleTangents();
 
     /// \brief compute the tangent give the three vertices
-    void calculateTangent(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t);
+    void calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t);
 
     /// \brief !!
-    void calculateTangent_test(smVec3<smFloat>& p1, smVec3<smFloat>& p2, smVec3<smFloat>& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3<smFloat>& t);
+    void calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t);
 
     /// \brief find the neighbors of all vertices of mesh
     void calcNeighborsVertices();
@@ -215,13 +193,13 @@ public:
     void translate(smFloat, smFloat, smFloat);
 
     /// \brief translate the mesh
-    void translate(smVec3<smFloat> p_offset);
+    void translate(smVec3f p_offset);
 
     /// \brief scale the mesh
-    void scale(smVec3<smFloat> p_scaleFactors);
+    void scale(smVec3f p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(smMatrix33<smFloat> p_rot);
+    void rotate(const smMatrix33f &p_rot);
 
     /// \brief check if there is a consistent orientation of triangle vertices
     /// across the entire surface mesh
@@ -282,163 +260,34 @@ public:
     }
 
     /// \brief constructor
-    smLineMesh(smInt p_nbrVertices): smBaseMesh()
-    {
-        nbrVertices = p_nbrVertices;
-        vertices.reserve(nbrVertices);
-        origVerts.reserve(nbrVertices);
-        edgeAABBs = new smAABB[nbrVertices - 1];
-        texCoord = new smTexCoord[nbrVertices];
-        edges = new smEdge[nbrVertices - 1];
-        nbrEdges = nbrVertices - 1;
-        isTextureCoordAvailable = false;
-        createAutoEdges();
-    }
+    smLineMesh(smInt p_nbrVertices);
 
     /// \brief constructor
-    smLineMesh(smInt p_nbrVertices, smBool autoEdge): smBaseMesh()
-    {
-        nbrVertices = p_nbrVertices;
-        vertices.reserve(nbrVertices);
-        origVerts.reserve(nbrVertices);
-        texCoord = new smTexCoord[nbrVertices];
-
-        /// Edge AABB should be assigned by the instance
-        edgeAABBs = NULL;
-
-        /// Edges should be assigned by the instance
-        edges = NULL;
-
-        /// Number of edges should be assigned by the instance
-        nbrEdges = 0;
-
-        isTextureCoordAvailable = false;
-
-        if (autoEdge)
-        {
-            createAutoEdges();
-        }
-    }
+    smLineMesh(smInt p_nbrVertices, smBool autoEdge);
 
     /// \brief !!
-    void createAutoEdges()
-    {
-        for (smInt i = 0; i < nbrEdges; i++)
-        {
-            edges[i].vert[0] = i;
-            edges[i].vert[1] = i + 1;
-        }
-    }
+    void createAutoEdges();
 
     /// \brief !!
     virtual void createCustomEdges() {};
 
     /// \brief updat AABB when the mesh moves
-    inline void updateAABB()
-    {
-        smAABB tempAABB;
-        smVec3<smFloat> minOffset(-2.0, -2.0, -2.0);
-        smVec3<smFloat> maxOffset(1.0, 1.0, 1.0);
-        smVec3<smFloat> minEdgeOffset(-0.1, -0.1, -0.1);
-        smVec3<smFloat> maxEdgeOffset(0.1, 0.1, 0.1);
-
-        tempAABB.aabbMin.x = FLT_MAX;
-        tempAABB.aabbMin.y = FLT_MAX;
-        tempAABB.aabbMin.z = FLT_MAX;
-
-        tempAABB.aabbMax.x = -FLT_MAX;
-        tempAABB.aabbMax.y = -FLT_MAX;
-        tempAABB.aabbMax.z = -FLT_MAX;
-
-        for (smInt i = 0; i < nbrEdges; i++)
-        {
-            ///min
-            edgeAABBs[i].aabbMin.x = SIMMEDTK_MIN(vertices[edges[i].vert[0]].x, vertices[edges[i].vert[1]].x);
-            edgeAABBs[i].aabbMin.y = SIMMEDTK_MIN(vertices[edges[i].vert[0]].y, vertices[edges[i].vert[1]].y);
-            edgeAABBs[i].aabbMin.z = SIMMEDTK_MIN(vertices[edges[i].vert[0]].z, vertices[edges[i].vert[1]].z);
-            edgeAABBs[i].aabbMin += minEdgeOffset;
-            tempAABB.aabbMin.x = SIMMEDTK_MIN(tempAABB.aabbMin.x, edgeAABBs[i].aabbMin.x);
-            tempAABB.aabbMin.y = SIMMEDTK_MIN(tempAABB.aabbMin.y, edgeAABBs[i].aabbMin.y);
-            tempAABB.aabbMin.z = SIMMEDTK_MIN(tempAABB.aabbMin.z, edgeAABBs[i].aabbMin.z);
-
-            ///max
-            edgeAABBs[i].aabbMax.x = SIMMEDTK_MAX(vertices[edges[i].vert[0]].x, vertices[edges[i].vert[1]].x);
-            edgeAABBs[i].aabbMax.y = SIMMEDTK_MAX(vertices[edges[i].vert[0]].y, vertices[edges[i].vert[1]].y);
-            edgeAABBs[i].aabbMax.z = SIMMEDTK_MAX(vertices[edges[i].vert[0]].z, vertices[edges[i].vert[1]].z);
-            edgeAABBs[i].aabbMax += maxEdgeOffset;
-            tempAABB.aabbMax.x = SIMMEDTK_MAX(tempAABB.aabbMax.x, edgeAABBs[i].aabbMax.x);
-            tempAABB.aabbMax.y = SIMMEDTK_MAX(tempAABB.aabbMax.y, edgeAABBs[i].aabbMax.y);
-            tempAABB.aabbMax.z = SIMMEDTK_MAX(tempAABB.aabbMax.z, edgeAABBs[i].aabbMax.z);
-        }
-
-        tempAABB.aabbMin += minOffset;
-        tempAABB.aabbMax += maxOffset;
-        aabb = tempAABB;
-    }
+    void updateAABB();
 
     /// \brief translate the vertices of mesh
-    void translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ)
-    {
-
-        for (smInt i = 0; i < nbrVertices; i++)
-        {
-            vertices[i].x = vertices[i].x + p_offsetX;
-            vertices[i].y = vertices[i].y + p_offsetY;
-            vertices[i].z = vertices[i].z + p_offsetZ;
-        }
-
-        updateAABB();
-    }
+    void translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ);
 
     /// \brief translate the vertices of mesh
-    void translate(smVec3<smFloat> p_offset)
-    {
-
-        for (smInt i = 0; i < nbrVertices; i++)
-        {
-            vertices[i] = vertices[i] + p_offset;
-            origVerts[i] = origVerts[i] + p_offset;
-        }
-
-        updateAABB();
-    }
+    void translate(smVec3f p_offset);
 
     /// \brief scale the mesh
-    void scale(smVec3<smFloat> p_scaleFactors)
-    {
-
-        for (smInt i = 0; i < nbrVertices; i++)
-        {
-            vertices[i].x = vertices[i].x * p_scaleFactors.x;
-            vertices[i].y = vertices[i].y * p_scaleFactors.y;
-            vertices[i].z = vertices[i].z * p_scaleFactors.z;
-
-            origVerts[i].x = origVerts[i].x * p_scaleFactors.x;
-            origVerts[i].y = origVerts[i].y * p_scaleFactors.y;
-            origVerts[i].z = origVerts[i].z * p_scaleFactors.z;
-        }
-
-        updateAABB();
-    }
+    void scale(smVec3f p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(smMatrix33<smFloat> p_rot)
-    {
-
-        for (smInt i = 0; i < nbrVertices; i++)
-        {
-            vertices[i] = p_rot * vertices[i];
-            origVerts[i] = p_rot * origVerts[i];
-        }
-
-        updateAABB();
-    }
+    void rotate(smMatrix33f p_rot);
 
     /// \brief query if the mesh is textured
-    inline smBool isMeshTextured()
-    {
-        return isTextureCoordAvailable;
-    }
+    smBool isMeshTextured();
 
     /// \brief draw the mesh
     void draw(smDrawParam p_params);

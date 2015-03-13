@@ -27,15 +27,15 @@
 // SimMedTK includes
 #include "smCore/smCoreClass.h"
 #include "smCollision/smCollisionModelIterator.h"
-#include "smUtilities/smMatrix44.h"
+#include "smUtilities/smMatrix.h"
 
 /// \brief !!
-template<typename T> 
+template<typename T>
 class smCollisionModel: public smCoreClass
 {
 protected:
-	typedef smMatrix44<double> MatrixType;
-	
+    typedef smMatrix44f MatrixType;
+
 public:
     /// \brief !!
     virtual void initStructure() = 0;

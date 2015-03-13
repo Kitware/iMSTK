@@ -24,6 +24,10 @@
 #ifndef SMFRAMEBUFFEROBJECT_H
 #define SMFRAMEBUFFEROBJECT_H
 
+// STL includes
+#include <string>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
@@ -31,7 +35,6 @@
 #include "smExternal/renderbuffer.h"
 #include "smCore/smTextureManager.h"
 
-#include <string.h>
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType
 {
@@ -66,98 +69,29 @@ protected:
 
 public:
     /// \brief get height
-    inline smInt getHeight()
-    {
-        return height;
-    }
+    smInt getHeight();
     /// \brief get width
-    inline smInt getWidth()
-    {
-        return width;
-    }
+    smInt getWidth();
     /// \brief set the attachment oder
-    void setAttachmentOrder(smInt p_attachmentOrder)
-    {
-        attachmentOrder = p_attachmentOrder;
-    }
+    void setAttachmentOrder(smInt p_attachmentOrder);
     /// \brief get the attachment order
-    smInt getAttachmentOrder(smInt p_attachmentOrder)
-    {
-        return attachmentOrder;
-    }
+    smInt getAttachmentOrder(smInt p_attachmentOrder);
     /// \brief get attacnment id. returns GL binding
-    GLenum getGLAttachmentId()
-    {
-        if (type == SIMMEDTK_RENDERBUFFER_DEPTH)
-        {
-            return GL_DEPTH_ATTACHMENT_EXT;
-        }
-
-        if (type == SIMMEDTK_RENDERBUFFER_STENCIL)
-        {
-            return GL_STENCIL_ATTACHMENT;
-        }
-
-        if (type == SIMMEDTK_RENDERBUFFER_COLOR_RGBA || type == SIMMEDTK_RENDERBUFFER_COLOR_RGB)
-        {
-            return GL_COLOR_ATTACHMENT0_EXT + attachmentOrder;
-        }
-    }
+    GLenum getGLAttachmentId();
     /// \brief returns buffer type
-    inline smRenderBufferType getRenderBufType()
-    {
-        return type;
-    }
+    smRenderBufferType getRenderBufType();
     /// \brief return GL buffer id
-    inline smGLUInt  getRenderBufId()
-    {
-        return _rb.GetId();
-    }
+    smGLUInt  getRenderBufId();
     /// \brief defaul constructor.
-    smRenderBuffer()
-    {
-        isAllocated = false;
-    }
+    smRenderBuffer();
     /// \brief set the type
-    smRenderBuffer(smRenderBufferType p_type, smInt p_width, smInt p_height)
-    {
-        width = p_width;
-        height = p_height;
-        _rb.Set(p_type, width, height);
-        isAllocated = true;
-        type = p_type;
-    }
+    smRenderBuffer(smRenderBufferType p_type, smInt p_width, smInt p_height);
     /// \brief create a depth buffer
-    smBool createDepthBuffer(smInt width, smInt height)
-    {
-        if (!isAllocated)
-        {
-            _rb.Set(GL_DEPTH_COMPONENT, width, height);
-            return true;
-        }
-
-        return false;
-    }
+    smBool createDepthBuffer(smInt width, smInt height);
     /// \brief create a color buffer
-    smBool createColorBuffer()
-    {
-        if (!isAllocated)
-        {
-            _rb.Set(SIMMEDTK_RENDERBUFFER_COLOR_RGBA, width, height);
-        }
-
-        return false;
-    }
+    smBool createColorBuffer();
     /// \brief create a stencil buffer
-    smBool createStencilBuffer()
-    {
-        if (!isAllocated)
-        {
-            _rb.Set(SIMMEDTK_RENDERBUFFER_STENCIL, width, height);
-        }
-
-        return false;
-    }
+    smBool createStencilBuffer();
 };
 
 /// \brief GL frame buffer class
@@ -184,81 +118,27 @@ public:
     smInt height;
 
     /// \brief framebuffer default constructor
-    smFrameBuffer()
-    {
-        width = 0;
-        height = 0;
-        isColorBufAttached = false;
-        isDepthTexAttached = false;
-        renderDepthBuff = false;
-        renderColorBuff = false;
-        renderBuffer = NULL;
-    }
+    smFrameBuffer();
     /// \brief set dimension of the renderbuffer
-    void setDim(smInt p_width, smInt p_height)
-    {
-        width = p_width;
-        height = p_height;
-    }
+    void setDim(smInt p_width, smInt p_height);
     /// \brief get height of the framebuffer
-    inline smInt getHeight()
-    {
-        return height;
-    }
+    smInt getHeight();
     /// \brief get the widht of the renderbuffer
-    inline smInt getWidth()
-    {
-        return width;
-    }
+    smInt getWidth();
     /// \brief attach texture
     void attachTexture();
     /// \brief attach render buffer to te frame buffer
-    void attachRenderBuffer(smRenderBuffer *p_renderBuf)
-    {
-        if (p_renderBuf->getWidth() != width || p_renderBuf->getHeight() != height)
-        {
-            _fbo.AttachRenderBuffer(p_renderBuf->getRenderBufId(), p_renderBuf->getGLAttachmentId());
-        }
-    }
+    void attachRenderBuffer(smRenderBuffer *p_renderBuf);
     /// \brief attach depth texture
-    void attachDepthTexture(smTexture *p_texture)
-    {
-        if (p_texture == NULL)
-        {
-            std::cout << "Error in frambuffer depth attachment" << "\n";
-        }
-
-        _fbo.AttachTexture(p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT);
-        isDepthTexAttached = true;
-    }
+    void attachDepthTexture(smTexture *p_texture);
     /// \brief attach a color texture
-    void attachColorTexture(smTexture *p_texture, smInt p_attachmentOrder)
-    {
-        defaultColorAttachment = p_attachmentOrder;
-        _fbo.AttachTexture(p_texture->GLtype, p_texture->textureGLId, GL_COLOR_ATTACHMENT0_EXT + p_attachmentOrder);
-        isColorBufAttached = true;
-    }
+    void attachColorTexture(smTexture *p_texture, smInt p_attachmentOrder);
     /// \brief activate color buffer in the specified order
-    inline void activeColorBuf(smInt  p_order)
-    {
-        glDrawBuffer(GL_COLOR_ATTACHMENT0_EXT + p_order);
-    }
+    void activeColorBuf(smInt  p_order);
     /// \brief enable the framebuffer
-    inline void enable()
-    {
-        _fbo.Bind();
-
-        if (!isColorBufAttached)
-        {
-            glDrawBuffer(GL_NONE);
-            glReadBuffer(GL_NONE);
-        }
-    }
+    void enable();
     /// \brief disable the frame buffer
-    inline void disable()
-    {
-        _fbo.Disable();
-    }
+    void disable();
     /// \brief check status of the frame buffer. It returns ok if the frame buffer is complete
     smBool checkStatus();
     /// \brief draw framebuffer. it is for debug purposes.

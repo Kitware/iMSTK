@@ -83,3 +83,22 @@ void smEventDispatcher::asyncSendEvent(smEvent *p_event)
 {
 
 }
+void smEventDispatcher::callHandlers( smEvent *p_event )
+{
+    int v = handlers.size();
+
+    for ( smInt i = 0; i < v; i++ )
+    {
+        if ( handlers[i]->enabled && p_event->eventType == handlers[i]->registeredEventType ||
+                handlers[i]->registeredEventType == SIMMEDTK_EVENTTYPE_ALL )
+        {
+            handlers[i]->handler->handleEvent( p_event );
+        }
+    }
+}
+smEventHandlerHolder::smEventHandlerHolder()
+{
+    enabled = true;
+    handler = NULL;
+    registeredEventType = SIMMEDTK_EVENTTYPE_NONE;
+}

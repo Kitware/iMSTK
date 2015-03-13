@@ -97,7 +97,7 @@ void main()
 
 
     light.lightPos.pos.setValue(0, 20.0, 20);
-    light.direction = smVec3<smFloat>(0.0, 0.0, -1.0);
+    light.direction = smVec3f(0.0, 0.0, -1.0);
     light.drawEnabled = false;
 
 

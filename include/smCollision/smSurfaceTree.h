@@ -35,14 +35,14 @@
 #include "smCore/smEventHandler.h"
 
 /// \brief !!
-template<typename CellType> 
-class smSurfaceTree: public smCollisionModel<CellType>, 
+template<typename CellType>
+class smSurfaceTree: public smCollisionModel<CellType>,
 					 public smEventHandler
 {
 protected:
   typedef smCollisionModel<CellType> BaseType;
   typedef typename BaseType::MatrixType MatrixType;
-  
+
 protected:
     smSurfaceMesh *mesh; 							///< surface mesh
     int minTreeRenderLevel; 						///< !!
@@ -61,7 +61,7 @@ public:
 
     /// \brief destructor
     ~smSurfaceTree();
-	
+
     MatrixType transRot; ///< matrix for translation and rotation
     int maxLevel; ///< max level of the tree
     CellType root; ///< !!
@@ -74,13 +74,13 @@ public:
     void initDraw(smDrawParam param);
 
 protected:
-  
+
     /// \brief creates the tree based on input triangles
     bool createTree(CellType &Node, const std::vector<int> &triangles,
                       int level, int siblingIndex);
 
 public:
-  
+
     /// \brief initialize the surface tree structure
     virtual void initStructure();
 

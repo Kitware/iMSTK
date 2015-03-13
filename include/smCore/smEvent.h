@@ -24,6 +24,7 @@
 #ifndef SMEVENT_H
 #define SMEVENT_H
 
+// SimMedTK includes
 #include "smCore/smEventData.h"
 
 class smEventDispatcher;

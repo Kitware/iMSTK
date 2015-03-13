@@ -23,13 +23,14 @@
 
 #ifndef SMMODULE_H
 #define SMMODULE_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smDispatcher.h"
 #include "smCore/smScene.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smEventHandler.h"
-
 
 ///this class is module major. Every other thread should derive this class
 class smModule: public smCoreClass
@@ -78,36 +79,19 @@ public:
     virtual void endFrame() = 0;
     virtual void exec() = 0;
     /// \brief flags for termination
-    void terminate()
-    {
-        terminateExecution = true;
-    }
+    void terminate();
+
     /// \brief  to check if the termination of the module is completed
-    smBool isTerminationDone()
-    {
-        return terminationCompleted;
-    }
+    smBool isTerminationDone();
+
     /// \brief  wait for termination
-    void waitTermination()
-    {
-        while (1)
-        {
-            if (terminationCompleted == true)
-            {
-                break;
-            }
-        }
-    }
+    void waitTermination();
+
     /// \brief set the event dispatcher
-    void setEventDispatcher(smEventDispatcher *p_dispathcer)
-    {
-        eventDispatcher = p_dispathcer;
-    }
+    void setEventDispatcher(smEventDispatcher *p_dispathcer);
+
     /// \brief  get module id
-    inline smInt getModuleId()
-    {
-        return uniqueId.ID;
-    }
+    smInt getModuleId();
 
 };
 

@@ -20,11 +20,17 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#include "smSimulators/smVegaConfigFemObject.h"
+
+// VEGA includes
 #include "configFile.h"
 
+// STL includes
 #include <cstring>
 #include <string>
+#include <limits>
+
+// SimMedTK includes
+#include "smSimulators/smVegaConfigFemObject.h"
 
 smVegaConfigFemObject::smVegaConfigFemObject()
 {
@@ -74,7 +80,7 @@ smVegaConfigFemObject::~smVegaConfigFemObject()
 }
 
 // Parse the configuration file
-void smVegaConfigFemObject::setFemObjConfuguration(std::string ConfigFilename)
+void smVegaConfigFemObject::setFemObjConfuguration(const std::string &ConfigFilename)
 {
 
     printf("VEGA: Parsing configuration file %s...\n", ConfigFilename.c_str());
@@ -123,7 +129,7 @@ void smVegaConfigFemObject::setFemObjConfuguration(std::string ConfigFilename)
     configFile.addOptionOptional("epsilon", &epsilon, 1E-6);
     configFile.addOptionOptional("numInternalForceThreads", &numInternalForceThreads, 0);
     configFile.addOptionOptional("numSolverThreads", &numSolverThreads, 1);
-    configFile.addOptionOptional("inversionThreshold", &inversionThreshold, -DBL_MAX);
+    configFile.addOptionOptional("inversionThreshold", &inversionThreshold, -std::numeric_limits< double >::max());
     configFile.addOptionOptional("forceLoadsFilename", forceLoadsFilename, "__none");
     configFile.addOptionOptional("singleStepMode", &singleStepMode, singleStepMode);
     configFile.addOptionOptional("pauseSimulation", &pauseSimulation, pauseSimulation);

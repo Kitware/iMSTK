@@ -24,10 +24,13 @@
 #ifndef SMKEYGLFWINTERFACE_H
 #define SMKEYGLFWINTERFACE_H
 
+// STL includes
+#include <map>
+
+// SimMedTK includes
 #include "smCore/smKey.h"
 
 #include <GLFW/glfw3.h>
-#include <map>
 
 static const std::map<int, smKey> glfwToSmKeyMap = {
     {GLFW_KEY_A, smKey::A},

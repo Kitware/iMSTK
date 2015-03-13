@@ -24,16 +24,19 @@
 #ifndef SMVBO_H
 #define SMVBO_H
 
+// STL includes
+#include <unordered_map>
+#include <cassert>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
-#include "smUtilities/smVec3.h"
+#include "smUtilities/smVector.h"
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
-#include "assert.h"
 
-#include <unordered_map>
 /// \brief VBO for rendering
 class smVBO: public smCoreClass
 {
@@ -64,94 +67,27 @@ private:
 
 public:
     /// \brief  constructor. gets error log or NULL
-    smVBO(smErrorLog *p_log)
-    {
-        this->log = p_log;
-        renderingError = false;
-    }
+    smVBO(smErrorLog *p_log);
 
     /// \brief  init with given VBO type
-    void init(smVBOType p_vboType)
-    {
-        smString error;
-        glGenBuffersARB(1, &vboDataId);
-        glGenBuffersARB(1, &vboIndexId);
-        assert(vboDataId > 0);
-        assert(vboIndexId > 0);
-
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-
-        if (p_vboType == SIMMEDTK_VBO_STATIC)
-        {
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
-        }
-        else if (p_vboType == SIMMEDTK_VBO_DYNAMIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
-        {
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
-        }
-
-        SM_CHECKERROR(log, error)
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-
-        if (p_vboType == SIMMEDTK_VBO_STATIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
-        {
-            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
-        }
-        else if (p_vboType == SIMMEDTK_VBO_DYNAMIC)
-        {
-            glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
-        }
-
-        SM_CHECKERROR(log, error)
-        vboType = p_vboType;
-        sizeOfDataBuffer = SIMMEDTK_VBOBUFFER_DATASIZE;
-        sizeOfIndexBuffer = SIMMEDTK_VBOBUFFER_INDEXSIZE;
-        currentDataOffset = 0;
-        currentIndexOffset = 0;
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
+    void init(smVBOType p_vboType);
     /// \brief  add vertices to the data buffer
-    smVBOResult addVerticestoBuffer(smInt p_nbrVertices, smInt p_nbrTriangles, smInt p_objectId)
-    {
-        if (sizeof(smVec3<smFloat>)*p_nbrVertices + sizeof(smVec3<smFloat>)*p_nbrVertices + sizeof(smTexCoord)*p_nbrVertices > sizeOfDataBuffer - currentDataOffset)
-        {
-            return SIMMEDTK_VBO_NODATAMEMORY;
-        }
-
-        if (sizeof(smInt)*p_nbrTriangles * 3 > sizeOfIndexBuffer - currentIndexOffset)
-        {
-            return SIMMEDTK_VBO_NODATAMEMORY;
-        }
-
-        dataOffsetMap[p_objectId] = currentDataOffset;
-        indexOffsetMap[p_objectId] = currentIndexOffset;
-        numberofVertices[p_objectId] = p_nbrVertices;
-        numberofTriangles[p_objectId] = p_nbrTriangles;
-        ///add the vertices and normals and the texture coordinates
-        currentDataOffset += sizeof(smVec3<smFloat>) * p_nbrVertices + sizeof(smVec3<smFloat>) * p_nbrVertices + sizeof(smTexCoord) * p_nbrVertices;
-        currentIndexOffset += p_nbrTriangles * sizeof(smTriangle);
-        return SIMMEDTK_VBO_OK;
-    }
+    smVBOResult addVerticestoBuffer(smInt p_nbrVertices, smInt p_nbrTriangles, smInt p_objectId);
     /// \brief update vertex data buffer
-    smVBOResult updateVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult updateVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
     /// \brief update  triangle index
     smVBOResult updateTriangleIndices(smInt *p_indices, smInt p_objectId);
     /// \brief draw elements in VBO
     smVBOResult drawElements(smInt p_objectId);
 
     /// \brief update the static vertices initially
-    smVBOResult initStaticVertices(smVec3<smFloat> *p_vectors, smVec3<smFloat> *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult initStaticVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
 
     /// \brief update the static triangle indices initially
     smVBOResult initTriangleIndices(smInt *p_indices, smInt p_objectId);
 
     /// \brief deletion of the VBO buffers
-    ~smVBO()
-    {
-        glDeleteBuffersARB(1, &vboDataId);
-        glDeleteBuffersARB(1, &vboIndexId);
-    }
+    ~smVBO();
 
 };
 

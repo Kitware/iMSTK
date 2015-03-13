@@ -24,21 +24,24 @@
 #ifndef SMERRORLOG_H
 #define SMERRORLOG_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smCoreClass.h"
-#include "smUtilities/smTimer.h"
-
+// STL includes
 #include <string>
 #include <fstream>
 #include <iostream>
 #include <mutex>
 #include <vector>
 
+// SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smCore/smCoreClass.h"
+#include "smUtilities/smTimer.h"
+
 /// \brief This is class is for error logging of the whole SimMedTK system.
 /// All errors should be reported to the instance of this class.
 /// Functions are thread-safe unless indicated.
 class smErrorLog: smCoreClass
 {
+
 private:
     std::vector<smString> errors; ///< error messages
     std::vector<smInt> timeStamps; ///< time stamps for errors
@@ -47,6 +50,7 @@ private:
     smBool consoleOutput; ///< Flag to print errors to stdout
 
 public:
+    smBool isOutputtoConsoleEnabled;
     smErrorLog();
 
     /// \brief Add the error in the repository.It is thread safe. It can be called by multiple threads.

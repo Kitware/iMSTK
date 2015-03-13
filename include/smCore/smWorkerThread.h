@@ -24,6 +24,7 @@
 #ifndef SMWORKERTHREAD_H
 #define SMWORKERTHREAD_H
 
+// SimMedTK includes
 #include "smCore/smCoreClass.h"
 #include "smCore/smSynchronization.h"
 

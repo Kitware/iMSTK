@@ -24,15 +24,19 @@
 #ifndef SM_SMSURFACETREE_HPP
 #define SM_SMSURFACETREE_HPP
 
-#include "smRendering/smViewer.h"
-
+// STL includes
 #include <string>
+
+// Eigen includes
+#include "Eigen/Dense"
+
+// SimMedTK includes
+#include "smRendering/smViewer.h"
 
 /// \brief initialize the surface tree structure
 template <typename CellType>
 void smSurfaceTree<CellType>::initStructure()
 {
-
     smVec3f center;
     float edge;
     std::vector<int> triangles;
@@ -136,7 +140,7 @@ void smSurfaceTree<CellType>::draw(smDrawParam params)
             {
                 glPushMatrix();
                 glColor3fv(smColor::colorPink.toGLColor());
-                glTranslatef(center.x, center.y, center.z);
+                glTranslatef(center[0], center[1], center[2]);
                 glutSolidSphere(length, 10, 10);
                 glPopMatrix();
                 counter++;
@@ -256,16 +260,17 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
 
         for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
-            totalDistance += Node.getCube().center.distance(mesh->vertices[*it]);
+            totalDistance += (Node.getCube().center - mesh->vertices[*it]).norm();
         }
 
-        float weightSum = 0;
-        float weight;
+        smFloat weightSum = 0;
+        smFloat weight;
+        smFloat totalDistance2 = totalDistance * totalDistance;
 
         for (std::set<int>::iterator it = Node.verticesIndices.begin(); it != Node.verticesIndices.end(); it++)
         {
-            weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
-            weight = 1-(Node.getCenter().distance(mesh->vertices[*it]) * Node.getCenter().distance(mesh->vertices[*it])) / (totalDistance * totalDistance);
+            // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
+            weight = 1-(Node.getCenter()-mesh->vertices[*it]).squaredNorm() / totalDistance2;
             weightSum += weight;
             Node.weights.push_back(weight);
         }
@@ -407,8 +412,7 @@ void smSurfaceTree<CellType>::translateRot()
 
         if (current->filled)
         {
-            current->getCube().center = transRot * initial->getCube().center;
-
+            current->getCube().center = this->transRot.block(0,0,3,3) * initial->getCube().center + this->transRot.col(3).head(3);
         }
     }
 }

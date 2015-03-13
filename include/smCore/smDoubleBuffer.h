@@ -24,15 +24,17 @@
 #ifndef SMDOUBLEBUFFER_H
 #define SMDOUBLEBUFFER_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smCoreClass.h"
-#include "smUtilities/smDataStructs.h"
-
+// STL includes
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <mutex>
 #include <condition_variable>
+
+// SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smCore/smCoreClass.h"
+#include "smUtilities/smDataStructures.h"
 
 #define SIMMEDTK_PIPE_MAXLISTENERS 10
 

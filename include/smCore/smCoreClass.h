@@ -24,11 +24,13 @@
 #ifndef SMCORECLASS_H
 #define SMCORECLASS_H
 
-#include "smCore/smConfig.h"
-#include "smRendering/smConfigRendering.h"
-
+// STL includes
 #include <atomic>
 #include <iostream>
+
+// SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smRendering/smConfigRendering.h"
 
 class smSDK;
 class smCoreClass;
@@ -71,46 +73,25 @@ public:
     smShort machineID;
 
     /// \brief  constructor
-    smUnifiedID()
-    {
-        sdkID = -1;
-        machineID = -1;
-    }
+    smUnifiedID();
 
     /// \brief  generate unique ID
-    inline void generateUniqueID()
-    {
-        ID = IDcounter.fetch_add(1);
-    }
+    void generateUniqueID();
 
     /// \brief  returns SDK id
-    inline smInt getSDKID()const
-    {
-        return sdkID;
-    }
+    smInt getSDKID() const;
 
     /// \brief  set with another smUnifiedID
-    inline void operator =(const smUnifiedID &p_id)
-    {
-        ID = p_id.ID;
-        sdkID = p_id.sdkID;
-        machineID = p_id.machineID;
-    }
+    void operator =(const smUnifiedID &p_id);
+
     /// \brief comparison with another smUnifiedID
-    inline bool operator==(smUnifiedID &p_id)
-    {
-        return (ID == p_id.ID && machineID == p_id.machineID);
-    }
+    bool operator==(smUnifiedID &p_id);
+
     /// \brief checks with ID. can be used to compare the object on the same machine
-    inline bool operator==(smInt &p_ID)
-    {
-        return (ID == p_ID);
-    }
+    bool operator==(smInt &p_ID);
+
     /// \brief comparison with id
-    inline bool operator!=(smInt &p_ID)
-    {
-        return (ID != p_ID);
-    }
+    bool operator!=(smInt &p_ID);
 
     friend smSDK;
 };
@@ -136,60 +117,31 @@ public:
     smClassDrawOrder drawOrder;
 
     /// \brief constructor
-    smCoreClass(): name("")
-    {
-        drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
-        uniqueId.generateUniqueID();
+    smCoreClass();
 
-    }
-    smCoreClass(const smCoreClass &cc)
-    {
-        this->referenceCounter.store(
-            cc.referenceCounter.load(std::memory_order_relaxed),
-            std::memory_order_relaxed);
-        this->type = cc.type;
-        this->name = cc.name;
-        this->uniqueId = cc.uniqueId;
-        this->renderDetail = cc.renderDetail;
-        this->drawOrder = cc.drawOrder;
-    }
     /// \brief get type of the class
-    inline smClassType getType()
-    {
-        return type;
-    }
+    smClassType getType();
 
     /// \brief his function is called by the renderer. The p_params stores renderer pointers
-    virtual void initDraw(smDrawParam p_params)
-    {
-    }
+    virtual void initDraw(smDrawParam p_params);
+
     /// \brief draw function is called for visualization the object
-    virtual void draw(smDrawParam p_params)
-    {
-    }
+    virtual void draw(smDrawParam p_params);
+
     /// \brief initialization of simulation
-    virtual void initSimulate(smSimulationParam p_params)
-    {
-    }
+    virtual void initSimulate(smSimulationParam p_params);
+
     /// \brief simulates the object
-    virtual void simulate(smSimulationParam p_params)
-    {
-    }
+    virtual void simulate(smSimulationParam p_params);
+
     /// \brief print the object
-    virtual void print()
-    {
-    }
+    virtual void print();
+
     /// \brief set the name of object
-    void setName(smString p_objectName)
-    {
-        name = p_objectName;
-    }
+    void setName(smString p_objectName);
 
     /// \brief get the name of the object
-    smString getName()
-    {
-        return name;
-    }
+    smString getName();
 
     friend smSDK;
 };

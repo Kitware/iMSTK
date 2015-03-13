@@ -21,25 +21,90 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smLight.h"
-#include "smUtilities/smQuat.h"
+// STD includes
+#include <cmath>
 
-smVec3<smFloat> smLight::defaultDir(0, 0, -1.0);
-smVec3<smFloat> smLight::defaultUpDir(0, 1, 0.0);
-smVec3<smFloat> smLight::defaultTransDir(1, 0, 0.0);
+// SimMedTK includes
+#include "smRendering/smLight.h"
+#include "smUtilities/smQuaternion.h"
+
+smVec3f smLight::defaultDir(0, 0, -1.0);
+smVec3f smLight::defaultUpDir(0, 1, 0.0);
+smVec3f smLight::defaultTransDir(1, 0, 0.0);
 
 void smLight::updateDirection()
 {
-
-    smQuat<smFloat> rot;
     smFloat angle;
-    smVec3<smFloat> dirNorm;
+    smVec3f dirNorm = direction.normalized();
 
-    dirNorm = direction.unit();
-    angle = acos(dirNorm.dot(defaultDir));
-    smVec3<smFloat> axisOfRot = dirNorm.cross(defaultDir);
-    axisOfRot.normalize();
-    rot.fromAxisAngle(axisOfRot, -angle);
-    upVector = rot.rotate(defaultUpDir);
-    transverseDir = rot.rotate(defaultTransDir);
+    angle = std::acos(dirNorm.dot(defaultDir));
+    smVec3f axisOfRot = dirNorm.cross(defaultDir).normalized();
+
+    smQuaternionf rot = getRotationQuaternion(-angle,axisOfRot);
+
+    upVector = rot*defaultUpDir;
+    transverseDir = rot*defaultTransDir;
+}
+smLightPos::smLightPos( float p_x, float p_y, float p_z, float p_w )
+{
+    pos << p_x, p_y, p_z;
+}
+smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationType p_lightLocation )
+{
+    name = p_name;
+    enabled = false;
+    previousState = false;
+    lightPos.pos = smVec3f::Zero();
+
+    if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
+    {
+        lightPos.w = 0.0;
+    }
+    else
+    {
+        lightPos.w = 1.0;
+    }
+
+    lightType = p_lightType;
+    lightLocationType = p_lightLocation;
+
+    direction << 0, 0, -1.0;
+    upVector = defaultUpDir;
+    transverseDir = defaultTransDir;
+    focusPosition << 0, 0, 0;
+
+    spotCutOffAngle = 45.0;
+    spotExp = 0.0;
+    lightColorAmbient.setValue( 0.2, 0.2, 0.2, 1.0 );
+    lightColorDiffuse.setValue( 0.8f, 0.8f, 0.8, 1.0f );
+    lightColorSpecular.setValue( 0.5f, 0.5f, 0.5f, 1.0f );
+    drawEnabled = true;
+    castShadow = false;
+    shadowNearView = 0.01;
+    shadowFarView = 4000;
+    shadowRatio = 1.0;
+    shadorAngle = 60;
+    attn_constant = 1.0;
+    attn_linear = 0.0;
+    attn_quadratic = 0.0;
+}
+void smLight::setType( smLightType p_lightType )
+{
+    if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
+    {
+        lightPos.w = 0.0;
+    }
+    else
+    {
+        lightPos.w = 1.0;
+    }
+}
+bool smLight::isEnabled()
+{
+    return enabled;
+}
+void smLight::activate( bool p_state )
+{
+    enabled = p_state;
+    previousState = enabled;
 }

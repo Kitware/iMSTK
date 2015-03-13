@@ -21,19 +21,32 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEC4_H
-#define SMVEC4_H
-/// \brief vector 4
-template <typename T>
-class smVec4
+#ifndef SMQUATERNION_H
+#define SMQUATERNION_H
+
+// Eigen includes
+#include "Eigen/Geometry"
+
+// SimMedTK includes
+#include "smUtilities/smMatrix.h"
+#include "smUtilities/smVector.h"
+
+/// A quaternion of floats.
+typedef Eigen::Quaternionf  smQuaternionf;
+
+/// A quaternion of doubles.
+typedef Eigen::Quaterniond  smQuaterniond;
+
+/// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
+/// \tparam T the numeric data type.
+/// \tparam VOpt the option flags
+/// \param angle the angle of the rotation, in radians.
+/// \param axis the axis of rotation.
+/// \returns the rotation quaternion.
+template <typename T, int VOpt>
+inline Eigen::Quaternion<T> getRotationQuaternion(const T& angle, const Eigen::Matrix<T, 3, 1, VOpt>& axis)
 {
-public:
-    inline smVec4(): vec()
-    {
-        w = 1.0;
-    }
-    smVec3<T> vec;
-    T w;
-};
+    return Eigen::Quaternion<T>(Eigen::AngleAxis<T>(angle, axis));
+}
 
 #endif

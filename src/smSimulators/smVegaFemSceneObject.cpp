@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+// SimMedTK includes
 #include "smSimulators/smVegaFemSceneObject.h"
 
 smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, smString ConfigFile)

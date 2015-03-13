@@ -20,12 +20,15 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMSCRIPTINGENGINE_H
 #define SMSCRIPTINGENGINE_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 
+// STL includes
 #include <unordered_map>
 
 struct smClassVariableInfo

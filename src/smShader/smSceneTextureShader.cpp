@@ -21,36 +21,36 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smShader/SceneTextureShader.h"
+// SimMedTK includes
+#include "smShader/smSceneTextureShader.h"
 #include "smCore/smSDK.h"
 
-
-SceneTextureShader::SceneTextureShader(const smString& p_verteShaderFileName,
-                                       const smString& p_fragmentFileName)
+smSceneTextureShader::smSceneTextureShader(smChar *p_verteShaderFileName, smChar *p_fragmentFileName)
 {
 
     this->log = smSDK::getErrorLog();
+    this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
     createParam("depthTex");
     createParam("sceneTex");
     createParam("prevTex");
-    this->log->setConsoleOutput(true);
+    this->checkErrorEnabled = true;
+    log->isOutputtoConsoleEnabled = true;
     this->registerShader();
 }
 
-
-void SceneTextureShader::predraw(smMesh *p_mesh)
+void smSceneTextureShader::predraw(smMesh *p_mesh)
 {
 
 }
 
-void SceneTextureShader::handleEvent(smEvent *p_event)
+void smSceneTextureShader::handleEvent(smEvent *p_event)
 {
 
 }
 
-void SceneTextureShader::initDraw(smDrawParam p_param)
+void smSceneTextureShader::initDraw(smDrawParam p_param)
 {
 
     smShader::initDraw(p_param);
@@ -59,7 +59,7 @@ void SceneTextureShader::initDraw(smDrawParam p_param)
     this->prevTex = getFragmentShaderParam("prevTex");
 }
 
-void SceneTextureShader::draw(smDrawParam p_param)
+void smSceneTextureShader::draw(smDrawParam p_param)
 {
 
     glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);

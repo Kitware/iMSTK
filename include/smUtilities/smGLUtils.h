@@ -24,10 +24,11 @@
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
 
+// SimMedTK includes
+#include "smCore/smCoreClass.h"
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
-#include "smUtilities/smMatrix33.h"
-#include "smUtilities/smMatrix44.h"
+#include "smUtilities/smVector.h"
+#include "smUtilities/smMatrix.h"
 
 /// \brief stores the information about the ground
 struct smGroundRenderInfo;
@@ -54,36 +55,11 @@ public:
                                  smFloat p_top);
 
     /// \brief draw unit quad
-    static inline void drawUnitQuadOnScreen()
-    {
-        glBegin(GL_QUADS);
-        glNormal3f(0, 0, 1);
-        glTexCoord2f(0, 0);
-        glVertex3f(-1, -1, -1);
-        glTexCoord2f(1, 0);
-        glVertex3f(1, -1, -1);
-        glTexCoord2f(1, 1);
-        glVertex3f(1, 1.0, -1);
-        glTexCoord2f(0, 1);
-        glVertex3f(-1, 1.0, -1);
-        glEnd();
-    }
+    static void drawUnitQuadOnScreen();
 
-    template <typename T>
-    static inline void queryProjectionMatrix(smMatrix44<T> &p_matrix)
-    {
-        T m[16];
-        glGetFloatv(GL_PROJECTION_MATRIX, m);
-        p_matrix.setMatrixFromOpenGL(m);
-    }
+    static void queryProjectionMatrix(smMatrix44f &p_matrix);
     /// \brief to query current model view matrix. p_matrix will have the final values.
-    template <typename T>
-    static inline void queryModelViewMatrix(smMatrix44<T> &p_matrix)
-    {
-        T m[16];
-        glGetFloatv(GL_MODELVIEW_MATRIX, m);
-        p_matrix.setMatrixFromOpenGL(m);
-    }
+    static void queryModelViewMatrix(smMatrix44f &p_matrix);
 };
 
 #endif
