@@ -54,8 +54,6 @@ void smFemSceneObject::buildLMmatrix()
 
     LM = smMatrixf::Zero(v_mesh->nbrTetra, 12);
 
-    smInt dof = 0;
-
     for (i = 0; i < v_mesh->nbrTetra; i++)
     {
         for (j = 0; j < 4; j++)
@@ -109,7 +107,7 @@ void smFemSceneObject::computeStiffness()
         smMatrixf k_ele = smMatrixf::Zero(12, 12);
         smMatrixf Ndash = smMatrixf::Zero(4, 3);
 
-        smFloat vol, dd;
+        smFloat vol;
         smMatrix44f coff = smMatrix44f::Zero();
         smMatrix44f coffinv = smMatrix44f::Zero();
 
@@ -189,7 +187,7 @@ void smFemSceneObject::computeStiffness()
 ///brief: Mass lumping of the stiffness matrix
 void smFemSceneObject::lumpMasses()
 {
-    smInt i, j;
+    smInt i;
     nodeMass = smVectorf::Zero(v_mesh->nbrNodes);
     smVec3f centroid;
     smVec3f node0, node1, node2, node3;
@@ -277,20 +275,18 @@ smFloat smFemSceneObject::tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3
 }
 
 ///brief:reads matrix elements from an external file
-smBool smFemSceneObject::loadMatrix(const smChar *fname, smMatrixf &a)
+smBool smFemSceneObject::loadMatrix(const smString &fname, smMatrixf &a)
 {
-    FILE *p;
-    smInt i, j;
-    smFloat temp;
+    FILE *p = fopen(fname.c_str(), "rb");
 
-    if (p = fopen(fname, "rb"))
+    if (p)
     {
         smFloat* data = new smFloat[a.rows()*a.rows()];
         fread(data, sizeof(smFloat), a.rows()*a.rows() , p);
 
-        for (i = 0; i < a.rows(); i++)
+        for (smInt i = 0; i < a.rows(); i++)
         {
-            for (j = 0; j < a.rows(); j++)
+            for (smInt j = 0; j < a.rows(); j++)
             {
                 a(i, j) = data[i * a.rows() + j];
             }
@@ -305,19 +301,18 @@ smBool smFemSceneObject::loadMatrix(const smChar *fname, smMatrixf &a)
 }
 
 ///brief:saves the matrix to a external file
-smBool smFemSceneObject::saveMatrix(const smChar *fname, smMatrixf &a)
+smBool smFemSceneObject::saveMatrix(const smString &fname, smMatrixf &a)
 {
-    FILE *p;
-    smInt i, j;
+    FILE *p = fopen(fname.c_str(), "wb");
 
-    if (p = fopen(fname, "wb"))
+    if (p)
     {
         smFloat *temp = new smFloat[a.rows()*a.rows()];
 
         //first copy the elements in a temporary buffer
-        for (i = 0; i < a.rows(); i++)
+        for (smInt i = 0; i < a.rows(); i++)
         {
-            for (j = 0; j < a.rows(); j++)
+            for (smInt j = 0; j < a.rows(); j++)
             {
                 temp[i + j * a.rows()] = a(i, j);
             }
@@ -337,13 +332,11 @@ smBool smFemSceneObject::saveMatrix(const smChar *fname, smMatrixf &a)
 ///brief:assembles element stiffness to global stiffness
 void smFemSceneObject::assembleK(smInt element, smMatrixf k)
 {
-    smInt i, j;
-
-    for (i = 0; i < 12; i++)
+    for (smInt i = 0; i < 12; i++)
     {
         if (LM(element, i) != 0)
         {
-            for (j = 0; j < 12; j++)
+            for (smInt j = 0; j < 12; j++)
             {
                 if (LM(element, j) != 0)
                 {
@@ -358,20 +351,7 @@ void smFemSceneObject::assembleK(smInt element, smMatrixf k)
 ///brief:
 smFloat smFemSceneObject::V(smInt xyz, smInt xyz123, smInt tet)
 {
-    if (xyz == 1)
-    {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][0];
-    }
-
-    if (xyz == 2)
-    {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][1];
-    }
-
-    if (xyz == 3)
-    {
-        return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][2];
-    }
+    return v_mesh->nodes[v_mesh->tetra[tet].vert[xyz123 - 1] - 1][xyz-1];
 }
 
 ///brief: compute the displacement using reanalysis technique
@@ -473,9 +453,9 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
 }
 
 
-void smFemSceneObject::draw(smDrawParam p_params)
+void smFemSceneObject::draw(const smDrawParam &p_params)
 {
-    p_params.caller = this;
+//     p_params.caller = this;
     this->v_mesh->draw(p_params);
 }
 smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
@@ -491,14 +471,19 @@ smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
         density = 500;
     }
 }
+
 smSceneObject *smFemSceneObject::clone()
 {
     return this;
 }
-void smFemSceneObject::serialize( void *p_memoryBlock )
+
+void smFemSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 }
-void smFemSceneObject::unSerialize( void *p_memoryBlock )
+
+void smFemSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
+
+// void smFemSceneObject::init() {}

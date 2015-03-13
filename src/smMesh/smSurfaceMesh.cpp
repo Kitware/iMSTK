@@ -212,7 +212,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     initTriangleArrays(mesh->mNumFaces);
 
     //Get indexed vertex data
-    for (int i = 0; i < mesh->mNumVertices; i++)
+    for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         this->vertices.emplace_back(
             smVec3f(mesh->mVertices[i][0],
@@ -245,7 +245,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     }
 
     //Setup triangle/face data
-    for (int i = 0; i < mesh->mNumFaces; i++)
+    for (size_t i = 0; i < mesh->mNumFaces; i++)
     {
         if (mesh->mFaces[i].mNumIndices != 3) //Make sure that the face is triangular
         {
@@ -283,7 +283,7 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
         return 0;
     }
 
-    while (ftell(l_file) < Filelength(fileName.c_str(), fileno(l_file)))    //Loop to scan the whole file
+    while (size_t(ftell(l_file)) < Filelength(fileName.c_str(), fileno(l_file)))    //Loop to scan the whole file
     {
 
         fread(&l_chunk_id, 2, 1, l_file);  //Read the chunk header
@@ -401,8 +401,8 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             {
                 smFloat fTemp[2];
                 fread(fTemp, sizeof(smFloat), 2, l_file);
-                this->texCoord[tpt].u = (smFloat)fTemp[0];
-                this->texCoord[tpt].v = (smFloat)fTemp[1];
+                this->texCoord[tpt].u = fTemp[0];
+                this->texCoord[tpt].v = fTemp[1];
             }
 
             isTextureCoordAvailable = true;

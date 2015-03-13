@@ -108,7 +108,9 @@ public:
     virtual void unSerialize(void *p_memoryBlock);
 
     /// \brief handle the events such as button presses related to stylus
-    virtual void handleEvent(smEvent *p_event);;
+    virtual void handleEvent(smEvent *p_event);
+
+    virtual void init();
 };
 
 /// \brief !!
@@ -138,7 +140,7 @@ public:
     smStylusRigidSceneObject(smErrorLog *p_log = NULL);
 
     /// \brief !!
-    tree<smMeshContainer*>::iterator &addMeshContainer(smMeshContainer *p_meshContainer);
+    tree<smMeshContainer*>::iterator addMeshContainer(smMeshContainer *p_meshContainer);
 
     /// \brief !!
     smBool addMeshContainer(smString p_ParentName, smMeshContainer *p_meshContainer);
@@ -155,10 +157,13 @@ public:
     smSceneObject *clone();
 
     /// \brief !!
-    virtual void initDraw(smDrawParam p_params);
+    virtual void initDraw(const smDrawParam &p_params);
 
     /// \brief !!
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
+
+    /// \brief !!
+    virtual void init();
 };
 
 /// \brief !!

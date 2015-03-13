@@ -57,7 +57,7 @@ protected:
     void handleEvent(smEvent *p_event);
 
     /// \brief render the PBD objects
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 
 };
 

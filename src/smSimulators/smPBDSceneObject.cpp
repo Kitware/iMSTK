@@ -23,9 +23,9 @@
 
 #include "smSimulators/smPBDSceneObject.h"
 
-void smPBDSurfaceSceneObject::draw(smDrawParam p_params)
+void smPBDSurfaceSceneObject::draw(const smDrawParam &p_params)
 {
-    p_params.caller = this;
+//     p_params.caller = this;
     mesh->draw(p_params);
 }
 
@@ -44,7 +44,7 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3f p_center, smFloat p
         }
     }
 }
-smPBDSceneObject::smPBDSceneObject( smErrorLog *p_log )
+smPBDSceneObject::smPBDSceneObject( smErrorLog */*p_log*/ )
 {
     type = SIMMEDTK_SMPBDSCENEOBJECT;
 }
@@ -52,11 +52,11 @@ smSceneObject *smPBDSceneObject::clone()
 {
     return this;
 }
-void smPBDSceneObject::serialize( void *p_memoryBlock )
+void smPBDSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 
 }
-void smPBDSceneObject::unSerialize( void *p_memoryBlock )
+void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
@@ -69,10 +69,10 @@ smSceneObject *smPBDSurfaceSceneObject::clone()
 {
     return this;
 }
-void smPBDSurfaceSceneObject::serialize( void *p_memoryBlock )
+void smPBDSurfaceSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 }
-void smPBDSurfaceSceneObject::unSerialize( void *p_memoryBlock )
+void smPBDSurfaceSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
@@ -90,7 +90,6 @@ void smPBDSurfaceSceneObject::initMeshStructure()
 }
 void smPBDSurfaceSceneObject::InitSurfaceObject()
 {
-    int i, j, k;
     //surface mesh
     nbrMass = mesh->nbrVertices;
 
@@ -99,12 +98,12 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     exF = new smVec3f[nbrMass];
     fixedMass = new bool[nbrMass];
 
-    for ( i = 0; i < nbrMass; i++ )
+    for ( smInt i = 0; i < nbrMass; i++ )
     {
         fixedMass[i] = false;
     }
 
-    for ( i = 0; i < nbrMass; i++ )
+    for ( smInt i = 0; i < nbrMass; i++ )
     {
         P[i] = mesh->vertices[i];
     }
@@ -112,7 +111,7 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     nbrSpr = mesh->edges.size();
     L0 = new float[nbrSpr];
 
-    for ( i = 0; i < nbrSpr; i++ )
+    for ( smInt i = 0; i < nbrSpr; i++ )
     {
         L0[i] = ( mesh->vertices[mesh->edges[i].vert[0]] - mesh->vertices[mesh->edges[i].vert[1]] ).norm();
     }

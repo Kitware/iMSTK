@@ -202,13 +202,7 @@ enum smPipeType
 /// \brief holder for pipe data
 struct smPipeData
 {
-    smPipeData()
-    {
-        dataLocation = NULL;
-        dataReady = false;
-        nbrElements = 0;
-        timeStamp = 0;
-    }
+    smPipeData();
 
     void *dataLocation;//if the data is call-by-value data is written here
     volatile smInt  nbrElements;
@@ -219,32 +213,15 @@ struct smPipeData
 struct smPipeRegisteration
 {
     /// \brief constructor
-    smPipeRegisteration()
-    {
-        regType = SIMMEDTK_PIPE_BYREF;
-    }
+    smPipeRegisteration();
 
-    smPipeRegisteration(smPipeRegType p_reg)
-    {
-        regType = p_reg;
-    }
+    smPipeRegisteration(smPipeRegType p_reg);
 
     smCoreClass *listenerObject;///pointer to the listener for future use
     smPipeData  data;///information about the data.
     smPipeRegType regType;///registration type. Will it be reference or value registration.
     /// \brief  print pipe registration information
-    void print()
-    {
-        if (regType == SIMMEDTK_PIPE_BYREF)
-        {
-            std::cout << "Listener Object" << " By Reference" << "\n";
-        }
-
-        if (regType == SIMMEDTK_PIPE_BYVALUE)
-        {
-            std::cout << "Listener Object" << " By Value" << "\n";
-        }
-    }
+    void print();
 
 };
 /// \brief pipe is used for communication among the entities in the framework
@@ -271,118 +248,34 @@ protected:
 
 public:
     /// \brief  destructor
-    ~smPipe()
-    {
-        smIndiceArrayIter<smPipeRegisteration*> iterValue(&byValue);
-
-        for (smInt i = iterValue.begin(); i < iterValue.end(); i++)
-        {
-            delete []iterValue[i]->data.dataLocation;
-        }
-    }
+    ~smPipe();
     /// \brief pipe constructor
     smPipe(smString p_name, smInt p_elementSize, smInt p_maxElements,
-           smPipeType p_pipeType = SIMMEDTK_PIPE_TYPEANY):
-        byRefs(SIMMEDTK_PIPE_MAXLISTENERS),
-        byValue(SIMMEDTK_PIPE_MAXLISTENERS)
-    {
-        name = p_name;
-        maxElements = p_maxElements;
-        elementSize = p_elementSize;
-        data = new smChar[elementSize * maxElements]; //change it to memory block later on
-        pipeType = p_pipeType;
-    }
+           smPipeType p_pipeType = SIMMEDTK_PIPE_TYPEANY);
     /// \brief get maximum number of elements
-    inline smInt getElements()
-    {
-        return maxElements;
-    }
+    smInt getElements();
     /// \brief  begin writing
-    inline volatile void *beginWrite()
-    {
-        return data;
-    }
+    void *beginWrite();
     /// \brief  end writing
-    inline void endWrite(smInt p_elements)
-    {
-        currentElements = p_elements;
-        timeStamp++;
-        acknowledgeRefListeners();
-    }
+    void endWrite(smInt p_elements);
     /// \brief  register for the pipe
-    inline smInt registerListener(smPipeRegisteration *p_pipeReg)
-    {
-        if (p_pipeReg->regType == SIMMEDTK_PIPE_BYREF)
-        {
-            p_pipeReg->data.dataLocation = data;
-            return byRefs.add(p_pipeReg);
-        }
-        else if (p_pipeReg->regType == SIMMEDTK_PIPE_BYVALUE)
-        {
-            p_pipeReg->data.dataLocation = new smChar[elementSize * maxElements];
-            p_pipeReg->data.dataReady = false;
-            p_pipeReg->data.nbrElements = 0;
-            p_pipeReg->data.timeStamp = timeStamp;
-            return byValue.add(p_pipeReg);
-        }
-    }
+    smInt registerListener(smPipeRegisteration *p_pipeReg);
 
     ///Acknowledge only raises the flag so that it will enable the listeners
-    inline void acknowledgeRefListeners()
-    {
-        smIndiceArrayIter<smPipeRegisteration*> iterRef(&byRefs);
-
-        for (smInt i = iterRef.begin(); i < iterRef.end(); i++)
-        {
-            (iterRef[i]->data.nbrElements) = currentElements;
-            (iterRef[i]->data.timeStamp) = timeStamp;
-            (iterRef[i]->data.dataReady) = true;
-        }
-    }
+    void acknowledgeRefListeners();
 
     ///This is for copy-by-value listeners..With this, the data will be copied to the listener provided data location
-    inline void acknowledgeValueListeners()
-    {
-        smIndiceArrayIter<smPipeRegisteration*> iter(&byValue);
-
-        for (smInt i = iter.begin(); i < iter.end(); i++)
-        {
-            memcpy(iter[i]->data.dataLocation, data, currentElements * elementSize);
-            (iter[i]->data.nbrElements) = currentElements;
-            (iter[i]->data.dataReady) = true;
-        }
-    }
+    void acknowledgeValueListeners();
 
     ///For copy by value, the function checks
-    inline void checkAndCopyNewData(smInt p_handleByValue)
-    {
-        smPipeRegisteration *reg = byValue.getByRef(p_handleByValue);
-
-        if (reg->data.timeStamp < timeStamp)
-        {
-            memcpy(reg->data.dataLocation, data, currentElements * elementSize);
-        }
-
-        reg->data.nbrElements = currentElements;
-    }
+    void checkAndCopyNewData(smInt p_handleByValue);
 
     ///for copy by value usage
-    inline void copyData(smInt p_handleByValue)
-    {
-        memcpy(byValue.getByRef(p_handleByValue)->data.dataLocation, data, currentElements * elementSize);
-        (byValue.getByRef(p_handleByValue)->data.nbrElements) = currentElements;
-    }
+    void copyData(smInt p_handleByValue);
 
-    friend smBool operator==(smPipe &p_pipe, smString p_name)
-    {
-        return (p_pipe.name == p_name ? true : false);
-    }
+    friend smBool operator==(smPipe &p_pipe, smString p_name);
     /// \brief print all the listeners (both reference  and value)
-    void print()
-    {
-        byRefs.print();
-        byValue.print();
-    }
+    void print() const;
 };
 /// \brief secure pipe is for consumer-producer relation. not implemented yet
 class smSecurePipe: public smPipe

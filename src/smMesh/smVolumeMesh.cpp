@@ -167,6 +167,7 @@ smBool smVolumeMesh::LoadTetra(const smString& fileName)
     }
 
     fclose(fp);
+    return true;
 }
 
 /// \brief loads the surface vertices and triangles
@@ -266,6 +267,7 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
     delete []temp;
     delete []onSurface;
     delete []surfaceRelation;
+    return true;
 
 }
 
@@ -273,8 +275,6 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
 ///Extensions to support other formats will come soon...
 smBool smVolumeMesh::readBC(const smString& fileName)
 {
-
-    smInt node;
     smInt number;
     smChar comma;
     smInt i;
@@ -296,6 +296,7 @@ smBool smVolumeMesh::readBC(const smString& fileName)
     }
 
     fclose(fp);
+    return true;
 }
 
 /// \brief copies the updated co-ordinates of the surface vertices only

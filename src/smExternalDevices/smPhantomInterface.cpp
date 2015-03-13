@@ -303,7 +303,7 @@ void smPhantomInterface::handleEvent(smEvent *p_event)
 }
 
 /// \brief
-void smPhantomInterface::draw(smDrawParam p_params)
+void smPhantomInterface::draw(const smDrawParam &p_params)
 {
     //Nothing to draw
 }

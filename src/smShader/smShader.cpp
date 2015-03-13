@@ -46,10 +46,10 @@ void printInfoLog(GLhandleARB obj)
 
     if (infologLength > 0)
     {
-        infoLog = (char *)malloc(infologLength);
+        infoLog = new char[infologLength];
         glGetInfoLogARB(obj, infologLength, &charsWritten, infoLog);
         printf("%s\n", infoLog);
-        free(infoLog);
+        delete [] infoLog;
     }
 }
 
@@ -272,6 +272,7 @@ smBool smShader::checkGLError()
             return true;
         }
     }
+    return false;
 }
 
 
@@ -469,7 +470,7 @@ smGLInt smShader::addShaderParamForAll(const smString& p_paramName)
 smGLInt smShader::getShaderParamForAll(const smString& p_paramName)
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
-    for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
+    for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
     {
         if (vertexShaderParamsString[i] == p_paramName)
         {
@@ -484,7 +485,7 @@ smGLInt smShader::getShaderParamForAll(const smString& p_paramName)
 smGLInt smShader::getFragmentShaderParam(const smString& p_paramName)
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
-    for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
+    for (size_t i = 0; i < fragmentShaderParamsString.size(); i++)
     {
         if (fragmentShaderParamsString[i] == p_paramName)
         {
@@ -499,7 +500,7 @@ smGLInt smShader::getFragmentShaderParam(const smString& p_paramName)
 smGLInt smShader::getShaderAtrribParam(const smString& p_paramName)
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
-    for (smInt i = 0; i < attribParamsString.size(); i++)
+    for (size_t i = 0; i < attribParamsString.size(); i++)
     {
         if (attribParamsString[i] == p_paramName)
         {
@@ -527,7 +528,6 @@ smBool smShader::reLoadAllShaders()
     std::ifstream vertexShaderFile;
     std::ifstream fragmentShaderFile;
     std::ifstream geometryShaderFile;
-    smLongInt fileSize;
 
     if (vertexProgramExist == true)
     {
@@ -704,7 +704,7 @@ smBool smShader::setShaderFileName(const smString& p_vertexFileName,
     return true;
 }
 
-void smShader::initDraw(smDrawParam p_param)
+void smShader::initDraw(const smDrawParam &/*p_param*/)
 {
 
     initShaders(vertexProgFileName, fragmentProgFileName, geometryProgFileName);
@@ -730,7 +730,7 @@ void smShader::getAttribAndParamLocations()
 
     smGLInt param;
 
-    for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
+    for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, vertexShaderParamsString[i].data());
         vertexShaderParams.push_back(param);
@@ -741,7 +741,7 @@ void smShader::getAttribAndParamLocations()
         }
     }
 
-    for (smInt i = 0; i < fragmentShaderParamsString.size(); i++)
+    for (size_t i = 0; i < fragmentShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, fragmentShaderParamsString[i].data());
         fragmentShaderParams.push_back(param);
@@ -753,7 +753,7 @@ void smShader::getAttribAndParamLocations()
         }
     }
 
-    for (smInt i = 0; i < geometryShaderParamsString.size(); i++)
+    for (size_t i = 0; i < geometryShaderParamsString.size(); i++)
     {
         param = glGetUniformLocation(shaderProgramObject, geometryShaderParamsString[i].data());
         geometryShaderParams.push_back(param);
@@ -764,7 +764,7 @@ void smShader::getAttribAndParamLocations()
         }
     }
 
-    for (smInt i = 0; i < attribParamsString.size(); i++)
+    for (size_t i = 0; i < attribParamsString.size(); i++)
     {
         param = glGetAttribLocation(shaderProgramObject, attribParamsString[i].data());
         attribShaderParams.push_back(param);
@@ -791,7 +791,7 @@ void smShader::activeGLTextures(smUnifiedID p_id)
     }
 }
 
-void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size)
+void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt /*p_size*/)
 {
     glVertexAttribPointer(attribShaderParams[p_id], 3, smGLFloatType, GL_FALSE, 0, p_vecs);
 }
@@ -800,9 +800,9 @@ void smShader::registerShader()
     shaders[this->uniqueId.ID] = this;
 }
 
-void smShader::print()
+void smShader::print() const
 {
-    for (smInt i = 0; i < vertexShaderParamsString.size(); i++)
+    for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
     {
         std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }

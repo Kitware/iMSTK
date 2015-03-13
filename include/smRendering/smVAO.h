@@ -117,7 +117,7 @@ public:
     /// \brief disable VAO
     void disable();
     /// \brief draw VAO
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
     /// \brief constructor
     ~smVAO();
 };

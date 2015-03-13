@@ -85,7 +85,7 @@ private:
     {
         p_local->sceneObjects.clear();
 
-        for (smInt i = 0; i < sceneObjects.size(); i++)
+        for (size_t i = 0; i < sceneObjects.size(); i++)
         {
             p_local->sceneObjects.push_back(sceneObjects[i]);
         }
@@ -158,6 +158,9 @@ public:
 
     smScene(smErrorLog *p_log = NULL);
     /// \brief add obejct to the scene, it is thread safe call.
+
+   virtual ~smScene()
+   {}
     void registerForScene(smCoreClass *p_simmedtkObject)
     {
         smSceneLocal *local = new smSceneLocal();

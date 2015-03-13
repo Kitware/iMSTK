@@ -91,7 +91,7 @@ public:
         }
         threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
 
-        for (smInt i = 0; i < this->simulators.size(); i++)
+        for (size_t i = 0; i < this->simulators.size(); i++)
         {
             smObjectSimulator *objectSimulator = simulators[i];
             objectSimulator->init();

@@ -35,8 +35,6 @@ smGLRenderer::smGLRenderer()
 
 void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail)
 {
-
-    static smFloat shadowMatrixGL[16];
     static smVec3f origin(0, 0, 0);
     static smVec3f xAxis(1, 0, 0);
     static smVec3f yAxis(0, 1, 0);
@@ -74,7 +72,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (smInt t = 0; t < p_lineMesh->textureIds.size(); t++)
+            for (size_t t = 0; t < p_lineMesh->textureIds.size(); t++)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
                 smTextureManager::activateTexture(p_lineMesh->textureIds[t].textureId);
@@ -131,7 +129,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
     if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
-        glColor3fv((smGLReal*)&renderDetail->highLightColor);
+        glColor3fv(reinterpret_cast<smGLReal*>(&renderDetail->highLightColor));
         glDrawArrays(GL_POINTS, 0, p_lineMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
@@ -149,7 +147,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (smInt t = 0; t < p_lineMesh->textureIds.size(); t++)
+            for (size_t t = 0; t < p_lineMesh->textureIds.size(); t++)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
                 smTextureManager::disableTexture(p_lineMesh->textureIds[t].textureId);
@@ -171,8 +169,6 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         smRenderDetail *renderDetail,
         smDrawParam p_drawParam)
 {
-
-    static smFloat shadowMatrixGL[16];
     static smVec3f origin(0, 0, 0);
     static smVec3f xAxis(1, 0, 0);
     static smVec3f yAxis(0, 1, 0);
@@ -207,7 +203,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
 
     if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
     {
-        for (smInt i = 0; i < renderDetail->shaders.size(); i++)
+        for (size_t i = 0; i < renderDetail->shaders.size(); i++)
         {
             if (renderDetail->shaderEnable[i])
             {
@@ -265,7 +261,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
 
             if (!shaderEnabled)
             {
-                for (smInt t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+                for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
                 {
                     glActiveTexture(GL_TEXTURE0 + t);
                     smTextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
@@ -357,7 +353,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
     if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
     {
         glDisable(GL_LIGHTING);
-        glColor3fv((smGLReal*)&renderDetail->highLightColor);
+        glColor3fv(reinterpret_cast<smGLReal*>(&renderDetail->highLightColor));
         glDrawArrays(GL_POINTS, 0, p_surfaceMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
@@ -379,7 +375,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (smInt t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
                 smTextureManager::disableTexture(p_surfaceMesh->textureIds[t].textureId);
@@ -394,7 +390,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
 
     if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
     {
-        for (smInt i = 0; i < renderDetail->shaders.size(); i++)
+        for (size_t i = 0; i < renderDetail->shaders.size(); i++)
         {
             if (shaderEnabled)
             {
@@ -414,7 +410,7 @@ void smGLRenderer::drawNormals(smMesh *p_mesh, smColor p_color)
 {
 
     glDisable(GL_LIGHTING);
-    glColor3fv((smGLFloat*)&p_color);
+    glColor3fv(reinterpret_cast<smGLReal*>(&p_color));
     smVec3f baryCenter;
     smVec3f tmp;
 
@@ -422,18 +418,18 @@ void smGLRenderer::drawNormals(smMesh *p_mesh, smColor p_color)
 
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
-        glVertex3fv((smGLFloat*) & (p_mesh->vertices[i]));
+        glVertex3fv(p_mesh->vertices[i].data());
         tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
-        glVertex3fv((smGLFloat *)&tmp);
+        glVertex3fv(tmp.data());
     }
 
     for (smInt i = 0; i < p_mesh->nbrTriangles; i++)
     {
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
-        glVertex3fv((smGLFloat*) & (baryCenter));
+        glVertex3fv(baryCenter.data());
         tmp = baryCenter + p_mesh->triNormals[i] * 5;
-        glVertex3fv((smGLFloat *)&tmp);
+        glVertex3fv(tmp.data());
     }
 
     glEnd();
@@ -450,9 +446,9 @@ void smGLRenderer::beginTriangles()
 void smGLRenderer::drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3)
 {
 
-    glVertex3fv((GLfloat*)&p_1);
-    glVertex3fv((GLfloat*)&p_2);
-    glVertex3fv((GLfloat*)&p_3);
+    glVertex3fv(p_1.data());
+    glVertex3fv(p_2.data());
+    glVertex3fv(p_3.data());
 }
 
 void smGLRenderer::endTriangles()
@@ -599,9 +595,9 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
     {
         if (p_sceneObject->customRender != nullptr)
         {
-            p_sceneObject->customRender->preDraw(p_sceneObject);
-            p_sceneObject->customRender->draw(p_sceneObject);
-            p_sceneObject->customRender->postDraw(p_sceneObject);
+            p_sceneObject->customRender->preDraw(*p_sceneObject);
+            p_sceneObject->customRender->draw(*p_sceneObject);
+            p_sceneObject->customRender->postDraw(*p_sceneObject);
         }
     }
     else
@@ -610,16 +606,17 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
         //rendering before the default renderer takes place
         if (p_sceneObject->customRender != nullptr)
         {
-            p_sceneObject->customRender->preDraw(p_sceneObject);
+            p_sceneObject->customRender->preDraw(*p_sceneObject);
         }
 
+        // TODO: scenobject does not have a draw function
         p_sceneObject->draw(p_param);
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place
         if (p_sceneObject->customRender != nullptr)
         {
-            p_sceneObject->customRender->postDraw(p_sceneObject);
+            p_sceneObject->customRender->postDraw(*p_sceneObject);
         }
     }
 }

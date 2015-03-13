@@ -28,6 +28,7 @@ smMath::smMath()
 {
     type = SIMMEDTK_SMMATH;
 }
+
 smInt smMath::pow(smInt p_base, smInt p_pow)
 {
     smInt res = 1;
@@ -39,6 +40,7 @@ smInt smMath::pow(smInt p_base, smInt p_pow)
 
     return res;
 }
+
 smFloat smMath::interpolate(smInt current, smInt min, smInt max)
 {
     if (current < min)
@@ -49,8 +51,5 @@ smFloat smMath::interpolate(smInt current, smInt min, smInt max)
     {
         return 1.0;
     }
-    else
-    {
-        return (smFloat)(current - min) / (smFloat)(max - min);
-    }
+    return (current - min) / (max - min);
 }

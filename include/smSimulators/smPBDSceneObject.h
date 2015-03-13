@@ -110,7 +110,7 @@ public:
     void findFixedCorners();
 
     /// \brief render the surface PBD object
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 };
 
 #endif

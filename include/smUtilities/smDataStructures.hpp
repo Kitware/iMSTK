@@ -160,7 +160,7 @@ T &smIndiceArray<T>::getByRef( std::string p_string )
     }
 }
 template<typename T> void
-smIndiceArray<T>::print()
+smIndiceArray<T>::print() const
 {
     for ( smInt i = 0; i < nbrElements; i++ )
     {
@@ -659,7 +659,7 @@ void smStorageSlidingWindow<T>::zeroed()
     memset( data, 0, sizeof( T )*windowSize );
 }
 template<typename T>
-void smStorageSlidingWindow<T>::print()
+void smStorageSlidingWindow<T>::print() const
 {
     for ( int i = 0; i < windowSize; i++ )
     {

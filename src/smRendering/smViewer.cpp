@@ -60,7 +60,6 @@ void SetVSync(bool sync)
 #elif defined(SIMMEDTK_OPERATINGSYSTEM_LINUX)
     Display *dpy = glXGetCurrentDisplay();
     GLXDrawable drawable = glXGetCurrentDrawable();
-    unsigned int swap, maxSwap;
 
     if (drawable && dpy)
     {
@@ -70,7 +69,7 @@ void SetVSync(bool sync)
 #endif
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+static void key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods)
 {
     smEvent *eventKeyboard;
     smSDK *sdk = smSDK::getInstance();
@@ -84,7 +83,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     eventKeyboard->senderId = viewer->getModuleId();
     eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventKeyboard->data = new smKeyboardEventData(); //Need to handle failure to allocate
-    kbData = (smKeyboardEventData*)eventKeyboard->data;
+    kbData = reinterpret_cast<smKeyboardEventData*>(eventKeyboard->data);
     kbData->keyBoardKey = GLFWKeyToSmKey(key);
     if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
     {
@@ -108,7 +107,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
 }
 
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+static void mouse_button_callback(GLFWwindow* window, int button, int action, int /*mods*/)
 {
     smSDK *sdk = smSDK::getInstance();
     assert(sdk);
@@ -121,7 +120,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     eventMouseButton->senderId = viewer->getModuleId();
     eventMouseButton->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventMouseButton->data = new smMouseButtonEventData(); //Need to handle failure to allocate
-    mbData = (smMouseButtonEventData*)eventMouseButton->data;
+    mbData = reinterpret_cast<smMouseButtonEventData*>(eventMouseButton->data);
 
     //Get the current cursor position
     glfwGetCursorPos(window, &(mbData->windowX), &(mbData->windowY));
@@ -144,7 +143,7 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
     sdk->getEventDispatcher()->sendEventAndDelete(eventMouseButton);
 }
 
-static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+static void cursor_position_callback(GLFWwindow* /*window*/, double xpos, double ypos)
 {
     smSDK *sdk = smSDK::getInstance();
     assert(sdk);
@@ -157,7 +156,7 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
     eventMouseMove->senderId = viewer->getModuleId();
     eventMouseMove->senderType = SIMMEDTK_SENDERTYPE_MODULE;
     eventMouseMove->data = new smMouseMoveEventData(); //Need to handle failure to allocate
-    mpData = (smMouseMoveEventData*)eventMouseMove->data;
+    mpData = reinterpret_cast<smMouseMoveEventData*>(eventMouseMove->data);
 
     mpData->windowX = xpos;
     mpData->windowY = ypos;
@@ -246,8 +245,8 @@ void smViewer::refreshLights()
         glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
         glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
         glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
     }
 }
 
@@ -329,16 +328,16 @@ void smViewer::initLights()
         glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
         glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
         glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
-        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, (smGLFloat)iter[i]->spotExp * SMLIGHT_SPOTMAX);
-        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, (smGLFloat)iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
+        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
     }
 }
 
 void smViewer::initObjects(smDrawParam p_param)
 {
-    for (smInt i = 0; i < objectList.size(); i++)
+    for (size_t i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
         {
@@ -391,45 +390,29 @@ void smViewer::initResources(smDrawParam p_param)
     }
 }
 
-void smViewer::initScenes(smDrawParam p_param)
+void smViewer::initScenes ( smDrawParam p_param )
 {
-    smClassType objectType;
-    smStaticSceneObject *staticSceneObject;
     smSceneObject *sceneObject;
     smScene *scene;
     smScene::smSceneIterator sceneIter;
-
     //traverse all the scene and the objects in the scene
-    for (smInt i = 0; i < sceneList.size(); i++)
+    for ( size_t i = 0; i < sceneList.size(); i++ )
     {
         scene = sceneList[i];
-        scene->registerForScene(this);
-        sceneIter.setScene(scene, this);
+        scene->registerForScene ( this );
+        sceneIter.setScene ( scene, this );
 
-        for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
+        for ( smInt j = sceneIter.start(); j < sceneIter.end(); j++ )
         {
             //sceneObject=scene->sceneObjects[j];
             sceneObject = sceneIter[j];
 
             //initialize the custom Render if there is any
-            if (sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER)
+            if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
             {
-                sceneObject->customRender->initDraw(p_param);
+                sceneObject->customRender->initDraw ( p_param );
             }
-
-            sceneObject->initDraw(p_param);
-
-            if (sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_VBO && viewerRenderDetail & SIMMEDTK_VIEWERRENDER_VBO_ENABLED)
-            {
-                objectType = sceneObject->getType();
-
-                switch (objectType)
-                {
-                case SIMMEDTK_SMSTATICSCENEOBJECT:
-                    staticSceneObject = (smStaticSceneObject*)sceneObject;
-                    break;
-                }
-            }//scene object is added in the vbo object.
+            sceneObject->initDraw ( p_param );
         }//object traverse
     }//scene traverse
 }
@@ -540,9 +523,9 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (smGLReal*)renderDetail->colorDiffuse.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (smGLReal*)renderDetail->colorSpecular.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, (smGLReal*)renderDetail->colorAmbient.toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, renderDetail->colorDiffuse.toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->colorSpecular.toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->colorAmbient.toGLColor());
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -554,7 +537,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (smInt t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
                 smTextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
@@ -616,7 +599,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         glPushMatrix();
         glDisable(GL_LIGHTING);
         glMultMatrixf(shadowMatrix.data());
-        glColor4fv((smGLFloat*)&renderDetail->shadowColor);
+        glColor4fv(reinterpret_cast<smGLFloat*>(&renderDetail->shadowColor));
         glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         glEnable(GL_LIGHTING);
         glPopMatrix();
@@ -625,7 +608,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
     if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
-        glColor3fv((smGLReal*)&renderDetail->highLightColor);
+        glColor3fv(reinterpret_cast<smGLFloat*>(&renderDetail->highLightColor));
         glDrawArrays(GL_POINTS, 0, p_surfaceMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
@@ -644,7 +627,7 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (smInt t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
                 smTextureManager::disableTexture(p_surfaceMesh->textureIds[t].textureId);
@@ -663,10 +646,8 @@ void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *r
 }
 
 ///vertex buffer implementation. It is not implemented yet. It will improve the performance drastically
-void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh, smRenderDetail *renderDetail, smInt p_objectId, smVBOType p_VBOType)
+void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh */*p_surfaceMesh*/, smRenderDetail *renderDetail, smInt /*p_objectId*/, smVBOType /*p_VBOType*/)
 {
-
-    static smFloat shadowMatrixGL[16];
     static smVec3f origin(0, 0, 0);
     static smVec3f xAxis(1, 0, 0);
     static smVec3f yAxis(0, 1, 0);
@@ -688,9 +669,9 @@ void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh, smRende
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (smGLReal*)&renderDetail->colorDiffuse);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (smGLReal*)&renderDetail->colorSpecular);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, (smGLReal*)&renderDetail->colorAmbient);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<smGLFloat*>(&renderDetail->colorDiffuse));
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, reinterpret_cast<smGLFloat*>(&renderDetail->colorSpecular));
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<smGLFloat*>(&renderDetail->colorAmbient));
     }
 
     if (renderDetail->renderType & SIMMEDTK_RENDER_FACES)
@@ -722,14 +703,13 @@ void smViewer::drawNormals(smMesh *p_mesh)
 {
 
     glDisable(GL_LIGHTING);
-    glColor3fv((smGLFloat*)&smColor::colorBlue);
+    glColor3fv(reinterpret_cast<smGLFloat*>(&smColor::colorBlue));
     smVec3f baryCenter;
-    smGLFloat* tmp = NULL;
     glBegin(GL_LINES);
 
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
-        glVertex3fv((smGLFloat*) & (p_mesh->vertices[i]));
+        glVertex3fv(p_mesh->vertices[i].data());
         smVec3f vector = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
         glVertex3fv(vector.data());
     }
@@ -738,7 +718,7 @@ void smViewer::drawNormals(smMesh *p_mesh)
     {
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
-        glVertex3fv((smGLFloat*) & (baryCenter));
+        glVertex3fv(baryCenter.data());
         smVec3f vector = baryCenter + p_mesh->triNormals[i] * 5;
         glVertex3fv(vector.data());
     }
@@ -791,17 +771,17 @@ void smViewer::enableLights()
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
             glLoadIdentity();
-            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
             glPopMatrix();
         }
         else
         {
-            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
         }
 
         if (iter[i]->lightType == SIMMEDTK_LIGHT_SPOTLIGHT)
         {
-            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->lightPos.pos.data());
         }
 
         glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
@@ -897,7 +877,7 @@ void smViewer::addFBO(const smString &p_fboName,
 
 void smViewer::initFboListItems()
 {
-    for (int i = 0; i < this->fboListItems.size(); i++)
+    for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
         smFboListItem *item = &fboListItems[i];
         item->fbo = new smFrameBuffer();
@@ -910,7 +890,7 @@ void smViewer::initFboListItems()
         {
             item->fbo->attachDepthTexture(item->depthTex);
         }
-        for (int j = 0; j < renderOperations.size(); j++)
+        for (size_t j = 0; j < renderOperations.size(); j++)
         {
             if (renderOperations[j].fboName == item->fboName)
             {
@@ -922,7 +902,7 @@ void smViewer::initFboListItems()
 
 void smViewer::destroyFboListItems()
 {
-    for (int i = 0; i < this->fboListItems.size(); i++)
+    for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
         if (fboListItems[i].fbo)
         {
@@ -938,7 +918,7 @@ void smViewer::renderSceneList(smDrawParam p_param)
 
     //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
     //only current objects and their derived classes
-    for (smInt sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
+    for (size_t sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
     {
         smGLRenderer::renderScene(sceneList[sceneIndex], p_param);
     }
@@ -1082,9 +1062,9 @@ void smViewer::drawWithShadows(smDrawParam &p_param)
 inline void smViewer::setToDefaults()
 {
 
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (smGLReal*)defaultDiffuseColor.toGLColor());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, (smGLReal*)defaultSpecularColor.toGLColor());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, (smGLReal*)defaultAmbientColor.toGLColor());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, defaultAmbientColor.toGLColor());
     glColor4fv(defaultDiffuseColor.toGLColor());
 }
 
@@ -1129,7 +1109,7 @@ smBool  smViewer::checkCameraCollisionWithScene()
     radiusMotion = (hPos - prevPosition).norm();
     prevPosition = hPos;
 
-    for (int i = 0; i < collisionMeshes.size(); i++)
+    for (size_t i = 0; i < collisionMeshes.size(); i++)
     {
         float distance;
         smMesh*mesh = collisionMeshes[i];
@@ -1225,10 +1205,8 @@ void smViewer::draw()
     param.projMatrix = camera.getProjMatRef();
     param.viewMatrix = camera.getViewMatRef();
 
-    for (smInt i = 0; i < objectList.size(); i++)
+    for (size_t i = 0; i < objectList.size(); i++)
     {
-        if (objectList[i]->drawOrder == SIMMEDTK_DRAW_BEFOREOBJECTS);
-
         objectList[i]->draw(param);
     }
 
@@ -1239,16 +1217,14 @@ void smViewer::draw()
     else
     {
         //renderSceneList(param);
-        for (int i = 0; i < renderOperations.size(); i++)
+        for (size_t i = 0; i < renderOperations.size(); i++)
         {
             processRenderOperation(renderOperations[i], param);
         }
     }
 
-    for (smInt i = 0; i < objectList.size(); i++)
+    for (size_t i = 0; i < objectList.size(); i++)
     {
-        if (objectList[i]->drawOrder == SIMMEDTK_DRAW_AFTEROBJECTS);
-
         objectList[i]->draw(param);
     }
 
@@ -1274,39 +1250,39 @@ void smViewer::addObject(smCoreClass *object)
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent(smEvent *p_event)
+void smViewer::handleEvent ( smEvent *p_event )
 {
     smLight *light;
     smVec3d lightDir;
     smVec3d lightUp;
     smVec3d transverseDir;
 
-    switch (p_event->eventType.eventTypeCode)
+    switch ( p_event->eventType.eventTypeCode )
     {
-    case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
-    {
-        smCameraEventData *cameraData =
-            (smCameraEventData *)p_event->data;
-        deviceCameraPos = cameraData->pos;
-        deviceCameraDir = cameraData->direction;
-        deviceCameraUpDir = cameraData->upDirection;
-        break;
-    }
-    case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
-    {
-        smLightMotionEventData *lightPosData =
-            (smLightMotionEventData*)p_event->data;
-
-        if (lights->size() < lightPosData->lightIndex)
+        case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
         {
-            light = lights->getByRef(lightPosData->lightIndex);
-            light->lightPos.pos = lightPosData->pos;
-            light->direction = lightPosData->direction;
+            smCameraEventData *cameraData =
+                reinterpret_cast<smCameraEventData *>(p_event->data);
+            deviceCameraPos = cameraData->pos;
+            deviceCameraDir = cameraData->direction;
+            deviceCameraUpDir = cameraData->upDirection;
+            break;
         }
-        break;
-    }
-    default:
-        break;
+        case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
+        {
+            smLightMotionEventData *lightPosData =
+                reinterpret_cast<smLightMotionEventData*>(p_event->data);
+
+            if ( lights->size() < lightPosData->lightIndex )
+            {
+                light = lights->getByRef ( lightPosData->lightIndex );
+                light->lightPos.pos = lightPosData->pos;
+                light->direction = lightPosData->direction;
+            }
+            break;
+        }
+        default:
+            break;
     }
 }
 

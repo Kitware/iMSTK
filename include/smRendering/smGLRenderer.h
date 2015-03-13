@@ -60,6 +60,8 @@ public:
     static void draw(smAABB &aabb, smColor p_color = smColor(1.0, 1.0, 1.0));
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
+    /// \brief draw function is called for visualization the object
+    virtual void draw(const smDrawParam &/*p_params*/){}
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();
     /// \brief Renders an smScene's objects

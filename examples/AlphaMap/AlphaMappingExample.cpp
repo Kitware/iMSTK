@@ -127,7 +127,7 @@ AlphaMapExample::~AlphaMapExample()
 }
 
 /// \brief
-void AlphaMapExample::draw(smDrawParam p_params)
+void AlphaMapExample::draw(const smDrawParam &p_params)
 {
 }
 

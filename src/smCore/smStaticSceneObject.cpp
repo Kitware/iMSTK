@@ -23,9 +23,23 @@
 
 #include "smCore/smStaticSceneObject.h"
 
-void smStaticSceneObject::draw(smDrawParam p_params)
+smStaticSceneObject::smStaticSceneObject ( smErrorLog* p_log )
 {
+    type = SIMMEDTK_SMSTATICSCENEOBJECT;
+    mesh = new smSurfaceMesh ( SMMESH_RIGID, p_log );
+}
+smStaticSceneObject::~smStaticSceneObject() {}
+void smStaticSceneObject::init() {}
+void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
+void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
 
-    p_params.caller = this;
+void smStaticSceneObject::draw(const smDrawParam &p_params)
+{
+//     p_params.caller = this;
     mesh->draw(p_params);
+}
+
+smSceneObject* smStaticSceneObject::clone()
+{
+    return this;
 }

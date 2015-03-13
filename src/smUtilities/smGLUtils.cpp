@@ -35,7 +35,7 @@ bool smGLUtils::queryGLError(smString& err)
     {
         errString = gluErrorString(errCode);
 
-        err = "OpenGL Error: " + smString((const smChar *)errString) + "\n";
+        err = "OpenGL Error: " + smString(reinterpret_cast<const char*>(errString)) + "\n";
 
         return true;
     }
@@ -48,22 +48,10 @@ bool smGLUtils::queryGLError(smString& err)
 ///taken from glProgramming.com.  Checks the extension.
 smBool smGLUtils::QueryExtension(const smString& extName)
 {
-    char *p = (char *) glGetString(GL_EXTENSIONS);
-    char *end = p + strlen(p);
+    auto it = std::find(
+        openGLExtensions.begin(),openGLExtensions.end(),extName);
 
-    while (p < end)
-    {
-        int n = strcspn(p, " ");
-
-        if ((extName.size() == n) && (strncmp(extName.c_str(), p, n) == 0))
-        {
-            return true;
-        }
-
-        p += (n + 1);
-    }
-
-    return false;
+    return it != openGLExtensions.end();
 }
 
 ///fade background draw

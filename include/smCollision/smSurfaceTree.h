@@ -71,7 +71,7 @@ public:
     std::vector<CellType> treeAllLevels; ///< !!
 
     /// \brief initialize the draw function related structures
-    void initDraw(smDrawParam param);
+    void initDraw(const smDrawParam &param);
 
 protected:
 
@@ -95,7 +95,7 @@ public:
     }
 
     /// \brief rendering the surface tree
-    virtual void draw(smDrawParam params);
+    virtual void draw(const smDrawParam &params);
 
     /// \brief !!
     void handleEvent(smEvent *event);

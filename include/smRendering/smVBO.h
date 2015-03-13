@@ -31,21 +31,21 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smRendering/smConfigRendering.h"
-#include "smUtilities/smVector.h"
 #include "smMesh/smMesh.h"
+#include "smRendering/smConfigRendering.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
+#include "smUtilities/smVector.h"
 
 /// \brief VBO for rendering
 class smVBO: public smCoreClass
 {
 private:
     /// \brief offsets for each mesh
-    smInt currentDataOffset;
-    smInt currentIndexOffset;
-    smInt sizeOfDataBuffer;
-    smInt sizeOfIndexBuffer;
+    size_t currentDataOffset;
+    size_t currentIndexOffset;
+    size_t sizeOfDataBuffer;
+    size_t sizeOfIndexBuffer;
     /// \brief  VBO type
     smVBOType vboType;
     /// \brief  vertices, normals, tangets data buffer
@@ -53,13 +53,13 @@ private:
     /// \brief index data
     GLuint vboIndexId;
     /// \brief  data offset keeps offset for each vertex
-    std::unordered_map<smInt, smInt> dataOffsetMap;
+    std::unordered_map<size_t, size_t> dataOffsetMap;
     /// \brief  index maps
-    std::unordered_map<smInt, smInt> indexOffsetMap;
+    std::unordered_map<size_t, size_t> indexOffsetMap;
     /// \brief  total number of vertices
-    std::unordered_map<smInt, smInt> numberofVertices;
+    std::unordered_map<size_t, size_t> numberofVertices;
     /// \brief number of triangles
-    std::unordered_map<smInt, smInt> numberofTriangles;
+    std::unordered_map<size_t, size_t> numberofTriangles;
     /// \brief  error log
     smErrorLog *log;
     /// \brief  rendering error
@@ -71,20 +71,32 @@ public:
 
     /// \brief  init with given VBO type
     void init(smVBOType p_vboType);
+
     /// \brief  add vertices to the data buffer
-    smVBOResult addVerticestoBuffer(smInt p_nbrVertices, smInt p_nbrTriangles, smInt p_objectId);
+    smVBOResult addVerticestoBuffer(const size_t p_nbrVertices,
+                                    const size_t p_nbrTriangles,
+                                    const size_t p_objectId);
+
     /// \brief update vertex data buffer
-    smVBOResult updateVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult updateVertices(const smVectorf &p_vectors,
+                                  const smVectorf &p_normals,
+                                  const smVectorf &p_textureCoords,
+                                  size_t p_objectId);
+
     /// \brief update  triangle index
-    smVBOResult updateTriangleIndices(smInt *p_indices, smInt p_objectId);
+    smVBOResult updateTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId);
+
     /// \brief draw elements in VBO
-    smVBOResult drawElements(smInt p_objectId);
+    smVBOResult drawElements(size_t p_objectId);
 
     /// \brief update the static vertices initially
-    smVBOResult initStaticVertices(smVec3f *p_vectors, smVec3f *p_normals, smTexCoord *p_textureCoords, smInt p_objectId);
+    smVBOResult initStaticVertices(const smVectorf &p_vectors,
+                                  const smVectorf &p_normals,
+                                  const smVectorf &p_textureCoords,
+                                  size_t p_objectId);
 
     /// \brief update the static triangle indices initially
-    smVBOResult initTriangleIndices(smInt *p_indices, smInt p_objectId);
+    smVBOResult initTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId);
 
     /// \brief deletion of the VBO buffers
     ~smVBO();

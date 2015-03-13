@@ -53,7 +53,7 @@ void smSpatialHash::addMesh(smLineMesh *p_mesh)
 
 void smSpatialHash::removeMesh(smMesh *p_mesh)
 {
-    for (smInt i = 0; i < meshes.size(); i++)
+    for (size_t i = 0; i < meshes.size(); i++)
         if (meshes[i]->uniqueId == p_mesh->uniqueId)
         {
             meshes.erase(meshes.begin()+i);
@@ -92,7 +92,7 @@ smSpatialHash::smSpatialHash(smErrorLog *p_errorLog, smInt p_hashTableSize,
 
     maxPrims = p_outOutputPrimSize;
 
-	/////////////////////// FIXME: These are leacking. They are not deallocated in this class. ///////////
+	/////////////////////// FIXME: These are leaking. They are not deallocated in this class. ///////////
     pipe = new smPipe("col_hash_tri2line", sizeof(smCollidedLineTris), p_outOutputPrimSize);
     pipeTriangles = new smPipe("col_hash_tri2tri", sizeof(smCollidedTriangles), p_outOutputPrimSize);
     pipeModelPoints = new smPipe("col_hash_model2points", sizeof(smCollidedModelPoints), p_outOutputPrimSize);
@@ -102,12 +102,8 @@ smSpatialHash::smSpatialHash(smErrorLog *p_errorLog, smInt p_hashTableSize,
 
 void smSpatialHash::initCustom()
 {
-
-    smClassType type;
-    smSceneObject *object;
-
     //do nothing for now
-    for (smInt i = 0; i < meshes.size(); i++)
+    for (size_t i = 0; i < meshes.size(); i++)
     {
         meshes[i]->allocateAABBTris();
     }
@@ -143,23 +139,27 @@ void smSpatialHash::computeHash(smMesh *p_mesh, int *p_tris, int p_nbrTris)
 
 inline void smSpatialHash::addTriangle(smMesh *p_mesh, smInt p_triangleId, smHash<smCellTriangle> &p_cells)
 {
-
-    smFloat xStartIndex, yStartIndex, zStartIndex;
-    smFloat  xEndIndex, yEndIndex, zEndIndex;
     smCellTriangle  triangle;
     triangle.meshID = p_mesh->uniqueId;
     triangle.primID = p_triangleId;
+
     triangle.vert[0] = p_mesh->vertices[p_mesh->triangles[p_triangleId].vert[0]];
     triangle.vert[1] = p_mesh->vertices[p_mesh->triangles[p_triangleId].vert[1]];
     triangle.vert[2] = p_mesh->vertices[p_mesh->triangles[p_triangleId].vert[2]];
 
-    xStartIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMin[0] / cellSizeX);
-    yStartIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMin[1] / cellSizeY);
-    zStartIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMin[2] / cellSizeZ);
+    smInt xStartIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMin[0] / cellSizeX);
+    smInt yStartIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMin[1] / cellSizeY);
+    smInt zStartIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMin[2] / cellSizeZ);
 
-    xEndIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMax[0] / cellSizeX);
-    yEndIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMax[1] / cellSizeY);
-    zEndIndex = (smInt)(p_mesh->triAABBs[p_triangleId].aabbMax[2] / cellSizeZ);
+    smInt xEndIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMax[0] / cellSizeX);
+    smInt yEndIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMax[1] / cellSizeY);
+    smInt zEndIndex = smInt(
+        p_mesh->triAABBs[p_triangleId].aabbMax[2] / cellSizeZ);
 
     for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
         for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
@@ -195,9 +195,6 @@ inline smBool smSpatialHash::findCandidateTris(smMesh *p_mesh, smMesh *p_mesh2)
 inline void smSpatialHash::addLine(smLineMesh *p_mesh,
                                    smInt p_edgeId, smHash<smCellLine> &p_cells)
 {
-
-    smFloat xStartIndex, yStartIndex, zStartIndex;
-    smFloat  xEndIndex, yEndIndex, zEndIndex;
     smCellLine  line;
     line.meshID = p_mesh->uniqueId;
     line.primID = p_edgeId;
@@ -205,13 +202,13 @@ inline void smSpatialHash::addLine(smLineMesh *p_mesh,
     line.vert[1] = p_mesh->vertices[p_mesh->edges[p_edgeId].vert[1]];
 
 
-    xStartIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMin[0] / cellSizeX);
-    yStartIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMin[1] / cellSizeY);
-    zStartIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMin[2] / cellSizeZ);
+    smInt xStartIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMin[0] / cellSizeX);
+    smInt yStartIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMin[1] / cellSizeY);
+    smInt zStartIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMin[2] / cellSizeZ);
 
-    xEndIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMax[0] / cellSizeX);
-    yEndIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMax[1] / cellSizeY);
-    zEndIndex = (smInt)(p_mesh->edgeAABBs[p_edgeId].aabbMax[2] / cellSizeZ);
+    smInt xEndIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMax[0] / cellSizeX);
+    smInt yEndIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMax[1] / cellSizeY);
+    smInt zEndIndex = smInt(p_mesh->edgeAABBs[p_edgeId].aabbMax[2] / cellSizeZ);
 
     for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
         for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
@@ -264,7 +261,7 @@ void smSpatialHash::computeCollisionTri2Tri()
     smShort point1, point2;
     smInt coPlanar;
 
-    tristris = (smCollidedTriangles*)pipeTriangles->beginWrite();
+    tristris = reinterpret_cast<smCollidedTriangles*>(pipeTriangles->beginWrite());
 
     while (cells.next(iterator))
     {
@@ -305,8 +302,8 @@ void smSpatialHash::computeCollisionTri2Tri()
 inline smInt compareLineTris(const void* p_element1, const void* p_element2)
 {
 
-    smCollidedLineTris* p_1 = (smCollidedLineTris*)p_element1;
-    smCollidedLineTris* p_2 = (smCollidedLineTris*)p_element2;
+    const smCollidedLineTris* p_1 = reinterpret_cast<const smCollidedLineTris*>(p_element1);
+    const smCollidedLineTris* p_2 = reinterpret_cast<const smCollidedLineTris*>(p_element2);
 
     return (p_1->line.primID - p_2->line.primID);
 }
@@ -321,7 +318,7 @@ inline void  smSpatialHash::filterLine2TrisResults()
     smInt t = 0;
     smBool existed = false;
 
-    lineTris = (smCollidedLineTris*)pipe->beginWrite();
+    lineTris = reinterpret_cast<smCollidedLineTris*>(pipe->beginWrite());
 
     if (nbrLineTriCollisions <= 0)
     {
@@ -387,7 +384,6 @@ void  smSpatialHash::computeCollisionLine2Tri()
     smInt t = 0;
     smHashIterator<smCellLine > iteratorLine;
     smHashIterator<smCellTriangle > iteratorTri;
-    smCollidedLineTris *lineTris;
     smCellLine line;
     smCellTriangle tri;
     smVec3f intersection;
@@ -421,7 +417,7 @@ void  smSpatialHash::computeCollisionLine2Tri()
     filterLine2TrisResults();
 }
 
-void smSpatialHash::initDraw(smDrawParam p_param)
+void smSpatialHash::initDraw(const smDrawParam &p_param)
 {
 
     smViewer *viewer;
@@ -429,13 +425,9 @@ void smSpatialHash::initDraw(smDrawParam p_param)
     viewer->addText("smhash");
 }
 
-void smSpatialHash::draw(smDrawParam p_param)
+void smSpatialHash::draw(const smDrawParam &/*p_param*/)
 {
-
-    smViewer *viewer;
     smString fps("Collision FPS: " + std::to_string(this->FPS) + " TimePerFrame: " + std::to_string(this->timerPerFrame));
-
-    viewer = p_param.rendererObject;
 
     glDisable(GL_LIGHTING);
     glColor3fv(smColor::colorWhite.toGLColor());
@@ -445,13 +437,13 @@ void smSpatialHash::draw(smDrawParam p_param)
     for (smInt i = 0; i < nbrTriCollisions; i++)
     {
 
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri1.vert[0]);
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri1.vert[1]);
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri1.vert[2]);
+        glVertex3fv(collidedPrims[i].tri1.vert[0].data());
+        glVertex3fv(collidedPrims[i].tri1.vert[1].data());
+        glVertex3fv(collidedPrims[i].tri1.vert[2].data());
 
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri2.vert[0]);
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri2.vert[1]);
-        glVertex3fv((GLfloat*)&collidedPrims[i].tri2.vert[2]);
+        glVertex3fv(collidedPrims[i].tri2.vert[0].data());
+        glVertex3fv(collidedPrims[i].tri2.vert[1].data());
+        glVertex3fv(collidedPrims[i].tri2.vert[2].data());
     }
 
     glEnd();
@@ -462,8 +454,8 @@ void smSpatialHash::draw(smDrawParam p_param)
 
     for (smInt i = 0; i < nbrLineTriCollisions; i++)
     {
-        glVertex3fv((GLfloat*)&collidedLineTris[i].line.vert[0]);
-        glVertex3fv((GLfloat*)&collidedLineTris[i].line.vert[1]);
+        glVertex3fv(collidedLineTris[i].line.vert[0].data());
+        glVertex3fv(collidedLineTris[i].line.vert[1].data());
     }
 
     glEnd();
@@ -475,9 +467,6 @@ void smSpatialHash::draw(smDrawParam p_param)
 
 inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel, smHash<smCellModel> p_cells)
 {
-
-    smFloat xStartIndex, yStartIndex, zStartIndex;
-    smFloat  xEndIndex, yEndIndex, zEndIndex;
     smCellModel cellModel;
     smAABB temp;
 
@@ -491,12 +480,12 @@ inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel
 
             temp.aabbMin =  iter[i].getCube().leftMinCorner();
             temp.aabbMax =  iter[i].getCube().rightMaxCorner();
-            xStartIndex = (smInt)(temp.aabbMin[0] / cellSizeX);
-            yStartIndex = (smInt)(temp.aabbMin[1] / cellSizeY);
-            zStartIndex = (smInt)(temp.aabbMin[2] / cellSizeZ);
-            xEndIndex = (smInt)(temp.aabbMax[0] / cellSizeX);
-            yEndIndex = (smInt)(temp.aabbMax[1] / cellSizeY);
-            zEndIndex = (smInt)(temp.aabbMax[2] / cellSizeZ);
+            smInt xStartIndex = smInt(temp.aabbMin[0] / cellSizeX);
+            smInt yStartIndex = smInt(temp.aabbMin[1] / cellSizeY);
+            smInt zStartIndex = smInt(temp.aabbMin[2] / cellSizeZ);
+            smInt xEndIndex = smInt(temp.aabbMax[0] / cellSizeX);
+            smInt yEndIndex = smInt(temp.aabbMax[1] / cellSizeY);
+            smInt zEndIndex = smInt(temp.aabbMax[2] / cellSizeZ);
             cellModel.primID = i;
             cellModel.center = iter[i].getCube().center;
             cellModel.radius = iter[i].getCube().getCircumscribedSphere().radius;
@@ -515,16 +504,14 @@ inline void smSpatialHash::addOctreeCell(smSurfaceTree<smOctreeCell> *p_colModel
 
 inline void smSpatialHash::addPoint(smMesh *p_mesh, smInt p_vertId, smHash<smCellPoint> p_cells)
 {
-    smFloat xStartIndex, yStartIndex, zStartIndex;
-    smFloat  xEndIndex, yEndIndex, zEndIndex;
     smCellPoint cellPoint;
     cellPoint.meshID = p_mesh->uniqueId;
     cellPoint.primID = p_vertId;
     cellPoint.vert = p_mesh->vertices[p_vertId];
 
-    xStartIndex = (smInt)(p_mesh->vertices[p_vertId][0] / cellSizeX);
-    yStartIndex = (smInt)(p_mesh->vertices[p_vertId][1] / cellSizeY);
-    zStartIndex = (smInt)(p_mesh->vertices[p_vertId][2] / cellSizeZ);
+    smInt xStartIndex = smInt(p_mesh->vertices[p_vertId][0] / cellSizeX);
+    smInt yStartIndex = smInt(p_mesh->vertices[p_vertId][1] / cellSizeY);
+    smInt zStartIndex = smInt(p_mesh->vertices[p_vertId][2] / cellSizeZ);
 
     p_cells.checkAndInsert(cellPoint, HASH(cells.tableSize, xStartIndex, yStartIndex, zStartIndex));
 }
@@ -546,7 +533,6 @@ void  smSpatialHash::findCandidatePoints(smMesh *p_mesh, smSurfaceTree<smOctreeC
 
 void smSpatialHash::computeCollisionModel2Points()
 {
-
     int t = 0;
     smFloat distanceFromCenter;
     smHashIterator<smCellModel > iteratorModel;
@@ -555,7 +541,7 @@ void smSpatialHash::computeCollisionModel2Points()
     smCellPoint point;
     smCollidedModelPoints *collidedModelPointsPipe;
 
-    collidedModelPointsPipe = (smCollidedModelPoints*)pipeModelPoints->beginWrite();
+    collidedModelPointsPipe = reinterpret_cast<smCollidedModelPoints*>(pipeModelPoints->beginWrite());
 
     while (cellsForModel.next(iteratorModel) && cellsForModelPoints.next(iteratorPoint))
     {
@@ -599,17 +585,17 @@ void smSpatialHash::run()
 {
     beginSim();
 
-    for (smInt i = 0; i < colModel.size(); i++)
-        for (smInt i = 0; i < meshes.size(); i++)
+    for (size_t i = 0; i < colModel.size(); i++)
+        for (size_t i = 0; i < meshes.size(); i++)
         {
             findCandidatePoints(meshes[i], colModel[i]);
             addOctreeCell(colModel[i], cellsForModel);
         }
 
     ///Triangle-Triangle collision
-    for (smInt i = 0; i < meshes.size(); i++)
+    for (size_t i = 0; i < meshes.size(); i++)
     {
-        for (smInt j = i + 1; j < meshes.size(); j++)
+        for (size_t j = i + 1; j < meshes.size(); j++)
         {
             if (meshes[i]->collisionGroup.isCollisionPermitted(meshes[j]->collisionGroup))
             {
@@ -622,8 +608,8 @@ void smSpatialHash::run()
     }
 
     ///Triangle-line Collision
-    for (smInt i = 0; i < meshes.size(); i++)
-        for (smInt j = 0; j < lineMeshes.size(); j++)
+    for (size_t i = 0; i < meshes.size(); i++)
+        for (size_t j = 0; j < lineMeshes.size(); j++)
         {
             if (meshes[i]->collisionGroup.isCollisionPermitted(lineMeshes[j]->collisionGroup))
             {
@@ -649,12 +635,12 @@ void smSpatialHash::beginSim()
     nbrLineTriCollisions = 0;
     nbrModelPointCollisions = 0;
 
-    for (smInt i = 0; i < meshes.size(); i++)
+    for (size_t i = 0; i < meshes.size(); i++)
     {
         meshes[i]->updateTriangleAABB();
     }
 
-    for (smInt i = 0; i < lineMeshes.size(); i++)
+    for (size_t i = 0; i < lineMeshes.size(); i++)
     {
         meshes[i]->upadateAABB();
     }

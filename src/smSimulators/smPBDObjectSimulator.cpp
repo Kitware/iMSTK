@@ -20,19 +20,19 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #include "smSimulators/smPBDSceneObject.h"
 #include "smSimulators/smPBDObjectSimulator.h"
 #include "smRendering/smGLRenderer.h"
 
-void smPBDObjectSimulator::draw(smDrawParam p_params)
+void smPBDObjectSimulator::draw(const smDrawParam &p_params)
 {
     smObjectSimulator::draw(p_params);
     smPBDSurfaceSceneObject *sceneObject;
 
-    for (smInt i = 0; i < objectsSimulated.size(); i++)
+    for (size_t i = 0; i < objectsSimulated.size(); i++)
     {
-        sceneObject = (smPBDSurfaceSceneObject*)objectsSimulated[i];
+        sceneObject = static_cast<smPBDSurfaceSceneObject*>(objectsSimulated[i]);
         smGLRenderer::draw(sceneObject->mesh->aabb);
     }
 }
@@ -57,10 +57,9 @@ void smPBDObjectSimulator::initCustom()
     smClassType type;
     smSceneObject *object;
     smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-    smVec3f *newVertices;
 
     //do nothing for now
-    for ( smInt i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
     {
         object = objectsSimulated[i];
         type = object->getType();
@@ -68,9 +67,14 @@ void smPBDObjectSimulator::initCustom()
         switch ( type )
         {
             case SIMMEDTK_SMPBDSURFACESCENEOBJECT:
-                pbdSurfaceSceneObject = ( smPBDSurfaceSceneObject * )object;
-                initObject( pbdSurfaceSceneObject );
+            {
+                pbdSurfaceSceneObject = static_cast<smPBDSurfaceSceneObject*>(object);
+                initObject ( pbdSurfaceSceneObject );
                 break;
+            }
+            default:
+                std::cerr << "Unknown class type" << std::endl;
+
         }
     }
 }
@@ -78,9 +82,6 @@ void smPBDObjectSimulator::run()
 {
     smSceneObject *sceneObj;
     smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-    smVec3f *X;
-    smMesh *mesh;
-    smInt i;
     smFloat dist, lamda;
     smVec3f dirVec, dP;
     smInt count = 0;
@@ -88,33 +89,31 @@ void smPBDObjectSimulator::run()
 
     beginSim();
 
-    for ( smInt j = 0; j < this->objectsSimulated.size(); j++ )
+    for ( size_t j = 0; j < this->objectsSimulated.size(); j++ )
     {
         sceneObj = this->objectsSimulated[j];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT )
         {
-            pbdSurfaceSceneObject = ( smPBDSurfaceSceneObject * )sceneObj;
+            pbdSurfaceSceneObject = static_cast<smPBDSurfaceSceneObject*>(sceneObj);
 
             if ( !pbdSurfaceSceneObject->flags.isSimulatorInit )
             {
                 initObject( pbdSurfaceSceneObject );
             }
 
-            mesh = pbdSurfaceSceneObject->mesh;
-
-            for ( i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->exF[i] = smVec3f::Zero();
             }
 
-            for ( i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->exF[i][1] -= 1.0;
             }
 
-            for ( i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->V[i] =
                     pbdSurfaceSceneObject->V[i] +
@@ -134,7 +133,7 @@ void smPBDObjectSimulator::run()
 
             while ( count < 30 )
             {
-                for ( i = 0; i < pbdSurfaceSceneObject->nbrSpr; i++ )
+                for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrSpr; i++ )
                 {
                     a = pbdSurfaceSceneObject->mesh->edges[i].vert[0];
                     b = pbdSurfaceSceneObject->mesh->edges[i].vert[1];
@@ -166,7 +165,7 @@ void smPBDObjectSimulator::run()
                 count++;
             }
 
-            for ( i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->V[i] = ( pbdSurfaceSceneObject->P[i] - pbdSurfaceSceneObject->localVerts[i] ) / pbdSurfaceSceneObject->dT;
 
@@ -184,16 +183,15 @@ void smPBDObjectSimulator::syncBuffers()
 {
     smSceneObject *sceneObj;
     smPBDSurfaceSceneObject *pbdSurfaceSceneObject;
-    smVec3f *vertices;
 
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
         sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT )
         {
-            pbdSurfaceSceneObject = ( smPBDSurfaceSceneObject * )sceneObj;
+            pbdSurfaceSceneObject = static_cast<smPBDSurfaceSceneObject*>(sceneObj);
             pbdSurfaceSceneObject->mesh->vertices = pbdSurfaceSceneObject->localVerts;
             pbdSurfaceSceneObject->mesh->updateTriangleNormals();
             pbdSurfaceSceneObject->mesh->updateVertexNormals();
@@ -203,12 +201,14 @@ void smPBDObjectSimulator::syncBuffers()
 }
 void smPBDObjectSimulator::handleEvent( smEvent *p_event )
 {
-    smKeyboardEventData *keyBoardData;
+    ;
 
     switch ( p_event->eventType.eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+        {
+            smKeyboardEventData *keyBoardData =
+                reinterpret_cast<smKeyboardEventData *>(p_event->data);
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {
@@ -216,5 +216,8 @@ void smPBDObjectSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
+        }
+        default:
+            std::cout << "Unknown event type." << std::endl;
     }
 }

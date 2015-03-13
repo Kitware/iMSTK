@@ -25,7 +25,8 @@
 #include "smShader/smMetalShader.h"
 #include "smCore/smSDK.h"
 
-smMetalShader::smMetalShader( char *p_verteShaderFileName, char *p_fragmentFileName )
+smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
+                              const smString &p_fragmentFileName )
 {
     this->log = smSDK::getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
@@ -71,11 +72,11 @@ void smMetalShader::attachMesh( smMesh *p_mesh, char *p_bump, char *p_decal, cha
     attachTexture( p_mesh->uniqueId, p_disp, "DispTex" );
     attachTexture( p_mesh->uniqueId, p_alphaMap, "AlphaTex" );
 }
-void smMetalShader::draw( smDrawParam p_param )
+void smMetalShader::draw(const smDrawParam &/*p_param*/)
 {
     //placeholder
 }
-void smMetalShader::initDraw( smDrawParam p_param )
+void smMetalShader::initDraw(const smDrawParam &p_param )
 {
     smShader::initDraw( p_param );
     specularPower = this->getFragmentShaderParam( "specularPower" );
@@ -105,7 +106,7 @@ void smMetalShader::handleEvent( smEvent *p_event )
     switch ( p_event->eventType.eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+            keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
 
             if ( keyBoardData->keyBoardKey == smKey::Add )
             {
@@ -130,13 +131,14 @@ void smMetalShader::switchDisable()
 {
     //
 }
-MetalShaderShadow::MetalShaderShadow( char *p_vertexShaderFileName, char *p_fragmentShaderFileName ) :
+MetalShaderShadow::MetalShaderShadow( const smString &p_vertexShaderFileName,
+                                      const smString &p_fragmentShaderFileName ) :
     smMetalShader( p_vertexShaderFileName, p_fragmentShaderFileName )
 {
     createParam( "ShadowMapTEST" );
     createParam( "canGetShadow" );
 }
-void MetalShaderShadow::initDraw( smDrawParam p_param )
+void MetalShaderShadow::initDraw(const smDrawParam &p_param )
 {
     smMetalShader::initDraw( p_param );
     this->print();
@@ -164,7 +166,7 @@ MetalShaderSoftShadow::MetalShaderSoftShadow() :
 {
     createParam( "ShadowMapTEST" );
 }
-void MetalShaderSoftShadow::initDraw( smDrawParam p_param )
+void MetalShaderSoftShadow::initDraw(const smDrawParam &p_param )
 {
     smMetalShader::initDraw( p_param );
     this->print();
@@ -175,3 +177,6 @@ void MetalShaderSoftShadow::predraw( smMesh *p_mesh )
     smMetalShader::predraw( p_mesh );
     smTextureManager::activateTexture( "depth", 30, shadowMapUniform );
 }
+void smMetalShader::predraw ( smSurfaceMesh* ) {}
+void MetalShaderSoftShadow::predraw ( smSurfaceMesh* ) {}
+void MetalShaderShadow::predraw ( smSurfaceMesh* ) {}

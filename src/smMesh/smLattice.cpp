@@ -86,7 +86,7 @@ smLatticeReturnType smLattice::init( smVec3f p_leftCorner, smVec3f p_rightCorner
             {
                 index = x + z * xSeperation + y * xSeperation * zSeperation;
 
-                if ( x < 0 || y < 0 | z < 0 || x >= xSeperation || y >= ySeperation || z >= zSeperation )
+                if ( (x < 0 || y < 0) | (z < 0 || x >= xSeperation || y >= ySeperation || z >= zSeperation) )
                 {
                     printf( "Error index is out of bounds in createllatice function" );
                     return SIMMEDTK_LATTICE_INVALIDBOUNDS;
@@ -142,7 +142,7 @@ void smLattice::indexReset()
                 cells[traverseIndex].lastPrimitiveIndex = 0;
             }
 }
-void smLattice::isCellEmpty( int p_cellIndex )
+void smLattice::isCellEmpty( int /*p_cellIndex*/ )
 {
 }
 void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
@@ -156,7 +156,6 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
     smInt maxZ;
     smInt index;
     smVec3f leftCorner = getLeftMinCorner();
-    smVec3f rightCorner = getRightMaxCorner();
 
     minX = ( aabb[p_primitiveIndex].aabbMin[0] - leftCorner[0] ) / xStep;
     minY = ( aabb[p_primitiveIndex].aabbMin[1] - leftCorner[1] ) / yStep;
@@ -172,7 +171,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
             {
                 index = xIndex + zIndex * xSeperation + yIndex * xSeperation * zSeperation;
 
-                if ( xIndex < 0 || yIndex < 0 | zIndex < 0 || xIndex >= xSeperation || yIndex >= ySeperation || zIndex >= zSeperation )
+                if ( ((xIndex < 0 || yIndex) < 0) | ((zIndex < 0 || xIndex >= xSeperation || yIndex >= ySeperation || zIndex >= zSeperation)) )
                 {
                     continue;
                 }
@@ -223,8 +222,6 @@ void smLattice::updateBounds( smSurfaceMesh *p_mesh, int p_index )
 }
 void smLattice::updateBounds()
 {
-    smInt numberOfprimitives;
-
     for ( smInt i = 0; i < mesh->nbrTriangles; i++ )
     {
         updateBounds( mesh, i );
@@ -246,14 +243,16 @@ void smLattice::addObject( smSceneObject *obj )
     switch ( objectType )
     {
         case SIMMEDTK_SMSTATICSCENEOBJECT:
-            mesh = ( ( smStaticSceneObject * )obj )->mesh;
+        {
+            mesh = static_cast<smStaticSceneObject*>(obj)->mesh;
             break;
+        }
+        default:
+            std::cerr << "Unknown class type." << std::endl;
     }
 }
-void smLattice::draw( smDrawParam p_params )
+void smLattice::draw(const smDrawParam &/*p_params*/ )
 {
-
-    int temp;
     int index = 0;
     int index2 = 0;
     smInt latticeMode;
@@ -265,14 +264,14 @@ void smLattice::draw( smDrawParam p_params )
     }
 
     glMatrixMode( GL_MODELVIEW );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ( GLfloat * )&smColor::colorYellow );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
 
     if ( latticeMode & SIMMEDTK_SMLATTICE_SEPERATIONLINES )
     {
         for ( int j = 0; j < ySeperation; j++ )
         {
             glDisable( GL_LIGHTING );
-            glColor3fv( ( GLfloat * )&smColor::colorWhite );
+            glColor3fv(reinterpret_cast<GLfloat*>(&smColor::colorWhite));
 
             glBegin( GL_LINES );
 
@@ -324,8 +323,8 @@ void smLattice::draw( smDrawParam p_params )
                         glEnable( GL_COLOR_MATERIAL );
 
                         glBegin( GL_LINE_STRIP );
-                        glColor3fv( ( GLfloat * )&smColor::colorWhite );
-                        glVertex3fv( ( GLfloat * )&cells[index].cellLeftCorner );
+                        glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
+                        glVertex3fv( cells[index].cellLeftCorner.data() );
                         glVertex3f( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] );
@@ -335,7 +334,7 @@ void smLattice::draw( smDrawParam p_params )
                         glVertex3f( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3fv( ( GLfloat * )&cells[index].cellLeftCorner );
+                        glVertex3fv( cells[index].cellLeftCorner.data());
 
                         glVertex3f( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
@@ -355,8 +354,8 @@ void smLattice::draw( smDrawParam p_params )
                         glEnd();
 
                         glBegin( GL_LINES );
-                        glColor3fv( ( GLfloat * )&smColor::colorWhite );
-                        glVertex3fv( ( GLfloat * )&cells[index].cellLeftCorner );
+                        glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
+                        glVertex3fv( cells[index].cellLeftCorner.data() );
                         glVertex3f( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
@@ -393,7 +392,7 @@ void smLattice::draw( smDrawParam p_params )
         glPushMatrix();
         glPushMatrix();
         glTranslatef( cells[0].cellLeftCorner[0], cells[0].cellLeftCorner[1], cells[0].cellLeftCorner[2] );
-        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ( GLfloat * )&smColor::colorYellow );
+        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
 
@@ -401,7 +400,7 @@ void smLattice::draw( smDrawParam p_params )
         glTranslatef( cells[this->totalCells - 1].cellRightCorner[0],
                       cells[this->totalCells - 1].cellRightCorner[1],
                       cells[this->totalCells - 1].cellRightCorner[2] );
-        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, ( GLfloat * )&smColor::colorRed );
+        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorRed));
         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
         glPopMatrix();

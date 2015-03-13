@@ -168,7 +168,7 @@ public:
     void addObject(smSceneObject *obj);
 
     /// \brief render the lattice for visaulization
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 
 };
 

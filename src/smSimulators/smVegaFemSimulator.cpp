@@ -41,15 +41,19 @@ void smVegaFemSimulator::initCustom()
     smSceneObject *object;
 
     //do nothing for now
-    for ( smInt i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
     {
         object = objectsSimulated[i];
 
         switch ( type )
         {
             case SIMMEDTK_SMVEGAFEMSCENEOBJECT:
+            {
                 object->flags.isSimulatorInit = true;
                 break;
+            }
+            default:
+                std::cerr << "Unknown class name." << std::endl;
         }
     }
 }
@@ -61,18 +65,15 @@ void smVegaFemSimulator::run()
 
     beginSim();
 
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
         sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
-
-            femSceneObject = ( smVegaFemSceneObject * )sceneObj;
-
+            femSceneObject = static_cast<smVegaFemSceneObject*>(sceneObj);
             femSceneObject->advanceDynamics();
-
         }
     }
 
@@ -87,14 +88,11 @@ void smVegaFemSimulator::syncBuffers()
 }
 void smVegaFemSimulator::handleEvent( smEvent *p_event )
 {
-
-    smKeyboardEventData *keyBoardData;
-    smHapticOutEventData *hapticEventData;
-
     switch ( p_event->eventType.eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+        {
+            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData *>(p_event->data);
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {
@@ -102,10 +100,12 @@ void smVegaFemSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
+        }
 
 
         case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-            hapticEventData = ( smHapticOutEventData * )p_event->data;
+        {
+            smHapticOutEventData *hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
 
             if ( hapticEventData->deviceId == 1 )
             {
@@ -116,5 +116,9 @@ void smVegaFemSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
+        }
+        default:
+            std::cerr << "Unknown class name." << std::endl;
+
     }
 }

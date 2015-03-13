@@ -51,8 +51,8 @@ public:
     /// \brief to enable/disable to shadow on particular object.
     smGLInt canGetShadowUniform;
     /// \brief constructor that get vertex and fragment shader file name.
-    smMetalShader(smChar *p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
-                smChar *p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
+    smMetalShader(const smString &p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
+                  const smString &p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
 
     /// \brief attach mesh to the shader
     void attachMesh(smMesh* p_mesh, smChar *p_bump,
@@ -61,11 +61,12 @@ public:
 
     void attachMesh(smMesh* p_mesh, smChar *p_bump, smChar *p_decal, smChar *p_specular, smChar *p_OCC, smChar *p_disp, smChar *p_alphaMap);
     /// \brief emtpy implementation of draw routine. needs to overwritten to enable real-time code changes
-    void draw(smDrawParam p_param);
+    void draw(const smDrawParam &p_param);
     /// \brief initializaiton of bindings
-    virtual void initDraw(smDrawParam p_param);
+    virtual void initDraw(const smDrawParam &p_param);
     /// \brief uniforms are set in the predraw
     virtual void predraw(smMesh *mesh);
+    virtual void predraw(smSurfaceMesh */*mesh*/);
     /// \brief handle keyboard event
     void handleEvent(smEvent *p_event);
     /// \brief any disable and enable shader options need to be here
@@ -82,12 +83,13 @@ class MetalShaderShadow: public smMetalShader
 
 public:
     /// \brief MetalShader v
-    MetalShaderShadow(smChar*p_vertexShaderFileName = "shaders/MultipleShadowsVertexBumpMap2.cg",
-                      smChar*p_fragmentShaderFileName = "shaders/MultipleShadowsFragmentBumpMap2.cg");
+    MetalShaderShadow(const smString &p_vertexShaderFileName = "shaders/MultipleShadowsVertexBumpMap2.cg",
+                      const smString &p_fragmentShaderFileName = "shaders/MultipleShadowsFragmentBumpMap2.cg");
     /// \brief intialization routine
-    virtual void initDraw(smDrawParam p_param);
+    virtual void initDraw(const smDrawParam &p_param);
     /// \brief unifom binding called before object is rendered
     virtual void predraw(smMesh *p_mesh);
+    virtual void predraw(smSurfaceMesh */*mesh*/);
 };
 
 /// \brief another variation of metalshader with differen shadow mapping technique
@@ -100,9 +102,10 @@ public:
     MetalShaderSoftShadow();
 
     /// \brief initialization routine
-    virtual void initDraw(smDrawParam p_param);
+    virtual void initDraw(const smDrawParam &p_param);
     /// \brief pre rendering routine before attached object is rendered
     virtual void predraw(smMesh *p_mesh);
+    virtual void predraw(smSurfaceMesh */*mesh*/);
 };
 
 #endif
