@@ -27,6 +27,11 @@
 #include "smCollision/smCollisionMoller.h"
 #include "smCore/smSDK.h"
 
+unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z)
+{
+    return (((((x)* HASH_P1) ^ ((y)* HASH_P2) ^ ((z)* HASH_P3))) % (SIZE));
+}
+
 void smSpatialHash::reset()
 {
     cells.clearAll();
