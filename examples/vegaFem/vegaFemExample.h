@@ -39,7 +39,7 @@ private:
     smSDK *sofmisSDK;
     smVegaFemSceneObject *femobj;
     smVegaFemSimulator *femSim;
-    smMatrix33<smFloat> mat;
+    smMatrix33f mat;
     smSimulator *simulator;
     smViewer viewer;
     smScene *scene1;

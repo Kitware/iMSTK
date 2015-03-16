@@ -24,10 +24,12 @@
 #ifndef SMTIMER_H
 #define SMTIMER_H
 
+// STL includes
+#include <chrono>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-
-#include <chrono>
 
 /// \brief timer class
 class smTimer: public smCoreClass
@@ -37,28 +39,17 @@ public:
     using TimePointType = ClockType::time_point;
     using DurationType = ClockType::duration;
     using PeriodType = ClockType::period;
+
     /// \brief constructor
-    smTimer()
-    {
-        start();
-    }
+    smTimer();
+
     /// \brief start the timer
-    inline  void start()
-    {
-        begin = ClockType::now();
-    }
+    void start();
 
     /// \brief Gets the time passed between this call and start()
     ///
     /// \return Returns the time in seconds
-    inline smLongDouble elapsed()
-    {
-        smLongDouble deltaSec;
-        TimePointType now = ClockType::now();
-        DurationType delta = now - begin;
-        deltaSec = (((smLongDouble)delta.count() * PeriodType::num) / PeriodType::den);
-        return deltaSec;
-    }
+    smLongDouble elapsed();
 
 private:
     TimePointType begin;

@@ -24,19 +24,20 @@
 #ifndef SMVAO_H
 #define SMVAO_H
 
+// STL includes
+#include <cassert>
+#include <unordered_map>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smConfigRendering.h"
-#include "smUtilities/smVec3.h"
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smUtils.h"
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
 #include "smShader/smShader.h"
-
-#include "assert.h"
-#include <unordered_map>
 
 enum smVBOBufferType
 {
@@ -66,14 +67,7 @@ struct smVBOBufferEntryInfo
     smString   shaderAttribName;
     GLint    shaderAttribLocation;
 public:
-    smVBOBufferEntryInfo()
-    {
-        shaderAttribLocation = -1;
-        attributeIndex = 1;
-        attribPointer = NULL;
-        nbrElements = 0;
-        arrayBufferType = SMVBO_POS;
-    }
+    smVBOBufferEntryInfo();
 };
 /// \brief Vertex Array Object for fast rendering
 class smVAO: public smCoreClass
@@ -96,54 +90,11 @@ public:
     smMesh *mesh;
 
     /// \brief need error log and totalBuffer Size
-    smVAO(smErrorLog *p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, smBool p_bindShaderObjects = true)
-    {
-        this->log = p_log;
-        renderingError = false;
-        totalNbrBuffers = 0;
-        vboType = p_vboType;
-        VAOs[this->uniqueId.ID] = this;
-        indexBufferLocation = -1;
-        bindShaderObjects = p_bindShaderObjects;
-    }
+    smVAO(smErrorLog *p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, smBool p_bindShaderObjects = true);
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
-    void setBufferData(smVBOBufferType p_type, smString p_ShaderAttribName, smInt p_nbrElements, void *p_ptr)
-    {
-        bufferInfo[totalNbrBuffers].arrayBufferType = p_type;
-
-        if (p_type == SMVBO_POS ||
-                p_type == SMVBO_NORMALS ||
-                p_type == SMVBO_TANGENTS ||
-                p_type == SMVBO_VEC3F)
-        {
-            bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_nbrElements;
-        }
-        else if (p_type == SMVBO_TEXTURECOORDS ||
-                 p_type == SMVBO_VEC2F)
-        {
-            bufferInfo[totalNbrBuffers].size = sizeof(smTexCoord) * p_nbrElements;
-        }
-        else if (p_type == SMVBO_VEC4F)
-        {
-            bufferInfo[totalNbrBuffers].size = sizeof(smFloat) * 4 * p_nbrElements;
-        }
-
-        bufferInfo[totalNbrBuffers].attribPointer = p_ptr;
-        bufferInfo[totalNbrBuffers].nbrElements = p_nbrElements;
-        bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-        bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
-        totalNbrBuffers++;
-    }
+    void setBufferData(smVBOBufferType p_type, smString p_ShaderAttribName, smInt p_nbrElements, void *p_ptr);
     /// \brief set the triangle information
-    void setTriangleInfo(smString p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr)
-    {
-        bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
-        bufferInfo[totalNbrBuffers].nbrElements = p_nbrTriangles * 3;
-        bufferInfo[totalNbrBuffers].attribPointer = p_ptr;
-        bufferInfo[totalNbrBuffers].size = sizeof(smInt) * p_nbrTriangles * 3;
-        bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
-        totalNbrBuffers++;
-    }
+    void setTriangleInfo(smString p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr);
 
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
     smBool setBufferDataFromMesh(smMesh *p_mesh,
@@ -151,97 +102,24 @@ public:
                                  smString p_POSITIONShaderName = "Position",
                                  smString p_NORMALShaderName = "Normal",
                                  smString p_TEXTURECOORDShaderName = "texCoords",
-                                 smString p_TANGENTSName = "Tangents")
-    {
-
-        if (p_shader == NULL)
-        {
-            shader = smShader::getShader(p_mesh->renderDetail.shaders[0]);
-        }
-        else
-        {
-            shader = p_shader;
-        }
-
-        bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
-        bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-        bufferInfo[totalNbrBuffers].shaderAttribName = p_POSITIONShaderName;
-        totalNbrBuffers++;
-
-        bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_NORMALS;
-        bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertNormals;
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-        bufferInfo[totalNbrBuffers].shaderAttribName = p_NORMALShaderName;
-        totalNbrBuffers++;
-
-        ///texture coord is for each vertex
-        bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TEXTURECOORDS;
-        bufferInfo[totalNbrBuffers].size = sizeof(smTexCoord) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->texCoord;
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-        bufferInfo[totalNbrBuffers].shaderAttribName = p_TEXTURECOORDShaderName;
-        totalNbrBuffers++;
-
-        if (p_mesh->tangentChannel)
-        {
-            bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TANGENTS;
-            bufferInfo[totalNbrBuffers].size = sizeof(smVec3f) * p_mesh->nbrVertices;
-            bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertTangents;
-            bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
-            bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-            bufferInfo[totalNbrBuffers].shaderAttribName = p_TANGENTSName;
-            totalNbrBuffers++;
-        }
-
-        bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrTriangles * 3;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->triangles;
-        bufferInfo[totalNbrBuffers].size = sizeof(smInt) * p_mesh->nbrTriangles * 3;
-        bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
-        totalNbrBuffers++;
-
-        mesh = p_mesh;
-        return true;
-    }
+                                 smString p_TANGENTSName = "Tangents");
     /// \brief updates the buffer with data. It is important for meshes undergoes topology changes
     smBool updateStreamData();
-    static void initVAOs(smDrawParam p_param)
-    {
-        for(auto& x: VAOs)
-            x.second->initBuffers(p_param);
-    }
+
+    static void initVAOs(smDrawParam p_param);
+
     /// \brief  init VAO buffers
     void initBuffers(smDrawParam p_param);
     /// \brief get VAO given the shader ID
-    static inline smVAO * getVAO(smUnifiedID p_shaderID)
-    {
-        return VAOs[p_shaderID.ID];
-    }
+    static smVAO * getVAO(smUnifiedID p_shaderID);
     /// \brief  enable the vertex array object
-    inline void enable()
-    {
-        glBindVertexArray(VAO);
-    }
+    void enable();
     /// \brief disable VAO
-    inline void disable()
-    {
-        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    }
+    void disable();
     /// \brief draw VAO
     void draw(smDrawParam p_params);
     /// \brief constructor
-    ~smVAO()
-    {
-        glDeleteBuffers(totalNbrBuffers, bufferIndices);
-        glDeleteVertexArrays(1, &VAO);
-    }
+    ~smVAO();
 };
 
 #endif

@@ -21,7 +21,36 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMLATTICETYPES_H
-#define SMLATTICETYPES_H
+// SimMedTK includes
+#include "smUtilities/smMath.h"
 
-#endif
+smMath::smMath()
+{
+    type = SIMMEDTK_SMMATH;
+}
+smInt smMath::pow(smInt p_base, smInt p_pow)
+{
+    smInt res = 1;
+
+    for (smInt i = 0; i < p_pow; i++)
+    {
+        res *= p_base;
+    }
+
+    return res;
+}
+smFloat smMath::interpolate(smInt current, smInt min, smInt max)
+{
+    if (current < min)
+    {
+        return 0.0;
+    }
+    else if (current > max)
+    {
+        return 1.0;
+    }
+    else
+    {
+        return (smFloat)(current - min) / (smFloat)(max - min);
+    }
+}

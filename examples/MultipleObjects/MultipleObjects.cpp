@@ -36,7 +36,7 @@ void createPBDandFEM()
     smFemSimulator *femSim;
     smPBDSurfaceSceneObject *pbdObject;
     smPBDObjectSimulator * pbd;
-    smMatrix33<smFloat> mat;
+    smMatrix33f mat;
     smSimulator *simulator;
     smViewer *viewer;
     smScene *scene1;
@@ -72,13 +72,13 @@ void createPBDandFEM()
     femobj->v_mesh->LoadTetra("../../resources/models/cylinder_Mesh.txt");
     femobj->v_mesh->getSurface("../../resources/models/cylinder_smesh.txt");
     femobj->v_mesh->readBC("../../resources/models/cylinder_BC.txt");
-    femobj->v_mesh->scaleVolumeMesh(smVec3<smFloat>(1, 1, 1));
+    femobj->v_mesh->scaleVolumeMesh(smVec3f(1, 1, 1));
     femobj->renderDetail.colorDiffuse = smColor::colorBlue;
     femobj->renderDetail.colorAmbient = smColor::colorBlue;
     femobj->renderDetail.shadowColor = smColor(0.2, 0.2, 0.2);
     femobj->v_mesh->rotate(mat);
-    femobj->v_mesh->scaleVolumeMesh(smVec3<smFloat>(0.5, 0.5, 1.0));
-    femobj->v_mesh->translateVolumeMesh(smVec3<smFloat>(20, 15, 20));
+    femobj->v_mesh->scaleVolumeMesh(smVec3f(0.5, 0.5, 1.0));
+    femobj->v_mesh->translateVolumeMesh(smVec3f(20, 15, 20));
     femobj->renderDetail.renderType = (SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_SHADOWS | SIMMEDTK_RENDER_FACES);
     femobj->renderDetail.lineSize = 1.0;
     femobj->renderDetail.pointSize = 5;
@@ -93,8 +93,8 @@ void createPBDandFEM()
     pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
 
     //pbdObject->mesh->rotate(mat);
-    pbdObject->mesh->scale(smVec3<smFloat>(2.3, 0.5, 2));
-    pbdObject->mesh->translate(smVec3<smFloat>(11, 25, 0));
+    pbdObject->mesh->scale(smVec3f(2.3, 0.5, 2));
+    pbdObject->mesh->translate(smVec3f(11, 25, 0));
     pbdObject->mesh->assignTexture("clothtexture");
     pbdObject->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
     pbdObject->initMeshStructure();

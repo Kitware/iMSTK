@@ -54,23 +54,12 @@ class smConsoleStream: public smIOStream
 {
     smString inputBuffer;
 public:
-    smConsoleStream()
-    {
-    }
+    smConsoleStream();
     /// \brief operator to print text
-    virtual smIOStream& operator <<(smString p_string)
-    {
-        std::cout << p_string;
-        return *this;
-    }
+    virtual smIOStream& operator <<(smString p_string);
 
     /// \brief to  input from use
-    virtual smIOStream& operator >>(smString &p_string)
-    {
-        std::getline(std::cin, inputBuffer);
-        p_string = inputBuffer;
-        return *this;
-    }
+    virtual smIOStream& operator >>(smString &p_string);
 };
 
 /// \brief window string
@@ -82,39 +71,15 @@ public:
     /// \brief position of string x,y
     smFloat x, y;
     /// \brief  constructors
-    smWindowString()
-    {
-        x = 0;
-        y = 0;
-        string = "";
-        string.reserve(SM_WINDOW_MAXSTRINGSIZE);
-    }
+    smWindowString();
 
-    smWindowString(smString p_string)
-    {
-        string = p_string;
-    }
+    smWindowString(smString p_string);
 
-    smWindowString(smString p_string, smFloat p_x, smFloat p_y)
-    {
-        string = p_string;
-        x = p_x;
-        y = p_y;
-    }
+    smWindowString(smString p_string, smFloat p_x, smFloat p_y);
     /// \brief operators for string
-    smWindowString &operator<<(smString p_string)
-    {
-        string = p_string;
-        return *this;
-    }
+    smWindowString &operator<<(smString p_string);
 
-    void operator =(smWindowString &p_windowString)
-    {
-        string.clear();
-        string = p_windowString.string;
-        x = p_windowString.x;
-        y = p_windowString.y;
-    }
+    void operator =(smWindowString &p_windowString);
 };
 
 struct smWindowData
@@ -126,14 +91,8 @@ struct smWindowData
 class smWindowStream: public smIOStream
 {
 public:
-    virtual smIOStream& operator <<(smString p_string)
-    {
-        return *this;
-    }
-    virtual smIOStream& operator >>(smString &p_string)
-    {
-        return *this;
-    }
+    virtual smIOStream& operator <<(smString p_string);
+    virtual smIOStream& operator >>(smString &p_string);
 };
 
 /// \brief opengl window stream for putting text on the screen
@@ -153,25 +112,7 @@ protected:
     smInt initialTextPositionX;
     smInt lastTextPosition;
     /// \brief initialization routines
-    void init(smInt p_totalTexts)
-    {
-        textColor.setValue(1.0, 1.0, 1.0, 1.0);
-        totalTexts = p_totalTexts;
-        windowTexts = new smWindowData[totalTexts];
-        drawOrder = SIMMEDTK_DRAW_AFTEROBJECTS;
-
-        for (smInt i = 0; i < totalTexts; i++)
-        {
-            windowTexts[i].enabled = false;
-        }
-
-        enabled = true;
-        currentIndex = 0;
-        initialTextPositionX = 0.0;
-        //initialTextPositionY = font.pointSize(); //+font.pointSize()/2.0;
-        initialTextPositionY = 0.0;
-        lastTextPosition = 0;
-    }
+    void init(smInt p_totalTexts);
 
 public:
     /// \brief enable/disable texts on display
@@ -180,11 +121,7 @@ public:
     smColor textColor;
 
     /// \brief constructors
-    smOpenGLWindowStream(smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW)
-    {
-        //font.setPointSize(10.0);
-        init(p_totalTexts);
-    }
+    smOpenGLWindowStream(smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
 
     /*smOpenGLWindowStream(QFont p_font, smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW)
     {
@@ -198,98 +135,17 @@ public:
         init(p_totalTexts);
     }*/
     /// \brief add text on window
-    virtual smInt addText(const smString &p_tag, const smString &p_string)
-    {
-        smWindowString string;
-        string.string = p_string;
-        string.x = 0;
-        string.y = lastTextPosition;
-        //lastTextPosition += font.pointSize() + font.pointSize() / 2.0;
-        tagMap[p_tag] = currentIndex;
-        windowTexts[currentIndex].enabled = true;
-        windowTexts[currentIndex].windowString = string;
-        currentIndex = (currentIndex + 1) % totalTexts;
-        return currentIndex;
-    }
+    virtual smInt addText(const smString &p_tag, const smString &p_string);
     /// \brief add text on window
-    bool addText(smString p_tag, smWindowString &p_string)
-    {
-        if (p_string.string.size() > SM_WINDOW_MAXSTRINGSIZE)
-        {
-            return false;
-        }
-
-        currentIndex = (currentIndex + 1) % totalTexts;
-        tagMap[p_tag] = currentIndex;
-        windowTexts[currentIndex].windowString = p_string;
-        windowTexts[currentIndex].enabled = true;
-        return true;
-    }
+    bool addText(smString p_tag, smWindowString &p_string);
     /// \brief update the text with specificed tag(p_tag)
-    bool updateText(smString p_tag, smString p_string)
-    {
-        smInt index = -1;
-
-        if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
-        {
-            return false;
-        }
-
-        index = tagMap[p_tag];
-
-        if (index >= 0)
-            windowTexts[index].windowString.string = p_string;
-            else
-            {
-                return false;
-            }
-
-        return true;
-    }
+    bool updateText(smString p_tag, smString p_string);
     /// \brief add text on window with specified text handle
-    bool updateText(smInt p_textHandle, smString p_string)
-    {
-        smInt index = p_textHandle;
-
-        if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
-        {
-            return false;
-        }
-
-        if (index >= 0)
-            windowTexts[index].windowString.string = p_string;
-            else
-            {
-                return false;
-            }
-
-        return true;
-    }
+    bool updateText(smInt p_textHandle, smString p_string);
     /// \brief remove text on window
-    bool removeText(smString p_tag)
-    {
-        smInt index = tagMap[p_tag];
-        windowTexts[index].enabled = false;
-        return true;
-    }
+    bool removeText(smString p_tag);
     /// \brief draw text on window
-    virtual void draw(smDrawParam p_params)
-    {
-        smViewer *viewer = (smViewer *)p_params.rendererObject;
-        glColor3fv(smColor::colorWhite.toGLColor());
-
-        /*
-        //This needs to be replaced by some opengl text api in the future
-        for (smInt i = 0; i < totalTexts; i++)
-        {
-            if (windowTexts[i].enabled)
-            {
-                viewer->drawText(windowTexts[i].windowString.x + initialTextPositionX, windowTexts[i].windowString.y + initialTextPositionY, windowTexts[i].windowString.string, font);
-            }
-
-        }
-        */
-    }
+    virtual void draw(smDrawParam p_params);
 };
 /// \brief window console
 class smWindowConsole: public smOpenGLWindowStream, public smEventHandler
@@ -306,58 +162,16 @@ protected:
     smColor backGroundColor;
 public:
     /// \brief window console constructor
-    smWindowConsole(smInt p_totalTexts = 5)
-    {
-        init(p_totalTexts);
-        backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-        smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-        left = 0.0;
-        bottom = 0.0;
-        right = 1.0;
-        top = 0.15;
-    }
+    smWindowConsole(smInt p_totalTexts = 5);
     /// \brief  return last entered entry
-    smString getLastEntry()
-    {
-        return windowTexts[currentIndex].windowString.string;
-    }
+    smString getLastEntry();
 
     /// \brief add text in the display
-    virtual smInt addText(smString p_tag, smString &p_string)
-    {
-        smInt traverseIndex;
-        smInt counter = 0;
-        smWindowString string;
-        string.string = p_string;
-        windowTexts[currentIndex].enabled = true;
-        windowTexts[currentIndex].windowString = string;
-        tagMap[p_tag] = currentIndex;
-
-        for (smInt i = currentIndex, counter = 0; counter < totalTexts; i--, counter++)
-        {
-            if (i < 0)
-            {
-                i += totalTexts;
-            }
-
-            traverseIndex = i % totalTexts;
-            windowTexts[traverseIndex].windowString.x = 0.0;
-            //windowTexts[traverseIndex].windowString.y = (font.pointSize() * (totalTexts - counter));
-        }
-
-        currentIndex = (currentIndex + 1) % totalTexts;
-        return currentIndex;
-    }
+    virtual smInt addText(smString p_tag, smString &p_string);
     /// \brief  draw console
-    virtual void draw(smDrawParam p_params)
-    {
-        //All previous code was for drawing on-screen text
-    }
+    virtual void draw(smDrawParam p_params);
     /// \brief  handle events
-    void handleEvent(smEvent *p_event)
-    {
-        //All previous code use interpreting keyboard events for on-screen text
-    }
+    void handleEvent(smEvent *p_event);
 };
 
 #endif

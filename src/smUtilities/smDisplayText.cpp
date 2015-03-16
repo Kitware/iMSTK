@@ -21,19 +21,19 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEC4_H
-#define SMVEC4_H
-/// \brief vector 4
-template <typename T>
-class smVec4
-{
-public:
-    inline smVec4(): vec()
-    {
-        w = 1.0;
-    }
-    smVec3<T> vec;
-    T w;
-};
+#include "smUtilities/smDisplayText.h"
 
-#endif
+// STL includes
+#include <iostream>
+#include <string>
+
+// SimMedTK includes
+
+void smDisplayText::addText(smDisplayMessage message)
+{
+    switch (message.outputStream)
+    {
+    case SMDISPLAY_CONSOLE:
+        std::cout << message.text << std::endl;
+    }
+}

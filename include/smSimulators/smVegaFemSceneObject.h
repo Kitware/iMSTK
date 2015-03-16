@@ -24,6 +24,7 @@
 #ifndef SMVEGAFEMSCENEOBJECT_H
 #define SMVEGAFEMSCENEOBJECT_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
@@ -34,7 +35,7 @@
 #include "smRendering/smCustomRenderer.h"
 #include "smSimulators/smVegaConfigFemObject.h"
 
-// VEGA
+// VEGA includes
 #include "getopts.h"
 #include "sceneObjectDeformable.h"
 #include "performanceCounter.h"

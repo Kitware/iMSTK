@@ -23,10 +23,14 @@
 
 #ifndef SMSIMULATOR_H
 #define SMSIMULATOR_H
+
+// Threads includes
+#include <ThreadPool.h>
+
+// SimMedTK includes
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
 
-#include <ThreadPool.h>
 
 struct smSimulationMainParam
 {

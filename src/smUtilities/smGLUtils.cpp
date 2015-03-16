@@ -133,3 +133,25 @@ void smGLUtils::drawQuadOnScreen(smColor p_color, smFloat p_left,
     glPopMatrix();
     glPopAttrib();
 }
+void smGLUtils::drawUnitQuadOnScreen()
+{
+    glBegin(GL_QUADS);
+    glNormal3f(0, 0, 1);
+    glTexCoord2f(0, 0);
+    glVertex3f(-1, -1, -1);
+    glTexCoord2f(1, 0);
+    glVertex3f(1, -1, -1);
+    glTexCoord2f(1, 1);
+    glVertex3f(1, 1.0, -1);
+    glTexCoord2f(0, 1);
+    glVertex3f(-1, 1.0, -1);
+    glEnd();
+}
+void smGLUtils::queryProjectionMatrix(smMatrix44f& p_matrix)
+{
+    glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
+}
+void smGLUtils::queryModelViewMatrix(smMatrix44f& p_matrix)
+{
+    glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
+}

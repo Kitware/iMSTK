@@ -24,8 +24,8 @@
 #ifndef SMGLRENDERER_H
 #define SMGLRENDERER_H
 
+// SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 
@@ -49,11 +49,11 @@ public:
     /// \brief  draw line mesh
     static void drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail);
     /// \brief draw coordinate system
-    static void drawCoordSystem(smViewer *viewer, smString p_name, smVec3<smFloat> p_pos, smVec3<smFloat> dirX, smVec3<smFloat> dirY, smVec3<smFloat> dirZ);
+    static void drawCoordSystem(smViewer *viewer, smString p_name, smVec3f p_pos, smVec3f dirX, smVec3f dirY, smVec3f dirZ);
     /// \brief begin rendering triangle
     static void beginTriangles();
     /// \brief draw triangle
-    static void drawTriangle(smVec3<smFloat> &p_1, smVec3<smFloat> &p_2, smVec3<smFloat> &p_3);
+    static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3);
     /// \brief end triangle rendering
     static void endTriangles();
     /// \brief draw AABB

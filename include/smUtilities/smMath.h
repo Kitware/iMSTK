@@ -43,38 +43,11 @@ class smMath: smCoreClass
 {
 public:
 
-    smMath()
-    {
-        type = SIMMEDTK_SMMATH;
-    }
+    smMath();
     /// \brief computes power
-    static inline smInt pow(smInt p_base, smInt p_pow)
-    {
-        smInt res = 1;
-
-        for (smInt i = 0; i < p_pow; i++)
-        {
-            res *= p_base;
-        }
-
-        return res;
-    }
+    static smInt pow(smInt p_base, smInt p_pow);
     /// \brief linear interpolation with min, max
-    static inline smFloat interpolate(smInt current, smInt min, smInt max)
-    {
-        if (current < min)
-        {
-            return 0.0;
-        }
-        else if (current > max)
-        {
-            return 1.0;
-        }
-        else
-        {
-            return (smFloat)(current - min) / (smFloat)(max - min);
-        }
-    }
+    static smFloat interpolate(smInt current, smInt min, smInt max);
 };
 /// \brief hash function
 template<class T>

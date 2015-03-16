@@ -24,15 +24,17 @@
 #ifndef SMSCENE_H
 #define SMSCENE_H
 
+// STL includes
+#include <mutex>
+#include <unordered_map>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smErrorLog.h"
-#include "smUtilities/smDataStructs.h"
+#include "smUtilities/smDataStructures.h"
 #include "smCore/smDoubleBuffer.h"
-
-#include <mutex>
-#include <unordered_map>
 
 class smPipe;
 class smSDK;

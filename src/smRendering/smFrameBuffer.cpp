@@ -124,3 +124,148 @@ void smFrameBuffer::draw(smDrawParam p_params)
     glEnd();
     glPopAttrib();
 }
+GLenum smRenderBuffer::getGLAttachmentId()
+{
+    if ( type == SIMMEDTK_RENDERBUFFER_DEPTH )
+    {
+        return GL_DEPTH_ATTACHMENT_EXT;
+    }
+
+    if ( type == SIMMEDTK_RENDERBUFFER_STENCIL )
+    {
+        return GL_STENCIL_ATTACHMENT;
+    }
+
+    if ( type == SIMMEDTK_RENDERBUFFER_COLOR_RGBA || type == SIMMEDTK_RENDERBUFFER_COLOR_RGB )
+    {
+        return GL_COLOR_ATTACHMENT0_EXT + attachmentOrder;
+    }
+}
+int smRenderBuffer::getHeight()
+{
+    return height;
+}
+int smRenderBuffer::getWidth()
+{
+    return width;
+}
+void smRenderBuffer::setAttachmentOrder( int p_attachmentOrder )
+{
+    attachmentOrder = p_attachmentOrder;
+}
+int smRenderBuffer::getAttachmentOrder( int p_attachmentOrder )
+{
+    return attachmentOrder;
+}
+smRenderBufferType smRenderBuffer::getRenderBufType()
+{
+    return type;
+}
+GLuint smRenderBuffer::getRenderBufId()
+{
+    return _rb.GetId();
+}
+smRenderBuffer::smRenderBuffer()
+{
+    isAllocated = false;
+}
+smRenderBuffer::smRenderBuffer( smRenderBufferType p_type, int p_width, int p_height )
+{
+    width = p_width;
+    height = p_height;
+    _rb.Set( p_type, width, height );
+    isAllocated = true;
+    type = p_type;
+}
+bool smRenderBuffer::createDepthBuffer( int width, int height )
+{
+    if ( !isAllocated )
+    {
+        _rb.Set( GL_DEPTH_COMPONENT, width, height );
+        return true;
+    }
+
+    return false;
+}
+bool smRenderBuffer::createColorBuffer()
+{
+    if ( !isAllocated )
+    {
+        _rb.Set( SIMMEDTK_RENDERBUFFER_COLOR_RGBA, width, height );
+    }
+
+    return false;
+}
+bool smRenderBuffer::createStencilBuffer()
+{
+    if ( !isAllocated )
+    {
+        _rb.Set( SIMMEDTK_RENDERBUFFER_STENCIL, width, height );
+    }
+
+    return false;
+}
+smFrameBuffer::smFrameBuffer()
+{
+    width = 0;
+    height = 0;
+    isColorBufAttached = false;
+    isDepthTexAttached = false;
+    renderDepthBuff = false;
+    renderColorBuff = false;
+    renderBuffer = NULL;
+}
+void smFrameBuffer::setDim( int p_width, int p_height )
+{
+    width = p_width;
+    height = p_height;
+}
+int smFrameBuffer::getHeight()
+{
+    return height;
+}
+int smFrameBuffer::getWidth()
+{
+    return width;
+}
+void smFrameBuffer::attachRenderBuffer( smRenderBuffer *p_renderBuf )
+{
+    if ( p_renderBuf->getWidth() != width || p_renderBuf->getHeight() != height )
+    {
+        _fbo.AttachRenderBuffer( p_renderBuf->getRenderBufId(), p_renderBuf->getGLAttachmentId() );
+    }
+}
+void smFrameBuffer::attachDepthTexture( smTexture *p_texture )
+{
+    if ( p_texture == NULL )
+    {
+        std::cout << "Error in frambuffer depth attachment" << "\n";
+    }
+
+    _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT );
+    isDepthTexAttached = true;
+}
+void smFrameBuffer::attachColorTexture( smTexture *p_texture, int p_attachmentOrder )
+{
+    defaultColorAttachment = p_attachmentOrder;
+    _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_COLOR_ATTACHMENT0_EXT + p_attachmentOrder );
+    isColorBufAttached = true;
+}
+void smFrameBuffer::activeColorBuf( int p_order )
+{
+    glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + p_order );
+}
+void smFrameBuffer::enable()
+{
+    _fbo.Bind();
+
+    if ( !isColorBufAttached )
+    {
+        glDrawBuffer( GL_NONE );
+        glReadBuffer( GL_NONE );
+    }
+}
+void smFrameBuffer::disable()
+{
+    _fbo.Disable();
+}

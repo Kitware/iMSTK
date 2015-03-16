@@ -58,3 +58,117 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
     executionTypeStatusChanged = false;
     execType = SIMMEDTK_SIMEXECUTION_SYNCMODE;
 }
+
+void smObjectSimulator::addObject( smSceneObject *p_object )
+{
+    p_object->objectSim = this;
+    objectsSimulated.push_back( p_object );
+}
+
+void smObjectSimulator::removeObject( smSceneObject *p_object )
+{
+}
+
+void smObjectSimulator::setPriority( smThreadPriority p_priority )
+{
+    threadPriority = p_priority;
+}
+
+void smObjectSimulator::setExecutionType( smSimulatorExecutionType p_type )
+{
+    if ( execType != p_type )
+    {
+        executionTypeStatusChanged = true;
+    }
+
+    execType = p_type;
+}
+
+smThreadPriority smObjectSimulator::getPriority()
+{
+    return threadPriority;
+}
+
+void smObjectSimulator::init()
+{
+    if ( isObjectSimInitialized == false )
+    {
+        initCustom();
+        //make the simulator true..it is initialized
+        isObjectSimInitialized = true;
+    }
+}
+
+void smObjectSimulator::beginSim()
+{
+    frameCounter++;
+    timer.start();
+}
+void smObjectSimulator::endSim()
+{
+    timerPerFrame = timer.elapsed();
+    totalTime += timerPerFrame;
+
+    if ( totalTime > 1.0 )
+    {
+        FPS = frameCounter;
+        frameCounter = 0.0;
+        totalTime = 0.0;
+    }
+}
+
+void smObjectSimulator::updateSceneList()
+{
+}
+
+smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smScheduleGroup &p_group, std::vector< smSceneObject * > &p_objectsSimulated, int p_threadIndex )
+{
+
+    smInt objectsPerThread;
+    smInt leap;
+    threadIndex = p_threadIndex;
+    smInt totalObjects = p_objectsSimulated.size();
+    leap = ( totalObjects % p_group.totalThreads );
+    objectsPerThread = p_objectsSimulated.size() / ( p_group.totalThreads );
+
+    if ( threadIndex == 0 )
+    {
+        beginIndex = 0;
+        endIndex = objectsPerThread + ( leap != 0 ? 1 : 0 );
+
+    }
+    else
+    {
+        beginIndex = objectsPerThread * threadIndex;
+
+        if ( threadIndex < leap && leap != 0 )
+        {
+            beginIndex += threadIndex;
+        }
+        else
+        {
+            beginIndex += leap;
+        }
+
+        endIndex = beginIndex + objectsPerThread;
+
+        if ( endIndex < leap && leap != 0 )
+        {
+            endIndex++;
+        }
+    }
+}
+void smObjectSimulator::smObjectSimulatorObjectIter::setThreadIndex( short int p_threadIndex )
+{
+    threadIndex = p_threadIndex;
+}
+
+int smObjectSimulator::smObjectSimulatorObjectIter::begin()
+{
+    return beginIndex;
+}
+
+int smObjectSimulator::smObjectSimulatorObjectIter::end()
+{
+    return endIndex;
+}

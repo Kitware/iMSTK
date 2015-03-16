@@ -20,7 +20,7 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #include "smRendering/smConfigRendering.h"
 #include "smShader/smShader.h"
 
@@ -43,4 +43,89 @@ void smRenderDetail::addVAO(smUnifiedID p_shaderID)
 
     VAOs.push_back(p_shaderID);
     VAOEnable.push_back(true);
+}
+smColor::smColor()
+{
+    rgba[0] = 0.8f;
+    rgba[1] = 0.8f;
+    rgba[2] = 0.8f;
+    rgba[3] = 1.0f;
+}
+smColor::smColor( float r, float g, float b, float a )
+{
+    rgba[0] = r;
+    rgba[1] = g;
+    rgba[2] = b;
+    rgba[3] = a;
+}
+void smColor::darken( float p_darkFactor )
+{
+
+    rgba[0] = ( rgba[1] - rgba[1] * ( p_darkFactor ) );
+    rgba[1] = ( rgba[2] - rgba[2] * ( p_darkFactor ) );
+    rgba[2] = ( rgba[3] - rgba[3] * ( p_darkFactor ) );
+    rgba[0] = ( rgba[0] < 0 ? 0 : rgba[0] );
+    rgba[1] = ( rgba[1] < 0 ? 0 : rgba[1] );
+    rgba[2] = ( rgba[2] < 0 ? 0 : rgba[2] );
+}
+void smColor::lighten( float p_darkFactor )
+{
+
+    rgba[0] = rgba[1] + rgba[1] * ( p_darkFactor );
+    rgba[1] = rgba[2] + rgba[2] * ( p_darkFactor );
+    rgba[2] = rgba[3] + rgba[3] * ( p_darkFactor );
+
+    rgba[0] = ( rgba[0] > 1.0 ? 1.0 : rgba[0] );
+    rgba[1] = ( rgba[1] < 1.0 ? 1.0 : rgba[1] );
+    rgba[2] = ( rgba[2] < 1.0 ? 1.0 : rgba[2] );
+}
+float smColor::operator()( int p_i )
+{
+    if ( p_i < 0 || p_i > 3 )
+    {
+        return -1;
+    }
+
+    return rgba[p_i];
+}
+smColor &smColor::operator=( smColor &p_color )
+{
+    rgba[0] = p_color.rgba[0];
+    rgba[1] = p_color.rgba[1];
+    rgba[2] = p_color.rgba[2];
+    rgba[3] = p_color.rgba[3];
+    return *this;
+}
+GLfloat *smColor::toGLColor()
+{
+    return ( smGLFloat * )rgba;
+}
+void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha )
+{
+    rgba[0] = p_red;
+    rgba[1] = p_green;
+    rgba[2] = p_blue;
+    rgba[3] = p_alpha;
+}
+smRenderDetail::smRenderDetail()
+{
+    renderType = SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_FACES;
+    highLightColor.rgba[0] = 1.0f;
+    highLightColor.rgba[1] = 0.0f;
+    highLightColor.rgba[2] = 0.0f;
+    pointSize = 1;
+    lineSize = 1;
+    shadowColor.rgba[0] = 0.0f;
+    shadowColor.rgba[1] = 0.0f;
+    shadowColor.rgba[2] = 0.0f;
+    shadowColor.rgba[3] = 0.5f;
+    colorDiffuse = smColor::colorWhite;
+    colorAmbient = smColor::colorWhite;
+    colorSpecular = smColor::colorWhite;
+    normalColor = smColor::colorGreen;
+    wireFrameColor = smColor::colorBlue;
+    shininess = 50.0;
+    debugDraw = false;
+    castShadow = true;
+    canGetShadow = true;
 }

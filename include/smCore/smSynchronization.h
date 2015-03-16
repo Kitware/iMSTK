@@ -24,13 +24,15 @@
 #ifndef SMSYNCHRONIZATION_H
 #define SMSYNCHRONIZATION_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smCoreClass.h"
-
+// STL includes
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
 #include <thread>
+
+// SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smCore/smCoreClass.h"
 
 /// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor

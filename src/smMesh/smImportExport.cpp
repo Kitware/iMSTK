@@ -43,20 +43,20 @@ smBool smImportExport::convertToJSON(smMesh *p_mesh, const smString& p_outputFil
 
     for (int i = 0; i < p_mesh->nbrVertices - 1; i++)
     {
-        fprintf(file, "%f,%f,%f,", p_mesh->vertices[i].x, p_mesh->vertices[i].y, p_mesh->vertices[i].z);
+        fprintf(file, "%f,%f,%f,", p_mesh->vertices[i][0], p_mesh->vertices[i][1], p_mesh->vertices[i][2]);
     }
 
-    fprintf(file, "%f,%f,%f", p_mesh->vertices[p_mesh->nbrVertices - 1].x, p_mesh->vertices[p_mesh->nbrVertices - 1].y, p_mesh->vertices[p_mesh->nbrVertices - 1].z);
+    fprintf(file, "%f,%f,%f", p_mesh->vertices[p_mesh->nbrVertices - 1][0], p_mesh->vertices[p_mesh->nbrVertices - 1][1], p_mesh->vertices[p_mesh->nbrVertices - 1][2]);
     fprintf(file, "],\n");
 
     fprintf(file, "\t\"vertexNormals\" : \n[");
 
     for (int i = 0; i < p_mesh->nbrVertices - 1; i++)
     {
-        fprintf(file, "%f,%f,%f,", p_mesh->vertNormals[i].x, p_mesh->vertNormals[i].y, p_mesh->vertNormals[i].z);
+        fprintf(file, "%f,%f,%f,", p_mesh->vertNormals[i][0], p_mesh->vertNormals[i][1], p_mesh->vertNormals[i][2]);
     }
 
-    fprintf(file, "%f,%f,%f", p_mesh->vertNormals[p_mesh->nbrVertices - 1].x, p_mesh->vertNormals[p_mesh->nbrVertices - 1].y, p_mesh->vertNormals[p_mesh->nbrVertices - 1].z);
+    fprintf(file, "%f,%f,%f", p_mesh->vertNormals[p_mesh->nbrVertices - 1][0], p_mesh->vertNormals[p_mesh->nbrVertices - 1][1], p_mesh->vertNormals[p_mesh->nbrVertices - 1][2]);
     fprintf(file, "],\n");
 
     fprintf(file, "\t\"vertexTextureCoords\" : [");
@@ -73,10 +73,10 @@ smBool smImportExport::convertToJSON(smMesh *p_mesh, const smString& p_outputFil
 
     for (int i = 0; i < p_mesh->nbrVertices - 1; i++)
     {
-        fprintf(file, "%f,%f,%f,", p_mesh->vertTangents[i].x, p_mesh->vertTangents[i].y, p_mesh->vertTangents[i].z);
+        fprintf(file, "%f,%f,%f,", p_mesh->vertTangents[i][0], p_mesh->vertTangents[i][1], p_mesh->vertTangents[i][2]);
     }
 
-    fprintf(file, "%f,%f,%f", p_mesh->vertTangents[p_mesh->nbrVertices - 1].x, p_mesh->vertTangents[p_mesh->nbrVertices - 1].y, p_mesh->vertTangents[p_mesh->nbrVertices - 1].z);
+    fprintf(file, "%f,%f,%f", p_mesh->vertTangents[p_mesh->nbrVertices - 1][0], p_mesh->vertTangents[p_mesh->nbrVertices - 1][1], p_mesh->vertTangents[p_mesh->nbrVertices - 1][2]);
     fprintf(file, "],\n");
 
     fprintf(file, "\t\"indices\" : \n[");

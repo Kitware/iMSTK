@@ -1,6 +1,7 @@
 #ifndef _GLM_CAMERA_H_
 #define _GLM_CAMERA_H_
 
+// GLM includes
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -15,7 +16,7 @@ public:
     //Construction/Destruction
     smCamera();
     //Nothing to clean up
-    
+
     //View settings
     void setCameraPos(float x, float y, float z);
     void setCameraPos(const glm::vec3& v);

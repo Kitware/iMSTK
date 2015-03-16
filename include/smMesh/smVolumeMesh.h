@@ -24,6 +24,7 @@
 #ifndef SMVOLUMEMESH_H
 #define SMVOLUMEMESH_H
 
+// SimMedTK includes
 #include "smMesh/smMesh.h"
 
 /// \brief this class is derived from generic Mesh class. Tetrahedron are building blocks of this volume mesh.
@@ -36,7 +37,7 @@ public:
     /// push smMesh class specific errors here
     smErrorLog *log_VM; ///< log the errors with volume mesh class
     smInt nbrNodes; ///< total number of nodes of the volume mesh
-    smVec3<float> *nodes; ///< data of nodal co-ordinates
+    smVec3f *nodes; ///< data of nodal co-ordinates
     smInt nbrTetra; ///< number of tetrahedra
     smTetrahedra *tetra; ///< tetrahedra data
     smInt *surfaceNodeIndex; ///<
@@ -77,13 +78,13 @@ public:
     void copySurface();
 
     /// \brief translate mesh vertices in x, y and z directions
-    void translateVolumeMesh(smVec3<smFloat> p_translate);
+    void translateVolumeMesh(smVec3f p_translate);
 
     /// \brief scale the volume mesh
-    void scaleVolumeMesh(smVec3<smFloat> p_scale);
+    void scaleVolumeMesh(smVec3f p_scale);
 
     /// \brief rotate mesh vertices in x, y and z directions
-    void rotVolumeMesh(smMatrix33<smFloat> p_rot);
+    void rotVolumeMesh(smMatrix33f p_rot);
 
     /// \brief load the mesh
     smBool loadMesh(const smString& fileName, smMeshFileType fileType);

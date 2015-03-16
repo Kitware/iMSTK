@@ -215,9 +215,9 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     for (int i = 0; i < mesh->mNumVertices; i++)
     {
         this->vertices.emplace_back(
-            smVec3f(mesh->mVertices[i].x,
-                    mesh->mVertices[i].y,
-                    mesh->mVertices[i].z));
+            smVec3f(mesh->mVertices[i][0],
+                    mesh->mVertices[i][1],
+                    mesh->mVertices[i][2]));
     }
     this->origVerts = this->vertices;
 
@@ -239,8 +239,8 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
         //Extract the texture data
         for (smUInt i = 0; i < mesh->mNumVertices; i++)
         {
-            this->texCoord[i].u = mesh->mTextureCoords[0][i].x;
-            this->texCoord[i].v = mesh->mTextureCoords[0][i].y;
+            this->texCoord[i].u = mesh->mTextureCoords[0][i][0];
+            this->texCoord[i].v = mesh->mTextureCoords[0][i][1];
         }
     }
 
@@ -345,8 +345,8 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             this->nbrVertices = l_qty;
             this->vertices.reserve(l_qty);
             this->origVerts.reserve(l_qty);
-            this->vertNormals = new smVec3<smFloat>[l_qty];
-            this->vertTangents = new smVec3<smFloat>[l_qty];
+            this->vertNormals = new smVec3f[l_qty];
+            this->vertTangents = new smVec3f[l_qty];
             this->texCoord = new smTexCoord[l_qty];
 
             for (smInt fpt = 0; fpt < this->nbrVertices; fpt++)
@@ -369,8 +369,8 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             fread(&l_qty, sizeof(smUShort), 1, l_file);
             this->nbrTriangles = l_qty;
             this->triangles = new smTriangle[l_qty];
-            this->triNormals = new smVec3<smFloat>[l_qty];
-            this->triTangents = new smVec3<smFloat>[l_qty];
+            this->triNormals = new smVec3f[l_qty];
+            this->triTangents = new smVec3f[l_qty];
 
             for (i = 0; i < l_qty; i++)
             {

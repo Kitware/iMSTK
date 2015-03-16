@@ -24,17 +24,18 @@
 #ifndef SMSHADER_H
 #define SMSHADER_H
 
+// STL includes
+#include <unordered_map>
+#include <list>
+#include <string>
+#include <vector>
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smGLUtils.h"
-#include "smUtilities/smMatrix44.h"
 #include "smUtilities/smTimer.h"
-
-#include <string.h>
-#include <unordered_map>
-#include <list>
-#include <vector>
 
 class smMesh;
 class smSurfaceMesh;
@@ -48,7 +49,6 @@ struct smTextureShaderAssignment
     /// \brief The parameters that shaders use
     smString shaderParamName;
 };
-
 
 /// \brief this is the generic shader class. It provides loading, initializing, binding,
 ///enabling disabling current shader functionality.Also it provides frequent check of the shader code
@@ -244,35 +244,9 @@ public:
                              const smString& p_geometryFileName,
                              const smString& p_fragmentFileName);
 
-    smBool setModelViewMatrixShaderName(const smString& p_modelviewMatrixName)
-    {
-        if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_modelviewMatrixName.length())
-        {
-            return false;
-        }
-        else
-        {
-            this->modelViewMatrixName = p_modelviewMatrixName;
-        }
+    smBool setModelViewMatrixShaderName(const smString& p_modelviewMatrixName);
 
-        createParam(modelViewMatrixName);
-        return true;
-    }
-
-    smBool setProjectionMatrixShaderName(const smString& p_projectionName)
-    {
-        if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_projectionName.length())
-        {
-            return false;
-        }
-        else
-        {
-            this->projectionMatrixName = p_projectionName;
-        }
-
-        createParam(projectionMatrixName);
-        return true;
-    }
+    smBool setProjectionMatrixShaderName(const smString& p_projectionName);
 
     /// \brief holds the unitform location for projection matrix. That is needed in newer versions of GLSL
     smGLInt projectionMatrix;
@@ -280,16 +254,7 @@ public:
     /// \brief holds the unitform location for modelview matrix. That is needed in newer versions of GLSL
     smGLInt modelViewMatrix;
 
-    inline void updateGLSLMatwithOPENGL()
-    {
-        smMatrix44f proj, model;
-        smGLUtils::queryModelViewMatrix<float>(model);
-        smGLUtils::queryProjectionMatrix<float>(proj);
-
-        //as the our matrix is row major, we need transpose it. Transpose parameters are true
-        glUniformMatrix4fv(modelViewMatrix, 1, true, (GLfloat*)model.e);
-        glUniformMatrix4fv(projectionMatrix, 1, true, (GLfloat*)proj.e);
-    }
+    void updateGLSLMatwithOPENGL();
 
     /// \brief returns the shader attrrib param
     smGLInt getShaderParamForAll(const smString& p_paramName);
@@ -303,10 +268,7 @@ public:
     void createParam(const smString& p_param);
     smInt createAttrib(const smString& p_attrib);
 
-    smGLInt queryUniformLocation(const smString& p_param)
-    {
-        return glGetUniformLocation(shaderProgramObject, p_param.data());
-    }
+    smGLInt queryUniformLocation(const smString& p_param);
 
 #endif
 
@@ -345,10 +307,7 @@ public:
     virtual void posdraw(smMesh *mesh) {}
     virtual void posdraw(smSurfaceMesh *mesh) {}
 
-    static inline smShader * getShader(smUnifiedID p_shaderID)
-    {
-        return shaders[p_shaderID.ID];
-    }
+    static smShader * getShader(smUnifiedID p_shaderID);
 
     smBool readShaderContent(const smString& p_file, smString& p_content);
     static void initGLShaders(smDrawParam p_param);

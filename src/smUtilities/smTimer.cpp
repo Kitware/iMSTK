@@ -21,10 +21,22 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMPIPE_H
-#define SMPIPE_H
+// SimMedTK includes
+#include "smUtilities/smTimer.h"
 
-#include "smCore/smConfig.h"
-#include "smCore/smCoreClass.h"
-
-#endif
+smTimer::smTimer()
+{
+    start();
+}
+void smTimer::start()
+{
+    begin = ClockType::now();
+}
+smLongDouble smTimer::elapsed()
+{
+    smLongDouble deltaSec;
+    TimePointType now = ClockType::now();
+    DurationType delta = now - begin;
+    deltaSec = (((smLongDouble)delta.count() * PeriodType::num) / PeriodType::den);
+    return deltaSec;
+}

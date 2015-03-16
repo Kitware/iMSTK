@@ -80,3 +80,7 @@ SIMMEDTK_SMCOLLISIONDETECTION:
     handleAll();
     return SIMMEDTK_DISPATCHER_OK;
 }
+smDispatcher::smDispatcher()
+{
+    type = SIMMEDTK_SMDISPATHCER;
+}

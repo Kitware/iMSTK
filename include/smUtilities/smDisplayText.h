@@ -22,6 +22,8 @@
 //---------------------------------------------------------------------------
 #ifndef SMDISPLAYTEXT_H
 #define SMDISPLAYTEXT_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 
@@ -53,14 +55,7 @@ class smDisplayText: smCoreClass
 {
 public:
     smDisplayText();
-    void addText(smDisplayMessage message)
-    {
-        switch (message.outputStream)
-        {
-        case SMDISPLAY_CONSOLE:
-            std::cout << message.text << endl;
-        }
-    }
+    void addText(smDisplayMessage message);
 };
 
 #endif

@@ -23,8 +23,9 @@
 
 #ifndef SMPHYSXVOLUMEMESH_H
 #define SMPHYSXVOLUMEMESH_H
+
+// SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVec3.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
 

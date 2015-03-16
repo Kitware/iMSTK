@@ -29,7 +29,7 @@
 
 // SimMedTK includes
 #include "smCore/smObjectSimulator.h"
-#include "smUtilities/smDataStructs.h"
+#include "smUtilities/smDataStructures.h"
 
 class smCellLine;
 class smCellModel;
@@ -59,10 +59,7 @@ enum smCollisionSetting
 #define HASH_P2 19349663
 #define HASH_P3 83492791
 
-inline unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z)
-{
-    return (((((x) * HASH_P1) ^ ((y) * HASH_P2) ^ ((z) * HASH_P3))) % (SIZE));
-}
+unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z);
 
 /// \brief spatial hash
 class smSpatialHash: public smObjectSimulator
@@ -122,16 +119,16 @@ protected:
     std::map<int, int> filteredList;
 
     /// \brief adds triangle to hash
-    inline void addTriangle(smMesh *mesh, int triangleId, smHash<smCellTriangle> &cells);
+    void addTriangle(smMesh *mesh, int triangleId, smHash<smCellTriangle> &cells);
 
     /// \brief adds line to hash
-    inline void addLine(smLineMesh *mesh, int edgeId, smHash<smCellLine> &cells);
+    void addLine(smLineMesh *mesh, int edgeId, smHash<smCellLine> &cells);
 
     /// \brief adds point to hash
-    inline void addPoint(smMesh *mesh, int vertId, smHash<smCellPoint> cells);
+    void addPoint(smMesh *mesh, int vertId, smHash<smCellPoint> cells);
 
     /// \brief adds octree cell to hash
-    inline void addOctreeCell(smSurfaceTree<smOctreeCell> *colModel, smHash<smCellModel> cells);
+    void addOctreeCell(smSurfaceTree<smOctreeCell> *colModel, smHash<smCellModel> cells);
 
     /// \brief !!
     void reset();
@@ -204,7 +201,7 @@ public:
     virtual void initCustom();
 
     /// \brief !! compute the hash
-    inline void computeHash(smMesh *mesh, int *tris, int nbrTris);
+    void computeHash(smMesh *mesh, int *tris, int nbrTris);
 
     /// \brief !!
     virtual void run();
