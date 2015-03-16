@@ -24,9 +24,6 @@
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
 
-// GLFW includes
-#include "GLFW/glfw3.h"
-
 // 3rd Party iIncludes
 #include <SFML/Window.hpp>
 

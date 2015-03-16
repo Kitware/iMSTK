@@ -46,10 +46,6 @@
 #include <GL/glut.h>
 #include <GL/gl.h> // for GLfloat, etc.
 
-// DevIL includes
-#include <IL/ilu.h>
-#include <IL/ilut.h>
-
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0
 /// \brief defines the threading mechanism
