@@ -23,10 +23,10 @@
   *  \copyright Apache License, Version 2.0.
   */
 
-#include "RenderCube.h"
+#include "AudioExample.h"
 
 int main()
 {
-    runRenderCube();
+    runAudioExample();
     return 0;
 }
