@@ -125,7 +125,7 @@ CollisionDetectionExampleWithHash::CollisionDetectionExampleWithHash()
 }
 
 ///Draw the collided triangles. This will be called due to the function call viewer->addObject(this)
-void CollisionDetectionExampleWithHash::draw(smDrawParam p_params)
+void CollisionDetectionExampleWithHash::draw(const smDrawParam &p_params)
 {
     smCollidedTriangles *tris;
 

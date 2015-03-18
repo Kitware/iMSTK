@@ -42,10 +42,9 @@ void smFemSimulator::initCustom()
     smClassType type;
     smSceneObject *object;
     smFemSceneObject *femObject;
-    smVec3f *newVertices;
 
     //do nothing for now
-    for ( smInt i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
     {
         object = objectsSimulated[i];
         type = object->getType();
@@ -53,11 +52,15 @@ void smFemSimulator::initCustom()
         switch ( type )
         {
             case SIMMEDTK_SMFEMSCENEOBJECT:
-                femObject = ( smFemSceneObject * )object;
+            {
+                femObject = static_cast<smFemSceneObject*>(object);
                 object->localVerts.reserve( femObject->v_mesh->nbrVertices );
                 object->localVerts = femObject->v_mesh->vertices;
                 object->flags.isSimulatorInit = true;
                 break;
+            }
+            default:
+                std::cerr << "Unknown class type." << std::endl;
         }
     }
 }
@@ -66,7 +69,6 @@ void smFemSimulator::run()
 
     smSceneObject *sceneObj;
     smFemSceneObject *femSceneObject;
-    smVec3f *vertices;
     smVolumeMesh *mesh;
     static smInt pickedIndex = -1;
     static smBool nodePicked = false;
@@ -77,7 +79,7 @@ void smFemSimulator::run()
 
     beginSim();
 
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
 
         sceneObj = this->objectsSimulated[i];
@@ -85,7 +87,7 @@ void smFemSimulator::run()
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMFEMSCENEOBJECT )
         {
-            femSceneObject = ( smFemSceneObject * )sceneObj;
+            femSceneObject = static_cast<smFemSceneObject*>(sceneObj);
             mesh = femSceneObject->v_mesh;
 
             if ( !hapticButtonPressed )
@@ -180,14 +182,14 @@ void smFemSimulator::syncBuffers()
     smFemSceneObject *femObject;
     smVolumeMesh *mesh;
 
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
         sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMFEMSCENEOBJECT )
         {
-            femObject = ( smFemSceneObject * )sceneObj;
+            femObject = static_cast<smFemSceneObject *>(sceneObj);
             mesh = femObject->v_mesh;
             mesh->vertices = femObject->localVerts;
             femObject->v_mesh->updateVertexNormals();
@@ -196,14 +198,11 @@ void smFemSimulator::syncBuffers()
 }
 void smFemSimulator::handleEvent( smEvent *p_event )
 {
-
-    smKeyboardEventData *keyBoardData;
-    smHapticOutEventData *hapticEventData;
-
     switch ( p_event->eventType.eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+        {
+            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData *> (p_event->data);
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {
@@ -211,9 +210,10 @@ void smFemSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
-
+        }
         case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-            hapticEventData = ( smHapticOutEventData * )p_event->data;
+        {
+            smHapticOutEventData *hapticEventData = reinterpret_cast<smHapticOutEventData*>(p_event->data);
 
             if ( hapticEventData->deviceId == 1 )
             {
@@ -224,5 +224,8 @@ void smFemSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
+        }
+        default:
+            std::cerr << "Unknown evant type." << std::endl;
     }
 }

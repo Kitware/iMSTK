@@ -29,11 +29,15 @@
 
 // SimMedTK includes
 
-void smDisplayText::addText(smDisplayMessage message)
+void smDisplayText::addText ( smDisplayMessage message )
 {
-    switch (message.outputStream)
+    switch ( message.outputStream )
     {
-    case SMDISPLAY_CONSOLE:
-        std::cout << message.text << std::endl;
+        case SMDISPLAY_CONSOLE:
+        {
+            std::cout << message.text << std::endl;
+        }
+        default:
+            std::cerr << "Unknown type." << std::endl;
     }
 }

@@ -23,14 +23,14 @@
 #define CROSS(dest,v1,v2) \
           dest[0]=v1[1]*v2[2]-v1[2]*v2[1]; \
           dest[1]=v1[2]*v2[0]-v1[0]*v2[2]; \
-          dest[2]=v1[0]*v2[1]-v1[1]*v2[0]; 
+          dest[2]=v1[0]*v2[1]-v1[1]*v2[0];
 
 #define DOT(v1,v2) (v1[0]*v2[0]+v1[1]*v2[1]+v1[2]*v2[2])
 
 #define SUB(dest,v1,v2) \
           dest[0]=v1[0]-v2[0]; \
           dest[1]=v1[1]-v2[1]; \
-          dest[2]=v1[2]-v2[2]; 
+          dest[2]=v1[2]-v2[2];
 
 #define FINDMINMAX(x0,x1,x2,min,max) \
   min = max = x0;   \
@@ -58,7 +58,7 @@ int planeBoxOverlap(float normal[3],float d, float maxbox[3])
   }
   if(DOT(normal,vmin)+d>0.0f) return 0;
   if(DOT(normal,vmax)+d>=0.0f) return 1;
-  
+
   return 0;
 }
 
@@ -120,8 +120,7 @@ int triBoxOverlap(float boxcenter[3],float boxhalfsize[3],float triverts[3][3])
   /*    3) crossproduct(edge from tri, {x,y,z}-directin) */
   /*       this gives 3x3=9 more tests */
    float v0[3],v1[3],v2[3];
-   float axis[3];
-   float min,max,d,p0,p1,p2,rad,fex,fey,fez;  
+   float min,max,d,p0,p1,p2,rad,fex,fey,fez;
    float normal[3],e0[3],e1[3],e2[3];
 
    /* This is the fastest branch on Sun */

@@ -61,7 +61,7 @@ public:
     {
     }
 
-    void CollisionDetectionExample::draw(smDrawParam p_params);
+    void CollisionDetectionExample::draw(const smDrawParam &p_params);
     ~CollisionDetectionExample();
 };
 

@@ -160,7 +160,7 @@ public:
     virtual void removeLattice(smLattice *p_lat, smInt p_listIndex);
 
     /// \brief !! renders the workers threads
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 
 };
 

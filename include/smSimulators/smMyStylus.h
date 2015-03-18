@@ -65,7 +65,7 @@ public:
     void handleEvent(smEvent *p_event);
 
     /// \brief render the avatar
-    void draw(smDrawParam p_param);
+    void draw(const smDrawParam &p_param);
 
     /// \brief constructor
     HookCautery(const smString& p_pivot = "../../resources/models/hook_cautery_new.3DS");

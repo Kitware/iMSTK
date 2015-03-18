@@ -80,10 +80,10 @@ public:
     void computeStiffness();
 
     /// \brief load a matrix from an external file
-    smBool loadMatrix(const smChar *fname, smMatrixf &a);
+    smBool loadMatrix(const smString &fname, smMatrixf &a);
 
     /// \brief save a matrix to an external file
-    smBool saveMatrix(const smChar *fname, smMatrixf &a);
+    smBool saveMatrix(const smString &fname, smMatrixf &a);
 
     /// \brief !!
     smFloat V(smInt xyz, smInt xyz123, smInt tet);
@@ -110,7 +110,10 @@ public:
     virtual void unSerialize(void *p_memoryBlock);
 
     /// \brief render the FEM mesh
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
+
+    /// \brief Init routine
+//     virtual void init(){}
 };
 
 #endif

@@ -27,7 +27,7 @@
 
 /// \brief
 smBool smImportExport::convertToJSON(smMesh *p_mesh, const smString& p_outputFileName,
-                                     smExportOptions p_export)
+                                     smExportOptions /*p_export*/)
 {
 
     FILE *file;

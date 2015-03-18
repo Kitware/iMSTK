@@ -59,7 +59,7 @@ public:
 
     smScriptReturnCodes registerVariable(smCoreClass *p_coreClass, void *p_variablePtr,
                                          SIMMEDTK_TYPEINFO p_typeInfo,
-                                         smString p_variableName, smInt p_nbr)
+                                         smString p_variableName, smInt /*p_nbr*/)
     {
 
         smScriptReturnCodes ret = SMSCRIPT_REG_OK;

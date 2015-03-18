@@ -92,10 +92,10 @@ public:
     }
 
     /// \brief rendering the collision meshes
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 
     /// \brief !!
-    void initDraw(smDrawParam p_param);
+    void initDraw(const smDrawParam &p_param);
 
     /// \brief !!
     void syncBuffers();

@@ -25,8 +25,8 @@
 #include "smCore/smSDK.h"
 
 smScene::smScene(smErrorLog *p_log) :
-    sceneLocal(SIMMEDTK_MAX_MODULES),
-    smCoreClass()
+    smCoreClass(),
+    sceneLocal(SIMMEDTK_MAX_MODULES)
 {
     type = SIMMEDTK_SMSCENE;
     this->log = p_log;
@@ -77,7 +77,7 @@ void smScene::removeSceneObject(smSceneObject *p_sceneObject)
     {
         std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
 
-        for (smInt i = 0; i < sceneObjects.size(); i++)
+        for (size_t i = 0; i < sceneObjects.size(); i++)
         {
             if (sceneObjects[i] == p_sceneObject)
             {
@@ -94,9 +94,9 @@ void smScene::removeSceneObject(smSceneObject *p_sceneObject)
 void smScene::removeSceneObject(smInt p_sceneObjectId)
 {
     std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
-    if (p_sceneObjectId >= 0 && p_sceneObjectId < sceneObjects.size())
+    if (p_sceneObjectId >= 0 && p_sceneObjectId < smInt(sceneObjects.size()))
     {
-        for (smInt i = 0; i < sceneObjects.size(); i++)
+        for (size_t i = 0; i < sceneObjects.size(); i++)
         {
             if (sceneObjects[i]->uniqueId == p_sceneObjectId)
             {
@@ -130,7 +130,7 @@ void smScene::copySceneObjects(smScene*p_scene)
 
     p_scene->sceneObjects.clear();
 
-    for (smInt i = 0; i < this->sceneObjects.size(); i++)
+    for (size_t i = 0; i < this->sceneObjects.size(); i++)
     {
         p_scene->sceneObjects.push_back(sceneObjects[i]);
     }

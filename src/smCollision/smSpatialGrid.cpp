@@ -335,7 +335,7 @@ void smSpatialGrid::removeLattice( smLattice *p_lat, int p_listIndex )
     totalLattices--;
     listUpdated = true;
 }
-void smSpatialGrid::draw( smDrawParam p_params )
+void smSpatialGrid::draw(const smDrawParam &p_params )
 {
     for ( smInt i = 0; i < totalThreads; i++ )
     {

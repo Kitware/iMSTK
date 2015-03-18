@@ -129,7 +129,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
     {
         smKeyboardEventData* kbData =
-            (smKeyboardEventData*)p_event->data;
+            reinterpret_cast<smKeyboardEventData*>(p_event->data);
         smKey key = kbData->keyBoardKey;
         if (key == smKey::Escape && kbData->pressed)
         {
@@ -192,7 +192,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
     {
         smMouseButtonEventData* mbData =
-            (smMouseButtonEventData*)p_event->data;
+            reinterpret_cast<smMouseButtonEventData*>(p_event->data);
         std::cout << "mbData: button: ";
         if (mbData->mouseButton == smMouseButton::Left)
             std::cout << "Left";
@@ -215,7 +215,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
     {
         smMouseMoveEventData* mpData =
-            (smMouseMoveEventData*)p_event->data;
+            reinterpret_cast<smMouseMoveEventData*>(p_event->data);
         std::cout << "mpData: x: " << mpData->windowX
             << " y: " << mpData->windowY << "\n";
         break;
@@ -225,7 +225,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     }
 }
 
-void RenderCube::simulateMain(smSimulationMainParam p_param)
+void RenderCube::simulateMain(smSimulationMainParam /*p_param*/)
 {
     //Run the simulator framework
     simmedtkSDK->run();

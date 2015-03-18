@@ -45,7 +45,7 @@ void smLight::updateDirection()
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
 }
-smLightPos::smLightPos( float p_x, float p_y, float p_z, float p_w )
+smLightPos::smLightPos( float p_x, float p_y, float p_z, float /*p_w*/ )
 {
     pos << p_x, p_y, p_z;
 }

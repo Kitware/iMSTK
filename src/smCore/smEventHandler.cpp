@@ -40,7 +40,7 @@ void smEventDispatcher::disableEventHandler(smEventHandler *p_handler,
         smEventType p_eventType)
 {
 
-    for (smInt i = 0; i < handlers.size(); i++)
+    for (size_t i = 0; i < handlers.size(); i++)
     {
         if (handlers[i]->handler == p_handler && handlers[i]->registeredEventType == p_eventType)
         {
@@ -53,7 +53,7 @@ void smEventDispatcher::enableEventHandler(smEventHandler *p_handler,
         smEventType p_eventType)
 {
 
-    for (smInt i = 0; i < handlers.size(); i++)
+    for (size_t i = 0; i < handlers.size(); i++)
     {
         if (handlers[i]->handler == p_handler && handlers[i]->registeredEventType == p_eventType)
         {
@@ -79,7 +79,7 @@ void smEventDispatcher::sendEventAndDelete(smEvent *p_event)
 
 ///asynchronous Event calling
 ///not implemented yet
-void smEventDispatcher::asyncSendEvent(smEvent *p_event)
+void smEventDispatcher::asyncSendEvent(smEvent */*p_event*/)
 {
 
 }
@@ -89,7 +89,7 @@ void smEventDispatcher::callHandlers( smEvent *p_event )
 
     for ( smInt i = 0; i < v; i++ )
     {
-        if ( handlers[i]->enabled && p_event->eventType == handlers[i]->registeredEventType ||
+        if ( (handlers[i]->enabled && p_event->eventType == handlers[i]->registeredEventType) ||
                 handlers[i]->registeredEventType == SIMMEDTK_EVENTTYPE_ALL )
         {
             handlers[i]->handler->handleEvent( p_event );
