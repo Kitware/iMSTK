@@ -27,7 +27,7 @@
 
 std::unordered_map<smInt, smVAO *>  smVAO::VAOs;
 
-void smVAO::initBuffers(smDrawParam p_param)
+void smVAO::initBuffers(smDrawParam /*p_param*/)
 {
     smString error;
     ///Create the Vertex Array Objects
@@ -36,7 +36,8 @@ void smVAO::initBuffers(smDrawParam p_param)
 
     ///Create Vertex Buffer Objects(VBOs)
     glGenBuffers(totalNbrBuffers, bufferIndices);
-    assert(bufferIndices > 0);
+
+    assert(bufferIndices != nullptr);
 
     ///Initialize and file the VBOs
     for (smInt i = 0; i < totalNbrBuffers; i++)
@@ -161,11 +162,8 @@ smBool smVAO::updateStreamData()
     return false;
 }
 
-void smVAO::draw(smDrawParam p_params)
+void smVAO::draw(const smDrawParam &/*p_params*/)
 {
-
-    float m[16];
-    float m1[16];
     glPushAttrib(GL_ENABLE_BIT);
     shader->enableShader();
     shader->updateGLSLMatwithOPENGL();

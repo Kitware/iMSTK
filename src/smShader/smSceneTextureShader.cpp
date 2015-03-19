@@ -25,7 +25,7 @@
 #include "smShader/smSceneTextureShader.h"
 #include "smCore/smSDK.h"
 
-smSceneTextureShader::smSceneTextureShader(smChar *p_verteShaderFileName, smChar *p_fragmentFileName)
+smSceneTextureShader::smSceneTextureShader(const smString &p_verteShaderFileName, const smString &p_fragmentFileName)
 {
 
     this->log = smSDK::getErrorLog();
@@ -40,17 +40,17 @@ smSceneTextureShader::smSceneTextureShader(smChar *p_verteShaderFileName, smChar
     this->registerShader();
 }
 
-void smSceneTextureShader::predraw(smMesh *p_mesh)
+void smSceneTextureShader::predraw(smMesh */*p_mesh*/)
 {
 
 }
 
-void smSceneTextureShader::handleEvent(smEvent *p_event)
+void smSceneTextureShader::handleEvent(smEvent */*p_event*/)
 {
 
 }
 
-void smSceneTextureShader::initDraw(smDrawParam p_param)
+void smSceneTextureShader::initDraw(const smDrawParam &p_param)
 {
 
     smShader::initDraw(p_param);
@@ -59,7 +59,7 @@ void smSceneTextureShader::initDraw(smDrawParam p_param)
     this->prevTex = getFragmentShaderParam("prevTex");
 }
 
-void smSceneTextureShader::draw(smDrawParam p_param)
+void smSceneTextureShader::draw(const smDrawParam &/*p_param*/)
 {
 
     glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);

@@ -31,11 +31,15 @@
 #include "smUtilities/smMatrix.h"
 #include "smUtilities/smVector.h"
 
+/// A quaternion.
+template<typename T>
+using smQuaternion = Eigen::Quaternion<T>;
+
 /// A quaternion of floats.
-typedef Eigen::Quaternionf  smQuaternionf;
+using smQuaternionf = smQuaternion<float>;
 
 /// A quaternion of doubles.
-typedef Eigen::Quaterniond  smQuaterniond;
+using smQuaterniond = smQuaternion<double>;
 
 /// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type.

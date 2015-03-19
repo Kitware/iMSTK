@@ -175,16 +175,14 @@ void smMesh::calcTriangleTangents()
         {
             vertTangents[v][0] = vertTangents[v][1] = vertTangents[v][2] = 0;
 
-            for (t = 0; t < vertTriNeighbors[v].size(); t++)
+            for (size_t i = 0; i < vertTriNeighbors[v].size(); i++)
             {
-                vertTangents[v][0] += triTangents[(vertTriNeighbors[v])[t]][0];
-                vertTangents[v][1] += triTangents[(vertTriNeighbors[v])[t]][1];
-                vertTangents[v][2] += triTangents[(vertTriNeighbors[v])[t]][2];
+                vertTangents[v] += triTangents[vertTriNeighbors[v][i]];
             }
 
-            vertTangents[v].normalize();
+            vertTangents[v].normalized();
             vertTangents[v] = (vertTangents[v] - vertNormals[v] * vertNormals[v].dot(vertTangents[v]));
-            vertTangents[v].normalize();
+            vertTangents[v].normalized();
         }
     }
 }
@@ -203,9 +201,6 @@ void smMesh::calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord&
     v2[0] = p3[0] - p1[0];
     v2[1] = p3[1] - p1[1];
     v2[2] = p3[2] - p1[2];
-
-    smFloat tt1 = t2.u - t1.u;
-    smFloat tt2 = t3.u - t1.u;
 
     smFloat bb1 = t2.v - t1.v;
     smFloat bb2 = t3.v - t1.v;
@@ -246,19 +241,17 @@ void smMesh::calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexC
 /// \brief calculates the normal of the vertex
 void smMesh::updateVertexNormals()
 {
-
-    smInt j;
     smVec3f temp = smVec3f::Zero();
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
-        for (j = 0; j < vertTriNeighbors[i].size(); j++)
+        for (size_t j = 0; j < vertTriNeighbors[i].size(); j++)
         {
-            temp += triNormals[(vertTriNeighbors[i])[j]];
+            temp += triNormals[vertTriNeighbors[i][j]];
         }
 
         vertNormals[i] = temp;
-        vertNormals[i].normalize();
+        vertNormals[i].normalized();
         temp = smVec3f::Zero();
     }
 }
@@ -349,7 +342,7 @@ void smMesh::calcNeighborsVertices()
 
     for (i = 0; i < nbrVertices; i++)
     {
-        for (smInt j = 0; j < vertTriNeighbors[i].size(); j++)
+        for (size_t j = 0; j < vertTriNeighbors[i].size(); j++)
         {
             triangleIndex = vertTriNeighbors[i][j];
             candidate[0] = triangles[triangleIndex].vert[0];
@@ -371,7 +364,7 @@ void smMesh::calcNeighborsVertices()
                 candidate[2] = -1;
             }
 
-            for (smInt k = 0; k < vertVertNeighbors[i].size(); k++)
+            for (size_t k = 0; k < vertVertNeighbors[i].size(); k++)
             {
                 if (vertVertNeighbors[i][k] == candidate[0])
                 {
@@ -442,15 +435,12 @@ inline void smMesh::upadateAABB()
 /// \brief
 void smMesh::calcEdges()
 {
-
-    smInt i, j, k;
-    smBool exist;
     smEdge edge;
     edges.reserve(SIMMEDTK_MESH_RESERVEDMAXEDGES);
 
-    for (i = 0; i < nbrVertices; i++)
+    for (smInt i = 0; i < nbrVertices; i++)
     {
-        for (j = 0; j < vertVertNeighbors[i].size(); j++)
+        for (size_t j = 0; j < vertVertNeighbors[i].size(); j++)
         {
             if (vertVertNeighbors[i][j] > i)
             {
@@ -532,7 +522,7 @@ void smMesh::rotate(const smMatrix33f &p_rot)
 }
 
 /// \brief
-void smMesh::draw(smDrawParam p_params)
+void smMesh::draw(const smDrawParam &p_params)
 {
 
     smViewer *viewer = p_params.rendererObject;
@@ -597,17 +587,11 @@ void smMesh::updateTriangleAABB()
 /// \brief
 void smMesh::checkCorrectWinding()
 {
-
-    smEdge  edge1;
-    smEdge  edge2;
-    smEdge  edge3;
     smInt x[3];
     smInt p[3];
-    smInt edgeMatch = 0;
 
     for (smInt i = 0; i < nbrTriangles; i++)
     {
-        edgeMatch = 0;
         x[0] = triangles[i].vert[0];
         x[1] = triangles[i].vert[1];
         x[2] = triangles[i].vert[2];
@@ -672,10 +656,8 @@ void smMesh::checkCorrectWinding()
 }
 
 /// \brief
-void smLineMesh::draw(smDrawParam p_params)
+void smLineMesh::draw(const smDrawParam &p_params)
 {
-
-    smViewer *viewer = p_params.rendererObject;
     smGLRenderer::drawLineMesh(this, &p_params.caller->renderDetail);
 
     if (p_params.caller->renderDetail.debugDraw)

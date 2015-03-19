@@ -19,7 +19,7 @@
 #
 # VegaFEM
 #
-set(VegaFEM_TAG "8b815e9fef40be3e0b0449b2672e004f6b2ac9b3")
+set(VegaFEM_TAG "a7aca2271ad483f7912009d0f9d0e75ed956142c")
 set(VegaFEM_REPOSITORY git@bitbucket.org:simmedtk/vegafem-cmake.git)
 
 # Make sure this file is included only once

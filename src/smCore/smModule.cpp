@@ -27,7 +27,7 @@
 void  smModule::beginModule()
 {
 
-    dispathcer->handle((smCoreClass*)this, SIMMEDTK_CALLERSTATE_BEGINFRAME);
+    dispathcer->handle(static_cast<smCoreClass*>(this), SIMMEDTK_CALLERSTATE_BEGINFRAME);
     beginFrame();
 
 }
@@ -37,7 +37,7 @@ void  smModule::endModule()
 {
 
     endFrame();
-    dispathcer->handle((smCoreClass*)this, SIMMEDTK_CALLERSTATE_ENDFRAME);
+    dispathcer->handle(static_cast<smCoreClass*>(this), SIMMEDTK_CALLERSTATE_ENDFRAME);
 }
 void smModule::terminate()
 {

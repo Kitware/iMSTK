@@ -67,11 +67,11 @@ void smWindowString::operator=(smWindowString& p_windowString)
     x = p_windowString.x;
     y = p_windowString.y;
 }
-smIOStream& smWindowStream::operator<<(smString p_string)
+smIOStream& smWindowStream::operator<<(smString /*p_string*/)
 {
     return *this;
 }
-smIOStream& smWindowStream::operator>>(smString& p_string)
+smIOStream& smWindowStream::operator>>(smString& /*p_string*/)
 {
     return *this;
 }
@@ -169,9 +169,8 @@ bool smOpenGLWindowStream::removeText(smString p_tag)
     windowTexts[index].enabled = false;
     return true;
 }
-void smOpenGLWindowStream::draw(smDrawParam p_params)
+void smOpenGLWindowStream::draw(const smDrawParam &/*p_params*/)
 {
-    smViewer *viewer = (smViewer *)p_params.rendererObject;
     glColor3fv(smColor::colorWhite.toGLColor());
 
     /*
@@ -200,10 +199,9 @@ smString smWindowConsole::getLastEntry()
 {
     return windowTexts[currentIndex].windowString.string;
 }
-smInt smWindowConsole::addText(smString p_tag, smString& p_string)
+smInt smWindowConsole::addText(const smString &p_tag, const smString& p_string)
 {
     smInt traverseIndex;
-    smInt counter = 0;
     smWindowString string;
     string.string = p_string;
     windowTexts[currentIndex].enabled = true;
@@ -225,11 +223,11 @@ smInt smWindowConsole::addText(smString p_tag, smString& p_string)
     currentIndex = (currentIndex + 1) % totalTexts;
     return currentIndex;
 }
-void smWindowConsole::draw(smDrawParam p_params)
+void smWindowConsole::draw(const smDrawParam &/*p_params*/)
 {
     //All previous code was for drawing on-screen text
 }
-void smWindowConsole::handleEvent(smEvent* p_event)
+void smWindowConsole::handleEvent(smEvent* /*p_event*/)
 {
     //All previous code use interpreting keyboard events for on-screen text
 }

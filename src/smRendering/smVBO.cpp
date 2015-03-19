@@ -23,24 +23,35 @@
 
 #include "smRendering/smVBO.h"
 
-smVBOResult smVBO::updateVertices(smVec3f *p_vectors, smVec3f *p_normals,
-                                  smTexCoord *p_textureCoords, smInt p_objectId)
+smVBO::smVBO( smErrorLog *p_log )
 {
+    this->log = p_log;
+    renderingError = false;
+}
 
-    smInt nbrVertices;
-    smFloat *baseBufferPtr;
-    smFloat *objectBufferPtr;
+smVBO::~smVBO()
+{
+    glDeleteBuffersARB( 1, &vboDataId );
+    glDeleteBuffersARB( 1, &vboIndexId );
+}
 
+/// WARNING: This function takes arrays to Eigen 3d vectors,
+/// it is not clear to me that the memory is aligned.
+smVBOResult smVBO::updateVertices(const smVectorf &p_vectors,
+                                  const smVectorf &p_normals,
+                                  const smVectorf &p_textureCoords,
+                                  size_t p_objectId)
+{
     if (vboType == SIMMEDTK_VBO_STATIC)
     {
         return SIMMEDTK_VBO_INVALIDOPERATION;
     }
 
-    nbrVertices = numberofVertices[p_objectId];
+    // Bind the vertices's VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-    baseBufferPtr = (smFloat*)glMapBufferARB(GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
-    objectBufferPtr = (smFloat*)((smChar*)baseBufferPtr + dataOffsetMap[p_objectId]);
 
+    smFloat *objectBufferPtr = reinterpret_cast<smFloat*>(glMapBufferARB(
+        GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + dataOffsetMap[p_objectId];
     if (objectBufferPtr == NULL)
     {
         log->addError("VBO could not map the buffer");
@@ -48,38 +59,41 @@ smVBOResult smVBO::updateVertices(smVec3f *p_vectors, smVec3f *p_normals,
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
 
-    //copy the buffers for vertices, normals and texture respectively
-    memcpy(objectBufferPtr, p_vectors, nbrVertices * sizeof(smVec3f));
-    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3f));
-    memcpy(objectBufferPtr, p_normals, nbrVertices * sizeof(smVec3f));
-    objectBufferPtr = (smFloat*)((smChar*)objectBufferPtr + nbrVertices * sizeof(smVec3f));
+    // Copy vertices
+    objectBufferPtr = std::copy(p_vectors.data(),
+                                p_vectors.data()+p_vectors.size(),
+                                objectBufferPtr);
 
-    if (p_textureCoords != NULL)
+    // Copy normals
+    objectBufferPtr = std::copy(p_normals.data(),
+                                p_normals.data()+p_normals.size(),
+                                objectBufferPtr);
+
+    // Copy texture coords
+    if (p_textureCoords.size() > 0)
     {
-        memcpy(objectBufferPtr, p_textureCoords, nbrVertices * sizeof(smTexCoord));
+        std::copy(p_textureCoords.data(),
+                  p_textureCoords.data()+p_textureCoords.size(),
+                  objectBufferPtr);
     }
 
-    //unmap the buffer
+    // Unmap the buffer
     glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
     return SIMMEDTK_VBO_OK;
 }
 
-smVBOResult smVBO::updateTriangleIndices(smInt *p_indices, smInt p_objectId)
+smVBOResult smVBO::updateTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId)
 {
-    smInt nbrTriangles;
-    smFloat *baseBufferPtr;
-    smFloat *objectBufferPtr;
-
-    if (vboType == SIMMEDTK_VBO_STATIC | vboType == SIMMEDTK_VBO_DYNAMIC)
+    if ((vboType == SIMMEDTK_VBO_STATIC) | (vboType == SIMMEDTK_VBO_DYNAMIC))
     {
         return SIMMEDTK_VBO_INVALIDOPERATION;
     }
 
-    nbrTriangles = numberofTriangles[p_objectId];
+    // Bind the indices' VBO
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-    baseBufferPtr = (smFloat*)glMapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB);
-    objectBufferPtr = (smFloat*)((smChar*)baseBufferPtr + indexOffsetMap[p_objectId]);
 
+    smFloat *objectBufferPtr = reinterpret_cast<smFloat*>(glMapBufferARB(
+        GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + indexOffsetMap[p_objectId];
     if (objectBufferPtr == NULL)
     {
         log->addError("VBO could not map the buffer");
@@ -87,13 +101,17 @@ smVBOResult smVBO::updateTriangleIndices(smInt *p_indices, smInt p_objectId)
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
 
-    memcpy(objectBufferPtr, p_indices, nbrTriangles * sizeof(smTriangle));
-    //unmap the buffer
+    // Copy indices
+    std::copy(p_indices.data(),
+              p_indices.data()+p_indices.size(),
+              objectBufferPtr);
+
+    // Unmap the buffer
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
     return SIMMEDTK_VBO_OK;
 }
 
-smVBOResult smVBO::drawElements(smInt p_objectId)
+smVBOResult smVBO::drawElements(size_t p_objectId)
 {
 
     smInt dataOffset;
@@ -106,10 +124,10 @@ smVBOResult smVBO::drawElements(smInt p_objectId)
     dataOffset = dataOffsetMap[p_objectId];
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-    glVertexPointer(3, smGLRealType, 0, (void*)dataOffset);
-    glNormalPointer(smGLRealType, 0, (void*)(dataOffset + nbrVertices * sizeof(smVec3f)));
+    glVertexPointer(3, smGLRealType, 0, reinterpret_cast<void*>(dataOffset));
+    glNormalPointer(smGLRealType, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3f)));
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-    glIndexPointer(smGLUIntType, 0, (void*)indexOffset);
+    glIndexPointer(smGLUIntType, 0, reinterpret_cast<void*>(indexOffset));
 
     //render polygons
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -118,7 +136,7 @@ smVBOResult smVBO::drawElements(smInt p_objectId)
 
     if (!renderingError)
     {
-        glDrawElements(GL_TRIANGLES, nbrTriangles * 3, smGLUIntType, (void*)indexOffset);
+        glDrawElements(GL_TRIANGLES, nbrTriangles * 3, smGLUIntType, reinterpret_cast<void*>(indexOffset));
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -134,36 +152,33 @@ smVBOResult smVBO::drawElements(smInt p_objectId)
 
 ///Static Binding of the buffers. It is mandatory to call this function
 /// this function must be called when the binding is SIMMEDTK_VBO_STATIC
-smVBOResult smVBO::initStaticVertices(smVec3f *p_vectors,
-                                      smVec3f *p_normals,
-                                      smTexCoord *p_textureCoords,
-                                      smInt p_objectId)
+smVBOResult smVBO::initStaticVertices(const smVectorf &p_vectors,
+                                      const smVectorf &p_normals,
+                                      const smVectorf &p_textureCoords,
+                                      size_t p_objectId)
 {
-
-    smInt nbrVertices;
-    smFloat *baseBufferPtr;
-    smFloat *objectBufferPtr;
-    smInt dataOffset;
-
     if (vboType == SIMMEDTK_VBO_DYNAMIC)
     {
         return SIMMEDTK_VBO_INVALIDOPERATION;
     }
 
-    dataOffset = dataOffsetMap[p_objectId];
-    nbrVertices = numberofVertices[p_objectId];
-    glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_vectors);
-    dataOffset += nbrVertices * sizeof(smVec3f);
-    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_normals);
-    dataOffset += nbrVertices * sizeof(smVec3f);
+    size_t dataOffset = dataOffsetMap[p_objectId];
 
-    if (p_textureCoords != NULL)
+    // Bind the vertices's VBO
+    glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
+
+    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, p_vectors.size() * sizeof(float), p_vectors.data());
+    dataOffset += p_vectors.size() * sizeof(float);
+
+    glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, p_normals.size() * sizeof(float), p_normals.data());
+    dataOffset += p_normals.size() * sizeof(float);
+
+    if (p_textureCoords.size() > 0)
     {
-        glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, nbrVertices * sizeof(smVec3f), p_textureCoords);
+        glBufferSubDataARB(GL_ARRAY_BUFFER_ARB, dataOffset, p_textureCoords.size() * sizeof(float), p_textureCoords.data());
     }
 
-    //unmap the buffer
+    // Unmap the buffer
     glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
     return SIMMEDTK_VBO_OK;
 }
@@ -171,33 +186,24 @@ smVBOResult smVBO::initStaticVertices(smVec3f *p_vectors,
 ///init Triangle Indices for the very first time for static objects
 ///this function must be called when the indices are not changing
 ///SIMMEDTK_VBO_NOINDICESCHANGE
-smVBOResult smVBO::initTriangleIndices(smInt *p_indices, smInt p_objectId)
+smVBOResult smVBO::initTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId)
 {
-
-    smInt nbrTriangles;
-    smFloat *baseBufferPtr;
-    smFloat *objectBufferPtr;
-    smInt indexOffset;
+    size_t indexOffset;
 
     if (vboType == SIMMEDTK_VBO_DYNAMIC)
     {
         return SIMMEDTK_VBO_INVALIDOPERATION;
     }
 
-    nbrTriangles = numberofTriangles[p_objectId];
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-    glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indexOffset, sizeof(smTriangle)*nbrTriangles, p_indices);
+    glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indexOffset, sizeof(smTriangle)*p_indices.size(), p_indices.data());
 
-    //unmap the buffer
+    // Unmap the buffer
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
     return SIMMEDTK_VBO_OK;
 }
-smVBO::smVBO( smErrorLog *p_log )
-{
-    this->log = p_log;
-    renderingError = false;
-}
+
 void smVBO::init( smVBOType p_vboType )
 {
     smString error;
@@ -238,14 +244,15 @@ void smVBO::init( smVBOType p_vboType )
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 }
-smVBOResult smVBO::addVerticestoBuffer( int p_nbrVertices, int p_nbrTriangles, int p_objectId )
+
+smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_nbrTriangles, const size_t p_objectId )
 {
     if ( sizeof( smVec3f )*p_nbrVertices + sizeof( smVec3f )*p_nbrVertices + sizeof( smTexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
 
-    if ( sizeof( smInt )*p_nbrTriangles * 3 > sizeOfIndexBuffer - currentIndexOffset )
+    if ( sizeof( smInt )*p_nbrTriangles * 3 > size_t(sizeOfIndexBuffer - currentIndexOffset))
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
@@ -258,9 +265,4 @@ smVBOResult smVBO::addVerticestoBuffer( int p_nbrVertices, int p_nbrTriangles, i
     currentDataOffset += sizeof( smVec3f ) * p_nbrVertices + sizeof( smVec3f ) * p_nbrVertices + sizeof( smTexCoord ) * p_nbrVertices;
     currentIndexOffset += p_nbrTriangles * sizeof( smTriangle );
     return SIMMEDTK_VBO_OK;
-}
-smVBO::~smVBO()
-{
-    glDeleteBuffersARB( 1, &vboDataId );
-    glDeleteBuffersARB( 1, &vboIndexId );
 }

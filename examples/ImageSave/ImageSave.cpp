@@ -68,9 +68,10 @@ public:
         ///run the sdk
         simmedtkSDK->run();
     }
+    virtual ~ImageExample(){}
 };
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     ImageExample *img = new ImageExample();
     delete img;

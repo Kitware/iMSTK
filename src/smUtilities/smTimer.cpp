@@ -37,6 +37,6 @@ smLongDouble smTimer::elapsed()
     smLongDouble deltaSec;
     TimePointType now = ClockType::now();
     DurationType delta = now - begin;
-    deltaSec = (((smLongDouble)delta.count() * PeriodType::num) / PeriodType::den);
+    deltaSec = ((static_cast<smLongDouble>(delta.count()) * PeriodType::num) / PeriodType::den);
     return deltaSec;
 }

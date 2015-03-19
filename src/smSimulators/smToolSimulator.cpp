@@ -92,14 +92,14 @@ void smToolSimulator::run()
     {
         beginSim();
 
-        for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+        for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
         {
             sceneObj = this->objectsSimulated[i];
 
             //ensure that dummy simulator will work on static scene objects only.
             if ( sceneObj->getType() == SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT )
             {
-                tool = ( smStylusRigidSceneObject * )sceneObj;
+                tool = static_cast<smStylusRigidSceneObject *>(sceneObj);
 
                 if ( tool->toolEnabled )
                 {
@@ -116,13 +116,11 @@ void smToolSimulator::syncBuffers()
 }
 void smToolSimulator::handleEvent( smEvent *p_event )
 {
-
-    smKeyboardEventData *keyBoardData;
-
     switch ( p_event->eventType.eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+        {
+            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {
@@ -130,5 +128,6 @@ void smToolSimulator::handleEvent( smEvent *p_event )
             }
 
             break;
+        }
     }
 }

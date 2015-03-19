@@ -61,7 +61,11 @@ include(SimMedTKCheckDependencies)
 set(ep_install_dir ${CMAKE_BINARY_DIR}/SuperBuild/Install)
 set(ep_suffix "-cmake")
 set(ep_common_c_flags "${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS}")
-set(ep_common_cxx_flags "${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS}")
+set(ep_suppress_warnings_flags)
+if(NOT MSVC)
+  set(ep_suppress_warnings_flags "-Wno-old-style-cast -Wno-write-strings")
+endif()
+set(ep_common_cxx_flags "${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS} ${ep_suppress_warnings_flags}")
 
 #----------------------------------------------------------------------------
 # Compute -G arg for configuring external projects with the same CMake generator:
@@ -168,7 +172,7 @@ ExternalProject_Add(${proj}
     ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
     -DSimMedTK_SUPERBUILD:BOOL=OFF
-    -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
+#     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
 #     -DSimMedTK_INSTALL_BIN_DIR:STRING=${SimMedTK_INSTALL_BIN_DIR}
 #     -DSimMedTK_INSTALL_LIB_DIR:STRING=${SimMedTK_INSTALL_LIB_DIR}
 #     -DSimMedTK_INSTALL_INCLUDE_DIR:STRING=${SimMedTK_INSTALL_INCLUDE_DIR}

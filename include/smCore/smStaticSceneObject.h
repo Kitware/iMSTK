@@ -37,29 +37,23 @@ public:
     /// \brief static scene object contains a mesh
     smSurfaceMesh *mesh;
     /// \brief constructor receives the error log
-    smStaticSceneObject(smErrorLog *p_log = NULL) : smSceneObject()
-    {
-        type = SIMMEDTK_SMSTATICSCENEOBJECT;
-        mesh = new smSurfaceMesh(SMMESH_RIGID, p_log);
-    }
+    smStaticSceneObject(smErrorLog *p_log = NULL);
+    ~smStaticSceneObject();
+
+    //not implemented yet..tansel
+    virtual void serialize(void *p_memoryBlock);
+
+    //not implemented yet..tansel
+    virtual void unSerialize(void *p_memoryBlock);
 
     ///not implemented yet.
-    virtual smSceneObject*clone()
-    {
-        return this;
-    }
+    virtual smSceneObject *clone();
 
-    //not implemented yet..tansel
-    virtual void serialize(void *p_memoryBlock)
-    {
-    }
+    /// \brief Initialization routine
+    virtual void init();
 
-    //not implemented yet..tansel
-    virtual void unSerialize(void *p_memoryBlock)
-    {
-    }
     /// \brief called if the object is added to the viewer.
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 };
 
 #endif

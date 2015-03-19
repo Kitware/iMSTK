@@ -166,7 +166,7 @@ CollisionDetectionExample::~CollisionDetectionExample()
 }
 
 ///Draw collided triangles
-void CollisionDetectionExample::draw(smDrawParam p_params)
+void CollisionDetectionExample::draw(const smDrawParam &p_params)
 {
 
     smCollidedTriangles *tris;

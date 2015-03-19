@@ -81,7 +81,7 @@ public:
 
 public:
     /// \brief rendering the curved grasper
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
     /// \brief event handler
     void handleEvent(smEvent *p_event);
     /// \brief for open and close motion

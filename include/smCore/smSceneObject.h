@@ -56,9 +56,6 @@ class smSceneObject: public smCoreClass
     friend class smScene;
     friend class smObjectSimulator;
 
-private:
-protected:
-
 public:
     /// \brief custom renderer
     smCustomRenderer *customRender;
@@ -98,13 +95,11 @@ public:
     ///this function may not be used
     ///every Scene Object should know how to clone itself. Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    virtual smSceneObject*clone() = 0;
+    virtual smSceneObject *clone() = 0;
 
     //comment: make the this routine abstact so that enforce everybody to write their initiazaliton routines
     ///the initialization routuines belong to the objects should be called herein
-    virtual void init()
-    {
-    };
+    virtual void init() = 0;
 };
 
 #endif

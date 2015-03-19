@@ -198,6 +198,7 @@ protected:
     /// \brief called in the end of each frame
     virtual void endFrame();
     /// \brief draw routines
+    virtual void draw(const smDrawParam &){};
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();

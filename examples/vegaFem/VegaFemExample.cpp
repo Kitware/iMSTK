@@ -26,7 +26,6 @@
 /// \brief Create a scene with one fem object using vega library
 vegaFemExample::vegaFemExample()
 {
-
     //Create an instance of the SoFMIS framework/SDK
     sofmisSDK = smSDK::createSDK();
 

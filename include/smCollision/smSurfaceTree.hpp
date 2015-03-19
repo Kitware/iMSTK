@@ -107,7 +107,7 @@ smSurfaceTree<CellType>::smSurfaceTree(smSurfaceMesh *mesh, int maxLevels)
 
 /// \brief Initialize the drawing structures
 template<typename CellType>
-void smSurfaceTree<CellType>::initDraw(smDrawParam param)
+void smSurfaceTree<CellType>::initDraw(const smDrawParam &param)
 {
     smViewer *viewer;
     viewer = param.rendererObject;
@@ -116,7 +116,7 @@ void smSurfaceTree<CellType>::initDraw(smDrawParam param)
 
 /// \brief draw the surface tree
 template<typename CellType>
-void smSurfaceTree<CellType>::draw(smDrawParam params)
+void smSurfaceTree<CellType>::draw(const smDrawParam &params)
 {
     smVec3f center;
     float length;
@@ -165,7 +165,7 @@ void smSurfaceTree<CellType>::handleEvent(smEvent *event)
 
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
 
-        keyBoardData = (smKeyboardEventData*)event->data;
+        keyBoardData = reinterpret_cast<smKeyboardEventData*>(event->data);
 
         if (keyBoardData->keyBoardKey == smKey::Add)
         {

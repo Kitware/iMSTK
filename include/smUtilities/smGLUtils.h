@@ -37,12 +37,28 @@ struct smGroundRenderInfo;
 class smGLUtils : public smCoreClass
 {
 public:
+    // OpenGL 3.0 adds the concept of indexed strings and
+    // deprecates calls to glGetString( GL_EXTENSIONS ), which
+    // will now generate GL_INVALID_ENUM.
+    smGLUtils()
+    {
+        int numExt;
+        glGetIntegerv( GL_NUM_EXTENSIONS, &numExt );
+        for(int i = 0; i < numExt; ++i)
+        {
+            openGLExtensions.emplace_back(
+                reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS,i)));
+        }
+    }
+    ~smGLUtils();
+
+public:
     /// \brief checks the openGL error. if there is an error then it returns
     /// \brief the error text otherwise it returns NULL
     static bool queryGLError(smString& err);
 
     /// \brief  taken from glProgramming.com.  Checks the extension.
-    static smBool QueryExtension(const smString& extName);
+    smBool QueryExtension(const smString& extName);
 
     /// \brief  fade background draw with a size groundRenderInfo.scale
     static void fadeBackgroundDraw();
@@ -60,6 +76,9 @@ public:
     static void queryProjectionMatrix(smMatrix44f &p_matrix);
     /// \brief to query current model view matrix. p_matrix will have the final values.
     static void queryModelViewMatrix(smMatrix44f &p_matrix);
+
+private:
+    std::vector<std::string> openGLExtensions;
 };
 
 #endif

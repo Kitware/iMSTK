@@ -20,7 +20,7 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMIOSTREAM_H
 #define SMIOSTREAM_H
 
@@ -145,7 +145,7 @@ public:
     /// \brief remove text on window
     bool removeText(smString p_tag);
     /// \brief draw text on window
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 };
 /// \brief window console
 class smWindowConsole: public smOpenGLWindowStream, public smEventHandler
@@ -167,9 +167,9 @@ public:
     smString getLastEntry();
 
     /// \brief add text in the display
-    virtual smInt addText(smString p_tag, smString &p_string);
+    virtual smInt addText(const smString &p_tag, const smString &p_string);
     /// \brief  draw console
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
     /// \brief  handle events
     void handleEvent(smEvent *p_event);
 };

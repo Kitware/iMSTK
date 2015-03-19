@@ -43,7 +43,7 @@ smTextureReturnType smTextureManager::initGLTextures()
     smTexture *texture;
     smImageData data;
 
-    for (smInt i = 0; i < textures.size(); i++)
+    for (size_t i = 0; i < textures.size(); i++)
     {
         texture = textures[i];
 
@@ -447,19 +447,19 @@ void smTextureManager::duplicateTexture(const smString& p_textureReferenceName, 
 }
 
 /// \brief
-void smTextureManager::copyTexture(const smString& p_textureDestinationName, const smString& p_textureSourceName)
+void smTextureManager::copyTexture(const smString& /*p_textureDestinationName*/, const smString& /*p_textureSourceName*/)
 {
-
-    smInt textureDstId;
-    smTexture *dstTex;
-    smInt textureSrcId;
-    smTexture *srcTex;
-
-    textureDstId = textureIndexId[p_textureDestinationName];
-    dstTex = textures[textureDstId];
-
-    textureSrcId = textureIndexId[p_textureSourceName];
-    srcTex = textures[textureSrcId];
+// WARNING: This function does nothing
+//     smInt textureDstId;
+//     smTexture *dstTex;
+//     smInt textureSrcId;
+//     smTexture *srcTex;
+//
+//     textureDstId = textureIndexId[p_textureDestinationName];
+//     dstTex = textures[textureDstId];
+//
+//     textureSrcId = textureIndexId[p_textureSourceName];
+//     srcTex = textures[textureSrcId];
 }
 
 /// \brief

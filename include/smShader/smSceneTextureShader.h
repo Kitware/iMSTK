@@ -40,15 +40,16 @@ public:
     /// \brief previous  texture GL id that is sent to shader. It stores previous image RGB values rendered in previous rendering stage in multipass
     smGLInt  prevTex;
     /// \brief constructor that receives the vertex and fragment shader file names
-    smSceneTextureShader(smChar *p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
-                       smChar *p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
+    smSceneTextureShader(const smString &p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
+                       const smString &p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
     /// \brief called during  rendering initialization
-    void initDraw(smDrawParam p_param);
+    void initDraw(const smDrawParam &p_param);
     /// \brief if object is added to viewer, it is called from viewer. used for debuginng purposes. It is needed to see effect of instant code changes in shader code
-    void draw(smDrawParam p_param);
+    void draw(const smDrawParam &p_param);
 
     /// \brief pre drawing of the shader. used for binding the uniforms if there are.
     virtual void predraw(smMesh *p_mesh);
+    virtual void predraw(smSurfaceMesh */*mesh*/){};
     /// \brief handle the events
     virtual void handleEvent(smEvent *p_event);
 };

@@ -215,7 +215,7 @@ public:
     virtual smBool loadMesh(const smString& fileName, smMeshFileType fileType) = 0;
 
     /// \brief render the surface mesh
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 };
 
 /// \brief holds the texture co-ordinates
@@ -290,7 +290,7 @@ public:
     smBool isMeshTextured();
 
     /// \brief draw the mesh
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 };
 
 #endif

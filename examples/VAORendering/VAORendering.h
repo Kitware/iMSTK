@@ -70,7 +70,7 @@ public:
         }
     }
 
-    void VAORendering::draw(smDrawParam p_params);
+    void VAORendering::draw(const smDrawParam &p_params);
     ~VAORendering();
 };
 

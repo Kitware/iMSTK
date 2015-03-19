@@ -119,6 +119,7 @@ public:
 
     /// \brief framebuffer default constructor
     smFrameBuffer();
+    virtual ~smFrameBuffer();
     /// \brief set dimension of the renderbuffer
     void setDim(smInt p_width, smInt p_height);
     /// \brief get height of the framebuffer
@@ -142,7 +143,7 @@ public:
     /// \brief check status of the frame buffer. It returns ok if the frame buffer is complete
     smBool checkStatus();
     /// \brief draw framebuffer. it is for debug purposes.
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 };
 
 #endif

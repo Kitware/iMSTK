@@ -52,7 +52,7 @@ smPQPCollision::smPQPCollision( smErrorLog *p_errorLog, int maxColResult ) : smO
     onlySpecificMeshId.ID = -1;
     pipePQP = new smPipe( "col_PQP", sizeof( smPQPResult ), maxColResult );
 }
-void smPQPCollision::draw( smDrawParam p_params )
+void smPQPCollision::draw(const smDrawParam &p_params )
 {
 
     double matrixArray[16];
@@ -68,7 +68,7 @@ void smPQPCollision::draw( smDrawParam p_params )
 
     glPopMatrix();
 }
-void smPQPCollision::initDraw( smDrawParam p_param )
+void smPQPCollision::initDraw(const smDrawParam &p_param )
 {
 }
 void smPQPCollision::syncBuffers()

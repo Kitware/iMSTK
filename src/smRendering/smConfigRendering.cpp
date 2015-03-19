@@ -98,7 +98,7 @@ smColor &smColor::operator=( smColor &p_color )
 }
 GLfloat *smColor::toGLColor()
 {
-    return ( smGLFloat * )rgba;
+    return static_cast<GLfloat *>(rgba);
 }
 void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha )
 {

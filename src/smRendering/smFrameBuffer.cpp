@@ -99,7 +99,7 @@ void test()
     glPopAttrib();
 }
 
-void smFrameBuffer::draw(smDrawParam p_params)
+void smFrameBuffer::draw(const smDrawParam &/*p_params*/)
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);
@@ -140,6 +140,7 @@ GLenum smRenderBuffer::getGLAttachmentId()
     {
         return GL_COLOR_ATTACHMENT0_EXT + attachmentOrder;
     }
+    return GLenum(0);
 }
 int smRenderBuffer::getHeight()
 {
@@ -153,7 +154,7 @@ void smRenderBuffer::setAttachmentOrder( int p_attachmentOrder )
 {
     attachmentOrder = p_attachmentOrder;
 }
-int smRenderBuffer::getAttachmentOrder( int p_attachmentOrder )
+int smRenderBuffer::getAttachmentOrder( int /*p_attachmentOrder*/ )
 {
     return attachmentOrder;
 }
@@ -269,3 +270,4 @@ void smFrameBuffer::disable()
 {
     _fbo.Disable();
 }
+smFrameBuffer::~smFrameBuffer() {}

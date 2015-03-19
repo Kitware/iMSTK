@@ -152,15 +152,15 @@ void smPhysXVolumeMesh::updateSurfaceVertices()
 
 void smPhysXVolumeMesh::findNeighborTetrasOfNode()
 {
-    smInt i, j, k, n, tempIdx[1000];
+    smInt n, tempIdx[1000];
 
     this->neiTet = new smNeighborTetrasOfNode[this->nbrNodes];
 
-    for (i = 0 ; i < this->nbrNodes; i++)
+    for (smInt i = 0 ; i < this->nbrNodes; i++)
     {
         n = 0;
 
-        for (j = 0 ; j < this->nbrTetra; j++)
+        for (smInt j = 0 ; j < this->nbrTetra; j++)
         {
             if (i == this->tetra[j].vert[0] ||
                     i == this->tetra[j].vert[1] ||
@@ -175,14 +175,14 @@ void smPhysXVolumeMesh::findNeighborTetrasOfNode()
         this->neiTet[i].nbrNeiTet = n;
         this->neiTet[i].idx = new smInt[this->neiTet[i].nbrNeiTet];
 
-        for (j = 0; j < this->neiTet[i].nbrNeiTet; j++)
+        for (smInt j = 0; j < this->neiTet[i].nbrNeiTet; j++)
         {
             this->neiTet[i].idx[j] = tempIdx[j];
         }
     }
 }
 
-void smPhysXVolumeMesh::draw(smDrawParam p_params)
+void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
 {
 
     if (renderSurface)
@@ -230,10 +230,10 @@ void smPhysXVolumeMesh::draw(smDrawParam p_params)
                     smVec3f b = v2 - v0;
                     normal = a.cross(b);
                     normal.normalize();
-                    glNormal3fv((GLfloat*)&normal);
-                    glVertex3fv((GLfloat*) &v0);
-                    glVertex3fv((GLfloat*) &v1);
-                    glVertex3fv((GLfloat*) &v2);
+                    glNormal3fv(normal.data());
+                    glVertex3fv(v0.data());
+                    glVertex3fv(v1.data());
+                    glVertex3fv(v2.data());
                 }
             }
         }
@@ -267,7 +267,7 @@ void smPhysXVolumeMesh::createEdgeofTetras()
                 edge.vert[0] = swap;
             }
 
-            for (smInt m = 0; m < tetraEdges[edge.vert[0]].size(); m++)
+            for (size_t m = 0; m < tetraEdges[edge.vert[0]].size(); m++)
             {
                 existingEdge = tetraEdges[edge.vert[0]][m];
 

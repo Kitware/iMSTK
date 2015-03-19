@@ -108,7 +108,7 @@ public:
     void exec();
 
     /// \brief draw the phantom configuration for visualization
-    void draw(smDrawParam p_params);
+    void draw(const smDrawParam &p_params);
 
 };
 

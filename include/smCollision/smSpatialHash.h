@@ -189,10 +189,10 @@ public:
     void filterLine2TrisResults();
 
     /// \brief !!
-    void draw(smDrawParam param);
+    void draw(const smDrawParam &param);
 
     /// \brief initialize the drawing structures
-    void initDraw(smDrawParam param);
+    void initDraw(const smDrawParam &param);
 
     /// \brief !!
     virtual void beginSim();

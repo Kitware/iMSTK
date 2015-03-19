@@ -70,33 +70,33 @@ smCoreClass::smCoreClass() : name( "" )
 
 }
 
-smClassType smCoreClass::getType()
+smClassType smCoreClass::getType() const
 {
     return type;
 }
 
-void smCoreClass::initDraw( smDrawParam p_params )
+void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
 {
 }
-void smCoreClass::draw( smDrawParam p_params )
+void smCoreClass::draw( const smDrawParam &/*p_params*/ )
 {
 }
-void smCoreClass::initSimulate( smSimulationParam p_params )
+void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
 {
 }
-void smCoreClass::simulate( smSimulationParam p_params )
+void smCoreClass::simulate( const smSimulationParam &/*p_params*/ )
 {
 }
-void smCoreClass::print()
+void smCoreClass::print() const
 {
 }
 
-void smCoreClass::setName( std::string p_objectName )
+void smCoreClass::setName( const std::string &p_objectName )
 {
     name = p_objectName;
 }
 
-std::string smCoreClass::getName()
+std::string smCoreClass::getName() const
 {
     return name;
 }

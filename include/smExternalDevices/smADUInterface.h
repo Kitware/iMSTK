@@ -100,7 +100,7 @@ public:
     virtual void endFrame() {};
 
     /// \brief !!
-    void draw(smDrawParam p_params) {};
+    void draw(const smDrawParam &p_params) {};
 
     /// \brief
     void run();

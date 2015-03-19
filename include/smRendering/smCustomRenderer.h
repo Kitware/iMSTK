@@ -43,9 +43,10 @@ public:
     /// \briefthis function should be implemented based on objects
     //virtual void init();
     /// \brief draw pre, default and post draw routines
-    virtual void preDraw(smSceneObject* p_object);
-    virtual void draw(smSceneObject *p_object);
-    virtual void postDraw(smSceneObject* p_object);
+    virtual void preDraw(const smSceneObject &p_object);
+    virtual void draw(const smDrawParam &p_object);
+    virtual void draw(const smSceneObject &p_object);
+    virtual void postDraw(const smSceneObject &p_object);
 };
 
 /// \briefderive this class if you want to render a class in the viewer.
