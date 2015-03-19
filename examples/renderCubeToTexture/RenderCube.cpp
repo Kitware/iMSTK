@@ -125,20 +125,30 @@ void RenderCube::setupLights()
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;
     light->attn_quadratic = 0.0;
-    viewer.addLight(light);
+    scene1->addLight(light);
 }
 
 void RenderCube::setupCamera()
 {
-    viewer.camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    viewer.camera.setFarClipDist(1000);
-    viewer.camera.setNearClipDist(0.001);
-    viewer.camera.setViewAngle(0.785398f); //45 degrees
-    viewer.camera.setCameraPos(3, 3, 5);
-    viewer.camera.setCameraFocus(0, 0, -1);
-    viewer.camera.setCameraUpVec(0, 1, 0);
-    viewer.camera.genProjMat();
-    viewer.camera.genViewMat();
+    scene1->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    scene1->camera.setFarClipDist(1000);
+    scene1->camera.setNearClipDist(0.001);
+    scene1->camera.setViewAngle(0.785398f); //45 degrees
+    scene1->camera.setCameraPos(3, 3, 5);
+    scene1->camera.setCameraFocus(0, 0, -1);
+    scene1->camera.setCameraUpVec(0, 1, 0);
+    scene1->camera.genProjMat();
+    scene1->camera.genViewMat();
+
+    scene2->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    scene2->camera.setFarClipDist(1000);
+    scene2->camera.setNearClipDist(0.001);
+    scene2->camera.setViewAngle(0.785398f); //45 degrees
+    scene2->camera.setCameraPos(0, 0, 5);
+    scene2->camera.setCameraFocus(0, 0, -1);
+    scene2->camera.setCameraUpVec(0, 1, 0);
+    scene2->camera.genProjMat();
+    scene2->camera.genViewMat();
 }
 
 void RenderCube::handleEvent(smEvent *p_event)
@@ -157,54 +167,54 @@ void RenderCube::handleEvent(smEvent *p_event)
         }
         else if (key == smKey::W && kbData->pressed)
         {
-            smCamera cam = viewer.camera;
+            smCamera cam = scene1->camera;
             if (smModKey::shift == (kbData->modKeys & smModKey::shift))
             {
                 //Move the camera up
-                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y + 1, cam.pos.z);
-                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y + 1, cam.fp.z);
-                viewer.camera.genViewMat();
+                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y + 1, cam.pos.z);
+                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y + 1, cam.fp.z);
+                scene1->camera.genViewMat();
             }
             else
             {
                 //Move the camera forward
-                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z - 1);
-                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z - 1);
-                viewer.camera.genViewMat();
+                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z - 1);
+                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z - 1);
+                scene1->camera.genViewMat();
             }
         }
         else if (key == smKey::A && kbData->pressed)
         {
             //Move the camera to the left
-            smCamera cam = viewer.camera;
-            viewer.camera.setCameraPos(cam.pos.x - 1, cam.pos.y, cam.pos.z);
-            viewer.camera.setCameraFocus(cam.fp.x - 1, cam.fp.y, cam.fp.z);
-            viewer.camera.genViewMat();
+            smCamera cam = scene1->camera;
+            scene1->camera.setCameraPos(cam.pos.x - 1, cam.pos.y, cam.pos.z);
+            scene1->camera.setCameraFocus(cam.fp.x - 1, cam.fp.y, cam.fp.z);
+            scene1->camera.genViewMat();
         }
         else if (key == smKey::S && kbData->pressed)
         {
             //Move the camera backward
-            smCamera cam = viewer.camera;
+            smCamera cam = scene1->camera;
             if (smModKey::shift == (kbData->modKeys & smModKey::shift))
             {
-                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y - 1, cam.pos.z);
-                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y - 1, cam.fp.z);
-                viewer.camera.genViewMat();
+                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y - 1, cam.pos.z);
+                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y - 1, cam.fp.z);
+                scene1->camera.genViewMat();
             }
             else
             {
-                viewer.camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z + 1);
-                viewer.camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z + 1);
-                viewer.camera.genViewMat();
+                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z + 1);
+                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z + 1);
+                scene1->camera.genViewMat();
             }
         }
         else if (key == smKey::D && kbData->pressed)
         {
             //Move the camera to the right
-            smCamera cam = viewer.camera;
-            viewer.camera.setCameraPos(cam.pos.x + 1, cam.pos.y, cam.pos.z);
-            viewer.camera.setCameraFocus(cam.fp.x + 1, cam.fp.y, cam.fp.z);
-            viewer.camera.genViewMat();
+            smCamera cam = scene1->camera;
+            scene1->camera.setCameraPos(cam.pos.x + 1, cam.pos.y, cam.pos.z);
+            scene1->camera.setCameraFocus(cam.fp.x + 1, cam.fp.y, cam.fp.z);
+            scene1->camera.genViewMat();
         }
         break;
     }
