@@ -54,7 +54,7 @@ RenderCube::RenderCube()
     //Assign the previously loaded texture to the cube model
     cube.mesh->assignTexture("cubetex");
     //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube.renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube.mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(&cube);
@@ -71,7 +71,7 @@ RenderCube::RenderCube()
 
     square.mesh->loadMesh("models/square.obj", SM_FILETYPE_OBJ);
     square.mesh->assignTexture("colorTex1");
-    square.renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    square.mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the square to the scene
     scene2->addSceneObject(&square);
