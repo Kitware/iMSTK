@@ -13,8 +13,8 @@ smCamera::smCamera()
     nearClip = 0.1f;
     farClip = 100.0f;
 
-    pos = glm::vec3(0, 0, 5);
-    fp = glm::vec3(0, 0, 0);
+    pos = glm::vec3(0, 0, 0);
+    fp = glm::vec3(0, 0, -1);
     up = glm::vec3(0, 1, 0);
 }
 

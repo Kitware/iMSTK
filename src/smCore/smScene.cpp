@@ -34,6 +34,7 @@ smScene::smScene(smErrorLog *p_log) :
     referenceCounter = 0;
     test = 0;
     sceneUpdatedTimeStamp = 0;
+    lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
 }
 
 smInt smScene::getSceneId()
@@ -141,4 +142,134 @@ smScene &smScene::operator =(smScene &p_scene)
 
     copySceneObjects(&p_scene);
     return *this;
+}
+
+
+void smScene::initLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
+    // Create light components
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        glEnable(iter[i]->renderUsage);
+        glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
+        glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
+        glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
+        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, (smGLFloat)iter[i]->spotExp * SMLIGHT_SPOTMAX);
+        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, (smGLFloat)iter[i]->spotCutOffAngle);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+    }
+}
+
+smInt smScene::addLight(smLight *p_light)
+{
+    smInt index = lights->add(p_light);
+    lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
+    lights->getByRef(index)->activate(true);
+    return index;
+}
+
+smBool smScene::setLight(smInt p_lightId, smLight *p_light)
+{
+    smInt index = lights->replace(p_lightId, p_light);
+
+    if (index > 0)
+    {
+        lights->getByRef(p_lightId)->renderUsage = GL_LIGHT0 + p_lightId;
+        return true;
+    }
+    return false;
+}
+
+void smScene::refreshLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
+
+    for (smInt i = iter.begin(); i < iter.end(); iter++)
+    {
+        glEnable(iter[i]->renderUsage);
+        glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
+        glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
+        glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
+        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
+        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+    }
+}
+
+smBool smScene::updateLight(smInt p_lightId, smLight *p_light)
+{
+
+    p_light->updateDirection();
+    return lights->replace(p_lightId, p_light);
+}
+
+void smScene::setLightPos(smInt p_lightId, smLightPos p_pos)
+{
+
+    smLight *temp;
+    temp = lights->getByRef(p_lightId);
+    temp->lightPos = p_pos;
+    temp->updateDirection();
+}
+
+void smScene::setLightPos(smInt p_lightId,
+                           smLightPos p_pos,
+                           smVec3f p_direction)
+{
+
+    smLight *temp;
+    temp = lights->getByRef(p_lightId);
+    temp->lightPos = p_pos;
+    temp->direction = p_direction;
+    temp->updateDirection();
+}
+
+
+void smScene::enableLights()
+{
+
+    static smIndiceArrayIter<smLight*> iter(lights);
+    smFloat dir[4];
+    static smLightPos defaultPos(0, 0, 0);
+
+    glEnable(GL_LIGHTING);
+
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        if (iter[i]->isEnabled())
+        {
+            glEnable(iter[i]->renderUsage);
+        }
+        else
+        {
+            glDisable(iter[i]->renderUsage);
+        }
+
+        glLightf(iter[i]->renderUsage, GL_CONSTANT_ATTENUATION, iter[i]->attn_constant);
+        glLightf(iter[i]->renderUsage, GL_LINEAR_ATTENUATION, iter[i]->attn_linear);
+        glLightf(iter[i]->renderUsage, GL_QUADRATIC_ATTENUATION, iter[i]->attn_quadratic);
+
+        if (iter[i]->lightLocationType == SIMMEDTK_LIGHTPOS_EYE)
+        {
+            glMatrixMode(GL_MODELVIEW);
+            glPushMatrix();
+            glLoadIdentity();
+            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+            glPopMatrix();
+        }
+        else
+        {
+            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+        }
+
+        if (iter[i]->lightType == SIMMEDTK_LIGHT_SPOTLIGHT)
+        {
+            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        }
+
+        glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
+    }
 }
