@@ -563,15 +563,13 @@ void smGLRenderer::renderScene(smScene* p_scene,
     smScene::smSceneIterator sceneIter;
 
     assert(p_scene);
-    assert(p_param.projMatrix);
-    assert(p_param.viewMatrix);
 
     //Load View and Projection Matrices
     // -- with new rendering techniques, these would be passed to a shader
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(p_param.projMatrix);
+    glLoadMatrixf(p_scene->camera.getProjMatRef());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(p_param.viewMatrix);
+    glLoadMatrixf(p_scene->camera.getViewMatRef());
 
     sceneIter.setScene(p_scene, p_param.caller);
 

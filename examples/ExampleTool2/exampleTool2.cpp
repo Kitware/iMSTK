@@ -154,7 +154,7 @@ void main()
     viewer->list();
     viewer->setWindowTitle("SimMedTK TEST");
     viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_GLOBALAXIS |
-                                 SIMMEDTK_VIEWERRENDER_SOFTSHADOWS | SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS;
+                                 | SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS;
     viewer->viewerRenderDetail = viewer->viewerRenderDetail;
     viewer->camera()->setZClippingCoefficient(100);
     viewer->setEventDispatcher(simmedtkSDK->getEventDispatcher());
