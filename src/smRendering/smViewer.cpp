@@ -175,35 +175,18 @@ smViewer::smViewer()
 {
     type = SIMMEDTK_SMVIEWER;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
-    shadowMatrix.setIdentity();
-    shadowMatrix(0, 1) = 0;
-    shadowMatrix(1, 1) = 0.0;
-    shadowMatrix(2, 1) = 0;
-    shadowMatrix(3, 1) = 0;
 
     defaultAmbientColor.setValue(0.1, 0.1, 0.1, 1.0);
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
     this->log = NULL;
-    consoleDisplay = false;
-    lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
     windowOutput = new smOpenGLWindowStream();
-    lightDrawScale = 50;
-    enableCameraMotion = false;
 
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
-
-    offsetAngle_Direction = 0;
-    offsetAngle_UpDirection = 0;
-    offsetAngle_rightDirection = 0;
-
-    cameraRadius = 1.0;
-    prevState_collided = false;
-    checkCameraCollision = false;
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -211,71 +194,6 @@ void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 {
     this->screenResolutionHeight = p_height;
     this->screenResolutionWidth = p_width;
-}
-
-smInt smViewer::addLight(smLight *p_light)
-{
-    smInt index = lights->add(p_light);
-    lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
-    lights->getByRef(index)->activate(true);
-    return index;
-}
-
-smBool smViewer::setLight(smInt p_lightId, smLight *p_light)
-{
-    smInt index = lights->replace(p_lightId, p_light);
-
-    if (index > 0)
-    {
-        lights->getByRef(p_lightId)->renderUsage = GL_LIGHT0 + p_lightId;
-        return true;
-    }
-    return false;
-}
-
-void smViewer::refreshLights()
-{
-    smIndiceArrayIter<smLight*> iter(lights);
-
-    for (smInt i = iter.begin(); i < iter.end(); iter++)
-    {
-        glEnable(iter[i]->renderUsage);
-        glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
-        glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
-        glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
-        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
-        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
-    }
-}
-
-smBool smViewer::updateLight(smInt p_lightId, smLight *p_light)
-{
-
-    p_light->updateDirection();
-    return lights->replace(p_lightId, p_light);
-}
-
-void smViewer::setLightPos(smInt p_lightId, smLightPos p_pos)
-{
-
-    smLight *temp;
-    temp = lights->getByRef(p_lightId);
-    temp->lightPos = p_pos;
-    temp->updateDirection();
-}
-
-void smViewer::setLightPos(smInt p_lightId,
-                           smLightPos p_pos,
-                           smVec3f p_direction)
-{
-
-    smLight *temp;
-    temp = lights->getByRef(p_lightId);
-    temp->lightPos = p_pos;
-    temp->direction = p_direction;
-    temp->updateDirection();
 }
 
 void smViewer::setUnlimitedFPS(smBool p_enableFPS)
@@ -318,23 +236,6 @@ void smViewer::initGLCaps()
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
 }
 
-void smViewer::initLights()
-{
-    smIndiceArrayIter<smLight*> iter(lights);
-    // Create light components
-    for (smInt i = iter.begin(); i < iter.end(); i++)
-    {
-        glEnable(iter[i]->renderUsage);
-        glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
-        glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
-        glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
-        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
-        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
-    }
-}
-
 void smViewer::initObjects(smDrawParam p_param)
 {
     for (size_t i = 0; i < objectList.size(); i++)
@@ -352,42 +253,11 @@ void smViewer::initObjects(smDrawParam p_param)
 
 void smViewer::initResources(smDrawParam p_param)
 {
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
-    {
-        fbo = new smFrameBuffer();
-        fbo->setDim(2048, 2048);
-        smTextureManager::createDepthTexture("depth", 2048, 2048);
-        backfbo = new smFrameBuffer();
-        backfbo->setDim(1024, 1024);
-        smTextureManager::createColorTexture("backmap", 1024, 1024);
-        smTextureManager::createDepthTexture("backmapdepth", 1024, 1024);
-        backfbo->renderDepthBuff = true;
-        backfbo->renderColorBuff = true;
-    }
-
     smTextureManager::initGLTextures();
     smShader::initGLShaders(p_param);
     smVAO::initVAOs(p_param);
 
     initFboListItems();
-
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
-    {
-        fbo->setDim(2048, 2048);
-        fbo->attachDepthTexture(smTextureManager::getTexture("depth"));
-
-        std::cout << "Checking the status of framebuffer for shadow" << "\n";
-        fbo->checkStatus();
-
-        backfbo->setDim(1024, 1024);
-        backfbo->attachColorTexture(smTextureManager::getTexture("backmap"), 0);
-        backfbo->attachDepthTexture(smTextureManager::getTexture("backmapdepth"));
-        std::cout << "Checking the status of framebuffer for dualparaboloid backmap" << "\n";
-        backfbo->checkStatus();
-
-        smTextureManager::disableTexture("depth");
-        smTextureManager::disableTexture("backmap");
-    }
 }
 
 void smViewer::initScenes ( smDrawParam p_param )
@@ -399,8 +269,9 @@ void smViewer::initScenes ( smDrawParam p_param )
     for ( size_t i = 0; i < sceneList.size(); i++ )
     {
         scene = sceneList[i];
-        scene->registerForScene ( this );
-        sceneIter.setScene ( scene, this );
+        scene->registerForScene(this);
+        scene->initLights();
+        sceneIter.setScene(scene, this);
 
         for ( smInt j = sceneIter.start(); j < sceneIter.end(); j++ )
         {
@@ -415,13 +286,6 @@ void smViewer::initScenes ( smDrawParam p_param )
             sceneObject->initDraw ( p_param );
         }//object traverse
     }//scene traverse
-}
-
-void smViewer::initCamera()
-{
-    //Generate the Projection and View Matricies
-    camera.genProjMat();
-    camera.genViewMat();
 }
 
 void smViewer::initGLContext()
@@ -480,7 +344,6 @@ void smViewer::init()
 
     this->initGLContext();
     this->initGLCaps();
-    this->initLights();
     this->initObjects(param);
     this->initResources(param);
     this->initScenes(param);
@@ -493,334 +356,6 @@ void smViewer::destroyGLContext()
     //Shutdown glfw
     glfwDestroyWindow(window);
     glfwTerminate();
-}
-
-///draw the surface mesh triangles based on the rendering type
-///problem is here
-//void smViewer::drawSurfaceMeshTriangles(smSurfaceMesh *p_surfaceMesh,smRenderDetail *renderDetail)
-void smViewer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail)
-{
-
-    static smVec3f origin(0, 0, 0);
-    static smVec3f xAxis(1, 0, 0);
-    static smVec3f yAxis(0, 1, 0);
-    static smVec3f zAxis(0, 0, 1);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
-    {
-        return;
-    }
-
-    glDisable(GL_TEXTURE_2D);
-    glPointSize(renderDetail->pointSize);
-    glLineWidth(renderDetail->lineSize);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
-    {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, renderDetail->colorDiffuse.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->colorSpecular.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->colorAmbient.toGLColor());
-    }
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
-    {
-        if (p_surfaceMesh->isMeshTextured())
-        {
-            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
-            {
-                glActiveTexture(GL_TEXTURE0 + t);
-                smTextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
-            }
-        }
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP)
-    {
-        glEnableClientState(GL_COLOR_ARRAY);
-    }
-
-    glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
-    {
-        if (p_surfaceMesh->isMeshTextured())
-        {
-            glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
-        }
-    }
-
-    glNormalPointer(smGLRealType, 0, p_surfaceMesh->vertNormals);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_FACES)
-    {
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-    }
-
-    if ((renderDetail->renderType & (SIMMEDTK_RENDER_VERTICES)))
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        glDisable(GL_LIGHTING);
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        glEnable(GL_LIGHTING);
-        //default rendering
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_WIREFRAME || this->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_WIREFRAMEALL)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glPolygonOffset(3.0, 2.0);
-        glDisable(GL_LIGHTING);
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        glEnable(GL_LIGHTING);
-        //default rendering
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_LOCALAXIS)
-    {
-        glEnable(GL_LIGHTING);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_SHADOWS)
-    {
-        glMatrixMode(GL_MATRIX_MODE);
-        glPushMatrix();
-        glDisable(GL_LIGHTING);
-        glMultMatrixf(shadowMatrix.data());
-        glColor4fv(reinterpret_cast<smGLFloat*>(&renderDetail->shadowColor));
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        glEnable(GL_LIGHTING);
-        glPopMatrix();
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
-    {
-        glDisable(GL_LIGHTING);
-        glColor3fv(reinterpret_cast<smGLFloat*>(&renderDetail->highLightColor));
-        glDrawArrays(GL_POINTS, 0, p_surfaceMesh->nbrVertices);
-        glEnable(GL_LIGHTING);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
-    {
-        glDisable(GL_BLEND);
-    }
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
-    {
-        if (p_surfaceMesh->isMeshTextured())
-        {
-            glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
-            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
-            {
-                glActiveTexture(GL_TEXTURE0 + t);
-                smTextureManager::disableTexture(p_surfaceMesh->textureIds[t].textureId);
-            }
-        }
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP)
-    {
-        glDisableClientState(GL_COLOR_ARRAY);
-    }
-
-    glEnable(GL_LIGHTING);
-    glPointSize(1.0);
-    glLineWidth(1.0);
-}
-
-///vertex buffer implementation. It is not implemented yet. It will improve the performance drastically
-void smViewer::drawSurfaceMeshTrianglesVBO(smSurfaceMesh */*p_surfaceMesh*/, smRenderDetail *renderDetail, smInt /*p_objectId*/, smVBOType /*p_VBOType*/)
-{
-    static smVec3f origin(0, 0, 0);
-    static smVec3f xAxis(1, 0, 0);
-    static smVec3f yAxis(0, 1, 0);
-    static smVec3f zAxis(0, 0, 1);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
-    {
-        return;
-    }
-
-    glPointSize(renderDetail->pointSize);
-    glLineWidth(renderDetail->lineSize);
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
-    {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, reinterpret_cast<smGLFloat*>(&renderDetail->colorDiffuse));
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, reinterpret_cast<smGLFloat*>(&renderDetail->colorSpecular));
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, reinterpret_cast<smGLFloat*>(&renderDetail->colorAmbient));
-    }
-
-    if (renderDetail->renderType & SIMMEDTK_RENDER_FACES)
-    {
-        //placeholder
-    }
-
-    glEnable(GL_LIGHTING);
-    glPointSize(1.0);
-    glLineWidth(1.0);
-}
-
-void smViewer::drawSMDeformableObject(smPBDSurfaceSceneObject *p_smPhsyObject)
-{
-
-    if (p_smPhsyObject->renderDetail.renderType & SIMMEDTK_RENDER_VBO)
-    {
-        //placeholder
-    }
-    else
-    {
-        drawSurfaceMeshTriangles(p_smPhsyObject->mesh, &p_smPhsyObject->renderDetail);
-    }
-
-    drawNormals(p_smPhsyObject->mesh);
-}
-
-void smViewer::drawNormals(smMesh *p_mesh)
-{
-
-    glDisable(GL_LIGHTING);
-    glColor3fv(reinterpret_cast<smGLFloat*>(&smColor::colorBlue));
-    smVec3f baryCenter;
-    glBegin(GL_LINES);
-
-    for (smInt i = 0; i < p_mesh->nbrVertices; i++)
-    {
-        glVertex3fv(p_mesh->vertices[i].data());
-        smVec3f vector = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
-        glVertex3fv(vector.data());
-    }
-
-    for (smInt i = 0; i < p_mesh->nbrTriangles; i++)
-    {
-        baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
-        baryCenter = baryCenter / 3.0;
-        glVertex3fv(baryCenter.data());
-        smVec3f vector = baryCenter + p_mesh->triNormals[i] * 5;
-        glVertex3fv(vector.data());
-    }
-
-    glEnd();
-
-    glEnable(GL_LIGHTING);
-}
-
-///draw the static objects
-void smViewer::drawSMStaticObject(smStaticSceneObject *p_smPhsyObject)
-{
-
-    if (p_smPhsyObject->renderDetail.renderType & SIMMEDTK_RENDER_VBO)
-    {
-        //
-    }
-    else
-    {
-        drawSurfaceMeshTriangles(p_smPhsyObject->mesh, &p_smPhsyObject->renderDetail);
-    }
-}
-
-void smViewer::enableLights()
-{
-
-    static smIndiceArrayIter<smLight*> iter(lights);
-    smFloat dir[4];
-    static smLightPos defaultPos(0, 0, 0);
-
-    glEnable(GL_LIGHTING);
-
-    for (smInt i = iter.begin(); i < iter.end(); i++)
-    {
-        if (iter[i]->isEnabled())
-        {
-            glEnable(iter[i]->renderUsage);
-        }
-        else
-        {
-            glDisable(iter[i]->renderUsage);
-        }
-
-        glLightf(iter[i]->renderUsage, GL_CONSTANT_ATTENUATION, iter[i]->attn_constant);
-        glLightf(iter[i]->renderUsage, GL_LINEAR_ATTENUATION, iter[i]->attn_linear);
-        glLightf(iter[i]->renderUsage, GL_QUADRATIC_ATTENUATION, iter[i]->attn_quadratic);
-
-        if (iter[i]->lightLocationType == SIMMEDTK_LIGHTPOS_EYE)
-        {
-            glMatrixMode(GL_MODELVIEW);
-            glPushMatrix();
-            glLoadIdentity();
-            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
-            glPopMatrix();
-        }
-        else
-        {
-            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.pos.data());
-        }
-
-        if (iter[i]->lightType == SIMMEDTK_LIGHT_SPOTLIGHT)
-        {
-            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->lightPos.pos.data());
-        }
-
-        glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
-    }
-}
-
-void setTextureMatrix()
-{
-
-    static double modelView[16];
-    static double projection[16];
-
-    // This is matrix transform every coordinate x,y,z
-    // x = x* 0.5 + 0.5
-    // y = y* 0.5 + 0.5
-    // z = z* 0.5 + 0.5
-    // Moving from unit cube [-1,1] to [0,1]
-    const GLdouble bias[16] =
-    {
-        0.5, 0.0, 0.0, 0.0,
-        0.0, 0.5, 0.0, 0.0,
-        0.0, 0.0, 0.5, 0.0,
-        0.5, 0.5, 0.5, 1.0
-    };
-
-    // Grab modelview and transformation matrices
-    glGetDoublev(GL_MODELVIEW_MATRIX, modelView);
-    glGetDoublev(GL_PROJECTION_MATRIX, projection);
-    glActiveTextureARB(GL_TEXTURE7);
-    glMatrixMode(GL_TEXTURE);
-    glLoadIdentity();
-    glLoadMatrixd(bias);
-
-    // concatating all matrice into one.
-    glMultMatrixd(projection);
-    glMultMatrixd(modelView);
-
-    // Go back to normal matrix mode
-    glMatrixMode(GL_MODELVIEW);
 }
 
 void smViewer::renderTextureOnView()
@@ -956,7 +491,7 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
     glViewport(0, 0, p_rop.fbo->getWidth(), p_rop.fbo->getHeight());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     //Enable lights
-    enableLights();
+    p_rop.scene->enableLights();
     processViewerOptions();
     //Render Scene
      smGLRenderer::renderScene(p_rop.scene, p_param);
@@ -970,7 +505,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     glViewport(0, 0, this->width(), this->height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     //Enable lights
-    enableLights();
+    p_rop.scene->enableLights();
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene, p_param);
@@ -997,67 +532,6 @@ void smViewer::registerScene(smScene *p_scene,
     p_scene->registerForScene(this);
     renderOperations.push_back(rop);
 }
-
-void smViewer::drawWithShadows(smDrawParam &p_param)
-{
-    smLight *light = NULL;
-
-    for (smInt i = 0; i < lights->size(); i++)
-    {
-        light = lights->getByRef(i);
-
-        if (light->castShadow)
-        {
-            break;
-        }
-    }
-
-    renderStage = SMRENDERSTAGE_SHADOWPASS;
-
-    glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
-    glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
-    glLoadIdentity();
-    gluPerspective(light->shadorAngle, light->shadowRatio, light->shadowNearView, light->shadowFarView);
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-
-    light->upVector[0] = camera.up.x;
-    light->upVector[1] = camera.up.y;
-    light->upVector[2] = camera.up.z;
-    light->direction[0] = camera.fp.x;
-    light->direction[1] = camera.fp.y;
-    light->direction[2] = camera.fp.z;
-    light->updateDirection();
-    gluLookAt(light->lightPos.pos[0], light->lightPos.pos[1], light->lightPos.pos[2],
-              camera.fp.x, camera.fp.y, camera.fp.z,
-              camera.up.x, camera.up.y, camera.up.z);
-    gluLookAt(camera.pos.x, camera.pos.y, camera.pos.z,
-              0.0, 0.0, 0.0,
-              camera.up.x, camera.up.y, camera.up.z);
-
-    fbo->enable();
-    smTextureManager::activateTexture("depth");
-    glPushAttrib(GL_VIEWPORT_BIT | GL_ENABLE_BIT); // for GL_DRAW_BUFFER and GL_READ_BUFFER
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glClearColor(0, 0, 0, 1);
-    glDepthRange(0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glViewport(0, 0, fbo->getWidth(), fbo->getHeight());
-    renderSceneList(p_param);
-    glPopAttrib();
-    fbo->disable();
-    setTextureMatrix();
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glPopAttrib();
-}
-
 
 inline void smViewer::setToDefaults()
 {
@@ -1090,99 +564,6 @@ inline void smViewer::adjustFPS()
     }
 }
 
-smBool  smViewer::checkCameraCollisionWithScene()
-{
-
-    static bool collided = false;
-    static bool prev_collided = false;
-    static smVec3f  lastCollidedHatpicPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
-    static smVec3f  proxy_hapticPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
-    static float radiusEffective = 0;
-    static smVec3f  last_collisionNormal;
-    static smVec3f prevPosition(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
-    static smFloat radiusMotion = 0;
-
-    smVec3f collisionNormal(0, 0, 0);
-    collided = false;
-    radiusEffective = 0;
-    smVec3f hPos(deviceCameraPos[0], deviceCameraPos[1], deviceCameraPos[2]);
-    radiusMotion = (hPos - prevPosition).norm();
-    prevPosition = hPos;
-
-    for (size_t i = 0; i < collisionMeshes.size(); i++)
-    {
-        float distance;
-        smMesh*mesh = collisionMeshes[i];
-        int nbrVert = mesh->nbrVertices;
-
-        for (int j = 0; j < nbrVert; j++)
-        {
-            distance = (mesh->vertices[j]-hPos).norm();
-
-            if (prev_collided)
-            {
-                smVec3f  posVector = hPos - lastCollidedHatpicPos;
-                float distance = posVector.norm();
-                posVector.normalize();
-
-                if (posVector.dot(last_collisionNormal) < 0)
-                {
-                    if ((distance - cameraRadius) > 0)
-                    {
-                        radiusEffective = distance - cameraRadius;
-                    }
-
-                    if (radiusEffective < 0)
-                    {
-                        radiusEffective = 0;
-                    }
-
-                    collided = true;
-                    break;
-                }
-            }
-            else
-            {
-                radiusEffective = 0;
-            }
-
-            if (distance < cameraRadius + radiusEffective + radiusMotion)
-            {
-                collisionNormal = collisionNormal + mesh->vertNormals[j];
-
-                if (!prev_collided)
-                {
-                    lastCollidedHatpicPos = hPos;
-                    last_collisionNormal = collisionNormal;
-                }
-
-                collided = true;
-                prev_collided = true;
-            }
-        }
-    }
-
-    if (collided)
-    {
-        proxy_hapticPos = lastCollidedHatpicPos;
-        last_collisionNormal.normalize();
-    }
-    else
-    {
-        proxy_hapticPos = hPos;
-        prev_collided = false;
-    }
-
-    return collided;
-}
-
-void smViewer::addCollisionCheckMeshes(smMesh *p_mesh)
-{
-
-    collisionMeshes.push_back(p_mesh);
-}
-
-
 ///main drawing routine for Rendering of all objects in the scene
 void smViewer::draw()
 {
@@ -1202,25 +583,14 @@ void smViewer::draw()
 
     adjustFPS();
 
-    param.projMatrix = camera.getProjMatRef();
-    param.viewMatrix = camera.getViewMatRef();
-
     for (size_t i = 0; i < objectList.size(); i++)
     {
         objectList[i]->draw(param);
     }
 
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_SOFTSHADOWS)
+    for (int i = 0; i < renderOperations.size(); i++)
     {
-        drawWithShadows(param);
-    }
-    else
-    {
-        //renderSceneList(param);
-        for (size_t i = 0; i < renderOperations.size(); i++)
-        {
-            processRenderOperation(renderOperations[i], param);
-        }
+        processRenderOperation(renderOperations[i], param);
     }
 
     for (size_t i = 0; i < objectList.size(); i++)
@@ -1252,38 +622,6 @@ void smViewer::addObject(smCoreClass *object)
 
 void smViewer::handleEvent ( smEvent *p_event )
 {
-    smLight *light;
-    smVec3d lightDir;
-    smVec3d lightUp;
-    smVec3d transverseDir;
-
-    switch ( p_event->eventType.eventTypeCode )
-    {
-        case SIMMEDTK_EVENTTYPE_CAMERA_UPDATE:
-        {
-            smCameraEventData *cameraData =
-                reinterpret_cast<smCameraEventData *>(p_event->data);
-            deviceCameraPos = cameraData->pos;
-            deviceCameraDir = cameraData->direction;
-            deviceCameraUpDir = cameraData->upDirection;
-            break;
-        }
-        case SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE:
-        {
-            smLightMotionEventData *lightPosData =
-                reinterpret_cast<smLightMotionEventData*>(p_event->data);
-
-            if ( lights->size() < lightPosData->lightIndex )
-            {
-                light = lights->getByRef ( lightPosData->lightIndex );
-                light->lightPos.pos = lightPosData->pos;
-                light->direction = lightPosData->direction;
-            }
-            break;
-        }
-        default:
-            break;
-    }
 }
 
 void smViewer::addText(smString p_tag)

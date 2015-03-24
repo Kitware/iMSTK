@@ -177,7 +177,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
     smBool shaderEnabled = false;
     smVAO *vao;
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_VAO)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO)
     {
         if (renderDetail->VAOs.size() < 1)
         {
@@ -224,19 +224,19 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
     glPointSize(renderDetail->pointSize);
     glLineWidth(renderDetail->lineSize);
 
-    if (p_surfaceMesh->vertTangents != NULL && shaderEnabled && p_surfaceMesh->tangentChannel && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->vertTangents != NULL && shaderEnabled && p_surfaceMesh->tangentChannel && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glVertexAttribPointerARB(shader->tangentAttrib, 3, GL_FLOAT, GL_FALSE, 0, p_surfaceMesh->vertTangents);
         glEnableVertexAttribArrayARB(shader->tangentAttrib);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail->colorDiffuse.toGLColor());
         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->colorSpecular.toGLColor());
@@ -244,17 +244,17 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->shininess);
     }
 
-    if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->isMeshTextured())
         {
-            if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+            if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
             {
                 glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             }
@@ -274,17 +274,17 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         if (p_surfaceMesh->isMeshTextured())
         {
@@ -292,14 +292,14 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glNormalPointer(smGLRealType, 0, p_surfaceMesh->vertNormals);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_FACES)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_FACES)
     {
-        if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
@@ -309,12 +309,12 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if ((renderDetail->renderType & (SIMMEDTK_RENDER_VERTICES)))
+    if ((p_surfaceMesh->renderDetail.renderType & (SIMMEDTK_RENDER_VERTICES)))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
 
-        if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
@@ -324,7 +324,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_WIREFRAME)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_WIREFRAME)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glLineWidth(renderDetail->lineSize + 0.5);
@@ -333,7 +333,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glDisable(GL_TEXTURE_2D);
         glColor4fv(renderDetail->wireFrameColor.toGLColor());
 
-        if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
@@ -345,12 +345,12 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_LOCALAXIS)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_LOCALAXIS)
     {
         glEnable(GL_LIGHTING);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glDisable(GL_LIGHTING);
         glColor3fv(reinterpret_cast<smGLReal*>(&renderDetail->highLightColor));
@@ -358,18 +358,18 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glEnable(GL_LIGHTING);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glDisable(GL_BLEND);
     }
 
-    if (!(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->isMeshTextured())
         {
@@ -383,7 +383,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP && !(renderDetail->renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
     {
         glDisableClientState(GL_COLOR_ARRAY);
     }
@@ -559,15 +559,13 @@ void smGLRenderer::renderScene(smScene* p_scene,
     smScene::smSceneIterator sceneIter;
 
     assert(p_scene);
-    assert(p_param.projMatrix);
-    assert(p_param.viewMatrix);
 
     //Load View and Projection Matrices
     // -- with new rendering techniques, these would be passed to a shader
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(p_param.projMatrix);
+    glLoadMatrixf(p_scene->camera.getProjMatRef());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(p_param.viewMatrix);
+    glLoadMatrixf(p_scene->camera.getViewMatRef());
 
     sceneIter.setScene(p_scene, p_param.caller);
 

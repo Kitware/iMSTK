@@ -42,8 +42,6 @@ struct smDrawParam
 {
     smViewer    *rendererObject;
     smCoreClass *caller;
-    smGLFloat *viewMatrix; ///< Pointer to an array detailing a 4x4 OpenGL view matrix
-    smGLFloat *projMatrix; ///< Pointer to an array detailing a 4x4 OpenGL projection matrix
     void *data;
 };
 

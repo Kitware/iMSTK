@@ -63,11 +63,11 @@ bool smUnifiedID::operator!=( int &p_ID )
     return ( ID != p_ID );
 }
 
-smCoreClass::smCoreClass() : name( "" )
+smCoreClass::smCoreClass() :
+    name("")
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId.generateUniqueID();
-
 }
 
 smClassType smCoreClass::getType() const
