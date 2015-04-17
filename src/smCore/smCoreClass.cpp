@@ -70,6 +70,12 @@ smCoreClass::smCoreClass() :
     uniqueId.generateUniqueID();
 }
 
+smCoreClass::smCoreClass(const std::string &_name) : name(_name)
+{
+    drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
+    uniqueId.generateUniqueID();
+}
+
 smClassType smCoreClass::getType() const
 {
     return type;

@@ -25,11 +25,12 @@
 #define SM_SPATIALHASH_H
 
 // STD includes
-#include <map>
+#include <memory>
 
 // SimMedTK includes
-#include "smCore/smObjectSimulator.h"
+#include "smCollision/smCollisionDetection.h"
 #include "smUtilities/smDataStructures.h"
+#include "smUtilities/smMakeUnique.h"
 
 class smCellLine;
 class smCellModel;
@@ -54,130 +55,49 @@ enum smCollisionSetting
     SIMMEDTK_COLISIONSETTING_MODEL2MODEL
 };
 
-#define SIMMEDTK_COLLISIONOUTPUTBUF_SIZE 1000
-#define HASH_P1 73856093
-#define HASH_P2 19349663
-#define HASH_P3 83492791
-
-unsigned int HASH(unsigned int SIZE, unsigned int x, unsigned int y, unsigned int z);
-
 /// \brief spatial hash
-class smSpatialHash: public smObjectSimulator
+class smSpatialHash: public smCollisionDetection
 {
-
-protected:
-    float cellSizeX; ///< cell size in x-direction
-    float cellSizeY; ///< cell size in y-direction
-    float cellSizeZ; ///< cell size in z-direction
-
-    //These structures below are Triangle2Triangle collisions
-
-    /// \brief Cells for triangles. It stores candidate triangles
-    smHash<smCellTriangle> cells;
-
-    /// \brief structure that stores the meshes in the scene
-    std::vector<smMesh *> meshes;
-
-    /// \brief After the collision is cimpleted the result is written in here
-    smCollidedTriangles *collidedPrims;
-
-    /// \brief Number of collisions that triangles are stored.
-    int nbrTriCollisions;
-
-    /// \brief Line mesh structure that is added to collision detection engine
-    std::vector<smLineMesh *> lineMeshes;
-
-    /// \brief Lines that stored in the scene.
-    smHash<smCellLine> cellLines;
-
-    /// \brief candidate triangles in the scene.
-    smHash<smCellTriangle> cellsForTri2Line;
-
-    /// \brief candidate cells for collision model
-    smHash<smCellModel> cellsForModel;
-
-    /// \brief candidate for Collision model to point
-    smHash<smCellPoint> cellsForModelPoints;
-
-    /// \brief The result is stored here.
-    smCollidedLineTris *collidedLineTris;
-
-    /// \brief The number of collisions that for line to triangle.
-    int nbrLineTriCollisions;
-
-    /// \brief smHash<smCollisionGroup> collisionGroups;
-
-    /// \brief the collision results are here
-    smCollidedModelPoints *collidedModelPoints;
-
-    /// \brief the number of collisions for model to point
-    int nbrModelPointCollisions;
-
-    /// \brief For maximum collision output.
-    int maxPrims;
-
-    std::map<int, int> filteredList;
-
-    /// \brief adds triangle to hash
-    void addTriangle(smMesh *mesh, int triangleId, smHash<smCellTriangle> &cells);
-
-    /// \brief adds line to hash
-    void addLine(smLineMesh *mesh, int edgeId, smHash<smCellLine> &cells);
-
-    /// \brief adds point to hash
-    void addPoint(smMesh *mesh, int vertId, smHash<smCellPoint> cells);
-
-    /// \brief adds octree cell to hash
-    void addOctreeCell(smSurfaceTree<smOctreeCell> *colModel, smHash<smCellModel> cells);
-
-    /// \brief !!
-    void reset();
-
-    std::vector<smSurfaceTree<smOctreeCell>*> colModel;
+public:
+    using SurfaceTreeType = smSurfaceTree<smOctreeCell>;
 
 public:
-    bool enableDuplicateFilter; ///< !!
-    smPipe *pipe; ///< !!
-    smPipe *pipeTriangles; ///< !!
-    smPipe *pipeModelPoints; ///< !!
 
     /// \brief !!
-    void  findCandidatePoints(smMesh *mesh, smSurfaceTree<smOctreeCell> *colModel);
-
-    /// \brief !!
-    void computeCollisionModel2Points();
+    smSpatialHash(smInt hashTableSize,
+                  smFloat cellSizeX,
+                  smFloat cellSizeY,
+                  smFloat cellSizeZ);
 
     /// \brief destructor clear some memory
     ~smSpatialHash();
 
     /// \brief !!
-    void addCollisionModel(smSurfaceTree<smOctreeCell> *CollMode);
+    void addCollisionModel(std::shared_ptr<SurfaceTreeType> CollModel);
 
     /// \brief !!
-    void addMesh(smMesh *mesh);
+    void addMesh(std::shared_ptr<smMesh> mesh);
 
     /// \brief !!
-    void addMesh(smLineMesh *mesh);
+    void addMesh(std::shared_ptr<smLineMesh> mesh);
 
     /// \brief !!
-    void removeMesh(smMesh *mesh);
+    void removeMesh(std::shared_ptr<smMesh> mesh);
 
     /// \brief !!
-    smSpatialHash(smErrorLog *errorLog,
-                  int hashTableSize,
-                  float cellSizeX,
-                  float cellSizeY,
-                  float cellSizeZ,
-                  int outOutputPrimSize = SIMMEDTK_COLLISIONOUTPUTBUF_SIZE);
+    smBool findCandidates(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+    {
+//         meshA.intersect(meshB);
+    }
 
     /// \brief !!
-    void draw();
+    smBool findCandidatePoints(std::shared_ptr<smMesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
-    bool findCandidateTris(smMesh *mesh, smMesh  *mesh2);
+    smBool  findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB);
 
     /// \brief find the candidate line-triangle pairs for collision (broad phase collision)
-    bool findCandidateTrisLines(smMesh *mesh, smLineMesh *mesh2);
+    smBool  findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -186,32 +106,75 @@ public:
     void computeCollisionLine2Tri();
 
     /// \brief !!
-    void filterLine2TrisResults();
-
-    /// \brief !!
-    void draw(const smDrawParam &param);
-
-    /// \brief initialize the drawing structures
-    void initDraw(const smDrawParam &param);
-
-    /// \brief !!
-    virtual void beginSim();
-
-    /// \brief !!
-    virtual void initCustom();
+    void computeCollisionModel2Points();
 
     /// \brief !! compute the hash
-    void computeHash(smMesh *mesh, int *tris, int nbrTris);
+    void computeHash(std::shared_ptr<smMesh> mesh, const std::vector<smInt> &tris);
+
+protected:
+    /// \brief adds triangle to hash
+    void addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<smCellTriangle> &cells);
+
+    /// \brief adds line to hash
+    void addLine(std::shared_ptr<smLineMesh> mesh, int edgeId, smHash<smCellLine> &cells);
+
+    /// \brief adds point to hash
+    void addPoint(std::shared_ptr<smMesh> mesh, int vertId, smHash<smCellPoint> &cells);
+
+    /// \brief adds octree cell to hash
+    void addOctreeCell(std::shared_ptr<SurfaceTreeType> colModel, smHash<smCellModel> &cells);
 
     /// \brief !!
-    virtual void run();
+    void reset();
 
-    /// \brief !!
-    void endSim();
+private:
+    void doComputeCollision(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+    {
+        findCandidates(meshA,meshB);
+        computeCollisionLine2Tri();
+        computeCollisionModel2Points();
+        computeCollisionTri2Tri();
+    }
 
-    /// \brief !! synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers();
+private:
+    smFloat cellSizeX; ///< cell spacing in x-direction
+    smFloat cellSizeY; ///< cell spacing in y-direction
+    smFloat cellSizeZ; ///< cell spacing in z-direction
 
+    // Candidate triangles
+    smHash<smCellTriangle> cells;
+
+    // Lines that stored in the scene.
+    smHash<smCellLine> cellLines;
+
+    // Candidate triangles in the scene.
+    smHash<smCellTriangle> cellsForTri2Line;
+
+    // Candidate cells for collision model
+    smHash<smCellModel> cellsForModel;
+
+    // Candidate for Collision model to point
+    smHash<smCellPoint> cellsForModelPoints;
+
+    // Mesh models
+    std::vector<std::shared_ptr<smMesh>> meshes;
+
+    // Line mehs models
+    std::vector<std::shared_ptr<smLineMesh>> lineMeshes;
+
+    // List of collision pairs triangles
+    std::vector<std::shared_ptr<smCollidedTriangles>> collidedPrims;
+
+    // List of collision pairs triangles-lines
+    std::vector<std::shared_ptr<smCollidedLineTris>> collidedLineTris;
+
+    // List of collision pairs models-points
+    std::vector<std::shared_ptr<smCollidedModelPoints>> collidedModelPoints;
+
+    std::vector<std::shared_ptr<SurfaceTreeType>> colModel;
+
+    struct HashFunction;
+    std::unique_ptr<HashFunction> hasher;
 };
 
 #endif

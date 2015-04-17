@@ -24,12 +24,31 @@
 #ifndef SMCOLLSIONDETECTION_H
 #define SMCOLLSIONDETECTION_H
 
-#include "smCore/smModule.h"
+// STL includes
+#include <memory>
 
-/// \brief !!
-class smCollisionDetection: public smModule
+// SimMedTK includes
+#include "smCore/smCoreClass.h"
+
+class smMesh;
+
+/// \brief Base class to calculate contact information between two meshes
+/// It determines if two meshes are in close proximity and calculates contacts
+/// if they are.
+class smCollisionDetection: public smCoreClass
 {
+public:
+    smCollisionDetection() {}
 
+    virtual ~smCollisionDetection() {}
+
+    void computeCollision(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+    {
+        this->doComputeCollision(meshA,meshB);
+    }
+
+private:
+    virtual void doComputeCollision(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB) = 0;
 };
 
 #endif

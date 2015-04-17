@@ -117,6 +117,9 @@ public:
     /// \brief constructor
     smCoreClass();
 
+    /// \brief constructor
+    smCoreClass(const std::string &);
+
     /// \brief get type of the class
     smClassType getType() const ;
 

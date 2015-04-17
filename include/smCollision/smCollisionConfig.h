@@ -29,10 +29,14 @@
 #include "smUtilities/smVector.h"
 #include "smCore/smCoreClass.h"
 
+struct GeometryRepresentation {};
+
 /// \brief Contains information related to the triangles that are present in a cell
 /// at any given point
-struct smCellTriangle
+struct smCellTriangle : public GeometryRepresentation
 {
+    smCellTriangle() : primID(0) {}
+    smCellTriangle(const smUInt &id) : primID(id) {}
     smUInt primID;
     smUnifiedID meshID;
     smVec3f vert[3];
@@ -46,8 +50,10 @@ struct smCellTriangle
 
 /// \brief Contains information related to the a line segments that are present in a cell
 /// at any given point
-struct smCellLine
+struct smCellLine : public GeometryRepresentation
 {
+    smCellLine() : primID(0) {}
+    smCellLine(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Edge id
     smUnifiedID meshID; ///< smMeshLine id
     smVec3f vert[2]; ///< Vertices
@@ -59,8 +65,10 @@ struct smCellLine
 };
 
 /// \brief !!
-struct smCellModel
+struct smCellModel : public GeometryRepresentation
 {
+    smCellModel() : primID(0) {}
+    smCellModel(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Model Prim id
     smUnifiedID meshID; ///< smMeshLine id
     smVec3f center; ///< Vertices
@@ -76,8 +84,10 @@ struct smCellModel
 
 /// \brief Contains information related to the a verticess that are present in a cell
 /// at any given point
-struct smCellPoint
+struct smCellPoint : public GeometryRepresentation
 {
+    smCellPoint() : primID(0) {}
+    smCellPoint(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Model Prim id
     smUnifiedID meshID; ///< smMeshLine id
     smVec3f vert; ///< Vertices
@@ -88,6 +98,7 @@ struct smCellPoint
 
     friend std::ostream &operator<<(std::ostream &out, smCellPoint &p);
 };
+
 
 /// \brief Contains triangle pair that have collided
 struct smCollidedTriangles

@@ -20,27 +20,15 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+#ifndef SMMAKESHARE_H
+#define SMMAKESHARE_H
 
-#include <bandit/bandit.h>
+#include <memory>
 
-#include "smCollision/smSpatialHash.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smDoubleBuffer.h"
-#include "smUtilities/smMakeUnique.h"
+template<typename T, typename... Ts>
+std::unique_ptr<T> make_unique(Ts&&... params)
+{
+    return std::unique_ptr<T>(new T(std::forward<Ts>(params)...));
+}
 
-using namespace bandit;
-
-go_bandit([](){
-    describe("the spatial hash collision detector", []() {
-        it("initializes properly ", []() {
-
-            std::unique_ptr<smSpatialHash> spatialHash(make_unique<smSpatialHash>(10,1.0,1.0,1.0));
-
-//             AssertThat( spatialHash->pipe->getElements(), Equals( 1 ) );
-//             AssertThat( spatialHash->pipeTriangles->getElements(), Equals( 1 ) );
-//             AssertThat( spatialHash->pipeModelPoints->getElements(), Equals( 1 ) );
-        });
-    });
-
-});
-
+#endif // SMMAKESHARE_H
