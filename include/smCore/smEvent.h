@@ -24,6 +24,9 @@
 #ifndef SMEVENT_H
 #define SMEVENT_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smCore/smEventData.h"
 
@@ -64,7 +67,7 @@ public:
     smEventType();
     smEventType(smInt p_eventType);
     smEventType & operator=(smInt p_eventTypeCode);
-    smBool operator ==(smEventType &p_event);
+    smBool operator ==(const smEventType &p_event);
     smBool operator ==(smInt p_eventTypeCode);
 };
 
@@ -90,26 +93,49 @@ class smEvent
 {
 
 public:
-    /// \brief  points to the data
-    void *data;
-    /// \brief priority of event
-    smEventPriority priority;
-    /// \brief  event type
-    smEventType eventType;
-    /// \brief  sender type
-    smSenderType senderType;
-    /// \brief  sender id
-    smInt senderId;
     /// \brief constrcutor
     smEvent();
     /// \brief  destructor
     ~smEvent();
 
-private:
-    /// \brief  message ID
-    smInt messageId;
-    friend smEventDispatcher;
+    std::shared_ptr<smEventData> getEventData()
+    {
+        return data;
+    }
 
+    void setEventData(std::shared_ptr<smEventData> eventData)
+    {
+        data = eventData;
+    }
+
+    smEventType &getEventType()
+    {
+        return eventType;
+    }
+
+    void setEventType(const smEventType &type)
+    {
+        eventType = type;
+    }
+
+    void setSenderType(const smSenderType &type)
+    {
+        senderType = type;
+    }
+
+    void setSenderId(const smInt &id)
+    {
+        senderId = id;
+    }
+
+private:
+    std::shared_ptr<smEventData> data; // points to the data
+    smInt messageId; // message ID
+    smEventPriority priority; // priority of event
+    smEventType eventType; // priority of event
+    smSenderType senderType; // sender type
+    smInt senderId; // sender id
+    friend smEventDispatcher;
 };
 /// \brief stream event
 class smStreamEvent: public smEvent

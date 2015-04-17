@@ -23,8 +23,9 @@
 
 // SimMedTK includes
 #include "smSimulators/smDummySimulator.h"
+#include "smCore/smStaticSceneObject.h"
 
-smDummySimulator::smDummySimulator( smErrorLog *p_errorLog ) : smObjectSimulator( p_errorLog )
+smDummySimulator::smDummySimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
 }
 void smDummySimulator::beginSim()
@@ -33,50 +34,45 @@ void smDummySimulator::beginSim()
 }
 void smDummySimulator::initCustom()
 {
-    smClassType type;
-    smSceneObject *object;
-    smStaticSceneObject *staticObject;
-    smVec3f *newVertices;
-
     //do nothing for now
-    for ( smInt i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
     {
-        object = objectsSimulated[i];
-        type = object->getType();
+        auto object = objectsSimulated[i];
 
-        switch ( type )
+        switch ( object->getType() )
         {
             case SIMMEDTK_SMSTATICSCENEOBJECT:
-                staticObject = ( smStaticSceneObject * )object;
-                object->localVerts.reserve( staticObject->mesh->nbrVertices );
-                object->localVerts = staticObject->mesh->vertices;
-                object->flags.isSimulatorInit = true;
+            {
+                auto staticObject = std::static_pointer_cast<smStaticSceneObject>(object);
+                object->getLocalVertices().reserve( staticObject->mesh->nbrVertices );
+                // WARNING:  Copy!!?
+                object->getLocalVertices() = staticObject->mesh->vertices;
+                object->getFlags().isSimulatorInit = true;
                 break;
+            }
+            default:
+                std::cerr << "Unknown scene object type." << std::endl;
+
         }
     }
 }
 void smDummySimulator::run()
 {
-    smSceneObject *sceneObj;
-    smStaticSceneObject *staticSceneObject;
-    smVec3f *vertices;
-    smMesh *mesh;
-
     beginSim();
 
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
-        sceneObj = this->objectsSimulated[i];
+        auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
         {
-            staticSceneObject = ( smStaticSceneObject * )sceneObj;
-            mesh = staticSceneObject->mesh;
+            auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
+            auto mesh = staticSceneObject->mesh;
 
             for ( smInt vertIndex = 0; vertIndex < staticSceneObject->mesh->nbrVertices; vertIndex++ )
             {
-                staticSceneObject->localVerts[vertIndex].y = staticSceneObject->localVerts[vertIndex].y + 0.000001;
+                staticSceneObject->getLocalVertices()[vertIndex][1] = staticSceneObject->getLocalVertices()[vertIndex][1] + 0.000001;
             }
         }
     }
@@ -89,31 +85,26 @@ void smDummySimulator::endSim()
 }
 void smDummySimulator::syncBuffers()
 {
-    smSceneObject *sceneObj;
-    smStaticSceneObject *staticSceneObject;
-    smMesh *mesh;
-
-    for ( smInt i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
-        sceneObj = this->objectsSimulated[i];
+        auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
         {
-            staticSceneObject = ( smStaticSceneObject * )sceneObj;
-            mesh = staticSceneObject->mesh;
-            mesh->vertices = staticSceneObject->localVerts;
+            auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
+            auto mesh = staticSceneObject->mesh;
+            // WARNING: Copy??!
+            mesh->vertices = staticSceneObject->getLocalVertices();
         }
     }
 }
-void smDummySimulator::handleEvent( smEvent *p_event )
+void smDummySimulator::handleEvent( std::shared_ptr<smEvent> p_event )
 {
-    smKeyboardEventData *keyBoardData;
-
-    switch ( p_event->eventType.eventTypeCode )
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = ( smKeyboardEventData * )p_event->data;
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {

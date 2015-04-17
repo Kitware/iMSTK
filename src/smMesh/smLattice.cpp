@@ -185,7 +185,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
                 cells[index].lastPrimitiveIndex++;
             }
 }
-void smLattice::updateBounds( smSurfaceMesh *p_mesh, int p_index )
+void smLattice::updateBounds( std::shared_ptr<smSurfaceMesh> p_mesh, int p_index )
 {
 
     //min

@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
+#include <Eigen/Geometry>
 
 // namespace SimMedTK
 // {

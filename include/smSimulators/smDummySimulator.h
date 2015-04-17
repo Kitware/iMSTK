@@ -32,12 +32,13 @@
 #include "smCore/smEventData.h"
 
 /// \brief Example simulator. This dummy simulator works on static scene objects for now.
-class smDummySimulator: public smObjectSimulator, public smEventHandler
+class smDummySimulator: public smObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smDummySimulator(smErrorLog *p_errorLog);
+    smDummySimulator(std::shared_ptr<smErrorLog> p_errorLog);
+    virtual ~smDummySimulator(){}
 
 protected:
     virtual void beginSim();
@@ -55,7 +56,7 @@ protected:
     void syncBuffers();
 
     /// \brief catch events such as key presses and other user inputs
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smEvent> p_event);
 };
 
 #endif

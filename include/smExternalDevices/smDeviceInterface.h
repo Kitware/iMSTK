@@ -36,7 +36,7 @@ const int   SIMMEDTK_MSG_SUCCESS =  0;
 
 /// \brief Abstract base interface class with virtual functions.
 /// Device specific implementation should be done by instantiating this class
-class smDeviceInterface: public smModule, smEventHandler
+class smDeviceInterface: public smModule
 {
 
 public:

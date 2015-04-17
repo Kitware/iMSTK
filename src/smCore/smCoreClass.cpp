@@ -36,7 +36,7 @@ void smUnifiedID::generateUniqueID()
     ID = IDcounter.fetch_add( 1 );
 }
 
-int smUnifiedID::getSDKID() const
+const smShort &smUnifiedID::getSdkId() const
 {
     return sdkID;
 }
@@ -76,9 +76,14 @@ smCoreClass::smCoreClass(const std::string &_name) : name(_name)
     uniqueId.generateUniqueID();
 }
 
-smClassType smCoreClass::getType() const
+const smClassType &smCoreClass::getType() const
 {
     return type;
+}
+
+void smCoreClass::setType(const smClassType& newType)
+{
+    this->type = newType;
 }
 
 void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
@@ -102,7 +107,7 @@ void smCoreClass::setName( const std::string &p_objectName )
     name = p_objectName;
 }
 
-std::string smCoreClass::getName() const
+const std::string &smCoreClass::getName() const
 {
     return name;
 }

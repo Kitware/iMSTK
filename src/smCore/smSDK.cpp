@@ -29,8 +29,9 @@
 #include <string>
 
 /// \brief SDK is singlenton class
-smSDK smSDK::sdk;
-smErrorLog * smSDK::errorLog;
+// std::unique_ptr<smErrorLog> smSDK::errorLog;
+std::shared_ptr<smSDK> smSDK::sdk;
+std::once_flag smSDK::sdkCallOnceFlag;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
 smIndiceArray<smModuleHolder> *smSDK::modulesRef;
@@ -38,32 +39,31 @@ smIndiceArray<smObjectSimulatorHolder>  *smSDK::objectSimulatorsRef;
 smIndiceArray<smObjectSimulatorHolder>*smSDK::collisionDetectorsRef;
 smIndiceArray<smSceneHolder>*smSDK::scenesRef;
 smIndiceArray<smSceneObjectHolder>*smSDK::sceneObjectsRef;
-smIndiceArray<smMotionTransformer *> *smSDK::motionTransRef;
+smIndiceArray<smMotionTransformer*> *smSDK::motionTransRef;
 smIndiceArray<smPipeHolder> *smSDK::pipesRef;
 
+
 /// \brief creates the scene of the simulator
-smScene *smSDK::createScene()
+std::shared_ptr<smScene> smSDK::createScene()
 {
-    smScene*scene;
-    scene = new smScene(errorLog);
+    auto scene = std::make_shared<smScene>(errorLog);
     registerScene(scene);
     scene->setName("Scene" + std::to_string(scene->uniqueId.ID));
     return scene;
 }
 
-void smSDK::releaseScene(smScene* scene)
+void smSDK::releaseScene(std::shared_ptr<smScene> scene)
 {
-    assert(scene);
     unRegisterScene(scene);
-    delete scene;
+    scene.reset();
 }
 
 smSDK::~smSDK()
 {
-
+    std::cout << "Killing SDK" << std::endl;
 }
 
-void smSDK::addViewer(smViewer* p_viewer)
+void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
 {
     assert(p_viewer);
 
@@ -77,18 +77,17 @@ void smSDK::addViewer(smViewer* p_viewer)
 /// \brief Returns a pointer to the viewer object
 ///
 /// \return Returns a pointer to the viewer object
-smViewer *smSDK::getViewerInstance()
+std::shared_ptr<smViewer> smSDK::getViewerInstance()
 {
     return this->viewer;
 }
 
 /// \brief
-smSimulator* smSDK::createSimulator()
+std::shared_ptr<smSimulator> smSDK::createSimulator()
 {
-
-    if (this->simulator == NULL)
+    if (this->simulator == nullptr)
     {
-        simulator = new smSimulator(errorLog);
+        simulator = std::make_shared<smSimulator>(errorLog);
         simulator->dispathcer = dispathcer;
 
         for (smInt j = 0; j < (*scenesRef).size(); j++)
@@ -152,11 +151,6 @@ void smSDK::run()
     updateSceneListAll();
     initRegisteredModules();
 
-    if (simulator != NULL)
-    {
-        simulator->exec();
-    }
-
     runRegisteredModules();
     while (!shutdown) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -170,13 +164,49 @@ void smSDK::run()
 }
 
 /// \brief
-void smSDK::addRef(smCoreClass* p_coreClass)
+void smSDK::addRef(std::shared_ptr<smCoreClass> p_coreClass)
 {
-    p_coreClass->referenceCounter++;
+    ++*p_coreClass;
 }
 
 /// \brief
-void smSDK::removeRef(smCoreClass* p_coreClass)
+void smSDK::removeRef(std::shared_ptr<smCoreClass> p_coreClass)
 {
-    p_coreClass->referenceCounter--;
+    --*p_coreClass;
+}
+
+std::shared_ptr<smSDK> smSDK::createSDK()
+{
+    std::call_once(sdkCallOnceFlag,
+                   []
+                    {
+                        sdk.reset(new smSDK);
+                    });
+    return sdk;
+}
+
+std::shared_ptr<smSDK> smSDK::getInstance()
+{
+    return smSDK::createSDK();
+}
+void smSDK::terminateAll()
+{
+
+    for(smInt i = 0; i < (*modulesRef).size(); i++)
+    {
+        (*modulesRef)[i].module->terminateExecution = true;
+    }
+
+    for(smInt i = 0; i < (*modulesRef).size(); i++)
+    {
+        smBool moduleTerminated = false;
+
+        while(true && !moduleTerminated)
+        {
+            if((*modulesRef)[i].module->isTerminationDone())
+            {
+                moduleTerminated = true;
+            }
+        }
+    }
 }

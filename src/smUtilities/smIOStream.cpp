@@ -189,7 +189,7 @@ smWindowConsole::smWindowConsole(smInt p_totalTexts)
 {
     init(p_totalTexts);
     backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-    smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
+    smSDK::getInstance()->getEventDispatcher()->registerEventHandler(safeDownCast<smEventHandler>(), SIMMEDTK_EVENTTYPE_KEYBOARD);
     left = 0.0;
     bottom = 0.0;
     right = 1.0;
@@ -227,7 +227,7 @@ void smWindowConsole::draw(const smDrawParam &/*p_params*/)
 {
     //All previous code was for drawing on-screen text
 }
-void smWindowConsole::handleEvent(smEvent* /*p_event*/)
+void smWindowConsole::handleEvent(std::shared_ptr<smEvent> /*p_event*/)
 {
     //All previous code use interpreting keyboard events for on-screen text
 }

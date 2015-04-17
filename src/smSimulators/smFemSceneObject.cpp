@@ -355,7 +355,7 @@ smFloat smFemSceneObject::V(smInt xyz, smInt xyz123, smInt tet)
 }
 
 ///brief: compute the displacement using reanalysis technique
-void smFemSceneObject::calculateDisplacements_QStatic(smVec3f *vertices)
+void smFemSceneObject::calculateDisplacements_QStatic(smStdVector3f &vertices)
 {
     smInt i;
     smInt dofNumber = ID(pulledNode, 0);
@@ -411,7 +411,7 @@ void smFemSceneObject::calculateDisplacements_QStatic(smVec3f *vertices)
 }
 
 ///brief:: calculates the displacements dy explicit dynamics using Central difference scheme
-void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
+void smFemSceneObject::calculateDisplacements_Dynamic(smStdVector3f &vertices)
 {
     smInt i;
     pulledNode = 62; //to test//324
@@ -452,13 +452,13 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
     }
 }
 
-
 void smFemSceneObject::draw(const smDrawParam &p_params)
 {
 //     p_params.caller = this;
     this->v_mesh->draw(p_params);
 }
-smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
+
+smFemSceneObject::smFemSceneObject( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMFEMSCENEOBJECT;
     v_mesh = new smVolumeMesh( SMMESH_DEFORMABLE, p_log );
@@ -472,9 +472,9 @@ smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
     }
 }
 
-smSceneObject *smFemSceneObject::clone()
+std::shared_ptr<smSceneObject> smFemSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
 
 void smFemSceneObject::serialize( void */*p_memoryBlock*/ )
@@ -485,5 +485,3 @@ void smFemSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
-
-// void smFemSceneObject::init() {}

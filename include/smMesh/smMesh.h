@@ -75,19 +75,7 @@ struct smTextureAttachment
 /// \brief base class for the mesh
 class smBaseMesh: public smCoreClass
 {
-
 public:
-    smCollisionGroup collisionGroup; ///< !!
-    smGLInt renderingID; ///< !!
-    smErrorLog *log; ///< record the log
-    std::vector<smVec3f> vertices; ///< vertices co-ordinate data at time t
-    std::vector<smVec3f> origVerts; ///< vertices co-ordinate data at time t=0
-    smInt  nbrVertices; ///< number of vertices
-    smAABB aabb; ///< Axis aligned bounding box
-    smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
-    smTexCoord *texCoord; ///< texture co-ordinates
-    std::vector<smTextureAttachment> textureIds; ///< !!
-
     /// \brief constructor
     smBaseMesh();
 
@@ -102,38 +90,24 @@ public:
 
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
+
+public:
+    smCollisionGroup collisionGroup; ///< !!
+    smGLInt renderingID; ///< !!
+    std::shared_ptr<smErrorLog> log; ///< record the log
+    smStdVector3f vertices; ///< vertices co-ordinate data at time t
+    smStdVector3f origVerts; ///< vertices co-ordinate data at time t=0
+    smInt  nbrVertices; ///< number of vertices
+    smAABB aabb; ///< Axis aligned bounding box
+    smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
+    smTexCoord *texCoord; ///< texture co-ordinates
+    std::vector<smTextureAttachment> textureIds; ///< !!
 };
 
 /// \brief: this is a generic Mesh class from which surface and volume meshes are inherited
 /// Note: this class cannot exist on its own
 class smMesh: public smBaseMesh
 {
-
-protected:
-
-public:
-    smInt  nbrTriangles; ///< number of triangles
-    smTriangle *triangles; ///< list of triangles
-    smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
-    int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
-    smVec3f *triNormals; ///< triangle normals
-    smVec3f *vertNormals; ///< vertex normals
-    smVec3f *triTangents; ///< triangle tangents
-    smVec3f *vertTangents; ///< vertex tangents
-    smBool tangentChannel; ///< !!
-    std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
-    std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
-    std::vector<smEdge> edges; ///< list of edges
-
-
-    ///AABBB of the mesh.
-    ///This value is allocated and computed by only collision detection module
-    ///Therefore it is initially NULL
-    smAABB *triAABBs;
-
-    smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
-    smMeshFileType meshFileType; ///< type of input mesh
-
 public:
     /// \brief constructor
     smMesh();
@@ -212,10 +186,32 @@ public:
     };
 
     /// \brief load the mesh
-    virtual smBool loadMesh(const smString& fileName, smMeshFileType fileType) = 0;
+    virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
 
     /// \brief render the surface mesh
     virtual void draw(const smDrawParam &p_params);
+
+public:
+    smInt  nbrTriangles; ///< number of triangles
+    smTriangle *triangles; ///< list of triangles
+    smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
+    int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
+    smVec3f *triNormals; ///< triangle normals
+    smVec3f *vertNormals; ///< vertex normals
+    smVec3f *triTangents; ///< triangle tangents
+    smVec3f *vertTangents; ///< vertex tangents
+    smBool tangentChannel; ///< !!
+    std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
+    std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
+    std::vector<smEdge> edges; ///< list of edges
+
+    ///AABBB of the mesh.
+    ///This value is allocated and computed by only collision detection module
+    ///Therefore it is initially NULL
+    smAABB *triAABBs;
+
+    smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
+    smMeshFileType meshFileType; ///< type of input mesh
 };
 
 /// \brief holds the texture co-ordinates
@@ -245,12 +241,7 @@ struct smEdge
 /// \brief !!
 class smLineMesh: public smBaseMesh
 {
-
 public:
-    smAABB *edgeAABBs;///< AABBs for the edges in the mesh
-    smEdge *edges;///< edges of the line mesh
-    smInt nbrEdges;///< number of edges of the line mesh
-
     /// \brief destructor
     ~smLineMesh()
     {
@@ -291,6 +282,12 @@ public:
 
     /// \brief draw the mesh
     void draw(const smDrawParam &p_params);
+
+public:
+    smAABB *edgeAABBs;///< AABBs for the edges in the mesh
+    smEdge *edges;///< edges of the line mesh
+    smInt nbrEdges;///< number of edges of the line mesh
+
 };
 
 #endif

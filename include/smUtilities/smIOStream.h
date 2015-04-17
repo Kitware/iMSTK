@@ -42,7 +42,7 @@
 #define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
 /// \brief I/O stream
-class smIOStream: public smCoreClass
+class smIOStream : public smEventHandler
 {
 public:
     virtual smIOStream& operator >>(smString &p_string) = 0;
@@ -66,10 +66,6 @@ public:
 struct smWindowString
 {
 public:
-    /// \brief string
-    smString string;
-    /// \brief position of string x,y
-    smFloat x, y;
     /// \brief  constructors
     smWindowString();
 
@@ -80,6 +76,12 @@ public:
     smWindowString &operator<<(smString p_string);
 
     void operator =(smWindowString &p_windowString);
+
+public:
+    /// \brief string
+    smString string;
+    /// \brief position of string x,y
+    smFloat x, y;
 };
 
 struct smWindowData
@@ -98,6 +100,39 @@ public:
 /// \brief opengl window stream for putting text on the screen
 class smOpenGLWindowStream: public smWindowStream
 {
+public:
+    void init(smInt p_totalTexts);
+
+    /// \brief enable/disable texts on display
+    smBool enabled;
+
+    /// \brief  text color
+    smColor textColor;
+
+    /// \brief constructors
+    smOpenGLWindowStream(smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
+
+    /// \brief add text on window
+    virtual smInt addText(const smString &p_tag, const smString &p_string);
+
+    /// \brief add text on window
+    bool addText(smString p_tag, smWindowString &p_string);
+
+    /// \brief update the text with specificed tag(p_tag)
+    bool updateText(smString p_tag, smString p_string);
+
+    /// \brief add text on window with specified text handle
+    bool updateText(smInt p_textHandle, smString p_string);
+
+    /// \brief remove text on window
+    bool removeText(smString p_tag);
+
+    /// \brief draw text on window
+    virtual void draw(const smDrawParam &p_params);
+
+    /// \brief  handle events
+    virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/) {}
+
 protected:
     /// \brief  fonts
     //QFont font;
@@ -112,54 +147,10 @@ protected:
     smInt initialTextPositionX;
     smInt lastTextPosition;
     /// \brief initialization routines
-    void init(smInt p_totalTexts);
-
-public:
-    /// \brief enable/disable texts on display
-    smBool enabled;
-    /// \brief  text color
-    smColor textColor;
-
-    /// \brief constructors
-    smOpenGLWindowStream(smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
-
-    /*smOpenGLWindowStream(QFont p_font, smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW)
-    {
-        font = p_font;
-        init(p_totalTexts);
-    }*/
-
-    /*smOpenGLWindowStream(smInt p_fontSize, smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW)
-    {
-        font.setPointSize(p_fontSize);
-        init(p_totalTexts);
-    }*/
-    /// \brief add text on window
-    virtual smInt addText(const smString &p_tag, const smString &p_string);
-    /// \brief add text on window
-    bool addText(smString p_tag, smWindowString &p_string);
-    /// \brief update the text with specificed tag(p_tag)
-    bool updateText(smString p_tag, smString p_string);
-    /// \brief add text on window with specified text handle
-    bool updateText(smInt p_textHandle, smString p_string);
-    /// \brief remove text on window
-    bool removeText(smString p_tag);
-    /// \brief draw text on window
-    virtual void draw(const smDrawParam &p_params);
 };
 /// \brief window console
-class smWindowConsole: public smOpenGLWindowStream, public smEventHandler
+class smWindowConsole: public smOpenGLWindowStream
 {
-protected:
-    /// \brief entered string on the console
-    smString enteredString;
-    /// \brief window console position min, max points on the display
-    smFloat left;
-    smFloat bottom;
-    smFloat right;
-    smFloat top;
-    /// \brief background color
-    smColor backGroundColor;
 public:
     /// \brief window console constructor
     smWindowConsole(smInt p_totalTexts = 5);
@@ -171,7 +162,18 @@ public:
     /// \brief  draw console
     virtual void draw(const smDrawParam &p_params);
     /// \brief  handle events
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smEvent> p_event);
+
+protected:
+    /// \brief entered string on the console
+    smString enteredString;
+    /// \brief window console position min, max points on the display
+    smFloat left;
+    smFloat bottom;
+    smFloat right;
+    smFloat top;
+    /// \brief background color
+    smColor backGroundColor;
 };
 
 #endif

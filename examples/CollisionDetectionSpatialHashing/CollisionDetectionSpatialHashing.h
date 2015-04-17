@@ -20,10 +20,14 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+#ifndef COLLISIONDETECTIONSPATIALHASHING_H
+#define COLLISIONDETECTIONSPATIALHASHING_H
 
-#ifndef COLLISIONDETECTIONEXAMPLEWITHHASH_H
-#define COLLISIONDETECTIONEXAMPLEWITHHASH_H
+// STL includes
+#include <memory>
 
+// SimMedTK includes
+#include "smCore/smSDK.h"
 #include "smCore/smConfig.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smCoreClass.h"
@@ -32,25 +36,31 @@
 #include "smCore/smSceneObject.h"
 #include "smSimulators/smDummySimulator.h"
 #include "smCollision/smSpatialHash.h"
+#include "smRendering/smViewer.h"
 
-class CollisionDetectionExampleWithHash: public smSimulationMain, public smCoreClass
+class CollisionDetectionSpatialHashing: public smSimulationMain
 {
 
 public:
-    smStaticSceneObject  *object1;
-    smStaticSceneObject  *object2;
-    smSDK* simmedtkSDK;
-    smScene *scene1;
-    smDummySimulator *dummySim;
-    smViewer *viewer;
-    smSimulator *simulator;
-    smSpatialHash *hash;
-    smPipeRegisteration myCollInformation;
+    CollisionDetectionSpatialHashing();
+    ~CollisionDetectionSpatialHashing(){}
 
-    CollisionDetectionExampleWithHash();
-    virtual void draw(const smDrawParam &p_params);
-    virtual void simulateMain(smSimulationMainParam p_param);
-    ~CollisionDetectionExampleWithHash();
+    void draw (const smDrawParam &p_params);
+    void simulateMain (const smSimulationMainParam &p_param);
+    void run();
+    void handleEvent(std::shared_ptr<smEvent> p_event);
+
+public:
+    std::shared_ptr<smSDK>                  sdk;
+    std::shared_ptr<smStaticSceneObject>    modelA;
+    std::shared_ptr<smStaticSceneObject>    modelB;
+    std::shared_ptr<smScene>                scene;
+    std::shared_ptr<smViewer>               viewer;
+    std::shared_ptr<smDummySimulator>       defaultSimulator;
+    std::shared_ptr<smSimulator>            simulator;
+    std::shared_ptr<smSpatialHash>          spatialHashing;
+    smInt moveObj;
 };
 
-#endif
+#endif // COLLISIONDETECTIONSPATIALHASHING_H
+

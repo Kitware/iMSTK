@@ -33,19 +33,22 @@ class smSurfaceMesh: public smMesh
 
 public:
     /// \brief push smMesh class specific errors here
-    smErrorLog *log_SF;
+    std::shared_ptr<smErrorLog> log_SF;
 
     /// \brief constructor
-    smSurfaceMesh(smMeshType meshtype, smErrorLog *log);
+    smSurfaceMesh();
+
+    /// \brief constructor
+    smSurfaceMesh(const smMeshType &meshtype, std::shared_ptr<smErrorLog> log);
 
     /// \brief destructor
     virtual ~smSurfaceMesh();
 
     /// \brief load the surface mesh
-    smBool loadMesh(const smString& fileName, smMeshFileType fileType);
+    smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
 
     /// \brief load the surface mesh using in-house code
-    smBool loadMeshLegacy(const smString& fileName, smMeshFileType fileType);
+    smBool loadMeshLegacy(const smString& fileName, const smMeshFileType &fileType);
 
     /// \brief load the surface mesh from 3ds format
     smBool Load3dsMesh(const smString& fileName);

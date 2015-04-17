@@ -42,7 +42,6 @@ class smCollidedTriangles;
 class smLineMesh;
 class smMesh;
 class smOctreeCell;
-class smPipe;
 
 template<typename CellType>
 class smSurfaceTree;
@@ -85,10 +84,7 @@ public:
     void removeMesh(std::shared_ptr<smMesh> mesh);
 
     /// \brief !!
-    smBool findCandidates(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
-    {
-//         meshA.intersect(meshB);
-    }
+    smBool findCandidates(/*std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB*/);
 
     /// \brief !!
     smBool findCandidatePoints(std::shared_ptr<smMesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
@@ -111,6 +107,10 @@ public:
     /// \brief !! compute the hash
     void computeHash(std::shared_ptr<smMesh> mesh, const std::vector<smInt> &tris);
 
+    const std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles() const;
+
+    std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles();
+
 protected:
     /// \brief adds triangle to hash
     void addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<smCellTriangle> &cells);
@@ -127,13 +127,17 @@ protected:
     /// \brief !!
     void reset();
 
+    void updateBVH();
+
 private:
-    void doComputeCollision(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+    void doComputeCollision(std::shared_ptr<smCollisionPair> pairs)
     {
-        findCandidates(meshA,meshB);
+        reset();
+        updateBVH();
+        findCandidates();
+        computeCollisionTri2Tri();
         computeCollisionLine2Tri();
         computeCollisionModel2Points();
-        computeCollisionTri2Tri();
     }
 
 private:
@@ -141,38 +145,17 @@ private:
     smFloat cellSizeY; ///< cell spacing in y-direction
     smFloat cellSizeZ; ///< cell spacing in z-direction
 
-    // Candidate triangles
-    smHash<smCellTriangle> cells;
-
-    // Lines that stored in the scene.
-    smHash<smCellLine> cellLines;
-
-    // Candidate triangles in the scene.
-    smHash<smCellTriangle> cellsForTri2Line;
-
-    // Candidate cells for collision model
-    smHash<smCellModel> cellsForModel;
-
-    // Candidate for Collision model to point
-    smHash<smCellPoint> cellsForModelPoints;
-
-    // Mesh models
-    std::vector<std::shared_ptr<smMesh>> meshes;
-
-    // Line mehs models
-    std::vector<std::shared_ptr<smLineMesh>> lineMeshes;
-
-    // List of collision pairs triangles
-    std::vector<std::shared_ptr<smCollidedTriangles>> collidedPrims;
-
-    // List of collision pairs triangles-lines
-    std::vector<std::shared_ptr<smCollidedLineTris>> collidedLineTris;
-
-    // List of collision pairs models-points
-    std::vector<std::shared_ptr<smCollidedModelPoints>> collidedModelPoints;
-
+    smHash<smCellTriangle> cells; // Candidate triangles
+    smHash<smCellLine> cellLines; // Lines that stored in the scene.
+    smHash<smCellTriangle> cellsForTri2Line;  // Candidate triangles in the scene.
+    smHash<smCellModel> cellsForModel; // Candidate cells for collision model
+    smHash<smCellPoint> cellsForModelPoints; // Candidate for Collision model to point
+    std::vector<std::shared_ptr<smMesh>> meshes; // Mesh models
+    std::vector<std::shared_ptr<smLineMesh>> lineMeshes; // Line mehs models
+    std::vector<std::shared_ptr<smCollidedTriangles>> collidedTriangles; // List of collision pairs triangles
+    std::vector<std::shared_ptr<smCollidedLineTris>> collidedLineTris; // List of collision pairs triangles-lines
+    std::vector<std::shared_ptr<smCollidedModelPoints>> collidedModelPoints; // List of collision pairs models-points
     std::vector<std::shared_ptr<SurfaceTreeType>> colModel;
-
     struct HashFunction;
     std::unique_ptr<HashFunction> hasher;
 };

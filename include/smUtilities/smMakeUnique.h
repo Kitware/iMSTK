@@ -20,8 +20,8 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef SMMAKESHARE_H
-#define SMMAKESHARE_H
+#ifndef SMMAKEUNIQUE_H
+#define SMMAKEUNIQUE_H
 
 #include <memory>
 
@@ -31,4 +31,4 @@ std::unique_ptr<T> make_unique(Ts&&... params)
     return std::unique_ptr<T>(new T(std::forward<Ts>(params)...));
 }
 
-#endif // SMMAKESHARE_H
+#endif // SMMAKEUNIQUE_H

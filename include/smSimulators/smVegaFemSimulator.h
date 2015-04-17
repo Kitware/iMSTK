@@ -28,30 +28,19 @@
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 #include "smSimulators/smVegaFemSceneObject.h"
 
-class smEvent;
-
 /// \brief Interface class between Vega and SimMedTK core
-class smVegaFemSimulator: public smObjectSimulator, public smEventHandler
+class smVegaFemSimulator: public smObjectSimulator
 {
-
-private:
-    smVec3f hapticPosition; ///< position of the haptic device end effector
-    smBool hapticButtonPressed; ///< true of the button is pressed
-    smEventDispatcher *eventDispatcher; ///< !!
 
 public:
     /// \brief constructor
-    smVegaFemSimulator(smErrorLog *p_errorLog);
+    smVegaFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
     /// \brief !!
-    void setDispatcher(smEventDispatcher *p_eventDispatcher);
-
-
-protected:
+    void setDispatcher(std::shared_ptr<smEventDispatcher> p_eventDispatcher);
 
     /// \brief start the job
     virtual void beginSim();
@@ -69,7 +58,12 @@ protected:
     void syncBuffers();
 
     /// \brief handle the keyboard and haptic button press events
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smEvent> p_event);
+
+private:
+    smVec3f hapticPosition; ///< position of the haptic device end effector
+    smBool hapticButtonPressed; ///< true of the button is pressed
+    std::shared_ptr<smEventDispatcher> eventDispatcher; ///< !!
 };
 
 #endif

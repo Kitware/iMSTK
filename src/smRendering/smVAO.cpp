@@ -25,7 +25,7 @@
 #include "smShader/smShader.h"
 #include "smRendering/smViewer.h"
 
-std::unordered_map<smInt, smVAO *>  smVAO::VAOs;
+std::unordered_map<smInt, std::shared_ptr<smVAO>> smVAO::VAOs;
 
 void smVAO::initBuffers(smDrawParam /*p_param*/)
 {
@@ -182,13 +182,13 @@ smVBOBufferEntryInfo::smVBOBufferEntryInfo()
     nbrElements = 0;
     arrayBufferType = SMVBO_POS;
 }
-smVAO::smVAO( smErrorLog *p_log, smVBOType p_vboType, bool p_bindShaderObjects )
+smVAO::smVAO( std::shared_ptr<smErrorLog> p_log, smVBOType p_vboType, bool p_bindShaderObjects )
 {
     this->log = p_log;
     renderingError = false;
     totalNbrBuffers = 0;
     vboType = p_vboType;
-    VAOs[this->uniqueId.ID] = this;
+    VAOs[this->uniqueId.ID] = safeDownCast<smVAO>();
     indexBufferLocation = -1;
     bindShaderObjects = p_bindShaderObjects;
 }
@@ -229,9 +229,8 @@ void smVAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles,
     bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
     totalNbrBuffers++;
 }
-bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, smShader *p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
+bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
 {
-
     if ( p_shader == NULL )
     {
         shader = smShader::getShader( p_mesh->renderDetail.shaders[0] );
@@ -294,7 +293,7 @@ void smVAO::initVAOs( smDrawParam p_param )
         x.second->initBuffers( p_param );
     }
 }
-smVAO *smVAO::getVAO( smUnifiedID p_shaderID )
+std::shared_ptr<smVAO> smVAO::getVAO( smUnifiedID p_shaderID )
 {
     return VAOs[p_shaderID.ID];
 }

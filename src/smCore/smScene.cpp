@@ -24,17 +24,18 @@
 #include "smCore/smScene.h"
 #include "smCore/smSDK.h"
 
-smScene::smScene(smErrorLog *p_log) :
+
+smScene::smScene(std::shared_ptr<smErrorLog> p_log) :
     smCoreClass(),
     sceneLocal(SIMMEDTK_MAX_MODULES)
 {
-    type = SIMMEDTK_SMSCENE;
     this->log = p_log;
+    type = SIMMEDTK_SMSCENE;
     totalObjects = 0;
     referenceCounter = 0;
     test = 0;
     sceneUpdatedTimeStamp = 0;
-    lights = new smIndiceArray<smLight*>(SIMMEDTK_VIEWER_MAXLIGHTS);
+    lights = new smIndiceArray<std::shared_ptr<smLight>>(SIMMEDTK_VIEWER_MAXLIGHTS);
 }
 
 smInt smScene::getSceneId()
@@ -47,22 +48,21 @@ smInt smScene::getTotalObjects()
     return totalObjects;
 }
 
-std::vector<smSceneObject*> smScene::getSceneObject()
+std::vector<std::shared_ptr<smSceneObject>> &smScene::getSceneObject()
 {
     std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
     return sceneObjects;
 }
 
-smScene& smScene::operator +=(smSceneObject *p_sceneObject)
+std::shared_ptr<smScene> smScene::operator+=(std::shared_ptr<smSceneObject> p_sceneObject)
 {
     addSceneObject(p_sceneObject);
-    return *this;
+    return safeDownCast<smScene>();
 }
 
-
-void smScene::addSceneObject(smSceneObject *p_sceneObject)
+void smScene::addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
-    if (p_sceneObject != NULL)
+    if (p_sceneObject != nullptr)
     {
         std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
         sceneObjects.push_back(p_sceneObject);
@@ -72,9 +72,9 @@ void smScene::addSceneObject(smSceneObject *p_sceneObject)
 }
 
 /// \brief removes the scene object based on scene object id
-void smScene::removeSceneObject(smSceneObject *p_sceneObject)
+void smScene::removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
-    if (p_sceneObject != NULL)
+    if (p_sceneObject != nullptr)
     {
         std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
 
@@ -126,28 +126,25 @@ void smScene::removeRef()
     this->referenceCounter--;
 }
 
-void smScene::copySceneObjects(smScene*p_scene)
+void smScene::copySceneObjects(std::shared_ptr<smScene> p_scene)
 {
-
     p_scene->sceneObjects.clear();
 
     for (size_t i = 0; i < this->sceneObjects.size(); i++)
     {
-        p_scene->sceneObjects.push_back(sceneObjects[i]);
+        p_scene->sceneObjects.emplace_back(sceneObjects[i]);
     }
 }
 
-smScene &smScene::operator =(smScene &p_scene)
+std::shared_ptr<smScene> smScene::operator=(std::shared_ptr<smScene> p_scene)
 {
-
-    copySceneObjects(&p_scene);
-    return *this;
+    copySceneObjects(p_scene);
+    return safeDownCast<smScene>();
 }
-
 
 void smScene::initLights()
 {
-    smIndiceArrayIter<smLight*> iter(lights);
+    smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
     // Create light components
     for (smInt i = iter.begin(); i < iter.end(); i++)
     {
@@ -155,14 +152,14 @@ void smScene::initLights()
         glLightfv(iter[i]->renderUsage, GL_AMBIENT, iter[i]->lightColorAmbient.toGLColor());
         glLightfv(iter[i]->renderUsage, GL_DIFFUSE, iter[i]->lightColorDiffuse.toGLColor());
         glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
-        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, (smGLFloat)iter[i]->spotExp * SMLIGHT_SPOTMAX);
-        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, (smGLFloat)iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
+        glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.getPosition().data());
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
     }
 }
 
-smInt smScene::addLight(smLight *p_light)
+smInt smScene::addLight(std::shared_ptr<smLight> p_light)
 {
     smInt index = lights->add(p_light);
     lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
@@ -170,7 +167,7 @@ smInt smScene::addLight(smLight *p_light)
     return index;
 }
 
-smBool smScene::setLight(smInt p_lightId, smLight *p_light)
+smBool smScene::setLight(smInt p_lightId, std::shared_ptr<smLight> p_light)
 {
     smInt index = lights->replace(p_lightId, p_light);
 
@@ -184,7 +181,7 @@ smBool smScene::setLight(smInt p_lightId, smLight *p_light)
 
 void smScene::refreshLights()
 {
-    smIndiceArrayIter<smLight*> iter(lights);
+    smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
 
     for (smInt i = iter.begin(); i < iter.end(); iter++)
     {
@@ -194,44 +191,35 @@ void smScene::refreshLights()
         glLightfv(iter[i]->renderUsage, GL_SPECULAR, iter[i]->lightColorSpecular.toGLColor());
         glLightf(iter[i]->renderUsage, GL_SPOT_EXPONENT, iter[i]->spotExp * SMLIGHT_SPOTMAX);
         glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
-        glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
-        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.getPosition().data());
+        glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
     }
 }
 
-smBool smScene::updateLight(smInt p_lightId, smLight *p_light)
+smBool smScene::updateLight(smInt p_lightId, std::shared_ptr<smLight> p_light)
 {
-
     p_light->updateDirection();
     return lights->replace(p_lightId, p_light);
 }
 
 void smScene::setLightPos(smInt p_lightId, smLightPos p_pos)
 {
-
-    smLight *temp;
-    temp = lights->getByRef(p_lightId);
+    std::shared_ptr<smLight> temp = lights->getByRef(p_lightId);
     temp->lightPos = p_pos;
     temp->updateDirection();
 }
 
-void smScene::setLightPos(smInt p_lightId,
-                           smLightPos p_pos,
-                           smVec3f p_direction)
+void smScene::setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction)
 {
-
-    smLight *temp;
-    temp = lights->getByRef(p_lightId);
+    std::shared_ptr<smLight> temp = lights->getByRef(p_lightId);
     temp->lightPos = p_pos;
     temp->direction = p_direction;
     temp->updateDirection();
 }
 
-
 void smScene::enableLights()
 {
-
-    static smIndiceArrayIter<smLight*> iter(lights);
+    static smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
     smFloat dir[4];
     static smLightPos defaultPos(0, 0, 0);
 
@@ -257,19 +245,83 @@ void smScene::enableLights()
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
             glLoadIdentity();
-            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.getPosition().data());
             glPopMatrix();
         }
         else
         {
-            glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
+            glLightfv(iter[i]->renderUsage, GL_POSITION, iter[i]->lightPos.getPosition().data());
         }
 
         if (iter[i]->lightType == SIMMEDTK_LIGHT_SPOTLIGHT)
         {
-            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+            glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, iter[i]->direction.data());
         }
 
         glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
     }
 }
+
+void smScene::registerForScene(std::shared_ptr<smCoreClass> p_simmedtkObject)
+{
+    std::shared_ptr<smSceneLocal> local = std::make_shared<smSceneLocal>();
+    local->id = p_simmedtkObject->uniqueId.ID;
+    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
+    copySceneToLocal(local);
+    sceneLocalIndex[p_simmedtkObject->uniqueId.ID] = sceneLocal.checkAndAdd(local);
+}
+void smScene::copySceneToLocal(std::shared_ptr< smSceneLocal > p_local)
+{
+    p_local->sceneObjects.clear();
+
+    for(size_t i = 0; i < sceneObjects.size(); i++)
+    {
+        p_local->sceneObjects.push_back(sceneObjects[i]);
+    }
+
+    p_local->sceneUpdatedTimeStamp = sceneUpdatedTimeStamp;
+}
+void smSceneIterator::setScene(std::shared_ptr< smScene > p_scene, std::shared_ptr< smCoreClass > p_core)
+{
+    std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
+    sceneLocal = p_scene->sceneLocal.getByRef(p_scene->sceneLocalIndex[p_core->uniqueId.ID]);
+
+    if(p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
+    {
+        p_scene->copySceneToLocal(sceneLocal);
+    }
+
+    endIndex = sceneLocal->sceneObjects.size();
+    currentIndex = 0;
+}
+smSceneIterator::smSceneIterator()
+{
+    currentIndex = endIndex = 0;
+    sceneLocal = nullptr;
+
+}
+int smSceneIterator::start()
+{
+    return 0;
+}
+void smSceneIterator::operator++()
+{
+    currentIndex++;
+}
+int smSceneIterator::end()
+{
+    return endIndex;
+}
+void smSceneIterator::operator--()
+{
+    currentIndex--;
+}
+std::shared_ptr< smSceneObject > smSceneIterator::operator[](int p_index)
+{
+    return sceneLocal->sceneObjects[p_index];
+}
+std::shared_ptr< smSceneObject > smSceneIterator::operator*()
+{
+    return sceneLocal->sceneObjects[currentIndex];
+}
+

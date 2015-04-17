@@ -92,16 +92,17 @@ bool smOctreeCell::isCollidedWithPoint()
     return 0;
 }
 
-void smOctreeCell::subDivide( const int divisionPerAxis, std::vector<smOctreeCell> &cells )
+void smOctreeCell::subDivide( const int divisionPerAxis,
+                              std::array<smOctreeCell,smOctreeCell::numberOfSubdivisions> &cells )
 {
     size_t totalCubes = divisionPerAxis * divisionPerAxis * divisionPerAxis;
 
     assert( cells.size() == totalCubes );
 
-    std::vector<smCube> cubes( totalCubes );
+    std::vector<smCube> cubes( smOctreeCell::numberOfSubdivisions );
     cube.subDivide( divisionPerAxis, cubes.data() );
 
-    for ( size_t i = 0; i < totalCubes; i++ )
+    for ( size_t i = 0; i < smOctreeCell::numberOfSubdivisions; i++ )
     {
         cells[i].cube = cubes[i];
     }

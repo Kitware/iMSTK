@@ -44,30 +44,34 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3f p_center, smFloat p
         }
     }
 }
-smPBDSceneObject::smPBDSceneObject( smErrorLog */*p_log*/ )
+smPBDSceneObject::smPBDSceneObject( std::shared_ptr<smErrorLog>/*p_log*/ )
 {
     type = SIMMEDTK_SMPBDSCENEOBJECT;
 }
-smSceneObject *smPBDSceneObject::clone()
+
+std::shared_ptr<smSceneObject> smPBDSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
+
 void smPBDSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 
 }
+
 void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
-smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( smErrorLog *p_log )
+
+smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMPBDSURFACESCENEOBJECT;
     mesh = new smSurfaceMesh( SMMESH_DEFORMABLE, p_log );
 }
-smSceneObject *smPBDSurfaceSceneObject::clone()
+std::shared_ptr<smSceneObject> smPBDSurfaceSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
 void smPBDSurfaceSceneObject::serialize( void */*p_memoryBlock*/ )
 {

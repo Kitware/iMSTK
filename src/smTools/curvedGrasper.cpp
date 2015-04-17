@@ -90,51 +90,55 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID,
     DAQdataID = 0;
 }
 
-void curvedGrasper::handleEvent(smEvent *p_event)
+void curvedGrasper::handleEvent(std::shared_ptr<smEvent> p_event)
 {
-    smHapticOutEventData *hapticEventData;
-    smKeyboardEventData *keyBoardData;
     smMatrix44f godPosMat;
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
     smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
 
-    switch (p_event->eventType.eventTypeCode)
+    switch(p_event->getEventType().eventTypeCode)
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        hapticEventData = reinterpret_cast<smHapticOutEventData*>(p_event->data);
-
-        if (hapticEventData->deviceId == this->phantomID)
+        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
         {
-            godPosMat = hapticEventData->transform;
-            transRot = godPosMat;
-            pos = hapticEventData->position;
-            vel = hapticEventData->velocity;
-            buttonState[0] = hapticEventData->buttonState[0];
-            buttonState[1] = hapticEventData->buttonState[1];
-            updateOpenClose();
-            //buttons
-            containerLower->offsetRotY =  angle / 360.0; //angle*maxangle;
-            containerUpper->offsetRotY =  -angle / 360.0; //-angle*maxangle;
+            auto hapticEventData
+                = std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
+
+            if(hapticEventData->deviceId == this->phantomID)
+            {
+                godPosMat = hapticEventData->transform;
+                transRot = godPosMat;
+                pos = hapticEventData->position;
+                vel = hapticEventData->velocity;
+                buttonState[0] = hapticEventData->buttonState[0];
+                buttonState[1] = hapticEventData->buttonState[1];
+                updateOpenClose();
+                //buttons
+                containerLower->offsetRotY =  angle / 360.0; //angle*maxangle;
+                containerUpper->offsetRotY =  -angle / 360.0; //-angle*maxangle;
+            }
+
+            break;
         }
 
-        break;
-
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
-
-        if (keyBoardData->keyBoardKey == smKey::Num1)
+        case SIMMEDTK_EVENTTYPE_KEYBOARD:
         {
-            smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
-            this->renderDetail.renderType = this->renderDetail.renderType | SIMMEDTK_RENDER_NONE;
-        }
+            auto keyBoardData
+                = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
-        if (keyBoardData->keyBoardKey == smKey::Num2)
-        {
-            smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
-            this->renderDetail.renderType = this->renderDetail.renderType & (~SIMMEDTK_RENDER_NONE);
-        }
+            if(keyBoardData->keyBoardKey == smKey::Num1)
+            {
+                smSDK::getInstance()->getEventDispatcher()->disableEventHandler(safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT));
+                this->renderDetail.renderType = this->renderDetail.renderType | SIMMEDTK_RENDER_NONE;
+            }
 
-        break;
+            if(keyBoardData->keyBoardKey == smKey::Num2)
+            {
+                smSDK::getInstance()->getEventDispatcher()->enableEventHandler(safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT));
+                this->renderDetail.renderType = this->renderDetail.renderType & (~SIMMEDTK_RENDER_NONE);
+            }
+
+            break;
+        }
     }
 }
 

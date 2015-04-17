@@ -101,21 +101,17 @@ void MyStylus::updateOpenClose()
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
-void MyStylus::handleEvent ( smEvent *p_event )
+void MyStylus::handleEvent (std::shared_ptr<smEvent> p_event)
 {
-
-
-    switch ( p_event->eventType.eventTypeCode )
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_HAPTICOUT:
         {
             smMeshContainer *containerLower = this->getMeshContainer ( "HookCauteryLower" );
             smMeshContainer *containerUpper = this->getMeshContainer ( "HookCauteryUpper" );
-            smHapticOutEventData *hapticEventData =
-                reinterpret_cast<smHapticOutEventData *> ( p_event->data );
+            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
             if ( hapticEventData->deviceId == this->phantomID )
             {
-
                 transRot = hapticEventData->transform;
 
                 pos = hapticEventData->position;
@@ -135,12 +131,11 @@ void MyStylus::handleEvent ( smEvent *p_event )
         }
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
         {
-            smKeyboardEventData *keyBoardData =
-                reinterpret_cast<smKeyboardEventData *> ( p_event->data );
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
             if ( keyBoardData->keyBoardKey == smKey::Num2 )
             {
                 smSDK::getInstance()->getEventDispatcher()
-                    ->disableEventHandler ( this, SIMMEDTK_EVENTTYPE_HAPTICOUT );
+                    ->disableEventHandler(safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
                 this->renderDetail.renderType = this->renderDetail.renderType
                     | SIMMEDTK_RENDER_NONE;
             }
@@ -148,7 +143,7 @@ void MyStylus::handleEvent ( smEvent *p_event )
             if ( keyBoardData->keyBoardKey == smKey::Num1 )
             {
                 smSDK::getInstance()->getEventDispatcher()
-                    ->enableEventHandler ( this, SIMMEDTK_EVENTTYPE_HAPTICOUT );
+                    ->enableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
                 this->renderDetail.renderType = this->renderDetail.renderType
                     & ( ~SIMMEDTK_RENDER_NONE );
             }
@@ -182,14 +177,13 @@ void HookCautery::draw(const smDrawParam &p_param)
     smStylusRigidSceneObject::draw(p_param);
 }
 
-void HookCautery::handleEvent ( smEvent *p_event )
+void HookCautery::handleEvent(std::shared_ptr<smEvent> p_event)
 {
-    switch ( p_event->eventType.eventTypeCode )
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_HAPTICOUT:
         {
-            smHapticOutEventData *hapticEventData =
-                reinterpret_cast<smHapticOutEventData *> ( p_event->data );
+            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>( p_event->getEventData() );
 
             if ( hapticEventData->deviceId == this->phantomID )
             {
@@ -206,13 +200,12 @@ void HookCautery::handleEvent ( smEvent *p_event )
         }
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
         {
-            smKeyboardEventData *keyBoardData =
-                reinterpret_cast<smKeyboardEventData *> ( p_event->data );
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>( p_event->getEventData() );
 
             if ( keyBoardData->keyBoardKey == smKey::Num1 )
             {
                 smSDK::getInstance()->getEventDispatcher()
-                    ->disableEventHandler ( this, SIMMEDTK_EVENTTYPE_HAPTICOUT );
+                    ->disableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT));
                 this->renderDetail.renderType = ( this->renderDetail.renderType
                     | SIMMEDTK_RENDER_NONE );
             }
@@ -220,7 +213,7 @@ void HookCautery::handleEvent ( smEvent *p_event )
             if ( keyBoardData->keyBoardKey == smKey::Num2 )
             {
                 smSDK::getInstance()->getEventDispatcher()
-                    ->enableEventHandler ( this, SIMMEDTK_EVENTTYPE_HAPTICOUT );
+                    ->enableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
                 this->renderDetail.renderType = ( this->renderDetail.renderType
                     & ( ~SIMMEDTK_RENDER_NONE ) );
             }

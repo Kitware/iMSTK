@@ -26,9 +26,10 @@
 #include "smCore/smSDK.h"
 
 smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
-                              const smString &p_fragmentFileName )
+                              const smString &p_fragmentFileName ) :
+                              smShader(smSDK::getInstance()->getErrorLog())
 {
-    this->log = smSDK::getErrorLog();
+    this->log = smSDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName( p_verteShaderFileName, NULL, p_fragmentFileName );
@@ -51,7 +52,8 @@ smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
     this->checkErrorEnabled = true;
     log->isOutputtoConsoleEnabled = true;
 }
-void smMetalShader::attachMesh( smMesh *p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
+
+void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
 {
     if ( !attachTexture( p_mesh->uniqueId, p_bump, "BumpTex" ) )
     {
@@ -63,7 +65,8 @@ void smMetalShader::attachMesh( smMesh *p_mesh, char *p_bump, char *p_decal, cha
     attachTexture( p_mesh->uniqueId, p_OCC, "OCCTex" );
     attachTexture( p_mesh->uniqueId, p_disp, "DispTex" );
 }
-void smMetalShader::attachMesh( smMesh *p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
+
+void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
 {
     attachTexture( p_mesh->uniqueId, p_bump, "BumpTex" );
     attachTexture( p_mesh->uniqueId, p_decal, "DecalTex" );
@@ -72,10 +75,12 @@ void smMetalShader::attachMesh( smMesh *p_mesh, char *p_bump, char *p_decal, cha
     attachTexture( p_mesh->uniqueId, p_disp, "DispTex" );
     attachTexture( p_mesh->uniqueId, p_alphaMap, "AlphaTex" );
 }
+
 void smMetalShader::draw(const smDrawParam &/*p_param*/)
 {
     //placeholder
 }
+
 void smMetalShader::initDraw(const smDrawParam &p_param )
 {
     smShader::initDraw( p_param );
@@ -84,7 +89,8 @@ void smMetalShader::initDraw(const smDrawParam &p_param )
     this->tangentAttrib = this->getShaderAtrribParam( "tangent" );
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
-void smMetalShader::predraw( smMesh *mesh )
+
+void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
 {
     specularPowerValue = mesh->renderDetail.shininess;
     glUniform1fARB( specularPower, specularPowerValue );
@@ -99,14 +105,14 @@ void smMetalShader::predraw( smMesh *mesh )
         glUniform1fARB( canGetShadowUniform, 0 );
     }
 }
-void smMetalShader::handleEvent( smEvent *p_event )
-{
-    smKeyboardEventData *keyBoardData;
 
-    switch ( p_event->eventType.eventTypeCode )
+void smMetalShader::handleEvent(std::shared_ptr<smEvent> p_event)
+{
+
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
             if ( keyBoardData->keyBoardKey == smKey::Add )
             {
@@ -123,14 +129,17 @@ void smMetalShader::handleEvent( smEvent *p_event )
             break;
     }
 }
+
 void smMetalShader::switchEnable()
 {
     //
 }
+
 void smMetalShader::switchDisable()
 {
     //
 }
+
 MetalShaderShadow::MetalShaderShadow( const smString &p_vertexShaderFileName,
                                       const smString &p_fragmentShaderFileName ) :
     smMetalShader( p_vertexShaderFileName, p_fragmentShaderFileName )
@@ -138,6 +147,7 @@ MetalShaderShadow::MetalShaderShadow( const smString &p_vertexShaderFileName,
     createParam( "ShadowMapTEST" );
     createParam( "canGetShadow" );
 }
+
 void MetalShaderShadow::initDraw(const smDrawParam &p_param )
 {
     smMetalShader::initDraw( p_param );
@@ -145,7 +155,8 @@ void MetalShaderShadow::initDraw(const smDrawParam &p_param )
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
-void MetalShaderShadow::predraw( smMesh *p_mesh )
+
+void MetalShaderShadow::predraw( std::shared_ptr<smMesh> p_mesh )
 {
     smMetalShader::predraw( p_mesh );
 
@@ -160,23 +171,27 @@ void MetalShaderShadow::predraw( smMesh *p_mesh )
 
     smTextureManager::activateTexture( "depth", 30, shadowMapUniform );
 }
+
 MetalShaderSoftShadow::MetalShaderSoftShadow() :
     smMetalShader( "shaders/SingleShadowVertexBumpMap2.cg",
                  "shaders/SingleShadowFragmentBumpMap2.cg" )
 {
     createParam( "ShadowMapTEST" );
 }
+
 void MetalShaderSoftShadow::initDraw(const smDrawParam &p_param )
 {
     smMetalShader::initDraw( p_param );
     this->print();
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
 }
-void MetalShaderSoftShadow::predraw( smMesh *p_mesh )
+
+void MetalShaderSoftShadow::predraw( std::shared_ptr<smMesh> p_mesh )
 {
     smMetalShader::predraw( p_mesh );
     smTextureManager::activateTexture( "depth", 30, shadowMapUniform );
 }
-void smMetalShader::predraw ( smSurfaceMesh* ) {}
-void MetalShaderSoftShadow::predraw ( smSurfaceMesh* ) {}
-void MetalShaderShadow::predraw ( smSurfaceMesh* ) {}
+
+void smMetalShader::predraw ( std::shared_ptr<smSurfaceMesh> ) {}
+void MetalShaderSoftShadow::predraw ( std::shared_ptr<smSurfaceMesh> ) {}
+void MetalShaderShadow::predraw ( std::shared_ptr<smSurfaceMesh> ) {}

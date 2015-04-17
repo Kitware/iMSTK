@@ -95,23 +95,7 @@ public:
 /// \brief !!
 class smLattice: public smCoreClass
 {
-
 public:
-    //these should be templated..Current design is based on the triangle
-    smAABB *aabb;
-    smSurfaceMesh *mesh;
-    smCell *cells;
-    smInt totalCells;
-    smInt xSeperation;
-    smInt ySeperation;
-    smInt zSeperation;
-    smFloat xStep;
-    smFloat yStep;
-    smFloat zStep;
-    smVec3f latticeCenter;
-    smInt time;
-    smUnifiedID linkedObject;
-
     /// \brief !!
     void boundingBoxInit()
     {
@@ -156,7 +140,7 @@ public:
     virtual void  linkPrimitivetoCell(smInt p_primitiveIndex);
 
     /// \brief update the bounds of the lattice
-    void updateBounds(smSurfaceMesh* p_mesh, smInt p_index);
+    void updateBounds(std::shared_ptr<smSurfaceMesh> p_mesh, smInt p_index);
 
     /// \brief update the bounds of the lattice
     void updateBounds();
@@ -170,6 +154,21 @@ public:
     /// \brief render the lattice for visaulization
     void draw(const smDrawParam &p_params);
 
+public:
+    //these should be templated..Current design is based on the triangle
+    smAABB *aabb;
+    std::shared_ptr<smSurfaceMesh> mesh;
+    smCell *cells;
+    smInt totalCells;
+    smInt xSeperation;
+    smInt ySeperation;
+    smInt zSeperation;
+    smFloat xStep;
+    smFloat yStep;
+    smFloat zStep;
+    smVec3f latticeCenter;
+    smInt time;
+    smUnifiedID linkedObject;
 };
 
 #endif

@@ -25,6 +25,7 @@
 #define SMSCENE_H
 
 // STL includes
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 
@@ -39,6 +40,7 @@
 #include "smRendering/smCamera.h"
 
 class smPipe;
+class smScene;
 class smSDK;
 
 struct smSceneLocal
@@ -51,136 +53,65 @@ public:
         sceneUpdatedTimeStamp = 0;
     }
 
-    inline smBool operator ==(smSceneLocal &p_param)
+    smBool operator ==(smSceneLocal &p_param)
     {
         return id == p_param.id;
     }
 
-    std::vector<smSceneObject*> sceneObjects;
+    std::vector<std::shared_ptr<smSceneObject>> sceneObjects;
     smUInt sceneUpdatedTimeStamp;
+};
+
+
+/// \brief iterator for scene object. The default iterates over the scene in the order of insertion. For scene graph, this iteration needs to be inherited and modified
+class smSceneIterator
+{
+public:
+    smSceneIterator();
+    /// \brief copy other scene to this current one.
+    void setScene(std::shared_ptr<smScene> p_scene, std::shared_ptr<smCoreClass> p_core);
+
+    smInt start();
+
+    smInt end();
+
+    /// \brief operator to increment the index to go to the next item in the scene
+    void operator++();
+
+    /// \brief operator to decrement the index to go to the previous item in the scene
+    void operator--();
+
+    /// \brief to access a particular entry in the scene with [] notation
+    std::shared_ptr<smSceneObject> operator[](smInt p_index);
+
+    /// \brief to access a particular entry in the scene with () notation
+    std::shared_ptr<smSceneObject> operator*();
+
+private:
+    smInt endIndex;
+    smInt currentIndex;
+    std::shared_ptr<smSceneLocal> sceneLocal;
 };
 
 ///Physics class should have all parameters such as material properties, mesh etc.. for
 ///note that when you remove the Physics do not delete it.Since propagation of the physics over the
 class smScene: public smCoreClass
 {
-protected:
-    smIndiceArray<smLight*> *lights;
-
-private:
-    /// \brief number of total objects in the scene
-    smInt totalObjects;
-    /// \brief error logging
-    smErrorLog *log;
-    /// \brief scene list lock for thread safe manipulation of the scene
-    std::mutex sceneListLock;
-    /// \brief reference counter to the scene
-    smUInt referenceCounter;
-    /// \brief last updated time stampe
-    smUInt sceneUpdatedTimeStamp;
-    /// \brief scene objects addition queue
-    std::vector<smSceneObject*> addQueue;
-    smIndiceArray<smSceneLocal*> sceneLocal;
-    std::unordered_map<smInt, smInt> sceneLocalIndex;
-    /// \brief scene objects storage
-    std::vector<smSceneObject*> sceneObjects;
-    /// \brief adds the objects in the local scene storage
-    void inline copySceneToLocal(smSceneLocal *p_local)
-    {
-        p_local->sceneObjects.clear();
-
-        for (size_t i = 0; i < sceneObjects.size(); i++)
-        {
-            p_local->sceneObjects.push_back(sceneObjects[i]);
-        }
-
-        p_local->sceneUpdatedTimeStamp = sceneUpdatedTimeStamp;
-
-    }
-
 public:
-    /// \brief iterator for scene object. The default iterates over the scene in the order of insertion. For scene graph, this iteration needs to be inherited and modified
-    struct smSceneIterator
-    {
-    protected:
-        //smInt startIndex;
-        smInt endIndex;
-        smInt currentIndex;
-        smSceneLocal *sceneLocal;
-    public:
-        inline smSceneIterator()
-        {
-            currentIndex = endIndex = 0;
-            sceneLocal = NULL;
+    smScene(std::shared_ptr<smErrorLog> p_log = nullptr);
 
-        }
-        /// \brief copy other scene to this current one.
-        inline void setScene(smScene *p_scene, smCoreClass *p_core)
-        {
-            std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
-            sceneLocal = p_scene->sceneLocal.getByRef(p_scene->sceneLocalIndex[p_core->uniqueId.ID]);
+    virtual ~smScene(){}
 
-            if (p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
-            {
-                p_scene->copySceneToLocal(sceneLocal);
-            }
-
-            endIndex = sceneLocal->sceneObjects.size();
-            currentIndex = 0;
-        }
-
-        inline smInt start()
-        {
-            return 0;
-        }
-
-        inline smInt end()
-        {
-            return endIndex;
-        }
-        /// \brief operator to increment the index to go to the next item in the scene
-        inline void operator++()
-        {
-            currentIndex++;
-        }
-        /// \brief operator to decrement the index to go to the previous item in the scene
-        inline void operator--()
-        {
-            currentIndex--;
-        }
-        /// \brief to access a particular entry in the scene with [] notation
-        inline smSceneObject* operator[](smInt p_index)
-        {
-            return sceneLocal->sceneObjects[p_index];
-        }
-        /// \brief to access a particular entry in the scene with () notation
-        inline smSceneObject* operator*()
-        {
-            return sceneLocal->sceneObjects[currentIndex];
-        }
-    };
-
-    smScene(smErrorLog *p_log = NULL);
     /// \brief add obejct to the scene, it is thread safe call.
-
-   virtual ~smScene()
-   {}
-    void registerForScene(smCoreClass *p_simmedtkObject)
-    {
-        smSceneLocal *local = new smSceneLocal();
-        local->id = p_simmedtkObject->uniqueId.ID;
-        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
-        copySceneToLocal(local);
-        sceneLocalIndex[p_simmedtkObject->uniqueId.ID] = sceneLocal.checkAndAdd(local);
-    }
+    void registerForScene(std::shared_ptr<smCoreClass> p_simmedtkObject);
 
     ///add physics in the scene
-    void  addSceneObject(smSceneObject *p_sceneObject);
+    void  addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
 
     ///remove the phyics in the scene.
     ///The removal of the phsyics in the scene needs some sync all over the modules
     ///so not implemented yet. Be aware that when you remove the phyics do no free the smPhysics class
-    void removeSceneObject(smSceneObject *p_sceneObject);
+    void removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
 
     ///the same as
     void removeSceneObject(smInt p_objectId);
@@ -190,38 +121,80 @@ public:
     ///it should be called in the initialization of the viewer, simulation or any other module.
     ///and the the list should be stored internally.
     ///The scene list removal will be taken care of later since the list should be update.
-    std::vector<smSceneObject*> getSceneObject();
+    std::vector<std::shared_ptr<smSceneObject>> &getSceneObject();
+
     /// \brief retursn scene id
     smInt getSceneId();
+
     /// \brief returns the total number of objects in the scene
     inline smInt getTotalObjects();
 
     ///Same functionality as addSceneObject
-    smScene& operator +=(smSceneObject *p_sceneObject);
+    std::shared_ptr<smScene> operator+=(std::shared_ptr<smSceneObject> p_sceneObject);
+
     /// \brief add and remove references
     void addRef();
+
     void removeRef();
-    void copySceneObjects(smScene*p_scene);
-    smScene &operator =(smScene &p_scene) ;
+
+    void copySceneObjects(std::shared_ptr<smScene> p_scene);
+
+    std::shared_ptr<smScene> operator=(std::shared_ptr<smScene> p_scene);
 
     /// \brief Initializes lights for rendering
     void initLights();
+
     /// \brief  enable attached lights
     void enableLights();
+
     /// \brief addlight
-    smInt addLight(smLight *p_light);
+    smInt addLight(std::shared_ptr<smLight> p_light);
+
     /// \brief set light given with light ID
-    smBool setLight(smInt lightId, smLight *p_light);
+    smBool setLight(smInt lightId, std::shared_ptr<smLight> p_light);
+
     /// \brief refresh lights. updates light  position based on the gl matrix
     void refreshLights();
+
     /// \brief update light information
-    smBool updateLight(smInt p_lightId, smLight *p_light);
+    smBool updateLight(smInt p_lightId, std::shared_ptr<smLight> p_light);
+
     void setLightPos(smInt p_lightId, smLightPos p_pos);
+
     void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
 
+    smCamera &getCamera()
+    {
+        return camera;
+    }
+
+    const smCamera &getCamera() const
+    {
+        return camera;
+    }
+
+private:
+    /// \brief adds the objects in the local scene storage
+    void inline copySceneToLocal(std::shared_ptr<smSceneLocal> p_local);
+
+protected:
+    smIndiceArray<std::shared_ptr<smLight>> *lights;
+
+private:
+    smIndiceArray<std::shared_ptr<smSceneLocal>> sceneLocal;
+    std::vector<std::shared_ptr<smSceneObject>> addQueue;       // scene objects addition queue
+    std::vector<std::shared_ptr<smSceneObject>> sceneObjects;   // scene objects storage
+    std::unordered_map<smInt, smInt> sceneLocalIndex;
+    std::shared_ptr<smErrorLog> log;                            // error logging
+    std::mutex sceneListLock;                                   // scene list lock for thread safe manipulation of the scene
+
+    smUInt sceneUpdatedTimeStamp;                               // last updated time stampe
+    smUInt referenceCounter;                                    // reference counter to the scene
+    smInt totalObjects;                                         // number of total objects in the scene
     smCamera camera;
 
     friend class smSDK;
+
     friend struct smSceneIterator;
 
     smInt test;

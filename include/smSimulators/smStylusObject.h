@@ -48,32 +48,34 @@ class smOctreeCell;
 class smMeshContainer
 {
 public:
-    smString name;
+    using SurfaceTreeType = smSurfaceTree<smOctreeCell>;
 
+public:
     /// \brief constructor
     smMeshContainer(smString p_name = "");
 
     /// \brief constructor
     smMeshContainer(smString p_name, smMesh *p_mesh, smVec3f p_prePos, smVec3f p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ);
 
-    smFloat offsetRotX; ///< offset in rotation in x-direction
-    smFloat offsetRotY; ///< offset in rotation in y-direction
-    smFloat offsetRotZ; ///< offset in rotation in z-direction
-    smVec3f preOffsetPos; ///< !!
-    smVec3f posOffsetPos; ///< !!
-    smMatrix44f accumulatedMatrix; ///< !!
-    smMatrix44f accumulatedDeviceMatrix; ///< !!
-
-    smMatrix44f currentMatrix; ///< !!
-    smMatrix44f currentViewerMatrix; ///< !!
-    smMatrix44f currentDeviceMatrix; ///< !!
-    smMatrix44f tempCurrentMatrix; ///< !!
-    smMatrix44f tempCurrentDeviceMatrix; ///< !!
-    smMesh * mesh; ///< mesh
-    smSurfaceTree<smOctreeCell> *colModel; ///< octree of surface
-
-    /// \brief !!
     void computeCurrentMatrix();
+
+public:
+    smString name;
+    smFloat offsetRotX; // offset in rotation in x-direction
+    smFloat offsetRotY; // offset in rotation in y-direction
+    smFloat offsetRotZ; // offset in rotation in z-direction
+    smVec3f preOffsetPos; // !!
+    smVec3f posOffsetPos; // !!
+    smMatrix44f accumulatedMatrix; // !!
+    smMatrix44f accumulatedDeviceMatrix; // !!
+
+    smMatrix44f currentMatrix; // !!
+    smMatrix44f currentViewerMatrix; // !!
+    smMatrix44f currentDeviceMatrix; // !!
+    smMatrix44f tempCurrentMatrix; // !!
+    smMatrix44f tempCurrentDeviceMatrix; // !!
+    smMesh * mesh; // mesh
+    std::shared_ptr<SurfaceTreeType> colModel; // octree of surface
 };
 
 /// \brief points on the stylus
@@ -82,24 +84,16 @@ struct smStylusPoints
     /// \brief constructor
     smStylusPoints();
 
-    smVec3f point; ///< co-ordinates of points on stylus
-    smMeshContainer *container; ///< !!
+    smVec3f point; // co-ordinates of points on stylus
+    smMeshContainer *container; // !!
 };
 
 /// \brief stylus object of the scene (typically used for laparascopic VR simulations)
 class smStylusSceneObject: public smSceneObject
 {
-
 public:
-    smVec3f pos; ///< position of stylus
-    smVec3f vel; ///< velocity of stylus
-    smMatrix33d rot; ///< rotation of stylus
-    smMatrix44f transRot; ///< !! translation and rotation matrix of stylus
-    smMatrix44f transRotDevice; ///< translation and rotation matrix of devide controlling the stylus
-    smBool toolEnabled; ///< !!
-
     /// \brief constructor
-    smStylusSceneObject(smErrorLog *p_log = NULL);
+    smStylusSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
     virtual void serialize(void *p_memoryBlock);
@@ -108,19 +102,26 @@ public:
     virtual void unSerialize(void *p_memoryBlock);
 
     /// \brief handle the events such as button presses related to stylus
-    virtual void handleEvent(smEvent *p_event);
+    virtual void handleEvent(std::shared_ptr<smEvent> p_event);
 
     virtual void init();
+
+public:
+    smVec3f pos; // position of stylus
+    smVec3f vel; // velocity of stylus
+    smMatrix33d rot; // rotation of stylus
+    smMatrix44f transRot; // !! translation and rotation matrix of stylus
+    smMatrix44f transRotDevice; // translation and rotation matrix of devide controlling the stylus
+    smBool toolEnabled; // !!
 };
 
 /// \brief !!
-class smStylusRigidSceneObject: public smStylusSceneObject, public smEventHandler
+class smStylusRigidSceneObject: public smStylusSceneObject
 {
-    std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
 public:
-    tree<smMeshContainer*> meshes; ///< meshes representing the stylus
-    tree<smMeshContainer*>::iterator rootIterator; ///< !!
-    volatile smBool updateViewerMatrixEnabled; ///< !!
+    tree<smMeshContainer*> meshes; // meshes representing the stylus
+    tree<smMeshContainer*>::iterator rootIterator; // !!
+    volatile smBool updateViewerMatrixEnabled; // !!
 
     /// \brief to show the device tool..It is for debugging god object
     smBool enableDeviceManipulatedTool;
@@ -134,10 +135,10 @@ public:
     /// \brief Post Traverse callback for the entire object.
     virtual void posTraverseCallBack();
 
-    smBool posCallBackEnabledForEntireObject; ///< !!
+    smBool posCallBackEnabledForEntireObject; // !!
 
     /// \brief !!
-    smStylusRigidSceneObject(smErrorLog *p_log = NULL);
+    smStylusRigidSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
     tree<smMeshContainer*>::iterator addMeshContainer(smMeshContainer *p_meshContainer);
@@ -151,10 +152,10 @@ public:
     /// \brief !!
     smMeshContainer *getMeshContainer(smString p_string) const;
 
-    virtual void handleEvent(smEvent *p_event);
+    virtual void handleEvent(std::shared_ptr<smEvent> p_event);
 
     /// \brief !!
-    smSceneObject *clone();
+    std::shared_ptr<smSceneObject> clone();
 
     /// \brief !!
     virtual void initDraw(const smDrawParam &p_params);
@@ -164,12 +165,15 @@ public:
 
     /// \brief !!
     virtual void init();
+
+private:
+    std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
 };
 
 /// \brief !!
 class smStylusDeformableSceneObject: public smStylusSceneObject
 {
-    smStylusDeformableSceneObject(smErrorLog *p_log = NULL);
+    smStylusDeformableSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 };
 
 #endif

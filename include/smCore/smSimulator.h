@@ -24,140 +24,90 @@
 #ifndef SMSIMULATOR_H
 #define SMSIMULATOR_H
 
+// STL include
+#include <memory>
+
 // Threads includes
 #include <ThreadPool.h>
 
 // SimMedTK includes
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
-
+#include "smUtilities/smMakeUnique.h"
+#include "smUtilities/smMakeUnique.h"
+#include "smCollision/smCollisionDetection.h"
 
 struct smSimulationMainParam
 {
-    std::vector<smScene*>sceneList;
+    std::vector<std::shared_ptr<smScene>> sceneList;
 };
-/// \brief call back for simulator module. simulateMain is called in every simulation module frame.
-class smSimulationMain
-{
 
+/// \brief call back for simulator module. simulateMain is called in every simulation module frame.
+class smSimulationMain : public smEventHandler
+{
 public:
-    virtual void simulateMain(smSimulationMainParam) = 0;
+    virtual void simulateMain(const smSimulationMainParam &) = 0;
 };
 
 class smSimulator: public smModule
 {
     friend class smSDK;
 
-protected:
-    std::vector<smObjectSimulator*> simulators;
-    std::vector<smObjectSimulator*> collisionDetectors;
-
-    std::unique_ptr<ThreadPool> threadPool;
-    /// \brief asynchronous thread pool
-    std::unique_ptr<ThreadPool> asyncPool;
-    /// \brief  maximum number of threads
-    smInt maxThreadCount;
-    /// \brief  error log
-    smErrorLog *log;
-    /// \brief  module keeps track of frame number
-    smUInt frameCounter;
-
-    ///Simulation main registration
-    smSimulationMain *main;
-    /// \brief  for updating the main in real-time. The change has effect after a frame is completed
-    smSimulationMain *changedMain;
-
-    volatile smInt  changedMainTimeStamp;
-    /// \brief time stamp when main callback is registered
-    volatile smInt  mainTimeStamp;
-
 private:
-    smInt asyncThreadPoolSize; ///< Tracks the number of threads the async threadpool is running
     /// \brief Initializes up asynchronous threadpool
     void initAsyncThreadPool();
 
 public:
     ///initializes all the simulators in the objects in the scene..
-    void init()
-    {
+    void init();
 
-        if (isInitialized == true)
-        {
-            return;
-        }
-        if (maxThreadCount == 0)
-        {
-            maxThreadCount = SIMMEDTK_MAX(simulators.size(), collisionDetectors.size());
-        }
-        threadPool = std::unique_ptr<ThreadPool>(new ThreadPool(maxThreadCount));
-
-        for (size_t i = 0; i < this->simulators.size(); i++)
-        {
-            smObjectSimulator *objectSimulator = simulators[i];
-            objectSimulator->init();
-        }
-
-        initAsyncThreadPool();
-
-        isInitialized = true;
-    }
     /// \brief constructor gets error log
-    smSimulator(smErrorLog *p_log)
-    {
+    smSimulator(std::shared_ptr<smErrorLog> p_log);
 
-        type = SIMMEDTK_SMSIMULATOR;
-        isInitialized = false;
-        this->log = p_log;
-        frameCounter = 0;
-        main = NULL;
-        changedMain = NULL;
-        changedMainTimeStamp = 0;
-        mainTimeStamp = 0;
-        maxThreadCount = 0;
-        asyncThreadPoolSize = 0;
-    }
-
-    void setMaxThreadCount(smInt p_threadMaxCount)
-    {
-
-        if (p_threadMaxCount < 0)
-        {
-            return;
-        }
-        else
-        {
-            maxThreadCount = p_threadMaxCount;
-        }
-    }
+    void setMaxThreadCount(smInt p_threadMaxCount);
 
     ///Simualtor registers the simulator and schedules it.
     ///the function is reentrant it is not thread safe.
-    void registerObjectSimulator(smObjectSimulator *objectSimulator);
+    void registerObjectSimulator(std::shared_ptr<smObjectSimulator> objectSimulator);
 
-    void  registerCollisionDetection(smObjectSimulator *p_collisionDetection);
+    void registerCollisionDetection(std::shared_ptr<smCollisionDetection> p_collisionDetection);
 
     ///Registration of the Simulation main. It is called in each and every frame
-    void registerSimulationMain(smSimulationMain*p_main);
+    void registerSimulationMain(std::shared_ptr<smSimulationMain> p_main);
+
     /// \brief the actual implementation of the simulator module resides in run function
     void run();
+
     /// \brief called at the beginning of  each and every frame
     virtual void beginFrame();
+
     /// \brief called at the end of each and every frame
     virtual void endFrame();
-    /// \brief this is called by SDK. it lanuches the simulator module
-    virtual void exec()
-    {
 
-        if (isInitialized)
-        {
-            run();
-        }
-        else
-        {
-            init();
-            run();
-        }
+    /// \brief this is called by SDK. it lanuches the simulator module
+    virtual void exec();
+
+    void addCollisionPair(const std::shared_ptr<smCollisionPair> &pair)
+    {
+        collisionPairs.emplace_back(pair);
     }
+
+private:
+    std::vector<std::shared_ptr<smObjectSimulator>> simulators;
+    std::vector<std::shared_ptr<smCollisionDetection>> collisionDetectors;
+    std::vector<std::shared_ptr<smCollisionPair>> collisionPairs;
+
+    std::unique_ptr<ThreadPool> threadPool; //
+    std::unique_ptr<ThreadPool> asyncPool; // asynchronous thread pool
+    std::shared_ptr<smErrorLog> log; // error log
+    std::shared_ptr<smSimulationMain> main; // Simulation main registration
+    std::shared_ptr<smSimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
+
+    smUInt frameCounter; // module keeps track of frame number
+    smInt maxThreadCount; // maximum number of threads
+    smInt changedMainTimeStamp;
+    smInt mainTimeStamp; // time stamp when main callback is registered
+    smInt asyncThreadPoolSize; // Tracks the number of threads the async threadpool is running
 };
 
 #endif

@@ -180,7 +180,9 @@ void smSpatialHash::computeCollisionTri2Tri()
 
             while (cells.nextBucketItem(iterator1, triB))
             {
-                if (triA.meshID == triB.meshID || !(smSDK::getMesh(triA.meshID)->collisionGroup.isCollisionPermitted(smSDK::getMesh(triB.meshID)->collisionGroup)))
+                if (triA.meshID == triB.meshID ||
+                    !(smSDK::getInstance()->getMesh(triA.meshID)->collisionGroup.isCollisionPermitted(
+                        smSDK::getInstance()->getMesh(triB.meshID)->collisionGroup)))
                 {
                     continue;
                 }
@@ -202,7 +204,7 @@ void smSpatialHash::computeCollisionTri2Tri()
                     auto collisionPair = std::make_shared<smCollidedTriangles>();
                     collisionPair->tri1 = triA;
                     collisionPair->tri2 = triB;
-                    collidedPrims.push_back(collisionPair);
+                    collidedTriangles.push_back(collisionPair);
                 }
             }
         }
@@ -227,8 +229,9 @@ void  smSpatialHash::computeCollisionLine2Tri()
 
             while (cellsForTri2Line.nextBucketItem(iteratorTri, tri))
             {
-
-                if (tri.meshID == line.meshID || !(smSDK::getMesh(tri.meshID)->collisionGroup.isCollisionPermitted(smSDK::getMesh(line.meshID)->collisionGroup)))
+                if (tri.meshID == line.meshID ||
+                    !(smSDK::getInstance()->getMesh(tri.meshID)->collisionGroup.isCollisionPermitted(
+                        smSDK::getInstance()->getMesh(line.meshID)->collisionGroup)))
                 {
                     continue;
                 }
@@ -379,7 +382,7 @@ void smSpatialHash::addOctreeCell(std::shared_ptr<smSpatialHash::SurfaceTreeType
 
     for (smInt i = iter.start(); i != iter.end(); ++i)
     {
-        if (iter[i].filled)
+        if (!iter[i].getIsEmpty())
         {
             temp.aabbMin =  iter[i].getCube().leftMinCorner();
             temp.aabbMax =  iter[i].getCube().rightMaxCorner();
@@ -412,11 +415,68 @@ void smSpatialHash::reset()
     cellLines.clearAll();
     cellsForTri2Line.clearAll();
     cellsForModelPoints.clearAll();
-    meshes.clear();
     lineMeshes.clear();
     collidedLineTris.clear();
     collidedModelPoints.clear();
-    collidedModelPoints.clear();
+    collidedTriangles.clear();
+}
+bool smSpatialHash::findCandidates()
+{
+    for(size_t i = 0; i < colModel.size(); i++)
+        for(size_t i = 0; i < meshes.size(); i++)
+        {
+            findCandidatePoints(meshes[i], colModel[i]);
+            addOctreeCell(colModel[i], cellsForModel);
+        }
+
+    ///Triangle-Triangle collision
+    for(size_t i = 0; i < meshes.size(); i++)
+    {
+        for(size_t j = i + 1; j < meshes.size(); j++)
+        {
+            if(meshes[i]->collisionGroup.isCollisionPermitted(meshes[j]->collisionGroup))
+            {
+                if(findCandidateTris(meshes[i], meshes[j]) == false)
+                {
+                    continue;
+                }
+            }
+        }
+    }
+
+    ///Triangle-line Collision
+    for(size_t i = 0; i < meshes.size(); i++)
+        for(size_t j = 0; j < lineMeshes.size(); j++)
+        {
+            if(meshes[i]->collisionGroup.isCollisionPermitted(lineMeshes[j]->collisionGroup))
+            {
+                if(findCandidateTrisLines(meshes[i], lineMeshes[j]) == false)
+                {
+                    continue;
+                }
+            }
+        }
+    return 0;
+}
+void smSpatialHash::updateBVH()
+{
+    for(size_t i = 0; i < meshes.size(); i++)
+    {
+        meshes[i]->updateTriangleAABB();
+    }
+
+    for(size_t i = 0; i < lineMeshes.size(); i++)
+    {
+        meshes[i]->upadateAABB();
+    }
+}
+const std::vector< std::shared_ptr< smCollidedTriangles > >& smSpatialHash::getCollidedTriangles() const
+{
+    return collidedTriangles;
+}
+std::vector< std::shared_ptr< smCollidedTriangles > >& smSpatialHash::getCollidedTriangles()
+{
+    return collidedTriangles;
 }
 
 

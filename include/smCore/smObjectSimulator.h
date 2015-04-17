@@ -24,6 +24,9 @@
 #ifndef SMOBJECTSIMULATOR_H
 #define SMOBJECTSIMULATOR_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
@@ -58,7 +61,7 @@ struct smObjectSimulatorParam
 
 ///This is the major object simulator. Each object simulator should derive this class.
 ///you want particular object simualtor to work over an object just set pointer of the object. the rest will be taken care of the simulator and object simulator.
-class smObjectSimulator: public smCoreClass
+class smObjectSimulator : public smEventHandler
 {
 
     ///friend class since smSimulator is the encapsulates the other simulators.
@@ -66,7 +69,7 @@ class smObjectSimulator: public smCoreClass
 
 protected:
     ///log of the object
-    smErrorLog *log;
+    std::shared_ptr<smErrorLog> log;
     smBool isObjectSimInitialized;
     smThreadPriority threadPriority;
     smTimer timer;
@@ -85,12 +88,12 @@ public:
     smBool enabled;
 
     ///the function is reentrant it is not thread safe.
-    virtual void addObject(smSceneObject *p_object);
+    virtual void addObject(std::shared_ptr<smSceneObject> p_object);
 
     /// \brief remove object from the simulator
-    virtual void removeObject(smSceneObject *p_object);
+    virtual void removeObject(std::shared_ptr<smSceneObject> p_object);
 
-    smObjectSimulator(smErrorLog *p_log);
+    smObjectSimulator(std::shared_ptr<smErrorLog> p_log);
 
     /// \brief  set thread priority
     void setPriority(smThreadPriority p_priority);
@@ -102,7 +105,7 @@ public:
 
 protected:
     ///objects that are simulated by this will be added to the list
-    std::vector <smSceneObject*> objectsSimulated;
+    std::vector<std::shared_ptr<smSceneObject>> objectsSimulated;
 
     virtual void initCustom() = 0;
 
@@ -140,8 +143,11 @@ protected:
         smShort endIndex;
         smShort currentIndex;
         smShort threadIndex;
+
     public:
-        smObjectSimulatorObjectIter(smScheduleGroup &p_group, std::vector <smSceneObject*> &p_objectsSimulated, smInt p_threadIndex);
+        smObjectSimulatorObjectIter(smScheduleGroup &p_group,
+                                    std::vector<std::shared_ptr<smSceneObject>> &p_objectsSimulated,
+                                    smInt p_threadIndex);
 
         inline void setThreadIndex(smShort p_threadIndex);
 

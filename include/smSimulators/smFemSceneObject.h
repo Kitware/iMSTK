@@ -42,6 +42,52 @@
 class smFemSceneObject: public smSceneObject
 {
 public:
+    /// \brief constructor
+    smFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+
+    /// \brief build FEM LM matrix
+    void buildLMmatrix();
+
+    /// \brief compute FEM stiffness matrix
+    void computeStiffness();
+
+    /// \brief load a matrix from an external file
+    smBool loadMatrix(const smString &fname, smMatrixf &a);
+
+    /// \brief save a matrix to an external file
+    smBool saveMatrix(const smString &fname, smMatrixf &a);
+
+    /// \brief !!
+    smFloat V(smInt xyz, smInt xyz123, smInt tet);
+
+    /// \brief assemble FEM stiffness matrix
+    void assembleK(smInt element, smMatrixf k);
+
+    /// \brief compute the displacements for quasi-static simulation
+    void calculateDisplacements_QStatic(smStdVector3f &vertices);
+
+    /// \brief compute the displacements for dynamic simulation
+    void calculateDisplacements_Dynamic(smStdVector3f &vertices);
+
+    /// \brief !!
+    void lumpMasses();
+
+    /// \brief get the volume of tetrahedron given four sides
+    smFloat tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3f &d);
+
+    /// \brief !!
+    virtual void serialize(void *p_memoryBlock);
+
+    /// \brief !!
+    virtual void unSerialize(void *p_memoryBlock);
+
+    /// \brief render the FEM mesh
+    virtual void draw(const smDrawParam &p_params);
+
+    /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
+    virtual std::shared_ptr<smSceneObject> clone();
+
+public:
     //fem objetc has two representations: surface and volume
     smVolumeMesh *v_mesh; ///< volume mesh
     smMatrixf LM; ///< LM matrix of FEM
@@ -66,54 +112,6 @@ public:
     smVectorf nodeMass; ///< nodal mass
     smVectorf viscosity; ///< viscosity
     smInt pulledNode; ///< ID of the node pulled by the user
-
-    /// \brief constructor
-    smFemSceneObject(smErrorLog *p_log = NULL);
-
-    /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
-    virtual smSceneObject* clone();
-
-    /// \brief build FEM LM matrix
-    void buildLMmatrix();
-
-    /// \brief compute FEM stiffness matrix
-    void computeStiffness();
-
-    /// \brief load a matrix from an external file
-    smBool loadMatrix(const smString &fname, smMatrixf &a);
-
-    /// \brief save a matrix to an external file
-    smBool saveMatrix(const smString &fname, smMatrixf &a);
-
-    /// \brief !!
-    smFloat V(smInt xyz, smInt xyz123, smInt tet);
-
-    /// \brief assemble FEM stiffness matrix
-    void assembleK(smInt element, smMatrixf k);
-
-    /// \brief compute the displacements for quasi-static simulation
-    void calculateDisplacements_QStatic(smVec3f*);
-
-    /// \brief compute the displacements for dynamic simulation
-    void calculateDisplacements_Dynamic(smVec3f *vertices);
-
-    /// \brief !!
-    void lumpMasses();
-
-    /// \brief get the volume of tetrahedron given four sides
-    smFloat tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3f &d);
-
-    /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
-
-    /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
-
-    /// \brief render the FEM mesh
-    virtual void draw(const smDrawParam &p_params);
-
-    /// \brief Init routine
-//     virtual void init(){}
 };
 
 #endif

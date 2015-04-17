@@ -38,13 +38,13 @@ private:
     ///handle viewer events
     /// \param p_caller this is the caller class
     /// \param p_callerState it indicates the state of the called which is predefined at the smConfig.h
-    void  handleViewer(smCoreClass *p_caller, smCallerState p_callerState);
+    void  handleViewer(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState);
 
     ///handle simulator events
-    void  handleSimulator(smCoreClass *p_caller, smCallerState p_callerState);
+    void  handleSimulator(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState);
 
     ///handle collision detection events
-    void  handleCollisionDetection(smCoreClass *p_caller, smCallerState p_callerState);
+    void  handleCollisionDetection(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState);
 
     ///handle all events
     void  handleAll();
@@ -54,7 +54,7 @@ public:
 
 public:
     ///handle all event and call corresponding events
-    smDispathcerResult handle(smCoreClass *p_caller, smCallerState p_callerState);
+    smDispathcerResult handle(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState);
 
 };
 

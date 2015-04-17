@@ -30,14 +30,12 @@
 #include "smShader/smShader.h"
 #include "smCore/smTextureManager.h"
 
-std::unordered_map<smInt, smShader *> smShader::shaders;
-smShader *smShader ::currentShader = NULL;
-smShader *smShader ::savedShader = NULL;
-smBool smShader::currentShaderEnabled = false;
+std::unordered_map<smInt, std::shared_ptr<smShader>> smShader::shaders;
+std::shared_ptr<smShader> smShader::currentShader = nullptr;
+std::shared_ptr<smShader> smShader::savedShader = nullptr;
 
 void printInfoLog(GLhandleARB obj)
 {
-
     int infologLength = 0;
     int charsWritten = 0;
     char *infoLog;
@@ -53,15 +51,34 @@ void printInfoLog(GLhandleARB obj)
     }
 }
 
-smShader::smShader(smErrorLog *log)
+smShader::smShader(std::shared_ptr<smErrorLog> logger)
 {
-
     type = SIMMEDTK_SMSHADER;
-    this->log = log;
+    log = logger;
     checkErrorEnabled = true;
-    time.start();
     setModelViewMatrixShaderName("ModelMatrix");
     setProjectionMatrixShaderName("ProjectionMatrix");
+    currentShaderEnabled = false;
+    time.start();
+
+    tangentAttrib = 0;
+    projectionMatrix = 0;
+    modelViewMatrix = 0;
+
+    vertexProgFileName = "";
+    fragmentProgFileName = "";
+    geometryProgFileName = "";
+    vertexShaderContent = "";
+    fragmentShaderContent = "";
+    geometryShaderContent = "";
+    modelViewMatrixName = "";
+    projectionMatrixName = "";
+
+    vertexProgramExist = false;
+    fragmentProgramExist = false;
+    geometryProgramExist = false;
+    currentShaderEnabled = false;
+    checkErrorEnabled = false;
 }
 
 smBool smShader::readShaderContent(const smString& p_file, smString& p_content)
@@ -298,8 +315,9 @@ void smShader::enableShader()
     }
 
     glUseProgramObjectARB(shaderProgramObject);
-    smShader::currentShader = this;
-    smShader::currentShaderEnabled = true;
+    smShader::currentShader = safeDownCast<smShader>();
+    currentShaderEnabled = true;
+
 #endif
 }
 
@@ -325,8 +343,8 @@ void smShader::disableShader()
     }
 
     glUseProgramObjectARB(0);
-    smShader::currentShader = this;
-    smShader::currentShaderEnabled = false;
+    smShader::currentShader = safeDownCast<smShader>();
+    currentShaderEnabled = false;
 #endif
 }
 
@@ -356,7 +374,7 @@ void smShader::restoreAndEnableCurrent()
         }
 
         glUseProgramObjectARB(currentShader->shaderProgramObject);
-        smShader::currentShaderEnabled = true;
+        currentShaderEnabled = true;
     }
 
 #endif
@@ -385,7 +403,7 @@ void smShader::saveAndDisableCurrent()
             glDisable(GL_GEOMETRY_SHADER_ARB);
         }
 
-        smShader::currentShaderEnabled = false;
+        currentShaderEnabled = false;
         smShader::savedShader = smShader::currentShader;
         glUseProgramObjectARB(0);
     }
@@ -797,7 +815,7 @@ void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt /*p_size*/
 }
 void smShader::registerShader()
 {
-    shaders[this->uniqueId.ID] = this;
+    shaders[this->uniqueId.ID] = safeDownCast<smShader>();
 }
 
 void smShader::print() const
@@ -849,7 +867,28 @@ GLint smShader::queryUniformLocation(const smString& p_param)
 {
     return glGetUniformLocation(shaderProgramObject, p_param.data());
 }
-smShader *smShader::getShader( smUnifiedID p_shaderID )
+std::shared_ptr<smShader> smShader::getShader( smUnifiedID p_shaderID )
 {
     return shaders[p_shaderID.ID];
+}
+smShader::~smShader()
+{
+#ifdef SIMMEDTK_OPENGL_SHADER
+
+    if(vertexProgramExist)
+    {
+        glDeleteObjectARB(vertexShaderObject);
+    }
+
+    if(fragmentProgramExist)
+    {
+        glDeleteObjectARB(fragmentShaderObject);
+    }
+
+    if(geometryProgramExist)
+    {
+        glDeleteObjectARB(geometryShaderObject);
+    }
+
+#endif
 }

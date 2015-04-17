@@ -725,9 +725,22 @@ inline int tri_tri_intersect_with_isectline(float V0[3],float V1[3],float V2[3],
 
 
 
- int tri_tri_intersect_with_isectline_penetrationDepth(float V0[3],float V1[3],float V2[3],
-				     float U0[3],float U1[3],float U2[3],int *coplanar,
-					 float isectpt1[3],float isectpt2[3], short &vSinglePoint,short &uSinglePoint,float point1[3], float point2[3])
+ int tri_tri_intersect_with_isectline_penetrationDepth(float V0[3],
+                                                       float V1[3],
+                                                       float V2[3],
+                                                       float U0[3],
+                                                       float U1[3],
+                                                       float U2[3],
+                                                       int *coplanar,
+                                                       float isectpt1[3],
+                                                       float isectpt2[3],
+                                                       short &vSinglePoint,
+                                                       short &uSinglePoint,
+                                                       float point1[3],
+                                                       float point2[3],
+                                                       float &depth,
+                                                       float normal[3]
+                                                      )
 {
   float E1[3],E2[3];
   float N1[3],N2[3],d1,d2;
@@ -922,9 +935,11 @@ inline int tri_tri_intersect_with_isectline(float V0[3],float V1[3],float V2[3],
 	point2[2]=U2[2]+N1[2]*temp;
   }
 
-
   //end tansel
-
+depth = temp;
+normal[0] = N1[0];
+normal[1] = N1[1];
+normal[2] = N1[2];
 
 
   return 1;

@@ -26,7 +26,6 @@
 /// \brief starts the tasks with the threads from thread pool
 void smSimulator::beginFrame()
 {
-
     frameCounter++;
 }
 
@@ -48,7 +47,7 @@ void smSimulator::initAsyncThreadPool()
         }
     }
 
-    asyncPool = std::unique_ptr<ThreadPool>(new ThreadPool(asyncThreadPoolSize));
+    asyncPool = make_unique<ThreadPool>(asyncThreadPoolSize);
 }
 
 /// \brief the main simulation loop
@@ -56,7 +55,7 @@ void smSimulator::run()
 {
     std::vector< std::future<int> > results;
     std::vector< std::future<int> > asyncResults;
-    smObjectSimulator *objectSimulator;
+    std::shared_ptr<smObjectSimulator> objectSimulator;
 
     if (isInitialized == false)
     {
@@ -75,11 +74,13 @@ void smSimulator::run()
         if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
         {
             objectSimulator = simulators[i];
-            asyncResults.emplace_back(asyncPool->enqueue([objectSimulator]()
+            asyncResults.emplace_back(asyncPool->enqueue(
+                [objectSimulator]()
                 {
                     objectSimulator->run();
                     return 0; //this return is just so we have a results value
-                }));
+                })
+            );
         }
     }
 
@@ -94,7 +95,6 @@ void smSimulator::run()
 
         if (changedMainTimeStamp > mainTimeStamp)
         {
-
             main = changedMain;
             changedMainTimeStamp = mainTimeStamp;
 
@@ -116,11 +116,13 @@ void smSimulator::run()
             }
 
             //start each simulator in it's own thread (as max threads allow...)
-            results.emplace_back(threadPool->enqueue([objectSimulator]()
+            results.emplace_back(threadPool->enqueue(
+                [objectSimulator]()
                 {
                     objectSimulator->run();
                     return 0; //this return is just so we have a results value
-                }));
+                })
+            );
         }
 
         for (auto&& result : results)
@@ -135,15 +137,22 @@ void smSimulator::run()
         }
 
         results.clear(); //clear the results buffer for new
+        std::shared_ptr<smCollisionDetection> collisionDetection;
         for (size_t i = 0; i < this->collisionDetectors.size(); i++)
         {
-            objectSimulator = collisionDetectors[i];
+            collisionDetection = collisionDetectors[i];
             //start each simulator in it's own thread (as max threads allow...)
-            results.emplace_back(threadPool->enqueue([objectSimulator]()
-                {
-                    objectSimulator->run();
-                    return 0; //this return is just so we have a results value
-                }));
+
+            for(const auto &pair : collisionPairs)
+            {
+                results.emplace_back(threadPool->enqueue(
+                    [collisionDetection,pair]()
+                    {
+                        collisionDetection->computeCollision(pair);
+                        return 0; //this return is just so we have a results value
+                    })
+                );
+            }
         }
 
         for (auto&& result : results)
@@ -162,24 +171,83 @@ void smSimulator::run()
 }
 
 /// \brief
-void smSimulator::registerObjectSimulator(smObjectSimulator *objectSimulator)
+void smSimulator::registerObjectSimulator(std::shared_ptr<smObjectSimulator> objectSimulator)
 {
-
-    simulators.push_back(objectSimulator);
+    simulators.emplace_back(objectSimulator);
     objectSimulator->enabled = true;
 }
 
 /// \brief
-void smSimulator::registerCollisionDetection(smObjectSimulator *p_collisionDetection)
+void smSimulator::registerCollisionDetection(std::shared_ptr<smCollisionDetection> p_collisionDetection)
 {
-
-    collisionDetectors.push_back(p_collisionDetection);
+    collisionDetectors.emplace_back(p_collisionDetection);
 }
 
 /// \brief
-void smSimulator::registerSimulationMain(smSimulationMain*p_main)
+void smSimulator::registerSimulationMain(std::shared_ptr<smSimulationMain> p_main)
 {
-
     changedMain = p_main;
     this->changedMainTimeStamp++;
+}
+
+void smSimulator::init()
+{
+    if(isInitialized == true)
+    {
+        return;
+    }
+    if(maxThreadCount == 0)
+    {
+        maxThreadCount = std::max(simulators.size(), collisionDetectors.size());
+    }
+    threadPool = make_unique<ThreadPool>(maxThreadCount);
+
+    for(size_t i = 0; i < this->simulators.size(); i++)
+    {
+        simulators[i]->init();
+    }
+
+    initAsyncThreadPool();
+    isInitialized = true;
+}
+
+smSimulator::smSimulator(std::shared_ptr< smErrorLog > p_log)
+{
+    type = SIMMEDTK_SMSIMULATOR;
+    isInitialized = false;
+    log = p_log;
+    frameCounter = 0;
+    main = nullptr;
+    changedMain = nullptr;
+    changedMainTimeStamp = 0;
+    mainTimeStamp = 0;
+    maxThreadCount = 0;
+    asyncThreadPoolSize = 0;
+}
+
+void smSimulator::setMaxThreadCount(int p_threadMaxCount)
+{
+    if(p_threadMaxCount < 0)
+    {
+        return;
+    }
+    else
+    {
+        maxThreadCount = p_threadMaxCount;
+    }
+}
+
+void smSimulator::exec()
+{
+    if(isInitialized)
+    {
+        run();
+    }
+    else
+    {
+        init();
+        run();
+    }
+
+    this->terminationCompleted = true;
 }

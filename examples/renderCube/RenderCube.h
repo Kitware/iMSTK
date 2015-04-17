@@ -37,7 +37,7 @@ public:
     void simulateMain(smSimulationMainParam p_param);
     void handleEvent(smEvent *p_event);
 private:
-    smSDK* simmedtkSDK;
+    std::unique_ptr<smSDK> sdk;
     smScene *scene1;
     smStaticSceneObject cube;
     smViewer viewer;

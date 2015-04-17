@@ -23,10 +23,10 @@
 
 #include "smCore/smStaticSceneObject.h"
 
-smStaticSceneObject::smStaticSceneObject ( smErrorLog* p_log )
+smStaticSceneObject::smStaticSceneObject ( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMSTATICSCENEOBJECT;
-    mesh = new smSurfaceMesh ( SMMESH_RIGID, p_log );
+    mesh = std::make_shared<smSurfaceMesh>( SMMESH_RIGID, p_log );
 }
 smStaticSceneObject::~smStaticSceneObject() {}
 void smStaticSceneObject::init() {}
@@ -39,7 +39,7 @@ void smStaticSceneObject::draw(const smDrawParam &p_params)
     mesh->draw(p_params);
 }
 
-smSceneObject* smStaticSceneObject::clone()
+std::shared_ptr<smSceneObject> smStaticSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }

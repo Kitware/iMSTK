@@ -26,13 +26,13 @@
 class ImageExample: public smCoreClass
 {
 
-    smSDK* simmedtkSDK;
+    std::unique_ptr<smSDK> sdk;
 public:
 
     ImageExample()
     {
         ///create the SDK
-        simmedtkSDK = smSDK::createSDK();
+        sdk = smSDK::createSDK();
 
         ///Init the texture manager before using it
         smTextureManager::init(smSDK::getErrorLog());
@@ -66,7 +66,7 @@ public:
         std::cout << "Bitmap Image is created" << "\n";
 
         ///run the sdk
-        simmedtkSDK->run();
+        sdk->run();
     }
     virtual ~ImageExample(){}
 };

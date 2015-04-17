@@ -33,6 +33,21 @@
 /// \brief Position based dynamics (PBD) object
 class smPBDSceneObject: public smSceneObject
 {
+public:
+    /// \brief constructor
+    smPBDSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+
+    /// \brief !!
+    virtual std::shared_ptr<smSceneObject> clone();
+
+    /// \brief !!
+    virtual void serialize(void *p_memoryBlock);
+
+    /// \brief !!
+    virtual void unSerialize(void *p_memoryBlock);
+
+    /// \brief find the masses that are fixed
+    void findFixedMass();
 
 public:
     smFloat dT; ///< size of time step
@@ -40,9 +55,9 @@ public:
     smFloat Damp; ///< damping values
     smInt nbrMass; ///< number of masses
     smInt **massIdx; ///< !!
-    smVec3f *P; ///< !! position
-    smVec3f  *V; ///< !! velocity
-    smVec3f  *exF; ///< external force
+    smStdVector3f P; ///< !! position
+    smStdVector3f V; ///< !! velocity
+    smStdVector3f exF; ///< external force
     smInt nbrSpr; ///< !! number of spheres
     smFloat *L0; ///< !! Initial length
     smBool *fixedMass; ///< true if masses are fixed
@@ -55,38 +70,18 @@ public:
 
     smFloat ball_mass; ///< !! mass of ball
     smFloat ball_rad; ///< !! radius of ball
-
-    /// \brief constructor
-    smPBDSceneObject(smErrorLog *p_log = NULL);
-
-    /// \brief !!
-    virtual smSceneObject*clone();
-
-    /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
-
-    /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
-
-    /// \brief find the masses that are fixed
-    void findFixedMass();
 };
 
 /// \brief Position based dynamics (PBD) object for surface mesh (eg. cloth)
 class smPBDSurfaceSceneObject: public smPBDSceneObject
 {
-
 public:
-    smSurfaceMesh *mesh; ///< surface mesh
-    smInt nbrTri; ///< number of surface triangles
-    smInt **triVertIdx; ///< !!
-    smInt **sprInTris; ///< triangles that include a spring
 
     /// \brief constructor
-    smPBDSurfaceSceneObject(smErrorLog *p_log = NULL);
+    smPBDSurfaceSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual smSceneObject *clone();
+    virtual std::shared_ptr<smSceneObject> clone();
 
     /// \brief !!
     virtual void serialize(void *p_memoryBlock);
@@ -111,6 +106,12 @@ public:
 
     /// \brief render the surface PBD object
     virtual void draw(const smDrawParam &p_params);
+
+public:
+    smSurfaceMesh *mesh; ///< surface mesh
+    smInt nbrTri; ///< number of surface triangles
+    smInt **triVertIdx; ///< !!
+    smInt **sprInTris; ///< triangles that include a spring
 };
 
 #endif

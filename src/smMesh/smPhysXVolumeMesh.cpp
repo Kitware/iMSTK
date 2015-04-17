@@ -21,12 +21,11 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smPhysXVolumeMesh.h"
+#include "smMesh//smPhysXVolumeMesh.h"
 #include "smRendering/smGLRenderer.h"
 
 smPhysXVolumeMesh::smPhysXVolumeMesh()
 {
-
     this->nbrTetra = 0;
     this->nbrNodes = 0;
     this->nbrLinks = 0;
@@ -36,19 +35,6 @@ smPhysXVolumeMesh::smPhysXVolumeMesh()
 
 smPhysXVolumeMesh::~smPhysXVolumeMesh()
 {
-
-    if (neiTet != NULL)
-    {
-        for (smInt i = 0; this->nbrNodes; i++)
-        {
-            if (this->neiTet[i].idx != NULL)
-            {
-                delete [] this->neiTet[i].idx;
-            }
-        }
-
-        delete [] neiTet;
-    }
 }
 
 ///loads the .tet and .obj file
@@ -103,8 +89,8 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
     this->nbrNodes = tempNodes.size();
     this->nbrLinks = links.size();
 
-    this->tetra = new smTetrahedra[this->nbrTetra];
-    this->nodes = new smVec3f[this->nbrNodes];
+    this->tetra.resize(this->nbrTetra);
+    this->nodes.resize(this->nbrNodes);
 
     for (smInt i = 0; i < this->nbrNodes; i++)
     {
@@ -119,10 +105,10 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
         this->tetra[i].vert[3] = tempIndices[4 * i + 3];
     }
 
-    surfaceMesh = new smSurfaceMesh(SMMESH_DEFORMABLE, NULL);
+    surfaceMesh = std::make_shared<smSurfaceMesh>(SMMESH_DEFORMABLE, nullptr);
     surfaceMesh->loadMesh(p_surfaceMesh, SM_FILETYPE_OBJ);
 
-    this->drawTet = new smBool[this->nbrTetra];
+    this->drawTet.resize(this->nbrTetra);
 
     for (smInt i = 0; i < this->nbrTetra; i++)
     {
@@ -154,7 +140,7 @@ void smPhysXVolumeMesh::findNeighborTetrasOfNode()
 {
     smInt n, tempIdx[1000];
 
-    this->neiTet = new smNeighborTetrasOfNode[this->nbrNodes];
+    this->neiTet.resize(this->nbrNodes);
 
     for (smInt i = 0 ; i < this->nbrNodes; i++)
     {
@@ -173,7 +159,7 @@ void smPhysXVolumeMesh::findNeighborTetrasOfNode()
         }
 
         this->neiTet[i].nbrNeiTet = n;
-        this->neiTet[i].idx = new smInt[this->neiTet[i].nbrNeiTet];
+        this->neiTet[i].idx.resize(this->neiTet[i].nbrNeiTet);
 
         for (smInt j = 0; j < this->neiTet[i].nbrNeiTet; j++)
         {
@@ -187,7 +173,7 @@ void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
 
     if (renderSurface)
     {
-        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, &p_params.caller->renderDetail, p_params);
+        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, p_params.caller->renderDetail, p_params);
     }
 
     if (renderTetras)

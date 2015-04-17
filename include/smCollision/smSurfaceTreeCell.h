@@ -36,17 +36,12 @@
 template <typename Derived>
 class smSurfaceTreeCell
 {
-
 public:
-    bool filled; ///< !!
-    int level; ///< level in the tree
-    std::set<int> verticesIndices; ///< indices of vertices
-    std::vector<float> weights; ///< !!
-
     /// \brief constructor
     smSurfaceTreeCell()
     {
-        filled = false;
+        isEmpty = true;
+        isLeaf = false;
         level = 0;
     }
 
@@ -57,7 +52,8 @@ public:
     }
 
     /// \brief subdivide the cell of surface tree structure
-    inline void subDivide(const int divisionPerAxis, std::vector<Derived> &cells)
+    template<typename ArrayType>
+    inline void subDivide(const int divisionPerAxis, ArrayType &cells)
     {
         derived()->subDivide(divisionPerAxis,cells);
     };
@@ -121,6 +117,84 @@ public:
     {
         return derived()->getLength();
     }
+
+    template<typename smAABB>
+    inline void addTriangleData(const smAABB &aabb, size_t index)
+    {
+        return derived()->addTriangleData(aabb,index);
+    }
+
+    inline const bool &getIsEmpty() const
+    {
+        return isEmpty;
+    }
+
+    inline void setIsEmpty(const bool &empty)
+    {
+        isEmpty = empty;
+    }
+
+    inline const bool &getIsLeaf() const
+    {
+        return isEmpty;
+    }
+
+    inline void setIsLeaf(const bool &leaf)
+    {
+        isLeaf = leaf;
+    }
+
+    inline const std::set<int> &getVerticesIndices() const
+    {
+        return verticesIndices;
+    }
+
+    inline void setVerticesIndices(const std::set<int> &indices)
+    {
+        verticesIndices = indices;
+    }
+
+    inline void addVertexIndex(const int &index)
+    {
+        verticesIndices.insert(index);
+    }
+
+    inline void setLevel(const int &l)
+    {
+        level = l;
+    }
+
+    inline const int &getLevel() const
+    {
+        return level;
+    }
+
+    inline void setWeights(const std::vector<float> &w)
+    {
+        weights = w;
+    }
+
+    inline const std::vector<float> &getWeights() const
+    {
+        return weights;
+    }
+
+    inline std::vector<float> &getWeights()
+    {
+        return weights;
+    }
+
+    inline void addWeight(const int &w)
+    {
+        weights.emplace_back(w);
+    }
+
+private:
+    bool isEmpty; ///< !!
+    bool isLeaf; ///< !!
+    int level; ///< level in the tree
+    std::vector<float> weights; ///< !!
+    std::set<int> verticesIndices; ///< indices of vertices
 };
 
 #endif

@@ -48,6 +48,16 @@ public:
                           smVec3f &p_projPoint1,
                           smVec3f &p_projPoint2);
 
+    static smBool tri2tri( smVec3f &p_tri1Point1,
+                           smVec3f &p_tri1Point2,
+                           smVec3f &p_tri1Point3,
+                           smVec3f &p_tri2Point1,
+                           smVec3f &p_tri2Point2,
+                           smVec3f &p_tri2Point3,
+                           float &depth,
+                           smVec3f &contactPoint,
+                           smVec3f &normal);
+
     /// \brief checks if the two triangles intersect
     static smBool tri2tri(smVec3f &p_tri1Point1,
                           smVec3f &p_tri1Point2,
@@ -60,7 +70,7 @@ public:
     static bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB, smAABB &result);
 
     /// \brief check the AABBs overlap. returns true if they intersect
-    static bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB);
+    static bool checkOverlapAABBAABB(const smAABB &aabbA, const smAABB &aabbB);
 
     /// \brief check if the point p_vertex is inside the AABB
     static inline bool checkOverlapAABBAABB(smAABB &aabbA, smVec3f &p_vertex);

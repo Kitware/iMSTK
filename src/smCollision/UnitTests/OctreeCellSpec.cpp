@@ -44,8 +44,8 @@ go_bandit([](){
 
         it("initializes properly", [&]() {
           AssertThat(numberOfSubdivisions, Equals(8));
-          AssertThat(treeCell.filled, IsFalse());
-          AssertThat(treeCell.level, Equals(0));
+          AssertThat(treeCell.getIsEmpty(), IsTrue());
+          AssertThat(treeCell.getLevel(), Equals(0));
         });
 
         it("sets the center properly", [&]() {

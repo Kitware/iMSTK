@@ -40,23 +40,13 @@ struct smPhysXLink
 struct smNeighborTetrasOfNode
 {
     smInt nbrNeiTet;
-    smInt *idx;
+    std::vector<smInt> idx;
 };
 
 /// \brief PhysX volume mesh
 class smPhysXVolumeMesh: public smVolumeMesh
 {
 public:
-    smBool renderSurface; ///< true if surface is to be rendered
-    smBool renderTetras; ///< true if tetrahedra is to be rendered
-    std::vector<smPhysXLink> links; ///< !!
-    smInt nbrLinks; ///< !! number of links
-    smSurfaceMesh *surfaceMesh; ///< surface mesh
-    std::vector<std::vector <smEdge>> tetraEdges; ///< edges of tetrahedra
-    smNeighborTetrasOfNode *neiTet; ///< neighbor tetrahedra of a node
-    smBool *drawTet; ///< true for those tetra to be rendered
-    smBool *removedNode; ///< true for nodes to be removed
-
     /// \brief constructor
     smPhysXVolumeMesh();
 
@@ -77,6 +67,17 @@ public:
 
     /// \brief find neighbor tetrahedra of node (brute force search)
     void findNeighborTetrasOfNode();
+
+public:
+    smBool renderSurface; ///< true if surface is to be rendered
+    smBool renderTetras; ///< true if tetrahedra is to be rendered
+    smInt nbrLinks; ///< !! number of links
+    std::shared_ptr<smSurfaceMesh> surfaceMesh; ///< surface mesh
+    std::vector<smPhysXLink> links; ///< !!
+    std::vector<smNeighborTetrasOfNode> neiTet; ///< neighbor tetrahedra of a node
+    std::vector<std::vector<smEdge>> tetraEdges; ///< edges of tetrahedra
+    std::vector<smBool> drawTet; ///< true for those tetra to be rendered
+    std::vector<smBool> removedNode; ///< true for nodes to be removed
 };
 
 #endif

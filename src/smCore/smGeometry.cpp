@@ -185,14 +185,14 @@ void smCube::expand( float p_expansion )
     sideLength = sideLength + sideLength * p_expansion;
 }
 
-smVec3f smCube::leftMinCorner()
+smVec3f smCube::leftMinCorner() const
 {
     return smVec3f( center[0] - sideLength * 0.5,
                     center[1] - sideLength * 0.5,
                     center[2] - sideLength * 0.5 );
 }
 
-smVec3f smCube::rightMaxCorner()
+smVec3f smCube::rightMaxCorner() const
 {
     return smVec3f( center[0] + sideLength * 0.5,
                     center[1] + sideLength * 0.5,

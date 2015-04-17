@@ -27,22 +27,19 @@
 
 void smObjectSimulator::initDraw(const smDrawParam &p_params)
 {
-
     p_params.rendererObject->addText(name);
 }
 
 void smObjectSimulator::draw(const smDrawParam &p_params)
 {
-
     smString fps(name + " FPS: " + std::to_string(this->FPS));
     p_params.rendererObject->updateText(name, fps);
 }
 
-smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
+smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
 {
-
     this->log = p_log;
-    smSDK::registerObjectSim(this);
+//     smSDK::getInstance()->registerObjectSim(safeDownCast<smObjectSimulator>());
     name = "objecSimulator" + std::to_string(uniqueId.ID);
 
     type = SIMMEDTK_SMOBJECTSIMULATOR;
@@ -59,13 +56,13 @@ smObjectSimulator::smObjectSimulator(smErrorLog *p_log)
     execType = SIMMEDTK_SIMEXECUTION_SYNCMODE;
 }
 
-void smObjectSimulator::addObject( smSceneObject *p_object )
+void smObjectSimulator::addObject(std::shared_ptr<smSceneObject> p_object)
 {
-    p_object->objectSim = this;
-    objectsSimulated.push_back( p_object );
+    p_object->objectSim = safeDownCast<smObjectSimulator>();
+    objectsSimulated.emplace_back( p_object );
 }
 
-void smObjectSimulator::removeObject( smSceneObject */*p_object*/ )
+void smObjectSimulator::removeObject(std::shared_ptr<smSceneObject> /*p_object*/ )
 {
 }
 
@@ -121,7 +118,9 @@ void smObjectSimulator::updateSceneList()
 {
 }
 
-smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smScheduleGroup &p_group, std::vector< smSceneObject * > &p_objectsSimulated, int p_threadIndex )
+smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smScheduleGroup &p_group,
+                                                                             std::vector<std::shared_ptr<smSceneObject>> &p_objectsSimulated,
+                                                                             int p_threadIndex )
 {
 
     smInt objectsPerThread;

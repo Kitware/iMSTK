@@ -22,12 +22,13 @@
 //---------------------------------------------------------------------------
 
 #include "smMesh/smMesh.h"
-#include "smCore/smSDK.h"
+// #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
+#include "smRendering/smViewer.h"
 
 smBaseMesh::smBaseMesh()
 {
-    smSDK::registerMesh(this);
+//     smSDK::getInstance()->registerMesh(safeDownCast<smBaseMesh>());
 }
 
 void smBaseMesh::updateOriginalVertsWithCurrent()
@@ -69,11 +70,11 @@ smMesh::~smMesh()
 /// \brief
 void smMesh::allocateAABBTris()
 {
-
     if (triAABBs == NULL)
     {
         triAABBs = new smAABB[nbrTriangles];
     }
+    this->updateTriangleAABB();
 }
 
 /// \brief
@@ -402,9 +403,8 @@ void smMesh::calcNeighborsVertices()
 }
 
 /// \brief
-inline void smMesh::upadateAABB()
+void smMesh::upadateAABB()
 {
-
     smFloat minx = smMAXFLOAT ;
     smFloat miny = smMAXFLOAT;
     smFloat minz = smMAXFLOAT;
@@ -524,19 +524,18 @@ void smMesh::rotate(const smMatrix33f &p_rot)
 /// \brief
 void smMesh::draw(const smDrawParam &p_params)
 {
-
-    smViewer *viewer = p_params.rendererObject;
+    auto viewer = p_params.rendererObject;
 
     if (viewer->renderStage == SMRENDERSTAGE_SHADOWPASS && p_params.caller->renderDetail.castShadow == false)
     {
         return;
     }
 
-    smGLRenderer::drawSurfaceMeshTriangles(this, &p_params.caller->renderDetail, p_params);
+    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), p_params.caller->renderDetail, p_params);
 
     if (p_params.caller->renderDetail.renderType & SIMMEDTK_RENDER_NORMALS)
     {
-        smGLRenderer::drawNormals(this, p_params.caller->renderDetail.normalColor);
+        smGLRenderer::drawNormals(safeDownCast<smMesh>(), p_params.caller->renderDetail.normalColor);
     }
 }
 
@@ -658,7 +657,7 @@ void smMesh::checkCorrectWinding()
 /// \brief
 void smLineMesh::draw(const smDrawParam &p_params)
 {
-    smGLRenderer::drawLineMesh(this, &p_params.caller->renderDetail);
+    smGLRenderer::drawLineMesh(safeDownCast<smLineMesh>(), p_params.caller->renderDetail);
 
     if (p_params.caller->renderDetail.debugDraw)
     {

@@ -25,21 +25,18 @@
 #include "smCore/smEvent.h"
 
 ///calls all the Event Handlers and then Delete the event
-void smEventDispatcher::registerEventHandler(smEventHandler *p_handler,
-        smEventType p_eventType)
+void smEventDispatcher::registerEventHandler(std::shared_ptr<smEventHandler> p_handler,
+        const smEventType &p_eventType)
 {
-
-    smEventHandlerHolder *holder;
-    holder = new smEventHandlerHolder();
+    std::shared_ptr<smEventHandlerHolder> holder = std::make_shared<smEventHandlerHolder>();
     holder->handler = p_handler;
     holder->registeredEventType = p_eventType;
     handlers.push_back(holder);
 }
 
-void smEventDispatcher::disableEventHandler(smEventHandler *p_handler,
-        smEventType p_eventType)
+void smEventDispatcher::disableEventHandler(std::shared_ptr<smEventHandler> p_handler,
+        const smEventType &p_eventType)
 {
-
     for (size_t i = 0; i < handlers.size(); i++)
     {
         if (handlers[i]->handler == p_handler && handlers[i]->registeredEventType == p_eventType)
@@ -49,8 +46,8 @@ void smEventDispatcher::disableEventHandler(smEventHandler *p_handler,
     }
 }
 
-void smEventDispatcher::enableEventHandler(smEventHandler *p_handler,
-        smEventType p_eventType)
+void smEventDispatcher::enableEventHandler(std::shared_ptr<smEventHandler> p_handler,
+        const smEventType &p_eventType)
 {
 
     for (size_t i = 0; i < handlers.size(); i++)
@@ -64,26 +61,25 @@ void smEventDispatcher::enableEventHandler(smEventHandler *p_handler,
 
 ///Synchronous Event calling..Be aware that the calling of the functions are not serialized.
 ///The serialization should be done within the handler function.
-void smEventDispatcher::sendStreamEvent(smEvent *p_event)
+void smEventDispatcher::sendStreamEvent(std::shared_ptr<smEvent> p_event)
 {
-
     callHandlers(p_event);
 }
 
-void smEventDispatcher::sendEventAndDelete(smEvent *p_event)
+void smEventDispatcher::sendEventAndDelete(std::shared_ptr<smEvent> p_event)
 {
-
     callHandlers(p_event);
-    delete p_event;
+    p_event.reset();
 }
 
 ///asynchronous Event calling
 ///not implemented yet
-void smEventDispatcher::asyncSendEvent(smEvent */*p_event*/)
+void smEventDispatcher::asyncSendEvent(std::shared_ptr<smEvent> /*p_event*/)
 {
 
 }
-void smEventDispatcher::callHandlers( smEvent *p_event )
+
+void smEventDispatcher::callHandlers(std::shared_ptr<smEvent> p_event)
 {
     int v = handlers.size();
 
@@ -99,6 +95,10 @@ void smEventDispatcher::callHandlers( smEvent *p_event )
 smEventHandlerHolder::smEventHandlerHolder()
 {
     enabled = true;
-    handler = NULL;
+    handler.reset();
     registeredEventType = SIMMEDTK_EVENTTYPE_NONE;
+}
+smEventDispatcher::smEventDispatcher()
+{
+    messageId = 1;
 }

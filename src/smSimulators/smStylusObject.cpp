@@ -100,13 +100,13 @@ void smStylusRigidSceneObject::initDraw(const smDrawParam &p_params)
     }
 }
 
-smStylusSceneObject::smStylusSceneObject(smErrorLog */*p_log*/)
+smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
 {
     type = SIMMEDTK_SMSTYLUSSCENEOBJECT;
     toolEnabled = true;
 }
 
-smStylusRigidSceneObject::smStylusRigidSceneObject(smErrorLog */*p_log*/)
+smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
 {
     type = SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT;
     updateViewerMatrixEnabled = true;
@@ -115,7 +115,7 @@ smStylusRigidSceneObject::smStylusRigidSceneObject(smErrorLog */*p_log*/)
     enableDeviceManipulatedTool = false;
 }
 
-smStylusDeformableSceneObject::smStylusDeformableSceneObject(smErrorLog */*p_log*/)
+smStylusDeformableSceneObject::smStylusDeformableSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
 {
     type = SIMMEDTK_SMSTYLUSDEFORMABLESCENEOBJECT;
 }
@@ -144,6 +144,7 @@ void smStylusRigidSceneObject::posTraverseCallBack(smMeshContainer &p_container)
         p_container.colModel->translateRot();
     }
 }
+
 smMeshContainer::smMeshContainer( std::string p_name )
 {
     name = p_name;
@@ -155,6 +156,7 @@ smMeshContainer::smMeshContainer( std::string p_name )
     mesh = NULL;
     colModel = NULL;
 }
+
 smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3f p_prePos, smVec3f p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
 {
     offsetRotX = p_offsetRotX;
@@ -165,6 +167,7 @@ smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3
     name = p_name;
     colModel = NULL;
 }
+
 void smMeshContainer::computeCurrentMatrix()
 {
     Eigen::Affine3f preTranslate( Eigen::Translation3f( preOffsetPos[0], preOffsetPos[1], preOffsetPos[2] ) );
@@ -177,21 +180,26 @@ void smMeshContainer::computeCurrentMatrix()
     tempCurrentMatrix *= transform;
     tempCurrentDeviceMatrix *= transform;
 }
+
 smStylusPoints::smStylusPoints()
 {
     point = smVec3f::Zero();
     container = NULL;
 }
+
 void smStylusSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 }
+
 void smStylusSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 }
-void smStylusSceneObject::handleEvent( smEvent */*p_event*/ ) {}
+
+void smStylusSceneObject::handleEvent( std::shared_ptr<smEvent>/*p_event*/ ) {}
 void smStylusRigidSceneObject::posTraverseCallBack()
 {
 }
+
 tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( smMeshContainer *p_meshContainer )
 {
     tree<smMeshContainer *>::iterator iter;
@@ -209,6 +217,7 @@ tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( 
     indexIterators[p_meshContainer->name] = iter;
     return iter;
 }
+
 bool smStylusRigidSceneObject::addMeshContainer( std::string p_ParentName, smMeshContainer *p_meshContainer )
 {
     tree<smMeshContainer *>::iterator iter;
@@ -231,15 +240,20 @@ bool smStylusRigidSceneObject::addMeshContainer( std::string p_ParentName, smMes
         return false;
     }
 }
+
 tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( tree< smMeshContainer * >::iterator p_iterator, smMeshContainer *p_meshContainer )
 {
     return meshes.insert( p_iterator, p_meshContainer );
 }
-void smStylusRigidSceneObject::handleEvent( smEvent */*p_event*/ ) {}
-smSceneObject *smStylusRigidSceneObject::clone()
+
+void smStylusRigidSceneObject::handleEvent( std::shared_ptr<smEvent>/*p_event*/ ) {}
+
+std::shared_ptr<smSceneObject> smStylusRigidSceneObject::clone()
 {
-    smStylusRigidSceneObject *ret = new smStylusRigidSceneObject();
+    // WARNING: What is the purpose of this function
+    std::shared_ptr<smStylusRigidSceneObject> ret = std::make_shared<smStylusRigidSceneObject>();
     return ret;
 }
+
 void smStylusRigidSceneObject::init() {}
 void smStylusSceneObject::init() {}

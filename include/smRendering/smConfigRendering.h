@@ -88,6 +88,7 @@ struct smColor
     smColor &operator=(smColor &p_color);
     /// \brief converts to gl color
     smGLFloat* toGLColor();
+    const smGLFloat* toGLColor() const;
     /// \brief set RGB color
     void setValue(smFloat p_red, smFloat p_green, smFloat p_blue, smFloat p_alpha);
 
@@ -154,47 +155,69 @@ struct smUnifiedID;
 struct smRenderDetail
 {
 public:
-    smRenderDetail() /*:shaders(10)*/;
-    /// \brief render type
-    smUInt renderType;
-    /// \brief diffuse color
-    smColor colorDiffuse;
-    /// \brief ambient color
-    smColor colorAmbient;
-    /// \brief specular color
-    smColor colorSpecular;
-    /// \brief highlight color
-    smColor highLightColor;
-    /// \brief shadow color
-    smColor shadowColor;
-    /// \brief object can generate a shadow or not
-    smBool castShadow;
-    /// \brief object can get the shadow or not
-    smBool canGetShadow;
-    /// \brief normal color
-    smColor normalColor;
-    /// \brief wire frame color
-    smColor wireFrameColor;
-    /// \brief point size if rendering of vertices are enabled
-    smFloat pointSize;
-    /// \brief line width size
-    smFloat lineSize;
-    /// \brief specular shinness
-    smFloat shininess;
-    /// \brief debug draw enabled or not
-    smBool debugDraw;
+    smRenderDetail();
+
     /// \brief attachment of shader
     void addShader(smUnifiedID p_shaderID);
+
     /// \brief attachment of VAO
     void addVAO(smUnifiedID p_shaderID);
-    /// \brief attached shaders
-    std::vector<smUnifiedID> shaders;
-    /// \brief enable/disable any attached shader
-    std::vector<smBool> shaderEnable;
-    /// \brief stores  VAO IDs
-    std::vector<smUnifiedID> VAOs;
-    /// \brief enable/disable any attached VAO
-    std::vector<smBool> VAOEnable;
+
+    const smColor &getColorDiffuse() const;
+
+    const smColor &getColorAmbient() const;
+
+    const smColor &getColorSpecular() const;
+
+    const smFloat &getShininess() const;
+
+    const smUInt &getRenderType() const;
+
+    const smFloat &getPointSize() const;
+
+    const smFloat &getLineSize() const;
+
+    const smColor &getNormalColor() const;
+
+    const smColor &getHighLightColor() const;
+
+    const smColor &getShadowColor() const;
+
+    const smBool &getCastShadow() const;
+
+    const smBool &getCanGetShadow() const;
+
+    const smColor &getWireFrameColor() const;
+
+    const smBool &getDebugDraw() const;
+
+    const std::vector<smUnifiedID> &getShaders() const;
+
+    const std::vector<smBool> &getShaderEnable() const;
+
+    const std::vector<smUnifiedID> &getVAOs() const;
+
+    const std::vector<smBool> &getVAOEnable() const;
+
+public:
+    smUInt renderType; // render type
+    smColor colorDiffuse; // diffuse color
+    smColor colorAmbient; // ambient color
+    smColor colorSpecular; // specular color
+    smColor highLightColor; // highlight color
+    smColor shadowColor; // shadow color
+    smBool castShadow; // object can generate a shadow or not
+    smBool canGetShadow; // object can get the shadow or not
+    smColor normalColor; // normal color
+    smColor wireFrameColor; // wire frame color
+    smFloat pointSize; // point size if rendering of vertices are enabled
+    smFloat lineSize; // line width size
+    smFloat shininess; // specular shinness
+    smBool debugDraw; // debug draw enabled or not
+    std::vector<smUnifiedID> shaders; // attached shaders
+    std::vector<smBool> shaderEnable; // enable/disable any attached shader
+    std::vector<smUnifiedID> VAOs; // stores  VAO IDs
+    std::vector<smBool> VAOEnable; // enable/disable any attached VAO
 };
 
 #endif

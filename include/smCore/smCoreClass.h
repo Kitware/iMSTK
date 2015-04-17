@@ -25,6 +25,7 @@
 #define SMCORECLASS_H
 
 // STL includes
+#include <memory>
 #include <atomic>
 #include <iostream>
 
@@ -40,18 +41,17 @@ class smViewer;
 /// \brief  viewer sends this to all objects to be rendered
 struct smDrawParam
 {
-    smViewer    *rendererObject;
-    smCoreClass *caller;
+    std::shared_ptr<smViewer> rendererObject;
+    std::shared_ptr<smCoreClass> caller;
     void *data;
 };
 
 /// \brief simulator calls object and sends this structure
 struct smSimulationParam
 {
-    smObjectSimulator *objectSimulator;
+    std::shared_ptr<smObjectSimulator> objectSimulator;
     void *caller;
     void *data;
-
 };
 
 /// \brief  This class indicates the unified id of all  objects in the framework
@@ -77,7 +77,12 @@ public:
     void generateUniqueID();
 
     /// \brief  returns SDK id
-    smInt getSDKID() const;
+    const smShort &getSdkId() const;
+
+    void setSdkId(const smShort &id)
+    {
+        sdkID = id;
+    }
 
     /// \brief  set with another smUnifiedID
     void operator =(const smUnifiedID &p_id);
@@ -91,29 +96,13 @@ public:
     /// \brief comparison with id
     bool operator!=(smInt &p_ID);
 
-    friend smSDK;
 };
 
 /// \brief core class of all objects in framework
-class smCoreClass
+class smCoreClass : public std::enable_shared_from_this<smCoreClass>
 {
 
-protected:
-    /// \brief class type
-    smClassType type;
-    /// \brief reference counter to identify the count the usage
-    std::atomic_int referenceCounter;
-
 public:
-    /// \brief name of the class
-    smString name;
-    /// \brief unique ID
-    smUnifiedID uniqueId;
-    /// \brief renderDetail specifies visualization type
-    smRenderDetail renderDetail;
-    /// \brief draw order of the object
-    smClassDrawOrder drawOrder;
-
     /// \brief constructor
     smCoreClass();
 
@@ -121,7 +110,10 @@ public:
     smCoreClass(const std::string &);
 
     /// \brief get type of the class
-    smClassType getType() const ;
+    const smClassType &getType() const ;
+
+    /// \brief set type of the class
+    void setType(const smClassType &newType);
 
     /// \brief his function is called by the renderer. The p_params stores renderer pointers
     virtual void initDraw(const smDrawParam &p_params);
@@ -142,13 +134,50 @@ public:
     void setName(const smString &p_objectName);
 
     /// \brief get the name of the object
-    smString getName() const;
+    const smString &getName() const;
 
-    friend smSDK;
+    /// \brief Increease reference counter
+    std::atomic_int &operator++()
+    {
+        ++referenceCounter;
+        return referenceCounter;
+    }
+
+    /// \brief Decreease reference counter
+    std::atomic_int &operator--()
+    {
+        --referenceCounter;
+        return referenceCounter;
+    }
+
+protected:
+    template<typename DerivedType>
+    std::shared_ptr<DerivedType> safeDownCast()
+    {
+        auto thisObject = shared_from_this();
+        return std::static_pointer_cast<DerivedType>(thisObject);
+    }
+
+protected:
+    /// \brief class type
+    smClassType type;
+    /// \brief reference counter to identify the count the usage
+    std::atomic_int referenceCounter;
+//     friend smSDK;
+
+public:
+    /// \brief name of the class
+    smString name;
+    /// \brief unique ID
+    smUnifiedID uniqueId;
+    /// \brief renderDetail specifies visualization type
+    smRenderDetail renderDetail;
+    /// \brief draw order of the object
+    smClassDrawOrder drawOrder;
 };
 
 /// \brief for future use
-class smInterface
+class smInterface : public smCoreClass
 {
 
 };

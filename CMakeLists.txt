@@ -196,7 +196,6 @@ simmedtk_find_package(DevIL REQUIRED)
 set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 
 simmedtk_find_package(Audiere REQUIRED)
-simmedtk_find_package(V8 REQUIRED)
 
 if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)

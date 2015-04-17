@@ -28,16 +28,73 @@
 #include "smExternal/moller.h"
 #include "smExternal/moller2.h"
 
-smBool smCollisionMoller::tri2tri( smVec3f &p_tri1Point1, smVec3f &p_tri1Point2, smVec3f &p_tri1Point3, smVec3f &p_tri2Point1, smVec3f &p_tri2Point2, smVec3f &p_tri2Point3, smInt &coplanar, smVec3f &p_intersectionPoint1, smVec3f &p_intersectionPoint2, smShort &p_tri1SinglePointIndex, smShort &p_tri2SinglePointIndex, smVec3f &p_projPoint1, smVec3f &p_projPoint2 )
+smBool smCollisionMoller::tri2tri( smVec3f &tri1Point1,
+                                   smVec3f &tri1Point2,
+                                   smVec3f &tri1Point3,
+                                   smVec3f &tri2Point1,
+                                   smVec3f &tri2Point2,
+                                   smVec3f &tri2Point3,
+                                   float &depth,
+                                   smVec3f &contactPoint,
+                                   smVec3f &normal)
 {
+    int coplanar;
+    smVec3f intersectionPoint2;
+    short tri1SinglePointIndex;
+    short tri2SinglePointIndex;
+    smVec3f projPoint1;
+    smVec3f projPoint2;
+    if ( tri_tri_intersect_with_isectline_penetrationDepth( tri1Point1.data(),
+                                                            tri1Point2.data(),
+                                                            tri1Point3.data(),
+                                                            tri2Point1.data(),
+                                                            tri2Point2.data(),
+                                                            tri2Point3.data(),
+                                                            &coplanar,
+                                                            contactPoint.data(),
+                                                            intersectionPoint2.data(),
+                                                            tri1SinglePointIndex,
+                                                            tri2SinglePointIndex,
+                                                            projPoint1.data(),
+                                                            projPoint2.data(),
+                                                            depth,
+                                                            normal.data()
+                                                          ) == 1 )
+    {
+        return true;
+    }
+    return false;
+}
 
+smBool smCollisionMoller::tri2tri( smVec3f &p_tri1Point1,
+                                   smVec3f &p_tri1Point2,
+                                   smVec3f &p_tri1Point3,
+                                   smVec3f &p_tri2Point1,
+                                   smVec3f &p_tri2Point2,
+                                   smVec3f &p_tri2Point3,
+                                   smInt &coplanar,
+                                   smVec3f &p_intersectionPoint1,
+                                   smVec3f &p_intersectionPoint2,
+                                   smShort &p_tri1SinglePointIndex,
+                                   smShort &p_tri2SinglePointIndex,
+                                   smVec3f &p_projPoint1,
+                                   smVec3f &p_projPoint2 )
+{
+    float depth;
+    smVec3f normal;
     if ( tri_tri_intersect_with_isectline_penetrationDepth( p_tri1Point1.data(),
-            p_tri1Point2.data(), p_tri1Point3.data(),
-            p_tri2Point1.data(), p_tri2Point2.data(),
-            p_tri2Point3.data(), &coplanar,
-            p_intersectionPoint1.data(), p_intersectionPoint2.data(),
-            p_tri1SinglePointIndex, p_tri2SinglePointIndex,
-            p_projPoint1.data(), p_projPoint2.data() ) == 1 )
+                                                            p_tri1Point2.data(),
+                                                            p_tri1Point3.data(),
+                                                            p_tri2Point1.data(),
+                                                            p_tri2Point2.data(),
+                                                            p_tri2Point3.data(),
+                                                            &coplanar,
+                                                            p_intersectionPoint1.data(),
+                                                            p_intersectionPoint2.data(),
+                                                            p_tri1SinglePointIndex,
+                                                            p_tri2SinglePointIndex,
+                                                            p_projPoint1.data(),
+                                                            p_projPoint2.data(),depth,normal.data() ) == 1 )
     {
         return true;
     }
@@ -76,15 +133,18 @@ bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB, smAA
     }
 }
 
-bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB )
+bool smCollisionMoller::checkOverlapAABBAABB( const smAABB &aabbA, const smAABB &aabbB )
 {
 
-    if ( aabbA.aabbMin[0] > aabbB.aabbMax[0] ||
-         aabbA.aabbMax[0] < aabbB.aabbMin[0] ||
-         aabbA.aabbMin[1] > aabbB.aabbMax[1] ||
-         aabbA.aabbMax[1] < aabbB.aabbMin[1] ||
-         aabbA.aabbMin[2] > aabbB.aabbMax[2] ||
-         aabbA.aabbMax[2] < aabbB.aabbMin[2] )
+    const smVec3f &min = aabbA.getMin();
+    const smVec3f &max = aabbA.getMax();
+
+    if ( min[0] > aabbB.aabbMax[0] ||
+         max[0] < aabbB.aabbMin[0] ||
+         min[1] > aabbB.aabbMax[1] ||
+         max[1] < aabbB.aabbMin[1] ||
+         min[2] > aabbB.aabbMax[2] ||
+         max[2] < aabbB.aabbMin[2] )
     {
         return false;
     }

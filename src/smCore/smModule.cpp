@@ -26,8 +26,7 @@
 /// \brief Begin frame will be called before the cycle
 void  smModule::beginModule()
 {
-
-    dispathcer->handle(static_cast<smCoreClass*>(this), SIMMEDTK_CALLERSTATE_BEGINFRAME);
+    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), SIMMEDTK_CALLERSTATE_BEGINFRAME);
     beginFrame();
 
 }
@@ -35,9 +34,8 @@ void  smModule::beginModule()
 /// \brief End frame will be called after the cycle
 void  smModule::endModule()
 {
-
     endFrame();
-    dispathcer->handle(static_cast<smCoreClass*>(this), SIMMEDTK_CALLERSTATE_ENDFRAME);
+    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), SIMMEDTK_CALLERSTATE_ENDFRAME);
 }
 void smModule::terminate()
 {
@@ -57,11 +55,18 @@ void smModule::waitTermination()
         }
     }
 }
-void smModule::setEventDispatcher( smEventDispatcher *p_dispathcer )
+void smModule::setEventDispatcher( std::shared_ptr<smEventDispatcher> p_dispathcer )
 {
     eventDispatcher = p_dispathcer;
 }
 int smModule::getModuleId()
 {
     return uniqueId.ID;
+}
+smModule::smModule()
+{
+    terminateExecution = false;
+    eventDispatcher = nullptr;
+    isInitialized = false;
+    name = "Module";
 }

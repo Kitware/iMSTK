@@ -33,40 +33,42 @@ smGLRenderer::smGLRenderer()
 
 }
 
-void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail)
+void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, const smRenderDetail &renderDetail)
 {
     static smVec3f origin(0, 0, 0);
     static smVec3f xAxis(1, 0, 0);
     static smVec3f yAxis(0, 1, 0);
     static smVec3f zAxis(0, 0, 1);
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_NONE)
+    const int renderType = renderDetail.getRenderType();
+
+    if (renderType & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     glDisable(GL_TEXTURE_2D);
 
-    glPointSize(renderDetail->pointSize);
-    glLineWidth(renderDetail->lineSize);
+    glPointSize(renderDetail.getPointSize());
+    glLineWidth(renderDetail.getLineSize());
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (renderType & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
+    if (renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail->colorDiffuse.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->colorSpecular.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->colorAmbient.toGLColor());
-        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->shininess);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail.getColorDiffuse().toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail.getColorSpecular().toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail.getColorAmbient().toGLColor());
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail.getShininess());
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_lineMesh->isMeshTextured())
         {
@@ -80,14 +82,14 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         }
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP)
+    if (renderType & SIMMEDTK_RENDER_COLORMAP)
     {
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
     glVertexPointer(3, smGLRealType, 0, p_lineMesh->vertices.data());
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_lineMesh->isMeshTextured())
         {
@@ -95,12 +97,12 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         }
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_FACES)
+    if (renderType & SIMMEDTK_RENDER_FACES)
     {
         glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, smGLUIntType, p_lineMesh->edges);
     }
 
-    if ((renderDetail->renderType & (SIMMEDTK_RENDER_VERTICES)))
+    if ((renderType & (SIMMEDTK_RENDER_VERTICES)))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
@@ -110,7 +112,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_WIREFRAME)
+    if (renderType & SIMMEDTK_RENDER_WIREFRAME)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPolygonOffset(3.0, 2.0);
@@ -121,27 +123,27 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_LOCALAXIS)
+    if (renderType & SIMMEDTK_RENDER_LOCALAXIS)
     {
         glEnable(GL_LIGHTING);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
+    if (renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
-        glColor3fv(reinterpret_cast<smGLReal*>(&renderDetail->highLightColor));
+        glColor3fv(renderDetail.getHighLightColor().toGLColor());
         glDrawArrays(GL_POINTS, 0, p_lineMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (renderType & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glDisable(GL_BLEND);
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_lineMesh->isMeshTextured())
         {
@@ -155,7 +157,7 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
         }
     }
 
-    if (renderDetail->renderType & SIMMEDTK_RENDER_COLORMAP)
+    if (renderType & SIMMEDTK_RENDER_COLORMAP)
     {
         glDisableClientState(GL_COLOR_ARRAY);
     }
@@ -165,29 +167,29 @@ void smGLRenderer::drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDe
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
-        smRenderDetail *renderDetail,
-        smDrawParam p_drawParam)
+void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh,
+        const smRenderDetail &renderDetail,
+        const smDrawParam &p_drawParam)
 {
     static smVec3f origin(0, 0, 0);
     static smVec3f xAxis(1, 0, 0);
     static smVec3f yAxis(0, 1, 0);
     static smVec3f zAxis(0, 0, 1);
-    smShader *shader = NULL;
+    std::shared_ptr<smShader> shader = nullptr;
     smBool shaderEnabled = false;
-    smVAO *vao;
+    std::shared_ptr<smVAO> vao;
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO)
     {
-        if (renderDetail->VAOs.size() < 1)
+        if (renderDetail.getVAOs().size() < 1)
         {
             return;
         }
         else
         {
-            if (renderDetail->VAOEnable[0])
+            if (renderDetail.getVAOEnable()[0])
             {
-                vao = smVAO::getVAO(renderDetail->VAOs[0]);
+                vao = smVAO::getVAO(renderDetail.getVAOs()[0]);
             }
             else
             {
@@ -196,18 +198,18 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
     {
-        for (size_t i = 0; i < renderDetail->shaders.size(); i++)
+        for (size_t i = 0; i < renderDetail.getShaders().size(); i++)
         {
-            if (renderDetail->shaderEnable[i])
+            if (renderDetail.getShaderEnable()[i])
             {
-                shader = smShader::getShader(renderDetail->shaders[i]);
+                shader = smShader::getShader(renderDetail.getShaders()[i]);
                 shader->enableShader();
                 shader->predraw(p_surfaceMesh);
                 shaderEnabled = true;
@@ -221,40 +223,41 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
     }
 
     glDisable(GL_TEXTURE_2D);
-    glPointSize(renderDetail->pointSize);
-    glLineWidth(renderDetail->lineSize);
+    glPointSize(renderDetail.getPointSize());
+    glLineWidth(renderDetail.getLineSize());
 
-    if (p_surfaceMesh->vertTangents != NULL && shaderEnabled && p_surfaceMesh->tangentChannel && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->vertTangents != NULL && shaderEnabled && p_surfaceMesh->tangentChannel && !(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
-        glVertexAttribPointerARB(shader->tangentAttrib, 3, GL_FLOAT, GL_FALSE, 0, p_surfaceMesh->vertTangents);
-        glEnableVertexAttribArrayARB(shader->tangentAttrib);
+        glVertexAttribPointerARB(shader->getTangentAttributes(), 3, GL_FLOAT, GL_FALSE, 0, p_surfaceMesh->vertTangents);
+        glEnableVertexAttribArrayARB(shader->getTangentAttributes());
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail->colorDiffuse.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->colorSpecular.toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->colorAmbient.toGLColor());
-        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->shininess);
+        const GLfloat * color = renderDetail.getColorDiffuse().toGLColor();
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail.getColorSpecular().toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail.getColorAmbient().toGLColor());
+        glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail.getShininess());
     }
 
-    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->isMeshTextured())
         {
-            if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+            if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
             {
                 glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             }
@@ -274,17 +277,17 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_TEXTURE && !(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         if (p_surfaceMesh->isMeshTextured())
         {
@@ -292,14 +295,14 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glNormalPointer(smGLRealType, 0, p_surfaceMesh->vertNormals);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_FACES)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
@@ -309,12 +312,12 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if ((p_surfaceMesh->renderDetail.renderType & (SIMMEDTK_RENDER_VERTICES)))
+    if ((p_surfaceMesh->renderDetail.getRenderType() & (SIMMEDTK_RENDER_VERTICES)))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
 
-        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
@@ -324,52 +327,52 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_WIREFRAME)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_WIREFRAME)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glLineWidth(renderDetail->lineSize + 0.5);
+        glLineWidth(renderDetail.getLineSize() + 0.5);
         glPolygonOffset(1.0, 1.0);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
-        glColor4fv(renderDetail->wireFrameColor.toGLColor());
+        glColor4fv(renderDetail.getWireFrameColor().toGLColor());
 
-        if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+        if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
         {
             glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
         }
 
         glEnable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
-        glLineWidth(renderDetail->lineSize);
+        glLineWidth(renderDetail.getLineSize());
         //default rendering
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_LOCALAXIS)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_LOCALAXIS)
     {
         glEnable(GL_LIGHTING);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glDisable(GL_LIGHTING);
-        glColor3fv(reinterpret_cast<smGLReal*>(&renderDetail->highLightColor));
+        glColor3fv(renderDetail.getHighLightColor().toGLColor());
         glDrawArrays(GL_POINTS, 0, p_surfaceMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TRANSPARENT)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_TRANSPARENT)
     {
         glDisable(GL_BLEND);
     }
 
-    if (!(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (!(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glDisableClientState(GL_VERTEX_ARRAY);
         glDisableClientState(GL_NORMAL_ARRAY);
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_TEXTURE)
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->isMeshTextured())
         {
@@ -383,18 +386,18 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
         }
     }
 
-    if (p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.renderType & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->renderDetail.getRenderType() & SIMMEDTK_RENDER_VAO))
     {
         glDisableClientState(GL_COLOR_ARRAY);
     }
 
     if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
     {
-        for (size_t i = 0; i < renderDetail->shaders.size(); i++)
+        for (size_t i = 0; i < renderDetail.getShaders().size(); i++)
         {
             if (shaderEnabled)
             {
-                smShader::getShader(renderDetail->shaders[i])->posdraw(p_surfaceMesh);
+                smShader::getShader(renderDetail.getShaders()[i])->posdraw(p_surfaceMesh);
                 shader->disableShader();
                 break;
             }
@@ -406,7 +409,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(smMesh *p_surfaceMesh,
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawNormals(smMesh *p_mesh, smColor p_color)
+void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
 {
 
     glDisable(GL_LIGHTING);
@@ -543,8 +546,6 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
     glEnable(GL_LIGHTING);
 }
 
-
-
 void smGLRenderer::enableDefaultGLRendering()
 {
 
@@ -553,19 +554,19 @@ void smGLRenderer::enableDefaultGLRendering()
     glUseProgramObjectARB(0);
 }
 
-void smGLRenderer::renderScene(smScene* p_scene,
+void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
                                smDrawParam p_param)
 {
-    smScene::smSceneIterator sceneIter;
+    smSceneIterator sceneIter;
 
     assert(p_scene);
 
     //Load View and Projection Matrices
     // -- with new rendering techniques, these would be passed to a shader
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(p_scene->camera.getProjMatRef());
+    glLoadMatrixf(p_scene->getCamera().getProjMatRef());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(p_scene->camera.getViewMatRef());
+    glLoadMatrixf(p_scene->getCamera().getViewMatRef());
 
     sceneIter.setScene(p_scene, p_param.caller);
 
@@ -580,31 +581,32 @@ void smGLRenderer::renderScene(smScene* p_scene,
     glPopMatrix();
 }
 
-void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
-                                     smDrawParam p_param)
+void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject,
+                                     const smDrawParam &p_param)
 {
-    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_NONE)
+    if (p_sceneObject->renderDetail.getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     //if the custom rendering enable only render this
-    if (p_sceneObject->renderDetail.renderType & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
+    std::shared_ptr<smCustomRenderer> renderer = p_sceneObject->getRenderer();
+    if (p_sceneObject->renderDetail.getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
     {
-        if (p_sceneObject->customRender != nullptr)
+        if (renderer != nullptr)
         {
-            p_sceneObject->customRender->preDraw(*p_sceneObject);
-            p_sceneObject->customRender->draw(*p_sceneObject);
-            p_sceneObject->customRender->postDraw(*p_sceneObject);
+            renderer->preDraw(*p_sceneObject);
+            renderer->draw(*p_sceneObject);
+            renderer->postDraw(*p_sceneObject);
         }
     }
     else
     {
         //If there is custom renderer first render the preDraw function. which is responsible for
         //rendering before the default renderer takes place
-        if (p_sceneObject->customRender != nullptr)
+        if (renderer != nullptr)
         {
-            p_sceneObject->customRender->preDraw(*p_sceneObject);
+            renderer->preDraw(*p_sceneObject);
         }
 
         // TODO: scenobject does not have a draw function
@@ -612,9 +614,9 @@ void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place
-        if (p_sceneObject->customRender != nullptr)
+        if (renderer != nullptr)
         {
-            p_sceneObject->customRender->postDraw(*p_sceneObject);
+            renderer->postDraw(*p_sceneObject);
         }
     }
 }

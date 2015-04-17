@@ -71,19 +71,19 @@ void SetVSync(bool sync)
 
 static void key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods)
 {
-    smEvent *eventKeyboard;
-    smSDK *sdk = smSDK::getInstance();
+    auto sdk = smSDK::getInstance();
     assert(sdk);
-    smViewer *viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewerInstance();
     assert(viewer);
-    smKeyboardEventData* kbData = nullptr;
 
-    eventKeyboard = new smEvent(); //Need to handle failure to allocate
-    eventKeyboard->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-    eventKeyboard->senderId = viewer->getModuleId();
-    eventKeyboard->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventKeyboard->data = new smKeyboardEventData(); //Need to handle failure to allocate
-    kbData = reinterpret_cast<smKeyboardEventData*>(eventKeyboard->data);
+    auto eventKeyboard = std::make_shared<smEvent>(); //Need to handle failure to allocate
+    eventKeyboard->setEventType(smEventType(SIMMEDTK_EVENTTYPE_KEYBOARD));
+    eventKeyboard->setSenderId(viewer->getModuleId());
+    eventKeyboard->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
+
+    auto kbData = std::make_shared<smKeyboardEventData>();
+    eventKeyboard->setEventData(kbData); //Need to handle failure to allocate
+
     kbData->keyBoardKey = GLFWKeyToSmKey(key);
     if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
     {
@@ -109,18 +109,18 @@ static void key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int 
 
 static void mouse_button_callback(GLFWwindow* window, int button, int action, int /*mods*/)
 {
-    smSDK *sdk = smSDK::getInstance();
+    auto sdk = smSDK::getInstance();
     assert(sdk);
-    smViewer *viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewerInstance();
     assert(viewer);
-    smMouseButtonEventData* mbData = nullptr;
 
-    smEvent *eventMouseButton = new smEvent(); //Need to handle failure to allocate
-    eventMouseButton->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
-    eventMouseButton->senderId = viewer->getModuleId();
-    eventMouseButton->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventMouseButton->data = new smMouseButtonEventData(); //Need to handle failure to allocate
-    mbData = reinterpret_cast<smMouseButtonEventData*>(eventMouseButton->data);
+    auto eventMouseButton = std::make_shared<smEvent>(); //Need to handle failure to allocate
+    eventMouseButton->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_BUTTON));
+    eventMouseButton->setSenderId(viewer->getModuleId());
+    eventMouseButton->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
+
+    auto mbData = std::make_shared<smMouseButtonEventData>();
+    eventMouseButton->setEventData(mbData); //Need to handle failure to allocate
 
     //Get the current cursor position
     glfwGetCursorPos(window, &(mbData->windowX), &(mbData->windowY));
@@ -145,18 +145,18 @@ static void mouse_button_callback(GLFWwindow* window, int button, int action, in
 
 static void cursor_position_callback(GLFWwindow* /*window*/, double xpos, double ypos)
 {
-    smSDK *sdk = smSDK::getInstance();
+    auto sdk = smSDK::getInstance();
     assert(sdk);
-    smViewer *viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewerInstance();
     assert(viewer);
-    smMouseMoveEventData* mpData = nullptr;
 
-    smEvent *eventMouseMove = new smEvent(); //Need to handle failure to allocate
-    eventMouseMove->eventType = SIMMEDTK_EVENTTYPE_MOUSE_MOVE;
-    eventMouseMove->senderId = viewer->getModuleId();
-    eventMouseMove->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    eventMouseMove->data = new smMouseMoveEventData(); //Need to handle failure to allocate
-    mpData = reinterpret_cast<smMouseMoveEventData*>(eventMouseMove->data);
+    auto eventMouseMove = std::make_shared<smEvent>(); //Need to handle failure to allocate
+    eventMouseMove->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_MOVE));
+    eventMouseMove->setSenderId(viewer->getModuleId());
+    eventMouseMove->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
+
+    auto mpData = std::make_shared<smMouseMoveEventData>();
+    eventMouseMove->setEventData(mpData); //Need to handle failure to allocate
 
     mpData->windowX = xpos;
     mpData->windowY = ypos;
@@ -166,8 +166,8 @@ static void cursor_position_callback(GLFWwindow* /*window*/, double xpos, double
 
 smRenderOperation::smRenderOperation()
 {
-    fbo = NULL;
-    scene = NULL;
+    fbo = nullptr;
+    scene = nullptr;
     fboName = "";
 }
 
@@ -181,7 +181,7 @@ smViewer::smViewer()
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
     this->log = NULL;
-    windowOutput = new smOpenGLWindowStream();
+    windowOutput = std::make_shared<smOpenGLWindowStream>();
 
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
@@ -198,7 +198,6 @@ void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 
 void smViewer::setUnlimitedFPS(smBool p_enableFPS)
 {
-
     unlimitedFPSEnabled = p_enableFPS;
     unlimitedFPSVariableChanged++;
 }
@@ -260,30 +259,28 @@ void smViewer::initResources(smDrawParam p_param)
     initFboListItems();
 }
 
-void smViewer::initScenes ( smDrawParam p_param )
+void smViewer::initScenes(smDrawParam p_param )
 {
-    smSceneObject *sceneObject;
-    smScene *scene;
-    smScene::smSceneIterator sceneIter;
+    std::shared_ptr<smSceneObject> sceneObject;
+    smSceneIterator sceneIter;
+
     //traverse all the scene and the objects in the scene
-    for ( size_t i = 0; i < sceneList.size(); i++ )
+    for(auto&& scene : sceneList)
     {
-        scene = sceneList[i];
-        scene->registerForScene(this);
+        scene->registerForScene(safeDownCast<smViewer>());
         scene->initLights();
-        sceneIter.setScene(scene, this);
+        sceneIter.setScene(scene, safeDownCast<smViewer>());
 
         for ( smInt j = sceneIter.start(); j < sceneIter.end(); j++ )
         {
-            //sceneObject=scene->sceneObjects[j];
             sceneObject = sceneIter[j];
 
             //initialize the custom Render if there is any
             if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
             {
-                sceneObject->customRender->initDraw ( p_param );
+                sceneObject->customRender->initDraw(p_param);
             }
-            sceneObject->initDraw ( p_param );
+            sceneObject->initDraw(p_param);
         }//object traverse
     }//scene traverse
 }
@@ -338,9 +335,9 @@ void smViewer::init()
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
+    param.rendererObject = safeDownCast<smViewer>();
+    param.caller = safeDownCast<smViewer>();
+    param.data = nullptr;
 
     this->initGLContext();
     this->initGLCaps();
@@ -449,8 +446,6 @@ void smViewer::destroyFboListItems()
 
 void smViewer::renderSceneList(smDrawParam p_param)
 {
-    smScene::smSceneIterator sceneIter;
-
     //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
     //only current objects and their derived classes
     for (size_t sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
@@ -511,7 +506,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     smGLRenderer::renderScene(p_rop.scene, p_param);
 }
 
-void smViewer::registerScene(smScene *p_scene,
+void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
                              smRenderTargetType p_target,
                              const smString &p_fboName)
 {
@@ -529,7 +524,7 @@ void smViewer::registerScene(smScene *p_scene,
 
     rop.fboName = p_fboName;
 
-    p_scene->registerForScene(this);
+    p_scene->registerForScene(safeDownCast<smViewer>());
     renderOperations.push_back(rop);
 }
 
@@ -575,9 +570,9 @@ void smViewer::draw()
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
+    param.rendererObject = safeDownCast<smViewer>();
+    param.caller = safeDownCast<smViewer>();
+    param.data = nullptr;
 
     beginModule();
 
@@ -588,7 +583,7 @@ void smViewer::draw()
         objectList[i]->draw(param);
     }
 
-    for (int i = 0; i < renderOperations.size(); i++)
+    for (size_t i = 0; i < renderOperations.size(); i++)
     {
         processRenderOperation(renderOperations[i], param);
     }
@@ -613,14 +608,14 @@ void smViewer::endFrame()
     glfwSwapBuffers(window);
 }
 
-void smViewer::addObject(smCoreClass *object)
+void smViewer::addObject(std::shared_ptr<smCoreClass> object)
 {
 
-    smSDK::addRef(object);
+    smSDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent ( smEvent *p_event )
+void smViewer::handleEvent ( std::shared_ptr<smEvent> /*p_event*/ )
 {
 }
 

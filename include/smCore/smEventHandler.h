@@ -25,6 +25,7 @@
 #define SMEVENTHANDLER_H
 
 // STL includes
+#include <memory>
 #include <atomic>
 
 // SimMedTK includes
@@ -37,67 +38,72 @@ class smEventType;
 
 struct smEventHolder
 {
-    smEvent *myEvent;
+    std::shared_ptr<smEvent> myEvent;
     smBool isActive;
 };
+
 /// \brief  event handler interface. this needs to be inherited by handlers.
-class smEventHandler: smInterface
+class smEventHandler: public smInterface
 {
 
 public:
     /// \brief  this function is called for any event
-    virtual void handleEvent(smEvent *p_event) = 0;
+    virtual void handleEvent(std::shared_ptr<smEvent> p_event) = 0;
 
 };
 
 /// \brief event holder
 class smEventHandlerHolder
 {
-
 public:
     smEventHandlerHolder();
-    smEventHandler *handler;
+
+public:
+    std::shared_ptr<smEventHandler> handler;
     smEventType  registeredEventType;
     smBool enabled;
 };
+
 /// \brief event dispatcher
 class smEventDispatcher
 {
 
-private:
-    /// \brief pointer to the event dispatcher
-    smDispatcher *dispatcher;
-    /// \brief handlers in the dispatcher
-    std::vector<smEventHandlerHolder*>handlers;
-    /// \brief message id counter. used to assign an ID for each message
-    std::atomic_int messageId;
-    /// \brief event holder. holds SIMMEDTK_MAX_EVENTSBUFFER of number holder
-    smEventHolder eventHolder[SIMMEDTK_MAX_EVENTSBUFFER];
-
 public:
     /// \brief constructor. Id is initialized to 1.
-    smEventDispatcher()
-    {
-        messageId = 1;
-    }
+    smEventDispatcher();
+
     /// \brief constructor
-    smEventDispatcher(smDispatcher *p_dispatcher);
+    smEventDispatcher(std::shared_ptr<smDispatcher> p_dispatcher);
+
     /// \brief  register event handler
-    void registerEventHandler(smEventHandler *handler, smEventType p_eventType);
+    void registerEventHandler(std::shared_ptr<smEventHandler> handler, const smEventType &p_eventType);
+
     /// \brief  enable event handler
-    void enableEventHandler(smEventHandler *p_handler, smEventType p_eventType);
+    void enableEventHandler(std::shared_ptr<smEventHandler> p_handler, const smEventType &p_eventType);
+
     /// \brief  disable event handler
-    void disableEventHandler(smEventHandler *p_handler, smEventType p_eventType);
+    void disableEventHandler(std::shared_ptr<smEventHandler> p_handler, const smEventType &p_eventType);
+
     /// \brief send event in asynchronous mode
-    void asyncSendEvent(smEvent *p_event);
+    void asyncSendEvent(std::shared_ptr<smEvent> p_event);
+
     /// \brief send and delete the event
-    void sendEventAndDelete(smEvent *p_event);
+    void sendEventAndDelete(std::shared_ptr<smEvent> p_event);
+
     /// \brief send stream event. Event is not deleted after sent.
-    void sendStreamEvent(smEvent *p_event);
+    void sendStreamEvent(std::shared_ptr<smEvent> p_event);
+
     /// \brief fetch event from the queue
     void fetchEvent();
+
     /// \brief this calls the handler in synchronization
-    void callHandlers(smEvent *p_event);
+    void callHandlers(std::shared_ptr<smEvent> p_event);
+
+private:
+    std::shared_ptr<smDispatcher> dispatcher; // pointer to the event dispatcher
+    std::vector<std::shared_ptr<smEventHandlerHolder>> handlers; // handlers in the dispatcher
+    std::atomic_int messageId; // message id counter. used to assign an ID for each message
+    smEventHolder eventHolder[SIMMEDTK_MAX_EVENTSBUFFER]; // events holder
 };
 
 #endif

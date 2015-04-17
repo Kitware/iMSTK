@@ -50,6 +50,16 @@ public:
     /// \brief maximum x,y,z point
     smVec3f aabbMax;
 
+    const smVec3f &getMax() const
+    {
+        return aabbMax;
+    }
+
+    const smVec3f &getMin() const
+    {
+        return aabbMin;
+    }
+
     /// \brief constrcutor. The default is set to origin for aabbMin and aabbMax
     smAABB();
 
@@ -118,16 +128,16 @@ struct smCube
     smCube();
 
     /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
-    void subDivide(smInt p_divisionPerAxis, smCube*p_cube);
+    void subDivide(smInt p_divisionPerAxis, smCube *p_cube);
 
     /// \brief expands the cube. increases the edge length with expansion*edge length
     void expand(smFloat p_expansion);
 
     /// \brief returns the left most corner
-    smVec3f leftMinCorner();
+    smVec3f leftMinCorner() const ;
 
     /// \brief returns right most corner
-    smVec3f rightMaxCorner();
+    smVec3f rightMaxCorner() const;
 
     /// \brief returns the smallest sphere encapsulates the cube
     smSphere getCircumscribedSphere();

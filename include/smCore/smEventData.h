@@ -32,8 +32,10 @@
 #include "smUtilities/smVector.h"
 #include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
 
+struct smEventData {};
+
 /// \brief keyboard event data
-struct smKeyboardEventData
+struct smKeyboardEventData : public smEventData
 {
     smKey keyBoardKey; ///< Key that was pressed
     smBool pressed; ///< if the key was pressed or released in this event
@@ -41,7 +43,7 @@ struct smKeyboardEventData
 };
 
 /// \brief mouse event data
-struct smMouseButtonEventData
+struct smMouseButtonEventData  : public smEventData
 {
     smMouseButton mouseButton; ///<Which mouse button was pressed
     smBool pressed; ///< if the button was pressed or released in this event
@@ -49,26 +51,26 @@ struct smMouseButtonEventData
     smDouble windowY; ///< window Y coorindate relative to top edge
 };
 
-struct smMouseMoveEventData
+struct smMouseMoveEventData  : public smEventData
 {
     smDouble windowX; ///< window X coorindate relative to left edge
     smDouble windowY; ///< window Y coorindate relative to top edge
 };
 
 /// \brief object click event related
-struct smObjectClickedData
+struct smObjectClickedData  : public smEventData
 {
     smInt objectId;
     smVec3f clickedPosition;
 };
 
 /// \brief for synchronization use
-struct smSynchEventData
+struct smSynchEventData  : public smEventData
 {
 };
 
 /// \brief  haptic out event data. Event that is sent from haptic device
-struct smHapticOutEventData
+struct smHapticOutEventData  : public smEventData
 {
     /// \brief device id
     smInt deviceId;
@@ -85,7 +87,7 @@ struct smHapticOutEventData
     smBool buttonState[4];//will be chnage later on
 };
 /// \brief haptic that is sent to the device
-struct smHapticInEventData
+struct smHapticInEventData  : public smEventData
 {
     /// \brief  device id
     smInt deviceId;
@@ -97,14 +99,14 @@ struct smHapticInEventData
 };
 /// \brief the collision that that has information of primitives corresponds to the objects.
 template <class smCollisionData>
-struct smObjectHitData
+struct smObjectHitData  : public smEventData
 {
     smInt objectSourceId;
     smInt objectTargetId;
     smCollisionData data;
 };
 /// \brief  virtual camera motion
-struct smCameraEventData
+struct smCameraEventData  : public smEventData
 {
     /// \brief  camera position
     smVec3f pos;
@@ -114,7 +116,7 @@ struct smCameraEventData
     smVec3f upDirection;
 };
 /// \brief  light motion evet data
-struct smLightMotionEventData
+struct smLightMotionEventData  : public smEventData
 {
     /// \brief  light index
     smInt lightIndex;

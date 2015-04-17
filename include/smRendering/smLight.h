@@ -52,10 +52,20 @@ enum smLightLocationType
 struct smLightPos
 {
 public:
-    smVec3f pos;
     smLightPos(smFloat p_x = 0.0, smFloat p_y = 0.0, smFloat p_z = 0.0, smFloat p_w = 1.0);
+    void setPosition(const smVec3f &p)
+    {
+        position = p;
+    }
 
+    const smVec3f &getPosition() const
+    {
+        return position;
+    }
+
+private:
     smFloat w;
+    smVec3f position;
     friend smLight;
 };
 

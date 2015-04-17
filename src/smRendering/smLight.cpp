@@ -45,16 +45,18 @@ void smLight::updateDirection()
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
 }
+
 smLightPos::smLightPos( float p_x, float p_y, float p_z, float /*p_w*/ )
 {
-    pos << p_x, p_y, p_z;
+    position << p_x, p_y, p_z;
 }
+
 smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationType p_lightLocation )
 {
     name = p_name;
     enabled = false;
     previousState = false;
-    lightPos.pos = smVec3f::Zero();
+    lightPos.setPosition(smVec3f::Zero());
 
     if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
     {

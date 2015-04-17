@@ -23,7 +23,7 @@
 
 #include "smSimulators/smToolSimulator.h"
 
-void smToolSimulator::updateTool(smStylusRigidSceneObject *p_tool)
+void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool)
 {
     smMatrix44f tempMat, tempMatDevice;
     smMatrix44f mat;
@@ -76,17 +76,17 @@ void smToolSimulator::updateTool(smStylusRigidSceneObject *p_tool)
         p_tool->posTraverseCallBack();
     }
 }
-smToolSimulator::smToolSimulator( smErrorLog *p_errorLog ) : smObjectSimulator( p_errorLog )
+
+smToolSimulator::smToolSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
 }
+
 void smToolSimulator::initCustom()
 {
 }
+
 void smToolSimulator::run()
 {
-
-    smSceneObject *sceneObj;
-    smStylusRigidSceneObject *tool;
 
     while ( true && this->enabled )
     {
@@ -94,12 +94,12 @@ void smToolSimulator::run()
 
         for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
         {
-            sceneObj = this->objectsSimulated[i];
+            auto sceneObj = this->objectsSimulated[i];
 
             //ensure that dummy simulator will work on static scene objects only.
             if ( sceneObj->getType() == SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT )
             {
-                tool = static_cast<smStylusRigidSceneObject *>(sceneObj);
+                auto tool = std::static_pointer_cast<smStylusRigidSceneObject>(sceneObj);
 
                 if ( tool->toolEnabled )
                 {
@@ -111,16 +111,18 @@ void smToolSimulator::run()
         endSim();
     }
 }
+
 void smToolSimulator::syncBuffers()
 {
 }
-void smToolSimulator::handleEvent( smEvent *p_event )
+
+void smToolSimulator::handleEvent( std::shared_ptr<smEvent> p_event )
 {
-    switch ( p_event->eventType.eventTypeCode )
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
         {
-            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {

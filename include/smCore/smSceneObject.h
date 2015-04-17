@@ -26,11 +26,13 @@
 
 // STD includes
 #include <vector>
+#include <memory>
 
 // SimMedTK includes
 #include "smUtilities/smVector.h"
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
+#include "smCore/smEventHandler.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
 
@@ -46,43 +48,41 @@ struct smObjectInitFlags
 
 };
 /// \brief  scene object for visualization
-class smSceneObject: public smCoreClass
+class smSceneObject: public smEventHandler
 {
-    /// \brief object simulator that will simulate the object
-    smObjectSimulator *objectSim;
-
     friend class smSDK;
     friend class smViewer;
     friend class smScene;
     friend class smObjectSimulator;
 
 public:
-    /// \brief custom renderer
-    smCustomRenderer *customRender;
-    /// \brief local copy of vertices
-    std::vector<smVec3f> localVerts;
-    /// \brief flags
-    smObjectInitFlags flags;
     /// \brief constructor
     smSceneObject();
+
     /// \brief returns object id
     smInt getObjectId()
     {
         return uniqueId.ID;
     }
+
     /// \brief get unified object id
     smUnifiedID getObjectUnifiedID()
     {
         return uniqueId;
     }
+
     /// \brief attach simulator to the object. This function that needs to be called to associate the simulator to the object
-    virtual void attachObjectSimulator(smObjectSimulator *p_objectSim);
+    virtual void attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim);
+
     /// \brief to release the simulator
     virtual void releaseObjectSimulator();
+
     /// \brief get object simulator
-    smObjectSimulator* getObjectSimulator();
+    std::shared_ptr<smObjectSimulator> getObjectSimulator();
+
     /// \brief attach custome renderer for the object. If the default rendering is not helpful
-    void attachCustomRenderer(smCustomRenderer *p_customeRenderer);
+    void attachCustomRenderer(std::shared_ptr<smCustomRenderer> p_customeRenderer);
+
     void releaseCustomeRenderer();
 
     ///serialize function explicity writes the object to the memory block
@@ -95,11 +95,32 @@ public:
     ///this function may not be used
     ///every Scene Object should know how to clone itself. Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    virtual smSceneObject *clone() = 0;
+    virtual std::shared_ptr<smSceneObject> clone() = 0;
 
     //comment: make the this routine abstact so that enforce everybody to write their initiazaliton routines
     ///the initialization routuines belong to the objects should be called herein
     virtual void init() = 0;
+
+    smStdVector3f &getLocalVertices()
+    {
+        return localVertices;
+    }
+
+    smObjectInitFlags &getFlags()
+    {
+        return flags;
+    }
+
+    std::shared_ptr<smCustomRenderer> getRenderer()
+    {
+        return customRender;
+    }
+
+private:
+    std::shared_ptr<smObjectSimulator> objectSim; // object simulator that will simulate the object
+    std::shared_ptr<smCustomRenderer> customRender;
+    smStdVector3f localVertices; // local copy of vertices
+    smObjectInitFlags flags;
 };
 
 #endif

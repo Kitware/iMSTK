@@ -33,14 +33,14 @@
 RenderCube::RenderCube()
 {
     //Create an instance of the SimMedTK framework/SDK
-    simmedtkSDK = smSDK::createSDK();
+    sdk = smSDK::createSDK();
 
     //Create a new scene to work in
-    scene1 = simmedtkSDK->createScene();
+    scene1 = sdk->createScene();
 
     //Create a viewer to see the scene through
-    //viewer = simmedtkSDK->createViewer();
-    simmedtkSDK->addViewer(&viewer);
+    //viewer = sdk->createViewer();
+    sdk->addViewer(&viewer);
 
     //Initialize the texture manager
     smTextureManager::init(smSDK::getErrorLog());
@@ -80,14 +80,14 @@ RenderCube::RenderCube()
     this->setupCamera();
 
     //Link up the event system between this object and the SimMedTK SDK
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
+    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
+    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
+    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
 }
 
 RenderCube::~RenderCube()
 {
-    simmedtkSDK->releaseScene(scene1);
+    sdk->releaseScene(scene1);
 }
 
 void RenderCube::setupLights()
@@ -134,7 +134,7 @@ void RenderCube::handleEvent(smEvent *p_event)
         if (key == smKey::Escape && kbData->pressed)
         {
             //Tell the framework to shutdown
-            simmedtkSDK->shutDown();
+            sdk->shutDown();
         }
         else if (key == smKey::W && kbData->pressed)
         {
@@ -228,7 +228,7 @@ void RenderCube::handleEvent(smEvent *p_event)
 void RenderCube::simulateMain(smSimulationMainParam /*p_param*/)
 {
     //Run the simulator framework
-    simmedtkSDK->run();
+    sdk->run();
 }
 
 void runRenderCube()

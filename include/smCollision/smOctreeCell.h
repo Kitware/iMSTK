@@ -28,6 +28,9 @@
 #include "smCollision/smSurfaceTreeCell.h"
 #include "smCore/smGeometry.h"
 
+#include <Eigen/Geometry>
+#include <array>
+
 /// \brief cell of an octree
 class smOctreeCell : public smSurfaceTreeCell<smOctreeCell>
 {
@@ -81,10 +84,40 @@ public:
     bool isCollidedWithPoint ();
 
     /// \brief subdivide the cells of octree cells
-    void subDivide ( const int divisionPerAxis, std::vector<smOctreeCell> &cells );
+    void subDivide ( const int divisionPerAxis,
+                     std::array<smOctreeCell,numberOfSubdivisions> &cells );
+
+    const smAABB getAabb() const
+    {
+        smAABB aabb;
+        aabb.aabbMin = cube.leftMinCorner();
+        aabb.aabbMax = cube.rightMaxCorner();
+
+        return aabb;
+    }
+
+    void getIntersections(const smAABB &aabb, std::vector<size_t> &triangles)
+    {
+        for(auto &i : data)
+        {
+            if(smAABB::checkOverlap(i.first,aabb))
+            {
+                triangles.emplace_back(i.second);
+            }
+        }
+
+    }
+
+    inline void addTriangleData(const smAABB &aabb, size_t index)
+    {
+        return data.emplace_back(aabb,index);
+    }
 
 private:
     smCube cube; ///< cube
+
+    std::vector<std::pair<smAABB,size_t>> data;
+
 };
 
 #endif

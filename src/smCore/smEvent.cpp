@@ -32,10 +32,6 @@ smEvent::smEvent()
 
 smEvent::~smEvent()
 {
-    if (data != nullptr)
-    {
-        delete data;
-    }
 }
 
 smEventType::smEventType()
@@ -54,12 +50,12 @@ smEventType & smEventType::operator=(smInt p_eventTypeCode)
     return *this;
 }
 
-smBool smEventType::operator ==(smEventType &p_event)
+smBool smEventType::operator ==(const smEventType &p_event)
 {
-    return (eventTypeCode == p_event.eventTypeCode ? true : false);
+    return eventTypeCode == p_event.eventTypeCode;
 }
 
 smBool smEventType::operator ==(smInt p_eventTypeCode)
 {
-    return (eventTypeCode == p_eventTypeCode ? true : false);
+    return eventTypeCode == p_eventTypeCode;
 }

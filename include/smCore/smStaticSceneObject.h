@@ -34,10 +34,9 @@
 class smStaticSceneObject: public smSceneObject
 {
 public:
-    /// \brief static scene object contains a mesh
-    smSurfaceMesh *mesh;
+
     /// \brief constructor receives the error log
-    smStaticSceneObject(smErrorLog *p_log = NULL);
+    smStaticSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
     ~smStaticSceneObject();
 
     //not implemented yet..tansel
@@ -47,13 +46,19 @@ public:
     virtual void unSerialize(void *p_memoryBlock);
 
     ///not implemented yet.
-    virtual smSceneObject *clone();
+    virtual std::shared_ptr<smSceneObject> clone();
 
     /// \brief Initialization routine
     virtual void init();
 
     /// \brief called if the object is added to the viewer.
     virtual void draw(const smDrawParam &p_params);
+
+    virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/){}
+
+public:
+    /// \brief static scene object contains a mesh
+    std::shared_ptr<smSurfaceMesh> mesh;
 };
 
 #endif

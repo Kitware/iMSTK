@@ -39,11 +39,11 @@ class smPBDObjectSimulator: public smObjectSimulator, public smEventHandler
 
 public:
     /// \brief constructor
-    smPBDObjectSimulator(smErrorLog *p_errorLog);
+    smPBDObjectSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
 protected:
     /// \brief initialize the PBD object
-    void initObject(smPBDSurfaceSceneObject *p_object);
+    void initObject(std::shared_ptr<smPBDSurfaceSceneObject> p_object);
     /// \brief !!
     virtual void initCustom();
 
@@ -54,7 +54,7 @@ protected:
     void syncBuffers();
 
     /// \brief handle key presses and other user events
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smEvent> p_event);
 
     /// \brief render the PBD objects
     void draw(const smDrawParam &p_params);

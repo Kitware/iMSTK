@@ -24,6 +24,9 @@
 #ifndef SMFEMSIMULATOR_H
 #define SMFEMSIMULATOR_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
@@ -32,19 +35,19 @@
 #include "smCore/smEventHandler.h"
 
 /// \brief Example FEM simulator
-class smFemSimulator: public smObjectSimulator, public smEventHandler
+class smFemSimulator: public smObjectSimulator
 {
 private:
     smVec3f hapticPosition;
     smBool hapticButtonPressed;
-    smEventDispatcher *eventDispatcher;
+    std::shared_ptr<smEventDispatcher> eventDispatcher;
 
 public:
     /// \brief constructor
-    smFemSimulator(smErrorLog *p_errorLog);
+    smFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
     /// \brief !!
-    void setDispatcher(smEventDispatcher *p_eventDispatcher);
+    void setDispatcher(std::shared_ptr<smEventDispatcher> p_eventDispatcher);
 
 protected:
     /// \brief !!
@@ -63,7 +66,7 @@ protected:
     void syncBuffers();
 
     /// \brief !!
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smEvent> p_event);
 };
 
 #endif
