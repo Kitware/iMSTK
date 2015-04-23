@@ -28,19 +28,19 @@
 #include "smRendering/smLight.h"
 #include "smUtilities/smQuaternion.h"
 
-smVec3f smLight::defaultDir(0, 0, -1.0);
-smVec3f smLight::defaultUpDir(0, 1, 0.0);
-smVec3f smLight::defaultTransDir(1, 0, 0.0);
+smVec3d smLight::defaultDir(0, 0, -1.0);
+smVec3d smLight::defaultUpDir(0, 1, 0.0);
+smVec3d smLight::defaultTransDir(1, 0, 0.0);
 
 void smLight::updateDirection()
 {
-    smFloat angle;
-    smVec3f dirNorm = direction.normalized();
+    double angle;
+    smVec3d dirNorm = direction.normalized();
 
     angle = std::acos(dirNorm.dot(defaultDir));
-    smVec3f axisOfRot = dirNorm.cross(defaultDir).normalized();
+    smVec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
 
-    smQuaternionf rot = getRotationQuaternion(-angle,axisOfRot);
+    smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
@@ -56,7 +56,7 @@ smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationTy
     name = p_name;
     enabled = false;
     previousState = false;
-    lightPos.setPosition(smVec3f::Zero());
+    lightPos.setPosition(smVec3d::Zero());
 
     if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
     {

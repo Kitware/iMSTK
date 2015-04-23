@@ -29,9 +29,9 @@ smAABB::smAABB()
     this->aabbMax << 0, 0, 0;
 }
 
-smVec3f smAABB::center() const
+smVec3d smAABB::center() const
 {
-    smVec3f output;
+    smVec3d output;
     output << 0.5f * ( this->aabbMin[0] + this->aabbMax[0] ),
            0.5f * ( this->aabbMin[1] + this->aabbMax[1] ),
            0.5f * ( this->aabbMin[2] + this->aabbMax[2] );
@@ -60,14 +60,14 @@ smAABB &smAABB::operator=( const smAABB &p_aabb )
     return *this;
 }
 
-smAABB &smAABB::operator*( const float p_scale )
+smAABB &smAABB::operator*( const double p_scale )
 {
     this->aabbMin *= p_scale;
     this->aabbMax *= p_scale;
     return *this;
 }
 
-void smAABB::subDivide( const float p_length, const int p_divison, smAABB *p_aabb ) const
+void smAABB::subDivide( const double p_length, const int p_divison, smAABB *p_aabb ) const
 {
     smInt index = 0;
 
@@ -88,9 +88,9 @@ void smAABB::subDivide( const float p_length, const int p_divison, smAABB *p_aab
 
 void smAABB::subDivide( const int p_divisionX, const int p_divisionY, const int p_divisionZ, smAABB *p_aabb ) const
 {
-    smFloat stepX;
-    smFloat stepY;
-    smFloat stepZ;
+    double stepX;
+    double stepY;
+    double stepZ;
 
     stepX = ( this->aabbMax[0] - this->aabbMin[0] ) / p_divisionX;
     stepY = ( this->aabbMax[1] - this->aabbMin[1] ) / p_divisionY;
@@ -118,22 +118,22 @@ void smAABB::subDivide( const int p_division, smAABB *p_aabb ) const
     subDivide( p_division, p_division, p_division, p_aabb );
 }
 
-float smAABB::halfSizeX() const
+double smAABB::halfSizeX() const
 {
     return .5 * ( aabbMax[0] - aabbMin[0] );
 }
 
-float smAABB::halfSizeY() const
+double smAABB::halfSizeY() const
 {
     return .5 * ( aabbMax[1] - aabbMin[1] );
 }
 
-float smAABB::halfSizeZ() const
+double smAABB::halfSizeZ() const
 {
     return .5 * ( aabbMax[2] - aabbMin[2] );
 }
 
-void smAABB::expand( const float &p_factor )
+void smAABB::expand( const double &p_factor )
 {
     this->aabbMin -= .5 * ( this->aabbMax - this->aabbMin ) * p_factor;
     this->aabbMax += .5 * ( this->aabbMax - this->aabbMin ) * p_factor;
@@ -145,7 +145,7 @@ smSphere::smSphere()
     radius = 1.0;
 }
 
-smSphere::smSphere( smVec3f p_center, float p_radius )
+smSphere::smSphere( smVec3d p_center, double p_radius )
 {
     radius = p_radius;
     center = p_center;
@@ -159,8 +159,8 @@ smCube::smCube()
 
 void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
 {
-    smVec3f minPoint;
-    smFloat divLength = ( sideLength / p_divisionPerAxis );
+    smVec3d minPoint;
+    double divLength = ( sideLength / p_divisionPerAxis );
     smInt index = 0;
     minPoint << center[0] - sideLength * 0.5,
              center[1] - sideLength * 0.5,
@@ -180,21 +180,21 @@ void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
             }
 }
 
-void smCube::expand( float p_expansion )
+void smCube::expand( double p_expansion )
 {
     sideLength = sideLength + sideLength * p_expansion;
 }
 
-smVec3f smCube::leftMinCorner() const
+smVec3d smCube::leftMinCorner() const
 {
-    return smVec3f( center[0] - sideLength * 0.5,
+    return smVec3d( center[0] - sideLength * 0.5,
                     center[1] - sideLength * 0.5,
                     center[2] - sideLength * 0.5 );
 }
 
-smVec3f smCube::rightMaxCorner() const
+smVec3d smCube::rightMaxCorner() const
 {
-    return smVec3f( center[0] + sideLength * 0.5,
+    return smVec3d( center[0] + sideLength * 0.5,
                     center[1] + sideLength * 0.5,
                     center[2] + sideLength * 0.5 );
 }

@@ -43,7 +43,7 @@ struct smSimulationMainParam
 };
 
 /// \brief call back for simulator module. simulateMain is called in every simulation module frame.
-class smSimulationMain : public smEventHandler
+class smSimulationMain 
 {
 public:
     virtual void simulateMain(const smSimulationMainParam &) = 0;

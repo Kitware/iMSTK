@@ -27,9 +27,8 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smEventData.h"
 #include "smSimulators/smStylusObject.h"
+#include "smCore/smErrorLog.h"
 
 
 /// \brief Example tool simulator
@@ -53,7 +52,7 @@ public:
     void syncBuffers();
 
     /// \brief handle the events such as button presses related to tool
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 };
 
 #endif

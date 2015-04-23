@@ -37,7 +37,6 @@
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smGLUtils.h"
 #include "smUtilities/smTimer.h"
-#include "smCore/smEventHandler.h"
 
 class smMesh;
 class smSurfaceMesh;
@@ -52,7 +51,7 @@ struct smTextureShaderAssignment
 // \brief Base shader class. It provides loading, initializing, binding,
 //  enabling disabling current shader functionality.Also it provides
 //  frequent check of the shader code to make shader development easy.
-class smShader: public smEventHandler
+class smShader: public smCoreClass
 {
 public:
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -118,10 +117,10 @@ public:
     }
 
     // \brief Attaches The texture ID to the mesh
-    void attachTexture(smUnifiedID p_meshID, smInt p_textureID);
+    void attachTexture(std::shared_ptr<smUnifiedId> p_meshID, smInt p_textureID);
 
     // \brief assigns the texture by name if you don't know the textureID
-    smBool attachTexture(smUnifiedID p_meshID, const smString& p_textureName, const smString& p_textureShaderName);
+    smBool attachTexture(std::shared_ptr<smUnifiedId> p_meshID, const smString& p_textureName, const smString& p_textureShaderName);
 
     void autoGetTextureIds();
 
@@ -243,15 +242,15 @@ public:
 
     virtual void posdraw(std::shared_ptr<smSurfaceMesh>/*mesh*/){};
 
-    static std::shared_ptr<smShader> getShader(smUnifiedID p_shaderID);
+    static std::shared_ptr<smShader> getShader(std::shared_ptr<smUnifiedId> p_shaderID);
 
     smBool readShaderContent(const smString& p_file, smString& p_content);
 
     static void initGLShaders(smDrawParam p_param);
 
-    void activeGLTextures(smUnifiedID p_id);
+    void activeGLTextures(std::shared_ptr<smUnifiedId> p_id);
 
-    void activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size);
+    void activeGLVertAttribs(smInt p_id, smVec3d *p_vecs, smInt p_size);
 
     void registerShader();
 

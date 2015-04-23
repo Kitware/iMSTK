@@ -63,7 +63,7 @@ smBool smVolumeMesh::loadMesh(const smString& fileName, const smMeshFileType &fi
 }
 
 /// \brief
-void smVolumeMesh::translateVolumeMesh(const smVec3f &p_offset)
+void smVolumeMesh::translateVolumeMesh(const smVec3d &p_offset)
 {
 
     this->translate(p_offset);
@@ -75,7 +75,7 @@ void smVolumeMesh::translateVolumeMesh(const smVec3f &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::scaleVolumeMesh(const smVec3f &p_offset)
+void smVolumeMesh::scaleVolumeMesh(const smVec3d &p_offset)
 {
 
     scale(p_offset);
@@ -87,7 +87,7 @@ void smVolumeMesh::scaleVolumeMesh(const smVec3f &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::rotVolumeMesh(const smMatrix33f &p_rot)
+void smVolumeMesh::rotVolumeMesh(const smMatrix33d &p_rot)
 {
 
     rotate(p_rot);
@@ -131,8 +131,8 @@ smBool smVolumeMesh::LoadTetra(const smString& fileName)
 
     for (i = 0; i < nbrNodes; i++)
     {
-        nodes.emplace_back(smVec3f());
-        smVec3f &node = nodes.back();
+        nodes.emplace_back(smVec3d());
+        smVec3d &node = nodes.back();
         fscanf(fp, "%f", &number);
         nodeNumber[i] = number;
         fscanf(fp, "%c", &comma);

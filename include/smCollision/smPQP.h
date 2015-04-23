@@ -28,7 +28,6 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smEventData.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smDataStructures.h"
@@ -42,8 +41,8 @@ class smPipe;
 /// \brief holds the result of the PQP collision
 struct smPQPResult
 {
-    smVec3f point1;
-    smVec3f point2;
+    smVec3d point1;
+    smVec3d point2;
     smFloat distance;
 };
 
@@ -52,14 +51,14 @@ class smPQPSkeleton: public smCoreClass
 {
 
 public:
-    smMatrix33f mR; ///<
-    smVec3f mT; ///<
+    smMatrix33d mR; ///<
+    smVec3d mT; ///<
     smMatrix44f mat; ///<
 
     PQP_Model  *mPQPModel; ///< PQP model
     smSurfaceMesh *mMesh; ///< surface mesh
     PQP_DistanceResult colRes; ///< PQP results
-    smUnifiedID colMeshId; ///< stores the closest mesh id
+    std::shared_ptr<smUnifiedId> colMeshId; ///< stores the closest mesh id
     smPQPSkeleton *colSkel; ///< !!
 
     /// \brief !! set the transforms
@@ -71,7 +70,7 @@ public:
 };
 
 ///PQP based collision detection
-class smPQPCollision: public smObjectSimulator, public smEventHandler
+class smPQPCollision: public smObjectSimulator
 {
 
 public:
@@ -80,7 +79,7 @@ public:
     smVec3d pos; ///< !!
     smFloat minCollisionDistance; ///< The default value is 1.0
     smBool  minCollisionHappened; ///<
-    smUnifiedID   onlySpecificMeshId; ///< collision check is done only with a specific mesh if this is given. This will have the mesh id;
+    std::shared_ptr<smUnifiedId>   onlySpecificMeshId; ///< collision check is done only with a specific mesh if this is given. This will have the mesh id;
     smPipe *pipePQP; ///< !!
 
     /// \brief constructor
@@ -115,7 +114,7 @@ public:
     void checkCollision();
 
     /// \brief !!
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
 };
 
 #endif

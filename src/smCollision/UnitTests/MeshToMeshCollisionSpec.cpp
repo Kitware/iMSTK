@@ -31,7 +31,7 @@
 
 using namespace bandit;
 
-std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3f &vertices)
+std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3d &vertices)
 {
     std::shared_ptr<smMeshCollisionModel> model = std::make_shared<smMeshCollisionModel>();
     std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
@@ -78,12 +78,12 @@ go_bandit([](){
         it("performs collision detection ", []() {
             std::unique_ptr<smCollisionDetection> meshToMeshCollision = make_unique<smMeshToMeshCollision>();
 
-            smStdVector3f verticesA;
+            smStdVector3d verticesA;
             verticesA.emplace_back(1.0,2.0,0);
             verticesA.emplace_back(2.0,3.0,0);
             verticesA.emplace_back(2.0,1.0,0);
 
-            smStdVector3f verticesB;
+            smStdVector3d verticesB;
             verticesB.emplace_back(1.0,2.0,0.5);
             verticesB.emplace_back(2.0,3.0,0);
             verticesB.emplace_back(2.0,1.0,0);

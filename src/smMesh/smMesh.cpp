@@ -78,15 +78,15 @@ void smMesh::allocateAABBTris()
 }
 
 /// \brief
-void CalculateTangentArray(smInt vertexCount, const smVec3f *vertex,
-                           const smVec3f *normal, const smTexCoord *texcoord,
+void CalculateTangentArray(smInt vertexCount, const smVec3d *vertex,
+                           const smVec3d *normal, const smTexCoord *texcoord,
                            long triangleCount, const smTriangle *triangle,
-                           smVec3f *tangent)
+                           smVec3d *tangent)
 {
 
-    smVec3f *tan1 = new smVec3f[vertexCount * 2];
-    smVec3f *tan2 = tan1 + vertexCount;
-    memset(tan1, 0, vertexCount * sizeof(smVec3f) * 2);
+    smVec3d *tan1 = new smVec3d[vertexCount * 2];
+    smVec3d *tan2 = tan1 + vertexCount;
+    memset(tan1, 0, vertexCount * sizeof(smVec3d) * 2);
 
     for (long a = 0; a < triangleCount; a++)
     {
@@ -94,9 +94,9 @@ void CalculateTangentArray(smInt vertexCount, const smVec3f *vertex,
         long i2 = triangle->vert[1];
         long i3 = triangle->vert[2];
 
-        const smVec3f& v1 = vertex[i1];
-        const smVec3f& v2 = vertex[i2];
-        const smVec3f& v3 = vertex[i3];
+        const smVec3d& v1 = vertex[i1];
+        const smVec3d& v2 = vertex[i2];
+        const smVec3d& v3 = vertex[i3];
 
         const smTexCoord& w1 = texcoord[i1];
         const smTexCoord& w2 = texcoord[i2];
@@ -115,9 +115,9 @@ void CalculateTangentArray(smInt vertexCount, const smVec3f *vertex,
         float t2 = w3.v - w1.v;
 
         float r = 1.0F / (s1 * t2 - s2 * t1);
-        smVec3f sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
+        smVec3d sdir((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r,
                      (t2 * z1 - t1 * z2) * r);
-        smVec3f tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
+        smVec3d tdir((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r,
                      (s1 * z2 - s2 * z1) * r);
 
         tan1[i1] += sdir;
@@ -133,8 +133,8 @@ void CalculateTangentArray(smInt vertexCount, const smVec3f *vertex,
 
     for (long a = 0; a < vertexCount; a++)
     {
-        smVec3f n = normal[a];
-        smVec3f t = tan1[a];
+        smVec3d n = normal[a];
+        smVec3d t = tan1[a];
         tangent[a] = (t - n * n.dot(t));
         tangent[a].normalize();
     }
@@ -152,9 +152,9 @@ void smMesh::calcTriangleTangents()
     for (t = 0; t < nbrTriangles; t++)
     {
         smTriangle *tmpTri = &triangles[t];
-        smVec3f *v0 = &vertices[tmpTri->vert[0]];
-        smVec3f *v1 = &vertices[tmpTri->vert[1]];
-        smVec3f *v2 = &vertices[tmpTri->vert[2]];
+        smVec3d *v0 = &vertices[tmpTri->vert[0]];
+        smVec3d *v1 = &vertices[tmpTri->vert[1]];
+        smVec3d *v2 = &vertices[tmpTri->vert[2]];
         smTexCoord *t0 = &texCoord[tmpTri->vert[0]];
         smTexCoord *t1 = &texCoord[tmpTri->vert[1]];
         smTexCoord *t2 = &texCoord[tmpTri->vert[2]];
@@ -189,11 +189,11 @@ void smMesh::calcTriangleTangents()
 }
 
 /// \brief calucate the triangle tangent for rendering purposes
-void smMesh::calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t)
+void smMesh::calculateTangent(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3d& t)
 {
 
-    smVec3f v1;
-    smVec3f v2;
+    smVec3d v1;
+    smVec3d v2;
 
     v1[0] = p2[0] - p1[0];
     v1[1] = p2[1] - p1[1];
@@ -214,11 +214,11 @@ void smMesh::calculateTangent(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord&
 }
 
 /// \brief
-void smMesh::calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3f& t)
+void smMesh::calculateTangent_test(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3d& t)
 {
 
-    smVec3f v1;
-    smVec3f v2;
+    smVec3d v1;
+    smVec3d v2;
 
     v1[0] = p2[0] - p1[0];
     v1[1] = p2[1] - p1[1];
@@ -242,7 +242,7 @@ void smMesh::calculateTangent_test(smVec3f& p1, smVec3f& p2, smVec3f& p3, smTexC
 /// \brief calculates the normal of the vertex
 void smMesh::updateVertexNormals()
 {
-    smVec3f temp = smVec3f::Zero();
+    smVec3d temp = smVec3d::Zero();
 
     for (smInt i = 0; i < nbrVertices; i++)
     {
@@ -253,7 +253,7 @@ void smMesh::updateVertexNormals()
 
         vertNormals[i] = temp;
         vertNormals[i].normalized();
-        temp = smVec3f::Zero();
+        temp = smVec3d::Zero();
     }
 }
 
@@ -268,10 +268,10 @@ void smMesh::updateTriangleNormals()
 }
 
 /// \brief calculates the normal of a triangle
-smVec3f smMesh::calculateTriangleNormal(smInt triNbr)
+smVec3d smMesh::calculateTriangleNormal(smInt triNbr)
 {
 
-    smVec3f v[3];
+    smVec3d v[3];
     smTriangle temp = this->triangles[triNbr];
 
     v[0] = this->vertices[temp.vert[0]];
@@ -293,8 +293,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     this->nbrVertices = nbr;
     this->vertices.reserve(nbr);
     this->origVerts.reserve(nbr);
-    this->vertNormals = new smVec3f[nbr];
-    this->vertTangents = new smVec3f[nbr];
+    this->vertNormals = new smVec3d[nbr];
+    this->vertTangents = new smVec3d[nbr];
     this->texCoord = new smTexCoord[nbr];
     return true;
 }
@@ -311,8 +311,8 @@ smBool smMesh::initTriangleArrays(smInt nbr)
     this->nbrTriangles = nbr;
 
     this->triangles = new smTriangle[nbr];
-    this->triNormals = new smVec3f[nbr];
-    this->triTangents = new smVec3f[nbr];
+    this->triNormals = new smVec3d[nbr];
+    this->triTangents = new smVec3d[nbr];
     return true;
 }
 
@@ -471,7 +471,7 @@ void smMesh::translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ)
 }
 
 /// \brief
-void smMesh::translate(smVec3f p_offset)
+void smMesh::translate(smVec3d p_offset)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
@@ -484,7 +484,7 @@ void smMesh::translate(smVec3f p_offset)
 }
 
 /// \brief
-void smMesh::scale(smVec3f p_scaleFactors)
+void smMesh::scale(smVec3d p_scaleFactors)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
@@ -502,7 +502,7 @@ void smMesh::scale(smVec3f p_scaleFactors)
 }
 
 /// \brief
-void smMesh::rotate(const smMatrix33f &p_rot)
+void smMesh::rotate(const smMatrix33d &p_rot)
 {
 
     for (smInt i = 0; i < nbrVertices; i++)
@@ -526,16 +526,16 @@ void smMesh::draw(const smDrawParam &p_params)
 {
     auto viewer = p_params.rendererObject;
 
-    if (viewer->renderStage == SMRENDERSTAGE_SHADOWPASS && p_params.caller->renderDetail.castShadow == false)
+    if (viewer->renderStage == SMRENDERSTAGE_SHADOWPASS && p_params.caller->getRenderDetail()->castShadow == false)
     {
         return;
     }
 
-    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), p_params.caller->renderDetail, p_params);
+    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), p_params.caller->getRenderDetail(),p_params);
 
-    if (p_params.caller->renderDetail.renderType & SIMMEDTK_RENDER_NORMALS)
+    if (p_params.caller->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-        smGLRenderer::drawNormals(safeDownCast<smMesh>(), p_params.caller->renderDetail.normalColor);
+        smGLRenderer::drawNormals(safeDownCast<smMesh>(), p_params.caller->getRenderDetail()->normalColor);
     }
 }
 
@@ -657,9 +657,9 @@ void smMesh::checkCorrectWinding()
 /// \brief
 void smLineMesh::draw(const smDrawParam &p_params)
 {
-    smGLRenderer::drawLineMesh(safeDownCast<smLineMesh>(), p_params.caller->renderDetail);
+    smGLRenderer::drawLineMesh(safeDownCast<smLineMesh>(), p_params.caller->getRenderDetail());
 
-    if (p_params.caller->renderDetail.debugDraw)
+    if (p_params.caller->getRenderDetail()->debugDraw)
     {
         smGLRenderer::draw(this->aabb);
 
@@ -756,10 +756,10 @@ void smLineMesh::createAutoEdges()
 void smLineMesh::updateAABB()
 {
     smAABB tempAABB;
-    smVec3f minOffset( -2.0, -2.0, -2.0 );
-    smVec3f maxOffset( 1.0, 1.0, 1.0 );
-    smVec3f minEdgeOffset( -0.1, -0.1, -0.1 );
-    smVec3f maxEdgeOffset( 0.1, 0.1, 0.1 );
+    smVec3d minOffset( -2.0, -2.0, -2.0 );
+    smVec3d maxOffset( 1.0, 1.0, 1.0 );
+    smVec3d minEdgeOffset( -0.1, -0.1, -0.1 );
+    smVec3d maxEdgeOffset( 0.1, 0.1, 0.1 );
 
     tempAABB.aabbMin[0] = FLT_MAX;
     tempAABB.aabbMin[1] = FLT_MAX;
@@ -806,7 +806,7 @@ void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
 
     updateAABB();
 }
-void smLineMesh::translate( smVec3f p_offset )
+void smLineMesh::translate( smVec3d p_offset )
 {
 
     for ( smInt i = 0; i < nbrVertices; i++ )
@@ -817,7 +817,7 @@ void smLineMesh::translate( smVec3f p_offset )
 
     updateAABB();
 }
-void smLineMesh::rotate( smMatrix33f p_rot )
+void smLineMesh::rotate( smMatrix33d p_rot )
 {
 
     for ( smInt i = 0; i < nbrVertices; i++ )
@@ -828,7 +828,7 @@ void smLineMesh::rotate( smMatrix33f p_rot )
 
     updateAABB();
 }
-void smLineMesh::scale( smVec3f p_scaleFactors )
+void smLineMesh::scale( smVec3d p_scaleFactors )
 {
 
     for ( smInt i = 0; i < nbrVertices; i++ )

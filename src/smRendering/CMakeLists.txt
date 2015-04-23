@@ -41,6 +41,7 @@ target_link_libraries(smRendering
     smExternal
     smUtilities
     smShader
+    smEvent
  PUBLIC
     ${OCULUS_VIEWER_TARGET_LINK_LIBRARIES}
 )

@@ -48,13 +48,12 @@ std::shared_ptr<smScene> smSDK::createScene()
 {
     auto scene = std::make_shared<smScene>(errorLog);
     registerScene(scene);
-    scene->setName("Scene" + std::to_string(scene->uniqueId.ID));
+    scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
     return scene;
 }
 
 void smSDK::releaseScene(std::shared_ptr<smScene> scene)
 {
-    unRegisterScene(scene);
     scene.reset();
 }
 
@@ -69,7 +68,6 @@ void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
 
     this->viewer = p_viewer;
     this->viewer->log = this->errorLog;
-    this->viewer->dispathcer = this->dispathcer;
 
     this->registerModule(p_viewer);
 }
@@ -88,7 +86,6 @@ std::shared_ptr<smSimulator> smSDK::createSimulator()
     if (this->simulator == nullptr)
     {
         simulator = std::make_shared<smSimulator>(errorLog);
-        simulator->dispathcer = dispathcer;
 
         for (smInt j = 0; j < (*scenesRef).size(); j++)
         {

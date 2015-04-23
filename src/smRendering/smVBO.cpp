@@ -125,7 +125,7 @@ smVBOResult smVBO::drawElements(size_t p_objectId)
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
     glVertexPointer(3, smGLRealType, 0, reinterpret_cast<void*>(dataOffset));
-    glNormalPointer(smGLRealType, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3f)));
+    glNormalPointer(smGLRealType, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3d)));
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
     glIndexPointer(smGLUIntType, 0, reinterpret_cast<void*>(indexOffset));
 
@@ -247,7 +247,7 @@ void smVBO::init( smVBOType p_vboType )
 
 smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_nbrTriangles, const size_t p_objectId )
 {
-    if ( sizeof( smVec3f )*p_nbrVertices + sizeof( smVec3f )*p_nbrVertices + sizeof( smTexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
+    if ( sizeof( smVec3d )*p_nbrVertices + sizeof( smVec3d )*p_nbrVertices + sizeof( smTexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
@@ -262,7 +262,7 @@ smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t
     numberofVertices[p_objectId] = p_nbrVertices;
     numberofTriangles[p_objectId] = p_nbrTriangles;
     ///add the vertices and normals and the texture coordinates
-    currentDataOffset += sizeof( smVec3f ) * p_nbrVertices + sizeof( smVec3f ) * p_nbrVertices + sizeof( smTexCoord ) * p_nbrVertices;
+    currentDataOffset += sizeof( smVec3d ) * p_nbrVertices + sizeof( smVec3d ) * p_nbrVertices + sizeof( smTexCoord ) * p_nbrVertices;
     currentIndexOffset += p_nbrTriangles * sizeof( smTriangle );
     return SIMMEDTK_VBO_OK;
 }

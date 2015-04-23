@@ -28,8 +28,6 @@
 #include "smCore/smCoreClass.h"
 #include "smRendering/smViewer.h"
 #include "smUtilities/smGLUtils.h"
-#include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smSDK.h"
 
 #include <iostream>
@@ -41,12 +39,22 @@
 #define SM_WINDOW_MAXSTRINGSIZE 255
 #define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
+namespace smtk {
+namespace Event {
+    class smEvent;
+    class smEventHandler;
+    class smCameraEvent;
+    }
+}
+
 /// \brief I/O stream
-class smIOStream : public smEventHandler
+class smIOStream : public smCoreClass
 {
 public:
     virtual smIOStream& operator >>(smString &p_string) = 0;
     virtual smIOStream& operator <<(smString p_string) = 0;
+protected:
+    std::shared_ptr<smtk::Event::smEventHandler> eventHanlder;
 };
 
 /// \brief  console stream; for printing text on the console
@@ -131,7 +139,7 @@ public:
     virtual void draw(const smDrawParam &p_params);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/) {}
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) {}
 
 protected:
     /// \brief  fonts
@@ -162,7 +170,7 @@ public:
     /// \brief  draw console
     virtual void draw(const smDrawParam &p_params);
     /// \brief  handle events
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 
 protected:
     /// \brief entered string on the console

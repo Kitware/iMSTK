@@ -36,8 +36,6 @@
 #include "smCore/smStaticSceneObject.h"
 #include "smUtilities/smGLUtils.h"
 #include "smRendering/smVBO.h"
-#include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smSimulators/smPBDSceneObject.h"
 #include "smSimulators/smFemSceneObject.h"
 #include "smUtilities/smDataStructures.h"
@@ -45,6 +43,7 @@
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
 #include "smRendering/smCamera.h"
+#include "smEvent/smEventHandler.h"
 
 
 //forward declaration
@@ -101,6 +100,8 @@ protected:
     std::vector<smRenderOperation> renderOperations;
     std::vector<smFboListItem> fboListItems;
 
+    static std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
+
     std::shared_ptr<smErrorLog> log;
     smInt unlimitedFPSVariableChanged;
     smBool unlimitedFPSEnabled;
@@ -109,6 +110,16 @@ protected:
     friend class smSDK;
 
 public:
+
+    void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
+    {
+        eventHandler->attachEvent(eventType,component);
+    }
+
+    static void keyboardEventTrigger(GLFWwindow*, int, int, int, int);
+    static void mouseButtonEventTrigger(GLFWwindow*, int, int, int);
+    static void mouseMoveEventTrigger(GLFWwindow*, double, double);
+
     smRenderingStageType renderStage;
 
     GLFWwindow* window;
@@ -205,7 +216,7 @@ protected:
     /// \brief render depth texture for debugging
     void renderTextureOnView();
     /// \brief  event handler
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 };

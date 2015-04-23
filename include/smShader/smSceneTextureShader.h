@@ -26,8 +26,13 @@
 
 // SimMedTK includes
 #include "smShader/smShader.h"
-#include "smCore/smEvent.h"
-#include "smCore/smEventHandler.h"
+
+namespace smtk{
+namespace Event{
+
+    class smEvent;
+}
+}
 
 /// \brief scene texture shader. This shader works on the scene that is placed on 2D image. It is for image based effects
 class smSceneTextureShader: public smShader
@@ -49,7 +54,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> /*mesh*/){};
 
     /// \brief handle the events
-    virtual void handleEvent(std::shared_ptr<smEvent> p_event);
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 
 public:
     /// \brief depth  texture GL id that is sent to shader. It stores scene depth values

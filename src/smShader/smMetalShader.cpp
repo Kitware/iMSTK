@@ -23,6 +23,8 @@
 
 // SimMedTK includes
 #include "smShader/smMetalShader.h"
+#include "smEvent/smEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 #include "smCore/smSDK.h"
 
 smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
@@ -55,25 +57,27 @@ smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
 
 void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
 {
-    if ( !attachTexture( p_mesh->uniqueId, p_bump, "BumpTex" ) )
+    if ( !attachTexture( p_mesh->getUniqueId(), p_bump, "BumpTex" ) )
     {
-        std::cout << "Error in bump attachment for mesh:" << p_mesh->name << "\n";
+        std::cout << "Error in bump attachment for mesh:" << p_mesh->getName() << "\n";
     }
 
-    attachTexture( p_mesh->uniqueId, p_decal, "DecalTex" );
-    attachTexture( p_mesh->uniqueId, p_specular, "SpecularTex" );
-    attachTexture( p_mesh->uniqueId, p_OCC, "OCCTex" );
-    attachTexture( p_mesh->uniqueId, p_disp, "DispTex" );
+    auto id = p_mesh->getUniqueId();
+    attachTexture( id, p_decal, "DecalTex" );
+    attachTexture( id, p_specular, "SpecularTex" );
+    attachTexture( id, p_OCC, "OCCTex" );
+    attachTexture( id, p_disp, "DispTex" );
 }
 
 void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
 {
-    attachTexture( p_mesh->uniqueId, p_bump, "BumpTex" );
-    attachTexture( p_mesh->uniqueId, p_decal, "DecalTex" );
-    attachTexture( p_mesh->uniqueId, p_specular, "SpecularTex" );
-    attachTexture( p_mesh->uniqueId, p_OCC, "OCCTex" );
-    attachTexture( p_mesh->uniqueId, p_disp, "DispTex" );
-    attachTexture( p_mesh->uniqueId, p_alphaMap, "AlphaTex" );
+    auto id = p_mesh->getUniqueId();
+    attachTexture( id, p_bump, "BumpTex" );
+    attachTexture( id, p_decal, "DecalTex" );
+    attachTexture( id, p_specular, "SpecularTex" );
+    attachTexture( id, p_OCC, "OCCTex" );
+    attachTexture( id, p_disp, "DispTex" );
+    attachTexture( id, p_alphaMap, "AlphaTex" );
 }
 
 void smMetalShader::draw(const smDrawParam &/*p_param*/)
@@ -92,11 +96,11 @@ void smMetalShader::initDraw(const smDrawParam &p_param )
 
 void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
 {
-    specularPowerValue = mesh->renderDetail.shininess;
+    specularPowerValue = mesh->getRenderDetail()->shininess;
     glUniform1fARB( specularPower, specularPowerValue );
     glUniform1fARB( alphaMapGain, alphaMapGainValue );
 
-    if ( mesh->renderDetail.canGetShadow )
+    if ( mesh->getRenderDetail()->canGetShadow )
     {
         glUniform1fARB( canGetShadowUniform, 1 );
     }
@@ -106,27 +110,29 @@ void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
     }
 }
 
-void smMetalShader::handleEvent(std::shared_ptr<smEvent> p_event)
+void smMetalShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-
-    switch ( p_event->getEventType().eventTypeCode )
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if ( keyBoardData->keyBoardKey == smKey::Add )
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::Add:
             {
                 specularPowerValue += 5;
-                std::cout << specularPowerValue << "\n";
+                std::cout << specularPowerValue << std::endl;
+                break;
             }
 
-            if ( keyBoardData->keyBoardKey == smKey::Subtract )
+            case smtk::Event::smKey::Subtract:
             {
                 specularPowerValue -= 5;
-                std::cout << specularPowerValue << "\n";
+                std::cout << specularPowerValue << std::endl;
+                break;
             }
-
-            break;
+            default:
+                break;
+        }
     }
 }
 
@@ -160,7 +166,7 @@ void MetalShaderShadow::predraw( std::shared_ptr<smMesh> p_mesh )
 {
     smMetalShader::predraw( p_mesh );
 
-    if ( p_mesh->renderDetail.canGetShadow )
+    if ( p_mesh->getRenderDetail()->canGetShadow )
     {
         glUniform1fARB( canGetShadowUniform, 1 );
     }

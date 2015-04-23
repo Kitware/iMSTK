@@ -54,7 +54,7 @@ RenderCube::RenderCube()
     //Assign the previously loaded texture to the cube model
     cube.mesh->assignTexture("cubetex");
     //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube.mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube.meshgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(&cube);
@@ -71,7 +71,7 @@ RenderCube::RenderCube()
 
     square.mesh->loadMesh("models/square.obj", SM_FILETYPE_OBJ);
     square.mesh->assignTexture("colorTex1");
-    square.mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    square.meshgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the square to the scene
     scene2->addSceneObject(&square);
@@ -120,7 +120,7 @@ void RenderCube::setupLights()
     light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
     light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
+    light->direction = smVec3d(0.0, 0.0, -1.0);
     light->drawEnabled = false;
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;
@@ -151,7 +151,7 @@ void RenderCube::setupCamera()
     scene2->camera.genViewMat();
 }
 
-void RenderCube::handleEvent(smEvent *p_event)
+void RenderCube::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
 {
     switch (p_event->eventType.eventTypeCode)
     {

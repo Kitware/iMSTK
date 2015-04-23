@@ -38,8 +38,8 @@ struct smCellTriangle : public GeometryRepresentation
     smCellTriangle() : primID(0) {}
     smCellTriangle(const smUInt &id) : primID(id) {}
     smUInt primID;
-    smUnifiedID meshID;
-    smVec3f vert[3];
+    std::shared_ptr<smUnifiedId> meshID;
+    smVec3d vert[3];
 
     bool operator ==(unsigned int p_ID);
 
@@ -55,8 +55,8 @@ struct smCellLine : public GeometryRepresentation
     smCellLine() : primID(0) {}
     smCellLine(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Edge id
-    smUnifiedID meshID; ///< smMeshLine id
-    smVec3f vert[2]; ///< Vertices
+    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
+    smVec3d vert[2]; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
     bool operator ==(smCellLine &p_line);
@@ -70,9 +70,9 @@ struct smCellModel : public GeometryRepresentation
     smCellModel() : primID(0) {}
     smCellModel(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Model Prim id
-    smUnifiedID meshID; ///< smMeshLine id
-    smVec3f center; ///< Vertices
-    smFloat radius;
+    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
+    smVec3d center; ///< Vertices
+    double radius;
 
     bool operator ==(unsigned int p_ID);
 
@@ -89,8 +89,8 @@ struct smCellPoint : public GeometryRepresentation
     smCellPoint() : primID(0) {}
     smCellPoint(const smUInt &id) : primID(id) {}
     smUInt primID; ///< Model Prim id
-    smUnifiedID meshID; ///< smMeshLine id
-    smVec3f vert; ///< Vertices
+    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
+    smVec3d vert; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
 
@@ -105,7 +105,7 @@ struct smCollidedTriangles
 {
     smCellTriangle tri1;
     smCellTriangle tri2;
-    smVec3f proj1, proj2;
+    smVec3d proj1, proj2;
     smShort point1, point2;
 };
 
@@ -114,7 +114,7 @@ struct smCollidedLineTris
 {
     smCellTriangle tri;
     smCellLine line;
-    smVec3f intersection;
+    smVec3d intersection;
 };
 
 /// \brief Contains model-point pair that have collided
@@ -122,7 +122,7 @@ struct smCollidedModelPoints
 {
     smCellModel model;
     smCellPoint point;
-    smFloat penetration;
+    double penetration;
 };
 
 /// \brief !!

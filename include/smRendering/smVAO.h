@@ -99,7 +99,7 @@ public:
     void initBuffers(smDrawParam p_param);
 
     /// \brief get VAO given the shader ID
-    static std::shared_ptr<smVAO> getVAO(smUnifiedID p_shaderID);
+    static std::shared_ptr<smVAO> getVAO(std::shared_ptr<smUnifiedId> p_shaderID);
 
     /// \brief  enable the vertex array object
     void enable();

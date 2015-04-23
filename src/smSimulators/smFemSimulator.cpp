@@ -24,14 +24,15 @@
 // SimMedTK includes
 #include "smSimulators/smFemSimulator.h"
 #include "smSimulators/smFemSceneObject.h"
+#include "smEvent/smEvent.h"
+#include "smEvent/smKeyboardEvent.h"
+#include "smEvent/smEventHandler.h"
+#include "smEvent/smHapticEvent.h"
+
 
 smFemSimulator::smFemSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
     hapticButtonPressed = false;
-}
-void smFemSimulator::setDispatcher( std::shared_ptr<smEventDispatcher> p_eventDispatcher )
-{
-    eventDispatcher = p_eventDispatcher;
 }
 void smFemSimulator::beginSim()
 {
@@ -53,7 +54,7 @@ void smFemSimulator::initCustom()
         {
             case SIMMEDTK_SMFEMSCENEOBJECT:
             {
-                smStdVector3f &vertices = object->getLocalVertices();
+                smStdVector3d &vertices = object->getLocalVertices();
                 std::shared_ptr<smFemSceneObject> femObject = std::static_pointer_cast<smFemSceneObject>(object);
                 vertices.reserve( femObject->v_mesh->nbrVertices );
                 // TODO: Copying entire vertex array!!?
@@ -139,27 +140,19 @@ void smFemSimulator::run()
 
             if ( i == 0 )
             {
-                auto eventForce = std::make_shared<smEvent>();
-                eventForce->setEventType(smEventType(SIMMEDTK_EVENTTYPE_HAPTICIN));
-                auto hapticData = std::make_shared<smHapticInEventData>();
-                hapticData->deviceId = 1;
+                auto hapticEvent = New<smtk::Event::smHapticEvent>(1,"Device1");
 
                 if ( nodePicked && dofNumber != 0 )
                 {
-                    hapticData->force[0] = -( hapticPosition[0] - femSceneObject->v_mesh->origVerts[pickedIndex][0] );
-                    hapticData->force[1] = -( hapticPosition[1] - femSceneObject->v_mesh->origVerts[pickedIndex][1] );
-                    hapticData->force[2] = -( hapticPosition[2] - femSceneObject->v_mesh->origVerts[pickedIndex][2] );
-                    std::cout << hapticData->force[0] << "," << hapticData->force[1] << "," << hapticData->force[2] << std::endl;
+                    hapticEvent->setForce(femSceneObject->v_mesh->origVerts[pickedIndex]-hapticPosition);
+                    std::cout << hapticEvent->getForce() << std::endl;
                 }
                 else
                 {
-                    hapticData->force[0] = 0;
-                    hapticData->force[1] = 0;
-                    hapticData->force[2] = 0;
+                    hapticEvent->setForce(smVec3d::Zero());
                 }
 
-                eventForce->getEventData() = hapticData;
-                eventDispatcher->sendEventAndDelete( eventForce );
+                eventHandler->triggerEvent(hapticEvent);
             }
         }
     }
@@ -189,38 +182,33 @@ void smFemSimulator::syncBuffers()
         }
     }
 }
-void smFemSimulator::handleEvent( std::shared_ptr<smEvent> p_event )
+void smFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            auto keyBoardData =
-            std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
-            {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
-            }
-
-            break;
-        }
-        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        {
-            auto hapticEventData =
-            std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
-
-            if ( hapticEventData->deviceId == 1 )
-            {
-                hapticPosition[0] = hapticEventData->position[0];
-                hapticPosition[1] = hapticEventData->position[1];
-                hapticPosition[2] = hapticEventData->position[2];
-                hapticButtonPressed = hapticEventData->buttonState[0];
-            }
-
-            break;
-        }
-        default:
-            std::cerr << "Unknown evant type." << std::endl;
+        return;
     }
+
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == 1)
+    {
+        hapticPosition = hapticEvent->getPosition();
+        hapticButtonPressed = hapticEvent->getButtonState(0);
+        return;
+    }
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::F1:
+            {
+                std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
+            }
+            default:
+                break;
+        }
+    }
+
 }

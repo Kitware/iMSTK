@@ -28,14 +28,13 @@
 
 class RenderCube
     : public smSimulationMain,
-      public smCoreClass,
-      public smEventHandler
+      public smCoreClass
 {
 public:
     RenderCube();
     ~RenderCube();
     void simulateMain(smSimulationMainParam p_param);
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
 private:
     std::unique_ptr<smSDK> sdk;
     smScene *scene1;

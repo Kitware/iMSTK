@@ -26,7 +26,13 @@
 
 // SimMedTK includes
 #include "smShader/smShader.h"
-#include "smCore/smEventHandler.h"
+
+namespace smtk{
+namespace Event{
+
+    class smEvent;
+}
+}
 
 /// \brief metal shader look. It is mainly used for tool rendering but utilized for high specularity rendering for tissues.
 class smMetalShader: public smShader
@@ -55,7 +61,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh);
 
     /// \brief handle keyboard event
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 
     /// \brief any disable and enable shader options need to be here
     virtual void switchEnable();

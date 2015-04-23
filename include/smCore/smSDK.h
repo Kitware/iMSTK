@@ -29,10 +29,8 @@
 #include "smCore/smCoreClass.h"
 #include "smCore/smScene.h"
 #include "smRendering/smViewer.h"
-#include "smCore/smDispatcher.h"
 #include "smCore/smSimulator.h"
 #include "smCore/smTextureManager.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructures.h"
 #include "smUtilities/smMakeUnique.h"
@@ -175,8 +173,6 @@ private:
     std::shared_ptr<smErrorLog> errorLog; ///< error log
     std::shared_ptr<smViewer> viewer; ///< Reference to the sdk viewer object
     std::shared_ptr<smSimulator> simulator; ///< Reference to the sdk simulator object
-    std::shared_ptr<smDispatcher> dispathcer; ///< dispatcher
-    std::shared_ptr<smEventDispatcher> eventDispatcher; ///< event dispatcher
     std::vector<std::shared_ptr<smScene>> sceneList; ///< scene list
 
     ///holds the references to the entities in the framework
@@ -203,8 +199,6 @@ private:
         sceneList.clear();
 
         errorLog = std::make_shared<smErrorLog>();
-        dispathcer = std::make_shared<smDispatcher>();
-        eventDispatcher = std::make_shared<smEventDispatcher>();
 
         // TODO: Fix these! Leaking...
         meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
@@ -262,12 +256,6 @@ public:
         return errorLog;
     };
 
-    ///SDK returns the event dispather
-    std::shared_ptr<smEventDispatcher> getEventDispatcher()
-    {
-        return eventDispatcher;
-    }
-
     ///terminates every module. Do it later on with smMessager
     void terminateAll();
 
@@ -288,86 +276,45 @@ public:
     {
         smMeshHolder mh;
         mh.mesh = p_mesh;
-        p_mesh->uniqueId.setSdkId(meshesRef->checkAndAdd(mh));
-        return p_mesh->uniqueId.getSdkId();
+        return meshesRef->checkAndAdd(mh);
     }
 
     smInt registerModule(std::shared_ptr<smModule> p_mod)
     {
         smModuleHolder mh;
         mh.module = p_mod;
-        p_mod->uniqueId.setSdkId(modulesRef->checkAndAdd(mh));
-        return p_mod->uniqueId.getSdkId();
+        return modulesRef->checkAndAdd(mh);
     }
 
     void registerObjectSim(std::shared_ptr<smObjectSimulator> p_os)
     {
         smObjectSimulatorHolder os;
         os.objectSim = p_os;
-        p_os->uniqueId.setSdkId(objectSimulatorsRef->checkAndAdd(os));
+        objectSimulatorsRef->checkAndAdd(os);
     }
 
     void registerCollDet(std::shared_ptr<smObjectSimulator> p_col)
     {
         smObjectSimulatorHolder col;
         col.objectSim = p_col;
-        p_col->uniqueId.setSdkId(collisionDetectorsRef->checkAndAdd(col));
+        collisionDetectorsRef->checkAndAdd(col);
     }
 
     void registerScene(std::shared_ptr<smScene> p_sc)
     {
         smSceneHolder sc;
         sc.scene = p_sc;
-        p_sc->uniqueId.setSdkId(scenesRef->checkAndAdd(sc));
-    }
-
-    static smBool unRegisterScene(std::shared_ptr<smScene> p_sc)
-    {
-        return scenesRef->remove(p_sc->uniqueId.getSdkId());
+        scenesRef->checkAndAdd(sc);
     }
 
     void registerSceneObject(std::shared_ptr<smSceneObject> p_sco)
     {
         smSceneObjectHolder  sh;
         sh.sceneObject = p_sco;
-        p_sco->uniqueId.setSdkId(sceneObjectsRef->checkAndAdd(sh));
+        sceneObjectsRef->checkAndAdd(sh);
     }
 
     /// \brief getter functions
-    std::shared_ptr<smBaseMesh> getMesh(smUnifiedID &p_unifiedID)
-    {
-        return (meshesRef->getByRef(p_unifiedID.getSdkId()).mesh);
-    }
-
-    std::shared_ptr<smModule> getModule(smUnifiedID &p_unifiedID)
-    {
-        return (modulesRef->getByRef(p_unifiedID.getSdkId()).module);
-    }
-
-    std::shared_ptr<smObjectSimulator> getObjectSim(smUnifiedID &p_unifiedID)
-    {
-        return (objectSimulatorsRef->getByRef(p_unifiedID.getSdkId()).objectSim);
-    }
-
-    std::shared_ptr<smObjectSimulator> getCollDet(smUnifiedID &p_unifiedID)
-    {
-        return (collisionDetectorsRef->getByRef(p_unifiedID.getSdkId()).objectSim);
-    }
-
-    std::shared_ptr<smScene> getScene(smUnifiedID &p_unifiedID)
-    {
-        return (scenesRef->getByRef(p_unifiedID.getSdkId()).scene);
-    }
-
-    std::shared_ptr<smSceneObject> getSceneObject(smUnifiedID &p_unifiedID)
-    {
-        return (sceneObjectsRef->getByRef(p_unifiedID.getSdkId()).sceneObject);
-    }
-
-    smPipe* getPipe(smUnifiedID &p_unifiedID)
-    {
-        return (pipesRef->getByRef(p_unifiedID.getSdkId()).pipe);
-    }
 
     smPipe* getPipeByName(smString p_name)
     {
@@ -379,7 +326,7 @@ public:
     {
         smPipeHolder ph;
         ph.pipe = p_pipe;
-        p_pipe->uniqueId.setSdkId(pipesRef->checkAndAdd(ph));
+        pipesRef->checkAndAdd(ph);
     }
 
     /// \brief create a pipe

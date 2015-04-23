@@ -27,7 +27,6 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smModule.h"
-#include "smCore/smEventHandler.h"
 
 /// Declarations and constants for the device
 const int   SIMMEDTK_MSG_UNKNOWN = -2;

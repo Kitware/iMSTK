@@ -30,13 +30,14 @@
 // SimMedTK includes
 #include "smRendering/smViewer.h"
 #include "smCollision/smSurfaceTreeIterator.h"
+#include "smEvent/smKeyboardEvent.h"
 
 /// \brief initialize the surface tree structure
 template <typename CellType>
 void smSurfaceTree<CellType>::initStructure()
 {
-    smVec3f center;
-    float edge;
+    smVec3d center;
+    double edge;
     std::vector<int> triangles;
 
     for (int i = 0; i < mesh->nbrTriangles; ++i)
@@ -116,8 +117,8 @@ void smSurfaceTree<CellType>::initDraw(const smDrawParam &param)
 template<typename CellType>
 void smSurfaceTree<CellType>::draw(const smDrawParam &params)
 {
-    smVec3f center;
-    float length;
+    smVec3d center;
+    double length;
     glColor3fv(smColor::colorGreen.toGLColor());
 
     glEnable(GL_LIGHTING);
@@ -153,15 +154,19 @@ void smSurfaceTree<CellType>::draw(const smDrawParam &params)
 
 /// \brief handle key press events
 template<typename CellType>
-void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smEvent> p_event)
+void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
 {
-    switch(p_event->getEventType().eventTypeCode)
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
+        return;
+    }
+    auto keyBoardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+    if(keyBoardEvent != nullptr)
+    {
+        smtk::Event::smKey keyPressed = keyBoardEvent->getKeyPressed();
+        switch(keyPressed)
         {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if(keyBoardData->keyBoardKey == smKey::Add)
+            case smtk::Event::smKey::Add:
             {
                 minTreeRenderLevel++;
 
@@ -178,7 +183,7 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smEvent> p_event)
                 currentLevel = minTreeRenderLevel;
             }
 
-            if(keyBoardData->keyBoardKey == smKey::Subtract)
+            case smtk::Event::smKey::Subtract:
             {
                 minTreeRenderLevel--;
 
@@ -195,31 +200,31 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smEvent> p_event)
                 currentLevel = minTreeRenderLevel;
             }
 
-            if(keyBoardData->keyBoardKey == smKey::R)
+            case smtk::Event::smKey::R:
             {
                 this->renderSurface = !this->renderSurface;
             }
 
-            if(keyBoardData->keyBoardKey == smKey::P)
+            case smtk::Event::smKey::P:
             {
                 this->enableShiftPos = !this->enableShiftPos;
             }
 
-            if(keyBoardData->keyBoardKey == smKey::K)
+            case smtk::Event::smKey::K:
             {
                 this->renderOnlySurface = !this->renderOnlySurface;
             }
 
-            if(keyBoardData->keyBoardKey == smKey::T)
+            case smtk::Event::smKey::T:
             {
                 updateStructure();
             }
 
-            break;
+            default:
+                std::cerr << "Unhandled key." << std::endl;
         }
     }
 }
-
 /// \brief create the surface tree
 template<typename CellType>
 bool smSurfaceTree<CellType>::createTree(CellType &Node,
@@ -241,7 +246,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
         Node.setIsLeaf(true);
 
         int nbrTriangles = triangles.size();
-        float totalDistance = 0.0;
+        double totalDistance = 0.0;
 
         for (int i = 0; i < nbrTriangles; ++i)
         {
@@ -360,7 +365,7 @@ void smSurfaceTree<CellType>::updateStructure()
     for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
     {
         current = &treeAllLevels[i];
-        smVec3f tempCenter(0, 0, 0);
+        smVec3d tempCenter(0, 0, 0);
         int counter = 0;
 
         if (!current->isEmpty())

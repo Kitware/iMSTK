@@ -78,19 +78,19 @@ AlphaMapExample::AlphaMapExample()
 
     object1->mesh->loadMeshLegacy("../../resources/models/gall_tissue.3DS", SM_FILETYPE_3DS);
 
-    metalShader->attachTexture(object1->mesh->uniqueId, "norm", "BumpTex");
-    metalShader->attachTexture(object1->mesh->uniqueId, "diffuse", "DecalTex");
-    metalShader->attachTexture(object1->mesh->uniqueId, "spec", "SpecularTex");
-    metalShader->attachTexture(object1->mesh->uniqueId, "noOCC", "OCCTex");
-    metalShader->attachTexture(object1->mesh->uniqueId, "alpha", "AlphaTex");
+    metalShader->attachTexture(object1->mesh->getUniqueId(), "norm", "BumpTex");
+    metalShader->attachTexture(object1->mesh->getUniqueId(), "diffuse", "DecalTex");
+    metalShader->attachTexture(object1->mesh->getUniqueId(), "spec", "SpecularTex");
+    metalShader->attachTexture(object1->mesh->getUniqueId(), "noOCC", "OCCTex");
+    metalShader->attachTexture(object1->mesh->getUniqueId(), "alpha", "AlphaTex");
 
-    object1->renderDetail.renderType = (SIMMEDTK_RENDER_FACES |
+    object1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES |
                                         SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_TRANSPARENT);
-    object1->renderDetail.addShader(metalShader->uniqueId);
+    object1getRenderDetail()->addShader(metalShader->getUniqueId());
     object1->mesh->translate(0, 10, -110);
-    object1->mesh->scale(smVec3f(5, 5, 5));
-    object1->renderDetail.lineSize = 2;
-    object1->renderDetail.pointSize = 5;
+    object1->mesh->scale(smVec3d(5, 5, 5));
+    object1getRenderDetail()->lineSize = 2;
+    object1getRenderDetail()->pointSize = 5;
 
     /// add object to the scene
     scene1->addSceneObject(object1);

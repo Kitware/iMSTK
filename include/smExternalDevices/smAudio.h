@@ -20,7 +20,7 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #ifndef SMAUDIO_H
 #define SMAUDIO_H
 
@@ -64,7 +64,7 @@ enum smAudioReturnType
 };
 
 /// \brief class to enable audio rendering
-class smAudio: public smCoreClass, public smEventHandler
+class smAudio: public smCoreClass
 {
 
     AudioDevicePtr device; ///< audio device
@@ -194,8 +194,12 @@ public:
     }
 
     /// \brief gather input events and change states and volume if needed
-    void handleEvent(smEvent *p_event)
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
     {
+        if(!this->isListening())
+        {
+            return;
+        }
         smAudioEventData *audioEvent;
 
         if (p_event->eventType == SIMMEDTK_EVENTTYPE_AUDIO)

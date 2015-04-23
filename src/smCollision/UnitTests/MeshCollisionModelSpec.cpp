@@ -54,7 +54,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            smStdVector3f vertices;
+            smStdVector3d vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
@@ -101,7 +101,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            smStdVector3f vertices;
+            smStdVector3d vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
@@ -131,8 +131,8 @@ go_bandit([](){
             mesh->allocateAABBTris();
 
 
-            smVec3f normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
-            smVec3f normalB = (vertices[2]-vertices[1]).cross(vertices[3]-vertices[1]).normalized();
+            smVec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
+            smVec3d normalB = (vertices[2]-vertices[1]).cross(vertices[3]-vertices[1]).normalized();
 
             AssertThat((meshCollisionModel->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
             AssertThat((meshCollisionModel->getNormal(1)-normalB).squaredNorm(), EqualsWithDelta(0.0,.00001));
@@ -147,7 +147,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            smStdVector3f vertices;
+            smStdVector3d vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);

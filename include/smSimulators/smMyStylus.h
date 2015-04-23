@@ -44,7 +44,7 @@ public:
     smMeshContainer meshContainer, meshContainerLower, meshContainerUpper; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 
     /// \brief constructor
     MyStylus(const smString& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
@@ -65,7 +65,7 @@ public:
     smMeshContainer meshContainer; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 
     /// \brief render the avatar
     void draw(const smDrawParam &p_param);

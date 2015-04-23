@@ -64,5 +64,5 @@ smSceneObject::smSceneObject()
 //     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;
-    name = "SceneObject" + std::to_string(uniqueId.ID);
+    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
 }

@@ -21,41 +21,32 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smEvent.h"
-#include "smCore/smEventHandler.h"
+#include <bandit/bandit.h>
 
-smEvent::smEvent()
-{
-    priority = SIMMEDTK_EVENTPRIORITY_NORMAL;
-    data = nullptr;
-}
+#include "smEvent/smEventHandler.h"
 
-smEvent::~smEvent()
-{
-}
+using namespace bandit;
 
-smEventType::smEventType()
-{
-    eventTypeCode = SIMMEDTK_EVENTTYPE_NONE;
-}
+go_bandit([](){
+    describe("Event handler", []() {
+        it("constructs ", []() {
+            std::unique_ptr<smEventHandler2> smEventHandler(make_unique<smEventHandler2>());
+        });
+        it("registers events ", []() {
+            std::unique_ptr<smEventHandler2> smEventHandler(make_unique<smEventHandler2>());
 
-smEventType::smEventType(smInt p_eventType)
-{
-    eventTypeCode = p_eventType;
-}
+            smEventHandler->attachEvent()
+            std::shared_ptr<smModelRepresentation> modelA = std::make_shared<smMeshCollisionModel>();
+            std::shared_ptr<smModelRepresentation> modelB = std::make_shared<smMeshCollisionModel>();
 
-smEventType & smEventType::operator=(smInt p_eventTypeCode)
-{
-    eventTypeCode = p_eventTypeCode;
-    return *this;
-}
+            collisionPair->setModels(modelA,modelB);
 
-smBool smEventType::operator ==(const smEventType &p_event)
-{
-    return eventTypeCode == p_event.eventTypeCode;
-}
+            AssertThat(collisionPair->getFirst(), Equals(modelA));
+            AssertThat(collisionPair->getSecond(), Equals(modelB));
 
-smBool smEventType::operator ==(smInt p_eventTypeCode)
-{
-    return eventTypeCode == p_eventTypeCode;
-}
+        });
+
+    });
+
+});
+

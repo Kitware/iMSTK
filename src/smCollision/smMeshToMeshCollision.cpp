@@ -38,9 +38,9 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
     std::vector<smMeshCollisionModel::NodePairType>
     intersectionNodes = meshA->getAABBTree()->getIntersectingNodes(meshB->getAABBTree());
 
-    float depth;
-    smVec3f normal;
-    smVec3f contactPoint;
+    double depth;
+    smVec3d normal;
+    smVec3d contactPoint;
     for(auto & intersection : intersectionNodes)
     {
         smMeshCollisionModel::AABBNodeType nodeA = intersection.first;
@@ -54,7 +54,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
 
         for(const auto & i : triangleListA)
         {
-            const smVec3f& normalA = meshA->getNormal(i);
+            const smVec3d& normalA = meshA->getNormal(i);
             if(normalA.isZero())
             {
                 continue;
@@ -63,7 +63,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
             auto verticesA = meshA->getTrianglePositions(i);
             for(auto & j : triangleListB)
             {
-                const smVec3f& normalB = meshB->getNormal(j);
+                const smVec3d& normalB = meshB->getNormal(j);
                 if(normalB.isZero())
                 {
                     continue;

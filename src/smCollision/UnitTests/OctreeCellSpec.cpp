@@ -36,7 +36,7 @@ go_bandit([](){
 
         const int numberOfSubdivisions = smOctreeCell::numberOfSubdivisions;
 
-        smVec3f center(1.,1.,1.);
+        smVec3d center(1.,1.,1.);
         treeCell.setCenter(center);
 
         float lenght = 14.5;

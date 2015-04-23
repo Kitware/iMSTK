@@ -188,7 +188,7 @@ smVAO::smVAO( std::shared_ptr<smErrorLog> p_log, smVBOType p_vboType, bool p_bin
     renderingError = false;
     totalNbrBuffers = 0;
     vboType = p_vboType;
-    VAOs[this->uniqueId.ID] = safeDownCast<smVAO>();
+    VAOs[this->getUniqueId()->getId()] = safeDownCast<smVAO>();
     indexBufferLocation = -1;
     bindShaderObjects = p_bindShaderObjects;
 }
@@ -202,7 +202,7 @@ void smVAO::setBufferData( smVBOBufferType p_type, std::string p_ShaderAttribNam
             p_type == SMVBO_TANGENTS ||
             p_type == SMVBO_VEC3F )
     {
-        bufferInfo[totalNbrBuffers].size = sizeof( smVec3f ) * p_nbrElements;
+        bufferInfo[totalNbrBuffers].size = sizeof( smVec3d ) * p_nbrElements;
     }
     else if ( p_type == SMVBO_TEXTURECOORDS ||
               p_type == SMVBO_VEC2F )
@@ -233,7 +233,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
 {
     if ( p_shader == NULL )
     {
-        shader = smShader::getShader( p_mesh->renderDetail.shaders[0] );
+        shader = smShader::getShader( p_mesh->getRenderDetail()->shaders[0] );
     }
     else
     {
@@ -241,7 +241,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     }
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
-    bufferInfo[totalNbrBuffers].size = sizeof( smVec3f ) * p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( smVec3d ) * p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
     bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
@@ -249,7 +249,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     totalNbrBuffers++;
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_NORMALS;
-    bufferInfo[totalNbrBuffers].size = sizeof( smVec3f ) * p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( smVec3d ) * p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertNormals;
     bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
@@ -268,7 +268,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     if ( p_mesh->tangentChannel )
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TANGENTS;
-        bufferInfo[totalNbrBuffers].size = sizeof( smVec3f ) * p_mesh->nbrVertices;
+        bufferInfo[totalNbrBuffers].size = sizeof( smVec3d ) * p_mesh->nbrVertices;
         bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertTangents;
         bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
         bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
@@ -293,9 +293,9 @@ void smVAO::initVAOs( smDrawParam p_param )
         x.second->initBuffers( p_param );
     }
 }
-std::shared_ptr<smVAO> smVAO::getVAO( smUnifiedID p_shaderID )
+std::shared_ptr<smVAO> smVAO::getVAO( std::shared_ptr<smUnifiedId> p_shaderID )
 {
-    return VAOs[p_shaderID.ID];
+    return VAOs[p_shaderID->getId()];
 }
 void smVAO::enable()
 {

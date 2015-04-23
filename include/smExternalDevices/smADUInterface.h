@@ -30,7 +30,6 @@
 #include "smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
 
 /// \brief holds data for calibration of ADU device
@@ -106,7 +105,7 @@ public:
     void run();
 
     /// \brief
-    void handleEvent(smEvent *p_event) {};
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) {};
 
 public:
     smPipe *ADUpipe; ///< !!

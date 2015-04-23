@@ -31,12 +31,20 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
+#include "smCore/smUnifiedId.h"
 #include "smRendering/smConfigRendering.h"
 
 class smSDK;
 class smCoreClass;
 class smObjectSimulator;
 class smViewer;
+
+namespace smtk {
+namespace Event {
+class smEvent;
+class smEventHandler;
+}
+}
 
 /// \brief  viewer sends this to all objects to be rendered
 struct smDrawParam
@@ -54,126 +62,175 @@ struct smSimulationParam
     void *data;
 };
 
-/// \brief  This class indicates the unified id of all  objects in the framework
-struct smUnifiedID
+///
+/// \brief new operator
+///
+/// This class should be used as :
+///    MyClass::Pointer p = New<MyT>(args);
+///
+///
+template<typename T, typename Pointer = std::shared_ptr<T>>
+class New : public Pointer
 {
-
-private:
-    /// \brief  atomic integer counter that is used to assign a unique number for  each object
-    static std::atomic_int IDcounter;
-    /// \brief  sdk ID. for network use
-    smShort sdkID;
-
 public:
-    /// \brief  unique ID
-    smShort ID;
-    /// \brief   machine ID. for network use
-    smShort machineID;
-
-    /// \brief  constructor
-    smUnifiedID();
-
-    /// \brief  generate unique ID
-    void generateUniqueID();
-
-    /// \brief  returns SDK id
-    const smShort &getSdkId() const;
-
-    void setSdkId(const smShort &id)
+    template<typename... ArgsType>
+    New(ArgsType&&... args)
     {
-        sdkID = id;
+        Pointer(std::make_shared<T>(args...));
     }
-
-    /// \brief  set with another smUnifiedID
-    void operator =(const smUnifiedID &p_id);
-
-    /// \brief comparison with another smUnifiedID
-    bool operator==(smUnifiedID &p_id);
-
-    /// \brief checks with ID. can be used to compare the object on the same machine
-    bool operator==(smInt &p_ID);
-
-    /// \brief comparison with id
-    bool operator!=(smInt &p_ID);
-
 };
 
-/// \brief core class of all objects in framework
+
+/// \brief core base class of all objects in framework
 class smCoreClass : public std::enable_shared_from_this<smCoreClass>
 {
 
 public:
-    /// \brief constructor
+    ///
+    /// \brief Default constructor
+    ///
     smCoreClass();
 
-    /// \brief constructor
+    ///
+    /// \brief Default constructor
+    ///
     smCoreClass(const std::string &);
 
+    ///
     /// \brief get type of the class
+    ///
     const smClassType &getType() const ;
 
+    ///
     /// \brief set type of the class
+    ///
     void setType(const smClassType &newType);
 
+    ///
     /// \brief his function is called by the renderer. The p_params stores renderer pointers
+    ///
     virtual void initDraw(const smDrawParam &p_params);
 
+    ///
     /// \brief draw function is called for visualization the object
+    ///
     virtual void draw(const smDrawParam &p_params);
 
+    ///
     /// \brief initialization of simulation
+    ///
     virtual void initSimulate(const smSimulationParam &p_params);
 
+    ///
     /// \brief simulates the object
+    ///
     virtual void simulate(const smSimulationParam &p_params);
 
+    ///
     /// \brief print the object
+    ///
     virtual void print() const;
 
+    ///
+    /// \brief event binding function
+    /// This function is called by the event handler after observing
+    /// events.
+    ///
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>);
+
+    ///
     /// \brief set the name of object
+    ///
     void setName(const smString &p_objectName);
 
+    ///
     /// \brief get the name of the object
+    ///
     const smString &getName() const;
 
+    ///
     /// \brief Increease reference counter
+    ///
     std::atomic_int &operator++()
     {
         ++referenceCounter;
         return referenceCounter;
     }
 
+    ///
     /// \brief Decreease reference counter
+    ///
     std::atomic_int &operator--()
     {
         --referenceCounter;
         return referenceCounter;
     }
 
+    ///
+    /// \brief Event listening state
+    /// \return listening
+    ///
+    const bool &isListening() const { return listening; }
+
+    ///
+    /// \brief Event listening state
+    ///
+    bool &isListening() { return listening; }
+
+    ///
+    /// \brief Event listening state
+    ///
+    void setIsListening( bool islistening) { listening = islistening; }
+
+    ///
+    /// \brief Event index used by the event handler to unregister event observers
+    /// \return eventIndex
+    ///
+    const int &getEventIndex() { return eventIndex; }
+
+    ///
+    /// \brief Set event index used by the event handler to unregister event observers
+    ///
+    void setEventIndex(int index) { eventIndex = index; }
+
+    ///
+    /// \brief Set the order on which the objects are painted.
+    ///
+    void setDrawOrder(const smClassDrawOrder &order) { drawOrder = order; }
+
+    ///
+    /// \brief Get the unique id of this object
+    ///
+    std::shared_ptr<smUnifiedId> getUniqueId() {return uniqueId;}
+
+    ///
+    /// \brief Set the unique id of this object
+    ///
+    std::shared_ptr<smRenderDetail> getRenderDetail() {return renderDetail;}
+
 protected:
+    ///
+    /// \brief Allows to use the *this* pointer from any child
+    ///
     template<typename DerivedType>
-    std::shared_ptr<DerivedType> safeDownCast()
+    inline std::shared_ptr<DerivedType> safeDownCast()
     {
-        auto thisObject = shared_from_this();
-        return std::static_pointer_cast<DerivedType>(thisObject);
+        return std::static_pointer_cast<DerivedType>(shared_from_this());
     }
 
 protected:
-    /// \brief class type
-    smClassType type;
-    /// \brief reference counter to identify the count the usage
-    std::atomic_int referenceCounter;
-//     friend smSDK;
+    std::atomic_int referenceCounter;   // reference counter to identify the count the usage
+    smClassType type;                   // class type
+    smString name;                      // name of the class
+    bool listening;                     // parameter to determine if this object
+    int eventIndex;                     // event index used to unregister observer events
+    std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
 
-public:
-    /// \brief name of the class
-    smString name;
-    /// \brief unique ID
-    smUnifiedID uniqueId;
-    /// \brief renderDetail specifies visualization type
-    smRenderDetail renderDetail;
-    /// \brief draw order of the object
-    smClassDrawOrder drawOrder;
+private:
+    std::shared_ptr<smUnifiedId> uniqueId;          // unique Id
+    std::shared_ptr<smRenderDetail> renderDetail;   // specifies visualization type
+    smClassDrawOrder drawOrder;                     // draw order of the object
+                                                    //  is listening for events
 };
 
 /// \brief for future use

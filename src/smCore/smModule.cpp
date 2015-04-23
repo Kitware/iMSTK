@@ -55,18 +55,13 @@ void smModule::waitTermination()
         }
     }
 }
-void smModule::setEventDispatcher( std::shared_ptr<smEventDispatcher> p_dispathcer )
-{
-    eventDispatcher = p_dispathcer;
-}
 int smModule::getModuleId()
 {
-    return uniqueId.ID;
+    return this->getUniqueId()->getId();
 }
 smModule::smModule()
 {
     terminateExecution = false;
-    eventDispatcher = nullptr;
     isInitialized = false;
     name = "Module";
 }

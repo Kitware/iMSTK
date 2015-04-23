@@ -31,6 +31,7 @@
 #include "smCollision/smCollisionDetection.h"
 #include "smUtilities/smDataStructures.h"
 #include "smUtilities/smMakeUnique.h"
+#include "smEvent/smKeyboardEvent.h"
 
 class smCellLine;
 class smCellModel;
@@ -110,6 +111,25 @@ public:
     const std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles() const;
 
     std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles();
+
+    void draw(const smDrawParam &p_params);
+
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+    {
+        if(!this->isListening())
+        {
+            return;
+        }
+        auto keyBoardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+        if(/*this->isListening && */(keyBoardEvent != nullptr))
+        {
+            if(keyBoardEvent->getKeyPressed() == smtk::Event::smKey::D && keyBoardEvent->getPressed())
+            {
+                smDrawParam p_params;
+                this->draw(p_params);
+            }
+        }
+    }
 
 protected:
     /// \brief adds triangle to hash

@@ -41,7 +41,7 @@ public:
     }
 
     smCube cube; ///< cube
-    smVec3f originalCubeCenter; ///< original cube center
+    smVec3d originalCubeCenter; ///< original cube center
     smSphere sphere; ///< !!
 
     std::vector<int> triagleIndices;  ///< triangle indices
@@ -52,7 +52,7 @@ public:
     inline void subDivide(const int divisionPerAxis, std::vector<smOctreeCell> &p_cells);
 
     /// \brief !!
-    inline bool isCollided(const smVec3f &p_v0, const smVec3f &p_v1, const smVec3f &p_v2);
+    inline bool isCollided(const smVec3d &p_v0, const smVec3d &p_v1, const smVec3d &p_v2);
 
     /// \brief !!
     inline void expand(const float p_expansion);

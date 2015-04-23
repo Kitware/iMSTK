@@ -55,8 +55,8 @@ RenderCubeOculus::RenderCubeOculus()
 
     //Load the cube model
     cube.mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
-    //cube.mesh->scale(smVec3f(0.1, 0.1, 0.1));
-    cube.mesh->translate(smVec3f(-2, -1, -3));
+    //cube.mesh->scale(smVec3d(0.1, 0.1, 0.1));
+    cube.mesh->translate(smVec3d(-2, -1, -3));
     //Assign the previously loaded texture to the cube model
     cube.mesh->assignTexture("cubetex");
     //Tell SimMedTK to render the faces of the model, and the texture assigned
@@ -107,7 +107,7 @@ void RenderCubeOculus::setupLights()
     light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
     light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
+    light->direction = smVec3d(0.0, 0.0, -1.0);
     light->drawEnabled = false;
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;

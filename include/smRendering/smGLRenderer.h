@@ -47,22 +47,22 @@ public:
     smGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, const smRenderDetail &renderDetail, const smDrawParam &p_drawParam);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail, const smDrawParam &p_drawParam);
 
     /// \brief  draw normals
     static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue);
 
     /// \brief  draw line mesh
-    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh,  const smRenderDetail &renderDetail);
+    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3f p_pos, smVec3f dirX, smVec3f dirY, smVec3f dirZ);
+    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();
 
     /// \brief draw triangle
-    static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3);
+    static void drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3);
 
     /// \brief end triangle rendering
     static void endTriangles();

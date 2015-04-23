@@ -45,7 +45,7 @@ void smSceneTextureShader::predraw(std::shared_ptr<smMesh>/*p_mesh*/)
 
 }
 
-void smSceneTextureShader::handleEvent(std::shared_ptr<smEvent> /*p_event*/)
+void smSceneTextureShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/)
 {
 
 }
@@ -74,13 +74,13 @@ void smSceneTextureShader::draw(const smDrawParam &/*p_param*/)
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
     glTexCoord2f(0, 0);
-    glVertex3f(-1, -1, 0);
+    glVertex3d(-1, -1, 0);
     glTexCoord2f(1, 0);
-    glVertex3f(1, -1, 0);
+    glVertex3d(1, -1, 0);
     glTexCoord2f(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2f(0, 1);
-    glVertex3f(-1, 1.0, 0);
+    glVertex3d(-1, 1.0, 0);
     glEnd();
     glPopAttrib();
 }

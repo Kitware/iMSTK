@@ -61,7 +61,7 @@ struct smObjectSimulatorParam
 
 ///This is the major object simulator. Each object simulator should derive this class.
 ///you want particular object simualtor to work over an object just set pointer of the object. the rest will be taken care of the simulator and object simulator.
-class smObjectSimulator : public smEventHandler
+class smObjectSimulator : public smCoreClass
 {
 
     ///friend class since smSimulator is the encapsulates the other simulators.
@@ -84,7 +84,7 @@ public:
     ///This is for scheduler
     smScheduleGroup scheduleGroup;
 
-    //smUnifiedID objectSimulatorId;
+    //std::shared_ptr<smUnifiedId> objectSimulatorId;
     smBool enabled;
 
     ///the function is reentrant it is not thread safe.

@@ -22,58 +22,22 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smCoreClass.h"
-
-std::atomic_int smUnifiedID::IDcounter;
-
-smUnifiedID::smUnifiedID()
-{
-    sdkID = -1;
-    machineID = -1;
-}
-
-void smUnifiedID::generateUniqueID()
-{
-    ID = IDcounter.fetch_add( 1 );
-}
-
-const smShort &smUnifiedID::getSdkId() const
-{
-    return sdkID;
-}
-
-void smUnifiedID::operator=( const smUnifiedID &p_id )
-{
-    ID = p_id.ID;
-    sdkID = p_id.sdkID;
-    machineID = p_id.machineID;
-}
-
-bool smUnifiedID::operator==( smUnifiedID &p_id )
-{
-    return ( ID == p_id.ID && machineID == p_id.machineID );
-}
-
-bool smUnifiedID::operator==( int &p_ID )
-{
-    return ( ID == p_ID );
-}
-
-bool smUnifiedID::operator!=( int &p_ID )
-{
-    return ( ID != p_ID );
-}
+#include "smEvent/smEventHandler.h"
 
 smCoreClass::smCoreClass() :
-    name("")
+    name(""), listening(false), eventIndex(-1)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
-    uniqueId.generateUniqueID();
+    uniqueId = New<smUnifiedId>();
+    eventHandler = New<smtk::Event::smEventHandler>();
 }
 
-smCoreClass::smCoreClass(const std::string &_name) : name(_name)
+smCoreClass::smCoreClass(const std::string &_name) :
+    name(_name), listening(false), eventIndex(-1)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
-    uniqueId.generateUniqueID();
+    uniqueId = New<smUnifiedId>();
+    eventHandler = New<smtk::Event::smEventHandler>();
 }
 
 const smClassType &smCoreClass::getType() const
@@ -88,18 +52,27 @@ void smCoreClass::setType(const smClassType& newType)
 
 void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
 {
+    std::cout << "Default initDraw" << std::endl;
 }
 void smCoreClass::draw( const smDrawParam &/*p_params*/ )
 {
+    std::cout << "Default draw" << std::endl;
 }
 void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
 {
+    std::cout << "Default initSimulate" << std::endl;
 }
 void smCoreClass::simulate( const smSimulationParam &/*p_params*/ )
 {
+    std::cout << "Default simulate" << std::endl;
 }
 void smCoreClass::print() const
 {
+    std::cout << "Default print" << std::endl;
+}
+void smCoreClass::handleEvent(std::shared_ptr< smtk::Event::smEvent >)
+{
+    std::cout << "Default handleEvent" << std::endl;
 }
 
 void smCoreClass::setName( const std::string &p_objectName )

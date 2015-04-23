@@ -168,7 +168,7 @@ void smSpatialHash::computeCollisionTri2Tri()
 
     smCellTriangle triA;
     smCellTriangle triB;
-    smVec3f proj1, proj2, inter1, inter2;
+    smVec3d proj1, proj2, inter1, inter2;
     smShort point1, point2;
     smInt coPlanar;
 
@@ -181,8 +181,7 @@ void smSpatialHash::computeCollisionTri2Tri()
             while (cells.nextBucketItem(iterator1, triB))
             {
                 if (triA.meshID == triB.meshID ||
-                    !(smSDK::getInstance()->getMesh(triA.meshID)->collisionGroup.isCollisionPermitted(
-                        smSDK::getInstance()->getMesh(triB.meshID)->collisionGroup)))
+                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
                 {
                     continue;
                 }
@@ -218,7 +217,7 @@ void  smSpatialHash::computeCollisionLine2Tri()
     smHashIterator<smCellTriangle > iteratorTri;
     smCellLine line;
     smCellTriangle tri;
-    smVec3f intersection;
+    smVec3d intersection;
 
     while (cellLines.next(iteratorLine) && cellsForTri2Line.next(iteratorTri))
     {
@@ -230,8 +229,7 @@ void  smSpatialHash::computeCollisionLine2Tri()
             while (cellsForTri2Line.nextBucketItem(iteratorTri, tri))
             {
                 if (tri.meshID == line.meshID ||
-                    !(smSDK::getInstance()->getMesh(tri.meshID)->collisionGroup.isCollisionPermitted(
-                        smSDK::getInstance()->getMesh(line.meshID)->collisionGroup)))
+                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
                 {
                     continue;
                 }
@@ -310,7 +308,7 @@ void smSpatialHash::computeHash(std::shared_ptr<smMesh> mesh, const std::vector<
 void smSpatialHash::addTriangle(std::shared_ptr<smMesh> mesh, smInt triangleId, smHash<smCellTriangle> &cells)
 {
     smCellTriangle  triangle;
-    triangle.meshID = mesh->uniqueId;
+    triangle.meshID = mesh->getUniqueId();
     triangle.primID = triangleId;
 
     triangle.vert[0] = mesh->vertices[mesh->triangles[triangleId].vert[0]];
@@ -337,7 +335,7 @@ void smSpatialHash::addLine(std::shared_ptr<smLineMesh> mesh,
                                    smInt edgeId, smHash<smCellLine> &cells)
 {
     smCellLine  line;
-    line.meshID = mesh->uniqueId;
+    line.meshID = mesh->getUniqueId();
     line.primID = edgeId;
     line.vert[0] = mesh->vertices[mesh->edges[edgeId].vert[0]];
     line.vert[1] = mesh->vertices[mesh->edges[edgeId].vert[1]];
@@ -361,7 +359,7 @@ void smSpatialHash::addLine(std::shared_ptr<smLineMesh> mesh,
 void smSpatialHash::addPoint(std::shared_ptr<smMesh> mesh, smInt vertId, smHash<smCellPoint> &cells)
 {
     smCellPoint cellPoint;
-    cellPoint.meshID = mesh->uniqueId;
+    cellPoint.meshID = mesh->getUniqueId();
     cellPoint.primID = vertId;
     cellPoint.vert = mesh->vertices[vertId];
 
@@ -477,6 +475,43 @@ const std::vector< std::shared_ptr< smCollidedTriangles > >& smSpatialHash::getC
 std::vector< std::shared_ptr< smCollidedTriangles > >& smSpatialHash::getCollidedTriangles()
 {
     return collidedTriangles;
+}
+void smSpatialHash::draw(const smDrawParam &/*p_params*/)
+{
+    glDisable(GL_LIGHTING);
+    glColor3fv(smColor::colorWhite.toGLColor());
+
+    glBegin(GL_TRIANGLES);
+
+    for(size_t i = 0; i < collidedTriangles.size(); i++)
+    {
+
+        glVertex3dv(collidedTriangles[i]->tri1.vert[0].data());
+        glVertex3dv(collidedTriangles[i]->tri1.vert[1].data());
+        glVertex3dv(collidedTriangles[i]->tri1.vert[2].data());
+
+        glVertex3dv(collidedTriangles[i]->tri2.vert[0].data());
+        glVertex3dv(collidedTriangles[i]->tri2.vert[1].data());
+        glVertex3dv(collidedTriangles[i]->tri2.vert[2].data());
+    }
+
+    glEnd();
+
+    glLineWidth(10.0);
+
+    glBegin(GL_LINES);
+
+    for(size_t i = 0; i < collidedLineTris.size(); i++)
+    {
+        glVertex3dv(collidedLineTris[i]->line.vert[0].data());
+        glVertex3dv(collidedLineTris[i]->line.vert[1].data());
+    }
+
+    glEnd();
+
+    glLineWidth(1.0);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
 }
 
 

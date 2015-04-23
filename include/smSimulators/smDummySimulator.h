@@ -28,8 +28,6 @@
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
-#include "smCore/smEventData.h"
 
 /// \brief Example simulator. This dummy simulator works on static scene objects for now.
 class smDummySimulator: public smObjectSimulator
@@ -56,7 +54,7 @@ protected:
     void syncBuffers();
 
     /// \brief catch events such as key presses and other user inputs
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
 };
 
 #endif

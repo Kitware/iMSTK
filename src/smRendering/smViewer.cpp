@@ -34,6 +34,13 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
+#include "smEvent/smEventHandler.h"
+#include "smEvent/smKeyboardEvent.h"
+#include "smEvent/smMouseButtonEvent.h"
+#include "smEvent/smMouseMoveEvent.h"
+#include "smEvent/smKeyGLFWInterface.h"
+
+
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -45,6 +52,8 @@
 #ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
+
+std::shared_ptr<smtk::Event::smEventHandler> smViewer::eventHandler;
 
 void SetVSync(bool sync)
 {
@@ -67,101 +76,6 @@ void SetVSync(bool sync)
     }
 
 #endif
-}
-
-static void key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventKeyboard = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventKeyboard->setEventType(smEventType(SIMMEDTK_EVENTTYPE_KEYBOARD));
-    eventKeyboard->setSenderId(viewer->getModuleId());
-    eventKeyboard->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto kbData = std::make_shared<smKeyboardEventData>();
-    eventKeyboard->setEventData(kbData); //Need to handle failure to allocate
-
-    kbData->keyBoardKey = GLFWKeyToSmKey(key);
-    if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
-    {
-        kbData->pressed = true;
-    }
-    else
-    {
-        kbData->pressed = false;
-    }
-
-    kbData->modKeys = smModKey::none;
-    if (mods & GLFW_MOD_SHIFT)
-        kbData->modKeys |= smModKey::shift;
-    if (mods & GLFW_MOD_CONTROL)
-        kbData->modKeys |= smModKey::control;
-    if (mods & GLFW_MOD_ALT)
-        kbData->modKeys |= smModKey::alt;
-    if (mods & GLFW_MOD_SUPER)
-        kbData->modKeys |= smModKey::super;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
-}
-
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int /*mods*/)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventMouseButton = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventMouseButton->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_BUTTON));
-    eventMouseButton->setSenderId(viewer->getModuleId());
-    eventMouseButton->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto mbData = std::make_shared<smMouseButtonEventData>();
-    eventMouseButton->setEventData(mbData); //Need to handle failure to allocate
-
-    //Get the current cursor position
-    glfwGetCursorPos(window, &(mbData->windowX), &(mbData->windowY));
-
-    //
-    if (button == GLFW_MOUSE_BUTTON_LEFT)
-        mbData->mouseButton = smMouseButton::Left;
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
-        mbData->mouseButton = smMouseButton::Right;
-    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
-        mbData->mouseButton = smMouseButton::Middle;
-    else
-        mbData->mouseButton = smMouseButton::Unknown;
-
-    if (action == GLFW_PRESS)
-        mbData->pressed = true;
-    else
-        mbData->pressed = false;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseButton);
-}
-
-static void cursor_position_callback(GLFWwindow* /*window*/, double xpos, double ypos)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventMouseMove = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventMouseMove->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_MOVE));
-    eventMouseMove->setSenderId(viewer->getModuleId());
-    eventMouseMove->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto mpData = std::make_shared<smMouseMoveEventData>();
-    eventMouseMove->setEventData(mpData); //Need to handle failure to allocate
-
-    mpData->windowX = xpos;
-    mpData->windowY = ypos;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseMove);
 }
 
 smRenderOperation::smRenderOperation()
@@ -187,6 +101,8 @@ smViewer::smViewer()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
+    if(eventHandler == nullptr)
+        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -250,6 +166,52 @@ void smViewer::initObjects(smDrawParam p_param)
     }
 }
 
+void smViewer::keyboardEventTrigger(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods)
+{
+    auto keyboardEvent = std::make_shared<smtk::Event::smKeyboardEvent>(smtk::Event::GLFWKeyToSmKey(key));
+    keyboardEvent->setPressed((action == GLFW_PRESS) || (action == GLFW_REPEAT));
+
+    keyboardEvent->setModifierKey(smtk::Event::smModKey::none);
+
+    if (mods & GLFW_MOD_SHIFT)
+        keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::shift);
+    if (mods & GLFW_MOD_CONTROL)
+        keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::control);
+    if (mods & GLFW_MOD_ALT)
+        keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::alt);
+    if (mods & GLFW_MOD_SUPER)
+        keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::super);
+
+    eventHandler->triggerEvent(keyboardEvent);
+}
+
+void smViewer::mouseMoveEventTrigger(GLFWwindow* /*window*/, double xpos, double ypos)
+{
+    auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
+    mouseEvent->setSender(smtk::Event::EventSender::Module);
+    mouseEvent->setWindowCoord(smVec2d(xpos,ypos));
+
+    eventHandler->triggerEvent(mouseEvent);
+}
+
+void smViewer::mouseButtonEventTrigger(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
+{
+    smMouseButton mouseButton;
+    if (button == GLFW_MOUSE_BUTTON_LEFT)
+        mouseButton = smMouseButton::Left;
+    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        mouseButton = smMouseButton::Right;
+    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+        mouseButton = smMouseButton::Middle;
+    else
+        mouseButton = smMouseButton::Unknown;
+
+    auto keyboardEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
+    keyboardEvent->setPresed(action == GLFW_PRESS);
+
+    eventHandler->triggerEvent(keyboardEvent);
+}
+
 void smViewer::initResources(smDrawParam p_param)
 {
     smTextureManager::initGLTextures();
@@ -309,9 +271,9 @@ void smViewer::initGLContext()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
+    glfwSetKeyCallback(window, smViewer::keyboardEventTrigger);
+    glfwSetMouseButtonCallback(window, smViewer::mouseButtonEventTrigger);
+    glfwSetCursorPosCallback(window, smViewer::mouseMoveEventTrigger);
 
     // Init GLEW
     GLenum err = glewInit();
@@ -373,13 +335,13 @@ void smViewer::renderTextureOnView()
     glTranslated(0, 0, -1);
     glBegin(GL_QUADS);
     glTexCoord2d(0, 0);
-    glVertex3f(0, 0, 0);
+    glVertex3d(0, 0, 0);
     glTexCoord2d(1, 0);
-    glVertex3f(1, 0, 0);
+    glVertex3d(1, 0, 0);
     glTexCoord2d(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2d(0, 1);
-    glVertex3f(0, 1.0, 0);
+    glVertex3d(0, 1.0, 0);
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopAttrib();
@@ -615,7 +577,7 @@ void smViewer::addObject(std::shared_ptr<smCoreClass> object)
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent ( std::shared_ptr<smEvent> /*p_event*/ )
+void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/ )
 {
 }
 

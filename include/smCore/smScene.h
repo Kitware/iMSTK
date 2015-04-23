@@ -114,7 +114,7 @@ public:
     void removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
 
     ///the same as
-    void removeSceneObject(smInt p_objectId);
+    void removeSceneObject(std::shared_ptr<smUnifiedId> p_objectId);
 
     ///in order to get the phsyics in the scene call this function.
     ///it is thread safe. but it shouldn't be called frequently.
@@ -124,7 +124,7 @@ public:
     std::vector<std::shared_ptr<smSceneObject>> &getSceneObject();
 
     /// \brief retursn scene id
-    smInt getSceneId();
+    std::shared_ptr<smUnifiedId> getSceneId();
 
     /// \brief returns the total number of objects in the scene
     inline smInt getTotalObjects();
@@ -161,7 +161,7 @@ public:
 
     void setLightPos(smInt p_lightId, smLightPos p_pos);
 
-    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
+    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3d p_direction);
 
     std::shared_ptr<smCamera> getCamera()
     {

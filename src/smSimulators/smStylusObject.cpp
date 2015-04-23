@@ -30,7 +30,7 @@
 
 void smStylusRigidSceneObject::draw(const smDrawParam &/*p_params*/)
 {
-    smMatrix44f viewMatrix;
+    smMatrix44d viewMatrix;
 
 #pragma unroll
 
@@ -50,7 +50,7 @@ void smStylusRigidSceneObject::draw(const smDrawParam &/*p_params*/)
             viewMatrix = iter.node->data->currentViewerMatrix;
         }
 
-        glMultMatrixf(viewMatrix.data());
+        glMultMatrixd(viewMatrix.data());
         glCallList(iter.node->data->mesh->renderingID);
         glPopMatrix();
         iter++;
@@ -68,7 +68,7 @@ void smStylusRigidSceneObject::draw(const smDrawParam &/*p_params*/)
                 viewMatrix = iter.node->data->currentViewerMatrix;
             }
 
-            glMultMatrixf(viewMatrix.data());
+            glMultMatrixd(viewMatrix.data());
             glCallList(iter.node->data->mesh->renderingID);
             glPopMatrix();
             iter++;
@@ -151,13 +151,13 @@ smMeshContainer::smMeshContainer( std::string p_name )
     offsetRotX = 0.0;
     offsetRotY = 0.0;
     offsetRotZ = 0.0;
-    preOffsetPos = smVec3f::Zero();
-    posOffsetPos = smVec3f::Zero();
+    preOffsetPos = smVec3d::Zero();
+    posOffsetPos = smVec3d::Zero();
     mesh = NULL;
     colModel = NULL;
 }
 
-smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3f p_prePos, smVec3f p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
+smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3d p_prePos, smVec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
 {
     offsetRotX = p_offsetRotX;
     offsetRotY = p_offsetRotY;
@@ -170,20 +170,20 @@ smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3
 
 void smMeshContainer::computeCurrentMatrix()
 {
-    Eigen::Affine3f preTranslate( Eigen::Translation3f( preOffsetPos[0], preOffsetPos[1], preOffsetPos[2] ) );
-    Eigen::Affine3f posTranslate( Eigen::Translation3f( posOffsetPos[0], posOffsetPos[1], posOffsetPos[2] ) );
-    Eigen::Affine3f rx( Eigen::Affine3f( Eigen::AngleAxisf( SM_PI_TWO * offsetRotX, smVec3f::UnitX() ) ) );
-    Eigen::Affine3f ry( Eigen::Affine3f( Eigen::AngleAxisf( SM_PI_TWO * offsetRotY, smVec3f::UnitY() ) ) );
-    Eigen::Affine3f rz( Eigen::Affine3f( Eigen::AngleAxisf( SM_PI_TWO * offsetRotZ, smVec3f::UnitZ() ) ) );
+    Eigen::Affine3d preTranslate( Eigen::Translation3d( preOffsetPos[0], preOffsetPos[1], preOffsetPos[2] ) );
+    Eigen::Affine3d posTranslate( Eigen::Translation3d( posOffsetPos[0], posOffsetPos[1], posOffsetPos[2] ) );
+    Eigen::Affine3d rx( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotX, smVec3d::UnitX() ) ) );
+    Eigen::Affine3d ry( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotY, smVec3d::UnitY() ) ) );
+    Eigen::Affine3d rz( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotZ, smVec3d::UnitZ() ) ) );
 
-    smMatrix44f transform = ( preTranslate * rx * ry * rz * posTranslate ).matrix();
+    smMatrix44d transform = ( preTranslate * rx * ry * rz * posTranslate ).matrix();
     tempCurrentMatrix *= transform;
     tempCurrentDeviceMatrix *= transform;
 }
 
 smStylusPoints::smStylusPoints()
 {
-    point = smVec3f::Zero();
+    point = smVec3d::Zero();
     container = NULL;
 }
 
@@ -195,7 +195,7 @@ void smStylusSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 }
 
-void smStylusSceneObject::handleEvent( std::shared_ptr<smEvent>/*p_event*/ ) {}
+void smStylusSceneObject::handleEvent(std::shared_ptr<smtk::Event::smEvent>/*p_event*/ ) {}
 void smStylusRigidSceneObject::posTraverseCallBack()
 {
 }
@@ -246,7 +246,7 @@ tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( 
     return meshes.insert( p_iterator, p_meshContainer );
 }
 
-void smStylusRigidSceneObject::handleEvent( std::shared_ptr<smEvent>/*p_event*/ ) {}
+void smStylusRigidSceneObject::handleEvent(std::shared_ptr<smtk::Event::smEvent>/*p_event*/ ) {}
 
 std::shared_ptr<smSceneObject> smStylusRigidSceneObject::clone()
 {

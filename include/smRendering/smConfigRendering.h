@@ -26,6 +26,7 @@
 
 // STL includes
 #include <cmath>
+#include <memory>
 #include <vector>
 
 // SimMedTK includes
@@ -147,7 +148,7 @@ struct smViewerDetail
     smColor backGroundColor;
 };
 
-struct smUnifiedID;
+struct smUnifiedId;
 
 
 /// \brief smRenderDetail has rendering options and features.
@@ -158,10 +159,10 @@ public:
     smRenderDetail();
 
     /// \brief attachment of shader
-    void addShader(smUnifiedID p_shaderID);
+    void addShader(std::shared_ptr<smUnifiedId> p_shaderID);
 
     /// \brief attachment of VAO
-    void addVAO(smUnifiedID p_shaderID);
+    void addVAO(std::shared_ptr<smUnifiedId> p_shaderID);
 
     const smColor &getColorDiffuse() const;
 
@@ -191,11 +192,11 @@ public:
 
     const smBool &getDebugDraw() const;
 
-    const std::vector<smUnifiedID> &getShaders() const;
+    const std::vector<std::shared_ptr<smUnifiedId>> &getShaders() const;
 
     const std::vector<smBool> &getShaderEnable() const;
 
-    const std::vector<smUnifiedID> &getVAOs() const;
+    const std::vector<std::shared_ptr<smUnifiedId>> &getVAOs() const;
 
     const std::vector<smBool> &getVAOEnable() const;
 
@@ -214,9 +215,9 @@ public:
     smFloat lineSize; // line width size
     smFloat shininess; // specular shinness
     smBool debugDraw; // debug draw enabled or not
-    std::vector<smUnifiedID> shaders; // attached shaders
+    std::vector<std::shared_ptr<smUnifiedId>> shaders; // attached shaders
     std::vector<smBool> shaderEnable; // enable/disable any attached shader
-    std::vector<smUnifiedID> VAOs; // stores  VAO IDs
+    std::vector<std::shared_ptr<smUnifiedId>> VAOs; // stores  VAO IDs
     std::vector<smBool> VAOEnable; // enable/disable any attached VAO
 };
 

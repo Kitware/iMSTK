@@ -1350,7 +1350,7 @@ void smVegaFemSceneObject::draw(const smDrawParam &/*p_params*/)
         glPolygonOffset(-1.0, -1.0);
         glPointSize(8.0);
         glBegin(GL_POINTS);
-        glVertex3f(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
+        glVertex3d(pulledVertexPos[0], pulledVertexPos[1], pulledVertexPos[2]);
         glEnd();
         glDisable(GL_POLYGON_OFFSET_FILL);
     }
@@ -1369,7 +1369,7 @@ void smVegaFemSceneObject::draw(const smDrawParam &/*p_params*/)
             glPolygonOffset(-1.0, -1.0);
             glPointSize(12.0);
             glBegin(GL_POINTS);
-            glVertex3f(fixedVertexPos[0], fixedVertexPos[1], fixedVertexPos[2]);
+            glVertex3d(fixedVertexPos[0], fixedVertexPos[1], fixedVertexPos[2]);
             glEnd();
             glDisable(GL_POLYGON_OFFSET_FILL);
         }
@@ -1454,8 +1454,8 @@ void smVegaFemSceneObject::drawAxes(double axisLength)
 
         float vertex[3] = {0, 0, 0};
         vertex[i] = axisLength;
-        glVertex3fv(vertex);
-        glVertex3f(0, 0, 0);
+        glVertex3dv(vertex);
+        glVertex3d(0, 0, 0);
     }
 
     glEnd();

@@ -88,13 +88,13 @@ void test()
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
     glTexCoord2d(0, 0);
-    glVertex3f(-1, -1, 0);
+    glVertex3d(-1, -1, 0);
     glTexCoord2d(1, 0);
-    glVertex3f(1, -1, 0);
+    glVertex3d(1, -1, 0);
     glTexCoord2d(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2d(0, 1);
-    glVertex3f(-1, 1.0, 0);
+    glVertex3d(-1, 1.0, 0);
     glEnd();
     glPopAttrib();
 }
@@ -114,13 +114,13 @@ void smFrameBuffer::draw(const smDrawParam &/*p_params*/)
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
     glTexCoord2d(0, 0);
-    glVertex3f(-1, -1, 0);
+    glVertex3d(-1, -1, 0);
     glTexCoord2d(1, 0);
-    glVertex3f(1, -1, 0);
+    glVertex3d(1, -1, 0);
     glTexCoord2d(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2d(0, 1);
-    glVertex3f(-1, 1.0, 0);
+    glVertex3d(-1, 1.0, 0);
     glEnd();
     glPopAttrib();
 }

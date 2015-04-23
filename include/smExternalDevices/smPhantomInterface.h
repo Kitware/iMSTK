@@ -33,7 +33,7 @@
 const int SM_MAX_PHANTOM_DEVICES = 4;
 
 /// \brief class to use phantom omni device
-class smPhantomInterface: public smHapticInterface, public smEventHandler
+class smPhantomInterface: public smHapticInterface
 {
 
 protected:
@@ -99,7 +99,7 @@ public:
     friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///< !!
 
     /// \brief handle events related to phantom omni
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
 
     /// \brief initialize (nothing happens)
     void init();

@@ -49,7 +49,7 @@ smPQPSkeleton::smPQPSkeleton( smSurfaceMesh *p_mesh )
 smPQPCollision::smPQPCollision( smErrorLog *p_errorLog, int maxColResult ) : smObjectSimulator( p_errorLog )
 {
     minCollisionDistance = 1.5; //default distance
-    onlySpecificMeshId.ID = -1;
+    onlySpecificMeshId->getId() = -1;
     pipePQP = new smPipe( "col_PQP", sizeof( smPQPResult ), maxColResult );
 }
 void smPQPCollision::draw(const smDrawParam &p_params )
@@ -63,7 +63,7 @@ void smPQPCollision::draw(const smDrawParam &p_params )
     {
         mat.getMatrixForOpenGL( matrixArray );
         glMultMatrixd( matrixArray );
-        smGLRenderer::drawSurfaceMeshTriangles( mPQPSourceSkeletons[i]->mMesh, &p_params.caller->renderDetail, p_params );
+        smGLRenderer::drawSurfaceMeshTriangles( mPQPSourceSkeletons[i]->mMesh, &p_params.callergetRenderDetail()-> p_params );
     }
 
     glPopMatrix();
@@ -114,7 +114,7 @@ void smPQPCollision::checkCollision()
         {
             dest = mPQPDestinationSkeletons[j];
 
-            if ( onlySpecificMeshId.ID > 0 && !( onlySpecificMeshId == dest->mMesh->uniqueId ) )
+            if ( onlySpecificMeshId->getId() > 0 && !( onlySpecificMeshId == dest->mMesh->getUniqueId() ) )
             {
                 continue;
             }
@@ -125,15 +125,15 @@ void smPQPCollision::checkCollision()
             {
 
                 src->colRes = colRes;
-                src->colMeshId = mPQPDestinationSkeletons[j]->mMesh->uniqueId;
+                src->colMeshId = mPQPDestinationSkeletons[j]->mMesh->getUniqueId();
                 src->colSkel = mPQPDestinationSkeletons[j];
             }
 
             if ( colRes.Distance() < minCollisionDistance )
             {
                 minCollisionHappened = true;
-                smVec3f p1;
-                smVec3f p2;
+                smVec3d p1;
+                smVec3d p2;
                 p1.setValue( colRes.p1[0], colRes.p1[1], colRes.p1[2] );
                 p2.setValue( colRes.p2[0], colRes.p2[1], colRes.p2[2] );
 

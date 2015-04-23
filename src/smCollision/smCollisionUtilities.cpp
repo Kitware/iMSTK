@@ -23,11 +23,11 @@
 
 #include "smCollision/smCollisionUtilities.h"
 
-int intersect3D_RayTriangleWithBarycentric( smVec3f P0, smVec3f P1, smVec3f V0, smVec3f V1, smVec3f V2, smVec3f *I, float &p_baryU, float &p_baryV, float &p_baryW, bool considerFrontFaceOnly )
+int intersect3D_RayTriangleWithBarycentric( smVec3d P0, smVec3d P1, smVec3d V0, smVec3d V1, smVec3d V2, smVec3d *I, float &p_baryU, float &p_baryV, float &p_baryW, bool considerFrontFaceOnly )
 {
 
-    smVec3f u, v, n;             // triangle vectors
-    smVec3f dir, w0, w;          // ray vectors
+    smVec3d u, v, n;             // triangle vectors
+    smVec3d dir, w0, w;          // ray vectors
     float r, a, b;               // params to calc ray-plane intersect
 
     // get triangle edge vectors and plane normal

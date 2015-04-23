@@ -39,10 +39,10 @@ void smSpatialGridWorker::checkNarrow( smLattice *p_latticeA, smLattice *p_latti
 {
 
     smInt coPlanar;
-    smVec3f interSectPoint1;
-    smVec3f interSectPoint2;
-    smVec3f projectedPoint1;
-    smVec3f projectedPoint2;
+    smVec3d interSectPoint1;
+    smVec3d interSectPoint2;
+    smVec3d projectedPoint1;
+    smVec3d projectedPoint2;
     smShort singlePoint1;
     smShort singlePoint2;
 
@@ -67,8 +67,8 @@ void smSpatialGridWorker::checkNarrow( smLattice *p_latticeA, smLattice *p_latti
         pairs[collidedPairs].proj1 = projectedPoint1;
         pairs[collidedPairs].proj2 = projectedPoint2;
 
-        pairs[collidedPairs].tri1.meshID = p_latticeA->mesh->uniqueId;
-        pairs[collidedPairs].tri2.meshID = p_latticeB->mesh->uniqueId;
+        pairs[collidedPairs].tri1.meshID = p_latticeA->mesh->getUniqueId();
+        pairs[collidedPairs].tri2.meshID = p_latticeB->mesh->getUniqueId();
 
         pairs[collidedPairs].tri1.primID = p_primAIndex;
         pairs[collidedPairs].tri2.primID = p_primBIndex;
@@ -174,11 +174,11 @@ void smSpatialGridWorker::beginTriangles()
 {
     glBegin( GL_TRIANGLES );
 }
-void smSpatialGridWorker::drawTriangle( smVec3f &p_1, smVec3f &p_2, smVec3f &p_3 )
+void smSpatialGridWorker::drawTriangle( smVec3d &p_1, smVec3d &p_2, smVec3d &p_3 )
 {
-    glVertex3fv( ( GLfloat * )&p_1 );
-    glVertex3fv( ( GLfloat * )&p_2 );
-    glVertex3fv( ( GLfloat * )&p_3 );
+    glVertex3dv( ( GLfloat * )&p_1 );
+    glVertex3dv( ( GLfloat * )&p_2 );
+    glVertex3dv( ( GLfloat * )&p_3 );
 }
 void smSpatialGridWorker::endTriangles()
 {

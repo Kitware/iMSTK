@@ -40,8 +40,8 @@
 
 #include <mutex>
 
-#define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3f(-10,-10,-10)
-#define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3f(10,10,10)
+#define SIMMEDTK_SPATIALGRID_LEFTCORNER smVec3d(-10,-10,-10)
+#define SIMMEDTK_SPATIALGRID_RIGHTCORNER  smVec3d(10,10,10)
 #define SIMMEDTK_SPATIALGRID_XSEPERATION 10
 #define SIMMEDTK_SPATIALGRID_YSEPERATION 10
 #define SIMMEDTK_SPATIALGRID_ZSEPERATION 10
@@ -91,7 +91,7 @@ public:
     static void beginTriangles();
 
     /// \brief draws the triangle
-    static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3);
+    static void drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3);
 
     /// \brief !!
     static void endTriangles();
@@ -107,8 +107,8 @@ private:
     smInt totalThreads; ///< number of total threads
     smSynchronization synch; ///< !!
 
-    smVec3f leftCorner; ///< left corner of the grid
-    smVec3f rightCorner; ///< right corner of the grid
+    smVec3d leftCorner; ///< left corner of the grid
+    smVec3d rightCorner; ///< right corner of the grid
     smInt xSeperation; ///< grid spacing in x-direction
     smInt ySeperation; ///< grid spacing in y-direction
     smInt zSeperation; ///< grid spacing in z-direction

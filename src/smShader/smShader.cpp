@@ -628,15 +628,15 @@ void smShader::enableCheckingErrors(smBool p_checkError)
     this->checkErrorEnabled = p_checkError;
 }
 
-void smShader::attachTexture(smUnifiedID p_meshID, smInt p_textureID)
+void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, smInt p_textureID)
 {
 
     smTextureShaderAssignment assign;
     assign.textureId = p_textureID;
-    texAssignments.insert( {p_meshID.ID, assign} );
+    texAssignments.insert( {p_meshID->getId(), assign} );
 }
 
-smBool smShader::attachTexture(smUnifiedID p_meshID,
+smBool smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID,
                                const smString& p_textureName,
                                const smString& p_textureShaderName)
 {
@@ -645,12 +645,12 @@ smBool smShader::attachTexture(smUnifiedID p_meshID,
 
     if (smTextureManager::findTextureId(p_textureName, assign.textureId) == SIMMEDTK_TEXTURE_NOTFOUND)
     {
-        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID.ID <<  "\n";
+        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID->getId() <<  "\n";
         return false;
     }
 
     assign.shaderParamName = p_textureShaderName;
-    texAssignments.insert( {p_meshID.ID, assign} );
+    texAssignments.insert( {p_meshID->getId(), assign} );
 
     return true;
 }
@@ -796,10 +796,10 @@ void smShader::initGLShaders(smDrawParam p_param)
         x.second->initDraw(p_param);
 }
 
-void smShader::activeGLTextures(smUnifiedID p_id)
+void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)
 {
     smInt counter = 0;
-    auto range = texAssignments.equal_range(p_id.ID);
+    auto range = texAssignments.equal_range(p_id->getId());
 
     for (auto i = range.first; i != range.second; i++)
     {
@@ -809,13 +809,13 @@ void smShader::activeGLTextures(smUnifiedID p_id)
     }
 }
 
-void smShader::activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt /*p_size*/)
+void smShader::activeGLVertAttribs(smInt p_id, smVec3d *p_vecs, smInt /*p_size*/)
 {
     glVertexAttribPointer(attribShaderParams[p_id], 3, smGLFloatType, GL_FALSE, 0, p_vecs);
 }
 void smShader::registerShader()
 {
-    shaders[this->uniqueId.ID] = safeDownCast<smShader>();
+    shaders[this->getUniqueId()->getId()] = safeDownCast<smShader>();
 }
 
 void smShader::print() const
@@ -867,9 +867,9 @@ GLint smShader::queryUniformLocation(const smString& p_param)
 {
     return glGetUniformLocation(shaderProgramObject, p_param.data());
 }
-std::shared_ptr<smShader> smShader::getShader( smUnifiedID p_shaderID )
+std::shared_ptr<smShader> smShader::getShader( std::shared_ptr<smUnifiedId> p_shaderID )
 {
-    return shaders[p_shaderID.ID];
+    return shaders[p_shaderID->getId()];
 }
 smShader::~smShader()
 {

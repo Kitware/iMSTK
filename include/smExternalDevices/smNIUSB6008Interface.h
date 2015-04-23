@@ -20,7 +20,7 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
- 
+
 #include "smCore/smConfig.h"
 
 #ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX
@@ -32,7 +32,6 @@
 #include "smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
 
 #include <NIDAQmx.h>
@@ -98,7 +97,7 @@ public:
     void run();
 
     /// \brief handle event related to NIUSB6008 device
-    void handleEvent(smEvent *p_event)
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
     {
     };
 

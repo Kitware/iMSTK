@@ -30,6 +30,12 @@
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smCoreClass.h"
 
+namespace smtk{
+namespace Event{
+    class smEvent;
+}
+}
+
 /// \brief static scene object
 class smStaticSceneObject: public smSceneObject
 {
@@ -54,7 +60,7 @@ public:
     /// \brief called if the object is added to the viewer.
     virtual void draw(const smDrawParam &p_params);
 
-    virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/){}
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/){}
 
     void setMesh(std::shared_ptr<smMesh> surfaceMesh)
     {

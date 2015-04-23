@@ -43,12 +43,11 @@ class CollisionDetectionSpatialHashing: public smSimulationMain
 
 public:
     CollisionDetectionSpatialHashing();
-    ~CollisionDetectionSpatialHashing(){}
+    virtual ~CollisionDetectionSpatialHashing(){}
 
     void draw (const smDrawParam &p_params);
-    void simulateMain (const smSimulationMainParam &p_param);
+    void simulateMain (const smSimulationMainParam &p_param) override;
     void run();
-    void handleEvent(std::shared_ptr<smEvent> p_event);
 
 public:
     std::shared_ptr<smSDK>                  sdk;
