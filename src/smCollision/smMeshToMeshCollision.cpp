@@ -1,31 +1,28 @@
-/*
- * // This file is part of the SimMedTK project.
- * // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
- * //                        Rensselaer Polytechnic Institute
- * //
- * // Licensed under the Apache License, Version 2.0 (the "License");
- * // you may not use this file except in compliance with the License.
- * // You may obtain a copy of the License at
- * //
- * //     http://www.apache.org/licenses/LICENSE-2.0
- * //
- * // Unless required by applicable law or agreed to in writing, software
- * // distributed under the License is distributed on an "AS IS" BASIS,
- * // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * // See the License for the specific language governing permissions and
- * // limitations under the License.
- * //
- * //---------------------------------------------------------------------------
- * //
- * // Authors:
- * //
- * // Contact:
- * //---------------------------------------------------------------------------
- */
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 
 // SimMedTK includes
 #include "smCollision/smMeshToMeshCollision.h"
-
 #include "smCollision/smCollisionMoller.h"
 #include "smCollision/smCollisionPair.h"
 #include "smCollision/smMeshCollisionModel.h"
@@ -38,20 +35,22 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
     auto meshA = std::static_pointer_cast<smMeshCollisionModel>(pairs->getFirst());
     auto meshB = std::static_pointer_cast<smMeshCollisionModel>(pairs->getSecond());
 
-    std::vector<smMeshCollisionModel::TreeNodePairType> intersectionNodes = meshA->getAABBTree()->getIntersectingNodes(meshB->getAABBTree());
+    std::vector<smMeshCollisionModel::NodePairType>
+    intersectionNodes = meshA->getAABBTree()->getIntersectingNodes(meshB->getAABBTree());
 
-    double depth = 0.0;
+    float depth;
     smVec3f normal;
-    smVec3f penetrationPointA, penetrationPointB;
+    smVec3f contactPoint;
     for(auto & intersection : intersectionNodes)
     {
-        smMeshCollisionModel::AABBNode nodeA = intersection.first;
-        smMeshCollisionModel::AABBNode nodeB = intersection.second;
+        smMeshCollisionModel::AABBNodeType nodeA = intersection.first;
+        smMeshCollisionModel::AABBNodeType nodeB = intersection.second;
 
         std::vector<size_t> triangleListA;
         std::vector<size_t> triangleListB;
 
         nodeA.getIntersections(nodeB.getAabb(), triangleListA);
+        nodeB.getIntersections(nodeA.getAabb(), triangleListB);
 
         for(const auto & i : triangleListA)
         {
@@ -73,16 +72,12 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
                 auto verticesB = meshB->getTrianglePositions(j);
 
                 // Chech for intersection
-                smVec3f contactPoint;
-                smVec3f normal;
-                float depth;
-                if(smCollisionMoller::tri2tri(
-                            verticesA[0], verticesA[1], verticesA[2],
-                            verticesB[0], verticesB[1], verticesB[2],
-                            depth, contactPoint, normal)
+                if(smCollisionMoller::tri2tri(verticesA[0], verticesA[1], verticesA[2],
+                                              verticesB[0], verticesB[1], verticesB[2],
+                                              depth, contactPoint, normal)
                   )
                 {
-                    pairs->addContact(depth, contactPoint, normal);
+                    pairs->addContact(std::abs(depth), contactPoint, normal);
                 }
             }
         }

@@ -64,12 +64,12 @@ smSurfaceTree<CellType>::~smSurfaceTree()
 
 /// \brief
 template<typename CellType>
-smSurfaceTree<CellType>::smSurfaceTree(smSurfaceMesh *_mesh, int maxLevels)
+smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels)
 {
-    mesh = _mesh;
+    mesh = surfaceMesh;
     totalCells = 0;
 
-	//set the total levels
+    //set the total levels
     currentLevel = maxLevel = maxLevels;
 
     //compute the total cells
@@ -83,7 +83,6 @@ smSurfaceTree<CellType>::smSurfaceTree(smSurfaceMesh *_mesh, int maxLevels)
     levelStartIndex.resize(maxLevel);
 
     //compute the levels start and end
-    int previousIndex = totalCells;
     levelStartIndex[0][0] = 0;
 
     for (int i = 1; i < maxLevel; ++i)
@@ -223,7 +222,7 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smEvent> p_event)
 
 /// \brief create the surface tree
 template<typename CellType>
-bool smSurfaceTree<CellType>::createTree(smSurfaceTreeCell<CellType> &Node,
+bool smSurfaceTree<CellType>::createTree(CellType &Node,
                                          const std::vector<int> &triangles,
                                          int siblingIndex)
 {
@@ -309,6 +308,15 @@ bool smSurfaceTree<CellType>::createTree(smSurfaceTreeCell<CellType> &Node,
 
         if (triangleMatrix[j].size() > 0)
         {
+            std::shared_ptr<CellType> parentNode = std::make_shared<CellType>();
+            parentNode->copyShape(Node);
+            parentNode->setLevel(level);
+            std::shared_ptr<CellType> childNode = std::make_shared<CellType>();
+            childNode->copyShape(subDividedNodes[j]);
+            childNode->setLevel(level + 1);
+            childNode->setParentNode(parentNode);
+            Node.setChildNode(j,childNode);
+
             treeAllLevels[childIndex].copyShape(subDividedNodes[j]);
             treeAllLevels[childIndex].setLevel(level + 1);
             treeAllLevels[childIndex].setIsEmpty(false);

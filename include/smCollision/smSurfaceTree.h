@@ -43,7 +43,7 @@ protected:
   typedef smMatrix44f MatrixType;
 
 protected:
-    smSurfaceMesh *mesh; 							///< surface mesh
+    std::shared_ptr<smSurfaceMesh> mesh; 							///< surface mesh
     int minTreeRenderLevel; 						///< !!
     bool renderSurface; 							///< !!
     bool enableShiftPos; 							///< !!
@@ -54,9 +54,8 @@ protected:
     int currentLevel; ///<
 
 public:
-
     /// \brief constructor
-    smSurfaceTree(smSurfaceMesh *mesh, int maxLevels = 6);
+    smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels = 6);
 
     /// \brief destructor
     ~smSurfaceTree();
@@ -75,7 +74,7 @@ public:
 protected:
 
     /// \brief creates the tree based on input triangles
-    bool createTree(smSurfaceTreeCell<CellType> &Node,
+    bool createTree(CellType &Node,
                     const std::vector<int> &triangles,
                     int siblingIndex);
 
@@ -114,14 +113,13 @@ public:
     std::vector<std::pair<CellType,CellType>> getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
     {
         std::vector<std::pair<CellType,CellType>> intersectingNodes;
-        getIntersectingNodes(root, otherTree->getRoot(),otherTree,intersectingNodes);
+        getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);
 
         return intersectingNodes;
     }
 
     void getIntersectingNodes(const CellType &left,
                               const CellType &right,
-                              std::shared_ptr<smSurfaceTree<CellType>> otherTree,
                               std::vector<std::pair<CellType,CellType>> &result )
     {
         if(!smCollisionMoller::checkOverlapAABBAABB(left.getAabb(),right.getAabb()))
@@ -135,29 +133,29 @@ public:
         }
         else if(left.getIsLeaf())
         {
-            auto rightIterator = otherTree->getLevelIterator(right.getLevel());
-            for(auto i = rightIterator.start(); i != rightIterator.end(); ++i)
+            for(const auto &child : right.getChildNodes())
             {
-                getIntersectingNodes(left,rightIterator[i],otherTree,result);
+                if(!child) continue;
+                getIntersectingNodes(left,*child.get(),result);
             }
         }
         else if(right.getIsLeaf())
         {
-            auto leftIterator = getLevelIterator(left.getLevel());
-            for(auto i = leftIterator.start(); i != leftIterator.end(); ++i)
+            for(const auto &child : left.getChildNodes())
             {
-                getIntersectingNodes(leftIterator[i],right,otherTree,result);
+                if(!child) continue;
+                getIntersectingNodes(*child.get(),right,result);
             }
         }
         else
         {
-            auto rightIterator = otherTree->getLevelIterator(right.getLevel());
-            for(auto i = rightIterator.start(); i != rightIterator.end(); ++i)
+            for(const auto &rightChild : right.getChildNodes())
             {
-                auto leftIterator = getLevelIterator(left.getLevel());
-                for(auto j = leftIterator.start(); j != leftIterator.end(); ++j)
+                if(!rightChild) continue;
+                for(const auto &leftChild : left.getChildNodes())
                 {
-                    getIntersectingNodes(leftIterator[i],rightIterator[i],otherTree,result);
+                    if(!leftChild) continue;
+                    getIntersectingNodes(*leftChild.get(),*rightChild.get(),result);
                 }
             }
         }

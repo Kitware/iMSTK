@@ -40,8 +40,7 @@ void smCollisionPair::addContact(const double& penetrationDepth, const smVec3f& 
     this->contacts.emplace_back(contact);
 }
 const std::pair< std::shared_ptr< smModelRepresentation >, std::shared_ptr< smModelRepresentation > >&
-smCollisionPair::getModels(const std::shared_ptr< smModelRepresentation >& first,
-                           const std::shared_ptr< smModelRepresentation >& second) const
+smCollisionPair::getModels() const
 {
     return modelRepresentations;
 }
@@ -56,4 +55,16 @@ std::shared_ptr< smModelRepresentation > smCollisionPair::getFirst()
 std::shared_ptr< smModelRepresentation > smCollisionPair::getSecond()
 {
     return this->modelRepresentations.second;
+}
+bool smCollisionPair::hasContacts()
+{
+    return !this->contacts.empty();
+}
+std::vector< std::shared_ptr< smContact > >& smCollisionPair::getContacts()
+{
+    return contacts;
+}
+const std::vector< std::shared_ptr< smContact > >& smCollisionPair::getContacts() const
+{
+    return contacts;
 }

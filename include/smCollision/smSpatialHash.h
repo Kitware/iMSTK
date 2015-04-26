@@ -130,7 +130,7 @@ protected:
     void updateBVH();
 
 private:
-    void doComputeCollision(std::shared_ptr<smCollisionPair> pairs)
+    void doComputeCollision(std::shared_ptr<smCollisionPair> /*pairs*/)
     {
         reset();
         updateBVH();

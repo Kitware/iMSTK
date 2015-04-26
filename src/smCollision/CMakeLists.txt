@@ -15,7 +15,6 @@ simmedtk_add_library(smCollision
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionDetection.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionModel.h
-    ${CMAKE_SOURCE_DIR}/include/smCollision/smPQP.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smSpatialGrid.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smSpatialHash.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smOctreeCell.h
