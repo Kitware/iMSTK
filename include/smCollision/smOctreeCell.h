@@ -30,6 +30,7 @@
 
 #include <Eigen/Geometry>
 #include <array>
+#include <memory>
 
 /// \brief cell of an octree
 class smOctreeCell : public smSurfaceTreeCell<smOctreeCell>
@@ -113,9 +114,36 @@ public:
         return data.emplace_back(aabb,index);
     }
 
+    std::shared_ptr<smOctreeCell> getChildNode(size_t i)
+    {
+        return childNodes[i];
+    }
+
+    const std::array<std::shared_ptr<smOctreeCell>,numberOfSubdivisions>
+    &getChildNodes() const
+    {
+        return childNodes;
+    }
+
+    void setChildNode(size_t i, std::shared_ptr<smOctreeCell> node)
+    {
+        childNodes[i] = node;
+    }
+
+    std::shared_ptr<smOctreeCell> getParentNode()
+    {
+        return parentNode;
+    }
+
+    void setParentNode(std::shared_ptr<smOctreeCell> parent)
+    {
+        parentNode = parent;
+    }
 private:
     smCube cube; ///< cube
 
+    std::array<std::shared_ptr<smOctreeCell>,numberOfSubdivisions> childNodes;
+    std::shared_ptr<smOctreeCell> parentNode;
     std::vector<std::pair<smAABB,size_t>> data;
 
 };

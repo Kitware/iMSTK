@@ -25,6 +25,7 @@
 #define SM_SURFACETREECELL_H
 
 // STD includes
+#include<memory>
 #include<vector>
 #include<set>
 
@@ -136,7 +137,7 @@ public:
 
     inline const bool &getIsLeaf() const
     {
-        return isEmpty;
+        return isLeaf;
     }
 
     inline void setIsLeaf(const bool &leaf)
@@ -187,6 +188,26 @@ public:
     inline void addWeight(const int &w)
     {
         weights.emplace_back(w);
+    }
+
+    inline std::shared_ptr<Derived> getChildNode(size_t i)
+    {
+        return derived()->getChildNode(i);
+    }
+
+    inline void setChildNode(size_t i, std::shared_ptr<Derived> node)
+    {
+        derived()->setChildNode(node);
+    }
+
+    inline std::shared_ptr<Derived> getParentNode()
+    {
+        derived()->getParentNode();
+    }
+
+    inline void setParentNode(std::shared_ptr<Derived> parent)
+    {
+        derived()->setParentNode(parent);
     }
 
 private:
