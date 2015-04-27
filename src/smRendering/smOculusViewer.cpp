@@ -296,9 +296,9 @@ int smOculusViewer::initOculus(void)
         // XXX: this doesn't work properly yet due to bugs in the oculus
         // 0.4.1 sdk/driver
 #ifdef WIN32
-        ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, 0, 0);
+        ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, nullptr, nullptr);
 #else
-        ovrHmd_AttachToWindow(hmd, sfmlWindow->getSystemHandle(), 0, 0);
+        ovrHmd_AttachToWindow(hmd, (void*)glXGetCurrentDrawable(), nullptr, nullptr);
 #endif
         std::cout << "running in \"direct-hmd\" mode\n";
     }
