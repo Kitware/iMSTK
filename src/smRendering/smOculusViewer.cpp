@@ -21,15 +21,17 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smOculusViewer.h"
-#include "smRendering/smGLRenderer.h"
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#ifdef WIN32
+#include "smRendering/smOculusViewer.h"
+#include "smRendering/smGLRenderer.h"
+
+#ifdef _WIN32 || WIN32
     #define OVR_OS_WIN32
 #elif defined(__APPLE__)
     #define OVR_OS_MAC
@@ -37,25 +39,9 @@
     #define OVR_OS_LINUX
     #include <X11/Xlib.h>
     #include <GL/glx.h>
-#endif 
-
-#include <OVR.h>
-#include <OVR_CAPI_GL.h>
-
-#if defined(WIN32)
-    #define GLFW_EXPOSE_NATIVE_WIN32
-    #define GLFW_EXPOSE_NATIVE_WGL
-#elif defined(__APPLE__)
-    #define GLFW_EXPOSE_NATIVE_COCOA
-    #define GLFW_EXPOSE_NATIVE_NSGL
-#else
-    #define GLFW_EXPOSE_NATIVE_X11
-    #define GLFW_EXPOSE_NATIVE_GLX
 #endif
 
-#include <GLFW/glfw3native.h>
-
-#include <iostream>
+#include <OVR_CAPI_GL.h>
 
 /// \brief Calculate the next power of two
 ///
@@ -294,7 +280,7 @@ int smOculusViewer::initOculus(void)
     glCfg.OGL.Header.Multisample = 1;
 
 #if defined(OVR_OS_WIN32)
-    glCfg.OGL.Window = glfwGetWin32Window(window);
+    glCfg.OGL.Window = sfmlWindow->getSystemHandle();
     glCfg.OGL.DC = wglGetCurrentDC();
 #elif defined(OVR_OS_LINUX)
     glCfg.OGL.Disp = glXGetCurrentDisplay();
@@ -312,7 +298,7 @@ int smOculusViewer::initOculus(void)
 #ifdef WIN32
         ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, 0, 0);
 #else
-        ovrHmd_AttachToWindow(hmd, (void*)glfwGetX11Window(window), 0, 0);
+        ovrHmd_AttachToWindow(hmd, sfmlWindow->getSystemHandle(), 0, 0);
 #endif
         std::cout << "running in \"direct-hmd\" mode\n";
     }
@@ -326,7 +312,7 @@ int smOculusViewer::initOculus(void)
     // vignetting, and timewrap, which shifts the image before drawing to
     // counter any lattency between the call to ovrHmd_GetEyePose and
     // ovrHmd_EndFrame.
-    distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette |
+    distortionCaps = ovrDistortionCap_Vignette |
                      ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
     if (!ovrHmd_ConfigureRendering(hmd, &glCfg.Config, distortionCaps,
                                    hmd->DefaultEyeFov, eyeRdesc)) {

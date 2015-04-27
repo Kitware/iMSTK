@@ -75,10 +75,10 @@ RenderCubeOculus::RenderCubeOculus()
     viewer.addObject(this);
 
     //Set some viewer properties
-    viewer.setScreenResolution(800, 640);
+    viewer.setScreenResolution(1920, 1080);
 
     //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Setup lights
     this->setupLights();
@@ -102,7 +102,7 @@ void RenderCubeOculus::setupLights()
     smLight* light = new smLight("SceneLight1",
                                  SIMMEDTK_LIGHT_SPOTLIGHT,
                                  SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.pos.setValue(10.0, 10.0, 10.0);
+    light->lightPos.pos << 10.0, 10.0, 10.0;
     light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
     light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);

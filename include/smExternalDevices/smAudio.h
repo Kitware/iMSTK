@@ -71,7 +71,7 @@ private:
 public:
     smAudio() :
         log{nullptr},
-        referenceName{""},
+        referenceName(""),
         state{SIMMEDTK_AUDIOSTATE_UNKNOWN},
         prevState{SIMMEDTK_AUDIOSTATE_UNKNOWN},
         volume{1.0},

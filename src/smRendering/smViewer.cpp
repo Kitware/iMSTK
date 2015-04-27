@@ -49,7 +49,7 @@ typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 
 void smViewer::setVSync(bool sync)
 {
-    this->sfmlWindow.setVerticalSyncEnabled(sync);
+    this->sfmlWindow->setVerticalSyncEnabled(sync);
 }
 
 smRenderOperation::smRenderOperation()
@@ -333,16 +333,16 @@ void smViewer::initGLContext()
 
     // Init OpenGL context
     sfmlContext = std::unique_ptr<sf::Context>(new sf::Context);
-
+    sfmlWindow = std::unique_ptr<sf::Window>(new sf::Window);
     // Init the rest of window system
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
     {
-        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+        this->sfmlWindow->create(sf::VideoMode(this->width(), this->height()),
                             windowTitle, sf::Style::Fullscreen);
     }
     else
     {
-        this->sfmlWindow.create(sf::VideoMode(this->width(), this->height()),
+        this->sfmlWindow->create(sf::VideoMode(this->width(), this->height()),
                             windowTitle, (sf::Style::Titlebar | sf::Style::Close));
     }
 
@@ -1137,13 +1137,13 @@ void smViewer::beginFrame()
         terminationCompleted = true;
     }
 
-    this->sfmlWindow.setActive(true); //activates opengl context
+    this->sfmlWindow->setActive(true); //activates opengl context
 }
 
 ///called by the module after each frame ends
 void smViewer::endFrame()
 {
-    this->sfmlWindow.display(); //swaps buffers
+    this->sfmlWindow->display(); //swaps buffers
 }
 
 void smViewer::processSFMLEvents(const sf::Event& p_event)
@@ -1307,7 +1307,7 @@ void smViewer::exec()
     {
         sf::Event event;
         this->draw();
-        while (this->sfmlWindow.pollEvent(event))
+        while (this->sfmlWindow->pollEvent(event))
         {
             this->processSFMLEvents(event);
         }

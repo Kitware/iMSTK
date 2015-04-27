@@ -142,7 +142,7 @@ public:
     smRenderingStageType renderStage;
 
     std::unique_ptr<sf::Context> sfmlContext;
-    sf::Window sfmlWindow;
+    std::unique_ptr<sf::Window> sfmlWindow;
     smCamera camera;
 
     smInt height(void);
