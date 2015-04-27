@@ -136,6 +136,23 @@ public:
     smFloat shadowFarView;
     smFloat shadowRatio;
     smFloat shadorAngle;
+
+    static std::shared_ptr<smLight> getDefaultLightning(const std::string &name = "SceneLight")
+    {
+        std::shared_ptr<smLight>
+        light = std::make_shared<smLight>(name,SIMMEDTK_LIGHT_SPOTLIGHT,SIMMEDTK_LIGHTPOS_WORLD);
+        light->lightPos.setPosition(smVec3f(10.0, 10.0, 10.0));
+        light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+        light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+        light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+        light->spotCutOffAngle = 60;
+        light->direction = smVec3f(0.0, 0.0, -1.0);
+        light->drawEnabled = false;
+        light->attn_constant = 1.0;
+        light->attn_linear = 0.0;
+        light->attn_quadratic = 0.0;
+        return light;
+    }
 };
 
 #endif

@@ -21,13 +21,16 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "CollisionDetectionSpatialHashing.h"
+#include "CollisionDetectionBVH.h"
+
+#include <memory>
 
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 #include "smCore/smEventData.h"
+#include "smCollision/smCollisionPair.h"
 
-CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
+CollisionDetectionBVH::CollisionDetectionBVH()
 {
     moveObj = 9;
 
@@ -42,9 +45,6 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     // Add our viewer to the SDK
     sdk->addViewer(viewer);
-
-    // Intializes the spatial spatialHashinging
-    spatialHashing = std::make_shared<smSpatialHash>(10000, 2, 2, 2);
 
     // Create dummy simulator
     defaultSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
@@ -63,111 +63,93 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     smTextureManager::loadTexture("textures/brick.jpg", "wallImage");
     smTextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
+    // Create collision models
+    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelA->getMesh()->assignTexture("livertexture1");
+    collisionModelA->getMesh()->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    collisionModelA->getMesh()->translate(7, 3, 0);
+    collisionModelA->getMesh()->renderDetail.lineSize = 2;
+    collisionModelA->getMesh()->renderDetail.pointSize = 5;
+
+    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->getMesh()->translate(smVec3f(2, 0, 0));
+    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->getMesh()->renderDetail.shadowColor.rgba[0] = 1.0;
+    collisionModelB->getMesh()->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+
+    // Add models to a collision pair so they can be queried for collision
+    std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
+    collisionPair->setModels(collisionModelA,collisionModelB);
+
+    // Collision detection to be used
+    collisionDetection = std::make_shared<smMeshToMeshCollision>();
+
     // Create a static scene
     modelA = std::make_shared<smStaticSceneObject>();
+    modelA->setMesh(collisionModelA->getMesh());
     sdk->registerSceneObject(modelA);
     sdk->registerMesh(modelA->mesh);
 
-    // Load mesh
-    modelA->mesh->loadMeshLegacy("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-
-    // Assign a texture
-    modelA->mesh->assignTexture("livertexture1");
-
-    // Set the rendering features
-    modelA->mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    modelA->mesh->translate(7, 3, 0);
-    modelA->mesh->renderDetail.lineSize = 2;
-    modelA->mesh->renderDetail.pointSize = 5;
-
     // Attach object to the dummy simulator. it will be simulated by dummy simulator
     modelA->attachObjectSimulator(defaultSimulator);
-    spatialHashing->addMesh(modelA->mesh);
 
     // Initialize the scecond object
     modelB = std::make_shared<smStaticSceneObject>();
+    modelB->setMesh(collisionModelB->getMesh());
     sdk->registerSceneObject(modelB);
     sdk->registerMesh(modelB->mesh);
-
-    modelB->mesh->loadMeshLegacy("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    modelB->mesh->translate(smVec3f(2, 0, 0));
-
-    modelB->mesh->assignTexture("livertexture2");
-    modelB->mesh->renderDetail.shadowColor.rgba[0] = 1.0;
-    modelB->mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    spatialHashing->addMesh(modelB->mesh);
 
     // Add object to the scene
     scene->addSceneObject(modelA);
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    auto light = std::make_shared<smLight>("SceneLight1",
-                                           SIMMEDTK_LIGHT_SPOTLIGHT,
-                                           SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.setPosition(smVec3f(10.0, 10.0, 10.0));
-    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
-    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
-    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
-    light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
-    light->drawEnabled = false;
-    light->attn_constant = 1.0;
-    light->attn_linear = 0.0;
-    light->attn_quadratic = 0.0;
+    std::shared_ptr<smLight> light = smLight::getDefaultLightning();
     scene->addLight(light);
 
     // Camera setup
-    std::shared_ptr<smCamera> sceneCamera = std::make_shared<smCamera>();
-    sceneCamera->setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    sceneCamera->setFarClipDist(1000);
-    sceneCamera->setNearClipDist(0.001);
-    sceneCamera->setViewAngle(0.785398f); //45 degrees
-    sceneCamera->setCameraPos(0, 20, 10);
-    sceneCamera->setCameraFocus(0, 0, 0);
-    sceneCamera->setCameraUpVec(0, 1, 0);
-    sceneCamera->genProjMat();
-    sceneCamera->genViewMat();
+    std::shared_ptr<smCamera> sceneCamera = smCamera::getDefaultCamera();
     scene->addCamera(sceneCamera);
 
     // Create a simulator module
     simulator = sdk->createSimulator();
     simulator->registerObjectSimulator(defaultSimulator);
-    simulator->registerCollisionDetection(spatialHashing);
+    simulator->registerCollisionDetection(collisionDetection);
+    simulator->addCollisionPair(collisionPair);
 
     // setup viewer
     viewer->setWindowTitle("SimMedTK CollisionHash Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
 
-    // we want viewer to render this object
-//     viewer->addObject(shared_from_this());
-
     // set event dispatcher to the viewer
     viewer->setEventDispatcher(sdk->getEventDispatcher());
-//     simulator->registerSimulationMain(safeDownCast<CollisionDetectionSpatialHashing>());
+    simulator->registerSimulationMain(std::static_pointer_cast<smSimulationMain>(shared_from_this()));
 }
 
 // Draw the collided triangles. This will be called due to the function call viewer->addObject(this)
-void CollisionDetectionSpatialHashing::draw(const smDrawParam &/*p_params*/)
+void CollisionDetectionBVH::draw(const smDrawParam &/*p_params*/)
 {
-    auto &triangles = spatialHashing->getCollidedTriangles();
-    glBegin(GL_TRIANGLES);
-
-    for (size_t i = 0; i < triangles.size(); i++)
-    {
-        glVertex3fv(triangles[i]->tri1.vert[0].data());
-        glVertex3fv(triangles[i]->tri1.vert[1].data());
-        glVertex3fv(triangles[i]->tri1.vert[2].data());
-
-        glVertex3fv(triangles[i]->tri2.vert[0].data());
-        glVertex3fv(triangles[i]->tri2.vert[1].data());
-        glVertex3fv(triangles[i]->tri2.vert[2].data());
-    }
-    glEnd();
+//     auto &triangles = collisionDetection->getCollidedTriangles();
+//     glBegin(GL_TRIANGLES);
+//
+//     for (size_t i = 0; i < triangles.size(); i++)
+//     {
+//         glVertex3fv(triangles[i]->tri1.vert[0].data());
+//         glVertex3fv(triangles[i]->tri1.vert[1].data());
+//         glVertex3fv(triangles[i]->tri1.vert[2].data());
+//
+//         glVertex3fv(triangles[i]->tri2.vert[0].data());
+//         glVertex3fv(triangles[i]->tri2.vert[1].data());
+//         glVertex3fv(triangles[i]->tri2.vert[2].data());
+//     }
+//     glEnd();
 }
 
-void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam &/*p_param*/)
+void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*/)
 {
     if ((10 > moveObj) && (moveObj > 0))
     {
@@ -181,12 +163,12 @@ void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam 
     }
 }
 
-void CollisionDetectionSpatialHashing::run()
+void CollisionDetectionBVH::run()
 {
     this->sdk->run();
 }
 
-void CollisionDetectionSpatialHashing::handleEvent(std::shared_ptr<smEvent> p_event)
+void CollisionDetectionBVH::handleEvent(std::shared_ptr<smEvent> p_event)
 {
     switch (p_event->getEventType().eventTypeCode)
     {
