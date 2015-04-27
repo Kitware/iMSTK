@@ -163,14 +163,14 @@ public:
 
     void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
 
-    smCamera &getCamera()
+    std::shared_ptr<smCamera> getCamera()
     {
         return camera;
     }
 
-    const smCamera &getCamera() const
+    void addCamera(std::shared_ptr<smCamera> sceneCamera)
     {
-        return camera;
+        camera = sceneCamera;
     }
 
 private:
@@ -191,7 +191,7 @@ private:
     smUInt sceneUpdatedTimeStamp;                               // last updated time stampe
     smUInt referenceCounter;                                    // reference counter to the scene
     smInt totalObjects;                                         // number of total objects in the scene
-    smCamera camera;
+    std::shared_ptr<smCamera> camera;
 
     friend class smSDK;
 

@@ -56,6 +56,12 @@ public:
 
     virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/){}
 
+    void setMesh(std::shared_ptr<smMesh> surfaceMesh)
+    {
+        mesh = std::static_pointer_cast<smSurfaceMesh>(surfaceMesh);
+        mesh->meshType = SMMESH_RIGID;
+    }
+
 public:
     /// \brief static scene object contains a mesh
     std::shared_ptr<smSurfaceMesh> mesh;

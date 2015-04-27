@@ -564,9 +564,9 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
     //Load View and Projection Matrices
     // -- with new rendering techniques, these would be passed to a shader
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(p_scene->getCamera().getProjMatRef());
+    glLoadMatrixf(p_scene->getCamera()->getProjMatRef());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(p_scene->getCamera().getViewMatRef());
+    glLoadMatrixf(p_scene->getCamera()->getViewMatRef());
 
     sceneIter.setScene(p_scene, p_param.caller);
 
