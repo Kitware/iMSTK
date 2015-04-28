@@ -30,11 +30,14 @@
 #include "smCore/smMouse.h"
 #include "smUtilities/smMatrix.h"
 #include "smUtilities/smVector.h"
-#include "smCore/smKeyGLFWInterface.h" //contains an interface to convert GLFW keys to smKeys
 
 /// \brief keyboard event data
 struct smKeyboardEventData
 {
+    smKeyboardEventData();
+    smKeyboardEventData(smKey key, smBool pressed, smModKey mods);
+    smKeyboardEventData(smKey key, smBool pressed, smBool shift,
+                        smBool control, smBool alt, smBool super);
     smKey keyBoardKey; ///< Key that was pressed
     smBool pressed; ///< if the key was pressed or released in this event
     smModKey modKeys; ///< modifier keys.  See smModKey for values
@@ -43,6 +46,9 @@ struct smKeyboardEventData
 /// \brief mouse event data
 struct smMouseButtonEventData
 {
+    smMouseButtonEventData();
+    smMouseButtonEventData(smMouseButton button,
+                           smBool pressed, smDouble x, smDouble y);
     smMouseButton mouseButton; ///<Which mouse button was pressed
     smBool pressed; ///< if the button was pressed or released in this event
     smDouble windowX; ///< window X coorindate relative to left edge
@@ -51,6 +57,8 @@ struct smMouseButtonEventData
 
 struct smMouseMoveEventData
 {
+    smMouseMoveEventData();
+    smMouseMoveEventData(smDouble x, smDouble y);
     smDouble windowX; ///< window X coorindate relative to left edge
     smDouble windowY; ///< window Y coorindate relative to top edge
 };

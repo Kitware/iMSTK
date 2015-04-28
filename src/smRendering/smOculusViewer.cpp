@@ -21,15 +21,17 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smOculusViewer.h"
-#include "smRendering/smGLRenderer.h"
+#include <iostream>
 
 #include <glm/glm.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#ifdef WIN32
+#include "smRendering/smOculusViewer.h"
+#include "smRendering/smGLRenderer.h"
+
+#ifdef _WIN32 || WIN32
     #define OVR_OS_WIN32
 #elif defined(__APPLE__)
     #define OVR_OS_MAC
@@ -37,25 +39,9 @@
     #define OVR_OS_LINUX
     #include <X11/Xlib.h>
     #include <GL/glx.h>
-#endif 
-
-#include <OVR.h>
-#include <OVR_CAPI_GL.h>
-
-#if defined(WIN32)
-    #define GLFW_EXPOSE_NATIVE_WIN32
-    #define GLFW_EXPOSE_NATIVE_WGL
-#elif defined(__APPLE__)
-    #define GLFW_EXPOSE_NATIVE_COCOA
-    #define GLFW_EXPOSE_NATIVE_NSGL
-#else
-    #define GLFW_EXPOSE_NATIVE_X11
-    #define GLFW_EXPOSE_NATIVE_GLX
 #endif
 
-#include <GLFW/glfw3native.h>
-
-#include <iostream>
+#include <OVR_CAPI_GL.h>
 
 /// \brief Calculate the next power of two
 ///
@@ -109,7 +95,6 @@ void smOculusViewer::init()
     ovr_Initialize();
     this->initGLContext();
     this->initGLCaps();
-    this->initLights();
     this->initObjects(param);
     this->initResources(param);
     this->initScenes(param);
@@ -162,7 +147,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Enable lights
-    enableLights();
+    p_rop.scene->enableLights();
 
     ovrHmd_GetEyePoses(hmd, 0, &(eyeRdesc->HmdToEyeViewOffset), pose, &ts);
     //for each eye ...
@@ -197,7 +182,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
         //we need to construct a view matrix by combining all the information
         // provided by the oculus SDK, about the position and orientation of
         // the user's head in the world.
-        glmView = camera.view;
+        glmView = p_rop.scene->camera.view;
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix
@@ -294,7 +279,7 @@ int smOculusViewer::initOculus(void)
     glCfg.OGL.Header.Multisample = 1;
 
 #if defined(OVR_OS_WIN32)
-    glCfg.OGL.Window = glfwGetWin32Window(window);
+    glCfg.OGL.Window = sfmlWindow->getSystemHandle();
     glCfg.OGL.DC = wglGetCurrentDC();
 #elif defined(OVR_OS_LINUX)
     glCfg.OGL.Disp = glXGetCurrentDisplay();
@@ -310,9 +295,9 @@ int smOculusViewer::initOculus(void)
         // XXX: this doesn't work properly yet due to bugs in the oculus
         // 0.4.1 sdk/driver
 #ifdef WIN32
-        ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, 0, 0);
+        ovrHmd_AttachToWindow(hmd, glCfg.OGL.Window, nullptr, nullptr);
 #else
-        ovrHmd_AttachToWindow(hmd, (void*)glfwGetX11Window(window), 0, 0);
+        ovrHmd_AttachToWindow(hmd, (void*)glXGetCurrentDrawable(), nullptr, nullptr);
 #endif
         std::cout << "running in \"direct-hmd\" mode\n";
     }
@@ -326,7 +311,7 @@ int smOculusViewer::initOculus(void)
     // vignetting, and timewrap, which shifts the image before drawing to
     // counter any lattency between the call to ovrHmd_GetEyePose and
     // ovrHmd_EndFrame.
-    distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette |
+    distortionCaps = ovrDistortionCap_Vignette |
                      ovrDistortionCap_TimeWarp | ovrDistortionCap_Overdrive;
     if (!ovrHmd_ConfigureRendering(hmd, &glCfg.Config, distortionCaps,
                                    hmd->DefaultEyeFov, eyeRdesc)) {

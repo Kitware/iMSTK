@@ -168,7 +168,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
 find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(GLFW REQUIRED)
+find_package(SFML REQUIRED)
 find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -192,11 +192,7 @@ endif()
 include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
-simmedtk_find_package(DevIL REQUIRED)
-set(IL_INCLUDE_DIR ${IL_INCLUDE_DIR}/..)
 
-simmedtk_find_package(Audiere REQUIRED)
-simmedtk_find_package(V8 REQUIRED)
 
 if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)
@@ -212,9 +208,9 @@ if(SimMedTK_USE_NIUSB6008)
   include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 endif()
 
-include_directories(SYSTEM "${IL_INCLUDE_DIR}")
 include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
 include_directories(SYSTEM "${GLM_INCLUDE_DIR}")
+include_directories(SYSTEM "${SFML_INCLUDE_DIRS}")
 include_directories(SYSTEM "${ThreadPool_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------

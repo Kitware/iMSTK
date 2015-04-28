@@ -42,5 +42,7 @@ target_link_libraries(smRendering
     smUtilities
     smShader
  PUBLIC
+    sfml::window
+    sfml::system
     ${OCULUS_VIEWER_TARGET_LINK_LIBRARIES}
 )

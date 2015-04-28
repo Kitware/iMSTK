@@ -24,8 +24,8 @@
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
 
-// GLFW includes
-#include "GLFW/glfw3.h"
+// 3rd Party iIncludes
+#include <SFML/Window.hpp>
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
@@ -45,7 +45,6 @@
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
 #include "smRendering/smCamera.h"
-
 
 //forward declaration
 class smSDK;
@@ -111,7 +110,11 @@ protected:
 public:
     smRenderingStageType renderStage;
 
-    GLFWwindow* window;
+    std::unique_ptr<sf::Context> sfmlContext;
+    std::unique_ptr<sf::Window> sfmlWindow;
+
+    ///if the camera motion is enabled from other external devices
+    smBool enableCameraMotion;
 
     smOpenGLWindowStream *windowOutput;
     /// \brief Viewer settings
@@ -140,7 +143,9 @@ public:
     /// \brief set scene as texture
     void setSceneAsTextureShader(smSceneTextureShader *p_shader);
     /// \brief set the window title
-    void setWindowTitle(smString);
+    void setWindowTitle(const smString &str);
+    /// \brief enable/disable VSync
+    void setVSync(bool sync);
     /// \brief Registers a scene for rendering with the viewer
     void registerScene(smScene *p_scene, smRenderTargetType p_target, const smString &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
@@ -206,6 +211,10 @@ protected:
     void renderTextureOnView();
     /// \brief  event handler
     void handleEvent(smEvent *p_event);
+    /// \brief processes an SFML event
+    void processSFMLEvents(const sf::Event& p_event);
+    /// \brief  scale for light drawing in the scene.
+    smFloat lightDrawScale;
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 };

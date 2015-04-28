@@ -5,6 +5,7 @@ simmedtk_add_library(smCore
     smDispatcher.cpp
     smErrorLog.cpp
     smEvent.cpp
+    smEventData.cpp
     smEventHandler.cpp
     smGeometry.cpp
     smModule.cpp
@@ -48,11 +49,8 @@ target_link_libraries(smCore
     GLEW::GLEW
     GLUT::GLUT
     ${OPENGL_LIBRARY}
-    glfw::glfw
+    sfml::graphics
   INTERFACE
-    ${ILUT_LIBRARIES}
-    ${ILU_LIBRARIES}
-    ${IL_LIBRARIES}
 )
 
 if(NOT MSVC)

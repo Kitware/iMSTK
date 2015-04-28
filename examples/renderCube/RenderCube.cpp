@@ -39,7 +39,6 @@ RenderCube::RenderCube()
     scene1 = simmedtkSDK->createScene();
 
     //Create a viewer to see the scene through
-    //viewer = simmedtkSDK->createViewer();
     simmedtkSDK->addViewer(&viewer);
 
     //Initialize the texture manager
@@ -64,14 +63,14 @@ RenderCube::RenderCube()
     //Setup the window title in the window manager
     viewer.setWindowTitle("SimMedTK RENDER TEST");
 
-    //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
+    //Add the RenderCube object we are in to the viewer from the SimMedTK SDK
     viewer.addObject(this);
 
     //Set some viewer properties
     viewer.setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    //viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Setup lights
     this->setupLights();

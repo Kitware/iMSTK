@@ -21,13 +21,30 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef IMAGEEXAMPLE_H
+#ifndef RENDER_CUBE_H
+#define RENDER_CUBE_H
 
-#define IMAGEEXAMPLE_H
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
 #include "smCore/smSDK.h"
+#include "smExternalDevices/smAudio.h"
 
+class AudioExample
+    : public smSimulationMain,
+      public smCoreClass,
+      public smEventHandler
+{
+public:
+    AudioExample();
+    ~AudioExample();
+    void simulateMain(smSimulationMainParam p_param);
+    void handleEvent(smEvent *p_event);
+private:
+    smSDK* simmedtkSDK;
+    smViewer viewer;
+    smAudio sound;
+    smBool loopSound;
+    smFloat soundVolume;
+};
+
+void runAudioExample();
 
 #endif

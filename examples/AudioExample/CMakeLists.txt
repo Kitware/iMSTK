@@ -1,6 +1,6 @@
 
-add_executable(renderCube main.cpp  RenderCube.cpp RenderCube.h)
-target_link_libraries(renderCube
+add_executable(AudioExample main.cpp  AudioExample.cpp AudioExample.h)
+target_link_libraries(AudioExample
   smCore
   smRendering
   smShader
