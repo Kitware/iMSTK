@@ -63,40 +63,49 @@ bool smUnifiedID::operator!=( int &p_ID )
     return ( ID != p_ID );
 }
 
-smCoreClass::smCoreClass() : name( "" )
+smCoreClass::smCoreClass() :
+    name("")
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId.generateUniqueID();
-
 }
 
-smClassType smCoreClass::getType()
+smClassType smCoreClass::getType() const
 {
     return type;
 }
 
-void smCoreClass::initDraw( smDrawParam p_params )
-{
-}
-void smCoreClass::draw( smDrawParam p_params )
-{
-}
-void smCoreClass::initSimulate( smSimulationParam p_params )
-{
-}
-void smCoreClass::simulate( smSimulationParam p_params )
-{
-}
-void smCoreClass::print()
+smDrawParam::smDrawParam() :
+    rendererObject{nullptr},
+    caller{nullptr},
+    viewMatrix{nullptr},
+    projMatrix{nullptr},
+    data{nullptr}
 {
 }
 
-void smCoreClass::setName( std::string p_objectName )
+void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
+{
+}
+void smCoreClass::draw( const smDrawParam &/*p_params*/ )
+{
+}
+void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
+{
+}
+void smCoreClass::simulate( const smSimulationParam &/*p_params*/ )
+{
+}
+void smCoreClass::print() const
+{
+}
+
+void smCoreClass::setName( const std::string &p_objectName )
 {
     name = p_objectName;
 }
 
-std::string smCoreClass::getName()
+std::string smCoreClass::getName() const
 {
     return name;
 }

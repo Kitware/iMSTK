@@ -28,7 +28,7 @@
 #include "smTools/curvedGrasper.h"
 #include "smCore/smSDK.h"
 
-void curvedGrasper::draw(smDrawParam p_params)
+void curvedGrasper::draw(const smDrawParam &p_params)
 {
     smStylusRigidSceneObject::draw(p_params);
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
@@ -101,11 +101,10 @@ void curvedGrasper::handleEvent(smEvent *p_event)
     switch (p_event->eventType.eventTypeCode)
     {
     case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        hapticEventData = (smHapticOutEventData *)p_event->data;
+        hapticEventData = reinterpret_cast<smHapticOutEventData*>(p_event->data);
 
         if (hapticEventData->deviceId == this->phantomID)
         {
-            smVec3f pos1 = hapticEventData->transform.col(3).head<3>();
             godPosMat = hapticEventData->transform;
             transRot = godPosMat;
             pos = hapticEventData->position;
@@ -121,7 +120,7 @@ void curvedGrasper::handleEvent(smEvent *p_event)
         break;
 
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        keyBoardData = (smKeyboardEventData*)p_event->data;
+        keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
 
         if (keyBoardData->keyBoardKey == smKey::Num1)
         {
@@ -162,7 +161,6 @@ void curvedGrasper::updateOpenClose()
         }
     }
 
-    smFloat tF;
 #ifdef smNIUSB6008DAQ
     NIUSB6008Data *NI_Data;
 

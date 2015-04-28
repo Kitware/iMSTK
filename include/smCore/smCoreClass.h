@@ -40,6 +40,7 @@ class smViewer;
 /// \brief  viewer sends this to all objects to be rendered
 struct smDrawParam
 {
+    smDrawParam();
     smViewer    *rendererObject;
     smCoreClass *caller;
     smGLFloat *viewMatrix; ///< Pointer to an array detailing a 4x4 OpenGL view matrix
@@ -120,28 +121,28 @@ public:
     smCoreClass();
 
     /// \brief get type of the class
-    smClassType getType();
+    smClassType getType() const ;
 
     /// \brief his function is called by the renderer. The p_params stores renderer pointers
-    virtual void initDraw(smDrawParam p_params);
+    virtual void initDraw(const smDrawParam &p_params);
 
     /// \brief draw function is called for visualization the object
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 
     /// \brief initialization of simulation
-    virtual void initSimulate(smSimulationParam p_params);
+    virtual void initSimulate(const smSimulationParam &p_params);
 
     /// \brief simulates the object
-    virtual void simulate(smSimulationParam p_params);
+    virtual void simulate(const smSimulationParam &p_params);
 
     /// \brief print the object
-    virtual void print();
+    virtual void print() const;
 
     /// \brief set the name of object
-    void setName(smString p_objectName);
+    void setName(const smString &p_objectName);
 
     /// \brief get the name of the object
-    smString getName();
+    smString getName() const;
 
     friend smSDK;
 };

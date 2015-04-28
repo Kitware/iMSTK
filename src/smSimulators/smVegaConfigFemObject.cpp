@@ -51,7 +51,6 @@ smVegaConfigFemObject::smVegaConfigFemObject()
     newmarkGamma = 0.5;
     use1DNewmarkParameterFamily = 1;
     substepsPerTimeStep = 1;
-    inversionThreshold;
     lockAt30Hz = 0;
     forceNeighborhoodSize = 5;
     enableCompressionResistance = 1;
@@ -136,7 +135,7 @@ void smVegaConfigFemObject::setFemObjConfuguration(const std::string &ConfigFile
     configFile.addOptionOptional("invertibleMaterial", invertibleMaterialString, invertibleMaterialString);
 
     // parse the configuration file
-    if (configFile.parseOptions((char*)ConfigFilename.c_str()) != 0)
+    if (configFile.parseOptions(ConfigFilename.c_str()) != 0)
     {
         printf("VEGA: Error parsing options.\n");
         exit(1);

@@ -42,12 +42,12 @@ public:
         createParam("textureUnit");
     }
 
-    virtual void initDraw(smDrawParam p_param)
+    virtual void initDraw(const smDrawParam &p_param)
     {
         smShader::initDraw(p_param);
         textUnit = this->getFragmentShaderParam("textureUnit");
     }
-    void draw(smDrawParam p_param)
+    void draw(const smDrawParam &p_param)
     {
         this->checkShaderUpdate(2000);
         //this->drawOrder=
@@ -201,7 +201,7 @@ VAORendering::~VAORendering()
 
 }
 
-void VAORendering::draw(smDrawParam p_params)
+void VAORendering::draw(const smDrawParam &p_params)
 {
 
 

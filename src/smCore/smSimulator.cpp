@@ -40,7 +40,7 @@ void smSimulator::initAsyncThreadPool()
 {
     asyncThreadPoolSize = 0;
 
-    for (smInt i = 0; i < simulators.size(); i++)
+    for (size_t i = 0; i < simulators.size(); i++)
     {
         if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
         {
@@ -70,7 +70,7 @@ void smSimulator::run()
 
     //Start up async threads
     asyncResults.reserve(this->asyncThreadPoolSize);
-    for (smInt i = 0; i < simulators.size(); i++)
+    for (size_t i = 0; i < simulators.size(); i++)
     {
         if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
         {
@@ -101,7 +101,7 @@ void smSimulator::run()
         }
 
         results.clear();
-        for (smInt i = 0; i < this->simulators.size(); i++)
+        for (size_t i = 0; i < this->simulators.size(); i++)
         {
             objectSimulator = simulators[i];
 
@@ -128,14 +128,14 @@ void smSimulator::run()
             result.get(); //waits for result value
         }
 
-        for (smInt i = 0; i < this->simulators.size(); i++)
+        for (size_t i = 0; i < this->simulators.size(); i++)
         {
             objectSimulator = simulators[i];
             objectSimulator->syncBuffers();
         }
 
         results.clear(); //clear the results buffer for new
-        for (smInt i = 0; i < this->collisionDetectors.size(); i++)
+        for (size_t i = 0; i < this->collisionDetectors.size(); i++)
         {
             objectSimulator = collisionDetectors[i];
             //start each simulator in it's own thread (as max threads allow...)

@@ -48,7 +48,7 @@ public:
     smPipeRegisteration myCollInformation;
 
     CollisionDetectionExampleWithHash();
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
     virtual void simulateMain(smSimulationMainParam p_param);
     ~CollisionDetectionExampleWithHash();
 };

@@ -125,10 +125,10 @@ protected:
     virtual void updateSceneList();
 
     /// \brief  initialization routine for rendering
-    virtual void initDraw(smDrawParam p_params);
+    virtual void initDraw(const smDrawParam &p_params);
 
     /// \brief  rendering of simulator. it is used for debugging purposes
-    virtual void draw(smDrawParam p_params);
+    virtual void draw(const smDrawParam &p_params);
 
     /// \brief object simulator iterator. The default iteration is sequantial in the order of the insertion.
     /// custom iteration requires extension of this class.

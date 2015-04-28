@@ -17,6 +17,7 @@ simmedtk_add_library(smCore
     smSimulator.cpp
     smStaticSceneObject.cpp
     smTextureManager.cpp
+    smDoubleBuffer.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCore/smConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h

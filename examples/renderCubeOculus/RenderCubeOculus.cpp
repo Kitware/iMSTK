@@ -112,20 +112,20 @@ void RenderCubeOculus::setupLights()
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;
     light->attn_quadratic = 0.0;
-    viewer.addLight(light);
+    scene1->addLight(light);
 }
 
 void RenderCubeOculus::setupCamera()
 {
-    viewer.camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    viewer.camera.setFarClipDist(1000);
-    viewer.camera.setNearClipDist(0.001);
-    viewer.camera.setViewAngle(0.785398f); //45 degrees
-    viewer.camera.setCameraPos(0, 0, 0);
-    viewer.camera.setCameraFocus(0, 0, -1);
-    viewer.camera.setCameraUpVec(0, 1, 0);
-    viewer.camera.genProjMat();
-    viewer.camera.genViewMat();
+    scene1->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    scene1->camera.setFarClipDist(1000);
+    scene1->camera.setNearClipDist(0.001);
+    scene1->camera.setViewAngle(0.785398f); //45 degrees
+    scene1->camera.setCameraPos(0, 0, 0);
+    scene1->camera.setCameraFocus(0, 0, -1);
+    scene1->camera.setCameraUpVec(0, 1, 0);
+    scene1->camera.genProjMat();
+    scene1->camera.genViewMat();
 }
 
 void RenderCubeOculus::simulateMain(smSimulationMainParam p_param)

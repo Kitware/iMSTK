@@ -224,7 +224,7 @@ public:
     void disableShader();
 
     /// \brief Initialize the shader..This is called automatically.
-    virtual void initDraw(smDrawParam p_param);
+    virtual void initDraw(const smDrawParam &p_param);
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     /// \brief add parameter for Vertex Shader
@@ -302,10 +302,10 @@ public:
     }
 
     /// \brief void implementations for virtual functions. needs to be overwritten for any specific uniform bindings
-    virtual void predraw(smMesh *mesh) {}
-    virtual void predraw(smSurfaceMesh *mesh) {}
-    virtual void posdraw(smMesh *mesh) {}
-    virtual void posdraw(smSurfaceMesh *mesh) {}
+    virtual void predraw(smMesh */*mesh*/){};
+    virtual void predraw(smSurfaceMesh */*mesh*/){};
+    virtual void posdraw(smMesh */*mesh*/){};
+    virtual void posdraw(smSurfaceMesh */*mesh*/){};
 
     static smShader * getShader(smUnifiedID p_shaderID);
 
@@ -314,7 +314,7 @@ public:
     void activeGLTextures(smUnifiedID p_id);
     void activeGLVertAttribs(smInt p_id, smVec3f *p_vecs, smInt p_size);
     void registerShader();
-    void print();
+    void print() const;
 
     /// \brief stores the current Active shader.
     static smShader *currentShader;

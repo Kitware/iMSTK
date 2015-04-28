@@ -34,7 +34,9 @@ class vegaFemExample : public smSimulationMain, public smCoreClass
 
 public:
     vegaFemExample();
-    void simulateMain(smSimulationMainParam p_param) { };
+
+    virtual ~vegaFemExample(){}
+    void simulateMain(smSimulationMainParam /*p_param*/) { };
 private:
     smSDK *sofmisSDK;
     smVegaFemSceneObject *femobj;

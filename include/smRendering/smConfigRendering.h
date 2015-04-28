@@ -133,7 +133,6 @@ struct smColor
 #define    SIMMEDTK_VIEWERRENDER_TRANSPARENCY                   (1<<7)
 #define    SIMMEDTK_VIEWERRENDER_FULLSCREEN                     (1<<8)
 #define    SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS         (1<<9)
-#define    SIMMEDTK_VIEWERRENDER_SOFTSHADOWS                    (1<<10)
 #define    SIMMEDTK_VIEWERRENDER_DISABLE                        (1<<11)
 #define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
 

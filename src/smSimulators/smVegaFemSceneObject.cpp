@@ -24,7 +24,7 @@
 // SimMedTK includes
 #include "smSimulators/smVegaFemSceneObject.h"
 
-smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog *p_log, smString ConfigFile)
+smVegaFemSceneObject::smVegaFemSceneObject(smErrorLog */*p_log*/, smString ConfigFile)
 {
 
     fps = 0.0;
@@ -253,11 +253,11 @@ void smVegaFemSceneObject::initSimulation()
     loadFixedBC();
 
     // make room for deformation and force vectors
-    u = (double*) calloc(3 * n, sizeof(double));
-    uvel = (double*) calloc(3 * n, sizeof(double));
-    uaccel = (double*) calloc(3 * n, sizeof(double));
-    f_ext = (double*) calloc(3 * n, sizeof(double));
-    f_extBase = (double*) calloc(3 * n, sizeof(double));
+    u = new double[3*n]();
+    uvel = new double[3*n]();
+    uaccel = new double[3*n]();
+    f_ext = new double[3*n]();
+    f_extBase = new double[3*n]();
 
     loadInitialStates();
     loadScriptedExternalFroces();
@@ -508,14 +508,14 @@ void smVegaFemSceneObject::loadMeshes()
             sscanf(femConfig->customMassSpringSystem, "chain,%d,%lf", &numParticles, &groupStiffness);
             printf("VEGA: Creating a chain mass-spring system with %d particles...\n", numParticles);
 
-            double * masses = (double*) malloc(sizeof(double) * numParticles);
+            double * masses = new double[numParticles];
 
             for (int i = 0; i < numParticles; i++)
             {
                 masses[i] = 1.0;
             }
 
-            double * restPositions = (double*) malloc(sizeof(double) * 3 * numParticles);
+            double * restPositions = new double[3 * numParticles];
 
             for (int i = 0; i < numParticles; i++)
             {
@@ -524,7 +524,7 @@ void smVegaFemSceneObject::loadMeshes()
                 restPositions[3 * i + 2] = 0;
             }
 
-            int * edges = (int*) malloc(sizeof(int) * 2 * (numParticles - 1));
+            int * edges = new int[2 * (numParticles - 1)];
 
             for (int i = 0; i < numParticles - 1; i++)
             {
@@ -532,7 +532,7 @@ void smVegaFemSceneObject::loadMeshes()
                 edges[2 * i + 1] = i + 1;
             }
 
-            int * edgeGroups = (int*) malloc(sizeof(int) * (numParticles - 1));
+            int * edgeGroups = new int[numParticles - 1];
 
             for (int i = 0; i < numParticles - 1; i++)
             {
@@ -638,7 +638,7 @@ void smVegaFemSceneObject::loadRenderingMesh()
         secondaryDeformableObjectRenderingMesh->BuildNeighboringStructure();
         secondaryDeformableObjectRenderingMesh->BuildNormals();
 
-        uSecondary = (double*) calloc(3 * secondaryDeformableObjectRenderingMesh->Getn(), sizeof(double));
+        uSecondary = new double[3 * secondaryDeformableObjectRenderingMesh->Getn()]();
 
         // load interpolation structure
         if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
@@ -701,7 +701,7 @@ void smVegaFemSceneObject::loadFixedBC()
     else
     {
         numFixedVertices = 1;
-        fixedVertices = (int*) malloc(sizeof(int) * numFixedVertices);
+        fixedVertices = new int[numFixedVertices];
         fixedVertices[0] = massSpringSystem->GetNumParticles();
     }
 
@@ -710,7 +710,7 @@ void smVegaFemSceneObject::loadFixedBC()
 
     // create 0-indexed fixed DOFs
     int numFixedDOFs = 3 * numFixedVertices;
-    int * fixedDOFs = (int*) malloc(sizeof(int) * numFixedDOFs);
+    int * fixedDOFs = new int[numFixedDOFs];
 
     for (int i = 0; i < numFixedVertices; i++)
     {
@@ -745,7 +745,7 @@ void smVegaFemSceneObject::loadInitialStates()
     }
     else if ((femConfig->deformableObject == MASSSPRING) && (femConfig->massSpringSystemSource == CHAIN))
     {
-        uInitial = (double*) calloc(3 * n, sizeof(double));
+        uInitial = new double[3*n]();
         int numParticles = massSpringSystem->GetNumParticles();
 
         for (int i = 0; i < numParticles; i++)
@@ -757,7 +757,7 @@ void smVegaFemSceneObject::loadInitialStates()
     }
     else
     {
-        uInitial = (double*) calloc(3 * n, sizeof(double));
+        uInitial = new double[3*n]();
     }
 
     // load initial velocity
@@ -797,7 +797,7 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
 {
 
     int numFixedDOFs = 3 * numFixedVertices;
-    int * fixedDOFs = (int*) malloc(sizeof(int) * numFixedDOFs);
+    int * fixedDOFs = new int[numFixedDOFs];
 
     // initialize the integrator
     printf("VEGA: Initializing the integrator, n = %d...\n", n);
@@ -1219,9 +1219,10 @@ inline void smVegaFemSceneObject::applyScriptedExternalForces()
     {
         printf("  External forces read from the binary input file.\n");
 
-        for (int i = 0; i < 3 * n; i++)
+        size_t offset = 3*n*timestepCounter;
+        for (size_t i = 0, end = 3u*n; i < end; i++)
         {
-            f_ext[i] += forceLoads[ELT(3 * n, i, timestepCounter)];
+            f_ext[i] += forceLoads[offset+i];
         }
     }
 
@@ -1294,25 +1295,25 @@ inline void smVegaFemSceneObject::updateStats()
                 sprintf(windowTitle, "%s | %s | Elements: %d | DOFs: %d | %.1f Hz |"
                         "Defo CPU Load: %d%%", "StVK", femConfig->solverMethod,
                         volumetricMesh->getNumElements(), volumetricMesh->getNumVertices() * 3,
-                        fps, (int)(100 * cpuLoad + 0.5));
+                        fps, smInt(100 * cpuLoad + 0.5));
 
             if (femConfig->deformableObject == COROTLINFEM)
                 sprintf(windowTitle, "%s:%d | %s | Elements: %d | DOFs: %d | %.1f Hz |"
                         "Defo CPU Load: %d%%", "CLFEM", femConfig->corotationalLinearFEM_warp,
                         femConfig->solverMethod, volumetricMesh->getNumElements(),
-                        volumetricMesh->getNumVertices() * 3, fps, (int)(100 * cpuLoad + 0.5));
+                        volumetricMesh->getNumVertices() * 3, fps, smInt(100 * cpuLoad + 0.5));
 
             if (femConfig->deformableObject == LINFEM)
                 sprintf(windowTitle, "%s | %s | Elements: %d | DOFs: %d | %.1f Hz |"
                         "Defo CPU Load: %d%%", "LinFEM", femConfig->solverMethod,
                         volumetricMesh->getNumElements(), volumetricMesh->getNumVertices() * 3, fps,
-                        (int)(100 * cpuLoad + 0.5));
+                        smInt(100 * cpuLoad + 0.5));
 
             if (femConfig->deformableObject == MASSSPRING)
                 sprintf(windowTitle, "%s | %s | Particles: %d | Edges: %d | %.1f Hz |"
                         "Defo CPU Load: %d%%", "mass-spring", femConfig->solverMethod,
                         massSpringSystem->GetNumParticles(), massSpringSystem->GetNumEdges(), fps,
-                        (int)(100 * cpuLoad + 0.5));
+                        int(100 * cpuLoad + 0.5));
 
             if (femConfig->deformableObject == INVERTIBLEFEM)
             {
@@ -1336,7 +1337,7 @@ inline void smVegaFemSceneObject::updateStats()
                 sprintf(windowTitle, "%s | %s | Elements: %d | DOFs: %d | %.1f Hz |"
                         "Defo CPU Load: %d%%", materialType, femConfig->solverMethod,
                         volumetricMesh->getNumElements(), volumetricMesh->getNumVertices() * 3,
-                        fps, (int)(100 * cpuLoad + 0.5));
+                        fps, smInt(100 * cpuLoad + 0.5));
             }
 
             glutSetWindowTitle(windowTitle);
@@ -1355,7 +1356,7 @@ inline void smVegaFemSceneObject::updateStats()
 
 
 // Displays the fem object with primary or secondary mesh, fixed vertices, vertices interacted with, ground plane etc.
-void smVegaFemSceneObject::draw(smDrawParam p_params)
+void smVegaFemSceneObject::draw(const smDrawParam &/*p_params*/)
 {
 
     glEnable(GL_LIGHTING);

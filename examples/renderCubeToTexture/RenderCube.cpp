@@ -36,9 +36,11 @@ RenderCube::RenderCube()
     simmedtkSDK = smSDK::createSDK();
 
     //Create a new scene to work in
-    scene1 = simmedtkSDK->createScene();
+    scene1 = simmedtkSDK->createScene(); //Scene rendered to texture
+    scene2 = simmedtkSDK->createScene(); //Scene rendered to screen
 
     //Create a viewer to see the scene through
+    //viewer = simmedtkSDK->createViewer();
     simmedtkSDK->addViewer(&viewer);
 
     //Initialize the texture manager
@@ -57,20 +59,38 @@ RenderCube::RenderCube()
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(&cube);
 
+    //Setup an FBO for rendering in the viewer.
+    //Create a color and depth texture for the FBO
+    smTextureManager::createColorTexture("colorTex1", 64, 64);
+    smTextureManager::createDepthTexture("depthTex1", 64, 64);
+    //Add the FBO and textures to the viewer
+    viewer.addFBO("fbo1", 
+                  smTextureManager::getTexture("colorTex1"),
+                  smTextureManager::getTexture("depthTex1"),
+                  64, 64);
+
+    square.mesh->loadMesh("models/square.obj", SM_FILETYPE_OBJ);
+    square.mesh->assignTexture("colorTex1");
+    square.mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+
+    //Add the square to the scene
+    scene2->addSceneObject(&square);
+
     //Register the scene with the viewer, and setup render target
-    viewer.registerScene(scene1, SMRENDERTARGET_SCREEN, "");
+    viewer.registerScene(scene1, SMRENDERTARGET_FBO, "fbo1");
+    viewer.registerScene(scene2, SMRENDERTARGET_SCREEN, "");
 
     //Setup the window title in the window manager
     viewer.setWindowTitle("SimMedTK RENDER TEST");
 
-    //Add the RenderCube object we are in to the viewer from the SimMedTK SDK
+    //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
     viewer.addObject(this);
 
     //Set some viewer properties
     viewer.setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
-    //viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Setup lights
     this->setupLights();
@@ -119,6 +139,16 @@ void RenderCube::setupCamera()
     scene1->camera.setCameraUpVec(0, 1, 0);
     scene1->camera.genProjMat();
     scene1->camera.genViewMat();
+
+    scene2->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
+    scene2->camera.setFarClipDist(1000);
+    scene2->camera.setNearClipDist(0.001);
+    scene2->camera.setViewAngle(0.785398f); //45 degrees
+    scene2->camera.setCameraPos(0, 0, 5);
+    scene2->camera.setCameraFocus(0, 0, -1);
+    scene2->camera.setCameraUpVec(0, 1, 0);
+    scene2->camera.genProjMat();
+    scene2->camera.genViewMat();
 }
 
 void RenderCube::handleEvent(smEvent *p_event)
@@ -128,7 +158,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_KEYBOARD:
     {
         smKeyboardEventData* kbData =
-            reinterpret_cast<smKeyboardEventData*>(p_event->data);
+            (smKeyboardEventData*)p_event->data;
         smKey key = kbData->keyBoardKey;
         if (key == smKey::Escape && kbData->pressed)
         {
@@ -191,7 +221,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
     {
         smMouseButtonEventData* mbData =
-            reinterpret_cast<smMouseButtonEventData*>(p_event->data);
+            (smMouseButtonEventData*)p_event->data;
         std::cout << "mbData: button: ";
         if (mbData->mouseButton == smMouseButton::Left)
             std::cout << "Left";
@@ -214,7 +244,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
     {
         smMouseMoveEventData* mpData =
-            reinterpret_cast<smMouseMoveEventData*>(p_event->data);
+            (smMouseMoveEventData*)p_event->data;
         std::cout << "mpData: x: " << mpData->windowX
             << " y: " << mpData->windowY << "\n";
         break;
@@ -224,7 +254,7 @@ void RenderCube::handleEvent(smEvent *p_event)
     }
 }
 
-void RenderCube::simulateMain(smSimulationMainParam /*p_param*/)
+void RenderCube::simulateMain(smSimulationMainParam p_param)
 {
     //Run the simulator framework
     simmedtkSDK->run();

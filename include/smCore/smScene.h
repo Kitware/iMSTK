@@ -35,6 +35,8 @@
 #include "smCore/smErrorLog.h"
 #include "smUtilities/smDataStructures.h"
 #include "smCore/smDoubleBuffer.h"
+#include "smRendering/smLight.h"
+#include "smRendering/smCamera.h"
 
 class smPipe;
 class smSDK;
@@ -62,6 +64,8 @@ public:
 ///note that when you remove the Physics do not delete it.Since propagation of the physics over the
 class smScene: public smCoreClass
 {
+protected:
+    smIndiceArray<smLight*> *lights;
 
 private:
     /// \brief number of total objects in the scene
@@ -85,7 +89,7 @@ private:
     {
         p_local->sceneObjects.clear();
 
-        for (smInt i = 0; i < sceneObjects.size(); i++)
+        for (size_t i = 0; i < sceneObjects.size(); i++)
         {
             p_local->sceneObjects.push_back(sceneObjects[i]);
         }
@@ -158,6 +162,9 @@ public:
 
     smScene(smErrorLog *p_log = NULL);
     /// \brief add obejct to the scene, it is thread safe call.
+
+   virtual ~smScene()
+   {}
     void registerForScene(smCoreClass *p_simmedtkObject)
     {
         smSceneLocal *local = new smSceneLocal();
@@ -196,6 +203,23 @@ public:
     void removeRef();
     void copySceneObjects(smScene*p_scene);
     smScene &operator =(smScene &p_scene) ;
+
+    /// \brief Initializes lights for rendering
+    void initLights();
+    /// \brief  enable attached lights
+    void enableLights();
+    /// \brief addlight
+    smInt addLight(smLight *p_light);
+    /// \brief set light given with light ID
+    smBool setLight(smInt lightId, smLight *p_light);
+    /// \brief refresh lights. updates light  position based on the gl matrix
+    void refreshLights();
+    /// \brief update light information
+    smBool updateLight(smInt p_lightId, smLight *p_light);
+    void setLightPos(smInt p_lightId, smLightPos p_pos);
+    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
+
+    smCamera camera;
 
     friend class smSDK;
     friend struct smSceneIterator;

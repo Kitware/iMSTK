@@ -24,20 +24,20 @@
 #include "smCore/smDispatcher.h"
 
 
-void smDispatcher::handleViewer(smCoreClass *p_caller, smCallerState p_callerState)
+void smDispatcher::handleViewer(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
 {
 
-    switch (p_callerState)
-    {
-    }
+//     switch (p_callerState)
+//     {
+//     }
 }
 
-void smDispatcher::handleSimulator(smCoreClass *p_caller, smCallerState p_callerState)
+void smDispatcher::handleSimulator(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
 {
 
 }
 
-void smDispatcher::handleCollisionDetection(smCoreClass *p_caller, smCallerState p_callerState)
+void smDispatcher::handleCollisionDetection(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
 {
 
 }
@@ -62,19 +62,19 @@ smDispathcerResult smDispatcher::handle(smCoreClass *p_caller, smCallerState p_c
     switch (classType)
     {
         //handle for viewer
-SIMMEDTK_SMVIEWER:
+    case SIMMEDTK_SMVIEWER:
         handleViewer(p_caller, p_callerState);
         break;
         //handle for simulator
-SIMMEDTK_SMSIMULATOR:
+    case SIMMEDTK_SMSIMULATOR:
         handleSimulator(p_caller, p_callerState);
-
         break;
         //handle for collision detection
-SIMMEDTK_SMCOLLISIONDETECTION:
+    case SIMMEDTK_SMCOLLISIONDETECTION:
         handleCollisionDetection(p_caller, p_callerState);
-
         break;
+    default:
+        std::cerr << "Unknown class type" << std::endl;
     }
 
     handleAll();

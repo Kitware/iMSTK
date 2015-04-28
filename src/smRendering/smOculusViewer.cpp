@@ -95,7 +95,6 @@ void smOculusViewer::init()
     ovr_Initialize();
     this->initGLContext();
     this->initGLCaps();
-    this->initLights();
     this->initObjects(param);
     this->initResources(param);
     this->initScenes(param);
@@ -148,7 +147,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //Enable lights
-    enableLights();
+    p_rop.scene->enableLights();
 
     ovrHmd_GetEyePoses(hmd, 0, &(eyeRdesc->HmdToEyeViewOffset), pose, &ts);
     //for each eye ...
@@ -183,7 +182,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
         //we need to construct a view matrix by combining all the information
         // provided by the oculus SDK, about the position and orientation of
         // the user's head in the world.
-        glmView = camera.view;
+        glmView = p_rop.scene->camera.view;
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix

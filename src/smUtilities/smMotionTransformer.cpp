@@ -74,22 +74,23 @@ void smHapticCameraTrans::handleEvent(smEvent* p_event)
             return;
         }
 
-        hapticEventData = (smHapticOutEventData *)p_event->data;
+        hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
 
+        smCameraEventData* cameraEvent = reinterpret_cast<smCameraEventData*>(newEvent->data);
         if (hapticEventData->deviceId == deviceId)
         {
-            ((smCameraEventData*)newEvent->data)->pos = hapticEventData->position * motionScale;
+            cameraEvent->pos = hapticEventData->position * motionScale;
             computeTransformation(hapticEventData->transform);
 
-            ((smCameraEventData*)newEvent->data)->direction = transFormedDirection;
-            ((smCameraEventData*)newEvent->data)->upDirection = transFormedUpDirection;
+            cameraEvent->direction = transFormedDirection;
+            cameraEvent->upDirection = transFormedUpDirection;
             rightVector = transFormedDirection.cross(transFormedUpDirection);
             rightVector.normalize();
 
             quat = getRotationQuaternion(float(SM_DEGREES2RADIANS(offsetAngle_RightDirection)), rightVector);
 
-            ((smCameraEventData*)newEvent->data)->direction = quat*((smCameraEventData*)newEvent->data)->direction;
-            ((smCameraEventData*)newEvent->data)->upDirection = quat*((smCameraEventData*)newEvent->data)->upDirection;
+            cameraEvent->direction = quat*cameraEvent->direction;
+            cameraEvent->upDirection = quat*cameraEvent->upDirection;
             sendEvent();
         }
 
@@ -120,14 +121,15 @@ void smHapticLightTrans::handleEvent(smEvent* p_event)
             return;
         }
 
-        hapticEventData = (smHapticOutEventData *)p_event->data;
+        hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
 
+        smLightMotionEventData *motionEvent = reinterpret_cast<smLightMotionEventData*>(newEvent->data);
         if (hapticEventData->deviceId == deviceId)
         {
-            ((smLightMotionEventData*)newEvent->data)->lightIndex = lightIndex;
-            ((smLightMotionEventData*)newEvent->data)->pos = hapticEventData->position * motionScale;
+            motionEvent->lightIndex = lightIndex;
+            motionEvent->pos = hapticEventData->position * motionScale;
             computeTransformation(hapticEventData->transform);
-            ((smLightMotionEventData*)newEvent->data)->direction = transFormedDirection;
+            motionEvent->direction = transFormedDirection;
 
             sendEvent();
 

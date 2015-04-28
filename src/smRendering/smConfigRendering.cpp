@@ -98,7 +98,7 @@ smColor &smColor::operator=( smColor &p_color )
 }
 GLfloat *smColor::toGLColor()
 {
-    return ( smGLFloat * )rgba;
+    return static_cast<GLfloat *>(rgba);
 }
 void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha )
 {
@@ -109,7 +109,7 @@ void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha 
 }
 smRenderDetail::smRenderDetail()
 {
-    renderType = SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_FACES;
+    renderType = 0;
     highLightColor.rgba[0] = 1.0f;
     highLightColor.rgba[1] = 0.0f;
     highLightColor.rgba[2] = 0.0f;

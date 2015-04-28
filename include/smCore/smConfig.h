@@ -214,6 +214,7 @@ enum smClassDrawOrder
     SIMMEDTK_DRAW_AFTEROBJECTS
 };
 
+
 ///SimMedTK uses opengl now. So all API should have the definition.
 #define SIMMEDTK_OPENGL_SHADER 1
 /// \brief unicode is not used.

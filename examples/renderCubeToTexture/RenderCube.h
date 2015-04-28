@@ -21,41 +21,33 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef ALPHAMAPPINGEXAMPLE_H
-#define ALPHAMAPPINGEXAMPLE_H
+#ifndef RENDER_CUBE_H
+#define RENDER_CUBE_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSimulator.h"
-#include "smCore/smStaticSceneObject.h"
-#include "smCore/smSceneObject.h"
-#include "smSimulators/smDummySimulator.h"
-#include "smExternalDevices/smPhantomInterface.h"
-#include "smUtilities/smMotionTransformer.h"
-#include "smShader/metalShader.h"
+#include "smCore/smSDK.h"
 
-
-class AlphaMapExample: public smSimulationMain, public smCoreClass
+class RenderCube
+    : public smSimulationMain,
+      public smCoreClass,
+      public smEventHandler
 {
-
 public:
-    smStaticSceneObject  *object1;
+    RenderCube();
+    ~RenderCube();
+    void simulateMain(smSimulationMainParam p_param);
+    void handleEvent(smEvent *p_event);
+private:
     smSDK* simmedtkSDK;
     smScene *scene1;
-    smViewer *viewer;
+    smScene *scene2;
+    smStaticSceneObject cube;
+    smStaticSceneObject square;
+    smViewer viewer;
 
-    smPhantomInterface* hapticInterface;
-    smHapticCameraTrans *motionTrans;
-
-    AlphaMapExample();
-    void initHapticCamMotion();
-
-    virtual void simulateMain(smSimulationMainParam p_param)
-    {
-    }
-    void draw(const smDrawParam &p_params);
-    ~AlphaMapExample();
+    void setupLights();
+    void setupCamera();
 };
+
+void runRenderCube();
 
 #endif

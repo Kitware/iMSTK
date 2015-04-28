@@ -42,7 +42,6 @@
 #include "smSimulators/smFemSceneObject.h"
 #include "smUtilities/smDataStructures.h"
 #include "smSimulators/smStylusObject.h"
-#include "smRendering/smLight.h"
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
 #include "smRendering/smCamera.h"
@@ -98,78 +97,32 @@ class smViewer : public smModule, public smEventHandler
 {
 protected:
     std::vector<smCoreClass*> objectList;
-    smIndiceArray<smLight*> *lights;
     std::vector<smRenderOperation> renderOperations;
     std::vector<smFboListItem> fboListItems;
 
-    ///Vertex Buffer objects
-    smVBO *vboDynamicObject;
-    smVBO * vboStaticObject;
-    smShader shader;
-    smShader shader1;
-    GLuint paramColor;
     smErrorLog *log;
-
-    //virtual void drawSurfaceMeshTriangles(smSurfaceMesh *p_surfaceMesh,smRenderDetail *renderDetail);
-    virtual void drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail);
-    virtual void drawSMStaticObject(smStaticSceneObject *p_smPhsyObject);
-    virtual void drawSurfaceMeshTrianglesVBO(smSurfaceMesh *p_surfaceMesh,
-            smRenderDetail *renderDetail,
-            smInt p_objectId,
-            smVBOType p_VBOType);
-    void drawSMDeformableObject(smPBDSurfaceSceneObject *p_smPhsyObject);
-    void drawFemObject(smFemSceneObject *p_smFEM);
-    void drawNormals(smMesh *p_mesh);
-    friend class smSDK;
-    smMatrix44f shadowMatrix;
-    smColor shadowColor;
-
-    ///Frame Buffer for Shadow rendering
-    smFrameBuffer *fbo;
-    smFrameBuffer *backfbo;
-    smFrameBuffer *frontfbo;
-
-    ///Shadow Shader
-    smShader *shadow;
-    smGLInt shadowMapUniform;
-    void drawSmLight(smLight *light);
     smInt unlimitedFPSVariableChanged;
     smBool unlimitedFPSEnabled;
     smInt screenResolutionWidth;
     smInt screenResolutionHeight;
+    friend class smSDK;
 
 public:
     smRenderingStageType renderStage;
 
     std::unique_ptr<sf::Context> sfmlContext;
     std::unique_ptr<sf::Window> sfmlWindow;
-    smCamera camera;
-
-    smInt height(void);
-    smInt width(void);
-    smFloat aspectRatio(void);
 
     ///if the camera motion is enabled from other external devices
     smBool enableCameraMotion;
 
-    //it is public for now
     smOpenGLWindowStream *windowOutput;
     /// \brief Viewer settings
     smUInt viewerRenderDetail;
-    /// \brief enable console display
-    smBool consoleDisplay;
-    /// \brief camera collision enabled/disabled
-    bool isCameraCollided;
-    /// \brief addlight
-    smInt addLight(smLight *p_light);
-    /// \brief set light given with light ID
-    smBool setLight(smInt lightId, smLight *p_light);
-    /// \brief refresh lights. updates light  position based on the gl matrix
-    void refreshLights();
-    /// \brief update light information
-    smBool updateLight(smInt p_lightId, smLight *p_light);
-    void setLightPos(smInt p_lightId, smLightPos p_pos);
-    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
+
+    smInt height(void);
+    smInt width(void);
+    smFloat aspectRatio(void);
     /// \brief disable vSync
     void setUnlimitedFPS(smBool p_enableFPS);
     /// \brief default constructor
@@ -211,27 +164,16 @@ public:
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
-    /// \brief if you want to put offset in camera movement. The following is the properties
-    smDouble offsetAngle_Direction;
-    smDouble offsetAngle_UpDirection;
-    smDouble offsetAngle_rightDirection;
-    smVec3d finalDeviceCameraDir;
-    smVec3d finalDeviceUpCameraDir;
-    smVec3d finalDeviceRightCameraDir;
 
 protected:
     /// \brief Initializes OpenGL capabilities and flags
     void initGLCaps();
-    /// \brief Initializes lights for rendering
-    void initLights();
     /// \brief Initializes the internal objectList
     void initObjects(smDrawParam p_param);
     /// \brief Initializes FBOs, textures, shaders and VAOs
     void initResources(smDrawParam p_param);
     /// \brief Initializes scenes in the sceneList
     void initScenes(smDrawParam p_param);
-    /// \brief Initializes the viewer's camera
-    void initCamera();
     /// \brief Initilizes the OpenGL context, and window containing it
     void initGLContext();
     /// \brief Cleans up after initGLContext()
@@ -256,58 +198,25 @@ protected:
     void initDepthBuffer();
     /// \brief Set the color and other viewer defaults
     void setToDefaults();
-    /// \brief Texture for shadow mapping
-    smGLUInt shadowMapTexture;
     /// \brief called in the beginning of each frame
     virtual void beginFrame();
     /// \brief called in the end of each frame
     virtual void endFrame();
     /// \brief draw routines
+    virtual void draw(const smDrawParam &){};
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();
-    /// \brief draw with shadows enabled
-    void drawWithShadows(smDrawParam &p_param);
     /// \brief render depth texture for debugging
     void renderTextureOnView();
-    /// \brief draw console. legacy code
-    void drawConsole();
     /// \brief  event handler
     void handleEvent(smEvent *p_event);
     /// \brief processes an SFML event
     void processSFMLEvents(const sf::Event& p_event);
-    /// \brief  enable attached lights
-    void enableLights();
     /// \brief  scale for light drawing in the scene.
     smFloat lightDrawScale;
-    //delete this..this is for demo..
-    smVec3f hapticPosition;
-    smVec3f  hapticForce;
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
-
-public:
-    /// \brief device camera position. This is used for manipulation of the camera with haptic device
-    smVec3f deviceCameraPos;
-    smVec3f deviceCameraDir;
-    smVec3f deviceCameraUpDir;
-    /// \brief  check if the camera is collided or not
-    smBool  checkCameraCollisionWithScene();
-    void addCollisionCheckMeshes(smMesh *mesh);
-    /// \brief  stores the  meshes that the collision check  will be performed with camera.
-    std::vector<smMesh*> collisionMeshes;
-    /// \brief  camera effective radius
-    smFloat cameraRadius;
-    /// \brief   previous state is collided.internal use
-    smBool prevState_collided;
-    /// \brief  last camera position
-    smVec3f lastCamPos;
-    /// \brief   check camera is collided
-    smBool checkCameraCollision;
-    /// \brief  camera collision callback
-    smCameraCollisionInterface *notes_cameraCollision;
-    /// \brief   for dynamic reflection
-    smMetalShader *renderandreflection;
 };
 
 #endif

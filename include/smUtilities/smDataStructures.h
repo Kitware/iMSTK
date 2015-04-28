@@ -68,7 +68,7 @@ public:
     /// \brief for iterative access
     friend smIndiceArrayIter<T>;
     /// \brief print the elements
-    inline void print();
+    inline void print() const;
     /// \brief operators
     inline T& operator[](smInt p_index);
 
@@ -133,7 +133,8 @@ struct smHashIterator
     smInt tableIndex;
     smInt currentIndex;
 
-    friend std::ostream &operator<<(std::ostream &out, smHashIterator<T> &p);
+    template <class K>
+    friend std::ostream &operator<<(std::ostream &out, smHashIterator<K> &p);
 };
 /// \brief hash return codes
 enum SIMMEDTK_HASHRETURN_CODES
@@ -227,7 +228,7 @@ public:
     /// \brief  zero all the entries
     inline void zeroed();
     /// \brief  print all the elements
-    void print();
+    void print() const;
 };
 
 #include "smUtilities/smDataStructures.hpp"
