@@ -25,7 +25,7 @@
 #include "smEvent/smEventHandler.h"
 
 smCoreClass::smCoreClass() :
-    name(""), listening(false), eventIndex(-1)
+    name(""), listening(false)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId = New<smUnifiedId>();
@@ -33,7 +33,7 @@ smCoreClass::smCoreClass() :
 }
 
 smCoreClass::smCoreClass(const std::string &_name) :
-    name(_name), listening(false), eventIndex(-1)
+    name(_name), listening(false)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId = New<smUnifiedId>();

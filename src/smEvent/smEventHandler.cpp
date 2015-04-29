@@ -29,16 +29,16 @@
 namespace smtk {
 namespace Event {
 
-size_t smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr< smCoreClass > component)
+void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
 {
     std::function<void(std::shared_ptr<smEvent>)> fn = std::bind(&smCoreClass::handleEvent,component,std::placeholders::_1);
-    size_t index = this->registerEvent(eventType, fn);
-    component->setEventIndex(index);
-    return index;
+    FunctionContainerType::iterator index = this->registerEvent(eventType, fn);
+    component->setEventIndex(eventType,index);
 }
-void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr< smCoreClass > component)
+void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
 {
-    this->unregisterEvent(eventType, component);
+    auto index = component->getEventIndex(eventType);
+    this->unregisterEvent(eventType,index);
 }
 
 } // Event namespace

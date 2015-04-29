@@ -23,15 +23,16 @@
  * //---------------------------------------------------------------------------
  */
 
-#ifndef SMEVENTHANDLER2_H
-#define SMEVENTHANDLER2_H
+#ifndef SMEVENTHANDLER_H
+#define SMEVENTHANDLER_H
 
 // STL includes
 #include <functional>
 #include <map>
 #include <memory>
 #include <utility>
-#include <vector>
+#include <list>
+#include <utility>
 
 // SimMedTK includes
 #include "smEvent/smEvent.h"
@@ -55,6 +56,10 @@ namespace Event {
 class smEventHandler
 {
 public:
+    using FunctionType = std::function<void ( std::shared_ptr<smEvent> )>;
+    using FunctionContainerType = std::list<FunctionType>;
+
+public:
     ///
     /// @brief Register event and function eventhandler
     /// @param eventName The event name
@@ -62,10 +67,11 @@ public:
     /// @return index of the registered event
     ///
     template <typename EventMethodType>
-    inline size_t registerEvent ( const EventType& eventName, EventMethodType&& observer )
+    inline FunctionContainerType::iterator
+    registerEvent ( const EventType& eventName, EventMethodType&& observer )
     {
-        observers[eventName].emplace_back ( std::forward<EventMethodType> ( observer ) );
-        return observers[eventName].size()-1;
+        observers[eventName].emplace_front( std::forward<EventMethodType> ( observer ) );
+        return std::begin(observers[eventName]);
     }
 
     ///
@@ -74,24 +80,15 @@ public:
     /// @param component Observer component to be unregistered, this commponent holds the key
     ///  to unregister.
     ///
-    template <typename ComponentType>
-    inline void unregisterEvent ( const EventType& eventName, const ComponentType& component )
+    inline void unregisterEvent( const EventType& eventName, FunctionContainerType::iterator iterator )
     {
         auto i = observers.find ( eventName );
-        if ( i == observers.end() ) {
+        if ( i == std::end(observers) || observers[eventName].size() == 0)
+        {
             return;
         }
 
-        // TODO: Implement a more robust un-register based on ComponentType::handleEvent()
-        // Something like:
-        //  auto functionHandle = i->second.find(ComponentType::handleEvent);
-        //  if (functionHandle != i->second.end())
-        //      i->second.erase(functionHandle)
-        // In order for this to work one will have to pass the handleEvent function directly
-        // in attachEvent.
-        //
-        auto begin = i->second.begin();
-        i->second.erase ( begin+component->getEventIndex() );
+        i->second.erase ( iterator );
     }
 
     ///
@@ -116,7 +113,7 @@ public:
     /// @param eventType Event name
     /// @param component Listener (or observer) of triggered events to attach
     ///
-    size_t attachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+    void attachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
 
     ///
     /// @brief Helper function to facilitate detachment of events.
@@ -126,8 +123,8 @@ public:
     void detachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
 
 private:
-    std::map<EventType, std::vector<std::function<void ( std::shared_ptr<smEvent> ) >>> observers; // Container of events
-                                                                                                    // to be triggered
+    std::map<EventType, FunctionContainerType> observers; // Container of events
+                                                          // to be triggered
 };
 
 } // Event namespace

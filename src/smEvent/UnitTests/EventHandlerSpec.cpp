@@ -28,12 +28,13 @@
 using namespace bandit;
 
 go_bandit([](){
+
     describe("Event handler", []() {
         it("constructs ", []() {
-            std::unique_ptr<smEventHandler2> smEventHandler(make_unique<smEventHandler2>());
+            std::unique_ptr<smEventHandler> smEventHandler(make_unique<smEventHandler2>());
         });
         it("registers events ", []() {
-            std::unique_ptr<smEventHandler2> smEventHandler(make_unique<smEventHandler2>());
+            std::unique_ptr<smEventHandler> smEventHandler(make_unique<smEventHandler2>());
 
             smEventHandler->attachEvent()
             std::shared_ptr<smModelRepresentation> modelA = std::make_shared<smMeshCollisionModel>();

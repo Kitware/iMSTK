@@ -28,23 +28,18 @@
 #include <memory>
 #include <atomic>
 #include <iostream>
+#include <map>
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smUnifiedId.h"
 #include "smRendering/smConfigRendering.h"
+#include "smEvent/smEventHandler.h"
 
 class smSDK;
 class smCoreClass;
 class smObjectSimulator;
 class smViewer;
-
-namespace smtk {
-namespace Event {
-class smEvent;
-class smEventHandler;
-}
-}
 
 /// \brief  viewer sends this to all objects to be rendered
 struct smDrawParam
@@ -186,12 +181,15 @@ public:
     /// \brief Event index used by the event handler to unregister event observers
     /// \return eventIndex
     ///
-    const int &getEventIndex() { return eventIndex; }
+    const smtk::Event::smEventHandler::FunctionContainerType::iterator
+    &getEventIndex(smtk::Event::EventType eventType) const
+    { return eventIndexMap.at(eventType); }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void setEventIndex(int index) { eventIndex = index; }
+    void setEventIndex(smtk::Event::EventType eventType, smtk::Event::smEventHandler::FunctionContainerType::iterator index)
+    { eventIndexMap[eventType] = index; }
 
     ///
     /// \brief Set the order on which the objects are painted.
@@ -223,7 +221,9 @@ protected:
     smClassType type;                   // class type
     smString name;                      // name of the class
     bool listening;                     // parameter to determine if this object
-    int eventIndex;                     // event index used to unregister observer events
+    std::map<
+    smtk::Event::EventType,
+    smtk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
 
 private:
