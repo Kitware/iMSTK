@@ -36,7 +36,7 @@
 
 /// \brief !!
 template<typename CellType>
-class smSurfaceTree
+class smSurfaceTree : public smCoreClass
 {
 protected:
   typedef smMatrix44d MatrixType;
@@ -96,7 +96,7 @@ public:
     virtual void draw(const smDrawParam &params);
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !! smSurfaceTree structure
     void updateStructure();

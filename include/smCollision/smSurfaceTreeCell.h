@@ -41,7 +41,7 @@ public:
     /// \brief constructor
     smSurfaceTreeCell()
     {
-        isEmpty = true;
+        empty = true;
         isLeaf = false;
         level = 0;
     }
@@ -125,14 +125,14 @@ public:
         return derived()->addTriangleData(aabb,index);
     }
 
-    inline const bool &getIsEmpty() const
+    inline const bool &isEmpty() const
     {
-        return isEmpty;
+        return empty;
     }
 
-    inline void setIsEmpty(const bool &empty)
+    inline void setIsEmpty(const bool &isEmpty)
     {
-        isEmpty = empty;
+        empty = isEmpty;
     }
 
     inline const bool &getIsLeaf() const
@@ -190,6 +190,11 @@ public:
         weights.emplace_back(w);
     }
 
+    inline const float &getWeight(const int &w) const
+    {
+        return weights.at(w);
+    }
+
     inline std::shared_ptr<Derived> getChildNode(size_t i)
     {
         return derived()->getChildNode(i);
@@ -211,7 +216,7 @@ public:
     }
 
 private:
-    bool isEmpty; ///< !!
+    bool empty; ///< !!
     bool isLeaf; ///< !!
     int level; ///< level in the tree
     std::vector<float> weights; ///< !!

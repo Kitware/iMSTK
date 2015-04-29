@@ -99,7 +99,7 @@ public:
     friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///< !!
 
     /// \brief handle events related to phantom omni
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 
     /// \brief initialize (nothing happens)
     void init();

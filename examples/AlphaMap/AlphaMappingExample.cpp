@@ -84,13 +84,13 @@ AlphaMapExample::AlphaMapExample()
     metalShader->attachTexture(object1->mesh->getUniqueId(), "noOCC", "OCCTex");
     metalShader->attachTexture(object1->mesh->getUniqueId(), "alpha", "AlphaTex");
 
-    object1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES |
+    object1->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES |
                                         SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_TRANSPARENT);
-    object1getRenderDetail()->addShader(metalShader->getUniqueId());
+    object1->getRenderDetail()->addShader(metalShader->getUniqueId());
     object1->mesh->translate(0, 10, -110);
     object1->mesh->scale(smVec3d(5, 5, 5));
-    object1getRenderDetail()->lineSize = 2;
-    object1getRenderDetail()->pointSize = 5;
+    object1->getRenderDetail()->lineSize = 2;
+    object1->getRenderDetail()->pointSize = 5;
 
     /// add object to the scene
     scene1->addSceneObject(object1);

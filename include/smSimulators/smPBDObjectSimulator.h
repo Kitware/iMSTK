@@ -54,7 +54,7 @@ protected:
     void syncBuffers();
 
     /// \brief handle key presses and other user events
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief render the PBD objects
     void draw(const smDrawParam &p_params);

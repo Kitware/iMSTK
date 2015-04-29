@@ -97,7 +97,7 @@ public:
     void run();
 
     /// \brief handle event related to NIUSB6008 device
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override
     {
     };
 

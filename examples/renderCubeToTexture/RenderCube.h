@@ -34,7 +34,7 @@ public:
     RenderCube();
     ~RenderCube();
     void simulateMain(smSimulationMainParam p_param);
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 private:
     std::unique_ptr<smSDK> sdk;
     smScene *scene1;

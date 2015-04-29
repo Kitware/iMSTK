@@ -139,7 +139,7 @@ public:
     virtual void draw(const smDrawParam &p_params);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) {}
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) override {}
 
 protected:
     /// \brief  fonts
@@ -170,7 +170,7 @@ public:
     /// \brief  draw console
     virtual void draw(const smDrawParam &p_params);
     /// \brief  handle events
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
 protected:
     /// \brief entered string on the console

@@ -114,7 +114,7 @@ public:
     void checkCollision();
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 };
 
 #endif

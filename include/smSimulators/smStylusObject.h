@@ -109,7 +109,7 @@ public:
     virtual void init();
 
     /// \brief handle the events such as button presses related to stylus
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
 public:
     smVec3d pos; // position of stylus
@@ -160,7 +160,7 @@ public:
     /// \brief !!
     smMeshContainer *getMeshContainer(smString p_string) const;
 
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !!
     std::shared_ptr<smSceneObject> clone();

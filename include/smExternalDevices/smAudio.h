@@ -167,7 +167,7 @@ public:
     }
 
     /// \brief gather input events and change states and volume if needed
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override
     {
         if(!this->isListening())
         {

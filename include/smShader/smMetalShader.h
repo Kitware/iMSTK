@@ -61,7 +61,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh);
 
     /// \brief handle keyboard event
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief any disable and enable shader options need to be here
     virtual void switchEnable();

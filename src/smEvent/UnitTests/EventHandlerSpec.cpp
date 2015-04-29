@@ -43,7 +43,7 @@ struct MyTestClass : public smCoreClass
 
     MyTestClass(smtk::Event::EventType _eventType) : success(false), eventType(_eventType) {}
 
-    void handleEvent(std::shared_ptr<smEvent> /*e*/)
+    void handleEvent(std::shared_ptr<smEvent> /*e*/) override
     {
 //         std::cout << int(eventType) << std::endl;
         success = true;

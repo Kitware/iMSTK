@@ -106,7 +106,7 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
 /// \brief Initialize the drawing structures
 template<typename CellType>
-void smSurfaceTree<CellType>::initDraw(const smDrawParam &param)
+void smSurfaceTree<CellType>::initDraw(const smDrawParam &/*param*/)
 {
 //     smViewer *viewer;
 //     viewer = param.rendererObject;
@@ -135,7 +135,7 @@ void smSurfaceTree<CellType>::draw(const smDrawParam &params)
             center = treeAllLevels[i].getCenter();
             length = treeAllLevels[i].getLength();
 
-            if (!treeAllLevels[i].getIsEmpty())
+            if (!treeAllLevels[i].isEmpty())
             {
                 glPushMatrix();
                 glColor3fv(smColor::colorPink.toGLColor());
@@ -372,7 +372,7 @@ void smSurfaceTree<CellType>::updateStructure()
         {
             for(auto &i : current->getVerticesIndices())
             {
-                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeighs(counter);
+                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeight(counter);
                 counter++;
             }
 
@@ -395,7 +395,7 @@ void smSurfaceTree<CellType>::translateRot()
         current = &treeAllLevels[i];
         initial = &initialTreeAllLevels[i];
 
-        if (!current->getIsEmpty())
+        if (!current->isEmpty())
         {
             current->getCube().center = this->transRot.block(0,0,3,3) * initial->getCube().center + this->transRot.col(3).head(3);
         }

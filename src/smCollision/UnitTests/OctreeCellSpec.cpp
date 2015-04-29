@@ -44,7 +44,7 @@ go_bandit([](){
 
         it("initializes properly", [&]() {
           AssertThat(numberOfSubdivisions, Equals(8));
-          AssertThat(treeCell.getIsEmpty(), IsTrue());
+          AssertThat(treeCell.isEmpty(), IsTrue());
           AssertThat(treeCell.getLevel(), Equals(0));
         });
 

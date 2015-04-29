@@ -54,7 +54,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> /*mesh*/){};
 
     /// \brief handle the events
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
 public:
     /// \brief depth  texture GL id that is sent to shader. It stores scene depth values

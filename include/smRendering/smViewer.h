@@ -216,7 +216,7 @@ protected:
     /// \brief render depth texture for debugging
     void renderTextureOnView();
     /// \brief  event handler
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
     /// \brief  launches the the viewer. don't call sdk will call this
     virtual void exec();
 };

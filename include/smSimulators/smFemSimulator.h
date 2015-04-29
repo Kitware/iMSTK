@@ -67,7 +67,7 @@ protected:
     void syncBuffers();
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

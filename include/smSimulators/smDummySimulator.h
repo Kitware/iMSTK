@@ -54,7 +54,7 @@ protected:
     void syncBuffers();
 
     /// \brief catch events such as key presses and other user inputs
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

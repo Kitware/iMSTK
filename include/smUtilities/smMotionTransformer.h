@@ -95,7 +95,7 @@ class smHapticCameraTrans: public smHapticTrans
 public:
     smHapticCameraTrans(const size_t &p_deviceID = size_t()); // constructor gets device id
 
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);// event handler
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;// event handler
 
 protected:
     smQuaterniond quat; // quaternion
@@ -119,7 +119,7 @@ public:
     smHapticLightTrans(const size_t &p_id = size_t());
 
     /// \brief handled event
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

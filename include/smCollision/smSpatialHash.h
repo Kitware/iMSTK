@@ -114,22 +114,7 @@ public:
 
     void draw(const smDrawParam &p_params);
 
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
-    {
-        if(!this->isListening())
-        {
-            return;
-        }
-        auto keyBoardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
-        if(/*this->isListening && */(keyBoardEvent != nullptr))
-        {
-            if(keyBoardEvent->getKeyPressed() == smtk::Event::smKey::D && keyBoardEvent->getPressed())
-            {
-                smDrawParam p_params;
-                this->draw(p_params);
-            }
-        }
-    }
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 
 protected:
     /// \brief adds triangle to hash
