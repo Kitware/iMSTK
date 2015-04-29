@@ -30,3 +30,7 @@ target_link_libraries(smEvent
   PRIVATE
     smCore
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

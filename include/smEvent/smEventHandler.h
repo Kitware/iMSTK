@@ -32,7 +32,7 @@
 #include <memory>
 #include <utility>
 #include <list>
-#include <utility>
+#include <algorithm>
 
 // SimMedTK includes
 #include "smEvent/smEvent.h"
@@ -60,6 +60,11 @@ public:
     using FunctionContainerType = std::list<FunctionType>;
 
 public:
+    ///
+    /// @brief Construct and initilize map
+    ///
+    smEventHandler() : observers() {}
+
     ///
     /// @brief Register event and function eventhandler
     /// @param eventName The event name
@@ -97,7 +102,8 @@ public:
     ///
     /// @tparam EventObserverType The event that trigges evaluation, child class of smEvent.
     ///
-    /// @Note If EventType::EventName is not a key in the event map, then an insertion is automatically performed.
+    /// @Note If EventType::EventName is not a key in the event map, then an insertion is
+    ///     automatically performed.
     ///
     template<typename EventObserverType>
     inline void triggerEvent ( std::shared_ptr<EventObserverType> event )
@@ -121,6 +127,20 @@ public:
     /// @param component Listener (or observer) of triggered events to detach
     ///
     void detachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+
+    ///
+    /// @brief Verify if the event has been stored.
+    /// @param eventType Event name
+    /// @param component Listener (or observer) of triggered events to detach
+    ///
+    bool isAttached( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+
+    ///
+    /// @brief Verify if the event has been stored.
+    /// @param eventType Event name
+    /// @param index the index of the function to query
+    ///
+    bool isAttached( const EventType& eventType, FunctionContainerType::iterator index );
 
 private:
     std::map<EventType, FunctionContainerType> observers; // Container of events

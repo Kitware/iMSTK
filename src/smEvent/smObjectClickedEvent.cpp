@@ -30,7 +30,7 @@ namespace Event {
 
 constexpr EventType smObjectClickedEvent::EventName;
 
-smObjectClickedEvent::smObjectClickedEvent(const int& objectId): id(objectId)
+smObjectClickedEvent::smObjectClickedEvent(const size_t& objectId): id(objectId)
 {}
 void smObjectClickedEvent::setWindowCoord(const smVec3d& coordinates)
 {

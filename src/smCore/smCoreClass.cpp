@@ -28,16 +28,16 @@ smCoreClass::smCoreClass() :
     name(""), listening(false)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
-    uniqueId = New<smUnifiedId>();
-    eventHandler = New<smtk::Event::smEventHandler>();
+    uniqueId = std::make_shared<smUnifiedId>();
+    eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 smCoreClass::smCoreClass(const std::string &_name) :
     name(_name), listening(false)
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
-    uniqueId = New<smUnifiedId>();
-    eventHandler = New<smtk::Event::smEventHandler>();
+    uniqueId = std::make_shared<smUnifiedId>();
+    eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 const smClassType &smCoreClass::getType() const
@@ -70,9 +70,12 @@ void smCoreClass::print() const
 {
     std::cout << "Default print" << std::endl;
 }
-void smCoreClass::handleEvent(std::shared_ptr< smtk::Event::smEvent >)
+void smCoreClass::handleEvent(std::shared_ptr< smtk::Event::smEvent > event)
 {
     std::cout << "Default handleEvent" << std::endl;
+    std::cout << "Sender " << int(event->getSender()) << std::endl;
+    std::cout << "Priority " << int(event->getPriority()) << std::endl;
+    std::cout << "Type " << int(smtk::Event::smEvent::EventName) << std::endl;
 }
 
 void smCoreClass::setName( const std::string &p_objectName )

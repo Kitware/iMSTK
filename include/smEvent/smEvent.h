@@ -26,6 +26,9 @@
 #ifndef SMEVENT_H
 #define SMEVENT_H
 
+// STL includes
+#include <memory>
+
 namespace smtk {
 namespace Event {
 
@@ -73,9 +76,14 @@ enum class EventSender
 class smEvent
 {
 public:
+    using Pointer = std::shared_ptr<smEvent>;
+
+public:
     static constexpr EventType EventName = EventType::None;
 
 public:
+    smEvent();
+
     void setPriority(const EventPriority &eventPriority);
 
     const EventPriority &getPriority();

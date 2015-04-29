@@ -31,14 +31,46 @@ namespace Event {
 
 void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
 {
-    std::function<void(std::shared_ptr<smEvent>)> fn = std::bind(&smCoreClass::handleEvent,component,std::placeholders::_1);
+    // Bind handleEvent to a void(std::shared_ptr<smEvent>) function
+    std::function<void(std::shared_ptr<smEvent>)>
+    fn = std::bind(&smCoreClass::handleEvent,component,std::placeholders::_1);
+
+    // Register the function and return index
     FunctionContainerType::iterator index = this->registerEvent(eventType, fn);
+
+    // Add index to the component observer
     component->setEventIndex(eventType,index);
 }
 void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
     this->unregisterEvent(eventType,index);
+    component->removeEventIndex(eventType);
+}
+bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr< smCoreClass > component)
+{
+    auto index = component->getEventIndex(eventType);
+
+    return this->isAttached(eventType,index);
+}
+bool smEventHandler::isAttached(const EventType& eventType, std::list< smEventHandler::FunctionType >::iterator index)
+{
+    auto i = observers.find(eventType);
+
+    if(i == std::end(observers) || observers[eventType].size() == 0)
+    {
+        return false;
+    }
+
+    for(auto fn = std::begin(i->second); fn != std::end(i->second); ++fn)
+    {
+        if(fn == index)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 } // Event namespace

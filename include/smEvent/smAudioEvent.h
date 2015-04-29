@@ -43,7 +43,7 @@ enum class AudioState
     PlayContinuous
 };
 
-class smAudioEvent
+class smAudioEvent: public smEvent
 {
 public:
     static constexpr EventType EventName = EventType::Audio;

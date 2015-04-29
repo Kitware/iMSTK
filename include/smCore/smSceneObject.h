@@ -67,7 +67,7 @@ public:
     /// \brief get unified object id
     smUnifiedId::Pointer getObjectUnifiedID()
     {
-        return New<smUnifiedId>();
+        return std::make_shared<smUnifiedId>();
     }
 
     /// \brief attach simulator to the object. This function that needs to be called to associate the simulator to the object

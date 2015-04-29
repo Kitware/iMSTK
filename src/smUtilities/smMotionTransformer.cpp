@@ -90,7 +90,7 @@ void smHapticCameraTrans::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_ev
     auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == deviceId)
     {
-        auto cameraEvent = New<smtk::Event::smCameraEvent>();
+        auto cameraEvent = std::make_shared<smtk::Event::smCameraEvent>();
         cameraEvent->setPosition(motionScale*hapticEvent->getPosition());
 
         smMatrix33d transformMatrix = hapticEvent->getTransform().block<3,3>(0,0);
@@ -133,7 +133,7 @@ void smHapticLightTrans::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_eve
     auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == deviceId)
     {
-        auto motionEvent = New<smtk::Event::smLightMotionEvent>(lightIndex);
+        auto motionEvent = std::make_shared<smtk::Event::smLightMotionEvent>(lightIndex);
         motionEvent->setPosition(motionScale*hapticEvent->getPosition());
 
         auto transformMatrix = hapticEvent->getTransform().block<3,3>(0,0);

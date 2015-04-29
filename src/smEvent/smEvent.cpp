@@ -30,6 +30,8 @@ namespace Event {
 
 constexpr EventType smEvent::EventName;
 
+smEvent::smEvent(): priority(EventPriority::Normal), sender(EventSender::Other), enabled(true) {}
+
 void smEvent::setPriority(const EventPriority& eventPriority)
 {
     this->priority = eventPriority;

@@ -39,14 +39,14 @@ public:
     static constexpr EventType EventName = EventType::ObjectClicked;
 
 public:
-    smObjectClickedEvent(const int &objectId);
+    smObjectClickedEvent(const size_t &objectId);
 
     void setWindowCoord(const smVec3d &coordinates);
 
     const smVec3d &getWindowCoord();
 
 private:
-    int id; // object id
+    size_t id; // object id
     smVec3d coord; // position
 };
 

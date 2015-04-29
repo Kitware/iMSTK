@@ -79,6 +79,8 @@ public:
 /// \brief core base class of all objects in framework
 class smCoreClass : public std::enable_shared_from_this<smCoreClass>
 {
+public:
+    using Pointer = std::shared_ptr<smCoreClass>;
 
 public:
     ///
@@ -182,14 +184,20 @@ public:
     /// \return eventIndex
     ///
     const smtk::Event::smEventHandler::FunctionContainerType::iterator
-    &getEventIndex(smtk::Event::EventType eventType) const
+    &getEventIndex(const smtk::Event::EventType &eventType) const
     { return eventIndexMap.at(eventType); }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void setEventIndex(smtk::Event::EventType eventType, smtk::Event::smEventHandler::FunctionContainerType::iterator index)
+    void setEventIndex(const smtk::Event::EventType &eventType, smtk::Event::smEventHandler::FunctionContainerType::iterator index)
     { eventIndexMap[eventType] = index; }
+
+    ///
+    /// \brief Set event index used by the event handler to unregister event observers
+    ///
+    void removeEventIndex(const smtk::Event::EventType &eventType)
+    { eventIndexMap.erase(eventType); }
 
     ///
     /// \brief Set the order on which the objects are painted.

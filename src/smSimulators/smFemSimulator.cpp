@@ -140,7 +140,7 @@ void smFemSimulator::run()
 
             if ( i == 0 )
             {
-                auto hapticEvent = New<smtk::Event::smHapticEvent>(1,"Device1");
+                auto hapticEvent = std::make_shared<smtk::Event::smHapticEvent>(1,"Device1");
 
                 if ( nodePicked && dofNumber != 0 )
                 {

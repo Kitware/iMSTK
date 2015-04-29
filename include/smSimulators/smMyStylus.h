@@ -37,7 +37,7 @@ class MyStylus: public smStylusRigidSceneObject
 {
 
 public:
-    smInt phantomID; ///< ID for phantom omni
+    size_t phantomID; ///< ID for phantom omni
     smBool buttonState[2]; ///< state of the buttons
     smFloat angle; ///< angle of the jaw (if applicable)
     smFloat maxangle; ///< maximum angle of the jaw (if applicable)
@@ -60,7 +60,7 @@ class HookCautery: public smStylusRigidSceneObject
 {
 
 public:
-    smInt phantomID; ///< ID of the phantom omni
+    size_t phantomID; ///< ID of the phantom omni
     smBool buttonState[2]; ///< state of the buttons
     smMeshContainer meshContainer; ///< !!
 

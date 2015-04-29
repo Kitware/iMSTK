@@ -55,8 +55,8 @@ public:
 
 private:
     bool pressed; ///< If the key was pressed or released in this event
-    smModKey modKey; ///< Modifier keys.  See smModKey for values
     smKey key; ///< Key that was pressed
+    smModKey modKey; ///< Modifier keys.  See smModKey for values
 };
 
 } // Event namespace
