@@ -214,6 +214,10 @@ public:
     ///
     std::shared_ptr<smRenderDetail> getRenderDetail() {return renderDetail;}
 
+    void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
+    {
+        eventHandler->attachEvent(eventType,component);
+    }
 protected:
     ///
     /// \brief Allows to use the *this* pointer from any child

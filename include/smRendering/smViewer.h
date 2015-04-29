@@ -111,11 +111,6 @@ protected:
 
 public:
 
-    void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
-    {
-        eventHandler->attachEvent(eventType,component);
-    }
-
     static void keyboardEventTrigger(GLFWwindow*, int, int, int, int);
     static void mouseButtonEventTrigger(GLFWwindow*, int, int, int);
     static void mouseMoveEventTrigger(GLFWwindow*, double, double);
