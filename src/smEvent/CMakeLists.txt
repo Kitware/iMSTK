@@ -10,6 +10,7 @@ simmedtk_add_library(smEvent
     smMouseButtonEvent.cpp
     smMouseMoveEvent.cpp
     smObjectClickedEvent.cpp
+    smAudioEvent.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smEvent/smEvent.h
     ${CMAKE_SOURCE_DIR}/include/smEvent/smCameraEvent.h

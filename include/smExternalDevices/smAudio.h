@@ -29,30 +29,9 @@
 #include "smCore/smErrorLog.h"
 #include "audiere.h"
 #include "smCore/smSDK.h"
+#include "smEvent/smAudioEvent.h"
 
 using namespace audiere;
-
-/// \brief contains state of the audio
-enum smAudioState
-{
-    SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS,
-    SIMMEDTK_AUDIOSTATE_PLAY,
-    SIMMEDTK_AUDIOSTATE_STOP
-};
-
-/// \brief contains data for audio rendering
-struct smAudioEventData
-{
-    smString sound;
-    smAudioState state;
-    smFloat volume;
-
-    smAudioEventData()
-    {
-        volume = -1;
-    }
-
-};
 
 /// \brief contains audio query states
 enum smAudioReturnType
@@ -72,8 +51,8 @@ class smAudio: public smCoreClass
 
     smErrorLog *log; ///< log for errors rendering audio
     smString referenceName; ///< !!
-    smAudioState state; ///< state of audio
-    smAudioState prevState; ///< state of audio in previous cycle
+    smtk::Event::AudioState state; ///< state of audio
+    smtk::Event::AudioState prevState; ///< state of audio in previous cycle
     smFloat prevVolume; ///< state of audio volume in previous cycle
 
     smFloat volume; ///< volume (max volume is 1.0)
@@ -93,8 +72,8 @@ public:
         log = p_log;
         continuousPlaying = true;
         referenceName = p_referenceName;
-        prevState = state = SIMMEDTK_AUDIOSTATE_STOP;
-        smSDK::getInstance()->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_AUDIO);
+        prevState = state = smtk::Event::AudioState::Stop;
+        this->eventHandler->registerEvent(smtk::Event::EventType::Audio,shared_from_this());
     }
 
     /// \brief destructor
@@ -121,47 +100,41 @@ public:
 
         switch (state)
         {
-        case SIMMEDTK_AUDIOSTATE_PLAY:
-            if (sound->isPlaying())
+            case smtk::Event::AudioState::Play:
             {
-                if (state ==  SIMMEDTK_AUDIOSTATE_PLAY || state ==  SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS)
+                if (sound->isPlaying())
                 {
+                    if (state ==  smtk::Event::AudioState::Play || state ==  smtk::Event::AudioState::PlayContinuous)
+                    {
+                        return SIMMEDTK_AUDIO_PLAYING;
+                    }
+
+                }
+                else
+                {
+                    sound->setVolume(volume);
+                    sound->play();
                     return SIMMEDTK_AUDIO_PLAYING;
                 }
-
-            }
-            else
-            {
-                sound->setVolume(volume);
-                sound->play();
-                return SIMMEDTK_AUDIO_PLAYING;
             }
 
-            break;
-
-        case SIMMEDTK_AUDIOSTATE_STOP:
-            if (state == SIMMEDTK_AUDIOSTATE_STOP && prevState == SIMMEDTK_AUDIOSTATE_STOP)
+            case smtk::Event::AudioState::Stop:
             {
+                if (prevState != smtk::Event::AudioState::Stop)
+                {
+                    sound->stop();
+                }
                 return SIMMEDTK_AUDIO_STOPPED;
             }
 
-            if (state == SIMMEDTK_AUDIOSTATE_STOP && prevState != SIMMEDTK_AUDIOSTATE_STOP)
+            case smtk::Event::AudioState::PlayContinuous:
             {
-                sound->stop();
-                return   SIMMEDTK_AUDIO_STOPPED;
+                sound->setRepeat(continuousPlaying);
+                return SIMMEDTK_AUDIO_PLAYING;
             }
-
-
-            break;
-
-        case SIMMEDTK_AUDIOSTATE_PLAYCONTINUOUS:
-            sound->setRepeat(continuousPlaying);
-            return SIMMEDTK_AUDIO_PLAYING;
-            break;
         }
 
         return SIMMEDTK_AUDIO_SOUNDNOOP;
-
     }
 
     /// \brief stop the audio
@@ -177,7 +150,7 @@ public:
     }
 
     /// \brief set the state of audio and continue playing
-    void setState(smAudioState p_state)
+    void setState(smtk::Event::AudioState p_state)
     {
         state = p_state;
         play();
@@ -200,16 +173,15 @@ public:
         {
             return;
         }
-        smAudioEventData *audioEvent;
 
-        if (p_event->eventType == SIMMEDTK_EVENTTYPE_AUDIO)
+        auto audioEvent = std::static_pointer_cast<smtk::Event::smAudioEvent>(event);
+
+        if (audioEvent != nullptr)
         {
-            audioEvent = (smAudioEventData*)p_event->data;
-
-            if (audioEvent->sound == referenceName)
+            if (audioEvent->getSound() == referenceName)
             {
-                setVolume(audioEvent->volume);
-                setState(audioEvent->state);
+                setVolume(audioEvent->getVolume());
+                setState(audioEvent->getState());
             }
         }
     }
