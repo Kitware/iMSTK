@@ -53,7 +53,6 @@
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
-std::shared_ptr<smtk::Event::smEventHandler> smViewer::eventHandler;
 
 void SetVSync(bool sync)
 {

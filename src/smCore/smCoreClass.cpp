@@ -24,6 +24,8 @@
 #include "smCore/smCoreClass.h"
 #include "smEvent/smEventHandler.h"
 
+std::shared_ptr<smtk::Event::smEventHandler> smCoreClass::eventHandler;
+
 smCoreClass::smCoreClass() :
     name(""), listening(false)
 {

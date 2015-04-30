@@ -82,6 +82,8 @@ class smCoreClass : public std::enable_shared_from_this<smCoreClass>
 public:
     using Pointer = std::shared_ptr<smCoreClass>;
 
+    static std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
+
 public:
     ///
     /// \brief Default constructor
@@ -236,7 +238,6 @@ protected:
     std::map<
     smtk::Event::EventType,
     smtk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
-    std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
 
 private:
     std::shared_ptr<smUnifiedId> uniqueId;          // unique Id
