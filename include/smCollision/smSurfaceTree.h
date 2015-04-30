@@ -62,7 +62,7 @@ public:
 
     MatrixType transRot; ///< matrix for translation and rotation
     int maxLevel; ///< max level of the tree
-    CellType root; ///< !!
+    std::shared_ptr<CellType> root; ///< !!
     float shiftScale; ///< !!
 
     std::vector<CellType> initialTreeAllLevels; ///< !!
@@ -74,7 +74,7 @@ public:
 protected:
 
     /// \brief creates the tree based on input triangles
-    bool createTree(CellType &Node,
+    bool createTree(std::shared_ptr<CellType> Node,
                     const std::vector<int> &triangles,
                     int siblingIndex);
 
@@ -96,66 +96,64 @@ public:
     /// \brief rendering the surface tree
     virtual void draw(const smDrawParam &params);
 
-    /// \brief !!
-    void handleEvent(std::shared_ptr<smEvent> p_event);
-
     /// \brief !! smSurfaceTree structure
     void updateStructure();
 
     /// \brief !!
     void translateRot();
 
-    CellType &getRoot()
+    std::shared_ptr<CellType> getRoot()
     {
         return root;
     }
 
-    std::vector<std::pair<CellType,CellType>> getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
+    std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>>
+    getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
     {
-        std::vector<std::pair<CellType,CellType>> intersectingNodes;
+        std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> intersectingNodes;
         getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);
 
         return intersectingNodes;
     }
 
-    void getIntersectingNodes(const CellType &left,
-                              const CellType &right,
-                              std::vector<std::pair<CellType,CellType>> &result )
+    void getIntersectingNodes(const std::shared_ptr<CellType> left,
+                              const std::shared_ptr<CellType> right,
+                              std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
     {
-        if(!smCollisionMoller::checkOverlapAABBAABB(left.getAabb(),right.getAabb()))
+        if(!smCollisionMoller::checkOverlapAABBAABB(left->getAabb(),right->getAabb()))
         {
             return;
         }
 
-        if(left.getIsLeaf() && right.getIsLeaf())
+        if(left->getIsLeaf() && right->getIsLeaf())
         {
             result.emplace_back(left,right);
         }
-        else if(left.getIsLeaf())
+        else if(left->getIsLeaf())
         {
-            for(const auto &child : right.getChildNodes())
+            for(const auto &child : right->getChildNodes())
             {
                 if(!child) continue;
-                getIntersectingNodes(left,*child.get(),result);
+                getIntersectingNodes(left,child,result);
             }
         }
-        else if(right.getIsLeaf())
+        else if(right->getIsLeaf())
         {
-            for(const auto &child : left.getChildNodes())
+            for(const auto &child : left->getChildNodes())
             {
                 if(!child) continue;
-                getIntersectingNodes(*child.get(),right,result);
+                getIntersectingNodes(child,right,result);
             }
         }
         else
         {
-            for(const auto &rightChild : right.getChildNodes())
+            for(const auto &rightChild : right->getChildNodes())
             {
                 if(!rightChild) continue;
-                for(const auto &leftChild : left.getChildNodes())
+                for(const auto &leftChild : left->getChildNodes())
                 {
                     if(!leftChild) continue;
-                    getIntersectingNodes(*leftChild.get(),*rightChild.get(),result);
+                    getIntersectingNodes(leftChild,rightChild,result);
                 }
             }
         }

@@ -87,7 +87,7 @@ public:
     /// \brief this is called by SDK. it lanuches the simulator module
     virtual void exec();
 
-    void addCollisionPair(const std::shared_ptr<smCollisionPair> &pair)
+    void addCollisionPair(std::shared_ptr<smCollisionPair> pair)
     {
         collisionPairs.emplace_back(pair);
     }

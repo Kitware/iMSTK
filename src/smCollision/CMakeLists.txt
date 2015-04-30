@@ -1,7 +1,7 @@
 
 simmedtk_add_library(smCollision
   SOURCES
-    smSpatialHash.cpp
+    smSpatialHashCollision.cpp
     smOctreeCell.cpp
     smCollisionMoller.cpp
     smCollisionUtilities.cpp

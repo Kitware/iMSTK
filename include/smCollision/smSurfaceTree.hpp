@@ -35,23 +35,24 @@
 template <typename CellType>
 void smSurfaceTree<CellType>::initStructure()
 {
-    smVec3f center;
-    float edge;
+    smVec3d center;
+    double edge;
     std::vector<int> triangles;
 
     for (int i = 0; i < mesh->nbrTriangles; ++i)
     {
         triangles.push_back(i);
     }
+    root = std::make_shared<CellType>();
 
     center = mesh->aabb.center();
     edge = SIMMEDTK_MAX(SIMMEDTK_MAX(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
                         mesh->aabb.halfSizeZ());
-    root.setCenter(center);
-    root.setLength(2 * edge);
-    root.setIsEmpty(false);
+    root->setCenter(center);
+    root->setLength(2 * edge);
+    root->setIsEmpty(false);
 
-    treeAllLevels[0] = root;
+    treeAllLevels[0] = *root.get();
     this->createTree(root, triangles, 0);
 	initialTreeAllLevels = treeAllLevels;
 }
@@ -105,7 +106,7 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
 /// \brief Initialize the drawing structures
 template<typename CellType>
-void smSurfaceTree<CellType>::initDraw(const smDrawParam &param)
+void smSurfaceTree<CellType>::initDraw(const smDrawParam &/*param*/)
 {
 //     smViewer *viewer;
 //     viewer = param.rendererObject;
@@ -116,8 +117,8 @@ void smSurfaceTree<CellType>::initDraw(const smDrawParam &param)
 template<typename CellType>
 void smSurfaceTree<CellType>::draw(const smDrawParam &params)
 {
-    smVec3f center;
-    float length;
+    smVec3d center;
+    double length;
     glColor3fv(smColor::colorGreen.toGLColor());
 
     glEnable(GL_LIGHTING);
@@ -125,111 +126,51 @@ void smSurfaceTree<CellType>::draw(const smDrawParam &params)
     glColor3fv(smColor::colorGreen.toGLColor());
     glColor3fv(smColor::colorBlue.toGLColor());
 
-    static int counter = 0;
-    if (renderOnlySurface)
-    {
-        for (int i = levelStartIndex[minTreeRenderLevel][0];
-                i < levelStartIndex[minTreeRenderLevel][1]; ++i)
-        {
-            center = treeAllLevels[i].getCenter();
-            length = treeAllLevels[i].getLength();
+    glPushMatrix();
+    glColor3fv(smColor::colorPink.toGLColor());
 
-            if (!treeAllLevels[i].getIsEmpty())
-            {
-                glPushMatrix();
-                glColor3fv(smColor::colorPink.toGLColor());
-                glTranslatef(center[0], center[1], center[2]);
-                glutSolidSphere(length, 10, 10);
-                glPopMatrix();
-                counter++;
-            }
-        }
-    }
+    this->root->draw();
+
+    glPopMatrix();
+
+//     static int counter = 0;
+//     if (!renderOnlySurface)
+//     {
+//         for (int i = levelStartIndex[minTreeRenderLevel][0];
+//                 i < levelStartIndex[minTreeRenderLevel][1]; ++i)
+//         {
+// //             center = treeAllLevels[i].getCenter();
+// //             length = treeAllLevels[i].getLength();
+//
+//             if (!treeAllLevels[i].getIsEmpty())
+//             {
+//                 glPushMatrix();
+//                 glColor3fv(smColor::colorPink.toGLColor());
+//                 treeAllLevels[i].draw();
+// //                 glTranslatef(center[0], center[1], center[2]);
+// //                 glutSolidSphere(length, 10, 10);
+//                 glPopMatrix();
+//                 counter++;
+//             }
+//         }
+//     }
 
     glPopAttrib();
     glEnable(GL_LIGHTING);
-    params.rendererObject->updateText("octree", "Total Spheres at Level:" + std::to_string(counter));
+//     params.rendererObject->updateText("octree", "Total Spheres at Level:" + std::to_string(counter));
 }
 
-/// \brief handle key press events
-template<typename CellType>
-void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smEvent> p_event)
-{
-    switch(p_event->getEventType().eventTypeCode)
-    {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if(keyBoardData->keyBoardKey == smKey::Add)
-            {
-                minTreeRenderLevel++;
-
-                if(minTreeRenderLevel > maxLevel)
-                {
-                    minTreeRenderLevel = maxLevel;
-                }
-
-                if(minTreeRenderLevel < 0)
-                {
-                    minTreeRenderLevel = 0;
-                }
-
-                currentLevel = minTreeRenderLevel;
-            }
-
-            if(keyBoardData->keyBoardKey == smKey::Subtract)
-            {
-                minTreeRenderLevel--;
-
-                if(minTreeRenderLevel > maxLevel)
-                {
-                    minTreeRenderLevel = maxLevel;
-                }
-
-                if(minTreeRenderLevel < 0)
-                {
-                    minTreeRenderLevel = 0;
-                }
-
-                currentLevel = minTreeRenderLevel;
-            }
-
-            if(keyBoardData->keyBoardKey == smKey::R)
-            {
-                this->renderSurface = !this->renderSurface;
-            }
-
-            if(keyBoardData->keyBoardKey == smKey::P)
-            {
-                this->enableShiftPos = !this->enableShiftPos;
-            }
-
-            if(keyBoardData->keyBoardKey == smKey::K)
-            {
-                this->renderOnlySurface = !this->renderOnlySurface;
-            }
-
-            if(keyBoardData->keyBoardKey == smKey::T)
-            {
-                updateStructure();
-            }
-
-            break;
-        }
-    }
-}
 
 /// \brief create the surface tree
 template<typename CellType>
-bool smSurfaceTree<CellType>::createTree(CellType &Node,
+bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
                                          const std::vector<int> &triangles,
                                          int siblingIndex)
 {
     std::array<CellType, CellType::numberOfSubdivisions> subDividedNodes;
     std::array<std::vector<int>, CellType::numberOfSubdivisions> triangleMatrix;
 
-    int level = Node.getLevel();
+    int level = Node->getLevel();
 
     if(level >= maxLevel)
     {
@@ -238,37 +179,37 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
 
     if (level == maxLevel-1)
     {
-        Node.setIsLeaf(true);
+        Node->setIsLeaf(true);
 
         int nbrTriangles = triangles.size();
-        float totalDistance = 0.0;
+        double totalDistance = 0.0;
 
         for (int i = 0; i < nbrTriangles; ++i)
         {
-            Node.addTriangleData(mesh->triAABBs[triangles[i]],triangles[i]);
-            Node.addVertexIndex(mesh->triangles[triangles[i]].vert[0]);
-            Node.addVertexIndex(mesh->triangles[triangles[i]].vert[1]);
-            Node.addVertexIndex(mesh->triangles[triangles[i]].vert[2]);
+            Node->addTriangleData(mesh->triAABBs[triangles[i]],triangles[i]);
+            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[0]);
+            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[1]);
+            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[2]);
         }
 
-        for(const auto &i : Node.getVerticesIndices())
+        for(const auto &i : Node->getVerticesIndices())
         {
-            totalDistance += (Node.getCenter() - mesh->vertices[i]).norm();
+            totalDistance += (Node->getCenter() - mesh->vertices[i]).norm();
         }
 
         smFloat weightSum = 0;
         smFloat weight;
         smFloat totalDistance2 = totalDistance * totalDistance;
 
-        for(const auto &i : Node.getVerticesIndices())
+        for(const auto &i : Node->getVerticesIndices())
         {
             // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
-            weight = 1-(Node.getCenter()-mesh->vertices[i]).squaredNorm() / totalDistance2;
+            weight = 1-(Node->getCenter()-mesh->vertices[i]).squaredNorm() / totalDistance2;
             weightSum += weight;
-            Node.addWeight(weight);
+            Node->addWeight(weight);
         }
 
-        for(auto &w : Node.getWeights())
+        for(auto &w : Node->getWeights())
         {
             w /= weightSum;
         }
@@ -276,7 +217,7 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
         return true;
     }
 
-    Node.subDivide(2, subDividedNodes);
+    Node->subDivide(2, subDividedNodes);
 
     for (int i = 0; i < CellType::numberOfSubdivisions; ++i)
     {
@@ -308,19 +249,14 @@ bool smSurfaceTree<CellType>::createTree(CellType &Node,
 
         if (triangleMatrix[j].size() > 0)
         {
-            std::shared_ptr<CellType> parentNode = std::make_shared<CellType>();
-            parentNode->copyShape(Node);
-            parentNode->setLevel(level);
             std::shared_ptr<CellType> childNode = std::make_shared<CellType>();
             childNode->copyShape(subDividedNodes[j]);
             childNode->setLevel(level + 1);
-            childNode->setParentNode(parentNode);
-            Node.setChildNode(j,childNode);
+            childNode->setParentNode(Node);
+            Node->setChildNode(j,childNode);
 
-            treeAllLevels[childIndex].copyShape(subDividedNodes[j]);
-            treeAllLevels[childIndex].setLevel(level + 1);
-            treeAllLevels[childIndex].setIsEmpty(false);
-            createTree(treeAllLevels[childIndex], triangleMatrix[j], levelStartIndex[level][0] + offset + j);
+            treeAllLevels[childIndex] = *childNode.get();
+            createTree(childNode, triangleMatrix[j], levelStartIndex[level][0] + offset + j);
         }
 
         triangleMatrix[j].clear();
@@ -360,14 +296,14 @@ void smSurfaceTree<CellType>::updateStructure()
     for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
     {
         current = &treeAllLevels[i];
-        smVec3f tempCenter(0, 0, 0);
+        smVec3d tempCenter(0, 0, 0);
         int counter = 0;
 
-        if (!current->isEmpty())
+        if (!current->getIsEmpty())
         {
             for(auto &i : current->getVerticesIndices())
             {
-                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeighs(counter);
+                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeight(counter);
                 counter++;
             }
 
@@ -390,7 +326,7 @@ void smSurfaceTree<CellType>::translateRot()
         current = &treeAllLevels[i];
         initial = &initialTreeAllLevels[i];
 
-        if (!current->getIsEmpty())
+        if (!current->isEmpty())
         {
             current->getCube().center = this->transRot.block(0,0,3,3) * initial->getCube().center + this->transRot.col(3).head(3);
         }

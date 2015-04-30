@@ -43,14 +43,14 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
     smVec3f contactPoint;
     for(auto & intersection : intersectionNodes)
     {
-        smMeshCollisionModel::AABBNodeType nodeA = intersection.first;
-        smMeshCollisionModel::AABBNodeType nodeB = intersection.second;
+        auto nodeA = intersection.first;
+        auto nodeB = intersection.second;
 
         std::vector<size_t> triangleListA;
         std::vector<size_t> triangleListB;
 
-        nodeA.getIntersections(nodeB.getAabb(), triangleListA);
-        nodeB.getIntersections(nodeA.getAabb(), triangleListB);
+        nodeA->getIntersections(nodeB->getAabb(), triangleListA);
+        nodeB->getIntersections(nodeA->getAabb(), triangleListB);
 
         for(const auto & i : triangleListA)
         {

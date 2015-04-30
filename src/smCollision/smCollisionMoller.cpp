@@ -28,22 +28,22 @@
 #include "smExternal/moller.h"
 #include "smExternal/moller2.h"
 
-smBool smCollisionMoller::tri2tri( smVec3f &tri1Point1,
-                                   smVec3f &tri1Point2,
-                                   smVec3f &tri1Point3,
-                                   smVec3f &tri2Point1,
-                                   smVec3f &tri2Point2,
-                                   smVec3f &tri2Point3,
-                                   float &depth,
-                                   smVec3f &contactPoint,
-                                   smVec3f &normal)
+smBool smCollisionMoller::tri2tri( smVec3d &tri1Point1,
+                                   smVec3d &tri1Point2,
+                                   smVec3d &tri1Point3,
+                                   smVec3d &tri2Point1,
+                                   smVec3d &tri2Point2,
+                                   smVec3d &tri2Point3,
+                                   double &depth,
+                                   smVec3d &contactPoint,
+                                   smVec3d &normal)
 {
     int coplanar;
-    smVec3f intersectionPoint2;
+    smVec3d intersectionPoint2;
     short tri1SinglePointIndex;
     short tri2SinglePointIndex;
-    smVec3f projPoint1;
-    smVec3f projPoint2;
+    smVec3d projPoint1;
+    smVec3d projPoint2;
     if ( tri_tri_intersect_with_isectline_penetrationDepth( tri1Point1.data(),
                                                             tri1Point2.data(),
                                                             tri1Point3.data(),
@@ -66,22 +66,22 @@ smBool smCollisionMoller::tri2tri( smVec3f &tri1Point1,
     return false;
 }
 
-smBool smCollisionMoller::tri2tri( smVec3f &p_tri1Point1,
-                                   smVec3f &p_tri1Point2,
-                                   smVec3f &p_tri1Point3,
-                                   smVec3f &p_tri2Point1,
-                                   smVec3f &p_tri2Point2,
-                                   smVec3f &p_tri2Point3,
+smBool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1,
+                                   smVec3d &p_tri1Point2,
+                                   smVec3d &p_tri1Point3,
+                                   smVec3d &p_tri2Point1,
+                                   smVec3d &p_tri2Point2,
+                                   smVec3d &p_tri2Point3,
                                    smInt &coplanar,
-                                   smVec3f &p_intersectionPoint1,
-                                   smVec3f &p_intersectionPoint2,
+                                   smVec3d &p_intersectionPoint1,
+                                   smVec3d &p_intersectionPoint2,
                                    smShort &p_tri1SinglePointIndex,
                                    smShort &p_tri2SinglePointIndex,
-                                   smVec3f &p_projPoint1,
-                                   smVec3f &p_projPoint2 )
+                                   smVec3d &p_projPoint1,
+                                   smVec3d &p_projPoint2 )
 {
-    float depth;
-    smVec3f normal;
+    double depth;
+    smVec3d normal;
     if ( tri_tri_intersect_with_isectline_penetrationDepth( p_tri1Point1.data(),
                                                             p_tri1Point2.data(),
                                                             p_tri1Point3.data(),
@@ -101,7 +101,7 @@ smBool smCollisionMoller::tri2tri( smVec3f &p_tri1Point1,
     return false;
 }
 
-smBool smCollisionMoller::tri2tri( smVec3f &p_tri1Point1, smVec3f &p_tri1Point2, smVec3f &p_tri1Point3, smVec3f &p_tri2Point1, smVec3f &p_tri2Point2, smVec3f &p_tri2Point3 )
+smBool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_tri2Point1, smVec3d &p_tri2Point2, smVec3d &p_tri2Point3 )
 {
     return ( tri_tri_intersect( p_tri1Point1.data(), p_tri1Point2.data(),
                                 p_tri1Point3.data(), p_tri2Point1.data(),
@@ -136,8 +136,8 @@ bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB, smAA
 bool smCollisionMoller::checkOverlapAABBAABB( const smAABB &aabbA, const smAABB &aabbB )
 {
 
-    const smVec3f &min = aabbA.getMin();
-    const smVec3f &max = aabbA.getMax();
+    const smVec3d &min = aabbA.getMin();
+    const smVec3d &max = aabbA.getMax();
 
     if ( min[0] > aabbB.aabbMax[0] ||
          max[0] < aabbB.aabbMin[0] ||
@@ -154,7 +154,7 @@ bool smCollisionMoller::checkOverlapAABBAABB( const smAABB &aabbA, const smAABB 
     }
 }
 
-bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smVec3f &p_vertex )
+bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smVec3d &p_vertex )
 {
 
     if ( aabbA.aabbMin[0] <= p_vertex[0] && aabbA.aabbMax[0] >= p_vertex[0] &&
@@ -169,7 +169,7 @@ bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smVec3f &p_vertex )
     }
 }
 
-smBool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3f &p_v )
+smBool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3d &p_v )
 {
     if ( p_v[0] >= p_aabb.aabbMin[0] &&
          p_v[1] >= p_aabb.aabbMin[1] &&
@@ -186,19 +186,19 @@ smBool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3f &p
     }
 }
 
-smBool smCollisionMoller::checkLineTri( smVec3f &p_linePoint1, smVec3f &p_linePoint2, smVec3f &p_tri1Point1, smVec3f &p_tri1Point2, smVec3f &p_tri1Point3, smVec3f &p_interSection )
+smBool smCollisionMoller::checkLineTri( smVec3d &p_linePoint1, smVec3d &p_linePoint2, smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_interSection )
 {
 
     //First find that ray intersect the polygon or not
     smInt i1, i2;
-    smVec3f U, V;
+    smVec3d U, V;
     smDouble plane[4], P[3], u[3], v[3], alpha, beta;
 
     //Now find the Normal vector
     U = p_tri1Point2 - p_tri1Point1;
     V = p_tri1Point3 - p_tri1Point1;
 
-    smVec3f cProd;
+    smVec3d cProd;
     cProd = U.cross( V );
     cProd.normalize();
 
@@ -208,8 +208,8 @@ smBool smCollisionMoller::checkLineTri( smVec3f &p_linePoint1, smVec3f &p_linePo
     plane[3] = -( ( plane[0] * p_tri1Point1[0] + plane[1] * p_tri1Point1[1] + plane[2] * p_tri1Point1[2] ) );
 
     //Now we got the plane equation and we can test whether our ray intersect or not
-    smFloat d1, d2, d, t;
-    smVec3f dir;
+    double d1, d2, d, t;
+    smVec3d dir;
 
     d1 = p_linePoint1.dot( cProd ) + plane[3];
     d2 = p_linePoint2.dot( cProd ) + plane[3];
@@ -283,12 +283,12 @@ smBool smCollisionMoller::checkLineTri( smVec3f &p_linePoint1, smVec3f &p_linePo
     return ( false );
 }
 
-smBool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3f &v1, smVec3f &v2, smVec3f &v3 )
+smBool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3 )
 {
 
-    smVec3f  boxhalfsize;
-    smVec3f boxCenter;
-    smFloat triverts[3][3] = {v1[0],v1[1],v1[2],
+    smVec3d  boxhalfsize;
+    smVec3d boxCenter;
+    double triverts[3][3] = {v1[0],v1[1],v1[2],
                               v2[0],v2[1],v2[2],
                               v3[0],v3[1],v3[2]};
     boxhalfsize[0] = p_aabb.halfSizeX();

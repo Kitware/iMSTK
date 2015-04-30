@@ -40,10 +40,12 @@ void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 {
     this->mesh.reset();
     this->mesh = modelMesh;
+    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), 6);
+    this->aabbTree->initStructure();
 }
 void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
-    if(this->mesh = nullptr)
+    if(this->mesh == nullptr)
     {
         this->mesh = std::make_shared<smSurfaceMesh>();
     }

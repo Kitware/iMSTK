@@ -41,7 +41,7 @@ public:
     /// \brief constructor
     smSurfaceTreeCell()
     {
-        isEmpty = true;
+        empty = true;
         isLeaf = false;
         level = 0;
     }
@@ -66,13 +66,13 @@ public:
     }
 
     /// \brief checks if the cell collided with a triangle primitive
-    inline bool isCollidedWithTri(const smVec3f &v0, const smVec3f &v1, const smVec3f &v2)
+    inline bool isCollidedWithTri(const smVec3d &v0, const smVec3d &v1, const smVec3d &v2)
     {
         return derived()->isCollidedWithTri(v0,v1,v2);
     }
 
     /// \brief checks if the cell contains the point primitive
-    inline bool isCollidedWithPoint(const smVec3f &point)
+    inline bool isCollidedWithPoint(const smVec3d &point)
     {
         return derived()->isCollidedWithPoint(point);
     }
@@ -84,7 +84,7 @@ public:
     }
 
     /// \brief set the center of the cell of surface tree
-    inline void setCenter(const smVec3f &center)
+    inline void setCenter(const smVec3d &center)
     {
         derived()->setCenter(center);
     }
@@ -96,7 +96,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline smVec3f &getCenter()
+    inline smVec3d &getCenter()
     {
         return derived()->getCenter();
     }
@@ -108,7 +108,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline const smVec3f &getCenter()  const
+    inline const smVec3d &getCenter()  const
     {
         return derived()->getCenter();
     }
@@ -125,14 +125,14 @@ public:
         return derived()->addTriangleData(aabb,index);
     }
 
-    inline const bool &getIsEmpty() const
+    inline const bool &isEmpty() const
     {
-        return isEmpty;
+        return empty;
     }
 
-    inline void setIsEmpty(const bool &empty)
+    inline void setIsEmpty(const bool &isEmpty)
     {
-        isEmpty = empty;
+        empty = isEmpty;
     }
 
     inline const bool &getIsLeaf() const
@@ -190,6 +190,11 @@ public:
         weights.emplace_back(w);
     }
 
+    inline const float &getWeight(const int &w) const
+    {
+        return weights.at(w);
+    }
+
     inline std::shared_ptr<Derived> getChildNode(size_t i)
     {
         return derived()->getChildNode(i);
@@ -211,7 +216,7 @@ public:
     }
 
 private:
-    bool isEmpty; ///< !!
+    bool empty; ///< !!
     bool isLeaf; ///< !!
     int level; ///< level in the tree
     std::vector<float> weights; ///< !!

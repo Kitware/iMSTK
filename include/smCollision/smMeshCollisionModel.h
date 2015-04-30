@@ -49,7 +49,7 @@ class smMeshCollisionModel : public smModelRepresentation
 public:
     using AABBNodeType = smOctreeCell;
     using AABBTreeType = smSurfaceTree<AABBNodeType>;
-    using NodePairType = std::pair<AABBNodeType,AABBNodeType>;
+    using NodePairType = std::pair<std::shared_ptr<AABBNodeType>,std::shared_ptr<AABBNodeType>>;
 
 public:
     smMeshCollisionModel();
@@ -89,6 +89,17 @@ public:
     /// @brief Returns array of vertices for triangle on surface
     ///
     std::array<smVec3f,3> getTrianglePositions(size_t i) const;
+
+    ///
+    /// @brief Returns array of vertices for triangle on surface
+    ///
+   void translate(const smVec3f &translation)
+   {
+       this->mesh->translate(translation);
+       this->mesh->upadateAABB();
+       this->mesh->updateTriangleAABB();
+       aabbTree->updateStructure();
+   }
 
 private:
     std::shared_ptr<smMesh> mesh; // Underlying mesh

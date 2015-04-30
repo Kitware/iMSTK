@@ -25,7 +25,7 @@
 
 #include <memory>
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
     auto App = std::make_shared<CollisionDetectionBVH>();
 
@@ -35,6 +35,8 @@ int main(int /*argc*/, char** /*argv*/)
     App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
     App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
     App->sdk->getSimulator()->registerSimulationMain(App);
+
+    glutInit(&argc,argv);
 
     App->run();
 

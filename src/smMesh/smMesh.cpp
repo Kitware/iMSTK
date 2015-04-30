@@ -48,7 +48,6 @@ smMesh::smMesh()
     type = SIMMEDTK_SMMESH;
     isTextureCoordAvailable = false;
     tangentChannel = false;
-    triAABBs = NULL;
 }
 
 /// \brief destructor
@@ -61,19 +60,12 @@ smMesh::~smMesh()
     delete [] triTangents;
     delete [] vertTangents;
 
-    if (triAABBs != NULL)
-    {
-        delete[] triAABBs;
-    }
 }
 
 /// \brief
 void smMesh::allocateAABBTris()
 {
-    if (triAABBs == NULL)
-    {
-        triAABBs = new smAABB[nbrTriangles];
-    }
+    this->triAABBs.resize(nbrTriangles);
     this->updateTriangleAABB();
 }
 
@@ -542,7 +534,6 @@ void smMesh::draw(const smDrawParam &p_params)
 /// \brief
 void smMesh::updateTriangleAABB()
 {
-
     smAABB tempAABB;
     tempAABB.aabbMin[0] = FLT_MAX;
     tempAABB.aabbMin[1] = FLT_MAX;

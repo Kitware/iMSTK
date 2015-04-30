@@ -55,31 +55,31 @@ public:
     void setCube(const smCube &other);
 
     /// \brief get the center of the octree cell
-    smVec3f &getCenter();
+    smVec3d &getCenter();
 
     /// \brief get constant reference to the center of the octree cell
-    const smVec3f &getCenter() const;
+    const smVec3d &getCenter() const;
 
     /// \brief set the center of the octree cell
-    void setCenter ( const smVec3f &center );
+    void setCenter ( const smVec3d &center );
 
     /// \brief get reference to the side length of the octree cell
-    float &getLength ();
+    double &getLength ();
 
     /// \brief get the side length of the octree cell
-    const float &getLength() const;
+    const double &getLength() const;
 
     /// \brief set the octree cell
     void copyShape ( const smOctreeCell &cell );
 
     /// \brief !! expand the cell of the octree structure
-    void expand ( const float expandScale );
+    void expand ( const double expandScale );
 
     /// \brief set the length of the octree cell
-    void setLength ( const float length );
+    void setLength ( const double length );
 
     /// \brief check if a triangle is intersecting the octree cell
-    bool isCollidedWithTri ( smVec3f &v0, smVec3f &v1, smVec3f &v2 );
+    bool isCollidedWithTri ( smVec3d &v0, smVec3d &v1, smVec3d &v2 );
 
     /// \brief check if a point lies inside an octree cell
     bool isCollidedWithPoint ();
@@ -88,12 +88,8 @@ public:
     void subDivide ( const int divisionPerAxis,
                      std::array<smOctreeCell,numberOfSubdivisions> &cells );
 
-    const smAABB getAabb() const
+    const smAABB &getAabb() const
     {
-        smAABB aabb;
-        aabb.aabbMin = cube.leftMinCorner();
-        aabb.aabbMax = cube.rightMaxCorner();
-
         return aabb;
     }
 
@@ -139,8 +135,31 @@ public:
     {
         parentNode = parent;
     }
+
+    void draw() const
+    {
+        this->aabb.draw();
+        for(auto &child : childNodes)
+        {
+            if(child)
+            {
+                child->draw();
+            }
+        }
+    }
+
+    void update()
+    {
+        this->aabb.reset();
+        for(auto &box : data)
+        {
+            this->aabb.extend(box.first);
+        }
+    }
+
 private:
     smCube cube; ///< cube
+    smAABB aabb;
 
     std::array<std::shared_ptr<smOctreeCell>,numberOfSubdivisions> childNodes;
     std::shared_ptr<smOctreeCell> parentNode;

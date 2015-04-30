@@ -34,10 +34,10 @@ struct smSphere;
 /// \brief  Simple Plane definition with unit normal and spatial location
 struct smPlane
 {
-    smVec3f unitNormal;
-    smVec3f pos;
-    smFloat distance(smVec3f p_vector);
-    smVec3f project(smVec3f p_vector);
+    smVec3d unitNormal;
+    smVec3d pos;
+    double distance(smVec3d p_vector);
+    smVec3d project(smVec3d p_vector);
 };
 
 /// \brief Axis Aligned bounding box declarions
@@ -45,17 +45,17 @@ class smAABB
 {
 public:
     /// \brief minimum x,y,z point
-    smVec3f aabbMin;
+    smVec3d aabbMin;
 
     /// \brief maximum x,y,z point
-    smVec3f aabbMax;
+    smVec3d aabbMax;
 
-    const smVec3f &getMax() const
+    const smVec3d &getMax() const
     {
         return aabbMax;
     }
 
-    const smVec3f &getMin() const
+    const smVec3d &getMin() const
     {
         return aabbMin;
     }
@@ -64,19 +64,19 @@ public:
     smAABB();
 
     /// \brief center of the AABB
-    smVec3f center() const;
+    smVec3d center() const;
 
     /// \brief check if two AABB overlaps
     static smBool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB);
 
     /// \brief set  p_aabb to the current one
-    smAABB &operator=(const smAABB &p_aabb);
+    const smAABB &operator=(const smAABB &p_aabb);
 
     /// \brief scale the AABB
-    smAABB &operator*(const smFloat p_scale);
+    smAABB &operator*(const double p_scale);
 
     /// \brief sub divides p_length will be used to create the slices
-    void subDivide(const smFloat p_length, const smInt p_divison, smAABB *p_aabb) const;
+    void subDivide(const double p_length, const smInt p_divison, smAABB *p_aabb) const;
 
     /// \brief divides current AABB in x,y,z axes with specificed divisions. results are placed in p_aabb
     void subDivide(const smInt p_divisionX, const smInt p_divisionY, const smInt p_divisionZ, smAABB *p_aabb) const;
@@ -85,16 +85,66 @@ public:
     void subDivide(const smInt p_division, smAABB *p_aabb) const;
 
     /// \brief returns half of X edge of AABB
-    smFloat halfSizeX() const;
+    double halfSizeX() const;
 
     /// \brief returns half of Y edge of AABB
-    smFloat halfSizeY() const;
+    double halfSizeY() const;
 
     /// \brief returns half of Z edge of AABB
-    smFloat halfSizeZ() const;
+    double halfSizeZ() const;
 
     /// \brief expands aabb with p_factor
-    void expand(const smFloat &p_factor);
+    void expand(const double &p_factor);
+
+    void draw() const
+    {
+        glBegin(GL_LINES);
+        {
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
+
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
+
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
+            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
+            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
+            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
+        }
+        glEnd();
+    }
+
+    void reset()
+    {
+        this->aabbMin << std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max();
+        this->aabbMax << std::numeric_limits<float>::min(),
+            std::numeric_limits<float>::min(),
+            std::numeric_limits<float>::min();
+    }
+
+    void extend(const smAABB &other)
+    {
+        this->aabbMin = this->aabbMin.array().min(other.getMin().array());
+        this->aabbMax = this->aabbMax.array().max(other.getMax().array());
+    }
 };
 
 /// \brief sphere structure
@@ -103,26 +153,26 @@ struct smSphere
 
 public:
     /// \brief center of sphere
-    smVec3f center;
+    smVec3d center;
 
     /// \brief radius of sshere
-    smFloat radius;
+    double radius;
 
     /// \brief constructor
     smSphere();
 
     /// \brief sphere constructor with center and radius
-    smSphere(smVec3f p_center, smFloat p_radius);
+    smSphere(smVec3d p_center, double p_radius);
 };
 
 /// \brief cube
 struct smCube
 {
     /// \brief cube center
-    smVec3f center;
+    smVec3d center;
 
     /// \brief cube length
-    smFloat sideLength;
+    double sideLength;
 
     /// \brief constructor
     smCube();
@@ -131,13 +181,13 @@ struct smCube
     void subDivide(smInt p_divisionPerAxis, smCube *p_cube);
 
     /// \brief expands the cube. increases the edge length with expansion*edge length
-    void expand(smFloat p_expansion);
+    void expand(double p_expansion);
 
     /// \brief returns the left most corner
-    smVec3f leftMinCorner() const ;
+    smVec3d leftMinCorner() const ;
 
     /// \brief returns right most corner
-    smVec3f rightMaxCorner() const;
+    smVec3d rightMaxCorner() const;
 
     /// \brief returns the smallest sphere encapsulates the cube
     smSphere getCircumscribedSphere();
