@@ -161,7 +161,6 @@ struct smPipeHolder: public smBaseHolder
 class smSDK: public smCoreClass
 {
 private:
-    static std::shared_ptr<smSDK> sdk; ///< singleton sdk.
     static std::once_flag sdkCallOnceFlag;
 
     bool shutdown; ///< Tells the SDK to terminate

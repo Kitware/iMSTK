@@ -99,9 +99,6 @@ protected:
     std::vector<std::shared_ptr<smCoreClass>> objectList;
     std::vector<smRenderOperation> renderOperations;
     std::vector<smFboListItem> fboListItems;
-
-    static std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
-
     std::shared_ptr<smErrorLog> log;
     smInt unlimitedFPSVariableChanged;
     smBool unlimitedFPSEnabled;

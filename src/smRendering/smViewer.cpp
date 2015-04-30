@@ -577,8 +577,9 @@ void smViewer::addObject(std::shared_ptr<smCoreClass> object)
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/ )
+void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
+
 }
 
 void smViewer::addText(smString p_tag)

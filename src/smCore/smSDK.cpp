@@ -30,7 +30,6 @@
 
 /// \brief SDK is singlenton class
 // std::unique_ptr<smErrorLog> smSDK::errorLog;
-std::shared_ptr<smSDK> smSDK::sdk;
 std::once_flag smSDK::sdkCallOnceFlag;
 
 smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
@@ -68,6 +67,9 @@ void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
 
     this->viewer = p_viewer;
     this->viewer->log = this->errorLog;
+    this->viewer->attachEvent(smtk::Event::EventType::Keyboard,scenesRef->getByRef(0).scene);
+    this->viewer->attachEvent(smtk::Event::EventType::MouseMove,scenesRef->getByRef(0).scene);
+    this->viewer->attachEvent(smtk::Event::EventType::MouseButton,scenesRef->getByRef(0).scene);
 
     this->registerModule(p_viewer);
 }
@@ -174,6 +176,7 @@ void smSDK::removeRef(std::shared_ptr<smCoreClass> p_coreClass)
 
 std::shared_ptr<smSDK> smSDK::createSDK()
 {
+    static std::shared_ptr<smSDK> sdk; ///< singleton sdk.
     std::call_once(sdkCallOnceFlag,
                    []
                     {
