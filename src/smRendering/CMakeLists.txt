@@ -1,15 +1,12 @@
 
 set(OCULUS_VIEWER_SOURCES)
 set(OCULUS_VIEWER_INCLUDES)
-set(OCULUS_VIEWER_TARGET_LINK_LIBRARIES)
 
 if (SimMedTK_USE_OCULUS)
   list(APPEND OCULUS_VIEWER_SOURCES
     smOculusViewer.cpp)
   list(APPEND OCULUS_VIEWER_INCLUDES
     ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h)
-  list(APPEND OCULUS_VIEWER_TARGET_LINK_LIBRARIES
-    Oculus::Oculus)
 endif(SimMedTK_USE_OCULUS)
 
 simmedtk_add_library(smRendering
@@ -44,5 +41,4 @@ target_link_libraries(smRendering
  PUBLIC
     sfml::window
     sfml::system
-    ${OCULUS_VIEWER_TARGET_LINK_LIBRARIES}
 )

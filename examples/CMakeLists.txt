@@ -4,6 +4,7 @@ if(SIMMEDTK_USE_PHANTOM_OMNI)
 endif(SIMMEDTK_USE_PHANTOM_OMNI)
 if(SimMedTK_USE_OCULUS)
   add_subdirectory(renderCubeOculus)
+  add_subdirectory(renderCubeToTextureOculus)
 endif(SimMedTK_USE_OCULUS)
 
 add_subdirectory(AudioExample)

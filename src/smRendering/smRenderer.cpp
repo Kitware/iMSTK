@@ -580,6 +580,35 @@ void smGLRenderer::renderScene(smScene* p_scene,
     glPopMatrix();
 }
 
+void smGLRenderer::renderScene(smScene* p_scene,
+                               smDrawParam p_param,
+                               const smMatrix44f &p_proj,
+                               const smMatrix44f &p_view)
+{
+    smScene::smSceneIterator sceneIter;
+
+    assert(p_scene);
+
+    //Load View and Projection Matrices
+    // -- with new rendering techniques, these would be passed to a shader
+    glMatrixMode(GL_PROJECTION);
+    glLoadMatrixf(p_proj.data());
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(p_view.data());
+
+    sceneIter.setScene(p_scene, p_param.caller);
+
+    for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
+    {
+        renderSceneObject(sceneIter[j], p_param);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+}
+
 void smGLRenderer::renderSceneObject(smSceneObject* p_sceneObject,
                                      smDrawParam p_param)
 {

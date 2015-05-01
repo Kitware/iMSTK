@@ -78,8 +78,6 @@ smClassType smCoreClass::getType() const
 smDrawParam::smDrawParam() :
     rendererObject{nullptr},
     caller{nullptr},
-    viewMatrix{nullptr},
-    projMatrix{nullptr},
     data{nullptr}
 {
 }

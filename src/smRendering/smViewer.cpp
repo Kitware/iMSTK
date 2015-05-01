@@ -454,8 +454,6 @@ void smViewer::draw()
     param.rendererObject = this;
     param.caller = this;
     param.data = nullptr;
-    param.projMatrix = nullptr;
-    param.viewMatrix = nullptr;
 
     beginModule();
 
