@@ -91,21 +91,22 @@ RenderCube::~RenderCube()
 
 void RenderCube::setupLights()
 {
-     //Setup Scene lighting
-    smLight* light = new smLight("SceneLight1",
-                                 SIMMEDTK_LIGHT_SPOTLIGHT,
-                                 SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.pos << 10.0, 10.0, 10.0;
-    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
-    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
-    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
-    light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
-    light->drawEnabled = false;
-    light->attn_constant = 1.0;
-    light->attn_linear = 0.0;
-    light->attn_quadratic = 0.0;
-    scene1->addLight(light);
+    //Setup Scene lighting
+    smLight* light1 = new smLight("SceneLight1",
+                                  SIMMEDTK_LIGHT_SPOTLIGHT,
+                                  SIMMEDTK_LIGHTPOS_WORLD);
+    light1->lightPos.pos << 5.0, 5.0, 5.0;
+    light1->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+    light1->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+    light1->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+    light1->spotCutOffAngle = 60;
+    light1->direction = smVec3f(0.0, 0.0, -1.0);
+    light1->drawEnabled = false;
+    light1->attn_constant = 1.0;
+    light1->attn_linear = 0.0;
+    light1->attn_quadratic = 0.0;
+    light1->activate(true);
+    scene1->addLight(light1);
 }
 
 void RenderCube::setupCamera()

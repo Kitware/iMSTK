@@ -206,8 +206,22 @@ public:
 
     /// \brief Initializes lights for rendering
     void initLights();
-    /// \brief  enable attached lights
+    /// \brief Enables all currently active lights in the scene
+    ///
+    /// \detail This should be called in conjunction with disableLights().
+    /// Calling this will essentially call glEnable(GL_LIGHT#) for every
+    /// enabled light.
     void enableLights();
+    /// \brief Disables all lights in the scene
+    ///
+    /// \detail This should be called in conjunction with enableLights().
+    /// Calling this will essentially call glDisable(GL_LIGHT#) for every
+    /// light(enabled or not).
+    void disableLights();
+    /// \brief Place the OpenGL lights in the scene
+    ///
+    /// \detail Should be called after enableLights()
+    void placeLights();
     /// \brief addlight
     smInt addLight(smLight *p_light);
     /// \brief set light given with light ID

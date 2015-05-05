@@ -142,9 +142,6 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
     glBindFramebuffer(GL_FRAMEBUFFER, oculusFBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //Enable lights
-    p_rop.scene->enableLights();
-
     ovrHmd_GetEyePoses(hmd, 0, &(eyeRdesc->HmdToEyeViewOffset), pose, &ts);
     //for each eye ...
     for (i = 0; i < 2; i++) {

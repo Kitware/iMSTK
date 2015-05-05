@@ -366,8 +366,7 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
     //Setup Viewport & Clear buffers
     glViewport(0, 0, p_rop.fbo->getWidth(), p_rop.fbo->getHeight());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //Enable lights
-    p_rop.scene->enableLights();
+
     processViewerOptions();
     //Render Scene
      smGLRenderer::renderScene(p_rop.scene, p_param);
@@ -380,8 +379,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //Enable lights
-    p_rop.scene->enableLights();
+
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene, p_param);
