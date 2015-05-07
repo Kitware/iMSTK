@@ -76,16 +76,16 @@ public:
     smFloat tetraVolume(smVec3d &a, smVec3d &b, smVec3d &c, smVec3d &d);
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief render the FEM mesh
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
     /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
-    virtual std::shared_ptr<smSceneObject> clone();
+    virtual std::shared_ptr<smSceneObject> clone() override;
 
 public:
     //fem objetc has two representations: surface and volume

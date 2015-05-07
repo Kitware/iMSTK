@@ -81,13 +81,13 @@ public:
     smPBDSurfaceSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual std::shared_ptr<smSceneObject> clone();
+    virtual std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief initialize the mesh structure
     void initMeshStructure();
@@ -105,7 +105,7 @@ public:
     void findFixedCorners();
 
     /// \brief render the surface PBD object
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
 public:
     smSurfaceMesh *mesh; ///< surface mesh

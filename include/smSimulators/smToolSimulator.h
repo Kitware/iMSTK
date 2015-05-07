@@ -43,13 +43,13 @@ public:
     void updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool);
 
     /// \brief !!
-    virtual void initCustom();
+    virtual void initCustom() override;
 
     /// \brief run the tool simulator in a loop here
-    virtual void run();
+    virtual void run() override;
 
     /// \brief synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers();
+    void syncBuffers() override;
 
     /// \brief handle the events such as button presses related to tool
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;

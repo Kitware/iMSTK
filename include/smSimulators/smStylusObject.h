@@ -101,12 +101,12 @@ public:
     smStylusSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
-    virtual void init();
+    virtual void init() override;
 
     /// \brief handle the events such as button presses related to stylus
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
@@ -163,16 +163,16 @@ public:
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !!
-    std::shared_ptr<smSceneObject> clone();
+    std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void initDraw(const smDrawParam &p_params);
+    virtual void initDraw(const smDrawParam &p_params) override;
 
     /// \brief !!
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
     /// \brief !!
-    virtual void init();
+    virtual void init() override;
 
 private:
     std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;

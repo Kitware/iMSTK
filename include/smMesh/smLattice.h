@@ -152,7 +152,7 @@ public:
     void addObject(smSceneObject *obj);
 
     /// \brief render the lattice for visaulization
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
 public:
     //these should be templated..Current design is based on the triangle

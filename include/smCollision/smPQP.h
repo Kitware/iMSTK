@@ -91,15 +91,15 @@ public:
     }
 
     /// \brief rendering the collision meshes
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
     /// \brief !!
-    void initDraw(const smDrawParam &p_param);
+    void initDraw(const smDrawParam &p_param) override;
 
     /// \brief !!
-    void syncBuffers();
+    void syncBuffers() override;
 
-    virtual void run();
+    virtual void run() override;
 
     std::vector<smPQPSkeleton *>mPQPSourceSkeletons; ///<
     std::vector<smPQPSkeleton *>mPQPDestinationSkeletons; ///<

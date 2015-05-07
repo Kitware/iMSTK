@@ -87,12 +87,12 @@ public:
     smString phantomDeviceNames[SM_MAX_PHANTOM_DEVICES]; ///< names of phantoms
 
     /// \brief empty functions for now
-    virtual void beginFrame()
+    virtual void beginFrame() override
     {
     };
 
     /// \brief empty functions for now
-    virtual void endFrame()
+    virtual void endFrame() override
     {
     };
 
@@ -102,13 +102,13 @@ public:
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 
     /// \brief initialize (nothing happens)
-    void init();
+    void init() override;
 
     /// \brief start device
-    void exec();
+    void exec() override;
 
     /// \brief draw the phantom configuration for visualization
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
 };
 

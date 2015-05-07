@@ -128,7 +128,7 @@ public:
     /// \brief default constructor
     smViewer();
     /// \brief initialization for viewer
-    virtual  void init();
+    virtual void init() override;
     /// \brief for exit viewer
     void exitViewer();
     /// \brief add object for rendering
@@ -197,11 +197,11 @@ protected:
     /// \brief Set the color and other viewer defaults
     void setToDefaults();
     /// \brief called in the beginning of each frame
-    virtual void beginFrame();
+    virtual void beginFrame() override;
     /// \brief called in the end of each frame
-    virtual void endFrame();
+    virtual void endFrame() override;
     /// \brief draw routines
-    virtual void draw(const smDrawParam &){};
+    virtual void draw(const smDrawParam &) override {};
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();
@@ -210,7 +210,7 @@ protected:
     /// \brief  event handler
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
     /// \brief  launches the the viewer. don't call sdk will call this
-    virtual void exec();
+    virtual void exec() override;
 };
 
 #endif

@@ -108,7 +108,7 @@ public:
     void disable();
 
     /// \brief draw VAO
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
     /// \brief constructor
     ~smVAO();

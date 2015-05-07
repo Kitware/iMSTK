@@ -46,21 +46,21 @@ public:
     ~smStaticSceneObject();
 
     //not implemented yet..tansel
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     //not implemented yet..tansel
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
     ///not implemented yet.
-    virtual std::shared_ptr<smSceneObject> clone();
+    virtual std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief Initialization routine
-    virtual void init();
+    virtual void init() override;
 
     /// \brief called if the object is added to the viewer.
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) override {}
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
 
     void setMesh(std::shared_ptr<smMesh> surfaceMesh)
     {

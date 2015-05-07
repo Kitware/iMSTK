@@ -189,7 +189,7 @@ public:
     virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
 
     /// \brief render the surface mesh
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
 public:
     smInt  nbrTriangles; ///< number of triangles
@@ -281,7 +281,7 @@ public:
     smBool isMeshTextured();
 
     /// \brief draw the mesh
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
 public:
     smAABB *edgeAABBs;///< AABBs for the edges in the mesh

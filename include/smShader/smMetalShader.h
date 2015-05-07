@@ -50,15 +50,15 @@ public:
     void attachMesh(std::shared_ptr<smMesh> p_mesh, smChar *p_bump, smChar *p_decal, smChar *p_specular, smChar *p_OCC, smChar *p_disp, smChar *p_alphaMap);
 
     /// \brief emtpy implementation of draw routine. needs to overwritten to enable real-time code changes
-    void draw(const smDrawParam &p_param);
+    void draw(const smDrawParam &p_param) override;
 
     /// \brief initializaiton of bindings
-    virtual void initDraw(const smDrawParam &p_param);
+    virtual void initDraw(const smDrawParam &p_param) override;
 
     /// \brief uniforms are set in the predraw
-    virtual void predraw(std::shared_ptr<smMesh> mesh);
+    virtual void predraw(std::shared_ptr<smMesh> mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh);
+    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
     /// \brief handle keyboard event
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
@@ -88,12 +88,12 @@ public:
     MetalShaderShadow(const smString &p_vertexShaderFileName,const smString &p_fragmentShaderFileName);
 
     /// \brief intialization routine
-    virtual void initDraw(const smDrawParam &p_param);
+    virtual void initDraw(const smDrawParam &p_param) override;
 
     /// \brief unifom binding called before object is rendered
-    virtual void predraw(std::shared_ptr<smMesh> mesh);
+    virtual void predraw(std::shared_ptr<smMesh> mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh);
+    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
 private:
     /// \brief for debugging purposes
@@ -109,12 +109,12 @@ public:
     MetalShaderSoftShadow();
 
     /// \brief initialization routine
-    virtual void initDraw(const smDrawParam &p_param);
+    virtual void initDraw(const smDrawParam &p_param) override;
 
     /// \brief pre rendering routine before attached object is rendered
-    virtual void predraw(std::shared_ptr<smMesh> p_mesh);
+    virtual void predraw(std::shared_ptr<smMesh> p_mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh);
+    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
 private:
     smGLInt shadowMapUniform;

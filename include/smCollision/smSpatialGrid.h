@@ -82,10 +82,10 @@ public:
     virtual void kernel();
 
     /// \brief the collision is advanced here
-    virtual void run();
+    virtual void run() override;
 
     /// \brief rendering for collision visualization
-    virtual void draw();
+    virtual void draw() override;
 
     /// \brief !!
     static void beginTriangles();
@@ -119,7 +119,7 @@ private:
     std::mutex listLock; ///< !!
 
     /// \brief !!
-    void beginFrame();
+    void beginFrame() override;
 
     /// \brief !!
     void startWorkers();
@@ -139,19 +139,19 @@ public:
     void setTotalThreads(smInt p_totalThreads);
 
     /// \brief initialization
-    void init();
+    void init() override;
 
     /// \brief run the collision checks in a loop here
-    void run();
+    void run() override;
 
     /// \brief !!
     void updateList();
 
     /// \brief !!
-    virtual void endFrame();
+    virtual void endFrame() override;
 
     /// \brief !!
-    virtual void exec();
+    virtual void exec() override;
 
     /// \brief This function adds lattice and it is  thread safe.
     virtual smInt addLattice(smLattice *p_lat);
@@ -160,7 +160,7 @@ public:
     virtual void removeLattice(smLattice *p_lat, smInt p_listIndex);
 
     /// \brief !! renders the workers threads
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
 };
 

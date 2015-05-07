@@ -52,19 +52,19 @@ public:
 
 protected:
     /// \brief !!
-    virtual void beginSim();
+    virtual void beginSim() override;
 
     /// \brief !!
-    virtual void initCustom();
+    virtual void initCustom() override;
 
     /// \brief run the fem simulation in a loop here
-    virtual void run();
+    virtual void run() override;
 
     /// \brief !!
-    void endSim();
+    void endSim() override;
 
     /// \brief synchronize the buffers in the object (do not call by yourself).
-    void syncBuffers();
+    void syncBuffers() override;
 
     /// \brief !!
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;

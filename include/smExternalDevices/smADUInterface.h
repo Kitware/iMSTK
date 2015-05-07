@@ -87,22 +87,22 @@ public:
     smBool isOpened; ///< !!
 
     /// \brief !!
-    void init();
+    void init() override;
 
     /// \brief !!
-    void exec();
+    void exec() override;
 
     /// \briefempty functions for now
-    virtual void beginFrame() {};
+    virtual void beginFrame() override {};
 
     /// \brief empty functions for now
-    virtual void endFrame() {};
+    virtual void endFrame() override {};
 
     /// \brief !!
-    void draw(const smDrawParam &p_params) {};
+    void draw(const smDrawParam &p_params) override {};
 
     /// \brief
-    void run();
+    void run() override;
 
     /// \brief
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)  override{};

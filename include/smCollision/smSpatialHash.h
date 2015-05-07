@@ -112,7 +112,7 @@ public:
 
     std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles();
 
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
 
@@ -135,7 +135,7 @@ protected:
     void updateBVH();
 
 private:
-    void doComputeCollision(std::shared_ptr<smCollisionPair> /*pairs*/)
+    void doComputeCollision(std::shared_ptr<smCollisionPair> /*pairs*/) override
     {
         reset();
         updateBVH();
