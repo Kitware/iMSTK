@@ -178,6 +178,10 @@ find_package(ThreadPool REQUIRED)
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
+
+  if(NOT WIN32)
+    find_package(X11 REQUIRED)
+  endif()
 endif()
 
 #-----------------------------------------------------------------------------

@@ -1,14 +1,3 @@
-
-set(OCULUS_VIEWER_SOURCES)
-set(OCULUS_VIEWER_INCLUDES)
-
-if (SimMedTK_USE_OCULUS)
-  list(APPEND OCULUS_VIEWER_SOURCES
-    smOculusViewer.cpp)
-  list(APPEND OCULUS_VIEWER_INCLUDES
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h)
-endif(SimMedTK_USE_OCULUS)
-
 simmedtk_add_library(smRendering
   SOURCES
     smConfigRendering.cpp
@@ -18,7 +7,6 @@ simmedtk_add_library(smRendering
     smVAO.cpp
     smVBO.cpp
     smViewer.cpp
-    ${OCULUS_VIEWER_SOURCES}
     smCamera.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
@@ -29,7 +17,6 @@ simmedtk_add_library(smRendering
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
-    ${OCULUS_VIEWER_INCLUDES}
 )
 
 target_link_libraries(smRendering
@@ -42,3 +29,39 @@ target_link_libraries(smRendering
     sfml::window
     sfml::system
 )
+
+
+#
+# Because of the way oculus SDK is required to build, a new library needs
+# to be created to link the runtime.
+# This might change in the future.
+#
+if (SimMedTK_USE_OCULUS)
+
+  set(OCULUS_LINK_LIBRARIES)
+  if (NOT WIN32)
+    list(APPEND OCULUS_LINK_LIBRARIES
+        ${X11_LIBRARIES}
+        ${X11_Xrandr_LIB}
+        ${X11_Xinput_LIB}
+        ${CMAKE_THREAD_LIBS_INIT})
+  endif()
+  if (UNIX AND NOT APPLE)
+    list(APPEND OCULUS_LINK_LIBRARIES rt)
+  endif()
+
+  simmedtk_add_library(smRenderingOculus
+    SOURCES
+      smOculusViewer.cpp
+    PUBLIC_HEADERS
+      ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h
+  )
+
+  target_link_libraries(smRenderingOculus
+    PRIVATE
+      smCore
+      smRendering
+    PUBLIC
+      ${OCULUS_LINK_LIBRARIES}
+  )
+endif(SimMedTK_USE_OCULUS)

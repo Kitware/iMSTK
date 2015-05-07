@@ -2,6 +2,7 @@ add_executable(renderCubeOculus main.cpp  RenderCubeOculus.cpp RenderCubeOculus.
 target_link_libraries(renderCubeOculus
   smCore
   smRendering
+  smRenderingOculus
   smShader
   smMesh
   Oculus::Oculus
