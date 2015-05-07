@@ -43,7 +43,7 @@ void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 }
 void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
-    if(this->mesh = nullptr)
+    if(nullptr == this->mesh)
     {
         this->mesh = std::make_shared<smSurfaceMesh>();
     }
