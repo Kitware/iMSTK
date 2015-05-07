@@ -23,13 +23,9 @@
 
 #include <iostream>
 
-#include <glm/glm.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
-
 #include "smRendering/smOculusViewer.h"
 #include "smRendering/smGLRenderer.h"
+#include "smUtilities/smQuaternion.h"
 
 #ifdef _WIN32 || WIN32
     #define OVR_OS_WIN32
@@ -135,7 +131,7 @@ void smOculusViewer::endFrame()
 void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param)
 {
     int i;
-    ovrMatrix4f proj;
+    ovrMatrix4f ovrProj;
     ovrPosef pose[2];
     ovrTrackingState ts;
 
@@ -146,25 +142,23 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
     glBindFramebuffer(GL_FRAMEBUFFER, oculusFBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //Enable lights
-    p_rop.scene->enableLights();
-
     ovrHmd_GetEyePoses(hmd, 0, &(eyeRdesc->HmdToEyeViewOffset), pose, &ts);
     //for each eye ...
     for (i = 0; i < 2; i++) {
         ovrEyeType eye = hmd->EyeRenderOrder[i];
-        glm::mat4 glmProj;
-        glm::mat4 glmView;
-        glm::mat4 tmpMat;
-        glm::vec3 tmpVec;
-        glm::quat tmpQuat;
+        smMatrix44f proj;
+        smMatrix44f view;
+        Eigen::Affine3f viewRotation;
+        Eigen::Affine3f headTracking;
+        Eigen::Affine3f playerHeight;
+
         // -- viewport transformation --
         //setup the viewport to draw in the left half of the framebuffer when
         // we're rendering the left eye's view (0, 0, width/2, height), and
         // in the right half of the framebuffer for the right eye's view
         // (width/2, 0, width/2, height)
         glViewport(eye == ovrEye_Left ? 0 : (fbWidth / 2),
-                   0, (fbWidth / 2), fbHeight);
+            0, (fbWidth / 2), fbHeight);
 
         processViewerOptions();
 
@@ -172,45 +166,43 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
         //we'll just have to use the projection matrix supplied by the oculus
         // SDK for this eye note that libovr matrices are the transpose of what
         // OpenGL expects, so we have to transpose them.
-        proj = ovrMatrix4f_Projection(hmd->DefaultEyeFov[eye], 0.1, 500.0, 1);
-        //copy the ovr matrix into a glm matrix and transpose it
-        memcpy(glm::value_ptr(tmpMat), proj.M, sizeof(glm::mat4));
-        glmProj = glm::transpose(tmpMat);
-        p_param.projMatrix = glm::value_ptr(glmProj);
+        ovrProj = ovrMatrix4f_Projection(hmd->DefaultEyeFov[eye], 0.1, 500.0, 1);
+        //copy the ovr matrix into a matrix and transpose it
+        proj = Eigen::Map<smMatrix44f>(&(ovrProj.M[0][0]));
+        proj.transposeInPlace();
 
         // -- view/camera transformation --
         //we need to construct a view matrix by combining all the information
         // provided by the oculus SDK, about the position and orientation of
         // the user's head in the world.
-        glmView = p_rop.scene->camera.view;
+        view = Eigen::Map<smMatrix44f>(glm::value_ptr(p_rop.scene->camera.view));
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix
-        tmpQuat = glm::quat(-pose[eye].Orientation.w,
-                            pose[eye].Orientation.x,
-                            pose[eye].Orientation.y,
-                            pose[eye].Orientation.z);
-        glmView = glm::toMat4(tmpQuat) * glmView;
+        viewRotation = smQuaternionf(-pose[eye].Orientation.w,
+            pose[eye].Orientation.x,
+            pose[eye].Orientation.y,
+            pose[eye].Orientation.z);
 
         //translate the view matrix with the positional tracking
-        if(ts.StatusFlags &
-           (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
+        if (ts.StatusFlags &
+            (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
         {
             //Not sure why these values have to be negated...but they do
-            tmpVec = glm::vec3(-ts.HeadPose.ThePose.Position.x,
-                               -ts.HeadPose.ThePose.Position.y,
-                               -ts.HeadPose.ThePose.Position.z);
-            glmView = glm::translate(glmView, tmpVec);
+            headTracking = Eigen::Translation3f(
+                -ts.HeadPose.ThePose.Position.x,
+                -ts.HeadPose.ThePose.Position.y,
+                -ts.HeadPose.ThePose.Position.z);
         }
         //move the camera to the eye level of the user from Oculus SDK settings
-        tmpVec = glm::vec3(0, -ovrHmd_GetFloat(hmd, OVR_KEY_EYE_HEIGHT, 1.65), 0);
-        glmView = glm::translate(glmView, tmpVec);
+        playerHeight = (Eigen::Translation3f(
+            0, -ovrHmd_GetFloat(hmd, OVR_KEY_EYE_HEIGHT, 1.65), 0));
 
-        //Load the matrix reference into the draw parameters
-        p_param.viewMatrix = glm::value_ptr(glmView);
+        smMatrix44f trans = (viewRotation * headTracking * playerHeight).matrix();
+        view = trans * view;
 
         //Render Scene
-        smGLRenderer::renderScene(p_rop.scene, p_param);
+        smGLRenderer::renderScene(p_rop.scene, p_param, proj, view);
     }
     //after drawing both eyes into the texture render target, revert to
     // drawing directly to the display, and we call ovrHmd_EndFrame, to let the
@@ -283,7 +275,7 @@ int smOculusViewer::initOculus(void)
     glCfg.OGL.DC = wglGetCurrentDC();
 #elif defined(OVR_OS_LINUX)
     glCfg.OGL.Disp = glXGetCurrentDisplay();
-#endif 
+#endif
 
 
     if (hmd->HmdCaps & ovrHmdCap_ExtendDesktop) {

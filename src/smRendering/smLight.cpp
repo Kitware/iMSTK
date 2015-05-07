@@ -78,7 +78,7 @@ smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationTy
     lightColorAmbient.setValue( 0.2, 0.2, 0.2, 1.0 );
     lightColorDiffuse.setValue( 0.8f, 0.8f, 0.8, 1.0f );
     lightColorSpecular.setValue( 0.5f, 0.5f, 0.5f, 1.0f );
-    drawEnabled = true;
+    drawEnabled = false;
     castShadow = false;
     shadowNearView = 0.01;
     shadowFarView = 4000;

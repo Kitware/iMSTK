@@ -159,6 +159,7 @@ void smScene::initLights()
         glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, (smGLFloat)iter[i]->spotCutOffAngle);
         glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
         glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glDisable(iter[i]->renderUsage);
     }
 }
 
@@ -166,7 +167,6 @@ smInt smScene::addLight(smLight *p_light)
 {
     smInt index = lights->add(p_light);
     lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
-    lights->getByRef(index)->activate(true);
     return index;
 }
 
@@ -196,6 +196,7 @@ void smScene::refreshLights()
         glLightf(iter[i]->renderUsage, GL_SPOT_CUTOFF, iter[i]->spotCutOffAngle);
         glLightfv(iter[i]->renderUsage, GL_POSITION, (smGLFloat*)&iter[i]->lightPos);
         glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
+        glDisable(iter[i]->renderUsage);
     }
 }
 
@@ -227,13 +228,9 @@ void smScene::setLightPos(smInt p_lightId,
     temp->updateDirection();
 }
 
-
 void smScene::enableLights()
 {
-
-    static smIndiceArrayIter<smLight*> iter(lights);
-    smFloat dir[4];
-    static smLightPos defaultPos(0, 0, 0);
+    smIndiceArrayIter<smLight*> iter(lights);
 
     glEnable(GL_LIGHTING);
 
@@ -246,6 +243,31 @@ void smScene::enableLights()
         else
         {
             glDisable(iter[i]->renderUsage);
+        }
+    }
+}
+
+void smScene::disableLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
+
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        glDisable(iter[i]->renderUsage);
+    }
+
+    glDisable(GL_LIGHTING);
+}
+
+void smScene::placeLights()
+{
+    smIndiceArrayIter<smLight*> iter(lights);
+
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        if (!(iter[i]->isEnabled()))
+        {
+            continue;
         }
 
         glLightf(iter[i]->renderUsage, GL_CONSTANT_ATTENUATION, iter[i]->attn_constant);
@@ -269,7 +291,5 @@ void smScene::enableLights()
         {
             glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, (smGLFloat*)&iter[i]->direction);
         }
-
-        glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
     }
 }
