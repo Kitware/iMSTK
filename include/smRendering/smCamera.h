@@ -52,7 +52,7 @@ public:
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);
         defaultCamera->setViewAngle(0.785398f); //45 degrees
-        defaultCamera->setCameraPos(0, 20, 10);
+        defaultCamera->setCameraPos(0, 0, 10);
         defaultCamera->setCameraFocus(0, 0, 0);
         defaultCamera->setCameraUpVec(0, 1, 0);
         defaultCamera->genProjMat();

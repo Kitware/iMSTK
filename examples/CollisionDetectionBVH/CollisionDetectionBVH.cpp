@@ -103,7 +103,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    std::shared_ptr<smLight> light = smLight::getDefaultLightning();
+    std::shared_ptr<smLight> light = smLight::getDefaultLighting();
     scene->addLight(light);
 
     // Camera setup

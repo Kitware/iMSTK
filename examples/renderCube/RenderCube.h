@@ -26,6 +26,8 @@
 
 #include "smCore/smSDK.h"
 
+#include "../common/wasdCameraController.h"
+
 class RenderCube
     : public smSimulationMain,
       public smCoreClass
@@ -33,13 +35,15 @@ class RenderCube
 public:
     RenderCube();
     ~RenderCube();
-    void simulateMain(smSimulationMainParam p_param);
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+    void simulateMain(const smSimulationMainParam &p_param) override;
 private:
-    std::unique_ptr<smSDK> sdk;
-    smScene *scene1;
-    smStaticSceneObject cube;
-    smViewer viewer;
+    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<smScene> scene1;
+    std::shared_ptr<smLight> light;
+    std::shared_ptr<smCamera> sceneCamera;
+    std::shared_ptr<smStaticSceneObject> cube;
+    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
 
     void setupLights();
     void setupCamera();

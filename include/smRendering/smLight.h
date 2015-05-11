@@ -113,7 +113,7 @@ public:
     //smVec3d direction;
     //between 0-1.0
     /// \brief  higher spot exponents result in a more focused light source,
-    //regardless of the spot cutoff angle. default is zeron
+    //regardless of the spot cutoff angle. default is zero
     smFloat spotExp;
     ///angle between 0-90 and 180 is also accepted
     smFloat spotCutOffAngle;
@@ -137,7 +137,7 @@ public:
     smFloat shadowRatio;
     smFloat shadorAngle;
 
-    static std::shared_ptr<smLight> getDefaultLightning(const std::string &name = "SceneLight")
+    static std::shared_ptr<smLight> getDefaultLighting(const std::string &name = "SceneLight")
     {
         std::shared_ptr<smLight>
         light = std::make_shared<smLight>(name,SIMMEDTK_LIGHT_SPOTLIGHT,SIMMEDTK_LIGHTPOS_WORLD);
@@ -151,6 +151,7 @@ public:
         light->attn_constant = 1.0;
         light->attn_linear = 0.0;
         light->attn_quadratic = 0.0;
+        light->activate(true);
         return light;
     }
 };

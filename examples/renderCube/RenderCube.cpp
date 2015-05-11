@@ -22,6 +22,9 @@
 //---------------------------------------------------------------------------
 
 #include "RenderCube.h"
+
+#include <memory>
+
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 
@@ -33,42 +36,44 @@
 RenderCube::RenderCube()
 {
     //Create an instance of the SimMedTK framework/SDK
-    sdk = smSDK::createSDK();
+    sdk = smSDK::getInstance();
 
     //Create a new scene to work in
     scene1 = sdk->createScene();
 
     //Create a viewer to see the scene through
-    //viewer = sdk->createViewer();
-    sdk->addViewer(&viewer);
+    viewer = std::make_shared<smViewer>();
+    sdk->addViewer(viewer);
+
+    //Create the camera controller
+    camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
 
     //Initialize the texture manager
-    smTextureManager::init(smSDK::getErrorLog());
+    smTextureManager::init(sdk->getErrorLog());
 
     //Load in the texture for the cube model
     smTextureManager::loadTexture("textures/cube.png", "cubetex");
 
+    cube = std::make_shared<smStaticSceneObject>();
+
     //Load the cube model
-    cube.mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
+    cube->mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
     //Assign the previously loaded texture to the cube model
-    cube.mesh->assignTexture("cubetex");
+    cube->mesh->assignTexture("cubetex");
     //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube.meshgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube->mesh->getRenderDetail()->renderType = SIMMEDTK_RENDER_WIREFRAME;//(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the cube to the scene to be rendered
-    scene1->addSceneObject(&cube);
+    scene1->addSceneObject(cube);
 
     //Register the scene with the viewer, and setup render target
-    viewer.registerScene(scene1, SMRENDERTARGET_SCREEN, "");
+    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, "");
 
     //Setup the window title in the window manager
-    viewer.setWindowTitle("SimMedTK RENDER TEST");
-
-    //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
-    viewer.addObject(this);
+    viewer->setWindowTitle("SimMedTK RENDER TEST");
 
     //Set some viewer properties
-    viewer.setScreenResolution(800, 640);
+    viewer->setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
@@ -79,10 +84,8 @@ RenderCube::RenderCube()
     //Set some camera parameters
     this->setupCamera();
 
-    //Link up the event system between this object and the SimMedTK SDK
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
+    //Link up the event system between this the camera controller and the viewer
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
 }
 
 RenderCube::~RenderCube()
@@ -92,140 +95,26 @@ RenderCube::~RenderCube()
 
 void RenderCube::setupLights()
 {
-     //Setup Scene lighting
-    smLight* light = new smLight("SceneLight1",
-                                 SIMMEDTK_LIGHT_SPOTLIGHT,
-                                 SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.pos << 10.0, 10.0, 10.0;
-    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
-    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
-    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
-    light->spotCutOffAngle = 60;
-    light->direction = smVec3d(0.0, 0.0, -1.0);
-    light->drawEnabled = false;
-    light->attn_constant = 1.0;
-    light->attn_linear = 0.0;
-    light->attn_quadratic = 0.0;
+    // Setup Scene lighting
+    light = smLight::getDefaultLighting();
+    assert(light);
     scene1->addLight(light);
 }
 
 void RenderCube::setupCamera()
 {
-    scene1->camera.setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    scene1->camera.setFarClipDist(1000);
-    scene1->camera.setNearClipDist(0.001);
-    scene1->camera.setViewAngle(0.785398f); //45 degrees
-    scene1->camera.setCameraPos(3, 3, 5);
-    scene1->camera.setCameraFocus(0, 0, -1);
-    scene1->camera.setCameraUpVec(0, 1, 0);
-    scene1->camera.genProjMat();
-    scene1->camera.genViewMat();
+    // Camera setup
+    sceneCamera = smCamera::getDefaultCamera();
+    assert(sceneCamera);
+    sceneCamera->setCameraPos(3, 3, 5);
+    sceneCamera->setCameraFocus(0, 0, -1);
+    sceneCamera->genProjMat();
+    sceneCamera->genViewMat();
+    scene1->addCamera(sceneCamera);
+    camCtl->setCamera(sceneCamera);
 }
 
-void RenderCube::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
-{
-    switch (p_event->eventType.eventTypeCode)
-    {
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-    {
-        smKeyboardEventData* kbData =
-            reinterpret_cast<smKeyboardEventData*>(p_event->data);
-        smKey key = kbData->keyBoardKey;
-        if (key == smKey::Escape && kbData->pressed)
-        {
-            //Tell the framework to shutdown
-            sdk->shutDown();
-        }
-        else if (key == smKey::W && kbData->pressed)
-        {
-            smCamera cam = scene1->camera;
-            if (smModKey::shift == (kbData->modKeys & smModKey::shift))
-            {
-                //Move the camera up
-                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y + 1, cam.pos.z);
-                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y + 1, cam.fp.z);
-                scene1->camera.genViewMat();
-            }
-            else
-            {
-                //Move the camera forward
-                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z - 1);
-                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z - 1);
-                scene1->camera.genViewMat();
-            }
-        }
-        else if (key == smKey::A && kbData->pressed)
-        {
-            //Move the camera to the left
-            smCamera cam = scene1->camera;
-            scene1->camera.setCameraPos(cam.pos.x - 1, cam.pos.y, cam.pos.z);
-            scene1->camera.setCameraFocus(cam.fp.x - 1, cam.fp.y, cam.fp.z);
-            scene1->camera.genViewMat();
-        }
-        else if (key == smKey::S && kbData->pressed)
-        {
-            //Move the camera backward
-            smCamera cam = scene1->camera;
-            if (smModKey::shift == (kbData->modKeys & smModKey::shift))
-            {
-                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y - 1, cam.pos.z);
-                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y - 1, cam.fp.z);
-                scene1->camera.genViewMat();
-            }
-            else
-            {
-                scene1->camera.setCameraPos(cam.pos.x, cam.pos.y, cam.pos.z + 1);
-                scene1->camera.setCameraFocus(cam.fp.x, cam.fp.y, cam.fp.z + 1);
-                scene1->camera.genViewMat();
-            }
-        }
-        else if (key == smKey::D && kbData->pressed)
-        {
-            //Move the camera to the right
-            smCamera cam = scene1->camera;
-            scene1->camera.setCameraPos(cam.pos.x + 1, cam.pos.y, cam.pos.z);
-            scene1->camera.setCameraFocus(cam.fp.x + 1, cam.fp.y, cam.fp.z);
-            scene1->camera.genViewMat();
-        }
-        break;
-    }
-    case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
-    {
-        smMouseButtonEventData* mbData =
-            reinterpret_cast<smMouseButtonEventData*>(p_event->data);
-        std::cout << "mbData: button: ";
-        if (mbData->mouseButton == smMouseButton::Left)
-            std::cout << "Left";
-        else if (mbData->mouseButton == smMouseButton::Right)
-            std::cout << "Right";
-        else if (mbData->mouseButton == smMouseButton::Middle)
-            std::cout << "Middle";
-        else
-            std::cout << "Unknown";
-
-        std::cout << " pressed: ";
-        if(mbData->pressed)
-            std::cout << "true";
-        else
-            std::cout << "false";
-
-        std::cout << " x: " << mbData->windowX << " y: " << mbData->windowY << "\n";
-        break;
-    }
-    case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
-    {
-        smMouseMoveEventData* mpData =
-            reinterpret_cast<smMouseMoveEventData*>(p_event->data);
-        std::cout << "mpData: x: " << mpData->windowX
-            << " y: " << mpData->windowY << "\n";
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void RenderCube::simulateMain(smSimulationMainParam /*p_param*/)
+void RenderCube::simulateMain(const smSimulationMainParam &p_param)
 {
     //Run the simulator framework
     sdk->run();

@@ -37,7 +37,7 @@ void smVAO::initBuffers(smDrawParam /*p_param*/)
     ///Create Vertex Buffer Objects(VBOs)
     glGenBuffers(totalNbrBuffers, bufferIndices);
 
-    assert(bufferIndices != nullptr);
+    SM_CHECKERROR(log, error);
 
     ///Initialize and file the VBOs
     for (smInt i = 0; i < totalNbrBuffers; i++)

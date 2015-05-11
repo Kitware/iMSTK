@@ -205,10 +205,10 @@ void smViewer::mouseButtonEventTrigger(GLFWwindow* /*window*/, int button, int a
     else
         mouseButton = smMouseButton::Unknown;
 
-    auto keyboardEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
-    keyboardEvent->setPresed(action == GLFW_PRESS);
+    auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
+    mouseEvent->setPresed(action == GLFW_PRESS);
 
-    eventHandler->triggerEvent(keyboardEvent);
+    eventHandler->triggerEvent(mouseEvent);
 }
 
 void smViewer::initResources(smDrawParam p_param)

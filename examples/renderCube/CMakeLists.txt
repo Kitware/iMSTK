@@ -5,4 +5,6 @@ target_link_libraries(renderCube
   smRendering
   smShader
   smMesh
+  smEvent
+  ExamplesCommon
   )

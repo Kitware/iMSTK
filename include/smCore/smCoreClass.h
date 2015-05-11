@@ -231,19 +231,18 @@ protected:
     }
 
 protected:
-    std::atomic_int referenceCounter;   // reference counter to identify the count the usage
-    smClassType type;                   // class type
-    smString name;                      // name of the class
-    bool listening;                     // parameter to determine if this object
+    std::atomic_int referenceCounter; ///< reference counter to identify the count the usage
+    smClassType type; ///< class type
+    smString name; ///< name of the class
+    bool listening; ///< parameter to determine if this object is listening for events
     std::map<
     smtk::Event::EventType,
     smtk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
 
 private:
-    std::shared_ptr<smUnifiedId> uniqueId;          // unique Id
-    std::shared_ptr<smRenderDetail> renderDetail;   // specifies visualization type
-    smClassDrawOrder drawOrder;                     // draw order of the object
-                                                    //  is listening for events
+    std::shared_ptr<smUnifiedId> uniqueId; ///< unique Id
+    std::shared_ptr<smRenderDetail> renderDetail; ///< specifies visualization type
+    smClassDrawOrder drawOrder; ///< draw order of the object
 };
 
 /// \brief for future use
