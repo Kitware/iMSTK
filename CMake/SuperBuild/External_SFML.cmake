@@ -17,11 +17,11 @@
 #
 ###########################################################################
 #
-# Oculus
+# SFML
 #
 
-set(Oculus_TAG "8ea873223fa0e2491a8ebe946b9f0fefe449fdc8")
-set(Oculus_REPOSITORY git@bitbucket.org:simmedtk/oculussdk.git)
+set(SFML_TAG "fc850ed99fc3e52e16c7d9d1bf71daf92cbe5f76")
+set(SFML_REPOSITORY ${git_protocol}://github.com/LaurentGomila/SFML.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -31,16 +31,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED Oculus_DIR AND NOT EXISTS ${Oculus_DIR})
-  message(FATAL_ERROR "Oculus_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED SFML_DIR AND NOT EXISTS ${SFML_DIR})
+  message(FATAL_ERROR "SFML_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(Oculus_DEPENDENCIES "")
+set(SFML_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Oculus)
+SimMedTKCheckDependencies(SFML)
 
-set(proj Oculus)
+set(proj SFML)
 
 if(NOT DEFINED ${proj}_DIR)
 
@@ -60,7 +60,6 @@ if(NOT DEFINED ${proj}_DIR)
     PREFIX ${CMAKE_BINARY_DIR}/SuperBuild/${proj}${ep_suffix}
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_TAG}
-    GIT_SUBMODULES cmake
     UPDATE_COMMAND ""
     INSTALL_COMMAND ""
     CMAKE_GENERATOR ${gen}
@@ -69,17 +68,17 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/SimMedTK-build
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DOCULUS_BUILD_SAMPLES:BOOL=OFF
+      -DSFML_BUILD_EXAMPLES:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
-	LOG_DOWNLOAD 1            # Wrap download in script to log output
-	LOG_UPDATE 1              # Wrap update in script to log output
-# 	LOG_CONFIGURE 1           # Wrap configure in script to log output
-# 	LOG_BUILD 1               # Wrap build in script to log output
-	LOG_TEST 1                # Wrap test in script to log output
-	LOG_INSTALL 1             # Wrap install in script to log output
+#     LOG_DOWNLOAD 1            # Wrap download in script to log output
+#     LOG_UPDATE 1              # Wrap update in script to log output
+  #   LOG_CONFIGURE 1           # Wrap configure in script to log output
+  #   LOG_BUILD 1               # Wrap build in script to log output
+#     LOG_TEST 1                # Wrap test in script to log output
+#     LOG_INSTALL 1             # Wrap install in script to log output
     )
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build)
 
@@ -87,5 +86,4 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Src/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})

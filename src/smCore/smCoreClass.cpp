@@ -53,6 +53,13 @@ void smCoreClass::setType(const smClassType& newType)
     this->type = newType;
 }
 
+smDrawParam::smDrawParam() :
+    rendererObject{nullptr},
+    caller{nullptr},
+    data{nullptr}
+{
+}
+
 void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
 {
     std::cout << "Default initDraw" << std::endl;

@@ -557,6 +557,19 @@ void smGLRenderer::enableDefaultGLRendering()
 void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
                                smDrawParam p_param)
 {
+    assert(p_scene);
+
+    smMatrix44f proj = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getProjMatRef());
+    smMatrix44f view = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getViewMatRef());
+
+    renderScene(p_scene, p_param, proj, view);
+}
+
+void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
+                               smDrawParam p_param,
+                               const smMatrix44f &p_proj,
+                               const smMatrix44f &p_view)
+{
     smSceneIterator sceneIter;
 
     assert(p_scene);
@@ -564,16 +577,24 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
     //Load View and Projection Matrices
     // -- with new rendering techniques, these would be passed to a shader
     glMatrixMode(GL_PROJECTION);
-    glLoadMatrixf(p_scene->getCamera()->getProjMatRef());
+    glPushMatrix();
+    glLoadMatrixf(p_proj.data());
     glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(p_scene->getCamera()->getViewMatRef());
+    glPushMatrix();
+    glLoadMatrixf(p_view.data());
 
     sceneIter.setScene(p_scene, p_param.caller);
+
+    //Enable lights
+    p_scene->enableLights();
+    p_scene->placeLights();
 
     for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
     {
         renderSceneObject(sceneIter[j], p_param);
     }
+
+    p_scene->disableLights();
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();

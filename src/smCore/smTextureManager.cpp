@@ -33,7 +33,6 @@ smInt smTextureManager:: activeTextures;
 smBool smTextureManager::isInitialized = false;
 smBool smTextureManager::isInitializedGL = false;
 smBool smTextureManager::isDeleteImagesEnabled = false;
-smCallTextureCallBack smTextureManager::callback = NULL;
 void *smTextureManager::param = NULL;
 
 /// \brief
@@ -41,7 +40,6 @@ smTextureReturnType smTextureManager::initGLTextures()
 {
     smString texManagerError;
     smTexture *texture;
-    smImageData data;
 
     for (size_t i = 0; i < textures.size(); i++)
     {
@@ -63,7 +61,6 @@ smTextureReturnType smTextureManager::initGLTextures()
             continue;
         }
 
-        ilBindImage(texture->imageId);
         glGenTextures(1, &texture->textureGLId);
 
         glBindTexture(GL_TEXTURE_2D,  texture->textureGLId);
@@ -75,54 +72,15 @@ smTextureReturnType smTextureManager::initGLTextures()
         glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        data.bytePerPixel = texture->bitsPerPixel;
-        data.width = texture->width;
-        data.height = texture->height;
-        data.imageColorType = SIMMEDTK_IMAGECOLOR_RGB;
-        data.fileName = texture->textureFileName;
 
-        if (ilGetInteger(IL_IMAGE_FORMAT) == IL_RGBA)
-        {
-            data.imageColorType = SIMMEDTK_IMAGECOLOR_RGBA;
-        }
-
-        data.data = ilGetData();
-
-        if (callback != NULL)
-        {
-            callback(&data, param);
-
-        }
-
-        ilSetData(data.data);
-        glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP),
-                     ilGetInteger(IL_IMAGE_WIDTH), ilGetInteger(IL_IMAGE_HEIGHT),
-                     0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE, data.data);
-
-        if (texture->isTextureDataAvailable)
-        {
-            if (data.imageColorType == SIMMEDTK_IMAGECOLOR_RGBA)
-            {
-                texture->mRGB = new unsigned char[4 * texture->width * texture->height];
-                memcpy(texture->mRGB, data.data, 4 * texture->width * texture->height);
-            }
-            else
-            {
-                texture->mRGB = new unsigned char[3 * texture->width * texture->height] ;
-                memcpy(texture->mRGB, data.data, 3 * texture->width * texture->height);
-            }
-        }
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture->width, texture->height,
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, texture->image.getPixelsPtr());
 
         glGenerateMipmap(GL_TEXTURE_2D);
 
         if (smGLUtils::queryGLError(texManagerError))
         {
             errorLog->addError(texManagerError);
-        }
-
-        if (isDeleteImagesEnabled)
-        {
-            ilDeleteImages(1, &textures[i]->imageId);
         }
 
     }
@@ -137,98 +95,50 @@ smTextureReturnType smTextureManager::initGLTextures()
 smTextureReturnType smTextureManager::loadTexture(const smString& p_fileName,
         const smString& p_textureReferenceName, smInt &p_textureId)
 {
+    smTextureReturnType ret = loadTexture(p_fileName, p_textureReferenceName, true);
+    if (ret == SIMMEDTK_TEXTURE_OK)
+    {
+        p_textureId = textureIndexId[p_textureReferenceName];
+    }
+    return ret;
+}
 
-    smTexture *texture;
-    ILenum error;
-    ILuint imageName;
+/// \brief
+smTextureReturnType smTextureManager::loadTexture(const smString& p_fileName, const smString& p_textureReferenceName, smBool p_flipImage)
+{
+    smTexture *texture = nullptr;
+    sf::Vector2u imageSize;
+
+    assert(p_fileName != "");
+    assert(p_textureReferenceName != "");
 
     if (!isInitialized)
     {
         return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
     }
 
-    ilGenImages(1, &imageName);
-    ilBindImage(imageName);
-    ilLoadImage(p_fileName.data());
-    iluFlipImage();
-    ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-
-    error = ilGetError();
-
-    if (error != IL_NO_ERROR)
-    {
-        reportError();
-        return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
-    }
-
     texture = new smTexture();
-    texture->textureFileName = p_fileName;
-    texture->width = ilGetInteger(IL_IMAGE_WIDTH);
-    texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
-    texture->imageId = imageName;
-    texture->bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8;
-    textures.push_back(texture);
-    textureIndexId[p_textureReferenceName] = activeTextures;
-    p_textureId = activeTextures;
-    activeTextures++;
-
-    return SIMMEDTK_TEXTURE_OK;
-}
-
-/// \brief
-smTextureReturnType smTextureManager::loadTexture(const smString& p_fileName, const smString& p_textureReferenceName, smBool p_flipImage, smBool deleteDataAfterLoaded)
-{
-    smTexture *texture = NULL;
-    ILenum error;
-    ILuint imageName;
-
-    assert(p_fileName != "");
-    assert(p_textureReferenceName != "");
-
-    ilGenImages(1, &imageName);
-    ilBindImage(imageName);
-
-    if (ilLoadImage(p_fileName.data()) == IL_FALSE)
+    assert(texture);
+    if (false == texture->image.loadFromFile(p_fileName))
     {
-        std::cout << "[smTextureManager::loadTexture] Texture is not found \"" << p_fileName << "\"\n";
+        std::cout << "[smTextureManager::loadTexture] Texture not found: \"" << p_fileName << "\"\n";
         return SIMMEDTK_TEXTURE_NOTFOUND;
     }
 
     if (p_flipImage)
     {
-        iluFlipImage();
+        texture->image.flipVertically();
     }
 
-    ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-    reportError();
-    error = ilGetError();
-
-    if (error != IL_NO_ERROR)
-    {
-        return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
-    }
-
-    texture = new smTexture();
     texture->textureFileName = p_fileName;
-    texture->width = ilGetInteger(IL_IMAGE_WIDTH);
-    texture->height = ilGetInteger(IL_IMAGE_HEIGHT);
-    texture->bitsPerPixel = ilGetInteger(IL_IMAGE_BPP) * 8;
-    texture->imageId = imageName;
-    texture->mRGB = NULL;
-    texture->isTextureDataAvailable = !deleteDataAfterLoaded;
+    imageSize = texture->image.getSize();
+    texture->width = imageSize.x;
+    texture->height = imageSize.y;
 
     textures.push_back(texture);
     textureIndexId[p_textureReferenceName] = activeTextures;
     activeTextures++;
     return SIMMEDTK_TEXTURE_OK;
-}
-
-/// \brief load texture with given filename, texture reference name, parameter to flip the image or not
-smTextureReturnType smTextureManager::loadTexture(const smString& p_fileName,
-        const smString& p_textureReferenceName, smBool p_flipImage)
-{
-
-    return loadTexture(p_fileName, p_textureReferenceName, p_flipImage, true);
 }
 
 
@@ -492,7 +402,6 @@ void smTextureManager::initDepthTexture(smTexture *p_texture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, p_texture->width, p_texture->height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    glGetIntegerv(GL_DEPTH_BITS, &p_texture->bitsPerPixel);
     glBindTexture(GL_TEXTURE_2D, 0);
     p_texture->isInitialized = true;
 }
@@ -542,30 +451,4 @@ void smTextureManager::generateMipMaps(const smString& p_textureReferenceName)
     texture = textures[textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
     glGenerateMipmap(GL_TEXTURE_2D);
-}
-
-/// \brief
-void smTextureManager::saveBinaryImage(void *p_binaryData, smInt p_width, smInt p_height, const smString& p_fileName)
-{
-
-    ILuint ilTexture, width = p_width, height = p_height;
-    ilGenImages(1, &ilTexture);
-    ilBindImage(ilTexture);
-    ilEnable(IL_FILE_OVERWRITE);
-    ilTexImage(width, height, 1, 1, IL_LUMINANCE, IL_UNSIGNED_BYTE, 0);
-    ilSetPixels(0, 0, 0, width, height, 1, IL_LUMINANCE, IL_UNSIGNED_BYTE, p_binaryData);
-    ilSave(IL_BMP, p_fileName.data());
-}
-
-/// \brief
-void smTextureManager::saveRGBImage(void *p_binaryData, smInt p_width, smInt p_height, const smString& p_fileName)
-{
-
-    ILuint ilTexture, width = p_width, height = p_height;
-    ilGenImages(1, &ilTexture);
-    ilBindImage(ilTexture);
-    ilEnable(IL_FILE_OVERWRITE);
-    ilTexImage(width, height, 1, 3, IL_RGB, IL_UNSIGNED_BYTE, 0);
-    ilSetPixels(0, 0, 0, width, height, 1, IL_RGB, IL_UNSIGNED_BYTE, p_binaryData);
-    ilSaveImage(p_fileName.data());
 }

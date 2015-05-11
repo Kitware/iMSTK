@@ -38,9 +38,9 @@ namespace Event {
 /// \brief contains state of the audio driver
 enum class AudioState
 {
-    Play,
+    Unknown = -1,
+    Play = 0,
     Stop,
-    PlayContinuous
 };
 
 class smAudioEvent: public smEvent

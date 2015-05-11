@@ -49,7 +49,7 @@ public:
 
     const bool &togglePressed();
 
-    void setModifierKey(const smModKey &coordinates);
+    void setModifierKey(const smModKey &modKey);
 
     const smModKey &getModifierKey();
 

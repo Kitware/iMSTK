@@ -67,10 +67,6 @@ void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
 
     this->viewer = p_viewer;
     this->viewer->log = this->errorLog;
-    this->viewer->attachEvent(smtk::Event::EventType::Keyboard,scenesRef->getByRef(0).scene);
-    this->viewer->attachEvent(smtk::Event::EventType::MouseMove,scenesRef->getByRef(0).scene);
-    this->viewer->attachEvent(smtk::Event::EventType::MouseButton,scenesRef->getByRef(0).scene);
-
     this->registerModule(p_viewer);
 }
 

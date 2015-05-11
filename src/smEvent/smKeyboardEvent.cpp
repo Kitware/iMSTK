@@ -30,9 +30,11 @@ namespace Event {
 
 constexpr EventType smKeyboardEvent::EventName;
 
-smKeyboardEvent::smKeyboardEvent(const smKey& button): pressed(false), key(button), modKey(smModKey::none)
+smKeyboardEvent::smKeyboardEvent(const smKey& button)
+    : pressed(false), key(button), modKey(smModKey::none)
 {
 }
+
 const smKey& smKeyboardEvent::getKeyPressed()
 {
     return key;
@@ -49,9 +51,9 @@ const bool& smKeyboardEvent::togglePressed()
 {
     return this->pressed = !this->pressed;
 }
-void smKeyboardEvent::setModifierKey(const smModKey& coordinates)
+void smKeyboardEvent::setModifierKey(const smModKey& modKey)
 {
-    this->modKey = coordinates;
+    this->modKey = modKey;
 }
 const smModKey& smKeyboardEvent::getModifierKey()
 {

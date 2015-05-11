@@ -24,136 +24,118 @@
 #ifndef SMAUDIO_H
 #define SMAUDIO_H
 
+#include <SFML/Audio.hpp>
+
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
-#include "audiere.h"
 #include "smCore/smSDK.h"
 #include "smEvent/smAudioEvent.h"
-
-using namespace audiere;
-
-/// \brief contains audio query states
-enum smAudioReturnType
-{
-    SIMMEDTK_AUDIO_PLAYING,
-    SIMMEDTK_AUDIO_STOPPED,
-    SIMMEDTK_AUDIO_SOUNDERROR,
-    SIMMEDTK_AUDIO_SOUNDNOOP,
-};
 
 /// \brief class to enable audio rendering
 class smAudio: public smCoreClass
 {
+private:
+    sf::Sound sound; ///< SFML Sound object, controls the sound data
+    sf::SoundBuffer soundBuffer; ///< SFML Sound buffer, contains the sound data
 
-    AudioDevicePtr device; ///< audio device
-    OutputStreamPtr sound; ///< !!
-
-    smErrorLog *log; ///< log for errors rendering audio
-    smString referenceName; ///< !!
+    std::shared_ptr<smErrorLog> log; ///< log for errors
+    smString referenceName; ///< A human readable string to refer to the object
     smtk::Event::AudioState state; ///< state of audio
     smtk::Event::AudioState prevState; ///< state of audio in previous cycle
     smFloat prevVolume; ///< state of audio volume in previous cycle
-
     smFloat volume; ///< volume (max volume is 1.0)
+    smBool loop; ///< play the song in a loop
 
 public:
-    smBool continuousPlaying; ///< true if audio is to be played continuously
+    smAudio() :
+        referenceName(""),
+        state{smtk::Event::AudioState::Unknown },
+        prevState{smtk::Event::AudioState::Unknown },
+        volume{1.0},
+        prevVolume{1.0},
+        loop{false}
+    {
+    }
 
     /// \brief constructor initialize various states
     smAudio(const smString& fileName,
             const smString& p_referenceName,
-            smErrorLog *p_log = NULL)
+            smErrorLog *p_log = nullptr,
+            smBool p_loop = false)
+        : referenceName(p_referenceName),
+          loop(p_loop)
     {
-        device = AudioDevicePtr(OpenDevice());
-        sound = OutputStreamPtr(OpenSound(device, fileName.c_str(), false));
-        volume = 1.0f; //max volume
-        prevVolume = 1.0f;
-        log = p_log;
-        continuousPlaying = true;
-        referenceName = p_referenceName;
+        if (0 != open(fileName, p_referenceName))
+        {
+            assert(false);
+        }
+
         prevState = state = smtk::Event::AudioState::Stop;
-        this->eventHandler->registerEvent(smtk::Event::EventType::Audio,shared_from_this());
+        volume = prevVolume = 1.0f;
     }
 
     /// \brief destructor
     ~smAudio()
     {
-        ///clean up process
-        sound = 0;
-        device = 0;
+    }
+
+    smInt open(const smString& fileName,
+               const smString& p_referenceName)
+    {
+        if (false == soundBuffer.loadFromFile(fileName))
+        {
+            if (nullptr != this->log)
+            {
+                this->log->addError("Error loading audio file: " + fileName);
+            }
+            return -1;
+        }
+        else
+        {
+            sound.setBuffer(soundBuffer);
+            referenceName = p_referenceName;
+        }
+        return 0;
     }
 
     /// \brief play the audio
-    smAudioReturnType play()
+    void play()
     {
+        assert("" != referenceName);
+        sound.play();
+    }
 
-        if (sound == NULL)
-        {
-            if (log != NULL)
-            {
-                log->addError("Error in playing sound.Sound object is NULL");
-            }
-
-            return SIMMEDTK_AUDIO_SOUNDERROR;
-        }
-
-        switch (state)
-        {
-            case smtk::Event::AudioState::Play:
-            {
-                if (sound->isPlaying())
-                {
-                    if (state ==  smtk::Event::AudioState::Play || state ==  smtk::Event::AudioState::PlayContinuous)
-                    {
-                        return SIMMEDTK_AUDIO_PLAYING;
-                    }
-
-                }
-                else
-                {
-                    sound->setVolume(volume);
-                    sound->play();
-                    return SIMMEDTK_AUDIO_PLAYING;
-                }
-            }
-
-            case smtk::Event::AudioState::Stop:
-            {
-                if (prevState != smtk::Event::AudioState::Stop)
-                {
-                    sound->stop();
-                }
-                return SIMMEDTK_AUDIO_STOPPED;
-            }
-
-            case smtk::Event::AudioState::PlayContinuous:
-            {
-                sound->setRepeat(continuousPlaying);
-                return SIMMEDTK_AUDIO_PLAYING;
-            }
-        }
-
-        return SIMMEDTK_AUDIO_SOUNDNOOP;
+    void pause()
+    {
+        assert("" != referenceName);
+        sound.pause();
     }
 
     /// \brief stop the audio
     void stop()
     {
-        if (sound != NULL)
-        {
-            if (sound->isPlaying())
-            {
-                sound->stop();
-            }
-        }
+        assert("" != referenceName);
+        sound.stop();
     }
 
     /// \brief set the state of audio and continue playing
     void setState(smtk::Event::AudioState p_state)
     {
+        assert("" != referenceName);
+
+        switch (state)
+        {
+        case smtk::Event::AudioState::Play:
+            this->play();
+            break;
+        case smtk::Event::AudioState::Stop:
+            this->stop();
+            break;
+        default:
+            return;
+        }
         state = p_state;
-        play();
         prevState = state;
     }
 
@@ -163,29 +145,15 @@ public:
         if (p_volume > 0.0 && p_volume < 1.0)
         {
             volume = p_volume;
+            sound.setVolume(volume*100);//SFML takes a range 0-100
         }
     }
 
-    /// \brief gather input events and change states and volume if needed
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override
+    void setLoop(smBool p_loop)
     {
-        if(!this->isListening())
-        {
-            return;
-        }
-
-        auto audioEvent = std::static_pointer_cast<smtk::Event::smAudioEvent>(event);
-
-        if (audioEvent != nullptr)
-        {
-            if (audioEvent->getSound() == referenceName)
-            {
-                setVolume(audioEvent->getVolume());
-                setState(audioEvent->getState());
-            }
-        }
+        sound.setLoop(p_loop);
+        this->loop = p_loop;
     }
-
 };
 
 #endif

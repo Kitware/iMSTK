@@ -44,6 +44,8 @@ class smViewer;
 /// \brief  viewer sends this to all objects to be rendered
 struct smDrawParam
 {
+    smDrawParam();
+
     std::shared_ptr<smViewer> rendererObject;
     std::shared_ptr<smCoreClass> caller;
     void *data;

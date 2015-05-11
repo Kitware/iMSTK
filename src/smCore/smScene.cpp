@@ -167,7 +167,6 @@ smInt smScene::addLight(std::shared_ptr<smLight> p_light)
 {
     smInt index = lights->add(p_light);
     lights->getByRef(index)->renderUsage = GL_LIGHT0 + index;
-    lights->getByRef(index)->activate(true);
     return index;
 }
 
@@ -227,12 +226,9 @@ void smScene::setLightPos(smInt p_lightId, smLightPos p_pos, smVec3d p_direction
 void smScene::enableLights()
 {
     static smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
-    smFloat dir[4];
-    static smLightPos defaultPos(0, 0, 0);
 
     glEnable(GL_LIGHTING);
 
-    smVec3f casted;
     for (smInt i = iter.begin(); i < iter.end(); i++)
     {
         if (iter[i]->isEnabled())
@@ -242,6 +238,32 @@ void smScene::enableLights()
         else
         {
             glDisable(iter[i]->renderUsage);
+        }
+    }
+}
+
+void smScene::disableLights()
+{
+    static smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
+
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        glDisable(iter[i]->renderUsage);
+    }
+
+    glDisable(GL_LIGHTING);
+}
+
+void smScene::placeLights()
+{
+    static smIndiceArrayIter<std::shared_ptr<smLight>> iter(lights);
+
+    for (smInt i = iter.begin(); i < iter.end(); i++)
+    {
+        smVec3f casted;
+        if (!(iter[i]->isEnabled()))
+        {
+            continue;
         }
 
         glLightf(iter[i]->renderUsage, GL_CONSTANT_ATTENUATION, iter[i]->attn_constant);
@@ -267,8 +289,6 @@ void smScene::enableLights()
         {
             glLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, casted.data());
         }
-
-        glGetLightfv(iter[i]->renderUsage, GL_SPOT_DIRECTION, dir);
     }
 }
 

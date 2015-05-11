@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  /=========================================================================
- 
+
  /**
   *  \brief
   *  \details
@@ -29,11 +29,16 @@
 #include "smCore/smSDK.h"
 #include "smRendering/smOculusViewer.h"
 
-class RenderCubeOculus : public smSimulationMain, public smCoreClass
+class RenderCubeOculus
+    : public smSimulationMain,
+    public smCoreClass,
+    public smEventHandler
 {
 public:
     RenderCubeOculus();
+    ~RenderCubeOculus();
     void simulateMain(smSimulationMainParam p_param);
+    void handleEvent(smEvent *p_event);
 private:
     smSDK* simmedtkSDK;
     smScene *scene1;

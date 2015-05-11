@@ -76,7 +76,7 @@ RenderCube::RenderCube()
     viewer->setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    //viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Setup lights
     this->setupLights();

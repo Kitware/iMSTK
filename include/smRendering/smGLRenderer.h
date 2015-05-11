@@ -31,6 +31,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
+#include "smUtilities/smMatrix.h"
 
 class smMesh;
 class smAABB;
@@ -84,7 +85,19 @@ public:
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
-    static void renderScene(std::shared_ptr<smScene> p_scene, smDrawParam p_param);
+    static void renderScene(std::shared_ptr<smScene> p_scene,
+                            smDrawParam p_param);
+    /// \brief Renders a smScene's objects
+    ///
+    /// \detail Requires the caller to have called registerForScene() on p_scene
+    /// \param p_scene The scene to render
+    /// \param p_param The drawing parameters
+    /// \param p_proj A custom projection matrix to use instead of that provided with the scene
+    /// \param p_view A custom view matrix to use instead of that provided with the scene
+    static void renderScene(std::shared_ptr<smScene> p_scene,
+                            smDrawParam p_param,
+                            const smMatrix44f &p_proj,
+                            const smMatrix44f &p_view);
 
     /// \brief Renders a single smSceneObject
     ///
