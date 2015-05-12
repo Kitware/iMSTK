@@ -1,5 +1,5 @@
 
-add_executable(renderCube main.cpp  RenderCube.cpp RenderCube.h)
+add_executable(renderCube main.cpp)
 target_link_libraries(renderCube
   smCore
   smRendering

@@ -21,34 +21,41 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef RENDER_CUBE_H
-#define RENDER_CUBE_H
+#ifndef SMTK_EXAMPLES_COMMON_KEYPRESSSDKSHUTDOWN_H
+#define SMTK_EXAMPLES_COMMON_KEYPRESSSDKSHUTDOWN_H
 
-#include "smCore/smSDK.h"
+#include "smCore/smCoreClass.h"
+#include "smEvent/smKey.h"
 
-#include "../common/wasdCameraController.h"
+namespace smtk {
+namespace Examples {
+namespace Common {
 
-class RenderCube
-    : public smSimulationMain,
-      public smCoreClass
+/// \brief Will shutdown the SDK when the a specified key is pressed
+class KeyPressSDKShutdown : public smCoreClass
 {
 public:
-    RenderCube();
-    ~RenderCube();
-    void simulateMain(const smSimulationMainParam &p_param) override;
-private:
-    std::shared_ptr<smSDK> sdk;
-    std::shared_ptr<smViewer> viewer;
-    std::shared_ptr<smScene> scene1;
-    std::shared_ptr<smLight> light;
-    std::shared_ptr<smCamera> sceneCamera;
-    std::shared_ptr<smStaticSceneObject> cube;
-    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
+    /// \brief Default constructor
+    ///
+    /// \detail Default key is escape
+    KeyPressSDKShutdown();
 
-    void setupLights();
-    void setupCamera();
+    /// \brief Event handling function from smCoreClass
+    ///
+    /// \param event Event to handle from the main event system
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+
+    /// \brief Set the keyboard key to listen for
+    ///
+    /// \param key The keyboard key to listen for
+    void setKey(smtk::Event::smKey key);
+
+private:
+    smtk::Event::smKey key; ///< When this key is pressed, shutdown the framework
 };
 
-void runRenderCube();
+}//Common
+}//Examples
+}//smtk
 
 #endif

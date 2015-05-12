@@ -284,7 +284,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
 
     if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
     {
-        glVertexPointer(3, smGLRealType, 0, p_surfaceMesh->vertices.data());
+        glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->vertices.data());
     }
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
