@@ -297,7 +297,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
 
     if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
     {
-        glNormalPointer(smGLRealType, 0, p_surfaceMesh->vertNormals);
+        glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->vertNormals);
     }
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
