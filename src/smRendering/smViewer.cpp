@@ -81,7 +81,7 @@ smViewer::smViewer()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
-    if(eventHandler == nullptr)
+    if(nullptr == eventHandler)
         eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
@@ -313,6 +313,7 @@ void smViewer::initFboListItems()
                 renderOperations[j].fbo = item->fbo;
             }
         }
+        item->fbo->disable();
     }
 }
 

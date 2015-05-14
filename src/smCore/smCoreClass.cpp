@@ -31,7 +31,8 @@ smCoreClass::smCoreClass() :
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId = std::make_shared<smUnifiedId>();
-    eventHandler = std::make_shared<smtk::Event::smEventHandler>();
+    if(nullptr == eventHandler)
+        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
     renderDetail = std::make_shared<smRenderDetail>();
 }
 
@@ -40,7 +41,8 @@ smCoreClass::smCoreClass(const std::string &_name) :
 {
     drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
     uniqueId = std::make_shared<smUnifiedId>();
-    eventHandler = std::make_shared<smtk::Event::smEventHandler>();
+    if(nullptr == eventHandler)
+        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 const smClassType &smCoreClass::getType() const

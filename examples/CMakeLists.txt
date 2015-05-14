@@ -12,7 +12,7 @@ endif(SimMedTK_USE_OCULUS)
 
 add_subdirectory(AudioExample)
 add_subdirectory(renderCube)
-# add_subdirectory(renderCubeToTexture)
+add_subdirectory(renderCubeToTexture)
 # add_subdirectory(vegaFem)
 # add_subdirectory(MultipleObjects)
 add_subdirectory(CollisionDetectionSpatialHashing)

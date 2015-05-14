@@ -52,7 +52,7 @@ int main()
 
     //Create the camera controller
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
-    keyShutdown= std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+    keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
     //Initialize the texture manager
     smTextureManager::init(sdk->getErrorLog());
