@@ -339,6 +339,65 @@ void smVolumeMesh::initSurface()
     updateVertexNormals();
 }
 
+void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMesh, bool perProcessingStage)
+{
+    smInt i, threeI, j;
+
+    //temporary arrays
+    smInt *numNodes, *numElements, *numVertsPerEle;
+    smInt **elements;
+    smDouble **nodes;
+
+    vega3dMesh->exportMeshGeometry(numNodes, nodes, numElements, numVertsPerEle, elements);
+
+    this->nbrTetra = *numElements;
+	this->nbrNodes = *numNodes;
+
+	this->tetra.clear();
+    //copy the element connectivity information
+    for(i=0; i<this->nbrTetra ; i++)
+    {
+        threeI = *numVertsPerEle * i;
+        for(j=0; j<*numVertsPerEle ; j++)
+        {
+            tetra[i].vert[j] = (*elements)[threeI + j];
+        }
+    }
+
+	this->nodes.resize(this->nbrNodes);
+    //copy the nodal co-ordinates
+    for(i=0; i<this->nbrVertices ; i++)
+    {
+        threeI = 3*i;
+        this->nodes[i][0] = (*nodes)[threeI];
+        this->nodes[i][1] = (*nodes)[threeI+1];
+        this->nodes[i][2] = (*nodes)[threeI+2]; 
+    }
+
+    if(perProcessingStage){
+        // do something here!
+    }
+
+    //deallocate temporary arrays   
+    delete [] numVertsPerEle;
+    delete [] numElements;
+    delete [] numNodes;
+
+    for(i=0; i<this->nbrTetra ; i++)
+    {
+        delete [] elements[i];
+    }
+    delete [] elements;
+
+	for (i = 0; i<this->nbrNodes; i++)
+    {
+        delete [] nodes[i];
+    }
+    delete [] nodes;
+
+}
+
+
 /// \brief destructor
 smVolumeMesh::~smVolumeMesh()
 {

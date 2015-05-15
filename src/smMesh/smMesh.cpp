@@ -835,7 +835,84 @@ void smLineMesh::scale( smVec3d p_scaleFactors )
 
     updateAABB();
 }
+
 bool smLineMesh::isMeshTextured()
 {
     return isTextureCoordAvailable;
+}
+
+
+bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool perProcessingStage)
+{   
+
+     if(!vegaSurfaceMesh->isTriangularMesh())
+    {
+        if (this->log != nullptr)
+        {
+            this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
+            return 0;
+        }
+    }    
+
+    smInt i, threeI;
+
+    // temporary arrays
+    smInt * numVertices;
+    smDouble ** vertices;
+    smInt * numTriangles;
+    smInt ** triangles;
+    smInt * numGroups;
+	smInt ** triangleGroups;
+    
+    vegaSurfaceMesh->exportGeometry(numVertices, vertices, numTriangles , triangles, numGroups, triangleGroups) ;
+
+    this->nbrVertices = *numVertices;
+    this->nbrTriangles = *numTriangles;
+
+    if(this->triangles != nullptr){
+        delete this->triangles;
+        this->triangles = new smTriangle[this->nbrTriangles];
+    }
+
+    //copy the triangle connectivity information
+    for(i=0; i<this->nbrTriangles ; i++)
+    {
+        threeI = 3*i;
+        this->triangles[i].vert[0] = (*triangles)[threeI+0];
+        this->triangles[i].vert[1] = (*triangles)[threeI+1];
+        this->triangles[i].vert[2] = (*triangles)[threeI+2];
+    }
+
+	this->vertices.resize(this->nbrVertices);
+    //copy the vertex co-ordinates
+    for(i=0; i<this->nbrVertices ; i++)
+    {
+       this->vertices[i][0] = vertices[i][0];
+       this->vertices[i][1] = vertices[i][1];
+       this->vertices[i][2] = vertices[i][2];
+    }
+
+    if(perProcessingStage){
+        updateOriginalVertsWithCurrent();
+    }
+
+    //deallocate temporary arrays
+    delete [] numTriangles;
+    delete [] numVertices;
+    delete [] numGroups;
+
+    for(i=0; i<this->nbrTriangles ; i++)
+    {
+        delete [] triangles[i];
+    }
+    delete [] triangles;
+
+    for(i=0; i<this->nbrVertices ; i++)
+    {        
+        delete [] vertices[i];        
+    }
+    delete [] vertices;
+
+    return 1;
+
 }

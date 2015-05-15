@@ -25,6 +25,8 @@
 
 // STL includes
 #include <memory>
+#include <chrono>
+#include <thread>
 
 // SimMedTK includes
 #include "smCore/smSDK.h"

@@ -158,6 +158,8 @@ void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*
         moveObj = 9; // reset
         modelB->mesh->translate(-moveObj, 0, 0);
     }
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void CollisionDetectionBVH::run()
