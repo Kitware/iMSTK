@@ -41,7 +41,7 @@ namespace Event {
 class smHapticEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::Haptic;
+    static EventType EventName;
 
 public:
     smHapticEvent(const size_t &deviceId, const std::string &deviceName);

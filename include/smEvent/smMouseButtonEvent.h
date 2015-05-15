@@ -37,7 +37,7 @@ namespace Event {
 class smMouseButtonEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::MouseButton;
+    static EventType EventName;
 
 public:
     smMouseButtonEvent(const smMouseButton &button);

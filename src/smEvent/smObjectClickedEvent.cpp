@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smObjectClickedEvent::EventName;
+EventType smObjectClickedEvent::EventName = EventType::ObjectClicked;
 
 smObjectClickedEvent::smObjectClickedEvent(const size_t& objectId): id(objectId)
 {}

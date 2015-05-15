@@ -30,7 +30,7 @@ namespace smtk
 namespace Event
 {
 
-constexpr EventType smAudioEvent::EventName;
+EventType smAudioEvent::EventName = EventType::Audio;
 
 smAudioEvent::smAudioEvent(): state(AudioState::Stop), sound(""), volume(-1.0)
 {

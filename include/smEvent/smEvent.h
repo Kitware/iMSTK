@@ -79,7 +79,7 @@ public:
     using Pointer = std::shared_ptr<smEvent>;
 
 public:
-    static constexpr EventType EventName = EventType::None;
+    static EventType EventName;
 
 public:
     smEvent();

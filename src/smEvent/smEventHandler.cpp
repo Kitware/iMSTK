@@ -47,13 +47,14 @@ void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<smC
     this->unregisterEvent(eventType,index);
     component->removeEventIndex(eventType);
 }
-bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr< smCoreClass > component)
+bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr<smCoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
 
     return this->isAttached(eventType,index);
 }
-bool smEventHandler::isAttached(const EventType& eventType, std::list< smEventHandler::FunctionType >::iterator index)
+bool smEventHandler::isAttached(const EventType& eventType,
+                                smEventHandler::FunctionContainerType::iterator index)
 {
     auto i = observers.find(eventType);
 

@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smCameraEvent::EventName;
+EventType smCameraEvent::EventName = EventType::CameraUpdate;
 
 smCameraEvent::smCameraEvent()
 {

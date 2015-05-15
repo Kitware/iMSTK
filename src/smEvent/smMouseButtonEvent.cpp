@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smMouseButtonEvent::EventName;
+EventType smMouseButtonEvent::EventName = EventType::MouseButton;
 
 smMouseButtonEvent::smMouseButtonEvent(const smMouseButton& button): pressed(false), mouseButton(button)
 {}

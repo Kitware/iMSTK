@@ -46,7 +46,7 @@ enum class AudioState
 class smAudioEvent: public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::Audio;
+    static EventType EventName;
 
 public:
     smAudioEvent();
