@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smLightMotionEvent::EventName;
+EventType smLightMotionEvent::EventName = EventType::LightMotion;
 
 smLightMotionEvent::smLightMotionEvent(const int& lightIndex): index(lightIndex)
 {

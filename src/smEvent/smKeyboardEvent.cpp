@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smKeyboardEvent::EventName;
+EventType smKeyboardEvent::EventName = EventType::Keyboard;
 
 smKeyboardEvent::smKeyboardEvent(const smKey& button)
     : pressed(false), key(button), modKey(smModKey::none)

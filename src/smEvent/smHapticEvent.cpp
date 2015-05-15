@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smHapticEvent::EventName;
+EventType smHapticEvent::EventName = EventType::Haptic;
 
 smHapticEvent::smHapticEvent(const size_t& deviceId, const std::string& deviceName): id(deviceId), name(deviceName)
 {}

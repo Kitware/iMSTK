@@ -23,6 +23,9 @@
 
 #include "CollisionDetectionSpatialHashing.h"
 
+#include "../common/wasdCameraController.h"
+#include "../common/KeyPressSDKShutdown.h"
+
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 #include "smCollision/smCollisionPair.h"
@@ -46,7 +49,10 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     // Intializes the spatial spatialHashinging
     spatialHashing = std::make_shared<smSpatialHashCollision>(10000, 2, 2, 2);
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, spatialHashing);
+
+    //Create the camera controller
+    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
+    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
     // Create dummy simulator
     defaultSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
@@ -74,7 +80,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     modelA->mesh->assignTexture("livertexture1");
 
     // Set the rendering features
-    modelA->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    modelA->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
     modelA->mesh->translate(7, 3, 0);
     modelA->mesh->getRenderDetail()->lineSize = 2;
     modelA->mesh->getRenderDetail()->pointSize = 5;
@@ -93,7 +99,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     modelB->mesh->assignTexture("livertexture2");
     modelB->mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    modelB->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    modelB->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
     spatialHashing->addMesh(modelB->mesh);
 
     // Add object to the scene
@@ -101,33 +107,15 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    auto light = std::make_shared<smLight>("SceneLight1",
-                                           SIMMEDTK_LIGHT_SPOTLIGHT,
-                                           SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.setPosition(smVec3d(10.0, 10.0, 10.0));
-    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
-    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
-    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
-    light->spotCutOffAngle = 60;
-    light->direction = smVec3d(0.0, 0.0, -1.0);
-    light->drawEnabled = false;
-    light->attn_constant = 1.0;
-    light->attn_linear = 0.0;
-    light->attn_quadratic = 0.0;
+    auto light = smLight::getDefaultLighting();
+    assert(light);
     scene->addLight(light);
 
     // Camera setup
-    std::shared_ptr<smCamera> sceneCamera = std::make_shared<smCamera>();
-    sceneCamera->setAspectRatio(800.0/640.0); //Doesn't have to match screen resolution
-    sceneCamera->setFarClipDist(1000);
-    sceneCamera->setNearClipDist(0.001);
-    sceneCamera->setViewAngle(0.785398f); //45 degrees
-    sceneCamera->setCameraPos(0, 20, 10);
-    sceneCamera->setCameraFocus(0, 0, 0);
-    sceneCamera->setCameraUpVec(0, 1, 0);
-    sceneCamera->genProjMat();
-    sceneCamera->genViewMat();
+    std::shared_ptr<smCamera> sceneCamera = smCamera::getDefaultCamera();
+    assert(sceneCamera);
     scene->addCamera(sceneCamera);
+    camCtl->setCamera(sceneCamera);
 
     // Create a simulator module
     simulator = sdk->createSimulator();
@@ -145,6 +133,10 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     viewer->setWindowTitle("SimMedTK CollisionHash Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
+
+    //Link up the event system between this the camera controller and the viewer
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
 }
 
 void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam &/*p_param*/)

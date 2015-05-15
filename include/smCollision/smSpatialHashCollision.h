@@ -90,10 +90,10 @@ public:
     smBool findCandidatePoints(std::shared_ptr<smMesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
-    smBool  findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB);
+    smBool findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB);
 
     /// \brief find the candidate line-triangle pairs for collision (broad phase collision)
-    smBool  findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB);
+    smBool findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -136,8 +136,8 @@ private:
         updateBVH();
         findCandidates();
         computeCollisionTri2Tri();
-        computeCollisionLine2Tri();
-        computeCollisionModel2Points();
+//         computeCollisionLine2Tri();
+//         computeCollisionModel2Points();
     }
 
 private:

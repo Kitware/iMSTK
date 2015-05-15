@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smMouseMoveEvent::EventName;
+EventType smMouseMoveEvent::EventName = EventType::MouseMove;
 
 void smMouseMoveEvent::setWindowCoord(const smVec2d& coordinates)
 {

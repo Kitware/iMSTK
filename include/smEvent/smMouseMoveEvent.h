@@ -36,7 +36,7 @@ namespace Event {
 class smMouseMoveEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::MouseMove;
+    static EventType EventName;
 
 public:
     void setWindowCoord(const smVec2d &coordinates);

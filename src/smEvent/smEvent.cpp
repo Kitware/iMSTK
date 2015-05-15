@@ -28,7 +28,7 @@
 namespace smtk {
 namespace Event {
 
-constexpr EventType smEvent::EventName;
+EventType smEvent::EventName = EventType::None;
 
 smEvent::smEvent(): priority(EventPriority::Normal), sender(EventSender::Other), enabled(true) {}
 

@@ -36,7 +36,7 @@ namespace Event {
 class smLightMotionEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::LightMotion;
+    static EventType EventName;
 
 public:
     smLightMotionEvent(const int &lightIndex);

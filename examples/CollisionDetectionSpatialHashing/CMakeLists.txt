@@ -8,4 +8,5 @@ target_link_libraries(CollisionDetectionSpatialHashing
   smSimulators
   smCollision
   smEvent
+  ExamplesCommon
   )

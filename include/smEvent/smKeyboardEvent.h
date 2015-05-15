@@ -36,7 +36,7 @@ namespace Event {
 class smKeyboardEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::Keyboard;
+    static EventType EventName;
 
 public:
     smKeyboardEvent(const smKey &button);

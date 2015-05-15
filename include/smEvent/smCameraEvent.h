@@ -37,7 +37,7 @@ namespace Event {
 class smCameraEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::CameraUpdate;
+    static EventType EventName;
 
 public:
     smCameraEvent();

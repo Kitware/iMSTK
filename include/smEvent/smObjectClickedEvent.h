@@ -36,7 +36,7 @@ namespace Event {
 class smObjectClickedEvent : public smEvent
 {
 public:
-    static constexpr EventType EventName = EventType::ObjectClicked;
+    static EventType EventName;
 
 public:
     smObjectClickedEvent(const size_t &objectId);
