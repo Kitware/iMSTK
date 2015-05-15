@@ -34,6 +34,13 @@
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
+#include "smEvent/smEventHandler.h"
+#include "smEvent/smKeyboardEvent.h"
+#include "smEvent/smMouseButtonEvent.h"
+#include "smEvent/smMouseMoveEvent.h"
+#include "smEvent/smKeySFMLInterface.h"
+
+
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -46,122 +53,9 @@
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
-void SetVSync(bool sync)
+void smViewer::setVSync(bool sync)
 {
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
-    PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
-    wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress("wglSwapIntervalEXT");
-
-    if (wglSwapIntervalEXT)
-    {
-        wglSwapIntervalEXT(sync);
-    }
-
-#elif defined(SIMMEDTK_OPERATINGSYSTEM_LINUX)
-    Display *dpy = glXGetCurrentDisplay();
-    GLXDrawable drawable = glXGetCurrentDrawable();
-
-    if (drawable && dpy)
-    {
-        glXSwapIntervalEXT(dpy, drawable, sync);
-    }
-
-#endif
-}
-
-static void key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int mods)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventKeyboard = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventKeyboard->setEventType(smEventType(SIMMEDTK_EVENTTYPE_KEYBOARD));
-    eventKeyboard->setSenderId(viewer->getModuleId());
-    eventKeyboard->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto kbData = std::make_shared<smKeyboardEventData>();
-    eventKeyboard->setEventData(kbData); //Need to handle failure to allocate
-
-    kbData->keyBoardKey = GLFWKeyToSmKey(key);
-    if ((action == GLFW_PRESS) || (action == GLFW_REPEAT))
-    {
-        kbData->pressed = true;
-    }
-    else
-    {
-        kbData->pressed = false;
-    }
-
-    kbData->modKeys = smModKey::none;
-    if (mods & GLFW_MOD_SHIFT)
-        kbData->modKeys |= smModKey::shift;
-    if (mods & GLFW_MOD_CONTROL)
-        kbData->modKeys |= smModKey::control;
-    if (mods & GLFW_MOD_ALT)
-        kbData->modKeys |= smModKey::alt;
-    if (mods & GLFW_MOD_SUPER)
-        kbData->modKeys |= smModKey::super;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventKeyboard);
-}
-
-static void mouse_button_callback(GLFWwindow* window, int button, int action, int /*mods*/)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventMouseButton = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventMouseButton->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_BUTTON));
-    eventMouseButton->setSenderId(viewer->getModuleId());
-    eventMouseButton->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto mbData = std::make_shared<smMouseButtonEventData>();
-    eventMouseButton->setEventData(mbData); //Need to handle failure to allocate
-
-    //Get the current cursor position
-    glfwGetCursorPos(window, &(mbData->windowX), &(mbData->windowY));
-
-    //
-    if (button == GLFW_MOUSE_BUTTON_LEFT)
-        mbData->mouseButton = smMouseButton::Left;
-    else if (button == GLFW_MOUSE_BUTTON_RIGHT)
-        mbData->mouseButton = smMouseButton::Right;
-    else if (button == GLFW_MOUSE_BUTTON_MIDDLE)
-        mbData->mouseButton = smMouseButton::Middle;
-    else
-        mbData->mouseButton = smMouseButton::Unknown;
-
-    if (action == GLFW_PRESS)
-        mbData->pressed = true;
-    else
-        mbData->pressed = false;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseButton);
-}
-
-static void cursor_position_callback(GLFWwindow* /*window*/, double xpos, double ypos)
-{
-    auto sdk = smSDK::getInstance();
-    assert(sdk);
-    auto viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    auto eventMouseMove = std::make_shared<smEvent>(); //Need to handle failure to allocate
-    eventMouseMove->setEventType(smEventType(SIMMEDTK_EVENTTYPE_MOUSE_MOVE));
-    eventMouseMove->setSenderId(viewer->getModuleId());
-    eventMouseMove->setSenderType(SIMMEDTK_SENDERTYPE_MODULE);
-
-    auto mpData = std::make_shared<smMouseMoveEventData>();
-    eventMouseMove->setEventData(mpData); //Need to handle failure to allocate
-
-    mpData->windowX = xpos;
-    mpData->windowY = ypos;
-
-    sdk->getEventDispatcher()->sendEventAndDelete(eventMouseMove);
+    this->sfmlWindow->setVerticalSyncEnabled(sync);
 }
 
 smRenderOperation::smRenderOperation()
@@ -187,6 +81,8 @@ smViewer::smViewer()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
+    if(nullptr == eventHandler)
+        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -287,31 +183,21 @@ void smViewer::initScenes(smDrawParam p_param )
 
 void smViewer::initGLContext()
 {
-    int count;
 
-    // Init GLFW(OpenGL context)
-    if (!glfwInit())
-    {
-        exit(EXIT_FAILURE);
-    }
-
-    // Init the rest of GLFW
+    // Init OpenGL context
+    sfmlContext = std::unique_ptr<sf::Context>(new sf::Context);
+    sfmlWindow = std::unique_ptr<sf::Window>(new sf::Window);
+    // Init the rest of window system
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
     {
-        GLFWmonitor** glfwMonitors = glfwGetMonitors(&count);
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), glfwMonitors[count - 1], NULL);
+        this->sfmlWindow->create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, sf::Style::Fullscreen);
     }
     else
     {
-        window = glfwCreateWindow(screenResolutionWidth, screenResolutionHeight,
-            windowTitle.c_str(), NULL, NULL);
+        this->sfmlWindow->create(sf::VideoMode(this->width(), this->height()),
+                            windowTitle, (sf::Style::Titlebar | sf::Style::Close));
     }
-
-    glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
-    glfwSetMouseButtonCallback(window, mouse_button_callback);
-    glfwSetCursorPosCallback(window, cursor_position_callback);
 
     // Init GLEW
     GLenum err = glewInit();
@@ -350,9 +236,7 @@ void smViewer::init()
 
 void smViewer::destroyGLContext()
 {
-    //Shutdown glfw
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    //nothing to do
 }
 
 void smViewer::renderTextureOnView()
@@ -373,13 +257,13 @@ void smViewer::renderTextureOnView()
     glTranslated(0, 0, -1);
     glBegin(GL_QUADS);
     glTexCoord2d(0, 0);
-    glVertex3f(0, 0, 0);
+    glVertex3d(0, 0, 0);
     glTexCoord2d(1, 0);
-    glVertex3f(1, 0, 0);
+    glVertex3d(1, 0, 0);
     glTexCoord2d(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2d(0, 1);
-    glVertex3f(0, 1.0, 0);
+    glVertex3d(0, 1.0, 0);
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopAttrib();
@@ -429,6 +313,7 @@ void smViewer::initFboListItems()
                 renderOperations[j].fbo = item->fbo;
             }
         }
+        item->fbo->disable();
     }
 }
 
@@ -485,8 +370,7 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
     //Setup Viewport & Clear buffers
     glViewport(0, 0, p_rop.fbo->getWidth(), p_rop.fbo->getHeight());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //Enable lights
-    p_rop.scene->enableLights();
+
     processViewerOptions();
     //Render Scene
      smGLRenderer::renderScene(p_rop.scene, p_param);
@@ -499,8 +383,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    //Enable lights
-    p_rop.scene->enableLights();
+
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene, p_param);
@@ -550,11 +433,11 @@ inline void smViewer::adjustFPS()
 
         if (unlimitedFPSEnabled)
         {
-            SetVSync(false);
+            setVSync(false);
         }
         else
         {
-            SetVSync(true);
+            setVSync(true);
         }
     }
 }
@@ -599,13 +482,78 @@ void smViewer::draw()
 ///called by the module before each frame starts
 void smViewer::beginFrame()
 {
-    glfwMakeContextCurrent(window);
+    if (terminateExecution == true)
+    {
+        terminationCompleted = true;
+    }
+
+    this->sfmlWindow->setActive(true); //activates opengl context
 }
 
 ///called by the module after each frame ends
 void smViewer::endFrame()
 {
-    glfwSwapBuffers(window);
+    this->sfmlWindow->display(); //swaps buffers
+}
+
+void smViewer::processSFMLEvents(const sf::Event& p_event)
+{
+    switch(p_event.type)
+    {
+    case sf::Event::Closed:
+        //TODO: some type of terminate event
+        break;
+    case sf::Event::KeyPressed:
+    case sf::Event::KeyReleased:
+    {
+        auto keyboardEvent = 
+            std::make_shared<smtk::Event::smKeyboardEvent>(smtk::Event::SFMLKeyToSmKey(p_event.key.code));
+        keyboardEvent->setPressed(sf::Event::KeyPressed == p_event.type);
+
+        keyboardEvent->setModifierKey(smtk::Event::smModKey::none);
+        if (p_event.key.shift)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::shift);
+        if (p_event.key.control)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::control);
+        if (p_event.key.alt)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::alt);
+        if (p_event.key.system)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::super);
+
+        eventHandler->triggerEvent(keyboardEvent);
+        break;
+    }
+    case sf::Event::MouseButtonPressed:
+    case sf::Event::MouseButtonReleased:
+    {
+        smMouseButton mouseButton;
+        if (sf::Mouse::Left == p_event.mouseButton.button)
+            mouseButton = smMouseButton::Left;
+        else if (sf::Mouse::Right == p_event.mouseButton.button)
+            mouseButton = smMouseButton::Right;
+        else if (sf::Mouse::Middle == p_event.mouseButton.button)
+            mouseButton = smMouseButton::Middle;
+        else
+            mouseButton = smMouseButton::Unknown;
+
+        auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
+        mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
+        mouseEvent->setWindowCoord(smVec2d(p_event.mouseButton.x,p_event.mouseButton.y));
+        eventHandler->triggerEvent(mouseEvent);
+        break;
+    }
+    case sf::Event::MouseMoved:
+    {
+        auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
+        mouseEvent->setSender(smtk::Event::EventSender::Module);
+        mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
+
+        eventHandler->triggerEvent(mouseEvent);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 void smViewer::addObject(std::shared_ptr<smCoreClass> object)
@@ -615,8 +563,9 @@ void smViewer::addObject(std::shared_ptr<smCoreClass> object)
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent ( std::shared_ptr<smEvent> /*p_event*/ )
+void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
+
 }
 
 void smViewer::addText(smString p_tag)
@@ -636,7 +585,7 @@ void smViewer::updateText(smInt p_handle, smString p_string)
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(smString str)
+void smViewer::setWindowTitle(const smString &str)
 {
     windowTitle = str;
 }
@@ -646,9 +595,14 @@ void smViewer::exec()
     // Init the viewer
     this->init();
 
-    while (!terminateExecution) {
+    while (!terminateExecution)
+    {
+        sf::Event event;
         this->draw();
-        glfwPollEvents();
+        while (this->sfmlWindow->pollEvent(event))
+        {
+            this->processSFMLEvents(event);
+        }
     }
 
     cleanUp();

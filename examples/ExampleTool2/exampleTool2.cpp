@@ -60,7 +60,7 @@ void main()
     light.spotCutOffAngle = 180.0;
 
     light.lightPos.pos.setValue(0, 2.0, 0);
-    light.direction = smVec3f(0.0, 0.0, 1.0);
+    light.direction = smVec3d(0.0, 0.0, 1.0);
     light.drawEnabled = true;
 
 
@@ -112,16 +112,16 @@ void main()
     curvedTool->mesh_upperJaw->assignTexture("toolJaw");
 
     ///we want to use shader. This requires the unique shader ID
-    curvedTool->renderDetail.addShader(metalShader->uniqueId);
+    curvedToolgetRenderDetail()->addShader(metalShader->getUniqueId());
 
     ///prevent casting shading on itself
-    curvedTool->mesh_lowerJaw->renderDetail.canGetShadow = false;
-    curvedTool->mesh_upperJaw->renderDetail.canGetShadow = false;
-    curvedTool->mesh_lowerJaw->renderDetail.shininess = 5.0;
-    curvedTool->mesh_upperJaw->renderDetail.shininess = 5.0;
-    curvedTool->mesh_pivot->renderDetail.shininess = 5.0;
-    curvedTool->mesh_lowerJaw->scale(smVec3f(1.0, 1.0, 1.5));
-    curvedTool->mesh_upperJaw->scale(smVec3f(1.0, 1.0, 1.5));
+    curvedTool->mesh_lowerJawgetRenderDetail()->canGetShadow = false;
+    curvedTool->mesh_upperJawgetRenderDetail()->canGetShadow = false;
+    curvedTool->mesh_lowerJawgetRenderDetail()->shininess = 5.0;
+    curvedTool->mesh_upperJawgetRenderDetail()->shininess = 5.0;
+    curvedTool->mesh_pivotgetRenderDetail()->shininess = 5.0;
+    curvedTool->mesh_lowerJaw->scale(smVec3d(1.0, 1.0, 1.5));
+    curvedTool->mesh_upperJaw->scale(smVec3d(1.0, 1.0, 1.5));
 
     ///Each mesh is attached with proper shader texture bindings
     metalShader->attachMesh(curvedTool->mesh_lowerJaw, "bump", "metal", "specTex", "specTex", "specTex");
@@ -132,7 +132,7 @@ void main()
     curvedTool->addMeshContainer(&curvedTool->meshContainer_pivot);
     curvedTool->addMeshContainer(curvedTool->meshContainer_pivot.name, &curvedTool->meshContainer_lowerJaw);
     curvedTool->addMeshContainer(curvedTool->meshContainer_pivot.name, &curvedTool->meshContainer_upperJaw);
-    curvedTool->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    curvedToolgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
     scene1->addSceneObject(curvedTool);
 
     ///Tool is attached to Tool simulator

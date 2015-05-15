@@ -33,10 +33,9 @@
 #include "smCore/smDispatcher.h"
 #include "smCore/smScene.h"
 #include "smCore/smSceneObject.h"
-#include "smCore/smEventHandler.h"
 
 ///this class is module major. Every other thread should derive this class
-class smModule: public smEventHandler
+class smModule: public smCoreClass
 {
 
 private:
@@ -59,17 +58,11 @@ protected:
     virtual void   endModule();
     /// \brief  dispatcher reference
     std::shared_ptr<smDispatcher> dispathcer;
-    /// \brief  event dispatcher reference
-    std::shared_ptr<smEventDispatcher> eventDispatcher;
 
 public:
     /// \brief  constructor initializes the module
     smModule();
 
-    void list()
-    {
-
-    }
     /// \brief virtual functions
     virtual void init() = 0;
     virtual void beginFrame() = 0;
@@ -84,13 +77,8 @@ public:
     /// \brief  wait for termination
     void waitTermination();
 
-    /// \brief set the event dispatcher
-    void setEventDispatcher(std::shared_ptr<smEventDispatcher> p_dispathcer);
-
     /// \brief  get module id
     smInt getModuleId();
-
-    virtual void handleEvent(std::shared_ptr<smEvent> /*p_event*/){}
 
 };
 

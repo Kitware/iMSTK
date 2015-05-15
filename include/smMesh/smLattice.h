@@ -59,8 +59,8 @@ enum smLatticeReturnType
 /// \brief !! holds the collision primitive pairs
 struct smCollisionPairs
 {
-    smUnifiedID objectIndex;
-    smUnifiedID objectIndex2;
+    std::shared_ptr<smUnifiedId> objectIndex;
+    std::shared_ptr<smUnifiedId> objectIndex2;
     smInt primIndex;
     smInt primIndex2;
 };
@@ -79,9 +79,9 @@ class smCell
 public:
     smInt id;
     smInt cellId[3];
-    smVec3f cellCenter;
-    smVec3f cellLeftCorner;
-    smVec3f cellRightCorner;
+    smVec3d cellCenter;
+    smVec3d cellLeftCorner;
+    smVec3d cellRightCorner;
     smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
     smInt lastPrimitiveIndex;
     smInt timeStamp;
@@ -115,19 +115,19 @@ public:
     smFloat getZStep();
 
     /// \brief get the center of the lattice
-    smVec3f getLatticeCenter();
+    smVec3d getLatticeCenter();
 
     /// \brief !! get the left corner of cell 0
-    smVec3f getLeftMinCorner();
+    smVec3d getLeftMinCorner();
 
     /// \brief !! get the right corner of cell 0
-    smVec3f getRightMaxCorner();
+    smVec3d getRightMaxCorner();
 
     /// \brief destructor
     ~smLattice();
 
     /// \brief Initialize the lattice
-    smLatticeReturnType init(smVec3f p_leftCorner, smVec3f p_rightCorner,
+    smLatticeReturnType init(smVec3d p_leftCorner, smVec3d p_rightCorner,
                              smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation);
 
     /// \brief !!
@@ -152,7 +152,7 @@ public:
     void addObject(smSceneObject *obj);
 
     /// \brief render the lattice for visaulization
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
 public:
     //these should be templated..Current design is based on the triangle
@@ -166,9 +166,9 @@ public:
     smFloat xStep;
     smFloat yStep;
     smFloat zStep;
-    smVec3f latticeCenter;
+    smVec3d latticeCenter;
     smInt time;
-    smUnifiedID linkedObject;
+    std::shared_ptr<smUnifiedId> linkedObject;
 };
 
 #endif

@@ -108,8 +108,8 @@ int planeBoxOverlap(double normal[3],double d, double maxbox[3])
         if(p0<p1) {min=p0; max=p1;} else {min=p1; max=p0;} \
 	rad = fa * boxhalfsize[X] + fb * boxhalfsize[Y];   \
 	if(min>rad || max<-rad) return 0;
-
-int triBoxOverlap(double boxcenter[3],double boxhalfsize[3],double triverts[3][3])
+template<typename MatrixType>
+int triBoxOverlap(double boxcenter[3],double boxhalfsize[3],MatrixType &triverts)
 {
 
   /*    use separating axis theorem to test overlap between triangle and box */
@@ -125,9 +125,9 @@ int triBoxOverlap(double boxcenter[3],double boxhalfsize[3],double triverts[3][3
 
    /* This is the fastest branch on Sun */
    /* move everything so that the boxcenter is in (0,0,0) */
-   SUB(v0,triverts[0],boxcenter);
-   SUB(v1,triverts[1],boxcenter);
-   SUB(v2,triverts[2],boxcenter);
+   SUB(v0,triverts.row(0).data(),boxcenter);
+   SUB(v1,triverts.row(1).data(),boxcenter);
+   SUB(v2,triverts.row(2).data(),boxcenter);
 
    /* compute triangle edges */
    SUB(e0,v1,v0);      /* tri edge 0 */

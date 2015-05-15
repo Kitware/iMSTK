@@ -33,15 +33,15 @@
 RenderCube::RenderCube()
 {
     //Create an instance of the SimMedTK framework/SDK
-    sdk = smSDK::createSDK();
+    simmedtkSDK = smSDK::createSDK();
 
     //Create a new scene to work in
-    scene1 = sdk->createScene(); //Scene rendered to texture
-    scene2 = sdk->createScene(); //Scene rendered to screen
+    scene1 = simmedtkSDK->createScene(); //Scene rendered to texture
+    scene2 = simmedtkSDK->createScene(); //Scene rendered to screen
 
     //Create a viewer to see the scene through
-    //viewer = sdk->createViewer();
-    sdk->addViewer(&viewer);
+    //viewer = simmedtkSDK->createViewer();
+    simmedtkSDK->addViewer(&viewer);
 
     //Initialize the texture manager
     smTextureManager::init(smSDK::getErrorLog());
@@ -87,10 +87,10 @@ RenderCube::RenderCube()
     viewer.addObject(this);
 
     //Set some viewer properties
-    viewer.setScreenResolution(800, 640);
+    viewer.setScreenResolution(1920, 1080);
 
     //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Setup lights
     this->setupLights();
@@ -99,33 +99,50 @@ RenderCube::RenderCube()
     this->setupCamera();
 
     //Link up the event system between this object and the SimMedTK SDK
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
-    sdk->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
+    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
 }
 
 RenderCube::~RenderCube()
 {
-    sdk->releaseScene(scene1);
+    simmedtkSDK->releaseScene(scene1);
 }
 
 void RenderCube::setupLights()
 {
-     //Setup Scene lighting
-    smLight* light = new smLight("SceneLight1",
-                                 SIMMEDTK_LIGHT_SPOTLIGHT,
-                                 SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.pos << 10.0, 10.0, 10.0;
-    light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
-    light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
-    light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
-    light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
-    light->drawEnabled = false;
-    light->attn_constant = 1.0;
-    light->attn_linear = 0.0;
-    light->attn_quadratic = 0.0;
-    scene1->addLight(light);
+    //Setup Scene lighting
+    smLight* light1 = new smLight("SceneLight1",
+                                  SIMMEDTK_LIGHT_SPOTLIGHT,
+                                  SIMMEDTK_LIGHTPOS_WORLD);
+    light1->lightPos.pos << 5.0, 5.0, 5.0;
+    light1->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+    light1->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+    light1->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+    light1->spotCutOffAngle = 60;
+    light1->direction = smVec3f(0.0, 0.0, -1.0);
+    light1->drawEnabled = false;
+    light1->attn_constant = 1.0;
+    light1->attn_linear = 0.0;
+    light1->attn_quadratic = 0.0;
+    light1->activate(true);
+    scene1->addLight(light1);
+
+    smLight* light2 = new smLight("SceneLight2",
+                                  SIMMEDTK_LIGHT_SPOTLIGHT,
+                                  SIMMEDTK_LIGHTPOS_WORLD);
+    light2->lightPos.pos << 0.0, 0.0, 5.0;
+    light2->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+    light2->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+    light2->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+    light2->spotCutOffAngle = 60;
+    light2->direction = smVec3f(0.0, 0.0, -1.0);
+    light2->drawEnabled = false;
+    light2->attn_constant = 1.0;
+    light2->attn_linear = 0.0;
+    light2->attn_quadratic = 0.0;
+    light2->activate(true);
+    scene2->addLight(light2);
 }
 
 void RenderCube::setupCamera()
@@ -163,7 +180,7 @@ void RenderCube::handleEvent(smEvent *p_event)
         if (key == smKey::Escape && kbData->pressed)
         {
             //Tell the framework to shutdown
-            sdk->shutDown();
+            simmedtkSDK->shutDown();
         }
         else if (key == smKey::W && kbData->pressed)
         {
@@ -257,7 +274,7 @@ void RenderCube::handleEvent(smEvent *p_event)
 void RenderCube::simulateMain(smSimulationMainParam p_param)
 {
     //Run the simulator framework
-    sdk->run();
+    simmedtkSDK->run();
 }
 
 void runRenderCube()

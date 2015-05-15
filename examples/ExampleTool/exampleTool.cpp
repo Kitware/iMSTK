@@ -57,7 +57,7 @@ public:
     {
     }
 
-    void  handleEvent(smEvent *p_event)
+    void  handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
     {
         s
         MyStylus::handleEvent(p_event);
@@ -97,7 +97,7 @@ void main()
 
 
     light.lightPos.pos.setValue(0, 20.0, 20);
-    light.direction = smVec3f(0.0, 0.0, -1.0);
+    light.direction = smVec3d(0.0, 0.0, -1.0);
     light.drawEnabled = false;
 
 
@@ -140,7 +140,7 @@ void main()
     hapticStylus->meshContainer.mesh->updateVertexNormals();
 
     ///set the rendering details
-    hapticStylus->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    hapticStylusgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
 
     ///create another tool. This is a cautery tool that has  only a shaft
     hapticStylus1 = new HookCautery();
@@ -148,8 +148,8 @@ void main()
     ///assign this to second phantom
     hapticStylus1->phantomID = 1;
 
-    //hapticStylus1->renderDetail.renderType=hapticStylus1->renderDetail.renderType|SIMMEDTK_RENDER_NONE;
-    hapticStylus1->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    //hapticStylus1getRenderDetail()->renderType=hapticStylus1getRenderDetail()->renderType|SIMMEDTK_RENDER_NONE;
+    hapticStylus1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
 
     ///creates tool simulator
     toolSim = new smToolSimulator(smSDK::getErrorLog());

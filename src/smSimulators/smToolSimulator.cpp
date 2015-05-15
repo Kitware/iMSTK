@@ -22,11 +22,13 @@
 //---------------------------------------------------------------------------
 
 #include "smSimulators/smToolSimulator.h"
+#include "smEvent/smEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 
 void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool)
 {
-    smMatrix44f tempMat, tempMatDevice;
-    smMatrix44f mat;
+    smMatrix44d tempMat, tempMatDevice;
+    smMatrix44d mat;
     tree<smMeshContainer*>::pre_order_iterator iter = p_tool->meshes.begin();
     //update the Root node first
     iter.node->data->computeCurrentMatrix();
@@ -116,20 +118,24 @@ void smToolSimulator::syncBuffers()
 {
 }
 
-void smToolSimulator::handleEvent( std::shared_ptr<smEvent> p_event )
+void smToolSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
+        return;
+    }
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
         {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
+            case smtk::Event::smKey::F1:
             {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
+                std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
             }
-
-            break;
+            default:
+                break;
         }
     }
 }

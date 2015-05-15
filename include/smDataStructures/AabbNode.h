@@ -53,8 +53,7 @@ public:
     /// Comparison operator
     bool operator== ( const AabbNode& other ) const
     {
-        return this->parent == other.getParent()
-            && ;
+        return this->parent == other.getParent();
     }
 
     void setAabb(const Eigen::AlignedBox<double, 3> &box)
@@ -90,6 +89,7 @@ public:
     bool intersect(std::shared_ptr<AabbNode> other)
     {
         const Eigen::AlignedBox<double, 3> &otherBox = other->getAabb();
+
         return (otherBox.min().array() > aabb.max().array()
             || aabb.min().array() > otherBox.max().array()).all();
     }

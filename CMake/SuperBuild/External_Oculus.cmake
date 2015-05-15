@@ -20,7 +20,7 @@
 # Oculus
 #
 
-set(Oculus_TAG "d4327f8e773dc9ce008717d4960629aabac97f8f")
+set(Oculus_TAG "8ea873223fa0e2491a8ebe946b9f0fefe449fdc8")
 set(Oculus_REPOSITORY git@bitbucket.org:simmedtk/oculussdk.git)
 
 # Make sure this file is included only once

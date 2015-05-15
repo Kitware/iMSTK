@@ -169,7 +169,7 @@ void smSpatialHashCollision::computeCollisionTri2Tri()
 
     smCellTriangle triA;
     smCellTriangle triB;
-    smVec3f proj1, proj2, inter1, inter2;
+    smVec3d proj1, proj2, inter1, inter2;
     smShort point1, point2;
     smInt coPlanar;
 
@@ -182,8 +182,7 @@ void smSpatialHashCollision::computeCollisionTri2Tri()
             while (cells.nextBucketItem(iterator1, triB))
             {
                 if (triA.meshID == triB.meshID ||
-                    !(smSDK::getInstance()->getMesh(triA.meshID)->collisionGroup.isCollisionPermitted(
-                        smSDK::getInstance()->getMesh(triB.meshID)->collisionGroup)))
+                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
                 {
                     continue;
                 }
@@ -219,7 +218,7 @@ void  smSpatialHashCollision::computeCollisionLine2Tri()
     smHashIterator<smCellTriangle > iteratorTri;
     smCellLine line;
     smCellTriangle tri;
-    smVec3f intersection;
+    smVec3d intersection;
 
     while (cellLines.next(iteratorLine) && cellsForTri2Line.next(iteratorTri))
     {
@@ -231,8 +230,7 @@ void  smSpatialHashCollision::computeCollisionLine2Tri()
             while (cellsForTri2Line.nextBucketItem(iteratorTri, tri))
             {
                 if (tri.meshID == line.meshID ||
-                    !(smSDK::getInstance()->getMesh(tri.meshID)->collisionGroup.isCollisionPermitted(
-                        smSDK::getInstance()->getMesh(line.meshID)->collisionGroup)))
+                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
                 {
                     continue;
                 }
@@ -311,7 +309,7 @@ void smSpatialHashCollision::computeHash(std::shared_ptr<smMesh> mesh, const std
 void smSpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, smInt triangleId, smHash<smCellTriangle> &cells)
 {
     smCellTriangle  triangle;
-    triangle.meshID = mesh->uniqueId;
+    triangle.meshID = mesh->getUniqueId();
     triangle.primID = triangleId;
 
     triangle.vert[0] = mesh->vertices[mesh->triangles[triangleId].vert[0]];
@@ -338,7 +336,7 @@ void smSpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
                                    smInt edgeId, smHash<smCellLine> &cells)
 {
     smCellLine  line;
-    line.meshID = mesh->uniqueId;
+    line.meshID = mesh->getUniqueId();
     line.primID = edgeId;
     line.vert[0] = mesh->vertices[mesh->edges[edgeId].vert[0]];
     line.vert[1] = mesh->vertices[mesh->edges[edgeId].vert[1]];
@@ -362,7 +360,7 @@ void smSpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
 void smSpatialHashCollision::addPoint(std::shared_ptr<smMesh> mesh, smInt vertId, smHash<smCellPoint> &cells)
 {
     smCellPoint cellPoint;
-    cellPoint.meshID = mesh->uniqueId;
+    cellPoint.meshID = mesh->getUniqueId();
     cellPoint.primID = vertId;
     cellPoint.vert = mesh->vertices[vertId];
 
@@ -383,7 +381,7 @@ void smSpatialHashCollision::addOctreeCell(std::shared_ptr<smSpatialHashCollisio
 
     for (smInt i = iter.start(); i != iter.end(); ++i)
     {
-        if (!iter[i].getIsEmpty())
+        if (!iter[i].isEmpty())
         {
             temp.aabbMin =  iter[i].getCube().leftMinCorner();
             temp.aabbMax =  iter[i].getCube().rightMaxCorner();
@@ -479,5 +477,3 @@ std::vector< std::shared_ptr< smCollidedTriangles > >& smSpatialHashCollision::g
 {
     return collidedTriangles;
 }
-
-

@@ -45,7 +45,7 @@ void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 }
 void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
-    if(this->mesh == nullptr)
+    if(nullptr == this->mesh)
     {
         this->mesh = std::make_shared<smSurfaceMesh>();
     }
@@ -54,19 +54,20 @@ void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const s
     this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), 6);
     this->aabbTree->initStructure();
 }
+
 std::shared_ptr< smMeshCollisionModel::AABBTreeType > smMeshCollisionModel::getAABBTree()
 {
     assert(this->aabbTree);
     return this->aabbTree;
 }
-const smVec3f& smMeshCollisionModel::getNormal(size_t i) const
+const smVec3d& smMeshCollisionModel::getNormal(size_t i) const
 {
     assert(this->mesh);
     return this->mesh->triNormals[i];
 }
-std::array<smVec3f,3> smMeshCollisionModel::getTrianglePositions(size_t i) const
+std::array<smVec3d,3> smMeshCollisionModel::getTrianglePositions(size_t i) const
 {
-    std::array<smVec3f, 3> vertices;
+    std::array<smVec3d, 3> vertices;
     vertices[0] = this->mesh->vertices[this->mesh->triangles[i].vert[0]];
     vertices[1] = this->mesh->vertices[this->mesh->triangles[i].vert[1]];
     vertices[2] = this->mesh->vertices[this->mesh->triangles[i].vert[2]];

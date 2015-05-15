@@ -51,8 +51,8 @@ go_bandit([](){
             std::unique_ptr<smCollisionPair> collisionPair(make_unique<smCollisionPair>());
 
             float depth = 1.0;
-            smVec3f contactPoint(0,0,1);
-            smVec3f normal(1,0,0);
+            smVec3d contactPoint(0,0,1);
+            smVec3d normal(1,0,0);
             collisionPair->addContact(depth,contactPoint,normal);
 
             std::shared_ptr<smContact> contact = collisionPair->getContacts().back();

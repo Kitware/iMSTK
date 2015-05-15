@@ -55,18 +55,18 @@ public:
     smFloat Damp; ///< damping values
     smInt nbrMass; ///< number of masses
     smInt **massIdx; ///< !!
-    smStdVector3f P; ///< !! position
-    smStdVector3f V; ///< !! velocity
-    smStdVector3f exF; ///< external force
+    smStdVector3d P; ///< !! position
+    smStdVector3d V; ///< !! velocity
+    smStdVector3d exF; ///< external force
     smInt nbrSpr; ///< !! number of spheres
     smFloat *L0; ///< !! Initial length
     smBool *fixedMass; ///< true if masses are fixed
     smInt nbrFixedMass; ///< number of fixed masses
     smInt *listFixedMass; ///< list of IDs of masses that are fixed
 
-    smVec3f ball_pos; ///< !! position of ball
-    smVec3f ball_vel; ///< !! velocity of ball
-    smVec3f ball_frc; ///< !!
+    smVec3d ball_pos; ///< !! position of ball
+    smVec3d ball_vel; ///< !! velocity of ball
+    smVec3d ball_frc; ///< !!
 
     smFloat ball_mass; ///< !! mass of ball
     smFloat ball_rad; ///< !! radius of ball
@@ -81,13 +81,13 @@ public:
     smPBDSurfaceSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual std::shared_ptr<smSceneObject> clone();
+    virtual std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief initialize the mesh structure
     void initMeshStructure();
@@ -99,13 +99,13 @@ public:
     ~smPBDSurfaceSceneObject();
 
     /// \brief find the masses that will be fixed based on the spheres
-    void findFixedMassWrtSphere(smVec3f p_center, smFloat pos);
+    void findFixedMassWrtSphere(smVec3d p_center, smFloat pos);
 
     /// \brief find fixed corners
     void findFixedCorners();
 
     /// \brief render the surface PBD object
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
 public:
     smSurfaceMesh *mesh; ///< surface mesh

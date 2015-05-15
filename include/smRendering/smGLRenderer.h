@@ -31,6 +31,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
+#include "smUtilities/smMatrix.h"
 
 class smMesh;
 class smAABB;
@@ -47,22 +48,22 @@ public:
     smGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, const smRenderDetail &renderDetail, const smDrawParam &p_drawParam);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail, const smDrawParam &p_drawParam);
 
     /// \brief  draw normals
     static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue);
 
     /// \brief  draw line mesh
-    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh,  const smRenderDetail &renderDetail);
+    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3f p_pos, smVec3f dirX, smVec3f dirY, smVec3f dirZ);
+    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();
 
     /// \brief draw triangle
-    static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3);
+    static void drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3);
 
     /// \brief end triangle rendering
     static void endTriangles();
@@ -84,7 +85,19 @@ public:
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
-    static void renderScene(std::shared_ptr<smScene> p_scene, smDrawParam p_param);
+    static void renderScene(std::shared_ptr<smScene> p_scene,
+                            smDrawParam p_param);
+    /// \brief Renders a smScene's objects
+    ///
+    /// \detail Requires the caller to have called registerForScene() on p_scene
+    /// \param p_scene The scene to render
+    /// \param p_param The drawing parameters
+    /// \param p_proj A custom projection matrix to use instead of that provided with the scene
+    /// \param p_view A custom view matrix to use instead of that provided with the scene
+    static void renderScene(std::shared_ptr<smScene> p_scene,
+                            smDrawParam p_param,
+                            const smMatrix44f &p_proj,
+                            const smMatrix44f &p_view);
 
     /// \brief Renders a single smSceneObject
     ///

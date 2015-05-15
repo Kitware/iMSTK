@@ -61,13 +61,13 @@ public:
     void copySurface();
 
     /// \brief translate mesh vertices in x, y and z directions
-    void translateVolumeMesh(const smVec3f &p_translate);
+    void translateVolumeMesh(const smVec3d &p_translate);
 
     /// \brief scale the volume mesh
-    void scaleVolumeMesh(const smVec3f &p_scale);
+    void scaleVolumeMesh(const smVec3d &p_scale);
 
     /// \brief rotate mesh vertices in x, y and z directions
-    void rotVolumeMesh(const smMatrix33f &p_rot);
+    void rotVolumeMesh(const smMatrix33d &p_rot);
 
     /// \brief load the mesh
     smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
@@ -77,7 +77,7 @@ public:
     smInt nbrTetra; ///< number of tetrahedra
     smInt nbrNodes; ///< total number of nodes of the volume mesh
     std::shared_ptr<smErrorLog> log_VM; ///< log the errors with volume mesh class
-    smStdVector3f nodes; ///< data of nodal co-ordinates
+    smStdVector3d nodes; ///< data of nodal co-ordinates
     std::vector<smTetrahedra> tetra; ///< tetrahedra data
     std::vector<smInt> surfaceNodeIndex; ///<
     std::vector<smBool> fixed; ///< indicates if the node is fixed or not

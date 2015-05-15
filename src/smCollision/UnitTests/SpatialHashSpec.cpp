@@ -23,7 +23,7 @@
 
 #include <bandit/bandit.h>
 
-#include "smCollision/smSpatialHash.h"
+#include "smCollision/smSpatialHashCollision.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smDoubleBuffer.h"
 #include "smUtilities/smMakeUnique.h"
@@ -34,7 +34,7 @@ go_bandit([](){
     describe("the spatial hash collision detector", []() {
         it("initializes properly ", []() {
 
-            std::unique_ptr<smSpatialHash> spatialHash(make_unique<smSpatialHash>(10,1.0,1.0,1.0));
+            std::unique_ptr<smSpatialHashCollision> spatialHash(make_unique<smSpatialHashCollision>(10,1.0,1.0,1.0));
 
 //             AssertThat( spatialHash->pipe->getElements(), Equals( 1 ) );
 //             AssertThat( spatialHash->pipeTriangles->getElements(), Equals( 1 ) );

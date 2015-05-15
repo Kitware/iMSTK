@@ -111,20 +111,20 @@ VAORendering::VAORendering()
 
 
     //object1->mesh->assignTexture("livertexture1");
-    object1->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_VAO);
+    object1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_VAO);
     object1->mesh->translate(7, 3, 0);
-    object1->renderDetail.lineSize = 2;
-    object1->renderDetail.pointSize = 5;
+    object1getRenderDetail()->lineSize = 2;
+    object1getRenderDetail()->pointSize = 5;
     object1->attachObjectSimulator(dummySim);
 
     ///create a second static object
     object2 = new smStaticSceneObject();
     object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    object2->mesh->translate(smVec3f(2, 0, 0));
+    object2->mesh->translate(smVec3d(2, 0, 0));
     ///assigne a texture for fixed shading( not for shader enabled rendeirng)
     object2->mesh->assignTexture("livertexture2");
-    object2->renderDetail.shadowColor.rgba[0] = 1.0;
-    object2->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    object2getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    object2getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
 
 
 
@@ -161,9 +161,9 @@ VAORendering::VAORendering()
     ///fills the buffer with mesh information..assign a shader for VAO binding
     vao->setBufferDataFromMesh(object1->mesh, myTestShader);
     ///addshader to the object
-    object1->renderDetail.addShader(myTestShader->uniqueId);
+    object1getRenderDetail()->addShader(myTestShader->getUniqueId());
     ///add VAO to the object
-    object1->renderDetail.addVAO(vao->uniqueId);
+    object1getRenderDetail()->addVAO(vao->getUniqueId());
 
     ///if needed; ask viewer  to  call vao.
     viewer->addObject(vao);

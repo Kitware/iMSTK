@@ -25,9 +25,6 @@
 #define SM_HAPTIC_INTERFACE_H
 
 #include "smDeviceInterface.h"
-#include "smCore/smEvent.h"
-#include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 
 #define SM_MAX_BUTTONS 4
 

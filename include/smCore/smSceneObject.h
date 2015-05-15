@@ -32,7 +32,6 @@
 #include "smUtilities/smVector.h"
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smCore/smEventHandler.h"
 #include "smRendering/smConfigRendering.h"
 #include "smRendering/smCustomRenderer.h"
 
@@ -48,7 +47,7 @@ struct smObjectInitFlags
 
 };
 /// \brief  scene object for visualization
-class smSceneObject: public smEventHandler
+class smSceneObject: public smCoreClass
 {
     friend class smSDK;
     friend class smViewer;
@@ -62,13 +61,13 @@ public:
     /// \brief returns object id
     smInt getObjectId()
     {
-        return uniqueId.ID;
+        return this->getUniqueId()->getId();
     }
 
     /// \brief get unified object id
-    smUnifiedID getObjectUnifiedID()
+    smUnifiedId::Pointer getObjectUnifiedID()
     {
-        return uniqueId;
+        return std::make_shared<smUnifiedId>();
     }
 
     /// \brief attach simulator to the object. This function that needs to be called to associate the simulator to the object
@@ -101,7 +100,7 @@ public:
     ///the initialization routuines belong to the objects should be called herein
     virtual void init() = 0;
 
-    smStdVector3f &getLocalVertices()
+    smStdVector3d &getLocalVertices()
     {
         return localVertices;
     }
@@ -119,7 +118,7 @@ public:
 private:
     std::shared_ptr<smObjectSimulator> objectSim; // object simulator that will simulate the object
     std::shared_ptr<smCustomRenderer> customRender;
-    smStdVector3f localVertices; // local copy of vertices
+    smStdVector3d localVertices; // local copy of vertices
     smObjectInitFlags flags;
 };
 

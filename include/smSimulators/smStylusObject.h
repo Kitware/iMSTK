@@ -34,11 +34,16 @@
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smSceneObject.h"
-#include "smCore/smEventHandler.h"
-#include "smCore/smEventData.h"
 #include "smUtilities/smMath.h"
 #include "smExternal/tree.hh"
 
+namespace smtk {
+    namespace Event {
+        class smEvent;
+        class smEventHandler;
+        class smCameraEvent;
+    }
+}
 
 template<typename T> class smCollisionModel;
 template<typename smSurfaceTreeCell> class smSurfaceTree;
@@ -55,7 +60,7 @@ public:
     smMeshContainer(smString p_name = "");
 
     /// \brief constructor
-    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3f p_prePos, smVec3f p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ);
+    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3d p_prePos, smVec3d p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ);
 
     void computeCurrentMatrix();
 
@@ -64,16 +69,16 @@ public:
     smFloat offsetRotX; // offset in rotation in x-direction
     smFloat offsetRotY; // offset in rotation in y-direction
     smFloat offsetRotZ; // offset in rotation in z-direction
-    smVec3f preOffsetPos; // !!
-    smVec3f posOffsetPos; // !!
-    smMatrix44f accumulatedMatrix; // !!
-    smMatrix44f accumulatedDeviceMatrix; // !!
+    smVec3d preOffsetPos; // !!
+    smVec3d posOffsetPos; // !!
+    smMatrix44d accumulatedMatrix; // !!
+    smMatrix44d accumulatedDeviceMatrix; // !!
 
-    smMatrix44f currentMatrix; // !!
-    smMatrix44f currentViewerMatrix; // !!
-    smMatrix44f currentDeviceMatrix; // !!
-    smMatrix44f tempCurrentMatrix; // !!
-    smMatrix44f tempCurrentDeviceMatrix; // !!
+    smMatrix44d currentMatrix; // !!
+    smMatrix44d currentViewerMatrix; // !!
+    smMatrix44d currentDeviceMatrix; // !!
+    smMatrix44d tempCurrentMatrix; // !!
+    smMatrix44d tempCurrentDeviceMatrix; // !!
     smMesh * mesh; // mesh
     std::shared_ptr<SurfaceTreeType> colModel; // octree of surface
 };
@@ -84,7 +89,7 @@ struct smStylusPoints
     /// \brief constructor
     smStylusPoints();
 
-    smVec3f point; // co-ordinates of points on stylus
+    smVec3d point; // co-ordinates of points on stylus
     smMeshContainer *container; // !!
 };
 
@@ -96,23 +101,26 @@ public:
     smStylusSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     /// \brief !!
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
+
+    virtual void init() override;
 
     /// \brief handle the events such as button presses related to stylus
-    virtual void handleEvent(std::shared_ptr<smEvent> p_event);
-
-    virtual void init();
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
 public:
-    smVec3f pos; // position of stylus
-    smVec3f vel; // velocity of stylus
+    smVec3d pos; // position of stylus
+    smVec3d vel; // velocity of stylus
     smMatrix33d rot; // rotation of stylus
-    smMatrix44f transRot; // !! translation and rotation matrix of stylus
-    smMatrix44f transRotDevice; // translation and rotation matrix of devide controlling the stylus
+    smMatrix44d transRot; // !! translation and rotation matrix of stylus
+    smMatrix44d transRotDevice; // translation and rotation matrix of devide controlling the stylus
     smBool toolEnabled; // !!
+
+protected:
+    std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
 };
 
 /// \brief !!
@@ -152,19 +160,19 @@ public:
     /// \brief !!
     smMeshContainer *getMeshContainer(smString p_string) const;
 
-    virtual void handleEvent(std::shared_ptr<smEvent> p_event);
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !!
-    std::shared_ptr<smSceneObject> clone();
+    std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void initDraw(const smDrawParam &p_params);
+    virtual void initDraw(const smDrawParam &p_params) override;
 
     /// \brief !!
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
     /// \brief !!
-    virtual void init();
+    virtual void init() override;
 
 private:
     std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;

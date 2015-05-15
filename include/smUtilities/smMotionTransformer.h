@@ -24,11 +24,17 @@
 #ifndef SMMOTIONTRANSFORMER_H
 #define SMMOTIONTRANSFORMER_H
 
-
-#include "smCore/smSDK.h"
-#include "smCore/smEvent.h"
-#include "smCore/smEventHandler.h"
+// SimMedTK includes
+#include "smCore/smCoreClass.h"
 #include "smUtilities/smQuaternion.h"
+
+namespace smtk {
+namespace Event {
+class smEvent;
+class smEventHandler;
+class smCameraEvent;
+}
+}
 
 /// \brief motion transformation type
 enum smMotionTransType
@@ -36,25 +42,19 @@ enum smMotionTransType
     SM_TRANSMOTION_HAPTIC2CAM,
 };
 
-/// \brief  motion transformation basec class
-class smMotionTransformer: public smEventHandler
-{
-public:
-    smBool enabled;
-};
 
 /// \brief motion transformation using a haptic device
-class smHapticTrans: public smMotionTransformer
+class smHapticTrans: public smCoreClass
 {
 public:
     /// \brief constructor
     smHapticTrans();
 
     /// \brief sets the device to listen
-    void setDeviceIdToListen(smInt p_id);
+    void setDeviceIdToListen(const size_t &p_id);
 
     /// \brief sets the motion scale
-    void setMotionScale(smFloat p_scale);
+    void setMotionScale(const float &p_scale);
 
     /// \brief compute the transformation usign the p_mat. it transforms the default directions
     void computeTransformation(smMatrix44f &p_mat);
@@ -63,50 +63,29 @@ public:
     void sendEvent();
 
     /// \brief Get devide id
-    smInt getDeviceId()
-    {
-        return deviceId;
-    }
+    const size_t &getDeviceId();
 
     /// \brief s devide id
-    void setDeviceId(smInt id)
-    {
-        deviceId = id;
-    }
+    void setDeviceId(const size_t &id);
 
     /// \brief Get devide id
-    std::shared_ptr<smEvent> &getNewEvent()
-    {
-        return newEvent;
-    }
+    std::shared_ptr<smtk::Event::smEvent> getNewEvent();
 
     /// \brief s devide id
-    void setNewEvent(std::shared_ptr<smEvent> event)
-    {
-        newEvent = event;
-    }
+    void setNewEvent(std::shared_ptr<smtk::Event::smEvent> event);
 
     /// \brief Get devide id
-    std::shared_ptr<smEventDispatcher> &getDispatch()
-    {
-        return dispatch;
-    }
+    std::shared_ptr<smtk::Event::smEventHandler> getEventHandler();
 
     /// \brief s devide id
-    void setDispatch(std::shared_ptr<smEventDispatcher> newDispatch)
-    {
-        dispatch = newDispatch;
-    }
+    void setEventHandler(std::shared_ptr<smtk::Event::smEventHandler> newEventHandler);
 
 protected:
-    smInt deviceId; // device id that will be used
-    smFloat motionScale; // motion scale
-    smVec3f transFormedDirection; // transformaed directions
-    smVec3f transFormedUpDirection;
-    smVec3f defaultDirection; // default directions
-    smVec3f defaultUpDirection;
-    std::shared_ptr<smEvent> newEvent; // event that will be sent
-    std::shared_ptr<smEventDispatcher> dispatch; // event dispatcher
+    size_t deviceId; // device id that will be used
+    float motionScale; // motion scale
+    smVec3d defaultDirection; // default directions
+    smVec3d defaultUpDirection;
+    std::shared_ptr<smtk::Event::smEventHandler> eventHandler; // event dispatcher
 
 };
 
@@ -114,12 +93,12 @@ protected:
 class smHapticCameraTrans: public smHapticTrans
 {
 public:
-    smHapticCameraTrans(smInt p_deviceID = 0); // constructor gets device id
+    smHapticCameraTrans(const size_t &p_deviceID = size_t()); // constructor gets device id
 
-    void handleEvent(std::shared_ptr<smEvent> p_event);// event handler
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;// event handler
 
 protected:
-    smQuaternionf quat; // quaternion
+    smQuaterniond quat; // quaternion
 
 public:
     smDouble offsetAngle_RightDirection; // any offset in the transverse (X) direction
@@ -130,17 +109,17 @@ public:
 class smHapticLightTrans: public smHapticTrans
 {
 protected:
-    smInt lightIndex; // light index that will be transformed
+    size_t lightIndex; // light index that will be transformed
 
 public:
     /// \brief  light index can be changed
-    void setLightIndex(smInt p_lightIndex);
+    void setLightIndex(const size_t &p_lightIndex);
 
     /// \brief constructor that gets device id
-    smHapticLightTrans(smInt p_id = 0);
+    smHapticLightTrans(const size_t &p_id = size_t());
 
     /// \brief handled event
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

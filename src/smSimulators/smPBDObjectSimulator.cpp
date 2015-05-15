@@ -85,7 +85,7 @@ void smPBDObjectSimulator::run()
     std::shared_ptr<smSceneObject> sceneObj;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
     smFloat dist, lamda;
-    smVec3f dirVec, dP;
+    smVec3d dirVec, dP;
     smInt count = 0;
     smInt a, b;
 
@@ -99,7 +99,7 @@ void smPBDObjectSimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT )
         {
             pbdSurfaceSceneObject = std::static_pointer_cast<smPBDSurfaceSceneObject>(sceneObj);
-            smStdVector3f &vertices = pbdSurfaceSceneObject->getLocalVertices();
+            smStdVector3d &vertices = pbdSurfaceSceneObject->getLocalVertices();
 
             if ( !pbdSurfaceSceneObject->getFlags().isSimulatorInit )
             {
@@ -108,7 +108,7 @@ void smPBDObjectSimulator::run()
 
             for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
-                pbdSurfaceSceneObject->exF[i] = smVec3f::Zero();
+                pbdSurfaceSceneObject->exF[i] = smVec3d::Zero();
             }
 
             for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
@@ -202,7 +202,7 @@ void smPBDObjectSimulator::syncBuffers()
         }
     }
 }
-void smPBDObjectSimulator::handleEvent( std::shared_ptr<smEvent> p_event )
+void smPBDObjectSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
     ;
 

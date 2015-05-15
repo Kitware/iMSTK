@@ -103,7 +103,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    std::shared_ptr<smLight> light = smLight::getDefaultLightning();
+    std::shared_ptr<smLight> light = smLight::getDefaultLighting();
     scene->addLight(light);
 
     // Camera setup
@@ -148,16 +148,16 @@ void CollisionDetectionBVH::draw(const smDrawParam &/*p_params*/)
 
 void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*/)
 {
-//     if ((10 > moveObj) && (moveObj > 0))
-//     {
-//         modelB->mesh->translate(1, 0, 0);
-//         moveObj--;
-//     }
-//     else
-//     {
-//         moveObj = 9; // reset
-//         modelB->mesh->translate(-moveObj, 0, 0);
-//     }
+    if ((10 > moveObj) && (moveObj > 0))
+    {
+        modelB->mesh->translate(1, 0, 0);
+        moveObj--;
+    }
+    else
+    {
+        moveObj = 9; // reset
+        modelB->mesh->translate(-moveObj, 0, 0);
+    }
 }
 
 void CollisionDetectionBVH::run()

@@ -44,7 +44,7 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
     static const smInt MESH_STRING_LEN = 256;
     smChar s[MESH_STRING_LEN];
     smInt i0, i1, i2, i3;
-    smVec3f v;
+    smVec3d v;
 
     FILE *f = fopen(p_TetFileName.c_str(), "r");
 
@@ -53,7 +53,7 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
         return false;
     }
 
-    std::vector<smVec3f> tempNodes;
+    std::vector<smVec3d> tempNodes;
     std::vector<smInt> tempIndices;
     smPhysXLink link;
 
@@ -120,7 +120,7 @@ smBool smPhysXVolumeMesh::loadTetFile(const smString& p_TetFileName, const smStr
 
 void smPhysXVolumeMesh::updateSurfaceVertices()
 {
-    smVec3f t[4];
+    smVec3d t[4];
 
     for (smInt i = 0; i < this->nbrLinks; i++)
     {
@@ -173,7 +173,7 @@ void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
 
     if (renderSurface)
     {
-        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, p_params.caller->renderDetail, p_params);
+        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, p_params.caller->getRenderDetail(),p_params);
     }
 
     if (renderTetras)
@@ -184,12 +184,12 @@ void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
         {
             if (this->drawTet[i])
             {
-                smVec3f p0(nodes[tetra[i].vert[0]]);
-                smVec3f p1(nodes[tetra[i].vert[1]]);
-                smVec3f p2(nodes[tetra[i].vert[2]]);
-                smVec3f p3(nodes[tetra[i].vert[3]]);
+                smVec3d p0(nodes[tetra[i].vert[0]]);
+                smVec3d p1(nodes[tetra[i].vert[1]]);
+                smVec3d p2(nodes[tetra[i].vert[2]]);
+                smVec3d p3(nodes[tetra[i].vert[3]]);
 
-                smVec3f normal, center, v[4];
+                smVec3d normal, center, v[4];
                 float scale = 0.9;
 
                 center = p0;
@@ -209,17 +209,17 @@ void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
 
                 for (smInt side = 0; side < 4; side ++)
                 {
-                    smVec3f &v0 = v[sides[side][0]];
-                    smVec3f &v1 = v[sides[side][1]];
-                    smVec3f &v2 = v[sides[side][2]];
-                    smVec3f a = v1 - v0;
-                    smVec3f b = v2 - v0;
+                    smVec3d &v0 = v[sides[side][0]];
+                    smVec3d &v1 = v[sides[side][1]];
+                    smVec3d &v2 = v[sides[side][2]];
+                    smVec3d a = v1 - v0;
+                    smVec3d b = v2 - v0;
                     normal = a.cross(b);
                     normal.normalize();
-                    glNormal3fv(normal.data());
-                    glVertex3fv(v0.data());
-                    glVertex3fv(v1.data());
-                    glVertex3fv(v2.data());
+                    glNormal3dv(normal.data());
+                    glVertex3dv(v0.data());
+                    glVertex3dv(v1.data());
+                    glVertex3dv(v2.data());
                 }
             }
         }

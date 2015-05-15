@@ -24,6 +24,11 @@
 #ifndef SMKEY_H
 #define SMKEY_H
 
+#include "smCore/smConfig.h"
+
+namespace smtk {
+namespace Event {
+
 enum class smModKey : smUInt
 {
     none = 0,
@@ -160,5 +165,8 @@ enum class smKey
     Backtick,         ///< The ` key
     KeyCount          ///< Keep last -- the total number of keyboard keys
 };
+
+} // Event namespace
+} // smtk namespace
 
 #endif

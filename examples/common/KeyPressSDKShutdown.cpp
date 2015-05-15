@@ -21,33 +21,36 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef RENDER_CUBE_H
-#define RENDER_CUBE_H
+#include "KeyPressSDKShutdown.h"
 
 #include "smCore/smSDK.h"
+#include "smEvent/smKeyboardEvent.h"
 
-class RenderCube
-    : public smSimulationMain,
-      public smCoreClass,
-      public smEventHandler
+namespace smtk {
+namespace Examples {
+namespace Common {
+
+KeyPressSDKShutdown::KeyPressSDKShutdown() : key(smtk::Event::smKey::Escape)
 {
-public:
-    RenderCube();
-    ~RenderCube();
-    void simulateMain(smSimulationMainParam p_param);
-    void handleEvent(smEvent *p_event);
-private:
-    std::unique_ptr<smSDK> sdk;
-    smScene *scene1;
-    smScene *scene2;
-    smStaticSceneObject cube;
-    smStaticSceneObject square;
-    smViewer viewer;
+}
 
-    void setupLights();
-    void setupCamera();
-};
+void KeyPressSDKShutdown::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+{
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+    if(keyboardEvent->getPressed())
+    {
+        if (keyboardEvent->getKeyPressed() == this->key)
+        {
+            smSDK::getInstance()->shutDown();
+        }
+    }
+}
 
-void runRenderCube();
+void KeyPressSDKShutdown::setKey(smtk::Event::smKey key)
+{
+    this->key = key;
+}
 
-#endif
+}//Common
+}//Examples
+}//smtk

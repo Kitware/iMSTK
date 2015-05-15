@@ -29,28 +29,30 @@
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
 #include "smUtilities/smMatrix.h"
+#include "smEvent/smHapticEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 
 MyStylus::MyStylus(const smString& p_shaft, const smString& p_lower, const smString& p_upper)
 {
     angle = 0;
-    smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
+    smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_shaft, SM_FILETYPE_3DS);
     mesh->assignTexture("hookCautery");
-    mesh->scale(smVec3f(0.2, 0.2, 0.2));
+    mesh->scale(smVec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     smSurfaceMesh *lowerMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     lowerMesh->loadMesh(p_lower, SM_FILETYPE_3DS);
     lowerMesh->assignTexture("metal");
-    lowerMesh->scale(smVec3f(0.2, 0.2, 0.2));
+    lowerMesh->scale(smVec3d(0.2, 0.2, 0.2));
     lowerMesh->rotate(rot);
 
     smSurfaceMesh *upperMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     upperMesh->loadMesh(p_upper, SM_FILETYPE_3DS);
     upperMesh->assignTexture("metal");
-    upperMesh->scale(smVec3f(0.2, 0.2, 0.2));
+    upperMesh->scale(smVec3d(0.2, 0.2, 0.2));
     upperMesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
@@ -70,6 +72,8 @@ MyStylus::MyStylus(const smString& p_shaft, const smString& p_lower, const smStr
     addMeshContainer(&meshContainer);
     addMeshContainer(meshContainer.name, &meshContainerLower);
     addMeshContainer(meshContainer.name, &meshContainerUpper);
+
+    this->listening = true;
 }
 
 void MyStylus::updateOpenClose()
@@ -101,68 +105,90 @@ void MyStylus::updateOpenClose()
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
-void MyStylus::handleEvent (std::shared_ptr<smEvent> p_event)
+void MyStylus::handleEvent (std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
+        return;
+    }
+
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
+    {
+        smMeshContainer *containerLower = this->getMeshContainer ( "HookCauteryLower" );
+        smMeshContainer *containerUpper = this->getMeshContainer ( "HookCauteryUpper" );
+        transRot = hapticEvent->getTransform();
+
+        pos = hapticEvent->getPosition();
+
+        vel = hapticEvent->getVelocity();
+
+        buttonState[0] = hapticEvent->getButtonState(0);
+        buttonState[1] = hapticEvent->getButtonState(1);
+        buttonState[2] = hapticEvent->getButtonState(2);
+        buttonState[3] = hapticEvent->getButtonState(3);
+
+        if ( buttonState[1] )
         {
-            smMeshContainer *containerLower = this->getMeshContainer ( "HookCauteryLower" );
-            smMeshContainer *containerUpper = this->getMeshContainer ( "HookCauteryUpper" );
-            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
-            if ( hapticEventData->deviceId == this->phantomID )
+            if ( angle < 1.0 )
             {
-                transRot = hapticEventData->transform;
-
-                pos = hapticEventData->position;
-
-                vel = hapticEventData->velocity;
-
-                buttonState[0] = hapticEventData->buttonState[0];
-                buttonState[1] = hapticEventData->buttonState[1];
-                buttonState[2] = hapticEventData->buttonState[2];
-                buttonState[3] = hapticEventData->buttonState[3];
-
-                updateOpenClose();
-
-                containerLower->offsetRotX = angle * 25;
-                containerUpper->offsetRotX = -angle * 25;
+                angle += 0.000004;
+            }
+            else
+            {
+                angle = 1.0;
             }
         }
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
+
+        if ( buttonState[0] )
         {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-            if ( keyBoardData->keyBoardKey == smKey::Num2 )
+            if ( angle > 0.00001 )
             {
-                smSDK::getInstance()->getEventDispatcher()
-                    ->disableEventHandler(safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
-                this->renderDetail.renderType = this->renderDetail.renderType
-                    | SIMMEDTK_RENDER_NONE;
+                angle -= 0.000004;
+            }
+            else
+            {
+                angle = 0.0;
+            }
+        }
+
+        containerLower->offsetRotX = angle * 25;
+        containerUpper->offsetRotX = -angle * 25;
+        return;
+    }
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::Num1:
+            {
+                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
+                break;
             }
 
-            if ( keyBoardData->keyBoardKey == smKey::Num1 )
+            case smtk::Event::smKey::Num2:
             {
-                smSDK::getInstance()->getEventDispatcher()
-                    ->enableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
-                this->renderDetail.renderType = this->renderDetail.renderType
-                    & ( ~SIMMEDTK_RENDER_NONE );
+                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
+                break;
             }
-            break;
+            default:
+                break;
         }
-        default:
-            std::cerr << "Unknoun event type" << std::endl;
-            break;
     }
 }
 
 HookCautery::HookCautery(const smString& p_pivot)
 {
-    smMatrix33f rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
+    smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_pivot, SM_FILETYPE_3DS);
     mesh->assignTexture("metal");
-    mesh->scale(smVec3f(0.2, 0.2, 0.2));
+    mesh->scale(smVec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
@@ -177,53 +203,50 @@ void HookCautery::draw(const smDrawParam &p_param)
     smStylusRigidSceneObject::draw(p_param);
 }
 
-void HookCautery::handleEvent(std::shared_ptr<smEvent> p_event)
+void HookCautery::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        {
-            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>( p_event->getEventData() );
+        return;
+    }
 
-            if ( hapticEventData->deviceId == this->phantomID )
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
+    {
+        transRot = hapticEvent->getTransform();
+
+        pos = hapticEvent->getPosition();
+
+        vel = hapticEvent->getVelocity();
+
+        buttonState[0] = hapticEvent->getButtonState(0);
+        buttonState[1] = hapticEvent->getButtonState(1);
+        buttonState[2] = hapticEvent->getButtonState(2);
+        buttonState[3] = hapticEvent->getButtonState(3);
+
+        return;
+    }
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::Num1:
             {
-                transRot = hapticEventData->transform;
-                pos = hapticEventData->position;
-                vel = hapticEventData->velocity;
-                buttonState[0] = hapticEventData->buttonState[0];
-                buttonState[1] = hapticEventData->buttonState[1];
-                buttonState[2] = hapticEventData->buttonState[2];
-                buttonState[3] = hapticEventData->buttonState[3];
+                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
+                break;
             }
 
-            break;
-        }
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>( p_event->getEventData() );
-
-            if ( keyBoardData->keyBoardKey == smKey::Num1 )
+            case smtk::Event::smKey::Num2:
             {
-                smSDK::getInstance()->getEventDispatcher()
-                    ->disableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT));
-                this->renderDetail.renderType = ( this->renderDetail.renderType
-                    | SIMMEDTK_RENDER_NONE );
+                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
+                break;
             }
-
-            if ( keyBoardData->keyBoardKey == smKey::Num2 )
-            {
-                smSDK::getInstance()->getEventDispatcher()
-                    ->enableEventHandler ( safeDownCast<smEventHandler>(), smEventType(SIMMEDTK_EVENTTYPE_HAPTICOUT) );
-                this->renderDetail.renderType = ( this->renderDetail.renderType
-                    & ( ~SIMMEDTK_RENDER_NONE ) );
-            }
-
-            break;
-        }
-        default:
-        {
-            std::cerr << "Unknoun event type" << std::endl;
-            break;
+            default:
+                break;
         }
     }
 }

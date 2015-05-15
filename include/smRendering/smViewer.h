@@ -24,8 +24,8 @@
 #ifndef SMVIEWER_H
 #define SMVIEWER_H
 
-// GLFW includes
-#include "GLFW/glfw3.h"
+// 3rd Party iIncludes
+#include <SFML/Window.hpp>
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
@@ -36,8 +36,6 @@
 #include "smCore/smStaticSceneObject.h"
 #include "smUtilities/smGLUtils.h"
 #include "smRendering/smVBO.h"
-#include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smSimulators/smPBDSceneObject.h"
 #include "smSimulators/smFemSceneObject.h"
 #include "smUtilities/smDataStructures.h"
@@ -45,7 +43,7 @@
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
 #include "smRendering/smCamera.h"
-
+#include "smEvent/smEventHandler.h"
 
 //forward declaration
 class smSDK;
@@ -100,7 +98,6 @@ protected:
     std::vector<std::shared_ptr<smCoreClass>> objectList;
     std::vector<smRenderOperation> renderOperations;
     std::vector<smFboListItem> fboListItems;
-
     std::shared_ptr<smErrorLog> log;
     smInt unlimitedFPSVariableChanged;
     smBool unlimitedFPSEnabled;
@@ -109,9 +106,14 @@ protected:
     friend class smSDK;
 
 public:
+
     smRenderingStageType renderStage;
 
-    GLFWwindow* window;
+    std::unique_ptr<sf::Context> sfmlContext;
+    std::unique_ptr<sf::Window> sfmlWindow;
+
+    ///if the camera motion is enabled from other external devices
+    smBool enableCameraMotion;
 
     std::shared_ptr<smOpenGLWindowStream> windowOutput;
     /// \brief Viewer settings
@@ -125,7 +127,7 @@ public:
     /// \brief default constructor
     smViewer();
     /// \brief initialization for viewer
-    virtual  void init();
+    virtual void init() override;
     /// \brief for exit viewer
     void exitViewer();
     /// \brief add object for rendering
@@ -140,7 +142,9 @@ public:
     /// \brief set scene as texture
     void setSceneAsTextureShader(std::shared_ptr<smSceneTextureShader> p_shader);
     /// \brief set the window title
-    void setWindowTitle(smString);
+    void setWindowTitle(const smString &str);
+    /// \brief enable/disable VSync
+    void setVSync(bool sync);
     /// \brief Registers a scene for rendering with the viewer
     void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const smString &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
@@ -194,20 +198,22 @@ protected:
     /// \brief Set the color and other viewer defaults
     void setToDefaults();
     /// \brief called in the beginning of each frame
-    virtual void beginFrame();
+    virtual void beginFrame() override;
     /// \brief called in the end of each frame
-    virtual void endFrame();
+    virtual void endFrame() override;
     /// \brief draw routines
-    virtual void draw(const smDrawParam &){};
+    virtual void draw(const smDrawParam &) override {};
     virtual void draw();
     /// \brief adjust  rendering FPS
     void adjustFPS();
     /// \brief render depth texture for debugging
     void renderTextureOnView();
     /// \brief  event handler
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    /// \brief processes an SFML event
+    void processSFMLEvents(const sf::Event& p_event);
     /// \brief  launches the the viewer. don't call sdk will call this
-    virtual void exec();
+    virtual void exec() override;
 };
 
 #endif

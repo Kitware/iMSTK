@@ -84,7 +84,7 @@ void smVegaFemSimulator::syncBuffers()
 {
 }
 
-void smVegaFemSimulator::handleEvent( std::shared_ptr<smEvent> p_event )
+void smVegaFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
     switch ( p_event->getEventType().eventTypeCode )
     {

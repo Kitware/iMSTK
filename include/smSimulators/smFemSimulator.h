@@ -30,43 +30,44 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
-#include "smCore/smEventData.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
+
+namespace smtk{
+namespace Event{
+class smEventHandler;
+class smEvent;
+}}
 
 /// \brief Example FEM simulator
 class smFemSimulator: public smObjectSimulator
 {
 private:
-    smVec3f hapticPosition;
+    smVec3d hapticPosition;
     smBool hapticButtonPressed;
-    std::shared_ptr<smEventDispatcher> eventDispatcher;
+    std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
 
 public:
     /// \brief constructor
     smFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
-    /// \brief !!
-    void setDispatcher(std::shared_ptr<smEventDispatcher> p_eventDispatcher);
-
 protected:
     /// \brief !!
-    virtual void beginSim();
+    virtual void beginSim() override;
 
     /// \brief !!
-    virtual void initCustom();
+    virtual void initCustom() override;
 
     /// \brief run the fem simulation in a loop here
-    virtual void run();
+    virtual void run() override;
 
     /// \brief !!
-    void endSim();
+    void endSim() override;
 
     /// \brief synchronize the buffers in the object (do not call by yourself).
-    void syncBuffers();
+    void syncBuffers() override;
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

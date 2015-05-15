@@ -24,6 +24,8 @@
 // SimMedTK includes
 #include "smSimulators/smDummySimulator.h"
 #include "smCore/smStaticSceneObject.h"
+#include "smEvent/smEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 
 smDummySimulator::smDummySimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
@@ -99,18 +101,25 @@ void smDummySimulator::syncBuffers()
         }
     }
 }
-void smDummySimulator::handleEvent( std::shared_ptr<smEvent> p_event )
+void smDummySimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
+        return;
+    }
 
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::F1:
             {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
+                std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
+                break;
             }
-
-            break;
+            default:
+                break;
+        }
     }
 }

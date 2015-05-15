@@ -36,7 +36,7 @@ void createPBDandFEM()
     smFemSimulator *femSim;
     smPBDSurfaceSceneObject *pbdObject;
     smPBDObjectSimulator * pbd;
-    smMatrix33f mat;
+    smMatrix33d mat;
     smSimulator *simulator;
     smViewer *viewer;
     smScene *scene1;
@@ -72,31 +72,31 @@ void createPBDandFEM()
     femobj->v_mesh->LoadTetra("../../resources/models/cylinder_Mesh.txt");
     femobj->v_mesh->getSurface("../../resources/models/cylinder_smesh.txt");
     femobj->v_mesh->readBC("../../resources/models/cylinder_BC.txt");
-    femobj->v_mesh->scaleVolumeMesh(smVec3f(1, 1, 1));
-    femobj->renderDetail.colorDiffuse = smColor::colorBlue;
-    femobj->renderDetail.colorAmbient = smColor::colorBlue;
-    femobj->renderDetail.shadowColor = smColor(0.2, 0.2, 0.2);
+    femobj->v_mesh->scaleVolumeMesh(smVec3d(1, 1, 1));
+    femobjgetRenderDetail()->colorDiffuse = smColor::colorBlue;
+    femobjgetRenderDetail()->colorAmbient = smColor::colorBlue;
+    femobjgetRenderDetail()->shadowColor = smColor(0.2, 0.2, 0.2);
     femobj->v_mesh->rotate(mat);
-    femobj->v_mesh->scaleVolumeMesh(smVec3f(0.5, 0.5, 1.0));
-    femobj->v_mesh->translateVolumeMesh(smVec3f(20, 15, 20));
-    femobj->renderDetail.renderType = (SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_SHADOWS | SIMMEDTK_RENDER_FACES);
-    femobj->renderDetail.lineSize = 1.0;
-    femobj->renderDetail.pointSize = 5;
+    femobj->v_mesh->scaleVolumeMesh(smVec3d(0.5, 0.5, 1.0));
+    femobj->v_mesh->translateVolumeMesh(smVec3d(20, 15, 20));
+    femobjgetRenderDetail()->renderType = (SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_SHADOWS | SIMMEDTK_RENDER_FACES);
+    femobjgetRenderDetail()->lineSize = 1.0;
+    femobjgetRenderDetail()->pointSize = 5;
     femobj->buildLMmatrix();
     femobj->computeStiffness();
     femobj->attachObjectSimulator(femSim);
 
     ///create a position based dynamics(PBD) surface object
     pbdObject = new smPBDSurfaceSceneObject();
-    pbdObject->renderDetail.colorDiffuse = smColor::colorWhite;
-    pbdObject->renderDetail.colorAmbient = smColor::colorWhite;
+    pbdObjectgetRenderDetail()->colorDiffuse = smColor::colorWhite;
+    pbdObjectgetRenderDetail()->colorAmbient = smColor::colorWhite;
     pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
 
     //pbdObject->mesh->rotate(mat);
-    pbdObject->mesh->scale(smVec3f(2.3, 0.5, 2));
-    pbdObject->mesh->translate(smVec3f(11, 25, 0));
+    pbdObject->mesh->scale(smVec3d(2.3, 0.5, 2));
+    pbdObject->mesh->translate(smVec3d(11, 25, 0));
     pbdObject->mesh->assignTexture("clothtexture");
-    pbdObject->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    pbdObjectgetRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
     pbdObject->initMeshStructure();
     pbdObject->InitSurfaceObject();
 
@@ -104,7 +104,7 @@ void createPBDandFEM()
     pbdObject->findFixedCorners();
 
     ///can use sphere shape to fix the vertices
-    ///pbdObject->findFixedMassWrtSphere(smVec3f(11,23,0),5);
+    ///pbdObject->findFixedMassWrtSphere(smVec3d(11,23,0),5);
     ///attach object to the simulator
     pbdObject->attachObjectSimulator(pbd);
 

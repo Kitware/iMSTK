@@ -25,18 +25,16 @@
 
 #include <memory>
 
-int main(int argc, char** argv)
+int main(int /*argc*/, char** /*argv*/)
 {
     auto App = std::make_shared<CollisionDetectionBVH>();
 
-    App->viewer->addObject(App);
+//     App->viewer->addObject(App);
     //Link up the event system between this object and the SimMedTK SDK
-    App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_KEYBOARD);
-    App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
-    App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
-    App->sdk->getSimulator()->registerSimulationMain(App);
-
-    glutInit(&argc,argv);
+//     App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_KEYBOARD);
+//     App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_BUTTON);
+//     App->sdk->getEventDispatcher()->registerEventHandler(App, SIMMEDTK_EVENTTYPE_MOUSE_MOVE);
+//     App->sdk->getSimulator()->registerSimulationMain(App);
 
     App->run();
 

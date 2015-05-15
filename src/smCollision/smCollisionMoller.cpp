@@ -280,17 +280,18 @@ smBool smCollisionMoller::checkLineTri( smVec3d &p_linePoint1, smVec3d &p_linePo
         }
     }
 
-    return ( false );
+    return false;
 }
 
 smBool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3 )
 {
 
-    smVec3d  boxhalfsize;
+    smVec3d boxhalfsize;
     smVec3d boxCenter;
-    double triverts[3][3] = {v1[0],v1[1],v1[2],
-                              v2[0],v2[1],v2[2],
-                              v3[0],v3[1],v3[2]};
+    smMatrix33d triverts;
+    triverts << v1[0],v1[1],v1[2],
+                v2[0],v2[1],v2[2],
+                v3[0],v3[1],v3[2];
     boxhalfsize[0] = p_aabb.halfSizeX();
     boxhalfsize[1] = p_aabb.halfSizeY();
     boxhalfsize[2] = p_aabb.halfSizeZ();
@@ -301,8 +302,5 @@ smBool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3d &v1, smVec3
     {
         return true;
     }
-    else
-    {
-        return false;
-    }
+    return false;
 }

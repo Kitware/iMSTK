@@ -32,13 +32,13 @@ smColor smColor::colorGray(0.8, 0.8, 0.8, 1.0);
 smColor smColor::colorYellow(1, 1, 0, 1);
 smColor smColor::colorPink(1, 0, 1, 1);
 
-void smRenderDetail::addShader(smUnifiedID p_shaderID)
+void smRenderDetail::addShader(std::shared_ptr<smUnifiedId> p_shaderID)
 {
 
     shaderEnable.push_back(true);
     shaders.push_back(p_shaderID);
 }
-void smRenderDetail::addVAO(smUnifiedID p_shaderID)
+void smRenderDetail::addVAO(std::shared_ptr<smUnifiedId> p_shaderID)
 {
 
     VAOs.push_back(p_shaderID);
@@ -191,7 +191,7 @@ const bool& smRenderDetail::getDebugDraw() const
 {
     return this->debugDraw;
 }
-const std::vector< smUnifiedID >& smRenderDetail::getShaders() const
+const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getShaders() const
 {
     return this->shaders;
 }
@@ -199,7 +199,7 @@ const std::vector< bool >& smRenderDetail::getShaderEnable() const
 {
     return this->shaderEnable;
 }
-const std::vector< smUnifiedID >& smRenderDetail::getVAOs() const
+const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getVAOs() const
 {
     return this->VAOs;
 }

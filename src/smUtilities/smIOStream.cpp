@@ -80,7 +80,7 @@ void smOpenGLWindowStream::init(smInt p_totalTexts)
     textColor.setValue(1.0, 1.0, 1.0, 1.0);
     totalTexts = p_totalTexts;
     windowTexts = new smWindowData[totalTexts];
-    drawOrder = SIMMEDTK_DRAW_AFTEROBJECTS;
+    this->setDrawOrder(SIMMEDTK_DRAW_AFTEROBJECTS);
 
     for (smInt i = 0; i < totalTexts; i++)
     {
@@ -189,7 +189,7 @@ smWindowConsole::smWindowConsole(smInt p_totalTexts)
 {
     init(p_totalTexts);
     backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-    smSDK::getInstance()->getEventDispatcher()->registerEventHandler(safeDownCast<smEventHandler>(), SIMMEDTK_EVENTTYPE_KEYBOARD);
+    this->eventHanlder->attachEvent(smtk::Event::EventType::Keyboard,shared_from_this());
     left = 0.0;
     bottom = 0.0;
     right = 1.0;
@@ -227,7 +227,7 @@ void smWindowConsole::draw(const smDrawParam &/*p_params*/)
 {
     //All previous code was for drawing on-screen text
 }
-void smWindowConsole::handleEvent(std::shared_ptr<smEvent> /*p_event*/)
+void smWindowConsole::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/)
 {
     //All previous code use interpreting keyboard events for on-screen text
 }

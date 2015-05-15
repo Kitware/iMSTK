@@ -34,7 +34,7 @@ void smCollisionPair::setModels(const std::shared_ptr< smModelRepresentation >& 
     this->modelRepresentations.first = first;
     this->modelRepresentations.second = second;
 }
-void smCollisionPair::addContact(const double& penetrationDepth, const smVec3f& contactPoint, const smVec3f& contactNornmal)
+void smCollisionPair::addContact(const double& penetrationDepth, const smVec3d& contactPoint, const smVec3d& contactNornmal)
 {
     auto contact = std::make_shared<smContact>(penetrationDepth, contactPoint, contactNornmal);
     this->contacts.emplace_back(contact);

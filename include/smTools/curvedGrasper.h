@@ -24,32 +24,42 @@
 #ifndef CURVEDGRASPER_H
 #define CURVEDGRASPER_H
 
+// SimMedTK includes
 #include "smSimulators/smStylusObject.h"
 #include "smMesh/smSurfaceMesh.h"
+
+namespace smtk {
+namespace Event {
+    class smEvent;
+    class smEventHandler;
+    class smCameraEvent;
+}
+}
+
 /// \brief Cruver Grasper tool
 class curvedGrasper: public smStylusRigidSceneObject
 {
 public:
     /// \brief constrcutor that gest hatpic device ID (e.g. 0 or 1), pivot, lower and upper mesh file names
-    curvedGrasper(smInt ID,
+    curvedGrasper(size_t ID,
                   const smString& p_pivotModelFileName = "../../resources/models/curved_pivot.3DS",
                   const smString& p_lowerModelFileName = "../../resources/models/curved_upper.3DS",
                   const smString& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief rendering the curved grasper
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
 
     /// \brief event handler
-    void handleEvent(std::shared_ptr<smEvent> p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief for open and close motion
     void updateOpenClose();
 
 public:
-    smInt phantomID; // phantom device ID that will be listened
+    size_t phantomID; // phantom device ID that will be listened
     smBool buttonState[2]; // buttons states of haptic device
-    smFloat angle; // angle of the jaws
-    smFloat maxangle; // maximum angle that jaws can open
+    double angle; // angle of the jaws
+    double maxangle; // maximum angle that jaws can open
     smMeshContainer meshContainer_pivot; // the pivto mesh container
     smMeshContainer meshContainer_lowerJaw; // lower jaw container
     smMeshContainer meshContainer_upperJaw; // upper jaw container
@@ -60,11 +70,11 @@ public:
     smPipeRegisteration NIUSB6008pipeReg; //
 #endif
     smVec3d godPos; // god object position
-    smFloat godMat[9]; // god object matrix
+    double godMat[9]; // god object matrix
     smInt DAQdataID; // interface for DAQ
-    smFloat minValue; // read  min  data value
-    smFloat maxValue; // read  max  data value
-    smFloat invRange; // 1/range value
+    double minValue; // read  min  data value
+    double maxValue; // read  max  data value
+    double invRange; // 1/range value
 };
 
 #endif

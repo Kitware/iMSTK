@@ -36,7 +36,7 @@ go_bandit([](){
 
         const int numberOfSubdivisions = smOctreeCell::numberOfSubdivisions;
 
-        smVec3f center(1.,1.,1.);
+        smVec3d center(1.,1.,1.);
         treeCell.setCenter(center);
 
         float lenght = 14.5;
@@ -44,7 +44,7 @@ go_bandit([](){
 
         it("initializes properly", [&]() {
           AssertThat(numberOfSubdivisions, Equals(8));
-          AssertThat(treeCell.getIsEmpty(), IsTrue());
+          AssertThat(treeCell.isEmpty(), IsTrue());
           AssertThat(treeCell.getLevel(), Equals(0));
         });
 

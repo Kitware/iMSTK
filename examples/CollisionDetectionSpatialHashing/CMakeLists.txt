@@ -7,4 +7,5 @@ target_link_libraries(CollisionDetectionSpatialHashing
   smMesh
   smSimulators
   smCollision
+  smEvent
   )

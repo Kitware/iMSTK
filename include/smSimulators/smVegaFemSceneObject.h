@@ -148,28 +148,28 @@ public:
     void drawAxes(double axisLength);
 
     /// \brief
-    virtual void serialize(void */*p_memoryBlock*/)
+    virtual void serialize(void *) override
     {
         //add code in future
     }
 
     /// \brief
-    virtual void unSerialize(void */*p_memoryBlock*/)
+    virtual void unSerialize(void *) override
     {
 
     }
 
     /// \brief not implemented yet.
-    virtual std::shared_ptr<smSceneObject> clone()
+    virtual std::shared_ptr<smSceneObject> clone() override
     {
         return safeDownCast<smSceneObject>();
     }
 
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
-    virtual void init(){}
+    virtual void init() override {}
 
 public:
     /// performance counters and simulation flags. some variable names are self explainatory

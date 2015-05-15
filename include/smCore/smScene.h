@@ -38,6 +38,9 @@
 #include "smCore/smDoubleBuffer.h"
 #include "smRendering/smLight.h"
 #include "smRendering/smCamera.h"
+#include "smEvent/smKeyboardEvent.h"
+#include "smEvent/smMouseButtonEvent.h"
+#include "smEvent/smMouseMoveEvent.h"
 
 class smPipe;
 class smScene;
@@ -114,7 +117,7 @@ public:
     void removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
 
     ///the same as
-    void removeSceneObject(smInt p_objectId);
+    void removeSceneObject(std::shared_ptr<smUnifiedId> p_objectId);
 
     ///in order to get the phsyics in the scene call this function.
     ///it is thread safe. but it shouldn't be called frequently.
@@ -124,7 +127,7 @@ public:
     std::vector<std::shared_ptr<smSceneObject>> &getSceneObject();
 
     /// \brief retursn scene id
-    smInt getSceneId();
+    std::shared_ptr<smUnifiedId> getSceneId();
 
     /// \brief returns the total number of objects in the scene
     inline smInt getTotalObjects();
@@ -144,8 +147,22 @@ public:
     /// \brief Initializes lights for rendering
     void initLights();
 
-    /// \brief  enable attached lights
+    /// \brief Enables all currently active lights in the scene
+    ///
+    /// \detail This should be called in conjunction with disableLights().
+    /// Calling this will essentially call glEnable(GL_LIGHT#) for every
+    /// enabled light.
     void enableLights();
+    /// \brief Disables all lights in the scene
+    ///
+    /// \detail This should be called in conjunction with enableLights().
+    /// Calling this will essentially call glDisable(GL_LIGHT#) for every
+    /// light(enabled or not).
+    void disableLights();
+    /// \brief Place the OpenGL lights in the scene
+    ///
+    /// \detail Should be called after enableLights()
+    void placeLights();
 
     /// \brief addlight
     smInt addLight(std::shared_ptr<smLight> p_light);
@@ -161,7 +178,7 @@ public:
 
     void setLightPos(smInt p_lightId, smLightPos p_pos);
 
-    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3f p_direction);
+    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3d p_direction);
 
     std::shared_ptr<smCamera> getCamera()
     {

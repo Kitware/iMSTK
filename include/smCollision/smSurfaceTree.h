@@ -33,14 +33,13 @@
 #include "smCollision/smSurfaceTreeCell.h"
 #include "smCollision/smCollisionMoller.h"
 #include "smMesh/smSurfaceMesh.h"
-#include "smCore/smEventHandler.h"
 
 /// \brief !!
 template<typename CellType>
-class smSurfaceTree
+class smSurfaceTree : public smCoreClass
 {
 protected:
-  typedef smMatrix44f MatrixType;
+  typedef smMatrix44d MatrixType;
 
 protected:
     std::shared_ptr<smSurfaceMesh> mesh; 							///< surface mesh
@@ -69,7 +68,7 @@ public:
     std::vector<CellType> treeAllLevels; ///< !!
 
     /// \brief initialize the draw function related structures
-    void initDraw(const smDrawParam &param);
+    void initDraw(const smDrawParam &param) override;
 
 protected:
 
@@ -88,13 +87,16 @@ public:
     virtual smCollisionModelIterator<CellType>  getLevelIterator() ;
 
     /// \brief !!
-    inline smUnifiedID getAttachedMeshID()
+    inline std::shared_ptr<smUnifiedId> getAttachedMeshID()
     {
-        return mesh->uniqueId;
+        return mesh->getUniqueId();
     }
 
     /// \brief rendering the surface tree
-    virtual void draw(const smDrawParam &params);
+    virtual void draw(const smDrawParam &params) override;
+
+    /// \brief !!
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !! smSurfaceTree structure
     void updateStructure();

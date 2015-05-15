@@ -83,23 +83,12 @@ public:
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const smVec3f &getNormal(size_t i) const;
+    const smVec3d &getNormal(size_t i) const;
 
     ///
     /// @brief Returns array of vertices for triangle on surface
     ///
-    std::array<smVec3f,3> getTrianglePositions(size_t i) const;
-
-    ///
-    /// @brief Returns array of vertices for triangle on surface
-    ///
-   void translate(const smVec3f &translation)
-   {
-       this->mesh->translate(translation);
-       this->mesh->upadateAABB();
-       this->mesh->updateTriangleAABB();
-       aabbTree->updateStructure();
-   }
+    std::array<smVec3d,3> getTrianglePositions(size_t i) const;
 
 private:
     std::shared_ptr<smMesh> mesh; // Underlying mesh

@@ -28,11 +28,14 @@
 #include <map>
 
 // SimMedTK includes
-#include "smCore/smKey.h"
+#include "smEvent/smKey.h"
 
 #include <GLFW/glfw3.h>
 
-static const std::map<int, smKey> glfwToSmKeyMap = {
+namespace smtk {
+namespace Event {
+
+static std::map<const int, const smKey> glfwToSmKeyMap = {
     {GLFW_KEY_A, smKey::A},
     {GLFW_KEY_B, smKey::B},
     {GLFW_KEY_C, smKey::C},
@@ -134,11 +137,25 @@ static const std::map<int, smKey> glfwToSmKeyMap = {
     {GLFW_KEY_F15, smKey::F15},
     {GLFW_KEY_PAUSE, smKey::Pause},
     {GLFW_KEY_GRAVE_ACCENT, smKey::Backtick},
+    {GLFW_KEY_UNKNOWN,smKey::Unknown}
 };
 
-inline smKey GLFWKeyToSmKey(int key)
+inline const smKey &GLFWKeyToSmKey(const int &key)
 {
-    return glfwToSmKeyMap.at(key);
+    try
+    {
+        const smKey & out = glfwToSmKeyMap.at(key);
+        return out;
+    }
+    catch (std::out_of_range &e)
+    {
+        std::cout << e.what() << std::endl;
+        return glfwToSmKeyMap[GLFW_KEY_UNKNOWN];
+    }
+    return glfwToSmKeyMap[GLFW_KEY_UNKNOWN];
 }
+
+} // Event namespace
+} // smtk namespace
 
 #endif

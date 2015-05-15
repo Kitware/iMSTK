@@ -40,7 +40,7 @@ smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
 {
     this->log = p_log;
 //     smSDK::getInstance()->registerObjectSim(safeDownCast<smObjectSimulator>());
-    name = "objecSimulator" + std::to_string(uniqueId.ID);
+    name = "objecSimulator" + std::to_string(this->getUniqueId()->getId());
 
     type = SIMMEDTK_SMOBJECTSIMULATOR;
     isObjectSimInitialized = false;

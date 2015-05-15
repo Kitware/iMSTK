@@ -21,41 +21,43 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smEvent.h"
-#include "smCore/smEventHandler.h"
+#ifndef SMUNIFIEDID_H
+#define SMUNIFIEDID_H
 
-smEvent::smEvent()
-{
-    priority = SIMMEDTK_EVENTPRIORITY_NORMAL;
-    data = nullptr;
-}
+// STL includes
+#include <atomic>
+#include <memory>
 
-smEvent::~smEvent()
-{
-}
 
-smEventType::smEventType()
+/// \brief  This class creates a unique unified id of each object in the framework
+struct smUnifiedId
 {
-    eventTypeCode = SIMMEDTK_EVENTTYPE_NONE;
-}
+public:
+    typedef std::shared_ptr<smUnifiedId> Pointer;
 
-smEventType::smEventType(smInt p_eventType)
-{
-    eventTypeCode = p_eventType;
-}
+public:
+    /// \brief  constructor
+    smUnifiedId();
 
-smEventType & smEventType::operator=(smInt p_eventTypeCode)
-{
-    eventTypeCode = p_eventTypeCode;
-    return *this;
-}
+    /// \brief comparison with another std::shared_ptr<smUnifiedId>
+    bool operator==(const smUnifiedId *id);
 
-smBool smEventType::operator ==(const smEventType &p_event)
-{
-    return eventTypeCode == p_event.eventTypeCode;
-}
+    /// \brief comparison with id
+    bool operator!=(const short &id);
 
-smBool smEventType::operator ==(smInt p_eventTypeCode)
-{
-    return eventTypeCode == p_eventTypeCode;
-}
+    /// Accessor
+
+    inline const short &getId() const
+    {
+        return this->ID;
+    }
+
+private:
+    static std::atomic_int IDcounter; // atomic integer counter that is used to assign a unique number for  each object
+    short ID; //  unique ID
+
+    smUnifiedId(const smUnifiedId&) = delete;
+    smUnifiedId &operator=(const smUnifiedId&) = delete;
+};
+
+#endif // SMUNIFIEDID_H

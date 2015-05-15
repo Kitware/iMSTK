@@ -1,10 +1,11 @@
-
 add_executable(renderCubeOculus main.cpp  RenderCubeOculus.cpp RenderCubeOculus.h)
 target_link_libraries(renderCubeOculus
   smCore
   smRendering
+  smRenderingOculus
   smShader
   smMesh
+  Oculus::Oculus
   )
 
 if(CMAKE_COMPILER_IS_GNUCXX)

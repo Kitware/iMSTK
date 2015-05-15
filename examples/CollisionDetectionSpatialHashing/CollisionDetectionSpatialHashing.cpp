@@ -25,7 +25,8 @@
 
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
-#include "smCore/smEventData.h"
+#include "smCollision/smCollisionPair.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 {
@@ -44,14 +45,12 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     sdk->addViewer(viewer);
 
     // Intializes the spatial spatialHashinging
-    spatialHashing = std::make_shared<smSpatialHash>(10000, 2, 2, 2);
+    spatialHashing = std::make_shared<smSpatialHashCollision>(10000, 2, 2, 2);
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, spatialHashing);
 
     // Create dummy simulator
     defaultSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
     sdk->registerObjectSim(defaultSimulator);
-
-    // Init dispacther for events
-    sdk->getEventDispatcher()->registerEventHandler(std::static_pointer_cast<smEventHandler>(defaultSimulator), smEventType(SIMMEDTK_EVENTTYPE_KEYBOARD));
 
     // Init texture manager and specify the textures needed for the current application
     smTextureManager::init(sdk->getErrorLog());
@@ -75,10 +74,10 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     modelA->mesh->assignTexture("livertexture1");
 
     // Set the rendering features
-    modelA->mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    modelA->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     modelA->mesh->translate(7, 3, 0);
-    modelA->mesh->renderDetail.lineSize = 2;
-    modelA->mesh->renderDetail.pointSize = 5;
+    modelA->mesh->getRenderDetail()->lineSize = 2;
+    modelA->mesh->getRenderDetail()->pointSize = 5;
 
     // Attach object to the dummy simulator. it will be simulated by dummy simulator
     modelA->attachObjectSimulator(defaultSimulator);
@@ -90,11 +89,11 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     sdk->registerMesh(modelB->mesh);
 
     modelB->mesh->loadMeshLegacy("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    modelB->mesh->translate(smVec3f(2, 0, 0));
+    modelB->mesh->translate(smVec3d(2, 0, 0));
 
     modelB->mesh->assignTexture("livertexture2");
-    modelB->mesh->renderDetail.shadowColor.rgba[0] = 1.0;
-    modelB->mesh->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    modelB->mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    modelB->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     spatialHashing->addMesh(modelB->mesh);
 
     // Add object to the scene
@@ -105,12 +104,12 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     auto light = std::make_shared<smLight>("SceneLight1",
                                            SIMMEDTK_LIGHT_SPOTLIGHT,
                                            SIMMEDTK_LIGHTPOS_WORLD);
-    light->lightPos.setPosition(smVec3f(10.0, 10.0, 10.0));
+    light->lightPos.setPosition(smVec3d(10.0, 10.0, 10.0));
     light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
     light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
     light->spotCutOffAngle = 60;
-    light->direction = smVec3f(0.0, 0.0, -1.0);
+    light->direction = smVec3d(0.0, 0.0, -1.0);
     light->drawEnabled = false;
     light->attn_constant = 1.0;
     light->attn_linear = 0.0;
@@ -135,36 +134,17 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     simulator->registerObjectSimulator(defaultSimulator);
     simulator->registerCollisionDetection(spatialHashing);
 
+    // Create dummy collision pair
+    std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
+    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
+    collisionPair->setModels(collisionModelA,collisionModelB);
+    simulator->addCollisionPair(collisionPair);
+
     // setup viewer
     viewer->setWindowTitle("SimMedTK CollisionHash Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
-
-    // we want viewer to render this object
-//     viewer->addObject(shared_from_this());
-
-    // set event dispatcher to the viewer
-    viewer->setEventDispatcher(sdk->getEventDispatcher());
-//     simulator->registerSimulationMain(safeDownCast<CollisionDetectionSpatialHashing>());
-}
-
-// Draw the collided triangles. This will be called due to the function call viewer->addObject(this)
-void CollisionDetectionSpatialHashing::draw(const smDrawParam &/*p_params*/)
-{
-    auto &triangles = spatialHashing->getCollidedTriangles();
-    glBegin(GL_TRIANGLES);
-
-    for (size_t i = 0; i < triangles.size(); i++)
-    {
-        glVertex3fv(triangles[i]->tri1.vert[0].data());
-        glVertex3fv(triangles[i]->tri1.vert[1].data());
-        glVertex3fv(triangles[i]->tri1.vert[2].data());
-
-        glVertex3fv(triangles[i]->tri2.vert[0].data());
-        glVertex3fv(triangles[i]->tri2.vert[1].data());
-        glVertex3fv(triangles[i]->tri2.vert[2].data());
-    }
-    glEnd();
 }
 
 void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam &/*p_param*/)
@@ -185,101 +165,3 @@ void CollisionDetectionSpatialHashing::run()
 {
     this->sdk->run();
 }
-
-void CollisionDetectionSpatialHashing::handleEvent(std::shared_ptr<smEvent> p_event)
-{
-    switch (p_event->getEventType().eventTypeCode)
-    {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            std::shared_ptr<smCamera> cam = scene->getCamera();
-            auto kbData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-            smKey key = kbData->keyBoardKey;
-            if (key == smKey::Escape && kbData->pressed)
-            {
-                //Tell the framework to shutdown
-                sdk->shutDown();
-            }
-            else if (key == smKey::W && kbData->pressed)
-            {
-                if (smModKey::shift == (kbData->modKeys & smModKey::shift))
-                {
-                    //Move the camera up
-                    cam->setCameraPos(cam->pos.x, cam->pos.y + 1, cam->pos.z);
-                    cam->setCameraFocus(cam->fp.x, cam->fp.y + 1, cam->fp.z);
-                    cam->genViewMat();
-                }
-                else
-                {
-                    //Move the camera forward
-                    cam->setCameraPos(cam->pos.x, cam->pos.y, cam->pos.z - 1);
-                    cam->setCameraFocus(cam->fp.x, cam->fp.y, cam->fp.z - 1);
-                    cam->genViewMat();
-                }
-            }
-            else if (key == smKey::A && kbData->pressed)
-            {
-                //Move the camera to the left
-                cam->setCameraPos(cam->pos.x - 1, cam->pos.y, cam->pos.z);
-                cam->setCameraFocus(cam->fp.x - 1, cam->fp.y, cam->fp.z);
-                cam->genViewMat();
-            }
-            else if (key == smKey::S && kbData->pressed)
-            {
-                //Move the camera backward
-                if (smModKey::shift == (kbData->modKeys & smModKey::shift))
-                {
-                    cam->setCameraPos(cam->pos.x, cam->pos.y - 1, cam->pos.z);
-                    cam->setCameraFocus(cam->fp.x, cam->fp.y - 1, cam->fp.z);
-                    cam->genViewMat();
-                }
-                else
-                {
-                    cam->setCameraPos(cam->pos.x, cam->pos.y, cam->pos.z + 1);
-                    cam->setCameraFocus(cam->fp.x, cam->fp.y, cam->fp.z + 1);
-                    cam->genViewMat();
-                }
-            }
-            else if (key == smKey::D && kbData->pressed)
-            {
-                //Move the camera to the right
-                cam->setCameraPos(cam->pos.x + 1, cam->pos.y, cam->pos.z);
-                cam->setCameraFocus(cam->fp.x + 1, cam->fp.y, cam->fp.z);
-                cam->genViewMat();
-            }
-            break;
-        }
-        case SIMMEDTK_EVENTTYPE_MOUSE_BUTTON:
-        {
-            auto mbData = std::static_pointer_cast<smMouseButtonEventData>(p_event->getEventData());
-            std::cout << "mbData: button: ";
-            if (mbData->mouseButton == smMouseButton::Left)
-                std::cout << "Left";
-            else if (mbData->mouseButton == smMouseButton::Right)
-                std::cout << "Right";
-            else if (mbData->mouseButton == smMouseButton::Middle)
-                std::cout << "Middle";
-            else
-                std::cout << "Unknown";
-
-            std::cout << " pressed: ";
-            if(mbData->pressed)
-                std::cout << "true";
-            else
-                std::cout << "false";
-
-            std::cout << " x: " << mbData->windowX << " y: " << mbData->windowY << "\n";
-            break;
-        }
-        case SIMMEDTK_EVENTTYPE_MOUSE_MOVE:
-        {
-            auto mpData = std::static_pointer_cast<smMouseMoveEventData>(p_event->getEventData());
-            std::cout << "mpData: x: " << mpData->windowX
-            << " y: " << mpData->windowY << "\n";
-            break;
-        }
-        default:
-            break;
-    }
-}
-

@@ -90,9 +90,9 @@ void smAABB::subDivide( const double p_length, const int p_divison, smAABB *p_aa
 
 void smAABB::subDivide( const int p_divisionX, const int p_divisionY, const int p_divisionZ, smAABB *p_aabb ) const
 {
-    smFloat stepX;
-    smFloat stepY;
-    smFloat stepZ;
+    double stepX;
+    double stepY;
+    double stepZ;
 
     stepX = ( this->aabbMax[0] - this->aabbMin[0] ) / p_divisionX;
     stepY = ( this->aabbMax[1] - this->aabbMin[1] ) / p_divisionY;
@@ -162,7 +162,7 @@ smCube::smCube()
 void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
 {
     smVec3d minPoint;
-    smFloat divLength = ( sideLength / p_divisionPerAxis );
+    double divLength = ( sideLength / p_divisionPerAxis );
     smInt index = 0;
     minPoint << center[0] - sideLength * 0.5,
              center[1] - sideLength * 0.5,
