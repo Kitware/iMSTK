@@ -23,6 +23,9 @@
 
 #include "CollisionDetectionBVH.h"
 
+#include "../common/wasdCameraController.h"
+#include "../common/KeyPressSDKShutdown.h"
+
 #include <memory>
 
 #include "smCore/smSDK.h"
@@ -45,6 +48,10 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     // Add our viewer to the SDK
     sdk->addViewer(viewer);
 
+    //Create the camera controller
+    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
+    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+
     // Create dummy simulator
     defaultSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
     sdk->registerObjectSim(defaultSimulator);
@@ -63,7 +70,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
     collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
     collisionModelA->getMesh()->assignTexture("livertexture1");
-    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
     collisionModelA->getMesh()->translate(7, 3, 0);
     collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
     collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
@@ -74,7 +81,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     collisionModelB->getMesh()->translate(smVec3d(2, 0, 0));
     collisionModelB->getMesh()->assignTexture("livertexture2");
     collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Add models to a collision pair so they can be queried for collision
     std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
@@ -103,12 +110,15 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    std::shared_ptr<smLight> light = smLight::getDefaultLighting();
+    auto light = smLight::getDefaultLighting();
+    assert(light);
     scene->addLight(light);
 
     // Camera setup
     std::shared_ptr<smCamera> sceneCamera = smCamera::getDefaultCamera();
+    assert(sceneCamera);
     scene->addCamera(sceneCamera);
+    camCtl->setCamera(sceneCamera);
 
     // Create a simulator module
     simulator = sdk->createSimulator();
@@ -117,14 +127,15 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     simulator->addCollisionPair(collisionPair);
 
     // setup viewer
-    viewer->setWindowTitle("SimMedTK CollisionHash Example");
+    viewer->setWindowTitle("SimMedTK Collision BVH Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
     viewer->addObject(collisionModelA->getAABBTree());
     viewer->addObject(collisionModelB->getAABBTree());
-    // set event dispatcher to the viewer
-//     viewer->setEventDispatcher(sdk->getEventDispatcher());
-//     simulator->registerSimulationMain(std::static_pointer_cast<smSimulationMain>(shared_from_this()));
+
+    //Link up the event system between this the camera controller and the viewer
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
 }
 
 // Draw the collided triangles. This will be called due to the function call viewer->addObject(this)
