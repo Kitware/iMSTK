@@ -8,4 +8,5 @@ target_link_libraries(CollisionDetectionBVH
   smRendering
   smShader
   smSimulators
+  ExamplesCommon
   )
