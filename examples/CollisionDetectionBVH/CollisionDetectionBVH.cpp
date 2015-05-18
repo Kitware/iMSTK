@@ -138,25 +138,6 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
 }
 
-// Draw the collided triangles. This will be called due to the function call viewer->addObject(this)
-void CollisionDetectionBVH::draw(const smDrawParam &/*p_params*/)
-{
-//     auto &triangles = collisionDetection->getCollidedTriangles();
-//     glBegin(GL_TRIANGLES);
-//
-//     for (size_t i = 0; i < triangles.size(); i++)
-//     {
-//         glVertex3dv(triangles[i]->tri1.vert[0].data());
-//         glVertex3dv(triangles[i]->tri1.vert[1].data());
-//         glVertex3dv(triangles[i]->tri1.vert[2].data());
-//
-//         glVertex3dv(triangles[i]->tri2.vert[0].data());
-//         glVertex3dv(triangles[i]->tri2.vert[1].data());
-//         glVertex3dv(triangles[i]->tri2.vert[2].data());
-//     }
-//     glEnd();
-}
-
 void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*/)
 {
     if ((10 > moveObj) && (moveObj > 0))

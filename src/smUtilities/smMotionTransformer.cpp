@@ -35,8 +35,6 @@ smHapticTrans::smHapticTrans()
 {
     defaultDirection = -smVec3d::UnitZ();
     defaultUpDirection = smVec3d::UnitY();
-    if(nullptr == eventHandler)
-        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
     motionScale = 1.0;
     this->listening = true;
 }

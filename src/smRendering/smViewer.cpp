@@ -81,8 +81,6 @@ smViewer::smViewer()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
-    if(nullptr == eventHandler)
-        eventHandler = std::make_shared<smtk::Event::smEventHandler>();
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -506,7 +504,7 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::KeyPressed:
     case sf::Event::KeyReleased:
     {
-        auto keyboardEvent = 
+        auto keyboardEvent =
             std::make_shared<smtk::Event::smKeyboardEvent>(smtk::Event::SFMLKeyToSmKey(p_event.key.code));
         keyboardEvent->setPressed(sf::Event::KeyPressed == p_event.type);
 
