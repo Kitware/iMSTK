@@ -40,16 +40,40 @@ class smCollisionPair;
 class smContactHandling: public smCoreClass
 {
 public:
-    smContactHandling() {}
+    smContactHandling() {};
 
-    virtual ~smContactHandling() {}
+    virtual ~smContactHandling() {};
 
-    smContactHandlingType getContactHandlingType();
+    ///
+    /// @brief Set the scene objects that are colliding
+    ///
+    void setSceneObjects(const std::shared_ptr< smSceneObject >& first,
+                        const std::shared_ptr< smSceneObject >& second);
 
-private:
+    ///
+    /// @brief Get how the contact between scene objects is processed
+    ///
+    smContactHandlingType getContactHandlingType() const;
+
+    ///
+    /// @brief Get the first scene object
+    ///
+	std::shared_ptr<smSceneObject> getFirstSceneObject() const;
+	
+    ///
+    /// @brief Get the second scene object
+    ///
+	std::shared_ptr<smSceneObject> getSecondSceneObject() const;
+
+protected:
 
     smContactHandlingType contactHandlingType;
 
+	std::pair<std::shared_ptr<smSceneObject>, std::shared_ptr<smSceneObject>> collidingSceneObjects;
+
+    ///
+    /// @brief Implementation of how the contacts between colliding objects is resolved
+    ///
     virtual void processContacts(std::shared_ptr<smCollisionPair> pairs)=0;
 
 };

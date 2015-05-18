@@ -36,8 +36,17 @@ struct smPlane
 {
     smVec3d unitNormal;
     smVec3d pos;
-    double distance(smVec3d p_vector);
-    smVec3d project(smVec3d p_vector);
+    
+    double distance(smVec3d p_vector)
+    {
+		Eigen::MatrixXd m = p_vector*unitNormal.transpose();
+		return m(0,0);
+    };
+
+    smVec3d project(smVec3d p_vector)
+    {
+        return p_vector-((pos-p_vector)*unitNormal.transpose())*unitNormal;
+    };
 };
 
 /// \brief Axis Aligned bounding box declarions

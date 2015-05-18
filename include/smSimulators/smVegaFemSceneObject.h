@@ -131,6 +131,12 @@ public:
     /// with the scene during runtime are added here
     inline void applyUserInteractionForces();
 
+    /// \brief Append the contact forces (if any)
+    void applyContactForces();
+
+    /// \brief Set all contact forces to zero (if any)
+    void setContactForcesToZero();
+
     /// \brief Forces that are defined by the user before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
@@ -233,6 +239,8 @@ public:
     double * uSecondary;        ///< interpolated displacement for secondary mesh
     double * uInitial;          ///< initial displacement
     double * velInitial;        ///< initial velocity
+
+    std::vector<double> f_contact; ///< contact forces (if any)
 
     std::shared_ptr<smVegaConfigFemObject> femConfig;
 

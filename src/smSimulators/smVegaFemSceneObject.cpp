@@ -178,6 +178,8 @@ void smVegaFemSceneObject::initSimulation()
     f_ext = new double[3*n]();
     f_extBase = new double[3*n]();
 
+    f_contact.resize(3*n);
+
     loadInitialStates();
     loadScriptedExternalFroces();
     createForceModel();
@@ -354,7 +356,6 @@ void smVegaFemSceneObject::loadMeshes()
         }
     }
 
-    // load mass spring system (if any)
     if (femConfig->deformableObject == MASSSPRING)
     {
 
@@ -1043,6 +1044,23 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
     }
 }
 
+
+void applyContactForces()
+{
+    if(f_contact.size() != 0)
+    {
+        for(int i=0; i<f_contact.size(); i++)
+        {
+            f_ext[i] += f_contact(i);
+        }
+    }
+}
+
+
+void setContactForcesToZero()
+{
+    f_contact.assign(f_contact.size(),0.0);
+}
 
 // Forces as a result of user interaction (through an interface such as mouse or haptic device) with the scene during runtime are added here
 inline void smVegaFemSceneObject::applyUserInteractionForces()

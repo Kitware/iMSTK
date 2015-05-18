@@ -21,26 +21,27 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smContactHandling.h"
+// SimMedTK includes
+#include "smCollision/smPlaneToMeshCollision.h"
+#include "smCollision/smCollisionMoller.h"
+#include "smCollision/smCollisionPair.h"
+#include "smCollision/smMeshCollisionModel.h"
 
-void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& first,
-                        const std::shared_ptr< smSceneObject >& second)
+// STL includes
+#include <vector>
+
+void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pairs)
 {
-    collidingSceneObjects.first = first;
-    collidingSceneObjects.second = second;
-}
+    auto collisionModel = std::static_pointer_cast<smMeshCollisionModel>(pairs->getFirst());
 
-smContactHandlingType smContactHandling::getContactHandlingType() 
-{
-    return contactHandlingType;
-}
+    int nodeID;
+    double depth;
+    smVec3d normal;
+    smVec3d contactPoint;
 
-std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject()
-{ 
-	return collidingSceneObjects.first; 
-}
+    for (int i=0; i<collisionModel->getMesh()-> ; i++)
+    {
 
-std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject()
-{
-    return collidingSceneObjects.second; 
+    }
+   
 }

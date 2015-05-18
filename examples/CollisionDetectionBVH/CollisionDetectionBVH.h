@@ -48,7 +48,6 @@ public:
     CollisionDetectionBVH();
     ~CollisionDetectionBVH(){}
 
-    void draw (const smDrawParam &p_params);
     void simulateMain (const smSimulationMainParam &p_param) override;
     void run();
 

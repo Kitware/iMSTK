@@ -21,26 +21,30 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smContactHandling.h"
 
-void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& first,
-                        const std::shared_ptr< smSceneObject >& second)
+#ifndef SMPLANETOMESHCOLLISION_H
+#define SMPLANETOMESHCOLLISION_H
+
+// SimMedTK includes
+#include "smCollision/smCollisionDetection.h"
+
+class smCollisionPair;
+
+///
+/// @brief Brute force collision detection between a mesh and a static plane
+///
+class smPlaneToMeshCollision : public smCollisionDetection
 {
-    collidingSceneObjects.first = first;
-    collidingSceneObjects.second = second;
-}
+public:
+    smPlaneToMeshCollision() {}
+    virtual ~smPlaneToMeshCollision() {}
 
-smContactHandlingType smContactHandling::getContactHandlingType() 
-{
-    return contactHandlingType;
-}
+    smPlaneToMeshCollision(const smMeshToMeshCollision &) = delete;
 
-std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject()
-{ 
-	return collidingSceneObjects.first; 
-}
+private:
+    smPlane plane;
+    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) override;
 
-std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject()
-{
-    return collidingSceneObjects.second; 
-}
+};
+
+#endif // SMPLANETOMESHCOLLISION_H

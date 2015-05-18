@@ -22,31 +22,40 @@
 //---------------------------------------------------------------------------
 
 
-#ifndef SMPENALTY_COLLISIONHANDLING_H
-#define SMPENALTY_COLLISIONHANDLING_H
+#ifndef SMPENALTY_CONTACTHANDLING_H
+#define SMPENALTY_CONTACTHANDLING_H
 
 // SimMedTK includes
-#include "smCollision/smCollisionHandling.h"
+#include "smCollision/smContactHandling.h"
 
 class smCollisionPair;
 
 ///
-/// @brief Penalty based collision handling
+/// @brief Penalty based for contact handling
 ///
-class smPenaltyCollisionHandling : public smCollisionHandling
+class smPenaltyCollisionHandling : public smContactHandling
 {
 public:
 	smPenaltyCollisionHandling(smContactHandlingType contactHandlingType);
-    virtual ~smPenaltyCollisionHandling() {}
+    
+    smPenaltyCollisionHandling(smContactHandlingType contactHandlingType,
+                             const std::shared_ptr<smSceneObject>& sceneObjFirst,
+                             const std::shared_ptr<smSceneObject>& sceneObjSecond);
+
+    virtual ~smPenaltyCollisionHandling() {};
 
 private:
-    void computeUnilateralContactForces(std::shared_ptr<smCollisionPair> pairs,
-                                        std::vector<double>& forceVec);
 
-    void computeBilateralContactForces(std::shared_ptr<smCollisionPair> pairs, 
-										std::vector<double>& forceVec_mesh1,
-										std::vector<double>& forceVec_mesh2);
+    ///
+    /// @brief Get the forces on one the first scene object using penalty method
+    ///
+    void computeUnilateralContactForces(std::shared_ptr<smCollisionPair> pairs);
+    
+    ///
+    /// @brief Get the forces on both the scene objects using penalty method
+    ///
+    void computeBilateralContactForces(std::shared_ptr<smCollisionPair> pairs);
 
 };
 
-#endif // SMPENALTY_COLLISIONHANDLING_H
+#endif // SMPENALTY_CONTACTHANDLING_H
