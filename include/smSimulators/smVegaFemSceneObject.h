@@ -77,6 +77,8 @@
 #include "configFile.h"
 #include "loadList.h"
 #include "matrixIO.h"
+#include "objMesh.h"
+#include "volumetricMesh.h"
 
 #define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
 const smString vega_string_none("__none");

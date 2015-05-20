@@ -841,7 +841,7 @@ bool smLineMesh::isMeshTextured()
     return isTextureCoordAvailable;
 }
 
-
+/*
 bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool perProcessingStage)
 {   
 
@@ -915,4 +915,4 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool
 
     return 1;
 
-}
+}*/

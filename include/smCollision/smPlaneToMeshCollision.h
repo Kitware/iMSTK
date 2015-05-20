@@ -27,6 +27,7 @@
 
 // SimMedTK includes
 #include "smCollision/smCollisionDetection.h"
+#include "smCore/smGeometry.h"
 
 class smCollisionPair;
 
@@ -39,7 +40,7 @@ public:
     smPlaneToMeshCollision() {}
     virtual ~smPlaneToMeshCollision() {}
 
-    smPlaneToMeshCollision(const smMeshToMeshCollision &) = delete;
+    smPlaneToMeshCollision(const smPlaneToMeshCollision &) = delete;
 
 private:
     smPlane plane;

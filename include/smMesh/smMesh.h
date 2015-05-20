@@ -38,7 +38,7 @@
 #include "smCore/smGeometry.h"
 
 //VEGA includes
-#include "objMesh.h"
+// #include "objMesh.h"
 
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
@@ -192,7 +192,7 @@ public:
     virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
 
     /// \brief load the mesh
-    bool importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool perProcessingStage);
+//     bool importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool perProcessingStage);
 
     /// \brief render the surface mesh
     virtual void draw(const smDrawParam &p_params) override;

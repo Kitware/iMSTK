@@ -338,7 +338,7 @@ void smVolumeMesh::initSurface()
     updateTriangleNormals();
     updateVertexNormals();
 }
-
+/*
 void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMesh, bool perProcessingStage)
 {
     smInt i, threeI, j;
@@ -396,7 +396,7 @@ void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMes
     delete [] nodes;
 
 }
-
+*/
 
 /// \brief destructor
 smVolumeMesh::~smVolumeMesh()

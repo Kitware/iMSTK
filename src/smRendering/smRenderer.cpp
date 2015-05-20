@@ -525,8 +525,10 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
                              };
     smVec3d tmp;
 
-    angle = std::acos(defaultDir.dot(p_plane.unitNormal));
-    axisOfRot = p_plane.unitNormal.cross(defaultDir);
+    smVec3d normal = p_plane.getUnitNormal();
+    smVec3d point = p_plane.getPoint();
+    angle = std::acos(defaultDir.dot(normal));
+    axisOfRot = normal.cross(defaultDir);
     axisOfRot.normalized();
 
     smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
@@ -534,13 +536,13 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
     glColor3fv(p_color.toGLColor());
-    tmp = rot*planePoints[0] + p_plane.pos;
+    tmp = rot*planePoints[0] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[1] + p_plane.pos;
+    tmp = rot*planePoints[1] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[2] + p_plane.pos;
+    tmp = rot*planePoints[2] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[3] + p_plane.pos;
+    tmp = rot*planePoints[3] + point;
     glVertex3dv(tmp.data());
     glEnd();
     glEnable(GL_LIGHTING);

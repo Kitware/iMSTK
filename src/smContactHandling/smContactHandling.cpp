@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smContactHandling.h"
+#include "smConstacHangling/smContactHandling.h"
 
 void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& first,
                         const std::shared_ptr< smSceneObject >& second)

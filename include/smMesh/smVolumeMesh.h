@@ -28,7 +28,7 @@
 #include "smMesh/smMesh.h"
 
 // VEGA includes
-#include "volumetricMesh.h"
+// #include "volumetricMesh.h"
 
 /// \brief this class is derived from generic Mesh class. Tetrahedron are building blocks of this volume mesh.
 ///  It also retains the surface triangle structure for rendering and collision detection purposes.
@@ -76,7 +76,7 @@ public:
     smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
 
     /// \brief populate the mesh data from the vega volumetric mesh file format
-    void importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMesh, bool perProcessingStage);
+//     void importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMesh, bool perProcessingStage);
 
 public:
     /// push smMesh class specific errors here

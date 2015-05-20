@@ -43,6 +43,8 @@ target_link_libraries(smSimulators
     VegaFEM::elasticForceModel
     VegaFEM::isotropicHyperelasticFEM
     VegaFEM::loadList
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
     )
 
 target_include_directories(smSimulators

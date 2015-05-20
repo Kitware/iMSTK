@@ -40,6 +40,17 @@ class smCollisionPair;
 class smContactHandling: public smCoreClass
 {
 public:
+    enum smContactHandlingType
+    {
+    SIMMEDTK_CONTACT_PENALTY_UNILATERAL,
+    SIMMEDTK_CONTACT_PENALTY_BILATERAL,
+    SIMMEDTK_CONTACT_PBD_UNILATERAL,
+    SIMMEDTK_CONTACT_PBD_BILATERAL,
+    SIMMEDTK_CONTACT_LPC_UNILATERAL,
+    SIMMEDTK_CONTACT_LCP_UNILATERAL,
+    SIMMEDTK_CONTACT_LCP_BILATERAL
+    };
+    
     smContactHandling() {};
 
     virtual ~smContactHandling() {};

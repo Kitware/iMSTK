@@ -17,10 +17,12 @@ simmedtk_add_library(smMesh
 )
 
 target_link_libraries(smMesh
-  PUBLIC
-    Assimp::Assimp
   PRIVATE
     smCore
     smRendering
     smCollision
+  PUBLIC
+    Assimp::Assimp
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
     )

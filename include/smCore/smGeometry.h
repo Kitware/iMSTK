@@ -32,21 +32,45 @@
 struct smSphere;
 
 /// \brief  Simple Plane definition with unit normal and spatial location
-struct smPlane
-{
-    smVec3d unitNormal;
-    smVec3d pos;
-    
-    double distance(smVec3d p_vector)
+class smPlane
+{    
+public:
+    smPlane(){}
+    ~smPlane(){}
+    double distance(const smVec3d &p_vector)
     {
-		Eigen::MatrixXd m = p_vector*unitNormal.transpose();
-		return m(0,0);
+        auto m = (p_vector-point).dot(unitNormal);
+        return m;
     };
 
-    smVec3d project(smVec3d p_vector)
+    smVec3d project(const smVec3d &p_vector)
     {
-        return p_vector-((pos-p_vector)*unitNormal.transpose())*unitNormal;
+        return p_vector-((point-p_vector)*unitNormal.transpose())*unitNormal;
     };
+    
+    const smVec3d &getUnitNormal() const
+    {
+        return this->unitNormal;
+    }
+    
+    void setUnitNormal(const smVec3d &normal)
+    {
+        this->unitNormal = normal;
+    }
+    
+    const smVec3d &getPoint() const
+    {
+        return this->point;
+    }
+    
+    void setPoint(const smVec3d &p)
+    {
+        this->point = p;
+    }
+    
+private:
+    smVec3d unitNormal;
+    smVec3d point;
 };
 
 /// \brief Axis Aligned bounding box declarions

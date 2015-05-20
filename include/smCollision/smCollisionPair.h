@@ -48,6 +48,7 @@ public:
     double depth;
     smVec3d point;
     smVec3d normal;
+    int index;
 };
 
 ///
