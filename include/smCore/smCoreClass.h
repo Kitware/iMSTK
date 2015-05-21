@@ -118,6 +118,11 @@ public:
     virtual void draw(const smDrawParam &p_params);
 
     ///
+    /// \brief draw function is called for visualization the object
+    ///
+    virtual void draw();
+
+    ///
     /// \brief initialization of simulation
     ///
     virtual void initSimulate(const smSimulationParam &p_params);

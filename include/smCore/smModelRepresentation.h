@@ -29,6 +29,10 @@
 // STL includes
 #include <memory>
 
+// SimMedTK includes
+#include "smCore/smCoreClass.h"
+#include "smMesh/smMesh.h"
+
 class smMesh;
 
 class smModelRepresentation
@@ -38,6 +42,9 @@ public:
     ~smModelRepresentation(){}
 
     virtual std::shared_ptr<smMesh> getMesh() = 0;
+    virtual std::shared_ptr<smCoreClass> getObject() = 0;
+    
+    virtual void draw() = 0;
 };
 
 #endif // SMMODELREPRESENTATION_H

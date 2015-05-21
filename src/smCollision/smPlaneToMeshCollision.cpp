@@ -21,85 +21,35 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-// SimMedTK includes
 #include "smCollision/smPlaneToMeshCollision.h"
+
+// SimMedTK includes
 #include "smCollision/smCollisionMoller.h"
 #include "smCollision/smCollisionPair.h"
 #include "smCollision/smMeshCollisionModel.h"
+#include "smCollision/smPlaneCollisionModel.h"
 
 // STL includes
-#include <vector>
+#include <limits>
 
-void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pairs)
+void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pair)
 {
-    auto mesh = std::static_pointer_cast<smMeshCollisionModel>(pairs->getFirst());
-    auto plane = std::static_pointer_cast<smpPlaneCollisionModel>(pairs->getFirst());
+    auto mesh = std::static_pointer_cast<smMeshCollisionModel>(pair->getFirst());
+    auto plane = std::static_pointer_cast<smPlaneCollisionModel>(pair->getFirst());
 
     if(!mesh || !plane)
         return;
-    
-    int nodeID;
-    double depth;
-    smVec3d normal;
-    smVec3d contactPoint;
 
-/*
-    for (int i=0; i<collisionModel->getMesh()-> ; i++)
+    smVec3d planeNormal = plane->getNormal();
+    float planeOffset = planeNormal.dot(plane->getPosition());
+    for (const auto& vertex : mesh->getVertices())
     {
+        double d = planeNormal.dot(vertex) - planeOffset;
+        if (d < std::numeric_limits<float>::epsilon())
+        {
+            // Create contact
+            pair->addContact(-d, vertex, planeNormal);
+        }
+    }
 
-    }*/
-   
 }
-
-std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>>
-    getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
-    {
-        std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> intersectingNodes;
-        getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);
-
-        return intersectingNodes;
-    }
-
-    void getIntersectingNodes(const std::shared_ptr<CellType> left,
-                              const std::shared_ptr<smpPlaneCollisionModel> right,
-                              std::vector<std::pair<std::shared_ptr<CellType>>> &result )
-    {
-        if(!smCollisionMoller::checkOverlapAABBAABB(left->getAabb(),right->getAabb()))
-        {
-            return;
-        }
-
-        if(left->getIsLeaf() && right->getIsLeaf())
-        {
-            result.emplace_back(left,right);
-        }
-        else if(left->getIsLeaf())
-        {
-            for(const auto &child : right->getChildNodes())
-            {
-                if(!child) continue;
-                getIntersectingNodes(left,child,result);
-            }
-        }
-        else if(right->getIsLeaf())
-        {
-            for(const auto &child : left->getChildNodes())
-            {
-                if(!child) continue;
-                getIntersectingNodes(child,right,result);
-            }
-        }
-        else
-        {
-            for(const auto &rightChild : right->getChildNodes())
-            {
-                if(!rightChild) continue;
-                for(const auto &leftChild : left->getChildNodes())
-                {
-                    if(!leftChild) continue;
-                    getIntersectingNodes(leftChild,rightChild,result);
-                }
-            }
-        }
-
-    }

@@ -27,16 +27,37 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smUtilities/smVector.h"
+#include "smUtilities/smMatrix.h"
 
 //forward declaration
 struct smSphere;
 
+class smAnalyticalGeometry
+{
+public:
+    smAnalyticalGeometry(){}
+    ~smAnalyticalGeometry(){}
+
+    virtual void translate(const smVec3d t)=0;
+    virtual void rotate(const smMatrix33d &rot)=0;
+
+    virtual void draw()=0;
+};
+
 /// \brief  Simple Plane definition with unit normal and spatial location
-class smPlane
-{    
+class smPlane : public smAnalyticalGeometry
+{
 public:
     smPlane(){}
     ~smPlane(){}
+
+    /// \brief sphere constructor with center and radius
+    smPlane(const smVec3d &p, const smVec3d &n)
+    {
+        this->point = p;
+        this->unitNormal = n;
+    }
+
     double distance(const smVec3d &p_vector)
     {
         auto m = (p_vector-point).dot(unitNormal);
@@ -47,31 +68,148 @@ public:
     {
         return p_vector-((point-p_vector)*unitNormal.transpose())*unitNormal;
     };
-    
+
     const smVec3d &getUnitNormal() const
     {
         return this->unitNormal;
     }
-    
+
     void setUnitNormal(const smVec3d &normal)
     {
         this->unitNormal = normal;
     }
-    
+
     const smVec3d &getPoint() const
     {
         return this->point;
     }
-    
+
     void setPoint(const smVec3d &p)
     {
         this->point = p;
     }
-    
+
+    void translate(const smVec3d t)
+    {
+        point += t;
+    }
+
+    void rotate(const smMatrix33d &rot)
+    {
+        unitNormal = rot * unitNormal;
+    }
+
+    void draw()
+    {
+        // add plane rendering here
+    }
+
 private:
     smVec3d unitNormal;
     smVec3d point;
 };
+
+
+/// \brief sphere with center and radius
+class smSphere : public smAnalyticalGeometry
+{
+public:
+    /// \brief constructor
+    smSphere();
+    
+    /// \brief sphere constructor with center and radius
+    smSphere(const smVec3d &c, const double &r)
+    {
+        this->center = c;
+        this->radius = r;
+    }
+
+    ~smSphere();
+
+    void setRadius(const double r)
+    {
+        this->radius = r;
+    }
+
+    void setCenter(const smVec3d& c)
+    {
+        this->center = c;
+    }
+
+    void incrementRadius(const double r)
+    {
+        this->radius += r;
+    }
+
+    void translate(const smVec3d t)
+    {
+        center += t;
+    }
+
+    void rotate(const smMatrix33d &rot)
+    {
+        //Its a sphere! nothing to be done.
+    }
+
+    void draw()
+    {
+        // add sphere rendering here
+    }
+
+    double getRadius() const
+    {
+        return this->radius;
+    }
+
+    const smVec3d &getCenter() const
+    {
+        return this->center;
+    }
+
+private:
+    /// \brief center of sphere
+    smVec3d center;
+
+    /// \brief radius of sshere
+    double radius;
+};
+
+/// \brief cube
+struct smCube
+{
+    /// \brief cube center
+    smVec3d center;
+
+    /// \brief cube length
+    double sideLength;
+
+    /// \brief constructor
+    smCube();
+
+    /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
+    void subDivide(smInt p_divisionPerAxis, smCube *p_cube);
+
+    /// \brief expands the cube. increases the edge length with expansion*edge length
+    void expand(double p_expansion);
+
+    /// \brief returns the left most corner
+    smVec3d leftMinCorner() const ;
+
+    /// \brief returns right most corner
+    smVec3d rightMaxCorner() const;
+
+    /// \brief returns the smallest sphere encapsulates the cube
+    smSphere getCircumscribedSphere();
+
+    /// \brief returns the  sphere with half edge of the cube as a radius
+    smSphere getInscribedSphere();
+
+    /// \brief get tangent sphere
+    smSphere getTangent2EdgeSphere();
+};
+
+
+
 
 /// \brief Axis Aligned bounding box declarions
 class smAABB
@@ -178,58 +316,6 @@ public:
         this->aabbMin = this->aabbMin.array().min(other.getMin().array());
         this->aabbMax = this->aabbMax.array().max(other.getMax().array());
     }
-};
-
-/// \brief sphere structure
-struct smSphere
-{
-
-public:
-    /// \brief center of sphere
-    smVec3d center;
-
-    /// \brief radius of sshere
-    double radius;
-
-    /// \brief constructor
-    smSphere();
-
-    /// \brief sphere constructor with center and radius
-    smSphere(smVec3d p_center, double p_radius);
-};
-
-/// \brief cube
-struct smCube
-{
-    /// \brief cube center
-    smVec3d center;
-
-    /// \brief cube length
-    double sideLength;
-
-    /// \brief constructor
-    smCube();
-
-    /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
-    void subDivide(smInt p_divisionPerAxis, smCube *p_cube);
-
-    /// \brief expands the cube. increases the edge length with expansion*edge length
-    void expand(double p_expansion);
-
-    /// \brief returns the left most corner
-    smVec3d leftMinCorner() const ;
-
-    /// \brief returns right most corner
-    smVec3d rightMaxCorner() const;
-
-    /// \brief returns the smallest sphere encapsulates the cube
-    smSphere getCircumscribedSphere();
-
-    /// \brief returns the  sphere with half edge of the cube as a radius
-    smSphere getInscribedSphere();
-
-    /// \brief get tangent sphere
-    smSphere getTangent2EdgeSphere();
 };
 
 #endif

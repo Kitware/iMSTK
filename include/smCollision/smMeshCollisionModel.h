@@ -90,6 +90,19 @@ public:
     ///
     std::array<smVec3d,3> getTrianglePositions(size_t i) const;
 
+    ///
+    /// @brief Returns array of vertices
+    ///
+    const smStdVector3d &getVertices() const
+    {
+        return mesh->getVertices();
+    }
+
+    void draw() override
+    {
+        this->mesh->draw();
+    }
+
 private:
     std::shared_ptr<smMesh> mesh; // Underlying mesh
     std::shared_ptr<AABBTreeType> aabbTree; // Bounding volume hierarchy

@@ -21,23 +21,30 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smStaticSceneObject.h"
+#include "smCore/smConfig.h"
+#include "smCore/smErrorLog.h"
+#include "smCore/smCoreClass.h"
+#include "smCore/smSDK.h"
+#include "smRendering/smViewer.h"
+#include "smSimulators/smVegaFemSimulator.h"
+#include "smSimulators/smVegaFemSceneObject.h"
 
-smStaticSceneObject::smStaticSceneObject ( std::shared_ptr<smErrorLog> p_log )
+class demo1Scene : public smSimulationMain, public smCoreClass
 {
-    type = SIMMEDTK_SMSTATICSCENEOBJECT;
-}
-smStaticSceneObject::~smStaticSceneObject() {}
-void smStaticSceneObject::init() {}
-void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
-void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
 
-void smStaticSceneObject::draw(const smDrawParam &p_params)
-{
-    staticModel->draw();
-}
+public:
+    demo1Scene();
 
-std::shared_ptr<smSceneObject> smStaticSceneObject::clone()
-{
-    return safeDownCast<smSceneObject>();
-}
+    virtual ~demo1Scene(){}
+    void simulateMain(smSimulationMainParam /*p_param*/) { };
+private:
+    std::unique_ptr<smSDK> sdk;
+    smVegaFemSceneObject *femobj;
+    smVegaFemSimulator *femSim;
+    smMatrix33d mat;
+    smSimulator *simulator;
+    smViewer viewer;
+    smScene *scene1;
+};
+
+void buildDemo1Scene();

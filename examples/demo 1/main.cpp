@@ -21,23 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smStaticSceneObject.h"
+#include "vegaFemExample.h"
 
-smStaticSceneObject::smStaticSceneObject ( std::shared_ptr<smErrorLog> p_log )
+int main()
 {
-    type = SIMMEDTK_SMSTATICSCENEOBJECT;
-}
-smStaticSceneObject::~smStaticSceneObject() {}
-void smStaticSceneObject::init() {}
-void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
-void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
-
-void smStaticSceneObject::draw(const smDrawParam &p_params)
-{
-    staticModel->draw();
-}
-
-std::shared_ptr<smSceneObject> smStaticSceneObject::clone()
-{
-    return safeDownCast<smSceneObject>();
+    demo1();
+    return 0;
 }

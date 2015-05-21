@@ -26,6 +26,7 @@
 #include "smCore/smStaticSceneObject.h"
 #include "smEvent/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 smDummySimulator::smDummySimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
@@ -46,9 +47,16 @@ void smDummySimulator::initCustom()
             case SIMMEDTK_SMSTATICSCENEOBJECT:
             {
                 auto staticObject = std::static_pointer_cast<smStaticSceneObject>(object);
-                object->getLocalVertices().reserve( staticObject->mesh->nbrVertices );
+                auto model = std::static_pointer_cast<smMeshCollisionModel>(staticObject->getModel());
+                if(nullptr == model)
+                {
+                    break;
+                }
+                std::shared_ptr<smMesh> mesh = model->getMesh();                
+                
+                object->getLocalVertices().reserve( mesh->nbrVertices );
                 // WARNING:  Copy!!?
-                object->getLocalVertices() = staticObject->mesh->vertices;
+                object->getLocalVertices() = mesh->vertices;
                 object->getFlags().isSimulatorInit = true;
                 break;
             }
@@ -70,9 +78,14 @@ void smDummySimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
         {
             auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
-            auto mesh = staticSceneObject->mesh;
+            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            if(nullptr == model)
+            {
+                break;
+            }
+            std::shared_ptr<smMesh> mesh = model->getMesh();
 
-            for ( smInt vertIndex = 0; vertIndex < staticSceneObject->mesh->nbrVertices; vertIndex++ )
+            for ( smInt vertIndex = 0; vertIndex < mesh->nbrVertices; vertIndex++ )
             {
                 staticSceneObject->getLocalVertices()[vertIndex][1] = staticSceneObject->getLocalVertices()[vertIndex][1] + 0.000001;
             }
@@ -95,7 +108,12 @@ void smDummySimulator::syncBuffers()
         if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
         {
             auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
-            auto mesh = staticSceneObject->mesh;
+            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            if(nullptr == model)
+            {
+                break;
+            }
+            std::shared_ptr<smMesh> mesh = model->getMesh();
             // WARNING: Copy??!
             mesh->vertices = staticSceneObject->getLocalVertices();
         }

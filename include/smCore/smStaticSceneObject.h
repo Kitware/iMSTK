@@ -26,6 +26,7 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
+#include "smCore/smModelRepresentation.h"
 #include "smCore/smSceneObject.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smCoreClass.h"
@@ -62,15 +63,19 @@ public:
 
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
 
-    void setMesh(std::shared_ptr<smMesh> surfaceMesh)
+    void setModel(std::shared_ptr<smModelRepresentation> model)
     {
-        mesh = std::static_pointer_cast<smSurfaceMesh>(surfaceMesh);
-        mesh->meshType = SMMESH_RIGID;
+        this->staticModel = model;
+    }
+
+    std::shared_ptr<smModelRepresentation> getModel()
+    {
+        return staticModel;
     }
 
 public:
     /// \brief static scene object contains a mesh
-    std::shared_ptr<smSurfaceMesh> mesh;
+    std::shared_ptr<smModelRepresentation> staticModel;
 };
 
 #endif

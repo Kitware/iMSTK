@@ -62,6 +62,16 @@ public:
                         const std::shared_ptr< smSceneObject >& second);
 
     ///
+    /// @brief Set the scene objects that are colliding
+    ///
+    void setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair);
+
+    ///
+    /// @brief Get how the contact between scene objects is processed
+    ///
+    std::shared_ptr<smCollisionPair> getCollisionPairs() const;
+
+    ///
     /// @brief Get how the contact between scene objects is processed
     ///
     smContactHandlingType getContactHandlingType() const;
@@ -76,16 +86,18 @@ public:
     ///
 	std::shared_ptr<smSceneObject> getSecondSceneObject() const;
 
+    ///
+    /// @brief Implementation of how the contacts between colliding objects is resolved
+    ///
+    virtual void resolveContacts() = 0;
 protected:
 
     smContactHandlingType contactHandlingType;
 
-	std::pair<std::shared_ptr<smSceneObject>, std::shared_ptr<smSceneObject>> collidingSceneObjects;
+    std::pair<std::shared_ptr<smSceneObject>, std::shared_ptr<smSceneObject>> collidingSceneObjects;
 
-    ///
-    /// @brief Implementation of how the contacts between colliding objects is resolved
-    ///
-    virtual void processContacts(std::shared_ptr<smCollisionPair> pairs)=0;
+    std::shared_ptr<smCollisionPair> collisionPairs;
+
 
 };
 

@@ -49,12 +49,12 @@ private:
     ///
     /// @brief Get the forces on one the first scene object using penalty method
     ///
-    void computeUnilateralContactForces(std::shared_ptr<smCollisionPair> pairs);
+    void computeUnilateralContactForces();
     
     ///
     /// @brief Get the forces on both the scene objects using penalty method
     ///
-    void computeBilateralContactForces(std::shared_ptr<smCollisionPair> pairs);
+    void computeBilateralContactForces();
 
 };
 

@@ -21,26 +21,37 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smConstacHangling/smContactHandling.h"
+#include "smContactHandling/smContactHandling.h"
 
 void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& first,
                         const std::shared_ptr< smSceneObject >& second)
 {
-    collidingSceneObjects.first = first;
-    collidingSceneObjects.second = second;
+    this->collidingSceneObjects.first = first;
+    this->collidingSceneObjects.second = second;
 }
+
+void setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair)
+{
+    this->collisionPairs = colPair;
+}
+
+std::shared_ptr<smCollisionPair> getCollisionPairs() const
+{
+    return this->collisionPairs;
+}
+
 
 smContactHandlingType smContactHandling::getContactHandlingType() 
 {
-    return contactHandlingType;
+    return this->contactHandlingType;
 }
 
 std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject()
 { 
-	return collidingSceneObjects.first; 
+	return this->collidingSceneObjects.first; 
 }
 
 std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject()
 {
-    return collidingSceneObjects.second; 
+    return this->collidingSceneObjects.second; 
 }

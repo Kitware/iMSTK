@@ -94,6 +94,11 @@ public:
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
 
+    const smStdVector3d &getVertices() const
+    {
+        return this->vertices;
+    }
+
 public:
     smCollisionGroup collisionGroup; ///< !!
     smGLInt renderingID; ///< !!
@@ -196,6 +201,12 @@ public:
 
     /// \brief render the surface mesh
     virtual void draw(const smDrawParam &p_params) override;
+
+    /// \brief render the surface mesh
+    virtual void draw() override
+    {
+        
+    }
 
 public:
     smInt  nbrTriangles; ///< number of triangles
