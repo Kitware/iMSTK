@@ -233,4 +233,26 @@ set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 
 add_subdirectory(src)
+export(PACKAGE SimMedTK)
+export(TARGETS  smCore
+                smCollision
+                smExternal
+                smExternalDevices
+                smMesh
+                smRendering
+                smShader
+                smSimulators
+                smTools
+                smUtilities
+                smEvent
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
+  NAMESPACE smtk::
+)
+
+configure_file(
+  CMake/SimMedTKConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
+  @ONLY
+)
+
 add_subdirectory(examples)
