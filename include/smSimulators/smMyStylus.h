@@ -24,6 +24,9 @@
 #ifndef SMMYSTYLUS_H
 #define SMMYSTYLUS_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smSimulators/smStylusObject.h"
 
@@ -34,14 +37,14 @@ class MyStylus: public smStylusRigidSceneObject
 {
 
 public:
-    smInt phantomID; ///< ID for phantom omni
+    size_t phantomID; ///< ID for phantom omni
     smBool buttonState[2]; ///< state of the buttons
     smFloat angle; ///< angle of the jaw (if applicable)
     smFloat maxangle; ///< maximum angle of the jaw (if applicable)
     smMeshContainer meshContainer, meshContainerLower, meshContainerUpper; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief constructor
     MyStylus(const smString& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
@@ -57,12 +60,12 @@ class HookCautery: public smStylusRigidSceneObject
 {
 
 public:
-    smInt phantomID; ///< ID of the phantom omni
+    size_t phantomID; ///< ID of the phantom omni
     smBool buttonState[2]; ///< state of the buttons
     smMeshContainer meshContainer; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief render the avatar
     void draw(const smDrawParam &p_param);

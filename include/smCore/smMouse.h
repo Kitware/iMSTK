@@ -27,9 +27,13 @@
 enum class smMouseButton
 {
 	Unknown = -1,
-	Left = 0,
+	Move,
+    Left = 0,
 	Right,
-	Middle
+	Middle,
+    Button0,
+    Button1,
+    Reset
 };
 
 #endif

@@ -28,33 +28,35 @@
 #include "smRendering/smLight.h"
 #include "smUtilities/smQuaternion.h"
 
-smVec3f smLight::defaultDir(0, 0, -1.0);
-smVec3f smLight::defaultUpDir(0, 1, 0.0);
-smVec3f smLight::defaultTransDir(1, 0, 0.0);
+smVec3d smLight::defaultDir(0, 0, -1.0);
+smVec3d smLight::defaultUpDir(0, 1, 0.0);
+smVec3d smLight::defaultTransDir(1, 0, 0.0);
 
 void smLight::updateDirection()
 {
-    smFloat angle;
-    smVec3f dirNorm = direction.normalized();
+    double angle;
+    smVec3d dirNorm = direction.normalized();
 
     angle = std::acos(dirNorm.dot(defaultDir));
-    smVec3f axisOfRot = dirNorm.cross(defaultDir).normalized();
+    smVec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
 
-    smQuaternionf rot = getRotationQuaternion(-angle,axisOfRot);
+    smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
 }
+
 smLightPos::smLightPos( float p_x, float p_y, float p_z, float /*p_w*/ )
 {
-    pos << p_x, p_y, p_z;
+    position << p_x, p_y, p_z;
 }
+
 smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationType p_lightLocation )
 {
     name = p_name;
     enabled = false;
     previousState = false;
-    lightPos.pos = smVec3f::Zero();
+    lightPos.setPosition(smVec3d::Zero());
 
     if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
     {

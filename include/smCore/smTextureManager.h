@@ -100,7 +100,7 @@ struct smImageData
 class smTextureManager: public smCoreClass
 {
 
-    static smErrorLog *errorLog;
+    static std::shared_ptr<smErrorLog> errorLog;
     static std::vector<smTexture*> textures;
     static std::unordered_map<smString, smInt> textureIndexId;
     static smInt activeTextures;
@@ -113,7 +113,7 @@ public:
     /// \brief init function called by the renderer thread
     static smTextureReturnType initGLTextures();
     /// \brief initialization function
-    static void init(smErrorLog * p_errorLog)
+    static void init(std::shared_ptr<smErrorLog> p_errorLog)
     {
         errorLog = p_errorLog;
         textures.resize(SIMMEDTK_MAX_TEXTURENBR);

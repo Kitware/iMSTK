@@ -24,20 +24,17 @@
 #include "smCore/smDispatcher.h"
 
 
-void smDispatcher::handleViewer(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
-{
-
-//     switch (p_callerState)
-//     {
-//     }
-}
-
-void smDispatcher::handleSimulator(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
+void smDispatcher::handleViewer(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
 {
 
 }
 
-void smDispatcher::handleCollisionDetection(smCoreClass */*p_caller*/, smCallerState /*p_callerState*/)
+void smDispatcher::handleSimulator(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
+{
+
+}
+
+void smDispatcher::handleCollisionDetection(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
 {
 
 }
@@ -51,7 +48,7 @@ void smDispatcher::handleAll()
 ///  \param p_caller        p_caller has pointer to the object which the function is called
 ///  \param p_callerState   p_callerState is stores the state of the at the moment of the function called.
 ///                         such as whether it is the beginning of the simulator frameor end of the simulator frame for now etc..
-smDispathcerResult smDispatcher::handle(smCoreClass *p_caller, smCallerState p_callerState)
+smDispathcerResult smDispatcher::handle(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState)
 {
 
     smClassType classType;

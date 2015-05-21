@@ -23,117 +23,104 @@
 
 #include "AudioExample.h"
 #include "smCore/smSDK.h"
-#include "smCore/smTextureManager.h"
 
-/// \brief A simple example of how to render an object using SimMedTK
-///
-/// \detail This is the default constructor, however, this is where the main
-/// program runs.  This program will create a cube with a texture pattern
-/// numbering each side of the cube, that's all it does.
-AudioExample::AudioExample()
-    : loopSound{false}, soundVolume{1.0}
-{
-    //Create an instance of the SimMedTK framework/SDK
-    simmedtkSDK = smSDK::createSDK();
 
-    //Create a viewer to see the scene through
-    simmedtkSDK->addViewer(&viewer);
-
-    sound.open("Sounds/ping.ogg", "PingSound");
-
-    //Setup the window title in the window manager
-    viewer.setWindowTitle("SimMedTK Audio Example");
-
-    //Add the RenderExample object we are in to the viewer from the SimMedTK SDK
-    viewer.addObject(this);
-
-    //Set some viewer properties
-    viewer.setScreenResolution(800, 640);
-
-    //Uncomment the following line for fullscreen
-    //viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
-
-    //Link up the event system between this object and the SimMedTK SDK
-    simmedtkSDK->getEventDispatcher()->registerEventHandler(this, SIMMEDTK_EVENTTYPE_KEYBOARD);
-}
-
-AudioExample::~AudioExample()
+AudioKeyboardController::AudioKeyboardController()
+    : loopSound{false},
+      soundVolume{100}
 {
 }
 
-void AudioExample::handleEvent(smEvent *p_event)
+AudioKeyboardController::AudioKeyboardController(std::shared_ptr<smAudio> a)
+    : loopSound{false},
+      soundVolume{100},
+      sound(a)
 {
-    switch (p_event->eventType.eventTypeCode)
+}
+
+void AudioKeyboardController::setSound(std::shared_ptr<smAudio> a)
+{
+    sound = a;
+}
+
+void AudioKeyboardController::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+{
+    assert(sound);
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+
+    if(keyboardEvent->getPressed())
     {
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-    {
-        smKeyboardEventData* kbData =
-            (smKeyboardEventData*)p_event->data;
-        smKey key = kbData->keyBoardKey;
-        if (key == smKey::Escape && kbData->pressed)
+        switch(keyboardEvent->getKeyPressed())
         {
-            //Tell the framework to shutdown
-            simmedtkSDK->shutDown();
-        }
-        else if (key == smKey::S && kbData->pressed)
-        {
-            sound.play();
-        }
-        else if (key == smKey::P && kbData->pressed)
-        {
-            sound.pause();
-        }
-        else if (key == smKey::H && kbData->pressed)
-        {
-            sound.stop();
-        }
-        else if (key == smKey::L && kbData->pressed)
-        {
+        case smtk::Event::smKey::S:
+            sound->play();
+            break;
+        case smtk::Event::smKey::P:
+            sound->pause();
+            break;
+        case smtk::Event::smKey::H:
+            sound->stop();
+            break;
+        case smtk::Event::smKey::L:
             loopSound = !loopSound;
-            sound.setLoop(loopSound);
-        }
-        else if (key == smKey::I && kbData->pressed)
-        {
+            sound->setLoop(loopSound);
+            break;
+        case smtk::Event::smKey::I:
             if (1.0 > soundVolume)
             {
                 soundVolume += 0.1;
-                sound.setVolume(soundVolume);
+                sound->setVolume(soundVolume);
             }
-        }
-        else if (key == smKey::D && kbData->pressed)
-        {
+            break;
+        case smtk::Event::smKey::D:
             if (0.0 <= soundVolume)
             {
                 soundVolume -= 0.1;
-                sound.setVolume(soundVolume);
+                sound->setVolume(soundVolume);
             }
+            break;
+        default:
+            break;
         }
-        break;
     }
-    default:
-        break;
-    }
-}
-
-void AudioExample::simulateMain(smSimulationMainParam p_param)
-{
-    std::cout << "Usage:\n"
-              << "Start sound: \'s\' key\n"
-              << "Pause sound: \'p\' key\n"
-              << "Halt sound: \'h\' key\n"
-              << "Toggle Loop sound: \'l\' key\n"
-              << "Increase volume: \'i\' key\n"
-              << "Decrease volume: \'d\' key\n";
-    //Run the simulator framework
-    simmedtkSDK->run();
 }
 
 void runAudioExample()
 {
-    smSimulationMainParam simulationParams;
-    AudioExample ae;
+    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<smAudio> sound;
+    std::shared_ptr<AudioKeyboardController> audioCtl;
 
-    ae.simulateMain(simulationParams);
+    //Create an instance of the SimMedTK framework/SDK
+    sdk = smSDK::getInstance();
+
+    //Create a viewer to see the scene through
+    viewer = std::make_shared<smViewer>();
+    sdk->addViewer(viewer);
+
+    //Create the audio controller
+    audioCtl = std::make_shared<AudioKeyboardController>();
+
+    sound = std::make_shared<smAudio>();
+    sound->open("Sounds/ping.ogg", "PingSound");
+
+    audioCtl->setSound(sound);
+
+    //Setup the window title in the window manager
+    viewer->setWindowTitle("SimMedTK Audio Example");
+
+    //Set some viewer properties
+    viewer->setScreenResolution(800, 640);
+
+    //Uncomment the following line for fullscreen
+    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+
+    //Link up the event system between this the audio controller and the viewer
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, audioCtl);
+
+    sdk->run();
 
     return;
 }

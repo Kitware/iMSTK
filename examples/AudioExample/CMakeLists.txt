@@ -5,6 +5,7 @@ target_link_libraries(AudioExample
   smRendering
   smShader
   smMesh
+  smEvent
   sfml::system
   sfml::audio
   sfml::graphics

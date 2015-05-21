@@ -25,7 +25,7 @@
 
 
 /// \brief constructor
-smVolumeMesh::smVolumeMesh(smMeshType p_meshtype, smErrorLog *log = NULL)
+smVolumeMesh::smVolumeMesh(const smMeshType &p_meshtype, std::shared_ptr<smErrorLog> log)
 {
 
     this->log_VM = log;
@@ -34,7 +34,7 @@ smVolumeMesh::smVolumeMesh(smMeshType p_meshtype, smErrorLog *log = NULL)
 }
 
 /// \brief loads the specified volume mesh
-smBool smVolumeMesh::loadMesh(const smString& fileName, smMeshFileType fileType = SM_FILETYPE_VOLUME)
+smBool smVolumeMesh::loadMesh(const smString& fileName, const smMeshFileType &fileType)
 {
 
     smBool ret;
@@ -44,14 +44,14 @@ smBool smVolumeMesh::loadMesh(const smString& fileName, smMeshFileType fileType 
         ret = LoadTetra(fileName);
 
         if (ret == 0)
-            if (log_VM != NULL)
+            if (log_VM != nullptr)
             {
                 log_VM->addError("Error: Mesh file NOT FOUND");
             }
     }
     else
     {
-        if (log_VM != NULL)
+        if (log_VM != nullptr)
         {
             log_VM->addError("Error: Mesh file type unidentified");
         }
@@ -63,7 +63,7 @@ smBool smVolumeMesh::loadMesh(const smString& fileName, smMeshFileType fileType 
 }
 
 /// \brief
-void smVolumeMesh::translateVolumeMesh(smVec3f p_offset)
+void smVolumeMesh::translateVolumeMesh(const smVec3d &p_offset)
 {
 
     this->translate(p_offset);
@@ -75,7 +75,7 @@ void smVolumeMesh::translateVolumeMesh(smVec3f p_offset)
 }
 
 /// \brief
-void smVolumeMesh::scaleVolumeMesh(smVec3f p_offset)
+void smVolumeMesh::scaleVolumeMesh(const smVec3d &p_offset)
 {
 
     scale(p_offset);
@@ -87,7 +87,7 @@ void smVolumeMesh::scaleVolumeMesh(smVec3f p_offset)
 }
 
 /// \brief
-void smVolumeMesh::rotVolumeMesh(smMatrix33f p_rot)
+void smVolumeMesh::rotVolumeMesh(const smMatrix33d &p_rot)
 {
 
     rotate(p_rot);
@@ -118,51 +118,56 @@ smBool smVolumeMesh::LoadTetra(const smString& fileName)
 
     fscanf(fp, "%f%c\n", &numnodes, &comma);
     nbrNodes = numnodes;
-    nodes = new smVec3f[nbrNodes];
-    fixed = new smBool[nbrNodes];
+    nodes.reserve(nbrNodes);
+    fixed.reserve(nbrNodes);
+
+    std::vector<smFloat> nodeNumber(nbrNodes);
 
     for (i = 0; i < nbrNodes; i++)
     {
-        fixed[i] = false;
+        fixed.push_back(false);
     }
 
-    smFloat *nodeNumber = new smFloat[nbrNodes];
 
     for (i = 0; i < nbrNodes; i++)
     {
+        nodes.emplace_back(smVec3d());
+        smVec3d &node = nodes.back();
         fscanf(fp, "%f", &number);
         nodeNumber[i] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i][0] = number;
+        node[0] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i][1] = number;
+        node[1] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        nodes[i][2] = number;
+        node[2] = number;
         fscanf(fp, "\n");
     }
 
     fscanf(fp, "%s\n", stri);
     nbrTetra = 563;
-    tetra = new smTetrahedra[nbrTetra];
+    tetra.reserve(nbrTetra);
 
     for (i = 0; i < nbrTetra; i++)
     {
+        tetra.emplace_back(smTetrahedra());
+        smTetrahedra &tetrahedra = tetra.back();
         fscanf(fp, "%f", &number);
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        tetra[i].vert[0] = number;
+        tetrahedra.vert[0] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        tetra[i].vert[1] = number;
+        tetrahedra.vert[1] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        tetra[i].vert[2] = number;
+        tetrahedra.vert[2] = number;
         fscanf(fp, "%c\n", &comma);
         fscanf(fp, "%f", &number);
-        tetra[i].vert[3] = number;
+        tetrahedra.vert[3] = number;
         fscanf(fp, "\n");
     }
 
@@ -179,7 +184,6 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
     smChar comma;
     smInt count;
     nbrTriangles = 777 - 564 + 1; //790....read here automatically
-    smTriangle *surfaceRelation = new smTriangle[nbrTriangles];
 
     initTriangleArrays(nbrTriangles);
 
@@ -193,24 +197,25 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
     smChar stri[19];
     fscanf(fp, "%s\n", stri);
 
+    std::vector<smTriangle> triangles;
     for (i = 0; i < nbrTriangles; i++)
     {
         fscanf(fp, "%f", &number);
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        surfaceRelation[i].vert[0] = number;
+        triangles[i].vert[0] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        surfaceRelation[i].vert[1] = number;
+        triangles[i].vert[1] = number;
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
-        surfaceRelation[i].vert[2] = number;
+        triangles[i].vert[2] = number;
         fscanf(fp, "\n");
     }
 
     fclose(fp);
 
-    smBool *onSurface = new smBool[nbrNodes];
+    std::vector<bool> onSurface(nbrNodes);
 
     for (j = 0; j < nbrNodes; j++)
     {
@@ -219,12 +224,12 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
 
     for (j = 0; j < nbrTriangles; j++)
     {
-        onSurface[surfaceRelation[j].vert[0] - 1] = onSurface[surfaceRelation[j].vert[1] - 1]
-                = onSurface[surfaceRelation[j].vert[2] - 1] = true;
+        onSurface[triangles[j].vert[0] - 1] = onSurface[triangles[j].vert[1] - 1]
+                = onSurface[triangles[j].vert[2] - 1] = true;
     }
 
     count = 0;
-    smInt *temp = new smInt[nbrNodes];
+    std::vector<smInt> temp(nbrNodes);
 
     for (i = 0; i < nbrNodes; i++)
     {
@@ -243,12 +248,12 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
 
     for (i = 0; i < nbrTriangles; i++)
     {
-        triangles[i].vert[0] = temp[surfaceRelation[i].vert[0] - 1];
-        triangles[i].vert[1] = temp[surfaceRelation[i].vert[1] - 1];
-        triangles[i].vert[2] = temp[surfaceRelation[i].vert[2] - 1];
+        triangles[i].vert[0] = temp[triangles[i].vert[0] - 1];
+        triangles[i].vert[1] = temp[triangles[i].vert[1] - 1];
+        triangles[i].vert[2] = temp[triangles[i].vert[2] - 1];
     }
 
-    surfaceNodeIndex = new smInt[nbrVertices];
+    surfaceNodeIndex.resize(nbrVertices);
 
     count = 0;
 
@@ -264,9 +269,6 @@ smBool smVolumeMesh::getSurface(const smString& fileName)
     //copy the co-ordinates of the surface vertices
     initSurface();
 
-    delete []temp;
-    delete []onSurface;
-    delete []surfaceRelation;
     return true;
 
 }
@@ -341,5 +343,10 @@ void smVolumeMesh::initSurface()
 smVolumeMesh::~smVolumeMesh()
 {
 
-    delete [] tetra;
+}
+
+smVolumeMesh::smVolumeMesh()
+{
+    nbrNodes = 0;
+    nbrTetra = 0;
 }

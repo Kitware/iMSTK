@@ -27,23 +27,23 @@
 vegaFemExample::vegaFemExample()
 {
     //Create an instance of the SoFMIS framework/SDK
-    sofmisSDK = smSDK::createSDK();
+    sdk = smSDK::createSDK();
 
     //Create a new scene to work in
-    scene1 = sofmisSDK->createScene();
+    scene1 = sdk->createScene();
 
     //Create a viewer to see the scene
-    sofmisSDK->addViewer(&viewer);
+    sdk->addViewer(&viewer);
 
     /// create a FEM simulator
-    femSim = new smVegaFemSimulator(sofmisSDK->getErrorLog());
+    femSim = new smVegaFemSimulator(sdk->getErrorLog());
 
     /// set the dispatcher for FEM. it will be used for sending events
-    femSim->setDispatcher(sofmisSDK->getEventDispatcher());
-    sofmisSDK->getEventDispatcher()->registerEventHandler(femSim, SIMMEDTK_EVENTTYPE_HAPTICOUT);
+    femSim->setDispatcher(sdk->getEventDispatcher());
+    sdk->getEventDispatcher()->registerEventHandler(femSim, SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
     /// create a Vega based FEM object and attach it to the fem simulator
-    femobj = new smVegaFemSceneObject(sofmisSDK->getErrorLog(),
+    femobj = new smVegaFemSceneObject(sdk->getErrorLog(),
                                       "../../../resources/vega/asianDragon/asianDragon.config");
     femobj->attachObjectSimulator(femSim);
 
@@ -51,15 +51,15 @@ vegaFemExample::vegaFemExample()
     scene1->addSceneObject(femobj);
 
     /// create a simulator module and register FEM simulator
-    simulator = sofmisSDK->createSimulator();
+    simulator = sdk->createSimulator();
     simulator->registerObjectSimulator(femSim);
 
     /// create a viewer
     viewer.viewerRenderDetail = viewer.viewerRenderDetail | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
-    viewer.setEventDispatcher(sofmisSDK->getEventDispatcher());
+    viewer.setEventDispatcher(sdk->getEventDispatcher());
 
     /// run the SDK
-    sofmisSDK->run();
+    sdk->run();
 }
 
 void VegaFemExample()

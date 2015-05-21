@@ -30,21 +30,19 @@
 
 // SimMedTK includes
 #include "smCollision/smCollisionModel.h"
-#include "smCollision/smSurfaceTreeIterator.h"
+#include "smCollision/smSurfaceTreeCell.h"
+#include "smCollision/smCollisionMoller.h"
 #include "smMesh/smSurfaceMesh.h"
-#include "smCore/smEventHandler.h"
 
 /// \brief !!
 template<typename CellType>
-class smSurfaceTree: public smCollisionModel<CellType>,
-					 public smEventHandler
+class smSurfaceTree : public smCoreClass
 {
 protected:
-  typedef smCollisionModel<CellType> BaseType;
-  typedef typename BaseType::MatrixType MatrixType;
+  typedef smMatrix44d MatrixType;
 
 protected:
-    smSurfaceMesh *mesh; 							///< surface mesh
+    std::shared_ptr<smSurfaceMesh> mesh; 							///< surface mesh
     int minTreeRenderLevel; 						///< !!
     bool renderSurface; 							///< !!
     bool enableShiftPos; 							///< !!
@@ -55,29 +53,29 @@ protected:
     int currentLevel; ///<
 
 public:
-
     /// \brief constructor
-    smSurfaceTree(smSurfaceMesh *mesh, int maxLevels);
+    smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels = 6);
 
     /// \brief destructor
     ~smSurfaceTree();
 
     MatrixType transRot; ///< matrix for translation and rotation
     int maxLevel; ///< max level of the tree
-    CellType root; ///< !!
+    std::shared_ptr<CellType> root; ///< !!
     float shiftScale; ///< !!
 
     std::vector<CellType> initialTreeAllLevels; ///< !!
     std::vector<CellType> treeAllLevels; ///< !!
 
     /// \brief initialize the draw function related structures
-    void initDraw(const smDrawParam &param);
+    void initDraw(const smDrawParam &param) override;
 
 protected:
 
     /// \brief creates the tree based on input triangles
-    bool createTree(CellType &Node, const std::vector<int> &triangles,
-                      int level, int siblingIndex);
+    bool createTree(std::shared_ptr<CellType> Node,
+                    const std::vector<int> &triangles,
+                    int siblingIndex);
 
 public:
 
@@ -89,22 +87,80 @@ public:
     virtual smCollisionModelIterator<CellType>  getLevelIterator() ;
 
     /// \brief !!
-    inline smUnifiedID getAttachedMeshID()
+    inline std::shared_ptr<smUnifiedId> getAttachedMeshID()
     {
-        return mesh->uniqueId;
+        return mesh->getUniqueId();
     }
 
     /// \brief rendering the surface tree
-    virtual void draw(const smDrawParam &params);
+    virtual void draw(const smDrawParam &params) override;
 
     /// \brief !!
-    void handleEvent(smEvent *event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief !! smSurfaceTree structure
     void updateStructure();
 
     /// \brief !!
     void translateRot();
+
+    std::shared_ptr<CellType> getRoot()
+    {
+        return root;
+    }
+
+    std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>>
+    getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
+    {
+        std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> intersectingNodes;
+        getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);
+
+        return intersectingNodes;
+    }
+
+    void getIntersectingNodes(const std::shared_ptr<CellType> left,
+                              const std::shared_ptr<CellType> right,
+                              std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
+    {
+        if(!smCollisionMoller::checkOverlapAABBAABB(left->getAabb(),right->getAabb()))
+        {
+            return;
+        }
+
+        if(left->getIsLeaf() && right->getIsLeaf())
+        {
+            result.emplace_back(left,right);
+        }
+        else if(left->getIsLeaf())
+        {
+            for(const auto &child : right->getChildNodes())
+            {
+                if(!child) continue;
+                getIntersectingNodes(left,child,result);
+            }
+        }
+        else if(right->getIsLeaf())
+        {
+            for(const auto &child : left->getChildNodes())
+            {
+                if(!child) continue;
+                getIntersectingNodes(child,right,result);
+            }
+        }
+        else
+        {
+            for(const auto &rightChild : right->getChildNodes())
+            {
+                if(!rightChild) continue;
+                for(const auto &leftChild : left->getChildNodes())
+                {
+                    if(!leftChild) continue;
+                    getIntersectingNodes(leftChild,rightChild,result);
+                }
+            }
+        }
+
+    }
 };
 
 #include "smCollision/smSurfaceTree.hpp"

@@ -24,32 +24,31 @@
 // SimMedTK includes
 #include "smSimulators/smVegaFemSimulator.h"
 
-smVegaFemSimulator::smVegaFemSimulator( smErrorLog *p_errorLog ) : smObjectSimulator( p_errorLog )
+smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
     hapticButtonPressed = false;
 }
-void smVegaFemSimulator::setDispatcher( smEventDispatcher *p_eventDispatcher )
+
+void smVegaFemSimulator::setDispatcher( std::shared_ptr<smEventDispatcher> p_eventDispatcher )
 {
     eventDispatcher = p_eventDispatcher;
 }
+
 void smVegaFemSimulator::beginSim()
 {
 }
+
 void smVegaFemSimulator::initCustom()
-{
-
-    smSceneObject *object;
-
-    //do nothing for now
+{//do nothing for now
     for ( size_t i = 0; i < objectsSimulated.size(); i++ )
     {
-        object = objectsSimulated[i];
+        auto object = objectsSimulated[i];
 
         switch ( type )
         {
             case SIMMEDTK_SMVEGAFEMSCENEOBJECT:
             {
-                object->flags.isSimulatorInit = true;
+                object->getFlags().isSimulatorInit = true;
                 break;
             }
             default:
@@ -57,42 +56,41 @@ void smVegaFemSimulator::initCustom()
         }
     }
 }
+
 void smVegaFemSimulator::run()
 {
-
-    smSceneObject *sceneObj;
-    smVegaFemSceneObject *femSceneObject;
-
     beginSim();
 
     for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
-        sceneObj = this->objectsSimulated[i];
+        auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
-            femSceneObject = static_cast<smVegaFemSceneObject*>(sceneObj);
+            auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
             femSceneObject->advanceDynamics();
         }
     }
 
     endSim();
-
 }
+
 void smVegaFemSimulator::endSim()
 {
 }
+
 void smVegaFemSimulator::syncBuffers()
 {
 }
-void smVegaFemSimulator::handleEvent( smEvent *p_event )
+
+void smVegaFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->eventType.eventTypeCode )
+    switch ( p_event->getEventType().eventTypeCode )
     {
         case SIMMEDTK_EVENTTYPE_KEYBOARD:
         {
-            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData *>(p_event->data);
+            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
             if ( keyBoardData->keyBoardKey == smKey::F1 )
             {
@@ -105,7 +103,7 @@ void smVegaFemSimulator::handleEvent( smEvent *p_event )
 
         case SIMMEDTK_EVENTTYPE_HAPTICOUT:
         {
-            smHapticOutEventData *hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
+            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
 
             if ( hapticEventData->deviceId == 1 )
             {

@@ -23,7 +23,6 @@
 
 #include "smCore/smConfig.h"
 #include "smCore/smSDK.h"
-#include "smCore/smKeySFMLInterface.h"
 #include "smUtilities/smIOStream.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
@@ -34,6 +33,13 @@
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
+
+#include "smEvent/smEventHandler.h"
+#include "smEvent/smKeyboardEvent.h"
+#include "smEvent/smMouseButtonEvent.h"
+#include "smEvent/smMouseMoveEvent.h"
+#include "smEvent/smKeySFMLInterface.h"
+
 
 #ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
 #include <X11/Xlib.h>
@@ -54,8 +60,8 @@ void smViewer::setVSync(bool sync)
 
 smRenderOperation::smRenderOperation()
 {
-    fbo = NULL;
-    scene = NULL;
+    fbo = nullptr;
+    scene = nullptr;
     fboName = "";
 }
 
@@ -69,7 +75,7 @@ smViewer::smViewer()
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
     this->log = NULL;
-    windowOutput = new smOpenGLWindowStream();
+    windowOutput = std::make_shared<smOpenGLWindowStream>();
 
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
@@ -86,7 +92,6 @@ void smViewer::setScreenResolution(smInt p_width, smInt p_height)
 
 void smViewer::setUnlimitedFPS(smBool p_enableFPS)
 {
-
     unlimitedFPSEnabled = p_enableFPS;
     unlimitedFPSVariableChanged++;
 }
@@ -148,30 +153,28 @@ void smViewer::initResources(smDrawParam p_param)
     initFboListItems();
 }
 
-void smViewer::initScenes ( smDrawParam p_param )
+void smViewer::initScenes(smDrawParam p_param )
 {
-    smSceneObject *sceneObject;
-    smScene *scene;
-    smScene::smSceneIterator sceneIter;
+    std::shared_ptr<smSceneObject> sceneObject;
+    smSceneIterator sceneIter;
+
     //traverse all the scene and the objects in the scene
-    for ( size_t i = 0; i < sceneList.size(); i++ )
+    for(auto&& scene : sceneList)
     {
-        scene = sceneList[i];
-        scene->registerForScene(this);
+        scene->registerForScene(safeDownCast<smViewer>());
         scene->initLights();
-        sceneIter.setScene(scene, this);
+        sceneIter.setScene(scene, safeDownCast<smViewer>());
 
         for ( smInt j = sceneIter.start(); j < sceneIter.end(); j++ )
         {
-            //sceneObject=scene->sceneObjects[j];
             sceneObject = sceneIter[j];
 
             //initialize the custom Render if there is any
             if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
             {
-                sceneObject->customRender->initDraw ( p_param );
+                sceneObject->customRender->initDraw(p_param);
             }
-            sceneObject->initDraw ( p_param );
+            sceneObject->initDraw(p_param);
         }//object traverse
     }//scene traverse
 }
@@ -216,9 +219,9 @@ void smViewer::init()
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
+    param.rendererObject = safeDownCast<smViewer>();
+    param.caller = safeDownCast<smViewer>();
+    param.data = nullptr;
 
     this->initGLContext();
     this->initGLCaps();
@@ -252,13 +255,13 @@ void smViewer::renderTextureOnView()
     glTranslated(0, 0, -1);
     glBegin(GL_QUADS);
     glTexCoord2d(0, 0);
-    glVertex3f(0, 0, 0);
+    glVertex3d(0, 0, 0);
     glTexCoord2d(1, 0);
-    glVertex3f(1, 0, 0);
+    glVertex3d(1, 0, 0);
     glTexCoord2d(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2d(0, 1);
-    glVertex3f(0, 1.0, 0);
+    glVertex3d(0, 1.0, 0);
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopAttrib();
@@ -308,6 +311,7 @@ void smViewer::initFboListItems()
                 renderOperations[j].fbo = item->fbo;
             }
         }
+        item->fbo->disable();
     }
 }
 
@@ -325,8 +329,6 @@ void smViewer::destroyFboListItems()
 
 void smViewer::renderSceneList(smDrawParam p_param)
 {
-    smScene::smSceneIterator sceneIter;
-
     //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
     //only current objects and their derived classes
     for (size_t sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
@@ -385,7 +387,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
     smGLRenderer::renderScene(p_rop.scene, p_param);
 }
 
-void smViewer::registerScene(smScene *p_scene,
+void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
                              smRenderTargetType p_target,
                              const smString &p_fboName)
 {
@@ -403,7 +405,7 @@ void smViewer::registerScene(smScene *p_scene,
 
     rop.fboName = p_fboName;
 
-    p_scene->registerForScene(this);
+    p_scene->registerForScene(safeDownCast<smViewer>());
     renderOperations.push_back(rop);
 }
 
@@ -449,8 +451,8 @@ void smViewer::draw()
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
+    param.rendererObject = safeDownCast<smViewer>();
+    param.caller = safeDownCast<smViewer>();
     param.data = nullptr;
 
     beginModule();
@@ -462,7 +464,7 @@ void smViewer::draw()
         objectList[i]->draw(param);
     }
 
-    for (int i = 0; i < renderOperations.size(); i++)
+    for (size_t i = 0; i < renderOperations.size(); i++)
     {
         processRenderOperation(renderOperations[i], param);
     }
@@ -494,100 +496,74 @@ void smViewer::endFrame()
 
 void smViewer::processSFMLEvents(const sf::Event& p_event)
 {
-    smEvent *event = nullptr;
-    smSDK *sdk = smSDK::getInstance();
-    assert(sdk);
-    smViewer *viewer = sdk->getViewerInstance();
-    assert(viewer);
-
-    event = new smEvent();
-    assert(event);
-    event->senderId = this->getModuleId();
-    event->senderType = SIMMEDTK_SENDERTYPE_MODULE;
-    event->data = nullptr;
-
     switch(p_event.type)
     {
     case sf::Event::Closed:
-        event->eventType = SIMMEDTK_EVENTTYPE_TERMINATE;
+        //TODO: some type of terminate event
         break;
     case sf::Event::KeyPressed:
     case sf::Event::KeyReleased:
-        event->eventType = SIMMEDTK_EVENTTYPE_KEYBOARD;
-        if (sf::Event::KeyPressed == p_event.type)
-        {
-            event->data =
-                new smKeyboardEventData(SFMLKeyToSmKey(p_event.key.code), true,
-                                        p_event.key.shift, p_event.key.control,
-                                        p_event.key.alt, p_event.key.system);
-        }
-        else if (sf::Event::KeyReleased == p_event.type)
-        {
-            event->data =
-                new smKeyboardEventData(SFMLKeyToSmKey(p_event.key.code), false,
-                                        p_event.key.shift, p_event.key.control,
-                                        p_event.key.alt, p_event.key.system);
-        }
-        else
-        {
-            delete event;
-            return;
-        }
-        assert(event->data);
+    {
+        auto keyboardEvent =
+            std::make_shared<smtk::Event::smKeyboardEvent>(smtk::Event::SFMLKeyToSmKey(p_event.key.code));
+        keyboardEvent->setPressed(sf::Event::KeyPressed == p_event.type);
+
+        keyboardEvent->setModifierKey(smtk::Event::smModKey::none);
+        if (p_event.key.shift)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::shift);
+        if (p_event.key.control)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::control);
+        if (p_event.key.alt)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::alt);
+        if (p_event.key.system)
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::super);
+
+        eventHandler->triggerEvent(keyboardEvent);
         break;
+    }
     case sf::Event::MouseButtonPressed:
     case sf::Event::MouseButtonReleased:
     {
-        smMouseButton button;
+        smMouseButton mouseButton;
         if (sf::Mouse::Left == p_event.mouseButton.button)
-            button = smMouseButton::Left;
+            mouseButton = smMouseButton::Left;
         else if (sf::Mouse::Right == p_event.mouseButton.button)
-            button = smMouseButton::Right;
+            mouseButton = smMouseButton::Right;
         else if (sf::Mouse::Middle == p_event.mouseButton.button)
-            button = smMouseButton::Middle;
+            mouseButton = smMouseButton::Middle;
         else
-            button = smMouseButton::Unknown;
+            mouseButton = smMouseButton::Unknown;
 
-        if (sf::Event::MouseButtonPressed == p_event.type)
-        {
-            event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
-            event->data =
-                new smMouseButtonEventData(button, true, p_event.mouseButton.x,
-                                           p_event.mouseButton.y);
-        }
-        else if (sf::Event::MouseButtonReleased == p_event.type)
-        {
-            event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_BUTTON;
-            event->data =
-                new smMouseButtonEventData(button, false, p_event.mouseButton.x,
-                                           p_event.mouseButton.y);
-        }
-        assert(event->data);
+        auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
+        mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
+        mouseEvent->setWindowCoord(smVec2d(p_event.mouseButton.x,p_event.mouseButton.y));
+        eventHandler->triggerEvent(mouseEvent);
         break;
     }
     case sf::Event::MouseMoved:
-        event->eventType = SIMMEDTK_EVENTTYPE_MOUSE_MOVE;
-        event->data =
-            new smMouseMoveEventData(p_event.mouseMove.x, p_event.mouseMove.y);
-        assert(event->data);
-        break;
-    default:
-        delete event;
-        return;
-    }
+    {
+        auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
+        mouseEvent->setSender(smtk::Event::EventSender::Module);
+        mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
 
-    sdk->getEventDispatcher()->sendEventAndDelete(event);
+        eventHandler->triggerEvent(mouseEvent);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
-void smViewer::addObject(smCoreClass *object)
+void smViewer::addObject(std::shared_ptr<smCoreClass> object)
 {
 
-    smSDK::addRef(object);
+    smSDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent ( smEvent *p_event )
+void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
+
 }
 
 void smViewer::addText(smString p_tag)

@@ -86,83 +86,9 @@ const smString vega_string_none("__none");
 /// \ , solving system of equations, post processing and customized rendering
 class smVegaFemSceneObject: public smSceneObject
 {
-
 public:
-
-    /// performance counters and simulation flags. some variable names are self explainatory
-    double fps; ///< fps of the simulation
-    const int fpsBufferSize = 5; ///< buffer size to display fps
-    int fpsHead; ///< !!
-    double fpsBuffer[5]; ///< buffer to display fps
-    double cpuLoad;
-    double forceAssemblyTime;
-    double forceAssemblyLocalTime;
-    const int forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    int forceAssemblyHead; /// !!
-    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    double systemSolveTime;
-    double systemSolveLocalTime;
-    const int systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    int systemSolveHead;
-    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    int enableTextures;
-    int staticSolver;
-    int graphicFrame;
-    int pulledVertex; ///< vertex that is pulled by user using external force
-    int explosionFlag; ///< 1 if the simulation goes unstable
-    PerformanceCounter titleBarCounter;
-    PerformanceCounter explosionCounter;
-    PerformanceCounter cpuLoadCounter;
-    int timestepCounter;
-    int subTimestepCounter;
-
-    /// Force models, time integrators, sparse matrices and meshes.
-    /// some variable names are self explainatory
-    int numFixedVertices; ///< number of fixed vertices
-    int * fixedVertices; ///< fixed vertcies
-    int numForceLoads; ///< number of discrete external load inputs
-    double * forceLoads; ///< discrete external load inputs
-    int positiveDefinite; ///< 1 if the effective matrix is positive definite
-    IntegratorBase * integratorBase; ///< integrator
-    ImplicitNewmarkSparse * implicitNewmarkSparse;
-    IntegratorBaseSparse * integratorBaseSparse;
-    ForceModel * forceModel; ///< Type of formulation driving the FEM simulation
-    StVKInternalForces * stVKInternalForces;
-    StVKStiffnessMatrix * stVKStiffnessMatrix;
-    StVKForceModel * stVKForceModel;
-    MassSpringSystemForceModel * massSpringSystemForceModel;
-    CorotationalLinearFEMForceModel * corotationalLinearFEMForceModel;
-    VolumetricMesh * volumetricMesh; ///< volume mesh
-    TetMesh * tetMesh; ///< volume mesh
-    Graph * meshGraph; ///< graph of the mesh
-    MassSpringSystem * massSpringSystem;
-    RenderSprings * renderMassSprings;
-    SparseMatrix * massMatrix; ///< sparse mass matrix need for FEM simulation
-    SparseMatrix * LaplacianDampingMatrix; ///< sparse damping matrix need for FEM simulation
-    int n;
-
-    // body states
-    double * u;                 ///< displacement
-    double * uvel;              ///< derivative of displacement in time
-    double * uaccel;            ///< double derivative of displacement in time
-    double * f_ext;             ///< external forces
-    double * f_extBase;         ///< non-varying external forces
-    double * uSecondary;        ///< interpolated displacement for secondary mesh
-    double * uInitial;          ///< initial displacement
-    double * velInitial;        ///< initial velocity
-
-    smVegaConfigFemObject *femConfig;
-
-    /// interpolation to secondary rendering mesh. self explainatory names
-    int secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices;
-    int * secondaryDeformableObjectRenderingMesh_interpolation_vertices;
-    double * secondaryDeformableObjectRenderingMesh_interpolation_weights;
-
-    SceneObjectDeformable * deformableObjectRenderingMesh;
-    SceneObjectDeformable * secondaryDeformableObjectRenderingMesh;
-
     /// \brief Constructor
-    smVegaFemSceneObject(smErrorLog *p_log = NULL, smString ConfigFile = vega_string_none);
+    smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr, smString ConfigFile = vega_string_none);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
@@ -222,28 +148,101 @@ public:
     void drawAxes(double axisLength);
 
     /// \brief
-    virtual void serialize(void */*p_memoryBlock*/)
+    virtual void serialize(void *) override
     {
         //add code in future
     }
 
     /// \brief
-    virtual void unSerialize(void */*p_memoryBlock*/)
+    virtual void unSerialize(void *) override
     {
 
     }
 
     /// \brief not implemented yet.
-    virtual smSceneObject* clone()
+    virtual std::shared_ptr<smSceneObject> clone() override
     {
-        return this;
+        return safeDownCast<smSceneObject>();
     }
 
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
 
-    virtual void init(){}
+    virtual void init() override {}
+
+public:
+    /// performance counters and simulation flags. some variable names are self explainatory
+    double fps; ///< fps of the simulation
+    const int fpsBufferSize = 5; ///< buffer size to display fps
+    int fpsHead; ///< !!
+    double fpsBuffer[5]; ///< buffer to display fps
+    double cpuLoad;
+    double forceAssemblyTime;
+    double forceAssemblyLocalTime;
+    const int forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+    int forceAssemblyHead; /// !!
+    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    double systemSolveTime;
+    double systemSolveLocalTime;
+    const int systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+    int systemSolveHead;
+    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    int enableTextures;
+    int staticSolver;
+    int graphicFrame;
+    int pulledVertex; ///< vertex that is pulled by user using external force
+    int explosionFlag; ///< 1 if the simulation goes unstable
+    PerformanceCounter titleBarCounter;
+    PerformanceCounter explosionCounter;
+    PerformanceCounter cpuLoadCounter;
+    int timestepCounter;
+    int subTimestepCounter;
+
+    /// Force models, time integrators, sparse matrices and meshes.
+    /// some variable names are self explainatory
+    int numFixedVertices; ///< number of fixed vertices
+    int * fixedVertices; ///< fixed vertcies
+    int numForceLoads; ///< number of discrete external load inputs
+    double * forceLoads; ///< discrete external load inputs
+    int positiveDefinite; ///< 1 if the effective matrix is positive definite
+    std::shared_ptr<IntegratorBase> integratorBase; ///< integrator
+    std::shared_ptr<ImplicitNewmarkSparse> implicitNewmarkSparse;
+    std::shared_ptr<IntegratorBaseSparse> integratorBaseSparse;
+    std::shared_ptr<ForceModel> forceModel; ///< Type of formulation driving the FEM simulation
+    std::shared_ptr<StVKInternalForces> stVKInternalForces;
+    std::shared_ptr<StVKStiffnessMatrix> stVKStiffnessMatrix;
+    std::shared_ptr<StVKForceModel> stVKForceModel;
+    std::shared_ptr<MassSpringSystemForceModel> massSpringSystemForceModel;
+    std::shared_ptr<CorotationalLinearFEMForceModel> corotationalLinearFEMForceModel;
+    std::shared_ptr<VolumetricMesh> volumetricMesh; ///< volume mesh
+    std::shared_ptr<TetMesh> tetMesh; ///< volume mesh
+    std::shared_ptr<Graph> meshGraph; ///< graph of the mesh
+    std::shared_ptr<MassSpringSystem> massSpringSystem;
+    std::shared_ptr<RenderSprings> renderMassSprings;
+    std::shared_ptr<SparseMatrix> massMatrix; ///< sparse mass matrix need for FEM simulation
+    std::shared_ptr<SparseMatrix> LaplacianDampingMatrix; ///< sparse damping matrix need for FEM simulation
+    int n;
+
+    // body states
+    double * u;                 ///< displacement
+    double * uvel;              ///< derivative of displacement in time
+    double * uaccel;            ///< double derivative of displacement in time
+    double * f_ext;             ///< external forces
+    double * f_extBase;         ///< non-varying external forces
+    double * uSecondary;        ///< interpolated displacement for secondary mesh
+    double * uInitial;          ///< initial displacement
+    double * velInitial;        ///< initial velocity
+
+    std::shared_ptr<smVegaConfigFemObject> femConfig;
+
+    /// interpolation to secondary rendering mesh. self explainatory names
+    int secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices;
+    int * secondaryDeformableObjectRenderingMesh_interpolation_vertices;
+    double * secondaryDeformableObjectRenderingMesh_interpolation_weights;
+
+    std::shared_ptr<SceneObjectDeformable> deformableObjectRenderingMesh;
+    std::shared_ptr<SceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
 };
 
 #endif

@@ -35,11 +35,11 @@ public:
     int currentLevel; ///<
     int endIndex; ///<
 
-    inline int start();
-    inline int end();
-    inline void operator++();
-    inline void operator--();
-    inline T operator[](int p_index);
+    inline int start(){ return 0; }
+    inline int end(){return 0; }
+    inline void operator++(){}
+    inline void operator--(){}
+    inline T operator[](int /*p_index*/){ return T(); }
 };
 
 #endif

@@ -49,10 +49,8 @@ size_t Filelength(const char * filename, int)
 }
 #endif
 
-
-
 /// \brief constructor
-smSurfaceMesh::smSurfaceMesh(smMeshType p_meshtype, smErrorLog *log = NULL)
+smSurfaceMesh::smSurfaceMesh(const smMeshType &p_meshtype, std::shared_ptr<smErrorLog> log)
 {
 
     this->log_SF = log;
@@ -67,7 +65,7 @@ smSurfaceMesh::~smSurfaceMesh()
 }
 
 /// \brief loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMesh(const smString& fileName, smMeshFileType fileType)
+smBool smSurfaceMesh::loadMesh(const smString& fileName, const smMeshFileType &fileType)
 {
 
     smBool ret = true;
@@ -116,7 +114,7 @@ smBool smSurfaceMesh::loadMesh(const smString& fileName, smMeshFileType fileType
 
 /// \brief --Deprecated, use loadMesh() for new simulators--
 /// Loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMeshLegacy(const smString& fileName, smMeshFileType fileType)
+smBool smSurfaceMesh::loadMeshLegacy(const smString& fileName, const smMeshFileType &fileType)
 {
 
     smBool ret = true;
@@ -215,7 +213,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
         this->vertices.emplace_back(
-            smVec3f(mesh->mVertices[i][0],
+            smVec3d(mesh->mVertices[i][0],
                     mesh->mVertices[i][1],
                     mesh->mVertices[i][2]));
     }
@@ -345,8 +343,8 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             this->nbrVertices = l_qty;
             this->vertices.reserve(l_qty);
             this->origVerts.reserve(l_qty);
-            this->vertNormals = new smVec3f[l_qty];
-            this->vertTangents = new smVec3f[l_qty];
+            this->vertNormals = new smVec3d[l_qty];
+            this->vertTangents = new smVec3d[l_qty];
             this->texCoord = new smTexCoord[l_qty];
 
             for (smInt fpt = 0; fpt < this->nbrVertices; fpt++)
@@ -369,8 +367,8 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             fread(&l_qty, sizeof(smUShort), 1, l_file);
             this->nbrTriangles = l_qty;
             this->triangles = new smTriangle[l_qty];
-            this->triNormals = new smVec3f[l_qty];
-            this->triTangents = new smVec3f[l_qty];
+            this->triNormals = new smVec3d[l_qty];
+            this->triTangents = new smVec3d[l_qty];
 
             for (i = 0; i < l_qty; i++)
             {
@@ -422,4 +420,10 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
     fclose(l_file);  // Closes the file stream
 
     return 1; // Returns ok
+}
+smSurfaceMesh::smSurfaceMesh()
+{
+    this->log_SF = std::shared_ptr<smErrorLog>();
+    meshType = SMMESH_DEFORMABLE;
+    meshFileType = SM_FILETYPE_NONE;
 }

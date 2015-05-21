@@ -29,7 +29,7 @@
 void smFemSceneObject::buildLMmatrix()
 {
     smInt i, j;
-    ID = smMatrixf::Zero(v_mesh->nbrNodes, 3);
+    ID = smMatrixd::Zero(v_mesh->nbrNodes, 3);
 
     smInt dofID = 0;
 
@@ -52,7 +52,7 @@ void smFemSceneObject::buildLMmatrix()
 
     totalDof = dofID;
 
-    LM = smMatrixf::Zero(v_mesh->nbrTetra, 12);
+    LM = smMatrixd::Zero(v_mesh->nbrTetra, 12);
 
     for (i = 0; i < v_mesh->nbrTetra; i++)
     {
@@ -65,15 +65,15 @@ void smFemSceneObject::buildLMmatrix()
     }
 
     //create arrays
-    fm_temp = smVectorf::Zero(totalDof);
-    fm = smVectorf::Zero(totalDof);
-    totalDisp = smVectorf::Zero(totalDof);
-    displacements = smVectorf::Zero(totalDof);
-    temp_displacements = smVectorf::Zero(totalDof);
-    displacements_prev = smVectorf::Zero(totalDof);
-    componentMasses = smVectorf::Zero(totalDof);
-    Kinv = smMatrixf::Zero(totalDof, totalDof);
-    stiffnessMatrix = smMatrixf::Zero(totalDof, totalDof);
+    fm_temp = smVectord::Zero(totalDof);
+    fm = smVectord::Zero(totalDof);
+    totalDisp = smVectord::Zero(totalDof);
+    displacements = smVectord::Zero(totalDof);
+    temp_displacements = smVectord::Zero(totalDof);
+    displacements_prev = smVectord::Zero(totalDof);
+    componentMasses = smVectord::Zero(totalDof);
+    Kinv = smMatrixd::Zero(totalDof, totalDof);
+    stiffnessMatrix = smMatrixd::Zero(totalDof, totalDof);
 }
 
 //brief: computes the stiffness matrix, its inverse and saves it in external file.
@@ -104,8 +104,8 @@ void smFemSceneObject::computeStiffness()
         smFloat c2 = v / (1 - v);
         smFloat c3 = (1 - 2 * v) / (2 * (1 - v));
 
-        smMatrixf k_ele = smMatrixf::Zero(12, 12);
-        smMatrixf Ndash = smMatrixf::Zero(4, 3);
+        smMatrixd k_ele = smMatrixd::Zero(12, 12);
+        smMatrixd Ndash = smMatrixd::Zero(4, 3);
 
         smFloat vol;
         smMatrix44f coff = smMatrix44f::Zero();
@@ -166,7 +166,7 @@ void smFemSceneObject::computeStiffness()
     //If the simulation is dynamic calculate the lumped mass matrix
     if (dynamicFem)
     {
-        dymamic_temp = smVectorf::Zero(totalDof);
+        dymamic_temp = smVectord::Zero(totalDof);
         lumpMasses();
 
         for (i = 0; i < v_mesh->nbrNodes; i++)
@@ -188,10 +188,10 @@ void smFemSceneObject::computeStiffness()
 void smFemSceneObject::lumpMasses()
 {
     smInt i;
-    nodeMass = smVectorf::Zero(v_mesh->nbrNodes);
-    smVec3f centroid;
-    smVec3f node0, node1, node2, node3;
-    smVec3f face012, face023, face013, face123;
+    nodeMass = smVectord::Zero(v_mesh->nbrNodes);
+    smVec3d centroid;
+    smVec3d node0, node1, node2, node3;
+    smVec3d face012, face023, face013, face123;
 
     for (i = 0; i < v_mesh->nbrTetra; i++)
     {
@@ -243,7 +243,7 @@ void smFemSceneObject::lumpMasses()
 }
 
 ///brief: volume of a tetra
-smFloat smFemSceneObject::tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3f &d)
+smFloat smFemSceneObject::tetraVolume(smVec3d &a, smVec3d &b, smVec3d &c, smVec3d &d)
 {
     smMatrix44f det;
     smFloat vol;
@@ -275,7 +275,7 @@ smFloat smFemSceneObject::tetraVolume(smVec3f &a, smVec3f &b, smVec3f &c, smVec3
 }
 
 ///brief:reads matrix elements from an external file
-smBool smFemSceneObject::loadMatrix(const smString &fname, smMatrixf &a)
+smBool smFemSceneObject::loadMatrix(const smString &fname, smMatrixd &a)
 {
     FILE *p = fopen(fname.c_str(), "rb");
 
@@ -301,7 +301,7 @@ smBool smFemSceneObject::loadMatrix(const smString &fname, smMatrixf &a)
 }
 
 ///brief:saves the matrix to a external file
-smBool smFemSceneObject::saveMatrix(const smString &fname, smMatrixf &a)
+smBool smFemSceneObject::saveMatrix(const smString &fname, smMatrixd &a)
 {
     FILE *p = fopen(fname.c_str(), "wb");
 
@@ -330,7 +330,7 @@ smBool smFemSceneObject::saveMatrix(const smString &fname, smMatrixf &a)
 
 
 ///brief:assembles element stiffness to global stiffness
-void smFemSceneObject::assembleK(smInt element, smMatrixf k)
+void smFemSceneObject::assembleK(smInt element, smMatrixd k)
 {
     for (smInt i = 0; i < 12; i++)
     {
@@ -355,7 +355,7 @@ smFloat smFemSceneObject::V(smInt xyz, smInt xyz123, smInt tet)
 }
 
 ///brief: compute the displacement using reanalysis technique
-void smFemSceneObject::calculateDisplacements_QStatic(smVec3f *vertices)
+void smFemSceneObject::calculateDisplacements_QStatic(smStdVector3d &vertices)
 {
     smInt i;
     smInt dofNumber = ID(pulledNode, 0);
@@ -411,7 +411,7 @@ void smFemSceneObject::calculateDisplacements_QStatic(smVec3f *vertices)
 }
 
 ///brief:: calculates the displacements dy explicit dynamics using Central difference scheme
-void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
+void smFemSceneObject::calculateDisplacements_Dynamic(smStdVector3d &vertices)
 {
     smInt i;
     pulledNode = 62; //to test//324
@@ -452,13 +452,13 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smVec3f *vertices)
     }
 }
 
-
 void smFemSceneObject::draw(const smDrawParam &p_params)
 {
 //     p_params.caller = this;
     this->v_mesh->draw(p_params);
 }
-smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
+
+smFemSceneObject::smFemSceneObject( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMFEMSCENEOBJECT;
     v_mesh = new smVolumeMesh( SMMESH_DEFORMABLE, p_log );
@@ -472,9 +472,9 @@ smFemSceneObject::smFemSceneObject( smErrorLog *p_log )
     }
 }
 
-smSceneObject *smFemSceneObject::clone()
+std::shared_ptr<smSceneObject> smFemSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
 
 void smFemSceneObject::serialize( void */*p_memoryBlock*/ )
@@ -485,5 +485,3 @@ void smFemSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
-
-// void smFemSceneObject::init() {}

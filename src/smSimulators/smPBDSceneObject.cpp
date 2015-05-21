@@ -29,7 +29,7 @@ void smPBDSurfaceSceneObject::draw(const smDrawParam &p_params)
     mesh->draw(p_params);
 }
 
-void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3f p_center, smFloat p_radius)
+void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p_radius)
 {
     smFloat dist = 0;
 
@@ -44,30 +44,34 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3f p_center, smFloat p
         }
     }
 }
-smPBDSceneObject::smPBDSceneObject( smErrorLog */*p_log*/ )
+smPBDSceneObject::smPBDSceneObject( std::shared_ptr<smErrorLog>/*p_log*/ )
 {
     type = SIMMEDTK_SMPBDSCENEOBJECT;
 }
-smSceneObject *smPBDSceneObject::clone()
+
+std::shared_ptr<smSceneObject> smPBDSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
+
 void smPBDSceneObject::serialize( void */*p_memoryBlock*/ )
 {
 
 }
+
 void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 
 }
-smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( smErrorLog *p_log )
+
+smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMPBDSURFACESCENEOBJECT;
     mesh = new smSurfaceMesh( SMMESH_DEFORMABLE, p_log );
 }
-smSceneObject *smPBDSurfaceSceneObject::clone()
+std::shared_ptr<smSceneObject> smPBDSurfaceSceneObject::clone()
 {
-    return this;
+    return safeDownCast<smSceneObject>();
 }
 void smPBDSurfaceSceneObject::serialize( void */*p_memoryBlock*/ )
 {
@@ -93,9 +97,9 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     //surface mesh
     nbrMass = mesh->nbrVertices;
 
-    P = new smVec3f[nbrMass];
-    V = new smVec3f[nbrMass];
-    exF = new smVec3f[nbrMass];
+    P = new smVec3d[nbrMass];
+    V = new smVec3d[nbrMass];
+    exF = new smVec3d[nbrMass];
     fixedMass = new bool[nbrMass];
 
     for ( smInt i = 0; i < nbrMass; i++ )
@@ -150,7 +154,7 @@ void smPBDSurfaceSceneObject::findFixedCorners()
 
     nbrFixedMass = 2;
     listFixedMass = new smInt[nbrFixedMass];
-    smVec3f corner[2];
+    smVec3d corner[2];
     smInt i, j;
     smFloat minmin, dist;
     corner[0] = mesh->aabb.aabbMax;

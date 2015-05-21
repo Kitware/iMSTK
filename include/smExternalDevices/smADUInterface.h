@@ -30,7 +30,6 @@
 #include "smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smDoubleBuffer.h"
 
 /// \brief holds data for calibration of ADU device
@@ -88,25 +87,25 @@ public:
     smBool isOpened; ///< !!
 
     /// \brief !!
-    void init();
+    void init() override;
 
     /// \brief !!
-    void exec();
+    void exec() override;
 
     /// \briefempty functions for now
-    virtual void beginFrame() {};
+    virtual void beginFrame() override {};
 
     /// \brief empty functions for now
-    virtual void endFrame() {};
+    virtual void endFrame() override {};
 
     /// \brief !!
-    void draw(const smDrawParam &p_params) {};
+    void draw(const smDrawParam &p_params) override {};
 
     /// \brief
-    void run();
+    void run() override;
 
     /// \brief
-    void handleEvent(smEvent *p_event) {};
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)  override{};
 
 public:
     smPipe *ADUpipe; ///< !!

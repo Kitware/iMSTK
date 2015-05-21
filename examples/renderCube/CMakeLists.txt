@@ -1,10 +1,12 @@
 
-add_executable(renderCube main.cpp  RenderCube.cpp RenderCube.h)
+add_executable(renderCube main.cpp)
 target_link_libraries(renderCube
   smCore
   smRendering
   smShader
   smMesh
+  smEvent
+  ExamplesCommon
   sfml::system
   sfml::audio
   sfml::graphics

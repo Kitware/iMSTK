@@ -70,13 +70,13 @@ void smGLUtils::fadeBackgroundDraw()
     glOrtho(-1, 1, -1, 1, 0.1, 1.1);
     glBegin(GL_POLYGON);
     glColor3f(0.219, 0.219, 0.435);
-    glVertex3f(-1, -1, -1);
+    glVertex3d(-1, -1, -1);
     glColor3f(0.219, 0.219, 0.435);
-    glVertex3f(1, -1, -1);
+    glVertex3d(1, -1, -1);
     glColor3f(0.0, 0.0, 0.0);
-    glVertex3f(1, 1, -1);
+    glVertex3d(1, 1, -1);
     glColor3f(0.0, 0.0, 0.0);
-    glVertex3f(-1, 1, -1);
+    glVertex3d(-1, 1, -1);
     glEnd();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -108,10 +108,10 @@ void smGLUtils::drawQuadOnScreen(smColor p_color, smFloat p_left,
     glOrtho(0, 1.0, 0.0, 1, 0.1, 1.1);
     glBegin(GL_QUADS);
     glColor4fv(p_color.toGLColor());
-    glVertex3f(p_left, p_bottom, -1.0);
-    glVertex3f(p_right, p_bottom, -1.0);
-    glVertex3f(p_right, p_top , -1.0);
-    glVertex3f(p_left, p_top , -1.0);
+    glVertex3d(p_left, p_bottom, -1.0);
+    glVertex3d(p_right, p_bottom, -1.0);
+    glVertex3d(p_right, p_top , -1.0);
+    glVertex3d(p_left, p_top , -1.0);
     glEnd();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_LIGHTING);
@@ -126,13 +126,13 @@ void smGLUtils::drawUnitQuadOnScreen()
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
     glTexCoord2f(0, 0);
-    glVertex3f(-1, -1, -1);
+    glVertex3d(-1, -1, -1);
     glTexCoord2f(1, 0);
-    glVertex3f(1, -1, -1);
+    glVertex3d(1, -1, -1);
     glTexCoord2f(1, 1);
-    glVertex3f(1, 1.0, -1);
+    glVertex3d(1, 1.0, -1);
     glTexCoord2f(0, 1);
-    glVertex3f(-1, 1.0, -1);
+    glVertex3d(-1, 1.0, -1);
     glEnd();
 }
 void smGLUtils::queryProjectionMatrix(smMatrix44f& p_matrix)

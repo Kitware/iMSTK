@@ -197,7 +197,6 @@ include(SimMedTKMacros)
 
 simmedtk_find_package(GLUT REQUIRED)
 
-
 if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)
 endif()

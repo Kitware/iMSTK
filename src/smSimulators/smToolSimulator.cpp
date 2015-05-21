@@ -22,11 +22,13 @@
 //---------------------------------------------------------------------------
 
 #include "smSimulators/smToolSimulator.h"
+#include "smEvent/smEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 
-void smToolSimulator::updateTool(smStylusRigidSceneObject *p_tool)
+void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool)
 {
-    smMatrix44f tempMat, tempMatDevice;
-    smMatrix44f mat;
+    smMatrix44d tempMat, tempMatDevice;
+    smMatrix44d mat;
     tree<smMeshContainer*>::pre_order_iterator iter = p_tool->meshes.begin();
     //update the Root node first
     iter.node->data->computeCurrentMatrix();
@@ -76,17 +78,17 @@ void smToolSimulator::updateTool(smStylusRigidSceneObject *p_tool)
         p_tool->posTraverseCallBack();
     }
 }
-smToolSimulator::smToolSimulator( smErrorLog *p_errorLog ) : smObjectSimulator( p_errorLog )
+
+smToolSimulator::smToolSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
 }
+
 void smToolSimulator::initCustom()
 {
 }
+
 void smToolSimulator::run()
 {
-
-    smSceneObject *sceneObj;
-    smStylusRigidSceneObject *tool;
 
     while ( true && this->enabled )
     {
@@ -94,12 +96,12 @@ void smToolSimulator::run()
 
         for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
         {
-            sceneObj = this->objectsSimulated[i];
+            auto sceneObj = this->objectsSimulated[i];
 
             //ensure that dummy simulator will work on static scene objects only.
             if ( sceneObj->getType() == SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT )
             {
-                tool = static_cast<smStylusRigidSceneObject *>(sceneObj);
+                auto tool = std::static_pointer_cast<smStylusRigidSceneObject>(sceneObj);
 
                 if ( tool->toolEnabled )
                 {
@@ -111,23 +113,29 @@ void smToolSimulator::run()
         endSim();
     }
 }
+
 void smToolSimulator::syncBuffers()
 {
 }
-void smToolSimulator::handleEvent( smEvent *p_event )
+
+void smToolSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->eventType.eventTypeCode )
+    if(!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
+        return;
+    }
+
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
         {
-            smKeyboardEventData *keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
-
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
+            case smtk::Event::smKey::F1:
             {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
+                std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
             }
-
-            break;
+            default:
+                break;
         }
     }
 }

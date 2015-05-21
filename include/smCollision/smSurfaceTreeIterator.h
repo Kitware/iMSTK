@@ -43,7 +43,7 @@ public:
     }
 
     /// \brief
-    smSurfaceTreeIterator(const smCollisionModelIterator<CellType> &i) 
+    smSurfaceTreeIterator(const smCollisionModelIterator<CellType> &i)
 	  : smCollisionModelIterator<CellType>()
     {
 		this->tree = nullptr;

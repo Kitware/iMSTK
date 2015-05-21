@@ -32,29 +32,12 @@
 ///  This surface triangle structure might be extracted from the volume mesh while loading
 class smVolumeMesh: public smMesh
 {
-
 public:
-    /// push smMesh class specific errors here
-    smErrorLog *log_VM; ///< log the errors with volume mesh class
-    smInt nbrNodes; ///< total number of nodes of the volume mesh
-    smVec3f *nodes; ///< data of nodal co-ordinates
-    smInt nbrTetra; ///< number of tetrahedra
-    smTetrahedra *tetra; ///< tetrahedra data
-    smInt *surfaceNodeIndex; ///<
-    smBool *fixed; ///< indicates if the node is fixed or not
+    /// \brief constructor
+    smVolumeMesh();
 
     /// \brief constructor
-    smVolumeMesh()
-    {
-        nbrNodes = 0;
-        nbrTetra = 0;
-        tetra = NULL;
-        surfaceNodeIndex = NULL;
-        fixed = NULL;
-    }
-
-    /// \brief constructor
-    smVolumeMesh(smMeshType meshtype, smErrorLog *log);
+    smVolumeMesh(const smMeshType &meshtype, std::shared_ptr<smErrorLog> log);
 
     /// \brief destructor
     ~smVolumeMesh();
@@ -78,16 +61,26 @@ public:
     void copySurface();
 
     /// \brief translate mesh vertices in x, y and z directions
-    void translateVolumeMesh(smVec3f p_translate);
+    void translateVolumeMesh(const smVec3d &p_translate);
 
     /// \brief scale the volume mesh
-    void scaleVolumeMesh(smVec3f p_scale);
+    void scaleVolumeMesh(const smVec3d &p_scale);
 
     /// \brief rotate mesh vertices in x, y and z directions
-    void rotVolumeMesh(smMatrix33f p_rot);
+    void rotVolumeMesh(const smMatrix33d &p_rot);
 
     /// \brief load the mesh
-    smBool loadMesh(const smString& fileName, smMeshFileType fileType);
+    smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
+
+public:
+    /// push smMesh class specific errors here
+    smInt nbrTetra; ///< number of tetrahedra
+    smInt nbrNodes; ///< total number of nodes of the volume mesh
+    std::shared_ptr<smErrorLog> log_VM; ///< log the errors with volume mesh class
+    smStdVector3d nodes; ///< data of nodal co-ordinates
+    std::vector<smTetrahedra> tetra; ///< tetrahedra data
+    std::vector<smInt> surfaceNodeIndex; ///<
+    std::vector<smBool> fixed; ///< indicates if the node is fixed or not
 };
 
 #endif

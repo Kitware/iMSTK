@@ -25,6 +25,7 @@
 #define SM_SURFACETREECELL_H
 
 // STD includes
+#include<memory>
 #include<vector>
 #include<set>
 
@@ -36,17 +37,12 @@
 template <typename Derived>
 class smSurfaceTreeCell
 {
-
 public:
-    bool filled; ///< !!
-    int level; ///< level in the tree
-    std::set<int> verticesIndices; ///< indices of vertices
-    std::vector<float> weights; ///< !!
-
     /// \brief constructor
     smSurfaceTreeCell()
     {
-        filled = false;
+        empty = true;
+        isLeaf = false;
         level = 0;
     }
 
@@ -57,7 +53,8 @@ public:
     }
 
     /// \brief subdivide the cell of surface tree structure
-    inline void subDivide(const int divisionPerAxis, std::vector<Derived> &cells)
+    template<typename ArrayType>
+    inline void subDivide(const int divisionPerAxis, ArrayType &cells)
     {
         derived()->subDivide(divisionPerAxis,cells);
     };
@@ -69,13 +66,13 @@ public:
     }
 
     /// \brief checks if the cell collided with a triangle primitive
-    inline bool isCollidedWithTri(const smVec3f &v0, const smVec3f &v1, const smVec3f &v2)
+    inline bool isCollidedWithTri(const smVec3d &v0, const smVec3d &v1, const smVec3d &v2)
     {
         return derived()->isCollidedWithTri(v0,v1,v2);
     }
 
     /// \brief checks if the cell contains the point primitive
-    inline bool isCollidedWithPoint(const smVec3f &point)
+    inline bool isCollidedWithPoint(const smVec3d &point)
     {
         return derived()->isCollidedWithPoint(point);
     }
@@ -87,7 +84,7 @@ public:
     }
 
     /// \brief set the center of the cell of surface tree
-    inline void setCenter(const smVec3f &center)
+    inline void setCenter(const smVec3d &center)
     {
         derived()->setCenter(center);
     }
@@ -99,7 +96,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline smVec3f &getCenter()
+    inline smVec3d &getCenter()
     {
         return derived()->getCenter();
     }
@@ -111,7 +108,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline const smVec3f &getCenter()  const
+    inline const smVec3d &getCenter()  const
     {
         return derived()->getCenter();
     }
@@ -121,6 +118,109 @@ public:
     {
         return derived()->getLength();
     }
+
+    template<typename smAABB>
+    inline void addTriangleData(const smAABB &aabb, size_t index)
+    {
+        return derived()->addTriangleData(aabb,index);
+    }
+
+    inline const bool &isEmpty() const
+    {
+        return empty;
+    }
+
+    inline void setIsEmpty(const bool &isEmpty)
+    {
+        empty = isEmpty;
+    }
+
+    inline const bool &getIsLeaf() const
+    {
+        return isLeaf;
+    }
+
+    inline void setIsLeaf(const bool &leaf)
+    {
+        isLeaf = leaf;
+    }
+
+    inline const std::set<int> &getVerticesIndices() const
+    {
+        return verticesIndices;
+    }
+
+    inline void setVerticesIndices(const std::set<int> &indices)
+    {
+        verticesIndices = indices;
+    }
+
+    inline void addVertexIndex(const int &index)
+    {
+        verticesIndices.insert(index);
+    }
+
+    inline void setLevel(const int &l)
+    {
+        level = l;
+    }
+
+    inline const int &getLevel() const
+    {
+        return level;
+    }
+
+    inline void setWeights(const std::vector<float> &w)
+    {
+        weights = w;
+    }
+
+    inline const std::vector<float> &getWeights() const
+    {
+        return weights;
+    }
+
+    inline std::vector<float> &getWeights()
+    {
+        return weights;
+    }
+
+    inline void addWeight(const int &w)
+    {
+        weights.emplace_back(w);
+    }
+
+    inline const float &getWeight(const int &w) const
+    {
+        return weights.at(w);
+    }
+
+    inline std::shared_ptr<Derived> getChildNode(size_t i)
+    {
+        return derived()->getChildNode(i);
+    }
+
+    inline void setChildNode(size_t i, std::shared_ptr<Derived> node)
+    {
+        derived()->setChildNode(node);
+    }
+
+    inline std::shared_ptr<Derived> getParentNode()
+    {
+        derived()->getParentNode();
+    }
+
+    inline void setParentNode(std::shared_ptr<Derived> parent)
+    {
+        derived()->setParentNode(parent);
+    }
+
+private:
+    bool empty; ///< !!
+    bool isLeaf; ///< !!
+    int level; ///< level in the tree
+    std::vector<float> weights; ///< !!
+    std::set<int> verticesIndices; ///< indices of vertices
 };
 
 #endif

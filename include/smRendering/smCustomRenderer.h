@@ -50,10 +50,9 @@ public:
 };
 
 /// \briefderive this class if you want to render a class in the viewer.
-class smCustomRenderInterface: public smInterface
+class smCustomRenderInterface
 {
-
-    virtual void draw();
+    virtual void draw(const smDrawParam &p_params);
 };
 
 #endif

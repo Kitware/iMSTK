@@ -32,13 +32,13 @@ smColor smColor::colorGray(0.8, 0.8, 0.8, 1.0);
 smColor smColor::colorYellow(1, 1, 0, 1);
 smColor smColor::colorPink(1, 0, 1, 1);
 
-void smRenderDetail::addShader(smUnifiedID p_shaderID)
+void smRenderDetail::addShader(std::shared_ptr<smUnifiedId> p_shaderID)
 {
 
     shaderEnable.push_back(true);
     shaders.push_back(p_shaderID);
 }
-void smRenderDetail::addVAO(smUnifiedID p_shaderID)
+void smRenderDetail::addVAO(std::shared_ptr<smUnifiedId> p_shaderID)
 {
 
     VAOs.push_back(p_shaderID);
@@ -98,8 +98,14 @@ smColor &smColor::operator=( smColor &p_color )
 }
 GLfloat *smColor::toGLColor()
 {
-    return static_cast<GLfloat *>(rgba);
+    return static_cast<GLfloat*>(rgba);
 }
+
+const GLfloat *smColor::toGLColor() const
+{
+    return static_cast<const GLfloat*>(rgba);
+}
+
 void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha )
 {
     rgba[0] = p_red;
@@ -128,4 +134,76 @@ smRenderDetail::smRenderDetail()
     debugDraw = false;
     castShadow = true;
     canGetShadow = true;
+}
+const smColor& smRenderDetail::getColorDiffuse() const
+{
+    return colorDiffuse;
+}
+const smColor& smRenderDetail::getColorAmbient() const
+{
+    return colorAmbient;
+}
+const smColor& smRenderDetail::getColorSpecular() const
+{
+    return colorSpecular;
+}
+const float& smRenderDetail::getShininess() const
+{
+    return shininess;
+}
+const smUInt& smRenderDetail::getRenderType() const
+{
+    return renderType;
+}
+const float& smRenderDetail::getPointSize() const
+{
+    return pointSize;
+}
+const float& smRenderDetail::getLineSize() const
+{
+    return lineSize;
+}
+const smColor& smRenderDetail::getNormalColor() const
+{
+    return this->normalColor;
+}
+const smColor& smRenderDetail::getHighLightColor() const
+{
+    return this->highLightColor;
+}
+const smColor& smRenderDetail::getShadowColor() const
+{
+    return this->shadowColor;
+}
+const bool& smRenderDetail::getCastShadow() const
+{
+    return this->castShadow;
+}
+const bool& smRenderDetail::getCanGetShadow() const
+{
+    return this->canGetShadow;
+}
+const smColor& smRenderDetail::getWireFrameColor() const
+{
+    return this->wireFrameColor;
+}
+const bool& smRenderDetail::getDebugDraw() const
+{
+    return this->debugDraw;
+}
+const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getShaders() const
+{
+    return this->shaders;
+}
+const std::vector< bool >& smRenderDetail::getShaderEnable() const
+{
+    return this->shaderEnable;
+}
+const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getVAOs() const
+{
+    return this->VAOs;
+}
+const std::vector< bool >& smRenderDetail::getVAOEnable() const
+{
+    return this->VAOEnable;
 }

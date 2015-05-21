@@ -29,6 +29,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Sparse>
+#include <Eigen/Geometry>
 
 // namespace SimMedTK
 // {
@@ -37,19 +38,19 @@
 
 /// A 2x2 matrix
 template<typename T>
-using smMatrix22 = Eigen::Matrix<float, 2, 2>;
+using smMatrix22 = Eigen::Matrix<T, 2, 2>;
 
 /// A 3x3 matrix
 template<typename T>
-using smMatrix33 = Eigen::Matrix<float, 3, 3>;
+using smMatrix33 = Eigen::Matrix<T, 3, 3>;
 
 /// A 4x4 matrix
 template<typename T>
-using smMatrix44 = Eigen::Matrix<float, 4, 4>;
+using smMatrix44 = Eigen::Matrix<T, 4, 4>;
 
 /// A 4x4 matrix
 template<typename T>
-using smMatrix66 = Eigen::Matrix<float, 6, 6>;
+using smMatrix66 = Eigen::Matrix<T, 6, 6>;
 
 /// A dynamic size diagonal matrix
 template<typename T>

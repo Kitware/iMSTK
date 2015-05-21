@@ -26,7 +26,7 @@
 
 #include <cassert>
 
-smErrorLog* smTextureManager:: errorLog;
+std::shared_ptr<smErrorLog> smTextureManager:: errorLog;
 std::vector<smTexture*>  smTextureManager:: textures;
 std::unordered_map<smString, smInt>  smTextureManager::textureIndexId;
 smInt smTextureManager:: activeTextures;

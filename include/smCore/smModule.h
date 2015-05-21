@@ -24,13 +24,15 @@
 #ifndef SMMODULE_H
 #define SMMODULE_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smDispatcher.h"
 #include "smCore/smScene.h"
 #include "smCore/smSceneObject.h"
-#include "smCore/smEventHandler.h"
 
 ///this class is module major. Every other thread should derive this class
 class smModule: public smCoreClass
@@ -50,29 +52,17 @@ protected:
     smBool terminationCompleted;
 
     ///scene list in the environment
-    std::vector<smScene*>sceneList;
+    std::vector<std::shared_ptr<smScene>> sceneList;
     /// \brief call are made for begin module and end module before and after each frame
     virtual void beginModule();
     virtual void   endModule();
     /// \brief  dispatcher reference
-    smDispatcher *dispathcer;
-    /// \brief  event dispatcher reference
-    smEventDispatcher *eventDispatcher;
+    std::shared_ptr<smDispatcher> dispathcer;
 
 public:
     /// \brief  constructor initializes the module
-    smModule()
-    {
-        terminateExecution = false;
-        eventDispatcher = NULL;
-        isInitialized = false;
-        name = "Module";
-    }
+    smModule();
 
-    void list()
-    {
-
-    }
     /// \brief virtual functions
     virtual void init() = 0;
     virtual void beginFrame() = 0;
@@ -86,9 +76,6 @@ public:
 
     /// \brief  wait for termination
     void waitTermination();
-
-    /// \brief set the event dispatcher
-    void setEventDispatcher(smEventDispatcher *p_dispathcer);
 
     /// \brief  get module id
     smInt getModuleId();

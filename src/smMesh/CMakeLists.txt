@@ -6,6 +6,7 @@ simmedtk_add_library(smMesh
     smSurfaceMesh.cpp
     smVolumeMesh.cpp
     smLattice.cpp
+    smPhysXVolumeMesh.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smMesh/smImportExport.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smMesh.h

@@ -26,12 +26,12 @@
 #include "smCore/smSDK.h"
 
 smSceneTextureShader::smSceneTextureShader(const smString &p_verteShaderFileName, const smString &p_fragmentFileName)
+: smShader(smSDK::getInstance()->getErrorLog())
 {
-
-    this->log = smSDK::getErrorLog();
+    this->log = smSDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
-    setShaderFileName(p_verteShaderFileName, NULL, p_fragmentFileName);
+    setShaderFileName(p_verteShaderFileName, "", p_fragmentFileName);
     createParam("depthTex");
     createParam("sceneTex");
     createParam("prevTex");
@@ -40,19 +40,18 @@ smSceneTextureShader::smSceneTextureShader(const smString &p_verteShaderFileName
     this->registerShader();
 }
 
-void smSceneTextureShader::predraw(smMesh */*p_mesh*/)
+void smSceneTextureShader::predraw(std::shared_ptr<smMesh>/*p_mesh*/)
 {
 
 }
 
-void smSceneTextureShader::handleEvent(smEvent */*p_event*/)
+void smSceneTextureShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/)
 {
 
 }
 
 void smSceneTextureShader::initDraw(const smDrawParam &p_param)
 {
-
     smShader::initDraw(p_param);
     this->depthTex = getFragmentShaderParam("depthTex");
     this->sceneTex = getFragmentShaderParam("sceneTex");
@@ -61,7 +60,6 @@ void smSceneTextureShader::initDraw(const smDrawParam &p_param)
 
 void smSceneTextureShader::draw(const smDrawParam &/*p_param*/)
 {
-
     glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
     glDisable(GL_LIGHTING);
     glEnable(GL_DEPTH_TEST);
@@ -76,13 +74,13 @@ void smSceneTextureShader::draw(const smDrawParam &/*p_param*/)
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
     glTexCoord2f(0, 0);
-    glVertex3f(-1, -1, 0);
+    glVertex3d(-1, -1, 0);
     glTexCoord2f(1, 0);
-    glVertex3f(1, -1, 0);
+    glVertex3d(1, -1, 0);
     glTexCoord2f(1, 1);
-    glVertex3f(1, 1.0, 0);
+    glVertex3d(1, 1.0, 0);
     glTexCoord2f(0, 1);
-    glVertex3f(-1, 1.0, 0);
+    glVertex3d(-1, 1.0, 0);
     glEnd();
     glPopAttrib();
 }

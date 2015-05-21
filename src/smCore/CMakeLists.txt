@@ -4,9 +4,6 @@ simmedtk_add_library(smCore
     smCoreClass.cpp
     smDispatcher.cpp
     smErrorLog.cpp
-    smEvent.cpp
-    smEventData.cpp
-    smEventHandler.cpp
     smGeometry.cpp
     smModule.cpp
     smObjectSimulator.cpp
@@ -18,6 +15,7 @@ simmedtk_add_library(smCore
     smStaticSceneObject.cpp
     smTextureManager.cpp
     smDoubleBuffer.cpp
+    smUnifiedId.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCore/smConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h

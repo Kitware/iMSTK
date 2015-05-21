@@ -21,120 +21,125 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-// SimMedTK includes
 #include "smUtilities/smMotionTransformer.h"
+
+// SimMedTK includes
+#include "smEvent/smEvent.h"
+#include "smEvent/smEventHandler.h"
+#include "smEvent/smCameraEvent.h"
+#include "smEvent/smHapticEvent.h"
+#include "smEvent/smLightMotionEvent.h"
+#include "smUtilities/smMatrix.h"
 
 smHapticTrans::smHapticTrans()
 {
-    newEvent = new smEvent();
-    defaultDirection << 0, 0, -1;
-    defaultUpDirection << 0, 1.0, 0;
-    dispatch = smSDK::getInstance()->getEventDispatcher();
+    defaultDirection = -smVec3d::UnitZ();
+    defaultUpDirection = smVec3d::UnitY();
     motionScale = 1.0;
-    enabled = true;
+    this->listening = true;
 }
-void smHapticTrans::setDeviceIdToListen(smInt p_id)
+
+void smHapticTrans::setDeviceIdToListen(const size_t &p_id)
 {
     deviceId = p_id;
 }
-void smHapticTrans::setMotionScale(smFloat p_scale)
+
+void smHapticTrans::setMotionScale(const float &p_scale)
 {
     motionScale = p_scale;
 }
-void smHapticTrans::computeTransformation(smMatrix44f& p_mat)
+
+const size_t &smHapticTrans::getDeviceId()
 {
-    static smMatrix33f mat;
-    mat = p_mat.block<3,3>(0,0);
-    transFormedDirection = (mat * defaultDirection);
-    transFormedUpDirection = (mat * defaultUpDirection);
+    return deviceId;
 }
-void smHapticTrans::sendEvent()
+void smHapticTrans::setDeviceId(const size_t &id)
 {
-    dispatch->sendStreamEvent(newEvent);
+    deviceId = id;
 }
-smHapticCameraTrans::smHapticCameraTrans(smInt p_deviceID)
+
+std::shared_ptr< smtk::Event::smEventHandler > smHapticTrans::getEventHandler()
 {
-    deviceId = p_deviceID;
-    newEvent->data = new smCameraEventData();
-    newEvent->eventType = SIMMEDTK_EVENTTYPE_CAMERA_UPDATE;
-    dispatch->registerEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
+    return eventHandler;
+}
+void smHapticTrans::setEventHandler(std::shared_ptr< smtk::Event::smEventHandler > cameraEventHandler)
+{
+    eventHandler = cameraEventHandler;
+}
+smHapticCameraTrans::smHapticCameraTrans(const size_t &p_deviceID)
+{
+    this->deviceId = p_deviceID;
+
     offsetAngle_RightDirection = 0;
     offsetAngle_UpDirection = 0;
+
+    // TODO: Detach any events previously attached
+
+    // Update event event handler
+    eventHandler->attachEvent(smtk::Event::EventType::CameraUpdate,shared_from_this());
 }
-void smHapticCameraTrans::handleEvent(smEvent* p_event)
+
+void smHapticCameraTrans::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-    smHapticOutEventData *hapticEventData;
-    smVec3f rightVector;
-
-    switch (p_event->eventType.eventTypeCode)
+    if(!this->isListening())
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        if (!enabled)
-        {
-            return;
-        }
+        return;
+    }
 
-        hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == deviceId)
+    {
+        auto cameraEvent = std::make_shared<smtk::Event::smCameraEvent>();
+        cameraEvent->setPosition(motionScale*hapticEvent->getPosition());
 
-        smCameraEventData* cameraEvent = reinterpret_cast<smCameraEventData*>(newEvent->data);
-        if (hapticEventData->deviceId == deviceId)
-        {
-            cameraEvent->pos = hapticEventData->position * motionScale;
-            computeTransformation(hapticEventData->transform);
+        smMatrix33d transformMatrix = hapticEvent->getTransform().block<3,3>(0,0);
 
-            cameraEvent->direction = transFormedDirection;
-            cameraEvent->upDirection = transFormedUpDirection;
-            rightVector = transFormedDirection.cross(transFormedUpDirection);
-            rightVector.normalize();
+        cameraEvent->setDirection(transformMatrix*this->defaultDirection);
+        cameraEvent->setUpDirection(transformMatrix*this->defaultUpDirection);
 
-            quat = getRotationQuaternion(float(SM_DEGREES2RADIANS(offsetAngle_RightDirection)), rightVector);
+        auto rotationAxis = cameraEvent->getDirection().cross(
+                cameraEvent->getUpDirection()).normalized();
 
-            cameraEvent->direction = quat*cameraEvent->direction;
-            cameraEvent->upDirection = quat*cameraEvent->upDirection;
-            sendEvent();
-        }
+        auto quat = getRotationQuaternion(offsetAngle_RightDirection,rotationAxis);
 
-        break;
+        cameraEvent->applyRotation(quat);
+
+        this->eventHandler->triggerEvent(cameraEvent);
     }
 }
-void smHapticLightTrans::setLightIndex(smInt p_lightIndex)
+
+void smHapticLightTrans::setLightIndex(const size_t &p_lightIndex)
 {
     lightIndex = p_lightIndex;
 }
-smHapticLightTrans::smHapticLightTrans(smInt p_id)
+
+smHapticLightTrans::smHapticLightTrans(const size_t &p_id)
 {
-    deviceId = p_id;
+    this->deviceId = p_id;
+
     lightIndex = 0;
-    newEvent->data = new smLightMotionEventData();
-    newEvent->eventType = SIMMEDTK_EVENTTYPE_LIGHTPOS_UPDATE;
-    dispatch->registerEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
+
+    eventHandler->attachEvent(smtk::Event::EventType::LightMotion,shared_from_this());
 }
-void smHapticLightTrans::handleEvent(smEvent* p_event)
+
+void smHapticLightTrans::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-    smHapticOutEventData *hapticEventData;
-
-    switch (p_event->eventType.eventTypeCode)
+    if(!this->isListening())
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        if (!enabled)
-        {
-            return;
-        }
+        return;
+    }
 
-        hapticEventData = reinterpret_cast<smHapticOutEventData *>(p_event->data);
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == deviceId)
+    {
+        auto motionEvent = std::make_shared<smtk::Event::smLightMotionEvent>(lightIndex);
+        motionEvent->setPosition(motionScale*hapticEvent->getPosition());
 
-        smLightMotionEventData *motionEvent = reinterpret_cast<smLightMotionEventData*>(newEvent->data);
-        if (hapticEventData->deviceId == deviceId)
-        {
-            motionEvent->lightIndex = lightIndex;
-            motionEvent->pos = hapticEventData->position * motionScale;
-            computeTransformation(hapticEventData->transform);
-            motionEvent->direction = transFormedDirection;
+        auto transformMatrix = hapticEvent->getTransform().block<3,3>(0,0);
 
-            sendEvent();
+        motionEvent->setDirection(transformMatrix*this->defaultDirection);
 
-        }
-
-        break;
+        this->eventHandler->triggerEvent(motionEvent);
     }
 }
+

@@ -38,10 +38,10 @@ public:
     virtual ~vegaFemExample(){}
     void simulateMain(smSimulationMainParam /*p_param*/) { };
 private:
-    smSDK *sofmisSDK;
+    std::unique_ptr<smSDK> sdk;
     smVegaFemSceneObject *femobj;
     smVegaFemSimulator *femSim;
-    smMatrix33f mat;
+    smMatrix33d mat;
     smSimulator *simulator;
     smViewer viewer;
     smScene *scene1;

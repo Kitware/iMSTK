@@ -29,6 +29,7 @@
 
 // Eigen includes
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 
 // namespace SimMedTK
 // {

@@ -38,32 +38,32 @@ smOctreeCell::~smOctreeCell()
 
 }
 
-smVec3f &smOctreeCell::getCenter()
+smVec3d &smOctreeCell::getCenter()
 {
     return  cube.center;
 }
 
-const smVec3f &smOctreeCell::getCenter() const
+const smVec3d &smOctreeCell::getCenter() const
 {
     return  cube.center;
 }
 
-void smOctreeCell::setCenter( const smVec3f &center )
+void smOctreeCell::setCenter( const smVec3d &center )
 {
     cube.center = center;
 }
 
-float &smOctreeCell::getLength()
+double &smOctreeCell::getLength()
 {
     return cube.sideLength;
 }
 
-const float &smOctreeCell::getLength() const
+const double &smOctreeCell::getLength() const
 {
     return cube.sideLength;
 }
 
-void smOctreeCell::setLength( const float length )
+void smOctreeCell::setLength( const double length )
 {
     cube.sideLength = length;
 }
@@ -73,12 +73,12 @@ void smOctreeCell::copyShape( const smOctreeCell &cell )
     cube = cell.cube;
 }
 
-void smOctreeCell::expand( const float expandScale )
+void smOctreeCell::expand( const double expandScale )
 {
     cube.expand( expandScale );
 }
 
-bool smOctreeCell::isCollidedWithTri( smVec3f &v0, smVec3f &v1, smVec3f &v2 )
+bool smOctreeCell::isCollidedWithTri( smVec3d &v0, smVec3d &v1, smVec3d &v2 )
 {
     smAABB tempAABB;
     tempAABB.aabbMin = cube.leftMinCorner();
@@ -92,16 +92,17 @@ bool smOctreeCell::isCollidedWithPoint()
     return 0;
 }
 
-void smOctreeCell::subDivide( const int divisionPerAxis, std::vector<smOctreeCell> &cells )
+void smOctreeCell::subDivide( const int divisionPerAxis,
+                              std::array<smOctreeCell, smOctreeCell::numberOfSubdivisions> &cells )
 {
     size_t totalCubes = divisionPerAxis * divisionPerAxis * divisionPerAxis;
 
     assert( cells.size() == totalCubes );
 
-    std::vector<smCube> cubes( totalCubes );
+    std::vector<smCube> cubes( smOctreeCell::numberOfSubdivisions );
     cube.subDivide( divisionPerAxis, cubes.data() );
 
-    for ( size_t i = 0; i < totalCubes; i++ )
+    for ( size_t i = 0; i < smOctreeCell::numberOfSubdivisions; i++ )
     {
         cells[i].cube = cubes[i];
     }

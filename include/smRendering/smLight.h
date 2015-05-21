@@ -52,10 +52,20 @@ enum smLightLocationType
 struct smLightPos
 {
 public:
-    smVec3f pos;
     smLightPos(smFloat p_x = 0.0, smFloat p_y = 0.0, smFloat p_z = 0.0, smFloat p_w = 1.0);
+    void setPosition(const smVec3d &p)
+    {
+        position = p;
+    }
 
+    const smVec3d &getPosition() const
+    {
+        return position;
+    }
+
+private:
     smFloat w;
+    smVec3d position;
     friend smLight;
 };
 
@@ -100,24 +110,24 @@ public:
     smColor lightColorSpecular;
 
     smLightPos  lightPos;
-    //smVec3f direction;
+    //smVec3d direction;
     //between 0-1.0
     /// \brief  higher spot exponents result in a more focused light source,
-    //regardless of the spot cutoff angle. default is zeron
+    //regardless of the spot cutoff angle. default is zero
     smFloat spotExp;
     ///angle between 0-90 and 180 is also accepted
     smFloat spotCutOffAngle;
     /// \brief light direction, up vector, transverse direction, focus point
-    smVec3f direction;
-    smVec3f upVector;
-    smVec3f transverseDir;
-    smVec3f focusPosition;//it is for shadow
+    smVec3d direction;
+    smVec3d upVector;
+    smVec3d transverseDir;
+    smVec3d focusPosition;//it is for shadow
     /// \brief update light direction
     void updateDirection();
     /// \brief  default direction for light, upvector and transverse direction
-    static smVec3f defaultDir;
-    static smVec3f defaultUpDir;
-    static smVec3f defaultTransDir;
+    static smVec3d defaultDir;
+    static smVec3d defaultUpDir;
+    static smVec3d defaultTransDir;
 
     /// \brief if the light casts shadow, this should be enabled. Unfortunately, we only support one light at a time for shadows
     smBool castShadow;
@@ -126,6 +136,24 @@ public:
     smFloat shadowFarView;
     smFloat shadowRatio;
     smFloat shadorAngle;
+
+    static std::shared_ptr<smLight> getDefaultLighting(const std::string &name = "SceneLight")
+    {
+        std::shared_ptr<smLight>
+        light = std::make_shared<smLight>(name,SIMMEDTK_LIGHT_SPOTLIGHT,SIMMEDTK_LIGHTPOS_WORLD);
+        light->lightPos.setPosition(smVec3d(10.0, 10.0, 10.0));
+        light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
+        light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
+        light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
+        light->spotCutOffAngle = 60;
+        light->direction = smVec3d(0.0, 0.0, -1.0);
+        light->drawEnabled = false;
+        light->attn_constant = 1.0;
+        light->attn_linear = 0.0;
+        light->attn_quadratic = 0.0;
+        light->activate(true);
+        return light;
+    }
 };
 
 #endif

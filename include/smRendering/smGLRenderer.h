@@ -24,6 +24,9 @@
 #ifndef SMGLRENDERER_H
 #define SMGLRENDERER_H
 
+// STL includes
+#include <memory>
+
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
@@ -43,34 +46,46 @@ class smGLRenderer: public smCoreClass
 public:
     /// \brief constructor
     smGLRenderer();
+
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(smMesh *p_surfaceMesh, smRenderDetail *renderDetail, smDrawParam p_drawParam);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail, const smDrawParam &p_drawParam);
+
     /// \brief  draw normals
-    static void drawNormals(smMesh *p_mesh, smColor p_color = smColor::colorBlue);
+    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue);
+
     /// \brief  draw line mesh
-    static void drawLineMesh(smLineMesh *p_lineMesh, smRenderDetail *renderDetail);
+    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
+
     /// \brief draw coordinate system
-    static void drawCoordSystem(smViewer *viewer, smString p_name, smVec3f p_pos, smVec3f dirX, smVec3f dirY, smVec3f dirZ);
+    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
+
     /// \brief begin rendering triangle
     static void beginTriangles();
+
     /// \brief draw triangle
-    static void drawTriangle(smVec3f &p_1, smVec3f &p_2, smVec3f &p_3);
+    static void drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3);
+
     /// \brief end triangle rendering
     static void endTriangles();
+
     /// \brief draw AABB
     static void draw(smAABB &aabb, smColor p_color = smColor(1.0, 1.0, 1.0));
+
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
+
     /// \brief draw function is called for visualization the object
     virtual void draw(const smDrawParam &/*p_params*/){}
+
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();
-    /// \brief Renders a smScene's objects
+
+    /// \brief Renders an smScene's objects
     ///
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
-    static void renderScene(smScene* p_scene,
+    static void renderScene(std::shared_ptr<smScene> p_scene,
                             smDrawParam p_param);
     /// \brief Renders a smScene's objects
     ///
@@ -79,15 +94,16 @@ public:
     /// \param p_param The drawing parameters
     /// \param p_proj A custom projection matrix to use instead of that provided with the scene
     /// \param p_view A custom view matrix to use instead of that provided with the scene
-    static void renderScene(smScene* p_scene,
+    static void renderScene(std::shared_ptr<smScene> p_scene,
                             smDrawParam p_param,
                             const smMatrix44f &p_proj,
                             const smMatrix44f &p_view);
+
     /// \brief Renders a single smSceneObject
     ///
     /// \param p_sceneObject The scene object to render
     /// \param p_param The drawing parameters
-    static void renderSceneObject(smSceneObject* p_sceneObject, smDrawParam p_param);
+    static void renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject, const smDrawParam &p_param);
 };
 
 #endif

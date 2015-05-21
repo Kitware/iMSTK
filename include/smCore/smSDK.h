@@ -29,12 +29,11 @@
 #include "smCore/smCoreClass.h"
 #include "smCore/smScene.h"
 #include "smRendering/smViewer.h"
-#include "smCore/smDispatcher.h"
 #include "smCore/smSimulator.h"
 #include "smCore/smTextureManager.h"
-#include "smCore/smEventHandler.h"
 #include "smCore/smModule.h"
 #include "smUtilities/smDataStructures.h"
+#include "smUtilities/smMakeUnique.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
@@ -66,7 +65,7 @@ struct smMeshHolder: public smBaseHolder
         mesh = NULL;
     }
 
-    smBaseMesh* mesh;
+    std::shared_ptr<smBaseMesh> mesh;
 
     inline smBool operator ==(smMeshHolder &p_param)
     {
@@ -82,7 +81,7 @@ struct smModuleHolder: public smBaseHolder
         module = NULL;
     }
 
-    smModule* module;
+    std::shared_ptr<smModule> module;
 
     inline smBool operator ==(smModuleHolder &p_param)
     {
@@ -98,7 +97,7 @@ struct smObjectSimulatorHolder: public smBaseHolder
         objectSim = NULL;
     }
 
-    smObjectSimulator* objectSim;
+    std::shared_ptr<smObjectSimulator> objectSim;
 
     inline smBool operator ==(smObjectSimulatorHolder &p_param)
     {
@@ -113,7 +112,7 @@ struct smSceneHolder: public smBaseHolder
         scene = NULL;
     }
 
-    smScene* scene;
+    std::shared_ptr<smScene> scene;
     inline smBool operator ==(smSceneHolder &p_param)
     {
         return scene == p_param.scene;
@@ -129,7 +128,7 @@ struct smSceneObjectHolder: public smBaseHolder
         sceneObject = NULL;
     }
 
-    smSceneObject* sceneObject;
+    std::shared_ptr<smSceneObject> sceneObject;
     inline smBool operator ==(smSceneObjectHolder &p_param)
     {
         return sceneObject == p_param.sceneObject;
@@ -161,26 +160,20 @@ struct smPipeHolder: public smBaseHolder
 /// \brief SDK class. it is a singlenton class for each machine runs the framework
 class smSDK: public smCoreClass
 {
+private:
+    static std::once_flag sdkCallOnceFlag;
 
-protected:
     bool shutdown; ///< Tells the SDK to terminate
     smInt sceneIdCounter; ///< this id is incremented when a scene is created
-    smViewer *viewer; ///< Reference to the sdk viewer object
-    smSimulator *simulator; ///< Reference to the sdk simulator object
-    std::vector<smScene*> sceneList; ///< scene list
-    static smErrorLog *errorLog; ///< error log
-    smDispatcher *dispathcer; ///< dispatcher
-    smEventDispatcher *eventDispatcher; ///< event dispatcher
     smInt argc;
     smChar argv;
     smBool isModulesStarted;
-    /// \brief update scene list. not implemented
-    void updateSceneListAll();
-    /// \brief init registered modules
-    void initRegisteredModules();
-    /// \brief run the registered modules
-    void runRegisteredModules();
-    static smSDK sdk; ///< singleton sdk.
+
+    std::shared_ptr<smErrorLog> errorLog; ///< error log
+    std::shared_ptr<smViewer> viewer; ///< Reference to the sdk viewer object
+    std::shared_ptr<smSimulator> simulator; ///< Reference to the sdk simulator object
+    std::vector<std::shared_ptr<smScene>> sceneList; ///< scene list
+
     ///holds the references to the entities in the framework
     static smIndiceArray<smMeshHolder> *meshesRef;
     static smIndiceArray<smModuleHolder> *modulesRef;
@@ -192,8 +185,7 @@ protected:
     static smIndiceArray<smPipeHolder>* pipesRef;
 
     std::vector<std::thread> modules; ///< Stores a list of running module threads
-    /// \brief destructor
-    ~smSDK();
+
     /// \brief constructor
     smSDK()
     {
@@ -201,14 +193,13 @@ protected:
         sceneIdCounter = 1;
         isModulesStarted = false;
         type = SIMMEDTK_SMSDK;
-        viewer = NULL;
-        simulator = NULL;
+        viewer = nullptr;
+        simulator = nullptr;
         sceneList.clear();
 
-        errorLog = new smErrorLog();
-        dispathcer = new smDispatcher();
-        eventDispatcher = new smEventDispatcher();
+        errorLog = std::make_shared<smErrorLog>();
 
+        // TODO: Fix these! Leaking...
         meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
         modulesRef = new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
         objectSimulatorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
@@ -219,177 +210,126 @@ protected:
     }
 
 public:
+    /// \brief destructor
+    ~smSDK();
+
+    /// \brief update scene list. not implemented
+    void updateSceneListAll();
+
+    /// \brief init registered modules
+    void initRegisteredModules();
+
+    /// \brief run the registered modules
+    void runRegisteredModules();
+
     ///shutdowns all the modules
     void shutDown();
 
     ///for now both functions below are the same. But it maybe subject to change.
-    static smSDK * createSDK()
-    {
-        return &sdk;
-    }
+    static std::shared_ptr<smSDK> createSDK();
 
-    static smSDK *getInstance()
-    {
-        return &sdk;
-    }
+    static std::shared_ptr<smSDK> getInstance();
 
     /// \brief Registers a viewer object with the SDK
     ///
-    void addViewer(smViewer* p_viewer);
+    void addViewer(std::shared_ptr<smViewer> p_viewer);
 
     ///SDK returns a pointer to the viewer
-    smViewer *getViewerInstance();
+    std::shared_ptr<smViewer> getViewerInstance();
 
     ///SDK creates simualtor
-    smSimulator *createSimulator();
+    std::shared_ptr<smSimulator> createSimulator();
+
+    ///SDK creates simualtor
+    std::shared_ptr<smSimulator> getSimulator()
+    {
+        return this->simulator;
+    }
 
     ///SDK creates scene
-    smScene *createScene();
+    std::shared_ptr<smScene> createScene();
 
     ///SDK returns logger for the system
-    static smErrorLog *getErrorLog()
+    std::shared_ptr<smErrorLog> getErrorLog()
     {
         return errorLog;
     };
 
-
-    ///SDK returns the event dispather
-    inline smEventDispatcher *getEventDispatcher()
-    {
-        return eventDispatcher;
-    }
-
     ///terminates every module. Do it later on with smMessager
-    void terminateAll()
-    {
-
-        for (smInt i = 0; i < (*modulesRef).size(); i++)
-        {
-            (*modulesRef)[i].module->terminateExecution = true;
-        }
-
-        for (smInt i = 0; i < (*modulesRef).size(); i++)
-        {
-            smBool moduleTerminated = false;
-
-            while (true && !moduleTerminated)
-            {
-                if ((*modulesRef)[i].module->isTerminationDone())
-                {
-                    moduleTerminated = true;
-                }
-            }
-        }
-    }
+    void terminateAll();
 
     ///release the scene from the SDK..not implemented yet
-    void releaseScene(smScene*);
+    void releaseScene(std::shared_ptr<smScene> scene);
+
     /// \brief run the SDK
     void run();
+
     /// \brief add reference to a core class
-    static void addRef(smCoreClass* p_coreClass);
+    void addRef(std::shared_ptr<smCoreClass> p_coreClass);
+
     /// \brief removes reference on core class
-    static void removeRef(smCoreClass* p_coreClass);
+    void removeRef(std::shared_ptr<smCoreClass> p_coreClass);
 
     /// \brief register functions
-    static smInt registerMesh(smBaseMesh*p_mesh)
+    smInt registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
     {
         smMeshHolder mh;
         mh.mesh = p_mesh;
-        return (p_mesh->uniqueId.sdkID = meshesRef->checkAndAdd(mh));
+        return meshesRef->checkAndAdd(mh);
     }
 
-    static smInt registerModule(smModule *p_mod)
+    smInt registerModule(std::shared_ptr<smModule> p_mod)
     {
         smModuleHolder mh;
         mh.module = p_mod;
-        return (p_mod->uniqueId.sdkID = modulesRef->checkAndAdd(mh));
+        return modulesRef->checkAndAdd(mh);
     }
 
-    static void registerObjectSim(smObjectSimulator*p_os)
+    void registerObjectSim(std::shared_ptr<smObjectSimulator> p_os)
     {
         smObjectSimulatorHolder os;
         os.objectSim = p_os;
-        p_os->uniqueId.sdkID = objectSimulatorsRef->checkAndAdd(os);
+        objectSimulatorsRef->checkAndAdd(os);
     }
 
-    static void registerCollDet(smObjectSimulator*p_col)
+    void registerCollDet(std::shared_ptr<smObjectSimulator> p_col)
     {
         smObjectSimulatorHolder col;
         col.objectSim = p_col;
-        p_col->uniqueId.sdkID = collisionDetectorsRef->checkAndAdd(col);
-
+        collisionDetectorsRef->checkAndAdd(col);
     }
 
-    static void registerScene(smScene *p_sc)
+    void registerScene(std::shared_ptr<smScene> p_sc)
     {
         smSceneHolder sc;
         sc.scene = p_sc;
-        p_sc->uniqueId.sdkID = scenesRef->checkAndAdd(sc);
+        scenesRef->checkAndAdd(sc);
     }
 
-    static smBool unRegisterScene(smScene *p_sc)
-    {
-        return scenesRef->remove(p_sc->uniqueId.sdkID);
-    }
-
-    static void registerSceneObject(smSceneObject*p_sco)
+    void registerSceneObject(std::shared_ptr<smSceneObject> p_sco)
     {
         smSceneObjectHolder  sh;
         sh.sceneObject = p_sco;
-        p_sco->uniqueId.sdkID = sceneObjectsRef->checkAndAdd(sh);
+        sceneObjectsRef->checkAndAdd(sh);
     }
-
 
     /// \brief getter functions
-    inline static smBaseMesh* getMesh(smUnifiedID &p_unifiedID)
-    {
-        return (meshesRef->getByRef(p_unifiedID.sdkID).mesh);
-    }
 
-    inline static smModule* getModule(smUnifiedID &p_unifiedID)
-    {
-        return (modulesRef->getByRef(p_unifiedID.sdkID).module);
-    }
-
-    inline static smObjectSimulator* getObjectSim(smUnifiedID &p_unifiedID)
-    {
-        return (objectSimulatorsRef->getByRef(p_unifiedID.sdkID).objectSim);
-    }
-
-    inline static smObjectSimulator* getCollDet(smUnifiedID &p_unifiedID)
-    {
-        return (collisionDetectorsRef->getByRef(p_unifiedID.sdkID).objectSim);
-    }
-
-    inline static smScene* getScene(smUnifiedID &p_unifiedID)
-    {
-        return (scenesRef->getByRef(p_unifiedID.sdkID).scene);
-    }
-
-    inline static smSceneObject* getSceneObject(smUnifiedID &p_unifiedID)
-    {
-        return (sceneObjectsRef->getByRef(p_unifiedID.sdkID).sceneObject);
-    }
-
-    inline static smPipe* getPipe(smUnifiedID &p_unifiedID)
-    {
-        return (pipesRef->getByRef(p_unifiedID.sdkID).pipe);
-    }
-
-    inline static smPipe* getPipeByName(smString p_name)
+    smPipe* getPipeByName(smString p_name)
     {
         return (pipesRef->getByRef(p_name).pipe);
     }
+
     /// \brief register pipe
-    static void registerPipe(smPipe*p_pipe)
+    void registerPipe(smPipe*p_pipe)
     {
         smPipeHolder ph;
         ph.pipe = p_pipe;
-        p_pipe->uniqueId.sdkID = pipesRef->checkAndAdd(ph);
+        pipesRef->checkAndAdd(ph);
     }
+
     /// \brief create a pipe
-    inline static smPipe *createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
+    smPipe *createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
     {
         smPipe *pipe;
         pipe = new smPipe(p_pipeName, p_elementSize, p_size);

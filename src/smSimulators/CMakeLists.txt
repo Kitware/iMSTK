@@ -1,18 +1,17 @@
 
 simmedtk_add_library(smSimulators
   SOURCES
-#     smDummySimulator.cpp
+    smDummySimulator.cpp
     smFemSceneObject.cpp
     smFemSimulator.cpp
     smMyStylus.cpp
-    smPBDObjectSimulator.cpp
-    smPBDSceneObject.cpp
-    smPhysXVolumeMesh.cpp
+#     smPBDObjectSimulator.cpp
+#     smPBDSceneObject.cpp
     smStylusObject.cpp
     smToolSimulator.cpp
-    smVegaConfigFemObject.cpp
-    smVegaFemSceneObject.cpp
-    smVegaFemSimulator.cpp
+#     smVegaConfigFemObject.cpp
+#     smVegaFemSceneObject.cpp
+#     smVegaFemSimulator.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h

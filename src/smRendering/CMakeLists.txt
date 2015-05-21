@@ -25,6 +25,7 @@ target_link_libraries(smRendering
     smExternal
     smUtilities
     smShader
+    smEvent
  PUBLIC
     sfml::window
     sfml::system

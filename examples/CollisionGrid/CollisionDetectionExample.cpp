@@ -83,10 +83,10 @@ CollisionDetectionExample::CollisionDetectionExample()
 
     ///texture attachment needed for fixed opengl rendering if texture is needed
     object1->mesh->assignTexture("livertexture1");
-    object1->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    object1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
     object1->mesh->translate(7, 0, 0);
-    object1->renderDetail.lineSize = 2;
-    object1->renderDetail.pointSize = 5;
+    object1getRenderDetail()->lineSize = 2;
+    object1getRenderDetail()->pointSize = 5;
 
     ///add object1 to lattice
     lat->addObject(object1);
@@ -97,11 +97,11 @@ CollisionDetectionExample::CollisionDetectionExample()
     ///the similiar routines for object2
     object2 = new smStaticSceneObject();
     object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    object2->mesh->translate(smVec3f(2, 0, 0));
+    object2->mesh->translate(smVec3d(2, 0, 0));
 
     object2->mesh->assignTexture("livertexture2");
-    object2->renderDetail.shadowColor.rgba[0] = 1.0;
-    object2->renderDetail.renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
+    object2getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    object2getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
 
     lat2->addObject(object2);
     spatGrid->addLattice(lat2);
@@ -180,13 +180,13 @@ void CollisionDetectionExample::draw(const smDrawParam &p_params)
 
             for (smInt i = 0; i < myCollInformation.data.nbrElements; i++)
             {
-                glVertex3fv((GLfloat*)&tris[i].tri1.vert[0]);
-                glVertex3fv((GLfloat*)&tris[i].tri1.vert[1]);
-                glVertex3fv((GLfloat*)&tris[i].tri1.vert[2]);
+                glVertex3dv((GLfloat*)&tris[i].tri1.vert[0]);
+                glVertex3dv((GLfloat*)&tris[i].tri1.vert[1]);
+                glVertex3dv((GLfloat*)&tris[i].tri1.vert[2]);
 
-                glVertex3fv((GLfloat*)&tris[i].tri2.vert[0]);
-                glVertex3fv((GLfloat*)&tris[i].tri2.vert[1]);
-                glVertex3fv((GLfloat*)&tris[i].tri2.vert[2]);
+                glVertex3dv((GLfloat*)&tris[i].tri2.vert[0]);
+                glVertex3dv((GLfloat*)&tris[i].tri2.vert[1]);
+                glVertex3dv((GLfloat*)&tris[i].tri2.vert[2]);
             }
 
             glEnd();

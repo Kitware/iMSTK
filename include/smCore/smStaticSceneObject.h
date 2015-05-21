@@ -30,30 +30,47 @@
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smCoreClass.h"
 
+namespace smtk{
+namespace Event{
+    class smEvent;
+}
+}
+
 /// \brief static scene object
 class smStaticSceneObject: public smSceneObject
 {
 public:
-    /// \brief static scene object contains a mesh
-    smSurfaceMesh *mesh;
+
     /// \brief constructor receives the error log
-    smStaticSceneObject(smErrorLog *p_log = NULL);
+    smStaticSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
     ~smStaticSceneObject();
 
     //not implemented yet..tansel
-    virtual void serialize(void *p_memoryBlock);
+    virtual void serialize(void *p_memoryBlock) override;
 
     //not implemented yet..tansel
-    virtual void unSerialize(void *p_memoryBlock);
+    virtual void unSerialize(void *p_memoryBlock) override;
 
     ///not implemented yet.
-    virtual smSceneObject *clone();
+    virtual std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief Initialization routine
-    virtual void init();
+    virtual void init() override;
 
     /// \brief called if the object is added to the viewer.
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw(const smDrawParam &p_params) override;
+
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
+
+    void setMesh(std::shared_ptr<smMesh> surfaceMesh)
+    {
+        mesh = std::static_pointer_cast<smSurfaceMesh>(surfaceMesh);
+        mesh->meshType = SMMESH_RIGID;
+    }
+
+public:
+    /// \brief static scene object contains a mesh
+    std::shared_ptr<smSurfaceMesh> mesh;
 };
 
 #endif

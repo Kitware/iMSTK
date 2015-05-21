@@ -54,7 +54,7 @@ public:
     virtual void simulateMain(smSimulationMainParam p_param)
     {
     }
-    void draw(const smDrawParam &p_params);
+    void draw(const smDrawParam &p_params) override;
     ~AlphaMapExample();
 };
 

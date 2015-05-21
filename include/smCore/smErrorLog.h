@@ -39,7 +39,7 @@
 /// \brief This is class is for error logging of the whole SimMedTK system.
 /// All errors should be reported to the instance of this class.
 /// Functions are thread-safe unless indicated.
-class smErrorLog: smCoreClass
+class smErrorLog : public smCoreClass
 {
 
 private:

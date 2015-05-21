@@ -27,35 +27,32 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smEventHandler.h"
-#include "smCore/smEventData.h"
 #include "smSimulators/smStylusObject.h"
+#include "smCore/smErrorLog.h"
 
 
 /// \brief Example tool simulator
-class smToolSimulator: public smObjectSimulator, public smEventHandler
+class smToolSimulator: public smObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smToolSimulator(smErrorLog *p_errorLog);
+    smToolSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
-protected:
     /// \brief update everything related to tool
-    void updateTool(smStylusRigidSceneObject *p_tool);
+    void updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool);
 
     /// \brief !!
-    virtual void initCustom();
+    virtual void initCustom() override;
 
     /// \brief run the tool simulator in a loop here
-    virtual void run();
+    virtual void run() override;
 
     /// \brief synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers();
+    void syncBuffers() override;
 
     /// \brief handle the events such as button presses related to tool
-    void handleEvent(smEvent *p_event);
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 };
 
 #endif

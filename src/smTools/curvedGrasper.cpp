@@ -27,17 +27,19 @@
 // SimMedTK includes
 #include "smTools/curvedGrasper.h"
 #include "smCore/smSDK.h"
+#include "smEvent/smHapticEvent.h"
+#include "smEvent/smKeyboardEvent.h"
 
 void curvedGrasper::draw(const smDrawParam &p_params)
 {
     smStylusRigidSceneObject::draw(p_params);
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
     glPushMatrix();
-    glMultMatrixf(containerLower->currentMatrix.data());
+    glMultMatrixd(containerLower->currentMatrix.data());
     glPopMatrix();
 }
 
-curvedGrasper::curvedGrasper(smInt p_PhantomID,
+curvedGrasper::curvedGrasper(size_t p_PhantomID,
                              const smString& p_pivotModelFileName,
                              const smString& p_lowerModelFileName,
                              const smString& p_upperModelFileName)
@@ -47,29 +49,29 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID,
     maxangle = 10 * 3.14 / 360;
     this->phantomID = p_PhantomID;
 
-    smMatrix33f rot;
+    smMatrix33d rot;
     mesh_pivot = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_pivot->loadMesh(p_pivotModelFileName, SM_FILETYPE_3DS);
-    mesh_pivot->scale(smVec3f(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitX()).matrix();
+    mesh_pivot->scale(smVec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
     mesh_pivot->rotate(rot);
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
     mesh_pivot->rotate(rot);
 
     mesh_upperJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_upperJaw->loadMesh(p_upperModelFileName, SM_FILETYPE_3DS);
-    mesh_upperJaw->scale(smVec3f(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitY()).matrix();
+    mesh_upperJaw->scale(smVec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitY()).matrix();
     mesh_upperJaw->rotate(rot);
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
     mesh_upperJaw->rotate(rot);
 
     mesh_lowerJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_lowerJaw->loadMesh(p_lowerModelFileName, SM_FILETYPE_3DS);
-    mesh_lowerJaw->scale(smVec3f(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitY()).matrix();
+    mesh_lowerJaw->scale(smVec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitY()).matrix();
     mesh_lowerJaw->rotate(rot);
-    rot = Eigen::AngleAxisf(-SM_PI_HALF, smVec3f::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
     mesh_lowerJaw->rotate(rot);
 
     meshContainer_pivot.name = "curvedGrasperPivot";
@@ -90,51 +92,73 @@ curvedGrasper::curvedGrasper(smInt p_PhantomID,
     DAQdataID = 0;
 }
 
-void curvedGrasper::handleEvent(smEvent *p_event)
+void curvedGrasper::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
 {
-    smHapticOutEventData *hapticEventData;
-    smKeyboardEventData *keyBoardData;
-    smMatrix44f godPosMat;
-    smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
-    smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
-
-    switch (p_event->eventType.eventTypeCode)
+    if(!this->isListening())
     {
-    case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        hapticEventData = reinterpret_cast<smHapticOutEventData*>(p_event->data);
+        return;
+    }
 
-        if (hapticEventData->deviceId == this->phantomID)
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
+    {
+        smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
+        smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
+        smMatrix44d godPosMat = hapticEvent->getTransform();
+        transRot = godPosMat;
+        pos = hapticEvent->getPosition();
+        vel = hapticEvent->getVelocity();
+        buttonState[0] = hapticEvent->getButtonState(0);
+        buttonState[1] = hapticEvent->getButtonState(1);
+
+        if (buttonState[0])
         {
-            godPosMat = hapticEventData->transform;
-            transRot = godPosMat;
-            pos = hapticEventData->position;
-            vel = hapticEventData->velocity;
-            buttonState[0] = hapticEventData->buttonState[0];
-            buttonState[1] = hapticEventData->buttonState[1];
-            updateOpenClose();
-            //buttons
-            containerLower->offsetRotY =  angle / 360.0; //angle*maxangle;
-            containerUpper->offsetRotY =  -angle / 360.0; //-angle*maxangle;
+            angle -= 0.05;
+
+            if (angle < 0.0)
+            {
+                angle = 0.0;
+            }
         }
 
-        break;
-
-    case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        keyBoardData = reinterpret_cast<smKeyboardEventData*>(p_event->data);
-
-        if (keyBoardData->keyBoardKey == smKey::Num1)
+        if (buttonState[1])
         {
-            smSDK::getInstance()->getEventDispatcher()->disableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
-            this->renderDetail.renderType = this->renderDetail.renderType | SIMMEDTK_RENDER_NONE;
+            angle += 0.05;
+
+            if (angle > 30.0)
+            {
+                angle = 30.0;
+            }
         }
 
-        if (keyBoardData->keyBoardKey == smKey::Num2)
-        {
-            smSDK::getInstance()->getEventDispatcher()->enableEventHandler(this, SIMMEDTK_EVENTTYPE_HAPTICOUT);
-            this->renderDetail.renderType = this->renderDetail.renderType & (~SIMMEDTK_RENDER_NONE);
-        }
+        containerLower->offsetRotY =  angle / 360.0; //angle*maxangle;
+        containerUpper->offsetRotY =  -angle / 360.0; //-angle*maxangle;
+        return;
+    }
 
-        break;
+    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    if(keyboardEvent)
+    {
+        switch(keyboardEvent->getKeyPressed())
+        {
+            case smtk::Event::smKey::Num1:
+            {
+                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
+                & ( ~SIMMEDTK_RENDER_NONE );
+                break;
+            }
+
+            case smtk::Event::smKey::Num2:
+            {
+                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
+                | SIMMEDTK_RENDER_NONE;
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 

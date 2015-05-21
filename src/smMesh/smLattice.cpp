@@ -46,15 +46,15 @@ float smLattice::getZStep()
 {
     return zStep;
 }
-smVec3f smLattice::getLatticeCenter()
+smVec3d smLattice::getLatticeCenter()
 {
     return latticeCenter;
 }
-smVec3f smLattice::getLeftMinCorner()
+smVec3d smLattice::getLeftMinCorner()
 {
     return cells[0].cellLeftCorner;
 }
-smVec3f smLattice::getRightMaxCorner()
+smVec3d smLattice::getRightMaxCorner()
 {
     return cells[totalCells - 1].cellRightCorner;
 }
@@ -63,7 +63,7 @@ smLattice::~smLattice()
     delete[] cells;
     delete[] aabb;
 }
-smLatticeReturnType smLattice::init( smVec3f p_leftCorner, smVec3f p_rightCorner, int p_xSeperation, int p_ySeperation, int p_zSeperation )
+smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner, int p_xSeperation, int p_ySeperation, int p_zSeperation )
 {
 
     smInt x, y, z;
@@ -155,7 +155,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
     smInt maxY;
     smInt maxZ;
     smInt index;
-    smVec3f leftCorner = getLeftMinCorner();
+    smVec3d leftCorner = getLeftMinCorner();
 
     minX = ( aabb[p_primitiveIndex].aabbMin[0] - leftCorner[0] ) / xStep;
     minY = ( aabb[p_primitiveIndex].aabbMin[1] - leftCorner[1] ) / yStep;
@@ -185,7 +185,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
                 cells[index].lastPrimitiveIndex++;
             }
 }
-void smLattice::updateBounds( smSurfaceMesh *p_mesh, int p_index )
+void smLattice::updateBounds( std::shared_ptr<smSurfaceMesh> p_mesh, int p_index )
 {
 
     //min
@@ -279,10 +279,10 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
             {
                 index = i + j * xSeperation * zSeperation;
                 index2 = index + xSeperation * ( zSeperation - 1 );
-                glVertex3f( cells[index].cellLeftCorner[0],
+                glVertex3d( cells[index].cellLeftCorner[0],
                             cells[index].cellLeftCorner[1],
                             cells[index].cellLeftCorner[2] - 4 * zStep );
-                glVertex3f( cells[index2].cellLeftCorner[0],
+                glVertex3d( cells[index2].cellLeftCorner[0],
                             cells[index2].cellLeftCorner[1],
                             cells[index2].cellLeftCorner[2] + 4 * zStep );
             }
@@ -291,10 +291,10 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
             {
                 index = i * xSeperation + j * xSeperation * zSeperation;
                 index2 = index + ( xSeperation - 1 );
-                glVertex3f( cells[index].cellLeftCorner[0] - 4 * xStep,
+                glVertex3d( cells[index].cellLeftCorner[0] - 4 * xStep,
                             cells[index].cellLeftCorner[1],
                             cells[index].cellLeftCorner[2] );
-                glVertex3f( cells[index2].cellLeftCorner[0] + 4 * xStep,
+                glVertex3d( cells[index2].cellLeftCorner[0] + 4 * xStep,
                             cells[index2].cellLeftCorner[1],
                             cells[index2].cellLeftCorner[2] );
             }
@@ -324,60 +324,60 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
 
                         glBegin( GL_LINE_STRIP );
                         glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
-                        glVertex3fv( cells[index].cellLeftCorner.data() );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3dv( cells[index].cellLeftCorner.data() );
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3fv( cells[index].cellLeftCorner.data());
+                        glVertex3dv( cells[index].cellLeftCorner.data());
 
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
                         glEnd();
 
                         glBegin( GL_LINES );
                         glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
-                        glVertex3fv( cells[index].cellLeftCorner.data() );
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3dv( cells[index].cellLeftCorner.data() );
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
 
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] );
 
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3f( cells[index].cellLeftCorner[0] + xStep,
+                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] + zStep );
 
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1],
                                     cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3f( cells[index].cellLeftCorner[0],
+                        glVertex3d( cells[index].cellLeftCorner[0],
                                     cells[index].cellLeftCorner[1] + yStep,
                                     cells[index].cellLeftCorner[2] + zStep );
                         glEnd();
