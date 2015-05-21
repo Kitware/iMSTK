@@ -167,14 +167,8 @@ public:
     /// \brief addlight
     smInt addLight(std::shared_ptr<smLight> p_light);
 
-    /// \brief set light given with light ID
-    smBool setLight(smInt lightId, std::shared_ptr<smLight> p_light);
-
     /// \brief refresh lights. updates light  position based on the gl matrix
     void refreshLights();
-
-    /// \brief update light information
-    smBool updateLight(smInt p_lightId, std::shared_ptr<smLight> p_light);
 
     void setLightPos(smInt p_lightId, smLightPos p_pos);
 
@@ -195,7 +189,7 @@ private:
     void inline copySceneToLocal(std::shared_ptr<smSceneLocal> p_local);
 
 protected:
-    smIndiceArray<std::shared_ptr<smLight>> *lights;
+    std::vector<std::shared_ptr<smLight> > lights;
 
 private:
     smIndiceArray<std::shared_ptr<smSceneLocal>> sceneLocal;
