@@ -247,6 +247,7 @@ export(TARGETS  smCore
                 smEvent
   FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
   NAMESPACE smtk::
+  EXPORT_LINK_INTERFACE_LIBRARIES
 )
 
 configure_file(
