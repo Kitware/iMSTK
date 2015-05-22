@@ -1,2 +1,12 @@
-#
-include(@CMAKE_CURRENT_BINARY_DIR/SimMedTKTargets.cmake)
+# Path to target files
+include(@CMAKE_CURRENT_BINARY_DIR@/SimMedTKTargets.cmake)
+
+# Path to SimMedTK source directory
+set(SimMedTK_SOURCE_DIR @CMAKE_CURRENT_SOURCE_DIR@)
+
+# Path to modules directory
+set(SimMedTK_MODULE_PATH ${SimMedTK_SOURCE_DIR}/CMake)
+
+# Include and library paths
+set(CMAKE_INCLUDE_PATH @CMAKE_INCLUDE_PATH@)
+set(CMAKE_LIBRARY_PATH @CMAKE_LIBRARY_PATH@)
