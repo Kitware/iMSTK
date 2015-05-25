@@ -41,10 +41,10 @@ public:
     smModelRepresentation(){}
     ~smModelRepresentation(){}
 
-    virtual std::shared_ptr<smMesh> getMesh() = 0;
-    virtual std::shared_ptr<smCoreClass> getObject() = 0;
+    virtual std::shared_ptr<smMesh> getMesh(){}
+    virtual std::shared_ptr<smCoreClass> getObject(){}
     
-    virtual void draw() = 0;
+    virtual void draw(){}
 };
 
 #endif // SMMODELREPRESENTATION_H

@@ -41,6 +41,33 @@ smIndiceArray<smSceneObjectHolder>*smSDK::sceneObjectsRef;
 smIndiceArray<smMotionTransformer*> *smSDK::motionTransRef;
 smIndiceArray<smPipeHolder> *smSDK::pipesRef;
 
+/// \brief constructor
+smSDK::smSDK()
+{
+    shutdown = false;
+    sceneIdCounter = 1;
+    isModulesStarted = false;
+    type = SIMMEDTK_SMSDK;
+    viewer = nullptr;
+    simulator = nullptr;
+    sceneList.clear();
+
+    errorLog = std::make_shared<smErrorLog>();
+
+    // TODO: Fix these! Leaking...
+    meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
+    modulesRef = new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
+    objectSimulatorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
+    collisionDetectorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
+    scenesRef = new smIndiceArray<smSceneHolder>(SIMMEDTK_SDK_MAXSCENES);
+    sceneObjectsRef = new smIndiceArray<smSceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
+    pipesRef = new smIndiceArray<smPipeHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
+}
+
+smSDK::~smSDK()
+{
+    std::cout << "Killing SDK" << std::endl;
+}
 
 /// \brief creates the scene of the simulator
 std::shared_ptr<smScene> smSDK::createScene()
@@ -56,9 +83,13 @@ void smSDK::releaseScene(std::shared_ptr<smScene> scene)
     scene.reset();
 }
 
-smSDK::~smSDK()
+std::shared_ptr<smViewer> smSDK::createViewer()
 {
-    std::cout << "Killing SDK" << std::endl;
+    this->viewer = std::make_shared<smViewer>();
+    this->viewer->log = this->errorLog;
+    this->registerModule(this->viewer);
+
+    return this->viewer;
 }
 
 void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
@@ -181,10 +212,34 @@ std::shared_ptr<smSDK> smSDK::createSDK()
     return sdk;
 }
 
+std::shared_ptr<smSDK> smSDK::createStandardSDK()
+{
+    static std::shared_ptr<smSDK> sdk; ///< singleton sdk.
+
+    std::call_once(sdkCallOnceFlag,
+                   []
+                    {
+                        sdk.reset(new smSDK);
+                    });
+    
+    auto scene = std::make_shared<smScene>(errorLog);
+    registerScene(scene);
+    scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
+
+    viewer = std::make_shared<smViewer>();
+    viewer->log = this->errorLog;
+    registerModule(this->viewer);
+
+    createSimulator();
+
+    return sdk;
+}
+
 std::shared_ptr<smSDK> smSDK::getInstance()
 {
     return smSDK::createSDK();
 }
+
 void smSDK::terminateAll()
 {
 
@@ -205,4 +260,94 @@ void smSDK::terminateAll()
             }
         }
     }
+}
+
+/// \brief register functions
+smInt smSDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
+{
+    smMeshHolder mh;
+    mh.mesh = p_mesh;
+    return meshesRef->checkAndAdd(mh);
+}
+
+smInt smSDK::registerModule(std::shared_ptr<smModule> p_mod)
+{
+    smModuleHolder mh;
+    mh.module = p_mod;
+    return modulesRef->checkAndAdd(mh);
+}
+
+void smSDK::registerObjectSim(std::shared_ptr<smObjectSimulator> p_os)
+{
+    smObjectSimulatorHolder os;
+    os.objectSim = p_os;
+    objectSimulatorsRef->checkAndAdd(os);
+}
+
+void smSDK::registerCollDet(std::shared_ptr<smObjectSimulator> p_col)
+{
+    smObjectSimulatorHolder col;
+    col.objectSim = p_col;
+    collisionDetectorsRef->checkAndAdd(col);
+}
+
+void smSDK::registerScene(std::shared_ptr<smScene> p_sc)
+{
+    smSceneHolder sc;
+    sc.scene = p_sc;
+    scenesRef->checkAndAdd(sc);
+}
+
+void smSDK::registerSceneObject(std::shared_ptr<smSceneObject> p_sco)
+{
+    smSceneObjectHolder  sh;
+    sh.sceneObject = p_sco;
+    sceneObjectsRef->checkAndAdd(sh);
+}
+
+void smSDK::addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<smObjectSimulator> p_os, int p_scId)
+{        
+    assert(p_os);
+    assert(p_sco);
+
+    p_sco->attachObjectSimulator(p_os);
+
+    this->registerObjectSim(p_os);
+    
+    this->registerSceneObject(p_sco);
+
+	sceneList[p_scId]->addSceneObject(p_sco);
+}
+
+smPipe* smSDK::getPipeByName(smString p_name)
+{
+    return (pipesRef->getByRef(p_name).pipe);
+}
+
+/// \brief register pipe
+void smSDK::registerPipe(smPipe*p_pipe)
+{
+    smPipeHolder ph;
+    ph.pipe = p_pipe;
+    pipesRef->checkAndAdd(ph);
+}
+
+/// \brief create a pipe
+smPipe* smSDK::createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
+{
+    smPipe *pipe;
+    pipe = new smPipe(p_pipeName, p_elementSize, p_size);
+    registerPipe(pipe);
+    return pipe;
+}
+
+///SDK returns logger for the system
+std::shared_ptr<smErrorLog> smSDK::getErrorLog()
+{
+    return errorLog;
+};
+
+std::shared_ptr<smSimulator> smSDK::getSimulator()
+{
+    return this->simulator;
 }

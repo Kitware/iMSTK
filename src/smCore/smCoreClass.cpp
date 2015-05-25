@@ -97,3 +97,8 @@ const std::string &smCoreClass::getName() const
 {
     return name;
 }
+// void smCoreClass::draw()
+// {
+// std::cout << "Default draw function called. Nothing drawn." << std::endl;
+// }
+

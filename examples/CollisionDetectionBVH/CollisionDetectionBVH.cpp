@@ -92,18 +92,18 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
     // Create a static scene
     modelA = std::make_shared<smStaticSceneObject>();
-    modelA->setMesh(collisionModelA->getMesh());
+    modelA->setModel(collisionModelA);
     sdk->registerSceneObject(modelA);
-    sdk->registerMesh(modelA->mesh);
+    sdk->registerMesh(collisionModelA->getMesh());
 
     // Attach object to the dummy simulator. it will be simulated by dummy simulator
     modelA->attachObjectSimulator(defaultSimulator);
 
     // Initialize the scecond object
     modelB = std::make_shared<smStaticSceneObject>();
-    modelB->setMesh(collisionModelB->getMesh());
+    modelB->setModel(collisionModelB);
     sdk->registerSceneObject(modelB);
-    sdk->registerMesh(modelB->mesh);
+    sdk->registerMesh(collisionModelB->getMesh());
 
     // Add object to the scene
     scene->addSceneObject(modelA);
@@ -142,13 +142,13 @@ void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*
 {
     if ((10 > moveObj) && (moveObj > 0))
     {
-        modelB->mesh->translate(1, 0, 0);
+        modelB->getModel()->getMesh()->translate(1, 0, 0);
         moveObj--;
     }
     else
     {
         moveObj = 9; // reset
-        modelB->mesh->translate(-moveObj, 0, 0);
+        modelB->getModel()->getMesh()->translate(-moveObj, 0, 0);
     }
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));

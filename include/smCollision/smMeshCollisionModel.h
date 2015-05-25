@@ -100,7 +100,7 @@ public:
 
     void draw() override
     {
-        this->mesh->draw();
+//         this->mesh->draw();
     }
 
 private:

@@ -30,9 +30,21 @@
 // SimMedTK includes
 #include "smCore/smCoreClass.h"
 #include "smContactHandling/smContactConfig.h"
+#include "smCore/smSceneObject.h"
 
 class smMesh;
 class smCollisionPair;
+
+enum smContactHandlingType
+{
+	SIMMEDTK_CONTACT_PENALTY_UNILATERAL,
+	SIMMEDTK_CONTACT_PENALTY_BILATERAL,
+	SIMMEDTK_CONTACT_PBD_UNILATERAL,
+	SIMMEDTK_CONTACT_PBD_BILATERAL,
+	SIMMEDTK_CONTACT_LPC_UNILATERAL,
+	SIMMEDTK_CONTACT_LCP_UNILATERAL,
+	SIMMEDTK_CONTACT_LCP_BILATERAL
+};
 
 /// \brief Base class to for handling contact for collision response
 /// Input: collision pairs containig the collision information
@@ -40,16 +52,7 @@ class smCollisionPair;
 class smContactHandling: public smCoreClass
 {
 public:
-    enum smContactHandlingType
-    {
-    SIMMEDTK_CONTACT_PENALTY_UNILATERAL,
-    SIMMEDTK_CONTACT_PENALTY_BILATERAL,
-    SIMMEDTK_CONTACT_PBD_UNILATERAL,
-    SIMMEDTK_CONTACT_PBD_BILATERAL,
-    SIMMEDTK_CONTACT_LPC_UNILATERAL,
-    SIMMEDTK_CONTACT_LCP_UNILATERAL,
-    SIMMEDTK_CONTACT_LCP_BILATERAL
-    };
+    
     
     smContactHandling() {};
 

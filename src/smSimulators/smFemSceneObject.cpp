@@ -454,34 +454,13 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smStdVector3d &vertices)
 
 void smFemSceneObject::draw(const smDrawParam &p_params)
 {
-//     p_params.caller = this;
+    // p_params.caller = this;
     this->v_mesh->draw(p_params);
 }
 
-smFemSceneObject::smFemSceneObject( std::shared_ptr<smErrorLog> p_log )
-{
-    type = SIMMEDTK_SMFEMSCENEOBJECT;
-    v_mesh = new smVolumeMesh( SMMESH_DEFORMABLE, p_log );
-    pullUp = true;
-    dynamicFem = false;
-
-    if ( dynamicFem )
-    {
-        dT = 0.02;
-        density = 500;
-    }
-}
 
 std::shared_ptr<smSceneObject> smFemSceneObject::clone()
 {
     return safeDownCast<smSceneObject>();
 }
-
-void smFemSceneObject::serialize( void */*p_memoryBlock*/ )
-{
-}
-
-void smFemSceneObject::unSerialize( void */*p_memoryBlock*/ )
-{
-
-}
+void smFemSceneObject::init() {}

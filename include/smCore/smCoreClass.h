@@ -120,7 +120,7 @@ public:
     ///
     /// \brief draw function is called for visualization the object
     ///
-    virtual void draw();
+//     virtual void draw();
 
     ///
     /// \brief initialization of simulation

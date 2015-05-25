@@ -57,6 +57,7 @@ class smSceneObject: public smCoreClass
 public:
     /// \brief constructor
     smSceneObject();
+    ~smSceneObject(){}
 
     /// \brief returns object id
     smInt getObjectId()

@@ -30,28 +30,28 @@ void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& 
     this->collidingSceneObjects.second = second;
 }
 
-void setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair)
+void smContactHandling::setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair)
 {
     this->collisionPairs = colPair;
 }
 
-std::shared_ptr<smCollisionPair> getCollisionPairs() const
+std::shared_ptr<smCollisionPair> smContactHandling::getCollisionPairs() const
 {
     return this->collisionPairs;
 }
 
 
-smContactHandlingType smContactHandling::getContactHandlingType() 
+smContactHandlingType smContactHandling::getContactHandlingType() const
 {
     return this->contactHandlingType;
 }
 
-std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject()
+std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject() const
 { 
 	return this->collidingSceneObjects.first; 
 }
 
-std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject()
+std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject() const
 {
     return this->collidingSceneObjects.second; 
 }

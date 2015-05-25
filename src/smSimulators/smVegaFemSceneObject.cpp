@@ -80,6 +80,9 @@ smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog>/*p_log*/,
     secondaryDeformableObjectRenderingMesh_interpolation_vertices = nullptr;
     secondaryDeformableObjectRenderingMesh_interpolation_weights = nullptr;
 
+    renderUsingVega = true;
+    importAndUpdateVolumeMeshToSmtk = false;
+
     type = SIMMEDTK_SMFEMSCENEOBJECT;
 
     femConfig = std::make_shared<smVegaConfigFemObject>();
@@ -169,6 +172,27 @@ void smVegaFemSceneObject::initSimulation()
     setDeformableModel();
     loadMeshes();
     loadRenderingMesh();
+
+    if(importAndUpdateVolumeMeshToSmtk)
+    {
+        this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
+        this->smtkVolumeMesh->importVolumeMeshDataFromVEGA_Format(this->volumetricMesh, true);
+    }
+
+    if(!renderUsingVega)
+    {
+        this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
+        if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
+        {            
+            this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh()->getMesh(), true);
+        }
+        else
+        {
+            this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->secondaryDeformableObjectRenderingMesh()->getMesh(), true);
+        }
+        
+    }
+
     loadFixedBC();
 
     // make room for deformation and force vectors
@@ -943,6 +967,9 @@ void smVegaFemSceneObject::advanceDynamics()
         // apply pre-defined external forces
         applyScriptedExternalForces();
 
+        // apply external forces arising from contact
+        applyContactForces();
+
         // set forces to the integrator
         integratorBaseSparse->SetExternalForces(f_ext);
 
@@ -952,6 +979,11 @@ void smVegaFemSceneObject::advanceDynamics()
         timestepCounter++;
 
         memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
+
+        if(importAndUpdateVolumeMeshToSmtk)
+        {
+            smtkVolumeMesh->updateVolumeMeshDataFromVEGA_Format(this->volumetricMesh);
+        }       
 
         if (femConfig->singleStepMode == 1)
         {
@@ -978,6 +1010,19 @@ void smVegaFemSceneObject::advanceDynamics()
 
     // update the secondary mesh
     updateSecondaryRenderingMesh();
+
+    if(!renderUsingVega)
+    {
+
+        if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
+        {            
+            this->smtkSurfaceMesh->updateSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh()->getMesh());
+        }
+        else
+        {
+            this->smtkSurfaceMesh->updateSurfaceMeshDataFromVEGA_Format(this->secondaryDeformableObjectRenderingMesh()->getMesh());
+        }
+    }
 
     // update stasts
     updateStats();
@@ -1280,9 +1325,25 @@ inline void smVegaFemSceneObject::updateStats()
     }
 }
 
+void smVegaFemSceneObject::setRenderUsingVega(bool vegaRender)
+{
+    this->renderUsingVega = vegaRender;
+}
+
+void smVegaFemSceneObject::draw(const smDrawParam &p_params)
+{
+    if(!renderUsingVega)
+    {
+        smtkSurfaceMesh->draw();
+    }
+    else
+    {
+        renderWithVega();
+    }
+}
 
 // Displays the fem object with primary or secondary mesh, fixed vertices, vertices interacted with, ground plane etc.
-void smVegaFemSceneObject::draw(const smDrawParam &/*p_params*/)
+void smVegaFemSceneObject::renderWithVega()
 {
 
     glEnable(GL_LIGHTING);

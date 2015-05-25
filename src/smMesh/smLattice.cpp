@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smMesh/smLattice.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 smLattice::smLattice()
 {
@@ -244,7 +245,13 @@ void smLattice::addObject( smSceneObject *obj )
     {
         case SIMMEDTK_SMSTATICSCENEOBJECT:
         {
-            mesh = static_cast<smStaticSceneObject*>(obj)->mesh;
+            auto staticSceneObject = static_cast<smStaticSceneObject*>(obj);
+            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            if(nullptr == model)
+            {
+                break;
+            }
+            std::shared_ptr<smMesh> mesh = model->getMesh();
             break;
         }
         default:

@@ -48,7 +48,8 @@ target_link_libraries(smCore
     GLUT::GLUT
     ${OPENGL_LIBRARY}
     sfml::graphics
-  INTERFACE
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
 )
 
 if(NOT MSVC)

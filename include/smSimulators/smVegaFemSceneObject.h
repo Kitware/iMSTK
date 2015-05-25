@@ -155,27 +155,19 @@ public:
     /// \brief draws cartesian axis
     void drawAxes(double axisLength);
 
-    /// \brief
-    virtual void serialize(void *) override
-    {
-        //add code in future
-    }
-
-    /// \brief
-    virtual void unSerialize(void *) override
-    {
-
-    }
-
-    /// \brief not implemented yet.
+    /*/// \brief not implemented yet.
     virtual std::shared_ptr<smSceneObject> clone() override
     {
         return safeDownCast<smSceneObject>();
-    }
+    }*/
+
+    void setRenderUsingVega(const bool vegaRender);
 
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
     virtual void draw(const smDrawParam &p_params) override;
+
+    void renderWithVega();
 
     virtual void init() override {}
 
@@ -206,6 +198,8 @@ public:
     PerformanceCounter cpuLoadCounter;
     int timestepCounter;
     int subTimestepCounter;
+    bool renderUsingVega;
+    bool importAndUpdateVolumeMeshToSmtk;
 
     /// Force models, time integrators, sparse matrices and meshes.
     /// some variable names are self explainatory
@@ -253,6 +247,9 @@ public:
 
     std::shared_ptr<SceneObjectDeformable> deformableObjectRenderingMesh;
     std::shared_ptr<SceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
+
+    std::shared_ptr<smVolumeMesh> smtkVolumeMesh;
+    std::shared_ptr<smSurfaceMesh> smtkSurfaceMesh;
 };
 
 #endif

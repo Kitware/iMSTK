@@ -43,7 +43,20 @@ class smFemSceneObject: public smSceneObject
 {
 public:
     /// \brief constructor
-    smFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+    smFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr)
+    {
+        type = SIMMEDTK_SMFEMSCENEOBJECT;
+        v_mesh = new smVolumeMesh( SMMESH_DEFORMABLE, p_log );
+        pullUp = true;
+        dynamicFem = false;
+
+        if ( dynamicFem )
+        {
+            dT = 0.02;
+            density = 500;
+        }
+    }
+    ~smFemSceneObject(){}
 
     /// \brief build FEM LM matrix
     void buildLMmatrix();
@@ -86,6 +99,8 @@ public:
 
     /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
     virtual std::shared_ptr<smSceneObject> clone() override;
+
+    virtual void init();
 
 public:
     //fem objetc has two representations: surface and volume

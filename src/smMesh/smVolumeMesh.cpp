@@ -338,8 +338,22 @@ void smVolumeMesh::initSurface()
     updateTriangleNormals();
     updateVertexNormals();
 }
-/*
-void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMesh, bool perProcessingStage)
+
+void smVolumeMesh::updateVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh)
+{
+    smInt i, threeI;
+
+    //copy the nodal co-ordinates
+    for(i=0; i<this->nbrVertices ; i++)
+    {
+        threeI = 3*i;
+        /*this->nodes[i][0] = (*nodes)[threeI];
+        this->nodes[i][1] = (*nodes)[threeI+1];
+        this->nodes[i][2] = (*nodes)[threeI+2];*/ 
+    }
+}
+
+void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
 {
     smInt i, threeI, j;
 
@@ -374,7 +388,8 @@ void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMes
         this->nodes[i][2] = (*nodes)[threeI+2]; 
     }
 
-    if(perProcessingStage){
+    if(preProcessingStage)
+    {
         // do something here!
     }
 
@@ -396,7 +411,6 @@ void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(VolumetricMesh *vega3dMes
     delete [] nodes;
 
 }
-*/
 
 /// \brief destructor
 smVolumeMesh::~smVolumeMesh()

@@ -28,6 +28,7 @@
 
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 int main()
 {
@@ -56,18 +57,17 @@ int main()
 
     //Initialize the texture manager
     smTextureManager::init(sdk->getErrorLog());
+    
+    std::shared_ptr<smMeshCollisionModel> cubeModel = std::make_shared<smMeshCollisionModel>();
+    cubeModel->loadTriangleMesh("models/cube.obj", SM_FILETYPE_OBJ);
+    cubeModel->getMesh()->assignTexture("cubetex");
+    cubeModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Load in the texture for the cube model
     smTextureManager::loadTexture("textures/cube.png", "cubetex");
 
     cube = std::make_shared<smStaticSceneObject>();
-
-    //Load the cube model
-    cube->mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
-    //Assign the previously loaded texture to the cube model
-    cube->mesh->assignTexture("cubetex");
-    //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube->setModel(cubeModel);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(cube);

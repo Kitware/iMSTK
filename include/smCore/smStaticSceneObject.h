@@ -30,6 +30,7 @@
 #include "smCore/smSceneObject.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smCoreClass.h"
+#include "smCore/smModelRepresentation.h"
 
 namespace smtk{
 namespace Event{

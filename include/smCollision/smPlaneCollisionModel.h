@@ -20,6 +20,9 @@
 
 #include <memory>
 
+// Eigen include
+#include<Eigen/Geometry>
+
 #include "smCore/smGeometry.h"
 #include "smCore/smModelRepresentation.h"
 

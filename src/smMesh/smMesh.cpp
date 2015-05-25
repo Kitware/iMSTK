@@ -841,11 +841,21 @@ bool smLineMesh::isMeshTextured()
     return isTextureCoordAvailable;
 }
 
-/*
-bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool perProcessingStage)
+void smMesh::updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh)
+{   
+    //copy the vertex co-ordinates
+    for(smInt i=0; i<this->nbrVertices ; i++)
+    {
+       this->vertices[i][0] = vertices[i][0];
+       this->vertices[i][1] = vertices[i][1];
+       this->vertices[i][2] = vertices[i][2];
+    }
+}
+
+bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh, const bool perProcessingStage)
 {   
 
-     if(!vegaSurfaceMesh->isTriangularMesh())
+    if(!vegaSurfaceMesh->isTriangularMesh())
     {
         if (this->log != nullptr)
         {
@@ -864,7 +874,7 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool
     smInt * numGroups;
 	smInt ** triangleGroups;
     
-    vegaSurfaceMesh->exportGeometry(numVertices, vertices, numTriangles , triangles, numGroups, triangleGroups) ;
+    vegaSurfaceMesh->exportGeometry(numVertices, vertices, numTriangles , triangles, numGroups, triangleGroups);
 
     this->nbrVertices = *numVertices;
     this->nbrTriangles = *numTriangles;
@@ -915,4 +925,4 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(objMesh *vegaSurfaceMesh, bool
 
     return 1;
 
-}*/
+}

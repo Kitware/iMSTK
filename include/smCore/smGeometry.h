@@ -38,10 +38,11 @@ public:
     smAnalyticalGeometry(){}
     ~smAnalyticalGeometry(){}
 
-    virtual void translate(const smVec3d t)=0;
-    virtual void rotate(const smMatrix33d &rot)=0;
+    void translate(const smVec3d t)=0;
+    void rotate(const smMatrix33d &rot)=0;
 
-    virtual void draw()=0;
+    void draw()=0;
+
 };
 
 /// \brief  Simple Plane definition with unit normal and spatial location
@@ -105,7 +106,10 @@ public:
     }
 
 private:
+    /// \brief unit normal of the plane
     smVec3d unitNormal;
+
+    /// \brief any point on the plane
     smVec3d point;
 };
 
@@ -116,7 +120,7 @@ class smSphere : public smAnalyticalGeometry
 public:
     /// \brief constructor
     smSphere();
-    
+
     /// \brief sphere constructor with center and radius
     smSphere(const smVec3d &c, const double &r)
     {
@@ -124,7 +128,7 @@ public:
         this->radius = r;
     }
 
-    ~smSphere();
+    ~smSphere(){}
 
     void setRadius(const double r)
     {
@@ -141,7 +145,7 @@ public:
         this->radius += r;
     }
 
-    void translate(const smVec3d t)
+    void translate(const smVec3d &t)
     {
         center += t;
     }

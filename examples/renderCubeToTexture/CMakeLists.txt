@@ -6,5 +6,6 @@ target_link_libraries(renderCubeToTexture
   smRendering
   smShader
   smMesh
+  smCollision
   ExamplesCommon
   )
