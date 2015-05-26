@@ -8,9 +8,4 @@ target_link_libraries(renderCube
   smEvent
   smCollision
   ExamplesCommon
-  sfml::system
-  sfml::audio
-  sfml::graphics
-  sfml::network
-  sfml::window
   )
