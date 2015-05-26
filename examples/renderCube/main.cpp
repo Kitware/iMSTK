@@ -82,7 +82,7 @@ int main()
     viewer->setScreenResolution(800, 640);
 
     //Uncomment the following line for fullscreen
-    //viewer.viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
+    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     // Setup Scene lighting
     light = smLight::getDefaultLighting();
