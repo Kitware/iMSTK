@@ -28,7 +28,6 @@
 #include "smCore/smConfig.h"
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smEventData.h"
 #include "smSimulators/smVegaFemSceneObject.h"
 
 /// \brief Interface class between Vega and SimMedTK core
@@ -38,9 +37,6 @@ class smVegaFemSimulator: public smObjectSimulator
 public:
     /// \brief constructor
     smVegaFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
-
-    /// \brief !!
-    void setDispatcher(std::shared_ptr<smEventDispatcher> p_eventDispatcher);
 
     /// \brief start the job
     virtual void beginSim();
@@ -63,7 +59,6 @@ public:
 private:
     smVec3d hapticPosition; ///< position of the haptic device end effector
     smBool hapticButtonPressed; ///< true of the button is pressed
-    std::shared_ptr<smEventDispatcher> eventDispatcher; ///< !!
 };
 
 #endif

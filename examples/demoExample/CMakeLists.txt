@@ -1,6 +1,6 @@
 
 add_executable(vegaFemExample main.cpp)
-target_link_libraries(demo1
+target_link_libraries(demoExample
   smCore
   smRendering
   smSimulators

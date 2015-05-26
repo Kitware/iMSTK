@@ -89,11 +89,16 @@ const smString vega_string_none("__none");
 class smVegaFemSceneObject: public smSceneObject
 {
 public:
+
+	smVegaFemSceneObject();
+
     /// \brief Constructor
     smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr, smString ConfigFile = vega_string_none);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
+
+	bool configure(smString ConfigFile);
 
     /// \brief Initialize the parameters and properties of the simulation object
     void initSimulation();
@@ -152,14 +157,11 @@ public:
     /// \brief prints a given string on the screen
     void print_bitmap_string(float x, float y, float z, void * font, char * s);
 
-    /// \brief draws cartesian axis
-    void drawAxes(double axisLength);
-
-    /*/// \brief not implemented yet.
+    /// \brief not implemented yet.
     virtual std::shared_ptr<smSceneObject> clone() override
     {
         return safeDownCast<smSceneObject>();
-    }*/
+    }
 
     void setRenderUsingVega(const bool vegaRender);
 
@@ -169,23 +171,35 @@ public:
 
     void renderWithVega();
 
-    virtual void init() override {}
+	///serialize function explicity writes the object to the memory block
+	///each scene object should know how to write itself to a memory block
+	virtual void serialize(void *p_memoryBlock) override {};
+
+	///Unserialize function can recover the object from the memory location
+	virtual void unSerialize(void *p_memoryBlock) override {};
+
+	///this function may not be used
+	///every Scene Object should know how to clone itself. Since the data structures will be
+	///in the beginning of the modules(such as simulator, viewer, collision etc.)
+	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+
+	virtual void init() override {};
 
 public:
     /// performance counters and simulation flags. some variable names are self explainatory
     double fps; ///< fps of the simulation
-    const int fpsBufferSize = 5; ///< buffer size to display fps
+	int fpsBufferSize;///< buffer size to display fps
     int fpsHead; ///< !!
     double fpsBuffer[5]; ///< buffer to display fps
     double cpuLoad;
     double forceAssemblyTime;
     double forceAssemblyLocalTime;
-    const int forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    int forceAssemblyHead; /// !!
+	int forceAssemblyBufferSize;
+    int forceAssemblyHead;
     double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     double systemSolveTime;
     double systemSolveLocalTime;
-    const int systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+	int systemSolveBufferSize;
     int systemSolveHead;
     double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     int enableTextures;

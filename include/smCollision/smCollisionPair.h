@@ -101,6 +101,11 @@ public:
     bool hasContacts();
 
     ///
+    /// @brief Returns the number of contacts (= number of contact pairs)
+    ///
+    int getNumberOfContacts();
+
+    ///
     /// @brief Returns contact array for these two models
     ///
     std::vector<std::shared_ptr<smContact>> &getContacts();

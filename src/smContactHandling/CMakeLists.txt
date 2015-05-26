@@ -18,5 +18,5 @@ target_link_libraries(smContactHandling
 )
 
 if(BUILD_TESTING)
-# add tests here
+    add_subdirectory(UnitTests)
 endif()

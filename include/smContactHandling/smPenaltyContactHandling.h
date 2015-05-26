@@ -43,7 +43,7 @@ public:
                              const std::shared_ptr<smSceneObject>& sceneObjFirst,
                              const std::shared_ptr<smSceneObject>& sceneObjSecond);
 
-	smContactHandlingType getContactHandlingType() const;
+	const smContactHandlingType &getContactHandlingType() const;
 
 	void resolveContacts();
 

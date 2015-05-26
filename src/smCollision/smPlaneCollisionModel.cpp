@@ -28,7 +28,8 @@ void smPlaneCollisionModel::draw()
 }
 const smVec3d& smPlaneCollisionModel::getNormal() const
 {
-//     return this->transform.linear() * this->plane->getUnitNormal();
+     //return this->transform.linear() * this->plane->getUnitNormal();
+	 return this->plane->getUnitNormal();//temporary fix
 }
 void smPlaneCollisionModel::setNormal(const smVec3d& normal)
 {

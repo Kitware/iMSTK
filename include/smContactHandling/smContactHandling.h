@@ -65,17 +65,17 @@ public:
                         const std::shared_ptr< smSceneObject >& second);
 
     ///
-    /// @brief Set the scene objects that are colliding
+    /// @brief Set the collision pair data structure in which the information needs to be stored
     ///
     void setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair);
 
     ///
-    /// @brief Get how the contact between scene objects is processed
+    /// @brief Get the colliison information contained in the collision pairs
     ///
     std::shared_ptr<smCollisionPair> getCollisionPairs() const;
 
     ///
-    /// @brief Get how the contact between scene objects is processed
+    /// @brief Get if the contact handling is unilateral or bilateral
     ///
     smContactHandlingType getContactHandlingType() const;
 
