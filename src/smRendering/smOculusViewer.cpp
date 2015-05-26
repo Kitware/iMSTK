@@ -84,9 +84,9 @@ void smOculusViewer::init()
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
+    param.rendererObject = safeDownCast<smOculusViewer>();
+    param.caller = safeDownCast<smOculusViewer>();
+    param.data = nullptr;
 
     ovr_Initialize();
     this->initGLContext();
@@ -175,7 +175,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
         //we need to construct a view matrix by combining all the information
         // provided by the oculus SDK, about the position and orientation of
         // the user's head in the world.
-        view = Eigen::Map<smMatrix44f>(glm::value_ptr(p_rop.scene->camera.view));
+        view = Eigen::Map<smMatrix44f>(p_rop.scene->getCamera()->getViewMatRef());
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix

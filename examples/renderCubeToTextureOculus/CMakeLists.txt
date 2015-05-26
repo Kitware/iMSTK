@@ -1,10 +1,11 @@
-
-add_executable(renderCubeToTextureOculus main.cpp  RenderCube.cpp RenderCube.h)
+add_executable(renderCubeToTextureOculus main.cpp)
 target_link_libraries(renderCubeToTextureOculus
   smCore
+  smEvent
   smRendering
   smRenderingOculus
   smShader
   smMesh
+  ExamplesCommon
   Oculus::Oculus
   )
