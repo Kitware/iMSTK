@@ -23,15 +23,17 @@ macro (simmedtk_find_package package_name)
     if(NOT SimMedTK_WINDOWS_DEPENDENCIES_DIR)
       set(SimMedTK_WINDOWS_DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
-    set(CMAKE_INCLUDE_PATH
+    list(APPEND CMAKE_INCLUDE_PATH
       "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}"
       "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/include"
       "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/include"
       )
-    set(CMAKE_LIBRARY_PATH
+    list(APPEND CMAKE_LIBRARY_PATH
       "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/lib"
       "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/lib"
       )
+    list(REMOVE_DUPLICATES CMAKE_INCLUDE_PATH)
+    list(REMOVE_DUPLICATES CMAKE_LIBRARY_PATH)
   endif (WIN32)
 
   find_package(${package_name} ${ARGN})
