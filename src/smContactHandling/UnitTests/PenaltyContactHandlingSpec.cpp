@@ -102,7 +102,7 @@ go_bandit([](){
 
 			std::shared_ptr<smVegaFemSceneObject> femSO = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
 
-			penaltyCH->setSceneObjects(planeSO, femSO);
+			penaltyCH->setSceneObjects(femSO, planeSO);
 
 			AssertThat(penaltyCH->getFirstSceneObject() != nullptr, IsTrue());
 
@@ -116,18 +116,21 @@ go_bandit([](){
 
 		it("checks contact forces ", [&]() {
 
-			std::shared_ptr<smPenaltyContactHandling> penaltyCH = std::make_shared<smPenaltyContactHandling>(true);
+			std::shared_ptr<smPenaltyContactHandling> penaltyCH = std::make_shared<smPenaltyContactHandling>(false);
 
 			std::shared_ptr<smStaticSceneObject> planeSO = createStaticPlaneSceneObject();
 
 			std::shared_ptr<smVegaFemSceneObject> femSO = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
 
 			femSO->uvel = new double[3];
-			femSO->uvel[0] = femSO->uvel[2] = femSO->uvel[2] = 1.0;
+			femSO->uvel[0] = femSO->uvel[1] = femSO->uvel[2] = 1.0;
+
+			femSO->f_ext = new double[3];
+			femSO->f_ext[0] = femSO->f_ext[1] = femSO->f_ext[2] = 0.0;
 			
 			femSO->f_contact.resize(3);
 
-			penaltyCH->setSceneObjects(planeSO, femSO);
+			penaltyCH->setSceneObjects(femSO, planeSO);
 
 			penaltyCH->resolveContacts();
 
