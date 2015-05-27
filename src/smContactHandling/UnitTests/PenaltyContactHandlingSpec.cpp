@@ -54,7 +54,10 @@ std::shared_ptr<smCollisionPair> createSampleCollisionPair()
     float depth = 1.0;
     smVec3d contactPoint(0,0,1);
     smVec3d normal(1,0,0);
+	
     collisionPair->addContact(depth,contactPoint,normal);
+
+	collisionPair->getContacts()[0]->index = 0;
 
     return collisionPair;
    
@@ -110,6 +113,28 @@ go_bandit([](){
 			AssertThat(penaltyCH->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT, IsTrue());
 
          });
+
+		it("checks contact forces ", [&]() {
+
+			std::shared_ptr<smPenaltyContactHandling> penaltyCH = std::make_shared<smPenaltyContactHandling>(true);
+
+			std::shared_ptr<smStaticSceneObject> planeSO = createStaticPlaneSceneObject();
+
+			std::shared_ptr<smVegaFemSceneObject> femSO = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
+
+			femSO->uvel = new double[3];
+			femSO->uvel[0] = femSO->uvel[2] = femSO->uvel[2] = 1.0;
+			
+			femSO->f_contact.resize(3);
+
+			penaltyCH->setSceneObjects(planeSO, femSO);
+
+			penaltyCH->resolveContacts();
+
+			AssertThat(femSO->f_contact[0]==98000, IsTrue());
+			AssertThat(femSO->f_contact[1] == 0, IsTrue());
+			AssertThat(femSO->f_contact[2] == 0, IsTrue());
+		});
     });
 });
 

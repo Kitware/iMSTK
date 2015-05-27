@@ -43,7 +43,7 @@ public:
     smContact ( const double penetrationDepth,
                 const smVec3d& contactPoint,
                 const smVec3d& contactNornmal
-              ) : depth ( penetrationDepth ), point ( contactPoint ), normal ( contactNornmal ) {}
+				) : depth(penetrationDepth), point(contactPoint), normal(contactNornmal){}
 
     double depth;
     smVec3d point;
