@@ -217,7 +217,7 @@ public:
     static std::shared_ptr<smSDK> createSDK();
 
     ///Creates the sdk, viewer and scene 0
-    std::shared_ptr<smSDK> createStandardSDK();
+    static std::shared_ptr<smSDK> createStandardSDK();
 
     static std::shared_ptr<smSDK> getInstance();
 

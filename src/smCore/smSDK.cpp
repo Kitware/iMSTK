@@ -216,10 +216,10 @@ std::shared_ptr<smSDK> smSDK::createStandardSDK()
 {
     auto sdk = createSDK();
     
-    createScene();
-    createViewer();
+    sdk->createScene();
+    sdk->createViewer();
 
-    createSimulator();
+    sdk->createSimulator();
 
     return sdk;
 }
