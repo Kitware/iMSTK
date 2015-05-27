@@ -211,14 +211,14 @@ void smVegaFemSceneObject::initSimulation()
     {
         this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
         if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
-        {            
+        {
             this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh->GetMesh(), true);
         }
         else
         {
             this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
         }
-        
+
     }
 
     loadFixedBC();
@@ -1016,7 +1016,7 @@ void smVegaFemSceneObject::advanceDynamics()
         if(importAndUpdateVolumeMeshToSmtk)
         {
             smtkVolumeMesh->updateVolumeMeshDataFromVEGA_Format(this->volumetricMesh);
-        }       
+        }
 
         if (femConfig->singleStepMode == 1)
         {
@@ -1048,7 +1048,7 @@ void smVegaFemSceneObject::advanceDynamics()
     {
 
         if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
-        {            
+        {
             this->smtkSurfaceMesh->updateSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh->GetMesh());
         }
         else
