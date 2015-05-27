@@ -241,6 +241,12 @@ public:
     ///SDK creates scene
     std::shared_ptr<smScene> createScene();
 
+    ///SDK creates scene
+    std::shared_ptr<smScene> getScene(size_t sceneId)
+    {
+        return scenesRef->getByRef(sceneId).scene;
+    }
+
     ///SDK returns logger for the system
     std::shared_ptr<smErrorLog> getErrorLog();
 

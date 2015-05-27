@@ -214,21 +214,10 @@ std::shared_ptr<smSDK> smSDK::createSDK()
 
 std::shared_ptr<smSDK> smSDK::createStandardSDK()
 {
-    static std::shared_ptr<smSDK> sdk; ///< singleton sdk.
-
-    std::call_once(sdkCallOnceFlag,
-                   []
-                    {
-                        sdk.reset(new smSDK);
-                    });
+    auto sdk = createSDK();
     
-    auto scene = std::make_shared<smScene>(errorLog);
-    registerScene(scene);
-    scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
-
-    viewer = std::make_shared<smViewer>();
-    viewer->log = this->errorLog;
-    registerModule(this->viewer);
+    createScene();
+    createViewer();
 
     createSimulator();
 
@@ -316,7 +305,7 @@ void smSDK::addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<
     
     this->registerSceneObject(p_sco);
 
-	sceneList[p_scId]->addSceneObject(p_sco);
+    this->getScene(p_scId)->addSceneObject(p_sco);
 }
 
 smPipe* smSDK::getPipeByName(smString p_name)
