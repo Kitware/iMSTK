@@ -38,10 +38,10 @@ public:
     smAnalyticalGeometry(){}
     ~smAnalyticalGeometry(){}
 
-    void translate(const smVec3d t)=0;
-    void rotate(const smMatrix33d &rot)=0;
+    virtual void translate(const smVec3d &t) = 0;
+    virtual void rotate(const smMatrix33d &rot) = 0;
 
-    void draw()=0;
+    virtual void draw()=0;
 
 };
 
@@ -90,7 +90,7 @@ public:
         this->point = p;
     }
 
-    void translate(const smVec3d t)
+    void translate(const smVec3d &t)
     {
         point += t;
     }

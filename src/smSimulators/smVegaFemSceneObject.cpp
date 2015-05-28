@@ -552,8 +552,9 @@ void smVegaFemSceneObject::loadMeshes()
     }
 
     int scaleRows = 1;
-	SparseMatrix *sm = LaplacianDampingMatrix.get();
+    SparseMatrix *sm;
     meshGraph->GetLaplacian(&sm, scaleRows);
+    LaplacianDampingMatrix.reset(sm);
     LaplacianDampingMatrix->ScalarMultiply(femConfig->dampingLaplacianCoef);
 }
 
@@ -1121,7 +1122,7 @@ void smVegaFemSceneObject::applyContactForces()
 {
     if(f_contact.size() != 0)
     {
-        for(size_t i=0; i<f_contact.size(); i++)
+        for(int i=0; i<f_contact.size(); i++)
         {
             f_ext[i] += f_contact[i];
         }
@@ -1361,10 +1362,12 @@ void smVegaFemSceneObject::draw(const smDrawParam &p_params)
 {
     if(!renderUsingVega)
     {
-        //smtkSurfaceMesh->draw();
+        smtkSurfaceMesh->draw(p_params);
     }
     else
     {
+        int ac; char**av;
+        glutInit(&ac,av);
         renderWithVega();
     }
 }
@@ -1463,7 +1466,7 @@ void smVegaFemSceneObject::renderWithVega()
     // render model fixed vertices
     if (femConfig->renderFixedVertices)
     {
-        for (size_t i = 0; i < this->fixedVertices.size(); i++)
+        for (int i = 0; i < this->fixedVertices.size(); i++)
         {
             glColor3f(1, 0, 0);
             double fixedVertexPos[3];

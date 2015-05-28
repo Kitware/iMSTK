@@ -33,18 +33,18 @@ vegaFemExample::vegaFemExample()
     scene1 = sdk->createScene();
 
     //Create a viewer to see the scene
-    sdk->addViewer(&viewer);
+    viewer = sdk->createViewer();
 
     /// create a FEM simulator
-    femSim = new smVegaFemSimulator(sdk->getErrorLog());
+    femSim = std::make_shared<smVegaFemSimulator>(sdk->getErrorLog());
 
     /// set the dispatcher for FEM. it will be used for sending events
-    femSim->setDispatcher(sdk->getEventDispatcher());
-    sdk->getEventDispatcher()->registerEventHandler(femSim, SIMMEDTK_EVENTTYPE_HAPTICOUT);
+//     femSim->setDispatcher(sdk->getEventDispatcher());
+//     sdk->getEventDispatcher()->registerEventHandler(femSim, SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
     /// create a Vega based FEM object and attach it to the fem simulator
-    femobj = new smVegaFemSceneObject(sdk->getErrorLog(),
-                                      "../../../resources/vega/asianDragon/asianDragon.config");
+    femobj = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
+                                      "res/asianDragon.config");
     femobj->attachObjectSimulator(femSim);
 
     /// add the FEM object to the scene
@@ -55,8 +55,9 @@ vegaFemExample::vegaFemExample()
     simulator->registerObjectSimulator(femSim);
 
     /// create a viewer
-    viewer.viewerRenderDetail = viewer.viewerRenderDetail | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
-    viewer.setEventDispatcher(sdk->getEventDispatcher());
+    viewer->viewerRenderDetail = viewer->viewerRenderDetail & 
+                                                    SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;  
+//     viewer.setEventDispatcher(sdk->getEventDispatcher());
 
     /// run the SDK
     sdk->run();

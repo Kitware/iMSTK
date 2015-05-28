@@ -29,22 +29,22 @@
 #include "smSimulators/smVegaFemSimulator.h"
 #include "smSimulators/smVegaFemSceneObject.h"
 
-class vegaFemExample : public smSimulationMain, public smCoreClass
+class vegaFemExample : public smSimulationMain
 {
 
 public:
     vegaFemExample();
 
     virtual ~vegaFemExample(){}
-    void simulateMain(smSimulationMainParam /*p_param*/) { };
+    void simulateMain(const smSimulationMainParam &){}
 private:
-    std::unique_ptr<smSDK> sdk;
-    smVegaFemSceneObject *femobj;
-    smVegaFemSimulator *femSim;
+    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<smVegaFemSceneObject> femobj;
+    std::shared_ptr<smVegaFemSimulator> femSim;
     smMatrix33d mat;
-    smSimulator *simulator;
-    smViewer viewer;
-    smScene *scene1;
+    std::shared_ptr<smSimulator> simulator;
+   std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<smScene> scene1;
 };
 
 void VegaFemExample();

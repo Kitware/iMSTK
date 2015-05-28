@@ -57,7 +57,7 @@ int main()
 
     //Initialize the texture manager
     smTextureManager::init(sdk->getErrorLog());
-    
+
     std::shared_ptr<smMeshCollisionModel> cubeModel = std::make_shared<smMeshCollisionModel>();
     cubeModel->loadTriangleMesh("models/cube.obj", SM_FILETYPE_OBJ);
     cubeModel->getMesh()->assignTexture("cubetex");
