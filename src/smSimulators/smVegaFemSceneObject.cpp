@@ -348,9 +348,9 @@ void smVegaFemSceneObject::loadMeshes()
             exit(1);
         }
 
-        printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);
+		printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);printf("VEGA:000000");
         // get the mass matrix
-        std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
+		std::shared_ptr<SparseMatrixOutline> massMatrixOutline; 
 
         try
         {
@@ -814,6 +814,8 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
                 femConfig->numSolverThreads);
     }
 
+    LinearSolver *linearSolver = new CGSolver(integratorBaseSparse->GetSystemMatrix());
+    integratorBaseSparse->setLinearSolver(linearSolver);
     integratorBase = integratorBaseSparse;
 
     if (integratorBase == nullptr)
@@ -1373,9 +1375,9 @@ void smVegaFemSceneObject::renderWithVega()
 
     glEnable(GL_LIGHTING);
 
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    //glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    glStencilFunc(GL_ALWAYS, 0, ~(0u));
+    //glStencilFunc(GL_ALWAYS, 0, ~(0u));
 
     // render embedded triangle mesh
     if (femConfig->renderSecondaryDeformableObject)
@@ -1423,8 +1425,8 @@ void smVegaFemSceneObject::renderWithVega()
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_LIGHTING);
 
-    glStencilFunc(GL_ALWAYS, 1, ~(0u));
-    glColor3f(0, 0, 0);
+   /* glStencilFunc(GL_ALWAYS, 1, ~(0u));
+    glColor3f(0, 0, 0);*/
 
     if (femConfig->renderWireframe)
     {
@@ -1432,14 +1434,14 @@ void smVegaFemSceneObject::renderWithVega()
     }
 
     // disable stencil buffer modifications
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    //glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-    glColor3f(0, 0, 0);
+    //glColor3f(0, 0, 0);
 
-    if (femConfig->renderAxes)
+    /*if (femConfig->renderAxes)
     {
         glLineWidth(1.0);
-    }
+    }*/
 
     // render the currently pulled vertex
     if (pulledVertex >= 0)
@@ -1501,7 +1503,7 @@ void smVegaFemSceneObject::renderWithVega()
 
     if (explosionFlag)
     {
-        sprintf(s, "The integrator went unstable.");
+        /*sprintf(s, "The integrator went unstable.");
         int windowWidth = 800;
         int windowHeight = 600;
         double x1 = 10;
@@ -1515,7 +1517,8 @@ void smVegaFemSceneObject::renderWithVega()
         y1 = 10;
         X1 = -1 + 2.0 * x1 / windowWidth;
         Y1 = -1 + 2.0 * y1 / windowHeight;
-        print_bitmap_string(X1, Y1, -1, GLUT_BITMAP_9_BY_15 , s);
+        print_bitmap_string(X1, Y1, -1, GLUT_BITMAP_9_BY_15 , s);*/
+        printf(s, "VEGA: The integrator went unstable!!");
     }
 
     glPopMatrix();
