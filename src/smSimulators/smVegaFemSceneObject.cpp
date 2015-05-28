@@ -47,8 +47,6 @@ smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, sm
     explosionFlag = 0;
     timestepCounter = 0;
     subTimestepCounter = 0;
-    numForceLoads = 0;
-    forceLoads = nullptr;
     integratorBase = nullptr;
     implicitNewmarkSparse = nullptr;
     integratorBaseSparse = nullptr;
@@ -171,12 +169,6 @@ smVegaFemSceneObject::~smVegaFemSceneObject()
     if (velInitial != nullptr)
     {
         free(velInitial);
-    }
-
-    //REVISIT!
-    if (fixedVertices != nullptr)
-    {
-        delete fixedVertices;
     }
 
     if (secondaryDeformableObjectRenderingMesh_interpolation_vertices != nullptr)
@@ -643,36 +635,34 @@ void smVegaFemSceneObject::loadRenderingMesh()
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
-
+    int numFixedVertices = fixedVertices.size();
     if (!((femConfig->deformableObject == MASSSPRING) && (femConfig->massSpringSystemSource == CHAIN)))
     {
         // read the fixed vertices
         // 1-indexed notation
         if (strcmp(femConfig->fixedVerticesFilename, "__none") == 0)
         {
-            numFixedVertices = 0;
-            fixedVertices = nullptr;
+            fixedVertices.clear();
         }
         else
         {
-            if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &fixedVertices) != 0)
+            int * data = fixedVertices.data();
+            if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &data) != 0)
             {
-                printf("VEGA: Error reading fixed vertices.\n");
-                exit(1);
+                throw std::logic_error("VEGA: Error reading fixed vertices.");
             }
 
-            LoadList::sort(numFixedVertices, fixedVertices);
+            LoadList::sort(numFixedVertices, fixedVertices.data());
         }
     }
     else
     {
-        numFixedVertices = 1;
-        fixedVertices = new int[numFixedVertices];
+        fixedVertices.resize(1);
         fixedVertices[0] = massSpringSystem->GetNumParticles();
     }
 
     printf("VEGA: Loaded %d fixed vertices. They are:\n", numFixedVertices);
-    LoadList::print(numFixedVertices, fixedVertices);
+    LoadList::print(numFixedVertices, fixedVertices.data());
 
     // create 0-indexed fixed DOFs
     int numFixedDOFs = 3 * numFixedVertices;
@@ -743,12 +733,13 @@ void smVegaFemSceneObject::loadInitialStates()
 // load the scripted externalloads
 void smVegaFemSceneObject::loadScriptedExternalFroces()
 {
-
     // load force loads
+    int numForceLoads = forceLoads.size();
     if (strcmp(femConfig->forceLoadsFilename, "__none") != 0)
     {
         int m1;
-        ReadMatrixFromDisk_(femConfig->forceLoadsFilename, &m1, &numForceLoads, &forceLoads);
+        double *data = forceLoads.data();
+        ReadMatrixFromDisk_(femConfig->forceLoadsFilename, &m1, &numForceLoads, &data);
 
         if (m1 != 3 * n)
         {
@@ -762,8 +753,8 @@ void smVegaFemSceneObject::loadScriptedExternalFroces()
 void smVegaFemSceneObject::initializeTimeIntegrator()
 {
 
-    int numFixedDOFs = 3 * numFixedVertices;
-    int * fixedDOFs = new int[numFixedDOFs];
+    int numFixedDOFs = 3 * this->fixedVertices.size();
+    std::vector<int> fixedDOFs(numFixedDOFs,0);
 
     // initialize the integrator
     printf("VEGA: Initializing the integrator, n = %d...\n", n);
@@ -775,7 +766,7 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
     {
 		implicitNewmarkSparse = std::make_shared<ImplicitNewmarkSparse>(3 * n, femConfig->timeStep,
                 massMatrix.get(), forceModel.get(), positiveDefinite,
-                numFixedDOFs, fixedDOFs,
+                numFixedDOFs, fixedDOFs.data(),
                 femConfig->dampingMassCoef,
                 femConfig->dampingStiffnessCoef,
                 femConfig->maxIterations,
@@ -789,10 +780,11 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
     {
 		implicitNewmarkSparse = std::make_shared<ImplicitBackwardEulerSparse>(3 * n, femConfig->timeStep,
                 massMatrix.get(), forceModel.get(), positiveDefinite,
-                numFixedDOFs, fixedDOFs,
+                numFixedDOFs, fixedDOFs.data(),
                 femConfig->dampingMassCoef,
                 femConfig->dampingStiffnessCoef,
-                femConfig->maxIterations, femConfig->epsilon,
+                femConfig->maxIterations,
+                femConfig->epsilon,
                 femConfig->numSolverThreads);
         integratorBaseSparse = implicitNewmarkSparse;
     }
@@ -801,7 +793,7 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
         int symplectic = 0;
 		integratorBaseSparse = std::make_shared<EulerSparse>(3 * n, femConfig->timeStep,
                                                massMatrix.get(), forceModel.get(), symplectic,
-                                               numFixedDOFs, fixedDOFs,
+                                               numFixedDOFs, fixedDOFs.data(),
                                                femConfig->dampingMassCoef);
     }
     else if (femConfig->solver == SYMPLECTICEULER)
@@ -809,13 +801,13 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
         int symplectic = 1;
         integratorBaseSparse = std::make_shared<EulerSparse>(3 * n, femConfig->timeStep, massMatrix.get(),
                                                forceModel.get(), symplectic, numFixedDOFs,
-                                               fixedDOFs, femConfig->dampingMassCoef);
+                                               fixedDOFs.data(), femConfig->dampingMassCoef);
     }
     else if (femConfig->solver == CENTRALDIFFERENCES)
     {
 		integratorBaseSparse = std::make_shared<CentralDifferencesSparse>(3 * n, femConfig->timeStep,
                 massMatrix.get(), forceModel.get(),
-                numFixedDOFs, fixedDOFs,
+                numFixedDOFs, fixedDOFs.data(),
                 femConfig->dampingMassCoef,
                 femConfig->dampingStiffnessCoef,
                 femConfig->centralDifferencesTangentialDampingUpdateMode,
@@ -1219,7 +1211,7 @@ inline void smVegaFemSceneObject::applyScriptedExternalForces()
 {
 
     // apply any scripted force loads
-    if (timestepCounter < numForceLoads)
+    if (timestepCounter < this->forceLoads.size())
     {
         printf("  External forces read from the binary input file.\n");
 
@@ -1469,7 +1461,7 @@ void smVegaFemSceneObject::renderWithVega()
     // render model fixed vertices
     if (femConfig->renderFixedVertices)
     {
-        for (int i = 0; i < numFixedVertices; i++)
+        for (int i = 0; i < this->fixedVertices.size(); i++)
         {
             glColor3f(1, 0, 0);
             double fixedVertexPos[3];

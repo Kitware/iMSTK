@@ -217,10 +217,8 @@ public:
 
     /// Force models, time integrators, sparse matrices and meshes.
     /// some variable names are self explainatory
-    int numFixedVertices; ///< number of fixed vertices
-    int * fixedVertices; ///< fixed vertcies
-    int numForceLoads; ///< number of discrete external load inputs
-    double * forceLoads; ///< discrete external load inputs
+    std::vector<int> fixedVertices; ///< fixed vertcies
+    std::vector<double> forceLoads; ///< discrete external load inputs
     int positiveDefinite; ///< 1 if the effective matrix is positive definite
     std::shared_ptr<IntegratorBase> integratorBase; ///< integrator
     std::shared_ptr<ImplicitNewmarkSparse> implicitNewmarkSparse;
