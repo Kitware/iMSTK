@@ -19,6 +19,8 @@ set(USE_PHANTOM_OMNI @SimMedTK_USE_PHANTOM_OMNI@)
 set(USE_ADU @SimMedTK_USE_ADU@)
 set(USE_NIUSB6008 @SimMedTK_USE_NIUSB6008@)
 
+set(VegaFEM_DIR @VegaFEM_DIR@)
+
 ## Collect external libs includes and settings
 set(SimMedTK_INCLUDE_DIRS
 )
@@ -30,7 +32,7 @@ find_package(SFML REQUIRED)
 find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(VegaFEM REQUIRED CONFIG)
+find_package(VegaFEM REQUIRED)
 find_package(ThreadPool REQUIRED)
 if(USE_OCULUS)
   find_package(Oculus REQUIRED)
