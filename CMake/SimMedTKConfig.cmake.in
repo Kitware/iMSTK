@@ -67,5 +67,7 @@ list(APPEND SimMedTK_INCLUDE_DIRS
 
 include_directories("${SimMedTK_INCLUDE_DIRS}")
 
+link_directories(@CMAKE_LIBRARY_PATH@)
+
 # Path to target files
 include("@CMAKE_CURRENT_BINARY_DIR@/SimMedTKTargets.cmake")

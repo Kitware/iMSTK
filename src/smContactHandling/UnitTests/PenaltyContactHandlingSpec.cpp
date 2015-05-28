@@ -33,7 +33,7 @@
 
 using namespace bandit;
 
-auto createStaticPlaneSceneObject()
+std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 {
 
 	auto staticPlane = std::make_shared<smStaticSceneObject>();
@@ -46,7 +46,7 @@ auto createStaticPlaneSceneObject()
 }
 
 
-auto createSampleCollisionPair()
+std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 {
 
 	auto collisionPair = std::make_shared<smCollisionPair>();

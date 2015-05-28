@@ -90,6 +90,7 @@ class smVegaFemSceneObject: public smSceneObject
 {
 public:
 
+    /// \brief Constructor
 	smVegaFemSceneObject();
 
     /// \brief Constructor
