@@ -350,7 +350,7 @@ void smVegaFemSceneObject::loadMeshes()
 
 		printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);printf("VEGA:000000");
         // get the mass matrix
-		std::shared_ptr<SparseMatrixOutline> massMatrixOutline; 
+		std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
 
         try
         {
@@ -1121,7 +1121,7 @@ void smVegaFemSceneObject::applyContactForces()
 {
     if(f_contact.size() != 0)
     {
-        for(int i=0; i<f_contact.size(); i++)
+        for(size_t i=0; i<f_contact.size(); i++)
         {
             f_ext[i] += f_contact[i];
         }
@@ -1463,7 +1463,7 @@ void smVegaFemSceneObject::renderWithVega()
     // render model fixed vertices
     if (femConfig->renderFixedVertices)
     {
-        for (int i = 0; i < this->fixedVertices.size(); i++)
+        for (size_t i = 0; i < this->fixedVertices.size(); i++)
         {
             glColor3f(1, 0, 0);
             double fixedVertexPos[3];
