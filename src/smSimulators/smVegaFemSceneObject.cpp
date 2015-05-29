@@ -1339,7 +1339,7 @@ inline void smVegaFemSceneObject::updateStats()
                         fps, smInt(100 * cpuLoad + 0.5));
             }
 
-            glutSetWindowTitle(windowTitle);
+//             glutSetWindowTitle(windowTitle);
         }
 
         graphicFrame = 0;
@@ -1366,8 +1366,6 @@ void smVegaFemSceneObject::draw(const smDrawParam &p_params)
     }
     else
     {
-        int ac; char**av;
-        glutInit(&ac,av);
         renderWithVega();
     }
 }
@@ -1528,7 +1526,7 @@ void smVegaFemSceneObject::renderWithVega()
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
 
-    glutSwapBuffers();
+//     glutSwapBuffers();
 }
 
 //font is, for example, GLUT_BITMAP_9_BY_15
@@ -1541,7 +1539,7 @@ void smVegaFemSceneObject::print_bitmap_string(float x, float y, float z, void *
     {
         while (*s)
         {
-            glutBitmapCharacter(font, *s);
+//             glutBitmapCharacter(font, *s);
             s++;
         }
     }

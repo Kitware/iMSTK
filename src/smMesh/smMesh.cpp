@@ -661,12 +661,12 @@ void smLineMesh::draw(const smDrawParam &p_params)
             glPushMatrix();
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorYellow.toGLColor());
             glTranslatef(edgeAABBs[i].aabbMin[0], edgeAABBs[i].aabbMin[1], edgeAABBs[i].aabbMin[2]);
-            glutSolidSphere(0.2, 15.0, 15.0);
+//             glutSolidSphere(0.2, 15.0, 15.0);
             glPopMatrix();
             glPushMatrix();
             glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
             glTranslatef(edgeAABBs[i].aabbMax[0], edgeAABBs[i].aabbMax[1], edgeAABBs[i].aabbMax[2]);
-            glutSolidSphere(0.2, 15.0, 15.0);
+//             glutSolidSphere(0.2, 15.0, 15.0);
             glPopMatrix();
         }
     }
@@ -842,7 +842,7 @@ bool smLineMesh::isMeshTextured()
 }
 
 void smMesh::updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh)
-{   
+{
     //copy the vertex co-ordinates
     for(smInt i=0; i<this->nbrVertices ; i++)
     {
@@ -853,7 +853,7 @@ void smMesh::updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfa
 }
 
 bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh, const bool perProcessingStage)
-{   
+{
 
     if(!vegaSurfaceMesh->isTriangularMesh())
     {
@@ -862,7 +862,7 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfa
             this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
             return 0;
         }
-    }    
+    }
 
     smInt i, threeI;
 
@@ -873,7 +873,7 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfa
     smInt ** triangles;
     smInt * numGroups;
 	smInt ** triangleGroups;
-    
+
     vegaSurfaceMesh->exportGeometry(numVertices, vertices, numTriangles , triangles, numGroups, triangleGroups);
 
     this->nbrVertices = *numVertices;
@@ -918,8 +918,8 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfa
     delete [] triangles;
 
     for(i=0; i<this->nbrVertices ; i++)
-    {        
-        delete [] vertices[i];        
+    {
+        delete [] vertices[i];
     }
     delete [] vertices;
 

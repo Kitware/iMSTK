@@ -400,7 +400,7 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
         glPushMatrix();
         glTranslatef( cells[0].cellLeftCorner[0], cells[0].cellLeftCorner[1], cells[0].cellLeftCorner[2] );
         glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
-        glutSolidSphere( 2, 20, 20 );
+//         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
 
         glPushMatrix();
@@ -408,7 +408,7 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
                       cells[this->totalCells - 1].cellRightCorner[1],
                       cells[this->totalCells - 1].cellRightCorner[2] );
         glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorRed));
-        glutSolidSphere( 2, 20, 20 );
+//         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
         glPopMatrix();
     }
