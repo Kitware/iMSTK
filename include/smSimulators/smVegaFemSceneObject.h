@@ -166,6 +166,10 @@ public:
 
     void setRenderUsingVega(const bool vegaRender);
 
+    /// \brief check all the surface nodes for the closest node within
+    /// certain threshold and set it to be the pulled vertex
+    void setPulledVertex(const smVec3d &userPos);
+
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
     virtual void draw(const smDrawParam &p_params) override;

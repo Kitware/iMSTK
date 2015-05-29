@@ -23,9 +23,6 @@
 
 // SimMedTK includes
 #include "smSimulators/smVegaFemSimulator.h"
-#include "smEvent/smEvent.h"
-#include "smEvent/smKeyboardEvent.h"
-#include "smEvent/smEventHandler.h"
 
 smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
 {
@@ -68,6 +65,7 @@ void smVegaFemSimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
             auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
+            
             femSceneObject->advanceDynamics();
         }
     }
@@ -85,21 +83,17 @@ void smVegaFemSimulator::syncBuffers()
 
 void smVegaFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    /*switch ( p_event->getEventType().eventTypeCode )
+    if (!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
+        return;
+    }
 
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
-            {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
-            }
+    /*auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if (hapticEvent != nullptr && hapticEvent->getDeviceId() == 1)
+    {
+        hapticPosition = hapticEvent->getPosition();
+        hapticButtonPressed = hapticEvent->getButtonState(0);
+        return;
+    }*/    
 
-            break;
-        }
-        default:
-            std::cerr << "Unknown class name." << std::endl;
-
-    }*/
 }

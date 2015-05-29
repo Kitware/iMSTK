@@ -1135,6 +1135,11 @@ void smVegaFemSceneObject::setContactForcesToZero()
     f_contact.assign(f_contact.size(),0.0);
 }
 
+void smVegaFemSceneObject::setPulledVertex(const smVec3d &userPos)
+{
+    pulledVertex = this->volumetricMesh->getClosestVertex(Vec3d(userPos(0), userPos(1), userPos(2)));
+}
+
 // Forces as a result of user interaction (through an interface such as mouse or haptic device) with the scene during runtime are added here
 inline void smVegaFemSceneObject::applyUserInteractionForces()
 {
