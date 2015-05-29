@@ -29,6 +29,9 @@
 #include "smUtilities/smVector.h"
 #include "smUtilities/smMatrix.h"
 
+#include "smRendering/smGLRenderer.h"
+//#include "smRendering/smViewer.h"
+
 //forward declaration
 struct smSphere;
 
@@ -52,22 +55,30 @@ public:
     smPlane(){}
     ~smPlane(){}
 
-    /// \brief sphere constructor with center and radius
+    /// \brief create a plane with point and unit normal
     smPlane(const smVec3d &p, const smVec3d &n)
     {
         this->point = p;
         this->unitNormal = n;
+        this->width = 1.0;
+        
+        this->drawPointsOrig[0] = smVec3d(width, 0, 0);
+        this->drawPointsOrig[1] = smVec3d(0, width, 0);
+        this->drawPointsOrig[2] = smVec3d(-width, 0, 0);
+        this->drawPointsOrig[3] = smVec3d(0, -width, 0);
+
+        this->movedOrRotated = true;
     }
 
     double distance(const smVec3d &p_vector)
     {
-        auto m = (p_vector-point).dot(unitNormal);
+        auto m = (p_vector - this->point).dot(this->unitNormal);
         return m;
     };
 
     smVec3d project(const smVec3d &p_vector)
     {
-        return p_vector-((point-p_vector)*unitNormal.transpose())*unitNormal;
+        return p_vector - ((this->point - p_vector)*this->unitNormal.transpose())*this->unitNormal;
     };
 
     const smVec3d &getUnitNormal() const
@@ -75,9 +86,16 @@ public:
         return this->unitNormal;
     }
 
+    void setModified(bool s)
+    {
+        this->movedOrRotated = s;
+    };
+
     void setUnitNormal(const smVec3d &normal)
     {
         this->unitNormal = normal;
+
+        this->movedOrRotated = true;
     }
 
     const smVec3d &getPoint() const
@@ -88,21 +106,86 @@ public:
     void setPoint(const smVec3d &p)
     {
         this->point = p;
+
+        this->movedOrRotated = true;
     }
 
     void translate(const smVec3d &t)
     {
-        point += t;
+        this->point += t;
+
+        this->movedOrRotated = true;
     }
 
     void rotate(const smMatrix33d &rot)
     {
-        unitNormal = rot * unitNormal;
+        this->unitNormal = rot * this->unitNormal;
+
+        this->movedOrRotated = true;
+    }
+
+    void setDrawPoint(const smVec3d &p1, const smVec3d &p2, const smVec3d &p3, const smVec3d &p4)
+    {
+        this->drawPointsOrig[0] = p1;
+        this->drawPointsOrig[1] = p2;
+        this->drawPointsOrig[2] = p3;
+        this->drawPointsOrig[3] = p4;
+
+        this->movedOrRotated = true;
+    }
+
+    void setWidth(double w)
+    {
+        this->width = w;
+    }
+
+    void updateDrawPoints()
+    {
+        smVec3d ny = smVec3d(0.0, unitNormal[2], -unitNormal[1]);
+        smVec3d nz = ny.cross(unitNormal);
+        ny.normalize();
+        nz.normalize();
+
+        smMatrix33d R;
+        R << this->unitNormal[0], ny[1], nz[2],
+             this->unitNormal[0], ny[1], nz[2],
+             this->unitNormal[0], ny[1], nz[2];
+
+        for (int i = 0; i < 4; i++)
+        {
+            this->drawPoints[i] = this->point + R*this->drawPointsOrig[i];
+        }
+        this->movedOrRotated = false;
     }
 
     void draw()
     {
-        // add plane rendering here
+        if (this->movedOrRotated)
+        {
+            updateDrawPoints();
+        }
+        glEnable(GL_LIGHTING);
+
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, smColor::colorGray.toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, smColor::colorWhite.toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, smColor::colorGray.toGLColor());
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        glPushMatrix();
+            glBegin(GL_QUADS);
+                glVertex3f(this->drawPoints[0][0], this->drawPoints[0][1], this->drawPoints[0][2]);
+                glVertex3f(this->drawPoints[1][0], this->drawPoints[1][1], this->drawPoints[1][2]);
+                glVertex3f(this->drawPoints[2][0], this->drawPoints[2][1], this->drawPoints[2][2]);
+                glVertex3f(this->drawPoints[3][0], this->drawPoints[3][1], this->drawPoints[3][2]);
+            glEnd();
+        glPopMatrix();
+
+        glDisable(GL_BLEND);
+
+        glEnable(GL_LIGHTING);
+
     }
 
 private:
@@ -111,6 +194,18 @@ private:
 
     /// \brief any point on the plane
     smVec3d point;
+
+    /// \brief true if the plane is static
+    bool movedOrRotated;
+
+    /// \brief width od the plane for rendering
+    double width;
+
+    /// \brief four points used to render plane
+    smVec3d drawPoints[4];
+
+    /// \brief four points used to render plane
+    smVec3d drawPointsOrig[4];
 };
 
 
