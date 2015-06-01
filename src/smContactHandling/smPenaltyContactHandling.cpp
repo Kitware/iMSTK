@@ -88,15 +88,12 @@ void smPenaltyContactHandling::computeUnilateralContactForces()
         for( int i = 0; i < contactInfo.size(); i++ )
         {
             nodeDofID = 3 * contactInfo[i]->index;
-
-            velocityProjection = smVec3d( femSceneObject->uvel[nodeDofID], femSceneObject->uvel[nodeDofID + 1], femSceneObject->uvel[nodeDofID + 2] );
+            velocityProjection = femSceneObject->getVelocityOfNodeWithDofID(nodeDofID);
             velocityProjection = contactInfo[i]->normal.dot( velocityProjection ) * contactInfo[i]->normal;
 
             force = stiffness * contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
 
-            femSceneObject->f_contact[nodeDofID] += force( 0 );
-            femSceneObject->f_contact[nodeDofID + 1] += force( 1 );
-            femSceneObject->f_contact[nodeDofID + 2] += force( 2 );
+            femSceneObject->setContactForceOfNodeWithDofID(nodeDofID, force);
 
         }
 

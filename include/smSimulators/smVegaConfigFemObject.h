@@ -27,6 +27,9 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 
+// VEGA includes
+#include "performanceCounter.h"
+
 // STL includes
 #include <cstdlib>
 #include <iostream>
@@ -39,11 +42,76 @@
 #include <windows.h>
 #endif
 
+#define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
+
 enum massSpringSystemSourceType { OBJ, TETMESH, CUBICMESH, CHAIN, NONE };
 enum deformableObjectType { STVK, COROTLINFEM, LINFEM, MASSSPRING, INVERTIBLEFEM, UNSPECIFIED };
 enum invertibleMaterialType { INV_STVK, INV_NEOHOOKEAN, INV_MOONEYRIVLIN, INV_NONE };
 enum solverType { IMPLICITNEWMARK, IMPLICITBACKWARDEULER, EULER, SYMPLECTICEULER, CENTRALDIFFERENCES, UNKNOWN };
 
+class smVegaPerformanceCounter
+{
+public:
+    /// performance counters and simulation flags. some variable names are self explainatory
+    double fps; ///< fps of the simulation
+    int fpsBufferSize;///< buffer size to display fps
+    int fpsHead; ///< !!
+    double fpsBuffer[5]; ///< buffer to display fps
+    double cpuLoad;
+    double forceAssemblyTime;
+    double forceAssemblyLocalTime;
+    int forceAssemblyBufferSize;
+    int forceAssemblyHead;
+    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    double systemSolveTime;
+    double systemSolveLocalTime;
+    int systemSolveBufferSize;
+    int systemSolveHead;
+    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    PerformanceCounter titleBarCounter;
+    PerformanceCounter explosionCounter;
+    PerformanceCounter cpuLoadCounter;
+
+    smVegaPerformanceCounter(){};
+    ~smVegaPerformanceCounter(){};
+
+    void initialize()
+    {
+        fps = 0.0;
+        fpsHead = 0;
+        cpuLoad = 0;
+        forceAssemblyTime = 0.0;
+        forceAssemblyLocalTime = 0.0;
+        forceAssemblyHead = 0;
+        systemSolveTime = 0.0;
+        systemSolveLocalTime = 0.0;
+        systemSolveHead = 0;
+
+        fpsBufferSize = 5; ///< buffer size to display fps
+        forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+        systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+    };
+
+    void clearFpsBuffer()
+    {
+        // clear fps buffer
+        int i;
+        for (i = 0; i < fpsBufferSize; i++)
+        {
+            fpsBuffer[i] = 0.0;
+        }
+
+        for (i = 0; i < forceAssemblyBufferSize; i++)
+        {
+            forceAssemblyBuffer[i] = 0.0;
+        }
+
+        for (i = 0; i < systemSolveBufferSize; i++)
+        {
+            systemSolveBuffer[i] = 0.0;
+        }
+    };
+};
 
 /// \brief This class parses and holds the information related to various input files
 /// It is separated from the smVegaFemSceneObject class in order to reduce the
