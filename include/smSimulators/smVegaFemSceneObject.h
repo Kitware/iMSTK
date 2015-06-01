@@ -28,6 +28,7 @@
 #include "smCore/smConfig.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
+#include "smMesh/smVegaSceneObjectDeformable.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smErrorLog.h"
@@ -65,7 +66,6 @@
 #include "objMesh.h"
 #include "performanceCounter.h"
 #include "renderSprings.h"
-#include "sceneObjectDeformable.h"
 #include "StVKCubeABCD.h"
 #include "StVKElementABCDLoader.h"
 #include "StVKForceModel.h"
@@ -262,8 +262,8 @@ public:
     int * secondaryDeformableObjectRenderingMesh_interpolation_vertices;
     double * secondaryDeformableObjectRenderingMesh_interpolation_weights;
 
-    std::shared_ptr<SceneObjectDeformable> deformableObjectRenderingMesh;
-    std::shared_ptr<SceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
+    std::shared_ptr<smVegaSceneObjectDeformable> deformableObjectRenderingMesh;
+    std::shared_ptr<smVegaSceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
 
     std::shared_ptr<smVolumeMesh> smtkVolumeMesh;
     std::shared_ptr<smSurfaceMesh> smtkSurfaceMesh;

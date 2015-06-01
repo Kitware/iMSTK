@@ -568,11 +568,11 @@ void smVegaFemSceneObject::loadRenderingMesh()
         exit(1);
     }
 
-    deformableObjectRenderingMesh = std::make_shared<SceneObjectDeformable>(femConfig->renderingMeshFilename);
+    deformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
 
     if (enableTextures)
     {
-        deformableObjectRenderingMesh->SetUpTextures(SceneObject::MODULATE, SceneObject::NOMIPMAP);
+        deformableObjectRenderingMesh->SetUpTextures(smVegaSceneObject::MODULATE, smVegaSceneObject::NOMIPMAP);
     }
 
     deformableObjectRenderingMesh->ResetDeformationToRest();
@@ -586,11 +586,11 @@ void smVegaFemSceneObject::loadRenderingMesh()
     if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
     {
 
-        secondaryDeformableObjectRenderingMesh = std::make_shared<SceneObjectDeformable>(femConfig->secondaryRenderingMeshFilename);
+        secondaryDeformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->secondaryRenderingMeshFilename);
 
         if (enableTextures)
         {
-            secondaryDeformableObjectRenderingMesh->SetUpTextures(SceneObject::MODULATE, SceneObject::NOMIPMAP);
+            secondaryDeformableObjectRenderingMesh->SetUpTextures(smVegaSceneObject::MODULATE, smVegaSceneObject::NOMIPMAP);
         }
 
         secondaryDeformableObjectRenderingMesh->ResetDeformationToRest();
