@@ -9,14 +9,10 @@ public:
   smVegaSceneObjectWithRestPosition(char * filename);
   virtual ~smVegaSceneObjectWithRestPosition();
 
-  void GetVertexRestPositions(float * buffer);
-  void GetVertexRestPositions(double * buffer);
-  std::shared_ptr<double> GetVertexRestPositions() { return restPosition; }
-
   virtual void TransformRigidly(double * centerOfMass, double * R);
 
 protected:
-    std::shared_ptr<double> restPosition;
+    std::vector<double> restPosition;
 };
 
 #endif

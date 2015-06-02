@@ -841,7 +841,7 @@ bool smLineMesh::isMeshTextured()
     return isTextureCoordAvailable;
 }
 
-void smMesh::updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh)
+void smMesh::updateSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
     //copy the vertex co-ordinates
     for(smInt i=0; i<this->nbrVertices ; i++)
@@ -852,7 +852,7 @@ void smMesh::updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfa
     }
 }
 
-bool smMesh::importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh, const bool perProcessingStage)
+bool smMesh::importSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
 {
 
     if(!vegaSurfaceMesh->isTriangularMesh())

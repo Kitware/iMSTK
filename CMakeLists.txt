@@ -149,7 +149,6 @@ if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-DWIN32_LEAN_AND_MEAN)
   add_definitions(-DWINDOWS_EXTRA_LEAN)
-  add_definitions(-DGLUT_BUILDING_LIB)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -194,8 +193,6 @@ if(BUILD_TESTING)
 endif()
 
 include(SimMedTKMacros)
-
-simmedtk_find_package(GLUT REQUIRED)
 
 if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)

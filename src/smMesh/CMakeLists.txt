@@ -29,7 +29,6 @@ target_link_libraries(smMesh
     smCollision
   PUBLIC
     Assimp::Assimp
-    VegaFEM::lighting
     VegaFEM::minivector
     VegaFEM::volumetricMesh
     )

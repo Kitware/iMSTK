@@ -15,43 +15,15 @@
 #include "smCore/smErrorLog.h"
 #include "smCore/smCoreClass.h"
 
-#include "macros.h"
+#include "vec3d.h"
 #include "objMesh.h"
-#include "objMeshRender.h"
-#include "minivector.h"
 
 class smVegaSceneObject
 {
 public:
-
-  enum LightingModulationType {MODULATE, REPLACE};
-  enum MipmapType {USEMIPMAP, NOMIPMAP};
-  enum AnisotropicFilteringType {USEANISOTROPICFILTERING, NOANISOTROPICFILTERING};
-  enum TextureTransparencyType {USETEXTURETRANSPARENCY, NOTEXTURETRANSPARENCY}; // enables 2-pass rendering for textures with transparencies
-
   // create a static scene object, by loading it from an Alias Wavefront OBJ file
   smVegaSceneObject(char * filename);
   virtual ~smVegaSceneObject();
-
-  // ==== render ====
-
-  virtual void Render();
-  virtual void RenderVertices();
-  virtual void RenderEdges(); 
-  virtual void RenderNormals();
-  virtual void RenderFacesAndEdges();
-
-  virtual void RenderVertex(int vertex);
-  virtual void RenderVertices(int numVertices, int * vertexList); // 0-indexed vertices
-  virtual void RenderVertices_Selection();
-
-  virtual void RenderShadow(double ground[4], double light[4]);
-  void RenderEdgesInGroup(char * groupName); // renders only the edges in the given group
-
-  // ==== display lists ====
-
-  void BuildDisplayList();
-  void PurgeDisplayList();
 
   // ==== mesh info and geometric queries ====
 
@@ -59,8 +31,6 @@ public:
   inline int GetNumVertices() { return n; }
   inline int GetNumFaces() { return mesh->getNumFaces(); }
   inline std::shared_ptr<ObjMesh> GetMesh() { return mesh; }
-  inline std::shared_ptr<ObjMeshRender> GetMeshRender() { return meshRender; }
-  inline int GetRenderMode() { return renderMode; }
 
   // smallest ball radius that encloses the model, with the ball centered at the given centroid
   void ComputeMeshRadius(Vec3d & centroid, double * radius);
@@ -74,19 +44,6 @@ public:
   // in this class, you can safely ignore the last parameter (keep it NULL)
   virtual int GetClosestVertex(Vec3d & queryPos, double * distance=NULL, double * auxVertexBuffer=NULL);
 
-  // ==== texture mapping and materials ====
-
-  // lightingModulation determines whether to multiply or replace the object color with the texture color
-  // mipmap determines whether to use mipmapping for texture rendering
-  // texturePool and updatePool should normally be set to NULL and 0. These options exist so that you can share the same texture across multiple meshes. If "texturePool" is not NULL, the loader will search for the texture in the pool of textures, Only if not found, it will load the texture, otherwise, it will soft-link it. If "updatePool" is 1, the loader will add a soft-link to any unique textures discovered in this object to the texturePool.
-  int SetUpTextures(LightingModulationType lightingModulation=MODULATE, MipmapType mipmap=USEMIPMAP, AnisotropicFilteringType anisotropicFiltering=USEANISOTROPICFILTERING, TextureTransparencyType=NOTEXTURETRANSPARENCY, std::vector<ObjMeshRender::Texture*> * texturePool=NULL, int updatePool=0); // you must call this **after** OpenGL has been initialized!!!
-  void EnableTextures();
-  void DisableTextures();
-  bool AreTexturesEnabled();
-  inline bool HasTextures() { return hasTextures_; }
-
-  void SetMaterialAlpha(double alpha); // sets the material alpha value for all the materials
-
   // ==== normals ====
 
   void BuildFaceNormals();
@@ -99,30 +56,12 @@ public:
 
   void SetNormalsToFaceNormals();
 
-  // ==== vertex labeling ====
-
-  void HighlightVertex(int i); // same as RenderVertex, except it always renders in green color and with point size 8.0
-
-  // model matrix for the shadow
-  static void SetShadowingModelviewMatrix(double ground[4], double light[4]);
-
   // ==== transformation ====
   virtual void TransformRigidly(double * centerOfMass, double * R);
 
 protected:
   int n;
-  unsigned int renderMode;
-  TextureTransparencyType textureTransparency;
-
   std::shared_ptr<ObjMesh> mesh;
-  std::shared_ptr<ObjMeshRender> meshRender;
-  GLuint displayList;
-  bool displayListExists;
-
-  GLuint displayListEdges;
-  bool displayListEdgesExists;
-
-  bool hasTextures_;
 };
 
 #endif

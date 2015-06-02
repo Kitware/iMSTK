@@ -31,7 +31,6 @@ target_link_libraries(smSimulators
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts
-    VegaFEM::sceneObject
     VegaFEM::performanceCounter
     VegaFEM::volumetricMesh
     VegaFEM::stvk

@@ -197,10 +197,10 @@ public:
     virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
 
     /// \brief load the mesh
-    bool importSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh, const bool perProcessingStage);
+    bool importSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage);
 
     /// \brief update the surface mesh data after the deformation
-    void updateSurfaceMeshDataFromVEGA_Format(const ObjMesh* const vegaSurfaceMesh);
+    void updateSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh);
 
     /// \brief render the surface mesh
     virtual void draw(const smDrawParam &/*p_params*/) override;
