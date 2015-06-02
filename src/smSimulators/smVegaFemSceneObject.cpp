@@ -96,7 +96,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, sm
     {
 		femConfig = std::make_shared<smVegaConfigFemObject>();
         femConfig->setFemObjConfuguration(ConfigFile);
-		std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file!" <<
+		std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file: " <<
 			ConfigFile.c_str() << std::endl;
 
 		initSimulation();
@@ -190,7 +190,8 @@ void smVegaFemSceneObject::initSimulation()
     massSpringSystem = nullptr;
 
     setDeformableModel();
-    loadMeshes();
+    loadVolumeMesh();
+    loadSurfaceMesh();
 
     if(importAndUpdateVolumeMeshToSmtk)
     {
@@ -315,7 +316,7 @@ void smVegaFemSceneObject::setDeformableModel()
 
 
 // Load specified meshes
-void smVegaFemSceneObject::loadMeshes()
+void smVegaFemSceneObject::loadVolumeMesh()
 {
 
     // load mesh
@@ -347,7 +348,7 @@ void smVegaFemSceneObject::loadMeshes()
             exit(1);
         }
 
-		printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);printf("VEGA:000000");
+		printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);
         // get the mass matrix
 		std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
 
@@ -549,12 +550,76 @@ void smVegaFemSceneObject::loadMeshes()
         meshGraph = std::make_shared<Graph>(massSpringSystem->GetNumParticles(),
                               massSpringSystem->GetNumEdges(), massSpringSystem->GetEdges());
     }
-
+    
     int scaleRows = 1;
     SparseMatrix *sm;
     meshGraph->GetLaplacian(&sm, scaleRows);
     LaplacianDampingMatrix.reset(sm);
     LaplacianDampingMatrix->ScalarMultiply(femConfig->dampingLaplacianCoef);
+}
+
+// Load the rendering mesh if it is designated
+void smVegaFemSceneObject::loadSurfaceMesh()
+{
+    // initialize the rendering mesh for the volumetric mesh
+    if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
+    {
+        printf("VEGA Error: rendering mesh was not specified.\n");
+        exit(1);
+    }
+
+    deformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
+
+    deformableObjectRenderingMesh->ResetDeformationToRest();
+    deformableObjectRenderingMesh->BuildNeighboringStructure();
+    deformableObjectRenderingMesh->BuildNormals();
+    //deformableObjectRenderingMesh->SetMaterialAlpha(0.5);
+
+    // initialize the embedded triangle rendering mesh
+    secondaryDeformableObjectRenderingMesh = nullptr;
+
+    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
+    {
+
+        secondaryDeformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->secondaryRenderingMeshFilename);
+
+        secondaryDeformableObjectRenderingMesh->ResetDeformationToRest();
+        secondaryDeformableObjectRenderingMesh->BuildNeighboringStructure();
+        secondaryDeformableObjectRenderingMesh->BuildNormals();
+
+        uSecondary = new double[3 * secondaryDeformableObjectRenderingMesh->Getn()]();
+
+        // load interpolation structure
+        if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
+        {
+            printf("VEGA Error: no secondary rendering mesh interpolation filename specified.\n");
+            exit(1);
+        }
+
+        secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices =
+            VolumetricMesh::getNumInterpolationElementVertices(femConfig->secondaryRenderingMeshInterpolationFilename);
+
+        if (secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices < 0)
+        {
+            printf("VEGA Error: unable to open file %s.\n", femConfig->secondaryRenderingMeshInterpolationFilename);
+            exit(1);
+        }
+
+        printf("VEGA: Num interpolation element vertices: %d\n",
+            secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices);
+
+        VolumetricMesh::loadInterpolationWeights(
+            femConfig->secondaryRenderingMeshInterpolationFilename,
+            secondaryDeformableObjectRenderingMesh->Getn(),
+            secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices,
+            &secondaryDeformableObjectRenderingMesh_interpolation_vertices,
+            &secondaryDeformableObjectRenderingMesh_interpolation_weights
+            );
+    }
+    else
+    {
+        femConfig->renderSecondaryDeformableObject = 0;
+    }
 }
 
 // Load the data related to the vertices that will remain fixed

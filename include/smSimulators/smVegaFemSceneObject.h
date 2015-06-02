@@ -108,10 +108,10 @@ public:
     void setDeformableModel();
 
     /// \brief Load specified meshes
-    void loadMeshes();
+    void loadVolumeMesh();
 
     /// \brief Load the rendering mesh if it is designated
-    void loadRenderingMesh();
+    void loadSurfaceMesh();
 
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC();

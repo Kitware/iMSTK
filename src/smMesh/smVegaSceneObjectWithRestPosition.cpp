@@ -4,7 +4,7 @@
 
 smVegaSceneObjectWithRestPosition::smVegaSceneObjectWithRestPosition(char * filename): smVegaSceneObject(filename)
 {
-  restPosition.reserve(3 * n);
+  restPosition.resize(3 * n); 
   for(int i = 0; i < n; i++)
   {
     Vec3d pos = mesh->getPosition(i);
