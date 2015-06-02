@@ -60,7 +60,7 @@ public:
     virtual void init() override;
 
     /// \brief called if the object is added to the viewer.
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
 

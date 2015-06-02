@@ -122,7 +122,6 @@ struct smColor
 ///Renders Vertex Buffer Objects
 #define    SIMMEDTK_RENDER_VBO               (1<<16)
 #define    SIMMEDTK_RENDER_NORMALS           (1<<17)
-#define    SIMMEDTK_RENDER_VAO               (1<<18)
 #define    SIMMEDTK_RENDER_NONE              (1<<31)
 
 /// \brief type definitions for variable viewerRenderDetail in smViewer

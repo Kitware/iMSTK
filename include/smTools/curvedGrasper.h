@@ -47,7 +47,7 @@ public:
                   const smString& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief rendering the curved grasper
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
     /// \brief event handler
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;

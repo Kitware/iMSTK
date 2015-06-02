@@ -208,7 +208,7 @@ public:
     void updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh);
 
     /// \brief render the surface mesh
-    virtual void draw(const smDrawParam &/*p_params*/) override;
+    virtual void draw() override;
 
     /// \brief get number of triangles
     int getNumTriangles()  const;
@@ -306,7 +306,7 @@ public:
     smBool isMeshTextured();
 
     /// \brief draw the mesh
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
 public:
     smAABB *edgeAABBs;///< AABBs for the edges in the mesh

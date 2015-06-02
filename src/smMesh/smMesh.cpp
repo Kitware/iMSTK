@@ -514,20 +514,13 @@ void smMesh::rotate(const smMatrix33d &p_rot)
 }
 
 /// \brief
-void smMesh::draw(const smDrawParam &p_params)
+void smMesh::draw()
 {
-    auto viewer = p_params.rendererObject;
+    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), this->getRenderDetail());
 
-    if (viewer->renderStage == SMRENDERSTAGE_SHADOWPASS && p_params.caller->getRenderDetail()->castShadow == false)
+    if (this->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-        return;
-    }
-
-    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), p_params.caller->getRenderDetail(),p_params);
-
-    if (p_params.caller->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
-    {
-        smGLRenderer::drawNormals(safeDownCast<smMesh>(), p_params.caller->getRenderDetail()->normalColor);
+        smGLRenderer::drawNormals(safeDownCast<smMesh>(), this->getRenderDetail()->normalColor);
     }
 }
 
@@ -646,31 +639,10 @@ void smMesh::checkCorrectWinding()
 }
 
 /// \brief
-void smLineMesh::draw(const smDrawParam &p_params)
+void smLineMesh::draw()
 {
-    smGLRenderer::drawLineMesh(safeDownCast<smLineMesh>(), p_params.caller->getRenderDetail());
-
-    if (p_params.caller->getRenderDetail()->debugDraw)
-    {
-        smGLRenderer::draw(this->aabb);
-
-        for (smInt i = 0; i < nbrEdges; i++)
-        {
-
-            smGLRenderer::draw(this->edgeAABBs[i]);
-            glPushMatrix();
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorYellow.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMin[0], edgeAABBs[i].aabbMin[1], edgeAABBs[i].aabbMin[2]);
-//             glutSolidSphere(0.2, 15.0, 15.0);
-            glPopMatrix();
-            glPushMatrix();
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMax[0], edgeAABBs[i].aabbMax[1], edgeAABBs[i].aabbMax[2]);
-//             glutSolidSphere(0.2, 15.0, 15.0);
-            glPopMatrix();
-        }
-    }
 }
+
 smTextureAttachment::smTextureAttachment()
 {
 }

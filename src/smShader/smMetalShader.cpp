@@ -80,14 +80,14 @@ void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, ch
     attachTexture( id, p_alphaMap, "AlphaTex" );
 }
 
-void smMetalShader::draw(const smDrawParam &/*p_param*/)
+void smMetalShader::draw()
 {
     //placeholder
 }
 
-void smMetalShader::initDraw(const smDrawParam &p_param )
+void smMetalShader::initDraw()
 {
-    smShader::initDraw( p_param );
+    smShader::initDraw();
     specularPower = this->getFragmentShaderParam( "specularPower" );
     alphaMapGain = this->getFragmentShaderParam( "alphaMapGain" );
     this->tangentAttrib = this->getShaderAtrribParam( "tangent" );
@@ -154,9 +154,9 @@ MetalShaderShadow::MetalShaderShadow( const smString &p_vertexShaderFileName,
     createParam( "canGetShadow" );
 }
 
-void MetalShaderShadow::initDraw(const smDrawParam &p_param )
+void MetalShaderShadow::initDraw()
 {
-    smMetalShader::initDraw( p_param );
+    smMetalShader::initDraw();
     this->print();
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
@@ -185,9 +185,9 @@ MetalShaderSoftShadow::MetalShaderSoftShadow() :
     createParam( "ShadowMapTEST" );
 }
 
-void MetalShaderSoftShadow::initDraw(const smDrawParam &p_param )
+void MetalShaderSoftShadow::initDraw()
 {
-    smMetalShader::initDraw( p_param );
+    smMetalShader::initDraw();
     this->print();
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
 }

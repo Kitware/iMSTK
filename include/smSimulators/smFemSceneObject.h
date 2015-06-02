@@ -95,7 +95,7 @@ public:
     virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief render the FEM mesh
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
     virtual std::shared_ptr<smSceneObject> clone() override;

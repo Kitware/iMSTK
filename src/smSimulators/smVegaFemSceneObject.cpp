@@ -1312,7 +1312,7 @@ inline void smVegaFemSceneObject::updateStats()
     }
 }
 
-void smVegaFemSceneObject::draw(const smDrawParam &p_params)
+void smVegaFemSceneObject::draw()
 {
-    smtkSurfaceMesh->draw(p_params);
+    smtkSurfaceMesh->draw();
 }

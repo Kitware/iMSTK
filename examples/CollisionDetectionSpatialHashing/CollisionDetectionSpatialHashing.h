@@ -47,7 +47,7 @@ public:
     CollisionDetectionSpatialHashing();
     virtual ~CollisionDetectionSpatialHashing(){}
 
-    void draw (const smDrawParam &p_params);
+    void draw ();
     void simulateMain (const smSimulationMainParam &p_param) override;
     void run();
 

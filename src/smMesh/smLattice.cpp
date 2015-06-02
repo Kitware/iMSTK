@@ -258,7 +258,7 @@ void smLattice::addObject( smSceneObject *obj )
             std::cerr << "Unknown class type." << std::endl;
     }
 }
-void smLattice::draw(const smDrawParam &/*p_params*/ )
+void smLattice::draw()
 {
     int index = 0;
     int index2 = 0;

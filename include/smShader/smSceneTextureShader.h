@@ -43,10 +43,10 @@ public:
                          const smString &p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
 
     /// \brief called during  rendering initialization
-    void initDraw(const smDrawParam &p_param) override;
+    void initDraw() override;
 
     /// \brief if object is added to viewer, it is called from viewer. used for debuginng purposes. It is needed to see effect of instant code changes in shader code
-    void draw(const smDrawParam &p_param) override;
+    void draw() override;
 
     /// \brief pre drawing of the shader. used for binding the uniforms if there are.
     virtual void predraw(std::shared_ptr<smMesh> p_mesh) override;

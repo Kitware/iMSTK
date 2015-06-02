@@ -168,12 +168,12 @@ void smPhysXVolumeMesh::findNeighborTetrasOfNode()
     }
 }
 
-void smPhysXVolumeMesh::draw(const smDrawParam &p_params)
+void smPhysXVolumeMesh::draw()
 {
 
     if (renderSurface)
     {
-        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, p_params.caller->getRenderDetail(),p_params);
+        smGLRenderer::drawSurfaceMeshTriangles(this->surfaceMesh, this->getRenderDetail());
     }
 
     if (renderTetras)

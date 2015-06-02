@@ -25,9 +25,9 @@
 #include "smSimulators/smPBDObjectSimulator.h"
 #include "smRendering/smGLRenderer.h"
 
-void smPBDObjectSimulator::draw(const smDrawParam &p_params)
+void smPBDObjectSimulator::draw()
 {
-    smObjectSimulator::draw(p_params);
+    smObjectSimulator::draw();
     std::shared_ptr<smPBDSurfaceSceneObject> sceneObject;
 
     for (size_t i = 0; i < objectsSimulated.size(); i++)

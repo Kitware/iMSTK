@@ -136,7 +136,7 @@ public:
     bool removeText(smString p_tag);
 
     /// \brief draw text on window
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     /// \brief  handle events
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) override {}
@@ -168,9 +168,7 @@ public:
     /// \brief add text in the display
     virtual smInt addText(const smString &p_tag, const smString &p_string) override;
     /// \brief  draw console
-    virtual void draw(const smDrawParam &p_params) override;
-    /// \brief  handle events
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    virtual void draw() override;
 
 protected:
     /// \brief entered string on the console

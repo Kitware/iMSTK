@@ -32,7 +32,7 @@ void smStaticSceneObject::init() {}
 void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
 void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
 
-void smStaticSceneObject::draw(const smDrawParam &p_params)
+void smStaticSceneObject::draw()
 {
     staticModel->draw();
 }

@@ -172,7 +172,7 @@ public:
 
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     void renderWithVega();
 

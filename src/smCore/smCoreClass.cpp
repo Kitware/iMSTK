@@ -53,33 +53,29 @@ void smCoreClass::setType(const smClassType& newType)
     this->type = newType;
 }
 
-smDrawParam::smDrawParam() :
-    rendererObject{nullptr},
-    caller{nullptr},
-    data{nullptr}
+void smCoreClass::initDraw()
 {
 }
 
-void smCoreClass::initDraw( const smDrawParam &/*p_params*/ )
+void smCoreClass::draw()
 {
-    std::cout << "Default initDraw" << std::endl;
 }
-void smCoreClass::draw( const smDrawParam &/*p_params*/ )
-{
-    std::cout << "Default draw" << std::endl;
-}
+
 void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
 {
     std::cout << "Default initSimulate" << std::endl;
 }
+
 void smCoreClass::simulate( const smSimulationParam &/*p_params*/ )
 {
     std::cout << "Default simulate" << std::endl;
 }
+
 void smCoreClass::print() const
 {
     std::cout << "Default print" << std::endl;
 }
+
 void smCoreClass::handleEvent(std::shared_ptr< smtk::Event::smEvent > event)
 {
     std::cout << "Default handleEvent" << std::endl;

@@ -41,16 +41,6 @@ class smCoreClass;
 class smObjectSimulator;
 class smViewer;
 
-/// \brief  viewer sends this to all objects to be rendered
-struct smDrawParam
-{
-    smDrawParam();
-
-    std::shared_ptr<smViewer> rendererObject;
-    std::shared_ptr<smCoreClass> caller;
-    void *data;
-};
-
 /// \brief simulator calls object and sends this structure
 struct smSimulationParam
 {
@@ -108,19 +98,14 @@ public:
     void setType(const smClassType &newType);
 
     ///
-    /// \brief his function is called by the renderer. The p_params stores renderer pointers
+    /// \brief his function is called by the renderer.
     ///
-    virtual void initDraw(const smDrawParam &p_params);
+    virtual void initDraw();
 
     ///
     /// \brief draw function is called for visualization the object
     ///
-    virtual void draw(const smDrawParam &p_params);
-
-    ///
-    /// \brief draw function is called for visualization the object
-    ///
-//     virtual void draw();
+    virtual void draw();
 
     ///
     /// \brief initialization of simulation

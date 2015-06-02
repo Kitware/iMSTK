@@ -452,10 +452,10 @@ void smFemSceneObject::calculateDisplacements_Dynamic(smStdVector3d &vertices)
     }
 }
 
-void smFemSceneObject::draw(const smDrawParam &p_params)
+void smFemSceneObject::draw()
 {
     // p_params.caller = this;
-    this->v_mesh->draw(p_params);
+    this->v_mesh->draw();
 }
 
 

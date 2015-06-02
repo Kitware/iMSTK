@@ -129,13 +129,13 @@ void smViewer::initGLCaps()
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
 }
 
-void smViewer::initObjects(smDrawParam p_param)
+void smViewer::initObjects()
 {
     for (size_t i = 0; i < objectList.size(); i++)
     {
         if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
         {
-            objectList[i]->initDraw(p_param);
+            objectList[i]->initDraw();
         }
         else
         {
@@ -144,38 +144,34 @@ void smViewer::initObjects(smDrawParam p_param)
     }
 }
 
-void smViewer::initResources(smDrawParam p_param)
+void smViewer::initResources()
 {
     smTextureManager::initGLTextures();
-    smShader::initGLShaders(p_param);
-    smVAO::initVAOs(p_param);
+    smShader::initGLShaders();
+    smVAO::initVAOs();
 
     initFboListItems();
 }
 
-void smViewer::initScenes(smDrawParam p_param )
+void smViewer::initScenes()
 {
-    std::shared_ptr<smSceneObject> sceneObject;
-    smSceneIterator sceneIter;
-
     //traverse all the scene and the objects in the scene
     for(auto&& scene : sceneList)
     {
-        scene->registerForScene(safeDownCast<smViewer>());
+        smSceneLocal sceneLocal;
+
         scene->initLights();
-        sceneIter.setScene(scene, safeDownCast<smViewer>());
+        scene->copySceneToLocal(sceneLocal);
 
-        for ( smInt j = sceneIter.start(); j < sceneIter.end(); j++ )
+        for (auto sceneObject: sceneLocal.sceneObjects)
         {
-            sceneObject = sceneIter[j];
-
             //initialize the custom Render if there is any
             if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
             {
-                sceneObject->customRender->initDraw(p_param);
+                sceneObject->customRender->initDraw();
             }
-            sceneObject->initDraw(p_param);
-        }//object traverse
+            sceneObject->initDraw();
+        }
     }//scene traverse
 }
 
@@ -212,22 +208,16 @@ void smViewer::initGLContext()
 ///initialization of the viewer module
 void smViewer::init()
 {
-    static smDrawParam param;
-
     if (isInitialized)
     {
         return;
     }
 
-    param.rendererObject = safeDownCast<smViewer>();
-    param.caller = safeDownCast<smViewer>();
-    param.data = nullptr;
-
     this->initGLContext();
     this->initGLCaps();
-    this->initObjects(param);
-    this->initResources(param);
-    this->initScenes(param);
+    this->initObjects();
+    this->initResources();
+    this->initScenes();
 
     isInitialized = true;
 }
@@ -327,16 +317,6 @@ void smViewer::destroyFboListItems()
     }
 }
 
-void smViewer::renderSceneList(smDrawParam p_param)
-{
-    //this routine is for rendering. if you implement different objects add rendering accordingly. Viewer knows to draw
-    //only current objects and their derived classes
-    for (size_t sceneIndex = 0; sceneIndex < sceneList.size(); sceneIndex++)
-    {
-        smGLRenderer::renderScene(sceneList[sceneIndex], p_param);
-    }
-}
-
 void smViewer::processViewerOptions()
 {
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
@@ -345,22 +325,22 @@ void smViewer::processViewerOptions()
     }
 }
 
-void smViewer::processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param)
+void smViewer::processRenderOperation(const smRenderOperation &p_rop)
 {
     switch (p_rop.target)
     {
     case SMRENDERTARGET_SCREEN:
-        renderToScreen(p_rop, p_param);
+        renderToScreen(p_rop);
         break;
     case SMRENDERTARGET_FBO:
-        renderToFBO(p_rop, p_param);
+        renderToFBO(p_rop);
         break;
     default:
         assert(0);
     }
 }
 
-void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
+void smViewer::renderToFBO(const smRenderOperation &p_rop)
 {
     assert(p_rop.fbo);
     //Enable FBO for rendering
@@ -371,12 +351,12 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param)
 
     processViewerOptions();
     //Render Scene
-     smGLRenderer::renderScene(p_rop.scene, p_param);
+     smGLRenderer::renderScene(p_rop.scene);
     //Disable FBO
     p_rop.fbo->disable();
 }
 
-void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param)
+void smViewer::renderToScreen(const smRenderOperation &p_rop)
 {
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
@@ -384,7 +364,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_para
 
     processViewerOptions();
     //Render Scene
-    smGLRenderer::renderScene(p_rop.scene, p_param);
+    smGLRenderer::renderScene(p_rop.scene);
 }
 
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
@@ -405,7 +385,6 @@ void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
 
     rop.fboName = p_fboName;
 
-    p_scene->registerForScene(safeDownCast<smViewer>());
     renderOperations.push_back(rop);
 }
 
@@ -443,17 +422,10 @@ inline void smViewer::adjustFPS()
 ///main drawing routine for Rendering of all objects in the scene
 void smViewer::draw()
 {
-
-    static smDrawParam param;
-
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
     {
         return;
     }
-
-    param.rendererObject = safeDownCast<smViewer>();
-    param.caller = safeDownCast<smViewer>();
-    param.data = nullptr;
 
     beginModule();
 
@@ -461,17 +433,17 @@ void smViewer::draw()
 
     for (size_t i = 0; i < objectList.size(); i++)
     {
-        objectList[i]->draw(param);
+        objectList[i]->draw();
     }
 
     for (size_t i = 0; i < renderOperations.size(); i++)
     {
-        processRenderOperation(renderOperations[i], param);
+        processRenderOperation(renderOperations[i]);
     }
 
     for (size_t i = 0; i < objectList.size(); i++)
     {
-        objectList[i]->draw(param);
+        objectList[i]->draw();
     }
 
     endModule();

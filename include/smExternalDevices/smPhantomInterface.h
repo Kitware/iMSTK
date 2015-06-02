@@ -108,7 +108,7 @@ public:
     void exec() override;
 
     /// \brief draw the phantom configuration for visualization
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
 };
 

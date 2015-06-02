@@ -27,7 +27,7 @@
 
 std::unordered_map<smInt, std::shared_ptr<smVAO>> smVAO::VAOs;
 
-void smVAO::initBuffers(smDrawParam /*p_param*/)
+void smVAO::initBuffers()
 {
     smString error;
     ///Create the Vertex Array Objects
@@ -162,7 +162,7 @@ smBool smVAO::updateStreamData()
     return false;
 }
 
-void smVAO::draw(const smDrawParam &/*p_params*/)
+void smVAO::draw()
 {
     glPushAttrib(GL_ENABLE_BIT);
     shader->enableShader();
@@ -286,11 +286,11 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     mesh = p_mesh;
     return true;
 }
-void smVAO::initVAOs( smDrawParam p_param )
+void smVAO::initVAOs()
 {
     for ( auto & x : VAOs )
     {
-        x.second->initBuffers( p_param );
+        x.second->initBuffers();
     }
 }
 std::shared_ptr<smVAO> smVAO::getVAO( std::shared_ptr<smUnifiedId> p_shaderID )
