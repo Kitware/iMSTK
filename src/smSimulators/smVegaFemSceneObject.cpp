@@ -969,7 +969,6 @@ void smVegaFemSceneObject::createForceModel()
 // Update the deformations by time stepping
 void smVegaFemSceneObject::advanceDynamics()
 {
-
     cpuLoadCounter.StartCounter();
 
     // reset external forces (usually to zero)
@@ -995,6 +994,8 @@ void smVegaFemSceneObject::advanceDynamics()
 
         timestepCounter++;
 
+        std::cout << "Time step: " << timestepCounter << std::endl;
+
         memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
 
         if(importAndUpdateVolumeMeshToSmtk)
@@ -1007,7 +1008,6 @@ void smVegaFemSceneObject::advanceDynamics()
             femConfig->singleStepMode = 2;
         }
 
-        //printf("VEGA: F"); fflush(nullptr);
         graphicFrame++;
 
         if (femConfig->lockAt30Hz)
@@ -1292,5 +1292,5 @@ inline void smVegaFemSceneObject::updateStats()
 
 void smVegaFemSceneObject::draw(const smDrawParam &p_params)
 {
-    smtkSurfaceMesh->draw(p_params);
+    //smtkSurfaceMesh->draw(p_params);
 }

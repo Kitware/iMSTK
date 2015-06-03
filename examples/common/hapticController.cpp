@@ -21,30 +21,23 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
+#include "hapticController.h"
+
 #include "smCore/smSDK.h"
-#include "smRendering/smViewer.h"
-#include "smSimulators/smVegaFemSimulator.h"
-#include "smSimulators/smVegaFemSceneObject.h"
+#include "smEvent/smKeyboardEvent.h"
 
-class vegaFemExample : public smSimulationMain
+using namespace smtk::Examples::Common;
+
+void hapticController::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
 {
+    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(event);
+    if(hapticEvent != nullptr && hapticEvent->getButtonState(0))
+    {
+        femSceneObject->setPulledVertex(hapticEvent->getPosition());       
+    }
+}
 
-public:
-    vegaFemExample();
-
-    virtual ~vegaFemExample(){}
-    void simulateMain(const smSimulationMainParam &){}
-private:
-    std::shared_ptr<smSDK> sdk;
-    std::shared_ptr<smVegaFemSceneObject> femobj;
-    std::shared_ptr<smVegaFemSimulator> femSim;
-    smMatrix33d mat;
-    std::shared_ptr<smSimulator> simulator;
-   std::shared_ptr<smViewer> viewer;
-    std::shared_ptr<smScene> scene1;
-};
-
-void VegaFemExample();
+void hapticController::setVegaFemSceneObject(const std::shared_ptr<smVegaFemSceneObject> &femSO)
+{
+    this->femSceneObject = femSO;
+}
