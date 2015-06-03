@@ -338,8 +338,8 @@ void smVolumeMesh::initSurface()
     updateTriangleNormals();
     updateVertexNormals();
 }
-
-void smVolumeMesh::updateVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh)
+// WIP
+void smVolumeMesh::updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh)
 {
     smInt i, threeI;
 
@@ -353,28 +353,30 @@ void smVolumeMesh::updateVolumeMeshDataFromVEGA_Format(const std::shared_ptr<con
     }
 }
 
-void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
+void smVolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
 {
     smInt i, threeI, j;
 
     //temporary arrays
-    smInt *numNodes, *numElements, *numVertsPerEle;
-    smInt **elements;
-    smDouble **nodes;
+    int numNodes(0);
+    int numElements(0);
+    int numVertsPerEle(0);
+    int *elements;
+    double *nodes;
 
-    vega3dMesh->exportMeshGeometry(numNodes, nodes, numElements, numVertsPerEle, elements);
+    vega3dMesh->exportMeshGeometry(&numNodes, &nodes, &numElements, &numVertsPerEle, &elements);
 
-    this->nbrTetra = *numElements;
-	this->nbrNodes = *numNodes;
+    this->nbrTetra = numElements;
+	this->nbrNodes = numNodes;
 
-	this->tetra.clear();
+    this->tetra.resize(this->nbrTetra);
     //copy the element connectivity information
     for(i=0; i<this->nbrTetra ; i++)
     {
-        threeI = *numVertsPerEle * i;
-        for(j=0; j<*numVertsPerEle ; j++)
+        threeI = numVertsPerEle * i;
+        for(j=0; j<numVertsPerEle ; j++)
         {
-            tetra[i].vert[j] = (*elements)[threeI + j];
+            tetra[i].vert[j] = elements[threeI + j];
         }
     }
 
@@ -383,31 +385,19 @@ void smVolumeMesh::importVolumeMeshDataFromVEGA_Format(const std::shared_ptr<con
     for(i=0; i<this->nbrVertices ; i++)
     {
         threeI = 3*i;
-        this->nodes[i][0] = (*nodes)[threeI];
-        this->nodes[i][1] = (*nodes)[threeI+1];
-        this->nodes[i][2] = (*nodes)[threeI+2]; 
+        this->nodes[i][0] = nodes[threeI];
+        this->nodes[i][1] = nodes[threeI+1];
+        this->nodes[i][2] = nodes[threeI+2]; 
     }
 
+    //WIP no original position data element in volume mesh
     if(preProcessingStage)
     {
         // do something here!
     }
 
     //deallocate temporary arrays   
-    delete [] numVertsPerEle;
-    delete [] numElements;
-    delete [] numNodes;
-
-    for(i=0; i<this->nbrTetra ; i++)
-    {
-        delete [] elements[i];
-    }
     delete [] elements;
-
-	for (i = 0; i<this->nbrNodes; i++)
-    {
-        delete [] nodes[i];
-    }
     delete [] nodes;
 
 }

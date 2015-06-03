@@ -851,7 +851,7 @@ int smMesh::getNumEdges() const
     return this->edges.size();
 }
 
-void smMesh::updateSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
+void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
     //copy the vertex co-ordinates
     for(smInt i=0; i<this->nbrVertices ; i++)
@@ -862,7 +862,7 @@ void smMesh::updateSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaS
     }
 }
 
-bool smMesh::importSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
+bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
 {
 
     if(!vegaSurfaceMesh->isTriangularMesh())

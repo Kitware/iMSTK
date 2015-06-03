@@ -87,7 +87,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, sm
     secondaryDeformableObjectRenderingMesh_interpolation_vertices = nullptr;
     secondaryDeformableObjectRenderingMesh_interpolation_weights = nullptr;
 
-    renderUsingVega = true;
+    renderUsingVega = false;
     importAndUpdateVolumeMeshToSmtk = false;
 
 	type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
@@ -193,12 +193,10 @@ void smVegaFemSceneObject::initSimulation()
     loadVolumeMesh();
     loadSurfaceMesh();
 
-    renderUsingVega = false;
-
     if(importAndUpdateVolumeMeshToSmtk)
     {
         this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
-        this->smtkVolumeMesh->importVolumeMeshDataFromVEGA_Format(this->volumetricMesh, true);
+        this->smtkVolumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
     }
     
     if(!renderUsingVega)
@@ -206,11 +204,11 @@ void smVegaFemSceneObject::initSimulation()
         this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
         if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
         {
-            this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh->GetMesh(), true);
+            this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->deformableObjectRenderingMesh->GetMesh(), true);
         }
         else
         {
-            this->smtkSurfaceMesh->importSurfaceMeshDataFromVEGA_Format(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
+            this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
         }
 
     }
@@ -1017,7 +1015,7 @@ void smVegaFemSceneObject::advanceDynamics()
 
         if(importAndUpdateVolumeMeshToSmtk)
         {
-            smtkVolumeMesh->updateVolumeMeshDataFromVEGA_Format(this->volumetricMesh);
+            smtkVolumeMesh->updateVolumeMeshFromVegaFormat(this->volumetricMesh);
         }
 
         if (femConfig->singleStepMode == 1)
@@ -1050,11 +1048,11 @@ void smVegaFemSceneObject::advanceDynamics()
 
         if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
         {
-            this->smtkSurfaceMesh->updateSurfaceMeshDataFromVEGA_Format(this->deformableObjectRenderingMesh->GetMesh());
+            this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->deformableObjectRenderingMesh->GetMesh());
         }
         else
         {
-            this->smtkSurfaceMesh->updateSurfaceMeshDataFromVEGA_Format(this->secondaryDeformableObjectRenderingMesh->GetMesh());
+            this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh());
         }
     }
 
@@ -1309,5 +1307,5 @@ inline void smVegaFemSceneObject::updateStats()
 
 void smVegaFemSceneObject::draw(const smDrawParam &p_params)
 {
-    //smtkSurfaceMesh->draw(p_params);
+    smtkSurfaceMesh->draw(p_params);
 }

@@ -76,10 +76,10 @@ public:
     smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
 
     /// \brief populate the mesh data from the vega volumetric mesh file format
-    void importVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage);
+    void importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage);
 
     /// \brief update the mesh data from the vega volumetric mesh after deformation happens
-	void updateVolumeMeshDataFromVEGA_Format(const std::shared_ptr<const VolumetricMesh> vega3dMesh);
+    void updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh);
 
 public:
     /// push smMesh class specific errors here

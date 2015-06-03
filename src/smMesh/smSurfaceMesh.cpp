@@ -431,10 +431,10 @@ smSurfaceMesh::smSurfaceMesh()
 void smSurfaceMesh::printPrimitiveDetails()
 {
     std::cout << "----------------------------\n";
-    std::cout << "Mesh Info for   : " << this->getName() <<"\n\t\t";
-    std::cout << "Num. vertices   : " << this->getNumVertices()<<"\n\t\t";
-    std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t\t";
-    std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t\t";
+    std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
+    std::cout << "Num. vertices   : " << this->getNumVertices() <<"\n\t";
+    std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t";
+    std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t";
     std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
     std::cout << "----------------------------\n";
 }
