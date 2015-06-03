@@ -427,3 +427,14 @@ smSurfaceMesh::smSurfaceMesh()
     meshType = SMMESH_DEFORMABLE;
     meshFileType = SM_FILETYPE_NONE;
 }
+
+void smSurfaceMesh::printPrimitiveDetails()
+{
+    std::cout << "----------------------------\n";
+    std::cout << "Mesh Info for   : " << this->getName() <<"\n\t\t";
+    std::cout << "Num. vertices   : " << this->getNumVertices()<<"\n\t\t";
+    std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t\t";
+    std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t\t";
+    std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
+    std::cout << "----------------------------\n";
+}

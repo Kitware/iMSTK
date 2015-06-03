@@ -193,12 +193,14 @@ void smVegaFemSceneObject::initSimulation()
     loadVolumeMesh();
     loadSurfaceMesh();
 
+    renderUsingVega = false;
+
     if(importAndUpdateVolumeMeshToSmtk)
     {
         this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
         this->smtkVolumeMesh->importVolumeMeshDataFromVEGA_Format(this->volumetricMesh, true);
     }
-
+    
     if(!renderUsingVega)
     {
         this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
@@ -251,6 +253,9 @@ void smVegaFemSceneObject::initSimulation()
     titleBarCounter.StartCounter();
 
     printf("Init simulator done\n");
+
+
+    smtkSurfaceMesh->printPrimitiveDetails();
 }
 
 
@@ -582,6 +587,18 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     {
 
         secondaryDeformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->secondaryRenderingMeshFilename);
+
+        if (secondaryDeformableObjectRenderingMesh == nullptr)
+        {
+            std::cout << "VEGA: Secondary rendering mesh is not initialized!\n";
+            exit(1);
+        }
+        else
+        {
+            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t" 
+                << secondaryDeformableObjectRenderingMesh->GetNumVertices() << " vertices\n\t\t"
+                << secondaryDeformableObjectRenderingMesh->GetNumFaces() << " faces\n";
+        }
 
         secondaryDeformableObjectRenderingMesh->ResetDeformationToRest();
         secondaryDeformableObjectRenderingMesh->BuildNeighboringStructure();

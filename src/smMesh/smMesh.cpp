@@ -841,6 +841,16 @@ bool smLineMesh::isMeshTextured()
     return isTextureCoordAvailable;
 }
 
+int smMesh::getNumTriangles() const
+{
+    return this->nbrTriangles;
+}
+
+int smMesh::getNumEdges() const
+{
+    return this->edges.size();
+}
+
 void smMesh::updateSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
     //copy the vertex co-ordinates
@@ -864,42 +874,42 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaS
         }
     }
 
-    smInt i, threeI;
+    int i, threeI;
 
     // temporary arrays
-    smInt * numVertices;
-    smDouble ** vertices;
-    smInt * numTriangles;
-    smInt ** triangles;
-    smInt * numGroups;
-	smInt ** triangleGroups;
+    int numVertices(0);
+    double* vertices;
+    int numTriangles(0);
+    int* triangles;
+    //smInt * numGroups;
+	//smInt ** triangleGroups;
 
-    vegaSurfaceMesh->exportGeometry(numVertices, vertices, numTriangles , triangles, numGroups, triangleGroups);
+    vertices = nullptr;
+    triangles = nullptr;
+    vegaSurfaceMesh->exportGeometry(&numVertices, &vertices, &numTriangles , &triangles, nullptr, nullptr);
 
-    this->nbrVertices = *numVertices;
-    this->nbrTriangles = *numTriangles;
+    this->nbrVertices = numVertices;
+    this->nbrTriangles = numTriangles;
 
-    if(this->triangles != nullptr){
-        delete this->triangles;
-        this->triangles = new smTriangle[this->nbrTriangles];
-    }
+    delete this->triangles;
+    this->triangles = new smTriangle[this->nbrTriangles];
 
     //copy the triangle connectivity information
     for(i=0; i<this->nbrTriangles ; i++)
     {
         threeI = 3*i;
-        this->triangles[i].vert[0] = (*triangles)[threeI+0];
-        this->triangles[i].vert[1] = (*triangles)[threeI+1];
-        this->triangles[i].vert[2] = (*triangles)[threeI+2];
+        this->triangles[i].vert[0] = triangles[threeI+0];
+        this->triangles[i].vert[1] = triangles[threeI+1];
+        this->triangles[i].vert[2] = triangles[threeI+2];
     }
 
-	this->vertices.resize(this->nbrVertices);
+    this->vertices.resize(this->nbrVertices);
     //copy the vertex co-ordinates
     for(i=0; i<this->nbrVertices ; i++)
     {
-       this->vertices[i][0] = vertices[i][0];
-       this->vertices[i][1] = vertices[i][1];
-       this->vertices[i][2] = vertices[i][2];
+        this->vertices[i][0] = vertices[3 * i + 0];
+        this->vertices[i][1] = vertices[3 * i + 1];
+        this->vertices[i][2] = vertices[3 * i + 2];
     }
 
     if(perProcessingStage){
@@ -907,20 +917,7 @@ bool smMesh::importSurfaceMeshDataFromVEGA_Format(std::shared_ptr<ObjMesh> vegaS
     }
 
     //deallocate temporary arrays
-    delete [] numTriangles;
-    delete [] numVertices;
-    delete [] numGroups;
-
-    for(i=0; i<this->nbrTriangles ; i++)
-    {
-        delete [] triangles[i];
-    }
     delete [] triangles;
-
-    for(i=0; i<this->nbrVertices ; i++)
-    {
-        delete [] vertices[i];
-    }
     delete [] vertices;
 
     return 1;

@@ -99,6 +99,11 @@ public:
         return this->vertices;
     }
 
+    int getNumVertices()
+    {
+        return nbrVertices;
+    }
+
 public:
     smCollisionGroup collisionGroup; ///< !!
     smGLInt renderingID; ///< !!
@@ -204,6 +209,12 @@ public:
 
     /// \brief render the surface mesh
     virtual void draw(const smDrawParam &/*p_params*/) override;
+
+    /// \brief get number of triangles
+    int getNumTriangles()  const;
+
+    /// \brief get number of edges
+    int getNumEdges()  const;
 
 public:
     smInt  nbrTriangles; ///< number of triangles

@@ -55,6 +55,9 @@ public:
 
     /// \brief load surface meshes using assimp library
     smBool LoadMeshAssimp(const smString& fileName);
+    
+    /// \brief print the details of the mesh
+    void printPrimitiveDetails();
 };
 
 #endif
