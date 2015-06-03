@@ -156,6 +156,7 @@ struct smRenderDetail
 {
 public:
     smRenderDetail();
+    smRenderDetail(smUInt type) : renderType(type) {}
 
     /// \brief attachment of shader
     void addShader(std::shared_ptr<smUnifiedId> p_shaderID);

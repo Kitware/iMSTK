@@ -33,7 +33,6 @@ smInt smTextureManager:: activeTextures;
 smBool smTextureManager::isInitialized = false;
 smBool smTextureManager::isInitializedGL = false;
 smBool smTextureManager::isDeleteImagesEnabled = false;
-void *smTextureManager::param = NULL;
 
 /// \brief
 smTextureReturnType smTextureManager::initGLTextures()
@@ -80,7 +79,10 @@ smTextureReturnType smTextureManager::initGLTextures()
 
         if (smGLUtils::queryGLError(texManagerError))
         {
-            errorLog->addError(texManagerError);
+            if(nullptr != errorLog)
+            {
+                errorLog->addError(texManagerError);
+            }
         }
 
     }

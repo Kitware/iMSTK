@@ -54,7 +54,32 @@ public:
     ///
     /// @brief Loads the mesh and stores it.
     ///
-    virtual void load(const std::string& meshName, const smMeshFileType &type);
+    void load(const std::string& meshName, const smMeshFileType &type);
+
+    ///
+    /// @brief Loads the mesh with texture and stores it. Only surface meshes allowed.
+    ///
+    void load(const std::string& meshFileName, const std::string& textureFileName, const std::string& textureName)
+    {
+        this->load(meshFileName,SM_FILETYPE_OBJ);
+        if(nullptr != this->mesh)
+        {
+            //Initialize the texture manager
+            smTextureManager::init();
+
+            //Load in the texture for the model
+            smTextureManager::loadTexture(textureFileName,textureName);
+            this->mesh->assignTexture(textureName);
+        }
+    }
+
+    ///
+    /// @brief Set the rendering details for this mesh
+    ///
+    void setRenderDetail(std::shared_ptr<smRenderDetail> renderDetail)
+    {
+        this->mesh->setRenderDetail(renderDetail);
+    }
 
     ///
     /// @brief Returns normal vectors for triangles on mesh surface

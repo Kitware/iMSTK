@@ -55,16 +55,11 @@ int main()
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
-    //Initialize the texture manager
-    smTextureManager::init(sdk->getErrorLog());
+    auto cubeModel = std::make_shared<smMeshModel>();
+    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    //Load in the texture for the cube model
-    smTextureManager::loadTexture("textures/cube.png", "cubetex");
-
-    std::shared_ptr<smMeshModel> cubeModel = std::make_shared<smMeshModel>();
-    cubeModel->load("models/cube.obj", SM_FILETYPE_OBJ);
-    cubeModel->getMesh()->assignTexture("cubetex");
-    cubeModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cubeModel->setRenderDetail(renderDetail);
 
     cube = std::make_shared<smStaticSceneObject>();
     cube->setModel(cubeModel);

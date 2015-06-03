@@ -204,9 +204,17 @@ public:
     std::shared_ptr<smUnifiedId> getUniqueId() {return uniqueId;}
 
     ///
-    /// \brief Set the unique id of this object
+    /// \brief Get render detail
     ///
     std::shared_ptr<smRenderDetail> getRenderDetail() {return renderDetail;}
+
+    ///
+    /// \brief Set the unique id of this object
+    ///
+    void setRenderDetail(std::shared_ptr<smRenderDetail> newRenderDetail)
+    {
+        renderDetail = newRenderDetail;
+    }
 
     void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
     {

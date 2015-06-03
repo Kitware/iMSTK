@@ -56,17 +56,12 @@ int main()
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
-    //Initialize the texture manager
-    smTextureManager::init(sdk->getErrorLog());
+    auto cubeModel = std::make_shared<smMeshModel>();
+    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    //Load in the texture for the cube model
-    smTextureManager::loadTexture("textures/cube.png", "cubetex");
+    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cubeModel->setRenderDetail(renderDetail);
 
-    std::shared_ptr<smMeshModel> cubeModel = std::make_shared<smMeshModel>();
-    cubeModel->load("models/cube.obj", SM_FILETYPE_OBJ);
-    cubeModel->getMesh()->assignTexture("cubetex");
-    cubeModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    //setup scene1
     cube = std::make_shared<smStaticSceneObject>();
     cube->setModel(cubeModel);
 
@@ -78,10 +73,12 @@ int main()
     smTextureManager::createColorTexture("colorTex1", 64, 64);
     smTextureManager::createDepthTexture("depthTex1", 64, 64);
 
-    std::shared_ptr<smMeshCollisionModel> squareModel = std::make_shared<smMeshCollisionModel>();
-    squareModel->loadTriangleMesh("models/square.obj", SM_FILETYPE_OBJ);
+    std::shared_ptr<smMeshModel> squareModel = std::make_shared<smMeshModel>();
+    squareModel->load("models/square.obj", SM_FILETYPE_OBJ);
     squareModel->getMesh()->assignTexture("colorTex1");
-    squareModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    renderDetail= std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    squareModel->setRenderDetail(renderDetail);
+
     square = std::make_shared<smStaticSceneObject>();
     square->setModel(squareModel);
 
