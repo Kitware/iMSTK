@@ -212,10 +212,9 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     //Get indexed vertex data
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices.emplace_back(
-            smVec3d(mesh->mVertices[i][0],
-                    mesh->mVertices[i][1],
-                    mesh->mVertices[i][2]));
+        this->vertices[i] = smVec3d(mesh->mVertices[i][0],
+                                    mesh->mVertices[i][1],
+                                    mesh->mVertices[i][2]);
     }
     this->origVerts = this->vertices;
 
