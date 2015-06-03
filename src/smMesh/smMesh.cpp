@@ -283,8 +283,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     }
 
     this->nbrVertices = nbr;
-    this->vertices.reserve(nbr);
-    this->origVerts.reserve(nbr);
+    this->vertices.resize(nbr);
+    this->origVerts.resize(nbr);
     this->vertNormals = new smVec3d[nbr];
     this->vertTangents = new smVec3d[nbr];
     this->texCoord = new smTexCoord[nbr];
@@ -891,8 +891,11 @@ bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
     this->nbrVertices = numVertices;
     this->nbrTriangles = numTriangles;
 
-    delete this->triangles;
-    this->triangles = new smTriangle[this->nbrTriangles];
+    initVertexArrays(numVertices);
+    initTriangleArrays(numTriangles);
+
+    /*delete this->triangles;
+    this->triangles = new smTriangle[this->nbrTriangles];*/
 
     //copy the triangle connectivity information
     for(i=0; i<this->nbrTriangles ; i++)
@@ -903,7 +906,7 @@ bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
         this->triangles[i].vert[2] = triangles[threeI+2];
     }
 
-    this->vertices.resize(this->nbrVertices);
+    //this->vertices.resize(this->nbrVertices);
     //copy the vertex co-ordinates
     for(i=0; i<this->nbrVertices ; i++)
     {

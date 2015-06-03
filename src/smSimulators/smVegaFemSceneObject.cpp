@@ -254,6 +254,10 @@ void smVegaFemSceneObject::initSimulation()
 
 
     smtkSurfaceMesh->printPrimitiveDetails();
+
+    smtkSurfaceMesh->initVertexNeighbors();
+    smtkSurfaceMesh->updateTriangleNormals();
+    smtkSurfaceMesh->updateVertexNormals();
 }
 
 
@@ -1055,6 +1059,9 @@ void smVegaFemSceneObject::advanceDynamics()
             this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh());
         }
     }
+
+    smtkSurfaceMesh->updateTriangleNormals();
+    smtkSurfaceMesh->updateVertexNormals();
 
     // update stasts
     updateStats();
