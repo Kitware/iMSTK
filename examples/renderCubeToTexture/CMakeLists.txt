@@ -8,4 +8,5 @@ target_link_libraries(renderCubeToTexture
   smMesh
   smCollision
   ExamplesCommon
+  smGeometry
   )

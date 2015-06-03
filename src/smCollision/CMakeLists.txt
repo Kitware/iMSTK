@@ -28,10 +28,10 @@ simmedtk_add_library(smCollision
 )
 
 target_link_libraries(smCollision
-  PUBLIC
-    smCore
   PRIVATE
+    smCore
     smEvent
+    smGeometry
 )
 
 if(BUILD_TESTING)

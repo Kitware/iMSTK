@@ -22,19 +22,19 @@
 //---------------------------------------------------------------------------
 
 
-#ifndef SMMESHMODEL_H
-#define SMMESHMODEL_H
+#ifndef SMMESHCOLLISIONMODEL_H
+#define SMMESHCOLLISIONMODEL_H
 
 // STL includes
 #include <memory>
 
 // SimMedTK includes
-#include "smCore/smModelRepresentation.h"
 #include "smMesh/smMesh.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smCollision/smSurfaceTree.h"
 #include "smCollision/smOctreeCell.h"
+#include "smGeometry/smMeshModel.h"
 
 ///
 /// @brief Mesh representation of a model.
@@ -44,7 +44,7 @@
 ///
 /// @see smMeshToMeshCollision
 ///
-class smMeshCollisionModel : public smModelRepresentation
+class smMeshCollisionModel : public smMeshModel
 {
 public:
     using AABBNodeType = smOctreeCell;
@@ -54,11 +54,6 @@ public:
 public:
     smMeshCollisionModel();
     ~smMeshCollisionModel();
-
-    ///
-    /// @brief Returns pointer to undelying mesh object.
-    ///
-    std::shared_ptr<smMesh> getMesh() override;
 
     ///
     /// @brief Set internal mesh data structure
@@ -71,40 +66,21 @@ public:
     std::shared_ptr<AABBTreeType> getAABBTree();
 
     ///
-    /// @brief Set internal AABB tree
-    ///
-    void setAABBTree(std::shared_ptr<AABBTreeType> modelAabbTree);
-
-    ///
     /// @brief Loads a triangular mesh and stores it.
     ///
     void loadTriangleMesh(const std::string &meshName, const smMeshFileType &type);
 
     ///
-    /// @brief Returns normal vectors for triangles on mesh surface
+    /// @brief Set internal AABB tree
     ///
-    const smVec3d &getNormal(size_t i) const;
+    void setAABBTree(std::shared_ptr<AABBTreeType> modelAabbTree);
 
     ///
-    /// @brief Returns array of vertices for triangle on surface
+    /// @brief Initialize AABB tree data structure
     ///
-    std::array<smVec3d,3> getTrianglePositions(size_t i) const;
-
-    ///
-    /// @brief Returns array of vertices
-    ///
-    const smStdVector3d &getVertices() const
-    {
-        return mesh->getVertices();
-    }
-
-    void draw() override
-    {
-         this->mesh->draw();
-    }
+    void initAABBTree(const int &numLevels = 6);
 
 private:
-    std::shared_ptr<smMesh> mesh; // Underlying mesh
     std::shared_ptr<AABBTreeType> aabbTree; // Bounding volume hierarchy
 };
 
