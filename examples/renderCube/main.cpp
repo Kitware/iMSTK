@@ -58,13 +58,13 @@ int main()
     //Initialize the texture manager
     smTextureManager::init(sdk->getErrorLog());
 
+    //Load in the texture for the cube model
+    smTextureManager::loadTexture("textures/cube.png", "cubetex");
+
     std::shared_ptr<smMeshCollisionModel> cubeModel = std::make_shared<smMeshCollisionModel>();
     cubeModel->loadTriangleMesh("models/cube.obj", SM_FILETYPE_OBJ);
     cubeModel->getMesh()->assignTexture("cubetex");
     cubeModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-
-    //Load in the texture for the cube model
-    smTextureManager::loadTexture("textures/cube.png", "cubetex");
 
     cube = std::make_shared<smStaticSceneObject>();
     cube->setModel(cubeModel);

@@ -202,7 +202,7 @@ protected:
     /// \brief called in the end of each frame
     virtual void endFrame() override;
     /// \brief draw routines
-    virtual void draw();
+    virtual void render();
     /// \brief adjust  rendering FPS
     void adjustFPS();
     /// \brief render depth texture for debugging

@@ -420,7 +420,7 @@ inline void smViewer::adjustFPS()
 }
 
 ///main drawing routine for Rendering of all objects in the scene
-void smViewer::draw()
+void smViewer::render()
 {
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
     {
@@ -568,7 +568,7 @@ void smViewer::exec()
     while (!terminateExecution)
     {
         sf::Event event;
-        this->draw();
+        this->render();
         while (this->sfmlWindow->pollEvent(event))
         {
             this->processSFMLEvents(event);

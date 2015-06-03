@@ -83,7 +83,7 @@ int main()
     squareModel->getMesh()->assignTexture("colorTex1");
     squareModel->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     square = std::make_shared<smStaticSceneObject>();
-    square->setModel(cubeModel);
+    square->setModel(squareModel);
 
     //Setup an FBO for rendering in the viewer.
     //Add the FBO and textures to the viewer
