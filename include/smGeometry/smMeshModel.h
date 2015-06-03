@@ -26,6 +26,7 @@
 
 // STL includes
 #include <memory>
+#include <array>
 
 // SimMedTK includes
 #include "smCore/smModelRepresentation.h"
