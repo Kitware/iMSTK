@@ -109,7 +109,7 @@ int main()
     viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-                                SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
+        SIMMEDTK_VIEWERRENDER_FADEBACKGROUND | SIMMEDTK_RENDER_WIREFRAME;
     // Get Scene
     scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");

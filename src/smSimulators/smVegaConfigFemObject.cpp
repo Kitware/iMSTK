@@ -56,8 +56,8 @@ smVegaConfigFemObject::smVegaConfigFemObject()
     enableCompressionResistance = 1;
     compressionResistance = 500;
     centralDifferencesTangentialDampingUpdateMode = 1;
-    addGravity = 0;
-    g = 9.81;
+    addGravity = 1;
+    g = -9.81;
     dampingLaplacianCoef = 0.0;
     deformableObjectCompliance = 1.0;
     baseFrequency = 1.0;

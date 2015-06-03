@@ -825,12 +825,14 @@ int smMesh::getNumEdges() const
 
 void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
+    Vec3d p;
     //copy the vertex co-ordinates
     for(smInt i=0; i<this->nbrVertices ; i++)
     {
-       this->vertices[i][0] = vertices[i][0];
-       this->vertices[i][1] = vertices[i][1];
-       this->vertices[i][2] = vertices[i][2];
+       p = vegaSurfaceMesh->getPosition(i);
+       this->vertices[i][0] = p[0];
+       this->vertices[i][1] = p[1];
+       this->vertices[i][2] = p[2];
     }
 }
 

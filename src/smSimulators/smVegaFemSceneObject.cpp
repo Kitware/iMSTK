@@ -211,6 +211,9 @@ void smVegaFemSceneObject::initSimulation()
             this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
         }
 
+        auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES);
+        this->smtkSurfaceMesh->setRenderDetail(renderDetail);
+
     }
 
     loadFixedBC();
@@ -639,6 +642,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     {
         femConfig->renderSecondaryDeformableObject = 0;
     }
+
 }
 
 // Load the data related to the vertices that will remain fixed
@@ -1003,7 +1007,7 @@ void smVegaFemSceneObject::advanceDynamics()
         applyScriptedExternalForces();
 
         // apply external forces arising from contact
-        applyContactForces();
+        //applyContactForces();
 
         // set forces to the integrator
         integratorBaseSparse->SetExternalForces(f_ext);
@@ -1059,7 +1063,6 @@ void smVegaFemSceneObject::advanceDynamics()
             this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh());
         }
     }
-
     smtkSurfaceMesh->updateTriangleNormals();
     smtkSurfaceMesh->updateVertexNormals();
 
