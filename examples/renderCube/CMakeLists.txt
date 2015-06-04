@@ -7,9 +7,4 @@ target_link_libraries(renderCube
   smMesh
   smEvent
   ExamplesCommon
-  sfml::system
-  sfml::audio
-  sfml::graphics
-  sfml::network
-  sfml::window
   )
