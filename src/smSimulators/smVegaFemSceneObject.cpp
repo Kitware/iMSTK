@@ -198,7 +198,7 @@ void smVegaFemSceneObject::initSimulation()
         this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
         this->smtkVolumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
     }
-    
+
     if(!renderUsingVega)
     {
         this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
@@ -211,7 +211,7 @@ void smVegaFemSceneObject::initSimulation()
             this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
         }
 
-        auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES);
+        auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
         this->smtkSurfaceMesh->setRenderDetail(renderDetail);
 
     }
@@ -560,7 +560,7 @@ void smVegaFemSceneObject::loadVolumeMesh()
         meshGraph = std::make_shared<Graph>(massSpringSystem->GetNumParticles(),
                               massSpringSystem->GetNumEdges(), massSpringSystem->GetEdges());
     }
-    
+
     int scaleRows = 1;
     SparseMatrix *sm;
     meshGraph->GetLaplacian(&sm, scaleRows);
@@ -600,7 +600,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         }
         else
         {
-            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t" 
+            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t"
                 << secondaryDeformableObjectRenderingMesh->GetNumVertices() << " vertices\n\t\t"
                 << secondaryDeformableObjectRenderingMesh->GetNumFaces() << " faces\n";
         }

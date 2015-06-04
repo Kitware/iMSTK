@@ -2,6 +2,7 @@
 simmedtk_add_library(smGeometry
   SOURCES
     smMeshModel.cpp
+    smPlaneModel.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smGeometry/smMeshModel.h
 )

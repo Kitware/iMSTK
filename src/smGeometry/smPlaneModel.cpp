@@ -21,13 +21,35 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "smGeometry/smPlaneModel.h"
 
-#include "smCollision/smPlaneCollisionModel.h"
-
-smPlaneCollisionModel::smPlaneCollisionModel(const smVec3d& p, const smVec3d& n)
-    : smPlaneModel(p, n)
+smPlaneModel::smPlaneModel(const smVec3d& p, const smVec3d& n)
 {
-
+    this->plane = std::make_shared<smPlane>(p, n);
+    this->transform = RigidTransformType::Identity();
 }
-
-smPlaneCollisionModel::~smPlaneCollisionModel() {}
+smPlaneModel::~smPlaneModel() {}
+void smPlaneModel::draw()
+{
+    this->plane->draw();
+}
+const smVec3d& smPlaneModel::getNormal() const
+{
+    return this->transform.linear() * this->plane->getUnitNormal();
+}
+void smPlaneModel::setNormal(const smVec3d& normal)
+{
+    this->plane->setUnitNormal(normal);
+}
+const smVec3d& smPlaneModel::getPosition() const
+{
+    return this->transform * this->plane->getPoint();
+}
+const smPlaneModel::RigidTransformType& smPlaneModel::getTransform() const
+{
+    return this->transform;
+}
+void smPlaneModel::setTransform(const smPlaneModel::RigidTransformType& t)
+{
+    this->transform = t;
+}

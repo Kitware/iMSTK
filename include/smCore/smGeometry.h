@@ -60,8 +60,8 @@ public:
     {
         this->point = p;
         this->unitNormal = n;
-        this->width = 1.0;
-        
+        this->width = 100.0;
+
         this->drawPointsOrig[0] = smVec3d(width, 0, 0);
         this->drawPointsOrig[1] = smVec3d(0, width, 0);
         this->drawPointsOrig[2] = smVec3d(-width, 0, 0);
