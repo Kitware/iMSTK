@@ -136,8 +136,7 @@ struct smColor
 #define    SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS         (1<<9)
 #define    SIMMEDTK_VIEWERRENDER_DISABLE                        (1<<11)
 #define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
-
-
+#define    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS                    (1<<13)
 
 
 /// \brief viewer detail. legacy code

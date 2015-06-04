@@ -119,6 +119,8 @@ public:
     /// \brief Viewer settings
     smUInt viewerRenderDetail;
 
+    smFloat globalAxisLength;    
+
     smInt height(void);
     smInt width(void);
     smFloat aspectRatio(void);
@@ -159,6 +161,8 @@ public:
     void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
+
+    void setGlobalAxisLength(const smFloat len);
     smString windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;

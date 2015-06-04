@@ -78,9 +78,10 @@ int main()
     femObject = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
         "asianDragon/asianDragon.config");
 
-    auto femObjRenderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES
-                                                             | SIMMEDTK_RENDER_VERTICES
-                                                             | SIMMEDTK_RENDER_NORMALS);
+    auto femObjRenderDetail = std::make_shared<smRenderDetail>(
+                                                               //SIMMEDTK_RENDER_FACES |
+                                                               SIMMEDTK_RENDER_VERTICES
+                                                              );
     femObjRenderDetail->setPointSize(4.0);
     smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
     femObjRenderDetail->setVertexColor(maroon);
@@ -100,26 +101,34 @@ int main()
 
     // Create dummy simulator
     staticSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
-    // create a static scene object
+
+    // create a static plane scene object of given normal and position
     staticObject = std::make_shared<smStaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, 0.0, 0.0), smVec3d(0.0, 0.0, 1.0));
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -10.0, 0.0),
+                                                    smVec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
 
-    // register FEM simulator
+    //-------------------------------------------------------
+    // Register both object simulators
+    //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
     sdkSimulator->registerObjectSimulator(femSimulator);
     //sdkSimulator->registerObjectSimulator(staticSimulator);
-
+ 
     //-------------------------------------------------------
-    // Customize viewer
+    // Customize the viewer
     //-------------------------------------------------------
     viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-        SIMMEDTK_VIEWERRENDER_FADEBACKGROUND | SIMMEDTK_RENDER_WIREFRAME;
+                                SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
+                                SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+
+    viewer->setGlobalAxisLength(0.8);
+
     // Get Scene
     scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
@@ -134,17 +143,16 @@ int main()
     sceneCamera->setCameraFocus(0, 0, 0);
     scene->addCamera(sceneCamera);
 
-    //Create the camera controller
+    // Create the camera controller
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     camCtl->setCamera(sceneCamera);
 
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
-    //Link up the event system between this the camera controller and the viewer
+    // Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
     viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
 
-    //viewer->addObject(femObject);
     //-------------------------------------------------------
     // Run the SDK
     //-------------------------------------------------------

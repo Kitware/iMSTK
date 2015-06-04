@@ -77,6 +77,8 @@ smViewer::smViewer()
     this->log = NULL;
     windowOutput = std::make_shared<smOpenGLWindowStream>();
 
+    this->globalAxisLength = 1.0;
+
     unlimitedFPSEnabled = false;
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
@@ -318,7 +320,7 @@ void smViewer::destroyFboListItems()
 }
 
 void smViewer::processViewerOptions()
-{
+{    
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
     {
         smGLUtils::fadeBackgroundDraw();
@@ -365,6 +367,35 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene);
+
+    //Render axis
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+    {
+        smMatrix44f proj = Eigen::Map<smMatrix44f>(p_rop.scene->getCamera()->getProjMatRef());
+        smMatrix44f view = Eigen::Map<smMatrix44f>(p_rop.scene->getCamera()->getViewMatRef());
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadMatrixf(proj.data());
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadMatrixf(view.data());
+
+        //Enable lights
+        p_rop.scene->enableLights();
+        p_rop.scene->placeLights();
+
+        smGLRenderer::drawAxes(this->globalAxisLength);
+
+        p_rop.scene->disableLights();
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+    }
+    
 }
 
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
@@ -429,7 +460,7 @@ void smViewer::render()
 
     beginModule();
 
-    adjustFPS();
+    adjustFPS();        
 
     for (size_t i = 0; i < objectList.size(); i++)
     {
@@ -444,7 +475,7 @@ void smViewer::render()
     for (size_t i = 0; i < objectList.size(); i++)
     {
         objectList[i]->draw();
-    }
+    }    
 
     endModule();
 }
@@ -600,4 +631,9 @@ smInt smViewer::width(void)
 smFloat smViewer::aspectRatio(void)
 {
     return screenResolutionHeight / screenResolutionWidth;
+}
+
+void smViewer::setGlobalAxisLength(const smFloat len)
+{
+    this->globalAxisLength = len;
 }

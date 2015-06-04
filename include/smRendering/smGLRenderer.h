@@ -74,6 +74,10 @@ public:
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
+    static void drawAxes(GLdouble length=1.0);
+
+    static void drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D);
+
     /// \brief draw function is called for visualization the object
     virtual void draw(){}
 
