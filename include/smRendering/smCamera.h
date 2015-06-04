@@ -1,49 +1,59 @@
-#ifndef _GLM_CAMERA_H_
-#define _GLM_CAMERA_H_
+#ifndef SMCAMERA_H
+#define SMCAMERA_H
+
+#include "smUtilities/smMatrix.h"
+#include "smUtilities/smVector.h"
 
 /// STL icludes
 #include <memory>
 
-// GLM includes
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
-
-/// \brief A simple camera class that uses glm as a backend
-///
-/// \detail Everything is public because I am going to leave it up to the
-/// programmer to not screw themselves or others
+/// \brief A simple camera class to calculate view and projection matrices
 ///
 class smCamera
 {
 public:
     //Construction/Destruction
     smCamera();
-    //Nothing to clean up
 
     //View settings
-    void setCameraPos(float x, float y, float z);
-    void setCameraPos(const glm::vec3& v);
-    void setCameraFocus(float x, float y, float z);
-    void setCameraFocus(const glm::vec3& v);
-    void setCameraUpVec(float x, float y, float z);
-    void setCameraUpVec(const glm::vec3& v);
+    void setPos(float x, float y, float z);
+    void setPos(const smVec3f& v);
+    smVec3f getPos();
+    void setFocus(float x, float y, float z);
+    void setFocus(const smVec3f& v);
+    smVec3f getFocus();
+    void setUpVec(float x, float y, float z);
+    void setUpVec(const smVec3f& v);
+    smVec3f getUpVec();
 
     //Projection settings
     void setAspectRatio(const float ar);
+    float getAspectRatio();
     void setViewAngle(const float a);
+    float getViewAngle();
+    void setViewAngleDeg(const float a);
+    float getViewAngleDeg();
     void setNearClipDist(const float d);
+    float getNearClipDist();
     void setFarClipDist(const float d);
+    float getFarClipDist();
 
     //Get matrix data
-    glm::mat4 getViewMat();
-    float* getViewMatRef();
-    glm::mat4 getProjMat();
-    float* getProjMatRef();
+    smMatrix44f getViewMat();
+    smMatrix44f getProjMat();
+
+    //Set Matrix data
+    void setViewMat(const smMatrix44f &m);
+    void setProjMat(const smMatrix44f &m);
 
     //Create matrices
     void genViewMat();
     void genProjMat();
+
+    static smMatrix44f lookAt(const smVec3f& pos,
+                             const smVec3f& fp,
+                             const smVec3f& up);
+    static smMatrix44f perspective(float fovy, float ar, float zNear, float zFar);
 
     static std::shared_ptr<smCamera> getDefaultCamera()
     {
@@ -52,18 +62,19 @@ public:
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);
         defaultCamera->setViewAngle(0.785398f); //45 degrees
-        defaultCamera->setCameraPos(0, 0, 10);
-        defaultCamera->setCameraFocus(0, 0, 0);
-        defaultCamera->setCameraUpVec(0, 1, 0);
+        defaultCamera->setPos(0, 0, 10);
+        defaultCamera->setFocus(0, 0, 0);
+        defaultCamera->setUpVec(0, 1, 0);
         defaultCamera->genProjMat();
         defaultCamera->genViewMat();
         return defaultCamera;
     }
 
+private:
     //View matrix variables
-    glm::vec3 pos; ///< position of the camera
-    glm::vec3 fp; ///< focal point of the camera
-    glm::vec3 up; ///< the up direction for the camera
+    smVec3f pos; ///< position of the camera
+    smVec3f fp; ///< focal point of the camera
+    smVec3f up; ///< the up direction for the camera
 
     //Projection matrix variables
     float ar; ///< aspect ratio
@@ -72,8 +83,8 @@ public:
     float farClip; ///< far clipping distance
 
     //functional matrices
-    glm::mat4 view; ///< View matrix for OpenGL
-    glm::mat4 proj; ///< Projection matrix for OpenGL
+    smMatrix44f view; ///< View matrix for OpenGL
+    smMatrix44f proj; ///< Projection matrix for OpenGL
 
 };
 

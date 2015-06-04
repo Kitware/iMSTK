@@ -63,11 +63,11 @@ public:
     /// \brief Set the step size that the camera moves with each key press
     ///
     /// \param size Size in generic units to move
-    void setStepSize(smUInt size);
+    void setStepSize(float size);
 
 private:
     std::shared_ptr<smCamera> camera; ///< Pointer to camera being controlled
-    smUInt moveDistance;
+    float moveDistance;
 };
 
 }//Common

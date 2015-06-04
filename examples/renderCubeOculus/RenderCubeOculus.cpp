@@ -115,9 +115,9 @@ void RenderCubeOculus::setupCamera()
     scene1->camera.setFarClipDist(1000);
     scene1->camera.setNearClipDist(0.001);
     scene1->camera.setViewAngle(0.785398f); //45 degrees
-    scene1->camera.setCameraPos(1, 1, 3);
-    scene1->camera.setCameraFocus(0, 0, -1);
-    scene1->camera.setCameraUpVec(0, 1, 0);
+    scene1->camera.setPos(1, 1, 3);
+    scene1->camera.setFocus(0, 0, -1);
+    scene1->camera.setUpVec(0, 1, 0);
     scene1->camera.genProjMat();
     scene1->camera.genViewMat();
 }

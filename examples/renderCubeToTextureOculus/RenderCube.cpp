@@ -151,9 +151,9 @@ void RenderCube::setupCamera()
     scene1->camera.setFarClipDist(1000);
     scene1->camera.setNearClipDist(0.001);
     scene1->camera.setViewAngle(0.785398f); //45 degrees
-    scene1->camera.setCameraPos(3, 3, 5);
-    scene1->camera.setCameraFocus(0, 0, -1);
-    scene1->camera.setCameraUpVec(0, 1, 0);
+    scene1->camera.setPos(3, 3, 5);
+    scene1->camera.setFocus(0, 0, -1);
+    scene1->camera.setUpVec(0, 1, 0);
     scene1->camera.genProjMat();
     scene1->camera.genViewMat();
 
@@ -161,9 +161,9 @@ void RenderCube::setupCamera()
     scene2->camera.setFarClipDist(1000);
     scene2->camera.setNearClipDist(0.001);
     scene2->camera.setViewAngle(0.785398f); //45 degrees
-    scene2->camera.setCameraPos(0, 0, 5);
-    scene2->camera.setCameraFocus(0, 0, -1);
-    scene2->camera.setCameraUpVec(0, 1, 0);
+    scene2->camera.setPos(0, 0, 5);
+    scene2->camera.setFocus(0, 0, -1);
+    scene2->camera.setUpVec(0, 1, 0);
     scene2->camera.genProjMat();
     scene2->camera.genViewMat();
 }

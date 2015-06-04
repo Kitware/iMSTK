@@ -30,12 +30,12 @@ namespace Examples {
 namespace Common {
 
 wasdCameraController::wasdCameraController()
-    : moveDistance{1}
+    : moveDistance{1.0}
 {
 }
 
 wasdCameraController::wasdCameraController(std::shared_ptr<smCamera> cam)
-    : moveDistance{1},
+    : moveDistance{1.0},
       camera(cam)
 {
 }
@@ -45,7 +45,7 @@ void wasdCameraController::setCamera(std::shared_ptr<smCamera> cam)
     camera = cam;
 }
 
-void wasdCameraController::setStepSize(smUInt size)
+void wasdCameraController::setStepSize(float size)
 {
     moveDistance = size;
 }
@@ -58,6 +58,7 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
     auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
+        smVec3f dispVec = smVec3f::Zero(); //Vector to store displacement of camera
         switch(keyboardEvent->getKeyPressed())
         {
         case smtk::Event::smKey::W:
@@ -65,24 +66,19 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
             if(smtk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & smtk::Event::smModKey::shift))
             {
                 //Move the camera up
-                camera->setCameraPos(camera->pos.x, camera->pos.y + moveDistance, camera->pos.z);
-                camera->setCameraFocus(camera->fp.x, camera->fp.y + moveDistance, camera->fp.z);
+                dispVec(1) = moveDistance;
             }
             else
             {
                 //Move the camera forward
-                camera->setCameraPos(camera->pos.x, camera->pos.y, camera->pos.z - moveDistance);
-                camera->setCameraFocus(camera->fp.x, camera->fp.y, camera->fp.z - moveDistance);
+                dispVec(2) = -moveDistance;
             }
-            camera->genViewMat();
             break;
         }
         case smtk::Event::smKey::A:
         {
             //Move the camera to the left
-            camera->setCameraPos(camera->pos.x - moveDistance, camera->pos.y, camera->pos.z);
-            camera->setCameraFocus(camera->fp.x - moveDistance, camera->fp.y, camera->fp.z);
-            camera->genViewMat();
+            dispVec(0) = -moveDistance;
             break;
         }
         case smtk::Event::smKey::S:
@@ -90,29 +86,29 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
             if(smtk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & smtk::Event::smModKey::shift))
             {
                 //Move the camera down
-                camera->setCameraPos(camera->pos.x, camera->pos.y - moveDistance, camera->pos.z);
-                camera->setCameraFocus(camera->fp.x, camera->fp.y - moveDistance, camera->fp.z);
+                dispVec(1) = -moveDistance;
             }
             else
             {
                 //Move the camera backward
-                camera->setCameraPos(camera->pos.x, camera->pos.y, camera->pos.z + moveDistance);
-                camera->setCameraFocus(camera->fp.x, camera->fp.y, camera->fp.z + moveDistance);
+                dispVec(2) = moveDistance;
             }
-            camera->genViewMat();
             break;
         }
         case smtk::Event::smKey::D:
         {
             //Move the camera to the right
-            camera->setCameraPos(camera->pos.x + moveDistance, camera->pos.y, camera->pos.z);
-            camera->setCameraFocus(camera->fp.x + moveDistance, camera->fp.y, camera->fp.z);
-            camera->genViewMat();
+            dispVec(0) = moveDistance;
             break;
         }
         default:
-            break;
+            return;
         }
+
+        //apply displacements
+        camera->setPos(camera->getPos() + dispVec);
+        camera->setFocus(camera->getFocus() + dispVec);
+        camera->genViewMat();
     }
 }
 
