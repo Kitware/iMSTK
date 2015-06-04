@@ -229,7 +229,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
-
+        glColor3fv(renderDetail->getVertexColor().toGLColor());
         glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
 
         glEnable(GL_LIGHTING);
@@ -295,7 +295,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
+void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color, smFloat length)
 {
 
     glDisable(GL_LIGHTING);
@@ -308,7 +308,7 @@ void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
         glVertex3dv(p_mesh->vertices[i].data());
-        tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
+        tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 
@@ -317,7 +317,7 @@ void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
         glVertex3dv(baryCenter.data());
-        tmp = baryCenter + p_mesh->triNormals[i] * 5;
+        tmp = baryCenter + p_mesh->triNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 

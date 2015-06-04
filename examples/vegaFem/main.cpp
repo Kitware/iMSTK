@@ -78,6 +78,16 @@ int main()
     femObject = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
         "asianDragon/asianDragon.config");
 
+    auto femObjRenderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES
+                                                             | SIMMEDTK_RENDER_VERTICES
+                                                             | SIMMEDTK_RENDER_NORMALS);
+    femObjRenderDetail->setPointSize(4.0);
+    smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
+    femObjRenderDetail->setVertexColor(maroon);
+    femObjRenderDetail->setNormalLength(0.02);
+
+    femObject->setRenderDetail(femObjRenderDetail);
+
     /*hapticCtl = std::make_shared<smtk::Examples::Common::hapticController>();
     hapticCtl->setVegaFemSceneObject(femObject);
     femSimulator->attachEvent(smtk::Event::EventType::Haptic, hapticCtl);*/

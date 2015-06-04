@@ -51,7 +51,7 @@ public:
     static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue);
+    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue, smFloat length=1.0);
 
     /// \brief  draw line mesh
     static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);

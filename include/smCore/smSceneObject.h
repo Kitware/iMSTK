@@ -114,7 +114,7 @@ public:
     std::shared_ptr<smCustomRenderer> getRenderer()
     {
         return customRender;
-    }
+    }    
 
 private:
     std::shared_ptr<smObjectSimulator> objectSim; // object simulator that will simulate the object

@@ -520,7 +520,9 @@ void smMesh::draw()
 
     if (this->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-        smGLRenderer::drawNormals(safeDownCast<smMesh>(), this->getRenderDetail()->normalColor);
+        smGLRenderer::drawNormals(safeDownCast<smMesh>(), 
+                                this->getRenderDetail()->normalColor,
+                                this->getRenderDetail()->normalLength);
     }
 }
 

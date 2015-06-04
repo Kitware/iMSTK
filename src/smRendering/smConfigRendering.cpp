@@ -88,7 +88,7 @@ float smColor::operator()( int p_i )
 
     return rgba[p_i];
 }
-smColor &smColor::operator=( smColor &p_color )
+smColor &smColor::operator=(const smColor &p_color )
 {
     rgba[0] = p_color.rgba[0];
     rgba[1] = p_color.rgba[1];
@@ -135,6 +135,54 @@ smRenderDetail::smRenderDetail()
     castShadow = true;
     canGetShadow = true;
 }
+void smRenderDetail::setNormalLength(const smFloat len)
+{
+    this->normalLength = len;
+}
+void smRenderDetail::setLineSize(const float size)
+{
+    this->lineSize = size;
+}
+void smRenderDetail::setPointSize(const float size)
+{
+    this->pointSize = size;
+}
+void smRenderDetail::setVertexColor(const smColor vertColor)
+{
+    this->vertexRenderColor = vertColor;
+}
+void smRenderDetail::setNormalColor(const smColor normColor)
+{
+    this->normalColor = normColor;
+}
+void smRenderDetail::setDiffuseColor(const smColor diffColor)
+{
+    this->colorDiffuse = diffColor;
+}
+void smRenderDetail::setAmbientColor(const smColor ambColor)
+{
+    this->colorAmbient = ambColor;
+}
+void smRenderDetail::setSpecularColor(const smColor specColor)
+{
+    this->colorSpecular = specColor;
+}
+void smRenderDetail::setShadowColor(const smColor shadColor)
+{
+    this->shadowColor = shadColor;
+}
+void smRenderDetail::setWireframeColor(const smColor wireColor)
+{
+    this->wireFrameColor = wireColor;
+}
+void smRenderDetail::setShininess(const smFloat s)
+{
+    this->shininess = s;
+}
+void smRenderDetail::setHighlightColor(const smColor highlightColor)
+{
+    this->highLightColor = highlightColor;
+}
 const smColor& smRenderDetail::getColorDiffuse() const
 {
     return colorDiffuse;
@@ -170,6 +218,10 @@ const smColor& smRenderDetail::getNormalColor() const
 const smColor& smRenderDetail::getHighLightColor() const
 {
     return this->highLightColor;
+}
+const smColor& smRenderDetail::getVertexColor() const
+{
+    return this->vertexRenderColor;
 }
 const smColor& smRenderDetail::getShadowColor() const
 {

@@ -176,6 +176,10 @@ public:
 
     void renderWithVega();
 
+    /// \brief sets the objects specific render details
+    /// Should be moved to base class in near future
+    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
+
 	///serialize function explicity writes the object to the memory block
 	///each scene object should know how to write itself to a memory block
 	virtual void serialize(void *p_memoryBlock) override {};

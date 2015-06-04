@@ -128,6 +128,11 @@ bool smVegaFemSceneObject::configure(smString ConfigFile)
 	}
 }
 
+void smVegaFemSceneObject::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
+{
+    smtkSurfaceMesh->setRenderDetail(r);
+}
+
 smVegaFemSceneObject::~smVegaFemSceneObject()
 {
 
@@ -198,7 +203,7 @@ void smVegaFemSceneObject::initSimulation()
         this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
         this->smtkVolumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
     }
-
+    
     if(!renderUsingVega)
     {
         this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
@@ -210,10 +215,6 @@ void smVegaFemSceneObject::initSimulation()
         {
             this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
         }
-
-        auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-        this->smtkSurfaceMesh->setRenderDetail(renderDetail);
-
     }
 
     loadFixedBC();
