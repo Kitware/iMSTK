@@ -283,8 +283,8 @@ smBool smMesh::initVertexArrays(smInt nbr)
     }
 
     this->nbrVertices = nbr;
-    this->vertices.reserve(nbr);
-    this->origVerts.reserve(nbr);
+    this->vertices.resize(nbr);
+    this->origVerts.resize(nbr);
     this->vertNormals = new smVec3d[nbr];
     this->vertTangents = new smVec3d[nbr];
     this->texCoord = new smTexCoord[nbr];
@@ -514,20 +514,15 @@ void smMesh::rotate(const smMatrix33d &p_rot)
 }
 
 /// \brief
-void smMesh::draw(const smDrawParam &p_params)
+void smMesh::draw()
 {
-    auto viewer = p_params.rendererObject;
+    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), this->getRenderDetail());
 
-    if (viewer->renderStage == SMRENDERSTAGE_SHADOWPASS && p_params.caller->getRenderDetail()->castShadow == false)
+    if (this->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-        return;
-    }
-
-    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), p_params.caller->getRenderDetail(),p_params);
-
-    if (p_params.caller->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
-    {
-        smGLRenderer::drawNormals(safeDownCast<smMesh>(), p_params.caller->getRenderDetail()->normalColor);
+        smGLRenderer::drawNormals(safeDownCast<smMesh>(), 
+                                this->getRenderDetail()->normalColor,
+                                this->getRenderDetail()->normalLength);
     }
 }
 
@@ -646,31 +641,10 @@ void smMesh::checkCorrectWinding()
 }
 
 /// \brief
-void smLineMesh::draw(const smDrawParam &p_params)
+void smLineMesh::draw()
 {
-    smGLRenderer::drawLineMesh(safeDownCast<smLineMesh>(), p_params.caller->getRenderDetail());
-
-    if (p_params.caller->getRenderDetail()->debugDraw)
-    {
-        smGLRenderer::draw(this->aabb);
-
-        for (smInt i = 0; i < nbrEdges; i++)
-        {
-
-            smGLRenderer::draw(this->edgeAABBs[i]);
-            glPushMatrix();
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorYellow.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMin[0], edgeAABBs[i].aabbMin[1], edgeAABBs[i].aabbMin[2]);
-            glutSolidSphere(0.2, 15.0, 15.0);
-            glPopMatrix();
-            glPushMatrix();
-            glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, smColor::colorRed.toGLColor());
-            glTranslatef(edgeAABBs[i].aabbMax[0], edgeAABBs[i].aabbMax[1], edgeAABBs[i].aabbMax[2]);
-            glutSolidSphere(0.2, 15.0, 15.0);
-            glPopMatrix();
-        }
-    }
 }
+
 smTextureAttachment::smTextureAttachment()
 {
 }
@@ -835,7 +809,96 @@ void smLineMesh::scale( smVec3d p_scaleFactors )
 
     updateAABB();
 }
+
 bool smLineMesh::isMeshTextured()
 {
     return isTextureCoordAvailable;
+}
+
+int smMesh::getNumTriangles() const
+{
+    return this->nbrTriangles;
+}
+
+int smMesh::getNumEdges() const
+{
+    return this->edges.size();
+}
+
+void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
+{
+    Vec3d p;
+    //copy the vertex co-ordinates
+    for(smInt i=0; i<this->nbrVertices ; i++)
+    {
+       p = vegaSurfaceMesh->getPosition(i);
+       this->vertices[i][0] = p[0];
+       this->vertices[i][1] = p[1];
+       this->vertices[i][2] = p[2];
+    }
+}
+
+bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
+{
+
+    if(!vegaSurfaceMesh->isTriangularMesh())
+    {
+        if (this->log != nullptr)
+        {
+            this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
+            return 0;
+        }
+    }
+
+    int i, threeI;
+
+    // temporary arrays
+    int numVertices(0);
+    double* vertices;
+    int numTriangles(0);
+    int* triangles;
+    //smInt * numGroups;
+	//smInt ** triangleGroups;
+
+    vertices = nullptr;
+    triangles = nullptr;
+    vegaSurfaceMesh->exportGeometry(&numVertices, &vertices, &numTriangles , &triangles, nullptr, nullptr);
+
+    this->nbrVertices = numVertices;
+    this->nbrTriangles = numTriangles;
+
+    initVertexArrays(numVertices);
+    initTriangleArrays(numTriangles);
+
+    /*delete this->triangles;
+    this->triangles = new smTriangle[this->nbrTriangles];*/
+
+    //copy the triangle connectivity information
+    for(i=0; i<this->nbrTriangles ; i++)
+    {
+        threeI = 3*i;
+        this->triangles[i].vert[0] = triangles[threeI+0];
+        this->triangles[i].vert[1] = triangles[threeI+1];
+        this->triangles[i].vert[2] = triangles[threeI+2];
+    }
+
+    //this->vertices.resize(this->nbrVertices);
+    //copy the vertex co-ordinates
+    for(i=0; i<this->nbrVertices ; i++)
+    {
+        this->vertices[i][0] = vertices[3 * i + 0];
+        this->vertices[i][1] = vertices[3 * i + 1];
+        this->vertices[i][2] = vertices[3 * i + 2];
+    }
+
+    if(perProcessingStage){
+        updateOriginalVertsWithCurrent();
+    }
+
+    //deallocate temporary arrays
+    delete [] triangles;
+    delete [] vertices;
+
+    return 1;
+
 }

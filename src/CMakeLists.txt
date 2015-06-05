@@ -1,6 +1,7 @@
 
 add_subdirectory(smCore)
 add_subdirectory(smCollision)
+add_subdirectory(smContactHandling)
 add_subdirectory(smExternal)
 add_subdirectory(smExternalDevices)
 add_subdirectory(smMesh)
@@ -10,3 +11,4 @@ add_subdirectory(smSimulators)
 add_subdirectory(smTools)
 add_subdirectory(smUtilities)
 add_subdirectory(smEvent)
+add_subdirectory(smGeometry)

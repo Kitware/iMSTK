@@ -21,30 +21,29 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSDK.h"
-#include "smRendering/smViewer.h"
-#include "smSimulators/smVegaFemSimulator.h"
-#include "smSimulators/smVegaFemSceneObject.h"
 
-class vegaFemExample : public smSimulationMain, public smCoreClass
+#ifndef SMPLANETOMESHCOLLISION_H
+#define SMPLANETOMESHCOLLISION_H
+
+// SimMedTK includes
+#include "smCollision/smCollisionDetection.h"
+
+class smCollisionPair;
+
+///
+/// @brief Brute force collision detection between a mesh and a static plane
+///
+class smPlaneToMeshCollision : public smCollisionDetection
 {
-
 public:
-    vegaFemExample();
+    smPlaneToMeshCollision() {}
+    virtual ~smPlaneToMeshCollision() {}
 
-    virtual ~vegaFemExample(){}
-    void simulateMain(smSimulationMainParam /*p_param*/) { };
+    smPlaneToMeshCollision(const smPlaneToMeshCollision &) = delete;
+
 private:
-    std::unique_ptr<smSDK> sdk;
-    smVegaFemSceneObject *femobj;
-    smVegaFemSimulator *femSim;
-    smMatrix33d mat;
-    smSimulator *simulator;
-    smViewer viewer;
-    smScene *scene1;
+    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) override;
+
 };
 
-void VegaFemExample();
+#endif // SMPLANETOMESHCOLLISION_H

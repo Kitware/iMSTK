@@ -60,7 +60,7 @@ public:
     void updateSurfaceVertices();
 
     /// \brief draw PhysX volume mesh
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     /// \brief compute the edges of the tetrahedra
     void createEdgeofTetras();

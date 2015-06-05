@@ -26,17 +26,15 @@
 smStaticSceneObject::smStaticSceneObject ( std::shared_ptr<smErrorLog> p_log )
 {
     type = SIMMEDTK_SMSTATICSCENEOBJECT;
-    mesh = std::make_shared<smSurfaceMesh>( SMMESH_RIGID, p_log );
 }
 smStaticSceneObject::~smStaticSceneObject() {}
 void smStaticSceneObject::init() {}
 void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
 void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
 
-void smStaticSceneObject::draw(const smDrawParam &p_params)
+void smStaticSceneObject::draw()
 {
-//     p_params.caller = this;
-    mesh->draw(p_params);
+    staticModel->draw();
 }
 
 std::shared_ptr<smSceneObject> smStaticSceneObject::clone()

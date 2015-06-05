@@ -68,7 +68,7 @@ public:
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief render the avatar
-    void draw(const smDrawParam &p_param);
+    void draw();
 
     /// \brief constructor
     HookCautery(const smString& p_pivot = "../../resources/models/hook_cautery_new.3DS");

@@ -44,7 +44,7 @@ public:
     //virtual void init();
     /// \brief draw pre, default and post draw routines
     virtual void preDraw(const smSceneObject &p_object);
-    virtual void draw(const smDrawParam &p_object);
+    virtual void draw();
     virtual void draw(const smSceneObject &p_object);
     virtual void postDraw(const smSceneObject &p_object);
 };
@@ -52,7 +52,7 @@ public:
 /// \briefderive this class if you want to render a class in the viewer.
 class smCustomRenderInterface
 {
-    virtual void draw(const smDrawParam &p_params);
+    virtual void draw();
 };
 
 #endif

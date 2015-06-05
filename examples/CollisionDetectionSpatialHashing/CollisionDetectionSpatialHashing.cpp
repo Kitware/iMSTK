@@ -68,39 +68,39 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     smTextureManager::loadTexture("textures/brick.jpg", "wallImage");
     smTextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
+        // Create collision models
+    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelA->getMesh()->assignTexture("livertexture1");
+    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    collisionModelA->getMesh()->translate(7, 3, 0);
+    collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
+    collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
+
+    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->getMesh()->translate(smVec3d(2, 0, 0));
+    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    
     // Create a static scene
     modelA = std::make_shared<smStaticSceneObject>();
+    modelA->setModel(collisionModelA);
     sdk->registerSceneObject(modelA);
-    sdk->registerMesh(modelA->mesh);
-
-    // Load mesh
-    modelA->mesh->loadMeshLegacy("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-
-    // Assign a texture
-    modelA->mesh->assignTexture("livertexture1");
-
-    // Set the rendering features
-    modelA->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    modelA->mesh->translate(7, 3, 0);
-    modelA->mesh->getRenderDetail()->lineSize = 2;
-    modelA->mesh->getRenderDetail()->pointSize = 5;
+    sdk->registerMesh(collisionModelA->getMesh());
 
     // Attach object to the dummy simulator. it will be simulated by dummy simulator
     modelA->attachObjectSimulator(defaultSimulator);
-    spatialHashing->addMesh(modelA->mesh);
+    spatialHashing->addMesh(collisionModelA->getMesh());
 
     // Initialize the scecond object
     modelB = std::make_shared<smStaticSceneObject>();
     sdk->registerSceneObject(modelB);
-    sdk->registerMesh(modelB->mesh);
+    sdk->registerMesh(collisionModelB->getMesh());
 
-    modelB->mesh->loadMeshLegacy("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    modelB->mesh->translate(smVec3d(2, 0, 0));
-
-    modelB->mesh->assignTexture("livertexture2");
-    modelB->mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    modelB->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    spatialHashing->addMesh(modelB->mesh);
+    spatialHashing->addMesh(collisionModelB->getMesh());
 
     // Add object to the scene
     scene->addSceneObject(modelA);
@@ -124,8 +124,6 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     // Create dummy collision pair
     std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
-    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
-    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
     collisionPair->setModels(collisionModelA,collisionModelB);
     simulator->addCollisionPair(collisionPair);
 
@@ -143,14 +141,16 @@ void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam 
 {
     if ((10 > moveObj) && (moveObj > 0))
     {
-        modelB->mesh->translate(1, 0, 0);
+        modelB->getModel()->getMesh()->translate(1, 0, 0);
         moveObj--;
     }
     else
     {
         moveObj = 9; // reset
-        modelB->mesh->translate(-moveObj, 0, 0);
+        modelB->getModel()->getMesh()->translate(-moveObj, 0, 0);
     }
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 }
 
 void CollisionDetectionSpatialHashing::run()

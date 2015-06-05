@@ -19,7 +19,7 @@
 #
 # VegaFEM
 #
-set(VegaFEM_TAG "a7aca2271ad483f7912009d0f9d0e75ed956142c")
+set(VegaFEM_TAG "6bba4eadbd943c003fcf90fcec122a3b3feef30d")
 set(VegaFEM_REPOSITORY git@bitbucket.org:simmedtk/vegafem-cmake.git)
 
 # Make sure this file is included only once
@@ -34,7 +34,7 @@ if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
   message(FATAL_ERROR "VegaFEM_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(VegaFEM_DEPENDENCIES GLEW GLUT)
+set(VegaFEM_DEPENDENCIES GLEW)
 if(WIN32)
   list(APPEND VegaFEM_DEPENDENCIES PTHREAD)
 endif(WIN32)
@@ -73,7 +73,7 @@ if(NOT DEFINED VegaFEM_DIR)
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
       -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
-      -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=ON
+      -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=OFF
       -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
       -DVegaFEM_BUILD_UTILITIES:BOOL=OFF
       -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}

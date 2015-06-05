@@ -25,15 +25,12 @@
 #include "smRendering/smViewer.h"
 #include "smCore/smSDK.h"
 
-void smObjectSimulator::initDraw(const smDrawParam &p_params)
+void smObjectSimulator::initDraw()
 {
-    p_params.rendererObject->addText(name);
 }
 
-void smObjectSimulator::draw(const smDrawParam &p_params)
+void smObjectSimulator::draw()
 {
-    smString fps(name + " FPS: " + std::to_string(this->FPS));
-    p_params.rendererObject->updateText(name, fps);
 }
 
 smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)

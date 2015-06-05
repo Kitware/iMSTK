@@ -99,7 +99,7 @@ void test()
     glPopAttrib();
 }
 
-void smFrameBuffer::draw(const smDrawParam &/*p_params*/)
+void smFrameBuffer::draw()
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);

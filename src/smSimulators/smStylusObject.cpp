@@ -28,7 +28,7 @@
 #include "smMesh/smMesh.h"
 #include "smUtilities/smGLUtils.h"
 
-void smStylusRigidSceneObject::draw(const smDrawParam &/*p_params*/)
+void smStylusRigidSceneObject::draw()
 {
     smMatrix44d viewMatrix;
 
@@ -78,11 +78,9 @@ void smStylusRigidSceneObject::draw(const smDrawParam &/*p_params*/)
     }
 }
 
-void smStylusRigidSceneObject::initDraw(const smDrawParam &p_params)
+void smStylusRigidSceneObject::initDraw()
 {
     smString errorText;
-    // TODO: WHy??
-//     p_params.caller = this;
     tree<smMeshContainer*>::pre_order_iterator iter = meshes.begin();
     smGLInt newList = glGenLists(meshes.size());
     smGLUtils::queryGLError(errorText);
@@ -92,7 +90,7 @@ void smStylusRigidSceneObject::initDraw(const smDrawParam &p_params)
     while (iter != meshes.end())
     {
         glNewList(newList + listCounter, GL_COMPILE);
-        iter.node->data->mesh->draw(p_params);
+        iter.node->data->mesh->draw();
         glEndList();
         iter.node->data->mesh->renderingID = (newList + listCounter);
         listCounter++;

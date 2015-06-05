@@ -48,10 +48,10 @@ public:
     smGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail, const smDrawParam &p_drawParam);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue);
+    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue, smFloat length=1.0);
 
     /// \brief  draw line mesh
     static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
@@ -74,8 +74,12 @@ public:
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
+    static void drawAxes(GLdouble length=1.0);
+
+    static void drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D);
+
     /// \brief draw function is called for visualization the object
-    virtual void draw(const smDrawParam &/*p_params*/){}
+    virtual void draw(){}
 
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();
@@ -85,8 +89,7 @@ public:
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
-    static void renderScene(std::shared_ptr<smScene> p_scene,
-                            smDrawParam p_param);
+    static void renderScene(std::shared_ptr<smScene> p_scene);
     /// \brief Renders a smScene's objects
     ///
     /// \detail Requires the caller to have called registerForScene() on p_scene
@@ -95,7 +98,6 @@ public:
     /// \param p_proj A custom projection matrix to use instead of that provided with the scene
     /// \param p_view A custom view matrix to use instead of that provided with the scene
     static void renderScene(std::shared_ptr<smScene> p_scene,
-                            smDrawParam p_param,
                             const smMatrix44f &p_proj,
                             const smMatrix44f &p_view);
 
@@ -103,7 +105,7 @@ public:
     ///
     /// \param p_sceneObject The scene object to render
     /// \param p_param The drawing parameters
-    static void renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject, const smDrawParam &p_param);
+    static void renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
 };
 
 #endif

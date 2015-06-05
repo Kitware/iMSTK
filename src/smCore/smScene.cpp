@@ -22,18 +22,13 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smScene.h"
-#include "smCore/smSDK.h"
 
 
 smScene::smScene(std::shared_ptr<smErrorLog> p_log) :
-    smCoreClass(),
-    sceneLocal(SIMMEDTK_MAX_MODULES)
+    smCoreClass()
 {
     this->log = p_log;
     type = SIMMEDTK_SMSCENE;
-    totalObjects = 0;
-    referenceCounter = 0;
-    test = 0;
     sceneUpdatedTimeStamp = 0;
 }
 
@@ -42,14 +37,9 @@ std::shared_ptr<smUnifiedId> smScene::getSceneId()
     return this->getUniqueId();
 }
 
-smInt smScene::getTotalObjects()
-{
-    return totalObjects;
-}
-
 std::vector<std::shared_ptr<smSceneObject>> &smScene::getSceneObject()
 {
-    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
+    std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
     return sceneObjects;
 }
 
@@ -63,9 +53,8 @@ void smScene::addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
     if (p_sceneObject != nullptr)
     {
-        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
+        std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
         sceneObjects.push_back(p_sceneObject);
-        totalObjects = sceneObjects.size();
         sceneUpdatedTimeStamp++;
     }
 }
@@ -75,14 +64,13 @@ void smScene::removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
     if (p_sceneObject != nullptr)
     {
-        std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
+        std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
 
         for (size_t i = 0; i < sceneObjects.size(); i++)
         {
             if (sceneObjects[i] == p_sceneObject)
             {
                 sceneObjects.erase(sceneObjects.begin() + i);
-                totalObjects = sceneObjects.size();
             }
         }
 
@@ -93,7 +81,7 @@ void smScene::removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 /// \brief removes the object from the scene based on its object id
 void smScene::removeSceneObject(std::shared_ptr<smUnifiedId> p_sceneObjectId)
 {
-    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
+    std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
     short id = p_sceneObjectId->getId();
     if (id >= 0 && id < smInt(sceneObjects.size()))
     {
@@ -102,28 +90,12 @@ void smScene::removeSceneObject(std::shared_ptr<smUnifiedId> p_sceneObjectId)
             if (sceneObjects[i]->getUniqueId()->getId() == id)
             {
                 sceneObjects.erase(sceneObjects.begin() + i);
-                totalObjects = sceneObjects.size();
             }
         }
 
     }
 
     sceneUpdatedTimeStamp++;
-}
-
-/// \brief
-void smScene::addRef()
-{
-    //Note: might want to replace with with an atomic variable
-    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
-    this->referenceCounter++;
-}
-
-void smScene::removeRef()
-{
-    //Note: might want to replace with with an atomic variable
-    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
-    this->referenceCounter--;
 }
 
 void smScene::copySceneObjects(std::shared_ptr<smScene> p_scene)
@@ -265,66 +237,15 @@ void smScene::placeLights()
     }
 }
 
-void smScene::registerForScene(std::shared_ptr<smCoreClass> p_simmedtkObject)
+void smScene::copySceneToLocal(smSceneLocal &p_local)
 {
-    std::shared_ptr<smSceneLocal> local = std::make_shared<smSceneLocal>();
-    local->id = p_simmedtkObject->getUniqueId()->getId();
-    std::lock_guard<std::mutex> lock(sceneListLock); //Lock is released when leaves scope
-    copySceneToLocal(local);
-    sceneLocalIndex[local->id] = sceneLocal.checkAndAdd(local);
-}
-void smScene::copySceneToLocal(std::shared_ptr< smSceneLocal > p_local)
-{
-    p_local->sceneObjects.clear();
+    std::lock_guard<std::mutex> lock(this->sceneLock); //Lock is released when leaves scope
 
-    for(size_t i = 0; i < sceneObjects.size(); i++)
+    if(!(this->sceneUpdatedTimeStamp > p_local.sceneUpdatedTimeStamp))
     {
-        p_local->sceneObjects.push_back(sceneObjects[i]);
+        return;
     }
 
-    p_local->sceneUpdatedTimeStamp = sceneUpdatedTimeStamp;
+    p_local.sceneObjects = this->sceneObjects;
+    p_local.sceneUpdatedTimeStamp = sceneUpdatedTimeStamp;
 }
-void smSceneIterator::setScene(std::shared_ptr< smScene > p_scene, std::shared_ptr< smCoreClass > p_core)
-{
-    std::lock_guard<std::mutex> lock(p_scene->sceneListLock); //Lock is released when leaves scope
-    sceneLocal = p_scene->sceneLocal.getByRef(p_scene->sceneLocalIndex[p_core->getUniqueId()->getId()]);
-
-    if(p_scene->sceneUpdatedTimeStamp > sceneLocal->sceneUpdatedTimeStamp)
-    {
-        p_scene->copySceneToLocal(sceneLocal);
-    }
-
-    endIndex = sceneLocal->sceneObjects.size();
-    currentIndex = 0;
-}
-smSceneIterator::smSceneIterator()
-{
-    currentIndex = endIndex = 0;
-    sceneLocal = nullptr;
-
-}
-int smSceneIterator::start()
-{
-    return 0;
-}
-void smSceneIterator::operator++()
-{
-    currentIndex++;
-}
-int smSceneIterator::end()
-{
-    return endIndex;
-}
-void smSceneIterator::operator--()
-{
-    currentIndex--;
-}
-std::shared_ptr< smSceneObject > smSceneIterator::operator[](int p_index)
-{
-    return sceneLocal->sceneObjects[p_index];
-}
-std::shared_ptr< smSceneObject > smSceneIterator::operator*()
-{
-    return sceneLocal->sceneObjects[currentIndex];
-}
-

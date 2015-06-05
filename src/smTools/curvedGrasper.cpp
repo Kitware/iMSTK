@@ -30,9 +30,9 @@
 #include "smEvent/smHapticEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 
-void curvedGrasper::draw(const smDrawParam &p_params)
+void curvedGrasper::draw()
 {
-    smStylusRigidSceneObject::draw(p_params);
+    smStylusRigidSceneObject::draw();
     smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
     glPushMatrix();
     glMultMatrixd(containerLower->currentMatrix.data());

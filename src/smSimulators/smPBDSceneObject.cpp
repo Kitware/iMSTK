@@ -23,10 +23,9 @@
 
 #include "smSimulators/smPBDSceneObject.h"
 
-void smPBDSurfaceSceneObject::draw(const smDrawParam &p_params)
+void smPBDSurfaceSceneObject::draw()
 {
-//     p_params.caller = this;
-    mesh->draw(p_params);
+    mesh->draw();
 }
 
 void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p_radius)
@@ -188,17 +187,3 @@ void smPBDSurfaceSceneObject::findFixedCorners()
         delete [] listFixedMass;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

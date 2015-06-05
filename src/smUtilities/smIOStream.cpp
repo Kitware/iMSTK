@@ -169,22 +169,10 @@ bool smOpenGLWindowStream::removeText(smString p_tag)
     windowTexts[index].enabled = false;
     return true;
 }
-void smOpenGLWindowStream::draw(const smDrawParam &/*p_params*/)
+void smOpenGLWindowStream::draw()
 {
-    glColor3fv(smColor::colorWhite.toGLColor());
-
-    /*
-    //This needs to be replaced by some opengl text api in the future
-    for (smInt i = 0; i < totalTexts; i++)
-    {
-        if (windowTexts[i].enabled)
-        {
-            viewer->drawText(windowTexts[i].windowString.x + initialTextPositionX, windowTexts[i].windowString.y + initialTextPositionY, windowTexts[i].windowString.string, font);
-        }
-
-    }
-    */
 }
+
 smWindowConsole::smWindowConsole(smInt p_totalTexts)
 {
     init(p_totalTexts);
@@ -223,11 +211,7 @@ smInt smWindowConsole::addText(const smString &p_tag, const smString& p_string)
     currentIndex = (currentIndex + 1) % totalTexts;
     return currentIndex;
 }
-void smWindowConsole::draw(const smDrawParam &/*p_params*/)
+void smWindowConsole::draw()
 {
     //All previous code was for drawing on-screen text
-}
-void smWindowConsole::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/)
-{
-    //All previous code use interpreting keyboard events for on-screen text
 }

@@ -141,18 +141,6 @@ void smAABB::expand( const double &p_factor )
     this->aabbMax += .5 * ( this->aabbMax - this->aabbMin ) * p_factor;
 }
 
-smSphere::smSphere()
-{
-    center << 0, 0, 0;
-    radius = 1.0;
-}
-
-smSphere::smSphere( smVec3d p_center, double p_radius )
-{
-    radius = p_radius;
-    center = p_center;
-}
-
 smCube::smCube()
 {
     center << 0, 0, 0;

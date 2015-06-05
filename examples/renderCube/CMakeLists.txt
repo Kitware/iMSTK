@@ -6,5 +6,7 @@ target_link_libraries(renderCube
   smShader
   smMesh
   smEvent
+  smCollision
   ExamplesCommon
+  smGeometry
   )

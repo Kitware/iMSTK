@@ -65,37 +65,6 @@ public:
     smUInt sceneUpdatedTimeStamp;
 };
 
-
-/// \brief iterator for scene object. The default iterates over the scene in the order of insertion. For scene graph, this iteration needs to be inherited and modified
-class smSceneIterator
-{
-public:
-    smSceneIterator();
-    /// \brief copy other scene to this current one.
-    void setScene(std::shared_ptr<smScene> p_scene, std::shared_ptr<smCoreClass> p_core);
-
-    smInt start();
-
-    smInt end();
-
-    /// \brief operator to increment the index to go to the next item in the scene
-    void operator++();
-
-    /// \brief operator to decrement the index to go to the previous item in the scene
-    void operator--();
-
-    /// \brief to access a particular entry in the scene with [] notation
-    std::shared_ptr<smSceneObject> operator[](smInt p_index);
-
-    /// \brief to access a particular entry in the scene with () notation
-    std::shared_ptr<smSceneObject> operator*();
-
-private:
-    smInt endIndex;
-    smInt currentIndex;
-    std::shared_ptr<smSceneLocal> sceneLocal;
-};
-
 ///Physics class should have all parameters such as material properties, mesh etc.. for
 ///note that when you remove the Physics do not delete it.Since propagation of the physics over the
 class smScene: public smCoreClass
@@ -104,9 +73,6 @@ public:
     smScene(std::shared_ptr<smErrorLog> p_log = nullptr);
 
     virtual ~smScene(){}
-
-    /// \brief add obejct to the scene, it is thread safe call.
-    void registerForScene(std::shared_ptr<smCoreClass> p_simmedtkObject);
 
     ///add physics in the scene
     void  addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
@@ -129,16 +95,8 @@ public:
     /// \brief retursn scene id
     std::shared_ptr<smUnifiedId> getSceneId();
 
-    /// \brief returns the total number of objects in the scene
-    inline smInt getTotalObjects();
-
     ///Same functionality as addSceneObject
     std::shared_ptr<smScene> operator+=(std::shared_ptr<smSceneObject> p_sceneObject);
-
-    /// \brief add and remove references
-    void addRef();
-
-    void removeRef();
 
     void copySceneObjects(std::shared_ptr<smScene> p_scene);
 
@@ -184,31 +142,16 @@ public:
         camera = sceneCamera;
     }
 
-private:
     /// \brief adds the objects in the local scene storage
-    void inline copySceneToLocal(std::shared_ptr<smSceneLocal> p_local);
-
-protected:
-    std::vector<std::shared_ptr<smLight> > lights;
+    void copySceneToLocal(smSceneLocal &p_local);
 
 private:
-    smIndiceArray<std::shared_ptr<smSceneLocal>> sceneLocal;
-    std::vector<std::shared_ptr<smSceneObject>> addQueue;       // scene objects addition queue
+    std::shared_ptr<smCamera> camera;                           //Camera for the scene
+    std::vector<std::shared_ptr<smLight> > lights;              //Lights in the scene
     std::vector<std::shared_ptr<smSceneObject>> sceneObjects;   // scene objects storage
-    std::unordered_map<smInt, smInt> sceneLocalIndex;
     std::shared_ptr<smErrorLog> log;                            // error logging
-    std::mutex sceneListLock;                                   // scene list lock for thread safe manipulation of the scene
-
-    smUInt sceneUpdatedTimeStamp;                               // last updated time stampe
-    smUInt referenceCounter;                                    // reference counter to the scene
-    smInt totalObjects;                                         // number of total objects in the scene
-    std::shared_ptr<smCamera> camera;
-
-    friend class smSDK;
-
-    friend struct smSceneIterator;
-
-    smInt test;
+    std::mutex sceneLock;                                       // scene list lock for thread safe manipulation of the scene
+    smUInt sceneUpdatedTimeStamp;                               // last updated time stamp
 };
 
 #endif

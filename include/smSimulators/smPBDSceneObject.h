@@ -105,7 +105,7 @@ public:
     void findFixedCorners();
 
     /// \brief render the surface PBD object
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
 public:
     smSurfaceMesh *mesh; ///< surface mesh

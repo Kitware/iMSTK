@@ -93,10 +93,10 @@ public:
     /// \brief updates the buffer with data. It is important for meshes undergoes topology changes
     smBool updateStreamData();
 
-    static void initVAOs(smDrawParam p_param);
+    static void initVAOs();
 
     /// \brief  init VAO buffers
-    void initBuffers(smDrawParam p_param);
+    void initBuffers();
 
     /// \brief get VAO given the shader ID
     static std::shared_ptr<smVAO> getVAO(std::shared_ptr<smUnifiedId> p_shaderID);
@@ -108,7 +108,7 @@ public:
     void disable();
 
     /// \brief draw VAO
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
     /// \brief constructor
     ~smVAO();

@@ -167,70 +167,18 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh,
-        std::shared_ptr<smRenderDetail> renderDetail,
-        const smDrawParam &p_drawParam)
+void smGLRenderer::drawSurfaceMeshTriangles(
+    std::shared_ptr<smMesh> p_surfaceMesh,
+    std::shared_ptr<smRenderDetail> renderDetail)
 {
-    static smVec3d origin(0, 0, 0);
-    static smVec3d xAxis(1, 0, 0);
-    static smVec3d yAxis(0, 1, 0);
-    static smVec3d zAxis(0, 0, 1);
-    std::shared_ptr<smShader> shader = nullptr;
-    smBool shaderEnabled = false;
-    std::shared_ptr<smVAO> vao;
-
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO)
-    {
-        if (renderDetail->getVAOs().size() < 1)
-        {
-            return;
-        }
-        else
-        {
-            if (renderDetail->getVAOEnable()[0])
-            {
-                vao = smVAO::getVAO(renderDetail->getVAOs()[0]);
-            }
-            else
-            {
-                return;
-            }
-        }
-    }
-
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
-    if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
-    {
-        for (size_t i = 0; i < renderDetail->getShaders().size(); i++)
-        {
-            if (renderDetail->getShaderEnable()[i])
-            {
-                shader = smShader::getShader(renderDetail->getShaders()[i]);
-                shader->enableShader();
-                shader->predraw(p_surfaceMesh);
-                shaderEnabled = true;
-                break;
-            }
-        }
-    }
-    else
-    {
-        smGLRenderer::enableDefaultGLRendering();
-    }
-
     glDisable(GL_TEXTURE_2D);
     glPointSize(renderDetail->getPointSize());
     glLineWidth(renderDetail->getLineSize());
-
-    if (p_surfaceMesh->vertTangents != NULL && shaderEnabled && p_surfaceMesh->tangentChannel && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        glVertexAttribPointerARB(shader->getTangentAttributes(), 3, GL_FLOAT, GL_FALSE, 0, p_surfaceMesh->vertTangents);
-        glEnableVertexAttribArrayARB(shader->getTangentAttributes());
-    }
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TRANSPARENT)
     {
@@ -247,80 +195,42 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->getShininess());
     }
 
-    if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glEnableClientState(GL_NORMAL_ARRAY);
-    }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->vertices.data());
+    glEnableClientState(GL_NORMAL_ARRAY);
+    glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->vertNormals);
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->isMeshTextured())
         {
-            if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-            {
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            }
+            glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+            glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
 
-            if (!shaderEnabled)
+            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
             {
-                for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
-                {
-                    glActiveTexture(GL_TEXTURE0 + t);
-                    smTextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
-                }
-            }
-            else
-            {
-                shader->activeGLTextures(p_surfaceMesh->getUniqueId());
+                glActiveTexture(GL_TEXTURE0 + t);
+                smTextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
             }
         }
     }
 
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_COLORMAP)
     {
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->vertices.data());
-    }
-
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        if (p_surfaceMesh->isMeshTextured())
-        {
-            glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
-        }
-    }
-
-    if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->vertNormals);
-    }
-
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-        {
-            glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        }
-        else
-        {
-            vao->draw(p_drawParam);
-        }
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
-
-        if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-        {
-            glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        }
+        glColor3fv(renderDetail->getVertexColor().toGLColor());
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
 
         glEnable(GL_LIGHTING);
         //default rendering
@@ -336,10 +246,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
         glDisable(GL_TEXTURE_2D);
         glColor4fv(renderDetail->getWireFrameColor().toGLColor());
 
-        if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-        {
-            glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
-        }
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
 
         glEnable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
@@ -348,12 +255,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_LOCALAXIS)
-    {
-        glEnable(GL_LIGHTING);
-    }
-
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_HIGHLIGHTVERTICES && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
         glColor3fv(renderDetail->getHighLightColor().toGLColor());
@@ -366,11 +268,8 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
         glDisable(GL_BLEND);
     }
 
-    if (!(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
-    {
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glDisableClientState(GL_NORMAL_ARRAY);
-    }
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
@@ -386,22 +285,9 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
         }
     }
 
-    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_COLORMAP && !(p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_VAO))
+    if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_COLORMAP)
     {
         glDisableClientState(GL_COLOR_ARRAY);
-    }
-
-    if (p_drawParam.rendererObject->renderStage != SMRENDERSTAGE_SHADOWPASS)
-    {
-        for (size_t i = 0; i < renderDetail->getShaders().size(); i++)
-        {
-            if (shaderEnabled)
-            {
-                smShader::getShader(renderDetail->getShaders()[i])->posdraw(p_surfaceMesh);
-                shader->disableShader();
-                break;
-            }
-        }
     }
 
     glEnable(GL_LIGHTING);
@@ -409,7 +295,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMes
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
+void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color, smFloat length)
 {
 
     glDisable(GL_LIGHTING);
@@ -422,7 +308,7 @@ void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
     for (smInt i = 0; i < p_mesh->nbrVertices; i++)
     {
         glVertex3dv(p_mesh->vertices[i].data());
-        tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * 5;
+        tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 
@@ -431,7 +317,7 @@ void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color)
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
         glVertex3dv(baryCenter.data());
-        tmp = baryCenter + p_mesh->triNormals[i] * 5;
+        tmp = baryCenter + p_mesh->triNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 
@@ -512,6 +398,83 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
+void smGLRenderer::drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D)
+{
+    double x = x2 - x1;
+    double y = y2 - y1;
+    double z = z2 - z1;
+    double L = sqrt(x*x + y*y + z*z);
+
+    GLUquadricObj *quadObj;
+
+    glPushMatrix();
+
+    glTranslated(x1, y1, z1);
+
+    if ((x != 0.) || (y != 0.)) {
+        glRotated(atan2(y, x) / 0.0174533, 0., 0., 1.);
+        glRotated(atan2(sqrt(x*x + y*y), z) / 0.0174533, 0., 1., 0.);
+    }
+    else if (z<0){
+        glRotated(180, 1., 0., 0.);
+    }
+
+    glTranslatef(0, 0, L - 4 * D);
+
+    quadObj = gluNewQuadric();
+    gluQuadricDrawStyle(quadObj, GLU_FILL);
+    gluQuadricNormals(quadObj, GLU_SMOOTH);
+    gluCylinder(quadObj, 2 * D, 0.0, 4 * D, 32, 1);
+    gluDeleteQuadric(quadObj);
+
+    quadObj = gluNewQuadric();
+    gluQuadricDrawStyle(quadObj, GLU_FILL);
+    gluQuadricNormals(quadObj, GLU_SMOOTH);
+    gluDisk(quadObj, 0.0, 2 * D, 32, 1);
+    gluDeleteQuadric(quadObj);
+
+    glTranslatef(0, 0, -L + 4 * D);
+
+    quadObj = gluNewQuadric();
+    gluQuadricDrawStyle(quadObj, GLU_FILL);
+    gluQuadricNormals(quadObj, GLU_SMOOTH);
+    gluCylinder(quadObj, D, D, L - 4 * D, 32, 1);
+    gluDeleteQuadric(quadObj);
+
+    quadObj = gluNewQuadric();
+    gluQuadricDrawStyle(quadObj, GLU_FILL);
+    gluQuadricNormals(quadObj, GLU_SMOOTH);
+    gluDisk(quadObj, 0.0, D, 32, 1);
+    gluDeleteQuadric(quadObj);
+
+    glPopMatrix();
+
+}
+
+void smGLRenderer::drawAxes(GLdouble length)
+{
+    glDisable(GL_LIGHTING);
+
+    glColor3fv(smColor::colorRed.toGLColor());
+    glPushMatrix();
+    //glTranslatef(-length, 0, 0);
+    drawArrow(0, 0, 0, length, 0, 0, length / 12);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorGreen.toGLColor());
+    glPushMatrix();
+    //glTranslatef(0, -length, 0);
+    drawArrow(0, 0, 0, 0, length, 0, length / 12);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorBlue.toGLColor());
+    glPushMatrix();
+    //glTranslatef(0, 0, -length);
+    drawArrow(0, 0, 0, 0, 0, length, length / 12);
+    glPopMatrix();
+
+    glEnable(GL_LIGHTING);
+}
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 
@@ -525,8 +488,10 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
                              };
     smVec3d tmp;
 
-    angle = std::acos(defaultDir.dot(p_plane.unitNormal));
-    axisOfRot = p_plane.unitNormal.cross(defaultDir);
+    smVec3d normal = p_plane.getUnitNormal();
+    smVec3d point = p_plane.getPoint();
+    angle = std::acos(defaultDir.dot(normal));
+    axisOfRot = normal.cross(defaultDir);
     axisOfRot.normalized();
 
     smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
@@ -534,43 +499,33 @@ void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
     glColor3fv(p_color.toGLColor());
-    tmp = rot*planePoints[0] + p_plane.pos;
+    tmp = rot*planePoints[0] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[1] + p_plane.pos;
+    tmp = rot*planePoints[1] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[2] + p_plane.pos;
+    tmp = rot*planePoints[2] + point;
     glVertex3dv(tmp.data());
-    tmp = rot*planePoints[3] + p_plane.pos;
+    tmp = rot*planePoints[3] + point;
     glVertex3dv(tmp.data());
     glEnd();
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::enableDefaultGLRendering()
-{
-
-    glDisable(GL_VERTEX_PROGRAM_ARB);
-    glDisable(GL_FRAGMENT_PROGRAM_ARB);
-    glUseProgramObjectARB(0);
-}
-
-void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
-                               smDrawParam p_param)
+void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene)
 {
     assert(p_scene);
 
     smMatrix44f proj = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getProjMatRef());
     smMatrix44f view = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getViewMatRef());
 
-    renderScene(p_scene, p_param, proj, view);
+    renderScene(p_scene, proj, view);
 }
 
 void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
-                               smDrawParam p_param,
                                const smMatrix44f &p_proj,
                                const smMatrix44f &p_view)
 {
-    smSceneIterator sceneIter;
+    smSceneLocal sceneLocal;
 
     assert(p_scene);
 
@@ -583,15 +538,15 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
     glPushMatrix();
     glLoadMatrixf(p_view.data());
 
-    sceneIter.setScene(p_scene, p_param.caller);
+    p_scene->copySceneToLocal(sceneLocal);
 
     //Enable lights
     p_scene->enableLights();
     p_scene->placeLights();
 
-    for (smInt j = sceneIter.start(); j < sceneIter.end(); j++)
+    for (auto x: sceneLocal.sceneObjects)
     {
-        renderSceneObject(sceneIter[j], p_param);
+        renderSceneObject(x);
     }
 
     p_scene->disableLights();
@@ -602,8 +557,7 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
     glPopMatrix();
 }
 
-void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject,
-                                     const smDrawParam &p_param)
+void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
     if (p_sceneObject->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
@@ -631,7 +585,7 @@ void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObjec
         }
 
         // TODO: scenobject does not have a draw function
-        p_sceneObject->draw(p_param);
+        p_sceneObject->draw();
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place

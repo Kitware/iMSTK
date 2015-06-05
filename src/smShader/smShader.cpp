@@ -722,7 +722,7 @@ smBool smShader::setShaderFileName(const smString& p_vertexFileName,
     return true;
 }
 
-void smShader::initDraw(const smDrawParam &/*p_param*/)
+void smShader::initDraw()
 {
 
     initShaders(vertexProgFileName, fragmentProgFileName, geometryProgFileName);
@@ -790,10 +790,10 @@ void smShader::getAttribAndParamLocations()
 }
 
 
-void smShader::initGLShaders(smDrawParam p_param)
+void smShader::initGLShaders()
 {
     for(auto& x : shaders)
-        x.second->initDraw(p_param);
+        x.second->initDraw();
 }
 
 void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)

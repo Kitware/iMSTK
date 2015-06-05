@@ -143,7 +143,7 @@ public:
     /// \brief check status of the frame buffer. It returns ok if the frame buffer is complete
     smBool checkStatus();
     /// \brief draw framebuffer. it is for debug purposes.
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 };
 
 #endif

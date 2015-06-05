@@ -32,50 +32,30 @@ smMeshCollisionModel::~smMeshCollisionModel()
 {
 
 }
-std::shared_ptr<smMesh> smMeshCollisionModel::getMesh()
-{
-    return this->mesh;
-}
 void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 {
-    this->mesh.reset();
-    this->mesh = modelMesh;
-    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), 6);
-    this->aabbTree->initStructure();
+    this->setModelMesh(modelMesh);
+    this->aabbTree.reset();
+    this->initAABBTree(6);
 }
 void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
-    if(nullptr == this->mesh)
-    {
-        this->mesh = std::make_shared<smSurfaceMesh>();
-    }
+    this->load(meshName,type);
 
-    this->mesh->loadMesh(meshName,type);
-    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), 6);
-    this->aabbTree->initStructure();
+    this->initAABBTree(6);
 }
-
 std::shared_ptr< smMeshCollisionModel::AABBTreeType > smMeshCollisionModel::getAABBTree()
 {
-    assert(this->aabbTree);
     return this->aabbTree;
 }
-const smVec3d& smMeshCollisionModel::getNormal(size_t i) const
-{
-    assert(this->mesh);
-    return this->mesh->triNormals[i];
-}
-std::array<smVec3d,3> smMeshCollisionModel::getTrianglePositions(size_t i) const
-{
-    std::array<smVec3d, 3> vertices;
-    vertices[0] = this->mesh->vertices[this->mesh->triangles[i].vert[0]];
-    vertices[1] = this->mesh->vertices[this->mesh->triangles[i].vert[1]];
-    vertices[2] = this->mesh->vertices[this->mesh->triangles[i].vert[2]];
 
-    return vertices;
-}
 void smMeshCollisionModel::setAABBTree(std::shared_ptr<smMeshCollisionModel::AABBTreeType> modelAabbTree)
 {
     this->aabbTree.reset();
     this->aabbTree = modelAabbTree;
+}
+void smMeshCollisionModel::initAABBTree(const int& numLevels)
+{
+    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), numLevels);
+    this->aabbTree->initStructure();
 }

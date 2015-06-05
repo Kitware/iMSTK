@@ -396,7 +396,7 @@ void smSpatialHashCollision::addOctreeCell(std::shared_ptr<smSpatialHashCollisio
 
             cellModel.primID = i;
             cellModel.center = iter[i].getCube().center;
-            cellModel.radius = iter[i].getCube().getCircumscribedSphere().radius;
+            cellModel.radius = iter[i].getCube().getCircumscribedSphere().getRadius();
 
             for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
                 for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)

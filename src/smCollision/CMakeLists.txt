@@ -11,6 +11,8 @@ simmedtk_add_library(smCollision
     smCollisionPair.cpp
     smMeshCollisionModel.cpp
     smMeshToMeshCollision.cpp
+    smPlaneToMeshCollision.cpp
+    smPlaneCollisionModel.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionConfig.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionDetection.h
@@ -22,13 +24,14 @@ simmedtk_add_library(smCollision
     ${CMAKE_SOURCE_DIR}/include/smCollision/smCollisionPair.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smMeshCollisionModel.h
     ${CMAKE_SOURCE_DIR}/include/smCollision/smMeshToMeshCollision.h
+    ${CMAKE_SOURCE_DIR}/include/smCollision/smPlaneToMeshCollision.h
 )
 
 target_link_libraries(smCollision
-  PUBLIC
-    smCore
   PRIVATE
+    smCore
     smEvent
+    smGeometry
 )
 
 if(BUILD_TESTING)

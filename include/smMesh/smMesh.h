@@ -37,6 +37,9 @@
 #include "smCollision/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
+//VEGA includes
+#include "objMesh.h"
+
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
 
@@ -90,6 +93,16 @@ public:
 
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
+
+    const smStdVector3d &getVertices() const
+    {
+        return this->vertices;
+    }
+
+    int getNumVertices()
+    {
+        return nbrVertices;
+    }
 
 public:
     smCollisionGroup collisionGroup; ///< !!
@@ -188,8 +201,20 @@ public:
     /// \brief load the mesh
     virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
 
+    /// \brief load the mesh
+    bool importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage);
+
+    /// \brief update the surface mesh data after the deformation
+    void updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh);
+
     /// \brief render the surface mesh
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
+
+    /// \brief get number of triangles
+    int getNumTriangles()  const;
+
+    /// \brief get number of edges
+    int getNumEdges()  const;
 
 public:
     smInt  nbrTriangles; ///< number of triangles
@@ -281,7 +306,7 @@ public:
     smBool isMeshTextured();
 
     /// \brief draw the mesh
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
 public:
     smAABB *edgeAABBs;///< AABBs for the edges in the mesh

@@ -68,7 +68,7 @@ public:
     std::vector<CellType> treeAllLevels; ///< !!
 
     /// \brief initialize the draw function related structures
-    void initDraw(const smDrawParam &param) override;
+    void initDraw() override;
 
 protected:
 
@@ -93,7 +93,7 @@ public:
     }
 
     /// \brief rendering the surface tree
-    virtual void draw(const smDrawParam &params) override;
+    virtual void draw() override;
 
     /// \brief !!
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;

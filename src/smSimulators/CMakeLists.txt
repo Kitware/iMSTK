@@ -5,13 +5,11 @@ simmedtk_add_library(smSimulators
     smFemSceneObject.cpp
     smFemSimulator.cpp
     smMyStylus.cpp
-#     smPBDObjectSimulator.cpp
-#     smPBDSceneObject.cpp
     smStylusObject.cpp
     smToolSimulator.cpp
-#     smVegaConfigFemObject.cpp
-#     smVegaFemSceneObject.cpp
-#     smVegaFemSimulator.cpp
+    smVegaConfigFemObject.cpp
+    smVegaFemSceneObject.cpp
+    smVegaFemSimulator.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h
@@ -33,7 +31,6 @@ target_link_libraries(smSimulators
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts
-    VegaFEM::sceneObject
     VegaFEM::performanceCounter
     VegaFEM::volumetricMesh
     VegaFEM::stvk
@@ -43,6 +40,8 @@ target_link_libraries(smSimulators
     VegaFEM::elasticForceModel
     VegaFEM::isotropicHyperelasticFEM
     VegaFEM::loadList
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
     )
 
 target_include_directories(smSimulators

@@ -177,7 +177,7 @@ public:
     void disableShader();
 
     // \brief Initialize the shader..This is called automatically.
-    virtual void initDraw(const smDrawParam &p_param);
+    virtual void initDraw();
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     // \brief add parameter for Vertex Shader
@@ -246,7 +246,7 @@ public:
 
     smBool readShaderContent(const smString& p_file, smString& p_content);
 
-    static void initGLShaders(smDrawParam p_param);
+    static void initGLShaders();
 
     void activeGLTextures(std::shared_ptr<smUnifiedId> p_id);
 

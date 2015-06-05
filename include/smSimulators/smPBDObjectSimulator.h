@@ -31,7 +31,6 @@
 class smErrorLog;
 class smPBDSurfaceSceneObject;
 class smEvent;
-class smDrawParam;
 
 /// \brief Example Position based dynamics (PBD) simulator
 class smPBDObjectSimulator: public smObjectSimulator
@@ -57,7 +56,7 @@ protected:
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
 
     /// \brief render the PBD objects
-    void draw(const smDrawParam &p_params) override;
+    void draw() override;
 
 };
 

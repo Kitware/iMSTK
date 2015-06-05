@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW GLUT GLM ThreadPool)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW GLM ThreadPool)
 if(BUILD_TESTING)
   list(APPEND SimMedTK_DEPENDENCIES Bandit)
 endif()
@@ -178,7 +178,7 @@ ExternalProject_Add(${proj}
 #     -DSimMedTK_INSTALL_INCLUDE_DIR:STRING=${SimMedTK_INSTALL_INCLUDE_DIR}
 #     -DSimMedTK_INSTALL_DOC_DIR:STRING=${SimMedTK_INSTALL_DOC_DIR}
     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-    -DSimMedTK_BUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+    -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}
     -DSimMedTK_C_FLAGS:STRING=${SimMedTK_C_FLAGS}

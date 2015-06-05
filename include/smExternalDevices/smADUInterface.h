@@ -99,7 +99,7 @@ public:
     virtual void endFrame() override {};
 
     /// \brief !!
-    void draw(const smDrawParam &p_params) override {};
+    void draw() override {};
 
     /// \brief
     void run() override;

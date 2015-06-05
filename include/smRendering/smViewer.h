@@ -119,6 +119,8 @@ public:
     /// \brief Viewer settings
     smUInt viewerRenderDetail;
 
+    smFloat globalAxisLength;    
+
     smInt height(void);
     smInt width(void);
     smFloat aspectRatio(void);
@@ -159,6 +161,8 @@ public:
     void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
+
+    void setGlobalAxisLength(const smFloat len);
     smString windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
@@ -168,11 +172,11 @@ protected:
     /// \brief Initializes OpenGL capabilities and flags
     void initGLCaps();
     /// \brief Initializes the internal objectList
-    void initObjects(smDrawParam p_param);
+    void initObjects();
     /// \brief Initializes FBOs, textures, shaders and VAOs
-    void initResources(smDrawParam p_param);
+    void initResources();
     /// \brief Initializes scenes in the sceneList
-    void initScenes(smDrawParam p_param);
+    void initScenes();
     /// \brief Initilizes the OpenGL context, and window containing it
     void initGLContext();
     /// \brief Cleans up after initGLContext()
@@ -180,15 +184,15 @@ protected:
     /// \brief Cleanup function called on exit to ensure resources are cleaned up
     virtual void cleanUp();
     /// \brief Renders the internal sceneList
-    void renderSceneList(smDrawParam p_param);
+    void renderSceneList();
     /// \brief Processes a render operation
-    void processRenderOperation(const smRenderOperation &p_rop, smDrawParam p_param);
+    void processRenderOperation(const smRenderOperation &p_rop);
     /// \brief Processes viewerRenderDetail options
     void processViewerOptions();
     /// \brief Renders the render operation to screen
-    virtual void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    virtual void renderToScreen(const smRenderOperation &p_rop);
     /// \brief Renders the render operation to an FBO
-    void renderToFBO(const smRenderOperation &p_rop, smDrawParam p_param);
+    void renderToFBO(const smRenderOperation &p_rop);
     /// \brief Initializes the FBOs in the FBO list
     void initFboListItems();
     /// \breif Destroys all the FBOs in the FBO list
@@ -202,8 +206,7 @@ protected:
     /// \brief called in the end of each frame
     virtual void endFrame() override;
     /// \brief draw routines
-    virtual void draw(const smDrawParam &) override {};
-    virtual void draw();
+    virtual void render();
     /// \brief adjust  rendering FPS
     void adjustFPS();
     /// \brief render depth texture for debugging
