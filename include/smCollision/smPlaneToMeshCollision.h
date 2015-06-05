@@ -21,34 +21,29 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef RENDER_CUBE_H
-#define RENDER_CUBE_H
 
-#include "smCore/smSDK.h"
-#include "smRendering/smOculusViewer.h"
+#ifndef SMPLANETOMESHCOLLISION_H
+#define SMPLANETOMESHCOLLISION_H
 
-class RenderCube
-    : public smSimulationMain,
-      public smCoreClass,
-      public smEventHandler
+// SimMedTK includes
+#include "smCollision/smCollisionDetection.h"
+
+class smCollisionPair;
+
+///
+/// @brief Brute force collision detection between a mesh and a static plane
+///
+class smPlaneToMeshCollision : public smCollisionDetection
 {
 public:
-    RenderCube();
-    ~RenderCube();
-    void simulateMain(smSimulationMainParam p_param);
-    void handleEvent(smEvent *p_event);
-private:
-    smSDK* simmedtkSDK;
-    smScene *scene1;
-    smScene *scene2;
-    smStaticSceneObject cube;
-    smStaticSceneObject square;
-    smOculusViewer viewer;
+    smPlaneToMeshCollision() {}
+    virtual ~smPlaneToMeshCollision() {}
 
-    void setupLights();
-    void setupCamera();
+    smPlaneToMeshCollision(const smPlaneToMeshCollision &) = delete;
+
+private:
+    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) override;
+
 };
 
-void runRenderCube();
-
-#endif
+#endif // SMPLANETOMESHCOLLISION_H

@@ -107,7 +107,7 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
 /// \brief Initialize the drawing structures
 template<typename CellType>
-void smSurfaceTree<CellType>::initDraw(const smDrawParam &/*param*/)
+void smSurfaceTree<CellType>::initDraw()
 {
 //     smViewer *viewer;
 //     viewer = param.rendererObject;
@@ -116,7 +116,7 @@ void smSurfaceTree<CellType>::initDraw(const smDrawParam &/*param*/)
 
 /// \brief draw the surface tree
 template<typename CellType>
-void smSurfaceTree<CellType>::draw(const smDrawParam &params)
+void smSurfaceTree<CellType>::draw()
 {
     smVec3d center;
     double length;

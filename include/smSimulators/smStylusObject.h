@@ -166,10 +166,10 @@ public:
     std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void initDraw(const smDrawParam &p_params) override;
+    virtual void initDraw() override;
 
     /// \brief !!
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
     /// \brief !!
     virtual void init() override;

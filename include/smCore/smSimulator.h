@@ -36,6 +36,7 @@
 #include "smUtilities/smMakeUnique.h"
 #include "smUtilities/smMakeUnique.h"
 #include "smCollision/smCollisionDetection.h"
+#include "smContactHandling/smContactHandling.h"
 
 struct smSimulationMainParam
 {
@@ -96,6 +97,7 @@ private:
     std::vector<std::shared_ptr<smObjectSimulator>> simulators;
     std::vector<std::shared_ptr<smCollisionDetection>> collisionDetectors;
     std::vector<std::shared_ptr<smCollisionPair>> collisionPairs;
+    std::vector<std::shared_ptr<smContactHandling>> contactHandlers;
 
     std::unique_ptr<ThreadPool> threadPool; //
     std::unique_ptr<ThreadPool> asyncPool; // asynchronous thread pool

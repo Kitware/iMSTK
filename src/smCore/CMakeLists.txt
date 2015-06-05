@@ -45,10 +45,10 @@ simmedtk_add_library(smCore
 target_link_libraries(smCore
   PUBLIC
     GLEW::GLEW
-    GLUT::GLUT
     ${OPENGL_LIBRARY}
     sfml::graphics
-  INTERFACE
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
 )
 
 if(NOT MSVC)

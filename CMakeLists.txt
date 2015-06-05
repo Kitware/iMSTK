@@ -149,7 +149,6 @@ if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
   add_definitions(-DWIN32_LEAN_AND_MEAN)
   add_definitions(-DWINDOWS_EXTRA_LEAN)
-  add_definitions(-DGLUT_BUILDING_LIB)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -194,8 +193,6 @@ endif()
 
 include(SimMedTKMacros)
 
-simmedtk_find_package(GLUT REQUIRED)
-
 if(SimMedTK_USE_PHANTOM_OMNI)
   simmedtk_find_package(OpenHaptics)
 endif()
@@ -231,4 +228,27 @@ set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 
 add_subdirectory(src)
+export(PACKAGE SimMedTK)
+export(TARGETS  smCore
+                smCollision
+                smExternal
+                smExternalDevices
+                smMesh
+                smRendering
+                smShader
+                smSimulators
+                smTools
+                smUtilities
+                smEvent
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
+  NAMESPACE smtk::
+  EXPORT_LINK_INTERFACE_LIBRARIES
+)
+
+configure_file(
+  CMake/SimMedTKConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
+  @ONLY
+)
+
 add_subdirectory(examples)

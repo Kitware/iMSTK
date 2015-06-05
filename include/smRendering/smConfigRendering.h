@@ -86,7 +86,7 @@ struct smColor
     /// \brief returns the color value given with the index
     smFloat operator()(smInt p_i);
     /// \brief setting
-    smColor &operator=(smColor &p_color);
+    smColor &operator=(const smColor &p_color);
     /// \brief converts to gl color
     smGLFloat* toGLColor();
     const smGLFloat* toGLColor() const;
@@ -122,7 +122,6 @@ struct smColor
 ///Renders Vertex Buffer Objects
 #define    SIMMEDTK_RENDER_VBO               (1<<16)
 #define    SIMMEDTK_RENDER_NORMALS           (1<<17)
-#define    SIMMEDTK_RENDER_VAO               (1<<18)
 #define    SIMMEDTK_RENDER_NONE              (1<<31)
 
 /// \brief type definitions for variable viewerRenderDetail in smViewer
@@ -137,8 +136,7 @@ struct smColor
 #define    SIMMEDTK_VIEWERRENDER_RESTORELASTCAMSETTINGS         (1<<9)
 #define    SIMMEDTK_VIEWERRENDER_DISABLE                        (1<<11)
 #define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
-
-
+#define    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS                    (1<<13)
 
 
 /// \brief viewer detail. legacy code
@@ -157,6 +155,7 @@ struct smRenderDetail
 {
 public:
     smRenderDetail();
+    smRenderDetail(smUInt type) : renderType(type) { normalLength = 1.0; }
 
     /// \brief attachment of shader
     void addShader(std::shared_ptr<smUnifiedId> p_shaderID);
@@ -182,6 +181,8 @@ public:
 
     const smColor &getHighLightColor() const;
 
+    const smColor &getVertexColor() const;
+
     const smColor &getShadowColor() const;
 
     const smBool &getCastShadow() const;
@@ -200,12 +201,37 @@ public:
 
     const std::vector<smBool> &getVAOEnable() const;
 
+    void setPointSize(const float size);
+
+    void setLineSize(const float size);
+
+    void setVertexColor(const smColor vertColor);
+
+    void setHighlightColor(const smColor highlightColor);
+
+    void setNormalColor(const smColor highlightColor);
+
+    void setShininess(const smFloat s);
+
+    void setNormalLength(const smFloat len);
+
+    void setDiffuseColor(const smColor diffColor);
+
+    void setAmbientColor(const smColor ambColor);
+
+    void setSpecularColor(const smColor specColor);
+
+    void setShadowColor(const smColor shadColor);
+
+    void setWireframeColor(const smColor wireColor);
+    
 public:
     smUInt renderType; // render type
     smColor colorDiffuse; // diffuse color
     smColor colorAmbient; // ambient color
     smColor colorSpecular; // specular color
     smColor highLightColor; // highlight color
+    smColor vertexRenderColor; // vertex color
     smColor shadowColor; // shadow color
     smBool castShadow; // object can generate a shadow or not
     smBool canGetShadow; // object can get the shadow or not
@@ -215,6 +241,7 @@ public:
     smFloat lineSize; // line width size
     smFloat shininess; // specular shinness
     smBool debugDraw; // debug draw enabled or not
+    smFloat normalLength; // length of rendered normals
     std::vector<std::shared_ptr<smUnifiedId>> shaders; // attached shaders
     std::vector<smBool> shaderEnable; // enable/disable any attached shader
     std::vector<std::shared_ptr<smUnifiedId>> VAOs; // stores  VAO IDs

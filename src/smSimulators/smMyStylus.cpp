@@ -198,9 +198,9 @@ HookCautery::HookCautery(const smString& p_pivot)
     addMeshContainer(&meshContainer);
 }
 
-void HookCautery::draw(const smDrawParam &p_param)
+void HookCautery::draw()
 {
-    smStylusRigidSceneObject::draw(p_param);
+    smStylusRigidSceneObject::draw();
 }
 
 void HookCautery::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)

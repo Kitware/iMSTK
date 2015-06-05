@@ -43,11 +43,12 @@ public:
     smContact ( const double penetrationDepth,
                 const smVec3d& contactPoint,
                 const smVec3d& contactNornmal
-              ) : depth ( penetrationDepth ), point ( contactPoint ), normal ( contactNornmal ) {}
+				) : depth(penetrationDepth), point(contactPoint), normal(contactNornmal){}
 
     double depth;
     smVec3d point;
     smVec3d normal;
+    int index;
 };
 
 ///
@@ -98,6 +99,11 @@ public:
     /// @brief Returns wether the contact container is empty
     ///
     bool hasContacts();
+
+    ///
+    /// @brief Returns the number of contacts (= number of contact pairs)
+    ///
+    int getNumberOfContacts();
 
     ///
     /// @brief Returns contact array for these two models

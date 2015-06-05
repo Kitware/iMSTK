@@ -50,15 +50,15 @@ void smSceneTextureShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p
 
 }
 
-void smSceneTextureShader::initDraw(const smDrawParam &p_param)
+void smSceneTextureShader::initDraw()
 {
-    smShader::initDraw(p_param);
+    smShader::initDraw();
     this->depthTex = getFragmentShaderParam("depthTex");
     this->sceneTex = getFragmentShaderParam("sceneTex");
     this->prevTex = getFragmentShaderParam("prevTex");
 }
 
-void smSceneTextureShader::draw(const smDrawParam &/*p_param*/)
+void smSceneTextureShader::draw()
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
     glDisable(GL_LIGHTING);

@@ -7,6 +7,9 @@ simmedtk_add_library(smMesh
     smVolumeMesh.cpp
     smLattice.cpp
     smPhysXVolumeMesh.cpp
+    smVegaSceneObject.cpp
+    smVegaSceneObjectDeformable.cpp
+    smVegaSceneObjectWithRestPosition.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smMesh/smImportExport.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smMesh.h
@@ -14,13 +17,18 @@ simmedtk_add_library(smMesh
     ${CMAKE_SOURCE_DIR}/include/smMesh/smVolumeMesh.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smLattice.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smLatticeTypes.h
+	${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectDeformable.h
+    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectWithRestPosition.h
 )
 
 target_link_libraries(smMesh
-  PUBLIC
-    Assimp::Assimp
   PRIVATE
     smCore
     smRendering
     smCollision
+  PUBLIC
+    Assimp::Assimp
+    VegaFEM::minivector
+    VegaFEM::volumetricMesh
     )

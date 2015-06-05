@@ -28,6 +28,7 @@
 #include "smCore/smConfig.h"
 #include "smMesh/smVolumeMesh.h"
 #include "smMesh/smSurfaceMesh.h"
+#include "smMesh/smVegaSceneObjectDeformable.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
 #include "smCore/smErrorLog.h"
@@ -36,47 +37,48 @@
 #include "smSimulators/smVegaConfigFemObject.h"
 
 // VEGA includes
-#include "getopts.h"
-#include "sceneObjectDeformable.h"
-#include "performanceCounter.h"
-#include "tetMesh.h"
-#include "StVKCubeABCD.h"
-#include "StVKTetABCD.h"
-#include "StVKTetHighMemoryABCD.h"
-#include "implicitBackwardEulerSparse.h"
-#include "eulerSparse.h"
 #include "centralDifferencesSparse.h"
-#include "StVKInternalForces.h"
-#include "StVKStiffnessMatrix.h"
-#include "StVKInternalForcesMT.h"
-#include "StVKStiffnessMatrixMT.h"
-#include "StVKForceModel.h"
-#include "massSpringSystemForceModel.h"
+#include "configFile.h"
+#include "corotationalLinearFEMForceModel.h"
 #include "corotationalLinearFEM.h"
 #include "corotationalLinearFEMMT.h"
-#include "corotationalLinearFEMForceModel.h"
-#include "linearFEMForceModel.h"
+#include "eulerSparse.h"
+#include "generateMeshGraph.h"
+#include "getIntegratorSolver.h"
+#include "getopts.h"
+#include "graph.h"
+#include "implicitBackwardEulerSparse.h"
+#include "isotropicHyperelasticFEMForceModel.h"
 #include "isotropicHyperelasticFEM.h"
 #include "isotropicHyperelasticFEMMT.h"
-#include "isotropicHyperelasticFEMForceModel.h"
 #include "isotropicMaterial.h"
-#include "StVKIsotropicMaterial.h"
-#include "neoHookeanIsotropicMaterial.h"
-#include "MooneyRivlinIsotropicMaterial.h"
-#include "getIntegratorSolver.h"
-#include "volumetricMeshLoader.h"
-#include "StVKElementABCDLoader.h"
-#include "generateMeshGraph.h"
-#include "massSpringSystem.h"
-#include "massSpringSystemMT.h"
+#include "linearFEMForceModel.h"
+#include "loadList.h"
+#include "massSpringSystemForceModel.h"
+#include "massSpringSystemFromCubicMeshConfigFile.h"
 #include "massSpringSystemFromObjMeshConfigFile.h"
 #include "massSpringSystemFromTetMeshConfigFile.h"
-#include "massSpringSystemFromCubicMeshConfigFile.h"
-#include "graph.h"
-#include "renderSprings.h"
-#include "configFile.h"
-#include "loadList.h"
+#include "massSpringSystem.h"
+#include "massSpringSystemMT.h"
 #include "matrixIO.h"
+#include "MooneyRivlinIsotropicMaterial.h"
+#include "neoHookeanIsotropicMaterial.h"
+#include "objMesh.h"
+#include "performanceCounter.h"
+#include "renderSprings.h"
+#include "StVKCubeABCD.h"
+#include "StVKElementABCDLoader.h"
+#include "StVKForceModel.h"
+#include "StVKInternalForces.h"
+#include "StVKInternalForcesMT.h"
+#include "StVKIsotropicMaterial.h"
+#include "StVKStiffnessMatrix.h"
+#include "StVKStiffnessMatrixMT.h"
+#include "StVKTetABCD.h"
+#include "StVKTetHighMemoryABCD.h"
+#include "tetMesh.h"
+#include "volumetricMesh.h"
+#include "volumetricMeshLoader.h"
 
 #define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
 const smString vega_string_none("__none");
@@ -87,11 +89,17 @@ const smString vega_string_none("__none");
 class smVegaFemSceneObject: public smSceneObject
 {
 public:
+
+    /// \brief Constructor
+	smVegaFemSceneObject();
+
     /// \brief Constructor
     smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr, smString ConfigFile = vega_string_none);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
+
+	bool configure(smString ConfigFile);
 
     /// \brief Initialize the parameters and properties of the simulation object
     void initSimulation();
@@ -100,10 +108,10 @@ public:
     void setDeformableModel();
 
     /// \brief Load specified meshes
-    void loadMeshes();
+    void loadVolumeMesh();
 
     /// \brief Load the rendering mesh if it is designated
-    void loadRenderingMesh();
+    void loadSurfaceMesh();
 
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC();
@@ -131,6 +139,12 @@ public:
     /// with the scene during runtime are added here
     inline void applyUserInteractionForces();
 
+    /// \brief Append the contact forces (if any)
+    void applyContactForces();
+
+    /// \brief Set all contact forces to zero (if any)
+    void setContactForcesToZero();
+
     /// \brief Forces that are defined by the user before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
@@ -144,48 +158,57 @@ public:
     /// \brief prints a given string on the screen
     void print_bitmap_string(float x, float y, float z, void * font, char * s);
 
-    /// \brief draws cartesian axis
-    void drawAxes(double axisLength);
-
-    /// \brief
-    virtual void serialize(void *) override
-    {
-        //add code in future
-    }
-
-    /// \brief
-    virtual void unSerialize(void *) override
-    {
-
-    }
-
     /// \brief not implemented yet.
     virtual std::shared_ptr<smSceneObject> clone() override
     {
         return safeDownCast<smSceneObject>();
     }
 
+    void setRenderUsingVega(const bool vegaRender);
+
+    /// \brief check all the surface nodes for the closest node within
+    /// certain threshold and set it to be the pulled vertex
+    void setPulledVertex(const smVec3d &userPos);
+
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
-    virtual void draw(const smDrawParam &p_params) override;
+    virtual void draw() override;
 
-    virtual void init() override {}
+    void renderWithVega();
+
+    /// \brief sets the objects specific render details
+    /// Should be moved to base class in near future
+    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
+
+	///serialize function explicity writes the object to the memory block
+	///each scene object should know how to write itself to a memory block
+	virtual void serialize(void *p_memoryBlock) override {};
+
+	///Unserialize function can recover the object from the memory location
+	virtual void unSerialize(void *p_memoryBlock) override {};
+
+	///this function may not be used
+	///every Scene Object should know how to clone itself. Since the data structures will be
+	///in the beginning of the modules(such as simulator, viewer, collision etc.)
+	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+
+	virtual void init() override {};
 
 public:
     /// performance counters and simulation flags. some variable names are self explainatory
     double fps; ///< fps of the simulation
-    const int fpsBufferSize = 5; ///< buffer size to display fps
+	int fpsBufferSize;///< buffer size to display fps
     int fpsHead; ///< !!
     double fpsBuffer[5]; ///< buffer to display fps
     double cpuLoad;
     double forceAssemblyTime;
     double forceAssemblyLocalTime;
-    const int forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    int forceAssemblyHead; /// !!
+	int forceAssemblyBufferSize;
+    int forceAssemblyHead;
     double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     double systemSolveTime;
     double systemSolveLocalTime;
-    const int systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+	int systemSolveBufferSize;
     int systemSolveHead;
     double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     int enableTextures;
@@ -198,13 +221,13 @@ public:
     PerformanceCounter cpuLoadCounter;
     int timestepCounter;
     int subTimestepCounter;
+    bool renderUsingVega;
+    bool importAndUpdateVolumeMeshToSmtk;
 
     /// Force models, time integrators, sparse matrices and meshes.
     /// some variable names are self explainatory
-    int numFixedVertices; ///< number of fixed vertices
-    int * fixedVertices; ///< fixed vertcies
-    int numForceLoads; ///< number of discrete external load inputs
-    double * forceLoads; ///< discrete external load inputs
+    std::vector<int> fixedVertices; ///< fixed vertcies
+    std::vector<double> forceLoads; ///< discrete external load inputs
     int positiveDefinite; ///< 1 if the effective matrix is positive definite
     std::shared_ptr<IntegratorBase> integratorBase; ///< integrator
     std::shared_ptr<ImplicitNewmarkSparse> implicitNewmarkSparse;
@@ -234,6 +257,8 @@ public:
     double * uInitial;          ///< initial displacement
     double * velInitial;        ///< initial velocity
 
+    std::vector<double> f_contact; ///< contact forces (if any)
+
     std::shared_ptr<smVegaConfigFemObject> femConfig;
 
     /// interpolation to secondary rendering mesh. self explainatory names
@@ -241,8 +266,11 @@ public:
     int * secondaryDeformableObjectRenderingMesh_interpolation_vertices;
     double * secondaryDeformableObjectRenderingMesh_interpolation_weights;
 
-    std::shared_ptr<SceneObjectDeformable> deformableObjectRenderingMesh;
-    std::shared_ptr<SceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
+    std::shared_ptr<smVegaSceneObjectDeformable> deformableObjectRenderingMesh;
+    std::shared_ptr<smVegaSceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
+
+    std::shared_ptr<smVolumeMesh> smtkVolumeMesh;
+    std::shared_ptr<smSurfaceMesh> smtkSurfaceMesh;
 };
 
 #endif

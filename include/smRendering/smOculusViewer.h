@@ -42,7 +42,7 @@ public:
 protected:
     virtual void beginFrame();
     virtual void endFrame();
-    virtual void renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param);
+    virtual void renderToScreen(const smRenderOperation &p_rop);
 private:
     ovrHmd hmd;
     ovrSizei eyeRes[2];

@@ -29,10 +29,6 @@ smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog )
     hapticButtonPressed = false;
 }
 
-void smVegaFemSimulator::setDispatcher( std::shared_ptr<smEventDispatcher> p_eventDispatcher )
-{
-    eventDispatcher = p_eventDispatcher;
-}
 
 void smVegaFemSimulator::beginSim()
 {
@@ -69,6 +65,7 @@ void smVegaFemSimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
             auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
+            
             femSceneObject->advanceDynamics();
         }
     }
@@ -86,37 +83,17 @@ void smVegaFemSimulator::syncBuffers()
 
 void smVegaFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
 {
-    switch ( p_event->getEventType().eventTypeCode )
+    if (!this->isListening())
     {
-        case SIMMEDTK_EVENTTYPE_KEYBOARD:
-        {
-            auto keyBoardData = std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
-
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
-            {
-                printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
-            }
-
-            break;
-        }
-
-
-        case SIMMEDTK_EVENTTYPE_HAPTICOUT:
-        {
-            auto hapticEventData = std::static_pointer_cast<smHapticOutEventData>(p_event->getEventData());
-
-            if ( hapticEventData->deviceId == 1 )
-            {
-                hapticPosition[0] = hapticEventData->position[0];
-                hapticPosition[1] = hapticEventData->position[1];
-                hapticPosition[2] = hapticEventData->position[2];
-                hapticButtonPressed = hapticEventData->buttonState[0];
-            }
-
-            break;
-        }
-        default:
-            std::cerr << "Unknown class name." << std::endl;
-
+        return;
     }
+
+    /*auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    if (hapticEvent != nullptr && hapticEvent->getDeviceId() == 1)
+    {
+        hapticPosition = hapticEvent->getPosition();
+        hapticButtonPressed = hapticEvent->getButtonState(0);
+        return;
+    }*/    
+
 }

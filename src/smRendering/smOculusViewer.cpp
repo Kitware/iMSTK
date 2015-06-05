@@ -77,23 +77,17 @@ smOculusViewer::~smOculusViewer()
 
 void smOculusViewer::init()
 {
-    static smDrawParam param;
-
     if (isInitialized)
     {
         return;
     }
 
-    param.rendererObject = this;
-    param.caller = this;
-    param.data = NULL;
-
     ovr_Initialize();
     this->initGLContext();
     this->initGLCaps();
-    this->initObjects(param);
-    this->initResources(param);
-    this->initScenes(param);
+    this->initObjects();
+    this->initResources();
+    this->initScenes();
     if (-1 == this->initOculus())
     {
         isInitialized = false;
@@ -128,7 +122,7 @@ void smOculusViewer::endFrame()
     // Oculus doesn't like it when you swap buffers
 }
 
-void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam p_param)
+void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
 {
     int i;
     ovrMatrix4f ovrProj;
@@ -202,7 +196,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop, smDrawParam 
         view = trans * view;
 
         //Render Scene
-        smGLRenderer::renderScene(p_rop.scene, p_param, proj, view);
+        smGLRenderer::renderScene(p_rop.scene, proj, view);
     }
     //after drawing both eyes into the texture render target, revert to
     // drawing directly to the display, and we call ovrHmd_EndFrame, to let the

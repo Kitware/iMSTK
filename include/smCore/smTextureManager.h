@@ -107,20 +107,22 @@ class smTextureManager: public smCoreClass
     static smBool isInitialized;
     static smBool isInitializedGL;
     static smBool isDeleteImagesEnabled;
-    static void *param;
 
 public:
     /// \brief init function called by the renderer thread
     static smTextureReturnType initGLTextures();
     /// \brief initialization function
-    static void init(std::shared_ptr<smErrorLog> p_errorLog)
+    static void init(std::shared_ptr<smErrorLog> p_errorLog = nullptr)
     {
-        errorLog = p_errorLog;
-        textures.resize(SIMMEDTK_MAX_TEXTURENBR);
-        textures.clear();
-        activeTextures = 0;
-        isDeleteImagesEnabled = true;
-        isInitialized = true;
+        if(!isInitialized)
+        {
+            errorLog = p_errorLog;
+            textures.resize(SIMMEDTK_MAX_TEXTURENBR);
+            textures.clear();
+            activeTextures = 0;
+            isDeleteImagesEnabled = true;
+            isInitialized = true;
+        }
     }
     /// \brief load textures with file name, reference that that is assigned to it, and returned texture id
     static smTextureReturnType loadTexture(const smString& p_fileName,

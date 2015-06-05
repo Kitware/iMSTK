@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smMesh/smLattice.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 smLattice::smLattice()
 {
@@ -244,14 +245,20 @@ void smLattice::addObject( smSceneObject *obj )
     {
         case SIMMEDTK_SMSTATICSCENEOBJECT:
         {
-            mesh = static_cast<smStaticSceneObject*>(obj)->mesh;
+            auto staticSceneObject = static_cast<smStaticSceneObject*>(obj);
+            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            if(nullptr == model)
+            {
+                break;
+            }
+            std::shared_ptr<smMesh> mesh = model->getMesh();
             break;
         }
         default:
             std::cerr << "Unknown class type." << std::endl;
     }
 }
-void smLattice::draw(const smDrawParam &/*p_params*/ )
+void smLattice::draw()
 {
     int index = 0;
     int index2 = 0;
@@ -393,7 +400,7 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
         glPushMatrix();
         glTranslatef( cells[0].cellLeftCorner[0], cells[0].cellLeftCorner[1], cells[0].cellLeftCorner[2] );
         glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
-        glutSolidSphere( 2, 20, 20 );
+//         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
 
         glPushMatrix();
@@ -401,7 +408,7 @@ void smLattice::draw(const smDrawParam &/*p_params*/ )
                       cells[this->totalCells - 1].cellRightCorner[1],
                       cells[this->totalCells - 1].cellRightCorner[2] );
         glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorRed));
-        glutSolidSphere( 2, 20, 20 );
+//         glutSolidSphere( 2, 20, 20 );
         glPopMatrix();
         glPopMatrix();
     }

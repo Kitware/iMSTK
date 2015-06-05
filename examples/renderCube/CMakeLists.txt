@@ -6,10 +6,7 @@ target_link_libraries(renderCube
   smShader
   smMesh
   smEvent
+  smCollision
   ExamplesCommon
-  sfml::system
-  sfml::audio
-  sfml::graphics
-  sfml::network
-  sfml::window
+  smGeometry
   )

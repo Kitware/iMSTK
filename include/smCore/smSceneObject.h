@@ -57,6 +57,7 @@ class smSceneObject: public smCoreClass
 public:
     /// \brief constructor
     smSceneObject();
+    ~smSceneObject(){}
 
     /// \brief returns object id
     smInt getObjectId()
@@ -113,7 +114,7 @@ public:
     std::shared_ptr<smCustomRenderer> getRenderer()
     {
         return customRender;
-    }
+    }    
 
 private:
     std::shared_ptr<smObjectSimulator> objectSim; // object simulator that will simulate the object

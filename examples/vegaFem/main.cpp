@@ -21,10 +21,145 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "vegaFemExample.h"
+// Core SimMedTK includes
+#include "smCore/smConfig.h"
+#include "smCore/smErrorLog.h"
+#include "smCore/smCoreClass.h"
+#include "smCore/smSDK.h"
+#include "smRendering/smViewer.h"
+#include "smCore/smSceneObject.h"
+
+// Include required types scene objects
+#include "smSimulators/smVegaFemSceneObject.h"
+#include "smCore/smStaticSceneObject.h"
+
+// Include required simulators
+#include "smSimulators/smVegaFemSimulator.h"
+#include "smSimulators/smDummySimulator.h"
+
+#include "smCollision/smPlaneCollisionModel.h"
+
+#include "../common/wasdCameraController.h"
+#include "../common/KeyPressSDKShutdown.h"
+//#include "../common/hapticController.h"
 
 int main()
 {
-    VegaFemExample();
+    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<smVegaFemSceneObject> femObject;
+    std::shared_ptr<smStaticSceneObject> staticObject;
+    std::shared_ptr<smVegaFemSimulator> femSimulator;
+    std::shared_ptr<smDummySimulator> staticSimulator;
+    std::shared_ptr<smPlaneCollisionModel> plane;
+    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<smScene> scene;
+    std::shared_ptr<smLight> light;
+    std::shared_ptr<smCamera> sceneCamera;
+    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
+    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    //std::shared_ptr<smtk::Examples::Common::hapticController> hapticCtl;
+    smMatrix33d mat;
+
+    //-------------------------------------------------------
+    // 1. Create an instance of the SoFMIS framework/SDK
+    // 2. Create viewer
+    // 3. Create default scene (scene 0)
+    //-------------------------------------------------------
+    sdk = smSDK::createStandardSDK();
+
+    //-------------------------------------------------------
+    // Create scene actor 1:  fem scene object + fem simulator
+    //-------------------------------------------------------
+
+    // create a FEM simulator
+    femSimulator = std::make_shared<smVegaFemSimulator>(sdk->getErrorLog());
+
+    // create a Vega based FEM object and attach it to the fem simulator
+    femObject = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
+        "asianDragon/asianDragon.config");
+
+    auto femObjRenderDetail = std::make_shared<smRenderDetail>(
+                                                               //SIMMEDTK_RENDER_FACES |
+                                                               SIMMEDTK_RENDER_VERTICES
+                                                              );
+    femObjRenderDetail->setPointSize(4.0);
+    smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
+    femObjRenderDetail->setVertexColor(maroon);
+    femObjRenderDetail->setNormalLength(0.02);
+
+    femObject->setRenderDetail(femObjRenderDetail);
+
+    /*hapticCtl = std::make_shared<smtk::Examples::Common::hapticController>();
+    hapticCtl->setVegaFemSceneObject(femObject);
+    femSimulator->attachEvent(smtk::Event::EventType::Haptic, hapticCtl);*/
+
+    sdk->addSceneActor(femObject, femSimulator);
+
+    //-------------------------------------------------------
+    // Create scene actor 2:  plane + dummy simulator
+    //-------------------------------------------------------
+
+    // Create dummy simulator
+    staticSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
+
+    // create a static plane scene object of given normal and position
+    staticObject = std::make_shared<smStaticSceneObject>();
+
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -10.0, 0.0),
+                                                    smVec3d(0.0, 1.0, 0.0));
+
+    staticObject->setModel(plane);
+    sdk->addSceneActor(staticObject, staticSimulator);
+
+    //-------------------------------------------------------
+    // Register both object simulators
+    //-------------------------------------------------------
+    auto sdkSimulator = sdk->getSimulator();
+    sdkSimulator->registerObjectSimulator(femSimulator);
+    //sdkSimulator->registerObjectSimulator(staticSimulator);
+ 
+    //-------------------------------------------------------
+    // Customize the viewer
+    //-------------------------------------------------------
+    viewer = sdk->getViewerInstance();
+
+    viewer->viewerRenderDetail = viewer->viewerRenderDetail |
+                                SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
+                                SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+
+    viewer->setGlobalAxisLength(0.8);
+
+    // Get Scene
+    scene = sdk->getScene(0);
+    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
+
+    // Setup Scene lighting
+    light = smLight::getDefaultLighting();
+    scene->addLight(light);
+
+    // Camera setup
+    sceneCamera = smCamera::getDefaultCamera();
+    sceneCamera->setPos(3, 3, 5);
+    sceneCamera->setFocus(0, 0, 0);
+    scene->addCamera(sceneCamera);
+
+    // Create the camera controller
+    camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
+    camCtl->setCamera(sceneCamera);
+
+    keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+
+    // Link up the event system between this the camera controller and the viewer
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
+
+    //-------------------------------------------------------
+    // Run the SDK
+    //-------------------------------------------------------
+    sdk->run();
+
+    //cleanup
+    sdk->releaseScene(scene);
+
     return 0;
 }

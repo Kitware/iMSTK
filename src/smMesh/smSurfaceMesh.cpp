@@ -212,10 +212,9 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     //Get indexed vertex data
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices.emplace_back(
-            smVec3d(mesh->mVertices[i][0],
-                    mesh->mVertices[i][1],
-                    mesh->mVertices[i][2]));
+        this->vertices[i] = smVec3d(mesh->mVertices[i][0],
+                                    mesh->mVertices[i][1],
+                                    mesh->mVertices[i][2]);
     }
     this->origVerts = this->vertices;
 
@@ -426,4 +425,15 @@ smSurfaceMesh::smSurfaceMesh()
     this->log_SF = std::shared_ptr<smErrorLog>();
     meshType = SMMESH_DEFORMABLE;
     meshFileType = SM_FILETYPE_NONE;
+}
+
+void smSurfaceMesh::printPrimitiveDetails()
+{
+    std::cout << "----------------------------\n";
+    std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
+    std::cout << "Num. vertices   : " << this->getNumVertices() <<"\n\t";
+    std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t";
+    std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t";
+    std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
+    std::cout << "----------------------------\n";
 }

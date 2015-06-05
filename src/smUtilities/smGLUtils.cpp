@@ -69,13 +69,13 @@ void smGLUtils::fadeBackgroundDraw()
     glLoadIdentity();
     glOrtho(-1, 1, -1, 1, 0.1, 1.1);
     glBegin(GL_POLYGON);
-    glColor3f(0.219, 0.219, 0.435);
+    glColor3f(0.4, 0.4, 0.8);
     glVertex3d(-1, -1, -1);
-    glColor3f(0.219, 0.219, 0.435);
+    glColor3f(0.4, 0.4, 0.8);
     glVertex3d(1, -1, -1);
-    glColor3f(0.0, 0.0, 0.0);
+    glColor3f(0.1, 0.1, 0.2);
     glVertex3d(1, 1, -1);
-    glColor3f(0.0, 0.0, 0.0);
+    glColor3f(0.1, 0.1, 0.2);
     glVertex3d(-1, 1, -1);
     glEnd();
     glEnable(GL_DEPTH_TEST);
