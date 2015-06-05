@@ -100,7 +100,7 @@ public:
     /// \brief !! This function does not clone!, it simply returns a pointer...this is dangerous
     virtual std::shared_ptr<smSceneObject> clone() override;
 
-    virtual void init();
+    virtual void init() override;
 
 public:
     //fem objetc has two representations: surface and volume
