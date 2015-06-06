@@ -1171,9 +1171,9 @@ inline void smVegaFemSceneObject::updatePerformanceMetrics()
     }
 }
 
-void smVegaFemSceneObject::draw(const smDrawParam &p_params)
+void smVegaFemSceneObject::draw()
 {
-    smtkSurfaceMesh->draw(p_params);
+    smtkSurfaceMesh->draw();
 }
 
 void smVegaFemSceneObject::setContactForceOfNodeWithDofID(const int dofID, const smVec3d force)

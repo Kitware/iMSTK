@@ -88,7 +88,7 @@ public:
     smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr, smString ConfigFile = vega_string_none);
 
     /// \brief Destructor
-    ~smVegaFemSceneObject(){};
+    ~smVegaFemSceneObject();
 
     /// \brief Initialize the data to defaults
     void setDefaults();
