@@ -43,8 +43,10 @@ class smStaticSceneObject: public smSceneObject
 {
 public:
 
-    /// \brief constructor receives the error log
+    /// \brief constructor
     smStaticSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+
+    /// \brief destructor
     ~smStaticSceneObject();
 
     //not implemented yet..tansel
@@ -56,23 +58,31 @@ public:
     ///not implemented yet.
     virtual std::shared_ptr<smSceneObject> clone() override;
 
-    /// \brief Initialization routine
-    virtual void init() override;
+    /// \brief Initialize the parameters and properties of the simulation object
+    void initialize() override;
+
+    /// \brief load initial displacements and velocities of the nodes
+    void loadInitialStates() override;
+
+    /// \brief configure the static scene object using external config file (optional)
+    bool configure(smString ConfigFile) override;
+
+    /// \brief duplicate the object 
+    virtual std::shared_ptr<void> duplicateAtRuntime() override;
+
+    /// \brief duplicate the object 
+    virtual std::shared_ptr<void> duplicateAtInitialization() override;
 
     /// \brief called if the object is added to the viewer.
     virtual void draw() override;
 
+    void printInfo() override;
+
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
 
-    void setModel(std::shared_ptr<smModelRepresentation> model)
-    {
-        this->staticModel = model;
-    }
+    void setModel(std::shared_ptr<smModelRepresentation> model);
 
-    std::shared_ptr<smModelRepresentation> getModel()
-    {
-        return staticModel;
-    }
+    std::shared_ptr<smModelRepresentation> getModel();
 
 public:
     /// \brief static scene object contains a mesh

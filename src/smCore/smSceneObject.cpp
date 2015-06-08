@@ -25,6 +25,23 @@
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smSDK.h"
 
+smSceneObject::smSceneObject()
+{
+    type = SIMMEDTK_SMSCENEOBJECT_TYPE_UNKNOWN;
+    isActive = true;
+    objectSim = nullptr;
+    customRender = nullptr;
+    //     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
+    flags.isViewerInit = false;
+    flags.isSimulatorInit = false;
+    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+}
+
+smSceneObject::~smSceneObject()
+{
+
+}
+
 ///attach the simulator to the  object
 void smSceneObject::attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim)
 {
@@ -56,13 +73,40 @@ void smSceneObject::releaseCustomeRenderer()
     customRender = nullptr;
 }
 
-smSceneObject::smSceneObject()
+/// \brief returns object id
+smInt smSceneObject::getObjectId()
 {
-    type = SIMMEDTK_SMSCENEBOJECT;
-    objectSim = nullptr;
-    customRender = nullptr;
-//     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
-    flags.isViewerInit = false;
-    flags.isSimulatorInit = false;
-    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+    return this->getUniqueId()->getId();
+}
+
+/// \brief get unified object id
+smUnifiedId::Pointer smSceneObject::getObjectUnifiedID()
+{
+    return std::make_shared<smUnifiedId>();
+}
+
+
+smStdVector3d & smSceneObject::getLocalVertices()
+{
+    return localVertices;
+}
+
+smObjectInitFlags & smSceneObject::getFlags()
+{
+    return flags;
+}
+
+std::shared_ptr<smCustomRenderer> smSceneObject::getRenderer()
+{
+    return customRender;
+}
+
+void smSceneObject::freeze()
+{
+    this->isActive = false;
+}
+
+void smSceneObject::activate()
+{
+    this->isActive = true;
 }

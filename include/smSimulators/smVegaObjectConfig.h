@@ -21,116 +21,61 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEGACONFIGFEMOBJECT_H
-#define SMVEGACONFIGFEMOBJECT_H
+#ifndef SM_VEGA_OBJECT_CONFIG_H
+#define SM_VEGA_OBJECT_CONFIG_H
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
 
 // VEGA includes
+#include "configFile.h"
 #include "performanceCounter.h"
-
-// STL includes
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cstdio>
-#include <cassert>
-
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 #define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
 
-enum massSpringSystemSourceType { OBJ, TETMESH, CUBICMESH, CHAIN, NONE };
-enum deformableObjectType { STVK, COROTLINFEM, LINFEM, MASSSPRING, INVERTIBLEFEM, UNSPECIFIED };
-enum invertibleMaterialType { INV_STVK, INV_NEOHOOKEAN, INV_MOONEYRIVLIN, INV_NONE };
-enum solverType { IMPLICITNEWMARK, IMPLICITBACKWARDEULER, EULER, SYMPLECTICEULER, CENTRALDIFFERENCES, UNKNOWN };
-
-class smVegaPerformanceCounter
+enum massSpringSystemSourceType
 {
-public:
-    /// performance counters and simulation flags. some variable names are self explainatory
-    double fps; ///< fps of the simulation
-    int fpsBufferSize;///< buffer size to display fps
-    int fpsHead; ///< !!
-    double fpsBuffer[5]; ///< buffer to display fps
-    double cpuLoad;
-    double forceAssemblyTime;
-    double forceAssemblyLocalTime;
-    int forceAssemblyBufferSize;
-    int forceAssemblyHead;
-    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    double systemSolveTime;
-    double systemSolveLocalTime;
-    int systemSolveBufferSize;
-    int systemSolveHead;
-    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    PerformanceCounter titleBarCounter;
-    PerformanceCounter explosionCounter;
-    PerformanceCounter cpuLoadCounter;
+    OBJ,
+    TETMESH,
+    CUBICMESH,
+    CHAIN,
+    NONE
+};
 
-    smVegaPerformanceCounter(){};
-    ~smVegaPerformanceCounter(){};
+enum deformableObjectType
+{
+    STVK,
+    COROTLINFEM,
+    LINFEM,
+    MASSSPRING,
+    INVERTIBLEFEM,
+    UNSPECIFIED
+};
 
-    void initialize()
-    {
-        fps = 0.0;
-        fpsHead = 0;
-        cpuLoad = 0;
-        forceAssemblyTime = 0.0;
-        forceAssemblyLocalTime = 0.0;
-        forceAssemblyHead = 0;
-        systemSolveTime = 0.0;
-        systemSolveLocalTime = 0.0;
-        systemSolveHead = 0;
+enum invertibleMaterialType
+{
+    INV_STVK,
+    INV_NEOHOOKEAN,
+    INV_MOONEYRIVLIN,
+    INV_NONE
+};
 
-        fpsBufferSize = 5; ///< buffer size to display fps
-        forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-        systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    };
-
-    void clearFpsBuffer()
-    {
-        // clear fps buffer
-        int i;
-        for (i = 0; i < fpsBufferSize; i++)
-        {
-            fpsBuffer[i] = 0.0;
-        }
-
-        for (i = 0; i < forceAssemblyBufferSize; i++)
-        {
-            forceAssemblyBuffer[i] = 0.0;
-        }
-
-        for (i = 0; i < systemSolveBufferSize; i++)
-        {
-            systemSolveBuffer[i] = 0.0;
-        }
-    };
+enum solverType
+{
+    IMPLICITNEWMARK,
+    IMPLICITBACKWARDEULER,
+    EULER,
+    SYMPLECTICEULER,
+    CENTRALDIFFERENCES,
+    UNKNOWN
 };
 
 /// \brief This class parses and holds the information related to various input files
 /// It is separated from the smVegaFemSceneObject class in order to reduce the
 /// amount of information stored while creating the fem model.
-class smVegaConfigFemObject
+class smVegaObjectConfig
 {
-
 public:
-
-    // display related
-    smInt renderWireframe; ///< render wireframe (true-1, false-0)
-    smInt renderAxes; ///< render axis (true-1, false-0)
-    smInt renderDeformableObject; ///< render deformable object (true-1, false-0)
-    smInt renderSecondaryDeformableObject; ///< render wireframe (true-1, false-0)
-    smInt useRealTimeNormals; ///< update normals realtime (true-1, false-0)
-    smInt renderFixedVertices; ///< render fixed vertices (true-1, false-0)
-    smInt renderSprings; ///< render springs (true-1, false-0)
-    smInt renderVertices; ///< render vertices (true-1, false-0)
-    smInt displayWindowTitle; ///< display title of window (true-1, false-0)
 
     // simulation. Some variable names self-explainatory
     smInt syncTimestepWithGraphics; ///< !!
@@ -151,19 +96,18 @@ public:
     const smInt max_corotationalLinearFEM_warp = 2;
     smChar implicitSolverMethod[4096];
     smChar solverMethod[4096];
-    smChar lightingConfigFilename[4096];
+
     smFloat dampingMassCoef; ///< viscous damping
     smFloat dampingStiffnessCoef; ///< structural damping
     smFloat dampingLaplacianCoef; ///<
     smFloat deformableObjectCompliance;
+
     smFloat baseFrequency; ///< !!
     smInt maxIterations; ///< maximum smInterations
     smDouble epsilon;  ///<
     smInt numInternalForceThreads; ///< max. execution threads for computing smInternal force
     smInt numSolverThreads; ///< max. solver threads for solver
-    smInt pauseSimulation;
     smInt singleStepMode;
-    smInt lockScene;
 
     // various file names. variable names self-explainatory
     smChar renderingMeshFilename[4096];
@@ -189,15 +133,46 @@ public:
     solverType solver;
 
     /// \brief Constructor
-    smVegaConfigFemObject();
+    smVegaObjectConfig();
 
     /// \brief Destructor
-    ~smVegaConfigFemObject();
+    ~smVegaObjectConfig();
 
-    /// \brief Read the confiuration file to parse all the specifications of the FEM scene
+    /// \brief Read the confiuration file to 
+    ///  parse all the specifications of the FEM scene
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
     void setFemObjConfuguration(const std::string &ConfigFile);
+};
+
+class smVegaPerformanceCounter
+{
+public:
+    double fps; ///< fps of the simulation
+    int fpsBufferSize;///< buffer size to display fps
+    int fpsHead; ///< !!
+    double fpsBuffer[5]; ///< buffer to display fps
+    double cpuLoad;
+    double forceAssemblyTime;
+    double forceAssemblyLocalTime;
+    int forceAssemblyBufferSize;
+    int forceAssemblyHead;
+    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    double systemSolveTime;
+    double systemSolveLocalTime;
+    int systemSolveBufferSize;
+    int systemSolveHead;
+    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    PerformanceCounter titleBarCounter;
+    PerformanceCounter explosionCounter;
+    PerformanceCounter cpuLoadCounter;
+
+    smVegaPerformanceCounter();
+    ~smVegaPerformanceCounter();
+
+    void initialize();
+
+    void clearFpsBuffer();
 };
 
 #endif

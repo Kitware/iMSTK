@@ -21,30 +21,11 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smVegaConfigFemObject.h"
+// SimMedTK includes
+#include "smSimulators/smVegaObjectConfig.h"
 
-// VEGA includes
-#include "configFile.h"
-
-// STL includes
-#include <cstring>
-#include <string>
-#include <limits>
-
-smVegaConfigFemObject::smVegaConfigFemObject()
+smVegaObjectConfig::smVegaObjectConfig()
 {
-
-    // display flags
-    renderWireframe = 1;
-    renderAxes = 0;
-    renderDeformableObject = 1;
-    renderSecondaryDeformableObject = 1;
-    useRealTimeNormals = 0;
-    renderFixedVertices = 1;
-    renderSprings = 0;
-    renderVertices = 0;
-    displayWindowTitle = 0;
-
     syncTimestepWithGraphics = 1;
     timeStep = 1.0 / 30;
     newmarkBeta = 0.25;
@@ -62,9 +43,7 @@ smVegaConfigFemObject::smVegaConfigFemObject()
     deformableObjectCompliance = 1.0;
     baseFrequency = 1.0;
     corotationalLinearFEM_warp = 1;
-    pauseSimulation = 0;
     singleStepMode = 0;
-    lockScene = 0;
 
     massSpringSystemSource = NONE;
     deformableObject = UNSPECIFIED;
@@ -72,67 +51,102 @@ smVegaConfigFemObject::smVegaConfigFemObject()
     solver = UNKNOWN;
 }
 
-smVegaConfigFemObject::~smVegaConfigFemObject()
+smVegaObjectConfig::~smVegaObjectConfig()
 {
-
 }
 
-// Parse the configuration file
-void smVegaConfigFemObject::setFemObjConfuguration(const std::string &ConfigFilename)
+void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilename)
 {
 
     printf("VEGA: Parsing configuration file %s...\n", ConfigFilename.c_str());
     ConfigFile configFile;
 
     // specify the entries of the config file
-
     // at least one of the following must be present:
     configFile.addOptionOptional("volumetricMeshFilename", volumetricMeshFilename, "__none");
     configFile.addOptionOptional("customMassSpringSystem", customMassSpringSystem, "__none");
     configFile.addOptionOptional("deformableObjectMethod", deformableObjectMethod, "StVK");
-    configFile.addOptionOptional("massSpringSystemObjConfigFilename", massSpringSystemObjConfigFilename, "__none");
-    configFile.addOptionOptional("massSpringSystemTetMeshConfigFilename", massSpringSystemTetMeshConfigFilename, "__none");
-    configFile.addOptionOptional("massSpringSystemCubicMeshConfigFilename", massSpringSystemCubicMeshConfigFilename, "__none");
+    
+    configFile.addOptionOptional("massSpringSystemObjConfigFilename",
+                                  massSpringSystemObjConfigFilename, "__none");
+
+    configFile.addOptionOptional("massSpringSystemTetMeshConfigFilename",
+                                  massSpringSystemTetMeshConfigFilename, "__none");
+
+    configFile.addOptionOptional("massSpringSystemCubicMeshConfigFilename",
+                                  massSpringSystemCubicMeshConfigFilename, "__none");
 
     // option for corotational linear FEM: if warp is disabled, one gets purely linear FEM
-    configFile.addOptionOptional("corotationalLinearFEM_warp", &corotationalLinearFEM_warp, corotationalLinearFEM_warp);
-    configFile.addOptionOptional("implicitSolverMethod", implicitSolverMethod, "none"); // this is now obsolete, but preserved for backward compatibility, use "solver" below
+    configFile.addOptionOptional("corotationalLinearFEM_warp",
+                                &corotationalLinearFEM_warp, corotationalLinearFEM_warp);
+
+    // this is now obsolete, but preserved for backward compatibility, use "solver" below
+    configFile.addOptionOptional("implicitSolverMethod", implicitSolverMethod, "none");
     configFile.addOptionOptional("solver", solverMethod, "implicitNewmark");
-    configFile.addOptionOptional("centralDifferencesTangentialDampingUpdateMode", &centralDifferencesTangentialDampingUpdateMode, centralDifferencesTangentialDampingUpdateMode);
+    
+    configFile.addOptionOptional("centralDifferencesTangentialDampingUpdateMode", 
+                                &centralDifferencesTangentialDampingUpdateMode,
+                                centralDifferencesTangentialDampingUpdateMode);
+
     configFile.addOptionOptional("initialPositionFilename", initialPositionFilename, "__none");
     configFile.addOptionOptional("initialVelocityFilename", initialVelocityFilename, "__none");
     configFile.addOptionOptional("outputFilename", outputFilename, "__none");
     configFile.addOptionOptional("addGravity", &addGravity, addGravity);
     configFile.addOptionOptional("g", &g, g);
     configFile.addOptionOptional("renderingMeshFilename", renderingMeshFilename, "__none");
-    configFile.addOptionOptional("secondaryRenderingMeshFilename", secondaryRenderingMeshFilename, "__none");
-    configFile.addOptionOptional("secondaryRenderingMeshInterpolationFilename", secondaryRenderingMeshInterpolationFilename, "__none");
-    configFile.addOptionOptional("useRealTimeNormals", &useRealTimeNormals, 0);
+    
+    configFile.addOptionOptional("secondaryRenderingMeshFilename",
+                                  secondaryRenderingMeshFilename, "__none");
+    
+    configFile.addOptionOptional("secondaryRenderingMeshInterpolationFilename",
+                                  secondaryRenderingMeshInterpolationFilename, "__none");
+
+    //configFile.addOptionOptional("useRealTimeNormals", &useRealTimeNormals, 0);
     configFile.addOptionOptional("fixedVerticesFilename", fixedVerticesFilename, "__none");
     configFile.addOptionOptional("massMatrixFilename", massMatrixFilename, "__none");
-    configFile.addOptionOptional("enableCompressionResistance", &enableCompressionResistance, enableCompressionResistance);
-    configFile.addOptionOptional("compressionResistance", &compressionResistance, compressionResistance);
+    configFile.addOptionOptional("enableCompressionResistance",
+                                  &enableCompressionResistance, enableCompressionResistance);
+
+    configFile.addOptionOptional("compressionResistance",
+                                 &compressionResistance, compressionResistance);
+
     configFile.addOption("timestep", &timeStep);
-    configFile.addOptionOptional("substepsPerTimeStep", &substepsPerTimeStep, substepsPerTimeStep);
-    configFile.addOptionOptional("syncTimestepWithGraphics", &syncTimestepWithGraphics, syncTimestepWithGraphics);
+
+    configFile.addOptionOptional("substepsPerTimeStep",
+                                 &substepsPerTimeStep, substepsPerTimeStep);
+    
+    configFile.addOptionOptional("syncTimestepWithGraphics",
+                                  &syncTimestepWithGraphics, syncTimestepWithGraphics);
+
     configFile.addOption("dampingMassCoef", &dampingMassCoef);
     configFile.addOption("dampingStiffnessCoef", &dampingStiffnessCoef);
-    configFile.addOptionOptional("dampingLaplacianCoef", &dampingLaplacianCoef, dampingLaplacianCoef);
+    
+    configFile.addOptionOptional("dampingLaplacianCoef",
+                                 &dampingLaplacianCoef, dampingLaplacianCoef);
+    
     configFile.addOptionOptional("newmarkBeta", &newmarkBeta, newmarkBeta);
     configFile.addOptionOptional("newmarkGamma", &newmarkGamma, newmarkGamma);
     configFile.addOption("deformableObjectCompliance", &deformableObjectCompliance);
     configFile.addOption("baseFrequency", &baseFrequency);
-    configFile.addOptionOptional("forceNeighborhoodSize", &forceNeighborhoodSize, forceNeighborhoodSize);
+    
+    configFile.addOptionOptional("forceNeighborhoodSize",
+                                 &forceNeighborhoodSize, forceNeighborhoodSize);
+    
     configFile.addOptionOptional("maxIterations", &maxIterations, 1);
     configFile.addOptionOptional("epsilon", &epsilon, 1E-6);
     configFile.addOptionOptional("numInternalForceThreads", &numInternalForceThreads, 0);
     configFile.addOptionOptional("numSolverThreads", &numSolverThreads, 1);
-    configFile.addOptionOptional("inversionThreshold", &inversionThreshold, -std::numeric_limits< double >::max());
+    
+    configFile.addOptionOptional("inversionThreshold",
+                                 &inversionThreshold, -std::numeric_limits< double >::max());
+
     configFile.addOptionOptional("forceLoadsFilename", forceLoadsFilename, "__none");
     configFile.addOptionOptional("singleStepMode", &singleStepMode, singleStepMode);
-    configFile.addOptionOptional("pauseSimulation", &pauseSimulation, pauseSimulation);
+    //configFile.addOptionOptional("pauseSimulation", &pauseSimulation, pauseSimulation);
     configFile.addOptionOptional("lockAt30Hz", &lockAt30Hz, lockAt30Hz);
-    configFile.addOptionOptional("invertibleMaterial", invertibleMaterialString, invertibleMaterialString);
+    
+    configFile.addOptionOptional("invertibleMaterial",
+                                  invertibleMaterialString, invertibleMaterialString);
 
     // parse the configuration file
     if (configFile.parseOptions((char *)ConfigFilename.c_str()) != 0)
@@ -142,7 +156,6 @@ void smVegaConfigFemObject::setFemObjConfuguration(const std::string &ConfigFile
     }
 
     // the config variables have now been loaded with their specified values
-
     // informatively print the variables (with assigned values) that were just parsed
     configFile.printOptions();
 
@@ -188,5 +201,50 @@ void smVegaConfigFemObject::setFemObjConfuguration(const std::string &ConfigFile
     {
         printf("VEGA Error: unknown implicit solver specified.\n");
         exit(1);
+    }
+}
+
+smVegaPerformanceCounter::smVegaPerformanceCounter()
+{
+}
+
+smVegaPerformanceCounter::~smVegaPerformanceCounter()
+{
+}
+
+void smVegaPerformanceCounter::initialize()
+{
+    fps = 0.0;
+    fpsHead = 0;
+    cpuLoad = 0;
+    forceAssemblyTime = 0.0;
+    forceAssemblyLocalTime = 0.0;
+    forceAssemblyHead = 0;
+    systemSolveTime = 0.0;
+    systemSolveLocalTime = 0.0;
+    systemSolveHead = 0;
+
+    fpsBufferSize = 5; ///< buffer size to display fps
+    forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+    systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+}
+
+void smVegaPerformanceCounter::clearFpsBuffer()
+{
+    // clear fps buffer
+    int i;
+    for (i = 0; i < fpsBufferSize; i++)
+    {
+        fpsBuffer[i] = 0.0;
+    }
+
+    for (i = 0; i < forceAssemblyBufferSize; i++)
+    {
+        forceAssemblyBuffer[i] = 0.0;
+    }
+
+    for (i = 0; i < systemSolveBufferSize; i++)
+    {
+        systemSolveBuffer[i] = 0.0;
     }
 }

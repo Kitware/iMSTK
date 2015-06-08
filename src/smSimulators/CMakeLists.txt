@@ -7,9 +7,10 @@ simmedtk_add_library(smSimulators
     smMyStylus.cpp
     smStylusObject.cpp
     smToolSimulator.cpp
-    smVegaConfigFemObject.cpp
+    smVegaObjectConfig.cpp
     smVegaFemSceneObject.cpp
     smVegaFemSimulator.cpp
+	smSceneObjectDeformable.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h
@@ -20,9 +21,10 @@ simmedtk_add_library(smSimulators
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smPhysXVolumeMesh.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smStylusObject.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smToolSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaConfigFemObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaObjectConfig.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSimulator.h
+	${CMAKE_SOURCE_DIR}/include/smSimulators/smSceneObjectDeformable.h
 )
 
 target_link_libraries(smSimulators

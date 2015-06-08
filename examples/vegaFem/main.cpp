@@ -79,7 +79,7 @@ int main()
         "asianDragon/asianDragon.config");
 
     auto femObjRenderDetail = std::make_shared<smRenderDetail>(
-                                                               //SIMMEDTK_RENDER_FACES |
+                                                               SIMMEDTK_RENDER_WIREFRAME |
                                                                SIMMEDTK_RENDER_VERTICES
                                                               );
     femObjRenderDetail->setPointSize(4.0);

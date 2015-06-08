@@ -25,7 +25,7 @@
 
 #include <memory>
 
-#include "smContactHandling/smPenaltyContactHandling.h"
+#include "smContactHandling/smPenaltyContactFemToStatic.h"
 #include "smCollision/smPlaneCollisionModel.h"
 #include "smCollision/smCollisionPair.h"
 #include "smSimulators/smVegaFemSceneObject.h"
@@ -35,7 +35,6 @@ using namespace bandit;
 
 std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 {
-
 	auto staticPlane = std::make_shared<smStaticSceneObject>();
 
     std::shared_ptr<smPlaneCollisionModel> plane = std::make_shared<smPlaneCollisionModel>( smVec3d(0.0, 0.0, 0.0), smVec3d(0.0, 0.0, 1.0) );
@@ -48,7 +47,6 @@ std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 
 std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 {
-
 	auto collisionPair = std::make_shared<smCollisionPair>();
 
     float depth = 1.0;
@@ -60,20 +58,19 @@ std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 	collisionPair->getContacts()[0]->index = 0;
 
     return collisionPair;
-
 }
 
 go_bandit([](){
     describe("Penalty contact handling:", []() {
 
-        auto handler        = std::make_shared<smPenaltyContactHandling>(false);
+        auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
 		auto fem            = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
         auto plane          = createStaticPlaneSceneObject();
         auto collisionPair  = createSampleCollisionPair();
 
 		it("initializes properly ", [&]() {
 			AssertThat(handler != nullptr, IsTrue());
-			AssertThat(handler->getContactHandlingType() == SIMMEDTK_CONTACT_PENALTY_UNILATERAL, IsTrue());
+            AssertThat(handler->getContactHandlingType() == SIMMEDTK_CONTACT_PENALTY_FEM_TO_STATIC, IsTrue());
         });
 
 		it("attches a collision pair ", [&]() {
