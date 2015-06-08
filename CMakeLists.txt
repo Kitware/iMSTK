@@ -235,6 +235,7 @@ export(TARGETS  smCore
                 smCollision
                 smExternal
                 smExternalDevices
+                smGeometry
                 smMesh
                 smRendering
                 smShader
