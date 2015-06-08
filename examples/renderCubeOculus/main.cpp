@@ -28,6 +28,7 @@
 
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
+#include "smGeometry/smMeshModel.h"
 #include "smRendering/smOculusViewer.h"
 
 int main()
@@ -55,20 +56,14 @@ int main()
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
-    //Initialize the texture manager
-    smTextureManager::init(sdk->getErrorLog());
+    auto cubeModel = std::make_shared<smMeshModel>();
+    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    //Load in the texture for the cube model
-    smTextureManager::loadTexture("textures/cube.png", "cubetex");
+    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cubeModel->setRenderDetail(renderDetail);
 
     cube = std::make_shared<smStaticSceneObject>();
-
-    //Load the cube model
-    cube->mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
-    //Assign the previously loaded texture to the cube model
-    cube->mesh->assignTexture("cubetex");
-    //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube->setModel(cubeModel);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(cube);
