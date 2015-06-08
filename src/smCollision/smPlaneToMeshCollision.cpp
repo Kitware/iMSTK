@@ -37,14 +37,17 @@ void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair>
     auto mesh = std::static_pointer_cast<smMeshCollisionModel>(pair->getFirst());
     auto plane = std::static_pointer_cast<smPlaneCollisionModel>(pair->getFirst());
 
-    if(!mesh || !plane)
+    if (!mesh || !plane)
+    {
         return;
+    }
 
+    double d;
     smVec3d planeNormal = plane->getNormal();
     float planeOffset = planeNormal.dot(plane->getPosition());
     for (const auto& vertex : mesh->getVertices())
     {
-        double d = planeNormal.dot(vertex) - planeOffset;
+        d = planeNormal.dot(vertex) - planeOffset;
         if (d < std::numeric_limits<float>::epsilon())
         {
             // Create contact

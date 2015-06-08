@@ -37,7 +37,12 @@
 #include "smSimulators/smVegaFemSimulator.h"
 #include "smSimulators/smDummySimulator.h"
 
+#include "smCollision/smCollisionPair.h"
 #include "smCollision/smPlaneCollisionModel.h"
+#include "smCollision/smMeshCollisionModel.h"
+#include "smCollision/smPlaneToMeshCollision.h"
+
+#include "smContactHandling\smPenaltyContactHandling.h"
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
@@ -79,7 +84,7 @@ int main()
         "asianDragon/asianDragon.config");
 
     auto femObjRenderDetail = std::make_shared<smRenderDetail>(
-                                                               //SIMMEDTK_RENDER_FACES |
+                                                               SIMMEDTK_RENDER_WIREFRAME |
                                                                SIMMEDTK_RENDER_VERTICES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
@@ -105,7 +110,7 @@ int main()
     // create a static plane scene object of given normal and position
     staticObject = std::make_shared<smStaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -10.0, 0.0),
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -3.0, 0.0),
                                                     smVec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
@@ -117,6 +122,38 @@ int main()
     auto sdkSimulator = sdk->getSimulator();
     sdkSimulator->registerObjectSimulator(femSimulator);
     //sdkSimulator->registerObjectSimulator(staticSimulator);
+
+
+    //-------------------------------------------------------
+    // Enable collision between scene actors 1 and 2
+    //-------------------------------------------------------
+    std::shared_ptr<smMeshCollisionModel> meshModel =
+                                    std::make_shared<smMeshCollisionModel>();
+    meshModel->setMesh(femObject->getSurfaceMesh());
+
+    std::shared_ptr<smCollisionPair> planeMeshCollisionPairs =
+                                         std::make_shared<smCollisionPair>();
+
+    planeMeshCollisionPairs->setModels(meshModel, plane);
+
+    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+
+    std::shared_ptr<smPlaneToMeshCollision> planeToMeshCollisionDetection =
+        std::make_shared<smPlaneToMeshCollision>();
+
+    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+
+    //-------------------------------------------------------
+    // Enable contact handling between scene actors 1 and 2
+    //-------------------------------------------------------
+    std::shared_ptr<smPenaltyContactHandling> planeToMeshContact =
+                                     std::make_shared<smPenaltyContactHandling>(false);
+
+    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+
+    planeToMeshContact->setSceneObjects(staticObject, femObject);
+
+    sdkSimulator->registerContactHandling(planeToMeshContact);
  
     //-------------------------------------------------------
     // Customize the viewer

@@ -192,6 +192,12 @@ void smSimulator::registerCollisionDetection(std::shared_ptr<smCollisionDetectio
 }
 
 /// \brief
+void smSimulator::registerContactHandling(std::shared_ptr<smContactHandling> p_contactHandling)
+{
+    contactHandlers.emplace_back(p_contactHandling);
+}
+
+/// \brief
 void smSimulator::registerSimulationMain(std::shared_ptr<smSimulationMain> p_main)
 {
     changedMain = p_main;

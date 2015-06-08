@@ -1018,7 +1018,7 @@ void smVegaFemSceneObject::advanceDynamics()
 
         timestepCounter++;
 
-        std::cout << "Time step: " << timestepCounter << std::endl;
+        //std::cout << "Time step: " << timestepCounter << std::endl;
 
         memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
 
@@ -1319,4 +1319,9 @@ inline void smVegaFemSceneObject::updateStats()
 void smVegaFemSceneObject::draw()
 {
     smtkSurfaceMesh->draw();
+}
+
+std::shared_ptr<smSurfaceMesh> smVegaFemSceneObject::getSurfaceMesh() const
+{
+    return smtkSurfaceMesh;
 }

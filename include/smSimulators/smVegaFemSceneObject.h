@@ -194,6 +194,8 @@ public:
 
 	virtual void init() override {};
 
+    std::shared_ptr<smSurfaceMesh> getSurfaceMesh() const;
+
 public:
     /// performance counters and simulation flags. some variable names are self explainatory
     double fps; ///< fps of the simulation
