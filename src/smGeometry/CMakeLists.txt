@@ -10,6 +10,7 @@ simmedtk_add_library(smGeometry
 target_link_libraries(smGeometry
   PRIVATE
     smCore
+    smRendering
 )
 
 if(BUILD_TESTING)
