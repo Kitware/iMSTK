@@ -1008,7 +1008,7 @@ void smVegaFemSceneObject::advanceDynamics()
         applyScriptedExternalForces();
 
         // apply external forces arising from contact
-        //applyContactForces();
+        applyContactForces();
 
         // set forces to the integrator
         integratorBaseSparse->SetExternalForces(f_ext);

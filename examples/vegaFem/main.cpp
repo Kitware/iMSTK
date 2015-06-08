@@ -110,7 +110,7 @@ int main()
     // create a static plane scene object of given normal and position
     staticObject = std::make_shared<smStaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -3.0, 0.0),
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -2.3, 0.0),
                                                     smVec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
@@ -127,27 +127,24 @@ int main()
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    std::shared_ptr<smMeshCollisionModel> meshModel =
-                                    std::make_shared<smMeshCollisionModel>();
+    auto meshModel = std::make_shared<smMeshCollisionModel>();
+    
     meshModel->setMesh(femObject->getSurfaceMesh());
 
-    std::shared_ptr<smCollisionPair> planeMeshCollisionPairs =
-                                         std::make_shared<smCollisionPair>();
+    auto planeMeshCollisionPairs = std::make_shared<smCollisionPair>();
 
     planeMeshCollisionPairs->setModels(meshModel, plane);
 
     sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    std::shared_ptr<smPlaneToMeshCollision> planeToMeshCollisionDetection =
-        std::make_shared<smPlaneToMeshCollision>();
+    auto planeToMeshCollisionDetection = std::make_shared<smPlaneToMeshCollision>();
 
     sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
-    std::shared_ptr<smPenaltyContactHandling> planeToMeshContact =
-                                     std::make_shared<smPenaltyContactHandling>(false);
+    auto planeToMeshContact = std::make_shared<smPenaltyContactHandling>(false);
 
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
