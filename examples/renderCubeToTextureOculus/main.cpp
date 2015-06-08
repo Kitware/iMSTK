@@ -29,6 +29,7 @@
 #include "smCore/smSDK.h"
 #include "smCore/smTextureManager.h"
 #include "smRendering/smOculusViewer.h"
+#include "smCollision/smMeshCollisionModel.h"
 
 int main()
 {
@@ -56,42 +57,38 @@ int main()
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
-    //Initialize the texture manager
-    smTextureManager::init(sdk->getErrorLog());
+    auto cubeModel = std::make_shared<smMeshModel>();
+    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    //Load in the texture for the cube model
-    smTextureManager::loadTexture("textures/cube.png", "cubetex");
+    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cubeModel->setRenderDetail(renderDetail);
 
-    //setup scene1
     cube = std::make_shared<smStaticSceneObject>();
-
-    //Load the cube model
-    cube->mesh->loadMesh("models/cube.obj", SM_FILETYPE_OBJ);
-    //Assign the previously loaded texture to the cube model
-    cube->mesh->assignTexture("cubetex");
-    //Tell SimMedTK to render the faces of the model, and the texture assigned
-    cube->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    cube->setModel(cubeModel);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(cube);
 
     //setup scene2
-
-    square = std::make_shared<smStaticSceneObject>();
-
-    //Setup an FBO for rendering in the viewer.
     //Create a color and depth texture for the FBO
     smTextureManager::createColorTexture("colorTex1", 64, 64);
     smTextureManager::createDepthTexture("depthTex1", 64, 64);
+
+    std::shared_ptr<smMeshModel> squareModel = std::make_shared<smMeshModel>();
+    squareModel->load("models/square.obj", SM_FILETYPE_OBJ);
+    squareModel->getMesh()->assignTexture("colorTex1");
+    renderDetail= std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    squareModel->setRenderDetail(renderDetail);
+
+    square = std::make_shared<smStaticSceneObject>();
+    square->setModel(squareModel);
+
+    //Setup an FBO for rendering in the viewer.
     //Add the FBO and textures to the viewer
     viewer->addFBO("fbo1",
                   smTextureManager::getTexture("colorTex1"),
                   smTextureManager::getTexture("depthTex1"),
                   64, 64);
-
-    square->mesh->loadMesh("models/square.obj", SM_FILETYPE_OBJ);
-    square->mesh->assignTexture("colorTex1");
-    square->mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
 
     //Add the square to the scene
     scene2->addSceneObject(square);
