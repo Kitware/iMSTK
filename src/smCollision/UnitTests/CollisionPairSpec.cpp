@@ -53,7 +53,7 @@ go_bandit([](){
             float depth = 1.0;
             smVec3d contactPoint(0,0,1);
             smVec3d normal(1,0,0);
-            collisionPair->addContact(depth,contactPoint,normal);
+            collisionPair->addContact(depth,contactPoint,1,normal);
 
             std::shared_ptr<smContact> contact = collisionPair->getContacts().back();
 

@@ -55,7 +55,7 @@ std::shared_ptr<smCollisionPair> createSampleCollisionPair()
     smVec3d contactPoint(0,0,1);
     smVec3d normal(1,0,0);
 
-    collisionPair->addContact(depth,contactPoint,normal);
+    collisionPair->addContact(depth,contactPoint,1,normal);
 
 	collisionPair->getContacts()[0]->index = 0;
 

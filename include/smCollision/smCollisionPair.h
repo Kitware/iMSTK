@@ -41,9 +41,10 @@ class smContact
 {
 public:
     smContact ( const double penetrationDepth,
-                const smVec3d& contactPoint,
+                const smVec3d& p,
+                const int ind,
                 const smVec3d& contactNornmal
-				) : depth(penetrationDepth), point(contactPoint), normal(contactNornmal){}
+				) : depth(penetrationDepth), point(p), index(ind), normal(contactNornmal){}
 
     double depth;
     smVec3d point;
@@ -77,8 +78,9 @@ public:
     /// @brief Add contact between the models
     ///
     void addContact( const double& penetrationDepth,
-                      const smVec3d& contactPoint,
-                      const smVec3d& contactNornmal);
+                     const smVec3d& vert,
+                     const int index,
+                     const smVec3d& contactNornmal);
 
     ///
     /// @brief Clear contact list

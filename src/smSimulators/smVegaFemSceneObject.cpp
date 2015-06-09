@@ -1005,7 +1005,7 @@ void smVegaFemSceneObject::advanceDynamics()
         applyUserInteractionForces();
 
         // apply pre-defined external forces
-        applyScriptedExternalForces();
+        //applyScriptedExternalForces();
 
         // apply external forces arising from contact
         applyContactForces();
