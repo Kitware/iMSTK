@@ -84,10 +84,10 @@ public:
     /// \brief to release the simulator
     virtual void releaseObjectSimulator();
 
-    /// \brief freeze the scene object by stopping updates
+    /// \brief freeze the scene object by stopping any further updates
     void freeze();
 
-    /// \brief acticate the scene object
+    /// \brief activate the scene object
     void activate();
 
     /// \brief get object simulator

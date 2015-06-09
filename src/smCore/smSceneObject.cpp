@@ -39,52 +39,43 @@ smSceneObject::smSceneObject()
 
 smSceneObject::~smSceneObject()
 {
-
 }
 
-///attach the simulator to the  object
 void smSceneObject::attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim)
 {
     p_objectSim->addObject(safeDownCast<smSceneObject>());
 }
 
-///release the simulator from the object
 void smSceneObject::releaseObjectSimulator()
 {
     objectSim->removeObject(safeDownCast<smSceneObject>());
     objectSim = nullptr;
 }
 
-///get a reference to the simulator
 std::shared_ptr<smObjectSimulator> smSceneObject::getObjectSimulator()
 {
     return objectSim;
 }
 
-///attach the custom renderer to the scene object
 void smSceneObject::attachCustomRenderer(std::shared_ptr<smCustomRenderer> p_customeRenderer)
 {
     customRender = p_customeRenderer;
 }
 
-///release the custom renderer from the class
 void smSceneObject::releaseCustomeRenderer()
 {
     customRender = nullptr;
 }
 
-/// \brief returns object id
 smInt smSceneObject::getObjectId()
 {
     return this->getUniqueId()->getId();
 }
 
-/// \brief get unified object id
 smUnifiedId::Pointer smSceneObject::getObjectUnifiedID()
 {
     return std::make_shared<smUnifiedId>();
 }
-
 
 smStdVector3d & smSceneObject::getLocalVertices()
 {

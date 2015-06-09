@@ -105,3 +105,13 @@ int smSceneObjectDeformable::getNumFixedDof() const
 {
     return numFixedDof;
 }
+
+void smSceneObjectDeformable::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
+{
+    primarySurfaceMesh->setRenderDetail(r);
+}
+
+void smSceneObjectDeformable::draw()
+{
+    primarySurfaceMesh->draw();
+}

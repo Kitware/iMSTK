@@ -98,7 +98,6 @@ int main()
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
-
     // Create dummy simulator
     staticSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
 

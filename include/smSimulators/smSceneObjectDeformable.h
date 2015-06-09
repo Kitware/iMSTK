@@ -60,6 +60,12 @@ public:
     /// with the scene during runtime are added here
     virtual void applyUserInteractionForces() = 0;
 
+    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
+    virtual void updateSecondaryRenderingMesh() = 0;
+
+    /// \brief Update the deformations by time stepping
+    virtual void advanceDynamics() = 0;
+
     /// \brief Append the contact forces (if any) to external forces
     void applyContactForces();
 
@@ -97,6 +103,14 @@ public:
 
     /// \brief get the number of degree of freedom that are not fixed
     int getNumDof() const;
+
+    /// \brief sets the objects specific render details
+    /// Should be moved to base class in near future
+    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
+
+    /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
+    ///  vertices interacted with, ground plane etc.
+    virtual void draw() override;
 
 protected:
 

@@ -26,7 +26,7 @@
 
 smVegaObjectConfig::smVegaObjectConfig()
 {
-    syncTimestepWithGraphics = 1;
+    syncTimestepWithGraphics = 0;
     timeStep = 1.0 / 30;
     newmarkBeta = 0.25;
     newmarkGamma = 0.5;
@@ -49,6 +49,11 @@ smVegaObjectConfig::smVegaObjectConfig()
     deformableObject = UNSPECIFIED;
     invertibleMaterial = INV_NONE;
     solver = UNKNOWN;
+}
+
+void smVegaObjectConfig::setSyncTimeStepWithGraphics(const bool syncOrNot)
+{
+    syncTimestepWithGraphics = syncOrNot;
 }
 
 smVegaObjectConfig::~smVegaObjectConfig()
@@ -216,7 +221,6 @@ void smVegaPerformanceCounter::initialize()
 {
     fps = 0.0;
     fpsHead = 0;
-    cpuLoad = 0;
     forceAssemblyTime = 0.0;
     forceAssemblyLocalTime = 0.0;
     forceAssemblyHead = 0;

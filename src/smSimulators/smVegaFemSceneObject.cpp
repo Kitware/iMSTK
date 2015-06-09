@@ -35,9 +35,9 @@ smVegaFemSceneObject::smVegaFemSceneObject() : smSceneObjectDeformable()
 
     importAndUpdateVolumeMeshToSmtk = false;
 
-    type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
 
-    name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
+    this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 }
 
 smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, 
@@ -86,20 +86,16 @@ bool smVegaFemSceneObject::configure(smString ConfigFile)
     }
     else
     {
-        std::cout << "VEGA: error! (In function: smVegaFemSceneObject::configure) configuration file invalid!" 
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! configuration file invalid!" 
                   << ConfigFile.c_str() << std::endl;
         return 0;
     }
 }
 
-void smVegaFemSceneObject::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
-{
-    primarySurfaceMesh->setRenderDetail(r);
-}
-
 std::shared_ptr<void> smVegaFemSceneObject::duplicateAtInitialization()
 {
-    std::shared_ptr<smVegaFemSceneObject> newSO =
+    auto newSO =
         std::make_shared<smVegaFemSceneObject>(nullptr, this->ConfigFileName);
     
     return (std::shared_ptr<void>)newSO;
@@ -109,7 +105,7 @@ std::shared_ptr<void> smVegaFemSceneObject::duplicateAtInitialization()
 std::shared_ptr<void> smVegaFemSceneObject::duplicateAtRuntime()
 {
 
-    std::shared_ptr<smVegaFemSceneObject> newSO = std::make_shared<smVegaFemSceneObject>();
+    auto newSO = std::make_shared<smVegaFemSceneObject>();
 
   /*    
     newSO->performaceTracker.initialize();
@@ -233,8 +229,8 @@ void smVegaFemSceneObject::resetToInitialState()
     }
     else
     {
-        std::cout << "VEGA: error! (In function: smVegaFemSceneObject::resetToInitialState)"
-                    << " Initial state undetermined as the topology is altered.\n";
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! Initial state undetermined as the topology is altered.\n";
     }
 }
 
@@ -321,8 +317,8 @@ void smVegaFemSceneObject::setDeformableModelType()
 
     if (femConfig->deformableObject == UNSPECIFIED)
     {
-        std::cout << "VEGA: error! (In function: smVegaFemSceneObject::setDeformableModelType) no deformable model specified." << std::endl;
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! no deformable model specified." << std::endl;
     }
 }
 
@@ -343,9 +339,9 @@ void smVegaFemSceneObject::loadVolumeMesh()
 
         if (volumetricMesh == nullptr)
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadVolumeMesh) unable to load the volumetric mesh from"
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! unable to load the volumetric mesh from"
                                         << femConfig->volumetricMeshFilename << std::endl;
-            exit(1);
         }
 
         numNodes = volumetricMesh->getNumVertices();
@@ -357,10 +353,9 @@ void smVegaFemSceneObject::loadVolumeMesh()
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
         {
-
-            std::cerr << "VEGA:  error! (In function: smVegaFemSceneObject::loadVolumeMesh) mass matrix for the StVK deformable model not specified" <<
+            PRINT_ERROR_LOCATION
+            std::cerr << "VEGA:  error! mass matrix for the StVK deformable model not specified" <<
                 femConfig->massMatrixFilename << std::endl;
-            exit(1);
         }
         
         std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename << "..." << std::endl;
@@ -375,9 +370,9 @@ void smVegaFemSceneObject::loadVolumeMesh()
         }
         catch (int exceptionCode)
         {
-            std::cout << "VEGA:  error! (In function: smVegaFemSceneObject::loadVolumeMesh) loading mass matrix" 
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA:  error! loading mass matrix" 
                         << femConfig->massMatrixFilename << std::endl;
-            exit(1);
         }
 
         massMatrix = std::make_shared<SparseMatrix>(massMatrixOutline.get());
@@ -391,8 +386,8 @@ void smVegaFemSceneObject::loadVolumeMesh()
 
             if (precomputedIntegrals == nullptr)
             {
-                std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadVolumeMesh) unable to load the StVK integrals.\n";
-                exit(1);
+                PRINT_ERROR_LOCATION
+                std::cout << "VEGA: error! unable to load the StVK integrals.\n";
             }
 
             std::cout << "VEGA: Generating internal forces and stiffness matrix models...\n";
@@ -431,8 +426,8 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     // initialize the rendering mesh for the volumetric mesh
     if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
     {
-        std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadSurfaceMesh) rendering mesh was not specified.\n";
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! rendering mesh was not specified.\n";
     }
 
     vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>( 
@@ -475,9 +470,8 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         // load interpolation structure
         if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
         {
-            std::cout << "VEGA:  error! (In function: smVegaFemSceneObject::loadSurfaceMesh) "<<
-                "no secondary rendering mesh interpolation filename specified.\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA:  error! no secondary rendering mesh interpolation filename specified.\n";
         }
 
         numInterpolationElementVerts =
@@ -486,9 +480,9 @@ void smVegaFemSceneObject::loadSurfaceMesh()
 
         if (numInterpolationElementVerts < 0)
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadSurfaceMesh) unable to open file " << 
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! unable to open file " << 
                 femConfig->secondaryRenderingMeshInterpolationFilename << "." << std::endl;
-            exit(1);
         }
 
         std::cout << "VEGA: Num interpolation element vertices:" <<
@@ -520,7 +514,8 @@ void smVegaFemSceneObject::loadFixedBC()
         int* data = fixedVertices.data();
         if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &data) != 0)
         {
-            throw std::logic_error("VEGA: error! (In function: smVegaFemSceneObject::loadFixedBC) reading fixed vertices.");
+            PRINT_ERROR_LOCATION
+            throw std::logic_error("VEGA: error! reading fixed vertices.");
         }
 
         LoadList::sort(numFixedVertices, fixedVertices.data());
@@ -566,8 +561,8 @@ void smVegaFemSceneObject::loadInitialStates()
 
         if ((m1 != 3 * numNodes) || (n1 != 1))
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadInitialStates) initial position matrix size mismatch.\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! initial position matrix size mismatch.\n";
         }
     }
     else
@@ -584,8 +579,8 @@ void smVegaFemSceneObject::loadInitialStates()
 
         if ((m1 != 3 * numNodes) || (n1 != 1))
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadInitialStates) initial position matrix size mismatch.\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! initial position matrix size mismatch.\n";
         }
     }
 }
@@ -602,9 +597,8 @@ void smVegaFemSceneObject::loadScriptedExternalForces()
 
         if (m1 != 3 * numNodes)
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::loadScriptedExternalForces) " 
-                << "Mismatch in the dimension of the force load matrix.\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! Mismatch in the dimension of the force load matrix.\n";
         }
     }
 }
@@ -711,9 +705,8 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
 
     if (integratorBase == nullptr)
     {
-        std::cout << "VEGA: error! (In function: smVegaFemSceneObject::initializeTimeIntegrator) " 
-                    << "failed to initialize numerical integrator.\n";
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! failed to initialize numerical integrator.\n";
     }
 
     // set integration parameters
@@ -758,9 +751,8 @@ void smVegaFemSceneObject::createForceModel()
 
         if (tetMesh == nullptr)
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::createForceModel) " 
-                        << "the input mesh is not a tet mesh (CLFEM deformable model).\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! the input mesh is not a tet mesh (CLFEM deformable model).\n";
         }
 
         CorotationalLinearFEM * corotationalLinearFEM;
@@ -782,7 +774,7 @@ void smVegaFemSceneObject::createForceModel()
     }
     case LINFEM:
     {
-        std::shared_ptr<LinearFEMForceModel> linearFEMForceModel = 
+        auto linearFEMForceModel = 
                     std::make_shared<LinearFEMForceModel>(stVKInternalForces.get());
         forceModel = linearFEMForceModel;
 
@@ -794,9 +786,8 @@ void smVegaFemSceneObject::createForceModel()
 
         if (tetMesh == nullptr)
         {
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::createForceModel) " 
-                        << "the input mesh is not a tet mesh (Invertible FEM deformable model).\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! the input mesh is not a tet mesh (Invertible FEM deformable model).\n";
         }
 
         IsotropicMaterial * isotropicMaterial = nullptr;
@@ -844,8 +835,8 @@ void smVegaFemSceneObject::createForceModel()
             break;
 
         default:
-            std::cout << "VEGA: error! (In function: smVegaFemSceneObject::createForceModel) invalid invertible material type.\n";
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! invalid invertible material type.\n";
             break;
         }
 
@@ -867,7 +858,7 @@ void smVegaFemSceneObject::createForceModel()
                                                             );
 
         // create force model for the invertible FEM class
-        std::shared_ptr<IsotropicHyperelasticFEMForceModel> isotropicHyperelasticFEMForceModel =
+        auto isotropicHyperelasticFEMForceModel =
                        std::make_shared<IsotropicHyperelasticFEMForceModel>(isotropicHyperelasticFEM);
 
         forceModel = isotropicHyperelasticFEMForceModel;
@@ -876,7 +867,8 @@ void smVegaFemSceneObject::createForceModel()
     }
     default:
     {
-        std::cout <<  "VEGA: error! (In function: smVegaFemSceneObject::createForceModel) Scene object is not of FE type!" << std::endl;
+        PRINT_ERROR_LOCATION
+        std::cout <<  "VEGA: error! Scene object is not of FE type!" << std::endl;
         break;
     }
     }
@@ -887,14 +879,12 @@ void smVegaFemSceneObject::createForceModel()
 void smVegaFemSceneObject::advanceDynamics()
 {
     int i;
-    performaceTracker.cpuLoadCounter.StartCounter();
 
     // reset external forces (usually to zero)
-    for (int i = 0; i < 3 * numNodes; i++)
+    for (i = 0; i < 3 * numNodes; i++)
     {
         f_ext[i] = f_extBase[i];
     }
-    //memcpy(f_ext.data(), f_extBase.data(), sizeof(double) * 3 * numNodes);
 
     if (femConfig->singleStepMode <= 1)
     {
@@ -921,9 +911,6 @@ void smVegaFemSceneObject::advanceDynamics()
         {
             u[i] = q[i];
         }
-        //memcpy(u.data(), integratorBase->Getq(), sizeof(double) * 3 * numNodes);
-
-        std::cout << "Time step: " << timestepCounter << std::endl;
 
         if (importAndUpdateVolumeMeshToSmtk)
         {
@@ -968,15 +955,8 @@ void smVegaFemSceneObject::advanceDynamics()
     primarySurfaceMesh->updateTriangleNormals();
     primarySurfaceMesh->updateVertexNormals();
 
-    primarySurfaceMesh->updateTriangleNormals();
-    primarySurfaceMesh->updateVertexNormals();
-
     // update stasts
     updatePerformanceMetrics();
-
-    performaceTracker.cpuLoadCounter.StopCounter();
-    double cpuTimePerGraphicsFrame = performaceTracker.cpuLoadCounter.GetElapsedTime();
-    performaceTracker.cpuLoad = cpuTimePerGraphicsFrame * performaceTracker.fps;
 }
 
 // Advance in time by a specificed amount and a chosen time stepping scheme
@@ -986,6 +966,7 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
     for (int i = 0; i < femConfig->substepsPerTimeStep; i++)
     {
         int code = integratorBase->DoTimestep();
+
         pt->forceAssemblyLocalTime = integratorBaseSparse->GetForceAssemblyTime();
         pt->systemSolveLocalTime = integratorBaseSparse->GetSystemSolveTime();
 
@@ -1117,7 +1098,6 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
 // simulation is added to the external force vector here
 inline void smVegaFemSceneObject::applyScriptedExternalForces()
 {
-
     // apply any scripted force loads
     if (timestepCounter < this->forceLoads.size())
     {
@@ -1129,13 +1109,11 @@ inline void smVegaFemSceneObject::applyScriptedExternalForces()
             f_ext[i] += forceLoads[offset + i];
         }
     }
-
 }
 
 // Use the computed displacemetnt update to interpolate to the secondary display mesh
 inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
 {
-
     // interpolate deformations from volumetric mesh to rendering triangle mesh
     if (vegaSecondarySurfaceMesh != nullptr)
     {
@@ -1159,7 +1137,6 @@ inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
         vegaPrimarySurfaceMesh->BuildNormals();
     }
 
-
     if (explosionFlag)
     {
         performaceTracker.explosionCounter.StopCounter();
@@ -1172,7 +1149,6 @@ inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
 }
 
 // Updates the stats related to timing, fps etc.
-// Also updates window title with real-time information
 inline void smVegaFemSceneObject::updatePerformanceMetrics()
 {
     smVegaPerformanceCounter *pt = &performaceTracker;
@@ -1192,18 +1168,12 @@ inline void smVegaFemSceneObject::updatePerformanceMetrics()
 
         graphicFrame = 0;
 
-        if ((femConfig->syncTimestepWithGraphics) &&
-            (femConfig->singleStepMode == 0))
+        if (femConfig->syncTimestepWithGraphics && femConfig->singleStepMode == 0)
         {
             femConfig->timeStep = 1.0 / pt->fps;
             integratorBase->SetTimestep(femConfig->timeStep / femConfig->substepsPerTimeStep);
         }
     }
-}
-
-void smVegaFemSceneObject::draw()
-{
-    primarySurfaceMesh->draw();
 }
 
 void smVegaFemSceneObject::printInfo()

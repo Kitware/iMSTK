@@ -87,9 +87,6 @@ public:
     /// \brief configure the vega fem scene object using external config file
     bool configure(smString ConfigFile) override;
 
-    /// \brief rest the object to inital configuration and reset initial states
-    void resetToInitialState();
-
     /// \brief load initial displacements and velocities of the nodes
     void loadInitialStates() override;
     
@@ -113,6 +110,21 @@ public:
     /// with the scene during runtime are added here
     void applyUserInteractionForces() override;
 
+    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
+    void updateSecondaryRenderingMesh() override;
+
+    /// \brief print object specific data
+    void printInfo() override;
+
+    /// \brief Update the deformations by time stepping
+    void advanceDynamics() override;
+
+    /// \brief Advance in time by a specificed amount and a chosen time stepping scheme
+    inline void advanceOneTimeStep();
+
+    /// \brief rest the object to inital configuration and reset initial states
+    void resetToInitialState();
+
     /// \brief Set the type of formulation used to model the deformation
     void setDeformableModelType();
 
@@ -125,18 +137,9 @@ public:
     /// \brief Inititialize the time integrator
     void initializeTimeIntegrator();
 
-    /// \brief Update the deformations by time stepping
-    void advanceDynamics();
-
-    /// \brief Advance in time by a specificed amount and a chosen time stepping scheme
-    inline void advanceOneTimeStep();
-
     /// \brief Forces that are defined by the user before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
-
-    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
-    inline void updateSecondaryRenderingMesh();
 
     /// \brief Updates the stats related to timing, fps etc. Also updates window title with real-time information
     inline void updatePerformanceMetrics();
@@ -144,43 +147,33 @@ public:
     /// \brief check all the surface nodes for the closest node within
     /// certain threshold and set it to be the pulled vertex
     void setPulledVertex(const smVec3d &userPos);
-
-    /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
-    ///  vertices interacted with, ground plane etc.
-    virtual void draw() override;
-
-    /// \brief sets the objects specific render details
-    /// Should be moved to base class in near future
-    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
     
-    ///serialize function explicity writes the object to the memory block
+    /// \brief serialize function explicity writes the object to the memory block
 	///each scene object should know how to write itself to a memory block
 	virtual void serialize(void *p_memoryBlock) override {};
 
-	///Unserialize function can recover the object from the memory location
+	/// \brief Unserialize function can recover the object from the memory location
 	virtual void unSerialize(void *p_memoryBlock) override {};
 
-	///this function may not be used
+	/// \brief this function may not be used
 	///every Scene Object should know how to clone itself. Since the data structures will be
 	///in the beginning of the modules(such as simulator, viewer, collision etc.)
 	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
 
     /// \brief not implemented yet.
     std::shared_ptr<smSceneObject> clone() override;
-
-    void printInfo() override;
     
 private:
    
-    smVegaPerformanceCounter performaceTracker;
-
     int staticSolver;
     int graphicFrame;
     int explosionFlag; ///< 1 if the simulation goes unstable
     int positiveDefinite; ///< 1 if the effective matrix is positive definite
 
-    bool importAndUpdateVolumeMeshToSmtk; 
-    
+    bool importAndUpdateVolumeMeshToSmtk;
+   
+    smVegaPerformanceCounter performaceTracker;
+
     std::shared_ptr<smVegaObjectConfig> femConfig;
     
     // Time integrators
@@ -212,7 +205,6 @@ private:
     // Vega surface meshes
     std::shared_ptr<smVegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
     std::shared_ptr<smVegaSceneObjectDeformable> vegaSecondarySurfaceMesh;
-
 };
 
-#endif
+#endif //SMVEGAFEMSCENEOBJECT_H

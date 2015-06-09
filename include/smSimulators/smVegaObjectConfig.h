@@ -143,6 +143,9 @@ public:
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
     void setFemObjConfuguration(const std::string &ConfigFile);
+
+    /// enable/disable update of scene object sync with graphics
+    void setSyncTimeStepWithGraphics(const bool syncOrNot);
 };
 
 class smVegaPerformanceCounter
@@ -152,20 +155,22 @@ public:
     int fpsBufferSize;///< buffer size to display fps
     int fpsHead; ///< !!
     double fpsBuffer[5]; ///< buffer to display fps
-    double cpuLoad;
+
+
     double forceAssemblyTime;
     double forceAssemblyLocalTime;
     int forceAssemblyBufferSize;
     int forceAssemblyHead;
     double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    
     double systemSolveTime;
     double systemSolveLocalTime;
     int systemSolveBufferSize;
     int systemSolveHead;
     double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    
     PerformanceCounter titleBarCounter;
     PerformanceCounter explosionCounter;
-    PerformanceCounter cpuLoadCounter;
 
     smVegaPerformanceCounter();
     ~smVegaPerformanceCounter();
