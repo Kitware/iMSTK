@@ -99,10 +99,10 @@ void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilenam
     configFile.addOptionOptional("addGravity", &addGravity, addGravity);
     configFile.addOptionOptional("g", &g, g);
     configFile.addOptionOptional("renderingMeshFilename", renderingMeshFilename, "__none");
-    
+
     configFile.addOptionOptional("secondaryRenderingMeshFilename",
                                   secondaryRenderingMeshFilename, "__none");
-    
+
     configFile.addOptionOptional("secondaryRenderingMeshInterpolationFilename",
                                   secondaryRenderingMeshInterpolationFilename, "__none");
 
@@ -119,29 +119,29 @@ void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilenam
 
     configFile.addOptionOptional("substepsPerTimeStep",
                                  &substepsPerTimeStep, substepsPerTimeStep);
-    
+
     configFile.addOptionOptional("syncTimestepWithGraphics",
                                   &syncTimestepWithGraphics, syncTimestepWithGraphics);
 
     configFile.addOption("dampingMassCoef", &dampingMassCoef);
     configFile.addOption("dampingStiffnessCoef", &dampingStiffnessCoef);
-    
+
     configFile.addOptionOptional("dampingLaplacianCoef",
                                  &dampingLaplacianCoef, dampingLaplacianCoef);
-    
+
     configFile.addOptionOptional("newmarkBeta", &newmarkBeta, newmarkBeta);
     configFile.addOptionOptional("newmarkGamma", &newmarkGamma, newmarkGamma);
     configFile.addOption("deformableObjectCompliance", &deformableObjectCompliance);
     configFile.addOption("baseFrequency", &baseFrequency);
-    
+
     configFile.addOptionOptional("forceNeighborhoodSize",
                                  &forceNeighborhoodSize, forceNeighborhoodSize);
-    
+
     configFile.addOptionOptional("maxIterations", &maxIterations, 1);
     configFile.addOptionOptional("epsilon", &epsilon, 1E-6);
     configFile.addOptionOptional("numInternalForceThreads", &numInternalForceThreads, 0);
     configFile.addOptionOptional("numSolverThreads", &numSolverThreads, 1);
-    
+
     configFile.addOptionOptional("inversionThreshold",
                                  &inversionThreshold, -std::numeric_limits< double >::max());
 
@@ -149,7 +149,7 @@ void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilenam
     configFile.addOptionOptional("singleStepMode", &singleStepMode, singleStepMode);
     //configFile.addOptionOptional("pauseSimulation", &pauseSimulation, pauseSimulation);
     configFile.addOptionOptional("lockAt30Hz", &lockAt30Hz, lockAt30Hz);
-    
+
     configFile.addOptionOptional("invertibleMaterial",
                                   invertibleMaterialString, invertibleMaterialString);
 

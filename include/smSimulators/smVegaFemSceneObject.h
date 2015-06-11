@@ -110,7 +110,8 @@ public:
     /// with the scene during runtime are added here
     void applyUserInteractionForces() override;
 
-    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
+    /// \brief Use the computed displacemetnt update
+    /// to interpolate to the secondary display mesh
     void updateSecondaryRenderingMesh() override;
 
     /// \brief print object specific data
@@ -137,16 +138,45 @@ public:
     /// \brief Inititialize the time integrator
     void initializeTimeIntegrator();
 
-    /// \brief Forces that are defined by the user before the start of the simulation
+    /// \brief Forces that are defined by the user 
+    ///  before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
 
-    /// \brief Updates the stats related to timing, fps etc. Also updates window title with real-time information
+    /// \brief Updates the stats related to timing, fps etc. 
+    /// Also updates window title with real-time information
     inline void updatePerformanceMetrics();
 
     /// \brief check all the surface nodes for the closest node within
     /// certain threshold and set it to be the pulled vertex
     void setPulledVertex(const smVec3d &userPos);
+
+    /// \brief returns velocity given the
+    /// localtion in the global velocity vector
+    smVec3d getVelocityOfNodeWithDofID(const int dofID) const;
+
+    /// \brief returns displacement given the
+    /// localtion in the global displacement vector
+    smVec3d getDisplacementOfNodeWithDofID(const int dofID) const;
+
+    /// \brief returns acceleration given the
+    /// localtion in the global acceleration vector
+    smVec3d getAccelerationOfNodeWithDofID(const int dofID) const;
+
+    /// \brief returns the number of nodes
+    int getNumNodes() const;
+
+    /// \brief returns total degree of freeedom (including fixed)
+    int getNumTotalDof() const;
+
+    /// \brief returns unknown degree of freeedom
+    int getNumDof() const;
+
+    /// \brief returns number of nodes that are fixed in space
+    int getNumFixedNodes() const;
+
+    /// \brief returns the degree od freedom that are known or fixed
+    int getNumFixedDof() const;
     
     /// \brief serialize function explicity writes the object to the memory block
 	///each scene object should know how to write itself to a memory block
@@ -156,7 +186,8 @@ public:
 	virtual void unSerialize(void *p_memoryBlock) override {};
 
 	/// \brief this function may not be used
-	///every Scene Object should know how to clone itself. Since the data structures will be
+	///every Scene Object should know how to clone itself. 
+    /// Since the data structures will be
 	///in the beginning of the modules(such as simulator, viewer, collision etc.)
 	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
 

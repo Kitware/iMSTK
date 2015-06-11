@@ -40,7 +40,7 @@ smVegaFemSceneObject::smVegaFemSceneObject() : smSceneObjectDeformable()
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 }
 
-smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, 
+smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log,
                                            smString ConfigFile) : smSceneObjectDeformable()
 {
     performaceTracker.initialize();
@@ -80,7 +80,7 @@ bool smVegaFemSceneObject::configure(smString ConfigFile)
         femConfig->setFemObjConfuguration(ConfigFile);
 
         std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file-" <<
-                                                                        ConfigFile.c_str() << std::endl;
+                                                               ConfigFile.c_str() << std::endl;
 
         return 1;
     }
@@ -107,7 +107,7 @@ std::shared_ptr<void> smVegaFemSceneObject::duplicateAtRuntime()
 
     auto newSO = std::make_shared<smVegaFemSceneObject>();
 
-  /*    
+  /*
     newSO->performaceTracker.initialize();
 
     newSO->staticSolver = 0;
@@ -124,7 +124,6 @@ std::shared_ptr<void> smVegaFemSceneObject::duplicateAtRuntime()
     newSO->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
    
    */
- 
 
     //// Copy the config settings
     //newSO->femConfig = std::make_shared<smVegaConfigFemObject>(*this->femConfig);
@@ -275,7 +274,7 @@ void smVegaFemSceneObject::initialize()
     initializeTimeIntegrator();
 
     performaceTracker.clearFpsBuffer();
-    performaceTracker.titleBarCounter.StartCounter();
+    performaceTracker.objectPerformanceCounter.StartCounter();
 
     std::cout << "Inititializing fem object done. \n";
 
@@ -357,8 +356,9 @@ void smVegaFemSceneObject::loadVolumeMesh()
             std::cerr << "VEGA:  error! mass matrix for the StVK deformable model not specified" <<
                 femConfig->massMatrixFilename << std::endl;
         }
-        
-        std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename << "..." << std::endl;
+
+        std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename <<
+                                                                                 "..." << std::endl;
 
         // get the mass matrix
         std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
@@ -539,7 +539,7 @@ void smVegaFemSceneObject::loadFixedBC()
     {
         fixedVertices[i]--;
     }
-    
+
     numTotalDOF = 3 * numNodes;
     numFixedNodes = numFixedVertices;
     numFixedDof = 3 * numFixedVertices;
@@ -640,18 +640,18 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
     else if (femConfig->solver == IMPLICITBACKWARDEULER)
     {
         implicitNewmarkSparse = std::make_shared<ImplicitBackwardEulerSparse>(
-                                                                                3 * numNodes,
-                                                                                femConfig->timeStep,
-                                                                                massMatrix.get(),
-                                                                                forceModel.get(),
-                                                                                positiveDefinite,
-                                                                                numFixedDOFs,
-                                                                                fixedDOFs.data(),
-                                                                                femConfig->dampingMassCoef,
-                                                                                femConfig->dampingStiffnessCoef,
-                                                                                femConfig->maxIterations,
-                                                                                femConfig->epsilon,
-                                                                                femConfig->numSolverThreads);
+                                                                            3 * numNodes,
+                                                                            femConfig->timeStep,
+                                                                            massMatrix.get(),
+                                                                            forceModel.get(),
+                                                                            positiveDefinite,
+                                                                            numFixedDOFs,
+                                                                            fixedDOFs.data(),
+                                                                            femConfig->dampingMassCoef,
+                                                                            femConfig->dampingStiffnessCoef,
+                                                                            femConfig->maxIterations,
+                                                                            femConfig->epsilon,
+                                                                            femConfig->numSolverThreads);
 
         integratorBaseSparse = implicitNewmarkSparse;
     }
@@ -930,8 +930,8 @@ void smVegaFemSceneObject::advanceDynamics()
 
             do
             {
-                performaceTracker.titleBarCounter.StopCounter();
-                elapsedTime = performaceTracker.titleBarCounter.GetElapsedTime();
+                performaceTracker.objectPerformanceCounter.StopCounter();
+                elapsedTime = performaceTracker.objectPerformanceCounter.GetElapsedTime();
             } while (1.0 * graphicFrame / elapsedTime >= 30.0);
         }
     }
@@ -984,7 +984,8 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
 
         if (code != 0)
         {
-            std::cout << "VEGA: The integrator went unstable. Reduce the timestep, or increase the number of substeps per timestep.\n";
+            std::cout << "VEGA: The integrator went unstable."
+                <<"Reduce the timestep, or increase the number of substeps per timestep.\n";
             integratorBase->ResetToRest();
 
             for (int i = 0; i < 3 * numNodes; i++)
@@ -1140,8 +1141,8 @@ inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
     if (explosionFlag)
     {
         performaceTracker.explosionCounter.StopCounter();
-
-        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0) // the message will appear on screen for 4 seconds
+        // the message will appear on screen for 4 seconds
+        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0) 
         {
             explosionFlag = 0;
         }
@@ -1153,12 +1154,12 @@ inline void smVegaFemSceneObject::updatePerformanceMetrics()
 {
     smVegaPerformanceCounter *pt = &performaceTracker;
     //update window title at 5 Hz
-    pt->titleBarCounter.StopCounter();
-    double elapsedTime = pt->titleBarCounter.GetElapsedTime();
+    pt->objectPerformanceCounter.StopCounter();
+    double elapsedTime = pt->objectPerformanceCounter.GetElapsedTime();
 
     if (elapsedTime >= 1.0 / 5)
     {
-        pt->titleBarCounter.StartCounter();
+        pt->objectPerformanceCounter.StartCounter();
         double fpsLocal = graphicFrame / elapsedTime;
 
         // average fps over last "fpsBufferSize" samples

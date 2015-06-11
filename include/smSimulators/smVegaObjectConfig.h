@@ -156,27 +156,33 @@ public:
     int fpsHead; ///< !!
     double fpsBuffer[5]; ///< buffer to display fps
 
-
+    // force assembly metrics recording
     double forceAssemblyTime;
     double forceAssemblyLocalTime;
     int forceAssemblyBufferSize;
     int forceAssemblyHead;
     double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     
+    // solver metrics recording
     double systemSolveTime;
     double systemSolveLocalTime;
     int systemSolveBufferSize;
     int systemSolveHead;
     double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
     
-    PerformanceCounter titleBarCounter;
-    PerformanceCounter explosionCounter;
+    PerformanceCounter objectPerformanceCounter;///< keeps track of overall performance
+    PerformanceCounter explosionCounter;///< keeps track of instability
 
+    /// \brief constructor
     smVegaPerformanceCounter();
+
+    /// \brief destructor
     ~smVegaPerformanceCounter();
 
+    /// \brief Initialization
     void initialize();
 
+    /// \brief clear the buffers that record the fps
     void clearFpsBuffer();
 };
 

@@ -124,6 +124,7 @@ public:
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
     virtual std::shared_ptr<smSceneObject> clone() = 0;
 
+    /// \brief print information related the scene object
     virtual void printInfo() = 0;
 
 protected:
