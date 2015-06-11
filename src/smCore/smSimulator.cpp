@@ -155,6 +155,11 @@ void smSimulator::run()
             }
         }
 
+        for (auto&& result : results)
+        { //Wait until there is a valid return value from each thread
+            result.get(); //waits for result value
+        }
+
         results.clear(); //clear the results buffer for new
         std::shared_ptr<smContactHandling> contactHandling;
         for (size_t i = 0; i < this->contactHandlers.size(); i++)

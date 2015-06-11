@@ -82,3 +82,14 @@ const std::vector< std::shared_ptr< smContact > >& smCollisionPair::getContacts(
 {
     return contacts;
 }
+
+void smCollisionPair::printCollisionPairs()
+{
+    std::cout << "# Contacts: " << this->contacts.size() << std::endl;
+    for (int i = 0; i < this->contacts.size(); i++)
+    {
+        std::cout << "Contact no: " << i << std::endl;
+        this->contacts[0]->printInfo();
+    }
+    
+}

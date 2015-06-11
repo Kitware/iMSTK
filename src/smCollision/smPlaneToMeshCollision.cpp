@@ -56,8 +56,8 @@ void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair>
         if (d < std::numeric_limits<float>::epsilon())
         {         
             pair->addContact(d, vert, i, planeNormal);// Create contact
-
-            std::cout << "Pushed contact\n";
         }
     }
+    /*std::cout << "@ Collision detection\n";
+    pair->printCollisionPairs();*/
 }

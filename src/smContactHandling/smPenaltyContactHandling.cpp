@@ -78,7 +78,8 @@ void smPenaltyContactHandling::computeUnilateralContactForces()
 
     auto contactInfo = this->getCollisionPairs()->getContacts();
 
-    std::cout << "# contacts: " << contactInfo.size() << std::endl;
+    /*std::cout << "@ Contact handling\n";
+    this->getCollisionPairs()->printCollisionPairs();*/
 
     if (this->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT &&
         this->getFirstSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
