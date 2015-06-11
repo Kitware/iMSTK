@@ -73,7 +73,7 @@ void smPenaltyContactHandling::resolveContacts()
 void smPenaltyContactHandling::computeUnilateralContactForces()
 {
     int penetratedNode, nodeDofID;
-    const double stiffness = 1.0e5, damping = 2000.0;
+    const double stiffness = 1.0e6, damping = 1.0e5;
     smVec3d velocityProjection;
 
     auto contactInfo = this->getCollisionPairs()->getContacts();

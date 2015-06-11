@@ -160,6 +160,17 @@ void smSimulator::run()
             result.get(); //waits for result value
         }
 
+        //for (const auto &x : contactHandlers)
+        //{
+        //    results.emplace_back(threadPool->enqueue(
+        //        [x]()
+        //    {
+        //        x->resolveContacts();
+        //        return 0; //this return is just so we have a results value
+        //    })
+        //    );
+        //}
+
         results.clear(); //clear the results buffer for new
         std::shared_ptr<smContactHandling> contactHandling;
         for (size_t i = 0; i < this->contactHandlers.size(); i++)

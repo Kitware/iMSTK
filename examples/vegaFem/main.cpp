@@ -110,7 +110,7 @@ int main()
     // create a static plane scene object of given normal and position
     staticObject = std::make_shared<smStaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -2.3, 0.0),
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -3.0, 0.0),
                                                     smVec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
