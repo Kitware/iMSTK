@@ -31,6 +31,7 @@
 // STL includes
 #include <memory>
 #include <vector>
+#include <iostream>
 
 class smModelRepresentation;
 
@@ -41,9 +42,18 @@ class smContact
 {
 public:
     smContact ( const double penetrationDepth,
-                const smVec3d& contactPoint,
+                const smVec3d& p,
+                const int ind,
                 const smVec3d& contactNornmal
-				) : depth(penetrationDepth), point(contactPoint), normal(contactNornmal){}
+				) : depth(penetrationDepth), point(p), index(ind), normal(contactNornmal){}
+
+    void printInfo()
+    {
+        std::cout << "\tDepth  : " << depth << std::endl;
+        std::cout << "\tIndex  : " << depth << std::endl;
+        std::cout << "\tNoramal: (" << normal(0) << ", " << normal(1) << ", " << normal(2) << ")\n";
+        std::cout << "\tVertex : (" << point(0) << ", " << point(1) << ", " << point(2) << ")\n\n";
+    }
 
     double depth;
     smVec3d point;
@@ -77,8 +87,9 @@ public:
     /// @brief Add contact between the models
     ///
     void addContact( const double& penetrationDepth,
-                      const smVec3d& contactPoint,
-                      const smVec3d& contactNornmal);
+                     const smVec3d& vert,
+                     const int index,
+                     const smVec3d& contactNornmal);
 
     ///
     /// @brief Clear contact list
@@ -110,6 +121,11 @@ public:
     ///
     std::vector<std::shared_ptr<smContact>> &getContacts();
     const std::vector<std::shared_ptr<smContact>> &getContacts() const;
+
+    ///
+    /// @brief Returns contact array for these two models
+    ///
+    void printCollisionPairs();
 
 private:
     std::pair<std::shared_ptr<smModelRepresentation>,

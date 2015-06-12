@@ -33,11 +33,12 @@
 
 class smPlaneCollisionModel : public smPlaneModel
 {
-
 public:
     smPlaneCollisionModel(const smVec3d &p, const smVec3d &n);
 
     ~smPlaneCollisionModel();
+
+    
 };
 
 #endif // SMPLANECOLLISIONMODEL_H_H
