@@ -1,7 +1,8 @@
 #include "smUtilities/smMath.h"
+#include "smUtilities/smQuaternion.h"
+#include "smUtilities/smVector.h"
 #include "smRendering/smCamera.h"
 
-///
 smCamera::smCamera()
 {
     ar = 4.0 / 3.0;
@@ -11,7 +12,12 @@ smCamera::smCamera()
 
     pos = smVec3f(0, 0, 0);
     fp = smVec3f(0, 0, -1);
-    up = smVec3f(0, 1, 0);
+
+    orientation = smQuaternionf();
+
+    viewDirty = true;
+    projDirty = true;
+    orientDirty = false;
 }
 
 smVec3f smCamera::getPos()
@@ -21,12 +27,14 @@ smVec3f smCamera::getPos()
 
 void smCamera::setPos(float x, float y, float z)
 {
-    pos = smVec3f(x, y, z);
+    this->setPos(smVec3f(x, y, z));
+    orientDirty = true;
 }
 
 void smCamera::setPos(const smVec3f& v)
 {
     pos = v;
+    viewDirty = true;
 }
 
 smVec3f smCamera::getFocus()
@@ -36,27 +44,24 @@ smVec3f smCamera::getFocus()
 
 void smCamera::setFocus(float x, float y, float z)
 {
-    fp = smVec3f(x, y, z);
+    this->setFocus(smVec3f(x, y, z));
+    orientDirty = true;
 }
 
 void smCamera::setFocus(const smVec3f& v)
 {
     fp = v;
+    viewDirty = true;
 }
 
 smVec3f smCamera::getUpVec()
 {
-    return up;
+    return getOrientation() * smVec3f::UnitY();
 }
 
-void smCamera::setUpVec(float x, float y, float z)
+smVec3f smCamera::getDirection()
 {
-    up = smVec3f(x, y, z);
-}
-
-void smCamera::setUpVec(const smVec3f& v)
-{
-    up = v;
+    return -(getOrientation() * smVec3f::UnitZ());
 }
 
 float smCamera::getAspectRatio()
@@ -67,6 +72,7 @@ float smCamera::getAspectRatio()
 void smCamera::setAspectRatio(const float ar)
 {
     this->ar = ar;
+    projDirty = true;
 }
 
 float smCamera::getViewAngle()
@@ -77,6 +83,7 @@ float smCamera::getViewAngle()
 void smCamera::setViewAngle(const float a)
 {
     angle = a;
+    projDirty = true;
 }
 
 float smCamera::getViewAngleDeg()
@@ -87,6 +94,7 @@ float smCamera::getViewAngleDeg()
 void smCamera::setViewAngleDeg(const float a)
 {
     angle = SM_DEGREES2RADIANS(a);
+    projDirty = true;
 }
 
 float smCamera::getNearClipDist()
@@ -97,6 +105,7 @@ float smCamera::getNearClipDist()
 void smCamera::setNearClipDist(const float d)
 {
     nearClip = d;
+    projDirty = true;
 }
 
 float smCamera::getFarClipDist()
@@ -107,10 +116,42 @@ float smCamera::getFarClipDist()
 void smCamera::setFarClipDist(const float d)
 {
     farClip = d;
+    projDirty = true;
+}
+
+void smCamera::setOrientation(const smQuaternionf q)
+{
+    this->orientation = q;
+}
+
+void smCamera::setOrientFromDir(const smVec3f d)
+{
+    smMatrix33f camAxes;
+    smVec3f tempUp = this->orientation * smVec3f::UnitY();
+
+    camAxes.col(2) = (-d).normalized();
+    camAxes.col(0) = tempUp.cross( camAxes.col(2) ).normalized();
+    camAxes.col(1) = camAxes.col(2).cross( camAxes.col(0) ).normalized();
+    setOrientation(smQuaternionf(camAxes));
+}
+
+smQuaternionf smCamera::getOrientation()
+{
+    if (true == orientDirty)
+    {
+        setOrientFromDir(getFocus() - getPos());
+        orientDirty = false;
+    }
+    return this->orientation;
 }
 
 smMatrix44f smCamera::getViewMat()
 {
+    if (true == viewDirty)
+    {
+        return view;
+    }
+    genViewMat();
     return view;
 }
 
@@ -121,6 +162,11 @@ void smCamera::setViewMat(const smMatrix44f &m)
 
 smMatrix44f smCamera::getProjMat()
 {
+    if (true == projDirty)
+    {
+        return proj;
+    }
+    genProjMat();
     return proj;
 }
 
@@ -128,6 +174,97 @@ void smCamera::setProjMat(const smMatrix44f &m)
 {
     this->proj = m;
 }
+
+void smCamera::pan(smVec3f v)
+{
+    v = getOrientation() * v;
+    setPos(getPos() + v);
+    setFocus(getFocus() + v);
+}
+
+void smCamera::zoom(const float d)
+{
+    float dist = (getPos() - getFocus()).norm();
+    if (dist > d)
+    {
+        setPos(getPos() + getDirection() * d);
+    }
+}
+
+void smCamera::rotateLocal(float angle, smVec3f axis)
+{
+    float dist = (getPos() - getFocus()).norm();
+    smQuaternionf q;
+    q = Eigen::AngleAxisf(angle, axis.normalized());
+
+    setOrientation(getOrientation() * q);
+    setFocus(getPos() + dist * getOrientation() * getDirection());
+}
+
+void smCamera::rotateFocus(float angle, smVec3f axis)
+{
+    float dist = (getFocus() - getPos()).norm();
+    smQuaternionf q;
+    q = Eigen::AngleAxisf(angle, axis.normalized());
+
+    setOrientation(getOrientation() * q);
+    setPos(getFocus() + dist * getOrientation() * getDirection());
+}
+
+void smCamera::rotateGlobal(float angle, smVec3f axis)
+{
+    float dist = (getFocus() - getPos()).norm();
+    smQuaternionf q;
+    q = Eigen::AngleAxisf(angle, axis.normalized());
+
+    setPos(getPos() + dist * q * getDirection());
+}
+
+void smCamera::rotateLocalX(float angle)
+{
+    rotateLocal(angle, smVec3f::UnitX());
+}
+
+void smCamera::rotateLocalY(float angle)
+{
+    rotateLocal(angle, smVec3f::UnitY());
+}
+
+void smCamera::rotateLocalZ(float angle)
+{
+    rotateLocal(angle, smVec3f::UnitZ());
+}
+
+void smCamera::rotateFocusX(float angle)
+{
+    rotateFocus(angle, smVec3f::UnitX());
+}
+
+void smCamera::rotateFocusY(float angle)
+{
+    rotateFocus(angle, smVec3f::UnitY());
+}
+
+void smCamera::rotateFocusZ(float angle)
+{
+    rotateFocus(angle, smVec3f::UnitZ());
+}
+
+void smCamera::rotateGlobalX(float angle)
+{
+    rotateGlobal(angle, smVec3f::UnitX());
+}
+
+void smCamera::rotateGlobalY(float angle)
+{
+    rotateGlobal(angle, smVec3f::UnitY());
+}
+
+void smCamera::rotateGlobalZ(float angle)
+{
+    rotateGlobal(angle, smVec3f::UnitZ());
+}
+
 
 // Implementation adapted from Sylvain Pointeau's Blog:
 // http://spointeau.blogspot.com/2013/12/hello-i-am-looking-at-opengl-3.html
@@ -151,7 +288,8 @@ smMatrix44f smCamera::lookAt(const smVec3f& pos,
 
 void smCamera::genViewMat()
 {
-    this->view = smCamera::lookAt(pos, fp, up);
+    this->view = smCamera::lookAt(pos, fp, getUpVec());
+    viewDirty = false;
 }
 
 // Implementation adapted from Sylvain Pointeau's Blog:
@@ -175,4 +313,5 @@ smMatrix44f smCamera::perspective(float fovy, float ar, float zNear, float zFar)
 void smCamera::genProjMat()
 {
     proj = smCamera::perspective(angle, ar, nearClip, farClip);
+    projDirty = false;
 }
