@@ -10,6 +10,7 @@ simmedtk_add_library(smMesh
     smVegaSceneObject.cpp
     smVegaSceneObjectDeformable.cpp
     smVegaSceneObjectWithRestPosition.cpp
+    smVegaVolumetricMesh.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smMesh/smImportExport.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smMesh.h
