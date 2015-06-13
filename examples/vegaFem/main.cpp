@@ -42,7 +42,7 @@
 #include "smCollision/smMeshCollisionModel.h"
 #include "smCollision/smPlaneToMeshCollision.h"
 
-#include "smContactHandling\smPenaltyContactHandling.h"
+#include "smContactHandling/smPenaltyContactHandling.h"
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
