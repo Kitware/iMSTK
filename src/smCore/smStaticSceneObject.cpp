@@ -50,25 +50,9 @@ void smStaticSceneObject::loadInitialStates()
 {
 }
 
-bool smStaticSceneObject::configure(smString ConfigFile)
+bool smStaticSceneObject::configure(const smString ConfigFile)
 {
     return false;
-}
-
-std::shared_ptr<void> smStaticSceneObject::duplicateAtRuntime()
-{
-    std::shared_ptr<smStaticSceneObject> newSO =
-        std::make_shared<smStaticSceneObject>();
-
-    return (std::shared_ptr<void>)newSO;
-}
-
-std::shared_ptr<void> smStaticSceneObject::duplicateAtInitialization()
-{
-    std::shared_ptr<smStaticSceneObject> newSO =
-        std::make_shared<smStaticSceneObject>();
-
-    return (std::shared_ptr<void>)newSO;
 }
 
 void smStaticSceneObject::draw()
@@ -91,7 +75,7 @@ std::shared_ptr<smModelRepresentation> smStaticSceneObject::getModel()
     return staticModel;
 }
 
-void smStaticSceneObject::printInfo()
+void smStaticSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";
     std::cout << "\t Name        : " << this->getName() << std::endl;

@@ -70,7 +70,7 @@ go_bandit([](){
 
 		it("initializes properly ", [&]() {
 			AssertThat(handler != nullptr, IsTrue());
-            AssertThat(handler->getContactHandlingType() == SIMMEDTK_CONTACT_PENALTY_FEM_TO_STATIC, IsTrue());
+            AssertThat(handler->getContactHandlingType() == smContactHandlingType::PENALTY_FEM_TO_STATIC, IsTrue());
         });
 
 		it("attches a collision pair ", [&]() {

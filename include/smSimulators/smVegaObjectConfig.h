@@ -26,49 +26,11 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
+#include "smCore/smErrorLog.h"
 
 // VEGA includes
 #include "configFile.h"
 #include "performanceCounter.h"
-
-#define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
-
-enum massSpringSystemSourceType
-{
-    OBJ,
-    TETMESH,
-    CUBICMESH,
-    CHAIN,
-    NONE
-};
-
-enum deformableObjectType
-{
-    STVK,
-    COROTLINFEM,
-    LINFEM,
-    MASSSPRING,
-    INVERTIBLEFEM,
-    UNSPECIFIED
-};
-
-enum invertibleMaterialType
-{
-    INV_STVK,
-    INV_NEOHOOKEAN,
-    INV_MOONEYRIVLIN,
-    INV_NONE
-};
-
-enum solverType
-{
-    IMPLICITNEWMARK,
-    IMPLICITBACKWARDEULER,
-    EULER,
-    SYMPLECTICEULER,
-    CENTRALDIFFERENCES,
-    UNKNOWN
-};
 
 /// \brief This class parses and holds the information related to various input files
 /// It is separated from the smVegaFemSceneObject class in order to reduce the
@@ -76,6 +38,43 @@ enum solverType
 class smVegaObjectConfig
 {
 public:
+
+    enum massSpringSystemSourceType
+    {
+        OBJ,
+        TETMESH,
+        CUBICMESH,
+        CHAIN,
+        NONE
+    };
+
+    enum deformableObjectType
+    {
+        STVK,
+        COROTLINFEM,
+        LINFEM,
+        MASSSPRING,
+        INVERTIBLEFEM,
+        UNSPECIFIED
+    };
+
+    enum invertibleMaterialType
+    {
+        INV_STVK,
+        INV_NEOHOOKEAN,
+        INV_MOONEYRIVLIN,
+        INV_NONE
+    };
+
+    enum timeIntegrationType
+    {
+        IMPLICITNEWMARK,
+        IMPLICITBACKWARDEULER,
+        EULER,
+        SYMPLECTICEULER,
+        CENTRALDIFFERENCES,
+        UNKNOWN
+    };
 
     // simulation. Some variable names self-explainatory
     smInt syncTimestepWithGraphics; ///< !!
@@ -110,6 +109,7 @@ public:
     smInt singleStepMode;
 
     // various file names. variable names self-explainatory
+    //string renderingMeshFilename;
     smChar renderingMeshFilename[4096];
     smChar secondaryRenderingMeshFilename[4096];
     smChar secondaryRenderingMeshInterpolationFilename[4096];
@@ -130,7 +130,7 @@ public:
     massSpringSystemSourceType massSpringSystemSource;
     deformableObjectType deformableObject;
     invertibleMaterialType invertibleMaterial;
-    solverType solver;
+    timeIntegrationType solver;
 
     /// \brief Constructor
     smVegaObjectConfig();
@@ -142,7 +142,7 @@ public:
     ///  parse all the specifications of the FEM scene
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
-    void setFemObjConfuguration(const std::string &ConfigFile);
+    void setFemObjConfuguration(const smString ConfigFile, const bool printVerbose);
 
     /// enable/disable update of scene object sync with graphics
     void setSyncTimeStepWithGraphics(const bool syncOrNot);
@@ -161,14 +161,14 @@ public:
     double forceAssemblyLocalTime;
     int forceAssemblyBufferSize;
     int forceAssemblyHead;
-    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    double forceAssemblyBuffer[50];
     
     // solver metrics recording
     double systemSolveTime;
     double systemSolveLocalTime;
     int systemSolveBufferSize;
     int systemSolveHead;
-    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
+    double systemSolveBuffer[50];
     
     PerformanceCounter objectPerformanceCounter;///< keeps track of overall performance
     PerformanceCounter explosionCounter;///< keeps track of instability

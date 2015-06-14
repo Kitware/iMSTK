@@ -63,8 +63,6 @@
 #include "volumetricMesh.h"
 #include "volumetricMeshLoader.h"
 
-const smString vega_string_none("__none");
-
 /// \brief Base class for any scene object that is defmormable
 /// and uses FE formulation to compute the evolution of configuration
 /// in time.
@@ -73,10 +71,10 @@ class smVegaFemSceneObject: public smSceneObjectDeformable
 public:
 
     /// \brief Constructor
-	smVegaFemSceneObject();
+    smVegaFemSceneObject();
 
     /// \brief Constructor
-    smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, smString ConfigFile);
+    smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log, const smString ConfigFile);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
@@ -85,16 +83,10 @@ public:
     void initialize() override;
 
     /// \brief configure the vega fem scene object using external config file
-    bool configure(smString ConfigFile) override;
+    bool configure(const smString ConfigFile) override;
 
     /// \brief load initial displacements and velocities of the nodes
     void loadInitialStates() override;
-    
-    /// \brief duplicate the object 
-    std::shared_ptr<void> duplicateAtRuntime() override;
-
-    /// \brief duplicate the object 
-    std::shared_ptr<void> duplicateAtInitialization() override;
 
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC() override;
@@ -104,7 +96,7 @@ public:
 
     /// \brief Load the surface mesh
     void loadSurfaceMesh() override;
-    
+
     /// \brief Forces as a result of user interaction
     /// (through an interface such as mouse or haptic device)
     /// with the scene during runtime are added here
@@ -115,7 +107,7 @@ public:
     void updateSecondaryRenderingMesh() override;
 
     /// \brief print object specific data
-    void printInfo() override;
+    void printInfo() const override;
 
     /// \brief Update the deformations by time stepping
     void advanceDynamics() override;
@@ -179,51 +171,51 @@ public:
     int getNumFixedDof() const;
     
     /// \brief serialize function explicity writes the object to the memory block
-	///each scene object should know how to write itself to a memory block
-	virtual void serialize(void *p_memoryBlock) override {};
+    ///each scene object should know how to write itself to a memory block
+    virtual void serialize(void *p_memoryBlock) override {};
 
-	/// \brief Unserialize function can recover the object from the memory location
-	virtual void unSerialize(void *p_memoryBlock) override {};
+    /// \brief Unserialize function can recover the object from the memory location
+    virtual void unSerialize(void *p_memoryBlock) override {};
 
-	/// \brief this function may not be used
-	///every Scene Object should know how to clone itself. 
+    /// \brief this function may not be used
+    ///every Scene Object should know how to clone itself. 
     /// Since the data structures will be
-	///in the beginning of the modules(such as simulator, viewer, collision etc.)
-	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+    ///in the beginning of the modules(such as simulator, viewer, collision etc.)
+    //virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
 
     /// \brief not implemented yet.
     std::shared_ptr<smSceneObject> clone() override;
-    
+
 private:
-   
+
     int staticSolver;
     int graphicFrame;
     int explosionFlag; ///< 1 if the simulation goes unstable
     int positiveDefinite; ///< 1 if the effective matrix is positive definite
 
     bool importAndUpdateVolumeMeshToSmtk;
-   
+
     smVegaPerformanceCounter performaceTracker;
 
     std::shared_ptr<smVegaObjectConfig> femConfig;
-    
+
     // Time integrators
     std::shared_ptr<IntegratorBase> integratorBase; ///< integrator
     std::shared_ptr<ImplicitNewmarkSparse> implicitNewmarkSparse;
     std::shared_ptr<IntegratorBaseSparse> integratorBaseSparse;
-    
+
     // Force models
     std::shared_ptr<ForceModel> forceModel; ///< Type of formulation driving the FEM simulation
     std::shared_ptr<StVKInternalForces> stVKInternalForces;
     std::shared_ptr<StVKStiffnessMatrix> stVKStiffnessMatrix;
     std::shared_ptr<StVKForceModel> stVKForceModel;
     std::shared_ptr<CorotationalLinearFEMForceModel> corotationalLinearFEMForceModel;
-    
+
     // Volume meshes and related graphs
     std::shared_ptr<VolumetricMesh> volumetricMesh; ///< volume mesh
     std::shared_ptr<TetMesh> tetMesh; ///< volume mesh
     std::shared_ptr<Graph> meshGraph; ///< graph of the mesh
-    
+
     // Sparse matrices
     std::shared_ptr<SparseMatrix> massMatrix; ///< sparse mass matrix need for FEM simulation
     std::shared_ptr<SparseMatrix> LaplacianDampingMatrix; ///< sparse damping matrix need for FEM simulation

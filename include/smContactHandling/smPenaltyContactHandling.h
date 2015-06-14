@@ -35,15 +35,15 @@ class smCollisionPair;
 class smPenaltyContactHandling : public smContactHandling
 {
 public:
-	smPenaltyContactHandling(bool typeBilateral);
+    smPenaltyContactHandling(bool typeBilateral);
     
-	smPenaltyContactHandling(bool typeBilateral,
+    smPenaltyContactHandling(bool typeBilateral,
                              const std::shared_ptr<smSceneObject>& sceneObjFirst,
                              const std::shared_ptr<smSceneObject>& sceneObjSecond);
 
     ~smPenaltyContactHandling();
 
-	void resolveContacts();
+    void resolveContacts();
 
     /// \brief Get the forces on one the first scene object using penalty method
     virtual void computeUnilateralContactForces() = 0;

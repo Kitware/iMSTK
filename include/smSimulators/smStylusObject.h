@@ -174,7 +174,7 @@ public:
 
     void loadInitialStates() override{};
 
-    bool configure(smString ConfigFile)
+    bool configure(const smString ConfigFile)
     {
         return false;
     }
@@ -195,7 +195,7 @@ public:
         return (std::shared_ptr<void>)newSO;
     }
 
-    void printInfo() override
+    void printInfo() const override
     {
         std::cout << "\t-------------------------------------\n";
         std::cout << "\t Name        : " << this->getName() << std::endl;
@@ -249,7 +249,7 @@ public:
         return ret;
     }
 
-    void printInfo() override
+    void printInfo() const override
     {
         std::cout << "\t-------------------------------------\n";
         std::cout << "\t Name        : " << this->getName() << std::endl;

@@ -23,7 +23,7 @@
 
 #include "smContactHandling/smContactHandling.h"
 
-smContactHandling::smContactHandling(bool typeBilateral)
+smContactHandling::smContactHandling(const bool typeBilateral)
 {
     if (typeBilateral)
     {
@@ -34,12 +34,12 @@ smContactHandling::smContactHandling(bool typeBilateral)
         isBilateral = false;
     }
 
-    type = SIMMEDTK_CONTACT_UNKNOWN;
+    type = smContactHandlingType::UNKNOWN;
 };
 
-smContactHandling::smContactHandling(bool typeBilateral,
-                                     const std::shared_ptr< smSceneObject >& first,
-                                     const std::shared_ptr< smSceneObject >& second)
+smContactHandling::smContactHandling(const bool typeBilateral,
+                                     const std::shared_ptr< smSceneObject > first,
+                                     const std::shared_ptr< smSceneObject > second)
 {
     if (typeBilateral)
     {
@@ -52,7 +52,7 @@ smContactHandling::smContactHandling(bool typeBilateral,
 
     setSceneObjects(first, second);
 
-    type = SIMMEDTK_CONTACT_UNKNOWN;
+    type = smContactHandlingType::UNKNOWN;
 }
 
 smContactHandling::~smContactHandling()
@@ -60,15 +60,14 @@ smContactHandling::~smContactHandling()
 }
 
 /// \brief Set the scene objects that are colliding
-void smContactHandling::setSceneObjects(
-                                        const std::shared_ptr< smSceneObject >& first,
-                                        const std::shared_ptr< smSceneObject >& second)
+void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject > first,
+                                        const std::shared_ptr< smSceneObject > second)
 {
     collidingSceneObjects.first = first;
     collidingSceneObjects.second = second;
 }
 
-void smContactHandling::setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair)
+void smContactHandling::setCollisionPairs(const std::shared_ptr< smCollisionPair > colPair)
 {
     collisionPairs = colPair;
 }
@@ -85,15 +84,15 @@ smContactHandlingType smContactHandling::getContactHandlingType() const
 
 std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject() const
 { 
-	return collidingSceneObjects.first; 
+    return collidingSceneObjects.first; 
 }
 
 std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject() const
 {
-    return collidingSceneObjects.second; 
+    return collidingSceneObjects.second;
 }
 
-bool smContactHandling::isUnilateral()
+bool smContactHandling::isUnilateral() const
 {
     return !isBilateral;
 }

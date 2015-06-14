@@ -25,7 +25,7 @@
 
 smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(bool typeBilateral) : smPenaltyContactHandling(typeBilateral)
 {
-    type = SIMMEDTK_CONTACT_PENALTY_FEM_TO_STATIC;
+    type = smContactHandlingType::PENALTY_FEM_TO_STATIC;
 }
 
 smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(
@@ -34,7 +34,7 @@ smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(
                                                     const std::shared_ptr<smSceneObject>& sceneObjSecond)
                                                     : smPenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
-    type = SIMMEDTK_CONTACT_PENALTY_FEM_TO_STATIC;
+    type = smContactHandlingType::PENALTY_FEM_TO_STATIC;
 }
 
 smPenaltyContactFemToStatic::~smPenaltyContactFemToStatic()

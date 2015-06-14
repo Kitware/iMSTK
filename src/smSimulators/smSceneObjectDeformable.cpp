@@ -24,7 +24,7 @@
 // SimMedTK includes
 #include "smSimulators/smSceneObjectDeformable.h"
 
-smSceneObjectDeformable::smSceneObjectDeformable() : smSceneObject()
+smSceneObjectDeformable::smSceneObjectDeformable()
 {
     topologyAltered = false;
     pulledVertex = -1;

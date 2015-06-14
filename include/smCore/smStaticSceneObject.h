@@ -65,18 +65,12 @@ public:
     void loadInitialStates() override;
 
     /// \brief configure the static scene object using external config file (optional)
-    bool configure(smString ConfigFile) override;
-
-    /// \brief duplicate the object 
-    virtual std::shared_ptr<void> duplicateAtRuntime() override;
-
-    /// \brief duplicate the object 
-    virtual std::shared_ptr<void> duplicateAtInitialization() override;
+    bool configure(const smString ConfigFile) override;
 
     /// \brief called if the object is added to the viewer.
     virtual void draw() override;
 
-    void printInfo() override;
+    void printInfo() const override;
 
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
 

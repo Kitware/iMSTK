@@ -45,10 +45,10 @@ smVegaObjectConfig::smVegaObjectConfig()
     corotationalLinearFEM_warp = 1;
     singleStepMode = 0;
 
-    massSpringSystemSource = NONE;
-    deformableObject = UNSPECIFIED;
-    invertibleMaterial = INV_NONE;
-    solver = UNKNOWN;
+    massSpringSystemSource = massSpringSystemSourceType::NONE;
+    deformableObject = deformableObjectType::UNSPECIFIED;
+    invertibleMaterial = invertibleMaterialType::INV_NONE;
+    solver = timeIntegrationType::UNKNOWN;
 }
 
 void smVegaObjectConfig::setSyncTimeStepWithGraphics(const bool syncOrNot)
@@ -60,10 +60,10 @@ smVegaObjectConfig::~smVegaObjectConfig()
 {
 }
 
-void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilename)
+void smVegaObjectConfig::setFemObjConfuguration(const smString ConfigFilename, const bool printVerbose)
 {
 
-    printf("VEGA: Parsing configuration file %s...\n", ConfigFilename.c_str());
+    std::cout << "VEGA: Parsing configuration file" << ConfigFilename.c_str()  << "...\n";
     ConfigFile configFile;
 
     // specify the entries of the config file
@@ -88,7 +88,7 @@ void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilenam
     // this is now obsolete, but preserved for backward compatibility, use "solver" below
     configFile.addOptionOptional("implicitSolverMethod", implicitSolverMethod, "none");
     configFile.addOptionOptional("solver", solverMethod, "implicitNewmark");
-    
+
     configFile.addOptionOptional("centralDifferencesTangentialDampingUpdateMode", 
                                 &centralDifferencesTangentialDampingUpdateMode,
                                 centralDifferencesTangentialDampingUpdateMode);
@@ -156,56 +156,59 @@ void smVegaObjectConfig::setFemObjConfuguration(const std::string &ConfigFilenam
     // parse the configuration file
     if (configFile.parseOptions((char *)ConfigFilename.c_str()) != 0)
     {
-        printf("VEGA: Error parsing options.\n");
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! parsing options.\n";
     }
 
     // the config variables have now been loaded with their specified values
     // informatively print the variables (with assigned values) that were just parsed
-    configFile.printOptions();
+    if (printVerbose)
+    {
+        configFile.printOptions();
+    }
 
     // set the solver based on config file input
-    solver = UNKNOWN;
+    solver = timeIntegrationType::UNKNOWN;
 
     if (strcmp(implicitSolverMethod, "implicitNewmark") == 0)
     {
-        solver = IMPLICITNEWMARK;
+        solver = timeIntegrationType::IMPLICITNEWMARK;
     }
 
     if (strcmp(implicitSolverMethod, "implicitBackwardEuler") == 0)
     {
-        solver = IMPLICITBACKWARDEULER;
+        solver = timeIntegrationType::IMPLICITBACKWARDEULER;
     }
 
     if (strcmp(solverMethod, "implicitNewmark") == 0)
     {
-        solver = IMPLICITNEWMARK;
+        solver = timeIntegrationType::IMPLICITNEWMARK;
     }
 
     if (strcmp(solverMethod, "implicitBackwardEuler") == 0)
     {
-        solver = IMPLICITBACKWARDEULER;
+        solver = timeIntegrationType::IMPLICITBACKWARDEULER;
     }
 
     if (strcmp(solverMethod, "Euler") == 0)
     {
-        solver = EULER;
+        solver = timeIntegrationType::EULER;
     }
 
     if (strcmp(solverMethod, "symplecticEuler") == 0)
     {
-        solver = SYMPLECTICEULER;
+        solver = timeIntegrationType::SYMPLECTICEULER;
     }
 
     if (strcmp(solverMethod, "centralDifferences") == 0)
     {
-        solver = CENTRALDIFFERENCES;
+        solver = timeIntegrationType::CENTRALDIFFERENCES;
     }
 
-    if (solver == UNKNOWN)
+    if (solver == timeIntegrationType::UNKNOWN)
     {
-        printf("VEGA Error: unknown implicit solver specified.\n");
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! unknown implicit solver specified.\n";
     }
 }
 
@@ -229,8 +232,8 @@ void smVegaPerformanceCounter::initialize()
     systemSolveHead = 0;
 
     fpsBufferSize = 5; ///< buffer size to display fps
-    forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-    systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
+    forceAssemblyBufferSize = 50;
+    systemSolveBufferSize = 50;
 }
 
 void smVegaPerformanceCounter::clearFpsBuffer()

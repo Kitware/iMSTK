@@ -38,7 +38,7 @@ class smSceneObjectDeformable : public smSceneObject
 public:
 
     /// \brief Constructor
-	smSceneObjectDeformable();
+    smSceneObjectDeformable();
 
     /// \brief Destructor
     ~smSceneObjectDeformable();

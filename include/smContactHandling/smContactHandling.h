@@ -35,10 +35,10 @@
 class smMesh;
 class smCollisionPair;
 
-enum smContactHandlingType
+enum class smContactHandlingType
 {
-	SIMMEDTK_CONTACT_PENALTY_FEM_TO_STATIC,
-	SIMMEDTK_CONTACT_UNKNOWN
+    PENALTY_FEM_TO_STATIC,
+    UNKNOWN
 };
 
 /// \brief Base class to for handling contact for collision response
@@ -47,25 +47,25 @@ enum smContactHandlingType
 class smContactHandling: public smCoreClass
 {
 public:
-    
-    smContactHandling(bool typeBilateral);
 
-    smContactHandling(bool typeBilateral,
-                      const std::shared_ptr<smSceneObject>& sceneObjFirst,
-                      const std::shared_ptr<smSceneObject>& sceneObjSecond);
+    smContactHandling(const bool typeBilateral);
 
-    ~smContactHandling();
+    smContactHandling(const bool typeBilateral,
+                      const std::shared_ptr<smSceneObject> sceneObjFirst,
+                      const std::shared_ptr<smSceneObject> sceneObjSecond);
+
+    virtual ~smContactHandling();
 
     /// \brief returns true if bilateral
-    bool isUnilateral();
+    bool isUnilateral() const;
 
     /// \brief Set the scene objects that are colliding
-    void setSceneObjects(const std::shared_ptr< smSceneObject >& first,
-                         const std::shared_ptr< smSceneObject >& second);
+    void setSceneObjects(const std::shared_ptr< smSceneObject > first,
+                         const std::shared_ptr< smSceneObject > second);
 
     /// \brief Set the collision pair data structure in which the information
     /// needs to be stored
-    void setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair);
+    void setCollisionPairs(const std::shared_ptr< smCollisionPair > colPair);
 
     /// \brief Get the colliison information contained in the collision pairs
     std::shared_ptr<smCollisionPair> getCollisionPairs() const;
@@ -74,10 +74,10 @@ public:
     smContactHandlingType getContactHandlingType() const;
 
     /// \brief Get the first scene object
-	std::shared_ptr<smSceneObject> getFirstSceneObject() const;
-	
+    std::shared_ptr<smSceneObject> getFirstSceneObject() const;
+
     /// \brief Get the second scene object
-	std::shared_ptr<smSceneObject> getSecondSceneObject() const;
+    std::shared_ptr<smSceneObject> getSecondSceneObject() const;
 
     /// \brief Implementation of how the contacts between colliding 
     /// objects is resolved

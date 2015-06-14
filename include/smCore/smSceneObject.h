@@ -71,12 +71,6 @@ public:
     /// \brief Load the initial posiitons, velocities etc.,
     virtual void loadInitialStates() = 0;
 
-    /// \brief duplicate the object 
-    virtual std::shared_ptr<void> duplicateAtRuntime() = 0;
-
-    /// \brief duplicate the object 
-    virtual std::shared_ptr<void> duplicateAtInitialization() = 0;
-
     /// \brief attach simulator to the object. 
     /// This function that needs to be called to associate the simulator to the object
     virtual void attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim);
@@ -125,7 +119,7 @@ public:
     virtual std::shared_ptr<smSceneObject> clone() = 0;
 
     /// \brief print information related the scene object
-    virtual void printInfo() = 0;
+    virtual void printInfo() const = 0;
 
 protected:
     bool isActive;
