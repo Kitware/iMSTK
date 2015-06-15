@@ -21,7 +21,7 @@
 #
 
 set(GLEW_TAG "e1f9e4702fe7cf9f5babb50c21fcf5a4860f2844")
-set(GLEW_REPOSITORY git@bitbucket.org:simmedtk/glew.git)
+set(GLEW_REPOSITORY git@gitlab.kitware.com:SimMedTK/Glew.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
