@@ -106,9 +106,7 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
         }
 
         //apply displacements
-        camera->setPos(camera->getPos() + dispVec);
-        camera->setFocus(camera->getFocus() + dispVec);
-        camera->genViewMat();
+        camera->pan(dispVec);
     }
 }
 

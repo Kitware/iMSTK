@@ -23,6 +23,7 @@
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
+#include "../common/pzrMouseCameraController.h"
 
 #include <memory>
 
@@ -40,7 +41,7 @@ int main()
     std::shared_ptr<smStaticSceneObject> cube;
     std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
-
+    std::shared_ptr<smtk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
     //Create an instance of the SimMedTK framework/SDK
     sdk = smSDK::getInstance();
 
@@ -54,6 +55,7 @@ int main()
     //Create the camera controller
     camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+    pzrCamCtl = std::make_shared<smtk::Examples::Common::pzrMouseCameraController>();
 
     auto cubeModel = std::make_shared<smMeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
@@ -93,10 +95,13 @@ int main()
     sceneCamera->genViewMat();
     scene1->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
+    pzrCamCtl->setCamera(sceneCamera);
 
     //Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
     viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(smtk::Event::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(smtk::Event::EventType::MouseButton, pzrCamCtl);
 
     //run the framework
     sdk->run();

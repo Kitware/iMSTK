@@ -30,6 +30,7 @@
 
 /// STL icludes
 #include <memory>
+#include <mutex>
 
 /// \brief A simple camera class to calculate view and projection matrices
 ///
@@ -42,31 +43,114 @@ public:
     smCamera();
 
     //View settings
-    void setPos(float x, float y, float z);
+    /// \brief Set the position of the camera
+    ///
+    /// \param x The position on the X axis in 3D space
+    /// \param y The position on the Y axis in 3D space
+    /// \param z The position on the Z axis in 3D space
+    void setPos(const float x, const float y, const float z);
+
+    /// \brief Set the position of the camera
+    ///
+    /// \param v 3 Dimensional vector describing the position of the camera
     void setPos(const smVec3f& v);
+
+    /// \brief Get the position of the camera
+    ///
+    /// \return 3 Dimensional vector containing the position of the camera
     smVec3f getPos();
-    void setFocus(float x, float y, float z);
+
+    /// \brief Set the focal point of the camera
+    ///
+    /// \param x The position on the X axis in 3D space
+    /// \param y The position on the Y axis in 3D space
+    /// \param z The position on the Z axis in 3D space
+    void setFocus(const float x, const float y, const float z);
+
+    /// \brief Set the focal point of the camera
+    ///
+    /// \param v 3 Dimensional vector describing the focal point of the camera
     void setFocus(const smVec3f& v);
+
+    /// \brief Get the focal point of the camera
+    ///
+    /// \return 3 Dimensional vector containing the focal point of the camera
     smVec3f getFocus();
+
+    /// \brief Get the up direction of the camera
+    ///
+    /// \return 3 Dimensional vector containing the up direction of the camera
     smVec3f getUpVec();
+
+    /// \brief Get the direction the camera is facing
+    ///
+    /// \return 3 Dimensional vector containing the direction of the camera
     smVec3f getDirection();
 
     //Projection settings
+    /// \brief Set the aspect ratio of the camera
+    ///
+    /// \detail It may be wise to set this the same as your window/screen size.
+    /// However, it does not have to be the same.
+    ///
+    /// \param ar The new aspect ratio of the camera
     void setAspectRatio(const float ar);
+
+    /// \brief Get the aspect ratio of the camera
+    ///
+    /// \return The aspect ratio of the camera
     float getAspectRatio();
+
+    /// \brief Set the vertical view angle of the camera
+    ///
+    /// \param a The angle to set the view angle of the camera in radians
     void setViewAngle(const float a);
+
+    /// \brief Get the vertical view angle of the camera
+    ///
+    /// \return The view angle of the camera in radians
     float getViewAngle();
+
+    /// \brief Set the vertical view angle of the camera
+    ///
+    /// \param a The angle to set the view angle of the camera in degrees
     void setViewAngleDeg(const float a);
+
+    /// \brief Get the vertical view angle of the camera
+    ///
+    /// \return The view angle of the camera in degrees
     float getViewAngleDeg();
+
+    /// \brief Set the clipping distance for objects near to the camera
+    ///
+    /// \param d The distance an object can be near to the camera before it is
+    /// clipped from view
     void setNearClipDist(const float d);
+
+    /// \brief Get the near clipping distance of the camera
+    ///
+    /// \return The near clipping distance
     float getNearClipDist();
+
+    /// \brief Set the clipping distance for objects too far from the camera
+    ///
+    /// \param d The distance an object can be from the camera before it is
+    /// clipped from view
     void setFarClipDist(const float d);
+
+    /// \brief Get the far clipping distance of the camera
+    ///
+    /// \return The far clipping distance
     float getFarClipDist();
 
-    //Set Matrix data
-    void setViewMat(const smMatrix44f &m);
-    void setProjMat(const smMatrix44f &m);
+    /// \brief Returns the internal view matrix for the camera
+    ///
+    /// \return A 4 by 4 matrix containing the view matrix of the camera
     smMatrix44f getViewMat();
+
+    /// \brief Returns the internal projection matrix for the camera
+    ///
+    /// \return A 4 by 4 matrix containing the projection matrix of the camera
     smMatrix44f getProjMat();
 
     /// \brief Pan the camera view
@@ -89,19 +173,13 @@ public:
     ///
     /// \param angle The angle in radians to rotate
     /// \param axis The axis to rotate about
-    void rotateLocal(float angle, smVec3f axis);
+    void rotateLocal(const float angle, const smVec3f axis);
 
     /// \brief Rotates about an arbitrary axis in focus point coordinates
     ///
     /// \param angle The angle in radians to rotate
     /// \param axis The axis to rotate about
-    void rotateFocus(float angle, smVec3f axis);
-
-    /// \brief Rotates about an arbitrary axis in global coordinates
-    ///
-    /// \param angle The angle in radians to rotate
-    /// \param axis The axis to rotate about
-    void rotateGlobal(float angle, smVec3f axis);
+    void rotateFocus(const float angle, const smVec3f axis);
 
     /// \brief Rotates about the camera's local X axis
     ///
@@ -110,14 +188,14 @@ public:
     /// point and the camera UP vector
     ///
     /// \param angle The angle in radians to rotate
-    void rotateLocalX(float angle);
+    void rotateLocalX(const float angle);
 
     /// \brief Rotates about the camera local Y axis
     ///
     /// \detail The camera local Y axis is interpreted as the camera UP vector
     ///
     /// \param angle The angle in radians to rotate
-    void rotateLocalY(float angle);
+    void rotateLocalY(const float angle);
 
     /// \brief Rotates about the camera local Z axis
     ///
@@ -125,7 +203,7 @@ public:
     /// vector from the camera focal point to the camera position
     ///
     /// \param angle The angle in radians to rotate
-    void rotateLocalZ(float angle);
+    void rotateLocalZ(const float angle);
 
     /// \brief Rotates about the camera focal point X axis
     ///
@@ -134,7 +212,7 @@ public:
     /// focal point and the camera UP vector
     ///
     /// \param angle The angle in radians to rotate
-    void rotateFocusX(float angle);
+    void rotateFocusX(const float angle);
 
     /// \brief Rotates about the camera focal point Y axis
     ///
@@ -142,7 +220,7 @@ public:
     /// (but above the focal point)
     ///
     /// \param angle The angle in radians to rotate
-    void rotateFocusY(float angle);
+    void rotateFocusY(const float angle);
 
     /// \brief Rotates about the camera focal point Z axis
     ///
@@ -150,27 +228,29 @@ public:
     /// vector from the camera focal point to the camera position
     ///
     /// \param angle The angle in radians to rotate
-    void rotateFocusZ(float angle);
+    void rotateFocusZ(const float angle);
 
-    /// \brief Rotates about the global X axis
+    /// \brief Creates a view matrix for use with OpenGL
     ///
-    /// \param angle The angle in radians to rotate
-    void rotateGlobalX(float angle);
-
-    /// \brief Rotates about the global Y axis
+    /// \param pos Position of the camera
+    /// \param fp Focal point of the camera
+    /// \param up Upward facing direction of the camera
     ///
-    /// \param angle The angle in radians to rotate
-    void rotateGlobalY(float angle);
+    /// \return A 4 by 4 matrix containing the view matrix
+    smMatrix44f lookAt(const smVec3f pos,
+                       const smVec3f fp,
+                       const smVec3f up);
 
-    /// \brief Rotates about the global Z axis
+    /// \brief Creates a perspective matrix for use with OpenGL
     ///
-    /// \param angle The angle in radians to rotate
-    void rotateGlobalZ(float angle);
-
-    smMatrix44f lookAt(const smVec3f& pos,
-                      const smVec3f& fp,
-                      const smVec3f& up);
-    smMatrix44f perspective(float fovy, float ar, float zNear, float zFar);
+    /// \param fovy Field of view in the Y direction
+    /// \param ar Aspect ratio
+    /// \param zNear The near clipping distance
+    /// \param zFar The far clipping distance
+    ///
+    /// \return A 4 by 4 matrix containing the perspective matrix
+    smMatrix44f perspective(const float fovy, const float ar,
+                            const float zNear, const float zFar);
 
     //Create matrices
     /// \brief Generates the view matrix
@@ -187,45 +267,78 @@ public:
     /// up access time to the matrix after modifications to affecting variables
     void genProjMat();
 
+    /// \brief Creates a default camera
+    ///
+    /// \detail Default settings are(not including constructor settings:
+    /// aspect ratio = (800/640),
+    /// far clipping distance = 1000,
+    /// near clipping distance = 0.001, and
+    /// position 10 units +Z away from origin(0, 0, 10)
+    ///
+    /// \return The shared_ptr containing the address of the allocated camera
     static std::shared_ptr<smCamera> getDefaultCamera()
     {
         std::shared_ptr<smCamera> defaultCamera = std::make_shared<smCamera>();
         defaultCamera->setAspectRatio(800.0 / 640.0); //Doesn't have to match screen resolution
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);
-        defaultCamera->setViewAngle(0.785398f); //45 degrees
         defaultCamera->setPos(0, 0, 10);
-        defaultCamera->viewDirty = true;
-        defaultCamera->projDirty = true;
         return defaultCamera;
     }
 
 private:
     //View matrix variables
     smVec3f pos; ///< position of the camera
+    std::mutex posLock; //< Controls access to the pos variable
     smVec3f fp; ///< focal point of the camera
-    smVec3f up; ///< the up direction for the camera
+    std::mutex fpLock; //< Controls access to the fp variable
     smQuaternionf orientation; ///< orientation of the camera
+    std::mutex orientationLock; //< Controls access to the orientation variable
+    smMatrix44f view; ///< View matrix for OpenGL
+    std::mutex viewLock; //< Controls access to the view variable
+    std::atomic_bool viewDirty; ///< True if view variables have been updated
+    std::atomic_bool orientDirty; ///< True if orientation needs to be recalculated
 
     //Projection matrix variables
-    float ar; ///< aspect ratio
-    float angle; ///< angle in radians
-    float nearClip; ///< near clipping distance
-    float farClip; ///< far clipping distance
-
-    //functional matrices
-    smMatrix44f view; ///< View matrix for OpenGL
+    std::atomic<float> ar; ///< aspect ratio
+    std::atomic<float> angle; ///< angle in radians
+    std::atomic<float> nearClip; ///< near clipping distance
+    std::atomic<float> farClip; ///< far clipping distance
     smMatrix44f proj; ///< Projection matrix for OpenGL
+    std::mutex projLock; //< Controls access to the proj variable
+    std::atomic_bool projDirty; ///< True if projection variables have been updated
 
-    bool viewDirty; ///< True if view variables have been updated
-    bool projDirty; ///< True if projection variables have been updated
-    bool orientDirty; ///< True if orientation needs to be recalculated
+    /// \brief Replace the internal view matrix of the camera
+    ///
+    /// \detail Beware: This might break things, other internal data is not
+    /// updated also
+    ///
+    /// \param m The new view matrix of the camera
+    void setViewMat(const smMatrix44f &m);
 
-    void setUpVec(float x, float y, float z);
-    void setUpVec(const smVec3f& v);
+    /// \brief Replace the internal projection matrix of the camera
+    ///
+    /// \detail Beware: This might break things, other internal data is not
+    /// updated also
+    ///
+    /// \param m The new projection matrix of the camera
+    void setProjMat(const smMatrix44f &m);
 
+    /// \brief Sets the orientation  of the camera from a given direction
+    ///
+    /// \detail Generally used to orient the camera toward the focal point
+    ///
+    /// \param d Directional vector to orient the camera with
     void setOrientFromDir(const smVec3f d);
+
+    /// \brief Replaces the internal quaternion with the one provided
+    ///
+    /// \param q New internal orientation quaternion
     void setOrientation(const smQuaternionf q);
+
+    /// \brief Returns the orientation of the camera
+    ///
+    /// \return The orientation of the camera as a quaternion
     smQuaternionf getOrientation();
 };
 

@@ -30,6 +30,8 @@ EventType smEvent::EventName = EventType::None;
 
 smEvent::smEvent(): priority(EventPriority::Normal), sender(EventSender::Other), enabled(true) {}
 
+smEvent::~smEvent() {}
+
 void smEvent::setPriority(const EventPriority& eventPriority)
 {
     this->priority = eventPriority;

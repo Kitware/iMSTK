@@ -498,15 +498,15 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::MouseButtonPressed:
     case sf::Event::MouseButtonReleased:
     {
-        smMouseButton mouseButton;
+        smtk::Event::smMouseButton mouseButton;
         if (sf::Mouse::Left == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Left;
+            mouseButton = smtk::Event::smMouseButton::Left;
         else if (sf::Mouse::Right == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Right;
+            mouseButton = smtk::Event::smMouseButton::Right;
         else if (sf::Mouse::Middle == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Middle;
+            mouseButton = smtk::Event::smMouseButton::Middle;
         else
-            mouseButton = smMouseButton::Unknown;
+            mouseButton = smtk::Event::smMouseButton::Unknown;
 
         auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
         mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
@@ -519,7 +519,6 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
         auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
         mouseEvent->setSender(smtk::Event::EventSender::Module);
         mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
-
         eventHandler->triggerEvent(mouseEvent);
         break;
     }

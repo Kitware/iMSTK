@@ -38,7 +38,7 @@ void smMouseButtonEvent::setPresed(const bool& press)
 {
     this->pressed = press;
 }
-const bool& smMouseButtonEvent::getPresed()
+const bool& smMouseButtonEvent::getPressed()
 {
     return this->pressed;
 }

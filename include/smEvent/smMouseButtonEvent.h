@@ -26,7 +26,6 @@
 
 // SimMedTK includes
 #include "smEvent/smEvent.h"
-#include "smCore/smMouse.h"
 #include "smUtilities/smVector.h"
 
 namespace smtk {
@@ -55,7 +54,7 @@ public:
 
     void setPresed(const bool &press);
 
-    const bool &getPresed();
+    const bool &getPressed();
 
     const bool &togglePressed();
 

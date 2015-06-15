@@ -81,6 +81,7 @@ public:
 
 public:
     smEvent();
+    virtual ~smEvent();
 
     void setPriority(const EventPriority &eventPriority);
 
