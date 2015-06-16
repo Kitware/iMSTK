@@ -44,15 +44,15 @@ smPenaltyContactFemToStatic::~smPenaltyContactFemToStatic()
 void smPenaltyContactFemToStatic::computeUnilateralContactForces()
 {
     int penetratedNode, nodeDofID;
-    const double stiffness = 1.0e5, damping = 2000.0;
+    const double stiffness = 1.0e6, damping = 1.0e5;
     smVec3d velocityProjection;
 
     std::vector<std::shared_ptr<smContact>> contactInfo = this->getCollisionPairs()->getContacts();
 
-    if (this->getFirstSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT
-        && this->getSecondSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
+    if (this->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT
+        && this->getFirstSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
     {
-        auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(this->getFirstSceneObject());
+        auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(this->getSecondSceneObject());
 
         femSceneObject->setContactForcesToZero();
         smVec3d force;
@@ -62,13 +62,11 @@ void smPenaltyContactFemToStatic::computeUnilateralContactForces()
             velocityProjection = femSceneObject->getVelocityOfNodeWithDofID(nodeDofID);
             velocityProjection = contactInfo[i]->normal.dot(velocityProjection) * contactInfo[i]->normal;
 
-            force = stiffness * contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
+            force = stiffness * -contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
 
             femSceneObject->setContactForceOfNodeWithDofID(nodeDofID, force);
 
         }
-
-        femSceneObject->applyContactForces();
     }
     else
     {

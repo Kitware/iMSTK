@@ -108,6 +108,12 @@ public:
     /// Should be moved to base class in near future
     void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
 
+    /// \brief get the primary surface mesh
+    std::shared_ptr<smSurfaceMesh> getPrimarySurfaceMesh() const;
+
+    /// \brief get the secondary surface mesh
+    std::shared_ptr<smSurfaceMesh> getSecondarySurfaceMesh() const;
+
     /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
     ///  vertices interacted with, ground plane etc.
     virtual void draw() override;

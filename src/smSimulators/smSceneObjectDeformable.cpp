@@ -115,3 +115,13 @@ void smSceneObjectDeformable::draw()
 {
     primarySurfaceMesh->draw();
 }
+
+std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getPrimarySurfaceMesh() const
+{
+    return primarySurfaceMesh;
+}
+
+std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getSecondarySurfaceMesh() const
+{
+    return secondarySurfaceMesh;
+}

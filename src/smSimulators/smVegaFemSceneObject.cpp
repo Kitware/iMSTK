@@ -53,7 +53,9 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
 
     importAndUpdateVolumeMeshToSmtk = false;
 
-    type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+
+    this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
     ConfigFileName = ConfigFile;
 
@@ -781,7 +783,7 @@ void smVegaFemSceneObject::advanceDynamics()
         applyUserInteractionForces();
 
         // apply pre-defined external forces
-        applyScriptedExternalForces();
+        //applyScriptedExternalForces();
 
         // apply external forces arising from contact
         applyContactForces();

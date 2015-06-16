@@ -87,6 +87,16 @@ public:
     ///
     void setTransform(const RigidTransformType &t);
 
+    ///
+    /// @brief Set transformation operator
+    ///
+    void setPlaneModel(const std::shared_ptr<smPlane> &p);
+
+    ///
+    /// @brief Set transformation operator
+    ///
+    std::shared_ptr<smPlane> getPlaneModel() const;
+
 protected:
     // Plane data and transform
     std::shared_ptr<smPlane> plane;

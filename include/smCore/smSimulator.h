@@ -73,6 +73,8 @@ public:
 
     void registerCollisionDetection(std::shared_ptr<smCollisionDetection> p_collisionDetection);
 
+    void registerContactHandling(std::shared_ptr<smContactHandling> p_contactHandling);
+
     ///Registration of the Simulation main. It is called in each and every frame
     void registerSimulationMain(std::shared_ptr<smSimulationMain> p_main);
 
