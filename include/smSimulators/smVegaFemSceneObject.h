@@ -62,6 +62,8 @@
 #include "tetMesh.h"
 #include "volumetricMesh.h"
 #include "volumetricMeshLoader.h"
+#include "generateSurfaceMesh.h"
+#include "generateMassMatrix.h"
 
 /// \brief Base class for any scene object that is defmormable
 /// and uses FE formulation to compute the evolution of configuration
