@@ -227,6 +227,8 @@ private:
     int* interpolationVertices;
     double* interpolationWeights;
 
+    std::shared_ptr<LinearSolver> linearSolver;
+
     // Vega surface meshes
     std::shared_ptr<smVegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
     std::shared_ptr<smVegaSceneObjectDeformable> vegaSecondarySurfaceMesh;

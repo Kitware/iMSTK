@@ -84,8 +84,9 @@ int main()
                                                         "asianDragon/asianDragon.config");
 
     auto femObjRenderDetail = std::make_shared<smRenderDetail>(
-                                                               SIMMEDTK_RENDER_WIREFRAME |
-                                                               SIMMEDTK_RENDER_VERTICES
+                                                               SIMMEDTK_RENDER_WIREFRAME
+                                                               | SIMMEDTK_RENDER_VERTICES
+                                                               //| SIMMEDTK_RENDER_FACES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
     smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);

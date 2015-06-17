@@ -145,7 +145,7 @@ protected:
     std::vector<double> f_contact;  ///< contact forces (if any)
     std::vector<double> forceLoads; ///< discrete external load inputs
 
-    std::vector<int> fixedVertices; ///< fixed vertcies
+    int* fixedVertices; ///< fixed vertcies
 
     std::shared_ptr<smVolumeMesh> volumeMesh;
     std::shared_ptr<smSurfaceMesh> primarySurfaceMesh;

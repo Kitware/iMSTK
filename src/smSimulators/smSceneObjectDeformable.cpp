@@ -34,6 +34,7 @@ smSceneObjectDeformable::smSceneObjectDeformable()
 
 smSceneObjectDeformable::~smSceneObjectDeformable()
 {
+    delete fixedVertices;
 }
 
 void smSceneObjectDeformable::applyContactForces()
