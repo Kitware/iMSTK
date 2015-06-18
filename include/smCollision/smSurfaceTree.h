@@ -29,7 +29,7 @@
 #include <array>
 
 // SimMedTK includes
-#include "smCollision/smCollisionModel.h"
+#include "smCore/smCollisionModel.h"
 #include "smCollision/smSurfaceTreeCell.h"
 #include "smCollision/smCollisionMoller.h"
 #include "smMesh/smSurfaceMesh.h"
@@ -67,9 +67,6 @@ public:
     std::vector<CellType> initialTreeAllLevels; ///< !!
     std::vector<CellType> treeAllLevels; ///< !!
 
-    /// \brief initialize the draw function related structures
-    void initDraw() override;
-
 protected:
 
     /// \brief creates the tree based on input triangles
@@ -91,9 +88,6 @@ public:
     {
         return mesh->getUniqueId();
     }
-
-    /// \brief rendering the surface tree
-    virtual void draw() override;
 
     /// \brief !!
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;

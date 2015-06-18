@@ -3,7 +3,6 @@ add_executable(AudioExample main.cpp  AudioExample.cpp AudioExample.h)
 target_link_libraries(AudioExample
   smCore
   smRendering
-  smShader
   smMesh
   smEvent
   sfml::system

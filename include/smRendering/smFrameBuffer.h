@@ -33,7 +33,7 @@
 #include "smCore/smErrorLog.h"
 #include "smExternal/framebufferObject.h"
 #include "smExternal/renderbuffer.h"
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 
 /// \brief frame buffer attachment type; color, depth, stencil
 enum smFBOImageAttachmentType
@@ -143,7 +143,7 @@ public:
     /// \brief check status of the frame buffer. It returns ok if the frame buffer is complete
     smBool checkStatus();
     /// \brief draw framebuffer. it is for debug purposes.
-    void draw() override;
+    void draw() const override;
 };
 
 #endif

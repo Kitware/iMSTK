@@ -29,15 +29,15 @@
 #include "smCore/smStaticSceneObject.h"
 #include "smCore/smEventData.h"
 #include <GL/glew.h>
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smExternalDevices/smPhantomInterface.h"
 #include "smSimulators/smStylusObject.h"
-#include "smShader/smShader.h"
-#include "smShader/metalShader.h"
+#include "smRendering/smShader.h"
+#include "smRendering/metalShader.h"
 #include "smSimulators/smToolSimulator.h"
 #include "smSimulators/smToolSimulator.h"
 #include "smTools/curvedGrasper.h"
-#include "smShader/metalShader.h"
+#include "smRendering/metalShader.h"
 
 #include <iostream>
 #include <stack>

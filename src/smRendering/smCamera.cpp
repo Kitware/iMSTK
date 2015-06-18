@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smUtilities/smMath.h"
-#include "smUtilities/smQuaternion.h"
-#include "smUtilities/smVector.h"
+#include "smCore/smMath.h"
+#include "smCore/smQuaternion.h"
+#include "smCore/smVector.h"
 #include "smRendering/smCamera.h"
 
 smCamera::smCamera()

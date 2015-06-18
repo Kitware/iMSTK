@@ -224,8 +224,8 @@ endif()
 #-----------------------------------------------------------------------------
 # Set C/CXX Flags
 #
-set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
-set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
+set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
+set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 
 set(SimMedTK_exports
   smCore
@@ -235,10 +235,8 @@ set(SimMedTK_exports
   smGeometry
   smMesh
   smRendering
-  smShader
   smSimulators
   smTools
-  smUtilities
   smEvent)
 
 if(SimMedTK_USE_OCULUS)

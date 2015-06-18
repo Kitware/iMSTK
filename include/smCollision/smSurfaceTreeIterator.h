@@ -25,7 +25,7 @@
 #define SM_SMSURFACETREEITERATOR_H
 
 // SimMedTK includes
-#include "smCollision/smCollisionModelIterator.h"
+#include "smCore/smCollisionModelIterator.h"
 #include "smCollision/smSurfaceTree.h"
 
 /// \brief !!

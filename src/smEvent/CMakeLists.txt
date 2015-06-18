@@ -1,9 +1,7 @@
 
 simmedtk_add_library(smEvent
   SOURCES
-    smEvent.cpp
     smCameraEvent.cpp
-    smEventHandler.cpp
     smHapticEvent.cpp
     smKeyboardEvent.cpp
     smLightMotionEvent.cpp
@@ -12,9 +10,7 @@ simmedtk_add_library(smEvent
     smObjectClickedEvent.cpp
     smAudioEvent.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smEvent/smEvent.h
     ${CMAKE_SOURCE_DIR}/include/smEvent/smCameraEvent.h
-    ${CMAKE_SOURCE_DIR}/include/smEvent/smEventHandler.h
     ${CMAKE_SOURCE_DIR}/include/smEvent/smHapticEvent.h
     ${CMAKE_SOURCE_DIR}/include/smEvent/smKeyboardEvent.h
     ${CMAKE_SOURCE_DIR}/include/smEvent/smLightMotionEvent.h

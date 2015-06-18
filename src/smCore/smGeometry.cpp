@@ -25,10 +25,16 @@
 #include <limits>
 
 #include "smCore/smGeometry.h"
+#include "smCore/smRenderDelegate.h"
 
 smAABB::smAABB()
 {
     this->reset();
+    this->renderDelegate =
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smAABBRenderDelegate");
+    if (this->renderDelegate)
+      this->renderDelegate->setSourceGeometry(this);
 }
 
 smVec3d smAABB::center() const

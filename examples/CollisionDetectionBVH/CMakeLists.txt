@@ -6,7 +6,6 @@ target_link_libraries(CollisionDetectionBVH
   smEvent
   smMesh
   smRendering
-  smShader
   smSimulators
   ExamplesCommon
   )

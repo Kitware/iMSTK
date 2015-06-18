@@ -28,7 +28,7 @@
 #include <memory>
 
 #include "smCore/smSDK.h"
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smGeometry/smMeshModel.h"
 
 int main()

@@ -64,7 +64,7 @@ void smVegaFemSimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
             auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
-            
+            //std::cout << "."; std::cout.flush();
             femSceneObject->advanceDynamics();
         }
     }

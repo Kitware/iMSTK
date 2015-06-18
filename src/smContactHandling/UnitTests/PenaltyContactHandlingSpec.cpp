@@ -27,7 +27,7 @@
 
 #include "smContactHandling/smPenaltyContactFemToStatic.h"
 #include "smCollision/smPlaneCollisionModel.h"
-#include "smCollision/smCollisionPair.h"
+#include "smCore/smCollisionPair.h"
 #include "smSimulators/smVegaFemSceneObject.h"
 #include "smCore/smStaticSceneObject.h"
 

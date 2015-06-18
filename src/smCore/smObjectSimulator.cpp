@@ -25,14 +25,6 @@
 #include "smRendering/smViewer.h"
 #include "smCore/smSDK.h"
 
-void smObjectSimulator::initDraw()
-{
-}
-
-void smObjectSimulator::draw()
-{
-}
-
 smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
 {
     this->log = p_log;

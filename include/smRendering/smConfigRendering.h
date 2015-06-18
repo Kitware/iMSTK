@@ -31,6 +31,9 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
+#include "smCore/smColor.h"
+#include "smCore/smRenderDetail.h"
+
 
 class smShader;
 
@@ -61,47 +64,6 @@ enum smVBOResult
     SIMMEDTK_VBO_INVALIDOPERATION,
     SIMMEDTK_VBO_BUFFERPOINTERERROR
 };
-
-struct smColor
-{
-    union
-    {
-        smFloat rgba[4];
-        struct
-        {
-            smFloat r;
-            smFloat g;
-            smFloat b;
-            smFloat a;
-        };
-    };
-    smColor();
-    smColor(smFloat r, smFloat g, smFloat b, smFloat a = 1.0);
-
-    /// \brief Dark ratio. the valu is between 0 and 1.0
-    void darken(smFloat p_darkFactor);
-    /// \brief lighten the color
-    void lighten(smFloat p_darkFactor);
-
-    /// \brief returns the color value given with the index
-    smFloat operator()(smInt p_i);
-    /// \brief setting
-    smColor &operator=(const smColor &p_color);
-    /// \brief converts to gl color
-    smGLFloat* toGLColor();
-    const smGLFloat* toGLColor() const;
-    /// \brief set RGB color
-    void setValue(smFloat p_red, smFloat p_green, smFloat p_blue, smFloat p_alpha);
-
-    static smColor colorWhite;
-    static smColor colorBlue;
-    static smColor colorGreen;
-    static smColor colorRed;
-    static smColor colorGray;
-    static smColor colorPink;
-    static smColor colorYellow;
-};
-
 
 /// \brief renderType. this shows how the render will be done
 #define    SIMMEDTK_RENDER_TEXTURE           (1<<1)
@@ -146,106 +108,4 @@ struct smViewerDetail
     smColor backGroundColor;
 };
 
-struct smUnifiedId;
-
-
-/// \brief smRenderDetail has rendering options and features.
-///It shows how the mesh should be rendered
-struct smRenderDetail
-{
-public:
-    smRenderDetail();
-    smRenderDetail(smUInt type) : renderType(type) { normalLength = 1.0; }
-
-    /// \brief attachment of shader
-    void addShader(std::shared_ptr<smUnifiedId> p_shaderID);
-
-    /// \brief attachment of VAO
-    void addVAO(std::shared_ptr<smUnifiedId> p_shaderID);
-
-    const smColor &getColorDiffuse() const;
-
-    const smColor &getColorAmbient() const;
-
-    const smColor &getColorSpecular() const;
-
-    const smFloat &getShininess() const;
-
-    const smUInt &getRenderType() const;
-
-    const smFloat &getPointSize() const;
-
-    const smFloat &getLineSize() const;
-
-    const smColor &getNormalColor() const;
-
-    const smColor &getHighLightColor() const;
-
-    const smColor &getVertexColor() const;
-
-    const smColor &getShadowColor() const;
-
-    const smBool &getCastShadow() const;
-
-    const smBool &getCanGetShadow() const;
-
-    const smColor &getWireFrameColor() const;
-
-    const smBool &getDebugDraw() const;
-
-    const std::vector<std::shared_ptr<smUnifiedId>> &getShaders() const;
-
-    const std::vector<smBool> &getShaderEnable() const;
-
-    const std::vector<std::shared_ptr<smUnifiedId>> &getVAOs() const;
-
-    const std::vector<smBool> &getVAOEnable() const;
-
-    void setPointSize(const float size);
-
-    void setLineSize(const float size);
-
-    void setVertexColor(const smColor vertColor);
-
-    void setHighlightColor(const smColor highlightColor);
-
-    void setNormalColor(const smColor highlightColor);
-
-    void setShininess(const smFloat s);
-
-    void setNormalLength(const smFloat len);
-
-    void setDiffuseColor(const smColor diffColor);
-
-    void setAmbientColor(const smColor ambColor);
-
-    void setSpecularColor(const smColor specColor);
-
-    void setShadowColor(const smColor shadColor);
-
-    void setWireframeColor(const smColor wireColor);
-    
-public:
-    smUInt renderType; // render type
-    smColor colorDiffuse; // diffuse color
-    smColor colorAmbient; // ambient color
-    smColor colorSpecular; // specular color
-    smColor highLightColor; // highlight color
-    smColor vertexRenderColor; // vertex color
-    smColor shadowColor; // shadow color
-    smBool castShadow; // object can generate a shadow or not
-    smBool canGetShadow; // object can get the shadow or not
-    smColor normalColor; // normal color
-    smColor wireFrameColor; // wire frame color
-    smFloat pointSize; // point size if rendering of vertices are enabled
-    smFloat lineSize; // line width size
-    smFloat shininess; // specular shinness
-    smBool debugDraw; // debug draw enabled or not
-    smFloat normalLength; // length of rendered normals
-    std::vector<std::shared_ptr<smUnifiedId>> shaders; // attached shaders
-    std::vector<smBool> shaderEnable; // enable/disable any attached shader
-    std::vector<std::shared_ptr<smUnifiedId>> VAOs; // stores  VAO IDs
-    std::vector<smBool> VAOEnable; // enable/disable any attached VAO
-};
-
-#endif
+#endif // SMCONFIGRENDERING_H

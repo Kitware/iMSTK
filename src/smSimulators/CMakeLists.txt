@@ -25,6 +25,9 @@ simmedtk_add_library(smSimulators
 target_link_libraries(smSimulators
   PRIVATE
     smCore
+    smMesh
+    smEvent
+    smCollision
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts

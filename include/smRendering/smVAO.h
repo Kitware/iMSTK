@@ -33,11 +33,11 @@
 #include "smCore/smCoreClass.h"
 #include "smConfigRendering.h"
 #include "smMesh/smMesh.h"
-#include "smUtilities/smGLUtils.h"
-#include "smUtilities/smUtils.h"
+#include "smRendering/smGLUtils.h"
+#include "smCore/smUtils.h"
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
-#include "smShader/smShader.h"
+#include "smRendering/smShader.h"
 
 enum smVBOBufferType
 {
@@ -91,7 +91,7 @@ public:
                                  smString p_TEXTURECOORDShaderName = "texCoords",
                                  smString p_TANGENTSName = "Tangents");
     /// \brief updates the buffer with data. It is important for meshes undergoes topology changes
-    smBool updateStreamData();
+    smBool updateStreamData() const;
 
     static void initVAOs();
 
@@ -102,13 +102,13 @@ public:
     static std::shared_ptr<smVAO> getVAO(std::shared_ptr<smUnifiedId> p_shaderID);
 
     /// \brief  enable the vertex array object
-    void enable();
+    void enable() const;
 
     /// \brief disable VAO
-    void disable();
+    void disable() const;
 
     /// \brief draw VAO
-    void draw() override;
+    void draw() const override;
 
     /// \brief constructor
     ~smVAO();

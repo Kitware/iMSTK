@@ -25,7 +25,7 @@
 
 #include "smRendering/smOculusViewer.h"
 #include "smRendering/smGLRenderer.h"
-#include "smUtilities/smQuaternion.h"
+#include "smCore/smQuaternion.h"
 
 #ifdef _WIN32 || WIN32
     #define OVR_OS_WIN32

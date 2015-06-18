@@ -33,10 +33,9 @@
 // SimMedTK includes
 #include "smCore/smModule.h"
 #include "smCore/smObjectSimulator.h"
-#include "smUtilities/smMakeUnique.h"
-#include "smUtilities/smMakeUnique.h"
-#include "smCollision/smCollisionDetection.h"
-#include "smContactHandling/smContactHandling.h"
+#include "smCore/smMakeUnique.h"
+#include "smCore/smCollisionDetection.h"
+#include "smCore/smContactHandling.h"
 
 struct smSimulationMainParam
 {

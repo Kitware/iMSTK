@@ -43,7 +43,11 @@
 #include <iostream>
 #include <cstdint>
 #include <GL/glew.h>
-#include <GL/gl.h> // for GLfloat, etc.
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
 
 /// \brief opengl rendering version
 #define SIMMEDTK_RENDERER_OPENGL    1.0

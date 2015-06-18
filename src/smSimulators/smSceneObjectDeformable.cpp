@@ -23,6 +23,7 @@
 
 // SimMedTK includes
 #include "smSimulators/smSceneObjectDeformable.h"
+#include "smCore/smFactory.h"
 
 smSceneObjectDeformable::smSceneObjectDeformable() :
     renderSecondaryMesh(false),
@@ -31,6 +32,9 @@ smSceneObjectDeformable::smSceneObjectDeformable() :
     timestepCounter(0),
     subTimestepCounter(0)
 {
+  this->setRenderDelegate(
+    smFactory<smRenderDelegate>::createSubclass(
+      "smRenderDelegate", "smSceneObjectDeformableRenderDelegate"));
 }
 
 smSceneObjectDeformable::~smSceneObjectDeformable()
@@ -132,18 +136,6 @@ void smSceneObjectDeformable::setRenderSecondaryMesh()
 void smSceneObjectDeformable::setRenderPrimaryMesh()
 {
     renderSecondaryMesh = false;
-}
-
-void smSceneObjectDeformable::draw()
-{
-    if (secondarySurfaceMesh != nullptr && renderSecondaryMesh)
-    {
-        secondarySurfaceMesh->draw();
-    }
-    else
-    {
-        primarySurfaceMesh->draw();
-    }
 }
 
 std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getPrimarySurfaceMesh() const

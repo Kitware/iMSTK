@@ -25,9 +25,9 @@
 #define SMCAMERAEVENT_H
 
 // SimMedTK includes
-#include "smEvent/smEvent.h"
-#include "smUtilities/smVector.h"
-#include "smUtilities/smQuaternion.h"
+#include "smCore/smEvent.h"
+#include "smCore/smVector.h"
+#include "smCore/smQuaternion.h"
 
 namespace smtk {
 namespace Event {

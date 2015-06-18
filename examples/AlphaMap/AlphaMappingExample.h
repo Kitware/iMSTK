@@ -32,8 +32,8 @@
 #include "smCore/smSceneObject.h"
 #include "smSimulators/smDummySimulator.h"
 #include "smExternalDevices/smPhantomInterface.h"
-#include "smUtilities/smMotionTransformer.h"
-#include "smShader/metalShader.h"
+#include "smCore/smMotionTransformer.h"
+#include "smRendering/metalShader.h"
 
 
 class AlphaMapExample: public smSimulationMain, public smCoreClass

@@ -26,7 +26,7 @@
 
 // SimMedTK includes
 #include "smCore/smCoreClass.h"
-#include "smEvent/smEventHandler.h"
+#include "smCore/smEventHandler.h"
 #include "smEvent/smAudioEvent.h"
 #include "smEvent/smCameraEvent.h"
 #include "smEvent/smHapticEvent.h"

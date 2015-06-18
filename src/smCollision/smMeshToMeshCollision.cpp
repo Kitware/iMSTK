@@ -22,9 +22,9 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
+#include "smCore/smCollisionPair.h"
 #include "smCollision/smMeshToMeshCollision.h"
 #include "smCollision/smCollisionMoller.h"
-#include "smCollision/smCollisionPair.h"
 #include "smCollision/smMeshCollisionModel.h"
 
 // STL includes

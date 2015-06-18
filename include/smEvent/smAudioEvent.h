@@ -28,7 +28,7 @@
 #include <string>
 
 // SimMedTK includes
-#include "smEvent/smEvent.h"
+#include "smCore/smEvent.h"
 
 namespace smtk {
 namespace Event {

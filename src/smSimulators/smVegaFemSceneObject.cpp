@@ -23,6 +23,8 @@
 
 // SimMedTK includes
 #include "smSimulators/smVegaFemSceneObject.h"
+#include "smCore/smFactory.h"
+#include "smCore/smRenderDelegate.h"
 
 smVegaFemSceneObject::smVegaFemSceneObject() :
     staticSolver(0),
@@ -36,6 +38,10 @@ smVegaFemSceneObject::smVegaFemSceneObject() :
     this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
+
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smSceneObjectDeformableRenderDelegate"));
 }
 
 smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log,
@@ -51,6 +57,12 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
     this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
+
+    // Create the default delegate before configuration so it
+    // can be overridden.
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smSceneObjectDeformableRenderDelegate"));
 
     ConfigFileName = ConfigFile;
 

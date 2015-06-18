@@ -3,7 +3,7 @@ add_executable(renderCube main.cpp)
 target_link_libraries(renderCube
   smCore
   smRendering
-  smShader
+  smRenderDelegates
   smMesh
   smEvent
   smCollision

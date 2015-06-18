@@ -25,7 +25,7 @@
 #define SMKEYBOARDEVENT_H
 
 // SimMedTK includes
-#include "smEvent/smEvent.h"
+#include "smCore/smEvent.h"
 #include "smEvent/smKey.h"
 
 namespace smtk {

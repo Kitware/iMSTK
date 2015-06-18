@@ -3,7 +3,6 @@ add_executable(CollisionDetectionSpatialHashing main.cpp CollisionDetectionSpati
 target_link_libraries(CollisionDetectionSpatialHashing
   smCore
   smRendering
-  smShader
   smMesh
   smSimulators
   smCollision

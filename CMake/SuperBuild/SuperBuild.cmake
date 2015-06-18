@@ -181,6 +181,11 @@ ExternalProject_Add(${proj}
     -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}
+    # Specify Eigen3's superbuild directory manually or FindEigen3
+    # may find a framework bundle on OS X in /Library/Frameworks
+    # that does not follow the directory convention FindEigen3 expects:
+    -DEIGEN3_INCLUDE_DIR:PATH=${SimMedTK_BINARY_DIR}/SuperBuild/Eigen
+    -DVegaFEM_DIR:PATH=${ep_install_dir}/lib/cmake/VegaFEM
     -DSimMedTK_C_FLAGS:STRING=${SimMedTK_C_FLAGS}
     -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
     -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}

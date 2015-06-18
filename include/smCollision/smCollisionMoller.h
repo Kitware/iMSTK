@@ -27,7 +27,7 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smGeometry.h"
-#include "smUtilities/smVector.h"
+#include "smCore/smVector.h"
 
 /// \brief Collision utililites
 class smCollisionMoller

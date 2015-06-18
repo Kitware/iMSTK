@@ -25,7 +25,7 @@
 
 #include "smEvent/smMouseButtonEvent.h"
 #include "smEvent/smMouseMoveEvent.h"
-#include "smUtilities/smMath.h"
+#include "smCore/smMath.h"
 
 namespace smtk {
 namespace Examples {

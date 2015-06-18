@@ -27,8 +27,8 @@
 #include "../common/KeyPressSDKShutdown.h"
 
 #include "smCore/smSDK.h"
-#include "smCore/smTextureManager.h"
-#include "smCollision/smCollisionPair.h"
+#include "smRendering/smTextureManager.h"
+#include "smCore/smCollisionPair.h"
 #include "smCollision/smMeshCollisionModel.h"
 
 CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()

@@ -25,7 +25,6 @@ target_link_libraries(smMesh
   PRIVATE
     smCore
     smRendering
-    smCollision
   PUBLIC
     Assimp::Assimp
     VegaFEM::minivector

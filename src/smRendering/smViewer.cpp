@@ -21,20 +21,16 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
-#include "smCore/smSDK.h"
-#include "smUtilities/smIOStream.h"
+#include "smCore/smIOStream.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
-#include "smShader/smShader.h"
-#include "smShader/smMetalShader.h"
-#include "smShader/smSceneTextureShader.h"
-#include "smUtilities/smDataStructures.h"
+#include "smRendering/smShader.h"
+#include "smCore/smDataStructures.h"
 #include "smRendering/smVBO.h"
 #include "smRendering/smVAO.h"
 #include "smExternal/tree.hh"
 
-#include "smEvent/smEventHandler.h"
+#include "smCore/smEventHandler.h"
 #include "smEvent/smKeyboardEvent.h"
 #include "smEvent/smMouseButtonEvent.h"
 #include "smEvent/smMouseMoveEvent.h"
@@ -55,50 +51,20 @@ typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 
 void smViewer::setVSync(bool sync)
 {
-    this->sfmlWindow->setVerticalSyncEnabled(sync);
-}
-
-smRenderOperation::smRenderOperation()
-{
-    fbo = nullptr;
-    scene = nullptr;
-    fboName = "";
+  this->sfmlWindow->setVerticalSyncEnabled(sync);
 }
 
 smViewer::smViewer()
 {
-    type = SIMMEDTK_SMVIEWER;
-    viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
-
-    defaultAmbientColor.setValue(0.1, 0.1, 0.1, 1.0);
-    defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
-    defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
-
-    this->log = NULL;
-    windowOutput = std::make_shared<smOpenGLWindowStream>();
-
-    this->globalAxisLength = 1.0;
-
-    unlimitedFPSEnabled = false;
-    unlimitedFPSVariableChanged = 1;
-    screenResolutionWidth = 1680;
-    screenResolutionHeight = 1050;
+  this->windowOutput = std::make_shared<smOpenGLWindowStream>();
 }
 
-///affects the framebuffer size and depth buffer size
-void smViewer::setScreenResolution(smInt p_width, smInt p_height)
+void smViewer::exitViewer()
 {
-    this->screenResolutionHeight = p_height;
-    this->screenResolutionWidth = p_width;
 }
 
-void smViewer::setUnlimitedFPS(smBool p_enableFPS)
-{
-    unlimitedFPSEnabled = p_enableFPS;
-    unlimitedFPSVariableChanged++;
-}
-
-void smViewer::initGLCaps()
+/// \brief Initializes OpenGL capabilities and flags
+void smViewer::initRenderingCapabilities()
 {
     //use multiple fragment samples in computing the final color of a pixel
     glEnable(GL_MULTISAMPLE);
@@ -131,21 +97,7 @@ void smViewer::initGLCaps()
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, 50);
 }
 
-void smViewer::initObjects()
-{
-    for (size_t i = 0; i < objectList.size(); i++)
-    {
-        if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
-        {
-            objectList[i]->initDraw();
-        }
-        else
-        {
-            continue;
-        }
-    }
-}
-
+/// \brief Initializes FBOs, textures, shaders and VAOs
 void smViewer::initResources()
 {
     smTextureManager::initGLTextures();
@@ -155,29 +107,8 @@ void smViewer::initResources()
     initFboListItems();
 }
 
-void smViewer::initScenes()
-{
-    //traverse all the scene and the objects in the scene
-    for(auto&& scene : sceneList)
-    {
-        smSceneLocal sceneLocal;
-
-        scene->initLights();
-        scene->copySceneToLocal(sceneLocal);
-
-        for (auto sceneObject: sceneLocal.sceneObjects)
-        {
-            //initialize the custom Render if there is any
-            if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
-            {
-                sceneObject->customRender->initDraw();
-            }
-            sceneObject->initDraw();
-        }
-    }//scene traverse
-}
-
-void smViewer::initGLContext()
+/// \brief Initializes the OpenGL context, and window containing it
+void smViewer::initRenderingContext()
 {
 
     // Init OpenGL context
@@ -207,28 +138,13 @@ void smViewer::initGLContext()
     }
 }
 
-///initialization of the viewer module
-void smViewer::init()
-{
-    if (isInitialized)
-    {
-        return;
-    }
-
-    this->initGLContext();
-    this->initGLCaps();
-    this->initObjects();
-    this->initResources();
-    this->initScenes();
-
-    isInitialized = true;
-}
-
-void smViewer::destroyGLContext()
+/// \brief Cleans up after initGLContext()
+void smViewer::destroyRenderingContext()
 {
     //nothing to do
 }
 
+/// \brief render depth texture for debugging
 void smViewer::renderTextureOnView()
 {
 
@@ -259,6 +175,15 @@ void smViewer::renderTextureOnView()
     glPopAttrib();
 }
 
+/// \brief Adds an FBO to the viewer to allow rendering to it.
+///
+/// \detail The FBO will be created an initialized in the viewer.
+///
+/// \param p_fboName String to reference the FBO by
+/// \param p_colorTex A texture that will contain the fbo's color texture.
+/// \param p_depthTex A texture that will contain the fbo's depth texture.
+/// \param p_width The width of the fbo
+/// \param p_height The height of the fbo
 void smViewer::addFBO(const smString &p_fboName,
                       smTexture *p_colorTex,
                       smTexture *p_depthTex,
@@ -281,6 +206,7 @@ void smViewer::addFBO(const smString &p_fboName,
     this->fboListItems.push_back(item);
 }
 
+/// \brief Initializes the FBOs in the FBO list
 void smViewer::initFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
@@ -307,6 +233,7 @@ void smViewer::initFboListItems()
     }
 }
 
+/// \brief Destroys all the FBOs in the FBO list
 void smViewer::destroyFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
@@ -319,6 +246,7 @@ void smViewer::destroyFboListItems()
     }
 }
 
+/// \brief Processes viewerRenderDetail options
 void smViewer::processViewerOptions()
 {    
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
@@ -327,21 +255,16 @@ void smViewer::processViewerOptions()
     }
 }
 
-void smViewer::processRenderOperation(const smRenderOperation &p_rop)
+///\brief Render and then process window events until the event queue is empty.
+void smViewer::processWindowEvents()
 {
-    switch (p_rop.target)
-    {
-    case SMRENDERTARGET_SCREEN:
-        renderToScreen(p_rop);
-        break;
-    case SMRENDERTARGET_FBO:
-        renderToFBO(p_rop);
-        break;
-    default:
-        assert(0);
-    }
+  sf::Event event;
+  this->render();
+  while (this->sfmlWindow->pollEvent(event))
+    this->processSFMLEvents(event);
 }
 
+/// \brief Renders the render operation to an FBO
 void smViewer::renderToFBO(const smRenderOperation &p_rop)
 {
     assert(p_rop.fbo);
@@ -358,6 +281,7 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop)
     p_rop.fbo->disable();
 }
 
+/// \brief Renders the render operation to screen
 void smViewer::renderToScreen(const smRenderOperation &p_rop)
 {
     //Setup Viewport & Clear buffers
@@ -397,6 +321,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
     }
 }
 
+/// \brief Registers a scene for rendering with the viewer
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
                              smRenderTargetType p_target,
                              const smString &p_fboName)
@@ -418,68 +343,16 @@ void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
     renderOperations.push_back(rop);
 }
 
-inline void smViewer::setToDefaults()
+/// \brief Set the color and other viewer defaults
+void smViewer::setToDefaults()
 {
-
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor());
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor());
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, defaultAmbientColor.toGLColor());
     glColor4fv(defaultDiffuseColor.toGLColor());
 }
 
-inline void smViewer::adjustFPS()
-{
-
-    static smInt _unlimitedFPSVariableChanged = 0;
-    smInt unlimitedFPSVariableChangedCurrent;
-    unlimitedFPSVariableChangedCurrent = unlimitedFPSVariableChanged;
-
-    if (_unlimitedFPSVariableChanged < unlimitedFPSVariableChangedCurrent)
-    {
-        _unlimitedFPSVariableChanged = unlimitedFPSVariableChangedCurrent;
-
-        if (unlimitedFPSEnabled)
-        {
-            setVSync(false);
-        }
-        else
-        {
-            setVSync(true);
-        }
-    }
-}
-
-///main drawing routine for Rendering of all objects in the scene
-void smViewer::render()
-{
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
-    {
-        return;
-    }
-
-    beginModule();
-
-    adjustFPS();
-
-    for (size_t i = 0; i < objectList.size(); i++)
-    {
-        objectList[i]->draw();
-    }
-
-    for (size_t i = 0; i < renderOperations.size(); i++)
-    {
-        processRenderOperation(renderOperations[i]);
-    }
-
-    for (size_t i = 0; i < objectList.size(); i++)
-    {
-        objectList[i]->draw();
-    }    
-
-    endModule();
-}
-
-///called by the module before each frame starts
+/// \brief Called at the beginning of each frame by the module
 void smViewer::beginFrame()
 {
     if (terminateExecution == true)
@@ -490,7 +363,7 @@ void smViewer::beginFrame()
     this->sfmlWindow->setActive(true); //activates opengl context
 }
 
-///called by the module after each frame ends
+///\brief Called at the end of each frame by the module
 void smViewer::endFrame()
 {
     this->sfmlWindow->display(); //swaps buffers
@@ -589,49 +462,13 @@ void smViewer::setWindowTitle(const smString &str)
     windowTitle = str;
 }
 
-void smViewer::exec()
-{
-    // Init the viewer
-    this->init();
-
-    while (!terminateExecution)
-    {
-        sf::Event event;
-        this->render();
-        while (this->sfmlWindow->pollEvent(event))
-        {
-            this->processSFMLEvents(event);
-        }
-    }
-
-    cleanUp();
-}
-
 void smViewer::cleanUp()
 {
     destroyFboListItems();
-    destroyGLContext();
+    destroyRenderingContext();
 
     //Must be set when all cleanup is done
     terminationCompleted = true;
 }
 
-smInt smViewer::height(void)
-{
-    return screenResolutionHeight;
-}
-
-smInt smViewer::width(void)
-{
-    return screenResolutionWidth;
-}
-
-smFloat smViewer::aspectRatio(void)
-{
-    return screenResolutionHeight / screenResolutionWidth;
-}
-
-void smViewer::setGlobalAxisLength(const smFloat len)
-{
-    this->globalAxisLength = len;
-}
+SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,100);

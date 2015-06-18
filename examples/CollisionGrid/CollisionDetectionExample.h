@@ -32,7 +32,7 @@
 #include "smCore/smSceneObject.h"
 #include "smSimulators/smDummySimulator.h"
 #include "smExternalDevices/smPhantomInterface.h"
-#include "smUtilities/smMotionTransformer.h"
+#include "smCore/smMotionTransformer.h"
 #include "smCollision/smSpatialGrid.h"
 
 
