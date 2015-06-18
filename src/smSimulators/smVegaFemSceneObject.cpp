@@ -385,8 +385,6 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         vegaSecondarySurfaceMesh->BuildNeighboringStructure();
         vegaSecondarySurfaceMesh->BuildNormals();
 
-        //uSecondary = new double[3 * vegaSecondarySurfaceMesh->Getn()]();
-
         uSecondary.resize(3 * vegaSecondarySurfaceMesh->Getn());
 
         // load interpolation structure
@@ -423,16 +421,12 @@ void smVegaFemSceneObject::loadSurfaceMesh()
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
-    int numFixedVertices = 0;// fixedVertices.size();
+    int numFixedVertices = 0;
 
     // read the fixed vertices
     // 1-indexed notation
-    if (strcmp(femConfig->fixedVerticesFilename, "__none") == 0)
-    {
-        //fixedVertices.clear();
-    }
-    else
-    {
+    if (strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
+    {    
         //int* data = fixedVertices.data();
         if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &fixedVertices) != 0)
         {
@@ -445,17 +439,6 @@ void smVegaFemSceneObject::loadFixedBC()
 
     std::cout << "VEGA: Loaded " << numFixedVertices << " fixed vertices. They are : \n";
     LoadList::print(numFixedVertices, fixedVertices);
-
-    // create 0-indexed fixed DOFs
-    /*int numFixedDOFs = 3 * numFixedVertices;
-    int * fixedDOFs = new int[numFixedDOFs];
-
-    for (int i = 0; i < numFixedVertices; i++)
-    {
-        fixedDOFs[3 * i + 0] = 3 * fixedVertices[i] - 3;
-        fixedDOFs[3 * i + 1] = 3 * fixedVertices[i] - 2;
-        fixedDOFs[3 * i + 2] = 3 * fixedVertices[i] - 1;
-    }*/
 
     for (int i = 0; i < numFixedVertices; i++)
     {
