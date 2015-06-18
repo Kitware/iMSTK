@@ -24,6 +24,8 @@
 // SimMedTK includes
 #include "smSimulators/smVegaObjectConfig.h"
 
+#include <cstring>
+
 smVegaObjectConfig::smVegaObjectConfig()
 {
     syncTimestepWithGraphics = 0;

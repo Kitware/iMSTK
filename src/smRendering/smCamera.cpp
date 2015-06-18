@@ -33,11 +33,11 @@ smCamera::smCamera()
       farClip(100.0),
       pos(0, 0, 0),
       fp(0, 0, -1),
-      orientation(),
-      viewDirty(true),
-      projDirty(true),
-      orientDirty(false)
+      orientation()
 {
+    viewDirty.store(true);
+    projDirty.store(true);
+    orientDirty.store(false);
 }
 
 smVec3f smCamera::getPos()
