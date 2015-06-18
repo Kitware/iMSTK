@@ -241,9 +241,25 @@ void smVegaFemSceneObject::loadVolumeMesh()
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
         {
-            PRINT_ERROR_LOCATION
-            std::cerr << "VEGA:  error! mass matrix for the StVK deformable model not specified" <<
-                femConfig->massMatrixFilename << std::endl;
+            strcpy(femConfig->massMatrixFilename, strcat(strcpy(femConfig->massMatrixFilename, femConfig->volumetricMeshFilename), ".mass"));
+            std::ifstream massMatFileName(femConfig->massMatrixFilename);
+            if (!massMatFileName.good())
+            {
+                std::cout << "VEGA: mass matrix file was not specified! Generating mass matrix file. \n";
+
+                SparseMatrix *tempMassMatrix;
+                GenerateMassMatrix::computeMassMatrix(volumetricMesh.get(), &tempMassMatrix, false);
+
+                std::cout << femConfig->massMatrixFilename << std::endl;
+                if (tempMassMatrix->Save(femConfig->massMatrixFilename)!=0)
+                {
+                    PRINT_ERROR_LOCATION
+                    std::cout << "VEGA:  error saving mass matrix"
+                        << femConfig->massMatrixFilename << std::endl;
+                }
+
+                delete tempMassMatrix;
+            }
         }
 
         std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename <<
@@ -310,18 +326,32 @@ void smVegaFemSceneObject::loadVolumeMesh()
     LaplacianDampingMatrix->ScalarMultiply(femConfig->dampingLaplacianCoef);
 }
 
+
 // Load the rendering mesh if it is designated
 void smVegaFemSceneObject::loadSurfaceMesh()
 {
     // initialize the rendering mesh for the volumetric mesh
     if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
     {
-        PRINT_ERROR_LOCATION
-        std::cout << "VEGA: error! rendering mesh was not specified.\n";
+        std::cout << "VEGA: rendering mesh was not specified!\n";
+        strcpy(femConfig->renderingMeshFilename, strcat(strcpy(femConfig->renderingMeshFilename, femConfig->volumetricMeshFilename), ".obj"));
+        std::ifstream renderingFileName(femConfig->renderingMeshFilename);
+        if (!renderingFileName.good())
+        {
+            std::cout << "VEGA: Generating primary rendering mesh.\n";
+
+            std::shared_ptr<ObjMesh> objMesh(GenerateSurfaceMesh::ComputeMesh(volumetricMesh.get(), false));
+
+            objMesh->save(femConfig->renderingMeshFilename);
+
+        }
+        else
+        {
+            std::cout << "VEGA: Loading primary rendering mesh: "<< femConfig->renderingMeshFilename <<" \n";
+        }
     }
 
-    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>( 
-                                                            femConfig->renderingMeshFilename);
+    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);  
 
     vegaPrimarySurfaceMesh->ResetDeformationToRest();
     vegaPrimarySurfaceMesh->BuildNeighboringStructure();
