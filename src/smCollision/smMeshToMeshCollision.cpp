@@ -77,7 +77,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
                                               depth, contactPoint, normal)
                   )
                 {
-                    pairs->addContact(std::abs(depth), contactPoint, normal);
+                    //pairs->addContact(std::abs(depth), contactPoint, normal);
                 }
             }
         }

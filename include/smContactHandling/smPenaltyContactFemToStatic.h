@@ -22,34 +22,33 @@
 //---------------------------------------------------------------------------
 
 
-#ifndef SMPENALTY_CONTACTHANDLING_H
-#define SMPENALTY_CONTACTHANDLING_H
+#ifndef SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT
+#define SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT
 
 // SimMedTK includes
-#include "smContactHandling/smContactHandling.h"
-#include "smCollision/smCollisionPair.h"
+#include "smContactHandling/smPenaltyContactHandling.h"
+#include "smSimulators/smVegaFemSceneObject.h"
 
-class smCollisionPair;
-
-/// \brief Penalty based for contact handling
-class smPenaltyContactHandling : public smContactHandling
+///
+/// @brief Penalty based for contact handling
+///
+class smPenaltyContactFemToStatic : public smPenaltyContactHandling
 {
 public:
-    smPenaltyContactHandling(bool typeBilateral);
+    smPenaltyContactFemToStatic(bool typeBilateral);
     
-    smPenaltyContactHandling(bool typeBilateral,
+    smPenaltyContactFemToStatic(bool typeBilateral,
                              const std::shared_ptr<smSceneObject>& sceneObjFirst,
                              const std::shared_ptr<smSceneObject>& sceneObjSecond);
 
-    ~smPenaltyContactHandling();
-
-    void resolveContacts();
+    virtual ~smPenaltyContactFemToStatic();
 
     /// \brief Get the forces on one the first scene object using penalty method
-    virtual void computeUnilateralContactForces() = 0;
-    
+    virtual void computeUnilateralContactForces() override;
+
     /// \brief Get the forces on both the scene objects using penalty method
-    virtual void computeBilateralContactForces() = 0;
+    virtual void computeBilateralContactForces() override;
+
 };
 
-#endif // SMPENALTY_CONTACTHANDLING_H
+#endif // SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT

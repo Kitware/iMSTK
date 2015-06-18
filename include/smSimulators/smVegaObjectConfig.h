@@ -21,48 +21,60 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEGACONFIGFEMOBJECT_H
-#define SMVEGACONFIGFEMOBJECT_H
+#ifndef SM_VEGA_OBJECT_CONFIG_H
+#define SM_VEGA_OBJECT_CONFIG_H
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
+#include "smCore/smErrorLog.h"
 
-// STL includes
-#include <cstdlib>
-#include <iostream>
-#include <vector>
-#include <string>
-#include <cstdio>
-#include <cassert>
-
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-enum massSpringSystemSourceType { OBJ, TETMESH, CUBICMESH, CHAIN, NONE };
-enum deformableObjectType { STVK, COROTLINFEM, LINFEM, MASSSPRING, INVERTIBLEFEM, UNSPECIFIED };
-enum invertibleMaterialType { INV_STVK, INV_NEOHOOKEAN, INV_MOONEYRIVLIN, INV_NONE };
-enum solverType { IMPLICITNEWMARK, IMPLICITBACKWARDEULER, EULER, SYMPLECTICEULER, CENTRALDIFFERENCES, UNKNOWN };
-
+// VEGA includes
+#include "configFile.h"
+#include "performanceCounter.h"
 
 /// \brief This class parses and holds the information related to various input files
 /// It is separated from the smVegaFemSceneObject class in order to reduce the
 /// amount of information stored while creating the fem model.
-class smVegaConfigFemObject
+class smVegaObjectConfig
 {
-
 public:
 
-    // display related
-    smInt renderWireframe; ///< render wireframe (true-1, false-0)
-    smInt renderAxes; ///< render axis (true-1, false-0)
-    smInt renderDeformableObject; ///< render deformable object (true-1, false-0)
-    smInt renderSecondaryDeformableObject; ///< render wireframe (true-1, false-0)
-    smInt useRealTimeNormals; ///< update normals realtime (true-1, false-0)
-    smInt renderFixedVertices; ///< render fixed vertices (true-1, false-0)
-    smInt renderSprings; ///< render springs (true-1, false-0)
-    smInt renderVertices; ///< render vertices (true-1, false-0)
-    smInt displayWindowTitle; ///< display title of window (true-1, false-0)
+    enum massSpringSystemSourceType
+    {
+        OBJ,
+        TETMESH,
+        CUBICMESH,
+        CHAIN,
+        NONE
+    };
+
+    enum deformableObjectType
+    {
+        STVK,
+        COROTLINFEM,
+        LINFEM,
+        MASSSPRING,
+        INVERTIBLEFEM,
+        UNSPECIFIED
+    };
+
+    enum invertibleMaterialType
+    {
+        INV_STVK,
+        INV_NEOHOOKEAN,
+        INV_MOONEYRIVLIN,
+        INV_NONE
+    };
+
+    enum timeIntegrationType
+    {
+        IMPLICITNEWMARK,
+        IMPLICITBACKWARDEULER,
+        EULER,
+        SYMPLECTICEULER,
+        CENTRALDIFFERENCES,
+        UNKNOWN
+    };
 
     // simulation. Some variable names self-explainatory
     smInt syncTimestepWithGraphics; ///< !!
@@ -83,21 +95,21 @@ public:
     const smInt max_corotationalLinearFEM_warp = 2;
     smChar implicitSolverMethod[4096];
     smChar solverMethod[4096];
-    smChar lightingConfigFilename[4096];
+
     smFloat dampingMassCoef; ///< viscous damping
     smFloat dampingStiffnessCoef; ///< structural damping
     smFloat dampingLaplacianCoef; ///<
     smFloat deformableObjectCompliance;
+
     smFloat baseFrequency; ///< !!
     smInt maxIterations; ///< maximum smInterations
     smDouble epsilon;  ///<
     smInt numInternalForceThreads; ///< max. execution threads for computing smInternal force
     smInt numSolverThreads; ///< max. solver threads for solver
-    smInt pauseSimulation;
     smInt singleStepMode;
-    smInt lockScene;
 
     // various file names. variable names self-explainatory
+    //string renderingMeshFilename;
     smChar renderingMeshFilename[4096];
     smChar secondaryRenderingMeshFilename[4096];
     smChar secondaryRenderingMeshInterpolationFilename[4096];
@@ -118,18 +130,60 @@ public:
     massSpringSystemSourceType massSpringSystemSource;
     deformableObjectType deformableObject;
     invertibleMaterialType invertibleMaterial;
-    solverType solver;
+    timeIntegrationType solver;
 
     /// \brief Constructor
-    smVegaConfigFemObject();
+    smVegaObjectConfig();
 
     /// \brief Destructor
-    ~smVegaConfigFemObject();
+    ~smVegaObjectConfig();
 
-    /// \brief Read the confiuration file to parse all the specifications of the FEM scene
+    /// \brief Read the confiuration file to 
+    ///  parse all the specifications of the FEM scene
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
-    void setFemObjConfuguration(const std::string &ConfigFile);
+    void setFemObjConfuguration(const smString ConfigFile, const bool printVerbose);
+
+    /// enable/disable update of scene object sync with graphics
+    void setSyncTimeStepWithGraphics(const bool syncOrNot);
+};
+
+class smVegaPerformanceCounter
+{
+public:
+    double fps; ///< fps of the simulation
+    int fpsBufferSize;///< buffer size to display fps
+    int fpsHead; ///< !!
+    double fpsBuffer[5]; ///< buffer to display fps
+
+    // force assembly metrics recording
+    double forceAssemblyTime;
+    double forceAssemblyLocalTime;
+    int forceAssemblyBufferSize;
+    int forceAssemblyHead;
+    double forceAssemblyBuffer[50];
+    
+    // solver metrics recording
+    double systemSolveTime;
+    double systemSolveLocalTime;
+    int systemSolveBufferSize;
+    int systemSolveHead;
+    double systemSolveBuffer[50];
+    
+    PerformanceCounter objectPerformanceCounter;///< keeps track of overall performance
+    PerformanceCounter explosionCounter;///< keeps track of instability
+
+    /// \brief constructor
+    smVegaPerformanceCounter();
+
+    /// \brief destructor
+    ~smVegaPerformanceCounter();
+
+    /// \brief Initialization
+    void initialize();
+
+    /// \brief clear the buffers that record the fps
+    void clearFpsBuffer();
 };
 
 #endif

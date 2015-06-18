@@ -53,3 +53,13 @@ void smPlaneModel::setTransform(const smPlaneModel::RigidTransformType& t)
 {
     this->transform = t;
 }
+
+void smPlaneModel::setPlaneModel(const std::shared_ptr<smPlane> &p)
+{
+    this->plane = p;
+}
+
+std::shared_ptr<smPlane> smPlaneModel::getPlaneModel() const
+{
+    return plane;
+}

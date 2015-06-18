@@ -37,7 +37,12 @@
 #include "smSimulators/smVegaFemSimulator.h"
 #include "smSimulators/smDummySimulator.h"
 
+#include "smCollision/smCollisionPair.h"
 #include "smCollision/smPlaneCollisionModel.h"
+#include "smCollision/smMeshCollisionModel.h"
+#include "smCollision/smPlaneToMeshCollision.h"
+
+#include "smContactHandling/smPenaltyContactFemToStatic.h"
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
@@ -76,10 +81,10 @@ int main()
 
     // create a Vega based FEM object and attach it to the fem simulator
     femObject = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
-        "asianDragon/asianDragon.config");
+                                                        "asianDragon/asianDragon.config");
 
     auto femObjRenderDetail = std::make_shared<smRenderDetail>(
-                                                               //SIMMEDTK_RENDER_FACES |
+                                                               SIMMEDTK_RENDER_WIREFRAME |
                                                                SIMMEDTK_RENDER_VERTICES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
@@ -98,14 +103,13 @@ int main()
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
-
     // Create dummy simulator
     staticSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
 
     // create a static plane scene object of given normal and position
     staticObject = std::make_shared<smStaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -10.0, 0.0),
+    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -3.0, 0.0),
                                                     smVec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
@@ -117,6 +121,35 @@ int main()
     auto sdkSimulator = sdk->getSimulator();
     sdkSimulator->registerObjectSimulator(femSimulator);
     //sdkSimulator->registerObjectSimulator(staticSimulator);
+
+
+    //-------------------------------------------------------
+    // Enable collision between scene actors 1 and 2
+    //-------------------------------------------------------
+    auto meshModel = std::make_shared<smMeshCollisionModel>();
+    
+    meshModel->setMesh(femObject->getPrimarySurfaceMesh());
+
+    auto planeMeshCollisionPairs = std::make_shared<smCollisionPair>();
+
+    planeMeshCollisionPairs->setModels(meshModel, plane);
+
+    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+
+    auto planeToMeshCollisionDetection = std::make_shared<smPlaneToMeshCollision>();
+
+    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+
+    //-------------------------------------------------------
+    // Enable contact handling between scene actors 1 and 2
+    //-------------------------------------------------------
+    auto planeToMeshContact = std::make_shared<smPenaltyContactFemToStatic>(false);
+
+    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+
+    planeToMeshContact->setSceneObjects(staticObject, femObject);
+
+    sdkSimulator->registerContactHandling(planeToMeshContact);
  
     //-------------------------------------------------------
     // Customize the viewer
@@ -131,7 +164,7 @@ int main()
 
     // Get Scene
     scene = sdk->getScene(0);
-    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
+    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
     light = smLight::getDefaultLighting();

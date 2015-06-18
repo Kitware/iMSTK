@@ -26,247 +26,155 @@
 
 smVegaFemSceneObject::smVegaFemSceneObject()
 {
-	type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    performaceTracker.initialize();
+
+    staticSolver = 0;
+    graphicFrame = 0;
+    explosionFlag = 0;
+    positiveDefinite = 0;
+
+    importAndUpdateVolumeMeshToSmtk = false;
+
+    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+
+    this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 }
 
-smVegaFemSceneObject::smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log, smString ConfigFile)
+smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log,
+                                           const smString ConfigFile)
 {
-    fps = 0.0;
-    fpsHead = 0;
-    cpuLoad = 0;
-    forceAssemblyTime = 0.0;
-    forceAssemblyLocalTime = 0.0;
-    forceAssemblyHead = 0;
-    systemSolveTime = 0.0;
-    systemSolveLocalTime = 0.0;
-    systemSolveHead = 0;
-    enableTextures = 0;
+    performaceTracker.initialize();
+
     staticSolver = 0;
     graphicFrame = 0;
     pulledVertex = -1;
     explosionFlag = 0;
-    timestepCounter = 0;
-    subTimestepCounter = 0;
-    integratorBase = nullptr;
-    implicitNewmarkSparse = nullptr;
-    integratorBaseSparse = nullptr;
-    forceModel = nullptr;
-    stVKInternalForces = nullptr;
-    stVKStiffnessMatrix = nullptr;
-    stVKForceModel = nullptr;
-    massSpringSystemForceModel = nullptr;
-    corotationalLinearFEMForceModel = nullptr;
     positiveDefinite = 0;
 
-	fpsBufferSize = 5; ///< buffer size to display fps
-	forceAssemblyBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-	systemSolveBufferSize = VEGA_PERFORMANCE_REC_BUFFER_SIZE;
-
-    volumetricMesh = nullptr;
-    tetMesh = nullptr;
-    meshGraph = nullptr;
-
-    massSpringSystem = nullptr;
-    renderMassSprings = nullptr;
-    massMatrix = nullptr;
-    LaplacianDampingMatrix = nullptr;
-
-    //states
-    u = nullptr;
-    uvel = nullptr;
-    uaccel = nullptr;
-    f_ext = nullptr;
-    f_extBase = nullptr;
-    uSecondary = nullptr;
-    uInitial = nullptr;
-    velInitial = nullptr;
-
-    deformableObjectRenderingMesh = nullptr;
-    secondaryDeformableObjectRenderingMesh = nullptr;
-
-    secondaryDeformableObjectRenderingMesh_interpolation_vertices = nullptr;
-    secondaryDeformableObjectRenderingMesh_interpolation_weights = nullptr;
-
-    renderUsingVega = false;
     importAndUpdateVolumeMeshToSmtk = false;
 
-	type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
 
-    if (ConfigFile.compare(vega_string_none) != 0)
-    {
-		femConfig = std::make_shared<smVegaConfigFemObject>();
-        femConfig->setFemObjConfuguration(ConfigFile);
-		std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file: " <<
-			ConfigFile.c_str() << std::endl;
+    this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
-		initSimulation();
-    }
-    else
-    {
-		std::cout << "VEGA: NOTE: Initialized the VegaFemSceneObject, but not configured yet!" << std::endl;
-    }
-}
+    ConfigFileName = ConfigFile;
 
-bool smVegaFemSceneObject::configure(smString ConfigFile)
-{
-	femConfig = std::make_shared<smVegaConfigFemObject>();
+    configure(ConfigFileName);
 
-	if (ConfigFile.compare(vega_string_none) != 0)
-	{
-		femConfig->setFemObjConfuguration(ConfigFile);
-		std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file!" <<
-			ConfigFile.c_str() << std::endl;
-
-		initSimulation();
-
-		return 1;
-	}
-	else
-	{
-		std::cout<<"VEGA: Configured file invalid!"<< ConfigFile.c_str() << std::endl;
-		return 0;
-	}
-}
-
-void smVegaFemSceneObject::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
-{
-    smtkSurfaceMesh->setRenderDetail(r);
+    initialize();
 }
 
 smVegaFemSceneObject::~smVegaFemSceneObject()
 {
+}
 
-    if (u != nullptr)
+std::shared_ptr<smSceneObject> smVegaFemSceneObject::clone()
+{
+    return safeDownCast<smSceneObject>();
+}
+
+bool smVegaFemSceneObject::configure(const smString ConfigFile)
+{
+    femConfig = std::make_shared<smVegaObjectConfig>();
+
+    if (ConfigFile.compare("__none") != 0)
     {
-        free(u);
+        femConfig->setFemObjConfuguration(ConfigFile, false);
+
+        std::cout << "VEGA: Initialized the VegaFemSceneObject and configured using file-" <<
+                                                               ConfigFile.c_str() << std::endl;
+
+        return 1;
     }
-
-    if (uvel != nullptr)
+    else
     {
-        free(uvel);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! configuration file invalid!"
+                  << ConfigFile.c_str() << std::endl;
+        return 0;
     }
+}
 
-    if (uaccel != nullptr)
+void smVegaFemSceneObject::resetToInitialState()
+{
+    if (!topologyAltered)
     {
-        free(uaccel);
+        performaceTracker.initialize();
+
+        graphicFrame = 0;
+        pulledVertex = -1;
+        explosionFlag = 0;
+        timestepCounter = 0;
+        subTimestepCounter = 0;
+
+        loadInitialStates();
+        //volumetricMesh->Reset();//WIP no stored initial positions
+        vegaPrimarySurfaceMesh->ResetDeformationToRest();
+
+        performaceTracker.clearFpsBuffer();
     }
-
-    if (f_ext != nullptr)
+    else
     {
-        free(f_ext);
-    }
-
-    if (f_extBase != nullptr)
-    {
-        free(f_extBase);
-    }
-
-    if (uSecondary != nullptr)
-    {
-        free(uSecondary);
-    }
-
-    if (uInitial != nullptr)
-    {
-        free(uInitial);
-    }
-
-    if (velInitial != nullptr)
-    {
-        free(velInitial);
-    }
-
-    if (secondaryDeformableObjectRenderingMesh_interpolation_vertices != nullptr)
-    {
-        delete secondaryDeformableObjectRenderingMesh_interpolation_vertices;
-    }
-
-    if (secondaryDeformableObjectRenderingMesh_interpolation_weights != nullptr)
-    {
-        delete secondaryDeformableObjectRenderingMesh_interpolation_weights;
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! Initial state undetermined as the topology is altered.\n";
     }
 }
 
 // Initialize the parameters and properties of the simulation object
-void smVegaFemSceneObject::initSimulation()
+void smVegaFemSceneObject::initialize()
 {
-
-    volumetricMesh = nullptr;
-    massSpringSystem = nullptr;
-
-    setDeformableModel();
+    setDeformableModelType();
     loadVolumeMesh();
     loadSurfaceMesh();
 
-    if(importAndUpdateVolumeMeshToSmtk)
+    if (importAndUpdateVolumeMeshToSmtk)
     {
-        this->smtkVolumeMesh = std::make_shared<smVolumeMesh>();
-        this->smtkVolumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
+        this->volumeMesh = std::make_shared<smVolumeMesh>();
+        this->volumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
     }
-    
-    if(!renderUsingVega)
+
+    this->primarySurfaceMesh = std::make_shared<smSurfaceMesh>();
+    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
     {
-        this->smtkSurfaceMesh = std::make_shared<smSurfaceMesh>();
-        if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
-        {
-            this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->deformableObjectRenderingMesh->GetMesh(), true);
-        }
-        else
-        {
-            this->smtkSurfaceMesh->importSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh(), true);
-        }
+        this->primarySurfaceMesh->importSurfaceMeshFromVegaFormat(
+                            this->vegaPrimarySurfaceMesh->GetMesh(), true);
+    }
+    else
+    {
+        this->primarySurfaceMesh->importSurfaceMeshFromVegaFormat(
+                            this->vegaSecondarySurfaceMesh->GetMesh(), true);
     }
 
     loadFixedBC();
 
     // make room for deformation and force vectors
-    u = new double[3*n]();
-    uvel = new double[3*n]();
-    uaccel = new double[3*n]();
-    f_ext = new double[3*n]();
-    f_extBase = new double[3*n]();
-
-    f_contact.resize(3*n);
+    u.resize(3 * numNodes);
+    uvel.resize(3 * numNodes);
+    uaccel.resize(3 * numNodes);
+    f_extBase.resize(3 * numNodes);
+    f_ext.resize(3 * numNodes);
+    f_contact.resize(3 * numNodes);
 
     loadInitialStates();
-    loadScriptedExternalFroces();
+    loadScriptedExternalForces();
     createForceModel();
     initializeTimeIntegrator();
 
-    // delete the config information that is not needed further
-    // delete femConfig;
+    performaceTracker.clearFpsBuffer();
+    performaceTracker.objectPerformanceCounter.StartCounter();
 
-    // clear fps buffer
-    for (int i = 0; i < fpsBufferSize; i++)
-    {
-        fpsBuffer[i] = 0.0;
-    }
+    std::cout << "Inititializing fem object done. \n";
 
-    for (int i = 0; i < forceAssemblyBufferSize; i++)
-    {
-        forceAssemblyBuffer[i] = 0.0;
-    }
+    primarySurfaceMesh->printPrimitiveDetails();
 
-    for (int i = 0; i < systemSolveBufferSize; i++)
-    {
-        systemSolveBuffer[i] = 0.0;
-    }
-
-    titleBarCounter.StartCounter();
-
-    printf("Init simulator done\n");
-
-
-    smtkSurfaceMesh->printPrimitiveDetails();
-
-    smtkSurfaceMesh->initVertexNeighbors();
-    smtkSurfaceMesh->updateTriangleNormals();
-    smtkSurfaceMesh->updateVertexNormals();
+    primarySurfaceMesh->initVertexNeighbors();
+    primarySurfaceMesh->updateTriangleNormals();
+    primarySurfaceMesh->updateVertexNormals();
 }
 
 
 // Set the type of formulation used to model the deformation
-void smVegaFemSceneObject::setDeformableModel()
+void smVegaFemSceneObject::setDeformableModelType()
 {
 
     // set deformable material type
@@ -274,94 +182,75 @@ void smVegaFemSceneObject::setDeformableModel()
     {
         if (strcmp(femConfig->deformableObjectMethod, "StVK") == 0)
         {
-            femConfig->deformableObject = STVK;
+            femConfig->deformableObject = smVegaObjectConfig::STVK;
         }
 
         if (strcmp(femConfig->deformableObjectMethod, "CLFEM") == 0)
         {
-            femConfig->deformableObject = COROTLINFEM;
+            femConfig->deformableObject = smVegaObjectConfig::COROTLINFEM;
         }
 
         if (strcmp(femConfig->deformableObjectMethod, "LinearFEM") == 0)
         {
-            femConfig->deformableObject = LINFEM;
+            femConfig->deformableObject = smVegaObjectConfig::LINFEM;
         }
 
         if (strcmp(femConfig->deformableObjectMethod, "InvertibleFEM") == 0)
         {
-            femConfig->deformableObject = INVERTIBLEFEM;
+            femConfig->deformableObject = smVegaObjectConfig::INVERTIBLEFEM;
         }
     }
 
-    if (strcmp(femConfig->massSpringSystemObjConfigFilename, "__none") != 0)
+    if (femConfig->deformableObject == smVegaObjectConfig::UNSPECIFIED)
     {
-        femConfig->massSpringSystemSource = OBJ;
-    }
-    else if (strcmp(femConfig->massSpringSystemTetMeshConfigFilename, "__none") != 0)
-    {
-        femConfig->massSpringSystemSource = TETMESH;
-    }
-    else if (strcmp(femConfig->massSpringSystemCubicMeshConfigFilename, "__none") != 0)
-    {
-        femConfig->massSpringSystemSource = CUBICMESH;
-    }
-    else if (strncmp(femConfig->customMassSpringSystem, "chain", 5) == 0)
-    {
-        femConfig->massSpringSystemSource = CHAIN;
-    }
-
-    if ((femConfig->massSpringSystemSource == OBJ)
-            || (femConfig->massSpringSystemSource == TETMESH)
-            || (femConfig->massSpringSystemSource == CUBICMESH)
-            || (femConfig->massSpringSystemSource == CHAIN))
-    {
-        femConfig->deformableObject = MASSSPRING;
-    }
-
-    if (femConfig->deformableObject == UNSPECIFIED)
-    {
-        printf("VEGA Error: no deformable model specified.\n");
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! no deformable model specified." << std::endl;
     }
 }
-
 
 // Load specified meshes
 void smVegaFemSceneObject::loadVolumeMesh()
 {
 
     // load mesh
-    if ((femConfig->deformableObject == STVK) || (femConfig->deformableObject == COROTLINFEM)
-            || (femConfig->deformableObject == LINFEM)
-            || (femConfig->deformableObject == INVERTIBLEFEM))
+    if ((femConfig->deformableObject == smVegaObjectConfig::STVK) ||
+        (femConfig->deformableObject == smVegaObjectConfig::COROTLINFEM) ||
+        (femConfig->deformableObject == smVegaObjectConfig::LINFEM) ||
+        (femConfig->deformableObject == smVegaObjectConfig::INVERTIBLEFEM))
     {
 
-        printf("VEGA: Loading volumetric mesh from file %s...\n", femConfig->volumetricMeshFilename);
+        std::cout << "VEGA: Loading volumetric mesh from file " 
+                  << femConfig->volumetricMeshFilename << "..." << std::endl;
 
-        volumetricMesh = std::shared_ptr<VolumetricMesh>(VolumetricMeshLoader::load(femConfig->volumetricMeshFilename));
+        volumetricMesh = std::shared_ptr<VolumetricMesh>(
+            VolumetricMeshLoader::load(femConfig->volumetricMeshFilename));
 
         if (volumetricMesh == nullptr)
         {
-            printf("VEGA Error: unable to load the volumetric mesh from %s.\n",
-                   femConfig->volumetricMeshFilename);
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! unable to load the volumetric mesh from"
+                                        << femConfig->volumetricMeshFilename << std::endl;
         }
 
-        n = volumetricMesh->getNumVertices();
-        printf("VEGA: Num vertices: %d. Num elements: %d\n", n, volumetricMesh->getNumElements());
+        numNodes = volumetricMesh->getNumVertices();
+        std::cout << "VEGA: Num vertices: " << numNodes <<
+                         ". Num elements: " << volumetricMesh->getNumElements() << std::endl;
+
         meshGraph = std::shared_ptr<Graph>(GenerateMeshGraph::Generate(volumetricMesh.get()));
 
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
         {
-            printf("VEGA Error: mass matrix for the StVK deformable model not specified (%s).\n",
-                   femConfig->massMatrixFilename);
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cerr << "VEGA:  error! mass matrix for the StVK deformable model not specified" <<
+                femConfig->massMatrixFilename << std::endl;
         }
 
-		printf("VEGA: Loading the mass matrix from file %s...\n", femConfig->massMatrixFilename);
+        std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename <<
+                                                                                 "..." << std::endl;
+
         // get the mass matrix
-		std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
+        std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
 
         try
         {
@@ -370,36 +259,39 @@ void smVegaFemSceneObject::loadVolumeMesh()
         }
         catch (int exceptionCode)
         {
-            printf("VEGA: Error loading mass matrix %s.\n", femConfig->massMatrixFilename);
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA:  error! loading mass matrix" 
+                        << femConfig->massMatrixFilename << std::endl;
         }
 
         massMatrix = std::make_shared<SparseMatrix>(massMatrixOutline.get());
 
-        if (femConfig->deformableObject == STVK || femConfig->deformableObject == LINFEM)  //LINFEM constructed from stVKInternalForces{
+        if (femConfig->deformableObject == smVegaObjectConfig::STVK ||
+            femConfig->deformableObject == smVegaObjectConfig::LINFEM)
         {
 
             unsigned int loadingFlag = 0; // 0 = use low-memory version, 1 = use high-memory version
-            std::shared_ptr<StVKElementABCD> precomputedIntegrals = std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh.get(), loadingFlag));
+            std::shared_ptr<StVKElementABCD> precomputedIntegrals = 
+                std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh.get(), loadingFlag));
 
             if (precomputedIntegrals == nullptr)
             {
-                printf("VEGA Error: unable to load the StVK integrals.\n");
-                exit(1);
+                PRINT_ERROR_LOCATION
+                std::cout << "VEGA: error! unable to load the StVK integrals.\n";
             }
 
-            printf("VEGA: Generating internal forces and stiffness matrix models...\n");
+            std::cout << "VEGA: Generating internal forces and stiffness matrix models...\n";
             fflush(nullptr);
 
             if (femConfig->numInternalForceThreads == 0)
                 stVKInternalForces = std::make_shared<StVKInternalForces>(volumetricMesh.get(),
-                        precomputedIntegrals.get(),
-                        femConfig->addGravity,
-                        femConfig->g);
+                precomputedIntegrals.get(),
+                femConfig->addGravity,
+                femConfig->g);
             else
                 stVKInternalForces = std::make_shared<StVKInternalForcesMT>(volumetricMesh.get(),
-                        precomputedIntegrals.get(), femConfig->addGravity,
-                        femConfig->g, femConfig->numInternalForceThreads);
+                precomputedIntegrals.get(), femConfig->addGravity,
+                femConfig->g, femConfig->numInternalForceThreads);
 
             if (femConfig->numInternalForceThreads == 0)
             {
@@ -407,159 +299,8 @@ void smVegaFemSceneObject::loadVolumeMesh()
             }
             else
                 stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrixMT>(stVKInternalForces.get(),
-                        femConfig->numInternalForceThreads);
+                femConfig->numInternalForceThreads);
         }
-    }
-
-    if (femConfig->deformableObject == MASSSPRING)
-    {
-
-        switch (femConfig->massSpringSystemSource)
-        {
-        case OBJ:
-        {
-            printf("VEGA: Loading mass spring system from an obj file...\n");
-            MassSpringSystemFromObjMeshConfigFile massSpringSystemFromObjMeshConfigFile;
-            MassSpringSystemObjMeshConfiguration massSpringSystemObjMeshConfiguration;
-
-			MassSpringSystem *mss = massSpringSystem.get();
-            if (massSpringSystemFromObjMeshConfigFile.GenerateMassSpringSystem(
-                        femConfig->massSpringSystemObjConfigFilename, &mss,
-                        &massSpringSystemObjMeshConfiguration) != 0)
-            {
-                printf("VEGA: Error initializing the mass spring system.\n");
-                exit(1);
-            }
-
-            strcpy(femConfig->renderingMeshFilename,
-                   massSpringSystemObjMeshConfiguration.massSpringMeshFilename);
-        }
-        break;
-
-        case TETMESH:
-        {
-            printf("VEGA: Loading mass spring system from a tet mesh file...\n");
-            MassSpringSystemFromTetMeshConfigFile massSpringSystemFromTetMeshConfigFile;
-            MassSpringSystemTetMeshConfiguration massSpringSystemTetMeshConfiguration;
-
-			MassSpringSystem *mss = massSpringSystem.get();
-            if (massSpringSystemFromTetMeshConfigFile.GenerateMassSpringSystem(
-                        femConfig->massSpringSystemTetMeshConfigFilename,
-                        &mss,
-                        &massSpringSystemTetMeshConfiguration) != 0)
-            {
-                printf("VEGA: Error initializing the mass spring system.\n");
-                exit(1);
-            }
-
-            strcpy(femConfig->renderingMeshFilename,
-                   massSpringSystemTetMeshConfiguration.surfaceMeshFilename);
-        }
-        break;
-
-        case CUBICMESH:
-        {
-            printf("VEGA: Loading mass spring system from a cubic mesh file...\n");
-            MassSpringSystemFromCubicMeshConfigFile massSpringSystemFromCubicMeshConfigFile;
-            MassSpringSystemCubicMeshConfiguration massSpringSystemCubicMeshConfiguration;
-
-			MassSpringSystem *mss = massSpringSystem.get();
-            if (massSpringSystemFromCubicMeshConfigFile.GenerateMassSpringSystem(
-                        femConfig->massSpringSystemCubicMeshConfigFilename,
-                        &mss,
-                        &massSpringSystemCubicMeshConfiguration) != 0)
-            {
-                printf("VEGA: Error initializing the mass spring system.\n");
-                exit(1);
-            }
-
-            strcpy(femConfig->renderingMeshFilename,
-                   massSpringSystemCubicMeshConfiguration.surfaceMeshFilename);
-        }
-        break;
-
-        case CHAIN:
-        {
-            int numParticles;
-            double groupStiffness;
-            sscanf(femConfig->customMassSpringSystem, "chain,%d,%lf", &numParticles, &groupStiffness);
-            printf("VEGA: Creating a chain mass-spring system with %d particles...\n", numParticles);
-
-            std::vector<double> masses(numParticles);
-
-            for (int i = 0; i < numParticles; i++)
-            {
-                masses[i] = 1.0;
-            }
-
-            std::vector<double> restPositions(3 * numParticles);
-
-            for (int i = 0; i < numParticles; i++)
-            {
-                restPositions[3 * i + 0] = 0;
-                restPositions[3 * i + 1] = (numParticles == 1) ? 0.0 : 1.0 * i / (numParticles - 1);
-                restPositions[3 * i + 2] = 0;
-            }
-
-            std::vector<int> edges(2 * (numParticles - 1));
-
-            for (int i = 0; i < numParticles - 1; i++)
-            {
-                edges[2 * i + 0] = i;
-                edges[2 * i + 1] = i + 1;
-            }
-
-            std::vector<int> edgeGroups(numParticles - 1);
-
-            for (int i = 0; i < numParticles - 1; i++)
-            {
-                edgeGroups[i] = 0;
-            }
-
-            double groupDamping = 0;
-
-            massSpringSystem = std::make_shared<MassSpringSystem>(numParticles, masses.data(), restPositions.data(),
-                                                    numParticles - 1, edges.data(), edgeGroups.data(),
-                                                    1, &groupStiffness, &groupDamping,
-                                                    femConfig->addGravity);
-
-            char s[96];
-            sprintf(s, "chain-%d.obj", numParticles);
-            massSpringSystem->CreateObjMesh(s);
-            strcpy(femConfig->renderingMeshFilename, s);
-        }
-        break;
-
-        default:
-            printf("VEGA Error: mesh spring system configuration file was not specified.\n");
-            exit(1);
-            break;
-        }//end switch
-
-        if (femConfig->addGravity)
-        {
-            massSpringSystem->SetGravity(femConfig->addGravity, femConfig->g);
-        }
-
-        if (femConfig->numInternalForceThreads > 0)
-        {
-            printf("VEGA: Launching threaded internal force evaluation: %d threads.\n",
-                   femConfig->numInternalForceThreads);
-            auto massSpringSystemMT = std::make_shared<MassSpringSystemMT>(*massSpringSystem.get(),
-                    femConfig->numInternalForceThreads);
-            massSpringSystem = massSpringSystemMT;
-        }
-
-        n = massSpringSystem->GetNumParticles();
-
-        // create the mass matrix
-		SparseMatrix *sm = massMatrix.get();
-		massSpringSystem->GenerateMassMatrix(&sm, 1);
-        massSpringSystem->GenerateMassMatrix(&sm);
-
-        // create the mesh graph (used only for the distribution of user forces over neighboring vertices)
-        meshGraph = std::make_shared<Graph>(massSpringSystem->GetNumParticles(),
-                              massSpringSystem->GetNumEdges(), massSpringSystem->GetEdges());
     }
 
     int scaleRows = 1;
@@ -575,107 +316,102 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     // initialize the rendering mesh for the volumetric mesh
     if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
     {
-        printf("VEGA Error: rendering mesh was not specified.\n");
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! rendering mesh was not specified.\n";
     }
 
-    deformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
+    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>( 
+                                                            femConfig->renderingMeshFilename);
 
-    deformableObjectRenderingMesh->ResetDeformationToRest();
-    deformableObjectRenderingMesh->BuildNeighboringStructure();
-    deformableObjectRenderingMesh->BuildNormals();
-    //deformableObjectRenderingMesh->SetMaterialAlpha(0.5);
+    vegaPrimarySurfaceMesh->ResetDeformationToRest();
+    vegaPrimarySurfaceMesh->BuildNeighboringStructure();
+    vegaPrimarySurfaceMesh->BuildNormals();
+    //vegaPrimarySurfaceMesh->SetMaterialAlpha(0.5);
 
     // initialize the embedded triangle rendering mesh
-    secondaryDeformableObjectRenderingMesh = nullptr;
+    vegaSecondarySurfaceMesh = nullptr;
 
     if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
     {
 
-        secondaryDeformableObjectRenderingMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->secondaryRenderingMeshFilename);
+        vegaSecondarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(
+                                                    femConfig->secondaryRenderingMeshFilename);
 
-        if (secondaryDeformableObjectRenderingMesh == nullptr)
+        if (vegaSecondarySurfaceMesh == nullptr)
         {
             std::cout << "VEGA: Secondary rendering mesh is not initialized!\n";
             exit(1);
         }
         else
         {
-            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t"
-                << secondaryDeformableObjectRenderingMesh->GetNumVertices() << " vertices\n\t\t"
-                << secondaryDeformableObjectRenderingMesh->GetNumFaces() << " faces\n";
+            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t" 
+                << vegaSecondarySurfaceMesh->GetNumVertices() << " vertices\n\t\t"
+                << vegaSecondarySurfaceMesh->GetNumFaces() << " faces\n";
         }
 
-        secondaryDeformableObjectRenderingMesh->ResetDeformationToRest();
-        secondaryDeformableObjectRenderingMesh->BuildNeighboringStructure();
-        secondaryDeformableObjectRenderingMesh->BuildNormals();
+        vegaSecondarySurfaceMesh->ResetDeformationToRest();
+        vegaSecondarySurfaceMesh->BuildNeighboringStructure();
+        vegaSecondarySurfaceMesh->BuildNormals();
 
-        uSecondary = new double[3 * secondaryDeformableObjectRenderingMesh->Getn()]();
+        //uSecondary = new double[3 * vegaSecondarySurfaceMesh->Getn()]();
+
+        uSecondary.resize(3 * vegaSecondarySurfaceMesh->Getn());
 
         // load interpolation structure
         if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
         {
-            printf("VEGA Error: no secondary rendering mesh interpolation filename specified.\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA:  error! no secondary rendering mesh interpolation filename specified.\n";
         }
 
-        secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices =
-            VolumetricMesh::getNumInterpolationElementVertices(femConfig->secondaryRenderingMeshInterpolationFilename);
+        numInterpolationElementVerts =
+            VolumetricMesh::getNumInterpolationElementVertices(
+                                femConfig->secondaryRenderingMeshInterpolationFilename);
 
-        if (secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices < 0)
+        if (numInterpolationElementVerts < 0)
         {
-            printf("VEGA Error: unable to open file %s.\n", femConfig->secondaryRenderingMeshInterpolationFilename);
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! unable to open file " << 
+                femConfig->secondaryRenderingMeshInterpolationFilename << "." << std::endl;
         }
 
-        printf("VEGA: Num interpolation element vertices: %d\n",
-            secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices);
+        std::cout << "VEGA: Num interpolation element vertices:" <<
+            numInterpolationElementVerts << std::endl;
 
         VolumetricMesh::loadInterpolationWeights(
-            femConfig->secondaryRenderingMeshInterpolationFilename,
-            secondaryDeformableObjectRenderingMesh->Getn(),
-            secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices,
-            &secondaryDeformableObjectRenderingMesh_interpolation_vertices,
-            &secondaryDeformableObjectRenderingMesh_interpolation_weights
-            );
+                            femConfig->secondaryRenderingMeshInterpolationFilename,
+                            vegaSecondarySurfaceMesh->Getn(),
+                            numInterpolationElementVerts,
+                            &interpolationVertices,
+                            &interpolationWeights
+                            );
     }
-    else
-    {
-        femConfig->renderSecondaryDeformableObject = 0;
-    }
-
 }
 
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
     int numFixedVertices = fixedVertices.size();
-    if (!((femConfig->deformableObject == MASSSPRING) && (femConfig->massSpringSystemSource == CHAIN)))
-    {
-        // read the fixed vertices
-        // 1-indexed notation
-        if (strcmp(femConfig->fixedVerticesFilename, "__none") == 0)
-        {
-            fixedVertices.clear();
-        }
-        else
-        {
-            int * data = fixedVertices.data();
-            if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &data) != 0)
-            {
-                throw std::logic_error("VEGA: Error reading fixed vertices.");
-            }
 
-            LoadList::sort(numFixedVertices, fixedVertices.data());
-        }
+    // read the fixed vertices
+    // 1-indexed notation
+    if (strcmp(femConfig->fixedVerticesFilename, "__none") == 0)
+    {
+        fixedVertices.clear();
     }
     else
     {
-        fixedVertices.resize(1);
-        fixedVertices[0] = massSpringSystem->GetNumParticles();
+        int* data = fixedVertices.data();
+        if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &data) != 0)
+        {
+            PRINT_ERROR_LOCATION
+            throw std::logic_error("VEGA: error! reading fixed vertices.");
+        }
+
+        LoadList::sort(numFixedVertices, fixedVertices.data());
     }
 
-    printf("VEGA: Loaded %d fixed vertices. They are:\n", numFixedVertices);
+    std::cout << "VEGA: Loaded" << numFixedVertices << " fixed vertices. They are : \n";
     LoadList::print(numFixedVertices, fixedVertices.data());
 
     // create 0-indexed fixed DOFs
@@ -694,58 +430,52 @@ void smVegaFemSceneObject::loadFixedBC()
         fixedVertices[i]--;
     }
 
-    printf("VEGA: Boundary vertices processed.\n");
+    numTotalDOF = 3 * numNodes;
+    numFixedNodes = numFixedVertices;
+    numFixedDof = 3 * numFixedVertices;
+    numDOF = numTotalDOF - numFixedDof;
+
+    std::cout << "VEGA: Boundary vertices processed.\n";
 }
 
 // load initial displacements and velocities of the nodes
 void smVegaFemSceneObject::loadInitialStates()
 {
-
     // load initial condition
     if (strcmp(femConfig->initialPositionFilename, "__none") != 0)
     {
         int m1, n1;
-        ReadMatrixFromDisk_(femConfig->initialPositionFilename, &m1, &n1, &uInitial);
 
-        if ((m1 != 3 * n) || (n1 != 1))
-        {
-            printf("VEGA Error: initial position matrix size mismatch.\n");
-            exit(1);
-        }
-    }
-    else if ((femConfig->deformableObject == MASSSPRING) && (femConfig->massSpringSystemSource == CHAIN))
-    {
-        uInitial = new double[3*n]();
-        int numParticles = massSpringSystem->GetNumParticles();
+        auto aInitialPointer = uInitial.data();
+        ReadMatrixFromDisk_(femConfig->initialPositionFilename, &m1, &n1, &aInitialPointer);
 
-        for (int i = 0; i < numParticles; i++)
+        if ((m1 != 3 * numNodes) || (n1 != 1))
         {
-            uInitial[3 * i + 0] = 1.0 - ((numParticles == 1) ? 1.0 : 1.0 * i / (numParticles - 1));
-            uInitial[3 * i + 1] = 1.0 - ((numParticles == 1) ? 0.0 : 1.0 * i / (numParticles - 1));
-            uInitial[3 * i + 2] = 0.0;
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! initial position matrix size mismatch.\n";
         }
     }
     else
     {
-        uInitial = new double[3*n]();
+        uInitial.resize(3 * numNodes);
     }
 
     // load initial velocity
     if (strcmp(femConfig->initialVelocityFilename, "__none") != 0)
     {
         int m1, n1;
-        ReadMatrixFromDisk_(femConfig->initialVelocityFilename, &m1, &n1, &velInitial);
+        auto velInitialPointer = uInitial.data();
+        ReadMatrixFromDisk_(femConfig->initialVelocityFilename, &m1, &n1, &velInitialPointer);
 
-        if ((m1 != 3 * n) || (n1 != 1))
+        if ((m1 != 3 * numNodes) || (n1 != 1))
         {
-            printf("VEGA Error: initial position matrix size mismatch.\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! initial position matrix size mismatch.\n";
         }
     }
 }
 
-// load the scripted externalloads
-void smVegaFemSceneObject::loadScriptedExternalFroces()
+void smVegaFemSceneObject::loadScriptedExternalForces()
 {
     // load force loads
     int numForceLoads = forceLoads.size();
@@ -755,10 +485,10 @@ void smVegaFemSceneObject::loadScriptedExternalFroces()
         double *data = forceLoads.data();
         ReadMatrixFromDisk_(femConfig->forceLoadsFilename, &m1, &numForceLoads, &data);
 
-        if (m1 != 3 * n)
+        if (m1 != 3 * numNodes)
         {
-            printf("VEGA Error: Mismatch in the dimension of the force load matrix.\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! Mismatch in the dimension of the force load matrix.\n";
         }
     }
 }
@@ -768,64 +498,95 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
 {
 
     int numFixedDOFs = 3 * this->fixedVertices.size();
-    std::vector<int> fixedDOFs(numFixedDOFs,0);
+    std::vector<int> fixedDOFs(numFixedDOFs, 0);
 
     // initialize the integrator
-    printf("VEGA: Initializing the integrator, n = %d...\n", n);
-    printf("VEGA: Solver type: %s\n", femConfig->solverMethod);
+    std::cout << "VEGA: Initializing the integrator, n = " << numNodes << "...\n";
+    std::cout << "VEGA: Solver type - " << femConfig->solverMethod << std::endl;
 
     integratorBaseSparse = nullptr;
 
-    if (femConfig->solver == IMPLICITNEWMARK)
+    if (femConfig->solver == smVegaObjectConfig::IMPLICITNEWMARK)
     {
-		implicitNewmarkSparse = std::make_shared<ImplicitNewmarkSparse>(3 * n, femConfig->timeStep,
-                massMatrix.get(), forceModel.get(), positiveDefinite,
-                numFixedDOFs, fixedDOFs.data(),
-                femConfig->dampingMassCoef,
-                femConfig->dampingStiffnessCoef,
-                femConfig->maxIterations,
-                femConfig->epsilon,
-                femConfig->newmarkBeta,
-                femConfig->newmarkGamma,
-                femConfig->numSolverThreads);
+        implicitNewmarkSparse = std::make_shared<ImplicitNewmarkSparse>(
+                                                                        3 * numNodes,
+                                                                        femConfig->timeStep,
+                                                                        massMatrix.get(),
+                                                                        forceModel.get(),
+                                                                        positiveDefinite,
+                                                                        numFixedDOFs,
+                                                                        fixedDOFs.data(),
+                                                                        femConfig->dampingMassCoef,
+                                                                        femConfig->dampingStiffnessCoef,
+                                                                        femConfig->maxIterations,
+                                                                        femConfig->epsilon,
+                                                                        femConfig->newmarkBeta,
+                                                                        femConfig->newmarkGamma,
+                                                                        femConfig->numSolverThreads
+                                                                        );
+
         integratorBaseSparse = implicitNewmarkSparse;
     }
-    else if (femConfig->solver == IMPLICITBACKWARDEULER)
+    else if (femConfig->solver == smVegaObjectConfig::IMPLICITBACKWARDEULER)
     {
-		implicitNewmarkSparse = std::make_shared<ImplicitBackwardEulerSparse>(3 * n, femConfig->timeStep,
-                massMatrix.get(), forceModel.get(), positiveDefinite,
-                numFixedDOFs, fixedDOFs.data(),
-                femConfig->dampingMassCoef,
-                femConfig->dampingStiffnessCoef,
-                femConfig->maxIterations,
-                femConfig->epsilon,
-                femConfig->numSolverThreads);
+        implicitNewmarkSparse = std::make_shared<ImplicitBackwardEulerSparse>(
+                                                                            3 * numNodes,
+                                                                            femConfig->timeStep,
+                                                                            massMatrix.get(),
+                                                                            forceModel.get(),
+                                                                            positiveDefinite,
+                                                                            numFixedDOFs,
+                                                                            fixedDOFs.data(),
+                                                                            femConfig->dampingMassCoef,
+                                                                            femConfig->dampingStiffnessCoef,
+                                                                            femConfig->maxIterations,
+                                                                            femConfig->epsilon,
+                                                                            femConfig->numSolverThreads);
+
         integratorBaseSparse = implicitNewmarkSparse;
     }
-    else if (femConfig->solver == EULER)
+    else if (femConfig->solver == smVegaObjectConfig::EULER)
     {
         int symplectic = 0;
-		integratorBaseSparse = std::make_shared<EulerSparse>(3 * n, femConfig->timeStep,
-                                               massMatrix.get(), forceModel.get(), symplectic,
-                                               numFixedDOFs, fixedDOFs.data(),
-                                               femConfig->dampingMassCoef);
+        integratorBaseSparse = std::make_shared<EulerSparse>(
+                                                            3 * numNodes,
+                                                            femConfig->timeStep,
+                                                            massMatrix.get(),
+                                                            forceModel.get(),
+                                                            symplectic,
+                                                            numFixedDOFs,
+                                                            fixedDOFs.data(),
+                                                            femConfig->dampingMassCoef
+                                                            );
     }
-    else if (femConfig->solver == SYMPLECTICEULER)
+    else if (femConfig->solver == smVegaObjectConfig::SYMPLECTICEULER)
     {
         int symplectic = 1;
-        integratorBaseSparse = std::make_shared<EulerSparse>(3 * n, femConfig->timeStep, massMatrix.get(),
-                                               forceModel.get(), symplectic, numFixedDOFs,
-                                               fixedDOFs.data(), femConfig->dampingMassCoef);
+        integratorBaseSparse = std::make_shared<EulerSparse>(
+                                                            3 * numNodes,
+                                                            femConfig->timeStep,
+                                                            massMatrix.get(),
+                                                            forceModel.get(),
+                                                            symplectic,
+                                                            numFixedDOFs,
+                                                            fixedDOFs.data(),
+                                                            femConfig->dampingMassCoef
+                                                            );
     }
-    else if (femConfig->solver == CENTRALDIFFERENCES)
+    else if (femConfig->solver == smVegaObjectConfig::CENTRALDIFFERENCES)
     {
-		integratorBaseSparse = std::make_shared<CentralDifferencesSparse>(3 * n, femConfig->timeStep,
-                massMatrix.get(), forceModel.get(),
-                numFixedDOFs, fixedDOFs.data(),
-                femConfig->dampingMassCoef,
-                femConfig->dampingStiffnessCoef,
-                femConfig->centralDifferencesTangentialDampingUpdateMode,
-                femConfig->numSolverThreads);
+        integratorBaseSparse = std::make_shared<CentralDifferencesSparse>(
+                                                            3 * numNodes,
+                                                            femConfig->timeStep,
+                                                            massMatrix.get(),
+                                                            forceModel.get(),
+                                                            numFixedDOFs,
+                                                            fixedDOFs.data(),
+                                                            femConfig->dampingMassCoef,
+                                                            femConfig->dampingStiffnessCoef,
+                                                            femConfig->centralDifferencesTangentialDampingUpdateMode,
+                                                            femConfig->numSolverThreads
+                                                            );
     }
 
     LinearSolver *linearSolver = new CGSolver(integratorBaseSparse->GetSystemMatrix());
@@ -834,23 +595,23 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
 
     if (integratorBase == nullptr)
     {
-        printf("VEGA Error: failed to initialize numerical integrator.\n");
-        exit(1);
+        PRINT_ERROR_LOCATION
+        std::cout << "VEGA: error! failed to initialize numerical integrator.\n";
     }
 
     // set integration parameters
     integratorBaseSparse->SetDampingMatrix(LaplacianDampingMatrix.get());
     integratorBase->ResetToRest();
-    integratorBase->SetState(uInitial, velInitial);
+    integratorBase->SetState(uInitial.data(), velInitial.data());
     integratorBase->SetTimestep(femConfig->timeStep / femConfig->substepsPerTimeStep);
 
     if (implicitNewmarkSparse != nullptr)
     {
         implicitNewmarkSparse->UseStaticSolver(staticSolver);
 
-        if (velInitial != nullptr)
+        if (velInitial.data() != nullptr)
         {
-            implicitNewmarkSparse->SetState(implicitNewmarkSparse->Getq(), velInitial);
+            implicitNewmarkSparse->SetState(implicitNewmarkSparse->Getq(), velInitial.data());
         }
     }
 }
@@ -860,23 +621,28 @@ void smVegaFemSceneObject::createForceModel()
 {
 
     // create force models, to be used by the integrator
-    printf("VEGA: Creating force models...\n");
+    std::cout << "VEGA: Creating force models..." << std::endl;
 
-    if (femConfig->deformableObject == STVK)
+    switch (femConfig->deformableObject)
     {
-		stVKForceModel = std::make_shared<StVKForceModel>(stVKInternalForces.get(), stVKStiffnessMatrix.get());
-        forceModel = stVKForceModel;
-        stVKForceModel->GetInternalForce(uInitial, u);
-    }
+    case smVegaObjectConfig::STVK:
+    {
 
-    if (femConfig->deformableObject == COROTLINFEM)
+        stVKForceModel = std::make_shared<StVKForceModel>(stVKInternalForces.get(),
+                                                          stVKStiffnessMatrix.get());
+        forceModel = stVKForceModel;
+        stVKForceModel->GetInternalForce(uInitial.data(), u.data());
+
+        break;
+    }
+    case smVegaObjectConfig::COROTLINFEM:
     {
         TetMesh * tetMesh = dynamic_cast<TetMesh*>(volumetricMesh.get());
 
         if (tetMesh == nullptr)
         {
-            printf("VEGA Error: the input mesh is not a tet mesh (CLFEM deformable model).\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! the input mesh is not a tet mesh (CLFEM deformable model).\n";
         }
 
         CorotationalLinearFEM * corotationalLinearFEM;
@@ -890,25 +656,28 @@ void smVegaFemSceneObject::createForceModel()
             corotationalLinearFEM = new CorotationalLinearFEMMT(tetMesh, femConfig->numInternalForceThreads);
         }
 
-		corotationalLinearFEMForceModel = std::make_shared<CorotationalLinearFEMForceModel>(
-            corotationalLinearFEM, femConfig->corotationalLinearFEM_warp);
+        corotationalLinearFEMForceModel = std::make_shared<CorotationalLinearFEMForceModel>(
+                                            corotationalLinearFEM, femConfig->corotationalLinearFEM_warp);
         forceModel = corotationalLinearFEMForceModel;
-    }
 
-    if (femConfig->deformableObject == LINFEM)
+        break;
+    }
+    case smVegaObjectConfig::LINFEM:
     {
-		std::shared_ptr<LinearFEMForceModel> linearFEMForceModel = std::make_shared<LinearFEMForceModel>(stVKInternalForces.get());
+        auto linearFEMForceModel = 
+                    std::make_shared<LinearFEMForceModel>(stVKInternalForces.get());
         forceModel = linearFEMForceModel;
-    }
 
-    if (femConfig->deformableObject == INVERTIBLEFEM)
+        break;
+    }
+    case smVegaObjectConfig::INVERTIBLEFEM:
     {
         TetMesh * tetMesh = dynamic_cast<TetMesh*>(volumetricMesh.get());
 
         if (tetMesh == nullptr)
         {
-            printf("VEGA Error: the input mesh is not a tet mesh (Invertible FEM deformable model).\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! the input mesh is not a tet mesh (Invertible FEM deformable model).\n";
         }
 
         IsotropicMaterial * isotropicMaterial = nullptr;
@@ -916,48 +685,48 @@ void smVegaFemSceneObject::createForceModel()
         // create the invertible material model
         if (strcmp(femConfig->invertibleMaterialString, "StVK") == 0)
         {
-            femConfig->invertibleMaterial = INV_STVK;
+            femConfig->invertibleMaterial = femConfig->invertibleMaterialType::INV_STVK;
         }
 
         if (strcmp(femConfig->invertibleMaterialString, "neoHookean") == 0)
         {
-            femConfig->invertibleMaterial = INV_NEOHOOKEAN;
+            femConfig->invertibleMaterial = femConfig->invertibleMaterialType::INV_NEOHOOKEAN;
         }
 
         if (strcmp(femConfig->invertibleMaterialString, "MooneyRivlin") == 0)
         {
-            femConfig->invertibleMaterial = INV_MOONEYRIVLIN;
+            femConfig->invertibleMaterial = femConfig->invertibleMaterialType::INV_MOONEYRIVLIN;
         }
 
         switch (femConfig->invertibleMaterial)
         {
-        case INV_STVK:
+        case smVegaObjectConfig::INV_STVK:
         {
 
             isotropicMaterial = new StVKIsotropicMaterial(tetMesh,
-                    femConfig->enableCompressionResistance,
-                    femConfig->compressionResistance);
-            printf("VEGA: Invertible material: StVK.\n");
+                                    femConfig->enableCompressionResistance,
+                                    femConfig->compressionResistance);
+            std::cout << "VEGA: Invertible material: StVK.\n";
             break;
         }
 
-        case INV_NEOHOOKEAN:
+        case smVegaObjectConfig::INV_NEOHOOKEAN:
             isotropicMaterial = new NeoHookeanIsotropicMaterial(tetMesh,
-                    femConfig->enableCompressionResistance,
-                    femConfig->compressionResistance);
-            printf("VEGA: Invertible material: neo-Hookean.\n");
+                                    femConfig->enableCompressionResistance,
+                                    femConfig->compressionResistance);
+            std::cout << "VEGA: Invertible material: neo-Hookean.\n";
             break;
 
-        case INV_MOONEYRIVLIN:
+        case smVegaObjectConfig::INV_MOONEYRIVLIN:
             isotropicMaterial = new MooneyRivlinIsotropicMaterial(tetMesh,
-                    femConfig->enableCompressionResistance,
-                    femConfig->compressionResistance);
-            printf("VEGA: Invertible material: Mooney-Rivlin.\n");
+                                    femConfig->enableCompressionResistance,
+                                    femConfig->compressionResistance);
+            std::cout << "VEGA: Invertible material: Mooney-Rivlin.\n";
             break;
 
         default:
-            printf("VEGA Error: invalid invertible material type.\n");
-            exit(1);
+            PRINT_ERROR_LOCATION
+            std::cout << "VEGA: error! invalid invertible material type.\n";
             break;
         }
 
@@ -966,65 +735,76 @@ void smVegaFemSceneObject::createForceModel()
 
         if (femConfig->numInternalForceThreads == 0)
             isotropicHyperelasticFEM = new IsotropicHyperelasticFEM(tetMesh, isotropicMaterial,
-                    femConfig->inversionThreshold,
-                    femConfig->addGravity, femConfig->g);
+            femConfig->inversionThreshold,
+            femConfig->addGravity, femConfig->g);
         else
-            isotropicHyperelasticFEM = new IsotropicHyperelasticFEMMT(tetMesh,
-                    isotropicMaterial,
-                    femConfig->inversionThreshold,
-                    femConfig->addGravity,
-                    femConfig->g,
-                    femConfig->numInternalForceThreads);
+            isotropicHyperelasticFEM = new IsotropicHyperelasticFEMMT(
+                                                            tetMesh,
+                                                            isotropicMaterial,
+                                                            femConfig->inversionThreshold,
+                                                            femConfig->addGravity,
+                                                            femConfig->g,
+                                                            femConfig->numInternalForceThreads
+                                                            );
 
         // create force model for the invertible FEM class
-        std::shared_ptr<IsotropicHyperelasticFEMForceModel> isotropicHyperelasticFEMForceModel =
-			std::make_shared<IsotropicHyperelasticFEMForceModel>(isotropicHyperelasticFEM);
+        auto isotropicHyperelasticFEMForceModel =
+                       std::make_shared<IsotropicHyperelasticFEMForceModel>(isotropicHyperelasticFEM);
+
         forceModel = isotropicHyperelasticFEMForceModel;
+
+        break;
+    }
+    default:
+    {
+        PRINT_ERROR_LOCATION
+        std::cout <<  "VEGA: error! Scene object is not of FE type!" << std::endl;
+        break;
+    }
     }
 
-    if (femConfig->deformableObject == MASSSPRING)
-    {
-		massSpringSystemForceModel = std::make_shared<MassSpringSystemForceModel>(massSpringSystem.get());
-        forceModel = massSpringSystemForceModel;
-		renderMassSprings = std::make_shared<RenderSprings>();
-    }
 }
 
 // Update the deformations by time stepping
 void smVegaFemSceneObject::advanceDynamics()
 {
-    cpuLoadCounter.StartCounter();
+    int i;
 
     // reset external forces (usually to zero)
-    memcpy(f_ext, f_extBase, sizeof(double) * 3 * n);
+    for (i = 0; i < 3 * numNodes; i++)
+    {
+        f_ext[i] = f_extBase[i];
+    }
 
-    if ((!femConfig->lockScene) && (!femConfig->pauseSimulation) && (femConfig->singleStepMode <= 1))
+    if (femConfig->singleStepMode <= 1)
     {
 
         // apply external user interaction forces
         applyUserInteractionForces();
 
         // apply pre-defined external forces
-        applyScriptedExternalForces();
+        //applyScriptedExternalForces();
 
         // apply external forces arising from contact
-        //applyContactForces();
+        applyContactForces();
 
         // set forces to the integrator
-        integratorBaseSparse->SetExternalForces(f_ext);
+        integratorBaseSparse->SetExternalForces(f_ext.data());
 
         // timestep the dynamics
         advanceOneTimeStep();
 
         timestepCounter++;
 
-        std::cout << "Time step: " << timestepCounter << std::endl;
-
-        memcpy(u, integratorBase->Getq(), sizeof(double) * 3 * n);
-
-        if(importAndUpdateVolumeMeshToSmtk)
+        double *q = integratorBase->Getq();
+        for (i = 0; i < 3 * numNodes; i++)
         {
-            smtkVolumeMesh->updateVolumeMeshFromVegaFormat(this->volumetricMesh);
+            u[i] = q[i];
+        }
+
+        if (importAndUpdateVolumeMeshToSmtk)
+        {
+            this->volumeMesh->updateVolumeMeshFromVegaFormat(this->volumetricMesh);
         }
 
         if (femConfig->singleStepMode == 1)
@@ -1040,71 +820,65 @@ void smVegaFemSceneObject::advanceDynamics()
 
             do
             {
-                titleBarCounter.StopCounter();
-                elapsedTime = titleBarCounter.GetElapsedTime();
-            }
-            while (1.0 * graphicFrame / elapsedTime >= 30.0);
+                performaceTracker.objectPerformanceCounter.StopCounter();
+                elapsedTime = performaceTracker.objectPerformanceCounter.GetElapsedTime();
+            } while (1.0 * graphicFrame / elapsedTime >= 30.0);
         }
     }
 
-    deformableObjectRenderingMesh->SetVertexDeformations(u);
+    vegaPrimarySurfaceMesh->SetVertexDeformations(u.data());
 
     // update the secondary mesh
     updateSecondaryRenderingMesh();
 
-    if(!renderUsingVega)
+    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
     {
-
-        if(strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
-        {
-            this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->deformableObjectRenderingMesh->GetMesh());
-        }
-        else
-        {
-            this->smtkSurfaceMesh->updateSurfaceMeshFromVegaFormat(this->secondaryDeformableObjectRenderingMesh->GetMesh());
-        }
+        this->primarySurfaceMesh->updateSurfaceMeshFromVegaFormat(
+                                                this->vegaPrimarySurfaceMesh->GetMesh());
     }
-    smtkSurfaceMesh->updateTriangleNormals();
-    smtkSurfaceMesh->updateVertexNormals();
+    else
+    {
+        this->primarySurfaceMesh->updateSurfaceMeshFromVegaFormat(
+                                                this->vegaSecondarySurfaceMesh->GetMesh());
+    }
+    
+    primarySurfaceMesh->updateTriangleNormals();
+    primarySurfaceMesh->updateVertexNormals();
 
     // update stasts
-    updateStats();
-
-    cpuLoadCounter.StopCounter();
-    double cpuTimePerGraphicsFrame = cpuLoadCounter.GetElapsedTime();
-    cpuLoad = cpuTimePerGraphicsFrame * fps;
+    updatePerformanceMetrics();
 }
 
 // Advance in time by a specificed amount and a chosen time stepping scheme
 inline void smVegaFemSceneObject::advanceOneTimeStep()
 {
-
+    smVegaPerformanceCounter *pt =  &performaceTracker;
     for (int i = 0; i < femConfig->substepsPerTimeStep; i++)
     {
         int code = integratorBase->DoTimestep();
-        //printf("."); fflush(nullptr);
 
-        forceAssemblyLocalTime = integratorBaseSparse->GetForceAssemblyTime();
-        systemSolveLocalTime = integratorBaseSparse->GetSystemSolveTime();
+        pt->forceAssemblyLocalTime = integratorBaseSparse->GetForceAssemblyTime();
+        pt->systemSolveLocalTime = integratorBaseSparse->GetSystemSolveTime();
 
         // average forceAssemblyTime over last "forceAssemblyBufferSize" samples
-        forceAssemblyTime += 1.0 / forceAssemblyBufferSize *
-                             (forceAssemblyLocalTime - forceAssemblyBuffer[forceAssemblyHead]);
-        forceAssemblyBuffer[forceAssemblyHead] = forceAssemblyLocalTime;
-        forceAssemblyHead = (forceAssemblyHead + 1) % forceAssemblyBufferSize;
+        pt->forceAssemblyTime += 1.0 / pt->forceAssemblyBufferSize *
+            (pt->forceAssemblyLocalTime - pt->forceAssemblyBuffer[pt->forceAssemblyHead]);
+        pt->forceAssemblyBuffer[pt->forceAssemblyHead] = pt->forceAssemblyLocalTime;
+        pt->forceAssemblyHead = (pt->forceAssemblyHead + 1) % pt->forceAssemblyBufferSize;
 
         // average systemSolveTime over last "systemSolveBufferSize" samples
-        systemSolveTime += 1.0 / systemSolveBufferSize *
-                           (systemSolveLocalTime - systemSolveBuffer[systemSolveHead]);
-        systemSolveBuffer[systemSolveHead] = systemSolveLocalTime;
-        systemSolveHead = (systemSolveHead + 1) % systemSolveBufferSize;
+        pt->systemSolveTime += 1.0 / pt->systemSolveBufferSize *
+            (pt->systemSolveLocalTime - pt->systemSolveBuffer[pt->systemSolveHead]);
+        pt->systemSolveBuffer[pt->systemSolveHead] = pt->systemSolveLocalTime;
+        pt->systemSolveHead = (pt->systemSolveHead + 1) % pt->systemSolveBufferSize;
 
         if (code != 0)
         {
-            printf("VEGA: The integrator went unstable. Reduce the timestep, or increase the number of substeps per timestep.\n");
+            std::cout << "VEGA: The integrator went unstable."
+                <<"Reduce the timestep, or increase the number of substeps per timestep.\n";
             integratorBase->ResetToRest();
 
-            for (int i = 0; i < 3 * n; i++)
+            for (int i = 0; i < 3 * numNodes; i++)
             {
                 f_ext[i] = 0;
                 f_extBase[i] = 0;
@@ -1112,7 +886,7 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
 
             integratorBase->SetExternalForcesToZero();
             explosionFlag = 1;
-            explosionCounter.StartCounter();
+            pt->explosionCounter.StartCounter();
             break;
         }
 
@@ -1121,33 +895,15 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
         {
             char s[4096];
             sprintf(s, "%s.u.%04d", femConfig->outputFilename, subTimestepCounter);
-            printf("VEGA: Saving deformation to %s.\n", s);
-            WriteMatrixToDisk_(s, 3 * n, 1, integratorBase->Getq());
+            std::cout << "VEGA: Saving deformation to " << s << ".\n";
+            WriteMatrixToDisk_(s, 3 * numNodes, 1, integratorBase->Getq());
             sprintf(s, "%s.f.%04d", femConfig->outputFilename, subTimestepCounter);
-            printf("VEGA: Saving forces to %s.\n", s);
-            WriteMatrixToDisk_(s, 3 * n, 1, integratorBase->GetExternalForces());
+            std::cout << "VEGA: Saving forces to " << s << ".\n";
+            WriteMatrixToDisk_(s, 3 * numNodes, 1, integratorBase->GetExternalForces());
         }
 
         subTimestepCounter++;
     }
-}
-
-
-void smVegaFemSceneObject::applyContactForces()
-{
-    if(f_contact.size() != 0)
-    {
-        for(int i=0; i<f_contact.size(); i++)
-        {
-            f_ext[i] += f_contact[i];
-        }
-    }
-}
-
-
-void smVegaFemSceneObject::setContactForcesToZero()
-{
-    f_contact.assign(f_contact.size(),0.0);
 }
 
 void smVegaFemSceneObject::setPulledVertex(const smVec3d &userPos)
@@ -1155,7 +911,8 @@ void smVegaFemSceneObject::setPulledVertex(const smVec3d &userPos)
     pulledVertex = this->volumetricMesh->getClosestVertex(Vec3d(userPos(0), userPos(1), userPos(2)));
 }
 
-// Forces as a result of user interaction (through an interface such as mouse or haptic device) with the scene during runtime are added here
+// Forces as a result of user interaction (through an interface such as mouse or haptic device)
+// with the scene during runtime are added here
 inline void smVegaFemSceneObject::applyUserInteractionForces()
 {
 
@@ -1193,7 +950,7 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
 
             std::set<int> newAffectedVertices;
 
-            for (std::set<int> :: iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
+            for (std::set<int> ::iterator iter = lastLayerVertices.begin(); iter != lastLayerVertices.end(); iter++)
             {
                 // traverse all neighbors and check if they were already previously inserted
                 int vtx = *iter;
@@ -1213,7 +970,7 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
 
             lastLayerVertices.clear();
 
-            for (std::set<int> :: iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
+            for (std::set<int> ::iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
             {
                 // apply force
                 f_ext[3 * *iter + 0] += forceMagnitude * externalForce[0];
@@ -1228,95 +985,141 @@ inline void smVegaFemSceneObject::applyUserInteractionForces()
     }
 }
 
-
-// Forces that are defined by the user before the start of the simulation is added to the external force vector here
+// Forces that are defined by the user before the start of the
+// simulation is added to the external force vector here
 inline void smVegaFemSceneObject::applyScriptedExternalForces()
 {
-
     // apply any scripted force loads
     if (timestepCounter < this->forceLoads.size())
     {
-        printf("  External forces read from the binary input file.\n");
+        std::cout << "External forces read from the binary input file.\n";
 
-        size_t offset = 3*n*timestepCounter;
-        for (size_t i = 0, end = 3u*n; i < end; i++)
+        size_t offset = 3 * numNodes*timestepCounter;
+        for (size_t i = 0, end = 3u * numNodes; i < end; i++)
         {
-            f_ext[i] += forceLoads[offset+i];
+            f_ext[i] += forceLoads[offset + i];
         }
     }
-
 }
-
 
 // Use the computed displacemetnt update to interpolate to the secondary display mesh
 inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
 {
-
     // interpolate deformations from volumetric mesh to rendering triangle mesh
-    if (secondaryDeformableObjectRenderingMesh != nullptr)
+    if (vegaSecondarySurfaceMesh != nullptr)
     {
         VolumetricMesh::interpolate(
-            u, uSecondary,
-            secondaryDeformableObjectRenderingMesh->Getn(),
-            secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices,
-            secondaryDeformableObjectRenderingMesh_interpolation_vertices,
-            secondaryDeformableObjectRenderingMesh_interpolation_weights
-        );
-        secondaryDeformableObjectRenderingMesh->SetVertexDeformations(uSecondary);
+            u.data(), uSecondary.data(),
+            vegaSecondarySurfaceMesh->Getn(),
+            numInterpolationElementVerts,
+            interpolationVertices,
+            interpolationWeights
+            );
+        vegaSecondarySurfaceMesh->SetVertexDeformations(uSecondary.data());
     }
 
-    if (femConfig->useRealTimeNormals)
+    // recompute normals
+    if (vegaSecondarySurfaceMesh != nullptr)
     {
-        // recompute normals
-        deformableObjectRenderingMesh->BuildNormals();
-
-        if (secondaryDeformableObjectRenderingMesh != nullptr)
-        {
-            secondaryDeformableObjectRenderingMesh->BuildNormals();
-        }
+        vegaSecondarySurfaceMesh->BuildNormals();
+    }
+    else
+    {
+        vegaPrimarySurfaceMesh->BuildNormals();
     }
 
     if (explosionFlag)
     {
-        explosionCounter.StopCounter();
-
-        if (explosionCounter.GetElapsedTime() > 4.0) // the message will appear on screen for 4 seconds
+        performaceTracker.explosionCounter.StopCounter();
+        // the message will appear on screen for 4 seconds
+        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0) 
         {
             explosionFlag = 0;
         }
     }
 }
 
-// Updates the stats related to timing, fps etc. Also updates window title with real-time information
-inline void smVegaFemSceneObject::updateStats()
+// Updates the stats related to timing, fps etc.
+inline void smVegaFemSceneObject::updatePerformanceMetrics()
 {
-
+    smVegaPerformanceCounter *pt = &performaceTracker;
     //update window title at 5 Hz
-    titleBarCounter.StopCounter();
-    double elapsedTime = titleBarCounter.GetElapsedTime();
+    pt->objectPerformanceCounter.StopCounter();
+    double elapsedTime = pt->objectPerformanceCounter.GetElapsedTime();
 
     if (elapsedTime >= 1.0 / 5)
     {
-        titleBarCounter.StartCounter();
+        pt->objectPerformanceCounter.StartCounter();
         double fpsLocal = graphicFrame / elapsedTime;
 
         // average fps over last "fpsBufferSize" samples
-        fps += 1.0 / fpsBufferSize * (fpsLocal - fpsBuffer[fpsHead]);
-        fpsBuffer[fpsHead] = fpsLocal;
-        fpsHead = (fpsHead + 1) % fpsBufferSize;
+        pt->fps += 1.0 / pt->fpsBufferSize * (fpsLocal - pt->fpsBuffer[pt->fpsHead]);
+        pt->fpsBuffer[pt->fpsHead] = fpsLocal;
+        pt->fpsHead = (pt->fpsHead + 1) % pt->fpsBufferSize;
 
         graphicFrame = 0;
 
-        if ((femConfig->syncTimestepWithGraphics) && ((!femConfig->lockScene) &&
-                (!femConfig->pauseSimulation) && (femConfig->singleStepMode == 0)))
+        if (femConfig->syncTimestepWithGraphics && femConfig->singleStepMode == 0)
         {
-            femConfig->timeStep = 1.0 / fps;
+            femConfig->timeStep = 1.0 / pt->fps;
             integratorBase->SetTimestep(femConfig->timeStep / femConfig->substepsPerTimeStep);
         }
     }
 }
 
-void smVegaFemSceneObject::draw()
+void smVegaFemSceneObject::printInfo() const
 {
-    smtkSurfaceMesh->draw();
+    std::cout << "\t-------------------------------------\n";
+    std::cout << "\t Name        : " << this->getName() << std::endl;
+    std::cout << "\t Type        : " << this->getType() << std::endl;
+    std::cout << "\t Model       : " << "--"  << std::endl;
+    std::cout << "\t # Nodes     : " << this->getNumNodes() << std::endl;
+    std::cout << "\t # TotalDOF  : " << this->getNumDof() << std::endl;
+    std::cout << "\t-------------------------------------\n";
+}
+
+smVec3d smVegaFemSceneObject::getVelocityOfNodeWithDofID(const int dofID) const
+{
+    smVec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
+
+    return vel;
+}
+
+smVec3d smVegaFemSceneObject::getDisplacementOfNodeWithDofID(const int dofID) const
+{
+    smVec3d disp(u[dofID], u[dofID + 1], u[dofID + 2]);
+
+    return disp;
+}
+
+smVec3d smVegaFemSceneObject::getAccelerationOfNodeWithDofID(const int dofID) const
+{
+    smVec3d accn(uaccel[dofID], uaccel[dofID + 1], uaccel[dofID + 2]);
+
+    return accn;
+}
+
+int smVegaFemSceneObject::getNumNodes() const
+{
+    return numNodes;
+}
+
+int smVegaFemSceneObject::getNumTotalDof() const
+{
+    return numTotalDOF;
+}
+
+int smVegaFemSceneObject::getNumDof() const
+{
+    return numDOF;
+}
+
+int smVegaFemSceneObject::getNumFixedNodes() const
+{
+    return numFixedNodes;
+}
+
+int smVegaFemSceneObject::getNumFixedDof() const
+{
+    return numFixedDof;
 }

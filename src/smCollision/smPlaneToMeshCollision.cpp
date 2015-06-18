@@ -35,21 +35,29 @@
 void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pair)
 {
     auto mesh = std::static_pointer_cast<smMeshCollisionModel>(pair->getFirst());
-    auto plane = std::static_pointer_cast<smPlaneCollisionModel>(pair->getFirst());
+    auto plane = std::static_pointer_cast<smPlaneCollisionModel>(pair->getSecond());
 
-    if(!mesh || !plane)
-        return;
-
-    smVec3d planeNormal = plane->getNormal();
-    float planeOffset = planeNormal.dot(plane->getPosition());
-    for (const auto& vertex : mesh->getVertices())
+    if (!mesh || !plane)
     {
-        double d = planeNormal.dot(vertex) - planeOffset;
-        if (d < std::numeric_limits<float>::epsilon())
-        {
-            // Create contact
-            pair->addContact(-d, vertex, planeNormal);
-        }
+        return;
     }
 
+    double d;
+    smVec3d planeNormal = plane->getPlaneModel()->getUnitNormal();
+    smVec3d planePos = plane->getPlaneModel()->getPoint();
+
+    smVec3d vert;
+    pair->clearContacts();
+    for (int i = 0; i < mesh->getVertices().size(); i++)//const auto& vertex : mesh->getVertices()
+    {
+        vert = mesh->getVertices()[i];
+        d = planeNormal.dot(vert - planePos);
+
+        if (d < std::numeric_limits<float>::epsilon())
+        {         
+            pair->addContact(d, vert, i, planeNormal);// Create contact
+        }
+    }
+    /*std::cout << "@ Collision detection\n";
+    pair->printCollisionPairs();*/
 }

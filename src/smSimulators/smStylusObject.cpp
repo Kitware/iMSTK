@@ -98,7 +98,7 @@ void smStylusRigidSceneObject::initDraw()
     }
 }
 
-smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
+smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/) : smSceneObject()
 {
     type = SIMMEDTK_SMSTYLUSSCENEOBJECT;
     toolEnabled = true;
@@ -113,7 +113,9 @@ smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*
     enableDeviceManipulatedTool = false;
 }
 
-smStylusDeformableSceneObject::smStylusDeformableSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
+smStylusDeformableSceneObject::smStylusDeformableSceneObject(
+                                            std::shared_ptr<smErrorLog>/*p_log*/)
+                                            : smStylusSceneObject()
 {
     type = SIMMEDTK_SMSTYLUSDEFORMABLESCENEOBJECT;
 }
@@ -253,5 +255,4 @@ std::shared_ptr<smSceneObject> smStylusRigidSceneObject::clone()
     return ret;
 }
 
-void smStylusRigidSceneObject::init() {}
-void smStylusSceneObject::init() {}
+//void smStylusSceneObject::init() {}

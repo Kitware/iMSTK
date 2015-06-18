@@ -106,10 +106,8 @@ public:
     /// \brief !!
     virtual void unSerialize(void *p_memoryBlock) override;
 
-    virtual void init() override;
-
     /// \brief handle the events such as button presses related to stylus
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;    
 
 public:
     smVec3d pos; // position of stylus
@@ -172,16 +170,92 @@ public:
     virtual void draw() override;
 
     /// \brief !!
-    virtual void init() override;
+    virtual void initialize() override {};
+
+    void loadInitialStates() override{};
+
+    bool configure(const smString ConfigFile)
+    {
+        return false;
+    }
+
+    std::shared_ptr<void> duplicateAtRuntime()
+    {
+        std::shared_ptr<smStylusRigidSceneObject> newSO =
+            std::make_shared<smStylusRigidSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+
+    std::shared_ptr<void> duplicateAtInitialization()
+    {
+        std::shared_ptr<smStylusRigidSceneObject> newSO =
+            std::make_shared<smStylusRigidSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+
+    void printInfo() const override
+    {
+        std::cout << "\t-------------------------------------\n";
+        std::cout << "\t Name        : " << this->getName() << std::endl;
+        std::cout << "\t Type        : " << this->getType() << std::endl;
+        std::cout << "\t-------------------------------------\n";
+    }
 
 private:
     std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
 };
 
+
+
+
 /// \brief !!
 class smStylusDeformableSceneObject: public smStylusSceneObject
 {
+ 
+public:
     smStylusDeformableSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+
+    ~smStylusDeformableSceneObject(){};
+
+    virtual void initialize() override {};
+
+    void loadInitialStates() {};
+
+    bool configure(smString ConfigFile)
+    {
+        return false;
+    }
+
+    std::shared_ptr<void> duplicateAtRuntime()
+    {
+        std::shared_ptr<smStylusDeformableSceneObject> newSO =
+            std::make_shared<smStylusDeformableSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+    std::shared_ptr<void> duplicateAtInitialization()
+    {
+        std::shared_ptr<smStylusDeformableSceneObject> newSO =
+            std::make_shared<smStylusDeformableSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+    std::shared_ptr<smSceneObject> clone() override
+    {
+        // WARNING: What is the purpose of this function
+        std::shared_ptr<smStylusDeformableSceneObject> ret = std::make_shared<smStylusDeformableSceneObject>();
+        return ret;
+    }
+
+    void printInfo() const override
+    {
+        std::cout << "\t-------------------------------------\n";
+        std::cout << "\t Name        : " << this->getName() << std::endl;
+        std::cout << "\t Type        : " << this->getType() << std::endl;
+        std::cout << "\t-------------------------------------\n";
+    }
 };
 
 #endif

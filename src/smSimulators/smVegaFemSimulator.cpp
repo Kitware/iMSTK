@@ -29,7 +29,6 @@ smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog )
     hapticButtonPressed = false;
 }
 
-
 void smVegaFemSimulator::beginSim()
 {
 }

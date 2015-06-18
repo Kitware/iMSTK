@@ -23,35 +23,76 @@
 
 #include "smContactHandling/smContactHandling.h"
 
-void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject >& first,
-                        const std::shared_ptr< smSceneObject >& second)
+smContactHandling::smContactHandling(const bool typeBilateral)
 {
-    this->collidingSceneObjects.first = first;
-    this->collidingSceneObjects.second = second;
+    if (typeBilateral)
+    {
+        isBilateral = true;
+    }
+    else
+    {
+        isBilateral = false;
+    }
+
+    type = smContactHandlingType::UNKNOWN;
+};
+
+smContactHandling::smContactHandling(const bool typeBilateral,
+                                     const std::shared_ptr< smSceneObject > first,
+                                     const std::shared_ptr< smSceneObject > second)
+{
+    if (typeBilateral)
+    {
+        isBilateral = true;
+    }
+    else
+    {
+        isBilateral = false;
+    }
+
+    setSceneObjects(first, second);
+
+    type = smContactHandlingType::UNKNOWN;
 }
 
-void smContactHandling::setCollisionPairs(const std::shared_ptr< smCollisionPair >& colPair)
+smContactHandling::~smContactHandling()
 {
-    this->collisionPairs = colPair;
+}
+
+/// \brief Set the scene objects that are colliding
+void smContactHandling::setSceneObjects(const std::shared_ptr< smSceneObject > first,
+                                        const std::shared_ptr< smSceneObject > second)
+{
+    collidingSceneObjects.first = first;
+    collidingSceneObjects.second = second;
+}
+
+void smContactHandling::setCollisionPairs(const std::shared_ptr< smCollisionPair > colPair)
+{
+    collisionPairs = colPair;
 }
 
 std::shared_ptr<smCollisionPair> smContactHandling::getCollisionPairs() const
 {
-    return this->collisionPairs;
+    return collisionPairs;
 }
-
 
 smContactHandlingType smContactHandling::getContactHandlingType() const
 {
-    return this->contactHandlingType;
+    return type;
 }
 
 std::shared_ptr<smSceneObject> smContactHandling::getFirstSceneObject() const
 { 
-	return this->collidingSceneObjects.first; 
+    return collidingSceneObjects.first; 
 }
 
 std::shared_ptr<smSceneObject> smContactHandling::getSecondSceneObject() const
 {
-    return this->collidingSceneObjects.second; 
+    return collidingSceneObjects.second;
+}
+
+bool smContactHandling::isUnilateral() const
+{
+    return !isBilateral;
 }
