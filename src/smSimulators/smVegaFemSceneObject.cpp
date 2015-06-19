@@ -418,7 +418,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     }
 }
 
-int smVegaFemSceneObject::readBcFromFile(char* filename, int& numFixed, int offset)
+int smVegaFemSceneObject::readBcFromFile(const char* filename, const int offset)
 {
     // comma-separated text file of fixed vertices
     FILE * fin;
@@ -430,7 +430,7 @@ int smVegaFemSceneObject::readBcFromFile(char* filename, int& numFixed, int offs
         return 1;
     }
 
-    numFixed = 0;
+    int numFixed = 0;
 
     char s[4096];
     while (fgets(s, 4096, fin) != nullptr)
@@ -473,29 +473,27 @@ int smVegaFemSceneObject::readBcFromFile(char* filename, int& numFixed, int offs
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
-    int numFixedVertices = 0;
-
     // read the fixed vertices
     // 1-indexed notation
     if (strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
     {    
         // set the offset to 1 because nodes are numbered from 1 in .bou file
-        if (readBcFromFile(femConfig->fixedVerticesFilename, numFixedVertices, 1) != 0)
+        if (readBcFromFile(femConfig->fixedVerticesFilename, 1) != 0)
         {
             PRINT_ERROR_LOCATION
             throw std::logic_error("VEGA: error! reading fixed vertices.");
         }
+        numFixedNodes = fixedVertices.size();
 
         // sort the list
-        LoadList::sort(numFixedVertices, fixedVertices.data());
+        LoadList::sort(numFixedNodes, fixedVertices.data());
     }
 
-    std::cout << "VEGA: Loaded " << numFixedVertices << " fixed vertices. They are : \n";
-    LoadList::print(numFixedVertices, fixedVertices.data());
+    std::cout << "VEGA: Loaded " << numFixedNodes << " fixed vertices. They are : \n";
+    LoadList::print(numFixedNodes, fixedVertices.data());
 
     numTotalDOF = 3 * numNodes;
-    numFixedNodes = numFixedVertices;
-    numFixedDof = 3 * numFixedVertices;
+    numFixedDof = 3 * numFixedNodes;
     numDOF = numTotalDOF - numFixedDof;
 
     std::cout << "VEGA: Fixed boundary vertices loaded.\n";

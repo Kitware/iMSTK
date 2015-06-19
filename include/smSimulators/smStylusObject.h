@@ -179,22 +179,6 @@ public:
         return false;
     }
 
-    std::shared_ptr<void> duplicateAtRuntime()
-    {
-        std::shared_ptr<smStylusRigidSceneObject> newSO =
-            std::make_shared<smStylusRigidSceneObject>();
-
-        return (std::shared_ptr<void>)newSO;
-    }
-
-    std::shared_ptr<void> duplicateAtInitialization()
-    {
-        std::shared_ptr<smStylusRigidSceneObject> newSO =
-            std::make_shared<smStylusRigidSceneObject>();
-
-        return (std::shared_ptr<void>)newSO;
-    }
-
     void printInfo() const override
     {
         std::cout << "\t-------------------------------------\n";

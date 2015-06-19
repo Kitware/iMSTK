@@ -91,7 +91,7 @@ public:
     void loadInitialStates() override;
 
     /// \brief reads the fixed nodes from .bou file
-    int readBcFromFile(char* filename, int& numFixed, int offset);
+    int readBcFromFile(const char* filename, const int offset);
 
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC() override;
