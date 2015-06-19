@@ -90,6 +90,9 @@ public:
     /// \brief load initial displacements and velocities of the nodes
     void loadInitialStates() override;
 
+    /// \brief reads the fixed nodes from .bou file
+    int readBcFromFile(char* filename, int& numFixed, int offset);
+
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC() override;
 

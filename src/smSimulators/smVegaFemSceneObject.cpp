@@ -418,6 +418,58 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     }
 }
 
+int smVegaFemSceneObject::readBcFromFile(char* filename, int& numFixed, int offset)
+{
+    // comma-separated text file of fixed vertices
+    FILE * fin;
+    fin = fopen(filename, "r");
+    if (!fin)
+    {
+        PRINT_ERROR_LOCATION
+        std::cout << "Error: could not open file "<< filename << ".\n";
+        return 1;
+    }
+
+    numFixed = 0;
+
+    char s[4096];
+    while (fgets(s, 4096, fin) != nullptr)
+    {
+        LoadList::stripBlanks(s);
+
+        char * pch;
+        pch = strtok(s, ",");
+        while ((pch != nullptr) && (isdigit(*pch)))
+        {
+            numFixed++;
+            pch = strtok(nullptr, ",");
+        }
+    }
+
+    fixedVertices.resize(numFixed);
+
+    rewind(fin);
+
+    numFixed = 0;
+
+    while (fgets(s, 4096, fin) != nullptr)
+    {
+        LoadList::stripBlanks(s);
+        char * pch;
+        pch = strtok(s, ",");
+        while ((pch != nullptr) && (isdigit(*pch)))
+        {
+            fixedVertices[numFixed] = atoi(pch) - offset;
+            numFixed++;
+            pch = strtok(nullptr, ",");
+        }
+    }
+
+    fclose(fin);
+
+    return 0;
+}
+
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
@@ -427,23 +479,19 @@ void smVegaFemSceneObject::loadFixedBC()
     // 1-indexed notation
     if (strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
     {    
-        //int* data = fixedVertices.data();
-        if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &fixedVertices) != 0)
+        // set the offset to 1 because nodes are numbered from 1 in .bou file
+        if (readBcFromFile(femConfig->fixedVerticesFilename, numFixedVertices, 1) != 0)
         {
             PRINT_ERROR_LOCATION
             throw std::logic_error("VEGA: error! reading fixed vertices.");
         }
 
-        LoadList::sort(numFixedVertices, fixedVertices);
+        // sort the list
+        LoadList::sort(numFixedVertices, fixedVertices.data());
     }
 
     std::cout << "VEGA: Loaded " << numFixedVertices << " fixed vertices. They are : \n";
-    LoadList::print(numFixedVertices, fixedVertices);
-
-    for (int i = 0; i < numFixedVertices; i++)
-    {
-        fixedVertices[i]--;
-    }
+    LoadList::print(numFixedVertices, fixedVertices.data());
 
     numTotalDOF = 3 * numNodes;
     numFixedNodes = numFixedVertices;
