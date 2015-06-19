@@ -37,12 +37,12 @@ class smOculusViewer : public smViewer
 public:
     smOculusViewer();
     virtual ~smOculusViewer();
-    virtual void init();
-    virtual void cleanUp();
+    virtual void init() override;
+    virtual void cleanUp() override;
 protected:
-    virtual void beginFrame();
-    virtual void endFrame();
-    virtual void renderToScreen(const smRenderOperation &p_rop);
+    virtual void beginFrame() override;
+    virtual void endFrame() override;
+    virtual void renderToScreen(const smRenderOperation &p_rop) override;
 private:
     ovrHmd hmd;
     ovrSizei eyeRes[2];

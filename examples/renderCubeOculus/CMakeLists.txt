@@ -6,6 +6,7 @@ target_link_libraries(renderCubeOculus
   smShader
   smMesh
   smEvent
+  smGeometry
   ExamplesCommon
   Oculus::Oculus
   )

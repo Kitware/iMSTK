@@ -515,8 +515,8 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene)
 {
     assert(p_scene);
 
-    smMatrix44f proj = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getProjMatRef());
-    smMatrix44f view = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getViewMatRef());
+    smMatrix44f proj = p_scene->getCamera()->getProjMat();
+    smMatrix44f view = p_scene->getCamera()->getViewMat();
 
     renderScene(p_scene, proj, view);
 }

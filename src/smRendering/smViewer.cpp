@@ -367,35 +367,6 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene);
-
-    //Render axis
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
-    {
-        smMatrix44f proj = Eigen::Map<smMatrix44f>(p_rop.scene->getCamera()->getProjMatRef());
-        smMatrix44f view = Eigen::Map<smMatrix44f>(p_rop.scene->getCamera()->getViewMatRef());
-
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadMatrixf(proj.data());
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadMatrixf(view.data());
-
-        //Enable lights
-        p_rop.scene->enableLights();
-        p_rop.scene->placeLights();
-
-        smGLRenderer::drawAxes(this->globalAxisLength);
-
-        p_rop.scene->disableLights();
-
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
-
-    }
-    
 }
 
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
@@ -527,15 +498,15 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::MouseButtonPressed:
     case sf::Event::MouseButtonReleased:
     {
-        smMouseButton mouseButton;
+        smtk::Event::smMouseButton mouseButton;
         if (sf::Mouse::Left == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Left;
+            mouseButton = smtk::Event::smMouseButton::Left;
         else if (sf::Mouse::Right == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Right;
+            mouseButton = smtk::Event::smMouseButton::Right;
         else if (sf::Mouse::Middle == p_event.mouseButton.button)
-            mouseButton = smMouseButton::Middle;
+            mouseButton = smtk::Event::smMouseButton::Middle;
         else
-            mouseButton = smMouseButton::Unknown;
+            mouseButton = smtk::Event::smMouseButton::Unknown;
 
         auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
         mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
@@ -548,7 +519,6 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
         auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
         mouseEvent->setSender(smtk::Event::EventSender::Module);
         mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
-
         eventHandler->triggerEvent(mouseEvent);
         break;
     }

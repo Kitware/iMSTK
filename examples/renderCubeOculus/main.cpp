@@ -88,10 +88,8 @@ int main()
     // Camera setup
     sceneCamera = smCamera::getDefaultCamera();
     assert(sceneCamera);
-    sceneCamera->setCameraPos(3, 3, 5);
-    sceneCamera->setCameraFocus(0, 0, -1);
-    sceneCamera->genProjMat();
-    sceneCamera->genViewMat();
+    sceneCamera->setPos(3, 3, 5);
+    sceneCamera->setFocus(0, 0, -1);
     scene1->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
 

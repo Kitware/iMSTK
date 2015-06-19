@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMTK_EXAMPLES_COMMON_WASDCAMERACONTROLLER_H
-#define SMTK_EXAMPLES_COMMON_WASDCAMERACONTROLLER_H
+#ifndef SMTK_EXAMPLES_COMMON_PZRMOUSECAMERACONTROLLER_H
+#define SMTK_EXAMPLES_COMMON_PZRMOUSECAMERACONTROLLER_H
 
 #include "smCore/smCoreClass.h"
 #include "smRendering/smCamera.h"
@@ -38,17 +38,17 @@ namespace Common {
 /// Shift + W = up, Shift + S = down
 /// To use this class, it must be registered with the event system.
 ///
-class wasdCameraController : public smCoreClass
+class pzrMouseCameraController : public smCoreClass
 {
 public:
     /// \brief Default constructor
     ///
-    wasdCameraController();
+    pzrMouseCameraController();
 
     /// \brief Default constructor
     ///
     /// \param cam Pointer to camera to be controlled
-    wasdCameraController(std::shared_ptr<smCamera> cam);
+    pzrMouseCameraController(std::shared_ptr<smCamera> cam);
 
     /// \brief Event handling function from smCoreClass
     ///
@@ -67,7 +67,10 @@ public:
 
 private:
     std::shared_ptr<smCamera> camera; ///< Pointer to camera being controlled
-    float moveDistance;
+    float moveDistance; ///< Modifier to the movement distance for operations
+    bool lmbPressed; ///< Left mouse button (un)pressed
+    bool rmbPressed; ///< Right mouse button (un)pressed
+    smVec2f coords; ///< Record of last window coords manipulated
 };
 
 }//Common
