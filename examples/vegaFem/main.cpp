@@ -46,6 +46,7 @@
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
+#include "../common/pzrMouseCameraController.h"
 //#include "../common/hapticController.h"
 
 int main()
@@ -62,6 +63,7 @@ int main()
     std::shared_ptr<smCamera> sceneCamera;
     std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    std::shared_ptr<smtk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
     //std::shared_ptr<smtk::Examples::Common::hapticController> hapticCtl;
     smMatrix33d mat;
 
@@ -182,9 +184,14 @@ int main()
 
     keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
 
+    pzrCamCtl = std::make_shared<smtk::Examples::Common::pzrMouseCameraController>();
+    pzrCamCtl->setCamera(sceneCamera);
+
     // Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
     viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(smtk::Event::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(smtk::Event::EventType::MouseButton, pzrCamCtl);
 
     //-------------------------------------------------------
     // Run the SDK

@@ -91,16 +91,16 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent>
 
         if(lmbPressed && rmbPressed)
         {
-            //rotate
-            this->camera->rotateFocusX(SM_DEGREES2RADIANS(moveDistance * diff(1)));
-            this->camera->rotateFocusY(SM_DEGREES2RADIANS(moveDistance * diff(0)));
+            //pan x and y
+            this->camera->pan(smVec3f(diff(0), diff(1), 0) * moveDistance);
             //reset coords for next mouse move event
             coords = newCoords;
         }
         else if(lmbPressed)
-        {
-            //pan x and y
-            this->camera->pan(smVec3f(diff(0), diff(1), 0) * moveDistance);
+        {            
+            //rotate
+            this->camera->rotateFocusX(SM_DEGREES2RADIANS(moveDistance * diff(1)));
+            this->camera->rotateFocusY(SM_DEGREES2RADIANS(moveDistance * diff(0)));
             //reset coords for next mouse move event
             coords = newCoords;
         }
