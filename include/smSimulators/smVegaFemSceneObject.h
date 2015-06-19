@@ -90,6 +90,9 @@ public:
     /// \brief load initial displacements and velocities of the nodes
     void loadInitialStates() override;
 
+    /// \brief reads the fixed nodes from .bou file
+    int readBcFromFile(const char* filename, const int offset);
+
     /// \brief Load the data related to the vertices that will be fixed
     void loadFixedBC() override;
 
@@ -226,6 +229,8 @@ private:
     int numInterpolationElementVerts;
     int* interpolationVertices;
     double* interpolationWeights;
+
+    std::shared_ptr<LinearSolver> linearSolver;
 
     // Vega surface meshes
     std::shared_ptr<smVegaSceneObjectDeformable> vegaPrimarySurfaceMesh;

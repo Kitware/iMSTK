@@ -66,6 +66,8 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
 
 smVegaFemSceneObject::~smVegaFemSceneObject()
 {
+    delete interpolationVertices;
+    delete interpolationWeights;
 }
 
 std::shared_ptr<smSceneObject> smVegaFemSceneObject::clone()
@@ -383,8 +385,6 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         vegaSecondarySurfaceMesh->BuildNeighboringStructure();
         vegaSecondarySurfaceMesh->BuildNormals();
 
-        //uSecondary = new double[3 * vegaSecondarySurfaceMesh->Getn()]();
-
         uSecondary.resize(3 * vegaSecondarySurfaceMesh->Getn());
 
         // load interpolation structure
@@ -418,54 +418,85 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     }
 }
 
+int smVegaFemSceneObject::readBcFromFile(const char* filename, const int offset)
+{
+    // comma-separated text file of fixed vertices
+    FILE * fin;
+    fin = fopen(filename, "r");
+    if (!fin)
+    {
+        PRINT_ERROR_LOCATION
+        std::cout << "Error: could not open file "<< filename << ".\n";
+        return 1;
+    }
+
+    int numFixed = 0;
+
+    char s[4096];
+    while (fgets(s, 4096, fin) != nullptr)
+    {
+        LoadList::stripBlanks(s);
+
+        char * pch;
+        pch = strtok(s, ",");
+        while ((pch != nullptr) && (isdigit(*pch)))
+        {
+            numFixed++;
+            pch = strtok(nullptr, ",");
+        }
+    }
+
+    fixedVertices.resize(numFixed);
+
+    rewind(fin);
+
+    numFixed = 0;
+
+    while (fgets(s, 4096, fin) != nullptr)
+    {
+        LoadList::stripBlanks(s);
+        char * pch;
+        pch = strtok(s, ",");
+        while ((pch != nullptr) && (isdigit(*pch)))
+        {
+            fixedVertices[numFixed] = atoi(pch) - offset;
+            numFixed++;
+            pch = strtok(nullptr, ",");
+        }
+    }
+
+    fclose(fin);
+
+    return 0;
+}
+
 // Load the data related to the vertices that will remain fixed
 void smVegaFemSceneObject::loadFixedBC()
 {
-    int numFixedVertices = fixedVertices.size();
-
     // read the fixed vertices
     // 1-indexed notation
-    if (strcmp(femConfig->fixedVerticesFilename, "__none") == 0)
-    {
-        fixedVertices.clear();
-    }
-    else
-    {
-        int* data = fixedVertices.data();
-        if (LoadList::load(femConfig->fixedVerticesFilename, &numFixedVertices, &data) != 0)
+    if (strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
+    {    
+        // set the offset to 1 because nodes are numbered from 1 in .bou file
+        if (readBcFromFile(femConfig->fixedVerticesFilename, 1) != 0)
         {
             PRINT_ERROR_LOCATION
             throw std::logic_error("VEGA: error! reading fixed vertices.");
         }
+        numFixedNodes = fixedVertices.size();
 
-        LoadList::sort(numFixedVertices, fixedVertices.data());
+        // sort the list
+        LoadList::sort(numFixedNodes, fixedVertices.data());
     }
 
-    std::cout << "VEGA: Loaded" << numFixedVertices << " fixed vertices. They are : \n";
-    LoadList::print(numFixedVertices, fixedVertices.data());
-
-    // create 0-indexed fixed DOFs
-    int numFixedDOFs = 3 * numFixedVertices;
-    int * fixedDOFs = new int[numFixedDOFs];
-
-    for (int i = 0; i < numFixedVertices; i++)
-    {
-        fixedDOFs[3 * i + 0] = 3 * fixedVertices[i] - 3;
-        fixedDOFs[3 * i + 1] = 3 * fixedVertices[i] - 2;
-        fixedDOFs[3 * i + 2] = 3 * fixedVertices[i] - 1;
-    }
-
-    for (int i = 0; i < numFixedVertices; i++)
-    {
-        fixedVertices[i]--;
-    }
+    std::cout << "VEGA: Loaded " << numFixedNodes << " fixed vertices. They are : \n";
+    LoadList::print(numFixedNodes, fixedVertices.data());
 
     numTotalDOF = 3 * numNodes;
-    numFixedNodes = numFixedVertices;
-    numFixedDof = 3 * numFixedVertices;
+    numFixedDof = 3 * numFixedNodes;
     numDOF = numTotalDOF - numFixedDof;
 
-    std::cout << "VEGA: Boundary vertices processed.\n";
+    std::cout << "VEGA: Fixed boundary vertices loaded.\n";
 }
 
 // load initial displacements and velocities of the nodes
@@ -527,7 +558,7 @@ void smVegaFemSceneObject::loadScriptedExternalForces()
 void smVegaFemSceneObject::initializeTimeIntegrator()
 {
 
-    int numFixedDOFs = 3 * this->fixedVertices.size();
+    int numFixedDOFs = 3 * numFixedNodes;
     std::vector<int> fixedDOFs(numFixedDOFs, 0);
 
     // initialize the integrator
@@ -619,8 +650,10 @@ void smVegaFemSceneObject::initializeTimeIntegrator()
                                                             );
     }
 
-    LinearSolver *linearSolver = new CGSolver(integratorBaseSparse->GetSystemMatrix());
-    integratorBaseSparse->setLinearSolver(linearSolver);
+    //LinearSolver *linearSolver = new CGSolver(integratorBaseSparse->GetSystemMatrix());
+
+    linearSolver = std::make_shared<CGSolver>(integratorBaseSparse->GetSystemMatrix());
+    integratorBaseSparse->setLinearSolver(linearSolver.get());
     integratorBase = integratorBaseSparse;
 
     if (integratorBase == nullptr)
