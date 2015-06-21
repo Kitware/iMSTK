@@ -367,6 +367,34 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
     processViewerOptions();
     //Render Scene
     smGLRenderer::renderScene(p_rop.scene);
+
+    //Render axis
+    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+    {      
+        smMatrix44f proj = p_rop.scene->getCamera()->getProjMat();
+        smMatrix44f view = p_rop.scene->getCamera()->getViewMat();
+
+        glMatrixMode(GL_PROJECTION);
+        glPushMatrix();
+        glLoadMatrixf(proj.data());
+        glMatrixMode(GL_MODELVIEW);
+        glPushMatrix();
+        glLoadMatrixf(view.data());
+
+        //Enable lights
+        p_rop.scene->enableLights();
+        p_rop.scene->placeLights();
+        
+        smGLRenderer::drawAxes(this->globalAxisLength);
+
+        p_rop.scene->disableLights();
+
+        glMatrixMode(GL_MODELVIEW);
+        glPopMatrix();
+        glMatrixMode(GL_PROJECTION);
+        glPopMatrix();
+
+    }
 }
 
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
@@ -431,7 +459,7 @@ void smViewer::render()
 
     beginModule();
 
-    adjustFPS();        
+    adjustFPS();
 
     for (size_t i = 0; i < objectList.size(); i++)
     {

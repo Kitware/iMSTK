@@ -74,9 +74,14 @@ public:
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
-    static void drawAxes(GLdouble length=1.0);
+    /// \brief  draw axes given rotation matrix, position and length to draw
+    static void drawAxes(Eigen::Matrix3f &rotMat, Eigen::Vector3f &pos, float length);
 
-    static void drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D);
+    /// \brief  draw global axes length to draw
+    static void drawAxes(float length);
+    
+    /// \brief  draw arrow given starting position, ending poistion and width of the arrow head
+    static void drawArrow(Eigen::Vector3f &start, Eigen::Vector3f &end, float D);
 
     /// \brief draw function is called for visualization the object
     virtual void draw(){}

@@ -398,18 +398,18 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D)
+void smGLRenderer::drawArrow(Eigen::Vector3f &start, Eigen::Vector3f &end, float D)
 {
-    double x = x2 - x1;
-    double y = y2 - y1;
-    double z = z2 - z1;
-    double L = sqrt(x*x + y*y + z*z);
+    float x = end[0] - start[0];
+    float y = end[1] - start[1];
+    float z = end[2] - start[2];
+    float L = sqrt(x*x + y*y + z*z);
 
     GLUquadricObj *quadObj;
 
     glPushMatrix();
 
-    glTranslated(x1, y1, z1);
+    glTranslated(start[0], start[1], start[2]);
 
     if ((x != 0.) || (y != 0.)) {
         glRotated(atan2(y, x) / 0.0174533, 0., 0., 1.);
@@ -451,30 +451,62 @@ void smGLRenderer::drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2,
 
 }
 
-void smGLRenderer::drawAxes(GLdouble length)
+void smGLRenderer::drawAxes(float length)
 {
     glDisable(GL_LIGHTING);
 
+    float headWidth = length / 12;
+
+    Eigen::Vector3f origin(0, 0, 0);
+
     glColor3fv(smColor::colorRed.toGLColor());
     glPushMatrix();
-    //glTranslatef(-length, 0, 0);
-    drawArrow(0, 0, 0, length, 0, 0, length / 12);
+    drawArrow(origin, Eigen::Vector3f(length, 0, 0), headWidth);
     glPopMatrix();
 
     glColor3fv(smColor::colorGreen.toGLColor());
     glPushMatrix();
-    //glTranslatef(0, -length, 0);
-    drawArrow(0, 0, 0, 0, length, 0, length / 12);
+    drawArrow(origin, Eigen::Vector3f(0, length, 0), headWidth);
     glPopMatrix();
 
     glColor3fv(smColor::colorBlue.toGLColor());
     glPushMatrix();
-    //glTranslatef(0, 0, -length);
-    drawArrow(0, 0, 0, 0, 0, length, length / 12);
+    drawArrow(origin, Eigen::Vector3f(0, 0, length), headWidth);
     glPopMatrix();
 
     glEnable(GL_LIGHTING);
 }
+
+void smGLRenderer::drawAxes(Eigen::Matrix3f &rotMat, Eigen::Vector3f &pos, float length)
+{
+    glDisable(GL_LIGHTING);
+
+    GLfloat headWidth = length / 12;
+
+    glColor3fv(smColor::colorRed.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f xVec(length, 0, 0);
+    xVec = rotMat*xVec + pos;
+    drawArrow(pos, xVec, headWidth);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorGreen.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f yVec(0, length, 0);
+    yVec = rotMat*yVec + pos;
+    drawArrow(pos, yVec, headWidth);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorBlue.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f zVec(0, 0, length);
+    zVec = rotMat*zVec + pos;
+    drawArrow(pos, zVec, headWidth);
+    glPopMatrix();
+
+    glEnable(GL_LIGHTING);
+}
+
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 
