@@ -67,6 +67,7 @@ endif()
 set(SimMedTK_VERSION_MAJOR 0)
 set(SimMedTK_VERSION_MINOR 0)
 set(SimMedTK_VERSION_PATCH 1)
+set(SimMedTK_VERSION "${SimMedTK_VERSION_MAJOR}.${SimMedTK_VERSION_MINOR}.${SimMedTK_VERSION_PATCH}")
 
 #-----------------------------------------------------------------------------
 # Testing
@@ -75,19 +76,14 @@ option(BUILD_TESTING "Test the project" ON)
 include(SimMedTKTesting)
 
 #-----------------------------------------------------------------------------
-# Documentation
+# Documentation options
 #
-option(DOCUMENTATION_TARGET_IN_ALL "Include the custom target for building documentation in 'all'" OFF)
-mark_as_advanced(DOCUMENTATION_TARGET_IN_ALL)
-
-set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
- CACHE PATH "Where documentation archives should be stored")
-mark_as_advanced(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY)
-
-#-----------------------------------------------------------------------------
-# Attempt to discover Doxygen so that DOXYGEN_EXECUTABLE is set to an appropriate default value
-#
-FIND_PACKAGE(Doxygen QUIET)
+option(SimMedTK_ENABLE_DOCUMENTATION
+  "Include targets for Doxygen- and Sphinx-generated documentation" OFF)
+if (SimMedTK_ENABLE_DOCUMENTATION)
+  find_package(Doxygen)
+  find_package(Sphinx)
+endif()
 
 #-----------------------------------------------------------------------------
 # Coverage
@@ -246,6 +242,24 @@ if(SimMedTK_USE_OCULUS)
 endif()
 
 add_subdirectory(src)
+
+add_subdirectory(examples)
+
+################################################################################
+# Build documentation
+# This also includes tutorials and other documentation that runs
+# examples and/or has its source linked to libraries, so it must
+# come after those targets have been declared.
+#
+
+if (SimMedTK_ENABLE_DOCUMENTATION)
+  add_subdirectory(documentation)
+endif()
+
+################################################################################
+# Create and install package configuration files.
+#
+
 export(PACKAGE SimMedTK)
 export(TARGETS
   ${SimMedTK_exports}
@@ -259,5 +273,3 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
   @ONLY
 )
-
-add_subdirectory(examples)
