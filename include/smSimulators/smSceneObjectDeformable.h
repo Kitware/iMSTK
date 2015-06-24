@@ -43,7 +43,8 @@ public:
     /// \brief Destructor
     ~smSceneObjectDeformable();
 
-    /// \brief rest the object to inital configuration and reset initial states
+    /// \brief rest the object to inital configuration 
+    /// and reset initial states
     virtual void resetToInitialState() = 0;
 
     /// \brief Load specified meshes
@@ -60,7 +61,8 @@ public:
     /// with the scene during runtime are added here
     virtual void applyUserInteractionForces() = 0;
 
-    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
+    /// \brief Use the computed displacemetnt 
+    /// update to interpolate to the secondary display mesh
     virtual void updateSecondaryRenderingMesh() = 0;
 
     /// \brief Update the deformations by time stepping
@@ -108,14 +110,21 @@ public:
     /// Should be moved to base class in near future
     void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
 
+    /// \brief enable drawing of secondary mesh (if initialized)
+    void setRenderSecondaryMesh();
+    
+    /// \brief enable drawing of primary mesh
+    void setRenderPrimaryMesh();
+
     /// \brief get the primary surface mesh
     std::shared_ptr<smSurfaceMesh> getPrimarySurfaceMesh() const;
 
     /// \brief get the secondary surface mesh
     std::shared_ptr<smSurfaceMesh> getSecondarySurfaceMesh() const;
 
-    /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
-    ///  vertices interacted with, ground plane etc.
+    /// \brief  Displays the fem object with
+    /// primary or secondary mesh, fixed vertices,
+    /// vertices interacted with, ground plane etc.
     virtual void draw() override;
 
 protected:
@@ -130,6 +139,7 @@ protected:
     int pulledVertex; ///< vertex that is pulled by user using external force
 
     bool topologyAltered;
+    bool renderSecondaryMesh;
 
     smString ConfigFileName;
 

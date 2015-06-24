@@ -24,12 +24,13 @@
 // SimMedTK includes
 #include "smSimulators/smSceneObjectDeformable.h"
 
-smSceneObjectDeformable::smSceneObjectDeformable()
+smSceneObjectDeformable::smSceneObjectDeformable() :
+    renderSecondaryMesh(false),
+    topologyAltered(false),
+    pulledVertex(-1),
+    timestepCounter(0),
+    subTimestepCounter(0)
 {
-    topologyAltered = false;
-    pulledVertex = -1;
-    timestepCounter=0;
-    subTimestepCounter=0;
 }
 
 smSceneObjectDeformable::~smSceneObjectDeformable()
@@ -109,11 +110,40 @@ int smSceneObjectDeformable::getNumFixedDof() const
 void smSceneObjectDeformable::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
 {
     primarySurfaceMesh->setRenderDetail(r);
+
+    if (secondarySurfaceMesh != nullptr)
+    {
+        secondarySurfaceMesh->setRenderDetail(r);
+    }
+}
+
+void smSceneObjectDeformable::setRenderSecondaryMesh()
+{
+    if (secondarySurfaceMesh != nullptr)
+    {
+        renderSecondaryMesh = true;
+    }
+    else
+    {
+        std::cout << "Secondary rendering mesh is not initilized! Cannot render secondary mesh\n";
+    }    
+}
+
+void smSceneObjectDeformable::setRenderPrimaryMesh()
+{
+    renderSecondaryMesh = false;
 }
 
 void smSceneObjectDeformable::draw()
 {
-    primarySurfaceMesh->draw();
+    if (secondarySurfaceMesh != nullptr && renderSecondaryMesh)
+    {
+        secondarySurfaceMesh->draw();
+    }
+    else
+    {
+        primarySurfaceMesh->draw();
+    }
 }
 
 std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getPrimarySurfaceMesh() const

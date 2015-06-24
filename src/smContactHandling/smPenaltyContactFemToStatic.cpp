@@ -44,7 +44,7 @@ smPenaltyContactFemToStatic::~smPenaltyContactFemToStatic()
 void smPenaltyContactFemToStatic::computeUnilateralContactForces()
 {
     int penetratedNode, nodeDofID;
-    const double stiffness = 1.0e6, damping = 1.0e5;
+    const double stiffness = 1.0e4, damping = 1.0e5;
     smVec3d velocityProjection;
 
     std::vector<std::shared_ptr<smContact>> contactInfo = this->getCollisionPairs()->getContacts();

@@ -82,13 +82,14 @@ int main()
     femSimulator = std::make_shared<smVegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    femObject = std::make_shared<smVegaFemSceneObject>(sdk->getErrorLog(),
-                                                        "asianDragon/asianDragon.config");
+    femObject = std::make_shared<smVegaFemSceneObject>(
+        sdk->getErrorLog(),
+        "asianDragon/asianDragon.config");
 
     auto femObjRenderDetail = std::make_shared<smRenderDetail>(
-                                                               SIMMEDTK_RENDER_WIREFRAME
-                                                               | SIMMEDTK_RENDER_VERTICES
-                                                               //| SIMMEDTK_RENDER_FACES
+                                                               //SIMMEDTK_RENDER_WIREFRAME
+                                                               //| SIMMEDTK_RENDER_VERTICES
+                                                                SIMMEDTK_RENDER_FACES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
     smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
@@ -175,7 +176,7 @@ int main()
 
     // Camera setup
     sceneCamera = smCamera::getDefaultCamera();
-    sceneCamera->setPos(3, 3, 5);
+    sceneCamera->setPos(12, 12, 24);
     sceneCamera->setFocus(0, 0, 0);
     scene->addCamera(sceneCamera);
 

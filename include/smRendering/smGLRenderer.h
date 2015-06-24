@@ -75,13 +75,13 @@ public:
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
     /// \brief  draw axes given rotation matrix, position and length to draw
-    static void drawAxes(Eigen::Matrix3f &rotMat, Eigen::Vector3f &pos, float length);
+    static void drawAxes(const Eigen::Matrix3f &rotMat, const Eigen::Vector3f &pos, const float length);
 
     /// \brief  draw global axes length to draw
-    static void drawAxes(float length);
+    static void drawAxes(const float length);
     
     /// \brief  draw arrow given starting position, ending poistion and width of the arrow head
-    static void drawArrow(Eigen::Vector3f &start, Eigen::Vector3f &end, float D);
+    static void drawArrow(const Eigen::Vector3f &start, const Eigen::Vector3f &end, const float D);
 
     /// \brief draw function is called for visualization the object
     virtual void draw(){}
