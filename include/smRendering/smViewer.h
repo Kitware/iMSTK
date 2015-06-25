@@ -37,7 +37,6 @@
 #include "smUtilities/smGLUtils.h"
 #include "smRendering/smVBO.h"
 #include "smSimulators/smPBDSceneObject.h"
-#include "smSimulators/smFemSceneObject.h"
 #include "smUtilities/smDataStructures.h"
 #include "smSimulators/smStylusObject.h"
 #include "smCore/smDoubleBuffer.h"

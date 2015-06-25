@@ -2,8 +2,6 @@
 simmedtk_add_library(smSimulators
   SOURCES
     smDummySimulator.cpp
-    smFemSceneObject.cpp
-    smFemSimulator.cpp
     smMyStylus.cpp
     smStylusObject.cpp
     smToolSimulator.cpp
@@ -13,12 +11,9 @@ simmedtk_add_library(smSimulators
 	smSceneObjectDeformable.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smMyStylus.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDObjectSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPhysXVolumeMesh.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smStylusObject.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smToolSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaObjectConfig.h
