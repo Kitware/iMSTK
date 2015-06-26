@@ -246,12 +246,10 @@ void smVegaFemSceneObject::loadVolumeMesh()
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
         {
-            strcpy(
-                femConfig->massMatrixFilename,
-                strcat(strcpy(femConfig->massMatrixFilename, femConfig->volumetricMeshFilename),
-                ".mass")
-                );
-            std::ifstream massMatFileName(femConfig->massMatrixFilename);
+            std::string massMatFilenameStr(femConfig->volumetricMeshFilename);
+            massMatFilenameStr += ".mass";
+            std::ifstream massMatFileName(massMatFilenameStr);
+
             if (!massMatFileName.good())
             {
                 std::cout << "VEGA: mass matrix file was not specified! Generating mass matrix file. \n";
@@ -341,13 +339,11 @@ void smVegaFemSceneObject::loadSurfaceMesh()
     if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
     {
         std::cout << "VEGA: rendering mesh was not specified!\n";
-        strcpy(
-            femConfig->renderingMeshFilename,
-            strcat(
-            strcpy(femConfig->renderingMeshFilename, femConfig->volumetricMeshFilename),
-            ".obj")
-            );
-        std::ifstream renderingFileName(femConfig->renderingMeshFilename);
+
+        std::string rendFilenameStr(femConfig->volumetricMeshFilename);
+        rendFilenameStr += ".mass";
+        std::ifstream renderingFileName(rendFilenameStr);
+       
         if (!renderingFileName.good())
         {
             std::cout << "VEGA: Generating primary rendering mesh.\n";

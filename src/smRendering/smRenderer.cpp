@@ -398,7 +398,7 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawArrow(const Eigen::Vector3f &start, const Eigen::Vector3f &end, const float D)
+void smGLRenderer::drawArrow(const smVec3f &start, const smVec3f &end, const float D)
 {
     float x = end[0] - start[0];
     float y = end[1] - start[1];
@@ -477,7 +477,7 @@ void smGLRenderer::drawAxes(const float length)
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::drawAxes(const Eigen::Matrix3f &rotMat, const Eigen::Vector3f &pos, const float length)
+void smGLRenderer::drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length)
 {
     glDisable(GL_LIGHTING);
 
