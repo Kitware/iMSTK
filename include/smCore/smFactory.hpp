@@ -1,6 +1,8 @@
 #ifndef SMFACTORY_HPP
 #define SMFACTORY_HPP
 
+#include <stdlib.h> // for atexit()
+
 template<typename T>
 void smFactory<T>::registerClassConfiguration(
   const std::string& classname,
@@ -11,19 +13,29 @@ void smFactory<T>::registerClassConfiguration(
   if (classname.empty())
     return;
 
+  if (!smFactory::s_catalog)
+    {
+    smFactory::s_catalog =
+      new std::map<std::string, typename smFactory<T>::smFactoryConfigurationOptions>;
+    atexit( []() { delete smFactory::s_catalog; } );
+    }
+
   smFactoryEntry entry;
   entry.subclassname = subclassname;
   entry.constructor = ctor;
   entry.group = group;
-  smFactory::s_catalog[classname].insert(entry);
+  (*smFactory::s_catalog)[classname].insert(entry);
 }
 
 template<typename T>
 const typename smFactory<T>::smFactoryConfigurationOptions& smFactory<T>::optionsForClass(const std::string& classname)
 {
   static smFactoryConfigurationOptions emptyOptions;
+  if (!smFactory::s_catalog)
+    return emptyOptions;
+
   typename std::map<std::string, smFactoryConfigurationOptions>::const_iterator it;
-  if (classname.empty() || (it = smFactory::s_catalog.find(classname)) == smFactory::s_catalog.end())
+  if (classname.empty() || (it = smFactory::s_catalog->find(classname)) == smFactory::s_catalog->end())
     return emptyOptions;
   return it->second;
 }
@@ -69,12 +81,12 @@ template<typename T>
 std::shared_ptr<T> smFactory<T>::createConcreteClass(
   const std::string& classname)
 {
-  if (classname.empty())
+  if (classname.empty() || !smFactory::s_catalog)
     return std::shared_ptr<T>();
 
   typename std::map<std::string, smFactoryConfigurationOptions>::const_iterator bit;
   typename smFactoryConfigurationOptions::const_iterator cit;
-  for (bit = smFactory::s_catalog.begin(); bit != smFactory::s_catalog.end(); ++bit)
+  for (bit = smFactory::s_catalog->begin(); bit != smFactory::s_catalog->end(); ++bit)
     for (cit = bit->second.begin(); cit != bit->second.end(); ++cit)
       if (cit->subclassname == classname)
         {
@@ -106,6 +118,6 @@ std::shared_ptr<T> smFactory<T>::createSubclassForGroup(
 
 /// Class-static map from abstract class names to registered concrete children.
 template<typename T>
-std::map<std::string, typename smFactory<T>::smFactoryConfigurationOptions> smFactory<T>::s_catalog;
+std::map<std::string, typename smFactory<T>::smFactoryConfigurationOptions>* smFactory<T>::s_catalog = NULL;
 
 #endif // SMFACTORY_HPP

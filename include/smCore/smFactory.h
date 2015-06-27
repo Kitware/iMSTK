@@ -9,53 +9,49 @@
 
 /**\brief A macro to register a concrete subclass of an abstract base class with smFactory.
   *
-  * You should call this in a compilation unit's global scope (i.e., in an
-  * implementation file - not a header- and outside any functions).
-  * It defines a special function that will be called when a dynamic library
-  * containing the compilation unit is loaded by the link loader.
-  * This function registers the class with smFactory.
+  * A macro to help register a concrete subclass with a factory.
+  * It should be called inside dynamic loader macros like so:
+  * <pre>
+  *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  *     SIMMEDTK_BEGIN_ONLOAD(register_base_class_children)
+  *       SIMMEDTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName1,integerClassGroupId);
+  *       SIMMEDTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName2,integerClassGroupId);
+  *       ...
+  *     SIMMEDTK_FINISH_ONLOAD()
+  *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
+  * </pre>
+  * If you build SimMedTK with static libraries, then your
+  * application should call (for the example above)
+  * <pre>simmedtk_register_base_class_children_onload();</pre>
+  * during your application's startup.
   *
   * This macro should only be used outside of the smCore library;
   * inside smCore, just modify smFactory so that s_catalog is
   * initialized with the proper entries directly. That's because
   * inside smCore, smFactory::s_catalog might not be initialized
   * before the first registration call is made.
+  *
+  * A more specific example is the way the smRendering library
+  * registers the smViewer class as a concrete child of smViewerBase:
+  * <pre>
+  *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  *     SIMMEDTK_BEGIN_ONLOAD(register_viewer_children)
+  *       SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,0);
+  *     SIMMEDTK_FINISH_ONLOAD()
+  *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
+  * </pre>
+  * When SimMedTK is built as dynamic libraries, this registration is
+  * automatic whenever linking to smRendering. Versions with a static
+  * smRendering library require you to call
+  * simmedtk_register_viewer_children_onload()
+  * at startup.
   */
-#ifndef WIN32
-#  define SIMMEDTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
-     static void TARGETCLASS##_##SUBCLASS##_registrar() __attribute__((constructor)); \
-     static void TARGETCLASS##_##SUBCLASS##_registrar() \
-     { \
+#define SIMMEDTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
        smFactory<BASECLASS>::registerClassConfiguration( \
          #TARGETCLASS, \
          #SUBCLASS, \
          []() { return std::shared_ptr<BASECLASS>(new SUBCLASS); }, \
-         GROUP); \
-     }
-#else
-#  include <windows.h>
-#  define SIMMEDTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
-     BOOL APIENTRY DllMain( \
-       HMODULE hModule, DWORD reason_for_call, LPVOID lpReserved) \
-     { \
-       switch (reason_for_call) \
-         { \
-       case DLL_PROCESS_ATTACH: \
-         smFactory<BASECLASS>::registerClassConfiguration( \
-           #TARGETCLASS, \
-           #SUBCLASS, \
-           []() { return std::shared_ptr<BASECLASS>(new SUBCLASS); }, \
-           GROUP); \
-         break; \
-       case DLL_THREAD_ATTACH: \
-       case DLL_THREAD_DETACH: \
-       case DLL_PROCESS_DETACH: /* TODO: Could unregister here */ \
-       default: \
-         break; \
-         } \
-       return TRUE; \
-     }
-#endif // WIN32
+         GROUP);
 
 /**\brief A factory provides a way to discover and construct subclasses of abstract classes.
   *
@@ -147,7 +143,7 @@ public:
     { return std::dynamic_pointer_cast<U>(createConcreteClass(targetClassname)); }
 
 protected:
-  static std::map<std::string, smFactoryConfigurationOptions> s_catalog;
+  static std::map<std::string, smFactoryConfigurationOptions>* s_catalog;
 };
 
 #include "smCore/smFactory.hpp"

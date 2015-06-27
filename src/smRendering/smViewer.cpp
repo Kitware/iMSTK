@@ -471,4 +471,8 @@ void smViewer::cleanUp()
     terminationCompleted = true;
 }
 
-SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,100);
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
+    SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,100);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()

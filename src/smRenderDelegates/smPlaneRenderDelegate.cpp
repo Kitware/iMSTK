@@ -39,4 +39,8 @@ void smPlaneRenderDelegate::draw() const
 
 }
 
-SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smPlaneRenderDelegate,2000);
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_plane_render_delegate)
+    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smPlaneRenderDelegate,2000);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()

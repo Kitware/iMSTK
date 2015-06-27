@@ -17,4 +17,8 @@ void smStaticSceneObjectRenderDelegate::draw() const
   geom->getModel()->draw();
 }
 
-SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smStaticSceneObjectRenderDelegate,2000);
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_static_scene_object_render_delegate)
+    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smStaticSceneObjectRenderDelegate,2000);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()

@@ -36,4 +36,8 @@ bool smMeshRenderDelegate::isTargetTextured() const
   return geom->isMeshTextured();
 }
 
-SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smMeshRenderDelegate,2000);
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
+    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smMeshRenderDelegate,2000);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()

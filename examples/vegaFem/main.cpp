@@ -49,8 +49,11 @@
 #include "../common/pzrMouseCameraController.h"
 //#include "../common/hapticController.h"
 
+#include "smRenderDelegates/smConfig.h"
+
 int main()
 {
+    SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<smSDK> sdk;
     std::shared_ptr<smVegaFemSceneObject> femObject;
     std::shared_ptr<smStaticSceneObject> staticObject;

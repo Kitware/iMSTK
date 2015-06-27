@@ -30,9 +30,11 @@
 #include "smCore/smSDK.h"
 #include "smRendering/smTextureManager.h"
 #include "smGeometry/smMeshModel.h"
+#include "smRenderDelegates/smConfig.h"
 
 int main()
 {
+    SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<smSDK> sdk;
     std::shared_ptr<smViewer> viewer;
     std::shared_ptr<smScene> scene1;

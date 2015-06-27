@@ -46,4 +46,8 @@ void smAABBRenderDelegate::draw() const
   glEnd();
 }
 
-SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smAABBRenderDelegate,2000);
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_aabb_render_delegate)
+    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smAABBRenderDelegate,2000);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()
