@@ -65,7 +65,9 @@ public:
     typedef std::shared_ptr<smRenderDetail> Ptr;
 
     smRenderDetail();
-    smRenderDetail(smUInt type) : renderType(type) { normalLength = 1.0; }
+    smRenderDetail(smUInt type);
+
+    void reset();
 
     /// \brief attachment of shader
     void addShader(std::shared_ptr<smUnifiedId> p_shaderID);

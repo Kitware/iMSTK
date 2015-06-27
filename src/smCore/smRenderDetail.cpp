@@ -28,28 +28,42 @@ void smRenderDetail::addVAO(std::shared_ptr<smUnifiedId> p_shaderID)
     VAOs.push_back(p_shaderID);
     VAOEnable.push_back(true);
 }
+
 smRenderDetail::smRenderDetail()
 {
-    renderType = 0;
-    highLightColor.rgba[0] = 1.0f;
-    highLightColor.rgba[1] = 0.0f;
-    highLightColor.rgba[2] = 0.0f;
-    pointSize = 1;
-    lineSize = 1;
-    shadowColor.rgba[0] = 0.0f;
-    shadowColor.rgba[1] = 0.0f;
-    shadowColor.rgba[2] = 0.0f;
-    shadowColor.rgba[3] = 0.5f;
-    colorDiffuse = smColor::colorWhite;
-    colorAmbient = smColor::colorWhite;
-    colorSpecular = smColor::colorWhite;
-    normalColor = smColor::colorGreen;
-    wireFrameColor = smColor::colorBlue;
-    shininess = 50.0;
-    debugDraw = false;
-    castShadow = true;
-    canGetShadow = true;
+  this->reset();
 }
+
+smRenderDetail::smRenderDetail(smUInt type)
+{
+  this->reset();
+  normalLength = 1.0;
+  this->renderType = type;
+}
+
+void smRenderDetail::reset()
+{
+  renderType = 0;
+  highLightColor.rgba[0] = 1.0f;
+  highLightColor.rgba[1] = 0.0f;
+  highLightColor.rgba[2] = 0.0f;
+  pointSize = 1;
+  lineSize = 1;
+  shadowColor.rgba[0] = 0.0f;
+  shadowColor.rgba[1] = 0.0f;
+  shadowColor.rgba[2] = 0.0f;
+  shadowColor.rgba[3] = 0.5f;
+  colorDiffuse = smColor::colorWhite;
+  colorAmbient = smColor::colorWhite;
+  colorSpecular = smColor::colorWhite;
+  normalColor = smColor::colorGreen;
+  wireFrameColor = smColor::colorBlue;
+  shininess = 50.0;
+  debugDraw = false;
+  castShadow = true;
+  canGetShadow = true;
+}
+
 void smRenderDetail::setNormalLength(const smFloat len)
 {
     this->normalLength = len;
