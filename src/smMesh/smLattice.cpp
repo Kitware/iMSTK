@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smMesh/smLattice.h"
-#include "smCollision/smMeshCollisionModel.h"
+#include "smCore/smFactory.h"
 
 smLattice::smLattice()
 {
@@ -34,6 +34,9 @@ smLattice::smLattice()
     this->xSeperation = 0;
     this->ySeperation = 0;
     this->zSeperation = 0;
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createSubclass(
+        "smRenderDelegate", "smLatticeRenderDelegate"));
 }
 float smLattice::getXStep()
 {
@@ -246,7 +249,7 @@ void smLattice::addObject( smSceneObject *obj )
         case SIMMEDTK_SMSTATICSCENEOBJECT:
         {
             auto staticSceneObject = static_cast<smStaticSceneObject*>(obj);
-            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            auto model = staticSceneObject->getModel();
             if(nullptr == model)
             {
                 break;
@@ -256,160 +259,5 @@ void smLattice::addObject( smSceneObject *obj )
         }
         default:
             std::cerr << "Unknown class type." << std::endl;
-    }
-}
-void smLattice::draw()
-{
-    int index = 0;
-    int index2 = 0;
-    smInt latticeMode;
-    latticeMode = SIMMEDTK_SMLATTICE_CELLPOINTSLINKS;
-
-    if ( cells == NULL || latticeMode == SIMMEDTK_SMLATTICE_NONE )
-    {
-        return;
-    }
-
-    glMatrixMode( GL_MODELVIEW );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
-
-    if ( latticeMode & SIMMEDTK_SMLATTICE_SEPERATIONLINES )
-    {
-        for ( int j = 0; j < ySeperation; j++ )
-        {
-            glDisable( GL_LIGHTING );
-            glColor3fv(reinterpret_cast<GLfloat*>(&smColor::colorWhite));
-
-            glBegin( GL_LINES );
-
-            for ( int i = 0; i < xSeperation; i++ )
-            {
-                index = i + j * xSeperation * zSeperation;
-                index2 = index + xSeperation * ( zSeperation - 1 );
-                glVertex3d( cells[index].cellLeftCorner[0],
-                            cells[index].cellLeftCorner[1],
-                            cells[index].cellLeftCorner[2] - 4 * zStep );
-                glVertex3d( cells[index2].cellLeftCorner[0],
-                            cells[index2].cellLeftCorner[1],
-                            cells[index2].cellLeftCorner[2] + 4 * zStep );
-            }
-
-            for ( int i = 0; i < zSeperation; i++ )
-            {
-                index = i * xSeperation + j * xSeperation * zSeperation;
-                index2 = index + ( xSeperation - 1 );
-                glVertex3d( cells[index].cellLeftCorner[0] - 4 * xStep,
-                            cells[index].cellLeftCorner[1],
-                            cells[index].cellLeftCorner[2] );
-                glVertex3d( cells[index2].cellLeftCorner[0] + 4 * xStep,
-                            cells[index2].cellLeftCorner[1],
-                            cells[index2].cellLeftCorner[2] );
-            }
-
-            glEnd();
-        }
-
-        glEnable( GL_LIGHTING );
-        glPopMatrix();
-    }
-
-    if ( latticeMode & SIMMEDTK_SMLATTICE_CELLPOINTS || SIMMEDTK_SMLATTICE_CELLPOINTSLINKS )
-    {
-        for ( int y = 0; y < ySeperation; y++ )
-            for ( int z = 0; z < zSeperation; z++ )
-                for ( int x = 0; x < xSeperation; x++ )
-                {
-
-                    index = x + z * xSeperation + y * xSeperation * zSeperation;
-
-                    if ( latticeMode & SIMMEDTK_SMLATTICE_CELLPOINTSLINKS )
-                    {
-                        glDisable( GL_LIGHTING );
-                        glDisable( GL_TEXTURE_2D );
-
-                        glEnable( GL_COLOR_MATERIAL );
-
-                        glBegin( GL_LINE_STRIP );
-                        glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
-                        glVertex3dv( cells[index].cellLeftCorner.data() );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3dv( cells[index].cellLeftCorner.data());
-
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] );
-                        glEnd();
-
-                        glBegin( GL_LINES );
-                        glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
-                        glVertex3dv( cells[index].cellLeftCorner.data() );
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] );
-
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] );
-
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3d( cells[index].cellLeftCorner[0] + xStep,
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] + zStep );
-
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1],
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glVertex3d( cells[index].cellLeftCorner[0],
-                                    cells[index].cellLeftCorner[1] + yStep,
-                                    cells[index].cellLeftCorner[2] + zStep );
-                        glEnd();
-
-                        glEnable( GL_LIGHTING );
-                    }
-                }
-    }
-
-    if ( latticeMode & SIMMEDTK_SMLATTICE_MINMAXPOINTS )
-    {
-        glPushMatrix();
-        glPushMatrix();
-        glTranslatef( cells[0].cellLeftCorner[0], cells[0].cellLeftCorner[1], cells[0].cellLeftCorner[2] );
-        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
-//         glutSolidSphere( 2, 20, 20 );
-        glPopMatrix();
-
-        glPushMatrix();
-        glTranslatef( cells[this->totalCells - 1].cellRightCorner[0],
-                      cells[this->totalCells - 1].cellRightCorner[1],
-                      cells[this->totalCells - 1].cellRightCorner[2] );
-        glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorRed));
-//         glutSolidSphere( 2, 20, 20 );
-        glPopMatrix();
-        glPopMatrix();
     }
 }

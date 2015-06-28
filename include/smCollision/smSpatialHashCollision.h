@@ -28,9 +28,9 @@
 #include <memory>
 
 // SimMedTK includes
-#include "smCollision/smCollisionDetection.h"
-#include "smUtilities/smDataStructures.h"
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smCollisionDetection.h"
+#include "smCore/smDataStructures.h"
+#include "smCore/smMakeUnique.h"
 
 class smCellLine;
 class smCellModel;

@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smSDK.h"
-#include "smMesh/smMesh.h"
+#include "smCore/smFactory.h"
 
 #include <chrono>
 #include <thread>
@@ -38,8 +38,6 @@ smIndiceArray<smObjectSimulatorHolder>  *smSDK::objectSimulatorsRef;
 smIndiceArray<smObjectSimulatorHolder>*smSDK::collisionDetectorsRef;
 smIndiceArray<smSceneHolder>*smSDK::scenesRef;
 smIndiceArray<smSceneObjectHolder>*smSDK::sceneObjectsRef;
-smIndiceArray<smMotionTransformer*> *smSDK::motionTransRef;
-smIndiceArray<smPipeHolder> *smSDK::pipesRef;
 
 /// \brief constructor
 smSDK::smSDK()
@@ -61,7 +59,6 @@ smSDK::smSDK()
     collisionDetectorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
     scenesRef = new smIndiceArray<smSceneHolder>(SIMMEDTK_SDK_MAXSCENES);
     sceneObjectsRef = new smIndiceArray<smSceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
-    pipesRef = new smIndiceArray<smPipeHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
 }
 
 smSDK::~smSDK()
@@ -83,16 +80,19 @@ void smSDK::releaseScene(std::shared_ptr<smScene> scene)
     scene.reset();
 }
 
-std::shared_ptr<smViewer> smSDK::createViewer()
+std::shared_ptr<smViewerBase> smSDK::createViewer()
 {
-    this->viewer = std::make_shared<smViewer>();
-    this->viewer->log = this->errorLog;
-    this->registerModule(this->viewer);
+    this->viewer = smFactory<smCoreClass>::createDefaultAs<smViewerBase>("smViewerBase");
+    if (!!this->viewer)
+      {
+      this->viewer->log = this->errorLog;
+      this->registerModule(this->viewer);
+      }
 
     return this->viewer;
 }
 
-void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
+void smSDK::addViewer(std::shared_ptr<smViewerBase> p_viewer)
 {
     assert(p_viewer);
 
@@ -104,7 +104,7 @@ void smSDK::addViewer(std::shared_ptr<smViewer> p_viewer)
 /// \brief Returns a pointer to the viewer object
 ///
 /// \return Returns a pointer to the viewer object
-std::shared_ptr<smViewer> smSDK::getViewerInstance()
+std::shared_ptr<smViewerBase> smSDK::getViewerInstance()
 {
     return this->viewer;
 }
@@ -143,24 +143,38 @@ void smSDK::initRegisteredModules()
         }
 }
 
-/// \brief
-void smSDK::runRegisteredModules()
+/** \brief Run the registered modules
+  *
+  * This will not run any modules that inherit smViewerBase as
+  * on some platforms (Mac OS X) only the main thread can run
+  * user interface code. The return value is -1 if the modules
+  * are already running or no module inherits smViewerBase.
+  * Otherwise, the index of the last viewer module encountered
+  * is returned.
+  */
+smInt smSDK::runRegisteredModules()
 {
+    smInt viewerIndex = -1;
 
     if (isModulesStarted)
     {
-        return;
+        return viewerIndex;
     }
 
     for (smInt i = 0; i < modulesRef->size(); i++)
     {
-        modules.emplace_back([i]{(*modulesRef)[i].module->exec();});
+        auto view = std::dynamic_pointer_cast<smViewerBase>((*modulesRef)[i].module);
+        if (view)
+          viewerIndex = i;
+        else
+          modules.emplace_back([i]{(*modulesRef)[i].module->exec();});
     }
 
     isModulesStarted = true;
+    return viewerIndex;
 }
 
-/// \brief
+///\brief shutdowns all the modules
 void smSDK::shutDown()
 {
 
@@ -177,7 +191,11 @@ void smSDK::run()
     updateSceneListAll();
     initRegisteredModules();
 
-    runRegisteredModules();
+    smInt viewer = runRegisteredModules();
+    // Run the viewer in the main thread:
+    if (viewer >= 0)
+        (*modulesRef)[viewer].module->exec();
+    // Now wait for other modules to shut down
     while (!shutdown) {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
@@ -306,28 +324,6 @@ void smSDK::addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<
     this->registerSceneObject(p_sco);
 
     this->getScene(p_scId)->addSceneObject(p_sco);
-}
-
-smPipe* smSDK::getPipeByName(smString p_name)
-{
-    return (pipesRef->getByRef(p_name).pipe);
-}
-
-/// \brief register pipe
-void smSDK::registerPipe(smPipe*p_pipe)
-{
-    smPipeHolder ph;
-    ph.pipe = p_pipe;
-    pipesRef->checkAndAdd(ph);
-}
-
-/// \brief create a pipe
-smPipe* smSDK::createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size)
-{
-    smPipe *pipe;
-    pipe = new smPipe(p_pipeName, p_elementSize, p_size);
-    registerPipe(pipe);
-    return pipe;
 }
 
 ///SDK returns logger for the system

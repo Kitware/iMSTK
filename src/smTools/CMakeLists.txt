@@ -9,4 +9,7 @@ simmedtk_add_library(smTools
 target_link_libraries(smTools
   PRIVATE
     smCore
+    smMesh
+    smSimulators
+    smEvent
 )

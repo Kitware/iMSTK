@@ -31,7 +31,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
-#include "smUtilities/smMatrix.h"
+#include "smCore/smMatrix.h"
 
 class smMesh;
 class smAABB;

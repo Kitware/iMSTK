@@ -34,7 +34,7 @@
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smSceneObject.h"
-#include "smUtilities/smMath.h"
+#include "smCore/smMath.h"
 #include "smExternal/tree.hh"
 
 namespace smtk {
@@ -162,12 +162,6 @@ public:
 
     /// \brief !!
     std::shared_ptr<smSceneObject> clone() override;
-
-    /// \brief !!
-    virtual void initDraw() override;
-
-    /// \brief !!
-    virtual void draw() override;
 
     /// \brief !!
     virtual void initialize() override {};

@@ -104,10 +104,9 @@ public:
     /// \brief find fixed corners
     void findFixedCorners();
 
-    /// \brief render the surface PBD object
-    virtual void draw() override;
-
 public:
+    friend class smPBDSurfaceRenderDetail;
+
     smSurfaceMesh *mesh; ///< surface mesh
     smInt nbrTri; ///< number of surface triangles
     smInt **triVertIdx; ///< !!

@@ -22,12 +22,17 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smStaticSceneObject.h"
+#include "smCore/smFactory.h"
 
 smStaticSceneObject::smStaticSceneObject(std::shared_ptr<smErrorLog> p_log) : smSceneObject()
 {
     type = SIMMEDTK_SMSTATICSCENEOBJECT;
 
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
+
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createSubclass(
+        "smRenderDelegate","smStaticSceneObjectRenderDelegate"));
 }
 
 smStaticSceneObject::~smStaticSceneObject()
@@ -53,11 +58,6 @@ void smStaticSceneObject::loadInitialStates()
 bool smStaticSceneObject::configure(const smString ConfigFile)
 {
     return false;
-}
-
-void smStaticSceneObject::draw()
-{
-    staticModel->draw();
 }
 
 std::shared_ptr<smSceneObject> smStaticSceneObject::clone()

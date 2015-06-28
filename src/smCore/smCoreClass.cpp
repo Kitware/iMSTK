@@ -22,7 +22,8 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smCoreClass.h"
-#include "smEvent/smEventHandler.h"
+#include "smCore/smEventHandler.h"
+#include "smCore/smRenderDelegate.h"
 
 std::shared_ptr<smtk::Event::smEventHandler>
 smCoreClass::eventHandler = std::make_shared<smtk::Event::smEventHandler>();
@@ -51,14 +52,6 @@ const smClassType &smCoreClass::getType() const
 void smCoreClass::setType(const smClassType& newType)
 {
     this->type = newType;
-}
-
-void smCoreClass::initDraw()
-{
-}
-
-void smCoreClass::draw()
-{
 }
 
 void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
@@ -93,8 +86,29 @@ const std::string &smCoreClass::getName() const
 {
     return name;
 }
-// void smCoreClass::draw()
-// {
-// std::cout << "Default draw function called. Nothing drawn." << std::endl;
-// }
 
+/// \brief Get render delegate
+std::shared_ptr<smRenderDelegate> smCoreClass::getRenderDelegate() const
+{
+  return this->renderDelegate;
+}
+
+/// \brief Set the delegate used to render this instance
+void smCoreClass::setRenderDelegate(std::shared_ptr<smRenderDelegate> delegate)
+{
+  this->renderDelegate = delegate;
+  if (this->renderDelegate)
+    this->renderDelegate->setSourceGeometry(this);
+}
+
+void smCoreClass::initDraw()
+{
+  if (this->renderDelegate)
+    this->renderDelegate->initDraw();
+}
+
+void smCoreClass::draw() const
+{
+  if (this->renderDelegate)
+    this->renderDelegate->draw();
+}

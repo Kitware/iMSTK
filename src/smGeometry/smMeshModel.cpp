@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smGeometry/smMeshModel.h"
+#include "smRendering/smTextureManager.h"
 
 smMeshModel::smMeshModel() {}
 smMeshModel::~smMeshModel() {}
@@ -76,7 +77,9 @@ const smStdVector3d& smMeshModel::getVertices() const
 }
 void smMeshModel::draw()
 {
-    this->mesh->draw();
+    smRenderDelegate::Ptr delegate = this->mesh->getRenderDelegate();
+    if (delegate)
+      delegate->draw();
 }
 void smMeshModel::setModelMesh(std::shared_ptr< smMesh > modelMesh)
 {

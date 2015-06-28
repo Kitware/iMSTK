@@ -30,13 +30,13 @@
 #include "smSimulators/smDummySimulator.h"
 #include "smCore/smEventData.h"
 #include <GL/glew.h>
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smExternalDevices/smPhantomInterface.h"
 #include "smSimulators/smStylusObject.h"
 #include "smSimulators/smMyStylus.h"
 #include "smCollision/smSpatialHash.h"
-#include "smUtilities/smMotionTransformer.h"
-#include "smShader/smShader.h"
+#include "smCore/smMotionTransformer.h"
+#include "smRendering/smShader.h"
 #include "smShader/metalShader.h"
 #include "smSimulators/smToolSimulator.h"
 

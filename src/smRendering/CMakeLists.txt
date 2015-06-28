@@ -1,19 +1,27 @@
 simmedtk_add_library(smRendering
   SOURCES
+    smCamera.cpp
     smConfigRendering.cpp
     smFrameBuffer.cpp
-    smLight.cpp
+    smGLUtils.cpp
+    smMetalShader.cpp
     smRenderer.cpp
+    smShader.cpp
+    smSceneTextureShader.cpp
+    smTextureManager.cpp
     smVAO.cpp
     smVBO.cpp
     smViewer.cpp
-    smCamera.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smCustomRenderer.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smFrameBuffer.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smGLRenderer.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smLight.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smGLUtils.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smMetalShader.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smSceneTextureShader.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smShader.h
+    ${CMAKE_SOURCE_DIR}/include/smRendering/smTextureManager.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
     ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
@@ -23,8 +31,6 @@ target_link_libraries(smRendering
   PRIVATE
     smCore
     smExternal
-    smUtilities
-    smShader
     smEvent
  PUBLIC
     sfml::window

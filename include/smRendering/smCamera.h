@@ -24,9 +24,9 @@
 #ifndef SMCAMERA_H
 #define SMCAMERA_H
 
-#include "smUtilities/smMatrix.h"
-#include "smUtilities/smVector.h"
-#include "smUtilities/smQuaternion.h"
+#include "smCore/smMatrix.h"
+#include "smCore/smVector.h"
+#include "smCore/smQuaternion.h"
 
 /// STL icludes
 #include <memory>

@@ -23,7 +23,7 @@
 
 #include "smExternalDevices/smPhantomInterface.h"
 #include "smRendering/smGLRenderer.h"
-#include "smUtilities/smTimer.h"
+#include "smCore/smTimer.h"
 #include <iostream>
 
 HDCallbackCode HDCALLBACK hapticCallback(void *pData);

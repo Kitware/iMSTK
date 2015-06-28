@@ -23,11 +23,6 @@
 
 #include "smSimulators/smPBDSceneObject.h"
 
-void smPBDSurfaceSceneObject::draw()
-{
-    mesh->draw();
-}
-
 void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p_radius)
 {
     smFloat dist = 0;

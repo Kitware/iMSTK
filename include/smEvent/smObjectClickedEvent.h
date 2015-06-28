@@ -26,8 +26,8 @@
 #define SMOBJECTCLICKEDEVENT_H
 
 // SimMedTK includes
-#include "smEvent/smEvent.h"
-#include <smUtilities/smVector.h>
+#include "smCore/smEvent.h"
+#include <smCore/smVector.h>
 
 namespace smtk {
 namespace Event {

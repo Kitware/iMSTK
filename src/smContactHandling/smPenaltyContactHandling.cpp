@@ -22,6 +22,8 @@
 //---------------------------------------------------------------------------
 
 #include "smContactHandling/smPenaltyContactHandling.h"
+#include "smSimulators/smVegaFemSceneObject.h"
+#include "smCore/smCollisionPair.h"
 
 smPenaltyContactHandling::smPenaltyContactHandling(bool typeBilateral) : smContactHandling(typeBilateral)
 {

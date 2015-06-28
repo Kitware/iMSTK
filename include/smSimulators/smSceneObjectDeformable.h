@@ -122,12 +122,8 @@ public:
     /// \brief get the secondary surface mesh
     std::shared_ptr<smSurfaceMesh> getSecondarySurfaceMesh() const;
 
-    /// \brief  Displays the fem object with
-    /// primary or secondary mesh, fixed vertices,
-    /// vertices interacted with, ground plane etc.
-    virtual void draw() override;
-
 protected:
+    friend class smSceneObjectDeformableRenderDelegate;
 
     int numNodes;
     int numFixedNodes;

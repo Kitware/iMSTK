@@ -23,7 +23,7 @@
 
 #include "CollisionDetectionExample.h"
 #include "smCore/smSDK.h"
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smMesh/smLattice.h"
 #include "smMesh/smLatticeTypes.h"
 #include "smCore/smEventData.h"

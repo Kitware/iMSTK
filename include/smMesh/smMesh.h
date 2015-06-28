@@ -31,10 +31,9 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smErrorLog.h"
-#include "smCore/smTextureManager.h"
-#include "smUtilities/smVector.h"
-#include "smUtilities/smMatrix.h"
-#include "smCollision/smCollisionConfig.h"
+#include "smCore/smVector.h"
+#include "smCore/smMatrix.h"
+#include "smCore/smCollisionConfig.h"
 #include "smCore/smGeometry.h"
 
 //VEGA includes
@@ -207,9 +206,6 @@ public:
     /// \brief update the surface mesh data after the deformation
     void updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh);
 
-    /// \brief render the surface mesh
-    virtual void draw() override;
-
     /// \brief get number of triangles
     int getNumTriangles()  const;
 
@@ -304,9 +300,6 @@ public:
 
     /// \brief query if the mesh is textured
     smBool isMeshTextured();
-
-    /// \brief draw the mesh
-    void draw() override;
 
 public:
     smAABB *edgeAABBs;///< AABBs for the edges in the mesh

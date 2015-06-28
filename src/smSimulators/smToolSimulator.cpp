@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smSimulators/smToolSimulator.h"
-#include "smEvent/smEvent.h"
+#include "smCore/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 
 void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool)

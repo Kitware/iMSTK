@@ -28,7 +28,7 @@
 #include "smSimulators/smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
-#include "smUtilities/smMatrix.h"
+#include "smCore/smMatrix.h"
 #include "smEvent/smHapticEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 
@@ -196,11 +196,6 @@ HookCautery::HookCautery(const smString& p_pivot)
     meshContainer.posOffsetPos[2] = 2;
 
     addMeshContainer(&meshContainer);
-}
-
-void HookCautery::draw()
-{
-    smStylusRigidSceneObject::draw();
 }
 
 void HookCautery::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)

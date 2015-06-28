@@ -23,9 +23,9 @@
 
 #include "smRendering/smGLRenderer.h"
 #include "smMesh/smMesh.h"
-#include "smUtilities/smDataStructures.h"
+#include "smCore/smDataStructures.h"
 #include "smRendering/smViewer.h"
-#include "smUtilities/smQuaternion.h"
+#include "smCore/smQuaternion.h"
 #include "smRendering/smVAO.h"
 
 smGLRenderer::smGLRenderer()
@@ -33,6 +33,7 @@ smGLRenderer::smGLRenderer()
 
 }
 
+#if 0
 void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail)
 {
     static smVec3d origin(0, 0, 0);
@@ -166,6 +167,7 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
     glPointSize(1.0);
     glLineWidth(1.0);
 }
+#endif // 0
 
 void smGLRenderer::drawSurfaceMeshTriangles(
     std::shared_ptr<smMesh> p_surfaceMesh,
@@ -202,7 +204,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
-        if (p_surfaceMesh->isMeshTextured())
+        if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
@@ -273,7 +275,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
-        if (p_surfaceMesh->isMeshTextured())
+        if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -591,14 +593,16 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
 
 void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
-    if (p_sceneObject->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
+    smRenderDetail::Ptr detail = p_sceneObject->getRenderDetail();
+    if (!detail || detail->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     //if the custom rendering enable only render this
+    smRenderDelegate::Ptr delegate = p_sceneObject->getRenderDelegate();
     std::shared_ptr<smCustomRenderer> renderer = p_sceneObject->getRenderer();
-    if (p_sceneObject->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
+    if (detail->getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
     {
         if (renderer != nullptr)
         {
@@ -607,7 +611,7 @@ void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObjec
             renderer->postDraw(*p_sceneObject);
         }
     }
-    else
+    else if (delegate)
     {
         //If there is custom renderer first render the preDraw function. which is responsible for
         //rendering before the default renderer takes place
@@ -616,8 +620,7 @@ void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObjec
             renderer->preDraw(*p_sceneObject);
         }
 
-        // TODO: scenobject does not have a draw function
-        p_sceneObject->draw();
+        delegate->draw();
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place

@@ -2,18 +2,17 @@ set(Module ContactHandling)
 
 add_executable(${Module}UnitTestRunner
   ${BANDIT_RUNNER}
-  PenaltyContactHandlingSpec.cpp  
+  PenaltyContactHandlingSpec.cpp
   )
 
 target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast>)
 
-target_link_libraries(${Module}UnitTestRunner 
-    smCollision 
-    smCore     
+target_link_libraries(${Module}UnitTestRunner
+    smCollision
+    smCore
     smEvent
     smCollision
     smSimulators
-    smUtilities
     smRendering
     smMesh
     smContactHandling)

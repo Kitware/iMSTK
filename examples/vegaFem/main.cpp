@@ -37,7 +37,7 @@
 #include "smSimulators/smVegaFemSimulator.h"
 #include "smSimulators/smDummySimulator.h"
 
-#include "smCollision/smCollisionPair.h"
+#include "smCore/smCollisionPair.h"
 #include "smCollision/smPlaneCollisionModel.h"
 #include "smCollision/smMeshCollisionModel.h"
 #include "smCollision/smPlaneToMeshCollision.h"
@@ -49,8 +49,11 @@
 #include "../common/pzrMouseCameraController.h"
 //#include "../common/hapticController.h"
 
+#include "smRenderDelegates/smConfig.h"
+
 int main()
 {
+    SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<smSDK> sdk;
     std::shared_ptr<smVegaFemSceneObject> femObject;
     std::shared_ptr<smStaticSceneObject> staticObject;
@@ -158,7 +161,7 @@ int main()
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    viewer = sdk->getViewerInstance();
+    viewer = std::dynamic_pointer_cast<smViewer>(sdk->getViewerInstance());
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |

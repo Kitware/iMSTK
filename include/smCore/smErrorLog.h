@@ -34,7 +34,7 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smUtilities/smTimer.h"
+#include "smCore/smTimer.h"
 
 #define PRINT_ERROR_LOCATION std::cout << "Error! In file: " << __FILE__ << "; at line: " << __LINE__ << std::endl;
 

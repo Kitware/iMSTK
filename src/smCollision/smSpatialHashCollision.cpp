@@ -27,7 +27,7 @@
 #include <cmath>
 
 // SimMedTK includes
-#include "smCollision/smCollisionConfig.h"
+#include "smCore/smCollisionConfig.h"
 #include "smCollision/smSurfaceTree.h"
 #include "smCollision/smOctreeCell.h"
 #include "smCollision/smCollisionMoller.h"

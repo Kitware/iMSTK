@@ -29,7 +29,7 @@
 #include <memory>
 
 // SimMedTK includes
-#include "smUtilities/smVector.h"
+#include "smCore/smVector.h"
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smRendering/smConfigRendering.h"
@@ -52,6 +52,7 @@ struct smObjectInitFlags
 class smSceneObject : public smCoreClass
 {
     friend class smSDK;
+    friend class smViewerBase;
     friend class smViewer;
     friend class smScene;
     friend class smObjectSimulator;

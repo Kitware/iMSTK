@@ -24,7 +24,7 @@
 #include <string.h>
 #include "smRendering/smFrameBuffer.h"
 #include "smCore/smConfig.h"
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smRendering/smGLRenderer.h"
 
 smBool smFrameBuffer::checkStatus()
@@ -99,7 +99,7 @@ void test()
     glPopAttrib();
 }
 
-void smFrameBuffer::draw()
+void smFrameBuffer::draw() const
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);

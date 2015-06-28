@@ -29,9 +29,9 @@
 #include <array>
 
 // SimMedTK includes
-#include "smEvent/smEvent.h"
-#include <smUtilities/smVector.h>
-#include <smUtilities/smMatrix.h>
+#include "smCore/smEvent.h"
+#include <smCore/smVector.h>
+#include <smCore/smMatrix.h>
 
 namespace smtk {
 namespace Event {

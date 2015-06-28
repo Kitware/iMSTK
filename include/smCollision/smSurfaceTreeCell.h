@@ -31,7 +31,7 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVector.h"
+#include "smCore/smVector.h"
 
 /// \brief contains the cell of the surface tree structure
 template <typename Derived>

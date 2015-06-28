@@ -22,86 +22,19 @@
 //---------------------------------------------------------------------------
 
 #include "smSimulators/smStylusObject.h"
-#include "smCollision/smCollisionModel.h"
+#include "smCore/smCollisionModel.h"
 #include "smCollision/smSurfaceTree.h"
 #include "smCollision/smOctreeCell.h"
 #include "smMesh/smMesh.h"
-#include "smUtilities/smGLUtils.h"
-
-void smStylusRigidSceneObject::draw()
-{
-    smMatrix44d viewMatrix;
-
-#pragma unroll
-
-    for (smInt i = 0; i < 2; i++)
-    {
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        tree<smMeshContainer*>::pre_order_iterator iter = meshes.begin();
-        glPushMatrix();
-
-        if (i == 2 && enableDeviceManipulatedTool)
-        {
-            viewMatrix = iter.node->data->currentDeviceMatrix;
-        }
-        else
-        {
-            viewMatrix = iter.node->data->currentViewerMatrix;
-        }
-
-        glMultMatrixd(viewMatrix.data());
-        glCallList(iter.node->data->mesh->renderingID);
-        glPopMatrix();
-        iter++;
-
-        while (iter != meshes.end())
-        {
-            glPushMatrix();
-
-            if (i == 2 && enableDeviceManipulatedTool)
-            {
-                viewMatrix = iter.node->data->currentDeviceMatrix;
-            }
-            else
-            {
-                viewMatrix = iter.node->data->currentViewerMatrix;
-            }
-
-            glMultMatrixd(viewMatrix.data());
-            glCallList(iter.node->data->mesh->renderingID);
-            glPopMatrix();
-            iter++;
-        }
-
-        glPopMatrix();
-    }
-}
-
-void smStylusRigidSceneObject::initDraw()
-{
-    smString errorText;
-    tree<smMeshContainer*>::pre_order_iterator iter = meshes.begin();
-    smGLInt newList = glGenLists(meshes.size());
-    smGLUtils::queryGLError(errorText);
-
-    smInt listCounter = 0;
-
-    while (iter != meshes.end())
-    {
-        glNewList(newList + listCounter, GL_COMPILE);
-        iter.node->data->mesh->draw();
-        glEndList();
-        iter.node->data->mesh->renderingID = (newList + listCounter);
-        listCounter++;
-        iter++;
-    }
-}
+#include "smRendering/smGLUtils.h"
 
 smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/) : smSceneObject()
 {
     type = SIMMEDTK_SMSTYLUSSCENEOBJECT;
     toolEnabled = true;
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smStylusRenderDelegate"));
 }
 
 smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)

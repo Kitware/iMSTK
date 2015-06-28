@@ -3,7 +3,6 @@ target_link_libraries(renderCubeOculus
   smCore
   smRendering
   smRenderingOculus
-  smShader
   smMesh
   smEvent
   smGeometry

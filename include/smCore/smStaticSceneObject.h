@@ -67,9 +67,6 @@ public:
     /// \brief configure the static scene object using external config file (optional)
     bool configure(const smString ConfigFile) override;
 
-    /// \brief called if the object is added to the viewer.
-    virtual void draw() override;
-
     void printInfo() const override;
 
     virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}

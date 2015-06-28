@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "smRendering/smVAO.h"
-#include "smShader/smShader.h"
+#include "smRendering/smShader.h"
 #include "smRendering/smViewer.h"
 
 std::unordered_map<smInt, std::shared_ptr<smVAO>> smVAO::VAOs;
@@ -127,7 +127,7 @@ void smVAO::initBuffers()
 }
 
 ///Updates the buffers. Call this function if there is change in the mesh. If it is a simulation mesh, it needs to be called in and very frame
-smBool smVAO::updateStreamData()
+smBool smVAO::updateStreamData() const
 {
 
     if (this->vboType == SIMMEDTK_VBO_STATIC)
@@ -162,7 +162,7 @@ smBool smVAO::updateStreamData()
     return false;
 }
 
-void smVAO::draw()
+void smVAO::draw() const
 {
     glPushAttrib(GL_ENABLE_BIT);
     shader->enableShader();
@@ -297,11 +297,11 @@ std::shared_ptr<smVAO> smVAO::getVAO( std::shared_ptr<smUnifiedId> p_shaderID )
 {
     return VAOs[p_shaderID->getId()];
 }
-void smVAO::enable()
+void smVAO::enable() const
 {
     glBindVertexArray( VAO );
 }
-void smVAO::disable()
+void smVAO::disable() const
 {
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
     glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );

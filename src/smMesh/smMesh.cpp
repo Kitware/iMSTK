@@ -25,6 +25,7 @@
 // #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"
+#include "smCore/smFactory.h"
 
 smBaseMesh::smBaseMesh()
 {
@@ -48,6 +49,9 @@ smMesh::smMesh()
     type = SIMMEDTK_SMMESH;
     isTextureCoordAvailable = false;
     tangentChannel = false;
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smMeshRenderDelegate"));
 }
 
 /// \brief destructor
@@ -514,19 +518,6 @@ void smMesh::rotate(const smMatrix33d &p_rot)
 }
 
 /// \brief
-void smMesh::draw()
-{
-    smGLRenderer::drawSurfaceMeshTriangles(safeDownCast<smMesh>(), this->getRenderDetail());
-
-    if (this->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
-    {
-        smGLRenderer::drawNormals(safeDownCast<smMesh>(), 
-                                this->getRenderDetail()->normalColor,
-                                this->getRenderDetail()->normalLength);
-    }
-}
-
-/// \brief
 void smMesh::updateTriangleAABB()
 {
     smAABB tempAABB;
@@ -638,11 +629,6 @@ void smMesh::checkCorrectWinding()
             }
         }
     }
-}
-
-/// \brief
-void smLineMesh::draw()
-{
 }
 
 smTextureAttachment::smTextureAttachment()
