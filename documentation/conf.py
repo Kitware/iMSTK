@@ -64,8 +64,6 @@ def runDoxygen(rtdsrcdir, rtdblddir, doxyfileIn, doxyfileOut):
 if readTheDocs:
   """Run Doxygen ourselves"""
   # Run doxygen ourselves on ReadTheDocs.org so that doxylinks will work.
-  runDoxygen(sourcedir, builddir, 'sparsehash.doxyfile.in', 'sparsehash.doxyfile')
-  runDoxygen(sourcedir, builddir, 'cjson.doxyfile.in', 'cjson.doxyfile')
   runDoxygen(sourcedir, builddir, 'SimMedTK.doxyfile.in', 'SimMedTK.doxyfile')
 
 # If extensions (or modules to document with autodoc) are in another directory,

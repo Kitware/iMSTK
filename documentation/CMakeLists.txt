@@ -3,8 +3,8 @@
 #
 # If we have doxygen, create reference API documentation for SimMedTK.
 #
-# This also generates documentation for third-party libraries
-# cJSON and sparsehash which is referenced by SimMedTK's documentation.
+# This can also generate tag-files and documentation for third-party
+# libraries for cross-referencing with SimMedTK's docs.
 #
 if(DOXYGEN_FOUND)
   file(MAKE_DIRECTORY "${SimMedTK_BINARY_DIR}/documentation/reference")
