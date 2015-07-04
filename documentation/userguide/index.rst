@@ -7,7 +7,7 @@ to help you create interactive applications that simulate mechanical
 (and other) aspects of biological systems.
 
 For instructions on obtaining, building, and installing
-SMTK, clone the repository:
+SimMedTK, clone the repository:
 
 .. code:: sh
 
@@ -16,17 +16,12 @@ SMTK, clone the repository:
 and follow the instructions in the :file:`ReadMe.mkd` file
 in the top-level source directory.
 The rest of this user's guide assumes you have built
-and installed SMTK according to these instructions.
-
-.. todo::
-
-   Add high-level discussion of the components of the toolkit
-   and how they fit together (before the "administration.rst"
-   line below).
+and installed SimMedTK according to these instructions.
 
 .. toctree::
    :maxdepth: 4
 
+   introduction.rst
    administration.rst
    contributing.rst
 

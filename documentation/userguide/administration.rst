@@ -4,7 +4,7 @@
 .. role:: arg(code)
    :language: sh
 
-.. _smtk-administration:
+.. _simmedtk-administration:
 
 **********************
 Administering SimMedTK

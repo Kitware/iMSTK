@@ -88,6 +88,7 @@ extensions = [
     'sphinxcontrib.actdiag',
     'sphinxcontrib.doxylink',
     'findfigure',
+    'numfig',
     'breathe'
 ]
 
