@@ -130,6 +130,10 @@ These packages can all be installed with pip:
   sudo pip install Pygments
   # For activity diagrams:
   sudo pip install sphinxcontrib-actdiag
+  # For image handling:
+  sudo pip install pillow
+  # For coloring html:
+  sudo pip install webcolor
 
 If you are unfamiliar with the documentation packages here, see these links for examples of their use
 (or use SimMedTK by example):
