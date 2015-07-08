@@ -27,7 +27,7 @@
 #include <memory>
 
 #include "smCore/smSDK.h"
-#include "smCore/smTextureManager.h"
+#include "smRendering/smTextureManager.h"
 #include "smRendering/smOculusViewer.h"
 #include "smCollision/smMeshCollisionModel.h"
 
@@ -119,19 +119,15 @@ int main()
     // Camera setup
     sceneCamera1 = smCamera::getDefaultCamera();
     assert(sceneCamera1);
-    sceneCamera1->setCameraPos(3, 3, 5);
-    sceneCamera1->setCameraFocus(0, 0, -1);
-    sceneCamera1->genProjMat();
-    sceneCamera1->genViewMat();
+    sceneCamera1->setPos(3, 3, 5);
+    sceneCamera1->setFocus(0, 0, -1);
     scene1->addCamera(sceneCamera1);
     camCtl->setCamera(sceneCamera1);
 
     sceneCamera2 = smCamera::getDefaultCamera();
     assert(sceneCamera2);
-    sceneCamera2->setCameraPos(0, 0, 5);
-    sceneCamera2->setCameraFocus(0, 0, -1);
-    sceneCamera2->genProjMat();
-    sceneCamera2->genViewMat();
+    sceneCamera2->setPos(0, 0, 5);
+    sceneCamera2->setFocus(0, 0, -1);
     scene2->addCamera(sceneCamera2);
 
     //Link up the event system between this the camera controller and the viewer

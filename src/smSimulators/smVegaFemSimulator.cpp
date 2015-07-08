@@ -29,7 +29,6 @@ smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog )
     hapticButtonPressed = false;
 }
 
-
 void smVegaFemSimulator::beginSim()
 {
 }
@@ -65,7 +64,7 @@ void smVegaFemSimulator::run()
         if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
         {
             auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
-            
+            //std::cout << "."; std::cout.flush();
             femSceneObject->advanceDynamics();
         }
     }

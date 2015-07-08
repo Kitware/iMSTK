@@ -4,8 +4,8 @@ target_link_libraries(renderCubeToTextureOculus
   smEvent
   smRendering
   smRenderingOculus
-  smShader
   smMesh
+  smGeometry
   ExamplesCommon
   Oculus::Oculus
   )

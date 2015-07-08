@@ -2,32 +2,32 @@
 simmedtk_add_library(smSimulators
   SOURCES
     smDummySimulator.cpp
-    smFemSceneObject.cpp
-    smFemSimulator.cpp
     smMyStylus.cpp
     smStylusObject.cpp
     smToolSimulator.cpp
-    smVegaConfigFemObject.cpp
+    smVegaObjectConfig.cpp
     smVegaFemSceneObject.cpp
     smVegaFemSimulator.cpp
+	smSceneObjectDeformable.cpp
   PUBLIC_HEADERS
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smFemSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smMyStylus.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDObjectSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPhysXVolumeMesh.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smStylusObject.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smToolSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaConfigFemObject.h
+    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaObjectConfig.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSimulator.h
+	${CMAKE_SOURCE_DIR}/include/smSimulators/smSceneObjectDeformable.h
 )
 
 target_link_libraries(smSimulators
   PRIVATE
     smCore
+    smMesh
+    smEvent
+    smCollision
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts

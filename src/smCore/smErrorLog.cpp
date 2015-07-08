@@ -91,3 +91,4 @@ void smErrorLog::setConsoleOutput(smBool flag)
 {
     consoleOutput = flag;
 }
+

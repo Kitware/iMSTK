@@ -26,7 +26,7 @@
 #define SMMESHTOMESHCOLLISION_H
 
 // SimMedTK includes
-#include "smCollision/smCollisionDetection.h"
+#include "smCore/smCollisionDetection.h"
 
 class smCollisionPair;
 

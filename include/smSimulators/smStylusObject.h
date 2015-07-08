@@ -34,7 +34,7 @@
 #include "smCore/smConfig.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smSceneObject.h"
-#include "smUtilities/smMath.h"
+#include "smCore/smMath.h"
 #include "smExternal/tree.hh"
 
 namespace smtk {
@@ -106,10 +106,8 @@ public:
     /// \brief !!
     virtual void unSerialize(void *p_memoryBlock) override;
 
-    virtual void init() override;
-
     /// \brief handle the events such as button presses related to stylus
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;    
 
 public:
     smVec3d pos; // position of stylus
@@ -166,22 +164,76 @@ public:
     std::shared_ptr<smSceneObject> clone() override;
 
     /// \brief !!
-    virtual void initDraw() override;
+    virtual void initialize() override {};
 
-    /// \brief !!
-    virtual void draw() override;
+    void loadInitialStates() override{};
 
-    /// \brief !!
-    virtual void init() override;
+    bool configure(const smString ConfigFile)
+    {
+        return false;
+    }
+
+    void printInfo() const override
+    {
+        std::cout << "\t-------------------------------------\n";
+        std::cout << "\t Name        : " << this->getName() << std::endl;
+        std::cout << "\t Type        : " << this->getType() << std::endl;
+        std::cout << "\t-------------------------------------\n";
+    }
 
 private:
     std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
 };
 
+
+
+
 /// \brief !!
 class smStylusDeformableSceneObject: public smStylusSceneObject
 {
+ 
+public:
     smStylusDeformableSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+
+    ~smStylusDeformableSceneObject(){};
+
+    virtual void initialize() override {};
+
+    void loadInitialStates() {};
+
+    bool configure(smString ConfigFile)
+    {
+        return false;
+    }
+
+    std::shared_ptr<void> duplicateAtRuntime()
+    {
+        std::shared_ptr<smStylusDeformableSceneObject> newSO =
+            std::make_shared<smStylusDeformableSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+    std::shared_ptr<void> duplicateAtInitialization()
+    {
+        std::shared_ptr<smStylusDeformableSceneObject> newSO =
+            std::make_shared<smStylusDeformableSceneObject>();
+
+        return (std::shared_ptr<void>)newSO;
+    }
+    std::shared_ptr<smSceneObject> clone() override
+    {
+        // WARNING: What is the purpose of this function
+        std::shared_ptr<smStylusDeformableSceneObject> ret = std::make_shared<smStylusDeformableSceneObject>();
+        return ret;
+    }
+
+    void printInfo() const override
+    {
+        std::cout << "\t-------------------------------------\n";
+        std::cout << "\t Name        : " << this->getName() << std::endl;
+        std::cout << "\t Type        : " << this->getType() << std::endl;
+        std::cout << "\t-------------------------------------\n";
+    }
 };
 
 #endif

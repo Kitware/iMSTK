@@ -22,22 +22,63 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smStaticSceneObject.h"
+#include "smCore/smFactory.h"
 
-smStaticSceneObject::smStaticSceneObject ( std::shared_ptr<smErrorLog> p_log )
+smStaticSceneObject::smStaticSceneObject(std::shared_ptr<smErrorLog> p_log) : smSceneObject()
 {
     type = SIMMEDTK_SMSTATICSCENEOBJECT;
-}
-smStaticSceneObject::~smStaticSceneObject() {}
-void smStaticSceneObject::init() {}
-void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ ) {}
-void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ ) {}
 
-void smStaticSceneObject::draw()
+    name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
+
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createSubclass(
+        "smRenderDelegate","smStaticSceneObjectRenderDelegate"));
+}
+
+smStaticSceneObject::~smStaticSceneObject()
 {
-    staticModel->draw();
+}
+
+void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ )
+{
+}
+
+void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ )
+{
+}
+
+void smStaticSceneObject::initialize()
+{
+}
+
+void smStaticSceneObject::loadInitialStates()
+{
+}
+
+bool smStaticSceneObject::configure(const smString ConfigFile)
+{
+    return false;
 }
 
 std::shared_ptr<smSceneObject> smStaticSceneObject::clone()
 {
     return safeDownCast<smSceneObject>();
+}
+
+void smStaticSceneObject::setModel(std::shared_ptr<smModelRepresentation> model)
+{
+    this->staticModel = model;
+}
+
+std::shared_ptr<smModelRepresentation> smStaticSceneObject::getModel()
+{
+    return staticModel;
+}
+
+void smStaticSceneObject::printInfo() const
+{
+    std::cout << "\t-------------------------------------\n";
+    std::cout << "\t Name        : " << this->getName() << std::endl;
+    std::cout << "\t Type        : " << this->getType() << std::endl;
+    std::cout << "\t-------------------------------------\n";
 }

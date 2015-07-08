@@ -25,8 +25,8 @@
 
 #include "smCollision/smMeshToMeshCollision.h"
 #include "smCollision/smMeshCollisionModel.h"
-#include "smCollision/smCollisionPair.h"
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smCollisionPair.h"
+#include "smCore/smMakeUnique.h"
 #include "smMesh/smSurfaceMesh.h"
 
 using namespace bandit;

@@ -26,41 +26,27 @@
 #define SMPENALTY_CONTACTHANDLING_H
 
 // SimMedTK includes
-#include "smContactHandling/smContactHandling.h"
-#include "smCollision/smCollisionPair.h"
+#include "smCore/smContactHandling.h"
 
-class smCollisionPair;
-
-///
-/// @brief Penalty based for contact handling
-///
+/// \brief Penalty based for contact handling
 class smPenaltyContactHandling : public smContactHandling
 {
 public:
-	smPenaltyContactHandling(bool typeBilateral);
-    
-	smPenaltyContactHandling(bool typeBilateral,
+    smPenaltyContactHandling(bool typeBilateral);
+
+    smPenaltyContactHandling(bool typeBilateral,
                              const std::shared_ptr<smSceneObject>& sceneObjFirst,
                              const std::shared_ptr<smSceneObject>& sceneObjSecond);
 
-	const smContactHandlingType &getContactHandlingType() const;
+    virtual ~smPenaltyContactHandling();
 
-	void resolveContacts();
+    void resolveContacts();
 
-	virtual ~smPenaltyContactHandling() {};
+    /// \brief Get the forces on one the first scene object using penalty method
+    virtual void computeUnilateralContactForces() = 0;
 
-private:
-
-    ///
-    /// @brief Get the forces on one the first scene object using penalty method
-    ///
-    void computeUnilateralContactForces();
-    
-    ///
-    /// @brief Get the forces on both the scene objects using penalty method
-    ///
-    void computeBilateralContactForces();
-
+    /// \brief Get the forces on both the scene objects using penalty method
+    virtual void computeBilateralContactForces() = 0;
 };
 
 #endif // SMPENALTY_CONTACTHANDLING_H

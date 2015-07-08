@@ -33,7 +33,7 @@
 #include "smCore/smSceneObject.h"
 #include "smCore/smScheduler.h"
 #include "smCore/smErrorLog.h"
-#include "smUtilities/smTimer.h"
+#include "smCore/smTimer.h"
 
 /// \brief  thread priority definitions
 enum smThreadPriority
@@ -126,12 +126,6 @@ protected:
 
     /// \brief updates scene list
     virtual void updateSceneList();
-
-    /// \brief  initialization routine for rendering
-    virtual void initDraw() override;
-
-    /// \brief  rendering of simulator. it is used for debugging purposes
-    virtual void draw() override;
 
     /// \brief object simulator iterator. The default iteration is sequantial in the order of the insertion.
     /// custom iteration requires extension of this class.

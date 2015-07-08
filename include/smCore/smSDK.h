@@ -30,10 +30,9 @@
 #include "smCore/smScene.h"
 #include "smRendering/smViewer.h"
 #include "smCore/smSimulator.h"
-#include "smCore/smTextureManager.h"
 #include "smCore/smModule.h"
-#include "smUtilities/smDataStructures.h"
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smDataStructures.h"
+#include "smCore/smMakeUnique.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
@@ -178,7 +177,7 @@ private:
     smBool isModulesStarted;
 
     std::shared_ptr<smErrorLog> errorLog; ///< error log
-    std::shared_ptr<smViewer> viewer; ///< Reference to the sdk viewer object
+    std::shared_ptr<smViewerBase> viewer; ///< Reference to the sdk viewer object
     std::shared_ptr<smSimulator> simulator; ///< Reference to the sdk simulator object
     std::vector<std::shared_ptr<smScene>> sceneList; ///< scene list
 
@@ -189,8 +188,6 @@ private:
     static smIndiceArray<smObjectSimulatorHolder> *collisionDetectorsRef;
     static smIndiceArray<smSceneHolder> *scenesRef;
     static smIndiceArray<smSceneObjectHolder> *sceneObjectsRef;
-    static smIndiceArray<smMotionTransformer *> *motionTransRef;
-    static smIndiceArray<smPipeHolder>* pipesRef;
 
     std::vector<std::thread> modules; ///< Stores a list of running module threads
 
@@ -204,13 +201,8 @@ public:
     /// \brief update scene list. not implemented
     void updateSceneListAll();
 
-    /// \brief init registered modules
     void initRegisteredModules();
-
-    /// \brief run the registered modules
-    void runRegisteredModules();
-
-    ///shutdowns all the modules
+    smInt runRegisteredModules();
     void shutDown();
 
     ///for now both functions below are the same. But it maybe subject to change.
@@ -223,14 +215,14 @@ public:
 
     /// \brief Registers a viewer object with the SDK
     ///
-    void addViewer(std::shared_ptr<smViewer> p_viewer);
+    void addViewer(std::shared_ptr<smViewerBase> p_viewer);
 
     /// \brief Creates and registers a viewer object with the SDK
     ///
-    std::shared_ptr<smViewer> createViewer();
+    std::shared_ptr<smViewerBase> createViewer();
 
     ///SDK returns a pointer to the viewer
-    std::shared_ptr<smViewer> getViewerInstance();
+    std::shared_ptr<smViewerBase> getViewerInstance();
 
     ///SDK creates simualtor
     std::shared_ptr<smSimulator> createSimulator();
@@ -279,14 +271,6 @@ public:
     void registerSceneObject(std::shared_ptr<smSceneObject> p_sco);
 
     void addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<smObjectSimulator> p_os, int p_scId=0);
-
-    smPipe* getPipeByName(smString p_name);
-
-    /// \brief register pipe
-    void registerPipe(smPipe*p_pipe);
-
-    /// \brief create a pipe
-    smPipe* createPipe(smString p_pipeName, smInt p_elementSize, smInt p_size);
 };
 
 #endif

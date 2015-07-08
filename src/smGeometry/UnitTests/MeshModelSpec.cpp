@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smMakeUnique.h"
 #include <bandit/bandit.h>
 
 #include "smGeometry/smMeshModel.h"

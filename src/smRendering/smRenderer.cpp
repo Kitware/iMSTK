@@ -23,9 +23,9 @@
 
 #include "smRendering/smGLRenderer.h"
 #include "smMesh/smMesh.h"
-#include "smUtilities/smDataStructures.h"
+#include "smCore/smDataStructures.h"
 #include "smRendering/smViewer.h"
-#include "smUtilities/smQuaternion.h"
+#include "smCore/smQuaternion.h"
 #include "smRendering/smVAO.h"
 
 smGLRenderer::smGLRenderer()
@@ -33,6 +33,7 @@ smGLRenderer::smGLRenderer()
 
 }
 
+#if 0
 void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail)
 {
     static smVec3d origin(0, 0, 0);
@@ -166,6 +167,7 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
     glPointSize(1.0);
     glLineWidth(1.0);
 }
+#endif // 0
 
 void smGLRenderer::drawSurfaceMeshTriangles(
     std::shared_ptr<smMesh> p_surfaceMesh,
@@ -202,7 +204,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
-        if (p_surfaceMesh->isMeshTextured())
+        if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
             glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
@@ -273,7 +275,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
-        if (p_surfaceMesh->isMeshTextured())
+        if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
@@ -398,18 +400,18 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D)
+void smGLRenderer::drawArrow(const smVec3f &start, const smVec3f &end, const float D)
 {
-    double x = x2 - x1;
-    double y = y2 - y1;
-    double z = z2 - z1;
-    double L = sqrt(x*x + y*y + z*z);
+    float x = end[0] - start[0];
+    float y = end[1] - start[1];
+    float z = end[2] - start[2];
+    float L = sqrt(x*x + y*y + z*z);
 
     GLUquadricObj *quadObj;
 
     glPushMatrix();
 
-    glTranslated(x1, y1, z1);
+    glTranslated(start[0], start[1], start[2]);
 
     if ((x != 0.) || (y != 0.)) {
         glRotated(atan2(y, x) / 0.0174533, 0., 0., 1.);
@@ -451,30 +453,62 @@ void smGLRenderer::drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2,
 
 }
 
-void smGLRenderer::drawAxes(GLdouble length)
+void smGLRenderer::drawAxes(const float length)
 {
     glDisable(GL_LIGHTING);
 
+    float headWidth = length / 12;
+
+    Eigen::Vector3f origin(0, 0, 0);
+
     glColor3fv(smColor::colorRed.toGLColor());
     glPushMatrix();
-    //glTranslatef(-length, 0, 0);
-    drawArrow(0, 0, 0, length, 0, 0, length / 12);
+    drawArrow(origin, Eigen::Vector3f(length, 0, 0), headWidth);
     glPopMatrix();
 
     glColor3fv(smColor::colorGreen.toGLColor());
     glPushMatrix();
-    //glTranslatef(0, -length, 0);
-    drawArrow(0, 0, 0, 0, length, 0, length / 12);
+    drawArrow(origin, Eigen::Vector3f(0, length, 0), headWidth);
     glPopMatrix();
 
     glColor3fv(smColor::colorBlue.toGLColor());
     glPushMatrix();
-    //glTranslatef(0, 0, -length);
-    drawArrow(0, 0, 0, 0, 0, length, length / 12);
+    drawArrow(origin, Eigen::Vector3f(0, 0, length), headWidth);
     glPopMatrix();
 
     glEnable(GL_LIGHTING);
 }
+
+void smGLRenderer::drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length)
+{
+    glDisable(GL_LIGHTING);
+
+    GLfloat headWidth = length / 12;
+
+    glColor3fv(smColor::colorRed.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f xVec(length, 0, 0);
+    xVec = rotMat*xVec + pos;
+    drawArrow(pos, xVec, headWidth);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorGreen.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f yVec(0, length, 0);
+    yVec = rotMat*yVec + pos;
+    drawArrow(pos, yVec, headWidth);
+    glPopMatrix();
+
+    glColor3fv(smColor::colorBlue.toGLColor());
+    glPushMatrix();
+    Eigen::Vector3f zVec(0, 0, length);
+    zVec = rotMat*zVec + pos;
+    drawArrow(pos, zVec, headWidth);
+    glPopMatrix();
+
+    glEnable(GL_LIGHTING);
+}
+
 void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
 {
 
@@ -515,8 +549,8 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene)
 {
     assert(p_scene);
 
-    smMatrix44f proj = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getProjMatRef());
-    smMatrix44f view = Eigen::Map<smMatrix44f>(p_scene->getCamera()->getViewMatRef());
+    smMatrix44f proj = p_scene->getCamera()->getProjMat();
+    smMatrix44f view = p_scene->getCamera()->getViewMat();
 
     renderScene(p_scene, proj, view);
 }
@@ -559,14 +593,16 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
 
 void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 {
-    if (p_sceneObject->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
+    smRenderDetail::Ptr detail = p_sceneObject->getRenderDetail();
+    if (!detail || detail->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     //if the custom rendering enable only render this
+    smRenderDelegate::Ptr delegate = p_sceneObject->getRenderDelegate();
     std::shared_ptr<smCustomRenderer> renderer = p_sceneObject->getRenderer();
-    if (p_sceneObject->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
+    if (detail->getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
     {
         if (renderer != nullptr)
         {
@@ -575,7 +611,7 @@ void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObjec
             renderer->postDraw(*p_sceneObject);
         }
     }
-    else
+    else if (delegate)
     {
         //If there is custom renderer first render the preDraw function. which is responsible for
         //rendering before the default renderer takes place
@@ -584,8 +620,7 @@ void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObjec
             renderer->preDraw(*p_sceneObject);
         }
 
-        // TODO: scenobject does not have a draw function
-        p_sceneObject->draw();
+        delegate->draw();
 
         //If there is custom renderer, render the postDraw function. which is responsible for
         //rendering after the default renderer takes place

@@ -31,7 +31,7 @@
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
 #include "smCore/smSceneObject.h"
-#include "smUtilities/smMatrix.h"
+#include "smCore/smMatrix.h"
 
 class smMesh;
 class smAABB;
@@ -74,9 +74,14 @@ public:
     /// \brief  draw plane
     static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
-    static void drawAxes(GLdouble length=1.0);
+    /// \brief  draw axes given rotation matrix, position and length to draw
+    static void drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length);
 
-    static void drawArrow(GLdouble x1, GLdouble y1, GLdouble z1, GLdouble x2, GLdouble y2, GLdouble z2, GLdouble D);
+    /// \brief  draw global axes length to draw
+    static void drawAxes(const float length);
+    
+    /// \brief  draw arrow given starting position, ending poistion and width of the arrow head
+    static void drawArrow(const smVec3f &start, const smVec3f &end, const float D);
 
     /// \brief draw function is called for visualization the object
     virtual void draw(){}

@@ -34,10 +34,11 @@
 #include "smCore/smConfig.h"
 #include "smCore/smUnifiedId.h"
 #include "smRendering/smConfigRendering.h"
-#include "smEvent/smEventHandler.h"
+#include "smCore/smEventHandler.h"
 
 class smSDK;
 class smCoreClass;
+class smRenderDelegate;
 class smObjectSimulator;
 class smViewer;
 
@@ -105,7 +106,7 @@ public:
     ///
     /// \brief draw function is called for visualization the object
     ///
-    virtual void draw();
+    virtual void draw() const;
 
     ///
     /// \brief initialization of simulation
@@ -203,23 +204,22 @@ public:
     ///
     std::shared_ptr<smUnifiedId> getUniqueId() {return uniqueId;}
 
-    ///
     /// \brief Get render detail
-    ///
-    std::shared_ptr<smRenderDetail> getRenderDetail() {return renderDetail;}
+    std::shared_ptr<smRenderDetail> getRenderDetail() const
+    {return renderDetail;}
 
-    ///
-    /// \brief Set the unique id of this object
-    ///
+    /// \brief Set the render details (properties affecting visual depiction)
     void setRenderDetail(std::shared_ptr<smRenderDetail> newRenderDetail)
-    {
-        renderDetail = newRenderDetail;
-    }
+    { this->renderDetail = newRenderDetail; }
+
+    std::shared_ptr<smRenderDelegate> getRenderDelegate() const;
+    void setRenderDelegate(std::shared_ptr<smRenderDelegate> delegate);
 
     void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
     {
         eventHandler->attachEvent(eventType,component);
     }
+
 protected:
     ///
     /// \brief Allows to use the *this* pointer from any child
@@ -238,6 +238,7 @@ protected:
     std::map<
     smtk::Event::EventType,
     smtk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
+    std::shared_ptr<smRenderDelegate> renderDelegate; ///!< Class that can render this class
 
 private:
     std::shared_ptr<smUnifiedId> uniqueId; ///< unique Id

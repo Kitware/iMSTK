@@ -151,10 +151,9 @@ public:
     /// \brief !!
     void addObject(smSceneObject *obj);
 
-    /// \brief render the lattice for visaulization
-    void draw() override;
-
 public:
+    friend class smLatticeRenderDelegate;
+
     //these should be templated..Current design is based on the triangle
     smAABB *aabb;
     std::shared_ptr<smSurfaceMesh> mesh;

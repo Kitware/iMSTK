@@ -3,11 +3,13 @@ simmedtk_add_library(ExamplesCommon
     wasdCameraController.cpp
     KeyPressSDKShutdown.cpp
     hapticController.cpp
-	
+    pzrMouseCameraController.cpp
+
   PUBLIC_HEADERS
     wasdCameraController.h
     KeyPressSDKShutdown.h
-	hapticController.h
+    hapticController.h
+    pzrMouseCameraController.h
 )
 
 target_link_libraries(ExamplesCommon

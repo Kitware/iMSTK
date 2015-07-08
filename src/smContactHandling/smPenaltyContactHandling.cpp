@@ -23,44 +23,26 @@
 
 #include "smContactHandling/smPenaltyContactHandling.h"
 #include "smSimulators/smVegaFemSceneObject.h"
+#include "smCore/smCollisionPair.h"
 
-smPenaltyContactHandling::smPenaltyContactHandling( bool typeBilateral )
+smPenaltyContactHandling::smPenaltyContactHandling(bool typeBilateral) : smContactHandling(typeBilateral)
 {
-    if( typeBilateral )
-    {
-        contactHandlingType = SIMMEDTK_CONTACT_PENALTY_BILATERAL;
-    }
-    else
-    {
-        contactHandlingType = SIMMEDTK_CONTACT_PENALTY_UNILATERAL;
-    }
 }
 
 smPenaltyContactHandling::smPenaltyContactHandling( bool typeBilateral,
-        const std::shared_ptr<smSceneObject>& sceneObjFirst,
-        const std::shared_ptr<smSceneObject>& sceneObjSecond )
+                                                    const std::shared_ptr<smSceneObject>& sceneObjFirst,
+                                                    const std::shared_ptr<smSceneObject>& sceneObjSecond)
+                                                    : smContactHandling(typeBilateral,sceneObjFirst,sceneObjSecond)
 {
-    if( typeBilateral )
-    {
-        contactHandlingType = SIMMEDTK_CONTACT_PENALTY_UNILATERAL;
-    }
-    else
-    {
-        contactHandlingType = SIMMEDTK_CONTACT_PENALTY_BILATERAL;
-    }
-
-    this->collidingSceneObjects.first = sceneObjFirst;
-    this->collidingSceneObjects.second = sceneObjSecond;
 }
 
-const smContactHandlingType &smPenaltyContactHandling::getContactHandlingType() const
+smPenaltyContactHandling::~smPenaltyContactHandling()
 {
-    return contactHandlingType;
-}
+};
 
 void smPenaltyContactHandling::resolveContacts()
 {
-    if( contactHandlingType == SIMMEDTK_CONTACT_PENALTY_UNILATERAL )
+    if (!isBilateral)
     {
         computeUnilateralContactForces();
     }
@@ -68,45 +50,4 @@ void smPenaltyContactHandling::resolveContacts()
     {
         computeBilateralContactForces();
     }
-}
-
-void smPenaltyContactHandling::computeUnilateralContactForces()
-{
-    int penetratedNode, nodeDofID;
-    const double stiffness = 1.0e6, damping = 1.0e5;
-    smVec3d velocityProjection;
-
-    auto contactInfo = this->getCollisionPairs()->getContacts();
-
-    /*std::cout << "@ Contact handling\n";
-    this->getCollisionPairs()->printCollisionPairs();*/
-
-    if (this->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT &&
-        this->getFirstSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
-    {
-        auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>( this->getSecondSceneObject() );
-
-        femSceneObject->setContactForcesToZero(); 
-        smVec3d force;
-        for( int i = 0; i < contactInfo.size(); i++ )
-        {
-
-            nodeDofID = 3 * contactInfo[i]->index;
-
-            velocityProjection = smVec3d( femSceneObject->uvel[nodeDofID], femSceneObject->uvel[nodeDofID + 1], femSceneObject->uvel[nodeDofID + 2] );
-            velocityProjection = contactInfo[i]->normal.dot( velocityProjection ) * contactInfo[i]->normal;
-
-            force = stiffness * -contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
-
-            femSceneObject->f_contact[nodeDofID] += force(0);
-            femSceneObject->f_contact[nodeDofID + 1] += force(1);
-            femSceneObject->f_contact[nodeDofID + 2] += force(2);
-
-        }
-    }
-
-}
-
-void smPenaltyContactHandling::computeBilateralContactForces()
-{
 }

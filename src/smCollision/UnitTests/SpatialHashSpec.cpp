@@ -26,7 +26,7 @@
 #include "smCollision/smSpatialHashCollision.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smDoubleBuffer.h"
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smMakeUnique.h"
 
 using namespace bandit;
 

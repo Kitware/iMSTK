@@ -34,7 +34,7 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smUtilities/smDataStructures.h"
+#include "smCore/smDataStructures.h"
 
 #define SIMMEDTK_PIPE_MAXLISTENERS 10
 

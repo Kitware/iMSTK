@@ -28,195 +28,79 @@
 #include <SFML/Window.hpp>
 
 // SimMedTK includes
-#include "smCore/smConfig.h"
-#include "smShader/smShader.h"
-#include "smCore/smScene.h"
-#include "smCore/smDispatcher.h"
-#include "smCore/smModule.h"
-#include "smCore/smStaticSceneObject.h"
-#include "smUtilities/smGLUtils.h"
+#include "smCore/smViewerBase.h"
+#include "smRendering/smShader.h"
+#include "smRendering/smGLUtils.h"
 #include "smRendering/smVBO.h"
 #include "smSimulators/smPBDSceneObject.h"
-#include "smSimulators/smFemSceneObject.h"
-#include "smUtilities/smDataStructures.h"
+#include "smCore/smDataStructures.h"
 #include "smSimulators/smStylusObject.h"
-#include "smCore/smDoubleBuffer.h"
 #include "smRendering/smFrameBuffer.h"
 #include "smRendering/smCamera.h"
-#include "smEvent/smEventHandler.h"
 
 //forward declaration
-class smSDK;
 class smOpenGLWindowStream;
-class smMetalShader;
-class smSceneTextureShader;
-
-class smCameraCollisionInterface
-{
-public:
-    virtual bool checkCameraCollision() = 0;
-};
-
-enum smRenderingStageType
-{
-    SMRENDERSTAGE_SHADOWPASS,
-    SMRENDERSTAGE_DPMAPPASS,
-    SMRENDERSTAGE_CUSTOMPASS,
-    SMRENDERSTAGE_FINALPASS
-};
-
-enum smRenderTargetType
-{
-    SMRENDERTARGET_SCREEN,
-    SMRENDERTARGET_FBO
-};
-
-/// \brief Describes what to render and where the rendering should take place
-struct smRenderOperation
-{
-    smRenderOperation();
-    std::shared_ptr<smScene> scene; ///< The scene full of objects to render
-    smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
-    smString fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
-    smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
-};
-
-struct smFboListItem
-{
-    smString fboName; ///< String identification
-    smFrameBuffer* fbo; ///< The FBO pointer
-    smTexture *depthTex; ///< The FBO depth texture pointer
-    smTexture *colorTex; ///< The FBO color texture pointer
-    smUInt width; ///< The width of the FBO
-    smUInt height; ///< The height of the FBO
-};
 
 /// \brief Handles all rendering routines.
-class smViewer : public smModule
+class smViewer : public smViewerBase
 {
-protected:
-    std::vector<std::shared_ptr<smCoreClass>> objectList;
-    std::vector<smRenderOperation> renderOperations;
-    std::vector<smFboListItem> fboListItems;
-    std::shared_ptr<smErrorLog> log;
-    smInt unlimitedFPSVariableChanged;
-    smBool unlimitedFPSEnabled;
-    smInt screenResolutionWidth;
-    smInt screenResolutionHeight;
-    friend class smSDK;
-
 public:
-
-    smRenderingStageType renderStage;
-
     std::unique_ptr<sf::Context> sfmlContext;
     std::unique_ptr<sf::Window> sfmlWindow;
 
-    ///if the camera motion is enabled from other external devices
-    smBool enableCameraMotion;
-
     std::shared_ptr<smOpenGLWindowStream> windowOutput;
-    /// \brief Viewer settings
-    smUInt viewerRenderDetail;
 
-    smFloat globalAxisLength;    
-
-    smInt height(void);
-    smInt width(void);
-    smFloat aspectRatio(void);
-    /// \brief disable vSync
-    void setUnlimitedFPS(smBool p_enableFPS);
     /// \brief default constructor
     smViewer();
-    /// \brief initialization for viewer
-    virtual void init() override;
     /// \brief for exit viewer
-    void exitViewer();
+    virtual void exitViewer() override;
     /// \brief add object for rendering
     void addObject(std::shared_ptr<smCoreClass> object);
     /// \brief add text for display
-    void addText(smString p_tag);
+    virtual void addText(smString p_tag) override;
     /// \brief update text
-    void updateText(smString p_tag, smString p_string);
-    void updateText(smInt p_handle, smString p_string);
-    /// \brief change window resolution
-    void setScreenResolution(smInt p_width, smInt p_height);
+    virtual void updateText(smString p_tag, smString p_string) override;
+    virtual void updateText(smInt p_handle, smString p_string) override;
     /// \brief set scene as texture
     void setSceneAsTextureShader(std::shared_ptr<smSceneTextureShader> p_shader);
     /// \brief set the window title
     void setWindowTitle(const smString &str);
     /// \brief enable/disable VSync
-    void setVSync(bool sync);
-    /// \brief Registers a scene for rendering with the viewer
-    void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const smString &p_fboName);
-    /// \brief Adds an FBO to the viewer to allow rendering to it.
-    ///
-    /// \detail The FBO will be created an initialized in the viewer.
-    ///
-    /// \param p_fboName String to reference the FBO by
-    /// \param p_colorTex A texture that will contain the fbo's color texture.
-    /// \param p_depthTex A texture that will contain the fbo's depth texture.
-    /// \param p_width The width of the fbo
-    /// \param p_height The height of the fbo
-    void addFBO(const smString &p_fboName,
+    virtual void setVSync(bool sync) override;
+    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const smString &p_fboName);
+    virtual void addFBO(const smString &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
                 smUInt p_width, smUInt p_height);
 
-    void setGlobalAxisLength(const smFloat len);
     smString windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
 
 protected:
-    /// \brief Initializes OpenGL capabilities and flags
-    void initGLCaps();
-    /// \brief Initializes the internal objectList
-    void initObjects();
-    /// \brief Initializes FBOs, textures, shaders and VAOs
-    void initResources();
-    /// \brief Initializes scenes in the sceneList
-    void initScenes();
-    /// \brief Initilizes the OpenGL context, and window containing it
-    void initGLContext();
-    /// \brief Cleans up after initGLContext()
-    void destroyGLContext();
+    virtual void initRenderingCapabilities() override;
+    virtual void initResources() override;
+    virtual void initRenderingContext() override;
+    virtual void destroyRenderingContext() override;
     /// \brief Cleanup function called on exit to ensure resources are cleaned up
-    virtual void cleanUp();
+    virtual void cleanUp() override;
     /// \brief Renders the internal sceneList
     void renderSceneList();
-    /// \brief Processes a render operation
-    void processRenderOperation(const smRenderOperation &p_rop);
-    /// \brief Processes viewerRenderDetail options
-    void processViewerOptions();
-    /// \brief Renders the render operation to screen
-    virtual void renderToScreen(const smRenderOperation &p_rop);
-    /// \brief Renders the render operation to an FBO
-    void renderToFBO(const smRenderOperation &p_rop);
-    /// \brief Initializes the FBOs in the FBO list
-    void initFboListItems();
-    /// \breif Destroys all the FBOs in the FBO list
-    void destroyFboListItems();
-    /// \brief
-    void initDepthBuffer();
-    /// \brief Set the color and other viewer defaults
-    void setToDefaults();
-    /// \brief called in the beginning of each frame
+
+    virtual void processViewerOptions() override;
+    virtual void processWindowEvents() override;
+    virtual void renderToScreen(const smRenderOperation &p_rop) override;
+    virtual void renderToFBO(const smRenderOperation &p_rop) override;
+    virtual void initFboListItems();
+    virtual void destroyFboListItems();
+    virtual void setToDefaults() override;
     virtual void beginFrame() override;
-    /// \brief called in the end of each frame
     virtual void endFrame() override;
-    /// \brief draw routines
-    virtual void render();
-    /// \brief adjust  rendering FPS
-    void adjustFPS();
-    /// \brief render depth texture for debugging
-    void renderTextureOnView();
+    virtual void renderTextureOnView() override;
     /// \brief  event handler
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
     /// \brief processes an SFML event
     void processSFMLEvents(const sf::Event& p_event);
-    /// \brief  launches the the viewer. don't call sdk will call this
-    virtual void exec() override;
 };
 
 #endif

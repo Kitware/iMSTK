@@ -31,6 +31,7 @@
 #include "smRendering/smViewer.h"
 #include "smCollision/smSurfaceTreeIterator.h"
 #include "smEvent/smKeyboardEvent.h"
+#include "smCore/smFactory.h"
 
 /// \brief initialize the surface tree structure
 template <typename CellType>
@@ -103,40 +104,9 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
     renderOnlySurface = false;
 
     mesh->allocateAABBTris();
-}
-
-/// \brief Initialize the drawing structures
-template<typename CellType>
-void smSurfaceTree<CellType>::initDraw()
-{
-//     smViewer *viewer;
-//     viewer = param.rendererObject;
-//     viewer->addText("octree");
-}
-
-/// \brief draw the surface tree
-template<typename CellType>
-void smSurfaceTree<CellType>::draw()
-{
-    smVec3d center;
-    double length;
-    glColor3fv(smColor::colorGreen.toGLColor());
-
-    glEnable(GL_LIGHTING);
-    glPushAttrib(GL_LIGHTING_BIT);
-    glColor3fv(smColor::colorGreen.toGLColor());
-    glColor3fv(smColor::colorBlue.toGLColor());
-
-    glPushMatrix();
-    glColor3fv(smColor::colorPink.toGLColor());
-
-    this->root->draw();
-
-    glPopMatrix();
-
-
-    glPopAttrib();
-    glEnable(GL_LIGHTING);
+    this->setRenderDelegate(
+      smFactory<smRenderDelegate>::createConcreteClass(
+        "smSurfaceTreeRenderDelegate"));
 }
 
 /// \brief handle key press events

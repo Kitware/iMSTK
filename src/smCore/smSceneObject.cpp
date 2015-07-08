@@ -25,44 +25,79 @@
 #include "smCore/smObjectSimulator.h"
 #include "smCore/smSDK.h"
 
-///attach the simulator to the  object
+smSceneObject::smSceneObject()
+{
+    type = SIMMEDTK_SMSCENEOBJECT_TYPE_UNKNOWN;
+    isActive = true;
+    objectSim = nullptr;
+    customRender = nullptr;
+    //     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
+    flags.isViewerInit = false;
+    flags.isSimulatorInit = false;
+    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+}
+
+smSceneObject::~smSceneObject()
+{
+}
+
 void smSceneObject::attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim)
 {
     p_objectSim->addObject(safeDownCast<smSceneObject>());
 }
 
-///release the simulator from the object
 void smSceneObject::releaseObjectSimulator()
 {
     objectSim->removeObject(safeDownCast<smSceneObject>());
     objectSim = nullptr;
 }
 
-///get a reference to the simulator
 std::shared_ptr<smObjectSimulator> smSceneObject::getObjectSimulator()
 {
     return objectSim;
 }
 
-///attach the custom renderer to the scene object
 void smSceneObject::attachCustomRenderer(std::shared_ptr<smCustomRenderer> p_customeRenderer)
 {
     customRender = p_customeRenderer;
 }
 
-///release the custom renderer from the class
 void smSceneObject::releaseCustomeRenderer()
 {
     customRender = nullptr;
 }
 
-smSceneObject::smSceneObject()
+smInt smSceneObject::getObjectId()
 {
-    type = SIMMEDTK_SMSCENEBOJECT;
-    objectSim = nullptr;
-    customRender = nullptr;
-//     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
-    flags.isViewerInit = false;
-    flags.isSimulatorInit = false;
-    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+    return this->getUniqueId()->getId();
+}
+
+smUnifiedId::Pointer smSceneObject::getObjectUnifiedID()
+{
+    return std::make_shared<smUnifiedId>();
+}
+
+smStdVector3d & smSceneObject::getLocalVertices()
+{
+    return localVertices;
+}
+
+smObjectInitFlags & smSceneObject::getFlags()
+{
+    return flags;
+}
+
+std::shared_ptr<smCustomRenderer> smSceneObject::getRenderer()
+{
+    return customRender;
+}
+
+void smSceneObject::freeze()
+{
+    this->isActive = false;
+}
+
+void smSceneObject::activate()
+{
+    this->isActive = true;
 }

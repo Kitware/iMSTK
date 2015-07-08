@@ -23,10 +23,10 @@
 
 #include <bandit/bandit.h>
 
-#include "smCollision/smCollisionPair.h"
+#include "smCore/smCollisionPair.h"
 #include "smCollision/smMeshCollisionModel.h"
 #include "smCore/smModelRepresentation.h"
-#include "smUtilities/smMakeUnique.h"
+#include "smCore/smMakeUnique.h"
 
 using namespace bandit;
 

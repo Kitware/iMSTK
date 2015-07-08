@@ -25,16 +25,7 @@
 #define SMVEGAFEMSCENEOBJECT_H
 
 // SimMedTK includes
-#include "smCore/smConfig.h"
-#include "smMesh/smVolumeMesh.h"
-#include "smMesh/smSurfaceMesh.h"
-#include "smMesh/smVegaSceneObjectDeformable.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSceneObject.h"
-#include "smCore/smErrorLog.h"
-#include "smRendering/smConfigRendering.h"
-#include "smRendering/smCustomRenderer.h"
-#include "smSimulators/smVegaConfigFemObject.h"
+#include "smSimulators/smSceneObjectDeformable.h"
 
 // VEGA includes
 #include "centralDifferencesSparse.h"
@@ -54,18 +45,10 @@
 #include "isotropicMaterial.h"
 #include "linearFEMForceModel.h"
 #include "loadList.h"
-#include "massSpringSystemForceModel.h"
-#include "massSpringSystemFromCubicMeshConfigFile.h"
-#include "massSpringSystemFromObjMeshConfigFile.h"
-#include "massSpringSystemFromTetMeshConfigFile.h"
-#include "massSpringSystem.h"
-#include "massSpringSystemMT.h"
 #include "matrixIO.h"
 #include "MooneyRivlinIsotropicMaterial.h"
 #include "neoHookeanIsotropicMaterial.h"
 #include "objMesh.h"
-#include "performanceCounter.h"
-#include "renderSprings.h"
 #include "StVKCubeABCD.h"
 #include "StVKElementABCDLoader.h"
 #include "StVKForceModel.h"
@@ -79,48 +62,72 @@
 #include "tetMesh.h"
 #include "volumetricMesh.h"
 #include "volumetricMeshLoader.h"
+#include "generateSurfaceMesh.h"
+#include "generateMassMatrix.h"
 
-#define VEGA_PERFORMANCE_REC_BUFFER_SIZE 50
-const smString vega_string_none("__none");
-
-/// \ Workhorse class for finite element object simulated using VEGA libraries.
-///   Functionality: initialization, update of tangend stiffness, stepping in time
-/// \ , solving system of equations, post processing and customized rendering
-class smVegaFemSceneObject: public smSceneObject
+/// \brief Base class for any scene object that is defmormable
+/// and uses FE formulation to compute the evolution of configuration
+/// in time.
+class smVegaFemSceneObject: public smSceneObjectDeformable
 {
 public:
 
     /// \brief Constructor
-	smVegaFemSceneObject();
+    smVegaFemSceneObject();
 
     /// \brief Constructor
-    smVegaFemSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr, smString ConfigFile = vega_string_none);
+    smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log, const smString ConfigFile);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
 
-	bool configure(smString ConfigFile);
-
     /// \brief Initialize the parameters and properties of the simulation object
-    void initSimulation();
+    void initialize() override;
 
-    /// \brief Set the type of formulation used to model the deformation
-    void setDeformableModel();
-
-    /// \brief Load specified meshes
-    void loadVolumeMesh();
-
-    /// \brief Load the rendering mesh if it is designated
-    void loadSurfaceMesh();
-
-    /// \brief Load the data related to the vertices that will be fixed
-    void loadFixedBC();
+    /// \brief configure the vega fem scene object using external config file
+    bool configure(const smString ConfigFile) override;
 
     /// \brief load initial displacements and velocities of the nodes
-    void loadInitialStates();
+    void loadInitialStates() override;
+
+    /// \brief reads the fixed nodes from .bou file
+    int readBcFromFile(const char* filename, const int offset);
+
+    /// \brief Load the data related to the vertices that will be fixed
+    void loadFixedBC() override;
+
+    /// \brief Load volume meshes
+    void loadVolumeMesh() override;
+
+    /// \brief Load the surface mesh
+    void loadSurfaceMesh() override;
+
+    /// \brief Forces as a result of user interaction
+    /// (through an interface such as mouse or haptic device)
+    /// with the scene during runtime are added here
+    void applyUserInteractionForces() override;
+
+    /// \brief Use the computed displacemetnt update
+    /// to interpolate to the secondary display mesh
+    void updateSecondaryRenderingMesh() override;
+
+    /// \brief print object specific data
+    void printInfo() const override;
+
+    /// \brief Update the deformations by time stepping
+    void advanceDynamics() override;
+
+    /// \brief Advance in time by a specificed amount and a chosen time stepping scheme
+    inline void advanceOneTimeStep();
+
+    /// \brief rest the object to inital configuration and reset initial states
+    void resetToInitialState();
+
+    /// \brief Set the type of formulation used to model the deformation
+    void setDeformableModelType();
 
     /// \brief load the scripted externalloads
-    void loadScriptedExternalFroces();
+    void loadScriptedExternalForces();
 
     /// \brief Create the force model (underlying formulation)
     void createForceModel();
@@ -128,151 +135,106 @@ public:
     /// \brief Inititialize the time integrator
     void initializeTimeIntegrator();
 
-    /// \brief Update the deformations by time stepping
-    void advanceDynamics();
-
-    /// \brief Advance in time by a specificed amount and a chosen time stepping scheme
-    inline void advanceOneTimeStep();
-
-    /// \brief Forces as a result of user interaction
-    /// (through an interface such as mouse or haptic device)
-    /// with the scene during runtime are added here
-    inline void applyUserInteractionForces();
-
-    /// \brief Append the contact forces (if any)
-    void applyContactForces();
-
-    /// \brief Set all contact forces to zero (if any)
-    void setContactForcesToZero();
-
-    /// \brief Forces that are defined by the user before the start of the simulation
+    /// \brief Forces that are defined by the user 
+    ///  before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
 
-    /// \brief Use the computed displacemetnt update to interpolate to the secondary display mesh
-    inline void updateSecondaryRenderingMesh();
-
-    /// \brief Updates the stats related to timing, fps etc. Also updates window title with real-time information
-    inline void updateStats();
-
-    /// \brief prints a given string on the screen
-    void print_bitmap_string(float x, float y, float z, void * font, char * s);
-
-    /// \brief not implemented yet.
-    virtual std::shared_ptr<smSceneObject> clone() override
-    {
-        return safeDownCast<smSceneObject>();
-    }
-
-    void setRenderUsingVega(const bool vegaRender);
+    /// \brief Updates the stats related to timing, fps etc. 
+    /// Also updates window title with real-time information
+    inline void updatePerformanceMetrics();
 
     /// \brief check all the surface nodes for the closest node within
     /// certain threshold and set it to be the pulled vertex
     void setPulledVertex(const smVec3d &userPos);
 
-    /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
-    ///  vertices interacted with, ground plane etc.
-    virtual void draw() override;
+    /// \brief returns velocity given the
+    /// localtion in the global velocity vector
+    smVec3d getVelocityOfNodeWithDofID(const int dofID) const;
 
-    void renderWithVega();
+    /// \brief returns displacement given the
+    /// localtion in the global displacement vector
+    smVec3d getDisplacementOfNodeWithDofID(const int dofID) const;
 
-    /// \brief sets the objects specific render details
-    /// Should be moved to base class in near future
-    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
+    /// \brief returns acceleration given the
+    /// localtion in the global acceleration vector
+    smVec3d getAccelerationOfNodeWithDofID(const int dofID) const;
 
-	///serialize function explicity writes the object to the memory block
-	///each scene object should know how to write itself to a memory block
-	virtual void serialize(void *p_memoryBlock) override {};
+    /// \brief returns the number of nodes
+    int getNumNodes() const;
 
-	///Unserialize function can recover the object from the memory location
-	virtual void unSerialize(void *p_memoryBlock) override {};
+    /// \brief returns total degree of freeedom (including fixed)
+    int getNumTotalDof() const;
 
-	///this function may not be used
-	///every Scene Object should know how to clone itself. Since the data structures will be
-	///in the beginning of the modules(such as simulator, viewer, collision etc.)
-	//virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+    /// \brief returns unknown degree of freeedom
+    int getNumDof() const;
 
-	virtual void init() override {};
+    /// \brief returns number of nodes that are fixed in space
+    int getNumFixedNodes() const;
 
-    std::shared_ptr<smSurfaceMesh> getSurfaceMesh() const;
+    /// \brief returns the degree od freedom that are known or fixed
+    int getNumFixedDof() const;
+    
+    /// \brief serialize function explicity writes the object to the memory block
+    ///each scene object should know how to write itself to a memory block
+    virtual void serialize(void *p_memoryBlock) override {};
 
-public:
-    /// performance counters and simulation flags. some variable names are self explainatory
-    double fps; ///< fps of the simulation
-	int fpsBufferSize;///< buffer size to display fps
-    int fpsHead; ///< !!
-    double fpsBuffer[5]; ///< buffer to display fps
-    double cpuLoad;
-    double forceAssemblyTime;
-    double forceAssemblyLocalTime;
-	int forceAssemblyBufferSize;
-    int forceAssemblyHead;
-    double forceAssemblyBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    double systemSolveTime;
-    double systemSolveLocalTime;
-	int systemSolveBufferSize;
-    int systemSolveHead;
-    double systemSolveBuffer[VEGA_PERFORMANCE_REC_BUFFER_SIZE];
-    int enableTextures;
+    /// \brief Unserialize function can recover the object from the memory location
+    virtual void unSerialize(void *p_memoryBlock) override {};
+
+    /// \brief this function may not be used
+    ///every Scene Object should know how to clone itself. 
+    /// Since the data structures will be
+    ///in the beginning of the modules(such as simulator, viewer, collision etc.)
+    //virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+
+    /// \brief not implemented yet.
+    std::shared_ptr<smSceneObject> clone() override;
+
+private:
+
     int staticSolver;
     int graphicFrame;
-    int pulledVertex; ///< vertex that is pulled by user using external force
     int explosionFlag; ///< 1 if the simulation goes unstable
-    PerformanceCounter titleBarCounter;
-    PerformanceCounter explosionCounter;
-    PerformanceCounter cpuLoadCounter;
-    int timestepCounter;
-    int subTimestepCounter;
-    bool renderUsingVega;
+    int positiveDefinite; ///< 1 if the effective matrix is positive definite
+
     bool importAndUpdateVolumeMeshToSmtk;
 
-    /// Force models, time integrators, sparse matrices and meshes.
-    /// some variable names are self explainatory
-    std::vector<int> fixedVertices; ///< fixed vertcies
-    std::vector<double> forceLoads; ///< discrete external load inputs
-    int positiveDefinite; ///< 1 if the effective matrix is positive definite
+    smVegaPerformanceCounter performaceTracker;
+
+    std::shared_ptr<smVegaObjectConfig> femConfig;
+
+    // Time integrators
     std::shared_ptr<IntegratorBase> integratorBase; ///< integrator
     std::shared_ptr<ImplicitNewmarkSparse> implicitNewmarkSparse;
     std::shared_ptr<IntegratorBaseSparse> integratorBaseSparse;
+
+    // Force models
     std::shared_ptr<ForceModel> forceModel; ///< Type of formulation driving the FEM simulation
     std::shared_ptr<StVKInternalForces> stVKInternalForces;
     std::shared_ptr<StVKStiffnessMatrix> stVKStiffnessMatrix;
     std::shared_ptr<StVKForceModel> stVKForceModel;
-    std::shared_ptr<MassSpringSystemForceModel> massSpringSystemForceModel;
     std::shared_ptr<CorotationalLinearFEMForceModel> corotationalLinearFEMForceModel;
+
+    // Volume meshes and related graphs
     std::shared_ptr<VolumetricMesh> volumetricMesh; ///< volume mesh
     std::shared_ptr<TetMesh> tetMesh; ///< volume mesh
     std::shared_ptr<Graph> meshGraph; ///< graph of the mesh
-    std::shared_ptr<MassSpringSystem> massSpringSystem;
-    std::shared_ptr<RenderSprings> renderMassSprings;
+
+    // Sparse matrices
     std::shared_ptr<SparseMatrix> massMatrix; ///< sparse mass matrix need for FEM simulation
     std::shared_ptr<SparseMatrix> LaplacianDampingMatrix; ///< sparse damping matrix need for FEM simulation
-    int n;
 
-    // body states
-    double * u;                 ///< displacement
-    double * uvel;              ///< derivative of displacement in time
-    double * uaccel;            ///< double derivative of displacement in time
-    double * f_ext;             ///< external forces
-    double * f_extBase;         ///< non-varying external forces
-    double * uSecondary;        ///< interpolated displacement for secondary mesh
-    double * uInitial;          ///< initial displacement
-    double * velInitial;        ///< initial velocity
+    // Interpolation between primary and secondary surface mesh
+    int numInterpolationElementVerts;
+    int* interpolationVertices;
+    double* interpolationWeights;
 
-    std::vector<double> f_contact; ///< contact forces (if any)
+    std::shared_ptr<LinearSolver> linearSolver;
 
-    std::shared_ptr<smVegaConfigFemObject> femConfig;
-
-    /// interpolation to secondary rendering mesh. self explainatory names
-    int secondaryDeformableObjectRenderingMesh_interpolation_numElementVertices;
-    int * secondaryDeformableObjectRenderingMesh_interpolation_vertices;
-    double * secondaryDeformableObjectRenderingMesh_interpolation_weights;
-
-    std::shared_ptr<smVegaSceneObjectDeformable> deformableObjectRenderingMesh;
-    std::shared_ptr<smVegaSceneObjectDeformable> secondaryDeformableObjectRenderingMesh;
-
-    std::shared_ptr<smVolumeMesh> smtkVolumeMesh;
-    std::shared_ptr<smSurfaceMesh> smtkSurfaceMesh;
+    // Vega surface meshes
+    std::shared_ptr<smVegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
+    std::shared_ptr<smVegaSceneObjectDeformable> vegaSecondarySurfaceMesh;
 };
 
-#endif
+#endif //SMVEGAFEMSCENEOBJECT_H

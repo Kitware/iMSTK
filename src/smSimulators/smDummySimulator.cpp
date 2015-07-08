@@ -24,7 +24,7 @@
 // SimMedTK includes
 #include "smSimulators/smDummySimulator.h"
 #include "smCore/smStaticSceneObject.h"
-#include "smEvent/smEvent.h"
+#include "smCore/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 #include "smCollision/smMeshCollisionModel.h"
 

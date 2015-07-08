@@ -26,16 +26,35 @@
 
 // SimMedTK includes
 #include "smCore/smConfig.h"
-#include "smUtilities/smVector.h"
-#include "smUtilities/smMatrix.h"
+#include "smCore/smVector.h"
+#include "smCore/smMatrix.h"
 
+#include "smCore/smFactory.h"
 #include "smRendering/smGLRenderer.h"
-//#include "smRendering/smViewer.h"
+#include "smCore/smRenderDelegate.h"
 
 //forward declaration
 struct smSphere;
 
-class smAnalyticalGeometry
+class smVisualArtifact
+{
+public:
+  virtual void setRenderDelegate(smRenderDelegate::Ptr delegate)
+    {
+    this->renderDelegate = delegate;
+    if (delegate)
+      this->renderDelegate->setSourceGeometry(this);
+    }
+  virtual void draw() const
+    {
+    if (this->renderDelegate)
+      this->renderDelegate->draw();
+    }
+
+  smRenderDelegate::Ptr renderDelegate;
+};
+
+class smAnalyticalGeometry : public smVisualArtifact
 {
 public:
     smAnalyticalGeometry(){}
@@ -43,16 +62,18 @@ public:
 
     virtual void translate(const smVec3d &t) = 0;
     virtual void rotate(const smMatrix33d &rot) = 0;
-
-    virtual void draw()=0;
-
 };
 
 /// \brief  Simple Plane definition with unit normal and spatial location
 class smPlane : public smAnalyticalGeometry
 {
 public:
-    smPlane(){}
+    smPlane()
+      {
+      this->setRenderDelegate(
+        smFactory<smRenderDelegate>::createSubclass(
+          "smRenderDelegate", "smPlaneRenderDelegate"));
+      }
     ~smPlane(){}
 
     /// \brief create a plane with point and unit normal
@@ -68,6 +89,10 @@ public:
         this->drawPointsOrig[3] = smVec3d(0, -width, 0);
 
         this->movedOrRotated = true;
+
+        this->setRenderDelegate(
+          smFactory<smRenderDelegate>::createSubclass(
+            "smRenderDelegate", "smPlaneRenderDelegate"));
     }
 
     double distance(const smVec3d &p_vector)
@@ -158,37 +183,6 @@ public:
         this->movedOrRotated = false;
     }
 
-    void draw()
-    {
-        smGLRenderer::draw(*this);
-//         if (this->movedOrRotated)
-//         {
-//             updateDrawPoints();
-//         }
-//         glEnable(GL_LIGHTING);
-//
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, smColor::colorGray.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, smColor::colorWhite.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, smColor::colorGray.toGLColor());
-//
-//         glEnable(GL_BLEND);
-//         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//
-//         glPushMatrix();
-//             glBegin(GL_QUADS);
-//                 glVertex3f(this->drawPoints[0][0], this->drawPoints[0][1], this->drawPoints[0][2]);
-//                 glVertex3f(this->drawPoints[1][0], this->drawPoints[1][1], this->drawPoints[1][2]);
-//                 glVertex3f(this->drawPoints[2][0], this->drawPoints[2][1], this->drawPoints[2][2]);
-//                 glVertex3f(this->drawPoints[3][0], this->drawPoints[3][1], this->drawPoints[3][2]);
-//             glEnd();
-//         glPopMatrix();
-//
-//         glDisable(GL_BLEND);
-//
-//         glEnable(GL_LIGHTING);
-
-    }
-
 private:
     /// \brief unit normal of the plane
     smVec3d unitNormal;
@@ -251,11 +245,6 @@ public:
         //Its a sphere! nothing to be done.
     }
 
-    void draw()
-    {
-        // add sphere rendering here
-    }
-
     double getRadius() const
     {
         return this->radius;
@@ -312,7 +301,7 @@ struct smCube
 
 
 /// \brief Axis Aligned bounding box declarions
-class smAABB
+class smAABB : public smVisualArtifact
 {
 public:
     /// \brief minimum x,y,z point
@@ -366,40 +355,6 @@ public:
 
     /// \brief expands aabb with p_factor
     void expand(const double &p_factor);
-
-    void draw() const
-    {
-        glBegin(GL_LINES);
-        {
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
-
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
-
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMin[2]);
-            glVertex3d(aabbMin[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMin[1], aabbMax[2]);
-            glVertex3d(aabbMin[0], aabbMax[1], aabbMax[2]);
-            glVertex3d(aabbMax[0], aabbMax[1], aabbMax[2]);
-        }
-        glEnd();
-    }
 
     void reset()
     {

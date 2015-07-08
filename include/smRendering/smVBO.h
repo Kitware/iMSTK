@@ -33,9 +33,9 @@
 #include "smCore/smCoreClass.h"
 #include "smMesh/smMesh.h"
 #include "smRendering/smConfigRendering.h"
-#include "smUtilities/smGLUtils.h"
-#include "smUtilities/smUtils.h"
-#include "smUtilities/smVector.h"
+#include "smRendering/smGLUtils.h"
+#include "smCore/smUtils.h"
+#include "smCore/smVector.h"
 
 /// \brief VBO for rendering
 class smVBO: public smCoreClass

@@ -1,31 +1,53 @@
 
 simmedtk_add_library(smCore
   SOURCES
+    smCollisionConfig.cpp
+    smCollisionDetection.cpp
+    smCollisionPair.cpp
+    smColor.cpp
+    smContactHandling.cpp
     smCoreClass.cpp
     smDispatcher.cpp
+    smDisplayText.cpp
     smErrorLog.cpp
+    smEvent.cpp
+    smEventHandler.cpp
     smGeometry.cpp
+    smIOStream.cpp
+    smLight.cpp
+    smMath.cpp
     smModule.cpp
     smObjectSimulator.cpp
+    smRenderDetail.cpp
     smScene.cpp
     smSceneObject.cpp
     smScriptingEngine.cpp
     smSDK.cpp
     smSimulator.cpp
     smStaticSceneObject.cpp
-    smTextureManager.cpp
+    smTimer.cpp
     smDoubleBuffer.cpp
     smUnifiedId.cpp
+    smViewerBase.cpp
   PUBLIC_HEADERS
+    ${CMAKE_SOURCE_DIR}/include/smCollisionConfig.h
+    ${CMAKE_SOURCE_DIR}/include/smCollisionDetection.h
+    ${CMAKE_SOURCE_DIR}/include/smCollisionManager.h
+    ${CMAKE_SOURCE_DIR}/include/smCollisionPair.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smConfig.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smContactHandling.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smDispatcher.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smDisplayText.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smDoubleBuffer.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smErrorLog.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smEventData.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smEvent.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smEventHandler.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smFactory.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smGeometry.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smIOStream.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smLight.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smMemoryBlock.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smModule.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smObjectSimulator.h
@@ -38,7 +60,7 @@ simmedtk_add_library(smCore
     ${CMAKE_SOURCE_DIR}/include/smCore/smSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smStaticSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSynchronization.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smTextureManager.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smViewerBase.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smWorkerThread.h
 )
 
@@ -53,4 +75,8 @@ target_link_libraries(smCore
 
 if(NOT MSVC)
   target_compile_features(smCore PUBLIC cxx_auto_type)
+endif()
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
 endif()

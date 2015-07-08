@@ -39,19 +39,19 @@ public:
     smVegaFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
 
     /// \brief start the job
-    virtual void beginSim();
+    virtual void beginSim() override;
 
     /// \brief !!
-    virtual void initCustom();
+    virtual void initCustom() override;
 
     /// \brief implement the deformation computation through fem here
-    virtual void run();
+    virtual void run() override;
 
     /// \breif end the job
-    void endSim();
+    void endSim() override;
 
     /// \brief synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers();
+    void syncBuffers() override;
 
     /// \brief handle the keyboard and haptic button press events
     void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
