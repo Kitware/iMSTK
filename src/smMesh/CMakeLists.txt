@@ -17,7 +17,7 @@ simmedtk_add_library(smMesh
     ${CMAKE_SOURCE_DIR}/include/smMesh/smVolumeMesh.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smLattice.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smLatticeTypes.h
-	${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObject.h
+    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectDeformable.h
     ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectWithRestPosition.h
 )
@@ -31,3 +31,7 @@ target_link_libraries(smMesh
     VegaFEM::minivector
     VegaFEM::volumetricMesh
     )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

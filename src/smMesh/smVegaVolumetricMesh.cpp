@@ -34,10 +34,12 @@ void smVegaVolumetricMesh::loadMesh(const std::string &fileName, const int &verb
         case VolumetricMesh::TET:
         {
             mesh = std::make_shared<TetMesh>(name, verbose);
+            break;
         }
         case VolumetricMesh::CUBIC:
         {
             mesh = std::make_shared<CubicMesh>(name, verbose);
+            break;
         }
         default:
         {
@@ -71,6 +73,7 @@ void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surf
     int surfaceMeshSize = meshVertices.size();
 
     // Allocate arrays
+    this->attachedMeshes.push_back(surfaceMesh);
     std::vector<int> &vertices = this->attachedVertices[surfaceMesh];
     std::vector<double> &weigths = this->attachedWeights[surfaceMesh];
 
@@ -83,6 +86,12 @@ void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surf
     {
         Vec3d vegaPosition(meshVertices[i][0], meshVertices[i][1], meshVertices[i][2]);
         int element = this->mesh->getContainingElement(vegaPosition);
+
+        if(element < 0)
+        {
+            std::cerr <<"Containing element not found for: " << meshVertices[i] <<std::endl;
+            continue;
+        }
 
         this->mesh->computeBarycentricWeights(element, vegaPosition, baryCentricWeights.data());
 
@@ -98,7 +107,7 @@ void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surf
                     minDistance = l;
                 }
             }
-            if(minDistance> radius)
+            if(minDistance > radius)
             {
                 for(int k = 0; k < numElementVertices; ++k)
                 {
@@ -121,5 +130,9 @@ const std::vector<double> &smVegaVolumetricMesh::getAttachedWeights(const size_t
 const std::vector<int> &smVegaVolumetricMesh::getAttachedVertices(const size_t &i) const
 {
     this->attachedVertices.at(attachedMeshes[i]);
+}
+std::shared_ptr< VolumetricMesh > smVegaVolumetricMesh::getVegaMesh()
+{
+    return this->mesh;
 }
 

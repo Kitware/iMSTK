@@ -1,5 +1,3 @@
-
-
 enable_testing()
 include(CTest)
 set(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
@@ -13,7 +11,7 @@ set(CMAKE_TESTDRIVER_TESTMAIN "#include <bandit/bandit.h>
 
 using namespace bandit;
 
-int main(int argc, char* argv[]) 
+int main(int argc, char* argv[])
 {
   return bandit::run(argc, argv);
 }
