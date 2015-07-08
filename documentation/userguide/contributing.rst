@@ -25,7 +25,17 @@ With that in mind:
 * src — this directory contains all of the source code for SimMedTK libraries and unit tests
 
   * smCore — a library for classes used throughout SimMedTK
+  * smMesh — scene objects that participate in the physics simulation
+  * smTools — models of surgical instruments
+  * smCollision — implementations of collision *detection* algorithms
+  * smContactHandling — implementations of collision *response* algorithms
+  * smSimulators — algorithms that perform timestepping
+  * smGeometry — scene objects such as planes and polygonal models that do not participate in the physics simulation
   * smRendering — source for :ref:`sm-rendering-sys` rendering code
+  * smRenderDelegates — library containing classes that render meshes and other scene objects
+  * smEvent — user interface event handlers
+  * smExternal — third-party code that is not part of a library
+  * smExternalDevices — interfaces to haptics devices
 
 * examples — demonstration applications that use SimMedTK libraries
 * documentation — user's guide documentation and configuration for the in-source documentation
