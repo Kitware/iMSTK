@@ -63,7 +63,7 @@ Using SimMedTK from another project
 
 .. todo::
 
-  SimMedTK does not currently export an SimMedTKConfig.cmake file like it should.
+  SimMedTK does not currently export a SimMedTKConfig.cmake file like it should.
 
 Extending SimMedTK
 ==================
@@ -71,10 +71,9 @@ Extending SimMedTK
 See the tutorials for in-depth guides on how to extend SimMedTK
 in certain obvious directions,
 
-* Writing an attribute system template file to represent a solver's input format.
+* Preparing a scene for a simulation
+* Writing a new render delegate.
 * Writing an exporter to support a new solver's input format.
-* Adding a new solid-modeling operator
-* Bridging SimMedTK to a new solid-modeling kernel
 
 Documentation style
 ===================
