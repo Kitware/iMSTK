@@ -31,7 +31,7 @@
 #include "smCore/smModule.h"
 #include "smCore/smStaticSceneObject.h"
 #include "smCore/smDataStructures.h"
-#include "smCore/smDoubleBuffer.h"
+#include "smCore/smPipe.h"
 
 // Forward declaration
 class smSDK;
