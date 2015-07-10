@@ -46,6 +46,8 @@ smMesh::smMesh()
     vertNormals = 0;
     triTangents = 0;
     vertTangents = 0;
+    nbrTriangles = 0;
+    nbrTexCoordForTrainglesOBJ = 0;
     type = SIMMEDTK_SMMESH;
     isTextureCoordAvailable = false;
     tangentChannel = false;
@@ -826,13 +828,15 @@ void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
 
 bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
 {
+    if (!vegaSurfaceMesh)
+        return false;
 
     if(!vegaSurfaceMesh->isTriangularMesh())
     {
         if (this->log != nullptr)
         {
             this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
-            return 0;
+            return false;
         }
     }
 

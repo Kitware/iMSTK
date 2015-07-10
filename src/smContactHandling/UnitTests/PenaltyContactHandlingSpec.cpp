@@ -35,11 +35,11 @@ using namespace bandit;
 
 std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 {
-	auto staticPlane = std::make_shared<smStaticSceneObject>();
+  auto staticPlane = std::make_shared<smStaticSceneObject>();
 
     std::shared_ptr<smPlaneCollisionModel> plane = std::make_shared<smPlaneCollisionModel>( smVec3d(0.0, 0.0, 0.0), smVec3d(0.0, 0.0, 1.0) );
 
-	staticPlane->setModel(plane);
+  staticPlane->setModel(plane);
 
     return staticPlane;
 }
@@ -47,7 +47,7 @@ std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 
 std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 {
-	auto collisionPair = std::make_shared<smCollisionPair>();
+  auto collisionPair = std::make_shared<smCollisionPair>();
 
     float depth = 1.0;
     smVec3d contactPoint(0,0,1);
@@ -55,7 +55,7 @@ std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 
     collisionPair->addContact(depth,contactPoint,1,normal);
 
-	collisionPair->getContacts()[0]->index = 0;
+  collisionPair->getContacts()[0]->index = 0;
 
     return collisionPair;
 }
@@ -63,23 +63,23 @@ std::shared_ptr<smCollisionPair> createSampleCollisionPair()
 go_bandit([](){
     describe("Penalty contact handling:", []() {
 
-        auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
-		auto fem            = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
-        auto plane          = createStaticPlaneSceneObject();
-        auto collisionPair  = createSampleCollisionPair();
+    auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
+    auto fem            = std::make_shared<smVegaFemSceneObject>(nullptr, "__none");
+    auto plane          = createStaticPlaneSceneObject();
+    auto collisionPair  = createSampleCollisionPair();
 
-		it("initializes properly ", [&]() {
-			AssertThat(handler != nullptr, IsTrue());
+    it("initializes properly ", [&]() {
+      AssertThat(handler != nullptr, IsTrue());
             AssertThat(handler->getContactHandlingType() == smContactHandlingType::PENALTY_FEM_TO_STATIC, IsTrue());
         });
 
-		it("attches a collision pair ", [&]() {
+    it("attches a collision pair ", [&]() {
             handler->setCollisionPairs(collisionPair);
             AssertThat(handler->getCollisionPairs() == collisionPair, IsTrue());
          });
 
-		it("attaches a scene object ", [&]() {
-			handler->setSceneObjects(fem, plane);
+    it("attaches a scene object ", [&]() {
+      handler->setSceneObjects(fem, plane);
 
             AssertThat(handler->getFirstSceneObject() == fem, IsTrue());
             AssertThat(handler->getSecondSceneObject() == plane, IsTrue());
@@ -88,7 +88,7 @@ go_bandit([](){
 
          });
 
-		it("computes contact force ", [&]() {
+    it("computes contact force ", [&]() {
             handler->setCollisionPairs(collisionPair);
 
            /* fem->uvel.push_back(1);
@@ -99,16 +99,16 @@ go_bandit([](){
             fem->f_ext.push_back(0);
             fem->f_ext.push_back(0);
 
-			fem->f_contact.resize(3);
+      fem->f_contact.resize(3);
 
-			handler->setSceneObjects(fem, plane);
+      handler->setSceneObjects(fem, plane);
 
-			handler->resolveContacts();
+      handler->resolveContacts();
 
-			AssertThat(fem->f_contact[0]==98000, IsTrue());
-			AssertThat(fem->f_contact[1] == 0, IsTrue());
-			AssertThat(fem->f_contact[2] == 0, IsTrue());*/
-		});
+      AssertThat(fem->f_contact[0]==98000, IsTrue());
+      AssertThat(fem->f_contact[1] == 0, IsTrue());
+      AssertThat(fem->f_contact[2] == 0, IsTrue());*/
+    });
     });
 });
 
