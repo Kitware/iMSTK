@@ -21,8 +21,9 @@ Inside each of these directories are a number of subdirectories corresponding to
 libraries that encapsulate difference components of SimMedTK.
 With that in mind:
 
-* include — this directory contains all of the header files for SimMedTK libraries
-* src — this directory contains all of the source code for SimMedTK libraries and unit tests
+* include — This directory contains all of the header files for SimMedTK libraries
+* src — This directory contains all of the source code for SimMedTK libraries and unit tests.
+  The directories correspond to library names.
 
   * smCore — a library for classes used throughout SimMedTK
   * smMesh — scene objects that participate in the physics simulation
@@ -40,7 +41,6 @@ With that in mind:
 * examples — demonstration applications that use SimMedTK libraries
 * documentation — user's guide documentation and configuration for the in-source documentation
 * CMake — scripts to aid in configuring, installing, and packaging SimMedTK
-
 
 Inside some :file:`src/`, subdirectories, there are :file:`UnitTests/` directories that
 contain Bandit_-based unit tests.
