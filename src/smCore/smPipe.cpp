@@ -56,7 +56,7 @@ smPipe::~smPipe()
 
     for ( smInt i = iterValue.begin(); i < iterValue.end(); i++ )
     {
-        delete [] iterValue[i]->data.dataLocation;
+        delete [] static_cast<smChar*>(iterValue[i]->data.dataLocation);
     }
 }
 smPipe::smPipe ( std::string p_name, int p_elementSize, int p_maxElements, smPipeType p_pipeType ) :
