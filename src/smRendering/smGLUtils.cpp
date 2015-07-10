@@ -24,6 +24,10 @@
 #include "smRendering/smGLUtils.h"
 #include "smRendering/smTextureManager.h"
 
+#ifndef _MSC_VER
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
 bool smGLUtils::queryGLError(smString& err)
