@@ -73,7 +73,8 @@ target_link_libraries(smCore
     VegaFEM::volumetricMesh
 )
 
-if(NOT MSVC)
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
+    OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   target_compile_features(smCore PUBLIC cxx_auto_type)
 endif()
 
