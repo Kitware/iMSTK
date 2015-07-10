@@ -43,7 +43,10 @@ void smPlaneModel::setNormal(const smVec3d& normal)
 }
 const smVec3d& smPlaneModel::getPosition() const
 {
-    return this->transform * this->plane->getPoint();
+  // NB: This static variable makes the function thread-unsafe.
+  static smVec3d result;
+  result = this->transform * this->plane->getPoint();
+  return result;
 }
 const smPlaneModel::RigidTransformType& smPlaneModel::getTransform() const
 {
