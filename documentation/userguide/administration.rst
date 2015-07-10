@@ -14,7 +14,8 @@ Previous sections covered the concepts and tools for using SimMedTK.
 This section is for system administrators who wish to make SimMedTK
 available to users
 
-* via command-line utilities for end users of SimMedTK, and/or
+* via a desktop application for end users of SimMedTK,
+* via command-line utilities for experts preparing simulation scenes, and/or
 * as a library for people developing SimMedTK-based applications.
 
 End-user tool installation
