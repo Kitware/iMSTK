@@ -1,8 +1,10 @@
 set(Module Mesh)
 
+configure_file(VegaVolumetricMeshSpec.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/VegaVolumetricMeshSpec.cpp @ONLY)
+
 add_executable(${Module}UnitTestRunner
   ${BANDIT_RUNNER}
-  VegaVolumetricMeshSpec.cpp
+  ${CMAKE_CURRENT_BINARY_DIR}/VegaVolumetricMeshSpec.cpp
 )
 
 target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast>)

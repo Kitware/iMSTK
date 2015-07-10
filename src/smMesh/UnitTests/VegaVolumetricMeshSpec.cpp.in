@@ -28,6 +28,8 @@
 #include "smMesh/smVegaVolumetricMesh.h"
 #include "smMesh/smSurfaceMesh.h"
 
+const std::string vegaMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.veg";
+
 using namespace bandit;
 
 go_bandit([](){
@@ -41,23 +43,25 @@ go_bandit([](){
             int verbose = 1;
             bool generateGraph = false;
             std::shared_ptr<smVegaVolumetricMesh> vegaMesh = std::make_shared<smVegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh("/home/rortiz/Projects/SimMedTK/build-clang/SimMedTK-build/src/smMesh/UnitTests/SampleMesh.veg",verbose);
+            vegaMesh->loadMesh(vegaMeshFileName,verbose);
             AssertThat(vegaMesh->getVegaMesh() != nullptr, IsTrue());
         });
         it("generates graph", []() {
             int verbose = 1;
             bool generateGraph = true;
             std::shared_ptr<smVegaVolumetricMesh> vegaMesh = std::make_shared<smVegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh("/home/rortiz/Projects/SimMedTK/build-clang/SimMedTK-build/src/smMesh/UnitTests/SampleMesh.veg",verbose);
+            vegaMesh->loadMesh(vegaMeshFileName,verbose);
             AssertThat(vegaMesh->getMeshGraph() != nullptr, IsTrue());
         });
         it("attaches surface mesh", []() {
             int verbose = 1;
             bool generateGraph = false;
             std::shared_ptr<smVegaVolumetricMesh> vegaMesh = std::make_shared<smVegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh("/home/rortiz/Projects/SimMedTK/build-clang/SimMedTK-build/src/smMesh/UnitTests/SampleMesh.veg",verbose);
+            vegaMesh->loadMesh(vegaMeshFileName,verbose);
 
             std::shared_ptr<smSurfaceMesh> surfaceMesh = std::make_shared<smSurfaceMesh>();
+
+            // These vertices coincide with vertices on the volume mesh. So the weights take a special form.
             surfaceMesh->vertices.emplace_back(-2.44627, -0.903874999999999, -1.711465);
             surfaceMesh->vertices.emplace_back(-2.008655, -0.762779999999999, -1.63081);
             surfaceMesh->vertices.emplace_back(-2.248035, -0.599385, -1.41836);
