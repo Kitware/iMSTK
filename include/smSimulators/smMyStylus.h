@@ -38,7 +38,7 @@ class MyStylus: public smStylusRigidSceneObject
 
 public:
     size_t phantomID; ///< ID for phantom omni
-    smBool buttonState[2]; ///< state of the buttons
+    smBool buttonState[4]; ///< state of the buttons
     smFloat angle; ///< angle of the jaw (if applicable)
     smFloat maxangle; ///< maximum angle of the jaw (if applicable)
     smMeshContainer meshContainer, meshContainerLower, meshContainerUpper; ///< !!
@@ -61,7 +61,7 @@ class HookCautery: public smStylusRigidSceneObject
 
 public:
     size_t phantomID; ///< ID of the phantom omni
-    smBool buttonState[2]; ///< state of the buttons
+    smBool buttonState[4]; ///< state of the buttons
     smMeshContainer meshContainer; ///< !!
 
     /// \brief handle keyboard and omni button presses
