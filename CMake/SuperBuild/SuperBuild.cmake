@@ -205,12 +205,7 @@ ExternalProject_Add(${proj}
     ${SimMedTK_DEPENDENCIES}
   )
 
-if(CMAKE_GENERATOR MATCHES ".*Makefiles.*")
-  set(simmedtk_build_cmd "$(MAKE)")
-else()
-  set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
-endif()
-
+set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
 #-----------------------------------------------------------------------------
 # SimMedTK
 #
@@ -221,8 +216,16 @@ else()
   set(SimMedTKBUILD_TARGET_ALL_OPTION "")
 endif()
 
+# If SimMedTK_SUPERBUILD_SUBPROJECT_DASHBOARD is set (by a buildbot slave's
+# initial cache, for example), then don't just build the "all" target
+if(SimMedTK_SUPERBUILD_SUBPROJECT_DASHBOARD)
+  set(simmedtk_target --target Experimental)
+else()
+  set(simmedtk_target)
+endif()
+
 add_custom_target(SimMedTK-build ${SimMedTKBUILD_TARGET_ALL_OPTION}
-  COMMAND ${simmedtk_build_cmd}
+  COMMAND ${simmedtk_build_cmd} ${simmedtk_target}
   WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
   )
 add_dependencies(SimMedTK-build SimMedTK-Configure)
@@ -234,3 +237,15 @@ add_custom_target(SimMedTK
   COMMAND ${simmedtk_build_cmd}
   WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
   )
+
+#-----------------------------------------------------------------------------
+# Enable testing in the superbuild and add a dummy test to see if that
+# gets the buildbot reporting success.
+enable_testing()
+
+# A dummy test.
+# TODO: This *should* test whether we built a valid package.
+add_test(
+  NAME SuperBuildTest
+  COMMAND ${CMAKE_COMMAND} -E echo "Success"
+)
