@@ -21,7 +21,6 @@ simmedtk_add_library(smCore
     smRenderDetail.cpp
     smScene.cpp
     smSceneObject.cpp
-    smScriptingEngine.cpp
     smSDK.cpp
     smSimulator.cpp
     smStaticSceneObject.cpp
@@ -55,7 +54,6 @@ simmedtk_add_library(smCore
     ${CMAKE_SOURCE_DIR}/include/smCore/smScene.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smScheduler.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smScriptingEngine.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSDK.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smStaticSceneObject.h
