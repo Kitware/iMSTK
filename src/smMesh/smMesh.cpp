@@ -46,6 +46,8 @@ smMesh::smMesh()
     vertNormals = 0;
     triTangents = 0;
     vertTangents = 0;
+    nbrTriangles = 0;
+    nbrTexCoordForTrainglesOBJ = 0;
     type = SIMMEDTK_SMMESH;
     isTextureCoordAvailable = false;
     tangentChannel = false;
