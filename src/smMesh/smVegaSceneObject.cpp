@@ -10,20 +10,27 @@ smVegaSceneObject::smVegaSceneObject(char * filename):
   mesh(NULL)
 {
   int verbose = 0;
-  mesh = std::make_shared<ObjMesh>(filename, verbose);
+  if (filename && filename[0])
+    {
+    mesh = std::make_shared<ObjMesh>(filename, verbose);
 
-  int encStart = strlen(filename) - 4;
-  if ((encStart > 0) && (strcmp(&filename[encStart], ".enc") == 0))
-  {
-    // must decode
-    printf("Decoding mesh.\n");
-    objMeshDecode(mesh.get());
-    printf("Decoded mesh.\n");
-  }
+    int encStart = strlen(filename) - 4;
+    if ((encStart > 0) && (strcmp(&filename[encStart], ".enc") == 0))
+      {
+      // must decode
+      printf("Decoding mesh.\n");
+      objMeshDecode(mesh.get());
+      printf("Decoded mesh.\n");
+      }
 
-  BuildFaceNormals();
+    BuildFaceNormals();
 
-  n = mesh->getNumVertices();
+    n = mesh->getNumVertices();
+    }
+  else
+    {
+    n = 0;
+    }
 }
 
 smVegaSceneObject::~smVegaSceneObject()

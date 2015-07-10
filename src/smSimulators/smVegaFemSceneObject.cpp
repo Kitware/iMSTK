@@ -26,6 +26,8 @@
 #include "smCore/smFactory.h"
 #include "smCore/smRenderDelegate.h"
 
+#include <exception>
+
 smVegaFemSceneObject::smVegaFemSceneObject() :
     staticSolver(0),
     graphicFrame(0),
@@ -146,7 +148,9 @@ void smVegaFemSceneObject::initialize()
     this->primarySurfaceMesh->importSurfaceMeshFromVegaFormat(
         this->vegaPrimarySurfaceMesh->GetMesh(), true);
 
-    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
+    if (
+      femConfig->secondaryRenderingMeshFilename[0] &&
+      (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0))
     {
         this->secondarySurfaceMesh = std::make_shared<smSurfaceMesh>();
 
@@ -338,11 +342,14 @@ void smVegaFemSceneObject::loadVolumeMesh()
         }
     }
 
-    int scaleRows = 1;
-    SparseMatrix *sm;
-    meshGraph->GetLaplacian(&sm, scaleRows);
-    LaplacianDampingMatrix.reset(sm);
-    LaplacianDampingMatrix->ScalarMultiply(femConfig->dampingLaplacianCoef);
+    if (meshGraph)
+    {
+        int scaleRows = 1;
+        SparseMatrix *sm;
+        meshGraph->GetLaplacian(&sm, scaleRows);
+        LaplacianDampingMatrix.reset(sm);
+        LaplacianDampingMatrix->ScalarMultiply(femConfig->dampingLaplacianCoef);
+    }
 }
 
 void smVegaFemSceneObject::loadSurfaceMesh()
@@ -355,7 +362,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         std::string rendFilenameStr(femConfig->volumetricMeshFilename);
         rendFilenameStr += ".mass";
         std::ifstream renderingFileName(rendFilenameStr);
-       
+
         if (!renderingFileName.good())
         {
             std::cout << "VEGA: Generating primary rendering mesh.\n";
@@ -371,7 +378,9 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         }
     }
 
-    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);  
+    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
+    if (!vegaPrimarySurfaceMesh->GetMesh())
+      return; // Go no further if given an invalid filename
 
     vegaPrimarySurfaceMesh->ResetDeformationToRest();
     vegaPrimarySurfaceMesh->BuildNeighboringStructure();
@@ -389,11 +398,11 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         if (vegaSecondarySurfaceMesh == nullptr)
         {
             std::cout << "VEGA: Secondary rendering mesh is not initialized!\n";
-            exit(1);
+            throw std::runtime_error("No secondary rendering mesh provided.");
         }
         else
         {
-            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t" 
+            std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t"
                 << vegaSecondarySurfaceMesh->GetNumVertices() << " vertices\n\t\t"
                 << vegaSecondarySurfaceMesh->GetNumFaces() << " faces\n";
         }
@@ -491,8 +500,10 @@ void smVegaFemSceneObject::loadFixedBC()
 {
     // read the fixed vertices
     // 1-indexed notation
-    if (strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
-    {    
+    if (
+      femConfig->fixedVerticesFilename[0] &&
+      strcmp(femConfig->fixedVerticesFilename, "__none") != 0)
+    {
         // set the offset to 1 because nodes are numbered from 1 in .bou file
         if (readBcFromFile(femConfig->fixedVerticesFilename, 1) != 0)
         {
