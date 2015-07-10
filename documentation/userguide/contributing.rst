@@ -159,7 +159,6 @@ If you are unfamiliar with the documentation packages here, see these links for 
 .. _Homebrew: http://brew.sh/
 .. _Sphinx: http://sphinx-doc.org/
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
-.. _VTK: http://vtk.org/
 .. _documentation for roles in reStructuredText: http://sphinx-doc.org/markup/inline.html
 
 To-do list
