@@ -73,7 +73,7 @@ target_link_libraries(smCore
     VegaFEM::volumetricMesh
 )
 
-message("COMPILER ID is ${CMAKE_CXX_COMPILER_ID}")
+message(WARNING "WARNING! COMPILER ID is ${CMAKE_CXX_COMPILER_ID}")
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
     OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   target_compile_features(smCore PUBLIC cxx_auto_type)
