@@ -29,10 +29,10 @@
 
 #define SM_NIUSB6008_INTERFACE_H
 
-#include "smDeviceInterface.h"
+#include "smExternalDevices/smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
-#include "smCore/smDoubleBuffer.h"
+#include "smCore/smPipe.h"
 
 #include <NIDAQmx.h>
 

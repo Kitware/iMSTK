@@ -27,10 +27,10 @@
 
 #define SM_ADU_INTERFACE_H
 
-#include "smDeviceInterface.h"
+#include "smExternalDevices/smDeviceInterface.h"
 #include "smCore/smEvent.h"
 #include "smCore/smEventData.h"
-#include "smCore/smDoubleBuffer.h"
+#include "smCore/smPipe.h"
 
 /// \brief holds data for calibration of ADU device
 struct ADUDeviceCalibrationData

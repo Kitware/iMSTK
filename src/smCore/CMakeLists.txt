@@ -21,12 +21,11 @@ simmedtk_add_library(smCore
     smRenderDetail.cpp
     smScene.cpp
     smSceneObject.cpp
-    smScriptingEngine.cpp
     smSDK.cpp
     smSimulator.cpp
     smStaticSceneObject.cpp
     smTimer.cpp
-    smDoubleBuffer.cpp
+    smPipe.cpp
     smUnifiedId.cpp
     smViewerBase.cpp
   PUBLIC_HEADERS
@@ -39,7 +38,7 @@ simmedtk_add_library(smCore
     ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smDispatcher.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smDisplayText.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smDoubleBuffer.h
+    ${CMAKE_SOURCE_DIR}/include/smCore/smPipe.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smErrorLog.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smEventData.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smEvent.h
@@ -55,7 +54,6 @@ simmedtk_add_library(smCore
     ${CMAKE_SOURCE_DIR}/include/smCore/smScene.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSceneObject.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smScheduler.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smScriptingEngine.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSDK.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smSimulator.h
     ${CMAKE_SOURCE_DIR}/include/smCore/smStaticSceneObject.h

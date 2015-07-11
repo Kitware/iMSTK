@@ -121,12 +121,6 @@ smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner
             }
 
     this->totalCells = counter;
-    this->xStep = xStep;
-    this->yStep = yStep;
-    this->zStep = zStep;
-    this->xSeperation = xSeperation;
-    this->ySeperation = ySeperation;
-    this->zSeperation = zSeperation;
     this->latticeCenter[0] = ( p_leftCorner[0] + p_rightCorner[0] ) / 2.0;
     this->latticeCenter[1] = ( p_leftCorner[1] + p_rightCorner[1] ) / 2.0;
     this->latticeCenter[2] = ( p_leftCorner[2] + p_rightCorner[2] ) / 2.0;
@@ -175,7 +169,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
             {
                 index = xIndex + zIndex * xSeperation + yIndex * xSeperation * zSeperation;
 
-                if ( ((xIndex < 0 || yIndex) < 0) | ((zIndex < 0 || xIndex >= xSeperation || yIndex >= ySeperation || zIndex >= zSeperation)) )
+                if ( ((xIndex < 0 || yIndex < 0)) || ((zIndex < 0 || xIndex >= xSeperation || yIndex >= ySeperation || zIndex >= zSeperation)) )
                 {
                     continue;
                 }

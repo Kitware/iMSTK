@@ -28,6 +28,10 @@
 #include "smCore/smQuaternion.h"
 #include "smRendering/smVAO.h"
 
+#ifndef _MSC_VER
+#  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 smGLRenderer::smGLRenderer()
 {
 

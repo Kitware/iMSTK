@@ -32,7 +32,7 @@
 // SimMedTK includes
 #include "smCore/smConfig.h"
 #include "smCore/smCoreClass.h"
-#include "smCore/smDoubleBuffer.h"
+#include "smCore/smPipe.h"
 #include "smCore/smErrorLog.h"
 #include "smCore/smLight.h"
 #include "smCore/smSceneObject.h"
@@ -42,7 +42,6 @@
 #include "smEvent/smMouseMoveEvent.h"
 #include "smRendering/smCamera.h"
 
-class smPipe;
 class smScene;
 class smSDK;
 
