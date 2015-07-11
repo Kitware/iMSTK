@@ -1,5 +1,3 @@
-
-
 enable_testing()
 include(CTest)
 set(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
