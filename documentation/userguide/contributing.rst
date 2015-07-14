@@ -1,9 +1,12 @@
-********************
+************************
 Contributing to SimMedTK
-********************
+************************
 
 .. role:: cxx(code)
    :language: c++
+
+.. role:: shell(code)
+   :language: sh
 
 .. contents::
 
@@ -57,6 +60,66 @@ Code style
 * Class methods should be camel case starting with a lowercase character (except acronyms which should be all-uppercase).
 * Use shared pointers and a static :cxx:`create()` method for classes that own significant storage or must be passed by
   reference to their superclass.
+
+Submitting and reviewing changes to SimMedTK
+============================================
+
+Once you have made a change to SimMedTK that you would like to contribute,
+you should submit a merge request to the canonical SimMedTK gitlab repository.
+When you submit the merge request, please use the following checklist to
+make reviewing the change as painless as possible:
+
+* You must give
+  (a) **buildbot**,
+  (b) any potential (human) **reviewers**, and
+  (c) **owners** of dashboard buildslaves
+  read access to your SimMedTK repository.
+  This is mandatory because Gitlab_ enforces permissions even on branches you have
+  submitted for review.
+  If reviewers do not have permission, they will not approve your branch for merging.
+  If buildbot does not have permission, tests cannot be queued.
+  If dashboard machine owners do not have permission, then tests will be queued but will
+  fail because the build slaves will not be able to check out your revisions.
+  (Yes, dashboard machines currently use their human owner's SSH keys to fetch revisions.)
+
+* Every commit in the merge request **must build and run** properly so that :shell:`git bisect`
+  can be used to track down issues.
+
+* The merge request should have as few commits as possible to make reviewing as simple as possible.
+  Use :shell:`git rebase -i` to *squash* commits.
+  This does not mean that a meaningful sequence of commits must be squashed, but if your commits
+  are not a clear, logical sequence you should consider squashing them.
+
+* If you are assigned to review a merge request,
+
+    * submit the branch for testing by adding the comment "@buildbot test" if
+      tests have not already been queued (and you think the request should be considered).
+      Submitting a request for testing should not be interpreted as approval of the request.
+    * use a "-1" comment to veto the merge request (and explain why)
+    * use a "+1" comment to indicate you've looked at the source changes and approve
+    * use a "+2" comment to indicate you've fetched the source, built, and tested it yourself
+    * do **not** "accept" the merge request (i.e., merge the branch into the master SimMedTK repository)
+      unless you are certain that the submitter does not have the authority to perform the merge.
+      The submitter should perform the merge whenever possible;
+      whoever performs the merge is responsible for monitoring the dashboard for failing tests.
+      Just because a merge request builds and passes tests does not mean that the master
+      branch will also build and pass tests.
+      (Failures can be introduced by intervening commits in other merges or by additional
+      platform tests performed by dashboards that only test the master branch.)
+
+* If you have submitted a request, you may "accept" it (i.e., merge the branch in to the master
+  SimMedTK repository) when
+    * your request has a "+2" or two "+1" comments and no unresolved "-1" comments.
+      (Resolving a "-1" must include the submitting reviewer agreeing to remove the object
+      or another reviewer explicitly overriding the objection in a comment.)
+      Submitting a request for testing should not be interpreted as approval of the request.
+    * dashboards run on the request (queued by you or a reviewer) **all** build and pass tests.
+      Branches that introduce new test failures should never be merged.
+   Whoever performs the merge is responsible for monitoring the dashboard for failing tests.
+   Just because a merge request builds and passes tests does not mean that the master
+   branch will also build and pass tests.
+   (Failures can be introduced by intervening commits in other merges or by additional
+   platform tests performed by dashboards that only test the master branch.)
 
 Using SimMedTK from another project
 ===================================
@@ -155,6 +218,7 @@ If you are unfamiliar with the documentation packages here, see these links for 
 
 .. _doxygen: http://doxygen.org/
 .. _doxylinks: https://pypi.python.org/pypi/sphinxcontrib-doxylink
+.. _Gitlab: https://gitlab.com/
 .. _graphviz: http://graphviz.org/
 .. _Homebrew: http://brew.sh/
 .. _Sphinx: http://sphinx-doc.org/
