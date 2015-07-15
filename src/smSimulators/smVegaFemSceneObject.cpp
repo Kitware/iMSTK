@@ -75,8 +75,6 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
 
 smVegaFemSceneObject::~smVegaFemSceneObject()
 {
-    delete interpolationVertices;
-    delete interpolationWeights;
 }
 
 std::shared_ptr<smSceneObject> smVegaFemSceneObject::clone()
@@ -240,7 +238,7 @@ void smVegaFemSceneObject::loadVolumeMesh()
         (femConfig->deformableObject == smVegaObjectConfig::INVERTIBLEFEM))
     {
 
-        std::cout << "VEGA: Loading volumetric mesh from file " 
+        std::cout << "VEGA: Loading volumetric mesh from file "
                   << femConfig->volumetricMeshFilename << "..." << std::endl;
 
         volumetricMesh = std::shared_ptr<VolumetricMesh>(
@@ -299,7 +297,7 @@ void smVegaFemSceneObject::loadVolumeMesh()
         catch (int exceptionCode)
         {
             PRINT_ERROR_LOCATION
-            std::cout << "VEGA:  error! loading mass matrix" 
+            std::cout << "VEGA:  error! loading mass matrix"
                         << femConfig->massMatrixFilename << std::endl;
         }
 
@@ -310,7 +308,7 @@ void smVegaFemSceneObject::loadVolumeMesh()
         {
 
             unsigned int loadingFlag = 0; // 0 = use low-memory version, 1 = use high-memory version
-            std::shared_ptr<StVKElementABCD> precomputedIntegrals = 
+            std::shared_ptr<StVKElementABCD> precomputedIntegrals =
                 std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh.get(), loadingFlag));
 
             if (precomputedIntegrals == nullptr)
@@ -427,19 +425,21 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         if (numInterpolationElementVerts < 0)
         {
             PRINT_ERROR_LOCATION
-            std::cout << "VEGA: error! unable to open file " << 
+            std::cout << "VEGA: error! unable to open file " <<
                 femConfig->secondaryRenderingMeshInterpolationFilename << "." << std::endl;
         }
 
         std::cout << "VEGA: Num interpolation element vertices:" <<
             numInterpolationElementVerts << std::endl;
 
+        int *vertices = interpolationVertices.data();
+        double *weights = interpolationWeights.data();
         VolumetricMesh::loadInterpolationWeights(
             femConfig->secondaryRenderingMeshInterpolationFilename,
             vegaSecondarySurfaceMesh->Getn(),
             numInterpolationElementVerts,
-            &interpolationVertices,
-            &interpolationWeights
+            &vertices,
+            &weights
             );
     }
 }
@@ -751,7 +751,7 @@ void smVegaFemSceneObject::createForceModel()
     }
     case smVegaObjectConfig::LINFEM:
     {
-        auto linearFEMForceModel = 
+        auto linearFEMForceModel =
                     std::make_shared<LinearFEMForceModel>(stVKInternalForces.get());
         forceModel = linearFEMForceModel;
 
@@ -948,7 +948,7 @@ void smVegaFemSceneObject::advanceDynamics()
                 this->vegaSecondarySurfaceMesh->GetMesh());
 
             secondarySurfaceMesh->updateTriangleNormals();
-            secondarySurfaceMesh->updateVertexNormals();                
+            secondarySurfaceMesh->updateVertexNormals();
         }
     }
     // update stasts
@@ -1112,8 +1112,8 @@ inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
             u.data(), uSecondary.data(),
             vegaSecondarySurfaceMesh->Getn(),
             numInterpolationElementVerts,
-            interpolationVertices,
-            interpolationWeights
+            interpolationVertices.data(),
+            interpolationWeights.data()
             );
         vegaSecondarySurfaceMesh->SetVertexDeformations(uSecondary.data());
     }
@@ -1132,7 +1132,7 @@ inline void smVegaFemSceneObject::updateSecondaryRenderingMesh()
     {
         performaceTracker.explosionCounter.StopCounter();
         // the message will appear on screen for 4 seconds
-        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0) 
+        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0)
         {
             explosionFlag = 0;
         }

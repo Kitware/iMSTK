@@ -135,12 +135,12 @@ public:
     /// \brief Inititialize the time integrator
     void initializeTimeIntegrator();
 
-    /// \brief Forces that are defined by the user 
+    /// \brief Forces that are defined by the user
     ///  before the start of the simulation
     ///  is added to the external force vector here
     inline void applyScriptedExternalForces();
 
-    /// \brief Updates the stats related to timing, fps etc. 
+    /// \brief Updates the stats related to timing, fps etc.
     /// Also updates window title with real-time information
     inline void updatePerformanceMetrics();
 
@@ -174,7 +174,7 @@ public:
 
     /// \brief returns the degree od freedom that are known or fixed
     int getNumFixedDof() const;
-    
+
     /// \brief serialize function explicity writes the object to the memory block
     ///each scene object should know how to write itself to a memory block
     virtual void serialize(void *p_memoryBlock) override {};
@@ -183,7 +183,7 @@ public:
     virtual void unSerialize(void *p_memoryBlock) override {};
 
     /// \brief this function may not be used
-    ///every Scene Object should know how to clone itself. 
+    ///every Scene Object should know how to clone itself.
     /// Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
     //virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
@@ -227,8 +227,8 @@ private:
 
     // Interpolation between primary and secondary surface mesh
     int numInterpolationElementVerts;
-    int* interpolationVertices;
-    double* interpolationWeights;
+    std::vector<int> interpolationVertices;
+    std::vector<double> interpolationWeights;
 
     std::shared_ptr<LinearSolver> linearSolver;
 

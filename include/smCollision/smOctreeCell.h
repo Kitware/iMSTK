@@ -93,16 +93,20 @@ public:
         return aabb;
     }
 
+    void setAabb(const smAABB &newAabb)
+    {
+        this->aabb = newAabb;
+    }
+
     void getIntersections(const smAABB &aabb, std::vector<size_t> &triangles)
     {
         for(auto &i : data)
         {
-            if(smAABB::checkOverlap(i.first,aabb))
+            if(i.first.overlaps(aabb))
             {
                 triangles.emplace_back(i.second);
             }
         }
-
     }
 
     inline void addTriangleData(const smAABB &aabb, size_t index)

@@ -34,13 +34,13 @@ std::shared_ptr<smMeshModel> getModel(const smStdVector3d &vertices)
     std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
     model->setModelMesh(mesh);
 
-    // Add two triangles to the data structure
+    // Add one triangle to the data structure
     mesh->initVertexArrays(3);
     mesh->initTriangleArrays(1);
 
-    mesh->vertices.push_back(vertices[0]);
-    mesh->vertices.push_back(vertices[1]);
-    mesh->vertices.push_back(vertices[2]);
+    mesh->vertices[0] = vertices[0];
+    mesh->vertices[1] = vertices[1];
+    mesh->vertices[2] = vertices[2];
 
     mesh->triangles[0].vert[0] = 0;
     mesh->triangles[0].vert[1] = 1;
@@ -54,12 +54,12 @@ std::shared_ptr<smMeshModel> getModel(const smStdVector3d &vertices)
 }
 
 go_bandit([](){
-    describe("BVH Collision Detection Algorithm", []() {
-        it("constructs ", []() {
+    describe("Mesh model", []() {
+        it("constructs", []() {
             auto model = make_unique<smMeshModel>();
             AssertThat(model != nullptr, IsTrue());
         });
-        it("can access mesh vertices ", []() {
+        it("can access mesh vertices", []() {
 
             smStdVector3d vertices;
             vertices.emplace_back(1.0,2.0,0);
@@ -72,12 +72,8 @@ go_bandit([](){
             AssertThat(model->getTrianglePositions(0)[1], Equals(vertices[1]));
             AssertThat(model->getTrianglePositions(0)[2], Equals(vertices[2]));
 
-            AssertThat(model->getTrianglePositions(1)[0], Equals(vertices[1]));
-            AssertThat(model->getTrianglePositions(1)[1], Equals(vertices[2]));
-            AssertThat(model->getTrianglePositions(1)[2], Equals(vertices[3]));
-
         });
-        it("can access mesh face normals ", []() {
+        it("can access mesh face normals", []() {
 
             smStdVector3d vertices;
             vertices.emplace_back(1.0,2.0,0);
@@ -87,11 +83,8 @@ go_bandit([](){
             auto model = getModel(vertices);
 
             smVec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
-            smVec3d normalB = (vertices[2]-vertices[1]).cross(vertices[3]-vertices[1]).normalized();
 
             AssertThat((model->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
-            AssertThat((model->getNormal(1)-normalB).squaredNorm(), EqualsWithDelta(0.0,.00001));
-
         });
 
     });

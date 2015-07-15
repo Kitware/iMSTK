@@ -522,44 +522,27 @@ void smMesh::rotate(const smMatrix33d &p_rot)
 /// \brief
 void smMesh::updateTriangleAABB()
 {
-    smAABB tempAABB;
-    tempAABB.aabbMin[0] = FLT_MAX;
-    tempAABB.aabbMin[1] = FLT_MAX;
-    tempAABB.aabbMin[2] = FLT_MAX;
-
-    tempAABB.aabbMax[0] = -FLT_MAX;
-    tempAABB.aabbMax[1] = -FLT_MAX;
-    tempAABB.aabbMax[2] = -FLT_MAX;
-
     for (smInt i = 0; i < nbrTriangles; i++)
     {
         // min
         triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
         triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(triAABBs[i].aabbMin[0] ,   vertices[triangles[i].vert[2]][0]);
-        tempAABB.aabbMin[0] = SIMMEDTK_MIN(tempAABB.aabbMin[0], triAABBs[i].aabbMin[0]);
 
         triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
         triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(triAABBs[i].aabbMin[1] ,   vertices[triangles[i].vert[2]][1]);
-        tempAABB.aabbMin[1] = SIMMEDTK_MIN(tempAABB.aabbMin[1], triAABBs[i].aabbMin[1]);
 
         triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][2], vertices[triangles[i].vert[1]][2]);
         triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(triAABBs[i].aabbMin[2] ,   vertices[triangles[i].vert[2]][2]);
-        tempAABB.aabbMin[2] = SIMMEDTK_MIN(tempAABB.aabbMin[2], triAABBs[i].aabbMin[2]);
 
         //max
         triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
         triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(triAABBs[i].aabbMax[0] ,   vertices[triangles[i].vert[2]][0]);
-        tempAABB.aabbMax[0] = SIMMEDTK_MAX(tempAABB.aabbMax[0], triAABBs[i].aabbMax[0]);
 
         triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
         triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(triAABBs[i].aabbMax[1] ,   vertices[triangles[i].vert[2]][1]);
-        tempAABB.aabbMax[1] = SIMMEDTK_MAX(tempAABB.aabbMax[1], triAABBs[i].aabbMax[1]);
 
         triAABBs[i].aabbMax[2] = SIMMEDTK_MAX(triAABBs[i].aabbMax[2],    vertices[triangles[i].vert[2]][2]);
-        tempAABB.aabbMax[2] = SIMMEDTK_MAX(tempAABB.aabbMax[2], triAABBs[i].aabbMax[2]);
     }
-
-    aabb = tempAABB;
 }
 
 /// \brief

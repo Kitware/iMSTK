@@ -61,6 +61,21 @@ bool smAABB::checkOverlap( const smAABB &p_aabbA, const smAABB &p_aabbB )
     return true;
 }
 
+bool smAABB::overlaps( const smAABB &other ) const
+{
+
+    if ( this->aabbMin[0] > other.aabbMax[0] ||
+        this->aabbMax[0] < other.aabbMin[0] ||
+        this->aabbMin[1] > other.aabbMax[1] ||
+        this->aabbMax[1] < other.aabbMin[1] ||
+        this->aabbMin[2] > other.aabbMax[2] ||
+        this->aabbMax[2] < other.aabbMin[2] )
+    {
+        return false;
+    }
+    return true;
+}
+
 const smAABB &smAABB::operator=( const smAABB &p_aabb )
 {
     this->aabbMax = p_aabb.aabbMax;

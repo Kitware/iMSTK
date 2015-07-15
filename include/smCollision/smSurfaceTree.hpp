@@ -53,6 +53,7 @@ void smSurfaceTree<CellType>::initStructure()
     root->setCenter(center);
     root->setLength(2 * edge);
     root->setIsEmpty(false);
+    root->setAabb(mesh->aabb);
 
     treeAllLevels[0] = *root.get();
     this->createTree(root, triangles, 0);
@@ -202,17 +203,16 @@ bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
     if (level == maxLevel-1)
     {
         Node->setIsLeaf(true);
-
-        int nbrTriangles = triangles.size();
         double totalDistance = 0.0;
 
-        for (int i = 0; i < nbrTriangles; ++i)
+        for(auto &triangle : triangles)
         {
-            Node->addTriangleData(mesh->triAABBs[triangles[i]],triangles[i]);
-            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[0]);
-            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[1]);
-            Node->addVertexIndex(mesh->triangles[triangles[i]].vert[2]);
+            Node->addTriangleData(mesh->triAABBs[triangle],triangle);
+            Node->addVertexIndex(mesh->triangles[triangle].vert[0]);
+            Node->addVertexIndex(mesh->triangles[triangle].vert[1]);
+            Node->addVertexIndex(mesh->triangles[triangle].vert[2]);
         }
+        Node->update();
 
         for(const auto &i : Node->getVerticesIndices())
         {
@@ -278,6 +278,17 @@ bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
             Node->setChildNode(j,childNode);
 
             treeAllLevels[childIndex] = *childNode.get();
+
+            // Set triangle and aabb data for the child node
+            if(childNode->getLevel() != maxLevel-1)
+            {
+                for(auto &triangle : triangleMatrix[j])
+                {
+                    childNode->addTriangleData(this->mesh->triAABBs[triangle],triangle);
+                }
+                childNode->update();
+            }
+
             createTree(childNode, triangleMatrix[j], levelStartIndex[level][0] + offset + j);
         }
 

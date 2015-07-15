@@ -19,7 +19,7 @@
 #
 # VegaFEM
 #
-set(VegaFEM_TAG "6bba4eadbd943c003fcf90fcec122a3b3feef30d")
+set(VegaFEM_TAG "simmedtk")
 set(VegaFEM_REPOSITORY git@gitlab.kitware.com:SimMedTK/VegaFEM-CMake.git)
 
 # Make sure this file is included only once

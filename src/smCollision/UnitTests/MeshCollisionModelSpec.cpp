@@ -60,10 +60,10 @@ go_bandit([](){
             vertices.emplace_back(2.0,1.0,-1.0);
             vertices.emplace_back(3.0,2.0,1.0);
 
-            mesh->vertices.push_back(vertices[0]);
-            mesh->vertices.push_back(vertices[1]);
-            mesh->vertices.push_back(vertices[2]);
-            mesh->vertices.push_back(vertices[3]);
+            mesh->vertices[0] = vertices[0];
+            mesh->vertices[1] = vertices[1];
+            mesh->vertices[2] = vertices[2];
+            mesh->vertices[3] = vertices[3];
 
             mesh->triangles[0].vert[0] = 0;
             mesh->triangles[0].vert[1] = 1;
@@ -107,10 +107,10 @@ go_bandit([](){
             vertices.emplace_back(2.0,1.0,-1.0);
             vertices.emplace_back(3.0,2.0,1.0);
 
-            mesh->vertices.push_back(vertices[0]);
-            mesh->vertices.push_back(vertices[1]);
-            mesh->vertices.push_back(vertices[2]);
-            mesh->vertices.push_back(vertices[3]);
+            mesh->vertices[0] = vertices[0];
+            mesh->vertices[1] = vertices[1];
+            mesh->vertices[2] = vertices[2];
+            mesh->vertices[3] = vertices[3];
 
             mesh->triangles[0].vert[0] = 0;
             mesh->triangles[0].vert[1] = 1;
