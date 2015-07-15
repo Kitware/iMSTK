@@ -125,11 +125,11 @@ void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surf
 }
 const std::vector<double> &smVegaVolumetricMesh::getAttachedWeights(const size_t &i) const
 {
-    this->attachedWeights.at(attachedMeshes[i]);
+    return this->attachedWeights.at(attachedMeshes[i]);
 }
 const std::vector<int> &smVegaVolumetricMesh::getAttachedVertices(const size_t &i) const
 {
-    this->attachedVertices.at(attachedMeshes[i]);
+    return this->attachedVertices.at(attachedMeshes[i]);
 }
 std::shared_ptr< VolumetricMesh > smVegaVolumetricMesh::getVegaMesh()
 {
