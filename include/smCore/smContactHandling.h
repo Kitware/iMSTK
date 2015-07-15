@@ -36,7 +36,7 @@ class smCollisionPair;
 
 enum class smContactHandlingType
 {
-    PENALTY_FEM_TO_STATIC,
+    PenaltyFemToStatic,
     UNKNOWN
 };
 
@@ -78,7 +78,7 @@ public:
     /// \brief Get the second scene object
     std::shared_ptr<smSceneObject> getSecondSceneObject() const;
 
-    /// \brief Implementation of how the contacts between colliding 
+    /// \brief Implementation of how the contacts between colliding
     /// objects is resolved
     virtual void resolveContacts() = 0;
 protected:

@@ -329,6 +329,9 @@ public:
     /// \brief check if two AABB overlaps
     static smBool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB);
 
+    /// \brief check if two AABB overlaps
+    smBool overlaps(const smAABB &other) const;
+
     /// \brief set  p_aabb to the current one
     const smAABB &operator=(const smAABB &p_aabb);
 

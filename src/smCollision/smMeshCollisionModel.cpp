@@ -36,13 +36,13 @@ void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 {
     this->setModelMesh(modelMesh);
     this->aabbTree.reset();
-    this->initAABBTree(6);
+    this->initAABBTree(1);
 }
 void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
     this->load(meshName,type);
 
-    this->initAABBTree(6);
+    this->initAABBTree(1);
 }
 std::shared_ptr< smMeshCollisionModel::AABBTreeType > smMeshCollisionModel::getAABBTree()
 {

@@ -35,15 +35,14 @@ std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3d &vertices)
 {
     std::shared_ptr<smMeshCollisionModel> model = std::make_shared<smMeshCollisionModel>();
     std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
-    model->setMesh(mesh);
 
     // Add two triangles to the data structure
     mesh->initVertexArrays(3);
     mesh->initTriangleArrays(1);
 
-    mesh->vertices.push_back(vertices[0]);
-    mesh->vertices.push_back(vertices[1]);
-    mesh->vertices.push_back(vertices[2]);
+    mesh->vertices[0] = vertices[0];
+    mesh->vertices[1] = vertices[1];
+    mesh->vertices[2] = vertices[2];
 
     mesh->triangles[0].vert[0] = 0;
     mesh->triangles[0].vert[1] = 1;
@@ -59,12 +58,7 @@ std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3d &vertices)
     mesh->upadateAABB();
     mesh->allocateAABBTris();
 
-    std::shared_ptr<smMeshCollisionModel::AABBTreeType>
-    modelAabbTree = std::make_shared<smMeshCollisionModel::AABBTreeType>(
-    std::static_pointer_cast<smSurfaceMesh>(mesh),1);
-    modelAabbTree->initStructure();
-
-    model->setAABBTree(modelAabbTree);
+    model->setMesh(mesh);
 
     return model;
 }

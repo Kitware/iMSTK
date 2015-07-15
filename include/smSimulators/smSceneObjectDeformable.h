@@ -43,7 +43,7 @@ public:
     /// \brief Destructor
     ~smSceneObjectDeformable();
 
-    /// \brief rest the object to inital configuration 
+    /// \brief rest the object to inital configuration
     /// and reset initial states
     virtual void resetToInitialState() = 0;
 
@@ -61,7 +61,7 @@ public:
     /// with the scene during runtime are added here
     virtual void applyUserInteractionForces() = 0;
 
-    /// \brief Use the computed displacemetnt 
+    /// \brief Use the computed displacemetnt
     /// update to interpolate to the secondary display mesh
     virtual void updateSecondaryRenderingMesh() = 0;
 
@@ -112,7 +112,7 @@ public:
 
     /// \brief enable drawing of secondary mesh (if initialized)
     void setRenderSecondaryMesh();
-    
+
     /// \brief enable drawing of primary mesh
     void setRenderPrimaryMesh();
 
@@ -121,6 +121,39 @@ public:
 
     /// \brief get the secondary surface mesh
     std::shared_ptr<smSurfaceMesh> getSecondarySurfaceMesh() const;
+
+    // Get generalized velocity vector
+    std::vector<double> &getVelocities()
+    {
+        return this->uvel;
+    }
+
+    const std::vector<double> &getVelocities() const
+    {
+        return this->uvel;
+    }
+
+    // Get generalized forces vector
+    std::vector<double> &getForces()
+    {
+        return this->f_ext;
+    }
+
+    const std::vector<double> &getForces() const
+    {
+        return this->f_ext;
+    }
+
+    // Get contact forces vector
+    std::vector<double> &getContactForces()
+    {
+        return this->f_contact;
+    }
+
+    const std::vector<double> &getContactForces() const
+    {
+        return this->f_contact;
+    }
 
 protected:
     friend class smSceneObjectDeformableRenderDelegate;
