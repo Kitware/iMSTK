@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smSDK.h"
-#include "smCore/smFactory.h"
+#include "smSDK.h"
+#include "smFactory.h"
 
 #include <chrono>
 #include <thread>

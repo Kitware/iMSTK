@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "smCore/smColor.h"
+#include "smColor.h"
 
 smColor smColor::colorWhite(1.0, 1.0, 1.0, 1.0);
 smColor smColor::colorBlue(0.0, 0.0, 1.0, 1.0);

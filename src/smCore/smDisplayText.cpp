@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smDisplayText.h"
+#include "smDisplayText.h"
 
 // STL includes
 #include <iostream>

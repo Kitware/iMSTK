@@ -13,18 +13,18 @@ simmedtk_add_library(smRendering
     smVBO.cpp
     smViewer.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smConfigRendering.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smCustomRenderer.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smFrameBuffer.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smGLRenderer.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smGLUtils.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smMetalShader.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smSceneTextureShader.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smShader.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smTextureManager.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smVAO.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smVBO.h
-    ${CMAKE_SOURCE_DIR}/include/smRendering/smViewer.h
+    smConfigRendering.h
+    smCustomRenderer.h
+    smFrameBuffer.h
+    smGLRenderer.h
+    smGLUtils.h
+    smMetalShader.h
+    smSceneTextureShader.h
+    smShader.h
+    smTextureManager.h
+    smVAO.h
+    smVBO.h
+    smViewer.h
 )
 
 target_link_libraries(smRendering
@@ -61,7 +61,7 @@ if (SimMedTK_USE_OCULUS)
     SOURCES
       smOculusViewer.cpp
     PUBLIC_HEADERS
-      ${CMAKE_SOURCE_DIR}/include/smRendering/smOculusViewer.h
+      smOculusViewer.h
   )
 
   target_link_libraries(smRenderingOculus

@@ -1,6 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
-#include "smMesh/smVegaSceneObjectWithRestPosition.h"
+#include "smVegaSceneObjectWithRestPosition.h"
 
 smVegaSceneObjectWithRestPosition::smVegaSceneObjectWithRestPosition(char * filename): smVegaSceneObject(filename)
 {

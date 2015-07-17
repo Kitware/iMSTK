@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smToolSimulator.h"
+#include "smToolSimulator.h"
 #include "smCore/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 

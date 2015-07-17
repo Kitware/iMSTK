@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smGLUtils.h"
-#include "smRendering/smTextureManager.h"
+#include "smGLUtils.h"
+#include "smTextureManager.h"
 
 #ifndef _MSC_VER
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"

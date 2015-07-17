@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "smMesh/smVegaSceneObjectDeformable.h"
+#include "smVegaSceneObjectDeformable.h"
 
 smVegaSceneObjectDeformable::smVegaSceneObjectDeformable(char * filenameOBJ):
     smVegaSceneObjectWithRestPosition(filenameOBJ)

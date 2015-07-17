@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smAudioEvent.h"
+#include "smAudioEvent.h"
 
 namespace smtk
 {

@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smVAO.h"
-#include "smRendering/smShader.h"
-#include "smRendering/smViewer.h"
+#include "smVAO.h"
+#include "smShader.h"
+#include "smViewer.h"
 
 std::unordered_map<smInt, std::shared_ptr<smVAO>> smVAO::VAOs;
 

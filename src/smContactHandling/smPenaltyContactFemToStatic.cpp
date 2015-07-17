@@ -21,7 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smContactHandling/smPenaltyContactFemToStatic.h"
+#include "smPenaltyContactFemToStatic.h"
+
 #include "smCore/smCollisionPair.h"
 
 smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(bool typeBilateral) : smPenaltyContactHandling(typeBilateral)

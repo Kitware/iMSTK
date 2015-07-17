@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smSimulators/smVegaObjectConfig.h"
+#include "smVegaObjectConfig.h"
 
 #include <cstring>
 

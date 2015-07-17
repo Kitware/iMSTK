@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smSpatialHashCollision.h"
+#include "smSpatialHashCollision.h"
 
 // STL includes
 #include <cmath>

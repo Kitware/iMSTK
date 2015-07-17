@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smMesh/smLattice.h"
+#include "smLattice.h"
 #include "smCore/smFactory.h"
 
 smLattice::smLattice()

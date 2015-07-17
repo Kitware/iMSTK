@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smDispatcher.h"
+#include "smDispatcher.h"
 
 
 void smDispatcher::handleViewer(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)

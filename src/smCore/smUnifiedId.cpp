@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smUnifiedId.h"
+#include "smUnifiedId.h"
 
 std::atomic_int smUnifiedId::IDcounter;
 smUnifiedId::smUnifiedId()

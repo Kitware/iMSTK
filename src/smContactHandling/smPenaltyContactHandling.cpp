@@ -21,7 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smContactHandling/smPenaltyContactHandling.h"
+#include "smPenaltyContactHandling.h"
+
 #include "smSimulators/smVegaFemSceneObject.h"
 #include "smCore/smCollisionPair.h"
 

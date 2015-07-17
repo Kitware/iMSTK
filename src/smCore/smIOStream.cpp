@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smCore/smIOStream.h"
+#include "smIOStream.h"
 
 smConsoleStream::smConsoleStream()
 {

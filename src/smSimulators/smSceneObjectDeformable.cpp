@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smSimulators/smSceneObjectDeformable.h"
+#include "smSceneObjectDeformable.h"
 #include "smCore/smFactory.h"
 
 smSceneObjectDeformable::smSceneObjectDeformable() :

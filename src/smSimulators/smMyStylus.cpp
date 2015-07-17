@@ -25,7 +25,7 @@
 #include "Eigen/Geometry"
 
 // SimMedTK includes
-#include "smSimulators/smMyStylus.h"
+#include "smMyStylus.h"
 #include "smMesh/smSurfaceMesh.h"
 #include "smCore/smSDK.h"
 #include "smCore/smMatrix.h"

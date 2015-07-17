@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smErrorLog.h"
+#include "smErrorLog.h"
 
 #include <cstring>
 #include <string>

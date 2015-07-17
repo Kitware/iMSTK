@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smStaticSceneObject.h"
-#include "smCore/smFactory.h"
+#include "smStaticSceneObject.h"
+#include "smFactory.h"
 
 smStaticSceneObject::smStaticSceneObject(std::shared_ptr<smErrorLog> p_log) : smSceneObject()
 {

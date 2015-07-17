@@ -21,12 +21,12 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smGLRenderer.h"
+#include "smGLRenderer.h"
 #include "smMesh/smMesh.h"
 #include "smCore/smDataStructures.h"
-#include "smRendering/smViewer.h"
+#include "smViewer.h"
 #include "smCore/smQuaternion.h"
-#include "smRendering/smVAO.h"
+#include "smVAO.h"
 
 #ifndef _MSC_VER
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"

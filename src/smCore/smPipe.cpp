@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smPipe.h"
+#include "smPipe.h"
 
 smPipeData::smPipeData()
 {

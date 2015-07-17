@@ -1,16 +1,15 @@
 simmedtk_add_library(smRenderDelegates
   SOURCES
     smAABBRenderDelegate.cpp
-    #smFemSceneRenderDelegate.cpp
     smLatticeRenderDelegate.cpp
     smMeshRenderDelegate.cpp
-    #smPBDSurfaceRenderDelegate.cpp
-    #smPhysXVolumeMeshRenderDelegate.cpp
     smPlaneRenderDelegate.cpp
     smSceneObjectDeformableRenderDelegate.cpp
     smStaticSceneObjectRenderDelegate.cpp
     smStylusRenderDelegate.cpp
     smSurfaceTreeRenderDelegate.cpp
+  PUBLIC_HEADERS
+    smConfig.h
 )
 
 target_link_libraries(smRenderDelegates

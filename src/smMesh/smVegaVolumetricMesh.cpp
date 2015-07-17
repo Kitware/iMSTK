@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smMesh/smVegaVolumetricMesh.h"
+#include "smVegaVolumetricMesh.h"
 
 smVegaVolumetricMesh::smVegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
 smVegaVolumetricMesh::~smVegaVolumetricMesh() {}

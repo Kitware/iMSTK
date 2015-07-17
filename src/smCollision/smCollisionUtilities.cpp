@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smCollisionUtilities.h"
+#include "smCollisionUtilities.h"
 
 int intersect3D_RayTriangleWithBarycentric( smVec3d P0, smVec3d P1, smVec3d V0, smVec3d V1, smVec3d V2, smVec3d *I, float &p_baryU, float &p_baryV, float &p_baryW, bool considerFrontFaceOnly )
 {

@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smMesh/smImportExport.h"
-#include "smMesh/smMesh.h"
+#include "smImportExport.h"
+#include "smMesh.h"
 #include "smCore/smSDK.h"
 
 /// \brief

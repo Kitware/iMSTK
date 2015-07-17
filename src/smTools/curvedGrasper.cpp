@@ -21,11 +21,12 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "curvedGrasper.h"
+
 // Eigen includes
 #include "Eigen/Geometry"
 
 // SimMedTK includes
-#include "smTools/curvedGrasper.h"
 #include "smCore/smSDK.h"
 #include "smEvent/smHapticEvent.h"
 #include "smEvent/smKeyboardEvent.h"

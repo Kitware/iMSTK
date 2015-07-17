@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smModule.h"
+#include "smModule.h"
 
 /// \brief Begin frame will be called before the cycle
 void  smModule::beginModule()

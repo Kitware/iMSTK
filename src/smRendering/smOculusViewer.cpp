@@ -23,8 +23,8 @@
 
 #include <iostream>
 
-#include "smRendering/smOculusViewer.h"
-#include "smRendering/smGLRenderer.h"
+#include "smOculusViewer.h"
+#include "smGLRenderer.h"
 #include "smCore/smQuaternion.h"
 
 #ifdef _WIN32 || WIN32

@@ -10,16 +10,16 @@ simmedtk_add_library(smSimulators
     smVegaFemSimulator.cpp
 	smSceneObjectDeformable.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smDummySimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smMyStylus.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDObjectSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smPBDSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smStylusObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smToolSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaObjectConfig.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smSimulators/smVegaFemSimulator.h
-	${CMAKE_SOURCE_DIR}/include/smSimulators/smSceneObjectDeformable.h
+    smDummySimulator.h
+    smMyStylus.h
+    smPBDObjectSimulator.h
+    smPBDSceneObject.h
+    smStylusObject.h
+    smToolSimulator.h
+    smVegaObjectConfig.h
+    smVegaFemSceneObject.h
+    smVegaFemSimulator.h
+    smSceneObjectDeformable.h
 )
 
 target_link_libraries(smSimulators

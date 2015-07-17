@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smCore/smMath.h"
+#include "smMath.h"
 
 smMath::smMath()
 {

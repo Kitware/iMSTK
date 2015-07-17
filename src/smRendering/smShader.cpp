@@ -27,8 +27,8 @@
 #include <chrono>
 
 // SimMedTK includes
-#include "smRendering/smShader.h"
-#include "smRendering/smTextureManager.h"
+#include "smShader.h"
+#include "smTextureManager.h"
 
 std::unordered_map<smInt, std::shared_ptr<smShader>> smShader::shaders;
 std::shared_ptr<smShader> smShader::currentShader = nullptr;

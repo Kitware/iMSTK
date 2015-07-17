@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smMesh/smVolumeMesh.h"
+#include "smVolumeMesh.h"
 
 
 /// \brief constructor

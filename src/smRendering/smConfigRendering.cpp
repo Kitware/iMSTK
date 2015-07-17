@@ -21,5 +21,5 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smConfigRendering.h"
+#include "smConfigRendering.h"
 

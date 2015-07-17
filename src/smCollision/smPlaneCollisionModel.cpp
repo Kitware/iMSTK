@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 
-#include "smCollision/smPlaneCollisionModel.h"
+#include "smPlaneCollisionModel.h"
 
 smPlaneCollisionModel::smPlaneCollisionModel(const smVec3d& p, const smVec3d& n)
     : smPlaneModel(p, n)

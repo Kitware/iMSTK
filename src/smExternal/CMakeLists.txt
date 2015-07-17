@@ -4,8 +4,8 @@ simmedtk_add_library(smExternal
     framebufferObject.cpp
     renderbuffer.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smExternal/framebufferObject.h
-    ${CMAKE_SOURCE_DIR}/include/smExternal/renderbuffer.h
+    framebufferObject.h
+    renderbuffer.h
 )
 
 target_compile_options(smExternal

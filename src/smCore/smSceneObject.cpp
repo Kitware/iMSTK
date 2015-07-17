@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smSceneObject.h"
-#include "smCore/smObjectSimulator.h"
-#include "smCore/smSDK.h"
+#include "smSceneObject.h"
+#include "smObjectSimulator.h"
+#include "smSDK.h"
 
 smSceneObject::smSceneObject()
 {

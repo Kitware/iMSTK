@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smCameraEvent.h"
+#include "smCameraEvent.h"
 
 namespace smtk {
 namespace Event {

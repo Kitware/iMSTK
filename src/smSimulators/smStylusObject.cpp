@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smStylusObject.h"
+#include "smStylusObject.h"
 #include "smCore/smCollisionModel.h"
 #include "smCollision/smSurfaceTree.h"
 #include "smCollision/smOctreeCell.h"

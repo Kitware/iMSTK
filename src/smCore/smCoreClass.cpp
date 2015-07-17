@@ -21,9 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smCoreClass.h"
-#include "smCore/smEventHandler.h"
-#include "smCore/smRenderDelegate.h"
+#include "smCoreClass.h"
+
+#include "smEventHandler.h"
+#include "smRenderDelegate.h"
 
 std::shared_ptr<smtk::Event::smEventHandler>
 smCoreClass::eventHandler = std::make_shared<smtk::Event::smEventHandler>();

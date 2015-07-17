@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smCollisionPair.h"
+#include "smCollisionPair.h"
 
 smCollisionPair::smCollisionPair() {}
 smCollisionPair::~smCollisionPair() {}
@@ -89,5 +89,5 @@ void smCollisionPair::printCollisionPairs()
         std::cout << "Contact no: " << i << std::endl;
         this->contacts[0]->printInfo();
     }
-    
+
 }

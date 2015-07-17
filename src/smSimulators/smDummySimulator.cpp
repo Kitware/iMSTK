@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smSimulators/smDummySimulator.h"
+#include "smDummySimulator.h"
 #include "smCore/smStaticSceneObject.h"
 #include "smCore/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
@@ -52,8 +52,8 @@ void smDummySimulator::initCustom()
                 {
                     break;
                 }
-                std::shared_ptr<smMesh> mesh = model->getMesh();                
-                
+                std::shared_ptr<smMesh> mesh = model->getMesh();
+
                 object->getLocalVertices().reserve( mesh->nbrVertices );
                 // WARNING:  Copy!!?
                 object->getLocalVertices() = mesh->vertices;

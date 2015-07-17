@@ -22,12 +22,12 @@
 //---------------------------------------------------------------------------
 
 #include "smCore/smIOStream.h"
-#include "smRendering/smGLRenderer.h"
-#include "smRendering/smViewer.h"
-#include "smRendering/smShader.h"
+#include "smGLRenderer.h"
+#include "smViewer.h"
+#include "smShader.h"
 #include "smCore/smDataStructures.h"
-#include "smRendering/smVBO.h"
-#include "smRendering/smVAO.h"
+#include "smVBO.h"
+#include "smVAO.h"
 #include "smExternal/tree.hh"
 
 #include "smCore/smEventHandler.h"

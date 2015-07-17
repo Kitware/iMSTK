@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smTextureManager.h"
-#include "smRendering/smGLUtils.h"
+#include "smTextureManager.h"
+#include "smGLUtils.h"
 
 #include <cassert>
 

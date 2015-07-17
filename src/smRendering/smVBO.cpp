@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smRendering/smVBO.h"
+#include "smVBO.h"
 
 smVBO::smVBO( smErrorLog *p_log )
 {

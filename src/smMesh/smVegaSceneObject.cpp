@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
-#include "smMesh/smVegaSceneObject.h"
+#include "smVegaSceneObject.h"
 #include "objMeshEncode.h"
 
 smVegaSceneObject::smVegaSceneObject(char * filename):

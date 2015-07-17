@@ -21,10 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "smCollisionMoller.h"
 
 // SimMedTK includes
 #include "smCore/smMatrix.h"
-#include "smCollision/smCollisionMoller.h"
 #include "smExternal/moller.h"
 #include "smExternal/moller2.h"
 

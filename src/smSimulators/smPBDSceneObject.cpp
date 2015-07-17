@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smPBDSceneObject.h"
+#include "smPBDSceneObject.h"
 
 void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p_radius)
 {

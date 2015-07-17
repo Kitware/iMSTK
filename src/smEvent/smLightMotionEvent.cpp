@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smLightMotionEvent.h"
+#include "smLightMotionEvent.h"
 
 namespace smtk {
 namespace Event {

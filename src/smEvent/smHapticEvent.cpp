@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smHapticEvent.h"
+#include "smHapticEvent.h"
 
 namespace smtk {
 namespace Event {

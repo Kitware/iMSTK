@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smMouseButtonEvent.h"
+#include "smMouseButtonEvent.h"
 
 namespace smtk {
 namespace Event {

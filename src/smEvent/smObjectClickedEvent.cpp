@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smObjectClickedEvent.h"
+#include "smObjectClickedEvent.h"
 
 namespace smtk {
 namespace Event {

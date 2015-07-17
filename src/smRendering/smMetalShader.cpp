@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smRendering/smMetalShader.h"
+#include "smMetalShader.h"
 #include "smCore/smEvent.h"
 #include "smEvent/smKeyboardEvent.h"
 #include "smCore/smSDK.h"

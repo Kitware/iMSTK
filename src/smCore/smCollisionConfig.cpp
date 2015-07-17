@@ -21,8 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-// SimMedTK includes
-#include "smCore/smCollisionConfig.h"
+#include "smCollisionConfig.h"
 
 bool smCellTriangle::operator==( unsigned int p_ID )
 {

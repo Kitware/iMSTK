@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smGeometry/smPlaneModel.h"
+#include "smPlaneModel.h"
 
 smPlaneModel::smPlaneModel(const smVec3d& p, const smVec3d& n)
 {

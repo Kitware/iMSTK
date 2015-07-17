@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smScene.h"
+#include "smScene.h"
 
 
 smScene::smScene(std::shared_ptr<smErrorLog> p_log) :

@@ -11,15 +11,15 @@ simmedtk_add_library(smMesh
     smVegaSceneObjectWithRestPosition.cpp
     smVegaVolumetricMesh.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smImportExport.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smMesh.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smSurfaceMesh.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smVolumeMesh.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smLattice.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smLatticeTypes.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectDeformable.h
-    ${CMAKE_SOURCE_DIR}/include/smMesh/smVegaSceneObjectWithRestPosition.h
+    smImportExport.h
+    smMesh.h
+    smSurfaceMesh.h
+    smVolumeMesh.h
+    smLattice.h
+    smLatticeTypes.h
+    smVegaSceneObject.h
+    smVegaSceneObjectDeformable.h
+    smVegaSceneObjectWithRestPosition.h
 )
 
 target_link_libraries(smMesh

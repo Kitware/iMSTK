@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smContactHandling.h"
+#include "smContactHandling.h"
 
 smContactHandling::smContactHandling(const bool typeBilateral)
 {

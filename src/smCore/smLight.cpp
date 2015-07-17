@@ -25,8 +25,8 @@
 #include <cmath>
 
 // SimMedTK includes
-#include "smCore/smLight.h"
-#include "smCore/smQuaternion.h"
+#include "smLight.h"
+#include "smQuaternion.h"
 
 smVec3d smLight::defaultDir(0, 0, -1.0);
 smVec3d smLight::defaultUpDir(0, 1, 0.0);

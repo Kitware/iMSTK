@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smSimulators/smPBDSceneObject.h"
-#include "smSimulators/smPBDObjectSimulator.h"
+#include "smPBDSceneObject.h"
+#include "smPBDObjectSimulator.h"
 #include "smRendering/smGLRenderer.h"
 
 void smPBDObjectSimulator::draw()

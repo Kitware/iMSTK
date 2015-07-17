@@ -28,13 +28,13 @@ simmedtk_add_library(smExternalDevices
     smDeviceInterface.cpp
     ${EXTERNAL_DEVICES_SOURCES}
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smADUInterface.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smDeviceInterface.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smHapticInterface.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/NIDAQmx.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smAudio.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smNIUSB6008Interface.h
-    ${CMAKE_SOURCE_DIR}/include/smExternalDevices/smPhantomInterface.h
+    smADUInterface.h
+    smDeviceInterface.h
+    smHapticInterface.h
+    NIDAQmx.h
+    smAudio.h
+    smNIUSB6008Interface.h
+    smPhantomInterface.h
 )
 
 target_link_libraries(smExternalDevices

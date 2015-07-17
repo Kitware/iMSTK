@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smSimulator.h"
+#include "smSimulator.h"
 
 /// \brief starts the tasks with the threads from thread pool
 void smSimulator::beginFrame()

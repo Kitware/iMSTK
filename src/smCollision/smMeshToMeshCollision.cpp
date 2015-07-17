@@ -21,9 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "smMeshToMeshCollision.h"
+
 // SimMedTK includes
 #include "smCore/smCollisionPair.h"
-#include "smCollision/smMeshToMeshCollision.h"
 #include "smCollision/smCollisionMoller.h"
 #include "smCollision/smMeshCollisionModel.h"
 

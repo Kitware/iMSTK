@@ -17,28 +17,6 @@
 #
 ###########################################################################
 
-macro (simmedtk_find_package package_name)
-  if (WIN32)
-    # TODO: Eventually we won't be needing this
-    if(NOT SimMedTK_WINDOWS_DEPENDENCIES_DIR)
-      set(SimMedTK_WINDOWS_DEPENDENCIES_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-    endif()
-    list(APPEND CMAKE_INCLUDE_PATH
-      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}"
-      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/include"
-      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/include"
-      )
-    list(APPEND CMAKE_LIBRARY_PATH
-      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/${package_name}/lib"
-      "${SimMedTK_WINDOWS_DEPENDENCIES_DIR}/dependencies/win32/release/lib${package_name}/lib"
-      )
-    list(REMOVE_DUPLICATES CMAKE_INCLUDE_PATH)
-    list(REMOVE_DUPLICATES CMAKE_LIBRARY_PATH)
-  endif (WIN32)
-
-  find_package(${package_name} ${ARGN})
-endmacro ()
-
 function(simmedtk_install_library target)
   set(options)
   set(oneValueArgs)
@@ -70,7 +48,6 @@ function(simmedtk_add_library target)
   )
   target_include_directories(${target}
     PUBLIC
-      $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
       $<INSTALL_INTERFACE:include/simmedtk>
       $<INSTALL_INTERFACE:include/simmedtk/${target}>

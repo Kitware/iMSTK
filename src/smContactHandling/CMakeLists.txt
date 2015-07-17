@@ -2,10 +2,10 @@
 simmedtk_add_library(smContactHandling
   SOURCES
     smPenaltyContactHandling.cpp
-	smPenaltyContactFemToStatic.cpp
+    smPenaltyContactFemToStatic.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smContactHandling/smPenaltyContactHandling.h
-	  ${CMAKE_SOURCE_DIR}/include/smContactHandling/smPenaltyContactFemToStatic.h
+    smPenaltyContactHandling.h
+    smPenaltyContactFemToStatic.h
 )
 
 target_link_libraries(smContactHandling

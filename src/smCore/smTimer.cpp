@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smCore/smTimer.h"
+#include "smTimer.h"
 
 smTimer::smTimer()
 {

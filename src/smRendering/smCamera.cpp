@@ -24,7 +24,7 @@
 #include "smCore/smMath.h"
 #include "smCore/smQuaternion.h"
 #include "smCore/smVector.h"
-#include "smRendering/smCamera.h"
+#include "smCamera.h"
 
 smCamera::smCamera()
     : ar(4.0 / 3.0),

@@ -21,11 +21,12 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "smOctreeCell.h"
+
 // STD includes
 #include <cassert>
 
 // SimMedTK includes
-#include "smCollision/smOctreeCell.h"
 #include "smCollision/smCollisionMoller.h"
 
 smOctreeCell::smOctreeCell() : BaseType()

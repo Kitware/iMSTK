@@ -21,8 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smCollisionDetection.h"
-
+#include "smCollisionDetection.h"
 
 void smCollisionDetection::computeCollision(std::shared_ptr< smCollisionPair > pairs)
 {

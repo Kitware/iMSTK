@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smSimulators/smVegaFemSceneObject.h"
+#include "smVegaFemSceneObject.h"
 #include "smCore/smFactory.h"
 #include "smCore/smRenderDelegate.h"
 

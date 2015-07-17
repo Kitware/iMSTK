@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smPlaneToMeshCollision.h"
+#include "smPlaneToMeshCollision.h"
 
 // SimMedTK includes
 #include "smCollision/smCollisionMoller.h"
@@ -54,7 +54,7 @@ void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair>
         d = planeNormal.dot(vert - planePos);
 
         if (d < std::numeric_limits<float>::epsilon())
-        {         
+        {
             pair->addContact(d, vert, i, planeNormal);// Create contact
         }
     }

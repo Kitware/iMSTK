@@ -24,8 +24,8 @@
 // STL includes
 #include <limits>
 
-#include "smCore/smGeometry.h"
-#include "smCore/smRenderDelegate.h"
+#include "smGeometry.h"
+#include "smRenderDelegate.h"
 
 smAABB::smAABB()
 {

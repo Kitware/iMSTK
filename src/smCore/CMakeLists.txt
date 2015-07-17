@@ -29,37 +29,37 @@ simmedtk_add_library(smCore
     smUnifiedId.cpp
     smViewerBase.cpp
   PUBLIC_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/smCollisionConfig.h
-    ${CMAKE_SOURCE_DIR}/include/smCollisionDetection.h
-    ${CMAKE_SOURCE_DIR}/include/smCollisionManager.h
-    ${CMAKE_SOURCE_DIR}/include/smCollisionPair.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smConfig.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smContactHandling.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smCoreClass.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smDispatcher.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smDisplayText.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smPipe.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smErrorLog.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smEventData.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smEvent.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smEventHandler.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smFactory.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smGeometry.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smIOStream.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smLight.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smMemoryBlock.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smModule.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smObjectSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smPipe.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smScene.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smScheduler.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smSDK.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smSimulator.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smStaticSceneObject.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smSynchronization.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smViewerBase.h
-    ${CMAKE_SOURCE_DIR}/include/smCore/smWorkerThread.h
+    smCollisionConfig.h
+    smCollisionDetection.h
+    smCollisionManager.h
+    smCollisionPair.h
+    smConfig.h
+    smContactHandling.h
+    smCoreClass.h
+    smDispatcher.h
+    smDisplayText.h
+    smPipe.h
+    smErrorLog.h
+    smEventData.h
+    smEvent.h
+    smEventHandler.h
+    smFactory.h
+    smGeometry.h
+    smIOStream.h
+    smLight.h
+    smMemoryBlock.h
+    smModule.h
+    smObjectSimulator.h
+    smPipe.h
+    smScene.h
+    smSceneObject.h
+    smScheduler.h
+    smSDK.h
+    smSimulator.h
+    smStaticSceneObject.h
+    smSynchronization.h
+    smViewerBase.h
+    smWorkerThread.h
 )
 
 target_link_libraries(smCore

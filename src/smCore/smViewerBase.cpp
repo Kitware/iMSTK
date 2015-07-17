@@ -21,11 +21,11 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
-#include "smCore/smSDK.h"
-#include "smCore/smIOStream.h"
-#include "smCore/smViewerBase.h"
-#include "smCore/smDataStructures.h"
+#include "smConfig.h"
+#include "smSDK.h"
+#include "smIOStream.h"
+#include "smViewerBase.h"
+#include "smDataStructures.h"
 #include "smExternal/tree.hh"
 
 smRenderOperation::smRenderOperation()

@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCollision/smMeshCollisionModel.h"
+#include "smMeshCollisionModel.h"
 
 smMeshCollisionModel::smMeshCollisionModel()
 {

@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smEvent/smKeyboardEvent.h"
+#include "smKeyboardEvent.h"
 
 namespace smtk {
 namespace Event {

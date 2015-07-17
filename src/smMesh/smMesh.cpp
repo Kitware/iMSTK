@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smMesh/smMesh.h"
+#include "smMesh.h"
 // #include "smCore/smSDK.h"
 #include "smRendering/smGLRenderer.h"
 #include "smRendering/smViewer.h"

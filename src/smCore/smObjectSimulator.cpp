@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smObjectSimulator.h"
+#include "smObjectSimulator.h"
 #include "smRendering/smViewer.h"
-#include "smCore/smSDK.h"
+#include "smSDK.h"
 
 smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
 {

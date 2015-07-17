@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "smRendering/smSceneTextureShader.h"
+#include "smSceneTextureShader.h"
 #include "smCore/smSDK.h"
 
 smSceneTextureShader::smSceneTextureShader(const smString &p_verteShaderFileName, const smString &p_fragmentFileName)

@@ -22,10 +22,10 @@
 //---------------------------------------------------------------------------
 
 #include <string.h>
-#include "smRendering/smFrameBuffer.h"
+#include "smFrameBuffer.h"
 #include "smCore/smConfig.h"
-#include "smRendering/smTextureManager.h"
-#include "smRendering/smGLRenderer.h"
+#include "smTextureManager.h"
+#include "smGLRenderer.h"
 
 smBool smFrameBuffer::checkStatus()
 {

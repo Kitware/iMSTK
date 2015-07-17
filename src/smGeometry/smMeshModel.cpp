@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smGeometry/smMeshModel.h"
+#include "smMeshModel.h"
 #include "smRendering/smTextureManager.h"
 
 smMeshModel::smMeshModel() {}
