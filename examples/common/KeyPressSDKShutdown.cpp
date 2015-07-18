@@ -23,8 +23,8 @@
 
 #include "KeyPressSDKShutdown.h"
 
-#include "smCore/smSDK.h"
-#include "smEvent/smKeyboardEvent.h"
+#include "Core/SDK.h"
+#include "Event/KeyboardEvent.h"
 
 namespace smtk {
 namespace Examples {
@@ -53,4 +53,4 @@ void KeyPressSDKShutdown::setKey(smtk::Event::smKey key)
 
 }//Common
 }//Examples
-}//smtk
+}//tk

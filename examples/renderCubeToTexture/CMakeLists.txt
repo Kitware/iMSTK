@@ -1,11 +1,11 @@
 
 add_executable(renderCubeToTexture main.cpp)
 target_link_libraries(renderCubeToTexture
-  smCore
-  smEvent
-  smRendering
-  smMesh
-  smCollision
+  Core
+  Event
+  Rendering
+  Mesh
+  Collision
   ExamplesCommon
-  smGeometry
+  Geometry
   )

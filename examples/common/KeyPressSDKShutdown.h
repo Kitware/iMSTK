@@ -24,8 +24,8 @@
 #ifndef SMTK_EXAMPLES_COMMON_KEYPRESSSDKSHUTDOWN_H
 #define SMTK_EXAMPLES_COMMON_KEYPRESSSDKSHUTDOWN_H
 
-#include "smCore/smCoreClass.h"
-#include "smEvent/smKey.h"
+#include "Core/CoreClass.h"
+#include "Event/Key.h"
 
 namespace smtk {
 namespace Examples {
@@ -56,6 +56,6 @@ private:
 
 }//Common
 }//Examples
-}//smtk
+}//tk
 
 #endif

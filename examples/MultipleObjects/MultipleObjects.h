@@ -25,10 +25,10 @@
 #define SMMULTIPLEOBJECTS_H
 
 #include <GL/glew.h>
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSDK.h"
-#include "smRendering/smViewer.h"
+#include "Core/Config.h"
+#include "Core/ErrorLog.h"
+#include "Core/CoreClass.h"
+#include "Core/SDK.h"
+#include "Rendering/Viewer.h"
 
 #endif

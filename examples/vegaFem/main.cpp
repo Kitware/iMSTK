@@ -22,34 +22,34 @@
 //---------------------------------------------------------------------------
 
 // Core SimMedTK includes
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSDK.h"
-#include "smRendering/smViewer.h"
-#include "smCore/smSceneObject.h"
+#include "Core/Config.h"
+#include "Core/ErrorLog.h"
+#include "Core/CoreClass.h"
+#include "Core/SDK.h"
+#include "Rendering/Viewer.h"
+#include "Core/SceneObject.h"
 
 // Include required types scene objects
-#include "smSimulators/smVegaFemSceneObject.h"
-#include "smCore/smStaticSceneObject.h"
+#include "Simulators/VegaFemSceneObject.h"
+#include "Core/StaticSceneObject.h"
 
 // Include required simulators
-#include "smSimulators/smVegaFemSimulator.h"
-#include "smSimulators/smDummySimulator.h"
+#include "Simulators/VegaFemSimulator.h"
+#include "Simulators/DummySimulator.h"
 
-#include "smCore/smCollisionPair.h"
-#include "smCollision/smPlaneCollisionModel.h"
-#include "smCollision/smMeshCollisionModel.h"
-#include "smCollision/smPlaneToMeshCollision.h"
+#include "Core/CollisionPair.h"
+#include "Collision/PlaneCollisionModel.h"
+#include "Collision/MeshCollisionModel.h"
+#include "Collision/PlaneToMeshCollision.h"
 
-#include "smContactHandling/smPenaltyContactFemToStatic.h"
+#include "ContactHandling/PenaltyContactFemToStatic.h"
 
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
 #include "../common/pzrMouseCameraController.h"
 //#include "../common/hapticController.h"
 
-#include "smRenderDelegates/smConfig.h"
+#include "RenderDelegates/Config.h"
 
 int main()
 {
@@ -134,7 +134,7 @@ int main()
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
     auto meshModel = std::make_shared<smMeshCollisionModel>();
-    
+
     meshModel->setMesh(femObject->getPrimarySurfaceMesh());
 
     auto planeMeshCollisionPairs = std::make_shared<smCollisionPair>();
@@ -157,7 +157,7 @@ int main()
     planeToMeshContact->setSceneObjects(staticObject, femObject);
 
     sdkSimulator->registerContactHandling(planeToMeshContact);
- 
+
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------

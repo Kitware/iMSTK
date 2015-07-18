@@ -22,11 +22,11 @@
 //---------------------------------------------------------------------------
 
 #include "CollisionDetectionExample.h"
-#include "smCore/smSDK.h"
-#include "smRendering/smTextureManager.h"
-#include "smMesh/smLattice.h"
-#include "smMesh/smLatticeTypes.h"
-#include "smCore/smEventData.h"
+#include "Core/SDK.h"
+#include "Rendering/TextureManager.h"
+#include "Mesh/Lattice.h"
+#include "Mesh/LatticeTypes.h"
+#include "Core/EventData.h"
 
 void CollisionDetectionExample::initHapticCamMotion()
 {

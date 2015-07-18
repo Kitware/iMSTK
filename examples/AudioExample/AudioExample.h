@@ -24,8 +24,8 @@
 #ifndef RENDER_CUBE_H
 #define RENDER_CUBE_H
 
-#include "smCore/smSDK.h"
-#include "smExternalDevices/smAudio.h"
+#include "Core/SDK.h"
+#include "Devices/Audio.h"
 
 class AudioKeyboardController : public smCoreClass
 {

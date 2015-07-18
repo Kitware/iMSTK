@@ -1,12 +1,12 @@
 
 add_executable(renderCube main.cpp)
 target_link_libraries(renderCube
-  smCore
-  smRendering
-  smRenderDelegates
-  smMesh
-  smEvent
-  smCollision
+  Core
+  Rendering
+  RenderDelegates
+  Mesh
+  Event
+  Collision
   ExamplesCommon
-  smGeometry
+  Geometry
   )

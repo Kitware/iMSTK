@@ -28,9 +28,9 @@
 
 #include <memory>
 
-#include "smCore/smSDK.h"
-#include "smRendering/smTextureManager.h"
-#include "smCore/smCollisionPair.h"
+#include "Core/SDK.h"
+#include "Rendering/TextureManager.h"
+#include "Core/CollisionPair.h"
 
 CollisionDetectionBVH::CollisionDetectionBVH()
 {

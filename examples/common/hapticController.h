@@ -24,9 +24,9 @@
 #ifndef SMTK_EXAMPLES_COMMON_HAPTICCONTROLLER_H_
 #define SMTK_EXAMPLES_COMMON_HAPTICCONTROLLER_H_
 
-#include "smCore/smCoreClass.h"
-#include "smEvent/smHapticEvent.h"
-#include "smSimulators/smVegaFemSceneObject.h"
+#include "Core/CoreClass.h"
+#include "Event/HapticEvent.h"
+#include "Simulators/VegaFemSceneObject.h"
 
 namespace smtk {
 namespace Examples {
@@ -57,6 +57,6 @@ private:
 
 }//Common
 }//Examples
-}//smtk
+}//tk
 
 #endif

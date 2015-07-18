@@ -23,8 +23,8 @@
 
 #include "hapticController.h"
 
-#include "smCore/smSDK.h"
-#include "smEvent/smKeyboardEvent.h"
+#include "Core/SDK.h"
+#include "Event/KeyboardEvent.h"
 
 using namespace smtk::Examples::Common;
 
@@ -33,7 +33,7 @@ void hapticController::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
     auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(event);
     if(hapticEvent != nullptr && hapticEvent->getButtonState(0))
     {
-        femSceneObject->setPulledVertex(hapticEvent->getPosition());       
+        femSceneObject->setPulledVertex(hapticEvent->getPosition());
     }
 }
 

@@ -1,11 +1,11 @@
 add_executable(renderCubeOculus main.cpp)
 target_link_libraries(renderCubeOculus
-  smCore
-  smRendering
-  smRenderingOculus
-  smMesh
-  smEvent
-  smGeometry
+  Core
+  Rendering
+  RenderingOculus
+  Mesh
+  Event
+  Geometry
   ExamplesCommon
   Oculus::Oculus
   )

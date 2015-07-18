@@ -23,7 +23,7 @@
 
 #include "wasdCameraController.h"
 
-#include "smEvent/smKeyboardEvent.h"
+#include "Event/KeyboardEvent.h"
 
 namespace smtk {
 namespace Examples {
@@ -112,4 +112,4 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
 
 }//Common
 }//Examples
-}//smtk
+}//tk

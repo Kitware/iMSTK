@@ -21,24 +21,24 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSceneObject.h"
-#include "smCore/smSDK.h"
-#include "smCore/smStaticSceneObject.h"
-#include "smSimulators/smDummySimulator.h"
-#include "smCore/smEventData.h"
+#include "Core/Config.h"
+#include "Core/ErrorLog.h"
+#include "Core/CoreClass.h"
+#include "Core/SceneObject.h"
+#include "Core/SDK.h"
+#include "Core/StaticSceneObject.h"
+#include "Simulators/DummySimulator.h"
+#include "Core/EventData.h"
 #include <GL/glew.h>
-#include "smRendering/smTextureManager.h"
-#include "smExternalDevices/smPhantomInterface.h"
-#include "smSimulators/smStylusObject.h"
-#include "smSimulators/smMyStylus.h"
-#include "smCollision/smSpatialHash.h"
-#include "smCore/smMotionTransformer.h"
-#include "smRendering/smShader.h"
-#include "smShader/metalShader.h"
-#include "smSimulators/smToolSimulator.h"
+#include "Rendering/TextureManager.h"
+#include "ExternalDevices/PhantomInterface.h"
+#include "Simulators/StylusObject.h"
+#include "Simulators/MyStylus.h"
+#include "Collision/SpatialHash.h"
+#include "Core/MotionTransformer.h"
+#include "Rendering/Shader.h"
+#include "Shader/metalShader.h"
+#include "Simulators/ToolSimulator.h"
 
 #include <iostream>
 #include <stack>

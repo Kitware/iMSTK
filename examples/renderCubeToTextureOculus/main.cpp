@@ -26,10 +26,10 @@
 
 #include <memory>
 
-#include "smCore/smSDK.h"
-#include "smRendering/smTextureManager.h"
-#include "smRendering/smOculusViewer.h"
-#include "smCollision/smMeshCollisionModel.h"
+#include "Core/SDK.h"
+#include "Rendering/TextureManager.h"
+#include "Rendering/OculusViewer.h"
+#include "Collision/MeshCollisionModel.h"
 
 int main()
 {

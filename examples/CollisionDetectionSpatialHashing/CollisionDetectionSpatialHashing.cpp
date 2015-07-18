@@ -26,10 +26,10 @@
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
 
-#include "smCore/smSDK.h"
-#include "smRendering/smTextureManager.h"
-#include "smCore/smCollisionPair.h"
-#include "smCollision/smMeshCollisionModel.h"
+#include "Core/SDK.h"
+#include "Rendering/TextureManager.h"
+#include "Core/CollisionPair.h"
+#include "Collision/MeshCollisionModel.h"
 
 CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 {
@@ -84,7 +84,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     collisionModelB->getMesh()->assignTexture("livertexture2");
     collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
     collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    
+
     // Create a static scene
     modelA = std::make_shared<smStaticSceneObject>();
     modelA->setModel(collisionModelA);

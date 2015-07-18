@@ -24,8 +24,8 @@
 #ifndef SMTK_EXAMPLES_COMMON_PZRMOUSECAMERACONTROLLER_H
 #define SMTK_EXAMPLES_COMMON_PZRMOUSECAMERACONTROLLER_H
 
-#include "smCore/smCoreClass.h"
-#include "smRendering/smCamera.h"
+#include "Core/CoreClass.h"
+#include "Rendering/Camera.h"
 
 namespace smtk {
 namespace Examples {
@@ -75,6 +75,6 @@ private:
 
 }//Common
 }//Examples
-}//smtk
+}//tk
 
 #endif

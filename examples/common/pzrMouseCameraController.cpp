@@ -23,9 +23,9 @@
 
 #include "pzrMouseCameraController.h"
 
-#include "smEvent/smMouseButtonEvent.h"
-#include "smEvent/smMouseMoveEvent.h"
-#include "smCore/smMath.h"
+#include "Event/MouseButtonEvent.h"
+#include "Event/MouseMoveEvent.h"
+#include "Core/Math.h"
 
 namespace smtk {
 namespace Examples {
@@ -97,7 +97,7 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent>
             coords = newCoords;
         }
         else if(lmbPressed)
-        {            
+        {
             //rotate
             this->camera->rotateFocusX(SM_DEGREES2RADIANS(moveDistance * diff(1)));
             this->camera->rotateFocusY(SM_DEGREES2RADIANS(moveDistance * diff(0)));
@@ -116,4 +116,4 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent>
 
 }//Common
 }//Examples
-}//smtk
+}//tk

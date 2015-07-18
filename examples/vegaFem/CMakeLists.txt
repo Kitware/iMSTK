@@ -1,13 +1,13 @@
 
 add_executable(vegaFemExample main.cpp)
 target_link_libraries(vegaFemExample
-  smCore
-  smRendering
-  smRenderDelegates
-  smSimulators
-  smMesh
-  smCollision
-  smContactHandling
-  smEvent
+  Core
+  Rendering
+  RenderDelegates
+  Simulators
+  Mesh
+  Collision
+  ContactHandling
+  Event
   ExamplesCommon
   )

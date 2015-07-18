@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "AudioExample.h"
-#include "smCore/smSDK.h"
+#include "Core/SDK.h"
 
 
 AudioKeyboardController::AudioKeyboardController()

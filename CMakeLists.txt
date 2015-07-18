@@ -224,19 +224,19 @@ set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 
 set(SimMedTK_exports
-  smCore
-  smCollision
-  smExternal
-  smExternalDevices
-  smGeometry
-  smMesh
-  smRendering
-  smSimulators
-  smTools
-  smEvent)
+  Core
+  Collision
+  External
+  ExternalDevices
+  Geometry
+  Mesh
+  Rendering
+  Simulators
+  Tools
+  Event)
 
 if(SimMedTK_USE_OCULUS)
-  list(APPEND SimMedTK_exports smRenderingOculus)
+  list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
 add_subdirectory(src)
@@ -262,7 +262,7 @@ export(PACKAGE SimMedTK)
 export(TARGETS
   ${SimMedTK_exports}
   FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
-  NAMESPACE smtk::
+  NAMESPACE mstk::
   EXPORT_LINK_INTERFACE_LIBRARIES
 )
 

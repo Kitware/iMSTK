@@ -22,11 +22,11 @@
 //---------------------------------------------------------------------------
 
 #include "MultipleObjects.h"
-#include "smSDK.h"
-#include "smFemSceneObject.h"
-#include "smFemSimulator.h"
-#include "smPBDSceneObject.h"
-#include "smPBDObjectSimulator.h"
+#include "SDK.h"
+#include "FemSceneObject.h"
+#include "FemSimulator.h"
+#include "PBDSceneObject.h"
+#include "PBDObjectSimulator.h"
 
 void createPBDandFEM()
 {

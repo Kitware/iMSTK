@@ -24,16 +24,16 @@
 #ifndef COLLISIONDETECTIONEXAMPLE_H
 #define COLLISIONDETECTIONEXAMPLE_H
 
-#include "smCore/smConfig.h"
-#include "smCore/smErrorLog.h"
-#include "smCore/smCoreClass.h"
-#include "smCore/smSimulator.h"
-#include "smCore/smStaticSceneObject.h"
-#include "smCore/smSceneObject.h"
-#include "smSimulators/smDummySimulator.h"
-#include "smExternalDevices/smPhantomInterface.h"
-#include "smCore/smMotionTransformer.h"
-#include "smCollision/smSpatialGrid.h"
+#include "Core/Config.h"
+#include "Core/ErrorLog.h"
+#include "Core/CoreClass.h"
+#include "Core/Simulator.h"
+#include "Core/StaticSceneObject.h"
+#include "Core/SceneObject.h"
+#include "Simulators/DummySimulator.h"
+#include "ExternalDevices/PhantomInterface.h"
+#include "Core/MotionTransformer.h"
+#include "Collision/SpatialGrid.h"
 
 
 class CollisionDetectionExample: public smSimulationMain, public smCoreClass

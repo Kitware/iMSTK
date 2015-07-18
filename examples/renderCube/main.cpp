@@ -27,10 +27,10 @@
 
 #include <memory>
 
-#include "smCore/smSDK.h"
-#include "smRendering/smTextureManager.h"
-#include "smGeometry/smMeshModel.h"
-#include "smRenderDelegates/smConfig.h"
+#include "Core/SDK.h"
+#include "Rendering/TextureManager.h"
+#include "Geometry/MeshModel.h"
+#include "RenderDelegates/Config.h"
 
 int main()
 {

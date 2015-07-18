@@ -13,8 +13,8 @@ simmedtk_add_library(ExamplesCommon
 )
 
 target_link_libraries(ExamplesCommon
-  smCore
-  smRendering
-  smEvent
-  smSimulators
+  Core
+  Rendering
+  Event
+  Simulators
   )
