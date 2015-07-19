@@ -44,21 +44,21 @@ enum ImageColorType
 struct smTexture
 {
     /// \brief texture file name
-    smString textureFileName;
+    std::string textureFileName;
     /// \brief GL id
     GLuint textureGLId;
     /// \brief stores the width of the texture
-    smInt width;
+    int width;
     /// \brief stores the height of the texture
-    smInt height;
+    int height;
     /// \brief image color type
     ImageColorType imageColorType;
     /// \brief SFML image
     sf::Image image;
     /// \brief GL id returned by opengl library
-    smGLUInt GLtype;
+    GLuint GLtype;
     /// \brief true when initilized
-    smBool isInitialized;
+    bool isInitialized;
     /// \brief to make a copy of the texture.
     inline smTexture *copy()
     {
@@ -79,11 +79,11 @@ struct smTexture
 struct smImageData
 {
     void *data;
-    smInt width;
-    smInt height;
-    smInt bytePerPixel;
+    int width;
+    int height;
+    int bytePerPixel;
     ImageColorType imageColorType;
-    smString fileName;
+    std::string fileName;
 };
 
 #endif // SMTEXTURE_H

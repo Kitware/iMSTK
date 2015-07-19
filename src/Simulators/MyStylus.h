@@ -38,18 +38,18 @@ class MyStylus: public smStylusRigidSceneObject
 
 public:
     size_t phantomID; ///< ID for phantom omni
-    smBool buttonState[4]; ///< state of the buttons
-    smFloat angle; ///< angle of the jaw (if applicable)
-    smFloat maxangle; ///< maximum angle of the jaw (if applicable)
+    bool buttonState[4]; ///< state of the buttons
+    float angle; ///< angle of the jaw (if applicable)
+    float maxangle; ///< maximum angle of the jaw (if applicable)
     smMeshContainer meshContainer, meshContainerLower, meshContainerUpper; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
     /// \brief constructor
-    MyStylus(const smString& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
-             const smString& p_lower = "../../resources/models/blunt_diss_lower.3DS",
-             const smString& p_upper = "../../resources/models/blunt_diss_upper.3DS");
+    MyStylus(const std::string& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
+             const std::string& p_lower = "../../resources/models/blunt_diss_lower.3DS",
+             const std::string& p_upper = "../../resources/models/blunt_diss_upper.3DS");
 
     /// \brief update the closing and opening of jaws (if applicable)
     void updateOpenClose();
@@ -61,14 +61,14 @@ class HookCautery: public smStylusRigidSceneObject
 
 public:
     size_t phantomID; ///< ID of the phantom omni
-    smBool buttonState[4]; ///< state of the buttons
+    bool buttonState[4]; ///< state of the buttons
     smMeshContainer meshContainer; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
     /// \brief constructor
-    HookCautery(const smString& p_pivot = "../../resources/models/hook_cautery_new.3DS");
+    HookCautery(const std::string& p_pivot = "../../resources/models/hook_cautery_new.3DS");
 };
 
 #endif

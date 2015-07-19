@@ -25,7 +25,7 @@
 #include "SceneTextureShader.h"
 #include "Core/SDK.h"
 
-smSceneTextureShader::smSceneTextureShader(const smString &p_verteShaderFileName, const smString &p_fragmentFileName)
+smSceneTextureShader::smSceneTextureShader(const std::string &p_verteShaderFileName, const std::string &p_fragmentFileName)
 : smShader(smSDK::getInstance()->getErrorLog())
 {
     this->log = smSDK::getInstance()->getErrorLog();
@@ -45,7 +45,7 @@ void smSceneTextureShader::predraw(std::shared_ptr<smMesh>/*p_mesh*/)
 
 }
 
-void smSceneTextureShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/)
+void smSceneTextureShader::handleEvent(std::shared_ptr<mstk::Event::smEvent> /*p_event*/)
 {
 
 }

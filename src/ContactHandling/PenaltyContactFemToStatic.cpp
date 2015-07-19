@@ -51,8 +51,8 @@ void smPenaltyContactFemToStatic::computeUnilateralContactForces()
 
     std::vector<std::shared_ptr<smContact>> contactInfo = this->getCollisionPairs()->getContacts();
 
-    if (this->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT
-        && this->getFirstSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT)
+    if (this->getSecondSceneObject()->getType() == core::ClassType::VegaFemSceneObject
+        && this->getFirstSceneObject()->getType() == core::ClassType::StaticSceneObject)
     {
         auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(this->getSecondSceneObject());
 

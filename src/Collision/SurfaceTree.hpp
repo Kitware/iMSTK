@@ -48,7 +48,7 @@ void smSurfaceTree<CellType>::initStructure()
     root = std::make_shared<CellType>();
 
     center = mesh->aabb.center();
-    edge = SIMMEDTK_MAX(SIMMEDTK_MAX(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
+    edge = std::max(std::max(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
                         mesh->aabb.halfSizeZ());
     root->setCenter(center);
     root->setLength(2 * edge);
@@ -112,19 +112,19 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
 /// \brief handle key press events
 template<typename CellType>
-void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
 {
     if(!this->isListening())
     {
         return;
     }
-    auto keyBoardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+    auto keyBoardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
     if(keyBoardEvent != nullptr)
     {
-        smtk::Event::smKey keyPressed = keyBoardEvent->getKeyPressed();
+        mstk::Event::smKey keyPressed = keyBoardEvent->getKeyPressed();
         switch(keyPressed)
         {
-            case smtk::Event::smKey::Add:
+            case mstk::Event::smKey::Add:
             {
                 minTreeRenderLevel++;
 
@@ -141,7 +141,7 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smtk::Event::smEvent> 
                 currentLevel = minTreeRenderLevel;
             }
 
-            case smtk::Event::smKey::Subtract:
+            case mstk::Event::smKey::Subtract:
             {
                 minTreeRenderLevel--;
 
@@ -158,22 +158,22 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<smtk::Event::smEvent> 
                 currentLevel = minTreeRenderLevel;
             }
 
-            case smtk::Event::smKey::R:
+            case mstk::Event::smKey::R:
             {
                 this->renderSurface = !this->renderSurface;
             }
 
-            case smtk::Event::smKey::P:
+            case mstk::Event::smKey::P:
             {
                 this->enableShiftPos = !this->enableShiftPos;
             }
 
-            case smtk::Event::smKey::K:
+            case mstk::Event::smKey::K:
             {
                 this->renderOnlySurface = !this->renderOnlySurface;
             }
 
-            case smtk::Event::smKey::T:
+            case mstk::Event::smKey::T:
             {
                 updateStructure();
             }
@@ -219,9 +219,9 @@ bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
             totalDistance += (Node->getCenter() - mesh->vertices[i]).norm();
         }
 
-        smFloat weightSum = 0;
-        smFloat weight;
-        smFloat totalDistance2 = totalDistance * totalDistance;
+        float weightSum = 0;
+        float weight;
+        float totalDistance2 = totalDistance * totalDistance;
 
         for(const auto &i : Node->getVerticesIndices())
         {

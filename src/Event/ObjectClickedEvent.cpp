@@ -23,7 +23,7 @@
 
 #include "ObjectClickedEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smObjectClickedEvent::EventName = EventType::ObjectClicked;
@@ -40,4 +40,4 @@ const smVec3d& smObjectClickedEvent::getWindowCoord()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

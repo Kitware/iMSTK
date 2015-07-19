@@ -23,7 +23,7 @@
 
 #include "KeyboardEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smKeyboardEvent::EventName = EventType::Keyboard;
@@ -59,4 +59,4 @@ const smModKey& smKeyboardEvent::getModifierKey()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

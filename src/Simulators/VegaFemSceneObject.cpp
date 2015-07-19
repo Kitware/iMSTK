@@ -37,7 +37,7 @@ smVegaFemSceneObject::smVegaFemSceneObject() :
 {
     performaceTracker.initialize();
 
-    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    this->type = core::ClassType::VegaFemSceneObject;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
@@ -47,7 +47,7 @@ smVegaFemSceneObject::smVegaFemSceneObject() :
 }
 
 smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log,
-                                           const smString ConfigFile):
+                                           const std::string ConfigFile):
                                            staticSolver(0),
                                            graphicFrame(0),
                                            explosionFlag(0),
@@ -56,7 +56,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
 {
     performaceTracker.initialize();
 
-    this->type = SIMMEDTK_SMVEGAFEMSCENEOBJECT;
+    this->type = core::ClassType::VegaFemSceneObject;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
@@ -82,7 +82,7 @@ std::shared_ptr<smSceneObject> smVegaFemSceneObject::clone()
     return safeDownCast<smSceneObject>();
 }
 
-bool smVegaFemSceneObject::configure(const smString ConfigFile)
+bool smVegaFemSceneObject::configure(const std::string ConfigFile)
 {
     femConfig = std::make_shared<smVegaObjectConfig>();
 
@@ -1171,7 +1171,6 @@ void smVegaFemSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";
     std::cout << "\t Name        : " << this->getName() << std::endl;
-    std::cout << "\t Type        : " << this->getType() << std::endl;
     std::cout << "\t Model       : " << "--"  << std::endl;
     std::cout << "\t # Nodes     : " << this->getNumNodes() << std::endl;
     std::cout << "\t # TotalDOF  : " << this->getNumDof() << std::endl;

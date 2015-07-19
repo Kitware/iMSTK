@@ -70,7 +70,7 @@ smADUInterface::smADUInterface()
 }
 
 /// \brief
-smADUInterface::smADUInterface(const smString& calibrationFile)
+smADUInterface::smADUInterface(const std::string& calibrationFile)
 {
 
 // Read device serial number and calibration values
@@ -86,10 +86,10 @@ smADUInterface::smADUInterface(const smString& calibrationFile)
         std::cout << " Check the location for file : " << deviceData << "\n";
     }
 
-    smString buffer;
-    smInt i;
-    smString t;
-    smString s;
+    std::string buffer;
+    int i;
+    std::string t;
+    std::string s;
 
     while (!reader.eof())
     {
@@ -181,7 +181,7 @@ smADUInterface::~smADUInterface()
 }
 
 /// \brief
-smInt smADUInterface::openDevice(const smString& serialNumber)
+int smADUInterface::openDevice(const std::string& serialNumber)
 {
 
     deviceHandle = OpenAduDeviceBySerialNumber(serialNumber.c_str(), 0);
@@ -199,7 +199,7 @@ smInt smADUInterface::openDevice(const smString& serialNumber)
 }
 
 /// \brief
-smInt smADUInterface::closeDevice()
+int smADUInterface::closeDevice()
 {
 
     CloseAduDevice(deviceHandle);
@@ -207,17 +207,17 @@ smInt smADUInterface::closeDevice()
 }
 
 /// \brief
-smInt* smADUInterface::readAnalogInputs()
+int* smADUInterface::readAnalogInputs()
 {
 
     return 0;
 }
 
 /// \brief Support for two inputs
-smInt smADUInterface::readAnalogInput(int channel)
+int smADUInterface::readAnalogInput(int channel)
 {
 
-    smString command;
+    std::string command;
     smChar data[8];
 
     if (channel == 0)
@@ -242,7 +242,7 @@ void smADUInterface::runDevice()
 
     if (isOpened)
     {
-        for (smInt i = 0; i < 2; i++)
+        for (int i = 0; i < 2; i++)
         {
             deviceData->anValue[i] = readAnalogInput(i);
         }

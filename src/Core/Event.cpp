@@ -23,7 +23,7 @@
 
 #include "Event.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smEvent::EventName = EventType::None;
@@ -58,5 +58,5 @@ const bool& smEvent::getEnabled()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 

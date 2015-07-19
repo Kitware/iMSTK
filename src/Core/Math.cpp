@@ -26,14 +26,14 @@
 
 smMath::smMath()
 {
-    type = SIMMEDTK_SMMATH;
+    type = core::ClassType::Math;
 }
 
-smInt smMath::pow(smInt p_base, smInt p_pow)
+int smMath::pow(int p_base, int p_pow)
 {
-    smInt res = 1;
+    int res = 1;
 
-    for (smInt i = 0; i < p_pow; i++)
+    for (int i = 0; i < p_pow; i++)
     {
         res *= p_base;
     }
@@ -41,7 +41,7 @@ smInt smMath::pow(smInt p_base, smInt p_pow)
     return res;
 }
 
-smFloat smMath::interpolate(smInt current, smInt min, smInt max)
+float smMath::interpolate(int current, int min, int max)
 {
     if (current < min)
     {

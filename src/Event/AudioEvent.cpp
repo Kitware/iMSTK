@@ -23,7 +23,7 @@
 
 #include "AudioEvent.h"
 
-namespace smtk
+namespace mstk
 {
 namespace Event
 {
@@ -33,11 +33,11 @@ EventType smAudioEvent::EventName = EventType::Audio;
 smAudioEvent::smAudioEvent(): state(AudioState::Stop), sound(""), volume(-1.0)
 {
 }
-void smAudioEvent::setState(const smtk::Event::AudioState& audioState)
+void smAudioEvent::setState(const mstk::Event::AudioState& audioState)
 {
     this->state = audioState;
 }
-const smtk::Event::AudioState& smAudioEvent::getState()
+const mstk::Event::AudioState& smAudioEvent::getState()
 {
     return this->state;
 }

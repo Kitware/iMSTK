@@ -46,16 +46,16 @@ public:
     ~smVolumeMesh();
 
     /// \brief constructor
-    void GenerateTetra(const smString& fileName);
+    void GenerateTetra(const std::string& fileName);
 
     /// \brief load tetrahedron
-    smBool LoadTetra(const smString& fileName);
+    bool LoadTetra(const std::string& fileName);
 
     /// \brief load surface triangles
-    smBool getSurface(const smString& fileName);
+    bool getSurface(const std::string& fileName);
 
     /// \brief read the boundary conditions
-    smBool readBC(const smString& fileName);
+    bool readBC(const std::string& fileName);
 
     /// \brief initialize the surface mesh
     void initSurface();
@@ -73,7 +73,7 @@ public:
     void rotVolumeMesh(const smMatrix33d &p_rot);
 
     /// \brief load the mesh
-    smBool loadMesh(const smString& fileName, const smMeshFileType &fileType);
+    bool loadMesh(const std::string& fileName, const smMeshFileType &fileType);
 
     /// \brief populate the mesh data from the vega volumetric mesh file format
     void importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage);
@@ -83,13 +83,13 @@ public:
 
 public:
     /// push smMesh class specific errors here
-    smInt nbrTetra; ///< number of tetrahedra
-    smInt nbrNodes; ///< total number of nodes of the volume mesh
+    int nbrTetra; ///< number of tetrahedra
+    int nbrNodes; ///< total number of nodes of the volume mesh
     std::shared_ptr<smErrorLog> log_VM; ///< log the errors with volume mesh class
     smStdVector3d nodes; ///< data of nodal co-ordinates
     std::vector<smTetrahedra> tetra; ///< tetrahedra data
-    std::vector<smInt> surfaceNodeIndex; ///<
-    std::vector<smBool> fixed; ///< indicates if the node is fixed or not
+    std::vector<int> surfaceNodeIndex; ///<
+    std::vector<bool> fixed; ///< indicates if the node is fixed or not
 };
 
 #endif

@@ -37,7 +37,7 @@
 #include "Core/Math.h"
 #include "External/tree.hh"
 
-namespace smtk {
+namespace mstk {
     namespace Event {
         class smEvent;
         class smEventHandler;
@@ -57,18 +57,18 @@ public:
 
 public:
     /// \brief constructor
-    smMeshContainer(smString p_name = "");
+    smMeshContainer(std::string p_name = "");
 
     /// \brief constructor
-    smMeshContainer(smString p_name, smMesh *p_mesh, smVec3d p_prePos, smVec3d p_posPos, smFloat p_offsetRotX, smFloat p_offsetRotY, smFloat p_offsetRotZ);
+    smMeshContainer(std::string p_name, smMesh *p_mesh, smVec3d p_prePos, smVec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ);
 
     void computeCurrentMatrix();
 
 public:
-    smString name;
-    smFloat offsetRotX; // offset in rotation in x-direction
-    smFloat offsetRotY; // offset in rotation in y-direction
-    smFloat offsetRotZ; // offset in rotation in z-direction
+    std::string name;
+    float offsetRotX; // offset in rotation in x-direction
+    float offsetRotY; // offset in rotation in y-direction
+    float offsetRotZ; // offset in rotation in z-direction
     smVec3d preOffsetPos; // !!
     smVec3d posOffsetPos; // !!
     smMatrix44d accumulatedMatrix; // !!
@@ -107,7 +107,7 @@ public:
     virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief handle the events such as button presses related to stylus
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
 public:
     smVec3d pos; // position of stylus
@@ -115,10 +115,10 @@ public:
     smMatrix33d rot; // rotation of stylus
     smMatrix44d transRot; // !! translation and rotation matrix of stylus
     smMatrix44d transRotDevice; // translation and rotation matrix of devide controlling the stylus
-    smBool toolEnabled; // !!
+    bool toolEnabled; // !!
 
 protected:
-    std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
+    std::shared_ptr<mstk::Event::smEventHandler> eventHandler;
 };
 
 /// \brief !!
@@ -127,13 +127,13 @@ class smStylusRigidSceneObject: public smStylusSceneObject
 public:
     tree<smMeshContainer*> meshes; // meshes representing the stylus
     tree<smMeshContainer*>::iterator rootIterator; // !!
-    volatile smBool updateViewerMatrixEnabled; // !!
+    volatile bool updateViewerMatrixEnabled; // !!
 
     /// \brief to show the device tool..It is for debugging god object
-    smBool enableDeviceManipulatedTool;
+    bool enableDeviceManipulatedTool;
 
     /// \brief enabling post traverse callback enabled for each node.
-    smBool posTraverseCallbackEnabled;
+    bool posTraverseCallbackEnabled;
 
     /// \brief post traverse callback for each node
     virtual void posTraverseCallBack(smMeshContainer &p_container);
@@ -141,7 +141,7 @@ public:
     /// \brief Post Traverse callback for the entire object.
     virtual void posTraverseCallBack();
 
-    smBool posCallBackEnabledForEntireObject; // !!
+    bool posCallBackEnabledForEntireObject; // !!
 
     /// \brief !!
     smStylusRigidSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
@@ -150,15 +150,15 @@ public:
     tree<smMeshContainer*>::iterator addMeshContainer(smMeshContainer *p_meshContainer);
 
     /// \brief !!
-    smBool addMeshContainer(smString p_ParentName, smMeshContainer *p_meshContainer);
+    bool addMeshContainer(std::string p_ParentName, smMeshContainer *p_meshContainer);
 
     /// \brief !!
     tree<smMeshContainer*>::iterator addMeshContainer(tree<smMeshContainer*>::iterator p_iterator, smMeshContainer *p_meshContainer);
 
     /// \brief !!
-    smMeshContainer *getMeshContainer(smString p_string) const;
+    smMeshContainer *getMeshContainer(std::string p_string) const;
 
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
     /// \brief !!
     std::shared_ptr<smSceneObject> clone() override;
@@ -168,7 +168,7 @@ public:
 
     void loadInitialStates() override{};
 
-    bool configure(const smString ConfigFile)
+    bool configure(const std::string ConfigFile)
     {
         return false;
     }
@@ -177,12 +177,11 @@ public:
     {
         std::cout << "\t-------------------------------------\n";
         std::cout << "\t Name        : " << this->getName() << std::endl;
-        std::cout << "\t Type        : " << this->getType() << std::endl;
         std::cout << "\t-------------------------------------\n";
     }
 
 private:
-    std::unordered_map<smString, tree<smMeshContainer*>::iterator> indexIterators;
+    std::unordered_map<std::string, tree<smMeshContainer*>::iterator> indexIterators;
 };
 
 
@@ -201,7 +200,7 @@ public:
 
     void loadInitialStates() {};
 
-    bool configure(smString ConfigFile)
+    bool configure(std::string ConfigFile)
     {
         return false;
     }
@@ -231,7 +230,6 @@ public:
     {
         std::cout << "\t-------------------------------------\n";
         std::cout << "\t Name        : " << this->getName() << std::endl;
-        std::cout << "\t Type        : " << this->getType() << std::endl;
         std::cout << "\t-------------------------------------\n";
     }
 };

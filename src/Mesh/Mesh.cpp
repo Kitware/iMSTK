@@ -22,7 +22,10 @@
 //---------------------------------------------------------------------------
 
 #include "Mesh.h"
-// #include "Core/SDK.h"
+
+#include <limits>
+
+// SimMedTK includes
 #include "Rendering/GLRenderer.h"
 #include "Rendering/Viewer.h"
 #include "Core/Factory.h"
@@ -48,7 +51,7 @@ smMesh::smMesh()
     vertTangents = 0;
     nbrTriangles = 0;
     nbrTexCoordForTrainglesOBJ = 0;
-    type = SIMMEDTK_SMMESH;
+    type = core::ClassType::Mesh;
     isTextureCoordAvailable = false;
     tangentChannel = false;
     this->setRenderDelegate(
@@ -76,7 +79,7 @@ void smMesh::allocateAABBTris()
 }
 
 /// \brief
-void CalculateTangentArray(smInt vertexCount, const smVec3d *vertex,
+void CalculateTangentArray(int vertexCount, const smVec3d *vertex,
                            const smVec3d *normal, const smTexCoord *texcoord,
                            long triangleCount, const smTriangle *triangle,
                            smVec3d *tangent)
@@ -144,7 +147,7 @@ void CalculateTangentArray(smInt vertexCount, const smVec3d *vertex,
 void smMesh::calcTriangleTangents()
 {
 
-    smInt t;
+    int t;
 
     // First calculate the triangle tangents
     for (t = 0; t < nbrTriangles; t++)
@@ -170,7 +173,7 @@ void smMesh::calcTriangleTangents()
     //calculate the vertex normals
     if (this->meshFileType == SM_FILETYPE_3DS || this->meshFileType == SM_FILETYPE_OBJ)
     {
-        for (smInt v = 0; v < nbrVertices; v++)
+        for (int v = 0; v < nbrVertices; v++)
         {
             vertTangents[v][0] = vertTangents[v][1] = vertTangents[v][2] = 0;
 
@@ -201,8 +204,8 @@ void smMesh::calculateTangent(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexCoord&
     v2[1] = p3[1] - p1[1];
     v2[2] = p3[2] - p1[2];
 
-    smFloat bb1 = t2.v - t1.v;
-    smFloat bb2 = t3.v - t1.v;
+    float bb1 = t2.v - t1.v;
+    float bb2 = t3.v - t1.v;
 
     t[0] = bb2 * v1[0] - bb1 * v2[0];
     t[1] = bb2 * v1[1] - bb1 * v2[1];
@@ -226,11 +229,11 @@ void smMesh::calculateTangent_test(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexC
     v2[1] = p3[1] - p1[1];
     v2[2] = p3[2] - p1[2];
 
-    smFloat tt1 = t2.u - t1.u;
-    smFloat tt2 = t3.u - t1.u;
+    float tt1 = t2.u - t1.u;
+    float tt2 = t3.u - t1.u;
 
-    smFloat bb1 = t2.v - t1.v;
-    smFloat bb2 = t3.v - t1.v;
+    float bb1 = t2.v - t1.v;
+    float bb2 = t3.v - t1.v;
     float r = 1.0F / (tt1 * bb2 - tt2 * bb1);
     t[0] = (bb2 * v1[0] - bb1 * v2[0]) * r;
     t[1] = (bb2 * v1[1] - bb1 * v2[1]) * r;
@@ -242,7 +245,7 @@ void smMesh::updateVertexNormals()
 {
     smVec3d temp = smVec3d::Zero();
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         for (size_t j = 0; j < vertTriNeighbors[i].size(); j++)
         {
@@ -259,14 +262,14 @@ void smMesh::updateVertexNormals()
 void smMesh::updateTriangleNormals()
 {
 
-    for (smInt i = 0; i < nbrTriangles; i++)
+    for (int i = 0; i < nbrTriangles; i++)
     {
         triNormals[i] = calculateTriangleNormal(i).normalized();
     }
 }
 
 /// \brief calculates the normal of a triangle
-smVec3d smMesh::calculateTriangleNormal(smInt triNbr)
+smVec3d smMesh::calculateTriangleNormal(int triNbr)
 {
 
     smVec3d v[3];
@@ -280,7 +283,7 @@ smVec3d smMesh::calculateTriangleNormal(smInt triNbr)
 }
 
 /// \brief allocates vertices and related array
-smBool smMesh::initVertexArrays(smInt nbr)
+bool smMesh::initVertexArrays(int nbr)
 {
 
     if (nbr < 0)
@@ -298,7 +301,7 @@ smBool smMesh::initVertexArrays(smInt nbr)
 }
 
 /// \brief allocates triangle and related array
-smBool smMesh::initTriangleArrays(smInt nbr)
+bool smMesh::initTriangleArrays(int nbr)
 {
 
     if (nbr < 0)
@@ -318,7 +321,7 @@ smBool smMesh::initTriangleArrays(smInt nbr)
 void smMesh::initVertexNeighbors()
 {
 
-    smInt i;
+    int i;
     vertTriNeighbors.resize(nbrVertices);
 
     for (i = 0; i < nbrTriangles; i++)
@@ -333,9 +336,9 @@ void smMesh::initVertexNeighbors()
 void smMesh::calcNeighborsVertices()
 {
 
-    smInt i;
-    smInt triangleIndex;
-    smInt candidate[3];
+    int i;
+    int triangleIndex;
+    int candidate[3];
 
     vertVertNeighbors.resize(nbrVertices);
 
@@ -403,22 +406,22 @@ void smMesh::calcNeighborsVertices()
 /// \brief
 void smMesh::upadateAABB()
 {
-    smFloat minx = smMAXFLOAT ;
-    smFloat miny = smMAXFLOAT;
-    smFloat minz = smMAXFLOAT;
-    smFloat maxx = -smMAXFLOAT;
-    smFloat maxy = -smMAXFLOAT;
-    smFloat maxz = -smMAXFLOAT;
+    double minx = std::numeric_limits<double>::max();
+    double miny = std::numeric_limits<double>::max();
+    double minz = std::numeric_limits<double>::max();
+    double maxx = -std::numeric_limits<double>::max();
+    double maxy = -std::numeric_limits<double>::max();
+    double maxz = -std::numeric_limits<double>::max();
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
-        minx = SIMMEDTK_MIN(vertices[i][0], minx);
-        miny = SIMMEDTK_MIN(vertices[i][1], miny);
-        minz = SIMMEDTK_MIN(vertices[i][2], minz);
+        minx = std::min(vertices[i][0], minx);
+        miny = std::min(vertices[i][1], miny);
+        minz = std::min(vertices[i][2], minz);
 
-        maxx = SIMMEDTK_MAX(vertices[i][0], maxx);
-        maxy = SIMMEDTK_MAX(vertices[i][1], maxy);
-        maxz = SIMMEDTK_MAX(vertices[i][2], maxz);
+        maxx = std::max(vertices[i][0], maxx);
+        maxy = std::max(vertices[i][1], maxy);
+        maxz = std::max(vertices[i][2], maxz);
     }
 
     aabb.aabbMin[0] = minx - (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
@@ -436,7 +439,7 @@ void smMesh::calcEdges()
     smEdge edge;
     edges.reserve(SIMMEDTK_MESH_RESERVEDMAXEDGES);
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         for (size_t j = 0; j < vertVertNeighbors[i].size(); j++)
         {
@@ -451,10 +454,10 @@ void smMesh::calcEdges()
 }
 
 /// \brief
-void smMesh::translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ)
+void smMesh::translate(float p_offsetX, float p_offsetY, float p_offsetZ)
 {
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         vertices[i][0] = vertices[i][0] + p_offsetX;
         vertices[i][1] = vertices[i][1] + p_offsetY;
@@ -472,7 +475,7 @@ void smMesh::translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ)
 void smMesh::translate(smVec3d p_offset)
 {
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         vertices[i] = vertices[i] + p_offset;
         origVerts[i] = origVerts[i] + p_offset;
@@ -485,7 +488,7 @@ void smMesh::translate(smVec3d p_offset)
 void smMesh::scale(smVec3d p_scaleFactors)
 {
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
         vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
@@ -503,14 +506,14 @@ void smMesh::scale(smVec3d p_scaleFactors)
 void smMesh::rotate(const smMatrix33d &p_rot)
 {
 
-    for (smInt i = 0; i < nbrVertices; i++)
+    for (int i = 0; i < nbrVertices; i++)
     {
         vertices[i] = p_rot * vertices[i];
         origVerts[i] = p_rot * origVerts[i];
         vertNormals[i] = p_rot * vertNormals[i];
     }
 
-    for (smInt i = 0; i < nbrTriangles; i++)
+    for (int i = 0; i < nbrTriangles; i++)
     {
         triNormals[i] = p_rot * triNormals[i];
     }
@@ -522,42 +525,42 @@ void smMesh::rotate(const smMatrix33d &p_rot)
 /// \brief
 void smMesh::updateTriangleAABB()
 {
-    for (smInt i = 0; i < nbrTriangles; i++)
+    for (int i = 0; i < nbrTriangles; i++)
     {
         // min
-        triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
-        triAABBs[i].aabbMin[0] = SIMMEDTK_MIN(triAABBs[i].aabbMin[0] ,   vertices[triangles[i].vert[2]][0]);
+        triAABBs[i].aabbMin[0] = std::min(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
+        triAABBs[i].aabbMin[0] = std::min(triAABBs[i].aabbMin[0] ,   vertices[triangles[i].vert[2]][0]);
 
-        triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
-        triAABBs[i].aabbMin[1] = SIMMEDTK_MIN(triAABBs[i].aabbMin[1] ,   vertices[triangles[i].vert[2]][1]);
+        triAABBs[i].aabbMin[1] = std::min(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
+        triAABBs[i].aabbMin[1] = std::min(triAABBs[i].aabbMin[1] ,   vertices[triangles[i].vert[2]][1]);
 
-        triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(vertices[triangles[i].vert[0]][2], vertices[triangles[i].vert[1]][2]);
-        triAABBs[i].aabbMin[2] = SIMMEDTK_MIN(triAABBs[i].aabbMin[2] ,   vertices[triangles[i].vert[2]][2]);
+        triAABBs[i].aabbMin[2] = std::min(vertices[triangles[i].vert[0]][2], vertices[triangles[i].vert[1]][2]);
+        triAABBs[i].aabbMin[2] = std::min(triAABBs[i].aabbMin[2] ,   vertices[triangles[i].vert[2]][2]);
 
         //max
-        triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
-        triAABBs[i].aabbMax[0] = SIMMEDTK_MAX(triAABBs[i].aabbMax[0] ,   vertices[triangles[i].vert[2]][0]);
+        triAABBs[i].aabbMax[0] = std::max(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
+        triAABBs[i].aabbMax[0] = std::max(triAABBs[i].aabbMax[0] ,   vertices[triangles[i].vert[2]][0]);
 
-        triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
-        triAABBs[i].aabbMax[1] = SIMMEDTK_MAX(triAABBs[i].aabbMax[1] ,   vertices[triangles[i].vert[2]][1]);
+        triAABBs[i].aabbMax[1] = std::max(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
+        triAABBs[i].aabbMax[1] = std::max(triAABBs[i].aabbMax[1] ,   vertices[triangles[i].vert[2]][1]);
 
-        triAABBs[i].aabbMax[2] = SIMMEDTK_MAX(triAABBs[i].aabbMax[2],    vertices[triangles[i].vert[2]][2]);
+        triAABBs[i].aabbMax[2] = std::max(triAABBs[i].aabbMax[2],    vertices[triangles[i].vert[2]][2]);
     }
 }
 
 /// \brief
 void smMesh::checkCorrectWinding()
 {
-    smInt x[3];
-    smInt p[3];
+    int x[3];
+    int p[3];
 
-    for (smInt i = 0; i < nbrTriangles; i++)
+    for (int i = 0; i < nbrTriangles; i++)
     {
         x[0] = triangles[i].vert[0];
         x[1] = triangles[i].vert[1];
         x[2] = triangles[i].vert[2];
 
-        for (smInt j = 0; j < nbrTriangles; j++)
+        for (int j = 0; j < nbrTriangles; j++)
         {
             if (j == i)
             {
@@ -635,9 +638,9 @@ void smBaseMesh::assignTexture( int p_textureId )
         this->textureIds.push_back( attachment );
     }
 }
-void smBaseMesh::assignTexture(const smString& p_referenceName)
+void smBaseMesh::assignTexture(const std::string& p_referenceName)
 {
-    smInt textureId;
+    int textureId;
     smTextureAttachment attachment;
 
     if (smTextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
@@ -683,7 +686,7 @@ smLineMesh::smLineMesh( int p_nbrVertices, bool autoEdge ) : smBaseMesh()
 }
 void smLineMesh::createAutoEdges()
 {
-    for ( smInt i = 0; i < nbrEdges; i++ )
+    for ( int i = 0; i < nbrEdges; i++ )
     {
         edges[i].vert[0] = i;
         edges[i].vert[1] = i + 1;
@@ -697,33 +700,33 @@ void smLineMesh::updateAABB()
     smVec3d minEdgeOffset( -0.1, -0.1, -0.1 );
     smVec3d maxEdgeOffset( 0.1, 0.1, 0.1 );
 
-    tempAABB.aabbMin[0] = FLT_MAX;
-    tempAABB.aabbMin[1] = FLT_MAX;
-    tempAABB.aabbMin[2] = FLT_MAX;
+    tempAABB.aabbMin[0] = std::numeric_limits<double>::max();
+    tempAABB.aabbMin[1] = std::numeric_limits<double>::max();
+    tempAABB.aabbMin[2] = std::numeric_limits<double>::max();
 
-    tempAABB.aabbMax[0] = -FLT_MAX;
-    tempAABB.aabbMax[1] = -FLT_MAX;
-    tempAABB.aabbMax[2] = -FLT_MAX;
+    tempAABB.aabbMax[0] = -std::numeric_limits<double>::max();
+    tempAABB.aabbMax[1] = -std::numeric_limits<double>::max();
+    tempAABB.aabbMax[2] = -std::numeric_limits<double>::max();
 
-    for ( smInt i = 0; i < nbrEdges; i++ )
+    for ( int i = 0; i < nbrEdges; i++ )
     {
         ///min
-        edgeAABBs[i].aabbMin[0] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
-        edgeAABBs[i].aabbMin[1] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
-        edgeAABBs[i].aabbMin[2] = SIMMEDTK_MIN( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
+        edgeAABBs[i].aabbMin[0] = std::min( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
+        edgeAABBs[i].aabbMin[1] = std::min( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
+        edgeAABBs[i].aabbMin[2] = std::min( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
         edgeAABBs[i].aabbMin += minEdgeOffset;
-        tempAABB.aabbMin[0] = SIMMEDTK_MIN( tempAABB.aabbMin[0], edgeAABBs[i].aabbMin[0] );
-        tempAABB.aabbMin[1] = SIMMEDTK_MIN( tempAABB.aabbMin[1], edgeAABBs[i].aabbMin[1] );
-        tempAABB.aabbMin[2] = SIMMEDTK_MIN( tempAABB.aabbMin[2], edgeAABBs[i].aabbMin[2] );
+        tempAABB.aabbMin[0] = std::min( tempAABB.aabbMin[0], edgeAABBs[i].aabbMin[0] );
+        tempAABB.aabbMin[1] = std::min( tempAABB.aabbMin[1], edgeAABBs[i].aabbMin[1] );
+        tempAABB.aabbMin[2] = std::min( tempAABB.aabbMin[2], edgeAABBs[i].aabbMin[2] );
 
         ///max
-        edgeAABBs[i].aabbMax[0] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
-        edgeAABBs[i].aabbMax[1] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
-        edgeAABBs[i].aabbMax[2] = SIMMEDTK_MAX( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
+        edgeAABBs[i].aabbMax[0] = std::max( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
+        edgeAABBs[i].aabbMax[1] = std::max( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
+        edgeAABBs[i].aabbMax[2] = std::max( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
         edgeAABBs[i].aabbMax += maxEdgeOffset;
-        tempAABB.aabbMax[0] = SIMMEDTK_MAX( tempAABB.aabbMax[0], edgeAABBs[i].aabbMax[0] );
-        tempAABB.aabbMax[1] = SIMMEDTK_MAX( tempAABB.aabbMax[1], edgeAABBs[i].aabbMax[1] );
-        tempAABB.aabbMax[2] = SIMMEDTK_MAX( tempAABB.aabbMax[2], edgeAABBs[i].aabbMax[2] );
+        tempAABB.aabbMax[0] = std::max( tempAABB.aabbMax[0], edgeAABBs[i].aabbMax[0] );
+        tempAABB.aabbMax[1] = std::max( tempAABB.aabbMax[1], edgeAABBs[i].aabbMax[1] );
+        tempAABB.aabbMax[2] = std::max( tempAABB.aabbMax[2], edgeAABBs[i].aabbMax[2] );
     }
 
     tempAABB.aabbMin += minOffset;
@@ -733,7 +736,7 @@ void smLineMesh::updateAABB()
 void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
 {
 
-    for ( smInt i = 0; i < nbrVertices; i++ )
+    for ( int i = 0; i < nbrVertices; i++ )
     {
         vertices[i][0] = vertices[i][0] + p_offsetX;
         vertices[i][1] = vertices[i][1] + p_offsetY;
@@ -745,7 +748,7 @@ void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
 void smLineMesh::translate( smVec3d p_offset )
 {
 
-    for ( smInt i = 0; i < nbrVertices; i++ )
+    for ( int i = 0; i < nbrVertices; i++ )
     {
         vertices[i] = vertices[i] + p_offset;
         origVerts[i] = origVerts[i] + p_offset;
@@ -756,7 +759,7 @@ void smLineMesh::translate( smVec3d p_offset )
 void smLineMesh::rotate( smMatrix33d p_rot )
 {
 
-    for ( smInt i = 0; i < nbrVertices; i++ )
+    for ( int i = 0; i < nbrVertices; i++ )
     {
         vertices[i] = p_rot * vertices[i];
         origVerts[i] = p_rot * origVerts[i];
@@ -767,7 +770,7 @@ void smLineMesh::rotate( smMatrix33d p_rot )
 void smLineMesh::scale( smVec3d p_scaleFactors )
 {
 
-    for ( smInt i = 0; i < nbrVertices; i++ )
+    for ( int i = 0; i < nbrVertices; i++ )
     {
         vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
         vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
@@ -800,7 +803,7 @@ void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
 {
     Vec3d p;
     //copy the vertex co-ordinates
-    for(smInt i=0; i<this->nbrVertices ; i++)
+    for(int i=0; i<this->nbrVertices ; i++)
     {
        p = vegaSurfaceMesh->getPosition(i);
        this->vertices[i][0] = p[0];

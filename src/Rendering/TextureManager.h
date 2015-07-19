@@ -43,11 +43,11 @@ class smTextureManager: public smCoreClass
 
     static std::shared_ptr<smErrorLog> errorLog;
     static std::vector<smTexture*> textures;
-    static std::unordered_map<smString, smInt> textureIndexId;
-    static smInt activeTextures;
-    static smBool isInitialized;
-    static smBool isInitializedGL;
-    static smBool isDeleteImagesEnabled;
+    static std::unordered_map<std::string, int> textureIndexId;
+    static int activeTextures;
+    static bool isInitialized;
+    static bool isInitializedGL;
+    static bool isDeleteImagesEnabled;
 
 public:
     /// \brief init function called by the renderer thread
@@ -66,65 +66,65 @@ public:
         }
     }
     /// \brief load textures with file name, reference that that is assigned to it, and returned texture id
-    static smTextureReturnType loadTexture(const smString& p_fileName,
-                                           const smString& p_textureReferenceName,
-                                           smInt &p_textureId);
+    static smTextureReturnType loadTexture(const std::string& p_fileName,
+                                           const std::string& p_textureReferenceName,
+                                           int &p_textureId);
 
-    static smTextureReturnType loadTexture(const smString& p_fileName,
-                                           const smString& p_textureReferenceName,
-                                           smBool p_flipImage = false);
+    static smTextureReturnType loadTexture(const std::string& p_fileName,
+                                           const std::string& p_textureReferenceName,
+                                           bool p_flipImage = false);
 
-    static smTextureReturnType findTextureId(const smString& p_textureReferenceName,
-            smInt &p_textureId);
+    static smTextureReturnType findTextureId(const std::string& p_textureReferenceName,
+            int &p_textureId);
     /// \brief activate textures based on texture reference name, texture reference, texture id and GL order
     static GLuint activateTexture(smTexture *p_texture);
-    static GLuint activateTexture(const smString& p_textureReferenceName);
-    static GLuint activateTexture(smInt p_textureId);
+    static GLuint activateTexture(const std::string& p_textureReferenceName);
+    static GLuint activateTexture(int p_textureId);
 
-    static GLuint activateTexture(const smString& p_textureReferenceName,
-                                  smInt p_textureGLOrder);
+    static GLuint activateTexture(const std::string& p_textureReferenceName,
+                                  int p_textureGLOrder);
 
-    static GLuint activateTexture(smTexture *p_texture, smInt p_textureGLOrder,
-                                  smInt p_shaderBindGLId);
+    static GLuint activateTexture(smTexture *p_texture, int p_textureGLOrder,
+                                  int p_shaderBindGLId);
 
-    static GLuint activateTexture(const smString& p_textureReferenceName,
-                                  smInt p_textureGLOrder, smInt p_shaderBindName);
+    static GLuint activateTexture(const std::string& p_textureReferenceName,
+                                  int p_textureGLOrder, int p_shaderBindName);
 
-    static GLuint activateTexture(smInt p_textureId, smInt p_textureGLOrder);
-    static void  activateTextureGL(GLuint  p_textureId, smInt p_textureGLOrder);
+    static GLuint activateTexture(int p_textureId, int p_textureGLOrder);
+    static void  activateTextureGL(GLuint  p_textureId, int p_textureGLOrder);
     /// \brief disable textures
-    static GLuint disableTexture(const smString& p_textureReferenceName);
+    static GLuint disableTexture(const std::string& p_textureReferenceName);
 
-    static GLuint disableTexture(const smString& p_textureReferenceName,
-                                 smInt p_textureGLOrder);
+    static GLuint disableTexture(const std::string& p_textureReferenceName,
+                                 int p_textureGLOrder);
 
-    static GLuint disableTexture(smInt p_textureId);
+    static GLuint disableTexture(int p_textureId);
 
     /// \brief functions return GL texture ID
-    static GLuint getOpenglTextureId(const smString& p_textureReferenceName);
-    static GLuint getOpenglTextureId(smInt p_textureId);
+    static GLuint getOpenglTextureId(const std::string& p_textureReferenceName);
+    static GLuint getOpenglTextureId(int p_textureId);
     /// \brief to get texture with given texture reference name
-    static smTexture * getTexture(const smString& p_textureReferenceName);
+    static smTexture * getTexture(const std::string& p_textureReferenceName);
     /// \brief to create a depth texture
-    static void createDepthTexture(const smString& p_textureReferenceName,
-                                   smInt p_width, smInt p_height);
+    static void createDepthTexture(const std::string& p_textureReferenceName,
+                                   int p_width, int p_height);
 
     /// \brief to create a color texture
-    static void  createColorTexture(const smString& p_textureReferenceName,
-                                    smInt p_width, smInt p_height);
+    static void  createColorTexture(const std::string& p_textureReferenceName,
+                                    int p_width, int p_height);
     /// \brief initialize depth texture and color texture
     static void initDepthTexture(smTexture *p_texture);
     static void initColorTexture(smTexture *p_texture);
     /// \brief generate mip maps
-    static void generateMipMaps(smInt p_textureId);
-    static void generateMipMaps(const smString& p_textureReferenceName);
+    static void generateMipMaps(int p_textureId);
+    static void generateMipMaps(const std::string& p_textureReferenceName);
     /// \brief to duplicate the texture
-    static void duplicateTexture(const smString& p_textureReferenceName,
+    static void duplicateTexture(const std::string& p_textureReferenceName,
                                  smTexture *p_texture, ImageColorType p_type);
 
     /// \brief copy the  texture specified with p_textureSourceName to the  texture specified with p_textureDestinationName
-    static void copyTexture(const smString& p_textureDestinationName,
-                            const smString& p_textureSourceName);
+    static void copyTexture(const std::string& p_textureDestinationName,
+                            const std::string& p_textureSourceName);
 };
 
 #endif

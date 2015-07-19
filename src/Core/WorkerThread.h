@@ -40,17 +40,17 @@ struct smProcessID
 {
 public:
     /// \brief numbering scheme in x,y,z
-    smUShort x;
-    smUShort y;
-    smUShort z;
+    unsigned short x;
+    unsigned short y;
+    unsigned short z;
 
-    smUShort totalProcX;
-    smUShort totalProcY;
-    smUShort totalProcZ;
+    unsigned short totalProcX;
+    unsigned short totalProcY;
+    unsigned short totalProcZ;
     /// \brief data
     void *data;
     /// \brief data size
-    smInt sizeOfData;
+    int sizeOfData;
     /// \brief numbering sceheme
     smProcessNumbering numbScheme;
 
@@ -70,7 +70,7 @@ public:
         totalProcY = p_ID.totalProcY;
         totalProcZ = p_ID.totalProcZ;
 
-        data = new smChar[p_ID.sizeOfData];
+        data = new char[p_ID.sizeOfData];
         memcpy(data, p_ID.data, sizeOfData);
     }
 
@@ -84,7 +84,7 @@ class smProcess: public smCoreClass
 
 protected:
     smProcessID id;
-    smBool termination;
+    bool termination;
 
 public:
     smProcess()

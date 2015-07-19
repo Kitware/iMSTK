@@ -30,7 +30,7 @@
 
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
-bool smGLUtils::queryGLError(smString& err)
+bool smGLUtils::queryGLError(std::string& err)
 {
     GLenum errCode;
     const GLubyte *errString;
@@ -39,7 +39,7 @@ bool smGLUtils::queryGLError(smString& err)
     {
         errString = gluErrorString(errCode);
 
-        err = "OpenGL Error: " + smString(reinterpret_cast<const char*>(errString)) + "\n";
+        err = "OpenGL Error: " + std::string(reinterpret_cast<const char*>(errString)) + "\n";
 
         return true;
     }
@@ -50,7 +50,7 @@ bool smGLUtils::queryGLError(smString& err)
 }
 
 ///taken from glProgramming.com.  Checks the extension.
-smBool smGLUtils::QueryExtension(const smString& extName)
+bool smGLUtils::QueryExtension(const std::string& extName)
 {
     auto it = std::find(
         openGLExtensions.begin(),openGLExtensions.end(),extName);
@@ -91,9 +91,9 @@ void smGLUtils::fadeBackgroundDraw()
     glPopAttrib();
 }
 
-void smGLUtils::drawQuadOnScreen(smColor p_color, smFloat p_left,
-                                 smFloat p_bottom, smFloat p_right,
-                                 smFloat p_top)
+void smGLUtils::drawQuadOnScreen(smColor p_color, float p_left,
+                                 float p_bottom, float p_right,
+                                 float p_top)
 {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glDisable(GL_DEPTH_TEST);

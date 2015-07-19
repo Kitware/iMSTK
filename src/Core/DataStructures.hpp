@@ -35,11 +35,11 @@ template<typename T>
 smIndiceArray<T>::smIndiceArray( int p_maxStorage )
 {
     maxStorage = p_maxStorage;
-    indices = new smInt[p_maxStorage];
+    indices = new int[p_maxStorage];
     storage = new T[p_maxStorage];
-    isEmpty = new smBool[p_maxStorage];
+    isEmpty = new bool[p_maxStorage];
 
-    for ( smInt i = 0; i < p_maxStorage; i++ )
+    for ( int i = 0; i < p_maxStorage; i++ )
     {
         isEmpty[i] = true;
     }
@@ -49,11 +49,11 @@ smIndiceArray<T>::smIndiceArray( int p_maxStorage )
 template<typename T> int
 smIndiceArray<T>::add( T p_item )
 {
-    smInt index = -1;
+    int index = -1;
 
     if ( nbrElements < maxStorage )
     {
-        for ( smInt i = 0; i < maxStorage; i++ )
+        for ( int i = 0; i < maxStorage; i++ )
         {
             if ( isEmpty[i] )
             {
@@ -77,11 +77,11 @@ smIndiceArray<T>::add( T p_item )
 template<typename T> int
 smIndiceArray<T>::checkAndAdd( T p_item )
 {
-    smInt index = -1;
+    int index = -1;
 
     if ( nbrElements < maxStorage )
     {
-        for ( smInt i = 0; i < nbrElements; i++ )
+        for ( int i = 0; i < nbrElements; i++ )
             if ( storage[indices[i]] == p_item )
             {
                 break;
@@ -95,11 +95,11 @@ smIndiceArray<T>::checkAndAdd( T p_item )
 template<typename T> bool
 smIndiceArray<T>::remove( int p_itemIndex )
 {
-    smInt counter = 0;
+    int counter = 0;
 
     if ( p_itemIndex >= 0 && p_itemIndex < maxStorage )
     {
-        for ( smInt i = 0; i < nbrElements; i++ )
+        for ( int i = 0; i < nbrElements; i++ )
         {
             if ( i == p_itemIndex )
             {
@@ -151,7 +151,7 @@ smIndiceArray<T>::getByRefSafe( int p_index, T &p_item )
 template<typename T>
 T &smIndiceArray<T>::getByRef( std::string p_string )
 {
-    for ( smInt i = 0; i < nbrElements; i++ )
+    for ( int i = 0; i < nbrElements; i++ )
     {
         if ( storage[indices[i]] == p_string )
         {
@@ -162,7 +162,7 @@ T &smIndiceArray<T>::getByRef( std::string p_string )
 template<typename T> void
 smIndiceArray<T>::print() const
 {
-    for ( smInt i = 0; i < nbrElements; i++ )
+    for ( int i = 0; i < nbrElements; i++ )
     {
         storage[indices[i]]->print();
     }
@@ -182,12 +182,12 @@ smIndiceArray<T>::copy( smIndiceArray &p_array )
 {
     if ( maxStorage < p_array.maxStorage )
     {
-        for ( smInt j = 0; j < maxStorage; j++ )
+        for ( int j = 0; j < maxStorage; j++ )
         {
             isEmpty[j] = true;
         }
 
-        for ( smInt i = 0; i < p_array.nbrElements; i++ )
+        for ( int i = 0; i < p_array.nbrElements; i++ )
         {
             storage[indices[i]] = p_array.storage[p_array.indices[i]];
             indices[i] = p_array.indices[i];
@@ -277,7 +277,7 @@ std::ostream &operator<<( std::ostream &out, smHashIterator< T > &p )
 template<typename T>
 void smHash<T>::moveEntriesInBucket( smEntryList< T > &p_Bucket, int p_entryIndex )
 {
-    for ( unsigned smInt i = p_entryIndex; i < p_Bucket.totalEntries - 1; i++ )
+    for ( unsigned int i = p_entryIndex; i < p_Bucket.totalEntries - 1; i++ )
     {
         p_Bucket.ID[i] = p_Bucket.ID[i + 1];
     }
@@ -287,7 +287,7 @@ void smHash<T>::moveEntriesInBucket( smEntryList< T > &p_Bucket, int p_entryInde
 template<typename T>
 bool smHash<T>::checkIdentical( smEntryList< T > &p_entry, T p_prim )
 {
-    for ( unsigned smInt i = 0; i < p_entry.totalEntries; i++ )
+    for ( unsigned int i = 0; i < p_entry.totalEntries; i++ )
     {
         if ( p_entry.ID[i] == p_prim )
         {
@@ -309,7 +309,7 @@ bool smHash<T>::findandUpdateEntry( smEntryList< T > &p_startEntry, T &p_prim )
             return false;
         }
 
-        for ( smInt i = 0; i < currentBucket->totalEntries; i++ )
+        for ( int i = 0; i < currentBucket->totalEntries; i++ )
         {
             if ( currentBucket->ID[i] == p_prim )
             {
@@ -569,7 +569,7 @@ void smHash<T>::printContent()
 template<typename T>
 void smHash<T>::clearAll()
 {
-    for ( smInt i = 0; i < tableSize; i++ )
+    for ( int i = 0; i < tableSize; i++ )
     {
         clearBuckets( primitiveIDs[i] );
     }

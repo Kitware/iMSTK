@@ -65,7 +65,7 @@ public:
     typedef std::shared_ptr<smRenderDetail> Ptr;
 
     smRenderDetail();
-    smRenderDetail(smUInt type);
+    smRenderDetail(unsigned int type);
 
     void reset();
 
@@ -81,13 +81,13 @@ public:
 
     const smColor &getColorSpecular() const;
 
-    const smFloat &getShininess() const;
+    const float &getShininess() const;
 
-    const smUInt &getRenderType() const;
+    const unsigned int &getRenderType() const;
 
-    const smFloat &getPointSize() const;
+    const float &getPointSize() const;
 
-    const smFloat &getLineSize() const;
+    const float &getLineSize() const;
 
     const smColor &getNormalColor() const;
 
@@ -97,21 +97,21 @@ public:
 
     const smColor &getShadowColor() const;
 
-    const smBool &getCastShadow() const;
+    const bool &getCastShadow() const;
 
-    const smBool &getCanGetShadow() const;
+    const bool &getCanGetShadow() const;
 
     const smColor &getWireFrameColor() const;
 
-    const smBool &getDebugDraw() const;
+    const bool &getDebugDraw() const;
 
     const std::vector<std::shared_ptr<smUnifiedId>> &getShaders() const;
 
-    const std::vector<smBool> &getShaderEnable() const;
+    const std::vector<bool> &getShaderEnable() const;
 
     const std::vector<std::shared_ptr<smUnifiedId>> &getVAOs() const;
 
-    const std::vector<smBool> &getVAOEnable() const;
+    const std::vector<bool> &getVAOEnable() const;
 
     void setPointSize(const float size);
 
@@ -123,9 +123,9 @@ public:
 
     void setNormalColor(const smColor highlightColor);
 
-    void setShininess(const smFloat s);
+    void setShininess(const float s);
 
-    void setNormalLength(const smFloat len);
+    void setNormalLength(const float len);
 
     void setDiffuseColor(const smColor diffColor);
 
@@ -138,26 +138,26 @@ public:
     void setWireframeColor(const smColor wireColor);
 
 public:
-    smUInt renderType; // render type
+    unsigned int renderType; // render type
     smColor colorDiffuse; // diffuse color
     smColor colorAmbient; // ambient color
     smColor colorSpecular; // specular color
     smColor highLightColor; // highlight color
     smColor vertexRenderColor; // vertex color
     smColor shadowColor; // shadow color
-    smBool castShadow; // object can generate a shadow or not
-    smBool canGetShadow; // object can get the shadow or not
+    bool castShadow; // object can generate a shadow or not
+    bool canGetShadow; // object can get the shadow or not
     smColor normalColor; // normal color
     smColor wireFrameColor; // wire frame color
-    smFloat pointSize; // point size if rendering of vertices are enabled
-    smFloat lineSize; // line width size
-    smFloat shininess; // specular shinness
-    smBool debugDraw; // debug draw enabled or not
-    smFloat normalLength; // length of rendered normals
+    float pointSize; // point size if rendering of vertices are enabled
+    float lineSize; // line width size
+    float shininess; // specular shinness
+    bool debugDraw; // debug draw enabled or not
+    float normalLength; // length of rendered normals
     std::vector<std::shared_ptr<smUnifiedId>> shaders; // attached shaders
-    std::vector<smBool> shaderEnable; // enable/disable any attached shader
+    std::vector<bool> shaderEnable; // enable/disable any attached shader
     std::vector<std::shared_ptr<smUnifiedId>> VAOs; // stores  VAO IDs
-    std::vector<smBool> VAOEnable; // enable/disable any attached VAO
+    std::vector<bool> VAOEnable; // enable/disable any attached VAO
 };
 
 #endif // SMRENDERDETAIL_H

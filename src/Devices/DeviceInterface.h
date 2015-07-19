@@ -61,19 +61,19 @@ public:
     }
 
     /// \brief write data (for ADU interface device)
-    virtual int write(void */*Interfacehandle*/, smInt /*port*/, void */*data*/)
+    virtual int write(void */*Interfacehandle*/, int /*port*/, void */*data*/)
     {
         return  SIMMEDTK_MSG_UNKNOWN;
     };
 
     /// \brief read data (for ADU interface device)
-    virtual int read(void */*Interfacehandle*/, smInt /*port*/, void */*data*/)
+    virtual int read(void */*Interfacehandle*/, int /*port*/, void */*data*/)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     } ;
 
 protected :
-    smBool driverInstalled; ///< true if device driver is installed
+    bool driverInstalled; ///< true if device driver is installed
 };
 
 #endif

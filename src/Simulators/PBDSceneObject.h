@@ -50,26 +50,26 @@ public:
     void findFixedMass();
 
 public:
-    smFloat dT; ///< size of time step
-    smFloat paraK; ///< !!
-    smFloat Damp; ///< damping values
-    smInt nbrMass; ///< number of masses
-    smInt **massIdx; ///< !!
+    float dT; ///< size of time step
+    float paraK; ///< !!
+    float Damp; ///< damping values
+    int nbrMass; ///< number of masses
+    int **massIdx; ///< !!
     smStdVector3d P; ///< !! position
     smStdVector3d V; ///< !! velocity
     smStdVector3d exF; ///< external force
-    smInt nbrSpr; ///< !! number of spheres
-    smFloat *L0; ///< !! Initial length
-    smBool *fixedMass; ///< true if masses are fixed
-    smInt nbrFixedMass; ///< number of fixed masses
-    smInt *listFixedMass; ///< list of IDs of masses that are fixed
+    int nbrSpr; ///< !! number of spheres
+    float *L0; ///< !! Initial length
+    bool *fixedMass; ///< true if masses are fixed
+    int nbrFixedMass; ///< number of fixed masses
+    int *listFixedMass; ///< list of IDs of masses that are fixed
 
     smVec3d ball_pos; ///< !! position of ball
     smVec3d ball_vel; ///< !! velocity of ball
     smVec3d ball_frc; ///< !!
 
-    smFloat ball_mass; ///< !! mass of ball
-    smFloat ball_rad; ///< !! radius of ball
+    float ball_mass; ///< !! mass of ball
+    float ball_rad; ///< !! radius of ball
 };
 
 /// \brief Position based dynamics (PBD) object for surface mesh (eg. cloth)
@@ -99,7 +99,7 @@ public:
     ~smPBDSurfaceSceneObject();
 
     /// \brief find the masses that will be fixed based on the spheres
-    void findFixedMassWrtSphere(smVec3d p_center, smFloat pos);
+    void findFixedMassWrtSphere(smVec3d p_center, float pos);
 
     /// \brief find fixed corners
     void findFixedCorners();
@@ -108,9 +108,9 @@ public:
     friend class smPBDSurfaceRenderDetail;
 
     smSurfaceMesh *mesh; ///< surface mesh
-    smInt nbrTri; ///< number of surface triangles
-    smInt **triVertIdx; ///< !!
-    smInt **sprInTris; ///< triangles that include a spring
+    int nbrTri; ///< number of surface triangles
+    int **triVertIdx; ///< !!
+    int **sprInTris; ///< triangles that include a spring
 };
 
 #endif

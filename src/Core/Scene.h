@@ -49,19 +49,19 @@ struct smSceneLocal
 {
 
 public:
-    smInt id;
+    int id;
     smSceneLocal()
     {
         sceneUpdatedTimeStamp = 0;
     }
 
-    smBool operator ==(smSceneLocal &p_param)
+    bool operator ==(smSceneLocal &p_param)
     {
         return id == p_param.id;
     }
 
     std::vector<std::shared_ptr<smSceneObject>> sceneObjects;
-    smUInt sceneUpdatedTimeStamp;
+    unsigned int sceneUpdatedTimeStamp;
 };
 
 ///Physics class should have all parameters such as material properties, mesh etc.. for
@@ -122,14 +122,14 @@ public:
     void placeLights();
 
     /// \brief addlight
-    smInt addLight(std::shared_ptr<smLight> p_light);
+    int addLight(std::shared_ptr<smLight> p_light);
 
     /// \brief refresh lights. updates light  position based on the gl matrix
     void refreshLights();
 
-    void setLightPos(smInt p_lightId, smLightPos p_pos);
+    void setLightPos(int p_lightId, smLightPos p_pos);
 
-    void setLightPos(smInt p_lightId, smLightPos p_pos, smVec3d p_direction);
+    void setLightPos(int p_lightId, smLightPos p_pos, smVec3d p_direction);
 
     std::shared_ptr<smCamera> getCamera()
     {
@@ -150,7 +150,7 @@ private:
     std::vector<std::shared_ptr<smSceneObject>> sceneObjects;   // scene objects storage
     std::shared_ptr<smErrorLog> log;                            // error logging
     std::mutex sceneLock;                                       // scene list lock for thread safe manipulation of the scene
-    smUInt sceneUpdatedTimeStamp;                               // last updated time stamp
+    unsigned int sceneUpdatedTimeStamp;                               // last updated time stamp
 };
 
 #endif

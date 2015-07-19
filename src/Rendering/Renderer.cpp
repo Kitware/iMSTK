@@ -92,26 +92,26 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
         glEnableClientState(GL_COLOR_ARRAY);
     }
 
-    glVertexPointer(3, smGLRealType, 0, p_lineMesh->vertices.data());
+    glVertexPointer(3, GL_FLOAT, 0, p_lineMesh->vertices.data());
 
     if (renderType & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_lineMesh->isMeshTextured())
         {
-            glTexCoordPointer(2, smGLRealType, 0, p_lineMesh->texCoord);
+            glTexCoordPointer(2, GL_FLOAT, 0, p_lineMesh->texCoord);
         }
     }
 
     if (renderType & SIMMEDTK_RENDER_FACES)
     {
-        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, smGLUIntType, p_lineMesh->edges);
+        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, GL_UNSIGNED_INT, p_lineMesh->edges);
     }
 
     if ((renderType & (SIMMEDTK_RENDER_VERTICES)))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
-        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, smGLUIntType, p_lineMesh->edges);
+        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, GL_UNSIGNED_INT, p_lineMesh->edges);
         glEnable(GL_LIGHTING);
         //default rendering
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -122,7 +122,7 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glPolygonOffset(3.0, 2.0);
         glDisable(GL_LIGHTING);
-        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, smGLUIntType, p_lineMesh->edges);
+        glDrawElements(GL_LINES, p_lineMesh->nbrEdges * 2, GL_UNSIGNED_INT, p_lineMesh->edges);
         glEnable(GL_LIGHTING);
         //default rendering
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -211,7 +211,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
         if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, smGLRealType, 0, p_surfaceMesh->texCoord);
+            glTexCoordPointer(2, GL_FLOAT, 0, p_surfaceMesh->texCoord);
 
             for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
             {
@@ -228,7 +228,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))
@@ -236,7 +236,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
         glColor3fv(renderDetail->getVertexColor().toGLColor());
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
 
         glEnable(GL_LIGHTING);
         //default rendering
@@ -252,7 +252,7 @@ void smGLRenderer::drawSurfaceMeshTriangles(
         glDisable(GL_TEXTURE_2D);
         glColor4fv(renderDetail->getWireFrameColor().toGLColor());
 
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, smGLUIntType, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
 
         glEnable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
@@ -301,24 +301,24 @@ void smGLRenderer::drawSurfaceMeshTriangles(
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color, smFloat length)
+void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color, float length)
 {
 
     glDisable(GL_LIGHTING);
-    glColor3fv(reinterpret_cast<smGLReal*>(&p_color));
+    glColor3fv(reinterpret_cast<GLfloat*>(&p_color));
     smVec3d baryCenter;
     smVec3d tmp;
 
     glBegin(GL_LINES);
 
-    for (smInt i = 0; i < p_mesh->nbrVertices; i++)
+    for (int i = 0; i < p_mesh->nbrVertices; i++)
     {
         glVertex3dv(p_mesh->vertices[i].data());
         tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 
-    for (smInt i = 0; i < p_mesh->nbrTriangles; i++)
+    for (int i = 0; i < p_mesh->nbrTriangles; i++)
     {
         baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
         baryCenter = baryCenter / 3.0;
@@ -513,7 +513,7 @@ void smGLRenderer::drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::draw(smPlane &p_plane, smFloat p_scale, smColor p_color)
+void smGLRenderer::draw(smPlane &p_plane, float p_scale, smColor p_color)
 {
 
     double angle;

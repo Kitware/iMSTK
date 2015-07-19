@@ -43,13 +43,13 @@ private:
 
 protected:
     ///initialization flag
-    smBool isInitialized;
+    bool isInitialized;
 
     ///execution termination..if it is true exit from the thread
-    smBool terminateExecution;
+    bool terminateExecution;
 
     ///When the terminatation is done by the module, this will be true
-    smBool terminationCompleted;
+    bool terminationCompleted;
 
     ///scene list in the environment
     std::vector<std::shared_ptr<smScene>> sceneList;
@@ -72,13 +72,13 @@ public:
     void terminate();
 
     /// \brief  to check if the termination of the module is completed
-    smBool isTerminationDone();
+    bool isTerminationDone();
 
     /// \brief  wait for termination
     void waitTermination();
 
     /// \brief  get module id
-    smInt getModuleId();
+    int getModuleId();
 
 };
 

@@ -44,7 +44,7 @@ void smDummySimulator::initCustom()
 
         switch ( object->getType() )
         {
-            case SIMMEDTK_SMSTATICSCENEOBJECT:
+            case core::ClassType::StaticSceneObject:
             {
                 auto staticObject = std::static_pointer_cast<smStaticSceneObject>(object);
                 auto model = std::static_pointer_cast<smMeshCollisionModel>(staticObject->getModel());
@@ -75,7 +75,7 @@ void smDummySimulator::run()
         auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
+        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
             auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
             auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
@@ -85,7 +85,7 @@ void smDummySimulator::run()
             }
             std::shared_ptr<smMesh> mesh = model->getMesh();
 
-            for ( smInt vertIndex = 0; vertIndex < mesh->nbrVertices; vertIndex++ )
+            for ( int vertIndex = 0; vertIndex < mesh->nbrVertices; vertIndex++ )
             {
                 staticSceneObject->getLocalVertices()[vertIndex][1] = staticSceneObject->getLocalVertices()[vertIndex][1] + 0.000001;
             }
@@ -105,7 +105,7 @@ void smDummySimulator::syncBuffers()
         auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == SIMMEDTK_SMSTATICSCENEOBJECT )
+        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
             auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
             auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
@@ -119,19 +119,19 @@ void smDummySimulator::syncBuffers()
         }
     }
 }
-void smDummySimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
+void smDummySimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::F1:
+            case mstk::Event::smKey::F1:
             {
                 std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
                 break;

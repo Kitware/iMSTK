@@ -26,13 +26,13 @@
 #include "EventHandler.h"
 #include "RenderDelegate.h"
 
-std::shared_ptr<smtk::Event::smEventHandler>
-smCoreClass::eventHandler = std::make_shared<smtk::Event::smEventHandler>();
+std::shared_ptr<mstk::Event::smEventHandler>
+smCoreClass::eventHandler = std::make_shared<mstk::Event::smEventHandler>();
 
 smCoreClass::smCoreClass() :
     name(""), listening(false)
 {
-    drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
+    drawOrder = core::ClassDrawOrder::BeforeObjects;
     uniqueId = std::make_shared<smUnifiedId>();
     renderDetail = std::make_shared<smRenderDetail>();
 }
@@ -40,17 +40,17 @@ smCoreClass::smCoreClass() :
 smCoreClass::smCoreClass(const std::string &_name) :
     name(_name), listening(false)
 {
-    drawOrder = SIMMEDTK_DRAW_BEFOREOBJECTS;
+    drawOrder = core::ClassDrawOrder::BeforeObjects;
     uniqueId = std::make_shared<smUnifiedId>();
     renderDetail = std::make_shared<smRenderDetail>();
 }
 
-const smClassType &smCoreClass::getType() const
+const core::ClassType &smCoreClass::getType() const
 {
     return type;
 }
 
-void smCoreClass::setType(const smClassType& newType)
+void smCoreClass::setType(const core::ClassType& newType)
 {
     this->type = newType;
 }
@@ -70,12 +70,12 @@ void smCoreClass::print() const
     std::cout << "Default print" << std::endl;
 }
 
-void smCoreClass::handleEvent(std::shared_ptr< smtk::Event::smEvent > event)
+void smCoreClass::handleEvent(std::shared_ptr< mstk::Event::smEvent > event)
 {
     std::cout << "Default handleEvent" << std::endl;
     std::cout << "Sender " << int(event->getSender()) << std::endl;
     std::cout << "Priority " << int(event->getPriority()) << std::endl;
-    std::cout << "Type " << int(smtk::Event::smEvent::EventName) << std::endl;
+    std::cout << "Type " << int(mstk::Event::smEvent::EventName) << std::endl;
 }
 
 void smCoreClass::setName( const std::string &p_objectName )

@@ -92,11 +92,11 @@ smAABB &smAABB::operator*( const double p_scale )
 
 void smAABB::subDivide( const double p_length, const int p_divison, smAABB *p_aabb ) const
 {
-    smInt index = 0;
+    int index = 0;
 
-    for ( smInt ix = 0; ix < p_divison; ix++ )
-        for ( smInt iy = 0; iy < p_divison; iy++ )
-            for ( smInt iz = 0; iz < p_divison; iz++ )
+    for ( int ix = 0; ix < p_divison; ix++ )
+        for ( int iy = 0; iy < p_divison; iy++ )
+            for ( int iz = 0; iz < p_divison; iz++ )
             {
                 p_aabb[index].aabbMin[0] = this->aabbMin[0] + p_length * ix;
                 p_aabb[index].aabbMin[1] = this->aabbMin[1] + p_length * iy;
@@ -118,11 +118,11 @@ void smAABB::subDivide( const int p_divisionX, const int p_divisionY, const int 
     stepX = ( this->aabbMax[0] - this->aabbMin[0] ) / p_divisionX;
     stepY = ( this->aabbMax[1] - this->aabbMin[1] ) / p_divisionY;
     stepZ = ( this->aabbMax[2] - this->aabbMin[2] ) / p_divisionZ;
-    smInt index = 0;
+    int index = 0;
 
-    for ( smInt ix = 0; ix < p_divisionX; ix++ )
-        for ( smInt iy = 0; iy < p_divisionY; iy++ )
-            for ( smInt iz = 0; iz < p_divisionZ; iz++ )
+    for ( int ix = 0; ix < p_divisionX; ix++ )
+        for ( int iy = 0; iy < p_divisionY; iy++ )
+            for ( int iz = 0; iz < p_divisionZ; iz++ )
             {
 
                 p_aabb[index].aabbMin[0] = this->aabbMin[0] + stepX * ix;
@@ -172,14 +172,14 @@ void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
 {
     smVec3d minPoint;
     double divLength = ( sideLength / p_divisionPerAxis );
-    smInt index = 0;
+    int index = 0;
     minPoint << center[0] - sideLength * 0.5,
              center[1] - sideLength * 0.5,
              center[2] - sideLength * 0.5;
 
-    for ( smInt ix = 0; ix < p_divisionPerAxis; ix++ )
-        for ( smInt iy = 0; iy < p_divisionPerAxis; iy++ )
-            for ( smInt iz = 0; iz < p_divisionPerAxis; iz++ )
+    for ( int ix = 0; ix < p_divisionPerAxis; ix++ )
+        for ( int iy = 0; iy < p_divisionPerAxis; iy++ )
+            for ( int iz = 0; iz < p_divisionPerAxis; iz++ )
             {
                 p_cube[index].center[0] = minPoint[0] + divLength * ix + divLength * 0.5;
                 p_cube[index].center[1] = minPoint[1] + divLength * iy + divLength * 0.5;

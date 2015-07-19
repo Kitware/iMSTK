@@ -65,10 +65,10 @@ smSurfaceMesh::~smSurfaceMesh()
 }
 
 /// \brief loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMesh(const smString& fileName, const smMeshFileType &fileType)
+bool smSurfaceMesh::loadMesh(const std::string& fileName, const smMeshFileType &fileType)
 {
 
-    smBool ret = true;
+    bool ret = true;
 
     switch (fileType)
     {
@@ -114,10 +114,10 @@ smBool smSurfaceMesh::loadMesh(const smString& fileName, const smMeshFileType &f
 
 /// \brief --Deprecated, use loadMesh() for new simulators--
 /// Loads the mesh based on the file type and initializes the normals
-smBool smSurfaceMesh::loadMeshLegacy(const smString& fileName, const smMeshFileType &fileType)
+bool smSurfaceMesh::loadMeshLegacy(const std::string& fileName, const smMeshFileType &fileType)
 {
 
-    smBool ret = true;
+    bool ret = true;
 
     switch (fileType)
     {
@@ -165,7 +165,7 @@ smBool smSurfaceMesh::loadMeshLegacy(const smString& fileName, const smMeshFileT
 }
 
 /// \brief
-smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
+bool smSurfaceMesh::LoadMeshAssimp(const std::string& fileName)
 {
 
     //Tell Assimp to not import any of the following from the mesh it loads
@@ -188,7 +188,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
     {
         if (log_SF != NULL)
         {
-            log_SF->addError("Error: Error loading mesh: " + smString(fileName));
+            log_SF->addError("Error: Error loading mesh: " + std::string(fileName));
         }
 
         return false;
@@ -234,7 +234,7 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
         }
 
         //Extract the texture data
-        for (smUInt i = 0; i < mesh->mNumVertices; i++)
+        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             this->texCoord[i].u = mesh->mTextureCoords[0][i][0];
             this->texCoord[i].v = mesh->mTextureCoords[0][i][1];
@@ -264,16 +264,16 @@ smBool smSurfaceMesh::LoadMeshAssimp(const smString& fileName)
 }
 
 /// \brief reads the mesh file in .3ds format
-smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
+bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
 {
 
-    smInt i; //Index variable
+    int i; //Index variable
     FILE *l_file; //File pointer
-    smUShort l_chunk_id; //Chunk identifier
-    smUInt l_chunk_lenght; //Chunk lenght
-    smUShort l_qty; //Number of elements in each chunk
-    smUShort temp;
-    smChar l_char;
+    unsigned short l_chunk_id; //Chunk identifier
+    unsigned int l_chunk_lenght; //Chunk lenght
+    unsigned short l_qty; //Number of elements in each chunk
+    unsigned short temp;
+    char l_char;
 
     if ((l_file = fopen(fileName.c_str(), "rb")) == NULL) //Open the file
     {
@@ -338,7 +338,7 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
         // Convert float to current real for precision
         //-------------------------------------------
         case 0x4110:
-            fread(&l_qty, sizeof(smUShort), 1, l_file);
+            fread(&l_qty, sizeof(unsigned short), 1, l_file);
             this->nbrVertices = l_qty;
             this->vertices.reserve(l_qty);
             this->origVerts.reserve(l_qty);
@@ -346,10 +346,10 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
             this->vertTangents = new smVec3d[l_qty];
             this->texCoord = new smTexCoord[l_qty];
 
-            for (smInt fpt = 0; fpt < this->nbrVertices; fpt++)
+            for (int fpt = 0; fpt < this->nbrVertices; fpt++)
             {
-                smFloat fTemp[3];
-                fread(fTemp, sizeof(smFloat), 3, l_file);
+                float fTemp[3];
+                fread(fTemp, sizeof(float), 3, l_file);
                 this->vertices.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
             }
 
@@ -363,7 +363,7 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
         //             + sub chunks
         //-------------------------------------------
         case 0x4120:
-            fread(&l_qty, sizeof(smUShort), 1, l_file);
+            fread(&l_qty, sizeof(unsigned short), 1, l_file);
             this->nbrTriangles = l_qty;
             this->triangles = new smTriangle[l_qty];
             this->triNormals = new smVec3d[l_qty];
@@ -371,15 +371,15 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
 
             for (i = 0; i < l_qty; i++)
             {
-                fread(&temp, sizeof(smUShort), 1, l_file);
+                fread(&temp, sizeof(unsigned short), 1, l_file);
                 this->triangles[i].vert[0] = temp;
 
-                fread(&temp, sizeof(smUShort), 1, l_file);
+                fread(&temp, sizeof(unsigned short), 1, l_file);
                 this->triangles[i].vert[1] = temp;
 
-                fread(&temp, sizeof(smUShort), 1, l_file);
+                fread(&temp, sizeof(unsigned short), 1, l_file);
                 this->triangles[i].vert[2] = temp;
-                fread(&temp, sizeof(smUShort), 1, l_file);
+                fread(&temp, sizeof(unsigned short), 1, l_file);
             }
 
             break;
@@ -392,12 +392,12 @@ smBool smSurfaceMesh::Load3dsMesh(const smString& fileName)
         //             + sub chunks
         //-------------------------------------------
         case 0x4140:
-            fread(&l_qty, sizeof(smUShort), 1, l_file);
+            fread(&l_qty, sizeof(unsigned short), 1, l_file);
 
-            for (smInt tpt = 0; tpt < l_qty; tpt++)
+            for (int tpt = 0; tpt < l_qty; tpt++)
             {
-                smFloat fTemp[2];
-                fread(fTemp, sizeof(smFloat), 2, l_file);
+                float fTemp[2];
+                fread(fTemp, sizeof(float), 2, l_file);
                 this->texCoord[tpt].u = fTemp[0];
                 this->texCoord[tpt].v = fTemp[1];
             }

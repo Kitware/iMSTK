@@ -57,22 +57,22 @@ public:
     /// \brief add object for rendering
     void addObject(std::shared_ptr<smCoreClass> object);
     /// \brief add text for display
-    virtual void addText(smString p_tag) override;
+    virtual void addText(std::string p_tag) override;
     /// \brief update text
-    virtual void updateText(smString p_tag, smString p_string) override;
-    virtual void updateText(smInt p_handle, smString p_string) override;
+    virtual void updateText(std::string p_tag, std::string p_string) override;
+    virtual void updateText(int p_handle, std::string p_string) override;
     /// \brief set scene as texture
     void setSceneAsTextureShader(std::shared_ptr<smSceneTextureShader> p_shader);
     /// \brief set the window title
-    void setWindowTitle(const smString &str);
+    void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
-    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const smString &p_fboName);
-    virtual void addFBO(const smString &p_fboName,
+    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
+    virtual void addFBO(const std::string &p_fboName,
                 smTexture *p_colorTex, smTexture *p_depthTex,
-                smUInt p_width, smUInt p_height);
+                unsigned int p_width, unsigned int p_height);
 
-    smString windowTitle;
+    std::string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;
@@ -98,7 +98,7 @@ protected:
     virtual void endFrame() override;
     virtual void renderTextureOnView() override;
     /// \brief  event handler
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
     /// \brief processes an SFML event
     void processSFMLEvents(const sf::Event& p_event);
 };

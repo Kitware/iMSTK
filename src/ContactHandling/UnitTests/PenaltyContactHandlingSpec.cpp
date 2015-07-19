@@ -84,8 +84,8 @@ go_bandit([]() {
             handler->setSceneObjects(plane,fem);
             AssertThat(handler->getFirstSceneObject() == plane, IsTrue());
             AssertThat(handler->getSecondSceneObject() == fem, IsTrue());
-            AssertThat(handler->getFirstSceneObject()->getType() == SIMMEDTK_SMSTATICSCENEOBJECT, IsTrue());
-            AssertThat(handler->getSecondSceneObject()->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT, IsTrue());
+            AssertThat(handler->getFirstSceneObject()->getType() == core::ClassType::StaticSceneObject, IsTrue());
+            AssertThat(handler->getSecondSceneObject()->getType() == core::ClassType::VegaFemSceneObject, IsTrue());
         });
 
         it("computes contact force ", []() {

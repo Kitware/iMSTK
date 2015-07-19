@@ -26,10 +26,10 @@
 
 #include "Core/Config.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
-enum class smModKey : smUInt
+enum class smModKey : unsigned int
 {
     none = 0,
     control = 1,
@@ -40,12 +40,12 @@ enum class smModKey : smUInt
 
 inline smModKey operator|(smModKey a, smModKey b)
 {
-    return static_cast<smModKey>(static_cast<smUInt>(a) | static_cast<smUInt>(b));
+    return static_cast<smModKey>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
 }
 
 inline smModKey operator&(smModKey a, smModKey b)
 {
-    return static_cast<smModKey>(static_cast<smUInt>(a) & static_cast<smUInt>(b));
+    return static_cast<smModKey>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
 }
 
 inline smModKey& operator |=(smModKey& a, smModKey b)
@@ -167,6 +167,6 @@ enum class smKey
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif

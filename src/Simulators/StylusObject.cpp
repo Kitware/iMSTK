@@ -30,7 +30,7 @@
 
 smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/) : smSceneObject()
 {
-    type = SIMMEDTK_SMSTYLUSSCENEOBJECT;
+    type = core::ClassType::StylusSceneObject;
     toolEnabled = true;
     this->setRenderDelegate(
       smFactory<smRenderDelegate>::createConcreteClass(
@@ -39,7 +39,7 @@ smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/) :
 
 smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
 {
-    type = SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT;
+    type = core::ClassType::StylusRigidSceneObject;
     updateViewerMatrixEnabled = true;
     rootIterator = meshes.begin();
     posCallBackEnabledForEntireObject = false;
@@ -50,10 +50,10 @@ smStylusDeformableSceneObject::smStylusDeformableSceneObject(
                                             std::shared_ptr<smErrorLog>/*p_log*/)
                                             : smStylusSceneObject()
 {
-    type = SIMMEDTK_SMSTYLUSDEFORMABLESCENEOBJECT;
+    type = core::ClassType::StylusSeformableSceneObject;
 }
 
-smMeshContainer *smStylusRigidSceneObject::getMeshContainer(smString p_string) const
+smMeshContainer *smStylusRigidSceneObject::getMeshContainer(std::string p_string) const
 {
     tree<smMeshContainer*>::iterator iter = meshes.begin_leaf();
 
@@ -128,7 +128,7 @@ void smStylusSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 }
 
-void smStylusSceneObject::handleEvent(std::shared_ptr<smtk::Event::smEvent>/*p_event*/ ) {}
+void smStylusSceneObject::handleEvent(std::shared_ptr<mstk::Event::smEvent>/*p_event*/ ) {}
 void smStylusRigidSceneObject::posTraverseCallBack()
 {
 }
@@ -179,7 +179,7 @@ tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( 
     return meshes.insert( p_iterator, p_meshContainer );
 }
 
-void smStylusRigidSceneObject::handleEvent(std::shared_ptr<smtk::Event::smEvent>/*p_event*/ ) {}
+void smStylusRigidSceneObject::handleEvent(std::shared_ptr<mstk::Event::smEvent>/*p_event*/ ) {}
 
 std::shared_ptr<smSceneObject> smStylusRigidSceneObject::clone()
 {

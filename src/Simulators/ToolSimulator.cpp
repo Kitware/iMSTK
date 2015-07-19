@@ -99,7 +99,7 @@ void smToolSimulator::run()
             auto sceneObj = this->objectsSimulated[i];
 
             //ensure that dummy simulator will work on static scene objects only.
-            if ( sceneObj->getType() == SIMMEDTK_SMSTYLUSRIGIDSCENEOBJECT )
+            if ( sceneObj->getType() == core::ClassType::StylusRigidSceneObject )
             {
                 auto tool = std::static_pointer_cast<smStylusRigidSceneObject>(sceneObj);
 
@@ -118,19 +118,19 @@ void smToolSimulator::syncBuffers()
 {
 }
 
-void smToolSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
+void smToolSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::F1:
+            case mstk::Event::smKey::F1:
             {
                 std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
             }

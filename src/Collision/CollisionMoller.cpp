@@ -28,7 +28,7 @@
 #include "External/moller.h"
 #include "External/moller2.h"
 
-smBool smCollisionMoller::tri2tri( smVec3d &tri1Point1,
+bool smCollisionMoller::tri2tri( smVec3d &tri1Point1,
                                    smVec3d &tri1Point2,
                                    smVec3d &tri1Point3,
                                    smVec3d &tri2Point1,
@@ -66,17 +66,17 @@ smBool smCollisionMoller::tri2tri( smVec3d &tri1Point1,
     return false;
 }
 
-smBool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1,
+bool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1,
                                    smVec3d &p_tri1Point2,
                                    smVec3d &p_tri1Point3,
                                    smVec3d &p_tri2Point1,
                                    smVec3d &p_tri2Point2,
                                    smVec3d &p_tri2Point3,
-                                   smInt &coplanar,
+                                   int &coplanar,
                                    smVec3d &p_intersectionPoint1,
                                    smVec3d &p_intersectionPoint2,
-                                   smShort &p_tri1SinglePointIndex,
-                                   smShort &p_tri2SinglePointIndex,
+                                   short &p_tri1SinglePointIndex,
+                                   short &p_tri2SinglePointIndex,
                                    smVec3d &p_projPoint1,
                                    smVec3d &p_projPoint2 )
 {
@@ -101,7 +101,7 @@ smBool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1,
     return false;
 }
 
-smBool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_tri2Point1, smVec3d &p_tri2Point2, smVec3d &p_tri2Point3 )
+bool smCollisionMoller::tri2tri( smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_tri2Point1, smVec3d &p_tri2Point2, smVec3d &p_tri2Point3 )
 {
     return ( tri_tri_intersect( p_tri1Point1.data(), p_tri1Point2.data(),
                                 p_tri1Point3.data(), p_tri2Point1.data(),
@@ -122,13 +122,13 @@ bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smAABB &aabbB, smAA
     }
     else
     {
-        result.aabbMin[0] = SIMMEDTK_MAX( aabbA.aabbMin[0], aabbB.aabbMin[0] );
-        result.aabbMin[1] = SIMMEDTK_MAX( aabbA.aabbMin[1], aabbB.aabbMin[1] );
-        result.aabbMin[2] = SIMMEDTK_MAX( aabbA.aabbMin[2], aabbB.aabbMin[2] );
+        result.aabbMin[0] = std::max( aabbA.aabbMin[0], aabbB.aabbMin[0] );
+        result.aabbMin[1] = std::max( aabbA.aabbMin[1], aabbB.aabbMin[1] );
+        result.aabbMin[2] = std::max( aabbA.aabbMin[2], aabbB.aabbMin[2] );
 
-        result.aabbMax[0] = SIMMEDTK_MIN( aabbA.aabbMax[0], aabbB.aabbMax[0] );
-        result.aabbMax[1] = SIMMEDTK_MIN( aabbA.aabbMax[1], aabbB.aabbMax[1] );
-        result.aabbMax[2] = SIMMEDTK_MIN( aabbA.aabbMax[2], aabbB.aabbMax[2] );
+        result.aabbMax[0] = std::min( aabbA.aabbMax[0], aabbB.aabbMax[0] );
+        result.aabbMax[1] = std::min( aabbA.aabbMax[1], aabbB.aabbMax[1] );
+        result.aabbMax[2] = std::min( aabbA.aabbMax[2], aabbB.aabbMax[2] );
         return true;
     }
 }
@@ -169,7 +169,7 @@ bool smCollisionMoller::checkOverlapAABBAABB( smAABB &aabbA, smVec3d &p_vertex )
     }
 }
 
-smBool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3d &p_v )
+bool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3d &p_v )
 {
     if ( p_v[0] >= p_aabb.aabbMin[0] &&
          p_v[1] >= p_aabb.aabbMin[1] &&
@@ -186,13 +186,13 @@ smBool smCollisionMoller::checkAABBPoint( const smAABB &p_aabb, const smVec3d &p
     }
 }
 
-smBool smCollisionMoller::checkLineTri( smVec3d &p_linePoint1, smVec3d &p_linePoint2, smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_interSection )
+bool smCollisionMoller::checkLineTri( smVec3d &p_linePoint1, smVec3d &p_linePoint2, smVec3d &p_tri1Point1, smVec3d &p_tri1Point2, smVec3d &p_tri1Point3, smVec3d &p_interSection )
 {
 
     //First find that ray intersect the polygon or not
-    smInt i1, i2;
+    int i1, i2;
     smVec3d U, V;
-    smDouble plane[4], P[3], u[3], v[3], alpha, beta;
+    double plane[4], P[3], u[3], v[3], alpha, beta;
 
     //Now find the Normal vector
     U = p_tri1Point2 - p_tri1Point1;
@@ -283,7 +283,7 @@ smBool smCollisionMoller::checkLineTri( smVec3d &p_linePoint1, smVec3d &p_linePo
     return false;
 }
 
-smBool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3 )
+bool smCollisionMoller::checkAABBTriangle( smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3 )
 {
 
     smVec3d boxhalfsize;

@@ -67,18 +67,18 @@ struct smRenderOperation
     smRenderOperation();
     std::shared_ptr<smScene> scene; ///< The scene full of objects to render
     smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
-    smString fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
+    std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
     smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
 };
 
 struct smFboListItem
 {
-    smString fboName; ///< String identification
+    std::string fboName; ///< String identification
     smFrameBuffer* fbo; ///< The FBO pointer
     smTexture *depthTex; ///< The FBO depth texture pointer
     smTexture *colorTex; ///< The FBO color texture pointer
-    smUInt width; ///< The width of the FBO
-    smUInt height; ///< The height of the FBO
+    unsigned int width; ///< The width of the FBO
+    unsigned int height; ///< The height of the FBO
 };
 
 /// \brief Handles all rendering routines.
@@ -89,10 +89,10 @@ protected:
     std::vector<smRenderOperation> renderOperations;
     std::vector<smFboListItem> fboListItems;
     std::shared_ptr<smErrorLog> log;
-    smInt unlimitedFPSVariableChanged;
-    smBool unlimitedFPSEnabled;
-    smInt screenResolutionWidth;
-    smInt screenResolutionHeight;
+    int unlimitedFPSVariableChanged;
+    bool unlimitedFPSEnabled;
+    int screenResolutionWidth;
+    int screenResolutionHeight;
     friend class smSDK;
 
 public:
@@ -100,18 +100,18 @@ public:
     smRenderingStageType renderStage;
 
     ///if the camera motion is enabled from other external devices
-    smBool enableCameraMotion;
+    bool enableCameraMotion;
 
     /// \brief Viewer settings
-    smUInt viewerRenderDetail;
+    unsigned int viewerRenderDetail;
 
-    smFloat globalAxisLength;
+    float globalAxisLength;
 
-    virtual smInt height(void);
-    virtual smInt width(void);
-    virtual smFloat aspectRatio(void);
+    virtual int height(void);
+    virtual int width(void);
+    virtual float aspectRatio(void);
     /// \brief disable vSync
-    virtual void setUnlimitedFPS(smBool p_enableFPS);
+    virtual void setUnlimitedFPS(bool p_enableFPS);
     /// \brief default constructor
     smViewerBase();
     /// \brief initialization for viewer
@@ -121,18 +121,18 @@ public:
     /// \brief add object for rendering
     virtual void addObject(std::shared_ptr<smCoreClass> object);
     /// \brief add text for display
-    virtual void addText(smString p_tag) = 0;
+    virtual void addText(std::string p_tag) = 0;
     /// \brief update text
-    virtual void updateText(smString p_tag, smString p_string) = 0;
-    virtual void updateText(smInt p_handle, smString p_string) = 0;
+    virtual void updateText(std::string p_tag, std::string p_string) = 0;
+    virtual void updateText(int p_handle, std::string p_string) = 0;
     /// \brief change window resolution
-    virtual void setScreenResolution(smInt p_width, smInt p_height);
+    virtual void setScreenResolution(int p_width, int p_height);
     /// \brief set the window title
-    virtual void setWindowTitle(const smString &str);
+    virtual void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) = 0;
     /// \brief Registers a scene for rendering with the viewer
-    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const smString &p_fboName);
+    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
     ///
     /// \detail The FBO will be created an initialized in the viewer.
@@ -143,12 +143,12 @@ public:
     /// \param p_width The width of the fbo
     /// \param p_height The height of the fbo
     virtual void addFBO(
-      const smString &p_fboName,
+      const std::string &p_fboName,
       smTexture *p_colorTex, smTexture *p_depthTex,
-      smUInt p_width, smUInt p_height);
+      unsigned int p_width, unsigned int p_height);
 
-    virtual void setGlobalAxisLength(const smFloat len);
-    smString windowTitle;
+    virtual void setGlobalAxisLength(const float len);
+    std::string windowTitle;
     smColor defaultDiffuseColor;
     smColor defaultAmbientColor;
     smColor defaultSpecularColor;

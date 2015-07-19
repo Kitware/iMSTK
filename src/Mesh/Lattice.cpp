@@ -70,8 +70,8 @@ smLattice::~smLattice()
 smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner, int p_xSeperation, int p_ySeperation, int p_zSeperation )
 {
 
-    smInt x, y, z;
-    smInt index;
+    int x, y, z;
+    int index;
 
     xSeperation = p_xSeperation;
     ySeperation = p_ySeperation;
@@ -82,7 +82,7 @@ smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner
     zStep = ( p_rightCorner[2] - p_leftCorner[2] ) / zSeperation;
     yStep = ( p_rightCorner[1] - p_leftCorner[1] ) / ySeperation;
     xStep = ( p_rightCorner[0] - p_leftCorner[0] ) / xSeperation;
-    smInt counter = 0;
+    int counter = 0;
 
     for ( y = 0; y < ySeperation; y++ )
         for ( z = 0; z < zSeperation; z++ )
@@ -112,7 +112,7 @@ smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner
                 cells[index].isActive = false;
                 cells[index].lastPrimitiveIndex = 0;
 
-                for ( smInt j = 0; j < SIMMEDTK_SPATIALGRID_MAXPRIMITIVES; j++ )
+                for ( int j = 0; j < SIMMEDTK_SPATIALGRID_MAXPRIMITIVES; j++ )
                 {
                     cells[index].cellPrimitives[j].index = 0;
                 }
@@ -146,13 +146,13 @@ void smLattice::isCellEmpty( int /*p_cellIndex*/ )
 void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
 {
 
-    smInt minX;
-    smInt minY;
-    smInt minZ;
-    smInt maxX;
-    smInt maxY;
-    smInt maxZ;
-    smInt index;
+    int minX;
+    int minY;
+    int minZ;
+    int maxX;
+    int maxY;
+    int maxZ;
+    int index;
     smVec3d leftCorner = getLeftMinCorner();
 
     minX = ( aabb[p_primitiveIndex].aabbMin[0] - leftCorner[0] ) / xStep;
@@ -163,9 +163,9 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
     maxY = ( aabb[p_primitiveIndex].aabbMax[1] - leftCorner[1] ) / yStep;
     maxZ = ( aabb[p_primitiveIndex].aabbMax[2] - leftCorner[2] ) / zStep;
 
-    for ( smInt yIndex = minY; yIndex <= maxY; yIndex++ )
-        for ( smInt xIndex = minX; xIndex <= maxX; xIndex++ )
-            for ( smInt zIndex = minZ; zIndex <= maxZ; zIndex++ )
+    for ( int yIndex = minY; yIndex <= maxY; yIndex++ )
+        for ( int xIndex = minX; xIndex <= maxX; xIndex++ )
+            for ( int zIndex = minZ; zIndex <= maxZ; zIndex++ )
             {
                 index = xIndex + zIndex * xSeperation + yIndex * xSeperation * zSeperation;
 
@@ -187,60 +187,60 @@ void smLattice::updateBounds( std::shared_ptr<smSurfaceMesh> p_mesh, int p_index
 {
 
     //min
-    aabb[p_index].aabbMin[0] =  SIMMEDTK_MIN( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][0],
+    aabb[p_index].aabbMin[0] =  std::min( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][0],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][0] );
-    aabb[p_index].aabbMin[0] = SIMMEDTK_MIN( aabb[p_index].aabbMin[0],
+    aabb[p_index].aabbMin[0] = std::min( aabb[p_index].aabbMin[0],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][0] );
 
-    aabb[p_index].aabbMin[1] =  SIMMEDTK_MIN( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][1],
+    aabb[p_index].aabbMin[1] =  std::min( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][1],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][1] );
-    aabb[p_index].aabbMin[1] = SIMMEDTK_MIN( aabb[p_index].aabbMin[1],
+    aabb[p_index].aabbMin[1] = std::min( aabb[p_index].aabbMin[1],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][1] );
 
-    aabb[p_index].aabbMin[2] =  SIMMEDTK_MIN( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][2],
+    aabb[p_index].aabbMin[2] =  std::min( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][2],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][2] );
-    aabb[p_index].aabbMin[2] = SIMMEDTK_MIN( aabb[p_index].aabbMin[2],
+    aabb[p_index].aabbMin[2] = std::min( aabb[p_index].aabbMin[2],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][2] );
 
     //max
-    aabb[p_index].aabbMax[0] =  SIMMEDTK_MAX( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][0],
+    aabb[p_index].aabbMax[0] =  std::max( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][0],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][0] );
-    aabb[p_index].aabbMax[0] = SIMMEDTK_MAX( aabb[p_index].aabbMax[0],
+    aabb[p_index].aabbMax[0] = std::max( aabb[p_index].aabbMax[0],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][0] );
 
-    aabb[p_index].aabbMax[1] =  SIMMEDTK_MAX( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][1],
+    aabb[p_index].aabbMax[1] =  std::max( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][1],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][1] );
-    aabb[p_index].aabbMax[1] = SIMMEDTK_MAX( aabb[p_index].aabbMax[1],
+    aabb[p_index].aabbMax[1] = std::max( aabb[p_index].aabbMax[1],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][1] );
 
-    aabb[p_index].aabbMax[2] =  SIMMEDTK_MAX( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][2],
+    aabb[p_index].aabbMax[2] =  std::max( p_mesh->vertices[p_mesh->triangles[p_index].vert[0]][2],
                                p_mesh->vertices[p_mesh->triangles[p_index].vert[1]][2] );
-    aabb[p_index].aabbMax[2] = SIMMEDTK_MAX( aabb[p_index].aabbMax[2],
+    aabb[p_index].aabbMax[2] = std::max( aabb[p_index].aabbMax[2],
                                             p_mesh->vertices[p_mesh->triangles[p_index].vert[2]][2] );
 }
 void smLattice::updateBounds()
 {
-    for ( smInt i = 0; i < mesh->nbrTriangles; i++ )
+    for ( int i = 0; i < mesh->nbrTriangles; i++ )
     {
         updateBounds( mesh, i );
     }
 }
 void smLattice::linkPrims()
 {
-    for ( smInt i = 0; i < mesh->nbrTriangles; i++ )
+    for ( int i = 0; i < mesh->nbrTriangles; i++ )
     {
         linkPrimitivetoCell( i );
     }
 }
 void smLattice::addObject( smSceneObject *obj )
 {
-    smClassType objectType;
+    core::ClassType objectType;
     linkedObject = obj->getObjectUnifiedID();
     objectType = obj->getType();
 
     switch ( objectType )
     {
-        case SIMMEDTK_SMSTATICSCENEOBJECT:
+        case core::ClassType::StaticSceneObject:
         {
             auto staticSceneObject = static_cast<smStaticSceneObject*>(obj);
             auto model = staticSceneObject->getModel();

@@ -75,7 +75,7 @@ class smCoreClass : public std::enable_shared_from_this<smCoreClass>
 public:
     using Pointer = std::shared_ptr<smCoreClass>;
 
-    static std::shared_ptr<smtk::Event::smEventHandler> eventHandler;
+    static std::shared_ptr<mstk::Event::smEventHandler> eventHandler;
 
 public:
     ///
@@ -91,12 +91,12 @@ public:
     ///
     /// \brief get type of the class
     ///
-    const smClassType &getType() const ;
+    const core::ClassType &getType() const ;
 
     ///
     /// \brief set type of the class
     ///
-    void setType(const smClassType &newType);
+    void setType(const core::ClassType &newType);
 
     ///
     /// \brief his function is called by the renderer.
@@ -128,17 +128,17 @@ public:
     /// This function is called by the event handler after observing
     /// events.
     ///
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>);
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent>);
 
     ///
     /// \brief set the name of object
     ///
-    void setName(const smString &p_objectName);
+    void setName(const std::string &p_objectName);
 
     ///
     /// \brief get the name of the object
     ///
-    const smString &getName() const;
+    const std::string &getName() const;
 
     ///
     /// \brief Increease reference counter
@@ -178,26 +178,26 @@ public:
     /// \brief Event index used by the event handler to unregister event observers
     /// \return eventIndex
     ///
-    const smtk::Event::smEventHandler::FunctionContainerType::iterator
-    &getEventIndex(const smtk::Event::EventType &eventType) const
+    const mstk::Event::smEventHandler::FunctionContainerType::iterator
+    &getEventIndex(const mstk::Event::EventType &eventType) const
     { return eventIndexMap.at(eventType); }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void setEventIndex(const smtk::Event::EventType &eventType, smtk::Event::smEventHandler::FunctionContainerType::iterator index)
+    void setEventIndex(const mstk::Event::EventType &eventType, mstk::Event::smEventHandler::FunctionContainerType::iterator index)
     { eventIndexMap[eventType] = index; }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void removeEventIndex(const smtk::Event::EventType &eventType)
+    void removeEventIndex(const mstk::Event::EventType &eventType)
     { eventIndexMap.erase(eventType); }
 
     ///
     /// \brief Set the order on which the objects are painted.
     ///
-    void setDrawOrder(const smClassDrawOrder &order) { drawOrder = order; }
+    void setDrawOrder(const core::ClassDrawOrder &order) { drawOrder = order; }
 
     ///
     /// \brief Get the unique id of this object
@@ -215,7 +215,7 @@ public:
     std::shared_ptr<smRenderDelegate> getRenderDelegate() const;
     void setRenderDelegate(std::shared_ptr<smRenderDelegate> delegate);
 
-    void attachEvent(const smtk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
+    void attachEvent(const mstk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
     {
         eventHandler->attachEvent(eventType,component);
     }
@@ -232,22 +232,22 @@ protected:
 
 protected:
     std::atomic_int referenceCounter; ///< reference counter to identify the count the usage
-    smClassType type; ///< class type
-    smString name; ///< name of the class
+    core::ClassType type; ///< class type
+    std::string name; ///< name of the class
     bool listening; ///< parameter to determine if this object is listening for events
     std::map<
-    smtk::Event::EventType,
-    smtk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
+    mstk::Event::EventType,
+    mstk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<smRenderDelegate> renderDelegate; ///!< Class that can render this class
 
 private:
     std::shared_ptr<smUnifiedId> uniqueId; ///< unique Id
     std::shared_ptr<smRenderDetail> renderDetail; ///< specifies visualization type
-    smClassDrawOrder drawOrder; ///< draw order of the object
+    core::ClassDrawOrder drawOrder; ///< draw order of the object
 };
 
 /// \brief for future use
-class smInterface : public smCoreClass
+class interface : public smCoreClass
 {
 
 };

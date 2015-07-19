@@ -40,9 +40,9 @@ enum SMDISPLAY_STREAM
 struct smDisplayMessage
 {
     /// \brief text to display
-    smString text;
+    std::string text;
     /// \brief sender id. Id given my the framework
-    smInt  senderId;
+    int  senderId;
     /// \brief diplay output
     SMDISPLAY_STREAM outputStream;
     /// \brief x,y position

@@ -37,7 +37,7 @@ smRenderOperation::smRenderOperation()
 
 smViewerBase::smViewerBase()
 {
-    type = SIMMEDTK_SMVIEWER;
+    type = core::ClassType::Viewer;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
 
     defaultAmbientColor.setValue(0.1, 0.1, 0.1, 1.0);
@@ -55,13 +55,13 @@ smViewerBase::smViewerBase()
 }
 
 ///affects the framebuffer size and depth buffer size
-void smViewerBase::setScreenResolution(smInt p_width, smInt p_height)
+void smViewerBase::setScreenResolution(int p_width, int p_height)
 {
     this->screenResolutionHeight = p_height;
     this->screenResolutionWidth = p_width;
 }
 
-void smViewerBase::setUnlimitedFPS(smBool p_enableFPS)
+void smViewerBase::setUnlimitedFPS(bool p_enableFPS)
 {
     unlimitedFPSEnabled = p_enableFPS;
     unlimitedFPSVariableChanged++;
@@ -71,7 +71,7 @@ void smViewerBase::initObjects()
 {
     for (size_t i = 0; i < objectList.size(); i++)
     {
-        if (objectList[i]->getType() != SIMMEDTK_SMSHADER)
+        if (objectList[i]->getType() != core::ClassType::Shader)
         {
             objectList[i]->initDraw();
         }
@@ -95,7 +95,7 @@ void smViewerBase::initScenes()
         for (auto sceneObject: sceneLocal.sceneObjects)
         {
             //initialize the custom Render if there is any
-            if ( sceneObject->customRender != NULL && sceneObject->getType() != SIMMEDTK_SMSHADER )
+            if ( sceneObject->customRender != NULL && sceneObject->getType() != core::ClassType::Shader )
             {
                 sceneObject->customRender->initDraw();
             }
@@ -121,10 +121,10 @@ void smViewerBase::init()
     isInitialized = true;
 }
 
-void smViewerBase::addFBO(const smString &p_fboName,
+void smViewerBase::addFBO(const std::string &p_fboName,
                       smTexture *p_colorTex,
                       smTexture *p_depthTex,
-                      smUInt p_width, smUInt p_height)
+                      unsigned int p_width, unsigned int p_height)
 {
     smFboListItem item;
 
@@ -160,7 +160,7 @@ void smViewerBase::processRenderOperation(const smRenderOperation &p_rop)
 
 void smViewerBase::registerScene(std::shared_ptr<smScene> p_scene,
                              smRenderTargetType p_target,
-                             const smString &p_fboName)
+                             const std::string &p_fboName)
 {
     smRenderOperation rop;
 
@@ -182,8 +182,8 @@ void smViewerBase::registerScene(std::shared_ptr<smScene> p_scene,
 inline void smViewerBase::adjustFPS()
 {
 
-    static smInt _unlimitedFPSVariableChanged = 0;
-    smInt unlimitedFPSVariableChangedCurrent;
+    static int _unlimitedFPSVariableChanged = 0;
+    int unlimitedFPSVariableChangedCurrent;
     unlimitedFPSVariableChangedCurrent = unlimitedFPSVariableChanged;
 
     if (_unlimitedFPSVariableChanged < unlimitedFPSVariableChangedCurrent)
@@ -243,7 +243,7 @@ void smViewerBase::addObject(std::shared_ptr<smCoreClass> object)
     objectList.push_back(object);
 }
 
-void smViewerBase::setWindowTitle(const smString &str)
+void smViewerBase::setWindowTitle(const std::string &str)
 {
     windowTitle = str;
 }
@@ -265,22 +265,22 @@ void smViewerBase::cleanUp()
     terminationCompleted = true;
 }
 
-smInt smViewerBase::height(void)
+int smViewerBase::height(void)
 {
     return screenResolutionHeight;
 }
 
-smInt smViewerBase::width(void)
+int smViewerBase::width(void)
 {
     return screenResolutionWidth;
 }
 
-smFloat smViewerBase::aspectRatio(void)
+float smViewerBase::aspectRatio(void)
 {
     return screenResolutionHeight / screenResolutionWidth;
 }
 
-void smViewerBase::setGlobalAxisLength(const smFloat len)
+void smViewerBase::setGlobalAxisLength(const float len)
 {
     this->globalAxisLength = len;
 }

@@ -27,7 +27,7 @@
 // SimMedTK includes
 #include "Shader.h"
 
-namespace smtk{
+namespace mstk{
 namespace Event{
 
     class smEvent;
@@ -39,15 +39,15 @@ class smMetalShader: public smShader
 {
 public:
     /// \brief constructor that get vertex and fragment shader file name.
-    smMetalShader(const smString &p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
-                  const smString &p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
+    smMetalShader(const std::string &p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
+                  const std::string &p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
 
     /// \brief attach mesh to the shader
-    void attachMesh(std::shared_ptr<smMesh> p_mesh, smChar *p_bump,
-                    smChar *p_decal, smChar *p_specular,
-                    smChar *p_OCC, smChar *p_disp);
+    void attachMesh(std::shared_ptr<smMesh> p_mesh, char *p_bump,
+                    char *p_decal, char *p_specular,
+                    char *p_OCC, char *p_disp);
 
-    void attachMesh(std::shared_ptr<smMesh> p_mesh, smChar *p_bump, smChar *p_decal, smChar *p_specular, smChar *p_OCC, smChar *p_disp, smChar *p_alphaMap);
+    void attachMesh(std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap);
 
     /// \brief emtpy implementation of draw routine. needs to overwritten to enable real-time code changes
     void draw() const override;
@@ -61,7 +61,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
     /// \brief handle keyboard event
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
     /// \brief any disable and enable shader options need to be here
     virtual void switchEnable();
@@ -69,15 +69,15 @@ public:
     virtual void switchDisable();
 
 public:
-    smGLInt lightPower; // light power
-    smGLInt roughness; // oughness of surface
-    smGLInt tangent; // tangent vectors attribute GL binding
-    smGLInt specularPower; // specular power
-    smGLFloat specularPowerValue; // specular power value, coefficient used in shader
-    smInt attrib; // for future use
-    smGLInt alphaMapGain; // alpha map gain
-    smGLFloat alphaMapGainValue; // alpha map gain coefficient
-    smGLInt canGetShadowUniform; // to enable/disable to shadow on particular object.
+    GLint lightPower; // light power
+    GLint roughness; // oughness of surface
+    GLint tangent; // tangent vectors attribute GL binding
+    GLint specularPower; // specular power
+    GLfloat specularPowerValue; // specular power value, coefficient used in shader
+    int attrib; // for future use
+    GLint alphaMapGain; // alpha map gain
+    GLfloat alphaMapGainValue; // alpha map gain coefficient
+    GLint canGetShadowUniform; // to enable/disable to shadow on particular object.
 };
 
 /// \brief MetalShader variantion with shadow feature
@@ -85,7 +85,7 @@ class MetalShaderShadow: public smMetalShader
 {
 public:
     /// \brief MetalShader v
-    MetalShaderShadow(const smString &p_vertexShaderFileName,const smString &p_fragmentShaderFileName);
+    MetalShaderShadow(const std::string &p_vertexShaderFileName,const std::string &p_fragmentShaderFileName);
 
     /// \brief intialization routine
     virtual void initDraw() override;
@@ -97,8 +97,8 @@ public:
 
 private:
     /// \brief for debugging purposes
-    smGLInt shadowMapUniform;
-    smGLInt canGetShadowUniform;
+    GLint shadowMapUniform;
+    GLint canGetShadowUniform;
 };
 
 /// \brief another variation of metalshader with differen shadow mapping technique
@@ -117,7 +117,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
 private:
-    smGLInt shadowMapUniform;
+    GLint shadowMapUniform;
 };
 
 #endif

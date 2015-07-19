@@ -43,9 +43,9 @@ class smSurfaceMesh;
 
 struct smTextureShaderAssignment
 {
-    smGLInt textureShaderGLassignment; // the id that smShader creates...
-    smInt textureId; // Id from texture manager
-    smString shaderParamName; // The parameters that shaders use
+    GLint textureShaderGLassignment; // the id that smShader creates...
+    int textureId; // Id from texture manager
+    std::string shaderParamName; // The parameters that shaders use
 };
 
 // \brief Base shader class. It provides loading, initializing, binding,
@@ -81,17 +81,17 @@ public:
     // if the uniform variable is found
     // \param p_shaderParams List of shader parameter locations to append to
     // if the uniform variable is found
-    smGLInt addShaderParamGLSL(const smString& p_paramName,
+    GLint addShaderParamGLSL(const std::string& p_paramName,
                                const GLhandleARB p_shaderProgramObject,
-                               std::vector<smString>& p_shaderParamsString,
+                               std::vector<std::string>& p_shaderParamsString,
                                std::vector<GLint>& p_shaderParams);
 
     // \brief add vertex, fragment and geometry shaders
-    GLint addVertexShaderParamGLSL(const smString& p_paramVertex);
+    GLint addVertexShaderParamGLSL(const std::string& p_paramVertex);
 
-    GLint addFragmentShaderParamGLSL(const smString& p_paramFragment);
+    GLint addFragmentShaderParamGLSL(const std::string& p_paramFragment);
 
-    GLint addGeometryShaderParamGLSL(const smString& p_paramGeometry);
+    GLint addGeometryShaderParamGLSL(const std::string& p_paramGeometry);
     // \brief returns the program object
     GLuint getProgramObject()
     {
@@ -117,10 +117,10 @@ public:
     }
 
     // \brief Attaches The texture ID to the mesh
-    void attachTexture(std::shared_ptr<smUnifiedId> p_meshID, smInt p_textureID);
+    void attachTexture(std::shared_ptr<smUnifiedId> p_meshID, int p_textureID);
 
     // \brief assigns the texture by name if you don't know the textureID
-    smBool attachTexture(std::shared_ptr<smUnifiedId> p_meshID, const smString& p_textureName, const smString& p_textureShaderName);
+    bool attachTexture(std::shared_ptr<smUnifiedId> p_meshID, const std::string& p_textureName, const std::string& p_textureShaderName);
 
     void autoGetTextureIds();
 
@@ -142,7 +142,7 @@ protected:
     // GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER, or GL_FRAGMENT_SHADER
     void createShaderGLSL(GLhandleARB &p_shaderObject,
                           const GLhandleARB p_shaderProgramObject,
-                          const smString& p_shaderContent,
+                          const std::string& p_shaderContent,
                           GLenum p_shaderType);
 
     // \brief Reloads and recompiles the shader object
@@ -150,13 +150,13 @@ protected:
     // \param p_shaderObject Shader handle to be reloaded
     // \param p_shaderContent A string containing the shader program
     void reloadShaderGLSL(const GLhandleARB p_shaderObject,
-                          const smString& p_shaderContent);
+                          const std::string& p_shaderContent);
 
     // \brief reloads all shaders
-    smBool reLoadAllShaders();
+    bool reLoadAllShaders();
 
     // \brief check opengl error
-    smBool checkGLError();
+    bool checkGLError();
 
 public:
     // \brief constructor gets the error log class
@@ -166,9 +166,9 @@ public:
     // \param vertexProgFileName   vertex program file name
     // \param fragmentProgFileName fragment program file name
     // \param geometryProgFileName geometry program file name
-    smBool initShaders(const smString& p_vertexProgFileName,
-                       const smString& p_fragmentProgFileName,
-                       const smString& p_geometryProgFileName);
+    bool initShaders(const std::string& p_vertexProgFileName,
+                       const std::string& p_fragmentProgFileName,
+                       const std::string& p_geometryProgFileName);
 
     // \brief  enables the shader
     void enableShader();
@@ -181,54 +181,54 @@ public:
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     // \brief add parameter for Vertex Shader
-    GLint addVertexShaderParam(const smString& p_paramVertex);
+    GLint addVertexShaderParam(const std::string& p_paramVertex);
 
     // \brief add parameter for Fragment Shader
-    GLint addFragmentShaderParam(const smString& p_paramFragment);
+    GLint addFragmentShaderParam(const std::string& p_paramFragment);
 
     // \brief add parameter for Geometry Shader
-    GLint addGeometryShaderParam(const smString& p_paramGeometry);
+    GLint addGeometryShaderParam(const std::string& p_paramGeometry);
 
     // \brief add parameter for all Shaders
-    GLint addShaderParamForAll(const smString& p_paramName);
+    GLint addShaderParamForAll(const std::string& p_paramName);
 
     // \brief attrib parameters for Shaders
-    GLint addShaderParamAttrib(const smString& p_paramName);
+    GLint addShaderParamAttrib(const std::string& p_paramName);
 
-    void createTextureParam(const smString& p_textureNameInShaderCode);
+    void createTextureParam(const std::string& p_textureNameInShaderCode);
 
-    smBool setShaderFileName(const smString& p_vertexFileName,
-                             const smString& p_geometryFileName,
-                             const smString& p_fragmentFileName);
+    bool setShaderFileName(const std::string& p_vertexFileName,
+                             const std::string& p_geometryFileName,
+                             const std::string& p_fragmentFileName);
 
-    smBool setModelViewMatrixShaderName(const smString& p_modelviewMatrixName);
+    bool setModelViewMatrixShaderName(const std::string& p_modelviewMatrixName);
 
-    smBool setProjectionMatrixShaderName(const smString& p_projectionName);
+    bool setProjectionMatrixShaderName(const std::string& p_projectionName);
 
     void updateGLSLMatwithOPENGL();
 
     // \brief returns the shader attrrib param
-    smGLInt getShaderParamForAll(const smString& p_paramName) const;
+    GLint getShaderParamForAll(const std::string& p_paramName) const;
 
     // \brief returns the fragment shader uniform param
-    smGLInt getFragmentShaderParam(const smString& p_paramName) const;
+    GLint getFragmentShaderParam(const std::string& p_paramName) const;
 
     // \brief returns the attrib location param
-    smGLInt getShaderAtrribParam(const smString& p_paramName) const;
+    GLint getShaderAtrribParam(const std::string& p_paramName) const;
 
-    void createParam(const smString& p_param);
+    void createParam(const std::string& p_param);
 
-    smInt createAttrib(const smString& p_attrib);
+    int createAttrib(const std::string& p_attrib);
 
-    smGLInt queryUniformLocation(const smString& p_param);
+    GLint queryUniformLocation(const std::string& p_param);
 
 #endif
 
     // \brief checks whether the shader routine is updated
-    smBool checkShaderUpdate(smInt milliseconds);
+    bool checkShaderUpdate(int milliseconds);
 
     // \brief turn on/off the error checking
-    void enableCheckingErrors(smBool p_checkError);
+    void enableCheckingErrors(bool p_checkError);
 
     // \brief cleans up of the shader objects
     ~smShader();
@@ -244,13 +244,13 @@ public:
 
     static std::shared_ptr<smShader> getShader(std::shared_ptr<smUnifiedId> p_shaderID);
 
-    smBool readShaderContent(const smString& p_file, smString& p_content);
+    bool readShaderContent(const std::string& p_file, std::string& p_content);
 
     static void initGLShaders();
 
     void activeGLTextures(std::shared_ptr<smUnifiedId> p_id);
 
-    void activeGLVertAttribs(smInt p_id, smVec3d *p_vecs, smInt p_size);
+    void activeGLVertAttribs(int p_id, smVec3d *p_vecs, int p_size);
 
     void registerShader();
 
@@ -262,42 +262,42 @@ public:
     // \brief save the last active shader and disable it.
     void saveAndDisableCurrent();
 
-    smGLInt getTangentAttributes()
+    GLint getTangentAttributes()
     {
         return tangentAttrib;
     }
 
 protected:
     std::shared_ptr<smErrorLog> log; //
-    smBool checkErrorEnabled; // if the error check is enabled or not. If it is checked, opengl errors are queried and if there is, they will be stored in logger
-    smGLInt tangentAttrib;
+    bool checkErrorEnabled; // if the error check is enabled or not. If it is checked, opengl errors are queried and if there is, they will be stored in logger
+    GLint tangentAttrib;
 
 private:
-    static std::unordered_map<smInt, std::shared_ptr<smShader>> shaders;
-    std::unordered_multimap<smInt, smTextureShaderAssignment> texAssignments; //
-    std::unordered_map<smString, smGLInt> textureGLBind; // This stores the opengl binded texture id
-    std::vector<smString> vertexShaderParamsString; // stores the parameters for vertex shader
-    std::vector<smString> fragmentShaderParamsString; // stores the parameters for fragment shader
-    std::vector<smString> geometryShaderParamsString; // stores the parameters for geometry shader
-    std::vector<smString> attribParamsString; // stores the attribute parameters
+    static std::unordered_map<int, std::shared_ptr<smShader>> shaders;
+    std::unordered_multimap<int, smTextureShaderAssignment> texAssignments; //
+    std::unordered_map<std::string, GLint> textureGLBind; // This stores the opengl binded texture id
+    std::vector<std::string> vertexShaderParamsString; // stores the parameters for vertex shader
+    std::vector<std::string> fragmentShaderParamsString; // stores the parameters for fragment shader
+    std::vector<std::string> geometryShaderParamsString; // stores the parameters for geometry shader
+    std::vector<std::string> attribParamsString; // stores the attribute parameters
     smTimer time; // time for periodically checnking the shader
 
-    smGLInt projectionMatrix; // holds the unitform location for projection matrix. That is needed in newer versions of GLSL
-    smGLInt modelViewMatrix; // holds the unitform location for modelview matrix. That is needed in newer versions of GLSL
+    GLint projectionMatrix; // holds the unitform location for projection matrix. That is needed in newer versions of GLSL
+    GLint modelViewMatrix; // holds the unitform location for modelview matrix. That is needed in newer versions of GLSL
 
-    smString vertexProgFileName; //
-    smString fragmentProgFileName; //
-    smString geometryProgFileName; //
-    smString vertexShaderContent; //stores the content of the vertex shader file
-    smString fragmentShaderContent; // stores the content of the fragment  shader file
-    smString geometryShaderContent; // stores the content of the geometry shader file
-    smString modelViewMatrixName; //
-    smString projectionMatrixName; //
+    std::string vertexProgFileName; //
+    std::string fragmentProgFileName; //
+    std::string geometryProgFileName; //
+    std::string vertexShaderContent; //stores the content of the vertex shader file
+    std::string fragmentShaderContent; // stores the content of the fragment  shader file
+    std::string geometryShaderContent; // stores the content of the geometry shader file
+    std::string modelViewMatrixName; //
+    std::string projectionMatrixName; //
 
-    smBool vertexProgramExist; // if the vertex shader exists this will be true
-    smBool fragmentProgramExist; // if the fragment shader exists this will be true
-    smBool geometryProgramExist; // if the geometry shader exists this will be true
-    smBool currentShaderEnabled; // if the currentShader is enabled or not
+    bool vertexProgramExist; // if the vertex shader exists this will be true
+    bool fragmentProgramExist; // if the fragment shader exists this will be true
+    bool geometryProgramExist; // if the geometry shader exists this will be true
+    bool currentShaderEnabled; // if the currentShader is enabled or not
 
     static std::shared_ptr<smShader> currentShader; // stores the current Active shader.
     static std::shared_ptr<smShader> savedShader; // It is also used to save and restore the current shader is disabled for a while to use

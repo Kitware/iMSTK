@@ -29,7 +29,7 @@
 #include "Core/Vector.h"
 #include "Core/Quaternion.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 class smCameraEvent : public smEvent
@@ -65,6 +65,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMCAMERAEVENT_H

@@ -77,55 +77,55 @@ public:
     };
 
     // simulation. Some variable names self-explainatory
-    smInt syncTimestepWithGraphics; ///< !!
-    smFloat timeStep; ///< time step
-    smFloat newmarkBeta; ///> beta in NewmarkBeta time smIntegration
-    smFloat newmarkGamma; ///> gamma in NewmarkBeta time smIntegration
-    smInt use1DNewmarkParameterFamily; ///< !!
-    smInt substepsPerTimeStep;
-    smDouble inversionThreshold; ///<
-    smInt lockAt30Hz; ///< update at 30Hz
-    smInt forceNeighborhoodSize; ///< !!
-    smInt enableCompressionResistance;
-    smDouble compressionResistance;
-    smInt centralDifferencesTangentialDampingUpdateMode; ///<
-    smInt addGravity; ///< include gravity
-    smDouble g;///> gravity; unit: m/s^2
-    smInt corotationalLinearFEM_warp;///> type of co-rotation formulation to be used
-    const smInt max_corotationalLinearFEM_warp = 2;
-    smChar implicitSolverMethod[4096];
-    smChar solverMethod[4096];
+    int syncTimestepWithGraphics; ///< !!
+    float timeStep; ///< time step
+    float newmarkBeta; ///> beta in NewmarkBeta time integration
+    float newmarkGamma; ///> gamma in NewmarkBeta time integration
+    int use1DNewmarkParameterFamily; ///< !!
+    int substepsPerTimeStep;
+    double inversionThreshold; ///<
+    int lockAt30Hz; ///< update at 30Hz
+    int forceNeighborhoodSize; ///< !!
+    int enableCompressionResistance;
+    double compressionResistance;
+    int centralDifferencesTangentialDampingUpdateMode; ///<
+    int addGravity; ///< include gravity
+    double g;///> gravity; unit: m/s^2
+    int corotationalLinearFEM_warp;///> type of co-rotation formulation to be used
+    const int max_corotationalLinearFEM_warp = 2;
+    char implicitSolverMethod[4096];
+    char solverMethod[4096];
 
-    smFloat dampingMassCoef; ///< viscous damping
-    smFloat dampingStiffnessCoef; ///< structural damping
-    smFloat dampingLaplacianCoef; ///<
-    smFloat deformableObjectCompliance;
+    float dampingMassCoef; ///< viscous damping
+    float dampingStiffnessCoef; ///< structural damping
+    float dampingLaplacianCoef; ///<
+    float deformableObjectCompliance;
 
-    smFloat baseFrequency; ///< !!
-    smInt maxIterations; ///< maximum smInterations
-    smDouble epsilon;  ///<
-    smInt numInternalForceThreads; ///< max. execution threads for computing smInternal force
-    smInt numSolverThreads; ///< max. solver threads for solver
-    smInt singleStepMode;
+    float baseFrequency; ///< !!
+    int maxIterations; ///< maximum interations
+    double epsilon;  ///<
+    int numInternalForceThreads; ///< max. execution threads for computing internal force
+    int numSolverThreads; ///< max. solver threads for solver
+    int singleStepMode;
 
     // various file names. variable names self-explainatory
     //string renderingMeshFilename;
-    smChar renderingMeshFilename[4096];
-    smChar secondaryRenderingMeshFilename[4096];
-    smChar secondaryRenderingMeshInterpolationFilename[4096];
-    smChar volumetricMeshFilename[4096];
-    smChar customMassSpringSystem[4096];
-    smChar deformableObjectMethod[4096];
-    smChar fixedVerticesFilename[4096];
-    smChar massMatrixFilename[4096];
-    smChar massSpringSystemObjConfigFilename[4096];
-    smChar massSpringSystemTetMeshConfigFilename[4096];
-    smChar massSpringSystemCubicMeshConfigFilename[4096];
-    smChar invertibleMaterialString[4096];
-    smChar initialPositionFilename[4096];
-    smChar initialVelocityFilename[4096];
-    smChar forceLoadsFilename[4096];
-    smChar outputFilename[4096];
+    char renderingMeshFilename[4096];
+    char secondaryRenderingMeshFilename[4096];
+    char secondaryRenderingMeshInterpolationFilename[4096];
+    char volumetricMeshFilename[4096];
+    char customMassSpringSystem[4096];
+    char deformableObjectMethod[4096];
+    char fixedVerticesFilename[4096];
+    char massMatrixFilename[4096];
+    char massSpringSystemObjConfigFilename[4096];
+    char massSpringSystemTetMeshConfigFilename[4096];
+    char massSpringSystemCubicMeshConfigFilename[4096];
+    char invertibleMaterialString[4096];
+    char initialPositionFilename[4096];
+    char initialVelocityFilename[4096];
+    char forceLoadsFilename[4096];
+    char outputFilename[4096];
 
     massSpringSystemSourceType massSpringSystemSource;
     deformableObjectType deformableObject;
@@ -142,7 +142,7 @@ public:
     ///  parse all the specifications of the FEM scene
     ///  such as type of material type, input mesh and rendering files,
     ///  boundary conditions etc.
-    void setFemObjConfuguration(const smString ConfigFile, const bool printVerbose);
+    void setFemObjConfuguration(const std::string ConfigFile, const bool printVerbose);
 
     /// enable/disable update of scene object sync with graphics
     void setSyncTimeStepWithGraphics(const bool syncOrNot);

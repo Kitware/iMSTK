@@ -23,11 +23,11 @@
 
 #include "PBDSceneObject.h"
 
-void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p_radius)
+void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, float p_radius)
 {
-    smFloat dist = 0;
+    float dist = 0;
 
-    for (smInt i = 0; i < mesh->nbrVertices; i++)
+    for (int i = 0; i < mesh->nbrVertices; i++)
     {
 
         dist = (p_center - mesh->vertices[i]).norm();
@@ -40,7 +40,7 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, smFloat p
 }
 smPBDSceneObject::smPBDSceneObject( std::shared_ptr<smErrorLog>/*p_log*/ )
 {
-    type = SIMMEDTK_SMPBDSCENEOBJECT;
+    type = core::ClassType::PbdSceneObject;
 }
 
 std::shared_ptr<smSceneObject> smPBDSceneObject::clone()
@@ -60,7 +60,7 @@ void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 
 smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<smErrorLog> p_log )
 {
-    type = SIMMEDTK_SMPBDSURFACESCENEOBJECT;
+    type = core::ClassType::PbdSurfaceSceneObject;
     mesh = new smSurfaceMesh( SMMESH_DEFORMABLE, p_log );
 }
 std::shared_ptr<smSceneObject> smPBDSurfaceSceneObject::clone()
@@ -96,12 +96,12 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     exF = new smVec3d[nbrMass];
     fixedMass = new bool[nbrMass];
 
-    for ( smInt i = 0; i < nbrMass; i++ )
+    for ( int i = 0; i < nbrMass; i++ )
     {
         fixedMass[i] = false;
     }
 
-    for ( smInt i = 0; i < nbrMass; i++ )
+    for ( int i = 0; i < nbrMass; i++ )
     {
         P[i] = mesh->vertices[i];
     }
@@ -109,7 +109,7 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     nbrSpr = mesh->edges.size();
     L0 = new float[nbrSpr];
 
-    for ( smInt i = 0; i < nbrSpr; i++ )
+    for ( int i = 0; i < nbrSpr; i++ )
     {
         L0[i] = ( mesh->vertices[mesh->edges[i].vert[0]] - mesh->vertices[mesh->edges[i].vert[1]] ).norm();
     }
@@ -147,10 +147,10 @@ void smPBDSurfaceSceneObject::findFixedCorners()
 {
 
     nbrFixedMass = 2;
-    listFixedMass = new smInt[nbrFixedMass];
+    listFixedMass = new int[nbrFixedMass];
     smVec3d corner[2];
-    smInt i, j;
-    smFloat minmin, dist;
+    int i, j;
+    float minmin, dist;
     corner[0] = mesh->aabb.aabbMax;
     corner[1] = mesh->aabb.aabbMin;
     listFixedMass[0] = -1;
@@ -158,7 +158,7 @@ void smPBDSurfaceSceneObject::findFixedCorners()
 
     for ( i = 0; i < nbrFixedMass; i++ )
     {
-        minmin = smMAXFLOAT;
+        minmin = std::numeric_limits<float>::max();
 
         for ( j = 0; j < mesh->nbrVertices; j++ )
         {

@@ -52,7 +52,7 @@ smPhantomInterface::smPhantomInterface()
     phantomDeviceNames[3] = "PHANToM 4";
 
     forceEnabled = true;
-    smBool openDevice = true;
+    bool openDevice = true;
     int incr = 0;
     numPhantomDevices = 0;
     HDErrorInfo error;
@@ -95,7 +95,7 @@ smPhantomInterface::~smPhantomInterface()
 }
 
 /// \brief
-smInt smPhantomInterface::startDevice()
+int smPhantomInterface::startDevice()
 {
 
     if (numPhantomDevices != 0)
@@ -127,7 +127,7 @@ int smPhantomInterface::closeDevice()
 }
 
 /// \brief
-int smPhantomInterface::openDevice(smInt phantomNumber)
+int smPhantomInterface::openDevice(int phantomNumber)
 {
 
     return SIMMEDTK_MSG_UNKNOWN;
@@ -166,9 +166,9 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
 
     frameCounter++;
     smPhantomInterface  * phantomInterface = static_cast<smPhantomInterface *>(pData);
-    smInt buttonState;
+    int buttonState;
 
-    smInt count = 0;
+    int count = 0;
 
     hduVector3D<double> ff;
 
@@ -282,7 +282,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
 }
 
 /// \brief
-void smPhantomInterface::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+void smPhantomInterface::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
 {
 
     smHapticInEventData *hapticEventData;

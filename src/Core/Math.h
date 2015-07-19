@@ -45,9 +45,9 @@ public:
 
     smMath();
     /// \brief computes power
-    static smInt pow(smInt p_base, smInt p_pow);
+    static int pow(int p_base, int p_pow);
     /// \brief linear interpolation with min, max
-    static smFloat interpolate(smInt current, smInt min, smInt max);
+    static float interpolate(int current, int min, int max);
 };
 /// \brief hash function
 template<class T>
@@ -59,14 +59,14 @@ public:
     }
     /// \brief  computes hash based on the has table size, given one number x
     template<T>
-    inline smUInt computeHash(smUInt p_tableSize, T p_x);
+    inline unsigned int computeHash(unsigned int p_tableSize, T p_x);
 
     /// \brief  computes hash based on the has table size, given  numbers x,y
     template<T>
-    inline smUInt computeHash(smUInt p_tableSize, T p_x, T p_y);
+    inline unsigned int computeHash(unsigned int p_tableSize, T p_x, T p_y);
     /// \brief  computes hash based on the has table size, given  numbers x,y,z
     template<T>
-    inline smUInt computeHash(smUInt p_tableSize, T p_x, T p_y, T p_z);
+    inline unsigned int computeHash(unsigned int p_tableSize, T p_x, T p_y, T p_z);
 };
 
 template<class T>

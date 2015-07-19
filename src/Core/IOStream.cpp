@@ -27,12 +27,12 @@
 smConsoleStream::smConsoleStream()
 {
 }
-smIOStream& smConsoleStream::operator<<(smString p_string)
+smIOStream& smConsoleStream::operator<<(std::string p_string)
 {
     std::cout << p_string;
     return *this;
 }
-smIOStream& smConsoleStream::operator>>(smString &p_string)
+smIOStream& smConsoleStream::operator>>(std::string &p_string)
 {
     std::getline(std::cin, inputBuffer);
     p_string = inputBuffer;
@@ -45,17 +45,17 @@ smWindowString::smWindowString()
     string = "";
     string.reserve(SM_WINDOW_MAXSTRINGSIZE);
 }
-smWindowString::smWindowString(smString p_string)
+smWindowString::smWindowString(std::string p_string)
 {
     string = p_string;
 }
-smWindowString::smWindowString(smString p_string, smFloat p_x, smFloat p_y)
+smWindowString::smWindowString(std::string p_string, float p_x, float p_y)
 {
     string = p_string;
     x = p_x;
     y = p_y;
 }
-smWindowString& smWindowString::operator<<(smString p_string)
+smWindowString& smWindowString::operator<<(std::string p_string)
 {
     string = p_string;
     return *this;
@@ -67,22 +67,22 @@ void smWindowString::operator=(smWindowString& p_windowString)
     x = p_windowString.x;
     y = p_windowString.y;
 }
-smIOStream& smWindowStream::operator<<(smString /*p_string*/)
+smIOStream& smWindowStream::operator<<(std::string /*p_string*/)
 {
     return *this;
 }
-smIOStream& smWindowStream::operator>>(smString& /*p_string*/)
+smIOStream& smWindowStream::operator>>(std::string& /*p_string*/)
 {
     return *this;
 }
-void smOpenGLWindowStream::init(smInt p_totalTexts)
+void smOpenGLWindowStream::init(int p_totalTexts)
 {
     textColor.setValue(1.0, 1.0, 1.0, 1.0);
     totalTexts = p_totalTexts;
     windowTexts = new smWindowData[totalTexts];
-    this->setDrawOrder(SIMMEDTK_DRAW_AFTEROBJECTS);
+    this->setDrawOrder(core::ClassDrawOrder::AfterObjects);
 
-    for (smInt i = 0; i < totalTexts; i++)
+    for (int i = 0; i < totalTexts; i++)
     {
         windowTexts[i].enabled = false;
     }
@@ -94,12 +94,12 @@ void smOpenGLWindowStream::init(smInt p_totalTexts)
     initialTextPositionY = 0.0;
     lastTextPosition = 0;
 }
-smOpenGLWindowStream::smOpenGLWindowStream(smInt p_totalTexts)
+smOpenGLWindowStream::smOpenGLWindowStream(int p_totalTexts)
 {
     //font.setPointSize(10.0);
     init(p_totalTexts);
 }
-smInt smOpenGLWindowStream::addText(const smString& p_tag, const smString& p_string)
+int smOpenGLWindowStream::addText(const std::string& p_tag, const std::string& p_string)
 {
     smWindowString string;
     string.string = p_string;
@@ -112,7 +112,7 @@ smInt smOpenGLWindowStream::addText(const smString& p_tag, const smString& p_str
     currentIndex = (currentIndex + 1) % totalTexts;
     return currentIndex;
 }
-bool smOpenGLWindowStream::addText(smString p_tag, smWindowString& p_string)
+bool smOpenGLWindowStream::addText(std::string p_tag, smWindowString& p_string)
 {
     if (p_string.string.size() > SM_WINDOW_MAXSTRINGSIZE)
     {
@@ -125,9 +125,9 @@ bool smOpenGLWindowStream::addText(smString p_tag, smWindowString& p_string)
     windowTexts[currentIndex].enabled = true;
     return true;
 }
-bool smOpenGLWindowStream::updateText(smString p_tag, smString p_string)
+bool smOpenGLWindowStream::updateText(std::string p_tag, std::string p_string)
 {
-    smInt index = -1;
+    int index = -1;
 
     if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
     {
@@ -145,9 +145,9 @@ bool smOpenGLWindowStream::updateText(smString p_tag, smString p_string)
 
     return true;
 }
-bool smOpenGLWindowStream::updateText(smInt p_textHandle, smString p_string)
+bool smOpenGLWindowStream::updateText(int p_textHandle, std::string p_string)
 {
-    smInt index = p_textHandle;
+    int index = p_textHandle;
 
     if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
     {
@@ -163,37 +163,37 @@ bool smOpenGLWindowStream::updateText(smInt p_textHandle, smString p_string)
 
     return true;
 }
-bool smOpenGLWindowStream::removeText(smString p_tag)
+bool smOpenGLWindowStream::removeText(std::string p_tag)
 {
-    smInt index = tagMap[p_tag];
+    int index = tagMap[p_tag];
     windowTexts[index].enabled = false;
     return true;
 }
 
-smWindowConsole::smWindowConsole(smInt p_totalTexts)
+smWindowConsole::smWindowConsole(int p_totalTexts)
 {
     init(p_totalTexts);
     backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-    this->eventHanlder->attachEvent(smtk::Event::EventType::Keyboard,shared_from_this());
+    this->eventHanlder->attachEvent(mstk::Event::EventType::Keyboard,shared_from_this());
     left = 0.0;
     bottom = 0.0;
     right = 1.0;
     top = 0.15;
 }
-smString smWindowConsole::getLastEntry()
+std::string smWindowConsole::getLastEntry()
 {
     return windowTexts[currentIndex].windowString.string;
 }
-smInt smWindowConsole::addText(const smString &p_tag, const smString& p_string)
+int smWindowConsole::addText(const std::string &p_tag, const std::string& p_string)
 {
-    smInt traverseIndex;
+    int traverseIndex;
     smWindowString string;
     string.string = p_string;
     windowTexts[currentIndex].enabled = true;
     windowTexts[currentIndex].windowString = string;
     tagMap[p_tag] = currentIndex;
 
-    for (smInt i = currentIndex, counter = 0; counter < totalTexts; i--, counter++)
+    for (int i = currentIndex, counter = 0; counter < totalTexts; i--, counter++)
     {
         if (i < 0)
         {

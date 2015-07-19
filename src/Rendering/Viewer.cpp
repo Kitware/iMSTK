@@ -37,7 +37,7 @@
 #include "Event/KeySFMLInterface.h"
 
 
-#ifdef SIMMEDTK_OPERATINGSYSTEM_LINUX
+#ifdef __linux__
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <GL/glxew.h>
@@ -45,7 +45,7 @@
 #include <GL/glx.h>
 #endif
 
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#ifdef _WIN32
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
@@ -184,10 +184,10 @@ void smViewer::renderTextureOnView()
 /// \param p_depthTex A texture that will contain the fbo's depth texture.
 /// \param p_width The width of the fbo
 /// \param p_height The height of the fbo
-void smViewer::addFBO(const smString &p_fboName,
+void smViewer::addFBO(const std::string &p_fboName,
                       smTexture *p_colorTex,
                       smTexture *p_depthTex,
-                      smUInt p_width, smUInt p_height)
+                      unsigned int p_width, unsigned int p_height)
 {
     smFboListItem item;
 
@@ -324,7 +324,7 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
 /// \brief Registers a scene for rendering with the viewer
 void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
                              smRenderTargetType p_target,
-                             const smString &p_fboName)
+                             const std::string &p_fboName)
 {
     smRenderOperation rop;
 
@@ -380,18 +380,18 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::KeyReleased:
     {
         auto keyboardEvent =
-            std::make_shared<smtk::Event::smKeyboardEvent>(smtk::Event::SFMLKeyToSmKey(p_event.key.code));
+            std::make_shared<mstk::Event::smKeyboardEvent>(mstk::Event::SFMLKeyToSmKey(p_event.key.code));
         keyboardEvent->setPressed(sf::Event::KeyPressed == p_event.type);
 
-        keyboardEvent->setModifierKey(smtk::Event::smModKey::none);
+        keyboardEvent->setModifierKey(mstk::Event::smModKey::none);
         if (p_event.key.shift)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::shift);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::shift);
         if (p_event.key.control)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::control);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::control);
         if (p_event.key.alt)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::alt);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::alt);
         if (p_event.key.system)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | smtk::Event::smModKey::super);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::super);
 
         eventHandler->triggerEvent(keyboardEvent);
         break;
@@ -399,17 +399,17 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::MouseButtonPressed:
     case sf::Event::MouseButtonReleased:
     {
-        smtk::Event::smMouseButton mouseButton;
+        mstk::Event::smMouseButton mouseButton;
         if (sf::Mouse::Left == p_event.mouseButton.button)
-            mouseButton = smtk::Event::smMouseButton::Left;
+            mouseButton = mstk::Event::smMouseButton::Left;
         else if (sf::Mouse::Right == p_event.mouseButton.button)
-            mouseButton = smtk::Event::smMouseButton::Right;
+            mouseButton = mstk::Event::smMouseButton::Right;
         else if (sf::Mouse::Middle == p_event.mouseButton.button)
-            mouseButton = smtk::Event::smMouseButton::Middle;
+            mouseButton = mstk::Event::smMouseButton::Middle;
         else
-            mouseButton = smtk::Event::smMouseButton::Unknown;
+            mouseButton = mstk::Event::smMouseButton::Unknown;
 
-        auto mouseEvent = std::make_shared<smtk::Event::smMouseButtonEvent>(mouseButton);
+        auto mouseEvent = std::make_shared<mstk::Event::smMouseButtonEvent>(mouseButton);
         mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
         mouseEvent->setWindowCoord(smVec2d(p_event.mouseButton.x,p_event.mouseButton.y));
         eventHandler->triggerEvent(mouseEvent);
@@ -417,8 +417,8 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     }
     case sf::Event::MouseMoved:
     {
-        auto mouseEvent = std::make_shared<smtk::Event::smMouseMoveEvent>();
-        mouseEvent->setSender(smtk::Event::EventSender::Module);
+        auto mouseEvent = std::make_shared<mstk::Event::smMouseMoveEvent>();
+        mouseEvent->setSender(mstk::Event::EventSender::Module);
         mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
         eventHandler->triggerEvent(mouseEvent);
         break;
@@ -435,29 +435,29 @@ void smViewer::addObject(std::shared_ptr<smCoreClass> object)
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
+void smViewer::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
 {
 
 }
 
-void smViewer::addText(smString p_tag)
+void smViewer::addText(std::string p_tag)
 {
 
-    windowOutput->addText(p_tag, smString(""));
+    windowOutput->addText(p_tag, std::string(""));
 }
 
-void smViewer::updateText(smString p_tag, smString p_string)
+void smViewer::updateText(std::string p_tag, std::string p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void smViewer::updateText(smInt p_handle, smString p_string)
+void smViewer::updateText(int p_handle, std::string p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(const smString &str)
+void smViewer::setWindowTitle(const std::string &str)
 {
     windowTitle = str;
 }

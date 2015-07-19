@@ -51,8 +51,8 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     spatialHashing = std::make_shared<smSpatialHashCollision>(10000, 2, 2, 2);
 
     //Create the camera controller
-    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
-    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
     // Create dummy simulator
     defaultSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
@@ -133,8 +133,8 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
 }
 
 void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam &/*p_param*/)

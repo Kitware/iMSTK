@@ -25,11 +25,11 @@
 #include "Shader.h"
 #include "Viewer.h"
 
-std::unordered_map<smInt, std::shared_ptr<smVAO>> smVAO::VAOs;
+std::unordered_map<int, std::shared_ptr<smVAO>> smVAO::VAOs;
 
 void smVAO::initBuffers()
 {
-    smString error;
+    std::string error;
     ///Create the Vertex Array Objects
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -40,7 +40,7 @@ void smVAO::initBuffers()
     SM_CHECKERROR(log, error);
 
     ///Initialize and file the VBOs
-    for (smInt i = 0; i < totalNbrBuffers; i++)
+    for (int i = 0; i < totalNbrBuffers; i++)
     {
         if (bufferInfo[i].arrayBufferType != SMVBO_INDEX)
         {
@@ -127,7 +127,7 @@ void smVAO::initBuffers()
 }
 
 ///Updates the buffers. Call this function if there is change in the mesh. If it is a simulation mesh, it needs to be called in and very frame
-smBool smVAO::updateStreamData() const
+bool smVAO::updateStreamData() const
 {
 
     if (this->vboType == SIMMEDTK_VBO_STATIC)
@@ -137,7 +137,7 @@ smBool smVAO::updateStreamData() const
 
     else if (vboType == SIMMEDTK_VBO_NOINDICESCHANGE || vboType == SIMMEDTK_VBO_DYNAMIC)
     {
-        for (smInt i = 0; i < totalNbrBuffers; i++)
+        for (int i = 0; i < totalNbrBuffers; i++)
         {
             if (bufferInfo[i].arrayBufferType != SMVBO_INDEX)
             {
@@ -211,7 +211,7 @@ void smVAO::setBufferData( smVBOBufferType p_type, std::string p_ShaderAttribNam
     }
     else if ( p_type == SMVBO_VEC4F )
     {
-        bufferInfo[totalNbrBuffers].size = sizeof( smFloat ) * 4 * p_nbrElements;
+        bufferInfo[totalNbrBuffers].size = sizeof( float ) * 4 * p_nbrElements;
     }
 
     bufferInfo[totalNbrBuffers].attribPointer = p_ptr;
@@ -225,7 +225,7 @@ void smVAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles,
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
     bufferInfo[totalNbrBuffers].nbrElements = p_nbrTriangles * 3;
     bufferInfo[totalNbrBuffers].attribPointer = p_ptr;
-    bufferInfo[totalNbrBuffers].size = sizeof( smInt ) * p_nbrTriangles * 3;
+    bufferInfo[totalNbrBuffers].size = sizeof( int ) * p_nbrTriangles * 3;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
     totalNbrBuffers++;
 }
@@ -279,7 +279,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
     bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrTriangles * 3;
     bufferInfo[totalNbrBuffers].attribPointer = p_mesh->triangles;
-    bufferInfo[totalNbrBuffers].size = sizeof( smInt ) * p_mesh->nbrTriangles * 3;
+    bufferInfo[totalNbrBuffers].size = sizeof( int ) * p_mesh->nbrTriangles * 3;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     totalNbrBuffers++;
 

@@ -57,9 +57,9 @@ struct smPipeData
     smPipeData();
 
     void *dataLocation;//if the data is call-by-value data is written here
-    volatile smInt  nbrElements;
-    volatile smBool dataReady;///flag is raised when the data is ready
-    volatile smUInt timeStamp;
+    volatile int  nbrElements;
+    volatile bool dataReady;///flag is raised when the data is ready
+    volatile unsigned int timeStamp;
 };
 /// \brief pipe registration holder
 struct smPipeRegisteration
@@ -83,35 +83,35 @@ protected:
     /// \brief  pipe stype
     smPipeType pipeType;
     /// \brief  number of elements
-    smInt maxElements;
+    int maxElements;
     /// \brief  pointer to the data
     void *data;
     /// \brief enable/disable
-    smBool enabled;
+    bool enabled;
     /// \brief indices to the objects that  register by reference
     smIndiceArray<smPipeRegisteration*> byRefs;
     /// \brief ndices to the objects that  register by value
     smIndiceArray<smPipeRegisteration*> byValue;
     /// \brief number of current elements in the pipe
-    volatile smInt currentElements;
-    volatile smUInt timeStamp;//For stamping the data
+    volatile int currentElements;
+    volatile unsigned int timeStamp;//For stamping the data
     /// \brief element size
-    volatile smInt elementSize;
+    volatile int elementSize;
 
 public:
     /// \brief  destructor
     ~smPipe();
     /// \brief pipe constructor
-    smPipe(smString p_name, smInt p_elementSize, smInt p_maxElements,
+    smPipe(std::string p_name, int p_elementSize, int p_maxElements,
            smPipeType p_pipeType = SIMMEDTK_PIPE_TYPEANY);
     /// \brief get maximum number of elements
-    smInt getElements();
+    int getElements();
     /// \brief  begin writing
     void *beginWrite();
     /// \brief  end writing
-    void endWrite(smInt p_elements);
+    void endWrite(int p_elements);
     /// \brief  register for the pipe
-    smInt registerListener(smPipeRegisteration *p_pipeReg);
+    int registerListener(smPipeRegisteration *p_pipeReg);
 
     ///Acknowledge only raises the flag so that it will enable the listeners
     void acknowledgeRefListeners();
@@ -120,12 +120,12 @@ public:
     void acknowledgeValueListeners();
 
     ///For copy by value, the function checks
-    void checkAndCopyNewData(smInt p_handleByValue);
+    void checkAndCopyNewData(int p_handleByValue);
 
     ///for copy by value usage
-    void copyData(smInt p_handleByValue);
+    void copyData(int p_handleByValue);
 
-    friend smBool operator==(smPipe &p_pipe, smString p_name);
+    friend bool operator==(smPipe &p_pipe, std::string p_name);
     /// \brief print all the listeners (both reference  and value)
     void print() const;
 };

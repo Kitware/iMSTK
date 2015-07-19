@@ -54,9 +54,9 @@ smPipe::~smPipe()
 {
     smIndiceArrayIter<smPipeRegisteration*> iterValue ( &byValue );
 
-    for ( smInt i = iterValue.begin(); i < iterValue.end(); i++ )
+    for ( int i = iterValue.begin(); i < iterValue.end(); i++ )
     {
-        delete [] static_cast<smChar*>(iterValue[i]->data.dataLocation);
+        delete [] static_cast<char*>(iterValue[i]->data.dataLocation);
     }
 }
 smPipe::smPipe ( std::string p_name, int p_elementSize, int p_maxElements, smPipeType p_pipeType ) :
@@ -66,7 +66,7 @@ smPipe::smPipe ( std::string p_name, int p_elementSize, int p_maxElements, smPip
     name = p_name;
     maxElements = p_maxElements;
     elementSize = p_elementSize;
-    data = new smChar[elementSize * maxElements]; //change it to memory block later on
+    data = new char[elementSize * maxElements]; //change it to memory block later on
     pipeType = p_pipeType;
 }
 int smPipe::getElements()
@@ -90,7 +90,7 @@ int smPipe::registerListener ( smPipeRegisteration* p_pipeReg )
         p_pipeReg->data.dataLocation = data;
         return byRefs.add ( p_pipeReg );
     }
-    p_pipeReg->data.dataLocation = new smChar[elementSize * maxElements];
+    p_pipeReg->data.dataLocation = new char[elementSize * maxElements];
     p_pipeReg->data.dataReady = false;
     p_pipeReg->data.nbrElements = 0;
     p_pipeReg->data.timeStamp = timeStamp;
@@ -100,7 +100,7 @@ void smPipe::acknowledgeRefListeners()
 {
     smIndiceArrayIter<smPipeRegisteration*> iterRef ( &byRefs );
 
-    for ( smInt i = iterRef.begin(); i < iterRef.end(); i++ )
+    for ( int i = iterRef.begin(); i < iterRef.end(); i++ )
     {
         ( iterRef[i]->data.nbrElements ) = currentElements;
         ( iterRef[i]->data.timeStamp ) = timeStamp;
@@ -111,7 +111,7 @@ void smPipe::acknowledgeValueListeners()
 {
     smIndiceArrayIter<smPipeRegisteration*> iter ( &byValue );
 
-    for ( smInt i = iter.begin(); i < iter.end(); i++ )
+    for ( int i = iter.begin(); i < iter.end(); i++ )
     {
         memcpy ( iter[i]->data.dataLocation, data, currentElements * elementSize );
         ( iter[i]->data.nbrElements ) = currentElements;

@@ -32,7 +32,7 @@
 #include "Event/HapticEvent.h"
 #include "Event/KeyboardEvent.h"
 
-MyStylus::MyStylus(const smString& p_shaft, const smString& p_lower, const smString& p_upper)
+MyStylus::MyStylus(const std::string& p_shaft, const std::string& p_lower, const std::string& p_upper)
 {
     angle = 0;
     smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
@@ -105,14 +105,14 @@ void MyStylus::updateOpenClose()
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
-void MyStylus::handleEvent (std::shared_ptr<smtk::Event::smEvent> p_event)
+void MyStylus::handleEvent (std::shared_ptr<mstk::Event::smEvent> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         smMeshContainer *containerLower = this->getMeshContainer ( "HookCauteryLower" );
@@ -157,21 +157,21 @@ void MyStylus::handleEvent (std::shared_ptr<smtk::Event::smEvent> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::Num1:
+            case mstk::Event::smKey::Num1:
             {
-                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case smtk::Event::smKey::Num2:
+            case mstk::Event::smKey::Num2:
             {
-                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
                 break;
             }
@@ -181,7 +181,7 @@ void MyStylus::handleEvent (std::shared_ptr<smtk::Event::smEvent> p_event)
     }
 }
 
-HookCautery::HookCautery(const smString& p_pivot)
+HookCautery::HookCautery(const std::string& p_pivot)
 {
     smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
 
@@ -198,14 +198,14 @@ HookCautery::HookCautery(const smString& p_pivot)
     addMeshContainer(&meshContainer);
 }
 
-void HookCautery::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
+void HookCautery::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         transRot = hapticEvent->getTransform();
@@ -222,21 +222,21 @@ void HookCautery::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::Num1:
+            case mstk::Event::smKey::Num1:
             {
-                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case smtk::Event::smKey::Num2:
+            case mstk::Event::smKey::Num2:
             {
-                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
                 break;
             }

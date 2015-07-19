@@ -60,7 +60,7 @@ public:
     std::shared_ptr<smDummySimulator>       defaultSimulator;
     std::shared_ptr<smSimulator>            simulator;
     std::shared_ptr<smMeshToMeshCollision>  collisionDetection;
-    smInt moveObj;
+    int moveObj;
 };
 
 #endif // COLLISIONDETECTIONSPATIALHASHING_H

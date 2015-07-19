@@ -63,7 +63,7 @@ private:
     /// \brief  error log
     smErrorLog *log;
     /// \brief  rendering error
-    smBool renderingError;
+    bool renderingError;
 
 public:
     /// \brief  constructor. gets error log or NULL

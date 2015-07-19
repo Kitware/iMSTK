@@ -49,7 +49,7 @@ public:
     /// \brief Gets the time passed between this call and start()
     ///
     /// \return Returns the time in seconds
-    smLongDouble elapsed();
+    long double elapsed();
 
 private:
     TimePointType begin;

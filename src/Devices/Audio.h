@@ -40,18 +40,18 @@ private:
     sf::SoundBuffer soundBuffer; ///< SFML Sound buffer, contains the sound data
 
     std::shared_ptr<smErrorLog> log; ///< log for errors
-    smString referenceName; ///< A human readable string to refer to the object
-    smtk::Event::AudioState state; ///< state of audio
-    smtk::Event::AudioState prevState; ///< state of audio in previous cycle
-    smFloat prevVolume; ///< state of audio volume in previous cycle
-    smFloat volume; ///< volume (max volume is 1.0)
-    smBool loop; ///< play the song in a loop
+    std::string referenceName; ///< A human readable string to refer to the object
+    mstk::Event::AudioState state; ///< state of audio
+    mstk::Event::AudioState prevState; ///< state of audio in previous cycle
+    float prevVolume; ///< state of audio volume in previous cycle
+    float volume; ///< volume (max volume is 1.0)
+    bool loop; ///< play the song in a loop
 
 public:
     smAudio() :
         referenceName(""),
-        state{smtk::Event::AudioState::Unknown },
-        prevState{smtk::Event::AudioState::Unknown },
+        state{mstk::Event::AudioState::Unknown },
+        prevState{mstk::Event::AudioState::Unknown },
         volume{1.0},
         prevVolume{1.0},
         loop{false}
@@ -59,10 +59,10 @@ public:
     }
 
     /// \brief constructor initialize various states
-    smAudio(const smString& fileName,
-            const smString& p_referenceName,
+    smAudio(const std::string& fileName,
+            const std::string& p_referenceName,
             smErrorLog *p_log = nullptr,
-            smBool p_loop = false)
+            bool p_loop = false)
         : referenceName(p_referenceName),
           loop(p_loop)
     {
@@ -71,7 +71,7 @@ public:
             assert(false);
         }
 
-        prevState = state = smtk::Event::AudioState::Stop;
+        prevState = state = mstk::Event::AudioState::Stop;
         volume = prevVolume = 1.0f;
     }
 
@@ -80,8 +80,8 @@ public:
     {
     }
 
-    smInt open(const smString& fileName,
-               const smString& p_referenceName)
+    int open(const std::string& fileName,
+               const std::string& p_referenceName)
     {
         if (false == soundBuffer.loadFromFile(fileName))
         {
@@ -120,16 +120,16 @@ public:
     }
 
     /// \brief set the state of audio and continue playing
-    void setState(smtk::Event::AudioState p_state)
+    void setState(mstk::Event::AudioState p_state)
     {
         assert("" != referenceName);
 
         switch (state)
         {
-        case smtk::Event::AudioState::Play:
+        case mstk::Event::AudioState::Play:
             this->play();
             break;
-        case smtk::Event::AudioState::Stop:
+        case mstk::Event::AudioState::Stop:
             this->stop();
             break;
         default:
@@ -140,7 +140,7 @@ public:
     }
 
     /// \brief set volume of audio
-    void setVolume(smFloat p_volume)
+    void setVolume(float p_volume)
     {
         if (p_volume > 0.0 && p_volume < 1.0)
         {
@@ -149,7 +149,7 @@ public:
         }
     }
 
-    void setLoop(smBool p_loop)
+    void setLoop(bool p_loop)
     {
         sound.setLoop(p_loop);
         this->loop = p_loop;

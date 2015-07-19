@@ -34,36 +34,29 @@ smErrorLog::smErrorLog()
     consoleOutput = true;
 }
 
-smBool smErrorLog::addError(const smString& p_text)
+bool smErrorLog::addError(const std::string& p_text)
 {
     if (0 >= p_text.length())
     {
         return false;
     }
 
-    if (SIMMEDTK_MAX_ERRORLOG_TEXT > p_text.length())
+    std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
+
+    if (consoleOutput)
     {
-        std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-
-        if (consoleOutput)
-        {
-            std::cout << p_text << "\n";
-        }
-
-        errors.push_back(p_text);
-        timeStamps.push_back(time.elapsed() * 1000);
-
-        if (SIMMEDTK_MAX_ERRORLOG <= errors.size())
-        {
-            errors.erase(errors.begin()); //Make room for new errors
-        }
-
-        return true;
+        std::cout << p_text << "\n";
     }
-    else
+
+    errors.push_back(p_text);
+    timeStamps.push_back(time.elapsed() * 1000);
+
+    if (100 <= errors.size())
     {
-        return false;
+        errors.erase(errors.begin()); //Make room for new errors
     }
+
+    return true;
 }
 
 ///Clean up all the errors in the repository.It is thread safe.
@@ -87,7 +80,7 @@ void smErrorLog::printLastErr()
     printLastErr();
 }
 
-void smErrorLog::setConsoleOutput(smBool flag)
+void smErrorLog::setConsoleOutput(bool flag)
 {
     consoleOutput = flag;
 }

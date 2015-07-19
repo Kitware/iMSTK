@@ -61,15 +61,15 @@ struct smCollisionPairs
 {
     std::shared_ptr<smUnifiedId> objectIndex;
     std::shared_ptr<smUnifiedId> objectIndex2;
-    smInt primIndex;
-    smInt primIndex2;
+    int primIndex;
+    int primIndex2;
 };
 
 /// \brief cell primitive
 struct smCellPrim
 {
-    smInt index;
-    smInt objectId;
+    int index;
+    int objectId;
 };
 
 /// \brief contains everything related to a cell
@@ -77,15 +77,15 @@ class smCell
 {
 
 public:
-    smInt id;
-    smInt cellId[3];
+    int id;
+    int cellId[3];
     smVec3d cellCenter;
     smVec3d cellLeftCorner;
     smVec3d cellRightCorner;
     smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
-    smInt lastPrimitiveIndex;
-    smInt timeStamp;
-    smBool isActive;
+    int lastPrimitiveIndex;
+    int timeStamp;
+    bool isActive;
 
     smCell()
     {
@@ -106,13 +106,13 @@ public:
     smLattice();
 
     /// \brief get the size of the lattice cell side in x-direction
-    smFloat getXStep();
+    float getXStep();
 
     /// \brief get the size of the lattice cell side in y-direction
-    smFloat getYStep();
+    float getYStep();
 
     /// \brief get the size of the lattice cell side in z-direction
-    smFloat getZStep();
+    float getZStep();
 
     /// \brief get the center of the lattice
     smVec3d getLatticeCenter();
@@ -128,19 +128,19 @@ public:
 
     /// \brief Initialize the lattice
     smLatticeReturnType init(smVec3d p_leftCorner, smVec3d p_rightCorner,
-                             smInt p_xSeperation, smInt p_ySeperation, smInt p_zSeperation);
+                             int p_xSeperation, int p_ySeperation, int p_zSeperation);
 
     /// \brief !!
     void indexReset();
 
     /// \brief !!
-    void isCellEmpty(smInt p_cellIndex);
+    void isCellEmpty(int p_cellIndex);
 
     /// \brief !!
-    virtual void  linkPrimitivetoCell(smInt p_primitiveIndex);
+    virtual void  linkPrimitivetoCell(int p_primitiveIndex);
 
     /// \brief update the bounds of the lattice
-    void updateBounds(std::shared_ptr<smSurfaceMesh> p_mesh, smInt p_index);
+    void updateBounds(std::shared_ptr<smSurfaceMesh> p_mesh, int p_index);
 
     /// \brief update the bounds of the lattice
     void updateBounds();
@@ -158,15 +158,15 @@ public:
     smAABB *aabb;
     std::shared_ptr<smSurfaceMesh> mesh;
     smCell *cells;
-    smInt totalCells;
-    smInt xSeperation;
-    smInt ySeperation;
-    smInt zSeperation;
-    smFloat xStep;
-    smFloat yStep;
-    smFloat zStep;
+    int totalCells;
+    int xSeperation;
+    int ySeperation;
+    int zSeperation;
+    float xStep;
+    float yStep;
+    float zStep;
     smVec3d latticeCenter;
-    smInt time;
+    int time;
     std::shared_ptr<smUnifiedId> linkedObject;
 };
 

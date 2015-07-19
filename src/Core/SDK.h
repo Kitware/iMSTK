@@ -68,7 +68,7 @@ struct smMeshHolder: public smBaseHolder
 
     std::shared_ptr<smBaseMesh> mesh;
 
-    inline smBool operator ==(smMeshHolder &p_param)
+    inline bool operator ==(smMeshHolder &p_param)
     {
         return mesh == p_param.mesh;
     }
@@ -85,7 +85,7 @@ struct smModuleHolder: public smBaseHolder
 
     std::shared_ptr<smModule> module;
 
-    inline smBool operator ==(smModuleHolder &p_param)
+    inline bool operator ==(smModuleHolder &p_param)
     {
         return module == p_param.module;
     }
@@ -102,7 +102,7 @@ struct smObjectSimulatorHolder: public smBaseHolder
 
     std::shared_ptr<smObjectSimulator> objectSim;
 
-    inline smBool operator ==(smObjectSimulatorHolder &p_param)
+    inline bool operator ==(smObjectSimulatorHolder &p_param)
     {
         return objectSim == p_param.objectSim;
     }
@@ -117,7 +117,7 @@ struct smSceneHolder: public smBaseHolder
     }
 
     std::shared_ptr<smScene> scene;
-    inline smBool operator ==(smSceneHolder &p_param)
+    inline bool operator ==(smSceneHolder &p_param)
     {
         return scene == p_param.scene;
     }
@@ -134,7 +134,7 @@ struct smSceneObjectHolder: public smBaseHolder
     }
 
     std::shared_ptr<smSceneObject> sceneObject;
-    inline smBool operator ==(smSceneObjectHolder &p_param)
+    inline bool operator ==(smSceneObjectHolder &p_param)
     {
         return sceneObject == p_param.sceneObject;
     }
@@ -152,12 +152,12 @@ struct smPipeHolder: public smBaseHolder
         pipe = NULL;
     }
 
-    inline smBool operator ==(smPipeHolder &p_param)
+    inline bool operator ==(smPipeHolder &p_param)
     {
         return pipe == p_param.pipe;
     }
 
-    inline friend smBool operator==(smPipeHolder &p_pipe, smString &p_name)
+    inline friend bool operator==(smPipeHolder &p_pipe, std::string &p_name)
     {
         return (*(p_pipe.pipe) == p_name);
     }
@@ -171,10 +171,10 @@ private:
     static std::once_flag sdkCallOnceFlag;
 
     bool shutdown; ///< Tells the SDK to terminate
-    smInt sceneIdCounter; ///< this id is incremented when a scene is created
-    smInt argc;
-    smChar argv;
-    smBool isModulesStarted;
+    int sceneIdCounter; ///< this id is incremented when a scene is created
+    int argc;
+    char argv;
+    bool isModulesStarted;
 
     std::shared_ptr<smErrorLog> errorLog; ///< error log
     std::shared_ptr<smViewerBase> viewer; ///< Reference to the sdk viewer object
@@ -202,7 +202,7 @@ public:
     void updateSceneListAll();
 
     void initRegisteredModules();
-    smInt runRegisteredModules();
+    int runRegisteredModules();
     void shutDown();
 
     ///for now both functions below are the same. But it maybe subject to change.
@@ -258,9 +258,9 @@ public:
     void removeRef(std::shared_ptr<smCoreClass> p_coreClass);
 
     /// \brief register functions
-    smInt registerMesh(std::shared_ptr<smBaseMesh> p_mesh);
+    int registerMesh(std::shared_ptr<smBaseMesh> p_mesh);
 
-    smInt registerModule(std::shared_ptr<smModule> p_mod);
+    int registerModule(std::shared_ptr<smModule> p_mod);
 
     void registerObjectSim(std::shared_ptr<smObjectSimulator> p_os);
 

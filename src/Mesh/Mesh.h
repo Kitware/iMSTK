@@ -71,7 +71,7 @@ class smShader;
 struct smTextureAttachment
 {
     smTextureAttachment();
-    smInt textureId;
+    int textureId;
 };
 
 /// \brief base class for the mesh
@@ -82,13 +82,13 @@ public:
     smBaseMesh();
 
     /// \brief query if the mesh has textures available for rendering
-    smBool isMeshTextured();
+    bool isMeshTextured();
 
     /// \brief assign the texture
-    void assignTexture(smInt p_textureId);
+    void assignTexture(int p_textureId);
 
     /// \brief assign the texture
-    void assignTexture(const smString& p_referenceName);
+    void assignTexture(const std::string& p_referenceName);
 
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
@@ -105,13 +105,13 @@ public:
 
 public:
     smCollisionGroup collisionGroup; ///< !!
-    smGLInt renderingID; ///< !!
+    GLint renderingID; ///< !!
     std::shared_ptr<smErrorLog> log; ///< record the log
     smStdVector3d vertices; ///< vertices co-ordinate data at time t
     smStdVector3d origVerts; ///< vertices co-ordinate data at time t=0
-    smInt  nbrVertices; ///< number of vertices
+    int  nbrVertices; ///< number of vertices
     smAABB aabb; ///< Axis aligned bounding box
-    smBool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
+    bool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
     smTexCoord *texCoord; ///< texture co-ordinates
     std::vector<smTextureAttachment> textureIds; ///< !!
 };
@@ -134,10 +134,10 @@ public:
     void getTriangleNeighbors();
 
     /// \brief initialize vertex arrays
-    smBool initVertexArrays(smInt nbr);
+    bool initVertexArrays(int nbr);
 
     /// \brief initialize triangle arrays
-    smBool initTriangleArrays(smInt nbr);
+    bool initTriangleArrays(int nbr);
 
     /// \brief initialize the neighbors of the vertex
     void initVertexNeighbors();
@@ -146,7 +146,7 @@ public:
     void allocateAABBTris();
 
     /// \brief compute the normal of a triangle
-    smVec3d calculateTriangleNormal(smInt triNbr);
+    smVec3d calculateTriangleNormal(int triNbr);
 
     /// \brief update the normals of triangles after they moved
     void updateTriangleNormals();
@@ -176,7 +176,7 @@ public:
     void calcEdges();
 
     /// \brief translate the mesh
-    void translate(smFloat, smFloat, smFloat);
+    void translate(float, float, float);
 
     /// \brief translate the mesh
     void translate(smVec3d p_offset);
@@ -198,7 +198,7 @@ public:
     };
 
     /// \brief load the mesh
-    virtual smBool loadMesh(const smString& fileName, const smMeshFileType &fileType) = 0;
+    virtual bool loadMesh(const std::string& fileName, const smMeshFileType &fileType) = 0;
 
     /// \brief load the mesh
     bool importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage);
@@ -213,7 +213,7 @@ public:
     int getNumEdges()  const;
 
 public:
-    smInt  nbrTriangles; ///< number of triangles
+    int  nbrTriangles; ///< number of triangles
     smTriangle *triangles; ///< list of triangles
     smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
@@ -221,9 +221,9 @@ public:
     smVec3d *vertNormals; ///< vertex normals
     smVec3d *triTangents; ///< triangle tangents
     smVec3d *vertTangents; ///< vertex tangents
-    smBool tangentChannel; ///< !!
-    std::vector< std::vector<smInt> > vertTriNeighbors; ///< list of neighbors for a triangle
-    std::vector< std::vector<smInt> > vertVertNeighbors; ///< list of neighbors for a vertex
+    bool tangentChannel; ///< !!
+    std::vector< std::vector<int> > vertTriNeighbors; ///< list of neighbors for a triangle
+    std::vector< std::vector<int> > vertVertNeighbors; ///< list of neighbors for a vertex
     std::vector<smEdge> edges; ///< list of edges
 
     ///AABBB of the mesh.
@@ -238,25 +238,25 @@ public:
 /// \brief holds the texture co-ordinates
 struct smTexCoord
 {
-    smFloat u, v;
+    float u, v;
 };
 
 /// \brief holds the vertex indices of triangle
 struct smTriangle
 {
-    smUInt vert[3];
+    unsigned int vert[3];
 };
 
 /// \brief holds the vertex indices of tetrahedron
 struct smTetrahedra
 {
-    smInt vert[4];
+    int vert[4];
 };
 
 /// \brief holds the vertex indices of edge
 struct smEdge
 {
-    smUInt vert[2];
+    unsigned int vert[2];
 };
 
 /// \brief !!
@@ -272,10 +272,10 @@ public:
     }
 
     /// \brief constructor
-    smLineMesh(smInt p_nbrVertices);
+    smLineMesh(int p_nbrVertices);
 
     /// \brief constructor
-    smLineMesh(smInt p_nbrVertices, smBool autoEdge);
+    smLineMesh(int p_nbrVertices, bool autoEdge);
 
     /// \brief !!
     void createAutoEdges();
@@ -287,7 +287,7 @@ public:
     void updateAABB();
 
     /// \brief translate the vertices of mesh
-    void translate(smFloat p_offsetX, smFloat p_offsetY, smFloat p_offsetZ);
+    void translate(float p_offsetX, float p_offsetY, float p_offsetZ);
 
     /// \brief translate the vertices of mesh
     void translate(smVec3d p_offset);
@@ -299,12 +299,12 @@ public:
     void rotate(smMatrix33d p_rot);
 
     /// \brief query if the mesh is textured
-    smBool isMeshTextured();
+    bool isMeshTextured();
 
 public:
     smAABB *edgeAABBs;///< AABBs for the edges in the mesh
     smEdge *edges;///< edges of the line mesh
-    smInt nbrEdges;///< number of edges of the line mesh
+    int nbrEdges;///< number of edges of the line mesh
 
 };
 

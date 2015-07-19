@@ -30,7 +30,7 @@
 #include "Shader.h"
 #include "TextureManager.h"
 
-std::unordered_map<smInt, std::shared_ptr<smShader>> smShader::shaders;
+std::unordered_map<int, std::shared_ptr<smShader>> smShader::shaders;
 std::shared_ptr<smShader> smShader::currentShader = nullptr;
 std::shared_ptr<smShader> smShader::savedShader = nullptr;
 
@@ -53,7 +53,7 @@ void printInfoLog(GLhandleARB obj)
 
 smShader::smShader(std::shared_ptr<smErrorLog> logger)
 {
-    type = SIMMEDTK_SMSHADER;
+    type = core::ClassType::Shader;
     log = logger;
     checkErrorEnabled = true;
     setModelViewMatrixShaderName("ModelMatrix");
@@ -81,7 +81,7 @@ smShader::smShader(std::shared_ptr<smErrorLog> logger)
     checkErrorEnabled = false;
 }
 
-smBool smShader::readShaderContent(const smString& p_file, smString& p_content)
+bool smShader::readShaderContent(const std::string& p_file, std::string& p_content)
 {
     std::ifstream file;
     if ("" != p_file)
@@ -113,9 +113,9 @@ smBool smShader::readShaderContent(const smString& p_file, smString& p_content)
 
 ///this function gets the vertex,fragment and geometry shader fileNames respectively. if you don't use
 /// one of them just simply send NULL pointer as a parameter.
-smBool smShader::initShaders(const smString& p_vertexProgFileName,
-                             const smString& p_fragmentProgFileName,
-                             const smString& p_geometryProgFileName)
+bool smShader::initShaders(const std::string& p_vertexProgFileName,
+                             const std::string& p_fragmentProgFileName,
+                             const std::string& p_geometryProgFileName)
 {
     if (glewIsSupported("GL_VERSION_2_0") == GL_FALSE)
     {
@@ -214,7 +214,7 @@ smBool smShader::initShaders(const smString& p_vertexProgFileName,
 
 void smShader::createShaderGLSL(GLhandleARB &p_shaderObject,
                                 const GLhandleARB p_shaderProgramObject,
-                                const smString& p_shaderContent,
+                                const std::string& p_shaderContent,
                                 GLenum p_shaderType)
 {
     const char *shaderSrc = p_shaderContent.data();
@@ -246,7 +246,7 @@ void smShader::createGeometryShaderGLSL()
 }
 
 void smShader::reloadShaderGLSL(const GLhandleARB p_shaderObject,
-                                const smString& p_shaderContent)
+                                const std::string& p_shaderContent)
 {
     const char *shaderSrc = p_shaderContent.data();
     glShaderSource(p_shaderObject, 1, &shaderSrc, NULL);
@@ -270,9 +270,9 @@ void smShader::reloadGeometryShaderGLSL()
 }
 
 ///checks the opengl error
-smBool smShader::checkGLError()
+bool smShader::checkGLError()
 {
-    smString errorText;
+    std::string errorText;
     if (checkErrorEnabled)
     {
         if (smGLUtils::queryGLError(errorText))
@@ -411,12 +411,12 @@ void smShader::saveAndDisableCurrent()
 #endif
 }
 
-smGLInt smShader::addShaderParamGLSL(const smString& p_paramName,
+GLint smShader::addShaderParamGLSL(const std::string& p_paramName,
                                      const GLhandleARB p_shaderProgramObject,
-                                     std::vector<smString>& p_shaderParamsString,
+                                     std::vector<std::string>& p_shaderParamsString,
                                      std::vector<GLint>& p_shaderParams)
 {
-    smGLInt param;
+    GLint param;
     param = glGetUniformLocation(p_shaderProgramObject, p_paramName.data());
     checkGLError();
     p_shaderParamsString.push_back(p_paramName);
@@ -424,32 +424,32 @@ smGLInt smShader::addShaderParamGLSL(const smString& p_paramName,
     return param;
 }
 
-smGLInt smShader::addVertexShaderParamGLSL(const smString& p_paramNameVertex)
+GLint smShader::addVertexShaderParamGLSL(const std::string& p_paramNameVertex)
 {
     return addShaderParamGLSL(p_paramNameVertex, shaderProgramObject,
                               vertexShaderParamsString, vertexShaderParams);
 }
 
-smGLInt smShader::addFragmentShaderParamGLSL(const smString& p_paramNameFragment)
+GLint smShader::addFragmentShaderParamGLSL(const std::string& p_paramNameFragment)
 {
     return addShaderParamGLSL(p_paramNameFragment, shaderProgramObject,
                               fragmentShaderParamsString, fragmentShaderParams);
 }
 
-smGLInt smShader::addGeometryShaderParamGLSL(const smString& p_paramNameGeometry)
+GLint smShader::addGeometryShaderParamGLSL(const std::string& p_paramNameGeometry)
 {
     return addShaderParamGLSL(p_paramNameGeometry, shaderProgramObject,
                               geometryShaderParamsString, geometryShaderParams);
 }
 
-smGLInt smShader::addVertexShaderParam(const smString& p_paramNameVertex)
+GLint smShader::addVertexShaderParam(const std::string& p_paramNameVertex)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     return addVertexShaderParamGLSL(p_paramNameVertex);
 #endif
 }
-smGLInt smShader::addFragmentShaderParam(const smString& p_paramNameFragment)
+GLint smShader::addFragmentShaderParam(const std::string& p_paramNameFragment)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -457,7 +457,7 @@ smGLInt smShader::addFragmentShaderParam(const smString& p_paramNameFragment)
 #endif
 }
 
-smGLInt smShader::addGeometryShaderParam(const smString& p_paramNameGeometry)
+GLint smShader::addGeometryShaderParam(const std::string& p_paramNameGeometry)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -465,11 +465,11 @@ smGLInt smShader::addGeometryShaderParam(const smString& p_paramNameGeometry)
 #endif
 }
 
-smGLInt smShader::addShaderParamForAll(const smString& p_paramName)
+GLint smShader::addShaderParamForAll(const std::string& p_paramName)
 {
 
 #ifdef SIMMEDTK_OPENGL_SHADER
-    smGLInt param;
+    GLint param;
     param = glGetUniformLocation(shaderProgramObject, p_paramName.data());
     vertexShaderParamsString.push_back(p_paramName);
     vertexShaderParams.push_back(param);
@@ -485,7 +485,7 @@ smGLInt smShader::addShaderParamForAll(const smString& p_paramName)
 #endif
 }
 
-smGLInt smShader::getShaderParamForAll(const smString& p_paramName) const
+GLint smShader::getShaderParamForAll(const std::string& p_paramName) const
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
     for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
@@ -500,7 +500,7 @@ smGLInt smShader::getShaderParamForAll(const smString& p_paramName) const
 #endif
 }
 
-smGLInt smShader::getFragmentShaderParam(const smString& p_paramName) const
+GLint smShader::getFragmentShaderParam(const std::string& p_paramName) const
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
     for (size_t i = 0; i < fragmentShaderParamsString.size(); i++)
@@ -515,7 +515,7 @@ smGLInt smShader::getFragmentShaderParam(const smString& p_paramName) const
 #endif
 }
 
-smGLInt smShader::getShaderAtrribParam(const smString& p_paramName) const
+GLint smShader::getShaderAtrribParam(const std::string& p_paramName) const
 {
 #ifdef SIMMEDTK_OPENGL_SHADER
     for (size_t i = 0; i < attribParamsString.size(); i++)
@@ -529,10 +529,10 @@ smGLInt smShader::getShaderAtrribParam(const smString& p_paramName) const
     return -1;
 #endif
 }
-GLint smShader::addShaderParamAttrib(const smString& p_paramName)
+GLint smShader::addShaderParamAttrib(const std::string& p_paramName)
 {
 
-    smGLInt param;
+    GLint param;
     param = glGetAttribLocationARB(shaderProgramObject, p_paramName.data());
 
     checkGLError();
@@ -540,7 +540,7 @@ GLint smShader::addShaderParamAttrib(const smString& p_paramName)
     return param;
 }
 
-smBool smShader::reLoadAllShaders()
+bool smShader::reLoadAllShaders()
 {
 
     std::ifstream vertexShaderFile;
@@ -612,7 +612,7 @@ smBool smShader::reLoadAllShaders()
     return true;
 }
 ///checks the shader source code within the given interval in milliseconds
-smBool smShader::checkShaderUpdate(smInt interval)
+bool smShader::checkShaderUpdate(int interval)
 {
     if ((time.elapsed() * 1000) > interval)
     {
@@ -622,13 +622,13 @@ smBool smShader::checkShaderUpdate(smInt interval)
     return true;
 }
 
-void smShader::enableCheckingErrors(smBool p_checkError)
+void smShader::enableCheckingErrors(bool p_checkError)
 {
 
     this->checkErrorEnabled = p_checkError;
 }
 
-void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, smInt p_textureID)
+void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, int p_textureID)
 {
 
     smTextureShaderAssignment assign;
@@ -636,9 +636,9 @@ void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, smInt p_text
     texAssignments.insert( {p_meshID->getId(), assign} );
 }
 
-smBool smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID,
-                               const smString& p_textureName,
-                               const smString& p_textureShaderName)
+bool smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID,
+                               const std::string& p_textureName,
+                               const std::string& p_textureShaderName)
 {
 
     smTextureShaderAssignment assign;
@@ -658,7 +658,7 @@ smBool smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID,
 void smShader::autoGetTextureIds()
 {
 
-    std::unordered_multimap<smInt, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
+    std::unordered_multimap<int, smTextureShaderAssignment>::iterator i = texAssignments.begin() ;
 
     for (; i != texAssignments.end(); i++)
     {
@@ -666,20 +666,20 @@ void smShader::autoGetTextureIds()
     }
 }
 
-void smShader::createTextureParam(const smString& p_textureNameInShaderCode)
+void smShader::createTextureParam(const std::string& p_textureNameInShaderCode)
 {
 
     this->textureGLBind[p_textureNameInShaderCode] = -1;
 }
 
-smBool smShader::setShaderFileName(const smString& p_vertexFileName,
-                                   const smString& p_geometryFileName,
-                                   const smString& p_fragmentFileName)
+bool smShader::setShaderFileName(const std::string& p_vertexFileName,
+                                   const std::string& p_geometryFileName,
+                                   const std::string& p_fragmentFileName)
 {
 
     if ("" != p_vertexFileName)
     {
-        if (SIMMEDTK_MAX_FILENAME_LENGTH < p_vertexFileName.length())
+        if (core::MaxFilenameLength < p_vertexFileName.length())
         {
             if (nullptr != log)
             {
@@ -693,7 +693,7 @@ smBool smShader::setShaderFileName(const smString& p_vertexFileName,
 
     if ("" != p_geometryFileName)
     {
-        if (SIMMEDTK_MAX_FILENAME_LENGTH < geometryProgFileName.length())
+        if (core::MaxFilenameLength < geometryProgFileName.length())
         {
             if (nullptr != log)
             {
@@ -707,7 +707,7 @@ smBool smShader::setShaderFileName(const smString& p_vertexFileName,
 
     if ("" != p_fragmentFileName)
     {
-        if (SIMMEDTK_MAX_FILENAME_LENGTH < fragmentProgFileName.length())
+        if (core::MaxFilenameLength < fragmentProgFileName.length())
         {
             if (nullptr != log)
             {
@@ -730,13 +730,13 @@ void smShader::initDraw()
     autoGetTextureIds();
 }
 
-smInt smShader::createAttrib(const smString& p_attrib)
+int smShader::createAttrib(const std::string& p_attrib)
 {
     attribParamsString.push_back(p_attrib);
     return attribParamsString.size();
 }
 
-void smShader::createParam(const smString& p_param)
+void smShader::createParam(const std::string& p_param)
 {
     vertexShaderParamsString.push_back(p_param);
     fragmentShaderParamsString.push_back(p_param);
@@ -746,7 +746,7 @@ void smShader::createParam(const smString& p_param)
 void smShader::getAttribAndParamLocations()
 {
 
-    smGLInt param;
+    GLint param;
 
     for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
     {
@@ -798,7 +798,7 @@ void smShader::initGLShaders()
 
 void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)
 {
-    smInt counter = 0;
+    int counter = 0;
     auto range = texAssignments.equal_range(p_id->getId());
 
     for (auto i = range.first; i != range.second; i++)
@@ -809,9 +809,9 @@ void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)
     }
 }
 
-void smShader::activeGLVertAttribs(smInt p_id, smVec3d *p_vecs, smInt /*p_size*/)
+void smShader::activeGLVertAttribs(int p_id, smVec3d *p_vecs, int /*p_size*/)
 {
-    glVertexAttribPointer(attribShaderParams[p_id], 3, smGLFloatType, GL_FALSE, 0, p_vecs);
+    glVertexAttribPointer(attribShaderParams[p_id], 3, GL_FLOAT, GL_FALSE, 0, p_vecs);
 }
 void smShader::registerShader()
 {
@@ -825,9 +825,9 @@ void smShader::print() const
         std::cout << "Param:" << vertexShaderParamsString[i] << "\n";
     }
 }
-bool smShader::setModelViewMatrixShaderName(const smString& p_modelviewMatrixName )
+bool smShader::setModelViewMatrixShaderName(const std::string& p_modelviewMatrixName )
 {
-    if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_modelviewMatrixName.length())
+    if ((core::MaxShaderVariableName - 1) < p_modelviewMatrixName.length())
     {
         return false;
     }
@@ -839,9 +839,9 @@ bool smShader::setModelViewMatrixShaderName(const smString& p_modelviewMatrixNam
     createParam(modelViewMatrixName);
     return true;
 }
-bool smShader::setProjectionMatrixShaderName(const smString& p_projectionName)
+bool smShader::setProjectionMatrixShaderName(const std::string& p_projectionName)
 {
-    if ((SIMMEDTK_MAX_SHADERVARIABLENAME - 1) < p_projectionName.length())
+    if ((core::MaxShaderVariableName - 1) < p_projectionName.length())
     {
         return false;
     }
@@ -863,7 +863,7 @@ void smShader::updateGLSLMatwithOPENGL()
     glUniformMatrix4fv( modelViewMatrix, 1, true, model.data() );
     glUniformMatrix4fv( projectionMatrix, 1, true, proj.data() );
 }
-GLint smShader::queryUniformLocation(const smString& p_param)
+GLint smShader::queryUniformLocation(const std::string& p_param)
 {
     return glGetUniformLocation(shaderProgramObject, p_param.data());
 }

@@ -178,7 +178,7 @@ void CollisionDetectionExample::draw()
             tris = (smCollidedTriangles *)myCollInformation.data.dataLocation;
             glBegin(GL_TRIANGLES);
 
-            for (smInt i = 0; i < myCollInformation.data.nbrElements; i++)
+            for (int i = 0; i < myCollInformation.data.nbrElements; i++)
             {
                 glVertex3dv((GLfloat*)&tris[i].tri1.vert[0]);
                 glVertex3dv((GLfloat*)&tris[i].tri1.vert[1]);

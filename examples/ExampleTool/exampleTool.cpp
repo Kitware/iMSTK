@@ -57,7 +57,7 @@ public:
     {
     }
 
-    void  handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+    void  handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
     {
         s
         MyStylus::handleEvent(p_event);

@@ -36,24 +36,24 @@
 
 struct smSpatialHashCollision::HashFunction
 {
-    HashFunction(smUInt hashConst1 = 73856093,
-                 smUInt hashConst2 = 19349663,
-                 smUInt hashConst3 = 83492791) : const1(hashConst1),const2(hashConst2),const3(hashConst3)
+    HashFunction(unsigned int hashConst1 = 73856093,
+                 unsigned int hashConst2 = 19349663,
+                 unsigned int hashConst3 = 83492791) : const1(hashConst1),const2(hashConst2),const3(hashConst3)
                  {}
 
-    smUInt getKey(const smUInt size, const smUInt x, const smUInt y, const smUInt z)
+    unsigned int getKey(const unsigned int size, const unsigned int x, const unsigned int y, const unsigned int z)
     {
         return (((((x)* const1) ^ ((y)* const2) ^ ((z)* const3))) % (size));
     }
-    smUInt const1;
-    smUInt const2;
-    smUInt const3;
+    unsigned int const1;
+    unsigned int const2;
+    unsigned int const3;
 };
 
-smSpatialHashCollision::smSpatialHashCollision(smInt hashTableSize,
-                             smFloat _cellSizeX,
-                             smFloat _cellSizeY,
-                             smFloat _cellSizeZ):
+smSpatialHashCollision::smSpatialHashCollision(int hashTableSize,
+                             float _cellSizeX,
+                             float _cellSizeY,
+                             float _cellSizeZ):
     cells(hashTableSize),
     cellLines(hashTableSize),
     cellsForTri2Line(hashTableSize),
@@ -93,15 +93,15 @@ void smSpatialHashCollision::removeMesh(std::shared_ptr<smMesh> mesh)
         meshes.erase(it);
 }
 
-smBool smSpatialHashCollision::findCandidatePoints(std::shared_ptr<smMesh> mesh,
+bool smSpatialHashCollision::findCandidatePoints(std::shared_ptr<smMesh> mesh,
                                           std::shared_ptr<smSpatialHashCollision::SurfaceTreeType> colModel)
 {
     smAABB tempAABB;
     tempAABB.aabbMin = colModel->root->getCube().leftMinCorner();
     tempAABB.aabbMax = colModel->root->getCube().rightMaxCorner();
 
-    smBool  found = false;
-    for (smInt i = 0; i < mesh->nbrVertices; i++)
+    bool  found = false;
+    for (int i = 0; i < mesh->nbrVertices; i++)
     {
         if (smCollisionMoller::checkAABBPoint(tempAABB, mesh->vertices[i]))
         {
@@ -112,7 +112,7 @@ smBool smSpatialHashCollision::findCandidatePoints(std::shared_ptr<smMesh> mesh,
     return found;
 }
 
-smBool smSpatialHashCollision::findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+bool smSpatialHashCollision::findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
 {
     smAABB aabboverlap;
 
@@ -134,7 +134,7 @@ smBool smSpatialHashCollision::findCandidateTris(std::shared_ptr<smMesh> meshA, 
     return true;
 }
 
-smBool smSpatialHashCollision::findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB)
+bool smSpatialHashCollision::findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB)
 {
     smAABB aabboverlap;
 
@@ -170,8 +170,8 @@ void smSpatialHashCollision::computeCollisionTri2Tri()
     smCellTriangle triA;
     smCellTriangle triB;
     smVec3d proj1, proj2, inter1, inter2;
-    smShort point1, point2;
-    smInt coPlanar;
+    short point1, point2;
+    int coPlanar;
 
     while (cells.next(iterator))
     {
@@ -270,7 +270,7 @@ void smSpatialHashCollision::computeCollisionModel2Points()
             while (cellsForModelPoints.nextBucketItem(iteratorPoint, point))
             {
 
-                smFloat distanceFromCenter = (model.center - point.vert).norm();
+                float distanceFromCenter = (model.center - point.vert).norm();
 
                 if (distanceFromCenter < model.radius)
                 {
@@ -285,28 +285,28 @@ void smSpatialHashCollision::computeCollisionModel2Points()
     }
 }
 
-void smSpatialHashCollision::computeHash(std::shared_ptr<smMesh> mesh, const std::vector<smInt> &triangleIndexes)
+void smSpatialHashCollision::computeHash(std::shared_ptr<smMesh> mesh, const std::vector<int> &triangleIndexes)
 {
     for(auto&& i : triangleIndexes)
     {
-        smInt xStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMin[0]/cellSizeX));
-        smInt yStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMin[1]/cellSizeY));
-        smInt zStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMin[2]/cellSizeZ));
+        int xStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[0]/cellSizeX));
+        int yStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[1]/cellSizeY));
+        int zStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[2]/cellSizeZ));
 
-        smInt xEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMax[0]/cellSizeX));
-        smInt yEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMax[1]/cellSizeY));
-        smInt zEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[i].aabbMax[2]/cellSizeZ));
+        int xEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[0]/cellSizeX));
+        int yEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[1]/cellSizeY));
+        int zEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[2]/cellSizeZ));
 
-        for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
-            for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
-                for (smInt iz = zStartIndex; iz <= zEndIndex; iz++)
+        for (int ix = xStartIndex; ix <= xEndIndex; ix++)
+            for (int iy = yStartIndex; iy <= yEndIndex; iy++)
+                for (int iz = zStartIndex; iz <= zEndIndex; iz++)
                 {
                     cells.insert(smCellTriangle(i), hasher->getKey(cells.tableSize, ix, iy, iz));
                 }
     }
 }
 
-void smSpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, smInt triangleId, smHash<smCellTriangle> &cells)
+void smSpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<smCellTriangle> &cells)
 {
     smCellTriangle  triangle;
     triangle.meshID = mesh->getUniqueId();
@@ -316,24 +316,24 @@ void smSpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, smInt tri
     triangle.vert[1] = mesh->vertices[mesh->triangles[triangleId].vert[1]];
     triangle.vert[2] = mesh->vertices[mesh->triangles[triangleId].vert[2]];
 
-    smInt xStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMin[0]/cellSizeX));
-    smInt yStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMin[1]/cellSizeY));
-    smInt zStartIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMin[2]/cellSizeZ));
+    int xStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[0]/cellSizeX));
+    int yStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[1]/cellSizeY));
+    int zStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[2]/cellSizeZ));
 
-    smInt xEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMax[0]/cellSizeX));
-    smInt yEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMax[1]/cellSizeY));
-    smInt zEndIndex = static_cast<smInt>(std::floor(mesh->triAABBs[triangleId].aabbMax[2]/cellSizeZ));
+    int xEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[0]/cellSizeX));
+    int yEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[1]/cellSizeY));
+    int zEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[2]/cellSizeZ));
 
-    for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
-        for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
-            for (smInt iz = zStartIndex; iz <= zEndIndex; iz++)
+    for (int ix = xStartIndex; ix <= xEndIndex; ix++)
+        for (int iy = yStartIndex; iy <= yEndIndex; iy++)
+            for (int iz = zStartIndex; iz <= zEndIndex; iz++)
             {
                 cells.checkAndInsert(triangle, hasher->getKey(cells.tableSize, ix, iy, iz));
             }
 }
 
 void smSpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
-                                   smInt edgeId, smHash<smCellLine> &cells)
+                                   int edgeId, smHash<smCellLine> &cells)
 {
     smCellLine  line;
     line.meshID = mesh->getUniqueId();
@@ -341,32 +341,32 @@ void smSpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
     line.vert[0] = mesh->vertices[mesh->edges[edgeId].vert[0]];
     line.vert[1] = mesh->vertices[mesh->edges[edgeId].vert[1]];
 
-    smInt xStartIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[0]/cellSizeX));
-    smInt yStartIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[1]/cellSizeY));
-    smInt zStartIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[2]/cellSizeZ));
+    int xStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[0]/cellSizeX));
+    int yStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[1]/cellSizeY));
+    int zStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[2]/cellSizeZ));
 
-    smInt xEndIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[0]/cellSizeX));
-    smInt yEndIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[1]/cellSizeY));
-    smInt zEndIndex = static_cast<smInt>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[2]/cellSizeZ));
+    int xEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[0]/cellSizeX));
+    int yEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[1]/cellSizeY));
+    int zEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[2]/cellSizeZ));
 
-    for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
-        for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
-            for (smInt iz = zStartIndex; iz <= zEndIndex; iz++)
+    for (int ix = xStartIndex; ix <= xEndIndex; ix++)
+        for (int iy = yStartIndex; iy <= yEndIndex; iy++)
+            for (int iz = zStartIndex; iz <= zEndIndex; iz++)
             {
                 cells.checkAndInsert(line, hasher->getKey(cells.tableSize, ix, iy, iz));
             }
 }
 
-void smSpatialHashCollision::addPoint(std::shared_ptr<smMesh> mesh, smInt vertId, smHash<smCellPoint> &cells)
+void smSpatialHashCollision::addPoint(std::shared_ptr<smMesh> mesh, int vertId, smHash<smCellPoint> &cells)
 {
     smCellPoint cellPoint;
     cellPoint.meshID = mesh->getUniqueId();
     cellPoint.primID = vertId;
     cellPoint.vert = mesh->vertices[vertId];
 
-    smInt xStartIndex = static_cast<smInt>(std::floor(mesh->vertices[vertId][0]/cellSizeX));
-    smInt yStartIndex = static_cast<smInt>(std::floor(mesh->vertices[vertId][1]/cellSizeY));
-    smInt zStartIndex = static_cast<smInt>(std::floor(mesh->vertices[vertId][2]/cellSizeZ));
+    int xStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][0]/cellSizeX));
+    int yStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][1]/cellSizeY));
+    int zStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][2]/cellSizeZ));
 
     cells.checkAndInsert(cellPoint, hasher->getKey(cells.tableSize, xStartIndex, yStartIndex, zStartIndex));
 }
@@ -379,28 +379,28 @@ void smSpatialHashCollision::addOctreeCell(std::shared_ptr<smSpatialHashCollisio
     smSurfaceTreeIterator<smOctreeCell> iter = colModel->getLevelIterator();
     cellModel.meshID = colModel->getAttachedMeshID();
 
-    for (smInt i = iter.start(); i != iter.end(); ++i)
+    for (int i = iter.start(); i != iter.end(); ++i)
     {
         if (!iter[i].isEmpty())
         {
             temp.aabbMin =  iter[i].getCube().leftMinCorner();
             temp.aabbMax =  iter[i].getCube().rightMaxCorner();
 
-            smInt xStartIndex = static_cast<smInt>(std::floor(temp.aabbMin[0]/cellSizeX));
-            smInt yStartIndex = static_cast<smInt>(std::floor(temp.aabbMin[1]/cellSizeY));
-            smInt zStartIndex = static_cast<smInt>(std::floor(temp.aabbMin[2]/cellSizeZ));
+            int xStartIndex = static_cast<int>(std::floor(temp.aabbMin[0]/cellSizeX));
+            int yStartIndex = static_cast<int>(std::floor(temp.aabbMin[1]/cellSizeY));
+            int zStartIndex = static_cast<int>(std::floor(temp.aabbMin[2]/cellSizeZ));
 
-            smInt xEndIndex = static_cast<smInt>(std::floor(temp.aabbMin[0]/cellSizeX));
-            smInt yEndIndex = static_cast<smInt>(std::floor(temp.aabbMin[1]/cellSizeY));
-            smInt zEndIndex = static_cast<smInt>(std::floor(temp.aabbMin[2]/cellSizeZ));
+            int xEndIndex = static_cast<int>(std::floor(temp.aabbMin[0]/cellSizeX));
+            int yEndIndex = static_cast<int>(std::floor(temp.aabbMin[1]/cellSizeY));
+            int zEndIndex = static_cast<int>(std::floor(temp.aabbMin[2]/cellSizeZ));
 
             cellModel.primID = i;
             cellModel.center = iter[i].getCube().center;
             cellModel.radius = iter[i].getCube().getCircumscribedSphere().getRadius();
 
-            for (smInt ix = xStartIndex; ix <= xEndIndex; ix++)
-                for (smInt iy = yStartIndex; iy <= yEndIndex; iy++)
-                    for (smInt iz = zStartIndex; iz <= zEndIndex; iz++)
+            for (int ix = xStartIndex; ix <= xEndIndex; ix++)
+                for (int iy = yStartIndex; iy <= yEndIndex; iy++)
+                    for (int iz = zStartIndex; iz <= zEndIndex; iz++)
                     {
                         cells.checkAndInsert(cellModel, hasher->getKey(cells.tableSize, ix, iy, iz));
                     }

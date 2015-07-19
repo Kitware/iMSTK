@@ -23,7 +23,7 @@
 
 #include "MouseButtonEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smMouseButtonEvent::EventName = EventType::MouseButton;
@@ -56,4 +56,4 @@ const smVec2d& smMouseButtonEvent::getWindowCoord()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

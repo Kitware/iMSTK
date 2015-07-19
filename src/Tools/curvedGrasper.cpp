@@ -32,9 +32,9 @@
 #include "Event/KeyboardEvent.h"
 
 curvedGrasper::curvedGrasper(size_t p_PhantomID,
-                             const smString& p_pivotModelFileName,
-                             const smString& p_lowerModelFileName,
-                             const smString& p_upperModelFileName)
+                             const std::string& p_pivotModelFileName,
+                             const std::string& p_lowerModelFileName,
+                             const std::string& p_upperModelFileName)
 {
 
     angle = 0;
@@ -84,14 +84,14 @@ curvedGrasper::curvedGrasper(size_t p_PhantomID,
     DAQdataID = 0;
 }
 
-void curvedGrasper::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
+void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
@@ -128,22 +128,22 @@ void curvedGrasper::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::Num1:
+            case mstk::Event::smKey::Num1:
             {
-                this->eventHandler->detachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
                 & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case smtk::Event::smKey::Num2:
+            case mstk::Event::smKey::Num2:
             {
-                this->eventHandler->attachEvent(smtk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
                 | SIMMEDTK_RENDER_NONE;
                 break;

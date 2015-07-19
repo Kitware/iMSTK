@@ -41,7 +41,7 @@ protected:
     smHapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///<
 
 public:
-    smBool forceEnabled;
+    bool forceEnabled;
 
     /// \brief constructor initialize the device
     smPhantomInterface();
@@ -50,31 +50,31 @@ public:
     ~smPhantomInterface();
 
     /// \brief !!
-    smInt openDevice();
+    int openDevice();
 
     /// \brief !!
-    smInt closeDevice();
+    int closeDevice();
 
     /// \brief !!
-    smInt openDevice(smInt phantomNumber) ;
+    int openDevice(int phantomNumber) ;
 
     /// \brief !!
-    smInt openDevice(smString phantomName);
+    int openDevice(std::string phantomName);
 
     /// \brief start device scheduler
-    smInt startDevice();
+    int startDevice();
 
     /// \brief get phantom position
-    smInt getPosition(smVec3 <smDouble>& d_pos);
+    int getPosition(smVec3 <smDouble>& d_pos);
 
     /// \brief get phantom orientation
-    smInt getOreintation(smMatrix33 <smDouble> *d_rot);
+    int getOreintation(smMatrix33 <smDouble> *d_rot);
 
     /// \brief get phantom transformation
-    smInt getDeviceTransform(smMatrix44 <smDouble> *d_transform);
+    int getDeviceTransform(smMatrix44 <smDouble> *d_transform);
 
     HHD dHandle[SM_MAX_PHANTOM_DEVICES]; ///< handles for devices available
-    smInt numPhantomDevices; ///< number of phantom devices
+    int numPhantomDevices; ///< number of phantom devices
     hduVector3Dd  position[SM_MAX_PHANTOM_DEVICES]; ///< position
     hduVector3Dd  velocity[SM_MAX_PHANTOM_DEVICES]; ///< velocity
     hduVector3Dd  angles[SM_MAX_PHANTOM_DEVICES]; ///< !! angles of arms
@@ -84,7 +84,7 @@ public:
     hapticDeviceData_t hapticDeviceData[SM_MAX_PHANTOM_DEVICES]; ///< haptic device data
     HDSchedulerHandle hapticCallbackHandle; ///< !!
 
-    smString phantomDeviceNames[SM_MAX_PHANTOM_DEVICES]; ///< names of phantoms
+    std::string phantomDeviceNames[SM_MAX_PHANTOM_DEVICES]; ///< names of phantoms
 
     /// \brief empty functions for now
     virtual void beginFrame() override
@@ -99,7 +99,7 @@ public:
     friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///< !!
 
     /// \brief handle events related to phantom omni
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
 
     /// \brief initialize (nothing happens)
     void init() override;

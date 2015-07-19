@@ -34,21 +34,21 @@ class smCollisionMoller
 {
 public:
     /// \brief triangle and triangle collision retursn intersection and projection points
-    static smBool tri2tri(smVec3d &p_tri1Point1,
+    static bool tri2tri(smVec3d &p_tri1Point1,
                           smVec3d &p_tri1Point2,
                           smVec3d &p_tri1Point3,
                           smVec3d &p_tri2Point1,
                           smVec3d &p_tri2Point2,
                           smVec3d &p_tri2Point3,
-                          smInt &coplanar,
+                          int &coplanar,
                           smVec3d &p_intersectionPoint1,
                           smVec3d &p_intersectionPoint2,
-                          smShort &p_tri1SinglePointIndex,
-                          smShort &p_tri2SinglePointIndex,
+                          short &p_tri1SinglePointIndex,
+                          short &p_tri2SinglePointIndex,
                           smVec3d &p_projPoint1,
                           smVec3d &p_projPoint2);
 
-    static smBool tri2tri( smVec3d &p_tri1Point1,
+    static bool tri2tri( smVec3d &p_tri1Point1,
                            smVec3d &p_tri1Point2,
                            smVec3d &p_tri1Point3,
                            smVec3d &p_tri2Point1,
@@ -59,7 +59,7 @@ public:
                            smVec3d &normal);
 
     /// \brief checks if the two triangles intersect
-    static smBool tri2tri(smVec3d &p_tri1Point1,
+    static bool tri2tri(smVec3d &p_tri1Point1,
                           smVec3d &p_tri1Point2,
                           smVec3d &p_tri1Point3,
                           smVec3d &p_tri2Point1,
@@ -76,7 +76,7 @@ public:
     static inline bool checkOverlapAABBAABB(smAABB &aabbA, smVec3d &p_vertex);
 
     /// \brief  checks if the line intersects the tirangle. returns if it is true. the intersection is returned in  p_interSection
-    static smBool checkLineTri(smVec3d &p_linePoint1,
+    static bool checkLineTri(smVec3d &p_linePoint1,
                                smVec3d &p_linePoint2,
                                smVec3d &p_tri1Point1,
                                smVec3d &p_tri1Point2,
@@ -84,9 +84,9 @@ public:
                                smVec3d &p_interSection);
 
     /// \brief checks if the triangles points are within the AABB
-    static smBool checkAABBTriangle(smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3);
+    static bool checkAABBTriangle(smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3);
 
-    static smBool checkAABBPoint(const smAABB &p_aabb, const smVec3d &p_v);
+    static bool checkAABBPoint(const smAABB &p_aabb, const smVec3d &p_v);
 };
 
 #endif // SM_COLLISIONMOLLER_H

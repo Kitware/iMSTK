@@ -27,7 +27,7 @@
 
 smSceneObject::smSceneObject()
 {
-    type = SIMMEDTK_SMSCENEOBJECT_TYPE_UNKNOWN;
+    type = core::ClassType::Unknown;
     isActive = true;
     objectSim = nullptr;
     customRender = nullptr;
@@ -67,7 +67,7 @@ void smSceneObject::releaseCustomeRenderer()
     customRender = nullptr;
 }
 
-smInt smSceneObject::getObjectId()
+int smSceneObject::getObjectId()
 {
     return this->getUniqueId()->getId();
 }

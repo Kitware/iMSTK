@@ -26,7 +26,7 @@
 
 smStaticSceneObject::smStaticSceneObject(std::shared_ptr<smErrorLog> p_log) : smSceneObject()
 {
-    type = SIMMEDTK_SMSTATICSCENEOBJECT;
+    type = core::ClassType::StaticSceneObject;
 
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
@@ -55,7 +55,7 @@ void smStaticSceneObject::loadInitialStates()
 {
 }
 
-bool smStaticSceneObject::configure(const smString ConfigFile)
+bool smStaticSceneObject::configure(const std::string ConfigFile)
 {
     return false;
 }
@@ -79,6 +79,5 @@ void smStaticSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";
     std::cout << "\t Name        : " << this->getName() << std::endl;
-    std::cout << "\t Type        : " << this->getType() << std::endl;
     std::cout << "\t-------------------------------------\n";
 }

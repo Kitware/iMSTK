@@ -27,7 +27,7 @@
 #include "Event/MouseMoveEvent.h"
 #include "Core/Math.h"
 
-namespace smtk {
+namespace mstk {
 namespace Examples {
 namespace Common {
 
@@ -54,7 +54,7 @@ void pzrMouseCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void pzrMouseCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
 {
     assert(nullptr != event);
     assert(nullptr != camera);

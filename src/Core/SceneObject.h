@@ -42,8 +42,8 @@ class smCustomRenderer;
 ///booleans for objects indicate whether they're initialized or not.
 struct smObjectInitFlags
 {
-    smBool isViewerInit;
-    smBool isSimulatorInit;
+    bool isViewerInit;
+    bool isSimulatorInit;
 
 };
 
@@ -67,7 +67,7 @@ public:
     /// \brief Abstract object initialization
     virtual void initialize() = 0;
 
-    virtual bool configure(smString ConfigFile) = 0;
+    virtual bool configure(std::string ConfigFile) = 0;
 
     /// \brief Load the initial posiitons, velocities etc.,
     virtual void loadInitialStates() = 0;
@@ -96,7 +96,7 @@ public:
     void releaseCustomeRenderer();
 
     /// \brief returns object id
-    smInt getObjectId();
+    int getObjectId();
 
     /// \brief get unified object id
     smUnifiedId::Pointer getObjectUnifiedID();

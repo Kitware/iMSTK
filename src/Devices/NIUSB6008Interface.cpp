@@ -23,7 +23,7 @@
 
 #include "smCore/smConfig.h"
 
-#ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX
+#ifndef __linux__
 #include <iostream>
 #include <fstream>
 #include <cassert>
@@ -41,7 +41,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID)
     char errBuff[2048] = {'\0'};
     NI_error = 0;
 
-    for (smInt i = 0; i < 2048; i++)
+    for (int i = 0; i < 2048; i++)
     {
         NI_errBuff[i] = '\0';
     }
@@ -127,7 +127,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID)
     else
     {
         printf("NI DAQ USB-6008 is not working \n");
-        smInt count = 0;
+        int count = 0;
 
         while (count < 1000)
         {
@@ -157,9 +157,9 @@ void smNIUSB6008Interface::getToolCalibrationData()
     fscanf(fp_cali, "%d\n", &nbrRegTool);
     regTool = new toolData[nbrRegTool];
 
-    for (smInt i = 0; i < nbrRegTool; i++)
+    for (int i = 0; i < nbrRegTool; i++)
     {
-        for (smInt j = 0; j < 5; j++)
+        for (int j = 0; j < 5; j++)
         {
             fscanf(fp_cali, "%c", &regTool[i].type[j]);
         }
@@ -186,7 +186,7 @@ void smNIUSB6008Interface::setTool()
       6     |    NEE_1
       7     |    KNO_0
     */
-    smInt i, j, k, n;
+    int i, j, k, n;
     FILE *fp;
     fp = fopen("config/toolSetting.txt", "r");
 
@@ -259,11 +259,11 @@ void smNIUSB6008Interface::setTool()
 }
 
 /// \brief
-void smNIUSB6008Interface::getToolData(smInt nc, smInt *ac)
+void smNIUSB6008Interface::getToolData(int nc, int *ac)
 {
 
-    smInt i, j, k;
-    smInt cc = 0;
+    int i, j, k;
+    int cc = 0;
 
     for (i = 0; i < nc; i++)
     {
@@ -337,11 +337,11 @@ void smNIUSB6008Interface::sendDataToPipe()
 
     NIUSB6008Data *pipeData;
     pipeData = (NIUSB6008Data*)NIUSB6008pipe->beginWrite();
-    smFloat tF;
-    smInt cid;
+    float tF;
+    int cid;
     pipeData->on = NI_on;
 
-    for (smInt i = 0; i < nbrActiveChannel; i++)
+    for (int i = 0; i < nbrActiveChannel; i++)
     {
         cid = activeChannel[i];
         tF = (aveData[i] - installedTool[cid].min) * installedTool[cid].invRange;
@@ -398,7 +398,7 @@ int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEvent
         if (read == 10)
         {
             NIUSB6008Interface->aveData[0] = NIUSB6008Interface->aveData[1] = NIUSB6008Interface->aveData[2] = 0.0;
-            smInt i, j;
+            int i, j;
 
             for (i = 0; i < 10; i++)
             {
@@ -453,4 +453,4 @@ Error:
     return 0;
 }
 
-#endif //ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX
+#endif //ifndef __linux__

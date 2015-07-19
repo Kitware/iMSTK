@@ -56,7 +56,7 @@ class smSceneObject;
 
 struct smObjectSimulatorParam
 {
-    smShort threadIndex;
+    short threadIndex;
 };
 
 ///This is the major object simulator. Each object simulator should derive this class.
@@ -70,22 +70,22 @@ class smObjectSimulator : public smCoreClass
 protected:
     ///log of the object
     std::shared_ptr<smErrorLog> log;
-    smBool isObjectSimInitialized;
+    bool isObjectSimInitialized;
     smThreadPriority threadPriority;
     smTimer timer;
-    smLongDouble timerPerFrame;
-    smLongDouble FPS;
-    smUInt frameCounter;
-    smLongDouble totalTime;
+    long double timerPerFrame;
+    long double FPS;
+    unsigned int frameCounter;
+    long double totalTime;
     smSimulatorExecutionType execType;
-    smBool executionTypeStatusChanged;
+    bool executionTypeStatusChanged;
 
 public:
     ///This is for scheduler
     smScheduleGroup scheduleGroup;
 
     //std::shared_ptr<smUnifiedId> objectSimulatorId;
-    smBool enabled;
+    bool enabled;
 
     ///the function is reentrant it is not thread safe.
     virtual void addObject(std::shared_ptr<smSceneObject> p_object);
@@ -133,21 +133,21 @@ protected:
     {
 
     private:
-        smShort beginIndex;
-        smShort endIndex;
-        smShort currentIndex;
-        smShort threadIndex;
+        short beginIndex;
+        short endIndex;
+        short currentIndex;
+        short threadIndex;
 
     public:
         smObjectSimulatorObjectIter(smScheduleGroup &p_group,
                                     std::vector<std::shared_ptr<smSceneObject>> &p_objectsSimulated,
-                                    smInt p_threadIndex);
+                                    int p_threadIndex);
 
-        inline void setThreadIndex(smShort p_threadIndex);
+        inline void setThreadIndex(short p_threadIndex);
 
-        inline smInt begin();
+        inline int begin();
 
-        inline smInt end();
+        inline int end();
     };
 };
 

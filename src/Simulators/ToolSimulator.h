@@ -52,7 +52,7 @@ public:
     void syncBuffers() override;
 
     /// \brief handle the events such as button presses related to tool
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 };
 
 #endif

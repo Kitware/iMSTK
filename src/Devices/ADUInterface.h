@@ -44,7 +44,7 @@ struct ADUDeviceCalibrationData
 /// \device Container for holding the device data
 struct ADUDeviceData
 {
-    smBool deviceOpen;
+    bool deviceOpen;
     smUInt calibration[4];
     smUInt anValue[3];
 };
@@ -58,33 +58,33 @@ public:
     smADUInterface();
 
     /// \brief constructor Open the ADU device with all necessary data recorded in a file
-    smADUInterface(const smString& calibrationFile);
+    smADUInterface(const std::string& calibrationFile);
 
     /// \brief destructor
     ~smADUInterface();
 
     /// \brief Open the ADU device specified by the serial number
-    smInt openDevice(const smString& serialNumber);
+    int openDevice(const std::string& serialNumber);
 
     /// \brief Close the ADU device
-    smInt closeDevice();
+    int closeDevice();
 
     /// \brief Function to be called in a thread for getting device data
     void runDevice();
 
     /// \brief !!
-    smInt readAnalogInput(smInt channel);
+    int readAnalogInput(int channel);
 
     /// \brief !!
-    smInt *readAnalogInputs();
+    int *readAnalogInputs();
 
-    smInt sw; ///< !!
-    smBool updateFlag; ///< !!
+    int sw; ///< !!
+    bool updateFlag; ///< !!
     void *deviceHandle; ///< !!
     ADUDeviceCalibrationData *calibrationData; ///< calibration data
     ADUDeviceData *deviceData; ///< device data
-    smString serialNumber; ///< serial number of the ADU device
-    smBool isOpened; ///< !!
+    std::string serialNumber; ///< serial number of the ADU device
+    bool isOpened; ///< !!
 
     /// \brief !!
     void init() override;
@@ -105,7 +105,7 @@ public:
     void run() override;
 
     /// \brief
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event)  override{};
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event)  override{};
 
 public:
     smPipe *ADUpipe; ///< !!

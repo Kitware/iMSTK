@@ -26,7 +26,7 @@
 #include "Core/SDK.h"
 
 /// \brief
-smBool smImportExport::convertToJSON(smMesh *p_mesh, const smString& p_outputFileName,
+bool smImportExport::convertToJSON(smMesh *p_mesh, const std::string& p_outputFileName,
                                      smExportOptions /*p_export*/)
 {
 

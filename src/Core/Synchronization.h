@@ -44,18 +44,18 @@ class smSynchronization: public smCoreClass
     std::condition_variable taskDone;
     std::condition_variable taskStart;
     std::mutex serverMutex;
-    smInt totalWorkers;
-    smInt finishedWorkerCounter;
-    smInt startedWorkerCounter;
-    smBool workerCounterUpdated;
-    smInt newWorkerCounter;
+    int totalWorkers;
+    int finishedWorkerCounter;
+    int startedWorkerCounter;
+    bool workerCounterUpdated;
+    int newWorkerCounter;
 
 public:
 
     /// \param p_threadsForWorkers  choose the number of worker threads
-    smSynchronization(smInt p_threadsForWorkers)
+    smSynchronization(int p_threadsForWorkers)
     {
-        type =   SIMMEDTK_SMSYNCHRONIZATION;
+        type =   core::ClassType::Synchronization;
         totalWorkers = p_threadsForWorkers;
         finishedWorkerCounter = 0;
         startedWorkerCounter = 0;
@@ -93,13 +93,13 @@ public:
 
     /// \brief You could change the number of worker threads synchronization
     ///Call this function after in the main thread where orchestration is done.
-    void setWorkerCounter(smInt p_workerCounter)
+    void setWorkerCounter(int p_workerCounter)
     {
         newWorkerCounter = p_workerCounter;
         workerCounterUpdated = true;
     }
 
-    smInt getTotalWorkers()
+    int getTotalWorkers()
     {
         return totalWorkers;
     }
@@ -123,7 +123,7 @@ public:
     }
 
     /// \brief this function is fore signalling the events after waking up the worker threads.
-    void startTasksandSignalEvent(smInt moduleId)
+    void startTasksandSignalEvent(int moduleId)
     {
 
         smEvent *eventSynch;

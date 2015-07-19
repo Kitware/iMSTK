@@ -28,7 +28,7 @@ smScene::smScene(std::shared_ptr<smErrorLog> p_log) :
     smCoreClass()
 {
     this->log = p_log;
-    type = SIMMEDTK_SMSCENE;
+    type = core::ClassType::Scene;
     sceneUpdatedTimeStamp = 0;
 }
 
@@ -83,7 +83,7 @@ void smScene::removeSceneObject(std::shared_ptr<smUnifiedId> p_sceneObjectId)
 {
     std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
     short id = p_sceneObjectId->getId();
-    if (id >= 0 && id < smInt(sceneObjects.size()))
+    if (id >= 0 && id < int(sceneObjects.size()))
     {
         for (size_t i = 0; i < sceneObjects.size(); i++)
         {
@@ -133,7 +133,7 @@ void smScene::initLights()
     }
 }
 
-smInt smScene::addLight(std::shared_ptr<smLight> p_light)
+int smScene::addLight(std::shared_ptr<smLight> p_light)
 {
     lights.push_back(p_light);
     lights.back()->renderUsage = GL_LIGHT0 + (lights.size() - 1);
@@ -159,14 +159,14 @@ void smScene::refreshLights()
     }
 }
 
-void smScene::setLightPos(smInt p_lightId, smLightPos p_pos)
+void smScene::setLightPos(int p_lightId, smLightPos p_pos)
 {
     std::shared_ptr<smLight> temp = lights.at(p_lightId);
     temp->lightPos = p_pos;
     temp->updateDirection();
 }
 
-void smScene::setLightPos(smInt p_lightId, smLightPos p_pos, smVec3d p_direction)
+void smScene::setLightPos(int p_lightId, smLightPos p_pos, smVec3d p_direction)
 {
     std::shared_ptr<smLight> temp = lights.at(p_lightId);
     temp->lightPos = p_pos;

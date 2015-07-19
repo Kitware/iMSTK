@@ -62,7 +62,7 @@ smVegaObjectConfig::~smVegaObjectConfig()
 {
 }
 
-void smVegaObjectConfig::setFemObjConfuguration(const smString ConfigFilename, const bool printVerbose)
+void smVegaObjectConfig::setFemObjConfuguration(const std::string ConfigFilename, const bool printVerbose)
 {
 
     std::cout << "VEGA: Parsing configuration file" << ConfigFilename.c_str()  << "...\n";

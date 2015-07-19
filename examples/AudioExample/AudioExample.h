@@ -42,7 +42,7 @@ public:
     /// \brief Event handling function from smCoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
 
     /// \brief Set the sound to be controlled
     ///
@@ -51,8 +51,8 @@ public:
 
 private:
     std::shared_ptr<smAudio> sound; ///< Pointer to sound being controlled
-    smBool loopSound; ///< Flag to loop the sound or not
-    smFloat soundVolume;
+    bool loopSound; ///< Flag to loop the sound or not
+    float soundVolume;
 };
 
 void runAudioExample();

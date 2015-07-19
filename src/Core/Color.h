@@ -22,32 +22,32 @@ struct smColor
 {
     union
     {
-        smFloat rgba[4];
+        float rgba[4];
         struct
         {
-            smFloat r;
-            smFloat g;
-            smFloat b;
-            smFloat a;
+            float r;
+            float g;
+            float b;
+            float a;
         };
     };
     smColor();
-    smColor(smFloat r, smFloat g, smFloat b, smFloat a = 1.0);
+    smColor(float r, float g, float b, float a = 1.0);
 
     /// \brief Dark ratio. the valu is between 0 and 1.0
-    void darken(smFloat p_darkFactor);
+    void darken(float p_darkFactor);
     /// \brief lighten the color
-    void lighten(smFloat p_darkFactor);
+    void lighten(float p_darkFactor);
 
     /// \brief returns the color value given with the index
-    smFloat operator()(smInt p_i);
+    float operator()(int p_i);
     /// \brief setting
     smColor &operator=(const smColor &p_color);
     /// \brief converts to gl color
-    smGLFloat* toGLColor();
-    const smGLFloat* toGLColor() const;
+    GLfloat* toGLColor();
+    const GLfloat* toGLColor() const;
     /// \brief set RGB color
-    void setValue(smFloat p_red, smFloat p_green, smFloat p_blue, smFloat p_alpha);
+    void setValue(float p_red, float p_green, float p_blue, float p_alpha);
 
     static smColor colorWhite;
     static smColor colorBlue;

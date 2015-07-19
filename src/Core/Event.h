@@ -27,7 +27,7 @@
 // STL includes
 #include <memory>
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 enum class EventType
@@ -102,6 +102,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMEVENT_H

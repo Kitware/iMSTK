@@ -27,7 +27,7 @@
 #include "TextureManager.h"
 #include "GLRenderer.h"
 
-smBool smFrameBuffer::checkStatus()
+bool smFrameBuffer::checkStatus()
 {
 
     GLenum ret = glCheckFramebufferStatus(GL_FRAMEBUFFER);

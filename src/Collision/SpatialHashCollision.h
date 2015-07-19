@@ -63,10 +63,10 @@ public:
 public:
 
     /// \brief !!
-    smSpatialHashCollision(smInt hashTableSize,
-                  smFloat cellSizeX,
-                  smFloat cellSizeY,
-                  smFloat cellSizeZ);
+    smSpatialHashCollision(int hashTableSize,
+                  float cellSizeX,
+                  float cellSizeY,
+                  float cellSizeZ);
 
     /// \brief destructor clear some memory
     ~smSpatialHashCollision();
@@ -84,16 +84,16 @@ public:
     void removeMesh(std::shared_ptr<smMesh> mesh);
 
     /// \brief !!
-    smBool findCandidates(/*std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB*/);
+    bool findCandidates(/*std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB*/);
 
     /// \brief !!
-    smBool findCandidatePoints(std::shared_ptr<smMesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
+    bool findCandidatePoints(std::shared_ptr<smMesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
-    smBool findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB);
+    bool findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB);
 
     /// \brief find the candidate line-triangle pairs for collision (broad phase collision)
-    smBool findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB);
+    bool findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -105,7 +105,7 @@ public:
     void computeCollisionModel2Points();
 
     /// \brief !! compute the hash
-    void computeHash(std::shared_ptr<smMesh> mesh, const std::vector<smInt> &tris);
+    void computeHash(std::shared_ptr<smMesh> mesh, const std::vector<int> &tris);
 
     const std::vector<std::shared_ptr<smCollidedTriangles>> &getCollidedTriangles() const;
 
@@ -141,9 +141,9 @@ private:
     }
 
 private:
-    smFloat cellSizeX; ///< cell spacing in x-direction
-    smFloat cellSizeY; ///< cell spacing in y-direction
-    smFloat cellSizeZ; ///< cell spacing in z-direction
+    float cellSizeX; ///< cell spacing in x-direction
+    float cellSizeY; ///< cell spacing in y-direction
+    float cellSizeZ; ///< cell spacing in z-direction
 
     smHash<smCellTriangle> cells; // Candidate triangles
     smHash<smCellLine> cellLines; // Lines that stored in the scene.

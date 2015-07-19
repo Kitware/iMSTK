@@ -64,7 +64,7 @@ public:
     /// \brief constructor gets error log
     smSimulator(std::shared_ptr<smErrorLog> p_log);
 
-    void setMaxThreadCount(smInt p_threadMaxCount);
+    void setMaxThreadCount(int p_threadMaxCount);
 
     ///Simualtor registers the simulator and schedules it.
     ///the function is reentrant it is not thread safe.
@@ -106,11 +106,11 @@ private:
     std::shared_ptr<smSimulationMain> main; // Simulation main registration
     std::shared_ptr<smSimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
 
-    smUInt frameCounter; // module keeps track of frame number
-    smInt maxThreadCount; // maximum number of threads
-    smInt changedMainTimeStamp;
-    smInt mainTimeStamp; // time stamp when main callback is registered
-    smInt asyncThreadPoolSize; // Tracks the number of threads the async threadpool is running
+    unsigned int frameCounter; // module keeps track of frame number
+    int maxThreadCount; // maximum number of threads
+    int changedMainTimeStamp;
+    int mainTimeStamp; // time stamp when main callback is registered
+    int asyncThreadPoolSize; // Tracks the number of threads the async threadpool is running
 };
 
 #endif

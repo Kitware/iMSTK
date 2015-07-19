@@ -27,7 +27,7 @@
 #include "Core/CoreClass.h"
 #include "Event/Key.h"
 
-namespace smtk {
+namespace mstk {
 namespace Examples {
 namespace Common {
 
@@ -43,15 +43,15 @@ public:
     /// \brief Event handling function from smCoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
 
     /// \brief Set the keyboard key to listen for
     ///
     /// \param key The keyboard key to listen for
-    void setKey(smtk::Event::smKey key);
+    void setKey(mstk::Event::smKey key);
 
 private:
-    smtk::Event::smKey key; ///< When this key is pressed, shutdown the framework
+    mstk::Event::smKey key; ///< When this key is pressed, shutdown the framework
 };
 
 }//Common

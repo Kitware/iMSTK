@@ -14,12 +14,12 @@ public:
 void smStylusRenderDelegate::initDraw() const
 {
   smStylusRigidSceneObject* geom = this->getSourceGeometryAs<smStylusRigidSceneObject>();
-  smString errorText;
+  std::string errorText;
   tree<smMeshContainer*>::pre_order_iterator iter = geom->meshes.begin();
-  smGLInt newList = glGenLists(geom->meshes.size());
+  GLint newList = glGenLists(geom->meshes.size());
   smGLUtils::queryGLError(errorText);
 
-  smInt listCounter = 0;
+  int listCounter = 0;
 
   while (iter != geom->meshes.end())
     {
@@ -39,7 +39,7 @@ void smStylusRenderDelegate::draw() const
 
 #pragma unroll
 
-  for (smInt i = 0; i < 2; i++)
+  for (int i = 0; i < 2; i++)
     {
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();

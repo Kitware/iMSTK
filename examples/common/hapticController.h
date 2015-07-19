@@ -28,7 +28,7 @@
 #include "Event/HapticEvent.h"
 #include "Simulators/VegaFemSceneObject.h"
 
-namespace smtk {
+namespace mstk {
 namespace Examples {
 namespace Common {
 
@@ -44,7 +44,7 @@ public:
     /// \brief Event handling function from smCoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
 
     /// \brief Set the scene objects which gets affected by this haptic event
     ///

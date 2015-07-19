@@ -16,7 +16,7 @@ void smLatticeRenderDelegate::draw() const
 
   int index = 0;
   int index2 = 0;
-  smInt latticeMode;
+  int latticeMode;
   latticeMode = SIMMEDTK_SMLATTICE_CELLPOINTSLINKS;
 
   if ( geom->cells == NULL || latticeMode == SIMMEDTK_SMLATTICE_NONE )

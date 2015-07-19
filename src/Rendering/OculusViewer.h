@@ -60,7 +60,7 @@ private:
     /// \details Code adapted from: http://nuclear.mutantstargoat.com/hg/oculus2/file/tip
     ///
     /// \return Returns -1 on error and 0 on success
-    smInt initOculus(void);
+    int initOculus(void);
 
     /// \brief Cleans up Oculus resources
     ///

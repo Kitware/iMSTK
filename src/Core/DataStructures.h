@@ -38,68 +38,68 @@ protected:
     /// \brief  storage
     T *storage;
     /// \brief  check if the slot is empty
-    smBool *isEmpty;
+    bool *isEmpty;
     /// \brief  indices
-    smInt *indices;
+    int *indices;
     /// \brief  number of elements
-    smInt nbrElements;
+    int nbrElements;
     /// \brief  maximum storage
-    smInt maxStorage;
+    int maxStorage;
 public:
     /// \brief  destructor
     ~smIndiceArray();
     /// \brief constructor; gets maximum number of elements
-    inline smIndiceArray(smInt p_maxStorage);
+    inline smIndiceArray(int p_maxStorage);
     /// \brief  add item
-    inline smInt add(T p_item);
+    inline int add(T p_item);
     /// \brief check if the item exists, if not add
-    inline smInt checkAndAdd(T p_item);
+    inline int checkAndAdd(T p_item);
     /// \brief remove the element from array
-    inline smBool remove(smInt p_itemIndex);
+    inline bool remove(int p_itemIndex);
 
     /// \brief replace the entry in p_index slot with p_item
-    inline smBool replace(smInt p_index, T &p_item);
+    inline bool replace(int p_index, T &p_item);
     /// \brief get element by reference
-    inline T& getByRef(smInt p_index);
+    inline T& getByRef(int p_index);
     /// \brief  get element by safe. If the element doesn't exist it will return false
-    inline smBool getByRefSafe(smInt p_index, T&p_item);
+    inline bool getByRefSafe(int p_index, T&p_item);
     /// \brief get element by reference with string
-    inline T& getByRef(smString p_string);
+    inline T& getByRef(std::string p_string);
     /// \brief for iterative access
     friend smIndiceArrayIter<T>;
     /// \brief print the elements
     inline void print() const;
     /// \brief operators
-    inline T& operator[](smInt p_index);
+    inline T& operator[](int p_index);
 
-    inline smInt size();
+    inline int size();
     /// \brief copy from another p_array
-    inline smBool copy(smIndiceArray &p_array);
+    inline bool copy(smIndiceArray &p_array);
 };
 
 /// \brief  iteration
 template<class T>
 class smIndiceArrayIter
 {
-    smInt index;
+    int index;
     smIndiceArray<T> *arrayPtr;
 public:
     /// \brief constructor that require index array
     smIndiceArrayIter(smIndiceArray<T> *p_array);
     /// \brief  operators for accessing and iteration
-    T& operator[](smInt p_index);
+    T& operator[](int p_index);
 
-    smInt& operator++(); //prefix;
+    int& operator++(); //prefix;
 
-    smInt operator++(const int);  //postfix;
+    int operator++(const int);  //postfix;
 
-    smInt& operator--(); //prefix;
+    int& operator--(); //prefix;
 
-    smInt operator--(const int);  //postfix;
+    int operator--(const int);  //postfix;
 
-    inline smInt begin();
+    inline int begin();
 
-    inline smInt end();
+    inline int end();
 };
 /// \brief hash bucket size
 #define SIMMEDTK_HASHBUCKET_SIZE    10
@@ -111,7 +111,7 @@ public:
     smEntryList();
 
     T ID[SIMMEDTK_HASHBUCKET_SIZE];
-    smUInt totalEntries;
+    unsigned int totalEntries;
     smEntryList* p_entry;
 };
 /// \brief hash iterator
@@ -130,8 +130,8 @@ struct smHashIterator
 
     smEntryList<T> *iterator;
     smEntryList<T> *bucketStart;
-    smInt tableIndex;
-    smInt currentIndex;
+    int tableIndex;
+    int currentIndex;
 
     template <class K>
     friend std::ostream &operator<<(std::ostream &out, smHashIterator<K> &p);
@@ -154,19 +154,19 @@ class smHash
     /// \brief primitive ids that is stored with entry list
     smEntryList<T> *primitiveIDs;
     /// \brief  current table index
-    smLongInt currentTableIndex;
+    long int currentTableIndex;
     /// \brief current entry index in the bucket
-    smLongInt currentEntryIndex;
+    long int currentEntryIndex;
     /// \brief  current bucket pointer
     smEntryList<T> *currentIterationBucket;
 public:
     /// \brief  number of pritimives
-    smLongInt num_prim;
+    long int num_prim;
     /// \brief  table size
-    smLongInt tableSize;
+    long int tableSize;
 private:
     /// \brief entries in the bucket
-    inline void moveEntriesInBucket(smEntryList<T> &p_Bucket, smInt p_entryIndex);
+    inline void moveEntriesInBucket(smEntryList<T> &p_Bucket, int p_entryIndex);
     /// \brief check if the p_prim exists in the bucket
     inline bool checkIdentical(smEntryList<T> &p_entry, T p_prim);
     /// \brief find the bucket entry and update it
@@ -176,12 +176,12 @@ private:
 
 public:
     /// \brief initializes the table; entry
-    smHash(smInt p_tableSize);
+    smHash(int p_tableSize);
     /// \brief  insert the entry; indicate as p_triangle. It can be any type not only a triangle
     /// hashindex is the has number generated for the entry
-    inline SIMMEDTK_HASHRETURN_CODES insert(T p_triangle, smUInt hashIndex);
+    inline SIMMEDTK_HASHRETURN_CODES insert(T p_triangle, unsigned int hashIndex);
     /// \brief check if there is an entry and index
-    inline SIMMEDTK_HASHRETURN_CODES checkAndInsert(T p_triangle, smUInt hashIndex);
+    inline SIMMEDTK_HASHRETURN_CODES checkAndInsert(T p_triangle, unsigned int hashIndex);
     /// \brief starts the iteration. reset the indices
     inline void startIteration();
     /// \brief  go to next table index
@@ -191,7 +191,7 @@ public:
     /// \brief proceed to next entry and return the element. it the bucket ends it will go to next table index
     inline bool next(T &p_prim);
     /// \brief next element by getting reference to it
-    inline smBool nextByRef(T **p_prim);
+    inline bool nextByRef(T **p_prim);
     /// \brief  print all the content
     inline void printContent();
     /// \brief  clear all table, including the elements

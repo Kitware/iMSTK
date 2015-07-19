@@ -45,7 +45,7 @@ smSDK::smSDK()
     shutdown = false;
     sceneIdCounter = 1;
     isModulesStarted = false;
-    type = SIMMEDTK_SMSDK;
+    type = core::ClassType::Sdk;
     viewer = nullptr;
     simulator = nullptr;
     sceneList.clear();
@@ -116,7 +116,7 @@ std::shared_ptr<smSimulator> smSDK::createSimulator()
     {
         simulator = std::make_shared<smSimulator>(errorLog);
 
-        for (smInt j = 0; j < (*scenesRef).size(); j++)
+        for (int j = 0; j < (*scenesRef).size(); j++)
         {
             simulator->sceneList.push_back((*scenesRef)[j].scene);
         }
@@ -136,8 +136,8 @@ void smSDK::updateSceneListAll()
 void smSDK::initRegisteredModules()
 {
 
-    for (smInt i = 0; i < modulesRef->size(); i++)
-        if ((*modulesRef)[i].module->getType() != SIMMEDTK_SMVIEWER)
+    for (int i = 0; i < modulesRef->size(); i++)
+        if ((*modulesRef)[i].module->getType() != core::ClassType::Viewer)
         {
             (*modulesRef)[i].module->init();
         }
@@ -152,16 +152,16 @@ void smSDK::initRegisteredModules()
   * Otherwise, the index of the last viewer module encountered
   * is returned.
   */
-smInt smSDK::runRegisteredModules()
+int smSDK::runRegisteredModules()
 {
-    smInt viewerIndex = -1;
+    int viewerIndex = -1;
 
     if (isModulesStarted)
     {
         return viewerIndex;
     }
 
-    for (smInt i = 0; i < modulesRef->size(); i++)
+    for (int i = 0; i < modulesRef->size(); i++)
     {
         auto view = std::dynamic_pointer_cast<smViewerBase>((*modulesRef)[i].module);
         if (view)
@@ -178,7 +178,7 @@ smInt smSDK::runRegisteredModules()
 void smSDK::shutDown()
 {
 
-    for (smInt i = 0; i < modulesRef->size(); i++)
+    for (int i = 0; i < modulesRef->size(); i++)
     {
         (*modulesRef)[i].module->terminateExecution = true;
     }
@@ -191,7 +191,7 @@ void smSDK::run()
     updateSceneListAll();
     initRegisteredModules();
 
-    smInt viewer = runRegisteredModules();
+    int viewer = runRegisteredModules();
     // Run the viewer in the main thread:
     if (viewer >= 0)
         (*modulesRef)[viewer].module->exec();
@@ -250,14 +250,14 @@ std::shared_ptr<smSDK> smSDK::getInstance()
 void smSDK::terminateAll()
 {
 
-    for(smInt i = 0; i < (*modulesRef).size(); i++)
+    for(int i = 0; i < (*modulesRef).size(); i++)
     {
         (*modulesRef)[i].module->terminateExecution = true;
     }
 
-    for(smInt i = 0; i < (*modulesRef).size(); i++)
+    for(int i = 0; i < (*modulesRef).size(); i++)
     {
-        smBool moduleTerminated = false;
+        bool moduleTerminated = false;
 
         while(true && !moduleTerminated)
         {
@@ -270,14 +270,14 @@ void smSDK::terminateAll()
 }
 
 /// \brief register functions
-smInt smSDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
+int smSDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
 {
     smMeshHolder mh;
     mh.mesh = p_mesh;
     return meshesRef->checkAndAdd(mh);
 }
 
-smInt smSDK::registerModule(std::shared_ptr<smModule> p_mod)
+int smSDK::registerModule(std::shared_ptr<smModule> p_mod)
 {
     smModuleHolder mh;
     mh.module = p_mod;

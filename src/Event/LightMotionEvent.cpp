@@ -23,7 +23,7 @@
 
 #include "LightMotionEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smLightMotionEvent::EventName = EventType::LightMotion;
@@ -59,4 +59,4 @@ const int& smLightMotionEvent::getLightIndex()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

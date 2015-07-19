@@ -26,7 +26,7 @@
 /// \brief Begin frame will be called before the cycle
 void  smModule::beginModule()
 {
-    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), SIMMEDTK_CALLERSTATE_BEGINFRAME);
+    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), core::CallerState::BeginFrame);
     beginFrame();
 
 }
@@ -35,7 +35,7 @@ void  smModule::beginModule()
 void  smModule::endModule()
 {
     endFrame();
-    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), SIMMEDTK_CALLERSTATE_ENDFRAME);
+    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), core::CallerState::EndFrame);
 }
 void smModule::terminate()
 {

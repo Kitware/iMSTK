@@ -34,7 +34,7 @@ smRenderDetail::smRenderDetail()
   this->reset();
 }
 
-smRenderDetail::smRenderDetail(smUInt type)
+smRenderDetail::smRenderDetail(unsigned int type)
 {
   this->reset();
   normalLength = 1.0;
@@ -64,7 +64,7 @@ void smRenderDetail::reset()
   canGetShadow = true;
 }
 
-void smRenderDetail::setNormalLength(const smFloat len)
+void smRenderDetail::setNormalLength(const float len)
 {
     this->normalLength = len;
 }
@@ -104,7 +104,7 @@ void smRenderDetail::setWireframeColor(const smColor wireColor)
 {
     this->wireFrameColor = wireColor;
 }
-void smRenderDetail::setShininess(const smFloat s)
+void smRenderDetail::setShininess(const float s)
 {
     this->shininess = s;
 }
@@ -128,7 +128,7 @@ const float& smRenderDetail::getShininess() const
 {
     return shininess;
 }
-const smUInt& smRenderDetail::getRenderType() const
+const unsigned int& smRenderDetail::getRenderType() const
 {
     return renderType;
 }

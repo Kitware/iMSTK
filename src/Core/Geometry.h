@@ -276,7 +276,7 @@ struct smCube
     smCube();
 
     /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
-    void subDivide(smInt p_divisionPerAxis, smCube *p_cube);
+    void subDivide(int p_divisionPerAxis, smCube *p_cube);
 
     /// \brief expands the cube. increases the edge length with expansion*edge length
     void expand(double p_expansion);
@@ -327,10 +327,10 @@ public:
     smVec3d center() const;
 
     /// \brief check if two AABB overlaps
-    static smBool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB);
+    static bool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB);
 
     /// \brief check if two AABB overlaps
-    smBool overlaps(const smAABB &other) const;
+    bool overlaps(const smAABB &other) const;
 
     /// \brief set  p_aabb to the current one
     const smAABB &operator=(const smAABB &p_aabb);
@@ -339,13 +339,13 @@ public:
     smAABB &operator*(const double p_scale);
 
     /// \brief sub divides p_length will be used to create the slices
-    void subDivide(const double p_length, const smInt p_divison, smAABB *p_aabb) const;
+    void subDivide(const double p_length, const int p_divison, smAABB *p_aabb) const;
 
     /// \brief divides current AABB in x,y,z axes with specificed divisions. results are placed in p_aabb
-    void subDivide(const smInt p_divisionX, const smInt p_divisionY, const smInt p_divisionZ, smAABB *p_aabb) const;
+    void subDivide(const int p_divisionX, const int p_divisionY, const int p_divisionZ, smAABB *p_aabb) const;
 
     /// \brief divides current AABB in all axes with specificed p_division. results are placed in p_aabb
-    void subDivide(const smInt p_division, smAABB *p_aabb) const;
+    void subDivide(const int p_division, smAABB *p_aabb) const;
 
     /// \brief returns half of X edge of AABB
     double halfSizeX() const;

@@ -31,13 +31,13 @@
 /// \brief holds haptic device data
 struct hapticDeviceData_t
 {
-    smInt deviceID;
-    smString deviceName;
+    int deviceID;
+    std::string deviceName;
     smVec3 <smDouble> position;
     smVec3 <smDouble> velocity;
     smVec3 <smDouble> angles;
     smMatrix44 <smDouble> transform;
-    smBool buttonState[SM_MAX_BUTTONS];
+    bool buttonState[SM_MAX_BUTTONS];
 };
 
 /// \brief Absract base class for haptic device

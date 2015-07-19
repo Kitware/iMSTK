@@ -28,7 +28,7 @@
 #include "Core/Event.h"
 #include "Key.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 class smKeyboardEvent : public smEvent
@@ -58,6 +58,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMKEYBOARDEVENT_H

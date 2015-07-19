@@ -25,7 +25,7 @@
 
 #include "Event/KeyboardEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Examples {
 namespace Common {
 
@@ -50,20 +50,20 @@ void wasdCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
 {
     assert(nullptr != event);
     assert(nullptr != camera);
 
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
         smVec3f dispVec = smVec3f::Zero(); //Vector to store displacement of camera
         switch(keyboardEvent->getKeyPressed())
         {
-        case smtk::Event::smKey::W:
+        case mstk::Event::smKey::W:
         {
-            if(smtk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & smtk::Event::smModKey::shift))
+            if(mstk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & mstk::Event::smModKey::shift))
             {
                 //Move the camera up
                 dispVec(1) = moveDistance;
@@ -75,15 +75,15 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
             }
             break;
         }
-        case smtk::Event::smKey::A:
+        case mstk::Event::smKey::A:
         {
             //Move the camera to the left
             dispVec(0) = -moveDistance;
             break;
         }
-        case smtk::Event::smKey::S:
+        case mstk::Event::smKey::S:
         {
-            if(smtk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & smtk::Event::smModKey::shift))
+            if(mstk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & mstk::Event::smModKey::shift))
             {
                 //Move the camera down
                 dispVec(1) = -moveDistance;
@@ -95,7 +95,7 @@ void wasdCameraController::handleEvent(std::shared_ptr<smtk::Event::smEvent> eve
             }
             break;
         }
-        case smtk::Event::smKey::D:
+        case mstk::Event::smKey::D:
         {
             //Move the camera to the right
             dispVec(0) = moveDistance;

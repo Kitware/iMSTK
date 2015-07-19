@@ -32,7 +32,7 @@
 #include "CoreClass.h"
 #include "ModelRepresentation.h"
 
-namespace smtk{
+namespace mstk{
 namespace Event{
     class smEvent;
 }
@@ -65,11 +65,11 @@ public:
     void loadInitialStates() override;
 
     /// \brief configure the static scene object using external config file (optional)
-    bool configure(const smString ConfigFile) override;
+    bool configure(const std::string ConfigFile) override;
 
     void printInfo() const override;
 
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent>) override {}
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent>) override {}
 
     void setModel(std::shared_ptr<smModelRepresentation> model);
 

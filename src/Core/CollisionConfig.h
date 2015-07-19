@@ -36,8 +36,8 @@ struct GeometryRepresentation {};
 struct smCellTriangle : public GeometryRepresentation
 {
     smCellTriangle() : primID(0) {}
-    smCellTriangle(const smUInt &id) : primID(id) {}
-    smUInt primID;
+    smCellTriangle(const unsigned int &id) : primID(id) {}
+    unsigned int primID;
     std::shared_ptr<smUnifiedId> meshID;
     smVec3d vert[3];
 
@@ -53,8 +53,8 @@ struct smCellTriangle : public GeometryRepresentation
 struct smCellLine : public GeometryRepresentation
 {
     smCellLine() : primID(0) {}
-    smCellLine(const smUInt &id) : primID(id) {}
-    smUInt primID; ///< Edge id
+    smCellLine(const unsigned int &id) : primID(id) {}
+    unsigned int primID; ///< Edge id
     std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
     smVec3d vert[2]; ///< Vertices
 
@@ -68,8 +68,8 @@ struct smCellLine : public GeometryRepresentation
 struct smCellModel : public GeometryRepresentation
 {
     smCellModel() : primID(0) {}
-    smCellModel(const smUInt &id) : primID(id) {}
-    smUInt primID; ///< Model Prim id
+    smCellModel(const unsigned int &id) : primID(id) {}
+    unsigned int primID; ///< Model Prim id
     std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
     smVec3d center; ///< Vertices
     double radius;
@@ -87,8 +87,8 @@ struct smCellModel : public GeometryRepresentation
 struct smCellPoint : public GeometryRepresentation
 {
     smCellPoint() : primID(0) {}
-    smCellPoint(const smUInt &id) : primID(id) {}
-    smUInt primID; ///< Model Prim id
+    smCellPoint(const unsigned int &id) : primID(id) {}
+    unsigned int primID; ///< Model Prim id
     std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
     smVec3d vert; ///< Vertices
 
@@ -106,7 +106,7 @@ struct smCollidedTriangles
     smCellTriangle tri1;
     smCellTriangle tri2;
     smVec3d proj1, proj2;
-    smShort point1, point2;
+    short point1, point2;
 };
 
 /// \brief Contains line pair that have collided
@@ -130,14 +130,14 @@ class smCollisionGroup
 {
 public:
 
-    smUInt64  groupId;
-    smUInt64  groupMask;
+    size_t groupId;
+    size_t groupMask;
 
     /// \brief !!
     smCollisionGroup();
 
     /// \brief !!
-    void setGroup(smUInt p_groupId);
+    void setGroup(unsigned int p_groupId);
 
     /// \brief !!
     void permitCollision(smCollisionGroup &p_group);
@@ -147,7 +147,7 @@ public:
 
     /// \brief if the group is different then the function checks the group mask..
     //  if they're in the same group collision enabled
-    smBool isCollisionPermitted(smCollisionGroup& p_group);
+    bool isCollisionPermitted(smCollisionGroup& p_group);
 
 };
 

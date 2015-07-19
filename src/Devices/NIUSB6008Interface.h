@@ -23,7 +23,7 @@
 
 #include "smCore/smConfig.h"
 
-#ifndef SIMMEDTK_OPERATINGSYSTEM_LINUX
+#ifndef __linux__
 
 #ifndef SM_NIUSB6008_INTERFACE_H
 
@@ -39,8 +39,8 @@
 /// \brief National Instruments USB6008 related data
 struct NIUSB6008Data
 {
-    smBool on;
-    smFloat value[3];
+    bool on;
+    float value[3];
 };
 
 /// \brief data related to tools used for laparoscopic surgery simulators
@@ -63,8 +63,8 @@ public:
     smPipe *NIUSB6008pipe; ///<
     int32 NI_error; ///<
     char NI_errBuff[2048]; ///<
-    smInt initCount; ///<
-    smBool NI_on; ///<
+    int initCount; ///<
+    bool NI_on; ///<
     float32 minValue[2]; ///<
     float32 maxValue[2]; ///<
     float32 invRange[2]; ///<
@@ -72,13 +72,13 @@ public:
     float64 sampdata[30]; ///<
     TaskHandle taskHandle; ///<
     float64 aveData[3]; ///<
-    smInt nbrRegTool; ///<
+    int nbrRegTool; ///<
     toolData *regTool; ///<
-    smInt nbrTotalChannel; ///<
+    int nbrTotalChannel; ///<
     toolData installedTool[8]; ///< total number of AI channels of the device = 8
-    smInt nbrActiveChannel; ///<
-    smInt activeChannel[3]; ///< maximum number of active channel is 3s
-    smInt taskID;
+    int nbrActiveChannel; ///<
+    int activeChannel[3]; ///< maximum number of active channel is 3s
+    int taskID;
 
 public:
 
@@ -97,7 +97,7 @@ public:
     void run();
 
     /// \brief handle event related to NIUSB6008 device
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> event) override
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override
     {
     };
 
@@ -124,7 +124,7 @@ public:
     void setTool();
 
     /// \brief get the data form registered tools
-    void getToolData(smInt nc, smInt *ac);
+    void getToolData(int nc, int *ac);
 
     /// \brief !!
     friend int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle,
@@ -137,4 +137,4 @@ public:
 
 #endif
 
-#endif //SIMMEDTK_OPERATINGSYSTEM_LINUX
+#endif //__linux__

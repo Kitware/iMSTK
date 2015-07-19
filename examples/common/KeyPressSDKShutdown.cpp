@@ -26,17 +26,17 @@
 #include "Core/SDK.h"
 #include "Event/KeyboardEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Examples {
 namespace Common {
 
-KeyPressSDKShutdown::KeyPressSDKShutdown() : key(smtk::Event::smKey::Escape)
+KeyPressSDKShutdown::KeyPressSDKShutdown() : key(mstk::Event::smKey::Escape)
 {
 }
 
-void KeyPressSDKShutdown::handleEvent(std::shared_ptr<smtk::Event::smEvent> event)
+void KeyPressSDKShutdown::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
 {
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
         if (keyboardEvent->getKeyPressed() == this->key)
@@ -46,7 +46,7 @@ void KeyPressSDKShutdown::handleEvent(std::shared_ptr<smtk::Event::smEvent> even
     }
 }
 
-void KeyPressSDKShutdown::setKey(smtk::Event::smKey key)
+void KeyPressSDKShutdown::setKey(mstk::Event::smKey key)
 {
     this->key = key;
 }

@@ -28,7 +28,7 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 enum class smMouseButton
@@ -69,6 +69,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMMOUSEBUTTONEVENT_H

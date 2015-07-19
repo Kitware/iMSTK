@@ -50,7 +50,7 @@ smVBOResult smVBO::updateVertices(const smVectorf &p_vectors,
     // Bind the vertices's VBO
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
 
-    smFloat *objectBufferPtr = reinterpret_cast<smFloat*>(glMapBufferARB(
+    float *objectBufferPtr = reinterpret_cast<float*>(glMapBufferARB(
         GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + dataOffsetMap[p_objectId];
     if (objectBufferPtr == NULL)
     {
@@ -92,7 +92,7 @@ smVBOResult smVBO::updateTriangleIndices(const smVector<size_t> &p_indices, size
     // Bind the indices' VBO
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
 
-    smFloat *objectBufferPtr = reinterpret_cast<smFloat*>(glMapBufferARB(
+    float *objectBufferPtr = reinterpret_cast<float*>(glMapBufferARB(
         GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + indexOffsetMap[p_objectId];
     if (objectBufferPtr == NULL)
     {
@@ -114,20 +114,20 @@ smVBOResult smVBO::updateTriangleIndices(const smVector<size_t> &p_indices, size
 smVBOResult smVBO::drawElements(size_t p_objectId)
 {
 
-    smInt dataOffset;
-    smInt nbrVertices;
-    smInt indexOffset;
-    smInt nbrTriangles;
+    int dataOffset;
+    int nbrVertices;
+    int indexOffset;
+    int nbrTriangles;
 
     nbrVertices = numberofVertices[p_objectId];
     nbrTriangles = numberofTriangles[p_objectId];
     dataOffset = dataOffsetMap[p_objectId];
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
-    glVertexPointer(3, smGLRealType, 0, reinterpret_cast<void*>(dataOffset));
-    glNormalPointer(smGLRealType, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3d)));
+    glVertexPointer(3, GL_FLOAT, 0, reinterpret_cast<void*>(dataOffset));
+    glNormalPointer(GL_FLOAT, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3d)));
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-    glIndexPointer(smGLUIntType, 0, reinterpret_cast<void*>(indexOffset));
+    glIndexPointer(GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(indexOffset));
 
     //render polygons
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -136,7 +136,7 @@ smVBOResult smVBO::drawElements(size_t p_objectId)
 
     if (!renderingError)
     {
-        glDrawElements(GL_TRIANGLES, nbrTriangles * 3, smGLUIntType, reinterpret_cast<void*>(indexOffset));
+        glDrawElements(GL_TRIANGLES, nbrTriangles * 3, GL_UNSIGNED_INT, reinterpret_cast<void*>(indexOffset));
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -206,7 +206,7 @@ smVBOResult smVBO::initTriangleIndices(const smVector<size_t> &p_indices, size_t
 
 void smVBO::init( smVBOType p_vboType )
 {
-    smString error;
+    std::string error;
     glGenBuffersARB(1, &vboDataId);
     glGenBuffersARB(1, &vboIndexId);
     assert(vboDataId > 0);
@@ -252,7 +252,7 @@ smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
 
-    if ( sizeof( smInt )*p_nbrTriangles * 3 > size_t(sizeOfIndexBuffer - currentIndexOffset))
+    if ( sizeof( int )*p_nbrTriangles * 3 > size_t(sizeOfIndexBuffer - currentIndexOffset))
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }

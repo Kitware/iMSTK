@@ -28,7 +28,7 @@
 #include "Simulators/StylusObject.h"
 #include "Mesh/SurfaceMesh.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
     class smEvent;
     class smEventHandler;
@@ -42,19 +42,19 @@ class curvedGrasper: public smStylusRigidSceneObject
 public:
     /// \brief constrcutor that gest hatpic device ID (e.g. 0 or 1), pivot, lower and upper mesh file names
     curvedGrasper(size_t ID,
-                  const smString& p_pivotModelFileName = "../../resources/models/curved_pivot.3DS",
-                  const smString& p_lowerModelFileName = "../../resources/models/curved_upper.3DS",
-                  const smString& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
+                  const std::string& p_pivotModelFileName = "../../resources/models/curved_pivot.3DS",
+                  const std::string& p_lowerModelFileName = "../../resources/models/curved_upper.3DS",
+                  const std::string& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief event handler
-    void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
     /// \brief for open and close motion
     void updateOpenClose();
 
 public:
     size_t phantomID; // phantom device ID that will be listened
-    smBool buttonState[2]; // buttons states of haptic device
+    bool buttonState[2]; // buttons states of haptic device
     double angle; // angle of the jaws
     double maxangle; // maximum angle that jaws can open
     smMeshContainer meshContainer_pivot; // the pivto mesh container
@@ -68,7 +68,7 @@ public:
 #endif
     smVec3d godPos; // god object position
     double godMat[9]; // god object matrix
-    smInt DAQdataID; // interface for DAQ
+    int DAQdataID; // interface for DAQ
     double minValue; // read  min  data value
     double maxValue; // read  max  data value
     double invRange; // 1/range value

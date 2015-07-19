@@ -170,7 +170,7 @@ protected:
     bool topologyAltered;
     bool renderSecondaryMesh;
 
-    smString ConfigFileName;
+    std::string ConfigFileName;
 
     // body states
     std::vector<double> u;          ///< displacement

@@ -29,7 +29,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <map>
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 static const std::map<int, smKey> sfmlToSmKeyMap = {
@@ -153,6 +153,6 @@ inline const smKey& SFMLKeyToSmKey(const int key)
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif

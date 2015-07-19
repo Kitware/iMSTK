@@ -41,7 +41,7 @@ void smVegaFemSimulator::initCustom()
 
         switch ( type )
         {
-            case SIMMEDTK_SMVEGAFEMSCENEOBJECT:
+            case core::ClassType::VegaFemSceneObject:
             {
                 object->getFlags().isSimulatorInit = true;
                 break;
@@ -61,7 +61,7 @@ void smVegaFemSimulator::run()
         auto sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == SIMMEDTK_SMVEGAFEMSCENEOBJECT )
+        if ( sceneObj->getType() == core::ClassType::VegaFemSceneObject )
         {
             auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(sceneObj);
             //std::cout << "."; std::cout.flush();
@@ -80,14 +80,14 @@ void smVegaFemSimulator::syncBuffers()
 {
 }
 
-void smVegaFemSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
+void smVegaFemSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
 {
     if (!this->isListening())
     {
         return;
     }
 
-    /*auto hapticEvent = std::static_pointer_cast<smtk::Event::smHapticEvent>(p_event);
+    /*auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
     if (hapticEvent != nullptr && hapticEvent->getDeviceId() == 1)
     {
         hapticPosition = hapticEvent->getPosition();

@@ -33,7 +33,7 @@
 #include <Core/Vector.h>
 #include <Core/Matrix.h>
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 class smHapticEvent : public smEvent
@@ -96,6 +96,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMHAPTICEVENT_H

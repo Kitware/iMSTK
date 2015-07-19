@@ -57,41 +57,41 @@ protected:
     /// \brief renderbuffer
     Renderbuffer _rb;
     /// \brief width of renderbuffer
-    smInt width;
+    int width;
     /// \brief height of the render buffer
-    smInt height;
+    int height;
     /// \brief allocation is done or not
-    smBool isAllocated;
+    bool isAllocated;
     /// \brief type of renderbuffer
     smRenderBufferType type;
     /// \brief attachment order in the frame buffer
-    smInt attachmentOrder;
+    int attachmentOrder;
 
 public:
     /// \brief get height
-    smInt getHeight();
+    int getHeight();
     /// \brief get width
-    smInt getWidth();
+    int getWidth();
     /// \brief set the attachment oder
-    void setAttachmentOrder(smInt p_attachmentOrder);
+    void setAttachmentOrder(int p_attachmentOrder);
     /// \brief get the attachment order
-    smInt getAttachmentOrder(smInt p_attachmentOrder);
+    int getAttachmentOrder(int p_attachmentOrder);
     /// \brief get attacnment id. returns GL binding
     GLenum getGLAttachmentId();
     /// \brief returns buffer type
     smRenderBufferType getRenderBufType();
     /// \brief return GL buffer id
-    smGLUInt  getRenderBufId();
+    GLuint  getRenderBufId();
     /// \brief defaul constructor.
     smRenderBuffer();
     /// \brief set the type
-    smRenderBuffer(smRenderBufferType p_type, smInt p_width, smInt p_height);
+    smRenderBuffer(smRenderBufferType p_type, int p_width, int p_height);
     /// \brief create a depth buffer
-    smBool createDepthBuffer(smInt width, smInt height);
+    bool createDepthBuffer(int width, int height);
     /// \brief create a color buffer
-    smBool createColorBuffer();
+    bool createColorBuffer();
     /// \brief create a stencil buffer
-    smBool createStencilBuffer();
+    bool createStencilBuffer();
 };
 
 /// \brief GL frame buffer class
@@ -101,31 +101,31 @@ public:
     /// \brief GL frame buffer
     FramebufferObject _fbo;
     /// \brief   color buffer is attached or not
-    smBool isColorBufAttached;
+    bool isColorBufAttached;
     /// \brief   depth buffer is attached or not
-    smBool isDepthTexAttached;
+    bool isDepthTexAttached;
     /// \brief default color buffer attachment
-    smInt defaultColorAttachment;
+    int defaultColorAttachment;
     /// \brief render buffer pointer
     smRenderBuffer *renderBuffer;
     /// \brief it is enabled when the renderbuffer exists
-    smBool renderDepthBuff;
+    bool renderDepthBuff;
     /// \brief it is enabled when the color buffer exists
-    smBool renderColorBuff;
+    bool renderColorBuff;
     /// \brief width
-    smInt width;
+    int width;
     /// \brief height
-    smInt height;
+    int height;
 
     /// \brief framebuffer default constructor
     smFrameBuffer();
     virtual ~smFrameBuffer();
     /// \brief set dimension of the renderbuffer
-    void setDim(smInt p_width, smInt p_height);
+    void setDim(int p_width, int p_height);
     /// \brief get height of the framebuffer
-    smInt getHeight();
+    int getHeight();
     /// \brief get the widht of the renderbuffer
-    smInt getWidth();
+    int getWidth();
     /// \brief attach texture
     void attachTexture();
     /// \brief attach render buffer to te frame buffer
@@ -133,15 +133,15 @@ public:
     /// \brief attach depth texture
     void attachDepthTexture(smTexture *p_texture);
     /// \brief attach a color texture
-    void attachColorTexture(smTexture *p_texture, smInt p_attachmentOrder);
+    void attachColorTexture(smTexture *p_texture, int p_attachmentOrder);
     /// \brief activate color buffer in the specified order
-    void activeColorBuf(smInt  p_order);
+    void activeColorBuf(int  p_order);
     /// \brief enable the framebuffer
     void enable();
     /// \brief disable the frame buffer
     void disable();
     /// \brief check status of the frame buffer. It returns ok if the frame buffer is complete
-    smBool checkStatus();
+    bool checkStatus();
     /// \brief draw framebuffer. it is for debug purposes.
     void draw() const override;
 };

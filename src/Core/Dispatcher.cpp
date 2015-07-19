@@ -24,17 +24,17 @@
 #include "Dispatcher.h"
 
 
-void smDispatcher::handleViewer(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
+void smDispatcher::handleViewer(std::shared_ptr<smCoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
 {
 
 }
 
-void smDispatcher::handleSimulator(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
+void smDispatcher::handleSimulator(std::shared_ptr<smCoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
 {
 
 }
 
-void smDispatcher::handleCollisionDetection(std::shared_ptr<smCoreClass> /*p_caller*/, smCallerState /*p_callerState*/)
+void smDispatcher::handleCollisionDetection(std::shared_ptr<smCoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
 {
 
 }
@@ -48,10 +48,10 @@ void smDispatcher::handleAll()
 ///  \param p_caller        p_caller has pointer to the object which the function is called
 ///  \param p_callerState   p_callerState is stores the state of the at the moment of the function called.
 ///                         such as whether it is the beginning of the simulator frameor end of the simulator frame for now etc..
-smDispathcerResult smDispatcher::handle(std::shared_ptr<smCoreClass> p_caller, smCallerState p_callerState)
+core::ResultDispatcher smDispatcher::handle(std::shared_ptr<smCoreClass> p_caller, core::CallerState p_callerState)
 {
 
-    smClassType classType;
+    core::ClassType classType;
 
     //get the type of the class which is calling
     classType = p_caller->getType();
@@ -59,15 +59,15 @@ smDispathcerResult smDispatcher::handle(std::shared_ptr<smCoreClass> p_caller, s
     switch (classType)
     {
         //handle for viewer
-    case SIMMEDTK_SMVIEWER:
+    case core::ClassType::Viewer:
         handleViewer(p_caller, p_callerState);
         break;
         //handle for simulator
-    case SIMMEDTK_SMSIMULATOR:
+    case core::ClassType::Simulator:
         handleSimulator(p_caller, p_callerState);
         break;
         //handle for collision detection
-    case SIMMEDTK_SMCOLLISIONDETECTION:
+    case core::ClassType::CollisionDetection:
         handleCollisionDetection(p_caller, p_callerState);
         break;
     default:
@@ -75,9 +75,9 @@ smDispathcerResult smDispatcher::handle(std::shared_ptr<smCoreClass> p_caller, s
     }
 
     handleAll();
-    return SIMMEDTK_DISPATCHER_OK;
+    return core::ResultDispatcher::Success;
 }
 smDispatcher::smDispatcher()
 {
-    type = SIMMEDTK_SMDISPATHCER;
+    type = core::ClassType::Dispathcer;
 }

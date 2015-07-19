@@ -54,17 +54,17 @@ enum smVBOBufferType
 struct smVBOBufferEntryInfo
 {
     ///attrib index; 0, 1, 2. It starts from 0
-    smInt attributeIndex;
+    int attributeIndex;
     ///based on type the data buffer  will change. It may be Position, normals, texture coords, tangents
     smVBOBufferType arrayBufferType;
     ///pointer to the actual that. It is mesh data.
     void *attribPointer;
     ///total number of elements
-    smInt nbrElements;
+    int nbrElements;
     ///total size of elements in bytes.
-    smInt size;
+    int size;
     ///attribName in the shader
-    smString   shaderAttribName;
+    std::string   shaderAttribName;
     GLint    shaderAttribLocation;
 public:
     smVBOBufferEntryInfo();
@@ -75,23 +75,23 @@ class smVAO: public smCoreClass
 {
 public:
     /// \brief need error log and totalBuffer Size
-    smVAO(std::shared_ptr<smErrorLog> p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, smBool p_bindShaderObjects = true);
+    smVAO(std::shared_ptr<smErrorLog> p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
 
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
-    void setBufferData(smVBOBufferType p_type, smString p_ShaderAttribName, smInt p_nbrElements, void *p_ptr);
+    void setBufferData(smVBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr);
 
     /// \brief set the triangle information
-    void setTriangleInfo(smString p_ShaderAttribName, smInt p_nbrTriangles, void *p_ptr);
+    void setTriangleInfo(std::string p_ShaderAttribName, int p_nbrTriangles, void *p_ptr);
 
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
-    smBool setBufferDataFromMesh(smMesh *p_mesh,
+    bool setBufferDataFromMesh(smMesh *p_mesh,
                                  std::shared_ptr<smShader> p_shader,
-                                 smString p_POSITIONShaderName = "Position",
-                                 smString p_NORMALShaderName = "Normal",
-                                 smString p_TEXTURECOORDShaderName = "texCoords",
-                                 smString p_TANGENTSName = "Tangents");
+                                 std::string p_POSITIONShaderName = "Position",
+                                 std::string p_NORMALShaderName = "Normal",
+                                 std::string p_TEXTURECOORDShaderName = "texCoords",
+                                 std::string p_TANGENTSName = "Tangents");
     /// \brief updates the buffer with data. It is important for meshes undergoes topology changes
-    smBool updateStreamData() const;
+    bool updateStreamData() const;
 
     static void initVAOs();
 
@@ -115,21 +115,21 @@ public:
 
 public:
     GLuint VAO;
-    smInt totalNbrBuffers;
+    int totalNbrBuffers;
     GLuint bufferIndices[SIMMEDTK_MAX_VBOBUFFERS];
-    smInt indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
+    int indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
     smVBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
     smVBOType vboType;
     ///All VBOs are stored here
-    static std::unordered_map<smInt, std::shared_ptr<smVAO>> VAOs;
+    static std::unordered_map<int, std::shared_ptr<smVAO>> VAOs;
     smMesh *mesh;
 
 private:
     std::shared_ptr<smErrorLog>  log;
     std::shared_ptr<smShader> shader;
-    smBool renderingError;
+    bool renderingError;
     ///Used for attaching attribs to the vertex objects
-    smBool bindShaderObjects;
+    bool bindShaderObjects;
 };
 
 #endif

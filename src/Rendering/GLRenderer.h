@@ -38,6 +38,7 @@ class smAABB;
 class smLineMesh;
 class smViewer;
 class smPlane;
+class smScene;
 
 struct smRenderDetail;
 /// \brief gl rendering utilities
@@ -51,13 +52,13 @@ public:
     static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue, smFloat length=1.0);
+    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue, float length=1.0);
 
     /// \brief  draw line mesh
     static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, smString p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
+    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, std::string p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();
@@ -72,14 +73,14 @@ public:
     static void draw(smAABB &aabb, smColor p_color = smColor(1.0, 1.0, 1.0));
 
     /// \brief  draw plane
-    static void draw(smPlane &p_plane, smFloat p_scale = 10.0, smColor p_color = smColor::colorYellow);
+    static void draw(smPlane &p_plane, float p_scale = 10.0, smColor p_color = smColor::colorYellow);
 
     /// \brief  draw axes given rotation matrix, position and length to draw
     static void drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length);
 
     /// \brief  draw global axes length to draw
     static void drawAxes(const float length);
-    
+
     /// \brief  draw arrow given starting position, ending poistion and width of the arrow head
     static void drawArrow(const smVec3f &start, const smVec3f &end, const float D);
 

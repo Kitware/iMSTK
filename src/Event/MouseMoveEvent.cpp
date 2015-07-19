@@ -23,7 +23,7 @@
 
 #include "MouseMoveEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smMouseMoveEvent::EventName = EventType::MouseMove;
@@ -38,4 +38,4 @@ const smVec2d& smMouseMoveEvent::getWindowCoord()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

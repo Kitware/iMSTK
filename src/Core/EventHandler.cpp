@@ -24,7 +24,7 @@
 #include "EventHandler.h"
 #include "CoreClass.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
@@ -73,4 +73,4 @@ bool smEventHandler::isAttached(const EventType& eventType,
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

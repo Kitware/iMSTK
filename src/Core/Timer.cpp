@@ -32,11 +32,11 @@ void smTimer::start()
 {
     begin = ClockType::now();
 }
-smLongDouble smTimer::elapsed()
+long double smTimer::elapsed()
 {
-    smLongDouble deltaSec;
+    long double deltaSec;
     TimePointType now = ClockType::now();
     DurationType delta = now - begin;
-    deltaSec = ((static_cast<smLongDouble>(delta.count()) * PeriodType::num) / PeriodType::den);
+    deltaSec = ((static_cast<long double>(delta.count()) * PeriodType::num) / PeriodType::den);
     return deltaSec;
 }

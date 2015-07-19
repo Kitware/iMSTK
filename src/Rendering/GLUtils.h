@@ -55,20 +55,20 @@ public:
 public:
     /// \brief checks the openGL error. if there is an error then it returns
     /// \brief the error text otherwise it returns NULL
-    static bool queryGLError(smString& err);
+    static bool queryGLError(std::string& err);
 
     /// \brief  taken from glProgramming.com.  Checks the extension.
-    smBool QueryExtension(const smString& extName);
+    bool QueryExtension(const std::string& extName);
 
     /// \brief  fade background draw with a size groundRenderInfo.scale
     static void fadeBackgroundDraw();
 
     /// \brief draw quad on screen with color and left, botton, right, top positions
     static void drawQuadOnScreen(smColor p_color,
-                                 smFloat p_left,
-                                 smFloat p_bottom,
-                                 smFloat p_right,
-                                 smFloat p_top);
+                                 float p_left,
+                                 float p_bottom,
+                                 float p_right,
+                                 float p_top);
 
     /// \brief draw unit quad
     static void drawUnitQuadOnScreen();

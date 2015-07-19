@@ -64,10 +64,10 @@ int main()
     std::shared_ptr<smScene> scene;
     std::shared_ptr<smLight> light;
     std::shared_ptr<smCamera> sceneCamera;
-    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
-    std::shared_ptr<smtk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
-    //std::shared_ptr<smtk::Examples::Common::hapticController> hapticCtl;
+    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
+    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
+    //std::shared_ptr<mstk::Examples::Common::hapticController> hapticCtl;
     smMatrix33d mat;
 
     //-------------------------------------------------------
@@ -101,9 +101,9 @@ int main()
 
     femObject->setRenderDetail(femObjRenderDetail);
 
-    /*hapticCtl = std::make_shared<smtk::Examples::Common::hapticController>();
+    /*hapticCtl = std::make_shared<mstk::Examples::Common::hapticController>();
     hapticCtl->setVegaFemSceneObject(femObject);
-    femSimulator->attachEvent(smtk::Event::EventType::Haptic, hapticCtl);*/
+    femSimulator->attachEvent(mstk::Event::EventType::Haptic, hapticCtl);*/
 
     sdk->addSceneActor(femObject, femSimulator);
 
@@ -184,19 +184,19 @@ int main()
     scene->addCamera(sceneCamera);
 
     // Create the camera controller
-    camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
+    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
     camCtl->setCamera(sceneCamera);
 
-    keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
+    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
-    pzrCamCtl = std::make_shared<smtk::Examples::Common::pzrMouseCameraController>();
+    pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
     pzrCamCtl->setCamera(sceneCamera);
 
     // Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(smtk::Event::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(smtk::Event::EventType::MouseButton, pzrCamCtl);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(mstk::Event::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(mstk::Event::EventType::MouseButton, pzrCamCtl);
 
     //-------------------------------------------------------
     // Run the SDK

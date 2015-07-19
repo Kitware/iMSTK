@@ -28,7 +28,7 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 class smMouseMoveEvent : public smEvent
@@ -46,6 +46,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMMOUSEMOVEEVENT_H

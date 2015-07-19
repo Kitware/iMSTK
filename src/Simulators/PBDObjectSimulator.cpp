@@ -56,7 +56,7 @@ void smPBDObjectSimulator::initObject( std::shared_ptr<smPBDSurfaceSceneObject> 
 }
 void smPBDObjectSimulator::initCustom()
 {
-    smClassType type;
+    core::ClassType type;
     std::shared_ptr<smSceneObject> object;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
 
@@ -68,7 +68,7 @@ void smPBDObjectSimulator::initCustom()
 
         switch ( type )
         {
-            case SIMMEDTK_SMPBDSURFACESCENEOBJECT:
+            case core::ClassType::PbdSurfaceSceneObject:
             {
                 pbdSurfaceSceneObject = std::static_pointer_cast<smPBDSurfaceSceneObject>(object);
                 initObject ( pbdSurfaceSceneObject );
@@ -84,10 +84,10 @@ void smPBDObjectSimulator::run()
 {
     std::shared_ptr<smSceneObject> sceneObj;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
-    smFloat dist, lamda;
+    float dist, lamda;
     smVec3d dirVec, dP;
-    smInt count = 0;
-    smInt a, b;
+    int count = 0;
+    int a, b;
 
     beginSim();
 
@@ -96,7 +96,7 @@ void smPBDObjectSimulator::run()
         sceneObj = this->objectsSimulated[j];
 
         //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT )
+        if ( sceneObj->getType() == core::ClassType::PbdSurfaceSceneObject )
         {
             pbdSurfaceSceneObject = std::static_pointer_cast<smPBDSurfaceSceneObject>(sceneObj);
             smStdVector3d &vertices = pbdSurfaceSceneObject->getLocalVertices();
@@ -106,18 +106,18 @@ void smPBDObjectSimulator::run()
                 initObject( pbdSurfaceSceneObject );
             }
 
-            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->exF[i] = smVec3d::Zero();
             }
 
-            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->exF[i][1] -= 1.0;
             }
 
 
-            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->V[i] =
                     pbdSurfaceSceneObject->V[i] +
@@ -136,7 +136,7 @@ void smPBDObjectSimulator::run()
 
             while ( count < 30 )
             {
-                for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrSpr; i++ )
+                for ( int i = 0; i < pbdSurfaceSceneObject->nbrSpr; i++ )
                 {
                     a = pbdSurfaceSceneObject->mesh->edges[i].vert[0];
                     b = pbdSurfaceSceneObject->mesh->edges[i].vert[1];
@@ -168,7 +168,7 @@ void smPBDObjectSimulator::run()
                 count++;
             }
 
-            for ( smInt i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
+            for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
                 pbdSurfaceSceneObject->V[i] = ( pbdSurfaceSceneObject->P[i] - vertices[i] ) / pbdSurfaceSceneObject->dT;
 
@@ -192,7 +192,7 @@ void smPBDObjectSimulator::syncBuffers()
         sceneObj = this->objectsSimulated[i];
 
         //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == SIMMEDTK_SMPBDSURFACESCENEOBJECT )
+        if ( sceneObj->getType() == core::ClassType::PbdSurfaceSceneObject )
         {
             // WARNING: Copying array!!??
             pbdSurfaceSceneObject->mesh->vertices = pbdSurfaceSceneObject->getLocalVertices();
@@ -202,7 +202,7 @@ void smPBDObjectSimulator::syncBuffers()
         }
     }
 }
-void smPBDObjectSimulator::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event )
+void smPBDObjectSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
 {
     ;
 

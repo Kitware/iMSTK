@@ -36,17 +36,17 @@ enum smSchedulingPriority
 struct smScheduleGroup
 {
 
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#ifdef _WIN32
     HANDLE threadHandle;
 #endif
 
 public:
-    smFloat groupWeight;
-    smShort totalThreads;
-    smFloat maxObservedFPS;
-    smFloat minObservedFPS;
-    smShort minObservedFPSThreadIndex;
-    smShort maxObservedFPSThreadIndex;
+    float groupWeight;
+    short totalThreads;
+    float maxObservedFPS;
+    float minObservedFPS;
+    short minObservedFPSThreadIndex;
+    short maxObservedFPSThreadIndex;
 
     smScheduleGroup()
     {
@@ -54,12 +54,12 @@ public:
         minTargetFPS = maxTargetFPS = maxObservedFPS = minObservedFPS = 0;
 
         minObservedFPSThreadIndex = maxObservedFPSThreadIndex = 0;
-#ifdef SIMMEDTK_OPERATINGSYSTEM_WINDOWS
+#ifdef _WIN32
         threadHandle = GetCurrentThread();
 #endif
     }
-    smFloat maxTargetFPS;
-    smFloat minTargetFPS;
+    float maxTargetFPS;
+    float minTargetFPS;
     friend class smSimulator;
 };
 

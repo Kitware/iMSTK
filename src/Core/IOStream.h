@@ -37,7 +37,7 @@
 #define SM_WINDOW_MAXSTRINGSIZE 255
 #define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
-namespace smtk {
+namespace mstk {
 namespace Event {
     class smEvent;
     class smEventHandler;
@@ -49,23 +49,23 @@ namespace Event {
 class smIOStream : public smCoreClass
 {
 public:
-    virtual smIOStream& operator >>(smString &p_string) = 0;
-    virtual smIOStream& operator <<(smString p_string) = 0;
+    virtual smIOStream& operator >>(std::string &p_string) = 0;
+    virtual smIOStream& operator <<(std::string p_string) = 0;
 protected:
-    std::shared_ptr<smtk::Event::smEventHandler> eventHanlder;
+    std::shared_ptr<mstk::Event::smEventHandler> eventHanlder;
 };
 
 /// \brief  console stream; for printing text on the console
 class smConsoleStream: public smIOStream
 {
-    smString inputBuffer;
+    std::string inputBuffer;
 public:
     smConsoleStream();
     /// \brief operator to print text
-    virtual smIOStream& operator <<(smString p_string);
+    virtual smIOStream& operator <<(std::string p_string);
 
     /// \brief to  input from use
-    virtual smIOStream& operator >>(smString &p_string);
+    virtual smIOStream& operator >>(std::string &p_string);
 };
 
 /// \brief window string
@@ -75,80 +75,80 @@ public:
     /// \brief  constructors
     smWindowString();
 
-    smWindowString(smString p_string);
+    smWindowString(std::string p_string);
 
-    smWindowString(smString p_string, smFloat p_x, smFloat p_y);
+    smWindowString(std::string p_string, float p_x, float p_y);
     /// \brief operators for string
-    smWindowString &operator<<(smString p_string);
+    smWindowString &operator<<(std::string p_string);
 
     void operator =(smWindowString &p_windowString);
 
 public:
     /// \brief string
-    smString string;
+    std::string string;
     /// \brief position of string x,y
-    smFloat x, y;
+    float x, y;
 };
 
 struct smWindowData
 {
-    smBool enabled;
+    bool enabled;
     smWindowString windowString;
 };
 /// \brief window stream for putting window string on text
 class smWindowStream: public smIOStream
 {
 public:
-    virtual smIOStream& operator <<(smString p_string);
-    virtual smIOStream& operator >>(smString &p_string);
+    virtual smIOStream& operator <<(std::string p_string);
+    virtual smIOStream& operator >>(std::string &p_string);
 };
 
 /// \brief opengl window stream for putting text on the screen
 class smOpenGLWindowStream: public smWindowStream
 {
 public:
-    void init(smInt p_totalTexts);
+    void init(int p_totalTexts);
 
     /// \brief enable/disable texts on display
-    smBool enabled;
+    bool enabled;
 
     /// \brief  text color
     smColor textColor;
 
     /// \brief constructors
-    smOpenGLWindowStream(smInt p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
+    smOpenGLWindowStream(int p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
 
     /// \brief add text on window
-    virtual smInt addText(const smString &p_tag, const smString &p_string);
+    virtual int addText(const std::string &p_tag, const std::string &p_string);
 
     /// \brief add text on window
-    bool addText(smString p_tag, smWindowString &p_string);
+    bool addText(std::string p_tag, smWindowString &p_string);
 
     /// \brief update the text with specificed tag(p_tag)
-    bool updateText(smString p_tag, smString p_string);
+    bool updateText(std::string p_tag, std::string p_string);
 
     /// \brief add text on window with specified text handle
-    bool updateText(smInt p_textHandle, smString p_string);
+    bool updateText(int p_textHandle, std::string p_string);
 
     /// \brief remove text on window
-    bool removeText(smString p_tag);
+    bool removeText(std::string p_tag);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> /*p_event*/) override {}
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> /*p_event*/) override {}
 
 protected:
     /// \brief  fonts
     //QFont font;
     /// \brief #of the total texts
-    smInt totalTexts;
+    int totalTexts;
     /// \brief  window texts
     smWindowData *windowTexts;
-    std::unordered_map<smString, smInt> tagMap;
-    smInt currentIndex;
+    std::unordered_map<std::string, int> tagMap;
+    int currentIndex;
     /// \brief initial text position on window
-    smInt initialTextPositionY;
-    smInt initialTextPositionX;
-    smInt lastTextPosition;
+    int initialTextPositionY;
+    int initialTextPositionX;
+    int lastTextPosition;
     /// \brief initialization routines
 };
 /// \brief window console
@@ -156,21 +156,21 @@ class smWindowConsole: public smOpenGLWindowStream
 {
 public:
     /// \brief window console constructor
-    smWindowConsole(smInt p_totalTexts = 5);
+    smWindowConsole(int p_totalTexts = 5);
     /// \brief  return last entered entry
-    smString getLastEntry();
+    std::string getLastEntry();
 
     /// \brief add text in the display
-    virtual smInt addText(const smString &p_tag, const smString &p_string) override;
+    virtual int addText(const std::string &p_tag, const std::string &p_string) override;
 
 protected:
     /// \brief entered string on the console
-    smString enteredString;
+    std::string enteredString;
     /// \brief window console position min, max points on the display
-    smFloat left;
-    smFloat bottom;
-    smFloat right;
-    smFloat top;
+    float left;
+    float bottom;
+    float right;
+    float top;
     /// \brief background color
     smColor backGroundColor;
 };

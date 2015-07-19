@@ -23,7 +23,7 @@
 
 #include "CameraEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smCameraEvent::EventName = EventType::CameraUpdate;
@@ -60,4 +60,4 @@ const smVec3d& smCameraEvent::getUpDirection()
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace

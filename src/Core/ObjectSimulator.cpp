@@ -31,7 +31,7 @@ smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
 //     smSDK::getInstance()->registerObjectSim(safeDownCast<smObjectSimulator>());
     name = "objecSimulator" + std::to_string(this->getUniqueId()->getId());
 
-    type = SIMMEDTK_SMOBJECTSIMULATOR;
+    type = core::ClassType::Simulator;
     isObjectSimInitialized = false;
     threadPriority = SIMMEDTK_THREAD_NORMALPRIORITY;
 
@@ -112,10 +112,10 @@ smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smS
                                                                              int p_threadIndex )
 {
 
-    smInt objectsPerThread;
-    smInt leap;
+    int objectsPerThread;
+    int leap;
     threadIndex = p_threadIndex;
-    smInt totalObjects = p_objectsSimulated.size();
+    int totalObjects = p_objectsSimulated.size();
     leap = ( totalObjects % p_group.totalThreads );
     objectsPerThread = p_objectsSimulated.size() / ( p_group.totalThreads );
 

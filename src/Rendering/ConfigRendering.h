@@ -104,7 +104,7 @@ enum smVBOResult
 /// \brief viewer detail. legacy code
 struct smViewerDetail
 {
-    smUInt environment;
+    unsigned int environment;
     smColor backGroundColor;
 };
 

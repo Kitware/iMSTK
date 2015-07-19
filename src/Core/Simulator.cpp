@@ -243,7 +243,7 @@ void smSimulator::init()
 
 smSimulator::smSimulator(std::shared_ptr< smErrorLog > p_log)
 {
-    type = SIMMEDTK_SMSIMULATOR;
+    type = core::ClassType::Simulator;
     isInitialized = false;
     log = p_log;
     frameCounter = 0;

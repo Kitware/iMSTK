@@ -27,7 +27,7 @@
 // SimMedTK includes
 #include "Shader.h"
 
-namespace smtk{
+namespace mstk{
 namespace Event{
 
     class smEvent;
@@ -39,8 +39,8 @@ class smSceneTextureShader: public smShader
 {
 public:
     /// \brief constructor that receives the vertex and fragment shader file names
-    smSceneTextureShader(const smString &p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
-                         const smString &p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
+    smSceneTextureShader(const std::string &p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
+                         const std::string &p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
 
     /// \brief called during  rendering initialization
     void initDraw() override;
@@ -54,15 +54,15 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh>) override{};
 
     /// \brief handle the events
-    virtual void handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
 
 public:
     /// \brief depth  texture GL id that is sent to shader. It stores scene depth values
-    smGLInt depthTex;
+    GLint depthTex;
     /// \brief scene  texture GL id that is sent to shader. It stores scene RGB values
-    smGLInt sceneTex;
+    GLint sceneTex;
     /// \brief previous  texture GL id that is sent to shader. It stores previous image RGB values rendered in previous rendering stage in multipass
-    smGLInt  prevTex;
+    GLint  prevTex;
 };
 
 #endif

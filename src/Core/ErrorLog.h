@@ -45,14 +45,14 @@ class smErrorLog : public smCoreClass
 {
 
 private:
-    std::vector<smString> errors; ///< error messages
-    std::vector<smInt> timeStamps; ///< time stamps for errors
+    std::vector<std::string> errors; ///< error messages
+    std::vector<int> timeStamps; ///< time stamps for errors
     std::mutex logLock; ///< mutex to sync access to logs
     smTimer time; ///< Timer for timestamps
-    smBool consoleOutput; ///< Flag to print errors to stdout
+    bool consoleOutput; ///< Flag to print errors to stdout
 
 public:
-    smBool isOutputtoConsoleEnabled;
+    bool isOutputtoConsoleEnabled;
     smErrorLog();
 
     /// \brief Add the error in the repository.It is thread safe. It can be called by multiple threads.
@@ -61,7 +61,7 @@ public:
     /// empty, function will return with error
     /// \param p_text A string containing the error message
     /// \return Returns true if the error was successfully logged, and false on error
-    smBool addError(const smString& p_text);
+    bool addError(const std::string& p_text);
 
     /// \brief Clean up all the errors in the repository.
     ///
@@ -78,7 +78,7 @@ public:
     /// \brief Copy all errors logged to console
     ///
     /// \param flag Set true to enable, false to disable copy to console
-    void setConsoleOutput(smBool flag);
+    void setConsoleOutput(bool flag);
 };
 
 #endif

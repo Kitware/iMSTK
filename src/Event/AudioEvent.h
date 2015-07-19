@@ -30,7 +30,7 @@
 // SimMedTK includes
 #include "Core/Event.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 /// \brief contains state of the audio driver
@@ -68,6 +68,6 @@ private:
 };
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
 
 #endif // SMAUDIOEVENT_H

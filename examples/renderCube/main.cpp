@@ -41,9 +41,9 @@ int main()
     std::shared_ptr<smLight> light;
     std::shared_ptr<smCamera> sceneCamera;
     std::shared_ptr<smStaticSceneObject> cube;
-    std::shared_ptr<smtk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<smtk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
-    std::shared_ptr<smtk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
+    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
+    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
     //Create an instance of the SimMedTK framework/SDK
     sdk = smSDK::getInstance();
 
@@ -55,9 +55,9 @@ int main()
     sdk->addViewer(viewer);
 
     //Create the camera controller
-    camCtl = std::make_shared<smtk::Examples::Common::wasdCameraController>();
-    keyShutdown = std::make_shared<smtk::Examples::Common::KeyPressSDKShutdown>();
-    pzrCamCtl = std::make_shared<smtk::Examples::Common::pzrMouseCameraController>();
+    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
 
     auto cubeModel = std::make_shared<smMeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
@@ -100,10 +100,10 @@ int main()
     pzrCamCtl->setCamera(sceneCamera);
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(smtk::Event::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(smtk::Event::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(smtk::Event::EventType::MouseButton, pzrCamCtl);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
+    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(mstk::Event::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(mstk::Event::EventType::MouseButton, pzrCamCtl);
 
     //run the framework
     sdk->run();

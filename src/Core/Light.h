@@ -52,7 +52,7 @@ enum smLightLocationType
 struct smLightPos
 {
 public:
-    smLightPos(smFloat p_x = 0.0, smFloat p_y = 0.0, smFloat p_z = 0.0, smFloat p_w = 1.0);
+    smLightPos(float p_x = 0.0, float p_y = 0.0, float p_z = 0.0, float p_w = 1.0);
     void setPosition(const smVec3d &p)
     {
         position = p;
@@ -64,7 +64,7 @@ public:
     }
 
 private:
-    smFloat w;
+    float w;
     smVec3d position;
     friend smLight;
 };
@@ -81,29 +81,29 @@ struct smLight
 {
 
 protected:
-    smBool enabled;
-    smBool previousState;
+    bool enabled;
+    bool previousState;
 
 public:
-    smBool drawEnabled;
+    bool drawEnabled;
 
-    smInt renderUsage;
-    smString name;
+    int renderUsage;
+    std::string name;
     smLightLocationType lightLocationType;
     smLightType lightType;
 
-    smFloat attn_constant;
-    smFloat attn_linear;
-    smFloat attn_quadratic;
+    float attn_constant;
+    float attn_linear;
+    float attn_quadratic;
 
-    smLight(smString p_name = "", smLightType p_lightType = SIMMEDTK_LIGHT_INFINITELIGHT,
+    smLight(std::string p_name = "", smLightType p_lightType = SIMMEDTK_LIGHT_INFINITELIGHT,
             smLightLocationType p_lightLocation = SIMMEDTK_LIGHTPOS_EYE);
     /// \brief set light type
     void setType(smLightType p_lightType);
     /// \brief  returns if the light is enabled or not
-    smBool isEnabled();
+    bool isEnabled();
     /// \brief  activate the light
-    void activate(smBool p_state);
+    void activate(bool p_state);
     /// \brief  light properties
     smColor lightColorDiffuse;
     smColor lightColorAmbient;
@@ -114,9 +114,9 @@ public:
     //between 0-1.0
     /// \brief  higher spot exponents result in a more focused light source,
     //regardless of the spot cutoff angle. default is zero
-    smFloat spotExp;
+    float spotExp;
     ///angle between 0-90 and 180 is also accepted
-    smFloat spotCutOffAngle;
+    float spotCutOffAngle;
     /// \brief light direction, up vector, transverse direction, focus point
     smVec3d direction;
     smVec3d upVector;
@@ -130,12 +130,12 @@ public:
     static smVec3d defaultTransDir;
 
     /// \brief if the light casts shadow, this should be enabled. Unfortunately, we only support one light at a time for shadows
-    smBool castShadow;
+    bool castShadow;
     /// \brief shadow near, far,  aspect ratio and angle
-    smFloat shadowNearView;
-    smFloat shadowFarView;
-    smFloat shadowRatio;
-    smFloat shadorAngle;
+    float shadowNearView;
+    float shadowFarView;
+    float shadowRatio;
+    float shadorAngle;
 
     static std::shared_ptr<smLight> getDefaultLighting(const std::string &name = "SceneLight")
     {

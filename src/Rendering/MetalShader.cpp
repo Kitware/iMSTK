@@ -27,8 +27,8 @@
 #include "Event/KeyboardEvent.h"
 #include "Core/SDK.h"
 
-smMetalShader::smMetalShader( const smString &p_verteShaderFileName,
-                              const smString &p_fragmentFileName ) :
+smMetalShader::smMetalShader( const std::string &p_verteShaderFileName,
+                              const std::string &p_fragmentFileName ) :
                               smShader(smSDK::getInstance()->getErrorLog())
 {
     this->log = smSDK::getInstance()->getErrorLog();
@@ -110,21 +110,21 @@ void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
     }
 }
 
-void smMetalShader::handleEvent(std::shared_ptr<smtk::Event::smEvent> p_event)
+void smMetalShader::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
 {
-    auto keyboardEvent = std::static_pointer_cast<smtk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case smtk::Event::smKey::Add:
+            case mstk::Event::smKey::Add:
             {
                 specularPowerValue += 5;
                 std::cout << specularPowerValue << std::endl;
                 break;
             }
 
-            case smtk::Event::smKey::Subtract:
+            case mstk::Event::smKey::Subtract:
             {
                 specularPowerValue -= 5;
                 std::cout << specularPowerValue << std::endl;
@@ -146,8 +146,8 @@ void smMetalShader::switchDisable()
     //
 }
 
-MetalShaderShadow::MetalShaderShadow( const smString &p_vertexShaderFileName,
-                                      const smString &p_fragmentShaderFileName ) :
+MetalShaderShadow::MetalShaderShadow( const std::string &p_vertexShaderFileName,
+                                      const std::string &p_fragmentShaderFileName ) :
     smMetalShader( p_vertexShaderFileName, p_fragmentShaderFileName )
 {
     createParam( "ShadowMapTEST" );

@@ -23,7 +23,7 @@
 
 #include "HapticEvent.h"
 
-namespace smtk {
+namespace mstk {
 namespace Event {
 
 EventType smHapticEvent::EventName = EventType::Haptic;
@@ -82,4 +82,4 @@ void smHapticEvent::setTorque(const smVec3d& deviceTorque)
 }
 
 } // Event namespace
-} // smtk namespace
+} // mstk namespace
