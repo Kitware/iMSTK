@@ -33,7 +33,7 @@ smSceneObjectDeformable::smSceneObjectDeformable() :
     subTimestepCounter(0)
 {
   this->setRenderDelegate(
-    smFactory<smRenderDelegate>::createSubclass(
+    Factory<RenderDelegate>::createSubclass(
       "RenderDelegate", "SceneObjectDeformableRenderDelegate"));
 }
 
@@ -58,30 +58,30 @@ void smSceneObjectDeformable::setContactForcesToZero()
 }
 
 void smSceneObjectDeformable::setContactForceOfNodeWithDofID(const int dofID,
-                                                             const smVec3d force)
+                                                             const core::Vec3d force)
 {
     f_contact[dofID] = force(0);
     f_contact[dofID + 1] = force(1);
     f_contact[dofID + 2] = force(2);
 }
 
-smVec3d smSceneObjectDeformable::getVelocityOfNodeWithDofID(const int dofID) const
+core::Vec3d smSceneObjectDeformable::getVelocityOfNodeWithDofID(const int dofID) const
 {
-    smVec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
+    core::Vec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
 
     return vel;
 }
 
-smVec3d smSceneObjectDeformable::getDisplacementOfNodeWithDofID(const int dofID) const
+core::Vec3d smSceneObjectDeformable::getDisplacementOfNodeWithDofID(const int dofID) const
 {
-    smVec3d disp(u[dofID], u[dofID + 1], u[dofID + 2]);
+    core::Vec3d disp(u[dofID], u[dofID + 1], u[dofID + 2]);
 
     return disp;
 }
 
-smVec3d smSceneObjectDeformable::getAccelerationOfNodeWithDofID(const int dofID) const
+core::Vec3d smSceneObjectDeformable::getAccelerationOfNodeWithDofID(const int dofID) const
 {
-    smVec3d accn(uaccel[dofID], uaccel[dofID + 1], uaccel[dofID + 2]);
+    core::Vec3d accn(uaccel[dofID], uaccel[dofID + 1], uaccel[dofID + 2]);
 
     return accn;
 }
@@ -111,7 +111,7 @@ int smSceneObjectDeformable::getNumFixedDof() const
     return numFixedDof;
 }
 
-void smSceneObjectDeformable::setRenderDetail(const std::shared_ptr<smRenderDetail> &r)
+void smSceneObjectDeformable::setRenderDetail(const std::shared_ptr<RenderDetail> &r)
 {
     primarySurfaceMesh->setRenderDetail(r);
 

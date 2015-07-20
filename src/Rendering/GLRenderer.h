@@ -34,55 +34,55 @@
 #include "Core/Matrix.h"
 
 class smMesh;
-class smAABB;
+class AABB;
 class smLineMesh;
 class smViewer;
-class smPlane;
-class smScene;
+class Plane;
+class Scene;
 
-struct smRenderDetail;
+struct RenderDetail;
 /// \brief gl rendering utilities
-class smGLRenderer: public smCoreClass
+class smGLRenderer: public CoreClass
 {
 public:
     /// \brief constructor
     smGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<smRenderDetail> renderDetail);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color = smColor::colorBlue, float length=1.0);
+    static void drawNormals(std::shared_ptr<smMesh> p_mesh, Color p_color = Color::colorBlue, float length=1.0);
 
     /// \brief  draw line mesh
-    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail);
+    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, std::string p_name, smVec3d p_pos, smVec3d dirX, smVec3d dirY, smVec3d dirZ);
+    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();
 
     /// \brief draw triangle
-    static void drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3);
+    static void drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p_3);
 
     /// \brief end triangle rendering
     static void endTriangles();
 
     /// \brief draw AABB
-    static void draw(smAABB &aabb, smColor p_color = smColor(1.0, 1.0, 1.0));
+    static void draw(AABB &aabb, Color p_color = Color(1.0, 1.0, 1.0));
 
     /// \brief  draw plane
-    static void draw(smPlane &p_plane, float p_scale = 10.0, smColor p_color = smColor::colorYellow);
+    static void draw(Plane &p_plane, float p_scale = 10.0, Color p_color = Color::colorYellow);
 
     /// \brief  draw axes given rotation matrix, position and length to draw
-    static void drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length);
+    static void drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, const float length);
 
     /// \brief  draw global axes length to draw
     static void drawAxes(const float length);
 
     /// \brief  draw arrow given starting position, ending poistion and width of the arrow head
-    static void drawArrow(const smVec3f &start, const smVec3f &end, const float D);
+    static void drawArrow(const core::Vec3f &start, const core::Vec3f &end, const float D);
 
     /// \brief draw function is called for visualization the object
     virtual void draw(){}
@@ -90,28 +90,28 @@ public:
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();
 
-    /// \brief Renders an smScene's objects
+    /// \brief Renders an Scene's objects
     ///
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
-    static void renderScene(std::shared_ptr<smScene> p_scene);
-    /// \brief Renders a smScene's objects
+    static void renderScene(std::shared_ptr<Scene> p_scene);
+    /// \brief Renders a Scene's objects
     ///
     /// \detail Requires the caller to have called registerForScene() on p_scene
     /// \param p_scene The scene to render
     /// \param p_param The drawing parameters
     /// \param p_proj A custom projection matrix to use instead of that provided with the scene
     /// \param p_view A custom view matrix to use instead of that provided with the scene
-    static void renderScene(std::shared_ptr<smScene> p_scene,
-                            const smMatrix44f &p_proj,
-                            const smMatrix44f &p_view);
+    static void renderScene(std::shared_ptr<Scene> p_scene,
+                            const Matrix44f &p_proj,
+                            const Matrix44f &p_view);
 
-    /// \brief Renders a single smSceneObject
+    /// \brief Renders a single SceneObject
     ///
     /// \param p_sceneObject The scene object to render
     /// \param p_param The drawing parameters
-    static void renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
+    static void renderSceneObject(std::shared_ptr<SceneObject> p_sceneObject);
 };
 
 #endif

@@ -40,7 +40,7 @@
 #include "Collision/SpatialHashCollision.h"
 #include "Rendering/Viewer.h"
 
-class CollisionDetectionSpatialHashing: public smSimulationMain
+class CollisionDetectionSpatialHashing: public SimulationMain
 {
 
 public:
@@ -48,18 +48,18 @@ public:
     virtual ~CollisionDetectionSpatialHashing(){}
 
     void draw ();
-    void simulateMain (const smSimulationMainParam &p_param) override;
+    void simulateMain (const SimulationMainParam &p_param) override;
     void run();
 
 public:
-    std::shared_ptr<smSDK>                  sdk;
-    std::shared_ptr<smStaticSceneObject>    modelA;
-    std::shared_ptr<smStaticSceneObject>    modelB;
-    std::shared_ptr<smScene>                scene;
+    std::shared_ptr<SDK>                  sdk;
+    std::shared_ptr<StaticSceneObject>    modelA;
+    std::shared_ptr<StaticSceneObject>    modelB;
+    std::shared_ptr<Scene>                scene;
     std::shared_ptr<smViewer>               viewer;
     std::shared_ptr<smDummySimulator>       defaultSimulator;
-    std::shared_ptr<smSimulator>            simulator;
-    std::shared_ptr<smSpatialHashCollision> spatialHashing;
+    std::shared_ptr<Simulator>            simulator;
+    std::shared_ptr<SpatialHashCollision> spatialHashing;
     int moveObj;
 };
 

@@ -27,26 +27,26 @@
 #include "Geometry.h"
 #include "RenderDelegate.h"
 
-smAABB::smAABB()
+AABB::AABB()
 {
     this->reset();
     this->renderDelegate =
-      smFactory<smRenderDelegate>::createConcreteClass(
+      Factory<RenderDelegate>::createConcreteClass(
         "AABBRenderDelegate");
     if (this->renderDelegate)
       this->renderDelegate->setSourceGeometry(this);
 }
 
-smVec3d smAABB::center() const
+core::Vec3d AABB::center() const
 {
-    smVec3d output;
+    core::Vec3d output;
     output << 0.5f * ( this->aabbMin[0] + this->aabbMax[0] ),
            0.5f * ( this->aabbMin[1] + this->aabbMax[1] ),
            0.5f * ( this->aabbMin[2] + this->aabbMax[2] );
     return output;
 }
 
-bool smAABB::checkOverlap( const smAABB &p_aabbA, const smAABB &p_aabbB )
+bool AABB::checkOverlap( const AABB &p_aabbA, const AABB &p_aabbB )
 {
 
     if ( p_aabbA.aabbMin[0] > p_aabbB.aabbMax[0] ||
@@ -61,7 +61,7 @@ bool smAABB::checkOverlap( const smAABB &p_aabbA, const smAABB &p_aabbB )
     return true;
 }
 
-bool smAABB::overlaps( const smAABB &other ) const
+bool AABB::overlaps( const AABB &other ) const
 {
 
     if ( this->aabbMin[0] > other.aabbMax[0] ||
@@ -76,21 +76,21 @@ bool smAABB::overlaps( const smAABB &other ) const
     return true;
 }
 
-const smAABB &smAABB::operator=( const smAABB &p_aabb )
+const AABB &AABB::operator=( const AABB &p_aabb )
 {
     this->aabbMax = p_aabb.aabbMax;
     this->aabbMin = p_aabb.aabbMin;
     return *this;
 }
 
-smAABB &smAABB::operator*( const double p_scale )
+AABB &AABB::operator*( const double p_scale )
 {
     this->aabbMin *= p_scale;
     this->aabbMax *= p_scale;
     return *this;
 }
 
-void smAABB::subDivide( const double p_length, const int p_divison, smAABB *p_aabb ) const
+void AABB::subDivide( const double p_length, const int p_divison, AABB *p_aabb ) const
 {
     int index = 0;
 
@@ -109,7 +109,7 @@ void smAABB::subDivide( const double p_length, const int p_divison, smAABB *p_aa
             }
 }
 
-void smAABB::subDivide( const int p_divisionX, const int p_divisionY, const int p_divisionZ, smAABB *p_aabb ) const
+void AABB::subDivide( const int p_divisionX, const int p_divisionY, const int p_divisionZ, AABB *p_aabb ) const
 {
     double stepX;
     double stepY;
@@ -136,41 +136,41 @@ void smAABB::subDivide( const int p_divisionX, const int p_divisionY, const int 
             }
 }
 
-void smAABB::subDivide( const int p_division, smAABB *p_aabb ) const
+void AABB::subDivide( const int p_division, AABB *p_aabb ) const
 {
     subDivide( p_division, p_division, p_division, p_aabb );
 }
 
-double smAABB::halfSizeX() const
+double AABB::halfSizeX() const
 {
     return .5 * ( aabbMax[0] - aabbMin[0] );
 }
 
-double smAABB::halfSizeY() const
+double AABB::halfSizeY() const
 {
     return .5 * ( aabbMax[1] - aabbMin[1] );
 }
 
-double smAABB::halfSizeZ() const
+double AABB::halfSizeZ() const
 {
     return .5 * ( aabbMax[2] - aabbMin[2] );
 }
 
-void smAABB::expand( const double &p_factor )
+void AABB::expand( const double &p_factor )
 {
     this->aabbMin -= .5 * ( this->aabbMax - this->aabbMin ) * p_factor;
     this->aabbMax += .5 * ( this->aabbMax - this->aabbMin ) * p_factor;
 }
 
-smCube::smCube()
+Cube::Cube()
 {
     center << 0, 0, 0;
     sideLength = 1.0;
 }
 
-void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
+void Cube::subDivide( int p_divisionPerAxis, Cube *p_cube )
 {
-    smVec3d minPoint;
+    core::Vec3d minPoint;
     double divLength = ( sideLength / p_divisionPerAxis );
     int index = 0;
     minPoint << center[0] - sideLength * 0.5,
@@ -191,36 +191,36 @@ void smCube::subDivide( int p_divisionPerAxis, smCube *p_cube )
             }
 }
 
-void smCube::expand( double p_expansion )
+void Cube::expand( double p_expansion )
 {
     sideLength = sideLength + sideLength * p_expansion;
 }
 
-smVec3d smCube::leftMinCorner() const
+core::Vec3d Cube::leftMinCorner() const
 {
-    return smVec3d( center[0] - sideLength * 0.5,
+    return core::Vec3d( center[0] - sideLength * 0.5,
                     center[1] - sideLength * 0.5,
                     center[2] - sideLength * 0.5 );
 }
 
-smVec3d smCube::rightMaxCorner() const
+core::Vec3d Cube::rightMaxCorner() const
 {
-    return smVec3d( center[0] + sideLength * 0.5,
+    return core::Vec3d( center[0] + sideLength * 0.5,
                     center[1] + sideLength * 0.5,
                     center[2] + sideLength * 0.5 );
 }
 
-smSphere smCube::getCircumscribedSphere()
+Sphere Cube::getCircumscribedSphere()
 {
-    return smSphere( center, 0.866025 * sideLength );
+    return Sphere( center, 0.866025 * sideLength );
 }
 
-smSphere smCube::getInscribedSphere()
+Sphere Cube::getInscribedSphere()
 {
-    return smSphere( center, sideLength * 0.5 );
+    return Sphere( center, sideLength * 0.5 );
 }
 
-smSphere smCube::getTangent2EdgeSphere()
+Sphere Cube::getTangent2EdgeSphere()
 {
-    return smSphere( center, sideLength * 0.707106 );
+    return Sphere( center, sideLength * 0.707106 );
 }

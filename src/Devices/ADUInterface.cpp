@@ -66,7 +66,7 @@ smADUInterface::smADUInterface()
         std::cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << "\n";
     }
 
-    ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
+//     ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
 }
 
 /// \brief
@@ -168,7 +168,7 @@ smADUInterface::smADUInterface(const std::string& calibrationFile)
         std::cout << "Check the USB connection of the ADU device or the serial number: Couldn't initialize the device" << "\n";
     }
 
-    ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
+//     ADUpipe = new smPipe("ADU_Data", sizeof(ADUDeviceData), 10);
     sw = 0;
     updateFlag = 0;
 }
@@ -255,17 +255,17 @@ void smADUInterface::runDevice()
 void smADUInterface::sendDataToPipe()
 {
 
-    ADUDeviceData *pipeData;
-    pipeData = (ADUDeviceData*)ADUpipe->beginWrite();
-    pipeData->calibration[0] = calibrationData->minValue1;
-    pipeData->calibration[1] = calibrationData->maxValue1;
-    pipeData->calibration[2] = calibrationData->minValue2;
-    pipeData->calibration[3] = calibrationData->maxValue2;
-    pipeData->anValue[0] = deviceData->anValue[0];
-    pipeData->anValue[1] = deviceData->anValue[1];
-    pipeData->deviceOpen = isOpened;
-    ADUpipe->endWrite(1);
-    ADUpipe->acknowledgeValueListeners();
+//     ADUDeviceData *pipeData;
+//     pipeData = (ADUDeviceData*)ADUpipe->beginWrite();
+//     pipeData->calibration[0] = calibrationData->minValue1;
+//     pipeData->calibration[1] = calibrationData->maxValue1;
+//     pipeData->calibration[2] = calibrationData->minValue2;
+//     pipeData->calibration[3] = calibrationData->maxValue2;
+//     pipeData->anValue[0] = deviceData->anValue[0];
+//     pipeData->anValue[1] = deviceData->anValue[1];
+//     pipeData->deviceOpen = isOpened;
+//     ADUpipe->endWrite(1);
+//     ADUpipe->acknowledgeValueListeners();
 }
 
 /// \brief

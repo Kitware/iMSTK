@@ -4,7 +4,7 @@
 #include <stdlib.h> // for atexit()
 
 template<typename T>
-void smFactory<T>::registerClassConfiguration(
+void Factory<T>::registerClassConfiguration(
   const std::string& classname,
   const std::string& subclassname,
   SharedPointerConstructor ctor,
@@ -13,39 +13,39 @@ void smFactory<T>::registerClassConfiguration(
   if (classname.empty())
     return;
 
-  if (!smFactory::s_catalog)
+  if (!Factory::s_catalog)
     {
-    smFactory::s_catalog =
-      new std::map<std::string, typename smFactory<T>::smFactoryConfigurationOptions>;
-    atexit( []() { delete smFactory::s_catalog; } );
+    Factory::s_catalog =
+      new std::map<std::string, typename Factory<T>::smFactoryConfigurationOptions>;
+    atexit( []() { delete Factory::s_catalog; } );
     }
 
   smFactoryEntry entry;
   entry.subclassname = subclassname;
   entry.constructor = ctor;
   entry.group = group;
-  (*smFactory::s_catalog)[classname].insert(entry);
+  (*Factory::s_catalog)[classname].insert(entry);
 }
 
 template<typename T>
-const typename smFactory<T>::smFactoryConfigurationOptions& smFactory<T>::optionsForClass(const std::string& classname)
+const typename Factory<T>::smFactoryConfigurationOptions& Factory<T>::optionsForClass(const std::string& classname)
 {
   static smFactoryConfigurationOptions emptyOptions;
-  if (!smFactory::s_catalog)
+  if (!Factory::s_catalog)
     return emptyOptions;
 
   typename std::map<std::string, smFactoryConfigurationOptions>::const_iterator it;
-  if (classname.empty() || (it = smFactory::s_catalog->find(classname)) == smFactory::s_catalog->end())
+  if (classname.empty() || (it = Factory::s_catalog->find(classname)) == Factory::s_catalog->end())
     return emptyOptions;
   return it->second;
 }
 
 template<typename T>
-std::shared_ptr<T> smFactory<T>::createDefault(
+std::shared_ptr<T> Factory<T>::createDefault(
   const std::string& classname)
 {
   const smFactoryConfigurationOptions& opts(
-    smFactory::optionsForClass(classname));
+    Factory::optionsForClass(classname));
   if (opts.empty())
     return std::shared_ptr<T>();
   //std::cout << "Creating default " << classname << ", " << opts.begin()->subclassname << "\n";
@@ -53,12 +53,12 @@ std::shared_ptr<T> smFactory<T>::createDefault(
 }
 
 template<typename T>
-std::shared_ptr<T> smFactory<T>::createSubclass(
+std::shared_ptr<T> Factory<T>::createSubclass(
   const std::string& classname,
   const std::string& subclassname)
 {
   const smFactoryConfigurationOptions& opts(
-    smFactory::optionsForClass(classname));
+    Factory::optionsForClass(classname));
 
   typename smFactoryConfigurationOptions::const_iterator it;
   for (it = opts.begin(); it != opts.end(); ++it)
@@ -78,15 +78,15 @@ std::shared_ptr<T> smFactory<T>::createSubclass(
   * class.
   */
 template<typename T>
-std::shared_ptr<T> smFactory<T>::createConcreteClass(
+std::shared_ptr<T> Factory<T>::createConcreteClass(
   const std::string& classname)
 {
-  if (classname.empty() || !smFactory::s_catalog)
+  if (classname.empty() || !Factory::s_catalog)
     return std::shared_ptr<T>();
 
   typename std::map<std::string, smFactoryConfigurationOptions>::const_iterator bit;
   typename smFactoryConfigurationOptions::const_iterator cit;
-  for (bit = smFactory::s_catalog->begin(); bit != smFactory::s_catalog->end(); ++bit)
+  for (bit = Factory::s_catalog->begin(); bit != Factory::s_catalog->end(); ++bit)
     for (cit = bit->second.begin(); cit != bit->second.end(); ++cit)
       if (cit->subclassname == classname)
         {
@@ -98,12 +98,12 @@ std::shared_ptr<T> smFactory<T>::createConcreteClass(
 }
 
 template<typename T>
-std::shared_ptr<T> smFactory<T>::createSubclassForGroup(
+std::shared_ptr<T> Factory<T>::createSubclassForGroup(
   const std::string& classname,
   int group)
 {
   const smFactoryConfigurationOptions& opts(
-    smFactory::optionsForClass(classname));
+    Factory::optionsForClass(classname));
 
   typename smFactoryConfigurationOptions::const_iterator it;
   for (it = opts.begin(); it != opts.end(); ++it)
@@ -118,6 +118,6 @@ std::shared_ptr<T> smFactory<T>::createSubclassForGroup(
 
 /// Class-static map from abstract class names to registered concrete children.
 template<typename T>
-std::map<std::string, typename smFactory<T>::smFactoryConfigurationOptions>* smFactory<T>::s_catalog = NULL;
+std::map<std::string, typename Factory<T>::smFactoryConfigurationOptions>* Factory<T>::s_catalog = NULL;
 
 #endif // SMFACTORY_HPP

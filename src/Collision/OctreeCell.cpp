@@ -29,97 +29,97 @@
 // SimMedTK includes
 #include "Collision/CollisionMoller.h"
 
-smOctreeCell::smOctreeCell() : BaseType()
+OctreeCell::OctreeCell() : BaseType()
 {
 
 }
 
-smOctreeCell::~smOctreeCell()
+OctreeCell::~OctreeCell()
 {
 
 }
 
-smVec3d &smOctreeCell::getCenter()
-{
-    return  cube.center;
-}
-
-const smVec3d &smOctreeCell::getCenter() const
+core::Vec3d &OctreeCell::getCenter()
 {
     return  cube.center;
 }
 
-void smOctreeCell::setCenter( const smVec3d &center )
+const core::Vec3d &OctreeCell::getCenter() const
+{
+    return  cube.center;
+}
+
+void OctreeCell::setCenter( const core::Vec3d &center )
 {
     cube.center = center;
 }
 
-double &smOctreeCell::getLength()
+double &OctreeCell::getLength()
 {
     return cube.sideLength;
 }
 
-const double &smOctreeCell::getLength() const
+const double &OctreeCell::getLength() const
 {
     return cube.sideLength;
 }
 
-void smOctreeCell::setLength( const double length )
+void OctreeCell::setLength( const double length )
 {
     cube.sideLength = length;
 }
 
-void smOctreeCell::copyShape( const smOctreeCell &cell )
+void OctreeCell::copyShape( const OctreeCell &cell )
 {
     cube = cell.cube;
 }
 
-void smOctreeCell::expand( const double expandScale )
+void OctreeCell::expand( const double expandScale )
 {
     cube.expand( expandScale );
 }
 
-bool smOctreeCell::isCollidedWithTri( smVec3d &v0, smVec3d &v1, smVec3d &v2 )
+bool OctreeCell::isCollidedWithTri( core::Vec3d &v0, core::Vec3d &v1, core::Vec3d &v2 )
 {
-    smAABB tempAABB;
+    AABB tempAABB;
     tempAABB.aabbMin = cube.leftMinCorner();
     tempAABB.aabbMax = cube.rightMaxCorner();
-    return smCollisionMoller::checkAABBTriangle( tempAABB, v0, v1, v2 );
+    return CollisionMoller::checkAABBTriangle( tempAABB, v0, v1, v2 );
 }
 
-bool smOctreeCell::isCollidedWithPoint()
+bool OctreeCell::isCollidedWithPoint()
 {
-    std::cerr << "Error::smOctreeCell::isCollidedWithPoint(): Function not implemented." << std::endl;
+    std::cerr << "Error::OctreeCell::isCollidedWithPoint(): Function not implemented." << std::endl;
     return 0;
 }
 
-void smOctreeCell::subDivide( const int divisionPerAxis,
-                              std::array<smOctreeCell, smOctreeCell::numberOfSubdivisions> &cells )
+void OctreeCell::subDivide( const int divisionPerAxis,
+                              std::array<OctreeCell, OctreeCell::numberOfSubdivisions> &cells )
 {
     size_t totalCubes = divisionPerAxis * divisionPerAxis * divisionPerAxis;
 
     assert( cells.size() == totalCubes );
 
-    std::vector<smCube> cubes( smOctreeCell::numberOfSubdivisions );
+    std::vector<Cube> cubes( OctreeCell::numberOfSubdivisions );
     cube.subDivide( divisionPerAxis, cubes.data() );
 
-    for ( size_t i = 0; i < smOctreeCell::numberOfSubdivisions; i++ )
+    for ( size_t i = 0; i < OctreeCell::numberOfSubdivisions; i++ )
     {
         cells[i].cube = cubes[i];
     }
 }
 
-const smCube &smOctreeCell::getCube() const
+const Cube &OctreeCell::getCube() const
 {
     return cube;
 }
 
-smCube &smOctreeCell::getCube()
+Cube &OctreeCell::getCube()
 {
     return cube;
 }
 
-void smOctreeCell::setCube(const smCube &otherCube)
+void OctreeCell::setCube(const Cube &otherCube)
 {
     this->cube.center = otherCube.center;
     this->cube.sideLength = otherCube.sideLength;

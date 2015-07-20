@@ -31,22 +31,22 @@
 #include "Core/SceneObject.h"
 
 //forward declaration
-class smSceneObject;
+class SceneObject;
 
 /// \brief custom renderer for the object.
 ///you could draw with one custom renderer with multiple objects.
 ///This is the reason why the functions are taken objects.
-class smCustomRenderer: public smCoreClass
+class smCustomRenderer: public CoreClass
 {
 
 public:
     /// \briefthis function should be implemented based on objects
     //virtual void init();
     /// \brief draw pre, default and post draw routines
-    virtual void preDraw(const smSceneObject &p_object);
+    virtual void preDraw(const SceneObject &p_object);
     virtual void draw();
-    virtual void draw(const smSceneObject &p_object);
-    virtual void postDraw(const smSceneObject &p_object);
+    virtual void draw(const SceneObject &p_object);
+    virtual void postDraw(const SceneObject &p_object);
 };
 
 /// \briefderive this class if you want to render a class in the viewer.

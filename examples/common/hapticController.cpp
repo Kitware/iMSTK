@@ -28,7 +28,7 @@
 
 using namespace mstk::Examples::Common;
 
-void hapticController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void hapticController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(event);
     if(hapticEvent != nullptr && hapticEvent->getButtonState(0))

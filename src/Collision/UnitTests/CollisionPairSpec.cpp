@@ -33,13 +33,13 @@ using namespace bandit;
 go_bandit([](){
     describe("Collision pair", []() {
         it("constructs ", []() {
-            std::unique_ptr<smCollisionPair> collisionPair(make_unique<smCollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
         });
         it("attaches models ", []() {
-            std::unique_ptr<smCollisionPair> collisionPair(make_unique<smCollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
 
-            std::shared_ptr<smModelRepresentation> modelA = std::make_shared<smMeshCollisionModel>();
-            std::shared_ptr<smModelRepresentation> modelB = std::make_shared<smMeshCollisionModel>();
+            std::shared_ptr<ModelRepresentation> modelA = std::make_shared<MeshCollisionModel>();
+            std::shared_ptr<ModelRepresentation> modelB = std::make_shared<MeshCollisionModel>();
 
             collisionPair->setModels(modelA,modelB);
 
@@ -48,14 +48,14 @@ go_bandit([](){
 
         });
         it("attaches contacts ", []() {
-            std::unique_ptr<smCollisionPair> collisionPair(make_unique<smCollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
 
             float depth = 1.0;
-            smVec3d contactPoint(0,0,1);
-            smVec3d normal(1,0,0);
+            core::Vec3d contactPoint(0,0,1);
+            core::Vec3d normal(1,0,0);
             collisionPair->addContact(depth,contactPoint,1,normal);
 
-            std::shared_ptr<smContact> contact = collisionPair->getContacts().back();
+            std::shared_ptr<Contact> contact = collisionPair->getContacts().back();
 
             AssertThat(collisionPair->hasContacts(), IsTrue());
             AssertThat(contact->normal, Equals(normal));

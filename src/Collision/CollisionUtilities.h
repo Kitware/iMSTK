@@ -28,8 +28,8 @@
 #include "Core/Vector.h"
 
 /// \brief If the point is in the triangle, it will also send the barycentric coord.
-int intersect3D_RayTriangleWithBarycentric(smVec3d P0, smVec3d P1, smVec3d V0,
-        smVec3d V1, smVec3d V2, smVec3d *I,
+int intersect3D_RayTriangleWithBarycentric(core::Vec3d P0, core::Vec3d P1, core::Vec3d V0,
+        core::Vec3d V1, core::Vec3d V2, core::Vec3d *I,
         float &p_baryU, float &p_baryV,
         float &p_baryW,
         bool considerFrontFaceOnly);

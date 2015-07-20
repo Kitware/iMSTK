@@ -31,7 +31,7 @@
 namespace mstk {
 namespace Event {
 
-class smKeyboardEvent : public smEvent
+class smKeyboardEvent : public Event
 {
 public:
     static EventType EventName;

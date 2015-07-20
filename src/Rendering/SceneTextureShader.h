@@ -30,7 +30,7 @@
 namespace mstk{
 namespace Event{
 
-    class smEvent;
+    class Event;
 }
 }
 
@@ -54,7 +54,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh>) override{};
 
     /// \brief handle the events
-    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
 public:
     /// \brief depth  texture GL id that is sent to shader. It stores scene depth values

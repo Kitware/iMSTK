@@ -42,18 +42,18 @@
 /// This class facilitates collision detection between a mesh and another
 /// model.
 ///
-/// @see smMeshToMeshCollision
+/// @see MeshToMeshCollision
 ///
-class smMeshCollisionModel : public smMeshModel
+class MeshCollisionModel : public smMeshModel
 {
 public:
-    using AABBNodeType = smOctreeCell;
-    using AABBTreeType = smSurfaceTree<AABBNodeType>;
+    using AABBNodeType = OctreeCell;
+    using AABBTreeType = SurfaceTree<AABBNodeType>;
     using NodePairType = std::pair<std::shared_ptr<AABBNodeType>,std::shared_ptr<AABBNodeType>>;
 
 public:
-    smMeshCollisionModel();
-    ~smMeshCollisionModel();
+    MeshCollisionModel();
+    ~MeshCollisionModel();
 
     ///
     /// @brief Set internal mesh data structure

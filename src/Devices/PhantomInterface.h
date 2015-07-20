@@ -37,7 +37,7 @@ class smPhantomInterface: public smHapticInterface
 {
 
 protected:
-    smEvent *hapticEvent[SM_MAX_PHANTOM_DEVICES]; ///<
+    Event *hapticEvent[SM_MAX_PHANTOM_DEVICES]; ///<
     smHapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///<
 
 public:
@@ -65,13 +65,13 @@ public:
     int startDevice();
 
     /// \brief get phantom position
-    int getPosition(smVec3 <smDouble>& d_pos);
+    int getPosition(core::Vec3 <smDouble>& d_pos);
 
     /// \brief get phantom orientation
-    int getOreintation(smMatrix33 <smDouble> *d_rot);
+    int getOreintation(Matrix33 <smDouble> *d_rot);
 
     /// \brief get phantom transformation
-    int getDeviceTransform(smMatrix44 <smDouble> *d_transform);
+    int getDeviceTransform(Matrix44 <smDouble> *d_transform);
 
     HHD dHandle[SM_MAX_PHANTOM_DEVICES]; ///< handles for devices available
     int numPhantomDevices; ///< number of phantom devices
@@ -99,7 +99,7 @@ public:
     friend HDCallbackCode HDCALLBACK hapticCallback(void *pData); ///< !!
 
     /// \brief handle events related to phantom omni
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
 
     /// \brief initialize (nothing happens)
     void init() override;

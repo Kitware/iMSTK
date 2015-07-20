@@ -27,12 +27,12 @@
 smConsoleStream::smConsoleStream()
 {
 }
-smIOStream& smConsoleStream::operator<<(std::string p_string)
+IOStream& smConsoleStream::operator<<(std::string p_string)
 {
     std::cout << p_string;
     return *this;
 }
-smIOStream& smConsoleStream::operator>>(std::string &p_string)
+IOStream& smConsoleStream::operator>>(std::string &p_string)
 {
     std::getline(std::cin, inputBuffer);
     p_string = inputBuffer;
@@ -67,11 +67,11 @@ void smWindowString::operator=(smWindowString& p_windowString)
     x = p_windowString.x;
     y = p_windowString.y;
 }
-smIOStream& smWindowStream::operator<<(std::string /*p_string*/)
+IOStream& smWindowStream::operator<<(std::string /*p_string*/)
 {
     return *this;
 }
-smIOStream& smWindowStream::operator>>(std::string& /*p_string*/)
+IOStream& smWindowStream::operator>>(std::string& /*p_string*/)
 {
     return *this;
 }

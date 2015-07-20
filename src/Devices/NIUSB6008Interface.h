@@ -30,7 +30,7 @@
 #define SM_NIUSB6008_INTERFACE_H
 
 #include "smExternalDevices/smDeviceInterface.h"
-#include "smCore/smEvent.h"
+#include "smCore/Event.h"
 #include "smCore/smEventData.h"
 #include "smCore/smPipe.h"
 
@@ -60,7 +60,7 @@ public:
     smNIUSB6008Interface(int VBLaST_Task_ID);
     ~smNIUSB6008Interface();
 
-    smPipe *NIUSB6008pipe; ///<
+//     smPipe *NIUSB6008pipe; ///<
     int32 NI_error; ///<
     char NI_errBuff[2048]; ///<
     int initCount; ///<
@@ -97,7 +97,7 @@ public:
     void run();
 
     /// \brief handle event related to NIUSB6008 device
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override
     {
     };
 

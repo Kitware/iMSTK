@@ -35,11 +35,11 @@
 #include "SceneObject.h"
 
 ///this class is module major. Every other thread should derive this class
-class smModule: public smCoreClass
+class Module: public CoreClass
 {
 
 private:
-    friend class smSDK;
+    friend class SDK;
 
 protected:
     ///initialization flag
@@ -52,16 +52,16 @@ protected:
     bool terminationCompleted;
 
     ///scene list in the environment
-    std::vector<std::shared_ptr<smScene>> sceneList;
+    std::vector<std::shared_ptr<Scene>> sceneList;
     /// \brief call are made for begin module and end module before and after each frame
     virtual void beginModule();
     virtual void   endModule();
     /// \brief  dispatcher reference
-    std::shared_ptr<smDispatcher> dispathcer;
+    std::shared_ptr<Dispatcher> dispathcer;
 
 public:
     /// \brief  constructor initializes the module
-    smModule();
+    Module();
 
     /// \brief virtual functions
     virtual void init() = 0;

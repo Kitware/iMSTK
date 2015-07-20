@@ -33,19 +33,19 @@ struct GeometryRepresentation {};
 
 /// \brief Contains information related to the triangles that are present in a cell
 /// at any given point
-struct smCellTriangle : public GeometryRepresentation
+struct CellTriangle : public GeometryRepresentation
 {
-    smCellTriangle() : primID(0) {}
-    smCellTriangle(const unsigned int &id) : primID(id) {}
+    CellTriangle() : primID(0) {}
+    CellTriangle(const unsigned int &id) : primID(id) {}
     unsigned int primID;
-    std::shared_ptr<smUnifiedId> meshID;
-    smVec3d vert[3];
+    std::shared_ptr<UnifiedId> meshID;
+    core::Vec3d vert[3];
 
     bool operator ==(unsigned int p_ID);
 
-    bool operator ==(smCellTriangle &p_tri);
+    bool operator ==(CellTriangle &p_tri);
 
-    friend std::ostream &operator<<(std::ostream &out, smCellTriangle &tri);
+    friend std::ostream &operator<<(std::ostream &out, CellTriangle &tri);
 };
 
 /// \brief Contains information related to the a line segments that are present in a cell
@@ -55,8 +55,8 @@ struct smCellLine : public GeometryRepresentation
     smCellLine() : primID(0) {}
     smCellLine(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Edge id
-    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
-    smVec3d vert[2]; ///< Vertices
+    std::shared_ptr<UnifiedId> meshID; ///< smMeshLine id
+    core::Vec3d vert[2]; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
     bool operator ==(smCellLine &p_line);
@@ -70,8 +70,8 @@ struct smCellModel : public GeometryRepresentation
     smCellModel() : primID(0) {}
     smCellModel(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Model Prim id
-    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
-    smVec3d center; ///< Vertices
+    std::shared_ptr<UnifiedId> meshID; ///< smMeshLine id
+    core::Vec3d center; ///< Vertices
     double radius;
 
     bool operator ==(unsigned int p_ID);
@@ -89,8 +89,8 @@ struct smCellPoint : public GeometryRepresentation
     smCellPoint() : primID(0) {}
     smCellPoint(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Model Prim id
-    std::shared_ptr<smUnifiedId> meshID; ///< smMeshLine id
-    smVec3d vert; ///< Vertices
+    std::shared_ptr<UnifiedId> meshID; ///< smMeshLine id
+    core::Vec3d vert; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
 
@@ -103,18 +103,18 @@ struct smCellPoint : public GeometryRepresentation
 /// \brief Contains triangle pair that have collided
 struct smCollidedTriangles
 {
-    smCellTriangle tri1;
-    smCellTriangle tri2;
-    smVec3d proj1, proj2;
+    CellTriangle tri1;
+    CellTriangle tri2;
+    core::Vec3d proj1, proj2;
     short point1, point2;
 };
 
 /// \brief Contains line pair that have collided
 struct smCollidedLineTris
 {
-    smCellTriangle tri;
+    CellTriangle tri;
     smCellLine line;
-    smVec3d intersection;
+    core::Vec3d intersection;
 };
 
 /// \brief Contains model-point pair that have collided

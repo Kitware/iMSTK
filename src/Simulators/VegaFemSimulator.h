@@ -31,12 +31,12 @@
 #include "VegaFemSceneObject.h"
 
 /// \brief Interface class between Vega and SimMedTK core
-class smVegaFemSimulator: public smObjectSimulator
+class smVegaFemSimulator: public ObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smVegaFemSimulator(std::shared_ptr<smErrorLog> p_errorLog);
+    smVegaFemSimulator(std::shared_ptr<ErrorLog> p_errorLog);
 
     /// \brief start the job
     virtual void beginSim() override;
@@ -54,10 +54,10 @@ public:
     void syncBuffers() override;
 
     /// \brief handle the keyboard and haptic button press events
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
 private:
-    smVec3d hapticPosition; ///< position of the haptic device end effector
+    core::Vec3d hapticPosition; ///< position of the haptic device end effector
     bool hapticButtonPressed; ///< true of the button is pressed
 };
 

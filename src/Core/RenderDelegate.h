@@ -1,14 +1,14 @@
 #ifndef SMRENDERABLE_H
 #define SMRENDERABLE_H
 
-#include "RenderDetail.h" // for smGeometrySource
+#include "RenderDetail.h" // for GeometrySource
 
 #include <memory> // for shared_ptr
 
-class smRenderDelegate
+class RenderDelegate
 {
 public:
-    typedef std::shared_ptr<smRenderDelegate> Ptr;
+    typedef std::shared_ptr<RenderDelegate> Ptr;
 
     virtual void initDraw() const
       { }
@@ -27,7 +27,7 @@ public:
       { return this->sourceGeometry.sourceAs<T>(); }
 
 protected:
-    smGeometrySource sourceGeometry; // object to render when draw() is called
+    GeometrySource sourceGeometry; // object to render when draw() is called
 };
 
 #endif // SMRENDERABLE_H

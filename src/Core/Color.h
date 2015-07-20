@@ -18,7 +18,7 @@
 
 #include "Config.h"
 
-struct smColor
+struct Color
 {
     union
     {
@@ -31,8 +31,8 @@ struct smColor
             float a;
         };
     };
-    smColor();
-    smColor(float r, float g, float b, float a = 1.0);
+    Color();
+    Color(float r, float g, float b, float a = 1.0);
 
     /// \brief Dark ratio. the valu is between 0 and 1.0
     void darken(float p_darkFactor);
@@ -42,20 +42,20 @@ struct smColor
     /// \brief returns the color value given with the index
     float operator()(int p_i);
     /// \brief setting
-    smColor &operator=(const smColor &p_color);
+    Color &operator=(const Color &p_color);
     /// \brief converts to gl color
     GLfloat* toGLColor();
     const GLfloat* toGLColor() const;
     /// \brief set RGB color
     void setValue(float p_red, float p_green, float p_blue, float p_alpha);
 
-    static smColor colorWhite;
-    static smColor colorBlue;
-    static smColor colorGreen;
-    static smColor colorRed;
-    static smColor colorGray;
-    static smColor colorPink;
-    static smColor colorYellow;
+    static Color colorWhite;
+    static Color colorBlue;
+    static Color colorGreen;
+    static Color colorRed;
+    static Color colorGray;
+    static Color colorPink;
+    static Color colorYellow;
 };
 
 #endif // SMCOLOR_H

@@ -35,11 +35,11 @@
 
 /// \brief contains the cell of the surface tree structure
 template <typename Derived>
-class smSurfaceTreeCell
+class SurfaceTreeCell
 {
 public:
     /// \brief constructor
-    smSurfaceTreeCell()
+    SurfaceTreeCell()
     {
         empty = true;
         isLeaf = false;
@@ -66,13 +66,13 @@ public:
     }
 
     /// \brief checks if the cell collided with a triangle primitive
-    inline bool isCollidedWithTri(const smVec3d &v0, const smVec3d &v1, const smVec3d &v2)
+    inline bool isCollidedWithTri(const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2)
     {
         return derived()->isCollidedWithTri(v0,v1,v2);
     }
 
     /// \brief checks if the cell contains the point primitive
-    inline bool isCollidedWithPoint(const smVec3d &point)
+    inline bool isCollidedWithPoint(const core::Vec3d &point)
     {
         return derived()->isCollidedWithPoint(point);
     }
@@ -84,7 +84,7 @@ public:
     }
 
     /// \brief set the center of the cell of surface tree
-    inline void setCenter(const smVec3d &center)
+    inline void setCenter(const core::Vec3d &center)
     {
         derived()->setCenter(center);
     }
@@ -96,7 +96,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline smVec3d &getCenter()
+    inline core::Vec3d &getCenter()
     {
         return derived()->getCenter();
     }
@@ -108,7 +108,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline const smVec3d &getCenter()  const
+    inline const core::Vec3d &getCenter()  const
     {
         return derived()->getCenter();
     }
@@ -119,8 +119,8 @@ public:
         return derived()->getLength();
     }
 
-    template<typename smAABB>
-    inline void addTriangleData(const smAABB &aabb, size_t index)
+    template<typename AABB>
+    inline void addTriangleData(const AABB &aabb, size_t index)
     {
         return derived()->addTriangleData(aabb,index);
     }

@@ -39,11 +39,11 @@
 using namespace bandit;
 using namespace mstk::Event;
 
-struct MyObserver : public smCoreClass
+struct MyObserver : public CoreClass
 {
     MyObserver(mstk::Event::EventType _eventType) : success(false), eventType(_eventType) {}
 
-    void handleEvent(std::shared_ptr<smEvent> event) override
+    void handleEvent(std::shared_ptr<Event> event) override
     {
         std::shared_ptr<smKeyboardEvent> keyboardEvent = std::static_pointer_cast<smKeyboardEvent>(event);
         if(keyboardEvent != nullptr && smKeyboardEvent::EventName == eventType)
@@ -109,8 +109,8 @@ go_bandit([](){
         it("attaches events ", []() {
             std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
 
-            smEvent::Pointer event = std::make_shared<smEvent>();
-            smCoreClass::Pointer observer = std::make_shared<smCoreClass>();
+            Event::Pointer event = std::make_shared<Event>();
+            CoreClass::Pointer observer = std::make_shared<CoreClass>();
 
             eventHandler->attachEvent(mstk::Event::EventType::Audio,observer);
 
@@ -120,8 +120,8 @@ go_bandit([](){
         it("detaches events ", []() {
             std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
 
-            smEvent::Pointer event = std::make_shared<smEvent>();
-            smCoreClass::Pointer observer = std::make_shared<smCoreClass>();
+            Event::Pointer event = std::make_shared<Event>();
+            CoreClass::Pointer observer = std::make_shared<CoreClass>();
 
             eventHandler->attachEvent(mstk::Event::EventType::Audio,observer);
 
@@ -135,12 +135,12 @@ go_bandit([](){
         it("dispatches events ", []() {
             std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
 
-            smEvent::Pointer event = std::make_shared<smEvent>();
+            Event::Pointer event = std::make_shared<Event>();
             std::shared_ptr<MyObserver> observer;
 
             observer = std::make_shared<MyObserver>(mstk::Event::EventType::None);
             eventHandler->attachEvent(mstk::Event::EventType::None,observer);
-            eventHandler->triggerEvent(std::make_shared<smEvent>());
+            eventHandler->triggerEvent(std::make_shared<Event>());
             AssertThat(observer->success, IsFalse());
 
             observer = std::make_shared<MyObserver>(mstk::Event::EventType::Audio);

@@ -25,79 +25,79 @@
 #include "ObjectSimulator.h"
 #include "SDK.h"
 
-smSceneObject::smSceneObject()
+SceneObject::SceneObject()
 {
     type = core::ClassType::Unknown;
     isActive = true;
     objectSim = nullptr;
     customRender = nullptr;
-    //     smSDK::getInstance()->registerSceneObject(safeDownCast<smSceneObject>());
+    //     SDK::getInstance()->registerSceneObject(safeDownCast<SceneObject>());
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;
     name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
 }
 
-smSceneObject::~smSceneObject()
+SceneObject::~SceneObject()
 {
 }
 
-void smSceneObject::attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim)
+void SceneObject::attachObjectSimulator(std::shared_ptr<ObjectSimulator> p_objectSim)
 {
-    p_objectSim->addObject(safeDownCast<smSceneObject>());
+    p_objectSim->addObject(safeDownCast<SceneObject>());
 }
 
-void smSceneObject::releaseObjectSimulator()
+void SceneObject::releaseObjectSimulator()
 {
-    objectSim->removeObject(safeDownCast<smSceneObject>());
+    objectSim->removeObject(safeDownCast<SceneObject>());
     objectSim = nullptr;
 }
 
-std::shared_ptr<smObjectSimulator> smSceneObject::getObjectSimulator()
+std::shared_ptr<ObjectSimulator> SceneObject::getObjectSimulator()
 {
     return objectSim;
 }
 
-void smSceneObject::attachCustomRenderer(std::shared_ptr<smCustomRenderer> p_customeRenderer)
+void SceneObject::attachCustomRenderer(std::shared_ptr<smCustomRenderer> p_customeRenderer)
 {
     customRender = p_customeRenderer;
 }
 
-void smSceneObject::releaseCustomeRenderer()
+void SceneObject::releaseCustomeRenderer()
 {
     customRender = nullptr;
 }
 
-int smSceneObject::getObjectId()
+int SceneObject::getObjectId()
 {
     return this->getUniqueId()->getId();
 }
 
-smUnifiedId::Pointer smSceneObject::getObjectUnifiedID()
+UnifiedId::Pointer SceneObject::getObjectUnifiedID()
 {
-    return std::make_shared<smUnifiedId>();
+    return std::make_shared<UnifiedId>();
 }
 
-smStdVector3d & smSceneObject::getLocalVertices()
+core::StdVector3d & SceneObject::getLocalVertices()
 {
     return localVertices;
 }
 
-smObjectInitFlags & smSceneObject::getFlags()
+ObjectInitFlags & SceneObject::getFlags()
 {
     return flags;
 }
 
-std::shared_ptr<smCustomRenderer> smSceneObject::getRenderer()
+std::shared_ptr<smCustomRenderer> SceneObject::getRenderer()
 {
     return customRender;
 }
 
-void smSceneObject::freeze()
+void SceneObject::freeze()
 {
     this->isActive = false;
 }
 
-void smSceneObject::activate()
+void SceneObject::activate()
 {
     this->isActive = true;
 }

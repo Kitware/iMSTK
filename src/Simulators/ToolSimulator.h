@@ -32,12 +32,12 @@
 
 
 /// \brief Example tool simulator
-class smToolSimulator: public smObjectSimulator
+class smToolSimulator: public ObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smToolSimulator(std::shared_ptr<smErrorLog> p_errorLog);
+    smToolSimulator(std::shared_ptr<ErrorLog> p_errorLog);
 
     /// \brief update everything related to tool
     void updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool);
@@ -52,7 +52,7 @@ public:
     void syncBuffers() override;
 
     /// \brief handle the events such as button presses related to tool
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 };
 
 #endif

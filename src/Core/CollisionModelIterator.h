@@ -26,7 +26,7 @@
 
 /// \brief !!
 template <typename T>
-class smCollisionModelIterator
+class CollisionModelIterator
 {
 
 public:

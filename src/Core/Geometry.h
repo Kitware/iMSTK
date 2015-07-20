@@ -34,12 +34,12 @@
 #include "RenderDelegate.h"
 
 //forward declaration
-struct smSphere;
+struct Sphere;
 
-class smVisualArtifact
+class VisualArtifact
 {
 public:
-  virtual void setRenderDelegate(smRenderDelegate::Ptr delegate)
+  virtual void setRenderDelegate(RenderDelegate::Ptr delegate)
     {
     this->renderDelegate = delegate;
     if (delegate)
@@ -51,62 +51,62 @@ public:
       this->renderDelegate->draw();
     }
 
-  smRenderDelegate::Ptr renderDelegate;
+  RenderDelegate::Ptr renderDelegate;
 };
 
-class smAnalyticalGeometry : public smVisualArtifact
+class AnalyticalGeometry : public VisualArtifact
 {
 public:
-    smAnalyticalGeometry(){}
-    ~smAnalyticalGeometry(){}
+    AnalyticalGeometry(){}
+    ~AnalyticalGeometry(){}
 
-    virtual void translate(const smVec3d &t) = 0;
-    virtual void rotate(const smMatrix33d &rot) = 0;
+    virtual void translate(const core::Vec3d &t) = 0;
+    virtual void rotate(const Matrix33d &rot) = 0;
 };
 
 /// \brief  Simple Plane definition with unit normal and spatial location
-class smPlane : public smAnalyticalGeometry
+class Plane : public AnalyticalGeometry
 {
 public:
-    smPlane()
+    Plane()
       {
       this->setRenderDelegate(
-        smFactory<smRenderDelegate>::createSubclass(
+        Factory<RenderDelegate>::createSubclass(
           "RenderDelegate", "PlaneRenderDelegate"));
       }
-    ~smPlane(){}
+    ~Plane(){}
 
     /// \brief create a plane with point and unit normal
-    smPlane(const smVec3d &p, const smVec3d &n)
+    Plane(const core::Vec3d &p, const core::Vec3d &n)
     {
         this->point = p;
         this->unitNormal = n;
         this->width = 100.0;
 
-        this->drawPointsOrig[0] = smVec3d(width, 0, 0);
-        this->drawPointsOrig[1] = smVec3d(0, width, 0);
-        this->drawPointsOrig[2] = smVec3d(-width, 0, 0);
-        this->drawPointsOrig[3] = smVec3d(0, -width, 0);
+        this->drawPointsOrig[0] = core::Vec3d(width, 0, 0);
+        this->drawPointsOrig[1] = core::Vec3d(0, width, 0);
+        this->drawPointsOrig[2] = core::Vec3d(-width, 0, 0);
+        this->drawPointsOrig[3] = core::Vec3d(0, -width, 0);
 
         this->movedOrRotated = true;
 
         this->setRenderDelegate(
-          smFactory<smRenderDelegate>::createSubclass(
+          Factory<RenderDelegate>::createSubclass(
             "RenderDelegate", "PlaneRenderDelegate"));
     }
 
-    double distance(const smVec3d &p_vector)
+    double distance(const core::Vec3d &p_vector)
     {
         auto m = (p_vector - this->point).dot(this->unitNormal);
         return m;
     };
 
-    smVec3d project(const smVec3d &p_vector)
+    core::Vec3d project(const core::Vec3d &p_vector)
     {
         return p_vector - ((this->point - p_vector)*this->unitNormal.transpose())*this->unitNormal;
     };
 
-    const smVec3d &getUnitNormal() const
+    const core::Vec3d &getUnitNormal() const
     {
         return this->unitNormal;
     }
@@ -116,40 +116,40 @@ public:
         this->movedOrRotated = s;
     };
 
-    void setUnitNormal(const smVec3d &normal)
+    void setUnitNormal(const core::Vec3d &normal)
     {
         this->unitNormal = normal;
 
         this->movedOrRotated = true;
     }
 
-    const smVec3d &getPoint() const
+    const core::Vec3d &getPoint() const
     {
         return this->point;
     }
 
-    void setPoint(const smVec3d &p)
+    void setPoint(const core::Vec3d &p)
     {
         this->point = p;
 
         this->movedOrRotated = true;
     }
 
-    void translate(const smVec3d &t)
+    void translate(const core::Vec3d &t)
     {
         this->point += t;
 
         this->movedOrRotated = true;
     }
 
-    void rotate(const smMatrix33d &rot)
+    void rotate(const Matrix33d &rot)
     {
         this->unitNormal = rot * this->unitNormal;
 
         this->movedOrRotated = true;
     }
 
-    void setDrawPoint(const smVec3d &p1, const smVec3d &p2, const smVec3d &p3, const smVec3d &p4)
+    void setDrawPoint(const core::Vec3d &p1, const core::Vec3d &p2, const core::Vec3d &p3, const core::Vec3d &p4)
     {
         this->drawPointsOrig[0] = p1;
         this->drawPointsOrig[1] = p2;
@@ -166,12 +166,12 @@ public:
 
     void updateDrawPoints()
     {
-        smVec3d ny = smVec3d(0.0, unitNormal[2], -unitNormal[1]);
-        smVec3d nz = ny.cross(unitNormal);
+        core::Vec3d ny = core::Vec3d(0.0, unitNormal[2], -unitNormal[1]);
+        core::Vec3d nz = ny.cross(unitNormal);
         ny.normalize();
         nz.normalize();
 
-        smMatrix33d R;
+        Matrix33d R;
         R << this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2];
@@ -185,10 +185,10 @@ public:
 
 private:
     /// \brief unit normal of the plane
-    smVec3d unitNormal;
+    core::Vec3d unitNormal;
 
     /// \brief any point on the plane
-    smVec3d point;
+    core::Vec3d point;
 
     /// \brief true if the plane is static
     bool movedOrRotated;
@@ -197,35 +197,35 @@ private:
     double width;
 
     /// \brief four points used to render plane
-    smVec3d drawPoints[4];
+    core::Vec3d drawPoints[4];
 
     /// \brief four points used to render plane
-    smVec3d drawPointsOrig[4];
+    core::Vec3d drawPointsOrig[4];
 };
 
 
 /// \brief sphere with center and radius
-class smSphere : public smAnalyticalGeometry
+class Sphere : public AnalyticalGeometry
 {
 public:
     /// \brief constructor
-    smSphere();
+    Sphere();
 
     /// \brief sphere constructor with center and radius
-    smSphere(const smVec3d &c, const double &r)
+    Sphere(const core::Vec3d &c, const double &r)
     {
         this->center = c;
         this->radius = r;
     }
 
-    ~smSphere(){}
+    ~Sphere(){}
 
     void setRadius(const double r)
     {
         this->radius = r;
     }
 
-    void setCenter(const smVec3d& c)
+    void setCenter(const core::Vec3d& c)
     {
         this->center = c;
     }
@@ -235,12 +235,12 @@ public:
         this->radius += r;
     }
 
-    void translate(const smVec3d &t)
+    void translate(const core::Vec3d &t)
     {
         center += t;
     }
 
-    void rotate(const smMatrix33d &rot)
+    void rotate(const Matrix33d &rot)
     {
         //Its a sphere! nothing to be done.
     }
@@ -250,102 +250,102 @@ public:
         return this->radius;
     }
 
-    const smVec3d &getCenter() const
+    const core::Vec3d &getCenter() const
     {
         return this->center;
     }
 
 private:
     /// \brief center of sphere
-    smVec3d center;
+    core::Vec3d center;
 
     /// \brief radius of sshere
     double radius;
 };
 
 /// \brief cube
-struct smCube
+struct Cube
 {
     /// \brief cube center
-    smVec3d center;
+    core::Vec3d center;
 
     /// \brief cube length
     double sideLength;
 
     /// \brief constructor
-    smCube();
+    Cube();
 
     /// \brief subdivides the cube in mulitple cube with given number of cubes identified for each axis with p_divisionPerAxis
-    void subDivide(int p_divisionPerAxis, smCube *p_cube);
+    void subDivide(int p_divisionPerAxis, Cube *p_cube);
 
     /// \brief expands the cube. increases the edge length with expansion*edge length
     void expand(double p_expansion);
 
     /// \brief returns the left most corner
-    smVec3d leftMinCorner() const ;
+    core::Vec3d leftMinCorner() const ;
 
     /// \brief returns right most corner
-    smVec3d rightMaxCorner() const;
+    core::Vec3d rightMaxCorner() const;
 
     /// \brief returns the smallest sphere encapsulates the cube
-    smSphere getCircumscribedSphere();
+    Sphere getCircumscribedSphere();
 
     /// \brief returns the  sphere with half edge of the cube as a radius
-    smSphere getInscribedSphere();
+    Sphere getInscribedSphere();
 
     /// \brief get tangent sphere
-    smSphere getTangent2EdgeSphere();
+    Sphere getTangent2EdgeSphere();
 };
 
 
 
 
 /// \brief Axis Aligned bounding box declarions
-class smAABB : public smVisualArtifact
+class AABB : public VisualArtifact
 {
 public:
     /// \brief minimum x,y,z point
-    smVec3d aabbMin;
+    core::Vec3d aabbMin;
 
     /// \brief maximum x,y,z point
-    smVec3d aabbMax;
+    core::Vec3d aabbMax;
 
-    const smVec3d &getMax() const
+    const core::Vec3d &getMax() const
     {
         return aabbMax;
     }
 
-    const smVec3d &getMin() const
+    const core::Vec3d &getMin() const
     {
         return aabbMin;
     }
 
     /// \brief constrcutor. The default is set to origin for aabbMin and aabbMax
-    smAABB();
+    AABB();
 
     /// \brief center of the AABB
-    smVec3d center() const;
+    core::Vec3d center() const;
 
     /// \brief check if two AABB overlaps
-    static bool checkOverlap(const smAABB &p_aabbA, const smAABB &p_aabbB);
+    static bool checkOverlap(const AABB &p_aabbA, const AABB &p_aabbB);
 
     /// \brief check if two AABB overlaps
-    bool overlaps(const smAABB &other) const;
+    bool overlaps(const AABB &other) const;
 
     /// \brief set  p_aabb to the current one
-    const smAABB &operator=(const smAABB &p_aabb);
+    const AABB &operator=(const AABB &p_aabb);
 
     /// \brief scale the AABB
-    smAABB &operator*(const double p_scale);
+    AABB &operator*(const double p_scale);
 
     /// \brief sub divides p_length will be used to create the slices
-    void subDivide(const double p_length, const int p_divison, smAABB *p_aabb) const;
+    void subDivide(const double p_length, const int p_divison, AABB *p_aabb) const;
 
     /// \brief divides current AABB in x,y,z axes with specificed divisions. results are placed in p_aabb
-    void subDivide(const int p_divisionX, const int p_divisionY, const int p_divisionZ, smAABB *p_aabb) const;
+    void subDivide(const int p_divisionX, const int p_divisionY, const int p_divisionZ, AABB *p_aabb) const;
 
     /// \brief divides current AABB in all axes with specificed p_division. results are placed in p_aabb
-    void subDivide(const int p_division, smAABB *p_aabb) const;
+    void subDivide(const int p_division, AABB *p_aabb) const;
 
     /// \brief returns half of X edge of AABB
     double halfSizeX() const;
@@ -369,7 +369,7 @@ public:
             std::numeric_limits<float>::min();
     }
 
-    void extend(const smAABB &other)
+    void extend(const AABB &other)
     {
         this->aabbMin = this->aabbMin.array().min(other.getMin().array());
         this->aabbMax = this->aabbMax.array().max(other.getMax().array());

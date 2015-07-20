@@ -37,9 +37,9 @@
 
 #ifdef _WIN32
 #ifndef MINGW32
-    #define NOMINMAX
+#  define NOMINMAX
 #endif
-#include <windows.h>
+#  include <windows.h>
 #endif
 
 #include <GL/glew.h>
@@ -134,7 +134,7 @@ enum class ClassDrawOrder
     AfterObjects
 };
 
-}
+} // namespace core
 // FIXME: This is currently hardwired into CMake, but must change
 //        once we get SimMedTK declspec'd and building dynamically
 //        on Windows.

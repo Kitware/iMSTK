@@ -33,75 +33,75 @@
 
 // namespace SimMedTK
 // {
-// namespace Math
-// {
 
 
 /// Aliases for vectors
 
 /// A 2D vector
 template<typename T>
-using smVector2 = Eigen::Matrix<T,2,1>;
+using Vector2 = Eigen::Matrix<T,2,1>;
 
 /// A 3D vector
 template<typename T>
-using smVector3 = Eigen::Matrix<T,3,1>;
+using Vector3 = Eigen::Matrix<T,3,1>;
 
 /// A 4D vector
 template<typename T>
-using smVector4 = Eigen::Matrix<T,4,1>;
+using Vector4 = Eigen::Matrix<T,4,1>;
 
 /// A 6D vector
 template<typename T>
-using smVector6 = Eigen::Matrix<T,6,1>;
+using Vector6 = Eigen::Matrix<T,6,1>;
 
 /// A dynamic size column vector
 template<typename T>
-using smVector = Eigen::Matrix<T, Eigen::Dynamic, 1>;
+using Vector = Eigen::Matrix<T, Eigen::Dynamic, 1>;
 
 // STD vectors of vectors
 template<typename T>
-using smStdVector3 = std::vector<smVector3<T>,
-    Eigen::aligned_allocator<smVector3<T>>>;
+using StdVector3 = std::vector<Vector3<T>,
+    Eigen::aligned_allocator<Vector3<T>>>;
 
+namespace core
+{
 /// A 2D vector of floats.
-using smVec2f = smVector2<float>;
+using Vec2f = Vector2<float>;
 
 /// A 3D vector of floats.
-using smVec3f = smVector3<float>;
+using Vec3f = Vector3<float>;
 
 /// A 4D vector of floats.
-using smVec4f = smVector4<float>;
+using Vec4f = Vector4<float>;
 
 /// A 6D vector of floats.
-using smVec6f = smVector6<float>;
+using Vec6f = Vector6<float>;
 
 /// A 2D vector of doubles.
-using smVec2d = smVector2<double>;
+using Vec2d = Vector2<double>;
 
 /// A 3D vector of doubles.
-using smVec3d = smVector3<double>;
+using Vec3d = Vector3<double>;
 
 /// A 4D vector of doubles.
-using smVec4d = smVector4<double>;
+using Vec4d = Vector4<double>;
 
 /// A 6D matrix of doubles.
-using smVec6d = smVector6<double>;
+using Vec6d = Vector6<double>;
 
 /// A dynamic size column vector
-using smVectorf = smVector<float>;
+using Vectorf = Vector<float>;
 
 /// A dynamic size column vector
-using smVectord = smVector<double>;
+using Vectord = Vector<double>;
 
 // STL vectors of float vectors
-using smStdVector3f = smStdVector3<float>;
+using StdVector3f = StdVector3<float>;
 
 // STL vectors of double vectors
-using smStdVector3d = smStdVector3<double>;
+using StdVector3d = StdVector3<double>;
 
 template<typename T>
-void flattenVectorArray(const smStdVector3<T> &v, Eigen::Matrix<T, 3, Eigen::Dynamic> &out)
+void flattenVectorArray(const StdVector3<T> &v, Eigen::Matrix<T, 3, Eigen::Dynamic> &out)
 {
     out.resize(v.size());
     for(size_t i = 0, end = v.size(); i < end; ++i)
@@ -110,7 +110,7 @@ void flattenVectorArray(const smStdVector3<T> &v, Eigen::Matrix<T, 3, Eigen::Dyn
     }
 }
 
-// } // Math
+} // core
 // } // SimMedTK
 
 #endif // SMVECTOR_H

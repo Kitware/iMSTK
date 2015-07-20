@@ -27,7 +27,7 @@
 
 void smPBDObjectSimulator::draw()
 {
-    smObjectSimulator::draw();
+    ObjectSimulator::draw();
     std::shared_ptr<smPBDSurfaceSceneObject> sceneObject;
 
     for (size_t i = 0; i < objectsSimulated.size(); i++)
@@ -36,7 +36,7 @@ void smPBDObjectSimulator::draw()
         smGLRenderer::draw(sceneObject->mesh->aabb);
     }
 }
-smPBDObjectSimulator::smPBDObjectSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
+smPBDObjectSimulator::smPBDObjectSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
     this->scheduleGroup.maxTargetFPS = 100;
     this->scheduleGroup.minTargetFPS = 30;
@@ -57,7 +57,7 @@ void smPBDObjectSimulator::initObject( std::shared_ptr<smPBDSurfaceSceneObject> 
 void smPBDObjectSimulator::initCustom()
 {
     core::ClassType type;
-    std::shared_ptr<smSceneObject> object;
+    std::shared_ptr<SceneObject> object;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
 
     //do nothing for now
@@ -82,10 +82,10 @@ void smPBDObjectSimulator::initCustom()
 }
 void smPBDObjectSimulator::run()
 {
-    std::shared_ptr<smSceneObject> sceneObj;
+    std::shared_ptr<SceneObject> sceneObj;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
     float dist, lamda;
-    smVec3d dirVec, dP;
+    core::Vec3d dirVec, dP;
     int count = 0;
     int a, b;
 
@@ -99,7 +99,7 @@ void smPBDObjectSimulator::run()
         if ( sceneObj->getType() == core::ClassType::PbdSurfaceSceneObject )
         {
             pbdSurfaceSceneObject = std::static_pointer_cast<smPBDSurfaceSceneObject>(sceneObj);
-            smStdVector3d &vertices = pbdSurfaceSceneObject->getLocalVertices();
+            core::StdVector3d &vertices = pbdSurfaceSceneObject->getLocalVertices();
 
             if ( !pbdSurfaceSceneObject->getFlags().isSimulatorInit )
             {
@@ -108,7 +108,7 @@ void smPBDObjectSimulator::run()
 
             for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
             {
-                pbdSurfaceSceneObject->exF[i] = smVec3d::Zero();
+                pbdSurfaceSceneObject->exF[i] = core::Vec3d::Zero();
             }
 
             for ( int i = 0; i < pbdSurfaceSceneObject->nbrMass; i++ )
@@ -184,7 +184,7 @@ void smPBDObjectSimulator::run()
 }
 void smPBDObjectSimulator::syncBuffers()
 {
-    std::shared_ptr<smSceneObject> sceneObj;
+    std::shared_ptr<SceneObject> sceneObj;
     std::shared_ptr<smPBDSurfaceSceneObject> pbdSurfaceSceneObject;
 
     for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
@@ -202,7 +202,7 @@ void smPBDObjectSimulator::syncBuffers()
         }
     }
 }
-void smPBDObjectSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
+void smPBDObjectSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
 {
     ;
 

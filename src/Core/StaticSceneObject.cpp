@@ -24,58 +24,58 @@
 #include "StaticSceneObject.h"
 #include "Factory.h"
 
-smStaticSceneObject::smStaticSceneObject(std::shared_ptr<smErrorLog> p_log) : smSceneObject()
+StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> p_log) : SceneObject()
 {
     type = core::ClassType::StaticSceneObject;
 
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createSubclass(
+      Factory<RenderDelegate>::createSubclass(
         "RenderDelegate","StaticSceneObjectRenderDelegate"));
 }
 
-smStaticSceneObject::~smStaticSceneObject()
+StaticSceneObject::~StaticSceneObject()
 {
 }
 
-void smStaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ )
+void StaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ )
 {
 }
 
-void smStaticSceneObject::serialize ( void* /*p_memoryBlock*/ )
+void StaticSceneObject::serialize ( void* /*p_memoryBlock*/ )
 {
 }
 
-void smStaticSceneObject::initialize()
+void StaticSceneObject::initialize()
 {
 }
 
-void smStaticSceneObject::loadInitialStates()
+void StaticSceneObject::loadInitialStates()
 {
 }
 
-bool smStaticSceneObject::configure(const std::string ConfigFile)
+bool StaticSceneObject::configure(const std::string ConfigFile)
 {
     return false;
 }
 
-std::shared_ptr<smSceneObject> smStaticSceneObject::clone()
+std::shared_ptr<SceneObject> StaticSceneObject::clone()
 {
-    return safeDownCast<smSceneObject>();
+    return safeDownCast<SceneObject>();
 }
 
-void smStaticSceneObject::setModel(std::shared_ptr<smModelRepresentation> model)
+void StaticSceneObject::setModel(std::shared_ptr<ModelRepresentation> model)
 {
     this->staticModel = model;
 }
 
-std::shared_ptr<smModelRepresentation> smStaticSceneObject::getModel()
+std::shared_ptr<ModelRepresentation> StaticSceneObject::getModel()
 {
     return staticModel;
 }
 
-void smStaticSceneObject::printInfo() const
+void StaticSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";
     std::cout << "\t Name        : " << this->getName() << std::endl;

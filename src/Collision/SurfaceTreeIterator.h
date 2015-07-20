@@ -30,24 +30,24 @@
 
 /// \brief !!
 template<typename CellType>
-class smSurfaceTreeIterator: public smCollisionModelIterator<CellType>
+class SurfaceTreeIterator: public CollisionModelIterator<CellType>
 {
 
 public:
-    smSurfaceTree<CellType> *tree;
+    SurfaceTree<CellType> *tree;
 
     /// \brief
-    smSurfaceTreeIterator(smSurfaceTree<CellType> *  p_tree)
+    SurfaceTreeIterator(SurfaceTree<CellType> *  p_tree)
     {
         tree = p_tree;
     }
 
     /// \brief
-    smSurfaceTreeIterator(const smCollisionModelIterator<CellType> &i)
-	  : smCollisionModelIterator<CellType>()
+    SurfaceTreeIterator(const CollisionModelIterator<CellType> &i)
+	  : CollisionModelIterator<CellType>()
     {
 		this->tree = nullptr;
-		const smSurfaceTreeIterator<CellType> &otherTree = static_cast<const smSurfaceTreeIterator<CellType>&>(i);
+		const SurfaceTreeIterator<CellType> &otherTree = static_cast<const SurfaceTreeIterator<CellType>&>(i);
 		if(otherTree.tree)
 		  this->tree = otherTree.tree;
 		this->startIndex = i.startIndex;
@@ -98,7 +98,7 @@ public:
         return this->endIndex;
     }
 
-    friend smSurfaceTree<CellType>;
+    friend SurfaceTree<CellType>;
 };
 
 #endif

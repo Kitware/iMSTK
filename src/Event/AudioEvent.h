@@ -41,7 +41,7 @@ enum class AudioState
     Stop,
 };
 
-class smAudioEvent: public smEvent
+class smAudioEvent: public Event
 {
 public:
     static EventType EventName;

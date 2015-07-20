@@ -7,7 +7,7 @@
 #include <set>
 #include <string>
 
-/**\brief A macro to register a concrete subclass of an abstract base class with smFactory.
+/**\brief A macro to register a concrete subclass of an abstract base class with Factory.
   *
   * A macro to help register a concrete subclass with a factory.
   * It should be called inside dynamic loader macros like so:
@@ -26,17 +26,17 @@
   * during your application's startup.
   *
   * This macro should only be used outside of the smCore library;
-  * inside smCore, just modify smFactory so that s_catalog is
+  * inside smCore, just modify Factory so that s_catalog is
   * initialized with the proper entries directly. That's because
-  * inside smCore, smFactory::s_catalog might not be initialized
+  * inside smCore, Factory::s_catalog might not be initialized
   * before the first registration call is made.
   *
   * A more specific example is the way the smRendering library
-  * registers the smViewer class as a concrete child of smViewerBase:
+  * registers the smViewer class as a concrete child of ViewerBase:
   * <pre>
   *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   *     SIMMEDTK_BEGIN_ONLOAD(register_viewer_children)
-  *       SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,0);
+  *       SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,smViewer,0);
   *     SIMMEDTK_FINISH_ONLOAD()
   *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
   * </pre>
@@ -47,7 +47,7 @@
   * at startup.
   */
 #define SIMMEDTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
-       smFactory<BASECLASS>::registerClassConfiguration( \
+       Factory<BASECLASS>::registerClassConfiguration( \
          #TARGETCLASS, \
          #SUBCLASS, \
          []() { return std::shared_ptr<BASECLASS>(new SUBCLASS); }, \
@@ -56,7 +56,7 @@
 /**\brief A factory provides a way to discover and construct subclasses of abstract classes.
   *
   * Concrete subclasses of abstract bases should call
-  * smFactory::registerClassConfiguration() in an initializer
+  * Factory::registerClassConfiguration() in an initializer
   * function.
   * Once this is done, the abstract class name can be
   * used as a key to fetch a list of possible subclasses
@@ -79,13 +79,13 @@
   * above text rendering.
   */
 template<typename T>
-class smFactory
+class Factory
 {
 public:
-  /// A function object whose signature returns a shared pointer to an smCoreClass instance.
+  /// A function object whose signature returns a shared pointer to an CoreClass instance.
   typedef std::function<std::shared_ptr<T>()> SharedPointerConstructor;
 
-  /// An internal structure used by smFactory to track subclasses of abstract classes.
+  /// An internal structure used by Factory to track subclasses of abstract classes.
   struct smFactoryEntry
   {
     std::string subclassname;

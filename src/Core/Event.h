@@ -71,17 +71,17 @@ enum class EventSender
 /// @brief Base event class
 /// Base class from which all events should derive.
 ///
-class smEvent
+class Event
 {
 public:
-    using Pointer = std::shared_ptr<smEvent>;
+    using Pointer = std::shared_ptr<Event>;
 
 public:
     static EventType EventName;
 
 public:
-    smEvent();
-    virtual ~smEvent();
+    Event();
+    virtual ~Event();
 
     void setPriority(const EventPriority &eventPriority);
 

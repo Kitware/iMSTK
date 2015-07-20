@@ -29,17 +29,17 @@
 #include <array>
 
 // SimMedTK includes
-#include "Core/CollisionModel.h"
+#include "Core/CollisionModelIterator.h"
 #include "Collision/SurfaceTreeCell.h"
 #include "Collision/CollisionMoller.h"
 #include "Mesh/SurfaceMesh.h"
 
 /// \brief !!
 template<typename CellType>
-class smSurfaceTree : public smCoreClass
+class SurfaceTree : public CoreClass
 {
 protected:
-  typedef smMatrix44d MatrixType;
+  typedef Matrix44d MatrixType;
 
 protected:
     std::shared_ptr<smSurfaceMesh> mesh; 							///< surface mesh
@@ -54,10 +54,10 @@ protected:
 
 public:
     /// \brief constructor
-    smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels = 6);
+    SurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels = 6);
 
     /// \brief destructor
-    ~smSurfaceTree();
+    ~SurfaceTree();
 
     MatrixType transRot; ///< matrix for translation and rotation
     int maxLevel; ///< max level of the tree
@@ -79,20 +79,20 @@ public:
     /// \brief initialize the surface tree structure
     virtual void initStructure();
 
-    virtual smCollisionModelIterator<CellType>  getLevelIterator(int level) ;
+    virtual CollisionModelIterator<CellType>  getLevelIterator(int level) ;
 
-    virtual smCollisionModelIterator<CellType>  getLevelIterator() ;
+    virtual CollisionModelIterator<CellType>  getLevelIterator() ;
 
     /// \brief !!
-    inline std::shared_ptr<smUnifiedId> getAttachedMeshID()
+    inline std::shared_ptr<UnifiedId> getAttachedMeshID()
     {
         return mesh->getUniqueId();
     }
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
-    /// \brief !! smSurfaceTree structure
+    /// \brief !! SurfaceTree structure
     void updateStructure();
 
     /// \brief !!
@@ -104,7 +104,7 @@ public:
     }
 
     std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>>
-    getIntersectingNodes(std::shared_ptr<smSurfaceTree<CellType>> otherTree)
+    getIntersectingNodes(std::shared_ptr<SurfaceTree<CellType>> otherTree)
     {
         std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> intersectingNodes;
         getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);

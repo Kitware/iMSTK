@@ -38,12 +38,12 @@ smGLRenderer::smGLRenderer()
 }
 
 #if 0
-void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<smRenderDetail> renderDetail)
+void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail)
 {
-    static smVec3d origin(0, 0, 0);
-    static smVec3d xAxis(1, 0, 0);
-    static smVec3d yAxis(0, 1, 0);
-    static smVec3d zAxis(0, 0, 1);
+    static core::Vec3d origin(0, 0, 0);
+    static core::Vec3d xAxis(1, 0, 0);
+    static core::Vec3d yAxis(0, 1, 0);
+    static core::Vec3d zAxis(0, 0, 1);
 
     const int renderType = renderDetail->getRenderType();
 
@@ -175,7 +175,7 @@ void smGLRenderer::drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::sha
 
 void smGLRenderer::drawSurfaceMeshTriangles(
     std::shared_ptr<smMesh> p_surfaceMesh,
-    std::shared_ptr<smRenderDetail> renderDetail)
+    std::shared_ptr<RenderDetail> renderDetail)
 {
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
@@ -301,13 +301,13 @@ void smGLRenderer::drawSurfaceMeshTriangles(
     glLineWidth(1.0);
 }
 
-void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, smColor p_color, float length)
+void smGLRenderer::drawNormals(std::shared_ptr<smMesh> p_mesh, Color p_color, float length)
 {
 
     glDisable(GL_LIGHTING);
     glColor3fv(reinterpret_cast<GLfloat*>(&p_color));
-    smVec3d baryCenter;
-    smVec3d tmp;
+    core::Vec3d baryCenter;
+    core::Vec3d tmp;
 
     glBegin(GL_LINES);
 
@@ -338,7 +338,7 @@ void smGLRenderer::beginTriangles()
     glBegin(GL_TRIANGLES);
 }
 
-void smGLRenderer::drawTriangle(smVec3d &p_1, smVec3d &p_2, smVec3d &p_3)
+void smGLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p_3)
 {
 
     glVertex3dv(p_1.data());
@@ -352,7 +352,7 @@ void smGLRenderer::endTriangles()
     glEnd();
 }
 
-void smGLRenderer::draw(smAABB &aabb, smColor p_color)
+void smGLRenderer::draw(AABB &aabb, Color p_color)
 {
 
     glPushAttrib(GL_LIGHTING_BIT);
@@ -404,7 +404,7 @@ void smGLRenderer::draw(smAABB &aabb, smColor p_color)
     glPopAttrib();
 }
 
-void smGLRenderer::drawArrow(const smVec3f &start, const smVec3f &end, const float D)
+void smGLRenderer::drawArrow(const core::Vec3f &start, const core::Vec3f &end, const float D)
 {
     float x = end[0] - start[0];
     float y = end[1] - start[1];
@@ -465,17 +465,17 @@ void smGLRenderer::drawAxes(const float length)
 
     Eigen::Vector3f origin(0, 0, 0);
 
-    glColor3fv(smColor::colorRed.toGLColor());
+    glColor3fv(Color::colorRed.toGLColor());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(length, 0, 0), headWidth);
     glPopMatrix();
 
-    glColor3fv(smColor::colorGreen.toGLColor());
+    glColor3fv(Color::colorGreen.toGLColor());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(0, length, 0), headWidth);
     glPopMatrix();
 
-    glColor3fv(smColor::colorBlue.toGLColor());
+    glColor3fv(Color::colorBlue.toGLColor());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(0, 0, length), headWidth);
     glPopMatrix();
@@ -483,27 +483,27 @@ void smGLRenderer::drawAxes(const float length)
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const float length)
+void smGLRenderer::drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, const float length)
 {
     glDisable(GL_LIGHTING);
 
     GLfloat headWidth = length / 12;
 
-    glColor3fv(smColor::colorRed.toGLColor());
+    glColor3fv(Color::colorRed.toGLColor());
     glPushMatrix();
     Eigen::Vector3f xVec(length, 0, 0);
     xVec = rotMat*xVec + pos;
     drawArrow(pos, xVec, headWidth);
     glPopMatrix();
 
-    glColor3fv(smColor::colorGreen.toGLColor());
+    glColor3fv(Color::colorGreen.toGLColor());
     glPushMatrix();
     Eigen::Vector3f yVec(0, length, 0);
     yVec = rotMat*yVec + pos;
     drawArrow(pos, yVec, headWidth);
     glPopMatrix();
 
-    glColor3fv(smColor::colorBlue.toGLColor());
+    glColor3fv(Color::colorBlue.toGLColor());
     glPushMatrix();
     Eigen::Vector3f zVec(0, 0, length);
     zVec = rotMat*zVec + pos;
@@ -513,26 +513,26 @@ void smGLRenderer::drawAxes(const smMatrix33f &rotMat, const smVec3f &pos, const
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::draw(smPlane &p_plane, float p_scale, smColor p_color)
+void smGLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
 {
 
     double angle;
-    smVec3d axisOfRot;
-    smVec3d defaultDir(0, 0, 1);
-    smVec3d planePoints[4] = {smVec3d(-p_scale, p_scale, 0),
-                              smVec3d(-p_scale, -p_scale, 0),
-                              smVec3d(p_scale, -p_scale, 0),
-                              smVec3d(p_scale, p_scale, 0)
+    core::Vec3d axisOfRot;
+    core::Vec3d defaultDir(0, 0, 1);
+    core::Vec3d planePoints[4] = {core::Vec3d(-p_scale, p_scale, 0),
+                              core::Vec3d(-p_scale, -p_scale, 0),
+                              core::Vec3d(p_scale, -p_scale, 0),
+                              core::Vec3d(p_scale, p_scale, 0)
                              };
-    smVec3d tmp;
+    core::Vec3d tmp;
 
-    smVec3d normal = p_plane.getUnitNormal();
-    smVec3d point = p_plane.getPoint();
+    core::Vec3d normal = p_plane.getUnitNormal();
+    core::Vec3d point = p_plane.getPoint();
     angle = std::acos(defaultDir.dot(normal));
     axisOfRot = normal.cross(defaultDir);
     axisOfRot.normalized();
 
-    smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
+    Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
@@ -549,21 +549,21 @@ void smGLRenderer::draw(smPlane &p_plane, float p_scale, smColor p_color)
     glEnable(GL_LIGHTING);
 }
 
-void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene)
+void smGLRenderer::renderScene(std::shared_ptr<Scene> p_scene)
 {
     assert(p_scene);
 
-    smMatrix44f proj = p_scene->getCamera()->getProjMat();
-    smMatrix44f view = p_scene->getCamera()->getViewMat();
+    Matrix44f proj = p_scene->getCamera()->getProjMat();
+    Matrix44f view = p_scene->getCamera()->getViewMat();
 
     renderScene(p_scene, proj, view);
 }
 
-void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
-                               const smMatrix44f &p_proj,
-                               const smMatrix44f &p_view)
+void smGLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
+                               const Matrix44f &p_proj,
+                               const Matrix44f &p_view)
 {
-    smSceneLocal sceneLocal;
+    SceneLocal sceneLocal;
 
     assert(p_scene);
 
@@ -595,16 +595,16 @@ void smGLRenderer::renderScene(std::shared_ptr<smScene> p_scene,
     glPopMatrix();
 }
 
-void smGLRenderer::renderSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
+void smGLRenderer::renderSceneObject(std::shared_ptr<SceneObject> p_sceneObject)
 {
-    smRenderDetail::Ptr detail = p_sceneObject->getRenderDetail();
+    RenderDetail::Ptr detail = p_sceneObject->getRenderDetail();
     if (!detail || detail->getRenderType() & SIMMEDTK_RENDER_NONE)
     {
         return;
     }
 
     //if the custom rendering enable only render this
-    smRenderDelegate::Ptr delegate = p_sceneObject->getRenderDelegate();
+    RenderDelegate::Ptr delegate = p_sceneObject->getRenderDelegate();
     std::shared_ptr<smCustomRenderer> renderer = p_sceneObject->getRenderer();
     if (detail->getRenderType() & SIMMEDTK_RENDER_CUSTOMRENDERONLY)
     {

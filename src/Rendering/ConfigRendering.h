@@ -105,7 +105,7 @@ enum smVBOResult
 struct smViewerDetail
 {
     unsigned int environment;
-    smColor backGroundColor;
+    Color backGroundColor;
 };
 
 #endif // SMCONFIGRENDERING_H

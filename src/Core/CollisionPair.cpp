@@ -23,65 +23,65 @@
 
 #include "CollisionPair.h"
 
-smCollisionPair::smCollisionPair() {}
-smCollisionPair::~smCollisionPair() {}
+CollisionPair::CollisionPair() {}
+CollisionPair::~CollisionPair() {}
 
-void smCollisionPair::setModels(const std::shared_ptr< smModelRepresentation >& first,
-                                const std::shared_ptr< smModelRepresentation >& second)
+void CollisionPair::setModels(const std::shared_ptr< ModelRepresentation >& first,
+                                const std::shared_ptr< ModelRepresentation >& second)
 {
     this->modelRepresentations.first = first;
     this->modelRepresentations.second = second;
 }
 
-void smCollisionPair::addContact(const double& penetrationDepth, const smVec3d& vert, const int index, const smVec3d& contactNornmal)
+void CollisionPair::addContact(const double& penetrationDepth, const core::Vec3d& vert, const int index, const core::Vec3d& contactNornmal)
 {
-    auto contact = std::make_shared<smContact>(penetrationDepth, vert, index, contactNornmal);
+    auto contact = std::make_shared<Contact>(penetrationDepth, vert, index, contactNornmal);
     //std::shared_ptr<smContact> contact(new smContact(penetrationDepth, vert, index, contactNornmal));
     this->contacts.emplace_back(contact);
 }
 
-const std::pair< std::shared_ptr< smModelRepresentation >, std::shared_ptr< smModelRepresentation > >&
-smCollisionPair::getModels() const
+const std::pair< std::shared_ptr< ModelRepresentation >, std::shared_ptr< ModelRepresentation > >&
+CollisionPair::getModels() const
 {
     return modelRepresentations;
 }
 
-void smCollisionPair::clearContacts()
+void CollisionPair::clearContacts()
 {
     contacts.clear();
 }
 
-int smCollisionPair::getNumberOfContacts()
+int CollisionPair::getNumberOfContacts()
 {
     return contacts.size();
 }
 
-std::shared_ptr< smModelRepresentation > smCollisionPair::getFirst()
+std::shared_ptr< ModelRepresentation > CollisionPair::getFirst()
 {
     return this->modelRepresentations.first;
 }
 
-std::shared_ptr< smModelRepresentation > smCollisionPair::getSecond()
+std::shared_ptr< ModelRepresentation > CollisionPair::getSecond()
 {
     return this->modelRepresentations.second;
 }
 
-bool smCollisionPair::hasContacts()
+bool CollisionPair::hasContacts()
 {
     return !this->contacts.empty();
 }
 
-std::vector< std::shared_ptr< smContact > >& smCollisionPair::getContacts()
+std::vector< std::shared_ptr< Contact > >& CollisionPair::getContacts()
 {
     return contacts;
 }
 
-const std::vector< std::shared_ptr< smContact > >& smCollisionPair::getContacts() const
+const std::vector< std::shared_ptr< Contact > >& CollisionPair::getContacts() const
 {
     return contacts;
 }
 
-void smCollisionPair::printCollisionPairs()
+void CollisionPair::printCollisionPairs()
 {
     std::cout << "# Contacts: " << this->contacts.size() << std::endl;
     for (int i = 0; i < this->contacts.size(); i++)

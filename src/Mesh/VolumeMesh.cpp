@@ -25,7 +25,7 @@
 
 
 /// \brief constructor
-smVolumeMesh::smVolumeMesh(const smMeshType &p_meshtype, std::shared_ptr<smErrorLog> log)
+smVolumeMesh::smVolumeMesh(const smMeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
 {
 
     this->log_VM = log;
@@ -63,7 +63,7 @@ bool smVolumeMesh::loadMesh(const std::string& fileName, const smMeshFileType &f
 }
 
 /// \brief
-void smVolumeMesh::translateVolumeMesh(const smVec3d &p_offset)
+void smVolumeMesh::translateVolumeMesh(const core::Vec3d &p_offset)
 {
 
     this->translate(p_offset);
@@ -75,7 +75,7 @@ void smVolumeMesh::translateVolumeMesh(const smVec3d &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::scaleVolumeMesh(const smVec3d &p_offset)
+void smVolumeMesh::scaleVolumeMesh(const core::Vec3d &p_offset)
 {
 
     scale(p_offset);
@@ -87,7 +87,7 @@ void smVolumeMesh::scaleVolumeMesh(const smVec3d &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::rotVolumeMesh(const smMatrix33d &p_rot)
+void smVolumeMesh::rotVolumeMesh(const Matrix33d &p_rot)
 {
 
     rotate(p_rot);
@@ -131,8 +131,8 @@ bool smVolumeMesh::LoadTetra(const std::string& fileName)
 
     for (i = 0; i < nbrNodes; i++)
     {
-        nodes.emplace_back(smVec3d());
-        smVec3d &node = nodes.back();
+        nodes.emplace_back(core::Vec3d());
+        core::Vec3d &node = nodes.back();
         fscanf(fp, "%f", &number);
         nodeNumber[i] = number;
         fscanf(fp, "%c", &comma);

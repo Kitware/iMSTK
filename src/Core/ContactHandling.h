@@ -32,9 +32,9 @@
 #include <memory>
 
 class smMesh;
-class smCollisionPair;
+class CollisionPair;
 
-enum class smContactHandlingType
+enum class ContactHandlingType
 {
     PenaltyFemToStatic,
     UNKNOWN
@@ -43,53 +43,53 @@ enum class smContactHandlingType
 /// \brief Base class to for handling contact for collision response
 /// Input: collision pairs containing the collision information
 /// Output: contact forces or Jacobians or projection/PBD constraints
-class smContactHandling: public smCoreClass
+class ContactHandling: public CoreClass
 {
 public:
 
-    smContactHandling(const bool typeBilateral);
+    ContactHandling(const bool typeBilateral);
 
-    smContactHandling(const bool typeBilateral,
-                      const std::shared_ptr<smSceneObject> sceneObjFirst,
-                      const std::shared_ptr<smSceneObject> sceneObjSecond);
+    ContactHandling(const bool typeBilateral,
+                      const std::shared_ptr<SceneObject> sceneObjFirst,
+                      const std::shared_ptr<SceneObject> sceneObjSecond);
 
-    virtual ~smContactHandling();
+    virtual ~ContactHandling();
 
     /// \brief returns true if bilateral
     bool isUnilateral() const;
 
     /// \brief Set the scene objects that are colliding
-    void setSceneObjects(const std::shared_ptr< smSceneObject > first,
-                         const std::shared_ptr< smSceneObject > second);
+    void setSceneObjects(const std::shared_ptr< SceneObject > first,
+                         const std::shared_ptr< SceneObject > second);
 
     /// \brief Set the collision pair data structure in which the information
     /// needs to be stored
-    void setCollisionPairs(const std::shared_ptr< smCollisionPair > colPair);
+    void setCollisionPairs(const std::shared_ptr< CollisionPair > colPair);
 
     /// \brief Get the colliison information contained in the collision pairs
-    std::shared_ptr<smCollisionPair> getCollisionPairs() const;
+    std::shared_ptr<CollisionPair> getCollisionPairs() const;
 
     /// \brief Get if the contact handling is unilateral or bilateral
-    smContactHandlingType getContactHandlingType() const;
+    ContactHandlingType getContactHandlingType() const;
 
     /// \brief Get the first scene object
-    std::shared_ptr<smSceneObject> getFirstSceneObject() const;
+    std::shared_ptr<SceneObject> getFirstSceneObject() const;
 
     /// \brief Get the second scene object
-    std::shared_ptr<smSceneObject> getSecondSceneObject() const;
+    std::shared_ptr<SceneObject> getSecondSceneObject() const;
 
     /// \brief Implementation of how the contacts between colliding
     /// objects is resolved
     virtual void resolveContacts() = 0;
 protected:
 
-    smContactHandlingType type;
+    ContactHandlingType type;
 
     bool isBilateral;
 
-    std::pair<std::shared_ptr<smSceneObject>, std::shared_ptr<smSceneObject>> collidingSceneObjects;
+    std::pair<std::shared_ptr<SceneObject>, std::shared_ptr<SceneObject>> collidingSceneObjects;
 
-    std::shared_ptr<smCollisionPair> collisionPairs;
+    std::shared_ptr<CollisionPair> collisionPairs;
 };
 
 #endif //SMCONTACTHANDLING_H

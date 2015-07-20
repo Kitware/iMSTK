@@ -36,18 +36,17 @@
 #include "Collision/SpatialGrid.h"
 
 
-class CollisionDetectionExample: public smSimulationMain, public smCoreClass
+class CollisionDetectionExample: public SimulationMain, public CoreClass
 {
 
 public:
-    smStaticSceneObject  *object1;
-    smStaticSceneObject  *object2;
-    smSDK* simmedtkSDK;
-    smScene *scene1;
+    StaticSceneObject  *object1;
+    StaticSceneObject  *object2;
+    SDK* simmedtkSDK;
+    Scene *scene1;
     smDummySimulator *dummySim;
     smViewer *viewer;
-    smSimulator *simulator;
-    smPipeRegisteration myCollInformation;
+    Simulator *simulator;
     smPhantomInterface* hapticInterface;
     smHapticCameraTrans *motionTrans;
     smSpatialGrid *spatGrid;
@@ -57,7 +56,7 @@ public:
     CollisionDetectionExample();
     void initHapticCamMotion();
 
-    virtual void simulateMain(smSimulationMainParam p_param)
+    virtual void simulateMain(SimulationMainParam p_param)
     {
     }
 

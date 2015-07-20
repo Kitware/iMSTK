@@ -71,11 +71,11 @@ public:
 };
 
 /// \brief Vertex Array Object for fast rendering
-class smVAO: public smCoreClass
+class smVAO: public CoreClass
 {
 public:
     /// \brief need error log and totalBuffer Size
-    smVAO(std::shared_ptr<smErrorLog> p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
+    smVAO(std::shared_ptr<ErrorLog> p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
 
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
     void setBufferData(smVBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr);
@@ -99,7 +99,7 @@ public:
     void initBuffers();
 
     /// \brief get VAO given the shader ID
-    static std::shared_ptr<smVAO> getVAO(std::shared_ptr<smUnifiedId> p_shaderID);
+    static std::shared_ptr<smVAO> getVAO(std::shared_ptr<UnifiedId> p_shaderID);
 
     /// \brief  enable the vertex array object
     void enable() const;
@@ -125,7 +125,7 @@ public:
     smMesh *mesh;
 
 private:
-    std::shared_ptr<smErrorLog>  log;
+    std::shared_ptr<ErrorLog>  log;
     std::shared_ptr<smShader> shader;
     bool renderingError;
     ///Used for attaching attribs to the vertex objects

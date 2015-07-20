@@ -50,7 +50,7 @@ void wasdCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     assert(nullptr != event);
     assert(nullptr != camera);
@@ -58,7 +58,7 @@ void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent> eve
     auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
-        smVec3f dispVec = smVec3f::Zero(); //Vector to store displacement of camera
+        core::Vec3f dispVec = core::Vec3f::Zero(); //Vector to store displacement of camera
         switch(keyboardEvent->getKeyPressed())
         {
         case mstk::Event::smKey::W:

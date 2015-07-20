@@ -42,11 +42,11 @@ smVegaFemSceneObject::smVegaFemSceneObject() :
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createConcreteClass(
+      Factory<RenderDelegate>::createConcreteClass(
         "SceneObjectDeformableRenderDelegate"));
 }
 
-smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log,
+smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<ErrorLog> p_log,
                                            const std::string ConfigFile):
                                            staticSolver(0),
                                            graphicFrame(0),
@@ -63,7 +63,7 @@ smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_l
     // Create the default delegate before configuration so it
     // can be overridden.
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createConcreteClass(
+      Factory<RenderDelegate>::createConcreteClass(
         "SceneObjectDeformableRenderDelegate"));
 
     ConfigFileName = ConfigFile;
@@ -77,9 +77,9 @@ smVegaFemSceneObject::~smVegaFemSceneObject()
 {
 }
 
-std::shared_ptr<smSceneObject> smVegaFemSceneObject::clone()
+std::shared_ptr<SceneObject> smVegaFemSceneObject::clone()
 {
-    return safeDownCast<smSceneObject>();
+    return safeDownCast<SceneObject>();
 }
 
 bool smVegaFemSceneObject::configure(const std::string ConfigFile)
@@ -1011,7 +1011,7 @@ inline void smVegaFemSceneObject::advanceOneTimeStep()
     }
 }
 
-void smVegaFemSceneObject::setPulledVertex(const smVec3d &userPos)
+void smVegaFemSceneObject::setPulledVertex(const core::Vec3d &userPos)
 {
     pulledVertex = this->volumetricMesh->getClosestVertex(Vec3d(userPos(0), userPos(1), userPos(2)));
 }
@@ -1177,23 +1177,23 @@ void smVegaFemSceneObject::printInfo() const
     std::cout << "\t-------------------------------------\n";
 }
 
-smVec3d smVegaFemSceneObject::getVelocityOfNodeWithDofID(const int dofID) const
+core::Vec3d smVegaFemSceneObject::getVelocityOfNodeWithDofID(const int dofID) const
 {
-    smVec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
+    core::Vec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
 
     return vel;
 }
 
-smVec3d smVegaFemSceneObject::getDisplacementOfNodeWithDofID(const int dofID) const
+core::Vec3d smVegaFemSceneObject::getDisplacementOfNodeWithDofID(const int dofID) const
 {
-    smVec3d disp(u[dofID], u[dofID + 1], u[dofID + 2]);
+    core::Vec3d disp(u[dofID], u[dofID + 1], u[dofID + 2]);
 
     return disp;
 }
 
-smVec3d smVegaFemSceneObject::getAccelerationOfNodeWithDofID(const int dofID) const
+core::Vec3d smVegaFemSceneObject::getAccelerationOfNodeWithDofID(const int dofID) const
 {
-    smVec3d accn(uaccel[dofID], uaccel[dofID + 1], uaccel[dofID + 2]);
+    core::Vec3d accn(uaccel[dofID], uaccel[dofID + 1], uaccel[dofID + 2]);
 
     return accn;
 }

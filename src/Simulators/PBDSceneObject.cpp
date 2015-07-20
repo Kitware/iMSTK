@@ -23,7 +23,7 @@
 
 #include "PBDSceneObject.h"
 
-void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, float p_radius)
+void smPBDSurfaceSceneObject::findFixedMassWrtSphere(core::Vec3d p_center, float p_radius)
 {
     float dist = 0;
 
@@ -38,14 +38,14 @@ void smPBDSurfaceSceneObject::findFixedMassWrtSphere(smVec3d p_center, float p_r
         }
     }
 }
-smPBDSceneObject::smPBDSceneObject( std::shared_ptr<smErrorLog>/*p_log*/ )
+smPBDSceneObject::smPBDSceneObject( std::shared_ptr<ErrorLog>/*p_log*/ )
 {
     type = core::ClassType::PbdSceneObject;
 }
 
-std::shared_ptr<smSceneObject> smPBDSceneObject::clone()
+std::shared_ptr<SceneObject> smPBDSceneObject::clone()
 {
-    return safeDownCast<smSceneObject>();
+    return safeDownCast<SceneObject>();
 }
 
 void smPBDSceneObject::serialize( void */*p_memoryBlock*/ )
@@ -58,14 +58,14 @@ void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 
 }
 
-smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<smErrorLog> p_log )
+smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<ErrorLog> p_log )
 {
     type = core::ClassType::PbdSurfaceSceneObject;
     mesh = new smSurfaceMesh( SMMESH_DEFORMABLE, p_log );
 }
-std::shared_ptr<smSceneObject> smPBDSurfaceSceneObject::clone()
+std::shared_ptr<SceneObject> smPBDSurfaceSceneObject::clone()
 {
-    return safeDownCast<smSceneObject>();
+    return safeDownCast<SceneObject>();
 }
 void smPBDSurfaceSceneObject::serialize( void */*p_memoryBlock*/ )
 {
@@ -91,9 +91,9 @@ void smPBDSurfaceSceneObject::InitSurfaceObject()
     //surface mesh
     nbrMass = mesh->nbrVertices;
 
-    P = new smVec3d[nbrMass];
-    V = new smVec3d[nbrMass];
-    exF = new smVec3d[nbrMass];
+    P = new core::Vec3d[nbrMass];
+    V = new core::Vec3d[nbrMass];
+    exF = new core::Vec3d[nbrMass];
     fixedMass = new bool[nbrMass];
 
     for ( int i = 0; i < nbrMass; i++ )
@@ -148,7 +148,7 @@ void smPBDSurfaceSceneObject::findFixedCorners()
 
     nbrFixedMass = 2;
     listFixedMass = new int[nbrFixedMass];
-    smVec3d corner[2];
+    core::Vec3d corner[2];
     int i, j;
     float minmin, dist;
     corner[0] = mesh->aabb.aabbMax;

@@ -24,7 +24,7 @@
 #ifndef SMSCHEDULER_H
 #define SMSCHEDULER_H
 
-class smSimulator;
+class Simulator;
 
 enum smSchedulingPriority
 {
@@ -33,7 +33,7 @@ enum smSchedulingPriority
     SIMMEDTK_SCHEDULING_BACKGROUND
 };
 
-struct smScheduleGroup
+struct ScheduleGroup
 {
 
 #ifdef _WIN32
@@ -48,7 +48,7 @@ public:
     short minObservedFPSThreadIndex;
     short maxObservedFPSThreadIndex;
 
-    smScheduleGroup()
+    ScheduleGroup()
     {
         totalThreads = 1;
         minTargetFPS = maxTargetFPS = maxObservedFPS = minObservedFPS = 0;
@@ -60,7 +60,7 @@ public:
     }
     float maxTargetFPS;
     float minTargetFPS;
-    friend class smSimulator;
+    friend class Simulator;
 };
 
 #endif

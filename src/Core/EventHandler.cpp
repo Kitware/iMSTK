@@ -27,11 +27,11 @@
 namespace mstk {
 namespace Event {
 
-void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
+void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
-    // Bind handleEvent to a void(std::shared_ptr<smEvent>) function
-    std::function<void(std::shared_ptr<smEvent>)>
-    fn = std::bind(&smCoreClass::handleEvent,component,std::placeholders::_1);
+    // Bind handleEvent to a void(std::shared_ptr<Event>) function
+    std::function<void(std::shared_ptr<Event>)>
+    fn = std::bind(&CoreClass::handleEvent,component,std::placeholders::_1);
 
     // Register the function and return index
     FunctionContainerType::iterator index = this->registerEvent(eventType, fn);
@@ -39,13 +39,13 @@ void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<smC
     // Add index to the component observer
     component->setEventIndex(eventType,index);
 }
-void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<smCoreClass> component)
+void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
     this->unregisterEvent(eventType,index);
     component->removeEventIndex(eventType);
 }
-bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr<smCoreClass> component)
+bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
 

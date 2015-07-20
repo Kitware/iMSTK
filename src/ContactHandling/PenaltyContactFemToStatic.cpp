@@ -25,31 +25,31 @@
 
 #include "Core/CollisionPair.h"
 
-smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(bool typeBilateral) : smPenaltyContactHandling(typeBilateral)
+PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : PenaltyContactHandling(typeBilateral)
 {
-    type = smContactHandlingType::PenaltyFemToStatic;
+    type = ContactHandlingType::PenaltyFemToStatic;
 }
 
-smPenaltyContactFemToStatic::smPenaltyContactFemToStatic(
+PenaltyContactFemToStatic::PenaltyContactFemToStatic(
                                                     bool typeBilateral,
-                                                    const std::shared_ptr<smSceneObject>& sceneObjFirst,
-                                                    const std::shared_ptr<smSceneObject>& sceneObjSecond)
-                                                    : smPenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
+                                                    const std::shared_ptr<SceneObject>& sceneObjFirst,
+                                                    const std::shared_ptr<SceneObject>& sceneObjSecond)
+                                                    : PenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
-    type = smContactHandlingType::PenaltyFemToStatic;
+    type = ContactHandlingType::PenaltyFemToStatic;
 }
 
-smPenaltyContactFemToStatic::~smPenaltyContactFemToStatic()
+PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 {
 }
 
-void smPenaltyContactFemToStatic::computeUnilateralContactForces()
+void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
     int penetratedNode, nodeDofID;
     const double stiffness = 1.0e4, damping = 1.0e5;
-    smVec3d velocityProjection;
+    core::Vec3d velocityProjection;
 
-    std::vector<std::shared_ptr<smContact>> contactInfo = this->getCollisionPairs()->getContacts();
+    std::vector<std::shared_ptr<Contact>> contactInfo = this->getCollisionPairs()->getContacts();
 
     if (this->getSecondSceneObject()->getType() == core::ClassType::VegaFemSceneObject
         && this->getFirstSceneObject()->getType() == core::ClassType::StaticSceneObject)
@@ -57,7 +57,7 @@ void smPenaltyContactFemToStatic::computeUnilateralContactForces()
         auto femSceneObject = std::static_pointer_cast<smVegaFemSceneObject>(this->getSecondSceneObject());
 
         femSceneObject->setContactForcesToZero();
-        smVec3d force;
+        core::Vec3d force;
         for (int i = 0; i < contactInfo.size(); i++)
         {
             nodeDofID = 3 * contactInfo[i]->index;
@@ -76,6 +76,6 @@ void smPenaltyContactFemToStatic::computeUnilateralContactForces()
     }
 }
 
-void smPenaltyContactFemToStatic::computeBilateralContactForces()
+void PenaltyContactFemToStatic::computeBilateralContactForces()
 {
 }

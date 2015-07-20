@@ -37,7 +37,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     moveObj = 9;
 
     // Create the sdk
-    sdk = smSDK::getInstance();
+    sdk = SDK::getInstance();
 
     // Create scene
     scene = sdk->createScene();
@@ -67,7 +67,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     smTextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
     // Create collision models
-    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
     collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
     collisionModelA->getMesh()->assignTexture("livertexture1");
     collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
@@ -75,23 +75,23 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
     collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
 
-    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
     collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
     collisionModelB->getMesh()->assignTexture("livertexture2");
-    collisionModelB->getMesh()->translate(smVec3d(2, 0, 0));
+    collisionModelB->getMesh()->translate(core::Vec3d(2, 0, 0));
     collisionModelB->getMesh()->assignTexture("livertexture2");
     collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
     collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Add models to a collision pair so they can be queried for collision
-    std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
+    std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
     collisionPair->setModels(collisionModelA,collisionModelB);
 
     // Collision detection to be used
-    collisionDetection = std::make_shared<smMeshToMeshCollision>();
+    collisionDetection = std::make_shared<MeshToMeshCollision>();
 
     // Create a static scene
-    modelA = std::make_shared<smStaticSceneObject>();
+    modelA = std::make_shared<StaticSceneObject>();
     modelA->setModel(collisionModelA);
     sdk->registerSceneObject(modelA);
     sdk->registerMesh(collisionModelA->getMesh());
@@ -100,7 +100,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     modelA->attachObjectSimulator(defaultSimulator);
 
     // Initialize the scecond object
-    modelB = std::make_shared<smStaticSceneObject>();
+    modelB = std::make_shared<StaticSceneObject>();
     modelB->setModel(collisionModelB);
     sdk->registerSceneObject(modelB);
     sdk->registerMesh(collisionModelB->getMesh());
@@ -110,7 +110,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    auto light = smLight::getDefaultLighting();
+    auto light = Light::getDefaultLighting();
     assert(light);
     scene->addLight(light);
 
@@ -138,7 +138,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
 }
 
-void CollisionDetectionBVH::simulateMain(const smSimulationMainParam &/*p_param*/)
+void CollisionDetectionBVH::simulateMain(const SimulationMainParam &/*p_param*/)
 {
     if ((10 > moveObj) && (moveObj > 0))
     {

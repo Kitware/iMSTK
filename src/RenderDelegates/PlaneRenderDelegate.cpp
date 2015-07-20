@@ -2,7 +2,7 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 
-class smPlaneRenderDelegate : public smRenderDelegate
+class smPlaneRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
@@ -10,16 +10,16 @@ public:
 
 void smPlaneRenderDelegate::draw() const
 {
-  smGLRenderer::draw(*this->getSourceGeometryAs<smPlane>());
+  smGLRenderer::draw(*this->getSourceGeometryAs<Plane>());
 //         if (this->movedOrRotated)
 //         {
 //             updateDrawPoints();
 //         }
 //         glEnable(GL_LIGHTING);
 //
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, smColor::colorGray.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, smColor::colorWhite.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, smColor::colorGray.toGLColor());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Color::colorGray.toGLColor());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Color::colorWhite.toGLColor());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Color::colorGray.toGLColor());
 //
 //         glEnable(GL_BLEND);
 //         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -41,6 +41,6 @@ void smPlaneRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_plane_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smPlaneRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smPlaneRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

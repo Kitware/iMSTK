@@ -38,11 +38,11 @@
 #include "Core/ErrorLog.h"
 
 /// \brief texture manager. It loads any image format and initializes in the GL context
-class smTextureManager: public smCoreClass
+class smTextureManager: public CoreClass
 {
 
-    static std::shared_ptr<smErrorLog> errorLog;
-    static std::vector<smTexture*> textures;
+    static std::shared_ptr<ErrorLog> errorLog;
+    static std::vector<Texture*> textures;
     static std::unordered_map<std::string, int> textureIndexId;
     static int activeTextures;
     static bool isInitialized;
@@ -53,7 +53,7 @@ public:
     /// \brief init function called by the renderer thread
     static smTextureReturnType initGLTextures();
     /// \brief initialization function
-    static void init(std::shared_ptr<smErrorLog> p_errorLog = nullptr)
+    static void init(std::shared_ptr<ErrorLog> p_errorLog = nullptr)
     {
         if(!isInitialized)
         {
@@ -77,14 +77,14 @@ public:
     static smTextureReturnType findTextureId(const std::string& p_textureReferenceName,
             int &p_textureId);
     /// \brief activate textures based on texture reference name, texture reference, texture id and GL order
-    static GLuint activateTexture(smTexture *p_texture);
+    static GLuint activateTexture(Texture *p_texture);
     static GLuint activateTexture(const std::string& p_textureReferenceName);
     static GLuint activateTexture(int p_textureId);
 
     static GLuint activateTexture(const std::string& p_textureReferenceName,
                                   int p_textureGLOrder);
 
-    static GLuint activateTexture(smTexture *p_texture, int p_textureGLOrder,
+    static GLuint activateTexture(Texture *p_texture, int p_textureGLOrder,
                                   int p_shaderBindGLId);
 
     static GLuint activateTexture(const std::string& p_textureReferenceName,
@@ -104,7 +104,7 @@ public:
     static GLuint getOpenglTextureId(const std::string& p_textureReferenceName);
     static GLuint getOpenglTextureId(int p_textureId);
     /// \brief to get texture with given texture reference name
-    static smTexture * getTexture(const std::string& p_textureReferenceName);
+    static Texture * getTexture(const std::string& p_textureReferenceName);
     /// \brief to create a depth texture
     static void createDepthTexture(const std::string& p_textureReferenceName,
                                    int p_width, int p_height);
@@ -113,14 +113,14 @@ public:
     static void  createColorTexture(const std::string& p_textureReferenceName,
                                     int p_width, int p_height);
     /// \brief initialize depth texture and color texture
-    static void initDepthTexture(smTexture *p_texture);
-    static void initColorTexture(smTexture *p_texture);
+    static void initDepthTexture(Texture *p_texture);
+    static void initColorTexture(Texture *p_texture);
     /// \brief generate mip maps
     static void generateMipMaps(int p_textureId);
     static void generateMipMaps(const std::string& p_textureReferenceName);
     /// \brief to duplicate the texture
     static void duplicateTexture(const std::string& p_textureReferenceName,
-                                 smTexture *p_texture, ImageColorType p_type);
+                                 Texture *p_texture, ImageColorType p_type);
 
     /// \brief copy the  texture specified with p_textureSourceName to the  texture specified with p_textureDestinationName
     static void copyTexture(const std::string& p_textureDestinationName,

@@ -36,7 +36,7 @@ enum smExportOptions
 };
 
 /// \brief class for importing and exporting meshes
-class smImportExport: public smCoreClass
+class smImportExport: public CoreClass
 {
 
 public:

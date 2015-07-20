@@ -59,8 +59,8 @@ enum smLatticeReturnType
 /// \brief !! holds the collision primitive pairs
 struct smCollisionPairs
 {
-    std::shared_ptr<smUnifiedId> objectIndex;
-    std::shared_ptr<smUnifiedId> objectIndex2;
+    std::shared_ptr<UnifiedId> objectIndex;
+    std::shared_ptr<UnifiedId> objectIndex2;
     int primIndex;
     int primIndex2;
 };
@@ -79,9 +79,9 @@ class smCell
 public:
     int id;
     int cellId[3];
-    smVec3d cellCenter;
-    smVec3d cellLeftCorner;
-    smVec3d cellRightCorner;
+    core::Vec3d cellCenter;
+    core::Vec3d cellLeftCorner;
+    core::Vec3d cellRightCorner;
     smCellPrim cellPrimitives[SIMMEDTK_SPATIALGRID_MAXPRIMITIVES];
     int lastPrimitiveIndex;
     int timeStamp;
@@ -93,13 +93,13 @@ public:
 };
 
 /// \brief !!
-class smLattice: public smCoreClass
+class smLattice: public CoreClass
 {
 public:
     /// \brief !!
     void boundingBoxInit()
     {
-        aabb = new smAABB[mesh->nbrTriangles];
+        aabb = new AABB[mesh->nbrTriangles];
     }
 
     /// \brief constructor
@@ -115,19 +115,19 @@ public:
     float getZStep();
 
     /// \brief get the center of the lattice
-    smVec3d getLatticeCenter();
+    core::Vec3d getLatticeCenter();
 
     /// \brief !! get the left corner of cell 0
-    smVec3d getLeftMinCorner();
+    core::Vec3d getLeftMinCorner();
 
     /// \brief !! get the right corner of cell 0
-    smVec3d getRightMaxCorner();
+    core::Vec3d getRightMaxCorner();
 
     /// \brief destructor
     ~smLattice();
 
     /// \brief Initialize the lattice
-    smLatticeReturnType init(smVec3d p_leftCorner, smVec3d p_rightCorner,
+    smLatticeReturnType init(core::Vec3d p_leftCorner, core::Vec3d p_rightCorner,
                              int p_xSeperation, int p_ySeperation, int p_zSeperation);
 
     /// \brief !!
@@ -149,13 +149,13 @@ public:
     void linkPrims();
 
     /// \brief !!
-    void addObject(smSceneObject *obj);
+    void addObject(SceneObject *obj);
 
 public:
     friend class smLatticeRenderDelegate;
 
     //these should be templated..Current design is based on the triangle
-    smAABB *aabb;
+    AABB *aabb;
     std::shared_ptr<smSurfaceMesh> mesh;
     smCell *cells;
     int totalCells;
@@ -165,9 +165,9 @@ public:
     float xStep;
     float yStep;
     float zStep;
-    smVec3d latticeCenter;
+    core::Vec3d latticeCenter;
     int time;
-    std::shared_ptr<smUnifiedId> linkedObject;
+    std::shared_ptr<UnifiedId> linkedObject;
 };
 
 #endif

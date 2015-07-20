@@ -37,7 +37,7 @@ enum SMDISPLAY_STREAM
 };
 
 /// \brief message type
-struct smDisplayMessage
+struct DisplayMessage
 {
     /// \brief text to display
     std::string text;
@@ -51,11 +51,11 @@ struct smDisplayMessage
 };
 
 /// \brief display text class console, window, error log etc.
-class smDisplayText: smCoreClass
+class DisplayText: CoreClass
 {
 public:
-    smDisplayText();
-    void addText(smDisplayMessage message);
+    DisplayText();
+    void addText(DisplayMessage message);
 };
 
 #endif

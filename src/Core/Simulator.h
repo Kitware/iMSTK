@@ -37,21 +37,21 @@
 #include "CollisionDetection.h"
 #include "ContactHandling.h"
 
-struct smSimulationMainParam
+struct SimulationMainParam
 {
-    std::vector<std::shared_ptr<smScene>> sceneList;
+    std::vector<std::shared_ptr<Scene>> sceneList;
 };
 
 /// \brief call back for simulator module. simulateMain is called in every simulation module frame.
-class smSimulationMain
+class SimulationMain
 {
 public:
-    virtual void simulateMain(const smSimulationMainParam &) = 0;
+    virtual void simulateMain(const SimulationMainParam &) = 0;
 };
 
-class smSimulator: public smModule
+class Simulator: public Module
 {
-    friend class smSDK;
+    friend class SDK;
 
 private:
     /// \brief Initializes up asynchronous threadpool
@@ -62,20 +62,20 @@ public:
     void init();
 
     /// \brief constructor gets error log
-    smSimulator(std::shared_ptr<smErrorLog> p_log);
+    Simulator(std::shared_ptr<ErrorLog> p_log);
 
     void setMaxThreadCount(int p_threadMaxCount);
 
     ///Simualtor registers the simulator and schedules it.
     ///the function is reentrant it is not thread safe.
-    void registerObjectSimulator(std::shared_ptr<smObjectSimulator> objectSimulator);
+    void registerObjectSimulator(std::shared_ptr<ObjectSimulator> objectSimulator);
 
-    void registerCollisionDetection(std::shared_ptr<smCollisionDetection> p_collisionDetection);
+    void registerCollisionDetection(std::shared_ptr<CollisionDetection> p_collisionDetection);
 
-    void registerContactHandling(std::shared_ptr<smContactHandling> p_contactHandling);
+    void registerContactHandling(std::shared_ptr<ContactHandling> p_contactHandling);
 
     ///Registration of the Simulation main. It is called in each and every frame
-    void registerSimulationMain(std::shared_ptr<smSimulationMain> p_main);
+    void registerSimulationMain(std::shared_ptr<SimulationMain> p_main);
 
     /// \brief the actual implementation of the simulator module resides in run function
     void run();
@@ -89,22 +89,22 @@ public:
     /// \brief this is called by SDK. it lanuches the simulator module
     virtual void exec();
 
-    void addCollisionPair(std::shared_ptr<smCollisionPair> pair)
+    void addCollisionPair(std::shared_ptr<CollisionPair> pair)
     {
         collisionPairs.emplace_back(pair);
     }
 
 private:
-    std::vector<std::shared_ptr<smObjectSimulator>> simulators;
-    std::vector<std::shared_ptr<smCollisionDetection>> collisionDetectors;
-    std::vector<std::shared_ptr<smCollisionPair>> collisionPairs;
-    std::vector<std::shared_ptr<smContactHandling>> contactHandlers;
+    std::vector<std::shared_ptr<ObjectSimulator>> simulators;
+    std::vector<std::shared_ptr<CollisionDetection>> collisionDetectors;
+    std::vector<std::shared_ptr<CollisionPair>> collisionPairs;
+    std::vector<std::shared_ptr<ContactHandling>> contactHandlers;
 
     std::unique_ptr<ThreadPool> threadPool; //
     std::unique_ptr<ThreadPool> asyncPool; // asynchronous thread pool
-    std::shared_ptr<smErrorLog> log; // error log
-    std::shared_ptr<smSimulationMain> main; // Simulation main registration
-    std::shared_ptr<smSimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
+    std::shared_ptr<ErrorLog> log; // error log
+    std::shared_ptr<SimulationMain> main; // Simulation main registration
+    std::shared_ptr<SimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
 
     unsigned int frameCounter; // module keeps track of frame number
     int maxThreadCount; // maximum number of threads

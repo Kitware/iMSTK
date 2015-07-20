@@ -32,11 +32,11 @@ using namespace bandit;
 
 go_bandit([](){
     describe("octree data structure", []() {
-        smOctreeCell treeCell;
+        OctreeCell treeCell;
 
-        const int numberOfSubdivisions = smOctreeCell::numberOfSubdivisions;
+        const int numberOfSubdivisions = OctreeCell::numberOfSubdivisions;
 
-        smVec3d center(1.,1.,1.);
+        core::Vec3d center(1.,1.,1.);
         treeCell.setCenter(center);
 
         float lenght = 14.5;

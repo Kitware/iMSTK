@@ -28,11 +28,11 @@
 #include "Config.h"
 
 template<typename T>
-class smIndiceArrayIter;
+class IndiceArrayIter;
 
 /// \brief  inidice array for fast access to index
 template<typename T>
-class smIndiceArray
+class IndiceArray
 {
 protected:
     /// \brief  storage
@@ -47,9 +47,9 @@ protected:
     int maxStorage;
 public:
     /// \brief  destructor
-    ~smIndiceArray();
+    ~IndiceArray();
     /// \brief constructor; gets maximum number of elements
-    inline smIndiceArray(int p_maxStorage);
+    inline IndiceArray(int p_maxStorage);
     /// \brief  add item
     inline int add(T p_item);
     /// \brief check if the item exists, if not add
@@ -66,7 +66,7 @@ public:
     /// \brief get element by reference with string
     inline T& getByRef(std::string p_string);
     /// \brief for iterative access
-    friend smIndiceArrayIter<T>;
+    friend IndiceArrayIter<T>;
     /// \brief print the elements
     inline void print() const;
     /// \brief operators
@@ -74,18 +74,18 @@ public:
 
     inline int size();
     /// \brief copy from another p_array
-    inline bool copy(smIndiceArray &p_array);
+    inline bool copy(IndiceArray &p_array);
 };
 
 /// \brief  iteration
 template<class T>
-class smIndiceArrayIter
+class IndiceArrayIter
 {
     int index;
-    smIndiceArray<T> *arrayPtr;
+    IndiceArray<T> *arrayPtr;
 public:
     /// \brief constructor that require index array
-    smIndiceArrayIter(smIndiceArray<T> *p_array);
+    IndiceArrayIter(IndiceArray<T> *p_array);
     /// \brief  operators for accessing and iteration
     T& operator[](int p_index);
 

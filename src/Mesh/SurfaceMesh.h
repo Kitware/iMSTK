@@ -33,13 +33,13 @@ class smSurfaceMesh: public smMesh
 
 public:
     /// \brief push smMesh class specific errors here
-    std::shared_ptr<smErrorLog> log_SF;
+    std::shared_ptr<ErrorLog> log_SF;
 
     /// \brief constructor
     smSurfaceMesh();
 
     /// \brief constructor
-    smSurfaceMesh(const smMeshType &meshtype, std::shared_ptr<smErrorLog> log);
+    smSurfaceMesh(const smMeshType &meshtype, std::shared_ptr<ErrorLog> log);
 
     /// \brief destructor
     virtual ~smSurfaceMesh();

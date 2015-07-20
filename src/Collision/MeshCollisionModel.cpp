@@ -23,38 +23,38 @@
 
 #include "MeshCollisionModel.h"
 
-smMeshCollisionModel::smMeshCollisionModel()
+MeshCollisionModel::MeshCollisionModel()
 {
 
 }
 
-smMeshCollisionModel::~smMeshCollisionModel()
+MeshCollisionModel::~MeshCollisionModel()
 {
 
 }
-void smMeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
+void MeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
 {
     this->setModelMesh(modelMesh);
     this->aabbTree.reset();
     this->initAABBTree(1);
 }
-void smMeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
+void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
 {
     this->load(meshName,type);
 
     this->initAABBTree(1);
 }
-std::shared_ptr< smMeshCollisionModel::AABBTreeType > smMeshCollisionModel::getAABBTree()
+std::shared_ptr< MeshCollisionModel::AABBTreeType > MeshCollisionModel::getAABBTree()
 {
     return this->aabbTree;
 }
 
-void smMeshCollisionModel::setAABBTree(std::shared_ptr<smMeshCollisionModel::AABBTreeType> modelAabbTree)
+void MeshCollisionModel::setAABBTree(std::shared_ptr<MeshCollisionModel::AABBTreeType> modelAabbTree)
 {
     this->aabbTree.reset();
     this->aabbTree = modelAabbTree;
 }
-void smMeshCollisionModel::initAABBTree(const int& numLevels)
+void MeshCollisionModel::initAABBTree(const int& numLevels)
 {
     this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), numLevels);
     this->aabbTree->initStructure();

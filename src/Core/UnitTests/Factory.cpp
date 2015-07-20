@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-class abstract : public smCoreClass
+class abstract : public CoreClass
 {
 public:
   virtual std::string stupid() const = 0;
@@ -24,8 +24,8 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_abstract_children)
-    SIMMEDTK_REGISTER_CLASS(smCoreClass, abstract, A, 65);
-    SIMMEDTK_REGISTER_CLASS(smCoreClass, abstract, B, 66);
+    SIMMEDTK_REGISTER_CLASS(CoreClass, abstract, A, 65);
+    SIMMEDTK_REGISTER_CLASS(CoreClass, abstract, B, 66);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()
 
@@ -36,23 +36,23 @@ go_bandit([](){
     SIMMEDTK_RUN_LOADER(register_abstract_children);
 
     it("shows 2 subclasses of \"abstract\"", [&]() {
-      AssertThat(smFactory<smCoreClass>::optionsForClass("abstract").size(), Equals(2));
+      AssertThat(Factory<CoreClass>::optionsForClass("abstract").size(), Equals(2));
     });
 
     it("creates a non-NULL default class instance", [&]() {
-      AssertThat(!!smFactory<smCoreClass>::createDefault("abstract").get(), IsTrue());
+      AssertThat(!!Factory<CoreClass>::createDefault("abstract").get(), IsTrue());
     });
 
     it("creates the *proper* non-NULL default class instance", [&]() {
-      AssertThat(smFactory<smCoreClass>::createDefaultAs<abstract>("abstract")->stupid()[0], Equals('A'));
+      AssertThat(Factory<CoreClass>::createDefaultAs<abstract>("abstract")->stupid()[0], Equals('A'));
     });
 
     it("creates the proper non-NULL *specified group* class instance", [&]() {
-      AssertThat(smFactory<smCoreClass>::createSubclassForGroupAs<abstract>("abstract", 66)->stupid()[0], Equals('B'));
+      AssertThat(Factory<CoreClass>::createSubclassForGroupAs<abstract>("abstract", 66)->stupid()[0], Equals('B'));
     });
 
     it("creates a non-NULL instance given only a concrete class name", [&]() {
-      AssertThat(smFactory<smCoreClass>::createConcreteClassAs<A>("A")->stupid()[0], Equals('A'));
+      AssertThat(Factory<CoreClass>::createConcreteClassAs<A>("A")->stupid()[0], Equals('A'));
     });
 
   });

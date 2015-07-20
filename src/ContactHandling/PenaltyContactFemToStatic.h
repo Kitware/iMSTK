@@ -32,16 +32,16 @@
 ///
 /// @brief Penalty based for contact handling
 ///
-class smPenaltyContactFemToStatic : public smPenaltyContactHandling
+class PenaltyContactFemToStatic : public PenaltyContactHandling
 {
 public:
-    smPenaltyContactFemToStatic(bool typeBilateral);
+    PenaltyContactFemToStatic(bool typeBilateral);
 
-    smPenaltyContactFemToStatic(bool typeBilateral,
-                             const std::shared_ptr<smSceneObject>& sceneObjFirst,
-                             const std::shared_ptr<smSceneObject>& sceneObjSecond);
+    PenaltyContactFemToStatic(bool typeBilateral,
+                             const std::shared_ptr<SceneObject>& sceneObjFirst,
+                             const std::shared_ptr<SceneObject>& sceneObjSecond);
 
-    virtual ~smPenaltyContactFemToStatic();
+    virtual ~PenaltyContactFemToStatic();
 
     /// \brief Get the forces on one the first scene object using penalty method
     virtual void computeUnilateralContactForces() override;

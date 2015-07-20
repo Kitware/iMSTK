@@ -32,7 +32,7 @@
 #include "CoreClass.h"
 
 /// \brief timer class
-class smTimer: public smCoreClass
+class Timer: public CoreClass
 {
 public:
     using ClockType = std::chrono::high_resolution_clock;
@@ -41,7 +41,7 @@ public:
     using PeriodType = ClockType::period;
 
     /// \brief constructor
-    smTimer();
+    Timer();
 
     /// \brief start the timer
     void start();

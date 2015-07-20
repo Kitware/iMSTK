@@ -16,15 +16,15 @@
 
 #include "Color.h"
 
-smColor smColor::colorWhite(1.0, 1.0, 1.0, 1.0);
-smColor smColor::colorBlue(0.0, 0.0, 1.0, 1.0);
-smColor smColor::colorGreen(0.0, 1.0, 0.0, 1.0);
-smColor smColor::colorRed(1.0, 0.0, 0.0, 1.0);
-smColor smColor::colorGray(0.8, 0.8, 0.8, 1.0);
-smColor smColor::colorYellow(1, 1, 0, 1);
-smColor smColor::colorPink(1, 0, 1, 1);
+Color Color::colorWhite(1.0, 1.0, 1.0, 1.0);
+Color Color::colorBlue(0.0, 0.0, 1.0, 1.0);
+Color Color::colorGreen(0.0, 1.0, 0.0, 1.0);
+Color Color::colorRed(1.0, 0.0, 0.0, 1.0);
+Color Color::colorGray(0.8, 0.8, 0.8, 1.0);
+Color Color::colorYellow(1, 1, 0, 1);
+Color Color::colorPink(1, 0, 1, 1);
 
-smColor::smColor()
+Color::Color()
 {
     rgba[0] = 0.8f;
     rgba[1] = 0.8f;
@@ -32,7 +32,7 @@ smColor::smColor()
     rgba[3] = 1.0f;
 }
 
-smColor::smColor( float r, float g, float b, float a )
+Color::Color( float r, float g, float b, float a )
 {
     rgba[0] = r;
     rgba[1] = g;
@@ -40,7 +40,7 @@ smColor::smColor( float r, float g, float b, float a )
     rgba[3] = a;
 }
 
-void smColor::darken( float p_darkFactor )
+void Color::darken( float p_darkFactor )
 {
 
     rgba[0] = ( rgba[1] - rgba[1] * ( p_darkFactor ) );
@@ -51,7 +51,7 @@ void smColor::darken( float p_darkFactor )
     rgba[2] = ( rgba[2] < 0 ? 0 : rgba[2] );
 }
 
-void smColor::lighten( float p_darkFactor )
+void Color::lighten( float p_darkFactor )
 {
 
     rgba[0] = rgba[1] + rgba[1] * ( p_darkFactor );
@@ -63,7 +63,7 @@ void smColor::lighten( float p_darkFactor )
     rgba[2] = ( rgba[2] < 1.0 ? 1.0 : rgba[2] );
 }
 
-float smColor::operator()( int p_i )
+float Color::operator()( int p_i )
 {
     if ( p_i < 0 || p_i > 3 )
     {
@@ -73,7 +73,7 @@ float smColor::operator()( int p_i )
     return rgba[p_i];
 }
 
-smColor &smColor::operator=(const smColor &p_color )
+Color &Color::operator=(const Color &p_color )
 {
     rgba[0] = p_color.rgba[0];
     rgba[1] = p_color.rgba[1];
@@ -82,17 +82,17 @@ smColor &smColor::operator=(const smColor &p_color )
     return *this;
 }
 
-GLfloat *smColor::toGLColor()
+GLfloat *Color::toGLColor()
 {
     return static_cast<GLfloat*>(rgba);
 }
 
-const GLfloat *smColor::toGLColor() const
+const GLfloat *Color::toGLColor() const
 {
     return static_cast<const GLfloat*>(rgba);
 }
 
-void smColor::setValue( float p_red, float p_green, float p_blue, float p_alpha )
+void Color::setValue( float p_red, float p_green, float p_blue, float p_alpha )
 {
     rgba[0] = p_red;
     rgba[1] = p_green;

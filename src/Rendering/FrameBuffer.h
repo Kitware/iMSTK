@@ -51,7 +51,7 @@ enum smRenderBufferType
     SIMMEDTK_RENDERBUFFER_COLOR_RGB = GL_RGB
 };
 /// \brief render buffer type used for frame buffer attachment
-class smRenderBuffer: public smCoreClass
+class smRenderBuffer: public CoreClass
 {
 protected:
     /// \brief renderbuffer
@@ -95,7 +95,7 @@ public:
 };
 
 /// \brief GL frame buffer class
-class smFrameBuffer: public smCoreClass
+class smFrameBuffer: public CoreClass
 {
 public:
     /// \brief GL frame buffer
@@ -131,9 +131,9 @@ public:
     /// \brief attach render buffer to te frame buffer
     void attachRenderBuffer(smRenderBuffer *p_renderBuf);
     /// \brief attach depth texture
-    void attachDepthTexture(smTexture *p_texture);
+    void attachDepthTexture(Texture *p_texture);
     /// \brief attach a color texture
-    void attachColorTexture(smTexture *p_texture, int p_attachmentOrder);
+    void attachColorTexture(Texture *p_texture, int p_attachmentOrder);
     /// \brief activate color buffer in the specified order
     void activeColorBuf(int  p_order);
     /// \brief enable the framebuffer

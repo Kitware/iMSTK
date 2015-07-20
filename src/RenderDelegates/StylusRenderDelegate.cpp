@@ -4,7 +4,7 @@
 #include "Rendering/GLUtils.h"
 #include "Simulators/StylusObject.h"
 
-class smStylusRenderDelegate : public smRenderDelegate
+class smStylusRenderDelegate : public RenderDelegate
 {
 public:
   virtual void initDraw() const override;
@@ -35,7 +35,7 @@ void smStylusRenderDelegate::initDraw() const
 void smStylusRenderDelegate::draw() const
 {
   smStylusRigidSceneObject* geom = this->getSourceGeometryAs<smStylusRigidSceneObject>();
-  smMatrix44d viewMatrix;
+  Matrix44d viewMatrix;
 
 #pragma unroll
 
@@ -85,6 +85,6 @@ void smStylusRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_stylus_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smStylusRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smStylusRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

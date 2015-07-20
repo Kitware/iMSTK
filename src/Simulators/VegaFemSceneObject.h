@@ -76,7 +76,7 @@ public:
     smVegaFemSceneObject();
 
     /// \brief Constructor
-    smVegaFemSceneObject(const std::shared_ptr<smErrorLog> p_log, const std::string ConfigFile);
+    smVegaFemSceneObject(const std::shared_ptr<ErrorLog> p_log, const std::string ConfigFile);
 
     /// \brief Destructor
     ~smVegaFemSceneObject();
@@ -146,19 +146,19 @@ public:
 
     /// \brief check all the surface nodes for the closest node within
     /// certain threshold and set it to be the pulled vertex
-    void setPulledVertex(const smVec3d &userPos);
+    void setPulledVertex(const core::Vec3d &userPos);
 
     /// \brief returns velocity given the
     /// localtion in the global velocity vector
-    smVec3d getVelocityOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getVelocityOfNodeWithDofID(const int dofID) const;
 
     /// \brief returns displacement given the
     /// localtion in the global displacement vector
-    smVec3d getDisplacementOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getDisplacementOfNodeWithDofID(const int dofID) const;
 
     /// \brief returns acceleration given the
     /// localtion in the global acceleration vector
-    smVec3d getAccelerationOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getAccelerationOfNodeWithDofID(const int dofID) const;
 
     /// \brief returns the number of nodes
     int getNumNodes() const;
@@ -186,10 +186,10 @@ public:
     ///every Scene Object should know how to clone itself.
     /// Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    //virtual std::shared_ptr<smSceneObject> clone() override { return nullptr; };
+    //virtual std::shared_ptr<SceneObject> clone() override { return nullptr; };
 
     /// \brief not implemented yet.
-    std::shared_ptr<smSceneObject> clone() override;
+    std::shared_ptr<SceneObject> clone() override;
 
 private:
 

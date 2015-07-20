@@ -27,14 +27,14 @@
 #include <string>
 #include <chrono>
 
-smErrorLog::smErrorLog()
+ErrorLog::ErrorLog()
 {
 
     time.start();
     consoleOutput = true;
 }
 
-bool smErrorLog::addError(const std::string& p_text)
+bool ErrorLog::addError(const std::string& p_text)
 {
     if (0 >= p_text.length())
     {
@@ -60,7 +60,7 @@ bool smErrorLog::addError(const std::string& p_text)
 }
 
 ///Clean up all the errors in the repository.It is thread safe.
-void smErrorLog::cleanAllErrors()
+void ErrorLog::cleanAllErrors()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
     errors.clear();
@@ -68,19 +68,19 @@ void smErrorLog::cleanAllErrors()
 }
 
 ///Print the last error.It is not thread safe.
-void smErrorLog::printLastErrUnsafe()
+void ErrorLog::printLastErrUnsafe()
 {
     std::cout << "Last Error:" << errors.back() << " Time:" << timeStamps.back() << " ms" << "\n";
 }
 
 ///Print  the last error in Thread Safe manner.
-void smErrorLog::printLastErr()
+void ErrorLog::printLastErr()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
     printLastErr();
 }
 
-void smErrorLog::setConsoleOutput(bool flag)
+void ErrorLog::setConsoleOutput(bool flag)
 {
     consoleOutput = flag;
 }

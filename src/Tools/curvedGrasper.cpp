@@ -41,29 +41,29 @@ curvedGrasper::curvedGrasper(size_t p_PhantomID,
     maxangle = 10 * 3.14 / 360;
     this->phantomID = p_PhantomID;
 
-    smMatrix33d rot;
+    Matrix33d rot;
     mesh_pivot = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_pivot->loadMesh(p_pivotModelFileName, SM_FILETYPE_3DS);
-    mesh_pivot->scale(smVec3d(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
+    mesh_pivot->scale(core::Vec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
     mesh_pivot->rotate(rot);
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_pivot->rotate(rot);
 
     mesh_upperJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_upperJaw->loadMesh(p_upperModelFileName, SM_FILETYPE_3DS);
-    mesh_upperJaw->scale(smVec3d(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitY()).matrix();
+    mesh_upperJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_upperJaw->rotate(rot);
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_upperJaw->rotate(rot);
 
     mesh_lowerJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh_lowerJaw->loadMesh(p_lowerModelFileName, SM_FILETYPE_3DS);
-    mesh_lowerJaw->scale(smVec3d(0.5, 0.5, 0.5));
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitY()).matrix();
+    mesh_lowerJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_lowerJaw->rotate(rot);
-    rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitZ()).matrix();
+    rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_lowerJaw->rotate(rot);
 
     meshContainer_pivot.name = "curvedGrasperPivot";
@@ -84,7 +84,7 @@ curvedGrasper::curvedGrasper(size_t p_PhantomID,
     DAQdataID = 0;
 }
 
-void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
+void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
 {
     if(!this->isListening())
     {
@@ -96,7 +96,7 @@ void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
     {
         smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
         smMeshContainer *containerUpper = this->getMeshContainer("curvedGrasperUpper");
-        smMatrix44d godPosMat = hapticEvent->getTransform();
+        Matrix44d godPosMat = hapticEvent->getTransform();
         transRot = godPosMat;
         pos = hapticEvent->getPosition();
         vel = hapticEvent->getVelocity();

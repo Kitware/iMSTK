@@ -30,31 +30,31 @@ EventType smCameraEvent::EventName = EventType::CameraUpdate;
 
 smCameraEvent::smCameraEvent()
 {
-    position = smVec3d::Zero();
-    direction = smVec3d::Zero();
-    upDirection = smVec3d::Zero();
+    position = core::Vec3d::Zero();
+    direction = core::Vec3d::Zero();
+    upDirection = core::Vec3d::Zero();
 }
-void smCameraEvent::setPosition(const smVec3d& cameraPosition)
+void smCameraEvent::setPosition(const core::Vec3d& cameraPosition)
 {
     this->position = cameraPosition;
 }
-const smVec3d& smCameraEvent::getPosition()
+const core::Vec3d& smCameraEvent::getPosition()
 {
     return this->position;
 }
-void smCameraEvent::setDirection(const smVec3d& cameraDirection)
+void smCameraEvent::setDirection(const core::Vec3d& cameraDirection)
 {
     this->direction = cameraDirection;
 }
-const smVec3d& smCameraEvent::getDirection()
+const core::Vec3d& smCameraEvent::getDirection()
 {
     return this->direction;
 }
-void smCameraEvent::setUpDirection(const smVec3d& cameraUpDirection)
+void smCameraEvent::setUpDirection(const core::Vec3d& cameraUpDirection)
 {
     this->upDirection = cameraUpDirection;
 }
-const smVec3d& smCameraEvent::getUpDirection()
+const core::Vec3d& smCameraEvent::getUpDirection()
 {
     return this->upDirection;
 }

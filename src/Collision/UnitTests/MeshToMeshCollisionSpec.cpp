@@ -31,9 +31,9 @@
 
 using namespace bandit;
 
-std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3d &vertices)
+std::shared_ptr<MeshCollisionModel> getModel(const core::StdVector3d &vertices)
 {
-    std::shared_ptr<smMeshCollisionModel> model = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
     std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
 
     // Add two triangles to the data structure
@@ -66,27 +66,27 @@ std::shared_ptr<smMeshCollisionModel> getModel(const smStdVector3d &vertices)
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {
         it("constructs ", []() {
-            std::unique_ptr<smCollisionDetection> meshToMeshCollision = make_unique<smMeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
             AssertThat(meshToMeshCollision == nullptr, IsFalse());
         });
         it("performs collision detection ", []() {
-            std::unique_ptr<smCollisionDetection> meshToMeshCollision = make_unique<smMeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
 
-            smStdVector3d verticesA;
+            core::StdVector3d verticesA;
             verticesA.emplace_back(1.0,2.0,0);
             verticesA.emplace_back(2.0,3.0,0);
             verticesA.emplace_back(2.0,1.0,0);
 
-            smStdVector3d verticesB;
+            core::StdVector3d verticesB;
             verticesB.emplace_back(1.0,2.0,0.5);
             verticesB.emplace_back(2.0,3.0,0);
             verticesB.emplace_back(2.0,1.0,0);
 
-            std::shared_ptr<smModelRepresentation> modelA = getModel(verticesA);
+            std::shared_ptr<ModelRepresentation> modelA = getModel(verticesA);
 
-            std::shared_ptr<smModelRepresentation> modelB = getModel(verticesB);
+            std::shared_ptr<ModelRepresentation> modelB = getModel(verticesB);
 
-            std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
+            std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
 
             collisionPair->setModels(modelA,modelB);
 

@@ -28,7 +28,7 @@
 #include "Event/KeyboardEvent.h"
 #include "Collision/MeshCollisionModel.h"
 
-smDummySimulator::smDummySimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
+smDummySimulator::smDummySimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
 }
 void smDummySimulator::beginSim()
@@ -46,8 +46,8 @@ void smDummySimulator::initCustom()
         {
             case core::ClassType::StaticSceneObject:
             {
-                auto staticObject = std::static_pointer_cast<smStaticSceneObject>(object);
-                auto model = std::static_pointer_cast<smMeshCollisionModel>(staticObject->getModel());
+                auto staticObject = std::static_pointer_cast<StaticSceneObject>(object);
+                auto model = std::static_pointer_cast<MeshCollisionModel>(staticObject->getModel());
                 if(nullptr == model)
                 {
                     break;
@@ -77,8 +77,8 @@ void smDummySimulator::run()
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
-            auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
-            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            auto staticSceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
+            auto model = std::static_pointer_cast<MeshCollisionModel>(staticSceneObject->getModel());
             if(nullptr == model)
             {
                 break;
@@ -107,8 +107,8 @@ void smDummySimulator::syncBuffers()
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
-            auto staticSceneObject = std::static_pointer_cast<smStaticSceneObject>(sceneObj);
-            auto model = std::static_pointer_cast<smMeshCollisionModel>(staticSceneObject->getModel());
+            auto staticSceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
+            auto model = std::static_pointer_cast<MeshCollisionModel>(staticSceneObject->getModel());
             if(nullptr == model)
             {
                 break;
@@ -119,7 +119,7 @@ void smDummySimulator::syncBuffers()
         }
     }
 }
-void smDummySimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
+void smDummySimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
 {
     if(!this->isListening())
     {

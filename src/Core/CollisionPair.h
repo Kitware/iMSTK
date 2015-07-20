@@ -33,18 +33,18 @@
 #include <vector>
 #include <iostream>
 
-class smModelRepresentation;
+class ModelRepresentation;
 
 ///
 /// \brief Contact point representation
 ///
-class smContact
+class Contact
 {
 public:
-    smContact ( const double penetrationDepth,
-                const smVec3d& p,
+    Contact ( const double penetrationDepth,
+                const core::Vec3d& p,
                 const int ind,
-                const smVec3d& contactNornmal
+                const core::Vec3d& contactNornmal
 				) : depth(penetrationDepth), point(p), index(ind), normal(contactNornmal){}
 
     void printInfo()
@@ -56,8 +56,8 @@ public:
     }
 
     double depth;
-    smVec3d point;
-    smVec3d normal;
+    core::Vec3d point;
+    core::Vec3d normal;
     int index;
 };
 
@@ -65,31 +65,31 @@ public:
 /// \brief Contains pair of potential collision models
 ///   This class also stores contacts between those models.
 ///
-class smCollisionPair
+class CollisionPair
 {
 public:
-    smCollisionPair();
-    ~smCollisionPair();
+    CollisionPair();
+    ~CollisionPair();
 
     ///
     /// @brief Set the pair of collision models
     ///
-    void setModels(const std::shared_ptr<smModelRepresentation>& first,
-                   const std::shared_ptr<smModelRepresentation>& second );
+    void setModels(const std::shared_ptr<ModelRepresentation>& first,
+                   const std::shared_ptr<ModelRepresentation>& second );
 
     ///
     /// @brief Get the pair of collision models
     ///
-    const std::pair<std::shared_ptr<smModelRepresentation>, std::shared_ptr<smModelRepresentation>>&
+    const std::pair<std::shared_ptr<ModelRepresentation>, std::shared_ptr<ModelRepresentation>>&
     getModels() const;
 
     ///
     /// @brief Add contact between the models
     ///
     void addContact( const double& penetrationDepth,
-                     const smVec3d& vert,
+                     const core::Vec3d& vert,
                      const int index,
-                     const smVec3d& contactNornmal);
+                     const core::Vec3d& contactNornmal);
 
     ///
     /// @brief Clear contact list
@@ -99,12 +99,12 @@ public:
     ///
     /// @brief Get first model
     ///
-    std::shared_ptr<smModelRepresentation> getFirst();
+    std::shared_ptr<ModelRepresentation> getFirst();
 
     ///
     /// @brief Get second model
     ///
-    std::shared_ptr<smModelRepresentation> getSecond();
+    std::shared_ptr<ModelRepresentation> getSecond();
 
     ///
     /// @brief Returns wether the contact container is empty
@@ -119,8 +119,8 @@ public:
     ///
     /// @brief Returns contact array for these two models
     ///
-    std::vector<std::shared_ptr<smContact>> &getContacts();
-    const std::vector<std::shared_ptr<smContact>> &getContacts() const;
+    std::vector<std::shared_ptr<Contact>> &getContacts();
+    const std::vector<std::shared_ptr<Contact>> &getContacts() const;
 
     ///
     /// @brief Returns contact array for these two models
@@ -128,10 +128,10 @@ public:
     void printCollisionPairs();
 
 private:
-    std::pair<std::shared_ptr<smModelRepresentation>,
-        std::shared_ptr<smModelRepresentation>> modelRepresentations; // Models
+    std::pair<std::shared_ptr<ModelRepresentation>,
+        std::shared_ptr<ModelRepresentation>> modelRepresentations; // Models
 
-    std::vector<std::shared_ptr<smContact>> contacts; // List of contacts
+    std::vector<std::shared_ptr<Contact>> contacts; // List of contacts
 };
 
 #endif // SMCOLLISIONPAIR_H

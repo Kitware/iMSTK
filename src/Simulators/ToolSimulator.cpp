@@ -27,8 +27,8 @@
 
 void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_tool)
 {
-    smMatrix44d tempMat, tempMatDevice;
-    smMatrix44d mat;
+    Matrix44d tempMat, tempMatDevice;
+    Matrix44d mat;
     tree<smMeshContainer*>::pre_order_iterator iter = p_tool->meshes.begin();
     //update the Root node first
     iter.node->data->computeCurrentMatrix();
@@ -79,7 +79,7 @@ void smToolSimulator::updateTool(std::shared_ptr<smStylusRigidSceneObject> p_too
     }
 }
 
-smToolSimulator::smToolSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
+smToolSimulator::smToolSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
 }
 
@@ -118,7 +118,7 @@ void smToolSimulator::syncBuffers()
 {
 }
 
-void smToolSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
+void smToolSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
 {
     if(!this->isListening())
     {

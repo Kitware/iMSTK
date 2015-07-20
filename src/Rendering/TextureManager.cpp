@@ -26,8 +26,8 @@
 
 #include <cassert>
 
-std::shared_ptr<smErrorLog> smTextureManager:: errorLog;
-std::vector<smTexture*>  smTextureManager:: textures;
+std::shared_ptr<ErrorLog> smTextureManager:: errorLog;
+std::vector<Texture*>  smTextureManager:: textures;
 std::unordered_map<std::string, int>  smTextureManager::textureIndexId;
 int smTextureManager:: activeTextures;
 bool smTextureManager::isInitialized = false;
@@ -38,7 +38,7 @@ bool smTextureManager::isDeleteImagesEnabled = false;
 smTextureReturnType smTextureManager::initGLTextures()
 {
     std::string texManagerError;
-    smTexture *texture;
+    Texture *texture;
 
     for (size_t i = 0; i < textures.size(); i++)
     {
@@ -108,7 +108,7 @@ smTextureReturnType smTextureManager::loadTexture(const std::string& p_fileName,
 /// \brief
 smTextureReturnType smTextureManager::loadTexture(const std::string& p_fileName, const std::string& p_textureReferenceName, bool p_flipImage)
 {
-    smTexture *texture = nullptr;
+    Texture *texture = nullptr;
     sf::Vector2u imageSize;
 
     assert(p_fileName != "");
@@ -119,7 +119,7 @@ smTextureReturnType smTextureManager::loadTexture(const std::string& p_fileName,
         return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
     }
 
-    texture = new smTexture();
+    texture = new Texture();
     assert(texture);
     if (false == texture->image.loadFromFile(p_fileName))
     {
@@ -166,7 +166,7 @@ GLuint smTextureManager::activateTexture(const std::string& p_textureReferenceNa
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
 
@@ -175,8 +175,8 @@ GLuint smTextureManager::activateTexture(const std::string& p_textureReferenceNa
     return texture->textureGLId;
 }
 
-/// \brief activate the texture given the smTexture argument
-GLuint smTextureManager::activateTexture(smTexture *p_texture)
+/// \brief activate the texture given the Texture argument
+GLuint smTextureManager::activateTexture(Texture *p_texture)
 {
 
     glBindTexture(GL_TEXTURE_2D, p_texture->textureGLId);
@@ -190,7 +190,7 @@ GLuint smTextureManager::activateTexture(const std::string& p_textureReferenceNa
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
     glActiveTexture(GL_TEXTURE0 + p_textureGLOrder);
@@ -208,7 +208,7 @@ GLuint smTextureManager::activateTexture(const std::string& p_textureReferenceNa
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
     glActiveTexture(GL_TEXTURE0 + p_textureGLOrder);
@@ -218,10 +218,10 @@ GLuint smTextureManager::activateTexture(const std::string& p_textureReferenceNa
     return texture->textureGLId;
 }
 
-/// \brief This function binds the smTexture to the appropriate shader texture.
+/// \brief This function binds the Texture to the appropriate shader texture.
 /// For instance if the argument is 0, the it will bind to GL_TEXTURE0
 /// Also for the shader the binded name will be p_shaderBindName
-GLuint smTextureManager::activateTexture(smTexture *p_texture,
+GLuint smTextureManager::activateTexture(Texture *p_texture,
         int p_textureGLOrder, int p_shaderBindGLId)
 {
 
@@ -236,7 +236,7 @@ GLuint smTextureManager::activateTexture(smTexture *p_texture,
 GLuint smTextureManager::activateTexture(int p_textureId)
 {
 
-    smTexture *texture;
+    Texture *texture;
     texture = textures[p_textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
     glEnable(GL_TEXTURE_2D);
@@ -248,7 +248,7 @@ GLuint smTextureManager::activateTexture(int p_textureId)
 GLuint smTextureManager::activateTexture(int p_textureId, int p_textureGLOrder)
 {
 
-    smTexture *texture;
+    Texture *texture;
     texture = textures[p_textureId];
     glActiveTexture(GL_TEXTURE0 + p_textureGLOrder);
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
@@ -270,7 +270,7 @@ GLuint smTextureManager::disableTexture(const std::string& p_textureReferenceNam
 {
 
     GLuint textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
@@ -283,7 +283,7 @@ GLuint smTextureManager::disableTexture(const std::string& p_textureReferenceNam
 {
 
     GLuint textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
 
@@ -297,7 +297,7 @@ GLuint smTextureManager::disableTexture(const std::string& p_textureReferenceNam
 GLuint smTextureManager::disableTexture(int p_textureId)
 {
 
-    smTexture *texture;
+    Texture *texture;
     texture = textures[p_textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
     glDisable(GL_TEXTURE_2D);
@@ -309,7 +309,7 @@ GLuint smTextureManager::getOpenglTextureId(const std::string& p_textureReferenc
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
     return texture->textureGLId;
@@ -320,7 +320,7 @@ GLuint smTextureManager::getOpenglTextureId(const std::string& p_textureReferenc
 GLuint smTextureManager::getOpenglTextureId(int p_textureId)
 {
 
-    smTexture *texture;
+    Texture *texture;
     texture = textures[p_textureId];
     return texture->textureGLId;
 
@@ -330,8 +330,8 @@ GLuint smTextureManager::getOpenglTextureId(int p_textureId)
 void smTextureManager::createDepthTexture(const std::string& p_textureReferenceName, int p_width, int p_height)
 {
 
-    smTexture *tex;
-    tex = new smTexture();
+    Texture *tex;
+    tex = new Texture();
     tex->height = p_height;
     tex->width = p_width;
     tex->GLtype = GL_TEXTURE_2D;
@@ -343,11 +343,11 @@ void smTextureManager::createDepthTexture(const std::string& p_textureReferenceN
 }
 
 /// \brief
-void smTextureManager::duplicateTexture(const std::string& p_textureReferenceName, smTexture *p_texture, ImageColorType p_type)
+void smTextureManager::duplicateTexture(const std::string& p_textureReferenceName, Texture *p_texture, ImageColorType p_type)
 {
 
-    smTexture *tex;
-    tex = new smTexture();
+    Texture *tex;
+    tex = new Texture();
     tex->height = p_texture->height;
     tex->width = p_texture->width;
     tex->GLtype = GL_TEXTURE_2D;
@@ -363,9 +363,9 @@ void smTextureManager::copyTexture(const std::string& /*p_textureDestinationName
 {
 // WARNING: This function does nothing
 //     int textureDstId;
-//     smTexture *dstTex;
+//     Texture *dstTex;
 //     int textureSrcId;
-//     smTexture *srcTex;
+//     Texture *srcTex;
 //
 //     textureDstId = textureIndexId[p_textureDestinationName];
 //     dstTex = textures[textureDstId];
@@ -378,8 +378,8 @@ void smTextureManager::copyTexture(const std::string& /*p_textureDestinationName
 void smTextureManager::createColorTexture(const std::string& p_textureReferenceName, int p_width, int p_height)
 {
 
-    smTexture *tex;
-    tex = new smTexture();
+    Texture *tex;
+    tex = new Texture();
     tex->height = p_height;
     tex->width = p_width;
     tex->GLtype = GL_TEXTURE_2D;
@@ -391,7 +391,7 @@ void smTextureManager::createColorTexture(const std::string& p_textureReferenceN
 }
 
 /// \brief
-void smTextureManager::initDepthTexture(smTexture *p_texture)
+void smTextureManager::initDepthTexture(Texture *p_texture)
 {
 
     glGenTextures(1, &p_texture->textureGLId);
@@ -409,7 +409,7 @@ void smTextureManager::initDepthTexture(smTexture *p_texture)
 }
 
 /// \brief
-void smTextureManager::initColorTexture(smTexture *p_texture)
+void smTextureManager::initColorTexture(Texture *p_texture)
 {
 
     glGenTextures(1, &p_texture->textureGLId);
@@ -424,11 +424,11 @@ void smTextureManager::initColorTexture(smTexture *p_texture)
 }
 
 /// \brief
-smTexture *smTextureManager::getTexture(const std::string& p_textureReferenceName)
+Texture *smTextureManager::getTexture(const std::string& p_textureReferenceName)
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     return texture = textures[textureId];
 }
@@ -437,7 +437,7 @@ smTexture *smTextureManager::getTexture(const std::string& p_textureReferenceNam
 void smTextureManager::generateMipMaps(int p_textureId)
 {
 
-    smTexture *texture;
+    Texture *texture;
     texture = textures[p_textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);
     glGenerateMipmap(GL_TEXTURE_2D);
@@ -448,7 +448,7 @@ void smTextureManager::generateMipMaps(const std::string& p_textureReferenceName
 {
 
     int textureId;
-    smTexture *texture;
+    Texture *texture;
     textureId = textureIndexId[p_textureReferenceName];
     texture = textures[textureId];
     glBindTexture(GL_TEXTURE_2D, texture->textureGLId);

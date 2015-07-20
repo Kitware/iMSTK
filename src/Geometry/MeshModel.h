@@ -39,7 +39,7 @@
 ///
 /// @see smMeshCollisionModel
 ///
-class smMeshModel : public smModelRepresentation
+class smMeshModel : public ModelRepresentation
 {
 public:
     ///
@@ -65,22 +65,22 @@ public:
     ///
     /// @brief Set the rendering details for this mesh
     ///
-    void setRenderDetail(std::shared_ptr<smRenderDetail> renderDetail);
+    void setRenderDetail(std::shared_ptr<RenderDetail> renderDetail);
 
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const smVec3d &getNormal(size_t i) const;
+    const core::Vec3d &getNormal(size_t i) const;
 
     ///
     /// @brief Returns array of vertices for triangle on surface
     ///
-    std::array<smVec3d,3> getTrianglePositions(size_t i) const;
+    std::array<core::Vec3d,3> getTrianglePositions(size_t i) const;
 
     ///
     /// @brief Returns array of vertices
     ///
-    const smStdVector3d &getVertices() const;
+    const core::StdVector3d &getVertices() const;
 
     ///
     /// @brief Draw this mesh

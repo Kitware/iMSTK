@@ -41,7 +41,7 @@
 ///
 /// @see smPlaneCollisionModel
 ///
-class smPlaneModel : public smModelRepresentation
+class smPlaneModel : public ModelRepresentation
 {
 public:
     using RigidTransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
@@ -50,7 +50,7 @@ public:
     ///
     /// @brief Constructor
     ///
-    smPlaneModel(const smVec3d& p, const smVec3d& n);
+    smPlaneModel(const core::Vec3d& p, const core::Vec3d& n);
 
     ///
     /// @brief Destructor
@@ -65,17 +65,17 @@ public:
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const smVec3d &getNormal() const;
+    const core::Vec3d &getNormal() const;
 
     ///
     /// @brief Set plane normal
     ///
-    void setNormal(const smVec3d &normal);
+    void setNormal(const core::Vec3d &normal);
 
     ///
     /// @brief Get relative position of the plane
     ///
-    const smVec3d &getPosition() const;
+    const core::Vec3d &getPosition() const;
 
     ///
     /// @brief Get transformation operator
@@ -90,16 +90,16 @@ public:
     ///
     /// @brief Set transformation operator
     ///
-    void setPlaneModel(const std::shared_ptr<smPlane> &p);
+    void setPlaneModel(const std::shared_ptr<Plane> &p);
 
     ///
     /// @brief Set transformation operator
     ///
-    std::shared_ptr<smPlane> getPlaneModel() const;
+    std::shared_ptr<Plane> getPlaneModel() const;
 
 protected:
     // Plane data and transform
-    std::shared_ptr<smPlane> plane;
+    std::shared_ptr<Plane> plane;
     RigidTransformType transform;
 };
 

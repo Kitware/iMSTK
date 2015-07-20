@@ -28,11 +28,11 @@ namespace Event {
 
 EventType smMouseMoveEvent::EventName = EventType::MouseMove;
 
-void smMouseMoveEvent::setWindowCoord(const smVec2d& coordinates)
+void smMouseMoveEvent::setWindowCoord(const core::Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const smVec2d& smMouseMoveEvent::getWindowCoord()
+const core::Vec2d& smMouseMoveEvent::getWindowCoord()
 {
     return this->coord;
 }

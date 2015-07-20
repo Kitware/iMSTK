@@ -30,11 +30,11 @@ EventType smObjectClickedEvent::EventName = EventType::ObjectClicked;
 
 smObjectClickedEvent::smObjectClickedEvent(const size_t& objectId): id(objectId)
 {}
-void smObjectClickedEvent::setWindowCoord(const smVec3d& coordinates)
+void smObjectClickedEvent::setWindowCoord(const core::Vec3d& coordinates)
 {
     this->coord = coordinates;
 }
-const smVec3d& smObjectClickedEvent::getWindowCoord()
+const core::Vec3d& smObjectClickedEvent::getWindowCoord()
 {
     return this->coord;
 }

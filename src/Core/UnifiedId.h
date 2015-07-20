@@ -30,17 +30,17 @@
 
 
 /// \brief  This class creates a unique unified id of each object in the framework
-struct smUnifiedId
+struct UnifiedId
 {
 public:
-    typedef std::shared_ptr<smUnifiedId> Pointer;
+    typedef std::shared_ptr<UnifiedId> Pointer;
 
 public:
     /// \brief  constructor
-    smUnifiedId();
+    UnifiedId();
 
-    /// \brief comparison with another std::shared_ptr<smUnifiedId>
-    bool operator==(const smUnifiedId *id);
+    /// \brief comparison with another std::shared_ptr<UnifiedId>
+    bool operator==(const UnifiedId *id);
 
     /// \brief comparison with id
     bool operator!=(const short &id);
@@ -56,8 +56,8 @@ private:
     static std::atomic_int IDcounter; // atomic integer counter that is used to assign a unique number for  each object
     short ID; //  unique ID
 
-    smUnifiedId(const smUnifiedId&) = delete;
-    smUnifiedId &operator=(const smUnifiedId&) = delete;
+    UnifiedId(const UnifiedId&) = delete;
+    UnifiedId &operator=(const UnifiedId&) = delete;
 };
 
 #endif // SMUNIFIEDID_H

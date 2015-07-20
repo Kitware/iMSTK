@@ -35,7 +35,7 @@ smLattice::smLattice()
     this->ySeperation = 0;
     this->zSeperation = 0;
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createSubclass(
+      Factory<RenderDelegate>::createSubclass(
         "RenderDelegate", "LatticeRenderDelegate"));
 }
 float smLattice::getXStep()
@@ -50,15 +50,15 @@ float smLattice::getZStep()
 {
     return zStep;
 }
-smVec3d smLattice::getLatticeCenter()
+core::Vec3d smLattice::getLatticeCenter()
 {
     return latticeCenter;
 }
-smVec3d smLattice::getLeftMinCorner()
+core::Vec3d smLattice::getLeftMinCorner()
 {
     return cells[0].cellLeftCorner;
 }
-smVec3d smLattice::getRightMaxCorner()
+core::Vec3d smLattice::getRightMaxCorner()
 {
     return cells[totalCells - 1].cellRightCorner;
 }
@@ -67,7 +67,7 @@ smLattice::~smLattice()
     delete[] cells;
     delete[] aabb;
 }
-smLatticeReturnType smLattice::init( smVec3d p_leftCorner, smVec3d p_rightCorner, int p_xSeperation, int p_ySeperation, int p_zSeperation )
+smLatticeReturnType smLattice::init( core::Vec3d p_leftCorner, core::Vec3d p_rightCorner, int p_xSeperation, int p_ySeperation, int p_zSeperation )
 {
 
     int x, y, z;
@@ -153,7 +153,7 @@ void smLattice::linkPrimitivetoCell( int p_primitiveIndex )
     int maxY;
     int maxZ;
     int index;
-    smVec3d leftCorner = getLeftMinCorner();
+    core::Vec3d leftCorner = getLeftMinCorner();
 
     minX = ( aabb[p_primitiveIndex].aabbMin[0] - leftCorner[0] ) / xStep;
     minY = ( aabb[p_primitiveIndex].aabbMin[1] - leftCorner[1] ) / yStep;
@@ -232,7 +232,7 @@ void smLattice::linkPrims()
         linkPrimitivetoCell( i );
     }
 }
-void smLattice::addObject( smSceneObject *obj )
+void smLattice::addObject( SceneObject *obj )
 {
     core::ClassType objectType;
     linkedObject = obj->getObjectUnifiedID();
@@ -242,7 +242,7 @@ void smLattice::addObject( smSceneObject *obj )
     {
         case core::ClassType::StaticSceneObject:
         {
-            auto staticSceneObject = static_cast<smStaticSceneObject*>(obj);
+            auto staticSceneObject = static_cast<StaticSceneObject*>(obj);
             auto model = staticSceneObject->getModel();
             if(nullptr == model)
             {

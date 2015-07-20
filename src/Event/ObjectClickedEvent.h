@@ -32,7 +32,7 @@
 namespace mstk {
 namespace Event {
 
-class smObjectClickedEvent : public smEvent
+class smObjectClickedEvent : public Event
 {
 public:
     static EventType EventName;
@@ -40,13 +40,13 @@ public:
 public:
     smObjectClickedEvent(const size_t &objectId);
 
-    void setWindowCoord(const smVec3d &coordinates);
+    void setWindowCoord(const core::Vec3d &coordinates);
 
-    const smVec3d &getWindowCoord();
+    const core::Vec3d &getWindowCoord();
 
 private:
     size_t id; // object id
-    smVec3d coord; // position
+    core::Vec3d coord; // position
 };
 
 } // Event namespace

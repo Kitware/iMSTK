@@ -30,7 +30,7 @@
 
 namespace mstk {
 namespace Event {
-    class smEvent;
+    class Event;
     class smEventHandler;
     class smCameraEvent;
 }
@@ -47,7 +47,7 @@ public:
                   const std::string& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief event handler
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
     /// \brief for open and close motion
     void updateOpenClose();
@@ -66,7 +66,7 @@ public:
 #ifdef smNIUSB6008DAQ
     smPipeRegisteration NIUSB6008pipeReg; //
 #endif
-    smVec3d godPos; // god object position
+    core::Vec3d godPos; // god object position
     double godMat[9]; // god object matrix
     int DAQdataID; // interface for DAQ
     double minValue; // read  min  data value

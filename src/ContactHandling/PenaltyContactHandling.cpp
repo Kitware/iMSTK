@@ -26,22 +26,22 @@
 #include "Simulators/VegaFemSceneObject.h"
 #include "Core/CollisionPair.h"
 
-smPenaltyContactHandling::smPenaltyContactHandling(bool typeBilateral) : smContactHandling(typeBilateral)
+PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) : ContactHandling(typeBilateral)
 {
 }
 
-smPenaltyContactHandling::smPenaltyContactHandling( bool typeBilateral,
-                                                    const std::shared_ptr<smSceneObject>& sceneObjFirst,
-                                                    const std::shared_ptr<smSceneObject>& sceneObjSecond)
-                                                    : smContactHandling(typeBilateral,sceneObjFirst,sceneObjSecond)
+PenaltyContactHandling::PenaltyContactHandling( bool typeBilateral,
+                                                    const std::shared_ptr<SceneObject>& sceneObjFirst,
+                                                    const std::shared_ptr<SceneObject>& sceneObjSecond)
+                                                    : ContactHandling(typeBilateral,sceneObjFirst,sceneObjSecond)
 {
 }
 
-smPenaltyContactHandling::~smPenaltyContactHandling()
+PenaltyContactHandling::~PenaltyContactHandling()
 {
 };
 
-void smPenaltyContactHandling::resolveContacts()
+void PenaltyContactHandling::resolveContacts()
 {
     if (!isBilateral)
     {

@@ -75,7 +75,7 @@ struct smTextureAttachment
 };
 
 /// \brief base class for the mesh
-class smBaseMesh: public smCoreClass
+class smBaseMesh: public CoreClass
 {
 public:
     /// \brief constructor
@@ -93,7 +93,7 @@ public:
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
 
-    const smStdVector3d &getVertices() const
+    const core::StdVector3d &getVertices() const
     {
         return this->vertices;
     }
@@ -106,11 +106,11 @@ public:
 public:
     smCollisionGroup collisionGroup; ///< !!
     GLint renderingID; ///< !!
-    std::shared_ptr<smErrorLog> log; ///< record the log
-    smStdVector3d vertices; ///< vertices co-ordinate data at time t
-    smStdVector3d origVerts; ///< vertices co-ordinate data at time t=0
+    std::shared_ptr<ErrorLog> log; ///< record the log
+    core::StdVector3d vertices; ///< vertices co-ordinate data at time t
+    core::StdVector3d origVerts; ///< vertices co-ordinate data at time t=0
     int  nbrVertices; ///< number of vertices
-    smAABB aabb; ///< Axis aligned bounding box
+    AABB aabb; ///< Axis aligned bounding box
     bool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
     smTexCoord *texCoord; ///< texture co-ordinates
     std::vector<smTextureAttachment> textureIds; ///< !!
@@ -146,7 +146,7 @@ public:
     void allocateAABBTris();
 
     /// \brief compute the normal of a triangle
-    smVec3d calculateTriangleNormal(int triNbr);
+    core::Vec3d calculateTriangleNormal(int triNbr);
 
     /// \brief update the normals of triangles after they moved
     void updateTriangleNormals();
@@ -164,10 +164,10 @@ public:
     void calcTriangleTangents();
 
     /// \brief compute the tangent give the three vertices
-    void calculateTangent(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3d& t);
+    void calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t);
 
     /// \brief !!
-    void calculateTangent_test(smVec3d& p1, smVec3d& p2, smVec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, smVec3d& t);
+    void calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t);
 
     /// \brief find the neighbors of all vertices of mesh
     void calcNeighborsVertices();
@@ -179,13 +179,13 @@ public:
     void translate(float, float, float);
 
     /// \brief translate the mesh
-    void translate(smVec3d p_offset);
+    void translate(core::Vec3d p_offset);
 
     /// \brief scale the mesh
-    void scale(smVec3d p_scaleFactors);
+    void scale(core::Vec3d p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(const smMatrix33d &p_rot);
+    void rotate(const Matrix33d &p_rot);
 
     /// \brief check if there is a consistent orientation of triangle vertices
     /// across the entire surface mesh
@@ -217,10 +217,10 @@ public:
     smTriangle *triangles; ///< list of triangles
     smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
-    smVec3d *triNormals; ///< triangle normals
-    smVec3d *vertNormals; ///< vertex normals
-    smVec3d *triTangents; ///< triangle tangents
-    smVec3d *vertTangents; ///< vertex tangents
+    core::Vec3d *triNormals; ///< triangle normals
+    core::Vec3d *vertNormals; ///< vertex normals
+    core::Vec3d *triTangents; ///< triangle tangents
+    core::Vec3d *vertTangents; ///< vertex tangents
     bool tangentChannel; ///< !!
     std::vector< std::vector<int> > vertTriNeighbors; ///< list of neighbors for a triangle
     std::vector< std::vector<int> > vertVertNeighbors; ///< list of neighbors for a vertex
@@ -229,7 +229,7 @@ public:
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
     ///Therefore it is initially NULL
-    std::vector<smAABB> triAABBs;
+    std::vector<AABB> triAABBs;
 
     smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
     smMeshFileType meshFileType; ///< type of input mesh
@@ -290,19 +290,19 @@ public:
     void translate(float p_offsetX, float p_offsetY, float p_offsetZ);
 
     /// \brief translate the vertices of mesh
-    void translate(smVec3d p_offset);
+    void translate(core::Vec3d p_offset);
 
     /// \brief scale the mesh
-    void scale(smVec3d p_scaleFactors);
+    void scale(core::Vec3d p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(smMatrix33d p_rot);
+    void rotate(Matrix33d p_rot);
 
     /// \brief query if the mesh is textured
     bool isMeshTextured();
 
 public:
-    smAABB *edgeAABBs;///< AABBs for the edges in the mesh
+    AABB *edgeAABBs;///< AABBs for the edges in the mesh
     smEdge *edges;///< edges of the line mesh
     int nbrEdges;///< number of edges of the line mesh
 

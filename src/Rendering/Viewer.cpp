@@ -185,11 +185,11 @@ void smViewer::renderTextureOnView()
 /// \param p_width The width of the fbo
 /// \param p_height The height of the fbo
 void smViewer::addFBO(const std::string &p_fboName,
-                      smTexture *p_colorTex,
-                      smTexture *p_depthTex,
+                      Texture *p_colorTex,
+                      Texture *p_depthTex,
                       unsigned int p_width, unsigned int p_height)
 {
-    smFboListItem item;
+    FboListItem item;
 
     item.fboName = p_fboName;
     item.width = p_width;
@@ -211,7 +211,7 @@ void smViewer::initFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
-        smFboListItem *item = &fboListItems[i];
+        FboListItem *item = &fboListItems[i];
         item->fbo = new smFrameBuffer();
         item->fbo->setDim(item->width, item->height);
         if (item->colorTex)
@@ -265,7 +265,7 @@ void smViewer::processWindowEvents()
 }
 
 /// \brief Renders the render operation to an FBO
-void smViewer::renderToFBO(const smRenderOperation &p_rop)
+void smViewer::renderToFBO(const RenderOperation &p_rop)
 {
     assert(p_rop.fbo);
     //Enable FBO for rendering
@@ -282,7 +282,7 @@ void smViewer::renderToFBO(const smRenderOperation &p_rop)
 }
 
 /// \brief Renders the render operation to screen
-void smViewer::renderToScreen(const smRenderOperation &p_rop)
+void smViewer::renderToScreen(const RenderOperation &p_rop)
 {
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
@@ -295,8 +295,8 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
     //Render axis
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
     {
-        smMatrix44f proj = p_rop.scene->getCamera()->getProjMat();
-        smMatrix44f view = p_rop.scene->getCamera()->getViewMat();
+        Matrix44f proj = p_rop.scene->getCamera()->getProjMat();
+        Matrix44f view = p_rop.scene->getCamera()->getViewMat();
 
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
@@ -322,11 +322,11 @@ void smViewer::renderToScreen(const smRenderOperation &p_rop)
 }
 
 /// \brief Registers a scene for rendering with the viewer
-void smViewer::registerScene(std::shared_ptr<smScene> p_scene,
+void smViewer::registerScene(std::shared_ptr<Scene> p_scene,
                              smRenderTargetType p_target,
                              const std::string &p_fboName)
 {
-    smRenderOperation rop;
+    RenderOperation rop;
 
     //sanity checks
     assert(p_scene);
@@ -411,7 +411,7 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
 
         auto mouseEvent = std::make_shared<mstk::Event::smMouseButtonEvent>(mouseButton);
         mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
-        mouseEvent->setWindowCoord(smVec2d(p_event.mouseButton.x,p_event.mouseButton.y));
+        mouseEvent->setWindowCoord(core::Vec2d(p_event.mouseButton.x,p_event.mouseButton.y));
         eventHandler->triggerEvent(mouseEvent);
         break;
     }
@@ -419,7 +419,7 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     {
         auto mouseEvent = std::make_shared<mstk::Event::smMouseMoveEvent>();
         mouseEvent->setSender(mstk::Event::EventSender::Module);
-        mouseEvent->setWindowCoord(smVec2d(p_event.mouseMove.x, p_event.mouseMove.y));
+        mouseEvent->setWindowCoord(core::Vec2d(p_event.mouseMove.x, p_event.mouseMove.y));
         eventHandler->triggerEvent(mouseEvent);
         break;
     }
@@ -428,14 +428,14 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     }
 }
 
-void smViewer::addObject(std::shared_ptr<smCoreClass> object)
+void smViewer::addObject(std::shared_ptr<CoreClass> object)
 {
 
-    smSDK::getInstance()->addRef(object);
+    SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
+void smViewer::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
 {
 
 }
@@ -473,6 +473,6 @@ void smViewer::cleanUp()
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
-    SIMMEDTK_REGISTER_CLASS(smCoreClass,smViewerBase,smViewer,100);
+    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,smViewer,100);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

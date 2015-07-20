@@ -31,22 +31,22 @@
 #include "CoreClass.h"
 
 class smMesh;
-class smCollisionPair;
+class CollisionPair;
 
 /// \brief Base class to calculate contact information between two meshes
 /// It determines if two meshes are in close proximity and calculates contacts
 /// if they are.
-class smCollisionDetection: public smCoreClass
+class CollisionDetection: public CoreClass
 {
 public:
-    smCollisionDetection() {}
+    CollisionDetection() {}
 
-    virtual ~smCollisionDetection() {}
+    virtual ~CollisionDetection() {}
 
-    void computeCollision(std::shared_ptr<smCollisionPair> pairs);
+    void computeCollision(std::shared_ptr<CollisionPair> pairs);
 
 private:
-    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) = 0;
+    virtual void doComputeCollision(std::shared_ptr<CollisionPair> pairs) = 0;
 };
 
 #endif

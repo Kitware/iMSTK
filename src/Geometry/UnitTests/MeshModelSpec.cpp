@@ -28,7 +28,7 @@
 
 using namespace bandit;
 
-std::shared_ptr<smMeshModel> getModel(const smStdVector3d &vertices)
+std::shared_ptr<smMeshModel> getModel(const core::StdVector3d &vertices)
 {
     std::shared_ptr<smMeshModel> model = std::make_shared<smMeshModel>();
     std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
@@ -61,7 +61,7 @@ go_bandit([](){
         });
         it("can access mesh vertices", []() {
 
-            smStdVector3d vertices;
+            core::StdVector3d vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
@@ -75,14 +75,14 @@ go_bandit([](){
         });
         it("can access mesh face normals", []() {
 
-            smStdVector3d vertices;
+            core::StdVector3d vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
 
             auto model = getModel(vertices);
 
-            smVec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
+            core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
 
             AssertThat((model->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });

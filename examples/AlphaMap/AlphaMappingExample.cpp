@@ -50,8 +50,8 @@ AlphaMapExample::AlphaMapExample()
     motionTrans = NULL;
     hapticInterface = NULL;
 
-    simmedtkSDK = smSDK::createSDK();
-    object1 = new smStaticSceneObject();
+    simmedtkSDK = SDK::createSDK();
+    object1 = new StaticSceneObject();
 
     smMetalShader *metalShader = new smMetalShader("../../resources/shaders/VertexBumpMap1.cg",
             "../../resources/shaders/FragmentBumpMap1.cg");
@@ -65,7 +65,7 @@ AlphaMapExample::AlphaMapExample()
 
 
 
-    smTextureManager::init(smSDK::getErrorLog());
+    smTextureManager::init(SDK::getErrorLog());
     smTextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg", "groundImage");
     smTextureManager::loadTexture("../../resources/textures/4351-normal.jpg", "groundBumpImage");
     smTextureManager::loadTexture("../../resources/textures/brick.jpg", "wallImage");
@@ -88,7 +88,7 @@ AlphaMapExample::AlphaMapExample()
                                         SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR | SIMMEDTK_RENDER_TRANSPARENT);
     object1->getRenderDetail()->addShader(metalShader->getUniqueId());
     object1->mesh->translate(0, 10, -110);
-    object1->mesh->scale(smVec3d(5, 5, 5));
+    object1->mesh->scale(core::Vec3d(5, 5, 5));
     object1->getRenderDetail()->lineSize = 2;
     object1->getRenderDetail()->pointSize = 5;
 

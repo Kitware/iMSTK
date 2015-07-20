@@ -29,16 +29,16 @@
 #include "Core/ContactHandling.h"
 
 /// \brief Penalty based for contact handling
-class smPenaltyContactHandling : public smContactHandling
+class PenaltyContactHandling : public ContactHandling
 {
 public:
-    smPenaltyContactHandling(bool typeBilateral);
+    PenaltyContactHandling(bool typeBilateral);
 
-    smPenaltyContactHandling(bool typeBilateral,
-                             const std::shared_ptr<smSceneObject>& sceneObjFirst,
-                             const std::shared_ptr<smSceneObject>& sceneObjSecond);
+    PenaltyContactHandling(bool typeBilateral,
+                             const std::shared_ptr<SceneObject>& sceneObjFirst,
+                             const std::shared_ptr<SceneObject>& sceneObjSecond);
 
-    virtual ~smPenaltyContactHandling();
+    virtual ~PenaltyContactHandling();
 
     void resolveContacts();
 

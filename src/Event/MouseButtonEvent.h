@@ -42,7 +42,7 @@ enum class smMouseButton
     Reset
 };
 
-class smMouseButtonEvent : public smEvent
+class smMouseButtonEvent : public Event
 {
 public:
     static EventType EventName;
@@ -58,14 +58,14 @@ public:
 
     const bool &togglePressed();
 
-    void setWindowCoord(const smVec2d &coordinates);
+    void setWindowCoord(const core::Vec2d &coordinates);
 
-    const smVec2d &getWindowCoord();
+    const core::Vec2d &getWindowCoord();
 
 private:
     bool pressed; // If the button was pressed or released in this event
     smMouseButton mouseButton; // Which mouse button was pressed
-    smVec2d coord; // X,Y coorindate relative to left edge
+    core::Vec2d coord; // X,Y coorindate relative to left edge
 };
 
 } // Event namespace

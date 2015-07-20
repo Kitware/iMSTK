@@ -30,12 +30,12 @@
 #include "Core/ErrorLog.h"
 
 /// \brief Example simulator. This dummy simulator works on static scene objects for now.
-class smDummySimulator: public smObjectSimulator
+class smDummySimulator: public ObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smDummySimulator(std::shared_ptr<smErrorLog> p_errorLog);
+    smDummySimulator(std::shared_ptr<ErrorLog> p_errorLog);
     virtual ~smDummySimulator(){}
 
 protected:
@@ -54,7 +54,7 @@ protected:
     void syncBuffers() override;
 
     /// \brief catch events such as key presses and other user inputs
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 };
 
 #endif

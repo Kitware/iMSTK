@@ -122,7 +122,7 @@ void smOculusViewer::endFrame()
     // Oculus doesn't like it when you swap buffers
 }
 
-void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
+void smOculusViewer::renderToScreen(const RenderOperation &p_rop)
 {
     int i;
     ovrMatrix4f ovrProj;
@@ -140,8 +140,8 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
     //for each eye ...
     for (i = 0; i < 2; i++) {
         ovrEyeType eye = hmd->EyeRenderOrder[i];
-        smMatrix44f proj;
-        smMatrix44f view;
+        Matrix44f proj;
+        Matrix44f view;
         Eigen::Affine3f viewRotation;
         Eigen::Affine3f headTracking;
         Eigen::Affine3f playerHeight;
@@ -162,7 +162,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
         // OpenGL expects, so we have to transpose them.
         ovrProj = ovrMatrix4f_Projection(hmd->DefaultEyeFov[eye], 0.1, 500.0, 1);
         //copy the ovr matrix into a matrix and transpose it
-        proj = Eigen::Map<smMatrix44f>(&(ovrProj.M[0][0]));
+        proj = Eigen::Map<Matrix44f>(&(ovrProj.M[0][0]));
         proj.transposeInPlace();
 
         // -- view/camera transformation --
@@ -173,7 +173,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix
-        viewRotation = smQuaternionf(-pose[eye].Orientation.w,
+        viewRotation = Quaternionf(-pose[eye].Orientation.w,
             pose[eye].Orientation.x,
             pose[eye].Orientation.y,
             pose[eye].Orientation.z);
@@ -192,7 +192,7 @@ void smOculusViewer::renderToScreen(const smRenderOperation &p_rop)
         playerHeight = (Eigen::Translation3f(
             0, -ovrHmd_GetFloat(hmd, OVR_KEY_EYE_HEIGHT, 1.65), 0));
 
-        smMatrix44f trans = (viewRotation * headTracking * playerHeight).matrix();
+        Matrix44f trans = (viewRotation * headTracking * playerHeight).matrix();
         view = trans * view;
 
         //Render Scene

@@ -38,7 +38,7 @@ namespace Common {
 /// Shift + W = up, Shift + S = down
 /// To use this class, it must be registered with the event system.
 ///
-class wasdCameraController : public smCoreClass
+class wasdCameraController : public CoreClass
 {
 public:
     /// \brief Default constructor
@@ -50,10 +50,10 @@ public:
     /// \param cam Pointer to camera to be controlled
     wasdCameraController(std::shared_ptr<smCamera> cam);
 
-    /// \brief Event handling function from smCoreClass
+    /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
 
     /// \brief Set the camera to be controlled
     ///

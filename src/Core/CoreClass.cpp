@@ -27,88 +27,88 @@
 #include "RenderDelegate.h"
 
 std::shared_ptr<mstk::Event::smEventHandler>
-smCoreClass::eventHandler = std::make_shared<mstk::Event::smEventHandler>();
+CoreClass::eventHandler = std::make_shared<mstk::Event::smEventHandler>();
 
-smCoreClass::smCoreClass() :
+CoreClass::CoreClass() :
     name(""), listening(false)
 {
     drawOrder = core::ClassDrawOrder::BeforeObjects;
-    uniqueId = std::make_shared<smUnifiedId>();
-    renderDetail = std::make_shared<smRenderDetail>();
+    uniqueId = std::make_shared<UnifiedId>();
+    renderDetail = std::make_shared<RenderDetail>();
 }
 
-smCoreClass::smCoreClass(const std::string &_name) :
+CoreClass::CoreClass(const std::string &_name) :
     name(_name), listening(false)
 {
     drawOrder = core::ClassDrawOrder::BeforeObjects;
-    uniqueId = std::make_shared<smUnifiedId>();
-    renderDetail = std::make_shared<smRenderDetail>();
+    uniqueId = std::make_shared<UnifiedId>();
+    renderDetail = std::make_shared<RenderDetail>();
 }
 
-const core::ClassType &smCoreClass::getType() const
+const core::ClassType &CoreClass::getType() const
 {
     return type;
 }
 
-void smCoreClass::setType(const core::ClassType& newType)
+void CoreClass::setType(const core::ClassType& newType)
 {
     this->type = newType;
 }
 
-void smCoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
+void CoreClass::initSimulate( const smSimulationParam &/*p_params*/ )
 {
     std::cout << "Default initSimulate" << std::endl;
 }
 
-void smCoreClass::simulate( const smSimulationParam &/*p_params*/ )
+void CoreClass::simulate( const smSimulationParam &/*p_params*/ )
 {
     std::cout << "Default simulate" << std::endl;
 }
 
-void smCoreClass::print() const
+void CoreClass::print() const
 {
     std::cout << "Default print" << std::endl;
 }
 
-void smCoreClass::handleEvent(std::shared_ptr< mstk::Event::smEvent > event)
+void CoreClass::handleEvent(std::shared_ptr< mstk::Event::Event > event)
 {
     std::cout << "Default handleEvent" << std::endl;
     std::cout << "Sender " << int(event->getSender()) << std::endl;
     std::cout << "Priority " << int(event->getPriority()) << std::endl;
-    std::cout << "Type " << int(mstk::Event::smEvent::EventName) << std::endl;
+    std::cout << "Type " << int(mstk::Event::Event::EventName) << std::endl;
 }
 
-void smCoreClass::setName( const std::string &p_objectName )
+void CoreClass::setName( const std::string &p_objectName )
 {
     name = p_objectName;
 }
 
-const std::string &smCoreClass::getName() const
+const std::string &CoreClass::getName() const
 {
     return name;
 }
 
 /// \brief Get render delegate
-std::shared_ptr<smRenderDelegate> smCoreClass::getRenderDelegate() const
+std::shared_ptr<RenderDelegate> CoreClass::getRenderDelegate() const
 {
   return this->renderDelegate;
 }
 
 /// \brief Set the delegate used to render this instance
-void smCoreClass::setRenderDelegate(std::shared_ptr<smRenderDelegate> delegate)
+void CoreClass::setRenderDelegate(std::shared_ptr<RenderDelegate> delegate)
 {
   this->renderDelegate = delegate;
   if (this->renderDelegate)
     this->renderDelegate->setSourceGeometry(this);
 }
 
-void smCoreClass::initDraw()
+void CoreClass::initDraw()
 {
   if (this->renderDelegate)
     this->renderDelegate->initDraw();
 }
 
-void smCoreClass::draw() const
+void CoreClass::draw() const
 {
   if (this->renderDelegate)
     this->renderDelegate->draw();

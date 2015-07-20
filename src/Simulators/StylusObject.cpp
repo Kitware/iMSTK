@@ -22,22 +22,21 @@
 //---------------------------------------------------------------------------
 
 #include "StylusObject.h"
-#include "Core/CollisionModel.h"
 #include "Collision/SurfaceTree.h"
 #include "Collision/OctreeCell.h"
 #include "Mesh/Mesh.h"
 #include "Rendering/GLUtils.h"
 
-smStylusSceneObject::smStylusSceneObject(std::shared_ptr<smErrorLog>/*p_log*/) : smSceneObject()
+smStylusSceneObject::smStylusSceneObject(std::shared_ptr<ErrorLog>/*p_log*/) : SceneObject()
 {
     type = core::ClassType::StylusSceneObject;
     toolEnabled = true;
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createConcreteClass(
+      Factory<RenderDelegate>::createConcreteClass(
         "StylusRenderDelegate"));
 }
 
-smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*p_log*/)
+smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<ErrorLog>/*p_log*/)
 {
     type = core::ClassType::StylusRigidSceneObject;
     updateViewerMatrixEnabled = true;
@@ -47,7 +46,7 @@ smStylusRigidSceneObject::smStylusRigidSceneObject(std::shared_ptr<smErrorLog>/*
 }
 
 smStylusDeformableSceneObject::smStylusDeformableSceneObject(
-                                            std::shared_ptr<smErrorLog>/*p_log*/)
+                                            std::shared_ptr<ErrorLog>/*p_log*/)
                                             : smStylusSceneObject()
 {
     type = core::ClassType::StylusSeformableSceneObject;
@@ -84,13 +83,13 @@ smMeshContainer::smMeshContainer( std::string p_name )
     offsetRotX = 0.0;
     offsetRotY = 0.0;
     offsetRotZ = 0.0;
-    preOffsetPos = smVec3d::Zero();
-    posOffsetPos = smVec3d::Zero();
+    preOffsetPos = core::Vec3d::Zero();
+    posOffsetPos = core::Vec3d::Zero();
     mesh = NULL;
     colModel = NULL;
 }
 
-smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3d p_prePos, smVec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
+smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
 {
     offsetRotX = p_offsetRotX;
     offsetRotY = p_offsetRotY;
@@ -103,20 +102,21 @@ smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, smVec3
 
 void smMeshContainer::computeCurrentMatrix()
 {
+    double pipi = 6.28318530717959;
     Eigen::Affine3d preTranslate( Eigen::Translation3d( preOffsetPos[0], preOffsetPos[1], preOffsetPos[2] ) );
     Eigen::Affine3d posTranslate( Eigen::Translation3d( posOffsetPos[0], posOffsetPos[1], posOffsetPos[2] ) );
-    Eigen::Affine3d rx( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotX, smVec3d::UnitX() ) ) );
-    Eigen::Affine3d ry( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotY, smVec3d::UnitY() ) ) );
-    Eigen::Affine3d rz( Eigen::Affine3d( Eigen::AngleAxisd( SM_PI_TWO * offsetRotZ, smVec3d::UnitZ() ) ) );
+    Eigen::Affine3d rx( Eigen::Affine3d( Eigen::AngleAxisd( pipi * offsetRotX, core::Vec3d::UnitX() ) ) );
+    Eigen::Affine3d ry( Eigen::Affine3d( Eigen::AngleAxisd( pipi * offsetRotY, core::Vec3d::UnitY() ) ) );
+    Eigen::Affine3d rz( Eigen::Affine3d( Eigen::AngleAxisd( pipi * offsetRotZ, core::Vec3d::UnitZ() ) ) );
 
-    smMatrix44d transform = ( preTranslate * rx * ry * rz * posTranslate ).matrix();
+    Matrix44d transform = ( preTranslate * rx * ry * rz * posTranslate ).matrix();
     tempCurrentMatrix *= transform;
     tempCurrentDeviceMatrix *= transform;
 }
 
 smStylusPoints::smStylusPoints()
 {
-    point = smVec3d::Zero();
+    point = core::Vec3d::Zero();
     container = NULL;
 }
 
@@ -128,7 +128,7 @@ void smStylusSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 }
 
-void smStylusSceneObject::handleEvent(std::shared_ptr<mstk::Event::smEvent>/*p_event*/ ) {}
+void smStylusSceneObject::handleEvent(std::shared_ptr<mstk::Event::Event>/*p_event*/ ) {}
 void smStylusRigidSceneObject::posTraverseCallBack()
 {
 }
@@ -179,9 +179,9 @@ tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( 
     return meshes.insert( p_iterator, p_meshContainer );
 }
 
-void smStylusRigidSceneObject::handleEvent(std::shared_ptr<mstk::Event::smEvent>/*p_event*/ ) {}
+void smStylusRigidSceneObject::handleEvent(std::shared_ptr<mstk::Event::Event>/*p_event*/ ) {}
 
-std::shared_ptr<smSceneObject> smStylusRigidSceneObject::clone()
+std::shared_ptr<SceneObject> smStylusRigidSceneObject::clone()
 {
     // WARNING: What is the purpose of this function
     std::shared_ptr<smStylusRigidSceneObject> ret = std::make_shared<smStylusRigidSceneObject>();

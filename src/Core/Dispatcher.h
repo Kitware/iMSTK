@@ -31,30 +31,30 @@
 ///The dispacther class is responsible of taking care of the
 ///tasks that need to proppgated over the whole modules.For instance, adding a new
 ///phyiscs at run-time
-class smDispatcher: public smCoreClass
+class Dispatcher: public CoreClass
 {
 
 private:
     ///handle viewer events
     /// \param p_caller this is the caller class
     /// \param p_callerState it indicates the state of the called which is predefined at the smConfig.h
-    void  handleViewer(std::shared_ptr<smCoreClass> p_caller, core::CallerState p_callerState);
+    void  handleViewer(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState);
 
     ///handle simulator events
-    void  handleSimulator(std::shared_ptr<smCoreClass> p_caller, core::CallerState p_callerState);
+    void  handleSimulator(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState);
 
     ///handle collision detection events
-    void  handleCollisionDetection(std::shared_ptr<smCoreClass> p_caller, core::CallerState p_callerState);
+    void  handleCollisionDetection(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState);
 
     ///handle all events
     void  handleAll();
 
 public:
-    smDispatcher();
+    Dispatcher();
 
 public:
     ///handle all event and call corresponding events
-    core::ResultDispatcher handle(std::shared_ptr<smCoreClass> p_caller, core::CallerState p_callerState);
+    core::ResultDispatcher handle(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState);
 
 };
 

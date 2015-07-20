@@ -28,22 +28,22 @@
 // SimMedTK includes
 #include "Core/CollisionDetection.h"
 
-class smCollisionPair;
+class CollisionPair;
 
 ///
 /// @brief COllision detection based on BVH queries and
 ///     triangle-triangle intersection tests.
 ///
-class smMeshToMeshCollision : public smCollisionDetection
+class MeshToMeshCollision : public CollisionDetection
 {
 public:
-    smMeshToMeshCollision() {}
-    virtual ~smMeshToMeshCollision() {}
+    MeshToMeshCollision() {}
+    virtual ~MeshToMeshCollision() {}
 
-    smMeshToMeshCollision(const smMeshToMeshCollision &) = delete;
+    MeshToMeshCollision(const MeshToMeshCollision &) = delete;
 
 private:
-    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) override;
+    virtual void doComputeCollision(std::shared_ptr<CollisionPair> pairs) override;
 
 };
 

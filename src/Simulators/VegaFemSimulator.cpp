@@ -24,7 +24,7 @@
 // SimMedTK includes
 #include "VegaFemSimulator.h"
 
-smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<smErrorLog> p_errorLog ) : smObjectSimulator( p_errorLog )
+smVegaFemSimulator::smVegaFemSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
     hapticButtonPressed = false;
 }
@@ -80,7 +80,7 @@ void smVegaFemSimulator::syncBuffers()
 {
 }
 
-void smVegaFemSimulator::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event )
+void smVegaFemSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
 {
     if (!this->isListening())
     {

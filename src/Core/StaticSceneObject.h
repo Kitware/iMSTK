@@ -34,20 +34,20 @@
 
 namespace mstk{
 namespace Event{
-    class smEvent;
+    class Event;
 }
 }
 
 /// \brief static scene object
-class smStaticSceneObject: public smSceneObject
+class StaticSceneObject: public SceneObject
 {
 public:
 
     /// \brief constructor
-    smStaticSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+    StaticSceneObject(std::shared_ptr<ErrorLog> p_log = nullptr);
 
     /// \brief destructor
-    ~smStaticSceneObject();
+    ~StaticSceneObject();
 
     //not implemented yet..tansel
     virtual void serialize(void *p_memoryBlock) override;
@@ -56,7 +56,7 @@ public:
     virtual void unSerialize(void *p_memoryBlock) override;
 
     ///not implemented yet.
-    virtual std::shared_ptr<smSceneObject> clone() override;
+    virtual std::shared_ptr<SceneObject> clone() override;
 
     /// \brief Initialize the parameters and properties of the simulation object
     void initialize() override;
@@ -69,15 +69,15 @@ public:
 
     void printInfo() const override;
 
-    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent>) override {}
+    virtual void handleEvent(std::shared_ptr<mstk::Event::Event>) override {}
 
-    void setModel(std::shared_ptr<smModelRepresentation> model);
+    void setModel(std::shared_ptr<ModelRepresentation> model);
 
-    std::shared_ptr<smModelRepresentation> getModel();
+    std::shared_ptr<ModelRepresentation> getModel();
 
 public:
     /// \brief static scene object contains a mesh
-    std::shared_ptr<smModelRepresentation> staticModel;
+    std::shared_ptr<ModelRepresentation> staticModel;
 };
 
 #endif

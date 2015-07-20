@@ -54,28 +54,28 @@
 int main()
 {
     SIMMEDTK_REGISTER_RENDER_DELEGATES();
-    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<SDK> sdk;
     std::shared_ptr<smVegaFemSceneObject> femObject;
-    std::shared_ptr<smStaticSceneObject> staticObject;
+    std::shared_ptr<StaticSceneObject> staticObject;
     std::shared_ptr<smVegaFemSimulator> femSimulator;
     std::shared_ptr<smDummySimulator> staticSimulator;
-    std::shared_ptr<smPlaneCollisionModel> plane;
+    std::shared_ptr<PlaneCollisionModel> plane;
     std::shared_ptr<smViewer> viewer;
-    std::shared_ptr<smScene> scene;
-    std::shared_ptr<smLight> light;
+    std::shared_ptr<Scene> scene;
+    std::shared_ptr<Light> light;
     std::shared_ptr<smCamera> sceneCamera;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
     std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
     //std::shared_ptr<mstk::Examples::Common::hapticController> hapticCtl;
-    smMatrix33d mat;
+    Matrix33d mat;
 
     //-------------------------------------------------------
     // 1. Create an instance of the SoFMIS framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
-    sdk = smSDK::createStandardSDK();
+    sdk = SDK::createStandardSDK();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
@@ -89,13 +89,13 @@ int main()
         sdk->getErrorLog(),
         "asianDragon/asianDragon.config");
 
-    auto femObjRenderDetail = std::make_shared<smRenderDetail>(
+    auto femObjRenderDetail = std::make_shared<RenderDetail>(
                                                                //SIMMEDTK_RENDER_WIREFRAME
                                                                //| SIMMEDTK_RENDER_VERTICES
                                                                 SIMMEDTK_RENDER_FACES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
-    smColor maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
+    Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
     femObjRenderDetail->setVertexColor(maroon);
     femObjRenderDetail->setNormalLength(0.02);
 
@@ -114,10 +114,10 @@ int main()
     staticSimulator = std::make_shared<smDummySimulator>(sdk->getErrorLog());
 
     // create a static plane scene object of given normal and position
-    staticObject = std::make_shared<smStaticSceneObject>();
+    staticObject = std::make_shared<StaticSceneObject>();
 
-    plane = std::make_shared<smPlaneCollisionModel>(smVec3d(0.0, -3.0, 0.0),
-                                                    smVec3d(0.0, 1.0, 0.0));
+    plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, -3.0, 0.0),
+                                                    core::Vec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -133,24 +133,24 @@ int main()
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    auto meshModel = std::make_shared<smMeshCollisionModel>();
+    auto meshModel = std::make_shared<MeshCollisionModel>();
 
     meshModel->setMesh(femObject->getPrimarySurfaceMesh());
 
-    auto planeMeshCollisionPairs = std::make_shared<smCollisionPair>();
+    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
     planeMeshCollisionPairs->setModels(meshModel, plane);
 
     sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    auto planeToMeshCollisionDetection = std::make_shared<smPlaneToMeshCollision>();
+    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
     sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
-    auto planeToMeshContact = std::make_shared<smPenaltyContactFemToStatic>(false);
+    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
 
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
@@ -174,7 +174,7 @@ int main()
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
-    light = smLight::getDefaultLighting();
+    light = Light::getDefaultLighting();
     scene->addLight(light);
 
     // Camera setup

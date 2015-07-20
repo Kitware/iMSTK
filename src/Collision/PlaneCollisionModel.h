@@ -24,19 +24,14 @@
 #ifndef SMPLANECOLLISIONMODEL_H
 #define SMPLANECOLLISIONMODEL_H
 
-#include <memory>
-
-// Eigen include
-#include<Eigen/Geometry>
-
 #include "Geometry/PlaneModel.h"
 
-class smPlaneCollisionModel : public smPlaneModel
+class PlaneCollisionModel : public smPlaneModel
 {
 public:
-    smPlaneCollisionModel(const smVec3d &p, const smVec3d &n);
+    PlaneCollisionModel(const core::Vec3d &p, const core::Vec3d &n);
 
-    ~smPlaneCollisionModel();
+    ~PlaneCollisionModel();
 
 
 };

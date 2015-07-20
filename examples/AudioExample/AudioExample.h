@@ -27,7 +27,7 @@
 #include "Core/SDK.h"
 #include "Devices/Audio.h"
 
-class AudioKeyboardController : public smCoreClass
+class AudioKeyboardController : public CoreClass
 {
 public:
     /// \brief Default constructor
@@ -39,10 +39,10 @@ public:
     /// \param a Pointer to sound to be controlled
     AudioKeyboardController(std::shared_ptr<smAudio> a);
 
-    /// \brief Event handling function from smCoreClass
+    /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
 
     /// \brief Set the sound to be controlled
     ///

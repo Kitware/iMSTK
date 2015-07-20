@@ -38,7 +38,7 @@
 ///simply set number of worker threads in the constructor
 ///then each worker threads should call waitTaskStart function when the taks
 ///is completed they should call signalTaskDone
-class smSynchronization: public smCoreClass
+class Synchronization: public CoreClass
 {
 
     std::condition_variable taskDone;
@@ -53,7 +53,7 @@ class smSynchronization: public smCoreClass
 public:
 
     /// \param p_threadsForWorkers  choose the number of worker threads
-    smSynchronization(int p_threadsForWorkers)
+    Synchronization(int p_threadsForWorkers)
     {
         type =   core::ClassType::Synchronization;
         totalWorkers = p_threadsForWorkers;
@@ -126,8 +126,8 @@ public:
     void startTasksandSignalEvent(int moduleId)
     {
 
-        smEvent *eventSynch;
-        eventSynch = new smEvent();
+        Event *eventSynch;
+        eventSynch = new Event();
         eventSynch->eventType = SIMMEDTK_EVENTTYPE_SYNCH;
         eventSynch->senderId = moduleId;
         eventSynch->senderType = SIMMEDTK_SENDERTYPE_EVENTSOURCE;

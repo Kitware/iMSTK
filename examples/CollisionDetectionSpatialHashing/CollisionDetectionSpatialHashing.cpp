@@ -36,7 +36,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     moveObj = 9;
 
     // Create the sdk
-    sdk = smSDK::getInstance();
+    sdk = SDK::getInstance();
 
     // Create scene
     scene = sdk->createScene();
@@ -48,7 +48,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     sdk->addViewer(viewer);
 
     // Intializes the spatial spatialHashinging
-    spatialHashing = std::make_shared<smSpatialHashCollision>(10000, 2, 2, 2);
+    spatialHashing = std::make_shared<SpatialHashCollision>(10000, 2, 2, 2);
 
     //Create the camera controller
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
@@ -69,7 +69,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     smTextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
         // Create collision models
-    std::shared_ptr<smMeshCollisionModel> collisionModelA = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
     collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
     collisionModelA->getMesh()->assignTexture("livertexture1");
     collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
@@ -77,16 +77,16 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
     collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
 
-    std::shared_ptr<smMeshCollisionModel> collisionModelB = std::make_shared<smMeshCollisionModel>();
+    std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
     collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
     collisionModelB->getMesh()->assignTexture("livertexture2");
-    collisionModelB->getMesh()->translate(smVec3d(2, 0, 0));
+    collisionModelB->getMesh()->translate(core::Vec3d(2, 0, 0));
     collisionModelB->getMesh()->assignTexture("livertexture2");
     collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
     collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Create a static scene
-    modelA = std::make_shared<smStaticSceneObject>();
+    modelA = std::make_shared<StaticSceneObject>();
     modelA->setModel(collisionModelA);
     sdk->registerSceneObject(modelA);
     sdk->registerMesh(collisionModelA->getMesh());
@@ -96,7 +96,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     spatialHashing->addMesh(collisionModelA->getMesh());
 
     // Initialize the scecond object
-    modelB = std::make_shared<smStaticSceneObject>();
+    modelB = std::make_shared<StaticSceneObject>();
     sdk->registerSceneObject(modelB);
     sdk->registerMesh(collisionModelB->getMesh());
 
@@ -107,7 +107,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     scene->addSceneObject(modelB);
 
     // Setup Scene lighting
-    auto light = smLight::getDefaultLighting();
+    auto light = Light::getDefaultLighting();
     assert(light);
     scene->addLight(light);
 
@@ -123,7 +123,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     simulator->registerCollisionDetection(spatialHashing);
 
     // Create dummy collision pair
-    std::shared_ptr<smCollisionPair> collisionPair = std::make_shared<smCollisionPair>();
+    std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
     collisionPair->setModels(collisionModelA,collisionModelB);
     simulator->addCollisionPair(collisionPair);
 
@@ -137,7 +137,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
 }
 
-void CollisionDetectionSpatialHashing::simulateMain(const smSimulationMainParam &/*p_param*/)
+void CollisionDetectionSpatialHashing::simulateMain(const SimulationMainParam &/*p_param*/)
 {
     if ((10 > moveObj) && (moveObj > 0))
     {

@@ -38,19 +38,19 @@
 
 /// A 2x2 matrix
 template<typename T>
-using smMatrix22 = Eigen::Matrix<T, 2, 2>;
+using Matrix22 = Eigen::Matrix<T, 2, 2>;
 
 /// A 3x3 matrix
 template<typename T>
-using smMatrix33 = Eigen::Matrix<T, 3, 3>;
+using Matrix33 = Eigen::Matrix<T, 3, 3>;
 
 /// A 4x4 matrix
 template<typename T>
-using smMatrix44 = Eigen::Matrix<T, 4, 4>;
+using Matrix44 = Eigen::Matrix<T, 4, 4>;
 
 /// A 4x4 matrix
 template<typename T>
-using smMatrix66 = Eigen::Matrix<T, 6, 6>;
+using Matrix66 = Eigen::Matrix<T, 6, 6>;
 
 /// A dynamic size diagonal matrix
 template<typename T>
@@ -58,32 +58,32 @@ using smDiagonalMatrix = Eigen::DiagonalMatrix<T, Eigen::Dynamic>;
 
 /// A dynamic size dense matrix
 template<typename T>
-using smMatrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 
 /// A dynamic size sparse column-major matrix
-template<typename T, int StorageType = Eigen::ColMajor>
-using smSparseMatrix = Eigen::SparseMatrix<T,StorageType>;
+// template<typename T, int StorageType = Eigen::ColMajor>
+// using SparseMatrix = Eigen::SparseMatrix<T,StorageType>;
 
 /// A 2x2 matrix of floats.
-using smMatrix22f = smMatrix22<float>;
+using Matrix22f = Matrix22<float>;
 
 /// A 3x3 matrix of floats.
-using smMatrix33f = smMatrix33<float>;
+using Matrix33f = Matrix33<float>;
 
 /// A 4x4 matrix of floats.
-using smMatrix44f = smMatrix44<float>;
+using Matrix44f = Matrix44<float>;
 
 /// A 2x2 matrix of doubles.
-using smMatrix22d = smMatrix22<double>;
+using Matrix22d = Matrix22<double>;
 
 /// A 3x3 matrix of doubles.
-using smMatrix33d = smMatrix33<double>;
+using Matrix33d = Matrix33<double>;
 
 /// A 4x4 matrix of doubles.
-using smMatrix44d = smMatrix44<double>;
+using Matrix44d = Matrix44<double>;
 
 /// A 6x6 matrix of doubles.
-using smMatrix66d = smMatrix66<double>;
+using Matrix66d = Matrix66<double>;
 
 /// A dynamic size diagonal matrix of floats
 using smDiagonalMatrixf = smDiagonalMatrix<float>;
@@ -92,26 +92,26 @@ using smDiagonalMatrixf = smDiagonalMatrix<float>;
 using smDiagonalMatrixd = smDiagonalMatrix<double>;
 
 /// A dynamic size matrix of floats
-using smMatrixf = smMatrix<float>;
+using Matrixf = Matrix<float>;
 
 /// A dynamic size matrix of doubles
-using smMatrixd = smMatrix<double>;
+using Matrixd = Matrix<double>;
 
-template<typename T, int StorageType>
-void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)
-{
-    A.setFromTriplets(triplets.begin(),triplets.end());
-}
-
-template<typename T, int StorageType, int opt>
-void solveSparseSystemCholesky(const Eigen::SparseMatrix<T,StorageType> &A,
-                               const Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &b,
-                               Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &x)
-{
-    // Solving:
-    Eigen::SimplicialCholesky<Eigen::SparseMatrix<T,StorageType>> solver(A);  // performs a Cholesky factorization of A
-    x = solver.solve(b);         // use the factorization to solve for the given right hand side
-}
+// template<typename T, int StorageType>
+// void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)
+// {
+//     A.setFromTriplets(triplets.begin(),triplets.end());
+// }
+//
+// template<typename T, int StorageType, int opt>
+// void solveSparseSystemCholesky(const Eigen::SparseMatrix<T,StorageType> &A,
+//                                const Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &b,
+//                                Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &x)
+// {
+//     // Solving:
+//     Eigen::SimplicialCholesky<Eigen::SparseMatrix<T,StorageType>> solver(A);  // performs a Cholesky factorization of A
+//     x = solver.solve(b);         // use the factorization to solve for the given right hand side
+// }
 
 // WARNING: The input matrix A should be in a compressed and column-major form. Otherwise an expensive copy will be made.
 // template<typename T, int StorageType, int opt>

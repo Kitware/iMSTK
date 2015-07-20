@@ -4,7 +4,7 @@
 
 /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
 ///  vertices interacted with, ground plane etc.
-class smSceneObjectDeformableRenderDelegate : public smRenderDelegate
+class smSceneObjectDeformableRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
@@ -28,6 +28,6 @@ void smSceneObjectDeformableRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_scene_object_deformable_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smSceneObjectDeformableRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smSceneObjectDeformableRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

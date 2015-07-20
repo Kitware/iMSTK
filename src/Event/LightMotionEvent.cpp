@@ -30,22 +30,22 @@ EventType smLightMotionEvent::EventName = EventType::LightMotion;
 
 smLightMotionEvent::smLightMotionEvent(const int& lightIndex): index(lightIndex)
 {
-    position = smVec3d::Zero();
-    direction = smVec3d::Zero();
+    position = core::Vec3d::Zero();
+    direction = core::Vec3d::Zero();
 }
-void smLightMotionEvent::setPosition(const smVec3d& lightPosition)
+void smLightMotionEvent::setPosition(const core::Vec3d& lightPosition)
 {
     this->position = lightPosition;
 }
-const smVec3d& smLightMotionEvent::getPosition()
+const core::Vec3d& smLightMotionEvent::getPosition()
 {
     return this->position;
 }
-void smLightMotionEvent::setDirection(const smVec3d& lightDirection)
+void smLightMotionEvent::setDirection(const core::Vec3d& lightDirection)
 {
     this->direction = lightDirection;
 }
-const smVec3d& smLightMotionEvent::getDirection()
+const core::Vec3d& smLightMotionEvent::getDirection()
 {
     return this->direction;
 }

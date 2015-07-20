@@ -34,14 +34,14 @@ KeyPressSDKShutdown::KeyPressSDKShutdown() : key(mstk::Event::smKey::Escape)
 {
 }
 
-void KeyPressSDKShutdown::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void KeyPressSDKShutdown::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
         if (keyboardEvent->getKeyPressed() == this->key)
         {
-            smSDK::getInstance()->shutDown();
+            SDK::getInstance()->shutDown();
         }
     }
 }

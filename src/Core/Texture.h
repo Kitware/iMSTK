@@ -41,7 +41,7 @@ enum ImageColorType
     SIMMEDTK_IMAGECOLOR_DEPTH
 };
 /// \brief texture structure
-struct smTexture
+struct Texture
 {
     /// \brief texture file name
     std::string textureFileName;
@@ -60,9 +60,9 @@ struct smTexture
     /// \brief true when initilized
     bool isInitialized;
     /// \brief to make a copy of the texture.
-    inline smTexture *copy()
+    inline Texture *copy()
     {
-        smTexture *myCopy = new smTexture();
+        Texture *myCopy = new Texture();
         myCopy->textureFileName = this->textureFileName;
         myCopy->textureGLId = this->textureGLId;
         myCopy->width = this->width;

@@ -47,24 +47,24 @@ using namespace std;
 void main()
 {
     smPhantomInterface * hapticInterface;
-    smSDK* simmedtkSDK;
-    smScene *scene1;
+    SDK* simmedtkSDK;
+    Scene *scene1;
     smViewer *viewer;
-    smSimulator *simulator;
+    Simulator *simulator;
 
     ///create lights
-    smLight light("Light0", SIMMEDTK_LIGHT_INFINITELIGHT, SIMMEDTK_LIGHTPOS_EYE);
+    Light light("Light0", InfiniteLight, Eye);
     light.lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
     light.lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light.lightColorSpecular.setValue(0.9, 0.0, 0.0, 1);
     light.spotCutOffAngle = 180.0;
 
     light.lightPos.pos.setValue(0, 2.0, 0);
-    light.direction = smVec3d(0.0, 0.0, 1.0);
+    light.direction = core::Vec3d(0.0, 0.0, 1.0);
     light.drawEnabled = true;
 
 
-    smLight light2("Light1", SIMMEDTK_LIGHT_SPOTLIGHT, SIMMEDTK_LIGHTPOS_WORLD);
+    Light light2("Light1", Spotlight, World);
     light2.lightColorDiffuse.setValue(0.4, 0.4, 0.4, 1);
     light2.lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light2.lightColorSpecular.setValue(0.1, 0.1, 0.1, 1);
@@ -77,7 +77,7 @@ void main()
     light2.castShadow = true;
 
     ///Creat the SDK. SDK is a singleton object.
-    simmedtkSDK = smSDK::createSDK();
+    simmedtkSDK = SDK::createSDK();
     scene1 = simmedtkSDK->createScene();
     scene1->setName("Scene1");
 
@@ -98,7 +98,7 @@ void main()
     metalShader->registerShader();
 
     ///tools are maniuplated with smToolSimulator
-    smToolSimulator *toolSim = new smToolSimulator(smSDK::getErrorLog());
+    smToolSimulator *toolSim = new smToolSimulator(SDK::getErrorLog());
 
     ///curved grasper requires device ID and models for pivot, upper and lower mesh
     curvedGrasper *curvedTool;
@@ -120,8 +120,8 @@ void main()
     curvedTool->mesh_lowerJawgetRenderDetail()->shininess = 5.0;
     curvedTool->mesh_upperJawgetRenderDetail()->shininess = 5.0;
     curvedTool->mesh_pivotgetRenderDetail()->shininess = 5.0;
-    curvedTool->mesh_lowerJaw->scale(smVec3d(1.0, 1.0, 1.5));
-    curvedTool->mesh_upperJaw->scale(smVec3d(1.0, 1.0, 1.5));
+    curvedTool->mesh_lowerJaw->scale(core::Vec3d(1.0, 1.0, 1.5));
+    curvedTool->mesh_upperJaw->scale(core::Vec3d(1.0, 1.0, 1.5));
 
     ///Each mesh is attached with proper shader texture bindings
     metalShader->attachMesh(curvedTool->mesh_lowerJaw, "bump", "metal", "specTex", "specTex", "specTex");

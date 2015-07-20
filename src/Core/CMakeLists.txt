@@ -15,7 +15,6 @@ simmedtk_add_library(Core
     Geometry.cpp
     IOStream.cpp
     Light.cpp
-    Math.cpp
     Module.cpp
     ObjectSimulator.cpp
     RenderDetail.cpp
@@ -25,7 +24,6 @@ simmedtk_add_library(Core
     Simulator.cpp
     StaticSceneObject.cpp
     Timer.cpp
-    Pipe.cpp
     UnifiedId.cpp
     ViewerBase.cpp
   PUBLIC_HEADERS
@@ -38,7 +36,6 @@ simmedtk_add_library(Core
     CoreClass.h
     Dispatcher.h
     DisplayText.h
-    Pipe.h
     ErrorLog.h
     EventData.h
     Event.h
@@ -50,7 +47,6 @@ simmedtk_add_library(Core
     MemoryBlock.h
     Module.h
     ObjectSimulator.h
-    Pipe.h
     Scene.h
     SceneObject.h
     Scheduler.h

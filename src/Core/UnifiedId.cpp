@@ -23,16 +23,16 @@
 
 #include "UnifiedId.h"
 
-std::atomic_int smUnifiedId::IDcounter;
-smUnifiedId::smUnifiedId()
+std::atomic_int UnifiedId::IDcounter;
+UnifiedId::UnifiedId()
 {
     ID = IDcounter.fetch_add(1);
 }
-bool smUnifiedId::operator==(const smUnifiedId* id)
+bool UnifiedId::operator==(const UnifiedId* id)
 {
     return (ID == id->getId());
 }
-bool smUnifiedId::operator!=(const short int& id)
+bool UnifiedId::operator!=(const short int& id)
 {
     return (ID != id);
 }

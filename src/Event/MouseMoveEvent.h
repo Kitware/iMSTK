@@ -31,18 +31,18 @@
 namespace mstk {
 namespace Event {
 
-class smMouseMoveEvent : public smEvent
+class smMouseMoveEvent : public Event
 {
 public:
     static EventType EventName;
 
 public:
-    void setWindowCoord(const smVec2d &coordinates);
+    void setWindowCoord(const core::Vec2d &coordinates);
 
-    const smVec2d &getWindowCoord();
+    const core::Vec2d &getWindowCoord();
 
 private:
-    smVec2d coord; // X,Y coorindate relative to left edge
+    core::Vec2d coord; // X,Y coorindate relative to left edge
 };
 
 } // Event namespace

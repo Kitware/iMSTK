@@ -3,7 +3,7 @@
 #include "Core/Factory.h"
 #include "Mesh/Mesh.h"
 
-class smMeshRenderDelegate : public smRenderDelegate
+class smMeshRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
@@ -38,6 +38,6 @@ bool smMeshRenderDelegate::isTargetTextured() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smMeshRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smMeshRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

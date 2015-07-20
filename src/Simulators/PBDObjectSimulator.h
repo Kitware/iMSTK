@@ -28,17 +28,17 @@
 #include "Core/ObjectSimulator.h"
 #include "Core/EventHandler.h"
 
-class smErrorLog;
+class ErrorLog;
 class smPBDSurfaceSceneObject;
-class smEvent;
+class Event;
 
 /// \brief Example Position based dynamics (PBD) simulator
-class smPBDObjectSimulator: public smObjectSimulator
+class smPBDObjectSimulator: public ObjectSimulator
 {
 
 public:
     /// \brief constructor
-    smPBDObjectSimulator(std::shared_ptr<smErrorLog> p_errorLog);
+    smPBDObjectSimulator(std::shared_ptr<ErrorLog> p_errorLog);
 
 protected:
     /// \brief initialize the PBD object
@@ -53,7 +53,7 @@ protected:
     void syncBuffers() override;
 
     /// \brief handle key presses and other user events
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
     /// \brief render the PBD objects
     void draw() override;

@@ -91,7 +91,7 @@ void smGLUtils::fadeBackgroundDraw()
     glPopAttrib();
 }
 
-void smGLUtils::drawQuadOnScreen(smColor p_color, float p_left,
+void smGLUtils::drawQuadOnScreen(Color p_color, float p_left,
                                  float p_bottom, float p_right,
                                  float p_top)
 {
@@ -139,11 +139,11 @@ void smGLUtils::drawUnitQuadOnScreen()
     glVertex3d(-1, 1.0, -1);
     glEnd();
 }
-void smGLUtils::queryProjectionMatrix(smMatrix44f& p_matrix)
+void smGLUtils::queryProjectionMatrix(Matrix44f& p_matrix)
 {
     glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
 }
-void smGLUtils::queryModelViewMatrix(smMatrix44f& p_matrix)
+void smGLUtils::queryModelViewMatrix(Matrix44f& p_matrix)
 {
     glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
 }

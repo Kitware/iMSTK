@@ -34,7 +34,7 @@
 struct smGroundRenderInfo;
 
 /// \brief opengl rendering utilities are here.
-class smGLUtils : public smCoreClass
+class smGLUtils : public CoreClass
 {
 public:
     // OpenGL 3.0 adds the concept of indexed strings and
@@ -64,7 +64,7 @@ public:
     static void fadeBackgroundDraw();
 
     /// \brief draw quad on screen with color and left, botton, right, top positions
-    static void drawQuadOnScreen(smColor p_color,
+    static void drawQuadOnScreen(Color p_color,
                                  float p_left,
                                  float p_bottom,
                                  float p_right,
@@ -73,9 +73,9 @@ public:
     /// \brief draw unit quad
     static void drawUnitQuadOnScreen();
 
-    static void queryProjectionMatrix(smMatrix44f &p_matrix);
+    static void queryProjectionMatrix(Matrix44f &p_matrix);
     /// \brief to query current model view matrix. p_matrix will have the final values.
-    static void queryModelViewMatrix(smMatrix44f &p_matrix);
+    static void queryModelViewMatrix(Matrix44f &p_matrix);
 
 private:
     std::vector<std::string> openGLExtensions;

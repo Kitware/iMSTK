@@ -28,14 +28,14 @@
 #include "DataStructures.h"
 #include "External/tree.hh"
 
-smRenderOperation::smRenderOperation()
+RenderOperation::RenderOperation()
 {
     fbo = nullptr;
     scene = nullptr;
     fboName = "";
 }
 
-smViewerBase::smViewerBase()
+ViewerBase::ViewerBase()
 {
     type = core::ClassType::Viewer;
     viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
@@ -55,19 +55,19 @@ smViewerBase::smViewerBase()
 }
 
 ///affects the framebuffer size and depth buffer size
-void smViewerBase::setScreenResolution(int p_width, int p_height)
+void ViewerBase::setScreenResolution(int p_width, int p_height)
 {
     this->screenResolutionHeight = p_height;
     this->screenResolutionWidth = p_width;
 }
 
-void smViewerBase::setUnlimitedFPS(bool p_enableFPS)
+void ViewerBase::setUnlimitedFPS(bool p_enableFPS)
 {
     unlimitedFPSEnabled = p_enableFPS;
     unlimitedFPSVariableChanged++;
 }
 
-void smViewerBase::initObjects()
+void ViewerBase::initObjects()
 {
     for (size_t i = 0; i < objectList.size(); i++)
     {
@@ -82,12 +82,12 @@ void smViewerBase::initObjects()
     }
 }
 
-void smViewerBase::initScenes()
+void ViewerBase::initScenes()
 {
     //traverse all the scene and the objects in the scene
     for(auto&& scene : sceneList)
     {
-        smSceneLocal sceneLocal;
+        SceneLocal sceneLocal;
 
         scene->initLights();
         scene->copySceneToLocal(sceneLocal);
@@ -105,7 +105,7 @@ void smViewerBase::initScenes()
 }
 
 ///initialization of the viewer module
-void smViewerBase::init()
+void ViewerBase::init()
 {
     if (isInitialized)
     {
@@ -121,12 +121,12 @@ void smViewerBase::init()
     isInitialized = true;
 }
 
-void smViewerBase::addFBO(const std::string &p_fboName,
-                      smTexture *p_colorTex,
-                      smTexture *p_depthTex,
+void ViewerBase::addFBO(const std::string &p_fboName,
+                      Texture *p_colorTex,
+                      Texture *p_depthTex,
                       unsigned int p_width, unsigned int p_height)
 {
-    smFboListItem item;
+    FboListItem item;
 
     item.fboName = p_fboName;
     item.width = p_width;
@@ -143,7 +143,7 @@ void smViewerBase::addFBO(const std::string &p_fboName,
     this->fboListItems.push_back(item);
 }
 
-void smViewerBase::processRenderOperation(const smRenderOperation &p_rop)
+void ViewerBase::processRenderOperation(const RenderOperation &p_rop)
 {
     switch (p_rop.target)
     {
@@ -158,11 +158,11 @@ void smViewerBase::processRenderOperation(const smRenderOperation &p_rop)
     }
 }
 
-void smViewerBase::registerScene(std::shared_ptr<smScene> p_scene,
+void ViewerBase::registerScene(std::shared_ptr<Scene> p_scene,
                              smRenderTargetType p_target,
                              const std::string &p_fboName)
 {
-    smRenderOperation rop;
+    RenderOperation rop;
 
     //sanity checks
     assert(p_scene);
@@ -179,7 +179,7 @@ void smViewerBase::registerScene(std::shared_ptr<smScene> p_scene,
     renderOperations.push_back(rop);
 }
 
-inline void smViewerBase::adjustFPS()
+inline void ViewerBase::adjustFPS()
 {
 
     static int _unlimitedFPSVariableChanged = 0;
@@ -202,7 +202,7 @@ inline void smViewerBase::adjustFPS()
 }
 
 ///main drawing routine for Rendering of all objects in the scene
-void smViewerBase::render()
+void ViewerBase::render()
 {
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
     {
@@ -213,7 +213,7 @@ void smViewerBase::render()
 
     adjustFPS();
 
-    smRenderDelegate::Ptr delegate;
+    RenderDelegate::Ptr delegate;
     for (size_t i = 0; i < objectList.size(); i++)
     {
         delegate = objectList[i]->getRenderDelegate();
@@ -236,19 +236,19 @@ void smViewerBase::render()
     endModule();
 }
 
-void smViewerBase::addObject(std::shared_ptr<smCoreClass> object)
+void ViewerBase::addObject(std::shared_ptr<CoreClass> object)
 {
 
-    smSDK::getInstance()->addRef(object);
+    SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void smViewerBase::setWindowTitle(const std::string &str)
+void ViewerBase::setWindowTitle(const std::string &str)
 {
     windowTitle = str;
 }
 
-void smViewerBase::exec()
+void ViewerBase::exec()
 {
     // Init the viewer
     this->init();
@@ -259,28 +259,28 @@ void smViewerBase::exec()
     cleanUp();
 }
 
-void smViewerBase::cleanUp()
+void ViewerBase::cleanUp()
 {
     //Must be set when all cleanup is done
     terminationCompleted = true;
 }
 
-int smViewerBase::height(void)
+int ViewerBase::height(void)
 {
     return screenResolutionHeight;
 }
 
-int smViewerBase::width(void)
+int ViewerBase::width(void)
 {
     return screenResolutionWidth;
 }
 
-float smViewerBase::aspectRatio(void)
+float ViewerBase::aspectRatio(void)
 {
     return screenResolutionHeight / screenResolutionWidth;
 }
 
-void smViewerBase::setGlobalAxisLength(const float len)
+void ViewerBase::setGlobalAxisLength(const float len)
 {
     this->globalAxisLength = len;
 }

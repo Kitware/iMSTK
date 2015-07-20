@@ -32,17 +32,17 @@
 
 int main()
 {
-    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<SDK> sdk;
     std::shared_ptr<smViewer> viewer;
-    std::shared_ptr<smScene> scene1, scene2;
-    std::shared_ptr<smLight> light1, light2;
+    std::shared_ptr<Scene> scene1, scene2;
+    std::shared_ptr<Light> light1, light2;
     std::shared_ptr<smCamera> sceneCamera1, sceneCamera2;
-    std::shared_ptr<smStaticSceneObject> cube, square;
+    std::shared_ptr<StaticSceneObject> cube, square;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
 
     //Create an instance of the SimMedTK framework/SDK
-    sdk = smSDK::getInstance();
+    sdk = SDK::getInstance();
 
     //Create the scenes
     scene1 = sdk->createScene(); //internal scene containing cube
@@ -59,10 +59,10 @@ int main()
     auto cubeModel = std::make_shared<smMeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     cubeModel->setRenderDetail(renderDetail);
 
-    cube = std::make_shared<smStaticSceneObject>();
+    cube = std::make_shared<StaticSceneObject>();
     cube->setModel(cubeModel);
 
     //Add the cube to the scene to be rendered
@@ -76,10 +76,10 @@ int main()
     std::shared_ptr<smMeshModel> squareModel = std::make_shared<smMeshModel>();
     squareModel->load("models/square.obj", SM_FILETYPE_OBJ);
     squareModel->getMesh()->assignTexture("colorTex1");
-    renderDetail= std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     squareModel->setRenderDetail(renderDetail);
 
-    square = std::make_shared<smStaticSceneObject>();
+    square = std::make_shared<StaticSceneObject>();
     square->setModel(squareModel);
 
     //Setup an FBO for rendering in the viewer.
@@ -106,13 +106,13 @@ int main()
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     // Setup Scene lighting
-    light1 = smLight::getDefaultLighting();
+    light1 = Light::getDefaultLighting();
     assert(light1);
     scene1->addLight(light1);
 
-    light2 = smLight::getDefaultLighting();
+    light2 = Light::getDefaultLighting();
     assert(light2);
-    light2->lightPos.setPosition(smVec3d(0.0, 0.0, 5.0));
+    light2->lightPos.setPosition(core::Vec3d(0.0, 0.0, 5.0));
     scene2->addLight(light2);
 
     // Camera setup

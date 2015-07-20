@@ -28,19 +28,19 @@
 #include "Light.h"
 #include "Quaternion.h"
 
-smVec3d smLight::defaultDir(0, 0, -1.0);
-smVec3d smLight::defaultUpDir(0, 1, 0.0);
-smVec3d smLight::defaultTransDir(1, 0, 0.0);
+core::Vec3d Light::defaultDir(0, 0, -1.0);
+core::Vec3d Light::defaultUpDir(0, 1, 0.0);
+core::Vec3d Light::defaultTransDir(1, 0, 0.0);
 
-void smLight::updateDirection()
+void Light::updateDirection()
 {
     double angle;
-    smVec3d dirNorm = direction.normalized();
+    core::Vec3d dirNorm = direction.normalized();
 
     angle = std::acos(dirNorm.dot(defaultDir));
-    smVec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
+    core::Vec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
 
-    smQuaterniond rot = getRotationQuaternion(-angle,axisOfRot);
+    Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
@@ -51,14 +51,14 @@ smLightPos::smLightPos( float p_x, float p_y, float p_z, float /*p_w*/ )
     position << p_x, p_y, p_z;
 }
 
-smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationType p_lightLocation )
+Light::Light( std::string p_name, LightType p_lightType, LightLocationType p_lightLocation )
 {
     name = p_name;
     enabled = false;
     previousState = false;
-    lightPos.setPosition(smVec3d::Zero());
+    lightPos.setPosition(core::Vec3d::Zero());
 
-    if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
+    if ( p_lightType == InfiniteLight )
     {
         lightPos.w = 0.0;
     }
@@ -90,9 +90,9 @@ smLight::smLight( std::string p_name, smLightType p_lightType, smLightLocationTy
     attn_linear = 0.0;
     attn_quadratic = 0.0;
 }
-void smLight::setType( smLightType p_lightType )
+void Light::setType( LightType p_lightType )
 {
-    if ( p_lightType == SIMMEDTK_LIGHT_INFINITELIGHT )
+    if ( p_lightType == InfiniteLight )
     {
         lightPos.w = 0.0;
     }
@@ -101,11 +101,11 @@ void smLight::setType( smLightType p_lightType )
         lightPos.w = 1.0;
     }
 }
-bool smLight::isEnabled()
+bool Light::isEnabled()
 {
     return enabled;
 }
-void smLight::activate( bool p_state )
+void Light::activate( bool p_state )
 {
     enabled = p_state;
     previousState = enabled;

@@ -36,16 +36,16 @@
 #include "EventHandler.h"
 #include "Rendering/ConfigRendering.h"
 
-class smSDK;
-class smCoreClass;
-class smRenderDelegate;
-class smObjectSimulator;
+class SDK;
+class CoreClass;
+class RenderDelegate;
+class ObjectSimulator;
 class smViewer;
 
 /// \brief simulator calls object and sends this structure
 struct smSimulationParam
 {
-    std::shared_ptr<smObjectSimulator> objectSimulator;
+    std::shared_ptr<ObjectSimulator> objectSimulator;
     void *caller;
     void *data;
 };
@@ -70,10 +70,10 @@ public:
 
 
 /// \brief core base class of all objects in framework
-class smCoreClass : public std::enable_shared_from_this<smCoreClass>
+class CoreClass : public std::enable_shared_from_this<CoreClass>
 {
 public:
-    using Pointer = std::shared_ptr<smCoreClass>;
+    using Pointer = std::shared_ptr<CoreClass>;
 
     static std::shared_ptr<mstk::Event::smEventHandler> eventHandler;
 
@@ -81,12 +81,12 @@ public:
     ///
     /// \brief Default constructor
     ///
-    smCoreClass();
+    CoreClass();
 
     ///
     /// \brief Default constructor
     ///
-    smCoreClass(const std::string &);
+    CoreClass(const std::string &);
 
     ///
     /// \brief get type of the class
@@ -128,7 +128,7 @@ public:
     /// This function is called by the event handler after observing
     /// events.
     ///
-    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent>);
+    virtual void handleEvent(std::shared_ptr<mstk::Event::Event>);
 
     ///
     /// \brief set the name of object
@@ -202,20 +202,20 @@ public:
     ///
     /// \brief Get the unique id of this object
     ///
-    std::shared_ptr<smUnifiedId> getUniqueId() {return uniqueId;}
+    std::shared_ptr<UnifiedId> getUniqueId() {return uniqueId;}
 
     /// \brief Get render detail
-    std::shared_ptr<smRenderDetail> getRenderDetail() const
+    std::shared_ptr<RenderDetail> getRenderDetail() const
     {return renderDetail;}
 
     /// \brief Set the render details (properties affecting visual depiction)
-    void setRenderDetail(std::shared_ptr<smRenderDetail> newRenderDetail)
+    void setRenderDetail(std::shared_ptr<RenderDetail> newRenderDetail)
     { this->renderDetail = newRenderDetail; }
 
-    std::shared_ptr<smRenderDelegate> getRenderDelegate() const;
-    void setRenderDelegate(std::shared_ptr<smRenderDelegate> delegate);
+    std::shared_ptr<RenderDelegate> getRenderDelegate() const;
+    void setRenderDelegate(std::shared_ptr<RenderDelegate> delegate);
 
-    void attachEvent(const mstk::Event::EventType &eventType, std::shared_ptr<smCoreClass> component)
+    void attachEvent(const mstk::Event::EventType &eventType, std::shared_ptr<CoreClass> component)
     {
         eventHandler->attachEvent(eventType,component);
     }
@@ -238,18 +238,12 @@ protected:
     std::map<
     mstk::Event::EventType,
     mstk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
-    std::shared_ptr<smRenderDelegate> renderDelegate; ///!< Class that can render this class
+    std::shared_ptr<RenderDelegate> renderDelegate; ///!< Class that can render this class
 
 private:
-    std::shared_ptr<smUnifiedId> uniqueId; ///< unique Id
-    std::shared_ptr<smRenderDetail> renderDetail; ///< specifies visualization type
+    std::shared_ptr<UnifiedId> uniqueId; ///< unique Id
+    std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
     core::ClassDrawOrder drawOrder; ///< draw order of the object
-};
-
-/// \brief for future use
-class interface : public smCoreClass
-{
-
 };
 
 #endif

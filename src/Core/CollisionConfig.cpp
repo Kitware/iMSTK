@@ -23,17 +23,17 @@
 
 #include "CollisionConfig.h"
 
-bool smCellTriangle::operator==( unsigned int p_ID )
+bool CellTriangle::operator==( unsigned int p_ID )
 {
     return ( primID == p_ID ? true : false );
 }
 
-bool smCellTriangle::operator==( smCellTriangle &p_tri )
+bool CellTriangle::operator==( CellTriangle &p_tri )
 {
     return ( p_tri.primID == primID ? true : false );
 }
 
-std::ostream &operator<<( std::ostream &out, smCellTriangle &tri )
+std::ostream &operator<<( std::ostream &out, CellTriangle &tri )
 {
     out << tri.primID;
     return out;

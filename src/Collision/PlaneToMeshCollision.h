@@ -28,21 +28,21 @@
 // SimMedTK includes
 #include "Core/CollisionDetection.h"
 
-class smCollisionPair;
+class CollisionPair;
 
 ///
 /// @brief Brute force collision detection between a mesh and a static plane
 ///
-class smPlaneToMeshCollision : public smCollisionDetection
+class PlaneToMeshCollision : public CollisionDetection
 {
 public:
-    smPlaneToMeshCollision() {}
-    virtual ~smPlaneToMeshCollision() {}
+    PlaneToMeshCollision() {}
+    virtual ~PlaneToMeshCollision() {}
 
-    smPlaneToMeshCollision(const smPlaneToMeshCollision &) = delete;
+    PlaneToMeshCollision(const PlaneToMeshCollision &) = delete;
 
 private:
-    virtual void doComputeCollision(std::shared_ptr<smCollisionPair> pairs) override;
+    virtual void doComputeCollision(std::shared_ptr<CollisionPair> pairs) override;
 
 };
 

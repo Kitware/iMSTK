@@ -24,9 +24,6 @@
 #ifndef SM_SMSURFACETREE_HPP
 #define SM_SMSURFACETREE_HPP
 
-// STL includes
-#include <string>
-
 // SimMedTK includes
 #include "Rendering/Viewer.h"
 #include "Collision/SurfaceTreeIterator.h"
@@ -35,9 +32,9 @@
 
 /// \brief initialize the surface tree structure
 template <typename CellType>
-void smSurfaceTree<CellType>::initStructure()
+void SurfaceTree<CellType>::initStructure()
 {
-    smVec3d center;
+    core::Vec3d center;
     double edge;
     std::vector<int> triangles;
 
@@ -62,13 +59,13 @@ void smSurfaceTree<CellType>::initStructure()
 
 /// \brief destructor
 template<typename CellType>
-smSurfaceTree<CellType>::~smSurfaceTree()
+SurfaceTree<CellType>::~SurfaceTree()
 {
 }
 
 /// \brief
 template<typename CellType>
-smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels)
+SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels)
 {
     mesh = surfaceMesh;
     totalCells = 0;
@@ -79,7 +76,7 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
     //compute the total cells
     for (int i = 0; i < maxLevel; ++i)
     {
-        totalCells += smMath::pow(CellType::numberOfSubdivisions, i);
+        totalCells += std::pow(int(CellType::numberOfSubdivisions), i);
     }
 
     treeAllLevels.resize(totalCells);
@@ -91,7 +88,7 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
     for (int i = 1; i < maxLevel; ++i)
     {
-        levelStartIndex[i][0] = levelStartIndex[i-1][0] + smMath::pow(CellType::numberOfSubdivisions, i-1);
+        levelStartIndex[i][0] = levelStartIndex[i-1][0] + std::pow(int(CellType::numberOfSubdivisions), i-1);
         levelStartIndex[i-1][1] = levelStartIndex[i][0];
     }
 
@@ -106,13 +103,13 @@ smSurfaceTree<CellType>::smSurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMes
 
     mesh->allocateAABBTris();
     this->setRenderDelegate(
-      smFactory<smRenderDelegate>::createConcreteClass(
+      Factory<RenderDelegate>::createConcreteClass(
         "SurfaceTreeRenderDelegate"));
 }
 
 /// \brief handle key press events
 template<typename CellType>
-void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void SurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     if(!this->isListening())
     {
@@ -186,7 +183,7 @@ void smSurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::smEvent> 
 
 /// \brief create the surface tree
 template<typename CellType>
-bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
+bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
                                          const std::vector<int> &triangles,
                                          int siblingIndex)
 {
@@ -300,9 +297,9 @@ bool smSurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
 
 /// \brief !!
 template <typename CellType>
-smCollisionModelIterator<CellType> smSurfaceTree<CellType>::getLevelIterator(int level)
+CollisionModelIterator<CellType> SurfaceTree<CellType>::getLevelIterator(int level)
 {
-    smSurfaceTreeIterator<CellType> iter(this);
+    SurfaceTreeIterator<CellType> iter(this);
     iter.startIndex = iter.currentIndex = this->levelStartIndex[level][0];
     iter.endIndex = this->levelStartIndex[level][1];
     iter.currentLevel = level;
@@ -311,9 +308,9 @@ smCollisionModelIterator<CellType> smSurfaceTree<CellType>::getLevelIterator(int
 
 /// \brief !!
 template <typename CellType>
-smCollisionModelIterator<CellType>  smSurfaceTree<CellType>::getLevelIterator()
+CollisionModelIterator<CellType>  SurfaceTree<CellType>::getLevelIterator()
 {
-    smSurfaceTreeIterator<CellType> iter(this);
+    SurfaceTreeIterator<CellType> iter(this);
     iter.startIndex = iter.currentIndex = this->levelStartIndex[currentLevel][0];
     iter.endIndex = this->levelStartIndex[currentLevel][1];
     iter.currentLevel = currentLevel;
@@ -322,14 +319,14 @@ smCollisionModelIterator<CellType>  smSurfaceTree<CellType>::getLevelIterator()
 
 /// \brief update the surface tree
 template <typename CellType>
-void smSurfaceTree<CellType>::updateStructure()
+void SurfaceTree<CellType>::updateStructure()
 {
     CellType *current;
 
     for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
     {
         current = &treeAllLevels[i];
-        smVec3d tempCenter(0, 0, 0);
+        core::Vec3d tempCenter(0, 0, 0);
         int counter = 0;
 
         if (!current->isEmpty())
@@ -347,7 +344,7 @@ void smSurfaceTree<CellType>::updateStructure()
 
 /// \brief !!
 template <typename CellType>
-void smSurfaceTree<CellType>::translateRot()
+void SurfaceTree<CellType>::translateRot()
 {
     CellType *current;
     CellType *initial;

@@ -24,18 +24,18 @@
 #include "Simulator.h"
 
 /// \brief starts the tasks with the threads from thread pool
-void smSimulator::beginFrame()
+void Simulator::beginFrame()
 {
     frameCounter++;
 }
 
 /// \brief waits until the frame ends
-void smSimulator::endFrame()
+void Simulator::endFrame()
 {
 
 }
 
-void smSimulator::initAsyncThreadPool()
+void Simulator::initAsyncThreadPool()
 {
     asyncThreadPoolSize = 0;
 
@@ -51,11 +51,11 @@ void smSimulator::initAsyncThreadPool()
 }
 
 /// \brief the main simulation loop
-void smSimulator::run()
+void Simulator::run()
 {
     std::vector< std::future<int> > results;
     std::vector< std::future<int> > asyncResults;
-    std::shared_ptr<smObjectSimulator> objectSimulator;
+    std::shared_ptr<ObjectSimulator> objectSimulator;
 
     if (isInitialized == false)
     {
@@ -64,7 +64,7 @@ void smSimulator::run()
     }
 
     results.reserve(this->simulators.size()); //make space for results
-    smSimulationMainParam param;
+    SimulationMainParam param;
     param.sceneList = sceneList;
 
     //Start up async threads
@@ -137,7 +137,7 @@ void smSimulator::run()
         }
 
         results.clear(); //clear the results buffer for new
-        std::shared_ptr<smCollisionDetection> collisionDetection;
+        std::shared_ptr<CollisionDetection> collisionDetection;
         for (size_t i = 0; i < this->collisionDetectors.size(); i++)
         {
             collisionDetection = collisionDetectors[i];
@@ -172,7 +172,7 @@ void smSimulator::run()
         //}
 
         results.clear(); //clear the results buffer for new
-        std::shared_ptr<smContactHandling> contactHandling;
+        std::shared_ptr<ContactHandling> contactHandling;
         for (size_t i = 0; i < this->contactHandlers.size(); i++)
         {
             contactHandlers[i]->resolveContacts();
@@ -195,32 +195,32 @@ void smSimulator::run()
 }
 
 /// \brief
-void smSimulator::registerObjectSimulator(std::shared_ptr<smObjectSimulator> objectSimulator)
+void Simulator::registerObjectSimulator(std::shared_ptr<ObjectSimulator> objectSimulator)
 {
     simulators.emplace_back(objectSimulator);
     objectSimulator->enabled = true;
 }
 
 /// \brief
-void smSimulator::registerCollisionDetection(std::shared_ptr<smCollisionDetection> p_collisionDetection)
+void Simulator::registerCollisionDetection(std::shared_ptr<CollisionDetection> p_collisionDetection)
 {
     collisionDetectors.emplace_back(p_collisionDetection);
 }
 
 /// \brief
-void smSimulator::registerContactHandling(std::shared_ptr<smContactHandling> p_contactHandling)
+void Simulator::registerContactHandling(std::shared_ptr<ContactHandling> p_contactHandling)
 {
     contactHandlers.emplace_back(p_contactHandling);
 }
 
 /// \brief
-void smSimulator::registerSimulationMain(std::shared_ptr<smSimulationMain> p_main)
+void Simulator::registerSimulationMain(std::shared_ptr<SimulationMain> p_main)
 {
     changedMain = p_main;
     this->changedMainTimeStamp++;
 }
 
-void smSimulator::init()
+void Simulator::init()
 {
     if(isInitialized == true)
     {
@@ -241,7 +241,7 @@ void smSimulator::init()
     isInitialized = true;
 }
 
-smSimulator::smSimulator(std::shared_ptr< smErrorLog > p_log)
+Simulator::Simulator(std::shared_ptr< ErrorLog > p_log)
 {
     type = core::ClassType::Simulator;
     isInitialized = false;
@@ -255,7 +255,7 @@ smSimulator::smSimulator(std::shared_ptr< smErrorLog > p_log)
     asyncThreadPoolSize = 0;
 }
 
-void smSimulator::setMaxThreadCount(int p_threadMaxCount)
+void Simulator::setMaxThreadCount(int p_threadMaxCount)
 {
     if(p_threadMaxCount < 0)
     {
@@ -267,7 +267,7 @@ void smSimulator::setMaxThreadCount(int p_threadMaxCount)
     }
 }
 
-void smSimulator::exec()
+void Simulator::exec()
 {
     if(isInitialized)
     {

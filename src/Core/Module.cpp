@@ -24,28 +24,28 @@
 #include "Module.h"
 
 /// \brief Begin frame will be called before the cycle
-void  smModule::beginModule()
+void  Module::beginModule()
 {
-    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), core::CallerState::BeginFrame);
+    dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()), core::CallerState::BeginFrame);
     beginFrame();
 
 }
 
 /// \brief End frame will be called after the cycle
-void  smModule::endModule()
+void  Module::endModule()
 {
     endFrame();
-    dispathcer->handle(std::static_pointer_cast<smCoreClass>(shared_from_this()), core::CallerState::EndFrame);
+    dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()), core::CallerState::EndFrame);
 }
-void smModule::terminate()
+void Module::terminate()
 {
     terminateExecution = true;
 }
-bool smModule::isTerminationDone()
+bool Module::isTerminationDone()
 {
     return terminationCompleted;
 }
-void smModule::waitTermination()
+void Module::waitTermination()
 {
     while ( 1 )
     {
@@ -55,11 +55,11 @@ void smModule::waitTermination()
         }
     }
 }
-int smModule::getModuleId()
+int Module::getModuleId()
 {
     return this->getUniqueId()->getId();
 }
-smModule::smModule()
+Module::Module()
 {
     terminateExecution = false;
     isInitialized = false;

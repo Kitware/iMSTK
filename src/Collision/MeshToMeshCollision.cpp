@@ -31,17 +31,17 @@
 // STL includes
 #include <vector>
 
-void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pairs)
+void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pairs)
 {
-    auto meshA = std::static_pointer_cast<smMeshCollisionModel>(pairs->getFirst());
-    auto meshB = std::static_pointer_cast<smMeshCollisionModel>(pairs->getSecond());
+    auto meshA = std::static_pointer_cast<MeshCollisionModel>(pairs->getFirst());
+    auto meshB = std::static_pointer_cast<MeshCollisionModel>(pairs->getSecond());
 
-    std::vector<smMeshCollisionModel::NodePairType>
+    std::vector<MeshCollisionModel::NodePairType>
     intersectionNodes = meshA->getAABBTree()->getIntersectingNodes(meshB->getAABBTree());
 
     double depth;
-    smVec3d normal;
-    smVec3d contactPoint;
+    core::Vec3d normal;
+    core::Vec3d contactPoint;
     for(auto & intersection : intersectionNodes)
     {
         auto nodeA = intersection.first;
@@ -55,7 +55,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
 
         for(const auto & i : triangleListA)
         {
-            const smVec3d& normalA = meshA->getNormal(i);
+            const core::Vec3d& normalA = meshA->getNormal(i);
             if(normalA.isZero())
             {
                 continue;
@@ -64,7 +64,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
             auto verticesA = meshA->getTrianglePositions(i);
             for(auto & j : triangleListB)
             {
-                const smVec3d& normalB = meshB->getNormal(j);
+                const core::Vec3d& normalB = meshB->getNormal(j);
                 if(normalB.isZero())
                 {
                     continue;
@@ -73,7 +73,7 @@ void smMeshToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> 
                 auto verticesB = meshB->getTrianglePositions(j);
 
                 // Chech for intersection
-                if(smCollisionMoller::tri2tri(verticesA[0], verticesA[1], verticesA[2],
+                if(CollisionMoller::tri2tri(verticesA[0], verticesA[1], verticesA[2],
                                               verticesB[0], verticesB[1], verticesB[2],
                                               depth, contactPoint, normal)
                   )

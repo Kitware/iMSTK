@@ -31,21 +31,14 @@
 #include "Module.h"
 #include "StaticSceneObject.h"
 #include "DataStructures.h"
-#include "Pipe.h"
 
 // Forward declaration
-class smSDK;
+class SDK;
 class smOpenGLWindowStream;
 class smMetalShader;
 class smSceneTextureShader;
 class smFrameBuffer;
-class smTexture;
-
-class smCameraCollisionInterface
-{
-public:
-    virtual bool checkCameraCollision() = 0;
-};
+class Texture;
 
 enum smRenderingStageType
 {
@@ -62,38 +55,38 @@ enum smRenderTargetType
 };
 
 /// \brief Describes what to render and where the rendering should take place
-struct smRenderOperation
+struct RenderOperation
 {
-    smRenderOperation();
-    std::shared_ptr<smScene> scene; ///< The scene full of objects to render
+    RenderOperation();
+    std::shared_ptr<Scene> scene; ///< The scene full of objects to render
     smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
     std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
     smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
 };
 
-struct smFboListItem
+struct FboListItem
 {
     std::string fboName; ///< String identification
     smFrameBuffer* fbo; ///< The FBO pointer
-    smTexture *depthTex; ///< The FBO depth texture pointer
-    smTexture *colorTex; ///< The FBO color texture pointer
+    Texture *depthTex; ///< The FBO depth texture pointer
+    Texture *colorTex; ///< The FBO color texture pointer
     unsigned int width; ///< The width of the FBO
     unsigned int height; ///< The height of the FBO
 };
 
 /// \brief Handles all rendering routines.
-class smViewerBase : public smModule
+class ViewerBase : public Module
 {
 protected:
-    std::vector<std::shared_ptr<smCoreClass>> objectList;
-    std::vector<smRenderOperation> renderOperations;
-    std::vector<smFboListItem> fboListItems;
-    std::shared_ptr<smErrorLog> log;
+    std::vector<std::shared_ptr<CoreClass>> objectList;
+    std::vector<RenderOperation> renderOperations;
+    std::vector<FboListItem> fboListItems;
+    std::shared_ptr<ErrorLog> log;
     int unlimitedFPSVariableChanged;
     bool unlimitedFPSEnabled;
     int screenResolutionWidth;
     int screenResolutionHeight;
-    friend class smSDK;
+    friend class SDK;
 
 public:
 
@@ -113,13 +106,13 @@ public:
     /// \brief disable vSync
     virtual void setUnlimitedFPS(bool p_enableFPS);
     /// \brief default constructor
-    smViewerBase();
+    ViewerBase();
     /// \brief initialization for viewer
     virtual void init() override;
     /// \brief for exit viewer
     virtual void exitViewer() = 0;
     /// \brief add object for rendering
-    virtual void addObject(std::shared_ptr<smCoreClass> object);
+    virtual void addObject(std::shared_ptr<CoreClass> object);
     /// \brief add text for display
     virtual void addText(std::string p_tag) = 0;
     /// \brief update text
@@ -132,7 +125,7 @@ public:
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) = 0;
     /// \brief Registers a scene for rendering with the viewer
-    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
+    virtual void registerScene(std::shared_ptr<Scene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
     /// \brief Adds an FBO to the viewer to allow rendering to it.
     ///
     /// \detail The FBO will be created an initialized in the viewer.
@@ -144,14 +137,14 @@ public:
     /// \param p_height The height of the fbo
     virtual void addFBO(
       const std::string &p_fboName,
-      smTexture *p_colorTex, smTexture *p_depthTex,
+      Texture *p_colorTex, Texture *p_depthTex,
       unsigned int p_width, unsigned int p_height);
 
     virtual void setGlobalAxisLength(const float len);
     std::string windowTitle;
-    smColor defaultDiffuseColor;
-    smColor defaultAmbientColor;
-    smColor defaultSpecularColor;
+    Color defaultDiffuseColor;
+    Color defaultAmbientColor;
+    Color defaultSpecularColor;
 
 protected:
     /// \brief Initializes rendering system (e.g., OpenGL) capabilities and flags
@@ -171,15 +164,15 @@ protected:
     /// \brief Renders the internal sceneList
     void renderSceneList();
     /// \brief Processes a render operation
-    virtual void processRenderOperation(const smRenderOperation &p_rop);
+    virtual void processRenderOperation(const RenderOperation &p_rop);
     /// \brief Processes viewerRenderDetail options
     virtual void processViewerOptions() = 0;
     /// \brief Process window events and render as the major part of an event loop
     virtual void processWindowEvents() = 0;
     /// \brief Renders the render operation to screen
-    virtual void renderToScreen(const smRenderOperation &p_rop) = 0;
+    virtual void renderToScreen(const RenderOperation &p_rop) = 0;
     /// \brief Renders the render operation to an FBO
-    virtual void renderToFBO(const smRenderOperation &p_rop) = 0;
+    virtual void renderToFBO(const RenderOperation &p_rop) = 0;
     /// \brief Set the color and other viewer defaults
     virtual void setToDefaults() = 0;
     /// \brief draw routines

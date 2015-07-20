@@ -26,33 +26,33 @@
 namespace mstk {
 namespace Event {
 
-EventType smEvent::EventName = EventType::None;
+EventType Event::EventName = EventType::None;
 
-smEvent::smEvent(): priority(EventPriority::Normal), sender(EventSender::Other), enabled(true) {}
+Event::Event(): priority(EventPriority::Normal), sender(EventSender::Other), enabled(true) {}
 
-smEvent::~smEvent() {}
+Event::~Event() {}
 
-void smEvent::setPriority(const EventPriority& eventPriority)
+void Event::setPriority(const EventPriority& eventPriority)
 {
     this->priority = eventPriority;
 }
-const EventPriority& smEvent::getPriority()
+const EventPriority& Event::getPriority()
 {
     return this->priority;
 }
-void smEvent::setSender(const EventSender& eventSender)
+void Event::setSender(const EventSender& eventSender)
 {
     this->sender = eventSender;
 }
-const EventSender& smEvent::getSender()
+const EventSender& Event::getSender()
 {
     return this->sender;
 }
-void smEvent::setEnabled(const bool& eventEnabled)
+void Event::setEnabled(const bool& eventEnabled)
 {
     this->enabled = eventEnabled;
 }
-const bool& smEvent::getEnabled()
+const bool& Event::getEnabled()
 {
     return this->enabled;
 }

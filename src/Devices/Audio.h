@@ -33,13 +33,13 @@
 #include "Event/AudioEvent.h"
 
 /// \brief class to enable audio rendering
-class smAudio: public smCoreClass
+class smAudio: public CoreClass
 {
 private:
     sf::Sound sound; ///< SFML Sound object, controls the sound data
     sf::SoundBuffer soundBuffer; ///< SFML Sound buffer, contains the sound data
 
-    std::shared_ptr<smErrorLog> log; ///< log for errors
+    std::shared_ptr<ErrorLog> log; ///< log for errors
     std::string referenceName; ///< A human readable string to refer to the object
     mstk::Event::AudioState state; ///< state of audio
     mstk::Event::AudioState prevState; ///< state of audio in previous cycle
@@ -61,7 +61,7 @@ public:
     /// \brief constructor initialize various states
     smAudio(const std::string& fileName,
             const std::string& p_referenceName,
-            smErrorLog *p_log = nullptr,
+            ErrorLog *p_log = nullptr,
             bool p_loop = false)
         : referenceName(p_referenceName),
           loop(p_loop)

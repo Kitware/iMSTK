@@ -29,9 +29,9 @@
 
 smMetalShader::smMetalShader( const std::string &p_verteShaderFileName,
                               const std::string &p_fragmentFileName ) :
-                              smShader(smSDK::getInstance()->getErrorLog())
+                              smShader(SDK::getInstance()->getErrorLog())
 {
-    this->log = smSDK::getInstance()->getErrorLog();
+    this->log = SDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName( p_verteShaderFileName, NULL, p_fragmentFileName );
@@ -110,7 +110,7 @@ void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
     }
 }
 
-void smMetalShader::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
+void smMetalShader::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
 {
     auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
     if(keyboardEvent)

@@ -33,14 +33,14 @@
 
 class smMesh;
 
-class smModelRepresentation
+class ModelRepresentation
 {
 public:
-    smModelRepresentation(){}
-    ~smModelRepresentation(){}
+    ModelRepresentation(){}
+    ~ModelRepresentation(){}
 
 	virtual std::shared_ptr<smMesh> getMesh(){ std::shared_ptr<smMesh> s; return s; }
-	virtual std::shared_ptr<smCoreClass> getObject(){ std::shared_ptr<smCoreClass> s; return s; }
+	virtual std::shared_ptr<CoreClass> getObject(){ std::shared_ptr<CoreClass> s; return s; }
 	virtual void draw(){}
 };
 

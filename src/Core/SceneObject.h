@@ -36,11 +36,11 @@
 #include "Rendering/CustomRenderer.h"
 
 //forward class declaration
-class smObjectSimulator;
+class ObjectSimulator;
 class smCustomRenderer;
 
 ///booleans for objects indicate whether they're initialized or not.
-struct smObjectInitFlags
+struct ObjectInitFlags
 {
     bool isViewerInit;
     bool isSimulatorInit;
@@ -49,20 +49,20 @@ struct smObjectInitFlags
 
 /// \brief Base class for any object in the scene both
 /// physical and otherwise
-class smSceneObject : public smCoreClass
+class SceneObject : public CoreClass
 {
-    friend class smSDK;
-    friend class smViewerBase;
+    friend class SDK;
+    friend class ViewerBase;
     friend class smViewer;
-    friend class smScene;
-    friend class smObjectSimulator;
+    friend class Scene;
+    friend class ObjectSimulator;
 
 public:
     /// \brief constructor
-    smSceneObject();
+    SceneObject();
 
     /// \brief destructor
-    ~smSceneObject();
+    ~SceneObject();
 
     /// \brief Abstract object initialization
     virtual void initialize() = 0;
@@ -74,7 +74,7 @@ public:
 
     /// \brief attach simulator to the object.
     /// This function that needs to be called to associate the simulator to the object
-    virtual void attachObjectSimulator(std::shared_ptr<smObjectSimulator> p_objectSim);
+    virtual void attachObjectSimulator(std::shared_ptr<ObjectSimulator> p_objectSim);
 
     /// \brief to release the simulator
     virtual void releaseObjectSimulator();
@@ -86,7 +86,7 @@ public:
     void activate();
 
     /// \brief get object simulator
-    std::shared_ptr<smObjectSimulator> getObjectSimulator();
+    std::shared_ptr<ObjectSimulator> getObjectSimulator();
 
     /// \brief attach custome renderer for the object.
     /// If the default rendering is not helpful
@@ -99,11 +99,11 @@ public:
     int getObjectId();
 
     /// \brief get unified object id
-    smUnifiedId::Pointer getObjectUnifiedID();
+    UnifiedId::Pointer getObjectUnifiedID();
 
-    smStdVector3d &getLocalVertices();
+    core::StdVector3d &getLocalVertices();
 
-    smObjectInitFlags &getFlags();
+    ObjectInitFlags &getFlags();
 
     std::shared_ptr<smCustomRenderer> getRenderer();
 
@@ -117,7 +117,7 @@ public:
     ///this function may not be used
     ///every Scene Object should know how to clone itself. Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    virtual std::shared_ptr<smSceneObject> clone() = 0;
+    virtual std::shared_ptr<SceneObject> clone() = 0;
 
     /// \brief print information related the scene object
     virtual void printInfo() const = 0;
@@ -126,10 +126,10 @@ protected:
     bool isActive;
 
 private:
-    std::shared_ptr<smObjectSimulator> objectSim; // object simulator that will simulate the object
+    std::shared_ptr<ObjectSimulator> objectSim; // object simulator that will simulate the object
     std::shared_ptr<smCustomRenderer> customRender;
-    smStdVector3d localVertices; // local copy of vertices
-    smObjectInitFlags flags;
+    core::StdVector3d localVertices; // local copy of vertices
+    ObjectInitFlags flags;
 };
 
 #endif

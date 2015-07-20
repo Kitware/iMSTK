@@ -57,7 +57,7 @@ public:
     {
     }
 
-    void  handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+    void  handleEvent(std::shared_ptr<mstk::Event::Event> event)
     {
         s
         MyStylus::handleEvent(p_event);
@@ -82,14 +82,14 @@ void main()
     MyStylus *hapticStylus;
     HookCautery *hapticStylus1;
     smPhantomInterface * hapticInterface;
-    smSDK* simmedtkSDK;
-    smScene *scene1;
+    SDK* simmedtkSDK;
+    Scene *scene1;
     smViewer *viewer;
-    smSimulator *simulator;
+    Simulator *simulator;
     smToolSimulator *toolSim;
 
     ///Initializes the lights
-    smLight light("light0", SIMMEDTK_LIGHT_INFINITELIGHT, SIMMEDTK_LIGHTPOS_EYE);
+    Light light("light0", InfiniteLight, Eye);
     light.lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
     light.lightColorAmbient.setValue(0.4, 0.4, 0.4, 1);
     light.lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
@@ -97,11 +97,11 @@ void main()
 
 
     light.lightPos.pos.setValue(0, 20.0, 20);
-    light.direction = smVec3d(0.0, 0.0, -1.0);
+    light.direction = core::Vec3d(0.0, 0.0, -1.0);
     light.drawEnabled = false;
 
 
-    smLight light2("light1", SIMMEDTK_LIGHT_SPOTLIGHT, SIMMEDTK_LIGHTPOS_WORLD);
+    Light light2("light1", Spotlight, World);
     light2.lightColorDiffuse.setValue(0.4, 0.4, 0.4, 1);
     light2.lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
     light2.lightColorSpecular.setValue(0.1, 0.1, 0.1, 1);
@@ -152,7 +152,7 @@ void main()
     hapticStylus1getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE | SIMMEDTK_RENDER_MATERIALCOLOR);
 
     ///creates tool simulator
-    toolSim = new smToolSimulator(smSDK::getErrorLog());
+    toolSim = new smToolSimulator(SDK::getErrorLog());
 
     ///define the execution of the simulator.
     toolSim->setExecutionType(SIMMEDTK_SIMEXECUTION_ASYNCMODE);
@@ -162,7 +162,7 @@ void main()
     hapticStylus1->attachObjectSimulator(toolSim);
 
     ///creates SDK
-    simmedtkSDK = smSDK::createSDK();
+    simmedtkSDK = SDK::createSDK();
 
     ///create a scene.
     scene1 = simmedtkSDK->createScene();

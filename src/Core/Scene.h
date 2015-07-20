@@ -32,7 +32,6 @@
 // SimMedTK includes
 #include "Config.h"
 #include "CoreClass.h"
-#include "Pipe.h"
 #include "ErrorLog.h"
 #include "Light.h"
 #include "SceneObject.h"
@@ -42,64 +41,64 @@
 #include "Event/MouseMoveEvent.h"
 #include "Rendering/Camera.h"
 
-class smScene;
-class smSDK;
+class Scene;
+class SDK;
 
-struct smSceneLocal
+struct SceneLocal
 {
 
 public:
     int id;
-    smSceneLocal()
+    SceneLocal()
     {
         sceneUpdatedTimeStamp = 0;
     }
 
-    bool operator ==(smSceneLocal &p_param)
+    bool operator ==(SceneLocal &p_param)
     {
         return id == p_param.id;
     }
 
-    std::vector<std::shared_ptr<smSceneObject>> sceneObjects;
+    std::vector<std::shared_ptr<SceneObject>> sceneObjects;
     unsigned int sceneUpdatedTimeStamp;
 };
 
 ///Physics class should have all parameters such as material properties, mesh etc.. for
 ///note that when you remove the Physics do not delete it.Since propagation of the physics over the
-class smScene: public smCoreClass
+class Scene: public CoreClass
 {
 public:
-    smScene(std::shared_ptr<smErrorLog> p_log = nullptr);
+    Scene(std::shared_ptr<ErrorLog> p_log = nullptr);
 
-    virtual ~smScene(){}
+    virtual ~Scene(){}
 
     ///add physics in the scene
-    void  addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
+    void  addSceneObject(std::shared_ptr<SceneObject> p_sceneObject);
 
     ///remove the phyics in the scene.
     ///The removal of the phsyics in the scene needs some sync all over the modules
     ///so not implemented yet. Be aware that when you remove the phyics do no free the smPhysics class
-    void removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject);
+    void removeSceneObject(std::shared_ptr<SceneObject> p_sceneObject);
 
     ///the same as
-    void removeSceneObject(std::shared_ptr<smUnifiedId> p_objectId);
+    void removeSceneObject(std::shared_ptr<UnifiedId> p_objectId);
 
     ///in order to get the phsyics in the scene call this function.
     ///it is thread safe. but it shouldn't be called frequently.
     ///it should be called in the initialization of the viewer, simulation or any other module.
     ///and the the list should be stored internally.
     ///The scene list removal will be taken care of later since the list should be update.
-    std::vector<std::shared_ptr<smSceneObject>> &getSceneObject();
+    std::vector<std::shared_ptr<SceneObject>> &getSceneObject();
 
     /// \brief retursn scene id
-    std::shared_ptr<smUnifiedId> getSceneId();
+    std::shared_ptr<UnifiedId> getSceneId();
 
     ///Same functionality as addSceneObject
-    std::shared_ptr<smScene> operator+=(std::shared_ptr<smSceneObject> p_sceneObject);
+    std::shared_ptr<Scene> operator+=(std::shared_ptr<SceneObject> p_sceneObject);
 
-    void copySceneObjects(std::shared_ptr<smScene> p_scene);
+    void copySceneObjects(std::shared_ptr<Scene> p_scene);
 
-    std::shared_ptr<smScene> operator=(std::shared_ptr<smScene> p_scene);
+    std::shared_ptr<Scene> operator=(std::shared_ptr<Scene> p_scene);
 
     /// \brief Initializes lights for rendering
     void initLights();
@@ -122,14 +121,14 @@ public:
     void placeLights();
 
     /// \brief addlight
-    int addLight(std::shared_ptr<smLight> p_light);
+    int addLight(std::shared_ptr<Light> p_light);
 
     /// \brief refresh lights. updates light  position based on the gl matrix
     void refreshLights();
 
     void setLightPos(int p_lightId, smLightPos p_pos);
 
-    void setLightPos(int p_lightId, smLightPos p_pos, smVec3d p_direction);
+    void setLightPos(int p_lightId, smLightPos p_pos, core::Vec3d p_direction);
 
     std::shared_ptr<smCamera> getCamera()
     {
@@ -142,13 +141,13 @@ public:
     }
 
     /// \brief adds the objects in the local scene storage
-    void copySceneToLocal(smSceneLocal &p_local);
+    void copySceneToLocal(SceneLocal &p_local);
 
 private:
     std::shared_ptr<smCamera> camera;                           //Camera for the scene
-    std::vector<std::shared_ptr<smLight> > lights;              //Lights in the scene
-    std::vector<std::shared_ptr<smSceneObject>> sceneObjects;   // scene objects storage
-    std::shared_ptr<smErrorLog> log;                            // error logging
+    std::vector<std::shared_ptr<Light> > lights;              //Lights in the scene
+    std::vector<std::shared_ptr<SceneObject>> sceneObjects;   // scene objects storage
+    std::shared_ptr<ErrorLog> log;                            // error logging
     std::mutex sceneLock;                                       // scene list lock for thread safe manipulation of the scene
     unsigned int sceneUpdatedTimeStamp;                               // last updated time stamp
 };

@@ -35,16 +35,16 @@
 class smCellLine;
 class smCellModel;
 class smCellPoint;
-class smCellTriangle;
+class CellTriangle;
 class smCollidedLineTris;
 class smCollidedModelPoints;
 class smCollidedTriangles;
 class smLineMesh;
 class smMesh;
-class smOctreeCell;
+class OctreeCell;
 
 template<typename CellType>
-class smSurfaceTree;
+class SurfaceTree;
 
 /// \brief
 enum smCollisionSetting
@@ -55,21 +55,21 @@ enum smCollisionSetting
 };
 
 /// \brief spatial hash
-class smSpatialHashCollision: public smCollisionDetection
+class SpatialHashCollision: public CollisionDetection
 {
 public:
-    using SurfaceTreeType = smSurfaceTree<smOctreeCell>;
+    using SurfaceTreeType = SurfaceTree<OctreeCell>;
 
 public:
 
     /// \brief !!
-    smSpatialHashCollision(int hashTableSize,
+    SpatialHashCollision(int hashTableSize,
                   float cellSizeX,
                   float cellSizeY,
                   float cellSizeZ);
 
     /// \brief destructor clear some memory
-    ~smSpatialHashCollision();
+    ~SpatialHashCollision();
 
     /// \brief !!
     void addCollisionModel(std::shared_ptr<SurfaceTreeType> CollModel);
@@ -113,7 +113,7 @@ public:
 
 protected:
     /// \brief adds triangle to hash
-    void addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<smCellTriangle> &cells);
+    void addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<CellTriangle> &cells);
 
     /// \brief adds line to hash
     void addLine(std::shared_ptr<smLineMesh> mesh, int edgeId, smHash<smCellLine> &cells);
@@ -130,7 +130,7 @@ protected:
     void updateBVH();
 
 private:
-    void doComputeCollision(std::shared_ptr<smCollisionPair> /*pairs*/)
+    void doComputeCollision(std::shared_ptr<CollisionPair> /*pairs*/)
     {
         reset();
         updateBVH();
@@ -145,9 +145,9 @@ private:
     float cellSizeY; ///< cell spacing in y-direction
     float cellSizeZ; ///< cell spacing in z-direction
 
-    smHash<smCellTriangle> cells; // Candidate triangles
+    smHash<CellTriangle> cells; // Candidate triangles
     smHash<smCellLine> cellLines; // Lines that stored in the scene.
-    smHash<smCellTriangle> cellsForTri2Line;  // Candidate triangles in the scene.
+    smHash<CellTriangle> cellsForTri2Line;  // Candidate triangles in the scene.
     smHash<smCellModel> cellsForModel; // Candidate cells for collision model
     smHash<smCellPoint> cellsForModelPoints; // Candidate for Collision model to point
     std::vector<std::shared_ptr<smMesh>> meshes; // Mesh models

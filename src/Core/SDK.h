@@ -42,9 +42,8 @@
 #define SIMMEDTK_SDK_MAXSCENEOBJTECTS 100
 
 class smMotionTransformer;
-class smPipe;
-template<typename T> class smIndiceArray;
-class smScene;
+template<typename T> class IndiceArray;
+class Scene;
 
 /// \brief module registration
 enum smSDKReturnType
@@ -53,71 +52,68 @@ enum smSDKReturnType
     SIMMEDTK_SDK_MODULEREGISTEREDALREADY
 };
 
-struct smBaseHolder
-{
-};
 
 /// \brief mesh holder
-struct smMeshHolder: public smBaseHolder
+struct MeshHolder
 {
 
-    smMeshHolder()
+    MeshHolder()
     {
         mesh = NULL;
     }
 
     std::shared_ptr<smBaseMesh> mesh;
 
-    inline bool operator ==(smMeshHolder &p_param)
+    inline bool operator ==(MeshHolder &p_param)
     {
         return mesh == p_param.mesh;
     }
 };
 
 /// \brief module holder
-struct smModuleHolder: public smBaseHolder
+struct ModuleHolder
 {
 
-    smModuleHolder()
+    ModuleHolder()
     {
         module = NULL;
     }
 
-    std::shared_ptr<smModule> module;
+    std::shared_ptr<Module> module;
 
-    inline bool operator ==(smModuleHolder &p_param)
+    inline bool operator ==(ModuleHolder &p_param)
     {
         return module == p_param.module;
     }
 };
 
 /// \brief simulator holder
-struct smObjectSimulatorHolder: public smBaseHolder
+struct ObjectSimulatorHolder
 {
 
-    smObjectSimulatorHolder()
+    ObjectSimulatorHolder()
     {
         objectSim = NULL;
     }
 
-    std::shared_ptr<smObjectSimulator> objectSim;
+    std::shared_ptr<ObjectSimulator> objectSim;
 
-    inline bool operator ==(smObjectSimulatorHolder &p_param)
+    inline bool operator ==(ObjectSimulatorHolder &p_param)
     {
         return objectSim == p_param.objectSim;
     }
 };
 
 /// \brief scene holders
-struct smSceneHolder: public smBaseHolder
+struct SceneHolder
 {
-    smSceneHolder()
+    SceneHolder()
     {
         scene = NULL;
     }
 
-    std::shared_ptr<smScene> scene;
-    inline bool operator ==(smSceneHolder &p_param)
+    std::shared_ptr<Scene> scene;
+    inline bool operator ==(SceneHolder &p_param)
     {
         return scene == p_param.scene;
     }
@@ -125,47 +121,25 @@ struct smSceneHolder: public smBaseHolder
 };
 
 /// \brief scene object holder
-struct smSceneObjectHolder: public smBaseHolder
+struct SceneObjectHolder
 {
 
-    smSceneObjectHolder()
+    SceneObjectHolder()
     {
         sceneObject = NULL;
     }
 
-    std::shared_ptr<smSceneObject> sceneObject;
-    inline bool operator ==(smSceneObjectHolder &p_param)
+    std::shared_ptr<SceneObject> sceneObject;
+    inline bool operator ==(SceneObjectHolder &p_param)
     {
         return sceneObject == p_param.sceneObject;
     }
 
 };
 
-/// \brief pipe holder
-struct smPipeHolder: public smBaseHolder
-{
-
-    smPipe *pipe;
-
-    smPipeHolder()
-    {
-        pipe = NULL;
-    }
-
-    inline bool operator ==(smPipeHolder &p_param)
-    {
-        return pipe == p_param.pipe;
-    }
-
-    inline friend bool operator==(smPipeHolder &p_pipe, std::string &p_name)
-    {
-        return (*(p_pipe.pipe) == p_name);
-    }
-
-};
 
 /// \brief SDK class. it is a singlenton class for each machine runs the framework
-class smSDK: public smCoreClass
+class SDK: public CoreClass
 {
 private:
     static std::once_flag sdkCallOnceFlag;
@@ -176,27 +150,27 @@ private:
     char argv;
     bool isModulesStarted;
 
-    std::shared_ptr<smErrorLog> errorLog; ///< error log
-    std::shared_ptr<smViewerBase> viewer; ///< Reference to the sdk viewer object
-    std::shared_ptr<smSimulator> simulator; ///< Reference to the sdk simulator object
-    std::vector<std::shared_ptr<smScene>> sceneList; ///< scene list
+    std::shared_ptr<ErrorLog> errorLog; ///< error log
+    std::shared_ptr<ViewerBase> viewer; ///< Reference to the sdk viewer object
+    std::shared_ptr<Simulator> simulator; ///< Reference to the sdk simulator object
+    std::vector<std::shared_ptr<Scene>> sceneList; ///< scene list
 
     ///holds the references to the entities in the framework
-    static smIndiceArray<smMeshHolder> *meshesRef;
-    static smIndiceArray<smModuleHolder> *modulesRef;
-    static smIndiceArray<smObjectSimulatorHolder> *objectSimulatorsRef;
-    static smIndiceArray<smObjectSimulatorHolder> *collisionDetectorsRef;
-    static smIndiceArray<smSceneHolder> *scenesRef;
-    static smIndiceArray<smSceneObjectHolder> *sceneObjectsRef;
+    static IndiceArray<MeshHolder> *meshesRef;
+    static IndiceArray<ModuleHolder> *modulesRef;
+    static IndiceArray<ObjectSimulatorHolder> *objectSimulatorsRef;
+    static IndiceArray<ObjectSimulatorHolder> *collisionDetectorsRef;
+    static IndiceArray<SceneHolder> *scenesRef;
+    static IndiceArray<SceneObjectHolder> *sceneObjectsRef;
 
     std::vector<std::thread> modules; ///< Stores a list of running module threads
 
     /// \brief constructor
-    smSDK();
+    SDK();
 
 public:
     /// \brief destructor
-    ~smSDK();
+    ~SDK();
 
     /// \brief update scene list. not implemented
     void updateSceneListAll();
@@ -206,71 +180,71 @@ public:
     void shutDown();
 
     ///for now both functions below are the same. But it maybe subject to change.
-    static std::shared_ptr<smSDK> createSDK();
+    static std::shared_ptr<SDK> createSDK();
 
     ///Creates the sdk, viewer and scene 0
-    static std::shared_ptr<smSDK> createStandardSDK();
+    static std::shared_ptr<SDK> createStandardSDK();
 
-    static std::shared_ptr<smSDK> getInstance();
+    static std::shared_ptr<SDK> getInstance();
 
     /// \brief Registers a viewer object with the SDK
     ///
-    void addViewer(std::shared_ptr<smViewerBase> p_viewer);
+    void addViewer(std::shared_ptr<ViewerBase> p_viewer);
 
     /// \brief Creates and registers a viewer object with the SDK
     ///
-    std::shared_ptr<smViewerBase> createViewer();
+    std::shared_ptr<ViewerBase> createViewer();
 
     ///SDK returns a pointer to the viewer
-    std::shared_ptr<smViewerBase> getViewerInstance();
+    std::shared_ptr<ViewerBase> getViewerInstance();
 
     ///SDK creates simualtor
-    std::shared_ptr<smSimulator> createSimulator();
+    std::shared_ptr<Simulator> createSimulator();
 
     ///SDK creates simualtor
-    std::shared_ptr<smSimulator> getSimulator();
+    std::shared_ptr<Simulator> getSimulator();
 
     ///SDK creates scene
-    std::shared_ptr<smScene> createScene();
+    std::shared_ptr<Scene> createScene();
 
     ///SDK creates scene
-    std::shared_ptr<smScene> getScene(size_t sceneId)
+    std::shared_ptr<Scene> getScene(size_t sceneId)
     {
         return scenesRef->getByRef(sceneId).scene;
     }
 
     ///SDK returns logger for the system
-    std::shared_ptr<smErrorLog> getErrorLog();
+    std::shared_ptr<ErrorLog> getErrorLog();
 
     ///terminates every module. Do it later on with smMessager
     void terminateAll();
 
     ///release the scene from the SDK..not implemented yet
-    void releaseScene(std::shared_ptr<smScene> scene);
+    void releaseScene(std::shared_ptr<Scene> scene);
 
     /// \brief run the SDK
     void run();
 
     /// \brief add reference to a core class
-    void addRef(std::shared_ptr<smCoreClass> p_coreClass);
+    void addRef(std::shared_ptr<CoreClass> p_coreClass);
 
     /// \brief removes reference on core class
-    void removeRef(std::shared_ptr<smCoreClass> p_coreClass);
+    void removeRef(std::shared_ptr<CoreClass> p_coreClass);
 
     /// \brief register functions
     int registerMesh(std::shared_ptr<smBaseMesh> p_mesh);
 
-    int registerModule(std::shared_ptr<smModule> p_mod);
+    int registerModule(std::shared_ptr<Module> p_mod);
 
-    void registerObjectSim(std::shared_ptr<smObjectSimulator> p_os);
+    void registerObjectSim(std::shared_ptr<ObjectSimulator> p_os);
 
-    void registerCollDet(std::shared_ptr<smObjectSimulator> p_col);
+    void registerCollDet(std::shared_ptr<ObjectSimulator> p_col);
 
-    void registerScene(std::shared_ptr<smScene> p_sc);
+    void registerScene(std::shared_ptr<Scene> p_sc);
 
-    void registerSceneObject(std::shared_ptr<smSceneObject> p_sco);
+    void registerSceneObject(std::shared_ptr<SceneObject> p_sco);
 
-    void addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<smObjectSimulator> p_os, int p_scId=0);
+    void addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<ObjectSimulator> p_os, int p_scId=0);
 };
 
 #endif

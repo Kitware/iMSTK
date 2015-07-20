@@ -23,14 +23,14 @@
 
 #include "ModelRepresentation.h"
 
-smModelRepresentation::smModelRepresentation()
+ModelRepresentation::ModelRepresentation()
 {
 
 }
 
-smModelRepresentation::~smModelRepresentation()
+ModelRepresentation::~ModelRepresentation()
 {
 
 }
-smModelRepresentation::smModelRepresentation() {}
-smModelRepresentation::~smModelRepresentation() {}
+ModelRepresentation::ModelRepresentation() {}
+ModelRepresentation::~ModelRepresentation() {}

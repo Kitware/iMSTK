@@ -24,32 +24,32 @@
 #include "Scene.h"
 
 
-smScene::smScene(std::shared_ptr<smErrorLog> p_log) :
-    smCoreClass()
+Scene::Scene(std::shared_ptr<ErrorLog> p_log) :
+    CoreClass()
 {
     this->log = p_log;
     type = core::ClassType::Scene;
     sceneUpdatedTimeStamp = 0;
 }
 
-std::shared_ptr<smUnifiedId> smScene::getSceneId()
+std::shared_ptr<UnifiedId> Scene::getSceneId()
 {
     return this->getUniqueId();
 }
 
-std::vector<std::shared_ptr<smSceneObject>> &smScene::getSceneObject()
+std::vector<std::shared_ptr<SceneObject>> &Scene::getSceneObject()
 {
     std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
     return sceneObjects;
 }
 
-std::shared_ptr<smScene> smScene::operator+=(std::shared_ptr<smSceneObject> p_sceneObject)
+std::shared_ptr<Scene> Scene::operator+=(std::shared_ptr<SceneObject> p_sceneObject)
 {
     addSceneObject(p_sceneObject);
-    return safeDownCast<smScene>();
+    return safeDownCast<Scene>();
 }
 
-void smScene::addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
+void Scene::addSceneObject(std::shared_ptr<SceneObject> p_sceneObject)
 {
     if (p_sceneObject != nullptr)
     {
@@ -60,7 +60,7 @@ void smScene::addSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 }
 
 /// \brief removes the scene object based on scene object id
-void smScene::removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
+void Scene::removeSceneObject(std::shared_ptr<SceneObject> p_sceneObject)
 {
     if (p_sceneObject != nullptr)
     {
@@ -79,7 +79,7 @@ void smScene::removeSceneObject(std::shared_ptr<smSceneObject> p_sceneObject)
 }
 
 /// \brief removes the object from the scene based on its object id
-void smScene::removeSceneObject(std::shared_ptr<smUnifiedId> p_sceneObjectId)
+void Scene::removeSceneObject(std::shared_ptr<UnifiedId> p_sceneObjectId)
 {
     std::lock_guard<std::mutex> lock(sceneLock); //Lock is released when leaves scope
     short id = p_sceneObjectId->getId();
@@ -98,7 +98,7 @@ void smScene::removeSceneObject(std::shared_ptr<smUnifiedId> p_sceneObjectId)
     sceneUpdatedTimeStamp++;
 }
 
-void smScene::copySceneObjects(std::shared_ptr<smScene> p_scene)
+void Scene::copySceneObjects(std::shared_ptr<Scene> p_scene)
 {
     p_scene->sceneObjects.clear();
 
@@ -108,15 +108,15 @@ void smScene::copySceneObjects(std::shared_ptr<smScene> p_scene)
     }
 }
 
-std::shared_ptr<smScene> smScene::operator=(std::shared_ptr<smScene> p_scene)
+std::shared_ptr<Scene> Scene::operator=(std::shared_ptr<Scene> p_scene)
 {
     copySceneObjects(p_scene);
-    return safeDownCast<smScene>();
+    return safeDownCast<Scene>();
 }
 
-void smScene::initLights()
+void Scene::initLights()
 {
-    smVec3f casted;
+    core::Vec3f casted;
 
     for (auto light: lights)
     {
@@ -133,16 +133,16 @@ void smScene::initLights()
     }
 }
 
-int smScene::addLight(std::shared_ptr<smLight> p_light)
+int Scene::addLight(std::shared_ptr<Light> p_light)
 {
     lights.push_back(p_light);
     lights.back()->renderUsage = GL_LIGHT0 + (lights.size() - 1);
     return (lights.size() - 1);
 }
 
-void smScene::refreshLights()
+void Scene::refreshLights()
 {
-    smVec3f casted;
+    core::Vec3f casted;
 
     for (auto light: lights)
     {
@@ -159,22 +159,22 @@ void smScene::refreshLights()
     }
 }
 
-void smScene::setLightPos(int p_lightId, smLightPos p_pos)
+void Scene::setLightPos(int p_lightId, smLightPos p_pos)
 {
-    std::shared_ptr<smLight> temp = lights.at(p_lightId);
+    std::shared_ptr<Light> temp = lights.at(p_lightId);
     temp->lightPos = p_pos;
     temp->updateDirection();
 }
 
-void smScene::setLightPos(int p_lightId, smLightPos p_pos, smVec3d p_direction)
+void Scene::setLightPos(int p_lightId, smLightPos p_pos, core::Vec3d p_direction)
 {
-    std::shared_ptr<smLight> temp = lights.at(p_lightId);
+    std::shared_ptr<Light> temp = lights.at(p_lightId);
     temp->lightPos = p_pos;
     temp->direction = p_direction;
     temp->updateDirection();
 }
 
-void smScene::enableLights()
+void Scene::enableLights()
 {
     glEnable(GL_LIGHTING);
 
@@ -191,7 +191,7 @@ void smScene::enableLights()
     }
 }
 
-void smScene::disableLights()
+void Scene::disableLights()
 {
     for (auto light: lights)
     {
@@ -201,11 +201,11 @@ void smScene::disableLights()
     glDisable(GL_LIGHTING);
 }
 
-void smScene::placeLights()
+void Scene::placeLights()
 {
     for (auto light: lights)
     {
-        smVec3f casted;
+        core::Vec3f casted;
         if (!(light->isEnabled()))
         {
             continue;
@@ -216,7 +216,7 @@ void smScene::placeLights()
         glLightf(light->renderUsage, GL_QUADRATIC_ATTENUATION, light->attn_quadratic);
 
         casted = light->lightPos.getPosition().cast<float>();
-        if (light->lightLocationType == SIMMEDTK_LIGHTPOS_EYE)
+        if (light->lightLocationType == Light::Eye)
         {
             glMatrixMode(GL_MODELVIEW);
             glPushMatrix();
@@ -230,14 +230,14 @@ void smScene::placeLights()
         }
 
         casted = light->direction.cast<float>();
-        if (light->lightType == SIMMEDTK_LIGHT_SPOTLIGHT)
+        if (light->lightType == Light::Spotlight)
         {
             glLightfv(light->renderUsage, GL_SPOT_DIRECTION, casted.data());
         }
     }
 }
 
-void smScene::copySceneToLocal(smSceneLocal &p_local)
+void Scene::copySceneToLocal(SceneLocal &p_local)
 {
     std::lock_guard<std::mutex> lock(this->sceneLock); //Lock is released when leaves scope
 

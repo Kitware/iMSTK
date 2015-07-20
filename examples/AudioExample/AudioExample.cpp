@@ -43,7 +43,7 @@ void AudioKeyboardController::setSound(std::shared_ptr<smAudio> a)
     sound = a;
 }
 
-void AudioKeyboardController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void AudioKeyboardController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     assert(sound);
 
@@ -88,13 +88,13 @@ void AudioKeyboardController::handleEvent(std::shared_ptr<mstk::Event::smEvent> 
 
 void runAudioExample()
 {
-    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<SDK> sdk;
     std::shared_ptr<smViewer> viewer;
     std::shared_ptr<smAudio> sound;
     std::shared_ptr<AudioKeyboardController> audioCtl;
 
     //Create an instance of the SimMedTK framework/SDK
-    sdk = smSDK::getInstance();
+    sdk = SDK::getInstance();
 
     //Create a viewer to see the scene through
     viewer = std::make_shared<smViewer>();

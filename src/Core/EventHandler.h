@@ -35,7 +35,7 @@
 // SimMedTK includes
 #include "Event.h"
 
-class smCoreClass;
+class CoreClass;
 
 namespace mstk {
 namespace Event {
@@ -47,14 +47,14 @@ namespace Event {
 /// https://juanchopanzacpp.wordpress.com/2013/02/24/simple-observer-pattern-implementation-c11/
 ///
 /// The only requirement is that the observer function to bind has
-/// the following signature: void handleEvent(std::shared_ptr<mstk::Event::smEvent> e)
-/// This means that anything inheriting from the smCoreClass can be
+/// the following signature: void handleEvent(std::shared_ptr<mstk::Event::Event> e)
+/// This means that anything inheriting from the CoreClass can be
 /// binded to an event.
 ///
 class smEventHandler
 {
 public:
-    using FunctionType = std::function<void ( std::shared_ptr<smEvent> )>;
+    using FunctionType = std::function<void ( std::shared_ptr<Event> )>;
     using FunctionContainerType = std::list<FunctionType>;
 
 public:
@@ -96,9 +96,9 @@ public:
 
     ///
     /// @brief Triger all events correspontding to the event name (EventType::EventName).
-    /// @param event Event to be triggered, see @smEvent and derived classes.
+    /// @param event Event to be triggered, see @Event and derived classes.
     ///
-    /// @tparam EventObserverType The event that trigges evaluation, child class of smEvent.
+    /// @tparam EventObserverType The event that trigges evaluation, child class of Event.
     ///
     /// @Note If EventType::EventName is not a key in the event map, then an insertion is
     ///     automatically performed.
@@ -117,21 +117,21 @@ public:
     /// @param eventType Event name
     /// @param component Listener (or observer) of triggered events to attach
     ///
-    void attachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+    void attachEvent ( const EventType& eventType, std::shared_ptr<CoreClass> component );
 
     ///
     /// @brief Helper function to facilitate detachment of events.
     /// @param eventType Event name
     /// @param component Listener (or observer) of triggered events to detach
     ///
-    void detachEvent ( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+    void detachEvent ( const EventType& eventType, std::shared_ptr<CoreClass> component );
 
     ///
     /// @brief Verify if the event has been stored.
     /// @param eventType Event name
     /// @param component Listener (or observer) of triggered events to detach
     ///
-    bool isAttached( const EventType& eventType, std::shared_ptr<smCoreClass> component );
+    bool isAttached( const EventType& eventType, std::shared_ptr<CoreClass> component );
 
     ///
     /// @brief Verify if the event has been stored.

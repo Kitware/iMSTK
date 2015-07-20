@@ -21,14 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/Math.h"
 #include "Core/Quaternion.h"
 #include "Core/Vector.h"
 #include "Camera.h"
 
 smCamera::smCamera()
     : ar(4.0 / 3.0),
-      angle(SM_DEGREES2RADIANS(45.0)),
+      angle(M_PI_4),
       nearClip(0.1),
       farClip(100.0),
       pos(0, 0, 0),
@@ -40,7 +39,7 @@ smCamera::smCamera()
     orientDirty.store(false);
 }
 
-smVec3f smCamera::getPos()
+core::Vec3f smCamera::getPos()
 {
     std::lock_guard<std::mutex> lock(posLock);
     return this->pos;
@@ -48,10 +47,10 @@ smVec3f smCamera::getPos()
 
 void smCamera::setPos(const float x, const float y, const float z)
 {
-    this->setPos(smVec3f(x, y, z));
+    this->setPos(core::Vec3f(x, y, z));
 }
 
-void smCamera::setPos(const smVec3f& v)
+void smCamera::setPos(const core::Vec3f& v)
 {
     {//scoped for mutex release
     std::lock_guard<std::mutex> lock(posLock);
@@ -61,7 +60,7 @@ void smCamera::setPos(const smVec3f& v)
     this->orientDirty.store(true);
 }
 
-smVec3f smCamera::getFocus()
+core::Vec3f smCamera::getFocus()
 {
     std::lock_guard<std::mutex> lock(fpLock);
     return this->fp;
@@ -69,10 +68,10 @@ smVec3f smCamera::getFocus()
 
 void smCamera::setFocus(const float x, const float y, const float z)
 {
-    this->setFocus(smVec3f(x, y, z));
+    this->setFocus(core::Vec3f(x, y, z));
 }
 
-void smCamera::setFocus(const smVec3f& v)
+void smCamera::setFocus(const core::Vec3f& v)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(fpLock);
@@ -82,14 +81,14 @@ void smCamera::setFocus(const smVec3f& v)
     this->orientDirty.store(true);
 }
 
-smVec3f smCamera::getUpVec()
+core::Vec3f smCamera::getUpVec()
 {
-    return getOrientation() * smVec3f::UnitY();
+    return getOrientation() * core::Vec3f::UnitY();
 }
 
-smVec3f smCamera::getDirection()
+core::Vec3f smCamera::getDirection()
 {
-    return -(getOrientation() * smVec3f::UnitZ());
+    return -(getOrientation() * core::Vec3f::UnitZ());
 }
 
 float smCamera::getAspectRatio()
@@ -116,12 +115,14 @@ void smCamera::setViewAngle(const float a)
 
 float smCamera::getViewAngleDeg()
 {
-    return SM_RADIANS2DEGREES(getViewAngle());
+    // Return degrees
+    return 57.2957795130823*getViewAngle();
 }
 
 void smCamera::setViewAngleDeg(const float a)
 {
-    setViewAngle(SM_DEGREES2RADIANS(a));
+    // Use radians
+    setViewAngle(0.0174532925199433*a);
 }
 
 float smCamera::getNearClipDist()
@@ -146,7 +147,7 @@ void smCamera::setFarClipDist(const float d)
     this->projDirty.store(true);
 }
 
-void smCamera::setOrientation(const smQuaternionf q)
+void smCamera::setOrientation(const Quaternionf q)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(orientationLock);
@@ -155,22 +156,22 @@ void smCamera::setOrientation(const smQuaternionf q)
     this->orientDirty.store(false);
 }
 
-void smCamera::setOrientFromDir(const smVec3f d)
+void smCamera::setOrientFromDir(const core::Vec3f d)
 {
-    smMatrix33f camAxes;
-    smVec3f tempUp;
+    Matrix33f camAxes;
+    core::Vec3f tempUp;
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(orientationLock);
-    tempUp = this->orientation * smVec3f::UnitY();
+    tempUp = this->orientation * core::Vec3f::UnitY();
     }
 
     camAxes.col(2) = (-d).normalized();
     camAxes.col(0) = tempUp.cross( camAxes.col(2) ).normalized();
     camAxes.col(1) = camAxes.col(2).cross( camAxes.col(0) ).normalized();
-    setOrientation(smQuaternionf(camAxes));
+    setOrientation(Quaternionf(camAxes));
 }
 
-smQuaternionf smCamera::getOrientation()
+Quaternionf smCamera::getOrientation()
 {
     if (true == this->orientDirty.load())
     {
@@ -180,7 +181,7 @@ smQuaternionf smCamera::getOrientation()
     return this->orientation;
 }
 
-smMatrix44f smCamera::getViewMat()
+Matrix44f smCamera::getViewMat()
 {
     if (true == this->viewDirty.load())
     {
@@ -190,7 +191,7 @@ smMatrix44f smCamera::getViewMat()
     return this->view;
 }
 
-void smCamera::setViewMat(const smMatrix44f &m)
+void smCamera::setViewMat(const Matrix44f &m)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(viewLock);
@@ -199,7 +200,7 @@ void smCamera::setViewMat(const smMatrix44f &m)
     this->viewDirty.store(false);
 }
 
-smMatrix44f smCamera::getProjMat()
+Matrix44f smCamera::getProjMat()
 {
     if (true == this->projDirty.load())
     {
@@ -209,7 +210,7 @@ smMatrix44f smCamera::getProjMat()
     return this->proj;
 }
 
-void smCamera::setProjMat(const smMatrix44f &m)
+void smCamera::setProjMat(const Matrix44f &m)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(projLock);
@@ -218,7 +219,7 @@ void smCamera::setProjMat(const smMatrix44f &m)
     this->projDirty.store(false);
 }
 
-void smCamera::pan(smVec3f v)
+void smCamera::pan(core::Vec3f v)
 {
     v = getOrientation() * v;
     setPos(getPos() + v);
@@ -234,20 +235,20 @@ void smCamera::zoom(const float d)
     }
 }
 
-void smCamera::rotateLocal(const float angle, const smVec3f axis)
+void smCamera::rotateLocal(const float angle, const core::Vec3f axis)
 {
     float dist = (getPos() - getFocus()).norm();
-    smQuaternionf q;
+    Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(getOrientation() * q);
     setFocus(getPos() + dist * getDirection());
 }
 
-void smCamera::rotateFocus(const float angle, const smVec3f axis)
+void smCamera::rotateFocus(const float angle, const core::Vec3f axis)
 {
     float dist = (getFocus() - getPos()).norm();
-    smQuaternionf q;
+    Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(getOrientation() * q);
@@ -256,47 +257,47 @@ void smCamera::rotateFocus(const float angle, const smVec3f axis)
 
 void smCamera::rotateLocalX(const float angle)
 {
-    rotateLocal(angle, smVec3f::UnitX());
+    rotateLocal(angle, core::Vec3f::UnitX());
 }
 
 void smCamera::rotateLocalY(const float angle)
 {
-    rotateLocal(angle, smVec3f::UnitY());
+    rotateLocal(angle, core::Vec3f::UnitY());
 }
 
 void smCamera::rotateLocalZ(const float angle)
 {
-    rotateLocal(angle, smVec3f::UnitZ());
+    rotateLocal(angle, core::Vec3f::UnitZ());
 }
 
 void smCamera::rotateFocusX(const float angle)
 {
-    rotateFocus(angle, smVec3f::UnitX());
+    rotateFocus(angle, core::Vec3f::UnitX());
 }
 
 void smCamera::rotateFocusY(const float angle)
 {
-    rotateFocus(angle, smVec3f::UnitY());
+    rotateFocus(angle, core::Vec3f::UnitY());
 }
 
 void smCamera::rotateFocusZ(const float angle)
 {
-    rotateFocus(angle, smVec3f::UnitZ());
+    rotateFocus(angle, core::Vec3f::UnitZ());
 }
 
 
 // Implementation adapted from Sylvain Pointeau's Blog:
 // http://spointeau.blogspot.com/2013/12/hello-i-am-looking-at-opengl-3.html
-smMatrix44f smCamera::lookAt(const smVec3f pos,
-                             const smVec3f fp,
-                             const smVec3f up)
+Matrix44f smCamera::lookAt(const core::Vec3f pos,
+                             const core::Vec3f fp,
+                             const core::Vec3f up)
 {
-    smVec3f f = (fp - pos).normalized();
-    smVec3f u = up.normalized();
-    smVec3f s = f.cross(u).normalized();
+    core::Vec3f f = (fp - pos).normalized();
+    core::Vec3f u = up.normalized();
+    core::Vec3f s = f.cross(u).normalized();
     u = s.cross(f);
 
-    smMatrix44f res;
+    Matrix44f res;
     res <<  s.x(),s.y(),s.z(),-s.dot(pos),
             u.x(),u.y(),u.z(),-u.dot(pos),
             -f.x(),-f.y(),-f.z(),f.dot(pos),
@@ -312,14 +313,14 @@ void smCamera::genViewMat()
 
 // Implementation adapted from Sylvain Pointeau's Blog:
 // http://spointeau.blogspot.com/2013/12/hello-i-am-looking-at-opengl-3.html
-smMatrix44f smCamera::perspective(const float fovy, const float ar,
+Matrix44f smCamera::perspective(const float fovy, const float ar,
                                   const float zNear, const float zFar)
 {
     assert(ar > 0);
     assert(zFar > zNear);
 
     double tanHalfFovy = tan(fovy / 2.0);
-    smMatrix44f res = smMatrix44f::Zero();
+    Matrix44f res = Matrix44f::Zero();
 
     res(0,0) = 1.0 / (ar * tanHalfFovy);
     res(1,1) = 1.0 / (tanHalfFovy);

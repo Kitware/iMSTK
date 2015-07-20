@@ -36,7 +36,7 @@
 namespace mstk {
 namespace Event {
 
-class smHapticEvent : public smEvent
+class smHapticEvent : public Event
 {
 public:
     static EventType EventName;
@@ -44,29 +44,29 @@ public:
 public:
     smHapticEvent(const size_t &deviceId, const std::string &deviceName);
 
-    void setPosition(const smVec3d &coordinates);
+    void setPosition(const core::Vec3d &coordinates);
 
-    const smVec3d &getPosition();
+    const core::Vec3d &getPosition();
 
-    void setVelocity(const smVec3d &deviceVelocity);
+    void setVelocity(const core::Vec3d &deviceVelocity);
 
-    const smVec3d &getVelocity();
+    const core::Vec3d &getVelocity();
 
-    void setAngles(const smVec3d &deviceAngles);
+    void setAngles(const core::Vec3d &deviceAngles);
 
-    const smVec3d &getAngles();
+    const core::Vec3d &getAngles();
 
-    const smMatrix44d &getTransform();
+    const Matrix44d &getTransform();
 
-    void setTransform(const smMatrix44d &deviceTransform);
+    void setTransform(const Matrix44d &deviceTransform);
 
-    const smVec3d &getForce();
+    const core::Vec3d &getForce();
 
-    void setForce(const smVec3d &deviceForce);
+    void setForce(const core::Vec3d &deviceForce);
 
-    const smVec3d &getTorque();
+    const core::Vec3d &getTorque();
 
-    void setTorque(const smVec3d &deviceTorque);
+    void setTorque(const core::Vec3d &deviceTorque);
 
     size_t getDeviceId()
     {
@@ -86,12 +86,12 @@ public:
 private:
     size_t id; // device id
     std::string name; // device name
-    smVec3d position; // position
-    smVec3d velocity; // velocity of the tip
-    smVec3d angles; // angles
-    smVec3d force; // input force
-    smVec3d torque; // input torque
-    smMatrix44d transform; // transformation matrix
+    core::Vec3d position; // position
+    core::Vec3d velocity; // velocity of the tip
+    core::Vec3d angles; // angles
+    core::Vec3d force; // input force
+    core::Vec3d torque; // input torque
+    Matrix44d transform; // transformation matrix
     std::array<bool,4> buttonState;//will be chnage later on
 };
 

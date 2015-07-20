@@ -51,7 +51,7 @@ void printInfoLog(GLhandleARB obj)
     }
 }
 
-smShader::smShader(std::shared_ptr<smErrorLog> logger)
+smShader::smShader(std::shared_ptr<ErrorLog> logger)
 {
     type = core::ClassType::Shader;
     log = logger;
@@ -628,7 +628,7 @@ void smShader::enableCheckingErrors(bool p_checkError)
     this->checkErrorEnabled = p_checkError;
 }
 
-void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, int p_textureID)
+void smShader::attachTexture(std::shared_ptr<UnifiedId> p_meshID, int p_textureID)
 {
 
     smTextureShaderAssignment assign;
@@ -636,7 +636,7 @@ void smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID, int p_textur
     texAssignments.insert( {p_meshID->getId(), assign} );
 }
 
-bool smShader::attachTexture(std::shared_ptr<smUnifiedId> p_meshID,
+bool smShader::attachTexture(std::shared_ptr<UnifiedId> p_meshID,
                                const std::string& p_textureName,
                                const std::string& p_textureShaderName)
 {
@@ -796,7 +796,7 @@ void smShader::initGLShaders()
         x.second->initDraw();
 }
 
-void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)
+void smShader::activeGLTextures(std::shared_ptr<UnifiedId> p_id)
 {
     int counter = 0;
     auto range = texAssignments.equal_range(p_id->getId());
@@ -809,7 +809,7 @@ void smShader::activeGLTextures(std::shared_ptr<smUnifiedId> p_id)
     }
 }
 
-void smShader::activeGLVertAttribs(int p_id, smVec3d *p_vecs, int /*p_size*/)
+void smShader::activeGLVertAttribs(int p_id, core::Vec3d *p_vecs, int /*p_size*/)
 {
     glVertexAttribPointer(attribShaderParams[p_id], 3, GL_FLOAT, GL_FALSE, 0, p_vecs);
 }
@@ -855,7 +855,7 @@ bool smShader::setProjectionMatrixShaderName(const std::string& p_projectionName
 }
 void smShader::updateGLSLMatwithOPENGL()
 {
-    smMatrix44f proj, model;
+    Matrix44f proj, model;
     smGLUtils::queryModelViewMatrix( model );
     smGLUtils::queryProjectionMatrix( proj );
 
@@ -867,7 +867,7 @@ GLint smShader::queryUniformLocation(const std::string& p_param)
 {
     return glGetUniformLocation(shaderProgramObject, p_param.data());
 }
-std::shared_ptr<smShader> smShader::getShader( std::shared_ptr<smUnifiedId> p_shaderID )
+std::shared_ptr<smShader> smShader::getShader( std::shared_ptr<UnifiedId> p_shaderID )
 {
     return shaders[p_shaderID->getId()];
 }

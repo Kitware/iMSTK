@@ -25,7 +25,6 @@
 
 #include "Event/MouseButtonEvent.h"
 #include "Event/MouseMoveEvent.h"
-#include "Core/Math.h"
 
 namespace mstk {
 namespace Examples {
@@ -54,7 +53,7 @@ void pzrMouseCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent> event)
+void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
     assert(nullptr != event);
     assert(nullptr != camera);
@@ -83,8 +82,8 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent>
     auto mouseMoveEvent = std::dynamic_pointer_cast<Event::smMouseMoveEvent>(event);
     if(mouseMoveEvent != nullptr)
     {
-        smVec2f diff;
-        smVec2f newCoords;
+        core::Vec2f diff;
+        core::Vec2f newCoords;
 
         newCoords = mouseMoveEvent->getWindowCoord().cast<float>();
         diff = coords - newCoords;
@@ -92,15 +91,16 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::smEvent>
         if(lmbPressed && rmbPressed)
         {
             //pan x and y
-            this->camera->pan(smVec3f(diff(0), diff(1), 0) * moveDistance);
+            this->camera->pan(core::Vec3f(diff(0), diff(1), 0) * moveDistance);
             //reset coords for next mouse move event
             coords = newCoords;
         }
         else if(lmbPressed)
         {
             //rotate
-            this->camera->rotateFocusX(SM_DEGREES2RADIANS(moveDistance * diff(1)));
-            this->camera->rotateFocusY(SM_DEGREES2RADIANS(moveDistance * diff(0)));
+            // In radians
+            this->camera->rotateFocusX(0.0174532925199433*(moveDistance * diff(1)));
+            this->camera->rotateFocusY(0.0174532925199433*(moveDistance * diff(0)));
             //reset coords for next mouse move event
             coords = newCoords;
         }

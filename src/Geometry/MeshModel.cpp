@@ -58,26 +58,26 @@ void smMeshModel::load(const std::string& meshName, const smMeshFileType& type)
 
     this->mesh->loadMesh(meshName, type);
 }
-const smVec3d& smMeshModel::getNormal(size_t i) const
+const core::Vec3d& smMeshModel::getNormal(size_t i) const
 {
     return this->mesh->triNormals[i];
 }
-std::array<smVec3d,3> smMeshModel::getTrianglePositions(size_t i) const
+std::array<core::Vec3d,3> smMeshModel::getTrianglePositions(size_t i) const
 {
-    std::array<smVec3d, 3> vertices;
+    std::array<core::Vec3d, 3> vertices;
     vertices[0] = this->mesh->vertices[this->mesh->triangles[i].vert[0]];
     vertices[1] = this->mesh->vertices[this->mesh->triangles[i].vert[1]];
     vertices[2] = this->mesh->vertices[this->mesh->triangles[i].vert[2]];
 
     return vertices;
 }
-const smStdVector3d& smMeshModel::getVertices() const
+const core::StdVector3d& smMeshModel::getVertices() const
 {
     return mesh->getVertices();
 }
 void smMeshModel::draw()
 {
-    smRenderDelegate::Ptr delegate = this->mesh->getRenderDelegate();
+    RenderDelegate::Ptr delegate = this->mesh->getRenderDelegate();
     if (delegate)
       delegate->draw();
 }
@@ -104,7 +104,7 @@ void smMeshModel::load(const std::string& meshFileName, const std::string& textu
         this->mesh->assignTexture(textureName);
     }
 }
-void smMeshModel::setRenderDetail(std::shared_ptr< smRenderDetail > renderDetail)
+void smMeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)
 {
     this->mesh->setRenderDetail(renderDetail);
 }

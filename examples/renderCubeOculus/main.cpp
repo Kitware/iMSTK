@@ -33,17 +33,17 @@
 
 int main()
 {
-    std::shared_ptr<smSDK> sdk;
+    std::shared_ptr<SDK> sdk;
     std::shared_ptr<smOculusViewer> viewer;
-    std::shared_ptr<smScene> scene1;
-    std::shared_ptr<smLight> light;
+    std::shared_ptr<Scene> scene1;
+    std::shared_ptr<Light> light;
     std::shared_ptr<smCamera> sceneCamera;
-    std::shared_ptr<smStaticSceneObject> cube;
+    std::shared_ptr<StaticSceneObject> cube;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
 
     //Create an instance of the SimMedTK framework/SDK
-    sdk = smSDK::getInstance();
+    sdk = SDK::getInstance();
 
     //Create a new scene to work in
     scene1 = sdk->createScene();
@@ -59,10 +59,10 @@ int main()
     auto cubeModel = std::make_shared<smMeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
-    auto renderDetail = std::make_shared<smRenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     cubeModel->setRenderDetail(renderDetail);
 
-    cube = std::make_shared<smStaticSceneObject>();
+    cube = std::make_shared<StaticSceneObject>();
     cube->setModel(cubeModel);
 
     //Add the cube to the scene to be rendered
@@ -81,7 +81,7 @@ int main()
     viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     // Setup Scene lighting
-    light = smLight::getDefaultLighting();
+    light = Light::getDefaultLighting();
     assert(light);
     scene1->addLight(light);
 

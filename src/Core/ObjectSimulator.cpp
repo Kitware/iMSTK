@@ -25,10 +25,10 @@
 #include "Rendering/Viewer.h"
 #include "SDK.h"
 
-smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
+ObjectSimulator::ObjectSimulator(std::shared_ptr<ErrorLog> p_log)
 {
     this->log = p_log;
-//     smSDK::getInstance()->registerObjectSim(safeDownCast<smObjectSimulator>());
+//     SDK::getInstance()->registerObjectSim(safeDownCast<ObjectSimulator>());
     name = "objecSimulator" + std::to_string(this->getUniqueId()->getId());
 
     type = core::ClassType::Simulator;
@@ -45,22 +45,22 @@ smObjectSimulator::smObjectSimulator(std::shared_ptr<smErrorLog> p_log)
     execType = SIMMEDTK_SIMEXECUTION_SYNCMODE;
 }
 
-void smObjectSimulator::addObject(std::shared_ptr<smSceneObject> p_object)
+void ObjectSimulator::addObject(std::shared_ptr<SceneObject> p_object)
 {
-    p_object->objectSim = safeDownCast<smObjectSimulator>();
+    p_object->objectSim = safeDownCast<ObjectSimulator>();
     objectsSimulated.emplace_back( p_object );
 }
 
-void smObjectSimulator::removeObject(std::shared_ptr<smSceneObject> /*p_object*/ )
+void ObjectSimulator::removeObject(std::shared_ptr<SceneObject> /*p_object*/ )
 {
 }
 
-void smObjectSimulator::setPriority( smThreadPriority p_priority )
+void ObjectSimulator::setPriority( smThreadPriority p_priority )
 {
     threadPriority = p_priority;
 }
 
-void smObjectSimulator::setExecutionType( smSimulatorExecutionType p_type )
+void ObjectSimulator::setExecutionType( smSimulatorExecutionType p_type )
 {
     if ( execType != p_type )
     {
@@ -70,12 +70,12 @@ void smObjectSimulator::setExecutionType( smSimulatorExecutionType p_type )
     execType = p_type;
 }
 
-smThreadPriority smObjectSimulator::getPriority()
+smThreadPriority ObjectSimulator::getPriority()
 {
     return threadPriority;
 }
 
-void smObjectSimulator::init()
+void ObjectSimulator::init()
 {
     if ( isObjectSimInitialized == false )
     {
@@ -85,12 +85,12 @@ void smObjectSimulator::init()
     }
 }
 
-void smObjectSimulator::beginSim()
+void ObjectSimulator::beginSim()
 {
     frameCounter++;
     timer.start();
 }
-void smObjectSimulator::endSim()
+void ObjectSimulator::endSim()
 {
     timerPerFrame = timer.elapsed();
     totalTime += timerPerFrame;
@@ -103,12 +103,12 @@ void smObjectSimulator::endSim()
     }
 }
 
-void smObjectSimulator::updateSceneList()
+void ObjectSimulator::updateSceneList()
 {
 }
 
-smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smScheduleGroup &p_group,
-                                                                             std::vector<std::shared_ptr<smSceneObject>> &p_objectsSimulated,
+ObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( ScheduleGroup &p_group,
+                                                                             std::vector<std::shared_ptr<SceneObject>> &p_objectsSimulated,
                                                                              int p_threadIndex )
 {
 
@@ -146,17 +146,17 @@ smObjectSimulator::smObjectSimulatorObjectIter::smObjectSimulatorObjectIter( smS
         }
     }
 }
-void smObjectSimulator::smObjectSimulatorObjectIter::setThreadIndex( short int p_threadIndex )
+void ObjectSimulator::smObjectSimulatorObjectIter::setThreadIndex( short int p_threadIndex )
 {
     threadIndex = p_threadIndex;
 }
 
-int smObjectSimulator::smObjectSimulatorObjectIter::begin()
+int ObjectSimulator::smObjectSimulatorObjectIter::begin()
 {
     return beginIndex;
 }
 
-int smObjectSimulator::smObjectSimulatorObjectIter::end()
+int ObjectSimulator::smObjectSimulatorObjectIter::end()
 {
     return endIndex;
 }

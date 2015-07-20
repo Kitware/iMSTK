@@ -31,52 +31,52 @@ EventType smHapticEvent::EventName = EventType::Haptic;
 smHapticEvent::smHapticEvent(const size_t& deviceId, const std::string& deviceName): id(deviceId), name(deviceName)
 {}
 
-void smHapticEvent::setPosition(const smVec3d& coordinates)
+void smHapticEvent::setPosition(const core::Vec3d& coordinates)
 {
     this->position = coordinates;
 }
 
-const smVec3d& smHapticEvent::getPosition()
+const core::Vec3d& smHapticEvent::getPosition()
 {
     return this->position;
 }
-void smHapticEvent::setVelocity(const smVec3d& deviceVelocity)
+void smHapticEvent::setVelocity(const core::Vec3d& deviceVelocity)
 {
     this->velocity = deviceVelocity;
 }
-const smVec3d& smHapticEvent::getVelocity()
+const core::Vec3d& smHapticEvent::getVelocity()
 {
     return this->velocity;
 }
-void smHapticEvent::setAngles(const smVec3d& deviceAngles)
+void smHapticEvent::setAngles(const core::Vec3d& deviceAngles)
 {
     this->angles = deviceAngles;
 }
-const smVec3d& smHapticEvent::getAngles()
+const core::Vec3d& smHapticEvent::getAngles()
 {
     return this->angles;
 }
-const smMatrix44d& smHapticEvent::getTransform()
+const Matrix44d& smHapticEvent::getTransform()
 {
     return this->transform;
 }
-void smHapticEvent::setTransform(const smMatrix44d& deviceTransform)
+void smHapticEvent::setTransform(const Matrix44d& deviceTransform)
 {
     this->transform = deviceTransform;
 }
-const smVec3d& smHapticEvent::getForce()
+const core::Vec3d& smHapticEvent::getForce()
 {
     return this->force;
 }
-void smHapticEvent::setForce(const smVec3d& deviceForce)
+void smHapticEvent::setForce(const core::Vec3d& deviceForce)
 {
     this->force = deviceForce;
 }
-const smVec3d& smHapticEvent::getTorque()
+const core::Vec3d& smHapticEvent::getTorque()
 {
     return this->torque;
 }
-void smHapticEvent::setTorque(const smVec3d& deviceTorque)
+void smHapticEvent::setTorque(const core::Vec3d& deviceTorque)
 {
     this->torque = deviceTorque;
 }

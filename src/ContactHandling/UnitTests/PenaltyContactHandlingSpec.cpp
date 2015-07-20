@@ -33,11 +33,11 @@
 
 using namespace bandit;
 
-std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
+std::shared_ptr<StaticSceneObject> createStaticPlaneSceneObject()
 {
-    auto staticPlane = std::make_shared<smStaticSceneObject>();
+    auto staticPlane = std::make_shared<StaticSceneObject>();
 
-    std::shared_ptr<smPlaneCollisionModel> plane = std::make_shared<smPlaneCollisionModel>( smVec3d(0.0, 0.0, 0.0), smVec3d(0.0, 0.0, 1.0) );
+    std::shared_ptr<PlaneCollisionModel> plane = std::make_shared<PlaneCollisionModel>( core::Vec3d(0.0, 0.0, 0.0), core::Vec3d(0.0, 0.0, 1.0) );
 
     staticPlane->setModel(plane);
 
@@ -45,13 +45,13 @@ std::shared_ptr<smStaticSceneObject> createStaticPlaneSceneObject()
 }
 
 
-std::shared_ptr<smCollisionPair> createSampleCollisionPair()
+std::shared_ptr<CollisionPair> createSampleCollisionPair()
 {
-    auto collisionPair = std::make_shared<smCollisionPair>();
+    auto collisionPair = std::make_shared<CollisionPair>();
 
     float depth = 1.0;
-    smVec3d contactPoint(0,0,1);
-    smVec3d normal(1,0,0);
+    core::Vec3d contactPoint(0,0,1);
+    core::Vec3d normal(1,0,0);
 
     collisionPair->addContact(depth,contactPoint,1,normal);
 
@@ -65,20 +65,20 @@ go_bandit([]() {
 
 
         it("initializes properly ", []() {
-            auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             AssertThat(handler != nullptr, IsTrue());
-            AssertThat(handler->getContactHandlingType() == smContactHandlingType::PenaltyFemToStatic, IsTrue());
+            AssertThat(handler->getContactHandlingType() == ContactHandlingType::PenaltyFemToStatic, IsTrue());
         });
 
         it("attches a collision pair ", []() {
-            auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             auto collisionPair  = createSampleCollisionPair();
             handler->setCollisionPairs(collisionPair);
             AssertThat(handler->getCollisionPairs() == collisionPair, IsTrue());
         });
 
         it("attaches a scene object ", []() {
-            auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             auto fem            = std::make_shared<smVegaFemSceneObject>();
             auto plane          = createStaticPlaneSceneObject();
             handler->setSceneObjects(plane,fem);
@@ -89,7 +89,7 @@ go_bandit([]() {
         });
 
         it("computes contact force ", []() {
-            auto handler        = std::make_shared<smPenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             auto fem            = std::make_shared<smVegaFemSceneObject>();
             auto collisionPair  = createSampleCollisionPair();
             auto plane          = createStaticPlaneSceneObject();

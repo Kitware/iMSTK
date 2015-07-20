@@ -31,7 +31,7 @@
 namespace mstk {
 namespace Event {
 
-class smLightMotionEvent : public smEvent
+class smLightMotionEvent : public Event
 {
 public:
     static EventType EventName;
@@ -39,13 +39,13 @@ public:
 public:
     smLightMotionEvent(const int &lightIndex);
 
-    void setPosition(const smVec3d &lightPosition);
+    void setPosition(const core::Vec3d &lightPosition);
 
-    const smVec3d &getPosition();
+    const core::Vec3d &getPosition();
 
-    void setDirection(const smVec3d &lightDirection);
+    void setDirection(const core::Vec3d &lightDirection);
 
-    const smVec3d &getDirection();
+    const core::Vec3d &getDirection();
 
     void setLightIndex(const int &lightIndex);
 
@@ -53,8 +53,8 @@ public:
 
 private:
     int index; // light index
-    smVec3d position; // light position
-    smVec3d direction; // direction
+    core::Vec3d position; // light position
+    core::Vec3d direction; // direction
 };
 
 } // Event namespace

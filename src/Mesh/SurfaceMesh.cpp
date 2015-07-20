@@ -50,7 +50,7 @@ size_t Filelength(const char * filename, int)
 #endif
 
 /// \brief constructor
-smSurfaceMesh::smSurfaceMesh(const smMeshType &p_meshtype, std::shared_ptr<smErrorLog> log)
+smSurfaceMesh::smSurfaceMesh(const smMeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
 {
 
     this->log_SF = log;
@@ -212,7 +212,7 @@ bool smSurfaceMesh::LoadMeshAssimp(const std::string& fileName)
     //Get indexed vertex data
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices[i] = smVec3d(mesh->mVertices[i][0],
+        this->vertices[i] = core::Vec3d(mesh->mVertices[i][0],
                                     mesh->mVertices[i][1],
                                     mesh->mVertices[i][2]);
     }
@@ -342,8 +342,8 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
             this->nbrVertices = l_qty;
             this->vertices.reserve(l_qty);
             this->origVerts.reserve(l_qty);
-            this->vertNormals = new smVec3d[l_qty];
-            this->vertTangents = new smVec3d[l_qty];
+            this->vertNormals = new core::Vec3d[l_qty];
+            this->vertTangents = new core::Vec3d[l_qty];
             this->texCoord = new smTexCoord[l_qty];
 
             for (int fpt = 0; fpt < this->nbrVertices; fpt++)
@@ -366,8 +366,8 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
             fread(&l_qty, sizeof(unsigned short), 1, l_file);
             this->nbrTriangles = l_qty;
             this->triangles = new smTriangle[l_qty];
-            this->triNormals = new smVec3d[l_qty];
-            this->triTangents = new smVec3d[l_qty];
+            this->triNormals = new core::Vec3d[l_qty];
+            this->triTangents = new core::Vec3d[l_qty];
 
             for (i = 0; i < l_qty; i++)
             {
@@ -422,7 +422,7 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
 }
 smSurfaceMesh::smSurfaceMesh()
 {
-    this->log_SF = std::shared_ptr<smErrorLog>();
+    this->log_SF = std::shared_ptr<ErrorLog>();
     meshType = SMMESH_DEFORMABLE;
     meshFileType = SM_FILETYPE_NONE;
 }

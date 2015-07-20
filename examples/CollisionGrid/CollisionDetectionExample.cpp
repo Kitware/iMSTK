@@ -51,10 +51,10 @@ CollisionDetectionExample::CollisionDetectionExample()
     spatGrid = new smSpatialGrid();
 
     ///create the sdk
-    simmedtkSDK = smSDK::createSDK();
+    simmedtkSDK = SDK::createSDK();
     ///create scene objects
-    object1 = new smStaticSceneObject();
-    object2 = new smStaticSceneObject();
+    object1 = new StaticSceneObject();
+    object2 = new StaticSceneObject();
 
     ///create a 3D lattice for each object
     lat = new smLattice();
@@ -64,11 +64,11 @@ CollisionDetectionExample::CollisionDetectionExample()
     scene1 = simmedtkSDK->createScene();
 
     ///dummy simulator. it translates the object
-    dummySim = new smDummySimulator(smSDK::getErrorLog());
+    dummySim = new smDummySimulator(SDK::getErrorLog());
     simmedtkSDK->getEventDispatcher()->registerEventHandler(dummySim, SIMMEDTK_EVENTTYPE_KEYBOARD);
 
     ///init texture manager and give the texture file names to be loaded
-    smTextureManager::init(smSDK::getErrorLog());
+    smTextureManager::init(SDK::getErrorLog());
     smTextureManager::loadTexture("../../resources/textures/fat9.bmp", "livertexture1");
     smTextureManager::loadTexture("../../resources/textures/blood.jpg", "livertexture2");
 
@@ -95,9 +95,9 @@ CollisionDetectionExample::CollisionDetectionExample()
     spatGrid->addLattice(lat);
 
     ///the similiar routines for object2
-    object2 = new smStaticSceneObject();
+    object2 = new StaticSceneObject();
     object2->mesh->loadMeshLegacy("../../resources/models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
-    object2->mesh->translate(smVec3d(2, 0, 0));
+    object2->mesh->translate(core::Vec3d(2, 0, 0));
 
     object2->mesh->assignTexture("livertexture2");
     object2getRenderDetail()->shadowColor.rgba[0] = 1.0;
@@ -126,7 +126,7 @@ CollisionDetectionExample::CollisionDetectionExample()
 
     //specify the viewer global settings
     viewer->viewerRenderDetail = viewer->viewerRenderDetail | SIMMEDTK_VIEWERRENDER_GROUND;
-    viewer->camera()->setFieldOfView(SM_DEGREES2RADIANS(60));
+    viewer->camera()->setFieldOfView(0.0174532925199433*(60));
     viewer->camera()->setZClippingCoefficient(1000);
     viewer->camera()->setZNearCoefficient(0.001);
     viewer->list();

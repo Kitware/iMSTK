@@ -33,13 +33,13 @@
 
 /// A quaternion.
 template<typename T>
-using smQuaternion = Eigen::Quaternion<T>;
+using Quaternion = Eigen::Quaternion<T>;
 
 /// A quaternion of floats.
-using smQuaternionf = smQuaternion<float>;
+using Quaternionf = Quaternion<float>;
 
 /// A quaternion of doubles.
-using smQuaterniond = smQuaternion<double>;
+using Quaterniond = Quaternion<double>;
 
 /// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type.

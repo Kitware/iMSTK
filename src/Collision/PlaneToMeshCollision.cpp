@@ -32,10 +32,10 @@
 // STL includes
 #include <limits>
 
-void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair> pair)
+void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pair)
 {
-    auto mesh = std::static_pointer_cast<smMeshCollisionModel>(pair->getFirst());
-    auto plane = std::static_pointer_cast<smPlaneCollisionModel>(pair->getSecond());
+    auto mesh = std::static_pointer_cast<MeshCollisionModel>(pair->getFirst());
+    auto plane = std::static_pointer_cast<PlaneCollisionModel>(pair->getSecond());
 
     if (!mesh || !plane)
     {
@@ -43,10 +43,10 @@ void smPlaneToMeshCollision::doComputeCollision(std::shared_ptr<smCollisionPair>
     }
 
     double d;
-    smVec3d planeNormal = plane->getPlaneModel()->getUnitNormal();
-    smVec3d planePos = plane->getPlaneModel()->getPoint();
+    core::Vec3d planeNormal = plane->getPlaneModel()->getUnitNormal();
+    core::Vec3d planePos = plane->getPlaneModel()->getPoint();
 
-    smVec3d vert;
+    core::Vec3d vert;
     pair->clearContacts();
     for (int i = 0; i < mesh->getVertices().size(); i++)//const auto& vertex : mesh->getVertices()
     {

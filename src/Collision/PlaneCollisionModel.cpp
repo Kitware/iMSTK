@@ -24,10 +24,10 @@
 
 #include "PlaneCollisionModel.h"
 
-smPlaneCollisionModel::smPlaneCollisionModel(const smVec3d& p, const smVec3d& n)
+PlaneCollisionModel::PlaneCollisionModel(const core::Vec3d& p, const core::Vec3d& n)
     : smPlaneModel(p, n)
 {
 
 }
 
-smPlaneCollisionModel::~smPlaneCollisionModel() {}
+PlaneCollisionModel::~PlaneCollisionModel() {}

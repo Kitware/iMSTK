@@ -35,24 +35,24 @@
 MyStylus::MyStylus(const std::string& p_shaft, const std::string& p_lower, const std::string& p_upper)
 {
     angle = 0;
-    smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
+    Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_shaft, SM_FILETYPE_3DS);
     mesh->assignTexture("hookCautery");
-    mesh->scale(smVec3d(0.2, 0.2, 0.2));
+    mesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     smSurfaceMesh *lowerMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     lowerMesh->loadMesh(p_lower, SM_FILETYPE_3DS);
     lowerMesh->assignTexture("metal");
-    lowerMesh->scale(smVec3d(0.2, 0.2, 0.2));
+    lowerMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     lowerMesh->rotate(rot);
 
     smSurfaceMesh *upperMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     upperMesh->loadMesh(p_upper, SM_FILETYPE_3DS);
     upperMesh->assignTexture("metal");
-    upperMesh->scale(smVec3d(0.2, 0.2, 0.2));
+    upperMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     upperMesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
@@ -105,7 +105,7 @@ void MyStylus::updateOpenClose()
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
-void MyStylus::handleEvent (std::shared_ptr<mstk::Event::smEvent> p_event)
+void MyStylus::handleEvent (std::shared_ptr<mstk::Event::Event> p_event)
 {
     if(!this->isListening())
     {
@@ -183,12 +183,12 @@ void MyStylus::handleEvent (std::shared_ptr<mstk::Event::smEvent> p_event)
 
 HookCautery::HookCautery(const std::string& p_pivot)
 {
-    smMatrix33d rot = Eigen::AngleAxisd(-SM_PI_HALF, smVec3d::UnitX()).matrix();
+    Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
     smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
     mesh->loadMesh(p_pivot, SM_FILETYPE_3DS);
     mesh->assignTexture("metal");
-    mesh->scale(smVec3d(0.2, 0.2, 0.2));
+    mesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
     meshContainer.name = "HookCauteryPivot";
@@ -198,7 +198,7 @@ HookCautery::HookCautery(const std::string& p_pivot)
     addMeshContainer(&meshContainer);
 }
 
-void HookCautery::handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event)
+void HookCautery::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
 {
     if(!this->isListening())
     {

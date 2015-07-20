@@ -16,32 +16,32 @@
 #include "RenderDetail.h"
 //#include "Shader/Shader.h"
 
-void smRenderDetail::addShader(std::shared_ptr<smUnifiedId> p_shaderID)
+void RenderDetail::addShader(std::shared_ptr<UnifiedId> p_shaderID)
 {
 
     shaderEnable.push_back(true);
     shaders.push_back(p_shaderID);
 }
-void smRenderDetail::addVAO(std::shared_ptr<smUnifiedId> p_shaderID)
+void RenderDetail::addVAO(std::shared_ptr<UnifiedId> p_shaderID)
 {
 
     VAOs.push_back(p_shaderID);
     VAOEnable.push_back(true);
 }
 
-smRenderDetail::smRenderDetail()
+RenderDetail::RenderDetail()
 {
   this->reset();
 }
 
-smRenderDetail::smRenderDetail(unsigned int type)
+RenderDetail::RenderDetail(unsigned int type)
 {
   this->reset();
   normalLength = 1.0;
   this->renderType = type;
 }
 
-void smRenderDetail::reset()
+void RenderDetail::reset()
 {
   renderType = 0;
   highLightColor.rgba[0] = 1.0f;
@@ -53,138 +53,138 @@ void smRenderDetail::reset()
   shadowColor.rgba[1] = 0.0f;
   shadowColor.rgba[2] = 0.0f;
   shadowColor.rgba[3] = 0.5f;
-  colorDiffuse = smColor::colorWhite;
-  colorAmbient = smColor::colorWhite;
-  colorSpecular = smColor::colorWhite;
-  normalColor = smColor::colorGreen;
-  wireFrameColor = smColor::colorBlue;
+  colorDiffuse = Color::colorWhite;
+  colorAmbient = Color::colorWhite;
+  colorSpecular = Color::colorWhite;
+  normalColor = Color::colorGreen;
+  wireFrameColor = Color::colorBlue;
   shininess = 50.0;
   debugDraw = false;
   castShadow = true;
   canGetShadow = true;
 }
 
-void smRenderDetail::setNormalLength(const float len)
+void RenderDetail::setNormalLength(const float len)
 {
     this->normalLength = len;
 }
-void smRenderDetail::setLineSize(const float size)
+void RenderDetail::setLineSize(const float size)
 {
     this->lineSize = size;
 }
-void smRenderDetail::setPointSize(const float size)
+void RenderDetail::setPointSize(const float size)
 {
     this->pointSize = size;
 }
-void smRenderDetail::setVertexColor(const smColor vertColor)
+void RenderDetail::setVertexColor(const Color vertColor)
 {
     this->vertexRenderColor = vertColor;
 }
-void smRenderDetail::setNormalColor(const smColor normColor)
+void RenderDetail::setNormalColor(const Color normColor)
 {
     this->normalColor = normColor;
 }
-void smRenderDetail::setDiffuseColor(const smColor diffColor)
+void RenderDetail::setDiffuseColor(const Color diffColor)
 {
     this->colorDiffuse = diffColor;
 }
-void smRenderDetail::setAmbientColor(const smColor ambColor)
+void RenderDetail::setAmbientColor(const Color ambColor)
 {
     this->colorAmbient = ambColor;
 }
-void smRenderDetail::setSpecularColor(const smColor specColor)
+void RenderDetail::setSpecularColor(const Color specColor)
 {
     this->colorSpecular = specColor;
 }
-void smRenderDetail::setShadowColor(const smColor shadColor)
+void RenderDetail::setShadowColor(const Color shadColor)
 {
     this->shadowColor = shadColor;
 }
-void smRenderDetail::setWireframeColor(const smColor wireColor)
+void RenderDetail::setWireframeColor(const Color wireColor)
 {
     this->wireFrameColor = wireColor;
 }
-void smRenderDetail::setShininess(const float s)
+void RenderDetail::setShininess(const float s)
 {
     this->shininess = s;
 }
-void smRenderDetail::setHighlightColor(const smColor highlightColor)
+void RenderDetail::setHighlightColor(const Color highlightColor)
 {
     this->highLightColor = highlightColor;
 }
-const smColor& smRenderDetail::getColorDiffuse() const
+const Color& RenderDetail::getColorDiffuse() const
 {
     return colorDiffuse;
 }
-const smColor& smRenderDetail::getColorAmbient() const
+const Color& RenderDetail::getColorAmbient() const
 {
     return colorAmbient;
 }
-const smColor& smRenderDetail::getColorSpecular() const
+const Color& RenderDetail::getColorSpecular() const
 {
     return colorSpecular;
 }
-const float& smRenderDetail::getShininess() const
+const float& RenderDetail::getShininess() const
 {
     return shininess;
 }
-const unsigned int& smRenderDetail::getRenderType() const
+const unsigned int& RenderDetail::getRenderType() const
 {
     return renderType;
 }
-const float& smRenderDetail::getPointSize() const
+const float& RenderDetail::getPointSize() const
 {
     return pointSize;
 }
-const float& smRenderDetail::getLineSize() const
+const float& RenderDetail::getLineSize() const
 {
     return lineSize;
 }
-const smColor& smRenderDetail::getNormalColor() const
+const Color& RenderDetail::getNormalColor() const
 {
     return this->normalColor;
 }
-const smColor& smRenderDetail::getHighLightColor() const
+const Color& RenderDetail::getHighLightColor() const
 {
     return this->highLightColor;
 }
-const smColor& smRenderDetail::getVertexColor() const
+const Color& RenderDetail::getVertexColor() const
 {
     return this->vertexRenderColor;
 }
-const smColor& smRenderDetail::getShadowColor() const
+const Color& RenderDetail::getShadowColor() const
 {
     return this->shadowColor;
 }
-const bool& smRenderDetail::getCastShadow() const
+const bool& RenderDetail::getCastShadow() const
 {
     return this->castShadow;
 }
-const bool& smRenderDetail::getCanGetShadow() const
+const bool& RenderDetail::getCanGetShadow() const
 {
     return this->canGetShadow;
 }
-const smColor& smRenderDetail::getWireFrameColor() const
+const Color& RenderDetail::getWireFrameColor() const
 {
     return this->wireFrameColor;
 }
-const bool& smRenderDetail::getDebugDraw() const
+const bool& RenderDetail::getDebugDraw() const
 {
     return this->debugDraw;
 }
-const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getShaders() const
+const std::vector< std::shared_ptr<UnifiedId> >& RenderDetail::getShaders() const
 {
     return this->shaders;
 }
-const std::vector< bool >& smRenderDetail::getShaderEnable() const
+const std::vector< bool >& RenderDetail::getShaderEnable() const
 {
     return this->shaderEnable;
 }
-const std::vector< std::shared_ptr<smUnifiedId> >& smRenderDetail::getVAOs() const
+const std::vector< std::shared_ptr<UnifiedId> >& RenderDetail::getVAOs() const
 {
     return this->VAOs;
 }
-const std::vector< bool >& smRenderDetail::getVAOEnable() const
+const std::vector< bool >& RenderDetail::getVAOEnable() const
 {
     return this->VAOEnable;
 }

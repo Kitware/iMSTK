@@ -28,17 +28,19 @@
 #include "CoreClass.h"
 #include "Synchronization.h"
 
-/// \brief process(used as conceptual meaning) numbering scheme
-enum smProcessNumbering
-{
-    SIMMEDTK_PROCNUMSCHEME_X__,
-    SIMMEDTK_PROCNUMSCHEME_XY_,
-    SIMMEDTK_PROCNUMSCHEME_XYZ,
-};
 /// \brief process id
-struct smProcessID
+struct ProcessID
 {
 public:
+
+    /// \brief process(used as conceptual meaning) numbering scheme
+    enum class ProcessNumbering
+    {
+        X,
+        XY,
+        XYZ,
+    };
+
     /// \brief numbering scheme in x,y,z
     unsigned short x;
     unsigned short y;
@@ -52,16 +54,16 @@ public:
     /// \brief data size
     int sizeOfData;
     /// \brief numbering sceheme
-    smProcessNumbering numbScheme;
+    ProcessNumbering numbScheme;
 
-    smProcessID()
+    ProcessID()
     {
         x = y = z = totalProcX = totalProcY = totalProcZ = sizeOfData = 0;
         data = NULL;
-        numbScheme = SIMMEDTK_PROCNUMSCHEME_X__;
+        numbScheme = ProcessNumbering::X;
     }
 
-    inline void operator=(smProcessID p_ID)
+    inline void operator=(ProcessID p_ID)
     {
         x = p_ID.x;
         y = p_ID.y;
@@ -79,15 +81,15 @@ public:
 
 
 /// \brief process. Process is a atomic execution unit(thread).
-class smProcess: public smCoreClass
+class Process: public CoreClass
 {
 
 protected:
-    smProcessID id;
+    ProcessID id;
     bool termination;
 
 public:
-    smProcess()
+    Process()
     {
         id.x = 0;
         id.y = 0;
@@ -97,17 +99,17 @@ public:
         id.totalProcZ = 0;
         id.data = NULL;
         id.sizeOfData = 0;
-        id.numbScheme = SIMMEDTK_PROCNUMSCHEME_X__;
+        id.numbScheme = ProcessID::ProcessNumbering::X;
         termination = false;
     }
 
-    smProcess(smProcessID p_id)
+    Process(ProcessID p_id)
     {
         id = p_id;
         termination = false;
     }
 
-    void setId(smProcessID p_id)
+    void setId(ProcessID p_id)
     {
         id = p_id;
     }
@@ -120,30 +122,30 @@ public:
     }
 };
 /// \brief worker thread extends process
-class smWorkerThread: public smProcess
+class WorkerThread: public Process
 {
 
 protected:
     /// \brief for synchronization
-    smSynchronization *synch;
+    Synchronization *synch;
 
 public:
-    smWorkerThread()
+    WorkerThread()
     {
     }
 
-    smWorkerThread(smProcessID p_ID): smProcess(p_ID)
+    WorkerThread(ProcessID p_ID): Process(p_ID)
     {
         termination = false;
     }
 
-    smWorkerThread(smSynchronization &p_synch, smProcessID p_ID): smProcess(p_ID)
+    WorkerThread(Synchronization &p_synch, ProcessID p_ID): Process(p_ID)
     {
         synch = &p_synch;
         termination = false;
     }
 
-    void setSynchObject(smSynchronization &p_synch)
+    void setSynchObject(Synchronization &p_synch)
     {
         synch = &p_synch;
     }

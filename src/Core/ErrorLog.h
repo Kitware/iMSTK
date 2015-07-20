@@ -41,19 +41,19 @@
 /// \brief This is class is for error logging of the whole SimMedTK system.
 /// All errors should be reported to the instance of this class.
 /// Functions are thread-safe unless indicated.
-class smErrorLog : public smCoreClass
+class ErrorLog : public CoreClass
 {
 
 private:
     std::vector<std::string> errors; ///< error messages
     std::vector<int> timeStamps; ///< time stamps for errors
     std::mutex logLock; ///< mutex to sync access to logs
-    smTimer time; ///< Timer for timestamps
+    Timer time; ///< Timer for timestamps
     bool consoleOutput; ///< Flag to print errors to stdout
 
 public:
     bool isOutputtoConsoleEnabled;
-    smErrorLog();
+    ErrorLog();
 
     /// \brief Add the error in the repository.It is thread safe. It can be called by multiple threads.
     ///

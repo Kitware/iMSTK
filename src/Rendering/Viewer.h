@@ -42,7 +42,7 @@
 class smOpenGLWindowStream;
 
 /// \brief Handles all rendering routines.
-class smViewer : public smViewerBase
+class smViewer : public ViewerBase
 {
 public:
     std::unique_ptr<sf::Context> sfmlContext;
@@ -55,7 +55,7 @@ public:
     /// \brief for exit viewer
     virtual void exitViewer() override;
     /// \brief add object for rendering
-    void addObject(std::shared_ptr<smCoreClass> object);
+    void addObject(std::shared_ptr<CoreClass> object);
     /// \brief add text for display
     virtual void addText(std::string p_tag) override;
     /// \brief update text
@@ -67,15 +67,15 @@ public:
     void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
-    virtual void registerScene(std::shared_ptr<smScene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
+    virtual void registerScene(std::shared_ptr<Scene> p_scene, smRenderTargetType p_target, const std::string &p_fboName);
     virtual void addFBO(const std::string &p_fboName,
-                smTexture *p_colorTex, smTexture *p_depthTex,
+                Texture *p_colorTex, Texture *p_depthTex,
                 unsigned int p_width, unsigned int p_height);
 
     std::string windowTitle;
-    smColor defaultDiffuseColor;
-    smColor defaultAmbientColor;
-    smColor defaultSpecularColor;
+    Color defaultDiffuseColor;
+    Color defaultAmbientColor;
+    Color defaultSpecularColor;
 
 protected:
     virtual void initRenderingCapabilities() override;
@@ -89,8 +89,8 @@ protected:
 
     virtual void processViewerOptions() override;
     virtual void processWindowEvents() override;
-    virtual void renderToScreen(const smRenderOperation &p_rop) override;
-    virtual void renderToFBO(const smRenderOperation &p_rop) override;
+    virtual void renderToScreen(const RenderOperation &p_rop) override;
+    virtual void renderToFBO(const RenderOperation &p_rop) override;
     virtual void initFboListItems();
     virtual void destroyFboListItems();
     virtual void setToDefaults() override;
@@ -98,7 +98,7 @@ protected:
     virtual void endFrame() override;
     virtual void renderTextureOnView() override;
     /// \brief  event handler
-    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
     /// \brief processes an SFML event
     void processSFMLEvents(const sf::Event& p_event);
 };

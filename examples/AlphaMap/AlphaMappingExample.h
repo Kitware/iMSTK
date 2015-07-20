@@ -36,13 +36,13 @@
 #include "Rendering/metalShader.h"
 
 
-class AlphaMapExample: public smSimulationMain, public smCoreClass
+class AlphaMapExample: public SimulationMain, public CoreClass
 {
 
 public:
-    smStaticSceneObject  *object1;
-    smSDK* simmedtkSDK;
-    smScene *scene1;
+    StaticSceneObject  *object1;
+    SDK* simmedtkSDK;
+    Scene *scene1;
     smViewer *viewer;
 
     smPhantomInterface* hapticInterface;
@@ -51,7 +51,7 @@ public:
     AlphaMapExample();
     void initHapticCamMotion();
 
-    virtual void simulateMain(smSimulationMainParam p_param)
+    virtual void simulateMain(SimulationMainParam p_param)
     {
     }
     void draw() override;

@@ -39,33 +39,33 @@
 
 namespace mstk {
 namespace Event {
-    class smEvent;
+    class Event;
     class smEventHandler;
     class smCameraEvent;
     }
 }
 
 /// \brief I/O stream
-class smIOStream : public smCoreClass
+class IOStream : public CoreClass
 {
 public:
-    virtual smIOStream& operator >>(std::string &p_string) = 0;
-    virtual smIOStream& operator <<(std::string p_string) = 0;
+    virtual IOStream& operator >>(std::string &p_string) = 0;
+    virtual IOStream& operator <<(std::string p_string) = 0;
 protected:
     std::shared_ptr<mstk::Event::smEventHandler> eventHanlder;
 };
 
 /// \brief  console stream; for printing text on the console
-class smConsoleStream: public smIOStream
+class smConsoleStream: public IOStream
 {
     std::string inputBuffer;
 public:
     smConsoleStream();
     /// \brief operator to print text
-    virtual smIOStream& operator <<(std::string p_string);
+    virtual IOStream& operator <<(std::string p_string);
 
     /// \brief to  input from use
-    virtual smIOStream& operator >>(std::string &p_string);
+    virtual IOStream& operator >>(std::string &p_string);
 };
 
 /// \brief window string
@@ -96,11 +96,11 @@ struct smWindowData
     smWindowString windowString;
 };
 /// \brief window stream for putting window string on text
-class smWindowStream: public smIOStream
+class smWindowStream: public IOStream
 {
 public:
-    virtual smIOStream& operator <<(std::string p_string);
-    virtual smIOStream& operator >>(std::string &p_string);
+    virtual IOStream& operator <<(std::string p_string);
+    virtual IOStream& operator >>(std::string &p_string);
 };
 
 /// \brief opengl window stream for putting text on the screen
@@ -113,7 +113,7 @@ public:
     bool enabled;
 
     /// \brief  text color
-    smColor textColor;
+    Color textColor;
 
     /// \brief constructors
     smOpenGLWindowStream(int p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
@@ -134,7 +134,7 @@ public:
     bool removeText(std::string p_tag);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<mstk::Event::smEvent> /*p_event*/) override {}
+    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> /*p_event*/) override {}
 
 protected:
     /// \brief  fonts
@@ -172,7 +172,7 @@ protected:
     float right;
     float top;
     /// \brief background color
-    smColor backGroundColor;
+    Color backGroundColor;
 };
 
 #endif

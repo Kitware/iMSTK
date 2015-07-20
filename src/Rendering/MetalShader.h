@@ -30,7 +30,7 @@
 namespace mstk{
 namespace Event{
 
-    class smEvent;
+    class Event;
 }
 }
 
@@ -61,7 +61,7 @@ public:
     virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
 
     /// \brief handle keyboard event
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> p_event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
 
     /// \brief any disable and enable shader options need to be here
     virtual void switchEnable();

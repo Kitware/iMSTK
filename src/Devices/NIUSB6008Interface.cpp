@@ -137,7 +137,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID)
         NI_on = false;
     }
 
-    NIUSB6008pipe = new smPipe("NIUSB6008_Data", sizeof(NIUSB6008Data), 10);
+//     NIUSB6008pipe = new smPipe("NIUSB6008_Data", sizeof(NIUSB6008Data), 10);
     aveData[0] = aveData[1] = 0.0;
 }
 
@@ -327,7 +327,7 @@ smNIUSB6008Interface::~smNIUSB6008Interface()
     DAQmxStopTask(taskHandle);
     DAQmxClearTask(taskHandle);
 
-    delete NIUSB6008pipe;
+//     delete NIUSB6008pipe;
     delete [] regTool;
 }
 
@@ -336,7 +336,7 @@ void smNIUSB6008Interface::sendDataToPipe()
 {
 
     NIUSB6008Data *pipeData;
-    pipeData = (NIUSB6008Data*)NIUSB6008pipe->beginWrite();
+//     pipeData = (NIUSB6008Data*)NIUSB6008pipe->beginWrite();
     float tF;
     int cid;
     pipeData->on = NI_on;
@@ -359,8 +359,8 @@ void smNIUSB6008Interface::sendDataToPipe()
         pipeData->value[i] = tF;
     }
 
-    NIUSB6008pipe->endWrite(1);
-    NIUSB6008pipe->acknowledgeValueListeners();
+//     NIUSB6008pipe->endWrite(1);
+//     NIUSB6008pipe->acknowledgeValueListeners();
 }
 
 /// \brief

@@ -23,7 +23,7 @@
 
 #include "VBO.h"
 
-smVBO::smVBO( smErrorLog *p_log )
+smVBO::smVBO( ErrorLog *p_log )
 {
     this->log = p_log;
     renderingError = false;
@@ -37,9 +37,9 @@ smVBO::~smVBO()
 
 /// WARNING: This function takes arrays to Eigen 3d vectors,
 /// it is not clear to me that the memory is aligned.
-smVBOResult smVBO::updateVertices(const smVectorf &p_vectors,
-                                  const smVectorf &p_normals,
-                                  const smVectorf &p_textureCoords,
+smVBOResult smVBO::updateVertices(const core::Vectorf &p_vectors,
+                                  const core::Vectorf &p_normals,
+                                  const core::Vectorf &p_textureCoords,
                                   size_t p_objectId)
 {
     if (vboType == SIMMEDTK_VBO_STATIC)
@@ -82,7 +82,7 @@ smVBOResult smVBO::updateVertices(const smVectorf &p_vectors,
     return SIMMEDTK_VBO_OK;
 }
 
-smVBOResult smVBO::updateTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId)
+smVBOResult smVBO::updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId)
 {
     if ((vboType == SIMMEDTK_VBO_STATIC) | (vboType == SIMMEDTK_VBO_DYNAMIC))
     {
@@ -125,7 +125,7 @@ smVBOResult smVBO::drawElements(size_t p_objectId)
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
     glVertexPointer(3, GL_FLOAT, 0, reinterpret_cast<void*>(dataOffset));
-    glNormalPointer(GL_FLOAT, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(smVec3d)));
+    glNormalPointer(GL_FLOAT, 0, reinterpret_cast<void*>(dataOffset + nbrVertices * sizeof(core::Vec3d)));
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
     glIndexPointer(GL_UNSIGNED_INT, 0, reinterpret_cast<void*>(indexOffset));
 
@@ -152,9 +152,9 @@ smVBOResult smVBO::drawElements(size_t p_objectId)
 
 ///Static Binding of the buffers. It is mandatory to call this function
 /// this function must be called when the binding is SIMMEDTK_VBO_STATIC
-smVBOResult smVBO::initStaticVertices(const smVectorf &p_vectors,
-                                      const smVectorf &p_normals,
-                                      const smVectorf &p_textureCoords,
+smVBOResult smVBO::initStaticVertices(const core::Vectorf &p_vectors,
+                                      const core::Vectorf &p_normals,
+                                      const core::Vectorf &p_textureCoords,
                                       size_t p_objectId)
 {
     if (vboType == SIMMEDTK_VBO_DYNAMIC)
@@ -186,7 +186,7 @@ smVBOResult smVBO::initStaticVertices(const smVectorf &p_vectors,
 ///init Triangle Indices for the very first time for static objects
 ///this function must be called when the indices are not changing
 ///SIMMEDTK_VBO_NOINDICESCHANGE
-smVBOResult smVBO::initTriangleIndices(const smVector<size_t> &p_indices, size_t p_objectId)
+smVBOResult smVBO::initTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId)
 {
     size_t indexOffset;
 
@@ -247,7 +247,7 @@ void smVBO::init( smVBOType p_vboType )
 
 smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_nbrTriangles, const size_t p_objectId )
 {
-    if ( sizeof( smVec3d )*p_nbrVertices + sizeof( smVec3d )*p_nbrVertices + sizeof( smTexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
+    if ( sizeof( core::Vec3d )*p_nbrVertices + sizeof( core::Vec3d )*p_nbrVertices + sizeof( smTexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
@@ -262,7 +262,7 @@ smVBOResult smVBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t
     numberofVertices[p_objectId] = p_nbrVertices;
     numberofTriangles[p_objectId] = p_nbrTriangles;
     ///add the vertices and normals and the texture coordinates
-    currentDataOffset += sizeof( smVec3d ) * p_nbrVertices + sizeof( smVec3d ) * p_nbrVertices + sizeof( smTexCoord ) * p_nbrVertices;
+    currentDataOffset += sizeof( core::Vec3d ) * p_nbrVertices + sizeof( core::Vec3d ) * p_nbrVertices + sizeof( smTexCoord ) * p_nbrVertices;
     currentIndexOffset += p_nbrTriangles * sizeof( smTriangle );
     return SIMMEDTK_VBO_OK;
 }

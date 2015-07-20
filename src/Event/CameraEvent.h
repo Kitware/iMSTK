@@ -32,7 +32,7 @@
 namespace mstk {
 namespace Event {
 
-class smCameraEvent : public smEvent
+class smCameraEvent : public Event
 {
 public:
     static EventType EventName;
@@ -40,28 +40,28 @@ public:
 public:
     smCameraEvent();
 
-    void setPosition(const smVec3d &cameraPosition);
+    void setPosition(const core::Vec3d &cameraPosition);
 
-    const smVec3d &getPosition();
+    const core::Vec3d &getPosition();
 
-    void setDirection(const smVec3d &cameraDirection);
+    void setDirection(const core::Vec3d &cameraDirection);
 
-    const smVec3d &getDirection();
+    const core::Vec3d &getDirection();
 
-    void setUpDirection(const smVec3d &cameraUpDirection);
+    void setUpDirection(const core::Vec3d &cameraUpDirection);
 
-    const smVec3d &getUpDirection();
+    const core::Vec3d &getUpDirection();
 
-    void applyRotation(const smQuaterniond &quat)
+    void applyRotation(const Quaterniond &quat)
     {
         direction = quat*direction;
         upDirection = quat*upDirection;
     }
 
 private:
-    smVec3d position; //  camera position
-    smVec3d direction; // direction
-    smVec3d upDirection; //  upward direction
+    core::Vec3d position; //  camera position
+    core::Vec3d direction; // direction
+    core::Vec3d upDirection; //  upward direction
 };
 
 } // Event namespace

@@ -32,7 +32,7 @@ namespace Examples {
 namespace Common {
 
 /// \brief Will shutdown the SDK when the a specified key is pressed
-class KeyPressSDKShutdown : public smCoreClass
+class KeyPressSDKShutdown : public CoreClass
 {
 public:
     /// \brief Default constructor
@@ -40,10 +40,10 @@ public:
     /// \detail Default key is escape
     KeyPressSDKShutdown();
 
-    /// \brief Event handling function from smCoreClass
+    /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event) override;
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
 
     /// \brief Set the keyboard key to listen for
     ///

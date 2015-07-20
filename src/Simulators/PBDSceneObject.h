@@ -31,14 +31,14 @@
 #include "Mesh/Mesh.h"
 
 /// \brief Position based dynamics (PBD) object
-class smPBDSceneObject: public smSceneObject
+class smPBDSceneObject: public SceneObject
 {
 public:
     /// \brief constructor
-    smPBDSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+    smPBDSceneObject(std::shared_ptr<ErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual std::shared_ptr<smSceneObject> clone();
+    virtual std::shared_ptr<SceneObject> clone();
 
     /// \brief !!
     virtual void serialize(void *p_memoryBlock);
@@ -55,18 +55,18 @@ public:
     float Damp; ///< damping values
     int nbrMass; ///< number of masses
     int **massIdx; ///< !!
-    smStdVector3d P; ///< !! position
-    smStdVector3d V; ///< !! velocity
-    smStdVector3d exF; ///< external force
+    core::StdVector3d P; ///< !! position
+    core::StdVector3d V; ///< !! velocity
+    core::StdVector3d exF; ///< external force
     int nbrSpr; ///< !! number of spheres
     float *L0; ///< !! Initial length
     bool *fixedMass; ///< true if masses are fixed
     int nbrFixedMass; ///< number of fixed masses
     int *listFixedMass; ///< list of IDs of masses that are fixed
 
-    smVec3d ball_pos; ///< !! position of ball
-    smVec3d ball_vel; ///< !! velocity of ball
-    smVec3d ball_frc; ///< !!
+    core::Vec3d ball_pos; ///< !! position of ball
+    core::Vec3d ball_vel; ///< !! velocity of ball
+    core::Vec3d ball_frc; ///< !!
 
     float ball_mass; ///< !! mass of ball
     float ball_rad; ///< !! radius of ball
@@ -78,10 +78,10 @@ class smPBDSurfaceSceneObject: public smPBDSceneObject
 public:
 
     /// \brief constructor
-    smPBDSurfaceSceneObject(std::shared_ptr<smErrorLog> p_log = nullptr);
+    smPBDSurfaceSceneObject(std::shared_ptr<ErrorLog> p_log = nullptr);
 
     /// \brief !!
-    virtual std::shared_ptr<smSceneObject> clone() override;
+    virtual std::shared_ptr<SceneObject> clone() override;
 
     /// \brief !!
     virtual void serialize(void *p_memoryBlock) override;
@@ -99,7 +99,7 @@ public:
     ~smPBDSurfaceSceneObject();
 
     /// \brief find the masses that will be fixed based on the spheres
-    void findFixedMassWrtSphere(smVec3d p_center, float pos);
+    void findFixedMassWrtSphere(core::Vec3d p_center, float pos);
 
     /// \brief find fixed corners
     void findFixedCorners();

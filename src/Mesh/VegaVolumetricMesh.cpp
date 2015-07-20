@@ -67,7 +67,7 @@ size_t smVegaVolumetricMesh::getNumberOfElements() const
 }
 void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surfaceMesh, const double &radius)
 {
-    const smStdVector3d &meshVertices = surfaceMesh->getVertices();
+    const core::StdVector3d &meshVertices = surfaceMesh->getVertices();
 
     int numElementVertices = this->mesh->getNumElementVertices();
     int surfaceMeshSize = meshVertices.size();

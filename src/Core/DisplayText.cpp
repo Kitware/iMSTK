@@ -29,7 +29,7 @@
 
 // SimMedTK includes
 
-void smDisplayText::addText ( smDisplayMessage message )
+void DisplayText::addText ( DisplayMessage message )
 {
     switch ( message.outputStream )
     {

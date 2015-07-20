@@ -46,11 +46,11 @@ const bool& smMouseButtonEvent::togglePressed()
 {
     return this->pressed = !this->pressed;
 }
-void smMouseButtonEvent::setWindowCoord(const smVec2d& coordinates)
+void smMouseButtonEvent::setWindowCoord(const core::Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const smVec2d& smMouseButtonEvent::getWindowCoord()
+const core::Vec2d& smMouseButtonEvent::getWindowCoord()
 {
     return this->coord;
 }

@@ -30,63 +30,63 @@
 #include "Core/Vector.h"
 
 /// \brief Collision utililites
-class smCollisionMoller
+class CollisionMoller
 {
 public:
     /// \brief triangle and triangle collision retursn intersection and projection points
-    static bool tri2tri(smVec3d &p_tri1Point1,
-                          smVec3d &p_tri1Point2,
-                          smVec3d &p_tri1Point3,
-                          smVec3d &p_tri2Point1,
-                          smVec3d &p_tri2Point2,
-                          smVec3d &p_tri2Point3,
+    static bool tri2tri(core::Vec3d &p_tri1Point1,
+                          core::Vec3d &p_tri1Point2,
+                          core::Vec3d &p_tri1Point3,
+                          core::Vec3d &p_tri2Point1,
+                          core::Vec3d &p_tri2Point2,
+                          core::Vec3d &p_tri2Point3,
                           int &coplanar,
-                          smVec3d &p_intersectionPoint1,
-                          smVec3d &p_intersectionPoint2,
+                          core::Vec3d &p_intersectionPoint1,
+                          core::Vec3d &p_intersectionPoint2,
                           short &p_tri1SinglePointIndex,
                           short &p_tri2SinglePointIndex,
-                          smVec3d &p_projPoint1,
-                          smVec3d &p_projPoint2);
+                          core::Vec3d &p_projPoint1,
+                          core::Vec3d &p_projPoint2);
 
-    static bool tri2tri( smVec3d &p_tri1Point1,
-                           smVec3d &p_tri1Point2,
-                           smVec3d &p_tri1Point3,
-                           smVec3d &p_tri2Point1,
-                           smVec3d &p_tri2Point2,
-                           smVec3d &p_tri2Point3,
+    static bool tri2tri( core::Vec3d &p_tri1Point1,
+                           core::Vec3d &p_tri1Point2,
+                           core::Vec3d &p_tri1Point3,
+                           core::Vec3d &p_tri2Point1,
+                           core::Vec3d &p_tri2Point2,
+                           core::Vec3d &p_tri2Point3,
                            double &depth,
-                           smVec3d &contactPoint,
-                           smVec3d &normal);
+                           core::Vec3d &contactPoint,
+                           core::Vec3d &normal);
 
     /// \brief checks if the two triangles intersect
-    static bool tri2tri(smVec3d &p_tri1Point1,
-                          smVec3d &p_tri1Point2,
-                          smVec3d &p_tri1Point3,
-                          smVec3d &p_tri2Point1,
-                          smVec3d &p_tri2Point2,
-                          smVec3d &p_tri2Point3);
+    static bool tri2tri(core::Vec3d &p_tri1Point1,
+                          core::Vec3d &p_tri1Point2,
+                          core::Vec3d &p_tri1Point3,
+                          core::Vec3d &p_tri2Point1,
+                          core::Vec3d &p_tri2Point2,
+                          core::Vec3d &p_tri2Point3);
 
     /// \brief check if the two AABB overlap returns encapsulating AABB of two
-    static bool checkOverlapAABBAABB(smAABB &aabbA, smAABB &aabbB, smAABB &result);
+    static bool checkOverlapAABBAABB(AABB &aabbA, AABB &aabbB, AABB &result);
 
     /// \brief check the AABBs overlap. returns true if they intersect
-    static bool checkOverlapAABBAABB(const smAABB &aabbA, const smAABB &aabbB);
+    static bool checkOverlapAABBAABB(const AABB &aabbA, const AABB &aabbB);
 
     /// \brief check if the point p_vertex is inside the AABB
-    static inline bool checkOverlapAABBAABB(smAABB &aabbA, smVec3d &p_vertex);
+    static inline bool checkOverlapAABBAABB(AABB &aabbA, core::Vec3d &p_vertex);
 
     /// \brief  checks if the line intersects the tirangle. returns if it is true. the intersection is returned in  p_interSection
-    static bool checkLineTri(smVec3d &p_linePoint1,
-                               smVec3d &p_linePoint2,
-                               smVec3d &p_tri1Point1,
-                               smVec3d &p_tri1Point2,
-                               smVec3d &p_tri1Point3,
-                               smVec3d &p_interSection);
+    static bool checkLineTri(core::Vec3d &p_linePoint1,
+                               core::Vec3d &p_linePoint2,
+                               core::Vec3d &p_tri1Point1,
+                               core::Vec3d &p_tri1Point2,
+                               core::Vec3d &p_tri1Point3,
+                               core::Vec3d &p_interSection);
 
     /// \brief checks if the triangles points are within the AABB
-    static bool checkAABBTriangle(smAABB &p_aabb, smVec3d &v1, smVec3d &v2, smVec3d &v3);
+    static bool checkAABBTriangle(AABB &p_aabb, core::Vec3d &v1, core::Vec3d &v2, core::Vec3d &v3);
 
-    static bool checkAABBPoint(const smAABB &p_aabb, const smVec3d &p_v);
+    static bool checkAABBPoint(const AABB &p_aabb, const core::Vec3d &p_v);
 };
 
 #endif // SM_COLLISIONMOLLER_H

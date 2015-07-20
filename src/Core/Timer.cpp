@@ -24,15 +24,15 @@
 // SimMedTK includes
 #include "Timer.h"
 
-smTimer::smTimer()
+Timer::Timer()
 {
     start();
 }
-void smTimer::start()
+void Timer::start()
 {
     begin = ClockType::now();
 }
-long double smTimer::elapsed()
+long double Timer::elapsed()
 {
     long double deltaSec;
     TimePointType now = ClockType::now();

@@ -28,9 +28,8 @@
 #define SM_ADU_INTERFACE_H
 
 #include "smExternalDevices/smDeviceInterface.h"
-#include "smCore/smEvent.h"
+#include "smCore/Event.h"
 #include "smCore/smEventData.h"
-#include "smCore/smPipe.h"
 
 /// \brief holds data for calibration of ADU device
 struct ADUDeviceCalibrationData
@@ -105,10 +104,10 @@ public:
     void run() override;
 
     /// \brief
-    void handleEvent(std::shared_ptr<mstk::Event::smEvent> event)  override{};
+    void handleEvent(std::shared_ptr<mstk::Event::Event> event)  override{};
 
 public:
-    smPipe *ADUpipe; ///< !!
+//     smPipe *ADUpipe; ///< !!
 
     /// \brief !!
     void sendDataToPipe();

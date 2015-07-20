@@ -2,7 +2,7 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 
-class smLatticeRenderDelegate : public smRenderDelegate
+class smLatticeRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
@@ -25,14 +25,14 @@ void smLatticeRenderDelegate::draw() const
     }
 
   glMatrixMode( GL_MODELVIEW );
-  glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
+  glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&Color::colorYellow));
 
   if ( latticeMode & SIMMEDTK_SMLATTICE_SEPERATIONLINES )
     {
     for ( int j = 0; j < geom->ySeperation; j++ )
       {
       glDisable( GL_LIGHTING );
-      glColor3fv(reinterpret_cast<GLfloat*>(&smColor::colorWhite));
+      glColor3fv(reinterpret_cast<GLfloat*>(&Color::colorWhite));
 
       glBegin( GL_LINES );
 
@@ -84,7 +84,7 @@ void smLatticeRenderDelegate::draw() const
             glEnable( GL_COLOR_MATERIAL );
 
             glBegin( GL_LINE_STRIP );
-            glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
+            glColor3fv( reinterpret_cast<GLfloat*>(&Color::colorWhite));
             glVertex3dv( geom->cells[index].cellLeftCorner.data() );
             glVertex3d( geom->cells[index].cellLeftCorner[0] + geom->xStep,
               geom->cells[index].cellLeftCorner[1],
@@ -115,7 +115,7 @@ void smLatticeRenderDelegate::draw() const
             glEnd();
 
             glBegin( GL_LINES );
-            glColor3fv( reinterpret_cast<GLfloat*>(&smColor::colorWhite));
+            glColor3fv( reinterpret_cast<GLfloat*>(&Color::colorWhite));
             glVertex3dv( geom->cells[index].cellLeftCorner.data() );
             glVertex3d( geom->cells[index].cellLeftCorner[0],
               geom->cells[index].cellLeftCorner[1] + geom->yStep,
@@ -153,7 +153,7 @@ void smLatticeRenderDelegate::draw() const
     glPushMatrix();
     glPushMatrix();
     glTranslatef( geom->cells[0].cellLeftCorner[0], geom->cells[0].cellLeftCorner[1], geom->cells[0].cellLeftCorner[2] );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorYellow));
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&Color::colorYellow));
     //         glutSolidSphere( 2, 20, 20 );
     glPopMatrix();
 
@@ -161,7 +161,7 @@ void smLatticeRenderDelegate::draw() const
     glTranslatef( geom->cells[geom->totalCells - 1].cellRightCorner[0],
       geom->cells[geom->totalCells - 1].cellRightCorner[1],
       geom->cells[geom->totalCells - 1].cellRightCorner[2] );
-    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&smColor::colorRed));
+    glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, reinterpret_cast<GLfloat*>(&Color::colorRed));
     //         glutSolidSphere( 2, 20, 20 );
     glPopMatrix();
     glPopMatrix();
@@ -170,6 +170,6 @@ void smLatticeRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_lattice_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(smRenderDelegate,smRenderDelegate,smLatticeRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smLatticeRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

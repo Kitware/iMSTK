@@ -25,14 +25,14 @@
 #define SMDATASTUCTURES_HPP
 
 template<typename T>
-smIndiceArray<T>::~smIndiceArray()
+IndiceArray<T>::~IndiceArray()
 {
     delete [] indices;
     delete [] storage;
     delete [] isEmpty;
 }
 template<typename T>
-smIndiceArray<T>::smIndiceArray( int p_maxStorage )
+IndiceArray<T>::IndiceArray( int p_maxStorage )
 {
     maxStorage = p_maxStorage;
     indices = new int[p_maxStorage];
@@ -47,7 +47,7 @@ smIndiceArray<T>::smIndiceArray( int p_maxStorage )
     nbrElements = 0;
 }
 template<typename T> int
-smIndiceArray<T>::add( T p_item )
+IndiceArray<T>::add( T p_item )
 {
     int index = -1;
 
@@ -75,7 +75,7 @@ smIndiceArray<T>::add( T p_item )
     return index;
 }
 template<typename T> int
-smIndiceArray<T>::checkAndAdd( T p_item )
+IndiceArray<T>::checkAndAdd( T p_item )
 {
     int index = -1;
 
@@ -93,7 +93,7 @@ smIndiceArray<T>::checkAndAdd( T p_item )
     return index;
 }
 template<typename T> bool
-smIndiceArray<T>::remove( int p_itemIndex )
+IndiceArray<T>::remove( int p_itemIndex )
 {
     int counter = 0;
 
@@ -120,7 +120,7 @@ smIndiceArray<T>::remove( int p_itemIndex )
     }
 }
 template<typename T> bool
-smIndiceArray<T>::replace( int p_index, T &p_item )
+IndiceArray<T>::replace( int p_index, T &p_item )
 {
     if ( isEmpty[p_index] == false )
     {
@@ -131,12 +131,12 @@ smIndiceArray<T>::replace( int p_index, T &p_item )
     return false;
 }
 template<typename T>
-T &smIndiceArray<T>::getByRef( int p_index )
+T &IndiceArray<T>::getByRef( int p_index )
 {
     return storage[p_index];
 }
 template<typename T> bool
-smIndiceArray<T>::getByRefSafe( int p_index, T &p_item )
+IndiceArray<T>::getByRefSafe( int p_index, T &p_item )
 {
     if ( isEmpty[p_index] )
     {
@@ -149,7 +149,7 @@ smIndiceArray<T>::getByRefSafe( int p_index, T &p_item )
     }
 }
 template<typename T>
-T &smIndiceArray<T>::getByRef( std::string p_string )
+T &IndiceArray<T>::getByRef( std::string p_string )
 {
     for ( int i = 0; i < nbrElements; i++ )
     {
@@ -160,7 +160,7 @@ T &smIndiceArray<T>::getByRef( std::string p_string )
     }
 }
 template<typename T> void
-smIndiceArray<T>::print() const
+IndiceArray<T>::print() const
 {
     for ( int i = 0; i < nbrElements; i++ )
     {
@@ -168,17 +168,17 @@ smIndiceArray<T>::print() const
     }
 }
 template<typename T>
-T &smIndiceArray<T>::operator[]( int p_index )
+T &IndiceArray<T>::operator[]( int p_index )
 {
     return storage[indices[p_index]];
 }
 template<typename T> int
-smIndiceArray<T>::size()
+IndiceArray<T>::size()
 {
     return nbrElements;
 }
 template<typename T> bool
-smIndiceArray<T>::copy( smIndiceArray &p_array )
+IndiceArray<T>::copy( IndiceArray &p_array )
 {
     if ( maxStorage < p_array.maxStorage )
     {
@@ -201,43 +201,43 @@ smIndiceArray<T>::copy( smIndiceArray &p_array )
 }
 
 template<typename T>
-smIndiceArrayIter<T>::smIndiceArrayIter( smIndiceArray< T > *p_array )
+IndiceArrayIter<T>::IndiceArrayIter( IndiceArray< T > *p_array )
 {
     arrayPtr = p_array;
 }
 template<typename T>
-T &smIndiceArrayIter<T>::operator[]( int p_index )
+T &IndiceArrayIter<T>::operator[]( int p_index )
 {
     return arrayPtr->storage[ arrayPtr->indices[p_index]];
 }
 template<typename T> int&
-smIndiceArrayIter<T>::operator++()
+IndiceArrayIter<T>::operator++()
 {
     return ++index;
 }
 template<typename T> int
-smIndiceArrayIter<T>::operator++( const int )
+IndiceArrayIter<T>::operator++( const int )
 {
     return index++;
 }
 template<typename T> int&
-smIndiceArrayIter<T>::operator--()
+IndiceArrayIter<T>::operator--()
 {
     return --index;
 }
 template<typename T> int
-smIndiceArrayIter<T>::operator--( const int )
+IndiceArrayIter<T>::operator--( const int )
 {
     return index--;
 }
 template<typename T> int
-smIndiceArrayIter<T>::begin()
+IndiceArrayIter<T>::begin()
 {
     index = 0;
     return index;
 }
 template<typename T> int
-smIndiceArrayIter<T>::end()
+IndiceArrayIter<T>::end()
 {
     return arrayPtr->nbrElements;
 }

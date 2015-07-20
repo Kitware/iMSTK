@@ -33,7 +33,7 @@
 #include "Mesh/VegaSceneObjectDeformable.h"
 
 /// \brief Base class for any scene object that is defmormable
-class smSceneObjectDeformable : public smSceneObject
+class smSceneObjectDeformable : public SceneObject
 {
 public:
 
@@ -76,19 +76,19 @@ public:
 
     /// \brief  Sets the contact force at a given location
     /// (not given node) in contact force vector
-    void setContactForceOfNodeWithDofID(const int dofID, const smVec3d force);
+    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d force);
 
     /// \brief  returns displacement of at a given location
     /// (not given node) in contact force vector
-    smVec3d getDisplacementOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getDisplacementOfNodeWithDofID(const int dofID) const;
 
     /// \brief  returns velocity of at a given location
     /// (not given node) in contact force vector
-    smVec3d getVelocityOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getVelocityOfNodeWithDofID(const int dofID) const;
 
     /// \brief  returns acceleration of at a given location
     /// (not given node) in contact force vector
-    smVec3d getAccelerationOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getAccelerationOfNodeWithDofID(const int dofID) const;
 
     /// \brief get the total number of nodes
     int getNumNodes() const;
@@ -108,7 +108,7 @@ public:
 
     /// \brief sets the objects specific render details
     /// Should be moved to base class in near future
-    void setRenderDetail(const std::shared_ptr<smRenderDetail> &r);
+    void setRenderDetail(const std::shared_ptr<RenderDetail> &r);
 
     /// \brief enable drawing of secondary mesh (if initialized)
     void setRenderSecondaryMesh();

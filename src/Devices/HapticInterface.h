@@ -33,10 +33,10 @@ struct hapticDeviceData_t
 {
     int deviceID;
     std::string deviceName;
-    smVec3 <smDouble> position;
-    smVec3 <smDouble> velocity;
-    smVec3 <smDouble> angles;
-    smMatrix44 <smDouble> transform;
+    core::Vec3 <smDouble> position;
+    core::Vec3 <smDouble> velocity;
+    core::Vec3 <smDouble> angles;
+    Matrix44 <smDouble> transform;
     bool buttonState[SM_MAX_BUTTONS];
 };
 
@@ -71,31 +71,31 @@ public:
     }
 
     /// \brief get the position of the end effector the haptic device
-    virtual int  getPosition(smVec3d & d_pos)
+    virtual int  getPosition(core::Vec3d & d_pos)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }
 
     /// \brief get the orientation of the end effector the haptic device
-    virtual int getOreintation(smMatrix33 <smDouble> *d_rot)
+    virtual int getOreintation(Matrix33 <smDouble> *d_rot)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }
 
     /// \brief get the transform (position + orientation) of the end effector the haptic device
-    virtual int getDeviceTransform(smMatrix44 <smDouble> *d_transform)
+    virtual int getDeviceTransform(Matrix44 <smDouble> *d_transform)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }
 
     /// \brief set force to the haptic device
-    virtual int setForce(smVec3d & force)
+    virtual int setForce(core::Vec3d & force)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }
 
     /// \brief set torque to the haptic device
-    virtual int setForceandTorque(smVec3 <smDouble>& force, smVec3 <smDouble> & torque)
+    virtual int setForceandTorque(core::Vec3 <smDouble>& force, core::Vec3 <smDouble> & torque)
     {
         return SIMMEDTK_MSG_UNKNOWN;
     }

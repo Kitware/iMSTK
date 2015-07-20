@@ -23,24 +23,24 @@
 #include <memory>
 #include <vector>
 
-class smVisualArtifact;
-class smCoreClass;
-struct smUnifiedId;
+class VisualArtifact;
+class CoreClass;
+struct UnifiedId;
 
 ///\brief Hold a pointer to a source of geometry that render details can use for drawing.
-struct smGeometrySource {
-  smCoreClass* sceneObject;
-  smVisualArtifact* analyticObject;
+struct GeometrySource {
+  CoreClass* sceneObject;
+  VisualArtifact* analyticObject;
 
-  smGeometrySource()
+  GeometrySource()
     : sceneObject(nullptr), analyticObject(nullptr)
     { }
-  void setSource(smCoreClass* src)
+  void setSource(CoreClass* src)
     {
     this->sceneObject = src;
     this->analyticObject = nullptr;
     }
-  void setSource(smVisualArtifact* src)
+  void setSource(VisualArtifact* src)
     {
     this->sceneObject = nullptr;
     this->analyticObject = src;
@@ -57,29 +57,29 @@ struct smGeometrySource {
     }
 };
 
-/// \brief smRenderDetail has rendering options and features.
+/// \brief RenderDetail has rendering options and features.
 ///It shows how the mesh should be rendered
-struct smRenderDetail
+struct RenderDetail
 {
 public:
-    typedef std::shared_ptr<smRenderDetail> Ptr;
+    typedef std::shared_ptr<RenderDetail> Ptr;
 
-    smRenderDetail();
-    smRenderDetail(unsigned int type);
+    RenderDetail();
+    RenderDetail(unsigned int type);
 
     void reset();
 
     /// \brief attachment of shader
-    void addShader(std::shared_ptr<smUnifiedId> p_shaderID);
+    void addShader(std::shared_ptr<UnifiedId> p_shaderID);
 
     /// \brief attachment of VAO
-    void addVAO(std::shared_ptr<smUnifiedId> p_shaderID);
+    void addVAO(std::shared_ptr<UnifiedId> p_shaderID);
 
-    const smColor &getColorDiffuse() const;
+    const Color &getColorDiffuse() const;
 
-    const smColor &getColorAmbient() const;
+    const Color &getColorAmbient() const;
 
-    const smColor &getColorSpecular() const;
+    const Color &getColorSpecular() const;
 
     const float &getShininess() const;
 
@@ -89,27 +89,27 @@ public:
 
     const float &getLineSize() const;
 
-    const smColor &getNormalColor() const;
+    const Color &getNormalColor() const;
 
-    const smColor &getHighLightColor() const;
+    const Color &getHighLightColor() const;
 
-    const smColor &getVertexColor() const;
+    const Color &getVertexColor() const;
 
-    const smColor &getShadowColor() const;
+    const Color &getShadowColor() const;
 
     const bool &getCastShadow() const;
 
     const bool &getCanGetShadow() const;
 
-    const smColor &getWireFrameColor() const;
+    const Color &getWireFrameColor() const;
 
     const bool &getDebugDraw() const;
 
-    const std::vector<std::shared_ptr<smUnifiedId>> &getShaders() const;
+    const std::vector<std::shared_ptr<UnifiedId>> &getShaders() const;
 
     const std::vector<bool> &getShaderEnable() const;
 
-    const std::vector<std::shared_ptr<smUnifiedId>> &getVAOs() const;
+    const std::vector<std::shared_ptr<UnifiedId>> &getVAOs() const;
 
     const std::vector<bool> &getVAOEnable() const;
 
@@ -117,46 +117,46 @@ public:
 
     void setLineSize(const float size);
 
-    void setVertexColor(const smColor vertColor);
+    void setVertexColor(const Color vertColor);
 
-    void setHighlightColor(const smColor highlightColor);
+    void setHighlightColor(const Color highlightColor);
 
-    void setNormalColor(const smColor highlightColor);
+    void setNormalColor(const Color highlightColor);
 
     void setShininess(const float s);
 
     void setNormalLength(const float len);
 
-    void setDiffuseColor(const smColor diffColor);
+    void setDiffuseColor(const Color diffColor);
 
-    void setAmbientColor(const smColor ambColor);
+    void setAmbientColor(const Color ambColor);
 
-    void setSpecularColor(const smColor specColor);
+    void setSpecularColor(const Color specColor);
 
-    void setShadowColor(const smColor shadColor);
+    void setShadowColor(const Color shadColor);
 
-    void setWireframeColor(const smColor wireColor);
+    void setWireframeColor(const Color wireColor);
 
 public:
     unsigned int renderType; // render type
-    smColor colorDiffuse; // diffuse color
-    smColor colorAmbient; // ambient color
-    smColor colorSpecular; // specular color
-    smColor highLightColor; // highlight color
-    smColor vertexRenderColor; // vertex color
-    smColor shadowColor; // shadow color
+    Color colorDiffuse; // diffuse color
+    Color colorAmbient; // ambient color
+    Color colorSpecular; // specular color
+    Color highLightColor; // highlight color
+    Color vertexRenderColor; // vertex color
+    Color shadowColor; // shadow color
     bool castShadow; // object can generate a shadow or not
     bool canGetShadow; // object can get the shadow or not
-    smColor normalColor; // normal color
-    smColor wireFrameColor; // wire frame color
+    Color normalColor; // normal color
+    Color wireFrameColor; // wire frame color
     float pointSize; // point size if rendering of vertices are enabled
     float lineSize; // line width size
     float shininess; // specular shinness
     bool debugDraw; // debug draw enabled or not
     float normalLength; // length of rendered normals
-    std::vector<std::shared_ptr<smUnifiedId>> shaders; // attached shaders
+    std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<bool> shaderEnable; // enable/disable any attached shader
-    std::vector<std::shared_ptr<smUnifiedId>> VAOs; // stores  VAO IDs
+    std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
     std::vector<bool> VAOEnable; // enable/disable any attached VAO
 };
 

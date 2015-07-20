@@ -29,18 +29,18 @@
 #include <string>
 
 /// \brief SDK is singlenton class
-// std::unique_ptr<smErrorLog> smSDK::errorLog;
-std::once_flag smSDK::sdkCallOnceFlag;
+// std::unique_ptr<ErrorLog> SDK::errorLog;
+std::once_flag SDK::sdkCallOnceFlag;
 
-smIndiceArray<smMeshHolder>  *smSDK::meshesRef;
-smIndiceArray<smModuleHolder> *smSDK::modulesRef;
-smIndiceArray<smObjectSimulatorHolder>  *smSDK::objectSimulatorsRef;
-smIndiceArray<smObjectSimulatorHolder>*smSDK::collisionDetectorsRef;
-smIndiceArray<smSceneHolder>*smSDK::scenesRef;
-smIndiceArray<smSceneObjectHolder>*smSDK::sceneObjectsRef;
+IndiceArray<MeshHolder>  *SDK::meshesRef;
+IndiceArray<ModuleHolder> *SDK::modulesRef;
+IndiceArray<ObjectSimulatorHolder>  *SDK::objectSimulatorsRef;
+IndiceArray<ObjectSimulatorHolder>*SDK::collisionDetectorsRef;
+IndiceArray<SceneHolder>*SDK::scenesRef;
+IndiceArray<SceneObjectHolder>*SDK::sceneObjectsRef;
 
 /// \brief constructor
-smSDK::smSDK()
+SDK::SDK()
 {
     shutdown = false;
     sceneIdCounter = 1;
@@ -50,39 +50,39 @@ smSDK::smSDK()
     simulator = nullptr;
     sceneList.clear();
 
-    errorLog = std::make_shared<smErrorLog>();
+    errorLog = std::make_shared<ErrorLog>();
 
     // TODO: Fix these! Leaking...
-    meshesRef = new smIndiceArray<smMeshHolder>(SIMMEDTK_SDK_MAXMESHES);
-    modulesRef = new smIndiceArray<smModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
-    objectSimulatorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
-    collisionDetectorsRef = new smIndiceArray<smObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
-    scenesRef = new smIndiceArray<smSceneHolder>(SIMMEDTK_SDK_MAXSCENES);
-    sceneObjectsRef = new smIndiceArray<smSceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
+    meshesRef = new IndiceArray<MeshHolder>(SIMMEDTK_SDK_MAXMESHES);
+    modulesRef = new IndiceArray<ModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
+    objectSimulatorsRef = new IndiceArray<ObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
+    collisionDetectorsRef = new IndiceArray<ObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
+    scenesRef = new IndiceArray<SceneHolder>(SIMMEDTK_SDK_MAXSCENES);
+    sceneObjectsRef = new IndiceArray<SceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
 }
 
-smSDK::~smSDK()
+SDK::~SDK()
 {
     std::cout << "Killing SDK" << std::endl;
 }
 
 /// \brief creates the scene of the simulator
-std::shared_ptr<smScene> smSDK::createScene()
+std::shared_ptr<Scene> SDK::createScene()
 {
-    auto scene = std::make_shared<smScene>(errorLog);
+    auto scene = std::make_shared<Scene>(errorLog);
     registerScene(scene);
     scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
     return scene;
 }
 
-void smSDK::releaseScene(std::shared_ptr<smScene> scene)
+void SDK::releaseScene(std::shared_ptr<Scene> scene)
 {
     scene.reset();
 }
 
-std::shared_ptr<smViewerBase> smSDK::createViewer()
+std::shared_ptr<ViewerBase> SDK::createViewer()
 {
-    this->viewer = smFactory<smCoreClass>::createDefaultAs<smViewerBase>("ViewerBase");
+    this->viewer = Factory<CoreClass>::createDefaultAs<ViewerBase>("ViewerBase");
     if (!!this->viewer)
       {
       this->viewer->log = this->errorLog;
@@ -92,7 +92,7 @@ std::shared_ptr<smViewerBase> smSDK::createViewer()
     return this->viewer;
 }
 
-void smSDK::addViewer(std::shared_ptr<smViewerBase> p_viewer)
+void SDK::addViewer(std::shared_ptr<ViewerBase> p_viewer)
 {
     assert(p_viewer);
 
@@ -104,17 +104,17 @@ void smSDK::addViewer(std::shared_ptr<smViewerBase> p_viewer)
 /// \brief Returns a pointer to the viewer object
 ///
 /// \return Returns a pointer to the viewer object
-std::shared_ptr<smViewerBase> smSDK::getViewerInstance()
+std::shared_ptr<ViewerBase> SDK::getViewerInstance()
 {
     return this->viewer;
 }
 
 /// \brief
-std::shared_ptr<smSimulator> smSDK::createSimulator()
+std::shared_ptr<Simulator> SDK::createSimulator()
 {
     if (this->simulator == nullptr)
     {
-        simulator = std::make_shared<smSimulator>(errorLog);
+        simulator = std::make_shared<Simulator>(errorLog);
 
         for (int j = 0; j < (*scenesRef).size(); j++)
         {
@@ -128,12 +128,12 @@ std::shared_ptr<smSimulator> smSDK::createSimulator()
 }
 
 /// \brief
-void smSDK::updateSceneListAll()
+void SDK::updateSceneListAll()
 {
 }
 
 /// \brief Initialize all modules registered to the SimMedTK SDK
-void smSDK::initRegisteredModules()
+void SDK::initRegisteredModules()
 {
 
     for (int i = 0; i < modulesRef->size(); i++)
@@ -145,14 +145,14 @@ void smSDK::initRegisteredModules()
 
 /** \brief Run the registered modules
   *
-  * This will not run any modules that inherit smViewerBase as
+  * This will not run any modules that inherit ViewerBase as
   * on some platforms (Mac OS X) only the main thread can run
   * user interface code. The return value is -1 if the modules
-  * are already running or no module inherits smViewerBase.
+  * are already running or no module inherits ViewerBase.
   * Otherwise, the index of the last viewer module encountered
   * is returned.
   */
-int smSDK::runRegisteredModules()
+int SDK::runRegisteredModules()
 {
     int viewerIndex = -1;
 
@@ -163,7 +163,7 @@ int smSDK::runRegisteredModules()
 
     for (int i = 0; i < modulesRef->size(); i++)
     {
-        auto view = std::dynamic_pointer_cast<smViewerBase>((*modulesRef)[i].module);
+        auto view = std::dynamic_pointer_cast<ViewerBase>((*modulesRef)[i].module);
         if (view)
           viewerIndex = i;
         else
@@ -175,7 +175,7 @@ int smSDK::runRegisteredModules()
 }
 
 ///\brief shutdowns all the modules
-void smSDK::shutDown()
+void SDK::shutDown()
 {
 
     for (int i = 0; i < modulesRef->size(); i++)
@@ -186,7 +186,7 @@ void smSDK::shutDown()
 }
 
 /// \brief runs the simulator
-void smSDK::run()
+void SDK::run()
 {
     updateSceneListAll();
     initRegisteredModules();
@@ -208,29 +208,29 @@ void smSDK::run()
 }
 
 /// \brief
-void smSDK::addRef(std::shared_ptr<smCoreClass> p_coreClass)
+void SDK::addRef(std::shared_ptr<CoreClass> p_coreClass)
 {
     ++*p_coreClass;
 }
 
 /// \brief
-void smSDK::removeRef(std::shared_ptr<smCoreClass> p_coreClass)
+void SDK::removeRef(std::shared_ptr<CoreClass> p_coreClass)
 {
     --*p_coreClass;
 }
 
-std::shared_ptr<smSDK> smSDK::createSDK()
+std::shared_ptr<SDK> SDK::createSDK()
 {
-    static std::shared_ptr<smSDK> sdk; ///< singleton sdk.
+    static std::shared_ptr<SDK> sdk; ///< singleton sdk.
     std::call_once(sdkCallOnceFlag,
                    []
                     {
-                        sdk.reset(new smSDK);
+                        sdk.reset(new SDK);
                     });
     return sdk;
 }
 
-std::shared_ptr<smSDK> smSDK::createStandardSDK()
+std::shared_ptr<SDK> SDK::createStandardSDK()
 {
     auto sdk = createSDK();
 
@@ -242,12 +242,12 @@ std::shared_ptr<smSDK> smSDK::createStandardSDK()
     return sdk;
 }
 
-std::shared_ptr<smSDK> smSDK::getInstance()
+std::shared_ptr<SDK> SDK::getInstance()
 {
-    return smSDK::createSDK();
+    return SDK::createSDK();
 }
 
-void smSDK::terminateAll()
+void SDK::terminateAll()
 {
 
     for(int i = 0; i < (*modulesRef).size(); i++)
@@ -270,49 +270,49 @@ void smSDK::terminateAll()
 }
 
 /// \brief register functions
-int smSDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
+int SDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
 {
-    smMeshHolder mh;
+    MeshHolder mh;
     mh.mesh = p_mesh;
     return meshesRef->checkAndAdd(mh);
 }
 
-int smSDK::registerModule(std::shared_ptr<smModule> p_mod)
+int SDK::registerModule(std::shared_ptr<Module> p_mod)
 {
-    smModuleHolder mh;
+    ModuleHolder mh;
     mh.module = p_mod;
     return modulesRef->checkAndAdd(mh);
 }
 
-void smSDK::registerObjectSim(std::shared_ptr<smObjectSimulator> p_os)
+void SDK::registerObjectSim(std::shared_ptr<ObjectSimulator> p_os)
 {
-    smObjectSimulatorHolder os;
+    ObjectSimulatorHolder os;
     os.objectSim = p_os;
     objectSimulatorsRef->checkAndAdd(os);
 }
 
-void smSDK::registerCollDet(std::shared_ptr<smObjectSimulator> p_col)
+void SDK::registerCollDet(std::shared_ptr<ObjectSimulator> p_col)
 {
-    smObjectSimulatorHolder col;
+    ObjectSimulatorHolder col;
     col.objectSim = p_col;
     collisionDetectorsRef->checkAndAdd(col);
 }
 
-void smSDK::registerScene(std::shared_ptr<smScene> p_sc)
+void SDK::registerScene(std::shared_ptr<Scene> p_sc)
 {
-    smSceneHolder sc;
+    SceneHolder sc;
     sc.scene = p_sc;
     scenesRef->checkAndAdd(sc);
 }
 
-void smSDK::registerSceneObject(std::shared_ptr<smSceneObject> p_sco)
+void SDK::registerSceneObject(std::shared_ptr<SceneObject> p_sco)
 {
-    smSceneObjectHolder  sh;
+    SceneObjectHolder  sh;
     sh.sceneObject = p_sco;
     sceneObjectsRef->checkAndAdd(sh);
 }
 
-void smSDK::addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<smObjectSimulator> p_os, int p_scId)
+void SDK::addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<ObjectSimulator> p_os, int p_scId)
 {
     assert(p_os);
     assert(p_sco);
@@ -327,12 +327,12 @@ void smSDK::addSceneActor(std::shared_ptr<smSceneObject> p_sco, std::shared_ptr<
 }
 
 ///SDK returns logger for the system
-std::shared_ptr<smErrorLog> smSDK::getErrorLog()
+std::shared_ptr<ErrorLog> SDK::getErrorLog()
 {
     return errorLog;
 };
 
-std::shared_ptr<smSimulator> smSDK::getSimulator()
+std::shared_ptr<Simulator> SDK::getSimulator()
 {
     return this->simulator;
 }
