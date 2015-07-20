@@ -28,27 +28,27 @@
 #include "Mesh.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
-class smSurfaceMesh: public smMesh
+class SurfaceMesh: public Mesh
 {
 
 public:
-    /// \brief push smMesh class specific errors here
+    /// \brief push Mesh class specific errors here
     std::shared_ptr<ErrorLog> log_SF;
 
     /// \brief constructor
-    smSurfaceMesh();
+    SurfaceMesh();
 
     /// \brief constructor
-    smSurfaceMesh(const smMeshType &meshtype, std::shared_ptr<ErrorLog> log);
+    SurfaceMesh(const MeshType &meshtype, std::shared_ptr<ErrorLog> log);
 
     /// \brief destructor
-    virtual ~smSurfaceMesh();
+    virtual ~SurfaceMesh();
 
     /// \brief load the surface mesh
-    bool loadMesh(const std::string& fileName, const smMeshFileType &fileType);
+    bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
 
     /// \brief load the surface mesh using in-house code
-    bool loadMeshLegacy(const std::string& fileName, const smMeshFileType &fileType);
+    bool loadMeshLegacy(const std::string& fileName, const MeshFileType &fileType);
 
     /// \brief load the surface mesh from 3ds format
     bool Load3dsMesh(const std::string& fileName);

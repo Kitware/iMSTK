@@ -38,12 +38,12 @@
 #include "GLUtils.h"
 #include "Core/Timer.h"
 
-class smMesh;
-class smSurfaceMesh;
+class Mesh;
+class SurfaceMesh;
 
-struct smTextureShaderAssignment
+struct TextureShaderAssignment
 {
-    GLint textureShaderGLassignment; // the id that smShader creates...
+    GLint textureShaderGLassignment; // the id that Shader creates...
     int textureId; // Id from texture manager
     std::string shaderParamName; // The parameters that shaders use
 };
@@ -51,7 +51,7 @@ struct smTextureShaderAssignment
 // \brief Base shader class. It provides loading, initializing, binding,
 //  enabling disabling current shader functionality.Also it provides
 //  frequent check of the shader code to make shader development easy.
-class smShader: public CoreClass
+class Shader: public CoreClass
 {
 public:
 #ifdef SIMMEDTK_OPENGL_SHADER
@@ -160,7 +160,7 @@ protected:
 
 public:
     // \brief constructor gets the error log class
-    smShader(std::shared_ptr<ErrorLog> logger);
+    Shader(std::shared_ptr<ErrorLog> logger);
 
     // \brief initialized the shaders.
     // \param vertexProgFileName   vertex program file name
@@ -231,18 +231,18 @@ public:
     void enableCheckingErrors(bool p_checkError);
 
     // \brief cleans up of the shader objects
-    ~smShader();
+    ~Shader();
 
     // \brief void implementations for virtual functions. needs to be overwritten for any specific uniform bindings
-    virtual void predraw(std::shared_ptr<smMesh>/*mesh*/){};
+    virtual void predraw(std::shared_ptr<Mesh>/*mesh*/){};
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh>/*mesh*/){};
+    virtual void predraw(std::shared_ptr<SurfaceMesh>/*mesh*/){};
 
-    virtual void posdraw(std::shared_ptr<smMesh>/*mesh*/){};
+    virtual void posdraw(std::shared_ptr<Mesh>/*mesh*/){};
 
-    virtual void posdraw(std::shared_ptr<smSurfaceMesh>/*mesh*/){};
+    virtual void posdraw(std::shared_ptr<SurfaceMesh>/*mesh*/){};
 
-    static std::shared_ptr<smShader> getShader(std::shared_ptr<UnifiedId> p_shaderID);
+    static std::shared_ptr<Shader> getShader(std::shared_ptr<UnifiedId> p_shaderID);
 
     bool readShaderContent(const std::string& p_file, std::string& p_content);
 
@@ -273,8 +273,8 @@ protected:
     GLint tangentAttrib;
 
 private:
-    static std::unordered_map<int, std::shared_ptr<smShader>> shaders;
-    std::unordered_multimap<int, smTextureShaderAssignment> texAssignments; //
+    static std::unordered_map<int, std::shared_ptr<Shader>> shaders;
+    std::unordered_multimap<int, TextureShaderAssignment> texAssignments; //
     std::unordered_map<std::string, GLint> textureGLBind; // This stores the opengl binded texture id
     std::vector<std::string> vertexShaderParamsString; // stores the parameters for vertex shader
     std::vector<std::string> fragmentShaderParamsString; // stores the parameters for fragment shader
@@ -299,8 +299,8 @@ private:
     bool geometryProgramExist; // if the geometry shader exists this will be true
     bool currentShaderEnabled; // if the currentShader is enabled or not
 
-    static std::shared_ptr<smShader> currentShader; // stores the current Active shader.
-    static std::shared_ptr<smShader> savedShader; // It is also used to save and restore the current shader is disabled for a while to use
+    static std::shared_ptr<Shader> currentShader; // stores the current Active shader.
+    static std::shared_ptr<Shader> savedShader; // It is also used to save and restore the current shader is disabled for a while to use
 
 #ifdef SIMMEDTK_OPENGL_SHADER
     GLhandleARB vertexShaderObject; // vertex shader object

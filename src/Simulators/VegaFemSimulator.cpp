@@ -80,14 +80,14 @@ void smVegaFemSimulator::syncBuffers()
 {
 }
 
-void smVegaFemSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
+void smVegaFemSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
 {
     if (!this->isListening())
     {
         return;
     }
 
-    /*auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
+    /*auto hapticEvent = std::static_pointer_cast<event::HapticEvent>(p_event);
     if (hapticEvent != nullptr && hapticEvent->getDeviceId() == 1)
     {
         hapticPosition = hapticEvent->getPosition();

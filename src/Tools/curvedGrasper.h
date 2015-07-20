@@ -28,12 +28,8 @@
 #include "Simulators/StylusObject.h"
 #include "Mesh/SurfaceMesh.h"
 
-namespace mstk {
-namespace Event {
+namespace core {
     class Event;
-    class smEventHandler;
-    class smCameraEvent;
-}
 }
 
 /// \brief Cruver Grasper tool
@@ -47,7 +43,7 @@ public:
                   const std::string& p_upperModelFileName = "../../resources/models/curved_lower.3DS");
 
     /// \brief event handler
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief for open and close motion
     void updateOpenClose();
@@ -60,9 +56,9 @@ public:
     smMeshContainer meshContainer_pivot; // the pivto mesh container
     smMeshContainer meshContainer_lowerJaw; // lower jaw container
     smMeshContainer meshContainer_upperJaw; // upper jaw container
-    smSurfaceMesh *mesh_pivot; // stores the pivot mesh
-    smSurfaceMesh *mesh_lowerJaw; // stores lower jaw mesh
-    smSurfaceMesh *mesh_upperJaw; // stores upper mesh jaw
+    SurfaceMesh *mesh_pivot; // stores the pivot mesh
+    SurfaceMesh *mesh_lowerJaw; // stores lower jaw mesh
+    SurfaceMesh *mesh_upperJaw; // stores upper mesh jaw
 #ifdef smNIUSB6008DAQ
     smPipeRegisteration NIUSB6008pipeReg; //
 #endif

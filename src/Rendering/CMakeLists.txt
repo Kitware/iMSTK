@@ -5,7 +5,7 @@ simmedtk_add_library(Rendering
     FrameBuffer.cpp
     GLUtils.cpp
     MetalShader.cpp
-    Renderer.cpp
+    GLRenderer.cpp
     Shader.cpp
     SceneTextureShader.cpp
     TextureManager.cpp

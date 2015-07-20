@@ -39,7 +39,7 @@
 */
 #include <iostream>
 
-#include "External/renderbuffer.h"
+#include "External/RenderBuffer.h"
 
 using namespace std;
 

@@ -33,17 +33,17 @@
 /// \brief this class is derived from generic Mesh class. Tetrahedron are building blocks of this volume mesh.
 ///  It also retains the surface triangle structure for rendering and collision detection purposes.
 ///  This surface triangle structure might be extracted from the volume mesh while loading
-class smVolumeMesh: public smMesh
+class VolumeMesh: public Mesh
 {
 public:
     /// \brief constructor
-    smVolumeMesh();
+    VolumeMesh();
 
     /// \brief constructor
-    smVolumeMesh(const smMeshType &meshtype, std::shared_ptr<ErrorLog> log);
+    VolumeMesh(const MeshType &meshtype, std::shared_ptr<ErrorLog> log);
 
     /// \brief destructor
-    ~smVolumeMesh();
+    ~VolumeMesh();
 
     /// \brief constructor
     void GenerateTetra(const std::string& fileName);
@@ -73,7 +73,7 @@ public:
     void rotVolumeMesh(const Matrix33d &p_rot);
 
     /// \brief load the mesh
-    bool loadMesh(const std::string& fileName, const smMeshFileType &fileType);
+    bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
 
     /// \brief populate the mesh data from the vega volumetric mesh file format
     void importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage);
@@ -82,12 +82,12 @@ public:
     void updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh);
 
 public:
-    /// push smMesh class specific errors here
+    /// push Mesh class specific errors here
     int nbrTetra; ///< number of tetrahedra
     int nbrNodes; ///< total number of nodes of the volume mesh
     std::shared_ptr<ErrorLog> log_VM; ///< log the errors with volume mesh class
     core::StdVector3d nodes; ///< data of nodal co-ordinates
-    std::vector<smTetrahedra> tetra; ///< tetrahedra data
+    std::vector<Tetrahedra> tetra; ///< tetrahedra data
     std::vector<int> surfaceNodeIndex; ///<
     std::vector<bool> fixed; ///< indicates if the node is fixed or not
 };

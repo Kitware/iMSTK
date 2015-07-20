@@ -6,7 +6,7 @@
 #include "VegaSceneObject.h"
 #include "objMeshEncode.h"
 
-smVegaSceneObject::smVegaSceneObject(char * filename):
+VegaSceneObject::VegaSceneObject(char * filename):
   mesh(NULL)
 {
   int verbose = 0;
@@ -33,66 +33,66 @@ smVegaSceneObject::smVegaSceneObject(char * filename):
     }
 }
 
-smVegaSceneObject::~smVegaSceneObject()
+VegaSceneObject::~VegaSceneObject()
 {
 }
 
 // assumes pre-existing face normals
 // second parameter is treshold angle for hard edges
-void smVegaSceneObject::BuildVertexNormals(double thresholdAngle)
+void VegaSceneObject::BuildVertexNormals(double thresholdAngle)
 {
   //do stuff with structure
   mesh->buildVertexNormals(thresholdAngle);
 }
 
-void smVegaSceneObject::BuildFaceNormals()
+void VegaSceneObject::BuildFaceNormals()
 {
   mesh->buildFaceNormals();
 }
 
-void smVegaSceneObject::BuildNormals(double thresholdAngle)
+void VegaSceneObject::BuildNormals(double thresholdAngle)
 {
   BuildFaceNormals();
   BuildVertexNormals(thresholdAngle);
 }
 
-void smVegaSceneObject::SetNormalsToFaceNormals()
+void VegaSceneObject::SetNormalsToFaceNormals()
 {
   mesh->setNormalsToFaceNormals();
 }
 
-void smVegaSceneObject::BuildNormalsFancy(double thresholdAngle)
+void VegaSceneObject::BuildNormalsFancy(double thresholdAngle)
 {
   BuildFaceNormals();
   mesh->buildVertexNormalsFancy(thresholdAngle);
 }
 
-int smVegaSceneObject::GetClosestVertex(Vec3d & queryPos, double * distance, double * auxVertexBuffer)
+int VegaSceneObject::GetClosestVertex(Vec3d & queryPos, double * distance, double * /*auxVertexBuffer*/)
 {
   return mesh->getClosestVertex(queryPos, distance);
 }
 
-void smVegaSceneObject::BuildNeighboringStructure()
+void VegaSceneObject::BuildNeighboringStructure()
 {
   mesh->buildVertexFaceNeighbors();
 }
 
-void smVegaSceneObject::ComputeMeshGeometricParameters(Vec3d * centroid, double * radius)
+void VegaSceneObject::ComputeMeshGeometricParameters(Vec3d * centroid, double * radius)
 {
   mesh->getMeshGeometricParameters(centroid, radius);
 }
 
-void smVegaSceneObject::ComputeMeshRadius(Vec3d & centroid, double * radius)
+void VegaSceneObject::ComputeMeshRadius(Vec3d & centroid, double * radius)
 {
   mesh->getMeshRadius(centroid, radius);
 }
 
-void smVegaSceneObject::ExportMeshGeometry(int * numVertices, double ** vertices, int * numTriangles, int ** triangles)
+void VegaSceneObject::ExportMeshGeometry(int * numVertices, double ** vertices, int * numTriangles, int ** triangles)
 {
   mesh->exportGeometry(numVertices, vertices, numTriangles, triangles, NULL, NULL);
 }
 
-void smVegaSceneObject::TransformRigidly(double * centerOfMass, double * R)
+void VegaSceneObject::TransformRigidly(double * centerOfMass, double * R)
 {
   Vec3d cv(centerOfMass);
   Mat3d Rv(R);

@@ -37,12 +37,10 @@
 #define SM_WINDOW_MAXSTRINGSIZE 255
 #define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
-namespace mstk {
-namespace Event {
+namespace core {
     class Event;
-    class smEventHandler;
-    class smCameraEvent;
-    }
+    class EventHandler;
+    class CameraEvent;
 }
 
 /// \brief I/O stream
@@ -52,7 +50,7 @@ public:
     virtual IOStream& operator >>(std::string &p_string) = 0;
     virtual IOStream& operator <<(std::string p_string) = 0;
 protected:
-    std::shared_ptr<mstk::Event::smEventHandler> eventHanlder;
+    std::shared_ptr<core::EventHandler> eventHanlder;
 };
 
 /// \brief  console stream; for printing text on the console
@@ -134,7 +132,7 @@ public:
     bool removeText(std::string p_tag);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> /*p_event*/) override {}
+    virtual void handleEvent(std::shared_ptr<core::Event> /*p_event*/) override {}
 
 protected:
     /// \brief  fonts

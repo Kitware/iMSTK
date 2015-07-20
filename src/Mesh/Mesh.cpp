@@ -25,23 +25,26 @@
 
 #include <limits>
 
+// VEgaFEM include
+#include "objMesh.h"
+
 // SimMedTK includes
 #include "Rendering/GLRenderer.h"
 #include "Rendering/Viewer.h"
 #include "Core/Factory.h"
 
-smBaseMesh::smBaseMesh()
+BaseMesh::BaseMesh()
 {
-//     SDK::getInstance()->registerMesh(safeDownCast<smBaseMesh>());
+//     SDK::getInstance()->registerMesh(safeDownCast<BaseMesh>());
 }
 
-void smBaseMesh::updateOriginalVertsWithCurrent()
+void BaseMesh::updateOriginalVertsWithCurrent()
 {
     origVerts = vertices;
 }
 
 /// \brief constructor
-smMesh::smMesh()
+Mesh::Mesh()
 {
     triangles = 0;
     texCoord = 0;
@@ -60,7 +63,7 @@ smMesh::smMesh()
 }
 
 /// \brief destructor
-smMesh::~smMesh()
+Mesh::~Mesh()
 {
     delete [] triangles;
     delete [] texCoord;
@@ -72,7 +75,7 @@ smMesh::~smMesh()
 }
 
 /// \brief
-void smMesh::allocateAABBTris()
+void Mesh::allocateAABBTris()
 {
     this->triAABBs.resize(nbrTriangles);
     this->updateTriangleAABB();
@@ -80,8 +83,8 @@ void smMesh::allocateAABBTris()
 
 /// \brief
 void CalculateTangentArray(int vertexCount, const core::Vec3d *vertex,
-                           const core::Vec3d *normal, const smTexCoord *texcoord,
-                           long triangleCount, const smTriangle *triangle,
+                           const core::Vec3d *normal, const TexCoord *texcoord,
+                           long triangleCount, const Triangle *triangle,
                            core::Vec3d *tangent)
 {
 
@@ -99,9 +102,9 @@ void CalculateTangentArray(int vertexCount, const core::Vec3d *vertex,
         const core::Vec3d& v2 = vertex[i2];
         const core::Vec3d& v3 = vertex[i3];
 
-        const smTexCoord& w1 = texcoord[i1];
-        const smTexCoord& w2 = texcoord[i2];
-        const smTexCoord& w3 = texcoord[i3];
+        const TexCoord& w1 = texcoord[i1];
+        const TexCoord& w2 = texcoord[i2];
+        const TexCoord& w3 = texcoord[i3];
 
         float x1 = v2[0] - v1[0];
         float x2 = v3[0] - v1[0];
@@ -144,7 +147,7 @@ void CalculateTangentArray(int vertexCount, const core::Vec3d *vertex,
 }
 
 /// \brief calucate the triangle tangents
-void smMesh::calcTriangleTangents()
+void Mesh::calcTriangleTangents()
 {
 
     int t;
@@ -152,26 +155,26 @@ void smMesh::calcTriangleTangents()
     // First calculate the triangle tangents
     for (t = 0; t < nbrTriangles; t++)
     {
-        smTriangle *tmpTri = &triangles[t];
+        Triangle *tmpTri = &triangles[t];
         core::Vec3d *v0 = &vertices[tmpTri->vert[0]];
         core::Vec3d *v1 = &vertices[tmpTri->vert[1]];
         core::Vec3d *v2 = &vertices[tmpTri->vert[2]];
-        smTexCoord *t0 = &texCoord[tmpTri->vert[0]];
-        smTexCoord *t1 = &texCoord[tmpTri->vert[1]];
-        smTexCoord *t2 = &texCoord[tmpTri->vert[2]];
+        TexCoord *t0 = &texCoord[tmpTri->vert[0]];
+        TexCoord *t1 = &texCoord[tmpTri->vert[1]];
+        TexCoord *t2 = &texCoord[tmpTri->vert[2]];
 
-        if (this->meshFileType == SM_FILETYPE_3DS)
+        if (this->meshFileType == BaseMesh::MeshFileType::ThreeDS)
         {
             calculateTangent(*v2, *v1, *v0, *t2, *t1, *t0, triTangents[t]);
         }
-        else if (this->meshFileType == SM_FILETYPE_OBJ)
+        else if (this->meshFileType == BaseMesh::MeshFileType::Obj)
         {
             calculateTangent_test(*v0, *v1, *v2, *t0, *t1, *t2, triTangents[t]);
         }
     }
 
     //calculate the vertex normals
-    if (this->meshFileType == SM_FILETYPE_3DS || this->meshFileType == SM_FILETYPE_OBJ)
+    if (this->meshFileType == BaseMesh::MeshFileType::ThreeDS || this->meshFileType == BaseMesh::MeshFileType::Obj)
     {
         for (int v = 0; v < nbrVertices; v++)
         {
@@ -182,15 +185,15 @@ void smMesh::calcTriangleTangents()
                 vertTangents[v] += triTangents[vertTriNeighbors[v][i]];
             }
 
-            vertTangents[v].normalized();
+            vertTangents[v].normalize();
             vertTangents[v] = (vertTangents[v] - vertNormals[v] * vertNormals[v].dot(vertTangents[v]));
-            vertTangents[v].normalized();
+            vertTangents[v].normalize();
         }
     }
 }
 
 /// \brief calucate the triangle tangent for rendering purposes
-void smMesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t)
+void Mesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t)
 {
 
     core::Vec3d v1;
@@ -215,7 +218,7 @@ void smMesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3,
 }
 
 /// \brief
-void smMesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t)
+void Mesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t)
 {
 
     core::Vec3d v1;
@@ -241,7 +244,7 @@ void smMesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d
 }
 
 /// \brief calculates the normal of the vertex
-void smMesh::updateVertexNormals()
+void Mesh::updateVertexNormals()
 {
     core::Vec3d temp = core::Vec3d::Zero();
 
@@ -253,13 +256,13 @@ void smMesh::updateVertexNormals()
         }
 
         vertNormals[i] = temp;
-        vertNormals[i].normalized();
+        vertNormals[i].normalize();
         temp = core::Vec3d::Zero();
     }
 }
 
 /// \brief updates the normal of all the triangle
-void smMesh::updateTriangleNormals()
+void Mesh::updateTriangleNormals()
 {
 
     for (int i = 0; i < nbrTriangles; i++)
@@ -269,11 +272,11 @@ void smMesh::updateTriangleNormals()
 }
 
 /// \brief calculates the normal of a triangle
-core::Vec3d smMesh::calculateTriangleNormal(int triNbr)
+core::Vec3d Mesh::calculateTriangleNormal(int triNbr)
 {
 
     core::Vec3d v[3];
-    smTriangle temp = this->triangles[triNbr];
+    Triangle temp = this->triangles[triNbr];
 
     v[0] = this->vertices[temp.vert[0]];
     v[1] = this->vertices[temp.vert[1]];
@@ -283,7 +286,7 @@ core::Vec3d smMesh::calculateTriangleNormal(int triNbr)
 }
 
 /// \brief allocates vertices and related array
-bool smMesh::initVertexArrays(int nbr)
+bool Mesh::initVertexArrays(int nbr)
 {
 
     if (nbr < 0)
@@ -296,12 +299,12 @@ bool smMesh::initVertexArrays(int nbr)
     this->origVerts.resize(nbr);
     this->vertNormals = new core::Vec3d[nbr];
     this->vertTangents = new core::Vec3d[nbr];
-    this->texCoord = new smTexCoord[nbr];
+    this->texCoord = new TexCoord[nbr];
     return true;
 }
 
 /// \brief allocates triangle and related array
-bool smMesh::initTriangleArrays(int nbr)
+bool Mesh::initTriangleArrays(int nbr)
 {
 
     if (nbr < 0)
@@ -311,14 +314,14 @@ bool smMesh::initTriangleArrays(int nbr)
 
     this->nbrTriangles = nbr;
 
-    this->triangles = new smTriangle[nbr];
+    this->triangles = new Triangle[nbr];
     this->triNormals = new core::Vec3d[nbr];
     this->triTangents = new core::Vec3d[nbr];
     return true;
 }
 
 /// \brief initializes the vertex neighbors
-void smMesh::initVertexNeighbors()
+void Mesh::initVertexNeighbors()
 {
 
     int i;
@@ -333,7 +336,7 @@ void smMesh::initVertexNeighbors()
 }
 
 /// \brief initializes the vertex neighbors
-void smMesh::calcNeighborsVertices()
+void Mesh::calcNeighborsVertices()
 {
 
     int i;
@@ -404,7 +407,7 @@ void smMesh::calcNeighborsVertices()
 }
 
 /// \brief
-void smMesh::upadateAABB()
+void Mesh::upadateAABB()
 {
     double minx = std::numeric_limits<double>::max();
     double miny = std::numeric_limits<double>::max();
@@ -434,9 +437,9 @@ void smMesh::upadateAABB()
 }
 
 /// \brief
-void smMesh::calcEdges()
+void Mesh::calcEdges()
 {
-    smEdge edge;
+    Edge edge;
     edges.reserve(SIMMEDTK_MESH_RESERVEDMAXEDGES);
 
     for (int i = 0; i < nbrVertices; i++)
@@ -454,7 +457,7 @@ void smMesh::calcEdges()
 }
 
 /// \brief
-void smMesh::translate(float p_offsetX, float p_offsetY, float p_offsetZ)
+void Mesh::translate(float p_offsetX, float p_offsetY, float p_offsetZ)
 {
 
     for (int i = 0; i < nbrVertices; i++)
@@ -472,7 +475,7 @@ void smMesh::translate(float p_offsetX, float p_offsetY, float p_offsetZ)
 }
 
 /// \brief
-void smMesh::translate(core::Vec3d p_offset)
+void Mesh::translate(core::Vec3d p_offset)
 {
 
     for (int i = 0; i < nbrVertices; i++)
@@ -485,7 +488,7 @@ void smMesh::translate(core::Vec3d p_offset)
 }
 
 /// \brief
-void smMesh::scale(core::Vec3d p_scaleFactors)
+void Mesh::scale(core::Vec3d p_scaleFactors)
 {
 
     for (int i = 0; i < nbrVertices; i++)
@@ -503,7 +506,7 @@ void smMesh::scale(core::Vec3d p_scaleFactors)
 }
 
 /// \brief
-void smMesh::rotate(const Matrix33d &p_rot)
+void Mesh::rotate(const Matrix33d &p_rot)
 {
 
     for (int i = 0; i < nbrVertices; i++)
@@ -523,7 +526,7 @@ void smMesh::rotate(const Matrix33d &p_rot)
 }
 
 /// \brief
-void smMesh::updateTriangleAABB()
+void Mesh::updateTriangleAABB()
 {
     for (int i = 0; i < nbrTriangles; i++)
     {
@@ -549,7 +552,7 @@ void smMesh::updateTriangleAABB()
 }
 
 /// \brief
-void smMesh::checkCorrectWinding()
+void Mesh::checkCorrectWinding()
 {
     int x[3];
     int p[3];
@@ -619,18 +622,18 @@ void smMesh::checkCorrectWinding()
     }
 }
 
-smTextureAttachment::smTextureAttachment()
+TextureAttachment::TextureAttachment()
 {
 }
 
-bool smBaseMesh::isMeshTextured()
+bool BaseMesh::isMeshTextured()
 {
     return isTextureCoordAvailable;
 }
 
-void smBaseMesh::assignTexture( int p_textureId )
+void BaseMesh::assignTexture( int p_textureId )
 {
-    smTextureAttachment attachment;
+    TextureAttachment attachment;
     attachment.textureId = p_textureId;
 
     if ( p_textureId > 0 )
@@ -638,35 +641,35 @@ void smBaseMesh::assignTexture( int p_textureId )
         this->textureIds.push_back( attachment );
     }
 }
-void smBaseMesh::assignTexture(const std::string& p_referenceName)
+void BaseMesh::assignTexture(const std::string& p_referenceName)
 {
     int textureId;
-    smTextureAttachment attachment;
+    TextureAttachment attachment;
 
-    if (smTextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
+    if (TextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
     {
         attachment.textureId = textureId;
         this->textureIds.push_back(attachment);
     }
 }
-smLineMesh::smLineMesh( int p_nbrVertices ) : smBaseMesh()
+LineMesh::LineMesh( int p_nbrVertices ) : BaseMesh()
 {
     nbrVertices = p_nbrVertices;
     vertices.reserve( nbrVertices );
     origVerts.reserve( nbrVertices );
     edgeAABBs = new AABB[nbrVertices - 1];
-    texCoord = new smTexCoord[nbrVertices];
-    edges = new smEdge[nbrVertices - 1];
+    texCoord = new TexCoord[nbrVertices];
+    edges = new Edge[nbrVertices - 1];
     nbrEdges = nbrVertices - 1;
     isTextureCoordAvailable = false;
     createAutoEdges();
 }
-smLineMesh::smLineMesh( int p_nbrVertices, bool autoEdge ) : smBaseMesh()
+LineMesh::LineMesh( int p_nbrVertices, bool autoEdge ) : BaseMesh()
 {
     nbrVertices = p_nbrVertices;
     vertices.reserve( nbrVertices );
     origVerts.reserve( nbrVertices );
-    texCoord = new smTexCoord[nbrVertices];
+    texCoord = new TexCoord[nbrVertices];
 
     /// Edge AABB should be assigned by the instance
     edgeAABBs = NULL;
@@ -684,7 +687,7 @@ smLineMesh::smLineMesh( int p_nbrVertices, bool autoEdge ) : smBaseMesh()
         createAutoEdges();
     }
 }
-void smLineMesh::createAutoEdges()
+void LineMesh::createAutoEdges()
 {
     for ( int i = 0; i < nbrEdges; i++ )
     {
@@ -692,7 +695,7 @@ void smLineMesh::createAutoEdges()
         edges[i].vert[1] = i + 1;
     }
 }
-void smLineMesh::updateAABB()
+void LineMesh::updateAABB()
 {
     AABB tempAABB;
     core::Vec3d minOffset( -2.0, -2.0, -2.0 );
@@ -733,7 +736,7 @@ void smLineMesh::updateAABB()
     tempAABB.aabbMax += maxOffset;
     aabb = tempAABB;
 }
-void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
+void LineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
 {
 
     for ( int i = 0; i < nbrVertices; i++ )
@@ -745,7 +748,7 @@ void smLineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
 
     updateAABB();
 }
-void smLineMesh::translate( core::Vec3d p_offset )
+void LineMesh::translate( core::Vec3d p_offset )
 {
 
     for ( int i = 0; i < nbrVertices; i++ )
@@ -756,7 +759,7 @@ void smLineMesh::translate( core::Vec3d p_offset )
 
     updateAABB();
 }
-void smLineMesh::rotate( Matrix33d p_rot )
+void LineMesh::rotate( Matrix33d p_rot )
 {
 
     for ( int i = 0; i < nbrVertices; i++ )
@@ -767,7 +770,7 @@ void smLineMesh::rotate( Matrix33d p_rot )
 
     updateAABB();
 }
-void smLineMesh::scale( core::Vec3d p_scaleFactors )
+void LineMesh::scale( core::Vec3d p_scaleFactors )
 {
 
     for ( int i = 0; i < nbrVertices; i++ )
@@ -784,22 +787,22 @@ void smLineMesh::scale( core::Vec3d p_scaleFactors )
     updateAABB();
 }
 
-bool smLineMesh::isMeshTextured()
+bool LineMesh::isMeshTextured()
 {
     return isTextureCoordAvailable;
 }
 
-int smMesh::getNumTriangles() const
+int Mesh::getNumTriangles() const
 {
     return this->nbrTriangles;
 }
 
-int smMesh::getNumEdges() const
+int Mesh::getNumEdges() const
 {
     return this->edges.size();
 }
 
-void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
+void Mesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
     Vec3d p;
     //copy the vertex co-ordinates
@@ -812,7 +815,7 @@ void smMesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
     }
 }
 
-bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
+bool Mesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage)
 {
     if (!vegaSurfaceMesh)
         return false;
@@ -847,7 +850,7 @@ bool smMesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfac
     initTriangleArrays(numTriangles);
 
     /*delete this->triangles;
-    this->triangles = new smTriangle[this->nbrTriangles];*/
+    this->triangles = new Triangle[this->nbrTriangles];*/
 
     //copy the triangle connectivity information
     for(i=0; i<this->nbrTriangles ; i++)

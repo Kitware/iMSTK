@@ -107,7 +107,7 @@ public:
 public:
     friend class smPBDSurfaceRenderDetail;
 
-    smSurfaceMesh *mesh; ///< surface mesh
+    SurfaceMesh *mesh; ///< surface mesh
     int nbrTri; ///< number of surface triangles
     int **triVertIdx; ///< !!
     int **sprInTris; ///< triangles that include a spring

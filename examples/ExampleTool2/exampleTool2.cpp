@@ -49,7 +49,7 @@ void main()
     PhantomInterface * hapticInterface;
     SDK* simmedtkSDK;
     Scene *scene1;
-    smViewer *viewer;
+    Viewer *viewer;
     Simulator *simulator;
 
     ///create lights
@@ -82,12 +82,12 @@ void main()
     scene1->setName("Scene1");
 
     ///init texture manager and load the textures
-    smTextureManager::init(simmedtkSDK->getErrorLog());
-    smTextureManager::loadTexture("../../resources/textures/metal.bmp", "metal");
-    smTextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp", "hookCautery");
-    smTextureManager::loadTexture("../../resources/textures/metalbump.bmp", "bump");
-    smTextureManager::loadTexture("../../resources/textures/sword_bump.bmp", "nobump");
-    smTextureManager::loadTexture("../../resources/textures/burn1024.bmp", "specTex"); ///for OCC I'll use the same texture
+    TextureManager::init(simmedtkSDK->getErrorLog());
+    TextureManager::loadTexture("../../resources/textures/metal.bmp", "metal");
+    TextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp", "hookCautery");
+    TextureManager::loadTexture("../../resources/textures/metalbump.bmp", "bump");
+    TextureManager::loadTexture("../../resources/textures/sword_bump.bmp", "nobump");
+    TextureManager::loadTexture("../../resources/textures/burn1024.bmp", "specTex"); ///for OCC I'll use the same texture
 
     ///initialize the vertex and fragment shader
     MetalShaderShadow *metalShader = new MetalShaderShadow(

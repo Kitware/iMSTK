@@ -13,8 +13,8 @@
   SIMMEDTK_RUN_LOADER(register_static_scene_object_render_delegate); \
   SIMMEDTK_RUN_LOADER(register_stylus_render_delegate); \
   SIMMEDTK_RUN_LOADER(register_surface_tree_render_delegate)
-  //SIMMEDTK_RUN_LOADER(register_fem_scene_render_delegate); \
-  //SIMMEDTK_RUN_LOADER(register_pbd_surface_render_delegate); \
-  //SIMMEDTK_RUN_LOADER(register_physx_volume_mesh_render_delegate); \
+  //SIMMEDTK_RUN_LOADER(register_fem_scene_render_delegate);
+  //SIMMEDTK_RUN_LOADER(register_pbd_surface_render_delegate);
+  //SIMMEDTK_RUN_LOADER(register_physx_volume_mesh_render_delegate);
 
 #endif // SMRENDERDELEGATES_CONFIG_H

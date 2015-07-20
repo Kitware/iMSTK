@@ -20,7 +20,7 @@ simmedtk_add_library(Event
 
 target_compile_options(Event
   PRIVATE
-    $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast>)
+    $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
 
 target_link_libraries(Event
   PRIVATE

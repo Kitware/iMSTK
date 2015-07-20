@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "VegaSceneObjectWithRestPosition.h"
 
-smVegaSceneObjectWithRestPosition::smVegaSceneObjectWithRestPosition(char * filename): smVegaSceneObject(filename)
+VegaSceneObjectWithRestPosition::VegaSceneObjectWithRestPosition(char * filename): VegaSceneObject(filename)
 {
   restPosition.resize(3 * n);
   for(int i = 0; i < n; i++)
@@ -14,13 +14,13 @@ smVegaSceneObjectWithRestPosition::smVegaSceneObjectWithRestPosition(char * file
   }
 }
 
-smVegaSceneObjectWithRestPosition::~smVegaSceneObjectWithRestPosition()
+VegaSceneObjectWithRestPosition::~VegaSceneObjectWithRestPosition()
 {
 }
 
-void smVegaSceneObjectWithRestPosition::TransformRigidly(double * centerOfMass, double * R)
+void VegaSceneObjectWithRestPosition::TransformRigidly(double * centerOfMass, double * R)
 {
-  smVegaSceneObject::TransformRigidly(centerOfMass, R);
+  VegaSceneObject::TransformRigidly(centerOfMass, R);
 
   for(int i=0; i<n; i++)
   {

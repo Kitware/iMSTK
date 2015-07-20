@@ -26,8 +26,8 @@
 #include "EventHandler.h"
 #include "RenderDelegate.h"
 
-std::shared_ptr<mstk::Event::smEventHandler>
-CoreClass::eventHandler = std::make_shared<mstk::Event::smEventHandler>();
+std::shared_ptr<core::EventHandler>
+CoreClass::eventHandler = std::make_shared<core::EventHandler>();
 
 CoreClass::CoreClass() :
     name(""), listening(false)
@@ -70,12 +70,12 @@ void CoreClass::print() const
     std::cout << "Default print" << std::endl;
 }
 
-void CoreClass::handleEvent(std::shared_ptr< mstk::Event::Event > event)
+void CoreClass::handleEvent(std::shared_ptr< core::Event > event)
 {
     std::cout << "Default handleEvent" << std::endl;
     std::cout << "Sender " << int(event->getSender()) << std::endl;
     std::cout << "Priority " << int(event->getPriority()) << std::endl;
-    std::cout << "Type " << int(mstk::Event::Event::EventName) << std::endl;
+    std::cout << "Type " << int(core::Event::EventName) << std::endl;
 }
 
 void CoreClass::setName( const std::string &p_objectName )

@@ -32,11 +32,11 @@
   * before the first registration call is made.
   *
   * A more specific example is the way the smRendering library
-  * registers the smViewer class as a concrete child of ViewerBase:
+  * registers the Viewer class as a concrete child of ViewerBase:
   * <pre>
   *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   *     SIMMEDTK_BEGIN_ONLOAD(register_viewer_children)
-  *       SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,smViewer,0);
+  *       SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,Viewer,0);
   *     SIMMEDTK_FINISH_ONLOAD()
   *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
   * </pre>

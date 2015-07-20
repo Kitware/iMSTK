@@ -31,28 +31,23 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
-#include "External/framebufferObject.h"
-#include "External/renderbuffer.h"
+#include "External/FrameBufferObject.h"
+#include "External/RenderBuffer.h"
 #include "TextureManager.h"
 
-/// \brief frame buffer attachment type; color, depth, stencil
-enum smFBOImageAttachmentType
-{
-    SIMMEDTK_FBOIMAGE_COLOR,
-    SIMMEDTK_FBOIMAGE_DEPTH,
-    SIMMEDTK_FBOIMAGE_STENCIL
-};
-/// \brief render buffer type
-enum smRenderBufferType
-{
-    SIMMEDTK_RENDERBUFFER_DEPTH = GL_DEPTH_COMPONENT,
-    SIMMEDTK_RENDERBUFFER_STENCIL = GL_STENCIL_INDEX,
-    SIMMEDTK_RENDERBUFFER_COLOR_RGBA = GL_RGBA,
-    SIMMEDTK_RENDERBUFFER_COLOR_RGB = GL_RGB
-};
 /// \brief render buffer type used for frame buffer attachment
-class smRenderBuffer: public CoreClass
+class RenderBuffer: public CoreClass
 {
+public:
+    /// \brief render buffer type
+    enum Type
+    {
+        Depth = GL_DEPTH_COMPONENT,
+        Stencil = GL_STENCIL_INDEX,
+        ColorRGBA = GL_RGBA,
+        ColorRGB = GL_RGB
+    };
+
 protected:
     /// \brief renderbuffer
     Renderbuffer _rb;
@@ -63,7 +58,7 @@ protected:
     /// \brief allocation is done or not
     bool isAllocated;
     /// \brief type of renderbuffer
-    smRenderBufferType type;
+    Type type;
     /// \brief attachment order in the frame buffer
     int attachmentOrder;
 
@@ -79,13 +74,13 @@ public:
     /// \brief get attacnment id. returns GL binding
     GLenum getGLAttachmentId();
     /// \brief returns buffer type
-    smRenderBufferType getRenderBufType();
+    Type getRenderBufType();
     /// \brief return GL buffer id
     GLuint  getRenderBufId();
     /// \brief defaul constructor.
-    smRenderBuffer();
+    RenderBuffer();
     /// \brief set the type
-    smRenderBuffer(smRenderBufferType p_type, int p_width, int p_height);
+    RenderBuffer(Type p_type, int p_width, int p_height);
     /// \brief create a depth buffer
     bool createDepthBuffer(int width, int height);
     /// \brief create a color buffer
@@ -95,7 +90,7 @@ public:
 };
 
 /// \brief GL frame buffer class
-class smFrameBuffer: public CoreClass
+class FrameBuffer: public CoreClass
 {
 public:
     /// \brief GL frame buffer
@@ -107,7 +102,7 @@ public:
     /// \brief default color buffer attachment
     int defaultColorAttachment;
     /// \brief render buffer pointer
-    smRenderBuffer *renderBuffer;
+    RenderBuffer *renderBuffer;
     /// \brief it is enabled when the renderbuffer exists
     bool renderDepthBuff;
     /// \brief it is enabled when the color buffer exists
@@ -118,8 +113,8 @@ public:
     int height;
 
     /// \brief framebuffer default constructor
-    smFrameBuffer();
-    virtual ~smFrameBuffer();
+    FrameBuffer();
+    virtual ~FrameBuffer();
     /// \brief set dimension of the renderbuffer
     void setDim(int p_width, int p_height);
     /// \brief get height of the framebuffer
@@ -129,7 +124,7 @@ public:
     /// \brief attach texture
     void attachTexture();
     /// \brief attach render buffer to te frame buffer
-    void attachRenderBuffer(smRenderBuffer *p_renderBuf);
+    void attachRenderBuffer(RenderBuffer *p_renderBuf);
     /// \brief attach depth texture
     void attachDepthTexture(Texture *p_texture);
     /// \brief attach a color texture

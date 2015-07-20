@@ -4,22 +4,22 @@
 #include <string.h>
 #include "VegaSceneObjectDeformable.h"
 
-smVegaSceneObjectDeformable::smVegaSceneObjectDeformable(char * filenameOBJ):
-    smVegaSceneObjectWithRestPosition(filenameOBJ)
+VegaSceneObjectDeformable::VegaSceneObjectDeformable(char * filenameOBJ):
+    VegaSceneObjectWithRestPosition(filenameOBJ)
 {
 }
 
-smVegaSceneObjectDeformable::~smVegaSceneObjectDeformable()
+VegaSceneObjectDeformable::~VegaSceneObjectDeformable()
 {
 }
 
-void smVegaSceneObjectDeformable::ResetDeformationToRest()
+void VegaSceneObjectDeformable::ResetDeformationToRest()
 {
   for(int i = 0; i < n; i++)
       mesh->setPosition(i, Vec3d(restPosition[3 * i + 0], restPosition[3 * i + 1], restPosition[3 * i + 2]));
 }
 
-void smVegaSceneObjectDeformable::AddVertexDeformations(double * u)
+void VegaSceneObjectDeformable::AddVertexDeformations(double * u)
 {
   for(int i = 0; i < n; i++)
   {
@@ -27,7 +27,7 @@ void smVegaSceneObjectDeformable::AddVertexDeformations(double * u)
   }
 }
 
-void smVegaSceneObjectDeformable::SetVertexDeformations(double * u)
+void VegaSceneObjectDeformable::SetVertexDeformations(double * u)
 {
   for(int i = 0; i < n; i++)
   {
@@ -35,7 +35,7 @@ void smVegaSceneObjectDeformable::SetVertexDeformations(double * u)
   }
 }
 
-void smVegaSceneObjectDeformable::SetVertexDeformations(float * u)
+void VegaSceneObjectDeformable::SetVertexDeformations(float * u)
 {
   // set the deformations
   for(int i = 0; i < n; i++)

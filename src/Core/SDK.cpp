@@ -270,7 +270,7 @@ void SDK::terminateAll()
 }
 
 /// \brief register functions
-int SDK::registerMesh(std::shared_ptr<smBaseMesh> p_mesh)
+int SDK::registerMesh(std::shared_ptr<BaseMesh> p_mesh)
 {
     MeshHolder mh;
     mh.mesh = p_mesh;

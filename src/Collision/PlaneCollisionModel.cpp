@@ -25,7 +25,7 @@
 #include "PlaneCollisionModel.h"
 
 PlaneCollisionModel::PlaneCollisionModel(const core::Vec3d& p, const core::Vec3d& n)
-    : smPlaneModel(p, n)
+    : PlaneModel(p, n)
 {
 
 }

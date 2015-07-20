@@ -36,50 +36,52 @@
 #include "Core/CollisionConfig.h"
 #include "Core/Geometry.h"
 
-//VEGA includes
-#include "objMesh.h"
-
 #define SIMMEDTK_MESH_AABBSKINFACTOR 0.1  ///Bounding box skin value
 #define SIMMEDTK_MESH_RESERVEDMAXEDGES 6000  ///this value is initially allocated buffer size for thge edges
 
-struct smTexCoord;
-struct smTriangle;
-struct smTetrahedra;
-struct smEdge;
+// VegaFEM class
+class ObjMesh;
 
-/// \brief designates what purpose/scenario the mesh is used for
-enum smMeshType
-{
-    SMMESH_DEFORMABLE,
-    SMMESH_DEFORMABLECUTABLE,
-    SMMESH_RIGIDCUTABLE,
-    SMMESH_RIGID
-};
+struct TexCoord;
+struct Triangle;
+struct Tetrahedra;
+struct Edge;
 
-/// \brief designates input mesh file type
-enum smMeshFileType
-{
-    SM_FILETYPE_NONE,
-    SM_FILETYPE_OBJ,
-    SM_FILETYPE_3DS,
-    SM_FILETYPE_VOLUME,
-};
 
-class smShader;
+
+class Shader;
 
 /// \brief !!
-struct smTextureAttachment
+struct TextureAttachment
 {
-    smTextureAttachment();
+    TextureAttachment();
     int textureId;
 };
 
 /// \brief base class for the mesh
-class smBaseMesh: public CoreClass
+class BaseMesh: public CoreClass
 {
 public:
+    /// \brief designates what purpose/scenario the mesh is used for
+    enum class MeshType
+    {
+        Deformable,
+        DeformableCutable,
+        RigidCutable,
+        Rigid
+    };
+
+    /// \brief designates input mesh file type
+    enum class MeshFileType
+    {
+        None,
+        Obj,
+        ThreeDS,
+        Volume,
+    };
+
     /// \brief constructor
-    smBaseMesh();
+    BaseMesh();
 
     /// \brief query if the mesh has textures available for rendering
     bool isMeshTextured();
@@ -112,20 +114,20 @@ public:
     int  nbrVertices; ///< number of vertices
     AABB aabb; ///< Axis aligned bounding box
     bool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
-    smTexCoord *texCoord; ///< texture co-ordinates
-    std::vector<smTextureAttachment> textureIds; ///< !!
+    TexCoord *texCoord; ///< texture co-ordinates
+    std::vector<TextureAttachment> textureIds; ///< !!
 };
 
 /// \brief: this is a generic Mesh class from which surface and volume meshes are inherited
 /// Note: this class cannot exist on its own
-class smMesh: public smBaseMesh
+class Mesh: public BaseMesh
 {
 public:
     /// \brief constructor
-    smMesh();
+    Mesh();
 
     /// \brief destructor
-    virtual ~smMesh();
+    virtual ~Mesh();
 
     /// \brief compute the neighbors of the vertex
     void getVertexNeighbors();
@@ -164,10 +166,10 @@ public:
     void calcTriangleTangents();
 
     /// \brief compute the tangent give the three vertices
-    void calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t);
+    void calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t);
 
     /// \brief !!
-    void calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, smTexCoord& t1, smTexCoord& t2, smTexCoord& t3, core::Vec3d& t);
+    void calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t);
 
     /// \brief find the neighbors of all vertices of mesh
     void calcNeighborsVertices();
@@ -192,13 +194,13 @@ public:
     void checkCorrectWinding();
 
     /// \brief get the type fo mesh
-    smMeshType getMeshType()
+    MeshType getMeshType()
     {
         return meshType;
     };
 
     /// \brief load the mesh
-    virtual bool loadMesh(const std::string& fileName, const smMeshFileType &fileType) = 0;
+    virtual bool loadMesh(const std::string& fileName, const MeshFileType &fileType) = 0;
 
     /// \brief load the mesh
     bool importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh, const bool perProcessingStage);
@@ -214,8 +216,8 @@ public:
 
 public:
     int  nbrTriangles; ///< number of triangles
-    smTriangle *triangles; ///< list of triangles
-    smTexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
+    Triangle *triangles; ///< list of triangles
+    TexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
     core::Vec3d *triNormals; ///< triangle normals
     core::Vec3d *vertNormals; ///< vertex normals
@@ -224,47 +226,47 @@ public:
     bool tangentChannel; ///< !!
     std::vector< std::vector<int> > vertTriNeighbors; ///< list of neighbors for a triangle
     std::vector< std::vector<int> > vertVertNeighbors; ///< list of neighbors for a vertex
-    std::vector<smEdge> edges; ///< list of edges
+    std::vector<Edge> edges; ///< list of edges
 
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
     ///Therefore it is initially NULL
     std::vector<AABB> triAABBs;
 
-    smMeshType meshType; ///< type of mesh (rigid, deformable etc.)
-    smMeshFileType meshFileType; ///< type of input mesh
+    MeshType meshType; ///< type of mesh (rigid, deformable etc.)
+    MeshFileType meshFileType; ///< type of input mesh
 };
 
 /// \brief holds the texture co-ordinates
-struct smTexCoord
+struct TexCoord
 {
     float u, v;
 };
 
 /// \brief holds the vertex indices of triangle
-struct smTriangle
+struct Triangle
 {
     unsigned int vert[3];
 };
 
 /// \brief holds the vertex indices of tetrahedron
-struct smTetrahedra
+struct Tetrahedra
 {
     int vert[4];
 };
 
 /// \brief holds the vertex indices of edge
-struct smEdge
+struct Edge
 {
     unsigned int vert[2];
 };
 
 /// \brief !!
-class smLineMesh: public smBaseMesh
+class LineMesh: public BaseMesh
 {
 public:
     /// \brief destructor
-    ~smLineMesh()
+    ~LineMesh()
     {
         delete[]edgeAABBs;
         delete[]texCoord;
@@ -272,10 +274,10 @@ public:
     }
 
     /// \brief constructor
-    smLineMesh(int p_nbrVertices);
+    LineMesh(int p_nbrVertices);
 
     /// \brief constructor
-    smLineMesh(int p_nbrVertices, bool autoEdge);
+    LineMesh(int p_nbrVertices, bool autoEdge);
 
     /// \brief !!
     void createAutoEdges();
@@ -303,7 +305,7 @@ public:
 
 public:
     AABB *edgeAABBs;///< AABBs for the edges in the mesh
-    smEdge *edges;///< edges of the line mesh
+    Edge *edges;///< edges of the line mesh
     int nbrEdges;///< number of edges of the line mesh
 
 };

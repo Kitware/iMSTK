@@ -27,8 +27,7 @@
 // STL includes
 #include <memory>
 
-namespace mstk {
-namespace Event {
+namespace core {
 
 enum class EventType
 {
@@ -101,7 +100,6 @@ private:
     bool enabled; // allows to disable this event
 };
 
-} // Event namespace
-} // mstk namespace
+} // core namespace
 
 #endif // SMEVENT_H

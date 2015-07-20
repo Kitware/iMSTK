@@ -42,7 +42,7 @@
 class smOpenGLWindowStream;
 
 /// \brief Handles all rendering routines.
-class smViewer : public ViewerBase
+class Viewer : public ViewerBase
 {
 public:
     std::unique_ptr<sf::Context> sfmlContext;
@@ -51,7 +51,7 @@ public:
     std::shared_ptr<smOpenGLWindowStream> windowOutput;
 
     /// \brief default constructor
-    smViewer();
+    Viewer();
     /// \brief for exit viewer
     virtual void exitViewer() override;
     /// \brief add object for rendering
@@ -62,7 +62,7 @@ public:
     virtual void updateText(std::string p_tag, std::string p_string) override;
     virtual void updateText(int p_handle, std::string p_string) override;
     /// \brief set scene as texture
-    void setSceneAsTextureShader(std::shared_ptr<smSceneTextureShader> p_shader);
+    void setSceneAsTextureShader(std::shared_ptr<SceneTextureShader> p_shader);
     /// \brief set the window title
     void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
@@ -98,7 +98,7 @@ protected:
     virtual void endFrame() override;
     virtual void renderTextureOnView() override;
     /// \brief  event handler
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    virtual void handleEvent(std::shared_ptr<core::Event> p_event) override;
     /// \brief processes an SFML event
     void processSFMLEvents(const sf::Event& p_event);
 };

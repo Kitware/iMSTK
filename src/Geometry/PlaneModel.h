@@ -41,7 +41,7 @@
 ///
 /// @see smPlaneCollisionModel
 ///
-class smPlaneModel : public ModelRepresentation
+class PlaneModel : public ModelRepresentation
 {
 public:
     using RigidTransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
@@ -50,12 +50,12 @@ public:
     ///
     /// @brief Constructor
     ///
-    smPlaneModel(const core::Vec3d& p, const core::Vec3d& n);
+    PlaneModel(const core::Vec3d& p, const core::Vec3d& n);
 
     ///
     /// @brief Destructor
     ///
-    virtual ~smPlaneModel();
+    virtual ~PlaneModel();
 
     ///
     /// @brief Draw this mesh

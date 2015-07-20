@@ -45,7 +45,7 @@ PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 
 void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
-    int penetratedNode, nodeDofID;
+    int nodeDofID;
     const double stiffness = 1.0e4, damping = 1.0e5;
     core::Vec3d velocityProjection;
 
@@ -58,7 +58,7 @@ void PenaltyContactFemToStatic::computeUnilateralContactForces()
 
         femSceneObject->setContactForcesToZero();
         core::Vec3d force;
-        for (int i = 0; i < contactInfo.size(); i++)
+        for (size_t i = 0; i < contactInfo.size(); i++)
         {
             nodeDofID = 3 * contactInfo[i]->index;
             velocityProjection = femSceneObject->getVelocityOfNodeWithDofID(nodeDofID);

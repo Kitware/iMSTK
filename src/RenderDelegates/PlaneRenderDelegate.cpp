@@ -2,15 +2,15 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 
-class smPlaneRenderDelegate : public RenderDelegate
+class PlaneRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
 };
 
-void smPlaneRenderDelegate::draw() const
+void PlaneRenderDelegate::draw() const
 {
-  smGLRenderer::draw(*this->getSourceGeometryAs<Plane>());
+  GLRenderer::draw(*this->getSourceGeometryAs<Plane>());
 //         if (this->movedOrRotated)
 //         {
 //             updateDrawPoints();
@@ -41,6 +41,6 @@ void smPlaneRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_plane_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smPlaneRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,PlaneRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

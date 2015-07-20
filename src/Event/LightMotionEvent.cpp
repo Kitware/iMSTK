@@ -23,40 +23,38 @@
 
 #include "LightMotionEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smLightMotionEvent::EventName = EventType::LightMotion;
+core::EventType LightMotionEvent::EventName = core::EventType::LightMotion;
 
-smLightMotionEvent::smLightMotionEvent(const int& lightIndex): index(lightIndex)
+LightMotionEvent::LightMotionEvent(const int& lightIndex): index(lightIndex)
 {
     position = core::Vec3d::Zero();
     direction = core::Vec3d::Zero();
 }
-void smLightMotionEvent::setPosition(const core::Vec3d& lightPosition)
+void LightMotionEvent::setPosition(const core::Vec3d& lightPosition)
 {
     this->position = lightPosition;
 }
-const core::Vec3d& smLightMotionEvent::getPosition()
+const core::Vec3d& LightMotionEvent::getPosition()
 {
     return this->position;
 }
-void smLightMotionEvent::setDirection(const core::Vec3d& lightDirection)
+void LightMotionEvent::setDirection(const core::Vec3d& lightDirection)
 {
     this->direction = lightDirection;
 }
-const core::Vec3d& smLightMotionEvent::getDirection()
+const core::Vec3d& LightMotionEvent::getDirection()
 {
     return this->direction;
 }
-void smLightMotionEvent::setLightIndex(const int& lightIndex)
+void LightMotionEvent::setLightIndex(const int& lightIndex)
 {
     this->index = lightIndex;
 }
-const int& smLightMotionEvent::getLightIndex()
+const int& LightMotionEvent::getLightIndex()
 {
     return this->index;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

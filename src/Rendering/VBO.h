@@ -38,7 +38,7 @@
 #include "Core/Vector.h"
 
 /// \brief VBO for rendering
-class smVBO: public CoreClass
+class VBO: public CoreClass
 {
 private:
     /// \brief offsets for each mesh
@@ -47,7 +47,7 @@ private:
     size_t sizeOfDataBuffer;
     size_t sizeOfIndexBuffer;
     /// \brief  VBO type
-    smVBOType vboType;
+    VBOType vboType;
     /// \brief  vertices, normals, tangets data buffer
     GLuint vboDataId;
     /// \brief index data
@@ -67,39 +67,39 @@ private:
 
 public:
     /// \brief  constructor. gets error log or NULL
-    smVBO(ErrorLog *p_log);
+    VBO(ErrorLog *p_log);
 
     /// \brief  init with given VBO type
-    void init(smVBOType p_vboType);
+    void init(VBOType p_vboType);
 
     /// \brief  add vertices to the data buffer
-    smVBOResult addVerticestoBuffer(const size_t p_nbrVertices,
+    VBOResult addVerticestoBuffer(const size_t p_nbrVertices,
                                     const size_t p_nbrTriangles,
                                     const size_t p_objectId);
 
     /// \brief update vertex data buffer
-    smVBOResult updateVertices(const core::Vectorf &p_vectors,
+    VBOResult updateVertices(const core::Vectorf &p_vectors,
                                   const core::Vectorf &p_normals,
                                   const core::Vectorf &p_textureCoords,
                                   size_t p_objectId);
 
     /// \brief update  triangle index
-    smVBOResult updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
+    VBOResult updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
 
     /// \brief draw elements in VBO
-    smVBOResult drawElements(size_t p_objectId);
+    VBOResult drawElements(size_t p_objectId);
 
     /// \brief update the static vertices initially
-    smVBOResult initStaticVertices(const core::Vectorf &p_vectors,
+    VBOResult initStaticVertices(const core::Vectorf &p_vectors,
                                   const core::Vectorf &p_normals,
                                   const core::Vectorf &p_textureCoords,
                                   size_t p_objectId);
 
     /// \brief update the static triangle indices initially
-    smVBOResult initTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
+    VBOResult initTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
 
     /// \brief deletion of the VBO buffers
-    ~smVBO();
+    ~VBO();
 
 };
 

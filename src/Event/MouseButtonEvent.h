@@ -28,10 +28,9 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-enum class smMouseButton
+enum class MouseButton
 {
     Unknown = -1,
     Left = 0,
@@ -42,15 +41,15 @@ enum class smMouseButton
     Reset
 };
 
-class smMouseButtonEvent : public Event
+class MouseButtonEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smMouseButtonEvent(const smMouseButton &button);
+    MouseButtonEvent(const MouseButton &button);
 
-    const smMouseButton &getMouseButton();
+    const MouseButton &getMouseButton();
 
     void setPresed(const bool &press);
 
@@ -64,11 +63,10 @@ public:
 
 private:
     bool pressed; // If the button was pressed or released in this event
-    smMouseButton mouseButton; // Which mouse button was pressed
+    MouseButton mouseButton; // Which mouse button was pressed
     core::Vec2d coord; // X,Y coorindate relative to left edge
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMMOUSEBUTTONEVENT_H

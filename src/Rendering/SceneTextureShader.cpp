@@ -25,8 +25,8 @@
 #include "SceneTextureShader.h"
 #include "Core/SDK.h"
 
-smSceneTextureShader::smSceneTextureShader(const std::string &p_verteShaderFileName, const std::string &p_fragmentFileName)
-: smShader(SDK::getInstance()->getErrorLog())
+SceneTextureShader::SceneTextureShader(const std::string &p_verteShaderFileName, const std::string &p_fragmentFileName)
+: Shader(SDK::getInstance()->getErrorLog())
 {
     this->log = SDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
@@ -40,25 +40,25 @@ smSceneTextureShader::smSceneTextureShader(const std::string &p_verteShaderFileN
     this->registerShader();
 }
 
-void smSceneTextureShader::predraw(std::shared_ptr<smMesh>/*p_mesh*/)
+void SceneTextureShader::predraw(std::shared_ptr<Mesh>/*p_mesh*/)
 {
 
 }
 
-void smSceneTextureShader::handleEvent(std::shared_ptr<mstk::Event::Event> /*p_event*/)
+void SceneTextureShader::handleEvent(std::shared_ptr<core::Event> /*p_event*/)
 {
 
 }
 
-void smSceneTextureShader::initDraw()
+void SceneTextureShader::initDraw()
 {
-    smShader::initDraw();
+    Shader::initDraw();
     this->depthTex = getFragmentShaderParam("depthTex");
     this->sceneTex = getFragmentShaderParam("sceneTex");
     this->prevTex = getFragmentShaderParam("prevTex");
 }
 
-void smSceneTextureShader::draw() const
+void SceneTextureShader::draw() const
 {
     glPushAttrib(GL_LIGHTING_BIT | GL_ENABLE_BIT | GL_VIEWPORT_BIT);
     glDisable(GL_LIGHTING);

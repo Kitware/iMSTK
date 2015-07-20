@@ -43,7 +43,7 @@ public:
     StaticSceneObject  *object1;
     SDK* simmedtkSDK;
     Scene *scene1;
-    smViewer *viewer;
+    Viewer *viewer;
 
     PhantomInterface* hapticInterface;
     smHapticCameraTrans *motionTrans;

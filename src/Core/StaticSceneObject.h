@@ -32,10 +32,8 @@
 #include "CoreClass.h"
 #include "ModelRepresentation.h"
 
-namespace mstk{
-namespace Event{
+namespace core {
     class Event;
-}
 }
 
 /// \brief static scene object
@@ -69,7 +67,7 @@ public:
 
     void printInfo() const override;
 
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event>) override {}
+    virtual void handleEvent(std::shared_ptr<core::Event>) override {}
 
     void setModel(std::shared_ptr<ModelRepresentation> model);
 

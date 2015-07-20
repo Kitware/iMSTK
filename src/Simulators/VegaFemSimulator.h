@@ -54,7 +54,7 @@ public:
     void syncBuffers() override;
 
     /// \brief handle the keyboard and haptic button press events
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
 private:
     core::Vec3d hapticPosition; ///< position of the haptic device end effector

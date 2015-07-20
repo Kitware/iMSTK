@@ -62,7 +62,7 @@ struct MeshHolder
         mesh = NULL;
     }
 
-    std::shared_ptr<smBaseMesh> mesh;
+    std::shared_ptr<BaseMesh> mesh;
 
     inline bool operator ==(MeshHolder &p_param)
     {
@@ -232,7 +232,7 @@ public:
     void removeRef(std::shared_ptr<CoreClass> p_coreClass);
 
     /// \brief register functions
-    int registerMesh(std::shared_ptr<smBaseMesh> p_mesh);
+    int registerMesh(std::shared_ptr<BaseMesh> p_mesh);
 
     int registerModule(std::shared_ptr<Module> p_mod);
 

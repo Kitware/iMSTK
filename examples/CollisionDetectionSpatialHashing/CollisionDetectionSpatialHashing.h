@@ -56,7 +56,7 @@ public:
     std::shared_ptr<StaticSceneObject>    modelA;
     std::shared_ptr<StaticSceneObject>    modelB;
     std::shared_ptr<Scene>                scene;
-    std::shared_ptr<smViewer>               viewer;
+    std::shared_ptr<Viewer>               viewer;
     std::shared_ptr<smDummySimulator>       defaultSimulator;
     std::shared_ptr<Simulator>            simulator;
     std::shared_ptr<SpatialHashCollision> spatialHashing;

@@ -23,37 +23,35 @@
 
 #include "MouseButtonEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smMouseButtonEvent::EventName = EventType::MouseButton;
+core::EventType MouseButtonEvent::EventName = core::EventType::MouseButton;
 
-smMouseButtonEvent::smMouseButtonEvent(const smMouseButton& button): pressed(false), mouseButton(button)
+MouseButtonEvent::MouseButtonEvent(const MouseButton& button): pressed(false), mouseButton(button)
 {}
-const smMouseButton& smMouseButtonEvent::getMouseButton()
+const MouseButton& MouseButtonEvent::getMouseButton()
 {
     return mouseButton;
 }
-void smMouseButtonEvent::setPresed(const bool& press)
+void MouseButtonEvent::setPresed(const bool& press)
 {
     this->pressed = press;
 }
-const bool& smMouseButtonEvent::getPressed()
+const bool& MouseButtonEvent::getPressed()
 {
     return this->pressed;
 }
-const bool& smMouseButtonEvent::togglePressed()
+const bool& MouseButtonEvent::togglePressed()
 {
     return this->pressed = !this->pressed;
 }
-void smMouseButtonEvent::setWindowCoord(const core::Vec2d& coordinates)
+void MouseButtonEvent::setWindowCoord(const core::Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec2d& smMouseButtonEvent::getWindowCoord()
+const core::Vec2d& MouseButtonEvent::getWindowCoord()
 {
     return this->coord;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

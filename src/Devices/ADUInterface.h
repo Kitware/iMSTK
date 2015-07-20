@@ -104,7 +104,7 @@ public:
     void run() override;
 
     /// \brief
-    void handleEvent(std::shared_ptr<mstk::Event::Event> event)  override{};
+    void handleEvent(std::shared_ptr<core::Event> event)  override{};
 
 public:
 //     smPipe *ADUpipe; ///< !!

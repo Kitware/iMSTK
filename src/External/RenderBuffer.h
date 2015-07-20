@@ -42,7 +42,7 @@
 #define UCDAVIS_RENDER_BUFFER_H
 
 #include "Core/Config.h"
-#include "framebufferObject.h"
+#include "FrameBufferObject.h"
 
 /*!
 Renderbuffer Class. This class encapsulates the Renderbuffer OpenGL

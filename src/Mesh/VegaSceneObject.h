@@ -18,12 +18,12 @@
 #include "vec3d.h"
 #include "objMesh.h"
 
-class smVegaSceneObject
+class VegaSceneObject
 {
 public:
   // create a static scene object, by loading it from an Alias Wavefront OBJ file
-  smVegaSceneObject(char * filename);
-  virtual ~smVegaSceneObject();
+  VegaSceneObject(char * filename);
+  virtual ~VegaSceneObject();
 
   // ==== mesh info and geometric queries ====
 

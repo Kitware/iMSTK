@@ -174,7 +174,7 @@ smWindowConsole::smWindowConsole(int p_totalTexts)
 {
     init(p_totalTexts);
     backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-    this->eventHanlder->attachEvent(mstk::Event::EventType::Keyboard,shared_from_this());
+    this->eventHanlder->attachEvent(core::EventType::Keyboard,shared_from_this());
     left = 0.0;
     bottom = 0.0;
     right = 1.0;

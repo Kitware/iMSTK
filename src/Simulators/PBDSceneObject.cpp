@@ -61,7 +61,7 @@ void smPBDSceneObject::unSerialize( void */*p_memoryBlock*/ )
 smPBDSurfaceSceneObject::smPBDSurfaceSceneObject( std::shared_ptr<ErrorLog> p_log )
 {
     type = core::ClassType::PbdSurfaceSceneObject;
-    mesh = new smSurfaceMesh( SMMESH_DEFORMABLE, p_log );
+    mesh = new SurfaceMesh( BaseMesh::MeshType::Deformable, p_log );
 }
 std::shared_ptr<SceneObject> smPBDSurfaceSceneObject::clone()
 {

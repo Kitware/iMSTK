@@ -37,7 +37,7 @@ int main()
     std::shared_ptr<smOculusViewer> viewer;
     std::shared_ptr<Scene> scene1, scene2;
     std::shared_ptr<Light> light1, light2;
-    std::shared_ptr<smCamera> sceneCamera1, sceneCamera2;
+    std::shared_ptr<Camera> sceneCamera1, sceneCamera2;
     std::shared_ptr<StaticSceneObject> cube, square;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
@@ -57,7 +57,7 @@ int main()
     camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
-    auto cubeModel = std::make_shared<smMeshModel>();
+    auto cubeModel = std::make_shared<MeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
@@ -71,11 +71,11 @@ int main()
 
     //setup scene2
     //Create a color and depth texture for the FBO
-    smTextureManager::createColorTexture("colorTex1", 64, 64);
-    smTextureManager::createDepthTexture("depthTex1", 64, 64);
+    TextureManager::createColorTexture("colorTex1", 64, 64);
+    TextureManager::createDepthTexture("depthTex1", 64, 64);
 
-    std::shared_ptr<smMeshModel> squareModel = std::make_shared<smMeshModel>();
-    squareModel->load("models/square.obj", SM_FILETYPE_OBJ);
+    std::shared_ptr<MeshModel> squareModel = std::make_shared<MeshModel>();
+    squareModel->load("models/square.obj", BaseMesh::MeshFileType::Obj);
     squareModel->getMesh()->assignTexture("colorTex1");
     renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     squareModel->setRenderDetail(renderDetail);
@@ -86,8 +86,8 @@ int main()
     //Setup an FBO for rendering in the viewer.
     //Add the FBO and textures to the viewer
     viewer->addFBO("fbo1",
-                  smTextureManager::getTexture("colorTex1"),
-                  smTextureManager::getTexture("depthTex1"),
+                  TextureManager::getTexture("colorTex1"),
+                  TextureManager::getTexture("depthTex1"),
                   64, 64);
 
     //Add the square to the scene
@@ -117,22 +117,22 @@ int main()
     scene2->addLight(light2);
 
     // Camera setup
-    sceneCamera1 = smCamera::getDefaultCamera();
+    sceneCamera1 = Camera::getDefaultCamera();
     assert(sceneCamera1);
     sceneCamera1->setPos(3, 3, 5);
     sceneCamera1->setFocus(0, 0, -1);
     scene1->addCamera(sceneCamera1);
     camCtl->setCamera(sceneCamera1);
 
-    sceneCamera2 = smCamera::getDefaultCamera();
+    sceneCamera2 = Camera::getDefaultCamera();
     assert(sceneCamera2);
     sceneCamera2->setPos(0, 0, 5);
     sceneCamera2->setFocus(0, 0, -1);
     scene2->addCamera(sceneCamera2);
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
 
     //run the framework
     sdk->run();

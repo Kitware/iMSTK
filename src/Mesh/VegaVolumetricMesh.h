@@ -42,18 +42,18 @@
 //
 // Interface to VegaFEM's volumetric mesh class
 //
-class smVegaVolumetricMesh
+class VegaVolumetricMesh
 {
 public:
     ///
     /// @brief Constructor
     ///
-    smVegaVolumetricMesh(bool generateMeshGraph = true);
+    VegaVolumetricMesh(bool generateMeshGraph = true);
 
     ///
     /// @brief Destructor
     ///
-    ~smVegaVolumetricMesh();
+    ~VegaVolumetricMesh();
 
     ///
     /// @brief Loads vega volume mesh and stores it locally
@@ -79,7 +79,7 @@ public:
     ///
     /// @brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
-    void attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surfaceMesh, const double &radius = -1.0);
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
 
     ///
     /// @brief Returns weigths associated with attached ith surface mesh
@@ -107,13 +107,13 @@ private:
     bool generateGraph;
 
     // Store pointer to the surface meshes
-    std::vector<std::shared_ptr<smSurfaceMesh>> attachedMeshes;
+    std::vector<std::shared_ptr<SurfaceMesh>> attachedMeshes;
 
     // Store map of vertices
-    std::map<std::shared_ptr<smSurfaceMesh>,std::vector<int>> attachedVertices;
+    std::map<std::shared_ptr<SurfaceMesh>,std::vector<int>> attachedVertices;
 
     // Store map of  weigths
-    std::map<std::shared_ptr<smSurfaceMesh>,std::vector<double>> attachedWeights;
+    std::map<std::shared_ptr<SurfaceMesh>,std::vector<double>> attachedWeights;
 
 };
 

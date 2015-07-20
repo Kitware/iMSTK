@@ -42,7 +42,7 @@ protected:
   typedef Matrix44d MatrixType;
 
 protected:
-    std::shared_ptr<smSurfaceMesh> mesh; 							///< surface mesh
+    std::shared_ptr<SurfaceMesh> mesh; 							///< surface mesh
     int minTreeRenderLevel; 						///< !!
     bool renderSurface; 							///< !!
     bool enableShiftPos; 							///< !!
@@ -54,7 +54,7 @@ protected:
 
 public:
     /// \brief constructor
-    SurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels = 6);
+    SurfaceTree(std::shared_ptr<SurfaceMesh> surfaceMesh, int maxLevels = 6);
 
     /// \brief destructor
     ~SurfaceTree();
@@ -90,7 +90,7 @@ public:
     }
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief !! SurfaceTree structure
     void updateStructure();

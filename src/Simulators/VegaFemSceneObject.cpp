@@ -46,7 +46,7 @@ smVegaFemSceneObject::smVegaFemSceneObject() :
         "SceneObjectDeformableRenderDelegate"));
 }
 
-smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<ErrorLog> p_log,
+smVegaFemSceneObject::smVegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/,
                                            const std::string ConfigFile):
                                            staticSolver(0),
                                            graphicFrame(0),
@@ -137,11 +137,11 @@ void smVegaFemSceneObject::initialize()
 
     if (importAndUpdateVolumeMeshToSmtk)
     {
-        this->volumeMesh = std::make_shared<smVolumeMesh>();
+        this->volumeMesh = std::make_shared<VolumeMesh>();
         this->volumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
     }
 
-    this->primarySurfaceMesh = std::make_shared<smSurfaceMesh>();
+    this->primarySurfaceMesh = std::make_shared<SurfaceMesh>();
 
     this->primarySurfaceMesh->importSurfaceMeshFromVegaFormat(
         this->vegaPrimarySurfaceMesh->GetMesh(), true);
@@ -150,7 +150,7 @@ void smVegaFemSceneObject::initialize()
       femConfig->secondaryRenderingMeshFilename[0] &&
       (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0))
     {
-        this->secondarySurfaceMesh = std::make_shared<smSurfaceMesh>();
+        this->secondarySurfaceMesh = std::make_shared<SurfaceMesh>();
 
         this->secondarySurfaceMesh->importSurfaceMeshFromVegaFormat(
             this->vegaSecondarySurfaceMesh->GetMesh(), true);
@@ -376,7 +376,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
         }
     }
 
-    vegaPrimarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
+    vegaPrimarySurfaceMesh = std::make_shared<VegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
     if (!vegaPrimarySurfaceMesh->GetMesh())
       return; // Go no further if given an invalid filename
 
@@ -390,7 +390,7 @@ void smVegaFemSceneObject::loadSurfaceMesh()
 
     if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
     {
-        vegaSecondarySurfaceMesh = std::make_shared<smVegaSceneObjectDeformable>(
+        vegaSecondarySurfaceMesh = std::make_shared<VegaSceneObjectDeformable>(
                                                     femConfig->secondaryRenderingMeshFilename);
 
         if (vegaSecondarySurfaceMesh == nullptr)

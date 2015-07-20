@@ -23,40 +23,38 @@
 
 #include "AudioEvent.h"
 
-namespace mstk
-{
-namespace Event
+
+namespace event
 {
 
-EventType smAudioEvent::EventName = EventType::Audio;
+core::EventType AudioEvent::EventName = core::EventType::Audio;
 
-smAudioEvent::smAudioEvent(): state(AudioState::Stop), sound(""), volume(-1.0)
+AudioEvent::AudioEvent(): state(AudioState::Stop), sound(""), volume(-1.0)
 {
 }
-void smAudioEvent::setState(const mstk::Event::AudioState& audioState)
+void AudioEvent::setState(const AudioState& audioState)
 {
     this->state = audioState;
 }
-const mstk::Event::AudioState& smAudioEvent::getState()
+const AudioEvent::AudioState& AudioEvent::getState()
 {
     return this->state;
 }
-void smAudioEvent::setSound(const std::string& soundStream)
+void AudioEvent::setSound(const std::string& soundStream)
 {
     this->sound = soundStream;
 }
-const std::string& smAudioEvent::getSound()
+const std::string& AudioEvent::getSound()
 {
     return this->sound;
 }
-void smAudioEvent::setVolume(const float& volumeScale)
+void AudioEvent::setVolume(const float& volumeScale)
 {
     this->volume = volumeScale;
 }
-const float& smAudioEvent::getVolume()
+const float& AudioEvent::getVolume()
 {
     return this->volume;
-}
 }
 }
 

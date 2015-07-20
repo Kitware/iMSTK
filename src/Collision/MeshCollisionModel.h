@@ -44,7 +44,7 @@
 ///
 /// @see MeshToMeshCollision
 ///
-class MeshCollisionModel : public smMeshModel
+class MeshCollisionModel : public MeshModel
 {
 public:
     using AABBNodeType = OctreeCell;
@@ -58,7 +58,7 @@ public:
     ///
     /// @brief Set internal mesh data structure
     ///
-    void setMesh(std::shared_ptr<smMesh> modelMesh);
+    void setMesh(std::shared_ptr<Mesh> modelMesh);
 
     ///
     /// @brief Returns pointer to axis aligned bounding box hierarchy
@@ -68,7 +68,7 @@ public:
     ///
     /// @brief Loads a triangular mesh and stores it.
     ///
-    void loadTriangleMesh(const std::string &meshName, const smMeshFileType &type);
+    void loadTriangleMesh(const std::string &meshName, const BaseMesh::MeshFileType &type);
 
     ///
     /// @brief Set internal AABB tree

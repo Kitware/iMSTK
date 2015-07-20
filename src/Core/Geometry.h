@@ -240,7 +240,7 @@ public:
         center += t;
     }
 
-    void rotate(const Matrix33d &rot)
+    void rotate(const Matrix33d &/*rot*/)
     {
         //Its a sphere! nothing to be done.
     }

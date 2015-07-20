@@ -35,15 +35,15 @@ pzrMouseCameraController::pzrMouseCameraController()
 {
 }
 
-pzrMouseCameraController::pzrMouseCameraController(std::shared_ptr<smCamera> cam)
+pzrMouseCameraController::pzrMouseCameraController(std::shared_ptr<Camera> cam)
     : moveDistance{1},
-      camera(cam),
       lmbPressed{false},
-      rmbPressed{false}
+      rmbPressed{false},
+      camera(cam)
 {
 }
 
-void pzrMouseCameraController::setCamera(std::shared_ptr<smCamera> cam)
+void pzrMouseCameraController::setCamera(std::shared_ptr<Camera> cam)
 {
     camera = cam;
 }
@@ -53,21 +53,21 @@ void pzrMouseCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void pzrMouseCameraController::handleEvent(std::shared_ptr<core::Event> event)
 {
     assert(nullptr != event);
     assert(nullptr != camera);
 
-    auto mouseButtonEvent = std::dynamic_pointer_cast<Event::smMouseButtonEvent>(event);
+    auto mouseButtonEvent = std::dynamic_pointer_cast<event::MouseButtonEvent>(event);
     if(mouseButtonEvent != nullptr)
     {
-        if(Event::smMouseButton::Left ==
+        if(event::MouseButton::Left ==
            mouseButtonEvent->getMouseButton())
         {
             lmbPressed = mouseButtonEvent->getPressed();
             coords = mouseButtonEvent->getWindowCoord().cast<float>();
         }
-        else if(Event::smMouseButton::Right ==
+        else if(event::MouseButton::Right ==
                 mouseButtonEvent->getMouseButton())
         {
             rmbPressed = mouseButtonEvent->getPressed();
@@ -79,7 +79,7 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> e
         }
     }
 
-    auto mouseMoveEvent = std::dynamic_pointer_cast<Event::smMouseMoveEvent>(event);
+    auto mouseMoveEvent = std::dynamic_pointer_cast<event::MouseMoveEvent>(event);
     if(mouseMoveEvent != nullptr)
     {
         core::Vec2f diff;

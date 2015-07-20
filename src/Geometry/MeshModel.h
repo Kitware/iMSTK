@@ -39,23 +39,23 @@
 ///
 /// @see smMeshCollisionModel
 ///
-class smMeshModel : public ModelRepresentation
+class MeshModel : public ModelRepresentation
 {
 public:
     ///
     /// @brief Constructor
     ///
-    smMeshModel();
+    MeshModel();
 
     ///
     /// @brief Destructor
     ///
-    virtual ~smMeshModel();
+    virtual ~MeshModel();
 
     ///
     /// @brief Loads the mesh and stores it.
     ///
-    void load(const std::string& meshName, const smMeshFileType &type);
+    void load(const std::string& meshName, const BaseMesh::MeshFileType &type);
 
     ///
     /// @brief Loads the mesh with texture and stores it. Only surface meshes allowed.
@@ -90,15 +90,15 @@ public:
     ///
     /// @brief Set internal mesh data structure
     ///
-    void setModelMesh(std::shared_ptr<smMesh> modelMesh);
+    void setModelMesh(std::shared_ptr<Mesh> modelMesh);
 
     ///
     /// @brief Returns pointer to undelying mesh object.
     ///
-    std::shared_ptr<smMesh> getMesh() override;
+    std::shared_ptr<Mesh> getMesh() override;
 
 protected:
-    std::shared_ptr<smMesh> mesh; // Underlying mesh
+    std::shared_ptr<Mesh> mesh; // Underlying mesh
 };
 
 #endif // SMMESHMODEL_H

@@ -36,12 +36,9 @@
 #include "Core/SceneObject.h"
 #include "External/tree.hh"
 
-namespace mstk {
-    namespace Event {
-        class Event;
-        class smEventHandler;
-        class smCameraEvent;
-    }
+namespace core {
+    class Event;
+    class EventHandler;
 }
 
 template<typename SurfaceTreeCell> class SurfaceTree;
@@ -58,7 +55,7 @@ public:
     smMeshContainer(std::string p_name = "");
 
     /// \brief constructor
-    smMeshContainer(std::string p_name, smMesh *p_mesh, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ);
+    smMeshContainer(std::string p_name, Mesh *p_mesh, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ);
 
     void computeCurrentMatrix();
 
@@ -77,7 +74,7 @@ public:
     Matrix44d currentDeviceMatrix; // !!
     Matrix44d tempCurrentMatrix; // !!
     Matrix44d tempCurrentDeviceMatrix; // !!
-    smMesh * mesh; // mesh
+    Mesh * mesh; // mesh
     std::shared_ptr<SurfaceTreeType> colModel; // octree of surface
 };
 
@@ -105,7 +102,7 @@ public:
     virtual void unSerialize(void *p_memoryBlock) override;
 
     /// \brief handle the events such as button presses related to stylus
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
 public:
     core::Vec3d pos; // position of stylus
@@ -116,7 +113,7 @@ public:
     bool toolEnabled; // !!
 
 protected:
-    std::shared_ptr<mstk::Event::smEventHandler> eventHandler;
+    std::shared_ptr<core::EventHandler> eventHandler;
 };
 
 /// \brief !!
@@ -156,7 +153,7 @@ public:
     /// \brief !!
     smMeshContainer *getMeshContainer(std::string p_string) const;
 
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    virtual void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief !!
     std::shared_ptr<SceneObject> clone() override;
@@ -166,7 +163,7 @@ public:
 
     void loadInitialStates() override{};
 
-    bool configure(const std::string ConfigFile)
+    bool configure(const std::string /*ConfigFile*/)
     {
         return false;
     }
@@ -198,7 +195,7 @@ public:
 
     void loadInitialStates() {};
 
-    bool configure(std::string ConfigFile)
+    bool configure(std::string /*ConfigFile*/)
     {
         return false;
     }
@@ -208,14 +205,14 @@ public:
         std::shared_ptr<smStylusDeformableSceneObject> newSO =
             std::make_shared<smStylusDeformableSceneObject>();
 
-        return (std::shared_ptr<void>)newSO;
+        return std::static_pointer_cast<void>(newSO);
     }
     std::shared_ptr<void> duplicateAtInitialization()
     {
         std::shared_ptr<smStylusDeformableSceneObject> newSO =
             std::make_shared<smStylusDeformableSceneObject>();
 
-        return (std::shared_ptr<void>)newSO;
+        return std::static_pointer_cast<void>(newSO);
     }
     std::shared_ptr<SceneObject> clone() override
     {

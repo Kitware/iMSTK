@@ -43,15 +43,15 @@ public:
     /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
+    void handleEvent(std::shared_ptr<core::Event> event) override;
 
     /// \brief Set the keyboard key to listen for
     ///
     /// \param key The keyboard key to listen for
-    void setKey(mstk::Event::smKey key);
+    void setKey(event::Key key);
 
 private:
-    mstk::Event::smKey key; ///< When this key is pressed, shutdown the framework
+    event::Key key; ///< When this key is pressed, shutdown the framework
 };
 
 }//Common

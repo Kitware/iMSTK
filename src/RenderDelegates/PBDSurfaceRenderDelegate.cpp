@@ -2,20 +2,20 @@
 #include "Core/RenderDelegate.h"
 #include "Simulators/PBDSceneObject.h"
 
-class smPBDSurfaceRenderDelegate : public RenderDelegate
+class PBDSurfaceRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
 };
 
-void smPBDSurfaceRenderDelegate::draw() const
+void PBDSurfaceRenderDelegate::draw() const
 {
-  smSurfaceMesh* mesh = this->getSourceGeometryAs<smPBDSurfaceSceneObject>()->mesh;
+  SurfaceMesh* mesh = this->getSourceGeometryAs<smPBDSurfaceSceneObject>()->mesh;
   mesh->draw();
 }
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_pbd_surface_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smPBDSurfaceRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,PBDSurfaceRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

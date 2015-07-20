@@ -23,41 +23,39 @@
 
 #include "CameraEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smCameraEvent::EventName = EventType::CameraUpdate;
+core::EventType CameraEvent::EventName = core::EventType::CameraUpdate;
 
-smCameraEvent::smCameraEvent()
+CameraEvent::CameraEvent()
 {
     position = core::Vec3d::Zero();
     direction = core::Vec3d::Zero();
     upDirection = core::Vec3d::Zero();
 }
-void smCameraEvent::setPosition(const core::Vec3d& cameraPosition)
+void CameraEvent::setPosition(const core::Vec3d& cameraPosition)
 {
     this->position = cameraPosition;
 }
-const core::Vec3d& smCameraEvent::getPosition()
+const core::Vec3d& CameraEvent::getPosition()
 {
     return this->position;
 }
-void smCameraEvent::setDirection(const core::Vec3d& cameraDirection)
+void CameraEvent::setDirection(const core::Vec3d& cameraDirection)
 {
     this->direction = cameraDirection;
 }
-const core::Vec3d& smCameraEvent::getDirection()
+const core::Vec3d& CameraEvent::getDirection()
 {
     return this->direction;
 }
-void smCameraEvent::setUpDirection(const core::Vec3d& cameraUpDirection)
+void CameraEvent::setUpDirection(const core::Vec3d& cameraUpDirection)
 {
     this->upDirection = cameraUpDirection;
 }
-const core::Vec3d& smCameraEvent::getUpDirection()
+const core::Vec3d& CameraEvent::getUpDirection()
 {
     return this->upDirection;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

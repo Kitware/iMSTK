@@ -97,21 +97,21 @@ using Matrixf = Matrix<float>;
 /// A dynamic size matrix of doubles
 using Matrixd = Matrix<double>;
 
-// template<typename T, int StorageType>
-// void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)
-// {
-//     A.setFromTriplets(triplets.begin(),triplets.end());
-// }
-//
-// template<typename T, int StorageType, int opt>
-// void solveSparseSystemCholesky(const Eigen::SparseMatrix<T,StorageType> &A,
-//                                const Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &b,
-//                                Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &x)
-// {
-//     // Solving:
-//     Eigen::SimplicialCholesky<Eigen::SparseMatrix<T,StorageType>> solver(A);  // performs a Cholesky factorization of A
-//     x = solver.solve(b);         // use the factorization to solve for the given right hand side
-// }
+template<typename T, int StorageType>
+void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)
+{
+    A.setFromTriplets(triplets.begin(),triplets.end());
+}
+
+template<typename T, int StorageType, int opt>
+void solveSparseSystemCholesky(const Eigen::SparseMatrix<T,StorageType> &A,
+                               const Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &b,
+                               Eigen::Matrix<T, Eigen::Dynamic, 1, opt> &x)
+{
+    // Solving:
+    Eigen::SimplicialCholesky<Eigen::SparseMatrix<T,StorageType>> solver(A);  // performs a Cholesky factorization of A
+    x = solver.solve(b);         // use the factorization to solve for the given right hand side
+}
 
 // WARNING: The input matrix A should be in a compressed and column-major form. Otherwise an expensive copy will be made.
 // template<typename T, int StorageType, int opt>

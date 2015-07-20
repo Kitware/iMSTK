@@ -36,10 +36,10 @@ int main()
 {
     SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<Viewer> viewer;
     std::shared_ptr<Scene> scene1;
     std::shared_ptr<Light> light;
-    std::shared_ptr<smCamera> sceneCamera;
+    std::shared_ptr<Camera> sceneCamera;
     std::shared_ptr<StaticSceneObject> cube;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
@@ -51,7 +51,7 @@ int main()
     scene1 = sdk->createScene();
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<smViewer>();
+    viewer = std::make_shared<Viewer>();
     sdk->addViewer(viewer);
 
     //Create the camera controller
@@ -59,7 +59,7 @@ int main()
     keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
     pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
 
-    auto cubeModel = std::make_shared<smMeshModel>();
+    auto cubeModel = std::make_shared<MeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
@@ -89,7 +89,7 @@ int main()
     scene1->addLight(light);
 
     // Camera setup
-    sceneCamera = smCamera::getDefaultCamera();
+    sceneCamera = Camera::getDefaultCamera();
     assert(sceneCamera);
     sceneCamera->setPos(3, 3, 5);
     sceneCamera->setFocus(0, 0, -1);
@@ -100,10 +100,10 @@ int main()
     pzrCamCtl->setCamera(sceneCamera);
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(mstk::Event::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(mstk::Event::EventType::MouseButton, pzrCamCtl);
+    viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
     //run the framework
     sdk->run();

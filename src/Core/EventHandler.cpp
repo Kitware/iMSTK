@@ -24,10 +24,9 @@
 #include "EventHandler.h"
 #include "CoreClass.h"
 
-namespace mstk {
-namespace Event {
+namespace core {
 
-void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
+void EventHandler::attachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
     // Bind handleEvent to a void(std::shared_ptr<Event>) function
     std::function<void(std::shared_ptr<Event>)>
@@ -39,20 +38,20 @@ void smEventHandler::attachEvent(const EventType& eventType, std::shared_ptr<Cor
     // Add index to the component observer
     component->setEventIndex(eventType,index);
 }
-void smEventHandler::detachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
+void EventHandler::detachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
     this->unregisterEvent(eventType,index);
     component->removeEventIndex(eventType);
 }
-bool smEventHandler::isAttached(const EventType& eventType, std::shared_ptr<CoreClass> component)
+bool EventHandler::isAttached(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {
     auto index = component->getEventIndex(eventType);
 
     return this->isAttached(eventType,index);
 }
-bool smEventHandler::isAttached(const EventType& eventType,
-                                smEventHandler::FunctionContainerType::iterator index)
+bool EventHandler::isAttached(const EventType& eventType,
+                                EventHandler::FunctionContainerType::iterator index)
 {
     auto i = observers.find(eventType);
 
@@ -72,5 +71,4 @@ bool smEventHandler::isAttached(const EventType& eventType,
     return false;
 }
 
-} // Event namespace
-} // mstk namespace
+} // core namespace

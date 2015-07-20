@@ -27,7 +27,7 @@
 #include "TextureManager.h"
 #include "GLRenderer.h"
 
-bool smFrameBuffer::checkStatus()
+bool FrameBuffer::checkStatus()
 {
 
     GLenum ret = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -99,7 +99,7 @@ void test()
     glPopAttrib();
 }
 
-void smFrameBuffer::draw() const
+void FrameBuffer::draw() const
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);
@@ -124,53 +124,53 @@ void smFrameBuffer::draw() const
     glEnd();
     glPopAttrib();
 }
-GLenum smRenderBuffer::getGLAttachmentId()
+GLenum RenderBuffer::getGLAttachmentId()
 {
-    if ( type == SIMMEDTK_RENDERBUFFER_DEPTH )
+    if ( type == Type::Depth )
     {
         return GL_DEPTH_ATTACHMENT_EXT;
     }
 
-    if ( type == SIMMEDTK_RENDERBUFFER_STENCIL )
+    if ( type == Type::Stencil )
     {
         return GL_STENCIL_ATTACHMENT;
     }
 
-    if ( type == SIMMEDTK_RENDERBUFFER_COLOR_RGBA || type == SIMMEDTK_RENDERBUFFER_COLOR_RGB )
+    if ( type == Type::ColorRGBA || type == Type::ColorRGB )
     {
         return GL_COLOR_ATTACHMENT0_EXT + attachmentOrder;
     }
     return GLenum(0);
 }
-int smRenderBuffer::getHeight()
+int RenderBuffer::getHeight()
 {
     return height;
 }
-int smRenderBuffer::getWidth()
+int RenderBuffer::getWidth()
 {
     return width;
 }
-void smRenderBuffer::setAttachmentOrder( int p_attachmentOrder )
+void RenderBuffer::setAttachmentOrder( int p_attachmentOrder )
 {
     attachmentOrder = p_attachmentOrder;
 }
-int smRenderBuffer::getAttachmentOrder( int /*p_attachmentOrder*/ )
+int RenderBuffer::getAttachmentOrder( int /*p_attachmentOrder*/ )
 {
     return attachmentOrder;
 }
-smRenderBufferType smRenderBuffer::getRenderBufType()
+RenderBuffer::Type RenderBuffer::getRenderBufType()
 {
     return type;
 }
-GLuint smRenderBuffer::getRenderBufId()
+GLuint RenderBuffer::getRenderBufId()
 {
     return _rb.GetId();
 }
-smRenderBuffer::smRenderBuffer()
+RenderBuffer::RenderBuffer()
 {
     isAllocated = false;
 }
-smRenderBuffer::smRenderBuffer( smRenderBufferType p_type, int p_width, int p_height )
+RenderBuffer::RenderBuffer( Type p_type, int p_width, int p_height )
 {
     width = p_width;
     height = p_height;
@@ -178,7 +178,7 @@ smRenderBuffer::smRenderBuffer( smRenderBufferType p_type, int p_width, int p_he
     isAllocated = true;
     type = p_type;
 }
-bool smRenderBuffer::createDepthBuffer( int width, int height )
+bool RenderBuffer::createDepthBuffer( int width, int height )
 {
     if ( !isAllocated )
     {
@@ -188,25 +188,25 @@ bool smRenderBuffer::createDepthBuffer( int width, int height )
 
     return false;
 }
-bool smRenderBuffer::createColorBuffer()
+bool RenderBuffer::createColorBuffer()
 {
     if ( !isAllocated )
     {
-        _rb.Set( SIMMEDTK_RENDERBUFFER_COLOR_RGBA, width, height );
+        _rb.Set( Type::ColorRGBA, width, height );
     }
 
     return false;
 }
-bool smRenderBuffer::createStencilBuffer()
+bool RenderBuffer::createStencilBuffer()
 {
     if ( !isAllocated )
     {
-        _rb.Set( SIMMEDTK_RENDERBUFFER_STENCIL, width, height );
+        _rb.Set( Type::Stencil, width, height );
     }
 
     return false;
 }
-smFrameBuffer::smFrameBuffer()
+FrameBuffer::FrameBuffer()
 {
     width = 0;
     height = 0;
@@ -216,27 +216,27 @@ smFrameBuffer::smFrameBuffer()
     renderColorBuff = false;
     renderBuffer = NULL;
 }
-void smFrameBuffer::setDim( int p_width, int p_height )
+void FrameBuffer::setDim( int p_width, int p_height )
 {
     width = p_width;
     height = p_height;
 }
-int smFrameBuffer::getHeight()
+int FrameBuffer::getHeight()
 {
     return height;
 }
-int smFrameBuffer::getWidth()
+int FrameBuffer::getWidth()
 {
     return width;
 }
-void smFrameBuffer::attachRenderBuffer( smRenderBuffer *p_renderBuf )
+void FrameBuffer::attachRenderBuffer( RenderBuffer *p_renderBuf )
 {
     if ( p_renderBuf->getWidth() != width || p_renderBuf->getHeight() != height )
     {
         _fbo.AttachRenderBuffer( p_renderBuf->getRenderBufId(), p_renderBuf->getGLAttachmentId() );
     }
 }
-void smFrameBuffer::attachDepthTexture( Texture *p_texture )
+void FrameBuffer::attachDepthTexture( Texture *p_texture )
 {
     if ( p_texture == NULL )
     {
@@ -246,17 +246,17 @@ void smFrameBuffer::attachDepthTexture( Texture *p_texture )
     _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT );
     isDepthTexAttached = true;
 }
-void smFrameBuffer::attachColorTexture( Texture *p_texture, int p_attachmentOrder )
+void FrameBuffer::attachColorTexture( Texture *p_texture, int p_attachmentOrder )
 {
     defaultColorAttachment = p_attachmentOrder;
     _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_COLOR_ATTACHMENT0_EXT + p_attachmentOrder );
     isColorBufAttached = true;
 }
-void smFrameBuffer::activeColorBuf( int p_order )
+void FrameBuffer::activeColorBuf( int p_order )
 {
     glDrawBuffer( GL_COLOR_ATTACHMENT0_EXT + p_order );
 }
-void smFrameBuffer::enable()
+void FrameBuffer::enable()
 {
     _fbo.Bind();
 
@@ -266,8 +266,8 @@ void smFrameBuffer::enable()
         glReadBuffer( GL_NONE );
     }
 }
-void smFrameBuffer::disable()
+void FrameBuffer::disable()
 {
     _fbo.Disable();
 }
-smFrameBuffer::~smFrameBuffer() {}
+FrameBuffer::~FrameBuffer() {}

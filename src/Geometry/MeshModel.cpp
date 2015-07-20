@@ -24,29 +24,29 @@
 #include "MeshModel.h"
 #include "Rendering/TextureManager.h"
 
-smMeshModel::smMeshModel() {}
-smMeshModel::~smMeshModel() {}
-void smMeshModel::load(const std::string& meshName, const smMeshFileType& type)
+MeshModel::MeshModel() {}
+MeshModel::~MeshModel() {}
+void MeshModel::load(const std::string& meshName, const BaseMesh::MeshFileType& type)
 {
     this->mesh.reset();
 
     switch(type)
     {
-        case SM_FILETYPE_OBJ:
+        case BaseMesh::MeshFileType::Obj:
         {
-            this->mesh = std::make_shared<smSurfaceMesh>();
+            this->mesh = std::make_shared<SurfaceMesh>();
             break;
         }
 
-        case SM_FILETYPE_3DS: // TODO: Is this a surface or volume mesh?
+        case BaseMesh::MeshFileType::ThreeDS: // TODO: Is this a surface or volume mesh?
         {
-            this->mesh = std::make_shared<smSurfaceMesh>();
+            this->mesh = std::make_shared<SurfaceMesh>();
             break;
         }
 
-        case SM_FILETYPE_VOLUME:
+        case BaseMesh::MeshFileType::Volume:
         {
-            this->mesh = std::make_shared<smVolumeMesh>();
+            this->mesh = std::make_shared<VolumeMesh>();
             break;
         }
 
@@ -58,11 +58,11 @@ void smMeshModel::load(const std::string& meshName, const smMeshFileType& type)
 
     this->mesh->loadMesh(meshName, type);
 }
-const core::Vec3d& smMeshModel::getNormal(size_t i) const
+const core::Vec3d& MeshModel::getNormal(size_t i) const
 {
     return this->mesh->triNormals[i];
 }
-std::array<core::Vec3d,3> smMeshModel::getTrianglePositions(size_t i) const
+std::array<core::Vec3d,3> MeshModel::getTrianglePositions(size_t i) const
 {
     std::array<core::Vec3d, 3> vertices;
     vertices[0] = this->mesh->vertices[this->mesh->triangles[i].vert[0]];
@@ -71,40 +71,40 @@ std::array<core::Vec3d,3> smMeshModel::getTrianglePositions(size_t i) const
 
     return vertices;
 }
-const core::StdVector3d& smMeshModel::getVertices() const
+const core::StdVector3d& MeshModel::getVertices() const
 {
     return mesh->getVertices();
 }
-void smMeshModel::draw()
+void MeshModel::draw()
 {
     RenderDelegate::Ptr delegate = this->mesh->getRenderDelegate();
     if (delegate)
       delegate->draw();
 }
-void smMeshModel::setModelMesh(std::shared_ptr< smMesh > modelMesh)
+void MeshModel::setModelMesh(std::shared_ptr< Mesh > modelMesh)
 {
     this->mesh.reset();
     this->mesh = modelMesh;
 }
-std::shared_ptr< smMesh > smMeshModel::getMesh()
+std::shared_ptr< Mesh > MeshModel::getMesh()
 {
     return this->mesh;
 }
-void smMeshModel::load(const std::string& meshFileName, const std::string& textureFileName, const std::string& textureName)
+void MeshModel::load(const std::string& meshFileName, const std::string& textureFileName, const std::string& textureName)
 {
-    this->load(meshFileName, SM_FILETYPE_OBJ);
+    this->load(meshFileName, BaseMesh::MeshFileType::Obj);
 
     if(nullptr != this->mesh)
     {
         //Initialize the texture manager
-        smTextureManager::init();
+        TextureManager::init();
 
         //Load in the texture for the model
-        smTextureManager::loadTexture(textureFileName, textureName);
+        TextureManager::loadTexture(textureFileName, textureName);
         this->mesh->assignTexture(textureName);
     }
 }
-void smMeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)
+void MeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)
 {
     this->mesh->setRenderDetail(renderDetail);
 }

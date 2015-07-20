@@ -23,46 +23,46 @@
 
 #include "PlaneModel.h"
 
-smPlaneModel::smPlaneModel(const core::Vec3d& p, const core::Vec3d& n)
+PlaneModel::PlaneModel(const core::Vec3d& p, const core::Vec3d& n)
 {
     this->plane = std::make_shared<Plane>(p, n);
     this->transform = RigidTransformType::Identity();
 }
-smPlaneModel::~smPlaneModel() {}
-void smPlaneModel::draw()
+PlaneModel::~PlaneModel() {}
+void PlaneModel::draw()
 {
     this->plane->draw();
 }
-const core::Vec3d& smPlaneModel::getNormal() const
+const core::Vec3d& PlaneModel::getNormal() const
 {
     return this->transform.linear() * this->plane->getUnitNormal();
 }
-void smPlaneModel::setNormal(const core::Vec3d& normal)
+void PlaneModel::setNormal(const core::Vec3d& normal)
 {
     this->plane->setUnitNormal(normal);
 }
-const core::Vec3d& smPlaneModel::getPosition() const
+const core::Vec3d& PlaneModel::getPosition() const
 {
   // NB: This static variable makes the function thread-unsafe.
   static core::Vec3d result;
   result = this->transform * this->plane->getPoint();
   return result;
 }
-const smPlaneModel::RigidTransformType& smPlaneModel::getTransform() const
+const PlaneModel::RigidTransformType& PlaneModel::getTransform() const
 {
     return this->transform;
 }
-void smPlaneModel::setTransform(const smPlaneModel::RigidTransformType& t)
+void PlaneModel::setTransform(const PlaneModel::RigidTransformType& t)
 {
     this->transform = t;
 }
 
-void smPlaneModel::setPlaneModel(const std::shared_ptr<Plane> &p)
+void PlaneModel::setPlaneModel(const std::shared_ptr<Plane> &p)
 {
     this->plane = p;
 }
 
-std::shared_ptr<Plane> smPlaneModel::getPlaneModel() const
+std::shared_ptr<Plane> PlaneModel::getPlaneModel() const
 {
     return plane;
 }

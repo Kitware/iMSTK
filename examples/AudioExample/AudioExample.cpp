@@ -43,37 +43,37 @@ void AudioKeyboardController::setSound(std::shared_ptr<Audio> a)
     sound = a;
 }
 
-void AudioKeyboardController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void AudioKeyboardController::handleEvent(std::shared_ptr<core::Event> event)
 {
     assert(sound);
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(event);
 
     if(keyboardEvent->getPressed())
     {
         switch(keyboardEvent->getKeyPressed())
         {
-        case mstk::Event::smKey::S:
+        case event::Key::S:
             sound->play();
             break;
-        case mstk::Event::smKey::P:
+        case event::Key::P:
             sound->pause();
             break;
-        case mstk::Event::smKey::H:
+        case event::Key::H:
             sound->stop();
             break;
-        case mstk::Event::smKey::L:
+        case event::Key::L:
             loopSound = !loopSound;
             sound->setLoop(loopSound);
             break;
-        case mstk::Event::smKey::I:
+        case event::Key::I:
             if (1.0 > soundVolume)
             {
                 soundVolume += 0.1;
                 sound->setVolume(soundVolume);
             }
             break;
-        case mstk::Event::smKey::D:
+        case event::Key::D:
             if (0.0 <= soundVolume)
             {
                 soundVolume -= 0.1;
@@ -89,7 +89,7 @@ void AudioKeyboardController::handleEvent(std::shared_ptr<mstk::Event::Event> ev
 void runAudioExample()
 {
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<Viewer> viewer;
     std::shared_ptr<Audio> sound;
     std::shared_ptr<AudioKeyboardController> audioCtl;
 
@@ -97,7 +97,7 @@ void runAudioExample()
     sdk = SDK::getInstance();
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<smViewer>();
+    viewer = std::make_shared<Viewer>();
     sdk->addViewer(viewer);
 
     //Create the audio controller
@@ -118,7 +118,7 @@ void runAudioExample()
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     //Link up the event system between this the audio controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, audioCtl);
+    viewer->attachEvent(core::EventType::Keyboard, audioCtl);
 
     sdk->run();
 

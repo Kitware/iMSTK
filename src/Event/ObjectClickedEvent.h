@@ -29,16 +29,15 @@
 #include "Core/Event.h"
 #include <Core/Vector.h>
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smObjectClickedEvent : public Event
+class ObjectClickedEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smObjectClickedEvent(const size_t &objectId);
+    ObjectClickedEvent(const size_t &objectId);
 
     void setWindowCoord(const core::Vec3d &coordinates);
 
@@ -49,7 +48,6 @@ private:
     core::Vec3d coord; // position
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMOBJECTCLICKEDEVENT_H

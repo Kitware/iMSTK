@@ -38,7 +38,7 @@ void createPBDandFEM()
     smPBDObjectSimulator * pbd;
     Matrix33d mat;
     Simulator *simulator;
-    smViewer *viewer;
+    Viewer *viewer;
     Scene *scene1;
 
     ///create rotation matrix
@@ -48,14 +48,14 @@ void createPBDandFEM()
     simmedtkSDK = SDK::getInstance();
 
     ///init texture manager and load the textures
-    smTextureManager::init(simmedtkSDK->getErrorLog());
-    smTextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg", "groundImage");
-    smTextureManager::loadTexture("../../resources/textures/4351-normal.jpg", "groundBumpImage");
-    smTextureManager::loadTexture("../../resources/textures/brick.jpg", "wallImage");
-    smTextureManager::loadTexture("../../resources/textures/brick-normal.jpg", "wallBumpImage");
+    TextureManager::init(simmedtkSDK->getErrorLog());
+    TextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg", "groundImage");
+    TextureManager::loadTexture("../../resources/textures/4351-normal.jpg", "groundBumpImage");
+    TextureManager::loadTexture("../../resources/textures/brick.jpg", "wallImage");
+    TextureManager::loadTexture("../../resources/textures/brick-normal.jpg", "wallBumpImage");
 
     //for cloth texture
-    smTextureManager::loadTexture("../../resources/textures/cloth.jpg", "clothtexture");
+    TextureManager::loadTexture("../../resources/textures/cloth.jpg", "clothtexture");
 
     ///create a FEM simulator
     femSim = new smFemSimulator(simmedtkSDK->getErrorLog());
@@ -90,7 +90,7 @@ void createPBDandFEM()
     pbdObject = new smPBDSurfaceSceneObject();
     pbdObjectgetRenderDetail()->colorDiffuse = Color::colorWhite;
     pbdObjectgetRenderDetail()->colorAmbient = Color::colorWhite;
-    pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", SM_FILETYPE_3DS);
+    pbdObject->mesh->loadMeshLegacy("../../resources/models/clothtextured.3ds", BaseMesh::MeshFileType::ThreeDS);
 
     //pbdObject->mesh->rotate(mat);
     pbdObject->mesh->scale(core::Vec3d(2.3, 0.5, 2));

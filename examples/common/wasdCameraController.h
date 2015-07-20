@@ -48,17 +48,17 @@ public:
     /// \brief Default constructor
     ///
     /// \param cam Pointer to camera to be controlled
-    wasdCameraController(std::shared_ptr<smCamera> cam);
+    wasdCameraController(std::shared_ptr<Camera> cam);
 
     /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
+    void handleEvent(std::shared_ptr<core::Event> event) override;
 
     /// \brief Set the camera to be controlled
     ///
     /// \param cam Pointer to camera to be controlled
-    void setCamera(std::shared_ptr<smCamera> cam);
+    void setCamera(std::shared_ptr<Camera> cam);
 
     /// \brief Set the step size that the camera moves with each key press
     ///
@@ -66,8 +66,8 @@ public:
     void setStepSize(float size);
 
 private:
-    std::shared_ptr<smCamera> camera; ///< Pointer to camera being controlled
     float moveDistance;
+    std::shared_ptr<Camera> camera; ///< Pointer to camera being controlled
 };
 
 }//Common

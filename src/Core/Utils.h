@@ -25,11 +25,11 @@
 #define SMUTILS_H
 
 /// \brief query,  logs and diplays opengl error
-#define SM_CHECKGLERROR_DISPLAY(log,error)  smGLUtils::queryGLError(error);\
+#define SM_CHECKGLERROR_DISPLAY(log,error)  GLUtils::queryGLError(error);\
                                             log->addError(error);\
                                             log->printLastErrUnsafe();\
 /// \brief query,  logs opengl error 
-#define SM_CHECKERROR(log,error) smGLUtils::queryGLError(error);\
+#define SM_CHECKERROR(log,error) GLUtils::queryGLError(error);\
                                  log->addError(error);\
  
 #endif

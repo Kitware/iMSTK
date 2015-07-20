@@ -130,12 +130,12 @@ public:
 
     void setLightPos(int p_lightId, smLightPos p_pos, core::Vec3d p_direction);
 
-    std::shared_ptr<smCamera> getCamera()
+    std::shared_ptr<Camera> getCamera()
     {
         return camera;
     }
 
-    void addCamera(std::shared_ptr<smCamera> sceneCamera)
+    void addCamera(std::shared_ptr<Camera> sceneCamera)
     {
         camera = sceneCamera;
     }
@@ -144,7 +144,7 @@ public:
     void copySceneToLocal(SceneLocal &p_local);
 
 private:
-    std::shared_ptr<smCamera> camera;                           //Camera for the scene
+    std::shared_ptr<Camera> camera;                           //Camera for the scene
     std::vector<std::shared_ptr<Light> > lights;              //Lights in the scene
     std::vector<std::shared_ptr<SceneObject>> sceneObjects;   // scene objects storage
     std::shared_ptr<ErrorLog> log;                            // error logging

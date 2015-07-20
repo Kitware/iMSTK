@@ -23,40 +23,38 @@
 
 #include "KeyboardEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smKeyboardEvent::EventName = EventType::Keyboard;
+core::EventType KeyboardEvent::EventName = core::EventType::Keyboard;
 
-smKeyboardEvent::smKeyboardEvent(const smKey& button)
-    : pressed(false), key(button), modKey(smModKey::none)
+KeyboardEvent::KeyboardEvent(const Key& button)
+    : pressed(false), key(button), modKey(ModKey::none)
 {
 }
 
-const smKey& smKeyboardEvent::getKeyPressed()
+const Key& KeyboardEvent::getKeyPressed()
 {
     return key;
 }
-void smKeyboardEvent::setPressed(const bool& press)
+void KeyboardEvent::setPressed(const bool& press)
 {
     this->pressed = press;
 }
-const bool& smKeyboardEvent::getPressed()
+const bool& KeyboardEvent::getPressed()
 {
     return this->pressed;
 }
-const bool& smKeyboardEvent::togglePressed()
+const bool& KeyboardEvent::togglePressed()
 {
     return this->pressed = !this->pressed;
 }
-void smKeyboardEvent::setModifierKey(const smModKey& modKey)
+void KeyboardEvent::setModifierKey(const ModKey& modKey)
 {
     this->modKey = modKey;
 }
-const smModKey& smKeyboardEvent::getModifierKey()
+const ModKey& KeyboardEvent::getModifierKey()
 {
     return this->modKey;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

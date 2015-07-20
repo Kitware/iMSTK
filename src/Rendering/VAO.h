@@ -39,7 +39,7 @@
 #include "VAO.h"
 #include "Shader.h"
 
-enum smVBOBufferType
+enum VBOBufferType
 {
     SMVBO_POS,
     SMVBO_NORMALS,
@@ -51,12 +51,12 @@ enum smVBOBufferType
     SMVBO_VEC2F
 };
 
-struct smVBOBufferEntryInfo
+struct VBOBufferEntryInfo
 {
     ///attrib index; 0, 1, 2. It starts from 0
     int attributeIndex;
     ///based on type the data buffer  will change. It may be Position, normals, texture coords, tangents
-    smVBOBufferType arrayBufferType;
+    VBOBufferType arrayBufferType;
     ///pointer to the actual that. It is mesh data.
     void *attribPointer;
     ///total number of elements
@@ -67,25 +67,25 @@ struct smVBOBufferEntryInfo
     std::string   shaderAttribName;
     GLint    shaderAttribLocation;
 public:
-    smVBOBufferEntryInfo();
+    VBOBufferEntryInfo();
 };
 
 /// \brief Vertex Array Object for fast rendering
-class smVAO: public CoreClass
+class VAO: public CoreClass
 {
 public:
     /// \brief need error log and totalBuffer Size
-    smVAO(std::shared_ptr<ErrorLog> p_log, smVBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
+    VAO(std::shared_ptr<ErrorLog> p_log, VBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
 
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
-    void setBufferData(smVBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr);
+    void setBufferData(VBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr);
 
     /// \brief set the triangle information
     void setTriangleInfo(std::string p_ShaderAttribName, int p_nbrTriangles, void *p_ptr);
 
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
-    bool setBufferDataFromMesh(smMesh *p_mesh,
-                                 std::shared_ptr<smShader> p_shader,
+    bool setBufferDataFromMesh(Mesh *p_mesh,
+                                 std::shared_ptr<Shader> p_shader,
                                  std::string p_POSITIONShaderName = "Position",
                                  std::string p_NORMALShaderName = "Normal",
                                  std::string p_TEXTURECOORDShaderName = "texCoords",
@@ -99,7 +99,7 @@ public:
     void initBuffers();
 
     /// \brief get VAO given the shader ID
-    static std::shared_ptr<smVAO> getVAO(std::shared_ptr<UnifiedId> p_shaderID);
+    static std::shared_ptr<VAO> getVAO(std::shared_ptr<UnifiedId> p_shaderID);
 
     /// \brief  enable the vertex array object
     void enable() const;
@@ -111,22 +111,22 @@ public:
     void draw() const override;
 
     /// \brief constructor
-    ~smVAO();
+    ~VAO();
 
 public:
-    GLuint VAO;
+    GLuint vaObject;
     int totalNbrBuffers;
     GLuint bufferIndices[SIMMEDTK_MAX_VBOBUFFERS];
     int indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
-    smVBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
-    smVBOType vboType;
+    VBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
+    VBOType vboType;
     ///All VBOs are stored here
-    static std::unordered_map<int, std::shared_ptr<smVAO>> VAOs;
-    smMesh *mesh;
+    static std::unordered_map<int, std::shared_ptr<VAO>> VAOs;
+    Mesh *mesh;
 
 private:
     std::shared_ptr<ErrorLog>  log;
-    std::shared_ptr<smShader> shader;
+    std::shared_ptr<Shader> shader;
     bool renderingError;
     ///Used for attaching attribs to the vertex objects
     bool bindShaderObjects;

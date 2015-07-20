@@ -49,22 +49,22 @@
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
-void smViewer::setVSync(bool sync)
+void Viewer::setVSync(bool sync)
 {
   this->sfmlWindow->setVerticalSyncEnabled(sync);
 }
 
-smViewer::smViewer()
+Viewer::Viewer()
 {
   this->windowOutput = std::make_shared<smOpenGLWindowStream>();
 }
 
-void smViewer::exitViewer()
+void Viewer::exitViewer()
 {
 }
 
 /// \brief Initializes OpenGL capabilities and flags
-void smViewer::initRenderingCapabilities()
+void Viewer::initRenderingCapabilities()
 {
     //use multiple fragment samples in computing the final color of a pixel
     glEnable(GL_MULTISAMPLE);
@@ -98,17 +98,17 @@ void smViewer::initRenderingCapabilities()
 }
 
 /// \brief Initializes FBOs, textures, shaders and VAOs
-void smViewer::initResources()
+void Viewer::initResources()
 {
-    smTextureManager::initGLTextures();
-    smShader::initGLShaders();
-    smVAO::initVAOs();
+    TextureManager::initGLTextures();
+    Shader::initGLShaders();
+    VAO::initVAOs();
 
     initFboListItems();
 }
 
 /// \brief Initializes the OpenGL context, and window containing it
-void smViewer::initRenderingContext()
+void Viewer::initRenderingContext()
 {
 
     // Init OpenGL context
@@ -139,13 +139,13 @@ void smViewer::initRenderingContext()
 }
 
 /// \brief Cleans up after initGLContext()
-void smViewer::destroyRenderingContext()
+void Viewer::destroyRenderingContext()
 {
     //nothing to do
 }
 
 /// \brief render depth texture for debugging
-void smViewer::renderTextureOnView()
+void Viewer::renderTextureOnView()
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);
@@ -158,7 +158,7 @@ void smViewer::renderTextureOnView()
     glLoadIdentity();
     glColor4f(1, 1, 1, 1);
     glActiveTextureARB(GL_TEXTURE0);
-    smTextureManager::activateTexture("depth");
+    TextureManager::activateTexture("depth");
     glEnable(GL_TEXTURE_2D);
     glTranslated(0, 0, -1);
     glBegin(GL_QUADS);
@@ -184,7 +184,7 @@ void smViewer::renderTextureOnView()
 /// \param p_depthTex A texture that will contain the fbo's depth texture.
 /// \param p_width The width of the fbo
 /// \param p_height The height of the fbo
-void smViewer::addFBO(const std::string &p_fboName,
+void Viewer::addFBO(const std::string &p_fboName,
                       Texture *p_colorTex,
                       Texture *p_depthTex,
                       unsigned int p_width, unsigned int p_height)
@@ -207,12 +207,12 @@ void smViewer::addFBO(const std::string &p_fboName,
 }
 
 /// \brief Initializes the FBOs in the FBO list
-void smViewer::initFboListItems()
+void Viewer::initFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
         FboListItem *item = &fboListItems[i];
-        item->fbo = new smFrameBuffer();
+        item->fbo = new FrameBuffer();
         item->fbo->setDim(item->width, item->height);
         if (item->colorTex)
         {
@@ -234,7 +234,7 @@ void smViewer::initFboListItems()
 }
 
 /// \brief Destroys all the FBOs in the FBO list
-void smViewer::destroyFboListItems()
+void Viewer::destroyFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
@@ -247,16 +247,16 @@ void smViewer::destroyFboListItems()
 }
 
 /// \brief Processes viewerRenderDetail options
-void smViewer::processViewerOptions()
+void Viewer::processViewerOptions()
 {
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
     {
-        smGLUtils::fadeBackgroundDraw();
+        GLUtils::fadeBackgroundDraw();
     }
 }
 
 ///\brief Render and then process window events until the event queue is empty.
-void smViewer::processWindowEvents()
+void Viewer::processWindowEvents()
 {
   sf::Event event;
   this->render();
@@ -265,7 +265,7 @@ void smViewer::processWindowEvents()
 }
 
 /// \brief Renders the render operation to an FBO
-void smViewer::renderToFBO(const RenderOperation &p_rop)
+void Viewer::renderToFBO(const RenderOperation &p_rop)
 {
     assert(p_rop.fbo);
     //Enable FBO for rendering
@@ -276,13 +276,13 @@ void smViewer::renderToFBO(const RenderOperation &p_rop)
 
     processViewerOptions();
     //Render Scene
-     smGLRenderer::renderScene(p_rop.scene);
+     GLRenderer::renderScene(p_rop.scene);
     //Disable FBO
     p_rop.fbo->disable();
 }
 
 /// \brief Renders the render operation to screen
-void smViewer::renderToScreen(const RenderOperation &p_rop)
+void Viewer::renderToScreen(const RenderOperation &p_rop)
 {
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
@@ -290,7 +290,7 @@ void smViewer::renderToScreen(const RenderOperation &p_rop)
 
     processViewerOptions();
     //Render Scene
-    smGLRenderer::renderScene(p_rop.scene);
+    GLRenderer::renderScene(p_rop.scene);
 
     //Render axis
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
@@ -309,7 +309,7 @@ void smViewer::renderToScreen(const RenderOperation &p_rop)
         p_rop.scene->enableLights();
         p_rop.scene->placeLights();
 
-        smGLRenderer::drawAxes(this->globalAxisLength);
+        GLRenderer::drawAxes(this->globalAxisLength);
 
         p_rop.scene->disableLights();
 
@@ -322,7 +322,7 @@ void smViewer::renderToScreen(const RenderOperation &p_rop)
 }
 
 /// \brief Registers a scene for rendering with the viewer
-void smViewer::registerScene(std::shared_ptr<Scene> p_scene,
+void Viewer::registerScene(std::shared_ptr<Scene> p_scene,
                              smRenderTargetType p_target,
                              const std::string &p_fboName)
 {
@@ -344,7 +344,7 @@ void smViewer::registerScene(std::shared_ptr<Scene> p_scene,
 }
 
 /// \brief Set the color and other viewer defaults
-void smViewer::setToDefaults()
+void Viewer::setToDefaults()
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor());
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor());
@@ -353,7 +353,7 @@ void smViewer::setToDefaults()
 }
 
 /// \brief Called at the beginning of each frame by the module
-void smViewer::beginFrame()
+void Viewer::beginFrame()
 {
     if (terminateExecution == true)
     {
@@ -364,12 +364,12 @@ void smViewer::beginFrame()
 }
 
 ///\brief Called at the end of each frame by the module
-void smViewer::endFrame()
+void Viewer::endFrame()
 {
     this->sfmlWindow->display(); //swaps buffers
 }
 
-void smViewer::processSFMLEvents(const sf::Event& p_event)
+void Viewer::processSFMLEvents(const sf::Event& p_event)
 {
     switch(p_event.type)
     {
@@ -380,18 +380,18 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::KeyReleased:
     {
         auto keyboardEvent =
-            std::make_shared<mstk::Event::smKeyboardEvent>(mstk::Event::SFMLKeyToSmKey(p_event.key.code));
+            std::make_shared<event::KeyboardEvent>(event::SFMLKeyToSmKey(p_event.key.code));
         keyboardEvent->setPressed(sf::Event::KeyPressed == p_event.type);
 
-        keyboardEvent->setModifierKey(mstk::Event::smModKey::none);
+        keyboardEvent->setModifierKey(event::ModKey::none);
         if (p_event.key.shift)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::shift);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | event::ModKey::shift);
         if (p_event.key.control)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::control);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | event::ModKey::control);
         if (p_event.key.alt)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::alt);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | event::ModKey::alt);
         if (p_event.key.system)
-            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | mstk::Event::smModKey::super);
+            keyboardEvent->setModifierKey(keyboardEvent->getModifierKey() | event::ModKey::super);
 
         eventHandler->triggerEvent(keyboardEvent);
         break;
@@ -399,17 +399,17 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     case sf::Event::MouseButtonPressed:
     case sf::Event::MouseButtonReleased:
     {
-        mstk::Event::smMouseButton mouseButton;
+        event::MouseButton mouseButton;
         if (sf::Mouse::Left == p_event.mouseButton.button)
-            mouseButton = mstk::Event::smMouseButton::Left;
+            mouseButton = event::MouseButton::Left;
         else if (sf::Mouse::Right == p_event.mouseButton.button)
-            mouseButton = mstk::Event::smMouseButton::Right;
+            mouseButton = event::MouseButton::Right;
         else if (sf::Mouse::Middle == p_event.mouseButton.button)
-            mouseButton = mstk::Event::smMouseButton::Middle;
+            mouseButton = event::MouseButton::Middle;
         else
-            mouseButton = mstk::Event::smMouseButton::Unknown;
+            mouseButton = event::MouseButton::Unknown;
 
-        auto mouseEvent = std::make_shared<mstk::Event::smMouseButtonEvent>(mouseButton);
+        auto mouseEvent = std::make_shared<event::MouseButtonEvent>(mouseButton);
         mouseEvent->setPresed(sf::Event::MouseButtonPressed == p_event.type);
         mouseEvent->setWindowCoord(core::Vec2d(p_event.mouseButton.x,p_event.mouseButton.y));
         eventHandler->triggerEvent(mouseEvent);
@@ -417,8 +417,8 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     }
     case sf::Event::MouseMoved:
     {
-        auto mouseEvent = std::make_shared<mstk::Event::smMouseMoveEvent>();
-        mouseEvent->setSender(mstk::Event::EventSender::Module);
+        auto mouseEvent = std::make_shared<event::MouseMoveEvent>();
+        mouseEvent->setSender(core::EventSender::Module);
         mouseEvent->setWindowCoord(core::Vec2d(p_event.mouseMove.x, p_event.mouseMove.y));
         eventHandler->triggerEvent(mouseEvent);
         break;
@@ -428,41 +428,41 @@ void smViewer::processSFMLEvents(const sf::Event& p_event)
     }
 }
 
-void smViewer::addObject(std::shared_ptr<CoreClass> object)
+void Viewer::addObject(std::shared_ptr<CoreClass> object)
 {
 
     SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void smViewer::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
+void Viewer::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
 {
 
 }
 
-void smViewer::addText(std::string p_tag)
+void Viewer::addText(std::string p_tag)
 {
 
     windowOutput->addText(p_tag, std::string(""));
 }
 
-void smViewer::updateText(std::string p_tag, std::string p_string)
+void Viewer::updateText(std::string p_tag, std::string p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void smViewer::updateText(int p_handle, std::string p_string)
+void Viewer::updateText(int p_handle, std::string p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);
 }
 
-void smViewer::setWindowTitle(const std::string &str)
+void Viewer::setWindowTitle(const std::string &str)
 {
     windowTitle = str;
 }
 
-void smViewer::cleanUp()
+void Viewer::cleanUp()
 {
     destroyFboListItems();
     destroyRenderingContext();
@@ -473,6 +473,6 @@ void smViewer::cleanUp()
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
-    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,smViewer,100);
+    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,Viewer,100);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

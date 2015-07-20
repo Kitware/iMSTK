@@ -34,7 +34,7 @@ using namespace bandit;
 std::shared_ptr<MeshCollisionModel> getModel(const core::StdVector3d &vertices)
 {
     std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
-    std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
 
     // Add two triangles to the data structure
     mesh->initVertexArrays(3);

@@ -3,11 +3,11 @@
 
 #include "VegaSceneObject.h"
 
-class smVegaSceneObjectWithRestPosition: public smVegaSceneObject
+class VegaSceneObjectWithRestPosition: public VegaSceneObject
 {
 public:
-  smVegaSceneObjectWithRestPosition(char * filename);
-  virtual ~smVegaSceneObjectWithRestPosition();
+  VegaSceneObjectWithRestPosition(char * filename);
+  virtual ~VegaSceneObjectWithRestPosition();
 
   virtual void TransformRigidly(double * centerOfMass, double * R);
 

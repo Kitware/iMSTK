@@ -2,13 +2,13 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 
-class smAABBRenderDelegate : public RenderDelegate
+class AABBRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
 };
 
-void smAABBRenderDelegate::draw() const
+void AABBRenderDelegate::draw() const
 {
   AABB* geom = this->getSourceGeometryAs<AABB>();
   if (!geom)
@@ -48,6 +48,6 @@ void smAABBRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_aabb_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smAABBRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,AABBRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

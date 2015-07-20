@@ -42,24 +42,24 @@ curvedGrasper::curvedGrasper(size_t p_PhantomID,
     this->phantomID = p_PhantomID;
 
     Matrix33d rot;
-    mesh_pivot = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    mesh_pivot->loadMesh(p_pivotModelFileName, SM_FILETYPE_3DS);
+    mesh_pivot = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    mesh_pivot->loadMesh(p_pivotModelFileName, BaseMesh::MeshFileType::ThreeDS);
     mesh_pivot->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
     mesh_pivot->rotate(rot);
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_pivot->rotate(rot);
 
-    mesh_upperJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    mesh_upperJaw->loadMesh(p_upperModelFileName, SM_FILETYPE_3DS);
+    mesh_upperJaw = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    mesh_upperJaw->loadMesh(p_upperModelFileName, BaseMesh::MeshFileType::ThreeDS);
     mesh_upperJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_upperJaw->rotate(rot);
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_upperJaw->rotate(rot);
 
-    mesh_lowerJaw = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    mesh_lowerJaw->loadMesh(p_lowerModelFileName, SM_FILETYPE_3DS);
+    mesh_lowerJaw = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    mesh_lowerJaw->loadMesh(p_lowerModelFileName, BaseMesh::MeshFileType::ThreeDS);
     mesh_lowerJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_lowerJaw->rotate(rot);
@@ -84,14 +84,14 @@ curvedGrasper::curvedGrasper(size_t p_PhantomID,
     DAQdataID = 0;
 }
 
-void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
+void curvedGrasper::handleEvent(std::shared_ptr<core::Event> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<event::HapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         smMeshContainer *containerLower = this->getMeshContainer("curvedGrasperLower");
@@ -128,22 +128,22 @@ void curvedGrasper::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::Num1:
+            case event::Key::Num1:
             {
-                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
                 & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case mstk::Event::smKey::Num2:
+            case event::Key::Num2:
             {
-                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType
                 | SIMMEDTK_RENDER_NONE;
                 break;

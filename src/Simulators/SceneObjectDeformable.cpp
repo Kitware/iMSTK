@@ -45,7 +45,7 @@ void smSceneObjectDeformable::applyContactForces()
 {
     if (f_contact.size() != 0)
     {
-        for (int i = 0; i < f_contact.size(); i++)
+        for (size_t i = 0; i < f_contact.size(); i++)
         {
             f_ext[i] += f_contact[i];
         }
@@ -138,12 +138,12 @@ void smSceneObjectDeformable::setRenderPrimaryMesh()
     renderSecondaryMesh = false;
 }
 
-std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getPrimarySurfaceMesh() const
+std::shared_ptr<SurfaceMesh> smSceneObjectDeformable::getPrimarySurfaceMesh() const
 {
     return primarySurfaceMesh;
 }
 
-std::shared_ptr<smSurfaceMesh> smSceneObjectDeformable::getSecondarySurfaceMesh() const
+std::shared_ptr<SurfaceMesh> smSceneObjectDeformable::getSecondarySurfaceMesh() const
 {
     return secondarySurfaceMesh;
 }

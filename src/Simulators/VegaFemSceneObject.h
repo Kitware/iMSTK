@@ -177,10 +177,10 @@ public:
 
     /// \brief serialize function explicity writes the object to the memory block
     ///each scene object should know how to write itself to a memory block
-    virtual void serialize(void *p_memoryBlock) override {};
+    virtual void serialize(void */*p_memoryBlock*/) override {};
 
     /// \brief Unserialize function can recover the object from the memory location
-    virtual void unSerialize(void *p_memoryBlock) override {};
+    virtual void unSerialize(void */*p_memoryBlock*/) override {};
 
     /// \brief this function may not be used
     ///every Scene Object should know how to clone itself.
@@ -233,8 +233,8 @@ private:
     std::shared_ptr<LinearSolver> linearSolver;
 
     // Vega surface meshes
-    std::shared_ptr<smVegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
-    std::shared_ptr<smVegaSceneObjectDeformable> vegaSecondarySurfaceMesh;
+    std::shared_ptr<VegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
+    std::shared_ptr<VegaSceneObjectDeformable> vegaSecondarySurfaceMesh;
 };
 
 #endif //SMVEGAFEMSCENEOBJECT_H

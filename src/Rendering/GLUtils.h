@@ -34,13 +34,13 @@
 struct smGroundRenderInfo;
 
 /// \brief opengl rendering utilities are here.
-class smGLUtils : public CoreClass
+class GLUtils : public CoreClass
 {
 public:
     // OpenGL 3.0 adds the concept of indexed strings and
     // deprecates calls to glGetString( GL_EXTENSIONS ), which
     // will now generate GL_INVALID_ENUM.
-    smGLUtils()
+    GLUtils()
     {
         int numExt;
         glGetIntegerv( GL_NUM_EXTENSIONS, &numExt );
@@ -50,7 +50,7 @@ public:
                 reinterpret_cast<const char*>(glGetStringi(GL_EXTENSIONS,i)));
         }
     }
-    ~smGLUtils();
+    ~GLUtils();
 
 public:
     /// \brief checks the openGL error. if there is an error then it returns

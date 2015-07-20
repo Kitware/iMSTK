@@ -32,11 +32,11 @@
 
 /// \brief This viewer class allows content to be rendered to an Oculus Rift
 ///
-class smOculusViewer : public smViewer
+class OculusViewer : public Viewer
 {
 public:
-    smOculusViewer();
-    virtual ~smOculusViewer();
+    OculusViewer();
+    virtual ~OculusViewer();
     virtual void init() override;
     virtual void cleanUp() override;
 protected:

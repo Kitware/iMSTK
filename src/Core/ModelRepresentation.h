@@ -31,7 +31,7 @@
 #include "CoreClass.h"
 #include "Mesh/Mesh.h"
 
-class smMesh;
+class Mesh;
 
 class ModelRepresentation
 {
@@ -39,7 +39,7 @@ public:
     ModelRepresentation(){}
     ~ModelRepresentation(){}
 
-	virtual std::shared_ptr<smMesh> getMesh(){ std::shared_ptr<smMesh> s; return s; }
+	virtual std::shared_ptr<Mesh> getMesh(){ std::shared_ptr<Mesh> s; return s; }
 	virtual std::shared_ptr<CoreClass> getObject(){ std::shared_ptr<CoreClass> s; return s; }
 	virtual void draw(){}
 };

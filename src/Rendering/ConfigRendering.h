@@ -35,7 +35,7 @@
 #include "Core/RenderDetail.h"
 
 
-class smShader;
+class Shader;
 
 /// \brief this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects.
@@ -48,7 +48,7 @@ class smShader;
 #define SIMMEDTK_MAX_VBOBUFFERS 10
 
 /// \brief The configuration for VBO
-enum smVBOType
+enum VBOType
 {
     SIMMEDTK_VBO_STATIC,
     SIMMEDTK_VBO_NOINDICESCHANGE,
@@ -56,7 +56,7 @@ enum smVBOType
 };
 
 /// \brief Vertex Buffer Objects Return Types
-enum smVBOResult
+enum VBOResult
 {
     SIMMEDTK_VBO_OK,
     SIMMEDTK_VBO_NODATAMEMORY,
@@ -86,7 +86,7 @@ enum smVBOResult
 #define    SIMMEDTK_RENDER_NORMALS           (1<<17)
 #define    SIMMEDTK_RENDER_NONE              (1<<31)
 
-/// \brief type definitions for variable viewerRenderDetail in smViewer
+/// \brief type definitions for variable viewerRenderDetail in Viewer
 #define    SIMMEDTK_VIEWERRENDER_GLOBALAXIS                     (1<<1)
 #define    SIMMEDTK_VIEWERRENDER_TEXT                           (1<<2)
 #define    SIMMEDTK_VIEWERRENDER_FADEBACKGROUND                 (1<<3)
@@ -99,13 +99,5 @@ enum smVBOResult
 #define    SIMMEDTK_VIEWERRENDER_DISABLE                        (1<<11)
 #define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
 #define    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS                    (1<<13)
-
-
-/// \brief viewer detail. legacy code
-struct smViewerDetail
-{
-    unsigned int environment;
-    Color backGroundColor;
-};
 
 #endif // SMCONFIGRENDERING_H

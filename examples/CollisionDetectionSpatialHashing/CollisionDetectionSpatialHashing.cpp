@@ -42,7 +42,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     scene = sdk->createScene();
 
     // Create viewer
-    viewer = std::make_shared<smViewer>();
+    viewer = std::make_shared<Viewer>();
 
     // Add our viewer to the SDK
     sdk->addViewer(viewer);
@@ -59,18 +59,18 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     sdk->registerObjectSim(defaultSimulator);
 
     // Init texture manager and specify the textures needed for the current application
-    smTextureManager::init(sdk->getErrorLog());
-    smTextureManager::loadTexture("textures/fat9.bmp", "livertexture1");
-    smTextureManager::loadTexture("textures/blood.jpg", "livertexture2");
+    TextureManager::init(sdk->getErrorLog());
+    TextureManager::loadTexture("textures/fat9.bmp", "livertexture1");
+    TextureManager::loadTexture("textures/blood.jpg", "livertexture2");
 
-    smTextureManager::loadTexture("textures/4351-diffuse.jpg", "groundImage");
-    smTextureManager::loadTexture("textures/4351-normal.jpg", "groundBumpImage");
-    smTextureManager::loadTexture("textures/brick.jpg", "wallImage");
-    smTextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
+    TextureManager::loadTexture("textures/4351-diffuse.jpg", "groundImage");
+    TextureManager::loadTexture("textures/4351-normal.jpg", "groundBumpImage");
+    TextureManager::loadTexture("textures/brick.jpg", "wallImage");
+    TextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
         // Create collision models
     std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
-    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
     collisionModelA->getMesh()->assignTexture("livertexture1");
     collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
     collisionModelA->getMesh()->translate(7, 3, 0);
@@ -78,7 +78,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
 
     std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
-    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", SM_FILETYPE_3DS);
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
     collisionModelB->getMesh()->assignTexture("livertexture2");
     collisionModelB->getMesh()->translate(core::Vec3d(2, 0, 0));
     collisionModelB->getMesh()->assignTexture("livertexture2");
@@ -112,7 +112,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     scene->addLight(light);
 
     // Camera setup
-    std::shared_ptr<smCamera> sceneCamera = smCamera::getDefaultCamera();
+    std::shared_ptr<Camera> sceneCamera = Camera::getDefaultCamera();
     assert(sceneCamera);
     scene->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
@@ -133,8 +133,8 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
 }
 
 void CollisionDetectionSpatialHashing::simulateMain(const SimulationMainParam &/*p_param*/)

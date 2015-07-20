@@ -32,13 +32,13 @@ MeshCollisionModel::~MeshCollisionModel()
 {
 
 }
-void MeshCollisionModel::setMesh(std::shared_ptr<smMesh> modelMesh)
+void MeshCollisionModel::setMesh(std::shared_ptr<Mesh> modelMesh)
 {
     this->setModelMesh(modelMesh);
     this->aabbTree.reset();
     this->initAABBTree(1);
 }
-void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const smMeshFileType &type)
+void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const BaseMesh::MeshFileType &type)
 {
     this->load(meshName,type);
 
@@ -56,6 +56,6 @@ void MeshCollisionModel::setAABBTree(std::shared_ptr<MeshCollisionModel::AABBTre
 }
 void MeshCollisionModel::initAABBTree(const int& numLevels)
 {
-    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<smSurfaceMesh>(this->mesh), numLevels);
+    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<SurfaceMesh>(this->mesh), numLevels);
     this->aabbTree->initStructure();
 }

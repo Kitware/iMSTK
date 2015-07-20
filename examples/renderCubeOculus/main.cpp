@@ -37,7 +37,7 @@ int main()
     std::shared_ptr<smOculusViewer> viewer;
     std::shared_ptr<Scene> scene1;
     std::shared_ptr<Light> light;
-    std::shared_ptr<smCamera> sceneCamera;
+    std::shared_ptr<Camera> sceneCamera;
     std::shared_ptr<StaticSceneObject> cube;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
@@ -56,7 +56,7 @@ int main()
     camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
     keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
-    auto cubeModel = std::make_shared<smMeshModel>();
+    auto cubeModel = std::make_shared<MeshModel>();
     cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
@@ -86,7 +86,7 @@ int main()
     scene1->addLight(light);
 
     // Camera setup
-    sceneCamera = smCamera::getDefaultCamera();
+    sceneCamera = Camera::getDefaultCamera();
     assert(sceneCamera);
     sceneCamera->setPos(3, 3, 5);
     sceneCamera->setFocus(0, 0, -1);
@@ -94,8 +94,8 @@ int main()
     camCtl->setCamera(sceneCamera);
 
     //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
 
     //run the framework
     sdk->run();

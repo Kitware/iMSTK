@@ -33,32 +33,32 @@
 #include "Core/SceneObject.h"
 #include "Core/Matrix.h"
 
-class smMesh;
+class Mesh;
 class AABB;
-class smLineMesh;
-class smViewer;
+class LineMesh;
+class Viewer;
 class Plane;
 class Scene;
 
 struct RenderDetail;
 /// \brief gl rendering utilities
-class smGLRenderer: public CoreClass
+class GLRenderer: public CoreClass
 {
 public:
     /// \brief constructor
-    smGLRenderer();
+    GLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<smMesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<Mesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<smMesh> p_mesh, Color p_color = Color::colorBlue, float length=1.0);
+    static void drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color = Color::colorBlue, float length=1.0);
 
     /// \brief  draw line mesh
-    static void drawLineMesh(std::shared_ptr<smLineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail);
+    static void drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<smViewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
+    static void drawCoordSystem(std::shared_ptr<Viewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();
@@ -85,7 +85,7 @@ public:
     static void drawArrow(const core::Vec3f &start, const core::Vec3f &end, const float D);
 
     /// \brief draw function is called for visualization the object
-    virtual void draw(){}
+    virtual void draw() const {}
 
     /// \brief switch to default rendering
     static void enableDefaultGLRendering();

@@ -35,9 +35,9 @@
 // Forward declaration
 class SDK;
 class smOpenGLWindowStream;
-class smMetalShader;
-class smSceneTextureShader;
-class smFrameBuffer;
+class MetalShader;
+class SceneTextureShader;
+class FrameBuffer;
 class Texture;
 
 enum smRenderingStageType
@@ -59,7 +59,7 @@ struct RenderOperation
 {
     RenderOperation();
     std::shared_ptr<Scene> scene; ///< The scene full of objects to render
-    smFrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
+    FrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
     std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
     smRenderTargetType target; ///< Specifies where the rendered result should be placed see smRenderTargetType
 };
@@ -67,7 +67,7 @@ struct RenderOperation
 struct FboListItem
 {
     std::string fboName; ///< String identification
-    smFrameBuffer* fbo; ///< The FBO pointer
+    FrameBuffer* fbo; ///< The FBO pointer
     Texture *depthTex; ///< The FBO depth texture pointer
     Texture *colorTex; ///< The FBO color texture pointer
     unsigned int width; ///< The width of the FBO

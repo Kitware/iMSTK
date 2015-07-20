@@ -38,7 +38,7 @@
 #include "Core/ErrorLog.h"
 
 /// \brief texture manager. It loads any image format and initializes in the GL context
-class smTextureManager: public CoreClass
+class TextureManager: public CoreClass
 {
 
     static std::shared_ptr<ErrorLog> errorLog;

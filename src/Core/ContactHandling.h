@@ -31,7 +31,7 @@
 // STL includes
 #include <memory>
 
-class smMesh;
+class Mesh;
 class CollisionPair;
 
 enum class ContactHandlingType

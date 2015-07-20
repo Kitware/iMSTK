@@ -41,8 +41,8 @@ private:
 
     std::shared_ptr<ErrorLog> log; ///< log for errors
     std::string referenceName; ///< A human readable string to refer to the object
-    mstk::Event::AudioState state; ///< state of audio
-    mstk::Event::AudioState prevState; ///< state of audio in previous cycle
+    event::AudioEvent::AudioState state; ///< state of audio
+    event::AudioEvent::AudioState prevState; ///< state of audio in previous cycle
     float prevVolume; ///< state of audio volume in previous cycle
     float volume; ///< volume (max volume is 1.0)
     bool loop; ///< play the song in a loop
@@ -50,10 +50,10 @@ private:
 public:
     Audio() :
         referenceName(""),
-        state{mstk::Event::AudioState::Unknown },
-        prevState{mstk::Event::AudioState::Unknown },
-        volume{1.0},
+        state{event::AudioEvent::AudioState::Unknown },
+        prevState{event::AudioEvent::AudioState::Unknown },
         prevVolume{1.0},
+        volume{1.0},
         loop{false}
     {
     }
@@ -61,7 +61,7 @@ public:
     /// \brief constructor initialize various states
     Audio(const std::string& fileName,
             const std::string& p_referenceName,
-            ErrorLog *p_log = nullptr,
+            ErrorLog */*p_log*/,
             bool p_loop = false)
         : referenceName(p_referenceName),
           loop(p_loop)
@@ -71,7 +71,7 @@ public:
             assert(false);
         }
 
-        prevState = state = mstk::Event::AudioState::Stop;
+        prevState = state = event::AudioEvent::AudioState::Stop;
         volume = prevVolume = 1.0f;
     }
 
@@ -120,16 +120,16 @@ public:
     }
 
     /// \brief set the state of audio and continue playing
-    void setState(mstk::Event::AudioState p_state)
+    void setState(event::AudioEvent::AudioState p_state)
     {
         assert("" != referenceName);
 
         switch (state)
         {
-        case mstk::Event::AudioState::Play:
+        case event::AudioEvent::AudioState::Play:
             this->play();
             break;
-        case mstk::Event::AudioState::Stop:
+        case event::AudioEvent::AudioState::Stop:
             this->stop();
             break;
         default:

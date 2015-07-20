@@ -57,7 +57,7 @@ public:
     {
     }
 
-    void  handleEvent(std::shared_ptr<mstk::Event::Event> event)
+    void  handleEvent(std::shared_ptr<core::Event> event)
     {
         s
         MyStylus::handleEvent(p_event);
@@ -84,7 +84,7 @@ void main()
     PhantomInterface * hapticInterface;
     SDK* simmedtkSDK;
     Scene *scene1;
-    smViewer *viewer;
+    Viewer *viewer;
     Simulator *simulator;
     smToolSimulator *toolSim;
 
@@ -114,11 +114,11 @@ void main()
     light2.castShadow = true;
 
     ///init texture manager and load the textures
-    smTextureManager::init(simmedtkSDK->getErrorLog());
-    smTextureManager::loadTexture("../../resources/textures/metal.bmp", "metal", true);
-    smTextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp", "hookCautery");
-    smTextureManager::loadTexture("../../resources/textures/metalbump.bmp", "bump");
-    smTextureManager::loadTexture("../../resources/textures/burn1024.bmp", "specTex"); ///for OCC I'll use the same texture
+    TextureManager::init(simmedtkSDK->getErrorLog());
+    TextureManager::loadTexture("../../resources/textures/metal.bmp", "metal", true);
+    TextureManager::loadTexture("../../resources/textures/hook_cautery3.bmp", "hookCautery");
+    TextureManager::loadTexture("../../resources/textures/metalbump.bmp", "bump");
+    TextureManager::loadTexture("../../resources/textures/burn1024.bmp", "specTex"); ///for OCC I'll use the same texture
 
     ///create a grasper
     hapticStylus = new myTool();

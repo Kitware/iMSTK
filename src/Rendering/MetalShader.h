@@ -35,19 +35,19 @@ namespace Event{
 }
 
 /// \brief metal shader look. It is mainly used for tool rendering but utilized for high specularity rendering for tissues.
-class smMetalShader: public smShader
+class MetalShader: public Shader
 {
 public:
     /// \brief constructor that get vertex and fragment shader file name.
-    smMetalShader(const std::string &p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
+    MetalShader(const std::string &p_verteShaderFileName = "shaders/VertexBumpMap1.cg",
                   const std::string &p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
 
     /// \brief attach mesh to the shader
-    void attachMesh(std::shared_ptr<smMesh> p_mesh, char *p_bump,
+    void attachMesh(std::shared_ptr<Mesh> p_mesh, char *p_bump,
                     char *p_decal, char *p_specular,
                     char *p_OCC, char *p_disp);
 
-    void attachMesh(std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap);
+    void attachMesh(std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap);
 
     /// \brief emtpy implementation of draw routine. needs to overwritten to enable real-time code changes
     void draw() const override;
@@ -56,12 +56,12 @@ public:
     virtual void initDraw() override;
 
     /// \brief uniforms are set in the predraw
-    virtual void predraw(std::shared_ptr<smMesh> mesh) override;
+    virtual void predraw(std::shared_ptr<Mesh> mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
+    virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 
     /// \brief handle keyboard event
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief any disable and enable shader options need to be here
     virtual void switchEnable();
@@ -81,7 +81,7 @@ public:
 };
 
 /// \brief MetalShader variantion with shadow feature
-class MetalShaderShadow: public smMetalShader
+class MetalShaderShadow: public MetalShader
 {
 public:
     /// \brief MetalShader v
@@ -91,9 +91,9 @@ public:
     virtual void initDraw() override;
 
     /// \brief unifom binding called before object is rendered
-    virtual void predraw(std::shared_ptr<smMesh> mesh) override;
+    virtual void predraw(std::shared_ptr<Mesh> mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
+    virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 
 private:
     /// \brief for debugging purposes
@@ -102,7 +102,7 @@ private:
 };
 
 /// \brief another variation of metalshader with differen shadow mapping technique
-class MetalShaderSoftShadow: public smMetalShader
+class MetalShaderSoftShadow: public MetalShader
 {
 public:
     /// \brief constrcutore with vertex and fragment shader
@@ -112,9 +112,9 @@ public:
     virtual void initDraw() override;
 
     /// \brief pre rendering routine before attached object is rendered
-    virtual void predraw(std::shared_ptr<smMesh> p_mesh) override;
+    virtual void predraw(std::shared_ptr<Mesh> p_mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh> mesh) override;
+    virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 
 private:
     GLint shadowMapUniform;

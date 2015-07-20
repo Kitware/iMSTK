@@ -56,7 +56,7 @@ static unsigned int next_pow2(unsigned int x)
     return x + 1;
 }
 
-smOculusViewer::smOculusViewer() : smViewer()
+OculusViewer::OculusViewer() : Viewer()
 {
     hmd = nullptr;
     fbWidth = 0;
@@ -70,12 +70,12 @@ smOculusViewer::smOculusViewer() : smViewer()
     oculusFBO = 0;
 }
 
-smOculusViewer::~smOculusViewer()
+OculusViewer::~OculusViewer()
 {
 
 }
 
-void smOculusViewer::init()
+void OculusViewer::init()
 {
     if (isInitialized)
     {
@@ -100,7 +100,7 @@ void smOculusViewer::init()
     }
 }
 
-void smOculusViewer::cleanUp()
+void OculusViewer::cleanUp()
 {
     destroyFboListItems();
     destroyGLContext();
@@ -108,7 +108,7 @@ void smOculusViewer::cleanUp()
     ovr_Shutdown();
 }
 
-void smOculusViewer::beginFrame()
+void OculusViewer::beginFrame()
 {
     if (terminateExecution == true)
     {
@@ -116,13 +116,13 @@ void smOculusViewer::beginFrame()
     }
 }
 
-void smOculusViewer::endFrame()
+void OculusViewer::endFrame()
 {
     //This is here to override swapping buffers,
     // Oculus doesn't like it when you swap buffers
 }
 
-void smOculusViewer::renderToScreen(const RenderOperation &p_rop)
+void OculusViewer::renderToScreen(const RenderOperation &p_rop)
 {
     int i;
     ovrMatrix4f ovrProj;
@@ -196,7 +196,7 @@ void smOculusViewer::renderToScreen(const RenderOperation &p_rop)
         view = trans * view;
 
         //Render Scene
-        smGLRenderer::renderScene(p_rop.scene, proj, view);
+        GLRenderer::renderScene(p_rop.scene, proj, view);
     }
     //after drawing both eyes into the texture render target, revert to
     // drawing directly to the display, and we call ovrHmd_EndFrame, to let the
@@ -211,7 +211,7 @@ void smOculusViewer::renderToScreen(const RenderOperation &p_rop)
     glUseProgram(0);
 }
 
-int smOculusViewer::initOculus(void)
+int OculusViewer::initOculus(void)
 {
     int i, x, y;
     unsigned int flags;
@@ -310,14 +310,14 @@ int smOculusViewer::initOculus(void)
     return 0;
 }
 
-void smOculusViewer::cleanupOculus(void)
+void OculusViewer::cleanupOculus(void)
 {
     if (hmd) {
         ovrHmd_Destroy(hmd);
     }
 }
 
-void smOculusViewer::updateRenTarg(int width, int height)
+void OculusViewer::updateRenTarg(int width, int height)
 {
     if (!oculusFBO) {
         //if oculusFBO does not exist,

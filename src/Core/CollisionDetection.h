@@ -30,7 +30,7 @@
 // SimMedTK includes
 #include "CoreClass.h"
 
-class smMesh;
+class Mesh;
 class CollisionPair;
 
 /// \brief Base class to calculate contact information between two meshes

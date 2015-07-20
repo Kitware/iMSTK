@@ -3,33 +3,33 @@
 #include "Core/Factory.h"
 #include "Mesh/Mesh.h"
 
-class smMeshRenderDelegate : public RenderDelegate
+class MeshRenderDelegate : public RenderDelegate
 {
 public:
   virtual void draw() const override;
   virtual bool isTargetTextured() const override;
 };
 
-void smMeshRenderDelegate::draw() const
+void MeshRenderDelegate::draw() const
 {
-  auto geom = this->getSourceGeometryAs<smMesh>();
+  auto geom = this->getSourceGeometryAs<Mesh>();
   if (!geom)
     return;
 
-  auto mesh = std::dynamic_pointer_cast<smMesh>(geom->shared_from_this());
-  smGLRenderer::drawSurfaceMeshTriangles(mesh, geom->getRenderDetail());
+  auto mesh = std::dynamic_pointer_cast<Mesh>(geom->shared_from_this());
+  GLRenderer::drawSurfaceMeshTriangles(mesh, geom->getRenderDetail());
 
   if (geom->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-    smGLRenderer::drawNormals(mesh,
+    GLRenderer::drawNormals(mesh,
       geom->getRenderDetail()->normalColor,
       geom->getRenderDetail()->normalLength);
     }
 }
 
-bool smMeshRenderDelegate::isTargetTextured() const
+bool MeshRenderDelegate::isTargetTextured() const
 {
-  auto geom = this->getSourceGeometryAs<smMesh>();
+  auto geom = this->getSourceGeometryAs<Mesh>();
   if (!geom)
     return false;
 
@@ -38,6 +38,6 @@ bool smMeshRenderDelegate::isTargetTextured() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smMeshRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,MeshRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

@@ -1,7 +1,6 @@
 simmedtk_add_library(RenderDelegates
   SOURCES
     AABBRenderDelegate.cpp
-    LatticeRenderDelegate.cpp
     MeshRenderDelegate.cpp
     PlaneRenderDelegate.cpp
     SceneObjectDeformableRenderDelegate.cpp

@@ -27,9 +27,9 @@
 #include "Event/KeyboardEvent.h"
 #include "Core/SDK.h"
 
-smMetalShader::smMetalShader( const std::string &p_verteShaderFileName,
+MetalShader::MetalShader( const std::string &p_verteShaderFileName,
                               const std::string &p_fragmentFileName ) :
-                              smShader(SDK::getInstance()->getErrorLog())
+                              Shader(SDK::getInstance()->getErrorLog())
 {
     this->log = SDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
@@ -55,7 +55,7 @@ smMetalShader::smMetalShader( const std::string &p_verteShaderFileName,
     log->isOutputtoConsoleEnabled = true;
 }
 
-void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
+void MetalShader::attachMesh( std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
 {
     if ( !attachTexture( p_mesh->getUniqueId(), p_bump, "BumpTex" ) )
     {
@@ -69,7 +69,7 @@ void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, ch
     attachTexture( id, p_disp, "DispTex" );
 }
 
-void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
+void MetalShader::attachMesh( std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
 {
     auto id = p_mesh->getUniqueId();
     attachTexture( id, p_bump, "BumpTex" );
@@ -80,21 +80,21 @@ void smMetalShader::attachMesh( std::shared_ptr<smMesh> p_mesh, char *p_bump, ch
     attachTexture( id, p_alphaMap, "AlphaTex" );
 }
 
-void smMetalShader::draw() const
+void MetalShader::draw() const
 {
     //placeholder
 }
 
-void smMetalShader::initDraw()
+void MetalShader::initDraw()
 {
-    smShader::initDraw();
+    Shader::initDraw();
     specularPower = this->getFragmentShaderParam( "specularPower" );
     alphaMapGain = this->getFragmentShaderParam( "alphaMapGain" );
     this->tangentAttrib = this->getShaderAtrribParam( "tangent" );
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
 
-void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
+void MetalShader::predraw(std::shared_ptr<Mesh> mesh )
 {
     specularPowerValue = mesh->getRenderDetail()->shininess;
     glUniform1fARB( specularPower, specularPowerValue );
@@ -110,21 +110,21 @@ void smMetalShader::predraw(std::shared_ptr<smMesh> mesh )
     }
 }
 
-void smMetalShader::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
+void MetalShader::handleEvent(std::shared_ptr<core::Event> p_event)
 {
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::Add:
+            case event::Key::Add:
             {
                 specularPowerValue += 5;
                 std::cout << specularPowerValue << std::endl;
                 break;
             }
 
-            case mstk::Event::smKey::Subtract:
+            case event::Key::Subtract:
             {
                 specularPowerValue -= 5;
                 std::cout << specularPowerValue << std::endl;
@@ -136,19 +136,19 @@ void smMetalShader::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
     }
 }
 
-void smMetalShader::switchEnable()
+void MetalShader::switchEnable()
 {
     //
 }
 
-void smMetalShader::switchDisable()
+void MetalShader::switchDisable()
 {
     //
 }
 
 MetalShaderShadow::MetalShaderShadow( const std::string &p_vertexShaderFileName,
                                       const std::string &p_fragmentShaderFileName ) :
-    smMetalShader( p_vertexShaderFileName, p_fragmentShaderFileName )
+    MetalShader( p_vertexShaderFileName, p_fragmentShaderFileName )
 {
     createParam( "ShadowMapTEST" );
     createParam( "canGetShadow" );
@@ -156,15 +156,15 @@ MetalShaderShadow::MetalShaderShadow( const std::string &p_vertexShaderFileName,
 
 void MetalShaderShadow::initDraw()
 {
-    smMetalShader::initDraw();
+    MetalShader::initDraw();
     this->print();
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
 
-void MetalShaderShadow::predraw( std::shared_ptr<smMesh> p_mesh )
+void MetalShaderShadow::predraw( std::shared_ptr<Mesh> p_mesh )
 {
-    smMetalShader::predraw( p_mesh );
+    MetalShader::predraw( p_mesh );
 
     if ( p_mesh->getRenderDetail()->canGetShadow )
     {
@@ -175,11 +175,11 @@ void MetalShaderShadow::predraw( std::shared_ptr<smMesh> p_mesh )
         glUniform1fARB( canGetShadowUniform, 0 );
     }
 
-    smTextureManager::activateTexture( "depth", 30, shadowMapUniform );
+    TextureManager::activateTexture( "depth", 30, shadowMapUniform );
 }
 
 MetalShaderSoftShadow::MetalShaderSoftShadow() :
-    smMetalShader( "shaders/SingleShadowVertexBumpMap2.cg",
+    MetalShader( "shaders/SingleShadowVertexBumpMap2.cg",
                  "shaders/SingleShadowFragmentBumpMap2.cg" )
 {
     createParam( "ShadowMapTEST" );
@@ -187,17 +187,17 @@ MetalShaderSoftShadow::MetalShaderSoftShadow() :
 
 void MetalShaderSoftShadow::initDraw()
 {
-    smMetalShader::initDraw();
+    MetalShader::initDraw();
     this->print();
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
 }
 
-void MetalShaderSoftShadow::predraw( std::shared_ptr<smMesh> p_mesh )
+void MetalShaderSoftShadow::predraw( std::shared_ptr<Mesh> p_mesh )
 {
-    smMetalShader::predraw( p_mesh );
-    smTextureManager::activateTexture( "depth", 30, shadowMapUniform );
+    MetalShader::predraw( p_mesh );
+    TextureManager::activateTexture( "depth", 30, shadowMapUniform );
 }
 
-void smMetalShader::predraw ( std::shared_ptr<smSurfaceMesh> ) {}
-void MetalShaderSoftShadow::predraw ( std::shared_ptr<smSurfaceMesh> ) {}
-void MetalShaderShadow::predraw ( std::shared_ptr<smSurfaceMesh> ) {}
+void MetalShader::predraw ( std::shared_ptr<SurfaceMesh> ) {}
+void MetalShaderSoftShadow::predraw ( std::shared_ptr<SurfaceMesh> ) {}
+void MetalShaderShadow::predraw ( std::shared_ptr<SurfaceMesh> ) {}

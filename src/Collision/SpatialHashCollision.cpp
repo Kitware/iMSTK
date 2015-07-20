@@ -75,25 +75,25 @@ void SpatialHashCollision::addCollisionModel(std::shared_ptr<SurfaceTreeType> Co
     colModel.push_back(CollMode);
 }
 
-void SpatialHashCollision::addMesh(std::shared_ptr<smMesh> mesh)
+void SpatialHashCollision::addMesh(std::shared_ptr<Mesh> mesh)
 {
     meshes.push_back(mesh);
     mesh->allocateAABBTris();
 }
 
-void SpatialHashCollision::addMesh(std::shared_ptr<smLineMesh> mesh)
+void SpatialHashCollision::addMesh(std::shared_ptr<LineMesh> mesh)
 {
     lineMeshes.push_back(mesh);
 }
 
-void SpatialHashCollision::removeMesh(std::shared_ptr<smMesh> mesh)
+void SpatialHashCollision::removeMesh(std::shared_ptr<Mesh> mesh)
 {
     auto it = std::find(meshes.begin(),meshes.end(),mesh);
     if(it != meshes.end())
         meshes.erase(it);
 }
 
-bool SpatialHashCollision::findCandidatePoints(std::shared_ptr<smMesh> mesh,
+bool SpatialHashCollision::findCandidatePoints(std::shared_ptr<Mesh> mesh,
                                           std::shared_ptr<SpatialHashCollision::SurfaceTreeType> colModel)
 {
     AABB tempAABB;
@@ -112,7 +112,7 @@ bool SpatialHashCollision::findCandidatePoints(std::shared_ptr<smMesh> mesh,
     return found;
 }
 
-bool SpatialHashCollision::findCandidateTris(std::shared_ptr<smMesh> meshA, std::shared_ptr<smMesh> meshB)
+bool SpatialHashCollision::findCandidateTris(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB)
 {
     AABB aabboverlap;
 
@@ -134,7 +134,7 @@ bool SpatialHashCollision::findCandidateTris(std::shared_ptr<smMesh> meshA, std:
     return true;
 }
 
-bool SpatialHashCollision::findCandidateTrisLines(std::shared_ptr<smMesh> meshA, std::shared_ptr<smLineMesh> meshB)
+bool SpatialHashCollision::findCandidateTrisLines(std::shared_ptr<Mesh> meshA, std::shared_ptr<LineMesh> meshB)
 {
     AABB aabboverlap;
 
@@ -285,7 +285,7 @@ void SpatialHashCollision::computeCollisionModel2Points()
     }
 }
 
-void SpatialHashCollision::computeHash(std::shared_ptr<smMesh> mesh, const std::vector<int> &triangleIndexes)
+void SpatialHashCollision::computeHash(std::shared_ptr<Mesh> mesh, const std::vector<int> &triangleIndexes)
 {
     for(auto&& i : triangleIndexes)
     {
@@ -306,7 +306,7 @@ void SpatialHashCollision::computeHash(std::shared_ptr<smMesh> mesh, const std::
     }
 }
 
-void SpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, int triangleId, smHash<CellTriangle> &cells)
+void SpatialHashCollision::addTriangle(std::shared_ptr<Mesh> mesh, int triangleId, smHash<CellTriangle> &cells)
 {
     CellTriangle  triangle;
     triangle.meshID = mesh->getUniqueId();
@@ -332,7 +332,7 @@ void SpatialHashCollision::addTriangle(std::shared_ptr<smMesh> mesh, int triangl
             }
 }
 
-void SpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
+void SpatialHashCollision::addLine(std::shared_ptr<LineMesh> mesh,
                                    int edgeId, smHash<smCellLine> &cells)
 {
     smCellLine  line;
@@ -357,7 +357,7 @@ void SpatialHashCollision::addLine(std::shared_ptr<smLineMesh> mesh,
             }
 }
 
-void SpatialHashCollision::addPoint(std::shared_ptr<smMesh> mesh, int vertId, smHash<smCellPoint> &cells)
+void SpatialHashCollision::addPoint(std::shared_ptr<Mesh> mesh, int vertId, smHash<smCellPoint> &cells)
 {
     smCellPoint cellPoint;
     cellPoint.meshID = mesh->getUniqueId();

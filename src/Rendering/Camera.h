@@ -37,11 +37,11 @@
 ///
 /// \detail The camera will be oriented facing down the -Z axis with an +Y axis
 /// up vector
-class smCamera
+class Camera
 {
 public:
     //Construction/Destruction
-    smCamera();
+    Camera();
 
     //View settings
     /// \brief Set the position of the camera
@@ -277,9 +277,9 @@ public:
     /// position 10 units +Z away from origin(0, 0, 10)
     ///
     /// \return The shared_ptr containing the address of the allocated camera
-    static std::shared_ptr<smCamera> getDefaultCamera()
+    static std::shared_ptr<Camera> getDefaultCamera()
     {
-        std::shared_ptr<smCamera> defaultCamera = std::make_shared<smCamera>();
+        std::shared_ptr<Camera> defaultCamera = std::make_shared<Camera>();
         defaultCamera->setAspectRatio(800.0 / 640.0); //Doesn't have to match screen resolution
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);

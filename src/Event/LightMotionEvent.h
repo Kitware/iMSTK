@@ -28,16 +28,15 @@
 #include "Core/Event.h"
 #include <Core/Vector.h>
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smLightMotionEvent : public Event
+    class LightMotionEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smLightMotionEvent(const int &lightIndex);
+    LightMotionEvent(const int &lightIndex);
 
     void setPosition(const core::Vec3d &lightPosition);
 
@@ -57,7 +56,6 @@ private:
     core::Vec3d direction; // direction
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMLIGHTMOTIONEVENT_H

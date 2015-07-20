@@ -40,7 +40,7 @@ class SDK;
 class CoreClass;
 class RenderDelegate;
 class ObjectSimulator;
-class smViewer;
+class Viewer;
 
 /// \brief simulator calls object and sends this structure
 struct smSimulationParam
@@ -75,7 +75,7 @@ class CoreClass : public std::enable_shared_from_this<CoreClass>
 public:
     using Pointer = std::shared_ptr<CoreClass>;
 
-    static std::shared_ptr<mstk::Event::smEventHandler> eventHandler;
+    static std::shared_ptr<core::EventHandler> eventHandler;
 
 public:
     ///
@@ -128,7 +128,7 @@ public:
     /// This function is called by the event handler after observing
     /// events.
     ///
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event>);
+    virtual void handleEvent(std::shared_ptr<core::Event>);
 
     ///
     /// \brief set the name of object
@@ -178,20 +178,20 @@ public:
     /// \brief Event index used by the event handler to unregister event observers
     /// \return eventIndex
     ///
-    const mstk::Event::smEventHandler::FunctionContainerType::iterator
-    &getEventIndex(const mstk::Event::EventType &eventType) const
+    const core::EventHandler::FunctionContainerType::iterator
+    &getEventIndex(const core::EventType &eventType) const
     { return eventIndexMap.at(eventType); }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void setEventIndex(const mstk::Event::EventType &eventType, mstk::Event::smEventHandler::FunctionContainerType::iterator index)
+    void setEventIndex(const core::EventType &eventType, core::EventHandler::FunctionContainerType::iterator index)
     { eventIndexMap[eventType] = index; }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void removeEventIndex(const mstk::Event::EventType &eventType)
+    void removeEventIndex(const core::EventType &eventType)
     { eventIndexMap.erase(eventType); }
 
     ///
@@ -215,7 +215,7 @@ public:
     std::shared_ptr<RenderDelegate> getRenderDelegate() const;
     void setRenderDelegate(std::shared_ptr<RenderDelegate> delegate);
 
-    void attachEvent(const mstk::Event::EventType &eventType, std::shared_ptr<CoreClass> component)
+    void attachEvent(const core::EventType &eventType, std::shared_ptr<CoreClass> component)
     {
         eventHandler->attachEvent(eventType,component);
     }
@@ -236,8 +236,8 @@ protected:
     std::string name; ///< name of the class
     bool listening; ///< parameter to determine if this object is listening for events
     std::map<
-    mstk::Event::EventType,
-    mstk::Event::smEventHandler::FunctionContainerType::iterator> eventIndexMap;
+    core::EventType,
+    core::EventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<RenderDelegate> renderDelegate; ///!< Class that can render this class
 
 private:

@@ -23,9 +23,9 @@
 
 #include "VegaVolumetricMesh.h"
 
-smVegaVolumetricMesh::smVegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
-smVegaVolumetricMesh::~smVegaVolumetricMesh() {}
-void smVegaVolumetricMesh::loadMesh(const std::string &fileName, const int &verbose)
+VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
+VegaVolumetricMesh::~VegaVolumetricMesh() {}
+void VegaVolumetricMesh::loadMesh(const std::string &fileName, const int &verbose)
 {
     char * name = const_cast<char*>(fileName.c_str());
     VolumetricMesh::elementType elementType = VolumetricMesh::getElementType(name);
@@ -53,24 +53,24 @@ void smVegaVolumetricMesh::loadMesh(const std::string &fileName, const int &verb
         meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(mesh.get()));
     }
 }
-std::shared_ptr<Graph> smVegaVolumetricMesh::getMeshGraph()
+std::shared_ptr<Graph> VegaVolumetricMesh::getMeshGraph()
 {
     return this->meshGraph;
 }
-size_t smVegaVolumetricMesh::getNumberOfVertices() const
+size_t VegaVolumetricMesh::getNumberOfVertices() const
 {
     return this->mesh->getNumVertices();
 }
-size_t smVegaVolumetricMesh::getNumberOfElements() const
+size_t VegaVolumetricMesh::getNumberOfElements() const
 {
     return this->mesh->getNumElements();
 }
-void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surfaceMesh, const double &radius)
+void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius)
 {
     const core::StdVector3d &meshVertices = surfaceMesh->getVertices();
 
     int numElementVertices = this->mesh->getNumElementVertices();
-    int surfaceMeshSize = meshVertices.size();
+    size_t surfaceMeshSize = meshVertices.size();
 
     // Allocate arrays
     this->attachedMeshes.push_back(surfaceMesh);
@@ -123,15 +123,15 @@ void smVegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<smSurfaceMesh> surf
         }
     }
 }
-const std::vector<double> &smVegaVolumetricMesh::getAttachedWeights(const size_t &i) const
+const std::vector<double> &VegaVolumetricMesh::getAttachedWeights(const size_t &i) const
 {
     return this->attachedWeights.at(attachedMeshes[i]);
 }
-const std::vector<int> &smVegaVolumetricMesh::getAttachedVertices(const size_t &i) const
+const std::vector<int> &VegaVolumetricMesh::getAttachedVertices(const size_t &i) const
 {
     return this->attachedVertices.at(attachedMeshes[i]);
 }
-std::shared_ptr< VolumetricMesh > smVegaVolumetricMesh::getVegaMesh()
+std::shared_ptr< VolumetricMesh > VegaVolumetricMesh::getVegaMesh()
 {
     return this->mesh;
 }

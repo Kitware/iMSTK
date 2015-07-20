@@ -65,7 +65,7 @@ SurfaceTree<CellType>::~SurfaceTree()
 
 /// \brief
 template<typename CellType>
-SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, int maxLevels)
+SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<SurfaceMesh> surfaceMesh, int maxLevels)
 {
     mesh = surfaceMesh;
     totalCells = 0;
@@ -109,19 +109,19 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<smSurfaceMesh> surfaceMesh, i
 
 /// \brief handle key press events
 template<typename CellType>
-void SurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
 {
     if(!this->isListening())
     {
         return;
     }
-    auto keyBoardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
+    auto keyBoardEvent = std::static_pointer_cast<event::KeyboardEvent>(event);
     if(keyBoardEvent != nullptr)
     {
-        mstk::Event::smKey keyPressed = keyBoardEvent->getKeyPressed();
+        event::Key keyPressed = keyBoardEvent->getKeyPressed();
         switch(keyPressed)
         {
-            case mstk::Event::smKey::Add:
+            case event::Key::Add:
             {
                 minTreeRenderLevel++;
 
@@ -138,7 +138,7 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::Event> even
                 currentLevel = minTreeRenderLevel;
             }
 
-            case mstk::Event::smKey::Subtract:
+            case event::Key::Subtract:
             {
                 minTreeRenderLevel--;
 
@@ -155,22 +155,22 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<mstk::Event::Event> even
                 currentLevel = minTreeRenderLevel;
             }
 
-            case mstk::Event::smKey::R:
+            case event::Key::R:
             {
                 this->renderSurface = !this->renderSurface;
             }
 
-            case mstk::Event::smKey::P:
+            case event::Key::P:
             {
                 this->enableShiftPos = !this->enableShiftPos;
             }
 
-            case mstk::Event::smKey::K:
+            case event::Key::K:
             {
                 this->renderOnlySurface = !this->renderOnlySurface;
             }
 
-            case mstk::Event::smKey::T:
+            case event::Key::T:
             {
                 updateStructure();
             }

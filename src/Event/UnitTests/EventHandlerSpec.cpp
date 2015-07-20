@@ -37,58 +37,59 @@
 #include "Event/ObjectClickedEvent.h"
 
 using namespace bandit;
-using namespace mstk::Event;
+using namespace core;
+using namespace event;
 
 struct MyObserver : public CoreClass
 {
-    MyObserver(mstk::Event::EventType _eventType) : success(false), eventType(_eventType) {}
+    MyObserver(core::EventType _eventType) : success(false), eventType(_eventType) {}
 
     void handleEvent(std::shared_ptr<Event> event) override
     {
-        std::shared_ptr<smKeyboardEvent> keyboardEvent = std::static_pointer_cast<smKeyboardEvent>(event);
-        if(keyboardEvent != nullptr && smKeyboardEvent::EventName == eventType)
+        std::shared_ptr<KeyboardEvent> keyboardEvent = std::static_pointer_cast<KeyboardEvent>(event);
+        if(keyboardEvent != nullptr && KeyboardEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a keyboard event..." << std::endl;
         }
-        std::shared_ptr<smAudioEvent> audioEvent = std::static_pointer_cast<smAudioEvent>(event);
-        if(audioEvent != nullptr && smAudioEvent::EventName == eventType)
+        std::shared_ptr<AudioEvent> audioEvent = std::static_pointer_cast<AudioEvent>(event);
+        if(audioEvent != nullptr && AudioEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its an audio event..." << std::endl;
         }
-        std::shared_ptr<smCameraEvent> cameraEvent = std::static_pointer_cast<smCameraEvent>(event);
-        if(cameraEvent != nullptr && smCameraEvent::EventName == eventType)
+        std::shared_ptr<CameraEvent> cameraEvent = std::static_pointer_cast<CameraEvent>(event);
+        if(cameraEvent != nullptr && CameraEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a camera event..." << std::endl;
         }
-        std::shared_ptr<smHapticEvent> hapticEvent = std::static_pointer_cast<smHapticEvent>(event);
-        if(hapticEvent != nullptr && smHapticEvent::EventName == eventType)
+        std::shared_ptr<HapticEvent> hapticEvent = std::static_pointer_cast<HapticEvent>(event);
+        if(hapticEvent != nullptr && HapticEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a haptic event..." << std::endl;
         }
-        std::shared_ptr<smLightMotionEvent> lightEvent = std::static_pointer_cast<smLightMotionEvent>(event);
-        if(lightEvent != nullptr && smLightMotionEvent::EventName == eventType)
+        std::shared_ptr<LightMotionEvent> lightEvent = std::static_pointer_cast<LightMotionEvent>(event);
+        if(lightEvent != nullptr && LightMotionEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a light event..." << std::endl;
         }
-        std::shared_ptr<smMouseButtonEvent> mouseButtonEvent = std::static_pointer_cast<smMouseButtonEvent>(event);
-        if(mouseButtonEvent != nullptr && smMouseButtonEvent::EventName == eventType)
+        std::shared_ptr<MouseButtonEvent> mouseButtonEvent = std::static_pointer_cast<MouseButtonEvent>(event);
+        if(mouseButtonEvent != nullptr && MouseButtonEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a mouse button event..." << std::endl;
         }
-        std::shared_ptr<smMouseMoveEvent> mouseMoveEvent = std::static_pointer_cast<smMouseMoveEvent>(event);
-        if(mouseMoveEvent != nullptr && smMouseMoveEvent::EventName == eventType)
+        std::shared_ptr<MouseMoveEvent> mouseMoveEvent = std::static_pointer_cast<MouseMoveEvent>(event);
+        if(mouseMoveEvent != nullptr && MouseMoveEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its a mouse button event..." << std::endl;
         }
-        std::shared_ptr<smObjectClickedEvent> objectClickedEvent = std::static_pointer_cast<smObjectClickedEvent>(event);
-        if(objectClickedEvent != nullptr && smObjectClickedEvent::EventName == eventType)
+        std::shared_ptr<ObjectClickedEvent> objectClickedEvent = std::static_pointer_cast<ObjectClickedEvent>(event);
+        if(objectClickedEvent != nullptr && ObjectClickedEvent::EventName == eventType)
         {
             success = true;
             std::cout << "its an object clicked event..." << std::endl;
@@ -96,91 +97,91 @@ struct MyObserver : public CoreClass
 
     }
     bool success;
-    mstk::Event::EventType eventType;
+    core::EventType eventType;
 };
 
 go_bandit([](){
 
     describe("Event handler", []() {
         it("constructs ", []() {
-            std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
+            std::shared_ptr<EventHandler> eventHandler = std::make_shared<EventHandler>();
             AssertThat(eventHandler != nullptr, IsTrue());
         });
         it("attaches events ", []() {
-            std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
+            std::shared_ptr<EventHandler> eventHandler = std::make_shared<EventHandler>();
 
             Event::Pointer event = std::make_shared<Event>();
             CoreClass::Pointer observer = std::make_shared<CoreClass>();
 
-            eventHandler->attachEvent(mstk::Event::EventType::Audio,observer);
+            eventHandler->attachEvent(core::EventType::Audio,observer);
 
-            AssertThat(eventHandler->isAttached(mstk::Event::EventType::Audio,observer), IsTrue());
+            AssertThat(eventHandler->isAttached(core::EventType::Audio,observer), IsTrue());
 
         });
         it("detaches events ", []() {
-            std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
+            std::shared_ptr<EventHandler> eventHandler = std::make_shared<EventHandler>();
 
             Event::Pointer event = std::make_shared<Event>();
             CoreClass::Pointer observer = std::make_shared<CoreClass>();
 
-            eventHandler->attachEvent(mstk::Event::EventType::Audio,observer);
+            eventHandler->attachEvent(core::EventType::Audio,observer);
 
-            AssertThat(eventHandler->isAttached(mstk::Event::EventType::Audio,observer), IsTrue());
-            auto index = observer->getEventIndex(mstk::Event::EventType::Audio);
+            AssertThat(eventHandler->isAttached(core::EventType::Audio,observer), IsTrue());
+            auto index = observer->getEventIndex(core::EventType::Audio);
 
-            eventHandler->detachEvent(mstk::Event::EventType::Audio,observer);
+            eventHandler->detachEvent(core::EventType::Audio,observer);
 
-            AssertThat(eventHandler->isAttached(mstk::Event::EventType::Audio,index), IsFalse());
+            AssertThat(eventHandler->isAttached(core::EventType::Audio,index), IsFalse());
         });
         it("dispatches events ", []() {
-            std::shared_ptr<smEventHandler> eventHandler = std::make_shared<smEventHandler>();
+            std::shared_ptr<EventHandler> eventHandler = std::make_shared<EventHandler>();
 
             Event::Pointer event = std::make_shared<Event>();
             std::shared_ptr<MyObserver> observer;
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::None);
-            eventHandler->attachEvent(mstk::Event::EventType::None,observer);
+            observer = std::make_shared<MyObserver>(core::EventType::None);
+            eventHandler->attachEvent(core::EventType::None,observer);
             eventHandler->triggerEvent(std::make_shared<Event>());
             AssertThat(observer->success, IsFalse());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::Audio);
-            eventHandler->attachEvent(mstk::Event::EventType::Audio,observer);
-            eventHandler->triggerEvent(std::make_shared<smAudioEvent>());
+            observer = std::make_shared<MyObserver>(core::EventType::Audio);
+            eventHandler->attachEvent(core::EventType::Audio,observer);
+            eventHandler->triggerEvent(std::make_shared<AudioEvent>());
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::Keyboard);
-            eventHandler->attachEvent(mstk::Event::EventType::Keyboard,observer);
-            eventHandler->triggerEvent(std::make_shared<smKeyboardEvent>(smKey::A));
+            observer = std::make_shared<MyObserver>(core::EventType::Keyboard);
+            eventHandler->attachEvent(core::EventType::Keyboard,observer);
+            eventHandler->triggerEvent(std::make_shared<KeyboardEvent>(Key::A));
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::CameraUpdate);
-            eventHandler->attachEvent(mstk::Event::EventType::CameraUpdate,observer);
-            eventHandler->triggerEvent(std::make_shared<smCameraEvent>());
+            observer = std::make_shared<MyObserver>(core::EventType::CameraUpdate);
+            eventHandler->attachEvent(core::EventType::CameraUpdate,observer);
+            eventHandler->triggerEvent(std::make_shared<CameraEvent>());
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::Haptic);
-            eventHandler->attachEvent(mstk::Event::EventType::Haptic,observer);
-            eventHandler->triggerEvent(std::make_shared<smHapticEvent>(0,"HapticDevice"));
+            observer = std::make_shared<MyObserver>(core::EventType::Haptic);
+            eventHandler->attachEvent(core::EventType::Haptic,observer);
+            eventHandler->triggerEvent(std::make_shared<HapticEvent>(0,"HapticDevice"));
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::LightMotion);
-            eventHandler->attachEvent(mstk::Event::EventType::LightMotion,observer);
-            eventHandler->triggerEvent(std::make_shared<smLightMotionEvent>(0));
+            observer = std::make_shared<MyObserver>(core::EventType::LightMotion);
+            eventHandler->attachEvent(core::EventType::LightMotion,observer);
+            eventHandler->triggerEvent(std::make_shared<LightMotionEvent>(0));
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::MouseButton);
-            eventHandler->attachEvent(mstk::Event::EventType::MouseButton,observer);
-            eventHandler->triggerEvent(std::make_shared<smMouseButtonEvent>(smMouseButton::Button0));
+            observer = std::make_shared<MyObserver>(core::EventType::MouseButton);
+            eventHandler->attachEvent(core::EventType::MouseButton,observer);
+            eventHandler->triggerEvent(std::make_shared<MouseButtonEvent>(MouseButton::Button0));
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::MouseMove);
-            eventHandler->attachEvent(mstk::Event::EventType::MouseMove,observer);
-            eventHandler->triggerEvent(std::make_shared<smMouseMoveEvent>());
+            observer = std::make_shared<MyObserver>(core::EventType::MouseMove);
+            eventHandler->attachEvent(core::EventType::MouseMove,observer);
+            eventHandler->triggerEvent(std::make_shared<MouseMoveEvent>());
             AssertThat(observer->success, IsTrue());
 
-            observer = std::make_shared<MyObserver>(mstk::Event::EventType::ObjectClicked);
-            eventHandler->attachEvent(mstk::Event::EventType::ObjectClicked,observer);
-            eventHandler->triggerEvent(std::make_shared<smObjectClickedEvent>(0));
+            observer = std::make_shared<MyObserver>(core::EventType::ObjectClicked);
+            eventHandler->attachEvent(core::EventType::ObjectClicked,observer);
+            eventHandler->triggerEvent(std::make_shared<ObjectClickedEvent>(0));
             AssertThat(observer->success, IsTrue());
 
         });

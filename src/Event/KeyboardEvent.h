@@ -28,18 +28,17 @@
 #include "Core/Event.h"
 #include "Key.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smKeyboardEvent : public Event
+class KeyboardEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smKeyboardEvent(const smKey &button);
+    KeyboardEvent(const Key &button);
 
-    const smKey &getKeyPressed();
+    const Key &getKeyPressed();
 
     void setPressed(const bool &press);
 
@@ -47,17 +46,16 @@ public:
 
     const bool &togglePressed();
 
-    void setModifierKey(const smModKey &modKey);
+    void setModifierKey(const ModKey &modKey);
 
-    const smModKey &getModifierKey();
+    const ModKey &getModifierKey();
 
 private:
     bool pressed; ///< If the key was pressed or released in this event
-    smKey key; ///< Key that was pressed
-    smModKey modKey; ///< Modifier keys.  See smModKey for values
+    Key key; ///< Key that was pressed
+    ModKey modKey; ///< Modifier keys.  See ModKey for values
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMKEYBOARDEVENT_H

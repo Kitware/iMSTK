@@ -53,7 +53,7 @@ class SceneObject : public CoreClass
 {
     friend class SDK;
     friend class ViewerBase;
-    friend class smViewer;
+    friend class Viewer;
     friend class Scene;
     friend class ObjectSimulator;
 

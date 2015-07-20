@@ -23,19 +23,17 @@
 
 #include "MouseMoveEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smMouseMoveEvent::EventName = EventType::MouseMove;
+core::EventType MouseMoveEvent::EventName = core::EventType::MouseMove;
 
-void smMouseMoveEvent::setWindowCoord(const core::Vec2d& coordinates)
+void MouseMoveEvent::setWindowCoord(const core::Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec2d& smMouseMoveEvent::getWindowCoord()
+const core::Vec2d& MouseMoveEvent::getWindowCoord()
 {
     return this->coord;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

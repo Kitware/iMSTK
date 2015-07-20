@@ -25,7 +25,7 @@
 
 
 /// \brief constructor
-smVolumeMesh::smVolumeMesh(const smMeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
+VolumeMesh::VolumeMesh(const MeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
 {
 
     this->log_VM = log;
@@ -34,12 +34,12 @@ smVolumeMesh::smVolumeMesh(const smMeshType &p_meshtype, std::shared_ptr<ErrorLo
 }
 
 /// \brief loads the specified volume mesh
-bool smVolumeMesh::loadMesh(const std::string& fileName, const smMeshFileType &fileType)
+bool VolumeMesh::loadMesh(const std::string& fileName, const MeshFileType &fileType)
 {
 
     bool ret;
 
-    if (fileType == SM_FILETYPE_VOLUME)
+    if (fileType == BaseMesh::MeshFileType::Volume)
     {
         ret = LoadTetra(fileName);
 
@@ -63,7 +63,7 @@ bool smVolumeMesh::loadMesh(const std::string& fileName, const smMeshFileType &f
 }
 
 /// \brief
-void smVolumeMesh::translateVolumeMesh(const core::Vec3d &p_offset)
+void VolumeMesh::translateVolumeMesh(const core::Vec3d &p_offset)
 {
 
     this->translate(p_offset);
@@ -75,7 +75,7 @@ void smVolumeMesh::translateVolumeMesh(const core::Vec3d &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::scaleVolumeMesh(const core::Vec3d &p_offset)
+void VolumeMesh::scaleVolumeMesh(const core::Vec3d &p_offset)
 {
 
     scale(p_offset);
@@ -87,7 +87,7 @@ void smVolumeMesh::scaleVolumeMesh(const core::Vec3d &p_offset)
 }
 
 /// \brief
-void smVolumeMesh::rotVolumeMesh(const Matrix33d &p_rot)
+void VolumeMesh::rotVolumeMesh(const Matrix33d &p_rot)
 {
 
     rotate(p_rot);
@@ -100,7 +100,7 @@ void smVolumeMesh::rotVolumeMesh(const Matrix33d &p_rot)
 
 /// \brief loads the tetra mesh from abacus
 ///Extensions to support other formats will come soon...
-bool smVolumeMesh::LoadTetra(const std::string& fileName)
+bool VolumeMesh::LoadTetra(const std::string& fileName)
 {
 
     float number;
@@ -153,8 +153,8 @@ bool smVolumeMesh::LoadTetra(const std::string& fileName)
 
     for (i = 0; i < nbrTetra; i++)
     {
-        tetra.emplace_back(smTetrahedra());
-        smTetrahedra &tetrahedra = tetra.back();
+        tetra.emplace_back(Tetrahedra());
+        Tetrahedra &tetrahedra = tetra.back();
         fscanf(fp, "%f", &number);
         fscanf(fp, "%c", &comma);
         fscanf(fp, "%f", &number);
@@ -176,7 +176,7 @@ bool smVolumeMesh::LoadTetra(const std::string& fileName)
 }
 
 /// \brief loads the surface vertices and triangles
-bool smVolumeMesh::getSurface(const std::string& fileName)
+bool VolumeMesh::getSurface(const std::string& fileName)
 {
 
     float number;
@@ -197,7 +197,7 @@ bool smVolumeMesh::getSurface(const std::string& fileName)
     char stri[19];
     fscanf(fp, "%s\n", stri);
 
-    std::vector<smTriangle> triangles;
+    std::vector<Triangle> triangles;
     for (i = 0; i < nbrTriangles; i++)
     {
         fscanf(fp, "%f", &number);
@@ -275,7 +275,7 @@ bool smVolumeMesh::getSurface(const std::string& fileName)
 
 /// \brief loads the tetra mesh from abacus
 ///Extensions to support other formats will come soon...
-bool smVolumeMesh::readBC(const std::string& fileName)
+bool VolumeMesh::readBC(const std::string& fileName)
 {
     int number;
     char comma;
@@ -302,7 +302,7 @@ bool smVolumeMesh::readBC(const std::string& fileName)
 }
 
 /// \brief copies the updated co-ordinates of the surface vertices only
-void smVolumeMesh::copySurface()
+void VolumeMesh::copySurface()
 {
 
     int i;
@@ -319,7 +319,7 @@ void smVolumeMesh::copySurface()
 }
 
 /// \brief copies the updated co-ordinates of the surface vertices only
-void smVolumeMesh::initSurface()
+void VolumeMesh::initSurface()
 {
     int i;
 
@@ -339,21 +339,21 @@ void smVolumeMesh::initSurface()
     updateVertexNormals();
 }
 // WIP
-void smVolumeMesh::updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh)
+void VolumeMesh::updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> /*vega3dMesh*/)
 {
-    int i, threeI;
+//     int i, threeI;
 
     //copy the nodal co-ordinates
-    for(i=0; i<this->nbrVertices ; i++)
-    {
-        threeI = 3*i;
+//     for(i=0; i<this->nbrVertices ; i++)
+//     {
+//         threeI = 3*i;
         /*this->nodes[i][0] = (*nodes)[threeI];
         this->nodes[i][1] = (*nodes)[threeI+1];
         this->nodes[i][2] = (*nodes)[threeI+2];*/
-    }
+//     }
 }
 
-void smVolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
+void VolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
 {
     int i, threeI, j;
 
@@ -403,12 +403,12 @@ void smVolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const Vo
 }
 
 /// \brief destructor
-smVolumeMesh::~smVolumeMesh()
+VolumeMesh::~VolumeMesh()
 {
 
 }
 
-smVolumeMesh::smVolumeMesh()
+VolumeMesh::VolumeMesh()
 {
     nbrNodes = 0;
     nbrTetra = 0;

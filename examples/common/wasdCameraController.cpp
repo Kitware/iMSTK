@@ -34,13 +34,13 @@ wasdCameraController::wasdCameraController()
 {
 }
 
-wasdCameraController::wasdCameraController(std::shared_ptr<smCamera> cam)
+wasdCameraController::wasdCameraController(std::shared_ptr<Camera> cam)
     : moveDistance{1.0},
       camera(cam)
 {
 }
 
-void wasdCameraController::setCamera(std::shared_ptr<smCamera> cam)
+void wasdCameraController::setCamera(std::shared_ptr<Camera> cam)
 {
     camera = cam;
 }
@@ -50,20 +50,20 @@ void wasdCameraController::setStepSize(float size)
     moveDistance = size;
 }
 
-void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void wasdCameraController::handleEvent(std::shared_ptr<core::Event> e)
 {
-    assert(nullptr != event);
+    assert(nullptr != e);
     assert(nullptr != camera);
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(e);
     if(keyboardEvent->getPressed())
     {
         core::Vec3f dispVec = core::Vec3f::Zero(); //Vector to store displacement of camera
         switch(keyboardEvent->getKeyPressed())
         {
-        case mstk::Event::smKey::W:
+        case event::Key::W:
         {
-            if(mstk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & mstk::Event::smModKey::shift))
+            if(event::ModKey::shift == (keyboardEvent->getModifierKey() & event::ModKey::shift))
             {
                 //Move the camera up
                 dispVec(1) = moveDistance;
@@ -75,15 +75,15 @@ void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event
             }
             break;
         }
-        case mstk::Event::smKey::A:
+        case event::Key::A:
         {
             //Move the camera to the left
             dispVec(0) = -moveDistance;
             break;
         }
-        case mstk::Event::smKey::S:
+        case event::Key::S:
         {
-            if(mstk::Event::smModKey::shift == (keyboardEvent->getModifierKey() & mstk::Event::smModKey::shift))
+            if(event::ModKey::shift == (keyboardEvent->getModifierKey() & event::ModKey::shift))
             {
                 //Move the camera down
                 dispVec(1) = -moveDistance;
@@ -95,7 +95,7 @@ void wasdCameraController::handleEvent(std::shared_ptr<mstk::Event::Event> event
             }
             break;
         }
-        case mstk::Event::smKey::D:
+        case event::Key::D:
         {
             //Move the camera to the right
             dispVec(0) = moveDistance;

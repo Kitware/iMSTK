@@ -282,7 +282,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
 }
 
 /// \brief
-void PhantomInterface::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void PhantomInterface::handleEvent(std::shared_ptr<core::Event> event)
 {
 
     smHapticInEventData *hapticEventData;

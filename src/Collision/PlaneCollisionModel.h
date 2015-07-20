@@ -26,7 +26,7 @@
 
 #include "Geometry/PlaneModel.h"
 
-class PlaneCollisionModel : public smPlaneModel
+class PlaneCollisionModel : public PlaneModel
 {
 public:
     PlaneCollisionModel(const core::Vec3d &p, const core::Vec3d &n);

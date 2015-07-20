@@ -65,18 +65,18 @@ AlphaMapExample::AlphaMapExample()
 
 
 
-    smTextureManager::init(SDK::getErrorLog());
-    smTextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg", "groundImage");
-    smTextureManager::loadTexture("../../resources/textures/4351-normal.jpg", "groundBumpImage");
-    smTextureManager::loadTexture("../../resources/textures/brick.jpg", "wallImage");
-    smTextureManager::loadTexture("../../resources/textures/brick-normal.jpg", "wallBumpImage");
-    smTextureManager::loadTexture("../../resources/textures/Tissue.jpg", "diffuse");
-    smTextureManager::loadTexture("../../resources/textures/Tissue_Alpha.jpg", "alpha");
-    smTextureManager::loadTexture("../../resources/textures/Tissue_NORM.jpg", "norm");
-    smTextureManager::loadTexture("../../resources/textures/Tissue_SPEC.jpg", "spec");
-    smTextureManager::loadTexture("../../resources/textures/band.bmp", "noOCC");
+    TextureManager::init(SDK::getErrorLog());
+    TextureManager::loadTexture("../../resources/textures/4351-diffuse.jpg", "groundImage");
+    TextureManager::loadTexture("../../resources/textures/4351-normal.jpg", "groundBumpImage");
+    TextureManager::loadTexture("../../resources/textures/brick.jpg", "wallImage");
+    TextureManager::loadTexture("../../resources/textures/brick-normal.jpg", "wallBumpImage");
+    TextureManager::loadTexture("../../resources/textures/Tissue.jpg", "diffuse");
+    TextureManager::loadTexture("../../resources/textures/Tissue_Alpha.jpg", "alpha");
+    TextureManager::loadTexture("../../resources/textures/Tissue_NORM.jpg", "norm");
+    TextureManager::loadTexture("../../resources/textures/Tissue_SPEC.jpg", "spec");
+    TextureManager::loadTexture("../../resources/textures/band.bmp", "noOCC");
 
-    object1->mesh->loadMeshLegacy("../../resources/models/gall_tissue.3DS", SM_FILETYPE_3DS);
+    object1->mesh->loadMeshLegacy("../../resources/models/gall_tissue.3DS", BaseMesh::MeshFileType::ThreeDS);
 
     metalShader->attachTexture(object1->mesh->getUniqueId(), "norm", "BumpTex");
     metalShader->attachTexture(object1->mesh->getUniqueId(), "diffuse", "DecalTex");

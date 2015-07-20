@@ -37,7 +37,7 @@ go_bandit([](){
         it("loads mesh ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
 
             meshCollisionModel->setMesh(mesh);
 
@@ -47,7 +47,7 @@ go_bandit([](){
         it("can access positions ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
 
             // Add two triangles to the data structure
@@ -94,7 +94,7 @@ go_bandit([](){
         it("can access normals ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
 
             // Add two triangles to the data structure
@@ -140,7 +140,7 @@ go_bandit([](){
         it("create BVH ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
 
             // Add two triangles to the data structure
@@ -178,7 +178,7 @@ go_bandit([](){
 
             std::shared_ptr<MeshCollisionModel::AABBTreeType>
             modelAabbTree = std::make_shared<MeshCollisionModel::AABBTreeType>(
-                std::static_pointer_cast<smSurfaceMesh>(mesh),6);
+                std::static_pointer_cast<SurfaceMesh>(mesh),6);
             modelAabbTree->initStructure();
 
             meshCollisionModel->setAABBTree(modelAabbTree);

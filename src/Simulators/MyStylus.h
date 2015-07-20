@@ -44,7 +44,7 @@ public:
     smMeshContainer meshContainer, meshContainerLower, meshContainerUpper; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief constructor
     MyStylus(const std::string& p_shaft = "../../resources/models/blunt_diss_pivot.3DS",
@@ -65,7 +65,7 @@ public:
     smMeshContainer meshContainer; ///< !!
 
     /// \brief handle keyboard and omni button presses
-    void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     /// \brief constructor
     HookCautery(const std::string& p_pivot = "../../resources/models/hook_cautery_new.3DS");

@@ -1,3 +1,5 @@
+/// WARNING: This file is distributed under the GPL
+/// TODO: Removed from the source tree.
 
 //	STL-like templated tree class.
 //

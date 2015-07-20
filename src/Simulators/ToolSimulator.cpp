@@ -118,19 +118,19 @@ void smToolSimulator::syncBuffers()
 {
 }
 
-void smToolSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
+void smToolSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::F1:
+            case event::Key::F1:
             {
                 std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
             }

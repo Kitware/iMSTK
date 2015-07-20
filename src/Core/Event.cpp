@@ -23,8 +23,7 @@
 
 #include "Event.h"
 
-namespace mstk {
-namespace Event {
+namespace core {
 
 EventType Event::EventName = EventType::None;
 
@@ -57,6 +56,5 @@ const bool& Event::getEnabled()
     return this->enabled;
 }
 
-} // Event namespace
-} // mstk namespace
+} // core namespace
 

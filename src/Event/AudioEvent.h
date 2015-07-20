@@ -30,24 +30,22 @@
 // SimMedTK includes
 #include "Core/Event.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-/// \brief contains state of the audio driver
-enum class AudioState
-{
-    Unknown = -1,
-    Play = 0,
-    Stop,
-};
-
-class smAudioEvent: public Event
+class AudioEvent: public core::Event
 {
 public:
-    static EventType EventName;
+    /// \brief contains state of the audio driver
+    enum class AudioState
+    {
+        Unknown = -1,
+        Play = 0,
+        Stop,
+    };
+    static core::EventType EventName;
 
 public:
-    smAudioEvent();
+    AudioEvent();
 
     void setState(const AudioState &audioState);
 
@@ -67,7 +65,6 @@ private:
     float volume;
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMAUDIOEVENT_H

@@ -40,7 +40,7 @@
 */
 #include <iostream>
 
-#include "External/framebufferObject.h"
+#include "FrameBufferObject.h"
 
 using namespace std;
 

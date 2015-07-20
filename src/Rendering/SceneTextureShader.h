@@ -27,19 +27,16 @@
 // SimMedTK includes
 #include "Shader.h"
 
-namespace mstk{
-namespace Event{
-
+namespace core {
     class Event;
-}
 }
 
 /// \brief scene texture shader. This shader works on the scene that is placed on 2D image. It is for image based effects
-class smSceneTextureShader: public smShader
+class SceneTextureShader: public Shader
 {
 public:
     /// \brief constructor that receives the vertex and fragment shader file names
-    smSceneTextureShader(const std::string &p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
+    SceneTextureShader(const std::string &p_verteShaderFileName = "shaders/renderSceneVertexShader.glsl",
                          const std::string &p_fragmentFileName = "shaders/renderSceneFragShader.glsl");
 
     /// \brief called during  rendering initialization
@@ -49,12 +46,12 @@ public:
     void draw() const override;
 
     /// \brief pre drawing of the shader. used for binding the uniforms if there are.
-    virtual void predraw(std::shared_ptr<smMesh> p_mesh) override;
+    virtual void predraw(std::shared_ptr<Mesh> p_mesh) override;
 
-    virtual void predraw(std::shared_ptr<smSurfaceMesh>) override{};
+    virtual void predraw(std::shared_ptr<SurfaceMesh>) override{};
 
     /// \brief handle the events
-    virtual void handleEvent(std::shared_ptr<mstk::Event::Event> p_event) override;
+    virtual void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
 public:
     /// \brief depth  texture GL id that is sent to shader. It stores scene depth values

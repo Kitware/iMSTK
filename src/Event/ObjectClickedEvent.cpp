@@ -23,21 +23,19 @@
 
 #include "ObjectClickedEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smObjectClickedEvent::EventName = EventType::ObjectClicked;
+core::EventType ObjectClickedEvent::EventName = core::EventType::ObjectClicked;
 
-smObjectClickedEvent::smObjectClickedEvent(const size_t& objectId): id(objectId)
+ObjectClickedEvent::ObjectClickedEvent(const size_t& objectId): id(objectId)
 {}
-void smObjectClickedEvent::setWindowCoord(const core::Vec3d& coordinates)
+void ObjectClickedEvent::setWindowCoord(const core::Vec3d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec3d& smObjectClickedEvent::getWindowCoord()
+const core::Vec3d& ObjectClickedEvent::getWindowCoord()
 {
     return this->coord;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

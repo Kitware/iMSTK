@@ -29,7 +29,6 @@ bool SurfaceTreeRenderDelegate::drawTree() const
     return false;
 
   core::Vec3d center;
-  double length;
   glColor3fv(Color::colorGreen.toGLColor());
 
   glEnable(GL_LIGHTING);

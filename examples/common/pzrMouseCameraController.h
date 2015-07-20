@@ -48,17 +48,17 @@ public:
     /// \brief Default constructor
     ///
     /// \param cam Pointer to camera to be controlled
-    pzrMouseCameraController(std::shared_ptr<smCamera> cam);
+    pzrMouseCameraController(std::shared_ptr<Camera> cam);
 
     /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
+    void handleEvent(std::shared_ptr<core::Event> event) override;
 
     /// \brief Set the camera to be controlled
     ///
     /// \param cam Pointer to camera to be controlled
-    void setCamera(std::shared_ptr<smCamera> cam);
+    void setCamera(std::shared_ptr<Camera> cam);
 
     /// \brief Set the step size that the camera moves with each key press
     ///
@@ -66,10 +66,10 @@ public:
     void setStepSize(float size);
 
 private:
-    std::shared_ptr<smCamera> camera; ///< Pointer to camera being controlled
     float moveDistance; ///< Modifier to the movement distance for operations
     bool lmbPressed; ///< Left mouse button (un)pressed
     bool rmbPressed; ///< Right mouse button (un)pressed
+    std::shared_ptr<Camera> camera; ///< Pointer to camera being controlled
     core::Vec2f coords; ///< Record of last window coords manipulated
 };
 

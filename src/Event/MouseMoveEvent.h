@@ -28,13 +28,12 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smMouseMoveEvent : public Event
+class MouseMoveEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
     void setWindowCoord(const core::Vec2d &coordinates);
@@ -45,7 +44,6 @@ private:
     core::Vec2d coord; // X,Y coorindate relative to left edge
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMMOUSEMOVEEVENT_H

@@ -33,7 +33,7 @@ void smPBDObjectSimulator::draw()
     for (size_t i = 0; i < objectsSimulated.size(); i++)
     {
         sceneObject = std::static_pointer_cast<smPBDSurfaceSceneObject>(objectsSimulated[i]);
-        smGLRenderer::draw(sceneObject->mesh->aabb);
+        GLRenderer::draw(sceneObject->mesh->aabb);
     }
 }
 smPBDObjectSimulator::smPBDObjectSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
@@ -202,7 +202,7 @@ void smPBDObjectSimulator::syncBuffers()
         }
     }
 }
-void smPBDObjectSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
+void smPBDObjectSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
     ;
 
@@ -213,7 +213,7 @@ void smPBDObjectSimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_eve
             auto keyBoardData =
             std::static_pointer_cast<smKeyboardEventData>(p_event->getEventData());
 
-            if ( keyBoardData->keyBoardKey == smKey::F1 )
+            if ( keyBoardData->keyBoardKey == Key::F1 )
             {
                 printf( "F1 Keyboard is pressed %c\n", keyBoardData->keyBoardKey );
             }

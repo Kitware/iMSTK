@@ -48,7 +48,7 @@ void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pai
 
     core::Vec3d vert;
     pair->clearContacts();
-    for (int i = 0; i < mesh->getVertices().size(); i++)//const auto& vertex : mesh->getVertices()
+    for (size_t i = 0; i < mesh->getVertices().size(); i++)//const auto& vertex : mesh->getVertices()
     {
         vert = mesh->getVertices()[i];
         d = planeNormal.dot(vert - planePos);

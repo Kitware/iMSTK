@@ -24,7 +24,7 @@
 #include "StaticSceneObject.h"
 #include "Factory.h"
 
-StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> p_log) : SceneObject()
+StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
 {
     type = core::ClassType::StaticSceneObject;
 
@@ -55,7 +55,7 @@ void StaticSceneObject::loadInitialStates()
 {
 }
 
-bool StaticSceneObject::configure(const std::string ConfigFile)
+bool StaticSceneObject::configure(const std::string /*ConfigFile*/)
 {
     return false;
 }

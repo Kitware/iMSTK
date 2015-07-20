@@ -45,7 +45,8 @@ public:
                 const core::Vec3d& p,
                 const int ind,
                 const core::Vec3d& contactNornmal
-				) : depth(penetrationDepth), point(p), index(ind), normal(contactNornmal){}
+                ) :
+                depth(penetrationDepth), point(p), normal(contactNornmal), index(ind){}
 
     void printInfo()
     {

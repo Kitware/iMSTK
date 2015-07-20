@@ -23,63 +23,61 @@
 
 #include "HapticEvent.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-EventType smHapticEvent::EventName = EventType::Haptic;
+core::EventType HapticEvent::EventName = core::EventType::Haptic;
 
-smHapticEvent::smHapticEvent(const size_t& deviceId, const std::string& deviceName): id(deviceId), name(deviceName)
+HapticEvent::HapticEvent(const size_t& deviceId, const std::string& deviceName): id(deviceId), name(deviceName)
 {}
 
-void smHapticEvent::setPosition(const core::Vec3d& coordinates)
+void HapticEvent::setPosition(const core::Vec3d& coordinates)
 {
     this->position = coordinates;
 }
 
-const core::Vec3d& smHapticEvent::getPosition()
+const core::Vec3d& HapticEvent::getPosition()
 {
     return this->position;
 }
-void smHapticEvent::setVelocity(const core::Vec3d& deviceVelocity)
+void HapticEvent::setVelocity(const core::Vec3d& deviceVelocity)
 {
     this->velocity = deviceVelocity;
 }
-const core::Vec3d& smHapticEvent::getVelocity()
+const core::Vec3d& HapticEvent::getVelocity()
 {
     return this->velocity;
 }
-void smHapticEvent::setAngles(const core::Vec3d& deviceAngles)
+void HapticEvent::setAngles(const core::Vec3d& deviceAngles)
 {
     this->angles = deviceAngles;
 }
-const core::Vec3d& smHapticEvent::getAngles()
+const core::Vec3d& HapticEvent::getAngles()
 {
     return this->angles;
 }
-const Matrix44d& smHapticEvent::getTransform()
+const Matrix44d& HapticEvent::getTransform()
 {
     return this->transform;
 }
-void smHapticEvent::setTransform(const Matrix44d& deviceTransform)
+void HapticEvent::setTransform(const Matrix44d& deviceTransform)
 {
     this->transform = deviceTransform;
 }
-const core::Vec3d& smHapticEvent::getForce()
+const core::Vec3d& HapticEvent::getForce()
 {
     return this->force;
 }
-void smHapticEvent::setForce(const core::Vec3d& deviceForce)
+void HapticEvent::setForce(const core::Vec3d& deviceForce)
 {
     this->force = deviceForce;
 }
-const core::Vec3d& smHapticEvent::getTorque()
+const core::Vec3d& HapticEvent::getTorque()
 {
     return this->torque;
 }
-void smHapticEvent::setTorque(const core::Vec3d& deviceTorque)
+void HapticEvent::setTorque(const core::Vec3d& deviceTorque)
 {
     this->torque = deviceTorque;
 }
 
-} // Event namespace
-} // mstk namespace
+} // event namespace

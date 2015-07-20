@@ -5,6 +5,6 @@ add_executable(${Module}UnitTestRunner
   Factory.cpp
 )
 
-target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast>)
+target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
 target_link_libraries(${Module}UnitTestRunner Core)
 simple_test(${Module} --reporter=spec)

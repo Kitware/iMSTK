@@ -33,16 +33,15 @@
 #include <Core/Vector.h>
 #include <Core/Matrix.h>
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smHapticEvent : public Event
+class HapticEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smHapticEvent(const size_t &deviceId, const std::string &deviceName);
+    HapticEvent(const size_t &deviceId, const std::string &deviceName);
 
     void setPosition(const core::Vec3d &coordinates);
 
@@ -95,7 +94,6 @@ private:
     std::array<bool,4> buttonState;//will be chnage later on
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMHAPTICEVENT_H

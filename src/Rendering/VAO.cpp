@@ -25,14 +25,14 @@
 #include "Shader.h"
 #include "Viewer.h"
 
-std::unordered_map<int, std::shared_ptr<smVAO>> smVAO::VAOs;
+std::unordered_map<int, std::shared_ptr<VAO>> VAO::VAOs;
 
-void smVAO::initBuffers()
+void VAO::initBuffers()
 {
     std::string error;
     ///Create the Vertex Array Objects
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    glGenVertexArrays(1, &vaObject);
+    glBindVertexArray(vaObject);
 
     ///Create Vertex Buffer Objects(VBOs)
     glGenBuffers(totalNbrBuffers, bufferIndices);
@@ -127,7 +127,7 @@ void smVAO::initBuffers()
 }
 
 ///Updates the buffers. Call this function if there is change in the mesh. If it is a simulation mesh, it needs to be called in and very frame
-bool smVAO::updateStreamData() const
+bool VAO::updateStreamData() const
 {
 
     if (this->vboType == SIMMEDTK_VBO_STATIC)
@@ -162,7 +162,7 @@ bool smVAO::updateStreamData() const
     return false;
 }
 
-void smVAO::draw() const
+void VAO::draw() const
 {
     glPushAttrib(GL_ENABLE_BIT);
     shader->enableShader();
@@ -174,7 +174,7 @@ void smVAO::draw() const
     shader->disableShader();
     glPopAttrib();
 }
-smVBOBufferEntryInfo::smVBOBufferEntryInfo()
+VBOBufferEntryInfo::VBOBufferEntryInfo()
 {
     shaderAttribLocation = -1;
     attributeIndex = 1;
@@ -182,18 +182,18 @@ smVBOBufferEntryInfo::smVBOBufferEntryInfo()
     nbrElements = 0;
     arrayBufferType = SMVBO_POS;
 }
-smVAO::smVAO( std::shared_ptr<ErrorLog> p_log, smVBOType p_vboType, bool p_bindShaderObjects )
+VAO::VAO( std::shared_ptr<ErrorLog> p_log, VBOType p_vboType, bool p_bindShaderObjects )
 {
     this->log = p_log;
     renderingError = false;
     totalNbrBuffers = 0;
     vboType = p_vboType;
-    VAOs[this->getUniqueId()->getId()] = safeDownCast<smVAO>();
+    VAOs[this->getUniqueId()->getId()] = safeDownCast<VAO>();
     indexBufferLocation = -1;
     bindShaderObjects = p_bindShaderObjects;
 }
 
-void smVAO::setBufferData( smVBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr )
+void VAO::setBufferData( VBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr )
 {
     bufferInfo[totalNbrBuffers].arrayBufferType = p_type;
 
@@ -207,7 +207,7 @@ void smVAO::setBufferData( smVBOBufferType p_type, std::string p_ShaderAttribNam
     else if ( p_type == SMVBO_TEXTURECOORDS ||
               p_type == SMVBO_VEC2F )
     {
-        bufferInfo[totalNbrBuffers].size = sizeof( smTexCoord ) * p_nbrElements;
+        bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * p_nbrElements;
     }
     else if ( p_type == SMVBO_VEC4F )
     {
@@ -220,7 +220,7 @@ void smVAO::setBufferData( smVBOBufferType p_type, std::string p_ShaderAttribNam
     bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
     totalNbrBuffers++;
 }
-void smVAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles, void *p_ptr )
+void VAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles, void *p_ptr )
 {
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
     bufferInfo[totalNbrBuffers].nbrElements = p_nbrTriangles * 3;
@@ -229,11 +229,11 @@ void smVAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles,
     bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
     totalNbrBuffers++;
 }
-bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
+bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
 {
     if ( p_shader == NULL )
     {
-        shader = smShader::getShader( p_mesh->getRenderDetail()->shaders[0] );
+        shader = Shader::getShader( p_mesh->getRenderDetail()->shaders[0] );
     }
     else
     {
@@ -258,7 +258,7 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
 
     ///texture coord is for each vertex
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TEXTURECOORDS;
-    bufferInfo[totalNbrBuffers].size = sizeof( smTexCoord ) * p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attribPointer = p_mesh->texCoord;
     bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
@@ -286,29 +286,29 @@ bool smVAO::setBufferDataFromMesh( smMesh *p_mesh, std::shared_ptr<smShader> p_s
     mesh = p_mesh;
     return true;
 }
-void smVAO::initVAOs()
+void VAO::initVAOs()
 {
     for ( auto & x : VAOs )
     {
         x.second->initBuffers();
     }
 }
-std::shared_ptr<smVAO> smVAO::getVAO( std::shared_ptr<UnifiedId> p_shaderID )
+std::shared_ptr<VAO> VAO::getVAO( std::shared_ptr<UnifiedId> p_shaderID )
 {
     return VAOs[p_shaderID->getId()];
 }
-void smVAO::enable() const
+void VAO::enable() const
 {
-    glBindVertexArray( VAO );
+    glBindVertexArray( vaObject );
 }
-void smVAO::disable() const
+void VAO::disable() const
 {
     glBindBufferARB( GL_ARRAY_BUFFER_ARB, 0 );
     glBindBufferARB( GL_ELEMENT_ARRAY_BUFFER_ARB, 0 );
 }
-smVAO::~smVAO()
+VAO::~VAO()
 {
     glDeleteBuffers( totalNbrBuffers, bufferIndices );
-    glDeleteVertexArrays( 1, &VAO );
+    glDeleteVertexArrays( 1, &vaObject );
 }
 

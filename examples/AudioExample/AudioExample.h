@@ -42,7 +42,7 @@ public:
     /// \brief Event handling function from CoreClass
     ///
     /// \param event Event to handle from the main event system
-    void handleEvent(std::shared_ptr<mstk::Event::Event> event) override;
+    void handleEvent(std::shared_ptr<core::Event> event) override;
 
     /// \brief Set the sound to be controlled
     ///
@@ -50,9 +50,9 @@ public:
     void setSound(std::shared_ptr<Audio> a);
 
 private:
-    std::shared_ptr<Audio> sound; ///< Pointer to sound being controlled
     bool loopSound; ///< Flag to loop the sound or not
     float soundVolume;
+    std::shared_ptr<Audio> sound; ///< Pointer to sound being controlled
 };
 
 void runAudioExample();

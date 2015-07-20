@@ -30,13 +30,13 @@ namespace mstk {
 namespace Examples {
 namespace Common {
 
-KeyPressSDKShutdown::KeyPressSDKShutdown() : key(mstk::Event::smKey::Escape)
+KeyPressSDKShutdown::KeyPressSDKShutdown() : key(event::Key::Escape)
 {
 }
 
-void KeyPressSDKShutdown::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void KeyPressSDKShutdown::handleEvent(std::shared_ptr<core::Event> event)
 {
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(event);
     if(keyboardEvent->getPressed())
     {
         if (keyboardEvent->getKeyPressed() == this->key)
@@ -46,7 +46,7 @@ void KeyPressSDKShutdown::handleEvent(std::shared_ptr<mstk::Event::Event> event)
     }
 }
 
-void KeyPressSDKShutdown::setKey(mstk::Event::smKey key)
+void KeyPressSDKShutdown::setKey(event::Key key)
 {
     this->key = key;
 }

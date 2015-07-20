@@ -50,30 +50,30 @@ size_t Filelength(const char * filename, int)
 #endif
 
 /// \brief constructor
-smSurfaceMesh::smSurfaceMesh(const smMeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
+SurfaceMesh::SurfaceMesh(const MeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
 {
 
     this->log_SF = log;
     meshType = p_meshtype;
-    meshFileType = SM_FILETYPE_NONE;
+    meshFileType = BaseMesh::MeshFileType::None;
 }
 
 /// \brief destructor
-smSurfaceMesh::~smSurfaceMesh()
+SurfaceMesh::~SurfaceMesh()
 {
 
 }
 
 /// \brief loads the mesh based on the file type and initializes the normals
-bool smSurfaceMesh::loadMesh(const std::string& fileName, const smMeshFileType &fileType)
+bool SurfaceMesh::loadMesh(const std::string& fileName, const MeshFileType &fileType)
 {
 
     bool ret = true;
 
     switch (fileType)
     {
-    case SM_FILETYPE_3DS:
-    case SM_FILETYPE_OBJ:
+    case BaseMesh::MeshFileType::ThreeDS:
+    case BaseMesh::MeshFileType::Obj:
         meshFileType = fileType;
         ret = LoadMeshAssimp(fileName);
         break;
@@ -114,18 +114,18 @@ bool smSurfaceMesh::loadMesh(const std::string& fileName, const smMeshFileType &
 
 /// \brief --Deprecated, use loadMesh() for new simulators--
 /// Loads the mesh based on the file type and initializes the normals
-bool smSurfaceMesh::loadMeshLegacy(const std::string& fileName, const smMeshFileType &fileType)
+bool SurfaceMesh::loadMeshLegacy(const std::string& fileName, const MeshFileType &fileType)
 {
 
     bool ret = true;
 
     switch (fileType)
     {
-    case SM_FILETYPE_3DS:
+    case BaseMesh::MeshFileType::ThreeDS:
         Load3dsMesh(fileName);
         break;
 
-    case SM_FILETYPE_OBJ:
+    case BaseMesh::MeshFileType::Obj:
         ret = LoadMeshAssimp(fileName);
         break;
 
@@ -165,7 +165,7 @@ bool smSurfaceMesh::loadMeshLegacy(const std::string& fileName, const smMeshFile
 }
 
 /// \brief
-bool smSurfaceMesh::LoadMeshAssimp(const std::string& fileName)
+bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
 {
 
     //Tell Assimp to not import any of the following from the mesh it loads
@@ -264,7 +264,7 @@ bool smSurfaceMesh::LoadMeshAssimp(const std::string& fileName)
 }
 
 /// \brief reads the mesh file in .3ds format
-bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
+bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
 {
 
     int i; //Index variable
@@ -344,7 +344,7 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
             this->origVerts.reserve(l_qty);
             this->vertNormals = new core::Vec3d[l_qty];
             this->vertTangents = new core::Vec3d[l_qty];
-            this->texCoord = new smTexCoord[l_qty];
+            this->texCoord = new TexCoord[l_qty];
 
             for (int fpt = 0; fpt < this->nbrVertices; fpt++)
             {
@@ -365,7 +365,7 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
         case 0x4120:
             fread(&l_qty, sizeof(unsigned short), 1, l_file);
             this->nbrTriangles = l_qty;
-            this->triangles = new smTriangle[l_qty];
+            this->triangles = new Triangle[l_qty];
             this->triNormals = new core::Vec3d[l_qty];
             this->triTangents = new core::Vec3d[l_qty];
 
@@ -420,14 +420,14 @@ bool smSurfaceMesh::Load3dsMesh(const std::string& fileName)
 
     return 1; // Returns ok
 }
-smSurfaceMesh::smSurfaceMesh()
+SurfaceMesh::SurfaceMesh()
 {
     this->log_SF = std::shared_ptr<ErrorLog>();
-    meshType = SMMESH_DEFORMABLE;
-    meshFileType = SM_FILETYPE_NONE;
+    meshType = MeshType::Deformable;
+    meshFileType = BaseMesh::MeshFileType::None;
 }
 
-void smSurfaceMesh::printPrimitiveDetails()
+void SurfaceMesh::printPrimitiveDetails()
 {
     std::cout << "----------------------------\n";
     std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";

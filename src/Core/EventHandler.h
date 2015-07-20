@@ -37,8 +37,7 @@
 
 class CoreClass;
 
-namespace mstk {
-namespace Event {
+namespace core {
 
 ///
 /// @brief Event handler. This class implement a generic observer design
@@ -47,11 +46,11 @@ namespace Event {
 /// https://juanchopanzacpp.wordpress.com/2013/02/24/simple-observer-pattern-implementation-c11/
 ///
 /// The only requirement is that the observer function to bind has
-/// the following signature: void handleEvent(std::shared_ptr<mstk::Event::Event> e)
+/// the following signature: void handleEvent(std::shared_ptr<core::Event> e)
 /// This means that anything inheriting from the CoreClass can be
 /// binded to an event.
 ///
-class smEventHandler
+class EventHandler
 {
 public:
     using FunctionType = std::function<void ( std::shared_ptr<Event> )>;
@@ -61,7 +60,7 @@ public:
     ///
     /// @brief Construct and initilize map
     ///
-    smEventHandler() : observers() {}
+    EventHandler() : observers() {}
 
     ///
     /// @brief Register event and function eventhandler
@@ -145,7 +144,6 @@ private:
                                                           // to be triggered
 };
 
-} // Event namespace
-} // mstk namespace
+} // core namespace
 
 #endif // SMEVENTHANDLER_H

@@ -29,16 +29,15 @@
 #include "Core/Vector.h"
 #include "Core/Quaternion.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-class smCameraEvent : public Event
+class CameraEvent : public core::Event
 {
 public:
-    static EventType EventName;
+    static core::EventType EventName;
 
 public:
-    smCameraEvent();
+    CameraEvent();
 
     void setPosition(const core::Vec3d &cameraPosition);
 
@@ -64,7 +63,6 @@ private:
     core::Vec3d upDirection; //  upward direction
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif // SMCAMERAEVENT_H

@@ -1,23 +1,24 @@
+
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Rendering/GLUtils.h"
 #include "Simulators/StylusObject.h"
 
-class smStylusRenderDelegate : public RenderDelegate
+class StylusRenderDelegate : public RenderDelegate
 {
 public:
   virtual void initDraw() const override;
   virtual void draw() const override;
 };
 
-void smStylusRenderDelegate::initDraw() const
+void StylusRenderDelegate::initDraw() const
 {
   smStylusRigidSceneObject* geom = this->getSourceGeometryAs<smStylusRigidSceneObject>();
   std::string errorText;
   tree<smMeshContainer*>::pre_order_iterator iter = geom->meshes.begin();
   GLint newList = glGenLists(geom->meshes.size());
-  smGLUtils::queryGLError(errorText);
+  GLUtils::queryGLError(errorText);
 
   int listCounter = 0;
 
@@ -32,12 +33,10 @@ void smStylusRenderDelegate::initDraw() const
     }
 }
 
-void smStylusRenderDelegate::draw() const
+void StylusRenderDelegate::draw() const
 {
   smStylusRigidSceneObject* geom = this->getSourceGeometryAs<smStylusRigidSceneObject>();
   Matrix44d viewMatrix;
-
-#pragma unroll
 
   for (int i = 0; i < 2; i++)
     {
@@ -85,6 +84,6 @@ void smStylusRenderDelegate::draw() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_stylus_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,smStylusRenderDelegate,2000);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,StylusRenderDelegate,2000);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

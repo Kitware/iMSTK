@@ -37,20 +37,20 @@ MyStylus::MyStylus(const std::string& p_shaft, const std::string& p_lower, const
     angle = 0;
     Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
-    smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    mesh->loadMesh(p_shaft, SM_FILETYPE_3DS);
+    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    mesh->loadMesh(p_shaft, BaseMesh::MeshFileType::ThreeDS);
     mesh->assignTexture("hookCautery");
     mesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
-    smSurfaceMesh *lowerMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    lowerMesh->loadMesh(p_lower, SM_FILETYPE_3DS);
+    SurfaceMesh *lowerMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    lowerMesh->loadMesh(p_lower, BaseMesh::MeshFileType::ThreeDS);
     lowerMesh->assignTexture("metal");
     lowerMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     lowerMesh->rotate(rot);
 
-    smSurfaceMesh *upperMesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    upperMesh->loadMesh(p_upper, SM_FILETYPE_3DS);
+    SurfaceMesh *upperMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    upperMesh->loadMesh(p_upper, BaseMesh::MeshFileType::ThreeDS);
     upperMesh->assignTexture("metal");
     upperMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     upperMesh->rotate(rot);
@@ -105,14 +105,14 @@ void MyStylus::updateOpenClose()
 }
 
 //This function is not fixed for a reason....I'll give you a hint...try to match the brackets
-void MyStylus::handleEvent (std::shared_ptr<mstk::Event::Event> p_event)
+void MyStylus::handleEvent (std::shared_ptr<core::Event> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<event::HapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         smMeshContainer *containerLower = this->getMeshContainer ( "HookCauteryLower" );
@@ -157,21 +157,21 @@ void MyStylus::handleEvent (std::shared_ptr<mstk::Event::Event> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::Num1:
+            case event::Key::Num1:
             {
-                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case mstk::Event::smKey::Num2:
+            case event::Key::Num2:
             {
-                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
                 break;
             }
@@ -185,8 +185,8 @@ HookCautery::HookCautery(const std::string& p_pivot)
 {
     Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
-    smSurfaceMesh *mesh = new smSurfaceMesh(SMMESH_RIGID, NULL);
-    mesh->loadMesh(p_pivot, SM_FILETYPE_3DS);
+    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    mesh->loadMesh(p_pivot, BaseMesh::MeshFileType::ThreeDS);
     mesh->assignTexture("metal");
     mesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
@@ -198,14 +198,14 @@ HookCautery::HookCautery(const std::string& p_pivot)
     addMeshContainer(&meshContainer);
 }
 
-void HookCautery::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
+void HookCautery::handleEvent(std::shared_ptr<core::Event> p_event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto hapticEvent = std::static_pointer_cast<mstk::Event::smHapticEvent>(p_event);
+    auto hapticEvent = std::static_pointer_cast<event::HapticEvent>(p_event);
     if(hapticEvent != nullptr && hapticEvent->getDeviceId() == this->phantomID)
     {
         transRot = hapticEvent->getTransform();
@@ -222,21 +222,21 @@ void HookCautery::handleEvent(std::shared_ptr<mstk::Event::Event> p_event)
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::Num1:
+            case event::Key::Num1:
             {
-                this->eventHandler->detachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->detachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType & ( ~SIMMEDTK_RENDER_NONE );
                 break;
             }
 
-            case mstk::Event::smKey::Num2:
+            case event::Key::Num2:
             {
-                this->eventHandler->attachEvent(mstk::Event::EventType::Haptic,shared_from_this());
+                this->eventHandler->attachEvent(core::EventType::Haptic,shared_from_this());
                 this->getRenderDetail()->renderType = this->getRenderDetail()->renderType | SIMMEDTK_RENDER_NONE;
                 break;
             }

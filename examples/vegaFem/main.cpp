@@ -60,10 +60,10 @@ int main()
     std::shared_ptr<smVegaFemSimulator> femSimulator;
     std::shared_ptr<smDummySimulator> staticSimulator;
     std::shared_ptr<PlaneCollisionModel> plane;
-    std::shared_ptr<smViewer> viewer;
+    std::shared_ptr<Viewer> viewer;
     std::shared_ptr<Scene> scene;
     std::shared_ptr<Light> light;
-    std::shared_ptr<smCamera> sceneCamera;
+    std::shared_ptr<Camera> sceneCamera;
     std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
     std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
@@ -103,7 +103,7 @@ int main()
 
     /*hapticCtl = std::make_shared<mstk::Examples::Common::hapticController>();
     hapticCtl->setVegaFemSceneObject(femObject);
-    femSimulator->attachEvent(mstk::Event::EventType::Haptic, hapticCtl);*/
+    femSimulator->attachEvent(core::Haptic, hapticCtl);*/
 
     sdk->addSceneActor(femObject, femSimulator);
 
@@ -161,7 +161,7 @@ int main()
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    viewer = std::dynamic_pointer_cast<smViewer>(sdk->getViewerInstance());
+    viewer = std::dynamic_pointer_cast<Viewer>(sdk->getViewerInstance());
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
@@ -178,7 +178,7 @@ int main()
     scene->addLight(light);
 
     // Camera setup
-    sceneCamera = smCamera::getDefaultCamera();
+    sceneCamera = Camera::getDefaultCamera();
     sceneCamera->setPos(12, 12, 24);
     sceneCamera->setFocus(0, 0, 0);
     scene->addCamera(sceneCamera);
@@ -193,10 +193,10 @@ int main()
     pzrCamCtl->setCamera(sceneCamera);
 
     // Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, camCtl);
-    viewer->attachEvent(mstk::Event::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(mstk::Event::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(mstk::Event::EventType::MouseButton, pzrCamCtl);
+    viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
     //-------------------------------------------------------
     // Run the SDK

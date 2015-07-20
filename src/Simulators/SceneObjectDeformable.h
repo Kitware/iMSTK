@@ -117,10 +117,10 @@ public:
     void setRenderPrimaryMesh();
 
     /// \brief get the primary surface mesh
-    std::shared_ptr<smSurfaceMesh> getPrimarySurfaceMesh() const;
+    std::shared_ptr<SurfaceMesh> getPrimarySurfaceMesh() const;
 
     /// \brief get the secondary surface mesh
-    std::shared_ptr<smSurfaceMesh> getSecondarySurfaceMesh() const;
+    std::shared_ptr<SurfaceMesh> getSecondarySurfaceMesh() const;
 
     // Get generalized velocity vector
     std::vector<double> &getVelocities()
@@ -156,19 +156,19 @@ public:
     }
 
 protected:
-    friend class smSceneObjectDeformableRenderDelegate;
+    friend class SceneObjectDeformableRenderDelegate;
 
     int numNodes;
     int numFixedNodes;
     int numTotalDOF;
     int numDOF;
     int numFixedDof;
-    int timestepCounter;
-    int subTimestepCounter;
-    int pulledVertex; ///< vertex that is pulled by user using external force
 
-    bool topologyAltered;
     bool renderSecondaryMesh;
+    bool topologyAltered;
+    int pulledVertex; ///< vertex that is pulled by user using external force
+    size_t timestepCounter;
+    int subTimestepCounter;
 
     std::string ConfigFileName;
 
@@ -186,9 +186,9 @@ protected:
 
     std::vector<int> fixedVertices; ///< fixed vertcies
 
-    std::shared_ptr<smVolumeMesh> volumeMesh;
-    std::shared_ptr<smSurfaceMesh> primarySurfaceMesh;
-    std::shared_ptr<smSurfaceMesh> secondarySurfaceMesh;
+    std::shared_ptr<VolumeMesh> volumeMesh;
+    std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
+    std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
 };
 
 #endif // SMVEGAFEMSCENEOBJECT_DEFORMABLE_H

@@ -30,7 +30,7 @@
 
 ///checks the openGL error. if there is an error then it returns
 ///the error text otherwise it returns NULL
-bool smGLUtils::queryGLError(std::string& err)
+bool GLUtils::queryGLError(std::string& err)
 {
     GLenum errCode;
     const GLubyte *errString;
@@ -50,7 +50,7 @@ bool smGLUtils::queryGLError(std::string& err)
 }
 
 ///taken from glProgramming.com.  Checks the extension.
-bool smGLUtils::QueryExtension(const std::string& extName)
+bool GLUtils::QueryExtension(const std::string& extName)
 {
     auto it = std::find(
         openGLExtensions.begin(),openGLExtensions.end(),extName);
@@ -59,7 +59,7 @@ bool smGLUtils::QueryExtension(const std::string& extName)
 }
 
 ///fade background draw
-void smGLUtils::fadeBackgroundDraw()
+void GLUtils::fadeBackgroundDraw()
 {
     glPushAttrib(GL_ALL_ATTRIB_BITS);
     glDisable(GL_DEPTH_TEST);
@@ -91,7 +91,7 @@ void smGLUtils::fadeBackgroundDraw()
     glPopAttrib();
 }
 
-void smGLUtils::drawQuadOnScreen(Color p_color, float p_left,
+void GLUtils::drawQuadOnScreen(Color p_color, float p_left,
                                  float p_bottom, float p_right,
                                  float p_top)
 {
@@ -125,7 +125,7 @@ void smGLUtils::drawQuadOnScreen(Color p_color, float p_left,
     glPopMatrix();
     glPopAttrib();
 }
-void smGLUtils::drawUnitQuadOnScreen()
+void GLUtils::drawUnitQuadOnScreen()
 {
     glBegin(GL_QUADS);
     glNormal3f(0, 0, 1);
@@ -139,11 +139,11 @@ void smGLUtils::drawUnitQuadOnScreen()
     glVertex3d(-1, 1.0, -1);
     glEnd();
 }
-void smGLUtils::queryProjectionMatrix(Matrix44f& p_matrix)
+void GLUtils::queryProjectionMatrix(Matrix44f& p_matrix)
 {
     glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
 }
-void smGLUtils::queryModelViewMatrix(Matrix44f& p_matrix)
+void GLUtils::queryModelViewMatrix(Matrix44f& p_matrix)
 {
     glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
 }

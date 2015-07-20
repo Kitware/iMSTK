@@ -52,7 +52,7 @@ void smDummySimulator::initCustom()
                 {
                     break;
                 }
-                std::shared_ptr<smMesh> mesh = model->getMesh();
+                std::shared_ptr<Mesh> mesh = model->getMesh();
 
                 object->getLocalVertices().reserve( mesh->nbrVertices );
                 // WARNING:  Copy!!?
@@ -83,7 +83,7 @@ void smDummySimulator::run()
             {
                 break;
             }
-            std::shared_ptr<smMesh> mesh = model->getMesh();
+            std::shared_ptr<Mesh> mesh = model->getMesh();
 
             for ( int vertIndex = 0; vertIndex < mesh->nbrVertices; vertIndex++ )
             {
@@ -113,25 +113,25 @@ void smDummySimulator::syncBuffers()
             {
                 break;
             }
-            std::shared_ptr<smMesh> mesh = model->getMesh();
+            std::shared_ptr<Mesh> mesh = model->getMesh();
             // WARNING: Copy??!
             mesh->vertices = staticSceneObject->getLocalVertices();
         }
     }
 }
-void smDummySimulator::handleEvent(std::shared_ptr<mstk::Event::Event> p_event )
+void smDummySimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<mstk::Event::smKeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case mstk::Event::smKey::F1:
+            case event::Key::F1:
             {
                 std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
                 break;

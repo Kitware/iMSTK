@@ -28,10 +28,10 @@
 
 using namespace bandit;
 
-std::shared_ptr<smMeshModel> getModel(const core::StdVector3d &vertices)
+std::shared_ptr<MeshModel> getModel(const core::StdVector3d &vertices)
 {
-    std::shared_ptr<smMeshModel> model = std::make_shared<smMeshModel>();
-    std::shared_ptr<smMesh> mesh = std::make_shared<smSurfaceMesh>();
+    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
+    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
     model->setModelMesh(mesh);
 
     // Add one triangle to the data structure
@@ -56,7 +56,7 @@ std::shared_ptr<smMeshModel> getModel(const core::StdVector3d &vertices)
 go_bandit([](){
     describe("Mesh model", []() {
         it("constructs", []() {
-            auto model = make_unique<smMeshModel>();
+            auto model = make_unique<MeshModel>();
             AssertThat(model != nullptr, IsTrue());
         });
         it("can access mesh vertices", []() {

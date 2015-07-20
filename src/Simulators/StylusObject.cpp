@@ -89,7 +89,7 @@ smMeshContainer::smMeshContainer( std::string p_name )
     colModel = NULL;
 }
 
-smMeshContainer::smMeshContainer( std::string p_name, smMesh */*p_mesh*/, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
+smMeshContainer::smMeshContainer( std::string p_name, Mesh */*p_mesh*/, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
 {
     offsetRotX = p_offsetRotX;
     offsetRotY = p_offsetRotY;
@@ -128,7 +128,7 @@ void smStylusSceneObject::unSerialize( void */*p_memoryBlock*/ )
 {
 }
 
-void smStylusSceneObject::handleEvent(std::shared_ptr<mstk::Event::Event>/*p_event*/ ) {}
+void smStylusSceneObject::handleEvent(std::shared_ptr<core::Event>/*p_event*/ ) {}
 void smStylusRigidSceneObject::posTraverseCallBack()
 {
 }
@@ -179,7 +179,7 @@ tree< smMeshContainer * >::iterator smStylusRigidSceneObject::addMeshContainer( 
     return meshes.insert( p_iterator, p_meshContainer );
 }
 
-void smStylusRigidSceneObject::handleEvent(std::shared_ptr<mstk::Event::Event>/*p_event*/ ) {}
+void smStylusRigidSceneObject::handleEvent(std::shared_ptr<core::Event>/*p_event*/ ) {}
 
 std::shared_ptr<SceneObject> smStylusRigidSceneObject::clone()
 {

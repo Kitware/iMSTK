@@ -26,10 +26,9 @@
 
 #include "Core/Config.h"
 
-namespace mstk {
-namespace Event {
+namespace event {
 
-enum class smModKey : unsigned int
+enum class ModKey : unsigned int
 {
     none = 0,
     control = 1,
@@ -38,27 +37,27 @@ enum class smModKey : unsigned int
     shift = 8
 };
 
-inline smModKey operator|(smModKey a, smModKey b)
+inline ModKey operator|(ModKey a, ModKey b)
 {
-    return static_cast<smModKey>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
+    return static_cast<ModKey>(static_cast<unsigned int>(a) | static_cast<unsigned int>(b));
 }
 
-inline smModKey operator&(smModKey a, smModKey b)
+inline ModKey operator&(ModKey a, ModKey b)
 {
-    return static_cast<smModKey>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
+    return static_cast<ModKey>(static_cast<unsigned int>(a) & static_cast<unsigned int>(b));
 }
 
-inline smModKey& operator |=(smModKey& a, smModKey b)
+inline ModKey& operator |=(ModKey& a, ModKey b)
 {
     return a = a | b;
 }
 
-inline smModKey& operator &=(smModKey& a, smModKey b)
+inline ModKey& operator &=(ModKey& a, ModKey b)
 {
     return a = a & b;
 }
 
-enum class smKey
+enum class Key
 {
     Unknown = -1,     ///< Unhandled key
     A = 0,            ///< The A key
@@ -166,7 +165,6 @@ enum class smKey
     KeyCount          ///< Keep last -- the total number of keyboard keys
 };
 
-} // Event namespace
-} // mstk namespace
+} // event namespace
 
 #endif
