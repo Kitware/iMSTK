@@ -24,7 +24,7 @@
 #ifndef SM_HAPTIC_INTERFACE_H
 #define SM_HAPTIC_INTERFACE_H
 
-#include "smDeviceInterface.h"
+#include "DeviceInterface.h"
 
 #define SM_MAX_BUTTONS 4
 
@@ -41,63 +41,63 @@ struct hapticDeviceData_t
 };
 
 /// \brief Absract base class for haptic device
-class smHapticInterface: public smDeviceInterface
+class HapticInterface: public DeviceInterface
 {
 
 public:
 
     /// \brief constructor
-    smHapticInterface();
+    HapticInterface();
 
     /// \brief destructor
-    virtual ~smHapticInterface() {};
+    virtual ~HapticInterface() {};
 
     /// \brief open haptic device
     virtual int openDevice()
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief close haptic device
     virtual int closeDevice()
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief start the haptic device
     virtual int startDevice()
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief get the position of the end effector the haptic device
     virtual int  getPosition(core::Vec3d & d_pos)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief get the orientation of the end effector the haptic device
     virtual int getOreintation(Matrix33 <smDouble> *d_rot)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief get the transform (position + orientation) of the end effector the haptic device
     virtual int getDeviceTransform(Matrix44 <smDouble> *d_transform)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief set force to the haptic device
     virtual int setForce(core::Vec3d & force)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief set torque to the haptic device
     virtual int setForceandTorque(core::Vec3 <smDouble>& force, core::Vec3 <smDouble> & torque)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
 };

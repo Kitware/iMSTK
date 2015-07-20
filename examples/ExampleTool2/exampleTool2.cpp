@@ -46,7 +46,7 @@ using namespace std;
 
 void main()
 {
-    smPhantomInterface * hapticInterface;
+    PhantomInterface * hapticInterface;
     SDK* simmedtkSDK;
     Scene *scene1;
     smViewer *viewer;
@@ -170,7 +170,7 @@ void main()
     simmedtkSDK->getEventDispatcher()->registerEventHandler(curvedTool, SIMMEDTK_EVENTTYPE_HAPTICOUT);
 
     ///create a phantom interface
-    hapticInterface = new smPhantomInterface();
+    hapticInterface = new PhantomInterface();
 
     ///set dispacther. This will be used to distrubute events
     hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());

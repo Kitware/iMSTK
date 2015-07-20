@@ -40,6 +40,9 @@
 #  define NOMINMAX
 #endif
 #  include <windows.h>
+// #   define inline  __forceinline
+// #   pragma inline_recursion(on)
+// #   pragma inline_depth(255)
 #endif
 
 #include <GL/glew.h>
@@ -226,15 +229,7 @@ enum class ClassDrawOrder
 
 ///SimMedTK uses opengl now. So all API should have the definition.
 #define SIMMEDTK_OPENGL_SHADER 1
-/// \brief unicode is not used.
-#undef _UNICODE
-#define NOMINMAX
-/// \brief OS specific routines
-#ifdef _WIN32
-#define inline  __forceinline
-#pragma inline_recursion(on)
-#pragma inline_depth(255)
-#endif
+
 
 
 #endif // SMCONFIG_H

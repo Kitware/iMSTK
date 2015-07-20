@@ -81,7 +81,7 @@ void main()
 
     MyStylus *hapticStylus;
     HookCautery *hapticStylus1;
-    smPhantomInterface * hapticInterface;
+    PhantomInterface * hapticInterface;
     SDK* simmedtkSDK;
     Scene *scene1;
     smViewer *viewer;
@@ -193,7 +193,7 @@ void main()
     simmedtkSDK->getEventDispatcher()->registerEventHandler(viewer, SIMMEDTK_EVENTTYPE_CAMERA_UPDATE);
 
     ///create a phanotm interface
-    hapticInterface = new smPhantomInterface();
+    hapticInterface = new PhantomInterface();
     hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
 
     ///register tools for haptic out and keyboard events

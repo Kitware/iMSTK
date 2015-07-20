@@ -21,20 +21,20 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
+#include "Core/smConfig.h"
 
 #ifndef __linux__
 #include <iostream>
 #include <fstream>
 #include <cassert>
-#include "smExternalDevices/smNIUSB6008Interface.h"
+#include "smExternalDevices/NIUSB6008Interface.h"
 
 #define DAQmxErrChk(functionCall) if( DAQmxFailed(error=(functionCall)) ) goto Error; else
 
 int32 CVICALLBACK DoneCallback(TaskHandle taskHandle, int32 status, void *callbackData);
 int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEventType, uInt32 nSamples, void *callbackData);
 
-smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID)
+NIUSB6008Interface::NIUSB6008Interface(int VBLaST_Task_ID)
 {
 
     int32  error = 0;
@@ -142,7 +142,7 @@ smNIUSB6008Interface::smNIUSB6008Interface(int VBLaST_Task_ID)
 }
 
 /// \brief
-void smNIUSB6008Interface::getToolCalibrationData()
+void NIUSB6008Interface::getToolCalibrationData()
 {
 
     FILE *fp_cali;
@@ -171,7 +171,7 @@ void smNIUSB6008Interface::getToolCalibrationData()
 }
 
 /// \brief
-void smNIUSB6008Interface::setTool()
+void NIUSB6008Interface::setTool()
 {
 
     /*
@@ -259,7 +259,7 @@ void smNIUSB6008Interface::setTool()
 }
 
 /// \brief
-void smNIUSB6008Interface::getToolData(int nc, int *ac)
+void NIUSB6008Interface::getToolData(int nc, int *ac)
 {
 
     int i, j, k;
@@ -293,7 +293,7 @@ void smNIUSB6008Interface::getToolData(int nc, int *ac)
 }
 
 /// \brief
-void smNIUSB6008Interface::initNI_Error(int32 error)
+void NIUSB6008Interface::initNI_Error(int32 error)
 {
     if (error < 0)
     {
@@ -321,7 +321,7 @@ void smNIUSB6008Interface::initNI_Error(int32 error)
 }
 
 /// \brief
-smNIUSB6008Interface::~smNIUSB6008Interface()
+NIUSB6008Interface::~NIUSB6008Interface()
 {
 
     DAQmxStopTask(taskHandle);
@@ -332,7 +332,7 @@ smNIUSB6008Interface::~smNIUSB6008Interface()
 }
 
 /// \brief
-void smNIUSB6008Interface::sendDataToPipe()
+void NIUSB6008Interface::sendDataToPipe()
 {
 
     NIUSB6008Data *pipeData;
@@ -364,7 +364,7 @@ void smNIUSB6008Interface::sendDataToPipe()
 }
 
 /// \brief
-void smNIUSB6008Interface::run()
+void NIUSB6008Interface::run()
 {
 
     while (1)
@@ -380,7 +380,7 @@ int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEvent
     char errBuff[2048] = {'\0'};
     int32 read = 0;
 
-    smNIUSB6008Interface  *NIUSB6008Interface = static_cast<smNIUSB6008Interface *>(callbackData);
+    NIUSB6008Interface  *NIUSB6008Interface = static_cast<NIUSB6008Interface *>(callbackData);
 
     /*********************************************/
     // DAQmx Read Code

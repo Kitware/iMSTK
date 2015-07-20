@@ -21,7 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smCore/smConfig.h"
+#include "Core/smConfig.h"
 
 #ifndef __linux__
 
@@ -29,10 +29,10 @@
 
 #define SM_NIUSB6008_INTERFACE_H
 
-#include "smExternalDevices/smDeviceInterface.h"
-#include "smCore/Event.h"
-#include "smCore/smEventData.h"
-#include "smCore/smPipe.h"
+#include "smExternalDevices/DeviceInterface.h"
+#include "Core/Event.h"
+#include "Core/smEventData.h"
+#include "Core/smPipe.h"
 
 #include <NIDAQmx.h>
 
@@ -53,12 +53,12 @@ struct toolData
 };
 
 /// \brief National Instruments USB6008 interface class
-class smNIUSB6008Interface: public smDeviceInterface
+class NIUSB6008Interface: public DeviceInterface
 {
 
 public:
-    smNIUSB6008Interface(int VBLaST_Task_ID);
-    ~smNIUSB6008Interface();
+    NIUSB6008Interface(int VBLaST_Task_ID);
+    ~NIUSB6008Interface();
 
 //     smPipe *NIUSB6008pipe; ///<
     int32 NI_error; ///<

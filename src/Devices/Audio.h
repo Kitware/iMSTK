@@ -33,7 +33,7 @@
 #include "Event/AudioEvent.h"
 
 /// \brief class to enable audio rendering
-class smAudio: public CoreClass
+class Audio: public CoreClass
 {
 private:
     sf::Sound sound; ///< SFML Sound object, controls the sound data
@@ -48,7 +48,7 @@ private:
     bool loop; ///< play the song in a loop
 
 public:
-    smAudio() :
+    Audio() :
         referenceName(""),
         state{mstk::Event::AudioState::Unknown },
         prevState{mstk::Event::AudioState::Unknown },
@@ -59,7 +59,7 @@ public:
     }
 
     /// \brief constructor initialize various states
-    smAudio(const std::string& fileName,
+    Audio(const std::string& fileName,
             const std::string& p_referenceName,
             ErrorLog *p_log = nullptr,
             bool p_loop = false)
@@ -76,7 +76,7 @@ public:
     }
 
     /// \brief destructor
-    ~smAudio()
+    ~Audio()
     {
     }
 

@@ -27,29 +27,29 @@
 
 #define SM_ADU_INTERFACE_H
 
-#include "smExternalDevices/smDeviceInterface.h"
-#include "smCore/Event.h"
-#include "smCore/smEventData.h"
+#include "Devices/DeviceInterface.h"
+#include "Core/Event.h"
+#include "Core/smEventData.h"
 
 /// \brief holds data for calibration of ADU device
 struct ADUDeviceCalibrationData
 {
-    smUInt maxValue1;
-    smUInt minValue1;
-    smUInt maxValue2;
-    smUInt minValue2;
+    unsigned int maxValue1;
+    unsigned int minValue1;
+    unsigned int maxValue2;
+    unsigned int minValue2;
 };
 
 /// \device Container for holding the device data
 struct ADUDeviceData
 {
     bool deviceOpen;
-    smUInt calibration[4];
-    smUInt anValue[3];
+    unsigned int calibration[4];
+    unsigned int anValue[3];
 };
 
 /// \device Interface class for the ADU device
-class smADUInterface: public smDeviceInterface
+class smADUInterface: public DeviceInterface
 {
 
 public:

@@ -22,9 +22,9 @@
 //---------------------------------------------------------------------------
 
 
-#include "smExternalDevices/smHapticInterface.h"
+#include "smExternalDevices/HapticInterface.h"
 
-smHapticInterface::smHapticInterface()
+HapticInterface::HapticInterface()
 {
 
 };

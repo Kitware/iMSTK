@@ -21,29 +21,29 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "smExternalDevices/smPhantomInterface.h"
-#include "smRendering/smGLRenderer.h"
-#include "smCore/Timer.h"
+#include "Devices/PhantomInterface.h"
+#include "Rendering/GLRenderer.h"
+#include "Core/Timer.h"
 #include <iostream>
 
 HDCallbackCode HDCALLBACK hapticCallback(void *pData);
 Timer hapticTimer;
 
 /// \brief additions to provide compabilibity with all the modules structures
-void smPhantomInterface::init()
+void PhantomInterface::init()
 {
 
 }
 
 /// \brief additions to provide compabilibity with all the modules structures
-void smPhantomInterface::exec()
+void PhantomInterface::exec()
 {
 
     startDevice();
 }
 
 /// \brief
-smPhantomInterface::smPhantomInterface()
+PhantomInterface::PhantomInterface()
 {
 
     phantomDeviceNames[0] = "PHANToM 1";
@@ -78,7 +78,7 @@ smPhantomInterface::smPhantomInterface()
 
             //Stream Event Creation
             hapticEvent[incr] = new Event();
-            hapticEventData[incr] = new smHapticOutEventData();
+            hapticEventData[incr] = new HapticOutEventData();
             hapticEvent[incr]->data = hapticEventData[incr];
             incr++;
         }
@@ -86,7 +86,7 @@ smPhantomInterface::smPhantomInterface()
 }
 
 /// \brief
-smPhantomInterface::~smPhantomInterface()
+PhantomInterface::~PhantomInterface()
 {
 
     hdStopScheduler();
@@ -95,7 +95,7 @@ smPhantomInterface::~smPhantomInterface()
 }
 
 /// \brief
-int smPhantomInterface::startDevice()
+int PhantomInterface::startDevice()
 {
 
     if (numPhantomDevices != 0)
@@ -105,53 +105,53 @@ int smPhantomInterface::startDevice()
                                UserData, HD_DEFAULT_SCHEDULER_PRIORITY);
         hapticTimer.start();
         hdStartScheduler();
-        return SIMMEDTK_MSG_SUCCESS;
+        return Message::Success;
 
     }
 
-    return SIMMEDTK_MSG_FAILURE;
+    return Message::Failure;
 }
 
 /// \brief
-int smPhantomInterface::openDevice()
+int PhantomInterface::openDevice()
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 /// \brief
-int smPhantomInterface::closeDevice()
+int PhantomInterface::closeDevice()
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 /// \brief
-int smPhantomInterface::openDevice(int phantomNumber)
+int PhantomInterface::openDevice(int phantomNumber)
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 /// \brief
-int smPhantomInterface::getPosition(core::Vec3 <smDouble> &d_pos)
+int PhantomInterface::getPosition(core::Vec3 <smDouble> &d_pos)
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 /// \brief
-int smPhantomInterface::getOreintation(Matrix33 <smDouble> *d_rot)
+int PhantomInterface::getOreintation(Matrix33 <smDouble> *d_rot)
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 /// \brief
-int smPhantomInterface::getDeviceTransform(Matrix44 <smDouble> *d_transform)
+int PhantomInterface::getDeviceTransform(Matrix44 <smDouble> *d_transform)
 {
 
-    return SIMMEDTK_MSG_UNKNOWN;
+    return Message::Unknown;
 }
 
 
@@ -165,7 +165,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
 {
 
     frameCounter++;
-    smPhantomInterface  * phantomInterface = static_cast<smPhantomInterface *>(pData);
+    PhantomInterface  * phantomInterface = static_cast<PhantomInterface *>(pData);
     int buttonState;
 
     int count = 0;
@@ -241,7 +241,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
     {
 
         //phantomInterface->hapticEvent[count]=new Event();
-        //hapticEventData[count]=new smHapticOutEventData();
+        //hapticEventData[count]=new HapticOutEventData();
         memcpy(phantomInterface->hapticEventData[count], (const void*)&phantomInterface->hapticDeviceData[count], sizeof(phantomInterface->hapticDeviceData[count]));
         phantomInterface->hapticEvent[count]->eventType = SIMMEDTK_EVENTTYPE_HAPTICOUT;
         phantomInterface->hapticEvent[count]->senderId = phantomInterface->getModuleId();
@@ -282,7 +282,7 @@ HDCallbackCode HDCALLBACK hapticCallback(void *pData)
 }
 
 /// \brief
-void smPhantomInterface::handleEvent(std::shared_ptr<mstk::Event::Event> event)
+void PhantomInterface::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 {
 
     smHapticInEventData *hapticEventData;
@@ -303,7 +303,7 @@ void smPhantomInterface::handleEvent(std::shared_ptr<mstk::Event::Event> event)
 }
 
 /// \brief
-void smPhantomInterface::draw()
+void PhantomInterface::draw()
 {
     //Nothing to draw
 }

@@ -25,7 +25,7 @@
 #include "Devices/DeviceInterface.h"
 
 
-smDeviceInterface::smDeviceInterface(): driverInstalled(false)
+DeviceInterface::DeviceInterface(): driverInstalled(false)
 {
 
 }

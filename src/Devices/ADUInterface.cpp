@@ -57,7 +57,7 @@ smADUInterface::smADUInterface()
     calibrationData->minValue2 = 0;
     calibrationData->maxValue2 = 1;
 
-    if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
+    if (openDevice(serialNumber) == Message::Success)
     {
         std::cout << "ADU USB Device Opened Successfully" << "\n";
     }
@@ -159,7 +159,7 @@ smADUInterface::smADUInterface(const std::string& calibrationFile)
          << calibrationData->maxValue1 << " " << calibrationData->minValue2
          << " " << calibrationData->maxValue2 << "\n";
 
-    if (openDevice(serialNumber) == SIMMEDTK_MSG_SUCCESS)
+    if (openDevice(serialNumber) == Message::Success)
     {
         std::cout << "ADU USB Device Opened Successfully" << "\n";
     }
@@ -189,12 +189,12 @@ int smADUInterface::openDevice(const std::string& serialNumber)
     if ((*((int *)&deviceHandle)) > 0)
     {
         isOpened = true;
-        return SIMMEDTK_MSG_SUCCESS;
+        return Message::Success;
     }
     else
     {
         isOpened = false;
-        return SIMMEDTK_MSG_FAILURE;
+        return Message::Failure;
     }
 }
 

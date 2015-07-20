@@ -31,14 +31,14 @@ AudioKeyboardController::AudioKeyboardController()
 {
 }
 
-AudioKeyboardController::AudioKeyboardController(std::shared_ptr<smAudio> a)
+AudioKeyboardController::AudioKeyboardController(std::shared_ptr<Audio> a)
     : loopSound{false},
       soundVolume{100},
       sound(a)
 {
 }
 
-void AudioKeyboardController::setSound(std::shared_ptr<smAudio> a)
+void AudioKeyboardController::setSound(std::shared_ptr<Audio> a)
 {
     sound = a;
 }
@@ -90,7 +90,7 @@ void runAudioExample()
 {
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<smViewer> viewer;
-    std::shared_ptr<smAudio> sound;
+    std::shared_ptr<Audio> sound;
     std::shared_ptr<AudioKeyboardController> audioCtl;
 
     //Create an instance of the SimMedTK framework/SDK
@@ -103,7 +103,7 @@ void runAudioExample()
     //Create the audio controller
     audioCtl = std::make_shared<AudioKeyboardController>();
 
-    sound = std::make_shared<smAudio>();
+    sound = std::make_shared<Audio>();
     sound->open("Sounds/ping.ogg", "PingSound");
 
     audioCtl->setSound(sound);

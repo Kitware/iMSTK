@@ -37,7 +37,7 @@ public:
     /// \brief Default constructor
     ///
     /// \param a Pointer to sound to be controlled
-    AudioKeyboardController(std::shared_ptr<smAudio> a);
+    AudioKeyboardController(std::shared_ptr<Audio> a);
 
     /// \brief Event handling function from CoreClass
     ///
@@ -47,10 +47,10 @@ public:
     /// \brief Set the sound to be controlled
     ///
     /// \param a Pointer to sound to be controlled
-    void setSound(std::shared_ptr<smAudio> a);
+    void setSound(std::shared_ptr<Audio> a);
 
 private:
-    std::shared_ptr<smAudio> sound; ///< Pointer to sound being controlled
+    std::shared_ptr<Audio> sound; ///< Pointer to sound being controlled
     bool loopSound; ///< Flag to loop the sound or not
     float soundVolume;
 };

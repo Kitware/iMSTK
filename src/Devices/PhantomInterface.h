@@ -24,30 +24,30 @@
 #ifndef SMPHANTOMINTERFACE_H
 #define SMPHANTOMINTERFACE_H
 
-#include "smHapticInterface.h"
+#include "HapticInterface.h"
 #include <HD/hd.h>
 #include <HDU/hduVector.h>
 #include <HDU/hduError.h>
-#include "smCore/smEventHandler.h"
+#include "Core/EventHandler.h"
 
 const int SM_MAX_PHANTOM_DEVICES = 4;
 
 /// \brief class to use phantom omni device
-class smPhantomInterface: public smHapticInterface
+class PhantomInterface: public HapticInterface
 {
 
 protected:
     Event *hapticEvent[SM_MAX_PHANTOM_DEVICES]; ///<
-    smHapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///<
+    HapticOutEventData *hapticEventData[SM_MAX_PHANTOM_DEVICES]; ///<
 
 public:
     bool forceEnabled;
 
     /// \brief constructor initialize the device
-    smPhantomInterface();
+    PhantomInterface();
 
     /// \brief destructor close the device; stop scheduler
-    ~smPhantomInterface();
+    ~PhantomInterface();
 
     /// \brief !!
     int openDevice();

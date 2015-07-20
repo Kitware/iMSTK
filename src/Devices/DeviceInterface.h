@@ -28,48 +28,51 @@
 #include "Core/Config.h"
 #include "Core/Module.h"
 
-/// Declarations and constants for the device
-const int   SIMMEDTK_MSG_UNKNOWN = -2;
-const int   SIMMEDTK_MSG_FAILURE = -1;
-const int   SIMMEDTK_MSG_SUCCESS =  0;
-
 /// \brief Abstract base interface class with virtual functions.
 /// Device specific implementation should be done by instantiating this class
-class smDeviceInterface: public Module
+class DeviceInterface: public Module
 {
 
 public:
+    enum class Message
+    {
+        Unknown = -2,
+        Failure = -1,
+        Success = 0
+    };
+
+public:
     /// \brief constructor
-    smDeviceInterface();
+    DeviceInterface();
 
     /// \brief destructor
-    virtual ~smDeviceInterface()
+    virtual ~DeviceInterface()
     {
 
     };
 
     /// \brief open the device
-    virtual int openDevice()
+    virtual Message openDevice()
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief close the device
-    virtual int closeDevice()
+    virtual Message closeDevice()
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     }
 
     /// \brief write data (for ADU interface device)
-    virtual int write(void */*Interfacehandle*/, int /*port*/, void */*data*/)
+    virtual Message write(void */*Interfacehandle*/, int /*port*/, void */*data*/)
     {
-        return  SIMMEDTK_MSG_UNKNOWN;
+        return  Message::Unknown;
     };
 
     /// \brief read data (for ADU interface device)
-    virtual int read(void */*Interfacehandle*/, int /*port*/, void */*data*/)
+    virtual Message read(void */*Interfacehandle*/, int /*port*/, void */*data*/)
     {
-        return SIMMEDTK_MSG_UNKNOWN;
+        return Message::Unknown;
     } ;
 
 protected :

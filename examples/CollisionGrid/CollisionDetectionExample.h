@@ -47,7 +47,7 @@ public:
     smDummySimulator *dummySim;
     smViewer *viewer;
     Simulator *simulator;
-    smPhantomInterface* hapticInterface;
+    PhantomInterface* hapticInterface;
     smHapticCameraTrans *motionTrans;
     smSpatialGrid *spatGrid;
     smLattice *lat;

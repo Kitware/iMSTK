@@ -45,7 +45,7 @@ public:
     Scene *scene1;
     smViewer *viewer;
 
-    smPhantomInterface* hapticInterface;
+    PhantomInterface* hapticInterface;
     smHapticCameraTrans *motionTrans;
 
     AlphaMapExample();

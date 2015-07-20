@@ -25,10 +25,10 @@
   * <pre>simmedtk_register_base_class_children_onload();</pre>
   * during your application's startup.
   *
-  * This macro should only be used outside of the smCore library;
-  * inside smCore, just modify Factory so that s_catalog is
+  * This macro should only be used outside of the Core library;
+  * inside Core, just modify Factory so that s_catalog is
   * initialized with the proper entries directly. That's because
-  * inside smCore, Factory::s_catalog might not be initialized
+  * inside Core, Factory::s_catalog might not be initialized
   * before the first registration call is made.
   *
   * A more specific example is the way the smRendering library

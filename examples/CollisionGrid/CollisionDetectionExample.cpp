@@ -31,7 +31,7 @@
 void CollisionDetectionExample::initHapticCamMotion()
 {
 
-    hapticInterface = new smPhantomInterface();
+    hapticInterface = new PhantomInterface();
     hapticInterface->forceEnabled = false; //disable forces right now for all devices
     hapticInterface->startDevice();
     hapticInterface->setEventDispatcher(simmedtkSDK->getEventDispatcher());
