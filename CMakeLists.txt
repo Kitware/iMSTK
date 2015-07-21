@@ -143,6 +143,7 @@ if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
+  add_definitions(-D_USE_MATH_DEFINES)
   add_definitions(-DWIN32_LEAN_AND_MEAN)
   add_definitions(-DWINDOWS_EXTRA_LEAN)
 endif()
@@ -232,7 +233,7 @@ set(SimMedTK_exports
   Mesh
   Rendering
   Simulators
-  Tools
+  VirtualTools
   Event)
 
 if(SimMedTK_USE_OCULUS)

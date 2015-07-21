@@ -6,7 +6,6 @@
 #define SIMMEDTK_REGISTER_RENDER_DELEGATES() \
   SIMMEDTK_RUN_LOADER(register_rendering_viewer); \
   SIMMEDTK_RUN_LOADER(register_aabb_render_delegate); \
-  SIMMEDTK_RUN_LOADER(register_lattice_render_delegate); \
   SIMMEDTK_RUN_LOADER(register_mesh_render_delegate); \
   SIMMEDTK_RUN_LOADER(register_plane_render_delegate); \
   SIMMEDTK_RUN_LOADER(register_scene_object_deformable_render_delegate); \

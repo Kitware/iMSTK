@@ -21,9 +21,6 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-// STD includes
-#include <cmath>
-
 // SimMedTK includes
 #include "Light.h"
 #include "Quaternion.h"

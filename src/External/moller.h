@@ -26,8 +26,6 @@
  * isectpt1, isectpt2 are the endpoints of the line of intersection
  */
 
-#include <cmath>
-
 //#define std::fabs(x) ((double)fabs(x))        /* implement as is fastest on your machine */
 // #define std::fabs(x) (x>=0?x:-x)        /* implement as is fastest on your machine */
 

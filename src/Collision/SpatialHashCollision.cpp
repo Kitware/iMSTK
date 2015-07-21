@@ -23,9 +23,6 @@
 
 #include "SpatialHashCollision.h"
 
-// STL includes
-#include <cmath>
-
 // SimMedTK includes
 #include "Core/CollisionConfig.h"
 #include "Collision/SurfaceTree.h"

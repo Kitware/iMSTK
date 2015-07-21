@@ -24,8 +24,6 @@
 #ifndef SMCONFIGRENDERING_H
 #define SMCONFIGRENDERING_H
 
-// STL includes
-#include <cmath>
 #include <memory>
 #include <vector>
 
