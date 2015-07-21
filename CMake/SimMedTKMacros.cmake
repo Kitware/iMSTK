@@ -55,7 +55,7 @@ function(simmedtk_add_library target)
   if (target_PUBLIC_HEADERS)
     simmedtk_install_library(${target})
     install(FILES ${target_PUBLIC_HEADERS}
-      DESTINATION include/simmedtk/${target}
+      DESTINATION include/v${SimMedTK_VERSION}/${target}
       COMPONENT Development
     )
   endif()

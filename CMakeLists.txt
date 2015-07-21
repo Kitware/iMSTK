@@ -156,7 +156,7 @@ if(SimMedTK_SUPERBUILD)
   return()
 endif()
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find required packages
@@ -240,9 +240,19 @@ if(SimMedTK_USE_OCULUS)
   list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
-add_subdirectory(src)
-
-add_subdirectory(examples)
+add_subdirectory(Core)
+add_subdirectory(Collision)
+add_subdirectory(ContactHandling)
+add_subdirectory(External)
+add_subdirectory(Devices)
+add_subdirectory(Mesh)
+add_subdirectory(Rendering)
+add_subdirectory(RenderDelegates)
+add_subdirectory(Simulators)
+add_subdirectory(VirtualTools)
+add_subdirectory(Event)
+add_subdirectory(Geometry)
+add_subdirectory(Examples)
 
 ################################################################################
 # Build documentation
@@ -252,7 +262,7 @@ add_subdirectory(examples)
 #
 
 if (SimMedTK_ENABLE_DOCUMENTATION)
-  add_subdirectory(documentation)
+  add_subdirectory(Documentation)
 endif()
 
 ################################################################################
