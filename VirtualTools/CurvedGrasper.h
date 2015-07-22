@@ -59,9 +59,7 @@ public:
     SurfaceMesh *mesh_pivot; // stores the pivot mesh
     SurfaceMesh *mesh_lowerJaw; // stores lower jaw mesh
     SurfaceMesh *mesh_upperJaw; // stores upper mesh jaw
-#ifdef smNIUSB6008DAQ
-    smPipeRegisteration NIUSB6008pipeReg; //
-#endif
+
     core::Vec3d godPos; // god object position
     double godMat[9]; // god object matrix
     int DAQdataID; // interface for DAQ

@@ -39,7 +39,7 @@ void VegaFemSimulator::initCustom()
     {
         auto object = objectsSimulated[i];
 
-        switch ( type )
+        switch ( object->getType() )
         {
             case core::ClassType::VegaFemSceneObject:
             {
