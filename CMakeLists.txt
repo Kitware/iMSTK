@@ -143,6 +143,7 @@ if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
   add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
+  add_definitions(-D_USE_MATH_DEFINES)
   add_definitions(-DWIN32_LEAN_AND_MEAN)
   add_definitions(-DWINDOWS_EXTRA_LEAN)
 endif()
@@ -155,7 +156,7 @@ if(SimMedTK_SUPERBUILD)
   return()
 endif()
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find required packages
@@ -224,24 +225,37 @@ set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 
 set(SimMedTK_exports
-  smCore
-  smCollision
-  smExternal
-  smExternalDevices
-  smGeometry
-  smMesh
-  smRendering
-  smSimulators
-  smTools
-  smEvent)
+  Collision
+  ContactHandling
+  Core
+  Devices
+  Event
+  External
+  Geometry
+  Mesh
+  RenderDelegates
+  Rendering
+  Simulators
+  VirtualTools
+  )
 
 if(SimMedTK_USE_OCULUS)
-  list(APPEND SimMedTK_exports smRenderingOculus)
+  list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
-add_subdirectory(src)
-
-add_subdirectory(examples)
+add_subdirectory(Collision)
+add_subdirectory(ContactHandling)
+add_subdirectory(Core)
+add_subdirectory(Devices)
+add_subdirectory(Event)
+add_subdirectory(External)
+add_subdirectory(Geometry)
+add_subdirectory(Mesh)
+add_subdirectory(RenderDelegates)
+add_subdirectory(Rendering)
+add_subdirectory(Simulators)
+add_subdirectory(VirtualTools)
+add_subdirectory(Examples)
 
 ################################################################################
 # Build documentation
@@ -251,7 +265,7 @@ add_subdirectory(examples)
 #
 
 if (SimMedTK_ENABLE_DOCUMENTATION)
-  add_subdirectory(documentation)
+  add_subdirectory(Documentation)
 endif()
 
 ################################################################################
@@ -262,7 +276,7 @@ export(PACKAGE SimMedTK)
 export(TARGETS
   ${SimMedTK_exports}
   FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
-  NAMESPACE smtk::
+  NAMESPACE mstk::
   EXPORT_LINK_INTERFACE_LIBRARIES
 )
 

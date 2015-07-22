@@ -1,9 +1,0 @@
-simmedtk_add_library(smUtilities
-  SOURCES
-    smDisplayText.cpp
-    smMath.cpp
-    smMotionTransformer.cpp
-    smTimer.cpp
-  PUBLIC_HEADERS
-    smDisplayText.h
-)

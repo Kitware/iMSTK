@@ -1,0 +1,76 @@
+
+simmedtk_add_library(Core
+  SOURCES
+    CollisionConfig.cpp
+    CollisionDetection.cpp
+    CollisionPair.cpp
+    Color.cpp
+    ContactHandling.cpp
+    CoreClass.cpp
+    Dispatcher.cpp
+    DisplayText.cpp
+    ErrorLog.cpp
+    Event.cpp
+    EventHandler.cpp
+    Geometry.cpp
+    IOStream.cpp
+    Light.cpp
+    Module.cpp
+    ObjectSimulator.cpp
+    RenderDetail.cpp
+    Scene.cpp
+    SceneObject.cpp
+    SDK.cpp
+    Simulator.cpp
+    StaticSceneObject.cpp
+    Timer.cpp
+    UnifiedId.cpp
+    ViewerBase.cpp
+  PUBLIC_HEADERS
+    CollisionConfig.h
+    CollisionDetection.h
+    CollisionManager.h
+    CollisionPair.h
+    Config.h
+    ContactHandling.h
+    CoreClass.h
+    Dispatcher.h
+    DisplayText.h
+    ErrorLog.h
+    EventData.h
+    Event.h
+    EventHandler.h
+    Factory.h
+    Geometry.h
+    IOStream.h
+    Light.h
+    MemoryBlock.h
+    Module.h
+    ObjectSimulator.h
+    Scene.h
+    SceneObject.h
+    Scheduler.h
+    SDK.h
+    Simulator.h
+    StaticSceneObject.h
+    Synchronization.h
+    ViewerBase.h
+    WorkerThread.h
+)
+
+target_link_libraries(Core
+  PUBLIC
+    GLEW::GLEW
+    ${OPENGL_LIBRARY}
+    sfml::graphics
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
+)
+
+if(UNIX)
+  target_compile_features(Core PUBLIC cxx_auto_type)
+endif()
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()
