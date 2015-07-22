@@ -225,34 +225,36 @@ set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 
 set(SimMedTK_exports
-  Core
   Collision
-  External
+  ContactHandling
+  Core
   Devices
+  Event
+  External
   Geometry
   Mesh
-  Rendering
   RenderDelegates
+  Rendering
   Simulators
   VirtualTools
-  Event)
+  )
 
 if(SimMedTK_USE_OCULUS)
   list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
-add_subdirectory(Core)
 add_subdirectory(Collision)
 add_subdirectory(ContactHandling)
-add_subdirectory(External)
+add_subdirectory(Core)
 add_subdirectory(Devices)
+add_subdirectory(Event)
+add_subdirectory(External)
+add_subdirectory(Geometry)
 add_subdirectory(Mesh)
-add_subdirectory(Rendering)
 add_subdirectory(RenderDelegates)
+add_subdirectory(Rendering)
 add_subdirectory(Simulators)
 add_subdirectory(VirtualTools)
-add_subdirectory(Event)
-add_subdirectory(Geometry)
 add_subdirectory(Examples)
 
 ################################################################################

@@ -42,7 +42,7 @@
 #ifndef UCDAVIS_FRAMEBUFFER_OBJECT_H
 #define UCDAVIS_FRAMEBUFFER_OBJECT_H
 
-#include <Core/Config.h>
+#include "Core/Config.h"
 #include <iostream>
 
 /*!
