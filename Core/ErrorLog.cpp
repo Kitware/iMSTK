@@ -77,7 +77,7 @@ void ErrorLog::printLastErrUnsafe()
 void ErrorLog::printLastErr()
 {
     std::lock_guard<std::mutex> lock(logLock); //Lock is released when leaves scope
-    printLastErr();
+    std::cout << "Last Error:" << errors.back() << " Time:" << timeStamps.back() << " ms" << "\n";
 }
 
 void ErrorLog::setConsoleOutput(bool flag)

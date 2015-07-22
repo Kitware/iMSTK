@@ -228,10 +228,11 @@ set(SimMedTK_exports
   Core
   Collision
   External
-  ExternalDevices
+  Devices
   Geometry
   Mesh
   Rendering
+  RenderDelegates
   Simulators
   VirtualTools
   Event)

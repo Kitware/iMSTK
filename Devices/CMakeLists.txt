@@ -23,7 +23,7 @@ if(SIMMEDTK_USE_NIUSB6008)
     NIUSB6008Interface.cpp)
 endif()
 
-simmedtk_add_library(ExternalDevices
+simmedtk_add_library(Devices
   SOURCES
     DeviceInterface.cpp
     ${EXTERNAL_DEVICES_SOURCES}
@@ -37,7 +37,7 @@ simmedtk_add_library(ExternalDevices
     PhantomInterface.h
 )
 
-target_link_libraries(ExternalDevices
+target_link_libraries(Devices
   PRIVATE
     Core
   PUBLIC

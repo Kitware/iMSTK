@@ -37,20 +37,17 @@ function(simmedtk_add_library target)
   set(options)
   set(oneValueArgs)
   set(multiValueArgs SOURCES PUBLIC_HEADERS)
+  cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
+  set(libtype)
   if (NOT WIN32)
-    set(libtype SHARED)
-  else()
     set(libtype STATIC)
   endif()
-  cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
-  add_library(${target} ${libtype}
-    ${target_SOURCES}
-  )
+  add_library(${target} ${libtype} ${target_SOURCES})
   target_include_directories(${target}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-      $<INSTALL_INTERFACE:include/simmedtk>
-      $<INSTALL_INTERFACE:include/simmedtk/${target}>
+      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}>
+      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}/${target}>
     )
   if (target_PUBLIC_HEADERS)
     simmedtk_install_library(${target})
