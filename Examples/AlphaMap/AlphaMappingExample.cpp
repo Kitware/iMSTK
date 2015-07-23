@@ -47,8 +47,8 @@ void AlphaMapExample::initHapticCamMotion()
 AlphaMapExample::AlphaMapExample()
 {
 
-    motionTrans = NULL;
-    hapticInterface = NULL;
+    motionTrans = nullptr;
+    hapticInterface = nullptr;
 
     simmedtkSDK = SDK::createSDK();
     object1 = new StaticSceneObject();
@@ -61,7 +61,7 @@ AlphaMapExample::AlphaMapExample()
 
 
     //  TCHAR szEXEPath[2048];
-    //  cout << GetModuleFileName ( NULL, szEXEPath, 2048 );
+    //  cout << GetModuleFileName ( nullptr, szEXEPath, 2048 );
 
 
 
@@ -115,12 +115,12 @@ AlphaMapExample::~AlphaMapExample()
     delete object1;
     delete scene1;
 
-    if (motionTrans != NULL)
+    if (motionTrans != nullptr)
     {
         delete motionTrans;
     }
 
-    if (hapticInterface != NULL)
+    if (hapticInterface != nullptr)
     {
         delete hapticInterface;
     }

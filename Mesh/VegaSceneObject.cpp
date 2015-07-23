@@ -8,7 +8,7 @@
 #include <float.h>
 
 VegaSceneObject::VegaSceneObject(char * filename):
-  mesh(NULL)
+  mesh(nullptr)
 {
   int verbose = 0;
   if (filename && filename[0])
@@ -90,7 +90,7 @@ void VegaSceneObject::ComputeMeshRadius(Vec3d & centroid, double * radius)
 
 void VegaSceneObject::ExportMeshGeometry(int * numVertices, double ** vertices, int * numTriangles, int ** triangles)
 {
-  mesh->exportGeometry(numVertices, vertices, numTriangles, triangles, NULL, NULL);
+  mesh->exportGeometry(numVertices, vertices, numTriangles, triangles, nullptr, nullptr);
 }
 
 void VegaSceneObject::TransformRigidly(double * centerOfMass, double * R)

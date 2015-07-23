@@ -28,14 +28,14 @@ template<typename T>
 EntryList<T>::EntryList()
 {
     totalEntries = 0;
-    p_entry = NULL;
+    p_entry = nullptr;
 }
 template<typename T>
 HashIterator<T>::HashIterator()
 {
     tableIndex = 0;
     currentIndex = 0;
-    bucketStart = NULL;
+    bucketStart = nullptr;
 }
 template<typename T> void
 HashIterator<T>::clone( HashIterator<T> &p_iterator )
@@ -87,7 +87,7 @@ bool Hash<T>::findandUpdateEntry( EntryList<T> &p_startEntry, T &p_prim )
 
     while ( true )
     {
-        if ( currentBucket == NULL )
+        if ( currentBucket == nullptr )
         {
             return false;
         }
@@ -111,7 +111,7 @@ void Hash<T>::clearBuckets( EntryList<T> &p_startEntry )
 
     while ( true )
     {
-        if ( currentBucket == NULL )
+        if ( currentBucket == nullptr )
         {
             return;
         }
@@ -134,18 +134,18 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex 
 {
     EntryList<T> *currentBucket;
     EntryList<T> *prevBucket;
-    EntryList<T> *emptySpace = NULL;
+    EntryList<T> *emptySpace = nullptr;
     prevBucket = &primitiveIDs[hashIndex];
     currentBucket = &primitiveIDs[hashIndex];
 
     while ( true )
     {
-        if ( currentBucket == NULL )
+        if ( currentBucket == nullptr )
         {
             break;
         }
 
-        if ( emptySpace == NULL && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
+        if ( emptySpace == nullptr && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
         {
             emptySpace = currentBucket;
             break;
@@ -155,7 +155,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex 
         currentBucket = currentBucket->p_entry;
     }
 
-    if ( currentBucket == NULL && emptySpace == NULL )
+    if ( currentBucket == nullptr && emptySpace == nullptr )
     {
         prevBucket->p_entry = new EntryList<T>;
         prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries] = p_triangle;
@@ -177,13 +177,13 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
 {
     EntryList<T> *currentBucket;
     EntryList<T> *prevBucket;
-    EntryList<T> *emptySpace = NULL;
+    EntryList<T> *emptySpace = nullptr;
     prevBucket = &primitiveIDs[hashIndex];
     currentBucket = &primitiveIDs[hashIndex];
 
     while ( true )
     {
-        if ( currentBucket == NULL )
+        if ( currentBucket == nullptr )
         {
             break;
         }
@@ -193,7 +193,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
             return SIMMEDTK_HASH_ENTRYALREADYEXISTS;
         }
 
-        if ( emptySpace == NULL && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
+        if ( emptySpace == nullptr && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
         {
             emptySpace = currentBucket;
             break;
@@ -203,7 +203,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
         currentBucket = currentBucket->p_entry;
     }
 
-    if ( currentBucket == NULL && emptySpace == NULL )
+    if ( currentBucket == nullptr && emptySpace == nullptr )
     {
         prevBucket->p_entry = new EntryList<T>;
         prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries] = p_triangle;
@@ -246,7 +246,7 @@ bool Hash<T>::nextBucketItem( HashIterator<T> &p_iterator, T &p_prim )
 {
     while ( true )
     {
-        if ( p_iterator.iterator == NULL )
+        if ( p_iterator.iterator == nullptr )
         {
             p_iterator.currentIndex = 0;
             return false;
@@ -278,7 +278,7 @@ bool Hash<T>::next( T &p_prim )
             return false;
         }
 
-        if ( currentIterationBucket == NULL )
+        if ( currentIterationBucket == nullptr )
         {
             currentTableIndex++;
             currentEntryIndex = 0;
@@ -313,7 +313,7 @@ bool Hash<T>::nextByRef( T **p_prim )
             return false;
         }
 
-        if ( currentIterationBucket == NULL )
+        if ( currentIterationBucket == nullptr )
         {
             currentTableIndex++;
             currentEntryIndex = 0;

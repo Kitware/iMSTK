@@ -34,7 +34,7 @@ MetalShader::MetalShader( const std::string &p_verteShaderFileName,
     this->log = SDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
-    setShaderFileName( p_verteShaderFileName, NULL, p_fragmentFileName );
+    setShaderFileName( p_verteShaderFileName, nullptr, p_fragmentFileName );
     createParam( "DecalTex" );
     createParam( "BumpTex" );
     createParam( "SpecularTex" );

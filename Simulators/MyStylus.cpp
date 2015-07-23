@@ -38,19 +38,19 @@ MyStylus::MyStylus(const std::string& p_shaft, const std::string& p_lower, const
     angle = 0;
     Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
-    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
     mesh->loadMesh(p_shaft, BaseMesh::MeshFileType::ThreeDS);
     mesh->assignTexture("hookCautery");
     mesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     mesh->rotate(rot);
 
-    SurfaceMesh *lowerMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    SurfaceMesh *lowerMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
     lowerMesh->loadMesh(p_lower, BaseMesh::MeshFileType::ThreeDS);
     lowerMesh->assignTexture("metal");
     lowerMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
     lowerMesh->rotate(rot);
 
-    SurfaceMesh *upperMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    SurfaceMesh *upperMesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
     upperMesh->loadMesh(p_upper, BaseMesh::MeshFileType::ThreeDS);
     upperMesh->assignTexture("metal");
     upperMesh->scale(core::Vec3d(0.2, 0.2, 0.2));
@@ -186,7 +186,7 @@ HookCautery::HookCautery(const std::string& p_pivot)
 {
     Matrix33d rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
-    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, NULL);
+    SurfaceMesh *mesh = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
     mesh->loadMesh(p_pivot, BaseMesh::MeshFileType::ThreeDS);
     mesh->assignTexture("metal");
     mesh->scale(core::Vec3d(0.2, 0.2, 0.2));

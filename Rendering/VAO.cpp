@@ -178,7 +178,7 @@ VBOBufferEntryInfo::VBOBufferEntryInfo()
 {
     shaderAttribLocation = -1;
     attributeIndex = 1;
-    attribPointer = NULL;
+    attribPointer = nullptr;
     nbrElements = 0;
     arrayBufferType = SMVBO_POS;
 }
@@ -231,7 +231,7 @@ void VAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles, v
 }
 bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
 {
-    if ( p_shader == NULL )
+    if ( p_shader == nullptr )
     {
         shader = Shader::getShader( p_mesh->getRenderDetail()->shaders[0] );
     }

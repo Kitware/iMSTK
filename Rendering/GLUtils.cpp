@@ -29,7 +29,7 @@
 #endif
 
 ///checks the openGL error. if there is an error then it returns
-///the error text otherwise it returns NULL
+///the error text otherwise it returns nullptr
 bool GLUtils::queryGLError(std::string& err)
 {
     GLenum errCode;

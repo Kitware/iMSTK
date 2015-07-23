@@ -54,7 +54,7 @@ public:
 
 public:
     /// \brief checks the openGL error. if there is an error then it returns
-    /// \brief the error text otherwise it returns NULL
+    /// \brief the error text otherwise it returns nullptr
     static bool queryGLError(std::string& err);
 
     /// \brief  taken from glProgramming.com.  Checks the extension.

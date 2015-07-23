@@ -88,7 +88,7 @@ void Simulator::run()
     {
         beginModule();
 
-        if (main != NULL)
+        if (main != nullptr)
         {
             main->simulateMain(param);
         }

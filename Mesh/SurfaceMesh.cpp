@@ -80,7 +80,7 @@ bool SurfaceMesh::loadMesh(const std::string& fileName, const MeshFileType &file
         break;
 
     default:
-        if (log_SF != NULL)
+        if (log_SF != nullptr)
         {
             log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
         }
@@ -92,7 +92,7 @@ bool SurfaceMesh::loadMesh(const std::string& fileName, const MeshFileType &file
 
     if (ret == false)
     {
-        if (log_SF != NULL)
+        if (log_SF != nullptr)
         {
             log_SF->addError("Error: Mesh file NOT FOUND");
         }
@@ -131,7 +131,7 @@ bool SurfaceMesh::loadMeshLegacy(const std::string& fileName, const MeshFileType
         break;
 
     default:
-        if (log_SF != NULL)
+        if (log_SF != nullptr)
         {
             log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
         }
@@ -144,7 +144,7 @@ bool SurfaceMesh::loadMeshLegacy(const std::string& fileName, const MeshFileType
 
     if (ret == false)
     {
-        if (log_SF != NULL)
+        if (log_SF != nullptr)
         {
             log_SF->addError("Error: Mesh file NOT FOUND");
         }
@@ -185,9 +185,9 @@ bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
                            aiProcess_RemoveComponent | //Removes the components in AI_CONFIG_PP_RVC_FLAGS
                            aiProcess_ImproveCacheLocality); //Reorders triangles for better vertex cache locality
 
-    if (scene == NULL)
+    if (scene == nullptr)
     {
-        if (log_SF != NULL)
+        if (log_SF != nullptr)
         {
             log_SF->addError("Error: Error loading mesh: " + std::string(fileName));
         }
@@ -225,7 +225,7 @@ bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
         //Assimp supports 3D texture coords, but we only support 2D
         if (mesh->mNumUVComponents[0] != 2)
         {
-            if (log_SF != NULL)
+            if (log_SF != nullptr)
             {
                 log_SF->addError("Error: Error loading mesh, non-two dimensional texture coordinate found.");
             }
@@ -247,7 +247,7 @@ bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
     {
         if (mesh->mFaces[i].mNumIndices != 3) //Make sure that the face is triangular
         {
-            if (log_SF != NULL)
+            if (log_SF != nullptr)
             {
                 log_SF->addError("Error: Error loading mesh, non-triangular face found.");
             }
@@ -276,7 +276,7 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
     unsigned short temp;
     char l_char;
 
-    if ((l_file = fopen(fileName.c_str(), "rb")) == NULL) //Open the file
+    if ((l_file = fopen(fileName.c_str(), "rb")) == nullptr) //Open the file
     {
         return 0;
     }

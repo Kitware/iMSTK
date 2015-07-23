@@ -52,7 +52,7 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
 
     float *objectBufferPtr = reinterpret_cast<float*>(glMapBufferARB(
         GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + dataOffsetMap[p_objectId];
-    if (objectBufferPtr == NULL)
+    if (objectBufferPtr == nullptr)
     {
         log->addError("VBO could not map the buffer");
         renderingError = true;
@@ -94,7 +94,7 @@ VBOResult VBO::updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_o
 
     float *objectBufferPtr = reinterpret_cast<float*>(glMapBufferARB(
         GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + indexOffsetMap[p_objectId];
-    if (objectBufferPtr == NULL)
+    if (objectBufferPtr == nullptr)
     {
         log->addError("VBO could not map the buffer");
         renderingError = true;

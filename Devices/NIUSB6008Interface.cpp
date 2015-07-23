@@ -72,39 +72,39 @@ NIUSB6008Interface::NIUSB6008Interface(int VBLaST_Task_ID)
     {
     case 1: // peg transfer: dissect, dissect
         //0 1
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai1", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai1", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
         break;
 
     case 2: // pattern cutting: dissect, shear
         //0 2
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai0", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
         break;
 
     case 3: // ligating loop: ligating loop, shear, grasper
         //2 3 4
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai3", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai4", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai3", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai4", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
         break;
 
     case 4: // intracorporeal suturing: needle driver, needle driver
         // 5 6
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai5", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai6", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai5", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai6", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
         break;
 
     case 5: // extracorporeal suturing: needle driver, needle driver, knot pusher
         // 5 6 7
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai5", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai6", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL));
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai7", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL)); //DAQmx_Val_Cfg_Default
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai5", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai6", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr));
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai7", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr)); //DAQmx_Val_Cfg_Default
         break;
 
     case 6:
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL)); // stapler
-        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai3", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, NULL)); //grasper
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai2", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr)); // stapler
+        initNI_Error(DAQmxCreateAIVoltageChan(taskHandle, "Dev1/ai3", "", DAQmx_Val_RSE, -10.0, 10.0, DAQmx_Val_Volts, nullptr)); //grasper
 
     default:
         break;
@@ -148,7 +148,7 @@ void NIUSB6008Interface::getToolCalibrationData()
     FILE *fp_cali;
     fp_cali = fopen("config/toolCalibrationNIUSB6008.txt", "r");
 
-    if (NULL == fp_cali)
+    if (nullptr == fp_cali)
     {
         printf("NI DAQ USB-6008 configuration file not found: config/toolCalibrationNIUSB6008.txt");
         assert(fp_cali);
@@ -190,7 +190,7 @@ void NIUSB6008Interface::setTool()
     FILE *fp;
     fp = fopen("config/toolSetting.txt", "r");
 
-    if (NULL == fp)
+    if (nullptr == fp)
     {
         printf("Tool settings file not found: config/toolSetting.txt");
         assert(fp);
@@ -388,10 +388,10 @@ int32 CVICALLBACK EveryNCallback(TaskHandle taskHandle, int32 everyNsamplesEvent
 
     if (NIUSB6008Interface->taskID == 1 || NIUSB6008Interface->taskID == 2 || NIUSB6008Interface->taskID == 4 || NIUSB6008Interface->taskID == 6)
     {
-        DAQmxErrChk(DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 20, &read, NULL));
+        DAQmxErrChk(DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 20, &read, nullptr));
     }
 
-    DAQmxErrChk(DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 10 * NIUSB6008Interface->nbrActiveChannel, &read, NULL));
+    DAQmxErrChk(DAQmxReadAnalogF64(taskHandle, 10, 10.0, DAQmx_Val_GroupByChannel, NIUSB6008Interface->sampdata, 10 * NIUSB6008Interface->nbrActiveChannel, &read, nullptr));
 
     if (read > 0)
     {

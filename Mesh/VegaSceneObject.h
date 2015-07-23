@@ -40,9 +40,9 @@ public:
   void ExportMeshGeometry(int * numVertices, double ** vertices, int * numTriangles, int ** triangles);
 
   // finds the closest vertex using an exhaustive search
-  // returns distance in "distance", if distance is not NULL
-  // in this class, you can safely ignore the last parameter (keep it NULL)
-  virtual int GetClosestVertex(Vec3d & queryPos, double * distance=NULL, double * auxVertexBuffer=NULL);
+  // returns distance in "distance", if distance is not nullptr
+  // in this class, you can safely ignore the last parameter (keep it nullptr)
+  virtual int GetClosestVertex(Vec3d & queryPos, double * distance=nullptr, double * auxVertexBuffer=nullptr);
 
   // ==== normals ====
 

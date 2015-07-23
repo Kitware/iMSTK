@@ -215,7 +215,7 @@ FrameBuffer::FrameBuffer()
     isDepthTexAttached = false;
     renderDepthBuff = false;
     renderColorBuff = false;
-    renderBuffer = NULL;
+    renderBuffer = nullptr;
 }
 void FrameBuffer::setDim( int p_width, int p_height )
 {
@@ -239,7 +239,7 @@ void FrameBuffer::attachRenderBuffer( RenderBuffer *p_renderBuf )
 }
 void FrameBuffer::attachDepthTexture( Texture *p_texture )
 {
-    if ( p_texture == NULL )
+    if ( p_texture == nullptr )
     {
         std::cout << "Error in frambuffer depth attachment" << "\n";
     }

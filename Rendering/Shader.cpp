@@ -113,14 +113,14 @@ bool Shader::readShaderContent(const std::string& p_file, std::string& p_content
 }
 
 ///this function gets the vertex,fragment and geometry shader fileNames respectively. if you don't use
-/// one of them just simply send NULL pointer as a parameter.
+/// one of them just simply send nullptr pointer as a parameter.
 bool Shader::initShaders(const std::string& p_vertexProgFileName,
                              const std::string& p_fragmentProgFileName,
                              const std::string& p_geometryProgFileName)
 {
     if (glewIsSupported("GL_VERSION_2_0") == GL_FALSE)
     {
-        if (log != NULL)
+        if (log != nullptr)
         {
             log->addError("Shader:OpenGL 2.0 not supported");
         }
@@ -220,7 +220,7 @@ void Shader::createShaderGLSL(GLhandleARB &p_shaderObject,
 {
     const char *shaderSrc = p_shaderContent.data();
     p_shaderObject = glCreateShader(p_shaderType);
-    glShaderSource(p_shaderObject, 1, &shaderSrc, NULL);
+    glShaderSource(p_shaderObject, 1, &shaderSrc, nullptr);
     glCompileShader(p_shaderObject);
     printInfoLog(p_shaderObject);
     checkGLError();
@@ -250,7 +250,7 @@ void Shader::reloadShaderGLSL(const GLhandleARB p_shaderObject,
                                 const std::string& p_shaderContent)
 {
     const char *shaderSrc = p_shaderContent.data();
-    glShaderSource(p_shaderObject, 1, &shaderSrc, NULL);
+    glShaderSource(p_shaderObject, 1, &shaderSrc, nullptr);
     glCompileShader(p_shaderObject);
     checkGLError();
 }
@@ -278,7 +278,7 @@ bool Shader::checkGLError()
     {
         if (GLUtils::queryGLError(errorText))
         {
-            if (log != NULL)
+            if (log != nullptr)
             {
                 log->addError(errorText);
             }
@@ -355,7 +355,7 @@ void Shader::restoreAndEnableCurrent()
 
 #ifdef SIMMEDTK_OPENGL_SHADER
 
-    if (Shader::savedShader != NULL)
+    if (Shader::savedShader != nullptr)
     {
         Shader::currentShader = Shader::savedShader;
 
@@ -387,7 +387,7 @@ void Shader::saveAndDisableCurrent()
 
 #ifdef SIMMEDTK_OPENGL_SHADER
 
-    if (currentShader != NULL)
+    if (currentShader != nullptr)
     {
         if (Shader::currentShader->vertexProgramExist)
         {
