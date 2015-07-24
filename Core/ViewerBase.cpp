@@ -43,7 +43,7 @@ ViewerBase::ViewerBase()
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
     defaultSpecularColor.setValue(0.9, 0.9, 0.9, 1.0);
 
-    this->log = NULL;
+    this->log = nullptr;
 
     this->globalAxisLength = 1.0;
 
@@ -94,7 +94,7 @@ void ViewerBase::initScenes()
         for (auto sceneObject: sceneLocal.sceneObjects)
         {
             //initialize the custom Render if there is any
-            if ( sceneObject->customRender != NULL && sceneObject->getType() != core::ClassType::Shader )
+            if ( sceneObject->customRender != nullptr && sceneObject->getType() != core::ClassType::Shader )
             {
                 sceneObject->customRender->initDraw();
             }

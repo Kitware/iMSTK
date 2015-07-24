@@ -672,10 +672,10 @@ LineMesh::LineMesh( int p_nbrVertices, bool autoEdge ) : BaseMesh()
     texCoord = new TexCoord[nbrVertices];
 
     /// Edge AABB should be assigned by the instance
-    edgeAABBs = NULL;
+    edgeAABBs = nullptr;
 
     /// Edges should be assigned by the instance
-    edges = NULL;
+    edges = nullptr;
 
     /// Number of edges should be assigned by the instance
     nbrEdges = 0;

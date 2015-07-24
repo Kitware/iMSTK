@@ -66,7 +66,7 @@ private:
     bool renderingError;
 
 public:
-    /// \brief  constructor. gets error log or NULL
+    /// \brief  constructor. gets error log or nullptr
     VBO(ErrorLog *p_log);
 
     /// \brief  init with given VBO type

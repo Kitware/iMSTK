@@ -39,19 +39,19 @@ go_bandit([](){
       AssertThat(Factory<CoreClass>::optionsForClass("abstract").size(), Equals(2));
     });
 
-    it("creates a non-NULL default class instance", [&]() {
+    it("creates a non-nullptr default class instance", [&]() {
       AssertThat(!!Factory<CoreClass>::createDefault("abstract").get(), IsTrue());
     });
 
-    it("creates the *proper* non-NULL default class instance", [&]() {
+    it("creates the *proper* non-nullptr default class instance", [&]() {
       AssertThat(Factory<CoreClass>::createDefaultAs<abstract>("abstract")->stupid()[0], Equals('A'));
     });
 
-    it("creates the proper non-NULL *specified group* class instance", [&]() {
+    it("creates the proper non-nullptr *specified group* class instance", [&]() {
       AssertThat(Factory<CoreClass>::createSubclassForGroupAs<abstract>("abstract", 66)->stupid()[0], Equals('B'));
     });
 
-    it("creates a non-NULL instance given only a concrete class name", [&]() {
+    it("creates a non-nullptr instance given only a concrete class name", [&]() {
       AssertThat(Factory<CoreClass>::createConcreteClassAs<A>("A")->stupid()[0], Equals('A'));
     });
 

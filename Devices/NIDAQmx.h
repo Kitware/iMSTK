@@ -97,8 +97,8 @@ typedef uInt32             CalHandle;
 #ifndef FALSE
 #define FALSE           (0L)
 #endif
-#ifndef NULL
-#define NULL            (0L)
+#ifndef nullptr
+#define nullptr            (0L)
 #endif
 
 

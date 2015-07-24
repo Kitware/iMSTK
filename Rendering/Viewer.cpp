@@ -241,7 +241,7 @@ void Viewer::destroyFboListItems()
         if (fboListItems[i].fbo)
         {
             delete (fboListItems[i].fbo);
-            fboListItems[i].fbo = NULL;
+            fboListItems[i].fbo = nullptr;
         }
     }
 }

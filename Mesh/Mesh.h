@@ -230,7 +230,7 @@ public:
 
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
-    ///Therefore it is initially NULL
+    ///Therefore it is initially nullptr
     std::vector<AABB> triAABBs;
 
     MeshType meshType; ///< type of mesh (rigid, deformable etc.)

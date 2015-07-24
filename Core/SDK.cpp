@@ -32,13 +32,6 @@
 // std::unique_ptr<ErrorLog> SDK::errorLog;
 std::once_flag SDK::sdkCallOnceFlag;
 
-IndiceArray<MeshHolder>  *SDK::meshesRef;
-IndiceArray<ModuleHolder> *SDK::modulesRef;
-IndiceArray<ObjectSimulatorHolder>  *SDK::objectSimulatorsRef;
-IndiceArray<ObjectSimulatorHolder>*SDK::collisionDetectorsRef;
-IndiceArray<SceneHolder>*SDK::scenesRef;
-IndiceArray<SceneObjectHolder>*SDK::sceneObjectsRef;
-
 /// \brief constructor
 SDK::SDK()
 {
@@ -51,14 +44,6 @@ SDK::SDK()
     sceneList.clear();
 
     errorLog = std::make_shared<ErrorLog>();
-
-    // TODO: Fix these! Leaking...
-    meshesRef = new IndiceArray<MeshHolder>(SIMMEDTK_SDK_MAXMESHES);
-    modulesRef = new IndiceArray<ModuleHolder>(SIMMEDTK_SDK_MAXMODULES) ;
-    objectSimulatorsRef = new IndiceArray<ObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS);
-    collisionDetectorsRef = new IndiceArray<ObjectSimulatorHolder>(SIMMEDTK_SDK_MAXOBJECTSIMULATORS) ;
-    scenesRef = new IndiceArray<SceneHolder>(SIMMEDTK_SDK_MAXSCENES);
-    sceneObjectsRef = new IndiceArray<SceneObjectHolder>(SIMMEDTK_SDK_MAXSCENEOBJTECTS);
 }
 
 SDK::~SDK()
@@ -83,7 +68,7 @@ void SDK::releaseScene(std::shared_ptr<Scene> scene)
 std::shared_ptr<ViewerBase> SDK::createViewer()
 {
     this->viewer = Factory<CoreClass>::createDefaultAs<ViewerBase>("ViewerBase");
-    if (!!this->viewer)
+    if (this->viewer)
       {
       this->viewer->log = this->errorLog;
       this->registerModule(this->viewer);
@@ -112,15 +97,10 @@ std::shared_ptr<ViewerBase> SDK::getViewerInstance()
 /// \brief
 std::shared_ptr<Simulator> SDK::createSimulator()
 {
-    if (this->simulator == nullptr)
+    if(!this->simulator)
     {
         simulator = std::make_shared<Simulator>(errorLog);
-
-        for (int j = 0; j < (*scenesRef).size(); j++)
-        {
-            simulator->sceneList.push_back((*scenesRef)[j].scene);
-        }
-
+        simulator->sceneList = this->sceneList;
         registerModule(simulator);
     }
 
@@ -135,12 +115,13 @@ void SDK::updateSceneListAll()
 /// \brief Initialize all modules registered to the SimMedTK SDK
 void SDK::initRegisteredModules()
 {
-
-    for (int i = 0; i < modulesRef->size(); i++)
-        if ((*modulesRef)[i].module->getType() != core::ClassType::Viewer)
+    for(auto &module : this->moduleList)
+    {
+        if(module->getType() != core::ClassType::Viewer)
         {
-            (*modulesRef)[i].module->init();
+            module->init();
         }
+    }
 }
 
 /** \brief Run the registered modules
@@ -151,36 +132,33 @@ void SDK::initRegisteredModules()
   * are already running or no module inherits ViewerBase.
   * Otherwise, the index of the last viewer module encountered
   * is returned.
+  * Note: This function assumes that there is only one viewer.
   */
-int SDK::runRegisteredModules()
+void SDK::runRegisteredModules()
 {
-    int viewerIndex = -1;
-
     if (isModulesStarted)
     {
-        return viewerIndex;
+        return;
     }
 
-    for (int i = 0; i < modulesRef->size(); i++)
+    for(auto &module : this->moduleList)
     {
-        auto view = std::dynamic_pointer_cast<ViewerBase>((*modulesRef)[i].module);
-        if (view)
-          viewerIndex = i;
-        else
-          modules.emplace_back([i]{(*modulesRef)[i].module->exec();});
+        auto viewer = std::dynamic_pointer_cast<ViewerBase>(module);
+        if(!viewer)
+        {
+            modules.emplace_back([module]{module->exec();});
+        }
     }
 
     isModulesStarted = true;
-    return viewerIndex;
 }
 
 ///\brief shutdowns all the modules
 void SDK::shutDown()
 {
-
-    for (int i = 0; i < modulesRef->size(); i++)
+    for(auto &module : this->moduleList)
     {
-        (*modulesRef)[i].module->terminateExecution = true;
+        module->terminateExecution = true;
     }
     shutdown = true;
 }
@@ -191,19 +169,23 @@ void SDK::run()
     updateSceneListAll();
     initRegisteredModules();
 
-    int viewer = runRegisteredModules();
-    // Run the viewer in the main thread:
-    if (viewer >= 0)
-        (*modulesRef)[viewer].module->exec();
+    runRegisteredModules();
+
+    this->viewer->exec();
+
     // Now wait for other modules to shut down
-    while (!shutdown) {
+    while (!shutdown)
+    {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-    terminateAll(); //Tell framework threads to shutdown
-    //Wait for all threads to finish processing
-    for (size_t i = 0; i < modules.size(); ++i)
+
+    // Tell framework threads to shutdown
+    terminateAll();
+
+    // Wait for all threads to finish processing
+    for (auto &module : modules)
     {
-        modules[i].join();
+        module.join();
     }
 }
 
@@ -249,19 +231,17 @@ std::shared_ptr<SDK> SDK::getInstance()
 
 void SDK::terminateAll()
 {
-
-    for(int i = 0; i < (*modulesRef).size(); i++)
+    for(auto &module : this->moduleList)
     {
-        (*modulesRef)[i].module->terminateExecution = true;
+        module->terminateExecution = true;
     }
 
-    for(int i = 0; i < (*modulesRef).size(); i++)
+    for(auto &module : this->moduleList)
     {
         bool moduleTerminated = false;
-
-        while(true && !moduleTerminated)
+        while(!moduleTerminated)
         {
-            if((*modulesRef)[i].module->isTerminationDone())
+            if(module->isTerminationDone())
             {
                 moduleTerminated = true;
             }
@@ -270,56 +250,71 @@ void SDK::terminateAll()
 }
 
 /// \brief register functions
-int SDK::registerMesh(std::shared_ptr<BaseMesh> p_mesh)
+void SDK::registerMesh(std::shared_ptr<BaseMesh> newMesh)
 {
-    MeshHolder mh;
-    mh.mesh = p_mesh;
-    return meshesRef->checkAndAdd(mh);
+    if(std::end(this->meshList) ==
+        std::find(std::begin(this->meshList),std::end(this->meshList),newMesh) )
+    {
+        this->meshList.emplace_back(newMesh);
+    }
 }
 
-int SDK::registerModule(std::shared_ptr<Module> p_mod)
+void SDK::registerModule(std::shared_ptr<Module> newModule)
 {
-    ModuleHolder mh;
-    mh.module = p_mod;
-    return modulesRef->checkAndAdd(mh);
+    if(std::end(this->moduleList) ==
+        std::find(std::begin(this->moduleList),std::end(this->moduleList),newModule) )
+    {
+        this->moduleList.emplace_back(newModule);
+    }
 }
 
-void SDK::registerObjectSim(std::shared_ptr<ObjectSimulator> p_os)
+void SDK::registerObjectSimulator(std::shared_ptr<ObjectSimulator> newObjectSimulator)
 {
-    ObjectSimulatorHolder os;
-    os.objectSim = p_os;
-    objectSimulatorsRef->checkAndAdd(os);
+    if(std::end(this->simulatorList) ==
+        std::find(std::begin(this->simulatorList),std::end(this->simulatorList),newObjectSimulator) )
+    {
+        this->simulatorList.emplace_back(newObjectSimulator);
+    }
 }
 
-void SDK::registerCollDet(std::shared_ptr<ObjectSimulator> p_col)
+void SDK::registerCollisionDetection(std::shared_ptr<CollisionDetection> newCollisionDetection)
 {
-    ObjectSimulatorHolder col;
-    col.objectSim = p_col;
-    collisionDetectorsRef->checkAndAdd(col);
+    if(std::end(this->collisionDetectionList) ==
+        std::find(std::begin(this->collisionDetectionList),std::end(this->collisionDetectionList),newCollisionDetection) )
+    {
+        this->collisionDetectionList.emplace_back(newCollisionDetection);
+    }
 }
 
-void SDK::registerScene(std::shared_ptr<Scene> p_sc)
+void SDK::registerScene(std::shared_ptr<Scene> newScene)
 {
-    SceneHolder sc;
-    sc.scene = p_sc;
-    scenesRef->checkAndAdd(sc);
+    if(std::end(this->sceneList) ==
+        std::find(std::begin(this->sceneList),std::end(this->sceneList),newScene) )
+    {
+        this->sceneList.emplace_back(newScene);
+    }
 }
 
-void SDK::registerSceneObject(std::shared_ptr<SceneObject> p_sco)
+void SDK::registerSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
-    SceneObjectHolder  sh;
-    sh.sceneObject = p_sco;
-    sceneObjectsRef->checkAndAdd(sh);
+    if(std::end(this->sceneObjectList) ==
+        std::find(std::begin(this->sceneObjectList),std::end(this->sceneObjectList),newSceneObject) )
+    {
+        this->sceneObjectList.emplace_back(newSceneObject);
+    }
 }
 
 void SDK::addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<ObjectSimulator> p_os, int p_scId)
 {
-    assert(p_os);
-    assert(p_sco);
+    if(!p_sco || !p_os)
+    {
+        std::cerr << "Empty objects" << std::endl;
+        return;
+    }
 
     p_sco->attachObjectSimulator(p_os);
 
-    this->registerObjectSim(p_os);
+    this->registerObjectSimulator(p_os);
 
     this->registerSceneObject(p_sco);
 

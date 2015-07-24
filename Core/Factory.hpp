@@ -118,6 +118,6 @@ std::shared_ptr<T> Factory<T>::createSubclassForGroup(
 
 /// Class-static map from abstract class names to registered concrete children.
 template<typename T>
-std::map<std::string, typename Factory<T>::FactoryConfigurationOptions>* Factory<T>::s_catalog = NULL;
+std::map<std::string, typename Factory<T>::FactoryConfigurationOptions>* Factory<T>::s_catalog = nullptr;
 
 #endif // SMFACTORY_HPP

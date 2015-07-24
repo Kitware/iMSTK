@@ -54,7 +54,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
     // Create dummy simulator
     defaultSimulator = std::make_shared<DummySimulator>(sdk->getErrorLog());
-    sdk->registerObjectSim(defaultSimulator);
+    sdk->registerObjectSimulator(defaultSimulator);
 
     // Init texture manager and specify the textures needed for the current application
     TextureManager::init(sdk->getErrorLog());

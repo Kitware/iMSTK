@@ -27,80 +27,6 @@
 // SimMedTK includes
 #include "Core/Config.h"
 
-template<typename T>
-class IndiceArrayIter;
-
-/// \brief  inidice array for fast access to index
-template<typename T>
-class IndiceArray
-{
-protected:
-    /// \brief  storage
-    T *storage;
-    /// \brief  check if the slot is empty
-    bool *isEmpty;
-    /// \brief  indices
-    int *indices;
-    /// \brief  number of elements
-    int nbrElements;
-    /// \brief  maximum storage
-    int maxStorage;
-public:
-    /// \brief  destructor
-    ~IndiceArray();
-    /// \brief constructor; gets maximum number of elements
-    inline IndiceArray(int p_maxStorage);
-    /// \brief  add item
-    inline int add(T p_item);
-    /// \brief check if the item exists, if not add
-    inline int checkAndAdd(T p_item);
-    /// \brief remove the element from array
-    inline bool remove(int p_itemIndex);
-
-    /// \brief replace the entry in p_index slot with p_item
-    inline bool replace(int p_index, T &p_item);
-    /// \brief get element by reference
-    inline T& getByRef(int p_index);
-    /// \brief  get element by safe. If the element doesn't exist it will return false
-    inline bool getByRefSafe(int p_index, T&p_item);
-    /// \brief get element by reference with string
-    inline T& getByRef(std::string p_string);
-    /// \brief for iterative access
-    friend IndiceArrayIter<T>;
-    /// \brief print the elements
-    inline void print() const;
-    /// \brief operators
-    inline T& operator[](int p_index);
-
-    inline int size();
-    /// \brief copy from another p_array
-    inline bool copy(IndiceArray &p_array);
-};
-
-/// \brief  iteration
-template<class T>
-class IndiceArrayIter
-{
-    int index;
-    IndiceArray<T> *arrayPtr;
-public:
-    /// \brief constructor that require index array
-    IndiceArrayIter(IndiceArray<T> *p_array);
-    /// \brief  operators for accessing and iteration
-    T& operator[](int p_index);
-
-    int& operator++(); //prefix;
-
-    int operator++(const int);  //postfix;
-
-    int& operator--(); //prefix;
-
-    int operator--(const int);  //postfix;
-
-    inline int begin();
-
-    inline int end();
-};
 /// \brief hash bucket size
 #define SIMMEDTK_HASHBUCKET_SIZE    10
 /// \brief a hash entry; bucket
@@ -164,6 +90,7 @@ public:
     long int num_prim;
     /// \brief  table size
     long int tableSize;
+
 private:
     /// \brief entries in the bucket
     inline void moveEntriesInBucket(EntryList<T> &p_Bucket, int p_entryIndex);
@@ -202,33 +129,6 @@ enum StorageSlideType
 {
     SIMMEDTK_STORAGESLIDING_FRONTFIRST,
     SIMMEDTK_STORAGESLIDING_LASTFIRST
-};
-/// \brief sliding storage window
-template<typename T>
-class StorageSlidingWindow
-{
-private:
-    /// \brief  type
-    StorageSlideType strorageType;
-public:
-    /// \brief  data
-    T *data;
-    /// \brief window size
-    unsigned int windowSize;
-    /// \brief constructor
-    ~StorageSlidingWindow();
-    /// \brief siding window storage. constructor  gets window size, type
-    StorageSlidingWindow(int p_windowSize = 10, StorageSlideType p_type = SIMMEDTK_STORAGESLIDING_LASTFIRST);
-    /// \brief storage type
-    inline StorageSlideType getStorageType();
-    /// \brief  resize storage
-    inline void resize(int p_newSize);
-    /// \brief add value
-    inline void add(T p_value);
-    /// \brief  zero all the entries
-    inline void zeroed();
-    /// \brief  print all the elements
-    void print() const;
 };
 
 #include "Core/DataStructures.hpp"

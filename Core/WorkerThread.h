@@ -59,7 +59,7 @@ public:
     ProcessID()
     {
         x = y = z = totalProcX = totalProcY = totalProcZ = sizeOfData = 0;
-        data = NULL;
+        data = nullptr;
         numbScheme = ProcessNumbering::X;
     }
 
@@ -97,7 +97,7 @@ public:
         id.totalProcX = 0;
         id.totalProcY = 0;
         id.totalProcZ = 0;
-        id.data = NULL;
+        id.data = nullptr;
         id.sizeOfData = 0;
         id.numbScheme = ProcessID::ProcessNumbering::X;
         termination = false;

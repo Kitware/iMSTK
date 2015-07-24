@@ -70,7 +70,7 @@ MeshContainer *StylusRigidSceneObject::getMeshContainer(std::string p_string) co
 
 void StylusRigidSceneObject::posTraverseCallBack(MeshContainer &p_container)
 {
-    if (p_container.colModel != NULL)
+    if (p_container.colModel != nullptr)
     {
         p_container.colModel->transRot = p_container.currentMatrix;
         p_container.colModel->translateRot();
@@ -85,8 +85,8 @@ MeshContainer::MeshContainer( std::string p_name )
     offsetRotZ = 0.0;
     preOffsetPos = core::Vec3d::Zero();
     posOffsetPos = core::Vec3d::Zero();
-    mesh = NULL;
-    colModel = NULL;
+    mesh = nullptr;
+    colModel = nullptr;
 }
 
 MeshContainer::MeshContainer( std::string p_name, Mesh */*p_mesh*/, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ )
@@ -97,7 +97,7 @@ MeshContainer::MeshContainer( std::string p_name, Mesh */*p_mesh*/, core::Vec3d 
     preOffsetPos = p_prePos;
     posOffsetPos = p_posPos;
     name = p_name;
-    colModel = NULL;
+    colModel = nullptr;
 }
 
 void MeshContainer::computeCurrentMatrix()
@@ -117,7 +117,7 @@ void MeshContainer::computeCurrentMatrix()
 StylusPoints::StylusPoints()
 {
     point = core::Vec3d::Zero();
-    container = NULL;
+    container = nullptr;
 }
 
 void StylusSceneObject::serialize( void */*p_memoryBlock*/ )
