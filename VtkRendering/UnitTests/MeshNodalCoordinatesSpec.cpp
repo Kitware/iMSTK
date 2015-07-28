@@ -21,41 +21,25 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef ALPHAMAPPINGEXAMPLE_H
-#define ALPHAMAPPINGEXAMPLE_H
+#include <memory>
 
-#include "Core/Config.h"
-#include "Core/ErrorLog.h"
-#include "Core/CoreClass.h"
-#include "Core/Simulator.h"
-#include "Core/StaticSceneObject.h"
-#include "Core/SceneObject.h"
-#include "Simulators/DummySimulator.h"
-#include "ExternalDevices/PhantomInterface.h"
-#include "Core/MotionTransformer.h"
-#include "Rendering/metalShader.h"
+// VTK includes
+#include <vtkNew.h>
+#include <vtkSmartPointer.h>
 
+// SimMedTK includes
+#include "../MeshNodalCoordinates.h"
 
-class AlphaMapExample: public SimulationMain, public CoreClass
-{
+#include <bandit/bandit.h>
+using namespace bandit;
 
-public:
-    StaticSceneObject  *object1;
-    SDK* simmedtkSDK;
-    Scene *scene1;
-    OpenGLViewer *viewer;
+go_bandit([](){
 
-    PhantomInterface* hapticInterface;
-    smHapticCameraTrans *motionTrans;
+    describe("VTK mapped array.", []() {
+        it("constructs", []() {
+            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            AssertThat(meshMapper.GetPointer() != nullptr, IsTrue());
+        });
+    });
+});
 
-    AlphaMapExample();
-    void initHapticCamMotion();
-
-    virtual void simulateMain(SimulationMainParam p_param)
-    {
-    }
-    void draw() override;
-    ~AlphaMapExample();
-};
-
-#endif

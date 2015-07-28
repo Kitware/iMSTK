@@ -71,7 +71,7 @@ std::array<core::Vec3d,3> MeshModel::getTrianglePositions(size_t i) const
 
     return vertices;
 }
-const core::StdVector3d& MeshModel::getVertices() const
+const std::vector<core::Vec3d>& MeshModel::getVertices() const
 {
     return mesh->getVertices();
 }

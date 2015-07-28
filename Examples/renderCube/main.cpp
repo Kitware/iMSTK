@@ -36,7 +36,7 @@ int main()
 {
     SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<Viewer> viewer;
+    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene1;
     std::shared_ptr<Light> light;
     std::shared_ptr<Camera> sceneCamera;
@@ -51,7 +51,7 @@ int main()
     scene1 = sdk->createScene();
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
     sdk->addViewer(viewer);
 
     //Create the camera controller

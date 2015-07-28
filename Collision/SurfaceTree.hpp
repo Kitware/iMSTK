@@ -25,7 +25,7 @@
 #define SM_SMSURFACETREE_HPP
 
 // SimMedTK includes
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 #include "Collision/SurfaceTreeIterator.h"
 #include "Event/KeyboardEvent.h"
 #include "Core/Factory.h"

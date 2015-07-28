@@ -33,7 +33,7 @@ public:
 
 void PlaneRenderDelegate::draw() const
 {
-  GLRenderer::draw(*this->getSourceGeometryAs<Plane>());
+  OpenGLRenderer::draw(*this->getSourceGeometryAs<Plane>());
 //         if (this->movedOrRotated)
 //         {
 //             updateDrawPoints();

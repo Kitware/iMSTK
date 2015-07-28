@@ -143,6 +143,11 @@ public:
     /// \brief adds the objects in the local scene storage
     void copySceneToLocal(SceneLocal &p_local);
 
+    const std::vector<std::shared_ptr<SceneObject>> &getSceneObjects() const
+    {
+        return sceneObjects;
+    }
+
 private:
     std::shared_ptr<Camera> camera;                           //Camera for the scene
     std::vector<std::shared_ptr<Light> > lights;              //Lights in the scene

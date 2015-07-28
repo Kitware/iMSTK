@@ -23,7 +23,7 @@
 
 #include "Simulators/PBDSceneObject.h"
 #include "Simulators/PBDObjectSimulator.h"
-#include "Rendering/GLRenderer.h"
+#include "Rendering/OpenGLRenderer.h"
 
 void PBDObjectSimulator::draw()
 {
@@ -33,7 +33,7 @@ void PBDObjectSimulator::draw()
     for (size_t i = 0; i < objectsSimulated.size(); i++)
     {
         sceneObject = std::static_pointer_cast<PBDSurfaceSceneObject>(objectsSimulated[i]);
-        GLRenderer::draw(sceneObject->mesh->aabb);
+        OpenGLRenderer::draw(sceneObject->mesh->aabb);
     }
 }
 PBDObjectSimulator::PBDObjectSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
@@ -99,7 +99,7 @@ void PBDObjectSimulator::run()
         if ( sceneObj->getType() == core::ClassType::PbdSurfaceSceneObject )
         {
             pbdSurfaceSceneObject = std::static_pointer_cast<PBDSurfaceSceneObject>(sceneObj);
-            core::StdVector3d &vertices = pbdSurfaceSceneObject->getLocalVertices();
+            std::vector<core::Vec3d> &vertices = pbdSurfaceSceneObject->getLocalVertices();
 
             if ( !pbdSurfaceSceneObject->getFlags().isSimulatorInit )
             {

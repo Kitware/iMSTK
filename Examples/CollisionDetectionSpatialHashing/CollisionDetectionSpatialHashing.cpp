@@ -42,7 +42,7 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
     scene = sdk->createScene();
 
     // Create viewer
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
 
     // Add our viewer to the SDK
     sdk->addViewer(viewer);

@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "Devices/PhantomInterface.h"
-#include "Rendering/GLRenderer.h"
+#include "Rendering/OpenGLRenderer.h"
 #include "Core/Timer.h"
 #include <iostream>
 

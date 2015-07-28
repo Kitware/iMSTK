@@ -54,7 +54,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
@@ -101,7 +101,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
@@ -147,7 +147,7 @@ go_bandit([](){
             mesh->initVertexArrays(4);
             mesh->initTriangleArrays(2);
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);

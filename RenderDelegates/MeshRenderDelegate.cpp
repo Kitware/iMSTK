@@ -40,11 +40,11 @@ void MeshRenderDelegate::draw() const
     return;
 
   auto mesh = std::dynamic_pointer_cast<Mesh>(geom->shared_from_this());
-  GLRenderer::drawSurfaceMeshTriangles(mesh, geom->getRenderDetail());
+  OpenGLRenderer::drawSurfaceMeshTriangles(mesh, geom->getRenderDetail());
 
   if (geom->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
-    GLRenderer::drawNormals(mesh,
+    OpenGLRenderer::drawNormals(mesh,
       geom->getRenderDetail()->normalColor,
       geom->getRenderDetail()->normalLength);
     }

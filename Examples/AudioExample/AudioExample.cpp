@@ -89,7 +89,7 @@ void AudioKeyboardController::handleEvent(std::shared_ptr<core::Event> event)
 void runAudioExample()
 {
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<Viewer> viewer;
+    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Audio> sound;
     std::shared_ptr<AudioKeyboardController> audioCtl;
 
@@ -97,7 +97,7 @@ void runAudioExample()
     sdk = SDK::getInstance();
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
     sdk->addViewer(viewer);
 
     //Create the audio controller

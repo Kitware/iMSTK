@@ -24,6 +24,8 @@
 #ifndef SMDATASTUCTURES_HPP
 #define SMDATASTUCTURES_HPP
 
+#include <iostream>
+
 template<typename T>
 EntryList<T>::EntryList()
 {

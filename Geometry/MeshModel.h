@@ -80,7 +80,7 @@ public:
     ///
     /// @brief Returns array of vertices
     ///
-    const core::StdVector3d &getVertices() const;
+    const std::vector<core::Vec3d> &getVertices() const;
 
     ///
     /// @brief Draw this mesh

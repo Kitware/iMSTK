@@ -28,7 +28,7 @@
 
 using namespace bandit;
 
-std::shared_ptr<MeshModel> getModel(const core::StdVector3d &vertices)
+std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 {
     std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
     std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
@@ -61,7 +61,7 @@ go_bandit([](){
         });
         it("can access mesh vertices", []() {
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
@@ -75,7 +75,7 @@ go_bandit([](){
         });
         it("can access mesh face normals", []() {
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);

@@ -48,9 +48,6 @@ struct Tetrahedra;
 struct Edge;
 
 
-
-class Shader;
-
 /// \brief !!
 struct TextureAttachment
 {
@@ -95,7 +92,12 @@ public:
     /// \brief update the original texture vertices with the current
     void updateOriginalVertsWithCurrent();
 
-    const core::StdVector3d &getVertices() const
+    const std::vector<core::Vec3d> &getVertices() const
+    {
+        return this->vertices;
+    }
+
+    std::vector<core::Vec3d> &getVertices()
     {
         return this->vertices;
     }
@@ -109,8 +111,8 @@ public:
     CollisionGroup collisionGroup; ///< !!
     GLint renderingID; ///< !!
     std::shared_ptr<ErrorLog> log; ///< record the log
-    core::StdVector3d vertices; ///< vertices co-ordinate data at time t
-    core::StdVector3d origVerts; ///< vertices co-ordinate data at time t=0
+    std::vector<core::Vec3d> vertices; ///< vertices co-ordinate data at time t
+    std::vector<core::Vec3d> origVerts; ///< vertices co-ordinate data at time t=0
     int  nbrVertices; ///< number of vertices
     AABB aabb; ///< Axis aligned bounding box
     bool isTextureCoordAvailable; ///< true if the texture co-ordinate is available

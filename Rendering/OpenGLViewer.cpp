@@ -21,50 +21,49 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Rendering/Viewer.h"
-#include "Core/IOStream.h"
-#include "Rendering/GLRenderer.h"
-#include "Rendering/Shader.h"
-#include "Core/DataStructures.h"
-#include "Rendering/VBO.h"
-#include "Rendering/VAO.h"
-#include "External/tree.hh"
+#include "Rendering/OpenGLViewer.h"
 
 #include "Core/EventHandler.h"
+#include "Core/IOStream.h"
 #include "Event/KeyboardEvent.h"
+#include "Event/KeySFMLInterface.h"
 #include "Event/MouseButtonEvent.h"
 #include "Event/MouseMoveEvent.h"
-#include "Event/KeySFMLInterface.h"
-
+#include "Rendering/OpenGLRenderer.h"
+#include "Rendering/Shader.h"
+#include "Rendering/VAO.h"
+#include "Rendering/VBO.h"
+#include "Rendering/TextureManager.h"
+#include "Rendering/FrameBuffer.h"
 
 #ifdef __linux__
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <GL/glxew.h>
-#include <GL/glxext.h>
-#include <GL/glx.h>
+#   include <X11/Xlib.h>
+#   include <X11/Xutil.h>
+#   include <GL/glxew.h>
+#   include <GL/glxext.h>
+#   include <GL/glx.h>
 #endif
 
 #ifdef _WIN32
 typedef bool (APIENTRY *PFNWGLSWAPINTERVALFARPROC)(int);
 #endif
 
-void Viewer::setVSync(bool sync)
+void OpenGLViewer::setVSync(bool sync)
 {
   this->sfmlWindow->setVerticalSyncEnabled(sync);
 }
 
-Viewer::Viewer()
+OpenGLViewer::OpenGLViewer()
 {
   this->windowOutput = std::make_shared<OpenGLWindowStream>();
 }
 
-void Viewer::exitViewer()
+void OpenGLViewer::exitViewer()
 {
 }
 
 /// \brief Initializes OpenGL capabilities and flags
-void Viewer::initRenderingCapabilities()
+void OpenGLViewer::initRenderingCapabilities()
 {
     //use multiple fragment samples in computing the final color of a pixel
     glEnable(GL_MULTISAMPLE);
@@ -98,7 +97,7 @@ void Viewer::initRenderingCapabilities()
 }
 
 /// \brief Initializes FBOs, textures, shaders and VAOs
-void Viewer::initResources()
+void OpenGLViewer::initResources()
 {
     TextureManager::initGLTextures();
     Shader::initGLShaders();
@@ -108,7 +107,7 @@ void Viewer::initResources()
 }
 
 /// \brief Initializes the OpenGL context, and window containing it
-void Viewer::initRenderingContext()
+void OpenGLViewer::initRenderingContext()
 {
 
     // Init OpenGL context
@@ -139,13 +138,13 @@ void Viewer::initRenderingContext()
 }
 
 /// \brief Cleans up after initGLContext()
-void Viewer::destroyRenderingContext()
+void OpenGLViewer::destroyRenderingContext()
 {
     //nothing to do
 }
 
 /// \brief render depth texture for debugging
-void Viewer::renderTextureOnView()
+void OpenGLViewer::renderTextureOnView()
 {
 
     glPushAttrib(GL_TEXTURE_BIT | GL_VIEWPORT_BIT | GL_LIGHTING_BIT);
@@ -184,7 +183,7 @@ void Viewer::renderTextureOnView()
 /// \param p_depthTex A texture that will contain the fbo's depth texture.
 /// \param p_width The width of the fbo
 /// \param p_height The height of the fbo
-void Viewer::addFBO(const std::string &p_fboName,
+void OpenGLViewer::addFBO(const std::string &p_fboName,
                       Texture *p_colorTex,
                       Texture *p_depthTex,
                       unsigned int p_width, unsigned int p_height)
@@ -207,7 +206,7 @@ void Viewer::addFBO(const std::string &p_fboName,
 }
 
 /// \brief Initializes the FBOs in the FBO list
-void Viewer::initFboListItems()
+void OpenGLViewer::initFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
@@ -234,7 +233,7 @@ void Viewer::initFboListItems()
 }
 
 /// \brief Destroys all the FBOs in the FBO list
-void Viewer::destroyFboListItems()
+void OpenGLViewer::destroyFboListItems()
 {
     for (size_t i = 0; i < this->fboListItems.size(); i++)
     {
@@ -247,7 +246,7 @@ void Viewer::destroyFboListItems()
 }
 
 /// \brief Processes viewerRenderDetail options
-void Viewer::processViewerOptions()
+void OpenGLViewer::processViewerOptions()
 {
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
     {
@@ -256,7 +255,7 @@ void Viewer::processViewerOptions()
 }
 
 ///\brief Render and then process window events until the event queue is empty.
-void Viewer::processWindowEvents()
+void OpenGLViewer::processWindowEvents()
 {
   sf::Event event;
   this->render();
@@ -265,7 +264,7 @@ void Viewer::processWindowEvents()
 }
 
 /// \brief Renders the render operation to an FBO
-void Viewer::renderToFBO(const RenderOperation &p_rop)
+void OpenGLViewer::renderToFBO(const RenderOperation &p_rop)
 {
     assert(p_rop.fbo);
     //Enable FBO for rendering
@@ -276,13 +275,13 @@ void Viewer::renderToFBO(const RenderOperation &p_rop)
 
     processViewerOptions();
     //Render Scene
-     GLRenderer::renderScene(p_rop.scene);
+     OpenGLRenderer::renderScene(p_rop.scene);
     //Disable FBO
     p_rop.fbo->disable();
 }
 
 /// \brief Renders the render operation to screen
-void Viewer::renderToScreen(const RenderOperation &p_rop)
+void OpenGLViewer::renderToScreen(const RenderOperation &p_rop)
 {
     //Setup Viewport & Clear buffers
     glViewport(0, 0, this->width(), this->height());
@@ -290,7 +289,7 @@ void Viewer::renderToScreen(const RenderOperation &p_rop)
 
     processViewerOptions();
     //Render Scene
-    GLRenderer::renderScene(p_rop.scene);
+    OpenGLRenderer::renderScene(p_rop.scene);
 
     //Render axis
     if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
@@ -309,7 +308,7 @@ void Viewer::renderToScreen(const RenderOperation &p_rop)
         p_rop.scene->enableLights();
         p_rop.scene->placeLights();
 
-        GLRenderer::drawAxes(this->globalAxisLength);
+        OpenGLRenderer::drawAxes(this->globalAxisLength);
 
         p_rop.scene->disableLights();
 
@@ -321,30 +320,8 @@ void Viewer::renderToScreen(const RenderOperation &p_rop)
     }
 }
 
-/// \brief Registers a scene for rendering with the viewer
-void Viewer::registerScene(std::shared_ptr<Scene> p_scene,
-                             RenderTargetType p_target,
-                             const std::string &p_fboName)
-{
-    RenderOperation rop;
-
-    //sanity checks
-    assert(p_scene);
-    if (p_target == SMRENDERTARGET_FBO)
-    {
-        assert(p_fboName != "");
-    }
-
-    rop.target = p_target;
-    rop.scene = p_scene;
-
-    rop.fboName = p_fboName;
-
-    renderOperations.push_back(rop);
-}
-
 /// \brief Set the color and other viewer defaults
-void Viewer::setToDefaults()
+void OpenGLViewer::setToDefaults()
 {
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor());
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor());
@@ -353,7 +330,7 @@ void Viewer::setToDefaults()
 }
 
 /// \brief Called at the beginning of each frame by the module
-void Viewer::beginFrame()
+void OpenGLViewer::beginFrame()
 {
     if (terminateExecution == true)
     {
@@ -364,12 +341,12 @@ void Viewer::beginFrame()
 }
 
 ///\brief Called at the end of each frame by the module
-void Viewer::endFrame()
+void OpenGLViewer::endFrame()
 {
     this->sfmlWindow->display(); //swaps buffers
 }
 
-void Viewer::processSFMLEvents(const sf::Event& p_event)
+void OpenGLViewer::processSFMLEvents(const sf::Event& p_event)
 {
     switch(p_event.type)
     {
@@ -428,41 +405,41 @@ void Viewer::processSFMLEvents(const sf::Event& p_event)
     }
 }
 
-void Viewer::addObject(std::shared_ptr<CoreClass> object)
+void OpenGLViewer::addObject(std::shared_ptr<CoreClass> object)
 {
 
     SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 
-void Viewer::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
+void OpenGLViewer::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
 {
 
 }
 
-void Viewer::addText(std::string p_tag)
+void OpenGLViewer::addText(std::string p_tag)
 {
 
     windowOutput->addText(p_tag, std::string(""));
 }
 
-void Viewer::updateText(std::string p_tag, std::string p_string)
+void OpenGLViewer::updateText(std::string p_tag, std::string p_string)
 {
 
     windowOutput->updateText(p_tag, p_string);
 }
-void Viewer::updateText(int p_handle, std::string p_string)
+void OpenGLViewer::updateText(int p_handle, std::string p_string)
 {
 
     windowOutput->updateText(p_handle, p_string);
 }
 
-void Viewer::setWindowTitle(const std::string &str)
+void OpenGLViewer::setWindowTitle(const std::string &str)
 {
     windowTitle = str;
 }
 
-void Viewer::cleanUp()
+void OpenGLViewer::cleanUp()
 {
     destroyFboListItems();
     destroyRenderingContext();
@@ -473,6 +450,7 @@ void Viewer::cleanUp()
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
-    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,Viewer,100);
+    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,OpenGLViewer,100);
   SIMMEDTK_FINISH_ONLOAD()
+OpenGLViewer::~OpenGLViewer() {}
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

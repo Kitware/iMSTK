@@ -26,7 +26,7 @@
 #include "Core/ErrorLog.h"
 #include "Core/CoreClass.h"
 #include "Core/SDK.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 #include "Core/SceneObject.h"
 
 // Include required types scene objects
@@ -60,7 +60,7 @@ int main()
     std::shared_ptr<VegaFemSimulator> femSimulator;
     std::shared_ptr<DummySimulator> staticSimulator;
     std::shared_ptr<PlaneCollisionModel> plane;
-    std::shared_ptr<Viewer> viewer;
+    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene;
     std::shared_ptr<Light> light;
     std::shared_ptr<Camera> sceneCamera;
@@ -161,7 +161,7 @@ int main()
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    viewer = std::dynamic_pointer_cast<Viewer>(sdk->getViewerInstance());
+    viewer = std::dynamic_pointer_cast<OpenGLViewer>(sdk->getViewerInstance());
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |

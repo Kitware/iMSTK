@@ -40,7 +40,7 @@ class SDK;
 class CoreClass;
 class RenderDelegate;
 class ObjectSimulator;
-class Viewer;
+class OpenGLViewer;
 
 /// \brief simulator calls object and sends this structure
 struct SimulationParam

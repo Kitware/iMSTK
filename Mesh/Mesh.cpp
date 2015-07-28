@@ -29,9 +29,10 @@
 #include "objMesh.h"
 
 // SimMedTK includes
-#include "Rendering/GLRenderer.h"
-#include "Rendering/Viewer.h"
 #include "Core/Factory.h"
+#include "Rendering/OpenGLRenderer.h"
+#include "Rendering/TextureManager.h"
+#include "Rendering/OpenGLViewer.h"
 
 BaseMesh::BaseMesh()
 {

@@ -23,6 +23,8 @@
 
 // SimMedTK includes
 #include "Rendering/MetalShader.h"
+
+#include "Rendering/TextureManager.h"
 #include "Core/Event.h"
 #include "Core/SDK.h"
 #include "Event/KeyboardEvent.h"

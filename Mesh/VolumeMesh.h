@@ -86,7 +86,7 @@ public:
     int nbrTetra; ///< number of tetrahedra
     int nbrNodes; ///< total number of nodes of the volume mesh
     std::shared_ptr<ErrorLog> log_VM; ///< log the errors with volume mesh class
-    core::StdVector3d nodes; ///< data of nodal co-ordinates
+    std::vector<core::Vec3d> nodes; ///< data of nodal co-ordinates
     std::vector<Tetrahedra> tetra; ///< tetrahedra data
     std::vector<int> surfaceNodeIndex; ///<
     std::vector<bool> fixed; ///< indicates if the node is fixed or not

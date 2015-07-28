@@ -39,7 +39,7 @@
 #include "Simulators/DummySimulator.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/MeshToMeshCollision.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 
 class CollisionDetectionBVH: public SimulationMain
 {
@@ -56,7 +56,7 @@ public:
     std::shared_ptr<StaticSceneObject>    modelA;
     std::shared_ptr<StaticSceneObject>    modelB;
     std::shared_ptr<Scene>                scene;
-    std::shared_ptr<Viewer>               viewer;
+    std::shared_ptr<OpenGLViewer>               viewer;
     std::shared_ptr<DummySimulator>       defaultSimulator;
     std::shared_ptr<Simulator>            simulator;
     std::shared_ptr<MeshToMeshCollision>  collisionDetection;

@@ -21,24 +21,25 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Rendering/GLRenderer.h"
+#include "Rendering/OpenGLRenderer.h"
 #include "Mesh/Mesh.h"
 #include "Core/DataStructures.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 #include "Core/Quaternion.h"
 #include "Rendering/VAO.h"
+#include "Rendering/TextureManager.h"
 
 #ifndef _MSC_VER
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
-GLRenderer::GLRenderer()
+OpenGLRenderer::OpenGLRenderer()
 {
 
 }
 
 #if 0
-void GLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail)
+void OpenGLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail)
 {
     static core::Vec3d origin(0, 0, 0);
     static core::Vec3d xAxis(1, 0, 0);
@@ -173,7 +174,7 @@ void GLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_
 }
 #endif // 0
 
-void GLRenderer::drawSurfaceMeshTriangles(
+void OpenGLRenderer::drawSurfaceMeshTriangles(
     std::shared_ptr<Mesh> p_surfaceMesh,
     std::shared_ptr<RenderDetail> renderDetail)
 {
@@ -301,7 +302,7 @@ void GLRenderer::drawSurfaceMeshTriangles(
     glLineWidth(1.0);
 }
 
-void GLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, float length)
+void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, float length)
 {
 
     glDisable(GL_LIGHTING);
@@ -332,13 +333,13 @@ void GLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, float 
     glEnable(GL_LIGHTING);
 }
 
-void GLRenderer::beginTriangles()
+void OpenGLRenderer::beginTriangles()
 {
 
     glBegin(GL_TRIANGLES);
 }
 
-void GLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p_3)
+void OpenGLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p_3)
 {
 
     glVertex3dv(p_1.data());
@@ -346,13 +347,13 @@ void GLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p
     glVertex3dv(p_3.data());
 }
 
-void GLRenderer::endTriangles()
+void OpenGLRenderer::endTriangles()
 {
 
     glEnd();
 }
 
-void GLRenderer::draw(AABB &aabb, Color p_color)
+void OpenGLRenderer::draw(AABB &aabb, Color p_color)
 {
 
     glPushAttrib(GL_LIGHTING_BIT);
@@ -404,7 +405,7 @@ void GLRenderer::draw(AABB &aabb, Color p_color)
     glPopAttrib();
 }
 
-void GLRenderer::drawArrow(const core::Vec3f &start, const core::Vec3f &end, const float D)
+void OpenGLRenderer::drawArrow(const core::Vec3f &start, const core::Vec3f &end, const float D)
 {
     float x = end[0] - start[0];
     float y = end[1] - start[1];
@@ -457,7 +458,7 @@ void GLRenderer::drawArrow(const core::Vec3f &start, const core::Vec3f &end, con
 
 }
 
-void GLRenderer::drawAxes(const float length)
+void OpenGLRenderer::drawAxes(const float length)
 {
     glDisable(GL_LIGHTING);
 
@@ -483,7 +484,7 @@ void GLRenderer::drawAxes(const float length)
     glEnable(GL_LIGHTING);
 }
 
-void GLRenderer::drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, const float length)
+void OpenGLRenderer::drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, const float length)
 {
     glDisable(GL_LIGHTING);
 
@@ -513,7 +514,7 @@ void GLRenderer::drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, const
     glEnable(GL_LIGHTING);
 }
 
-void GLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
+void OpenGLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
 {
 
     double angle;
@@ -549,7 +550,7 @@ void GLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
     glEnable(GL_LIGHTING);
 }
 
-void GLRenderer::renderScene(std::shared_ptr<Scene> p_scene)
+void OpenGLRenderer::renderScene(std::shared_ptr<Scene> p_scene)
 {
     assert(p_scene);
 
@@ -559,7 +560,7 @@ void GLRenderer::renderScene(std::shared_ptr<Scene> p_scene)
     renderScene(p_scene, proj, view);
 }
 
-void GLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
+void OpenGLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
                                const Matrix44f &p_proj,
                                const Matrix44f &p_view)
 {
@@ -595,7 +596,7 @@ void GLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
     glPopMatrix();
 }
 
-void GLRenderer::renderSceneObject(std::shared_ptr<SceneObject> p_sceneObject)
+void OpenGLRenderer::renderSceneObject(std::shared_ptr<SceneObject> p_sceneObject)
 {
     RenderDetail::Ptr detail = p_sceneObject->getRenderDetail();
     if (!detail || detail->getRenderType() & SIMMEDTK_RENDER_NONE)

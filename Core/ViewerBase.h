@@ -58,10 +58,15 @@ enum RenderTargetType
 struct RenderOperation
 {
     RenderOperation();
+    RenderOperation(std::shared_ptr<Scene> s,  const RenderTargetType &t, const std::string &fbName) :
+        scene(s),
+        target(t),
+        fboName(fbName)
+    {}
     std::shared_ptr<Scene> scene; ///< The scene full of objects to render
     FrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
-    std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
     RenderTargetType target; ///< Specifies where the rendered result should be placed see RenderTargetType
+    std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
 };
 
 struct FboListItem
@@ -100,6 +105,16 @@ public:
 
     float globalAxisLength;
 
+    /// \brief for exit viewer
+    virtual void exitViewer() = 0;
+    /// \brief add text for display
+    virtual void addText(std::string p_tag) = 0;
+    /// \brief update text
+    virtual void updateText(std::string p_tag, std::string p_string) = 0;
+    virtual void updateText(int p_handle, std::string p_string) = 0;
+    /// \brief enable/disable VSync
+    virtual void setVSync(bool sync) = 0;
+
     virtual int height(void);
     virtual int width(void);
     virtual float aspectRatio(void);
@@ -109,23 +124,14 @@ public:
     ViewerBase();
     /// \brief initialization for viewer
     virtual void init() override;
-    /// \brief for exit viewer
-    virtual void exitViewer() = 0;
     /// \brief add object for rendering
     virtual void addObject(std::shared_ptr<CoreClass> object);
-    /// \brief add text for display
-    virtual void addText(std::string p_tag) = 0;
-    /// \brief update text
-    virtual void updateText(std::string p_tag, std::string p_string) = 0;
-    virtual void updateText(int p_handle, std::string p_string) = 0;
     /// \brief change window resolution
     virtual void setScreenResolution(int p_width, int p_height);
     /// \brief set the window title
     virtual void setWindowTitle(const std::string &str);
-    /// \brief enable/disable VSync
-    virtual void setVSync(bool sync) = 0;
     /// \brief Registers a scene for rendering with the viewer
-    virtual void registerScene(std::shared_ptr<Scene> p_scene, RenderTargetType p_target, const std::string &p_fboName);
+    virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target, const std::string &fboName = "");
     /// \brief Adds an FBO to the viewer to allow rendering to it.
     ///
     /// \detail The FBO will be created an initialized in the viewer.
@@ -147,40 +153,41 @@ public:
     Color defaultSpecularColor;
 
 protected:
+    /// \brief Renders the render operation to screen
+    virtual void renderToScreen(const RenderOperation &p_rop) = 0;
+    /// \brief Renders the render operation to an FBO
+    virtual void renderToFBO(const RenderOperation &p_rop) = 0;
     /// \brief Initializes rendering system (e.g., OpenGL) capabilities and flags
     virtual void initRenderingCapabilities() = 0;
-    /// \brief Initializes the internal objectList
-    virtual void initObjects();
-    /// \brief Initializes FBOs, textures, shaders and VAOs
-    virtual void initResources() = 0;
-    /// \brief Initializes scenes in the sceneList
-    virtual void initScenes();
     /// \brief Initilizes the rendering system (e.g., OpenGL) context, and window containing it
     virtual void initRenderingContext() = 0;
     /// \brief Cleans up after initGLContext()
     virtual void destroyRenderingContext() = 0;
+    /// \brief Initializes FBOs, textures, shaders and VAOs
+    virtual void initResources() = 0;
+    /// \brief Processes viewerRenderDetail options
+    virtual void processViewerOptions() = 0;
+    /// \brief Process window events and render as the major part of an event loop
+    virtual void processWindowEvents() = 0;
+    /// \brief Set the color and other viewer defaults
+    virtual void setToDefaults() = 0;
+    /// \brief render depth texture for debugging
+    virtual void renderTextureOnView() = 0;
+
+    /// \brief Initializes the internal objectList
+    virtual void initObjects();
+    /// \brief Initializes scenes in the sceneList
+    virtual void initScenes();
     /// \brief Cleanup function called on exit to ensure resources are cleaned up
     virtual void cleanUp();
     /// \brief Renders the internal sceneList
     void renderSceneList();
     /// \brief Processes a render operation
     virtual void processRenderOperation(const RenderOperation &p_rop);
-    /// \brief Processes viewerRenderDetail options
-    virtual void processViewerOptions() = 0;
-    /// \brief Process window events and render as the major part of an event loop
-    virtual void processWindowEvents() = 0;
-    /// \brief Renders the render operation to screen
-    virtual void renderToScreen(const RenderOperation &p_rop) = 0;
-    /// \brief Renders the render operation to an FBO
-    virtual void renderToFBO(const RenderOperation &p_rop) = 0;
-    /// \brief Set the color and other viewer defaults
-    virtual void setToDefaults() = 0;
     /// \brief draw routines
     virtual void render();
     /// \brief adjust  rendering FPS
     void adjustFPS();
-    /// \brief render depth texture for debugging
-    virtual void renderTextureOnView() = 0;
     /// \brief initialize, run the event loop (processWindowEvents) and clean up.
     virtual void exec();
 };

@@ -36,17 +36,17 @@
 class Mesh;
 class AABB;
 class LineMesh;
-class Viewer;
+class OpenGLViewer;
 class Plane;
 class Scene;
 
 struct RenderDetail;
 /// \brief gl rendering utilities
-class GLRenderer: public CoreClass
+class OpenGLRenderer: public CoreClass
 {
 public:
     /// \brief constructor
-    GLRenderer();
+    OpenGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
     static void drawSurfaceMeshTriangles(std::shared_ptr<Mesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
@@ -58,7 +58,7 @@ public:
     static void drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief draw coordinate system
-    static void drawCoordSystem(std::shared_ptr<Viewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
+    static void drawCoordSystem(std::shared_ptr<OpenGLViewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
 
     /// \brief begin rendering triangle
     static void beginTriangles();

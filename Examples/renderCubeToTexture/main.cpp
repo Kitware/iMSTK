@@ -33,7 +33,7 @@
 int main()
 {
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<Viewer> viewer;
+    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene1, scene2;
     std::shared_ptr<Light> light1, light2;
     std::shared_ptr<Camera> sceneCamera1, sceneCamera2;
@@ -49,7 +49,7 @@ int main()
     scene2 = sdk->createScene(); //external scene containing square with scene1 mapped to it
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
     sdk->addViewer(viewer);
 
     //Create the camera controller

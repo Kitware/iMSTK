@@ -53,7 +53,7 @@ class SceneObject : public CoreClass
 {
     friend class SDK;
     friend class ViewerBase;
-    friend class Viewer;
+    friend class OpenGLViewer;
     friend class Scene;
     friend class ObjectSimulator;
 
@@ -101,7 +101,7 @@ public:
     /// \brief get unified object id
     UnifiedId::Pointer getObjectUnifiedID();
 
-    core::StdVector3d &getLocalVertices();
+    std::vector<core::Vec3d> &getLocalVertices();
 
     ObjectInitFlags &getFlags();
 
@@ -128,7 +128,7 @@ protected:
 private:
     std::shared_ptr<ObjectSimulator> objectSim; // object simulator that will simulate the object
     std::shared_ptr<CustomRenderer> customRender;
-    core::StdVector3d localVertices; // local copy of vertices
+    std::vector<core::Vec3d> localVertices; // local copy of vertices
     ObjectInitFlags flags;
 };
 

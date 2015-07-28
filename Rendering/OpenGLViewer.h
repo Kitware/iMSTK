@@ -29,29 +29,18 @@
 
 // SimMedTK includes
 #include "Core/ViewerBase.h"
-#include "Rendering/Shader.h"
-#include "Rendering/GLUtils.h"
-#include "Rendering/VBO.h"
-#include "Simulators/PBDSceneObject.h"
-#include "Core/DataStructures.h"
-#include "Simulators/StylusObject.h"
-#include "Rendering/FrameBuffer.h"
-#include "Rendering/Camera.h"
 
 //forward declaration
 class OpenGLWindowStream;
 
 /// \brief Handles all rendering routines.
-class Viewer : public ViewerBase
+class OpenGLViewer : public ViewerBase
 {
 public:
-    std::unique_ptr<sf::Context> sfmlContext;
-    std::unique_ptr<sf::Window> sfmlWindow;
-
-    std::shared_ptr<OpenGLWindowStream> windowOutput;
-
     /// \brief default constructor
-    Viewer();
+    OpenGLViewer();
+    ~OpenGLViewer();
+
     /// \brief for exit viewer
     virtual void exitViewer() override;
     /// \brief add object for rendering
@@ -67,15 +56,11 @@ public:
     void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
-    virtual void registerScene(std::shared_ptr<Scene> p_scene, RenderTargetType p_target, const std::string &p_fboName);
     virtual void addFBO(const std::string &p_fboName,
-                Texture *p_colorTex, Texture *p_depthTex,
-                unsigned int p_width, unsigned int p_height);
-
-    std::string windowTitle;
-    Color defaultDiffuseColor;
-    Color defaultAmbientColor;
-    Color defaultSpecularColor;
+                        Texture *p_colorTex,
+                        Texture *p_depthTex,
+                        unsigned int p_width,
+                        unsigned int p_height);
 
 protected:
     virtual void initRenderingCapabilities() override;
@@ -91,8 +76,6 @@ protected:
     virtual void processWindowEvents() override;
     virtual void renderToScreen(const RenderOperation &p_rop) override;
     virtual void renderToFBO(const RenderOperation &p_rop) override;
-    virtual void initFboListItems();
-    virtual void destroyFboListItems();
     virtual void setToDefaults() override;
     virtual void beginFrame() override;
     virtual void endFrame() override;
@@ -100,7 +83,18 @@ protected:
     /// \brief  event handler
     virtual void handleEvent(std::shared_ptr<core::Event> p_event) override;
     /// \brief processes an SFML event
+    virtual void initFboListItems();
+    virtual void destroyFboListItems();
     void processSFMLEvents(const sf::Event& p_event);
+
+private:
+    std::unique_ptr<sf::Context> sfmlContext;
+    std::unique_ptr<sf::Window> sfmlWindow;
+    std::shared_ptr<OpenGLWindowStream> windowOutput;
+    std::string windowTitle;
+    Color defaultDiffuseColor;
+    Color defaultAmbientColor;
+    Color defaultSpecularColor;
 };
 
 #endif
