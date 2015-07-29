@@ -61,7 +61,7 @@ template <class Scalar> void MeshNodalCoordinates<Scalar>
         os, indent);
 
     os << indent << "vertexArray : " << this->vertexArray << std::endl;
-    os << "TempDoubleArray : " << &this->TempDoubleArray << std::endl;
+    os << "TempDoubleArray : " << this->TempDoubleArray << std::endl;
 }
 
 //------------------------------------------------------------------------------
@@ -183,7 +183,7 @@ template <class Scalar> void MeshNodalCoordinates<Scalar>
 template <class Scalar> double* MeshNodalCoordinates<Scalar>
 ::GetTuple(vtkIdType i)
 {
-    this->GetTuple(i, this->TempDoubleArray.data());
+    this->TempDoubleArray = (*this->vertexArray)[i];
     return this->TempDoubleArray.data();
 }
 
@@ -191,9 +191,9 @@ template <class Scalar> double* MeshNodalCoordinates<Scalar>
 template <class Scalar> void MeshNodalCoordinates<Scalar>
 ::GetTuple(vtkIdType i, double *tuple)
 {
-    tuple[0] = static_cast<double>((*this->vertexArray)[i](0));
-    tuple[1] = static_cast<double>((*this->vertexArray)[i](1));
-    tuple[2] = static_cast<double>((*this->vertexArray)[i](2));
+    tuple[0] = static_cast<double>((*this->vertexArray)[i][0]);
+    tuple[1] = static_cast<double>((*this->vertexArray)[i][1]);
+    tuple[2] = static_cast<double>((*this->vertexArray)[i][2]);
 }
 
 //------------------------------------------------------------------------------
@@ -507,3 +507,4 @@ template <class Scalar> vtkIdType MeshNodalCoordinates<Scalar>
     }
     return -1;
 }
+

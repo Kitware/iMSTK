@@ -116,7 +116,7 @@ private:
     void operator=(const MeshNodalCoordinates &); // Not implemented.
 
     vtkIdType Lookup(const Scalar &val, vtkIdType startIndex);
-    std::array<double,3> TempDoubleArray;
+    core::Vec3d TempDoubleArray;
 };
 
 #include "MeshNodalCoordinates.txx"

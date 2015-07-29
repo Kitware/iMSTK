@@ -88,7 +88,7 @@ MeshRenderDelegate::MeshRenderDelegate()
     }
 
     vertices->SetNumberOfPoints(mesh->getVertices().size());
-    vertices->SetData(mappedData.Get());
+    vertices->SetData(mappedData.GetPointer());
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
 

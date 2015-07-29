@@ -26,6 +26,7 @@
 // VTK includes
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
+#include <vtkPoints.h>
 
 // SimMedTK includes
 #include "../MeshNodalCoordinates.h"
@@ -40,6 +41,51 @@ go_bandit([](){
             vtkNew<MeshNodalCoordinates<double>> meshMapper;
             AssertThat(meshMapper.GetPointer() != nullptr, IsTrue());
         });
+
+        it("initializes", []() {
+            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            meshMapper->Initialize();
+            AssertThat(meshMapper->GetMaxId() == -1, IsTrue());
+            AssertThat(meshMapper->GetSize() == 0, IsTrue());
+            AssertThat(meshMapper->GetNumberOfComponents() == 1, IsTrue());
+        });
+
+        it("wraps data", []() {
+            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            std::vector<core::Vec3d> vertices;
+            vertices.emplace_back(0,1,0);
+            vertices.emplace_back(1,0,0);
+            vertices.emplace_back(0,0,1);
+            vertices.emplace_back(0,1,1);
+
+            meshMapper->SetVertexArray(vertices);
+
+            AssertThat(meshMapper->GetMaxId() == 11, IsTrue());
+            AssertThat(meshMapper->GetSize() == 12, IsTrue());
+            AssertThat(meshMapper->GetNumberOfComponents() == 3, IsTrue());
+        });
+
+        it("is used by vtkPoints", []() {
+            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            std::vector<core::Vec3d> vertices;
+            vertices.emplace_back(0,1,0);
+            vertices.emplace_back(1,0,0);
+            vertices.emplace_back(0,0,1);
+            vertices.emplace_back(0,1,1);
+
+            meshMapper->SetVertexArray(vertices);
+
+            vtkNew<vtkPoints> points;
+            points->SetData(meshMapper.GetPointer());
+            points->Modified();
+
+            AssertThat(points->GetNumberOfPoints() == 4, IsTrue());
+            AssertThat(points->GetPoint(0)[1] == 1, IsTrue());
+            AssertThat(points->GetPoint(1)[0] == 1, IsTrue());
+            AssertThat(points->GetPoint(2)[2] == 1, IsTrue());
+            AssertThat(points->GetPoint(3)[1] == 1, IsTrue());
+        });
     });
+
 });
 
