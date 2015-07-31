@@ -34,6 +34,8 @@
 #include "Rendering/TextureManager.h"
 #include "Rendering/OpenGLViewer.h"
 
+#include "VtkRendering/VtkRenderDelegate.h"
+
 BaseMesh::BaseMesh()
 {
 //     SDK::getInstance()->registerMesh(safeDownCast<BaseMesh>());
@@ -47,7 +49,6 @@ void BaseMesh::updateOriginalVertsWithCurrent()
 /// \brief constructor
 Mesh::Mesh()
 {
-    triangles = 0;
     texCoord = 0;
     triNormals = 0;
     vertNormals = 0;
@@ -58,15 +59,14 @@ Mesh::Mesh()
     type = core::ClassType::Mesh;
     isTextureCoordAvailable = false;
     tangentChannel = false;
-    this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClass(
-        "MeshRenderDelegate"));
+    auto delegate = Factory<VtkRenderDelegate>::createConcreteClass(
+        "MeshRenderDelegate");
+    this->setRenderDelegate(delegate);
 }
 
 /// \brief destructor
 Mesh::~Mesh()
 {
-    delete [] triangles;
     delete [] texCoord;
     delete [] triNormals;
     delete [] vertNormals;
@@ -315,7 +315,7 @@ bool Mesh::initTriangleArrays(int nbr)
 
     this->nbrTriangles = nbr;
 
-    this->triangles = new Triangle[nbr];
+    this->triangles.resize(nbr);
     this->triNormals = new core::Vec3d[nbr];
     this->triTangents = new core::Vec3d[nbr];
     return true;

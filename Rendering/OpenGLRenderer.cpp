@@ -229,7 +229,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))
@@ -237,7 +237,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
         glColor3fv(renderDetail->getVertexColor().toGLColor());
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
 
         glEnable(GL_LIGHTING);
         //default rendering
@@ -253,7 +253,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         glDisable(GL_TEXTURE_2D);
         glColor4fv(renderDetail->getWireFrameColor().toGLColor());
 
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles);
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
 
         glEnable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);

@@ -47,11 +47,10 @@
 class MeshRenderDelegate : public VtkRenderDelegate
 {
 public:
-    MeshRenderDelegate();
     virtual bool isTargetTextured() const override;
 
     vtkActor *getActor() const;
-    void init();
+    void initDraw();
 
 private:
     vtkSmartPointer<vtkActor> actor;
@@ -59,7 +58,7 @@ private:
     vtkSmartPointer<vtkMapper> mapper;
 };
 
-MeshRenderDelegate::MeshRenderDelegate()
+void MeshRenderDelegate::initDraw()
 {
     actor = vtkActor::New();
     mappedData = MeshNodalCoordinates<double>::New();
@@ -78,7 +77,7 @@ MeshRenderDelegate::MeshRenderDelegate()
 
     mappedData->SetVertexArray(mesh->getVertices());
 
-    for(int i = 0; i < mesh->nbrTriangles; ++i)
+    for(size_t i = 0; i < mesh->triangles.size(); ++i)
     {
         vtkIdType    cell[3];
         cell[0] = mesh->triangles[i].vert[0];
@@ -128,6 +127,6 @@ vtkActor *MeshRenderDelegate::getActor() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
 SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,MeshRenderDelegate,300);
+    SIMMEDTK_REGISTER_CLASS(VtkRenderDelegate,VtkRenderDelegate,MeshRenderDelegate,300);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

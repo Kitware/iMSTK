@@ -366,7 +366,7 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
         case 0x4120:
             fread(&l_qty, sizeof(unsigned short), 1, l_file);
             this->nbrTriangles = l_qty;
-            this->triangles = new Triangle[l_qty];
+            this->triangles.resize(l_qty);
             this->triNormals = new core::Vec3d[l_qty];
             this->triTangents = new core::Vec3d[l_qty];
 

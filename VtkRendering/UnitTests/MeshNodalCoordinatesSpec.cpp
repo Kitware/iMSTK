@@ -77,7 +77,6 @@ go_bandit([](){
 
             vtkNew<vtkPoints> points;
             points->SetData(meshMapper.GetPointer());
-            points->Modified();
 
             AssertThat(points->GetNumberOfPoints() == 4, IsTrue());
             AssertThat(points->GetPoint(0)[1] == 1, IsTrue());

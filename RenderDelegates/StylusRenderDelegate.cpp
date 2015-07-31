@@ -30,11 +30,11 @@
 class StylusRenderDelegate : public RenderDelegate
 {
 public:
-  virtual void initDraw() const override;
+  virtual void initDraw() override;
   virtual void draw() const override;
 };
 
-void StylusRenderDelegate::initDraw() const
+void StylusRenderDelegate::initDraw()
 {
   StylusRigidSceneObject* geom = this->getSourceGeometryAs<StylusRigidSceneObject>();
   std::string errorText;

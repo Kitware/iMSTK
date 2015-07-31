@@ -218,7 +218,7 @@ public:
 
 public:
     int  nbrTriangles; ///< number of triangles
-    Triangle *triangles; ///< list of triangles
+    std::vector<Triangle> triangles; ///< list of triangles
     TexCoord *texCoordForTrianglesOBJ; ///< !! tansel for OBJ
     int nbrTexCoordForTrainglesOBJ; ///< !! tansel for OBJ
     core::Vec3d *triNormals; ///< triangle normals
@@ -248,19 +248,19 @@ struct TexCoord
 /// \brief holds the vertex indices of triangle
 struct Triangle
 {
-    unsigned int vert[3];
+    std::array<unsigned int,3> vert;
 };
 
 /// \brief holds the vertex indices of tetrahedron
 struct Tetrahedra
 {
-    int vert[4];
+    std::array<unsigned int,4> vert;
 };
 
 /// \brief holds the vertex indices of edge
 struct Edge
 {
-    unsigned int vert[2];
+    std::array<unsigned int,2> vert;
 };
 
 /// \brief !!

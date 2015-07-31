@@ -16,7 +16,7 @@
 //
 #ifndef SMRENDERDETAIL_H
 #define SMRENDERDETAIL_H
-
+#include <iostream>
 #include "Core/Config.h"
 #include "Core/Color.h"
 
@@ -37,6 +37,7 @@ struct GeometrySource {
     { }
   void setSource(CoreClass* src)
     {
+        std::cout << "Mesh " << src << std::endl;
     this->sceneObject = src;
     this->analyticObject = nullptr;
     }

@@ -131,7 +131,7 @@ public:
     /// \brief set the window title
     virtual void setWindowTitle(const std::string &str);
     /// \brief Registers a scene for rendering with the viewer
-    virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target, const std::string &fboName = "");
+    virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target = SMRENDERTARGET_SCREEN, const std::string &fboName = "");
     /// \brief Adds an FBO to the viewer to allow rendering to it.
     ///
     /// \detail The FBO will be created an initialized in the viewer.

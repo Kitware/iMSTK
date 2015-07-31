@@ -278,7 +278,7 @@ bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader,
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
     bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrTriangles * 3;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->triangles;
+    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->triangles.data();
     bufferInfo[totalNbrBuffers].size = sizeof( int ) * p_mesh->nbrTriangles * 3;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     totalNbrBuffers++;

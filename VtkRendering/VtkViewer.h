@@ -25,109 +25,117 @@
 #define VTKVIEWER_H
 
 #include "Core/ViewerBase.h"
-#include "Core/MakeUnique.h"
-
-// VTK includes
-#include <vtkNew.h>
-#include <vtkSmartPointer.h>
-#include <vtkRenderer.h>
-#include <vtkRenderWindow.h>
-#include <vtkRenderWindowInteractor.h>
 
 class VtkViewer : public ViewerBase
 {
 
 public:
-    VtkViewer() : renderer(make_unique<VtkRenderer>(safeDownCast<VtkViewer>()))
-    {
-    }
-
+    VtkViewer();
     ~VtkViewer();
 
-    bool operator==(const VtkViewer& other) const;
-    VtkViewer(const VtkViewer& other);
-    VtkViewer& operator=(const VtkViewer& other);
+    VtkViewer(const VtkViewer& other) = delete;
+    VtkViewer& operator=(const VtkViewer& other) = delete;
 
 public:
     ///
     /// \brief Execute when exit viewer
     ///
-    virtual void exitViewer(){}
+    void exitViewer() override {}
 
     ///
-    /// \brief add text for display
+    /// \brief Add text for display
     ///
-    virtual void addText(std::string /*tag*/){}
+    void addText(std::string /*tag*/) override {}
 
     ///
-    /// \brief update text
+    /// \brief Update text
     ///
-    virtual void updateText(std::string /*tag*/, std::string /*string*/){}
+    void updateText(std::string /*tag*/, std::string /*string*/) override {}
 
     ///
-    /// \brief update text
+    /// \brief Update text
     ///
-    virtual void updateText(int /*handle*/, std::string /*string*/){}
+    void updateText(int /*handle*/, std::string /*string*/) override {}
 
     ///
-    /// \brief enable/disable VSync
+    /// \brief Enable/disable VSync
     ///
-    virtual void setVSync(bool /*sync*/){}
+    void setVSync(bool /*sync*/) override {}
+
+    ///
+    /// \brief Execute this module
+    ///
+    void exec() override;
+
+    ///
+    /// \brief Run when frame begins
+    ///
+    void beginFrame() override {}
+
+    ///
+    /// \brief Run when frame ends
+    ///
+    void endFrame() override {}
+
+    ///
+    /// \brief Verify that the rendering pipeline initializes properly
+    ///
+    bool isValid();
 
 protected:
     ///
     /// \brief Renders the render operation to screen
     ///
-    virtual void renderToScreen(const RenderOperation &/*rop*/){}
+    void renderToScreen(const RenderOperation &/*rop*/) override {}
 
     ///
     /// \brief Renders the render operation to an FBO
     ///
-    virtual void renderToFBO(const RenderOperation &/*rop*/){}
+    void renderToFBO(const RenderOperation &/*rop*/) override {}
 
     ///
     /// \brief Initializes rendering system (e.g., OpenGL) capabilities and flags
     ///
-    virtual void initRenderingCapabilities(){}
+    void initRenderingCapabilities() override {}
 
     ///
     /// \brief Initilizes the rendering system (e.g., OpenGL) context, and window containing it
-    virtual void initRenderingContext();
+    void initRenderingContext() override ;
 
     ///
     /// \brief Cleans up after initGLContext()
     ///
-    virtual void destroyRenderingContext(){}
+    void destroyRenderingContext() override {}
 
     ///
     /// \brief Initializes FBOs, textures, shaders and VAOs
     ///
-    virtual void initResources(){}
+    void initResources() override {}
 
     ///
     /// \brief Processes viewerRenderDetail options
     ///
-    virtual void processViewerOptions(){}
+    void processViewerOptions() override {}
 
     ///
     /// \brief Process window events and render as the major part of an event loop
     ///
-    virtual void processWindowEvents(){}
+    void processWindowEvents() override {}
 
     ///
     /// \brief Set the color and other viewer defaults
     ///
-    virtual void setToDefaults(){}
+    void setToDefaults() override {}
 
     ///
     /// \brief render depth texture for debugging
     ///
-    virtual void renderTextureOnView(){}
+    void renderTextureOnView() override {}
 
-    virtual void exec();
-
-
-    void render();
+    ///
+    /// \brief Render scene
+    ///
+    void render() override;
 
 private:
     class VtkRenderer;

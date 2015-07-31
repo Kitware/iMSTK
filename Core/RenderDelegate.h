@@ -10,7 +10,7 @@ class RenderDelegate
 public:
     typedef std::shared_ptr<RenderDelegate> Ptr;
 
-    virtual void initDraw() const
+    virtual void initDraw()
       { }
     virtual void draw() const
       { }
@@ -31,3 +31,4 @@ protected:
 };
 
 #endif // SMRENDERABLE_H
+
