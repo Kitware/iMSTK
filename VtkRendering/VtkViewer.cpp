@@ -57,7 +57,7 @@ public:
         this->renderWindowInteractor->Start();
     }
 
-    void initRenderingContext()
+    void addRenderer()
     {
         // Create a new renderer and add actors to it.
         vtkNew<vtkRenderer> renderer;
@@ -110,10 +110,6 @@ VtkViewer::~VtkViewer()
 {
 }
 
-void VtkViewer::initRenderingContext()
-{
-    this->renderer->initRenderingContext();
-}
 void VtkViewer::exec()
 {
     this->init();
@@ -137,5 +133,9 @@ bool VtkViewer::isValid()
     return ( this->renderer != nullptr )
            && ( this->renderer->renderWindow != nullptr )
            && ( this->renderer->renderWindowInteractor != nullptr );
+}
+void VtkViewer::initResources()
+{
+    this->renderer->addRenderer();
 }
 

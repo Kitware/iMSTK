@@ -100,7 +100,7 @@ protected:
 
     ///
     /// \brief Initilizes the rendering system (e.g., OpenGL) context, and window containing it
-    void initRenderingContext() override ;
+    void initRenderingContext() override {}
 
     ///
     /// \brief Cleans up after initGLContext()
@@ -110,7 +110,7 @@ protected:
     ///
     /// \brief Initializes FBOs, textures, shaders and VAOs
     ///
-    void initResources() override {}
+    void initResources() override;
 
     ///
     /// \brief Processes viewerRenderDetail options
