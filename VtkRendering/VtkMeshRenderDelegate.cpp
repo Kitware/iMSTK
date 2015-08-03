@@ -108,13 +108,13 @@ void MeshRenderDelegate::initDraw()
         textureCoordinates->SetNumberOfComponents(3);
         textureCoordinates->SetName("TextureCoordinates");
 
-        auto texCoords = mesh->getTextureCoordinates(0);
+        auto texCoords = mesh->getTextureCoordinates();
         for(auto &coord : texCoords)
         {
             float tuple[3] = {coord[0],coord[1],0.0};
             textureCoordinates->InsertNextTuple(tuple);
         }
-        unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates);
+        unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates.GetPointer());
     }
 
     if (mesh->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)

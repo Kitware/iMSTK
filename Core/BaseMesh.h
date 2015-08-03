@@ -29,6 +29,7 @@
 
 #include "Core/CoreClass.h"
 #include "Core/Vector.h"
+#include "Core/Quaternion.h"
 
 class CollisionGroup;
 class ErrorLog;
@@ -70,9 +71,10 @@ public:
     };
 
     ///
-    /// \brief constructor
+    /// \brief constructor/Destructor
     ///
     BaseMesh();
+    virtual ~BaseMesh();
     ///
     /// \brief Stores the texture locally. It assumes that the texture has been
     ///  already added to the \TextureManager
@@ -95,10 +97,22 @@ public:
     bool isMeshTextured() const;
 
     ///
-    /// \brief Returns vertices coordinates
+    /// \brief Returns vertex coordinates
     ///
     const std::vector<core::Vec3d> &getVertices() const;
     std::vector<core::Vec3d> &getVertices();
+
+    ///
+    /// \brief Returns vertex ith coordinate
+    ///
+    const core::Vec3d &getVertex(const size_t i) const;
+    core::Vec3d &getVertex(const size_t i);
+
+    ///
+    /// \brief Returns original vertex coordinates
+    ///
+    const std::vector<core::Vec3d> &getOrigVertices() const;
+    std::vector<core::Vec3d> &getOrigVertices();
 
     ///
     /// \brief Get the total number of vertices
@@ -108,17 +122,17 @@ public:
     ///
     /// \brief Return the collision group this mesh belongs to.
     ///
-    std::shared_ptr<CollisionGroup> getCollisionGroup() const;
+    std::shared_ptr<CollisionGroup> &getCollisionGroup();
 
     ///
-    /// \brief Returns the bounding box for this mesh.
-    ///
-    Eigen::AlignedBox3d getBoundingBox() const;
-
-    ///
-    /// \brief Returns the bounding box for this mesh.
+    /// \brief Set the rendering id
     ///
     size_t getRenderingId() const;
+
+    ///
+    /// \brief Set the rendering id
+    ///
+    void setRenderingId(size_t id);
 
     ///
     /// \brief Returns the the name of ith texture.
@@ -145,6 +159,46 @@ public:
     ///
     const int &getTextureId(size_t i) const;
 
+    ///
+    /// \brief Return true if it contains texture coordinates
+    ///
+    bool hasTextureCoordinates() const;
+
+    ///
+    /// \brief Add texture coordinates
+    ///
+    void addTextureCoordinate(const core::Vec2f &coord);
+    void addTextureCoordinate(const float &x, const float &y);
+
+    ///
+    /// \brief Set/get bounding box
+    ///
+    void setBoundingBox(const Eigen::AlignedBox3d &box);
+    const Eigen::AlignedBox3d &getBoundingBox() const;
+
+    ///
+    /// \brief Translate the mesh
+    ///
+    void translate(core::Vec3d offset);
+
+    ///
+    /// \brief Scale the mesh
+    ///
+    void scale(core::Vec3d factor);
+
+    ///
+    /// \brief Rotate the mesh
+    ///
+    void rotate(const Quaterniond &rot)
+    {
+        auto &vertices = this->getVertices();
+        auto &origVerts = this->getOrigVertices();
+        for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
+        {
+            vertices[i] = R * vertices[i];
+            origVerts[i] = R * origVerts[i];
+        }
+    }
 private:
     // Data arrays - Vertices only
     // vertices co-ordinate data at time t

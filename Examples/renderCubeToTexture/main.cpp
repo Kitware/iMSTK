@@ -74,8 +74,8 @@ int main()
     TextureManager::createDepthTexture("depthTex1", 64, 64);
 
     std::shared_ptr<MeshModel> squareModel = std::make_shared<MeshModel>();
-    squareModel->load("models/square.obj", BaseMesh::MeshFileType::Obj);
-    squareModel->getMesh()->assignTexture("colorTex1");
+    squareModel->load("models/square.obj", Core::BaseMesh::MeshFileType::Obj);
+    squareModel->getMesh()->assignTexture("","colorTex1");
     renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     squareModel->setRenderDetail(renderDetail);
 

@@ -116,7 +116,7 @@ public:
                               const std::shared_ptr<CellType> right,
                               std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
     {
-        if(!left->getAabb().overlaps(right->getAabb()))
+        if(left->getAabb().intersection(right->getAabb()).isEmpty())
         {
             return;
         }

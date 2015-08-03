@@ -68,18 +68,18 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
     // Create collision models
     std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
-    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
-    collisionModelA->getMesh()->assignTexture("livertexture1");
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
+    collisionModelA->getMesh()->assignTexture("","livertexture1");
     collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    collisionModelA->getMesh()->translate(7, 3, 0);
+    collisionModelA->getMesh()->translate(core::Vec3d(7, 3, 0));
     collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
     collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
 
     std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
-    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
-    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
+    collisionModelB->getMesh()->assignTexture("","livertexture2");
     collisionModelB->getMesh()->translate(core::Vec3d(2, 0, 0));
-    collisionModelB->getMesh()->assignTexture("livertexture2");
+    collisionModelB->getMesh()->assignTexture("","livertexture2");
     collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
     collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
@@ -142,13 +142,13 @@ void CollisionDetectionBVH::simulateMain(const SimulationMainParam &/*p_param*/)
 {
     if ((10 > moveObj) && (moveObj > 0))
     {
-        modelB->getModel()->getMesh()->translate(1, 0, 0);
+        modelB->getModel()->getMesh()->translate(core::Vec3d(1, 0, 0));
         moveObj--;
     }
     else
     {
         moveObj = 9; // reset
-        modelB->getModel()->getMesh()->translate(-moveObj, 0, 0);
+        modelB->getModel()->getMesh()->translate(core::Vec3d(-moveObj, 0, 0));
     }
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));

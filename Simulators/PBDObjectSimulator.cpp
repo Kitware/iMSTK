@@ -48,10 +48,10 @@ void PBDObjectSimulator::initObject( std::shared_ptr<PBDSurfaceSceneObject> p_ob
         return;
     }
 
-    p_object->getLocalVertices().reserve( p_object->mesh->nbrVertices );
+    p_object->getLocalVertices().reserve( p_object->mesh->getNumberOfVertices() );
 
     // WARNING: Copying vertices??!!
-    p_object->getLocalVertices() = p_object->mesh->vertices;
+    p_object->getLocalVertices() = p_object->mesh->getVertices();
     p_object->getFlags().isSimulatorInit = true;
 }
 void PBDObjectSimulator::initCustom()

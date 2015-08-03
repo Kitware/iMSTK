@@ -62,9 +62,10 @@ go_bandit([](){
             std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
 
             // These vertices coincide with vertices on the volume mesh. So the weights take a special form.
-            surfaceMesh->vertices.emplace_back(-2.44627, -0.903874999999999, -1.711465);
-            surfaceMesh->vertices.emplace_back(-2.008655, -0.762779999999999, -1.63081);
-            surfaceMesh->vertices.emplace_back(-2.248035, -0.599385, -1.41836);
+            auto &vertices = surfaceMesh->getVertices();
+            vertices.emplace_back(-2.44627, -0.903874999999999, -1.711465);
+            vertices.emplace_back(-2.008655, -0.762779999999999, -1.63081);
+            vertices.emplace_back(-2.248035, -0.599385, -1.41836);
 
             vegaMesh->attachSurfaceMesh(surfaceMesh,2.0);
 

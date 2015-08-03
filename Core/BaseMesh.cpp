@@ -46,9 +46,6 @@ struct BaseMesh::TextureAttachment
 
     // Texture filename
     std::string textureFileName;
-
-    // True if the texture co-ordinate is available
-    bool isTextureCoordAvailable;
 };
 
 BaseMesh::BaseMesh() : collisionGroup(nullptr), log(nullptr)
@@ -57,6 +54,7 @@ BaseMesh::BaseMesh() : collisionGroup(nullptr), log(nullptr)
 }
 void BaseMesh::assignTexture( const int textureId )
 {
+    // Texture enumeration starts at 1.
     if(textureId < 1)
     {
         return;
@@ -106,17 +104,29 @@ std::vector<core::Vec3d>& BaseMesh::getVertices()
 {
     return this->vertices;
 }
+const core::Vec3d& BaseMesh::getVertex ( const size_t i ) const
+{
+    return this->vertices[i];
+}
+core::Vec3d& BaseMesh::getVertex ( const size_t i )
+{
+    return this->vertices[i];
+}
+const std::vector<core::Vec3d>& BaseMesh::getOrigVertices() const
+{
+    return this->origVerts;
+}
+std::vector<core::Vec3d>& BaseMesh::getOrigVertices()
+{
+    return this->origVerts;
+}
 std::size_t BaseMesh::getNumberOfVertices() const
 {
     return this->vertices.size();
 }
-std::shared_ptr< CollisionGroup > BaseMesh::getCollisionGroup() const
+std::shared_ptr< CollisionGroup > &BaseMesh::getCollisionGroup()
 {
     return this->collisionGroup;
-}
-Eigen::AlignedBox3d BaseMesh::getBoundingBox() const
-{
-    return this->aabb;
 }
 std::size_t BaseMesh::getRenderingId() const
 {
@@ -126,9 +136,13 @@ std::string BaseMesh::getTextureFileName(const size_t i) const
 {
     return textures[i]->textureFileName;
 }
-const std::vector<core::Vec2f,
-            Eigen::aligned_allocator<core::Vec2f>> &
+const std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &
 BaseMesh::getTextureCoordinates() const
+{
+    return this->textureCoord;
+}
+std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &
+BaseMesh::getTextureCoordinates()
 {
     return this->textureCoord;
 }
@@ -141,5 +155,31 @@ const int& BaseMesh::getTextureId(size_t i) const
 {
     return this->textures[i]->textureId;
 }
+bool BaseMesh::BaseMesh::hasTextureCoordinates() const
+{
+    return this->textureCoord.size() > 0;
+}
+void BaseMesh::addTextureCoordinate ( const core::Vec2f& coord )
+{
+    this->textureCoord.push_back( coord );
+}
+void BaseMesh::addTextureCoordinate ( const float& x, const float& y )
+{
+    this->textureCoord.push_back( core::Vec2f(x,y) );
+}
+void BaseMesh::setBoundingBox ( const Eigen::AlignedBox3d& box )
+{
+    this->aabb = box;
+}
+const Eigen::AlignedBox3d& BaseMesh::getBoundingBox() const
+{
+    return this->aabb;
+}
+void BaseMesh::setRenderingId( size_t id )
+{
+    this->renderingID = id;
+}
+BaseMesh::~BaseMesh() {}
+
 
 }

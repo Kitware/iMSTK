@@ -68,7 +68,7 @@ public:
     ///
     /// @brief Loads a triangular mesh and stores it.
     ///
-    void loadTriangleMesh(const std::string &meshName, const BaseMesh::MeshFileType &type);
+    void loadTriangleMesh(const std::string &meshName, const Core::BaseMesh::MeshFileType &type);
 
     ///
     /// @brief Set internal AABB tree

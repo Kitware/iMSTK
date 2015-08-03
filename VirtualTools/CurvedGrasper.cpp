@@ -42,24 +42,24 @@ CurvedGrasper::CurvedGrasper(size_t p_PhantomID,
     this->phantomID = p_PhantomID;
 
     Matrix33d rot;
-    mesh_pivot = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
-    mesh_pivot->loadMesh(p_pivotModelFileName, BaseMesh::MeshFileType::ThreeDS);
+    mesh_pivot = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);
+    mesh_pivot->loadMesh(p_pivotModelFileName, Core::BaseMesh::MeshFileType::ThreeDS);
     mesh_pivot->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
     mesh_pivot->rotate(rot);
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_pivot->rotate(rot);
 
-    mesh_upperJaw = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
-    mesh_upperJaw->loadMesh(p_upperModelFileName, BaseMesh::MeshFileType::ThreeDS);
+    mesh_upperJaw = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);
+    mesh_upperJaw->loadMesh(p_upperModelFileName, Core::BaseMesh::MeshFileType::ThreeDS);
     mesh_upperJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_upperJaw->rotate(rot);
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitZ()).matrix();
     mesh_upperJaw->rotate(rot);
 
-    mesh_lowerJaw = new SurfaceMesh(BaseMesh::MeshType::Rigid, nullptr);
-    mesh_lowerJaw->loadMesh(p_lowerModelFileName, BaseMesh::MeshFileType::ThreeDS);
+    mesh_lowerJaw = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);
+    mesh_lowerJaw->loadMesh(p_lowerModelFileName, Core::BaseMesh::MeshFileType::ThreeDS);
     mesh_lowerJaw->scale(core::Vec3d(0.5, 0.5, 0.5));
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitY()).matrix();
     mesh_lowerJaw->rotate(rot);

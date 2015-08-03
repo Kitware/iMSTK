@@ -38,7 +38,7 @@ void MeshCollisionModel::setMesh(std::shared_ptr<Mesh> modelMesh)
     this->aabbTree.reset();
     this->initAABBTree(1);
 }
-void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const BaseMesh::MeshFileType &type)
+void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const Core::BaseMesh::MeshFileType &type)
 {
     this->load(meshName,type);
 

@@ -49,7 +49,7 @@ void StylusRenderDelegate::initDraw()
     glNewList(newList + listCounter, GL_COMPILE);
     iter.node->data->mesh->draw();
     glEndList();
-    iter.node->data->mesh->renderingID = (newList + listCounter);
+    iter.node->data->mesh->setRenderingId(newList + listCounter);
     listCounter++;
     iter++;
     }
@@ -77,7 +77,7 @@ void StylusRenderDelegate::draw() const
       }
 
     glMultMatrixd(viewMatrix.data());
-    glCallList(iter.node->data->mesh->renderingID);
+    glCallList(iter.node->data->mesh->getRenderingId());
     glPopMatrix();
     iter++;
 
@@ -95,7 +95,7 @@ void StylusRenderDelegate::draw() const
         }
 
       glMultMatrixd(viewMatrix.data());
-      glCallList(iter.node->data->mesh->renderingID);
+      glCallList(iter.node->data->mesh->getRenderingId());
       glPopMatrix();
       iter++;
       }

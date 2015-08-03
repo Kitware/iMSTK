@@ -48,79 +48,6 @@ struct Triangle;
 struct Tetrahedra;
 struct Edge;
 
-
-/// \brief !!
-struct TextureAttachment
-{
-    TextureAttachment();
-    int textureId;
-};
-
-/// \brief base class for the mesh
-class BaseMesh: public CoreClass
-{
-public:
-    /// \brief designates what purpose/scenario the mesh is used for
-    enum class MeshType
-    {
-        Deformable,
-        DeformableCutable,
-        RigidCutable,
-        Rigid
-    };
-
-    /// \brief designates input mesh file type
-    enum class MeshFileType
-    {
-        None,
-        Obj,
-        ThreeDS,
-        Volume,
-    };
-
-    /// \brief constructor
-    BaseMesh();
-
-    /// \brief query if the mesh has textures available for rendering
-    bool isMeshTextured();
-
-    /// \brief assign the texture
-    void assignTexture(int p_textureId);
-
-    /// \brief assign the texture
-    void assignTexture(const std::string& p_referenceName);
-
-    /// \brief update the original texture vertices with the current
-    void updateOriginalVertsWithCurrent();
-
-    const std::vector<core::Vec3d> &getVertices() const
-    {
-        return this->vertices;
-    }
-
-    std::vector<core::Vec3d> &getVertices()
-    {
-        return this->vertices;
-    }
-
-    int getNumVertices()
-    {
-        return nbrVertices;
-    }
-
-public:
-    CollisionGroup collisionGroup; ///< !!
-    GLint renderingID; ///< !!
-    std::shared_ptr<ErrorLog> log; ///< record the log
-    std::vector<core::Vec3d> vertices; ///< vertices co-ordinate data at time t
-    std::vector<core::Vec3d> origVerts; ///< vertices co-ordinate data at time t=0
-    int  nbrVertices; ///< number of vertices
-    AABB aabb; ///< Axis aligned bounding box
-    bool isTextureCoordAvailable; ///< true if the texture co-ordinate is available
-    TexCoord *texCoord; ///< texture co-ordinates
-    std::vector<TextureAttachment> textureIds; ///< !!
-};
-
 /// \brief: this is a generic Mesh class from which surface and volume meshes are inherited
 /// Note: this class cannot exist on its own
 class Mesh: public Core::BaseMesh
@@ -159,20 +86,30 @@ public:
     /// \brief update the normals of vertices after they moved
     void updateVertexNormals();
 
-    /// \brief update AABB after the mesh moved
+    /// \brief update Eigen::AlignedBox3d after the mesh moved
     void upadateAABB();
 
-    /// \brief update AABB of each triangle after mesh moved
+    /// \brief update Eigen::AlignedBox3d of each triangle after mesh moved
     void updateTriangleAABB();
 
     /// \brief compute triangle tangents
     void calcTriangleTangents();
 
     /// \brief compute the tangent give the three vertices
-    void calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t);
+    core::Vec3d calculateTangent(const core::Vec3d& p1,
+                                 const core::Vec3d& p2,
+                                 const core::Vec3d& p3,
+                                 const core::Vec2f& t1,
+                                 const core::Vec2f& t2,
+                                 const core::Vec2f& t3);
 
     /// \brief !!
-    void calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t);
+    core::Vec3d calculateTangent_test(const core::Vec3d& p1,
+                                      const core::Vec3d& p2,
+                                      const core::Vec3d& p3,
+                                      const core::Vec2f& t1,
+                                      const core::Vec2f& t2,
+                                      const core::Vec2f& t3);
 
     /// \brief find the neighbors of all vertices of mesh
     void calcNeighborsVertices();
@@ -181,16 +118,13 @@ public:
     void calcEdges();
 
     /// \brief translate the mesh
-    void translate(float, float, float);
-
-    /// \brief translate the mesh
     void translate(core::Vec3d p_offset);
 
     /// \brief scale the mesh
     void scale(core::Vec3d p_scaleFactors);
 
     /// \brief rotate the mesh
-    void rotate(const Matrix33d &p_rot);
+    void rotate(const Quaterniond &p_rot);
 
     /// \brief check if there is a consistent orientation of triangle vertices
     /// across the entire surface mesh
@@ -212,10 +146,16 @@ public:
     void updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh);
 
     /// \brief get number of triangles
-    int getNumTriangles()  const;
+    int getNumTriangles()  const
+    {
+        return this->nbrTriangles;
+    }
 
     /// \brief get number of edges
-    int getNumEdges()  const;
+    size_t getNumEdges() const
+    {
+        return this->edges.size();
+    }
 
 public:
     int  nbrTriangles; ///< number of triangles
@@ -234,7 +174,7 @@ public:
     ///AABBB of the mesh.
     ///This value is allocated and computed by only collision detection module
     ///Therefore it is initially nullptr
-    std::vector<AABB> triAABBs;
+    std::vector<Eigen::AlignedBox3d> triAABBs;
 
     MeshType meshType; ///< type of mesh (rigid, deformable etc.)
     MeshFileType meshFileType; ///< type of input mesh
@@ -262,55 +202,6 @@ struct Tetrahedra
 struct Edge
 {
     std::array<unsigned int,2> vert;
-};
-
-/// \brief !!
-class LineMesh: public BaseMesh
-{
-public:
-    /// \brief destructor
-    ~LineMesh()
-    {
-        delete[]edgeAABBs;
-        delete[]texCoord;
-        delete[]edges;
-    }
-
-    /// \brief constructor
-    LineMesh(int p_nbrVertices);
-
-    /// \brief constructor
-    LineMesh(int p_nbrVertices, bool autoEdge);
-
-    /// \brief !!
-    void createAutoEdges();
-
-    /// \brief !!
-    virtual void createCustomEdges() {};
-
-    /// \brief updat AABB when the mesh moves
-    void updateAABB();
-
-    /// \brief translate the vertices of mesh
-    void translate(float p_offsetX, float p_offsetY, float p_offsetZ);
-
-    /// \brief translate the vertices of mesh
-    void translate(core::Vec3d p_offset);
-
-    /// \brief scale the mesh
-    void scale(core::Vec3d p_scaleFactors);
-
-    /// \brief rotate the mesh
-    void rotate(Matrix33d p_rot);
-
-    /// \brief query if the mesh is textured
-    bool isMeshTextured();
-
-public:
-    AABB *edgeAABBs;///< AABBs for the edges in the mesh
-    Edge *edges;///< edges of the line mesh
-    int nbrEdges;///< number of edges of the line mesh
-
 };
 
 #endif

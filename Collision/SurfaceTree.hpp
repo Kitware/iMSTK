@@ -35,7 +35,6 @@ template <typename CellType>
 void SurfaceTree<CellType>::initStructure()
 {
     core::Vec3d center;
-    double edge;
     std::vector<int> triangles;
 
     for (int i = 0; i < mesh->nbrTriangles; ++i)
@@ -44,13 +43,12 @@ void SurfaceTree<CellType>::initStructure()
     }
     root = std::make_shared<CellType>();
 
-    center = mesh->aabb.center();
-    edge = std::max(std::max(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
-                        mesh->aabb.halfSizeZ());
+    auto &boundingBox = mesh->getBoundingBox();
+    center = boundingBox.center();
     root->setCenter(center);
-    root->setLength(2 * edge);
+    root->setLength(boundingBox.sizes().maxCoeff());
     root->setIsEmpty(false);
-    root->setAabb(mesh->aabb);
+    root->setAabb(mesh->getBoundingBox());
 
     treeAllLevels[0] = *root.get();
     this->createTree(root, triangles, 0);
@@ -190,6 +188,7 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
     std::array<CellType, CellType::numberOfSubdivisions> subDividedNodes;
     std::array<std::vector<int>, CellType::numberOfSubdivisions> triangleMatrix;
 
+    auto const &vertices = mesh->getVertices();
     int level = Node->getLevel();
 
     if(level >= maxLevel)
@@ -213,7 +212,7 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
 
         for(const auto &i : Node->getVerticesIndices())
         {
-            totalDistance += (Node->getCenter() - mesh->vertices[i]).norm();
+            totalDistance += (Node->getCenter() - vertices[i]).norm();
         }
 
         float weightSum = 0;
@@ -223,7 +222,7 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         for(const auto &i : Node->getVerticesIndices())
         {
             // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
-            weight = 1-(Node->getCenter()-mesh->vertices[i]).squaredNorm() / totalDistance2;
+            weight = 1-(Node->getCenter()-vertices[i]).squaredNorm() / totalDistance2;
             weightSum += weight;
             Node->addWeight(weight);
         }
@@ -249,9 +248,9 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         for (int j = 0; j < CellType::numberOfSubdivisions; ++j)
         {
             if (subDividedNodes[j].isCollidedWithTri(
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[0]],
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[1]],
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[2]]))
+                        vertices[mesh->triangles[triangles[i]].vert[0]],
+                        vertices[mesh->triangles[triangles[i]].vert[1]],
+                        vertices[mesh->triangles[triangles[i]].vert[2]]))
             {
                 triangleMatrix[j].push_back(triangles[i]);
             }
@@ -322,7 +321,8 @@ template <typename CellType>
 void SurfaceTree<CellType>::updateStructure()
 {
     CellType *current;
-
+    auto const &vertices = mesh->getVertices();
+    auto const &origVertices = mesh->getOrigVertices();
     for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
     {
         current = &treeAllLevels[i];
@@ -333,7 +333,7 @@ void SurfaceTree<CellType>::updateStructure()
         {
             for(auto &i : current->getVerticesIndices())
             {
-                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeight(counter);
+                tempCenter = tempCenter + (vertices[i]-origVertices[i]) * current->getWeight(counter);
                 counter++;
             }
 

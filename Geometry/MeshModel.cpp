@@ -26,25 +26,25 @@
 
 MeshModel::MeshModel() {}
 MeshModel::~MeshModel() {}
-void MeshModel::load(const std::string& meshName, const BaseMesh::MeshFileType& type)
+void MeshModel::load(const std::string& meshName, const Core::BaseMesh::MeshFileType& type)
 {
     this->mesh.reset();
 
     switch(type)
     {
-        case BaseMesh::MeshFileType::Obj:
+        case Core::BaseMesh::MeshFileType::Obj:
         {
             this->mesh = std::make_shared<SurfaceMesh>();
             break;
         }
 
-        case BaseMesh::MeshFileType::ThreeDS: // TODO: Is this a surface or volume mesh?
+        case Core::BaseMesh::MeshFileType::ThreeDS: // TODO: Is this a surface or volume mesh?
         {
             this->mesh = std::make_shared<SurfaceMesh>();
             break;
         }
 
-        case BaseMesh::MeshFileType::Volume:
+        case Core::BaseMesh::MeshFileType::Volume:
         {
             this->mesh = std::make_shared<VolumeMesh>();
             break;
@@ -65,9 +65,9 @@ const core::Vec3d& MeshModel::getNormal(size_t i) const
 std::array<core::Vec3d,3> MeshModel::getTrianglePositions(size_t i) const
 {
     std::array<core::Vec3d, 3> vertices;
-    vertices[0] = this->mesh->vertices[this->mesh->triangles[i].vert[0]];
-    vertices[1] = this->mesh->vertices[this->mesh->triangles[i].vert[1]];
-    vertices[2] = this->mesh->vertices[this->mesh->triangles[i].vert[2]];
+    vertices[0] = this->mesh->getVertex(this->mesh->triangles[i].vert[0]);
+    vertices[1] = this->mesh->getVertex(this->mesh->triangles[i].vert[1]);
+    vertices[2] = this->mesh->getVertex(this->mesh->triangles[i].vert[2]);
 
     return vertices;
 }
@@ -92,7 +92,7 @@ std::shared_ptr< Mesh > MeshModel::getMesh()
 }
 void MeshModel::load(const std::string& meshFileName, const std::string& textureFileName, const std::string& textureName)
 {
-    this->load(meshFileName, BaseMesh::MeshFileType::Obj);
+    this->load(meshFileName, Core::BaseMesh::MeshFileType::Obj);
 
     if(nullptr != this->mesh)
     {
@@ -101,7 +101,7 @@ void MeshModel::load(const std::string& meshFileName, const std::string& texture
 
         //Load in the texture for the model
         TextureManager::loadTexture(textureFileName, textureName);
-        this->mesh->assignTexture(textureName);
+        this->mesh->assignTexture(meshFileName,textureName);
     }
 }
 void MeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)

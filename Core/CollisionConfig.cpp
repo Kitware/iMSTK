@@ -98,21 +98,21 @@ void CollisionGroup::setGroup( unsigned int p_groupId )
     groupMask = groupId;
 }
 
-void CollisionGroup::permitCollision( CollisionGroup &p_group )
+void CollisionGroup::permitCollision( std::shared_ptr<CollisionGroup> p_group )
 {
-    groupMask = groupMask | ( p_group.groupId );
-    p_group.groupMask = p_group.groupMask | ( groupId );
+    groupMask = groupMask | ( p_group->groupId );
+    p_group->groupMask = p_group->groupMask | ( groupId );
     std::cout << "Mask:" << groupMask << "\n";
     std::cout << "GroupId:" << groupId << "\n";
 }
 
-void CollisionGroup::forbidCollision( CollisionGroup &p_group )
+void CollisionGroup::forbidCollision( std::shared_ptr<CollisionGroup> p_group )
 {
-    groupMask = groupMask & ( ~p_group.groupId );
-    p_group.groupMask = p_group.groupMask & ( ~groupId );
+    groupMask = groupMask & ( ~p_group->groupId );
+    p_group->groupMask = p_group->groupMask & ( ~groupId );
 }
 
-bool CollisionGroup::isCollisionPermitted( CollisionGroup &p_group )
+bool CollisionGroup::isCollisionPermitted( std::shared_ptr<CollisionGroup> p_group ) const
 {
-    return ( ( groupId & p_group.groupId ) == 0 ? ( ( groupId & p_group.groupMask ) == 0 ? false : true ) : true );
+    return ( ( groupId & p_group->groupId ) == 0 ? ( ( groupId & p_group->groupMask ) == 0 ? false : true ) : true );
 }

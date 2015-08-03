@@ -55,7 +55,7 @@ public:
     ///
     /// @brief Loads the mesh and stores it.
     ///
-    void load(const std::string& meshName, const BaseMesh::MeshFileType &type);
+    void load(const std::string& meshName, const Core::BaseMesh::MeshFileType &type);
 
     ///
     /// @brief Loads the mesh with texture and stores it. Only surface meshes allowed.

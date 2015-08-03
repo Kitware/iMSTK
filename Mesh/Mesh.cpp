@@ -36,16 +36,6 @@
 
 #include "VtkRendering/VtkRenderDelegate.h"
 
-BaseMesh::BaseMesh()
-{
-//     SDK::getInstance()->registerMesh(safeDownCast<BaseMesh>());
-}
-
-void BaseMesh::updateOriginalVertsWithCurrent()
-{
-    origVerts = vertices;
-}
-
 /// \brief constructor
 Mesh::Mesh()
 {
@@ -65,7 +55,6 @@ Mesh::Mesh()
 /// \brief destructor
 Mesh::~Mesh()
 {
-    delete [] texCoord;
     delete [] triNormals;
     delete [] vertNormals;
     delete [] triTangents;
@@ -155,7 +144,6 @@ void Mesh::calcTriangleTangents()
     auto texCoordArray = this->getTextureCoordinates();
     for (t = 0; t < nbrTriangles; t++)
     {
-        Triangle *tmpTri = &triangles[t];
         auto &v0 = vertexArray[triangles[t].vert[0]];
         auto &v1 = vertexArray[triangles[t].vert[1]];
         auto &v2 = vertexArray[triangles[t].vert[2]];
@@ -193,64 +181,53 @@ void Mesh::calcTriangleTangents()
 }
 
 /// \brief calucate the triangle tangent for rendering purposes
-core::Vec3d Mesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3)
+core::Vec3d Mesh::calculateTangent(const core::Vec3d& p1,
+                                   const core::Vec3d& p2,
+                                   const core::Vec3d& p3,
+                                   const core::Vec2f& t1,
+                                   const core::Vec2f& t2,
+                                   const core::Vec2f& t3)
 {
-    core::Vec3d tangent;
-    core::Vec3d v1;
-    core::Vec3d v2;
+    core::Vec3d v1 = p2-p1;
+    core::Vec3d v2 = p3-p1;
 
-    v1[0] = p2[0] - p1[0];
-    v1[1] = p2[1] - p1[1];
-    v1[2] = p2[2] - p1[2];
+    float bb1 = t2(1) - t1(1);
+    float bb2 = t3(1) - t1(1);
 
-    v2[0] = p3[0] - p1[0];
-    v2[1] = p3[1] - p1[1];
-    v2[2] = p3[2] - p1[2];
-
-    float bb1 = t2.v - t1.v;
-    float bb2 = t3.v - t1.v;
-
-    tangent[0] = bb2 * v1[0] - bb1 * v2[0];
-    tangent[1] = bb2 * v1[1] - bb1 * v2[1];
-    tangent[2] = bb2 * v1[2] - bb1 * v2[2];
+    core::Vec3d tangent = bb2 * v1 - bb1 * v2;
 
     return tangent.normalized();
 }
 
 /// \brief
-core::Vec3d Mesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3)
+core::Vec3d Mesh::calculateTangent_test(const core::Vec3d& p1,
+                                        const core::Vec3d& p2,
+                                        const core::Vec3d& p3,
+                                        const core::Vec2f& t1,
+                                        const core::Vec2f& t2,
+                                        const core::Vec2f& t3)
 {
+    core::Vec3d v1 = p2-p1;
+    core::Vec3d v2 = p3-p1;
 
-    core::Vec3d tangent;
-    core::Vec3d v1;
-    core::Vec3d v2;
+    float tt1 = t2(0)-t1(0);
+    float tt2 = t3(0)-t1(0);
 
-    v1[0] = p2[0] - p1[0];
-    v1[1] = p2[1] - p1[1];
-    v1[2] = p2[2] - p1[2];
+    float bb1 = t2(1)-t1(1);
+    float bb2 = t3(1)-t1(1);
+    float r = 1.0f/(tt1 * bb2 - tt2 * bb1);
 
-    v2[0] = p3[0] - p1[0];
-    v2[1] = p3[1] - p1[1];
-    v2[2] = p3[2] - p1[2];
+    core::Vec3d tangent = (bb2*v1 - bb1*v2)*r;
 
-    float tt1 = t2.u - t1.u;
-    float tt2 = t3.u - t1.u;
-
-    float bb1 = t2.v - t1.v;
-    float bb2 = t3.v - t1.v;
-    float r = 1.0F / (tt1 * bb2 - tt2 * bb1);
-    tangent = (bb2*v1 - bb1*v2)*r;
-
-    return tangent;
+    return tangent.normalized();
 }
 
 /// \brief calculates the normal of the vertex
 void Mesh::updateVertexNormals()
 {
-    core::Vec3d temp = core::Vec3d::Zero();
-
-    for (int i = 0; i < nbrVertices; i++)
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
+        core::Vec3d temp = core::Vec3d::Zero();
         for (size_t j = 0; j < vertTriNeighbors[i].size(); j++)
         {
             temp += triNormals[vertTriNeighbors[i][j]];
@@ -258,7 +235,6 @@ void Mesh::updateVertexNormals()
 
         vertNormals[i] = temp;
         vertNormals[i].normalize();
-        temp = core::Vec3d::Zero();
     }
 }
 
@@ -275,15 +251,11 @@ void Mesh::updateTriangleNormals()
 /// \brief calculates the normal of a triangle
 core::Vec3d Mesh::calculateTriangleNormal(int triNbr)
 {
+    Triangle t = this->triangles[triNbr];
 
-    core::Vec3d v[3];
-    Triangle temp = this->triangles[triNbr];
+    const core::Vec3d &v = this->getVertex(t.vert[0]);
 
-    v[0] = this->vertices[temp.vert[0]];
-    v[1] = this->vertices[temp.vert[1]];
-    v[2] = this->vertices[temp.vert[2]];
-
-    return (v[1] - v[0]).cross(v[2] - v[0]).normalized();
+    return (this->getVertex(t.vert[1]) - v).cross(this->getVertex(t.vert[2]) - v).normalized();
 }
 
 /// \brief allocates vertices and related array
@@ -295,12 +267,12 @@ bool Mesh::initVertexArrays(int nbr)
         return false;
     }
 
-    this->nbrVertices = nbr;
-    this->vertices.resize(nbr);
-    this->origVerts.resize(nbr);
+    this->getVertices().resize(nbr);
+    this->getOrigVertices().resize(nbr);
+    this->getTextureCoordinates().resize(nbr);
+
     this->vertNormals = new core::Vec3d[nbr];
     this->vertTangents = new core::Vec3d[nbr];
-    this->texCoord = new TexCoord[nbr];
     return true;
 }
 
@@ -324,11 +296,9 @@ bool Mesh::initTriangleArrays(int nbr)
 /// \brief initializes the vertex neighbors
 void Mesh::initVertexNeighbors()
 {
+    vertTriNeighbors.resize(this->getNumberOfVertices());
 
-    int i;
-    vertTriNeighbors.resize(nbrVertices);
-
-    for (i = 0; i < nbrTriangles; i++)
+    for (int i = 0; i < nbrTriangles; ++i)
     {
         vertTriNeighbors[triangles[i].vert[0]].push_back(i);
         vertTriNeighbors[triangles[i].vert[1]].push_back(i);
@@ -339,33 +309,31 @@ void Mesh::initVertexNeighbors()
 /// \brief initializes the vertex neighbors
 void Mesh::calcNeighborsVertices()
 {
-
-    int i;
-    int triangleIndex;
     int candidate[3];
 
-    vertVertNeighbors.resize(nbrVertices);
+    vertVertNeighbors.resize(this->getNumberOfVertices());
 
-    for (i = 0; i < nbrVertices; i++)
+    for (size_t i = 0, end = vertVertNeighbors.size(); i < end; ++i)
     {
-        for (size_t j = 0; j < vertTriNeighbors[i].size(); j++)
+        int ii = int(i);
+        for (size_t j = 0, end_j = vertTriNeighbors[i].size(); j < end_j; ++j)
         {
-            triangleIndex = vertTriNeighbors[i][j];
+            auto triangleIndex = vertTriNeighbors[i][j];
             candidate[0] = triangles[triangleIndex].vert[0];
             candidate[1] = triangles[triangleIndex].vert[1];
             candidate[2] = triangles[triangleIndex].vert[2];
 
-            if (candidate[0] == i)
+            if (candidate[0] == ii)
             {
                 candidate[0] = -1;
             }
 
-            if (candidate[1] == i)
+            if (candidate[1] == ii)
             {
                 candidate[1] = -1;
             }
 
-            if (candidate[2] == i)
+            if (candidate[2] == ii)
             {
                 candidate[2] = -1;
             }
@@ -402,7 +370,6 @@ void Mesh::calcNeighborsVertices()
             {
                 vertVertNeighbors[i].push_back(candidate[2]);
             }
-
         }
     }
 }
@@ -410,31 +377,27 @@ void Mesh::calcNeighborsVertices()
 /// \brief
 void Mesh::upadateAABB()
 {
-    double minx = std::numeric_limits<double>::max();
-    double miny = std::numeric_limits<double>::max();
-    double minz = std::numeric_limits<double>::max();
-    double maxx = -std::numeric_limits<double>::max();
-    double maxy = -std::numeric_limits<double>::max();
-    double maxz = -std::numeric_limits<double>::max();
+    core::Vec3d minVector(
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max());
+    core::Vec3d maxVector(
+        std::numeric_limits<double>::min(),
+        std::numeric_limits<double>::min(),
+        std::numeric_limits<double>::min());
 
-    for (int i = 0; i < nbrVertices; i++)
+    auto &vertices = this->getVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; i++)
     {
-        minx = std::min(vertices[i][0], minx);
-        miny = std::min(vertices[i][1], miny);
-        minz = std::min(vertices[i][2], minz);
-
-        maxx = std::max(vertices[i][0], maxx);
-        maxy = std::max(vertices[i][1], maxy);
-        maxz = std::max(vertices[i][2], maxz);
+        minVector = minVector.array().min(vertices[i].array());
+        maxVector = maxVector.array().max(vertices[i].array());
     }
 
-    aabb.aabbMin[0] = minx - (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMin[1] = miny - (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMin[2] = minz - (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    core::Vec3d skinOffset = (maxVector-minVector)*SIMMEDTK_MESH_AABBSKINFACTOR;
 
-    aabb.aabbMax[0] = maxx + (maxx - minx) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMax[1] = maxy + (maxy - miny) * SIMMEDTK_MESH_AABBSKINFACTOR;
-    aabb.aabbMax[2] = maxz + (maxz - minz) * SIMMEDTK_MESH_AABBSKINFACTOR;
+    Eigen::AlignedBox3d bbox(minVector-skinOffset,
+                             maxVector+skinOffset);
+    this->setBoundingBox(bbox);
 }
 
 /// \brief
@@ -443,7 +406,7 @@ void Mesh::calcEdges()
     Edge edge;
     edges.reserve(SIMMEDTK_MESH_RESERVEDMAXEDGES);
 
-    for (int i = 0; i < nbrVertices; i++)
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; i++)
     {
         for (size_t j = 0; j < vertVertNeighbors[i].size(); j++)
         {
@@ -458,28 +421,11 @@ void Mesh::calcEdges()
 }
 
 /// \brief
-void Mesh::translate(float p_offsetX, float p_offsetY, float p_offsetZ)
-{
-
-    for (int i = 0; i < nbrVertices; i++)
-    {
-        vertices[i][0] = vertices[i][0] + p_offsetX;
-        vertices[i][1] = vertices[i][1] + p_offsetY;
-        vertices[i][2] = vertices[i][2] + p_offsetZ;
-
-        origVerts[i][0] = vertices[i][0] + p_offsetX;
-        origVerts[i][1] = vertices[i][1] + p_offsetY;
-        origVerts[i][2] = vertices[i][2] + p_offsetZ;
-    }
-
-    upadateAABB();
-}
-
-/// \brief
 void Mesh::translate(core::Vec3d p_offset)
 {
-
-    for (int i = 0; i < nbrVertices; i++)
+    auto &vertices = this->getVertices();
+    auto &origVerts = this->getOrigVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
         vertices[i] = vertices[i] + p_offset;
         origVerts[i] = origVerts[i] + p_offset;
@@ -488,38 +434,30 @@ void Mesh::translate(core::Vec3d p_offset)
     upadateAABB();
 }
 
-/// \brief
 void Mesh::scale(core::Vec3d p_scaleFactors)
 {
-
-    for (int i = 0; i < nbrVertices; i++)
+    auto &vertices = this->getVertices();
+    auto &origVerts = this->getOrigVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
-        vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
-        vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
-        vertices[i][2] = vertices[i][2] * p_scaleFactors[2];
-
-        origVerts[i][0] = origVerts[i][0] * p_scaleFactors[0];
-        origVerts[i][1] = origVerts[i][1] * p_scaleFactors[1];
-        origVerts[i][2] = origVerts[i][2] * p_scaleFactors[2];
+        vertices[i].array() *= p_scaleFactors.array();
+        origVerts[i].array() *= p_scaleFactors.array();
     }
 
     upadateAABB();
 }
 
-/// \brief
-void Mesh::rotate(const Matrix33d &p_rot)
+void Mesh::rotate(const Quaterniond &R)
 {
-
-    for (int i = 0; i < nbrVertices; i++)
+    BaseMesh::rotate(R);
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
-        vertices[i] = p_rot * vertices[i];
-        origVerts[i] = p_rot * origVerts[i];
-        vertNormals[i] = p_rot * vertNormals[i];
+        vertNormals[i] = R * vertNormals[i];
     }
 
     for (int i = 0; i < nbrTriangles; i++)
     {
-        triNormals[i] = p_rot * triNormals[i];
+        triNormals[i] = R * triNormals[i];
     }
 
     calcTriangleTangents();
@@ -529,40 +467,22 @@ void Mesh::rotate(const Matrix33d &p_rot)
 /// \brief
 void Mesh::updateTriangleAABB()
 {
+    auto const &vertices = this->getVertices();
     for (int i = 0; i < nbrTriangles; i++)
     {
-        // min
-        triAABBs[i].aabbMin[0] = std::min(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
-        triAABBs[i].aabbMin[0] = std::min(triAABBs[i].aabbMin[0] ,   vertices[triangles[i].vert[2]][0]);
-
-        triAABBs[i].aabbMin[1] = std::min(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
-        triAABBs[i].aabbMin[1] = std::min(triAABBs[i].aabbMin[1] ,   vertices[triangles[i].vert[2]][1]);
-
-        triAABBs[i].aabbMin[2] = std::min(vertices[triangles[i].vert[0]][2], vertices[triangles[i].vert[1]][2]);
-        triAABBs[i].aabbMin[2] = std::min(triAABBs[i].aabbMin[2] ,   vertices[triangles[i].vert[2]][2]);
-
-        //max
-        triAABBs[i].aabbMax[0] = std::max(vertices[triangles[i].vert[0]][0], vertices[triangles[i].vert[1]][0]);
-        triAABBs[i].aabbMax[0] = std::max(triAABBs[i].aabbMax[0] ,   vertices[triangles[i].vert[2]][0]);
-
-        triAABBs[i].aabbMax[1] = std::max(vertices[triangles[i].vert[0]][1], vertices[triangles[i].vert[1]][1]);
-        triAABBs[i].aabbMax[1] = std::max(triAABBs[i].aabbMax[1] ,   vertices[triangles[i].vert[2]][1]);
-
-        triAABBs[i].aabbMax[2] = std::max(triAABBs[i].aabbMax[2],    vertices[triangles[i].vert[2]][2]);
+        triAABBs[i].setEmpty();
+        triAABBs[i].extend(vertices[triangles[i].vert[0]]);
+        triAABBs[i].extend(vertices[triangles[i].vert[1]]);
+        triAABBs[i].extend(vertices[triangles[i].vert[2]]);
     }
 }
 
 /// \brief
 void Mesh::checkCorrectWinding()
 {
-    int x[3];
-    int p[3];
-
     for (int i = 0; i < nbrTriangles; i++)
     {
-        x[0] = triangles[i].vert[0];
-        x[1] = triangles[i].vert[1];
-        x[2] = triangles[i].vert[2];
+        auto &x = triangles[i].vert;
 
         for (int j = 0; j < nbrTriangles; j++)
         {
@@ -571,9 +491,7 @@ void Mesh::checkCorrectWinding()
                 continue;
             }
 
-            p[0] = triangles[j].vert[0];
-            p[1] = triangles[j].vert[1];
-            p[2] = triangles[j].vert[2];
+            auto p = triangles[j].vert;
 
             if (x[0] == p[0] && x[1] == p[1])
             {
@@ -623,196 +541,17 @@ void Mesh::checkCorrectWinding()
     }
 }
 
-TextureAttachment::TextureAttachment()
-{
-}
-
-bool BaseMesh::isMeshTextured()
-{
-    return isTextureCoordAvailable;
-}
-
-void BaseMesh::assignTexture( int p_textureId )
-{
-    TextureAttachment attachment;
-    attachment.textureId = p_textureId;
-
-    if ( p_textureId > 0 )
-    {
-        this->textureIds.push_back( attachment );
-    }
-}
-void BaseMesh::assignTexture(const std::string& p_referenceName)
-{
-    int textureId;
-    TextureAttachment attachment;
-
-    if (TextureManager::findTextureId(p_referenceName, textureId) == SIMMEDTK_TEXTURE_OK)
-    {
-        attachment.textureId = textureId;
-        this->textureIds.push_back(attachment);
-    }
-}
-LineMesh::LineMesh( int p_nbrVertices ) : BaseMesh()
-{
-    nbrVertices = p_nbrVertices;
-    vertices.reserve( nbrVertices );
-    origVerts.reserve( nbrVertices );
-    edgeAABBs = new AABB[nbrVertices - 1];
-    texCoord = new TexCoord[nbrVertices];
-    edges = new Edge[nbrVertices - 1];
-    nbrEdges = nbrVertices - 1;
-    isTextureCoordAvailable = false;
-    createAutoEdges();
-}
-LineMesh::LineMesh( int p_nbrVertices, bool autoEdge ) : BaseMesh()
-{
-    nbrVertices = p_nbrVertices;
-    vertices.reserve( nbrVertices );
-    origVerts.reserve( nbrVertices );
-    texCoord = new TexCoord[nbrVertices];
-
-    /// Edge AABB should be assigned by the instance
-    edgeAABBs = nullptr;
-
-    /// Edges should be assigned by the instance
-    edges = nullptr;
-
-    /// Number of edges should be assigned by the instance
-    nbrEdges = 0;
-
-    isTextureCoordAvailable = false;
-
-    if ( autoEdge )
-    {
-        createAutoEdges();
-    }
-}
-void LineMesh::createAutoEdges()
-{
-    for ( int i = 0; i < nbrEdges; i++ )
-    {
-        edges[i].vert[0] = i;
-        edges[i].vert[1] = i + 1;
-    }
-}
-void LineMesh::updateAABB()
-{
-    AABB tempAABB;
-    core::Vec3d minOffset( -2.0, -2.0, -2.0 );
-    core::Vec3d maxOffset( 1.0, 1.0, 1.0 );
-    core::Vec3d minEdgeOffset( -0.1, -0.1, -0.1 );
-    core::Vec3d maxEdgeOffset( 0.1, 0.1, 0.1 );
-
-    tempAABB.aabbMin[0] = std::numeric_limits<double>::max();
-    tempAABB.aabbMin[1] = std::numeric_limits<double>::max();
-    tempAABB.aabbMin[2] = std::numeric_limits<double>::max();
-
-    tempAABB.aabbMax[0] = -std::numeric_limits<double>::max();
-    tempAABB.aabbMax[1] = -std::numeric_limits<double>::max();
-    tempAABB.aabbMax[2] = -std::numeric_limits<double>::max();
-
-    for ( int i = 0; i < nbrEdges; i++ )
-    {
-        ///min
-        edgeAABBs[i].aabbMin[0] = std::min( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
-        edgeAABBs[i].aabbMin[1] = std::min( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
-        edgeAABBs[i].aabbMin[2] = std::min( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
-        edgeAABBs[i].aabbMin += minEdgeOffset;
-        tempAABB.aabbMin[0] = std::min( tempAABB.aabbMin[0], edgeAABBs[i].aabbMin[0] );
-        tempAABB.aabbMin[1] = std::min( tempAABB.aabbMin[1], edgeAABBs[i].aabbMin[1] );
-        tempAABB.aabbMin[2] = std::min( tempAABB.aabbMin[2], edgeAABBs[i].aabbMin[2] );
-
-        ///max
-        edgeAABBs[i].aabbMax[0] = std::max( vertices[edges[i].vert[0]][0], vertices[edges[i].vert[1]][0] );
-        edgeAABBs[i].aabbMax[1] = std::max( vertices[edges[i].vert[0]][1], vertices[edges[i].vert[1]][1] );
-        edgeAABBs[i].aabbMax[2] = std::max( vertices[edges[i].vert[0]][2], vertices[edges[i].vert[1]][2] );
-        edgeAABBs[i].aabbMax += maxEdgeOffset;
-        tempAABB.aabbMax[0] = std::max( tempAABB.aabbMax[0], edgeAABBs[i].aabbMax[0] );
-        tempAABB.aabbMax[1] = std::max( tempAABB.aabbMax[1], edgeAABBs[i].aabbMax[1] );
-        tempAABB.aabbMax[2] = std::max( tempAABB.aabbMax[2], edgeAABBs[i].aabbMax[2] );
-    }
-
-    tempAABB.aabbMin += minOffset;
-    tempAABB.aabbMax += maxOffset;
-    aabb = tempAABB;
-}
-void LineMesh::translate( float p_offsetX, float p_offsetY, float p_offsetZ )
-{
-
-    for ( int i = 0; i < nbrVertices; i++ )
-    {
-        vertices[i][0] = vertices[i][0] + p_offsetX;
-        vertices[i][1] = vertices[i][1] + p_offsetY;
-        vertices[i][2] = vertices[i][2] + p_offsetZ;
-    }
-
-    updateAABB();
-}
-void LineMesh::translate( core::Vec3d p_offset )
-{
-
-    for ( int i = 0; i < nbrVertices; i++ )
-    {
-        vertices[i] = vertices[i] + p_offset;
-        origVerts[i] = origVerts[i] + p_offset;
-    }
-
-    updateAABB();
-}
-void LineMesh::rotate( Matrix33d p_rot )
-{
-
-    for ( int i = 0; i < nbrVertices; i++ )
-    {
-        vertices[i] = p_rot * vertices[i];
-        origVerts[i] = p_rot * origVerts[i];
-    }
-
-    updateAABB();
-}
-void LineMesh::scale( core::Vec3d p_scaleFactors )
-{
-
-    for ( int i = 0; i < nbrVertices; i++ )
-    {
-        vertices[i][0] = vertices[i][0] * p_scaleFactors[0];
-        vertices[i][1] = vertices[i][1] * p_scaleFactors[1];
-        vertices[i][2] = vertices[i][2] * p_scaleFactors[2];
-
-        origVerts[i][0] = origVerts[i][0] * p_scaleFactors[0];
-        origVerts[i][1] = origVerts[i][1] * p_scaleFactors[1];
-        origVerts[i][2] = origVerts[i][2] * p_scaleFactors[2];
-    }
-
-    updateAABB();
-}
-
-bool LineMesh::isMeshTextured()
-{
-    return isTextureCoordAvailable;
-}
-
-int Mesh::getNumTriangles() const
-{
-    return this->nbrTriangles;
-}
-
-int Mesh::getNumEdges() const
-{
-    return this->edges.size();
-}
-
 void Mesh::updateSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceMesh)
 {
     Vec3d p;
     //copy the vertex co-ordinates
-    for(int i=0; i<this->nbrVertices ; i++)
+    auto &vertices = this->getVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
        p = vegaSurfaceMesh->getPosition(i);
-       this->vertices[i][0] = p[0];
-       this->vertices[i][1] = p[1];
-       this->vertices[i][2] = p[2];
+       vertices[i][0] = p[0];
+       vertices[i][1] = p[1];
+       vertices[i][2] = p[2];
     }
 }
 
@@ -823,61 +562,51 @@ bool Mesh::importSurfaceMeshFromVegaFormat(std::shared_ptr<ObjMesh> vegaSurfaceM
 
     if(!vegaSurfaceMesh->isTriangularMesh())
     {
-        if (this->log != nullptr)
-        {
-            this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
+//         if (this->log != nullptr)
+//         {
+//             this->log->addError("Error : SimMedTK supports only triangular surface mesh. Vega mesh is not a triangle mesh!");
             return false;
-        }
+//         }
     }
 
-    int i, threeI;
 
     // temporary arrays
     int numVertices(0);
-    double* vertices;
     int numTriangles(0);
-    int* triangles;
-    //Int * numGroups;
-	//Int ** triangleGroups;
 
-    vertices = nullptr;
-    triangles = nullptr;
-    vegaSurfaceMesh->exportGeometry(&numVertices, &vertices, &numTriangles , &triangles, nullptr, nullptr);
+    double* vegaVertices = nullptr;
+    int* vegaTriangles = nullptr;
+    vegaSurfaceMesh->exportGeometry(&numVertices, &vegaVertices, &numTriangles , &vegaTriangles, nullptr, nullptr);
 
-    this->nbrVertices = numVertices;
     this->nbrTriangles = numTriangles;
 
     initVertexArrays(numVertices);
     initTriangleArrays(numTriangles);
 
-    /*delete this->triangles;
-    this->triangles = new Triangle[this->nbrTriangles];*/
-
     //copy the triangle connectivity information
-    for(i=0; i<this->nbrTriangles ; i++)
+    for(int i = 0, fastIndex = 0; i < this->nbrTriangles; ++i, fastIndex+=3)
     {
-        threeI = 3*i;
-        this->triangles[i].vert[0] = triangles[threeI+0];
-        this->triangles[i].vert[1] = triangles[threeI+1];
-        this->triangles[i].vert[2] = triangles[threeI+2];
+        this->triangles[i].vert[0] = vegaTriangles[fastIndex+0];
+        this->triangles[i].vert[1] = vegaTriangles[fastIndex+1];
+        this->triangles[i].vert[2] = vegaTriangles[fastIndex+2];
     }
 
-    //this->vertices.resize(this->nbrVertices);
-    //copy the vertex co-ordinates
-    for(i=0; i<this->nbrVertices ; i++)
+    auto &vertexArray = this->getVertices();
+    for(int i = 0, fastIndex = 0; i < numVertices; ++i, fastIndex+=3)
     {
-        this->vertices[i][0] = vertices[3 * i + 0];
-        this->vertices[i][1] = vertices[3 * i + 1];
-        this->vertices[i][2] = vertices[3 * i + 2];
+        vertexArray[i][0] = vegaVertices[fastIndex+0];
+        vertexArray[i][1] = vegaVertices[fastIndex+1];
+        vertexArray[i][2] = vegaVertices[fastIndex+2];
     }
 
-    if(perProcessingStage){
+    if(perProcessingStage)
+    {
         updateOriginalVertsWithCurrent();
     }
 
     //deallocate temporary arrays
-    delete [] triangles;
-    delete [] vertices;
+    delete [] vegaTriangles;
+    delete [] vegaVertices;
 
     return 1;
 

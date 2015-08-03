@@ -37,10 +37,10 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
     // Add one triangle to the data structure
     mesh->initVertexArrays(3);
     mesh->initTriangleArrays(1);
-
-    mesh->vertices[0] = vertices[0];
-    mesh->vertices[1] = vertices[1];
-    mesh->vertices[2] = vertices[2];
+    auto &vertexArray = mesh->getVertices();
+    vertexArray[0] = vertices[0];
+    vertexArray[1] = vertices[1];
+    vertexArray[2] = vertices[2];
 
     mesh->triangles[0].vert[0] = 0;
     mesh->triangles[0].vert[1] = 1;

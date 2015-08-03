@@ -54,9 +54,9 @@ void DummySimulator::initCustom()
                 }
                 std::shared_ptr<Mesh> mesh = model->getMesh();
 
-                object->getLocalVertices().reserve( mesh->nbrVertices );
+                object->getLocalVertices().reserve( mesh->getNumberOfVertices() );
                 // WARNING:  Copy!!?
-                object->getLocalVertices() = mesh->vertices;
+                object->getLocalVertices() = mesh->getVertices();
                 object->getFlags().isSimulatorInit = true;
                 break;
             }
@@ -85,7 +85,7 @@ void DummySimulator::run()
             }
             std::shared_ptr<Mesh> mesh = model->getMesh();
 
-            for ( int vertIndex = 0; vertIndex < mesh->nbrVertices; vertIndex++ )
+            for ( int vertIndex = 0; vertIndex < mesh->getNumberOfVertices(); vertIndex++ )
             {
                 staticSceneObject->getLocalVertices()[vertIndex][1] = staticSceneObject->getLocalVertices()[vertIndex][1] + 0.000001;
             }
@@ -115,7 +115,7 @@ void DummySimulator::syncBuffers()
             }
             std::shared_ptr<Mesh> mesh = model->getMesh();
             // WARNING: Copy??!
-            mesh->vertices = staticSceneObject->getLocalVertices();
+            mesh->getVertices() = staticSceneObject->getLocalVertices();
         }
     }
 }

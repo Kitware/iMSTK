@@ -27,10 +27,11 @@ void PBDSurfaceSceneObject::findFixedMassWrtSphere(core::Vec3d p_center, float p
 {
     float dist = 0;
 
-    for (int i = 0; i < mesh->nbrVertices; i++)
+    auto &vertices = mesh->getVertices();
+    for (int i = 0; i < mesh->getNumberOfVertices(); i++)
     {
 
-        dist = (p_center - mesh->vertices[i]).norm();
+        dist = (p_center - vertices[i]).norm();
 
         if (dist < p_radius)
         {
@@ -89,7 +90,8 @@ void PBDSurfaceSceneObject::initMeshStructure()
 void PBDSurfaceSceneObject::InitSurfaceObject()
 {
     //surface mesh
-    nbrMass = mesh->nbrVertices;
+    nbrMass = mesh->getNumberOfVertices();
+    auto &vertices = mesh->getVertices();
 
     P = new core::Vec3d[nbrMass];
     V = new core::Vec3d[nbrMass];
@@ -103,7 +105,7 @@ void PBDSurfaceSceneObject::InitSurfaceObject()
 
     for ( int i = 0; i < nbrMass; i++ )
     {
-        P[i] = mesh->vertices[i];
+        P[i] = vertices[i];
     }
 
     nbrSpr = mesh->edges.size();
@@ -111,7 +113,7 @@ void PBDSurfaceSceneObject::InitSurfaceObject()
 
     for ( int i = 0; i < nbrSpr; i++ )
     {
-        L0[i] = ( mesh->vertices[mesh->edges[i].vert[0]] - mesh->vertices[mesh->edges[i].vert[1]] ).norm();
+        L0[i] = ( vertices[mesh->edges[i].vert[0]] - vertices[mesh->edges[i].vert[1]] ).norm();
     }
 
     mesh->allocateAABBTris();
@@ -145,7 +147,7 @@ PBDSurfaceSceneObject::~PBDSurfaceSceneObject()
 }
 void PBDSurfaceSceneObject::findFixedCorners()
 {
-
+    auto &vertices = mesh->getVertices();
     nbrFixedMass = 2;
     listFixedMass = new int[nbrFixedMass];
     core::Vec3d corner[2];
@@ -160,9 +162,9 @@ void PBDSurfaceSceneObject::findFixedCorners()
     {
         minmin = std::numeric_limits<float>::max();
 
-        for ( j = 0; j < mesh->nbrVertices; j++ )
+        for ( j = 0; j < mesh->getNumberOfVertices(); j++ )
         {
-            dist = ( corner[i] - mesh->vertices[j] ).norm();
+            dist = ( corner[i] - vertices[j] ).norm();
 
             if ( dist < minmin )
             {

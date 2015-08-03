@@ -227,8 +227,8 @@ private:
 
     // Interpolation between primary and secondary surface mesh
     int numInterpolationElementVerts;
-    std::vector<int> interpolationVertices;
-    std::vector<double> interpolationWeights;
+    int *interpolationVertices;
+    double *interpolationWeights;
 
     std::shared_ptr<LinearSolver> linearSolver;
 

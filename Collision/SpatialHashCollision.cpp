@@ -23,6 +23,8 @@
 
 #include "SpatialHashCollision.h"
 
+#include <Eigen/Geometry>
+
 // SimMedTK includes
 #include "Core/CollisionConfig.h"
 #include "Collision/SurfaceTree.h"
@@ -78,11 +80,6 @@ void SpatialHashCollision::addMesh(std::shared_ptr<Mesh> mesh)
     mesh->allocateAABBTris();
 }
 
-void SpatialHashCollision::addMesh(std::shared_ptr<LineMesh> mesh)
-{
-    lineMeshes.push_back(mesh);
-}
-
 void SpatialHashCollision::removeMesh(std::shared_ptr<Mesh> mesh)
 {
     auto it = std::find(meshes.begin(),meshes.end(),mesh);
@@ -98,9 +95,11 @@ bool SpatialHashCollision::findCandidatePoints(std::shared_ptr<Mesh> mesh,
     tempAABB.aabbMax = colModel->root->getCube().rightMaxCorner();
 
     bool  found = false;
-    for (int i = 0; i < mesh->nbrVertices; i++)
+
+    auto &vertices = mesh->getVertices();
+    for (size_t i = 0, end = mesh->getNumberOfVertices(); i < end; ++i)
     {
-        if (CollisionMoller::checkAABBPoint(tempAABB, mesh->vertices[i]))
+        if (CollisionMoller::checkAABBPoint(tempAABB, vertices[i]))
         {
             addPoint(mesh, i, cellsForModelPoints);
             found = true;
@@ -111,9 +110,8 @@ bool SpatialHashCollision::findCandidatePoints(std::shared_ptr<Mesh> mesh,
 
 bool SpatialHashCollision::findCandidateTris(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB)
 {
-    AABB aabboverlap;
-
-    if (CollisionMoller::checkOverlapAABBAABB(meshA->aabb, meshB->aabb, aabboverlap) == false)
+    auto intersection = meshA->getBoundingBox().intersection(meshB->getBoundingBox());
+    if (intersection.isEmpty())
     {
         return false;
     }
@@ -126,34 +124,6 @@ bool SpatialHashCollision::findCandidateTris(std::shared_ptr<Mesh> meshA, std::s
     for (int i = 0; i < meshB->nbrTriangles; i++)
     {
         addTriangle(meshB, i, cells);
-    }
-
-    return true;
-}
-
-bool SpatialHashCollision::findCandidateTrisLines(std::shared_ptr<Mesh> meshA, std::shared_ptr<LineMesh> meshB)
-{
-    AABB aabboverlap;
-
-    if (CollisionMoller::checkOverlapAABBAABB(meshA->aabb, meshB->aabb, aabboverlap) == false)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < meshA->nbrTriangles; i++)
-    {
-        if (CollisionMoller::checkOverlapAABBAABB(aabboverlap, meshA->triAABBs[i]))
-        {
-            addTriangle(meshA, i, cellsForTri2Line);
-        }
-    }
-
-    for (int i = 0; i < meshB->nbrEdges; i++)
-    {
-        if (CollisionMoller::checkOverlapAABBAABB(aabboverlap, meshB->edgeAABBs[i]))
-        {
-            addLine(meshB, i, cellLines);
-        }
     }
 
     return true;
@@ -179,7 +149,7 @@ void SpatialHashCollision::computeCollisionTri2Tri()
             while (cells.nextBucketItem(iterator1, triB))
             {
                 if (triA.meshID == triB.meshID ||
-                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
+                    !(meshes[0]->getCollisionGroup()->isCollisionPermitted(meshes[1]->getCollisionGroup())))
                 {
                     continue;
                 }
@@ -227,7 +197,7 @@ void  SpatialHashCollision::computeCollisionLine2Tri()
             while (cellsForTri2Line.nextBucketItem(iteratorTri, tri))
             {
                 if (tri.meshID == line.meshID ||
-                    !(meshes[0]->collisionGroup.isCollisionPermitted(meshes[1]->collisionGroup)))
+                    !(meshes[0]->getCollisionGroup()->isCollisionPermitted(meshes[1]->getCollisionGroup())))
                 {
                     continue;
                 }
@@ -284,15 +254,19 @@ void SpatialHashCollision::computeCollisionModel2Points()
 
 void SpatialHashCollision::computeHash(std::shared_ptr<Mesh> mesh, const std::vector<int> &triangleIndexes)
 {
+    core::Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
     for(auto&& i : triangleIndexes)
     {
-        int xStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[0]/cellSizeX));
-        int yStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[1]/cellSizeY));
-        int zStartIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMin[2]/cellSizeZ));
+        auto startIndices = mesh->triAABBs[i].min().array()*cellSize.array();
+        auto endIndices = mesh->triAABBs[i].max().array()*cellSize.array();
 
-        int xEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[0]/cellSizeX));
-        int yEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[1]/cellSizeY));
-        int zEndIndex = static_cast<int>(std::floor(mesh->triAABBs[i].aabbMax[2]/cellSizeZ));
+        int xStartIndex = static_cast<int>(std::floor(startIndices(0)));
+        int yStartIndex = static_cast<int>(std::floor(startIndices(1)));
+        int zStartIndex = static_cast<int>(std::floor(startIndices(2)));
+
+        int xEndIndex = static_cast<int>(std::floor(endIndices(0)));
+        int yEndIndex = static_cast<int>(std::floor(endIndices(1)));
+        int zEndIndex = static_cast<int>(std::floor(endIndices(2)));
 
         for (int ix = xStartIndex; ix <= xEndIndex; ix++)
             for (int iy = yStartIndex; iy <= yEndIndex; iy++)
@@ -309,18 +283,23 @@ void SpatialHashCollision::addTriangle(std::shared_ptr<Mesh> mesh, int triangleI
     triangle.meshID = mesh->getUniqueId();
     triangle.primID = triangleId;
 
-    triangle.vert[0] = mesh->vertices[mesh->triangles[triangleId].vert[0]];
-    triangle.vert[1] = mesh->vertices[mesh->triangles[triangleId].vert[1]];
-    triangle.vert[2] = mesh->vertices[mesh->triangles[triangleId].vert[2]];
+    core::Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
 
-    int xStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[0]/cellSizeX));
-    int yStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[1]/cellSizeY));
-    int zStartIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMin[2]/cellSizeZ));
+    auto startIndices = mesh->triAABBs[triangleId].min().array()*cellSize.array();
+    auto endIndices = mesh->triAABBs[triangleId].max().array()*cellSize.array();
 
-    int xEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[0]/cellSizeX));
-    int yEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[1]/cellSizeY));
-    int zEndIndex = static_cast<int>(std::floor(mesh->triAABBs[triangleId].aabbMax[2]/cellSizeZ));
+    int xStartIndex = static_cast<int>(std::floor(startIndices(0)));
+    int yStartIndex = static_cast<int>(std::floor(startIndices(1)));
+    int zStartIndex = static_cast<int>(std::floor(startIndices(2)));
 
+    int xEndIndex = static_cast<int>(std::floor(endIndices(0)));
+    int yEndIndex = static_cast<int>(std::floor(endIndices(1)));
+    int zEndIndex = static_cast<int>(std::floor(endIndices(2)));
+
+    auto &vertices = mesh->getVertices();
+    triangle.vert[0] = vertices[mesh->triangles[triangleId].vert[0]];
+    triangle.vert[1] = vertices[mesh->triangles[triangleId].vert[1]];
+    triangle.vert[2] = vertices[mesh->triangles[triangleId].vert[2]];
     for (int ix = xStartIndex; ix <= xEndIndex; ix++)
         for (int iy = yStartIndex; iy <= yEndIndex; iy++)
             for (int iz = zStartIndex; iz <= zEndIndex; iz++)
@@ -329,41 +308,20 @@ void SpatialHashCollision::addTriangle(std::shared_ptr<Mesh> mesh, int triangleI
             }
 }
 
-void SpatialHashCollision::addLine(std::shared_ptr<LineMesh> mesh,
-                                   int edgeId, Hash<CellLine> &cells)
-{
-    CellLine  line;
-    line.meshID = mesh->getUniqueId();
-    line.primID = edgeId;
-    line.vert[0] = mesh->vertices[mesh->edges[edgeId].vert[0]];
-    line.vert[1] = mesh->vertices[mesh->edges[edgeId].vert[1]];
-
-    int xStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[0]/cellSizeX));
-    int yStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[1]/cellSizeY));
-    int zStartIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMin[2]/cellSizeZ));
-
-    int xEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[0]/cellSizeX));
-    int yEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[1]/cellSizeY));
-    int zEndIndex = static_cast<int>(std::floor(mesh->edgeAABBs[edgeId].aabbMax[2]/cellSizeZ));
-
-    for (int ix = xStartIndex; ix <= xEndIndex; ix++)
-        for (int iy = yStartIndex; iy <= yEndIndex; iy++)
-            for (int iz = zStartIndex; iz <= zEndIndex; iz++)
-            {
-                cells.checkAndInsert(line, hasher->getKey(cells.tableSize, ix, iy, iz));
-            }
-}
 
 void SpatialHashCollision::addPoint(std::shared_ptr<Mesh> mesh, int vertId, Hash<CellPoint> &cells)
 {
     CellPoint cellPoint;
     cellPoint.meshID = mesh->getUniqueId();
     cellPoint.primID = vertId;
-    cellPoint.vert = mesh->vertices[vertId];
 
-    int xStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][0]/cellSizeX));
-    int yStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][1]/cellSizeY));
-    int zStartIndex = static_cast<int>(std::floor(mesh->vertices[vertId][2]/cellSizeZ));
+    auto &vertices = mesh->getVertices();
+
+    cellPoint.vert = vertices[vertId];
+
+    int xStartIndex = static_cast<int>(std::floor(vertices[vertId][0]/cellSizeX));
+    int yStartIndex = static_cast<int>(std::floor(vertices[vertId][1]/cellSizeY));
+    int zStartIndex = static_cast<int>(std::floor(vertices[vertId][2]/cellSizeZ));
 
     cells.checkAndInsert(cellPoint, hasher->getKey(cells.tableSize, xStartIndex, yStartIndex, zStartIndex));
 }
@@ -411,7 +369,6 @@ void SpatialHashCollision::reset()
     cellLines.clearAll();
     cellsForTri2Line.clearAll();
     cellsForModelPoints.clearAll();
-    lineMeshes.clear();
     collidedLineTris.clear();
     collidedModelPoints.clear();
     collidedTriangles.clear();
@@ -419,18 +376,20 @@ void SpatialHashCollision::reset()
 bool SpatialHashCollision::findCandidates()
 {
     for(size_t i = 0; i < colModel.size(); i++)
+    {
         for(size_t i = 0; i < meshes.size(); i++)
         {
             findCandidatePoints(meshes[i], colModel[i]);
             addOctreeCell(colModel[i], cellsForModel);
         }
+    }
 
     ///Triangle-Triangle collision
     for(size_t i = 0; i < meshes.size(); i++)
     {
         for(size_t j = i + 1; j < meshes.size(); j++)
         {
-            if(meshes[i]->collisionGroup.isCollisionPermitted(meshes[j]->collisionGroup))
+            if(meshes[i]->getCollisionGroup()->isCollisionPermitted(meshes[j]->getCollisionGroup()))
             {
                 if(findCandidateTris(meshes[i], meshes[j]) == false)
                 {
@@ -440,18 +399,6 @@ bool SpatialHashCollision::findCandidates()
         }
     }
 
-    ///Triangle-line Collision
-    for(size_t i = 0; i < meshes.size(); i++)
-        for(size_t j = 0; j < lineMeshes.size(); j++)
-        {
-            if(meshes[i]->collisionGroup.isCollisionPermitted(lineMeshes[j]->collisionGroup))
-            {
-                if(findCandidateTrisLines(meshes[i], lineMeshes[j]) == false)
-                {
-                    continue;
-                }
-            }
-        }
     return 0;
 }
 void SpatialHashCollision::updateBVH()
@@ -459,11 +406,6 @@ void SpatialHashCollision::updateBVH()
     for(size_t i = 0; i < meshes.size(); i++)
     {
         meshes[i]->updateTriangleAABB();
-    }
-
-    for(size_t i = 0; i < lineMeshes.size(); i++)
-    {
-        meshes[i]->upadateAABB();
     }
 }
 const std::vector< std::shared_ptr< CollidedTriangles > >& SpatialHashCollision::getCollidedTriangles() const

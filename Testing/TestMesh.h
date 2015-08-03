@@ -57,7 +57,7 @@ std::shared_ptr<Mesh> makeSurfaceMesh()
     };
 
     std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
-    mesh->vertices = vertices;
+    mesh->getVertices() = vertices;
     mesh->triangles = triangles;
 
     return mesh;

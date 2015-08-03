@@ -39,7 +39,6 @@ class CellTriangle;
 class CollidedLineTris;
 class CollidedModelPoints;
 class CollidedTriangles;
-class LineMesh;
 class Mesh;
 class OctreeCell;
 
@@ -70,9 +69,6 @@ public:
     void addMesh(std::shared_ptr<Mesh> mesh);
 
     /// \brief !!
-    void addMesh(std::shared_ptr<LineMesh> mesh);
-
-    /// \brief !!
     void removeMesh(std::shared_ptr<Mesh> mesh);
 
     /// \brief !!
@@ -83,9 +79,6 @@ public:
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
     bool findCandidateTris(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB);
-
-    /// \brief find the candidate line-triangle pairs for collision (broad phase collision)
-    bool findCandidateTrisLines(std::shared_ptr<Mesh> meshA, std::shared_ptr<LineMesh> meshB);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -106,9 +99,6 @@ public:
 protected:
     /// \brief adds triangle to hash
     void addTriangle(std::shared_ptr<Mesh> mesh, int triangleId, Hash<CellTriangle> &cells);
-
-    /// \brief adds line to hash
-    void addLine(std::shared_ptr<LineMesh> mesh, int edgeId, Hash<CellLine> &cells);
 
     /// \brief adds point to hash
     void addPoint(std::shared_ptr<Mesh> mesh, int vertId, Hash<CellPoint> &cells);
@@ -143,7 +133,6 @@ private:
     Hash<CellModel> cellsForModel; // Candidate cells for collision model
     Hash<CellPoint> cellsForModelPoints; // Candidate for Collision model to point
     std::vector<std::shared_ptr<Mesh>> meshes; // Mesh models
-    std::vector<std::shared_ptr<LineMesh>> lineMeshes; // Line mehs models
     std::vector<std::shared_ptr<CollidedTriangles>> collidedTriangles; // List of collision pairs triangles
     std::vector<std::shared_ptr<CollidedLineTris>> collidedLineTris; // List of collision pairs triangles-lines
     std::vector<std::shared_ptr<CollidedModelPoints>> collidedModelPoints; // List of collision pairs models-points

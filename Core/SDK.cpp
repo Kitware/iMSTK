@@ -250,7 +250,7 @@ void SDK::terminateAll()
 }
 
 /// \brief register functions
-void SDK::registerMesh(std::shared_ptr<BaseMesh> newMesh)
+void SDK::registerMesh(std::shared_ptr<Core::BaseMesh> newMesh)
 {
     if(std::end(this->meshList) ==
         std::find(std::begin(this->meshList),std::end(this->meshList),newMesh) )

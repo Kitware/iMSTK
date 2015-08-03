@@ -198,29 +198,21 @@ bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
     //extract the information from the aiScene's mesh objects
     aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
 
-    if (mesh->HasTextureCoords(0))
-    {
-        this->isTextureCoordAvailable = 1;
-    }
-    else
-    {
-        this->isTextureCoordAvailable = 0;
-    }
-
     initVertexArrays(mesh->mNumVertices);
     initTriangleArrays(mesh->mNumFaces);
 
     //Get indexed vertex data
+    auto &vertices = this->getVertices();
     for (size_t i = 0; i < mesh->mNumVertices; i++)
     {
-        this->vertices[i] = core::Vec3d(mesh->mVertices[i][0],
-                                    mesh->mVertices[i][1],
-                                    mesh->mVertices[i][2]);
+        vertices[i] = core::Vec3d(mesh->mVertices[i][0],
+                                  mesh->mVertices[i][1],
+                                  mesh->mVertices[i][2]);
     }
-    this->origVerts = this->vertices;
+    this->updateOriginalVertsWithCurrent();
 
     //Get indexed texture coordinate data
-    if (isTextureCoordAvailable)
+    if (mesh->HasTextureCoords(0))
     {
         //Assimp supports 3D texture coords, but we only support 2D
         if (mesh->mNumUVComponents[0] != 2)
@@ -230,15 +222,14 @@ bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
                 log_SF->addError("Error: Error loading mesh, non-two dimensional texture coordinate found.");
             }
 
-            this->isTextureCoordAvailable = 0;
             return false;
         }
 
         //Extract the texture data
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
-            this->texCoord[i].u = mesh->mTextureCoords[0][i][0];
-            this->texCoord[i].v = mesh->mTextureCoords[0][i][1];
+            this->addTextureCoordinate(mesh->mTextureCoords[0][i][0],
+                                       mesh->mTextureCoords[0][i][1]);
         }
     }
 
@@ -287,6 +278,7 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
         fread(&l_chunk_id, 2, 1, l_file);  //Read the chunk header
         fread(&l_chunk_lenght, 4, 1, l_file);  //Read the lenght of the chunk
 
+        auto vertexArray = this->getVertices();
         switch (l_chunk_id)
         {
         //----------------- MAIN3DS -----------------
@@ -340,18 +332,15 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
         //-------------------------------------------
         case 0x4110:
             fread(&l_qty, sizeof(unsigned short), 1, l_file);
-            this->nbrVertices = l_qty;
-            this->vertices.reserve(l_qty);
-            this->origVerts.reserve(l_qty);
+            vertexArray.reserve(l_qty);
             this->vertNormals = new core::Vec3d[l_qty];
             this->vertTangents = new core::Vec3d[l_qty];
-            this->texCoord = new TexCoord[l_qty];
 
-            for (int fpt = 0; fpt < this->nbrVertices; fpt++)
+            for (int fpt = 0; fpt < l_qty; fpt++)
             {
                 float fTemp[3];
                 fread(fTemp, sizeof(float), 3, l_file);
-                this->vertices.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
+                vertexArray.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
             }
 
             break;
@@ -399,11 +388,8 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
             {
                 float fTemp[2];
                 fread(fTemp, sizeof(float), 2, l_file);
-                this->texCoord[tpt].u = fTemp[0];
-                this->texCoord[tpt].v = fTemp[1];
+                this->addTextureCoordinate(fTemp[0],fTemp[1]);
             }
-
-            isTextureCoordAvailable = true;
 
             break;
 
@@ -416,7 +402,7 @@ bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
             fseek(l_file, l_chunk_lenght - 6, SEEK_CUR);
         }
     }
-    this->origVerts = this->vertices;
+    this->updateOriginalVertsWithCurrent();
     fclose(l_file);  // Closes the file stream
 
     return 1; // Returns ok
@@ -432,7 +418,7 @@ void SurfaceMesh::printPrimitiveDetails()
 {
     std::cout << "----------------------------\n";
     std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
-    std::cout << "Num. vertices   : " << this->getNumVertices() <<"\n\t";
+    std::cout << "Num. vertices   : " << this->getNumberOfVertices() <<"\n\t";
     std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t";
     std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t";
     std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";

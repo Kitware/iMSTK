@@ -140,14 +140,14 @@ public:
     void setGroup(unsigned int p_groupId);
 
     /// \brief !!
-    void permitCollision(CollisionGroup &p_group);
+    void permitCollision(std::shared_ptr<CollisionGroup> p_group);
 
     /// \brief !!
-    void forbidCollision(CollisionGroup &p_group);
+    void forbidCollision(std::shared_ptr<CollisionGroup> p_group);
 
     /// \brief if the group is different then the function checks the group mask..
     //  if they're in the same group collision enabled
-    bool isCollisionPermitted(CollisionGroup& p_group);
+    bool isCollisionPermitted(std::shared_ptr<CollisionGroup> p_group) const;
 
 };
 

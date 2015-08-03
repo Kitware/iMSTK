@@ -253,7 +253,7 @@ bool VolumeMesh::getSurface(const std::string& fileName)
         triangles[i].vert[2] = temp[triangles[i].vert[2] - 1];
     }
 
-    surfaceNodeIndex.resize(nbrVertices);
+    surfaceNodeIndex.resize(this->getNumberOfVertices());
 
     count = 0;
 
@@ -304,10 +304,8 @@ bool VolumeMesh::readBC(const std::string& fileName)
 /// \brief copies the updated co-ordinates of the surface vertices only
 void VolumeMesh::copySurface()
 {
-
-    int i;
-
-    for (i = 0; i < nbrVertices; i++)
+    auto &vertices = this->getVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
         vertices[i][0] = nodes[surfaceNodeIndex[i]][0];
         vertices[i][1] = nodes[surfaceNodeIndex[i]][1];
@@ -321,9 +319,9 @@ void VolumeMesh::copySurface()
 /// \brief copies the updated co-ordinates of the surface vertices only
 void VolumeMesh::initSurface()
 {
-    int i;
-
-    for (i = 0; i < nbrVertices; i++)
+    auto &vertices = this->getVertices();
+    auto &origVerts = this->getOrigVertices();
+    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
         vertices[i][0] = nodes[surfaceNodeIndex[i]][0];
         vertices[i][1] = nodes[surfaceNodeIndex[i]][1];
@@ -355,7 +353,7 @@ void VolumeMesh::updateVolumeMeshFromVegaFormat(const std::shared_ptr<const Volu
 
 void VolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage)
 {
-    int i, threeI, j;
+    int threeI, j;
 
     //temporary arrays
     int numNodes(0);
@@ -371,7 +369,7 @@ void VolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const Volu
 
     this->tetra.resize(this->nbrTetra);
     //copy the element connectivity information
-    for(i=0; i<this->nbrTetra ; i++)
+    for(int i=0; i<this->nbrTetra ; i++)
     {
         threeI = numVertsPerEle * i;
         for(j=0; j<numVertsPerEle ; j++)
@@ -382,7 +380,7 @@ void VolumeMesh::importVolumeMeshFromVegaFormat(const std::shared_ptr<const Volu
 
 	this->nodes.resize(this->nbrNodes);
     //copy the nodal co-ordinates
-    for(i=0; i<this->nbrVertices ; i++)
+    for(size_t i=0, end = this->getNumberOfVertices(); i < end; i++)
     {
         threeI = 3*i;
         this->nodes[i][0] = nodes[threeI];
