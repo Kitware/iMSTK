@@ -26,6 +26,7 @@ simmedtk_add_library(Core
     Timer.cpp
     UnifiedId.cpp
     ViewerBase.cpp
+    BaseMesh.cpp
   PUBLIC_HEADERS
     CollisionConfig.h
     CollisionDetection.h
@@ -56,6 +57,7 @@ simmedtk_add_library(Core
     Synchronization.h
     ViewerBase.h
     WorkerThread.h
+    BaseMesh.h
 )
 
 target_link_libraries(Core

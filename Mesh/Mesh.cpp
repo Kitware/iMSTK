@@ -49,7 +49,6 @@ void BaseMesh::updateOriginalVertsWithCurrent()
 /// \brief constructor
 Mesh::Mesh()
 {
-    texCoord = 0;
     triNormals = 0;
     vertNormals = 0;
     triTangents = 0;
@@ -57,7 +56,6 @@ Mesh::Mesh()
     nbrTriangles = 0;
     nbrTexCoordForTrainglesOBJ = 0;
     type = core::ClassType::Mesh;
-    isTextureCoordAvailable = false;
     tangentChannel = false;
     auto delegate = Factory<VtkRenderDelegate>::createConcreteClass(
         "MeshRenderDelegate");
@@ -150,34 +148,35 @@ void CalculateTangentArray(int vertexCount, const core::Vec3d *vertex,
 /// \brief calucate the triangle tangents
 void Mesh::calcTriangleTangents()
 {
-
     int t;
 
     // First calculate the triangle tangents
+    auto vertexArray = this->getVertices();
+    auto texCoordArray = this->getTextureCoordinates();
     for (t = 0; t < nbrTriangles; t++)
     {
         Triangle *tmpTri = &triangles[t];
-        core::Vec3d *v0 = &vertices[tmpTri->vert[0]];
-        core::Vec3d *v1 = &vertices[tmpTri->vert[1]];
-        core::Vec3d *v2 = &vertices[tmpTri->vert[2]];
-        TexCoord *t0 = &texCoord[tmpTri->vert[0]];
-        TexCoord *t1 = &texCoord[tmpTri->vert[1]];
-        TexCoord *t2 = &texCoord[tmpTri->vert[2]];
+        auto &v0 = vertexArray[triangles[t].vert[0]];
+        auto &v1 = vertexArray[triangles[t].vert[1]];
+        auto &v2 = vertexArray[triangles[t].vert[2]];
+        auto &t0 = texCoordArray[triangles[t].vert[0]];
+        auto &t1 = texCoordArray[triangles[t].vert[1]];
+        auto &t2 = texCoordArray[triangles[t].vert[2]];
 
         if (this->meshFileType == BaseMesh::MeshFileType::ThreeDS)
         {
-            calculateTangent(*v2, *v1, *v0, *t2, *t1, *t0, triTangents[t]);
+            triTangents[t] = calculateTangent(v2, v1, v0, t2, t1, t0);
         }
         else if (this->meshFileType == BaseMesh::MeshFileType::Obj)
         {
-            calculateTangent_test(*v0, *v1, *v2, *t0, *t1, *t2, triTangents[t]);
+            triTangents[t] = calculateTangent_test(v0, v1, v2, t0, t1, t2);
         }
     }
 
     //calculate the vertex normals
     if (this->meshFileType == BaseMesh::MeshFileType::ThreeDS || this->meshFileType == BaseMesh::MeshFileType::Obj)
     {
-        for (int v = 0; v < nbrVertices; v++)
+        for (int v = 0, end = vertexArray.size(); v < end; ++v)
         {
             vertTangents[v][0] = vertTangents[v][1] = vertTangents[v][2] = 0;
 
@@ -194,9 +193,9 @@ void Mesh::calcTriangleTangents()
 }
 
 /// \brief calucate the triangle tangent for rendering purposes
-void Mesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t)
+core::Vec3d Mesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3)
 {
-
+    core::Vec3d tangent;
     core::Vec3d v1;
     core::Vec3d v2;
 
@@ -211,17 +210,18 @@ void Mesh::calculateTangent(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, T
     float bb1 = t2.v - t1.v;
     float bb2 = t3.v - t1.v;
 
-    t[0] = bb2 * v1[0] - bb1 * v2[0];
-    t[1] = bb2 * v1[1] - bb1 * v2[1];
-    t[2] = bb2 * v1[2] - bb1 * v2[2];
+    tangent[0] = bb2 * v1[0] - bb1 * v2[0];
+    tangent[1] = bb2 * v1[1] - bb1 * v2[1];
+    tangent[2] = bb2 * v1[2] - bb1 * v2[2];
 
-    t.normalize();
+    return tangent.normalized();
 }
 
 /// \brief
-void Mesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3, core::Vec3d& t)
+core::Vec3d Mesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& p3, TexCoord& t1, TexCoord& t2, TexCoord& t3)
 {
 
+    core::Vec3d tangent;
     core::Vec3d v1;
     core::Vec3d v2;
 
@@ -239,9 +239,9 @@ void Mesh::calculateTangent_test(core::Vec3d& p1, core::Vec3d& p2, core::Vec3d& 
     float bb1 = t2.v - t1.v;
     float bb2 = t3.v - t1.v;
     float r = 1.0F / (tt1 * bb2 - tt2 * bb1);
-    t[0] = (bb2 * v1[0] - bb1 * v2[0]) * r;
-    t[1] = (bb2 * v1[1] - bb1 * v2[1]) * r;
-    t[2] = (bb2 * v1[2] - bb1 * v2[2]) * r;
+    tangent = (bb2*v1 - bb1*v2)*r;
+
+    return tangent;
 }
 
 /// \brief calculates the normal of the vertex

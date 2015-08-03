@@ -29,6 +29,7 @@
 
 // SimMedTK includes
 #include "Core/Config.h"
+#include "Core/BaseMesh.h"
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
 #include "Core/Vector.h"
@@ -122,7 +123,7 @@ public:
 
 /// \brief: this is a generic Mesh class from which surface and volume meshes are inherited
 /// Note: this class cannot exist on its own
-class Mesh: public BaseMesh
+class Mesh: public Core::BaseMesh
 {
 public:
     /// \brief constructor

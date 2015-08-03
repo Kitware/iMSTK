@@ -203,21 +203,22 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->vertices.data());
+    glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->getVertices().data());
     glEnableClientState(GL_NORMAL_ARRAY);
     glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->vertNormals);
 
+    auto &meshTextures = p_surfaceMesh->getTextures();
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
     {
         if (p_surfaceMesh->getRenderDelegate()->isTargetTextured())
         {
             glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-            glTexCoordPointer(2, GL_FLOAT, 0, p_surfaceMesh->texCoord);
+            glTexCoordPointer(2, GL_FLOAT, 0, p_surfaceMesh->getTextureCoordinates().data()->data());
 
-            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+            for (size_t t = 0, end = meshTextures.size(); t < end; ++t)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
-                TextureManager::activateTexture(p_surfaceMesh->textureIds[t].textureId);
+                TextureManager::activateTexture(p_surfaceMesh->getTextureId(t));
             }
         }
     }
@@ -266,7 +267,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     {
         glDisable(GL_LIGHTING);
         glColor3fv(renderDetail->getHighLightColor().toGLColor());
-        glDrawArrays(GL_POINTS, 0, p_surfaceMesh->nbrVertices);
+        glDrawArrays(GL_POINTS, 0, p_surfaceMesh->getNumberOfVertices());
         glEnable(GL_LIGHTING);
     }
 
@@ -284,10 +285,10 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         {
             glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
-            for (size_t t = 0; t < p_surfaceMesh->textureIds.size(); t++)
+            for (size_t t = 0, end = meshTextures.size(); t < end; ++t)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
-                TextureManager::disableTexture(p_surfaceMesh->textureIds[t].textureId);
+                TextureManager::disableTexture(p_surfaceMesh->getTextureId(t));
             }
         }
     }
@@ -304,7 +305,6 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
 void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, float length)
 {
-
     glDisable(GL_LIGHTING);
     glColor3fv(reinterpret_cast<GLfloat*>(&p_color));
     core::Vec3d baryCenter;
@@ -312,16 +312,17 @@ void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, fl
 
     glBegin(GL_LINES);
 
-    for (int i = 0; i < p_mesh->nbrVertices; i++)
+    auto &vertices = p_mesh->getVertices();
+    for (int i = 0, end = vertices.size(); i < end; i++)
     {
-        glVertex3dv(p_mesh->vertices[i].data());
-        tmp = p_mesh->vertices[i] + p_mesh->vertNormals[i] * length;
+        glVertex3dv(vertices[i].data());
+        tmp = vertices[i] + p_mesh->vertNormals[i] * length;
         glVertex3dv(tmp.data());
     }
 
     for (int i = 0; i < p_mesh->nbrTriangles; i++)
     {
-        baryCenter = p_mesh->vertices[p_mesh->triangles[i].vert[0]] + p_mesh->vertices[p_mesh->triangles[i].vert[1]] + p_mesh->vertices[p_mesh->triangles[i].vert[2]] ;
+        baryCenter = vertices[p_mesh->triangles[i].vert[0]] + vertices[p_mesh->triangles[i].vert[1]] + vertices[p_mesh->triangles[i].vert[2]];
         baryCenter = baryCenter / 3.0;
         glVertex3dv(baryCenter.data());
         tmp = baryCenter + p_mesh->triNormals[i] * length;
@@ -335,13 +336,11 @@ void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, fl
 
 void OpenGLRenderer::beginTriangles()
 {
-
     glBegin(GL_TRIANGLES);
 }
 
 void OpenGLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3d &p_3)
 {
-
     glVertex3dv(p_1.data());
     glVertex3dv(p_2.data());
     glVertex3dv(p_3.data());
@@ -349,13 +348,11 @@ void OpenGLRenderer::drawTriangle(core::Vec3d &p_1, core::Vec3d &p_2, core::Vec3
 
 void OpenGLRenderer::endTriangles()
 {
-
     glEnd();
 }
 
 void OpenGLRenderer::draw(AABB &aabb, Color p_color)
 {
-
     glPushAttrib(GL_LIGHTING_BIT);
 
     glDisable(GL_LIGHTING);

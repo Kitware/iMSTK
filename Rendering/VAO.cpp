@@ -240,27 +240,30 @@ bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader,
         shader = p_shader;
     }
 
+    auto totalNumberOfVertices = p_mesh->getNumberOfVertices();
+    auto vertices = p_mesh->getVertices();
+
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
-    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
+    bufferInfo[totalNbrBuffers].attribPointer = vertices.data();
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_POSITIONShaderName;
     totalNbrBuffers++;
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_NORMALS;
-    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertNormals;
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_NORMALShaderName;
     totalNbrBuffers++;
 
     ///texture coord is for each vertex
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TEXTURECOORDS;
-    bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * p_mesh->nbrVertices;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->texCoord;
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * totalNumberOfVertices;
+    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->getTextureCoordinates().data()->data();
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_TEXTURECOORDShaderName;
     totalNbrBuffers++;
@@ -268,9 +271,9 @@ bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader,
     if ( p_mesh->tangentChannel )
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TANGENTS;
-        bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
+        bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
         bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertTangents;
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+        bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
         bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
         bufferInfo[totalNbrBuffers].shaderAttribName = p_TANGENTSName;
         totalNbrBuffers++;

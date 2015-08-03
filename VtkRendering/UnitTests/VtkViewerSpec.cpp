@@ -49,6 +49,7 @@ go_bandit([](){
 
         it("renders mesh", []() {
             auto mesh = makeSurfaceMesh();
+//             mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
             auto viewer = std::make_shared<VtkViewer>();
 
 //             auto scene = std::make_shared<Scene>();

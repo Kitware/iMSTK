@@ -39,9 +39,13 @@
 #include <vtkDataSetMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPoints.h>
+#include <vtkPointData.h>
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkJPEGReader.h>
+#include <vtkFloatArray.h>
+#include <vtkTexture.h>
 
 
 class MeshRenderDelegate : public VtkRenderDelegate
@@ -91,13 +95,36 @@ void MeshRenderDelegate::initDraw()
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
 
-    if (geom->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
+    vtkSmartPointer<vtkTexture> texture;
+    if(mesh->isMeshTextured())
+    {
+        vtkNew<vtkJPEGReader> jpegReader;
+        jpegReader->SetFileName(mesh->getTextureFileName(0).c_str());
+
+        texture = vtkTexture::New();
+        texture->SetInputConnection(jpegReader->GetOutputPort());
+
+        vtkNew<vtkFloatArray> textureCoordinates;
+        textureCoordinates->SetNumberOfComponents(3);
+        textureCoordinates->SetName("TextureCoordinates");
+
+        auto texCoords = mesh->getTextureCoordinates(0);
+        for(auto &coord : texCoords)
+        {
+            float tuple[3] = {coord[0],coord[1],0.0};
+            textureCoordinates->InsertNextTuple(tuple);
+        }
+        unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates);
+    }
+
+    if (mesh->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
         geometry->SetInputData(unstructuredMesh.GetPointer());
 
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
         normals->SetInputConnection(geometry->GetOutputPort());
+        normals->ComputeCellNormalsOn();
 
         mapper = vtkPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
@@ -108,6 +135,10 @@ void MeshRenderDelegate::initDraw()
         mapper->SetInputDataObject(unstructuredMesh.GetPointer());
     }
 
+    if(texture.GetPointer())
+    {
+        actor->SetTexture(texture);
+    }
     actor->SetMapper(mapper);
 }
 
