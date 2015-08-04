@@ -169,6 +169,7 @@ find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(VegaFEM REQUIRED CONFIG)
 find_package(ThreadPool REQUIRED)
+find_package(VTK REQUIRED)
 
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)

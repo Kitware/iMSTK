@@ -164,6 +164,15 @@ endif(WIN32)
 #
 SET(proj SimMedTK-Configure)
 
+if (NOT SimMedTK_VTK_DIR)
+  find_package(VTK REQUIRED)
+  mark_as_advanced(SimMedTK_VTK_DIR)
+  set(SimMedTK_VTK_DIR ${VTK_DIR})
+endif()
+list(APPEND SimMedTK_SUPERBUILD_CMAKE_OPTIONS
+  "-DVTK_DIR:FILEPATH=${SimMedTK_VTK_DIR}"
+)
+
 ExternalProject_Add(${proj}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
@@ -171,6 +180,7 @@ ExternalProject_Add(${proj}
   CMAKE_ARGS
     ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
+    ${SimMedTK_SUPERBUILD_CMAKE_OPTIONS}
     -DSimMedTK_SUPERBUILD:BOOL=OFF
 #     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
 #     -DSimMedTK_INSTALL_BIN_DIR:STRING=${SimMedTK_INSTALL_BIN_DIR}
