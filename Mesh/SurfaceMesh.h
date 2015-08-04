@@ -25,39 +25,51 @@
 #define SMSURFACEMESH_H
 
 // SimMedTK includes
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
-class SurfaceMesh: public Mesh
+class SurfaceMesh: public Core::BaseMesh
 {
 
 public:
-    /// \brief push Mesh class specific errors here
-    std::shared_ptr<ErrorLog> log_SF;
-
+    ///
     /// \brief constructor
+    ///
     SurfaceMesh();
 
-    /// \brief constructor
-    SurfaceMesh(const MeshType &meshtype, std::shared_ptr<ErrorLog> log);
-
+    ///
     /// \brief destructor
+    ///
     virtual ~SurfaceMesh();
 
+    ///
     /// \brief load the surface mesh
-    bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
+    ///
+    bool load(const std::string& fileName);
 
-    /// \brief load the surface mesh using in-house code
-    bool loadMeshLegacy(const std::string& fileName, const MeshFileType &fileType);
-
-    /// \brief load the surface mesh from 3ds format
-    bool Load3dsMesh(const std::string& fileName);
-
-    /// \brief load surface meshes using assimp library
-    bool LoadMeshAssimp(const std::string& fileName);
-
+    ///
     /// \brief print the details of the mesh
-    void printPrimitiveDetails();
+    ///
+    void print();
+
+private:
+    // SurfaceMesh class specific errors here
+    std::shared_ptr<ErrorLog> logger;
+
+    // List of triangles
+    std::vector<std::array<int,3>> triangles;
+
+    // List of triangle normals
+    std::vector<core::Vec3d> triangleNormals;
+
+    // List of vertex normals
+    std::vector<core::Vec3d> vertexNormals;
+
+    // List of triangle tangents
+    std::vector<core::Vec3d> triangleTangents;
+
+    // List of vertex tangents
+    std::vector<core::Vec3d> vertexTangents;
 };
 
 #endif
