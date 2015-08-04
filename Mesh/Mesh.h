@@ -117,14 +117,8 @@ public:
     /// \brief find all the edges of the mesh
     void calcEdges();
 
-    /// \brief translate the mesh
-    void translate(core::Vec3d p_offset);
-
-    /// \brief scale the mesh
-    void scale(core::Vec3d p_scaleFactors);
-
     /// \brief rotate the mesh
-    void rotate(const Quaterniond &p_rot);
+    void rotate(const Quaterniond &rotation);
 
     /// \brief check if there is a consistent orientation of triangle vertices
     /// across the entire surface mesh

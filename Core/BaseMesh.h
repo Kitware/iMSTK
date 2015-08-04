@@ -40,7 +40,7 @@ namespace Core {
 ///
 /// \brief Base class for all meshes used in the simulation.
 ///
-/// \see \SurfaceMesh and \VolumeMesh
+/// \see \SurfaceMesh
 ///
 class BaseMesh: public CoreClass
 {
@@ -177,28 +177,24 @@ public:
     const Eigen::AlignedBox3d &getBoundingBox() const;
 
     ///
-    /// \brief Translate the mesh
+    /// \brief Apply a tranlation to the vertices
     ///
-    void translate(core::Vec3d offset);
+    void translate(const Eigen::Translation3d &translation);
 
     ///
-    /// \brief Scale the mesh
+    /// \brief Apply a scaling to the vertices
     ///
-    void scale(core::Vec3d factor);
+    void scale(const Eigen::UniformScaling<double> &scaling);
 
     ///
-    /// \brief Rotate the mesh
+    /// \brief Apply a rotation to the vertices
     ///
-    void rotate(const Quaterniond &rot)
-    {
-        auto &vertices = this->getVertices();
-        auto &origVerts = this->getOrigVertices();
-        for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
-        {
-            vertices[i] = R * vertices[i];
-            origVerts[i] = R * origVerts[i];
-        }
-    }
+    void rotate(const Quaterniond &rotation);
+
+    ///
+    /// \brief Apply any affine tranformation to the vertices.
+    ///
+    void transform(const Eigen::Transform<double,3,Eigen::Affine> &transformation);
 private:
     // Data arrays - Vertices only
     // vertices co-ordinate data at time t

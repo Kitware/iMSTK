@@ -62,42 +62,6 @@ bool VolumeMesh::loadMesh(const std::string& fileName, const MeshFileType &fileT
     return ret;
 }
 
-/// \brief
-void VolumeMesh::translateVolumeMesh(const core::Vec3d &p_offset)
-{
-
-    this->translate(p_offset);
-
-    for (int i = 0; i < this->nbrNodes; i++)
-    {
-        nodes[i] += p_offset;
-    }
-}
-
-/// \brief
-void VolumeMesh::scaleVolumeMesh(const core::Vec3d &p_offset)
-{
-
-    scale(p_offset);
-
-    for (int i = 0; i < this->nbrNodes; i++)
-    {
-        nodes[i] = nodes[i].cwiseProduct(p_offset);
-    }
-}
-
-/// \brief
-void VolumeMesh::rotVolumeMesh(const Matrix33d &p_rot)
-{
-
-    rotate(p_rot);
-
-    for (int i = 0; i < nbrNodes; i++)
-    {
-        nodes[i] = p_rot * nodes[i];
-    }
-}
-
 /// \brief loads the tetra mesh from abacus
 ///Extensions to support other formats will come soon...
 bool VolumeMesh::LoadTetra(const std::string& fileName)

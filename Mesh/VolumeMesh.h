@@ -63,15 +63,6 @@ public:
     /// \brief copy the surface mesh
     void copySurface();
 
-    /// \brief translate mesh vertices in x, y and z directions
-    void translateVolumeMesh(const core::Vec3d &p_translate);
-
-    /// \brief scale the volume mesh
-    void scaleVolumeMesh(const core::Vec3d &p_scale);
-
-    /// \brief rotate mesh vertices in x, y and z directions
-    void rotVolumeMesh(const Matrix33d &p_rot);
-
     /// \brief load the mesh
     bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
 

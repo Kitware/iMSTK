@@ -37,7 +37,6 @@ struct GeometrySource {
     { }
   void setSource(CoreClass* src)
     {
-        std::cout << "Mesh " << src << std::endl;
     this->sceneObject = src;
     this->analyticObject = nullptr;
     }

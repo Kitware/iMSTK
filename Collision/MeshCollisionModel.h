@@ -31,7 +31,6 @@
 // SimMedTK includes
 #include "Mesh/Mesh.h"
 #include "Mesh/SurfaceMesh.h"
-#include "Mesh/VolumeMesh.h"
 #include "Collision/SurfaceTree.h"
 #include "Collision/OctreeCell.h"
 #include "Geometry/MeshModel.h"

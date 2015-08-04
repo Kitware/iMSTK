@@ -48,10 +48,8 @@ struct BaseMesh::TextureAttachment
     std::string textureFileName;
 };
 
-BaseMesh::BaseMesh() : collisionGroup(nullptr), log(nullptr)
-{
-
-}
+BaseMesh::BaseMesh() : collisionGroup(nullptr), log(nullptr) {}
+BaseMesh::~BaseMesh() {}
 void BaseMesh::assignTexture( const int textureId )
 {
     // Texture enumeration starts at 1.
@@ -179,7 +177,38 @@ void BaseMesh::setRenderingId( size_t id )
 {
     this->renderingID = id;
 }
-BaseMesh::~BaseMesh() {}
+void BaseMesh::translate ( const Eigen::Translation3d& translation )
+{
+    std::for_each ( std::begin(vertices),std::end(vertices),
+                    [translation] ( core::Vec3d &v )
+    {
+        v = translation*v;
+    } );
+}
+void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
+{
+    std::for_each ( std::begin(vertices),std::end(vertices),
+                    [scaling] ( core::Vec3d &v )
+    {
+        v = scaling*v;
+    } );
+}
+void BaseMesh::rotate ( const Quaterniond& rotation )
+{
+    std::for_each ( std::begin(vertices),std::end(vertices),
+                    [rotation] ( core::Vec3d &v )
+    {
+        v = rotation*v;
+    } );
+}
+void BaseMesh::transform ( const Eigen::Transform<double,3,Eigen::Affine>& transformation )
+{
+    std::for_each ( std::begin(vertices),std::end(vertices),
+                    [transformation] ( core::Vec3d &v )
+    {
+        v = transformation*v;
+    } );
+}
 
 
 }

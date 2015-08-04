@@ -420,48 +420,18 @@ void Mesh::calcEdges()
     }
 }
 
-/// \brief
-void Mesh::translate(core::Vec3d p_offset)
+void Mesh::rotate(const Quaterniond &rotation)
 {
-    auto &vertices = this->getVertices();
-    auto &origVerts = this->getOrigVertices();
+    BaseMesh::rotate(rotation);
     for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
     {
-        vertices[i] = vertices[i] + p_offset;
-        origVerts[i] = origVerts[i] + p_offset;
-    }
-
-    upadateAABB();
-}
-
-void Mesh::scale(core::Vec3d p_scaleFactors)
-{
-    auto &vertices = this->getVertices();
-    auto &origVerts = this->getOrigVertices();
-    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
-    {
-        vertices[i].array() *= p_scaleFactors.array();
-        origVerts[i].array() *= p_scaleFactors.array();
-    }
-
-    upadateAABB();
-}
-
-void Mesh::rotate(const Quaterniond &R)
-{
-    BaseMesh::rotate(R);
-    for (size_t i = 0, end = this->getNumberOfVertices(); i < end; ++i)
-    {
-        vertNormals[i] = R * vertNormals[i];
+        vertNormals[i] = rotation * vertNormals[i];
     }
 
     for (int i = 0; i < nbrTriangles; i++)
     {
-        triNormals[i] = R * triNormals[i];
+        triNormals[i] = rotation * triNormals[i];
     }
-
-    calcTriangleTangents();
-    upadateAABB();
 }
 
 /// \brief
