@@ -75,6 +75,8 @@ VegaFemSceneObject::VegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/
 
 VegaFemSceneObject::~VegaFemSceneObject()
 {
+    delete [] interpolationVertices;
+    delete [] interpolationWeights;
 }
 
 std::shared_ptr<SceneObject> VegaFemSceneObject::clone()
@@ -432,14 +434,12 @@ void VegaFemSceneObject::loadSurfaceMesh()
         std::cout << "VEGA: Num interpolation element vertices:" <<
             numInterpolationElementVerts << std::endl;
 
-        int *vertices = interpolationVertices.data();
-        double *weights = interpolationWeights.data();
         VolumetricMesh::loadInterpolationWeights(
             femConfig->secondaryRenderingMeshInterpolationFilename,
             vegaSecondarySurfaceMesh->Getn(),
             numInterpolationElementVerts,
-            &vertices,
-            &weights
+            &interpolationVertices,
+            &interpolationWeights
             );
     }
 }
@@ -1112,8 +1112,8 @@ inline void VegaFemSceneObject::updateSecondaryRenderingMesh()
             u.data(), uSecondary.data(),
             vegaSecondarySurfaceMesh->Getn(),
             numInterpolationElementVerts,
-            interpolationVertices.data(),
-            interpolationWeights.data()
+            interpolationVertices,
+            interpolationWeights
             );
         vegaSecondarySurfaceMesh->SetVertexDeformations(uSecondary.data());
     }
