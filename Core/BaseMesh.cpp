@@ -102,6 +102,42 @@ std::vector<core::Vec3d>& BaseMesh::getVertices()
 {
     return this->vertices;
 }
+const std::vector< std::array<std::size_t,3>>& BaseMesh::getTriangles() const
+{
+    return this->triangleArray;
+}
+std::vector< std::array<std::size_t,3>>& BaseMesh::getTriangles()
+{
+    return this->triangleArray;
+}
+void BaseMesh::setTriangles(const std::vector< std::array<std::size_t,3>>& triangles)
+{
+    this->triangleArray = triangles;
+}
+const std::vector< std::array<std::size_t,4>>& BaseMesh::getTetrahedrons() const
+{
+    return this->tetrahedraArray;
+}
+std::vector< std::array<std::size_t,4>>& BaseMesh::getTetrahedrons()
+{
+    return this->tetrahedraArray;
+}
+void BaseMesh::setTriangles(const std::vector<std::array<std::size_t,4>>& tetrahedrons)
+{
+    this->tetrahedraArray = tetrahedrons;
+}
+const std::vector< std::array<std::size_t,8> >& BaseMesh::getHexahedrons() const
+{
+    return this->hexahedraArray;
+}
+std::vector< std::array<std::size_t,8>>& BaseMesh::getHexahedrons()
+{
+    return this->hexahedraArray;
+}
+void BaseMesh::setTriangles(const std::vector<std::array< std::size_t,8>>& hexahedrons)
+{
+    this->hexahedraArray = hexahedrons;
+}
 const core::Vec3d& BaseMesh::getVertex ( const size_t i ) const
 {
     return this->vertices[i];
@@ -209,6 +245,5 @@ void BaseMesh::transform ( const Eigen::Transform<double,3,Eigen::Affine>& trans
         v = transformation*v;
     } );
 }
-
 
 }

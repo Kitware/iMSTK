@@ -55,6 +55,8 @@ public:
         Deformable,
         DeformableCutable,
         RigidCutable,
+        Volume,
+        Surface,
         Rigid
     };
 
@@ -66,7 +68,6 @@ public:
         None,
         Obj,
         ThreeDS,
-        Volume,
         Vtk
     };
 
@@ -97,10 +98,25 @@ public:
     bool isMeshTextured() const;
 
     ///
-    /// \brief Returns vertex coordinates
+    /// \brief Accessors for vertex coordinates
     ///
     const std::vector<core::Vec3d> &getVertices() const;
     std::vector<core::Vec3d> &getVertices();
+
+    ///
+    /// \brief Topology data accessors
+    ///
+    const std::vector<std::array<size_t,3>> &getTriangles() const;
+    std::vector<std::array<size_t,3>> &getTriangles();
+    void setTriangles(const std::vector<std::array<size_t,3>> &triangles);
+
+    const std::vector<std::array<size_t,4>> &getTetrahedrons() const;
+    std::vector<std::array<size_t,4>> &getTetrahedrons();
+    void setTetrahedrons(const std::vector<std::array<size_t,4>> &tetrahedrons);
+
+    const std::vector<std::array<size_t,8>> &getHexahedrons() const;
+    std::vector<std::array<size_t,8>> &getHexahedrons();
+    void setHexahedrons(const std::vector<std::array<size_t,8>> &hexahedrons);
 
     ///
     /// \brief Returns vertex ith coordinate
@@ -195,13 +211,19 @@ public:
     /// \brief Apply any affine tranformation to the vertices.
     ///
     void transform(const Eigen::Transform<double,3,Eigen::Affine> &transformation);
-private:
+
+protected:
     // Data arrays - Vertices only
     // vertices co-ordinate data at time t
     std::vector<core::Vec3d> vertices;
 
     // vertices co-ordinate data at time t=0
     std::vector<core::Vec3d> origVerts;
+
+    // Topology arrays
+    std::vector<std::array<size_t,3>> triangleArray;
+    std::vector<std::array<size_t,4>> tetrahedraArray;
+    std::vector<std::array<size_t,8>> hexahedraArray;
 
     // Collision group this mesh belongs to.
     std::shared_ptr<CollisionGroup> collisionGroup;
@@ -221,6 +243,7 @@ private:
     // Texture coordinates
     std::vector<core::Vec2f,
                 Eigen::aligned_allocator<core::Vec2f>> textureCoord;
+
 };
 
 }// namespace Core

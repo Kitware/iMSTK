@@ -24,25 +24,22 @@
 #ifndef SMVEGAMESH_H
 #define SMVEGAMESH_H
 
+// SimMedTK includes
+#include "Core/BaseMesh.h"
+
 // STL includes
 #include <iostream>
 #include <memory>
 #include <map>
 
-// SimMedTK includes
-#include "Mesh/SurfaceMesh.h"
-
-// VEGA includes
-#include "volumetricMesh.h"
-#include "generateMeshGraph.h"
-#include "cubicMesh.h"
-#include "tetMesh.h"
-#include "graph.h"
+class Graph;
+class SurfaceMesh;
+class VolumetricMesh;
 
 //
 // Interface to VegaFEM's volumetric mesh class
 //
-class VegaVolumetricMesh
+class VegaVolumetricMesh : public Core::BaseMesh
 {
 public:
     ///
@@ -95,6 +92,11 @@ public:
     /// @brief Return mesh
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
+
+    ///
+    /// @brief Sets the vega mesh
+    ///
+    std::shared_ptr<VolumetricMesh> setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
 
 private:
     // Vega mesh base object

@@ -28,9 +28,8 @@
 #include <memory>
 
 #include "Core/BaseMesh.h"
-#include "InputOutput/ReaderDelegate.h"
 
-class MeshIO : std::enable_shared_from_this<MeshIO>
+class MeshIO : public std::enable_shared_from_this<MeshIO>
 {
 public:
     enum class MeshFileType
@@ -44,6 +43,7 @@ public:
         VEG,
         Unknown
     };
+
     MeshIO();
     ~MeshIO();
 
@@ -58,17 +58,29 @@ public:
     ///  There will be corner cases in which this function wont properly work.
     ///  eg "c:\program files\AppleGate.Net\readme"
     ///
-    MeshFileType checkFileType(const std::string &filename);
+    void checkFileType();
 
+    ///
+    /// \brief Mesh accessors
+    ///
     std::shared_ptr<Core::BaseMesh> getMesh();
+    void setMesh(std::shared_ptr<Core::BaseMesh> newMesh);
 
-    void setReaderDelegate(std::shared_ptr<ReaderDelegate> delegate);
+    ///
+    /// \brief Filename accessors
+    ///
+    const std::string &getFilename() const;
+    void setFilename(const std::string &filename);
+
+    ///
+    /// \brief Returns the file type. This gets set to the correct typwhen calling \checkFileType.
+    ///
+    const MeshFileType &getFileType() const;
 
 private:
-    class MeshReader;
-    std::unique_ptr<MeshReader> reader;
     std::shared_ptr<Core::BaseMesh> mesh;
-    std::shared_ptr<ReaderDelegate> readerDelegate;
+    std::string fileName;
+    MeshFileType fileType;
 };
 
 #endif // MESHIO_H

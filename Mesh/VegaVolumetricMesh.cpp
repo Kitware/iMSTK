@@ -23,6 +23,16 @@
 
 #include "Mesh/VegaVolumetricMesh.h"
 
+// SimMedTK includes
+#include "Mesh/SurfaceMesh.h"
+
+// VEGA includes
+#include "volumetricMesh.h"
+#include "generateMeshGraph.h"
+#include "cubicMesh.h"
+#include "tetMesh.h"
+#include "graph.h"
+
 VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
 VegaVolumetricMesh::~VegaVolumetricMesh() {}
 void VegaVolumetricMesh::loadMesh(const std::string &fileName, const int &verbose)
@@ -134,5 +144,14 @@ const std::vector<int> &VegaVolumetricMesh::getAttachedVertices(const size_t &i)
 std::shared_ptr< VolumetricMesh > VegaVolumetricMesh::getVegaMesh()
 {
     return this->mesh;
+}
+std::shared_ptr< VolumetricMesh > VegaVolumetricMesh::setVegaMesh(std::shared_ptr< VolumetricMesh > newMesh)
+{
+    this->mesh = newMesh;
+
+    if(nullptr != this->mesh && generateGraph)
+    {
+        meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(this->mesh.get()));
+    }
 }
 

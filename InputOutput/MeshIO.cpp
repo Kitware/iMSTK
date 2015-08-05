@@ -22,51 +22,68 @@
 //---------------------------------------------------------------------------
 
 #include "MeshIO.h"
-MeshIO::MeshIO() : mesh ( nullptr ) {}
+
+MeshIO::MeshIO(): mesh(nullptr), fileName(""), fileType(MeshFileType::Unknown) {}
+MeshIO::~MeshIO() {}
 void MeshIO::read ( const std::string& filename )
 {
+    this->fileName = filename;
 }
 void MeshIO::write ( const std::string& filename )
 {
 }
-MeshIO::MeshFileType MeshIO::checkFileType ( const std::string& filename )
+void MeshIO::checkFileType( )
 {
-    std::string extension = filename.substr ( filename.find_last_of ( "." ) + 1 );
+    if(this->fileName.length() == 0)
+    {
+        std::cerr << "MeshIO: Error invalid filename." << std::endl;
+        return;
+    }
+    std::string extension = this->fileName.substr ( this->fileName.find_last_of ( "." ) + 1 );
+
     if ( extension == "vtk" )
     {
-        return MeshFileType::VTK;
+        this->fileType = MeshFileType::VTK;
     }
     if ( extension == "vtp" )
     {
-        return MeshFileType::VTP;
+        this->fileType = MeshFileType::VTP;
     }
     if ( extension == "obj" )
     {
-        return MeshFileType::OBJ;
+        this->fileType = MeshFileType::OBJ;
     }
     if ( extension == "stl" )
     {
-        return MeshFileType::STL;
+        this->fileType = MeshFileType::STL;
     }
     if ( extension == "ply" )
     {
-        return MeshFileType::PLY;
+        this->fileType = MeshFileType::PLY;
     }
     if ( extension == "veg" )
     {
-        return MeshFileType::VEG;
+        this->fileType = MeshFileType::VEG;
     }
-    return MeshFileType::Unknown;
+    this->fileType = MeshFileType::Unknown;
 }
 std::shared_ptr< Core::BaseMesh > MeshIO::getMesh()
 {
     return this->mesh;
 }
-void MeshIO::setReaderDelegate ( std::shared_ptr< ReaderDelegate > delegate )
+void MeshIO::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
 {
-    this->readerDelegate = delegate;
-    if ( this->readerDelegate )
-    {
-        this->readerDelegate->setReader ( this );
-    }
+    this->mesh = newMesh;
+}
+const std::string& MeshIO::getFilename() const
+{
+    return this->fileName;
+}
+void MeshIO::setFilename(const std::string& filename)
+{
+    this->fileName = filename;
+}
+const MeshIO::MeshFileType &MeshIO::getFileType() const
+{
+    return fileType;
 }

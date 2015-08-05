@@ -24,35 +24,37 @@
 #ifndef READERDELEGATE_H
 #define READERDELEGATE_H
 
+#include <cstdint>
 #include <memory>
-#include <InputOutput/MeshIO.h>
+
+#include "InputOutput/MeshIO.h"
+#include "Core/Config.h"
 
 class ReaderDelegate
 {
 public:
     typedef std::shared_ptr<ReaderDelegate> Ptr;
 
+public:
+    RenderDelegate(std::shared_ptr<T> src)
+    {
+        meshIO = src;
+    }
+    RenderDelegate() = delete;
+
+
+    enum class ReaderGroup : int
+    {
+        VTK,
+        Assimp,
+        Vega,
+        Other
+    };
+
     virtual void read(){ }
 
-    template<typename T>
-    void setReader ( T* src )
-    {
-        this->reader = src;
-    }
-
-    template<typename T>
-    std::shared_ptr<T> getReaderAs() const
-    {
-        auto child = std::dynamic_pointer_cast<T>(this->reader);
-        if(child)
-        {
-            return child;
-        }
-
-        return nullptr;
-    }
-
 protected:
-    std::shared_ptr<MeshIO> reader; // object to render when draw() is called
+    std::shared_ptr<MeshIO> meshIO; // object to render when draw() is called
+    std::unordered_map<ReaderGroup,std::vector<MeshIO::MeshFileType>> groupMap;
 };
 #endif // READERDELEGATE_H

@@ -19,17 +19,21 @@
 // Authors:
 //
 // Contact:
-//---------------------------------------------------------------------------d
+//---------------------------------------------------------------------------
 
-#ifndef ASSIMPMESHREADER_H
-#define ASSIMPMESHREADER_H
 
-#include "InputOutput/MeshIO.h"
+#include "Core/Factory.h"
+#include "InputOutput/ReaderDelegate.h"
 
-class AssimpMeshReader : MeshIO
+
+class AssimpMeshReaderDelegate : ReaderDelegate
 {
 public:
 private:
 };
 
-#endif // ASSIMPMESHREADER_H
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_AssimpMeshReaderDelegate_delegate)
+    SIMMEDTK_REGISTER_CLASS(ReaderDelegate,ReaderDelegate,AssimpMeshReaderDelegate,ReaderDelegate::ReaderGroup::Assimp);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()
