@@ -132,7 +132,15 @@ public:
     ///
     /// \brief print the details of the mesh
     ///
-    void print();
+    void print()
+    {
+        std::cout << "----------------------------\n";
+        std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
+        std::cout << "Num. vertices   : " << this->getNumberOfVertices() <<"\n\t";
+        std::cout << "Num. triangles  : " << this->getTriangles().size() << "\n\t";
+        std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
+        std::cout << "----------------------------\n";
+    }
 
 private:
     // SurfaceMesh class specific errors here
