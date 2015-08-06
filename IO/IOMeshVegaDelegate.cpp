@@ -25,7 +25,7 @@
 
 
 #include "Core/Factory.h"
-#include "InputOutput/IODelegate.h"
+#include "InputOutput/IOMeshDelegate.h"
 #include "Mesh//VegaVolumetricMesh.h"
 
 // Vega includes
@@ -33,7 +33,7 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 
-class VegaMeshDelegate : IODelegate
+class VegaMeshDelegate : IOMeshDelegate
 {
 public:
     void read()
@@ -72,6 +72,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
 SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
-SIMMEDTK_REGISTER_CLASS(IODelegate, IODelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
+SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

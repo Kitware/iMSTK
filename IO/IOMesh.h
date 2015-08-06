@@ -28,14 +28,23 @@
 #include <memory>
 #include <unordered_map>
 
-#include "InputOutput/IODelegate.h"
+#include "InputOutput/IOMeshDelegate.h"
 #include "Core/Factory.h"
 #include "Core/BaseMesh.h"
 
-class IOMesh : public std::enable_shared_from_this<IOMesh>
+///
+/// \brief Mesh input/output class. This class is used to read meshes on several formats.
+///  Users can add more readers by implementing delegates for a particular reader
+///     \see \VTKMeshDelegate, \VegaMeshDelegarte and \AssimpMeshDelegate
+///
+class IOMesh
 {
-    typedef std::function<std::shared_ptr<IODelegate>(std::shared_ptr<IOMesh>)> DelegatorType;
+    typedef std::function<std::shared_ptr<IOMeshDelegate>(std::shared_ptr<IOMesh>)> DelegatorType;
 public:
+    ///
+    /// \brief Enum class for the type of files this mesh io expect,
+    ///         add more types here to extend the mesh io.
+    ///
     enum class MeshFileType
     {
         VTK,
@@ -48,6 +57,10 @@ public:
         Unknown
     };
 
+
+    ///
+    /// \brief Enum class for the readers group. Used to prioritize the io delegates in the factory.
+    ///
     enum class ReaderGroup : int
     {
         VTK,
@@ -55,6 +68,10 @@ public:
         Vega,
         Other
     };
+
+    ///
+    /// \brief Constructor/Destructors
+    ///
     IOMesh(ReaderGroup priorityGroup = ReaderGroup::VTK);
     ~IOMesh();
 
@@ -89,9 +106,16 @@ public:
     const MeshFileType &getFileType() const;
 
 private:
-    std::shared_ptr<Core::BaseMesh> mesh;
+    // Storage for the mesh file name, used by delegates.
     std::string fileName;
+
+    // Storage for the file type, used by delegates.
     MeshFileType fileType;
+
+    // Mesh pointer.
+    std::shared_ptr<Core::BaseMesh> mesh;
+
+    // Map file types with reader delegates.
     std::unordered_map<MeshFileType,DelegatorType> delegatorList;
 };
 

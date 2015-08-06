@@ -23,14 +23,15 @@
 
 
 #include "Core/Factory.h"
-#include "InputOutput/IODelegate.h"
+#include "InputOutput/IOMeshDelegate.h"
+#include "Mesh/SurfaceMesh.h"
 
 // Assimp includes
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-class AssimpMeshDelegate : IODelegate
+class AssimpMeshDelegate : IOMeshDelegate
 {
 public:
     void read()
@@ -61,7 +62,8 @@ public:
         // Extract the information from the aiScene's mesh objects
         aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
 
-        auto &vertices = this->meshIO->getMesh()->getVertices();
+        auto localMesh = std::make_shared<SurfaceMesh>();
+        auto &vertices = localMesh->getVertices();
 
         vertices.reserve(mesh->mNumVertices);
 
@@ -72,7 +74,7 @@ public:
                                   mesh->mVertices[i][1],
                                   mesh->mVertices[i][2]);
         }
-        this->meshIO->getMesh()->updateOriginalVertsWithCurrent();
+        localMesh->updateOriginalVertsWithCurrent();
 
         // Get indexed texture coordinate data
         if (mesh->HasTextureCoords(0))
@@ -93,7 +95,7 @@ public:
             }
         }
 
-        auto &triangles = this->meshIO->getMesh()->getTriangles();
+        auto &triangles = localMesh->getTriangles();
         triangles.reserve(mesh->mNumFaces);
 
         // Setup triangle/face data
@@ -111,13 +113,13 @@ public:
                                    mesh->mFaces[i].mIndices[2]);
         }
 
-        return true;
+        this->meshIO->setMesh(localMesh);
     }
     void write(){}
 };
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_AssimpMeshReaderDelegate)
-    SIMMEDTK_REGISTER_CLASS(IODelegate,IODelegate,AssimpMeshDelegate,IOMesh::ReaderGroup::Assimp);
+    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,AssimpMeshDelegate,IOMesh::ReaderGroup::Assimp);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

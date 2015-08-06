@@ -30,10 +30,10 @@
 #include "InputOutput/IOMesh.h"
 #include "Core/Config.h"
 
-class IODelegate
+class IOMeshDelegate
 {
 public:
-    typedef std::shared_ptr<IODelegate> Ptr;
+    typedef std::shared_ptr<IOMeshDelegate> Ptr;
 
 public:
     setSource(std::shared_ptr<IOMesh> src)

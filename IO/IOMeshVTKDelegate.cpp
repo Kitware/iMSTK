@@ -22,7 +22,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "InputOutput/IODelegate.h"
+#include "InputOutput/IOMeshDelegate.h"
 #include "Core/Factory.h"
 
 // VTK includes
@@ -36,7 +36,7 @@
 #include <vtkPLYReader.h>
 #include <vtkSTLReader.h>
 
-class VTKMeshDelegate : IODelegate
+class VTKMeshDelegate : IOMeshDelegate
 {
 public:
     void read()
@@ -203,6 +203,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
 SIMMEDTK_BEGIN_ONLOAD(register_VTKMeshReaderDelegate)
-SIMMEDTK_REGISTER_CLASS(IODelegate, IODelegate, VTKMeshDelegate, IOMesh::ReaderGroup::VTK);
+SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VTKMeshDelegate, IOMesh::ReaderGroup::VTK);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()
