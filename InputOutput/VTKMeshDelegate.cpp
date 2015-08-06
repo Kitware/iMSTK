@@ -22,8 +22,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "InputOutput/IODelegate.h"
 #include "Core/Factory.h"
-#include "InputOutput/ReaderDelegate.h"
 
 // VTK includes
 #include <vtkNew.h>
@@ -36,14 +36,9 @@
 #include <vtkPLYReader.h>
 #include <vtkSTLReader.h>
 
-class VTKMeshReaderDelegate : ReaderDelegate
+class VTKMeshDelegate : IODelegate
 {
 public:
-    VTKMeshReaderDelegate()
-    {
-    }
-    ~VTKMeshReaderDelegate();
-
     void read()
     {
         auto name = this->meshIO->getFileName().c_str();
@@ -53,7 +48,7 @@ public:
 
         switch(this->meshIO->getFileType())
         {
-            case MeshIO::MeshFileType::OBJ:
+            case IOMesh::MeshFileType::OBJ:
             {
                 vtkNew<vtkOBJReader> reader;
                 reader->SetFileName(name);
@@ -61,9 +56,12 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
+                this->vtkPointsToLocal(points);
+                this->vtkCellsToLocal(cellArray);
+                this->vtkFieldsToLocal(fieldData);
                 break;
             }
-            case MeshIO::MeshFileType::STL:
+            case IOMesh::MeshFileType::STL:
             {
                 vtkNew<vtkSTLReader> reader;
                 reader->SetFileName(name);
@@ -71,9 +69,12 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
+                this->vtkPointsToLocal(points);
+                this->vtkCellsToLocal(cellArray);
+                this->vtkFieldsToLocal(fieldData);
                 break;
             }
-            case MeshIO::MeshFileType::PLY:
+            case IOMesh::MeshFileType::PLY:
             {
                 vtkNew<vtkPLYReader> reader;
                 reader->SetFileName(name);
@@ -81,6 +82,9 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
+                this->vtkPointsToLocal(points);
+                this->vtkCellsToLocal(cellArray);
+                this->vtkFieldsToLocal(fieldData);
                 break;
             }
             default:
@@ -111,10 +115,10 @@ public:
                 {
                     std::cerr << "VTKMeshReaderDelegate: Unsupported dataset." << std::endl;
                 }
+                this->vtkPointsToLocal(points);
+                this->vtkCellsToLocal(cellArray);
+                this->vtkFieldsToLocal(fieldData);
             }
-            this->vtkPointsToLocal(points);
-            this->vtkCellsToLocal(cellArray);
-            this->vtkFieldsToLocal(fieldData);
         }
     }
 
@@ -141,11 +145,9 @@ public:
         {
             return;
         }
-        auto &vertices = this->meshIO->getMesh()->getVertices();
-
-        std::vector<std::array<size_t,3>> triangleArray;
-        std::vector<std::array<size_t,4>> tetraArray;
-        std::vector<std::array<size_t,8>> hexaArray;
+        auto &triangleArray = this->meshIO->getMesh()->getTriangles();
+        auto &tetraArray = this->meshIO->getMesh()->getTetrahedrons();
+        auto &hexaArray = this->meshIO->getMesh()->getHexahedrons();
 
         cells->InitTraversal();
         vtkNew<vtkIdList> element;
@@ -170,19 +172,6 @@ public:
                     break;
                 }
             }
-        }
-
-        if(!triangleArray.empty())
-        {
-            this->meshIO->getMesh()->setTriangles(std::move(triangleArray));
-        }
-        if(!tetraArray.empty())
-        {
-            this->meshIO->getMesh()->setTetrahedrons(std::move(tetraArray));
-        }
-        if(!hexaArray.empty())
-        {
-            this->meshIO->getMesh()->setTriangles(std::move(hexaArray));
         }
     }
 
@@ -209,11 +198,11 @@ public:
             std::cout << "youngModulus: " << youngModulus << std::endl;
         }
     }
-
+    void write(){}
 };
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-SIMMEDTK_BEGIN_ONLOAD(register_vega_mesh_reader_delegate)
-SIMMEDTK_REGISTER_CLASS(ReaderDelegate, ReaderDelegate, VTKMeshReaderDelegate, ReaderDelegate::ReaderGroup::VTK);
+SIMMEDTK_BEGIN_ONLOAD(register_VTKMeshReaderDelegate)
+SIMMEDTK_REGISTER_CLASS(IODelegate, IODelegate, VTKMeshDelegate, IOMesh::ReaderGroup::VTK);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

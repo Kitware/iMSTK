@@ -26,11 +26,15 @@
 #define MESHIO_H
 
 #include <memory>
+#include <unordered_map>
 
+#include "InputOutput/IODelegate.h"
+#include "Core/Factory.h"
 #include "Core/BaseMesh.h"
 
-class MeshIO : public std::enable_shared_from_this<MeshIO>
+class IOMesh : public std::enable_shared_from_this<IOMesh>
 {
+    typedef std::function<std::shared_ptr<IODelegate>(std::shared_ptr<IOMesh>)> DelegatorType;
 public:
     enum class MeshFileType
     {
@@ -44,14 +48,21 @@ public:
         Unknown
     };
 
-    MeshIO();
-    ~MeshIO();
+    enum class ReaderGroup : int
+    {
+        VTK,
+        Assimp,
+        Vega,
+        Other
+    };
+    IOMesh(ReaderGroup priorityGroup = ReaderGroup::VTK);
+    ~IOMesh();
 
     ///
     /// \brief Read/Write meshes
     ///
-    void read(const std::string &filename);
-    void write(const std::string &filename);
+    void read(const std::string &filePath);
+    void write(const std::string &filePath);
 
     ///
     /// \brief Simplistic function for figuring out the extension of a file from its path.
@@ -70,7 +81,7 @@ public:
     /// \brief Filename accessors
     ///
     const std::string &getFilename() const;
-    void setFilename(const std::string &filename);
+    void setFilename(const std::string &filePath);
 
     ///
     /// \brief Returns the file type. This gets set to the correct typwhen calling \checkFileType.
@@ -81,6 +92,7 @@ private:
     std::shared_ptr<Core::BaseMesh> mesh;
     std::string fileName;
     MeshFileType fileType;
+    std::unordered_map<MeshFileType,DelegatorType> delegatorList;
 };
 
 #endif // MESHIO_H

@@ -27,34 +27,24 @@
 #include <cstdint>
 #include <memory>
 
-#include "InputOutput/MeshIO.h"
+#include "InputOutput/IOMesh.h"
 #include "Core/Config.h"
 
-class ReaderDelegate
+class IODelegate
 {
 public:
-    typedef std::shared_ptr<ReaderDelegate> Ptr;
+    typedef std::shared_ptr<IODelegate> Ptr;
 
 public:
-    RenderDelegate(std::shared_ptr<T> src)
+    setSource(std::shared_ptr<IOMesh> src)
     {
         meshIO = src;
     }
-    RenderDelegate() = delete;
-
-
-    enum class ReaderGroup : int
-    {
-        VTK,
-        Assimp,
-        Vega,
-        Other
-    };
 
     virtual void read(){ }
+    virtual void write(){ }
 
 protected:
-    std::shared_ptr<MeshIO> meshIO; // object to render when draw() is called
-    std::unordered_map<ReaderGroup,std::vector<MeshIO::MeshFileType>> groupMap;
+    std::shared_ptr<IOMesh> meshIO;
 };
 #endif // READERDELEGATE_H

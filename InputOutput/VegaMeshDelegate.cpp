@@ -25,7 +25,7 @@
 
 
 #include "Core/Factory.h"
-#include "InputOutput/ReaderDelegate.h"
+#include "InputOutput/IODelegate.h"
 #include "Mesh//VegaVolumetricMesh.h"
 
 // Vega includes
@@ -33,7 +33,7 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 
-class VegaMeshReaderDelegate : ReaderDelegate
+class VegaMeshDelegate : IODelegate
 {
 public:
     void read()
@@ -67,10 +67,11 @@ public:
         volumetricMesh->setVegaMesh(mesh);
         this->meshIO->setMesh(volumetricMesh);
     }
+    void write(){}
 };
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-SIMMEDTK_BEGIN_ONLOAD(register_vega_mesh_reader_delegate)
-SIMMEDTK_REGISTER_CLASS(ReaderDelegate, ReaderDelegate, VegaMeshReaderDelegate, ReaderDelegate::ReaderGroup::Vega);
+SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
+SIMMEDTK_REGISTER_CLASS(IODelegate, IODelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()
