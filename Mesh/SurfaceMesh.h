@@ -43,9 +43,91 @@ public:
     virtual ~SurfaceMesh();
 
     ///
-    /// \brief load the surface mesh
+    /// \brief calculates the normal of a triangle
     ///
-    bool load(const std::string& fileName);
+    core::Vec3d computeTriangleNormal(int triangle)
+    {
+        auto t = this->triangleArray[triangle];
+
+        const core::Vec3d &v0 = this->vertices[t[0]];
+
+        return (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
+    }
+
+    ///
+    /// \brief Calculate normals for all triangles
+    ///
+    void computeTriangleNormals()
+    {
+        triangleNormals.clear();
+        for(const auto &t : this->triangleArray)
+        {
+            const core::Vec3d &v0 = this->vertices[t[0]];
+
+            this->triangleNormals.push_back(this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
+        }
+    }
+
+    ///
+    /// \brief Calculate normals for all triangles
+    ///
+    void computeVertexNormals()
+    {
+        for (size_t i = 0, end = this->vertices.size(); i < end; ++i)
+        {
+            this->vertexNormals.push_back(core::Vec3d::Zero());
+            for(auto const &j : this->vertexTriangleNeighbors[i])
+            {
+                this->vertexNormals[i] += this->triangleNormals[j];
+            }
+            this->vertexNormals[i].normalize();
+        }
+    }
+
+    ///
+    /// \brief Calculate vertex neighbors
+    ///
+    void computeVertexNeighbors()
+    {
+        vertexNeighbors.resize(this->vertices.size());
+
+        if(vertexTriangleNeighbors.size() == 0)
+        {
+            this->computeVertexTriangleNeighbors();
+        }
+
+        for (size_t i = 0, end = this->vertices.size(); i < end; ++i)
+        {
+            for (auto const &j : this->vertexTriangleNeighbors[i])
+            {
+                for(auto const &vertex : this->triangleArray[j])
+                {
+                    if(vertex != i)
+                    {
+                        this->vertexNeighbors[i].push_back(vertex);
+                    }
+                }
+            }
+        }
+    }
+
+    ///
+    /// \brief initializes the vertex neighbors
+    ///
+    void computeVertexTriangleNeighbors()
+    {
+        vertexTriangleNeighbors.resize(this->vertices.size());
+
+        int triangle = 0;
+        for(auto const &t : this->triangleArray)
+        {
+            vertexTriangleNeighbors[t[0]].push_back(triangle);
+            vertexTriangleNeighbors[t[1]].push_back(triangle);
+            vertexTriangleNeighbors[t[2]].push_back(triangle);
+            triangle++;
+        }
+    }
+
 
     ///
     /// \brief print the details of the mesh
@@ -55,9 +137,6 @@ public:
 private:
     // SurfaceMesh class specific errors here
     std::shared_ptr<ErrorLog> logger;
-
-    // List of triangles
-    std::vector<std::array<int,3>> triangles;
 
     // List of triangle normals
     std::vector<core::Vec3d> triangleNormals;
@@ -70,6 +149,14 @@ private:
 
     // List of vertex tangents
     std::vector<core::Vec3d> vertexTangents;
+
+    // List of vertex neighbors
+    std::vector<std::vector<size_t>> vertexNeighbors;
+
+    // List of vertex neighbors
+    std::vector<std::vector<size_t>> vertexTriangleNeighbors;
 };
 
 #endif
+
+
