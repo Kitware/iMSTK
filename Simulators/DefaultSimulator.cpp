@@ -22,20 +22,27 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
-#include "Simulators/DummySimulator.h"
+#include "Simulators/DefaultSimulator.h"
 #include "Core/StaticSceneObject.h"
 #include "Core/Event.h"
 #include "Event/KeyboardEvent.h"
 #include "Collision/MeshCollisionModel.h"
 
-DummySimulator::DummySimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
+DefaultSimulator::DefaultSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
+    this->addOperation([](std::vector<core::Vec3d>& array)
+    {
+        for(auto &x : array)
+        {
+            x.array() += 0.000001;
+        }
+    });
 }
-void DummySimulator::beginSim()
+void DefaultSimulator::beginSim()
 {
     //start the job
 }
-void DummySimulator::initCustom()
+void DefaultSimulator::initCustom()
 {
     //do nothing for now
     for ( size_t i = 0; i < objectsSimulated.size(); i++ )
@@ -46,13 +53,14 @@ void DummySimulator::initCustom()
         {
             case core::ClassType::StaticSceneObject:
             {
-                auto staticObject = std::static_pointer_cast<StaticSceneObject>(object);
-                auto model = std::static_pointer_cast<MeshCollisionModel>(staticObject->getModel());
-                if(nullptr == model)
+                auto sceneObject = std::static_pointer_cast<StaticSceneObject>(object);
+                auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
+                if(!model)
                 {
+                    std::cerr << "Unknown model type." << std::endl;
                     break;
                 }
-                std::shared_ptr<Mesh> mesh = model->getMesh();
+                auto mesh = std::static_pointer_cast<MeshCollisionModel>(model)->getMesh();
 
                 object->getLocalVertices().reserve( mesh->getNumberOfVertices() );
                 // WARNING:  Copy!!?
@@ -66,7 +74,7 @@ void DummySimulator::initCustom()
         }
     }
 }
-void DummySimulator::run()
+void DefaultSimulator::run()
 {
     beginSim();
 
@@ -77,28 +85,22 @@ void DummySimulator::run()
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
-            auto staticSceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-            auto model = std::static_pointer_cast<MeshCollisionModel>(staticSceneObject->getModel());
-            if(nullptr == model)
-            {
-                break;
-            }
-            std::shared_ptr<Mesh> mesh = model->getMesh();
+            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
 
-            for ( int vertIndex = 0; vertIndex < mesh->getNumberOfVertices(); vertIndex++ )
+            for(auto apply : this->operatorFunctions)
             {
-                staticSceneObject->getLocalVertices()[vertIndex][1] = staticSceneObject->getLocalVertices()[vertIndex][1] + 0.000001;
+                apply(sceneObject->getLocalVertices());
             }
         }
     }
 
     endSim();
 }
-void DummySimulator::endSim()
+void DefaultSimulator::endSim()
 {
     //end the job
 }
-void DummySimulator::syncBuffers()
+void DefaultSimulator::syncBuffers()
 {
     for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
     {
@@ -107,19 +109,20 @@ void DummySimulator::syncBuffers()
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
         {
-            auto staticSceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-            auto model = std::static_pointer_cast<MeshCollisionModel>(staticSceneObject->getModel());
-            if(nullptr == model)
+            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
+            auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
+            if(!model)
             {
+                std::cerr << "Unknown model type." << std::endl;
                 break;
             }
-            std::shared_ptr<Mesh> mesh = model->getMesh();
+            auto mesh = std::static_pointer_cast<MeshCollisionModel>(model)->getMesh();
             // WARNING: Copy??!
-            mesh->getVertices() = staticSceneObject->getLocalVertices();
+            mesh->getVertices() = sceneObject->getLocalVertices();
         }
     }
 }
-void DummySimulator::handleEvent(std::shared_ptr<core::Event> p_event )
+void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
     if(!this->isListening())
     {

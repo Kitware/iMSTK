@@ -31,39 +31,25 @@
 
 using namespace bandit;
 
-std::shared_ptr<MeshCollisionModel> getModel(const std::vector<core::Vec3d> &vertices)
+std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 {
-    std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
-    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
+    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
 
-    // Add two triangles to the data structure
-    mesh->initVertexArrays(3);
-    mesh->initTriangleArrays(1);
+    // Add one triangle to the data structure
+    mesh->setVertices(vertices);
 
-    auto vertexArray = mesh->getVertices();
+    std::array<size_t,3> t = {0,1,2};
+    mesh->getTriangles().emplace_back(t);
 
-    vertexArray[0] = vertices[0];
-    vertexArray[1] = vertices[1];
-    vertexArray[2] = vertices[2];
+    mesh->computeVertexNeighbors();
+    mesh->computeTriangleNormals();
+    mesh->computeVertexNormals();
 
-    mesh->triangles[0].vert[0] = 0;
-    mesh->triangles[0].vert[1] = 1;
-    mesh->triangles[0].vert[2] = 2;
-
-    mesh->initVertexNeighbors();
-    mesh->updateTriangleNormals();
-    mesh->updateVertexNormals();
-
-    //edge information
-    mesh->calcNeighborsVertices();
-    mesh->calcEdges();
-    mesh->upadateAABB();
-    mesh->allocateAABBTris();
-
-    model->setMesh(mesh);
-
+    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
+    model->setModelMesh(mesh);
     return model;
 }
+
 
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {
@@ -84,9 +70,9 @@ go_bandit([](){
             verticesB.emplace_back(2.0,3.0,0);
             verticesB.emplace_back(2.0,1.0,0);
 
-            std::shared_ptr<ModelRepresentation> modelA = getModel(verticesA);
+            std::shared_ptr<Model> modelA = getModel(verticesA);
 
-            std::shared_ptr<ModelRepresentation> modelB = getModel(verticesB);
+            std::shared_ptr<Model> modelB = getModel(verticesB);
 
             std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
 

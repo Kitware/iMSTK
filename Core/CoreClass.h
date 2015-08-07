@@ -89,6 +89,11 @@ public:
     CoreClass(const std::string &);
 
     ///
+    /// \brief Default constructor
+    ///
+    virtual ~CoreClass() = default;
+
+    ///
     /// \brief get type of the class
     ///
     const core::ClassType &getType() const ;

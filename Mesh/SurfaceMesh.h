@@ -26,6 +26,7 @@
 
 // SimMedTK includes
 #include "Core/BaseMesh.h"
+#include "Rendering/TextureManager.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
 class SurfaceMesh: public Core::BaseMesh
@@ -40,112 +41,138 @@ public:
     ///
     /// \brief destructor
     ///
-    virtual ~SurfaceMesh();
+    ~SurfaceMesh();
 
     ///
     /// \brief calculates the normal of a triangle
     ///
-    core::Vec3d computeTriangleNormal(int triangle)
-    {
-        auto t = this->triangleArray[triangle];
-
-        const core::Vec3d &v0 = this->vertices[t[0]];
-
-        return (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
-    }
+    core::Vec3d computeTriangleNormal(int triangle);
 
     ///
     /// \brief Calculate normals for all triangles
     ///
-    void computeTriangleNormals()
-    {
-        triangleNormals.clear();
-        for(const auto &t : this->triangleArray)
-        {
-            const core::Vec3d &v0 = this->vertices[t[0]];
-
-            this->triangleNormals.push_back(this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
-        }
-    }
+    void computeTriangleNormals();
 
     ///
     /// \brief Calculate normals for all triangles
     ///
-    void computeVertexNormals()
-    {
-        for (size_t i = 0, end = this->vertices.size(); i < end; ++i)
-        {
-            this->vertexNormals.push_back(core::Vec3d::Zero());
-            for(auto const &j : this->vertexTriangleNeighbors[i])
-            {
-                this->vertexNormals[i] += this->triangleNormals[j];
-            }
-            this->vertexNormals[i].normalize();
-        }
-    }
+    void computeVertexNormals();
 
     ///
     /// \brief Calculate vertex neighbors
     ///
-    void computeVertexNeighbors()
-    {
-        vertexNeighbors.resize(this->vertices.size());
-
-        if(vertexTriangleNeighbors.size() == 0)
-        {
-            this->computeVertexTriangleNeighbors();
-        }
-
-        for (size_t i = 0, end = this->vertices.size(); i < end; ++i)
-        {
-            for (auto const &j : this->vertexTriangleNeighbors[i])
-            {
-                for(auto const &vertex : this->triangleArray[j])
-                {
-                    if(vertex != i)
-                    {
-                        this->vertexNeighbors[i].push_back(vertex);
-                    }
-                }
-            }
-        }
-    }
+    void computeVertexNeighbors();
 
     ///
     /// \brief initializes the vertex neighbors
     ///
-    void computeVertexTriangleNeighbors()
-    {
-        vertexTriangleNeighbors.resize(this->vertices.size());
+    void computeVertexTriangleNeighbors();
 
-        int triangle = 0;
-        for(auto const &t : this->triangleArray)
-        {
-            vertexTriangleNeighbors[t[0]].push_back(triangle);
-            vertexTriangleNeighbors[t[1]].push_back(triangle);
-            vertexTriangleNeighbors[t[2]].push_back(triangle);
-            triangle++;
-        }
+    ///
+    /// \brief Compute tangents for triangles
+    ///
+    void computeTriangleTangents();
+
+    ///
+    /// \brief Check for the correct triangle orientation.
+    ///
+    void checkTriangleOrientation();
+
+    /// Texture handling
+
+    struct TextureAttachment;
+    ///
+    /// \brief Returns the the name of ith texture.
+    ///
+    const std::string &getTextureFileName(const size_t i) const;
+
+    ///
+    /// \brief Returns the texture coordinates array.
+    ///
+    const std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates() const;
+    std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates();
+
+    ///
+    /// \brief Returns the bounding box for this mesh.
+    ///
+    const std::vector<std::shared_ptr<TextureAttachment>> &getTextures() const;
+
+    ///
+    /// \brief Returns the bounding box for this mesh.
+    ///
+    const int &getTextureId(size_t i) const;
+
+    ///
+    /// \brief Return true if it contains texture coordinates
+    ///
+    bool hasTextureCoordinates() const;
+
+    ///
+    /// \brief Add texture coordinates
+    ///
+    void addTextureCoordinate(const core::Vec2f &coord);
+    void addTextureCoordinate(const float &x, const float &y);
+
+    ///
+    /// \brief Assign the texture
+    ///
+    void assignTexture(const std::string& referenceName);
+
+    ///
+    /// \brief Query if the mesh has textures available for rendering
+    ///
+    bool isMeshTextured() const;
+
+    ///
+    /// \brief Set/get use OBJ of ThreDS textures coordinates
+    ///
+    void setUseOBJTexture(bool use);
+    void setUseThreDSTexture(bool use);
+
+    ///
+    /// \brief Get triangle normals
+    ///
+    const core::Vec3d &getTriangleNormal(size_t i) const;
+
+    ///
+    /// \brief Get tangents
+    ///
+    const core::Vec3d &getTriangleTangent(size_t i) const;
+
+    ///
+    /// \brief Get vertex normal
+    ///
+    const core::Vec3d &getVertexNormal(size_t i) const;
+
+    ///
+    /// \brief Get vertex normal
+    ///
+    const std::vector<core::Vec3d> &getVertexNormals() const
+    {
+        return this->vertexNormals;
+    }
+    std::vector<core::Vec3d> &getVertexNormals()
+    {
+        return this->vertexNormals;
     }
 
+    ///
+    /// \brief Get vertex tangents
+    ///
+    const core::Vec3d &getVertexTangent(size_t i) const;
+    const std::vector<core::Vec3d> &getVertexTangents() const;
+    std::vector<core::Vec3d> &getVertexTangents()
+    {
+        return this->vertexTangents;
+    }
 
     ///
     /// \brief print the details of the mesh
     ///
-    void print()
-    {
-        std::cout << "----------------------------\n";
-        std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
-        std::cout << "Num. vertices   : " << this->getNumberOfVertices() <<"\n\t";
-        std::cout << "Num. triangles  : " << this->getTriangles().size() << "\n\t";
-        std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
-        std::cout << "----------------------------\n";
-    }
-
+    void print() const override;
 private:
-    // SurfaceMesh class specific errors here
-    std::shared_ptr<ErrorLog> logger;
-
     // List of triangle normals
     std::vector<core::Vec3d> triangleNormals;
 
@@ -163,8 +190,19 @@ private:
 
     // List of vertex neighbors
     std::vector<std::vector<size_t>> vertexTriangleNeighbors;
+
+    // Textures attached to this mesh.
+    std::vector<std::shared_ptr<TextureAttachment>> textures;
+
+    // Texture coordinates
+    std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> textureCoord;
+
+    bool useThreeDSTexureCoordinates;
+    bool useOBJDSTexureCoordinates;
 };
 
 #endif
+
 
 

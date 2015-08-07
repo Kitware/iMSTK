@@ -22,7 +22,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "InputOutput/IOMeshDelegate.h"
+#include "IO/IOMeshDelegate.h"
 #include "Core/Factory.h"
 
 // VTK includes
@@ -36,10 +36,10 @@
 #include <vtkPLYReader.h>
 #include <vtkSTLReader.h>
 
-class VTKMeshDelegate : IOMeshDelegate
+class VTKMeshDelegate : public IOMeshDelegate
 {
 public:
-    void read()
+    void read() const
     {
         auto name = this->meshIO->getFileName().c_str();
         vtkPoints *points;
@@ -122,7 +122,7 @@ public:
         }
     }
 
-    void vtkPointsToLocal(vtkPoints *points)
+    void vtkPointsToLocal(vtkPoints *points) const
     {
         if(!points)
         {
@@ -130,7 +130,7 @@ public:
             return;
         }
         auto &vertices = this->meshIO->getMesh()->getVertices();
-        for(size_t i = 0; i < points->GetNumberOfPoints(); ++i)
+        for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
         {
             double position[3];
             points->GetPoint(i,position);
@@ -139,7 +139,7 @@ public:
         }
     }
 
-    void vtkCellsToLocal(vtkCellArray *cells)
+    void vtkCellsToLocal(vtkCellArray *cells) const
     {
         if(!cells)
         {
@@ -151,31 +151,34 @@ public:
 
         cells->InitTraversal();
         vtkNew<vtkIdList> element;
-        while(cells->GetNextCell(element))
+        while(cells->GetNextCell(element.GetPointer()))
         {
             switch(element->GetNumberOfIds())
             {
                 case 3:
                 {
-                    triangleArray.emplace_back(element->GetId(0),element->GetId(1),element->GetId(2));
+                    std::array<size_t,3> e = {element->GetId(0),element->GetId(1),element->GetId(2)};
+                    triangleArray.emplace_back(e);
                     break;
                 }
                 case 4:
                 {
-                    tetraArray.emplace_back(element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3));
+                    std::array<size_t,4> e = {element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3)};
+                    tetraArray.emplace_back(e);
                     break;
                 }
                 case 8:
                 {
-                    hexaArray.emplace_back(element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3),
-                                           element->GetId(4),element->GetId(5),element->GetId(6),element->GetId(7));
+                    std::array<size_t,8> e = {element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3),
+                                              element->GetId(4),element->GetId(5),element->GetId(6),element->GetId(7)};
+                    hexaArray.emplace_back(e);
                     break;
                 }
             }
         }
     }
 
-    void vtkFieldsToLocal(vtkFieldData *fields)
+    void vtkFieldsToLocal(vtkFieldData *fields) const
     {
         if(!fields)
         {

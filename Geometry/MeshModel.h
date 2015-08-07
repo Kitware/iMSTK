@@ -29,7 +29,7 @@
 #include <array>
 
 // SimMedTK includes
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 #include "Mesh/VolumeMesh.h"
 
@@ -39,7 +39,7 @@
 ///
 /// @see MeshCollisionModel
 ///
-class MeshModel : public ModelRepresentation
+class MeshModel : public Model
 {
 public:
     ///
@@ -53,14 +53,9 @@ public:
     virtual ~MeshModel();
 
     ///
-    /// @brief Loads the mesh and stores it.
-    ///
-    void load(const std::string& meshName, const Core::BaseMesh::MeshFileType &type);
-
-    ///
     /// @brief Loads the mesh with texture and stores it. Only surface meshes allowed.
     ///
-    void load(const std::string& meshFileName, const std::string& textureFileName, const std::string& textureName);
+    void load(const std::string& meshFileName);
 
     ///
     /// @brief Set the rendering details for this mesh
@@ -68,19 +63,14 @@ public:
     void setRenderDetail(std::shared_ptr<RenderDetail> renderDetail);
 
     ///
-    /// @brief Returns normal vectors for triangles on mesh surface
-    ///
-    const core::Vec3d &getNormal(size_t i) const;
-
-    ///
-    /// @brief Returns array of vertices for triangle on surface
-    ///
-    std::array<core::Vec3d,3> getTrianglePositions(size_t i) const;
-
-    ///
     /// @brief Returns array of vertices
     ///
     const std::vector<core::Vec3d> &getVertices() const;
+
+    ///
+    /// @brief Returns array of triangles
+    ///
+    const std::vector<std::array<size_t,3>> &getTriangles() const;
 
     ///
     /// @brief Draw this mesh
@@ -90,15 +80,20 @@ public:
     ///
     /// @brief Set internal mesh data structure
     ///
-    void setModelMesh(std::shared_ptr<Mesh> modelMesh);
+    void setModelMesh(std::shared_ptr<Core::BaseMesh> modelMesh);
 
     ///
     /// @brief Returns pointer to undelying mesh object.
     ///
-    std::shared_ptr<Mesh> getMesh() override;
+    std::shared_ptr<Core::BaseMesh> getMesh() override;
+
+    ///
+    /// \brief Assign texture to the surface mesh
+    ///
+    void addTexture(const std::string& textureFileName, const std::string& textureName);
 
 protected:
-    std::shared_ptr<Mesh> mesh; // Underlying mesh
+    std::shared_ptr<Core::BaseMesh> mesh; // Underlying mesh
 };
 
 #endif // SMMESHMODEL_H

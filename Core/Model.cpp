@@ -21,16 +21,16 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 
-ModelRepresentation::ModelRepresentation()
+Model::Model()
 {
 
 }
 
-ModelRepresentation::~ModelRepresentation()
+Model::~Model()
 {
 
 }
-ModelRepresentation::ModelRepresentation() {}
-ModelRepresentation::~ModelRepresentation() {}
+Model::Model() {}
+Model::~Model() {}

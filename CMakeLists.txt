@@ -232,6 +232,7 @@ set(SimMedTK_exports
   Event
   External
   Geometry
+  IO
   Mesh
   RenderDelegates
   Rendering
@@ -250,6 +251,7 @@ add_subdirectory(Devices)
 add_subdirectory(Event)
 add_subdirectory(External)
 add_subdirectory(Geometry)
+add_subdirectory(IO)
 add_subdirectory(Mesh)
 add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)

@@ -30,26 +30,19 @@ using namespace bandit;
 
 std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 {
-    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
-    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
-    model->setModelMesh(mesh);
+    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
 
     // Add one triangle to the data structure
-    mesh->initVertexArrays(3);
-    mesh->initTriangleArrays(1);
-    auto &vertexArray = mesh->getVertices();
-    vertexArray[0] = vertices[0];
-    vertexArray[1] = vertices[1];
-    vertexArray[2] = vertices[2];
+    mesh->setVertices(vertices);
 
-    mesh->triangles[0].vert[0] = 0;
-    mesh->triangles[0].vert[1] = 1;
-    mesh->triangles[0].vert[2] = 2;
+    mesh->getTriangles().emplace_back(0,1,2);
 
-    mesh->initVertexNeighbors();
-    mesh->updateTriangleNormals();
-    mesh->updateVertexNormals();
+    mesh->computeVertexNeighbors();
+    mesh->computeTriangleNormals();
+    mesh->computeVertexNormals();
 
+    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
+    model->setModelMesh(mesh);
     return model;
 }
 
@@ -68,9 +61,9 @@ go_bandit([](){
 
             auto model = getModel(vertices);
 
-            AssertThat(model->getTrianglePositions(0)[0], Equals(vertices[0]));
-            AssertThat(model->getTrianglePositions(0)[1], Equals(vertices[1]));
-            AssertThat(model->getTrianglePositions(0)[2], Equals(vertices[2]));
+            AssertThat(model->getVertices()[0], Equals(vertices[0]));
+            AssertThat(model->getVertices()[1], Equals(vertices[1]));
+            AssertThat(model->getVertices()[2], Equals(vertices[2]));
 
         });
         it("can access mesh face normals", []() {
@@ -84,7 +77,7 @@ go_bandit([](){
 
             core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
 
-            AssertThat((model->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
+            AssertThat((model->getSurfaceNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
 
     });

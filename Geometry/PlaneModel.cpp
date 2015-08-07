@@ -33,7 +33,7 @@ void PlaneModel::draw()
 {
     this->plane->draw();
 }
-const core::Vec3d& PlaneModel::getNormal() const
+const core::Vec3d& PlaneModel::getSurfaceNormal() const
 {
     return this->transform.linear() * this->plane->getUnitNormal();
 }

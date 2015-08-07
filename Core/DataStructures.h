@@ -24,6 +24,8 @@
 #ifndef SMDATASTRUTCTURES_H
 #define SMDATASTRUTCTURES_H
 
+#include <iostream>
+
 // SimMedTK includes
 #include "Core/Config.h"
 

@@ -27,6 +27,7 @@
 #include "Core/CollisionPair.h"
 #include "Collision/CollisionMoller.h"
 #include "Collision/MeshCollisionModel.h"
+#include "Collision/SurfaceTree.h"
 
 // STL includes
 #include <vector>
@@ -55,22 +56,22 @@ void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pair
 
         for(const auto & i : triangleListA)
         {
-            const core::Vec3d& normalA = meshA->getNormal(i);
+            const core::Vec3d& normalA = meshA->getSurfaceNormal(i);
             if(normalA.isZero())
             {
                 continue;
             }
 
-            auto verticesA = meshA->getTrianglePositions(i);
+            auto verticesA = meshA->getElementPositions(i);
             for(auto & j : triangleListB)
             {
-                const core::Vec3d& normalB = meshB->getNormal(j);
+                const core::Vec3d& normalB = meshB->getSurfaceNormal(j);
                 if(normalB.isZero())
                 {
                     continue;
                 }
 
-                auto verticesB = meshB->getTrianglePositions(j);
+                auto verticesB = meshB->getElementPositions(j);
 
                 // Chech for intersection
                 if(CollisionMoller::tri2tri(verticesA[0], verticesA[1], verticesA[2],

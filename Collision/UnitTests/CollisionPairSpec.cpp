@@ -25,7 +25,7 @@
 
 #include "Core/CollisionPair.h"
 #include "Collision/MeshCollisionModel.h"
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 #include "Core/MakeUnique.h"
 
 using namespace bandit;
@@ -38,8 +38,8 @@ go_bandit([](){
         it("attaches models ", []() {
             std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
 
-            std::shared_ptr<ModelRepresentation> modelA = std::make_shared<MeshCollisionModel>();
-            std::shared_ptr<ModelRepresentation> modelB = std::make_shared<MeshCollisionModel>();
+            std::shared_ptr<Model> modelA = std::make_shared<MeshCollisionModel>();
+            std::shared_ptr<Model> modelB = std::make_shared<MeshCollisionModel>();
 
             collisionPair->setModels(modelA,modelB);
 

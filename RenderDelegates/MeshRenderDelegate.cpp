@@ -24,7 +24,7 @@
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 class MeshRenderDelegate : public RenderDelegate
 {

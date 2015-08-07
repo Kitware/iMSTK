@@ -22,74 +22,11 @@
 //---------------------------------------------------------------------------
 
 #include "Core/BaseMesh.h"
-#include "Core/CollisionConfig.h"
 
 namespace Core {
 
-///
-/// \brief Texture management structure
-///
-struct BaseMesh::TextureAttachment
-{
-    TextureAttachment() :
-        textureId(-1),
-        textureName(""),
-        textureFileName("")
-    {
-    }
-
-    // Texture id
-    int textureId;
-
-    // Texture internal name
-    std::string textureName;
-
-    // Texture filename
-    std::string textureFileName;
-};
-
-BaseMesh::BaseMesh() : collisionGroup(nullptr), log(nullptr) {}
+BaseMesh::BaseMesh() {}
 BaseMesh::~BaseMesh() {}
-void BaseMesh::assignTexture( const int textureId )
-{
-    // Texture enumeration starts at 1.
-    if(textureId < 1)
-    {
-        return;
-    }
-
-    auto attachment = std::make_shared<TextureAttachment>();
-    attachment->textureId = textureId;
-
-    this->textures.push_back(attachment);
-}
-void BaseMesh::assignTexture(const std::string &newTextureFileName,
-                             const std::string &referenceName)
-{
-    auto it = std::find_if(std::begin(textures), std::end(textures),
-              [referenceName](std::shared_ptr<Core::BaseMesh::TextureAttachment> &t)
-                {
-                    if(t->textureName != referenceName)
-                        return false;
-                    return true;
-                });
-    // If there is a texture with same name, then ignore this one.
-    if(it != std::end(textures))
-    {
-        return;
-    }
-    else
-    {
-        auto attachment = std::make_shared<TextureAttachment>();
-        attachment->textureName = referenceName;
-        attachment->textureFileName = newTextureFileName;
-        this->textures.push_back(attachment);
-    }
-}
-bool BaseMesh::isMeshTextured() const
-{
-    return this->textures.size() > 0;
-}
 void BaseMesh::updateOriginalVertsWithCurrent()
 {
     this->origVerts = this->vertices;
@@ -122,7 +59,7 @@ std::vector< std::array<std::size_t,4>>& BaseMesh::getTetrahedrons()
 {
     return this->tetrahedraArray;
 }
-void BaseMesh::setTriangles(const std::vector<std::array<std::size_t,4>>& tetrahedrons)
+void BaseMesh::setTetrahedrons(const std::vector<std::array<std::size_t,4>>& tetrahedrons)
 {
     this->tetrahedraArray = tetrahedrons;
 }
@@ -134,7 +71,7 @@ std::vector< std::array<std::size_t,8>>& BaseMesh::getHexahedrons()
 {
     return this->hexahedraArray;
 }
-void BaseMesh::setTriangles(const std::vector<std::array< std::size_t,8>>& hexahedrons)
+void BaseMesh::setHexahedrons(const std::vector<std::array< std::size_t,8>>& hexahedrons)
 {
     this->hexahedraArray = hexahedrons;
 }
@@ -158,57 +95,12 @@ std::size_t BaseMesh::getNumberOfVertices() const
 {
     return this->vertices.size();
 }
-std::shared_ptr< CollisionGroup > &BaseMesh::getCollisionGroup()
-{
-    return this->collisionGroup;
-}
 std::size_t BaseMesh::getRenderingId() const
 {
     return this->renderingID;
 }
-std::string BaseMesh::getTextureFileName(const size_t i) const
-{
-    return textures[i]->textureFileName;
-}
-const std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &
-BaseMesh::getTextureCoordinates() const
-{
-    return this->textureCoord;
-}
-std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &
-BaseMesh::getTextureCoordinates()
-{
-    return this->textureCoord;
-}
-const std::vector< std::shared_ptr< BaseMesh::TextureAttachment > > &
-BaseMesh::getTextures() const
-{
-    return this->textures;
-}
-const int& BaseMesh::getTextureId(size_t i) const
-{
-    return this->textures[i]->textureId;
-}
-bool BaseMesh::BaseMesh::hasTextureCoordinates() const
-{
-    return this->textureCoord.size() > 0;
-}
-void BaseMesh::addTextureCoordinate ( const core::Vec2f& coord )
-{
-    this->textureCoord.push_back( coord );
-}
-void BaseMesh::addTextureCoordinate ( const float& x, const float& y )
-{
-    this->textureCoord.push_back( core::Vec2f(x,y) );
-}
-void BaseMesh::setBoundingBox ( const Eigen::AlignedBox3d& box )
-{
-    this->aabb = box;
-}
-const Eigen::AlignedBox3d& BaseMesh::getBoundingBox() const
-{
-    return this->aabb;
-}
+
+
 void BaseMesh::setRenderingId( size_t id )
 {
     this->renderingID = id;
@@ -244,6 +136,20 @@ void BaseMesh::transform ( const Eigen::Transform<double,3,Eigen::Affine>& trans
     {
         v = transformation*v;
     } );
+}
+void BaseMesh::setVertices(const std::vector<core::Vec3d>& vertices)
+{
+    this->vertices = vertices;
+}
+std::array<core::Vec3d,3> BaseMesh::getTriangleVertices(size_t i) const
+{
+    std::array<core::Vec3d,3> triangleVertices =
+    {
+        this->vertices[this->triangleArray[i][0]],
+        this->vertices[this->triangleArray[i][1]],
+        this->vertices[this->triangleArray[i][2]]
+    };
+    return std::move(triangleVertices);
 }
 
 }

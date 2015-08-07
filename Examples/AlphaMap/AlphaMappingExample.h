@@ -30,7 +30,7 @@
 #include "Core/Simulator.h"
 #include "Core/StaticSceneObject.h"
 #include "Core/SceneObject.h"
-#include "Simulators/DummySimulator.h"
+#include "Simulators/DefaultSimulator.h"
 #include "ExternalDevices/PhantomInterface.h"
 #include "Core/MotionTransformer.h"
 #include "Rendering/metalShader.h"

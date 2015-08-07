@@ -21,95 +21,79 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include"IOMesh.h"
+#include "IO/IOMesh.h"
+#include "IO/IOMeshDelegate.h"
+#include "Core/MakeUnique.h"
 
-IOMesh::IOMesh(IOMesh::ReaderGroup priorityGroup) : fileName(""), fileType(MeshFileType::Unknown), mesh(nullptr)
+class IOMesh::DelegatorType
+{
+    typedef std::function<std::shared_ptr<IOMeshDelegate>()> DelegatorFunction;
+
+public:
+    DelegatorType(IOMesh *ioMesh) : io(ioMesh){}
+    void addDefaultDelegator(const MeshFileType &type, const std::string &delegateName)
+    {
+        this->delegatorList[type] = [&]()
+        {
+            auto delegate = Factory<IOMeshDelegate>::createDefault(delegateName);
+            if(delegate)
+            {
+                delegate->setSource(io);
+            }
+            return delegate;
+        };
+    }
+    void addGroupDelegator(const MeshFileType &type, const std::string &delegateName, const int &group)
+    {
+        this->delegatorList[type] = [&]()
+        {
+            auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup(delegateName,group);
+            if(delegate)
+            {
+                delegate->setSource(io);
+            }
+            return delegate;
+        };
+    }
+    std::shared_ptr<IOMeshDelegate> get(const MeshFileType &type)
+    {
+        return this->delegatorList[type]();
+    }
+
+public:
+    std::map<MeshFileType,DelegatorFunction> delegatorList;
+    IOMesh *io;
+};
+
+IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
+    fileName(""),
+    fileType(MeshFileType::Unknown),
+    mesh(nullptr),
+    delegator(make_unique<DelegatorType>(this))
 {
     //
     // VTK io for some vtk files (use only vtk to read these files)
-    delegatorList[MeshFileType::VTK] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createDefault("VTKMeshReaderDelegate");
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
-    delegatorList[MeshFileType::VTU] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createDefault("VTKMeshReaderDelegate");
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
-    delegatorList[MeshFileType::VTP] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createDefault("VTKMeshReaderDelegate");
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
+    this->delegator->addDefaultDelegator(MeshFileType::VTK,"VTKMeshReaderDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VTU,"VTKMeshReaderDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VTP,"VTKMeshReaderDelegate");
     //
     // Set the vega io, only vega can read/write those files
-    delegatorList[MeshFileType::VEG] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createDefault("VegaMeshDelegate");
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
+    this->delegator->addDefaultDelegator(MeshFileType::VEG,"VegaMeshDelegate");
     //
     // The readers for obj,stl and ply are based on a priority group (defaults to vtk io's)
-    delegatorList[MeshFileType::OBJ] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup("IOMeshDelegate",priorityGroup);
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
-    delegatorList[MeshFileType::STL] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup("IOMeshDelegate",priorityGroup);
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
-    delegatorList[MeshFileType::PLY] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup("IOMeshDelegate",priorityGroup);
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
-    delegatorList[MeshFileType::Unknown] = [](std::shared_ptr<IOMesh> source)
-    {
-        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup("IOMeshDelegate",ReaderGroup::Assimp);
-        if(delegate)
-        {
-            delegate->setSource(source);
-        }
-        return delegate;
-    };
+    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",priorityGroup);
+    this->delegator->addGroupDelegator(MeshFileType::STL,"IOMeshDelegate",priorityGroup);
+    this->delegator->addGroupDelegator(MeshFileType::PLY,"IOMeshDelegate",priorityGroup);
+    //
+    // Default reader for unknown filetypes is assimp
+    this->delegator->addDefaultDelegator(MeshFileType::VTP,"IOMeshDelegate");
 }
 IOMesh::~IOMesh() {}
 void IOMesh::read(const std::string& filePath)
 {
     this->fileName = filePath;
     this->checkFileType();
-    auto reader = this->delegatorList[this->fileType](this);
+    auto reader = this->delegator->get(this->fileType);
     if(reader)
     {
         reader->read();
@@ -120,7 +104,7 @@ void IOMesh::read(const std::string& filePath)
     }
 
 }
-void IOMesh::write(const std::string& filePath)
+void IOMesh::write(const std::string& /*filePath*/)
 {
 }
 void IOMesh::checkFileType()
@@ -172,7 +156,7 @@ void IOMesh::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
 {
     this->mesh = newMesh;
 }
-const std::string& IOMesh::getFilename() const
+const std::string& IOMesh::getFileName() const
 {
     return this->fileName;
 }

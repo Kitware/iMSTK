@@ -22,25 +22,27 @@
 //---------------------------------------------------------------------------
 
 #include "Collision/MeshCollisionModel.h"
+#include "Collision/SurfaceTree.h"
+#include "Core/CollisionConfig.h"
 
 MeshCollisionModel::MeshCollisionModel()
 {
-
+    this->collisionGroup = std::make_shared<CollisionGroup>();
 }
 
 MeshCollisionModel::~MeshCollisionModel()
 {
 
 }
-void MeshCollisionModel::setMesh(std::shared_ptr<Mesh> modelMesh)
+void MeshCollisionModel::setMesh(std::shared_ptr<SurfaceMesh> modelMesh)
 {
     this->setModelMesh(modelMesh);
     this->aabbTree.reset();
     this->initAABBTree(1);
 }
-void MeshCollisionModel::loadTriangleMesh(const std::string& meshName, const Core::BaseMesh::MeshFileType &type)
+void MeshCollisionModel::loadTriangleMesh(const std::string& meshName)
 {
-    this->load(meshName,type);
+    this->load(meshName);
 
     this->initAABBTree(1);
 }
@@ -56,6 +58,51 @@ void MeshCollisionModel::setAABBTree(std::shared_ptr<MeshCollisionModel::AABBTre
 }
 void MeshCollisionModel::initAABBTree(const int& numLevels)
 {
-    this->aabbTree = std::make_shared<AABBTreeType>(std::static_pointer_cast<SurfaceMesh>(this->mesh), numLevels);
+    this->aabbTree = std::make_shared<AABBTreeType>(shared_from_this(), numLevels);
     this->aabbTree->initStructure();
+}
+const core::Vec3d& MeshCollisionModel::getSurfaceNormal(size_t i) const
+{
+    auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(this->mesh);
+    return surfaceMesh->getTriangleNormal(i);
+}
+std::array<core::Vec3d,3> MeshCollisionModel::getElementPositions(size_t i) const
+{
+    auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(this->mesh);
+    return std::move(surfaceMesh->getTriangleVertices(i));
+}
+void MeshCollisionModel::setBoundingBox(const Eigen::AlignedBox3d& box)
+{
+    this->aabb = box;
+}
+const Eigen::AlignedBox3d& MeshCollisionModel::getBoundingBox() const
+{
+    return this->aabb;
+}
+void MeshCollisionModel::computeBoundingBoxes()
+{
+    auto const &vertices = mesh->getVertices();
+    triangleBoundingBoxArray.reserve(this->mesh->getTriangles().size());
+
+    for(auto &t : this->mesh->getTriangles())
+    {
+        triangleBoundingBoxArray.push_back(Eigen::AlignedBox3d());
+        Eigen::AlignedBox3d &box = triangleBoundingBoxArray.back();
+        box.extend(vertices[t[0]]);
+        box.extend(vertices[t[1]]);
+        box.extend(vertices[t[2]]);
+        aabb.extend(box);
+    }
+}
+const Eigen::AlignedBox3d& MeshCollisionModel::getAabb(size_t i) const
+{
+    return this->triangleBoundingBoxArray[i];
+}
+const Eigen::AlignedBox3d& MeshCollisionModel::getAabb() const
+{
+    return this->aabb;
+}
+std::shared_ptr< CollisionGroup >& MeshCollisionModel::getCollisionGroup()
+{
+    return this->collisionGroup;
 }

@@ -25,62 +25,15 @@
 #define SMVOLUMEMESH_H
 
 // SimMedTK includes
-#include "Mesh.h"
-
-// VEGA includes
-#include "volumetricMesh.h"
+#include "Core/BaseMesh.h"
 
 /// \brief this class is derived from generic Mesh class. Tetrahedron are building blocks of this volume mesh.
 ///  It also retains the surface triangle structure for rendering and collision detection purposes.
 ///  This surface triangle structure might be extracted from the volume mesh while loading
-class VolumeMesh: public Mesh
+class VolumeMesh: public Core::BaseMesh
 {
 public:
-    /// \brief constructor
-    VolumeMesh();
 
-    /// \brief constructor
-    VolumeMesh(const MeshType &meshtype, std::shared_ptr<ErrorLog> log);
-
-    /// \brief destructor
-    ~VolumeMesh();
-
-    /// \brief constructor
-    void GenerateTetra(const std::string& fileName);
-
-    /// \brief load tetrahedron
-    bool LoadTetra(const std::string& fileName);
-
-    /// \brief load surface triangles
-    bool getSurface(const std::string& fileName);
-
-    /// \brief read the boundary conditions
-    bool readBC(const std::string& fileName);
-
-    /// \brief initialize the surface mesh
-    void initSurface();
-
-    /// \brief copy the surface mesh
-    void copySurface();
-
-    /// \brief load the mesh
-    bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
-
-    /// \brief populate the mesh data from the vega volumetric mesh file format
-    void importVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh, const bool preProcessingStage);
-
-    /// \brief update the mesh data from the vega volumetric mesh after deformation happens
-    void updateVolumeMeshFromVegaFormat(const std::shared_ptr<const VolumetricMesh> vega3dMesh);
-
-public:
-    /// push Mesh class specific errors here
-    int nbrTetra; ///< number of tetrahedra
-    int nbrNodes; ///< total number of nodes of the volume mesh
-    std::shared_ptr<ErrorLog> log_VM; ///< log the errors with volume mesh class
-    std::vector<core::Vec3d> nodes; ///< data of nodal co-ordinates
-    std::vector<Tetrahedra> tetra; ///< tetrahedra data
-    std::vector<int> surfaceNodeIndex; ///<
-    std::vector<bool> fixed; ///< indicates if the node is fixed or not
 };
 
 #endif

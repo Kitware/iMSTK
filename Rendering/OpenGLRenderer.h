@@ -33,7 +33,7 @@
 #include "Core/SceneObject.h"
 #include "Core/Matrix.h"
 
-class Mesh;
+class SurfaceMesh;
 class AABB;
 class LineMesh;
 class OpenGLViewer;
@@ -49,13 +49,10 @@ public:
     OpenGLRenderer();
 
     /// \brief draws surface mesh with given rendertdail and draw paramters
-    static void drawSurfaceMeshTriangles(std::shared_ptr<Mesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
+    static void drawSurfaceMeshTriangles(std::shared_ptr<SurfaceMesh> p_surfaceMesh, std::shared_ptr<RenderDetail> renderDetail);
 
     /// \brief  draw normals
-    static void drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color = Color::colorBlue, float length=1.0);
-
-    /// \brief  draw line mesh
-    static void drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::shared_ptr<RenderDetail> renderDetail);
+    static void drawNormals(std::shared_ptr<SurfaceMesh> p_mesh, Color p_color = Color::colorBlue, float length=1.0);
 
     /// \brief draw coordinate system
     static void drawCoordSystem(std::shared_ptr<OpenGLViewer> viewer, std::string p_name, core::Vec3d p_pos, core::Vec3d dirX, core::Vec3d dirY, core::Vec3d dirZ);
@@ -70,7 +67,7 @@ public:
     static void endTriangles();
 
     /// \brief draw AABB
-    static void draw(AABB &aabb, Color p_color = Color(1.0, 1.0, 1.0));
+    static void draw(const Eigen::AlignedBox3d &aabb, Color p_color = Color(1.0, 1.0, 1.0));
 
     /// \brief  draw plane
     static void draw(Plane &p_plane, float p_scale = 10.0, Color p_color = Color::colorYellow);

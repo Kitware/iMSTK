@@ -37,8 +37,11 @@
 #include "Core/ErrorLog.h"
 #include "Rendering/GLUtils.h"
 #include "Core/Timer.h"
+#include "Core/BaseMesh.h"
 
-class Mesh;
+namespace Core {
+class BaseMesh;
+}
 class SurfaceMesh;
 
 struct TextureShaderAssignment
@@ -234,11 +237,11 @@ public:
     ~Shader();
 
     // \brief void implementations for virtual functions. needs to be overwritten for any specific uniform bindings
-    virtual void predraw(std::shared_ptr<Mesh>/*mesh*/){};
+    virtual void predraw(std::shared_ptr<Core::BaseMesh>/*mesh*/){};
 
     virtual void predraw(std::shared_ptr<SurfaceMesh>/*mesh*/){};
 
-    virtual void posdraw(std::shared_ptr<Mesh>/*mesh*/){};
+    virtual void posdraw(std::shared_ptr<Core::BaseMesh>/*mesh*/){};
 
     virtual void posdraw(std::shared_ptr<SurfaceMesh>/*mesh*/){};
 

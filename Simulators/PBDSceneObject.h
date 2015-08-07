@@ -28,7 +28,7 @@
 #include "Core/Config.h"
 #include "Core/SceneObject.h"
 #include "Mesh/SurfaceMesh.h"
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 /// \brief Position based dynamics (PBD) object
 class PBDSceneObject: public SceneObject

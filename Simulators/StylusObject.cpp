@@ -24,7 +24,7 @@
 #include "Simulators/StylusObject.h"
 #include "Collision/SurfaceTree.h"
 #include "Collision/OctreeCell.h"
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 #include "Rendering/GLUtils.h"
 
 StylusSceneObject::StylusSceneObject(std::shared_ptr<ErrorLog>/*p_log*/) : SceneObject()

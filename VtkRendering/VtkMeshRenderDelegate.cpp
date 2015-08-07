@@ -26,7 +26,7 @@
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 #include "VtkRendering/MeshNodalCoordinates.h"
 #include "VtkRendering/VtkRenderDelegate.h"

@@ -26,6 +26,7 @@
 #include "Core/IOStream.h"
 #include "Core/ViewerBase.h"
 #include "Core/DataStructures.h"
+#include "Core/RenderDelegate.h"
 
 RenderOperation::RenderOperation()
 {

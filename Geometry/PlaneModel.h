@@ -32,7 +32,7 @@
 #include <Eigen/Geometry>
 
 // SimMedTK includes
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 #include "Core/Geometry.h"
 
 ///
@@ -41,7 +41,7 @@
 ///
 /// @see PlaneCollisionModel
 ///
-class PlaneModel : public ModelRepresentation
+class PlaneModel : public Model
 {
 public:
     using RigidTransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
@@ -65,7 +65,7 @@ public:
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const core::Vec3d &getNormal() const;
+    const core::Vec3d &getSurfaceNormal() const;
 
     ///
     /// @brief Set plane normal

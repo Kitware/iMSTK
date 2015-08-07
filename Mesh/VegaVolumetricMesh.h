@@ -43,60 +43,60 @@ class VegaVolumetricMesh : public Core::BaseMesh
 {
 public:
     ///
-    /// @brief Constructor
+    /// \brief Constructor
     ///
     VegaVolumetricMesh(bool generateMeshGraph = true);
 
     ///
-    /// @brief Destructor
+    /// \brief Destructor
     ///
     ~VegaVolumetricMesh();
 
     ///
-    /// @brief Loads vega volume mesh and stores it locally
+    /// \brief Loads vega volume mesh and stores it locally
     ///
     void loadMesh(const std::string &fileName, const int &verbose);
 
     ///
-    /// @brief Returns graph
+    /// \brief Returns graph
     /// Note that this does not check if the graph is valid
     ///
     std::shared_ptr<Graph> getMeshGraph();
 
     ///
-    /// @brief Returns the total number of vertices in the mesh
+    /// \brief Returns the total number of vertices in the mesh
     ///
     size_t getNumberOfVertices() const;
 
     ///
-    /// @brief Returns the total number of elements in the mesh
+    /// \brief Returns the total number of elements in the mesh
     ///
     size_t getNumberOfElements() const;
 
     ///
-    /// @brief Attach surface mesh to the volume mesh and stores interpolation weights
+    /// \brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
 
     ///
-    /// @brief Returns weigths associated with attached ith surface mesh
+    /// \brief Returns weigths associated with attached ith surface mesh
     ///
     const std::vector<double> &getAttachedWeights(const size_t &i) const;
 
     ///
-    /// @brief Return vertices for interpolation weights for ith surface mesh
+    /// \brief Return vertices for interpolation weights for ith surface mesh
     ///
     const std::vector<int> &getAttachedVertices(const size_t &i) const;
 
     ///
-    /// @brief Return mesh
+    /// \brief Return mesh
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
 
     ///
-    /// @brief Sets the vega mesh
+    /// \brief Sets the vega mesh
     ///
-    std::shared_ptr<VolumetricMesh> setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
+    void setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
 
 private:
     // Vega mesh base object

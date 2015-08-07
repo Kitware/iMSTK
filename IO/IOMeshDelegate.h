@@ -21,13 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef READERDELEGATE_H
-#define READERDELEGATE_H
+#ifndef IOMESHDELEGATE_H
+#define IOMESHDELEGATE_H
 
 #include <cstdint>
 #include <memory>
 
-#include "InputOutput/IOMesh.h"
+#include "IO/IOMesh.h"
 #include "Core/Config.h"
 
 class IOMeshDelegate
@@ -36,15 +36,15 @@ public:
     typedef std::shared_ptr<IOMeshDelegate> Ptr;
 
 public:
-    setSource(std::shared_ptr<IOMesh> src)
+    void setSource(IOMesh *src)
     {
         meshIO = src;
     }
 
-    virtual void read(){ }
+    virtual void read() const { }
     virtual void write(){ }
 
 protected:
-    std::shared_ptr<IOMesh> meshIO;
+    IOMesh *meshIO;
 };
 #endif // READERDELEGATE_H

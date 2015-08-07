@@ -145,7 +145,7 @@ std::shared_ptr< VolumetricMesh > VegaVolumetricMesh::getVegaMesh()
 {
     return this->mesh;
 }
-std::shared_ptr< VolumetricMesh > VegaVolumetricMesh::setVegaMesh(std::shared_ptr< VolumetricMesh > newMesh)
+void VegaVolumetricMesh::setVegaMesh(std::shared_ptr< VolumetricMesh > newMesh)
 {
     this->mesh = newMesh;
 

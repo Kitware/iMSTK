@@ -26,8 +26,8 @@
 CollisionPair::CollisionPair() {}
 CollisionPair::~CollisionPair() {}
 
-void CollisionPair::setModels(const std::shared_ptr< ModelRepresentation >& first,
-                                const std::shared_ptr< ModelRepresentation >& second)
+void CollisionPair::setModels(const std::shared_ptr< Model >& first,
+                                const std::shared_ptr< Model >& second)
 {
     this->modelRepresentations.first = first;
     this->modelRepresentations.second = second;
@@ -40,7 +40,7 @@ void CollisionPair::addContact(const double& penetrationDepth, const core::Vec3d
     this->contacts.emplace_back(contact);
 }
 
-const std::pair< std::shared_ptr< ModelRepresentation >, std::shared_ptr< ModelRepresentation > >&
+const std::pair< std::shared_ptr< Model >, std::shared_ptr< Model > >&
 CollisionPair::getModels() const
 {
     return modelRepresentations;
@@ -56,12 +56,12 @@ int CollisionPair::getNumberOfContacts()
     return contacts.size();
 }
 
-std::shared_ptr< ModelRepresentation > CollisionPair::getFirst()
+std::shared_ptr< Model > CollisionPair::getFirst()
 {
     return this->modelRepresentations.first;
 }
 
-std::shared_ptr< ModelRepresentation > CollisionPair::getSecond()
+std::shared_ptr< Model > CollisionPair::getSecond()
 {
     return this->modelRepresentations.second;
 }

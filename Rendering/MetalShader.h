@@ -34,6 +34,11 @@ namespace Event{
 }
 }
 
+namespace Core {
+    class BaseMesh;
+}
+class SurfaceMesh;
+
 /// \brief metal shader look. It is mainly used for tool rendering but utilized for high specularity rendering for tissues.
 class MetalShader: public Shader
 {
@@ -43,11 +48,11 @@ public:
                   const std::string &p_fragmentFileName = "shaders/FragmentBumpMap1.cg");
 
     /// \brief attach mesh to the shader
-    void attachMesh(std::shared_ptr<Mesh> p_mesh, char *p_bump,
+    void attachMesh(std::shared_ptr<Core::BaseMesh> p_mesh, char *p_bump,
                     char *p_decal, char *p_specular,
                     char *p_OCC, char *p_disp);
 
-    void attachMesh(std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap);
+    void attachMesh(std::shared_ptr<Core::BaseMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap);
 
     /// \brief emtpy implementation of draw routine. needs to overwritten to enable real-time code changes
     void draw() const override;
@@ -56,7 +61,7 @@ public:
     virtual void initDraw() override;
 
     /// \brief uniforms are set in the predraw
-    virtual void predraw(std::shared_ptr<Mesh> mesh) override;
+    virtual void predraw(std::shared_ptr<Core::BaseMesh> mesh) override;
 
     virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 
@@ -91,7 +96,7 @@ public:
     virtual void initDraw() override;
 
     /// \brief unifom binding called before object is rendered
-    virtual void predraw(std::shared_ptr<Mesh> mesh) override;
+    virtual void predraw(std::shared_ptr<Core::BaseMesh> mesh) override;
 
     virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 
@@ -112,7 +117,7 @@ public:
     virtual void initDraw() override;
 
     /// \brief pre rendering routine before attached object is rendered
-    virtual void predraw(std::shared_ptr<Mesh> p_mesh) override;
+    virtual void predraw(std::shared_ptr<Core::BaseMesh> p_mesh) override;
 
     virtual void predraw(std::shared_ptr<SurfaceMesh> mesh) override;
 

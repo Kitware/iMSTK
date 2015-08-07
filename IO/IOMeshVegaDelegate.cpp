@@ -25,7 +25,7 @@
 
 
 #include "Core/Factory.h"
-#include "InputOutput/IOMeshDelegate.h"
+#include "IO/IOMeshDelegate.h"
 #include "Mesh//VegaVolumetricMesh.h"
 
 // Vega includes
@@ -33,17 +33,17 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 
-class VegaMeshDelegate : IOMeshDelegate
+class VegaMeshDelegate : public IOMeshDelegate
 {
 public:
-    void read()
+    void read() const
     {
         // const cast to silence warnings later on
         auto name = const_cast<char*>(this->meshIO->getFileName().c_str());
 
-        std::shared_ptr<VolumetricMesh> mesh = std::make_shared<VolumetricMesh>();
+        std::shared_ptr<VolumetricMesh> mesh;
 
-        VolumetricMesh::elementType elementType = VolumetricMesh::getElementType(name);
+        auto elementType = VolumetricMesh::getElementType(name);
         switch(elementType)
         {
             case VolumetricMesh::TET:
@@ -71,7 +71,7 @@ public:
 };
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
-SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
-SIMMEDTK_FINISH_ONLOAD()
+    SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
+        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
+    SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

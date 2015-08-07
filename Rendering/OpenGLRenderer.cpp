@@ -21,13 +21,15 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Rendering/OpenGLRenderer.h"
-#include "Mesh/Mesh.h"
 #include "Core/DataStructures.h"
-#include "Rendering/OpenGLViewer.h"
 #include "Core/Quaternion.h"
-#include "Rendering/VAO.h"
+#include "Core/RenderDelegate.h"
+#include "Core/Geometry.h"
+#include "Mesh/SurfaceMesh.h"
+#include "Rendering/OpenGLRenderer.h"
+#include "Rendering/OpenGLViewer.h"
 #include "Rendering/TextureManager.h"
+#include "Rendering/VAO.h"
 
 #ifndef _MSC_VER
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
@@ -175,7 +177,7 @@ void OpenGLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::sha
 #endif // 0
 
 void OpenGLRenderer::drawSurfaceMeshTriangles(
-    std::shared_ptr<Mesh> p_surfaceMesh,
+    std::shared_ptr<SurfaceMesh> p_surfaceMesh,
     std::shared_ptr<RenderDetail> renderDetail)
 {
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_NONE)
@@ -203,9 +205,9 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     }
 
     glEnableClientState(GL_VERTEX_ARRAY);
-    glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->getVertices().data());
+    glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->getVertices().data()->data());
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->vertNormals);
+    glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->getVertexNormals().data());
 
     auto &meshTextures = p_surfaceMesh->getTextures();
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
@@ -230,7 +232,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))
@@ -238,7 +240,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
         glColor3fv(renderDetail->getVertexColor().toGLColor());
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
 
         glEnable(GL_LIGHTING);
         //default rendering
@@ -254,7 +256,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         glDisable(GL_TEXTURE_2D);
         glColor4fv(renderDetail->getWireFrameColor().toGLColor());
 
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->nbrTriangles * 3, GL_UNSIGNED_INT, p_surfaceMesh->triangles.data());
+        glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
 
         glEnable(GL_LIGHTING);
         glEnable(GL_TEXTURE_2D);
@@ -303,7 +305,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     glLineWidth(1.0);
 }
 
-void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, float length)
+void OpenGLRenderer::drawNormals(std::shared_ptr<SurfaceMesh> p_mesh, Color p_color, float length)
 {
     glDisable(GL_LIGHTING);
     glColor3fv(reinterpret_cast<GLfloat*>(&p_color));
@@ -313,19 +315,20 @@ void OpenGLRenderer::drawNormals(std::shared_ptr<Mesh> p_mesh, Color p_color, fl
     glBegin(GL_LINES);
 
     auto &vertices = p_mesh->getVertices();
-    for (int i = 0, end = vertices.size(); i < end; i++)
+    for (size_t i = 0, end = vertices.size(); i < end; i++)
     {
         glVertex3dv(vertices[i].data());
-        tmp = vertices[i] + p_mesh->vertNormals[i] * length;
+        tmp = vertices[i] + p_mesh->getVertexNormal(i) * length;
         glVertex3dv(tmp.data());
     }
 
-    for (int i = 0; i < p_mesh->nbrTriangles; i++)
+    auto const &triangles = p_mesh->getTriangles();
+    for (size_t i = 0, end = p_mesh->getTriangles().size(); i < end; i++)
     {
-        baryCenter = vertices[p_mesh->triangles[i].vert[0]] + vertices[p_mesh->triangles[i].vert[1]] + vertices[p_mesh->triangles[i].vert[2]];
+        baryCenter = vertices[triangles[i][0]] + vertices[triangles[i][1]] + vertices[triangles[i][2]];
         baryCenter = baryCenter / 3.0;
         glVertex3dv(baryCenter.data());
-        tmp = baryCenter + p_mesh->triNormals[i] * length;
+        tmp = baryCenter + p_mesh->getTriangleNormal(i) * length;
         glVertex3dv(tmp.data());
     }
 
@@ -351,7 +354,7 @@ void OpenGLRenderer::endTriangles()
     glEnd();
 }
 
-void OpenGLRenderer::draw(AABB &aabb, Color p_color)
+void OpenGLRenderer::draw(const Eigen::AlignedBox3d &aabb, Color p_color)
 {
     glPushAttrib(GL_LIGHTING_BIT);
 
@@ -361,41 +364,45 @@ void OpenGLRenderer::draw(AABB &aabb, Color p_color)
     glLineWidth(1.0);
     glColor3fv(p_color.toGLColor());
     glBegin(GL_LINES);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
 
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    auto const &min = aabb.min();
+    auto const &max = aabb.max();
 
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMin[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3d(min(0), min(0), min(2));
+    glVertex3d(max(0), min(0), min(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
+    glVertex3d(min(0), min(0), min(2));
+    glVertex3d(min(0), max(0), min(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3d(min(0), min(0), min(2));
+    glVertex3d(min(0), min(0), max(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    glVertex3d(max(0), max(0), max(2));
+    glVertex3d(min(0), max(0), max(2));
 
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3d(max(0), max(0), max(2));
+    glVertex3d(max(0), min(0), max(2));
 
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    glVertex3d(max(0), max(0), max(2));
+    glVertex3d(max(0), max(0), min(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMin[0], aabb.aabbMax[2]);
+    glVertex3d(min(0), max(0), max(2));
+    glVertex3d(min(0), min(0), max(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMax[2]);
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
+    glVertex3d(min(0), max(0), max(2));
+    glVertex3d(min(0), max(0), min(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMin[0], aabb.aabbMin[2]);
+    glVertex3d(max(0), min(0), max(2));
+    glVertex3d(min(0), min(0), max(2));
 
-    glVertex3d(aabb.aabbMax[0], aabb.aabbMax[0], aabb.aabbMin[2]);
-    glVertex3d(aabb.aabbMin[0], aabb.aabbMax[0], aabb.aabbMin[2]);
+    glVertex3d(max(0), min(0), max(2));
+    glVertex3d(max(0), min(0), min(2));
+
+    glVertex3d(max(0), max(0), min(2));
+    glVertex3d(max(0), min(0), min(2));
+
+    glVertex3d(max(0), max(0), min(2));
+    glVertex3d(min(0), max(0), min(2));
     glEnd();
     glLineWidth(1.0);
     glEnable(GL_LIGHTING);

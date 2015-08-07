@@ -35,7 +35,7 @@
 
 // Include required simulators
 #include "Simulators/VegaFemSimulator.h"
-#include "Simulators/DummySimulator.h"
+#include "Simulators/DefaultSimulator.h"
 
 #include "Core/CollisionPair.h"
 #include "Collision/PlaneCollisionModel.h"
@@ -58,7 +58,7 @@ int main()
     std::shared_ptr<VegaFemSceneObject> femObject;
     std::shared_ptr<StaticSceneObject> staticObject;
     std::shared_ptr<VegaFemSimulator> femSimulator;
-    std::shared_ptr<DummySimulator> staticSimulator;
+    std::shared_ptr<DefaultSimulator> staticSimulator;
     std::shared_ptr<PlaneCollisionModel> plane;
     std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene;
@@ -111,7 +111,7 @@ int main()
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
-    staticSimulator = std::make_shared<DummySimulator>(sdk->getErrorLog());
+    staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
     // create a static plane scene object of given normal and position
     staticObject = std::make_shared<StaticSceneObject>();

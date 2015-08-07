@@ -23,7 +23,7 @@
 
 
 #include "Core/Factory.h"
-#include "InputOutput/IOMeshDelegate.h"
+#include "IO/IOMeshDelegate.h"
 #include "Mesh/SurfaceMesh.h"
 
 // Assimp includes
@@ -31,10 +31,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-class AssimpMeshDelegate : IOMeshDelegate
+class AssimpMeshDelegate : public IOMeshDelegate
 {
 public:
-    void read()
+    void read() const
     {
         auto fileName = this->meshIO->getFileName().c_str();
         // Tell Assimp to not import any of the following from the mesh it loads
@@ -62,8 +62,8 @@ public:
         // Extract the information from the aiScene's mesh objects
         aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
 
-        auto localMesh = std::make_shared<SurfaceMesh>();
-        auto &vertices = localMesh->getVertices();
+        auto surfaceMesh = std::make_shared<SurfaceMesh>();
+        auto &vertices = surfaceMesh->getVertices();
 
         vertices.reserve(mesh->mNumVertices);
 
@@ -74,7 +74,7 @@ public:
                                   mesh->mVertices[i][1],
                                   mesh->mVertices[i][2]);
         }
-        localMesh->updateOriginalVertsWithCurrent();
+        surfaceMesh->updateOriginalVertsWithCurrent();
 
         // Get indexed texture coordinate data
         if (mesh->HasTextureCoords(0))
@@ -86,7 +86,7 @@ public:
                 return;
             }
 
-            auto &textureCoordinates = this->meshIO->getMesh()->getTextureCoordinates();
+            auto &textureCoordinates = surfaceMesh->getTextureCoordinates();
             // Extract the texture data
             for (unsigned int i = 0; i < mesh->mNumVertices; i++)
             {
@@ -95,7 +95,7 @@ public:
             }
         }
 
-        auto &triangles = localMesh->getTriangles();
+        auto &triangles = surfaceMesh->getTriangles();
         triangles.reserve(mesh->mNumFaces);
 
         // Setup triangle/face data
@@ -108,12 +108,13 @@ public:
                 return;
             }
 
-            triangles.emplace_back(mesh->mFaces[i].mIndices[0],
+            std::array<size_t,3> t = {mesh->mFaces[i].mIndices[0],
                                    mesh->mFaces[i].mIndices[1],
-                                   mesh->mFaces[i].mIndices[2]);
+                                   mesh->mFaces[i].mIndices[2]};
+            triangles.emplace_back(t);
         }
 
-        this->meshIO->setMesh(localMesh);
+        this->meshIO->setMesh(surfaceMesh);
     }
     void write(){}
 };

@@ -33,7 +33,7 @@
 #include <vector>
 #include <iostream>
 
-class ModelRepresentation;
+class Model;
 
 ///
 /// \brief Contact point representation
@@ -74,13 +74,13 @@ public:
     ///
     /// @brief Set the pair of collision models
     ///
-    void setModels(const std::shared_ptr<ModelRepresentation>& first,
-                   const std::shared_ptr<ModelRepresentation>& second );
+    void setModels(const std::shared_ptr<Model>& first,
+                   const std::shared_ptr<Model>& second );
 
     ///
     /// @brief Get the pair of collision models
     ///
-    const std::pair<std::shared_ptr<ModelRepresentation>, std::shared_ptr<ModelRepresentation>>&
+    const std::pair<std::shared_ptr<Model>, std::shared_ptr<Model>>&
     getModels() const;
 
     ///
@@ -99,12 +99,12 @@ public:
     ///
     /// @brief Get first model
     ///
-    std::shared_ptr<ModelRepresentation> getFirst();
+    std::shared_ptr<Model> getFirst();
 
     ///
     /// @brief Get second model
     ///
-    std::shared_ptr<ModelRepresentation> getSecond();
+    std::shared_ptr<Model> getSecond();
 
     ///
     /// @brief Returns wether the contact container is empty
@@ -128,8 +128,8 @@ public:
     void printCollisionPairs();
 
 private:
-    std::pair<std::shared_ptr<ModelRepresentation>,
-        std::shared_ptr<ModelRepresentation>> modelRepresentations; // Models
+    std::pair<std::shared_ptr<Model>,
+        std::shared_ptr<Model>> modelRepresentations; // Models
 
     std::vector<std::shared_ptr<Contact>> contacts; // List of contacts
 };

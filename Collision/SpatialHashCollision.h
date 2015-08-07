@@ -39,7 +39,8 @@ class CellTriangle;
 class CollidedLineTris;
 class CollidedModelPoints;
 class CollidedTriangles;
-class Mesh;
+class SurfaceMesh;
+class MeshCollisionModel;
 class OctreeCell;
 
 template<typename CellType>
@@ -66,19 +67,19 @@ public:
     void addCollisionModel(std::shared_ptr<SurfaceTreeType> CollModel);
 
     /// \brief !!
-    void addMesh(std::shared_ptr<Mesh> mesh);
+    void addModel(std::shared_ptr<MeshCollisionModel> mesh);
 
     /// \brief !!
-    void removeMesh(std::shared_ptr<Mesh> mesh);
+    void removeModel(std::shared_ptr<MeshCollisionModel> mesh);
 
     /// \brief !!
-    bool findCandidates(/*std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB*/);
+    bool findCandidates(/*std::shared_ptr<SurfaceMesh> meshA, std::shared_ptr<SurfaceMesh> meshB*/);
 
     /// \brief !!
-    bool findCandidatePoints(std::shared_ptr<Mesh> mesh, std::shared_ptr<SurfaceTreeType> colModel);
+    bool findCandidatePoints(std::shared_ptr<MeshCollisionModel> model, std::shared_ptr<SurfaceTreeType> tree);
 
     /// \brief find the candidate triangle pairs for collision (broad phase collision)
-    bool findCandidateTris(std::shared_ptr<Mesh> meshA, std::shared_ptr<Mesh> meshB);
+    bool findCandidateTris(std::shared_ptr<MeshCollisionModel> modelA, std::shared_ptr<MeshCollisionModel> ModelB);
 
     /// \brief compute the collision between two triangles (narrow phase collision)
     void computeCollisionTri2Tri();
@@ -90,7 +91,7 @@ public:
     void computeCollisionModel2Points();
 
     /// \brief !! compute the hash
-    void computeHash(std::shared_ptr<Mesh> mesh, const std::vector<int> &tris);
+    void computeHash(std::shared_ptr<MeshCollisionModel> model, const std::vector<int> &tris);
 
     const std::vector<std::shared_ptr<CollidedTriangles>> &getCollidedTriangles() const;
 
@@ -98,10 +99,10 @@ public:
 
 protected:
     /// \brief adds triangle to hash
-    void addTriangle(std::shared_ptr<Mesh> mesh, int triangleId, Hash<CellTriangle> &cells);
+    void addTriangle(std::shared_ptr<MeshCollisionModel> model, int triangleId, Hash<CellTriangle> &cells);
 
     /// \brief adds point to hash
-    void addPoint(std::shared_ptr<Mesh> mesh, int vertId, Hash<CellPoint> &cells);
+    void addPoint(std::shared_ptr<MeshCollisionModel> model, int vertId, Hash<CellPoint> &cells);
 
     /// \brief adds octree cell to hash
     void addOctreeCell(std::shared_ptr<SurfaceTreeType> colModel, Hash<CellModel> &cells);
@@ -132,7 +133,7 @@ private:
     Hash<CellTriangle> cellsForTri2Line;  // Candidate triangles in the scene.
     Hash<CellModel> cellsForModel; // Candidate cells for collision model
     Hash<CellPoint> cellsForModelPoints; // Candidate for Collision model to point
-    std::vector<std::shared_ptr<Mesh>> meshes; // Mesh models
+    std::vector<std::shared_ptr<MeshCollisionModel>> collisionModels; // SurfaceMesh models
     std::vector<std::shared_ptr<CollidedTriangles>> collidedTriangles; // List of collision pairs triangles
     std::vector<std::shared_ptr<CollidedLineTris>> collidedLineTris; // List of collision pairs triangles-lines
     std::vector<std::shared_ptr<CollidedModelPoints>> collidedModelPoints; // List of collision pairs models-points

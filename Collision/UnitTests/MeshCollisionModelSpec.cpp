@@ -26,6 +26,7 @@
 #include "Collision/MeshCollisionModel.h"
 #include "Core/MakeUnique.h"
 #include "Mesh/SurfaceMesh.h"
+#include "Collision/SurfaceTree.h"
 
 using namespace bandit;
 
@@ -37,7 +38,7 @@ go_bandit([](){
         it("loads mesh ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
+            std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
 
             meshCollisionModel->setMesh(mesh);
 
@@ -47,12 +48,8 @@ go_bandit([](){
         it("can access positions ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
+            std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
-
-            // Add two triangles to the data structure
-            mesh->initVertexArrays(4);
-            mesh->initTriangleArrays(2);
 
             std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
@@ -60,47 +57,32 @@ go_bandit([](){
             vertices.emplace_back(2.0,1.0,-1.0);
             vertices.emplace_back(3.0,2.0,1.0);
 
-            auto vertexArray = mesh->getVertices();
-            vertexArray[0] = vertices[0];
-            vertexArray[1] = vertices[1];
-            vertexArray[2] = vertices[2];
-            vertexArray[3] = vertices[3];
+            mesh->setVertices(vertices);
 
-            mesh->triangles[0].vert[0] = 0;
-            mesh->triangles[0].vert[1] = 1;
-            mesh->triangles[0].vert[2] = 2;
+            std::array<size_t,3> t0 = {0,1,2};
+            std::array<size_t,3> t1 = {0,1,2};
+            mesh->getTriangles().emplace_back(t0);
+            mesh->getTriangles().emplace_back(t1);
 
-            mesh->triangles[1].vert[0] = 1;
-            mesh->triangles[1].vert[1] = 2;
-            mesh->triangles[1].vert[2] = 3;
+            mesh->computeVertexNeighbors();
+            mesh->computeTriangleNormals();
+            mesh->computeVertexNormals();
 
-            mesh->initVertexNeighbors();
-            mesh->updateTriangleNormals();
-            mesh->updateVertexNormals();
+            auto p0 = meshCollisionModel->getElementPositions(0);
+            AssertThat(p0[0], Equals(vertices[0]));
+            AssertThat(p0[1], Equals(vertices[1]));
+            AssertThat(p0[2], Equals(vertices[2]));
 
-            //edge information
-            mesh->calcNeighborsVertices();
-            mesh->calcEdges();
-            mesh->upadateAABB();
-            mesh->allocateAABBTris();
-
-            AssertThat(meshCollisionModel->getTrianglePositions(0)[0], Equals(vertices[0]));
-            AssertThat(meshCollisionModel->getTrianglePositions(0)[1], Equals(vertices[1]));
-            AssertThat(meshCollisionModel->getTrianglePositions(0)[2], Equals(vertices[2]));
-
-            AssertThat(meshCollisionModel->getTrianglePositions(1)[0], Equals(vertices[1]));
-            AssertThat(meshCollisionModel->getTrianglePositions(1)[1], Equals(vertices[2]));
-            AssertThat(meshCollisionModel->getTrianglePositions(1)[2], Equals(vertices[3]));
+            auto p1 = meshCollisionModel->getElementPositions(1);
+            AssertThat(p1[0], Equals(vertices[1]));
+            AssertThat(p1[1], Equals(vertices[2]));
+            AssertThat(p1[2], Equals(vertices[3]));
         });
         it("can access normals ", []() {
             std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
 
-            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
+            std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
-
-            // Add two triangles to the data structure
-            mesh->initVertexArrays(4);
-            mesh->initTriangleArrays(2);
 
             std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
@@ -114,76 +96,50 @@ go_bandit([](){
             vertexArray[2] = vertices[2];
             vertexArray[3] = vertices[3];
 
-            mesh->triangles[0].vert[0] = 0;
-            mesh->triangles[0].vert[1] = 1;
-            mesh->triangles[0].vert[2] = 2;
+            std::array<size_t,3> t0 = {0,1,2};
+            std::array<size_t,3> t1 = {1,2,3};
+            mesh->getTriangles().emplace_back(t0);
+            mesh->getTriangles().emplace_back(t1);
 
-            mesh->triangles[1].vert[0] = 1;
-            mesh->triangles[1].vert[1] = 2;
-            mesh->triangles[1].vert[2] = 3;
-
-            mesh->initVertexNeighbors();
-            mesh->updateTriangleNormals();
-            mesh->updateVertexNormals();
-
-            //edge information
-            mesh->calcNeighborsVertices();
-            mesh->calcEdges();
-            mesh->upadateAABB();
-            mesh->allocateAABBTris();
-
+            mesh->computeVertexNeighbors();
+            mesh->computeTriangleNormals();
+            mesh->computeVertexNormals();
 
             core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
             core::Vec3d normalB = (vertices[2]-vertices[1]).cross(vertices[3]-vertices[1]).normalized();
 
-            AssertThat((meshCollisionModel->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
-            AssertThat((meshCollisionModel->getNormal(1)-normalB).squaredNorm(), EqualsWithDelta(0.0,.00001));
+            AssertThat((meshCollisionModel->getSurfaceNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
+            AssertThat((meshCollisionModel->getSurfaceNormal(1)-normalB).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
         it("create BVH ", []() {
-            std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
+            std::shared_ptr<MeshCollisionModel> meshCollisionModel = std::make_shared<MeshCollisionModel>();
 
-            std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
+            std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
 
             // Add two triangles to the data structure
-            mesh->initVertexArrays(4);
-            mesh->initTriangleArrays(2);
-
             std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
             vertices.emplace_back(3.0,2.0,1.0);
 
-            auto vertexArray = mesh->getVertices();
-            vertexArray.push_back(vertices[0]);
-            vertexArray.push_back(vertices[1]);
-            vertexArray.push_back(vertices[2]);
-            vertexArray.push_back(vertices[3]);
+            mesh->setVertices(vertices);
 
-            mesh->triangles[0].vert[0] = 0;
-            mesh->triangles[0].vert[1] = 1;
-            mesh->triangles[0].vert[2] = 2;
+            std::array<size_t,3> t0 = {0,1,2};
+            std::array<size_t,3> t1 = {1,2,3};
+            mesh->getTriangles().emplace_back(t0);
+            mesh->getTriangles().emplace_back(t1);
 
-            mesh->triangles[1].vert[0] = 1;
-            mesh->triangles[1].vert[1] = 2;
-            mesh->triangles[1].vert[2] = 3;
-
-            mesh->initVertexNeighbors();
-            mesh->updateTriangleNormals();
-            mesh->updateVertexNormals();
-
-            //edge information
-            mesh->calcNeighborsVertices();
-            mesh->calcEdges();
-            mesh->upadateAABB();
-            mesh->allocateAABBTris();
+            mesh->computeVertexNeighbors();
+            mesh->computeTriangleNormals();
+            mesh->computeVertexNormals();
 
             std::shared_ptr<MeshCollisionModel::AABBTreeType>
-            modelAabbTree = std::make_shared<MeshCollisionModel::AABBTreeType>(
-                std::static_pointer_cast<SurfaceMesh>(mesh),6);
+            modelAabbTree = std::make_shared<MeshCollisionModel::AABBTreeType>(meshCollisionModel,6);
             modelAabbTree->initStructure();
 
+            meshCollisionModel->computeBoundingBoxes();
             meshCollisionModel->setAABBTree(modelAabbTree);
 
             AssertThat(meshCollisionModel->getAABBTree(), Equals(modelAabbTree));

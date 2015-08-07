@@ -13,6 +13,7 @@ target_link_libraries(Geometry
     Core
     Mesh
     Rendering
+    IO
 )
 
 if(BUILD_TESTING)

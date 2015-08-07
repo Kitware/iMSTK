@@ -1,7 +1,6 @@
 
 simmedtk_add_library(Mesh
   SOURCES
-    Mesh.cpp
     SurfaceMesh.cpp
     VolumeMesh.cpp
     VegaSceneObject.cpp
@@ -9,7 +8,6 @@ simmedtk_add_library(Mesh
     VegaSceneObjectWithRestPosition.cpp
     VegaVolumetricMesh.cpp
   PUBLIC_HEADERS
-    Mesh.h
     SurfaceMesh.h
     VolumeMesh.h
     VegaSceneObject.h

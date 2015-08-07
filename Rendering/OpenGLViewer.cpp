@@ -25,6 +25,7 @@
 
 #include "Core/EventHandler.h"
 #include "Core/IOStream.h"
+#include "Core/Factory.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/KeySFMLInterface.h"
 #include "Event/MouseButtonEvent.h"
@@ -58,6 +59,7 @@ OpenGLViewer::OpenGLViewer()
   this->windowOutput = std::make_shared<OpenGLWindowStream>();
 }
 
+OpenGLViewer::~OpenGLViewer() {}
 void OpenGLViewer::exitViewer()
 {
 }
@@ -452,5 +454,4 @@ SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
     SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,OpenGLViewer,100);
   SIMMEDTK_FINISH_ONLOAD()
-OpenGLViewer::~OpenGLViewer() {}
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

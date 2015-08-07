@@ -21,40 +21,29 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMDUMMYSIMULATOR_H
-#define SMDUMMYSIMULATOR_H
+#ifndef SMMODEL
+#define SMMODEL
+
+// STL includes
+#include <memory>
 
 // SimMedTK includes
-#include "Core/Config.h"
-#include "Core/ObjectSimulator.h"
-#include "Core/ErrorLog.h"
+#include "Core/CoreClass.h"
 
-/// \brief Example simulator. This dummy simulator works on static scene objects for now.
-class DummySimulator: public ObjectSimulator
+namespace Core {
+    class BaseMesh;
+}
+class CoreClass;
+
+class Model
 {
-
 public:
-    /// \brief constructor
-    DummySimulator(std::shared_ptr<ErrorLog> p_errorLog);
-    virtual ~DummySimulator(){}
+    Model(){}
+    ~Model(){}
 
-protected:
-    virtual void beginSim() override;
-
-    /// \brief !!
-    virtual void initCustom() override;
-
-    /// \brief advance the simulator in time in a loop here
-    virtual void run() override;
-
-    /// \brief !!
-    void endSim() override;
-
-    /// \brief synchronize the buffers in the object (do not call by yourself).
-    void syncBuffers() override;
-
-    /// \brief catch events such as key presses and other user inputs
-    void handleEvent(std::shared_ptr<core::Event> p_event) override;
+    virtual std::shared_ptr<Core::BaseMesh> getMesh(){ return nullptr; }
+    virtual std::shared_ptr<CoreClass> getObject(){ return nullptr; }
+	virtual void draw(){}
 };
 
-#endif
+#endif // SMMODEL

@@ -20,26 +20,23 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-
-
-#ifndef MESHIO_H
-#define MESHIO_H
+#ifndef IOMESH_H
+#define IOMESH_H
 
 #include <memory>
-#include <unordered_map>
 
-#include "InputOutput/IOMeshDelegate.h"
 #include "Core/Factory.h"
 #include "Core/BaseMesh.h"
 
+class IOMeshDelegate;
+
 ///
-/// \brief Mesh input/output class. This class is used to read meshes on several formats.
+/// \brief Mesh input/output class. This class is used to read/write meshes on several formats.
 ///  Users can add more readers by implementing delegates for a particular reader
-///     \see \VTKMeshDelegate, \VegaMeshDelegarte and \AssimpMeshDelegate
+///     \see \IOMeshVTKDelegate, \IOMeshVegaDelegarte and \IOMeshAssimpDelegate
 ///
 class IOMesh
 {
-    typedef std::function<std::shared_ptr<IOMeshDelegate>(std::shared_ptr<IOMesh>)> DelegatorType;
 public:
     ///
     /// \brief Enum class for the type of files this mesh io expect,
@@ -61,7 +58,7 @@ public:
     ///
     /// \brief Enum class for the readers group. Used to prioritize the io delegates in the factory.
     ///
-    enum class ReaderGroup : int
+    enum ReaderGroup
     {
         VTK,
         Assimp,
@@ -70,9 +67,9 @@ public:
     };
 
     ///
-    /// \brief Constructor/Destructors
+    /// \brief Constructor/Destructor
     ///
-    IOMesh(ReaderGroup priorityGroup = ReaderGroup::VTK);
+    IOMesh(const IOMesh::ReaderGroup &priorityGroup = ReaderGroup::VTK);
     ~IOMesh();
 
     ///
@@ -80,13 +77,6 @@ public:
     ///
     void read(const std::string &filePath);
     void write(const std::string &filePath);
-
-    ///
-    /// \brief Simplistic function for figuring out the extension of a file from its path.
-    ///  There will be corner cases in which this function wont properly work.
-    ///  eg "c:\program files\AppleGate.Net\readme"
-    ///
-    void checkFileType();
 
     ///
     /// \brief Mesh accessors
@@ -97,13 +87,20 @@ public:
     ///
     /// \brief Filename accessors
     ///
-    const std::string &getFilename() const;
+    const std::string &getFileName() const;
     void setFilename(const std::string &filePath);
 
     ///
     /// \brief Returns the file type. This gets set to the correct typwhen calling \checkFileType.
     ///
     const MeshFileType &getFileType() const;
+private:
+    ///
+    /// \brief Simplistic function for figuring out the extension of a file from its path.
+    ///  There will be corner cases in which this function wont properly work.
+    ///  eg "c:\program files\AppleGate.Net\readme"
+    ///
+    void checkFileType();
 
 private:
     // Storage for the mesh file name, used by delegates.
@@ -115,8 +112,9 @@ private:
     // Mesh pointer.
     std::shared_ptr<Core::BaseMesh> mesh;
 
-    // Map file types with reader delegates.
-    std::unordered_map<MeshFileType,DelegatorType> delegatorList;
+    // Handle delegation of readers.
+    class DelegatorType;
+    std::unique_ptr<DelegatorType> delegator;
 };
 
 #endif // MESHIO_H

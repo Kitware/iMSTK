@@ -1,3 +1,6 @@
+find_package(VTK REQUIRED)
+
+include(${VTK_USE_FILE})
 
 simmedtk_add_library(IO
   SOURCES
@@ -6,24 +9,21 @@ simmedtk_add_library(IO
     IOMeshVegaDelegate.cpp
     IOMeshVTKDelegate.cpp
   PUBLIC_HEADERS
-    Mesh.h
-    SurfaceMesh.h
-    VolumeMesh.h
-    VegaSceneObject.h
-    VegaSceneObjectDeformable.h
-    VegaSceneObjectWithRestPosition.h
+    IOMesh.h
+    IOMeshDelegate.h
 )
 
-target_link_libraries(Mesh
+target_link_libraries(IO
   PRIVATE
     Core
-    Rendering
+    Mesh
   PUBLIC
+    ${VTK_LIBRARIES}
     Assimp::Assimp
     VegaFEM::minivector
     VegaFEM::volumetricMesh
     )
 
 if(BUILD_TESTING)
-  add_subdirectory(UnitTests)
+#   add_subdirectory(UnitTests)
 endif()
