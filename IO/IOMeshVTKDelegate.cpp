@@ -22,8 +22,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include <array>
+#include <vector>
+
 #include "IO/IOMeshDelegate.h"
 #include "Core/Factory.h"
+#include "Mesh/SurfaceMesh.h"
+#include "Mesh/VegaVolumetricMesh.h"
 
 // VTK includes
 #include <vtkNew.h>
@@ -39,12 +44,34 @@
 class VTKMeshDelegate : public IOMeshDelegate
 {
 public:
+    enum MeshType 
+    {
+        None    = 0,
+        Tri     = 1 << 0,
+        Tetra   = 1 << 1,
+        Hexa    = 1 << 2,
+        hasMatrials = 1 << 3,
+        hasBDConditions = 1 << 4
+        
+    };
+    int meshProps;
+    
+public:
     void read() const
     {
         auto name = this->meshIO->getFileName().c_str();
         vtkPoints *points;
         vtkCellArray *cellArray;
         vtkFieldData *fieldData;
+        
+        std::vector<core::Vec3d> vertices;
+        std::vector<std::array<size_t,3>> triangleArray;
+        std::vector<std::array<size_t,4>> tetraArray;
+        std::vector<std::array<size_t,8>> hexaArray;
+        std::vector<size_t> bdConditions;
+        core::Vec3d materials;
+        
+        this->meshProps = 0;
 
         switch(this->meshIO->getFileType())
         {
@@ -56,9 +83,7 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
-                this->vtkPointsToLocal(points);
-                this->vtkCellsToLocal(cellArray);
-                this->vtkFieldsToLocal(fieldData);
+                this->meshProps |= MeshType::Tri;
                 break;
             }
             case IOMesh::MeshFileType::STL:
@@ -69,9 +94,7 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
-                this->vtkPointsToLocal(points);
-                this->vtkCellsToLocal(cellArray);
-                this->vtkFieldsToLocal(fieldData);
+                this->meshProps |= MeshType::Tri;
                 break;
             }
             case IOMesh::MeshFileType::PLY:
@@ -82,9 +105,7 @@ public:
                 points = reader->GetOutput()->GetPoints();
                 cellArray = reader->GetOutput()->GetPolys();
                 fieldData = reader->GetOutput()->GetFieldData();
-                this->vtkPointsToLocal(points);
-                this->vtkCellsToLocal(cellArray);
-                this->vtkFieldsToLocal(fieldData);
+                this->meshProps |= MeshType::Tri;
                 break;
             }
             default:
@@ -115,21 +136,51 @@ public:
                 {
                     std::cerr << "VTKMeshReaderDelegate: Unsupported dataset." << std::endl;
                 }
-                this->vtkPointsToLocal(points);
-                this->vtkCellsToLocal(cellArray);
-                this->vtkFieldsToLocal(fieldData);
             }
+        }
+        this->copyPoints(points,vertices);
+        this->copyCells(cellArray,triangleArray,tetraArray,hexaArray);
+        this->copyData(fieldData,bdConditions,materials);
+        
+        //--
+        if(this->meshProps & MeshType::Tetra)
+        {
+            if((this->meshProps & MeshType::hasBDConditions) && (this->meshProps & MeshType::hasMatrials))
+            {
+                this->setVegaTetraMesh(vertices,tetraArray,bdConditions,materials);
+            }
+            else
+            {
+                this->setVegaTetraMesh(vertices,tetraArray);
+            }
+            if(this->meshProps & MeshType::Tri)
+            {
+                auto surfaceMesh = std::make_shared<SurfaceMesh>();
+                std::vector<core::Vec3d> surfaceVertices;
+                for(auto &t: triangleArray)
+                {
+                    surfaceVertices.push_back(vertexArray[t(0)]);
+                    surfaceVertices.push_back(vertexArray[t(1)]);
+                    surfaceVertices.push_back(vertexArray[t(2)]);
+                }
+                surfaceMesh->setVertices(surfaceVertices);
+                surfaceMesh->setTriangles(triangleArray);
+                std::static_pointer_cast<VegaVolumetricMesh>(this->meshIO->getMesh())->attachSurfaceMesh(surfaceMesh,2.0);
+            }
+        }
+        else if((this->meshProps & MeshType::Tri) && !(this->meshProps & MeshType::Tetra))
+        {
+            this->setSurfaceMesh(vertices,triangleArray);
         }
     }
 
-    void vtkPointsToLocal(vtkPoints *points) const
+    void copyPoints(vtkPoints *points, std::vector<core::Vec3d> &vertices) const
     {
         if(!points)
         {
             std::cerr << "VTKMeshReaderDelegate: Not points found." << std::endl;
             return;
         }
-        auto &vertices = this->meshIO->getMesh()->getVertices();
         for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
         {
             double position[3];
@@ -139,15 +190,12 @@ public:
         }
     }
 
-    void vtkCellsToLocal(vtkCellArray *cells) const
+    bool copyCells(vtkCellArray *cells, std::vector<std::array<size_t,3>> &triangleArray, std::vector<std::array<size_t,4>> &tetraArray, std::vector<std::array<size_t,8>> &hexaArray) const
     {
         if(!cells)
         {
             return;
         }
-        auto &triangleArray = this->meshIO->getMesh()->getTriangles();
-        auto &tetraArray = this->meshIO->getMesh()->getTetrahedrons();
-        auto &hexaArray = this->meshIO->getMesh()->getHexahedrons();
 
         cells->InitTraversal();
         vtkNew<vtkIdList> element;
@@ -176,9 +224,21 @@ public:
                 }
             }
         }
+        if(triangleArray.size() > 0)
+        {
+            this->meshProps |= MeshType::Tri;
+        }
+        if(tetraArray.size() > 0)
+        {
+            this->meshProps |= MeshType::Tetra;
+        }
+        if(hexaArray.size() > 0)
+        {
+            this->meshProps |= MeshType::Hexa;
+        }
     }
 
-    void vtkFieldsToLocal(vtkFieldData *fields) const
+    void copyData(vtkFieldData *fields, std::vector<size_t> &constraints, core::Vec3d &material) const
     {
         if(!fields)
         {
@@ -188,19 +248,94 @@ public:
         double mass = 0;
         double poissonRatio = 0;
         double youngModulus = 0;
-        vtkUnsignedIntArray *boundaryConditions;
-        if(fields)
-        {
-            boundaryConditions = vtkUnsignedIntArray::SafeDownCast(fields->GetArray("boundary_conditions"));
-            mass = fields->GetArray("mass_density")->GetComponent(0,0);
-            poissonRatio = fields->GetArray("poisson_ratio")->GetComponent(0,0);
-            youngModulus = fields->GetArray("young_modulus")->GetComponent(0,0);
 
-            std::cout << "mass: " << mass << std::endl;
-            std::cout << "poissonRatio: " << poissonRatio << std::endl;
-            std::cout << "youngModulus: " << youngModulus << std::endl;
+        this->meshProps |= MeshType::hasMatrials;
+        
+        auto boundaryConditions = vtkUnsignedIntArray::SafeDownCast(fields->GetArray("boundary_conditions"));
+        if(boundaryConditions && boundaryConditions->GetNumberOfTuples() > 0)
+        {
+            this->meshProps |= MeshType::hasBDConditions;
+        }
+        if(fields->GetArray("mass_density"))
+        {
+            material(0) = fields->GetArray("mass_density")->GetComponent(0,0);
+        }
+        if(fields->GetArray("poisson_ratio"))
+        {
+            material(1) = fields->GetArray("poisson_ratio")->GetComponent(0,0);
+        }
+        if(fields->GetArray("young_modulus"))
+        {
+            material(2) = fields->GetArray("young_modulus")->GetComponent(0,0);
         }
     }
+    
+    void setSurfaceMesh(const std::vector<core::Vec3d> &vertices, 
+                        const std::vector<std::array<size_t,3>> &triangleArray)
+    {
+        auto mesh = std::make_shared<SurfaceMesh>();
+        mesh->setVertices(vertices);
+        mesh->setTriangles(triangleArray);
+        this->meshIO->setMesh(mesh);
+    }
+    
+    void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices, 
+                          const std::vector<std::array<size_t,4>> &tetraArray, 
+                          const std::vector<size_t> &bdConditions, 
+                          const core::Vec3d &material)
+    {
+        auto tetraMesh = std::make_shared<VegaVolumetricMesh>();
+        auto vegaMesh = std::make_shared<TetMesh>(vertices.size(),
+                                                  vertices.data().data(),
+                                                  tetraArray.size(),
+                                                  tetraArray.data().data(),
+                                                  material[0],
+                                                  material[1],
+                                                  material[2]);
+        tetraMesh->setVegaMesh(vegaMesh);
+        this->meshIO->setMesh(tetraMesh);        
+    }
+    
+    void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices, 
+                          const std::vector<std::array<size_t,4>> &tetraArray)
+    {
+        auto tetraMesh = std::make_shared<VegaVolumetricMesh>();
+        auto vegaMesh = std::make_shared<TetMesh>(vertices.size(),
+                                                  vertices.data().data(),
+                                                  tetraArray.size(),
+                                                  tetraArray.data().data());
+        tetraMesh->setVegaMesh(vegaMesh);
+        this->meshIO->setMesh(tetraMesh);        
+    }    
+    
+    void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices, 
+                         const std::vector<std::array<size_t,8>> &hexaArray, 
+                         const std::vector<size_t> &bdConditions, 
+                         const std::array<double,3> &material)
+    {
+        auto hexaMesh = std::make_shared<VegaVolumetricMesh>();
+        auto vegaMesh = std::make_shared<CubicMesh>(vertices.size(),
+                                                    vertices.data().data(),
+                                                    hexaArray.size(),
+                                                    hexaArray.data().data(),
+                                                    material[0],
+                                                    material[1],
+                                                    material[2]);
+        hexaMesh->setVegaMesh(vegaMesh);
+        this->meshIO->setMesh(hexaMesh);
+    }
+    
+    void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices, 
+                         const std::vector<std::array<size_t,8>> &hexaArray)
+    {
+        auto hexaMesh = std::make_shared<VegaVolumetricMesh>();
+        auto vegaMesh = std::make_shared<CubicMesh>(vertices.size(),
+                                                    vertices.data().data(),
+                                                    hexaArray.size(),
+                                                    hexaArray.data().data());
+        hexaMesh->setVegaMesh(vegaMesh);
+        this->meshIO->setMesh(hexaMesh);
+    }    
     void write(){}
 };
 
