@@ -31,6 +31,10 @@ void BaseMesh::updateOriginalVertsWithCurrent()
 {
     this->origVerts = this->vertices;
 }
+void BaseMesh::resetVertices()
+{
+    this->vertices = this->origVerts;
+}
 const std::vector<core::Vec3d>& BaseMesh::getVertices() const
 {
     return this->vertices;
@@ -99,8 +103,6 @@ std::size_t BaseMesh::getRenderingId() const
 {
     return this->renderingID;
 }
-
-
 void BaseMesh::setRenderingId( size_t id )
 {
     this->renderingID = id;
@@ -151,5 +153,6 @@ std::array<core::Vec3d,3> BaseMesh::getTriangleVertices(size_t i) const
     };
     return std::move(triangleVertices);
 }
+
 
 }

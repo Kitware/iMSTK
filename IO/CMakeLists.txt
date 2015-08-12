@@ -8,6 +8,7 @@ simmedtk_add_library(IO
     IOMeshAssimpDelegate.cpp
     IOMeshVegaDelegate.cpp
     IOMeshVTKDelegate.cpp
+    IOMesh3dsDelegate.cpp
   PUBLIC_HEADERS
     IOMesh.h
     IOMeshDelegate.h

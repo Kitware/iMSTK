@@ -34,7 +34,7 @@
 class AssimpMeshDelegate : public IOMeshDelegate
 {
 public:
-    void read() const
+    void read()
     {
         auto fileName = this->meshIO->getFileName().c_str();
         // Tell Assimp to not import any of the following from the mesh it loads

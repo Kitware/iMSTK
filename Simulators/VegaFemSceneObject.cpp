@@ -25,6 +25,8 @@
 #include "Simulators/VegaFemSceneObject.h"
 #include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
+#include "IO/IOMesh.h"
+#include "Mesh/VegaVolumetricMesh.h"
 
 #include <exception>
 
@@ -140,7 +142,7 @@ void VegaFemSceneObject::initialize()
     if (importAndUpdateVolumeMeshToSmtk)
     {
         this->volumeMesh = std::make_shared<VolumeMesh>();
-        this->volumeMesh->importVolumeMeshFromVegaFormat(this->volumetricMesh, true);
+        this->volumetricMesh->updateVertices();
     }
 
     this->primarySurfaceMesh = std::make_shared<SurfaceMesh>();
@@ -243,8 +245,13 @@ void VegaFemSceneObject::loadVolumeMesh()
         std::cout << "VEGA: Loading volumetric mesh from file "
                   << femConfig->volumetricMeshFilename << "..." << std::endl;
 
-        volumetricMesh = std::shared_ptr<VolumetricMesh>(
-            VolumetricMeshLoader::load(femConfig->volumetricMeshFilename));
+        auto ioMesh = std::make_shared<IOMesh>();
+        ioMesh->read(femConfig->volumetricMeshFilename);
+
+        volumetricMesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+
+//         volumetricMesh = std::shared_ptr<VolumetricMesh>(
+//             VolumetricMeshLoader::load(femConfig->volumetricMeshFilename));
 
         if (volumetricMesh == nullptr)
         {
@@ -253,11 +260,11 @@ void VegaFemSceneObject::loadVolumeMesh()
                                         << femConfig->volumetricMeshFilename << std::endl;
         }
 
-        numNodes = volumetricMesh->getNumVertices();
+        numNodes = volumetricMesh->getNumberOfVertices();
         std::cout << "VEGA: Num vertices: " << numNodes <<
-                         ". Num elements: " << volumetricMesh->getNumElements() << std::endl;
+                         ". Num elements: " << volumetricMesh->getNumberOfElements() << std::endl;
 
-        meshGraph = std::shared_ptr<Graph>(GenerateMeshGraph::Generate(volumetricMesh.get()));
+        meshGraph = volumetricMesh->getMeshGraph();
 
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
@@ -271,7 +278,7 @@ void VegaFemSceneObject::loadVolumeMesh()
                 std::cout << "VEGA: mass matrix file was not specified! Generating mass matrix file. \n";
 
                 SparseMatrix *tempMassMatrix;
-                GenerateMassMatrix::computeMassMatrix(volumetricMesh.get(), &tempMassMatrix, false);
+                GenerateMassMatrix::computeMassMatrix(volumetricMesh->getVegaMesh().get(), &tempMassMatrix, false);
 
                 std::cout << femConfig->massMatrixFilename << std::endl;
                 if (tempMassMatrix->Save(femConfig->massMatrixFilename)!=0)
@@ -311,7 +318,7 @@ void VegaFemSceneObject::loadVolumeMesh()
 
             unsigned int loadingFlag = 0; // 0 = use low-memory version, 1 = use high-memory version
             std::shared_ptr<StVKElementABCD> precomputedIntegrals =
-                std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh.get(), loadingFlag));
+                std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh->getVegaMesh().get(), loadingFlag));
 
             if (precomputedIntegrals == nullptr)
             {
@@ -323,12 +330,12 @@ void VegaFemSceneObject::loadVolumeMesh()
             fflush(nullptr);
 
             if (femConfig->numInternalForceThreads == 0)
-                stVKInternalForces = std::make_shared<StVKInternalForces>(volumetricMesh.get(),
+                stVKInternalForces = std::make_shared<StVKInternalForces>(volumetricMesh->getVegaMesh().get(),
                 precomputedIntegrals.get(),
                 femConfig->addGravity,
                 femConfig->g);
             else
-                stVKInternalForces = std::make_shared<StVKInternalForcesMT>(volumetricMesh.get(),
+                stVKInternalForces = std::make_shared<StVKInternalForcesMT>(volumetricMesh->getVegaMesh().get(),
                 precomputedIntegrals.get(), femConfig->addGravity,
                 femConfig->g, femConfig->numInternalForceThreads);
 
@@ -367,7 +374,7 @@ void VegaFemSceneObject::loadSurfaceMesh()
         {
             std::cout << "VEGA: Generating primary rendering mesh.\n";
 
-            std::shared_ptr<ObjMesh> objMesh(GenerateSurfaceMesh::ComputeMesh(volumetricMesh.get(), false));
+            std::shared_ptr<ObjMesh> objMesh(GenerateSurfaceMesh::ComputeMesh(volumetricMesh->getVegaMesh().get(), false));
 
             objMesh->save(femConfig->renderingMeshFilename);
 
@@ -377,6 +384,7 @@ void VegaFemSceneObject::loadSurfaceMesh()
             std::cout << "VEGA: Loading primary rendering mesh: "<< femConfig->renderingMeshFilename <<" \n";
         }
     }
+
 
     vegaPrimarySurfaceMesh = std::make_shared<VegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
     if (!vegaPrimarySurfaceMesh->GetMesh())
@@ -392,10 +400,10 @@ void VegaFemSceneObject::loadSurfaceMesh()
 
     if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
     {
-        vegaSecondarySurfaceMesh = std::make_shared<VegaSceneObjectDeformable>(
-                                                    femConfig->secondaryRenderingMeshFilename);
+        auto ioMesh = std::make_shared<IOMesh>();
+        ioMesh->read(femConfig->secondaryRenderingMeshFilename);
 
-        if (vegaSecondarySurfaceMesh == nullptr)
+        if (ioMesh->getMesh() == nullptr)
         {
             std::cout << "VEGA: Secondary rendering mesh is not initialized!\n";
             throw std::runtime_error("No secondary rendering mesh provided.");
@@ -403,8 +411,8 @@ void VegaFemSceneObject::loadSurfaceMesh()
         else
         {
             std::cout << "VEGA: Secondary rendering mesh is initialized:\n\t\t"
-                << vegaSecondarySurfaceMesh->GetNumVertices() << " vertices\n\t\t"
-                << vegaSecondarySurfaceMesh->GetNumFaces() << " faces\n";
+                << ioMesh->getMesh()->getNumberOfVertices() << " vertices\n\t\t"
+                << ioMesh->getMesh()->getTriangles().size() << " faces\n";
         }
 
         vegaSecondarySurfaceMesh->ResetDeformationToRest();
@@ -724,7 +732,7 @@ void VegaFemSceneObject::createForceModel()
     }
     case VegaObjectConfig::COROTLINFEM:
     {
-        TetMesh * tetMesh = dynamic_cast<TetMesh*>(volumetricMesh.get());
+        TetMesh * tetMesh = dynamic_cast<TetMesh*>(volumetricMesh->getVegaMesh().get());
 
         if (tetMesh == nullptr)
         {

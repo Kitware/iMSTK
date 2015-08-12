@@ -36,7 +36,7 @@
 class VegaMeshDelegate : public IOMeshDelegate
 {
 public:
-    void read() const
+    void read()
     {
         // const cast to silence warnings later on
         auto name = const_cast<char*>(this->meshIO->getFileName().c_str());

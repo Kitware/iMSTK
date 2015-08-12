@@ -79,6 +79,11 @@ public:
     void updateOriginalVertsWithCurrent();
 
     ///
+    /// \brief Copy vertices into origVerts
+    ///
+    void resetVertices();
+
+    ///
     /// \brief Accessors for vertex coordinates
     ///
     const std::vector<core::Vec3d> &getVertices() const;

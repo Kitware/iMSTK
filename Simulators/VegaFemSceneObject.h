@@ -65,6 +65,8 @@
 #include "generateSurfaceMesh.h"
 #include "generateMassMatrix.h"
 
+class VegaVolumetricMesh;
+
 /// \brief Base class for any scene object that is defmormable
 /// and uses FE formulation to compute the evolution of configuration
 /// in time.
@@ -217,7 +219,7 @@ private:
     std::shared_ptr<CorotationalLinearFEMForceModel> corotationalLinearFEMForceModel;
 
     // Volume meshes and related graphs
-    std::shared_ptr<VolumetricMesh> volumetricMesh; ///< volume mesh
+    std::shared_ptr<VegaVolumetricMesh> volumetricMesh; ///< volume mesh
     std::shared_ptr<TetMesh> tetMesh; ///< volume mesh
     std::shared_ptr<Graph> meshGraph; ///< graph of the mesh
 

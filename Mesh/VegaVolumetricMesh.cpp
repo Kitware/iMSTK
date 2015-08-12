@@ -32,6 +32,7 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 #include "graph.h"
+#include "vec3d.h"
 
 VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
 VegaVolumetricMesh::~VegaVolumetricMesh() {}
@@ -153,5 +154,23 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr< VolumetricMesh > newMesh)
     {
         meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(this->mesh.get()));
     }
+}
+void VegaVolumetricMesh::updateSurfaceVertices()
+{
+    int numNodes = this->mesh->getNumVertices();
+    this->vertices.resize(numNodes);
+
+    for(int i = 0; i < numNodes; ++i)
+    {
+        this->mesh->getVertex(i)->convertToArray(vertices[i].data());
+    }
+}
+std::unordered_map<size_t,size_t>& VegaVolumetricMesh::getVertexMap()
+{
+    return this->vertexMap;
+}
+void VegaVolumetricMesh::setVertexMap(const std::unordered_map< std::size_t, std::size_t >& map)
+{
+    this->vertexMap = map;
 }
 
