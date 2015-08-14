@@ -186,7 +186,6 @@ protected:
 
     std::vector<int> fixedVertices; ///< fixed vertcies
 
-    std::shared_ptr<VolumeMesh> volumeMesh;
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
 };

@@ -53,11 +53,6 @@ public:
     ~VegaVolumetricMesh();
 
     ///
-    /// \brief Loads vega volume mesh and stores it locally
-    ///
-    void loadMesh(const std::string &fileName, const int &verbose);
-
-    ///
     /// \brief Returns graph
     /// Note that this does not check if the graph is valid
     ///
@@ -101,12 +96,12 @@ public:
     ///
     /// \brief Update nodes to local arrays
     ///
-    void updateSurfaceVertices();
+    void updateAttachedMeshes(double *q);
 
     ///
     /// \brief Return the vertex map
     ///
-    std::unordered_map<size_t,size_t> &getVertexMap() const;
+    const std::unordered_map<size_t,size_t> &getVertexMap() const;
 
     ///
     /// \brief Sets the vertex map

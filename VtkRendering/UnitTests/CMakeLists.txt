@@ -7,5 +7,5 @@ add_executable(${Module}UnitTestRunner
 )
 
 target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
-target_link_libraries(${Module}UnitTestRunner Core Mesh VtkRendering Geometry)
+target_link_libraries(${Module}UnitTestRunner Core Mesh VtkRendering Geometry Rendering)
 simple_test(${Module} --reporter=xunit)

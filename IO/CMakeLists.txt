@@ -26,5 +26,5 @@ target_link_libraries(IO
     )
 
 if(BUILD_TESTING)
-#   add_subdirectory(UnitTests)
+  add_subdirectory(UnitTests)
 endif()

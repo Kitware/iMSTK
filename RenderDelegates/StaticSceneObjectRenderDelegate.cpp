@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Geometry.h"
 #include "Core/StaticSceneObject.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"

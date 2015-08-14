@@ -51,6 +51,7 @@ public:
         STL,
         PLY,
         VEG,
+        ThreeDS,
         Unknown
     };
 

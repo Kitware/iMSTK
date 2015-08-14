@@ -57,7 +57,9 @@ int main()
     keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
     auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
+    TextureManager::addTexture("textures/cube.png", "cubetex");
+    cubeModel->load("models/cube.obj");
+    std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     cubeModel->setRenderDetail(renderDetail);
@@ -74,8 +76,8 @@ int main()
     TextureManager::createDepthTexture("depthTex1", 64, 64);
 
     std::shared_ptr<MeshModel> squareModel = std::make_shared<MeshModel>();
-    squareModel->load("models/square.obj", Core::BaseMesh::MeshFileType::Obj);
-    squareModel->getMesh()->assignTexture("","colorTex1");
+    squareModel->load("models/square.obj");
+    std::static_pointer_cast<SurfaceMesh>(squareModel->getMesh())->assignTexture("colorTex1");
     renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     squareModel->setRenderDetail(renderDetail);
 
@@ -85,8 +87,8 @@ int main()
     //Setup an FBO for rendering in the viewer.
     //Add the FBO and textures to the viewer
     viewer->addFBO("fbo1",
-                  TextureManager::getTexture("colorTex1"),
-                  TextureManager::getTexture("depthTex1"),
+                  TextureManager::getTexture("colorTex1").get(),
+                  TextureManager::getTexture("depthTex1").get(),
                   64, 64);
 
     //Add the square to the scene

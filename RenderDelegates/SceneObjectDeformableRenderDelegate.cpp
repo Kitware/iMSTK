@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Simulators/SceneObjectDeformable.h"
@@ -30,27 +31,30 @@
 class SceneObjectDeformableRenderDelegate : public RenderDelegate
 {
 public:
-  virtual void draw() const override;
+    virtual void draw() const override;
 };
 
 void SceneObjectDeformableRenderDelegate::draw() const
 {
-  auto geom = this->getSourceGeometryAs<SceneObjectDeformable>();
-  if (!geom)
-    return;
+    auto geom = this->getSourceGeometryAs<SceneObjectDeformable>();
 
-  if (geom->renderSecondaryMesh && !!geom->getSecondarySurfaceMesh())
+    if(!geom)
     {
-    geom->getSecondarySurfaceMesh()->draw();
+        return;
     }
-  else
+
+    if(geom->renderSecondaryMesh && !!geom->getSecondarySurfaceMesh())
     {
-    geom->getPrimarySurfaceMesh()->draw();
+        geom->getSecondarySurfaceMesh()->draw();
+    }
+    else
+    {
+        geom->getPrimarySurfaceMesh()->draw();
     }
 }
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_scene_object_deformable_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SceneObjectDeformableRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_BEGIN_ONLOAD(register_scene_object_deformable_render_delegate)
+SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SceneObjectDeformableRenderDelegate,2000);
+SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

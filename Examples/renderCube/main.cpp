@@ -60,7 +60,9 @@ int main()
     pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
 
     auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
+    TextureManager::addTexture("textures/cube.png", "cubetex");
+    cubeModel->load("models/cube.obj");
+    std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     cubeModel->setRenderDetail(renderDetail);

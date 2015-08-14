@@ -21,44 +21,30 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include <bandit/bandit.h>
 #include <memory>
 
+// SimMedTK includes
+#include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
+#include "IO/IOMesh.h"
 
-std::shared_ptr<SurfaceMesh> makeSurfaceMesh()
-{
-    std::vector<core::Vec3d> vertices =
-    {
-        {-0.5,-0.5, -0.5},
-        {-0.5, -0.5, 0.5},
-        {-0.5, 0.5, -0.5},
-        {-0.5, 0.5, 0.5},
-        {0.5, -0.5, -0.5},
-        {0.5, -0.5, 0.5},
-        {0.5, 0.5, -0.5},
-        {0.5, 0.5, 0.5},
-        {3.5527136788e-09,-1.7763568394e-09, 0}
-    };
+const std::string vegaMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.veg";
 
-    std::vector<std::array<size_t,3>> triangles  =
-    {
-        {{0, 1, 2}},
-        {{0, 4, 1}},
-        {{0, 2, 4}},
-        {{3, 2, 1}},
-        {{1, 5, 3}},
-        {{5, 1, 4}},
-        {{2, 3, 6}},
-        {{6, 4, 2}},
-        {{7, 3, 5}},
-        {{7, 6, 3}},
-        {{4, 6, 5}},
-        {{7, 5, 6}}
-    };
+using namespace bandit;
 
-    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
-    mesh->getVertices() = vertices;
-    mesh->setTriangles(triangles);
+go_bandit([](){
 
-    return mesh;
-}
+    describe("Vega Volumetric Mesh", []() {
+        it("constructs", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            AssertThat(io != nullptr, IsTrue());
+        });
+        it("loads mesh", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            io->read(vegaMeshFileName);
+            AssertThat(io->getMesh() != nullptr, IsTrue());
+        });
+
+    });
+});

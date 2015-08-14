@@ -70,22 +70,22 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
         // Create collision models
     std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
-    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
-    collisionModelA->getMesh()->assignTexture("","livertexture1");
-    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    Eigen::Translation3d t(core::Vec3d(7, 3, 0));
-    collisionModelA->getMesh()->translate(t);
-    collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
-    collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    auto mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelA->getMesh());
+    mesh->assignTexture("livertexture1");
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->getRenderDetail()->lineSize = 2;
+    mesh->getRenderDetail()->pointSize = 5;
 
     std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
-    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
-    collisionModelB->getMesh()->assignTexture("","livertexture2");
-    t.vector() = core::Vec3d(2, 0, 0);
-    collisionModelB->getMesh()->translate(t);
-    collisionModelB->getMesh()->assignTexture("","livertexture2");
-    collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelB->getMesh());
+    mesh->assignTexture("livertexture2");
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->assignTexture("livertexture2");
+    mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Create a static scene
     modelA = std::make_shared<StaticSceneObject>();
@@ -95,14 +95,14 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     // Attach object to the dummy simulator. it will be simulated by dummy simulator
     modelA->attachObjectSimulator(defaultSimulator);
-    spatialHashing->addMesh(collisionModelA->getMesh());
+    spatialHashing->addModel(collisionModelA);
 
     // Initialize the scecond object
     modelB = std::make_shared<StaticSceneObject>();
     sdk->registerSceneObject(modelB);
     sdk->registerMesh(collisionModelB->getMesh());
 
-    spatialHashing->addMesh(collisionModelB->getMesh());
+    spatialHashing->addModel(collisionModelB);
 
     // Add object to the scene
     scene->addSceneObject(modelA);
@@ -110,12 +110,10 @@ CollisionDetectionSpatialHashing::CollisionDetectionSpatialHashing()
 
     // Setup Scene lighting
     auto light = Light::getDefaultLighting();
-    assert(light);
     scene->addLight(light);
 
     // Camera setup
     std::shared_ptr<Camera> sceneCamera = Camera::getDefaultCamera();
-    assert(sceneCamera);
     scene->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
 

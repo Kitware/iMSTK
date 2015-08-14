@@ -44,6 +44,7 @@ public:
     typedef std::shared_ptr<IOMeshDelegate> Ptr;
 
 public:
+    IOMeshDelegate() : meshProps(0){}
     void setSource(IOMesh *src)
     {
         meshIO = src;
@@ -51,6 +52,18 @@ public:
 
     virtual void read() { }
     virtual void write(){ }
+
+    enum MeshType
+    {
+        None    = 0,
+        Tri     = 1 << 0,
+        Tetra   = 1 << 1,
+        Hexa    = 1 << 2,
+        hasMaterials = 1 << 3,
+        hasBDConditions = 1 << 4
+
+    };
+    int meshProps;
 
 protected:
     void setSurfaceMesh(const std::vector<core::Vec3d> &vertices,

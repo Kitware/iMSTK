@@ -57,7 +57,10 @@ public:
     }
     std::shared_ptr<IOMeshDelegate> get(const MeshFileType &type)
     {
-        return this->delegatorList[type]();
+        auto f = static_cast<DelegatorFunction>(this->delegatorList.at(type));
+        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroupAs("VegaMeshDelegate",ReaderGroup::Vega);
+        auto fun = f();
+        return f();
     }
 
 public:
@@ -87,6 +90,11 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     //
     // Default reader for unknown filetypes is assimp
     this->delegator->addDefaultDelegator(MeshFileType::VTP,"IOMeshDelegate");
+    //
+    // Default reader for 3ds filetypes is assimp
+    this->delegator->addDefaultDelegator(MeshFileType::ThreeDS,"IOMeshDelegate");
+
+
 }
 IOMesh::~IOMesh() {}
 void IOMesh::read(const std::string& filePath)
@@ -116,34 +124,39 @@ void IOMesh::checkFileType()
     }
     std::string extension = this->fileName.substr(this->fileName.find_last_of(".") + 1);
 
-    if (extension =="vtk")
+    if (extension =="vtk" || extension =="VTK")
     {
         this->fileType = MeshFileType::VTK;
         return;
     }
-    if (extension =="vtp")
+    if (extension =="vtp" || extension =="VTP")
     {
         this->fileType = MeshFileType::VTP;
         return;
     }
-    if (extension =="obj")
+    if (extension =="obj" || extension =="OBJ")
     {
         this->fileType = MeshFileType::OBJ;
         return;
     }
-    if (extension =="stl")
+    if (extension =="stl" || extension =="STL")
     {
         this->fileType = MeshFileType::STL;
         return;
     }
-    if (extension =="ply")
+    if (extension =="ply" || extension =="PLY")
     {
         this->fileType = MeshFileType::PLY;
         return;
     }
-    if (extension =="veg")
+    if (extension =="veg" || extension =="VEG")
     {
         this->fileType = MeshFileType::VEG;
+        return;
+    }
+    if (extension =="3ds" || extension =="3DS")
+    {
+        this->fileType = MeshFileType::ThreeDS;
         return;
     }
     this->fileType = MeshFileType::Unknown;

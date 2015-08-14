@@ -26,7 +26,7 @@
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
-#include "Core/BaseMesh.h"
+#include "Mesh/SurfaceMesh.h"
 
 #include "VtkRendering/MeshNodalCoordinates.h"
 #include "VtkRendering/VtkRenderDelegate.h"
@@ -71,22 +71,23 @@ void MeshRenderDelegate::initDraw()
     vtkNew<vtkPoints> vertices;
     vtkNew<vtkCellArray> triangles;
 
-    auto geom = this->getSourceGeometryAs<Mesh>();
+    auto geom = this->getSourceGeometryAs<SurfaceMesh>();
     if (!geom)
     {
         return;
     }
 
-    auto mesh = std::dynamic_pointer_cast<Mesh>(geom->shared_from_this());
+    auto mesh = std::static_pointer_cast<SurfaceMesh>(geom->shared_from_this());
 
     mappedData->SetVertexArray(mesh->getVertices());
 
-    for(size_t i = 0; i < mesh->triangles.size(); ++i)
+    auto surfaceTriangles = mesh->getTriangles();
+    for(const auto &t : surfaceTriangles)
     {
         vtkIdType    cell[3];
-        cell[0] = mesh->triangles[i].vert[0];
-        cell[1] = mesh->triangles[i].vert[1];
-        cell[2] = mesh->triangles[i].vert[2];
+        cell[0] = t[0];
+        cell[1] = t[1];
+        cell[2] = t[2];
         triangles->InsertNextCell(3,cell);
     }
 
@@ -144,7 +145,7 @@ void MeshRenderDelegate::initDraw()
 
 bool MeshRenderDelegate::isTargetTextured() const
 {
-    auto geom = this->getSourceGeometryAs<Mesh>();
+    auto geom = this->getSourceGeometryAs<SurfaceMesh>();
     if (!geom)
         return false;
 

@@ -43,19 +43,6 @@
 class VTKMeshDelegate : public IOMeshDelegate
 {
 public:
-    enum MeshType
-    {
-        None    = 0,
-        Tri     = 1 << 0,
-        Tetra   = 1 << 1,
-        Hexa    = 1 << 2,
-        hasMaterials = 1 << 3,
-        hasBDConditions = 1 << 4
-
-    };
-    int meshProps;
-
-public:
     ///
     /// \brief
     ///
@@ -168,7 +155,7 @@ public:
 
                 auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(
                     this->meshIO->getMesh());
-                vegaMesh->setVertexMap() = uniqueVertexArray;
+                vegaMesh->setVertexMap(uniqueVertexArray);
                 vegaMesh->attachSurfaceMesh(meshToAttach);
             }
             else
@@ -194,9 +181,9 @@ public:
 
                 auto meshToAttach = std::make_shared<SurfaceMesh>();
                 meshToAttach->setVertices(surfaceVertices);
-                meshToAttach->setTriangles(triangleArray);
-                std::static_pointer_cast<VegaVolumetricMesh>(
-                    this->meshIO->getMesh())->attachSurfaceMesh(meshToAttach);
+                meshToAttach->setTriangles(localTriangleArray);
+                vegaMesh->setVertexMap(uniqueVertexArray);
+                vegaMesh->attachSurfaceMesh(meshToAttach);
             }
         }
         else if((this->meshProps & MeshType::Tri) && !(this->meshProps & MeshType::Tetra))
@@ -239,20 +226,31 @@ public:
             {
                 case 3:
                 {
-                    std::array<size_t,3> e = {element->GetId(0),element->GetId(1),element->GetId(2)};
+                    std::array<size_t,3> e = {element->GetId(0),
+                        element->GetId(1),
+                        element->GetId(2)};
                     triangleArray.emplace_back(e);
                     break;
                 }
                 case 4:
                 {
-                    std::array<size_t,4> e = {element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3)};
+                    std::array<size_t,4> e = {element->GetId(0),
+                        element->GetId(1),
+                        element->GetId(2),
+                        element->GetId(3)};
                     tetraArray.emplace_back(e);
                     break;
                 }
                 case 8:
                 {
-                    std::array<size_t,8> e = {element->GetId(0),element->GetId(1),element->GetId(2),element->GetId(3),
-                                              element->GetId(4),element->GetId(5),element->GetId(6),element->GetId(7)};
+                    std::array<size_t,8> e = {element->GetId(0),
+                        element->GetId(1),
+                        element->GetId(2),
+                        element->GetId(3),
+                        element->GetId(4),
+                        element->GetId(5),
+                        element->GetId(6),
+                        element->GetId(7)};
                     hexaArray.emplace_back(e);
                     break;
                 }

@@ -188,3 +188,16 @@ const std::vector< bool >& RenderDetail::getVAOEnable() const
 {
     return this->VAOEnable;
 }
+GeometrySource::GeometrySource()
+    : sceneObject(nullptr), analyticObject(nullptr)
+{ }
+void GeometrySource::setSource(CoreClass* src)
+{
+    this->sceneObject = src;
+    this->analyticObject = nullptr;
+}
+void GeometrySource::setSource(VisualArtifact* src)
+{
+    this->sceneObject = nullptr;
+    this->analyticObject = src;
+}

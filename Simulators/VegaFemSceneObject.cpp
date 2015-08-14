@@ -139,29 +139,6 @@ void VegaFemSceneObject::initialize()
     loadVolumeMesh();
     loadSurfaceMesh();
 
-    if (importAndUpdateVolumeMeshToSmtk)
-    {
-        this->volumeMesh = std::make_shared<VolumeMesh>();
-        this->volumetricMesh->updateVertices();
-    }
-
-    this->primarySurfaceMesh = std::make_shared<SurfaceMesh>();
-
-    this->primarySurfaceMesh->importSurfaceMeshFromVegaFormat(
-        this->vegaPrimarySurfaceMesh->GetMesh(), true);
-
-    if (
-      femConfig->secondaryRenderingMeshFilename[0] &&
-      (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0))
-    {
-        this->secondarySurfaceMesh = std::make_shared<SurfaceMesh>();
-
-        this->secondarySurfaceMesh->importSurfaceMeshFromVegaFormat(
-            this->vegaSecondarySurfaceMesh->GetMesh(), true);
-
-        this->setRenderSecondaryMesh();
-    }
-
     loadFixedBC();
 
     // make room for deformation and force vectors
@@ -181,21 +158,6 @@ void VegaFemSceneObject::initialize()
     performaceTracker.objectPerformanceCounter.StartCounter();
 
     std::cout << "Inititializing fem object done. \n";
-
-    primarySurfaceMesh->printPrimitiveDetails();
-
-    primarySurfaceMesh->initVertexNeighbors();
-    primarySurfaceMesh->updateTriangleNormals();
-    primarySurfaceMesh->updateVertexNormals();
-
-    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
-    {
-        secondarySurfaceMesh->printPrimitiveDetails();
-
-        secondarySurfaceMesh->initVertexNeighbors();
-        secondarySurfaceMesh->updateTriangleNormals();
-        secondarySurfaceMesh->updateVertexNormals();
-    }
 }
 
 void VegaFemSceneObject::setDeformableModelType()
@@ -234,7 +196,6 @@ void VegaFemSceneObject::setDeformableModelType()
 
 void VegaFemSceneObject::loadVolumeMesh()
 {
-
     // load mesh
     if ((femConfig->deformableObject == VegaObjectConfig::STVK) ||
         (femConfig->deformableObject == VegaObjectConfig::COROTLINFEM) ||
@@ -250,9 +211,6 @@ void VegaFemSceneObject::loadVolumeMesh()
 
         volumetricMesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
 
-//         volumetricMesh = std::shared_ptr<VolumetricMesh>(
-//             VolumetricMeshLoader::load(femConfig->volumetricMeshFilename));
-
         if (volumetricMesh == nullptr)
         {
             PRINT_ERROR_LOCATION
@@ -261,10 +219,8 @@ void VegaFemSceneObject::loadVolumeMesh()
         }
 
         numNodes = volumetricMesh->getNumberOfVertices();
-        std::cout << "VEGA: Num vertices: " << numNodes <<
+        std::cout << "VEGA: Num vertices: " << volumetricMesh->getNumberOfVertices() <<
                          ". Num elements: " << volumetricMesh->getNumberOfElements() << std::endl;
-
-        meshGraph = volumetricMesh->getMeshGraph();
 
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
@@ -281,7 +237,7 @@ void VegaFemSceneObject::loadVolumeMesh()
                 GenerateMassMatrix::computeMassMatrix(volumetricMesh->getVegaMesh().get(), &tempMassMatrix, false);
 
                 std::cout << femConfig->massMatrixFilename << std::endl;
-                if (tempMassMatrix->Save(femConfig->massMatrixFilename)!=0)
+                if (tempMassMatrix->Save(femConfig->massMatrixFilename) != 0)
                 {
                     PRINT_ERROR_LOCATION
                     std::cout << "VEGA:  error saving mass matrix"
@@ -317,8 +273,7 @@ void VegaFemSceneObject::loadVolumeMesh()
         {
 
             unsigned int loadingFlag = 0; // 0 = use low-memory version, 1 = use high-memory version
-            std::shared_ptr<StVKElementABCD> precomputedIntegrals =
-                std::shared_ptr<StVKElementABCD>(StVKElementABCDLoader::load(volumetricMesh->getVegaMesh().get(), loadingFlag));
+            auto precomputedIntegrals = StVKElementABCDLoader::load(volumetricMesh->getVegaMesh().get(), loadingFlag);
 
             if (precomputedIntegrals == nullptr)
             {
@@ -330,25 +285,30 @@ void VegaFemSceneObject::loadVolumeMesh()
             fflush(nullptr);
 
             if (femConfig->numInternalForceThreads == 0)
-                stVKInternalForces = std::make_shared<StVKInternalForces>(volumetricMesh->getVegaMesh().get(),
-                precomputedIntegrals.get(),
-                femConfig->addGravity,
-                femConfig->g);
-            else
-                stVKInternalForces = std::make_shared<StVKInternalForcesMT>(volumetricMesh->getVegaMesh().get(),
-                precomputedIntegrals.get(), femConfig->addGravity,
-                femConfig->g, femConfig->numInternalForceThreads);
-
-            if (femConfig->numInternalForceThreads == 0)
             {
+                stVKInternalForces = std::make_shared<StVKInternalForces>(
+                    volumetricMesh->getVegaMesh().get(),
+                    precomputedIntegrals,
+                    femConfig->addGravity,
+                    femConfig->g);
                 stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrix>(stVKInternalForces.get());
             }
             else
-                stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrixMT>(stVKInternalForces.get(),
-                femConfig->numInternalForceThreads);
+            {
+                stVKInternalForces = std::make_shared<StVKInternalForcesMT>(
+                    volumetricMesh->getVegaMesh().get(),
+                    precomputedIntegrals,
+                    femConfig->addGravity,
+                    femConfig->g,
+                    femConfig->numInternalForceThreads);
+                stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrixMT>(
+                    stVKInternalForces.get(),
+                    femConfig->numInternalForceThreads);
+            }
         }
     }
 
+    auto meshGraph = volumetricMesh->getMeshGraph();
     if (meshGraph)
     {
         int scaleRows = 1;
@@ -361,42 +321,7 @@ void VegaFemSceneObject::loadVolumeMesh()
 
 void VegaFemSceneObject::loadSurfaceMesh()
 {
-    // initialize the rendering mesh for the volumetric mesh
-    if (strcmp(femConfig->renderingMeshFilename, "__none") == 0)
-    {
-        std::cout << "VEGA: rendering mesh was not specified!\n";
-
-        std::string rendFilenameStr(femConfig->volumetricMeshFilename);
-        rendFilenameStr += ".mass";
-        std::ifstream renderingFileName(rendFilenameStr);
-
-        if (!renderingFileName.good())
-        {
-            std::cout << "VEGA: Generating primary rendering mesh.\n";
-
-            std::shared_ptr<ObjMesh> objMesh(GenerateSurfaceMesh::ComputeMesh(volumetricMesh->getVegaMesh().get(), false));
-
-            objMesh->save(femConfig->renderingMeshFilename);
-
-        }
-        else
-        {
-            std::cout << "VEGA: Loading primary rendering mesh: "<< femConfig->renderingMeshFilename <<" \n";
-        }
-    }
-
-
-    vegaPrimarySurfaceMesh = std::make_shared<VegaSceneObjectDeformable>(femConfig->renderingMeshFilename);
-    if (!vegaPrimarySurfaceMesh->GetMesh())
-      return; // Go no further if given an invalid filename
-
-    vegaPrimarySurfaceMesh->ResetDeformationToRest();
-    vegaPrimarySurfaceMesh->BuildNeighboringStructure();
-    vegaPrimarySurfaceMesh->BuildNormals();
-    //vegaPrimarySurfaceMesh->SetMaterialAlpha(0.5);
-
     // initialize the embedded triangle rendering mesh
-    vegaSecondarySurfaceMesh = nullptr;
 
     if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") != 0)
     {
@@ -414,41 +339,8 @@ void VegaFemSceneObject::loadSurfaceMesh()
                 << ioMesh->getMesh()->getNumberOfVertices() << " vertices\n\t\t"
                 << ioMesh->getMesh()->getTriangles().size() << " faces\n";
         }
-
-        vegaSecondarySurfaceMesh->ResetDeformationToRest();
-        vegaSecondarySurfaceMesh->BuildNeighboringStructure();
-        vegaSecondarySurfaceMesh->BuildNormals();
-
-        uSecondary.resize(3 * vegaSecondarySurfaceMesh->Getn());
-
-        // load interpolation structure
-        if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
-        {
-            PRINT_ERROR_LOCATION
-            std::cout << "VEGA:  error! no secondary rendering mesh interpolation filename specified.\n";
-        }
-
-        numInterpolationElementVerts =
-            VolumetricMesh::getNumInterpolationElementVertices(
-            femConfig->secondaryRenderingMeshInterpolationFilename);
-
-        if (numInterpolationElementVerts < 0)
-        {
-            PRINT_ERROR_LOCATION
-            std::cout << "VEGA: error! unable to open file " <<
-                femConfig->secondaryRenderingMeshInterpolationFilename << "." << std::endl;
-        }
-
-        std::cout << "VEGA: Num interpolation element vertices:" <<
-            numInterpolationElementVerts << std::endl;
-
-        VolumetricMesh::loadInterpolationWeights(
-            femConfig->secondaryRenderingMeshInterpolationFilename,
-            vegaSecondarySurfaceMesh->Getn(),
-            numInterpolationElementVerts,
-            &interpolationVertices,
-            &interpolationWeights
-            );
+        auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+        this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
     }
 }
 
@@ -903,10 +795,7 @@ void VegaFemSceneObject::advanceDynamics()
             u[i] = q[i];
         }
 
-        if (importAndUpdateVolumeMeshToSmtk)
-        {
-            this->volumeMesh->updateVolumeMeshFromVegaFormat(this->volumetricMesh);
-        }
+        this->volumetricMesh->updateAttachedMeshes(q);
 
         if (femConfig->singleStepMode == 1)
         {
@@ -927,38 +816,6 @@ void VegaFemSceneObject::advanceDynamics()
         }
     }
 
-    vegaPrimarySurfaceMesh->SetVertexDeformations(u.data());
-
-    // update the secondary mesh
-    updateSecondaryRenderingMesh();
-
-    if (strcmp(femConfig->secondaryRenderingMeshFilename, "__none") == 0)
-    {
-        this->primarySurfaceMesh->updateSurfaceMeshFromVegaFormat(
-            this->vegaPrimarySurfaceMesh->GetMesh());
-
-        primarySurfaceMesh->updateTriangleNormals();
-        primarySurfaceMesh->updateVertexNormals();
-    }
-    else
-    {
-        this->primarySurfaceMesh->updateSurfaceMeshFromVegaFormat(
-            this->vegaPrimarySurfaceMesh->GetMesh());
-
-        if (!renderSecondaryMesh)
-        {
-            primarySurfaceMesh->updateTriangleNormals();
-            primarySurfaceMesh->updateVertexNormals();
-        }
-        else
-        {
-            this->secondarySurfaceMesh->updateSurfaceMeshFromVegaFormat(
-                this->vegaSecondarySurfaceMesh->GetMesh());
-
-            secondarySurfaceMesh->updateTriangleNormals();
-            secondarySurfaceMesh->updateVertexNormals();
-        }
-    }
     // update stasts
     updatePerformanceMetrics();
 }
@@ -1021,7 +878,8 @@ inline void VegaFemSceneObject::advanceOneTimeStep()
 
 void VegaFemSceneObject::setPulledVertex(const core::Vec3d &userPos)
 {
-    pulledVertex = this->volumetricMesh->getClosestVertex(Vec3d(userPos(0), userPos(1), userPos(2)));
+    Vec3d position(userPos(0), userPos(1), userPos(2));
+    pulledVertex = this->volumetricMesh->getVegaMesh()->getClosestVertex(position);
 }
 
 inline void VegaFemSceneObject::applyUserInteractionForces()
@@ -1113,38 +971,7 @@ inline void VegaFemSceneObject::applyScriptedExternalForces()
 
 inline void VegaFemSceneObject::updateSecondaryRenderingMesh()
 {
-    // interpolate deformations from volumetric mesh to rendering triangle mesh
-    if (vegaSecondarySurfaceMesh != nullptr)
-    {
-        VolumetricMesh::interpolate(
-            u.data(), uSecondary.data(),
-            vegaSecondarySurfaceMesh->Getn(),
-            numInterpolationElementVerts,
-            interpolationVertices,
-            interpolationWeights
-            );
-        vegaSecondarySurfaceMesh->SetVertexDeformations(uSecondary.data());
-    }
 
-    // recompute normals
-    if (vegaSecondarySurfaceMesh != nullptr)
-    {
-        vegaSecondarySurfaceMesh->BuildNormals();
-    }
-    else
-    {
-        vegaPrimarySurfaceMesh->BuildNormals();
-    }
-
-    if (explosionFlag)
-    {
-        performaceTracker.explosionCounter.StopCounter();
-        // the message will appear on screen for 4 seconds
-        if (performaceTracker.explosionCounter.GetElapsedTime() > 4.0)
-        {
-            explosionFlag = 0;
-        }
-    }
 }
 
 inline void VegaFemSceneObject::updatePerformanceMetrics()

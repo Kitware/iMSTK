@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/MakeUnique.h"
 #include <bandit/bandit.h>
 
+#include "Core/MakeUnique.h"
 #include "Geometry/MeshModel.h"
 
 using namespace bandit;
@@ -34,8 +34,9 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 
     // Add one triangle to the data structure
     mesh->setVertices(vertices);
+    std::array<size_t,3> triangle = {0,1,2};
 
-    mesh->getTriangles().emplace_back(0,1,2);
+    mesh->getTriangles().emplace_back(triangle);
 
     mesh->computeVertexNeighbors();
     mesh->computeTriangleNormals();
@@ -77,7 +78,8 @@ go_bandit([](){
 
             core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
 
-            AssertThat((model->getSurfaceNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
+            auto mesh = std::static_pointer_cast<SurfaceMesh>(model->getMesh());
+            AssertThat((mesh->getTriangleNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
 
     });

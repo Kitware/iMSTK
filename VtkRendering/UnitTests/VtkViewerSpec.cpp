@@ -65,8 +65,8 @@ go_bandit([](){
 //
 //             //Add the cube to the scene to be rendered
 //             scene->addSceneObject(cube);
-
-            mesh->assignTexture("/home/rortiz/tmp/CollisionHash_resources/textures/brick.jpg","cubeTex");
+            TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/brick.jpg","cubeTex");
+            mesh->assignTexture("cubeTex");
             viewer->addObject(mesh);
 
             viewer->exec();

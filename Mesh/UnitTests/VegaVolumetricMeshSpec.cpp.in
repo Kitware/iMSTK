@@ -34,43 +34,36 @@ using namespace bandit;
 
 go_bandit([](){
 
-    describe("Vega Volumetric Mesh", []() {
-        it("constructs", []() {
-            std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>();
-            AssertThat(vegaMesh != nullptr, IsTrue());
-        });
-        it("loads mesh", []() {
-            int verbose = 1;
-            bool generateGraph = false;
-            std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh(vegaMeshFileName,verbose);
-            AssertThat(vegaMesh->getVegaMesh() != nullptr, IsTrue());
-        });
-        it("generates graph", []() {
-            int verbose = 1;
-            bool generateGraph = true;
-            std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh(vegaMeshFileName,verbose);
-            AssertThat(vegaMesh->getMeshGraph() != nullptr, IsTrue());
-        });
-        it("attaches surface mesh", []() {
-            int verbose = 1;
-            bool generateGraph = false;
-            std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
-            vegaMesh->loadMesh(vegaMeshFileName,verbose);
-
-            std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
-
-            // These vertices coincide with vertices on the volume mesh. So the weights take a special form.
-            auto &vertices = surfaceMesh->getVertices();
-            vertices.emplace_back(-2.44627, -0.903874999999999, -1.711465);
-            vertices.emplace_back(-2.008655, -0.762779999999999, -1.63081);
-            vertices.emplace_back(-2.248035, -0.599385, -1.41836);
-
-            vegaMesh->attachSurfaceMesh(surfaceMesh,2.0);
-
-            auto &weights = vegaMesh->getAttachedWeights(0);
-            AssertThat(weights[0] == 1 && weights[5] == 1 && weights[10] == 1, IsTrue());
-        });
-    });
+//     describe("Vega Volumetric Mesh", []() {
+//         it("constructs", []() {
+//             std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>();
+//             AssertThat(vegaMesh != nullptr, IsTrue());
+//         });
+//         it("generates graph", []() {
+//             int verbose = 1;
+//             bool generateGraph = true;
+//             std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
+//             vegaMesh->loadMesh(vegaMeshFileName,verbose);
+//             AssertThat(vegaMesh->getMeshGraph() != nullptr, IsTrue());
+//         });
+//         it("attaches surface mesh", []() {
+//             int verbose = 1;
+//             bool generateGraph = false;
+//             std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
+//             vegaMesh->loadMesh(vegaMeshFileName,verbose);
+// 
+//             std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
+//
+//             // These vertices coincide with vertices on the volume mesh. So the weights take a special form.
+//             auto &vertices = surfaceMesh->getVertices();
+//             vertices.emplace_back(-2.44627, -0.903874999999999, -1.711465);
+//             vertices.emplace_back(-2.008655, -0.762779999999999, -1.63081);
+//             vertices.emplace_back(-2.248035, -0.599385, -1.41836);
+//
+//             vegaMesh->attachSurfaceMesh(surfaceMesh,2.0);
+//
+//             auto &weights = vegaMesh->getAttachedWeights(0);
+//             AssertThat(weights[0] == 1 && weights[5] == 1 && weights[10] == 1, IsTrue());
+//         });
+//     });
 });

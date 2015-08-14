@@ -69,21 +69,22 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     // Create collision models
     Eigen::Translation3d t(core::Vec3d(7, 3, 0));
     std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
-    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
-    collisionModelA->getMesh()->assignTexture("","livertexture1");
-    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    collisionModelA->getMesh()->translate(t);
-    collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
-    collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    auto mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelA->getMesh());
+    mesh->assignTexture("livertexture1");
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->getRenderDetail()->lineSize = 2;
+    mesh->getRenderDetail()->pointSize = 5;
 
     std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
-    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", Core::BaseMesh::MeshFileType::ThreeDS);
-    collisionModelB->getMesh()->assignTexture("","livertexture2");
-    t.vector() = core::Vec3d(2, 0, 0);
-    collisionModelB->getMesh()->translate(t);
-    collisionModelB->getMesh()->assignTexture("","livertexture2");
-    collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelB->getMesh());
+    mesh->assignTexture("livertexture2");
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->assignTexture("livertexture2");
+    mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Add models to a collision pair so they can be queried for collision
     std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
@@ -113,12 +114,10 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
     // Setup Scene lighting
     auto light = Light::getDefaultLighting();
-    assert(light);
     scene->addLight(light);
 
     // Camera setup
     std::shared_ptr<Camera> sceneCamera = Camera::getDefaultCamera();
-    assert(sceneCamera);
     scene->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
 
@@ -132,8 +131,6 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     viewer->setWindowTitle("SimMedTK Collision BVH Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
-    viewer->addObject(collisionModelA->getAABBTree());
-    viewer->addObject(collisionModelB->getAABBTree());
 
     //Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(core::EventType::Keyboard, camCtl);

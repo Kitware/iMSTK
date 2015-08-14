@@ -63,23 +63,22 @@ core::Vec3d SurfaceMesh::computeTriangleNormal(int triangle)
 }
 void SurfaceMesh::computeTriangleNormals()
 {
-    this->triangleNormals.clear();
+    this->triangleNormals.resize(this->triangleArray.size());
 
-    for(const auto &t : this->triangleArray)
+    for(size_t i = 0, end = this->triangleArray.size(); i < end; ++i)
     {
-        const core::Vec3d &v0 = this->vertices[t[0]];
+        const auto &t = this->triangleArray[i];
+        const auto &v0 = this->vertices[t[0]];
 
-        this->triangleNormals.push_back((this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized());
+        this->triangleNormals[i] = (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
     }
 }
 void SurfaceMesh::computeVertexNormals()
 {
-    this->vertexNormals.clear();
+    this->vertexNormals.resize(this->vertices.size(),core::Vec3d::Zero());
 
     for(size_t i = 0, end = this->vertices.size(); i < end; ++i)
     {
-        this->vertexNormals.push_back(core::Vec3d::Zero());
-
         for(auto const &j : this->vertexTriangleNeighbors[i])
         {
             this->vertexNormals[i] += this->triangleNormals[j];
@@ -247,6 +246,8 @@ void SurfaceMesh::assignTexture(const std::string& referenceName)
 
     if(id < 0)
     {
+        std::cerr << "The texture " << referenceName
+            << " cant be attached because it has not been processed but the manager." << std::endl;
         return;
     }
 
@@ -257,7 +258,7 @@ void SurfaceMesh::assignTexture(const std::string& referenceName)
 }
 bool SurfaceMesh::isMeshTextured() const
 {
-    return this->textures.size() > 0;
+    return !this->textures.empty();
 }
 void SurfaceMesh::setUseOBJTexture(bool use)
 {

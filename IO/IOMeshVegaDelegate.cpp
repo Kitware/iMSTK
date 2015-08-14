@@ -49,11 +49,13 @@ public:
             case VolumetricMesh::TET:
             {
                 mesh = std::make_shared<TetMesh>(name, true);
+                this->meshProps |= MeshType::Tetra;
                 break;
             }
             case VolumetricMesh::CUBIC:
             {
                 mesh = std::make_shared<CubicMesh>(name, true);
+                this->meshProps |= MeshType::Hexa;
                 break;
             }
             default:
@@ -62,8 +64,43 @@ public:
                 std::cerr << "Unknown element type." << std::endl;
             }
         }
-
+        // Use vega to compute the surface triangles
         auto volumetricMesh = std::make_shared<VegaVolumetricMesh>(true);
+        auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(this->meshIO->getMesh());
+        ObjMesh *vegaObjMesh = GenerateSurfaceMesh::ComputeMesh(vegaMesh->getVegaMesh().get());
+        const ObjMesh::Group *vegaObjMeshGroup = vegaObjMesh->getGroupHandle(0);
+
+        // Copy triangles from vega structure...
+        std::vector<std::array<size_t,3>> localTriangleArray(vegaObjMesh->getNumFaces());
+
+        for(int i = 0, end = vegaObjMeshGroup->getNumFaces(); i < end; ++i)
+        {
+            localTriangleArray[i][0] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(0)->getPositionIndex();
+            localTriangleArray[i][1] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(1)->getPositionIndex();
+            localTriangleArray[i][2] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(2)->getPositionIndex();
+        }
+        delete vegaObjMesh;
+
+        // copy vertices
+        std::vector<core::Vec3d> vertices;
+        auto vegaVertices = *mesh->getVertices();
+        for(size_t i = 0, end = mesh->getNumVertices(); i < end; ++i)
+        {
+            vertices.emplace_back(vegaVertices[i][0],
+                                  vegaVertices[i][1],
+                                  vegaVertices[i][2]);
+        }
+
+        std::vector<core::Vec3d> surfaceVertices;
+        std::unordered_map<size_t,size_t> uniqueVertexArray;
+        this->reorderSurfaceTopology(localTriangleArray,vertices,surfaceVertices,uniqueVertexArray);
+
+        auto meshToAttach = std::make_shared<SurfaceMesh>();
+        meshToAttach->setVertices(surfaceVertices);
+        meshToAttach->setTriangles(localTriangleArray);
+
+        volumetricMesh->setVertexMap(uniqueVertexArray);
+        volumetricMesh->attachSurfaceMesh(meshToAttach);
         volumetricMesh->setVegaMesh(mesh);
         this->meshIO->setMesh(volumetricMesh);
     }
