@@ -237,7 +237,7 @@ set(SimMedTK_exports
   RenderDelegates
   Rendering
   Simulators
-  VirtualTools
+#   VirtualTools
   )
 
 if(SimMedTK_USE_OCULUS)
@@ -257,7 +257,7 @@ add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)
 add_subdirectory(VtkRendering)
 add_subdirectory(Simulators)
-add_subdirectory(VirtualTools)
+# add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
 
 ################################################################################

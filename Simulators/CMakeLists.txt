@@ -4,7 +4,7 @@ simmedtk_add_library(Simulators
     DefaultSimulator.cpp
 #     MyStylus.cpp
 #     StylusObject.cpp
-    ToolSimulator.cpp
+#     ToolSimulator.cpp
     VegaObjectConfig.cpp
     VegaFemSceneObject.cpp
     VegaFemSimulator.cpp
@@ -13,7 +13,7 @@ simmedtk_add_library(Simulators
     DefaultSimulator.h
 #     MyStylus.h
 #     StylusObject.h
-    ToolSimulator.h
+#     ToolSimulator.h
     VegaObjectConfig.h
     VegaFemSceneObject.h
     VegaFemSimulator.h
