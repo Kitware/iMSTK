@@ -87,6 +87,7 @@ set(SimMedTK_VERSION "${SimMedTK_VERSION_MAJOR}.${SimMedTK_VERSION_MINOR}.${SimM
 # Testing
 #
 option(BUILD_TESTING "Test the project" ON)
+include(SimMedTKTesting)
 
 #-----------------------------------------------------------------------------
 # Documentation options

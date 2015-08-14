@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMINTERFACE_H
-#define SMINTERFACE_H
+#ifndef SM_DEVICE_H
+#define SM_DEVICE_H
 
 // SimMedTK includes
 #include "Core/Config.h"
