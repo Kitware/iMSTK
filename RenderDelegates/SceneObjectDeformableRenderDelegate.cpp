@@ -25,6 +25,9 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Simulators/SceneObjectDeformable.h"
+#include "Simulators/VegaFemSceneObject.h"
+#include "Mesh/VegaVolumetricMesh.h"
+#include "Mesh/SurfaceMesh.h"
 
 /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
 ///  vertices interacted with, ground plane etc.
@@ -36,21 +39,28 @@ public:
 
 void SceneObjectDeformableRenderDelegate::draw() const
 {
-    auto geom = this->getSourceGeometryAs<SceneObjectDeformable>();
+    auto geom = this->getSourceGeometryAs<VegaFemSceneObject>();
 
     if(!geom)
     {
         return;
     }
-
-    if(geom->renderSecondaryMesh && !!geom->getSecondarySurfaceMesh())
+    auto mesh = geom->getVolumetricMesh();
+    if(!mesh)
     {
-        geom->getSecondarySurfaceMesh()->draw();
+        return;
     }
-    else
+    auto surfaceMesh = mesh->getAttachedMesh(0);
+    if(!surfaceMesh)
     {
-        geom->getPrimarySurfaceMesh()->draw();
+        return;
     }
+    auto delegate = surfaceMesh->getRenderDelegate();
+    if(!delegate)
+    {
+        return;
+    }
+    delegate->draw();
 }
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()

@@ -32,6 +32,7 @@
 // Include required types scene objects
 #include "Simulators/VegaFemSceneObject.h"
 #include "Core/StaticSceneObject.h"
+#include "Mesh/VegaVolumetricMesh.h"
 
 // Include required simulators
 #include "Simulators/VegaFemSimulator.h"
@@ -60,7 +61,7 @@ int main()
     std::shared_ptr<VegaFemSimulator> femSimulator;
     std::shared_ptr<DefaultSimulator> staticSimulator;
     std::shared_ptr<PlaneCollisionModel> plane;
-    std::shared_ptr<OpenGLViewer> viewer;
+    std::shared_ptr<ViewerBase> viewer;
     std::shared_ptr<Scene> scene;
     std::shared_ptr<Light> light;
     std::shared_ptr<Camera> sceneCamera;
@@ -89,17 +90,16 @@ int main()
         sdk->getErrorLog(),
         "asianDragon/asianDragon.config");
 
-    auto femObjRenderDetail = std::make_shared<RenderDetail>(
-                                                               //SIMMEDTK_RENDER_WIREFRAME
-                                                               //| SIMMEDTK_RENDER_VERTICES
-                                                                SIMMEDTK_RENDER_FACES
+    auto femObjRenderDetail = std::make_shared<RenderDetail>(//SIMMEDTK_RENDER_WIREFRAME
+                                                             //| SIMMEDTK_RENDER_VERTICES
+                                                             SIMMEDTK_RENDER_FACES
                                                               );
     femObjRenderDetail->setPointSize(4.0);
     Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
     femObjRenderDetail->setVertexColor(maroon);
     femObjRenderDetail->setNormalLength(0.02);
 
-    femObject->setRenderDetail(femObjRenderDetail);
+    femObject->getVolumetricMesh()->setRenderDetail(0,femObjRenderDetail);
 
     /*hapticCtl = std::make_shared<mstk::Examples::Common::hapticController>();
     hapticCtl->setVegaFemSceneObject(femObject);
@@ -117,7 +117,7 @@ int main()
     staticObject = std::make_shared<StaticSceneObject>();
 
     plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, -3.0, 0.0),
-                                                    core::Vec3d(0.0, 1.0, 0.0));
+                                                  core::Vec3d(0.0, 1.0, 0.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -135,7 +135,7 @@ int main()
     //-------------------------------------------------------
     auto meshModel = std::make_shared<MeshCollisionModel>();
 
-    meshModel->setMesh(femObject->getPrimarySurfaceMesh());
+    meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
 
     auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
@@ -161,7 +161,7 @@ int main()
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    viewer = std::dynamic_pointer_cast<OpenGLViewer>(sdk->getViewerInstance());
+    viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |

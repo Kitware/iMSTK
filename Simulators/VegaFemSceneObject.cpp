@@ -42,31 +42,22 @@ VegaFemSceneObject::VegaFemSceneObject() :
     this->type = core::ClassType::VegaFemSceneObject;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
-
-    this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClass(
-        "SceneObjectDeformableRenderDelegate"));
 }
 
 VegaFemSceneObject::VegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/,
-                                           const std::string ConfigFile):
-                                           staticSolver(0),
-                                           graphicFrame(0),
-                                           explosionFlag(0),
-                                           positiveDefinite(0),
-                                           importAndUpdateVolumeMeshToSmtk(false)
+                                       const std::string ConfigFile)
+    :
+    staticSolver(0),
+    graphicFrame(0),
+    explosionFlag(0),
+    positiveDefinite(0),
+    importAndUpdateVolumeMeshToSmtk(false)
 {
     performaceTracker.initialize();
 
     this->type = core::ClassType::VegaFemSceneObject;
 
     this->name = "VegaFem_SceneObject_" + std::to_string(this->getUniqueId()->getId());
-
-    // Create the default delegate before configuration so it
-    // can be overridden.
-    this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClass(
-        "SceneObjectDeformableRenderDelegate"));
 
     ConfigFileName = ConfigFile;
 
@@ -77,8 +68,6 @@ VegaFemSceneObject::VegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/
 
 VegaFemSceneObject::~VegaFemSceneObject()
 {
-    delete [] interpolationVertices;
-    delete [] interpolationWeights;
 }
 
 std::shared_ptr<SceneObject> VegaFemSceneObject::clone()
@@ -121,8 +110,6 @@ void VegaFemSceneObject::resetToInitialState()
         subTimestepCounter = 0;
 
         loadInitialStates();
-        //volumetricMesh->Reset();//WIP no stored initial positions
-        vegaPrimarySurfaceMesh->ResetDeformationToRest();
 
         performaceTracker.clearFpsBuffer();
     }
@@ -209,13 +196,14 @@ void VegaFemSceneObject::loadVolumeMesh()
         auto ioMesh = std::make_shared<IOMesh>();
         ioMesh->read(femConfig->volumetricMeshFilename);
 
-        volumetricMesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+        volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
 
-        if (volumetricMesh == nullptr)
+        if (!volumetricMesh)
         {
             PRINT_ERROR_LOCATION
             std::cout << "VEGA: error! unable to load the volumetric mesh from"
                                         << femConfig->volumetricMeshFilename << std::endl;
+            return;
         }
 
         numNodes = volumetricMesh->getNumberOfVertices();
@@ -250,22 +238,8 @@ void VegaFemSceneObject::loadVolumeMesh()
 
         std::cout << "VEGA: Loading the mass matrix from file " << femConfig->massMatrixFilename <<
                                                                                  "..." << std::endl;
-
         // get the mass matrix
-        std::shared_ptr<SparseMatrixOutline> massMatrixOutline;
-
-        try
-        {
-            // 3 is expansion flag to indicate this is a mass matrix; and does 3x3 identity block expansion
-            massMatrixOutline = std::make_shared<SparseMatrixOutline>(femConfig->massMatrixFilename, 3);
-        }
-        catch (int exceptionCode)
-        {
-            PRINT_ERROR_LOCATION
-            std::cout << "VEGA:  error! loading mass matrix"
-                        << femConfig->massMatrixFilename << std::endl;
-        }
-
+        std::shared_ptr<SparseMatrixOutline> massMatrixOutline = std::make_shared<SparseMatrixOutline>(femConfig->massMatrixFilename, 3);
         massMatrix = std::make_shared<SparseMatrix>(massMatrixOutline.get());
 
         if (femConfig->deformableObject == VegaObjectConfig::STVK ||
@@ -615,10 +589,10 @@ void VegaFemSceneObject::createForceModel()
     case VegaObjectConfig::STVK:
     {
 
-        stVKForceModel = std::make_shared<StVKForceModel>(stVKInternalForces.get(),
+        auto stVKForceModel = std::make_shared<StVKForceModel>(stVKInternalForces.get(),
                                                           stVKStiffnessMatrix.get());
-        forceModel = stVKForceModel;
         stVKForceModel->GetInternalForce(uInitial.data(), u.data());
+        forceModel = stVKForceModel;
 
         break;
     }
@@ -643,7 +617,7 @@ void VegaFemSceneObject::createForceModel()
             corotationalLinearFEM = new CorotationalLinearFEMMT(tetMesh, femConfig->numInternalForceThreads);
         }
 
-        corotationalLinearFEMForceModel = std::make_shared<CorotationalLinearFEMForceModel>(
+        auto corotationalLinearFEMForceModel = std::make_shared<CorotationalLinearFEMForceModel>(
                                             corotationalLinearFEM, femConfig->corotationalLinearFEM_warp);
         forceModel = corotationalLinearFEMForceModel;
 
@@ -659,7 +633,7 @@ void VegaFemSceneObject::createForceModel()
     }
     case VegaObjectConfig::INVERTIBLEFEM:
     {
-        TetMesh * tetMesh = dynamic_cast<TetMesh*>(volumetricMesh.get());
+        std::shared_ptr<TetMesh> tetMesh = std::static_pointer_cast<TetMesh>(volumetricMesh->getVegaMesh());
 
         if (tetMesh == nullptr)
         {
@@ -691,7 +665,7 @@ void VegaFemSceneObject::createForceModel()
         {
 
             isotropicMaterial = new StVKIsotropicMaterial(
-                tetMesh,
+                tetMesh.get(),
                 femConfig->enableCompressionResistance,
                 femConfig->compressionResistance);
             std::cout << "VEGA: Invertible material: StVK.\n";
@@ -700,7 +674,7 @@ void VegaFemSceneObject::createForceModel()
 
         case VegaObjectConfig::INV_NEOHOOKEAN:
             isotropicMaterial = new NeoHookeanIsotropicMaterial(
-                tetMesh,
+                tetMesh.get(),
                 femConfig->enableCompressionResistance,
                 femConfig->compressionResistance);
             std::cout << "VEGA: Invertible material: neo-Hookean.\n";
@@ -708,7 +682,7 @@ void VegaFemSceneObject::createForceModel()
 
         case VegaObjectConfig::INV_MOONEYRIVLIN:
             isotropicMaterial = new MooneyRivlinIsotropicMaterial(
-                tetMesh,
+                tetMesh.get(),
                 femConfig->enableCompressionResistance,
                 femConfig->compressionResistance);
             std::cout << "VEGA: Invertible material: Mooney-Rivlin.\n";
@@ -726,14 +700,14 @@ void VegaFemSceneObject::createForceModel()
         if (femConfig->numInternalForceThreads == 0)
         {
             isotropicHyperelasticFEM = new IsotropicHyperelasticFEM(
-                tetMesh, isotropicMaterial,
+                tetMesh.get(), isotropicMaterial,
                 femConfig->inversionThreshold,
                 femConfig->addGravity, femConfig->g);
         }
         else
         {
             isotropicHyperelasticFEM = new IsotropicHyperelasticFEMMT(
-                tetMesh,
+                tetMesh.get(),
                 isotropicMaterial,
                 femConfig->inversionThreshold,
                 femConfig->addGravity,
@@ -884,10 +858,15 @@ void VegaFemSceneObject::setPulledVertex(const core::Vec3d &userPos)
 
 inline void VegaFemSceneObject::applyUserInteractionForces()
 {
-
     // determine force in case user is pulling on a vertex
     if (pulledVertex != -1)
     {
+        auto meshGraph = this->volumetricMesh->getMeshGraph();
+        if(!meshGraph)
+        {
+            std::cerr << "Mesh graph has not being set.\n";
+            return;
+        }
 
         double externalForce[3];
 
@@ -939,16 +918,17 @@ inline void VegaFemSceneObject::applyUserInteractionForces()
 
             lastLayerVertices.clear();
 
+            for(const auto &v : newAffectedVertices)
             for (std::set<int> ::iterator iter = newAffectedVertices.begin(); iter != newAffectedVertices.end(); iter++)
             {
                 // apply force
-                f_ext[3 * *iter + 0] += forceMagnitude * externalForce[0];
-                f_ext[3 * *iter + 1] += forceMagnitude * externalForce[1];
-                f_ext[3 * *iter + 2] += forceMagnitude * externalForce[2];
+                f_ext[3*v+0] += forceMagnitude * externalForce[0];
+                f_ext[3*v+1] += forceMagnitude * externalForce[1];
+                f_ext[3*v+2] += forceMagnitude * externalForce[2];
 
                 // generate new layers
-                lastLayerVertices.insert(*iter);
-                affectedVertices.insert(*iter);
+                lastLayerVertices.insert(v);
+                affectedVertices.insert(v);
             }
         }
     }
@@ -1056,4 +1036,8 @@ int VegaFemSceneObject::getNumFixedNodes() const
 int VegaFemSceneObject::getNumFixedDof() const
 {
     return numFixedDof;
+}
+std::shared_ptr< VegaVolumetricMesh > VegaFemSceneObject::getVolumetricMesh()
+{
+    return this->volumetricMesh;
 }

@@ -37,28 +37,43 @@ std::shared_ptr<SurfaceMesh> makeSurfaceMesh()
         {0.5, -0.5, 0.5},
         {0.5, 0.5, -0.5},
         {0.5, 0.5, 0.5},
-        {3.5527136788e-09,-1.7763568394e-09, 0}
     };
 
     std::vector<std::array<size_t,3>> triangles  =
     {
-        {{0, 1, 2}},
-        {{0, 4, 1}},
-        {{0, 2, 4}},
         {{3, 2, 1}},
+        {{0, 1, 2}},
+        {{0, 2, 4}},
+        {{0, 4, 1}},
         {{1, 5, 3}},
-        {{5, 1, 4}},
         {{2, 3, 6}},
+        {{4, 6, 5}},
+        {{5, 1, 4}},
         {{6, 4, 2}},
         {{7, 3, 5}},
-        {{7, 6, 3}},
-        {{4, 6, 5}},
+        {{3, 7, 6}},
         {{7, 5, 6}}
     };
+    std::vector<std::array<double,2>> texCoord  =
+    {
+        {0.0,0.0},
+        {0.0,1.0},
+        {1.0,0.0},
+        {1.0,1.0},
+        {1.0,0.0},
+        {1.0,1.0},
+        {0.0,0.0},
+        {0.0,1.0},
+    };
+
 
     std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
     mesh->getVertices() = vertices;
     mesh->setTriangles(triangles);
+    for(size_t i = 0; i < texCoord.size(); ++i)
+    {
+        mesh->addTextureCoordinate(texCoord[i][0],texCoord[i][1]);
+    }
 
     return mesh;
 }

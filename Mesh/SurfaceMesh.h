@@ -27,6 +27,7 @@
 // SimMedTK includes
 #include "Core/BaseMesh.h"
 #include "Rendering/TextureManager.h"
+#include "Core/Factory.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
 class SurfaceMesh: public Core::BaseMesh

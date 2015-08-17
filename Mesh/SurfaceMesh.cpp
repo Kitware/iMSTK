@@ -23,7 +23,6 @@
 
 #include "Mesh/SurfaceMesh.h"
 #include "Core/CollisionConfig.h"
-#include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
 
 ///
@@ -47,8 +46,7 @@ struct SurfaceMesh::TextureAttachment
 SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureCoordinates(false)
 {
     this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClass(
-        "MeshRenderDelegate"));
+      Factory<RenderDelegate>::createConcreteClassForGroup("MeshRenderDelegate",300));
 }
 SurfaceMesh::~SurfaceMesh()
 {
@@ -233,7 +231,7 @@ void SurfaceMesh::addTextureCoordinate(const core::Vec2f& coord)
 }
 bool SurfaceMesh::hasTextureCoordinates() const
 {
-    return this->textureCoord.size() > 0;
+    return !this->textureCoord.empty();
 }
 void SurfaceMesh::addTextureCoordinate(const float& x, const float& y)
 {

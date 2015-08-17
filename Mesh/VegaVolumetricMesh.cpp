@@ -34,7 +34,9 @@
 #include "graph.h"
 #include "vec3d.h"
 
-VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph) {}
+VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph)
+{
+}
 VegaVolumetricMesh::~VegaVolumetricMesh() {}
 std::shared_ptr<Graph> VegaVolumetricMesh::getMeshGraph()
 {
@@ -124,6 +126,7 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
 
     if(nullptr != this->mesh && generateGraph)
     {
+        meshGraph.reset();
         meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(this->mesh.get()));
     }
 }
@@ -154,4 +157,23 @@ const std::unordered_map<size_t,size_t>& VegaVolumetricMesh::getVertexMap() cons
 void VegaVolumetricMesh::setVertexMap(const std::unordered_map<size_t,size_t>& map)
 {
     this->vertexMap = map;
+}
+const std::vector< size_t >& VegaVolumetricMesh::getFixedVertices() const
+{
+    return this->fixedVertices;
+}
+void VegaVolumetricMesh::setFixedVertices(const std::vector< size_t >& dofs)
+{
+    this->fixedVertices.clear();
+    this->fixedVertices = dofs;
+}
+std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getAttachedMesh(const size_t i)
+{
+    return i < this->attachedMeshes.size() ?
+            this->attachedMeshes.at(i) :
+            nullptr;
+}
+void VegaVolumetricMesh::setRenderDetail(int i, std::shared_ptr< RenderDetail > newRenderDetail)
+{
+    this->attachedMeshes.at(i)->setRenderDetail(newRenderDetail);
 }

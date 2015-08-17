@@ -153,8 +153,3 @@ void VtkViewer::initResources()
     this->renderer->addRenderer();
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
-    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,VtkViewer,300);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
