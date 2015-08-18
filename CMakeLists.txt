@@ -289,3 +289,7 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
   @ONLY
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

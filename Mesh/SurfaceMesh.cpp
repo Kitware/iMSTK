@@ -295,4 +295,12 @@ const std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents() const
 {
     return this->vertexTangents;
 }
+std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents()
+{
+    return this->vertexTangents;
+}
+size_t SurfaceMesh::getNumberOfTriangles() const
+{
+    return this->triangleArray.size();
+}
 

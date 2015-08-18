@@ -101,16 +101,23 @@ using StdVector3f = StdVector3<float>;
 using StdVector3d = StdVector3<double>;
 
 template<typename T>
-void flattenVectorArray(const StdVector3<T> &v, Eigen::Matrix<T, 3, Eigen::Dynamic> &out)
+Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>> getEigenMap(std::vector<Vector3<T>> &v)
 {
-    out.resize(v.size());
-    for(size_t i = 0, end = v.size(); i < end; ++i)
-    {
-        out.col(i) = v(i);
-    }
+    return Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>>(v.data()->data(),v.size()*Vector3<T>::SizeAtCompileTime);
 }
 
 } // core
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<Vector3<T>>& obj)
+{
+    for(auto v : obj)
+    {
+        os << v << std::endl;
+    }
+    return os;
+}
+
 // } // SimMedTK
 
 #endif // SMVECTOR_H

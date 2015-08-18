@@ -2,7 +2,6 @@
 #define SMFACTORY_HPP
 
 #include <cstdlib> // for std::atexit
-#include "Core/Factory.h"
 
 template<typename T>
 void Factory<T>::registerClassConfiguration(

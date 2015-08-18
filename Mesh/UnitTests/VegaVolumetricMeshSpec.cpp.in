@@ -28,7 +28,7 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
 
-const std::string vegaMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.veg";
+const std::string vegaMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
 
 using namespace bandit;
 
@@ -51,7 +51,7 @@ go_bandit([](){
 //             bool generateGraph = false;
 //             std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>(generateGraph);
 //             vegaMesh->loadMesh(vegaMeshFileName,verbose);
-// 
+//
 //             std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
 //
 //             // These vertices coincide with vertices on the volume mesh. So the weights take a special form.

@@ -31,6 +31,7 @@
 
 // VTK includes
 #include <vtkNew.h>
+#include <vtkXMLGenericDataObjectReader.h>
 #include <vtkGenericDataObjectReader.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnsignedIntArray.h>
@@ -54,9 +55,12 @@ public:
     {
         // Get file name and define some variables.
         auto name = this->meshIO->getFileName().c_str();
-        vtkPoints *points;
-        vtkCellArray *cellArray;
-        vtkFieldData *fieldData;
+        std::vector<core::Vec3d> vertices;
+        std::vector<std::array<size_t,3>> triangleArray;
+        std::vector<std::array<size_t,4>> tetraArray;
+        std::vector<std::array<size_t,8>> hexaArray;
+        std::vector<size_t> bdConditions;
+        core::Vec3d materials;
 
         // Record the type of mesh we have.
         this->meshProps = 0;
@@ -70,9 +74,11 @@ public:
                 vtkNew<vtkOBJReader> reader;
                 reader->SetFileName(name);
                 reader->Update();
-                points = reader->GetOutput()->GetPoints();
-                cellArray = reader->GetOutput()->GetPolys();
-                fieldData = reader->GetOutput()->GetFieldData();
+
+                // Copy data to local arrays
+                this->copyPoints(reader->GetOutput()->GetPoints(),vertices);
+                this->copyCells(reader->GetOutput()->GetPolys(),triangleArray,tetraArray,hexaArray);
+                this->copyData(reader->GetOutput()->GetFieldData(),bdConditions,materials);
                 this->meshProps |= MeshType::Tri;
                 break;
             }
@@ -82,9 +88,11 @@ public:
                 vtkNew<vtkSTLReader> reader;
                 reader->SetFileName(name);
                 reader->Update();
-                points = reader->GetOutput()->GetPoints();
-                cellArray = reader->GetOutput()->GetPolys();
-                fieldData = reader->GetOutput()->GetFieldData();
+
+                // Copy data to local arrays
+                this->copyPoints(reader->GetOutput()->GetPoints(),vertices);
+                this->copyCells(reader->GetOutput()->GetPolys(),triangleArray,tetraArray,hexaArray);
+                this->copyData(reader->GetOutput()->GetFieldData(),bdConditions,materials);
                 this->meshProps |= MeshType::Tri;
                 break;
             }
@@ -94,54 +102,62 @@ public:
                 vtkNew<vtkPLYReader> reader;
                 reader->SetFileName(name);
                 reader->Update();
-                points = reader->GetOutput()->GetPoints();
-                cellArray = reader->GetOutput()->GetPolys();
-                fieldData = reader->GetOutput()->GetFieldData();
+
+                // Copy data to local arrays
+                this->copyPoints(reader->GetOutput()->GetPoints(),vertices);
+                this->copyCells(reader->GetOutput()->GetPolys(),triangleArray,tetraArray,hexaArray);
+                this->copyData(reader->GetOutput()->GetFieldData(),bdConditions,materials);
                 this->meshProps |= MeshType::Tri;
                 break;
             }
-            // Any other vtk file format.
+            // Vtk legacy formats
+            case IOMesh::MeshFileType::VTK:
+            {
+                this->readGenericFormat<vtkGenericDataObjectReader>(
+                    name,
+                    vertices,
+                    triangleArray,
+                    tetraArray,
+                    hexaArray,
+                    bdConditions,
+                    materials
+                );
+                break;
+            }
+            // Vtk VTU formats
+            case IOMesh::MeshFileType::VTU:
+            {
+                this->readGenericFormat<vtkXMLGenericDataObjectReader>(
+                    name,
+                    vertices,
+                    triangleArray,
+                    tetraArray,
+                    hexaArray,
+                    bdConditions,
+                    materials
+                );
+                break;
+            }
+            // Vtk VTU formats
+            case IOMesh::MeshFileType::VTP:
+            {
+                this->readGenericFormat<vtkXMLGenericDataObjectReader>(
+                    name,
+                    vertices,
+                    triangleArray,
+                    tetraArray,
+                    hexaArray,
+                    bdConditions,
+                    materials
+                );
+                break;
+            }
             default:
             {
-                vtkNew<vtkGenericDataObjectReader> reader;
-                reader->SetFileName(name);
-                reader->Update();
-
-                vtkPointSet *output = vtkPointSet::SafeDownCast(reader->GetOutput());
-
-                if(!output)
-                {
-                    std::cerr << "VTKMeshReaderDelegate: Empty reader for vtk files." << std::endl;
-                    return;
-                }
-
-                points = output->GetPoints();
-                fieldData = output->GetFieldData();
-                if(reader->IsFilePolyData())
-                {
-                    cellArray = reader->GetPolyDataOutput()->GetPolys();
-                }
-                else if(reader->IsFileUnstructuredGrid())
-                {
-                    cellArray = reader->GetUnstructuredGridOutput()->GetCells();
-                }
-                else
-                {
-                    std::cerr << "VTKMeshReaderDelegate: Unsupported dataset." << std::endl;
-                }
+                std::cerr << "IOMeshVTKDelegate: Unsupported file format." << std::endl;
+                return;
             }
         }
-        // Copy data to local arrays
-        std::vector<core::Vec3d> vertices;
-        std::vector<std::array<size_t,3>> triangleArray;
-        std::vector<std::array<size_t,4>> tetraArray;
-        std::vector<std::array<size_t,8>> hexaArray;
-        std::vector<size_t> bdConditions;
-        core::Vec3d materials;
-
-        this->copyPoints(points,vertices);
-        this->copyCells(cellArray,triangleArray,tetraArray,hexaArray);
-        this->copyData(fieldData,bdConditions,materials);
 
         // If the mesh has tetrahedral elements as well as triangle
         // elements we assume that the triangles correspond
@@ -231,7 +247,7 @@ public:
             std::cerr << "VTKMeshReaderDelegate: Not points found." << std::endl;
             return;
         }
-        for(vtkIdType i = 0; i < points->GetNumberOfPoints(); ++i)
+        for(vtkIdType i = 0, end = points->GetNumberOfPoints(); i < end; ++i)
         {
             double position[3];
             points->GetPoint(i,position);
@@ -355,10 +371,49 @@ public:
     }
 
     void write(){}
+
+    template<typename GenericReader>
+    void readGenericFormat(const std::string &name,
+                        std::vector<core::Vec3d> &vertices,
+                        std::vector<std::array<size_t,3>> &triangleArray,
+                        std::vector<std::array<size_t,4>> &tetraArray,
+                        std::vector<std::array<size_t,8>> &hexaArray,
+                        std::vector<size_t> &bdConditions,
+                        core::Vec3d &materials)
+    {
+        vtkNew<GenericReader> reader;
+        reader->SetFileName(name.c_str());
+        reader->Update();
+
+        vtkPointSet *output = vtkPointSet::SafeDownCast(reader->GetOutput());
+
+        if(!output)
+        {
+            std::cerr << "VTKMeshReaderDelegate: Empty reader for vtk files." << std::endl;
+            return;
+        }
+
+        // Copy data to local arrays
+        this->copyPoints(output->GetPoints(),vertices);
+        this->copyData(output->GetFieldData(),bdConditions,materials);
+        if(auto out = reader->GetPolyDataOutput())
+        {
+            this->copyCells(out->GetPolys(),triangleArray,tetraArray,hexaArray);
+        }
+        else if(auto out = reader->GetUnstructuredGridOutput())
+        {
+            this->copyCells(out->GetCells(),triangleArray,tetraArray,hexaArray);
+        }
+        else
+        {
+            std::cerr << "VTKMeshReaderDelegate: Unsupported dataset." << std::endl;
+        }
+    }
+
 };
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
     SIMMEDTK_BEGIN_ONLOAD(register_VTKMeshReaderDelegate)
-        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, IOMeshVTKDelegate, IOMesh::ReaderGroup::VTK);
+    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, IOMeshVTKDelegate, IOMesh::ReaderGroup::VTK);
     SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

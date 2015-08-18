@@ -82,15 +82,15 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
 {
     //
     // VTK io for some vtk files (use only vtk to read these files)
-    this->delegator->addDefaultDelegator(MeshFileType::VTK,"VTKMeshReaderDelegate");
-    this->delegator->addDefaultDelegator(MeshFileType::VTU,"VTKMeshReaderDelegate");
-    this->delegator->addDefaultDelegator(MeshFileType::VTP,"VTKMeshReaderDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VTK,"IOMeshDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VTU,"IOMeshDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VTP,"IOMeshDelegate");
     //
     // Set the vega io, only vega can read/write those files
     this->delegator->addDefaultDelegator(MeshFileType::VEG,"IOMeshVegaDelegate");
     //
     // The readers for obj,stl and ply are based on a priority group (defaults to vtk io's)
-    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",ReaderGroup::Assimp);
+    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::STL,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::PLY,"IOMeshDelegate",priorityGroup);
     //
@@ -139,6 +139,11 @@ IOMesh::MeshFileType IOMesh::getFileExtension() const
     if (extension =="vtp" || extension =="VTP")
     {
         extensionType = MeshFileType::VTP;
+        return extensionType;
+    }
+    if (extension =="vtu" || extension =="VTU")
+    {
+        extensionType = MeshFileType::VTU;
         return extensionType;
     }
     if (extension =="obj" || extension =="OBJ")

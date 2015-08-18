@@ -164,15 +164,19 @@ public:
     ///
     const core::Vec3d &getVertexTangent(size_t i) const;
     const std::vector<core::Vec3d> &getVertexTangents() const;
-    std::vector<core::Vec3d> &getVertexTangents()
-    {
-        return this->vertexTangents;
-    }
+    std::vector<core::Vec3d> &getVertexTangents();
 
     ///
     /// \brief print the details of the mesh
     ///
     void print() const override;
+
+    ///
+    /// \brief Get the total number of triangles
+    ///
+    size_t getNumberOfTriangles() const;
+
+
 private:
     // List of triangle normals
     std::vector<core::Vec3d> triangleNormals;
