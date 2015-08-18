@@ -31,7 +31,7 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-class AssimpMeshDelegate : public IOMeshDelegate
+class IOMeshAssimpDelegate : public IOMeshDelegate
 {
 public:
     void read()
@@ -121,6 +121,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_AssimpMeshReaderDelegate)
-    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,AssimpMeshDelegate,IOMesh::ReaderGroup::Assimp);
+    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,IOMeshAssimpDelegate,IOMesh::ReaderGroup::Assimp);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

@@ -126,6 +126,9 @@ public:
   static std::shared_ptr<T> createConcreteClass(
     const std::string& targetClassname);
 
+  static std::shared_ptr<T> createConcreteClassForGroup(
+    const std::string& targetClassname, int group);
+
   template<typename U>
   static std::shared_ptr<U> createDefaultAs(const std::string& targetClassname)
     { return std::dynamic_pointer_cast<U>(createDefault(targetClassname)); }

@@ -33,7 +33,12 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 
-class VegaMeshDelegate : public IOMeshDelegate
+///
+/// \brief Class delegate to read Vega (.veg) volimetric file format. This
+/// reader also computes the surface of the mesh and stores it as a \SurfaceMesh.
+/// This mesh is then attached to the volumetric mesh and updated as the
+/// underlined volume mesh deforms and moves.
+class IOMeshVegaDelegate : public IOMeshDelegate
 {
 public:
     void read()
@@ -64,10 +69,12 @@ public:
                 std::cerr << "Unknown element type." << std::endl;
             }
         }
-        // Use vega to compute the surface triangles
+
         auto volumetricMesh = std::make_shared<VegaVolumetricMesh>(true);
-        auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(this->meshIO->getMesh());
-        ObjMesh *vegaObjMesh = GenerateSurfaceMesh::ComputeMesh(vegaMesh->getVegaMesh().get());
+        volumetricMesh->setVegaMesh(mesh);
+
+        // Use vega to compute the surface triangles
+        ObjMesh *vegaObjMesh = GenerateSurfaceMesh::ComputeMesh(mesh.get());
         const ObjMesh::Group *vegaObjMeshGroup = vegaObjMesh->getGroupHandle(0);
 
         // Copy triangles from vega structure...
@@ -83,17 +90,21 @@ public:
 
         // copy vertices
         std::vector<core::Vec3d> vertices;
-        auto vegaVertices = *mesh->getVertices();
         for(size_t i = 0, end = mesh->getNumVertices(); i < end; ++i)
         {
-            vertices.emplace_back(vegaVertices[i][0],
-                                  vegaVertices[i][1],
-                                  vegaVertices[i][2]);
+            const Vec3d &v = *mesh->getVertex(i);
+            vertices.emplace_back(v[0],
+                                  v[1],
+                                  v[2]);
         }
 
         std::vector<core::Vec3d> surfaceVertices;
         std::unordered_map<size_t,size_t> uniqueVertexArray;
-        this->reorderSurfaceTopology(localTriangleArray,vertices,surfaceVertices,uniqueVertexArray);
+        this->reorderSurfaceTopology(
+            vertices,
+            surfaceVertices,
+            localTriangleArray,
+            uniqueVertexArray);
 
         auto meshToAttach = std::make_shared<SurfaceMesh>();
         meshToAttach->setVertices(surfaceVertices);
@@ -101,7 +112,6 @@ public:
 
         volumetricMesh->setVertexMap(uniqueVertexArray);
         volumetricMesh->attachSurfaceMesh(meshToAttach);
-        volumetricMesh->setVegaMesh(mesh);
         this->meshIO->setMesh(volumetricMesh);
     }
     void write(){}
@@ -109,6 +119,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
     SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
-        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VegaMeshDelegate, IOMesh::ReaderGroup::Vega);
+        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshVegaDelegate, IOMeshVegaDelegate, IOMesh::ReaderGroup::Vega);
     SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

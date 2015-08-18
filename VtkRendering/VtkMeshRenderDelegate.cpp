@@ -27,6 +27,7 @@
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Mesh/SurfaceMesh.h"
+#include "Mesh/VegaVolumetricMesh.h"
 
 #include "VtkRendering/MeshNodalCoordinates.h"
 #include "VtkRendering/VtkRenderDelegate.h"
@@ -71,10 +72,23 @@ void MeshRenderDelegate::initDraw()
     vtkNew<vtkPoints> vertices;
     vtkNew<vtkCellArray> triangles;
 
+    // The geometry can be either a volume or surface.
+    // If its a vega volume then get its attached surface mesh.
+    // This render delegate only draws surface meshes.
     auto geom = this->getSourceGeometryAs<SurfaceMesh>();
     if (!geom)
     {
-        return;
+        auto vega = this->getSourceGeometryAs<VegaVolumetricMesh>();
+        if(!vega)
+        {
+            return;
+        }
+        auto surfaceMesh = vega->getAttachedMesh(0);
+        if (!surfaceMesh)
+        {
+            return;
+        }
+        geom = surfaceMesh.get();
     }
 
     auto mesh = std::static_pointer_cast<SurfaceMesh>(geom->shared_from_this());
@@ -125,7 +139,7 @@ void MeshRenderDelegate::initDraw()
 
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
         normals->SetInputConnection(geometry->GetOutputPort());
-        normals->ComputeCellNormalsOn();
+        normals->AutoOrientNormalsOn();
 
         mapper = vtkPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
@@ -159,6 +173,6 @@ vtkActor *MeshRenderDelegate::getActor() const
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
 SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(VtkRenderDelegate,VtkRenderDelegate,MeshRenderDelegate,300);
+    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,MeshRenderDelegate,300);
 SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

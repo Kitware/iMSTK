@@ -43,7 +43,7 @@
     }
 #endif
 
-class Mesh3dsDelegate : public IOMeshDelegate
+class IOMesh3dsDelegate : public IOMeshDelegate
 {
 public:
     void read()
@@ -205,6 +205,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
   SIMMEDTK_BEGIN_ONLOAD(register_Mesh3dsDelegate)
-  SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,Mesh3dsDelegate,IOMesh::ReaderGroup::Other);
+  SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,IOMesh3dsDelegate,IOMesh::ReaderGroup::Other);
   SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

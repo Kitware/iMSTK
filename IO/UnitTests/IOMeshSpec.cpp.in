@@ -30,6 +30,10 @@
 #include "IO/IOMesh.h"
 
 const std::string vegaMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.veg";
+const std::string vtuMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.vtu";
+const std::string stlMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.stl";
+const std::string objMeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.obj";
+const std::string ds3MeshFileName = "@CMAKE_CURRENT_BINARY_DIR@/SampleMesh.3ds";
 
 using namespace bandit;
 
@@ -40,9 +44,29 @@ go_bandit([](){
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
             AssertThat(io != nullptr, IsTrue());
         });
-        it("loads mesh", []() {
+        it("loads veg mesh", []() {
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
             io->read(vegaMeshFileName);
+            AssertThat(io->getMesh() != nullptr, IsTrue());
+        });
+        it("loads vtu mesh", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            io->read(vtuMeshFileName);
+            AssertThat(io->getMesh() != nullptr, IsTrue());
+        });
+        it("loads stl mesh", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            io->read(stlMeshFileName);
+            AssertThat(io->getMesh() != nullptr, IsTrue());
+        });
+        it("loads veg mesh", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            io->read(objMeshFileName);
+            AssertThat(io->getMesh() != nullptr, IsTrue());
+        });
+        it("loads 3ds mesh", []() {
+            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
+            io->read(ds3MeshFileName);
             AssertThat(io->getMesh() != nullptr, IsTrue());
         });
 

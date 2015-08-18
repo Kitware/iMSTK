@@ -30,6 +30,7 @@
 #include "Core/Scene.h"
 #include "VtkRendering/VtkViewer.h"
 #include "Testing/TestMesh.h"
+#include "IO/IOMesh.h"
 
 #include <bandit/bandit.h>
 using namespace bandit;
@@ -48,25 +49,14 @@ go_bandit([](){
         });
 
         it("renders mesh", []() {
-            auto mesh = makeSurfaceMesh();
-//             mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
-            auto viewer = std::make_shared<VtkViewer>();
+            auto io = std::make_shared<IOMesh>();
+            io->read("/home/rortiz/tmp/CollisionHash_resources/models/liver.obj");
 
-//             auto scene = std::make_shared<Scene>();
-//
-//             auto cubeModel = std::make_shared<MeshModel>();
-//             cubeModel->setModelMesh(makeSurfaceMesh());
-//
-//             auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-//             cubeModel->setRenderDetail(renderDetail);
-//
-//             auto cube = std::make_shared<StaticSceneObject>();
-//             cube->setModel(cubeModel);
-//
-//             //Add the cube to the scene to be rendered
-//             scene->addSceneObject(cube);
-            TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/brick.jpg","cubeTex");
-            mesh->assignTexture("cubeTex");
+            auto mesh = std::static_pointer_cast<SurfaceMesh>(io->getMesh());
+            auto viewer = std::make_shared<VtkViewer>();
+            TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/voronoi.jpg","blood");
+            mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
+            mesh->assignTexture("blood");
             viewer->addObject(mesh);
 
             viewer->exec();

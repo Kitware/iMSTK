@@ -40,30 +40,31 @@
 #include <vtkPLYReader.h>
 #include <vtkSTLReader.h>
 
-class VTKMeshDelegate : public IOMeshDelegate
+///
+/// \brief This delegate implements the VTK based readers/writers. It creates
+/// a VegaVolumetric mesh for tetra/hexaarrays and a surface mesh otherwise.
+///
+class IOMeshVTKDelegate : public IOMeshDelegate
 {
 public:
     ///
-    /// \brief
+    /// \brief Performs the actual reading of the mesh and
     ///
     void read()
     {
+        // Get file name and define some variables.
         auto name = this->meshIO->getFileName().c_str();
         vtkPoints *points;
         vtkCellArray *cellArray;
         vtkFieldData *fieldData;
 
-        std::vector<core::Vec3d> vertices;
-        std::vector<std::array<size_t,3>> triangleArray;
-        std::vector<std::array<size_t,4>> tetraArray;
-        std::vector<std::array<size_t,8>> hexaArray;
-        std::vector<size_t> bdConditions;
-        core::Vec3d materials;
-
+        // Record the type of mesh we have.
         this->meshProps = 0;
 
+        // Choose the reader according to filetype
         switch(this->meshIO->getFileType())
         {
+            // VTK obj reader
             case IOMesh::MeshFileType::OBJ:
             {
                 vtkNew<vtkOBJReader> reader;
@@ -75,6 +76,7 @@ public:
                 this->meshProps |= MeshType::Tri;
                 break;
             }
+            // VTK STL reader
             case IOMesh::MeshFileType::STL:
             {
                 vtkNew<vtkSTLReader> reader;
@@ -86,6 +88,7 @@ public:
                 this->meshProps |= MeshType::Tri;
                 break;
             }
+            // VTK PLY reader
             case IOMesh::MeshFileType::PLY:
             {
                 vtkNew<vtkPLYReader> reader;
@@ -97,6 +100,7 @@ public:
                 this->meshProps |= MeshType::Tri;
                 break;
             }
+            // Any other vtk file format.
             default:
             {
                 vtkNew<vtkGenericDataObjectReader> reader;
@@ -127,14 +131,27 @@ public:
                 }
             }
         }
+        // Copy data to local arrays
+        std::vector<core::Vec3d> vertices;
+        std::vector<std::array<size_t,3>> triangleArray;
+        std::vector<std::array<size_t,4>> tetraArray;
+        std::vector<std::array<size_t,8>> hexaArray;
+        std::vector<size_t> bdConditions;
+        core::Vec3d materials;
+
         this->copyPoints(points,vertices);
         this->copyCells(cellArray,triangleArray,tetraArray,hexaArray);
         this->copyData(fieldData,bdConditions,materials);
 
-        //--
+        // If the mesh has tetrahedral elements as well as triangle
+        // elements we assume that the triangles correspond
+        // to the triangles on the surface of the volume mesh. If
+        // the mesh has only tetras, then create the surface
+        // elements and store it in a vega volumetric mesh.
         if(this->meshProps & MeshType::Tetra)
         {
-            if((this->meshProps & MeshType::hasBDConditions) && (this->meshProps & MeshType::hasMaterials))
+            if((this->meshProps & MeshType::hasBDConditions) &&
+                (this->meshProps & MeshType::hasMaterials))
             {
                 this->setVegaTetraMesh(vertices,tetraArray,bdConditions,materials);
             }
@@ -142,12 +159,19 @@ public:
             {
                 this->setVegaTetraMesh(vertices,tetraArray);
             }
+
+            // If the vtk dataset also contains surface triangles, then
+            // store them in a SurfaceMesh and attach to the volumetric mesh.
+            // Otherwise use vega to compute the surface triangles.
             if(this->meshProps & MeshType::Tri)
             {
-                // If the vtk dataset also contains surface triangles, store them in the mesh
                 std::vector<core::Vec3d> surfaceVertices;
                 std::unordered_map<size_t,size_t> uniqueVertexArray;
-                this->reorderSurfaceTopology(triangleArray,vertices,surfaceVertices,uniqueVertexArray);
+                this->reorderSurfaceTopology(
+                    vertices,
+                    surfaceVertices,
+                    triangleArray,
+                    uniqueVertexArray);
 
                 auto meshToAttach = std::make_shared<SurfaceMesh>();
                 meshToAttach->setVertices(surfaceVertices);
@@ -160,28 +184,31 @@ public:
             }
             else
             {
-                // Otherwise use vega to compute the surface triangles
                 auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(this->meshIO->getMesh());
                 ObjMesh *vegaObjMesh = GenerateSurfaceMesh::ComputeMesh(vegaMesh->getVegaMesh().get());
                 const ObjMesh::Group *vegaObjMeshGroup = vegaObjMesh->getGroupHandle(0);
 
-                // Copy triangles from vega structure...
-                std::vector<std::array<size_t,3>> localTriangleArray(vegaObjMesh->getNumFaces());
+                // Copy triangles from vega surface mesh.
+                triangleArray.resize(vegaObjMesh->getNumFaces());
 
-                std::vector<core::Vec3d> surfaceVertices;
                 for(int i = 0, end = vegaObjMeshGroup->getNumFaces(); i < end; ++i)
                 {
-                    localTriangleArray[i][0] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(0)->getPositionIndex();
-                    localTriangleArray[i][1] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(1)->getPositionIndex();
-                    localTriangleArray[i][2] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(2)->getPositionIndex();
+                    triangleArray[i][0] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(0)->getPositionIndex();
+                    triangleArray[i][1] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(1)->getPositionIndex();
+                    triangleArray[i][2] = vegaObjMeshGroup->getFaceHandle(i)->getVertexHandle(2)->getPositionIndex();
                 }
                 delete vegaObjMesh;
+                std::vector<core::Vec3d> surfaceVertices;
                 std::unordered_map<size_t,size_t> uniqueVertexArray;
-                this->reorderSurfaceTopology(localTriangleArray,vertices,surfaceVertices,uniqueVertexArray);
+                this->reorderSurfaceTopology(
+                    vertices,
+                    surfaceVertices,
+                    triangleArray,
+                    uniqueVertexArray);
 
                 auto meshToAttach = std::make_shared<SurfaceMesh>();
                 meshToAttach->setVertices(surfaceVertices);
-                meshToAttach->setTriangles(localTriangleArray);
+                meshToAttach->setTriangles(triangleArray);
                 vegaMesh->setVertexMap(uniqueVertexArray);
                 vegaMesh->attachSurfaceMesh(meshToAttach);
             }
@@ -192,6 +219,11 @@ public:
         }
     }
 
+    ///
+    /// \brief Copy vtk points into vertices.
+    /// \param points VTK point taken from the dataset.
+    /// \param vertices Array oof vertices holding coordinates.
+    ///
     void copyPoints(vtkPoints *points, std::vector<core::Vec3d> &vertices) const
     {
         if(!points)
@@ -208,6 +240,13 @@ public:
         }
     }
 
+    ///
+    /// \brief Copy vtk cells into triangles.
+    /// \param cells VTK cell array taken from the dataset.
+    /// \param tetraArray Array of triangles holding indices to vertices.
+    /// \param tetraArray Array of tetrahedrons holding indices to vertices.
+    /// \param hexaArray Array of hexahedrons holding indices to vertices.
+    ///
     void copyCells(vtkCellArray *cells,
                    std::vector<std::array<size_t,3>> &triangleArray,
                    std::vector<std::array<size_t,4>> &tetraArray,
@@ -270,6 +309,12 @@ public:
         }
     }
 
+    ///
+    /// \brief Copy vtk field data.
+    /// \param cells VTK fields array taken from the dataset.
+    /// \param constraints Output array of a vector holding indices to vertices.
+    /// \param material Array of material properties.
+    ///
     void copyData(vtkFieldData *fields,
                   std::vector<size_t> &constraints,
                   core::Vec3d &material)
@@ -279,28 +324,33 @@ public:
             return;
         }
         // Get boundary conditions and material properties
-        double mass = 0;
-        double poissonRatio = 0;
-        double youngModulus = 0;
 
         this->meshProps |= MeshType::hasMaterials;
 
         auto boundaryConditions = vtkUnsignedIntArray::SafeDownCast(fields->GetArray("boundary_conditions"));
         if(boundaryConditions && boundaryConditions->GetNumberOfTuples() > 0)
         {
+            constraints.resize(boundaryConditions->GetNumberOfTuples());
+            for(size_t i = 0; i < boundaryConditions->GetNumberOfTuples(); ++i)
+            {
+                constraints[i] = boundaryConditions->GetValue(i);
+            }
             this->meshProps |= MeshType::hasBDConditions;
         }
         if(fields->GetArray("mass_density"))
         {
             material(0) = fields->GetArray("mass_density")->GetComponent(0,0);
+            this->meshProps |= MeshType::hasDensity;
         }
         if(fields->GetArray("poisson_ratio"))
         {
             material(1) = fields->GetArray("poisson_ratio")->GetComponent(0,0);
+            this->meshProps |= MeshType::hasPoisson;
         }
         if(fields->GetArray("young_modulus"))
         {
             material(2) = fields->GetArray("young_modulus")->GetComponent(0,0);
+            this->meshProps |= MeshType::hasYoung;
         }
     }
 
@@ -309,6 +359,6 @@ public:
 
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
     SIMMEDTK_BEGIN_ONLOAD(register_VTKMeshReaderDelegate)
-        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, VTKMeshDelegate, IOMesh::ReaderGroup::VTK);
+        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, IOMeshVTKDelegate, IOMesh::ReaderGroup::VTK);
     SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

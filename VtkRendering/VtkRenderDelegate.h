@@ -9,6 +9,7 @@ class VtkRenderDelegate : public RenderDelegate
 {
 public:
     virtual vtkActor *getActor() const = 0;
+    virtual void initDraw(){};
 };
 
 #endif // SMRENDERABLE_H

@@ -50,22 +50,41 @@ public:
         meshIO = src;
     }
 
+    ///
+    /// \brief Performs the actual reading of the mesh.
+    ///     It populates the local mesh datastructure.
+    ///
     virtual void read() { }
+
+    ///
+    /// \brief Write mesh.
+    ///  You can use one of the boundled writers or any customized one.
+    ///
     virtual void write(){ }
 
+    /// \brief Mesh type and property variable
     enum MeshType
     {
-        None    = 0,
-        Tri     = 1 << 0,
-        Tetra   = 1 << 1,
-        Hexa    = 1 << 2,
-        hasMaterials = 1 << 3,
-        hasBDConditions = 1 << 4
+        Unknown         = 0,
+        Tri             = 1,
+        Tetra           = 1 << 1,
+        Hexa            = 1 << 2,
+        hasMaterials    = 1 << 3,
+        hasBDConditions = 1 << 4,
+        hasDensity      = 1 << 4,
+        hasPoisson      = 1 << 5,
+        hasYoung        = 1 << 6
 
     };
-    int meshProps;
+
+    // Used to know what type of mesh is being read.
+    unsigned int meshProps;
 
 protected:
+    ///
+    /// \brief Creates a new surface mesh with vertices and triangleArray and
+    /// stores it in the meshIO.
+    ///
     void setSurfaceMesh(const std::vector<core::Vec3d> &vertices,
                         const std::vector<std::array<size_t,3>> &triangleArray)
     {
@@ -75,6 +94,11 @@ protected:
         this->meshIO->setMesh(mesh);
     }
 
+    ///
+    /// \brief Creates a new vega volumetric mesh with vertices and tetraArray
+    /// and stores it in the meshIO. Uses the vega mesh constructor that takes
+    /// boundary conditions and material properties.
+    ///
     void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
                           const std::vector<std::array<size_t,4>> &tetraArray,
                           const std::vector<size_t> &bdConditions,
@@ -103,9 +127,15 @@ protected:
                                                   material[1],
                                                   material[2]);
         tetraMesh->setVegaMesh(vegaMesh);
+        tetraMesh->setFixedVertices(bdConditions);
         this->meshIO->setMesh(tetraMesh);
+
     }
 
+    ///
+    /// \brief Creates a new vega volumetric mesh with vertices and tetraArray
+    /// and stores it in the meshIO.
+    ///
     void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
                           const std::vector<std::array<size_t,4>> &tetraArray)
     {
@@ -131,6 +161,11 @@ protected:
         this->meshIO->setMesh(tetraMesh);
     }
 
+    ///
+    /// \brief Creates a new vega volumetric mesh with vertices and hexaArray
+    /// and stores it in the meshIO. Uses the vega mesh constructor that takes
+    /// boundary conditions and material properties.
+    ///
     void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
                          const std::vector<std::array<size_t,8>> &hexaArray,
                          const std::vector<size_t> &bdConditions,
@@ -160,9 +195,16 @@ protected:
                                                     material[1],
                                                     material[2]);
         hexaMesh->setVegaMesh(vegaMesh);
+        hexaMesh->setFixedVertices(bdConditions);
         this->meshIO->setMesh(hexaMesh);
     }
 
+    ///
+    /// \brief Creates a new vega volumetric mesh with vertices and hexaArray
+    /// and stores it in the meshIO.
+    /// \param vertices Vertex array
+    /// \param hexaArray Hexahedron array
+    ///
     void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
                          const std::vector<std::array<size_t,8>> &hexaArray)
     {
@@ -190,22 +232,28 @@ protected:
         this->meshIO->setMesh(hexaMesh);
     }
 
-    void reorderSurfaceTopology(std::vector<std::array<size_t,3>> &triangleArray,
-                                const std::vector<core::Vec3d> &vertices,
+    ///
+    /// \brief Utility function to help extract a surface mesh from a volume
+    ///      mesh.
+    /// \param triangleArray Triangle array of the surface of the volumetric
+    ///     mesh. This array will be sorted and updated with new indices.
+    /// \param vertices Entire volumetric mesh vertex array.
+    /// \param surfaceVertices Ouput array containing the vertex array for
+    ///     the surface mesh.
+    /// \param uniqueVertexArray Output map of the vertices. Maps indices
+    ///     from the surfaceVertices to vertices.
+    ///
+    void reorderSurfaceTopology(const std::vector<core::Vec3d> &vertices,
                                 std::vector<core::Vec3d> &surfaceVertices,
+                                std::vector<std::array<size_t,3>> &triangleArray,
                                 std::unordered_map<size_t,size_t> &uniqueVertexArray
                                )
     {
-        auto CompareTriangles = [&](const std::array<size_t,3> &x,
-                                    const std::array<size_t,3> &y) -> bool
-        {
-            return (x[0] < y[0])
-                || ((x[0] == y[0]) && (x[1] < y[1]))
-                || ((x[1] == y[1]) && (x[2] < y[2])) ? true: false;
-        };
+        // First, sort the triangle array to speed thing up later.
+        std::sort(std::begin(triangleArray),std::end(triangleArray));
 
-        std::sort(std::begin(triangleArray),std::end(triangleArray),CompareTriangles);
-
+        // Use a set to discard repeated indices in the surface triangles. T
+        // This also sort the vertex index.
         std::set<size_t> uniqueVertexSet;
         for(const auto &t : triangleArray)
         {
@@ -214,12 +262,14 @@ protected:
                 uniqueVertexSet.insert(v);
             }
         }
+
+        // Create a map between the volumetric mesh vertex indices and surface
+        // vertex indices.
         size_t index = 0;
         for(const auto &v : uniqueVertexSet)
         {
             uniqueVertexArray[index++] = v;
         }
-        uniqueVertexSet.clear();
         for(auto &t : triangleArray)
         {
             for(auto &v : t)

@@ -23,21 +23,48 @@
 #ifndef IOMESH_H
 #define IOMESH_H
 
+#include "Core/Factory.h"
 #include <memory>
 
-#include "Core/Factory.h"
-#include "Core/BaseMesh.h"
-
 class IOMeshDelegate;
+namespace Core{
+    class BaseMesh;
+}
 
 ///
-/// \brief Mesh input/output class. This class is used to read/write meshes on several formats.
-///  Users can add more readers by implementing delegates for a particular reader
-///     \see \IOMeshVTKDelegate, \IOMeshVegaDelegarte and \IOMeshAssimpDelegate
+/// \brief Mesh input/output class. This class is used to read/write meshes on
+/// several formats. I currently used VTK, VegaFEM, Assimp and a custom reader
+/// for .3ds files. Users can add more readers by implementing delegates for a
+/// particular reader \see \IOMeshVTKDelegate, \IOMeshVegaDelegarte and
+/// \IOMeshAssimpDelegate. Users and developers can extend this mesh reader to
+/// any ther format by listing the format here in MeshFileType and implement a
+/// delegate for the required format, \see \IOMeshAssimpDelegate,
+/// \IOMeshVTKDelegate, \IOMesh3dsDelegate, \IOMeshVegaDelegate.
 ///
 class IOMesh
 {
 public:
+    ///
+    /// \brief Enum class for the readers group. This enum is used to prioritize the io
+    ///  delegates in the factory. For instance, VTK and Assimp both can read
+    ///  stl files. You can use the contructor of IOMesh in order to give
+    ///  highter (lower) priority to Assimp (or any other reader) to read .stl (or any
+    ///  of the supported formats) formated files.
+    ///
+    enum ReaderGroup
+    {
+        VTK,
+        Assimp,
+        Vega,
+        Other
+    };
+
+    ///
+    /// \brief Constructor/Destructor
+    ///
+    IOMesh(const IOMesh::ReaderGroup &priorityGroup = ReaderGroup::VTK);
+    ~IOMesh();
+
     ///
     /// \brief Enum class for the type of files this mesh io expect,
     ///         add more types here to extend the mesh io.
@@ -54,24 +81,6 @@ public:
         ThreeDS,
         Unknown
     };
-
-
-    ///
-    /// \brief Enum class for the readers group. Used to prioritize the io delegates in the factory.
-    ///
-    enum ReaderGroup
-    {
-        VTK,
-        Assimp,
-        Vega,
-        Other
-    };
-
-    ///
-    /// \brief Constructor/Destructor
-    ///
-    IOMesh(const IOMesh::ReaderGroup &priorityGroup = ReaderGroup::VTK);
-    ~IOMesh();
 
     ///
     /// \brief Read/Write meshes
@@ -95,13 +104,15 @@ public:
     /// \brief Returns the file type. This gets set to the correct typwhen calling \checkFileType.
     ///
     const MeshFileType &getFileType() const;
+
 private:
     ///
-    /// \brief Simplistic function for figuring out the extension of a file from its path.
+    /// \brief Simple utility function for determine the extension of a file from its path.
     ///  There will be corner cases in which this function wont properly work.
     ///  eg "c:\program files\AppleGate.Net\readme"
+    ///  TODO: Improve this fuction. Maybe using Boost filesystem library.
     ///
-    void checkFileType();
+    IOMesh::MeshFileType getFileExtension() const;
 
 private:
     // Storage for the mesh file name, used by delegates.

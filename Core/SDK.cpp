@@ -67,7 +67,7 @@ void SDK::releaseScene(std::shared_ptr<Scene> scene)
 
 std::shared_ptr<ViewerBase> SDK::createViewer()
 {
-    this->viewer = Factory<CoreClass>::createDefaultAs<ViewerBase>("ViewerBase");
+    this->viewer = Factory<CoreClass>::createSubclassForGroupAs<ViewerBase>("ViewerBase",300);
     if (this->viewer)
       {
       this->viewer->log = this->errorLog;

@@ -22,9 +22,16 @@
 //---------------------------------------------------------------------------
 
 #include "IO/IOMesh.h"
-#include "IO/IOMeshDelegate.h"
-#include "Core/MakeUnique.h"
 
+#include "Core/BaseMesh.h"
+#include "Core/Factory.h"
+#include "Core/MakeUnique.h"
+#include "IO/IOMeshDelegate.h"
+
+///
+/// \brief DelegatorType. Holds a list of factory delegates that take care the
+/// actual read operation. This is the dispatcher of delegators for readers
+/// and writers for mesh formats.
 class IOMesh::DelegatorType
 {
     typedef std::function<std::shared_ptr<IOMeshDelegate>()> DelegatorFunction;
@@ -33,7 +40,7 @@ public:
     DelegatorType(IOMesh *ioMesh) : io(ioMesh){}
     void addDefaultDelegator(const MeshFileType &type, const std::string &delegateName)
     {
-        this->delegatorList[type] = [&]()
+        auto f = [=]()
         {
             auto delegate = Factory<IOMeshDelegate>::createDefault(delegateName);
             if(delegate)
@@ -42,10 +49,11 @@ public:
             }
             return delegate;
         };
+        this->delegatorList.emplace(type,f);
     }
     void addGroupDelegator(const MeshFileType &type, const std::string &delegateName, const int &group)
     {
-        this->delegatorList[type] = [&]()
+        auto f = [=]()
         {
             auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup(delegateName,group);
             if(delegate)
@@ -54,13 +62,11 @@ public:
             }
             return delegate;
         };
+        this->delegatorList.emplace(type,f);
     }
     std::shared_ptr<IOMeshDelegate> get(const MeshFileType &type)
     {
-        auto f = static_cast<DelegatorFunction>(this->delegatorList.at(type));
-        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroupAs("VegaMeshDelegate",ReaderGroup::Vega);
-        auto fun = f();
-        return f();
+        return this->delegatorList.at(type)();
     }
 
 public:
@@ -81,26 +87,25 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     this->delegator->addDefaultDelegator(MeshFileType::VTP,"VTKMeshReaderDelegate");
     //
     // Set the vega io, only vega can read/write those files
-    this->delegator->addDefaultDelegator(MeshFileType::VEG,"VegaMeshDelegate");
+    this->delegator->addDefaultDelegator(MeshFileType::VEG,"IOMeshVegaDelegate");
     //
     // The readers for obj,stl and ply are based on a priority group (defaults to vtk io's)
-    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",priorityGroup);
+    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",ReaderGroup::Assimp);
     this->delegator->addGroupDelegator(MeshFileType::STL,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::PLY,"IOMeshDelegate",priorityGroup);
     //
-    // Default reader for unknown filetypes is assimp
-    this->delegator->addDefaultDelegator(MeshFileType::VTP,"IOMeshDelegate");
-    //
     // Default reader for 3ds filetypes is assimp
-    this->delegator->addDefaultDelegator(MeshFileType::ThreeDS,"IOMeshDelegate");
-
-
+    this->delegator->addGroupDelegator(MeshFileType::ThreeDS,"IOMeshDelegate",ReaderGroup::Assimp);
+    //
+    // Default reader for unknown filetypes
+    this->delegator->addGroupDelegator(MeshFileType::Unknown,"IOMeshDelegate",priorityGroup);
 }
+
 IOMesh::~IOMesh() {}
 void IOMesh::read(const std::string& filePath)
 {
     this->fileName = filePath;
-    this->checkFileType();
+    this->fileType = this->getFileExtension();
     auto reader = this->delegator->get(this->fileType);
     if(reader)
     {
@@ -115,53 +120,55 @@ void IOMesh::read(const std::string& filePath)
 void IOMesh::write(const std::string& /*filePath*/)
 {
 }
-void IOMesh::checkFileType()
+IOMesh::MeshFileType IOMesh::getFileExtension() const
 {
+    auto extensionType = MeshFileType::Unknown;
     if (this->fileName.length() == 0)
     {
         std::cerr << "IOMesh: Error invalid file name." << std::endl;
-        return;
+        return extensionType;
     }
+
     std::string extension = this->fileName.substr(this->fileName.find_last_of(".") + 1);
 
     if (extension =="vtk" || extension =="VTK")
     {
-        this->fileType = MeshFileType::VTK;
-        return;
+        extensionType = MeshFileType::VTK;
+        return extensionType;
     }
     if (extension =="vtp" || extension =="VTP")
     {
-        this->fileType = MeshFileType::VTP;
-        return;
+        extensionType = MeshFileType::VTP;
+        return extensionType;
     }
     if (extension =="obj" || extension =="OBJ")
     {
-        this->fileType = MeshFileType::OBJ;
-        return;
+        extensionType = MeshFileType::OBJ;
+        return extensionType;
     }
     if (extension =="stl" || extension =="STL")
     {
-        this->fileType = MeshFileType::STL;
-        return;
+        extensionType = MeshFileType::STL;
+        return extensionType;
     }
     if (extension =="ply" || extension =="PLY")
     {
-        this->fileType = MeshFileType::PLY;
-        return;
+        extensionType = MeshFileType::PLY;
+        return extensionType;
     }
     if (extension =="veg" || extension =="VEG")
     {
-        this->fileType = MeshFileType::VEG;
-        return;
+        extensionType = MeshFileType::VEG;
+        return extensionType;
     }
     if (extension =="3ds" || extension =="3DS")
     {
-        this->fileType = MeshFileType::ThreeDS;
-        return;
+        extensionType = MeshFileType::ThreeDS;
+        return extensionType;
     }
-    this->fileType = MeshFileType::Unknown;
+    return extensionType;
 }
-std::shared_ptr< Core::BaseMesh > IOMesh::getMesh()
+std::shared_ptr<Core::BaseMesh> IOMesh::getMesh()
 {
     return this->mesh;
 }

@@ -45,11 +45,17 @@ public:
     {
     }
 
+    ///
+    /// \brief Return the render window
+    ///
     vtkSmartPointer<vtkRenderWindow> get() const
     {
         return this->renderWindow;
     }
 
+    ///
+    /// \brief Render scene
+    ///
     void render()
     {
         this->viewer->adjustFPS();
@@ -57,6 +63,14 @@ public:
         this->renderWindowInteractor->Start();
     }
 
+    void removeRenderer(vtkRenderer* renderer)
+    {
+        this->renderWindow->RemoveRenderer(renderer);
+    }
+
+    ///
+    /// \brief Add renderer to the render windows
+    ///
     void addRenderer()
     {
         // Create a new renderer and add actors to it.
@@ -74,7 +88,7 @@ public:
         {
             for(const auto &object : ro.scene->getSceneObject())
             {
-                delegate = std::static_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
+                delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
                 if (delegate)
                 {
                     renderer->AddActor(delegate->getActor());
@@ -83,7 +97,7 @@ public:
         }
         for(const auto &object : this->viewer->objectList)
         {
-            delegate = std::static_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
+            delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
             if (delegate)
             {
                 renderer->AddActor(delegate->getActor());
@@ -139,3 +153,8 @@ void VtkViewer::initResources()
     this->renderer->addRenderer();
 }
 
+SIMMEDTK_BEGIN_DYNAMIC_LOADER()
+  SIMMEDTK_BEGIN_ONLOAD(register_rendering_viewer)
+    SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,VtkViewer,300);
+  SIMMEDTK_FINISH_ONLOAD()
+SIMMEDTK_FINISH_DYNAMIC_LOADER()

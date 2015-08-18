@@ -232,7 +232,12 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
+        auto data = (unsigned int*)p_surfaceMesh->getTriangles().data()->data();
+        int size = p_surfaceMesh->getTriangles().size() * 3;
+        Eigen::Map<Eigen::Matrix<unsigned int,Eigen::Dynamic,1>> vectorData(data,p_surfaceMesh->getTriangles().size() * 3);
+        std::cout << "Size = " << p_surfaceMesh->getTriangles().size() * 3 << std::endl;
+        std::cout << vectorData << std::endl;
+        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, data);
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))

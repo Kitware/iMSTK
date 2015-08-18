@@ -23,7 +23,6 @@
 
 #include "Core/Config.h"
 #include "Core/SDK.h"
-#include "Core/IOStream.h"
 #include "Core/ViewerBase.h"
 #include "Core/DataStructures.h"
 #include "Core/RenderDelegate.h"

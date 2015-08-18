@@ -247,7 +247,7 @@ void SurfaceMesh::assignTexture(const std::string& referenceName)
     if(id < 0)
     {
         std::cerr << "The texture " << referenceName
-            << " cant be attached because it has not been processed but the manager." << std::endl;
+            << " cant be attached because it has not been processed by the manager." << std::endl;
         return;
     }
 

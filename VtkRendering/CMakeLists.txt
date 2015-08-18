@@ -12,8 +12,7 @@ simmedtk_add_library(VtkRendering
 )
 set(PRIVATE_LIBS
     PRIVATE
-        Core
-        Mesh)
+        Core)
 if(VTK_LIBRARIES)
     target_link_libraries(VtkRendering
     PUBLIC

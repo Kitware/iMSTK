@@ -20,7 +20,6 @@
 #include "Core/Config.h"
 #include "Core/Color.h"
 
-#include <iostream>
 #include <memory>
 #include <vector>
 
@@ -30,44 +29,55 @@ struct UnifiedId;
 
 ///\brief Hold a pointer to a source of geometry that render details can use for drawing.
 struct GeometrySource {
-    CoreClass* sceneObject;
-    VisualArtifact* analyticObject;
+  CoreClass* sceneObject;
+  VisualArtifact* analyticObject;
 
-    GeometrySource();
-    void setSource ( CoreClass* src );
-    void setSource ( VisualArtifact* src );
-    template<typename T>
-    T* sourceAs() const
+  GeometrySource()
+    : sceneObject(nullptr), analyticObject(nullptr)
+    { }
+  void setSource(CoreClass* src)
     {
-        T* result;
-        if ( ( result = dynamic_cast<T*> ( sceneObject ) ) )
-        {
-            return result;
-        }
-        if ( ( result = dynamic_cast<T*> ( analyticObject ) ) )
-        {
-            return result;
-        }
-        return nullptr;
+    this->sceneObject = src;
+    this->analyticObject = nullptr;
+    }
+  void setSource(VisualArtifact* src)
+    {
+    this->sceneObject = nullptr;
+    this->analyticObject = src;
+    }
+  template<typename T>
+  T* sourceAs() const
+    {
+    T* result;
+    if ((result = dynamic_cast<T*>(sceneObject)))
+    {
+      return result;
+    }
+    if ((result = dynamic_cast<T*>(analyticObject)))
+    {
+      return result;
+    }
+    return nullptr;
     }
 };
 
 /// \brief RenderDetail has rendering options and features.
 ///It shows how the mesh should be rendered
-struct RenderDetail {
+struct RenderDetail
+{
 public:
     typedef std::shared_ptr<RenderDetail> Ptr;
 
     RenderDetail();
-    RenderDetail ( unsigned int type );
+    RenderDetail(unsigned int type);
 
     void reset();
 
     /// \brief attachment of shader
-    void addShader ( std::shared_ptr<UnifiedId> p_shaderID );
+    void addShader(std::shared_ptr<UnifiedId> p_shaderID);
 
     /// \brief attachment of VAO
-    void addVAO ( std::shared_ptr<UnifiedId> p_shaderID );
+    void addVAO(std::shared_ptr<UnifiedId> p_shaderID);
 
     const Color &getColorDiffuse() const;
 
@@ -107,29 +117,29 @@ public:
 
     const std::vector<bool> &getVAOEnable() const;
 
-    void setPointSize ( const float size );
+    void setPointSize(const float size);
 
-    void setLineSize ( const float size );
+    void setLineSize(const float size);
 
-    void setVertexColor ( const Color vertColor );
+    void setVertexColor(const Color vertColor);
 
-    void setHighlightColor ( const Color highlightColor );
+    void setHighlightColor(const Color highlightColor);
 
-    void setNormalColor ( const Color highlightColor );
+    void setNormalColor(const Color highlightColor);
 
-    void setShininess ( const float s );
+    void setShininess(const float s);
 
-    void setNormalLength ( const float len );
+    void setNormalLength(const float len);
 
-    void setDiffuseColor ( const Color diffColor );
+    void setDiffuseColor(const Color diffColor);
 
-    void setAmbientColor ( const Color ambColor );
+    void setAmbientColor(const Color ambColor);
 
-    void setSpecularColor ( const Color specColor );
+    void setSpecularColor(const Color specColor);
 
-    void setShadowColor ( const Color shadColor );
+    void setShadowColor(const Color shadColor);
 
-    void setWireframeColor ( const Color wireColor );
+    void setWireframeColor(const Color wireColor);
 
 public:
     unsigned int renderType; // render type
@@ -155,4 +165,3 @@ public:
 };
 
 #endif // SMRENDERDETAIL_H
-
