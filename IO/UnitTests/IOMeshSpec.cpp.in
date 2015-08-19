@@ -34,10 +34,10 @@ const std::string objMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.obj"
 const std::string vegMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
 const std::string plyMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.ply";
 const std::string stlMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.stl";
-const std::string vtkMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.vtk";
+const std::string vtkMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtk";
 const std::string vtuMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtu";
 const std::string vtuPropFileName = "@CMAKE_BINARY_DIR@/Testing/Models/TestMesh.vtu";
-const std::string vtpMeshFileName = "@CMAKE_BINARY_DIR@/Testing/Models/sphere.vtp";
+const std::string vtpMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtp";
 
 using namespace bandit;
 
@@ -74,6 +74,10 @@ go_bandit([](){
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
         it("loads ply mesh", []() {
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
@@ -101,6 +105,10 @@ go_bandit([](){
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
         it("loads vtu mesh", []() {
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
@@ -110,6 +118,10 @@ go_bandit([](){
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
         it("loads vtu with properties mesh", []() {
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
@@ -119,6 +131,10 @@ go_bandit([](){
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
         it("loads vtp with properties mesh", []() {
             std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
