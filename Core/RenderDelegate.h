@@ -8,11 +8,20 @@
 class RenderDelegate
 {
 public:
+
+    enum RendererType
+    {
+        VTK = 300,
+        Other = 400
+    };
+
     typedef std::shared_ptr<RenderDelegate> Ptr;
 
     virtual void initDraw()
     { }
     virtual void draw() const
+    { }
+    virtual void modified()
     { }
 
     virtual bool isTargetTextured() const

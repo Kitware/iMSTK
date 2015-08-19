@@ -23,14 +23,28 @@
 
 #include "Core/Model.h"
 
-Model::Model()
-{
 
-}
-
-Model::~Model()
-{
-
-}
 Model::Model() {}
 Model::~Model() {}
+std::shared_ptr< Core::BaseMesh > Model::getMesh()
+{
+    return nullptr;
+}
+std::shared_ptr< CoreClass > Model::getObject()
+{
+    return nullptr;
+}
+void Model::draw() {}
+std::shared_ptr< RenderDelegate > Model::getRenderDelegate() const
+{
+    return this->renderDelegate;
+}
+void Model::setRenderDelegate(RenderDelegate::Ptr delegate)
+{
+    this->renderDelegate = delegate;
+
+    if(delegate)
+    {
+        this->renderDelegate->setSourceGeometry(this);
+    }
+}

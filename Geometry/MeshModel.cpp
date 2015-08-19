@@ -26,7 +26,12 @@
 #include "IO/IOMesh.h"
 #include "Core/RenderDelegate.h"
 
-MeshModel::MeshModel() {}
+MeshModel::MeshModel()
+{
+    this->setRenderDelegate(
+        Factory<RenderDelegate>::createConcreteClassForGroup(
+            "MeshRenderDelegate",RenderDelegate::RendererType::VTK));
+}
 MeshModel::~MeshModel() {}
 void MeshModel::load(const std::string& meshName)
 {

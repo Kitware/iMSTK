@@ -23,9 +23,9 @@
 
 #include <memory>
 
+#include "Core/Model.h"
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
-#include "Core/Factory.h"
 #include "Mesh/SurfaceMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
 
@@ -56,22 +56,18 @@ public:
 
     vtkActor *getActor() const;
     void initDraw();
+    void modified();
 
 private:
-    vtkSmartPointer<vtkActor> actor;
-    vtkSmartPointer<MeshNodalCoordinates<double>> mappedData;
+    vtkNew<vtkActor> actor;
+    vtkNew<MeshNodalCoordinates<double>> mappedData;
     vtkSmartPointer<vtkMapper> mapper;
+
+    vtkSmartPointer<vtkDataSet> dataSet;
 };
 
 void MeshRenderDelegate::initDraw()
 {
-    actor = vtkActor::New();
-    mappedData = MeshNodalCoordinates<double>::New();
-
-    vtkNew<vtkUnstructuredGrid> unstructuredMesh;
-    vtkNew<vtkPoints> vertices;
-    vtkNew<vtkCellArray> triangles;
-
     // The geometry can be either a volume or surface.
     // If its a vega volume then get its attached surface mesh.
     // This render delegate only draws surface meshes.
@@ -95,6 +91,7 @@ void MeshRenderDelegate::initDraw()
 
     mappedData->SetVertexArray(mesh->getVertices());
 
+    vtkNew<vtkCellArray> triangles;
     auto surfaceTriangles = mesh->getTriangles();
     for(const auto &t : surfaceTriangles)
     {
@@ -105,8 +102,11 @@ void MeshRenderDelegate::initDraw()
         triangles->InsertNextCell(3,cell);
     }
 
+    vtkNew<vtkPoints> vertices;
     vertices->SetNumberOfPoints(mesh->getVertices().size());
     vertices->SetData(mappedData.GetPointer());
+
+    vtkNew<vtkUnstructuredGrid> unstructuredMesh;
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
 
@@ -132,6 +132,7 @@ void MeshRenderDelegate::initDraw()
         unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates.GetPointer());
     }
 
+    dataSet = unstructuredMesh.GetPointer();
     if (mesh->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
@@ -140,6 +141,7 @@ void MeshRenderDelegate::initDraw()
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
+
 
         mapper = vtkPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
@@ -154,7 +156,7 @@ void MeshRenderDelegate::initDraw()
     {
         actor->SetTexture(texture);
     }
-    actor->SetMapper(mapper);
+    actor->SetMapper(mapper.GetPointer());
 }
 
 bool MeshRenderDelegate::isTargetTextured() const
@@ -171,8 +173,18 @@ vtkActor *MeshRenderDelegate::getActor() const
     return this->actor.GetPointer();
 }
 
+void MeshRenderDelegate::modified()
+{
+    dataSet->Modified();
+}
+
+#include "Core/Config.h"
+#include "Core/Factory.h"
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-SIMMEDTK_BEGIN_ONLOAD(register_mesh_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,MeshRenderDelegate,300);
-SIMMEDTK_FINISH_ONLOAD()
+    SIMMEDTK_BEGIN_ONLOAD(register_MeshRenderDelegate)
+        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
+                                RenderDelegate,
+                                MeshRenderDelegate,
+                                RenderDelegate::RendererType::VTK);
+    SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

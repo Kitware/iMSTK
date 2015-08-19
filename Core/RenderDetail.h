@@ -25,12 +25,14 @@
 
 class VisualArtifact;
 class CoreClass;
+class Model;
 struct UnifiedId;
 
 ///\brief Hold a pointer to a source of geometry that render details can use for drawing.
 struct GeometrySource {
   CoreClass* sceneObject;
   VisualArtifact* analyticObject;
+  Model *model;
 
   GeometrySource()
     : sceneObject(nullptr), analyticObject(nullptr)
@@ -39,11 +41,19 @@ struct GeometrySource {
     {
     this->sceneObject = src;
     this->analyticObject = nullptr;
+    this->model = nullptr;
     }
   void setSource(VisualArtifact* src)
     {
     this->sceneObject = nullptr;
+    this->model = nullptr;
     this->analyticObject = src;
+    }
+  void setSource(Model* src)
+    {
+    this->sceneObject = nullptr;
+    this->model = src;
+    this->analyticObject = nullptr;
     }
   template<typename T>
   T* sourceAs() const
@@ -56,6 +66,10 @@ struct GeometrySource {
     if ((result = dynamic_cast<T*>(analyticObject)))
     {
       return result;
+    }
+    if ((result = dynamic_cast<T*>(model)))
+    {
+        return result;
     }
     return nullptr;
     }

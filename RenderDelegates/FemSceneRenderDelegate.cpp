@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Model.h"
 #include "Simulators/FemSceneObject.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"

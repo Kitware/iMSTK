@@ -16,6 +16,7 @@ simmedtk_add_library(Core
     IOStream.cpp
     Light.cpp
     Module.cpp
+    Model.cpp
     ObjectSimulator.cpp
     RenderDetail.cpp
     Scene.cpp
@@ -47,6 +48,7 @@ simmedtk_add_library(Core
     Light.h
     MemoryBlock.h
     Module.h
+    Model.h
     ObjectSimulator.h
     Scene.h
     SceneObject.h

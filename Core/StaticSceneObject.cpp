@@ -23,6 +23,7 @@
 
 #include "Core/StaticSceneObject.h"
 #include "Core/Factory.h"
+#include "RenderDelegate.h"
 
 StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
 {
@@ -31,8 +32,8 @@ StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : Scen
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 
     this->setRenderDelegate(
-      Factory<RenderDelegate>::createSubclass(
-        "RenderDelegate","StaticSceneObjectRenderDelegate"));
+        Factory<RenderDelegate>::createConcreteClassForGroup(
+        "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::VTK));
 }
 
 StaticSceneObject::~StaticSceneObject()

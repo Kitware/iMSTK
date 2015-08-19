@@ -31,18 +31,31 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyleSwitch.h>
+#include <vtkCommand.h>
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
 ///
-class VtkViewer::VtkRenderer
+class VtkViewer::VtkRenderer : public vtkCommand
 {
+    int timerId;
 public:
     VtkRenderer(VtkViewer *activeViewer) :
         viewer(activeViewer),
         renderWindow(vtkRenderWindow::New()),
         renderWindowInteractor(vtkRenderWindowInteractor::New())
     {
+        this->timerId = -1;
+    }
+
+    virtual void Execute(vtkObject *caller, unsigned long eventId,
+                         void *callData)
+    {
+        if(timerId == *static_cast<int*>(callData))
+        {
+            this->renderWindow->Render();
+        }
     }
 
     ///
@@ -60,7 +73,10 @@ public:
     {
         this->viewer->adjustFPS();
         this->renderWindow->Render();
+        this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
+        this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
         this->renderWindowInteractor->Start();
+        this->renderWindowInteractor->DestroyTimer(this->timerId);
     }
 
     void removeRenderer(vtkRenderer* renderer)
@@ -81,7 +97,10 @@ public:
         }
 
         this->renderWindowInteractor->SetRenderWindow(renderWindow);
-
+        vtkSmartPointer<vtkInteractorStyleSwitch> style =
+        vtkSmartPointer<vtkInteractorStyleSwitch>::New();
+        style->SetCurrentStyleToTrackballCamera();
+        renderWindowInteractor->SetInteractorStyle( style );
         // The actors are obtained from VtkRenderDelegates
         std::shared_ptr<VtkRenderDelegate> delegate;
         for(auto &ro : this->viewer->renderOperations)

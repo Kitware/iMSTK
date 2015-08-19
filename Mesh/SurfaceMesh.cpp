@@ -46,7 +46,7 @@ struct SurfaceMesh::TextureAttachment
 SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureCoordinates(false)
 {
     this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClassForGroup("MeshRenderDelegate",300));
+      Factory<RenderDelegate>::createConcreteClassForGroup("MeshRenderDelegate",RenderDelegate::RendererType::VTK));
 }
 SurfaceMesh::~SurfaceMesh()
 {

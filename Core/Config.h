@@ -60,7 +60,6 @@ enum
     MaxShaderVariableName = 255
 };
 
-
 /// \brief class types. Each class should have type of itself
 enum class ClassType
 {

@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Model.h"
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Simulators/PBDSceneObject.h"

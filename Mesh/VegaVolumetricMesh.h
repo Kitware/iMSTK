@@ -24,6 +24,9 @@
 #ifndef SMVEGAMESH_H
 #define SMVEGAMESH_H
 
+// STD includes
+#include <fstream>
+
 // SimMedTK includes
 #include "Core/BaseMesh.h"
 
@@ -123,6 +126,16 @@ public:
     /// Set render detail for surface meshes.
     ///
     void setRenderDetail(int i, std::shared_ptr<RenderDetail> newRenderDetail);
+
+    ///
+    /// \brief Get attached rendering mesh
+    ///
+    std::shared_ptr<SurfaceMesh> getRenderingMesh();
+
+    ///
+    /// \brief Get attached surface mesh
+    ///
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName);
 
 private:
     // Vega mesh base object

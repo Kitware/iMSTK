@@ -25,6 +25,7 @@
 
 // SimMedTK includes
 #include "Mesh/SurfaceMesh.h"
+#include "Core/RenderDelegate.h"
 
 // VEGA includes
 #include "volumetricMesh.h"
@@ -74,8 +75,7 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
 
         if(element < 0)
         {
-            std::cerr <<"Containing element not found for: " << meshVertices[i] <<std::endl;
-            continue;
+            element = this->mesh->getClosestElement(vegaPosition);
         }
 
         this->mesh->computeBarycentricWeights(element, vegaPosition, baryCentricWeights.data());
@@ -132,8 +132,9 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
 }
 void VegaVolumetricMesh::updateAttachedMeshes(double *q)
 {
-    for(auto surfaceMesh : this->attachedMeshes)
-    {
+    auto surfaceMesh = this->getRenderingMesh();
+//     for(auto surfaceMesh : this->attachedMeshes)
+//     {
         std::vector<core::Vec3d> displacements(surfaceMesh->getNumberOfVertices());
         VolumetricMesh::interpolate(q,
                                     displacements.data()->data(),
@@ -145,10 +146,12 @@ void VegaVolumetricMesh::updateAttachedMeshes(double *q)
         auto &vertices = surfaceMesh->getVertices();
         for(size_t i = 0, end = displacements.size(); i < end; ++i)
         {
-            vertices[i] += displacements[i];
+            std::cout << displacements[i] << std::endl;
+            vertices[i] += displacements[i]*100000;
         }
         surfaceMesh->computeTriangleNormals();
-    }
+        surfaceMesh->getRenderDelegate()->modified();
+//     }
 }
 const std::unordered_map<size_t,size_t>& VegaVolumetricMesh::getVertexMap() const
 {
@@ -176,4 +179,44 @@ std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getAttachedMesh(const size_t 
 void VegaVolumetricMesh::setRenderDetail(int i, std::shared_ptr< RenderDetail > newRenderDetail)
 {
     this->attachedMeshes.at(i)->setRenderDetail(newRenderDetail);
+}
+std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getRenderingMesh()
+{
+    return attachedMeshes.size() > 0
+           ? this->attachedMeshes.at(attachedMeshes.size() - 1)
+           : nullptr;
+}
+void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr< SurfaceMesh > surfaceMesh, const std::string& fileName)
+{
+    std::ifstream fileStream(fileName.c_str());
+
+    if(!fileStream)
+    {
+        std::cerr << "Unable to open file: " << fileName << std::endl;
+        return;
+    }
+
+    this->attachedMeshes.push_back(surfaceMesh);
+    std::vector<int> &vertices = this->attachedVertices[surfaceMesh];
+    std::vector<double> &weigths = this->attachedWeights[surfaceMesh];
+    vertices.clear();
+    weigths.clear();
+
+    int index;
+    std::array<int, 4> v;
+    std::array<double, 4> w;
+
+    while(fileStream >> index
+            >> v[0] >> w[0]
+            >> v[1] >> w[1]
+            >> v[2] >> w[2]
+            >> v[3] >> w[3])
+    {
+        vertices.push_back(v[0]); weigths.push_back(w[0]);
+        vertices.push_back(v[1]); weigths.push_back(w[1]);
+        vertices.push_back(v[2]); weigths.push_back(w[2]);
+        vertices.push_back(v[3]); weigths.push_back(w[3]);
+    }
+
+    std::cout << "Total # of weights read: " << weigths.size() << std::endl;
 }

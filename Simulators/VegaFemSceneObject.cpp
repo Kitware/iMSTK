@@ -196,9 +196,9 @@ void VegaFemSceneObject::loadVolumeMesh()
         auto ioMesh = std::make_shared<IOMesh>();
         ioMesh->read(femConfig->volumetricMeshFilename);
 
-        volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+        this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
 
-        if (!volumetricMesh)
+        if (!this->volumetricMesh)
         {
             PRINT_ERROR_LOCATION
             std::cout << "VEGA: error! unable to load the volumetric mesh from"
@@ -206,9 +206,9 @@ void VegaFemSceneObject::loadVolumeMesh()
             return;
         }
 
-        numNodes = volumetricMesh->getNumberOfVertices();
-        std::cout << "VEGA: Num vertices: " << volumetricMesh->getNumberOfVertices() <<
-                         ". Num elements: " << volumetricMesh->getNumberOfElements() << std::endl;
+        numNodes = this->volumetricMesh->getNumberOfVertices();
+        std::cout << "VEGA: Num vertices: " << this->volumetricMesh->getNumberOfVertices() <<
+                         ". Num elements: " << this->volumetricMesh->getNumberOfElements() << std::endl;
 
         // load mass matrix
         if (strcmp(femConfig->massMatrixFilename, "__none") == 0)
@@ -222,7 +222,7 @@ void VegaFemSceneObject::loadVolumeMesh()
                 std::cout << "VEGA: mass matrix file was not specified! Generating mass matrix file. \n";
 
                 SparseMatrix *tempMassMatrix;
-                GenerateMassMatrix::computeMassMatrix(volumetricMesh->getVegaMesh().get(), &tempMassMatrix, false);
+                GenerateMassMatrix::computeMassMatrix(this->volumetricMesh->getVegaMesh().get(), &tempMassMatrix, false);
 
                 std::cout << femConfig->massMatrixFilename << std::endl;
                 if (tempMassMatrix->Save(femConfig->massMatrixFilename) != 0)
@@ -247,7 +247,7 @@ void VegaFemSceneObject::loadVolumeMesh()
         {
 
             unsigned int loadingFlag = 0; // 0 = use low-memory version, 1 = use high-memory version
-            auto precomputedIntegrals = StVKElementABCDLoader::load(volumetricMesh->getVegaMesh().get(), loadingFlag);
+            auto precomputedIntegrals = StVKElementABCDLoader::load(this->volumetricMesh->getVegaMesh().get(), loadingFlag);
 
             if (precomputedIntegrals == nullptr)
             {
@@ -261,7 +261,7 @@ void VegaFemSceneObject::loadVolumeMesh()
             if (femConfig->numInternalForceThreads == 0)
             {
                 stVKInternalForces = std::make_shared<StVKInternalForces>(
-                    volumetricMesh->getVegaMesh().get(),
+                    this->volumetricMesh->getVegaMesh().get(),
                     precomputedIntegrals,
                     femConfig->addGravity,
                     femConfig->g);
@@ -270,7 +270,7 @@ void VegaFemSceneObject::loadVolumeMesh()
             else
             {
                 stVKInternalForces = std::make_shared<StVKInternalForcesMT>(
-                    volumetricMesh->getVegaMesh().get(),
+                    this->volumetricMesh->getVegaMesh().get(),
                     precomputedIntegrals,
                     femConfig->addGravity,
                     femConfig->g,
@@ -282,7 +282,7 @@ void VegaFemSceneObject::loadVolumeMesh()
         }
     }
 
-    auto meshGraph = volumetricMesh->getMeshGraph();
+    auto meshGraph = this->volumetricMesh->getMeshGraph();
     if (meshGraph)
     {
         int scaleRows = 1;
@@ -314,8 +314,19 @@ void VegaFemSceneObject::loadSurfaceMesh()
                 << ioMesh->getMesh()->getTriangles().size() << " faces\n";
         }
         auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
-        this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
+
+        // load interpolation structure
+        if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
+        {
+            std::cerr << "VEGA:  error! no secondary rendering mesh interpolation filename specified." << std::endl;
+            std::cerr << "VEGA:  error! weighs will be computed. Slow operation." << std::endl;
+            this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
+        }
+
+        this->volumetricMesh->attachSurfaceMesh(surfaceMesh,
+                                                femConfig->secondaryRenderingMeshInterpolationFilename);
     }
+
 }
 
 int VegaFemSceneObject::readBcFromFile(const char* filename, const int offset)

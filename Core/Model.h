@@ -29,6 +29,7 @@
 
 // SimMedTK includes
 #include "Core/CoreClass.h"
+#include "Core/RenderDelegate.h"
 
 namespace Core {
     class BaseMesh;
@@ -38,12 +39,20 @@ class CoreClass;
 class Model
 {
 public:
-    Model(){}
-    ~Model(){}
+    Model();
+    ~Model();
 
-    virtual std::shared_ptr<Core::BaseMesh> getMesh(){ return nullptr; }
-    virtual std::shared_ptr<CoreClass> getObject(){ return nullptr; }
-	virtual void draw(){}
+    virtual std::shared_ptr<Core::BaseMesh> getMesh();
+    virtual std::shared_ptr<CoreClass> getObject();
+    virtual void draw();
+
+    virtual void setRenderDelegate(RenderDelegate::Ptr delegate);
+
+    /// \brief Get render delegate
+    RenderDelegate::Ptr getRenderDelegate() const;
+
+private:
+    RenderDelegate::Ptr renderDelegate;
 };
 
 #endif // SMMODEL

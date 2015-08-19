@@ -21,6 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include <memory>
+
 // Core SimMedTK includes
 #include "Core/Config.h"
 #include "Core/ErrorLog.h"
@@ -92,18 +94,14 @@ int main()
 
     auto femObjRenderDetail = std::make_shared<RenderDetail>(//SIMMEDTK_RENDER_WIREFRAME
                                                              //| SIMMEDTK_RENDER_VERTICES
-                                                             SIMMEDTK_RENDER_FACES
+                                                             SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
                                                               );
     femObjRenderDetail->setPointSize(4.0);
     Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
     femObjRenderDetail->setVertexColor(maroon);
     femObjRenderDetail->setNormalLength(0.02);
 
-    femObject->getVolumetricMesh()->setRenderDetail(0,femObjRenderDetail);
-
-    /*hapticCtl = std::make_shared<mstk::Examples::Common::hapticController>();
-    hapticCtl->setVegaFemSceneObject(femObject);
-    femSimulator->attachEvent(core::Haptic, hapticCtl);*/
+    femObject->getVolumetricMesh()->getRenderingMesh()->setRenderDetail(femObjRenderDetail);
 
     sdk->addSceneActor(femObject, femSimulator);
 

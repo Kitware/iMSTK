@@ -27,6 +27,11 @@ PlaneModel::PlaneModel(const core::Vec3d& p, const core::Vec3d& n)
 {
     this->plane = std::make_shared<Plane>(p, n);
     this->transform = RigidTransformType::Identity();
+
+    this->setRenderDelegate(
+        Factory<RenderDelegate>::createConcreteClassForGroup(
+            "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::VTK));
+
 }
 PlaneModel::~PlaneModel() {}
 void PlaneModel::draw()

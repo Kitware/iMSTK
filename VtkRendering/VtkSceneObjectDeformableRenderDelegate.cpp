@@ -22,50 +22,56 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Model.h"
-#include "Core/Geometry.h"
-#include "Core/RenderDelegate.h"
-#include "Core/Factory.h"
-#include "Simulators/SceneObjectDeformable.h"
+#include "Core/Geometry.h" // for VisualArtifact used by geometry sources in RenderDelegate
 #include "Simulators/VegaFemSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
-#include "Mesh/SurfaceMesh.h"
+#include "VtkRendering/VtkRenderDelegate.h"
+
+// VTK includes
+#include <vtkActor.h>
 
 /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
 ///  vertices interacted with, ground plane etc.
-class SceneObjectDeformableRenderDelegate : public RenderDelegate
+class SceneObjectDeformableRenderDelegate : public VtkRenderDelegate
 {
 public:
-    virtual void draw() const override;
+    vtkActor *getActor() const override;
 };
 
-void SceneObjectDeformableRenderDelegate::draw() const
+vtkActor *SceneObjectDeformableRenderDelegate::getActor() const
 {
     auto geom = this->getSourceGeometryAs<VegaFemSceneObject>();
 
     if(!geom)
     {
-        return;
+        return nullptr;
     }
     auto mesh = geom->getVolumetricMesh();
     if(!mesh)
     {
-        return;
+        return nullptr;
     }
-    auto surfaceMesh = mesh->getAttachedMesh(0);
+    auto surfaceMesh = mesh->getRenderingMesh();
     if(!surfaceMesh)
     {
-        return;
+        return nullptr;
     }
-    auto delegate = surfaceMesh->getRenderDelegate();
+    auto delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(surfaceMesh->getRenderDelegate());
     if(!delegate)
     {
-        return;
+        return nullptr;
     }
-    delegate->draw();
+    delegate->initDraw();
+    return delegate->getActor();
 }
 
+#include "Core/Config.h"
+#include "Core/Factory.h"
 SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-SIMMEDTK_BEGIN_ONLOAD(register_scene_object_deformable_render_delegate)
-SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SceneObjectDeformableRenderDelegate,2000);
-SIMMEDTK_FINISH_ONLOAD()
+    SIMMEDTK_BEGIN_ONLOAD(register_SceneObjectDeformableRenderDelegate)
+        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
+                                RenderDelegate,
+                                SceneObjectDeformableRenderDelegate,
+                                RenderDelegate::RendererType::VTK);
+    SIMMEDTK_FINISH_ONLOAD()
 SIMMEDTK_FINISH_DYNAMIC_LOADER()

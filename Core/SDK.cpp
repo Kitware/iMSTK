@@ -23,6 +23,7 @@
 
 #include "Core/SDK.h"
 #include "Core/Factory.h"
+#include "Core/RenderDelegate.h"
 
 #include <chrono>
 #include <thread>
@@ -67,12 +68,16 @@ void SDK::releaseScene(std::shared_ptr<Scene> scene)
 
 std::shared_ptr<ViewerBase> SDK::createViewer()
 {
-    this->viewer = Factory<CoreClass>::createSubclassForGroupAs<ViewerBase>("ViewerBase",300);
+    this->viewer = Factory<CoreClass>::createSubclassForGroupAs<ViewerBase>("ViewerBase",RenderDelegate::VTK);
     if (this->viewer)
-      {
-      this->viewer->log = this->errorLog;
-      this->registerModule(this->viewer);
-      }
+    {
+        this->viewer->log = this->errorLog;
+        this->registerModule(this->viewer);
+    }
+    else
+    {
+        std::cerr << "Error: Unable to create viewer." << std::endl;
+    }
 
     return this->viewer;
 }
@@ -86,9 +91,9 @@ void SDK::addViewer(std::shared_ptr<ViewerBase> p_viewer)
     this->registerModule(p_viewer);
 }
 
+///
 /// \brief Returns a pointer to the viewer object
 ///
-/// \return Returns a pointer to the viewer object
 std::shared_ptr<ViewerBase> SDK::getViewerInstance()
 {
     return this->viewer;
@@ -173,20 +178,20 @@ void SDK::run()
 
     this->viewer->exec();
 
-    // Now wait for other modules to shut down
-    while (!shutdown)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
-
-    // Tell framework threads to shutdown
-    terminateAll();
-
-    // Wait for all threads to finish processing
-    for (auto &module : modules)
-    {
-        module.join();
-    }
+//     // Now wait for other modules to shut down
+//     while (!shutdown)
+//     {
+//         std::this_thread::sleep_for(std::chrono::seconds(1));
+//     }
+//
+//     // Tell framework threads to shutdown
+//     terminateAll();
+//
+//     // Wait for all threads to finish processing
+//     for (auto &module : modules)
+//     {
+//         module.join();
+//     }
 }
 
 /// \brief
