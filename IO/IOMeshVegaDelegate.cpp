@@ -109,6 +109,7 @@ public:
         auto meshToAttach = std::make_shared<SurfaceMesh>();
         meshToAttach->setVertices(surfaceVertices);
         meshToAttach->setTriangles(localTriangleArray);
+        meshToAttach->updateOriginalVertsWithCurrent();
 
         volumetricMesh->setVertexMap(uniqueVertexArray);
         volumetricMesh->attachSurfaceMesh(meshToAttach);

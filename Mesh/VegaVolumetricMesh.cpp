@@ -53,6 +53,7 @@ size_t VegaVolumetricMesh::getNumberOfElements() const
 }
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius)
 {
+    std::cout << "Attaching mesh: " << surfaceMesh << std::endl;
     const std::vector<core::Vec3d> &meshVertices = surfaceMesh->getVertices();
 
     int numElementVertices = this->mesh->getNumElementVertices();
@@ -142,12 +143,12 @@ void VegaVolumetricMesh::updateAttachedMeshes(double *q)
                                     this->mesh->getNumElementVertices(),
                                     this->attachedVertices.at(surfaceMesh).data(),
                                     this->attachedWeights.at(surfaceMesh).data());
-        surfaceMesh->resetVertices();
+
+        auto &restVertices = surfaceMesh->getOrigVertices();
         auto &vertices = surfaceMesh->getVertices();
         for(size_t i = 0, end = displacements.size(); i < end; ++i)
         {
-            std::cout << displacements[i] << std::endl;
-            vertices[i] += displacements[i]*100000;
+            vertices[i] = restVertices[i] + displacements[i];
         }
         surfaceMesh->computeTriangleNormals();
         surfaceMesh->getRenderDelegate()->modified();
@@ -189,6 +190,7 @@ std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getRenderingMesh()
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr< SurfaceMesh > surfaceMesh, const std::string& fileName)
 {
     std::ifstream fileStream(fileName.c_str());
+    std::cout << "Reading rendering mesh weights: " << std::endl;
 
     if(!fileStream)
     {
@@ -218,5 +220,5 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr< SurfaceMesh > surfac
         vertices.push_back(v[3]); weigths.push_back(w[3]);
     }
 
-    std::cout << "Total # of weights read: " << weigths.size() << std::endl;
+    std::cout << "\tTotal # of weights read: " << weigths.size() << std::endl;
 }

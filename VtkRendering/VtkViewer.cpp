@@ -33,23 +33,49 @@
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleSwitch.h>
 #include <vtkCommand.h>
+#include <vtkCallbackCommand.h>
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
 ///
 class VtkViewer::VtkRenderer : public vtkCommand
 {
-    int timerId;
+    using FunctionType = void(vtkObject *,unsigned long,void*,void*);
+    using CallBackFunctionType = std::function<FunctionType>;
+
 public:
     VtkRenderer(VtkViewer *activeViewer) :
-        viewer(activeViewer),
-        renderWindow(vtkRenderWindow::New()),
-        renderWindowInteractor(vtkRenderWindowInteractor::New())
+        timerId(-1),
+        viewer(activeViewer)
     {
-        this->timerId = -1;
+        auto timerEvent = [&](vtkObject*,unsigned long,void *callData, void*)
+                          {
+                              if(this->timerId == *static_cast<int*>(callData))
+                              {
+                                  this->renderWindow->Render();
+                              }
+                          };
+        auto keyPress =  [](vtkObject *caller,unsigned long,void*,void*)
+                         {
+                             vtkRenderWindowInteractor *iren =
+                                static_cast<vtkRenderWindowInteractor*>(caller);
+                             // Close the window
+                             iren->GetRenderWindow()->Finalize();
+
+                             // Stop the interactor
+                             iren->TerminateApp();
+                             std::cout << "Closing window..." << std::endl;
+                         };
+
+        callBacks.emplace(vtkCommand::TimerEvent,timerEvent);
+        callBacks.emplace(vtkCommand::KeyPressEvent,keyPress);
     }
 
-    virtual void Execute(vtkObject *caller, unsigned long eventId,
+    ///
+    /// \brief Callback method
+    ///
+    void Execute(vtkObject *vtkNotUsed(caller),
+                         unsigned long vtkNotUsed(eventId),
                          void *callData)
     {
         if(timerId == *static_cast<int*>(callData))
@@ -61,9 +87,9 @@ public:
     ///
     /// \brief Return the render window
     ///
-    vtkSmartPointer<vtkRenderWindow> get() const
+    vtkRenderWindow *getRenderWindow() const
     {
-        return this->renderWindow;
+        return this->renderWindow.GetPointer();
     }
 
     ///
@@ -73,10 +99,20 @@ public:
     {
         this->viewer->adjustFPS();
         this->renderWindow->Render();
-        this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
         this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
+        this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
         this->renderWindowInteractor->Start();
         this->renderWindowInteractor->DestroyTimer(this->timerId);
+    }
+
+    void setObservers()
+    {
+        for(auto f : this->callBacks)
+        {
+            vtkNew<vtkCallbackCommand> callback;
+            callback->SetCallback(f.second.target<FunctionType>());
+            this->renderWindowInteractor->AddObserver(f.first,callback.GetPointer());
+        }
     }
 
     void removeRenderer(vtkRenderer* renderer)
@@ -85,7 +121,7 @@ public:
     }
 
     ///
-    /// \brief Add renderer to the render windows
+    /// \brief Add renderer to the render window
     ///
     void addRenderer()
     {
@@ -96,7 +132,8 @@ public:
             this->renderWindow->FullScreenOn();
         }
 
-        this->renderWindowInteractor->SetRenderWindow(renderWindow);
+        this->renderWindow->SetWindowName("MSTK");
+        this->renderWindowInteractor->SetRenderWindow(renderWindow.GetPointer());
         vtkSmartPointer<vtkInteractorStyleSwitch> style =
         vtkSmartPointer<vtkInteractorStyleSwitch>::New();
         style->SetCurrentStyleToTrackballCamera();
@@ -130,9 +167,11 @@ public:
     }
 
 public:
+    int timerId;
     VtkViewer *viewer;
-    vtkSmartPointer<vtkRenderWindow> renderWindow;
-    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
+    vtkNew<vtkRenderWindow> renderWindow;
+    vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
+    std::map<vtkCommand::EventIds,CallBackFunctionType> callBacks;
 };
 
 VtkViewer::VtkViewer() : renderer(make_unique<VtkRenderer> (this))
@@ -164,8 +203,8 @@ void VtkViewer::render()
 bool VtkViewer::isValid()
 {
     return ( this->renderer != nullptr )
-           && ( this->renderer->renderWindow != nullptr )
-           && ( this->renderer->renderWindowInteractor != nullptr );
+           && ( this->renderer->renderWindow.GetPointer() != nullptr )
+           && ( this->renderer->renderWindowInteractor.GetPointer() != nullptr );
 }
 void VtkViewer::initResources()
 {

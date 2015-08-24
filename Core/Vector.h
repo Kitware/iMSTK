@@ -100,11 +100,13 @@ using StdVector3f = StdVector3<float>;
 // STL vectors of double vectors
 using StdVector3d = StdVector3<double>;
 
+// Vector map
 template<typename T>
-Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>> getEigenMap(std::vector<Vector3<T>> &v)
-{
-    return Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>>(v.data()->data(),v.size()*Vector3<T>::SizeAtCompileTime);
-}
+using VectorMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1,Eigen::RowMajor>>;
+
+// Nx3 matrix map
+template<typename T>
+using Matrix3MapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,3,Eigen::RowMajor>>;
 
 } // core
 

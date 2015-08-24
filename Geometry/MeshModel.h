@@ -31,7 +31,6 @@
 // SimMedTK includes
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
-#include "Mesh/VolumeMesh.h"
 
 ///
 /// @brief Mesh representation of a model.

@@ -322,7 +322,7 @@ void VegaFemSceneObject::loadSurfaceMesh()
             std::cerr << "VEGA:  error! weighs will be computed. Slow operation." << std::endl;
             this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
         }
-
+        surfaceMesh->updateOriginalVertsWithCurrent();
         this->volumetricMesh->attachSurfaceMesh(surfaceMesh,
                                                 femConfig->secondaryRenderingMeshInterpolationFilename);
     }

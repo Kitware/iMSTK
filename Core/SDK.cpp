@@ -178,20 +178,20 @@ void SDK::run()
 
     this->viewer->exec();
 
-//     // Now wait for other modules to shut down
-//     while (!shutdown)
-//     {
-//         std::this_thread::sleep_for(std::chrono::seconds(1));
-//     }
-//
-//     // Tell framework threads to shutdown
-//     terminateAll();
-//
-//     // Wait for all threads to finish processing
-//     for (auto &module : modules)
-//     {
-//         module.join();
-//     }
+    // Now wait for other modules to shut down
+    while (!shutdown)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    // Tell framework threads to shutdown
+    terminateAll();
+
+    // Wait for all threads to finish processing
+    for (auto &module : modules)
+    {
+        module.join();
+    }
 }
 
 /// \brief

@@ -38,6 +38,9 @@
 #include "generateSurfaceMesh.h"
 #include "objMesh.h"
 
+///
+/// \brief Base class for mesh IO delegates.
+///
 class IOMeshDelegate
 {
 public:

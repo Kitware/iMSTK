@@ -35,7 +35,7 @@ public:
 
 void FemSceneRenderDelegate::draw() const
 {
-  VolumeMesh* v_mesh = this->getSourceGeometryAs<FemSceneObject>()->v_mesh;
+  auto v_mesh = this->getSourceGeometryAs<FemSceneObject>()->v_mesh;
   RenderDelegate::Ptr delegate = v_mesh->getRenderDelegate();
   if (delegate)
     delegate->draw();

@@ -39,8 +39,7 @@ public:
     virtual void initDraw() override;
 
 private:
-    vtkSmartPointer<vtkActor> actor;
-    vtkSmartPointer<vtkPolyDataMapper> mapper;
+    vtkNew<vtkActor> actor;
 };
 
 void PlaneRenderDelegate::initDraw()
@@ -52,22 +51,25 @@ void PlaneRenderDelegate::initDraw()
     }
 
     vtkNew<vtkPlaneSource> planeSource;
+    planeSource->SetCenter(-100,-100,0);
+    planeSource->SetPoint1(100,-100,0);
+    planeSource->SetPoint2(-100,100,0);
+
     auto center = plane->getPoint();
     auto normal = plane->getUnitNormal();
 
     planeSource->SetCenter(center(0),center(1),center(2));
     planeSource->SetNormal(normal(0),normal(1),normal(2));
 
-    this->mapper = vtkPolyDataMapper::New();
-    this->mapper->SetInputConnection(planeSource->GetOutputPort());
+    auto mapper = vtkPolyDataMapper::New();
+    mapper->SetInputConnection(planeSource->GetOutputPort());
 
-    this->actor = vtkActor::New();
     this->actor->SetMapper(mapper);
 }
 
 vtkActor *PlaneRenderDelegate::getActor() const
 {
-    return actor;
+    return actor.GetPointer();
 }
 
 #include "Core/Config.h"
