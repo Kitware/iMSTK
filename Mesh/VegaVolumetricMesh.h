@@ -137,6 +137,11 @@ public:
     ///
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName);
 
+    ///
+    /// \brief Get attached collision mesh
+    ///
+    std::shared_ptr<SurfaceMesh> getCollisionMesh();
+
 private:
     // Vega mesh base object
     std::shared_ptr<VolumetricMesh> mesh;
@@ -156,7 +161,7 @@ private:
     // Store map of  weigths
     std::map<std::shared_ptr<SurfaceMesh>,std::vector<double>> attachedWeights;
 
-    // Store map of surface vertex indices
+    // Store map of conforming surface vertex indices
     std::unordered_map<size_t,size_t> vertexMap;
 
     // Fixed DOFs

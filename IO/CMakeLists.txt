@@ -25,6 +25,7 @@ target_link_libraries(IO
     VegaFEM::volumetricMesh
     )
 
+target_compile_options(IO PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-sign-compare -Wno-narrowing>)
 if(BUILD_TESTING)
   add_subdirectory(UnitTests)
 endif()

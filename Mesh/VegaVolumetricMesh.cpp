@@ -133,26 +133,38 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
 }
 void VegaVolumetricMesh::updateAttachedMeshes(double *q)
 {
-    auto surfaceMesh = this->getRenderingMesh();
-//     for(auto surfaceMesh : this->attachedMeshes)
-//     {
-        std::vector<core::Vec3d> displacements(surfaceMesh->getNumberOfVertices());
+    auto renderingMesh = this->getRenderingMesh();
+    if(renderingMesh)
+    {
+        std::vector<core::Vec3d> displacements(renderingMesh->getNumberOfVertices());
         VolumetricMesh::interpolate(q,
                                     displacements.data()->data(),
-                                    surfaceMesh->getNumberOfVertices(),
+                                    renderingMesh->getNumberOfVertices(),
                                     this->mesh->getNumElementVertices(),
-                                    this->attachedVertices.at(surfaceMesh).data(),
-                                    this->attachedWeights.at(surfaceMesh).data());
+                                    this->attachedVertices.at(renderingMesh).data(),
+                                    this->attachedWeights.at(renderingMesh).data());
 
-        auto &restVertices = surfaceMesh->getOrigVertices();
-        auto &vertices = surfaceMesh->getVertices();
+        auto &restPositions = renderingMesh->getOrigVertices();
+        auto &vertices = renderingMesh->getVertices();
         for(size_t i = 0, end = displacements.size(); i < end; ++i)
         {
-            vertices[i] = restVertices[i] + displacements[i];
+            vertices[i] = restPositions[i] + displacements[i];
         }
-        surfaceMesh->computeTriangleNormals();
-        surfaceMesh->getRenderDelegate()->modified();
-//     }
+        renderingMesh->computeTriangleNormals();
+        renderingMesh->getRenderDelegate()->modified();
+    }
+
+    auto collisionMesh = this->getCollisionMesh();
+    if(collisionMesh)
+    {
+        core::Matrix3MapType<double> displacementMap(q,3,this->mesh->getNumVertices());
+        auto &restPositions = collisionMesh->getOrigVertices();
+        auto &vertices = collisionMesh->getVertices();
+        for(size_t i = 0, end = collisionMesh->getNumberOfVertices(); i < end; ++i)
+        {
+            vertices[i] = restPositions[i] + displacementMap.col(vertexMap[i]);
+        }
+    }
 }
 const std::unordered_map<size_t,size_t>& VegaVolumetricMesh::getVertexMap() const
 {
@@ -183,7 +195,7 @@ void VegaVolumetricMesh::setRenderDetail(int i, std::shared_ptr< RenderDetail > 
 }
 std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getRenderingMesh()
 {
-    return attachedMeshes.size() > 0
+    return attachedMeshes.size() > 1
            ? this->attachedMeshes.at(attachedMeshes.size() - 1)
            : nullptr;
 }
@@ -221,4 +233,10 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr< SurfaceMesh > surfac
     }
 
     std::cout << "\tTotal # of weights read: " << weigths.size() << std::endl;
+}
+std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getCollisionMesh()
+{
+    return attachedMeshes.size() > 0
+           ? this->attachedMeshes.at(0)
+           : nullptr;
 }
