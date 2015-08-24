@@ -33,10 +33,10 @@ using namespace bandit;
 go_bandit([](){
     describe("Mesh collision model used by collision detection algorithms.", []() {
         it("construct ", []() {
-            std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
+            std::unique_ptr<MeshCollisionModel> meshCollisionModel = Core::make_unique<MeshCollisionModel>();
         });
         it("loads mesh ", []() {
-            std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
+            std::unique_ptr<MeshCollisionModel> meshCollisionModel = Core::make_unique<MeshCollisionModel>();
 
             std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
 
@@ -46,7 +46,7 @@ go_bandit([](){
 
         });
         it("can access positions ", []() {
-            std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
+            std::unique_ptr<MeshCollisionModel> meshCollisionModel = Core::make_unique<MeshCollisionModel>();
 
             std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);
@@ -79,7 +79,7 @@ go_bandit([](){
             AssertThat(p1[2], Equals(vertices[3]));
         });
         it("can access normals ", []() {
-            std::unique_ptr<MeshCollisionModel> meshCollisionModel = make_unique<MeshCollisionModel>();
+            std::unique_ptr<MeshCollisionModel> meshCollisionModel = Core::make_unique<MeshCollisionModel>();
 
             std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
             meshCollisionModel->setMesh(mesh);

@@ -50,7 +50,7 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 go_bandit([](){
     describe("Mesh model", []() {
         it("constructs", []() {
-            auto model = make_unique<MeshModel>();
+            auto model = Core::make_unique<MeshModel>();
             AssertThat(model != nullptr, IsTrue());
         });
         it("can access mesh vertices", []() {

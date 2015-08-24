@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Simulator.h"
+#include "Core/MakeUnique.h"
 
 /// \brief starts the tasks with the threads from thread pool
 void Simulator::beginFrame()
@@ -47,7 +48,7 @@ void Simulator::initAsyncThreadPool()
         }
     }
 
-    asyncPool = make_unique<ThreadPool>(asyncThreadPoolSize);
+    asyncPool = Core::make_unique<ThreadPool>(asyncThreadPoolSize);
 }
 
 /// \brief the main simulation loop
@@ -230,7 +231,7 @@ void Simulator::init()
     {
         maxThreadCount = std::max(simulators.size(), collisionDetectors.size());
     }
-    threadPool = make_unique<ThreadPool>(maxThreadCount);
+    threadPool = Core::make_unique<ThreadPool>(maxThreadCount);
 
     for(size_t i = 0; i < this->simulators.size(); i++)
     {

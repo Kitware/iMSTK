@@ -22,23 +22,8 @@
  * // Contact:
  * //---------------------------------------------------------------------------
  */
-
-/*=========================================================================
-
-  Program:   Visualization Toolkit
-  Module:    MeshNodalCoordinates.txx
-
-  Copyright (c) Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
-
-=========================================================================*/
-
-#include "MeshNodalCoordinates.h"
+#ifndef MESHNODALCOORDINATES_TXX
+#define MESHNODALCOORDINATES_TXX
 
 #include "vtkIdList.h"
 #include "vtkObjectFactory.h"
@@ -333,6 +318,14 @@ template <class Scalar> void MeshNodalCoordinates<Scalar>
 }
 
 //------------------------------------------------------------------------------
+template <class Scalar> void MeshNodalCoordinates<Scalar>
+::InsertTuples(vtkIdType,vtkIdType,vtkIdType,vtkAbstractArray*)
+{
+    vtkErrorMacro("Read only container.")
+    return;
+}
+
+//------------------------------------------------------------------------------
 template <class Scalar> vtkIdType MeshNodalCoordinates<Scalar>
 ::InsertNextTuple(vtkIdType, vtkAbstractArray *)
 {
@@ -508,3 +501,4 @@ template <class Scalar> vtkIdType MeshNodalCoordinates<Scalar>
     return -1;
 }
 
+#endif // MESHNODALCOORDINATES_H

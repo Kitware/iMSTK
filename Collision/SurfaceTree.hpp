@@ -24,6 +24,9 @@
 #ifndef SM_SMSURFACETREE_HPP
 #define SM_SMSURFACETREE_HPP
 
+// STD includes
+#include <numeric> // for iota
+
 // SimMedTK includes
 #include "Rendering/OpenGLViewer.h"
 #include "Collision/SurfaceTreeIterator.h"

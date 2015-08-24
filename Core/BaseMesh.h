@@ -24,6 +24,9 @@
 #ifndef BASEMESH_H
 #define BASEMESH_H
 
+// STD includes
+#include <array>
+
 // Eigen includes
 #include <Eigen/Geometry>
 

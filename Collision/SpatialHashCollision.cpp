@@ -60,7 +60,7 @@ SpatialHashCollision::SpatialHashCollision(int hashTableSize,
     cellsForTri2Line(hashTableSize),
     cellsForModel(hashTableSize),
     cellsForModelPoints(hashTableSize),
-    hasher(make_unique<HashFunction>())
+    hasher(Core::make_unique<HashFunction>())
 {
     cellSizeX = _cellSizeX;
     cellSizeY = _cellSizeY;

@@ -78,7 +78,7 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     fileName(""),
     fileType(MeshFileType::Unknown),
     mesh(nullptr),
-    delegator(make_unique<DelegatorType>(this))
+    delegator(Core::make_unique<DelegatorType>(this))
 {
     //
     // VTK io for some vtk files (use only vtk to read these files)

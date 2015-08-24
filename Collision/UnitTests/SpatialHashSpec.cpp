@@ -33,7 +33,7 @@ go_bandit([](){
     describe("the spatial hash collision detector", []() {
         it("initializes properly ", []() {
 
-            std::unique_ptr<SpatialHashCollision> spatialHash(make_unique<SpatialHashCollision>(10,1.0,1.0,1.0));
+            std::unique_ptr<SpatialHashCollision> spatialHash(Core::make_unique<SpatialHashCollision>(10,1.0,1.0,1.0));
 
 //             AssertThat( spatialHash->pipe->getElements(), Equals( 1 ) );
 //             AssertThat( spatialHash->pipeTriangles->getElements(), Equals( 1 ) );

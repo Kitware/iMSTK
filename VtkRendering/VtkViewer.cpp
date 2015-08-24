@@ -40,8 +40,9 @@
 ///
 class VtkViewer::VtkRenderer : public vtkCommand
 {
-    using FunctionType = void(vtkObject *,unsigned long,void*,void*);
-    using CallBackFunctionType = std::function<FunctionType>;
+    //typedef void(*FunctionType)(vtkObject *, unsigned long, void*, void*);
+    //using FunctionType = void(vtkObject *,unsigned long,void*,void*);
+    //using CallBackFunctionType = std::function<FunctionType>;
 
 public:
     VtkRenderer(VtkViewer *activeViewer) :
@@ -67,8 +68,8 @@ public:
                              std::cout << "Closing window..." << std::endl;
                          };
 
-        callBacks.emplace(vtkCommand::TimerEvent,timerEvent);
-        callBacks.emplace(vtkCommand::KeyPressEvent,keyPress);
+        //callBacks.emplace(vtkCommand::TimerEvent,timerEvent);
+        //callBacks.emplace(vtkCommand::KeyPressEvent,keyPress);
     }
 
     ///
@@ -107,12 +108,12 @@ public:
 
     void setObservers()
     {
-        for(auto f : this->callBacks)
-        {
-            vtkNew<vtkCallbackCommand> callback;
-            callback->SetCallback(f.second.target<FunctionType>());
-            this->renderWindowInteractor->AddObserver(f.first,callback.GetPointer());
-        }
+//        for(auto f : this->callBacks)
+//        {
+//            vtkNew<vtkCallbackCommand> callback;
+//            callback->SetCallback(f.second.target<FunctionType>());
+//            this->renderWindowInteractor->AddObserver(f.first,callback.GetPointer());
+//        }
     }
 
     void removeRenderer(vtkRenderer* renderer)
@@ -171,10 +172,10 @@ public:
     VtkViewer *viewer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
-    std::map<vtkCommand::EventIds,CallBackFunctionType> callBacks;
+//    std::map<vtkCommand::EventIds,CallBackFunctionType> callBacks;
 };
 
-VtkViewer::VtkViewer() : renderer(make_unique<VtkRenderer> (this))
+VtkViewer::VtkViewer() : renderer(Core::make_unique<VtkRenderer> (this))
 {
 }
 

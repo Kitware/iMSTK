@@ -54,11 +54,11 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
             AssertThat(meshToMeshCollision == nullptr, IsFalse());
         });
         it("performs collision detection ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
 
             std::vector<core::Vec3d> verticesA;
             verticesA.emplace_back(1.0,2.0,0);

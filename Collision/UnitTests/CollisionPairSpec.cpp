@@ -33,10 +33,10 @@ using namespace bandit;
 go_bandit([](){
     describe("Collision pair", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
         });
         it("attaches models ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
 
             std::shared_ptr<Model> modelA = std::make_shared<MeshCollisionModel>();
             std::shared_ptr<Model> modelB = std::make_shared<MeshCollisionModel>();
@@ -48,7 +48,7 @@ go_bandit([](){
 
         });
         it("attaches contacts ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(make_unique<CollisionPair>());
+            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
 
             float depth = 1.0;
             core::Vec3d contactPoint(0,0,1);
