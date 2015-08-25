@@ -53,7 +53,6 @@ size_t VegaVolumetricMesh::getNumberOfElements() const
 }
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius)
 {
-    std::cout << "Attaching mesh: " << surfaceMesh << std::endl;
     const std::vector<core::Vec3d> &meshVertices = surfaceMesh->getVertices();
 
     int numElementVertices = this->mesh->getNumElementVertices();
@@ -61,6 +60,13 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
 
     // Allocate arrays
     this->attachedMeshes.push_back(surfaceMesh);
+
+    // The first attached mesh is always the conforming mesh
+    if(this->attachedMeshes.size() == 1)
+    {
+        return;
+    }
+
     std::vector<int> &vertices = this->attachedVertices[surfaceMesh];
     std::vector<double> &weigths = this->attachedWeights[surfaceMesh];
 
