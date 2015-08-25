@@ -234,9 +234,9 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     {
         auto data = (unsigned int*)p_surfaceMesh->getTriangles().data()->data();
         int size = p_surfaceMesh->getTriangles().size() * 3;
-        Eigen::Map<Eigen::Matrix<unsigned int,Eigen::Dynamic,1>> vectorData(data,p_surfaceMesh->getTriangles().size() * 3);
-        std::cout << "Size = " << p_surfaceMesh->getTriangles().size() * 3 << std::endl;
-        std::cout << vectorData << std::endl;
+        //
+        // TODO: Investigate a crash here when using the opengl renderer
+        //
         glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, data);
     }
 

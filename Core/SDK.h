@@ -33,6 +33,7 @@
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
 #include "Rendering/OpenGLViewer.h"
+#include "RenderDelegates/Config.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
@@ -74,7 +75,9 @@ public:
     ///
     std::shared_ptr<ViewerBase> createViewer();
 
-    ///SDK returns a pointer to the viewer
+    ///
+    /// \brief Returns a pointer to the viewer object
+    ///
     std::shared_ptr<ViewerBase> getViewerInstance();
 
     ///SDK creates simualtor

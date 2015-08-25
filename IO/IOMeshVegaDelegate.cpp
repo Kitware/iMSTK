@@ -118,8 +118,4 @@ public:
     void write(){}
 };
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_VegaMeshReaderDelegate)
-        SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshVegaDelegate, IOMeshVegaDelegate, IOMesh::ReaderGroup::Vega);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(IOMeshDelegate,IOMeshVegaDelegate,IOMesh::ReaderGroup::Vega);

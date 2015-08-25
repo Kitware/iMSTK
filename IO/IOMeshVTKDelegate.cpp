@@ -110,7 +110,7 @@ public:
                 this->meshProps |= MeshType::Tri;
                 break;
             }
-            // Vtk legacy formats
+            // VTK legacy formats
             case IOMesh::MeshFileType::VTK:
             {
                 this->readGenericFormat<vtkGenericDataObjectReader>(
@@ -124,7 +124,7 @@ public:
                 );
                 break;
             }
-            // Vtk VTU formats
+            // VTK VTU formats
             case IOMesh::MeshFileType::VTU:
             {
                 this->readGenericFormat<vtkXMLGenericDataObjectReader>(
@@ -138,7 +138,7 @@ public:
                 );
                 break;
             }
-            // Vtk VTU formats
+            // VTK VTU formats
             case IOMesh::MeshFileType::VTP:
             {
                 this->readGenericFormat<vtkXMLGenericDataObjectReader>(
@@ -244,7 +244,7 @@ public:
     {
         if(!points)
         {
-            std::cerr << "VTKMeshReaderDelegate: Not points found." << std::endl;
+            std::cerr << "IOMeshVTKDelegate: Not points found." << std::endl;
             return;
         }
         for(vtkIdType i = 0, end = points->GetNumberOfPoints(); i < end; ++i)
@@ -389,7 +389,7 @@ public:
 
         if(!output)
         {
-            std::cerr << "VTKMeshReaderDelegate: Empty reader for vtk files." << std::endl;
+            std::cerr << "IOMeshVTKDelegate: Empty reader for vtk files." << std::endl;
             return;
         }
 
@@ -406,14 +406,10 @@ public:
         }
         else
         {
-            std::cerr << "VTKMeshReaderDelegate: Unsupported dataset." << std::endl;
+            std::cerr << "IOMeshVTKDelegate: Unsupported dataset." << std::endl;
         }
     }
 
 };
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_VTKMeshReaderDelegate)
-    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate, IOMeshDelegate, IOMeshVTKDelegate, IOMesh::ReaderGroup::VTK);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(IOMeshDelegate,IOMeshVTKDelegate,IOMesh::ReaderGroup::VTK)

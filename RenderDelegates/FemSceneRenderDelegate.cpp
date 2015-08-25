@@ -41,8 +41,6 @@ void FemSceneRenderDelegate::draw() const
     delegate->draw();
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_fem_scene_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,FemSceneRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     FemSceneRenderDelegate,
+                     RenderDelegate::RendererType::Other)

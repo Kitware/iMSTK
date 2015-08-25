@@ -115,14 +115,6 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
         }
     }
 }
-const std::vector<double> &VegaVolumetricMesh::getAttachedWeights(const size_t &i) const
-{
-    return this->attachedWeights.at(attachedMeshes[i]);
-}
-const std::vector<int> &VegaVolumetricMesh::getAttachedVertices(const size_t &i) const
-{
-    return this->attachedVertices.at(attachedMeshes[i]);
-}
 std::shared_ptr<VolumetricMesh> VegaVolumetricMesh::getVegaMesh()
 {
     return this->mesh;
@@ -245,4 +237,12 @@ std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getCollisionMesh()
     return attachedMeshes.size() > 0
            ? this->attachedMeshes.at(0)
            : nullptr;
+}
+const std::vector< double >& VegaVolumetricMesh::getAttachedWeights(std::shared_ptr< SurfaceMesh > surfaceMesh) const
+{
+    return this->attachedWeights.at(surfaceMesh);
+}
+const std::vector< int >& VegaVolumetricMesh::getAttachedVertices(std::shared_ptr< SurfaceMesh > surfaceMesh) const
+{
+    return this->attachedVertices.at(surfaceMesh);
 }

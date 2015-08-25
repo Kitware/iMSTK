@@ -45,11 +45,10 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
     mesh->computeTriangleNormals();
     mesh->computeVertexNormals();
 
-    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
-    model->setModelMesh(mesh);
+    std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
+    model->setMesh(mesh);
     return model;
 }
-
 
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {

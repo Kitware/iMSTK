@@ -29,7 +29,6 @@
 
 // SimMedTK includes
 #include "Core/Matrix.h"
-#include "Core/Vector.h"
 
 /// A quaternion.
 template<typename T>

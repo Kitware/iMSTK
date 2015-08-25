@@ -67,7 +67,7 @@ public:
 //         None,
 //         Obj,
 //         ThreeDS,
-//         Vtk
+//         VTK
 //     };
 
     ///

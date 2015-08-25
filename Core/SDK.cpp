@@ -30,7 +30,6 @@
 #include <string>
 
 /// \brief SDK is singlenton class
-// std::unique_ptr<ErrorLog> SDK::errorLog;
 std::once_flag SDK::sdkCallOnceFlag;
 
 /// \brief constructor
@@ -68,7 +67,8 @@ void SDK::releaseScene(std::shared_ptr<Scene> scene)
 
 std::shared_ptr<ViewerBase> SDK::createViewer()
 {
-    this->viewer = Factory<CoreClass>::createSubclassForGroupAs<ViewerBase>("ViewerBase",RenderDelegate::VTK);
+    this->viewer =
+        Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
     if (this->viewer)
     {
         this->viewer->log = this->errorLog;
@@ -86,14 +86,12 @@ void SDK::addViewer(std::shared_ptr<ViewerBase> p_viewer)
 {
     assert(p_viewer);
 
+    this->viewer.reset();
     this->viewer = p_viewer;
     this->viewer->log = this->errorLog;
     this->registerModule(p_viewer);
 }
 
-///
-/// \brief Returns a pointer to the viewer object
-///
 std::shared_ptr<ViewerBase> SDK::getViewerInstance()
 {
     return this->viewer;

@@ -50,13 +50,9 @@
 #include "../common/wasdCameraController.h"
 #include "../common/KeyPressSDKShutdown.h"
 #include "../common/pzrMouseCameraController.h"
-//#include "../common/hapticController.h"
-
-#include "RenderDelegates/Config.h"
 
 int main()
 {
-    SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<VegaFemSceneObject> femObject;
     std::shared_ptr<StaticSceneObject> staticObject;

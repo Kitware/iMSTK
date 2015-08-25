@@ -48,7 +48,9 @@ public:
 
     virtual void setRenderDelegate(RenderDelegate::Ptr delegate);
 
+    ///
     /// \brief Get render delegate
+    ///
     RenderDelegate::Ptr getRenderDelegate() const;
 
 private:

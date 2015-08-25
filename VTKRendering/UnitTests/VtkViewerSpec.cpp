@@ -28,7 +28,7 @@
 #include "Core/RenderDetail.h"
 #include "Core/StaticSceneObject.h"
 #include "Core/Scene.h"
-#include "VtkRendering/VtkViewer.h"
+#include "VTKRendering/VTKViewer.h"
 #include "Testing/TestMesh.h"
 #include "IO/IOMesh.h"
 
@@ -37,30 +37,29 @@ using namespace bandit;
 
 go_bandit([](){
 
-    describe("Vtk based viewer.", []() {
+    describe("VTK based viewer.", []() {
         it("constructs", []() {
-            auto viewer = std::make_shared<VtkViewer>();
+            auto viewer = std::make_shared<VTKViewer>();
             AssertThat(viewer != nullptr, IsTrue());
         });
 
         it("initializes rendering pipeline", []() {
-            auto viewer = std::make_shared<VtkViewer>();
+            auto viewer = std::make_shared<VTKViewer>();
             AssertThat(viewer->isValid(), IsTrue());
         });
 
-        it("renders mesh", []() {
-            auto io = std::make_shared<IOMesh>();
-            io->read("/home/rortiz/tmp/CollisionHash_resources/models/liver.obj");
-
-            auto mesh = std::static_pointer_cast<SurfaceMesh>(io->getMesh());
-            auto viewer = std::make_shared<VtkViewer>();
-            TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/voronoi.jpg","blood");
-            mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
-            mesh->assignTexture("blood");
-            viewer->addObject(mesh);
-
-            viewer->exec();
-        });
+//         it("renders mesh", []() {
+//             auto io = std::make_shared<IOMesh>();
+//             io->read("/home/rortiz/tmp/CollisionHash_resources/models/liver.obj");
+//
+//             auto mesh = std::static_pointer_cast<SurfaceMesh>(io->getMesh());
+//             auto viewer = std::make_shared<VTKViewer>();
+//             TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/voronoi.jpg","blood");
+//             mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
+//             mesh->assignTexture("blood");
+//             viewer->addObject(mesh);
+//
+//         });
 
     });
 

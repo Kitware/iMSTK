@@ -215,7 +215,11 @@ ExternalProject_Add(${proj}
     ${SimMedTK_DEPENDENCIES}
   )
 
-set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+if(CMAKE_GENERATOR MATCHES "Unix Makefiles")
+    set(simmedtk_build_cmd "$(MAKE)")
+else()
+    set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+endif()
 #-----------------------------------------------------------------------------
 # SimMedTK
 #

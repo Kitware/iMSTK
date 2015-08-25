@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "VtkRendering/VtkViewer.h"
-#include "VtkRendering/VtkRenderDelegate.h"
+#include "VTKRendering/VTKViewer.h"
+#include "VTKRendering/VTKRenderDelegate.h"
 #include "Core/MakeUnique.h"
 
 // VTK includes
@@ -38,14 +38,14 @@
 ///
 /// \brief Wrapper to the vtkRendering pipeline
 ///
-class VtkViewer::VtkRenderer : public vtkCommand
+class VTKViewer::VTKRenderer : public vtkCommand
 {
     //typedef void(*FunctionType)(vtkObject *, unsigned long, void*, void*);
     //using FunctionType = void(vtkObject *,unsigned long,void*,void*);
     //using CallBackFunctionType = std::function<FunctionType>;
 
 public:
-    VtkRenderer(VtkViewer *activeViewer) :
+    VTKRenderer(VTKViewer *activeViewer) :
         timerId(-1),
         viewer(activeViewer)
     {
@@ -139,13 +139,13 @@ public:
         vtkSmartPointer<vtkInteractorStyleSwitch>::New();
         style->SetCurrentStyleToTrackballCamera();
         renderWindowInteractor->SetInteractorStyle( style );
-        // The actors are obtained from VtkRenderDelegates
-        std::shared_ptr<VtkRenderDelegate> delegate;
+        // The actors are obtained from VTKRenderDelegates
+        std::shared_ptr<VTKRenderDelegate> delegate;
         for(auto &ro : this->viewer->renderOperations)
         {
             for(const auto &object : ro.scene->getSceneObject())
             {
-                delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
+                delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
                 if (delegate)
                 {
                     renderer->AddActor(delegate->getActor());
@@ -154,7 +154,7 @@ public:
         }
         for(const auto &object : this->viewer->objectList)
         {
-            delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(object->getRenderDelegate());
+            delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
             if (delegate)
             {
                 renderer->AddActor(delegate->getActor());
@@ -169,26 +169,26 @@ public:
 
 public:
     int timerId;
-    VtkViewer *viewer;
+    VTKViewer *viewer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
 //    std::map<vtkCommand::EventIds,CallBackFunctionType> callBacks;
 };
 
-VtkViewer::VtkViewer() : renderer(Core::make_unique<VtkRenderer> (this))
+VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
 {
 }
 
-VtkViewer::~VtkViewer()
+VTKViewer::~VTKViewer()
 {
 }
 
-void VtkViewer::exec()
+void VTKViewer::exec()
 {
     this->init();
     this->render();
 }
-void VtkViewer::render()
+void VTKViewer::render()
 {
     if(this->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
     {
@@ -201,14 +201,17 @@ void VtkViewer::render()
 
     this->endModule();
 }
-bool VtkViewer::isValid()
+bool VTKViewer::isValid()
 {
     return ( this->renderer != nullptr )
            && ( this->renderer->renderWindow.GetPointer() != nullptr )
            && ( this->renderer->renderWindowInteractor.GetPointer() != nullptr );
 }
-void VtkViewer::initResources()
+void VTKViewer::initResources()
 {
     this->renderer->addRenderer();
 }
 
+RegisterFactoryClass(ViewerBase,
+                     VTKViewer,
+                     RenderDelegate::RendererType::VTK)

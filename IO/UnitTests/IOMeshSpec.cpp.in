@@ -27,7 +27,8 @@
 // SimMedTK includes
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
-#include "IO/IOMesh.h"
+#include "IO/IO.h"
+#include "Core/MakeUnique.h"
 
 const std::string ds3MeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.3ds";
 const std::string objMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.obj";
@@ -41,36 +42,34 @@ const std::string vtpMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vt
 
 using namespace bandit;
 
-go_bandit([](){
+go_bandit([&](){
 
-    describe("IO Mesh Reader", []() {
-        it("constructs", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            AssertThat(io != nullptr, IsTrue());
+    describe("IO Mesh Reader", [&]() {
+        std::unique_ptr<IOMesh> ioMesh = Core::make_unique<IOMesh>();
+
+        it("constructs", [&]() {
+            AssertThat(ioMesh != nullptr, IsTrue());
         });
-        it("loads 3ds mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(ds3MeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::ThreeDS, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(io->getMesh());
+        it("loads 3ds mesh", [&]() {
+            ioMesh->read(ds3MeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::ThreeDS, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads obj mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(objMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::OBJ, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(io->getMesh());
+        it("loads obj mesh", [&]() {
+            ioMesh->read(objMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::OBJ, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads veg mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(vegMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::VEG, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(io->getMesh());
+        it("loads veg mesh", [&]() {
+            ioMesh->read(vegMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VEG, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
@@ -79,29 +78,26 @@ go_bandit([](){
             AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
             AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads ply mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(plyMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::PLY, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(io->getMesh());
+        it("loads ply mesh", [&]() {
+            ioMesh->read(plyMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::PLY, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads stl mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(stlMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::STL, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(io->getMesh());
+        it("loads stl mesh", [&]() {
+            ioMesh->read(stlMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::STL, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads vtk mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(vtkMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::VTK, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(io->getMesh());
+        it("loads vtk mesh", [&]() {
+            ioMesh->read(vtkMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTK, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
@@ -110,11 +106,10 @@ go_bandit([](){
             AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
             AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads vtu mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(vtuMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(io->getMesh());
+        it("loads vtu mesh", [&]() {
+            ioMesh->read(vtuMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
@@ -123,11 +118,10 @@ go_bandit([](){
             AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
             AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads vtu with properties mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(vtuPropFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(io->getMesh());
+        it("loads vtu with properties mesh", [&]() {
+            ioMesh->read(vtuPropFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
@@ -136,11 +130,10 @@ go_bandit([](){
             AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
             AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
         });
-        it("loads vtp with properties mesh", []() {
-            std::shared_ptr<IOMesh> io = std::make_shared<IOMesh>();
-            io->read(vtpMeshFileName);
-            AssertThat(io->getFileType() == IOMesh::MeshFileType::VTP, IsTrue());
-            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(io->getMesh());
+        it("loads vtp with properties mesh", [&]() {
+            ioMesh->read(vtpMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTP, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
             AssertThat(mesh != nullptr, IsTrue());
             AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
             AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());

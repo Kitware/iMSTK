@@ -73,8 +73,6 @@ bool SurfaceTreeRenderDelegate::drawTree() const
   return true;
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_surface_tree_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SurfaceTreeRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     SurfaceTreeRenderDelegate,
+                     RenderDelegate::RendererType::Other)

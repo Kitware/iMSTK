@@ -38,8 +38,6 @@ void PBDSurfaceRenderDelegate::draw() const
   mesh->draw();
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_pbd_surface_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,PBDSurfaceRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     PBDSurfaceRenderDelegate,
+                     RenderDelegate::RendererType::Other)

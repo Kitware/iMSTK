@@ -5,7 +5,7 @@
 
 class vtkActor;
 
-class VtkRenderDelegate : public RenderDelegate
+class VTKRenderDelegate : public RenderDelegate
 {
 public:
     virtual vtkActor *getActor() const = 0;

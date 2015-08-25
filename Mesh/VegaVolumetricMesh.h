@@ -77,16 +77,6 @@ public:
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
 
     ///
-    /// \brief Returns weigths associated with attached ith surface mesh
-    ///
-    const std::vector<double> &getAttachedWeights(const size_t &i) const;
-
-    ///
-    /// \brief Return vertices for interpolation weights for ith surface mesh
-    ///
-    const std::vector<int> &getAttachedVertices(const size_t &i) const;
-
-    ///
     /// \brief Return mesh
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
@@ -141,6 +131,16 @@ public:
     /// \brief Get attached collision mesh
     ///
     std::shared_ptr<SurfaceMesh> getCollisionMesh();
+
+    ///
+    /// \brief Returns weigths associated with attached ith surface mesh
+    ///
+    const std::vector<double> &getAttachedWeights(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
+
+    ///
+    /// \brief Return vertices for interpolation weights for ith surface mesh
+    ///
+    const std::vector<int> &getAttachedVertices(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
 
 private:
     // Vega mesh base object

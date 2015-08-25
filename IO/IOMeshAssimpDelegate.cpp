@@ -119,8 +119,5 @@ public:
     void write(){}
 };
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_AssimpMeshReaderDelegate)
-    SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,IOMeshAssimpDelegate,IOMesh::ReaderGroup::Assimp);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+
+RegisterFactoryClass(IOMeshDelegate,IOMeshAssimpDelegate,IOMesh::ReaderGroup::Assimp);

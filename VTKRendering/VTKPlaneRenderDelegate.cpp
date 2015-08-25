@@ -24,15 +24,15 @@
 #include "Core/Model.h"
 #include "Core/Geometry.h"
 
-// Vtk incudes
+// VTK incudes
 #include <vtkActor.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPlaneSource.h>
-#include "VtkRendering/VtkRenderDelegate.h"
+#include "VTKRendering/VTKRenderDelegate.h"
 
-class PlaneRenderDelegate : public VtkRenderDelegate
+class PlaneRenderDelegate : public VTKRenderDelegate
 {
 public:
     vtkActor *getActor() const override;
@@ -72,13 +72,6 @@ vtkActor *PlaneRenderDelegate::getActor() const
     return actor.GetPointer();
 }
 
-#include "Core/Config.h"
-#include "Core/Factory.h"
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_PlaneRenderDelegate)
-        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
-                                RenderDelegate,
-                                PlaneRenderDelegate,
-                                RenderDelegate::RendererType::VTK);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     PlaneRenderDelegate,
+                     RenderDelegate::RendererType::VTK)

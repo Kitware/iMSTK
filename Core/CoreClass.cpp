@@ -97,6 +97,7 @@ std::shared_ptr<RenderDelegate> CoreClass::getRenderDelegate() const
 /// \brief Set the delegate used to render this instance
 void CoreClass::setRenderDelegate(std::shared_ptr<RenderDelegate> delegate)
 {
+  this->renderDelegate.reset();
   this->renderDelegate = delegate;
   if (this->renderDelegate)
     this->renderDelegate->setSourceGeometry(this);

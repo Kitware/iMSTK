@@ -29,10 +29,10 @@
 #include "Mesh/SurfaceMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
 
-#include "VtkRendering/MeshNodalCoordinates.h"
-#include "VtkRendering/VtkRenderDelegate.h"
+#include "VTKRendering/MeshNodalCoordinates.h"
+#include "VTKRendering/VTKRenderDelegate.h"
 
-// Vtk incudes
+// VTK incudes
 #include <vtkSmartPointer.h>
 #include <vtkNew.h>
 #include <vtkActor.h>
@@ -49,7 +49,7 @@
 #include <vtkTexture.h>
 
 
-class MeshRenderDelegate : public VtkRenderDelegate
+class MeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     virtual bool isTargetTextured() const override;
@@ -178,13 +178,6 @@ void MeshRenderDelegate::modified()
     dataSet->Modified();
 }
 
-#include "Core/Config.h"
-#include "Core/Factory.h"
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_MeshRenderDelegate)
-        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
-                                RenderDelegate,
-                                MeshRenderDelegate,
-                                RenderDelegate::RendererType::VTK);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     MeshRenderDelegate,
+                     RenderDelegate::RendererType::VTK)

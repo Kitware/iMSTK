@@ -38,6 +38,11 @@
 template <typename CellType>
 void SurfaceTree<CellType>::initStructure()
 {
+    if(!this->model->getMesh() || this->model->getMesh()->getNumberOfVertices() == 0)
+    {
+        std::cerr << "Error: Empty or unvalid mesh." << std::endl;
+        return;
+    }
     core::Vec3d center;
     std::vector<int> triangles(this->model->getMesh()->getTriangles().size());
     std::iota(std::begin(triangles),std::end(triangles),0);
@@ -53,7 +58,7 @@ void SurfaceTree<CellType>::initStructure()
 
     treeAllLevels[0] = *root.get();
     this->createTree(root, triangles, 0);
-	initialTreeAllLevels = treeAllLevels;
+    initialTreeAllLevels = treeAllLevels;
 }
 
 /// \brief destructor

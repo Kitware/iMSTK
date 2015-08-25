@@ -26,15 +26,15 @@
 
 #include "Core/ViewerBase.h"
 
-class VtkViewer : public ViewerBase
+class VTKViewer : public ViewerBase
 {
 
 public:
-    VtkViewer();
-    ~VtkViewer();
+    VTKViewer();
+    ~VTKViewer();
 
-    VtkViewer(const VtkViewer& other) = delete;
-    VtkViewer& operator=(const VtkViewer& other) = delete;
+    VTKViewer(const VTKViewer& other) = delete;
+    VTKViewer& operator=(const VTKViewer& other) = delete;
 
 public:
     ///
@@ -138,8 +138,8 @@ protected:
     void render() override;
 
 private:
-    class VtkRenderer;
-    std::unique_ptr<VtkRenderer> renderer;
+    class VTKRenderer;
+    std::unique_ptr<VTKRenderer> renderer;
 };
 
 

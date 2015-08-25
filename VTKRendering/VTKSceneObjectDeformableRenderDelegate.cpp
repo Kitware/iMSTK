@@ -25,14 +25,14 @@
 #include "Core/Geometry.h" // for VisualArtifact used by geometry sources in RenderDelegate
 #include "Simulators/VegaFemSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
-#include "VtkRendering/VtkRenderDelegate.h"
+#include "VTKRendering/VTKRenderDelegate.h"
 
 // VTK includes
 #include <vtkActor.h>
 
 /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
 ///  vertices interacted with, ground plane etc.
-class SceneObjectDeformableRenderDelegate : public VtkRenderDelegate
+class SceneObjectDeformableRenderDelegate : public VTKRenderDelegate
 {
 public:
     vtkActor *getActor() const override;
@@ -56,7 +56,7 @@ vtkActor *SceneObjectDeformableRenderDelegate::getActor() const
     {
         return nullptr;
     }
-    auto delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(surfaceMesh->getRenderDelegate());
+    auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(surfaceMesh->getRenderDelegate());
     if(!delegate)
     {
         return nullptr;
@@ -65,13 +65,6 @@ vtkActor *SceneObjectDeformableRenderDelegate::getActor() const
     return delegate->getActor();
 }
 
-#include "Core/Config.h"
-#include "Core/Factory.h"
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_SceneObjectDeformableRenderDelegate)
-        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
-                                RenderDelegate,
-                                SceneObjectDeformableRenderDelegate,
-                                RenderDelegate::RendererType::VTK);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     SceneObjectDeformableRenderDelegate,
+                     RenderDelegate::RendererType::VTK)

@@ -24,13 +24,13 @@
 #include "Core/Model.h"
 #include "Core/Geometry.h"
 #include "Core/StaticSceneObject.h"
-#include "VtkRendering/VtkRenderDelegate.h"
+#include "VTKRendering/VTKRenderDelegate.h"
 #include "Geometry/PlaneModel.h"
 
 // VTK includes
 #include <vtkActor.h>
 
-class StaticSceneObjectRenderDelegate : public VtkRenderDelegate
+class StaticSceneObjectRenderDelegate : public VTKRenderDelegate
 {
 public:
     vtkActor *getActor() const override;
@@ -52,7 +52,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor() const
         return nullptr;
     }
 
-    auto delegate = std::dynamic_pointer_cast<VtkRenderDelegate>(
+    auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
         planeModel->getPlaneModel()->getRenderDelegate());
 
     if(!delegate)
@@ -63,13 +63,6 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor() const
     return delegate->getActor();
 }
 
-#include "Core/Config.h"
-#include "Core/Factory.h"
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-    SIMMEDTK_BEGIN_ONLOAD(register_StaticSceneObjectRenderDelegate)
-        SIMMEDTK_REGISTER_CLASS(RenderDelegate,
-                                RenderDelegate,
-                                StaticSceneObjectRenderDelegate,
-                                RenderDelegate::RendererType::VTK);
-    SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     StaticSceneObjectRenderDelegate,
+                     RenderDelegate::RendererType::VTK)

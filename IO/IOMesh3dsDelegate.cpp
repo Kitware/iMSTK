@@ -203,8 +203,4 @@ public:
     void write(){}
 };
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_Mesh3dsDelegate)
-  SIMMEDTK_REGISTER_CLASS(IOMeshDelegate,IOMeshDelegate,IOMesh3dsDelegate,IOMesh::ReaderGroup::Other);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(IOMeshDelegate,IOMesh3dsDelegate,IOMesh::ReaderGroup::Other);

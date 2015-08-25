@@ -34,9 +34,7 @@
 
 int main()
 {
-    SIMMEDTK_REGISTER_RENDER_DELEGATES();
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene1;
     std::shared_ptr<Light> light;
     std::shared_ptr<Camera> sceneCamera;
@@ -47,12 +45,11 @@ int main()
     //Create an instance of the SimMedTK framework/SDK
     sdk = SDK::getInstance();
 
+    // Default viewer is based on vtk
+    auto viewer = sdk->createViewer();
+
     //Create a new scene to work in
     scene1 = sdk->createScene();
-
-    //Create a viewer to see the scene through
-    viewer = std::make_shared<OpenGLViewer>();
-    sdk->addViewer(viewer);
 
     //Create the camera controller
     camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
@@ -68,7 +65,17 @@ int main()
     cubeModel->setRenderDetail(renderDetail);
 
     cube = std::make_shared<StaticSceneObject>();
-    cube->setModel(cubeModel);
+
+    // If you want to use the GL renderer you need to specify the appropiate render delegates
+    // This can be automated in the future, for now VTK is the default renderer
+//     cube->setModel(cubeModel);
+//     auto renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
+//         "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::Other);
+//     cube->setRenderDelegate(renderDelegate);
+//
+//     renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
+//         "MeshRenderDelegate",RenderDelegate::RendererType::Other);
+//     cubeModel->getMesh()->setRenderDelegate(renderDelegate);
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(cube);

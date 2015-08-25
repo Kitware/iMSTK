@@ -20,27 +20,16 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+#ifndef IO_H
+#define IO_H
 
-#include <bandit/bandit.h>
+/// NOTE: Make sure that this file is included only once per application.
 
-#include "Collision/SpatialHashCollision.h"
-#include "Core/ErrorLog.h"
-#include "Core/MakeUnique.h"
+#include "IO/IOMesh.h"
 
-using namespace bandit;
+SIMMEDTK_RUN_LOADER(register_IOMesh3dsDelegate);
+SIMMEDTK_RUN_LOADER(register_IOMeshAssimpDelegate);
+SIMMEDTK_RUN_LOADER(register_IOMeshVegaDelegate);
+SIMMEDTK_RUN_LOADER(register_IOMeshVTKDelegate);
 
-go_bandit([](){
-    describe("the spatial hash collision detector", []() {
-        it("initializes properly ", []() {
-
-            std::unique_ptr<SpatialHashCollision>
-            spatialHash(Core::make_unique<SpatialHashCollision>(10,1.0,1.0,1.0));
-            AssertThat(spatialHash != nullptr, IsTrue());
-//             AssertThat( spatialHash->pipe->getElements(), Equals( 1 ) );
-//             AssertThat( spatialHash->pipeTriangles->getElements(), Equals( 1 ) );
-//             AssertThat( spatialHash->pipeModelPoints->getElements(), Equals( 1 ) );
-        });
-    });
-
-});
-
+#endif // IOMESH_H
