@@ -20,16 +20,16 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef IO_H
-#define IO_H
+#ifndef VTKRENDERING_H
+#define VTKRENDERING_H
+
+#include "Core/Config.h"
 
 /// NOTE: Make sure that this file is included only once per application.
 
-#include "IO/IOMesh.h"
+SIMMEDTK_RUN_LOADER(register_MeshRenderDelegate);
+SIMMEDTK_RUN_LOADER(register_PlaneRenderDelegate);
+SIMMEDTK_RUN_LOADER(register_SceneObjectDeformableRenderDelegate);
+SIMMEDTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate);
 
-SIMMEDTK_RUN_LOADER(register_IOMesh3dsDelegate);
-SIMMEDTK_RUN_LOADER(register_IOMeshAssimpDelegate);
-SIMMEDTK_RUN_LOADER(register_IOMeshVegaDelegate);
-SIMMEDTK_RUN_LOADER(register_IOMeshVTKDelegate);
-
-#endif // IO_H
+#endif // VTKRENDERING_H

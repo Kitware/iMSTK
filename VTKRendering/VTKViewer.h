@@ -77,11 +77,6 @@ public:
     ///
     void endFrame() override {}
 
-    ///
-    /// \brief Verify that the rendering pipeline initializes properly
-    ///
-    bool isValid();
-
 protected:
     ///
     /// \brief Renders the render operation to screen

@@ -34,6 +34,8 @@ StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : Scen
     this->setRenderDelegate(
         Factory<RenderDelegate>::createConcreteClassForGroup(
         "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::VTK));
+
+    std::cout << this->getRenderDelegate() << std::endl;
 }
 
 StaticSceneObject::~StaticSceneObject()

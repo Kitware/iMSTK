@@ -207,7 +207,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(3, GL_DOUBLE, 0, p_surfaceMesh->getVertices().data()->data());
     glEnableClientState(GL_NORMAL_ARRAY);
-    glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->getVertexNormals().data());
+    glNormalPointer(GL_DOUBLE, 0, p_surfaceMesh->getVertexNormals().data()->data());
 
     auto &meshTextures = p_surfaceMesh->getTextures();
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_TEXTURE)
@@ -232,12 +232,15 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
-        auto data = (unsigned int*)p_surfaceMesh->getTriangles().data()->data();
-        int size = p_surfaceMesh->getTriangles().size() * 3;
-        //
-        // TODO: Investigate a crash here when using the opengl renderer
-        //
-        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, data);
+        // TODO: Investigate why this expensive copy needs to be performed.
+        std::vector<unsigned int> data;
+        for(auto t : p_surfaceMesh->getTriangles())
+        {
+            data.emplace_back(t[0]);
+            data.emplace_back(t[1]);
+            data.emplace_back(t[2]);
+        }
+        glDrawElements(GL_TRIANGLES, data.size(), GL_UNSIGNED_INT, data.data());
     }
 
     if ((p_surfaceMesh->getRenderDetail()->getRenderType() & (SIMMEDTK_RENDER_VERTICES)))

@@ -34,6 +34,8 @@
 
 int main()
 {
+    const bool useVTKRenderer = true;
+
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<Scene> scene1;
     std::shared_ptr<Light> light;
@@ -46,18 +48,29 @@ int main()
     sdk = SDK::getInstance();
 
     // Default viewer is based on vtk
-    auto viewer = sdk->createViewer();
+    std::shared_ptr<ViewerBase> viewer;
+    if(useVTKRenderer)
+    {
+        viewer = sdk->createViewer();
+    }
+    else
+    {
+        viewer = std::make_shared<OpenGLViewer>();
+        sdk->addViewer(viewer);
+    }
 
     //Create a new scene to work in
     scene1 = sdk->createScene();
 
     //Create the camera controller
-    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
-    pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
-
+    if(!useVTKRenderer)
+    {
+        camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+        keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+        pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+    }
     auto cubeModel = std::make_shared<MeshModel>();
-    TextureManager::addTexture("textures/cube.png", "cubetex");
+    TextureManager::addTexture("textures/cube.jpg", "cubetex");
     cubeModel->load("models/cube.obj");
     std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
 
@@ -67,15 +80,19 @@ int main()
     cube = std::make_shared<StaticSceneObject>();
 
     // If you want to use the GL renderer you need to specify the appropiate render delegates
-    // This can be automated in the future, for now VTK is the default renderer
-//     cube->setModel(cubeModel);
-//     auto renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
-//         "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::Other);
-//     cube->setRenderDelegate(renderDelegate);
-//
-//     renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
-//         "MeshRenderDelegate",RenderDelegate::RendererType::Other);
-//     cubeModel->getMesh()->setRenderDelegate(renderDelegate);
+    // This can be automated in the future, for now VTK is the default renderer and the delegates
+    // need to be reset.
+    cube->setModel(cubeModel);
+    if(!useVTKRenderer)
+    {
+        auto renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
+            "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::Other);
+        cube->setRenderDelegate(renderDelegate);
+
+        renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
+            "MeshRenderDelegate",RenderDelegate::RendererType::Other);
+        cubeModel->getMesh()->setRenderDelegate(renderDelegate);
+    }
 
     //Add the cube to the scene to be rendered
     scene1->addSceneObject(cube);
@@ -93,32 +110,37 @@ int main()
     //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     // Setup Scene lighting
-    light = Light::getDefaultLighting();
-    assert(light);
-    scene1->addLight(light);
+    if(!useVTKRenderer)
+    {
+        light = Light::getDefaultLighting();
+        assert(light);
+        scene1->addLight(light);
 
-    // Camera setup
-    sceneCamera = Camera::getDefaultCamera();
-    assert(sceneCamera);
-    sceneCamera->setPos(3, 3, 5);
-    sceneCamera->setFocus(0, 0, -1);
-    sceneCamera->genProjMat();
-    sceneCamera->genViewMat();
-    scene1->addCamera(sceneCamera);
-    camCtl->setCamera(sceneCamera);
-    pzrCamCtl->setCamera(sceneCamera);
+        // Camera setup
+        sceneCamera = Camera::getDefaultCamera();
+        assert(sceneCamera);
+        sceneCamera->setPos(3, 3, 5);
+        sceneCamera->setFocus(0, 0, -1);
+        sceneCamera->genProjMat();
+        sceneCamera->genViewMat();
+        scene1->addCamera(sceneCamera);
+        camCtl->setCamera(sceneCamera);
+        pzrCamCtl->setCamera(sceneCamera);
 
-    //Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(core::EventType::Keyboard, camCtl);
-    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
+        //Link up the event system between this the camera controller and the viewer
+        viewer->attachEvent(core::EventType::Keyboard, camCtl);
+        viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+        viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+        viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
+    }
+
+    viewer->exec();
     //run the framework
-    sdk->run();
+//     sdk->run();
 
     //cleanup
-    sdk->releaseScene(scene1);
+//     sdk->releaseScene(scene1);
 
     return 0;
 }

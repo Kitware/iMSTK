@@ -61,7 +61,7 @@ core::Vec3d SurfaceMesh::computeTriangleNormal(int triangle)
 }
 void SurfaceMesh::computeTriangleNormals()
 {
-    this->triangleNormals.resize(this->triangleArray.size());
+    this->triangleNormals.resize(this->triangleArray.size(),core::Vec3d::Zero());
 
     for(size_t i = 0, end = this->triangleArray.size(); i < end; ++i)
     {
@@ -74,6 +74,11 @@ void SurfaceMesh::computeTriangleNormals()
 void SurfaceMesh::computeVertexNormals()
 {
     this->vertexNormals.resize(this->vertices.size(),core::Vec3d::Zero());
+
+    if(this->vertexTriangleNeighbors.size() == 0)
+    {
+        this->computeVertexTriangleNeighbors();
+    }
 
     for(size_t i = 0, end = this->vertices.size(); i < end; ++i)
     {

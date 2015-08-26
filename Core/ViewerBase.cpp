@@ -51,6 +51,7 @@ ViewerBase::ViewerBase()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
+    valid = true;
 }
 
 ///affects the framebuffer size and depth buffer size

@@ -103,7 +103,7 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     this->delegator->addDelegator(MeshFileType::VEG,"IOMeshVegaDelegate");
     //
     // The readers for obj,stl and ply are based on a priority group (defaults to vtk io's)
-    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",priorityGroup);
+    this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",ReaderGroup::Assimp);
     this->delegator->addGroupDelegator(MeshFileType::STL,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::PLY,"IOMeshDelegate",priorityGroup);
     //

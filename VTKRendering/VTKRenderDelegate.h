@@ -8,9 +8,11 @@ class vtkActor;
 class VTKRenderDelegate : public RenderDelegate
 {
 public:
-    virtual vtkActor *getActor() const = 0;
-    virtual void initDraw(){}
-    virtual void modified(){}
+    virtual vtkActor *getActor() = 0;
+    virtual void initDraw() override{}
+    virtual void modified() override{}
+    virtual void draw() const
+    { }
 };
 
 #endif // SMRENDERABLE_H

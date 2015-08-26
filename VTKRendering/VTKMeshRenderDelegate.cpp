@@ -54,9 +54,11 @@ class MeshRenderDelegate : public VTKRenderDelegate
 public:
     virtual bool isTargetTextured() const override;
 
-    vtkActor *getActor() const;
-    void initDraw();
-    void modified();
+    vtkActor *getActor() override;
+    void initDraw() override;
+    void modified() override;
+    void draw() const
+    { }
 
 private:
     vtkNew<vtkActor> actor;
@@ -168,7 +170,7 @@ bool MeshRenderDelegate::isTargetTextured() const
     return geom->isMeshTextured();
 }
 
-vtkActor *MeshRenderDelegate::getActor() const
+vtkActor *MeshRenderDelegate::getActor()
 {
     return this->actor.GetPointer();
 }

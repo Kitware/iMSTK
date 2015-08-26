@@ -35,8 +35,10 @@
 class PlaneRenderDelegate : public VTKRenderDelegate
 {
 public:
-    vtkActor *getActor() const override;
+    vtkActor *getActor() override;
     virtual void initDraw() override;
+    void draw() const
+    { }
 
 private:
     vtkNew<vtkActor> actor;
@@ -67,7 +69,7 @@ void PlaneRenderDelegate::initDraw()
     this->actor->SetMapper(mapper);
 }
 
-vtkActor *PlaneRenderDelegate::getActor() const
+vtkActor *PlaneRenderDelegate::getActor()
 {
     return actor.GetPointer();
 }

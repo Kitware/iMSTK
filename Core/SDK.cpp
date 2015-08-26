@@ -177,7 +177,7 @@ void SDK::run()
     this->viewer->exec();
 
     // Now wait for other modules to shut down
-    while (!shutdown)
+    while (this->viewer->isValid() && !shutdown)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

@@ -94,6 +94,8 @@ protected:
         auto mesh = std::make_shared<SurfaceMesh>();
         mesh->setVertices(vertices);
         mesh->setTriangles(triangleArray);
+        mesh->computeTriangleNormals();
+        mesh->computeVertexNormals();
         this->meshIO->setMesh(mesh);
     }
 

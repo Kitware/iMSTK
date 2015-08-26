@@ -26,6 +26,7 @@
 #include "Core/StaticSceneObject.h"
 #include "VTKRendering/VTKRenderDelegate.h"
 #include "Geometry/PlaneModel.h"
+#include "Geometry/MeshModel.h"
 
 // VTK includes
 #include <vtkActor.h>
@@ -33,10 +34,12 @@
 class StaticSceneObjectRenderDelegate : public VTKRenderDelegate
 {
 public:
-    vtkActor *getActor() const override;
+    vtkActor *getActor() override;
+    void draw() const
+    { }
 };
 
-vtkActor *StaticSceneObjectRenderDelegate::getActor() const
+vtkActor *StaticSceneObjectRenderDelegate::getActor()
 {
     StaticSceneObject* geom = this->getSourceGeometryAs<StaticSceneObject>();
     if (!geom)
@@ -47,20 +50,32 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor() const
     auto planeModel = std::dynamic_pointer_cast<PlaneModel>(
         geom->getModel());
 
-    if(!planeModel)
+    if(planeModel)
     {
-        return nullptr;
+        auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
+            planeModel->getPlaneModel()->getRenderDelegate());
+        if(!delegate)
+        {
+            return nullptr;
+        }
+        delegate->initDraw();
+        return delegate->getActor();
     }
 
-    auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
-        planeModel->getPlaneModel()->getRenderDelegate());
+    auto meshModel = std::dynamic_pointer_cast<MeshModel>(
+        geom->getModel());
 
-    if(!delegate)
+    if(meshModel)
     {
-        return nullptr;
+        auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
+            meshModel->getMesh()->getRenderDelegate());
+        if(!delegate)
+        {
+            return nullptr;
+        }
+        delegate->initDraw();
+        return delegate->getActor();
     }
-    delegate->initDraw();
-    return delegate->getActor();
 }
 
 RegisterFactoryClass(RenderDelegate,

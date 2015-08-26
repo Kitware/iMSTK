@@ -62,9 +62,7 @@ public:
         // Extract the information from the aiScene's mesh objects
         aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
 
-        auto surfaceMesh = std::make_shared<SurfaceMesh>();
-        auto &vertices = surfaceMesh->getVertices();
-
+        std::vector<core::Vec3d> vertices;
         vertices.reserve(mesh->mNumVertices);
 
         // Get indexed vertex data
@@ -74,29 +72,9 @@ public:
                                   mesh->mVertices[i][1],
                                   mesh->mVertices[i][2]);
         }
-        surfaceMesh->updateOriginalVertsWithCurrent();
 
-        // Get indexed texture coordinate data
-        if (mesh->HasTextureCoords(0))
-        {
-            //Assimp supports 3D texture coords, but we only support 2D
-            if (mesh->mNumUVComponents[0] != 2)
-            {
-                std::cerr << "Error: Error loading mesh, non-two dimensional texture coordinate found." << std::endl;
-                return;
-            }
-
-            auto &textureCoordinates = surfaceMesh->getTextureCoordinates();
-            // Extract the texture data
-            for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-            {
-                textureCoordinates.emplace_back(mesh->mTextureCoords[0][i][0],
-                                                mesh->mTextureCoords[0][i][1]);
-            }
-        }
-
-        auto &triangles = surfaceMesh->getTriangles();
-        triangles.reserve(mesh->mNumFaces);
+        std::vector<std::array<size_t,3>> triangleArray;
+        triangleArray.reserve(mesh->mNumFaces);
 
         // Setup triangle/face data
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -111,10 +89,30 @@ public:
             std::array<size_t,3> t = {mesh->mFaces[i].mIndices[0],
                                    mesh->mFaces[i].mIndices[1],
                                    mesh->mFaces[i].mIndices[2]};
-            triangles.emplace_back(t);
+            triangleArray.emplace_back(t);
         }
 
-        this->meshIO->setMesh(surfaceMesh);
+        this->setSurfaceMesh(vertices,triangleArray);
+
+        // Get indexed texture coordinate data
+        if (mesh->HasTextureCoords(0))
+        {
+            //Assimp supports 3D texture coords, but we only support 2D
+            if (mesh->mNumUVComponents[0] != 2)
+            {
+                std::cerr << "Error: Error loading mesh, non-two dimensional texture coordinate found." << std::endl;
+                return;
+            }
+
+            auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(this->meshIO->getMesh());
+            auto &textureCoordinates = surfaceMesh->getTextureCoordinates();
+            // Extract the texture data
+            for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+            {
+                textureCoordinates.emplace_back(mesh->mTextureCoords[0][i][0],
+                                                mesh->mTextureCoords[0][i][1]);
+            }
+        }
     }
     void write(){}
 };

@@ -147,10 +147,24 @@ public:
       unsigned int p_width, unsigned int p_height);
 
     virtual void setGlobalAxisLength(const float len);
+
+    virtual const bool &isValid()
+    {
+        return this->valid;
+    }
+
+    virtual void setIsValid(const bool newValid)
+    {
+        this->valid = newValid;
+    }
+
     std::string windowTitle;
     Color defaultDiffuseColor;
     Color defaultAmbientColor;
     Color defaultSpecularColor;
+    bool valid;
+    /// \brief initialize, run the event loop (processWindowEvents) and clean up.
+    virtual void exec();
 
 protected:
     /// \brief Renders the render operation to screen
@@ -188,8 +202,6 @@ protected:
     virtual void render();
     /// \brief adjust  rendering FPS
     void adjustFPS();
-    /// \brief initialize, run the event loop (processWindowEvents) and clean up.
-    virtual void exec();
 };
 
 #endif // SMVIEWERBASE_H

@@ -35,10 +35,12 @@
 class SceneObjectDeformableRenderDelegate : public VTKRenderDelegate
 {
 public:
-    vtkActor *getActor() const override;
+    vtkActor *getActor() override;
+    void draw() const
+    { }
 };
 
-vtkActor *SceneObjectDeformableRenderDelegate::getActor() const
+vtkActor *SceneObjectDeformableRenderDelegate::getActor()
 {
     auto geom = this->getSourceGeometryAs<VegaFemSceneObject>();
 

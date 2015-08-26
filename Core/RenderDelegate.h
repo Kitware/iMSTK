@@ -11,8 +11,8 @@ public:
 
     enum RendererType
     {
-        VTK = 300,
-        Other = 400
+        VTK,
+        Other
     };
 
     typedef std::shared_ptr<RenderDelegate> Ptr;
@@ -40,9 +40,9 @@ public:
     {
         return this->sourceGeometry.sourceAs<T>();
     }
-
 protected:
     GeometrySource sourceGeometry; // object to render when draw() is called
+    std::string type;
 };
 
 #endif // SMRENDERABLE_H

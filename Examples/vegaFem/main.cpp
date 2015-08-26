@@ -24,12 +24,7 @@
 #include <memory>
 
 // Core SimMedTK includes
-#include "Core/Config.h"
-#include "Core/ErrorLog.h"
-#include "Core/CoreClass.h"
 #include "Core/SDK.h"
-#include "Rendering/OpenGLViewer.h"
-#include "Core/SceneObject.h"
 
 // Include required types scene objects
 #include "Simulators/VegaFemSceneObject.h"
