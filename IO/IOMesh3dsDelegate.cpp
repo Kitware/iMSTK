@@ -27,7 +27,7 @@
 
 #ifdef _WIN32
     #define fileno _fileno
-    #include "io.h"
+    #include <io.h>
     int Filelength(const char*, int id)
     {
         return filelength(id);

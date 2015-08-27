@@ -156,7 +156,7 @@ enum class ClassDrawOrder
 #    define SIMMEDTK_DESTRUCTOR_ATTRIB
 #    define SIMMEDTK_RUN_LOADER(CONTEXT) \
        extern void simmedtk_##CONTEXT##_onload(); \
-       simmedtk_##CONTEXT##_onload()
+       simmedtk_##CONTEXT##_onload();
 #  endif
 
 /**\brief Invoke methods at the time a dynamic library is invoked.
