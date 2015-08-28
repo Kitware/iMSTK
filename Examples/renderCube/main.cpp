@@ -27,14 +27,19 @@
 
 #include <memory>
 
+#include "IO/initIO.h"
+#include "RenderDelegates/initRenderDelegates.h"
+#include "VTKRendering/initVTKRendering.h"
 #include "Core/SDK.h"
 #include "Rendering/TextureManager.h"
 #include "Geometry/MeshModel.h"
-#include "RenderDelegates/Config.h"
 
 int main()
 {
-    const bool useVTKRenderer = true;
+    initRenderDelegates();
+    initVTKRendering();
+    initIODelegates();
+    const bool useVTKRenderer = false;
 
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<Scene> scene1;

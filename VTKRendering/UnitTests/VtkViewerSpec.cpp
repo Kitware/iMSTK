@@ -32,11 +32,15 @@
 #include "Testing/TestMesh.h"
 #include "IO/IOMesh.h"
 
+#include "IO/initIO.h"
+#include "VTKRendering/initVTKRendering.h"
+
 #include <bandit/bandit.h>
 using namespace bandit;
 
 go_bandit([](){
-
+    initVTKRendering();
+    initIODelegates();
     describe("VTK based viewer.", []() {
         it("constructs", []() {
             auto viewer = std::make_shared<VTKViewer>();

@@ -142,7 +142,7 @@ enum class ClassDrawOrder
 //        on Windows.
 #if !defined(WIN32)
 #  define SIMMEDTK_IS_DYNAMIC
-#else
+// #else
 #  undef SIMMEDTK_IS_DYNAMIC
 #endif
 
@@ -156,7 +156,7 @@ enum class ClassDrawOrder
 #    define SIMMEDTK_DESTRUCTOR_ATTRIB
 #    define SIMMEDTK_RUN_LOADER(CONTEXT) \
        extern void simmedtk_##CONTEXT##_onload(); \
-       simmedtk_##CONTEXT##_onload();
+       simmedtk_##CONTEXT##_onload()
 #  endif
 
 /**\brief Invoke methods at the time a dynamic library is invoked.

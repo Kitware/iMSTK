@@ -7,8 +7,10 @@ simmedtk_add_library(VTKRendering
     VTKPlaneRenderDelegate.cpp
     VTKSceneObjectDeformableRenderDelegate.cpp
     VTKStaticSceneObjectRenderDelegate.cpp
+    initVTKRendering.cpp
   PUBLIC_HEADERS
     VTKViewer.h
+    initVTKRendering.h
 )
 set(PRIVATE_LIBS
     PRIVATE

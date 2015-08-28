@@ -27,7 +27,8 @@
 // SimMedTK includes
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
-#include "IO/IO.h"
+#include "IO/IOMesh.h"
+#include "IO/initIO.h"
 
 const std::string vegaMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
 
@@ -35,6 +36,7 @@ using namespace bandit;
 
 go_bandit([](){
 
+    initIODelegates();
     describe("Vega Volumetric Mesh", []() {
         auto ioMesh = std::make_shared<IOMesh>();
         ioMesh->read(vegaMeshFileName);

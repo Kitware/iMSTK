@@ -5,6 +5,7 @@ target_link_libraries(renderCube
   VTKRendering
   Rendering
   RenderDelegates
+  IO
   Mesh
   Event
   Collision

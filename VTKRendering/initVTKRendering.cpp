@@ -20,17 +20,9 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef VTKRENDERING_H
-#define VTKRENDERING_H
+#include "VTKRendering/initVTKRendering.h"
 
-#include "Core/Config.h"
-
-/// NOTE: Make sure that this file is included only once per application.
-
-
-//SIMMEDTK_RUN_LOADER(register_MeshRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_PlaneRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_SceneObjectDeformableRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate);
-
-#endif // VTKRENDERING_H
+void initVTKRendering()
+{
+    SIMMEDTK_REGISTER_VTKRENDER_DELEGATES();
+}

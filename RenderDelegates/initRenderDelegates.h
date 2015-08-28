@@ -27,13 +27,15 @@
 
 #include "Core/Config.h"
 
-//SIMMEDTK_RUN_LOADER(register_OpenGLViewer);
-//SIMMEDTK_RUN_LOADER(register_AABBRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_MeshRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_PlaneRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_SceneObjectDeformableRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_StylusRenderDelegate);
-//SIMMEDTK_RUN_LOADER(register_SurfaceTreeRenderDelegate);
+#define SIMMEDTK_REGISTER_RENDER_DELEGATES() \
+    SIMMEDTK_RUN_LOADER(register_OpenGLViewer); \
+    SIMMEDTK_RUN_LOADER(register_AABBRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_MeshRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_PlaneRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_SceneObjectDeformableRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_SurfaceTreeRenderDelegate);
+
+void initRenderDelegates();
 
 #endif // SMRENDERDELEGATES_CONFIG_H

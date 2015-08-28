@@ -46,8 +46,15 @@
 #include "../common/KeyPressSDKShutdown.h"
 #include "../common/pzrMouseCameraController.h"
 
+#include "IO/initIO.h"
+#include "RenderDelegates/initRenderDelegates.h"
+#include "VTKRendering/initVTKRendering.h"
+
 int main()
 {
+    initRenderDelegates();
+    initVTKRendering();
+    initIODelegates();
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<VegaFemSceneObject> femObject;
     std::shared_ptr<StaticSceneObject> staticObject;

@@ -172,6 +172,7 @@ public:
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
 {
+
 }
 
 VTKViewer::~VTKViewer()

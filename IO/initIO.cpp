@@ -20,16 +20,9 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef IOConfig_H
-#define IOConfig_H
+#include "IO/initIO.h"
 
-/// NOTE: Make sure that this file is included only once per application.
-
-#include "IO/IOMesh.h"
-
-//SIMMEDTK_RUN_LOADER(register_IOMesh3dsDelegate);
-//SIMMEDTK_RUN_LOADER(register_IOMeshAssimpDelegate);
-//SIMMEDTK_RUN_LOADER(register_IOMeshVegaDelegate);
-//SIMMEDTK_RUN_LOADER(register_IOMeshVTKDelegate);
-
-#endif // IO_H
+void initIODelegates()
+{
+    SIMMEDTK_REGISTER_IO_DELEGATES();
+}

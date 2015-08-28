@@ -33,9 +33,6 @@
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
 #include "Rendering/OpenGLViewer.h"
-#include "VTKRendering/VTKRendering.h"
-#include "RenderDelegates/Config.h"
-#include "IO/IOConfig.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100

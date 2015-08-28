@@ -9,9 +9,11 @@ simmedtk_add_library(IO
     IOMeshVegaDelegate.cpp
     IOMeshVTKDelegate.cpp
     IOMesh3dsDelegate.cpp
+    initIO.cpp
   PUBLIC_HEADERS
     IOMesh.h
     IOMeshDelegate.h
+    initIO.h
 )
 
 target_link_libraries(IO

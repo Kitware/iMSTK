@@ -6,7 +6,7 @@ project(SimMedTK)
 # Library mode: SHARED (default) or STATIC
 #
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-set(SimMedTK_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+set(SimMedTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 mark_as_advanced(BUILD_SHARED_LIBS)
 
 #-----------------------------------------------------------------------------
