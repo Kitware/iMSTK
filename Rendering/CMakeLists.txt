@@ -32,6 +32,7 @@ target_link_libraries(Rendering
     Core
     External
     Event
+    Mesh
  PUBLIC
     sfml::window
     sfml::system
