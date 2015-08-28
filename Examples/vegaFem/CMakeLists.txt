@@ -11,4 +11,5 @@ target_link_libraries(vegaFemExample
   ContactHandling
   Event
   ExamplesCommon
+  IO
   )
