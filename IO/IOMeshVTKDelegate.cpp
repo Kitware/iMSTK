@@ -281,31 +281,34 @@ public:
             {
                 case 3:
                 {
-                    std::array<size_t,3> e = {element->GetId(0),
-                        element->GetId(1),
-                        element->GetId(2)};
+                    std::array<size_t,3> e;
+                    e[0] = element->GetId(0);
+                    e[1] = element->GetId(1);
+                    e[2] = element->GetId(2);
                     triangleArray.emplace_back(e);
                     break;
                 }
                 case 4:
                 {
-                    std::array<size_t,4> e = {element->GetId(0),
-                        element->GetId(1),
-                        element->GetId(2),
-                        element->GetId(3)};
+                    std::array<size_t,4> e;
+                    e[0] = element->GetId(0);
+                    e[1] = element->GetId(1);
+                    e[2] = element->GetId(2);
+                    e[3] = element->GetId(3);
                     tetraArray.emplace_back(e);
                     break;
                 }
                 case 8:
                 {
-                    std::array<size_t,8> e = {element->GetId(0),
-                        element->GetId(1),
-                        element->GetId(2),
-                        element->GetId(3),
-                        element->GetId(4),
-                        element->GetId(5),
-                        element->GetId(6),
-                        element->GetId(7)};
+                    std::array<size_t,8> e;
+                    e[0] = element->GetId(0);
+                    e[1] = element->GetId(1);
+                    e[2] = element->GetId(2);
+                    e[3] = element->GetId(3);
+                    e[4] = element->GetId(4);
+                    e[5] = element->GetId(5);
+                    e[6] = element->GetId(6);
+                    e[7] = element->GetId(7);
                     hexaArray.emplace_back(e);
                     break;
                 }

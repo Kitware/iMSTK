@@ -16,7 +16,10 @@ set(PRIVATE_LIBS
     PRIVATE
         Core
         Simulators
-        Rendering)
+        Rendering
+        Mesh
+        Geometry
+        )
 
 if(VTK_LIBRARIES)
     target_link_libraries(VTKRendering

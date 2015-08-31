@@ -43,7 +43,7 @@ const std::string vtpMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vt
 
 using namespace bandit;
 
-go_bandit([&](){
+go_bandit([](){
 
     initIODelegates();
     describe("IO Mesh Reader", [&]() {

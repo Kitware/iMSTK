@@ -26,6 +26,7 @@ target_link_libraries(Simulators
     Mesh
     Event
     Collision
+    IO
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts

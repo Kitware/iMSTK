@@ -76,6 +76,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor()
         delegate->initDraw();
         return delegate->getActor();
     }
+    return nullptr;
 }
 
 RegisterFactoryClass(RenderDelegate,
