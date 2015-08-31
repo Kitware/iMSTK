@@ -12,7 +12,6 @@ target_link_libraries(Geometry
   PRIVATE
     Core
     Mesh
-    Rendering
     IO
 )
 

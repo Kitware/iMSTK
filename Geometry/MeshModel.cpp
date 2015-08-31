@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "Geometry/MeshModel.h"
-#include "Rendering/TextureManager.h"
 #include "IO/IOMesh.h"
 #include "Core/RenderDelegate.h"
 
@@ -78,11 +77,17 @@ void MeshModel::addTexture(const std::string& textureFileName, const std::string
         std::cerr << "Cant assign texture to non-surface mesh." << std::endl;
         return;
     }
-    //Initialize the texture manager
-    TextureManager::init();
 
-    //Load in the texture for the model
-    TextureManager::addTexture(textureFileName, textureName);
+    if(surfaceMesh->getRenderDetail())
+    {
+        surfaceMesh->getRenderDetail()->setTextureFilename(textureFileName);
+    }
+    else
+    {
+        auto renderDetail = std::make_shared<RenderDetail>();
+        renderDetail->setTextureFilename(textureFileName);
+        surfaceMesh->setRenderDetail(renderDetail);
+    }
 
     surfaceMesh->assignTexture(textureName);
 }
