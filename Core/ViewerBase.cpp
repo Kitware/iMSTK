@@ -183,7 +183,7 @@ void ViewerBase::registerScene(std::shared_ptr<Scene> scene,
     renderOperations.push_back(rop);
 }
 
-inline void ViewerBase::adjustFPS()
+void ViewerBase::adjustFPS()
 {
 
     static int _unlimitedFPSVariableChanged = 0;

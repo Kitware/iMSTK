@@ -15,7 +15,8 @@ simmedtk_add_library(VTKRendering
 set(PRIVATE_LIBS
     PRIVATE
         Core
-        Simulators)
+        Simulators
+        Rendering)
 
 if(VTK_LIBRARIES)
     target_link_libraries(VTKRendering
