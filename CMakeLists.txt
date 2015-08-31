@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.1)
 
+if (POLICY CMP0058)
+  cmake_policy(SET CMP0058 NEW)
+endif()
 project(SimMedTK)
 
 #-----------------------------------------------------------------------------
