@@ -22,7 +22,8 @@
 //---------------------------------------------------------------------------
 
 #include "Mesh/SurfaceMesh.h"
-#include "Core/CollisionConfig.h"
+
+#include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
 
 ///
@@ -210,10 +211,6 @@ void SurfaceMesh::checkTriangleOrientation()
         }
     }
 }
-const std::string& SurfaceMesh::getTextureFileName(const size_t i) const
-{
-    return TextureManager::getTexture(textures[i]->textureId)->textureFileName;
-}
 const std::vector< Eigen::Matrix< float, int(2), int(1) >, Eigen::aligned_allocator< Eigen::Matrix< float, int(2), int(1) > > >& SurfaceMesh::getTextureCoordinates() const
 {
     return this->textureCoord;
@@ -244,24 +241,30 @@ void SurfaceMesh::addTextureCoordinate(const float& x, const float& y)
 }
 void SurfaceMesh::assignTexture(const std::string& referenceName)
 {
-    int id;
-    TextureManager::findTextureId(referenceName,id);
-
-    if(id < 0)
-    {
-        std::cerr << "The texture " << referenceName
-            << " cant be attached because it has not been processed by the manager." << std::endl;
-        return;
-    }
-
+    // TODO: This test has to be done at the rendrer level!
+//     int id;
+//     TextureManager::findTextureId(referenceName,id);
+//
+//     if(id < 0)
+//     {
+//         std::cerr << "The texture " << referenceName
+//             << " cant be attached because it has not been processed by the manager." << std::endl;
+//         return;
+//     }
+//
     auto attachment = std::make_shared<TextureAttachment>();
+    attachment->textureId = -1;
     attachment->textureName = referenceName;
-    attachment->textureId = id;
     this->textures.push_back(attachment);
 }
 bool SurfaceMesh::isMeshTextured() const
 {
-    return !this->textures.empty();
+    if(!this->renderDetail)
+    {
+        return false;
+    }
+
+    return !this->renderDetail->getTextureFilename().empty();
 }
 void SurfaceMesh::setUseOBJTexture(bool use)
 {

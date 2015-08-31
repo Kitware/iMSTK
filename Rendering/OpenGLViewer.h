@@ -32,6 +32,7 @@
 
 //forward declaration
 class OpenGLWindowStream;
+class SceneTextureShader;
 
 /// \brief Handles all rendering routines.
 class OpenGLViewer : public ViewerBase

@@ -36,7 +36,6 @@
 class SDK;
 class OpenGLWindowStream;
 class MetalShader;
-class SceneTextureShader;
 class FrameBuffer;
 class Texture;
 

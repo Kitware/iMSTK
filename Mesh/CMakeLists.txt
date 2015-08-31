@@ -11,7 +11,6 @@ simmedtk_add_library(Mesh
 target_link_libraries(Mesh
   PRIVATE
     Core
-    Rendering
   PUBLIC
     Assimp::Assimp
     VegaFEM::minivector

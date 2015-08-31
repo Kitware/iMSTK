@@ -32,7 +32,7 @@
 #include "Core/Vector.h"
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 #include "Rendering/CustomRenderer.h"
 
 //forward class declaration

@@ -34,7 +34,8 @@
 #include "Core/Config.h"
 #include "Core/UnifiedId.h"
 #include "Core/EventHandler.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
+#include "Core/RenderDetail.h"
 
 class SDK;
 class CoreClass;
@@ -244,10 +245,10 @@ protected:
     core::EventType,
     core::EventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<RenderDelegate> renderDelegate; ///!< Class that can render this class
+    std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
 
 private:
     std::shared_ptr<UnifiedId> uniqueId; ///< unique Id
-    std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
     core::ClassDrawOrder drawOrder; ///< draw order of the object
 };
 

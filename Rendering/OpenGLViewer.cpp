@@ -325,10 +325,10 @@ void OpenGLViewer::renderToScreen(const RenderOperation &p_rop)
 /// \brief Set the color and other viewer defaults
 void OpenGLViewer::setToDefaults()
 {
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor());
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, defaultAmbientColor.toGLColor());
-    glColor4fv(defaultDiffuseColor.toGLColor());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, defaultDiffuseColor.toGLColor<GLfloat>());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, defaultSpecularColor.toGLColor<GLfloat>());
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, defaultAmbientColor.toGLColor<GLfloat>());
+    glColor4fv(defaultDiffuseColor.toGLColor<GLfloat>());
 }
 
 /// \brief Called at the beginning of each frame by the module

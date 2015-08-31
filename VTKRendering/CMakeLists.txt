@@ -16,6 +16,7 @@ set(PRIVATE_LIBS
     PRIVATE
         Core
         Simulators)
+
 if(VTK_LIBRARIES)
     target_link_libraries(VTKRendering
     PUBLIC

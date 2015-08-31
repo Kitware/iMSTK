@@ -121,9 +121,9 @@ void Scene::initLights()
     for (auto light: lights)
     {
         glEnable(light->renderUsage);
-        glLightfv(light->renderUsage, GL_AMBIENT, light->lightColorAmbient.toGLColor());
-        glLightfv(light->renderUsage, GL_DIFFUSE, light->lightColorDiffuse.toGLColor());
-        glLightfv(light->renderUsage, GL_SPECULAR, light->lightColorSpecular.toGLColor());
+        glLightfv(light->renderUsage, GL_AMBIENT, light->lightColorAmbient.toGLColor<GLfloat>());
+        glLightfv(light->renderUsage, GL_DIFFUSE, light->lightColorDiffuse.toGLColor<GLfloat>());
+        glLightfv(light->renderUsage, GL_SPECULAR, light->lightColorSpecular.toGLColor<GLfloat>());
         glLightf(light->renderUsage, GL_SPOT_EXPONENT, light->spotExp * SMLIGHT_SPOTMAX);
         glLightf(light->renderUsage, GL_SPOT_CUTOFF, light->spotCutOffAngle);
         casted = light->lightPos.getPosition().cast<float>();
@@ -147,9 +147,9 @@ void Scene::refreshLights()
     for (auto light: lights)
     {
         glEnable(light->renderUsage);
-        glLightfv(light->renderUsage, GL_AMBIENT, light->lightColorAmbient.toGLColor());
-        glLightfv(light->renderUsage, GL_DIFFUSE, light->lightColorDiffuse.toGLColor());
-        glLightfv(light->renderUsage, GL_SPECULAR, light->lightColorSpecular.toGLColor());
+        glLightfv(light->renderUsage, GL_AMBIENT, light->lightColorAmbient.toGLColor<GLfloat>());
+        glLightfv(light->renderUsage, GL_DIFFUSE, light->lightColorDiffuse.toGLColor<GLfloat>());
+        glLightfv(light->renderUsage, GL_SPECULAR, light->lightColorSpecular.toGLColor<GLfloat>());
         glLightf(light->renderUsage, GL_SPOT_EXPONENT, light->spotExp * SMLIGHT_SPOTMAX);
         glLightf(light->renderUsage, GL_SPOT_CUTOFF, light->spotCutOffAngle);
         casted = light->lightPos.getPosition().cast<float>();

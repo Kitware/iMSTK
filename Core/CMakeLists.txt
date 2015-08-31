@@ -63,6 +63,7 @@ simmedtk_add_library(Core
 )
 
 target_link_libraries(Core
+
   PUBLIC
     GLEW::GLEW
     ${OPENGL_LIBRARY}

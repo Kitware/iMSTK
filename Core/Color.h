@@ -43,9 +43,20 @@ struct Color
     float operator()(int p_i);
     /// \brief setting
     Color &operator=(const Color &p_color);
+
     /// \brief converts to gl color
-    GLfloat* toGLColor();
-    const GLfloat* toGLColor() const;
+    template<typename GLColorType>
+    GLColorType* toGLColor()
+    {
+        return static_cast<GLColorType*>(&rgba[0]);
+    }
+
+    template<typename GLColorType>
+    const GLColorType* toGLColor() const
+    {
+        return static_cast<const GLColorType*>(&rgba[0]);
+    }
+
     /// \brief set RGB color
     void setValue(float p_red, float p_green, float p_blue, float p_alpha);
 

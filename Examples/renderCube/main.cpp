@@ -33,13 +33,14 @@
 #include "Core/SDK.h"
 #include "Rendering/TextureManager.h"
 #include "Geometry/MeshModel.h"
+#include "Core/Factory.h"
 
 int main()
 {
     initRenderDelegates();
     initVTKRendering();
     initIODelegates();
-    const bool useVTKRenderer = false;
+    const bool useVTKRenderer = true;
 
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<Scene> scene1;
@@ -67,20 +68,22 @@ int main()
     //Create a new scene to work in
     scene1 = sdk->createScene();
 
-    //Create the camera controller
+    auto cubeModel = std::make_shared<MeshModel>();
+    cubeModel->load("models/cube.obj");
+    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
+    renderDetail->setTextureFilename("textures/cube.jpg");
+    cubeModel->setRenderDetail(renderDetail);
+
     if(!useVTKRenderer)
     {
+        //Create the camera controller
         camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
         keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
         pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+        TextureManager::addTexture("textures/cube.jpg", "cubetex");
+        std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
     }
-    auto cubeModel = std::make_shared<MeshModel>();
-    TextureManager::addTexture("textures/cube.jpg", "cubetex");
-    cubeModel->load("models/cube.obj");
-    std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
 
-    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    cubeModel->setRenderDetail(renderDetail);
 
     cube = std::make_shared<StaticSceneObject>();
 

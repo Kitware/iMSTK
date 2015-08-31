@@ -32,7 +32,7 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/BaseMesh.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 #include "Rendering/GLUtils.h"
 #include "Core/Utils.h"
 #include "Core/Vector.h"

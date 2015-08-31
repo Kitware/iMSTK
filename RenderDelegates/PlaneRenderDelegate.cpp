@@ -41,9 +41,9 @@ void PlaneRenderDelegate::draw() const
 //         }
 //         glEnable(GL_LIGHTING);
 //
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Color::colorGray.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Color::colorWhite.toGLColor());
-//         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Color::colorGray.toGLColor());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Color::colorGray.toGLColor<GLfloat>());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Color::colorWhite.toGLColor<GLfloat>());
+//         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Color::colorGray.toGLColor<GLfloat>());
 //
 //         glEnable(GL_BLEND);
 //         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

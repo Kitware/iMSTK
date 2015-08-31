@@ -53,15 +53,15 @@ bool SurfaceTreeRenderDelegate::drawTree() const
     return false;
 
   core::Vec3d center;
-  glColor3fv(Color::colorGreen.toGLColor());
+  glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
 
   glEnable(GL_LIGHTING);
   glPushAttrib(GL_LIGHTING_BIT);
-  glColor3fv(Color::colorGreen.toGLColor());
-  glColor3fv(Color::colorBlue.toGLColor());
+  glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
+  glColor3fv(Color::colorBlue.toGLColor<GLfloat>());
 
   glPushMatrix();
-  glColor3fv(Color::colorPink.toGLColor());
+  glColor3fv(Color::colorPink.toGLColor<GLfloat>());
 
   geom->getRoot()->draw();
 

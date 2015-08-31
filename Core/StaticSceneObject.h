@@ -32,6 +32,8 @@
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
+class ErrorLog;
+
 namespace core {
     class Event;
 }

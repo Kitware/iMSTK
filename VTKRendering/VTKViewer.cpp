@@ -24,6 +24,7 @@
 #include "VTKRendering/VTKViewer.h"
 #include "VTKRendering/VTKRenderDelegate.h"
 #include "Core/MakeUnique.h"
+#include "Core/Factory.h"
 
 // VTK includes
 #include <vtkNew.h>

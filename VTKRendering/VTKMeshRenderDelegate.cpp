@@ -113,10 +113,11 @@ void MeshRenderDelegate::initDraw()
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
 
     vtkSmartPointer<vtkTexture> texture;
-    if(mesh->isMeshTextured())
+    auto renderDetail = mesh->getRenderDetail();
+    if(renderDetail && renderDetail->renderTexture())
     {
         vtkNew<vtkJPEGReader> jpegReader;
-        jpegReader->SetFileName(mesh->getTextureFileName(0).c_str());
+        jpegReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
 
         texture = vtkTexture::New();
         texture->SetInputConnection(jpegReader->GetOutputPort());
@@ -135,7 +136,7 @@ void MeshRenderDelegate::initDraw()
     }
 
     dataSet = unstructuredMesh.GetPointer();
-    if (mesh->getRenderDetail()->renderType & SIMMEDTK_RENDER_NORMALS)
+    if (renderDetail && renderDetail->renderNormals())
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
         geometry->SetInputData(unstructuredMesh.GetPointer());

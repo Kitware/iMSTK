@@ -68,9 +68,9 @@ void OpenGLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::sha
 
     if (renderType & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail->getColorDiffuse().toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getColorSpecular().toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getColorAmbient().toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,  renderDetail->getColorDiffuse().toGLColor<GLfloat>());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getColorSpecular().toGLColor<GLfloat>());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getColorAmbient().toGLColor<GLfloat>());
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->getShininess());
     }
 
@@ -139,7 +139,7 @@ void OpenGLRenderer::drawLineMesh(std::shared_ptr<LineMesh> p_lineMesh, std::sha
     if (renderType & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
-        glColor3fv(renderDetail->getHighLightColor().toGLColor());
+        glColor3fv(renderDetail->getHighLightColor().toGLColor<GLfloat>());
         glDrawArrays(GL_POINTS, 0, p_lineMesh->nbrVertices);
         glEnable(GL_LIGHTING);
     }
@@ -197,10 +197,10 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        const GLfloat * color = renderDetail->getColorDiffuse().toGLColor();
+        const GLfloat * color = renderDetail->getColorDiffuse().toGLColor<GLfloat>();
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getColorSpecular().toGLColor());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getColorAmbient().toGLColor());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getColorSpecular().toGLColor<GLfloat>());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getColorAmbient().toGLColor<GLfloat>());
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->getShininess());
     }
 
@@ -247,7 +247,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
         glDisable(GL_LIGHTING);
-        glColor3fv(renderDetail->getVertexColor().toGLColor());
+        glColor3fv(renderDetail->getVertexColor().toGLColor<GLfloat>());
         glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
 
         glEnable(GL_LIGHTING);
@@ -262,7 +262,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
         glPolygonOffset(1.0, 1.0);
         glDisable(GL_LIGHTING);
         glDisable(GL_TEXTURE_2D);
-        glColor4fv(renderDetail->getWireFrameColor().toGLColor());
+        glColor4fv(renderDetail->getWireFrameColor().toGLColor<GLfloat>());
 
         glDrawElements(GL_TRIANGLES, p_surfaceMesh->getTriangles().size() * 3, GL_UNSIGNED_INT, p_surfaceMesh->getTriangles().data()->data());
 
@@ -276,7 +276,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_HIGHLIGHTVERTICES)
     {
         glDisable(GL_LIGHTING);
-        glColor3fv(renderDetail->getHighLightColor().toGLColor());
+        glColor3fv(renderDetail->getHighLightColor().toGLColor<GLfloat>());
         glDrawArrays(GL_POINTS, 0, p_surfaceMesh->getNumberOfVertices());
         glEnable(GL_LIGHTING);
     }
@@ -370,7 +370,7 @@ void OpenGLRenderer::draw(const Eigen::AlignedBox3d &aabb, Color p_color)
     glDisable(GL_TEXTURE_2D);
 
     glLineWidth(1.0);
-    glColor3fv(p_color.toGLColor());
+    glColor3fv(p_color.toGLColor<GLfloat>());
     glBegin(GL_LINES);
 
     auto const &min = aabb.min();
@@ -478,17 +478,17 @@ void OpenGLRenderer::drawAxes(const float length)
 
     Eigen::Vector3f origin(0, 0, 0);
 
-    glColor3fv(Color::colorRed.toGLColor());
+    glColor3fv(Color::colorRed.toGLColor<GLfloat>());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(length, 0, 0), headWidth);
     glPopMatrix();
 
-    glColor3fv(Color::colorGreen.toGLColor());
+    glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(0, length, 0), headWidth);
     glPopMatrix();
 
-    glColor3fv(Color::colorBlue.toGLColor());
+    glColor3fv(Color::colorBlue.toGLColor<GLfloat>());
     glPushMatrix();
     drawArrow(origin, Eigen::Vector3f(0, 0, length), headWidth);
     glPopMatrix();
@@ -502,21 +502,21 @@ void OpenGLRenderer::drawAxes(const Matrix33f &rotMat, const core::Vec3f &pos, c
 
     GLfloat headWidth = length / 12;
 
-    glColor3fv(Color::colorRed.toGLColor());
+    glColor3fv(Color::colorRed.toGLColor<GLfloat>());
     glPushMatrix();
     Eigen::Vector3f xVec(length, 0, 0);
     xVec = rotMat*xVec + pos;
     drawArrow(pos, xVec, headWidth);
     glPopMatrix();
 
-    glColor3fv(Color::colorGreen.toGLColor());
+    glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
     glPushMatrix();
     Eigen::Vector3f yVec(0, length, 0);
     yVec = rotMat*yVec + pos;
     drawArrow(pos, yVec, headWidth);
     glPopMatrix();
 
-    glColor3fv(Color::colorBlue.toGLColor());
+    glColor3fv(Color::colorBlue.toGLColor<GLfloat>());
     glPushMatrix();
     Eigen::Vector3f zVec(0, 0, length);
     zVec = rotMat*zVec + pos;
@@ -549,7 +549,7 @@ void OpenGLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
 
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);
-    glColor3fv(p_color.toGLColor());
+    glColor3fv(p_color.toGLColor<GLfloat>());
     tmp = rot*planePoints[0] + point;
     glVertex3dv(tmp.data());
     tmp = rot*planePoints[1] + point;

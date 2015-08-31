@@ -26,8 +26,6 @@
 
 // SimMedTK includes
 #include "Core/BaseMesh.h"
-#include "Rendering/TextureManager.h"
-#include "Core/Factory.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
 class SurfaceMesh: public Core::BaseMesh
@@ -82,11 +80,6 @@ public:
     /// Texture handling
 
     struct TextureAttachment;
-    ///
-    /// \brief Returns the the name of ith texture.
-    ///
-    const std::string &getTextureFileName(const size_t i) const;
-
     ///
     /// \brief Returns the texture coordinates array.
     ///

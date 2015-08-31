@@ -33,7 +33,7 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Utils.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 #include "Rendering/GLUtils.h"
 #include "Rendering/Shader.h"
 #include "Rendering/VBO.h"

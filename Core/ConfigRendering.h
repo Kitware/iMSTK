@@ -24,17 +24,6 @@
 #ifndef SMCONFIGRENDERING_H
 #define SMCONFIGRENDERING_H
 
-#include <memory>
-#include <vector>
-
-// SimMedTK includes
-#include "Core/Config.h"
-#include "Core/Color.h"
-#include "Core/RenderDetail.h"
-
-
-class Shader;
-
 /// \brief this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects.
 ///the value is in bytes

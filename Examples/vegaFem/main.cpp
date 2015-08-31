@@ -99,7 +99,11 @@ int main()
     femObjRenderDetail->setVertexColor(maroon);
     femObjRenderDetail->setNormalLength(0.02);
 
-    femObject->getVolumetricMesh()->getRenderingMesh()->setRenderDetail(femObjRenderDetail);
+    auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
+    if(renderingMesh)
+    {
+        renderingMesh->setRenderDetail(femObjRenderDetail);
+    }
 
     sdk->addSceneActor(femObject, femSimulator);
 

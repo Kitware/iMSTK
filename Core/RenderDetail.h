@@ -19,6 +19,7 @@
 
 #include "Core/Config.h"
 #include "Core/Color.h"
+#include "Core/ConfigRendering.h"
 
 #include <memory>
 #include <vector>
@@ -155,6 +156,12 @@ public:
 
     void setWireframeColor(const Color wireColor);
 
+    void setTextureFilename(const std::string &filename);
+    const std::string &getTextureFilename() const;
+    bool renderTexture() const;
+
+    bool renderNormals() const;
+
 public:
     unsigned int renderType; // render type
     Color colorDiffuse; // diffuse color
@@ -172,6 +179,8 @@ public:
     float shininess; // specular shinness
     bool debugDraw; // debug draw enabled or not
     float normalLength; // length of rendered normals
+    std::string textureFilename; // file name for the texture attached
+
     std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<bool> shaderEnable; // enable/disable any attached shader
     std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
