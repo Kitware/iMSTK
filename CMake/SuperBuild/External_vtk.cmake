@@ -37,7 +37,7 @@ if(NOT DEFINED ${proj}_DIR)
     )
   endif()
 
-  message(STATUS "Adding project:${proj}")
+#   message(STATUS "Adding project:${proj}")
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}
     BINARY_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build
