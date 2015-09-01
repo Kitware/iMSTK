@@ -26,7 +26,6 @@
 #define MESHNODALCOORDINATES_H
 
 #include "vtkMappedDataArray.h"
-#include "vtkIOExodusModule.h" // For export macro
 
 #include "vtkTypeTemplate.h" // For templated vtkObject API
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro

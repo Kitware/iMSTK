@@ -169,14 +169,14 @@ endif(WIN32)
 #
 SET(proj SimMedTK-Configure)
 
-if (NOT SimMedTK_VTK_DIR)
-  find_package(VTK REQUIRED)
-  mark_as_advanced(SimMedTK_VTK_DIR)
-  set(SimMedTK_VTK_DIR ${VTK_DIR})
-endif()
-list(APPEND SimMedTK_SUPERBUILD_CMAKE_OPTIONS
-  "-DVTK_DIR:FILEPATH=${SimMedTK_VTK_DIR}"
-)
+# if (NOT SimMedTK_VTK_DIR)
+#   find_package(VTK REQUIRED)
+#   mark_as_advanced(SimMedTK_VTK_DIR)
+#   set(SimMedTK_VTK_DIR ${VTK_DIR})
+# endif()
+# list(APPEND SimMedTK_SUPERBUILD_CMAKE_OPTIONS
+#   "-DVTK_DIR:FILEPATH=${SimMedTK_VTK_DIR}"
+# )
 
 message("SimMedTK_BUILD_SHARED_LIBS=${SimMedTK_BUILD_SHARED_LIBS}")
 

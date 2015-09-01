@@ -56,10 +56,13 @@ if(NOT DEFINED ${proj}_DIR)
       -DVTK_Group_StandAlone:BOOL=OFF
       -DVTK_Group_Rendering:BOOL=OFF
       -DModule_vtkRenderingOpenGL2:BOOL=ON
+      -DModule_vtkIOXML:BOOL=ON
+      -DModule_vtkIOLegacy:BOOL=ON
+      -DModule_vtkIOPLY:BOOL=ON
+      -DModule_vtkInteractionStyle:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-      ${OUTPUT_DIRECTORIES}
     DEPENDS
       ${${proj}_DEPENDENCIES}
 #     LOG_DOWNLOAD 1            # Wrap download in script to log output
@@ -69,10 +72,11 @@ if(NOT DEFINED ${proj}_DIR)
 #     LOG_TEST 1                # Wrap test in script to log output
 #     LOG_INSTALL 1             # Wrap install in script to log output
     )
-  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SimMedTK-build/lib)
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
 set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS VTK_DIR:PATH=${${proj}_DIR})
