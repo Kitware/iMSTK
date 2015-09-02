@@ -24,37 +24,41 @@
 #ifndef SM_SMSURFACETREE_HPP
 #define SM_SMSURFACETREE_HPP
 
+// STD includes
+#include <numeric> // for iota
+
 // SimMedTK includes
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 #include "Collision/SurfaceTreeIterator.h"
 #include "Event/KeyboardEvent.h"
 #include "Core/Factory.h"
+#include "Collision/MeshCollisionModel.h"
 
 /// \brief initialize the surface tree structure
 template <typename CellType>
 void SurfaceTree<CellType>::initStructure()
 {
-    core::Vec3d center;
-    double edge;
-    std::vector<int> triangles;
-
-    for (int i = 0; i < mesh->nbrTriangles; ++i)
+    if(!this->model->getMesh() || this->model->getMesh()->getNumberOfVertices() == 0)
     {
-        triangles.push_back(i);
+        std::cerr << "Error: Empty or unvalid mesh." << std::endl;
+        return;
     }
+    core::Vec3d center;
+    std::vector<int> triangles(this->model->getMesh()->getTriangles().size());
+    std::iota(std::begin(triangles),std::end(triangles),0);
+
     root = std::make_shared<CellType>();
 
-    center = mesh->aabb.center();
-    edge = std::max(std::max(mesh->aabb.halfSizeX(), mesh->aabb.halfSizeY()),
-                        mesh->aabb.halfSizeZ());
+    auto &boundingBox = model->getBoundingBox();
+    center = boundingBox.center();
     root->setCenter(center);
-    root->setLength(2 * edge);
+    root->setLength(boundingBox.sizes().maxCoeff());
     root->setIsEmpty(false);
-    root->setAabb(mesh->aabb);
+    root->setAabb(model->getBoundingBox());
 
     treeAllLevels[0] = *root.get();
     this->createTree(root, triangles, 0);
-	initialTreeAllLevels = treeAllLevels;
+    initialTreeAllLevels = treeAllLevels;
 }
 
 /// \brief destructor
@@ -65,9 +69,9 @@ SurfaceTree<CellType>::~SurfaceTree()
 
 /// \brief
 template<typename CellType>
-SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<SurfaceMesh> surfaceMesh, int maxLevels)
+SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceModel, int maxLevels)
 {
-    mesh = surfaceMesh;
+    this->model = surfaceModel;
     totalCells = 0;
 
     //set the total levels
@@ -101,7 +105,7 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<SurfaceMesh> surfaceMesh, int
     enableTrianglePos = false;
     renderOnlySurface = false;
 
-    mesh->allocateAABBTris();
+    this->model->computeBoundingBoxes();
     this->setRenderDelegate(
       Factory<RenderDelegate>::createConcreteClass(
         "SurfaceTreeRenderDelegate"));
@@ -190,6 +194,8 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
     std::array<CellType, CellType::numberOfSubdivisions> subDividedNodes;
     std::array<std::vector<int>, CellType::numberOfSubdivisions> triangleMatrix;
 
+    auto const &vertices = this->model->getVertices();
+    auto const &meshTriangles = this->model->getTriangles();
     int level = Node->getLevel();
 
     if(level >= maxLevel)
@@ -202,18 +208,18 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         Node->setIsLeaf(true);
         double totalDistance = 0.0;
 
-        for(auto &triangle : triangles)
+        for(auto &t : triangles)
         {
-            Node->addTriangleData(mesh->triAABBs[triangle],triangle);
-            Node->addVertexIndex(mesh->triangles[triangle].vert[0]);
-            Node->addVertexIndex(mesh->triangles[triangle].vert[1]);
-            Node->addVertexIndex(mesh->triangles[triangle].vert[2]);
+            Node->addTriangleData(this->model->getAabb(t),t);
+            Node->addVertexIndex(meshTriangles[t][0]);
+            Node->addVertexIndex(meshTriangles[t][1]);
+            Node->addVertexIndex(meshTriangles[t][2]);
         }
         Node->update();
 
         for(const auto &i : Node->getVerticesIndices())
         {
-            totalDistance += (Node->getCenter() - mesh->vertices[i]).norm();
+            totalDistance += (Node->getCenter() - vertices[i]).norm();
         }
 
         float weightSum = 0;
@@ -223,7 +229,7 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         for(const auto &i : Node->getVerticesIndices())
         {
             // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
-            weight = 1-(Node->getCenter()-mesh->vertices[i]).squaredNorm() / totalDistance2;
+            weight = 1-(Node->getCenter()-vertices[i]).squaredNorm() / totalDistance2;
             weightSum += weight;
             Node->addWeight(weight);
         }
@@ -249,9 +255,9 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         for (int j = 0; j < CellType::numberOfSubdivisions; ++j)
         {
             if (subDividedNodes[j].isCollidedWithTri(
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[0]],
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[1]],
-                        mesh->vertices[mesh->triangles[triangles[i]].vert[2]]))
+                        vertices[meshTriangles[triangles[i]][0]],
+                        vertices[meshTriangles[triangles[i]][1]],
+                        vertices[meshTriangles[triangles[i]][2]]))
             {
                 triangleMatrix[j].push_back(triangles[i]);
             }
@@ -279,9 +285,9 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
             // Set triangle and aabb data for the child node
             if(childNode->getLevel() != maxLevel-1)
             {
-                for(auto &triangle : triangleMatrix[j])
+                for(auto &t : triangleMatrix[j])
                 {
-                    childNode->addTriangleData(this->mesh->triAABBs[triangle],triangle);
+                    childNode->addTriangleData(this->model->getAabb(t),t);
                 }
                 childNode->update();
             }
@@ -322,7 +328,8 @@ template <typename CellType>
 void SurfaceTree<CellType>::updateStructure()
 {
     CellType *current;
-
+    auto const &vertices = this->model->getVertices();
+    auto const &origVertices = this->model->getMesh()->getOrigVertices();
     for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
     {
         current = &treeAllLevels[i];
@@ -333,7 +340,7 @@ void SurfaceTree<CellType>::updateStructure()
         {
             for(auto &i : current->getVerticesIndices())
             {
-                tempCenter = tempCenter + (mesh->vertices[i]-mesh->origVerts[i]) * current->getWeight(counter);
+                tempCenter = tempCenter + (vertices[i]-origVertices[i]) * current->getWeight(counter);
                 counter++;
             }
 
@@ -363,7 +370,53 @@ void SurfaceTree<CellType>::translateRot()
     }
 }
 
+template <typename CellType>
+void SurfaceTree<CellType>::getIntersectingNodes(const std::shared_ptr<CellType> left,
+                                                          const std::shared_ptr<CellType> right,
+                                                          std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
+{
+    if(left->getAabb().intersection(right->getAabb()).isEmpty())
+    {
+        return;
+    }
+
+    if(left->getIsLeaf() && right->getIsLeaf())
+    {
+        result.emplace_back(left,right);
+    }
+    else if(left->getIsLeaf())
+    {
+        for(const auto &child : right->getChildNodes())
+        {
+            if(!child) continue;
+            this->getIntersectingNodes(left,child,result);
+        }
+    }
+    else if(right->getIsLeaf())
+    {
+        for(const auto &child : left->getChildNodes())
+        {
+            if(!child) continue;
+            this->getIntersectingNodes(child,right,result);
+        }
+    }
+    else
+    {
+        for(const auto &rightChild : right->getChildNodes())
+        {
+            if(!rightChild) continue;
+            for(const auto &leftChild : left->getChildNodes())
+            {
+                if(!leftChild) continue;
+                this->getIntersectingNodes(leftChild,rightChild,result);
+            }
+        }
+    }
+
+}
+
 
 
 #endif
+
 

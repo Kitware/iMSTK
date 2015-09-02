@@ -1,7 +1,7 @@
 #ifndef SMFACTORY_HPP
 #define SMFACTORY_HPP
 
-#include <stdlib.h> // for atexit()
+#include <cstdlib> // for std::atexit
 
 template<typename T>
 void Factory<T>::registerClassConfiguration(
@@ -17,7 +17,7 @@ void Factory<T>::registerClassConfiguration(
     {
     Factory::s_catalog =
       new std::map<std::string, typename Factory<T>::FactoryConfigurationOptions>;
-    atexit( []() { delete Factory::s_catalog; } );
+    std::atexit( []() { delete Factory::s_catalog; } );
     }
 
   FactoryEntry entry;
@@ -48,7 +48,7 @@ std::shared_ptr<T> Factory<T>::createDefault(
     Factory::optionsForClass(classname));
   if (opts.empty())
     return std::shared_ptr<T>();
-  //std::cout << "Creating default " << classname << ", " << opts.begin()->subclassname << "\n";
+  std::cout << "Creating default " << classname << ", " << opts.begin()->subclassname << "\n";
   return opts.begin()->constructor();
 }
 
@@ -64,7 +64,7 @@ std::shared_ptr<T> Factory<T>::createSubclass(
   for (it = opts.begin(); it != opts.end(); ++it)
     if (it->subclassname == subclassname)
       {
-      //std::cout << "Creating " << it->subclassname << " (" << classname << ")\n";
+      std::cout << "Creating " << it->subclassname << " (" << classname << ")\n";
       return it->constructor();
       }
 
@@ -90,7 +90,34 @@ std::shared_ptr<T> Factory<T>::createConcreteClass(
     for (cit = bit->second.begin(); cit != bit->second.end(); ++cit)
       if (cit->subclassname == classname)
         {
-        //std::cout << "Creating " << cit->subclassname << " (" << classname << " implied)\n";
+        std::cout << "Creating " << cit->subclassname << " (" << classname << " implied)\n";
+        return cit->constructor();
+        }
+
+  return std::shared_ptr<T>();
+}
+
+/**\brief Create an instance given the name of a concrete class in group.
+  *
+  * This method will be slow since the map of all abstract bases
+  * must be traversed to find the constructor for the concrete
+  * class.
+  */
+template<typename T>
+std::shared_ptr<T> Factory<T>::createConcreteClassForGroup(
+  const std::string& classname,
+  int group)
+{
+  if (classname.empty() || !Factory::s_catalog)
+    return std::shared_ptr<T>();
+
+  typename std::map<std::string, FactoryConfigurationOptions>::const_iterator bit;
+  typename FactoryConfigurationOptions::const_iterator cit;
+  for (bit = Factory::s_catalog->begin(); bit != Factory::s_catalog->end(); ++bit)
+    for (cit = bit->second.begin(); cit != bit->second.end(); ++cit)
+      if ((cit->subclassname == classname) && (cit->group == group))
+        {
+        std::cout << "Creating " << cit->subclassname << " (" << classname << ", " << cit->group << ")\n";
         return cit->constructor();
         }
 
@@ -109,7 +136,7 @@ std::shared_ptr<T> Factory<T>::createSubclassForGroup(
   for (it = opts.begin(); it != opts.end(); ++it)
     if (it->group == group)
       {
-      //std::cout << "Creating " << it->subclassname << " (" << classname << ", " << it->group << ")\n";
+      std::cout << "Creating " << it->subclassname << " (" << classname << ", " << it->group << ")\n";
       return it->constructor();
       }
 

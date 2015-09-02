@@ -36,9 +36,9 @@
 #include "Core/Simulator.h"
 #include "Core/StaticSceneObject.h"
 #include "Core/SceneObject.h"
-#include "Simulators/DummySimulator.h"
+#include "Simulators/DefaultSimulator.h"
 #include "Collision/SpatialHashCollision.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 
 class CollisionDetectionSpatialHashing: public SimulationMain
 {
@@ -56,8 +56,8 @@ public:
     std::shared_ptr<StaticSceneObject>    modelA;
     std::shared_ptr<StaticSceneObject>    modelB;
     std::shared_ptr<Scene>                scene;
-    std::shared_ptr<Viewer>               viewer;
-    std::shared_ptr<DummySimulator>       defaultSimulator;
+    std::shared_ptr<OpenGLViewer>               viewer;
+    std::shared_ptr<DefaultSimulator>       defaultSimulator;
     std::shared_ptr<Simulator>            simulator;
     std::shared_ptr<SpatialHashCollision> spatialHashing;
     int moveObj;

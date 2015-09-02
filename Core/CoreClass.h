@@ -34,13 +34,14 @@
 #include "Core/Config.h"
 #include "Core/UnifiedId.h"
 #include "Core/EventHandler.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
+#include "Core/RenderDetail.h"
 
 class SDK;
 class CoreClass;
 class RenderDelegate;
 class ObjectSimulator;
-class Viewer;
+class OpenGLViewer;
 
 /// \brief simulator calls object and sends this structure
 struct SimulationParam
@@ -87,6 +88,11 @@ public:
     /// \brief Default constructor
     ///
     CoreClass(const std::string &);
+
+    ///
+    /// \brief Default constructor
+    ///
+    virtual ~CoreClass() = default;
 
     ///
     /// \brief get type of the class
@@ -239,10 +245,10 @@ protected:
     core::EventType,
     core::EventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<RenderDelegate> renderDelegate; ///!< Class that can render this class
+    std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
 
 private:
     std::shared_ptr<UnifiedId> uniqueId; ///< unique Id
-    std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
     core::ClassDrawOrder drawOrder; ///< draw order of the object
 };
 

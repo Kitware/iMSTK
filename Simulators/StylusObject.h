@@ -32,7 +32,7 @@
 
 // SimMedTK includes
 #include "Core/Config.h"
-#include "Mesh/Mesh.h"
+#include "Mesh/SurfaceMesh.h"
 #include "Core/SceneObject.h"
 #include "External/tree.hh"
 
@@ -55,7 +55,7 @@ public:
     MeshContainer(std::string p_name = "");
 
     /// \brief constructor
-    MeshContainer(std::string p_name, Mesh *p_mesh, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ);
+    MeshContainer(std::string p_name, SurfaceMesh *p_mesh, core::Vec3d p_prePos, core::Vec3d p_posPos, float p_offsetRotX, float p_offsetRotY, float p_offsetRotZ);
 
     void computeCurrentMatrix();
 
@@ -74,7 +74,7 @@ public:
     Matrix44d currentDeviceMatrix; // !!
     Matrix44d tempCurrentMatrix; // !!
     Matrix44d tempCurrentDeviceMatrix; // !!
-    Mesh * mesh; // mesh
+    SurfaceMesh * mesh; // mesh
     std::shared_ptr<SurfaceTreeType> colModel; // octree of surface
 };
 

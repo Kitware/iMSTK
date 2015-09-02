@@ -2,6 +2,7 @@
 add_executable(vegaFemExample main.cpp)
 target_link_libraries(vegaFemExample
   Core
+  VTKRendering
   Rendering
   RenderDelegates
   Simulators
@@ -10,4 +11,5 @@ target_link_libraries(vegaFemExample
   ContactHandling
   Event
   ExamplesCommon
+  IO
   )

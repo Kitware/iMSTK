@@ -23,418 +23,292 @@
 
 #include "Mesh/SurfaceMesh.h"
 
-#include <assert.h>
+#include "Core/Factory.h"
+#include "Core/RenderDelegate.h"
 
-//assimp includes
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#ifdef _WIN32
-#define fileno _fileno
-#include "io.h"
-int Filelength(const char*, int id)
+///
+/// \brief Texture management structure
+///
+struct SurfaceMesh::TextureAttachment
 {
-    return filelength(id);
-}
+    TextureAttachment() :
+    textureId(-1),
+    textureName("")
+    {
+    }
 
-#else
+    // Texture id
+    int textureId;
 
-#include<sys/stat.h>
+    // Texture internal name
+    std::string textureName;
+};
 
-size_t Filelength(const char * filename, int)
+SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureCoordinates(false)
 {
-    struct stat st;
-    stat(filename, &st);
-    return st.st_size;
+    this->setRenderDelegate(
+      Factory<RenderDelegate>::createConcreteClassForGroup("MeshRenderDelegate",RenderDelegate::RendererType::VTK));
 }
-#endif
-
-/// \brief constructor
-SurfaceMesh::SurfaceMesh(const MeshType &p_meshtype, std::shared_ptr<ErrorLog> log)
-{
-
-    this->log_SF = log;
-    meshType = p_meshtype;
-    meshFileType = BaseMesh::MeshFileType::None;
-}
-
-/// \brief destructor
 SurfaceMesh::~SurfaceMesh()
 {
-
 }
-
-/// \brief loads the mesh based on the file type and initializes the normals
-bool SurfaceMesh::loadMesh(const std::string& fileName, const MeshFileType &fileType)
+core::Vec3d SurfaceMesh::computeTriangleNormal(int triangle)
 {
+    auto t = this->triangleArray[triangle];
 
-    bool ret = true;
+    const core::Vec3d &v0 = this->vertices[t[0]];
 
-    switch (fileType)
-    {
-    case BaseMesh::MeshFileType::ThreeDS:
-    case BaseMesh::MeshFileType::Obj:
-        meshFileType = fileType;
-        ret = LoadMeshAssimp(fileName);
-        break;
-
-    default:
-        if (log_SF != nullptr)
-        {
-            log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
-        }
-
-        ret = false;
-    }
-
-    assert(ret);
-
-    if (ret == false)
-    {
-        if (log_SF != nullptr)
-        {
-            log_SF->addError("Error: Mesh file NOT FOUND");
-        }
-    }
-
-    if (ret)
-    {
-        initVertexNeighbors();
-        this->updateTriangleNormals();
-        this->updateVertexNormals();
-
-        //edge information
-        this->calcNeighborsVertices();
-        this->calcEdges();
-        this->upadateAABB();
-    }
-
-    return ret;
+    return (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
 }
-
-/// \brief --Deprecated, use loadMesh() for new simulators--
-/// Loads the mesh based on the file type and initializes the normals
-bool SurfaceMesh::loadMeshLegacy(const std::string& fileName, const MeshFileType &fileType)
+void SurfaceMesh::computeTriangleNormals()
 {
+    this->triangleNormals.resize(this->triangleArray.size(),core::Vec3d::Zero());
 
-    bool ret = true;
-
-    switch (fileType)
+    for(size_t i = 0, end = this->triangleArray.size(); i < end; ++i)
     {
-    case BaseMesh::MeshFileType::ThreeDS:
-        Load3dsMesh(fileName);
-        break;
+        const auto &t = this->triangleArray[i];
+        const auto &v0 = this->vertices[t[0]];
 
-    case BaseMesh::MeshFileType::Obj:
-        ret = LoadMeshAssimp(fileName);
-        break;
-
-    default:
-        if (log_SF != nullptr)
-        {
-            log_SF->addError("Error: Mesh file TYPE UNIDENTIFIED");
-        }
-
-        ret = false;
+        this->triangleNormals[i] = (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
     }
-
-    meshFileType = fileType;
-    assert(ret);
-
-    if (ret == false)
-    {
-        if (log_SF != nullptr)
-        {
-            log_SF->addError("Error: Mesh file NOT FOUND");
-        }
-    }
-
-    if (ret)
-    {
-        initVertexNeighbors();
-        this->updateTriangleNormals();
-        this->updateVertexNormals();
-
-        //edge information
-        this->calcNeighborsVertices();
-        this->calcEdges();
-        this->upadateAABB();
-    }
-
-    return ret;
 }
-
-/// \brief
-bool SurfaceMesh::LoadMeshAssimp(const std::string& fileName)
+void SurfaceMesh::computeVertexNormals()
 {
+    this->vertexNormals.resize(this->vertices.size(),core::Vec3d::Zero());
 
-    //Tell Assimp to not import any of the following from the mesh it loads
-    Assimp::Importer importer;
-    importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS,
-                                aiComponent_CAMERAS | aiComponent_LIGHTS |
-                                aiComponent_MATERIALS | aiComponent_TEXTURES |
-                                aiComponent_BONEWEIGHTS | aiComponent_COLORS |
-                                aiComponent_TANGENTS_AND_BITANGENTS |
-                                aiComponent_NORMALS | aiComponent_ANIMATIONS);
-
-    //Import the file, and do some post-processing
-    const aiScene* scene = importer.ReadFile(fileName,
-                           aiProcess_Triangulate | //Triangulate any polygons that are not triangular
-                           aiProcess_JoinIdenticalVertices | //Ensures indexed vertices from faces
-                           aiProcess_RemoveComponent | //Removes the components in AI_CONFIG_PP_RVC_FLAGS
-                           aiProcess_ImproveCacheLocality); //Reorders triangles for better vertex cache locality
-
-    if (scene == nullptr)
+    if(this->vertexTriangleNeighbors.size() == 0)
     {
-        if (log_SF != nullptr)
+        this->computeVertexTriangleNeighbors();
+    }
+
+    for(size_t i = 0, end = this->vertices.size(); i < end; ++i)
+    {
+        for(auto const &j : this->vertexTriangleNeighbors[i])
         {
-            log_SF->addError("Error: Error loading mesh: " + std::string(fileName));
+            this->vertexNormals[i] += this->triangleNormals[j];
         }
 
+        this->vertexNormals[i].normalize();
+    }
+}
+void SurfaceMesh::computeVertexNeighbors()
+{
+    this->vertexNeighbors.resize(this->vertices.size());
+
+    if(vertexTriangleNeighbors.size() == 0)
+    {
+        this->computeVertexTriangleNeighbors();
+    }
+
+    for(size_t i = 0, end = this->vertices.size(); i < end; ++i)
+    {
+        for(auto const &j : this->vertexTriangleNeighbors[i])
+        {
+            for(auto const &vertex : this->triangleArray[j])
+            {
+                if(vertex != i)
+                {
+                    this->vertexNeighbors[i].push_back(vertex);
+                }
+            }
+        }
+    }
+}
+void SurfaceMesh::computeVertexTriangleNeighbors()
+{
+    this->vertexTriangleNeighbors.resize(this->vertices.size());
+
+    int triangle = 0;
+
+    for(auto const &t : this->triangleArray)
+    {
+        this->vertexTriangleNeighbors[t[0]].push_back(triangle);
+        this->vertexTriangleNeighbors[t[1]].push_back(triangle);
+        this->vertexTriangleNeighbors[t[2]].push_back(triangle);
+        triangle++;
+    }
+}
+void SurfaceMesh::computeTriangleTangents()
+{
+    // Check if there are texture coordinates
+    if(!this->hasTextureCoordinates())
+    {
+        std::cerr << "Can't compute tangents without texture coordinates." << std::endl;
+        return;
+    }
+
+    this->triangleTangents.resize(this->triangleArray.size());
+
+    // First, calculate the triangle tangents
+    for(size_t t = 0, end = this->triangleArray.size(); t < end; ++t)
+    {
+        const auto &triangle = this->triangleArray[t];
+
+        // Get triangle vertices
+        const auto &v0 = this->vertices[triangle[0]];
+        const auto &v1 = this->vertices[triangle[1]];
+        const auto &v2 = this->vertices[triangle[2]];
+
+        // Get texture coordinates for triangle
+        const auto &t0 = this->textureCoord[triangle[0]];
+        const auto &t1 = this->textureCoord[triangle[1]];
+        const auto &t2 = this->textureCoord[triangle[2]];
+
+        // COMMENT: I am not sure why two different types of tangent calculations are used here.
+        this->triangleTangents[t] = ((t1[1] - t0[1])*(v1 - v0) - (t2[1] - t0[1])*(v2 - v0));
+
+        if(this->useThreeDSTexureCoordinates)
+        {
+            float r = 1.0/((t1[0]-t0[0])*(t2[1]-t0[1]) - (t1[1]-t0[1])*(t2[0]-t0[0]));
+            this->triangleTangents[t] *= r;
+        }
+
+        this->triangleTangents[t].normalize();
+    }
+
+    // Calculate the vertex tangents
+    if(this->useThreeDSTexureCoordinates || this->useOBJDSTexureCoordinates)
+    {
+        for(size_t v = 0, end = this->vertices.size(); v < end; ++v)
+        {
+            this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
+
+            for(size_t i = 0; i < this->vertexTriangleNeighbors[v].size(); i++)
+            {
+                this->vertexTangents[v] += this->triangleTangents[this->vertexTriangleNeighbors[v][i]];
+            }
+
+            this->vertexTangents[v].normalize();
+            this->vertexTangents[v] -= this->vertexNormals[v]*this->vertexNormals[v].dot(this->vertexTangents[v]);
+            this->vertexTangents[v].normalize();
+        }
+    }
+}
+void SurfaceMesh::checkTriangleOrientation()
+{
+    for(int i = 0, end_i = this->triangleArray.size(); i < end_i; ++i)
+    {
+        auto const &x = this->triangleArray[i];
+
+        for(int j = 0, end_j = this->triangleArray.size(); j < end_j && j != i; ++j)
+        {
+            auto const &y = this->triangleArray[j];
+
+            if((x[0] == y[0] && x[1] == y[1]) ||
+                    (x[0] == y[1] && x[1] == y[2]) ||
+                    (x[0] == y[1] && x[1] == y[2]) ||
+                    (x[0] == y[2] && x[1] == y[0]) ||
+                    (x[1] == y[0] && x[2] == y[1]) ||
+                    (x[1] == y[1] && x[2] == y[2]) ||
+                    (x[1] == y[2] && x[2] == y[0]) ||
+                    (x[2] == y[0] && x[0] == y[1]) ||
+                    (x[2] == y[1] && x[0] == y[2]) ||
+                    (x[2] == y[2] && x[0] == y[0])
+              )
+            {
+                std::cout << "Wrong Winding Triangles:" << i << "," << j << "\n";
+            }
+        }
+    }
+}
+const std::vector< Eigen::Matrix< float, int(2), int(1) >, Eigen::aligned_allocator< Eigen::Matrix< float, int(2), int(1) > > >& SurfaceMesh::getTextureCoordinates() const
+{
+    return this->textureCoord;
+}
+std::vector< Eigen::Matrix< float, int(2), int(1) >, Eigen::aligned_allocator< Eigen::Matrix< float, int(2), int(1) > > >& SurfaceMesh::getTextureCoordinates()
+{
+    return this->textureCoord;
+}
+const std::vector< std::shared_ptr< SurfaceMesh::TextureAttachment > >& SurfaceMesh::getTextures() const
+{
+    return this->textures;
+}
+const int& SurfaceMesh::getTextureId(size_t i) const
+{
+    return this->textures[i]->textureId;
+}
+void SurfaceMesh::addTextureCoordinate(const core::Vec2f& coord)
+{
+    this->textureCoord.push_back(coord);
+}
+bool SurfaceMesh::hasTextureCoordinates() const
+{
+    return !this->textureCoord.empty();
+}
+void SurfaceMesh::addTextureCoordinate(const float& x, const float& y)
+{
+    this->textureCoord.emplace_back(x,y);
+}
+void SurfaceMesh::assignTexture(const std::string& referenceName)
+{
+    // TODO: This test has to be done at the rendrer level!
+//     int id;
+//     TextureManager::findTextureId(referenceName,id);
+//
+//     if(id < 0)
+//     {
+//         std::cerr << "The texture " << referenceName
+//             << " cant be attached because it has not been processed by the manager." << std::endl;
+//         return;
+//     }
+//
+    auto attachment = std::make_shared<TextureAttachment>();
+    attachment->textureId = -1;
+    attachment->textureName = referenceName;
+    this->textures.push_back(attachment);
+}
+bool SurfaceMesh::isMeshTextured() const
+{
+    if(!this->renderDetail)
+    {
         return false;
     }
 
-    //extract the information from the aiScene's mesh objects
-    aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
-
-    if (mesh->HasTextureCoords(0))
-    {
-        this->isTextureCoordAvailable = 1;
-    }
-    else
-    {
-        this->isTextureCoordAvailable = 0;
-    }
-
-    initVertexArrays(mesh->mNumVertices);
-    initTriangleArrays(mesh->mNumFaces);
-
-    //Get indexed vertex data
-    for (size_t i = 0; i < mesh->mNumVertices; i++)
-    {
-        this->vertices[i] = core::Vec3d(mesh->mVertices[i][0],
-                                    mesh->mVertices[i][1],
-                                    mesh->mVertices[i][2]);
-    }
-    this->origVerts = this->vertices;
-
-    //Get indexed texture coordinate data
-    if (isTextureCoordAvailable)
-    {
-        //Assimp supports 3D texture coords, but we only support 2D
-        if (mesh->mNumUVComponents[0] != 2)
-        {
-            if (log_SF != nullptr)
-            {
-                log_SF->addError("Error: Error loading mesh, non-two dimensional texture coordinate found.");
-            }
-
-            this->isTextureCoordAvailable = 0;
-            return false;
-        }
-
-        //Extract the texture data
-        for (unsigned int i = 0; i < mesh->mNumVertices; i++)
-        {
-            this->texCoord[i].u = mesh->mTextureCoords[0][i][0];
-            this->texCoord[i].v = mesh->mTextureCoords[0][i][1];
-        }
-    }
-
-    //Setup triangle/face data
-    for (size_t i = 0; i < mesh->mNumFaces; i++)
-    {
-        if (mesh->mFaces[i].mNumIndices != 3) //Make sure that the face is triangular
-        {
-            if (log_SF != nullptr)
-            {
-                log_SF->addError("Error: Error loading mesh, non-triangular face found.");
-            }
-
-            //might want to consider an assert here also
-            return false;
-        }
-
-        this->triangles[i].vert[0] = mesh->mFaces[i].mIndices[0];
-        this->triangles[i].vert[1] = mesh->mFaces[i].mIndices[1];
-        this->triangles[i].vert[2] = mesh->mFaces[i].mIndices[2];
-    }
-
-    return true;
+    return !this->renderDetail->getTextureFilename().empty();
 }
-
-/// \brief reads the mesh file in .3ds format
-bool SurfaceMesh::Load3dsMesh(const std::string& fileName)
+void SurfaceMesh::setUseOBJTexture(bool use)
 {
-
-    int i; //Index variable
-    FILE *l_file; //File pointer
-    unsigned short l_chunk_id; //Chunk identifier
-    unsigned int l_chunk_lenght; //Chunk lenght
-    unsigned short l_qty; //Number of elements in each chunk
-    unsigned short temp;
-    char l_char;
-
-    if ((l_file = fopen(fileName.c_str(), "rb")) == nullptr) //Open the file
-    {
-        return 0;
-    }
-
-    while (size_t(ftell(l_file)) < Filelength(fileName.c_str(), fileno(l_file)))    //Loop to scan the whole file
-    {
-
-        fread(&l_chunk_id, 2, 1, l_file);  //Read the chunk header
-        fread(&l_chunk_lenght, 4, 1, l_file);  //Read the lenght of the chunk
-
-        switch (l_chunk_id)
-        {
-        //----------------- MAIN3DS -----------------
-        // Description: Main chunk, contains all the other chunks
-        // Chunk ID: 4d4d
-        // Chunk Lenght: 0 + sub chunks
-        //-------------------------------------------
-        case 0x4d4d:
-            break;
-
-        //----------------- EDIT3DS -----------------
-        // Description: 3D Editor chunk, objects layout info
-        // Chunk ID: 3d3d (hex)
-        // Chunk Lenght: 0 + sub chunks
-        //-------------------------------------------
-        case 0x3d3d:
-            break;
-
-        //--------------- EDIT_OBJECT ---------------
-        // Description: Object block, info for each object
-        // Chunk ID: 4000 (hex)
-        // Chunk Lenght: len(object name) + sub chunks
-        //-------------------------------------------
-        case 0x4000:
-            i = 0;
-
-            do
-            {
-                fread(&l_char, 1, 1, l_file);
-                i++;
-            }
-            while (l_char != '\0' && i < 20);
-
-            break;
-
-        //--------------- OBJ_TRIMESH ---------------
-        // Description: Triangular mesh, contains chunks for 3d mesh info
-        // Chunk ID: 4100 (hex)
-        // Chunk Lenght: 0 + sub chunks
-        //-------------------------------------------
-        case 0x4100:
-            break;
-
-        //--------------- TRI_VERTEXL ---------------
-        // Description: Vertices list
-        // Chunk ID: 4110 (hex)
-        // Chunk Lenght: 1 x unsigned short (number of vertices)
-        //             + 3 x float (vertex coordinates) x (number of vertices)
-        //             + sub chunks
-        // Convert float to current real for precision
-        //-------------------------------------------
-        case 0x4110:
-            fread(&l_qty, sizeof(unsigned short), 1, l_file);
-            this->nbrVertices = l_qty;
-            this->vertices.reserve(l_qty);
-            this->origVerts.reserve(l_qty);
-            this->vertNormals = new core::Vec3d[l_qty];
-            this->vertTangents = new core::Vec3d[l_qty];
-            this->texCoord = new TexCoord[l_qty];
-
-            for (int fpt = 0; fpt < this->nbrVertices; fpt++)
-            {
-                float fTemp[3];
-                fread(fTemp, sizeof(float), 3, l_file);
-                this->vertices.emplace_back(fTemp[0], fTemp[1], fTemp[2]);
-            }
-
-            break;
-
-        //--------------- TRI_FACEL1 ----------------
-        // Description: Polygons (faces) list
-        // Chunk ID: 4120 (hex)
-        // Chunk Lenght: 1 x unsigned short (number of polygons)
-        //             + 3 x unsigned short (polygon points) x (number of polygons)
-        //             + sub chunks
-        //-------------------------------------------
-        case 0x4120:
-            fread(&l_qty, sizeof(unsigned short), 1, l_file);
-            this->nbrTriangles = l_qty;
-            this->triangles = new Triangle[l_qty];
-            this->triNormals = new core::Vec3d[l_qty];
-            this->triTangents = new core::Vec3d[l_qty];
-
-            for (i = 0; i < l_qty; i++)
-            {
-                fread(&temp, sizeof(unsigned short), 1, l_file);
-                this->triangles[i].vert[0] = temp;
-
-                fread(&temp, sizeof(unsigned short), 1, l_file);
-                this->triangles[i].vert[1] = temp;
-
-                fread(&temp, sizeof(unsigned short), 1, l_file);
-                this->triangles[i].vert[2] = temp;
-                fread(&temp, sizeof(unsigned short), 1, l_file);
-            }
-
-            break;
-
-        //------------- TRI_MAPPINGCOORS ------------
-        // Description: Vertices list
-        // Chunk ID: 4140 (hex)
-        // Chunk Lenght: 1 x unsigned short (number of mapping points)
-        //             + 2 x float (mapping coordinates) x (number of mapping points)
-        //             + sub chunks
-        //-------------------------------------------
-        case 0x4140:
-            fread(&l_qty, sizeof(unsigned short), 1, l_file);
-
-            for (int tpt = 0; tpt < l_qty; tpt++)
-            {
-                float fTemp[2];
-                fread(fTemp, sizeof(float), 2, l_file);
-                this->texCoord[tpt].u = fTemp[0];
-                this->texCoord[tpt].v = fTemp[1];
-            }
-
-            isTextureCoordAvailable = true;
-
-            break;
-
-        //----------- Skip unknow chunks ------------
-        //We need to skip all the chunks that currently we don't use
-        //We use the chunk lenght information to set the file pointer
-        //to the same level next chunk
-        //-------------------------------------------
-        default:
-            fseek(l_file, l_chunk_lenght - 6, SEEK_CUR);
-        }
-    }
-    this->origVerts = this->vertices;
-    fclose(l_file);  // Closes the file stream
-
-    return 1; // Returns ok
+    this->useOBJDSTexureCoordinates = use;
 }
-SurfaceMesh::SurfaceMesh()
+void SurfaceMesh::setUseThreDSTexture(bool use)
 {
-    this->log_SF = std::shared_ptr<ErrorLog>();
-    meshType = MeshType::Deformable;
-    meshFileType = BaseMesh::MeshFileType::None;
+    this->useThreeDSTexureCoordinates = use;
 }
-
-void SurfaceMesh::printPrimitiveDetails()
+void SurfaceMesh::print() const
 {
     std::cout << "----------------------------\n";
     std::cout << "Mesh Info for   : " << this->getName() <<"\n\t";
-    std::cout << "Num. vertices   : " << this->getNumVertices() <<"\n\t";
-    std::cout << "Num. triangles  : " << this->getNumTriangles() << "\n\t";
-    std::cout << "Num. edges      : " << this->getNumEdges() << "\n\t";
+    std::cout << "Num. vertices   : " << this->getNumberOfVertices() <<"\n\t";
+    std::cout << "Num. triangles  : " << this->getTriangles().size() << "\n\t";
     std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
     std::cout << "----------------------------\n";
 }
+const core::Vec3d& SurfaceMesh::getTriangleNormal(size_t i) const
+{
+    return this->triangleNormals[i];
+}
+const core::Vec3d& SurfaceMesh::getTriangleTangent(size_t i) const
+{
+    return this->triangleTangents[i];
+}
+const core::Vec3d& SurfaceMesh::getVertexNormal(size_t i) const
+{
+    return this->vertexNormals[i];
+}
+const core::Vec3d& SurfaceMesh::getVertexTangent(size_t i) const
+{
+    return this->vertexTangents[i];
+}
+const std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents() const
+{
+    return this->vertexTangents;
+}
+std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents()
+{
+    return this->vertexTangents;
+}
+size_t SurfaceMesh::getNumberOfTriangles() const
+{
+    return this->triangleArray.size();
+}
+

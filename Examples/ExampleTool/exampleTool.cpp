@@ -27,7 +27,7 @@
 #include "Core/SceneObject.h"
 #include "Core/SDK.h"
 #include "Core/StaticSceneObject.h"
-#include "Simulators/DummySimulator.h"
+#include "Simulators/DefaultSimulator.h"
 #include "Core/EventData.h"
 #include <GL/glew.h>
 #include "Rendering/TextureManager.h"

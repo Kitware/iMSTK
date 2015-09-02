@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Model.h"
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
@@ -30,11 +31,11 @@
 class StylusRenderDelegate : public RenderDelegate
 {
 public:
-  virtual void initDraw() const override;
+  virtual void initDraw() override;
   virtual void draw() const override;
 };
 
-void StylusRenderDelegate::initDraw() const
+void StylusRenderDelegate::initDraw()
 {
   StylusRigidSceneObject* geom = this->getSourceGeometryAs<StylusRigidSceneObject>();
   std::string errorText;
@@ -49,7 +50,7 @@ void StylusRenderDelegate::initDraw() const
     glNewList(newList + listCounter, GL_COMPILE);
     iter.node->data->mesh->draw();
     glEndList();
-    iter.node->data->mesh->renderingID = (newList + listCounter);
+    iter.node->data->mesh->setRenderingId(newList + listCounter);
     listCounter++;
     iter++;
     }
@@ -77,7 +78,7 @@ void StylusRenderDelegate::draw() const
       }
 
     glMultMatrixd(viewMatrix.data());
-    glCallList(iter.node->data->mesh->renderingID);
+    glCallList(iter.node->data->mesh->getRenderingId());
     glPopMatrix();
     iter++;
 
@@ -95,7 +96,7 @@ void StylusRenderDelegate::draw() const
         }
 
       glMultMatrixd(viewMatrix.data());
-      glCallList(iter.node->data->mesh->renderingID);
+      glCallList(iter.node->data->mesh->getRenderingId());
       glPopMatrix();
       iter++;
       }
@@ -104,8 +105,6 @@ void StylusRenderDelegate::draw() const
     }
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_stylus_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,StylusRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     StylusRenderDelegate,
+                     RenderDelegate::RendererType::Other)

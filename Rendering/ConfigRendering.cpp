@@ -21,5 +21,5 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 

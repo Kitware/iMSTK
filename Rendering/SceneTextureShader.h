@@ -46,7 +46,7 @@ public:
     void draw() const override;
 
     /// \brief pre drawing of the shader. used for binding the uniforms if there are.
-    virtual void predraw(std::shared_ptr<Mesh> p_mesh) override;
+    virtual void predraw(std::shared_ptr<Core::BaseMesh> p_mesh) override;
 
     virtual void predraw(std::shared_ptr<SurfaceMesh>) override{};
 

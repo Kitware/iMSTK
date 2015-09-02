@@ -25,12 +25,10 @@
 #define SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 
 // SimMedTK includes
-#include "Mesh/VolumeMesh.h"
 #include "Mesh/SurfaceMesh.h"
 #include "Core/SceneObject.h"
 #include "Core/ErrorLog.h"
 #include "VegaObjectConfig.h"
-#include "Mesh/VegaSceneObjectDeformable.h"
 
 /// \brief Base class for any scene object that is defmormable
 class SceneObjectDeformable : public SceneObject
@@ -186,7 +184,6 @@ protected:
 
     std::vector<int> fixedVertices; ///< fixed vertcies
 
-    std::shared_ptr<VolumeMesh> volumeMesh;
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
 };

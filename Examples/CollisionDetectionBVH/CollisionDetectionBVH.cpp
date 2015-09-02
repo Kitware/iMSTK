@@ -43,7 +43,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     scene = sdk->createScene();
 
     // Create viewer
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
 
     // Add our viewer to the SDK
     sdk->addViewer(viewer);
@@ -53,7 +53,7 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
     // Create dummy simulator
-    defaultSimulator = std::make_shared<DummySimulator>(sdk->getErrorLog());
+    defaultSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
     sdk->registerObjectSimulator(defaultSimulator);
 
     // Init texture manager and specify the textures needed for the current application
@@ -67,21 +67,24 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     TextureManager::loadTexture("textures/brick-normal.jpg", "wallBumpImage");
 
     // Create collision models
+    Eigen::Translation3d t(core::Vec3d(7, 3, 0));
     std::shared_ptr<MeshCollisionModel> collisionModelA = std::make_shared<MeshCollisionModel>();
-    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
-    collisionModelA->getMesh()->assignTexture("livertexture1");
-    collisionModelA->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
-    collisionModelA->getMesh()->translate(7, 3, 0);
-    collisionModelA->getMesh()->getRenderDetail()->lineSize = 2;
-    collisionModelA->getMesh()->getRenderDetail()->pointSize = 5;
+    collisionModelA->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    auto mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelA->getMesh());
+    mesh->assignTexture("livertexture1");
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->getRenderDetail()->lineSize = 2;
+    mesh->getRenderDetail()->pointSize = 5;
 
     std::shared_ptr<MeshCollisionModel> collisionModelB = std::make_shared<MeshCollisionModel>();
-    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS", BaseMesh::MeshFileType::ThreeDS);
-    collisionModelB->getMesh()->assignTexture("livertexture2");
-    collisionModelB->getMesh()->translate(core::Vec3d(2, 0, 0));
-    collisionModelB->getMesh()->assignTexture("livertexture2");
-    collisionModelB->getMesh()->getRenderDetail()->shadowColor.rgba[0] = 1.0;
-    collisionModelB->getMesh()->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
+    collisionModelB->loadTriangleMesh("models/liverNormalized_SB2.3DS");
+    mesh = std::static_pointer_cast<SurfaceMesh>(collisionModelB->getMesh());
+    mesh->assignTexture("livertexture2");
+    mesh->translate(Eigen::Translation3d(core::Vec3d(7, 3, 0)));
+    mesh->assignTexture("livertexture2");
+    mesh->getRenderDetail()->shadowColor.rgba[0] = 1.0;
+    mesh->getRenderDetail()->renderType = (SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_WIREFRAME);
 
     // Add models to a collision pair so they can be queried for collision
     std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
@@ -111,12 +114,10 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
     // Setup Scene lighting
     auto light = Light::getDefaultLighting();
-    assert(light);
     scene->addLight(light);
 
     // Camera setup
     std::shared_ptr<Camera> sceneCamera = Camera::getDefaultCamera();
-    assert(sceneCamera);
     scene->addCamera(sceneCamera);
     camCtl->setCamera(sceneCamera);
 
@@ -130,8 +131,6 @@ CollisionDetectionBVH::CollisionDetectionBVH()
     viewer->setWindowTitle("SimMedTK Collision BVH Example");
     viewer->setScreenResolution(800, 640);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
-    viewer->addObject(collisionModelA->getAABBTree());
-    viewer->addObject(collisionModelB->getAABBTree());
 
     //Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(core::EventType::Keyboard, camCtl);
@@ -140,15 +139,17 @@ CollisionDetectionBVH::CollisionDetectionBVH()
 
 void CollisionDetectionBVH::simulateMain(const SimulationMainParam &/*p_param*/)
 {
+    Eigen::Translation3d t(core::Vec3d(1, 0, 0));
     if ((10 > moveObj) && (moveObj > 0))
     {
-        modelB->getModel()->getMesh()->translate(1, 0, 0);
+        modelB->getModel()->getMesh()->translate(t);
         moveObj--;
     }
     else
     {
+        t.vector() = core::Vec3d(-moveObj, 0, 0);
         moveObj = 9; // reset
-        modelB->getModel()->getMesh()->translate(-moveObj, 0, 0);
+        modelB->getModel()->getMesh()->translate(t);
     }
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));

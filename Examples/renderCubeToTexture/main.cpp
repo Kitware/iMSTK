@@ -33,7 +33,7 @@
 int main()
 {
     std::shared_ptr<SDK> sdk;
-    std::shared_ptr<Viewer> viewer;
+    std::shared_ptr<OpenGLViewer> viewer;
     std::shared_ptr<Scene> scene1, scene2;
     std::shared_ptr<Light> light1, light2;
     std::shared_ptr<Camera> sceneCamera1, sceneCamera2;
@@ -49,7 +49,7 @@ int main()
     scene2 = sdk->createScene(); //external scene containing square with scene1 mapped to it
 
     //Create a viewer to see the scene through
-    viewer = std::make_shared<Viewer>();
+    viewer = std::make_shared<OpenGLViewer>();
     sdk->addViewer(viewer);
 
     //Create the camera controller
@@ -57,7 +57,9 @@ int main()
     keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
 
     auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
+    TextureManager::addTexture("textures/cube.png", "cubetex");
+    cubeModel->load("models/cube.obj");
+    std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
 
     auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     cubeModel->setRenderDetail(renderDetail);
@@ -74,8 +76,8 @@ int main()
     TextureManager::createDepthTexture("depthTex1", 64, 64);
 
     std::shared_ptr<MeshModel> squareModel = std::make_shared<MeshModel>();
-    squareModel->load("models/square.obj", BaseMesh::MeshFileType::Obj);
-    squareModel->getMesh()->assignTexture("colorTex1");
+    squareModel->load("models/square.obj");
+    std::static_pointer_cast<SurfaceMesh>(squareModel->getMesh())->assignTexture("colorTex1");
     renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
     squareModel->setRenderDetail(renderDetail);
 
@@ -85,8 +87,8 @@ int main()
     //Setup an FBO for rendering in the viewer.
     //Add the FBO and textures to the viewer
     viewer->addFBO("fbo1",
-                  TextureManager::getTexture("colorTex1"),
-                  TextureManager::getTexture("depthTex1"),
+                  TextureManager::getTexture("colorTex1").get(),
+                  TextureManager::getTexture("depthTex1").get(),
                   64, 64);
 
     //Add the square to the scene

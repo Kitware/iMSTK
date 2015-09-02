@@ -23,9 +23,8 @@
 
 #include "Rendering/VBO.h"
 
-VBO::VBO( ErrorLog *p_log )
+VBO::VBO()
 {
-    this->log = p_log;
     renderingError = false;
 }
 
@@ -54,7 +53,7 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
         GL_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + dataOffsetMap[p_objectId];
     if (objectBufferPtr == nullptr)
     {
-        log->addError("VBO could not map the buffer");
+        std::cerr << "VBO could not map the buffer" << std::endl;
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
@@ -96,7 +95,7 @@ VBOResult VBO::updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_o
         GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + indexOffsetMap[p_objectId];
     if (objectBufferPtr == nullptr)
     {
-        log->addError("VBO could not map the buffer");
+        std::cerr << "VBO could not map the buffer" << std::endl;
         renderingError = true;
         return SIMMEDTK_VBO_BUFFERPOINTERERROR;
     }
@@ -197,7 +196,7 @@ VBOResult VBO::initTriangleIndices(const Vector<size_t> &p_indices, size_t p_obj
 
     indexOffset = indexOffsetMap[p_objectId];
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
-    glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indexOffset, sizeof(Triangle)*p_indices.size(), p_indices.data());
+    glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, indexOffset, sizeof(std::array<size_t,3>)*p_indices.size(), p_indices.data());
 
     // Unmap the buffer
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
@@ -223,7 +222,7 @@ void VBO::init( VBOType p_vboType )
         glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
     }
 
-    SM_CHECKERROR(log, error)
+//     SM_CHECKERROR(log, error)
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
 
     if (p_vboType == SIMMEDTK_VBO_STATIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
@@ -235,7 +234,7 @@ void VBO::init( VBOType p_vboType )
         glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
     }
 
-    SM_CHECKERROR(log, error);
+//     SM_CHECKERROR(log, error);
     vboType = p_vboType;
     sizeOfDataBuffer = SIMMEDTK_VBOBUFFER_DATASIZE;
     sizeOfIndexBuffer = SIMMEDTK_VBOBUFFER_INDEXSIZE;
@@ -247,7 +246,7 @@ void VBO::init( VBOType p_vboType )
 
 VBOResult VBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_nbrTriangles, const size_t p_objectId )
 {
-    if ( sizeof( core::Vec3d )*p_nbrVertices + sizeof( core::Vec3d )*p_nbrVertices + sizeof( TexCoord )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
+    if ( sizeof( core::Vec3d )*p_nbrVertices + sizeof( core::Vec3d )*p_nbrVertices + sizeof( std::array<float,2> )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
     {
         return SIMMEDTK_VBO_NODATAMEMORY;
     }
@@ -262,7 +261,7 @@ VBOResult VBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_n
     numberofVertices[p_objectId] = p_nbrVertices;
     numberofTriangles[p_objectId] = p_nbrTriangles;
     ///add the vertices and normals and the texture coordinates
-    currentDataOffset += sizeof( core::Vec3d ) * p_nbrVertices + sizeof( core::Vec3d ) * p_nbrVertices + sizeof( TexCoord ) * p_nbrVertices;
-    currentIndexOffset += p_nbrTriangles * sizeof( Triangle );
+    currentDataOffset += sizeof( core::Vec3d ) * p_nbrVertices + sizeof( core::Vec3d ) * p_nbrVertices + sizeof( std::array<float,2> ) * p_nbrVertices;
+    currentIndexOffset += p_nbrTriangles * sizeof( std::array<size_t,3> );
     return SIMMEDTK_VBO_OK;
 }

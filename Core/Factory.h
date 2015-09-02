@@ -53,6 +53,13 @@
          []() { return std::shared_ptr<BASECLASS>(new SUBCLASS); }, \
          GROUP);
 
+#define RegisterFactoryClass(BASECLASS,SUBCLASS,GROUP) \
+    SIMMEDTK_BEGIN_DYNAMIC_LOADER() \
+        SIMMEDTK_BEGIN_ONLOAD(register_##SUBCLASS) \
+        SIMMEDTK_REGISTER_CLASS(BASECLASS, BASECLASS, SUBCLASS, GROUP) \
+        SIMMEDTK_FINISH_ONLOAD() \
+    SIMMEDTK_FINISH_DYNAMIC_LOADER()
+
 /**\brief A factory provides a way to discover and construct subclasses of abstract classes.
   *
   * Concrete subclasses of abstract bases should call
@@ -125,6 +132,9 @@ public:
 
   static std::shared_ptr<T> createConcreteClass(
     const std::string& targetClassname);
+
+  static std::shared_ptr<T> createConcreteClassForGroup(
+    const std::string& targetClassname, int group);
 
   template<typename U>
   static std::shared_ptr<U> createDefaultAs(const std::string& targetClassname)

@@ -30,7 +30,7 @@
 #include "Core/Matrix.h"
 
 #include "Core/Factory.h"
-#include "Rendering/GLRenderer.h"
+#include "Rendering/OpenGLRenderer.h"
 #include "RenderDelegate.h"
 
 //forward declaration
@@ -51,6 +51,11 @@ public:
       this->renderDelegate->draw();
     }
 
+    /// \brief Get render delegate
+    std::shared_ptr<RenderDelegate> getRenderDelegate() const
+    {
+        return this->renderDelegate;
+    }
   RenderDelegate::Ptr renderDelegate;
 };
 
@@ -71,8 +76,8 @@ public:
     Plane()
       {
       this->setRenderDelegate(
-        Factory<RenderDelegate>::createSubclass(
-          "RenderDelegate", "PlaneRenderDelegate"));
+        Factory<RenderDelegate>::createSubclassForGroup(
+            "RenderDelegate", RenderDelegate::RendererType::VTK));
       }
     ~Plane(){}
 

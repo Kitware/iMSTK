@@ -40,7 +40,7 @@ SceneTextureShader::SceneTextureShader(const std::string &p_verteShaderFileName,
     this->registerShader();
 }
 
-void SceneTextureShader::predraw(std::shared_ptr<Mesh>/*p_mesh*/)
+void SceneTextureShader::predraw(std::shared_ptr<Core::BaseMesh>/*p_mesh*/)
 {
 
 }

@@ -77,7 +77,7 @@ UnifiedId::Pointer SceneObject::getObjectUnifiedID()
     return std::make_shared<UnifiedId>();
 }
 
-core::StdVector3d & SceneObject::getLocalVertices()
+std::vector<core::Vec3d> & SceneObject::getLocalVertices()
 {
     return localVertices;
 }

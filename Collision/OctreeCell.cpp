@@ -79,12 +79,13 @@ void OctreeCell::expand( const double expandScale )
     cube.expand( expandScale );
 }
 
-bool OctreeCell::isCollidedWithTri( core::Vec3d &v0, core::Vec3d &v1, core::Vec3d &v2 )
+bool OctreeCell::isCollidedWithTri(const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2 ) const
 {
-    AABB tempAABB;
-    tempAABB.aabbMin = cube.leftMinCorner();
-    tempAABB.aabbMax = cube.rightMaxCorner();
-    return CollisionMoller::checkAABBTriangle( tempAABB, v0, v1, v2 );
+    Eigen::AlignedBox3d box;
+    box.min() = cube.leftMinCorner();
+    box.max() = cube.rightMaxCorner();
+
+    return (box.contains(v0) || box.contains(v1) || box.contains(v2));
 }
 
 bool OctreeCell::isCollidedWithPoint()

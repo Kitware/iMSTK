@@ -16,6 +16,7 @@ simmedtk_add_library(Core
     IOStream.cpp
     Light.cpp
     Module.cpp
+    Model.cpp
     ObjectSimulator.cpp
     RenderDetail.cpp
     Scene.cpp
@@ -26,6 +27,7 @@ simmedtk_add_library(Core
     Timer.cpp
     UnifiedId.cpp
     ViewerBase.cpp
+    BaseMesh.cpp
   PUBLIC_HEADERS
     CollisionConfig.h
     CollisionDetection.h
@@ -46,6 +48,7 @@ simmedtk_add_library(Core
     Light.h
     MemoryBlock.h
     Module.h
+    Model.h
     ObjectSimulator.h
     Scene.h
     SceneObject.h
@@ -56,9 +59,11 @@ simmedtk_add_library(Core
     Synchronization.h
     ViewerBase.h
     WorkerThread.h
+    BaseMesh.h
 )
 
 target_link_libraries(Core
+
   PUBLIC
     GLEW::GLEW
     ${OPENGL_LIBRARY}

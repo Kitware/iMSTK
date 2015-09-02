@@ -23,9 +23,9 @@
 
 #include "Core/Config.h"
 #include "Core/SDK.h"
-#include "Core/IOStream.h"
 #include "Core/ViewerBase.h"
 #include "Core/DataStructures.h"
+#include "Core/RenderDelegate.h"
 
 RenderOperation::RenderOperation()
 {
@@ -51,6 +51,7 @@ ViewerBase::ViewerBase()
     unlimitedFPSVariableChanged = 1;
     screenResolutionWidth = 1680;
     screenResolutionHeight = 1050;
+    valid = true;
 }
 
 ///affects the framebuffer size and depth buffer size
@@ -68,11 +69,11 @@ void ViewerBase::setUnlimitedFPS(bool p_enableFPS)
 
 void ViewerBase::initObjects()
 {
-    for (size_t i = 0; i < objectList.size(); i++)
+    for (const auto &i : this->objectList)
     {
-        if (objectList[i]->getType() != core::ClassType::Shader)
+        if (i->getType() != core::ClassType::Shader)
         {
-            objectList[i]->initDraw();
+            i->initDraw();
         }
         else
         {
@@ -89,9 +90,8 @@ void ViewerBase::initScenes()
         SceneLocal sceneLocal;
 
         scene->initLights();
-        scene->copySceneToLocal(sceneLocal);
 
-        for (auto sceneObject: sceneLocal.sceneObjects)
+        for (const auto &sceneObject : scene->getSceneObjects())
         {
             //initialize the custom Render if there is any
             if ( sceneObject->customRender != nullptr && sceneObject->getType() != core::ClassType::Shader )
@@ -157,28 +157,33 @@ void ViewerBase::processRenderOperation(const RenderOperation &p_rop)
     }
 }
 
-void ViewerBase::registerScene(std::shared_ptr<Scene> p_scene,
-                             RenderTargetType p_target,
-                             const std::string &p_fboName)
+void ViewerBase::registerScene(std::shared_ptr<Scene> scene,
+                             RenderTargetType target,
+                             const std::string &fboName)
 {
-    RenderOperation rop;
-
-    //sanity checks
-    assert(p_scene);
-    if (p_target == SMRENDERTARGET_FBO)
+    if(!scene)
     {
-        assert(p_fboName != "");
+        std::cerr << "Error: unvalid scene." << std::endl;
+        return;
     }
 
-    rop.target = p_target;
-    rop.scene = p_scene;
+    if (target == SMRENDERTARGET_FBO && fboName.length() == 0)
+    {
+        std::cerr << "Error: unvalid FBO name." << std::endl;
+        return;
+    }
 
-    rop.fboName = p_fboName;
+    RenderOperation rop;
+
+    rop.target = target;
+    rop.scene = scene;
+
+    rop.fboName = fboName;
 
     renderOperations.push_back(rop);
 }
 
-inline void ViewerBase::adjustFPS()
+void ViewerBase::adjustFPS()
 {
 
     static int _unlimitedFPSVariableChanged = 0;

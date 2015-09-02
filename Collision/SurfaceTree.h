@@ -34,6 +34,8 @@
 #include "Collision/CollisionMoller.h"
 #include "Mesh/SurfaceMesh.h"
 
+class MeshCollisionModel;
+
 /// \brief !!
 template<typename CellType>
 class SurfaceTree : public CoreClass
@@ -42,7 +44,6 @@ protected:
   typedef Matrix44d MatrixType;
 
 protected:
-    std::shared_ptr<SurfaceMesh> mesh; 							///< surface mesh
     int minTreeRenderLevel; 						///< !!
     bool renderSurface; 							///< !!
     bool enableShiftPos; 							///< !!
@@ -51,10 +52,11 @@ protected:
     int totalCells; 								///< number of total cells
     std::vector<std::array<int,2>> levelStartIndex; ///< Stores levels start and end indices
     int currentLevel; ///<
+    std::shared_ptr<MeshCollisionModel> model;
 
 public:
     /// \brief constructor
-    SurfaceTree(std::shared_ptr<SurfaceMesh> surfaceMesh, int maxLevels = 6);
+    SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceModel, int maxLevels = 6);
 
     /// \brief destructor
     ~SurfaceTree();
@@ -86,7 +88,7 @@ public:
     /// \brief !!
     inline std::shared_ptr<UnifiedId> getAttachedMeshID()
     {
-        return mesh->getUniqueId();
+        return this->model->getMesh()->getUniqueId();
     }
 
     /// \brief !!
@@ -114,49 +116,9 @@ public:
 
     void getIntersectingNodes(const std::shared_ptr<CellType> left,
                               const std::shared_ptr<CellType> right,
-                              std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
-    {
-        if(!left->getAabb().overlaps(right->getAabb()))
-        {
-            return;
-        }
-
-        if(left->getIsLeaf() && right->getIsLeaf())
-        {
-            result.emplace_back(left,right);
-        }
-        else if(left->getIsLeaf())
-        {
-            for(const auto &child : right->getChildNodes())
-            {
-                if(!child) continue;
-                getIntersectingNodes(left,child,result);
-            }
-        }
-        else if(right->getIsLeaf())
-        {
-            for(const auto &child : left->getChildNodes())
-            {
-                if(!child) continue;
-                getIntersectingNodes(child,right,result);
-            }
-        }
-        else
-        {
-            for(const auto &rightChild : right->getChildNodes())
-            {
-                if(!rightChild) continue;
-                for(const auto &leftChild : left->getChildNodes())
-                {
-                    if(!leftChild) continue;
-                    getIntersectingNodes(leftChild,rightChild,result);
-                }
-            }
-        }
-
-    }
+                              std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result );
 };
 
-#include "SurfaceTree.hpp"
+#include "Collision/SurfaceTree.hpp"
 
 #endif

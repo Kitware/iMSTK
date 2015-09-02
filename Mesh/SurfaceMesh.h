@@ -25,39 +25,182 @@
 #define SMSURFACEMESH_H
 
 // SimMedTK includes
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
-class SurfaceMesh: public Mesh
+class SurfaceMesh: public Core::BaseMesh
 {
 
 public:
-    /// \brief push Mesh class specific errors here
-    std::shared_ptr<ErrorLog> log_SF;
-
+    ///
     /// \brief constructor
+    ///
     SurfaceMesh();
 
-    /// \brief constructor
-    SurfaceMesh(const MeshType &meshtype, std::shared_ptr<ErrorLog> log);
-
+    ///
     /// \brief destructor
-    virtual ~SurfaceMesh();
+    ///
+    ~SurfaceMesh();
 
-    /// \brief load the surface mesh
-    bool loadMesh(const std::string& fileName, const MeshFileType &fileType);
+    ///
+    /// \brief calculates the normal of a triangle
+    ///
+    core::Vec3d computeTriangleNormal(int triangle);
 
-    /// \brief load the surface mesh using in-house code
-    bool loadMeshLegacy(const std::string& fileName, const MeshFileType &fileType);
+    ///
+    /// \brief Calculate normals for all triangles
+    ///
+    void computeTriangleNormals();
 
-    /// \brief load the surface mesh from 3ds format
-    bool Load3dsMesh(const std::string& fileName);
+    ///
+    /// \brief Calculate normals for all triangles
+    ///
+    void computeVertexNormals();
 
-    /// \brief load surface meshes using assimp library
-    bool LoadMeshAssimp(const std::string& fileName);
+    ///
+    /// \brief Calculate vertex neighbors
+    ///
+    void computeVertexNeighbors();
 
+    ///
+    /// \brief initializes the vertex neighbors
+    ///
+    void computeVertexTriangleNeighbors();
+
+    ///
+    /// \brief Compute tangents for triangles
+    ///
+    void computeTriangleTangents();
+
+    ///
+    /// \brief Check for the correct triangle orientation.
+    ///
+    void checkTriangleOrientation();
+
+    /// Texture handling
+
+    struct TextureAttachment;
+    ///
+    /// \brief Returns the texture coordinates array.
+    ///
+    const std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates() const;
+    std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates();
+
+    ///
+    /// \brief Returns the bounding box for this mesh.
+    ///
+    const std::vector<std::shared_ptr<TextureAttachment>> &getTextures() const;
+
+    ///
+    /// \brief Returns the bounding box for this mesh.
+    ///
+    const int &getTextureId(size_t i) const;
+
+    ///
+    /// \brief Return true if it contains texture coordinates
+    ///
+    bool hasTextureCoordinates() const;
+
+    ///
+    /// \brief Add texture coordinates
+    ///
+    void addTextureCoordinate(const core::Vec2f &coord);
+    void addTextureCoordinate(const float &x, const float &y);
+
+    ///
+    /// \brief Assign the texture
+    ///
+    void assignTexture(const std::string& referenceName);
+
+    ///
+    /// \brief Query if the mesh has textures available for rendering
+    ///
+    bool isMeshTextured() const;
+
+    ///
+    /// \brief Set/get use OBJ of ThreDS textures coordinates
+    ///
+    void setUseOBJTexture(bool use);
+    void setUseThreDSTexture(bool use);
+
+    ///
+    /// \brief Get triangle normals
+    ///
+    const core::Vec3d &getTriangleNormal(size_t i) const;
+
+    ///
+    /// \brief Get tangents
+    ///
+    const core::Vec3d &getTriangleTangent(size_t i) const;
+
+    ///
+    /// \brief Get vertex normal
+    ///
+    const core::Vec3d &getVertexNormal(size_t i) const;
+
+    ///
+    /// \brief Get vertex normal
+    ///
+    const std::vector<core::Vec3d> &getVertexNormals() const
+    {
+        return this->vertexNormals;
+    }
+    std::vector<core::Vec3d> &getVertexNormals()
+    {
+        return this->vertexNormals;
+    }
+
+    ///
+    /// \brief Get vertex tangents
+    ///
+    const core::Vec3d &getVertexTangent(size_t i) const;
+    const std::vector<core::Vec3d> &getVertexTangents() const;
+    std::vector<core::Vec3d> &getVertexTangents();
+
+    ///
     /// \brief print the details of the mesh
-    void printPrimitiveDetails();
+    ///
+    void print() const override;
+
+    ///
+    /// \brief Get the total number of triangles
+    ///
+    size_t getNumberOfTriangles() const;
+
+
+private:
+    // List of triangle normals
+    std::vector<core::Vec3d> triangleNormals;
+
+    // List of vertex normals
+    std::vector<core::Vec3d> vertexNormals;
+
+    // List of triangle tangents
+    std::vector<core::Vec3d> triangleTangents;
+
+    // List of vertex tangents
+    std::vector<core::Vec3d> vertexTangents;
+
+    // List of vertex neighbors
+    std::vector<std::vector<size_t>> vertexNeighbors;
+
+    // List of vertex neighbors
+    std::vector<std::vector<size_t>> vertexTriangleNeighbors;
+
+    // Textures attached to this mesh.
+    std::vector<std::shared_ptr<TextureAttachment>> textures;
+
+    // Texture coordinates
+    std::vector<core::Vec2f,
+    Eigen::aligned_allocator<core::Vec2f>> textureCoord;
+
+    bool useThreeDSTexureCoordinates;
+    bool useOBJDSTexureCoordinates;
 };
 
 #endif
+
+
+

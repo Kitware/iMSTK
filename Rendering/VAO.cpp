@@ -23,7 +23,7 @@
 
 #include "Rendering/VAO.h"
 #include "Rendering/Shader.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 
 std::unordered_map<int, std::shared_ptr<VAO>> VAO::VAOs;
 
@@ -207,7 +207,7 @@ void VAO::setBufferData( VBOBufferType p_type, std::string p_ShaderAttribName, i
     else if ( p_type == SMVBO_TEXTURECOORDS ||
               p_type == SMVBO_VEC2F )
     {
-        bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * p_nbrElements;
+        bufferInfo[totalNbrBuffers].size = sizeof( std::array<float,3> ) * p_nbrElements;
     }
     else if ( p_type == SMVBO_VEC4F )
     {
@@ -229,7 +229,7 @@ void VAO::setTriangleInfo( std::string p_ShaderAttribName, int p_nbrTriangles, v
     bufferInfo[totalNbrBuffers].shaderAttribName = p_ShaderAttribName;
     totalNbrBuffers++;
 }
-bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
+bool VAO::setBufferDataFromMesh( SurfaceMesh *p_mesh, std::shared_ptr<Shader> p_shader, std::string p_POSITIONShaderName, std::string p_NORMALShaderName, std::string p_TEXTURECOORDShaderName, std::string p_TANGENTSName )
 {
     if ( p_shader == nullptr )
     {
@@ -240,46 +240,49 @@ bool VAO::setBufferDataFromMesh( Mesh *p_mesh, std::shared_ptr<Shader> p_shader,
         shader = p_shader;
     }
 
+    auto totalNumberOfVertices = p_mesh->getNumberOfVertices();
+    auto vertices = p_mesh->getVertices();
+
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_POS;
-    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertices.data();
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
+    bufferInfo[totalNbrBuffers].attribPointer = vertices.data();
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_POSITIONShaderName;
     totalNbrBuffers++;
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_NORMALS;
-    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertNormals;
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
+    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->getVertexNormals().data()->data();
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_NORMALShaderName;
     totalNbrBuffers++;
 
     ///texture coord is for each vertex
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TEXTURECOORDS;
-    bufferInfo[totalNbrBuffers].size = sizeof( TexCoord ) * p_mesh->nbrVertices;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->texCoord;
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+    bufferInfo[totalNbrBuffers].size = sizeof( std::array<float,3> ) * totalNumberOfVertices;
+    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->getTextureCoordinates().data()->data();
+    bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     bufferInfo[totalNbrBuffers].shaderAttribName = p_TEXTURECOORDShaderName;
     totalNbrBuffers++;
 
-    if ( p_mesh->tangentChannel )
+    if ( p_mesh->getVertexTangents().size() > 0 )
     {
         bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_TANGENTS;
-        bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * p_mesh->nbrVertices;
-        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->vertTangents;
-        bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrVertices;
+        bufferInfo[totalNbrBuffers].size = sizeof( core::Vec3d ) * totalNumberOfVertices;
+        bufferInfo[totalNbrBuffers].attribPointer = p_mesh->getVertexTangents().data()->data();
+        bufferInfo[totalNbrBuffers].nbrElements = totalNumberOfVertices;
         bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
         bufferInfo[totalNbrBuffers].shaderAttribName = p_TANGENTSName;
         totalNbrBuffers++;
     }
 
     bufferInfo[totalNbrBuffers].arrayBufferType = SMVBO_INDEX;
-    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->nbrTriangles * 3;
-    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->triangles;
-    bufferInfo[totalNbrBuffers].size = sizeof( int ) * p_mesh->nbrTriangles * 3;
+    bufferInfo[totalNbrBuffers].nbrElements = p_mesh->getTriangles().size() * 3;
+    bufferInfo[totalNbrBuffers].attribPointer = p_mesh->getTriangles().data()->data();
+    bufferInfo[totalNbrBuffers].size = sizeof( std::array <std::size_t,3> ) * p_mesh->getTriangles().size();
     bufferInfo[totalNbrBuffers].attributeIndex = totalNbrBuffers;
     totalNbrBuffers++;
 

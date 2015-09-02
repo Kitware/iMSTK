@@ -24,6 +24,7 @@
 // SimMedTK includes
 #include "Simulators/SceneObjectDeformable.h"
 #include "Core/Factory.h"
+#include <Core/RenderDelegate.h>
 
 SceneObjectDeformable::SceneObjectDeformable() :
     renderSecondaryMesh(false),
@@ -33,8 +34,9 @@ SceneObjectDeformable::SceneObjectDeformable() :
     subTimestepCounter(0)
 {
   this->setRenderDelegate(
-    Factory<RenderDelegate>::createSubclass(
-      "RenderDelegate", "SceneObjectDeformableRenderDelegate"));
+      Factory<RenderDelegate>::createConcreteClassForGroup(
+          "SceneObjectDeformableRenderDelegate",
+          RenderDelegate::RendererType::VTK));
 }
 
 SceneObjectDeformable::~SceneObjectDeformable()

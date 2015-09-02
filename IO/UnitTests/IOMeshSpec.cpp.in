@@ -1,0 +1,145 @@
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
+
+#include <bandit/bandit.h>
+#include <memory>
+
+// SimMedTK includes
+#include "Mesh/VegaVolumetricMesh.h"
+#include "Mesh/SurfaceMesh.h"
+#include "IO/IOMesh.h"
+#include "IO/initIO.h"
+#include "Core/MakeUnique.h"
+
+const std::string ds3MeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.3ds";
+const std::string objMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.obj";
+const std::string vegMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
+const std::string plyMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.ply";
+const std::string stlMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.stl";
+const std::string vtkMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtk";
+const std::string vtuMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtu";
+const std::string vtuPropFileName = "@CMAKE_BINARY_DIR@/Testing/Models/TestMesh.vtu";
+const std::string vtpMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtp";
+
+using namespace bandit;
+
+go_bandit([](){
+
+    initIODelegates();
+    describe("IO Mesh Reader", [&]() {
+        std::unique_ptr<IOMesh> ioMesh = Core::make_unique<IOMesh>();
+
+        it("constructs", [&]() {
+            AssertThat(ioMesh != nullptr, IsTrue());
+        });
+        it("loads 3ds mesh", [&]() {
+            ioMesh->read(ds3MeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::ThreeDS, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads obj mesh", [&]() {
+            ioMesh->read(objMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::OBJ, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads veg mesh", [&]() {
+            ioMesh->read(vegMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VEG, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads ply mesh", [&]() {
+            ioMesh->read(plyMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::PLY, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads stl mesh", [&]() {
+            ioMesh->read(stlMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::STL, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads vtk mesh", [&]() {
+            ioMesh->read(vtkMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTK, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads vtu mesh", [&]() {
+            ioMesh->read(vtuMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads vtu with properties mesh", [&]() {
+            ioMesh->read(vtuPropFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTU, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfElements() > 0, IsTrue());
+
+            auto surface = mesh->getAttachedMesh(0);
+            AssertThat(surface->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(surface->getNumberOfTriangles() > 0, IsTrue());
+        });
+        it("loads vtp with properties mesh", [&]() {
+            ioMesh->read(vtpMeshFileName);
+            AssertThat(ioMesh->getFileType() == IOMesh::MeshFileType::VTP, IsTrue());
+            auto mesh = std::dynamic_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+            AssertThat(mesh != nullptr, IsTrue());
+            AssertThat(mesh->getNumberOfVertices() > 0, IsTrue());
+            AssertThat(mesh->getNumberOfTriangles() > 0, IsTrue());
+        });
+
+    });
+});

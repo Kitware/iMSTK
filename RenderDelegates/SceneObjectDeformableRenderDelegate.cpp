@@ -21,36 +21,49 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Model.h"
+#include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Simulators/SceneObjectDeformable.h"
+#include "Simulators/VegaFemSceneObject.h"
+#include "Mesh/VegaVolumetricMesh.h"
+#include "Mesh/SurfaceMesh.h"
 
 /// \brief  Displays the fem object with primary or secondary mesh, fixed vertices,
 ///  vertices interacted with, ground plane etc.
 class SceneObjectDeformableRenderDelegate : public RenderDelegate
 {
 public:
-  virtual void draw() const override;
+    virtual void draw() const override;
 };
 
 void SceneObjectDeformableRenderDelegate::draw() const
 {
-  auto geom = this->getSourceGeometryAs<SceneObjectDeformable>();
-  if (!geom)
-    return;
+    auto geom = this->getSourceGeometryAs<VegaFemSceneObject>();
 
-  if (geom->renderSecondaryMesh && !!geom->getSecondarySurfaceMesh())
+    if(!geom)
     {
-    geom->getSecondarySurfaceMesh()->draw();
+        return;
     }
-  else
+    auto mesh = geom->getVolumetricMesh();
+    if(!mesh)
     {
-    geom->getPrimarySurfaceMesh()->draw();
+        return;
     }
+    auto surfaceMesh = mesh->getAttachedMesh(0);
+    if(!surfaceMesh)
+    {
+        return;
+    }
+    auto delegate = surfaceMesh->getRenderDelegate();
+    if(!delegate)
+    {
+        return;
+    }
+    delegate->draw();
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_scene_object_deformable_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SceneObjectDeformableRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     SceneObjectDeformableRenderDelegate,
+                     RenderDelegate::RendererType::Other)

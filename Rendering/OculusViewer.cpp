@@ -24,7 +24,7 @@
 #include <iostream>
 
 #include "Rendering/OculusViewer.h"
-#include "Rendering/GLRenderer.h"
+#include "Rendering/OpenGLRenderer.h"
 #include "Core/Quaternion.h"
 
 #ifdef _WIN32 || WIN32
@@ -56,7 +56,7 @@ static unsigned int next_pow2(unsigned int x)
     return x + 1;
 }
 
-OculusViewer::OculusViewer() : Viewer()
+OculusViewer::OculusViewer() : OpenGLViewer()
 {
     hmd = nullptr;
     fbWidth = 0;
@@ -196,7 +196,7 @@ void OculusViewer::renderToScreen(const RenderOperation &p_rop)
         view = trans * view;
 
         //Render Scene
-        GLRenderer::renderScene(p_rop.scene, proj, view);
+        OpenGLRenderer::renderScene(p_rop.scene, proj, view);
     }
     //after drawing both eyes into the texture render target, revert to
     // drawing directly to the display, and we call ovrHmd_EndFrame, to let the

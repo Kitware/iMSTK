@@ -65,6 +65,8 @@
 #include "generateSurfaceMesh.h"
 #include "generateMassMatrix.h"
 
+class VegaVolumetricMesh;
+
 /// \brief Base class for any scene object that is defmormable
 /// and uses FE formulation to compute the evolution of configuration
 /// in time.
@@ -191,6 +193,8 @@ public:
     /// \brief not implemented yet.
     std::shared_ptr<SceneObject> clone() override;
 
+    std::shared_ptr<VegaVolumetricMesh> getVolumetricMesh();
+
 private:
 
     int staticSolver;
@@ -213,28 +217,15 @@ private:
     std::shared_ptr<ForceModel> forceModel; ///< Type of formulation driving the FEM simulation
     std::shared_ptr<StVKInternalForces> stVKInternalForces;
     std::shared_ptr<StVKStiffnessMatrix> stVKStiffnessMatrix;
-    std::shared_ptr<StVKForceModel> stVKForceModel;
-    std::shared_ptr<CorotationalLinearFEMForceModel> corotationalLinearFEMForceModel;
 
     // Volume meshes and related graphs
-    std::shared_ptr<VolumetricMesh> volumetricMesh; ///< volume mesh
-    std::shared_ptr<TetMesh> tetMesh; ///< volume mesh
-    std::shared_ptr<Graph> meshGraph; ///< graph of the mesh
+    std::shared_ptr<VegaVolumetricMesh> volumetricMesh; ///< volume mesh
 
     // Sparse matrices
     std::shared_ptr<SparseMatrix> massMatrix; ///< sparse mass matrix need for FEM simulation
     std::shared_ptr<SparseMatrix> LaplacianDampingMatrix; ///< sparse damping matrix need for FEM simulation
 
-    // Interpolation between primary and secondary surface mesh
-    int numInterpolationElementVerts;
-    std::vector<int> interpolationVertices;
-    std::vector<double> interpolationWeights;
-
     std::shared_ptr<LinearSolver> linearSolver;
-
-    // Vega surface meshes
-    std::shared_ptr<VegaSceneObjectDeformable> vegaPrimarySurfaceMesh;
-    std::shared_ptr<VegaSceneObjectDeformable> vegaSecondarySurfaceMesh;
 };
 
 #endif //SMVEGAFEMSCENEOBJECT_H

@@ -23,6 +23,8 @@
 
 // SimMedTK includes
 #include "Rendering/MetalShader.h"
+
+#include "Rendering/TextureManager.h"
 #include "Core/Event.h"
 #include "Core/SDK.h"
 #include "Event/KeyboardEvent.h"
@@ -55,7 +57,7 @@ MetalShader::MetalShader( const std::string &p_verteShaderFileName,
     log->isOutputtoConsoleEnabled = true;
 }
 
-void MetalShader::attachMesh( std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
+void MetalShader::attachMesh( std::shared_ptr<Core::BaseMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp )
 {
     if ( !attachTexture( p_mesh->getUniqueId(), p_bump, "BumpTex" ) )
     {
@@ -69,7 +71,7 @@ void MetalShader::attachMesh( std::shared_ptr<Mesh> p_mesh, char *p_bump, char *
     attachTexture( id, p_disp, "DispTex" );
 }
 
-void MetalShader::attachMesh( std::shared_ptr<Mesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
+void MetalShader::attachMesh( std::shared_ptr<Core::BaseMesh> p_mesh, char *p_bump, char *p_decal, char *p_specular, char *p_OCC, char *p_disp, char *p_alphaMap )
 {
     auto id = p_mesh->getUniqueId();
     attachTexture( id, p_bump, "BumpTex" );
@@ -94,7 +96,7 @@ void MetalShader::initDraw()
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
 
-void MetalShader::predraw(std::shared_ptr<Mesh> mesh )
+void MetalShader::predraw(std::shared_ptr<Core::BaseMesh> mesh )
 {
     specularPowerValue = mesh->getRenderDetail()->shininess;
     glUniform1fARB( specularPower, specularPowerValue );
@@ -162,7 +164,7 @@ void MetalShaderShadow::initDraw()
     canGetShadowUniform = getFragmentShaderParam( "canGetShadow" );
 }
 
-void MetalShaderShadow::predraw( std::shared_ptr<Mesh> p_mesh )
+void MetalShaderShadow::predraw( std::shared_ptr<Core::BaseMesh> p_mesh )
 {
     MetalShader::predraw( p_mesh );
 
@@ -192,7 +194,7 @@ void MetalShaderSoftShadow::initDraw()
     shadowMapUniform = getFragmentShaderParam( "ShadowMapTEST" );
 }
 
-void MetalShaderSoftShadow::predraw( std::shared_ptr<Mesh> p_mesh )
+void MetalShaderSoftShadow::predraw( std::shared_ptr<Core::BaseMesh> p_mesh )
 {
     MetalShader::predraw( p_mesh );
     TextureManager::activateTexture( "depth", 30, shadowMapUniform );

@@ -31,60 +31,47 @@
 
 using namespace bandit;
 
-std::shared_ptr<MeshCollisionModel> getModel(const core::StdVector3d &vertices)
+std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 {
+    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
+
+    // Add one triangle to the data structure
+    mesh->setVertices(vertices);
+
+    std::array<size_t,3> t = {0,1,2};
+    mesh->getTriangles().emplace_back(t);
+
+    mesh->computeVertexNeighbors();
+    mesh->computeTriangleNormals();
+    mesh->computeVertexNormals();
+
     std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
-    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
-
-    // Add two triangles to the data structure
-    mesh->initVertexArrays(3);
-    mesh->initTriangleArrays(1);
-
-    mesh->vertices[0] = vertices[0];
-    mesh->vertices[1] = vertices[1];
-    mesh->vertices[2] = vertices[2];
-
-    mesh->triangles[0].vert[0] = 0;
-    mesh->triangles[0].vert[1] = 1;
-    mesh->triangles[0].vert[2] = 2;
-
-    mesh->initVertexNeighbors();
-    mesh->updateTriangleNormals();
-    mesh->updateVertexNormals();
-
-    //edge information
-    mesh->calcNeighborsVertices();
-    mesh->calcEdges();
-    mesh->upadateAABB();
-    mesh->allocateAABBTris();
-
     model->setMesh(mesh);
-
     return model;
 }
 
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
             AssertThat(meshToMeshCollision == nullptr, IsFalse());
         });
         it("performs collision detection ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = make_unique<MeshToMeshCollision>();
+            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
 
-            core::StdVector3d verticesA;
+            std::vector<core::Vec3d> verticesA;
             verticesA.emplace_back(1.0,2.0,0);
             verticesA.emplace_back(2.0,3.0,0);
             verticesA.emplace_back(2.0,1.0,0);
 
-            core::StdVector3d verticesB;
+            std::vector<core::Vec3d> verticesB;
             verticesB.emplace_back(1.0,2.0,0.5);
             verticesB.emplace_back(2.0,3.0,0);
             verticesB.emplace_back(2.0,1.0,0);
 
-            std::shared_ptr<ModelRepresentation> modelA = getModel(verticesA);
+            std::shared_ptr<Model> modelA = getModel(verticesA);
 
-            std::shared_ptr<ModelRepresentation> modelB = getModel(verticesB);
+            std::shared_ptr<Model> modelB = getModel(verticesB);
 
             std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
 

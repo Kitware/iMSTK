@@ -42,7 +42,7 @@ class TextureManager: public CoreClass
 {
 
     static std::shared_ptr<ErrorLog> errorLog;
-    static std::vector<Texture*> textures;
+    static std::vector<std::shared_ptr<Texture>> textures;
     static std::unordered_map<std::string, int> textureIndexId;
     static int activeTextures;
     static bool isInitialized;
@@ -65,6 +65,10 @@ public:
             isInitialized = true;
         }
     }
+    /// \brief adds texture with file name, reference that that is assigned to it, and returned texture id
+    static TextureReturnType addTexture(const std::string& p_fileName,
+                                        const std::string& p_textureReferenceName);
+
     /// \brief load textures with file name, reference that that is assigned to it, and returned texture id
     static TextureReturnType loadTexture(const std::string& p_fileName,
                                            const std::string& p_textureReferenceName,
@@ -76,15 +80,16 @@ public:
 
     static TextureReturnType findTextureId(const std::string& p_textureReferenceName,
             int &p_textureId);
+
     /// \brief activate textures based on texture reference name, texture reference, texture id and GL order
-    static GLuint activateTexture(Texture *p_texture);
+    static GLuint activateTexture(std::shared_ptr<Texture> p_texture);
     static GLuint activateTexture(const std::string& p_textureReferenceName);
     static GLuint activateTexture(int p_textureId);
 
     static GLuint activateTexture(const std::string& p_textureReferenceName,
                                   int p_textureGLOrder);
 
-    static GLuint activateTexture(Texture *p_texture, int p_textureGLOrder,
+    static GLuint activateTexture(std::shared_ptr<Texture> p_texture, int p_textureGLOrder,
                                   int p_shaderBindGLId);
 
     static GLuint activateTexture(const std::string& p_textureReferenceName,
@@ -104,7 +109,8 @@ public:
     static GLuint getOpenglTextureId(const std::string& p_textureReferenceName);
     static GLuint getOpenglTextureId(int p_textureId);
     /// \brief to get texture with given texture reference name
-    static Texture * getTexture(const std::string& p_textureReferenceName);
+    static std::shared_ptr<Texture>  getTexture(const std::string& p_textureReferenceName);
+    static std::shared_ptr<Texture>  getTexture(const int& id);
     /// \brief to create a depth texture
     static void createDepthTexture(const std::string& p_textureReferenceName,
                                    int p_width, int p_height);
@@ -113,14 +119,14 @@ public:
     static void  createColorTexture(const std::string& p_textureReferenceName,
                                     int p_width, int p_height);
     /// \brief initialize depth texture and color texture
-    static void initDepthTexture(Texture *p_texture);
-    static void initColorTexture(Texture *p_texture);
+    static void initDepthTexture(std::shared_ptr<Texture> p_texture);
+    static void initColorTexture(std::shared_ptr<Texture> p_texture);
     /// \brief generate mip maps
     static void generateMipMaps(int p_textureId);
     static void generateMipMaps(const std::string& p_textureReferenceName);
     /// \brief to duplicate the texture
     static void duplicateTexture(const std::string& p_textureReferenceName,
-                                 Texture *p_texture, ImageColorType p_type);
+                                 std::shared_ptr<Texture> p_texture, ImageColorType p_type);
 
     /// \brief copy the  texture specified with p_textureSourceName to the  texture specified with p_textureDestinationName
     static void copyTexture(const std::string& p_textureDestinationName,

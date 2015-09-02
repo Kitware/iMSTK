@@ -82,16 +82,6 @@ Color &Color::operator=(const Color &p_color )
     return *this;
 }
 
-GLfloat *Color::toGLColor()
-{
-    return static_cast<GLfloat*>(rgba);
-}
-
-const GLfloat *Color::toGLColor() const
-{
-    return static_cast<const GLfloat*>(rgba);
-}
-
 void Color::setValue( float p_red, float p_green, float p_blue, float p_alpha )
 {
     rgba[0] = p_red;

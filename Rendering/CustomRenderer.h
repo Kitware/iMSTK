@@ -26,7 +26,7 @@
 
 
 // SimMedTK includes
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/SceneObject.h"

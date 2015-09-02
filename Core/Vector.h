@@ -100,17 +100,26 @@ using StdVector3f = StdVector3<float>;
 // STL vectors of double vectors
 using StdVector3d = StdVector3<double>;
 
+// Vector map
 template<typename T>
-void flattenVectorArray(const StdVector3<T> &v, Eigen::Matrix<T, 3, Eigen::Dynamic> &out)
-{
-    out.resize(v.size());
-    for(size_t i = 0, end = v.size(); i < end; ++i)
-    {
-        out.col(i) = v(i);
-    }
-}
+using VectorMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>>;
+
+// Nx3 matrix map
+template<typename T>
+using Matrix3MapType = Eigen::Map<Eigen::Matrix<T,3,Eigen::Dynamic>>;
 
 } // core
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<Vector3<T>>& obj)
+{
+    for(auto v : obj)
+    {
+        os << v << std::endl;
+    }
+    return os;
+}
+
 // } // SimMedTK
 
 #endif // SMVECTOR_H

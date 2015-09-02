@@ -21,6 +21,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Core/Model.h"
 #include "Core/RenderDelegate.h"
 #include "Core/Factory.h"
 #include "Collision/MeshCollisionModel.h"
@@ -52,15 +53,15 @@ bool SurfaceTreeRenderDelegate::drawTree() const
     return false;
 
   core::Vec3d center;
-  glColor3fv(Color::colorGreen.toGLColor());
+  glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
 
   glEnable(GL_LIGHTING);
   glPushAttrib(GL_LIGHTING_BIT);
-  glColor3fv(Color::colorGreen.toGLColor());
-  glColor3fv(Color::colorBlue.toGLColor());
+  glColor3fv(Color::colorGreen.toGLColor<GLfloat>());
+  glColor3fv(Color::colorBlue.toGLColor<GLfloat>());
 
   glPushMatrix();
-  glColor3fv(Color::colorPink.toGLColor());
+  glColor3fv(Color::colorPink.toGLColor<GLfloat>());
 
   geom->getRoot()->draw();
 
@@ -72,8 +73,6 @@ bool SurfaceTreeRenderDelegate::drawTree() const
   return true;
 }
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_surface_tree_render_delegate)
-    SIMMEDTK_REGISTER_CLASS(RenderDelegate,RenderDelegate,SurfaceTreeRenderDelegate,2000);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+RegisterFactoryClass(RenderDelegate,
+                     SurfaceTreeRenderDelegate,
+                     RenderDelegate::RendererType::Other)

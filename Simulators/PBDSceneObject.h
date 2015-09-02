@@ -28,7 +28,7 @@
 #include "Core/Config.h"
 #include "Core/SceneObject.h"
 #include "Mesh/SurfaceMesh.h"
-#include "Mesh/Mesh.h"
+#include "Core/BaseMesh.h"
 
 /// \brief Position based dynamics (PBD) object
 class PBDSceneObject: public SceneObject
@@ -55,9 +55,9 @@ public:
     float Damp; ///< damping values
     int nbrMass; ///< number of masses
     int **massIdx; ///< !!
-    core::StdVector3d P; ///< !! position
-    core::StdVector3d V; ///< !! velocity
-    core::StdVector3d exF; ///< external force
+    std::vector<core::Vec3d> P; ///< !! position
+    std::vector<core::Vec3d> V; ///< !! velocity
+    std::vector<core::Vec3d> exF; ///< external force
     int nbrSpr; ///< !! number of spheres
     float *L0; ///< !! Initial length
     bool *fixedMass; ///< true if masses are fixed

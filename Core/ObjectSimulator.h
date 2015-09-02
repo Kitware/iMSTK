@@ -87,6 +87,7 @@ public:
 
     ObjectSimulator(std::shared_ptr<ErrorLog> p_log);
 
+
     /// \brief  set thread priority
     void setPriority(ThreadPriority p_priority);
     /// \brief  set execution type

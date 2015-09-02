@@ -111,7 +111,7 @@ void GLUtils::drawQuadOnScreen(Color p_color, float p_left,
     glLoadIdentity();
     glOrtho(0, 1.0, 0.0, 1, 0.1, 1.1);
     glBegin(GL_QUADS);
-    glColor4fv(p_color.toGLColor());
+    glColor4fv(p_color.toGLColor<GLfloat>());
     glVertex3d(p_left, p_bottom, -1.0);
     glVertex3d(p_right, p_bottom, -1.0);
     glVertex3d(p_right, p_top , -1.0);

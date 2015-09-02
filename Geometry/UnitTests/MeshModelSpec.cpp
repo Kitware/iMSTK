@@ -21,61 +21,55 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/MakeUnique.h"
 #include <bandit/bandit.h>
 
+#include "Core/MakeUnique.h"
 #include "Geometry/MeshModel.h"
 
 using namespace bandit;
 
-std::shared_ptr<MeshModel> getModel(const core::StdVector3d &vertices)
+std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 {
-    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
-    std::shared_ptr<Mesh> mesh = std::make_shared<SurfaceMesh>();
-    model->setModelMesh(mesh);
+    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
 
     // Add one triangle to the data structure
-    mesh->initVertexArrays(3);
-    mesh->initTriangleArrays(1);
+    mesh->setVertices(vertices);
+    std::array<size_t,3> triangle = {0,1,2};
 
-    mesh->vertices[0] = vertices[0];
-    mesh->vertices[1] = vertices[1];
-    mesh->vertices[2] = vertices[2];
+    mesh->getTriangles().emplace_back(triangle);
 
-    mesh->triangles[0].vert[0] = 0;
-    mesh->triangles[0].vert[1] = 1;
-    mesh->triangles[0].vert[2] = 2;
+    mesh->computeVertexNeighbors();
+    mesh->computeTriangleNormals();
+    mesh->computeVertexNormals();
 
-    mesh->initVertexNeighbors();
-    mesh->updateTriangleNormals();
-    mesh->updateVertexNormals();
-
+    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
+    model->setModelMesh(mesh);
     return model;
 }
 
 go_bandit([](){
     describe("Mesh model", []() {
         it("constructs", []() {
-            auto model = make_unique<MeshModel>();
+            auto model = Core::make_unique<MeshModel>();
             AssertThat(model != nullptr, IsTrue());
         });
         it("can access mesh vertices", []() {
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
 
             auto model = getModel(vertices);
 
-            AssertThat(model->getTrianglePositions(0)[0], Equals(vertices[0]));
-            AssertThat(model->getTrianglePositions(0)[1], Equals(vertices[1]));
-            AssertThat(model->getTrianglePositions(0)[2], Equals(vertices[2]));
+            AssertThat(model->getVertices()[0], Equals(vertices[0]));
+            AssertThat(model->getVertices()[1], Equals(vertices[1]));
+            AssertThat(model->getVertices()[2], Equals(vertices[2]));
 
         });
         it("can access mesh face normals", []() {
 
-            core::StdVector3d vertices;
+            std::vector<core::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
@@ -84,7 +78,8 @@ go_bandit([](){
 
             core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
 
-            AssertThat((model->getNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
+            auto mesh = std::static_pointer_cast<SurfaceMesh>(model->getMesh());
+            AssertThat((mesh->getTriangleNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
 
     });

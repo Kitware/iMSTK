@@ -32,7 +32,7 @@
 #include "Core/Module.h"
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100
@@ -74,7 +74,9 @@ public:
     ///
     std::shared_ptr<ViewerBase> createViewer();
 
-    ///SDK returns a pointer to the viewer
+    ///
+    /// \brief Returns a pointer to the viewer object
+    ///
     std::shared_ptr<ViewerBase> getViewerInstance();
 
     ///SDK creates simualtor
@@ -114,7 +116,7 @@ public:
     void removeRef(std::shared_ptr<CoreClass> p_coreClass);
 
     /// \brief register functions
-    void registerMesh(std::shared_ptr<BaseMesh> p_mesh);
+    void registerMesh(std::shared_ptr<Core::BaseMesh> p_mesh);
 
     void registerModule(std::shared_ptr<Module> p_mod);
 
@@ -142,7 +144,7 @@ private:
     std::shared_ptr<Simulator> simulator; ///< Reference to the sdk simulator object
 
     ///holds the references to the entities in the framework
-    std::vector<std::shared_ptr<BaseMesh>> meshList;
+    std::vector<std::shared_ptr<Core::BaseMesh>> meshList;
     std::vector<std::shared_ptr<Module>> moduleList;
     std::vector<std::shared_ptr<ObjectSimulator>> simulatorList;
     std::vector<std::shared_ptr<CollisionDetection>> collisionDetectionList;

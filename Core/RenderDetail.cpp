@@ -18,50 +18,49 @@
 
 void RenderDetail::addShader(std::shared_ptr<UnifiedId> p_shaderID)
 {
-
     shaderEnable.push_back(true);
     shaders.push_back(p_shaderID);
 }
 void RenderDetail::addVAO(std::shared_ptr<UnifiedId> p_shaderID)
 {
-
     VAOs.push_back(p_shaderID);
     VAOEnable.push_back(true);
 }
 
 RenderDetail::RenderDetail()
 {
-  this->reset();
+    this->reset();
 }
 
 RenderDetail::RenderDetail(unsigned int type)
 {
-  this->reset();
-  normalLength = 1.0;
-  this->renderType = type;
+    this->reset();
+    normalLength = 1.0;
+    this->renderType = type;
 }
 
 void RenderDetail::reset()
 {
-  renderType = 0;
-  highLightColor.rgba[0] = 1.0f;
-  highLightColor.rgba[1] = 0.0f;
-  highLightColor.rgba[2] = 0.0f;
-  pointSize = 1;
-  lineSize = 1;
-  shadowColor.rgba[0] = 0.0f;
-  shadowColor.rgba[1] = 0.0f;
-  shadowColor.rgba[2] = 0.0f;
-  shadowColor.rgba[3] = 0.5f;
-  colorDiffuse = Color::colorWhite;
-  colorAmbient = Color::colorWhite;
-  colorSpecular = Color::colorWhite;
-  normalColor = Color::colorGreen;
-  wireFrameColor = Color::colorBlue;
-  shininess = 50.0;
-  debugDraw = false;
-  castShadow = true;
-  canGetShadow = true;
+    renderType = 0;
+    highLightColor.rgba[0] = 1.0f;
+    highLightColor.rgba[1] = 0.0f;
+    highLightColor.rgba[2] = 0.0f;
+    pointSize = 1;
+    lineSize = 1;
+    shadowColor.rgba[0] = 0.0f;
+    shadowColor.rgba[1] = 0.0f;
+    shadowColor.rgba[2] = 0.0f;
+    shadowColor.rgba[3] = 0.5f;
+    colorDiffuse = Color::colorWhite;
+    colorAmbient = Color::colorWhite;
+    colorSpecular = Color::colorWhite;
+    normalColor = Color::colorGreen;
+    wireFrameColor = Color::colorBlue;
+    shininess = 50.0;
+    debugDraw = false;
+    castShadow = true;
+    canGetShadow = true;
+    textureFilename = "";
 }
 
 void RenderDetail::setNormalLength(const float len)
@@ -187,4 +186,20 @@ const std::vector< std::shared_ptr<UnifiedId> >& RenderDetail::getVAOs() const
 const std::vector< bool >& RenderDetail::getVAOEnable() const
 {
     return this->VAOEnable;
+}
+void RenderDetail::setTextureFilename(const std::string& filename)
+{
+    this->textureFilename = filename;
+}
+const std::string &RenderDetail::getTextureFilename() const
+{
+    return this->textureFilename;
+}
+bool RenderDetail::renderTexture() const
+{
+    return !this->textureFilename.empty() && this->renderType & SIMMEDTK_RENDER_TEXTURE;
+}
+bool RenderDetail::renderNormals() const
+{
+    return  this->renderType & SIMMEDTK_RENDER_NORMALS;
 }

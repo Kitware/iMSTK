@@ -60,7 +60,6 @@ enum
     MaxShaderVariableName = 255
 };
 
-
 /// \brief class types. Each class should have type of itself
 enum class ClassType
 {
@@ -143,7 +142,7 @@ enum class ClassDrawOrder
 //        on Windows.
 #if !defined(WIN32)
 #  define SIMMEDTK_IS_DYNAMIC
-#else
+// #else
 #  undef SIMMEDTK_IS_DYNAMIC
 #endif
 

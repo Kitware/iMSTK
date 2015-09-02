@@ -29,6 +29,6 @@
 #include "Core/ErrorLog.h"
 #include "Core/CoreClass.h"
 #include "Core/SDK.h"
-#include "Rendering/Viewer.h"
+#include "Rendering/OpenGLViewer.h"
 
 #endif

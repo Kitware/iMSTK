@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool vtk)
 if(BUILD_TESTING)
   list(APPEND SimMedTK_DEPENDENCIES Bandit)
 endif()
@@ -137,6 +137,11 @@ list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
   -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
 )
 
+# VTK gets installed inside SimMedTK's build dir:
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
+  -DVTK_DIR:PATH=${SimMedTK_BINARY_DIR}/SimMedTK-build/lib/cmake/vtk-6.3
+)
+
 #-----------------------------------------------------------------------------
 # Set CMake OSX variable to pass down the external project
 #
@@ -171,6 +176,7 @@ ExternalProject_Add(${proj}
   CMAKE_ARGS
     ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
     ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
+    ${SimMedTK_SUPERBUILD_CMAKE_OPTIONS}
     -DSimMedTK_SUPERBUILD:BOOL=OFF
 #     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
 #     -DSimMedTK_INSTALL_BIN_DIR:STRING=${SimMedTK_INSTALL_BIN_DIR}
@@ -205,7 +211,11 @@ ExternalProject_Add(${proj}
     ${SimMedTK_DEPENDENCIES}
   )
 
-set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+if(CMAKE_GENERATOR MATCHES "Unix Makefiles")
+    set(simmedtk_build_cmd "$(MAKE)")
+else()
+    set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+endif()
 #-----------------------------------------------------------------------------
 # SimMedTK
 #

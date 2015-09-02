@@ -24,77 +24,123 @@
 #ifndef SMVEGAMESH_H
 #define SMVEGAMESH_H
 
+// STD includes
+#include <fstream>
+
+// SimMedTK includes
+#include "Core/BaseMesh.h"
+
 // STL includes
 #include <iostream>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
-// SimMedTK includes
-#include "Mesh/SurfaceMesh.h"
-
-// VEGA includes
-#include "volumetricMesh.h"
-#include "generateMeshGraph.h"
-#include "cubicMesh.h"
-#include "tetMesh.h"
-#include "graph.h"
+class Graph;
+class SurfaceMesh;
+class VolumetricMesh;
 
 //
 // Interface to VegaFEM's volumetric mesh class
 //
-class VegaVolumetricMesh
+class VegaVolumetricMesh : public Core::BaseMesh
 {
 public:
     ///
-    /// @brief Constructor
+    /// \brief Constructor
     ///
     VegaVolumetricMesh(bool generateMeshGraph = true);
 
     ///
-    /// @brief Destructor
+    /// \brief Destructor
     ///
     ~VegaVolumetricMesh();
 
     ///
-    /// @brief Loads vega volume mesh and stores it locally
-    ///
-    void loadMesh(const std::string &fileName, const int &verbose);
-
-    ///
-    /// @brief Returns graph
+    /// \brief Returns graph
     /// Note that this does not check if the graph is valid
     ///
     std::shared_ptr<Graph> getMeshGraph();
 
     ///
-    /// @brief Returns the total number of vertices in the mesh
+    /// \brief Returns the total number of vertices in the mesh
     ///
     size_t getNumberOfVertices() const;
 
     ///
-    /// @brief Returns the total number of elements in the mesh
+    /// \brief Returns the total number of elements in the mesh
     ///
     size_t getNumberOfElements() const;
 
     ///
-    /// @brief Attach surface mesh to the volume mesh and stores interpolation weights
+    /// \brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
 
     ///
-    /// @brief Returns weigths associated with attached ith surface mesh
-    ///
-    const std::vector<double> &getAttachedWeights(const size_t &i) const;
-
-    ///
-    /// @brief Return vertices for interpolation weights for ith surface mesh
-    ///
-    const std::vector<int> &getAttachedVertices(const size_t &i) const;
-
-    ///
-    /// @brief Return mesh
+    /// \brief Return mesh
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
+
+    ///
+    /// \brief Sets the vega mesh
+    ///
+    void setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
+
+    ///
+    /// \brief Update nodes to local arrays
+    ///
+    void updateAttachedMeshes(double *q);
+
+    ///
+    /// \brief Return the vertex map
+    ///
+    const std::unordered_map<size_t,size_t> &getVertexMap() const;
+
+    ///
+    /// \brief Sets the vertex map
+    ///
+    void setVertexMap(const std::unordered_map<size_t,size_t> &map);
+
+    ///
+    /// \brief Set/Get fixed degree of freedom array.
+    ///
+    void setFixedVertices(const std::vector<size_t> &dofs);
+    const std::vector<size_t> &getFixedVertices() const;
+
+    ///
+    /// \brief Get fattached surface meshes
+    ///
+    std::shared_ptr<SurfaceMesh> getAttachedMesh(const size_t i);
+
+    ///
+    /// Set render detail for surface meshes.
+    ///
+    void setRenderDetail(int i, std::shared_ptr<RenderDetail> newRenderDetail);
+
+    ///
+    /// \brief Get attached rendering mesh
+    ///
+    std::shared_ptr<SurfaceMesh> getRenderingMesh();
+
+    ///
+    /// \brief Get attached surface mesh
+    ///
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName);
+
+    ///
+    /// \brief Get attached collision mesh
+    ///
+    std::shared_ptr<SurfaceMesh> getCollisionMesh();
+
+    ///
+    /// \brief Returns weigths associated with attached ith surface mesh
+    ///
+    const std::vector<double> &getAttachedWeights(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
+
+    ///
+    /// \brief Return vertices for interpolation weights for ith surface mesh
+    ///
+    const std::vector<int> &getAttachedVertices(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
 
 private:
     // Vega mesh base object
@@ -115,6 +161,13 @@ private:
     // Store map of  weigths
     std::map<std::shared_ptr<SurfaceMesh>,std::vector<double>> attachedWeights;
 
+    // Store map of conforming surface vertex indices
+    std::unordered_map<size_t,size_t> vertexMap;
+
+    // Fixed DOFs
+    std::vector<size_t> fixedVertices;
+
 };
+
 
 #endif // SMVEGAMESH_H

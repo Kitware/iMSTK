@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.1)
 
+if (POLICY CMP0058)
+  cmake_policy(SET CMP0058 NEW)
+endif()
 project(SimMedTK)
 
 #-----------------------------------------------------------------------------
 # Library mode: SHARED (default) or STATIC
 #
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-set(SimMedTK_BUILD_SHARED_LIBS BUILD_SHARED_LIBS)
+set(SimMedTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 mark_as_advanced(BUILD_SHARED_LIBS)
 
 #-----------------------------------------------------------------------------
@@ -170,6 +173,8 @@ find_package(Eigen3 REQUIRED)
 find_package(VegaFEM REQUIRED CONFIG)
 find_package(ThreadPool REQUIRED)
 
+find_package(VTK REQUIRED)
+
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
@@ -232,11 +237,12 @@ set(SimMedTK_exports
   Event
   External
   Geometry
+  IO
   Mesh
   RenderDelegates
   Rendering
   Simulators
-  VirtualTools
+#   VirtualTools
   )
 
 if(SimMedTK_USE_OCULUS)
@@ -250,11 +256,13 @@ add_subdirectory(Devices)
 add_subdirectory(Event)
 add_subdirectory(External)
 add_subdirectory(Geometry)
+add_subdirectory(IO)
 add_subdirectory(Mesh)
 add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)
+add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)
-add_subdirectory(VirtualTools)
+# add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
 
 ################################################################################
@@ -285,3 +293,7 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
   @ONLY
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

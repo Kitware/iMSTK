@@ -26,11 +26,13 @@
 
 // SimMedTK includes
 #include "Core/Config.h"
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 #include "Core/SceneObject.h"
 #include "CoreClass.h"
-#include "Core/ModelRepresentation.h"
+#include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
+
+class ErrorLog;
 
 namespace core {
     class Event;
@@ -69,13 +71,13 @@ public:
 
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
 
-    void setModel(std::shared_ptr<ModelRepresentation> model);
+    void setModel(std::shared_ptr<Model> model);
 
-    std::shared_ptr<ModelRepresentation> getModel();
+    std::shared_ptr<Model> getModel();
 
 public:
     /// \brief static scene object contains a mesh
-    std::shared_ptr<ModelRepresentation> staticModel;
+    std::shared_ptr<Model> staticModel;
 };
 
 #endif

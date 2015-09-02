@@ -79,7 +79,7 @@ public:
     void setLength ( const double length );
 
     /// \brief check if a triangle is intersecting the octree cell
-    bool isCollidedWithTri ( core::Vec3d &v0, core::Vec3d &v1, core::Vec3d &v2 );
+    bool isCollidedWithTri ( const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2 ) const;
 
     /// \brief check if a point lies inside an octree cell
     bool isCollidedWithPoint ();
@@ -88,28 +88,28 @@ public:
     void subDivide ( const int divisionPerAxis,
                      std::array<OctreeCell,numberOfSubdivisions> &cells );
 
-    const AABB &getAabb() const
+    const Eigen::AlignedBox3d &getAabb() const
     {
         return aabb;
     }
 
-    void setAabb(const AABB &newAabb)
+    void setAabb(const Eigen::AlignedBox3d &newAabb)
     {
         this->aabb = newAabb;
     }
 
-    void getIntersections(const AABB &aabb, std::vector<size_t> &triangles)
+    void getIntersections(const Eigen::AlignedBox3d &aabb, std::vector<size_t> &triangles)
     {
         for(auto &i : data)
         {
-            if(i.first.overlaps(aabb))
+            if(!i.first.intersection(aabb).isEmpty())
             {
                 triangles.emplace_back(i.second);
             }
         }
     }
 
-    inline void addTriangleData(const AABB &aabb, size_t index)
+    inline void addTriangleData(const Eigen::AlignedBox3d &aabb, size_t index)
     {
         return data.emplace_back(aabb,index);
     }
@@ -142,19 +142,19 @@ public:
 
     void draw() const
     {
-        this->aabb.draw();
-        for(auto &child : childNodes)
-        {
-            if(child)
-            {
-                child->draw();
-            }
-        }
+//         this->aabb.draw();
+//         for(auto &child : childNodes)
+//         {
+//             if(child)
+//             {
+//                 child->draw();
+//             }
+//         }
     }
 
     void update()
     {
-        this->aabb.reset();
+        this->aabb.setEmpty();
         for(auto &box : data)
         {
             this->aabb.extend(box.first);
@@ -163,11 +163,11 @@ public:
 
 private:
     Cube cube; ///< cube
-    AABB aabb;
+    Eigen::AlignedBox3d aabb;
 
     std::array<std::shared_ptr<OctreeCell>,numberOfSubdivisions> childNodes;
     std::shared_ptr<OctreeCell> parentNode;
-    std::vector<std::pair<AABB,size_t>> data;
+    std::vector<std::pair<Eigen::AlignedBox3d,size_t>> data;
 
 };
 

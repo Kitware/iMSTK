@@ -31,8 +31,8 @@
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "Mesh/Mesh.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/BaseMesh.h"
+#include "Core/ConfigRendering.h"
 #include "Rendering/GLUtils.h"
 #include "Core/Utils.h"
 #include "Core/Vector.h"
@@ -60,14 +60,12 @@ private:
     std::unordered_map<size_t, size_t> numberofVertices;
     /// \brief number of triangles
     std::unordered_map<size_t, size_t> numberofTriangles;
-    /// \brief  error log
-    ErrorLog *log;
     /// \brief  rendering error
     bool renderingError;
 
 public:
     /// \brief  constructor. gets error log or nullptr
-    VBO(ErrorLog *p_log);
+    VBO();
 
     /// \brief  init with given VBO type
     void init(VBOType p_vboType);

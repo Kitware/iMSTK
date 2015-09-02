@@ -31,7 +31,7 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Vector.h"
-#include "Rendering/ConfigRendering.h"
+#include "Core/ConfigRendering.h"
 
 #define SMLIGHT_SPOTMAX 128
 

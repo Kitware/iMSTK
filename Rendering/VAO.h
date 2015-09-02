@@ -29,14 +29,14 @@
 #include <unordered_map>
 
 // SimMedTK includes
+#include "Core/BaseMesh.h"
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "ConfigRendering.h"
-#include "Mesh/Mesh.h"
-#include "Rendering/GLUtils.h"
 #include "Core/Utils.h"
-#include "Rendering/VBO.h"
+#include "Core/ConfigRendering.h"
+#include "Rendering/GLUtils.h"
 #include "Rendering/Shader.h"
+#include "Rendering/VBO.h"
 
 enum VBOBufferType
 {
@@ -83,7 +83,7 @@ public:
     void setTriangleInfo(std::string p_ShaderAttribName, int p_nbrTriangles, void *p_ptr);
 
     /// \brief fills the buffer by directly using mesh. It uses default attrib location for shader
-    bool setBufferDataFromMesh(Mesh *p_mesh,
+    bool setBufferDataFromMesh(SurfaceMesh *p_mesh,
                                  std::shared_ptr<Shader> p_shader,
                                  std::string p_POSITIONShaderName = "Position",
                                  std::string p_NORMALShaderName = "Normal",
@@ -121,7 +121,7 @@ public:
     VBOType vboType;
     ///All VBOs are stored here
     static std::unordered_map<int, std::shared_ptr<VAO>> VAOs;
-    Mesh *mesh;
+    SurfaceMesh *mesh;
 
 private:
     std::shared_ptr<ErrorLog>  log;

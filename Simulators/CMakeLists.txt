@@ -1,21 +1,19 @@
 
 simmedtk_add_library(Simulators
   SOURCES
-    DummySimulator.cpp
-    MyStylus.cpp
-    StylusObject.cpp
-    ToolSimulator.cpp
+    DefaultSimulator.cpp
+#     MyStylus.cpp
+#     StylusObject.cpp
+#     ToolSimulator.cpp
     VegaObjectConfig.cpp
     VegaFemSceneObject.cpp
     VegaFemSimulator.cpp
 	SceneObjectDeformable.cpp
   PUBLIC_HEADERS
-    DummySimulator.h
-    MyStylus.h
-    PBDObjectSimulator.h
-    PBDSceneObject.h
-    StylusObject.h
-    ToolSimulator.h
+    DefaultSimulator.h
+#     MyStylus.h
+#     StylusObject.h
+#     ToolSimulator.h
     VegaObjectConfig.h
     VegaFemSceneObject.h
     VegaFemSimulator.h
@@ -28,6 +26,7 @@ target_link_libraries(Simulators
     Mesh
     Event
     Collision
+    IO
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts
