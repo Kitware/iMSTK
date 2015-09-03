@@ -62,8 +62,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor()
         return delegate->getActor();
     }
 
-    auto meshModel = std::dynamic_pointer_cast<MeshModel>(
-        geom->getModel());
+    auto meshModel = std::dynamic_pointer_cast<MeshModel>(geom->getModel());
 
     if(meshModel)
     {

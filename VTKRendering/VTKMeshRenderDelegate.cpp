@@ -48,8 +48,8 @@
 #include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
-#include <vtkProperty.h>
-
+#include <vtkShader.h>
+#include <vtkOpenGLPolyDataMapper.h>
 
 class MeshRenderDelegate : public VTKRenderDelegate
 {
@@ -94,6 +94,7 @@ void MeshRenderDelegate::initDraw()
     auto mesh = std::static_pointer_cast<SurfaceMesh>(geom->shared_from_this());
 
     mappedData->SetVertexArray(mesh->getVertices());
+
     vtkNew<vtkCellArray> triangles;
     auto surfaceTriangles = mesh->getTriangles();
     for(const auto &t : surfaceTriangles)
@@ -186,8 +187,32 @@ void MeshRenderDelegate::initDraw()
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
 
-        mapper = vtkPolyDataMapper::New();
+        mapper = vtkOpenGLPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
+
+        if(renderDetail->hasShaders())
+        {
+            auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
+            auto shadersPrograms = renderDetail->getShaderPrograms();
+            for(const auto &program : shadersPrograms)
+            {
+//                 glMapper->SetFragmentShaderCode(program);
+            }
+
+            auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
+            for(auto &shader : shadersProgramReplacements)
+            {
+                for(auto &program : shader.second)
+                {
+//                     glMapper->AddShaderReplacement(shader.first,
+//                                                  program[0],
+//                                                  true,
+//                                                  program[1],
+//                                                  false
+//                                                 );
+                }
+            }
+        }
     }
     else
     {

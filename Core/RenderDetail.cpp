@@ -207,7 +207,7 @@ const std::string &RenderDetail::getTextureFilename() const
 }
 bool RenderDetail::renderTexture() const
 {
-    return !this->textureFilename.empty() && this->renderType & SIMMEDTK_RENDER_TEXTURE;
+    return !this->textureFilename.empty() && (this->renderType & SIMMEDTK_RENDER_TEXTURE);
 }
 bool RenderDetail::renderNormals() const
 {

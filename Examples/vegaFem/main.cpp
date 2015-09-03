@@ -166,6 +166,7 @@ int main(int ac, char** av)
     sdkSimulator->registerObjectSimulator(femSimulator);
     //sdkSimulator->registerObjectSimulator(staticSimulator);
 
+
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
@@ -179,6 +180,7 @@ int main(int ac, char** av)
     femObject->setModel(meshModel);
 
     auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+
     planeMeshCollisionPairs->setModels(meshModel, plane);
 
     sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
@@ -191,7 +193,9 @@ int main(int ac, char** av)
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
     auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+
     planeToMeshContact->setSceneObjects(staticObject, femObject);
 
     sdkSimulator->registerContactHandling(planeToMeshContact);

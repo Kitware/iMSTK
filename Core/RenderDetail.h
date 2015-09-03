@@ -24,6 +24,7 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <map>
 
 class VisualArtifact;
 class CoreClass;
@@ -168,6 +169,32 @@ public:
     const float &getOpacity() const;
     void setOpacity(const float &value);
 
+    ///
+    /// @brief Add a shader program to the the list of programs (vtk)
+    /// @param program String containing the actual program
+    ///
+    void addShaderProgram(const std::string &program)
+    {
+        this->shaderPrograms.push_back(program);
+    }
+
+    std::vector<std::string> &getShaderPrograms()
+    {
+        return this->shaderPrograms;
+    }
+
+    ///
+    /// @brief Add a shader program for partial replacement of vtk default shaders.
+    /// @param type 0 = vertex, 1 = Fragment, 2 = Geometry
+    /// @param program String containing the actual program
+    ///
+    void addShaderProgramReplacement(int type, const std::string &from,
+                                     const std::string &to)
+    {
+        std::array<std::string,2> replacement = {from,to};
+        this->shaderProgramReplacements[type].push_back(replacement);
+    }
+
     const Color &getBackground() const
     {
         return this->background;
@@ -187,6 +214,19 @@ public:
     {
         this->background = value;
     }
+
+    std::map<int,std::vector<std::array<std::string,2>>>
+    &getShaderProgramReplacements()
+    {
+        return this->shaderProgramReplacements;
+    }
+
+    bool hasShaders()
+    {
+        return !this->shaderPrograms.empty() ||
+               !this->shaderProgramReplacements.empty();
+    }
+
 public:
     unsigned int renderType; // render type
     Color colorDiffuse; // diffuse color
@@ -215,6 +255,8 @@ public:
     std::vector<bool> shaderEnable; // enable/disable any attached shader
     std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
     std::vector<bool> VAOEnable; // enable/disable any attached VAO
+    std::vector<std::string> shaderPrograms;
+    std::map<int,std::vector<std::array<std::string,2>>> shaderProgramReplacements;
 };
 
 #endif // SMRENDERDETAIL_H
