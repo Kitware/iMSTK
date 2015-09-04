@@ -2,8 +2,8 @@
 # Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
 ###########################################################################
 
-set(vtk_TAG d45f8a1fa284428be74095a4e808f98d6b37eb84)
-set(vtk_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
+set(VTK_TAG d45f8a1fa284428be74095a4e808f98d6b37eb84)
+set(VTK_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -13,17 +13,16 @@ endif()
 set(${CMAKE_CURRENT_LIST_FILENAME}_FILE_INCLUDED 1)
 
 # Sanity checks
-if(DEFINED vtk_DIR AND NOT EXISTS ${vtk_DIR})
-  message(FATAL_ERROR "vtk_DIR variable is defined but corresponds to non-existing directory")
+if(DEFINED VTK_DIR AND NOT EXISTS ${VTK_DIR})
+  message(FATAL_ERROR "VTK_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(vtk_DEPENDENCIES "")
+set(VTK_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(vtk)
+SimMedTKCheckDependencies(VTK)
 
-set(proj vtk)
-
+set(proj VTK)
 if(NOT DEFINED ${proj}_DIR)
 
   # Set CMake OSX variable to pass down the external project

@@ -44,12 +44,7 @@ int main()
 
     std::shared_ptr<SDK> sdk;
     std::shared_ptr<Scene> scene1;
-    std::shared_ptr<Light> light;
-    std::shared_ptr<Camera> sceneCamera;
-    std::shared_ptr<StaticSceneObject> cube;
-    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
-    std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
+
     //Create an instance of the SimMedTK framework/SDK
     sdk = SDK::getInstance();
 
@@ -76,16 +71,12 @@ int main()
 
     if(!useVTKRenderer)
     {
-        //Create the camera controller
-        camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-        keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
-        pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
         TextureManager::addTexture("textures/cube.jpg", "cubetex");
         std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
     }
 
 
-    cube = std::make_shared<StaticSceneObject>();
+    auto cube = std::make_shared<StaticSceneObject>();
 
     // If you want to use the GL renderer you need to specify the appropiate render delegates
     // This can be automated in the future, for now VTK is the default renderer and the delegates
@@ -120,18 +111,23 @@ int main()
     // Setup Scene lighting
     if(!useVTKRenderer)
     {
-        light = Light::getDefaultLighting();
+        auto light = Light::getDefaultLighting();
         assert(light);
         scene1->addLight(light);
 
         // Camera setup
-        sceneCamera = Camera::getDefaultCamera();
+        auto sceneCamera = Camera::getDefaultCamera();
         assert(sceneCamera);
         sceneCamera->setPos(3, 3, 5);
         sceneCamera->setFocus(0, 0, -1);
         sceneCamera->genProjMat();
         sceneCamera->genViewMat();
         scene1->addCamera(sceneCamera);
+
+        //Create the camera controller
+        auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+        auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+        auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
         camCtl->setCamera(sceneCamera);
         pzrCamCtl->setCamera(sceneCamera);
 
