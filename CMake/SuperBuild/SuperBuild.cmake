@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen ThreadPool VTK)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool VTK)
 if(BUILD_TESTING)
   list(APPEND SimMedTK_DEPENDENCIES Bandit)
 endif()
@@ -164,6 +164,17 @@ if(APPLE)
     -DCMAKE_OSX_SYSROOT=${CMAKE_OSX_SYSROOT}
     -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET})
 endif()
+
+#-----------------------------------------------------------------------------
+# Set CMake Windows variable to pass down the external project
+#
+set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
+if(WIN32)
+  if( DEFINED SimMedTK_WINDOWS_DEPENDENCIES_DIR)
+    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+      -DSimMedTK_WINDOWS_DEPENDENCIES_DIR:PATH=${SimMedTK_WINDOWS_DEPENDENCIES_DIR})
+  endif()
+endif(WIN32)
 
 #-----------------------------------------------------------------------------
 # SimMedTK Configure
