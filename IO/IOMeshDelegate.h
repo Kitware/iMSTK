@@ -76,7 +76,8 @@ public:
         hasBDConditions = 1 << 4,
         hasDensity      = 1 << 4,
         hasPoisson      = 1 << 5,
-        hasYoung        = 1 << 6
+        hasYoung        = 1 << 6,
+        hasTcoords        = 1 << 7
 
     };
 

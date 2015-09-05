@@ -40,6 +40,8 @@
 #include <vtkOBJReader.h>
 #include <vtkPLYReader.h>
 #include <vtkSTLReader.h>
+#include <vtkPointData.h>
+#include <vtkFloatArray.h>
 
 ///
 /// \brief This delegate implements the VTK based readers/writers. It creates
@@ -59,6 +61,7 @@ public:
         std::vector<std::array<size_t,3>> triangleArray;
         std::vector<std::array<size_t,4>> tetraArray;
         std::vector<std::array<size_t,8>> hexaArray;
+        std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> tcoordsArray;
         std::vector<size_t> bdConditions;
         core::Vec3d materials;
 
@@ -79,6 +82,8 @@ public:
                 this->copyPoints(reader->GetOutput()->GetPoints(),vertices);
                 this->copyCells(reader->GetOutput()->GetPolys(),triangleArray,tetraArray,hexaArray);
                 this->copyData(reader->GetOutput()->GetFieldData(),bdConditions,materials);
+                this->copyTextureCoordinates(reader->GetOutput()->GetPointData(),tcoordsArray);
+
                 this->meshProps |= MeshType::Tri;
                 break;
             }
@@ -179,8 +184,11 @@ public:
             // If the vtk dataset also contains surface triangles, then
             // store them in a SurfaceMesh and attach to the volumetric mesh.
             // Otherwise use vega to compute the surface triangles.
+            auto meshToAttach = std::make_shared<SurfaceMesh>();
             if(this->meshProps & MeshType::Tri)
             {
+                auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(
+                    this->meshIO->getMesh());
                 std::vector<core::Vec3d> surfaceVertices;
                 std::unordered_map<size_t,size_t> uniqueVertexArray;
                 this->reorderSurfaceTopology(
@@ -189,12 +197,9 @@ public:
                     triangleArray,
                     uniqueVertexArray);
 
-                auto meshToAttach = std::make_shared<SurfaceMesh>();
                 meshToAttach->setVertices(surfaceVertices);
                 meshToAttach->setTriangles(triangleArray);
 
-                auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(
-                    this->meshIO->getMesh());
                 vegaMesh->setVertexMap(uniqueVertexArray);
                 vegaMesh->attachSurfaceMesh(meshToAttach);
             }
@@ -222,16 +227,28 @@ public:
                     triangleArray,
                     uniqueVertexArray);
 
-                auto meshToAttach = std::make_shared<SurfaceMesh>();
                 meshToAttach->setVertices(surfaceVertices);
                 meshToAttach->setTriangles(triangleArray);
                 vegaMesh->setVertexMap(uniqueVertexArray);
                 vegaMesh->attachSurfaceMesh(meshToAttach);
             }
+            if(this->meshProps & MeshType::hasTcoords)
+            {
+                auto &tcoords = meshToAttach->getTextureCoordinates();
+                tcoords = tcoordsArray;
+            }
+
         }
         else if((this->meshProps & MeshType::Tri) && !(this->meshProps & MeshType::Tetra))
         {
             this->setSurfaceMesh(vertices,triangleArray);
+            if(this->meshProps & MeshType::hasTcoords)
+            {
+                auto &tcoords =
+                    std::static_pointer_cast<SurfaceMesh>(this->meshIO->getMesh())->getTextureCoordinates();
+                tcoords = tcoordsArray;
+            }
+
         }
     }
 
@@ -370,6 +387,30 @@ public:
         {
             material(2) = fields->GetArray("young_modulus")->GetComponent(0,0);
             this->meshProps |= MeshType::hasYoung;
+        }
+    }
+
+    ///
+    /// \brief Copy texture coodinates
+    /// \param tcoord Texture coordinates
+    ///
+    void copyTextureCoordinates(vtkPointData* pointData,
+         std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &tcoordsArray)
+    {
+        if(pointData)
+        {
+            auto tcoords = vtkFloatArray::SafeDownCast(pointData->GetTCoords());
+            if(!tcoords)
+            {
+                return;
+            }
+            this->meshProps |= MeshType::hasTcoords;
+            for(vtkIdType i = 0, end = tcoords->GetNumberOfTuples(); i < end; ++i)
+            {
+                float uv[2];
+                tcoords->GetTupleValue(i,uv);
+                tcoordsArray.emplace_back(uv[0],uv[1]);
+            }
         }
     }
 
