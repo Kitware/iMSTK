@@ -2,7 +2,7 @@
 # Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
 ###########################################################################
 
-set(VTK_TAG d45f8a1fa284428be74095a4e808f98d6b37eb84)
+set(VTK_TAG v6.2.0)
 set(VTK_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
 
 # Make sure this file is included only once

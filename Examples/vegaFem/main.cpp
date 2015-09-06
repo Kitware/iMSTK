@@ -185,11 +185,10 @@ int main()
     //-------------------------------------------------------
     // Run the SDK
     //-------------------------------------------------------
-    viewer->exec();
-//     sdk->run();
+    sdk->run();
 
     //cleanup
-//     sdk->releaseScene(scene);
+    sdk->releaseScene(scene);
 
     return 0;
 }
