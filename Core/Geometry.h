@@ -75,6 +75,8 @@ class Plane : public AnalyticalGeometry
 public:
     Plane()
       {
+      this->width = 100.0;
+
       this->setRenderDelegate(
         Factory<RenderDelegate>::createSubclassForGroup(
             "RenderDelegate", RenderDelegate::RendererType::VTK));
@@ -85,7 +87,7 @@ public:
     Plane(const core::Vec3d &p, const core::Vec3d &n)
     {
         this->point = p;
-        this->unitNormal = n;
+        this->unitNormal = n.normalized();
         this->width = 100.0;
 
         this->drawPointsOrig[0] = core::Vec3d(width, 0, 0);
@@ -162,6 +164,11 @@ public:
         this->drawPointsOrig[3] = p4;
 
         this->movedOrRotated = true;
+    }
+
+    double getWidth() const
+    {
+        return this->width;
     }
 
     void setWidth(double w)
