@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool vtk)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool VTK)
 if(BUILD_TESTING)
   list(APPEND SimMedTK_DEPENDENCIES Bandit)
 endif()

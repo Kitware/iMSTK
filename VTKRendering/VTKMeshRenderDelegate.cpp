@@ -92,7 +92,6 @@ void MeshRenderDelegate::initDraw()
     auto mesh = std::static_pointer_cast<SurfaceMesh>(geom->shared_from_this());
 
     mappedData->SetVertexArray(mesh->getVertices());
-
     vtkNew<vtkCellArray> triangles;
     auto surfaceTriangles = mesh->getTriangles();
     for(const auto &t : surfaceTriangles)
