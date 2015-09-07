@@ -177,7 +177,8 @@ vtkActor *MeshRenderDelegate::getActor()
 
 void MeshRenderDelegate::modified()
 {
-    dataSet->Modified();
+    if (this->dataSet)
+        dataSet->Modified();
 }
 
 RegisterFactoryClass(RenderDelegate,
