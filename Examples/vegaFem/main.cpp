@@ -50,7 +50,7 @@
 #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 
-int main()
+int main(int argc, char* argv[])
 {
     initRenderDelegates();
     initVTKRendering();
@@ -72,7 +72,9 @@ int main()
     auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),"asianDragon/asianDragon.config");
+    auto femObject = std::make_shared<VegaFemSceneObject>(
+        sdk->getErrorLog(),
+        argc > 1 ? argv[1] : "asianDragon/asianDragon.config");
 
     Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
     auto femObjRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);
@@ -95,8 +97,11 @@ int main()
     // create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();
 
-    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, -3.0, 0.0),
-                                                       core::Vec3d(0.0, 1.0, 0.0));
+    auto plane = std::make_shared<PlaneCollisionModel>(
+      core::Vec3d(0.0, -3.0, 0.0),
+      core::Vec3d(0.0, 1.0, 0.0));
+    if (argc > 2)
+      plane->getPlaneModel()->setWidth(atof(argv[2]));
     staticObject->setModel(plane);
 
     sdk->addSceneActor(staticObject, staticSimulator);
