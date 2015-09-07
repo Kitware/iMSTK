@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
 //
 // Authors:
 //
 // Contact:
-//---------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------
 
 #include "IO/IOMesh.h"
 
@@ -38,55 +38,80 @@ class IOMesh::DelegatorType
 
 public:
     DelegatorType(IOMesh *ioMesh) : io(ioMesh){}
-    void addDefaultDelegator(const MeshFileType &type, const std::string &delegateName)
-    {
-        auto f = [=]()
-        {
-            auto delegate = Factory<IOMeshDelegate>::createDefault(delegateName);
-            if(delegate)
-            {
-                delegate->setSource(io);
-            }
-            return delegate;
-        };
-        this->delegatorList.emplace(type,f);
-    }
-    void addGroupDelegator(const MeshFileType &type, const std::string &delegateName, const int &group)
-    {
-        auto f = [=]()
-        {
-            auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup(delegateName,group);
-            if(delegate)
-            {
-                delegate->setSource(io);
-            }
-            return delegate;
-        };
-        this->delegatorList.emplace(type,f);
-    }
-    void addDelegator(const MeshFileType &type, const std::string &delegateName)
-    {
-        auto f = [=]()
-        {
-            auto delegate = Factory<IOMeshDelegate>::createConcreteClass(delegateName);
-            if(delegate)
-            {
-                delegate->setSource(io);
-            }
-            return delegate;
-        };
-        this->delegatorList.emplace(type,f);
-    }
-    std::shared_ptr<IOMeshDelegate> get(const MeshFileType &type)
-    {
-        return this->delegatorList.at(type)();
-    }
+    void addDefaultDelegator(const MeshFileType &type, const std::string &delegateName);
+    void addGroupDelegator(const MeshFileType &type, const std::string &delegateName,
+                           const int &group);
+    void addDelegator(const MeshFileType &type, const std::string &delegateName);
+    std::shared_ptr<IOMeshDelegate> get(const MeshFileType &type);
 
 public:
     std::map<MeshFileType,DelegatorFunction> delegatorList;
     IOMesh *io;
 };
 
+//----------------------------------------------------------------------------------------
+void IOMesh::DelegatorType::addDefaultDelegator(const IOMesh::MeshFileType& type,
+                                                const std::string& delegateName)
+{
+    auto f = [ = ]()
+    {
+        auto delegate = Factory<IOMeshDelegate>::createDefault(delegateName);
+
+        if(delegate)
+        {
+            delegate->setSource(io);
+        }
+
+        return delegate;
+    };
+    this->delegatorList.emplace(type, f);
+}
+
+//----------------------------------------------------------------------------------------
+void IOMesh::DelegatorType::addGroupDelegator(const MeshFileType& type,
+                                              const std::string& delegateName,
+                                              const int& group)
+{
+    auto f = [ = ]()
+    {
+        auto delegate = Factory<IOMeshDelegate>::createSubclassForGroup(delegateName,
+                                                                        group);
+
+        if(delegate)
+        {
+            delegate->setSource(io);
+        }
+
+        return delegate;
+    };
+    this->delegatorList.emplace(type, f);
+}
+
+//----------------------------------------------------------------------------------------
+void IOMesh::DelegatorType::addDelegator(const MeshFileType& type,
+                                         const std::string& delegateName)
+{
+    auto f = [ = ]()
+    {
+        auto delegate = Factory<IOMeshDelegate>::createConcreteClass(delegateName);
+
+        if(delegate)
+        {
+            delegate->setSource(io);
+        }
+
+        return delegate;
+    };
+    this->delegatorList.emplace(type, f);
+}
+
+//----------------------------------------------------------------------------------------
+std::shared_ptr< IOMeshDelegate > IOMesh::DelegatorType::get(const MeshFileType& type)
+{
+    return this->delegatorList.at(type)();
+}
+
+//----------------------------------------------------------------------------------------
 IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     fileName(""),
     fileType(MeshFileType::Unknown),
@@ -102,19 +127,25 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     // Set the vega io, only vega can read/write those files
     this->delegator->addDelegator(MeshFileType::VEG,"IOMeshVegaDelegate");
     //
-    // The readers for obj,stl and ply are based on a priority group (defaults to vtk io's)
+    // The readers for obj,stl and ply are based on a priority group
+    // (defaults to vtk io's)
     this->delegator->addGroupDelegator(MeshFileType::OBJ,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::STL,"IOMeshDelegate",priorityGroup);
     this->delegator->addGroupDelegator(MeshFileType::PLY,"IOMeshDelegate",priorityGroup);
     //
     // Default reader for 3ds filetypes is assimp
-    this->delegator->addGroupDelegator(MeshFileType::ThreeDS,"IOMeshDelegate",ReaderGroup::Assimp);
+    this->delegator->addGroupDelegator(MeshFileType::ThreeDS,"IOMeshDelegate",
+                                       ReaderGroup::Assimp);
     //
     // Default reader for unknown filetypes
-    this->delegator->addGroupDelegator(MeshFileType::Unknown,"IOMeshDelegate",priorityGroup);
+    this->delegator->addGroupDelegator(MeshFileType::Unknown,"IOMeshDelegate",
+                                       priorityGroup);
 }
 
+//----------------------------------------------------------------------------------------
 IOMesh::~IOMesh() {}
+
+//----------------------------------------------------------------------------------------
 void IOMesh::read(const std::string& filePath)
 {
     // clear the mesh pointer
@@ -135,6 +166,8 @@ void IOMesh::read(const std::string& filePath)
 void IOMesh::write(const std::string& /*filePath*/)
 {
 }
+
+//----------------------------------------------------------------------------------------
 IOMesh::MeshFileType IOMesh::getFileExtension() const
 {
     auto extensionType = MeshFileType::Unknown;
@@ -188,22 +221,32 @@ IOMesh::MeshFileType IOMesh::getFileExtension() const
     }
     return extensionType;
 }
+
+//----------------------------------------------------------------------------------------
 std::shared_ptr<Core::BaseMesh> IOMesh::getMesh()
 {
     return this->mesh;
 }
+
+//----------------------------------------------------------------------------------------
 void IOMesh::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
 {
     this->mesh = newMesh;
 }
+
+//----------------------------------------------------------------------------------------
 const std::string& IOMesh::getFileName() const
 {
     return this->fileName;
 }
+
+//----------------------------------------------------------------------------------------
 void IOMesh::setFilename(const std::string& filePath)
 {
     this->fileName = filePath;
 }
+
+//----------------------------------------------------------------------------------------
 const IOMesh::MeshFileType &IOMesh::getFileType() const
 {
     return fileType;
