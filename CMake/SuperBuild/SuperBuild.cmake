@@ -137,11 +137,6 @@ list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
   -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
 )
 
-# VTK gets installed inside SimMedTK's build dir:
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
-  -DVTK_DIR:PATH=${SimMedTK_BINARY_DIR}/SimMedTK-build/lib/cmake/vtk-6.3
-)
-
 #-----------------------------------------------------------------------------
 # Set CMake OSX variable to pass down the external project
 #
