@@ -142,6 +142,11 @@ public:
     ///
     const std::vector<int> &getAttachedVertices(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
 
+    ///
+    /// \brief Return vertices for interpolation weights for ith surface mesh
+    ///
+    void saveWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &filename) const;
+
 private:
     // Vega mesh base object
     std::shared_ptr<VolumetricMesh> mesh;

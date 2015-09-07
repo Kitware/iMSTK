@@ -205,6 +205,10 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr< SurfaceMesh > surfac
     if(!fileStream)
     {
         std::cerr << "Unable to open file: " << fileName << std::endl;
+        std::cerr << "Generating weights..." << std::endl;
+        this->attachSurfaceMesh(surfaceMesh,5.0);
+        this->saveWeights(surfaceMesh,fileName);
+
         return;
     }
 
@@ -237,6 +241,27 @@ std::shared_ptr< SurfaceMesh > VegaVolumetricMesh::getCollisionMesh()
     return attachedMeshes.size() > 0
            ? this->attachedMeshes.at(0)
            : nullptr;
+}
+void VegaVolumetricMesh::saveWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string& filename) const
+{
+    auto vertices = this->attachedVertices.at(surfaceMesh);
+    auto weights = this->attachedWeights.at(surfaceMesh);
+
+    int numElementVertices = this->mesh->getNumElementVertices();
+    std::ofstream fileStream(filename.c_str(), std::ofstream::out);
+
+    for(size_t i = 0, end = weights.size() / numElementVertices; i < end; ++i)
+    {
+        auto index = i * numElementVertices;
+        fileStream << i
+                   << " " << vertices[index] << " " << weights[index]
+                   << " " << vertices[index + 1] << " " << weights[index + 1]
+                   << " " << vertices[index + 2] << " " << weights[index + 2]
+                   << " " << vertices[index + 3] << " " << weights[index + 3] << std::endl;
+    }
+
+    fileStream << std::endl;
+    fileStream.close();
 }
 const std::vector< double >& VegaVolumetricMesh::getAttachedWeights(std::shared_ptr< SurfaceMesh > surfaceMesh) const
 {

@@ -194,6 +194,10 @@ public:
     std::shared_ptr<SceneObject> clone() override;
 
     std::shared_ptr<VegaVolumetricMesh> getVolumetricMesh();
+    void setVolumetricMesh(std::shared_ptr<VegaVolumetricMesh> mesh)
+    {
+        this->volumetricMesh = mesh;
+    }
 
 private:
 
@@ -201,8 +205,6 @@ private:
     int graphicFrame;
     int explosionFlag; ///< 1 if the simulation goes unstable
     int positiveDefinite; ///< 1 if the effective matrix is positive definite
-
-    bool importAndUpdateVolumeMeshToSmtk;
 
     VegaPerformanceCounter performaceTracker;
 
