@@ -35,4 +35,4 @@
 
 void initIODelegates();
 
-#endif // IO_H
+#endif // IOConfig_H
