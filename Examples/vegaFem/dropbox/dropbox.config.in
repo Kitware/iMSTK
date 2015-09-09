@@ -33,7 +33,7 @@ StVK
 @SimMedTK_VEGA_EXAMPLE_DIR@/dropbox/dropbox.veg.obj
 
 *secondaryRenderingMeshFilename
-@SimMedTK_VEGA_EXAMPLE_DIR@/dropbox/dropbox.obj
+@SimMedTK_VEGA_EXAMPLE_DIR@/dropbox/dropbox.vtk
 
 *secondaryRenderingMeshInterpolationFilename
 @SimMedTK_VEGA_EXAMPLE_DIR@/dropbox/dropbox.interp
