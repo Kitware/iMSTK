@@ -177,7 +177,7 @@ void OculusViewer::renderToScreen(const RenderOperation &p_rop)
 
         //retrieve the orientation quaternion and
         // convert it to a rotation matrix
-        viewRotation = Quaternionf(-pose[eye].Orientation.w,
+        viewRotation = core::Quaternionf(-pose[eye].Orientation.w,
             pose[eye].Orientation.x,
             pose[eye].Orientation.y,
             pose[eye].Orientation.z);

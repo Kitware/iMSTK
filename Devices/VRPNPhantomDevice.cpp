@@ -1,10 +1,8 @@
 #include "VRPNPhantomDevice.h"
 
-#include <vrpn_Connection.h>
 #include <vrpn_Button.h>
 #include <vrpn_ForceDevice.h>
 #include <vrpn_Tracker.h>
-#include <server_src/vrpn_Phantom.h>
 
 #include <chrono>
 #include <thread>
@@ -12,8 +10,7 @@
 #include <algorithm>
 
 VRPNPhantomDevice::VRPNPhantomDevice()
-    : terminate{false},
-      deviceURL("Phantom0@localhost"),
+    : deviceURL("Phantom0@localhost"),
       delay(std::chrono::milliseconds(100))
 {
 
@@ -24,52 +21,69 @@ VRPNPhantomDevice::~VRPNPhantomDevice()
 
 }
 
-Device::Message VRPNPhantomDevice::open()
+DeviceInterface::Message VRPNPhantomDevice::openDevice()
 {
-    vrpnButton = std::make_shared<vrpn_Button_Remote>(this->deviceURL);
-    vrpnForce = std::make_shared<vrpn_ForceDevice_Remote>(this->deviceURL);
-    vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(this->deviceURL);
-    //need try/catch incase the memory couldn't be allocated, the return
+    vrpnButton = std::make_shared<vrpn_Button_Remote>(this->deviceURL.c_str());
+    vrpnForce = std::make_shared<vrpn_ForceDevice_Remote>(this->deviceURL.c_str());
+    vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(this->deviceURL.c_str());
+    //need try/catch incase the memory couldn't be allocated, then return
     // Message::Failure;
 
-    vrpnButton->register_change_handler( this, ButtonChangeHandler );
-    vrpnForce->register_force_change_handler( this, ForceChangeHandler );
-    vrpnTracker->register_change_handler( this, TrackerChangeHandler );
+    vrpnButton->register_change_handler(this, buttonChangeHandler);
+    vrpnForce->register_force_change_handler(this, forceChangeHandler);
+    vrpnTracker->register_change_handler(this, trackerChangeHandler);
 
-    return Device::Message::Success;
+    return DeviceInterface::Message::Success;
 }
 
-Device::Message VRPNPhantomDevice::close()
+DeviceInterface::Message VRPNPhantomDevice::closeDevice()
 {
-    terminate = true;
-    return Device::Message::Success;
+    this->terminate();
+    return DeviceInterface::Message::Success;
+}
+
+void VRPNPhantomDevice::init()
+{
+    buttonTimers[0].start();
+    buttonTimers[1].start();
+    forceTimer.start();
+    posTimer.start();
+    quatTimer.start();
 }
 
 void VRPNPhantomDevice::exec()
 {
-    while(!terminate)
+    while(!terminateExecution)
     {
         processChanges();
         std::this_thread::sleep_for(delay);
     }
 }
 
-void VRPNPhantomDevice::setDeviceURL(const string s)
+void VRPNPhantomDevice::beginFrame()
+{
+}
+
+void VRPNPhantomDevice::endFrame()
+{
+}
+
+void VRPNPhantomDevice::setDeviceURL(const std::string s)
 {
     deviceURL = s;
 }
 
-const std::string VRPNPhantomDevice::getDeviceURL()
+std::string VRPNPhantomDevice::getDeviceURL()
 {
     return deviceURL;
 }
 
-void VRPNPhantomDevice::setPollDelay(const std::chrono::duration d)
+void VRPNPhantomDevice::setPollDelay(const std::chrono::milliseconds d)
 {
     delay = d;
 }
 
-const std::chrono::duration VRPNPhantomDevice::getPollDelay()
+std::chrono::milliseconds VRPNPhantomDevice::getPollDelay()
 {
     return delay;
 }
@@ -81,6 +95,53 @@ void VRPNPhantomDevice::processChanges()
     vrpnTracker->mainloop();
 }
 
+core::Vec3d VRPNPhantomDevice::getForce()
+{
+    return force;
+}
+
+core::Vec3d VRPNPhantomDevice::getPosition()
+{
+    return pos;
+}
+
+core::Quaterniond VRPNPhantomDevice::getOrientation()
+{
+    return quat;
+}
+
+bool VRPNPhantomDevice::getButton(size_t i)
+{
+    if (i < 2)
+        return buttons[i];
+    else
+        return false;
+}
+
+long double VRPNPhantomDevice::getForceETime()
+{
+    return forceTimer.elapsed();
+}
+
+long double VRPNPhantomDevice::getPositionETime()
+{
+    return posTimer.elapsed();
+}
+
+long double VRPNPhantomDevice::getOrientationETime()
+{
+    return quatTimer.elapsed();
+}
+
+long double VRPNPhantomDevice::getButtonETime(size_t i)
+{
+    if (i < 2)
+        return buttonTimers[i].elapsed();
+    else
+        return -1;
+}
+
+
 void VRPN_CALLBACK
 VRPNPhantomDevice::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 {
@@ -88,8 +149,8 @@ VRPNPhantomDevice::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 
     if (b.button < handler->buttons.size())
     {
-        buttons[b.button] = (1 == b.state);
-        //Should also handle time stamps
+        handler->buttons[b.button] = (1 == b.state);
+        handler->buttonTimers[b.button].start();
     }//else the button isn't accounted for, as far as we know, it didn't exist
 }
 
@@ -98,77 +159,16 @@ VRPNPhantomDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
 {
     VRPNPhantomDevice *handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
 
-    std::copy(std::begin(f.force), std::end(f.force), std::begin(handler->force));
-    //Should also handle time stamps
+    handler->force = Eigen::Map<const core::Vec3d>(f.force);
+    handler->forceTimer.start();
 }
 
 void VRPN_CALLBACK
 VRPNPhantomDevice::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
     VRPNPhantomDevice *handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
-
-    std::copy(std::begin(t.pos), std::end(t.pos), std::begin(handler->pos));
-    std::copy(std::begin(t.quat), std::end(t.quat), std::begin(handler->quat));
-    //Should also handle time stamps
-}
-
-
-
-
-VRPNPhantomDeviceServer::VRPNPhantomDeviceServer()
-    : terminate{false},
-      deviceName("Phantom0"),
-      delay(std::chrono::milliseconds(100))
-{
-
-}
-
-VRPNPhantomDeviceServer::~VRPNPhantomDeviceServer()
-{
-    delete connection;
-}
-
-Device::Message VRPNPhantomDeviceServer::open()
-{
-    connection = vrpn_create_server_connection();
-    phantom = std::make_shared<vrpn_Phantom>(deviceName, connection, 60.0f);
-    //need try/catch incase the memory couldn't be allocated, the return
-    // Message::Failure;
-    return Device::Message::Success;
-}
-
-Device::Message VRPNPhantomDeviceServer::close()
-{
-    terminate = true;
-    return Device::Message::Success;
-}
-
-void VRPNPhantomDeviceServer::exec()
-{
-    while(!terminate)
-    {
-        phantom->mainloop();
-        connection->mainloop();
-        std::this_thread::sleep_for(delay);
-    }
-}
-
-void VRPNPhantomDeviceServer::setDeviceName(const string s)
-{
-    deviceName = s;
-}
-
-const std::string VRPNPhantomDeviceServer::getDeviceName()
-{
-    return deviceName;
-}
-
-void VRPNPhantomDeviceServer::setPollDelay(const std::chrono::duration d)
-{
-    delay = d;
-}
-
-const std::chrono::duration VRPNPhantomDeviceServer::getPollDelay()
-{
-    return delay;
+    handler->pos = Eigen::Map<const core::Vec3d>(t.pos);
+    handler->posTimer.start();
+    handler->quat = Eigen::Map<const core::Quaterniond>(t.quat);
+    handler->quatTimer.start();
 }

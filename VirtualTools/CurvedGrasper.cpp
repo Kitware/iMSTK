@@ -41,7 +41,7 @@ CurvedGrasper::CurvedGrasper(size_t p_PhantomID,
     maxangle = 10 * 3.14 / 360;
     this->phantomID = p_PhantomID;
 
-    Quaterniond rot;
+    core::Quaterniond rot;
     mesh_pivot = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);
     mesh_pivot->loadMesh(p_pivotModelFileName, Core::BaseMesh::MeshFileType::ThreeDS);
     Eigen::UniformScaling<double> scaling(0.5);

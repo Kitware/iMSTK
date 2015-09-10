@@ -209,6 +209,12 @@ if(SimMedTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics)
 endif()
 
+if(SimMedTK_USE_PHANTOM_OMNI)
+  find_package(VRPN REQUIRED)
+  include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
+  include_directories(SYSTEM VRPN_PHANTOM_INCLUDE_DIR)
+endif()
+
 if(SimMedTK_USE_ADU)
   find_package(ADU REQUIRED)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")

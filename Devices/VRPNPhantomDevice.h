@@ -24,77 +24,70 @@
 #ifndef SM_VRPNPHANTOMDEVICE_H
 #define SM_VRPNPHANTOMDEVICE_H
 
-#include "Device.h"
+#include "Core/Vector.h"
+#include "Core/Quaternion.h"
+#include "Core/Timer.h"
+#include "Devices/DeviceInterface.h"
 
-#include <vrpn_Connection.h>
+#include <vrpn_Types.h>
 #include <vrpn_Button.h>
 #include <vrpn_ForceDevice.h>
 #include <vrpn_Tracker.h>
-#include <server_src/vrpn_Phantom.h>
 
 #include <string>
 #include <memory>
 #include <chrono>
 #include <array>
 
-class VRPNPhantomDevice : Device
+class VRPNPhantomDevice : public DeviceInterface
 {
 public:
     VRPNPhantomDevice();
     virtual ~VRPNPhantomDevice();
-    Device::Message open() override;
-    Device::Message close() override;
-    void exec() override;
+    DeviceInterface::Message openDevice() override;
+    DeviceInterface::Message closeDevice() override;
 
-    void setDeviceURL(const string s);
-    const std::string getDeviceURL();
-    void setPollDelay(const std::chrono::duration d);
-    const std::chrono::duration getPollDelay();
+    void init() override;
+    void exec() override;
+    void beginFrame() override;
+    void endFrame() override;
+
+    void setDeviceURL(const std::string s);
+    std::string getDeviceURL();
+    void setPollDelay(const std::chrono::milliseconds d);
+    std::chrono::milliseconds getPollDelay();
+    core::Vec3d getForce();
+    core::Vec3d getPosition();
+    core::Quaterniond getOrientation();
+    bool getButton(size_t i);
+    long double getForceETime();
+    long double getPositionETime();
+    long double getOrientationETime();
+    long double getButtonETime(size_t i);
 
 private:
-    bool terminate;
     std::string deviceURL;
-    std::chrono::duration delay;
+    std::chrono::milliseconds delay;
 
-    //Need getters and setters for these
     std::array<bool, 2> buttons; //< Buttons: true = pressed/false = not pressed
-    std::array<vprn_float64, 3> force; //this should really be a vec3 or something
-    std::array<vprn_float64, 3> pos; //this should really be a vec3 or something
-    std::array<vprn_float64, 4> quat; //this should really be a quat or something
+    core::Vec3d force; //this should really be a vec3 or something
+    core::Vec3d pos; //this should really be a vec3 or something
+    core::Quaterniond quat; //this should really be a quat or something
+
+    std::array<core::Timer, 2> buttonTimers;
+    core::Timer forceTimer;
+    core::Timer posTimer;
+    core::Timer quatTimer;
 
     std::shared_ptr<vrpn_Button_Remote> vrpnButton;
     std::shared_ptr<vrpn_ForceDevice_Remote> vrpnForce;
     std::shared_ptr<vrpn_Tracker_Remote> vrpnTracker;
 
     void processChanges();
-    void VRPN_CALLBACK buttonChangeHandler(void *userData, const vrpn_BUTTONCB b);
-    void VRPN_CALLBACK forceChangeHandler(void *userData, const vrpn_FORCECB f);
-    void VRPN_CALLBACK trackerChangeHandler(void *userData, const vrpn_TRACKERCB b);
-};
 
-
-class VRPNPhantomDeviceServer : Device
-{
-public:
-    VRPNPhantomDeviceServer();
-    virtual ~VRPNPhantomDeviceServer();
-
-    Device::Message open() override;
-    Device::Message close() override;
-    void exec() override;
-
-    void setDeviceName(const string s);
-    const std::string getDeviceName();
-    void setPollDelay(const std::chrono::duration d);
-    const std::chrono::duration getPollDelay();
-
-private:
-    bool terminate;
-    std::string deviceName;
-    std::chrono::duration delay;
-
-    vrpn_Connection connection;
-    std::shared_ptr<vrpn_Phantom> phantom;
+    static void VRPN_CALLBACK buttonChangeHandler(void *userData, const vrpn_BUTTONCB b);
+    static void VRPN_CALLBACK forceChangeHandler(void *userData, const vrpn_FORCECB f);
+    static void VRPN_CALLBACK trackerChangeHandler(void *userData, const vrpn_TRACKERCB b);
 };
 
 #endif

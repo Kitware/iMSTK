@@ -174,12 +174,23 @@ void SDK::run()
 
     runRegisteredModules();
 
-    this->viewer->exec();
-
-    // Now wait for other modules to shut down
-    while (this->viewer->isValid() && !shutdown)
+    if (nullptr != this->viewer)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        this->viewer->exec();
+
+        // Now wait for other modules to shut down
+        while (this->viewer->isValid() && !shutdown)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+    else
+    {
+        // Now wait for other modules to shut down
+        while (!shutdown)
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
 
     // Tell framework threads to shutdown

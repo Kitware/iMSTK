@@ -148,7 +148,7 @@ public:
     ///
     /// \brief Apply a rotation to the vertices
     ///
-    void rotate(const Quaterniond &rotation);
+    void rotate(const core::Quaterniond &rotation);
 
     ///
     /// \brief Apply any affine tranformation to the vertices.

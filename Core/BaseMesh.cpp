@@ -127,7 +127,7 @@ void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
         v = scaling*v;
     } );
 }
-void BaseMesh::rotate ( const Quaterniond& rotation )
+void BaseMesh::rotate ( const core::Quaterniond& rotation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
                     [rotation] ( core::Vec3d &v )

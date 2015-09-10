@@ -283,7 +283,7 @@ private:
     std::vector<std::string> fragmentShaderParamsString; // stores the parameters for fragment shader
     std::vector<std::string> geometryShaderParamsString; // stores the parameters for geometry shader
     std::vector<std::string> attribParamsString; // stores the attribute parameters
-    Timer time; // time for periodically checnking the shader
+    core::Timer time; // time for periodically checnking the shader
 
     GLint projectionMatrix; // holds the unitform location for projection matrix. That is needed in newer versions of GLSL
     GLint modelViewMatrix; // holds the unitform location for modelview matrix. That is needed in newer versions of GLSL

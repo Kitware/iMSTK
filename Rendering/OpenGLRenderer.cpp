@@ -556,7 +556,7 @@ void OpenGLRenderer::draw(Plane &p_plane, float p_scale, Color p_color)
     axisOfRot = normal.cross(defaultDir);
     axisOfRot.normalize();
 
-    Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
+    core::Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     glDisable(GL_LIGHTING);
     glBegin(GL_QUADS);

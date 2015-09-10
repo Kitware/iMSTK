@@ -301,6 +301,11 @@ public:
         return zoomValue;
     }
 
+    /// \brief Replaces the internal quaternion with the one provided
+    ///
+    /// \param q New internal orientation quaternion
+    void setOrientation(const core::Quaternionf q);
+
     /// \brief Returns the orientation of the camera
     ///
     /// \return The orientation of the camera as a quaternion
@@ -312,7 +317,7 @@ private:
     std::mutex posLock; //< Controls access to the pos variable
     core::Vec3f fp; ///< focal point of the camera
     std::mutex fpLock; //< Controls access to the fp variable
-    Quaternionf orientation; ///< orientation of the camera
+    core::Quaternionf orientation; ///< orientation of the camera
     std::mutex orientationLock; //< Controls access to the orientation variable
     Matrix44f view; ///< View matrix for OpenGL
     std::mutex viewLock; //< Controls access to the view variable
@@ -351,11 +356,6 @@ private:
     ///
     /// \param d Directional vector to orient the camera with
     void setOrientFromDir(const core::Vec3f d);
-
-    /// \brief Replaces the internal quaternion with the one provided
-    ///
-    /// \param q New internal orientation quaternion
-    void setOrientation(const Quaternionf q);
 };
 
 #endif

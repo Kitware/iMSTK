@@ -146,7 +146,7 @@ void Camera::setFarClipDist(const float d)
     this->projDirty.store(true);
 }
 
-void Camera::setOrientation(const Quaternionf q)
+void Camera::setOrientation(const core::Quaternionf q)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(orientationLock);
@@ -167,10 +167,10 @@ void Camera::setOrientFromDir(const core::Vec3f d)
     camAxes.col(2) = (-d).normalized();
     camAxes.col(0) = tempUp.cross( camAxes.col(2) ).normalized();
     camAxes.col(1) = camAxes.col(2).cross( camAxes.col(0) ).normalized();
-    setOrientation(Quaternionf(camAxes));
+    setOrientation(core::Quaternionf(camAxes));
 }
 
-Quaternionf Camera::getOrientation()
+core::Quaternionf Camera::getOrientation()
 {
     if (true == this->orientDirty.load())
     {
@@ -237,7 +237,7 @@ void Camera::zoom(const float d)
 void Camera::rotateLocal(const float angle, const core::Vec3f axis)
 {
     float dist = (getPos() - getFocus()).norm();
-    Quaternionf q;
+    core::Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(getOrientation() * q);
@@ -247,7 +247,7 @@ void Camera::rotateLocal(const float angle, const core::Vec3f axis)
 void Camera::rotateFocus(const float angle, const core::Vec3f axis)
 {
     float dist = (getFocus() - getPos()).norm();
-    Quaternionf q;
+    core::Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(getOrientation() * q);

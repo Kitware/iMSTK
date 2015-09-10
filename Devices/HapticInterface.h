@@ -24,7 +24,9 @@
 #ifndef SM_HAPTIC_INTERFACE_H
 #define SM_HAPTIC_INTERFACE_H
 
-#include "External/DeviceInterface.h"
+#include "Devices/DeviceInterface.h"
+
+#include "Core/Matrix.h"
 
 #define SM_MAX_BUTTONS 4
 
@@ -36,7 +38,7 @@ struct hapticDeviceData_t
     core::Vec3d position;
     core::Vec3d velocity;
     core::Vec3d angles;
-    Matrix44 transform;
+    Matrix44d transform;
     bool buttonState[SM_MAX_BUTTONS];
 };
 
@@ -53,49 +55,49 @@ public:
     virtual ~HapticInterface() {};
 
     /// \brief open haptic device
-    virtual int openDevice()
+    virtual Message openDevice()
     {
         return Message::Unknown;
     }
 
     /// \brief close haptic device
-    virtual int closeDevice()
+    virtual Message closeDevice()
     {
         return Message::Unknown;
     }
 
     /// \brief start the haptic device
-    virtual int startDevice()
+    virtual Message startDevice()
     {
         return Message::Unknown;
     }
 
     /// \brief get the position of the end effector the haptic device
-    virtual int  getPosition(core::Vec3d & d_pos)
+    virtual Message  getPosition(core::Vec3d & d_pos)
     {
         return Message::Unknown;
     }
 
     /// \brief get the orientation of the end effector the haptic device
-    virtual int getOreintation(Matrix33  *d_rot)
+    virtual Message getOreintation(Matrix33d  *d_rot)
     {
         return Message::Unknown;
     }
 
     /// \brief get the transform (position + orientation) of the end effector the haptic device
-    virtual int getDeviceTransform(Matrix44  *d_transform)
+    virtual Message getDeviceTransform(Matrix44d  *d_transform)
     {
         return Message::Unknown;
     }
 
     /// \brief set force to the haptic device
-    virtual int setForce(core::Vec3d & force)
+    virtual Message setForce(core::Vec3d & force)
     {
         return Message::Unknown;
     }
 
     /// \brief set torque to the haptic device
-    virtual int setForceandTorque(core::Vec3 & force, core::Vec3  & torque)
+    virtual Message setForceandTorque(core::Vec3d & force, core::Vec3d  & torque)
     {
         return Message::Unknown;
     }

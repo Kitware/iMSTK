@@ -2,23 +2,23 @@
 set(EXTERNAL_DEVICES_SOURCES)
 set(EXTERNAL_DEVICES_TARGET_LIBRARIES)
 
-if(SIMMEDTK_USE_PHANTOM_OMNI)
+if(SimMedTK_USE_PHANTOM_OMNI)
   list(APPEND EXTERNAL_DEVICES_SOURCES
     HapticInterface.cpp
-    PhantomInterface.cpp
+#    PhantomInterface.cpp
+    VRPNPhantomDevice.cpp
     )
   list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
-    OH::HD
-    OH::HDU
+    vrpn::vrpn
     )
 endif()
 
-if(SIMMEDTK_USE_ADU)
+if(SimMedTK_USE_ADU)
   list(APPEND EXTERNAL_DEVICES_SOURCES
     ADUInterface.cpp)
 endif()
 
-if(SIMMEDTK_USE_NIUSB6008)
+if(SimMedTK_USE_NIUSB6008)
   list(APPEND EXTERNAL_DEVICES_SOURCES
     NIUSB6008Interface.cpp)
 endif()
@@ -35,6 +35,7 @@ simmedtk_add_library(Devices
     Audio.h
     NIUSB6008Interface.h
     PhantomInterface.h
+    VRPNPhantomDevice.h
 )
 
 target_link_libraries(Devices

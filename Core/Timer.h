@@ -31,6 +31,8 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 
+namespace core {
+
 /// \brief timer class
 class Timer: public CoreClass
 {
@@ -54,5 +56,7 @@ public:
 private:
     TimePointType begin;
 };
+
+} //core
 
 #endif

@@ -23,6 +23,7 @@
 
 // SimMedTK includes
 #include "Core/Timer.h"
+using namespace core;
 
 Timer::Timer()
 {

@@ -48,7 +48,7 @@ private:
     std::vector<std::string> errors; ///< error messages
     std::vector<int> timeStamps; ///< time stamps for errors
     std::mutex logLock; ///< mutex to sync access to logs
-    Timer time; ///< Timer for timestamps
+    core::Timer time; ///< Timer for timestamps
     bool consoleOutput; ///< Flag to print errors to stdout
 
 public:

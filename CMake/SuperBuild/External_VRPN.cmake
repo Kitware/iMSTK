@@ -2,7 +2,7 @@
 # Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
 ###########################################################################
 
-set(VRPN_TAG 47ce887dfcf4d9a517c2416a9dcdf7bf5fdd0cb4)
+set(VRPN_TAG f733f16b7f978ffdcc722a453a0ed55e8c634cd7)
 set(VRPN_REPOSITORY https://github.com/sradigan/vrpn.git)
 
 # Make sure this file is included only once
@@ -37,20 +37,6 @@ if(NOT DEFINED ${proj}_DIR)
     )
   endif()
 
-  set(CMAKE_GENERAL_EXTERNAL_PROJECT_ARGS)
-  if(SimMedTK_USE_PHANTOM_OMNI)
-    simmedtk_find_package(OpenHaptics QUIET)
-    if(OPENHAPTICS_FOUND)
-      list(APPEND CMAKE_GENERAL_EXTERNAL_PROJECT_ARGS
-        -DVRPN_USE_PHANTOM_SERVER:BOOL=ON
-        -DOpenHaptics_DIR:PATH=${OpenHaptics_DIR}
-        -DVRPN_GPL_SERVER:BOOL=ON
-        -DVRPN_USE_HDAPI:BOOL=ON
-        -DVRPN_USE_HID:BOOL=ON
-        )
-    endif(OPENHAPTICS_FOUND)
-  endif()
-
 #   message(STATUS "Adding project:${proj}")
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}
@@ -65,10 +51,13 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DBUILD_SHARED_LIBS:BOOL=OFF
+      -DVRPN_USE_SHARED_LIBRARY:BOOL=OFF
       -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
       -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
       -DVRPN_SUBPROJECT_BUILD:BOOL=ON
+      -DVRPN_BUILD_CLIENT_LIBRARY:BOOL=ON
+      -DVRPN_BUILD_SERVER_LIBRARY:BOOL=ON
       -DVRPN_INSTALL:BOOL=OFF
       -DVRPN_BUILD_PYTHON:BOOL=OFF
       -DVRPN_USE_GPM_MOUSE:BOOL=OFF
