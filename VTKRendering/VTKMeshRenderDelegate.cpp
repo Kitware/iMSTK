@@ -81,7 +81,7 @@ void MeshRenderDelegate::initDraw()
         {
             return;
         }
-        auto surfaceMesh = vega->getAttachedMesh(0);
+        auto surfaceMesh = vega->getRenderingMesh();
         if (!surfaceMesh)
         {
             return;

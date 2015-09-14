@@ -77,6 +77,11 @@ public:
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
 
     ///
+    /// \brief Get attached surface mesh
+    ///
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName, const double &radius = 5.0);
+
+    ///
     /// \brief Return mesh
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
@@ -123,11 +128,6 @@ public:
     std::shared_ptr<SurfaceMesh> getRenderingMesh();
 
     ///
-    /// \brief Get attached surface mesh
-    ///
-    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName);
-
-    ///
     /// \brief Get attached collision mesh
     ///
     std::shared_ptr<SurfaceMesh> getCollisionMesh();
@@ -143,9 +143,23 @@ public:
     const std::vector<int> &getAttachedVertices(std::shared_ptr<SurfaceMesh> surfaceMesh) const;
 
     ///
-    /// \brief Return vertices for interpolation weights for ith surface mesh
+    /// \brief Save interpolation weights for surfaceMesh into filename
     ///
     void saveWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &filename) const;
+
+    ///
+    /// \brief Read interpolation weights for surfaceMesh
+    ///
+    void readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &filename, const double radius = 1.0);
+
+    ///
+    /// \brief Generate interpolation weights for surfaceMesh and volume mesh
+    ///
+    void generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                         double radius = 1.0,
+                         const bool saveToDisk = false,
+                         const std::string &filename = "mesh.interp"
+                        );
 
 private:
     // Vega mesh base object
