@@ -708,7 +708,6 @@ void VegaFemSceneObject::createForceModel()
 
         // create the invertible FEM deformable model
         IsotropicHyperelasticFEM * isotropicHyperelasticFEM;
-
         if (femConfig->numInternalForceThreads == 0)
         {
             isotropicHyperelasticFEM = new IsotropicHyperelasticFEM(
@@ -834,7 +833,7 @@ inline void VegaFemSceneObject::advanceOneTimeStep()
                 <<"Reduce the timestep, or increase the number of substeps per timestep.\n";
             integratorBase->ResetToRest();
 
-            for (int i = 0; i < 3 * numNodes; i++)
+            for (int i = 0, end = 3*numNodes; i < end; ++i)
             {
                 f_ext[i] = 0;
                 f_extBase[i] = 0;

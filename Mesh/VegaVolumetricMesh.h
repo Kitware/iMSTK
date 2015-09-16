@@ -161,6 +161,11 @@ public:
                          const std::string &filename = "mesh.interp"
                         );
 
+    ///
+    /// \brief Apply a tranlation to all the vertices, including attached meshes.
+    ///
+    void translate(const Eigen::Translation3d &translation, bool setInitialPoints = false);
+
 private:
     // Vega mesh base object
     std::shared_ptr<VolumetricMesh> mesh;

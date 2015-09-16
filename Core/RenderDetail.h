@@ -162,7 +162,20 @@ public:
     bool renderTexture() const;
 
     bool renderNormals() const;
+    bool renderWireframe() const;
 
+    const float &getOpacity() const;
+    void setOpacity(const float &value);
+
+    const Color &getBackground() const
+    {
+        return this->background;
+    }
+
+    void setBackground(const Color &value)
+    {
+        this->background = value;
+    }
 public:
     unsigned int renderType; // render type
     Color colorDiffuse; // diffuse color
@@ -180,7 +193,9 @@ public:
     float shininess; // specular shinness
     bool debugDraw; // debug draw enabled or not
     float normalLength; // length of rendered normals
-    std::string textureFilename; // file name for the texture attached
+    float opacity; // opacity
+    std::string textureFilename; // file name for the texture attached]
+    Color background;
 
     std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<bool> shaderEnable; // enable/disable any attached shader

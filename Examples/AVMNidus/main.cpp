@@ -56,20 +56,7 @@ int main()
     initRenderDelegates();
     initVTKRendering();
     initIODelegates();
-    std::shared_ptr<SDK> sdk;
-    std::shared_ptr<VegaFemSceneObject> femObject;
-    std::shared_ptr<StaticSceneObject> staticObject;
-    std::shared_ptr<VegaFemSimulator> femSimulator;
-    std::shared_ptr<DefaultSimulator> staticSimulator;
-    std::shared_ptr<PlaneCollisionModel> plane;
-    std::shared_ptr<ViewerBase> viewer;
-    std::shared_ptr<Scene> scene;
-    std::shared_ptr<Light> light;
-    std::shared_ptr<Camera> sceneCamera;
-    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
-    std::shared_ptr<mstk::Examples::Common::pzrMouseCameraController> pzrCamCtl;
-    //std::shared_ptr<mstk::Examples::Common::hapticController> hapticCtl;
+
     Matrix33d mat;
 
     //-------------------------------------------------------
@@ -77,32 +64,33 @@ int main()
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
-    sdk = SDK::createStandardSDK();
+    auto sdk = SDK::createStandardSDK();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
 
     // create a FEM simulator
-    femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),
+    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),
                                                      "nidus.config");
 
-    auto femObjRenderDetail = std::make_shared<RenderDetail>(//SIMMEDTK_RENDER_WIREFRAME
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
                                                              //| SIMMEDTK_RENDER_VERTICES
                                                              SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
                                                               );
-    femObjRenderDetail->setPointSize(4.0);
-    Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
-    femObjRenderDetail->setVertexColor(maroon);
-    femObjRenderDetail->setNormalLength(0.02);
+    meshRenderDetail->setNormalLength(0.02);
+    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
+    meshRenderDetail->setDiffuseColor(Color::colorGray);
+    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
+    meshRenderDetail->setShininess(20.0);
 
     auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
     if(renderingMesh)
     {
-        renderingMesh->setRenderDetail(femObjRenderDetail);
+        renderingMesh->setRenderDetail(meshRenderDetail);
     }
 
     sdk->addSceneActor(femObject, femSimulator);
@@ -111,13 +99,13 @@ int main()
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
-    staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
     // create a static plane scene object of given normal and position
-    staticObject = std::make_shared<StaticSceneObject>();
+    auto staticObject = std::make_shared<StaticSceneObject>();
 
-    plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, -3.0, 0.0),
-                                                  core::Vec3d(0.0, 1.0, 0.0));
+    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
+                                                  core::Vec3d(0.0, 0.0, 1.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -127,8 +115,6 @@ int main()
     //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
     sdkSimulator->registerObjectSimulator(femSimulator);
-    //sdkSimulator->registerObjectSimulator(staticSimulator);
-
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
@@ -161,7 +147,7 @@ int main()
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
@@ -170,33 +156,23 @@ int main()
     viewer->setGlobalAxisLength(0.8);
 
     // Get Scene
-    scene = sdk->getScene(0);
+    auto scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
-    light = Light::getDefaultLighting();
-    scene->addLight(light);
+    auto light1 = Light::getDefaultLighting();
+    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    scene->addLight(light1);
+
+    auto light2 = Light::getDefaultLighting();
+    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    scene->addLight(light2);
 
     // Camera setup
-    sceneCamera = Camera::getDefaultCamera();
-    sceneCamera->setPos(12, 12, 24);
-    sceneCamera->setFocus(0, 0, 0);
+    auto sceneCamera = Camera::getDefaultCamera();
+    sceneCamera->setPos(-60,0,0);
+    sceneCamera->setZoom(.5);
     scene->addCamera(sceneCamera);
-
-    // Create the camera controller
-    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-    camCtl->setCamera(sceneCamera);
-
-    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
-
-    pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
-    pzrCamCtl->setCamera(sceneCamera);
-
-    // Link up the event system between this the camera controller and the viewer
-    viewer->attachEvent(core::EventType::Keyboard, camCtl);
-    viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
-    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
-    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
     //-------------------------------------------------------
     // Run the SDK

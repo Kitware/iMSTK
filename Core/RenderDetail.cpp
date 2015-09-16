@@ -42,17 +42,17 @@ RenderDetail::RenderDetail(unsigned int type)
 void RenderDetail::reset()
 {
     renderType = 0;
-    highLightColor.rgba[0] = 1.0f;
-    highLightColor.rgba[1] = 0.0f;
-    highLightColor.rgba[2] = 0.0f;
+    highLightColor.rgba[0] = 1.0;
+    highLightColor.rgba[1] = 0.0;
+    highLightColor.rgba[2] = 0.0;
     pointSize = 1;
     lineSize = 1;
-    shadowColor.rgba[0] = 0.0f;
-    shadowColor.rgba[1] = 0.0f;
-    shadowColor.rgba[2] = 0.0f;
-    shadowColor.rgba[3] = 0.5f;
-    colorDiffuse = Color::colorWhite;
-    colorAmbient = Color::colorWhite;
+    shadowColor.rgba[0] = 0.0;
+    shadowColor.rgba[1] = 0.0;
+    shadowColor.rgba[2] = 0.0;
+    shadowColor.rgba[3] = 0.5;
+    colorDiffuse = Color::colorGray;
+    colorAmbient = Color::colorGray;
     colorSpecular = Color::colorWhite;
     normalColor = Color::colorGreen;
     wireFrameColor = Color::colorBlue;
@@ -60,7 +60,12 @@ void RenderDetail::reset()
     debugDraw = false;
     castShadow = true;
     canGetShadow = true;
+    opacity = 1.0;
     textureFilename = "";
+    background.rgba[0] = 81.0/255.0;
+    background.rgba[1] = 87.0/255.0;
+    background.rgba[2] = 110.0/255.0;
+    background.rgba[3] = 1.0;
 }
 
 void RenderDetail::setNormalLength(const float len)
@@ -202,4 +207,16 @@ bool RenderDetail::renderTexture() const
 bool RenderDetail::renderNormals() const
 {
     return  this->renderType & SIMMEDTK_RENDER_NORMALS;
+}
+const float &RenderDetail::getOpacity() const
+{
+    return this->opacity;
+}
+void RenderDetail::setOpacity(const float &opacityValue)
+{
+    this->opacity = opacityValue;
+}
+bool RenderDetail::renderWireframe() const
+{
+    return this->renderType & SIMMEDTK_RENDER_WIREFRAME;
 }

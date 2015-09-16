@@ -47,6 +47,7 @@
 #include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
+#include <vtkProperty.h>
 
 
 class MeshRenderDelegate : public VTKRenderDelegate
@@ -111,8 +112,29 @@ void MeshRenderDelegate::initDraw()
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
 
-    vtkSmartPointer<vtkTexture> texture;
     auto renderDetail = mesh->getRenderDetail();
+    if(renderDetail)
+    {
+        auto ambientColor = renderDetail->getColorAmbient().getValue();
+        auto diffuseColor = renderDetail->getColorDiffuse().getValue();
+        auto specularColor = renderDetail->getColorSpecular().getValue();
+        auto specularPower = renderDetail->getShininess();
+        auto opacity = renderDetail->getOpacity();
+        actor->GetProperty()->SetAmbient(ambientColor[3]);
+        actor->GetProperty()->SetAmbientColor(ambientColor[0],ambientColor[1],ambientColor[2]);
+        actor->GetProperty()->SetDiffuse(diffuseColor[3]);
+        actor->GetProperty()->SetDiffuseColor(diffuseColor[0],diffuseColor[1],diffuseColor[2]);
+        actor->GetProperty()->SetSpecular(specularColor[3]);
+        actor->GetProperty()->SetSpecularColor(specularColor[0],specularColor[1],specularColor[2]);
+        actor->GetProperty()->SetSpecularPower(specularPower);
+        actor->GetProperty()->SetOpacity(opacity);
+    }
+
+    if(renderDetail && renderDetail->renderWireframe())
+    {
+        actor->GetProperty()->SetRepresentationToWireframe();
+    }
+    vtkSmartPointer<vtkTexture> texture;
     if(renderDetail && renderDetail->renderTexture())
     {
         vtkNew<vtkJPEGReader> jpegReader;
@@ -143,7 +165,6 @@ void MeshRenderDelegate::initDraw()
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
-
 
         mapper = vtkPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());

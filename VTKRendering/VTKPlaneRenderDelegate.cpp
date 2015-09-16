@@ -30,6 +30,9 @@
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPlaneSource.h>
+#include <vtkProperty.h>
+#include <vtkJPEGReader.h>
+#include <vtkFloatArray.h>
 #include "VTKRendering/VTKRenderDelegate.h"
 
 class PlaneRenderDelegate : public VTKRenderDelegate
@@ -50,6 +53,28 @@ void PlaneRenderDelegate::initDraw()
     if(!plane)
     {
         return;
+    }
+
+    auto renderDetail = plane->getRenderDetail();
+    if(renderDetail)
+    {
+        auto ambientColor = renderDetail->getColorAmbient().getValue();
+        auto diffuseColor = renderDetail->getColorDiffuse().getValue();
+        auto specularColor = renderDetail->getColorSpecular().getValue();
+        auto specularPower = renderDetail->getShininess();
+        auto opacity = renderDetail->getOpacity();
+        actor->GetProperty()->SetAmbient(ambientColor[3]);
+        actor->GetProperty()->SetAmbientColor(ambientColor[0],ambientColor[1],ambientColor[2]);
+        actor->GetProperty()->SetDiffuse(diffuseColor[3]);
+        actor->GetProperty()->SetDiffuseColor(diffuseColor[0],diffuseColor[1],diffuseColor[2]);
+        actor->GetProperty()->SetSpecular(specularColor[3]);
+        actor->GetProperty()->SetSpecularColor(specularColor[0],specularColor[1],specularColor[2]);
+        actor->GetProperty()->SetSpecularPower(specularPower);
+        actor->GetProperty()->SetOpacity(opacity);
+    }
+    if(renderDetail && renderDetail->renderWireframe())
+    {
+        actor->GetProperty()->SetRepresentationToWireframe();
     }
 
     vtkNew<vtkPlaneSource> planeSource;

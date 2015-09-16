@@ -60,6 +60,8 @@ if(NOT DEFINED ${proj}_DIR)
       -DModule_vtkIOLegacy:BOOL=ON
       -DModule_vtkIOPLY:BOOL=ON
       -DModule_vtkInteractionStyle:BOOL=ON
+      -DModule_vtkRenderingAnnotation:BOOL=ON
+      -DModule_vtkInteractionWidgets:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}

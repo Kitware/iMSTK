@@ -313,3 +313,11 @@ const std::vector< int >& VegaVolumetricMesh::getAttachedVertices(std::shared_pt
 {
     return this->attachedVertices.at(surfaceMesh);
 }
+void VegaVolumetricMesh::translate(const Eigen::Translation3d& translation, bool setInitialPoints)
+{
+    for(auto meshes : this->attachedMeshes)
+    {
+        meshes->translate(translation, setInitialPoints);
+    }
+
+}

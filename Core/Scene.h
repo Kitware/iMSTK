@@ -148,6 +148,11 @@ public:
         return sceneObjects;
     }
 
+    const std::vector<std::shared_ptr<Light> > &getLights() const
+    {
+        return this->lights;
+    }
+
 private:
     std::shared_ptr<Camera> camera;                           //Camera for the scene
     std::vector<std::shared_ptr<Light> > lights;              //Lights in the scene

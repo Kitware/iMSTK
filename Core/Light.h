@@ -111,7 +111,7 @@ public:
     Color lightColorSpecular;
 
     LightPos  lightPos;
-    //Vec3d direction;
+
     //between 0-1.0
     /// \brief  higher spot exponents result in a more focused light source,
     //regardless of the spot cutoff angle. default is zero

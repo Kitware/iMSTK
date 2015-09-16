@@ -138,7 +138,7 @@ public:
     ///
     /// \brief Apply a tranlation to the vertices
     ///
-    void translate(const Eigen::Translation3d &translation);
+    virtual void translate(const Eigen::Translation3d &translation, bool setInitialPoints = false);
 
     ///
     /// \brief Apply a scaling to the vertices
