@@ -78,17 +78,13 @@ void PlaneRenderDelegate::initDraw()
     }
 
     vtkNew<vtkPlaneSource> planeSource;
-    planeSource->SetCenter(-100,-100,0);
-    planeSource->SetPoint1(100,-100,0);
-    planeSource->SetPoint2(-100,100,0);
-
     auto center = plane->getPoint();
     auto normal = plane->getUnitNormal();
     core::Vec3d xp = normal.cross(core::Vec3d(0., 1., 0.));
     if (xp.squaredNorm() < 1e-8)
-      xp = normal.cross(core::Vec3d(0., 0., 1.)).normalized();
+        xp = normal.cross(core::Vec3d(0., 0., 1.)).normalized();
     else
-      xp = xp.normalized();
+        xp = xp.normalized();
     core::Vec3d yp = normal.cross(xp).normalized();
 
     double planeSize = plane->getWidth();

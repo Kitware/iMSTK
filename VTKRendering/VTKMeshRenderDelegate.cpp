@@ -48,8 +48,8 @@
 #include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
-#include <vtkShader.h>
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkProperty.h>
 
 class MeshRenderDelegate : public VTKRenderDelegate
 {
@@ -194,24 +194,10 @@ void MeshRenderDelegate::initDraw()
         {
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
             auto shadersPrograms = renderDetail->getShaderPrograms();
-            for(const auto &program : shadersPrograms)
-            {
-//                 glMapper->SetFragmentShaderCode(program);
-            }
+            this->setShadersProgram(glMapper,shadersPrograms);
 
             auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
-            for(auto &shader : shadersProgramReplacements)
-            {
-                for(auto &program : shader.second)
-                {
-//                     glMapper->AddShaderReplacement(shader.first,
-//                                                  program[0],
-//                                                  true,
-//                                                  program[1],
-//                                                  false
-//                                                 );
-                }
-            }
+            this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
         }
     }
     else

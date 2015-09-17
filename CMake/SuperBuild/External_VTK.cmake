@@ -2,8 +2,9 @@
 # Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
 ###########################################################################
 
-set(VTK_VERSION_NUM 6.2)
-set(VTK_TAG v${VTK_VERSION_NUM}.0)
+set(VTK_VERSION_NUM 6.3)
+# set(VTK_TAG v${VTK_VERSION_NUM}.0)
+set(VTK_TAG 47425ee694df750be696b0f6ade9a8dc4fe0b652)
 set(VTK_REPOSITORY https://gitlab.kitware.com/vtk/vtk.git)
 
 # Make sure this file is included only once
@@ -83,5 +84,5 @@ else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SimMedTK-build/include/vtk-${VTK_VERSION_NUM}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
 list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DVTK_DIR:PATH=${${proj}_DIR})

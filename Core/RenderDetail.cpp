@@ -15,6 +15,9 @@
 // limitations under the License.
 
 #include "Core/RenderDetail.h"
+#include <fstream>
+#include <sstream>
+#include <iostream>
 
 void RenderDetail::addShader(std::shared_ptr<UnifiedId> p_shaderID)
 {
@@ -62,15 +65,12 @@ void RenderDetail::reset()
     canGetShadow = true;
     opacity = 1.0;
     textureFilename = "";
-
-    background.rgba[0] = 0.5;
-    background.rgba[1] = 0.5;
-    background.rgba[2] = 0.7;
-
+    background.rgba[0] = 81.0/255.0;
+    background.rgba[1] = 87.0/255.0;
+    background.rgba[2] = 110.0/255.0;
+    background.rgba[3] = 1.0;
     faceBackgroundBottom.setValue(0.8, 0.8, 0.8, 1.0);
     faceBackgroundTop.setValue(0.45, 0.45, 0.8, 1.0);
-
-    background.rgba[3] = 1.0;
 }
 
 void RenderDetail::setNormalLength(const float len)
@@ -228,4 +228,42 @@ bool RenderDetail::renderWireframe() const
 bool RenderDetail::renderFaces() const
 {
     return this->renderType & SIMMEDTK_RENDER_FACES;
+}
+void RenderDetail::addShaderProgram(int shaderType, const std::string& programFilename)
+{
+    std::ifstream shaderFileStream(programFilename.c_str(), std::ifstream::in);
+    if(!shaderFileStream.is_open())
+    {
+        std::cerr << "Error opening the shader program: " << programFilename << std::endl;
+        return;
+    }
+    std::stringstream buffer;
+    buffer << shaderFileStream.rdbuf();
+    this->shaderPrograms.emplace(shaderType,buffer.str());
+}
+std::map<int, std::string >& RenderDetail::getShaderPrograms()
+{
+    return this->shaderPrograms;
+}
+void RenderDetail::addShaderProgramReplacement(int type, const std::string& from, const std::string& to)
+{
+    std::array<std::string, 2> replacement = {from, to};
+    this->shaderProgramReplacements[type].push_back(replacement);
+}
+const Color& RenderDetail::getBackground() const
+{
+    return this->background;
+}
+void RenderDetail::setBackground(const Color& value)
+{
+    this->background = value;
+}
+std::map< int, std::vector< std::array< std::string, int(2) > > >& RenderDetail::getShaderProgramReplacements()
+{
+    return this->shaderProgramReplacements;
+}
+bool RenderDetail::hasShaders()
+{
+    return !this->shaderPrograms.empty() ||
+           !this->shaderProgramReplacements.empty();
 }

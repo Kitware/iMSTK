@@ -47,6 +47,8 @@
 #include "VTKRendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
+#include <vtkShader.h>
+
 int main(int ac, char **av)
 {
     std::string configFile = "./nidus.config";
@@ -82,11 +84,15 @@ int main(int ac, char **av)
                                                              //| SIMMEDTK_RENDER_VERTICES
                                                              SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
                                                               );
-    meshRenderDetail->setNormalLength(0.02);
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
     meshRenderDetail->setShininess(20.0);
+
+    // Set shader porograms
+    meshRenderDetail->addShaderProgram(vtkShader::Vertex,"wet_vert.glsl");
+    meshRenderDetail->addShaderProgram(vtkShader::Fragment,"wet_frag.glsl");
+    meshRenderDetail->setTextureFilename("textures/cube.jpg");
 
     auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
     if(renderingMesh)

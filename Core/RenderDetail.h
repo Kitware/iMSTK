@@ -173,15 +173,9 @@ public:
     /// @brief Add a shader program to the the list of programs (vtk)
     /// @param program String containing the actual program
     ///
-    void addShaderProgram(const std::string &program)
-    {
-        this->shaderPrograms.push_back(program);
-    }
+    void addShaderProgram(int shaderType, const std::string &programFilename);
 
-    std::vector<std::string> &getShaderPrograms()
-    {
-        return this->shaderPrograms;
-    }
+    std::map<int,std::string> &getShaderPrograms();
 
     ///
     /// @brief Add a shader program for partial replacement of vtk default shaders.
@@ -189,16 +183,9 @@ public:
     /// @param program String containing the actual program
     ///
     void addShaderProgramReplacement(int type, const std::string &from,
-                                     const std::string &to)
-    {
-        std::array<std::string,2> replacement = {from,to};
-        this->shaderProgramReplacements[type].push_back(replacement);
-    }
+                                     const std::string &to);
 
-    const Color &getBackground() const
-    {
-        return this->background;
-    }
+    const Color &getBackground() const;
 
     const Color &getBackgroundTop() const
     {
@@ -210,22 +197,12 @@ public:
         return this->faceBackgroundBottom;
     }
 
-    void setBackground(const Color &value)
-    {
-        this->background = value;
-    }
+    void setBackground(const Color &value);
 
     std::map<int,std::vector<std::array<std::string,2>>>
-    &getShaderProgramReplacements()
-    {
-        return this->shaderProgramReplacements;
-    }
+    &getShaderProgramReplacements();
 
-    bool hasShaders()
-    {
-        return !this->shaderPrograms.empty() ||
-               !this->shaderProgramReplacements.empty();
-    }
+    bool hasShaders();
 
 public:
     unsigned int renderType; // render type
@@ -247,7 +224,6 @@ public:
     float opacity; // opacity
     std::string textureFilename; // file name for the texture attached]
     Color background;
-
     Color faceBackgroundBottom;
     Color faceBackgroundTop;
 
@@ -255,7 +231,7 @@ public:
     std::vector<bool> shaderEnable; // enable/disable any attached shader
     std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
     std::vector<bool> VAOEnable; // enable/disable any attached VAO
-    std::vector<std::string> shaderPrograms;
+    std::map<int,std::string> shaderPrograms;
     std::map<int,std::vector<std::array<std::string,2>>> shaderProgramReplacements;
 };
 

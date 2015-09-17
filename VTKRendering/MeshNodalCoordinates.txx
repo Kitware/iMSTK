@@ -463,6 +463,14 @@ template <class Scalar> void MeshNodalCoordinates<Scalar>
 }
 
 //------------------------------------------------------------------------------
+template <class Scalar> void MeshNodalCoordinates<Scalar>
+::InsertVariantValue(vtkIdType, vtkVariant)
+{
+    vtkErrorMacro("Read only container.")
+    return;
+}
+
+//------------------------------------------------------------------------------
 template <class Scalar> MeshNodalCoordinates<Scalar>
 ::MeshNodalCoordinates()
 {
