@@ -51,8 +51,14 @@
 #include "VTKRendering/initVTKRendering.h"
 #include "IO/IOMesh.h"
 
-int main()
+int main(int ac, char **av)
 {
+    std::string configFile = "./nidus.config";
+    if(ac == 2)
+    {
+        configFile = av[1];
+    }
+
     initRenderDelegates();
     initVTKRendering();
     initIODelegates();
@@ -74,8 +80,7 @@ int main()
     auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),
-                                                     "nidus.config");
+    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
 
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
                                                              //| SIMMEDTK_RENDER_VERTICES
@@ -157,7 +162,7 @@ int main()
 
     // Get Scene
     auto scene = sdk->getScene(0);
-    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
+    viewer->registerScene(scene);
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();

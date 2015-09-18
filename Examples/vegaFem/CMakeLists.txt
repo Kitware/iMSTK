@@ -1,5 +1,7 @@
-add_executable(vegaFemExample main.cpp)
-target_link_libraries(vegaFemExample
+set(APP vegaFemExample)
+
+add_executable(${APP} main.cpp)
+target_link_libraries(${APP}
   Core
   Geometry
   VTKRendering
@@ -14,24 +16,59 @@ target_link_libraries(vegaFemExample
   IO
 )
 
-# Configure an example to run in the build directory:
-set(dropbox_files
-  dropbox.bou
-  dropbox.config
-  dropbox.lights
-  dropbox.mtl
-  dropbox.vtk
-  dropbox.veg
+set_target_properties(${APP}
+    PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-set(SimMedTK_VEGA_EXAMPLE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
-foreach (_file ${dropbox_files})
-  configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/dropbox/${_file}.in
-    ${CMAKE_CURRENT_BINARY_DIR}/dropbox/${_file}
-    @ONLY
-  )
-endforeach()
+set(${APP}_DATA "${CMAKE_CURRENT_BINARY_DIR}")
+if(NOT EXISTS ${${APP}_DATA})
+    file(MAKE_DIRECTORY ${${APP}_DATA})
+endif()
+
+set(FILE_URL http://midas3.kitware.com/midas/download/item/318708/box.tar)
+set(FILE_SHA1 5c6e34c0de6ed2b16263aff2f33098f98a2bb875)
+set(LOCAL_FILE ${EXAMPLES_DATA}/box.tar)
+
+midas_download(${FILE_URL} ${FILE_SHA1} ${LOCAL_FILE})
+
+# Extract data
+set(DATA
+    ${${APP}_DATA}/box.bou
+    ${${APP}_DATA}/box.config
+    ${${APP}_DATA}/box.interp
+    ${${APP}_DATA}/box.mass
+    ${${APP}_DATA}/box.vtk
+    ${${APP}_DATA}/box.veg
+)
+
+add_custom_command(
+    TARGET ${APP}
+    POST_BUILD
+#     BYPRODUCTS ${DATA}
+    COMMAND ${CMAKE_COMMAND} -E tar xf ${LOCAL_FILE}
+    WORKING_DIRECTORY ${${APP}_DATA}
+    COMMENT "Unpacking ${LOCAL_FILE}"
+)
+
+# Configure an example to run in the build directory:
+# set(dropbox_files
+#   dropbox.bou
+#   dropbox.config
+#   dropbox.lights
+#   dropbox.mtl
+#   dropbox.vtk
+#   dropbox.veg
+# )
+
+# set(SimMedTK_VEGA_EXAMPLE_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+# foreach (_file ${dropbox_files})
+#   configure_file(
+#     ${CMAKE_CURRENT_SOURCE_DIR}/dropbox/${_file}.in
+#     ${CMAKE_CURRENT_BINARY_DIR}/dropbox/${_file}
+#     @ONLY
+#   )
+# endforeach()
 # Generate the mass-matrix and interpolation simulation
 # inputs from the volume mesh and surface mesh.
 # add_custom_command(

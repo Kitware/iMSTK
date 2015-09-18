@@ -35,8 +35,6 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
     endif()
     set(CMAKE_${type}_OUTPUT_DIRECTORY ${output_dir} CACHE INTERNAL "Single output directory for building all libraries.")
   endforeach()
-
-
 else()
   # Multi-configuration is more difficult.  Not only do we need to
   # properly set the output directories, but we also need to

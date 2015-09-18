@@ -50,8 +50,14 @@
 #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 
-int main(int argc, char* argv[])
+int main(int ac, char** av)
 {
+    std::string configFile = "./box.config";
+    if(ac > 1)
+    {
+        configFile = av[1];
+    }
+
     initRenderDelegates();
     initVTKRendering();
     initIODelegates();
@@ -73,19 +79,21 @@ int main(int argc, char* argv[])
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject = std::make_shared<VegaFemSceneObject>(
-        sdk->getErrorLog(),
-        argc > 1 ? argv[1] : "asianDragon/asianDragon.config");
+        sdk->getErrorLog(),configFile);
 
-    Color maroon(165.0f / 255, 42.0f / 255, 42.0f / 255, 1.0);
-    auto femObjRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);
-    femObjRenderDetail->setPointSize(4.0);
-    femObjRenderDetail->setVertexColor(maroon);
-    femObjRenderDetail->setNormalLength(0.02);
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
+    //| SIMMEDTK_RENDER_VERTICES
+    SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
+    );
+    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
+    meshRenderDetail->setDiffuseColor(Color::colorGray);
+    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
+    meshRenderDetail->setShininess(20.0);
 
     auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
     if(renderingMesh)
     {
-        renderingMesh->setRenderDetail(femObjRenderDetail);
+        renderingMesh->setRenderDetail(meshRenderDetail);
     }
     sdk->addSceneActor(femObject, femSimulator);
 
@@ -100,8 +108,9 @@ int main(int argc, char* argv[])
     auto plane = std::make_shared<PlaneCollisionModel>(
       core::Vec3d(0.0, -3.0, 0.0),
       core::Vec3d(0.0, 1.0, 0.0));
-    if (argc > 2)
-      plane->getPlaneModel()->setWidth(atof(argv[2]));
+    plane->getPlaneModel()->setWidth(5);
+    if (ac > 2)
+      plane->getPlaneModel()->setWidth(atof(av[2]));
     staticObject->setModel(plane);
 
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -160,15 +169,21 @@ int main(int argc, char* argv[])
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
+    auto light1 = Light::getDefaultLighting();
+    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    scene->addLight(light1);
+
+    auto light2 = Light::getDefaultLighting();
+    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    scene->addLight(light2);
+
+    // Setup Scene lighting
     if(!useVTKRenderer)
     {
-        auto light = Light::getDefaultLighting();
-        scene->addLight(light);
-
         // Camera setup
         auto sceneCamera = Camera::getDefaultCamera();
-        sceneCamera->setPos(12, 12, 24);
-        sceneCamera->setFocus(0, 0, 0);
+        sceneCamera->setPos(-60,0,0);
+        sceneCamera->setZoom(.5);
         scene->addCamera(sceneCamera);
 
         // Create the camera controller
