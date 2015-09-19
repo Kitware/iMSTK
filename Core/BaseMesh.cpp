@@ -107,13 +107,17 @@ void BaseMesh::setRenderingId( size_t id )
 {
     this->renderingID = id;
 }
-void BaseMesh::translate ( const Eigen::Translation3d& translation )
+void BaseMesh::translate( const Eigen::Translation3d& translation, bool setInitialPoints )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
                     [translation] ( core::Vec3d &v )
     {
         v = translation*v;
     } );
+    if(setInitialPoints)
+    {
+        this->updateOriginalVertsWithCurrent();
+    }
 }
 void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
 {

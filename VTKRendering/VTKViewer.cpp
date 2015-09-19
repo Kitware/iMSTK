@@ -35,6 +35,10 @@
 #include <vtkInteractorStyleSwitch.h>
 #include <vtkCommand.h>
 #include <vtkCallbackCommand.h>
+#include <vtkCamera.h>
+#include <vtkLight.h>
+#include <vtkAxesActor.h>
+#include <vtkOrientationMarkerWidget.h>
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
@@ -121,25 +125,61 @@ public:
     {
         // Create a new renderer and add actors to it.
         vtkNew<vtkRenderer> renderer;
-        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
-        {
-            this->renderWindow->FullScreenOn();
-        }
-        else
-        {
-            this->renderWindow->SetSize(this->viewer->height(),this->viewer->width());
-        }
-
-        this->renderWindow->SetWindowName(this->viewer->windowTitle.data());
-        this->renderWindowInteractor->SetRenderWindow(this->renderWindow.GetPointer());
-        vtkNew<vtkInteractorStyleSwitch> style;
-        style->SetCurrentStyleToTrackballCamera();
-        renderWindowInteractor->SetInteractorStyle(style.GetPointer());
-
         // The actors are obtained from VTKRenderDelegates
         std::shared_ptr<VTKRenderDelegate> delegate;
         for(auto &ro : this->viewer->renderOperations)
         {
+
+            // Set up lighting
+            auto lights = ro.scene->getLights();
+            for(auto &light : lights)
+            {
+                auto position = light->lightPos.getPosition();
+                auto colorDiffuse = light->lightColorDiffuse.getValue();
+                auto colorAmbient = light->lightColorDiffuse.getValue();
+                auto colorSpecular = light->lightColorDiffuse.getValue();
+                auto coneAngle = light->spotCutOffAngle;
+                auto focalPoint = light->focusPosition;
+                auto constAttenuation = light->attn_constant;
+                auto linearAttenuation = light->attn_linear;
+                auto quadAttenuation = light->attn_quadratic;
+
+                vtkNew<vtkLight> l;
+                l->SetLightTypeToSceneLight();
+                l->SetPosition(position[0],position[1],position[2]);
+                l->SetDiffuseColor(colorDiffuse[0],colorDiffuse[1],colorDiffuse[2]);
+                l->SetAmbientColor(colorAmbient[0],colorAmbient[1],colorAmbient[2]);
+                l->SetSpecularColor(colorSpecular[0],colorSpecular[1],colorSpecular[2]);
+                l->SetConeAngle(coneAngle);
+                l->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
+                l->SetAttenuationValues(constAttenuation,linearAttenuation,quadAttenuation);
+                renderer->AddLight(l.GetPointer());
+            }
+
+            // Set up camera
+            auto camera = ro.scene->getCamera();
+            if(camera)
+            {
+                auto position = camera->getPos();
+                auto focus = camera->getFocus();
+                auto upView = camera->getOrientation() * core::Vec3f::UnitZ();
+                auto viewangle = camera->getViewAngleDeg();
+                auto nearClippingRange = camera->getNearClipDist();
+                auto farClippingRange = camera->getFarClipDist();
+                auto zoom = camera->getZoom();
+
+                vtkNew<vtkCamera> c;
+                c->SetPosition(position[0],position[1],position[2]);
+                c->SetFocalPoint(focus[0],focus[1],focus[2]);
+                c->SetViewAngle(viewangle);
+                c->SetClippingRange(nearClippingRange,farClippingRange);
+                c->Zoom(zoom);
+                c->SetViewUp(upView[0],upView[1],upView[2]);
+
+                renderer->SetActiveCamera(c.GetPointer());
+                renderer->ResetCamera();
+            }
+
             for(const auto &object : ro.scene->getSceneObject())
             {
                 delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
@@ -162,6 +202,37 @@ public:
         {
             this->renderWindow->AddRenderer(renderer.GetPointer());
         }
+
+        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
+        {
+            this->renderWindow->FullScreenOn();
+        }
+        else
+        {
+            this->renderWindow->SetSize(this->viewer->height(),this->viewer->width());
+        }
+
+        this->renderWindow->SetWindowName(this->viewer->windowTitle.data());
+        this->renderWindowInteractor->SetRenderWindow(this->renderWindow.GetPointer());
+        vtkNew<vtkInteractorStyleSwitch> style;
+        style->SetCurrentStyleToTrackballCamera();
+        renderWindowInteractor->SetInteractorStyle(style.GetPointer());
+
+        if(viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        {
+            std::cerr << "Axis display does not work properly." << std::endl;
+//             vtkNew<vtkAxesActor> axesActor;
+//
+//             vtkNew<vtkOrientationMarkerWidget> orientationWidget;
+//             orientationWidget->SetOrientationMarker( axesActor.GetPointer() );
+//             orientationWidget->SetInteractor( renderWindowInteractor.GetPointer() );
+//             orientationWidget->SetEnabled( 1 );
+//             orientationWidget->InteractiveOff();
+        }
+
+        // Set up background
+        auto background = this->viewer->getRenderDetail()->getBackground().getValue();
+        renderer->SetBackground(background[0],background[1],background[2]);
     }
 
 public:

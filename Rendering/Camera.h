@@ -59,7 +59,7 @@ public:
     /// \brief Get the position of the camera
     ///
     /// \return 3 Dimensional vector containing the position of the camera
-    core::Vec3f getPos();
+    const core::Vec3f &getPos();
 
     /// \brief Set the focal point of the camera
     ///
@@ -76,17 +76,17 @@ public:
     /// \brief Get the focal point of the camera
     ///
     /// \return 3 Dimensional vector containing the focal point of the camera
-    core::Vec3f getFocus();
+    const core::Vec3f &getFocus();
 
     /// \brief Get the up direction of the camera
     ///
     /// \return 3 Dimensional vector containing the up direction of the camera
-    core::Vec3f getUpVec();
+    const core::Vec3f getUpVec();
 
     /// \brief Get the direction the camera is facing
     ///
     /// \return 3 Dimensional vector containing the direction of the camera
-    core::Vec3f getDirection();
+    const core::Vec3f getDirection();
 
     //Projection settings
     /// \brief Set the aspect ratio of the camera
@@ -100,7 +100,7 @@ public:
     /// \brief Get the aspect ratio of the camera
     ///
     /// \return The aspect ratio of the camera
-    float getAspectRatio();
+    float getAspectRatio() const;
 
     /// \brief Set the vertical view angle of the camera
     ///
@@ -110,7 +110,7 @@ public:
     /// \brief Get the vertical view angle of the camera
     ///
     /// \return The view angle of the camera in radians
-    float getViewAngle();
+    float getViewAngle() const;
 
     /// \brief Set the vertical view angle of the camera
     ///
@@ -120,7 +120,7 @@ public:
     /// \brief Get the vertical view angle of the camera
     ///
     /// \return The view angle of the camera in degrees
-    float getViewAngleDeg();
+    float getViewAngleDeg() const;
 
     /// \brief Set the clipping distance for objects near to the camera
     ///
@@ -131,7 +131,7 @@ public:
     /// \brief Get the near clipping distance of the camera
     ///
     /// \return The near clipping distance
-    float getNearClipDist();
+    float getNearClipDist() const;
 
     /// \brief Set the clipping distance for objects too far from the camera
     ///
@@ -142,7 +142,7 @@ public:
     /// \brief Get the far clipping distance of the camera
     ///
     /// \return The far clipping distance
-    float getFarClipDist();
+    float getFarClipDist() const;
 
     /// \brief Returns the internal view matrix for the camera
     ///
@@ -239,8 +239,8 @@ public:
     ///
     /// \return A 4 by 4 matrix containing the view matrix
     Matrix44f lookAt(const core::Vec3f pos,
-                       const core::Vec3f fp,
-                       const core::Vec3f up);
+                     const core::Vec3f fp,
+                     const core::Vec3f up);
 
     /// \brief Creates a perspective matrix for use with OpenGL
     ///
@@ -251,7 +251,7 @@ public:
     ///
     /// \return A 4 by 4 matrix containing the perspective matrix
     Matrix44f perspective(const float fovy, const float ar,
-                            const float zNear, const float zFar);
+                          const float zNear, const float zFar);
 
     //Create matrices
     /// \brief Generates the view matrix
@@ -284,8 +284,27 @@ public:
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);
         defaultCamera->setPos(0, 0, 10);
+        defaultCamera->setZoom(2);
+        defaultCamera->setFocus(0, 0, 0);
         return defaultCamera;
     }
+
+    /// Set zoom value
+    void setZoom(float zoom)
+    {
+        this->zoomValue = zoom;
+    }
+
+    // Get zoom value
+    const float &getZoom() const
+    {
+        return zoomValue;
+    }
+
+    /// \brief Returns the orientation of the camera
+    ///
+    /// \return The orientation of the camera as a quaternion
+    Quaternionf getOrientation();
 
 private:
     //View matrix variables
@@ -299,6 +318,7 @@ private:
     std::mutex viewLock; //< Controls access to the view variable
     std::atomic_bool viewDirty; ///< True if view variables have been updated
     std::atomic_bool orientDirty; ///< True if orientation needs to be recalculated
+    float zoomValue;
 
     //Projection matrix variables
     std::atomic<float> ar; ///< aspect ratio
@@ -336,11 +356,6 @@ private:
     ///
     /// \param q New internal orientation quaternion
     void setOrientation(const Quaternionf q);
-
-    /// \brief Returns the orientation of the camera
-    ///
-    /// \return The orientation of the camera as a quaternion
-    Quaternionf getOrientation();
 };
 
 #endif

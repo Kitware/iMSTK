@@ -195,6 +195,14 @@ public:
         this->movedOrRotated = false;
     }
 
+    /// \brief Get render detail
+    std::shared_ptr<RenderDetail> getRenderDetail() const
+    {return renderDetail;}
+
+    /// \brief Set the render details (properties affecting visual depiction)
+    void setRenderDetail(std::shared_ptr<RenderDetail> newRenderDetail)
+    { this->renderDetail = newRenderDetail; }
+
 private:
     /// \brief unit normal of the plane
     core::Vec3d unitNormal;
@@ -213,6 +221,9 @@ private:
 
     /// \brief four points used to render plane
     core::Vec3d drawPointsOrig[4];
+
+    /// Render details
+    std::shared_ptr<RenderDetail> renderDetail;
 };
 
 

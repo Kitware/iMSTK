@@ -38,7 +38,7 @@ Camera::Camera()
     projDirty.store(true);
 }
 
-core::Vec3f Camera::getPos()
+const core::Vec3f &Camera::getPos()
 {
     std::lock_guard<std::mutex> lock(posLock);
     return this->pos;
@@ -59,7 +59,7 @@ void Camera::setPos(const core::Vec3f& v)
     this->orientDirty.store(true);
 }
 
-core::Vec3f Camera::getFocus()
+const core::Vec3f &Camera::getFocus()
 {
     std::lock_guard<std::mutex> lock(fpLock);
     return this->fp;
@@ -80,17 +80,17 @@ void Camera::setFocus(const core::Vec3f& v)
     this->orientDirty.store(true);
 }
 
-core::Vec3f Camera::getUpVec()
+const core::Vec3f Camera::getUpVec()
 {
     return getOrientation() * core::Vec3f::UnitY();
 }
 
-core::Vec3f Camera::getDirection()
+const core::Vec3f Camera::getDirection()
 {
     return -(getOrientation() * core::Vec3f::UnitZ());
 }
 
-float Camera::getAspectRatio()
+float Camera::getAspectRatio() const
 {
     return this->ar.load();
 }
@@ -101,7 +101,7 @@ void Camera::setAspectRatio(const float ar)
     this->projDirty.store(true);
 }
 
-float Camera::getViewAngle()
+float Camera::getViewAngle() const
 {
     return this->angle.load();
 }
@@ -112,7 +112,7 @@ void Camera::setViewAngle(const float a)
     this->projDirty.store(true);
 }
 
-float Camera::getViewAngleDeg()
+float Camera::getViewAngleDeg() const
 {
     // Return degrees
     return 57.2957795130823*getViewAngle();
@@ -124,7 +124,7 @@ void Camera::setViewAngleDeg(const float a)
     setViewAngle(0.0174532925199433*a);
 }
 
-float Camera::getNearClipDist()
+float Camera::getNearClipDist() const
 {
     return this->nearClip.load();
 }
@@ -135,7 +135,7 @@ void Camera::setNearClipDist(const float d)
     this->projDirty.store(true);
 }
 
-float Camera::getFarClipDist()
+float Camera::getFarClipDist() const
 {
     return this->farClip.load();
 }

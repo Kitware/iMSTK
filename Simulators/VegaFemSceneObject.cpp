@@ -34,8 +34,7 @@ VegaFemSceneObject::VegaFemSceneObject() :
     staticSolver(0),
     graphicFrame(0),
     explosionFlag(0),
-    positiveDefinite(0),
-    importAndUpdateVolumeMeshToSmtk(false)
+    positiveDefinite(0)
 {
     performaceTracker.initialize();
 
@@ -50,8 +49,7 @@ VegaFemSceneObject::VegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/
     staticSolver(0),
     graphicFrame(0),
     explosionFlag(0),
-    positiveDefinite(0),
-    importAndUpdateVolumeMeshToSmtk(false)
+    positiveDefinite(0)
 {
     performaceTracker.initialize();
 
@@ -314,6 +312,7 @@ void VegaFemSceneObject::loadSurfaceMesh()
                 << ioMesh->getMesh()->getTriangles().size() << " faces\n";
         }
         auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
+        surfaceMesh->updateOriginalVertsWithCurrent();
 
         // load interpolation structure
         if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)
@@ -322,9 +321,11 @@ void VegaFemSceneObject::loadSurfaceMesh()
             std::cerr << "VEGA:  error! weighs will be computed. Slow operation." << std::endl;
             this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
         }
-        surfaceMesh->updateOriginalVertsWithCurrent();
-        this->volumetricMesh->attachSurfaceMesh(surfaceMesh,
+        else
+        {
+            this->volumetricMesh->attachSurfaceMesh(surfaceMesh,
                                                 femConfig->secondaryRenderingMeshInterpolationFilename);
+        }
     }
 
 }
@@ -707,7 +708,6 @@ void VegaFemSceneObject::createForceModel()
 
         // create the invertible FEM deformable model
         IsotropicHyperelasticFEM * isotropicHyperelasticFEM;
-
         if (femConfig->numInternalForceThreads == 0)
         {
             isotropicHyperelasticFEM = new IsotropicHyperelasticFEM(
@@ -833,7 +833,7 @@ inline void VegaFemSceneObject::advanceOneTimeStep()
                 <<"Reduce the timestep, or increase the number of substeps per timestep.\n";
             integratorBase->ResetToRest();
 
-            for (int i = 0; i < 3 * numNodes; i++)
+            for (int i = 0, end = 3*numNodes; i < end; ++i)
             {
                 f_ext[i] = 0;
                 f_extBase[i] = 0;

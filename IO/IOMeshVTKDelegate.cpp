@@ -258,6 +258,7 @@ void IOMeshVTKDelegate::read()
 
             meshToAttach->setVertices(surfaceVertices);
             meshToAttach->setTriangles(triangleArray);
+            meshToAttach->updateOriginalVertsWithCurrent();
 
             vegaMesh->setVertexMap(uniqueVertexArray);
             vegaMesh->attachSurfaceMesh(meshToAttach);
@@ -289,6 +290,7 @@ void IOMeshVTKDelegate::read()
 
             meshToAttach->setVertices(surfaceVertices);
             meshToAttach->setTriangles(triangleArray);
+            meshToAttach->updateOriginalVertsWithCurrent();
             vegaMesh->setVertexMap(uniqueVertexArray);
             vegaMesh->attachSurfaceMesh(meshToAttach);
         }
