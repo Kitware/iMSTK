@@ -200,10 +200,10 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
 
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_MATERIALCOLOR)
     {
-        const GLfloat * color = renderDetail->getColorDiffuse().toGLColor<GLfloat>();
+        const GLfloat * color = renderDetail->getDiffuseColor().toGLColor<GLfloat>();
         glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, color);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getColorSpecular().toGLColor<GLfloat>());
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getColorAmbient().toGLColor<GLfloat>());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, renderDetail->getSpecularColor().toGLColor<GLfloat>());
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, renderDetail->getAmbientColor().toGLColor<GLfloat>());
         glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, renderDetail->getShininess());
     }
 

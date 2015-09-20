@@ -233,7 +233,7 @@ bool VAO::setBufferDataFromMesh( SurfaceMesh *p_mesh, std::shared_ptr<Shader> p_
 {
     if ( p_shader == nullptr )
     {
-        shader = Shader::getShader( p_mesh->getRenderDetail()->shaders[0] );
+        shader = Shader::getShader( p_mesh->getRenderDetail()->getShaders()[0] );
     }
     else
     {

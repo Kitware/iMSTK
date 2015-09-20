@@ -14,6 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
 #ifndef SMRENDERDETAIL_H
 #define SMRENDERDETAIL_H
 
@@ -31,50 +37,53 @@ class CoreClass;
 class Model;
 struct UnifiedId;
 
-///\brief Hold a pointer to a source of geometry that render details can use for drawing.
-struct GeometrySource {
-  CoreClass* sceneObject;
-  VisualArtifact* analyticObject;
-  Model *model;
+///
+/// \brief Hold a pointer to a source of geometry that render details can use for drawing.
+/// 
+struct GeometrySource
+{
+    CoreClass* sceneObject;
+    VisualArtifact* analyticObject;
+    Model *model;
 
-  GeometrySource()
-    : sceneObject(nullptr), analyticObject(nullptr)
+    GeometrySource()
+        : sceneObject(nullptr), analyticObject(nullptr)
     { }
-  void setSource(CoreClass* src)
+    void setSource(CoreClass* src)
     {
-    this->sceneObject = src;
-    this->analyticObject = nullptr;
-    this->model = nullptr;
+        this->sceneObject = src;
+        this->analyticObject = nullptr;
+        this->model = nullptr;
     }
-  void setSource(VisualArtifact* src)
+    void setSource(VisualArtifact* src)
     {
-    this->sceneObject = nullptr;
-    this->model = nullptr;
-    this->analyticObject = src;
+        this->sceneObject = nullptr;
+        this->model = nullptr;
+        this->analyticObject = src;
     }
-  void setSource(Model* src)
+    void setSource(Model* src)
     {
-    this->sceneObject = nullptr;
-    this->model = src;
-    this->analyticObject = nullptr;
+        this->sceneObject = nullptr;
+        this->model = src;
+        this->analyticObject = nullptr;
     }
-  template<typename T>
-  T* sourceAs() const
+    template<typename T>
+    T* sourceAs() const
     {
-    T* result;
-    if ((result = dynamic_cast<T*>(sceneObject)))
-    {
-      return result;
-    }
-    if ((result = dynamic_cast<T*>(analyticObject)))
-    {
-      return result;
-    }
-    if ((result = dynamic_cast<T*>(model)))
-    {
-        return result;
-    }
-    return nullptr;
+        T* result;
+        if((result = dynamic_cast<T*>(sceneObject)))
+        {
+            return result;
+        }
+        if((result = dynamic_cast<T*>(analyticObject)))
+        {
+            return result;
+        }
+        if((result = dynamic_cast<T*>(model)))
+        {
+            return result;
+        }
+        return nullptr;
     }
 };
 
@@ -85,108 +94,42 @@ struct RenderDetail
 public:
     typedef std::shared_ptr<RenderDetail> Ptr;
 
+    ///
+    /// \brief Constructors/Destructor
+    /// 
     RenderDetail();
+    ~RenderDetail();
     RenderDetail(unsigned int type);
 
-    void reset();
-
-    /// \brief attachment of shader
-    void addShader(std::shared_ptr<UnifiedId> p_shaderID);
-
-    /// \brief attachment of VAO
-    void addVAO(std::shared_ptr<UnifiedId> p_shaderID);
-
-    const Color &getColorDiffuse() const;
-
-    const Color &getColorAmbient() const;
-
-    const Color &getColorSpecular() const;
-
-    const float &getShininess() const;
-
-    const unsigned int &getRenderType() const;
-
-    const float &getPointSize() const;
-
-    const float &getLineSize() const;
-
-    const Color &getNormalColor() const;
-
+    ///
+    /// @brief  Color setters
+    ///
+    const Color &getAmbientColor() const;
+    const Color &getDiffuseColor() const;
+    const Color &getSpecularColor() const;
     const Color &getHighLightColor() const;
-
-    const Color &getVertexColor() const;
-
+    const Color &getNormalColor() const;
     const Color &getShadowColor() const;
-
-    const bool &getCastShadow() const;
-
-    const bool &getCanGetShadow() const;
-
+    const Color &getVertexColor() const;
     const Color &getWireFrameColor() const;
-
-    const bool &getDebugDraw() const;
-
-    const std::vector<std::shared_ptr<UnifiedId>> &getShaders() const;
-
-    const std::vector<bool> &getShaderEnable() const;
-
-    const std::vector<std::shared_ptr<UnifiedId>> &getVAOs() const;
-
-    const std::vector<bool> &getVAOEnable() const;
-
-    void setPointSize(const float size);
-
-    void setLineSize(const float size);
-
-    void setVertexColor(const Color vertColor);
-
-    void setHighlightColor(const Color highlightColor);
-
-    void setNormalColor(const Color highlightColor);
-
-    void setShininess(const float s);
-
-    void setNormalLength(const float len);
-
-    void setDiffuseColor(const Color diffColor);
-
-    void setAmbientColor(const Color ambColor);
-
-    void setSpecularColor(const Color specColor);
-
-    void setShadowColor(const Color shadColor);
-
-    void setWireframeColor(const Color wireColor);
-
-    void setTextureFilename(const std::string &filename);
-    const std::string &getTextureFilename() const;
-    bool renderTexture() const;
-
-    bool renderNormals() const;
-    bool renderWireframe() const;
-    bool renderFaces() const;
-
-    const float &getOpacity() const;
-    void setOpacity(const float &value);
-
+    
     ///
-    /// @brief Add a shader program to the the list of programs (vtk)
-    /// @param program String containing the actual program
+    /// @brief  Color getters
     ///
-    void addShaderProgram(int shaderType, const std::string &programFilename);
-
-    std::map<int,std::string> &getShaderPrograms();
-
-    ///
-    /// @brief Add a shader program for partial replacement of vtk default shaders.
-    /// @param type 0 = vertex, 1 = Fragment, 2 = Geometry
-    /// @param program String containing the actual program
-    ///
-    void addShaderProgramReplacement(int type, const std::string &from,
-                                     const std::string &to);
-
+    void setAmbientColor(const Color &color);
+    void setDiffuseColor(const Color &color);
+    void setHighlightColor(const Color &color);
+    void setNormalColor(const Color &color);
+    void setShadowColor(const Color &color);
+    void setSpecularColor(const Color &color);
+    void setVertexColor(const Color &color);
+    void setWireframeColor(const Color &color);
+    
+    /// 
+    /// \brief Get/Set background color
+    /// 
     const Color &getBackground() const;
-
+    void setBackground(const Color &value);
     const Color &getBackgroundTop() const
     {
         return this->faceBackgroundTop;
@@ -196,43 +139,176 @@ public:
     {
         return this->faceBackgroundBottom;
     }
+    
+    /// 
+    /// \brief Get/Set opacity value
+    /// 
+    const float &getOpacity() const;
+    void setOpacity(const float &value);
+    
+    /// 
+    /// \brief Get/Set specular power
+    /// 
+    const float &getShininess() const;
+    void setShininess(const float &value);
+    
+    /// 
+    /// \brief Get/Set the length of the normal vector to draw
+    /// 
+    const float &getNormalLength() const;
+    void setNormalLength(const float &value);
+    
+    /// 
+    /// \brief Get/Set size of point to draw
+    /// 
+    const float &getPointSize() const;
+    void setPointSize(const float &value);
+    
+    /// 
+    /// \brief Get/Set size of line to draw
+    /// 
+    const float &getLineSize() const;
+    void setLineSize(const float &value);
+    
+    /// 
+    /// \brief Can the object get the shadow
+    /// 
+    const bool &getCanGetShadow() const;
+    
+    /// 
+    /// \brief Can the object cast a shadow
+    /// 
+    const bool &getCastShadow() const;
+    
+    /// 
+    /// \brief Debug mode
+    /// 
+    const bool &getDebugDraw() const;
+    
+    /// 
+    /// \brief Render type
+    /// 
+    const unsigned int &getRenderType() const;
+    
+    /// 
+    /// \brief Get enabled/disabled shaders array
+    /// 
+    const std::vector<bool> &getShaderEnable() const;
+    
+    /// 
+    /// \brief Get VAO's array
+    /// 
+    const std::vector<std::shared_ptr<UnifiedId>> &getVAOs() const;
+    
+    /// 
+    /// \brief Get enabled/disabled VAO array
+    /// 
+    const std::vector<bool> &getVAOEnable() const;
+    
+    ///
+    /// \brief Set/Get the binding texture filename
+    ///
+    void setTextureFilename(const std::string &filename);
+    const std::string &getTextureFilename() const;
+    
+    ///
+    /// \brief Returns true if you want to draw texture map
+    ///
+    void setRenderTexture(bool value);
+    bool renderTexture() const;
+    
+    ///
+    /// \brief Returns true if you want to draw normalsmap
+    ///
+    void setRenderNormals(bool value);
+    bool renderNormals() const;
+    
+    ///
+    /// \brief Returns true if you want to draw wireframe
+    ///
+    void setRenderWireframe(bool value);
+    bool renderWireframe() const;
+    bool renderFaces() const;
 
-    void setBackground(const Color &value);
+    ///
+    /// @brief Add a shader program to the the list (vtk)
+    ///
+    void addShaderProgram(int shaderType, const std::string &programFilename);
 
-    std::map<int,std::vector<std::array<std::string,2>>>
+    ///
+    /// \brief Return list of shader programs
+    ///
+    std::map<int, std::string> &getShaderPrograms();
+
+    ///
+    /// @brief Add a shader program for partial replacement of vtk default shaders.
+    /// @param type 0 = vertex, 1 = Fragment, 2 = Geometry
+    /// @param program String containing the actual program
+    ///
+    void addShaderProgramReplacement(int type, const std::string &from,
+                                     const std::string &to);
+
+
+    ///
+    /// \brief Return list of shader program replacements
+    ///
+    std::map<int, std::vector<std::array<std::string, 2>>>
     &getShaderProgramReplacements();
-
+    
+    /// 
+    /// \brief Retrurns true if there is vtk shader in the list
+    ///
     bool hasShaders();
 
-public:
-    unsigned int renderType; // render type
-    Color colorDiffuse; // diffuse color
-    Color colorAmbient; // ambient color
-    Color colorSpecular; // specular color
-    Color highLightColor; // highlight color
-    Color vertexRenderColor; // vertex color
-    Color shadowColor; // shadow color
-    bool castShadow; // object can generate a shadow or not
+    ///
+    /// \brief attachment of shader
+    /// 
+    void addShader(std::shared_ptr<UnifiedId> p_shaderID);
+
+    /// 
+    /// \brief Get shaders array
+    /// 
+    const std::vector<std::shared_ptr<UnifiedId>> &getShaders() const;
+    
+    ///
+    /// \brief attachment of VAO
+    /// 
+    void addVAO(std::shared_ptr<UnifiedId> p_shaderID);
+
+    /// 
+    /// \brief Reset variables and containers
+    ///
+    void reset();
+    
+private:
     bool canGetShadow; // object can get the shadow or not
-    Color normalColor; // normal color
-    Color wireFrameColor; // wire frame color
-    float pointSize; // point size if rendering of vertices are enabled
-    float lineSize; // line width size
-    float shininess; // specular shinness
+    bool castShadow; // object can generate a shadow or not
     bool debugDraw; // debug draw enabled or not
-    float normalLength; // length of rendered normals
-    float opacity; // opacity
-    std::string textureFilename; // file name for the texture attached]
-    Color background;
+    Color background; // backgroung color
     Color faceBackgroundBottom;
     Color faceBackgroundTop;
+    Color ambientColor; // ambient color
+    Color diffuseColor; // diffuse color
+    Color specularColor; // specular color
+    Color highLightColor; // highlight color
+    Color normalColor; // normal color
+    Color shadowColor; // shadow color
+    Color vertexRenderColor; // vertex color
+    Color wireFrameColor; // wire frame color
+    float lineSize; // line width size
+    float normalLength; // length of rendered normals
+    float opacity; // opacity
+    float pointSize; // point size if rendering of vertices are enabled
+    float shininess; // specular shinness
+    std::string textureFilename; // file name for the texture attached]
+    unsigned int renderType; // render type
 
-    std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
+    std::map<int, std::string> shaderPrograms;
+    std::map<int, std::vector<std::array<std::string, 2>>> shaderProgramReplacements;
     std::vector<bool> shaderEnable; // enable/disable any attached shader
-    std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
     std::vector<bool> VAOEnable; // enable/disable any attached VAO
-    std::map<int,std::string> shaderPrograms;
-    std::map<int,std::vector<std::array<std::string,2>>> shaderProgramReplacements;
+    std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
+    std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
 };
 
 #endif // SMRENDERDETAIL_H

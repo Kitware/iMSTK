@@ -58,9 +58,9 @@ void PlaneRenderDelegate::initDraw()
     auto renderDetail = plane->getRenderDetail();
     if(renderDetail)
     {
-        auto ambientColor = renderDetail->getColorAmbient().getValue();
-        auto diffuseColor = renderDetail->getColorDiffuse().getValue();
-        auto specularColor = renderDetail->getColorSpecular().getValue();
+        auto ambientColor = renderDetail->getAmbientColor().getValue();
+        auto diffuseColor = renderDetail->getDiffuseColor().getValue();
+        auto specularColor = renderDetail->getSpecularColor().getValue();
         auto specularPower = renderDetail->getShininess();
         auto opacity = renderDetail->getOpacity();
         actor->GetProperty()->SetAmbient(ambientColor[3]);

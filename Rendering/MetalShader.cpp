@@ -98,11 +98,11 @@ void MetalShader::initDraw()
 
 void MetalShader::predraw(std::shared_ptr<Core::BaseMesh> mesh )
 {
-    specularPowerValue = mesh->getRenderDetail()->shininess;
+    specularPowerValue = mesh->getRenderDetail()->getShininess();
     glUniform1fARB( specularPower, specularPowerValue );
     glUniform1fARB( alphaMapGain, alphaMapGainValue );
 
-    if ( mesh->getRenderDetail()->canGetShadow )
+    if ( mesh->getRenderDetail()->getCanGetShadow() )
     {
         glUniform1fARB( canGetShadowUniform, 1 );
     }
@@ -168,7 +168,7 @@ void MetalShaderShadow::predraw( std::shared_ptr<Core::BaseMesh> p_mesh )
 {
     MetalShader::predraw( p_mesh );
 
-    if ( p_mesh->getRenderDetail()->canGetShadow )
+    if ( p_mesh->getRenderDetail()->getCanGetShadow() )
     {
         glUniform1fARB( canGetShadowUniform, 1 );
     }
