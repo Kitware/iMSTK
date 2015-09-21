@@ -38,7 +38,13 @@ DeviceInterface::Message VRPNPhantomDevice::openDevice()
 
 DeviceInterface::Message VRPNPhantomDevice::closeDevice()
 {
-    this->terminate();
+    vrpnButton->unregister_change_handler(this, buttonChangeHandler);
+    vrpnForce->unregister_force_change_handler(this, forceChangeHandler);
+    vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
+
+    this->vrpnButton.reset();
+    this->vrpnForce.reset();
+    this->vrpnTracker.reset();
     return DeviceInterface::Message::Success;
 }
 

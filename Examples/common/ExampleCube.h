@@ -33,20 +33,32 @@ namespace mstk {
 namespace Examples {
 namespace Common {
 
+/// \brief A simple interface for creating a textured cube in 3D space
+///
 class ExampleCube
 {
 public:
     ExampleCube(bool vtkRenderer = true);
+
+    /// \brief Tell the cube to initialize using the VTK renderer
+    ///
     void useVTKRenderer(bool b);
+
+    /// \brief Create the cube object, load meshes and textures, etc
+    ///
     void setup();
+
+    /// \brief Get a pointer to the cube's scene object
+    ///
+    /// \return Shared pointer to the internal static scene object
     std::shared_ptr<StaticSceneObject> getStaticSceneObject();
 
 private:
-    std::shared_ptr<StaticSceneObject> cube;
-    std::shared_ptr<RenderDetail> renderDetail;
-    std::shared_ptr<MeshModel> cubeModel;
+    std::shared_ptr<StaticSceneObject> cube; ///< Cube scene object
+    std::shared_ptr<RenderDetail> renderDetail; ///< Details of how to render
+    std::shared_ptr<MeshModel> cubeModel; ///< Cube 3D mesh
 
-    bool useVTK;
+    bool useVTK; ///< To use, or not use the VTK renderer
 };
 
 } //Common

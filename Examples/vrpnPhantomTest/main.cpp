@@ -51,13 +51,13 @@ int main()
 
     auto sdk = SDK::getInstance();
     auto phantom = std::make_shared<VRPNPhantomDevice>();
-    //auto listener = std::make_shared<vrpnPhantomListener>(phantom);
     auto controller = std::make_shared<vrpnPhantomObjectController>();
+    controller->setScalingFactor(5.0);
 
     sdk->registerModule(phantom);
     sdk->registerModule(controller);
 
-    //get some user input and setup device url and stuff like that
+    //get some user input and setup device url
     std::cout << "Enter the VRPN device URL(" << phantom->getDeviceURL() << "): ";
     std::getline(std::cin, input);
     if(!input.empty())
@@ -77,6 +77,7 @@ int main()
             = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::Other);
     }
 
+    //Set up the cube object
     cube.useVTKRenderer(useVTKRenderer);
     cube.setup();
 
@@ -109,14 +110,13 @@ int main()
         scene->addCamera(sceneCamera);
     }
 
-    viewer->exec();
-
-
+    //Open communication for the vrpn phantom
     phantom->openDevice();
 
     controller->setPhantom(phantom);
     controller->setMesh(cube.getStaticSceneObject()->getModel()->getMesh());
 
+    sdk->addViewer(viewer);
     sdk->run();
 
     return 0;

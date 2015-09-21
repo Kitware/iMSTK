@@ -36,8 +36,11 @@ vrpnPhantomObjectController::vrpnPhantomObjectController(
     : phantom(p),
       mesh(m),
       scalingFactor(1.0),
+      pScale(scalingFactor),
       delay(std::chrono::milliseconds(100))
 {
+    pRot = core::Quaterniond(0, 0, 0, 0);
+    pPos = core::Vec3d(0, 0, 0);
 }
 
 void vrpnPhantomObjectController::init()
@@ -59,17 +62,33 @@ void vrpnPhantomObjectController::exec()
 
     while(!terminateExecution)
     {
+        using AffTrans3d = Eigen::Transform<double,3,Eigen::Affine>;
         //calculate new transformation
-        Eigen::Transform<double,3,Eigen::Affine> trans;
+        core::Quaterniond rot = phantom->getOrientation();
+        core::Vec3d pos = phantom->getPosition();
+        double scale = scalingFactor; //store in case it is changed during this
+        //create the transform for the current data
+        AffTrans3d trans = Eigen::Translation3d(pos * scale) * rot;
 
-        trans.rotate(phantom->getOrientation());
-        trans.translate(phantom->getPosition() * scalingFactor);
+        //exclude any zero data that comes at initialization
+        if(!(((core::Vec3d::Zero() == rot.vec()) && (0 == rot.w())) &&
+             (core::Vec3d::Zero() == pos)))
+        {
+            //don't inverse the transform until there is non-zero data
+            if(!(((core::Vec3d::Zero() == pRot.vec()) && (0 == pRot.w())) &&
+                 (core::Vec3d::Zero() == pPos)))
+            {
+                AffTrans3d pTrans = Eigen::Translation3d(pPos * pScale) * pRot;
+                mesh->transform(pTrans.inverse()); //inverse prev transform
+            }
+            mesh->transform(trans); //apply new transformation
+            mesh->getRenderDelegate()->modified(); //tell the renderer to update
 
-        mesh->transform(prevTrans.inverse()); //inverse previous transformation
-        mesh->transform(trans); //apply new transformation
-        mesh->getRenderDelegate()->modified();
-
-        prevTrans = trans; //track most recent transform
+            //store this transformation so it can be inverted before the next
+            pPos = pos;
+            pRot = rot;
+            pScale = scale;
+        }
 
         std::this_thread::sleep_for(delay);
     }
