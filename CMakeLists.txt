@@ -47,11 +47,21 @@ option(SimMedTK_SUPERBUILD
 mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
-# Device options
+# Devices options
 #
 option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+
+#-----------------------------------------------------------------------------
+# VRPN options
+option(USE_VRPN_CLIENT "Use VRPN in client mode." ON)
+option(USE_VRPN_SERVER "Use VRPN in server mode." OFF)
+
+if(USE_VRPN_SERVER)
+    set(SimMedTK_USE_PHANTOM_OMNI ON CACHE BOOL "Force the use of OpenHaptics." FORCE)
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Oculus Option - Disabled by default
@@ -209,10 +219,9 @@ if(SimMedTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics)
 endif()
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
   find_package(VRPN REQUIRED)
   include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
-  include_directories(SYSTEM VRPN_PHANTOM_INCLUDE_DIR)
 endif()
 
 if(SimMedTK_USE_ADU)

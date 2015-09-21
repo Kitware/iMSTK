@@ -37,6 +37,16 @@ if(NOT DEFINED ${proj}_DIR)
     )
   endif()
 
+  set(SERVER_ARGS)
+  if(USE_VRPN_SERVER)
+    set(SERVER_ARGS
+        -DVRPN_BUILD_SERVERS:BOOL=ON
+        -DVRPN_USE_HDAPI:BOOL=ON
+        -DVRPN_GPL_SERVER:BOOL=ON
+        -DVRPN_USE_PHANTOM_SERVER:BOOL=ON
+        -DVRPN_USE_HID:BOOL=ON)
+  endif()
+
 #   message(STATUS "Adding project:${proj}")
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}
@@ -63,8 +73,8 @@ if(NOT DEFINED ${proj}_DIR)
       -DVRPN_USE_GPM_MOUSE:BOOL=OFF
       -DVRPN_USE_LIBNIFALCON:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-      ${CMAKE_GENERAL_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
+      ${SERVER_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
 #     LOG_DOWNLOAD 1            # Wrap download in script to log output
@@ -81,4 +91,4 @@ else()
 endif()
 
 set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS VRPN_DIR:PATH=${${proj}_DIR})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DVRPN_DIR:PATH=${${proj}_DIR})

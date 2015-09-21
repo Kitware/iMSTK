@@ -29,9 +29,18 @@ mark_as_advanced(
   VRPN_LIBRARY
   VRPN_QUAT_LIBRARY)
 
-if(VRPN_FOUND AND NOT TARGET vrpn::vrpn)
-  add_library(vrpn::vrpn INTERFACE IMPORTED)
-  set_target_properties(vrpn::vrpn PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${VRPN_LIBRARY};${VRPN_QUAT_LIBRARY}"
-    INTERFACE_INCLUDE_DIRECTORIES "${VRPN_INCLUDE_DIR}")
+if(VRPN_FOUND)
+  if(NOT TARGET vrpn::vrpn)
+    add_library(vrpn::vrpn INTERFACE IMPORTED)
+    set_target_properties(vrpn::vrpn PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${VRPN_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${VRPN_INCLUDE_DIR}")
+  endif()
+  if(NOT TARGET vrpn::quat)
+    add_library(vrpn::quat INTERFACE IMPORTED)
+    set_target_properties(vrpn::quat PROPERTIES
+        INTERFACE_LINK_LIBRARIES "${VRPN_QUAT_LIBRARY}"
+        INTERFACE_INCLUDE_DIRECTORIES "${VRPN_INCLUDE_DIR}")
+  endif()
+
 endif()

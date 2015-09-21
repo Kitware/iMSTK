@@ -2,14 +2,15 @@
 set(EXTERNAL_DEVICES_SOURCES)
 set(EXTERNAL_DEVICES_TARGET_LIBRARIES)
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
   list(APPEND EXTERNAL_DEVICES_SOURCES
-    HapticInterface.cpp
+#     HapticInterface.cpp
 #    PhantomInterface.cpp
     VRPNPhantomDevice.cpp
     )
   list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
     vrpn::vrpn
+    vrpn::quat
     )
 endif()
 
@@ -28,13 +29,13 @@ simmedtk_add_library(Devices
     DeviceInterface.cpp
     ${EXTERNAL_DEVICES_SOURCES}
   PUBLIC_HEADERS
-    ADUInterface.h
+#     ADUInterface.h
+#     HapticInterface.h
+#     NIDAQmx.h
+#     Audio.h
+#     NIUSB6008Interface.h
+#     PhantomInterface.h
     DeviceInterface.h
-    HapticInterface.h
-    NIDAQmx.h
-    Audio.h
-    NIUSB6008Interface.h
-    PhantomInterface.h
     VRPNPhantomDevice.h
 )
 

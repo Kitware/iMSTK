@@ -1,3 +1,26 @@
+// This file is part of the SimMedTK project.
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+//---------------------------------------------------------------------------
+//
+// Authors:
+//
+// Contact:
+//---------------------------------------------------------------------------
+
 #include "VRPNPhantomDevice.h"
 
 #include <vrpn_Button.h>
@@ -16,31 +39,34 @@ VRPNPhantomDevice::VRPNPhantomDevice()
 
 }
 
+//---------------------------------------------------------------------------
 VRPNPhantomDevice::~VRPNPhantomDevice()
 {
 
 }
 
+//---------------------------------------------------------------------------
 DeviceInterface::Message VRPNPhantomDevice::openDevice()
 {
-    vrpnButton = std::make_shared<vrpn_Button_Remote>(this->deviceURL.c_str());
-    vrpnForce = std::make_shared<vrpn_ForceDevice_Remote>(this->deviceURL.c_str());
-    vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(this->deviceURL.c_str());
-    //need try/catch incase the memory couldn't be allocated, then return
+    this->vrpnButton = std::make_shared<vrpn_Button_Remote>(this->deviceURL.c_str());
+    this->vrpnForce = std::make_shared<vrpn_ForceDevice_Remote>(this->deviceURL.c_str());
+    this->vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(this->deviceURL.c_str());
+    //TODO: need try/catch incase the memory couldn't be allocated, then return
     // Message::Failure;
 
-    vrpnButton->register_change_handler(this, buttonChangeHandler);
-    vrpnForce->register_force_change_handler(this, forceChangeHandler);
-    vrpnTracker->register_change_handler(this, trackerChangeHandler);
+    this->vrpnButton->register_change_handler(this, buttonChangeHandler);
+    this->vrpnForce->register_force_change_handler(this, forceChangeHandler);
+    this->vrpnTracker->register_change_handler(this, trackerChangeHandler);
 
     return DeviceInterface::Message::Success;
 }
 
+//---------------------------------------------------------------------------
 DeviceInterface::Message VRPNPhantomDevice::closeDevice()
 {
-    vrpnButton->unregister_change_handler(this, buttonChangeHandler);
-    vrpnForce->unregister_force_change_handler(this, forceChangeHandler);
-    vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
+    this->vrpnButton->unregister_change_handler(this, buttonChangeHandler);
+    this->vrpnForce->unregister_force_change_handler(this, forceChangeHandler);
+    this->vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
 
     this->vrpnButton.reset();
     this->vrpnForce.reset();
@@ -48,133 +74,160 @@ DeviceInterface::Message VRPNPhantomDevice::closeDevice()
     return DeviceInterface::Message::Success;
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::init()
 {
-    buttonTimers[0].start();
-    buttonTimers[1].start();
-    forceTimer.start();
-    posTimer.start();
-    quatTimer.start();
+    this->buttonTimers[0].start();
+    this->buttonTimers[1].start();
+    this->forceTimer.start();
+    this->posTimer.start();
+    this->quatTimer.start();
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::exec()
 {
-    while(!terminateExecution)
+    while(!this->terminateExecution)
     {
-        processChanges();
-        std::this_thread::sleep_for(delay);
+        this->processChanges();
+        std::this_thread::sleep_for(this->delay);
     }
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::beginFrame()
 {
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::endFrame()
 {
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::setDeviceURL(const std::string s)
 {
-    deviceURL = s;
+    this->deviceURL = s;
 }
 
-std::string VRPNPhantomDevice::getDeviceURL()
+//---------------------------------------------------------------------------
+const std::string &VRPNPhantomDevice::getDeviceURL() const
 {
-    return deviceURL;
+    return this->deviceURL;
 }
 
-void VRPNPhantomDevice::setPollDelay(const std::chrono::milliseconds d)
+//---------------------------------------------------------------------------
+void VRPNPhantomDevice::setPollDelay(const std::chrono::milliseconds &d)
 {
-    delay = d;
+    this->delay = d;
 }
 
-std::chrono::milliseconds VRPNPhantomDevice::getPollDelay()
+//---------------------------------------------------------------------------
+const std::chrono::milliseconds &VRPNPhantomDevice::getPollDelay() const
 {
-    return delay;
+    return this->delay;
 }
 
+//---------------------------------------------------------------------------
 void VRPNPhantomDevice::processChanges()
 {
-    vrpnButton->mainloop();
-    vrpnForce->mainloop();
-    vrpnTracker->mainloop();
+    this->vrpnButton->mainloop();
+    this->vrpnForce->mainloop();
+    this->vrpnTracker->mainloop();
 }
 
-core::Vec3d VRPNPhantomDevice::getForce()
+//---------------------------------------------------------------------------
+const core::Vec3d &VRPNPhantomDevice::getForce() const
 {
-    return force;
+    return this->force;
 }
 
-core::Vec3d VRPNPhantomDevice::getPosition()
+//---------------------------------------------------------------------------
+const core::Vec3d &VRPNPhantomDevice::getPosition() const
 {
-    return pos;
+    return this->pos;
 }
 
-core::Quaterniond VRPNPhantomDevice::getOrientation()
+//---------------------------------------------------------------------------
+const core::Quaterniond &VRPNPhantomDevice::getOrientation() const
 {
-    return quat;
+    return this->quat;
 }
 
-bool VRPNPhantomDevice::getButton(size_t i)
+//---------------------------------------------------------------------------
+bool VRPNPhantomDevice::getButton(size_t i) const
 {
     if (i < 2)
-        return buttons[i];
+        return this->buttons[i];
     else
         return false;
 }
 
+//---------------------------------------------------------------------------
 long double VRPNPhantomDevice::getForceETime()
 {
-    return forceTimer.elapsed();
+    return this->forceTimer.elapsed();
 }
 
+//---------------------------------------------------------------------------
 long double VRPNPhantomDevice::getPositionETime()
 {
-    return posTimer.elapsed();
+    return this->posTimer.elapsed();
 }
 
+//---------------------------------------------------------------------------
 long double VRPNPhantomDevice::getOrientationETime()
 {
-    return quatTimer.elapsed();
+    return this->quatTimer.elapsed();
 }
 
+//---------------------------------------------------------------------------
 long double VRPNPhantomDevice::getButtonETime(size_t i)
 {
     if (i < 2)
-        return buttonTimers[i].elapsed();
+        return this->buttonTimers[i].elapsed();
     else
         return -1;
 }
 
-
+//---------------------------------------------------------------------------
 void VRPN_CALLBACK
 VRPNPhantomDevice::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 {
-    VRPNPhantomDevice *handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
+    auto handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
 
-    if (b.button < handler->buttons.size())
+    if (b.button < vrpn_int32(handler->buttons.size()))
     {
         handler->buttons[b.button] = (1 == b.state);
         handler->buttonTimers[b.button].start();
-    }//else the button isn't accounted for, as far as we know, it didn't exist
+    }
 }
 
+//---------------------------------------------------------------------------
 void VRPN_CALLBACK
 VRPNPhantomDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
 {
-    VRPNPhantomDevice *handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
+    auto handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
 
-    handler->force = Eigen::Map<const core::Vec3d>(f.force);
+    handler->force[0] = f.force[0];
+    handler->force[1] = f.force[1];
+    handler->force[2] = f.force[2];
     handler->forceTimer.start();
 }
 
+//---------------------------------------------------------------------------
 void VRPN_CALLBACK
 VRPNPhantomDevice::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
-    VRPNPhantomDevice *handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
-    handler->pos = Eigen::Map<const core::Vec3d>(t.pos);
+    auto handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
+
+    handler->pos[0] = t.pos[0];
+    handler->pos[1] = t.pos[1];
+    handler->pos[2] = t.pos[2];
     handler->posTimer.start();
-    handler->quat = Eigen::Map<const core::Quaterniond>(t.quat);
+    handler->quat.w() = t.quat[0];
+    handler->quat.x() = t.quat[1];
+    handler->quat.y() = t.quat[2];
+    handler->quat.z() = t.quat[3];
     handler->quatTimer.start();
 }

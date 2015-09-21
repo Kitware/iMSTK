@@ -25,9 +25,9 @@ endfunction()
 
 # add_subdirectory(common)
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
   add_subdirectory(vrpnPhantomTest)
-endif(SimMedTK_USE_PHANTOM_OMNI)
+endif()
 
 if(SimMedTK_USE_OCULUS)
   add_subdirectory(renderCubeOculus)

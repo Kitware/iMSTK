@@ -29,7 +29,7 @@ list(APPEND ExamplesCommon_link_libs
   Mesh
 )
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
   list(APPEND ExamplesCommon_sources
     vrpnPhantomObjectController.cpp
   )
@@ -39,7 +39,7 @@ if(SimMedTK_USE_PHANTOM_OMNI)
   list(APPEND ExamplesCommon_link_libs
     Devices
   )
-endif(SimMedTK_USE_PHANTOM_OMNI)
+endif()
 
 simmedtk_add_library(ExamplesCommon
   SOURCES
