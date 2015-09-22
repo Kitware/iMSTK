@@ -1,9 +1,11 @@
 
 simmedtk_add_library(VirtualTools
   SOURCES
-    CurvedGrasper.cpp
+#     CurvedGrasper.cpp
+    ToolCoupler.cpp
   PUBLIC_HEADERS
-    CurvedGrasper.h
+    ToolCoupler.h
+#     CurvedGrasper.h
 )
 
 target_link_libraries(VirtualTools

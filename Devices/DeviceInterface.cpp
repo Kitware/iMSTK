@@ -25,7 +25,151 @@
 #include "Devices/DeviceInterface.h"
 
 
-DeviceInterface::DeviceInterface(): driverInstalled(false)
+DeviceInterface::DeviceInterface(): driverInstalled(false), pollDelay(100)
 {
 
+}
+
+//---------------------------------------------------------------------------
+DeviceInterface::~DeviceInterface()
+{
+
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::setPollDelay(const std::chrono::milliseconds &d)
+{
+    this->pollDelay = d;
+}
+
+//---------------------------------------------------------------------------
+const std::chrono::milliseconds &DeviceInterface::getPollDelay() const
+{
+    return this->pollDelay;
+}
+
+//---------------------------------------------------------------------------
+long double DeviceInterface::getForceETime()
+{
+    return this->forceTimer.elapsed();
+}
+
+//---------------------------------------------------------------------------
+long double DeviceInterface::getPositionETime()
+{
+    return this->posTimer.elapsed();
+}
+
+//---------------------------------------------------------------------------
+long double DeviceInterface::getOrientationETime()
+{
+    return this->quatTimer.elapsed();
+}
+
+//---------------------------------------------------------------------------
+const core::Vec3d &DeviceInterface::getForce() const
+{
+    return this->force;
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::setForce(const core::Vec3d& f)
+{
+    this->force = f;
+}
+
+//---------------------------------------------------------------------------
+const core::Vec3d &DeviceInterface::getTorque() const
+{
+    return this->torque;
+}
+
+//---------------------------------------------------------------------------
+const core::Vec3d &DeviceInterface::getPosition() const
+{
+    return this->position;
+}
+
+//---------------------------------------------------------------------------
+const core::Vec3d &DeviceInterface::getVelocity() const
+{
+    return this->velocity;
+}
+
+//---------------------------------------------------------------------------
+const core::Quaterniond &DeviceInterface::getOrientation() const
+{
+    return this->orientation;
+}
+
+//---------------------------------------------------------------------------
+bool DeviceInterface::getButton(size_t i) const
+{
+    auto numButtons = this->buttons.size();
+    if (i < numButtons)
+        return this->buttons[i];
+    else
+        return false;
+}
+
+//---------------------------------------------------------------------------
+long double DeviceInterface::getButtonETime(size_t i)
+{
+    auto numButtons = this->buttonTimers.size();
+    if (i < numButtons)
+        return this->buttonTimers[i].elapsed();
+    else
+        return -1;
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::init()
+{
+    this->forceTimer.start();
+    this->posTimer.start();
+    this->quatTimer.start();
+    this->velTimer.start();
+    for(auto &buttonTimer : this->buttonTimers)
+    {
+        buttonTimer.start();
+    }
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::beginFrame()
+{
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::endFrame()
+{
+}
+
+//---------------------------------------------------------------------------
+void DeviceInterface::exec()
+{
+}
+
+//---------------------------------------------------------------------------
+DeviceInterface::Message DeviceInterface::openDevice()
+{
+    return Message::Unknown;
+}
+
+//---------------------------------------------------------------------------
+DeviceInterface::Message DeviceInterface::closeDevice()
+{
+    return Message::Unknown;
+}
+
+//---------------------------------------------------------------------------
+DeviceInterface::Message DeviceInterface::write(void*, int, void*)
+{
+    return  Message::Unknown;
+}
+
+//---------------------------------------------------------------------------
+DeviceInterface::Message DeviceInterface::read(void*, int, void*)
+{
+    return Message::Unknown;
 }

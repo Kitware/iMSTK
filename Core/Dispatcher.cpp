@@ -23,31 +23,12 @@
 
 #include "Core/Dispatcher.h"
 
-
-void Dispatcher::handleViewer(std::shared_ptr<CoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
+Dispatcher::Dispatcher()
 {
-
+    type = core::ClassType::Dispathcer;
 }
 
-void Dispatcher::handleSimulator(std::shared_ptr<CoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
-{
-
-}
-
-void Dispatcher::handleCollisionDetection(std::shared_ptr<CoreClass> /*p_caller*/, core::CallerState /*p_callerState*/)
-{
-
-}
-
-void Dispatcher::handleAll()
-{
-
-}
-
-//// \brief this function takes care of handling of system level tasks before or after every frame
-///  \param p_caller        p_caller has pointer to the object which the function is called
-///  \param p_callerState   p_callerState is stores the state of the at the moment of the function called.
-///                         such as whether it is the beginning of the simulator frameor end of the simulator frame for now etc..
+//---------------------------------------------------------------------------
 core::ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState)
 {
 
@@ -77,7 +58,37 @@ core::ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, c
     handleAll();
     return core::ResultDispatcher::Success;
 }
-Dispatcher::Dispatcher()
+
+//---------------------------------------------------------------------------
+void Dispatcher::handleViewer(std::shared_ptr<CoreClass> /*p_caller*/,
+                              core::CallerState /*p_callerState*/)
 {
-    type = core::ClassType::Dispathcer;
+
+}
+
+//---------------------------------------------------------------------------
+void Dispatcher::handleSimulator(std::shared_ptr<CoreClass> /*p_caller*/,
+                                 core::CallerState /*p_callerState*/)
+{
+
+}
+
+//---------------------------------------------------------------------------
+void Dispatcher::handleCollisionDetection(std::shared_ptr<CoreClass> /*p_caller*/,
+                                          core::CallerState /*p_callerState*/)
+{
+
+}
+
+//---------------------------------------------------------------------------
+void Dispatcher::handleCollisionResponse(std::shared_ptr<CoreClass> /*p_caller*/,
+                                         core::CallerState /*p_callerState*/)
+{
+
+}
+
+//---------------------------------------------------------------------------
+void Dispatcher::handleAll()
+{
+
 }

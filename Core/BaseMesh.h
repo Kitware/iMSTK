@@ -45,7 +45,9 @@ namespace Core {
 class BaseMesh: public CoreClass
 {
 public:
+    using TransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
 
+public:
     ///
     /// \brief designates what purpose/scenario the mesh is used for
     ///
@@ -153,7 +155,7 @@ public:
     ///
     /// \brief Apply any affine tranformation to the vertices.
     ///
-    void transform(const Eigen::Transform<double,3,Eigen::Affine> &transformation);
+    void transform(const TransformType &transformation);
 
     ///
     /// \brief Apply any affine tranformation to the vertices.

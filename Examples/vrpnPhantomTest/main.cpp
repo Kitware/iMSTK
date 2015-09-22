@@ -25,7 +25,6 @@
 #include <chrono>
 #include <thread>
 
-#include "Examples/common/vrpnPhantomObjectController.h"
 #include "Examples/common/ExampleCube.h"
 
 #include "Core/SDK.h"
@@ -35,10 +34,10 @@
 #include "IO/initIO.h"
 #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
+#include "VirtualTools/ToolCoupler.h"
 
 int main()
 {
-    using vrpnPhantomObjectController = mstk::Examples::Common::vrpnPhantomObjectController;
     using ExampleCube = mstk::Examples::Common::ExampleCube;
 
     initRenderDelegates();
@@ -51,7 +50,7 @@ int main()
 
     auto sdk = SDK::getInstance();
     auto phantom = std::make_shared<VRPNPhantomDevice>();
-    auto controller = std::make_shared<vrpnPhantomObjectController>();
+    auto controller = std::make_shared<ToolCoupler>(phantom);
     controller->setScalingFactor(5.0);
 
     sdk->registerModule(phantom);
@@ -110,10 +109,6 @@ int main()
         scene->addCamera(sceneCamera);
     }
 
-    //Open communication for the vrpn phantom
-    phantom->openDevice();
-
-    controller->setPhantom(phantom);
     controller->setMesh(cube.getStaticSceneObject()->getModel()->getMesh());
 
     sdk->addViewer(viewer);

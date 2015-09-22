@@ -12,4 +12,5 @@ target_link_libraries(vrpnPhantomTest
   ExamplesCommon
   Geometry
   Devices
+  VirtualTools
   )

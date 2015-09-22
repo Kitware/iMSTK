@@ -6,6 +6,8 @@ if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
   list(APPEND EXTERNAL_DEVICES_SOURCES
 #     HapticInterface.cpp
 #    PhantomInterface.cpp
+    VRPNDeviceClient.cpp
+    VRPNDeviceServer.h
     VRPNPhantomDevice.cpp
     )
   list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
@@ -36,6 +38,8 @@ simmedtk_add_library(Devices
 #     NIUSB6008Interface.h
 #     PhantomInterface.h
     DeviceInterface.h
+    VRPNDeviceServer.h
+    VRPNDeviceClient.h
     VRPNPhantomDevice.h
 )
 

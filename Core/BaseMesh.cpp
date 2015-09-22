@@ -135,7 +135,7 @@ void BaseMesh::rotate ( const core::Quaterniond& rotation )
         v = rotation*v;
     } );
 }
-void BaseMesh::transform ( const Eigen::Transform<double,3,Eigen::Affine>& transformation )
+void BaseMesh::transform ( const TransformType& transformation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
                     [transformation] ( core::Vec3d &v )

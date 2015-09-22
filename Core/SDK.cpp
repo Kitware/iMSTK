@@ -1,4 +1,5 @@
 // This file is part of the SimMedTK project.
+// Copyright (c) Kitware, Inc.
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -161,7 +162,7 @@ void SDK::shutDown()
 {
     for(auto &module : this->moduleList)
     {
-        module->terminateExecution = true;
+        module->terminate();
     }
     shutdown = true;
 }
@@ -179,18 +180,17 @@ void SDK::run()
         this->viewer->exec();
 
         // Now wait for other modules to shut down
-        while (this->viewer->isValid() && !shutdown)
+        while (this->viewer->isValid())
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
+        shutdown = true;
     }
-    else
+
+    // Now wait for other modules to shut down
+    while (!shutdown)
     {
-        // Now wait for other modules to shut down
-        while (!shutdown)
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     // Tell framework threads to shutdown
@@ -247,7 +247,7 @@ void SDK::terminateAll()
 {
     for(auto &module : this->moduleList)
     {
-        module->terminateExecution = true;
+        module->terminate();
     }
 
     for(auto &module : this->moduleList)

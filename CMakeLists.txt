@@ -268,8 +268,7 @@ set(SimMedTK_exports
   RenderDelegates
   Rendering
   Simulators
-  VTKRendering
-#   VirtualTools
+  VirtualTools
   )
 
 if(SimMedTK_USE_OCULUS)
@@ -289,7 +288,7 @@ add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)
 add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)
-# add_subdirectory(VirtualTools)
+add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
 
 ################################################################################
@@ -308,6 +307,12 @@ endif()
 #
 
 export(PACKAGE SimMedTK)
+export(TARGETS
+  ${SimMedTK_exports}
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
+  NAMESPACE mstk::
+  EXPORT_LINK_INTERFACE_LIBRARIES
+)
 
 configure_file(
   CMake/SimMedTKConfig.cmake.in

@@ -23,21 +23,28 @@
 
 // SimMedTK includes
 #include "Core/Timer.h"
-using namespace core;
+
+namespace core {
 
 Timer::Timer()
 {
-    start();
+    this->start();
 }
+
+//---------------------------------------------------------------------------
 void Timer::start()
 {
-    begin = ClockType::now();
+    this->begin = ClockType::now();
 }
+
+//---------------------------------------------------------------------------
 long double Timer::elapsed()
 {
     long double deltaSec;
     TimePointType now = ClockType::now();
-    DurationType delta = now - begin;
+    DurationType delta = now - this->begin;
     deltaSec = ((static_cast<long double>(delta.count()) * PeriodType::num) / PeriodType::den);
     return deltaSec;
+}
+
 }
