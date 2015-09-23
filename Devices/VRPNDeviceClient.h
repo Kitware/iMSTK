@@ -35,10 +35,16 @@
 #include "Core/Vector.h"
 #include "Core/Quaternion.h"
 
-// VRPN includes
-#include <vrpn_Button.h>
-#include <vrpn_ForceDevice.h>
-#include <vrpn_Tracker.h>
+#include <vrpn_Configure.h>             // for VRPN_CALLBACK
+
+class vrpn_Tracker_Remote;
+class vrpn_Button_Remote;
+class vrpn_Analog_Remote;
+
+typedef struct _vrpn_BUTTONCB vrpn_BUTTONCB;
+typedef struct _vrpn_TRACKERVELCB vrpn_TRACKERVELCB;
+typedef struct _vrpn_TRACKERCB vrpn_TRACKERCB;
+typedef struct _vrpn_ANALOGCB vrpn_ANALOGCB;
 
 class VRPNDeviceClient: public DeviceInterface
 {
@@ -116,12 +122,22 @@ private:
     ///
     static void VRPN_CALLBACK trackerChangeHandler(void *userData, const vrpn_TRACKERCB b);
 
+    ///
+    /// \brief VRPN call back for position and orientation data
+    /// \param userData Pointer to this to allow updating
+    /// internal data
+    /// \param b VRPN callback structure containing new position and
+    /// orientation data
+    ///
+    static void VRPN_CALLBACK analogChangeHandler(void *userData, const vrpn_ANALOGCB a);
+
 protected:
     std::string deviceURL;                              //!< Connection device URL
 
 private:
     std::shared_ptr<vrpn_Button_Remote> vrpnButton;     //!< VRPN button interface
     std::shared_ptr<vrpn_Tracker_Remote> vrpnTracker;   //!< VRPN position/orientation interface
+    std::shared_ptr<vrpn_Analog_Remote> vrpnAnalog;   //!< VRPN position/orientation interface
 };
 
 #endif // VRPNDEVICE_H

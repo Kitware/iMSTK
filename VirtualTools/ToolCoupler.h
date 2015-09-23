@@ -171,6 +171,7 @@ private:
     std::shared_ptr<Core::BaseMesh> mesh; //!< Pointer to controlled mesh
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
     std::shared_ptr<DeviceInterface> outputDevice; //!< Pointer to output device
+    Eigen::Transform<double, 3, Eigen::Isometry> initialTransform; //!< Transform applied to the position obtained from device
 };
 
 #endif // TOOLCOUPLER_H

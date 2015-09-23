@@ -2,18 +2,42 @@
 set(EXTERNAL_DEVICES_SOURCES)
 set(EXTERNAL_DEVICES_TARGET_LIBRARIES)
 
-if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
-  list(APPEND EXTERNAL_DEVICES_SOURCES
-#     HapticInterface.cpp
-#    PhantomInterface.cpp
-    VRPNDeviceClient.cpp
-    VRPNDeviceServer.h
-    VRPNPhantomDevice.cpp
-    )
-  list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
-    vrpn::vrpn
-    vrpn::quat
-    )
+if(USE_VRPN_CLIENT)
+    if(USE_VRPN_SERVER)
+        list(APPEND EXTERNAL_DEVICES_SOURCES
+            VRPNDeviceServer.cpp
+        )
+        # --------------------------------
+        if(SimMedTK_USE_PHANTOM_OMNI)
+            add_definitions(-DVRPN_USE_PHANTOM_SERVER)
+            # --------------------------------
+            list(APPEND EXTERNAL_DEVICES_SOURCES
+                VRPNPhantomDevice.cpp
+                )
+            # --------------------------------
+            list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
+                OH::HD
+                OH::HDU
+                OH::HL
+                OH::HLU
+                vrpn::phantom
+                )
+        endif()
+        # --------------------------------
+        list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
+            vrpn::server
+        )
+    endif(USE_VRPN_SERVER)
+    # --------------------------------
+    list(APPEND EXTERNAL_DEVICES_SOURCES
+        VRPNDeviceClient.cpp
+        )
+    # --------------------------------
+    list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
+        vrpn::vrpn
+        vrpn::quat
+        vrpn::libusb
+        )
 endif()
 
 if(SimMedTK_USE_ADU)
@@ -31,12 +55,6 @@ simmedtk_add_library(Devices
     DeviceInterface.cpp
     ${EXTERNAL_DEVICES_SOURCES}
   PUBLIC_HEADERS
-#     ADUInterface.h
-#     HapticInterface.h
-#     NIDAQmx.h
-#     Audio.h
-#     NIUSB6008Interface.h
-#     PhantomInterface.h
     DeviceInterface.h
     VRPNDeviceServer.h
     VRPNDeviceClient.h

@@ -39,12 +39,17 @@ if(NOT DEFINED ${proj}_DIR)
 
   set(SERVER_ARGS)
   if(USE_VRPN_SERVER)
-    set(SERVER_ARGS
-        -DVRPN_BUILD_SERVERS:BOOL=ON
-        -DVRPN_USE_HDAPI:BOOL=ON
+    list(APPEND SERVER_ARGS
+#         -DVRPN_BUILD_SERVERS:BOOL=ON
+        -DVRPN_BUILD_SERVER_LIBRARY:BOOL=ON
         -DVRPN_GPL_SERVER:BOOL=ON
-        -DVRPN_USE_PHANTOM_SERVER:BOOL=ON
-        -DVRPN_USE_HID:BOOL=ON)
+        -DVRPN_USE_HID:BOOL=ON
+        -DVRPN_USE_LIBUSB_1_0:BOOL=ON)
+    if(SimMedTK_USE_PHANTOM_OMNI)
+        list(APPEND SERVER_ARGS
+            -DVRPN_USE_HDAPI:BOOL=ON
+            -DVRPN_USE_PHANTOM_SERVER:BOOL=ON)
+    endif(SimMedTK_USE_PHANTOM_OMNI)
   endif()
 
 #   message(STATUS "Adding project:${proj}")
@@ -72,12 +77,13 @@ if(NOT DEFINED ${proj}_DIR)
       -DVRPN_BUILD_PYTHON:BOOL=OFF
       -DVRPN_USE_GPM_MOUSE:BOOL=OFF
       -DVRPN_USE_LIBNIFALCON:BOOL=OFF
+      -DBUILD_TESTING:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
       ${SERVER_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
-#     LOG_DOWNLOAD 1            # Wrap download in script to log output
+    LOG_DOWNLOAD 1            # Wrap download in script to log output
 #     LOG_UPDATE 1              # Wrap update in script to log output
 #     LOG_CONFIGURE 1           # Wrap configure in script to log output
 #     LOG_BUILD 1               # Wrap build in script to log output

@@ -30,8 +30,6 @@
 #include "Devices/DeviceInterface.h"
 #include "Core/RenderDelegate.h"
 
-ToolCoupler::~ToolCoupler() {}
-
 //---------------------------------------------------------------------------
 ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
                          std::shared_ptr< Core::BaseMesh > toolMesh)
@@ -40,6 +38,8 @@ ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
     this->outputDevice = inputDevice;
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
+    this->initialTransform.setIdentity();
+    this->name = "ToolCoupler";
 }
 
 //---------------------------------------------------------------------------
@@ -48,6 +48,8 @@ ToolCoupler::ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice)
     this->inputDevice = inputDevice;
     this->outputDevice = inputDevice;
     this->pollDelay = std::chrono::milliseconds(100);
+    this->initialTransform.Identity();
+    this->name = "ToolCoupler";
 }
 
 //---------------------------------------------------------------------------
@@ -59,6 +61,13 @@ ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
     this->outputDevice = outputDevice;
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
+    this->initialTransform.Identity();
+    this->name = "ToolCoupler";
+}
+
+//---------------------------------------------------------------------------
+ToolCoupler::~ToolCoupler()
+{
 }
 
 //---------------------------------------------------------------------------
@@ -144,7 +153,7 @@ void ToolCoupler::init()
     this->orientation.setIdentity();
     this->position.setZero();
 
-    //Open communication for the device
+    // Open communication for the device
     this->inputDevice->openDevice();
 }
 
@@ -157,34 +166,38 @@ void ToolCoupler::endFrame() {}
 //---------------------------------------------------------------------------
 void ToolCoupler::exec()
 {
-
     if(!this->mesh)
     {
-        return;
+        this->terminate();
     }
 
-    while(this->updateTracker() && this->updateForces())
+    while(!this->terminateExecution)
     {
+        if(!this->updateTracker() || !this->updateForces())
+        {
+            this->terminate();
+        }
         std::this_thread::sleep_for(pollDelay);
     }
+    this->terminationCompleted = true;
+    this->inputDevice->closeDevice();
 }
 
 //---------------------------------------------------------------------------
 bool ToolCoupler::updateTracker()
 {
-    if(!this->inputDevice || this->terminateExecution)
+    if(!this->inputDevice)
     {
         std::cout << "Invalid input device" << std::endl;
         return false;
     }
-
     core::Quaterniond rot = inputDevice->getOrientation();
     core::Vec3d pos = inputDevice->getPosition() * this->scalingFactor;
 
     Eigen::Translation3d translation(pos - this->position);
     Eigen::Quaterniond rotation(rot * this->orientation);
 
-    this->mesh->transform(translation * rotation);
+    this->mesh->transform(/*this->initialTransform**/translation*rotation);
 
     this->mesh->getRenderDelegate()->modified(); //tell the renderer to update
 
@@ -197,8 +210,9 @@ bool ToolCoupler::updateTracker()
 //---------------------------------------------------------------------------
 bool ToolCoupler::updateForces()
 {
-    if(!this->outputDevice || this->terminateExecution)
+    if(!this->outputDevice)
     {
+        std::cout << "Invalid output device" << std::endl;
         return false;
     }
 

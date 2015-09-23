@@ -22,6 +22,9 @@
 
 #include "Devices/VRPNDeviceServer.h"
 
+// STL includes
+#include <thread>
+
 // VRPN includes
 #include <vrpn_Connection.h>
 #include <vrpn_3DConnexion.h>
@@ -35,12 +38,7 @@
 
 VRPNDeviceServer::VRPNDeviceServer()
 {
-
-}
-
-//---------------------------------------------------------------------------
-VRPNDeviceServer::VRPNServerDevice(const VRPNDeviceServer& other)
-{
+    this->name = "VRPNDeviceServer";
 
 }
 
@@ -56,8 +54,8 @@ void VRPNDeviceServer::exec()
     auto connection = vrpn_create_server_connection();
 
     // Create the various device objects
-    std::shared_ptr<vrpn_3DConnexion_Navigator> navigator =
-        std::make_shared<vrpn_3DConnexion_Navigator>("navigator", connection);
+    std::shared_ptr<vrpn_3DConnexion_SpaceExplorer> navigator =
+        std::make_shared<vrpn_3DConnexion_SpaceExplorer>("navigator", connection);
     std::shared_ptr<vrpn_Tracker_RazerHydra> razer =
         std::make_shared<vrpn_Tracker_RazerHydra>("razer", connection);
     std::shared_ptr<vrpn_Tracker_FilterOneEuro> razerFiltered =
@@ -67,7 +65,7 @@ void VRPNDeviceServer::exec()
 
 #ifdef VRPN_USE_PHANTOM_SERVER
     std::shared_ptr<vrpn_Phantom> phantom =
-        std::make_shared<vrpn_Phantom>("phantom", connection, 60.0f);
+        std::make_shared<vrpn_Phantom>("Phantom0", connection, 60.0f);
     std::shared_ptr<vrpn_Tracker_FilterOneEuro> phantomFiltered =
         std::make_shared<vrpn_Tracker_FilterOneEuro>("phantom_filtered", connection, "*phantom", 7);
 #endif
@@ -89,5 +87,6 @@ void VRPNDeviceServer::exec()
         std::this_thread::sleep_for(this->pollDelay);
     }
 
+    this->terminationCompleted = true;
     delete connection;
 }

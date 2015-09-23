@@ -170,34 +170,21 @@ void SDK::shutDown()
 /// \brief runs the simulator
 void SDK::run()
 {
-    updateSceneListAll();
-    initRegisteredModules();
+    this->updateSceneListAll();
+    this->initRegisteredModules();
 
-    runRegisteredModules();
-
+    this->runRegisteredModules();
     if (nullptr != this->viewer)
     {
         this->viewer->exec();
-
-        // Now wait for other modules to shut down
-        while (this->viewer->isValid())
-        {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-        }
-        shutdown = true;
-    }
-
-    // Now wait for other modules to shut down
-    while (!shutdown)
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
     // Tell framework threads to shutdown
-    terminateAll();
+    this->shutDown();
+    this->terminateAll();
 
     // Wait for all threads to finish processing
-    for (auto &module : modules)
+    for (auto &module : this->modules)
     {
         module.join();
     }
@@ -247,19 +234,7 @@ void SDK::terminateAll()
 {
     for(auto &module : this->moduleList)
     {
-        module->terminate();
-    }
-
-    for(auto &module : this->moduleList)
-    {
-        bool moduleTerminated = false;
-        while(!moduleTerminated)
-        {
-            if(module->isTerminationDone())
-            {
-                moduleTerminated = true;
-            }
-        }
+        module->waitTermination();
     }
 }
 

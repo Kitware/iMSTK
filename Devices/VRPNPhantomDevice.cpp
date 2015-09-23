@@ -22,10 +22,23 @@
 //---------------------------------------------------------------------------
 
 #include "Devices/VRPNPhantomDevice.h"
+#include "Core/Matrix.h"
+
+// VRPN includes
+#include <vrpn_ForceDevice.h>
 
 VRPNPhantomDevice::VRPNPhantomDevice()
+    :
+    enableForce(true),
+    contactPlane(core::Vec4f(0.0,1.0,0.0,100)),
+    dampingCoefficient(0.5),
+    dynamicFriction(0.0),
+    springCoefficient(1.0),
+    staticFriction(0.0),
+    vrpnForce(nullptr)
 {
     this->setDeviceURL("Phantom0@localhost");
+    this->name = "VRPNPhantomDevice";
 }
 
 //---------------------------------------------------------------------------
@@ -70,4 +83,18 @@ VRPNPhantomDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
 
     handler->force << f.force[0],f.force[1],f.force[2];
     handler->forceTimer.start();
+
+    handler->vrpnForce->set_plane(handler->contactPlane.data());
+    handler->vrpnForce->sendSurface();
+
+    // Update other force settings
+    handler->vrpnForce->setSurfaceFstatic( handler->staticFriction );
+    handler->vrpnForce->setSurfaceFdynamic( handler->dynamicFriction );
+    handler->vrpnForce->setSurfaceKspring( handler->springCoefficient );
+    handler->vrpnForce->setSurfaceKdamping( handler->dampingCoefficient );
+    handler->vrpnForce->setSurfaceBuzzAmplitude( 0.0 );
+    handler->vrpnForce->setSurfaceBuzzFrequency( 60.0 ); // Hz
+    handler->vrpnForce->setSurfaceTextureAmplitude( 0.00 ); // meters
+    handler->vrpnForce->setSurfaceTextureWavelength( 0.01f ); // meters
+    handler->vrpnForce->setRecoveryTime( 10 );
 }

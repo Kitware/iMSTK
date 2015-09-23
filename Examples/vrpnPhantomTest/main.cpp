@@ -31,10 +31,12 @@
 #include "Core/Factory.h"
 #include "Core/ViewerBase.h"
 #include "Devices/VRPNPhantomDevice.h"
+#include "Devices/VRPNDeviceServer.h"
 #include "IO/initIO.h"
 #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 #include "VirtualTools/ToolCoupler.h"
+#include "Geometry/PlaneModel.h"
 
 int main()
 {
@@ -46,23 +48,35 @@ int main()
     const bool useVTKRenderer = true; // VTK is the default viewer.
 
     ExampleCube cube;
-    std::string input = "";
+    auto plane = std::make_shared<PlaneModel>(core::Vec3d(0.0, -5.0, 0.0),
+                                              core::Vec3d(0.0, 1.0, 0.0));
+    plane->getPlaneModel()->setWidth(5);
+    auto staticPlane = std::make_shared<StaticSceneObject>();
+    staticPlane->setModel(plane);
+    std::string input = "navigator@localhost";
 
     auto sdk = SDK::getInstance();
-    auto phantom = std::make_shared<VRPNPhantomDevice>();
-    auto controller = std::make_shared<ToolCoupler>(phantom);
+    auto server = std::make_shared<VRPNDeviceServer>();
+    auto client = std::make_shared<VRPNDeviceClient>();
+//     core::Vec4f contactPlane;
+//     contactPlane << 0.0, 1.0, 0.0, -5.0;
+//     client->setContactPlane(contactPlane);
+//     client->setDampingCoefficient(.0001);
+//     client->setSpringCoefficient(.01);
+    auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(5.0);
 
-    sdk->registerModule(phantom);
+    sdk->registerModule(server);
+    sdk->registerModule(client);
     sdk->registerModule(controller);
 
     //get some user input and setup device url
-    std::cout << "Enter the VRPN device URL(" << phantom->getDeviceURL() << "): ";
-    std::getline(std::cin, input);
-    if(!input.empty())
-    {
-        phantom->setDeviceURL(input);
-    }
+//     std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
+//     std::getline(std::cin, input);
+//     if(!input.empty())
+//     {
+        client->setDeviceURL(input);
+//     }
 
     auto scene = std::make_shared<Scene>();
 
@@ -79,9 +93,11 @@ int main()
     //Set up the cube object
     cube.useVTKRenderer(useVTKRenderer);
     cube.setup();
+    controller->setMesh(cube.getStaticSceneObject()->getModel()->getMesh());
 
     // Add the cube to the scene to be rendered
     scene->addSceneObject(cube.getStaticSceneObject());
+    scene->addSceneObject(staticPlane);
 
     // Register the scene with the viewer, and setup render target
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
@@ -109,10 +125,7 @@ int main()
         scene->addCamera(sceneCamera);
     }
 
-    controller->setMesh(cube.getStaticSceneObject()->getModel()->getMesh());
-
     sdk->addViewer(viewer);
     sdk->run();
-
     return 0;
 }

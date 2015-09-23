@@ -22,8 +22,16 @@
 
 #include "Devices/VRPNDeviceClient.h"
 
+// VRPN includes
+#include <vrpn_Button.h>
+#include <vrpn_Tracker.h>
+#include <vrpn_Analog.h>
+
 VRPNDeviceClient::VRPNDeviceClient()
-    : deviceURL("Device0@localhost") {}
+    : deviceURL("Device0@localhost")
+    {
+        this->name = "VRPNDeviceClient";
+    }
 
 //---------------------------------------------------------------------------
 VRPNDeviceClient::~VRPNDeviceClient() {}
@@ -33,9 +41,12 @@ DeviceInterface::Message VRPNDeviceClient::openDevice()
 {
     this->vrpnButton = std::make_shared<vrpn_Button_Remote>(this->deviceURL.c_str());
     this->vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(this->deviceURL.c_str());
+    this->vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(this->deviceURL.c_str());
 
     this->vrpnButton->register_change_handler(this, buttonChangeHandler);
     this->vrpnTracker->register_change_handler(this, trackerChangeHandler);
+//     this->vrpnTracker->register_change_handler(this, velocityChangeHandler);
+    this->vrpnAnalog->register_change_handler(this, analogChangeHandler);
 
     return DeviceInterface::Message::Success;
 }
@@ -45,9 +56,12 @@ DeviceInterface::Message VRPNDeviceClient::closeDevice()
 {
     this->vrpnButton->unregister_change_handler(this, buttonChangeHandler);
     this->vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
+//     this->vrpnButton->unregister_change_handler(this, velocityChangeHandler);
+    this->vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
 
     this->vrpnButton.reset();
     this->vrpnTracker.reset();
+    this->vrpnAnalog.reset();
     return DeviceInterface::Message::Success;
 }
 
@@ -116,4 +130,14 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
     handler->orientation.y() = t.quat[2];
     handler->orientation.z() = t.quat[3];
     handler->quatTimer.start();
+}
+
+//---------------------------------------------------------------------------
+void VRPN_CALLBACK
+VRPNDeviceClient::analogChangeHandler(void* userData, const vrpn_ANALOGCB a)
+{
+    auto handler = reinterpret_cast< VRPNDeviceClient * >( userData );
+
+    handler->position << a.channel[0], -a.channel[1], -a.channel[2];
+    return;
 }

@@ -27,7 +27,7 @@
 
 DeviceInterface::DeviceInterface(): driverInstalled(false), pollDelay(100)
 {
-
+    this->name = "DeviceInterface";
 }
 
 //---------------------------------------------------------------------------

@@ -153,11 +153,6 @@ public:
         return this->valid;
     }
 
-    virtual void setIsValid(const bool newValid)
-    {
-        this->valid = newValid;
-    }
-
     std::string windowTitle;
     Color defaultDiffuseColor;
     Color defaultAmbientColor;

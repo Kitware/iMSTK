@@ -58,8 +58,8 @@ option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
 option(USE_VRPN_CLIENT "Use VRPN in client mode." ON)
 option(USE_VRPN_SERVER "Use VRPN in server mode." OFF)
 
-if(USE_VRPN_SERVER)
-    set(SimMedTK_USE_PHANTOM_OMNI ON CACHE BOOL "Force the use of OpenHaptics." FORCE)
+if(SimMedTK_USE_PHANTOM_OMNI)
+    set(USE_VRPN_SERVER ON CACHE BOOL "Force the use of VRPN servers." FORCE)
 endif()
 
 
@@ -219,7 +219,11 @@ if(SimMedTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics)
 endif()
 
-if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
+if(SimMedTK_USE_PHANTOM_OMNI)
+  find_package(OpenHaptics REQUIRED)
+endif()
+
+if(USE_VRPN_CLIENT OR USE_VRPN_SERVERS)
   find_package(VRPN REQUIRED)
   include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
 endif()

@@ -71,7 +71,6 @@ public:
             }
             case vtkCommand::ExitEvent:
             {
-                std::cout << "Closing window..." << std::endl;
                 vtkRenderWindowInteractor *iren =
                 static_cast<vtkRenderWindowInteractor*>(caller);
                 // Close the window
@@ -79,8 +78,7 @@ public:
 
                 // Stop the interactor
                 iren->TerminateApp();
-                viewer->setIsValid(false);
-                viewer->cleanUp();
+                viewer->terminate();
                 break;
             }
         }
@@ -244,7 +242,7 @@ public:
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
 {
-
+    this->name = "VTKViewer";
 }
 
 VTKViewer::~VTKViewer()
@@ -255,6 +253,7 @@ void VTKViewer::exec()
 {
     this->init();
     this->render();
+    this->terminationCompleted = true;
 }
 void VTKViewer::render()
 {
