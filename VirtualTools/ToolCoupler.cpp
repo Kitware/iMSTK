@@ -194,8 +194,8 @@ bool ToolCoupler::updateTracker()
     core::Quaterniond rot = inputDevice->getOrientation();
     core::Vec3d pos = inputDevice->getPosition() * this->scalingFactor;
 
-    Eigen::Translation3d translation(pos - this->position);
     Eigen::Quaterniond rotation(rot * this->orientation);
+    Eigen::Translation3d translation(pos - rotation*this->position);
 
     this->mesh->transform(/*this->initialTransform**/translation*rotation);
 
