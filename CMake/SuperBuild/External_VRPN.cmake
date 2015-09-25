@@ -35,7 +35,10 @@ if(NOT DEFINED ${proj}_DIR)
           -DLibNifalcon_DIR=${LibNifalcon_DIR}
           -DCMAKE_INCLUDE_PATH=${SimMedTK_CMAKE_INCLUDE_PATH}
           )
-          message("SimMedTK_CMAKE_INCLUDE_PATH=${SimMedTK_CMAKE_INCLUDE_PATH}")
+  else()
+      list(APPEND VRPN_EP_ARGS
+          -DVRPN_USE_LIBNIFALCON:BOOL=OFF
+          )
   endif()
 
   # Set CMake OSX variable to pass down the external project

@@ -45,7 +45,7 @@ DeviceInterface::Message VRPNDeviceClient::openDevice()
 
     this->vrpnButton->register_change_handler(this, buttonChangeHandler);
     this->vrpnTracker->register_change_handler(this, trackerChangeHandler);
-//     this->vrpnTracker->register_change_handler(this, velocityChangeHandler);
+    this->vrpnTracker->register_change_handler(this, velocityChangeHandler);
     this->vrpnAnalog->register_change_handler(this, analogChangeHandler);
 
     return DeviceInterface::Message::Success;
@@ -56,7 +56,7 @@ DeviceInterface::Message VRPNDeviceClient::closeDevice()
 {
     this->vrpnButton->unregister_change_handler(this, buttonChangeHandler);
     this->vrpnTracker->unregister_change_handler(this, trackerChangeHandler);
-//     this->vrpnButton->unregister_change_handler(this, velocityChangeHandler);
+    this->vrpnTracker->unregister_change_handler(this, velocityChangeHandler);
     this->vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
 
     this->vrpnButton.reset();
@@ -123,7 +123,7 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
-    handler->position << t.pos[0], t.pos[1], t.pos[2];
+    handler->position << t.pos[0], -t.pos[1], -t.pos[2];
     handler->posTimer.start();
     handler->orientation.w() = t.quat[0];
     handler->orientation.x() = t.quat[1];
@@ -138,6 +138,17 @@ VRPNDeviceClient::analogChangeHandler(void* userData, const vrpn_ANALOGCB a)
 {
     auto handler = reinterpret_cast< VRPNDeviceClient * >( userData );
 
-    handler->position << a.channel[0], -a.channel[1], -a.channel[2];
+    if(a.num_channel > 0)
+    {
+        handler->position << a.channel[0], -a.channel[1], -a.channel[2];
+        handler->posTimer.start();
+    }
+    if(a.num_channel > 3)
+    {
+        handler->orientation = Eigen::AngleAxisd(a.channel[3]*M_PI,core::Vec3d::UnitX())*
+                               Eigen::AngleAxisd(a.channel[4]*M_PI,core::Vec3d::UnitY())*
+                               Eigen::AngleAxisd(a.channel[5]*M_PI,core::Vec3d::UnitZ());
+        handler->quatTimer.start();
+    }
     return;
 }
