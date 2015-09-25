@@ -27,10 +27,17 @@ set(VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}")
 set(VRPN_LIBRARIES "${VRPN_LIBRARY} ${VRPN_QUAT_LIBRARY} ${VRPN_SERVER_LIBRARY} ${VRPN_PHANTOM_LIBRARY}")
 
 # Try to find libusb dependency
-find_package(Libusb1 REQUIRED)
+find_package(Libusb1 QUIET)
 if(LIBUSB1_FOUND)
     list(APPEND VRPN_LIBRARIES ${LIBUSB1_LIBRARIES})
     list(APPEND VRPN_INCLUDE_DIRS ${LIBUSB1_INCLUDE_DIRS})
+endif()
+
+# Try to find falcon dependency
+find_package(LibNifalcon QUIET)
+if(LIBUSB1_FOUND)
+    list(APPEND VRPN_LIBRARIES ${LIBNIFALCON_LIBRARIES})
+    list(APPEND VRPN_INCLUDE_DIRS ${LIBNIFALCON_INCLUDE_DIRS})
 endif()
 
 include(FindPackageHandleStandardArgs)
@@ -57,12 +64,22 @@ if(VRPN_FOUND)
         INTERFACE_LINK_LIBRARIES "${VRPN_LIBRARY}"
         INTERFACE_INCLUDE_DIRECTORIES "${VRPN_INCLUDE_DIR}")
   endif()
-  if(NOT TARGET vrpn::libusb)
-    add_library(vrpn::libusb INTERFACE IMPORTED)
-    set_target_properties(vrpn::libusb PROPERTIES
-        INTERFACE_LINK_LIBRARIES "${LIBUSB1_LIBRARIES}"
-        INTERFACE_INCLUDE_DIRECTORIES "${LIBUSB1_INCLUDE_DIRS}")
-  endif()
+  if(LIBUSB1_FOUND)
+    if(NOT TARGET vrpn::libusb)
+        add_library(vrpn::libusb INTERFACE IMPORTED)
+        set_target_properties(vrpn::libusb PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${LIBUSB1_LIBRARIES}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBUSB1_INCLUDE_DIRS}")
+    endif()
+  endif(LIBUSB1_FOUND)
+  if(LIBNIFALCON_FOUND)
+    if(NOT TARGET vrpn::libfalcon)
+        add_library(vrpn::libfalcon INTERFACE IMPORTED)
+        set_target_properties(vrpn::libfalcon PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${LIBNIFALCON_LIBRARIES}"
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBNIFALCON_INCLUDE_DIRS}")
+    endif()
+  endif(LIBNIFALCON_FOUND)
   if(NOT TARGET vrpn::quat)
     add_library(vrpn::quat INTERFACE IMPORTED)
     set_target_properties(vrpn::quat PROPERTIES

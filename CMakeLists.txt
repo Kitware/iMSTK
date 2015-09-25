@@ -52,6 +52,7 @@ mark_as_advanced(SimMedTK_SUPERBUILD)
 option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+option(SimMedTK_USE_FALCON "Use the Falcon device." OFF)
 
 #-----------------------------------------------------------------------------
 # VRPN options
