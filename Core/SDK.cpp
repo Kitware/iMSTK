@@ -121,10 +121,7 @@ void SDK::initRegisteredModules()
 {
     for(auto &module : this->moduleList)
     {
-        if(module->getType() != core::ClassType::Viewer)
-        {
-            module->init();
-        }
+        module->init();
     }
 }
 
@@ -179,14 +176,14 @@ void SDK::run()
         this->viewer->exec();
     }
 
-    // Tell framework threads to shutdown
+    // Tell framework threads to shutdown if the viewer returs
     this->shutDown();
     this->terminateAll();
 
     // Wait for all threads to finish processing
-    for (auto &module : this->modules)
+    for (auto &moduleThread : this->modules)
     {
-        module.join();
+        moduleThread.join();
     }
 }
 

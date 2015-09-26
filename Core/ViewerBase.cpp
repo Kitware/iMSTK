@@ -256,9 +256,6 @@ void ViewerBase::setWindowTitle(const std::string &str)
 
 void ViewerBase::exec()
 {
-    // Init the viewer
-    this->init();
-
     while (!terminateExecution)
     {
         this->processWindowEvents();

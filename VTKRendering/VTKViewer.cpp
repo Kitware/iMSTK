@@ -55,15 +55,15 @@ public:
     }
 
     ///
-    /// \brief Callback method
+    /// \brief Callback method executed by the render window interactor.
     ///
-    void Execute(vtkObject *caller, unsigned long eventId, void *callData)
+    void Execute(vtkObject *vtkNotUsed(caller), unsigned long eventId, void *callData)
     {
         switch(eventId)
         {
             case vtkCommand::TimerEvent:
             {
-                if(timerId == *static_cast<int*>(callData))
+                if(timerId == *static_cast<int*>(callData) && !this->viewer->isTerminated())
                 {
                     this->renderWindow->Render();
                 }
@@ -71,14 +71,13 @@ public:
             }
             case vtkCommand::ExitEvent:
             {
-                vtkRenderWindowInteractor *iren =
-                static_cast<vtkRenderWindowInteractor*>(caller);
                 // Close the window
-                iren->GetRenderWindow()->Finalize();
+                this->renderWindow->Finalize();
 
                 // Stop the interactor
-                iren->TerminateApp();
-                viewer->terminate();
+                this->renderWindowInteractor->TerminateApp();
+                this->renderWindowInteractor->DestroyTimer(this->timerId);
+                this->viewer->terminate();
                 break;
             }
         }
@@ -97,15 +96,8 @@ public:
     ///
     void render()
     {
-        this->viewer->adjustFPS();
         this->renderWindow->Render();
-        this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
-
-        this->renderWindowInteractor->AddObserver(vtkCommand::ExitEvent,this);
-
-        this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
         this->renderWindowInteractor->Start();
-        this->renderWindowInteractor->DestroyTimer(this->timerId);
     }
 
     ///
@@ -117,67 +109,84 @@ public:
     }
 
     ///
+    /// \brief Add light to vtk renderer
+    ///
+    void addLight(vtkRenderer *renderer, Light *light)
+    {
+        auto position = light->lightPos.getPosition();
+        auto colorDiffuse = light->lightColorDiffuse.getValue();
+        auto colorAmbient = light->lightColorDiffuse.getValue();
+        auto colorSpecular = light->lightColorDiffuse.getValue();
+        auto coneAngle = light->spotCutOffAngle;
+        auto focalPoint = light->focusPosition;
+        auto constAttenuation = light->attn_constant;
+        auto linearAttenuation = light->attn_linear;
+        auto quadAttenuation = light->attn_quadratic;
+
+        vtkNew<vtkLight> l;
+        l->SetLightTypeToSceneLight();
+        l->SetPosition(position[0],position[1],position[2]);
+        l->SetDiffuseColor(colorDiffuse[0],colorDiffuse[1],colorDiffuse[2]);
+        l->SetAmbientColor(colorAmbient[0],colorAmbient[1],colorAmbient[2]);
+        l->SetSpecularColor(colorSpecular[0],colorSpecular[1],colorSpecular[2]);
+        l->SetConeAngle(coneAngle);
+        l->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
+        l->SetAttenuationValues(constAttenuation,linearAttenuation,quadAttenuation);
+        renderer->AddLight(l.GetPointer());
+    }
+
+    ///
+    /// \brief Add camera to vtk renderer
+    ///
+    void addCamera(vtkRenderer *renderer, Camera *camera)
+    {
+        auto position = camera->getPos();
+        auto focus = camera->getFocus();
+        auto upView = camera->getOrientation() * core::Vec3f::UnitZ();
+        auto viewangle = camera->getViewAngleDeg();
+        auto nearClippingRange = camera->getNearClipDist();
+        auto farClippingRange = camera->getFarClipDist();
+        auto zoom = camera->getZoom();
+
+        vtkNew<vtkCamera> c;
+        c->SetPosition(position[0],position[1],position[2]);
+        c->SetFocalPoint(focus[0],focus[1],focus[2]);
+        c->SetViewAngle(viewangle);
+        c->SetClippingRange(nearClippingRange,farClippingRange);
+        c->Zoom(zoom);
+        c->SetViewUp(upView[0],upView[1],upView[2]);
+
+        renderer->SetActiveCamera(c.GetPointer());
+        renderer->ResetCamera();
+    }
+
+    ///
     /// \brief Add renderer to the render window
     ///
     void addRenderer()
     {
         // Create a new renderer and add actors to it.
         vtkNew<vtkRenderer> renderer;
+
         // The actors are obtained from VTKRenderDelegates
         std::shared_ptr<VTKRenderDelegate> delegate;
         for(auto &ro : this->viewer->renderOperations)
         {
-
-            // Set up lighting
+            // Set up lights
             auto lights = ro.scene->getLights();
             for(auto &light : lights)
             {
-                auto position = light->lightPos.getPosition();
-                auto colorDiffuse = light->lightColorDiffuse.getValue();
-                auto colorAmbient = light->lightColorDiffuse.getValue();
-                auto colorSpecular = light->lightColorDiffuse.getValue();
-                auto coneAngle = light->spotCutOffAngle;
-                auto focalPoint = light->focusPosition;
-                auto constAttenuation = light->attn_constant;
-                auto linearAttenuation = light->attn_linear;
-                auto quadAttenuation = light->attn_quadratic;
-
-                vtkNew<vtkLight> l;
-                l->SetLightTypeToSceneLight();
-                l->SetPosition(position[0],position[1],position[2]);
-                l->SetDiffuseColor(colorDiffuse[0],colorDiffuse[1],colorDiffuse[2]);
-                l->SetAmbientColor(colorAmbient[0],colorAmbient[1],colorAmbient[2]);
-                l->SetSpecularColor(colorSpecular[0],colorSpecular[1],colorSpecular[2]);
-                l->SetConeAngle(coneAngle);
-                l->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
-                l->SetAttenuationValues(constAttenuation,linearAttenuation,quadAttenuation);
-                renderer->AddLight(l.GetPointer());
+                this->addLight(renderer.GetPointer(),light.get());
             }
 
             // Set up camera
             auto camera = ro.scene->getCamera();
             if(camera)
             {
-                auto position = camera->getPos();
-                auto focus = camera->getFocus();
-                auto upView = camera->getOrientation() * core::Vec3f::UnitZ();
-                auto viewangle = camera->getViewAngleDeg();
-                auto nearClippingRange = camera->getNearClipDist();
-                auto farClippingRange = camera->getFarClipDist();
-                auto zoom = camera->getZoom();
-
-                vtkNew<vtkCamera> c;
-                c->SetPosition(position[0],position[1],position[2]);
-                c->SetFocalPoint(focus[0],focus[1],focus[2]);
-                c->SetViewAngle(viewangle);
-                c->SetClippingRange(nearClippingRange,farClippingRange);
-                c->Zoom(zoom);
-                c->SetViewUp(upView[0],upView[1],upView[2]);
-
-                renderer->SetActiveCamera(c.GetPointer());
-                renderer->ResetCamera();
+                this->addCamera(renderer.GetPointer(),camera.get());
             }
 
+            // Set up actors
             for(const auto &object : ro.scene->getSceneObject())
             {
                 delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
@@ -187,6 +196,8 @@ public:
                 }
             }
         }
+
+        // Add actors from objects directly attached to the viewer.
         for(const auto &object : this->viewer->objectList)
         {
             delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
@@ -212,20 +223,26 @@ public:
 
         this->renderWindow->SetWindowName(this->viewer->windowTitle.data());
         this->renderWindowInteractor->SetRenderWindow(this->renderWindow.GetPointer());
+        this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
+        this->renderWindowInteractor->AddObserver(vtkCommand::ExitEvent,this);
+
+        // Initialize must be called prior to creating timer events.
+        this->renderWindowInteractor->Initialize();
+        this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
+
         vtkNew<vtkInteractorStyleSwitch> style;
         style->SetCurrentStyleToTrackballCamera();
         renderWindowInteractor->SetInteractorStyle(style.GetPointer());
 
-        if(viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        if(0)// viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
         {
-            std::cerr << "Axis display does not work properly." << std::endl;
-//             vtkNew<vtkAxesActor> axesActor;
-//
-//             vtkNew<vtkOrientationMarkerWidget> orientationWidget;
-//             orientationWidget->SetOrientationMarker( axesActor.GetPointer() );
-//             orientationWidget->SetInteractor( renderWindowInteractor.GetPointer() );
-//             orientationWidget->SetEnabled( 1 );
-//             orientationWidget->InteractiveOff();
+            // FIXME: This causes the renderer to crash.
+            vtkNew<vtkAxesActor> axesActor;
+            vtkNew<vtkOrientationMarkerWidget> orientationWidget;
+            orientationWidget->SetOrientationMarker( axesActor.GetPointer() );
+            orientationWidget->SetInteractor( renderWindowInteractor.GetPointer() );
+            orientationWidget->SetEnabled( 1 );
+            orientationWidget->InteractiveOff();
         }
 
         // Set up background
@@ -251,7 +268,6 @@ VTKViewer::~VTKViewer()
 
 void VTKViewer::exec()
 {
-    this->init();
     this->render();
     this->terminationCompleted = true;
 }

@@ -49,6 +49,12 @@ bool Module::isTerminationDone()
 }
 
 //---------------------------------------------------------------------------
+bool Module::isTerminated()
+{
+    return this->terminateExecution;
+}
+
+//---------------------------------------------------------------------------
 void Module::waitTermination()
 {
     while ( 1 )

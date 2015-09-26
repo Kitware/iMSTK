@@ -55,6 +55,11 @@ public:
     bool isTerminationDone();
 
     ///
+    /// \brief Check if the termination signal has being sent.
+    ///
+    bool isTerminated();
+
+    ///
     /// \brief Wait for termination.
     ///
     void waitTermination();
