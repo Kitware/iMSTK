@@ -41,7 +41,7 @@ class BaseMesh;
 class ToolCoupler : public Module
 {
 public:
-	using TransformType = Eigen::Transform<double, 3, Eigen::Affine>;
+	using TransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
 
 public:
     ///
@@ -69,7 +69,7 @@ public:
     ///
     /// \brief Set the output device for this tool coupler
     ///
-    std::shared_ptr<DeviceInterface> getInputDevice() const;
+    std::shared_ptr<DeviceInterface> getInputDevice();
 
     ///
     /// \brief Set the output device for this tool coupler
@@ -80,7 +80,7 @@ public:
     ///
     /// \brief Get the output device for this tool coupler
     ///
-    std::shared_ptr<DeviceInterface> getOutpurDevice() const;
+    std::shared_ptr<DeviceInterface> getOutputDevice();
 
     ///
     /// \brief Set the pointer to the mesh to control
@@ -171,7 +171,7 @@ private:
     std::shared_ptr<Core::BaseMesh> mesh; //!< Pointer to controlled mesh
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
     std::shared_ptr<DeviceInterface> outputDevice; //!< Pointer to output device
-    Eigen::Transform<double, 3, Eigen::Isometry> initialTransform; //!< Transform applied to the position obtained from device
+    TransformType initialTransform; //!< Transform applied to the position obtained from device
 };
 
 #endif // TOOLCOUPLER_H

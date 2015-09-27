@@ -22,7 +22,10 @@
 //---------------------------------------------------------------------------
 
 // SimMedTK includes
+#include "Devices/VRPNForceDevice.h"
+#include "Simulators/VegaFemSceneObject.h"
 #include "Simulators/VegaFemSimulator.h"
+#include "VirtualTools/ToolCoupler.h"
 
 VegaFemSimulator::VegaFemSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
@@ -66,6 +69,7 @@ void VegaFemSimulator::run()
             auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(sceneObj);
             //std::cout << "."; std::cout.flush();
             femSceneObject->advanceDynamics();
+            this->updateHapticForces(femSceneObject);
         }
     }
 
@@ -94,5 +98,57 @@ void VegaFemSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
         hapticButtonPressed = hapticEvent->getButtonState(0);
         return;
     }*/
+
+}
+void VegaFemSimulator::setHapticTool(std::shared_ptr< ToolCoupler > tool)
+{
+    this->hapticTool = tool;
+}
+std::shared_ptr< ToolCoupler > VegaFemSimulator::getHapticTool() const
+{
+    return this->hapticTool;
+}
+void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sceneObject)
+{
+    auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
+    if(!outputDevice)
+    {
+        core::Vec3f normal(0,1,0);
+        outputDevice->setContactPlane(normal,100);
+        return;
+    }
+
+    auto forces = sceneObject->getContactForces();
+    auto points = sceneObject->getContactPoints();
+
+    if(forces.size() == 0)
+    {
+        core::Vec3f normal(0,1,0);
+        outputDevice->setContactPlane(normal,100);
+        return;
+    }
+
+    core::Vec3d totalForce = core::Vec3d::Zero();
+    for(const auto &f : forces)
+    {
+        totalForce = f.second;
+    }
+    core::Vec3d contactPoint = core::Vec3d::Zero();
+
+    for(const auto &p : points)
+    {
+        contactPoint = p.second;
+    }
+    contactPoint /= points.size();
+
+    float norm = totalForce.norm();
+    auto normal = totalForce.normalized();
+    auto d = totalForce.dot(contactPoint);
+
+    outputDevice->setContactPlane(normal.cast<float>(),0);
+    outputDevice->setDampingCoefficient(0.001);
+    outputDevice->setDynamicFriction(0.0);
+    outputDevice->setSpringCoefficient(norm);
+    outputDevice->setStaticFriction(0.0);
 
 }

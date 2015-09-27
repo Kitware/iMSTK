@@ -119,7 +119,7 @@ void IOMeshVegaDelegate::read()
     auto meshToAttach = std::make_shared<SurfaceMesh>();
     meshToAttach->setVertices(surfaceVertices);
     meshToAttach->setTriangles(localTriangleArray);
-    meshToAttach->updateOriginalVertsWithCurrent();
+    meshToAttach->updateInitialVertices();
 
     volumetricMesh->setVertexMap(uniqueVertexArray);
     volumetricMesh->attachSurfaceMesh(meshToAttach);

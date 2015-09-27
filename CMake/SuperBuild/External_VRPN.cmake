@@ -35,10 +35,6 @@ if(NOT DEFINED ${proj}_DIR)
           -DLibNifalcon_DIR=${LibNifalcon_DIR}
           -DCMAKE_INCLUDE_PATH=${SimMedTK_CMAKE_INCLUDE_PATH}
           )
-  else()
-      list(APPEND VRPN_EP_ARGS
-          -DVRPN_USE_LIBNIFALCON:BOOL=OFF
-          )
   endif()
 
   # Set CMake OSX variable to pass down the external project
@@ -52,14 +48,22 @@ if(NOT DEFINED ${proj}_DIR)
     )
   endif()
 
+  # Set CMake MSVS variable to pass down the external project
+  set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
+  if(MSVC)
+    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
+        -DLIBUSB1_ROOT_DIR:PATH=${LIBUSB1_ROOT_DIR}
+        -DLIBUSB1_INCLUDE_DIR:PATH=${LIBUSB1_INCLUDE_DIR}
+        -DLIBUSB1_LIBRARY:PATH=${LIBUSB1_LIBRARY}
+    )
+  endif()
+
   set(SERVER_ARGS)
   if(USE_VRPN_SERVER)
     list(APPEND SERVER_ARGS
-#         -DVRPN_BUILD_SERVERS:BOOL=ON
         -DVRPN_BUILD_SERVER_LIBRARY:BOOL=ON
-        -DVRPN_GPL_SERVER:BOOL=ON
         -DVRPN_USE_HID:BOOL=ON
-        -DVRPN_USE_LIBUSB_1_0:BOOL=ON)
+        )
     if(SimMedTK_USE_PHANTOM_OMNI)
         list(APPEND SERVER_ARGS
             -DVRPN_USE_HDAPI:BOOL=ON
@@ -86,19 +90,21 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
       -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
       -DVRPN_SUBPROJECT_BUILD:BOOL=ON
+      -DVRPN_BUILD_CLIENTS:BOOL=OFF
+      -DVRPN_BUILD_SERVERS:BOOL=OFF
       -DVRPN_BUILD_CLIENT_LIBRARY:BOOL=ON
-      -DVRPN_BUILD_SERVER_LIBRARY:BOOL=ON
       -DVRPN_INSTALL:BOOL=OFF
       -DVRPN_BUILD_PYTHON:BOOL=OFF
       -DVRPN_USE_GPM_MOUSE:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
       ${SERVER_ARGS}
       ${VRPN_EP_ARGS}
     DEPENDS
       ${${proj}_DEPENDENCIES}
-    LOG_DOWNLOAD 1            # Wrap download in script to log output
+    # LOG_DOWNLOAD 1            # Wrap download in script to log output
 #     LOG_UPDATE 1              # Wrap update in script to log output
 #     LOG_CONFIGURE 1           # Wrap configure in script to log output
 #     LOG_BUILD 1               # Wrap build in script to log output
@@ -113,3 +119,8 @@ endif()
 
 set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
 list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DVRPN_DIR:PATH=${${proj}_DIR})
+if(MSVC)
+    list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
+        ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
+    )
+endif(MSVC)

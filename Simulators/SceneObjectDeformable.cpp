@@ -45,26 +45,33 @@ SceneObjectDeformable::~SceneObjectDeformable()
 
 void SceneObjectDeformable::applyContactForces()
 {
-    if (f_contact.size() != 0)
+    for(const auto &cf : contactForces)
     {
-        for (size_t i = 0; i < f_contact.size(); i++)
-        {
-            f_ext[i] += f_contact[i];
-        }
+        int i = cf.first;
+        f_ext[i] += cf.second[0];
+        f_ext[i+1] += cf.second[1];
+        f_ext[i+2] += cf.second[2];
     }
 }
 
 void SceneObjectDeformable::setContactForcesToZero()
 {
-    f_contact.assign(f_contact.size(), 0.0);
+    contactForces.clear();
+    contactPoints.clear();
 }
 
 void SceneObjectDeformable::setContactForceOfNodeWithDofID(const int dofID,
-                                                             const core::Vec3d force)
+                                                             const core::Vec3d &force)
 {
-    f_contact[dofID] = force(0);
-    f_contact[dofID + 1] = force(1);
-    f_contact[dofID + 2] = force(2);
+    contactForces[dofID] = force;
+}
+
+void SceneObjectDeformable::setContactForceOfNodeWithDofID(const int dofID,
+                                                           const core::Vec3d &point,
+                                                           const core::Vec3d &force)
+{
+    contactPoints[dofID] = point;
+    contactForces[dofID] = force;
 }
 
 core::Vec3d SceneObjectDeformable::getVelocityOfNodeWithDofID(const int dofID) const

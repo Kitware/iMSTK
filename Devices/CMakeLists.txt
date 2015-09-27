@@ -6,14 +6,11 @@ if(USE_VRPN_CLIENT)
     if(USE_VRPN_SERVER)
         list(APPEND EXTERNAL_DEVICES_SOURCES
             VRPNDeviceServer.cpp
+            VRPNForceDevice.cpp
         )
         # --------------------------------
         if(SimMedTK_USE_PHANTOM_OMNI)
             add_definitions(-DVRPN_USE_PHANTOM_SERVER)
-            # --------------------------------
-            list(APPEND EXTERNAL_DEVICES_SOURCES
-                VRPNPhantomDevice.cpp
-                )
             # --------------------------------
             list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
                 OH::HD
@@ -58,7 +55,7 @@ simmedtk_add_library(Devices
     DeviceInterface.h
     VRPNDeviceServer.h
     VRPNDeviceClient.h
-    VRPNPhantomDevice.h
+    VRPNForceDevice.h
 )
 
 target_link_libraries(Devices
@@ -67,4 +64,3 @@ target_link_libraries(Devices
   PUBLIC
     ${EXTERNAL_DEVICES_TARGET_LIBRARIES}
 )
-

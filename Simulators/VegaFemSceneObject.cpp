@@ -132,7 +132,6 @@ void VegaFemSceneObject::initialize()
     uaccel.resize(3 * numNodes);
     f_extBase.resize(3 * numNodes);
     f_ext.resize(3 * numNodes);
-    f_contact.resize(3 * numNodes);
 
     loadInitialStates();
     loadScriptedExternalForces();
@@ -312,7 +311,7 @@ void VegaFemSceneObject::loadSurfaceMesh()
                 << ioMesh->getMesh()->getTriangles().size() << " faces\n";
         }
         auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(ioMesh->getMesh());
-        surfaceMesh->updateOriginalVertsWithCurrent();
+        surfaceMesh->updateInitialVertices();
 
         // load interpolation structure
         if (strcmp(femConfig->secondaryRenderingMeshInterpolationFilename, "__none") == 0)

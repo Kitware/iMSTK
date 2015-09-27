@@ -24,6 +24,9 @@
 #ifndef SMSTATICSCENEOBJECT_H
 #define SMSTATICSCENEOBJECT_H
 
+// STL includes
+#include <unordered_map>
+
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/Model.h"
@@ -75,9 +78,32 @@ public:
 
     std::shared_ptr<Model> getModel();
 
+    // Get contact forces vector
+    std::unordered_map<int,core::Vec3d> &getContactForces()
+    {
+        return this->contactForces;
+    }
+
+    const std::unordered_map<int,core::Vec3d> &getContactForces() const
+    {
+        return this->contactForces;
+    }
+
+    // Get contact forces vector
+    std::unordered_map<int,core::Vec3d> &getContactPoints()
+    {
+        return this->contactPoints;
+    }
+
+    const std::unordered_map<int,core::Vec3d> &getContactPoints() const
+    {
+        return this->contactPoints;
+    }
 public:
     /// \brief static scene object contains a mesh
     std::shared_ptr<Model> staticModel;
+    std::unordered_map<int,core::Vec3d> contactForces;
+    std::unordered_map<int,core::Vec3d> contactPoints;
 };
 
 #endif

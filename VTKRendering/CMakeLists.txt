@@ -20,6 +20,7 @@ set(PRIVATE_LIBS
         Rendering
         Mesh
         Geometry
+        Devices
         )
 
 if(VTK_LIBRARIES)

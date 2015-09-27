@@ -77,7 +77,7 @@ void ToolCoupler::setInputDevice(std::shared_ptr< DeviceInterface > newDevice)
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< DeviceInterface > ToolCoupler::getInputDevice() const
+std::shared_ptr< DeviceInterface > ToolCoupler::getInputDevice()
 {
     return this->inputDevice;
 }
@@ -89,7 +89,7 @@ void ToolCoupler::setOutpurDevice(std::shared_ptr< DeviceInterface > newDevice)
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< DeviceInterface > ToolCoupler::getOutpurDevice() const
+std::shared_ptr< DeviceInterface > ToolCoupler::getOutputDevice()
 {
     return this->outputDevice;
 }

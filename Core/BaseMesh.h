@@ -45,7 +45,7 @@ namespace Core {
 class BaseMesh: public CoreClass
 {
 public:
-    using TransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
+    using TransformType = Eigen::Transform<double, 3, Eigen::Affine>;
 
 public:
     ///
@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Copy vertices into origVerts
     ///
-    void updateOriginalVertsWithCurrent();
+    void updateInitialVertices();
 
     ///
     /// \brief Copy vertices into origVerts

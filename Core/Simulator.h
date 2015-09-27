@@ -27,15 +27,14 @@
 // STL include
 #include <memory>
 
-// Threads includes
-#include <ThreadPool.h>
-
 // SimMedTK includes
 #include "Core/Module.h"
 #include "Core/ObjectSimulator.h"
 #include "Core/MakeUnique.h"
 #include "Core/CollisionDetection.h"
 #include "Core/ContactHandling.h"
+
+class ThreadPool;
 
 struct SimulationMainParam
 {
@@ -89,10 +88,7 @@ public:
     /// \brief this is called by SDK. it lanuches the simulator module
     virtual void exec();
 
-    void addCollisionPair(std::shared_ptr<CollisionPair> pair)
-    {
-        collisionPairs.emplace_back(pair);
-    }
+    void addCollisionPair(std::shared_ptr<CollisionPair> pair);
 
 private:
     std::vector<std::shared_ptr<ObjectSimulator>> simulators;

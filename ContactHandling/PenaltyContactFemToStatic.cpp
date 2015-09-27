@@ -65,7 +65,7 @@ void PenaltyContactFemToStatic::computeUnilateralContactForces()
 
             force = stiffness * -contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
 
-            femSceneObject->setContactForceOfNodeWithDofID(nodeDofID, force);
+            femSceneObject->setContactForceOfNodeWithDofID(nodeDofID, contactInfo[i]->point, force);
 
         }
     }

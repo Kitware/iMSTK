@@ -27,8 +27,10 @@
 #include "Core/RenderDelegate.h"
 
 #include <chrono>
-#include <thread>
 #include <string>
+
+// Threads includes
+#include <ThreadPool.h>
 
 /// \brief SDK is singlenton class
 std::once_flag SDK::sdkCallOnceFlag;

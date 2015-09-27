@@ -166,17 +166,6 @@ if(APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set CMake Windows variable to pass down the external project
-#
-set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
-if(WIN32)
-  if( DEFINED SimMedTK_WINDOWS_DEPENDENCIES_DIR)
-    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
-      -DSimMedTK_WINDOWS_DEPENDENCIES_DIR:PATH=${SimMedTK_WINDOWS_DEPENDENCIES_DIR})
-  endif()
-endif(WIN32)
-
-#-----------------------------------------------------------------------------
 # SimMedTK Configure
 #
 SET(proj SimMedTK-Configure)

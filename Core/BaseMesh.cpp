@@ -27,7 +27,7 @@ namespace Core {
 
 BaseMesh::BaseMesh() {}
 BaseMesh::~BaseMesh() {}
-void BaseMesh::updateOriginalVertsWithCurrent()
+void BaseMesh::updateInitialVertices()
 {
     this->origVerts = this->vertices;
 }
@@ -116,7 +116,7 @@ void BaseMesh::translate( const Eigen::Translation3d& translation, bool setIniti
     } );
     if(setInitialPoints)
     {
-        this->updateOriginalVertsWithCurrent();
+        this->updateInitialVertices();
     }
 }
 void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )

@@ -24,6 +24,9 @@
 #ifndef SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 #define SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 
+// STL includes
+#include <unordered_map>
+
 // SimMedTK includes
 #include "Mesh/SurfaceMesh.h"
 #include "Core/SceneObject.h"
@@ -74,7 +77,12 @@ public:
 
     /// \brief  Sets the contact force at a given location
     /// (not given node) in contact force vector
-    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d force);
+    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d &force);
+
+    /// \brief  Sets the contact force at a given location
+    /// (not given node) in contact force vector
+    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d &contactPoint,
+                                        const core::Vec3d &force);
 
     /// \brief  returns displacement of at a given location
     /// (not given node) in contact force vector
@@ -143,14 +151,25 @@ public:
     }
 
     // Get contact forces vector
-    std::vector<double> &getContactForces()
+    std::unordered_map<int,core::Vec3d> &getContactForces()
     {
-        return this->f_contact;
+        return this->contactForces;
     }
 
-    const std::vector<double> &getContactForces() const
+    const std::unordered_map<int,core::Vec3d> &getContactForces() const
     {
-        return this->f_contact;
+        return this->contactForces;
+    }
+
+    // Get contact forces vector
+    std::unordered_map<int,core::Vec3d> &getContactPoints()
+    {
+        return this->contactPoints;
+    }
+
+    const std::unordered_map<int,core::Vec3d> &getContactPoints() const
+    {
+        return this->contactPoints;
     }
 
 protected:
@@ -179,13 +198,15 @@ protected:
     std::vector<double> uSecondary; ///< interpolated displacement for secondary mesh
     std::vector<double> uInitial;   ///< initial displacement
     std::vector<double> velInitial; ///< initial velocity
-    std::vector<double> f_contact;  ///< contact forces (if any)
     std::vector<double> forceLoads; ///< discrete external load inputs
 
     std::vector<int> fixedVertices; ///< fixed vertcies
 
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
+
+    std::unordered_map<int,core::Vec3d> contactForces;
+    std::unordered_map<int,core::Vec3d> contactPoints;
 };
 
 #endif // SMVEGAFEMSCENEOBJECT_DEFORMABLE_H

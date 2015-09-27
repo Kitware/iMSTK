@@ -24,6 +24,9 @@
 #ifndef SMSDK_H
 #define SMSDK_H
 
+// STL includes
+#include <thread>
+
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"

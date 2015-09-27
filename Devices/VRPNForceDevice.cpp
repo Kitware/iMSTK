@@ -21,13 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Devices/VRPNPhantomDevice.h"
+#include "Devices/VRPNForceDevice.h"
 #include "Core/Matrix.h"
 
 // VRPN includes
 #include <vrpn_ForceDevice.h>
 
-VRPNPhantomDevice::VRPNPhantomDevice()
+VRPNForceDevice::VRPNForceDevice()
     :
     enableForce(true),
     contactPlane(core::Vec4f(0.0,1.0,0.0,100)),
@@ -42,10 +42,10 @@ VRPNPhantomDevice::VRPNPhantomDevice()
 }
 
 //---------------------------------------------------------------------------
-VRPNPhantomDevice::~VRPNPhantomDevice(){}
+VRPNForceDevice::~VRPNForceDevice(){}
 
 //---------------------------------------------------------------------------
-DeviceInterface::Message VRPNPhantomDevice::openDevice()
+DeviceInterface::Message VRPNForceDevice::openDevice()
 {
     this->vrpnForce = std::make_shared<vrpn_ForceDevice_Remote>(this->deviceURL.c_str());
     this->vrpnForce->register_force_change_handler(this, forceChangeHandler);
@@ -53,7 +53,7 @@ DeviceInterface::Message VRPNPhantomDevice::openDevice()
 }
 
 //---------------------------------------------------------------------------
-DeviceInterface::Message VRPNPhantomDevice::closeDevice()
+DeviceInterface::Message VRPNForceDevice::closeDevice()
 {
     this->vrpnForce->unregister_force_change_handler(this, forceChangeHandler);
     this->vrpnForce.reset();
@@ -61,14 +61,14 @@ DeviceInterface::Message VRPNPhantomDevice::closeDevice()
 }
 
 //---------------------------------------------------------------------------
-void VRPNPhantomDevice::processChanges()
+void VRPNForceDevice::processChanges()
 {
     VRPNDeviceClient::processChanges();
     this->vrpnForce->mainloop();
 }
 
 //---------------------------------------------------------------------------
-void VRPNPhantomDevice::init()
+void VRPNForceDevice::init()
 {
     this->buttons.resize(2);
     this->buttonTimers.resize(2);
@@ -77,9 +77,9 @@ void VRPNPhantomDevice::init()
 
 //---------------------------------------------------------------------------
 void VRPN_CALLBACK
-VRPNPhantomDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
+VRPNForceDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
 {
-    auto handler = reinterpret_cast<VRPNPhantomDevice*>(userData);
+    auto handler = reinterpret_cast<VRPNForceDevice*>(userData);
 
     handler->force << f.force[0],f.force[1],f.force[2];
     handler->forceTimer.start();

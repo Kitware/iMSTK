@@ -24,6 +24,9 @@
 #include "Core/Simulator.h"
 #include "Core/MakeUnique.h"
 
+// Threads includes
+#include <ThreadPool.h>
+
 /// \brief starts the tasks with the threads from thread pool
 void Simulator::beginFrame()
 {
@@ -284,4 +287,8 @@ void Simulator::exec()
 
     this->terminationCompleted = true;
     std::cout << "Simulator terminated" <<std::endl;
+}
+void Simulator::addCollisionPair(std::shared_ptr< CollisionPair > pair)
+{
+    collisionPairs.emplace_back(pair);
 }

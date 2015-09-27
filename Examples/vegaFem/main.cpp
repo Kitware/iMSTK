@@ -30,6 +30,8 @@
 #include "Simulators/VegaFemSceneObject.h"
 #include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
+#include "Devices/VRPNForceDevice.h"
+#include "VirtualTools/ToolCoupler.h"
 
 // Include required simulators
 #include "Simulators/VegaFemSimulator.h"
@@ -65,6 +67,19 @@ int main(int ac, char** av)
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
+    auto client = std::make_shared<VRPNForceDevice>();
+    //get some user input and setup device url
+    std::string input = "navigator@localhost";
+    std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
+    std::getline(std::cin, input);
+    if(!input.empty())
+    {
+        client->setDeviceURL(input);
+    }
+    auto controller = std::make_shared<ToolCoupler>(client);
+    controller->setScalingFactor(5.0);
+    sdk->registerModule(client);
+    sdk->registerModule(controller);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
@@ -72,6 +87,7 @@ int main(int ac, char** av)
 
     // create a FEM simulator
     auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject = std::make_shared<VegaFemSceneObject>(
@@ -94,7 +110,7 @@ int main(int ac, char** av)
     sdk->addSceneActor(femObject, femSimulator);
 
     //-------------------------------------------------------
-    // Create scene actor 2:  plane + dummy simulator
+    // Create scene actor 2:  plane
     //-------------------------------------------------------
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
@@ -110,6 +126,26 @@ int main(int ac, char** av)
     staticObject->setModel(plane);
 
     sdk->addSceneActor(staticObject, staticSimulator);
+
+    //-------------------------------------------------------
+    // Create scene actor 2:  loli tool
+    // create a static object to hold the lolitool scene object of given normal and position
+    //-------------------------------------------------------
+    auto loliSceneObject = std::make_shared<StaticSceneObject>();
+
+    auto loliCollisionModel = std::make_shared<MeshCollisionModel>();
+    loliCollisionModel->loadTriangleMesh("./loli.vtk");
+    loliSceneObject->setModel(loliCollisionModel);
+
+    auto loliMesh = loliCollisionModel->getMesh();
+    Core::BaseMesh::TransformType transform = Eigen::Translation3d(core::Vec3d(0,5,0))*Eigen::Scaling(.5);
+
+    loliMesh->transform(transform);
+    loliMesh->updateInitialVertices();
+
+    auto loliSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    sdk->addSceneActor(loliSceneObject, loliSimulator);
+    controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
     // Register both object simulators

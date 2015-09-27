@@ -30,7 +30,7 @@
 #include "Core/SDK.h"
 #include "Core/Factory.h"
 #include "Core/ViewerBase.h"
-#include "Devices/VRPNPhantomDevice.h"
+#include "Devices/VRPNForceDevice.h"
 #include "Devices/VRPNDeviceServer.h"
 #include "IO/initIO.h"
 #include "RenderDelegates/initRenderDelegates.h"
@@ -56,8 +56,8 @@ int main()
     std::string input = "navigator@localhost";
 
     auto sdk = SDK::getInstance();
-    auto server = std::make_shared<VRPNDeviceServer>();
-    auto client = std::make_shared<VRPNDeviceClient>();
+//     auto server = std::make_shared<VRPNDeviceServer>();
+    auto client = std::make_shared<VRPNForceDevice>();
 //     core::Vec4f contactPlane;
 //     contactPlane << 0.0, 1.0, 0.0, -5.0;
 //     client->setContactPlane(contactPlane);
@@ -66,7 +66,7 @@ int main()
     auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(5.0);
 
-    sdk->registerModule(server);
+//     sdk->registerModule(server);
     sdk->registerModule(client);
     sdk->registerModule(controller);
 

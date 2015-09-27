@@ -33,14 +33,14 @@ typedef struct _vrpn_FORCECB vrpn_FORCECB;
 /// \brief An interface for the Phantom Omni or Geomagic Touch using VRPN.
 ///     This is the main client code.
 ///
-class VRPNPhantomDevice : public VRPNDeviceClient
+class VRPNForceDevice : public VRPNDeviceClient
 {
 public:
     ///
     /// \brief Constructor/Destructor
     ///
-    VRPNPhantomDevice();
-    ~VRPNPhantomDevice();
+    VRPNForceDevice();
+    ~VRPNForceDevice();
 
     ///
     /// \brief Open the connection to the VRPN server
@@ -83,6 +83,14 @@ public:
     void setContactPlane(const core::Vec4f &plane)
     {
         this->contactPlane = plane;
+    }
+
+    ///
+    /// \brief Set contact plane
+    ///
+    void setContactPlane(const core::Vec3f &plane, const float d)
+    {
+        this->contactPlane << plane,d;
     }
 
     ///

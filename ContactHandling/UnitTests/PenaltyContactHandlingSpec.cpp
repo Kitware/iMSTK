@@ -107,16 +107,16 @@ go_bandit([]() {
             f.push_back(0);
             f.push_back(0);
 
+            fem->setContactForceOfNodeWithDofID(0,core::Vec3d(0,0,0));
             auto &contactForce = fem->getContactForces();
-            contactForce.resize(3);
 
             handler->resolveContacts();
 
             std::cout << contactForce[0] << std::endl;
 
-            AssertThat(contactForce[0]==-110000, IsTrue());
-            AssertThat(contactForce[1] == 0, IsTrue());
-            AssertThat(contactForce[2] == 0, IsTrue());
+            AssertThat(contactForce[0][0]==-110000, IsTrue());
+            AssertThat(contactForce[0][1] == 0, IsTrue());
+            AssertThat(contactForce[0][2] == 0, IsTrue());
         });
     });
 });

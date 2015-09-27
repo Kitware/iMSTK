@@ -27,6 +27,8 @@
 #include "Core/Event.h"
 #include "Event/KeyboardEvent.h"
 #include "Collision/MeshCollisionModel.h"
+#include "Devices/VRPNForceDevice.h"
+#include "VirtualTools/ToolCoupler.h"
 
 DefaultSimulator::DefaultSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
 {
@@ -60,7 +62,7 @@ void DefaultSimulator::initCustom()
                     std::cerr << "Unknown model type." << std::endl;
                     break;
                 }
-                auto mesh = std::static_pointer_cast<MeshCollisionModel>(model)->getMesh();
+                auto mesh = model->getMesh();
 
                 object->getLocalVertices().reserve( mesh->getNumberOfVertices() );
                 // WARNING:  Copy!!?
@@ -91,6 +93,7 @@ void DefaultSimulator::run()
             {
                 apply(sceneObject->getLocalVertices());
             }
+            this->updateHapticForces(sceneObject);
         }
     }
 
@@ -143,4 +146,49 @@ void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
                 break;
         }
     }
+}
+
+void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sceneObject)
+{
+    auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
+    if(!outputDevice)
+    {
+        core::Vec3f normal(0,1,0);
+        outputDevice->setContactPlane(normal,100);
+        return;
+    }
+
+    auto forces = sceneObject->getContactForces();
+    auto points = sceneObject->getContactPoints();
+
+    if(forces.size() == 0)
+    {
+        core::Vec3f normal(0,1,0);
+        outputDevice->setContactPlane(normal,100);
+        return;
+    }
+
+    core::Vec3d totalForce = core::Vec3d::Zero();
+    for(const auto &f : forces)
+    {
+        totalForce = f.second;
+    }
+    core::Vec3d contactPoint = core::Vec3d::Zero();
+
+    for(const auto &p : points)
+    {
+        contactPoint = p.second;
+    }
+    contactPoint /= points.size();
+
+    float norm = totalForce.norm();
+    auto normal = totalForce.normalized();
+    auto d = totalForce.dot(contactPoint);
+
+    outputDevice->setContactPlane(normal.cast<float>(),0);
+    outputDevice->setDampingCoefficient(0.001);
+    outputDevice->setDynamicFriction(0.0);
+    outputDevice->setSpringCoefficient(norm);
+    outputDevice->setStaticFriction(0.0);
+
 }
