@@ -419,3 +419,21 @@ void RenderDetail::reset()
     this->faceBackgroundBottom.setValue(0.8, 0.8, 0.8, 1.0);
     this->faceBackgroundTop.setValue(0.45, 0.45, 0.8, 1.0);
 }
+
+//---------------------------------------------------------------------------
+void RenderDetail::setRenderType(unsigned int p_renderType){
+	renderType = p_renderType;
+}
+
+//---------------------------------------------------------------------------
+void RenderDetail::addShaderAttribute(int shaderType, const std::string &attributeName){
+
+
+
+
+
+
+
+}
+
+

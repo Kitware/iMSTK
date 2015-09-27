@@ -195,6 +195,7 @@ void MeshRenderDelegate::initDraw()
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
             auto shadersPrograms = renderDetail->getShaderPrograms();
             this->setShadersProgram(glMapper,shadersPrograms);
+		
 
             auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
             this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);

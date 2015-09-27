@@ -31,7 +31,7 @@
 #include <vector>
 #include <string>
 #include <map>
-
+#include <array>
 class VisualArtifact;
 class CoreClass;
 class Model;
@@ -280,6 +280,18 @@ public:
     ///
     void reset();
     
+	/// 
+	/// \brief Set render type
+	///
+	void setRenderType(unsigned int p_renderType);
+
+
+	///
+	/// @brief Add an attribute to a program to the the list (vtk)
+	///
+	void addShaderAttribute(int shaderType, const std::string &attributeName);
+	
+
 private:
     bool canGetShadow; // object can get the shadow or not
     bool castShadow; // object can generate a shadow or not
@@ -309,6 +321,7 @@ private:
     std::vector<bool> VAOEnable; // enable/disable any attached VAO
     std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
+	std::map<std::string,int> shaderAttributes;
 };
 
 #endif // SMRENDERDETAIL_H

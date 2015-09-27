@@ -75,12 +75,12 @@ int main(int ac, char **av)
     //-------------------------------------------------------
 
     // create a FEM simulator
-    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+   // auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
+    //auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
+    auto meshRenderDetail = std::make_shared<RenderDetail>(//SIMMEDTK_RENDER_WIREFRAME |
                                                              //| SIMMEDTK_RENDER_VERTICES
                                                              SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
                                                               );
@@ -94,13 +94,13 @@ int main(int ac, char **av)
     meshRenderDetail->addShaderProgram(vtkShader::Fragment,"wet_frag.glsl");
     meshRenderDetail->setTextureFilename("textures/cube.jpg");
 
-    auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
-    if(renderingMesh)
+   // auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
+   /* if(renderingMesh)
     {
         renderingMesh->setRenderDetail(meshRenderDetail);
     }
 
-    sdk->addSceneActor(femObject, femSimulator);
+    sdk->addSceneActor(femObject, femSimulator);*/
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
@@ -121,35 +121,46 @@ int main(int ac, char **av)
     // Register both object simulators
     //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
-    sdkSimulator->registerObjectSimulator(femSimulator);
+    //sdkSimulator->registerObjectSimulator(femSimulator);
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    auto meshModel = std::make_shared<MeshCollisionModel>();
+    //auto meshModel = std::make_shared<MeshCollisionModel>();
 
-    meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
+    //meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
 
-    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+    //auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
-    planeMeshCollisionPairs->setModels(meshModel, plane);
+    //planeMeshCollisionPairs->setModels(meshModel, plane);
 
-    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+    //sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+    //auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
-    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+    //sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
-    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+    //auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
 
-    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+    //planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
-    planeToMeshContact->setSceneObjects(staticObject, femObject);
+    //planeToMeshContact->setSceneObjects(staticObject, femObject);
 
-    sdkSimulator->registerContactHandling(planeToMeshContact);
+    //sdkSimulator->registerContactHandling(planeToMeshContact);
+
+
+
+	auto cubeModel = std::make_shared<MeshModel>();
+	cubeModel->load("models/cube.obj");
+	cubeModel->getMesh()->scale(Eigen::UniformScaling<double>(10.0));
+	cubeModel->setRenderDetail(meshRenderDetail);
+
+	auto cube = std::make_shared<StaticSceneObject>();
+	cube->setModel(cubeModel);
+
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -165,6 +176,9 @@ int main(int ac, char **av)
     // Get Scene
     auto scene = sdk->getScene(0);
     viewer->registerScene(scene);
+	
+	scene->addSceneObject(cube);
+
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();
