@@ -40,8 +40,6 @@ set(DATA
     ${${APP}_DATA}/nidus1764.mass
     ${${APP}_DATA}/nidusS7415.vtk
     ${${APP}_DATA}/nidusV1764.vtk
-    ${${APP}_DATA}/wet_frag.glsl
-    ${${APP}_DATA}/wet_vert.glsl
 )
 
 add_custom_command(

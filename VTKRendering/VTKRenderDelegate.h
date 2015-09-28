@@ -5,6 +5,19 @@
 #include "Core/RenderDelegate.h"
 
 class vtkActor;
+class CustomGLPolyDataMapper :public vtkOpenGLPolyDataMapper{
+public:
+	static CustomGLPolyDataMapper* New();
+	vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
+	virtual void initDraw() {}
+	virtual void modified() {}
+	virtual void draw() const { }
+	virtual void SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
+
+
+
+
+};
 
 class VTKRenderDelegate : public RenderDelegate
 {
@@ -34,6 +47,7 @@ void VTKRenderDelegate::setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
             case vtkShader::Fragment:
             {
                 mapper->SetFragmentShaderCode(program.second.c_str());
+				
                 break;
             }
             case vtkShader::Vertex:
@@ -67,6 +81,7 @@ void VTKRenderDelegate::setShadersProgramReplacements(vtkOpenGLPolyDataMapper *m
                                          true,
                                          program[1],
                                          false);
+		
         }
     }
 }

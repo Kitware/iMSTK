@@ -90,8 +90,8 @@ int main(int ac, char **av)
     meshRenderDetail->setShininess(20.0);
 
     // Set shader porograms
-    meshRenderDetail->addShaderProgram(vtkShader::Vertex,"wet_vert.glsl");
-    meshRenderDetail->addShaderProgram(vtkShader::Fragment,"wet_frag.glsl");
+    meshRenderDetail->addShaderProgram(vtkShader::Vertex,"shaders/wet_vert.glsl");
+    meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl");
     meshRenderDetail->setTextureFilename("textures/cube.jpg");
 
    // auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
@@ -199,7 +199,7 @@ int main(int ac, char **av)
     // Run the SDK
     //-------------------------------------------------------
     sdk->run();
-
+	 
     //cleanup
     sdk->releaseScene(scene);
 

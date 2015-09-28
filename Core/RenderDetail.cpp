@@ -26,6 +26,7 @@
 #include <sstream>
 #include <iostream>
 
+
 //---------------------------------------------------------------------------
 RenderDetail::RenderDetail()
 {

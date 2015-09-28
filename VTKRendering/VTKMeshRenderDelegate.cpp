@@ -51,6 +51,8 @@
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProperty.h>
 
+vtkStandardNewMacro(CustomGLPolyDataMapper)
+
 class MeshRenderDelegate : public VTKRenderDelegate
 {
 public:
@@ -176,6 +178,16 @@ void MeshRenderDelegate::initDraw()
         }
         unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates.GetPointer());
     }
+	//vtkNew<vtkDoubleArray> tangentArray;
+	//tangentArray->SetNumberOfComponents(3);
+	//tangentArray->SetName("Tangents");
+
+	//vtkNew<vtkPoints> tangents;
+	//tangents->SetNumberOfPoints(mesh->getVertices().size());
+	
+
+
+
 
     dataSet = unstructuredMesh.GetPointer();
     if (renderDetail && renderDetail->renderNormals())
@@ -187,9 +199,9 @@ void MeshRenderDelegate::initDraw()
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
 
-        mapper = vtkOpenGLPolyDataMapper::New();
+		mapper = CustomGLPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
-
+		
         if(renderDetail->hasShaders())
         {
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
@@ -198,7 +210,10 @@ void MeshRenderDelegate::initDraw()
 		
 
             auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
-            this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
+            //this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
+			
+			
+			
         }
     }
     else
@@ -232,6 +247,14 @@ void MeshRenderDelegate::modified()
 {
     if (this->dataSet)
         dataSet->Modified();
+}
+
+
+
+void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act)
+{
+	vtkOpenGLPolyDataMapper::SetMapperShaderParameters(cellBO, ren, act);
+
 }
 
 RegisterFactoryClass(RenderDelegate,
