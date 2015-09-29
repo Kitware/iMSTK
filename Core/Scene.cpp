@@ -23,6 +23,14 @@
 
 #include "Core/Scene.h"
 
+// VTK glew library
+#include <vtk_glew.h>
+
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
 
 Scene::Scene(std::shared_ptr<ErrorLog> p_log) :
     CoreClass()

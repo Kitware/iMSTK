@@ -27,6 +27,14 @@
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/SurfaceTree.h"
 
+#include <vtk_glew.h>
+
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
+
 class SurfaceTreeRenderDelegate : public RenderDelegate
 {
 public:

@@ -1,5 +1,9 @@
-enable_testing()
+find_package(Bandit REQUIRED)
+include_directories(${BANDIT_INCLUDE_DIR})
+
 include(CTest)
+enable_testing()
+
 set(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 if (APPLE)

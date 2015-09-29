@@ -14,6 +14,8 @@ if( MSVC )
   set(LIBRARY_SUFFIX "-${MSVC_PREFIX}-mt" CACHE STRING "the suffix for the assimp windows library" FORCE)
 endif()
 
+set(ASSIMP_INCLUDE_DIRS)
+set(ASSIMP_LIBRARIES)
 
 find_path(ASSIMP_INCLUDE_DIR
     assimp/config.h
@@ -25,22 +27,46 @@ find_library(ASSIMP_LIBRARY
     assimp${LIBRARY_SUFFIX}d
     )
 
+find_package(ZLIB)
+if(NOT ZLIB_FOUND)
+  find_library(ZLIB_LIBRARY
+    NAMES
+      zlibstaticd
+      zlibstatic
+    )
+endif()
+
+set(ASSIMP_ZLIB_INCLUDE_DIR "${ASSIMP_INCLUDE_DIR}" "${ZLIB_INCLUDE_DIR}")
+
 set(ASSIMP_INCLUDE_DIRS "${ASSIMP_INCLUDE_DIR}")
-set(ASSIMP_LIBRARIES "${ASSIMP_LIBRARY}")
+set(ASSIMP_LIBRARIES "${ASSIMP_LIBRARY}" "${ZLIB_LIBRARY}")
 
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ASSIMP
   REQUIRED_VARS
-    ASSIMP_INCLUDE_DIR
-    ASSIMP_LIBRARY)
+  ASSIMP_INCLUDE_DIR
+  ASSIMP_ZLIB_INCLUDE_DIR
+  ASSIMP_LIBRARY
+  ZLIB_LIBRARY
+  )
 
 mark_as_advanced(
   ASSIMP_INCLUDE_DIR
-  ASSIMP_LIBRARY)
+  ASSIMP_ZLIB_INCLUDE_DIR
+  ASSIMP_LIBRARY
+  ZLIB_LIBRARY
+  )
 
 if(ASSIMP_FOUND AND NOT TARGET Assimp::Assimp)
   add_library(Assimp::Assimp INTERFACE IMPORTED)
   set_target_properties(Assimp::Assimp PROPERTIES
     INTERFACE_LINK_LIBRARIES "${ASSIMP_LIBRARY}"
     INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_INCLUDE_DIR}")
+endif()
+
+if(ASSIMP_FOUND AND NOT TARGET Assimp::Zlib)
+  add_library(Assimp::Zlib INTERFACE IMPORTED)
+  set_target_properties(Assimp::Zlib PROPERTIES
+    INTERFACE_LINK_LIBRARIES "${ZLIB_LIBRARY}"
+    INTERFACE_INCLUDE_DIRECTORIES "${ASSIMP_ZLIB_INCLUDE_DIR}")
 endif()

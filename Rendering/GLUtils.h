@@ -24,6 +24,15 @@
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
 
+// VTK glew library
+#include <vtk_glew.h>
+
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
+
 // SimMedTK includes
 #include "Core/CoreClass.h"
 #include "Core/Config.h"

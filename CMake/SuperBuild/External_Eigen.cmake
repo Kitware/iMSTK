@@ -79,10 +79,11 @@ if(NOT DEFINED ${proj}_DIR)
 	LOG_DOWNLOAD 1            # Wrap download in script to log output
 	LOG_UPDATE 1              # Wrap update in script to log output
     )
-  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj})
+  set(${proj}_DIR "${CMAKE_BINARY_DIR}/SuperBuild/${proj}")
 
 else()
   SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
 set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DEIGEN3_INCLUDE_DIR:PATH=${${proj}_DIR})
