@@ -35,6 +35,7 @@ SceneObject::SceneObject()
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;
     name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+    hasContactForces = false;
 }
 
 SceneObject::~SceneObject()

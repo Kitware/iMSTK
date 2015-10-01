@@ -34,30 +34,28 @@
 
 void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pair)
 {
-    auto mesh = std::static_pointer_cast<MeshCollisionModel>(pair->getFirst());
-    auto plane = std::static_pointer_cast<PlaneCollisionModel>(pair->getSecond());
+    auto meshModel = std::static_pointer_cast<MeshCollisionModel>(pair->getFirst());
+    auto planeModel = std::static_pointer_cast<PlaneCollisionModel>(pair->getSecond());
 
-    if (!mesh || !plane)
+    if (!meshModel || !planeModel)
     {
         return;
     }
 
-    double d;
-    core::Vec3d planeNormal = plane->getPlaneModel()->getUnitNormal();
-    core::Vec3d planePos = plane->getPlaneModel()->getPoint();
+    core::Vec3d normal = planeModel->getPlaneModel()->getUnitNormal();
+    core::Vec3d contactPoint = planeModel->getPlaneModel()->getPoint();
 
-    core::Vec3d vert;
     pair->clearContacts();
-    for (size_t i = 0; i < mesh->getVertices().size(); i++)//const auto& vertex : mesh->getVertices()
+    const auto &vertices = meshModel->getVertices();
+    for (size_t i = 0, end = vertices.size(); i < end; ++i)
     {
-        vert = mesh->getVertices()[i];
-        d = planeNormal.dot(vert - planePos);
+        auto vertex = vertices[i];
+        auto d = normal.dot(vertex - contactPoint);
 
         if (d < std::numeric_limits<float>::epsilon())
         {
-            pair->addContact(d, vert, i, planeNormal);// Create contact
+            pair->addContact(meshModel, d, vertex, i, normal);// Create contact
+            pair->addContact(planeModel, d, contactPoint, i, -normal);// Create contact
         }
     }
-    /*std::cout << "@ Collision detection\n";
-    pair->printCollisionPairs();*/
 }

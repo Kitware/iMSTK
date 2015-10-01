@@ -12,7 +12,6 @@ target_link_libraries(VirtualTools
   PRIVATE
     Core
     Mesh
-    Simulators
     Event
     Devices
 )

@@ -81,6 +81,7 @@ public:
     /// \brief Implementation of how the contacts between colliding
     /// objects is resolved
     virtual void resolveContacts() = 0;
+
 protected:
 
     ContactHandlingType type;
@@ -89,7 +90,7 @@ protected:
 
     std::pair<std::shared_ptr<SceneObject>, std::shared_ptr<SceneObject>> collidingSceneObjects;
 
-    std::shared_ptr<CollisionPair> collisionPairs;
+    std::shared_ptr<CollisionPair> collisionPair;
 };
 
 #endif //SMCONTACTHANDLING_H

@@ -32,6 +32,7 @@
 #include <memory>
 #include <vector>
 #include <iostream>
+#include <map>
 
 class Model;
 
@@ -45,7 +46,21 @@ public:
              const core::Vec3d& p,
              const int ind,
              const core::Vec3d& contactNornmal) :
-                depth(penetrationDepth), point(p), normal(contactNornmal), index(ind){}
+                depth(penetrationDepth),
+                point(p),
+                normal(contactNornmal),
+                index(ind),
+                model(nullptr){}
+    Contact (std::shared_ptr<Model> m,
+             const double penetrationDepth,
+             const core::Vec3d& p,
+             const int ind,
+             const core::Vec3d& contactNornmal) :
+                depth(penetrationDepth),
+                point(p),
+                normal(contactNornmal),
+                index(ind),
+                model(m){}
 
     void printInfo()
     {
@@ -59,6 +74,7 @@ public:
     core::Vec3d point;
     core::Vec3d normal;
     int index;
+    std::shared_ptr<Model> model;
 };
 
 ///
@@ -74,8 +90,8 @@ public:
     ///
     /// @brief Set the pair of collision models
     ///
-    void setModels(const std::shared_ptr<Model>& first,
-                   const std::shared_ptr<Model>& second );
+    void setModels(std::shared_ptr<Model> first,
+                   std::shared_ptr<Model> second );
 
     ///
     /// @brief Get the pair of collision models
@@ -87,6 +103,15 @@ public:
     /// @brief Add contact between the models
     ///
     void addContact( const double& penetrationDepth,
+                     const core::Vec3d& vert,
+                     const int index,
+                     const core::Vec3d& contactNornmal);
+
+    ///
+    /// @brief Add contact between the models
+    ///
+    void addContact( std::shared_ptr<Model> model,
+                     const double& penetrationDepth,
                      const core::Vec3d& vert,
                      const int index,
                      const core::Vec3d& contactNornmal);
@@ -123,15 +148,22 @@ public:
     const std::vector<std::shared_ptr<Contact>> &getContacts() const;
 
     ///
+    /// @brief Returns contact array for a particular model
+    ///
+    std::vector<std::shared_ptr<Contact>> &getContacts(const std::shared_ptr<Model> &model);
+    const std::vector<std::shared_ptr<Contact>> &getContacts(const std::shared_ptr<Model> &model) const;
+
+    ///
     /// @brief Returns contact array for these two models
     ///
     void printCollisionPairs();
 
 private:
     std::pair<std::shared_ptr<Model>,
-        std::shared_ptr<Model>> modelRepresentations; // Models
-
-    std::vector<std::shared_ptr<Contact>> contacts; // List of contacts
+        std::shared_ptr<Model>> modelRepresentations; //!< Models
+    std::vector<std::shared_ptr<Contact>> contacts; //!< List of contacts
+    std::map<std::shared_ptr<Model>,
+               std::vector<std::shared_ptr<Contact>>> modelContacts; //!< Contacts per model
 };
 
 #endif // SMCOLLISIONPAIR_H

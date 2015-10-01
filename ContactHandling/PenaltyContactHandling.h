@@ -26,6 +26,8 @@
 // SimMedTK includes
 #include "Core/ContactHandling.h"
 
+#include "Core/CollisionPair.h"
+
 /// \brief Penalty based for contact handling
 class PenaltyContactHandling : public ContactHandling
 {
@@ -33,8 +35,8 @@ public:
     PenaltyContactHandling(bool typeBilateral);
 
     PenaltyContactHandling(bool typeBilateral,
-                             const std::shared_ptr<SceneObject>& sceneObjFirst,
-                             const std::shared_ptr<SceneObject>& sceneObjSecond);
+                           const std::shared_ptr<SceneObject>& sceneObjFirst,
+                           const std::shared_ptr<SceneObject>& sceneObjSecond);
 
     virtual ~PenaltyContactHandling();
 
@@ -45,6 +47,73 @@ public:
 
     /// \brief Get the forces on both the scene objects using penalty method
     virtual void computeBilateralContactForces() = 0;
+
+    /// \brief Get the forces on both the scene objects using penalty method
+    virtual void computeForces(std::shared_ptr<SceneObject> sceneObject)
+    {
+        if(sceneObject->computeContactForce())
+        {
+            auto model = sceneObject->getModel();
+            if(!model)
+            {
+                return;
+            }
+
+            auto contactInfo = this->getCollisionPairs()->getContacts(model);
+            sceneObject->setContactForcesToZero();
+            core::Vec3d force;
+            core::Vec3d velocityProjection;
+            int nodeDofID;
+
+            for(size_t i = 0; i < contactInfo.size(); ++i)
+            {
+                nodeDofID = 3 * contactInfo[i]->index;
+                velocityProjection = sceneObject->getVelocity(nodeDofID);
+                velocityProjection = contactInfo[i]->normal.dot(velocityProjection) * contactInfo[i]->normal;
+
+                force = -stiffness * contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
+
+                sceneObject->setContactForce(nodeDofID, contactInfo[i]->point, force);
+            }
+            return;
+        }
+    }
+
+    ///
+    /// \brief Set stiffness coefficient
+    ///
+    void setStiffness(const double stiffnessCoeff)
+    {
+        this->stiffness = stiffnessCoeff;
+    }
+
+    ///
+    /// \brief Get the stiffness coefficient
+    ///
+    double getStiffness() const
+    {
+        return this->stiffness;
+    }
+
+    ///
+    /// \brief Set stiffness coefficient
+    ///
+    void setDamping(const double dampingValue)
+    {
+        this->damping = dampingValue;
+    }
+
+    ///
+    /// \brief Get the stiffness coefficient
+    ///
+    double getDamping() const
+    {
+        return this->damping;
+    }
+
+private:
+    double stiffness;
+    double damping;
 };
 
 #endif // SMPENALTY_CONTACTHANDLING_H

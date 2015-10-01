@@ -72,25 +72,13 @@ public:
     /// \brief Append the contact forces (if any) to external forces
     void applyContactForces();
 
-    /// \brief Set all contact forces to zero (if any)
-    void setContactForcesToZero();
-
-    /// \brief  Sets the contact force at a given location
-    /// (not given node) in contact force vector
-    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d &force);
-
-    /// \brief  Sets the contact force at a given location
-    /// (not given node) in contact force vector
-    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d &contactPoint,
-                                        const core::Vec3d &force);
-
     /// \brief  returns displacement of at a given location
     /// (not given node) in contact force vector
     core::Vec3d getDisplacementOfNodeWithDofID(const int dofID) const;
 
     /// \brief  returns velocity of at a given location
     /// (not given node) in contact force vector
-    core::Vec3d getVelocityOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getVelocity(const int dofID) const;
 
     /// \brief  returns acceleration of at a given location
     /// (not given node) in contact force vector
@@ -150,28 +138,6 @@ public:
         return this->f_ext;
     }
 
-    // Get contact forces vector
-    std::unordered_map<int,core::Vec3d> &getContactForces()
-    {
-        return this->contactForces;
-    }
-
-    const std::unordered_map<int,core::Vec3d> &getContactForces() const
-    {
-        return this->contactForces;
-    }
-
-    // Get contact forces vector
-    std::unordered_map<int,core::Vec3d> &getContactPoints()
-    {
-        return this->contactPoints;
-    }
-
-    const std::unordered_map<int,core::Vec3d> &getContactPoints() const
-    {
-        return this->contactPoints;
-    }
-
 protected:
     friend class SceneObjectDeformableRenderDelegate;
 
@@ -205,8 +171,6 @@ protected:
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
 
-    std::unordered_map<int,core::Vec3d> contactForces;
-    std::unordered_map<int,core::Vec3d> contactPoints;
 };
 
 #endif // SMVEGAFEMSCENEOBJECT_DEFORMABLE_H

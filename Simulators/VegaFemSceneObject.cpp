@@ -1002,7 +1002,7 @@ void VegaFemSceneObject::printInfo() const
     std::cout << "\t-------------------------------------\n";
 }
 
-core::Vec3d VegaFemSceneObject::getVelocityOfNodeWithDofID(const int dofID) const
+core::Vec3d VegaFemSceneObject::getVelocity(const int dofID) const
 {
     core::Vec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
 

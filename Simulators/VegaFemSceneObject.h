@@ -152,7 +152,7 @@ public:
 
     /// \brief returns velocity given the
     /// localtion in the global velocity vector
-    core::Vec3d getVelocityOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getVelocity(const int dofID) const;
 
     /// \brief returns displacement given the
     /// localtion in the global displacement vector

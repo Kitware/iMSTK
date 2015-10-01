@@ -13,6 +13,8 @@ target_link_libraries(${APP}
   ContactHandling
   Event
   IO
+  Devices
+  VirtualTools
 )
 
 set_target_properties(${APP}

@@ -23,6 +23,8 @@
 
 #include "Core/ContactHandling.h"
 
+#include "Core/CollisionPair.h"
+
 ContactHandling::ContactHandling(const bool typeBilateral)
 {
     if (typeBilateral)
@@ -69,12 +71,12 @@ void ContactHandling::setSceneObjects(const std::shared_ptr< SceneObject > first
 
 void ContactHandling::setCollisionPairs(const std::shared_ptr< CollisionPair > colPair)
 {
-    collisionPairs = colPair;
+    collisionPair = colPair;
 }
 
 std::shared_ptr<CollisionPair> ContactHandling::getCollisionPairs() const
 {
-    return collisionPairs;
+    return collisionPair;
 }
 
 ContactHandlingType ContactHandling::getContactHandlingType() const
