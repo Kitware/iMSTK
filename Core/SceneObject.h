@@ -180,9 +180,10 @@ public:
     void setContactForcesToZero()
     {
         this->contactForces.clear();
+        this->contactPoints.clear();
     }
 
-    void setContactForce(const int dofID,const core::Vec3d &force)
+    void setContactForce(const int dofID, const core::Vec3d &force)
     {
         this->contactForces[dofID] = force;
     }

@@ -58,11 +58,11 @@ int main()
     auto sdk = SDK::getInstance();
 //     auto server = std::make_shared<VRPNDeviceServer>();
     auto client = std::make_shared<VRPNForceDevice>();
-//     core::Vec4f contactPlane;
-//     contactPlane << 0.0, 1.0, 0.0, -5.0;
-//     client->setContactPlane(contactPlane);
-//     client->setDampingCoefficient(.0001);
-//     client->setSpringCoefficient(.01);
+    core::Vec4f contactPlane;
+    contactPlane << 0.0, 1.0, 0.0, -5.0;
+    client->setContactPlane(contactPlane);
+    client->setDampingCoefficient(.0001);
+    client->setSpringCoefficient(.01);
     auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(5.0);
 
@@ -71,12 +71,12 @@ int main()
     sdk->registerModule(controller);
 
     //get some user input and setup device url
-//     std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
-//     std::getline(std::cin, input);
-//     if(!input.empty())
-//     {
+    std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
+    std::getline(std::cin, input);
+    if(!input.empty())
+    {
         client->setDeviceURL(input);
-//     }
+    }
 
     auto scene = std::make_shared<Scene>();
 

@@ -38,7 +38,7 @@ VRPNForceDevice::VRPNForceDevice()
     vrpnForce(nullptr)
 {
     this->setDeviceURL("Phantom0@localhost");
-    this->name = "VRPNPhantomDevice";
+    this->name = "VRPNForceDevice";
 }
 
 //---------------------------------------------------------------------------

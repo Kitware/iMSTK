@@ -110,6 +110,11 @@ std::shared_ptr< ToolCoupler > VegaFemSimulator::getHapticTool() const
 }
 void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sceneObject)
 {
+    if(!hapticTool)
+    {
+        return;
+    }
+
     auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
     if(!outputDevice)
     {
@@ -117,6 +122,7 @@ void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sc
         outputDevice->setContactPlane(normal,100);
         return;
     }
+
 
     auto forces = sceneObject->getContactForces();
     auto points = sceneObject->getContactPoints();
@@ -131,21 +137,21 @@ void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sc
     core::Vec3d totalForce = core::Vec3d::Zero();
     for(const auto &f : forces)
     {
-        totalForce = f.second;
+        totalForce += f.second;
     }
     core::Vec3d contactPoint = core::Vec3d::Zero();
 
     for(const auto &p : points)
     {
-        contactPoint = p.second;
+        contactPoint += p.second;
     }
     contactPoint /= points.size();
 
     float norm = totalForce.norm();
     auto normal = totalForce.normalized();
-    auto d = totalForce.dot(contactPoint);
+    auto d = normal.dot(contactPoint);
 
-    outputDevice->setContactPlane(normal.cast<float>(),0);
+    outputDevice->setContactPlane(normal.cast<float>(),d);
     outputDevice->setDampingCoefficient(0.001);
     outputDevice->setDynamicFriction(0.0);
     outputDevice->setSpringCoefficient(norm);

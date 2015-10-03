@@ -64,16 +64,15 @@ public:
             core::Vec3d force;
             core::Vec3d velocityProjection;
             int nodeDofID;
-
-            for(size_t i = 0; i < contactInfo.size(); ++i)
+            for(auto &contact : contactInfo)
             {
-                nodeDofID = 3 * contactInfo[i]->index;
+                nodeDofID = 3 * contact->index;
                 velocityProjection = sceneObject->getVelocity(nodeDofID);
-                velocityProjection = contactInfo[i]->normal.dot(velocityProjection) * contactInfo[i]->normal;
+                velocityProjection = contact->normal.dot(velocityProjection) * contact->normal;
 
-                force = -stiffness * contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
+                force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
 
-                sceneObject->setContactForce(nodeDofID, contactInfo[i]->point, force);
+                sceneObject->setContactForce(nodeDofID, contact->point, force);
             }
             return;
         }

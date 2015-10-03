@@ -233,6 +233,7 @@ void SDK::terminateAll()
 {
     for(auto &module : this->moduleList)
     {
+        module->terminate();
         module->waitTermination();
     }
 }

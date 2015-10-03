@@ -73,6 +73,7 @@ void VRPNDeviceClient::exec()
         this->processChanges();
         std::this_thread::sleep_for(this->pollDelay);
     }
+    this->terminationCompleted = true;
 }
 
 //---------------------------------------------------------------------------

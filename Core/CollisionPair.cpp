@@ -24,7 +24,9 @@
 #include "Core/CollisionPair.h"
 #include "Core/Model.h"
 
-CollisionPair::CollisionPair() {}
+CollisionPair::CollisionPair()
+{
+}
 
 //---------------------------------------------------------------------------
 CollisionPair::~CollisionPair() {}
@@ -35,6 +37,8 @@ void CollisionPair::setModels(std::shared_ptr<Model> first,
 {
     this->modelRepresentations.first = first;
     this->modelRepresentations.second = second;
+    this->modelContacts[first].clear();
+    this->modelContacts[second].clear();
 }
 
 //---------------------------------------------------------------------------
@@ -76,6 +80,8 @@ CollisionPair::getModels() const
 void CollisionPair::clearContacts()
 {
     this->contacts.clear();
+    this->modelContacts[this->modelRepresentations.first].clear();
+    this->modelContacts[this->modelRepresentations.second].clear();
 }
 
 //---------------------------------------------------------------------------
@@ -103,30 +109,30 @@ bool CollisionPair::hasContacts()
 }
 
 //---------------------------------------------------------------------------
-std::vector< std::shared_ptr< Contact > >& CollisionPair::getContacts()
+std::vector<std::shared_ptr<Contact>>& CollisionPair::getContacts()
 {
     return this->contacts;
 }
 
 //---------------------------------------------------------------------------
-const std::vector< std::shared_ptr< Contact > >&
+const std::vector<std::shared_ptr<Contact>>&
 CollisionPair::getContacts() const
 {
     return this->contacts;
 }
 
 //---------------------------------------------------------------------------
-std::vector< std::shared_ptr< Contact > >&
+std::vector<std::shared_ptr<Contact>>&
 CollisionPair::getContacts(const std::shared_ptr<Model> &model)
 {
     return this->modelContacts.at(model);
 }
 
 //---------------------------------------------------------------------------
-const std::vector< std::shared_ptr< Contact > >&
+const std::vector<std::shared_ptr<Contact>>&
 CollisionPair::getContacts(const std::shared_ptr<Model> &model) const
 {
-    return this->contacts;
+    return this->modelContacts.at(model);
 }
 
 //---------------------------------------------------------------------------

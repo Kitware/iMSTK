@@ -55,7 +55,7 @@ void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pai
         if (d < std::numeric_limits<float>::epsilon())
         {
             pair->addContact(meshModel, d, vertex, i, normal);// Create contact
-            pair->addContact(planeModel, d, contactPoint, i, -normal);// Create contact
+            pair->addContact(planeModel, d, vertex-d*normal, i, -normal);// Create contact
         }
     }
 }
