@@ -50,8 +50,12 @@
 #include <vtkTexture.h>
 #include <vtkOpenGLPolyDataMapper.h>
 #include <vtkProperty.h>
+#include "vtkShaderProgram.h"
+#include "vtkOpenGLVertexArrayObject.h"
+#include "vtkOpenGLVertexBufferObject.h"
 
 vtkStandardNewMacro(CustomGLPolyDataMapper)
+
 
 class MeshRenderDelegate : public VTKRenderDelegate
 {
@@ -201,6 +205,12 @@ void MeshRenderDelegate::initDraw()
 
 		mapper = CustomGLPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
+		auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
+		mesh->computeVertexNeighbors();
+		mesh->setUseOBJTexture(true);
+		mesh->computeTriangleTangents();
+		
+		mapperCustom->tangents = mesh->getVertexTangents();
 		
         if(renderDetail->hasShaders())
         {
@@ -249,12 +259,46 @@ void MeshRenderDelegate::modified()
         dataSet->Modified();
 }
 
+void CustomGLPolyDataMapper::initDraw(){
 
+
+	cout << "init" << endl;
+
+}
+void CustomGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act){
+	tangentsBuffer = vtkOpenGLBufferObject::New();
+	tangentsBuffer->Bind();
+	if (tangentsBuffer->Upload(this->tangents, vtkOpenGLBufferObject::ArrayBuffer)){
+		cout << "Completed Tangents Binding"<<endl;
+	
+	
+	}
+	tangentsBuffer->Release();
+	vtkOpenGLPolyDataMapper::BuildBufferObjects(ren,act);
+
+}
 
 void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act)
 {
+	double testColor1 = 0.01;
+	double testColor2 = 0.01;
+	static double testColor3 = 0.01;
+	vtkShaderProgram *program = cellBO.Program;
+	
+	testColor3 += 0.01;
+	program->SetUniformf("TestColor1", testColor1);
+	program->SetUniformf("TestColor2", testColor2);
+	program->SetUniformf("TestColor3", testColor3);
+	cellBO.VAO->Bind();
+	
+	if (!cellBO.VAO->AddAttributeArray(cellBO.Program, this->tangentsBuffer,
+		"vertTangents", 0,
+		0, VTK_DOUBLE, 3, false))
+	{
+		vtkErrorMacro(<< "Error setting 'vertTangents' in shader VAO.");
+	}
 	vtkOpenGLPolyDataMapper::SetMapperShaderParameters(cellBO, ren, act);
-
+		
 }
 
 RegisterFactoryClass(RenderDelegate,

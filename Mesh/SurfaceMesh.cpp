@@ -151,6 +151,7 @@ void SurfaceMesh::computeTriangleTangents()
     // Calculate the vertex tangents
     if(this->useThreeDSTexureCoordinates || this->useOBJDSTexureCoordinates)
     {
+		this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
         for(size_t v = 0, end = this->vertices.size(); v < end; ++v)
         {
             this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
