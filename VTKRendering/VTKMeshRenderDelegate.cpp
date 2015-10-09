@@ -44,8 +44,6 @@
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
-#include <vtkPNGReader.h>
-#include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -53,6 +51,9 @@
 #include "vtkShaderProgram.h"
 #include "vtkOpenGLVertexArrayObject.h"
 #include "vtkOpenGLVertexBufferObject.h"
+#include <vtkXMLImageDataReader.h>
+#include <vtkImageReader.h>
+#include <vtkImageReader2Factory.h>
 
 vtkStandardNewMacro(CustomGLPolyDataMapper)
 
@@ -152,23 +153,23 @@ void MeshRenderDelegate::initDraw()
     vtkSmartPointer<vtkTexture> texture;
     if(renderDetail && renderDetail->renderTexture())
     {
-        texture = vtkTexture::New();
-        texture->RepeatOff();
+		// Read texture file
+		vtkSmartPointer<vtkImageReader2Factory> readerFactory =
+			vtkSmartPointer<vtkImageReader2Factory>::New();
+		vtkImageReader2 *imageReader =
+			readerFactory->CreateImageReader2(mesh->getRenderDetail()->getTextureFilename().c_str());
+		cout << mesh->getRenderDetail()->getTextureFilename() << endl;
+		imageReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
+		if (imageReader == NULL)
+		{
+			cout << "Error in opening the file" << endl;
+		
+		}
+		imageReader->Update();
 
-        std::string filename = mesh->getRenderDetail()->getTextureFilename();
-        std::string ext = filename.substr(filename.find_last_of(".") + 1);
-        if (ext == "png" || ext == "PNG")
-        {
-            vtkNew<vtkPNGReader> PNGreader;
-            PNGreader->SetFileName(filename.c_str());
-            texture->SetInputConnection(PNGreader->GetOutputPort());
-        }
-        else if (ext == "jpg" || ext == "JPG" || ext == "jpeg" || ext == "JPEG")
-        {
-            vtkNew<vtkJPEGReader> JPEGreader;
-            JPEGreader->SetFileName(filename.c_str());
-            texture->SetInputConnection(JPEGreader->GetOutputPort());
-        }
+
+        texture = vtkTexture::New();
+      	texture->SetInputConnection(imageReader->GetOutputPort());
 
         vtkNew<vtkFloatArray> textureCoordinates;
         textureCoordinates->SetNumberOfComponents(3);
@@ -189,10 +190,7 @@ void MeshRenderDelegate::initDraw()
 	//vtkNew<vtkPoints> tangents;
 	//tangents->SetNumberOfPoints(mesh->getVertices().size());
 	
-
-
-
-
+	
     dataSet = unstructuredMesh.GetPointer();
     if (renderDetail && renderDetail->renderNormals())
     {
@@ -206,6 +204,7 @@ void MeshRenderDelegate::initDraw()
 		mapper = CustomGLPolyDataMapper::New();
         mapper->SetInputConnection(normals->GetOutputPort());
 		auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
+		mapperCustom->renderDetail = renderDetail;
 		mesh->computeVertexNeighbors();
 		mesh->setUseOBJTexture(true);
 		mesh->computeTriangleTangents();

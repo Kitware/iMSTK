@@ -8,6 +8,7 @@ class vtkActor;
 class CustomGLPolyDataMapper :public vtkOpenGLPolyDataMapper{
 public:
 	static CustomGLPolyDataMapper* New();
+	std::shared_ptr<RenderDetail> renderDetail;
 	vtkOpenGLBufferObject * tangentsBuffer;
 	std::vector<core::Vec3d>tangents;
 	vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
