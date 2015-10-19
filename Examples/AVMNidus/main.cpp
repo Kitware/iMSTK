@@ -92,6 +92,9 @@ int main(int ac, char **av)
     // Set shader porograms
     meshRenderDetail->addShaderProgram(vtkShader::Vertex,"shaders/wet_vert.glsl");
     meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl");
+	meshRenderDetail->addTexture("decal", "textures/cube2.jpg", "textureDecal", "wet_frag.glsl");
+	meshRenderDetail->addTexture("bump", "textures/usertile34.bmp", "textureSpecular", "wet_frag.glsl");
+	meshRenderDetail->addTexture("specular", "textures/2.png", "textureBump", "wet_frag.glsl");
     meshRenderDetail->setTextureFilename("textures/cube.jpg");
 
    // auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();

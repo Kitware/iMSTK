@@ -438,3 +438,24 @@ void RenderDetail::addShaderAttribute(int shaderType, const std::string &attribu
 }
 
 
+//---------------------------------------------------------------------------
+void RenderDetail::addTexture(const std::string &textureName, const std::string &filename, const std::string &shaderBinding, const std::string &shaderProgramName){
+	textures[textureName].textureName = textureName;
+	textures[textureName].fileName = filename;
+	textures[textureName].shaderBinding = shaderBinding;
+	textures[textureName].shaderProgramName = shaderProgramName;
+	textures[textureName].shaderUniformGL = -1; //not defined intially
+	
+
+}
+
+std::map<std::string, TextureDetail>  &RenderDetail::getTextures() 
+{
+	return this->textures;
+
+
+
+}
+int RenderDetail::getNumberOfTextures(){
+	return this->textures.size();
+}

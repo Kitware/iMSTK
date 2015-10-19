@@ -32,10 +32,18 @@
 #include <string>
 #include <map>
 #include <array>
+
+
+
+
 class VisualArtifact;
 class CoreClass;
 class Model;
 struct UnifiedId;
+
+class vtkOpenGLTexture;
+
+
 
 ///
 /// \brief Hold a pointer to a source of geometry that render details can use for drawing.
@@ -85,6 +93,17 @@ struct GeometrySource
         }
         return nullptr;
     }
+};
+
+
+struct TextureDetail {
+	std::string textureName;
+	std::string fileName;
+	std::string shaderBinding;
+	std::string shaderProgramName;
+	GLint shaderUniformGL;
+	vtkOpenGLTexture* vtexture;
+
 };
 
 /// \brief RenderDetail has rendering options and features.
@@ -210,6 +229,17 @@ public:
     ///
     void setTextureFilename(const std::string &filename);
     const std::string &getTextureFilename() const;
+
+	///
+	/// \brief Set/Get the binding texture filename for a shader. shaderBinding is for texture name in the shader name 
+	///
+	void addTexture(const std::string &textureName, const std::string &filename, const std::string &shaderBinding, const std::string &shaderProgramName);
+	//const std::string &getTextureFilename() const;
+	std::map<std::string, TextureDetail>& RenderDetail::getTextures();
+	int getNumberOfTextures();
+
+
+
     
     ///
     /// \brief Returns true if you want to draw texture map
@@ -322,6 +352,7 @@ private:
     std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<std::shared_ptr<UnifiedId>> VAOs; // stores  VAO IDs
 	std::map<std::string,int> shaderAttributes;
+	std::map<std::string, TextureDetail> textures;
 };
 
 #endif // SMRENDERDETAIL_H

@@ -44,6 +44,7 @@
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
+
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
 #include <vtkOpenGLPolyDataMapper.h>
@@ -54,6 +55,11 @@
 #include <vtkXMLImageDataReader.h>
 #include <vtkImageReader.h>
 #include <vtkImageReader2Factory.h>
+#include "RenderDetail.h"
+#include "vtkTextureObject.h"
+#include "vtkOpenGLTexture.h"
+#include "vtkOpenGLRenderWindow.h"
+#include "vtkIndent.h"
 
 vtkStandardNewMacro(CustomGLPolyDataMapper)
 
@@ -150,26 +156,45 @@ void MeshRenderDelegate::initDraw()
         actor->GetProperty()->SetInterpolationToPhong();
     }
 
-    vtkSmartPointer<vtkTexture> texture;
-    if(renderDetail && renderDetail->renderTexture())
+    //vtkSmartPointer<vtkTexture> texture;
+	vtkOpenGLTexture* texture;
+	
+	
+	int nbrTextures = renderDetail->getNumberOfTextures();
+	if ((renderDetail && renderDetail->renderTexture()) || nbrTextures>0)
     {
 		// Read texture file
 		vtkSmartPointer<vtkImageReader2Factory> readerFactory =
 			vtkSmartPointer<vtkImageReader2Factory>::New();
-		vtkImageReader2 *imageReader =
-			readerFactory->CreateImageReader2(mesh->getRenderDetail()->getTextureFilename().c_str());
-		cout << mesh->getRenderDetail()->getTextureFilename() << endl;
-		imageReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
-		if (imageReader == NULL)
-		{
-			cout << "Error in opening the file" << endl;
+		std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
 		
+		for (auto &t : textures){
+			TextureDetail &textureDetail = t.second;
+			//textureDetail.fileName
+			vtkSmartPointer<vtkImageReader2> imageReader =
+				readerFactory->CreateImageReader2(textureDetail.fileName.c_str());
+			if (imageReader == NULL)
+			{
+				cout << "Error in opening the file" << endl;
+				continue;
+			}
+			imageReader->SetFileName(textureDetail.fileName.c_str());
+			imageReader->Update();
+			texture = vtkOpenGLTexture::New();
+			//vtkTextureObject *textureObject = vtkTextureObject::New();
+		
+			texture->SetInputConnection(imageReader->GetOutputPort());
+			
+			//texture->SetTextureObject(textureObject);
+			//textureObject->Create2D
+			textureDetail.vtexture = texture;
+			cout << "Image File Loaded"<<textureDetail.fileName.c_str() << endl;
 		}
-		imageReader->Update();
-
-
-        texture = vtkTexture::New();
-      	texture->SetInputConnection(imageReader->GetOutputPort());
+		
+		//vtkSmartPointer<vtkImageReader2> imageReader =
+		///	readerFactory->CreateImageReader2(mesh->getRenderDetail()->getTextureFilename().c_str());
+		//cout << mesh->getRenderDetail()->getTextureFilename() << endl;
+		//imageReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
 
         vtkNew<vtkFloatArray> textureCoordinates;
         textureCoordinates->SetNumberOfComponents(3);
@@ -202,6 +227,9 @@ void MeshRenderDelegate::initDraw()
         normals->AutoOrientNormalsOn();
 
 		mapper = CustomGLPolyDataMapper::New();
+
+
+		///The tangent computation needs to go out of the this block..tansel
         mapper->SetInputConnection(normals->GetOutputPort());
 		auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
 		mapperCustom->renderDetail = renderDetail;
@@ -231,9 +259,9 @@ void MeshRenderDelegate::initDraw()
         mapper->SetInputDataObject(unstructuredMesh.GetPointer());
     }
 
-    if(texture.GetPointer())
+    if(texture)
     {
-        actor->SetTexture(texture);
+		actor->SetTexture(texture);
     }
     actor->SetMapper(mapper.GetPointer());
 }
@@ -288,6 +316,20 @@ void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, 
 	program->SetUniformf("TestColor1", testColor1);
 	program->SetUniformf("TestColor2", testColor2);
 	program->SetUniformf("TestColor3", testColor3);
+
+	std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
+	
+	
+	for (auto &t : textures){
+		TextureDetail &textureDetail = t.second;
+		textureDetail.vtexture->GetTextureObject();
+		long a = textureDetail.vtexture->GetIndex();
+		textureDetail.vtexture->Load(ren);
+	
+		
+		program->SetUniformi(textureDetail.shaderBinding.c_str(), textureDetail.vtexture->GetTextureUnit());
+
+	}
 	cellBO.VAO->Bind();
 	
 	if (!cellBO.VAO->AddAttributeArray(cellBO.Program, this->tangentsBuffer,
