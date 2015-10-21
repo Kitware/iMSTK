@@ -21,9 +21,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "../common/wasdCameraController.h"
-#include "../common/KeyPressSDKShutdown.h"
-#include "../common/pzrMouseCameraController.h"
+#include "Examples/common/wasdCameraController.h"
+#include "Examples/common/KeyPressSDKShutdown.h"
+#include "Examples/common/pzrMouseCameraController.h"
+#include "Examples/common/ExampleCube.h"
 
 #include <memory>
 
@@ -37,56 +38,36 @@
 
 int main()
 {
-    initRenderDelegates();
-    initVTKRendering();
-    initIODelegates();
+    using ExampleCube = mstk::Examples::Common::ExampleCube;
+
     const bool useVTKRenderer = true; // VTK is the default viewer.
+    ExampleCube cube;
+    std::shared_ptr<ViewerBase> viewer;
+    initRenderDelegates();
+    initIODelegates();
+
+    if (useVTKRenderer)
+    {
+        initVTKRendering();
+    }
 
     auto scene = std::make_shared<Scene>();
 
     // Create a viewer
-    std::shared_ptr<ViewerBase> viewer
-        = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
-    if(!useVTKRenderer)
+    if(useVTKRenderer)
     {
-        viewer.reset();
-        viewer
-            = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::Other);
+        viewer = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
+    }
+    else
+    {
+        viewer = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::Other);
     }
 
-    auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("models/cube.obj");
-
-    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    renderDetail->setTextureFilename("textures/cube.jpg");
-
-    cubeModel->setRenderDetail(renderDetail);
-
-    if(!useVTKRenderer)
-    {
-        TextureManager::addTexture("textures/cube.jpg", "cubetex");
-        std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
-    }
-
-    auto cube = std::make_shared<StaticSceneObject>();
-
-    // If you want to use the GL renderer you need to specify the appropiate render delegates
-    // This can be automated in the future, for now VTK is the default renderer and the delegates
-    // need to be reset.
-    cube->setModel(cubeModel);
-    if(!useVTKRenderer)
-    {
-        auto renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
-            "StaticSceneObjectRenderDelegate",RenderDelegate::Other);
-        cube->setRenderDelegate(renderDelegate);
-
-        renderDelegate = Factory<RenderDelegate>::createConcreteClassForGroup(
-            "MeshRenderDelegate",RenderDelegate::Other);
-        cubeModel->getMesh()->setRenderDelegate(renderDelegate);
-    }
+    cube.useVTKRenderer(useVTKRenderer);
+    cube.setup();
 
     // Add the cube to the scene to be rendered
-    scene->addSceneObject(cube);
+    scene->addSceneObject(cube.getStaticSceneObject());
 
     // Register the scene with the viewer, and setup render target
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");

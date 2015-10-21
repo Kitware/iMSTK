@@ -200,6 +200,24 @@ private:
     bool useOBJDSTexureCoordinates;
 };
 
+///
+/// \brief Texture management structure
+///
+struct SurfaceMesh::TextureAttachment
+{
+    TextureAttachment() :
+    textureId(-1),
+    textureName("")
+    {
+    }
+
+    // Texture id
+    int textureId;
+
+    // Texture internal name
+    std::string textureName;
+};
+
 #endif
 
 

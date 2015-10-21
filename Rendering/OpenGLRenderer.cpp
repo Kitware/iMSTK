@@ -220,7 +220,7 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
             for (size_t t = 0, end = meshTextures.size(); t < end; ++t)
             {
                 glActiveTexture(GL_TEXTURE0 + t);
-                TextureManager::activateTexture(p_surfaceMesh->getTextureId(t));
+                TextureManager::activateTexture(meshTextures[t]->textureName);
             }
         }
     }
@@ -233,12 +233,15 @@ void OpenGLRenderer::drawSurfaceMeshTriangles(
     if (p_surfaceMesh->getRenderDetail()->getRenderType() & SIMMEDTK_RENDER_FACES)
     {
         // TODO: Investigate why this expensive copy needs to be performed.
+        // Sean: I can only think because the data MUST be unsigned int or
+        //     GLuint would really be the most appropriate, as per
+        //     GL_UNSIGNED_INT.  Also the vector could be a std::array.
         std::vector<unsigned int> data;
         for(auto t : p_surfaceMesh->getTriangles())
         {
-            data.emplace_back(t[0]);
-            data.emplace_back(t[1]);
-            data.emplace_back(t[2]);
+            data.emplace_back((unsigned int) t[0]);
+            data.emplace_back((unsigned int) t[1]);
+            data.emplace_back((unsigned int) t[2]);
         }
         glDrawElements(GL_TRIANGLES, data.size(), GL_UNSIGNED_INT, data.data());
     }
@@ -592,7 +595,7 @@ void OpenGLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
     p_scene->copySceneToLocal(sceneLocal);
 
     //Enable lights
-    p_scene->enableLights();
+    p_scene->activateLights();
     p_scene->placeLights();
 
     for (auto x: sceneLocal.sceneObjects)
@@ -600,7 +603,7 @@ void OpenGLRenderer::renderScene(std::shared_ptr<Scene> p_scene,
         renderSceneObject(x);
     }
 
-    p_scene->disableLights();
+    p_scene->deactivateLights();
 
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();

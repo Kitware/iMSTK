@@ -55,7 +55,7 @@ protected:
     std::vector<std::shared_ptr<Scene>> sceneList;
     /// \brief call are made for begin module and end module before and after each frame
     virtual void beginModule();
-    virtual void   endModule();
+    virtual void endModule();
     /// \brief  dispatcher reference
     std::shared_ptr<Dispatcher> dispathcer;
 
@@ -64,7 +64,7 @@ public:
     Module();
 
     /// \brief virtual functions
-    virtual void init() = 0;
+    virtual bool init() = 0;
     virtual void beginFrame() = 0;
     virtual void endFrame() = 0;
     virtual void exec() = 0;

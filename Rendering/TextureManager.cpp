@@ -136,10 +136,10 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName, con
         return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
     }
 
-    if (!isInitialized)
-    {
-        return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
-    }
+    //if (!isInitialized)
+    //{
+    //    return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
+    //}
 
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 

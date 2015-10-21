@@ -122,7 +122,7 @@ public:
     /// \brief default constructor
     ViewerBase();
     /// \brief initialization for viewer
-    virtual void init() override;
+    virtual bool init() override;
     /// \brief add object for rendering
     virtual void addObject(std::shared_ptr<CoreClass> object);
     /// \brief change window resolution
@@ -140,10 +140,10 @@ public:
     /// \param p_depthTex A texture that will contain the fbo's depth texture.
     /// \param p_width The width of the fbo
     /// \param p_height The height of the fbo
-    virtual void addFBO(
-      const std::string &p_fboName,
-      Texture *p_colorTex, Texture *p_depthTex,
-      unsigned int p_width, unsigned int p_height);
+    void addFBO(
+        const std::string &p_fboName,
+        Texture *p_colorTex, Texture *p_depthTex,
+        unsigned int p_width, unsigned int p_height);
 
     virtual void setGlobalAxisLength(const float len);
 

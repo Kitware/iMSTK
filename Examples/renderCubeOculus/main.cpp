@@ -21,87 +21,82 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "../common/wasdCameraController.h"
-#include "../common/KeyPressSDKShutdown.h"
+#include "Examples/common/wasdCameraController.h"
+#include "Examples/common/KeyPressSDKShutdown.h"
+#include "Examples/common/pzrMouseCameraController.h"
+#include "Examples/common/ExampleCube.h"
 
 #include <memory>
 
-#include "Core/SDK.h"
+#include "IO/initIO.h"
+#include "RenderDelegates/initRenderDelegates.h"
+#include "VTKRendering/initVTKRendering.h"
 #include "Rendering/TextureManager.h"
-#include "Geometry/MeshModel.h"
 #include "Rendering/OculusViewer.h"
+#include "Geometry/MeshModel.h"
+#include "Core/Factory.h"
+#include "Core/ViewerBase.h"
 
 int main()
 {
-    std::shared_ptr<SDK> sdk;
-    std::shared_ptr<smOculusViewer> viewer;
-    std::shared_ptr<Scene> scene1;
-    std::shared_ptr<Light> light;
-    std::shared_ptr<Camera> sceneCamera;
-    std::shared_ptr<StaticSceneObject> cube;
-    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    using ExampleCube = mstk::Examples::Common::ExampleCube;
 
-    //Create an instance of the SimMedTK framework/SDK
-    sdk = SDK::getInstance();
+    ExampleCube cube;
+    initRenderDelegates();
+    initIODelegates();
 
-    //Create a new scene to work in
-    scene1 = sdk->createScene();
+    auto scene = std::make_shared<Scene>();
 
-    //Create a viewer to see the scene through
-    viewer = std::make_shared<smOculusViewer>();
-    sdk->addViewer(viewer);
+    // Create a viewer
+    auto viewer = std::make_shared<OculusViewer>();
 
-    //Create the camera controller
-    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    assert(viewer);
 
-    auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("models/cube.obj", "textures/cube.png", "cubetex");
+    cube.useVTKRenderer(false);
+    cube.setup();
 
-    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    cubeModel->setRenderDetail(renderDetail);
+    // Add the cube to the scene to be rendered
+    scene->addSceneObject(cube.getStaticSceneObject());
 
-    cube = std::make_shared<StaticSceneObject>();
-    cube->setModel(cubeModel);
+    // Register the scene with the viewer, and setup render target
+    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "");
 
-    //Add the cube to the scene to be rendered
-    scene1->addSceneObject(cube);
-
-    //Register the scene with the viewer, and setup render target
-    viewer->registerScene(scene1, SMRENDERTARGET_SCREEN, "");
-
-    //Setup the window title in the window manager
+    // Setup the window title in the window manager
     viewer->setWindowTitle("SimMedTK RENDER TEST");
 
-    //Set some viewer properties
-    viewer->setScreenResolution(1920, 1080);
+    // Set some viewer properties
+    viewer->setScreenResolution(800, 640);
 
-    //Uncomment the following line for fullscreen
+    //Make the window fullscreen for oculus
     viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
-    // Setup Scene lighting
-    light = Light::getDefaultLighting();
+    auto light = Light::getDefaultLighting();
     assert(light);
-    scene1->addLight(light);
+    scene->addLight(light);
 
     // Camera setup
-    sceneCamera = Camera::getDefaultCamera();
+    auto sceneCamera = Camera::getDefaultCamera();
     assert(sceneCamera);
     sceneCamera->setPos(3, 3, 5);
     sceneCamera->setFocus(0, 0, -1);
-    scene1->addCamera(sceneCamera);
-    camCtl->setCamera(sceneCamera);
+    sceneCamera->genProjMat();
+    sceneCamera->genViewMat();
+    scene->addCamera(sceneCamera);
 
-    //Link up the event system between this the camera controller and the viewer
+    // Create the camera controller
+    auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+    camCtl->setCamera(sceneCamera);
+    pzrCamCtl->setCamera(sceneCamera);
+
+    // Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(core::EventType::Keyboard, camCtl);
     viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
-    //run the framework
-    sdk->run();
-
-    //cleanup
-    sdk->releaseScene(scene1);
+    viewer->exec();
 
     return 0;
 }

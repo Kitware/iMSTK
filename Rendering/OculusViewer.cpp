@@ -21,11 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Rendering/OculusViewer.h"
+
 #include <iostream>
 
-#include "Rendering/OculusViewer.h"
 #include "Rendering/OpenGLRenderer.h"
 #include "Core/Quaternion.h"
+#include "Core/Factory.h"
 
 #ifdef _WIN32 || WIN32
     #define OVR_OS_WIN32
@@ -58,6 +60,7 @@ static unsigned int next_pow2(unsigned int x)
 
 OculusViewer::OculusViewer() : OpenGLViewer()
 {
+    ovrInitialized = ovrFalse;
     hmd = nullptr;
     fbWidth = 0;
     fbHeight = 0;
@@ -72,40 +75,41 @@ OculusViewer::OculusViewer() : OpenGLViewer()
 
 OculusViewer::~OculusViewer()
 {
-
+    this->cleanUp();
 }
 
-void OculusViewer::init()
+bool OculusViewer::init()
 {
     if (isInitialized)
     {
-        return;
+        return false;
     }
 
-    ovr_Initialize();
-    this->initGLContext();
-    this->initGLCaps();
-    this->initObjects();
-    this->initResources();
-    this->initScenes();
+    ovrInitialized = ovr_Initialize();
+    if (ovrFalse == ovrInitialized)
+    {
+        return false;
+    }
+
+    ViewerBase::init(); //this will set isInitialized = true if successful
+    if (!isInitialized)
+    {
+        return false;
+    }
+
     if (-1 == this->initOculus())
     {
-        isInitialized = false;
-        //probably call clean up?
-        ovr_Shutdown();
+        return false;
     }
-    else
-    {
-        isInitialized = true;
-    }
+
+    isInitialized = true;
+    return true;
 }
 
 void OculusViewer::cleanUp()
 {
-    destroyFboListItems();
-    destroyGLContext();
+    this->OpenGLViewer::cleanUp();
     cleanupOculus();
-    ovr_Shutdown();
 }
 
 void OculusViewer::beginFrame()
@@ -312,8 +316,15 @@ int OculusViewer::initOculus(void)
 
 void OculusViewer::cleanupOculus(void)
 {
+    if (ovrTrue == ovrInitialized)
+    {
+        ovr_Shutdown();
+        ovrInitialized = false;
+    }
+
     if (hmd) {
         ovrHmd_Destroy(hmd);
+        hmd = nullptr;
     }
 }
 
@@ -358,3 +369,7 @@ void OculusViewer::updateRenTarg(int width, int height)
     std::cout << "created render target: " << width << "x" << height
               << " (texture size: " << fbTexWidth << "x" << fbTexHeight << ")\n";
 }
+
+RegisterFactoryClass(OpenGLViewer,
+                     OculusViewer,
+                     RenderDelegate::RendererType::Other)

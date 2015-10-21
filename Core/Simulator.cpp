@@ -221,11 +221,11 @@ void Simulator::registerSimulationMain(std::shared_ptr<SimulationMain> p_main)
     this->changedMainTimeStamp++;
 }
 
-void Simulator::init()
+bool Simulator::init()
 {
     if(isInitialized == true)
     {
-        return;
+        return false;
     }
     if(maxThreadCount == 0)
     {
@@ -240,6 +240,8 @@ void Simulator::init()
 
     initAsyncThreadPool();
     isInitialized = true;
+
+    return true;
 }
 
 Simulator::Simulator(std::shared_ptr< ErrorLog > p_log)

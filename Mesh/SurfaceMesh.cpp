@@ -26,24 +26,6 @@
 #include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
 
-///
-/// \brief Texture management structure
-///
-struct SurfaceMesh::TextureAttachment
-{
-    TextureAttachment() :
-    textureId(-1),
-    textureName("")
-    {
-    }
-
-    // Texture id
-    int textureId;
-
-    // Texture internal name
-    std::string textureName;
-};
-
 SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureCoordinates(false)
 {
     this->setRenderDelegate(
@@ -253,7 +235,7 @@ void SurfaceMesh::assignTexture(const std::string& referenceName)
 //     }
 //
     auto attachment = std::make_shared<TextureAttachment>();
-    attachment->textureId = -1;
+    attachment->textureId = this->textures.size();
     attachment->textureName = referenceName;
     this->textures.push_back(attachment);
 }

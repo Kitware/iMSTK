@@ -104,11 +104,11 @@ void ViewerBase::initScenes()
 }
 
 ///initialization of the viewer module
-void ViewerBase::init()
+bool ViewerBase::init()
 {
     if (isInitialized)
     {
-        return;
+        return false;
     }
 
     this->initRenderingContext();
@@ -118,12 +118,14 @@ void ViewerBase::init()
     this->initScenes();
 
     isInitialized = true;
+
+    return true;
 }
 
 void ViewerBase::addFBO(const std::string &p_fboName,
-                      Texture *p_colorTex,
-                      Texture *p_depthTex,
-                      unsigned int p_width, unsigned int p_height)
+                        Texture *p_colorTex,
+                        Texture *p_depthTex,
+                        unsigned int p_width, unsigned int p_height)
 {
     FboListItem item;
 
@@ -258,7 +260,10 @@ void ViewerBase::exec()
     this->init();
 
     while (!terminateExecution)
-      this->processWindowEvents();
+    {
+        this->processWindowEvents();
+        this->render();
+    }
 
     cleanUp();
 }

@@ -57,11 +57,6 @@ public:
     void setWindowTitle(const std::string &str);
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
-    virtual void addFBO(const std::string &p_fboName,
-                        Texture *p_colorTex,
-                        Texture *p_depthTex,
-                        unsigned int p_width,
-                        unsigned int p_height);
 
 protected:
     virtual void initRenderingCapabilities() override;
@@ -88,9 +83,11 @@ protected:
     virtual void destroyFboListItems();
     void processSFMLEvents(const sf::Event& p_event);
 
+protected:
+    std::unique_ptr<sf::Window> sfmlWindow;
+
 private:
     std::unique_ptr<sf::Context> sfmlContext;
-    std::unique_ptr<sf::Window> sfmlWindow;
     std::shared_ptr<OpenGLWindowStream> windowOutput;
     std::string windowTitle;
     Color defaultDiffuseColor;

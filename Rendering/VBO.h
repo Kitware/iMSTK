@@ -82,7 +82,7 @@ public:
                                   size_t p_objectId);
 
     /// \brief update  triangle index
-    VBOResult updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
+    VBOResult updateTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId);
 
     /// \brief draw elements in VBO
     VBOResult drawElements(size_t p_objectId);
@@ -94,7 +94,7 @@ public:
                                   size_t p_objectId);
 
     /// \brief update the static triangle indices initially
-    VBOResult initTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId);
+    VBOResult initTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId);
 
     /// \brief deletion of the VBO buffers
     ~VBO();

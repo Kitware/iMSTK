@@ -103,18 +103,24 @@ public:
     /// \brief Initializes lights for rendering
     void initLights();
 
-    /// \brief Enables all currently active lights in the scene
+    /// \brief Enables/disables lights for the scene
+    ///
+    /// \param b Boolean: true enables lights, false disables lights
+    ///
+    void enableLights(bool b);
+
+    /// \brief Activates all currently active lights in the scene
     ///
     /// \detail This should be called in conjunction with disableLights().
     /// Calling this will essentially call glEnable(GL_LIGHT#) for every
     /// enabled light.
-    void enableLights();
-    /// \brief Disables all lights in the scene
+    void activateLights();
+    /// \brief DeActivates all lights in the scene
     ///
     /// \detail This should be called in conjunction with enableLights().
     /// Calling this will essentially call glDisable(GL_LIGHT#) for every
     /// light(enabled or not).
-    void disableLights();
+    void deactivateLights();
     /// \brief Place the OpenGL lights in the scene
     ///
     /// \detail Should be called after enableLights()
@@ -160,6 +166,7 @@ private:
     std::shared_ptr<ErrorLog> log;                            // error logging
     std::mutex sceneLock;                                       // scene list lock for thread safe manipulation of the scene
     unsigned int sceneUpdatedTimeStamp;                               // last updated time stamp
+    bool lightsEnabled; ///< Enables/Disables lights for the whole scene
 };
 
 #endif

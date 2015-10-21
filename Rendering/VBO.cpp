@@ -81,7 +81,7 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
     return SIMMEDTK_VBO_OK;
 }
 
-VBOResult VBO::updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId)
+VBOResult VBO::updateTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId)
 {
     if ((vboType == SIMMEDTK_VBO_STATIC) | (vboType == SIMMEDTK_VBO_DYNAMIC))
     {
@@ -91,7 +91,7 @@ VBOResult VBO::updateTriangleIndices(const Vector<size_t> &p_indices, size_t p_o
     // Bind the indices' VBO
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
 
-    float *objectBufferPtr = reinterpret_cast<float*>(glMapBufferARB(
+    GLuint *objectBufferPtr = reinterpret_cast<GLuint*>(glMapBufferARB(
         GL_ELEMENT_ARRAY_BUFFER_ARB, GL_READ_WRITE_ARB)) + indexOffsetMap[p_objectId];
     if (objectBufferPtr == nullptr)
     {
@@ -185,7 +185,7 @@ VBOResult VBO::initStaticVertices(const core::Vectorf &p_vectors,
 ///init Triangle Indices for the very first time for static objects
 ///this function must be called when the indices are not changing
 ///SIMMEDTK_VBO_NOINDICESCHANGE
-VBOResult VBO::initTriangleIndices(const Vector<size_t> &p_indices, size_t p_objectId)
+VBOResult VBO::initTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId)
 {
     size_t indexOffset;
 
