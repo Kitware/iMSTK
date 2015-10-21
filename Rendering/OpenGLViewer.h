@@ -45,7 +45,7 @@ public:
     /// \brief for exit viewer
     virtual void exitViewer() override;
     /// \brief add object for rendering
-    void addObject(std::shared_ptr<CoreClass> object);
+    void addObject(std::shared_ptr<CoreClass> object) override;
     /// \brief add text for display
     virtual void addText(std::string p_tag) override;
     /// \brief update text
@@ -54,7 +54,7 @@ public:
     /// \brief set scene as texture
     void setSceneAsTextureShader(std::shared_ptr<SceneTextureShader> p_shader);
     /// \brief set the window title
-    void setWindowTitle(const std::string &str);
+    void setWindowTitle(const std::string &str) override;
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
 

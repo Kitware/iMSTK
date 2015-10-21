@@ -11,7 +11,7 @@ public:
     virtual vtkActor *getActor() = 0;
     virtual void initDraw() override{}
     virtual void modified() override{}
-    virtual void draw() const
+    virtual void draw() const override
     { }
 };
 

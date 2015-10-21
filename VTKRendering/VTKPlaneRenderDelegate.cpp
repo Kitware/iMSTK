@@ -40,7 +40,7 @@ class PlaneRenderDelegate : public VTKRenderDelegate
 public:
     vtkActor *getActor() override;
     virtual void initDraw() override;
-    void draw() const
+    void draw() const override
     { }
 
 private:

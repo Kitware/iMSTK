@@ -163,7 +163,7 @@ public:
     Color defaultSpecularColor;
     bool valid;
     /// \brief initialize, run the event loop (processWindowEvents) and clean up.
-    virtual void exec();
+    virtual void exec() override;
 
 protected:
     /// \brief Renders the render operation to screen
