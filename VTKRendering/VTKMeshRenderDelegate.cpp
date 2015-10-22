@@ -58,7 +58,7 @@ public:
     vtkActor *getActor() override;
     void initDraw() override;
     void modified() override;
-    void draw() const
+    void draw() const override
     { }
 
 private:

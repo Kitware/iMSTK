@@ -81,7 +81,7 @@ protected:
     ///
     /// \brief Renders the render operation to screen
     ///
-    void renderToScreen(const RenderOperation &/*rop*/) override {}
+    virtual void renderToScreen(const RenderOperation &/*rop*/) override {}
 
     ///
     /// \brief Renders the render operation to an FBO
@@ -95,7 +95,7 @@ protected:
 
     ///
     /// \brief Initilizes the rendering system (e.g., OpenGL) context, and window containing it
-    void initRenderingContext() override {}
+    virtual void initRenderingContext() override;
 
     ///
     /// \brief Cleans up after initGLContext()
@@ -105,7 +105,7 @@ protected:
     ///
     /// \brief Initializes FBOs, textures, shaders and VAOs
     ///
-    void initResources() override;
+    void initResources() override {}
 
     ///
     /// \brief Processes viewerRenderDetail options

@@ -124,7 +124,7 @@ void OpenGLViewer::initRenderingContext()
     else
     {
         this->sfmlWindow->create(sf::VideoMode(this->width(), this->height()),
-                            windowTitle, (sf::Style::Titlebar | sf::Style::Close));
+                            windowTitle,  sf::Style::Default);
     }
 
     // Init GLEW
@@ -174,37 +174,6 @@ void OpenGLViewer::renderTextureOnView()
     glEnd();
     glDisable(GL_TEXTURE_2D);
     glPopAttrib();
-}
-
-/// \brief Adds an FBO to the viewer to allow rendering to it.
-///
-/// \detail The FBO will be created an initialized in the viewer.
-///
-/// \param p_fboName String to reference the FBO by
-/// \param p_colorTex A texture that will contain the fbo's color texture.
-/// \param p_depthTex A texture that will contain the fbo's depth texture.
-/// \param p_width The width of the fbo
-/// \param p_height The height of the fbo
-void OpenGLViewer::addFBO(const std::string &p_fboName,
-                      Texture *p_colorTex,
-                      Texture *p_depthTex,
-                      unsigned int p_width, unsigned int p_height)
-{
-    FboListItem item;
-
-    item.fboName = p_fboName;
-    item.width = p_width;
-    item.height = p_height;
-    if (p_colorTex)
-    {
-        item.colorTex = p_colorTex;
-    }
-    if (p_depthTex)
-    {
-        item.depthTex = p_depthTex;
-    }
-
-    this->fboListItems.push_back(item);
 }
 
 /// \brief Initializes the FBOs in the FBO list
@@ -307,12 +276,12 @@ void OpenGLViewer::renderToScreen(const RenderOperation &p_rop)
         glLoadMatrixf(view.data());
 
         //Enable lights
-        p_rop.scene->enableLights();
+        p_rop.scene->activateLights();
         p_rop.scene->placeLights();
 
         OpenGLRenderer::drawAxes(this->globalAxisLength);
 
-        p_rop.scene->disableLights();
+        p_rop.scene->deactivateLights();
 
         glMatrixMode(GL_MODELVIEW);
         glPopMatrix();

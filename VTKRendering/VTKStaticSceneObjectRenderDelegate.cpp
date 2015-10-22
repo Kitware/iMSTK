@@ -35,7 +35,7 @@ class StaticSceneObjectRenderDelegate : public VTKRenderDelegate
 {
 public:
     vtkActor *getActor() override;
-    void draw() const
+    void draw() const override
     { }
 };
 

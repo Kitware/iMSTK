@@ -59,7 +59,7 @@ private:
 
 public:
     ///initializes all the simulators in the objects in the scene..
-    void init();
+    bool init();
 
     /// \brief constructor gets error log
     Simulator(std::shared_ptr<ErrorLog> p_log);

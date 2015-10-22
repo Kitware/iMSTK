@@ -185,12 +185,12 @@ public:
         return weights;
     }
 
-    inline void addWeight(const int &w)
+    inline void addWeight(const float &w)
     {
         weights.emplace_back(w);
     }
 
-    inline const float &getWeight(const int &w) const
+    inline const float &getWeight(const float &w) const
     {
         return weights.at(w);
     }

@@ -269,7 +269,7 @@ void VTKViewer::render()
 
     this->endModule();
 }
-void VTKViewer::initResources()
+void VTKViewer::initRenderingContext()
 {
     this->renderer->addRenderer();
 }

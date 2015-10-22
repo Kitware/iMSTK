@@ -30,6 +30,7 @@ Scene::Scene(std::shared_ptr<ErrorLog> p_log) :
     this->log = p_log;
     type = core::ClassType::Scene;
     sceneUpdatedTimeStamp = 0;
+    lightsEnabled = false;
 }
 
 std::shared_ptr<UnifiedId> Scene::getSceneId()
@@ -174,8 +175,18 @@ void Scene::setLightPos(int p_lightId, LightPos p_pos, core::Vec3d p_direction)
     temp->updateDirection();
 }
 
-void Scene::enableLights()
+void Scene::enableLights(bool b)
 {
+    lightsEnabled = b;
+}
+
+void Scene::activateLights()
+{
+    if (!lightsEnabled)
+    {
+        return;
+    }
+
     glEnable(GL_LIGHTING);
 
     for (auto light: lights)
@@ -191,7 +202,7 @@ void Scene::enableLights()
     }
 }
 
-void Scene::disableLights()
+void Scene::deactivateLights()
 {
     for (auto light: lights)
     {
@@ -203,6 +214,16 @@ void Scene::disableLights()
 
 void Scene::placeLights()
 {
+    if (!lightsEnabled)
+    {
+        return;
+    }
+
+    if (!lightsEnabled)
+    {
+        return;
+    }
+
     for (auto light: lights)
     {
         core::Vec3f casted;

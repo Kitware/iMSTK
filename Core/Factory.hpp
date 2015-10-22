@@ -114,13 +114,17 @@ std::shared_ptr<T> Factory<T>::createConcreteClassForGroup(
   typename std::map<std::string, FactoryConfigurationOptions>::const_iterator bit;
   typename FactoryConfigurationOptions::const_iterator cit;
   for (bit = Factory::s_catalog->begin(); bit != Factory::s_catalog->end(); ++bit)
+  {
     for (cit = bit->second.begin(); cit != bit->second.end(); ++cit)
+    {
+      std::cout << "cit: subclassname: " << cit->subclassname << " group: " << cit->group << "\n";
       if ((cit->subclassname == classname) && (cit->group == group))
-        {
+      {
         std::cout << "Creating " << cit->subclassname << " (" << classname << ", " << cit->group << ")\n";
         return cit->constructor();
-        }
-
+      }
+    }
+  }
   return std::shared_ptr<T>();
 }
 

@@ -123,7 +123,7 @@ public:
     inline void advanceOneTimeStep();
 
     /// \brief rest the object to inital configuration and reset initial states
-    void resetToInitialState();
+    void resetToInitialState() override;
 
     /// \brief Set the type of formulation used to model the deformation
     void setDeformableModelType();

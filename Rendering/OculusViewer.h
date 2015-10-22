@@ -37,13 +37,14 @@ class OculusViewer : public OpenGLViewer
 public:
     OculusViewer();
     virtual ~OculusViewer();
-    virtual void init() override;
-    virtual void cleanUp() override;
+    virtual bool init() override;
 protected:
+    virtual void cleanUp() override;
     virtual void beginFrame() override;
     virtual void endFrame() override;
     virtual void renderToScreen(const RenderOperation &p_rop) override;
 private:
+    ovrBool ovrInitialized;
     ovrHmd hmd;
     ovrSizei eyeRes[2];
     ovrEyeRenderDesc eyeRdesc[2];
