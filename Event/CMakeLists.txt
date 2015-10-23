@@ -1,4 +1,3 @@
-
 simmedtk_add_library(Event
   SOURCES
     AudioEvent.cpp

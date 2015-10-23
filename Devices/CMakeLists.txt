@@ -6,7 +6,6 @@ if(USE_VRPN_CLIENT)
     if(USE_VRPN_SERVER)
         list(APPEND EXTERNAL_DEVICES_SOURCES
             VRPNDeviceServer.cpp
-            VRPNForceDevice.cpp
         )
         # --------------------------------
         if(SimMedTK_USE_PHANTOM_OMNI)
@@ -23,17 +22,18 @@ if(USE_VRPN_CLIENT)
         # --------------------------------
         list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
             vrpn::server
+            vrpn::libusb
         )
     endif(USE_VRPN_SERVER)
     # --------------------------------
     list(APPEND EXTERNAL_DEVICES_SOURCES
         VRPNDeviceClient.cpp
+        VRPNForceDevice.cpp
         )
     # --------------------------------
     list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
         vrpn::vrpn
         vrpn::quat
-        vrpn::libusb
         )
 endif()
 

@@ -31,7 +31,7 @@
 #include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Devices/VRPNForceDevice.h"
-#include "Devices/VRPNDeviceServer.h"
+// #include "Devices/VRPNDeviceServer.h"
 #include "VirtualTools/ToolCoupler.h"
 
 // Include required simulators
@@ -45,8 +45,12 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
+// #include "../common/wasdCameraController.h"
+// #include "../common/KeyPressSDKShutdown.h"
+// #include "../common/pzrMouseCameraController.h"
+
 #include "IO/initIO.h"
-#include "RenderDelegates/initRenderDelegates.h"
+// #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 
 int main(int ac, char** av)
@@ -57,7 +61,7 @@ int main(int ac, char** av)
         configFile = av[1];
     }
 
-    initRenderDelegates();
+    // initRenderDelegates();
     initVTKRendering();
     initIODelegates();
     const bool useVTKRenderer = true;
@@ -69,19 +73,19 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
     auto client = std::make_shared<VRPNForceDevice>();
-    auto server = std::make_shared<VRPNDeviceServer>();
+    // auto server = std::make_shared<VRPNDeviceServer>();
 
     //get some user input and setup device url
     std::string input = "Phantom0@localhost";
     std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
-//     std::getline(std::cin, input);
+    std::getline(std::cin, input);
     if(!input.empty())
     {
         client->setDeviceURL(input);
     }
     auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(5.0);
-    sdk->registerModule(server);
+    // sdk->registerModule(server);
     sdk->registerModule(client);
     sdk->registerModule(controller);
 
@@ -194,13 +198,13 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto viewer = sdk->getViewerInstance();
 
-    if(!useVTKRenderer)
-    {
-        viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-                                    SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
-                                    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
-        viewer->setGlobalAxisLength(0.8);
-    }
+    // if(!useVTKRenderer)
+    // {
+    //     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
+    //                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
+    //                                 SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+    //     viewer->setGlobalAxisLength(0.8);
+    // }
 
     // Get Scene
     auto scene = sdk->getScene(0);
@@ -214,6 +218,31 @@ int main(int ac, char** av)
     auto light2 = Light::getDefaultLighting();
     light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
+
+    // Setup Scene lighting
+    // if(!useVTKRenderer)
+    // {
+    //     // Camera setup
+    //     auto sceneCamera = Camera::getDefaultCamera();
+    //     sceneCamera->setPos(-60,0,0);
+    //     sceneCamera->setZoom(.5);
+    //     scene->addCamera(sceneCamera);
+    //
+    //     // Create the camera controller
+    //     auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    //     camCtl->setCamera(sceneCamera);
+    //
+    //     auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    //
+    //     auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+    //     pzrCamCtl->setCamera(sceneCamera);
+    //
+    //     // Link up the event system between this the camera controller and the viewer
+    //     viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    //     viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    //     viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    //     viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
+    // }
 
     //-------------------------------------------------------
     // Run the SDK

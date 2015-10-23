@@ -26,7 +26,7 @@ endfunction()
 # add_subdirectory(common)
 
 if(USE_VRPN_CLIENT OR USE_VRPN_SERVER)
-  add_subdirectory(vrpnPhantomTest)
+  # add_subdirectory(vrpnPhantomTest)
 endif()
 
 if(SimMedTK_USE_OCULUS)

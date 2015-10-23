@@ -35,6 +35,8 @@ target_link_libraries(Rendering
     Event
     Mesh
  PUBLIC
+    ${VTK_LIBRARIES}
+    vtkglew
     sfml::window
     sfml::system
     vtkglew
