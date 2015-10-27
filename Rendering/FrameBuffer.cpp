@@ -237,7 +237,7 @@ void FrameBuffer::attachRenderBuffer( RenderBuffer *p_renderBuf )
         _fbo.AttachRenderBuffer( p_renderBuf->getRenderBufId(), p_renderBuf->getGLAttachmentId() );
     }
 }
-void FrameBuffer::attachDepthTexture( Texture *p_texture )
+void FrameBuffer::attachDepthTexture(std::shared_ptr<Texture> p_texture )
 {
     if ( p_texture == nullptr )
     {
@@ -247,7 +247,7 @@ void FrameBuffer::attachDepthTexture( Texture *p_texture )
     _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_DEPTH_ATTACHMENT_EXT );
     isDepthTexAttached = true;
 }
-void FrameBuffer::attachColorTexture( Texture *p_texture, int p_attachmentOrder )
+void FrameBuffer::attachColorTexture(std::shared_ptr<Texture> p_texture, int p_attachmentOrder )
 {
     defaultColorAttachment = p_attachmentOrder;
     _fbo.AttachTexture( p_texture->GLtype, p_texture->textureGLId, GL_COLOR_ATTACHMENT0_EXT + p_attachmentOrder );

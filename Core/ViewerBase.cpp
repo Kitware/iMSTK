@@ -123,8 +123,8 @@ bool ViewerBase::init()
 }
 
 void ViewerBase::addFBO(const std::string &p_fboName,
-                        Texture *p_colorTex,
-                        Texture *p_depthTex,
+                        std::shared_ptr<Texture> p_colorTex,
+                        std::shared_ptr<Texture> p_depthTex,
                         unsigned int p_width, unsigned int p_height)
 {
     FboListItem item;

@@ -26,6 +26,7 @@
 #include "Core/EventHandler.h"
 #include "Core/IOStream.h"
 #include "Core/Factory.h"
+#include "Core/ViewerBase.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/KeySFMLInterface.h"
 #include "Event/MouseButtonEvent.h"
