@@ -33,6 +33,7 @@
 #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 #include "Rendering/TextureManager.h"
+#include "Rendering/OculusViewer.h"
 #include "Geometry/MeshModel.h"
 #include "Core/Factory.h"
 #include "Core/ViewerBase.h"
@@ -91,6 +92,9 @@ int main()
 
     // Set some viewer properties
     viewer->setScreenResolution(800, 640);
+
+    //Make the window fullscreen for oculus
+    viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();
