@@ -26,6 +26,7 @@ list(APPEND ExamplesCommon_link_libs
   Event
   Simulators
   Geometry
+  Mesh
 )
 
 if(SimMedTK_USE_PHANTOM_OMNI)
