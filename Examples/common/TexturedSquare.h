@@ -21,9 +21,11 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef MSTK_EXAMPLES_COMMON_EXAMPLECUBE_H
-#define MSTK_EXAMPLES_COMMON_EXAMPLECUBE_H
 
+#ifndef MSTK_EXAMPLES_COMMON_TEXTUREDSQUARE_H
+#define MSTK_EXAMPLES_COMMON_TEXTUREDSQUARE_H
+
+#include <string>
 #include <memory>
 
 #include "Core/StaticSceneObject.h"
@@ -33,18 +35,19 @@ namespace mstk {
 namespace Examples {
 namespace Common {
 
-class ExampleCube
+class TexturedSquare
 {
 public:
-    ExampleCube(bool vtkRenderer = true);
+    TexturedSquare(bool vtkRenderer = true);
     void useVTKRenderer(bool b);
     void setup();
     std::shared_ptr<StaticSceneObject> getStaticSceneObject();
+    void setTexture(const std::string &t);
 
 private:
-    std::shared_ptr<StaticSceneObject> cube;
+    std::shared_ptr<StaticSceneObject> square;
     std::shared_ptr<RenderDetail> renderDetail;
-    std::shared_ptr<MeshModel> cubeModel;
+    std::shared_ptr<MeshModel> squareModel;
 
     bool useVTK;
 };

@@ -21,113 +21,97 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "../common/wasdCameraController.h"
-#include "../common/KeyPressSDKShutdown.h"
+#include "Examples/common/wasdCameraController.h"
+#include "Examples/common/KeyPressSDKShutdown.h"
+#include "Examples/common/pzrMouseCameraController.h"
+#include "Examples/common/ExampleCube.h"
+#include "Examples/common/TexturedSquare.h"
 
 #include <memory>
 
-#include "Core/SDK.h"
+#include "IO/initIO.h"
+#include "RenderDelegates/initRenderDelegates.h"
+#include "VTKRendering/initVTKRendering.h"
 #include "Rendering/TextureManager.h"
-#include "Collision/MeshCollisionModel.h"
+#include "Geometry/MeshModel.h"
+#include "Core/Factory.h"
+#include "Core/ViewerBase.h"
 
 int main()
 {
-    std::shared_ptr<SDK> sdk;
-    std::shared_ptr<OpenGLViewer> viewer;
-    std::shared_ptr<Scene> scene1, scene2;
-    std::shared_ptr<Light> light1, light2;
-    std::shared_ptr<Camera> sceneCamera1, sceneCamera2;
-    std::shared_ptr<StaticSceneObject> cube, square;
-    std::shared_ptr<mstk::Examples::Common::wasdCameraController> camCtl;
-    std::shared_ptr<mstk::Examples::Common::KeyPressSDKShutdown> keyShutdown;
+    using ExampleCube = mstk::Examples::Common::ExampleCube;
+    using TexturedSquare = mstk::Examples::Common::TexturedSquare;
 
-    //Create an instance of the SimMedTK framework/SDK
-    sdk = SDK::getInstance();
+    ExampleCube cube;
+    TexturedSquare square;
 
-    //Create the scenes
-    scene1 = sdk->createScene(); //internal scene containing cube
-    scene2 = sdk->createScene(); //external scene containing square with scene1 mapped to it
+    initRenderDelegates();
+    initIODelegates();
 
-    //Create a viewer to see the scene through
-    viewer = std::make_shared<OpenGLViewer>();
-    sdk->addViewer(viewer);
+    auto scene1 = std::make_shared<Scene>();
+    auto scene2 = std::make_shared<Scene>();
 
-    //Create the camera controller
-    camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-    keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    // Create a viewer
+    auto viewer = Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::Other);
 
-    auto cubeModel = std::make_shared<MeshModel>();
-    TextureManager::addTexture("textures/cube.png", "cubetex");
-    cubeModel->load("models/cube.obj");
-    std::static_pointer_cast<SurfaceMesh>(cubeModel->getMesh())->assignTexture("cubetex");
+    assert(viewer);
+    assert(scene1);
+    assert(scene2);
 
-    auto renderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    cubeModel->setRenderDetail(renderDetail);
+    cube.useVTKRenderer(false);
+    cube.setup();
 
-    cube = std::make_shared<StaticSceneObject>();
-    cube->setModel(cubeModel);
+    square.useVTKRenderer(false);
+    square.setup();
 
-    //Add the cube to the scene to be rendered
-    scene1->addSceneObject(cube);
-
-    //setup scene2
+    //setup scene for displaying the rendered to texture object
     //Create a color and depth texture for the FBO
     TextureManager::createColorTexture("colorTex1", 64, 64);
     TextureManager::createDepthTexture("depthTex1", 64, 64);
 
-    std::shared_ptr<MeshModel> squareModel = std::make_shared<MeshModel>();
-    squareModel->load("models/square.obj");
-    std::static_pointer_cast<SurfaceMesh>(squareModel->getMesh())->assignTexture("colorTex1");
-    renderDetail= std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_TEXTURE);
-    squareModel->setRenderDetail(renderDetail);
-
-    square = std::make_shared<StaticSceneObject>();
-    square->setModel(squareModel);
-
-    //Setup an FBO for rendering in the viewer.
-    //Add the FBO and textures to the viewer
     viewer->addFBO("fbo1",
-                  TextureManager::getTexture("colorTex1").get(),
-                  TextureManager::getTexture("depthTex1").get(),
-                  64, 64);
+                   TextureManager::getTexture("colorTex1"),
+                   TextureManager::getTexture("depthTex1"),
+                   64, 64);
 
-    //Add the square to the scene
-    scene2->addSceneObject(square);
+    square.setTexture("colorTex1");
 
-    //Register the scene with the viewer, and setup render target
+    // Add the cube to the scene to be rendered
+    scene1->addSceneObject(cube.getStaticSceneObject());
+
+    //Add the square to the scene to be rendered
+    scene2->addSceneObject(square.getStaticSceneObject());
+
+    // Register the scene with the viewer, and setup render target
     viewer->registerScene(scene1, SMRENDERTARGET_FBO, "fbo1");
     viewer->registerScene(scene2, SMRENDERTARGET_SCREEN, "");
 
-    //Setup the window title in the window manager
+    // Setup the window title in the window manager
     viewer->setWindowTitle("SimMedTK RENDER TO TEXTURE TEST");
 
-    //Set some viewer properties
+    // Set some viewer properties
     viewer->setScreenResolution(800, 640);
 
-    //Uncomment the following line for fullscreen
-    //viewer->viewerRenderDetail |= SIMMEDTK_VIEWERRENDER_FULLSCREEN;
-
     // Setup Scene lighting
-    light1 = Light::getDefaultLighting();
+    auto light1 = Light::getDefaultLighting();
     assert(light1);
     scene1->addLight(light1);
 
-    light2 = Light::getDefaultLighting();
+    auto light2 = Light::getDefaultLighting();
     assert(light2);
     light2->lightPos.setPosition(core::Vec3d(0.0, 0.0, 5.0));
     scene2->addLight(light2);
 
     // Camera setup
-    sceneCamera1 = Camera::getDefaultCamera();
+    auto sceneCamera1 = Camera::getDefaultCamera();
     assert(sceneCamera1);
     sceneCamera1->setPos(3, 3, 5);
     sceneCamera1->setFocus(0, 0, -1);
     sceneCamera1->genProjMat();
     sceneCamera1->genViewMat();
     scene1->addCamera(sceneCamera1);
-    camCtl->setCamera(sceneCamera1);
 
-    sceneCamera2 = Camera::getDefaultCamera();
+    auto sceneCamera2 = Camera::getDefaultCamera();
     assert(sceneCamera2);
     sceneCamera2->setPos(0, 0, 5);
     sceneCamera2->setFocus(0, 0, -1);
@@ -135,16 +119,20 @@ int main()
     sceneCamera2->genViewMat();
     scene2->addCamera(sceneCamera2);
 
-    //Link up the event system between this the camera controller and the viewer
+    // Create the camera controller
+    auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+    camCtl->setCamera(sceneCamera1);
+    pzrCamCtl->setCamera(sceneCamera1);
+
+    // Link up the event system between this the camera controller and the viewer
     viewer->attachEvent(core::EventType::Keyboard, camCtl);
     viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
 
-    //run the framework
-    sdk->run();
-
-    //cleanup
-    sdk->releaseScene(scene1);
-    sdk->releaseScene(scene2);
+    viewer->exec();
 
     return 0;
 }

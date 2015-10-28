@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMFRAMEBUFFEROBJECT_H
-#define SMFRAMEBUFFEROBJECT_H
+#ifndef SMFRAMEBUFFER_H
+#define SMFRAMEBUFFER_H
 
 // STL includes
 #include <string>
@@ -126,9 +126,9 @@ public:
     /// \brief attach render buffer to te frame buffer
     void attachRenderBuffer(RenderBuffer *p_renderBuf);
     /// \brief attach depth texture
-    void attachDepthTexture(Texture *p_texture);
+    void attachDepthTexture(std::shared_ptr<Texture> p_texture);
     /// \brief attach a color texture
-    void attachColorTexture(Texture *p_texture, int p_attachmentOrder);
+    void attachColorTexture(std::shared_ptr<Texture> p_texture, int p_attachmentOrder);
     /// \brief activate color buffer in the specified order
     void activeColorBuf(int  p_order);
     /// \brief enable the framebuffer

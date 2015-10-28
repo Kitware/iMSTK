@@ -8,6 +8,7 @@ list(APPEND ExamplesCommon_sources
   hapticController.cpp
   pzrMouseCameraController.cpp
   ExampleCube.cpp
+  TexturedSquare.cpp
 )
 
 list(APPEND ExamplesCommon_headers
@@ -16,6 +17,7 @@ list(APPEND ExamplesCommon_headers
   hapticController.h
   pzrMouseCameraController.h
   ExampleCube.h
+  TexturedSquare.h
 )
 
 list(APPEND ExamplesCommon_link_libs
@@ -23,6 +25,8 @@ list(APPEND ExamplesCommon_link_libs
   Rendering
   Event
   Simulators
+  Geometry
+  Mesh
 )
 
 if(SimMedTK_USE_PHANTOM_OMNI)

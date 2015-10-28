@@ -1,11 +1,14 @@
 add_executable(renderCubeToTextureOculus main.cpp)
 target_link_libraries(renderCubeToTextureOculus
   Core
-  Event
   Rendering
   RenderingOculus
+  RenderDelegates
+  IO
   Mesh
-  Geometry
+  Event
+  Collision
   ExamplesCommon
+  Geometry
   Oculus::Oculus
   )

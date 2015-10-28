@@ -37,7 +37,7 @@ class SDK;
 class OpenGLWindowStream;
 class MetalShader;
 class FrameBuffer;
-class Texture;
+struct Texture;
 
 enum RenderingStageType
 {
@@ -72,8 +72,8 @@ struct FboListItem
 {
     std::string fboName; ///< String identification
     FrameBuffer* fbo; ///< The FBO pointer
-    Texture *depthTex; ///< The FBO depth texture pointer
-    Texture *colorTex; ///< The FBO color texture pointer
+    std::shared_ptr<Texture> depthTex; ///< The FBO depth texture pointer
+    std::shared_ptr<Texture> colorTex; ///< The FBO color texture pointer
     unsigned int width; ///< The width of the FBO
     unsigned int height; ///< The height of the FBO
 };
@@ -142,7 +142,8 @@ public:
     /// \param p_height The height of the fbo
     void addFBO(
         const std::string &p_fboName,
-        Texture *p_colorTex, Texture *p_depthTex,
+        std::shared_ptr<Texture> p_colorTex,
+        std::shared_ptr<Texture> p_depthTex,
         unsigned int p_width, unsigned int p_height);
 
     virtual void setGlobalAxisLength(const float len);
