@@ -69,7 +69,7 @@ void VegaFemSimulator::run()
             auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(sceneObj);
             //std::cout << "."; std::cout.flush();
             femSceneObject->advanceDynamics();
-            this->updateHapticForces(femSceneObject);
+            //this->updateHapticForces(femSceneObject);
         }
     }
 

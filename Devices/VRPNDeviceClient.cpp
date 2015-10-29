@@ -124,12 +124,13 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
-    handler->position << t.pos[0], -t.pos[1], -t.pos[2];
+    handler->position << t.pos[0], t.pos[1], t.pos[2];
     handler->posTimer.start();
-    handler->orientation.w() = t.quat[0];
-    handler->orientation.x() = t.quat[1];
-    handler->orientation.y() = t.quat[2];
-    handler->orientation.z() = t.quat[3];
+
+    handler->orientation.x() = t.quat[0];
+    handler->orientation.y() = t.quat[1];
+    handler->orientation.z() = t.quat[2];
+    handler->orientation.w() = t.quat[3];
     handler->quatTimer.start();
 }
 

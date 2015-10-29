@@ -30,119 +30,119 @@
 #include "Devices/DeviceInterface.h"
 #include "Core/RenderDelegate.h"
 
-//---------------------------------------------------------------------------
 ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
                          std::shared_ptr< Core::BaseMesh > toolMesh)
 {
     this->inputDevice = inputDevice;
     this->outputDevice = inputDevice;
+
+    this->offsetPosition.setZero();
+    this->offsetOrientation.setIdentity();
+    //this->offsetOrientation = core::Quaterniond(-30.0,1,0,0);
+
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
     this->initialTransform.setIdentity();
     this->name = "ToolCoupler";
 }
 
-//---------------------------------------------------------------------------
 ToolCoupler::ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice)
 {
     this->inputDevice = inputDevice;
     this->outputDevice = inputDevice;
+
+    this->offsetPosition.setZero();
+    this->offsetOrientation.setIdentity();
+    //this->offsetOrientation = core::Quaterniond(-30.0, 1, 0, 0);
+
     this->pollDelay = std::chrono::milliseconds(100);
     this->initialTransform.Identity();
     this->name = "ToolCoupler";
 }
 
-//---------------------------------------------------------------------------
 ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
                          std::shared_ptr< DeviceInterface > outputDevice,
                          std::shared_ptr< Core::BaseMesh > toolMesh)
 {
     this->inputDevice = inputDevice;
     this->outputDevice = outputDevice;
+
+    this->offsetPosition.setZero();
+    this->offsetOrientation.setIdentity();
+    //this->offsetOrientation = core::Quaterniond(-30, 1, 0, 0);
+
+
+
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
     this->initialTransform.Identity();
     this->name = "ToolCoupler";
 }
 
-//---------------------------------------------------------------------------
 ToolCoupler::~ToolCoupler()
 {
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setInputDevice(std::shared_ptr< DeviceInterface > newDevice)
 {
     this->inputDevice = newDevice;
 }
 
-//---------------------------------------------------------------------------
 std::shared_ptr< DeviceInterface > ToolCoupler::getInputDevice()
 {
     return this->inputDevice;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setOutpurDevice(std::shared_ptr< DeviceInterface > newDevice)
 {
     this->outputDevice = newDevice;
 }
 
-//---------------------------------------------------------------------------
 std::shared_ptr< DeviceInterface > ToolCoupler::getOutputDevice()
 {
     return this->outputDevice;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
 {
     this->mesh = newMesh;
 }
 
-//---------------------------------------------------------------------------
 std::shared_ptr< Core::BaseMesh > ToolCoupler::getMesh() const
 {
     return this->mesh;
 }
 
-//---------------------------------------------------------------------------
 const std::chrono::milliseconds &ToolCoupler::getPollDelay() const
 {
     return this->pollDelay;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setPollDelay(const std::chrono::milliseconds& delay)
 {
     this->pollDelay = delay;
 }
 
-//---------------------------------------------------------------------------
 const double& ToolCoupler::getScalingFactor() const
 {
     return this->scalingFactor;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setScalingFactor(const double& factor)
 {
     this->scalingFactor = factor;
 }
 
-//---------------------------------------------------------------------------
 const Eigen::Quaternion<double> &ToolCoupler::getOrientation() const
 {
     return this->orientation;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::setOrientation(const Eigen::Map< Eigen::Quaternion< double > >& newOrientation)
 {
     this->orientation = newOrientation;
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::init()
 {
     if(!this->outputDevice)
@@ -157,13 +157,10 @@ void ToolCoupler::init()
     this->inputDevice->openDevice();
 }
 
-//---------------------------------------------------------------------------
 void ToolCoupler::beginFrame() {}
 
-//---------------------------------------------------------------------------
 void ToolCoupler::endFrame() {}
 
-//---------------------------------------------------------------------------
 void ToolCoupler::exec()
 {
     if(!this->mesh)
@@ -183,33 +180,44 @@ void ToolCoupler::exec()
     this->inputDevice->closeDevice();
 }
 
-//---------------------------------------------------------------------------
 bool ToolCoupler::updateTracker()
 {
+
     if(!this->inputDevice)
     {
         std::cout << "Invalid input device" << std::endl;
         return false;
     }
-    core::Quaterniond rot = inputDevice->getOrientation();
-    core::Vec3d pos = inputDevice->getPosition() * this->scalingFactor;
 
-    Eigen::Quaterniond rotation(rot * this->orientation);
-    Eigen::Translation3d translation(pos - rotation*this->position);
+    this->prevPosition = this->position;
+    this->prevOrientation = this->orientation;
 
-    this->mesh->transform(/*this->initialTransform**/translation*rotation);
+    core::Quaterniond newRot = inputDevice->getOrientation();
+    core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
+
+    Eigen::Quaterniond deltaRotation(newRot * this->orientation.conjugate());
+    Eigen::Translation3d translationPrev(-this->position);
+    Eigen::Translation3d translationPresent(newPos);
+    Eigen::Translation3d translationOffset(this->offsetPosition);
+
+    this->mesh->transform(
+        translationOffset*
+        translationPresent*
+        this->offsetOrientation*
+        deltaRotation*
+        translationPrev);
 
     this->mesh->getRenderDelegate()->modified(); //tell the renderer to update
 
-    this->position = pos;
-    this->orientation = rot.conjugate();
+    this->position = newPos + this->offsetPosition;
+    this->orientation = this->offsetOrientation * newRot;
 
     return true;
 }
 
-//---------------------------------------------------------------------------
 bool ToolCoupler::updateForces()
 {
+
     if(!this->outputDevice)
     {
         std::cout << "Invalid output device" << std::endl;
@@ -217,4 +225,35 @@ bool ToolCoupler::updateForces()
     }
 
     return true;
+}
+
+void ToolCoupler::setOffsetOrientation(
+    const Eigen::Map<core::Quaterniond> &offsetOrientation)
+{
+    this->offsetOrientation = offsetOrientation;
+}
+
+void ToolCoupler::setOffsetPosition(const core::Vec3d &offsetPosition)
+{
+    this->offsetPosition = offsetPosition;
+}
+
+const core::Quaterniond& ToolCoupler::getOffsetOrientation() const
+{
+    return this->offsetOrientation;
+}
+
+const core::Vec3d& ToolCoupler::getOffsetPosition() const
+{
+    return this->offsetPosition;
+}
+
+const core::Vec3d& ToolCoupler::getPrevPosition() const
+{
+    return this->prevPosition;
+}
+
+const core::Quaterniond& ToolCoupler::getPrevOrientation() const
+{
+    return this->prevOrientation;
 }

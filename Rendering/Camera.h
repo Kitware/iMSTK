@@ -287,8 +287,8 @@ public:
         defaultCamera->setAspectRatio(800.0 / 640.0); //Doesn't have to match screen resolution
         defaultCamera->setFarClipDist(1000);
         defaultCamera->setNearClipDist(0.001);
-        defaultCamera->setPos(0.0, 0.0, 10.0);
-        defaultCamera->setZoom(2.0);
+        defaultCamera->setPos(10.0, 10.0, 10.0);
+        defaultCamera->setZoom(1.0);
         defaultCamera->setFocus(0.0, 0.0, 0.0);
         return defaultCamera;
     }

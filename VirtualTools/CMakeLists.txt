@@ -3,8 +3,10 @@ simmedtk_add_library(VirtualTools
   SOURCES
 #     CurvedGrasper.cpp
     ToolCoupler.cpp
+	#LaparoscopicCameraCoupler.cpp
   PUBLIC_HEADERS
     ToolCoupler.h
+	#LaparoscopicCameraCoupler.h
 #     CurvedGrasper.h
 )
 

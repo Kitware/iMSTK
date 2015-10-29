@@ -22,43 +22,42 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef TOOLCOUPLER_H
-#define TOOLCOUPLER_H
+#ifndef iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H
+#define iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H
 
 #include <memory>
 #include <chrono>
 
+// iMSTK includes
 #include "Core/Module.h"
 #include "Core/Quaternion.h"
 #include "Core/Vector.h"
 
-class DeviceInterface;
-namespace Core
-{
-class BaseMesh;
-}
+// vtk includes
+#include <vtkCamera.h>
 
-class ToolCoupler : public Module
+class DeviceInterface;
+
+class LaparoscopicCameraCoupler : public Module
 {
 public:
 	using TransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
 
 public:
     ///
-    /// \brief Constructor/Destructor
+    /// \brief Constructor
     ///
-    ToolCoupler() = default;
-    ~ToolCoupler();
+    LaparoscopicCameraCoupler() = default;
 
-    ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice,
-                std::shared_ptr<Core::BaseMesh> toolMesh);
+    LaparoscopicCameraCoupler(std::shared_ptr<DeviceInterface> inputDevice,
+                std::shared_ptr<vtkCamera> camera);
 
-    ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice);
+    LaparoscopicCameraCoupler(std::shared_ptr<DeviceInterface> inputDevice);
 
-    ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice,
-				std::shared_ptr<DeviceInterface> outputDevice,
-                std::shared_ptr<Core::BaseMesh> toolMesh);
-
+	///
+	/// \brief Destructor
+	///
+    ~LaparoscopicCameraCoupler();
 
     ///
     /// \brief Set the input device for this tool
@@ -72,38 +71,27 @@ public:
     std::shared_ptr<DeviceInterface> getInputDevice();
 
     ///
-    /// \brief Set the output device for this tool coupler
-    /// \param newDevice A pointer to an allocated device
-    ///
-    void setOutpurDevice(std::shared_ptr<DeviceInterface> newDevice);
-
-    ///
-    /// \brief Get the output device for this tool coupler
-    ///
-    std::shared_ptr<DeviceInterface> getOutputDevice();
-
-    ///
     /// \brief Set the pointer to the mesh to control
     /// \param newMesh A pointer to an allocated mesh
     ///
-    void setMesh(std::shared_ptr<Core::BaseMesh> newMesh);
+    void setCamera(std::shared_ptr<vtkCamera> newCamera);
 
     ///
     /// \brief Get the output device for this tool coupler
     ///
-    std::shared_ptr<Core::BaseMesh> getMesh() const;
+    std::shared_ptr<vtkCamera> getcamera() const;
 
     ///
-    /// \brief Get the current polling delay
+    /// \brief Get the current pooling delay
     /// \return The currently set polling delay
     ///
-    const std::chrono::milliseconds &getPollDelay() const;
+    const std::chrono::milliseconds &getPoolDelay() const;
 
     ///
-    /// \brief Set the polling delay of the controller to get new data from the device
+    /// \brief Set the pooling delay of the controller to get new data from the device
     /// \param delay The new polling delay to set
     ///
-    void setPollDelay(const std::chrono::milliseconds &delay);
+    void setPoolDelay(const std::chrono::milliseconds &delay);
 
     ///
     /// \brief Get the current scaling factor
@@ -113,18 +101,18 @@ public:
 
     ///
     /// \brief Set how much to scale the physical movement by in 3D space
-    /// \param factor The new scaling factor to set
+    /// \param The new scaling factor to set
     ///
-    void setScalingFactor(const double &factor);
+    void setScalingFactor(const double factor);
 
     ///
     /// \brief Get the current orientation
-    /// \return The currently set scaling factor
+    /// \return The orientation
     ///
     const core::Quaterniond &getOrientation() const;
 
     ///
-    /// \brief Set orientationmuch to scale the physical movement by in 3D space
+    /// \brief Set orientation much to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
     void setOrientation(const Eigen::Map<core::Quaterniond> &newOrientation);
@@ -136,10 +124,10 @@ public:
     const core::Vec3d &getPosition() const;
 
     ///
-    /// \brief Set orientationmuch to scale the physical movement by in 3D space
+    /// \brief Set orientation much to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
-    void setPosition(const core::Vec3d &newOrientation);
+    void setPosition(const core::Vec3d &newPosition);
 
     ///
     /// \brief Set offset orientation much to scale the physical movement by in 3D space
@@ -158,16 +146,6 @@ public:
     /// \return The currently set scaling factor
     ///
     const core::Vec3d &getOffsetPosition() const;
-
-	///
-	/// \brief Return the previous position
-	///
-    const core::Vec3d& getPrevPosition() const;
-
-	///
-	/// \brief Return the previous orientation
-	///
-    const core::Quaterniond& getPrevOrientation() const;
 
     ///
     /// \brief Set offset orientation much to scale the physical movement by in 3D space
@@ -192,28 +170,18 @@ public:
     ///
     bool updateTracker();
 
-    ///
-    /// \brief Update forces of the model from device data.
-    ///
-    bool updateForces();
-
 private:
-    core::Quaterniond orientation; //!< Previous rotation quaternion from phantom
-    core::Vec3d position;          //!< Previous position from phantom
-
-    core::Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom
-    core::Vec3d prevPosition;          //!< Previous position from phantom
-
+    TransformType initialTransform; //!< Transform applied to the position obtained from device
+    core::Quaterniond orientation; //!< Previous rotation quaternion from device
+    core::Vec3d position;          //!< Previous position from device
     double scalingFactor;          //!< Scaling factor for physical to virtual translation
 
     core::Quaterniond offsetOrientation; //!< Previous rotation quaternion from device
     core::Vec3d offsetPosition;          //!< Previous position from device
 
-    std::chrono::milliseconds pollDelay;  //!< Polling delay
-    std::shared_ptr<Core::BaseMesh> mesh; //!< Pointer to controlled mesh
+    std::chrono::milliseconds poolDelay;  //!< Pooling delay
+    std::shared_ptr<vtkCamera> camera; //!< Pointer to rendering camera
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
-    std::shared_ptr<DeviceInterface> outputDevice; //!< Pointer to output device
-    TransformType initialTransform; //!< Transform applied to the position obtained from device
 };
 
-#endif // TOOLCOUPLER_H
+#endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

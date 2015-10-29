@@ -290,3 +290,8 @@ void ViewerBase::setGlobalAxisLength(const float len)
 {
     this->globalAxisLength = len;
 }
+
+void ViewerBase::setViewerRenderDetail(const unsigned int newRenderDetail)
+{
+    this->viewerRenderDetail = newRenderDetail;
+}

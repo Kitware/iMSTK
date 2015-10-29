@@ -153,6 +153,8 @@ public:
         return this->valid;
     }
 
+    void setViewerRenderDetail(const unsigned int newRenderDetail);
+
     std::string windowTitle;
     Color defaultDiffuseColor;
     Color defaultAmbientColor;

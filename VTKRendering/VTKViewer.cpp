@@ -180,7 +180,7 @@ public:
             }
 
             // Set up camera
-            auto camera = ro.scene->getCamera();
+            auto camera = ro.scene->getCamera()->getDefaultCamera();
             if(camera)
             {
                 this->addCamera(renderer.GetPointer(),camera.get());
@@ -234,16 +234,23 @@ public:
         style->SetCurrentStyleToTrackballCamera();
         renderWindowInteractor->SetInteractorStyle(style.GetPointer());
 
-        if(0)// viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        if ( viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
         {
-            // FIXME: This causes the renderer to crash.
-            vtkNew<vtkAxesActor> axesActor;
-            vtkNew<vtkOrientationMarkerWidget> orientationWidget;
-            orientationWidget->SetOrientationMarker( axesActor.GetPointer() );
-            orientationWidget->SetInteractor( renderWindowInteractor.GetPointer() );
-            orientationWidget->SetEnabled( 1 );
-            orientationWidget->InteractiveOff();
+            vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
+
+            renderer->AddActor(axes);
         }
+
+        //if(0)// viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        //{
+        //    // FIXME: This causes the renderer to crash.
+        //    vtkNew<vtkAxesActor> axesActor;
+        //    vtkNew<vtkOrientationMarkerWidget> orientationWidget;
+        //    orientationWidget->SetOrientationMarker( axesActor.GetPointer() );
+        //    orientationWidget->SetInteractor( renderWindowInteractor.GetPointer() );
+        //    orientationWidget->SetEnabled( 1 );
+        //    orientationWidget->InteractiveOff();
+        //}
 
         // Set up background
         auto background = this->viewer->getRenderDetail()->getBackground().getValue();
