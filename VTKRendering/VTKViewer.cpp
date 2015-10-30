@@ -254,8 +254,20 @@ public:
         //}
 
         // Set up background
-        auto background = this->viewer->getRenderDetail()->getBackground().getValue();
-        renderer->SetBackground(background[0],background[1],background[2]);
+        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADE_BACKGROUND)
+        {
+            auto bgTop = this->viewer->getRenderDetail()->getBackgroundTop().getValue();
+            auto bgBottom = this->viewer->getRenderDetail()->getBackgroundBottom().getValue();
+
+            renderer->GradientBackgroundOn();
+            renderer->SetBackground(bgBottom[0], bgBottom[1], bgBottom[2]);
+            renderer->SetBackground2(bgTop[0], bgTop[1], bgTop[2]);
+        }
+        else
+        {
+            auto background = this->viewer->getRenderDetail()->getBackground().getValue();
+            renderer->SetBackground(background[0], background[1], background[2]);
+        }
     }
 
 public:

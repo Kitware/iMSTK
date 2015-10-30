@@ -86,5 +86,6 @@ enum VBOResult
 #define    SIMMEDTK_VIEWERRENDER_DISABLE                        (1<<11)
 #define    SIMMEDTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
 #define    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS                    (1<<13)
+#define    SIMMEDTK_VIEWERRENDER_FADE_BACKGROUND                (1<<14)
 
 #endif // SMCONFIGRENDERING_H

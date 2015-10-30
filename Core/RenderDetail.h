@@ -172,6 +172,16 @@ public:
         return this->background;
     }
 
+    const Color &getBackgroundTop() const
+    {
+        return this->faceBackgroundTop;
+    }
+
+    const Color &getBackgroundBottom() const
+    {
+        return this->faceBackgroundBottom;
+    }
+
     void setBackground(const Color &value)
     {
         this->background = value;
@@ -196,6 +206,9 @@ public:
     float opacity; // opacity
     std::string textureFilename; // file name for the texture attached]
     Color background;
+
+    Color faceBackgroundBottom;
+    Color faceBackgroundTop;
 
     std::vector<std::shared_ptr<UnifiedId>> shaders; // attached shaders
     std::vector<bool> shaderEnable; // enable/disable any attached shader

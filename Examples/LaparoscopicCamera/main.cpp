@@ -95,7 +95,7 @@ int main(int ac, char** av)
     dragonRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
     dragonRenderDetail->setDiffuseColor(Color(0.0, 0.8, 0.0, 1.0));
     dragonRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
-    dragonRenderDetail->setShininess(20.0);
+    dragonRenderDetail->setShininess(100.0);
 
     dragenModel->setRenderDetail(dragonRenderDetail);
 
@@ -112,7 +112,10 @@ int main(int ac, char** av)
 
     auto viewer = sdk->getViewerInstance();
 
-    viewer->setViewerRenderDetail(SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS);
+    viewer->setViewerRenderDetail(
+        SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS
+        //| SIMMEDTK_VIEWERRENDER_FADE_BACKGROUND
+        );
 
     // Get Scene
     auto scene = sdk->getScene(0);
@@ -142,7 +145,7 @@ int main(int ac, char** av)
         camClient->setDeviceURL(input);
     }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
-    camController->setScalingFactor(30.0);
+    camController->setScalingFactor(40.0);
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
     camController->setCamera((std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
