@@ -6,25 +6,24 @@ simmedtk_add_library(Rendering
     GLUtils.cpp
     MetalShader.cpp
     OpenGLRenderer.cpp
-    Shader.cpp
+    OpenGLViewer.cpp
     SceneTextureShader.cpp
+    Shader.cpp
     TextureManager.cpp
     VAO.cpp
     VBO.cpp
-    OpenGLViewer.cpp
   PUBLIC_HEADERS
-    ConfigRendering.h
     CustomRenderer.h
     FrameBuffer.h
-    OpenGLRenderer.h
     GLUtils.h
     MetalShader.h
+    OpenGLRenderer.h
+    OpenGLViewer.h
     SceneTextureShader.h
     Shader.h
     TextureManager.h
     VAO.h
     VBO.h
-    OpenGLViewer.h
 )
 
 target_link_libraries(Rendering

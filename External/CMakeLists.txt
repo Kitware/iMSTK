@@ -5,7 +5,10 @@ simmedtk_add_library(External
     RenderBuffer.cpp
   PUBLIC_HEADERS
     FrameBufferObject.h
+    moller.h
+    moller2.h
     RenderBuffer.h
+    tree.hh
 )
 
 target_compile_options(External

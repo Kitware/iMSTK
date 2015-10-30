@@ -4,16 +4,16 @@ include(${VTK_USE_FILE})
 simmedtk_add_library(IO
   SOURCES
     initIO.cpp
+    IOMesh.cpp
     IOMesh3dsDelegate.cpp
     IOMeshAssimpDelegate.cpp
-    IOMesh.cpp
     IOMeshDelegate.cpp
     IOMeshVegaDelegate.cpp
     IOMeshVTKDelegate.cpp
   PUBLIC_HEADERS
+    initIO.h
     IOMesh.h
     IOMeshDelegate.h
-    initIO.h
 )
 
 target_link_libraries(IO

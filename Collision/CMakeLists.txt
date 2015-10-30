@@ -1,23 +1,27 @@
 
 simmedtk_add_library(Collision
   SOURCES
-    SpatialHashCollision.cpp
-    OctreeCell.cpp
     CollisionMoller.cpp
     CollisionUtilities.cpp
-    OctreeCell.cpp
     MeshCollisionModel.cpp
     MeshToMeshCollision.cpp
-    PlaneToMeshCollision.cpp
+    OctreeCell.cpp
     PlaneCollisionModel.cpp
+    PlaneToMeshCollision.cpp
+    SpatialHashCollision.cpp
   PUBLIC_HEADERS
-    SpatialGrid.h
-    SpatialHash.h
-    OctreeCell.h
     CollisionMoller.h
+    CollisionUtilities.h
     MeshCollisionModel.h
     MeshToMeshCollision.h
+    OctreeCell.h
+    PlaneCollisionModel.h
     PlaneToMeshCollision.h
+    SpatialHashCollision.h
+    SurfaceTree.h
+    SurfaceTree.hpp
+    SurfaceTreeCell.h
+    SurfaceTreeIterator.h
 )
 
 target_link_libraries(Collision
