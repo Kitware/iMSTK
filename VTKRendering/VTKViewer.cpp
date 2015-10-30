@@ -30,6 +30,7 @@
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkRenderer.h>
+#include <vtkRendererCollection.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkInteractorStyleSwitch.h>
@@ -291,6 +292,13 @@ void VTKViewer::render()
 
     this->endModule();
 }
+
+vtkCamera* VTKViewer::getVtkCamera()
+{
+    return this->renderer->getRenderWindow()->GetRenderers()->
+        GetFirstRenderer()->GetActiveCamera();
+}
+
 void VTKViewer::initRenderingContext()
 {
     this->renderer->addRenderer();

@@ -74,12 +74,12 @@ public:
     /// \brief Set the pointer to the mesh to control
     /// \param newMesh A pointer to an allocated mesh
     ///
-    void setCamera(std::shared_ptr<vtkCamera> newCamera);
+    void setCamera(vtkCamera* newCamera);
 
     ///
     /// \brief Get the output device for this tool coupler
     ///
-    std::shared_ptr<vtkCamera> getcamera() const;
+    vtkCamera* getcamera() const;
 
     ///
     /// \brief Get the current pooling delay
@@ -173,6 +173,10 @@ public:
 private:
     TransformType initialTransform; //!< Transform applied to the position obtained from device
     core::Quaterniond orientation; //!< Previous rotation quaternion from device
+
+    core::Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom
+    core::Vec3d prevPosition;          //!< Previous position from phantom
+
     core::Vec3d position;          //!< Previous position from device
     double scalingFactor;          //!< Scaling factor for physical to virtual translation
 
@@ -180,7 +184,7 @@ private:
     core::Vec3d offsetPosition;          //!< Previous position from device
 
     std::chrono::milliseconds poolDelay;  //!< Pooling delay
-    std::shared_ptr<vtkCamera> camera; //!< Pointer to rendering camera
+    vtkCamera* camera; //!< Pointer to rendering camera
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
 };
 

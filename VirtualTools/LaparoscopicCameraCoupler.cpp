@@ -63,12 +63,12 @@ std::shared_ptr< DeviceInterface > LaparoscopicCameraCoupler::getInputDevice()
     return this->inputDevice;
 }
 
-void LaparoscopicCameraCoupler::setCamera(std::shared_ptr<vtkCamera> newCamera)
+void LaparoscopicCameraCoupler::setCamera(vtkCamera* newCamera)
 {
     this->camera = newCamera;
 }
 
-std::shared_ptr<vtkCamera> LaparoscopicCameraCoupler::getcamera() const
+vtkCamera* LaparoscopicCameraCoupler::getcamera() const
 {
     return this->camera;
 }
@@ -142,23 +142,30 @@ void LaparoscopicCameraCoupler::exec()
 
 bool LaparoscopicCameraCoupler::updateTracker()
 {
-    if(!this->inputDevice)
+
+    if (!this->inputDevice)
     {
         std::cout << "Invalid input device" << std::endl;
         return false;
     }
-    core::Quaterniond rot = inputDevice->getOrientation();
-    core::Vec3d pos = inputDevice->getPosition() * this->scalingFactor;
 
-    Eigen::Quaterniond rotation(rot * this->orientation);
-    Eigen::Translation3d translation(pos - rotation*this->position);
 
-    this->mesh->transform(/*this->initialTransform**/translation*rotation);
+    /*this->prevPosition = this->position;
+    this->prevOrientation = this->orientation;*/
 
-    this->mesh->getRenderDelegate()->modified(); //tell the renderer to update
+    core::Quaterniond newRot = inputDevice->getOrientation();
+    core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
 
-    this->position = pos;
-    this->orientation = rot.conjugate();
+    this->camera->SetPosition(newPos[0], newPos[1], newPos[2]);
+    return true;
+
+    Eigen::Quaterniond deltaRotation(newRot * this->orientation.conjugate());
+    Eigen::Translation3d translationPrev(-this->position);
+    Eigen::Translation3d translationPresent(newPos);
+    Eigen::Translation3d translationOffset(this->offsetPosition);
+
+    this->position = newPos + this->offsetPosition;
+    this->orientation = this->offsetOrientation * newRot;
 
     return true;
 }

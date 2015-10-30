@@ -26,6 +26,8 @@
 
 #include "Core/ViewerBase.h"
 
+class vtkCamera;
+
 class VTKViewer : public ViewerBase
 {
 
@@ -76,6 +78,11 @@ public:
     /// \brief Run when frame ends
     ///
     void endFrame() override {}
+
+    ///
+    /// \brief Returns the pointer to the current vtk camera
+    ///
+    vtkCamera* getVtkCamera();
 
 protected:
     ///
@@ -136,6 +143,5 @@ private:
     class VTKRenderer;
     std::unique_ptr<VTKRenderer> renderer;
 };
-
 
 #endif // VTKVIEWER_H

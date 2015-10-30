@@ -38,7 +38,6 @@ ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
 
     this->offsetPosition.setZero();
     this->offsetOrientation.setIdentity();
-    //this->offsetOrientation = core::Quaterniond(-30.0,1,0,0);
 
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
@@ -53,7 +52,6 @@ ToolCoupler::ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice)
 
     this->offsetPosition.setZero();
     this->offsetOrientation.setIdentity();
-    //this->offsetOrientation = core::Quaterniond(-30.0, 1, 0, 0);
 
     this->pollDelay = std::chrono::milliseconds(100);
     this->initialTransform.Identity();
@@ -69,9 +67,6 @@ ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
 
     this->offsetPosition.setZero();
     this->offsetOrientation.setIdentity();
-    //this->offsetOrientation = core::Quaterniond(-30, 1, 0, 0);
-
-
 
     this->pollDelay = std::chrono::milliseconds(100);
     this->mesh = toolMesh;
@@ -138,7 +133,8 @@ const Eigen::Quaternion<double> &ToolCoupler::getOrientation() const
     return this->orientation;
 }
 
-void ToolCoupler::setOrientation(const Eigen::Map< Eigen::Quaternion< double > >& newOrientation)
+void ToolCoupler::setOrientation(
+    const Eigen::Map< Eigen::Quaternion< double > >& newOrientation)
 {
     this->orientation = newOrientation;
 }
