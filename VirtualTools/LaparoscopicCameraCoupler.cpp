@@ -149,25 +149,17 @@ bool LaparoscopicCameraCoupler::updateTracker()
         return false;
     }
 
-
-    /*this->prevPosition = this->position;
-    this->prevOrientation = this->orientation;*/
-
     core::Quaterniond newRot = inputDevice->getOrientation();
     core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
 
+    core::Vec3d transformedFocus = newRot._transformVector(core::Vec3d(0, 0, -200));
+    core::Vec3d transformedUpVector = newRot._transformVector(core::Vec3d(0, 1, 0));
+
     this->camera->SetPosition(newPos[0], newPos[1], newPos[2]);
+    this->camera->SetViewUp(transformedUpVector[0], transformedUpVector[1], transformedUpVector[2]);
+    this->camera->SetFocalPoint(transformedFocus[0], transformedFocus[1], transformedFocus[2]);
     return true;
 
-    Eigen::Quaterniond deltaRotation(newRot * this->orientation.conjugate());
-    Eigen::Translation3d translationPrev(-this->position);
-    Eigen::Translation3d translationPresent(newPos);
-    Eigen::Translation3d translationOffset(this->offsetPosition);
-
-    this->position = newPos + this->offsetPosition;
-    this->orientation = this->offsetOrientation * newRot;
-
-    return true;
 }
 
 void LaparoscopicCameraCoupler::setOffsetOrientation(

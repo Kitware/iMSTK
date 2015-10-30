@@ -142,7 +142,7 @@ int main(int ac, char** av)
         camClient->setDeviceURL(input);
     }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
-    camController->setScalingFactor(20.0);
+    camController->setScalingFactor(30.0);
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
     camController->setCamera((std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
