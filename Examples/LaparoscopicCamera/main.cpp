@@ -102,19 +102,15 @@ int main(int ac, char** av)
     sdk->addSceneActor(staticDragon, staticSimulator2);
 
     //-------------------------------------------------------
-    // Register both object simulators
-    //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
-
-    //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
 
     auto viewer = sdk->getViewerInstance();
 
     viewer->setViewerRenderDetail(
-        SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS
-        //| SIMMEDTK_VIEWERRENDER_FADE_BACKGROUND
+        SIMMEDTK_VIEWERRENDER_GLOBALAXIS
+        | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND
+        | SIMMEDTK_DISABLE_MOUSE_INTERACTION
         );
 
     // Get Scene
@@ -148,7 +144,8 @@ int main(int ac, char** av)
     camController->setScalingFactor(40.0);
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
-    camController->setCamera((std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
+    camController->setCamera(
+        (std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
 
     sdk->registerModule(camClient);
     sdk->registerModule(camController);

@@ -38,6 +38,7 @@ public:
     VTKViewer(const VTKViewer& other) = delete;
     VTKViewer& operator=(const VTKViewer& other) = delete;
 
+    class customMouseInteractorStyle;
 public:
     ///
     /// \brief Execute when exit viewer

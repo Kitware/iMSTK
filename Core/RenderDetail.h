@@ -163,6 +163,7 @@ public:
 
     bool renderNormals() const;
     bool renderWireframe() const;
+    bool renderFaces() const;
 
     const float &getOpacity() const;
     void setOpacity(const float &value);

@@ -134,6 +134,13 @@ void MeshRenderDelegate::initDraw()
     {
         actor->GetProperty()->SetRepresentationToWireframe();
     }
+
+    if (renderDetail && renderDetail->renderFaces())
+    {
+        actor->GetProperty()->SetRepresentationToSurface();
+        actor->GetProperty()->SetInterpolationToPhong();
+    }
+
     vtkSmartPointer<vtkTexture> texture;
     if(renderDetail && renderDetail->renderTexture())
     {

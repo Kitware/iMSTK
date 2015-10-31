@@ -40,6 +40,27 @@
 #include <vtkLight.h>
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkObjectFactory.h>
+
+// Remove the mouse interaction
+class VTKViewer::customMouseInteractorStyle : public vtkInteractorStyleTrackballCamera
+{
+public:
+    static customMouseInteractorStyle* New();
+    vtkTypeMacro(customMouseInteractorStyle, vtkInteractorStyleTrackballCamera);
+
+    virtual void 	OnMouseMove(){}
+    virtual void 	OnLeftButtonDown(){}
+    virtual void 	OnLeftButtonUp(){}
+    virtual void 	OnMiddleButtonDown(){}
+    virtual void 	OnMiddleButtonUp(){}
+    virtual void 	OnRightButtonDown(){}
+    virtual void 	OnRightButtonUp(){}
+    virtual void 	OnMouseWheelForward(){}
+    virtual void 	OnMouseWheelBackward(){}
+};
+vtkStandardNewMacro(VTKViewer::customMouseInteractorStyle);
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
@@ -190,7 +211,8 @@ public:
             // Set up actors
             for(const auto &object : ro.scene->getSceneObject())
             {
-                delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
+                delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
+                    object->getRenderDelegate());
                 if (delegate)
                 {
                     renderer->AddActor(delegate->getActor());
@@ -201,7 +223,8 @@ public:
         // Add actors from objects directly attached to the viewer.
         for(const auto &object : this->viewer->objectList)
         {
-            delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(object->getRenderDelegate());
+            delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(
+                object->getRenderDelegate());
             if (delegate)
             {
                 renderer->AddActor(delegate->getActor());
@@ -225,17 +248,20 @@ public:
         this->renderWindow->SetWindowName(this->viewer->windowTitle.data());
         this->renderWindowInteractor->SetRenderWindow(this->renderWindow.GetPointer());
         this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
-        this->renderWindowInteractor->AddObserver(vtkCommand::ExitEvent,this);
+        this->renderWindowInteractor->AddObserver(vtkCommand::ExitEvent, this);
+
+        if (viewer->viewerRenderDetail & SIMMEDTK_DISABLE_MOUSE_INTERACTION)
+        {
+            vtkSmartPointer<customMouseInteractorStyle> customStyle =
+                vtkSmartPointer<customMouseInteractorStyle>::New();
+            renderWindowInteractor->SetInteractorStyle(customStyle);
+        }
 
         // Initialize must be called prior to creating timer events.
         this->renderWindowInteractor->Initialize();
         this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
 
-        vtkNew<vtkInteractorStyleSwitch> style;
-        style->SetCurrentStyleToTrackballCamera();
-        renderWindowInteractor->SetInteractorStyle(style.GetPointer());
-
-        if ( viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        if ( viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBALAXIS)
         {
             vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
 
@@ -254,7 +280,7 @@ public:
         //}
 
         // Set up background
-        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADE_BACKGROUND)
+        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
         {
             auto bgTop = this->viewer->getRenderDetail()->getBackgroundTop().getValue();
             auto bgBottom = this->viewer->getRenderDetail()->getBackgroundBottom().getValue();

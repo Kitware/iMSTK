@@ -156,10 +156,18 @@ bool LaparoscopicCameraCoupler::updateTracker()
     core::Vec3d transformedUpVector = newRot._transformVector(core::Vec3d(0, 1, 0));
 
     this->camera->SetPosition(newPos[0], newPos[1], newPos[2]);
-    this->camera->SetViewUp(transformedUpVector[0], transformedUpVector[1], transformedUpVector[2]);
-    this->camera->SetFocalPoint(transformedFocus[0], transformedFocus[1], transformedFocus[2]);
-    return true;
 
+    this->camera->SetViewUp(
+        transformedUpVector[0],
+        transformedUpVector[1],
+        transformedUpVector[2]);
+
+    this->camera->SetFocalPoint(
+        transformedFocus[0],
+        transformedFocus[1],
+        transformedFocus[2]);
+
+    return true;
 }
 
 void LaparoscopicCameraCoupler::setOffsetOrientation(

@@ -225,3 +225,7 @@ bool RenderDetail::renderWireframe() const
 {
     return this->renderType & SIMMEDTK_RENDER_WIREFRAME;
 }
+bool RenderDetail::renderFaces() const
+{
+    return this->renderType & SIMMEDTK_RENDER_FACES;
+}
