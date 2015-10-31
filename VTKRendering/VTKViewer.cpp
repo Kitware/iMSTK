@@ -40,27 +40,6 @@
 #include <vtkLight.h>
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
-#include <vtkInteractorStyleTrackballCamera.h>
-#include <vtkObjectFactory.h>
-
-// Remove the mouse interaction
-class VTKViewer::customMouseInteractorStyle : public vtkInteractorStyleTrackballCamera
-{
-public:
-    static customMouseInteractorStyle* New();
-    vtkTypeMacro(customMouseInteractorStyle, vtkInteractorStyleTrackballCamera);
-
-    virtual void 	OnMouseMove(){}
-    virtual void 	OnLeftButtonDown(){}
-    virtual void 	OnLeftButtonUp(){}
-    virtual void 	OnMiddleButtonDown(){}
-    virtual void 	OnMiddleButtonUp(){}
-    virtual void 	OnRightButtonDown(){}
-    virtual void 	OnRightButtonUp(){}
-    virtual void 	OnMouseWheelForward(){}
-    virtual void 	OnMouseWheelBackward(){}
-};
-vtkStandardNewMacro(VTKViewer::customMouseInteractorStyle);
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
@@ -252,9 +231,17 @@ public:
 
         if (viewer->viewerRenderDetail & SIMMEDTK_DISABLE_MOUSE_INTERACTION)
         {
-            vtkSmartPointer<customMouseInteractorStyle> customStyle =
-                vtkSmartPointer<customMouseInteractorStyle>::New();
-            renderWindowInteractor->SetInteractorStyle(customStyle);
+            renderWindowInteractor->RemoveObservers("LeftButtonPressEvent");
+            renderWindowInteractor->RemoveObservers("RightButtonPressEvent");
+            renderWindowInteractor->RemoveObservers("MiddleButtonPressEvent");
+
+            renderWindowInteractor->RemoveObservers("LeftButtonReleaseEvent");
+            renderWindowInteractor->RemoveObservers("RightButtonReleaseEvent");
+            renderWindowInteractor->RemoveObservers("MiddleButtonReleaseEvent");
+
+            renderWindowInteractor->RemoveObservers("MouseWheelBackwardEvent");
+            renderWindowInteractor->RemoveObservers("MouseWheelForwardEvent");
+            renderWindowInteractor->RemoveObservers("MouseMoveEvent");
         }
 
         // Initialize must be called prior to creating timer events.

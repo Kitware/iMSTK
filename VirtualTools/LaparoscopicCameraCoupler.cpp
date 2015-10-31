@@ -142,7 +142,6 @@ void LaparoscopicCameraCoupler::exec()
 
 bool LaparoscopicCameraCoupler::updateTracker()
 {
-
     if (!this->inputDevice)
     {
         std::cout << "Invalid input device" << std::endl;
