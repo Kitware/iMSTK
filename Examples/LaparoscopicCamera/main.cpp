@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include <memory>
+#include <math.h>
 
 // Core SimMedTK includes
 #include "Core/SDK.h"
@@ -51,6 +52,27 @@
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
+std::shared_ptr<MeshCollisionModel> createStaticSceneObject(
+    std::shared_ptr<SDK> sdk,
+    char* meshFile,
+    std::shared_ptr<RenderDetail> renderProp)
+{
+    auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+
+    auto staticDragon = std::make_shared<StaticSceneObject>();
+
+    auto dragenModel = std::make_shared<MeshCollisionModel>();
+    dragenModel->loadTriangleMesh(meshFile);
+    dragenModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
+    staticDragon->setModel(dragenModel);
+
+    dragenModel->setRenderDetail(renderProp);
+
+    sdk->addSceneActor(staticDragon, staticSimulator2);
+
+    return dragenModel;
+}
+
 int main(int ac, char** av)
 {
     initVTKRendering();
@@ -68,7 +90,7 @@ int main(int ac, char** av)
     auto staticObject = std::make_shared<StaticSceneObject>();
 
     auto plane = std::make_shared<PlaneCollisionModel>(
-      core::Vec3d(0.0, -3.0, 0.0),
+      core::Vec3d(0.0, -0.01, 0.0),
       core::Vec3d(0.0, 1.0, 0.0));
     plane->getPlaneModel()->setWidth(5);
     if (ac > 2)
@@ -80,26 +102,23 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     // Create scene actor 2:  dragon
     //-------------------------------------------------------
-    auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
-
-    // create a static plane scene object of given normal and position
-    auto staticDragon = std::make_shared<StaticSceneObject>();
-
-    auto dragenModel = std::make_shared<MeshCollisionModel>();
-    dragenModel->loadTriangleMesh("./asianDragon.vtk");
-    dragenModel->getMesh()->scale(Eigen::UniformScaling<double>(0.2));
-    staticDragon->setModel(dragenModel);
-
     auto dragonRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
 
     dragonRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-    dragonRenderDetail->setDiffuseColor(Color(0.0, 0.8, 0.0, 1.0));
+    dragonRenderDetail->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
     dragonRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
     dragonRenderDetail->setShininess(100.0);
 
-    dragenModel->setRenderDetail(dragonRenderDetail);
+    double radius = 3.0;
+    for (int i = 0; i < 6; i++)
+    {
+        auto meshModel = createStaticSceneObject(sdk, "./Target.vtk", dragonRenderDetail);
 
-    sdk->addSceneActor(staticDragon, staticSimulator2);
+        meshModel->getMesh()->translate(Eigen::Translation3d(0,0,-radius));
+
+        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
+        meshModel->getMesh()->rotate(q);
+    }
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -141,7 +160,7 @@ int main(int ac, char** av)
         camClient->setDeviceURL(input);
     }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
-    camController->setScalingFactor(40.0);
+    camController->setScalingFactor(50.0);
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
     camController->setCamera(
