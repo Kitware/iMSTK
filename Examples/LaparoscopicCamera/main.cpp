@@ -58,7 +58,7 @@ bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
     meshRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
     meshRenderDetail->setShininess(100.0);
 
-    double radius = 2.0;
+    double radius = 3.0;
     for (int i = 0; i < 6; i++)
     {
         auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
@@ -99,7 +99,7 @@ int main(int ac, char** av)
     auto staticObject = std::make_shared<StaticSceneObject>();
 
     auto plane = std::make_shared<PlaneCollisionModel>(
-      core::Vec3d(0.0, -3.01, 0.0),
+      core::Vec3d(0.0, -0.01, 0.0),
       core::Vec3d(0.0, 1.0, 0.0));
     plane->getPlaneModel()->setWidth(5);
     if (ac > 2)
@@ -123,7 +123,7 @@ int main(int ac, char** av)
     // Create camera navigation scene
     //-------------------------------------------------------
 
-    createCameraNavigationScene(sdk, "./asianDragon.vtk");
+    createCameraNavigationScene(sdk, "./Target.vtk");
 
     //-------------------------------------------------------
     // Customize the viewer
