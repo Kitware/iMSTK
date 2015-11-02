@@ -52,35 +52,38 @@ else()
 	endif()
 endif()
 
-find_path(LIBUSB1_INCLUDE_DIR
-	NAMES
-	libusb.h
-	PATHS
-	${PC_LIBUSB1_INCLUDE_DIRS}
-	${PC_LIBUSB1_INCLUDEDIR}
-	HINTS
-	"${LIBUSB1_ROOT_DIR}"
-	PATH_SUFFIXES
-	include
-	libusb-1.0
-	include/libusb-1.0)
-
 find_library(LIBUSB1_LIBRARY
-	NAMES
+NAMES
 	usb-1.0
 	libusb-1.0
-	PATHS
-	${PC_LIBUSB1_LIBRARY_DIRS}
-	${PC_LIBUSB1_LIBDIR}
-	${LIBUSB1_ROOT_DIR}
-	PATH_SUFFIXES
-	${_lib_suffixes})
+PATHS
+	"${LIBUSB1_ROOT_DIR}"
+PATH_SUFFIXES
+	${_lib_suffixes}
+)
+list(APPEND CMAKE_INCLUDE_PATH ${LIBUSB1_ROOT_DIR}/include/libusb-1.0/)
+if(EXISTS ${LIBUSB1_ROOT_DIR}/include/libusb-1.0/libusb.h)
 
+					message("CMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}")
+endif()
+find_path(LIBUSB1_INCLUDE_DIR
+	NAMES
+		libusb.h
+	PATHS
+		${LIBUSB1_ROOT_DIR}/include/libusb-1.0/
+	PATH_SUFFIXES
+		include/libusb-1.0
+		include
+		libusb-1.0
+	)
+
+		message("_lib_suffixes=${_lib_suffixes}")
+		message("LIBUSB1_LIBRARY=${LIBUSB1_LIBRARY}")
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Libusb1
-	DEFAULT_MSG
 	LIBUSB1_LIBRARY
-	LIBUSB1_INCLUDE_DIR)
+#	LIBUSB1_INCLUDE_DIR
+)
 
 if(LIBUSB1_FOUND)
 	set(LIBUSB1_LIBRARIES "${LIBUSB1_LIBRARY}")

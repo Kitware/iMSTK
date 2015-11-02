@@ -39,7 +39,7 @@ class VRPNDeviceServer : public DeviceInterface
 
 public:
     VRPNDeviceServer();
-    ~VRPNDeviceServer();
+    ~VRPNDeviceServer() = default;
 
     void exec() override;
 
@@ -47,7 +47,7 @@ private:
     std::vector<std::shared_ptr<vrpn_Analog>> analogServers;
     std::vector<std::shared_ptr<vrpn_Tracker>> trackerServers;
     std::vector<std::shared_ptr<vrpn_ForceDeviceServer>> forceServers;
-    std::vector<std::shared_ptr<vrpn_Connection>> connectionList;
+    std::shared_ptr<vrpn_Connection> connection;
 };
 
 #endif // VRPNSERVERDEVICE_H

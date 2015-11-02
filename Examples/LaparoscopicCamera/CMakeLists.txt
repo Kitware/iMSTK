@@ -29,7 +29,7 @@ if(NOT EXISTS ${${APP}_DATA})
 endif()
 
 set(FILE_URL http://midas3.kitware.com/midas/download/item/318708/box.tar)
-set(FILE_SHA1 5c6e34c0de6ed2b16263aff2f33098f98a2bb875)
+set(FILE_SHA1 928294a91477bc5d6fa494afb34016ba7f0b40c5)
 set(LOCAL_FILE ${EXAMPLES_DATA}/box.tar)
 
 midas_download(${FILE_URL} ${FILE_SHA1} ${LOCAL_FILE})

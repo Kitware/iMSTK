@@ -32,6 +32,7 @@
 #include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Devices/VRPNForceDevice.h"
+#include "Devices/VRPNDeviceServer.h"
 #include "VirtualTools/ToolCoupler.h"
 #include "VirtualTools/LaparoscopicCameraCoupler.h"
 
@@ -158,16 +159,17 @@ int main(int ac, char** av)
     // Create a Laparoscopic camera controller
     //-------------------------------------------------------
     auto camClient = std::make_shared<VRPNForceDevice>();
+    auto server = std::make_shared<VRPNDeviceServer>();
 
     //get some user input and setup device url
-    std::string input = "Phantom@10.171.2.217";//"Phantom0@localhost";
+    std::string input = "navigator@localhost";
     std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
-    std::getline(std::cin, input);
+//     std::getline(std::cin, input);
 
-    if (!input.empty())
-    {
+//     if (!input.empty())
+//     {
         camClient->setDeviceURL(input);
-    }
+//     }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
     camController->setScalingFactor(50.0);
 
@@ -175,6 +177,7 @@ int main(int ac, char** av)
     camController->setCamera(
         (std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
 
+    sdk->registerModule(server);
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
 

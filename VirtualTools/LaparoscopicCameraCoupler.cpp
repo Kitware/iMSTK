@@ -154,6 +154,9 @@ bool LaparoscopicCameraCoupler::updateTracker()
     core::Vec3d transformedFocus = newRot._transformVector(core::Vec3d(0, 0, -200));
     core::Vec3d transformedUpVector = newRot._transformVector(core::Vec3d(0, 1, 0));
 
+//     std::cout << "newPos" << newPos << std::endl;
+//     std::cout << "transformedUpVector" << transformedUpVector << std::endl;
+//     std::cout << "transformedFocus" << transformedFocus << std::endl;
     this->camera->SetPosition(newPos[0], newPos[1], newPos[2]);
 
     this->camera->SetViewUp(
