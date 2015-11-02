@@ -32,45 +32,54 @@
 #include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Devices/VRPNForceDevice.h"
-
 #include "VirtualTools/ToolCoupler.h"
 #include "VirtualTools/LaparoscopicCameraCoupler.h"
 
 // Include required simulators
 #include "Simulators/VegaFemSimulator.h"
 #include "Simulators/DefaultSimulator.h"
-
 #include "Core/CollisionPair.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
-
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-
 #include "IO/initIO.h"
 
+// VTK includes
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
-std::shared_ptr<MeshCollisionModel> createStaticSceneObject(
-    std::shared_ptr<SDK> sdk,
-    char* meshFile,
-    std::shared_ptr<RenderDetail> renderProp)
+bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
 {
-    auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
-    auto staticDragon = std::make_shared<StaticSceneObject>();
+    meshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
+    meshRenderDetail->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
+    meshRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
+    meshRenderDetail->setShininess(100.0);
 
-    auto dragenModel = std::make_shared<MeshCollisionModel>();
-    dragenModel->loadTriangleMesh(meshFile);
-    dragenModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
-    staticDragon->setModel(dragenModel);
+    double radius = 2.0;
+    for (int i = 0; i < 6; i++)
+    {
+        auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
-    dragenModel->setRenderDetail(renderProp);
+        auto staticTarget = std::make_shared<StaticSceneObject>();
 
-    sdk->addSceneActor(staticDragon, staticSimulator2);
+        auto targetModel = std::make_shared<MeshCollisionModel>();
+        targetModel->loadTriangleMesh(fileName);
+        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
+        staticTarget->setModel(targetModel);
 
-    return dragenModel;
+        targetModel->setRenderDetail(meshRenderDetail);
+
+        sdk->addSceneActor(staticTarget, staticSimulator2);
+
+        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
+
+        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
+        targetModel->getMesh()->rotate(q);
+    }
+    return true;
 }
 
 int main(int ac, char** av)
@@ -90,35 +99,31 @@ int main(int ac, char** av)
     auto staticObject = std::make_shared<StaticSceneObject>();
 
     auto plane = std::make_shared<PlaneCollisionModel>(
-      core::Vec3d(0.0, -0.01, 0.0),
+      core::Vec3d(0.0, -3.01, 0.0),
       core::Vec3d(0.0, 1.0, 0.0));
     plane->getPlaneModel()->setWidth(5);
     if (ac > 2)
       plane->getPlaneModel()->setWidth(atof(av[2]));
     staticObject->setModel(plane);
 
+    auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
+
+    Color grey(0.32, 0.32, 0.32, 1.);
+
+    planeRendDetail->setAmbientColor(grey);
+    planeRendDetail->setDiffuseColor(grey);
+    planeRendDetail->setSpecularColor(grey);
+    planeRendDetail->setShininess(50.0);
+
+    plane->getPlaneModel()->setRenderDetail(planeRendDetail);
+
     sdk->addSceneActor(staticObject, staticSimulator);
 
     //-------------------------------------------------------
-    // Create scene actor 2:  dragon
+    // Create camera navigation scene
     //-------------------------------------------------------
-    auto dragonRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
 
-    dragonRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-    dragonRenderDetail->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
-    dragonRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
-    dragonRenderDetail->setShininess(100.0);
-
-    double radius = 3.0;
-    for (int i = 0; i < 6; i++)
-    {
-        auto meshModel = createStaticSceneObject(sdk, "./Target.vtk", dragonRenderDetail);
-
-        meshModel->getMesh()->translate(Eigen::Translation3d(0,0,-radius));
-
-        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
-        meshModel->getMesh()->rotate(q);
-    }
+    createCameraNavigationScene(sdk, "./asianDragon.vtk");
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -144,6 +149,10 @@ int main(int ac, char** av)
     auto light2 = Light::getDefaultLighting();
     light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
+
+    auto light3 = Light::getDefaultLighting();
+    light3->lightPos.setPosition(core::Vec3d(0.0, 25.0, 0.0));
+    scene->addLight(light3);
 
     //-------------------------------------------------------
     // Create a Laparoscopic camera controller
