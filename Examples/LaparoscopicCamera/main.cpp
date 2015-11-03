@@ -51,7 +51,9 @@
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
-bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, const std::string &fileName)
+#define SPACE_EXPLORER_DEVICE true
+
+bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
 {
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
@@ -161,12 +163,23 @@ int main(int ac, char** av)
     // it to the vtk viewer
     //-------------------------------------------------------
     auto camClient = std::make_shared<VRPNForceDevice>();
-    auto server = std::make_shared<VRPNDeviceServer>();
+    std::shared_ptr<VRPNDeviceServer> server;
+    std::string input;
 
-    //get some user input and setup device url
-    std::string input = "Phantom0@localhost";//"Phantom@10.171.2.217"
-    std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
-    std::getline(std::cin, input);
+    if (SPACE_EXPLORER_DEVICE)
+    {
+        server = std::make_shared<VRPNDeviceServer>();
+
+        //get some user input and setup device url
+        input = "navigator@localhost";
+    }
+    else
+    {
+        //get some user input and setup device url
+        std::string input = "Phantom0@localhost";//"Phantom@10.171.2.217"
+        std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
+        std::getline(std::cin, input);
+    }
 
     if (!input.empty())
     {
@@ -176,8 +189,6 @@ int main(int ac, char** av)
     camController->setScalingFactor(50.0);
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
-    camController->setCamera(
-        (std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
 
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
@@ -194,6 +205,11 @@ int main(int ac, char** av)
 
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
+
+    if (SPACE_EXPLORER_DEVICE)
+    {
+        sdk->registerModule(server);
+    }
 
     //-------------------------------------------------------
     // Run the SDK

@@ -39,6 +39,7 @@
 VRPNDeviceServer::VRPNDeviceServer() : connection(vrpn_create_server_connection())
 {
     this->name = "VRPNDeviceServer";
+
 }
 
 //---------------------------------------------------------------------------
