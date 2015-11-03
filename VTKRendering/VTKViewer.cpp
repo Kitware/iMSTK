@@ -54,6 +54,7 @@ public:
     {
 
     }
+    VTKRenderer(){}
 
     ///
     /// \brief Callback method executed by the render window interactor.
@@ -66,6 +67,11 @@ public:
             {
                 if(timerId == *static_cast<int*>(callData) && !this->viewer->isTerminated())
                 {
+                    if (cameraControllerData != nullptr)
+                    {
+                        updateCamera();
+                    }
+
                     this->renderWindow->Render();
                 }
                 break;
@@ -82,6 +88,30 @@ public:
                 break;
             }
         }
+    }
+
+	///
+	/// \brief Update the camera from external source (optional)
+	///
+    void updateCamera()
+    {
+        vtkCamera* camera = getRenderWindow()->GetRenderers()->
+            GetFirstRenderer()->GetActiveCamera();
+
+        camera->SetPosition(
+            cameraControllerData->position[0],
+            cameraControllerData->position[1],
+            cameraControllerData->position[2]);
+
+        camera->SetViewUp(
+            cameraControllerData->upVector[0],
+            cameraControllerData->upVector[1],
+            cameraControllerData->upVector[2]);
+
+        camera->SetFocalPoint(
+            cameraControllerData->focus[0],
+            cameraControllerData->focus[1],
+            cameraControllerData->focus[2]);
     }
 
     ///
@@ -195,6 +225,7 @@ public:
                 if (delegate)
                 {
                     renderer->AddActor(delegate->getActor());
+
                 }
             }
         }
@@ -288,6 +319,7 @@ public:
     VTKViewer *viewer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
+    std::shared_ptr<cameraConfigurationData> cameraControllerData;
 };
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
@@ -323,6 +355,11 @@ vtkCamera* VTKViewer::getVtkCamera()
     return this->renderer->getRenderWindow()->GetRenderers()->
         GetFirstRenderer()->GetActiveCamera();
 }
+
+void VTKViewer::setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData)
+{
+    renderer->cameraControllerData = camData;
+};
 
 void VTKViewer::initRenderingContext()
 {

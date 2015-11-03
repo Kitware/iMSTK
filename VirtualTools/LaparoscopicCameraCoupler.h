@@ -38,6 +38,16 @@
 
 class DeviceInterface;
 
+struct cameraConfigurationData
+{
+    core::Vec3d position;
+    core::Vec3d focus;
+    core::Vec3d upVector;
+
+    cameraConfigurationData() : position(0, 0, 0), focus(0, 0, -1), upVector(0, 1, 0){};
+    ~cameraConfigurationData(){}
+};
+
 class LaparoscopicCameraCoupler : public Module
 {
 public:
@@ -154,6 +164,16 @@ public:
     void setOffsetPosition(const core::Vec3d &offsetPosition);
 
     ///
+    /// \brief Update position and orientation of the camera based on device data
+    ///
+    bool updateCamera();
+
+	///
+	/// \brief Returns the pointer to the camera data that is updated by this controller
+	///
+    std::shared_ptr<cameraConfigurationData> getCameraData();
+
+    ///
     /// \brief Module overrides
     ///
     bool init() override;
@@ -164,11 +184,6 @@ public:
     /// \brief Update tracker and
     ///
     void exec() override;
-
-    ///
-    /// \brief Update position an orientation of the model from device data.
-    ///
-    bool updateTracker();
 
 private:
     TransformType initialTransform; //!< Transform applied to the position obtained from device
@@ -186,6 +201,8 @@ private:
     std::chrono::milliseconds poolDelay;  //!< Pooling delay
     vtkCamera* camera; //!< Pointer to rendering camera
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
+
+    std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
 };
 
 #endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

@@ -38,6 +38,8 @@ LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     this->poolDelay = std::chrono::milliseconds(100);
     this->initialTransform.setIdentity();
     this->name = "LaparoscopicCameraCoupler";
+
+    cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
 LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
@@ -47,6 +49,8 @@ LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     this->poolDelay = std::chrono::milliseconds(100);
     this->initialTransform.Identity();
     this->name = "LaparoscopicCameraCoupler";
+
+    cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
 LaparoscopicCameraCoupler::~LaparoscopicCameraCoupler()
@@ -131,7 +135,7 @@ void LaparoscopicCameraCoupler::exec()
 
     while(!this->terminateExecution)
     {
-        if(!this->updateTracker())
+        if(!this->updateCamera())
         {
             this->terminate();
         }
@@ -141,7 +145,7 @@ void LaparoscopicCameraCoupler::exec()
     this->inputDevice->closeDevice();
 }
 
-bool LaparoscopicCameraCoupler::updateTracker()
+bool LaparoscopicCameraCoupler::updateCamera()
 {
     if (!this->inputDevice)
     {
@@ -152,23 +156,10 @@ bool LaparoscopicCameraCoupler::updateTracker()
     core::Quaterniond newRot = inputDevice->getOrientation();
     core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
 
-    core::Vec3d transformedFocus = newRot._transformVector(core::Vec3d(0, 0, -200));
-    core::Vec3d transformedUpVector = newRot._transformVector(core::Vec3d(0, 1, 0));
-
-//     std::cout << "newPos" << newPos << std::endl;
-//     std::cout << "transformedUpVector" << transformedUpVector << std::endl;
-//     std::cout << "transformedFocus" << transformedFocus << std::endl;
-    this->camera->SetPosition(newPos[0], newPos[1], newPos[2]);
-
-    this->camera->SetViewUp(
-        transformedUpVector[0],
-        transformedUpVector[1],
-        transformedUpVector[2]);
-
-    this->camera->SetFocalPoint(
-        transformedFocus[0],
-        transformedFocus[1],
-        transformedFocus[2]);
+    // update the camera position, focus and up vector data
+    cameraPosOrientData->position = inputDevice->getPosition() * this->scalingFactor;
+    cameraPosOrientData->focus = newRot._transformVector(core::Vec3d(0, 0, -200));
+    cameraPosOrientData->upVector = newRot._transformVector(core::Vec3d(0, 1, 0));
 
     return true;
 }
@@ -193,3 +184,8 @@ const core::Vec3d & LaparoscopicCameraCoupler::getOffsetPosition() const
 {
     return this->offsetPosition;
 }
+
+std::shared_ptr<cameraConfigurationData> LaparoscopicCameraCoupler::getCameraData()
+{
+    return cameraPosOrientData;
+};

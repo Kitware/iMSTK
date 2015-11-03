@@ -23,7 +23,7 @@
 
 #include <memory>
 #include <string>
-#include <math.h>
+#include <cmath>
 
 // Core SimMedTK includes
 #include "Core/SDK.h"
@@ -51,7 +51,7 @@
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
-bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, std::string fileName)
+bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, const std::string &fileName)
 {
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
@@ -128,7 +128,7 @@ int main(int ac, char** av)
     createCameraNavigationScene(sdk, "./Target.vtk");
 
     //-------------------------------------------------------
-    // Customize the viewer
+    // Set up the viewer
     //-------------------------------------------------------
 
     auto viewer = sdk->getViewerInstance();
@@ -157,20 +157,21 @@ int main(int ac, char** av)
     scene->addLight(light3);
 
     //-------------------------------------------------------
-    // Create a Laparoscopic camera controller
+    // Create a Laparoscopic camera controller and connect
+    // it to the vtk viewer
     //-------------------------------------------------------
     auto camClient = std::make_shared<VRPNForceDevice>();
     auto server = std::make_shared<VRPNDeviceServer>();
 
     //get some user input and setup device url
-    std::string input = "navigator@localhost";
+    std::string input = "Phantom0@localhost";//"Phantom@10.171.2.217"
     std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
-//     std::getline(std::cin, input);
+    std::getline(std::cin, input);
 
-//     if (!input.empty())
-//     {
+    if (!input.empty())
+    {
         camClient->setDeviceURL(input);
-//     }
+    }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
     camController->setScalingFactor(50.0);
 
@@ -178,7 +179,19 @@ int main(int ac, char** av)
     camController->setCamera(
         (std::static_pointer_cast<VTKViewer>(viewer))->getVtkCamera());
 
-    sdk->registerModule(server);
+    std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
+
+    vtkCamera* cam = vtkViewer->getVtkCamera();
+
+    // set the view angle of the camera. 80 deg for laparoscopic camera
+    cam->SetViewAngle(80.0);
+
+    // set the camera to be controlled by the camera controller
+    camController->setCamera(cam);
+
+    // Connect the camera controller to the vtk viewer to enable camera manipulation
+    vtkViewer->setCameraControllerData(camController->getCameraData());
+
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
 

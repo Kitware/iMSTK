@@ -25,6 +25,7 @@
 #define VTKVIEWER_H
 
 #include "Core/ViewerBase.h"
+#include "VirtualTools/LaparoscopicCameraCoupler.h"
 
 class vtkCamera;
 
@@ -83,6 +84,11 @@ public:
     /// \brief Returns the pointer to the current vtk camera
     ///
     vtkCamera* getVtkCamera();
+
+	///
+	/// \brief Sets the position and orientation data from the camera controller
+	///
+    void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
 
 protected:
     ///
