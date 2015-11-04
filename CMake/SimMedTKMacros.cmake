@@ -23,14 +23,19 @@ function(simmedtk_install_library target)
   set(multiValueArgs DEPENDS)
   cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   install(TARGETS ${target}
-    EXPORT VegaFEMTargets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include
+    EXPORT ${target}Targets
+    RUNTIME DESTINATION bin COMPONENT Development
+    LIBRARY DESTINATION lib COMPONENT Development
+    ARCHIVE DESTINATION lib COMPONENT Development
+    INCLUDES DESTINATION include COMPONENT Development
   )
   export(PACKAGE ${target})
-  export(TARGETS ${target} ${target_DEPENDS} APPEND FILE ${target}-exports.cmake)
+  install(EXPORT ${target}Targets
+    DESTINATION "CMake"
+    NAMESPACE mstk::
+    EXPORT_LINK_INTERFACE_LIBRARIES
+    COMPONENT Development
+  )
 endfunction()
 
 function(simmedtk_add_library target)
@@ -46,13 +51,13 @@ function(simmedtk_add_library target)
   target_include_directories(${target}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}>
-      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}/${target}>
+      $<INSTALL_INTERFACE:include>
+      $<INSTALL_INTERFACE:include/${target}>
     )
   if (target_PUBLIC_HEADERS)
     simmedtk_install_library(${target})
     install(FILES ${target_PUBLIC_HEADERS}
-      DESTINATION include/v${SimMedTK_VERSION}/${target}
+      DESTINATION include/${target}
       COMPONENT Development
     )
   endif()

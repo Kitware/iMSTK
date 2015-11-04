@@ -1,6 +1,7 @@
 
 simmedtk_add_library(Core
   SOURCES
+    BaseMesh.cpp
     CollisionConfig.cpp
     CollisionDetection.cpp
     CollisionPair.cpp
@@ -15,8 +16,8 @@ simmedtk_add_library(Core
     Geometry.cpp
     IOStream.cpp
     Light.cpp
-    Module.cpp
     Model.cpp
+    Module.cpp
     ObjectSimulator.cpp
     RenderDetail.cpp
     Scene.cpp
@@ -27,29 +28,35 @@ simmedtk_add_library(Core
     Timer.cpp
     UnifiedId.cpp
     ViewerBase.cpp
-    BaseMesh.cpp
   PUBLIC_HEADERS
+    BaseMesh.h
     CollisionConfig.h
     CollisionDetection.h
-    CollisionManager.h
+    CollisionModelIterator.h
     CollisionPair.h
+    Color.h
     Config.h
+    ConfigRendering.h
     ContactHandling.h
     CoreClass.h
+    DataStructures.h
     Dispatcher.h
     DisplayText.h
     ErrorLog.h
-    EventData.h
     Event.h
     EventHandler.h
     Factory.h
     Geometry.h
     IOStream.h
     Light.h
-    MemoryBlock.h
-    Module.h
+    MakeUnique.h
+    Matrix.h
     Model.h
+    Module.h
     ObjectSimulator.h
+    Quaternion.h
+    RenderDelegate.h
+    RenderDetail.h
     Scene.h
     SceneObject.h
     Scheduler.h
@@ -57,9 +64,15 @@ simmedtk_add_library(Core
     Simulator.h
     StaticSceneObject.h
     Synchronization.h
+    Texture.h
+    Timer.h
+    UnifiedId.h
+    Utils.h
+    Vector.h
     ViewerBase.h
     WorkerThread.h
-    BaseMesh.h
+    DataStructures.hpp
+    Factory.hpp
 )
 
 target_link_libraries(Core

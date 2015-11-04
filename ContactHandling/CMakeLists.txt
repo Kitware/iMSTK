@@ -1,11 +1,11 @@
 
 simmedtk_add_library(ContactHandling
   SOURCES
-    PenaltyContactHandling.cpp
     PenaltyContactFemToStatic.cpp
+    PenaltyContactHandling.cpp
   PUBLIC_HEADERS
-    PenaltyContactHandling.h
     PenaltyContactFemToStatic.h
+    PenaltyContactHandling.h
 )
 
 target_link_libraries(ContactHandling

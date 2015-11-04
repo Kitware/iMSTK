@@ -241,6 +241,7 @@ set(SimMedTK_exports
   RenderDelegates
   Rendering
   Simulators
+  VTKRendering
 #   VirtualTools
   )
 
@@ -280,12 +281,6 @@ endif()
 #
 
 export(PACKAGE SimMedTK)
-export(TARGETS
-  ${SimMedTK_exports}
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
-  NAMESPACE mstk::
-  EXPORT_LINK_INTERFACE_LIBRARIES
-)
 
 configure_file(
   CMake/SimMedTKConfig.cmake.in
@@ -293,6 +288,15 @@ configure_file(
   @ONLY
 )
 
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
+  DESTINATION "CMake"
+  COMPONENT Development
+)
+
 if(BUILD_TESTING)
   add_subdirectory(Testing)
 endif()
+
+set(CPACK_COMPONENTS_ALL Development)
+include(CPack)

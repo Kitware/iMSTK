@@ -1,6 +1,7 @@
 
 simmedtk_add_library(Event
   SOURCES
+    AudioEvent.cpp
     CameraEvent.cpp
     HapticEvent.cpp
     KeyboardEvent.cpp
@@ -8,13 +9,16 @@ simmedtk_add_library(Event
     MouseButtonEvent.cpp
     MouseMoveEvent.cpp
     ObjectClickedEvent.cpp
-    AudioEvent.cpp
   PUBLIC_HEADERS
+    AudioEvent.h
     CameraEvent.h
     HapticEvent.h
+    Key.h
     KeyboardEvent.h
+    KeySFMLInterface.h
     LightMotionEvent.h
     MouseButtonEvent.h
+    MouseMoveEvent.h
     ObjectClickedEvent.h
 )
 
