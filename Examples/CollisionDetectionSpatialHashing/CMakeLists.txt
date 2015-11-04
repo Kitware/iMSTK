@@ -1,3 +1,4 @@
+include(${VTK_USE_FILE})
 add_executable(CollisionDetectionSpatialHashing main.cpp CollisionDetectionSpatialHashing.cpp CollisionDetectionSpatialHashing.h)
 
 target_link_libraries(CollisionDetectionSpatialHashing

@@ -23,6 +23,7 @@ target_link_libraries(IO
   PUBLIC
     ${VTK_LIBRARIES}
     Assimp::Assimp
+    Assimp::Zlib
     VegaFEM::minivector
     VegaFEM::volumetricMesh
     )

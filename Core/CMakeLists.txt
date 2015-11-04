@@ -1,4 +1,4 @@
-
+include(${VTK_USE_FILE})
 simmedtk_add_library(Core
   SOURCES
     BaseMesh.cpp
@@ -78,11 +78,11 @@ simmedtk_add_library(Core
 target_link_libraries(Core
 
   PUBLIC
-    GLEW::GLEW
     ${OPENGL_LIBRARY}
     sfml::graphics
     VegaFEM::objMesh
     VegaFEM::volumetricMesh
+    vtkglew
 )
 
 if(UNIX)

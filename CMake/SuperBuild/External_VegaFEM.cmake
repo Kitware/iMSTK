@@ -34,7 +34,7 @@ if(DEFINED VegaFEM_DIR AND NOT EXISTS ${VegaFEM_DIR})
   message(FATAL_ERROR "VegaFEM_DIR variable is defined but corresponds to non-existing directory")
 endif()
 
-set(VegaFEM_DEPENDENCIES GLEW)
+set(VegaFEM_DEPENDENCIES "")
 if(WIN32)
   list(APPEND VegaFEM_DEPENDENCIES PTHREAD)
 endif(WIN32)
@@ -81,6 +81,7 @@ if(NOT DEFINED VegaFEM_DIR)
       -DCMAKE_REQUIRED_INCLUDES:STRING=${ep_install_dir}/include
       ${OUTPUT_DIRECTORIES}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${ep_config_flags}
     DEPENDS
       ${VegaFEM_DEPENDENCIES}
 	LOG_DOWNLOAD 1            # Wrap download in script to log output

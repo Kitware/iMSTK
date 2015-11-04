@@ -1,3 +1,5 @@
+include(${VTK_USE_FILE})
+
 simmedtk_add_library(Rendering
   SOURCES
     Camera.cpp
@@ -35,6 +37,7 @@ target_link_libraries(Rendering
  PUBLIC
     sfml::window
     sfml::system
+    vtkglew
 )
 
 

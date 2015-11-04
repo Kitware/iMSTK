@@ -45,13 +45,6 @@
 // #   pragma inline_depth(255)
 #endif
 
-#include <GL/glew.h>
-#ifndef __APPLE__
-#  include <GL/gl.h> // for GLfloat, etc.
-#else
-#  include <OpenGL/gl.h> // for GLfloat, etc.
-#endif
-
 namespace core {
 
 enum

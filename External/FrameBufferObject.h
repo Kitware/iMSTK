@@ -42,6 +42,15 @@
 #ifndef UCDAVIS_FRAMEBUFFER_OBJECT_H
 #define UCDAVIS_FRAMEBUFFER_OBJECT_H
 
+// VTK glew library
+#include <vtk_glew.h>
+
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
+
 #include "Core/Config.h"
 #include <iostream>
 

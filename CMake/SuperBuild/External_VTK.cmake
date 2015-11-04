@@ -62,9 +62,11 @@ if(NOT DEFINED ${proj}_DIR)
       -DModule_vtkInteractionStyle:BOOL=ON
       -DModule_vtkRenderingAnnotation:BOOL=ON
       -DModule_vtkInteractionWidgets:BOOL=ON
+      -DModule_vtkglew:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
+      ${ep_config_flags}
     DEPENDS
       ${${proj}_DEPENDENCIES}
 #     LOG_DOWNLOAD 1            # Wrap download in script to log output

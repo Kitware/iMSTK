@@ -6,13 +6,6 @@ endif()
 project(SimMedTK)
 
 #-----------------------------------------------------------------------------
-# Library mode: SHARED (default) or STATIC
-#
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-set(SimMedTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-mark_as_advanced(BUILD_SHARED_LIBS)
-
-#-----------------------------------------------------------------------------
 # Update CMake module path
 #
 list(INSERT CMAKE_MODULE_PATH 0
@@ -30,9 +23,27 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #-----------------------------------------------------------------------------
+# Include macros
+#
+include(SimMedTKMacros)
+
+#-----------------------------------------------------------------------------
+# Library mode: SHARED (default in Linux/Mac) or STATIC (Required in Win32)
+#
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+if(WIN32 AND MSVC)
+  # TODO: In windows iMSTK needs to build static libraries but still link to
+  # shared externals. Add logic to take this into consideration.
+  # set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+endif()
+set(SimMedTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+mark_as_advanced(BUILD_SHARED_LIBS)
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #
-option(SimMedTK_SUPERBUILD "Build SimMedTK and the projects it depends on via SuperBuild.cmake." ON)
+option(SimMedTK_SUPERBUILD
+    "Build SimMedTK and the projects it depends on via SuperBuild.cmake." ON)
 mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
@@ -76,7 +87,6 @@ set(SimMedTK_VERSION "${SimMedTK_VERSION_MAJOR}.${SimMedTK_VERSION_MINOR}.${SimM
 # Testing
 #
 option(BUILD_TESTING "Test the project" ON)
-include(SimMedTKTesting)
 
 #-----------------------------------------------------------------------------
 # Documentation options
@@ -136,12 +146,16 @@ endif()
 
 if(MSVC)
   set(msvc_suppressed_warnings
-    "/wd4290" # C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+  # C++ exception specification ignored except to indicate a function is not
+  # __declspec(nothrow)
+    "/wd4290"
   )
   set(msvc_other_flags
-    "/EHsc" # Enable C++ Exceptions
+  # Enable C++ Exceptions
+    "/EHsc"
   )
-  set(SimMedTK_CXX_FLAGS "${SimMedTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
+  set(SimMedTK_CXX_FLAGS
+    "${SimMedTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
@@ -149,6 +163,7 @@ if(MSVC)
   add_definitions(-D_USE_MATH_DEFINES)
   add_definitions(-DWIN32_LEAN_AND_MEAN)
   add_definitions(-DWINDOWS_EXTRA_LEAN)
+  configure_msvc_runtime()
 endif()
 
 #-----------------------------------------------------------------------------
@@ -166,7 +181,6 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 #
 find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(SFML REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -187,24 +201,20 @@ endif()
 # Testing framework
 #
 if(BUILD_TESTING)
-  find_package(Bandit REQUIRED)
-  include_directories(${BANDIT_INCLUDE_DIR})
   include(SimMedTKTesting)
 endif()
 
-include(SimMedTKMacros)
-
 if(SimMedTK_USE_PHANTOM_OMNI)
-  simmedtk_find_package(OpenHaptics)
+  find_package(OpenHaptics)
 endif()
 
 if(SimMedTK_USE_ADU)
-  simmedtk_find_package(ADU REQUIRED)
+  find_package(ADU REQUIRED)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
 endif()
 
 if(SimMedTK_USE_NIUSB6008)
-  simmedtk_find_package(NIDAQ REQUIRED)
+  find_package(NIDAQ REQUIRED)
   include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 endif()
 
@@ -215,7 +225,8 @@ include_directories(SYSTEM "${ThreadPool_INCLUDE_DIR}")
 #-----------------------------------------------------------------------------
 # SimMedTK_SUPERBUILD_BINARY_DIR
 #
-# If SimMedTK_SUPERBUILD_BINARY_DIR isn't defined, it means SimMedTK is *NOT* build using Superbuild.
+# If SimMedTK_SUPERBUILD_BINARY_DIR isn't defined, it means SimMedTK is *NOT* build using
+# Superbuild.
 # In that case, SimMedTK_SUPERBUILD_BINARY_DIR should default to SimMedTK_BINARY_DIR
 #
 if(NOT DEFINED SimMedTK_SUPERBUILD_BINARY_DIR)

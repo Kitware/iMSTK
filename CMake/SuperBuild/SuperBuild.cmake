@@ -17,7 +17,7 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen GLEW ThreadPool VTK)
+set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen ThreadPool VTK)
 if(BUILD_TESTING)
   list(APPEND SimMedTK_DEPENDENCIES Bandit)
 endif()
@@ -67,6 +67,13 @@ if(NOT MSVC)
 endif()
 set(ep_common_cxx_flags "${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS} ${ep_suppress_warnings_flags}")
 
+set(ep_config_flags)
+foreach(type ${CMAKE_CONFIGURATION_TYPES})
+  string(TOUPPER ${type} type_UP)
+  list(APPEND ep_config_flags -DCMAKE_C_FLAGS_${type_UP}:STRING=${CMAKE_C_FLAGS_${type_UP}})
+  list(APPEND ep_config_flags -DCMAKE_CXX_FLAGS_${type_UP}:STRING=${CMAKE_CXX_FLAGS_${type_UP}})
+endforeach()
+
 #----------------------------------------------------------------------------
 # Compute -G arg for configuring external projects with the same CMake generator:
 #
@@ -91,12 +98,18 @@ set(SimMedTK_CMAKE_LIBRARY_PATH)
 if(CMAKE_CONFIGURATION_TYPES)
   foreach(CFG_TYPE ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER "${CFG_TYPE}" CFG_TYPE_UPPER)
-    list(APPEND OUTPUT_DIRECTORIES -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND OUTPUT_DIRECTORIES -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND OUTPUT_DIRECTORIES -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES -DSimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES -DSimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND OUTPUT_DIRECTORIES
+    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND OUTPUT_DIRECTORIES
+    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND OUTPUT_DIRECTORIES
+    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
+    -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
+    -DSimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
+    -DSimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
 
     set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_LIBRARY_PATH}${sep}${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
     set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_LIBRARY_PATH}${sep}${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
@@ -112,8 +125,10 @@ else()
   -DSimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
   -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
   )
-  set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
-  set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
+  set(SimMedTK_CMAKE_LIBRARY_PATH
+  "${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
+  set(SimMedTK_CMAKE_LIBRARY_PATH
+  "${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
 endif()
 
 #-----------------------------------------------------------------------------
@@ -123,7 +138,7 @@ endif()
 # where '<EP>' is an external project name.
 #
 set(SimMedTK_SUPERBUILD_EP_ARGS
-  -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH})
+)
 
 #-----------------------------------------------------------------------------
 # Check for the dependencies
@@ -135,7 +150,9 @@ SimMedTKCheckDependencies(SimMedTK)
 #
 list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
   -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
+  -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
 )
+list(REMOVE_DUPLICATES SimMedTK_SUPERBUILD_EP_ARGS)
 
 #-----------------------------------------------------------------------------
 # Set CMake OSX variable to pass down the external project
@@ -149,17 +166,6 @@ if(APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Set CMake Windows variable to pass down the external project
-#
-set(CMAKE_MSVC_EXTERNAL_PROJECT_ARGS)
-if(WIN32)
-  if( DEFINED SimMedTK_WINDOWS_DEPENDENCIES_DIR)
-    list(APPEND CMAKE_MSVC_EXTERNAL_PROJECT_ARGS
-      -DSimMedTK_WINDOWS_DEPENDENCIES_DIR:PATH=${SimMedTK_WINDOWS_DEPENDENCIES_DIR})
-  endif()
-endif(WIN32)
-
-#-----------------------------------------------------------------------------
 # SimMedTK Configure
 #
 SET(proj SimMedTK-Configure)
@@ -169,9 +175,6 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   LIST_SEPARATOR ${sep}
   CMAKE_ARGS
-    ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
-    ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
-    ${SimMedTK_SUPERBUILD_CMAKE_OPTIONS}
     -DSimMedTK_SUPERBUILD:BOOL=OFF
 #     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
 #     -DSimMedTK_INSTALL_BIN_DIR:STRING=${SimMedTK_INSTALL_BIN_DIR}
@@ -182,18 +185,20 @@ ExternalProject_Add(${proj}
     -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
     -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}
-    # Specify Eigen3's superbuild directory manually or FindEigen3
-    # may find a framework bundle on OS X in /Library/Frameworks
-    # that does not follow the directory convention FindEigen3 expects:
-    -DEIGEN3_INCLUDE_DIR:PATH=${SimMedTK_BINARY_DIR}/SuperBuild/Eigen
-    -DVegaFEM_DIR:PATH=${ep_install_dir}/lib/cmake/VegaFEM
     -DSimMedTK_C_FLAGS:STRING=${SimMedTK_C_FLAGS}
+    # Pass Projects options down to the superbuild #
+    # Use Options #
     -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
+    -DSimMedTK_USE_FALCON:BOOL=${SimMedTK_USE_FALCON}
+    -DUSE_VRPN_SERVER:BOOL=${USE_VRPN_SERVER}
+    -DUSE_VRPN_CLIENT:BOOL=${USE_VRPN_CLIENT}
     -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}
-    -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
-    -DBUILD_TESTING:BOOL=${BUILD_TESTING}
     -DSimMedTK_USE_OCULUS:BOOL=${SimMedTK_USE_OCULUS}
+    -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
+    # Options #
+    -DBUILD_TESTING:BOOL=${BUILD_TESTING}
     -DSimMedTK_ENABLE_DOCUMENTATION:BOOL=${SimMedTK_ENABLE_DOCUMENTATION}
+    ${SimMedTK_SUPERBUILD_CMAKE_OPTIONS}
     ${SimMedTK_OUTPUT_DIRECTORIES}
     ${SimMedTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}
@@ -246,6 +251,7 @@ add_custom_target(SimMedTK
 #-----------------------------------------------------------------------------
 # Enable testing in the superbuild and add a dummy test to see if that
 # gets the buildbot reporting success.
+include(CTest)
 enable_testing()
 
 # A dummy test.

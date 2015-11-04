@@ -12,7 +12,6 @@ target_link_libraries(${APP}
   Collision
   ContactHandling
   Event
-  ExamplesCommon
   IO
 )
 

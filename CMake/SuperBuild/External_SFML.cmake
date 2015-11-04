@@ -66,11 +66,13 @@ if(NOT DEFINED ${proj}_DIR)
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+      -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/SimMedTK-build
       -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
       -DSFML_BUILD_EXAMPLES:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
+      ${ep_config_flags}
     DEPENDS
       ${${proj}_DEPENDENCIES}
 #     LOG_DOWNLOAD 1            # Wrap download in script to log output

@@ -38,11 +38,20 @@
 #include "Rendering/TextureManager.h"
 #include "Rendering/FrameBuffer.h"
 
+// VTK glew library
+#include <vtk_glew.h>
+
+#ifndef __APPLE__
+#  include <GL/gl.h> // for GLfloat, etc.
+#else
+#  include <OpenGL/gl.h> // for GLfloat, etc.
+#endif
+
 #ifdef __linux__
 #   include <X11/Xlib.h>
 #   include <X11/Xutil.h>
-#   include <GL/glxew.h>
-#   include <GL/glxext.h>
+// #   include <GL/glxew.h>
+// #   include <GL/glxext.h>
 #   include <GL/glx.h>
 #endif
 

@@ -1,4 +1,4 @@
-
+include(${VTK_USE_FILE})
 simmedtk_add_library(External
   SOURCES
     FrameBufferObject.cpp
