@@ -66,10 +66,11 @@ LaparoscopicCameraCoupler::~LaparoscopicCameraCoupler()
 void LaparoscopicCameraCoupler::initializeCameraScopeConfiguration()
 {
     this->bendingRadius = 1.0; // default bending radius
+    angleX = 0.0;
     angleY = 0.0;
-    maxAngleY = 11.0 / 7; //+ 90 deg
-    minAngleY = -11.0 / 7; //- 90 deg
-    deltaAngleY = (4.0 / 360)*(22.0 / 7);// 2 deg
+    maxAngleX = maxAngleY = 11.0 / 7; //+ 90 deg
+    minAngleX = minAngleY = -11.0 / 7; //- 90 deg
+    deltaAngleXY = (4.0 / 360)*(22.0 / 7);// 2 deg
 }
 
 void LaparoscopicCameraCoupler::setInputDevice(std::shared_ptr<DeviceInterface> newDevice)
@@ -168,15 +169,24 @@ bool LaparoscopicCameraCoupler::updateCamera()
         return false;
     }
 
-    if (this->inputDevice->getButton(0) && angleY<maxAngleY)
+    if (this->inputDevice->getButton(0) && angleY < maxAngleY)
     {
-        angleY += deltaAngleY;
-        //std::cout << "button 0 pressed. angle:" << angleY << std::endl;
+        angleY += deltaAngleXY;
     }
-    else if (this->inputDevice->getButton(1) && angleY>minAngleY)
+
+    if (this->inputDevice->getButton(1) && angleY > minAngleY)
     {
-        angleY -= deltaAngleY;
-        //std::cout << "button 1 pressed. angle:" << angleY << std::endl;
+        angleY -= deltaAngleXY;
+    }
+
+    if (this->inputDevice->getButton(3) && angleX < maxAngleX)
+    {
+        angleX += deltaAngleXY;
+    }
+
+    if (this->inputDevice->getButton(4) && angleX > minAngleX)
+    {
+        angleX -= deltaAngleXY;
     }
 
     core::Quaterniond newDeviceRot = inputDevice->getOrientation();
@@ -186,14 +196,15 @@ bool LaparoscopicCameraCoupler::updateCamera()
 
     core::Quaterniond bendingRot(cos(angleY/2), 0, sin(angleY/2), 0);
     bendingRot.normalize();
+    bendingRot = bendingRot*core::Quaterniond(cos(angleX/2), sin(angleX/2), 0, 0);
+    bendingRot.normalize();
 
     // update the camera position, focus and up vector data
     cameraPosOrientData->focus = newDeviceRot*bendingRot*core::Vec3d(0, 0, -200.0);
     cameraPosOrientData->upVector = newDeviceRot*bendingRot*core::Vec3d(0, 1.0, 0);
 
     cameraPosOrientData->position =
-        newDeviceRot*(bendingOffset - bendingRot*bendingOffset)
-        + newDevicePos;
+        newDeviceRot*(bendingOffset - bendingRot*bendingOffset) + newDevicePos;
 
     return true;
 }

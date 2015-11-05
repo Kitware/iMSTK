@@ -215,10 +215,15 @@ private:
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
 
     double bendingRadius;//!< bending radius of the tip of the scope
+
     double angleY;
     double maxAngleY;
     double minAngleY;
-    double deltaAngleY;
+
+    double angleX;
+    double maxAngleX;
+    double minAngleX;
+    double deltaAngleXY;
 
     std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
 };
