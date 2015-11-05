@@ -80,7 +80,8 @@ bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
 
         targetModel->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
 
-        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
+        Eigen::Quaterniond q(cos(i*22.0/42), 0, sin(i*22.0/42), 0);
+        q.normalize();
         targetModel->getMesh()->rotate(q);
     }
     return true;
@@ -112,7 +113,7 @@ int main(int ac, char** av)
 
     auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
 
-    Color grey(0.32, 0.32, 0.32, 1.);
+    Color grey(0.32, 0.32, 0.32, 1.0);
 
     planeRendDetail->setAmbientColor(grey);
     planeRendDetail->setDiffuseColor(grey);
@@ -186,7 +187,8 @@ int main(int ac, char** av)
         camClient->setDeviceURL(input);
     }
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
-    camController->setScalingFactor(50.0);
+    camController->setScalingFactor(40.0);
+
 
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
 

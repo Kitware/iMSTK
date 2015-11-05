@@ -225,7 +225,6 @@ public:
                 if (delegate)
                 {
                     renderer->AddActor(delegate->getActor());
-
                 }
             }
         }

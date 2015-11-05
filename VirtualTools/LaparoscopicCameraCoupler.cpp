@@ -32,12 +32,16 @@
 
 LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     std::shared_ptr< DeviceInterface > inputDevice,
-    std::shared_ptr< vtkCamera > camera)
+    vtkCamera* camera)
 {
     this->inputDevice = inputDevice;
     this->poolDelay = std::chrono::milliseconds(100);
     this->initialTransform.setIdentity();
     this->name = "LaparoscopicCameraCoupler";
+
+    initializeCameraScopeConfiguration();
+
+    this->camera = camera;
 
     cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
@@ -50,11 +54,22 @@ LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     this->initialTransform.Identity();
     this->name = "LaparoscopicCameraCoupler";
 
+    initializeCameraScopeConfiguration();
+
     cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
 LaparoscopicCameraCoupler::~LaparoscopicCameraCoupler()
 {
+}
+
+void LaparoscopicCameraCoupler::initializeCameraScopeConfiguration()
+{
+    this->bendingRadius = 1.0; // default bending radius
+    angleY = 0.0;
+    maxAngleY = 11.0 / 7; //+ 90 deg
+    minAngleY = -11.0 / 7; //- 90 deg
+    deltaAngleY = (4.0 / 360)*(22.0 / 7);// 2 deg
 }
 
 void LaparoscopicCameraCoupler::setInputDevice(std::shared_ptr<DeviceInterface> newDevice)
@@ -108,14 +123,13 @@ void LaparoscopicCameraCoupler::setOrientation(
     this->orientation = newOrientation;
 }
 
-bool LaparoscopicCameraCoupler::init()
+void LaparoscopicCameraCoupler::init()
 {
     this->orientation.setIdentity();
     this->position.setZero();
 
     // Open communication for the device
     this->inputDevice->openDevice();
-    return true;
 }
 
 void LaparoscopicCameraCoupler::beginFrame()
@@ -135,14 +149,15 @@ void LaparoscopicCameraCoupler::exec()
 
     while(!this->terminateExecution)
     {
-        if(!this->updateCamera())
+        if (!this->updateCamera())
         {
             this->terminate();
         }
         std::this_thread::sleep_for(poolDelay);
     }
-    this->terminationCompleted = true;
     this->inputDevice->closeDevice();
+
+    this->terminate();
 }
 
 bool LaparoscopicCameraCoupler::updateCamera()
@@ -153,13 +168,32 @@ bool LaparoscopicCameraCoupler::updateCamera()
         return false;
     }
 
-    core::Quaterniond newRot = inputDevice->getOrientation();
-    core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
+    if (this->inputDevice->getButton(0) && angleY<maxAngleY)
+    {
+        angleY += deltaAngleY;
+        //std::cout << "button 0 pressed. angle:" << angleY << std::endl;
+    }
+    else if (this->inputDevice->getButton(1) && angleY>minAngleY)
+    {
+        angleY -= deltaAngleY;
+        //std::cout << "button 1 pressed. angle:" << angleY << std::endl;
+    }
+
+    core::Quaterniond newDeviceRot = inputDevice->getOrientation();
+    core::Vec3d newDevicePos = inputDevice->getPosition()*this->scalingFactor;
+
+    core::Vec3d bendingOffset = core::Vec3d(0, 0, this->bendingRadius);
+
+    core::Quaterniond bendingRot(cos(angleY/2), 0, sin(angleY/2), 0);
+    bendingRot.normalize();
 
     // update the camera position, focus and up vector data
-    cameraPosOrientData->position = inputDevice->getPosition() * this->scalingFactor;
-    cameraPosOrientData->focus = newRot._transformVector(core::Vec3d(0, 0, -200));
-    cameraPosOrientData->upVector = newRot._transformVector(core::Vec3d(0, 1, 0));
+    cameraPosOrientData->focus = newDeviceRot*bendingRot*core::Vec3d(0, 0, -200.0);
+    cameraPosOrientData->upVector = newDeviceRot*bendingRot*core::Vec3d(0, 1.0, 0);
+
+    cameraPosOrientData->position =
+        newDeviceRot*(bendingOffset - bendingRot*bendingOffset)
+        + newDevicePos;
 
     return true;
 }
@@ -189,3 +223,14 @@ std::shared_ptr<cameraConfigurationData> LaparoscopicCameraCoupler::getCameraDat
 {
     return cameraPosOrientData;
 };
+
+
+double LaparoscopicCameraCoupler::getBendingRadius() const
+{
+    return bendingRadius;
+}
+
+void LaparoscopicCameraCoupler::setBendingRadius(const double val)
+{
+    bendingRadius = val;
+}

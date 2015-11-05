@@ -59,8 +59,9 @@ public:
     ///
     LaparoscopicCameraCoupler() = default;
 
-    LaparoscopicCameraCoupler(std::shared_ptr<DeviceInterface> inputDevice,
-                std::shared_ptr<vtkCamera> camera);
+    LaparoscopicCameraCoupler(
+        std::shared_ptr<DeviceInterface> inputDevice,
+        vtkCamera* camera);
 
     LaparoscopicCameraCoupler(std::shared_ptr<DeviceInterface> inputDevice);
 
@@ -68,6 +69,11 @@ public:
 	/// \brief Destructor
 	///
     ~LaparoscopicCameraCoupler();
+
+	///
+	/// \brief Initialize the camera scope configuration
+	///
+    void initializeCameraScopeConfiguration();
 
     ///
     /// \brief Set the input device for this tool
@@ -168,10 +174,16 @@ public:
     ///
     bool updateCamera();
 
-	///
+    ///
 	/// \brief Returns the pointer to the camera data that is updated by this controller
 	///
     std::shared_ptr<cameraConfigurationData> getCameraData();
+
+    ///
+    /// \brief Getter and setter for the bending radius of the tip of the scope
+    ///
+    double getBendingRadius() const;
+    void setBendingRadius(const double val);
 
     ///
     /// \brief Module overrides
@@ -201,6 +213,12 @@ private:
     std::chrono::milliseconds poolDelay;  //!< Pooling delay
     vtkCamera* camera; //!< Pointer to rendering camera
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
+
+    double bendingRadius;//!< bending radius of the tip of the scope
+    double angleY;
+    double maxAngleY;
+    double minAngleY;
+    double deltaAngleY;
 
     std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
 };
