@@ -154,6 +154,12 @@ void LaparoscopicCameraCoupler::exec()
         {
             this->terminate();
         }
+
+        if (this->inputDevice->getButton(0))
+        {
+            this->screenCaptureData->triggerScreenCapture = true;
+        }
+
         std::this_thread::sleep_for(poolDelay);
     }
     this->inputDevice->closeDevice();
@@ -235,7 +241,6 @@ std::shared_ptr<cameraConfigurationData> LaparoscopicCameraCoupler::getCameraDat
     return cameraPosOrientData;
 };
 
-
 double LaparoscopicCameraCoupler::getBendingRadius() const
 {
     return bendingRadius;
@@ -244,4 +249,14 @@ double LaparoscopicCameraCoupler::getBendingRadius() const
 void LaparoscopicCameraCoupler::setBendingRadius(const double val)
 {
     bendingRadius = val;
+}
+
+std::shared_ptr<screenShotData> LaparoscopicCameraCoupler::getScreenCaptureData()
+{
+    return screenCaptureData;
+};
+
+void LaparoscopicCameraCoupler::enableScreenCapture()
+{
+    this->screenCaptureData = std::make_shared<screenShotData>();
 }

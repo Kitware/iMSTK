@@ -35,6 +35,8 @@
 
 // vtk includes
 #include <vtkCamera.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
 
 class DeviceInterface;
 
@@ -45,7 +47,36 @@ struct cameraConfigurationData
     core::Vec3d upVector;
 
     cameraConfigurationData() : position(0, 0, 0), focus(0, 0, -1), upVector(0, 1, 0){};
-    ~cameraConfigurationData(){}
+    ~cameraConfigurationData(){};
+};
+
+struct screenShotData
+{
+    std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
+    std::shared_ptr<vtkPNGWriter> pngWriter;
+    bool triggerScreenCapture;
+    int screenShotNumber;
+
+    screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
+    {
+        windowToImageFilter = std::make_shared<vtkWindowToImageFilter>();
+
+        windowToImageFilter->SetMagnification(3); //set the resolution of the output
+                                                  //image (3 times the current resolution
+                                                  // of vtk render window)
+
+        windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha
+                                                         // (transparency) channel
+
+        windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+
+        windowToImageFilter->Update();
+
+        pngWriter = std::make_shared<vtkPNGWriter>();
+        pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
+    };
+
+    ~screenShotData(){};
 };
 
 class LaparoscopicCameraCoupler : public Module
@@ -185,6 +216,16 @@ public:
     double getBendingRadius() const;
     void setBendingRadius(const double val);
 
+	///
+	/// \brief
+	///
+    std::shared_ptr<screenShotData> getScreenCaptureData();
+
+	///
+	/// \brief
+	///
+    void enableScreenCapture();
+
     ///
     /// \brief Module overrides
     ///
@@ -226,6 +267,10 @@ private:
     double deltaAngleXY;
 
     std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
+
+    std::shared_ptr<screenShotData> screenCaptureData;
+
+    std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
 };
 
 #endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

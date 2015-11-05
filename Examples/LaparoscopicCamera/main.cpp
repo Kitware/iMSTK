@@ -50,6 +50,8 @@
 // VTK includes
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkPNGWriter.h"
 
 #define SPACE_EXPLORER_DEVICE true
 
@@ -189,7 +191,6 @@ int main(int ac, char** av)
     auto camController = std::make_shared<LaparoscopicCameraCoupler>(camClient);
     camController->setScalingFactor(40.0);
 
-
     viewer->init(); // viewer should be initialized to be able to retrieve the camera
 
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
@@ -212,6 +213,10 @@ int main(int ac, char** av)
     {
         sdk->registerModule(server);
     }
+
+    // Enable screenshot
+    camController->enableScreenCapture();
+    vtkViewer->setScreenCaptureData(camController->getScreenCaptureData());
 
     //-------------------------------------------------------
     // Run the SDK

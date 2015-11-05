@@ -90,6 +90,11 @@ public:
 	///
     void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
 
+	///
+	/// \brief Set the data realted to screen capture
+	///
+    void setScreenCaptureData(std::shared_ptr<screenShotData> data);
+
 protected:
     ///
     /// \brief Renders the render operation to screen
