@@ -254,7 +254,7 @@ void LaparoscopicCameraCoupler::setBendingRadius(const double val)
 std::shared_ptr<screenShotData> LaparoscopicCameraCoupler::getScreenCaptureData()
 {
     return screenCaptureData;
-};
+}
 
 void LaparoscopicCameraCoupler::enableScreenCapture()
 {

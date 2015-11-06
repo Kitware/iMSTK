@@ -26,6 +26,8 @@
 
 #include "Core/ViewerBase.h"
 #include "VirtualTools/LaparoscopicCameraCoupler.h"
+#include "vtkContextActor.h"
+#include "vtkContextScene.h"
 
 class vtkCamera;
 
@@ -94,6 +96,13 @@ public:
 	/// \brief Set the data realted to screen capture
 	///
     void setScreenCaptureData(std::shared_ptr<screenShotData> data);
+
+    ///
+    /// \brief Add chart actor to the renderer
+    ///
+    void addChartActor(
+        std::shared_ptr<vtkContextActor> chartActor,
+        std::shared_ptr<vtkContextScene> chartScene);
 
 protected:
     ///
