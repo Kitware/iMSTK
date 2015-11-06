@@ -93,16 +93,14 @@ public:
     void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
 
 	///
-	/// \brief Set the data realted to screen capture
+	/// \brief Set the data related to screen capture
 	///
-    void setScreenCaptureData(std::shared_ptr<screenShotData> data);
+    //void setScreenCaptureData(std::shared_ptr<screenShotData> data);
 
     ///
     /// \brief Add chart actor to the renderer
     ///
-    void addChartActor(
-        std::shared_ptr<vtkContextActor> chartActor,
-        std::shared_ptr<vtkContextScene> chartScene);
+    void addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene);
 
 protected:
     ///

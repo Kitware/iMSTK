@@ -50,34 +50,34 @@ struct cameraConfigurationData
     ~cameraConfigurationData(){};
 };
 
-struct screenShotData
-{
-    std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
-    std::shared_ptr<vtkPNGWriter> pngWriter;
-    bool triggerScreenCapture;
-    int screenShotNumber;
-
-    screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
-    {
-        windowToImageFilter = std::make_shared<vtkWindowToImageFilter>();
-
-        windowToImageFilter->SetMagnification(3); //set the resolution of the output
-                                                  //image (3 times the current resolution
-                                                  // of vtk render window)
-
-        windowToImageFilter->SetInputBufferTypeToRGBA(); //also record the alpha
-                                                         // (transparency) channel
-
-        windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
-
-        windowToImageFilter->Update();
-
-        pngWriter = std::make_shared<vtkPNGWriter>();
-        pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
-    };
-
-    ~screenShotData(){};
-};
+//struct screenShotData
+//{
+//    std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
+//    std::shared_ptr<vtkPNGWriter> pngWriter;
+//    bool triggerScreenCapture;
+//    int screenShotNumber;
+//
+//    screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
+//    {
+//        windowToImageFilter = std::make_shared<vtkWindowToImageFilter>();
+//
+//        windowToImageFilter->SetMagnification(1); // set the resolution of the output
+//                                                  // image
+//
+//        windowToImageFilter->SetInputBufferTypeToRGBA(); // also record the alpha
+//                                                         // (transparency) channel
+//
+//        windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+//
+//        windowToImageFilter->Update();
+//
+//        pngWriter = std::make_shared<vtkPNGWriter>();
+//
+//        pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
+//    };
+//
+//    ~screenShotData(){};
+//};
 
 class LaparoscopicCameraCoupler : public Module
 {
@@ -217,12 +217,12 @@ public:
     void setBendingRadius(const double val);
 
 	///
-	/// \brief
+	/// \brief Get the screen capture related data
 	///
-    std::shared_ptr<screenShotData> getScreenCaptureData();
+    //std::shared_ptr<screenShotData> getScreenCaptureData();
 
 	///
-	/// \brief
+	/// \brief Initializes screen capture capability
 	///
     void enableScreenCapture();
 
@@ -268,7 +268,7 @@ private:
 
     std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
 
-    std::shared_ptr<screenShotData> screenCaptureData;
+    //std::shared_ptr<screenShotData> screenCaptureData;
 
     std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
 };
