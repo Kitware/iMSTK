@@ -68,30 +68,31 @@ public:
                 if(timerId == *static_cast<int*>(callData) &&
                     !this->viewer->isTerminated())
                 {
+
                     if (this->cameraControllerData != nullptr)
                     {
                         updateCamera();
                     }
 
-                    //if (this->screenCaptureData != nullptr)
-                    //{
-                    //    if (this->screenCaptureData->triggerScreenCapture)
-                    //    {
-                    //        //this->screenCaptureData->windowToImageFilter->Update();
+                    if (this->screenCaptureData != nullptr)
+                    {
+                        if (this->screenCaptureData->triggerScreenCapture)
+                        {
+                            //this->screenCaptureData->windowToImageFilter->Update();
 
-                    //        std::string captureName = "screenShot-"
-                    //            + std::to_string(this->screenCaptureData->screenShotNumber)
-                    //            + ".png";
+                            std::string captureName = "screenShot-"
+                                + std::to_string(this->screenCaptureData->screenShotNumber)
+                                + ".png";
 
-                    //        this->screenCaptureData->pngWriter->SetFileName(
-                    //            captureName.data());
+                            this->screenCaptureData->pngWriter->SetFileName(
+                                captureName.data());
 
-                    //        this->screenCaptureData->pngWriter->Write();
+                            this->screenCaptureData->pngWriter->Write();
 
-                    //        this->screenCaptureData->screenShotNumber++;
-                    //        this->screenCaptureData->triggerScreenCapture = false;
-                    //    }
-                    //}
+                            this->screenCaptureData->screenShotNumber++;
+                            this->screenCaptureData->triggerScreenCapture = false;
+                        }
+                    }
 
                     this->renderWindow->Render();
                 }
@@ -340,7 +341,7 @@ public:
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
     std::shared_ptr<cameraConfigurationData> cameraControllerData;
-    //std::shared_ptr<screenShotData> screenCaptureData;
+    std::shared_ptr<screenShotData> screenCaptureData;
 };
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
@@ -382,13 +383,15 @@ void VTKViewer::setCameraControllerData(std::shared_ptr<cameraConfigurationData>
     renderer->cameraControllerData = camData;
 }
 
-//void VTKViewer::setScreenCaptureData(std::shared_ptr<screenShotData> data)
-//{
-//    renderer->screenCaptureData = data;
-//
-//    renderer->screenCaptureData->windowToImageFilter->SetInput(
-//        this->renderer->getRenderWindow());
-//}
+void VTKViewer::setScreenCaptureData(std::shared_ptr<screenShotData> data)
+{
+    renderer->screenCaptureData = data;
+
+    this->renderer->getRenderWindow()->SetAlphaBitPlanes(1);
+
+    renderer->screenCaptureData->windowToImageFilter->SetInput(
+        this->renderer->getRenderWindow());
+}
 
 void VTKViewer::addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene)
 {

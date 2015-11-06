@@ -95,7 +95,7 @@ public:
 	///
 	/// \brief Set the data related to screen capture
 	///
-    //void setScreenCaptureData(std::shared_ptr<screenShotData> data);
+    void setScreenCaptureData(std::shared_ptr<screenShotData> data);
 
     ///
     /// \brief Add chart actor to the renderer

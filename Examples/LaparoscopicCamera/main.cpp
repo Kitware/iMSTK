@@ -58,8 +58,8 @@
 #include "vtkFloatArray.h"
 #include "vtkPlotPoints.h"
 #include "vtkTable.h"
-#include "vtkNew.h"
 #include "vtkAxis.h"
+#include "vtkNew.h"
 
 #define SPACE_EXPLORER_DEVICE true
 
@@ -330,10 +330,10 @@ int main(int ac, char** av)
     std::shared_ptr<LaparoscopicCameraCoupler> camController = addCameraController(sdk);
 
     // Enable screenshot capture
-    //camController->enableScreenCapture();
+    camController->enableScreenCapture();
 
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
-    //vtkViewer->setScreenCaptureData(camController->getScreenCaptureData());
+    vtkViewer->setScreenCaptureData(camController->getScreenCaptureData());
 
     // Add a 2D overlay on the 3D scene
     add2DOverlay(vtkViewer);
