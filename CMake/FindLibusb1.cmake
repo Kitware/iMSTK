@@ -81,8 +81,9 @@ find_path(LIBUSB1_INCLUDE_DIR
 		message("LIBUSB1_LIBRARY=${LIBUSB1_LIBRARY}")
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Libusb1
-	LIBUSB1_LIBRARY
-#	LIBUSB1_INCLUDE_DIR
+	REQUIRED_VARS
+		LIBUSB1_LIBRARY
+#		LIBUSB1_INCLUDE_DIR
 )
 
 if(LIBUSB1_FOUND)

@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include <memory>
+#include <string>
 #include <math.h>
 
 // Core SimMedTK includes
@@ -50,7 +51,7 @@
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
-bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
+bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, std::string fileName)
 {
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
