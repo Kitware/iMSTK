@@ -60,13 +60,11 @@ struct screenShotData
 
     screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
     {
-        windowToImageFilter->SetMagnification(1); // set the resolution of the output
-                                                  // image
+        windowToImageFilter->SetMagnification(1);
 
-        windowToImageFilter->SetInputBufferTypeToRGB(); // also record the alpha
-                                                         // (transparency) channel
+        windowToImageFilter->SetInputBufferTypeToRGB();
 
-        windowToImageFilter->ReadFrontBufferOff(); // read from the back buffer
+        windowToImageFilter->ReadFrontBufferOff();
 
         windowToImageFilter->Update();
 
