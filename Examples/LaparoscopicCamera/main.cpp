@@ -82,7 +82,7 @@ bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
     plane->getPlaneModel()->setWidth(5);
     staticObject->setModel(plane);
 
-    auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
+    auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
     Color grey(0.32, 0.32, 0.32, 1.0);
 
@@ -164,24 +164,27 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer)
     //Add both to the renderer
     vtkViewer->addChartActor(chartActor.GetPointer(), chartScene.GetPointer());
 
+    //----------------------------------------------------
+    // Add data points representing the concentric circles
+    //----------------------------------------------------
     // Create a table with some points in it...
     vtkNew<vtkTable> table;
 
-    vtkNew<vtkFloatArray> arrX;
-    arrX->SetName("X Axis");
-    table->AddColumn(arrX.GetPointer());
+    vtkNew<vtkFloatArray> circle1X;
+    circle1X->SetName("Circle 1 X");
+    table->AddColumn(circle1X.GetPointer());
 
-    vtkNew<vtkFloatArray> arrC;
-    arrC->SetName("Cosine");
-    table->AddColumn(arrC.GetPointer());
+    vtkNew<vtkFloatArray> circle1Y;
+    circle1Y->SetName("Circle 1 Y");
+    table->AddColumn(circle1Y.GetPointer());
 
-    vtkNew<vtkFloatArray> arrS;
-    arrS->SetName("Sine");
-    table->AddColumn(arrS.GetPointer());
+    vtkNew<vtkFloatArray> circle2X;
+    circle2X->SetName("Circle 2 X");
+    table->AddColumn(circle2X.GetPointer());
 
-    vtkNew<vtkFloatArray> arrT;
-    arrT->SetName("Tan");
-    table->AddColumn(arrT.GetPointer());
+    vtkNew<vtkFloatArray> circle2Y;
+    circle2Y->SetName("Circle 2 Y");
+    table->AddColumn(circle2Y.GetPointer());
 
     // Test charting with a few more points...
     int numPoints = 100;
@@ -189,39 +192,117 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer)
     double xRange[2] = { 0.0, range };
     double yRange[2] = { 0.0, range };
 
-    int s;
-    float radius = range / 6;
-    float inc = 2*radius / (numPoints - 1);
-    table->SetNumberOfRows(numPoints);
-    /*chart->GetAxis(0)->SetRange(xRange);
-    chart->GetAxis(1)->SetRange(yRange);*/
+    chart->GetAxis(0)->SetRange(xRange);
+    chart->GetAxis(1)->SetRange(yRange);
 
     /*chart->GetAxis(0)->SetUnscaledRange(xRange);
     chart->GetAxis(1)->SetUnscaledRange(yRange);*/
 
-    for (int i = 0; i < numPoints; ++i)
+    table->SetNumberOfRows(numPoints + 1);
+
+    double radius1 = range / 6;
+    double radius2 = range / 8;
+    double theta;
+
+    for (int i = 0; i < numPoints; i++)
     {
-        if (sin(i * 44 / (7 * numPoints)) < 0)
-            s = -1;
-        else
-            s = 1;
+        theta = 11.0 / 7 + i * 44.0 / (7 * numPoints);
 
-        table->SetValue(i, 0, range / 2 + i*inc*s);
-        table->SetValue(i, 1, range / 2 + radius*cos(i * 22.0 / (7 * numPoints)));
-        table->SetValue(i, 2, range / 2 + radius*sin(i * 22.0 / (7 * numPoints)));
+        table->SetValue(i, 0, range / 2 + radius1*cos(theta));
+        table->SetValue(i, 1, range / 2 + radius1*sin(theta));
+
+        table->SetValue(i, 2, range / 2 + radius2*cos(theta));
+        table->SetValue(i, 3, range / 2 + radius2*sin(theta));
     }
+    theta = 11.0 / 7;
+    table->SetValue(numPoints, 0, range / 2 + radius1*cos(theta));
+    table->SetValue(numPoints, 1, range / 2 + radius1*sin(theta));
+    table->SetValue(numPoints, 2, range / 2 + radius2*cos(theta));
+    table->SetValue(numPoints, 3, range / 2 + radius2*sin(theta));
 
-    // Add multiple line plots, setting the colors etc
-    vtkPlot *points = chart->AddPlot(vtkChart::LINE);
-    points->SetInputData(table.GetPointer(), 2, 1);
-    points->SetColor(0, 0, 0, 255);
-    points->SetWidth(1.0);
+    double lineWidth = 2.0;
+    vtkPlot *points1 = chart->AddPlot(vtkChart::LINE);
+    points1->SetInputData(table.GetPointer(), 0, 1);
+    points1->SetColor(1, 0, 0, 255);
+    points1->SetWidth(lineWidth);
 
-    /*vtkPlotPoints::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CROSS);
-    points = chart->AddPlot(vtkChart::LINE);
-    points->SetInputData(table.GetPointer(), 0, 2);
-    points->SetColor(0, 0, 0, 255);
-    points->SetWidth(1.0);*/
+    vtkPlot *points2 = chart->AddPlot(vtkChart::LINE);
+    points2->SetInputData(table.GetPointer(), 2, 3);
+    points2->SetColor(1, 0, 0, 255);
+    points2->SetWidth(lineWidth);
+
+    //--------------------------------------------------
+    // Add data points representing the parallel lines
+    //--------------------------------------------------
+    vtkNew<vtkTable> table2;
+
+    vtkNew<vtkFloatArray> parallelLineTopX;
+    parallelLineTopX->SetName("parallel Line Top X");
+    table2->AddColumn(parallelLineTopX.GetPointer());
+
+    vtkNew<vtkFloatArray> parallelLineTopY;
+    parallelLineTopY->SetName("parallel Line Top Y");
+    table2->AddColumn(parallelLineTopY.GetPointer());
+
+    vtkNew<vtkFloatArray> parallelLineBottomX;
+    parallelLineBottomX->SetName("parallel Line Bottom X");
+    table2->AddColumn(parallelLineBottomX.GetPointer());
+
+    vtkNew<vtkFloatArray> parallelLineBottomY;
+    parallelLineBottomY->SetName("parallel Line Bottom Y");
+    table2->AddColumn(parallelLineBottomY.GetPointer());
+
+    table2->SetNumberOfRows(2);
+    double deltaTheta=0.07;
+
+    theta = 11.0 / 7 + (1 - deltaTheta)*11.0 / 7;
+    table2->SetValue(0, 0, range / 2 + radius1*cos(theta));
+    table2->SetValue(0, 1, range / 2 + radius1*sin(theta));
+
+    theta = deltaTheta*11.0 / 7;
+    table2->SetValue(1, 0, range / 2 + radius1*cos(theta));
+    table2->SetValue(1, 1, range / 2 + radius1*sin(theta));
+
+    theta = 11.0 / 7 + (1 + deltaTheta)*11.0 / 7;
+    table2->SetValue(0, 2, range / 2 + radius1*cos(theta));
+    table2->SetValue(0, 3, range / 2 + radius1*sin(theta));
+
+    theta = -deltaTheta*11.0 / 7;
+    table2->SetValue(1, 2, range / 2 + radius1*cos(theta));
+    table2->SetValue(1, 3, range / 2 + radius1*sin(theta));
+
+    vtkPlot *points3 = chart->AddPlot(vtkChart::LINE);
+    points3->SetInputData(table2.GetPointer(), 0, 1);
+    points3->SetColor(1, 0, 0, 255);
+    points3->SetWidth(lineWidth);
+
+    vtkPlot *points4 = chart->AddPlot(vtkChart::LINE);
+    points4->SetInputData(table2.GetPointer(), 2, 3);
+    points4->SetColor(1, 0, 0, 255);
+    points4->SetWidth(lineWidth);
+
+    //-----------------------------------------------------------
+    // Add data points to hack disabling the autoscaling of chart
+    //-----------------------------------------------------------
+    vtkNew<vtkTable> table3;
+
+    vtkNew<vtkFloatArray> cornerPointX;
+    cornerPointX->SetName("Corner point X");
+    table3->AddColumn(cornerPointX.GetPointer());
+
+    vtkNew<vtkFloatArray> cornerPointY;
+    cornerPointY->SetName("Corner point Y");
+    table3->AddColumn(cornerPointY.GetPointer());
+
+    table3->SetNumberOfRows(2);
+    table3->SetValue(0, 0, 0);
+    table3->SetValue(0, 1, 0);
+    table3->SetValue(1, 0, range);
+    table3->SetValue(1, 1, range);
+
+    vtkPlot *points5 = chart->AddPlot(vtkChart::POINTS);
+    points5->SetInputData(table3.GetPointer(), 0, 1);
+    points5->SetColor(255, 255, 255, 0);
 }
 
 ///
