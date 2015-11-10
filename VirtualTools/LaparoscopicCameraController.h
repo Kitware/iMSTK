@@ -74,7 +74,7 @@ struct screenShotData
     ~screenShotData(){};
 };
 
-class LaparoscopicCameraCoupler : public Module
+class LaparoscopicCameraController : public Module
 {
 public:
 	using TransformType = Eigen::Transform<double, 3, Eigen::Isometry>;
@@ -83,18 +83,18 @@ public:
     ///
     /// \brief Constructor
     ///
-    LaparoscopicCameraCoupler() = default;
+    LaparoscopicCameraController() = default;
 
-    LaparoscopicCameraCoupler(
+    LaparoscopicCameraController(
         std::shared_ptr<DeviceInterface> inputDevice,
         vtkCamera* camera);
 
-    LaparoscopicCameraCoupler(std::shared_ptr<DeviceInterface> inputDevice);
+    LaparoscopicCameraController(std::shared_ptr<DeviceInterface> inputDevice);
 
 	///
 	/// \brief Destructor
 	///
-    ~LaparoscopicCameraCoupler();
+    ~LaparoscopicCameraController();
 
 	///
 	/// \brief Initialize the camera scope configuration

@@ -93,7 +93,6 @@ public:
                             this->screenCaptureData->triggerScreenCapture = false;
                         }
                     }
-
                     this->renderWindow->Render();
                 }
                 break;

@@ -25,7 +25,7 @@
 #define VTKVIEWER_H
 
 #include "Core/ViewerBase.h"
-#include "VirtualTools/LaparoscopicCameraCoupler.h"
+#include "VirtualTools/LaparoscopicCameraController.h"
 #include "vtkContextActor.h"
 #include "vtkContextScene.h"
 

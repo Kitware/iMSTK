@@ -22,7 +22,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "LaparoscopicCameraCoupler.h"
+#include "LaparoscopicCameraController.h"
 
 #include <thread>
 
@@ -30,7 +30,7 @@
 #include "Devices/DeviceInterface.h"
 #include "Core/RenderDelegate.h"
 
-LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
+LaparoscopicCameraController::LaparoscopicCameraController(
     std::shared_ptr< DeviceInterface > inputDevice,
     vtkCamera* camera)
 {
@@ -46,7 +46,7 @@ LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
-LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
+LaparoscopicCameraController::LaparoscopicCameraController(
     std::shared_ptr<DeviceInterface> inputDevice)
 {
     this->inputDevice = inputDevice;
@@ -59,11 +59,11 @@ LaparoscopicCameraCoupler::LaparoscopicCameraCoupler(
     cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
-LaparoscopicCameraCoupler::~LaparoscopicCameraCoupler()
+LaparoscopicCameraController::~LaparoscopicCameraController()
 {
 }
 
-void LaparoscopicCameraCoupler::initializeCameraScopeConfiguration()
+void LaparoscopicCameraController::initializeCameraScopeConfiguration()
 {
     this->bendingRadius = 1.0; // default bending radius
     angleX = 0.0;
@@ -73,58 +73,58 @@ void LaparoscopicCameraCoupler::initializeCameraScopeConfiguration()
     deltaAngleXY = (4.0 / 360)*(22.0 / 7);// 2 deg
 }
 
-void LaparoscopicCameraCoupler::setInputDevice(std::shared_ptr<DeviceInterface> newDevice)
+void LaparoscopicCameraController::setInputDevice(std::shared_ptr<DeviceInterface> newDevice)
 {
     this->inputDevice = newDevice;
 }
 
-std::shared_ptr< DeviceInterface > LaparoscopicCameraCoupler::getInputDevice()
+std::shared_ptr< DeviceInterface > LaparoscopicCameraController::getInputDevice()
 {
     return this->inputDevice;
 }
 
-void LaparoscopicCameraCoupler::setCamera(vtkCamera* newCamera)
+void LaparoscopicCameraController::setCamera(vtkCamera* newCamera)
 {
     this->camera = newCamera;
 }
 
-vtkCamera* LaparoscopicCameraCoupler::getcamera() const
+vtkCamera* LaparoscopicCameraController::getcamera() const
 {
     return this->camera;
 }
 
-const std::chrono::milliseconds &LaparoscopicCameraCoupler::getPoolDelay() const
+const std::chrono::milliseconds &LaparoscopicCameraController::getPoolDelay() const
 {
     return this->poolDelay;
 }
 
-void LaparoscopicCameraCoupler::setPoolDelay(const std::chrono::milliseconds& delay)
+void LaparoscopicCameraController::setPoolDelay(const std::chrono::milliseconds& delay)
 {
     this->poolDelay = delay;
 }
 
-const double& LaparoscopicCameraCoupler::getScalingFactor() const
+const double& LaparoscopicCameraController::getScalingFactor() const
 {
     return this->scalingFactor;
 }
 
-void LaparoscopicCameraCoupler::setScalingFactor(const double factor)
+void LaparoscopicCameraController::setScalingFactor(const double factor)
 {
     this->scalingFactor = factor;
 }
 
-const Eigen::Quaternion<double> &LaparoscopicCameraCoupler::getOrientation() const
+const Eigen::Quaternion<double> &LaparoscopicCameraController::getOrientation() const
 {
     return this->orientation;
 }
 
-void LaparoscopicCameraCoupler::setOrientation(
+void LaparoscopicCameraController::setOrientation(
     const Eigen::Map<Eigen::Quaternion<double>>& newOrientation)
 {
     this->orientation = newOrientation;
 }
 
-void LaparoscopicCameraCoupler::init()
+void LaparoscopicCameraController::init()
 {
     this->orientation.setIdentity();
     this->position.setZero();
@@ -133,15 +133,15 @@ void LaparoscopicCameraCoupler::init()
     this->inputDevice->openDevice();
 }
 
-void LaparoscopicCameraCoupler::beginFrame()
+void LaparoscopicCameraController::beginFrame()
 {
 }
 
-void LaparoscopicCameraCoupler::endFrame()
+void LaparoscopicCameraController::endFrame()
 {
 }
 
-void LaparoscopicCameraCoupler::exec()
+void LaparoscopicCameraController::exec()
 {
     if(!this->camera)
     {
@@ -167,7 +167,7 @@ void LaparoscopicCameraCoupler::exec()
     this->terminate();
 }
 
-bool LaparoscopicCameraCoupler::updateCamera()
+bool LaparoscopicCameraController::updateCamera()
 {
     if (!this->inputDevice)
     {
@@ -215,48 +215,48 @@ bool LaparoscopicCameraCoupler::updateCamera()
     return true;
 }
 
-void LaparoscopicCameraCoupler::setOffsetOrientation(
+void LaparoscopicCameraController::setOffsetOrientation(
     const Eigen::Map<core::Quaterniond> &offsetOrientation)
 {
     this->offsetOrientation = offsetOrientation;
 }
 
-void LaparoscopicCameraCoupler::setOffsetPosition(const core::Vec3d &offsetPosition)
+void LaparoscopicCameraController::setOffsetPosition(const core::Vec3d &offsetPosition)
 {
     this->offsetPosition = offsetPosition;
 }
 
-const core::Quaterniond & LaparoscopicCameraCoupler::getOffsetOrientation() const
+const core::Quaterniond & LaparoscopicCameraController::getOffsetOrientation() const
 {
     return this->offsetOrientation;
 }
 
-const core::Vec3d & LaparoscopicCameraCoupler::getOffsetPosition() const
+const core::Vec3d & LaparoscopicCameraController::getOffsetPosition() const
 {
     return this->offsetPosition;
 }
 
-std::shared_ptr<cameraConfigurationData> LaparoscopicCameraCoupler::getCameraData()
+std::shared_ptr<cameraConfigurationData> LaparoscopicCameraController::getCameraData()
 {
     return cameraPosOrientData;
 };
 
-double LaparoscopicCameraCoupler::getBendingRadius() const
+double LaparoscopicCameraController::getBendingRadius() const
 {
     return bendingRadius;
 }
 
-void LaparoscopicCameraCoupler::setBendingRadius(const double val)
+void LaparoscopicCameraController::setBendingRadius(const double val)
 {
     bendingRadius = val;
 }
 
-std::shared_ptr<screenShotData> LaparoscopicCameraCoupler::getScreenCaptureData()
+std::shared_ptr<screenShotData> LaparoscopicCameraController::getScreenCaptureData()
 {
     return screenCaptureData;
 }
 
-void LaparoscopicCameraCoupler::enableScreenCapture()
+void LaparoscopicCameraController::enableScreenCapture()
 {
     this->screenCaptureData = std::make_shared<screenShotData>();
 }
