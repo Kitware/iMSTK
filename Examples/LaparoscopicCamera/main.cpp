@@ -39,10 +39,13 @@
 ///
 /// \brief Create camera navigation scene
 ///
-bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
+bool createCameraNavigationScene(
+    std::shared_ptr<SDK> sdk,
+    char* fileName,
+    char* fileNameTarget)
 {
     //-------------------------------------------------------
-    // Create scene actor 1:  plane
+    // Create plane
     //-------------------------------------------------------
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
@@ -57,49 +60,80 @@ bool createCameraNavigationScene(std::shared_ptr<SDK> sdk, char* fileName)
 
     auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
-    Color grey(0.32, 0.32, 0.32, 1.0);
-
-    planeRendDetail->setAmbientColor(grey);
-    planeRendDetail->setDiffuseColor(grey);
-    planeRendDetail->setSpecularColor(grey);
+    planeRendDetail->setAmbientColor(Color(0.5, 0.5, 0.5, 1.0));
+    planeRendDetail->setDiffuseColor(Color(0.5, 0.5, 0.5, 1.0));
+    planeRendDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
     planeRendDetail->setShininess(50.0);
 
     plane->getPlaneModel()->setRenderDetail(planeRendDetail);
 
-    sdk->addSceneActor(staticObject, staticSimulator);
+    sdk->getScene(0)->addSceneObject(staticObject);
 
     //-------------------------------------------------------
-    // Create targets
+    // Create target blocks
     //-------------------------------------------------------
+
+    Color grey(0.32, 0.32, 0.32, 1.0);
+
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
-    meshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-    meshRenderDetail->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
-    meshRenderDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
+    meshRenderDetail->setAmbientColor(grey);
+    meshRenderDetail->setDiffuseColor(grey);
+    meshRenderDetail->setSpecularColor(grey);
     meshRenderDetail->setShininess(100.0);
 
     double radius = 3.0;
     for (int i = 0; i < 6; i++)
     {
-        auto staticSimulator2 = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+        auto staticBlock = std::make_shared<StaticSceneObject>();
 
-        auto staticTarget = std::make_shared<StaticSceneObject>();
+        auto targetBlock = std::make_shared<MeshCollisionModel>();
+        targetBlock->loadTriangleMesh(fileName);
+        targetBlock->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
+        staticBlock->setModel(targetBlock);
 
-        auto targetModel = std::make_shared<MeshCollisionModel>();
-        targetModel->loadTriangleMesh(fileName);
-        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
-        staticTarget->setModel(targetModel);
+        targetBlock->setRenderDetail(meshRenderDetail);
 
-        targetModel->setRenderDetail(meshRenderDetail);
+        sdk->getScene(0)->addSceneObject(staticBlock);
 
-        sdk->addSceneActor(staticTarget, staticSimulator2);
-
-        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
+        targetBlock->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
 
         Eigen::Quaterniond q(cos(i*22.0/42), 0, sin(i*22.0/42), 0);
         q.normalize();
+        targetBlock->getMesh()->rotate(q);
+    }
+
+    //-------------------------------------------------------
+    // Create targets
+    //-------------------------------------------------------
+    auto meshRenderDetail2 = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+
+    meshRenderDetail2->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
+    meshRenderDetail2->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
+    meshRenderDetail2->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
+    meshRenderDetail2->setShininess(100.0);
+
+    for (int i = 0; i < 6; i++)
+    {
+        auto staticTarget = std::make_shared<StaticSceneObject>();
+
+        auto targetModel = std::make_shared<MeshCollisionModel>();
+        targetModel->loadTriangleMesh(fileNameTarget);
+        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.1));//0.2
+        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
+        staticTarget->setModel(targetModel);
+
+        targetModel->setRenderDetail(meshRenderDetail2);
+
+        sdk->getScene(0)->addSceneObject(staticTarget);
+
+        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
+
+        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
+        q.normalize();
         targetModel->getMesh()->rotate(q);
     }
+
     return true;
 }
 
@@ -346,7 +380,7 @@ int main(int ac, char** av)
     auto sdk = SDK::createStandardSDK();
 
     // Create camera navigation scene
-    createCameraNavigationScene(sdk, "./Target.vtk");
+    createCameraNavigationScene(sdk, "./Target.vtk", "./Target-marker.vtk");
 
     //-------------------------------------------------------
     // Set up the viewer
@@ -379,8 +413,9 @@ int main(int ac, char** av)
 
     //-------------------------------------------------------
 
-    // add a camera controller
-    std::shared_ptr<LaparoscopicCameraController> camController = addCameraController(sdk);
+    // Add a camera controller
+    std::shared_ptr<LaparoscopicCameraController> camController =
+        addCameraController(sdk);
 
     // Enable screenshot capture
     camController->enableScreenCapture();
@@ -394,7 +429,7 @@ int main(int ac, char** av)
     // Run the SDK
     sdk->run();
 
-    //cleanup
+    // Cleanup
     sdk->releaseScene(scene);
 
     return 0;

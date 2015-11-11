@@ -74,6 +74,13 @@ struct screenShotData
     ~screenShotData(){};
 };
 
+///
+/// \class LaparoscopicCameraController
+///
+/// \brief This class enables the controll of the vtk camera using an external device
+/// Additionally it allows for tip deflection just like you would see in some laparoscopic
+/// camera scopes.
+///
 class LaparoscopicCameraController : public Module
 {
 public:
@@ -234,7 +241,9 @@ public:
     void exec() override;
 
 private:
-    TransformType initialTransform; //!< Transform applied to the position obtained from device
+    TransformType initialTransform; //!< Transform applied to the position
+                                    // obtained from device
+
     core::Quaterniond orientation; //!< Previous rotation quaternion from device
 
     core::Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom

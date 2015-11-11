@@ -68,12 +68,13 @@ void LaparoscopicCameraController::initializeCameraScopeConfiguration()
     this->bendingRadius = 1.0; // default bending radius
     angleX = 0.0;
     angleY = 0.0;
-    maxAngleX = maxAngleY = 11.0 / 7; //+ 90 deg
+    maxAngleX = maxAngleY = 11.0 / 7; // 90 deg
     minAngleX = minAngleY = -11.0 / 7; //- 90 deg
     deltaAngleXY = (4.0 / 360)*(22.0 / 7);// 2 deg
 }
 
-void LaparoscopicCameraController::setInputDevice(std::shared_ptr<DeviceInterface> newDevice)
+void LaparoscopicCameraController::setInputDevice(
+    std::shared_ptr<DeviceInterface> newDevice)
 {
     this->inputDevice = newDevice;
 }
