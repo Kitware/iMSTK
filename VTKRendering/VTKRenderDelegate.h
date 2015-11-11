@@ -3,13 +3,17 @@
 
 #include <vtkOpenGLPolyDataMapper.h>
 #include "Core/RenderDelegate.h"
+//#include "Core/RenderDetail.h"
 
 class vtkActor;
+class Shaders;
+
 class CustomGLPolyDataMapper :public vtkOpenGLPolyDataMapper{
 public:
 	static CustomGLPolyDataMapper* New();
 	std::shared_ptr<RenderDetail> renderDetail;
 	vtkOpenGLBufferObject * tangentsBuffer;
+	//vtkOpenGLVertexBufferObject* tangentsBuffer;
 	std::vector<core::Vec3d>tangents;
 	vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
 		virtual void initDraw();
@@ -31,46 +35,16 @@ public:
     virtual void modified() override{}
     virtual void draw() const override{ }
 
-    template<typename ShaderProgramType>
-    void setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
-                           const ShaderProgramType &shaderPrograms);
+  
+    void setShadersProgram(vtkOpenGLPolyDataMapper *mapper,const std::string  &shaderPrograms);
 
     template<typename ShaderProgramType>
     void setShadersProgramReplacements(vtkOpenGLPolyDataMapper *mapper,
                                        const ShaderProgramType &shaderPrograms);
 };
 
-template<typename ShaderProgramType>
-void VTKRenderDelegate::setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
-                                          const ShaderProgramType &shaderPrograms)
-{
-    for(const auto &program : shaderPrograms)
-    {
-        switch(static_cast<vtkShader::Type>(program.first))
-        {
-            case vtkShader::Fragment:
-            {
-                mapper->SetFragmentShaderCode(program.second.c_str());
-				
-                break;
-            }
-            case vtkShader::Vertex:
-            {
-                mapper->SetVertexShaderCode(program.second.c_str());
-                break;
-            }
-            case vtkShader::Geometry:
-            {
-                mapper->SetGeometryShaderCode(program.second.c_str());
-                break;
-            }
-            default:
-            {
-                std::cerr << "Unknown shader program." << std::endl;
-            }
-        }
-    }
-}
+
+
 
 template<typename ShaderProgramType>
 void VTKRenderDelegate::setShadersProgramReplacements(vtkOpenGLPolyDataMapper *mapper,

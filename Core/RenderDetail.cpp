@@ -26,7 +26,117 @@
 #include <sstream>
 #include <iostream>
 
+std::map<std::string, ShaderDetail> Shaders::shaderPrograms;
 
+bool Shaders::shaderExists(std::string shaderProgramName){
+	std::map<std::string, ShaderDetail>::iterator it= shaderPrograms.find(shaderProgramName);
+	if (it == shaderPrograms.end())
+	{
+		return false;
+	}
+	else
+	{
+		
+		return true;
+	}
+
+}
+
+bool Shaders::getShaderProgram(std::string shaderProgramName, ShaderDetail &shaderDetail){
+	std::map<std::string, ShaderDetail>::iterator it;
+	it = shaderPrograms.find(shaderProgramName);
+	if (it == shaderPrograms.end())
+	{
+		return false;
+	}
+	else
+	{
+		shaderDetail = shaderPrograms[shaderProgramName];
+		return true;
+	}
+}
+ bool Shaders::createShader(std::string shaderProgramName, std::string vertexShaderFileName, std::string fragmentShaderFileName, 
+	 std::string geometryShaderFileName)
+{
+	 ShaderDetail shaderDetail;
+	 std::map<std::string, ShaderDetail> &shaderPrograms = Shaders::getShaderPrograms();
+
+
+	 std::ifstream shaderFileStream(vertexShaderFileName.c_str(), std::ifstream::in);
+	 if (!shaderFileStream.is_open())
+	 {
+
+
+		 std::cerr << "Error opening the shader program: " << vertexShaderFileName << std::endl;
+		 return false;
+	 }
+	 std::stringstream buffer;
+	 buffer << shaderFileStream.rdbuf();
+	
+	 
+	shaderDetail.vertexShaderFileName = vertexShaderFileName;
+	shaderDetail.vertexShaderSource = buffer.str();
+	//std::cout << shaderDetail.vertexShaderSource << std::endl;
+
+	//loading the fragment shader source code
+	shaderFileStream.close();
+	shaderFileStream.clear();
+	buffer.str(std::string());
+	buffer.clear();
+	
+
+
+
+	
+	shaderFileStream.open(fragmentShaderFileName.c_str(), std::ifstream::in);
+	if (!shaderFileStream.is_open())
+	{
+			std::cerr << "Error opening the shader program: " << fragmentShaderFileName << std::endl;
+			return false;
+	}
+
+	buffer << shaderFileStream.rdbuf();
+	shaderDetail.fragmentShaderFileName = fragmentShaderFileName;
+	shaderDetail.fragmentShaderSource = buffer.str();
+	//std::cout << shaderDetail.fragmentShaderSource << std::endl;
+	
+	shaderFileStream.close();
+	shaderFileStream.clear();
+	buffer.str(std::string());
+	buffer.clear();
+	
+	if (!geometryShaderFileName.empty()){
+		shaderFileStream.open(geometryShaderFileName.c_str(), std::ifstream::in);
+		if (!shaderFileStream.is_open())
+		{
+
+
+			std::cerr << "Error opening the shader program: " << geometryShaderFileName << std::endl;
+			return false;
+		}
+		buffer << shaderFileStream.rdbuf();
+		shaderDetail.geometryShaderFileName = geometryShaderFileName;
+		shaderDetail.geometryShaderSource = buffer.str();
+		shaderDetail.geometryShaderExists = true;
+		shaderFileStream.close();
+		shaderFileStream.clear();
+		buffer.str(std::string());
+		buffer.clear();
+
+	}
+
+	
+	
+	
+	shaderDetail.shaderProgramName = shaderProgramName;
+	shaderPrograms.emplace(shaderProgramName, shaderDetail);
+
+}
+
+std::map<std::string, ShaderDetail>  &Shaders::getShaderPrograms() {
+	return Shaders::shaderPrograms;
+
+}
 //---------------------------------------------------------------------------
 RenderDetail::RenderDetail()
 {
@@ -39,6 +149,7 @@ RenderDetail::RenderDetail(unsigned int type)
     this->reset();
     this->normalLength = 1.0;
     this->renderType = type;
+	hasShader = false;
 }
 
 //---------------------------------------------------------------------------
@@ -330,8 +441,22 @@ bool RenderDetail::renderFaces() const
 }
 
 //---------------------------------------------------------------------------
-void RenderDetail::addShaderProgram(int shaderType, const std::string& programFilename)
+void RenderDetail::addShaderProgram(const std::string &shaderProgramName)
 {
+	
+	if (Shaders::shaderExists(shaderProgramName))
+	{
+		hasShader = true;
+		this->shaderProgramName.assign(shaderProgramName);
+	}
+	
+}
+//This will depreciate
+void RenderDetail::addShaderProgram(int shaderType, const std::string& programFilename, const std::string &shaderProgramName)
+{
+
+	ShaderDetail shaderDetail;
+	
     std::ifstream shaderFileStream(programFilename.c_str(), std::ifstream::in);
     if(!shaderFileStream.is_open())
     {
@@ -340,13 +465,26 @@ void RenderDetail::addShaderProgram(int shaderType, const std::string& programFi
     }
     std::stringstream buffer;
     buffer << shaderFileStream.rdbuf();
-    this->shaderPrograms.emplace(shaderType,buffer.str());
+	std::map<std::string, ShaderDetail> &shaderPrograms = Shaders::getShaderPrograms();
+	if (!(shaderPrograms.find(shaderProgramName) == shaderPrograms.end())){
+		shaderDetail = shaderPrograms[shaderProgramName];
+	}
+	if (shaderType == 0/*vtkShader::Vertex*/){//the numeric value will be changed with vtkShader::Vertex
+		shaderDetail.vertexShaderFileName=programFilename;
+		shaderDetail.vertexShaderSource=buffer.str();
+	}
+	if (shaderType == 1/*vtkShader::Fragment*/){//the numeric value will be changed with  vtkShader::Fragment
+		//auto &shaderDetail = shaderPrograms[shaderProgramName];
+		shaderDetail.fragmentShaderFileName=programFilename;
+		shaderDetail.fragmentShaderSource=buffer.str();
+	}
+	shaderPrograms.emplace(shaderProgramName, shaderDetail);
 }
 
 //---------------------------------------------------------------------------
-std::map<int, std::string >& RenderDetail::getShaderPrograms()
+std::string  RenderDetail::getShaderProgram() 
 {
-    return this->shaderPrograms;
+	return shaderProgramName;
 }
 
 //---------------------------------------------------------------------------
@@ -365,8 +503,11 @@ std::map< int, std::vector< std::array< std::string, int(2) > > >& RenderDetail:
 //---------------------------------------------------------------------------
 bool RenderDetail::hasShaders()
 {
-    return !this->shaderPrograms.empty() ||
-           !this->shaderProgramReplacements.empty();
+	//std::map<std::string, ShaderDetail> &shaderPrograms = Shaders::getShaderPrograms();
+	//return !shaderPrograms.empty() ||
+     //      !this->shaderProgramReplacements.empty();
+
+	return hasShader;
 }
 
 //---------------------------------------------------------------------------

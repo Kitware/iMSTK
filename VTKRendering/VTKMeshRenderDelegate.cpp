@@ -182,8 +182,12 @@ void MeshRenderDelegate::initDraw()
 			imageReader->Update();
 			texture = vtkOpenGLTexture::New();
 			//vtkTextureObject *textureObject = vtkTextureObject::New();
-		
+			//texture->GetTextureObject()->SetLinearMagnification(true);
+			//texture->GetTextureObject()->SetGenerateMipmap(true);
 			texture->SetInputConnection(imageReader->GetOutputPort());
+		
+		
+
 			
 			//texture->SetTextureObject(textureObject);
 			//textureObject->Create2D
@@ -235,6 +239,7 @@ void MeshRenderDelegate::initDraw()
 		mapperCustom->renderDetail = renderDetail;
 		mesh->computeVertexNeighbors();
 		mesh->setUseOBJTexture(true);
+		//mesh->setUseThreDSTexture(true);
 		mesh->computeTriangleTangents();
 		
 		mapperCustom->tangents = mesh->getVertexTangents();
@@ -242,12 +247,24 @@ void MeshRenderDelegate::initDraw()
         if(renderDetail->hasShaders())
         {
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
-            auto shadersPrograms = renderDetail->getShaderPrograms();
-            this->setShadersProgram(glMapper,shadersPrograms);
+			//auto shadersPrograms = renderDetail->getShaderPrograms();
+			std::string shaderProgramName =renderDetail->getShaderProgram();
+			
+			this->setShadersProgram(glMapper, shaderProgramName);
+			/*for (auto&shaderProgramName : shadersPrograms){
+				if (shaderProgramName.second){
+					this->setShadersProgram(glMapper, shaderProgramName.first);
+					auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
+					this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
+				}
+
+			}*/
+		
+		
+            
 		
 
-            auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
-            //this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
+          
 			
 			
 			
@@ -293,9 +310,13 @@ void CustomGLPolyDataMapper::initDraw(){
 
 }
 void CustomGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act){
+	
 	tangentsBuffer = vtkOpenGLBufferObject::New();
+	//tangentsBuffer=vtkOpenGLVertexBufferObject::New();
+	
 	tangentsBuffer->Bind();
 	if (tangentsBuffer->Upload(this->tangents, vtkOpenGLBufferObject::ArrayBuffer)){
+	//if (tangentsBuffer->Upload(this->tangents, vtkOpenGLVertexBufferObject::ArrayBuffer)){
 		cout << "Completed Tangents Binding"<<endl;
 	
 	
@@ -307,16 +328,16 @@ void CustomGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act)
 
 void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act)
 {
-	double testColor1 = 0.01;
-	double testColor2 = 0.01;
+	float lightPower = 5.0;
+	float roughness = 160.0;
 	static double testColor3 = 0.01;
 	vtkShaderProgram *program = cellBO.Program;
-	
-	testColor3 += 0.01;
-	program->SetUniformf("TestColor1", testColor1);
-	program->SetUniformf("TestColor2", testColor2);
-	program->SetUniformf("TestColor3", testColor3);
 
+	testColor3 += 0.01;
+	program->SetUniformf("lightPower", lightPower);
+	program->SetUniformf("roughness", roughness);
+	//program->SetUniformf("TestColor3", testColor3);
+	
 	std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
 	
 	
@@ -340,6 +361,59 @@ void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, 
 	}
 	vtkOpenGLPolyDataMapper::SetMapperShaderParameters(cellBO, ren, act);
 		
+}
+
+void VTKRenderDelegate::setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
+	const std::string &shaderPrograms)
+{
+   
+	std::map<std::string, ShaderDetail>    &shaders = Shaders::getShaderPrograms();
+	
+	if (shaders.find(shaderPrograms) == shaders.end()){
+
+		return;
+	}
+	ShaderDetail &shaderDetail=shaders[shaderPrograms];
+
+	if (shaderDetail.initialized)
+		return;
+
+
+	mapper->SetFragmentShaderCode(shaderDetail.fragmentShaderSource.c_str());
+	mapper->SetVertexShaderCode(shaderDetail.vertexShaderSource.c_str());
+	if (shaderDetail.geometryShaderExists)
+	mapper->SetGeometryShaderCode(shaderDetail.geometryShaderSource.c_str());
+	
+	//This attachment can be further improved
+	//for(const auto &program : shaderPrograms)
+	//{
+
+
+	//if (program.second[]
+	/* switch(static_cast<vtkShader::Type>(program.first))
+	{
+	case vtkShader::Fragment:
+	{
+	mapper->SetFragmentShaderCode(program.second.c_str());
+
+	break;
+	}
+	case vtkShader::Vertex:
+	{
+	mapper->SetVertexShaderCode(program.second.c_str());
+	break;
+	}
+	case vtkShader::Geometry:
+	{
+	mapper->SetGeometryShaderCode(program.second.c_str());
+	break;
+	}
+	default:
+	{
+	std::cerr << "Unknown shader program." << std::endl;
+	}
+	}*/
+	// }
 }
 
 RegisterFactoryClass(RenderDelegate,

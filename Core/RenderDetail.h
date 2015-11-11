@@ -106,6 +106,50 @@ struct TextureDetail {
 
 };
 
+
+struct ShaderDetail{
+	ShaderDetail(){
+		initialized = false;
+		geometryShaderExists = false;
+	
+	}
+	std::string vertexShaderFileName;
+	std::string vertexShaderSource;
+
+	std::string fragmentShaderFileName;
+	std::string fragmentShaderSource;
+
+	bool geometryShaderExists;
+	std::string geometryShaderFileName;
+	std::string geometryShaderSource;
+	std::string shaderProgramName;
+	bool initialized;
+	
+	//std::string tessellationShaderFileName;
+	//std::string tessellationShaderSource;
+	//std::string computeShaderFileName;
+	//std::string computeShaderSource;
+
+		
+};
+
+
+class Shaders{
+public:
+	Shaders();
+	static bool createShader(std::string shaderProgramName, std::string vertexShaderFileName, std::string fragmentShaderFileName, std::string geometryShaderFileName);
+	static std::map<std::string, ShaderDetail>  &getShaderPrograms();
+	static bool Shaders::getShaderProgram(std::string shaderProgramName, ShaderDetail &shaderDetail);
+	static bool shaderExists(std::string shaderProgramName);
+
+	
+	
+	
+protected:
+
+	static std::map<std::string, ShaderDetail> shaderPrograms;
+
+};
 /// \brief RenderDetail has rendering options and features.
 ///It shows how the mesh should be rendered
 struct RenderDetail
@@ -263,12 +307,15 @@ public:
     ///
     /// @brief Add a shader program to the the list (vtk)
     ///
-    void addShaderProgram(int shaderType, const std::string &programFilename);
+	void addShaderProgram(int shaderType, const std::string &programFilename, const std::string & programName);
+
+	void RenderDetail::addShaderProgram(const std::string &shaderProgramName);
+	std::string  getShaderProgram();
 
     ///
     /// \brief Return list of shader programs
     ///
-    std::map<int, std::string> &getShaderPrograms();
+	std::map<std::string, bool> &getShaderPrograms();
 
     ///
     /// @brief Add a shader program for partial replacement of vtk default shaders.
@@ -344,8 +391,12 @@ private:
     float shininess; // specular shinness
     std::string textureFilename; // file name for the texture attached]
     unsigned int renderType; // render type
+	
+	std::string shaderProgramName;
+	bool hasShader;
 
-    std::map<int, std::string> shaderPrograms;
+
+	std::map<std::string,bool> shaderPrograms;
     std::map<int, std::vector<std::array<std::string, 2>>> shaderProgramReplacements;
     std::vector<bool> shaderEnable; // enable/disable any attached shader
     std::vector<bool> VAOEnable; // enable/disable any attached VAO

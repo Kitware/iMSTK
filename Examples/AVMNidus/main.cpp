@@ -90,12 +90,31 @@ int main(int ac, char **av)
     meshRenderDetail->setShininess(20.0);
 
     // Set shader porograms
-    meshRenderDetail->addShaderProgram(vtkShader::Vertex,"shaders/wet_vert.glsl");
-    meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl");
-	meshRenderDetail->addTexture("decal", "textures/cube2.jpg", "textureDecal", "wet_frag.glsl");
-	meshRenderDetail->addTexture("bump", "textures/usertile34.bmp", "textureSpecular", "wet_frag.glsl");
-	meshRenderDetail->addTexture("specular", "textures/2.png", "textureBump", "wet_frag.glsl");
-    meshRenderDetail->setTextureFilename("textures/cube.jpg");
+
+	//meshRenderDetail->addShaderProgram(vtkShader::Vertex,"shaders/wet_vert.glsl","wetshader");
+	//meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl","wetshader");
+	Shaders::createShader("wetshader", "shaders/wet_vert.glsl", "shaders/wet_frag.glsl", "");
+    meshRenderDetail->addShaderProgram("wetshader");
+	/*meshRenderDetail->addTexture("decal", "textures/metal1.bmp", "textureDecal", "wetshader");
+	meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
+	meshRenderDetail->setTextureFilename("textures/cube.jpg");
+	*/
+	meshRenderDetail->addTexture("decal", "textures/brainx.bmp", "textureDecal", "wetshader");
+	meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
+	meshRenderDetail->setTextureFilename("textures/brainx.bmp");
+
+
+	auto planeMeshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);
+	planeMeshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
+	planeMeshRenderDetail->setDiffuseColor(Color::colorGray);
+	planeMeshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
+	planeMeshRenderDetail->setShininess(20.0);
+
+	// Set shader porograms
+	planeMeshRenderDetail->addShaderProgram("wetshader");
+	planeMeshRenderDetail->addTexture("decal", "textures/brain_outside.jpg", "textureDecal", "wetshader");
+	planeMeshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
+	
 
    // auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
    /* if(renderingMesh)
@@ -112,13 +131,13 @@ int main(int ac, char **av)
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
     // create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<StaticSceneObject>();
+    //auto staticObject = std::make_shared<StaticSceneObject>();
 
-    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
-                                                  core::Vec3d(0.0, 0.0, 1.0));
+    //auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
+      //                                            core::Vec3d(0.0, 0.0, 1.0));
 
-    staticObject->setModel(plane);
-    sdk->addSceneActor(staticObject, staticSimulator);
+    //staticObject->setModel(plane);
+    //sdk->addSceneActor(staticObject, staticSimulator);
 
     //-------------------------------------------------------
     // Register both object simulators
@@ -157,13 +176,23 @@ int main(int ac, char **av)
 
 
 	auto cubeModel = std::make_shared<MeshModel>();
-	cubeModel->load("models/cube.obj");
-	cubeModel->getMesh()->scale(Eigen::UniformScaling<double>(10.0));
+	//cubeModel->load("models/blade2.obj");
+	cubeModel->load("models/brain.obj");
+	//cubeModel->getMesh()->scale(Eigen::UniformScaling<double>(10.0));
 	cubeModel->setRenderDetail(meshRenderDetail);
 
 	auto cube = std::make_shared<StaticSceneObject>();
 	cube->setModel(cubeModel);
 
+
+
+	auto planeModel = std::make_shared<MeshModel>();
+	//cubeModel->load("models/blade2.obj");
+	planeModel->load("models/plane.obj");
+	planeModel->setRenderDetail(planeMeshRenderDetail);
+
+	auto plane = std::make_shared<StaticSceneObject>();
+	plane->setModel(planeModel);
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -181,6 +210,7 @@ int main(int ac, char **av)
     viewer->registerScene(scene);
 	
 	scene->addSceneObject(cube);
+	scene->addSceneObject(plane);
 
 
     // Setup Scene lighting

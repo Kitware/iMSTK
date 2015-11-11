@@ -1,4 +1,6 @@
 include(${VTK_USE_FILE})
+
+message("${VTK_USE_FILE}")
 simmedtk_add_library(Core
   SOURCES
     BaseMesh.cpp
@@ -9,6 +11,7 @@ simmedtk_add_library(Core
     ContactHandling.cpp
     CoreClass.cpp
     Dispatcher.cpp
+    DisplayText.cpp
     ErrorLog.cpp
     Event.cpp
     EventHandler.cpp
@@ -31,6 +34,7 @@ simmedtk_add_library(Core
     BaseMesh.h
     CollisionConfig.h
     CollisionDetection.h
+    CollisionManager.h
     CollisionModelIterator.h
     CollisionPair.h
     Color.h
@@ -41,7 +45,9 @@ simmedtk_add_library(Core
     DataStructures.h
     DataStructures.hpp
     Dispatcher.h
+    DisplayText.h
     ErrorLog.h
+    EventData.h
     Event.h
     EventHandler.h
     Factory.h
@@ -51,6 +57,7 @@ simmedtk_add_library(Core
     Light.h
     MakeUnique.h
     Matrix.h
+    MemoryBlock.h
     Model.h
     Module.h
     ObjectSimulator.h
