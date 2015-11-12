@@ -55,13 +55,14 @@ bool createCameraNavigationScene(
     auto plane = std::make_shared<PlaneCollisionModel>(
         core::Vec3d(0.0, -0.01, 0.0),
         core::Vec3d(0.0, 1.0, 0.0));
+
     plane->getPlaneModel()->setWidth(5);
     staticObject->setModel(plane);
 
     auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
 
-    planeRendDetail->setAmbientColor(Color(0.5, 0.5, 0.5, 1.0));
-    planeRendDetail->setDiffuseColor(Color(0.5, 0.5, 0.5, 1.0));
+    planeRendDetail->setAmbientColor(Color(0.4, 0.4, 0.4, 1.0));
+    planeRendDetail->setDiffuseColor(Color(0.4, 0.4, 0.4, 1.0));
     planeRendDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
     planeRendDetail->setShininess(50.0);
 
@@ -119,8 +120,8 @@ bool createCameraNavigationScene(
 
         auto targetModel = std::make_shared<MeshCollisionModel>();
         targetModel->loadTriangleMesh(fileNameTarget);
-        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.1));//0.2
-        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
+        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0.02, 0.02));
+        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));
         staticTarget->setModel(targetModel);
 
         targetModel->setRenderDetail(meshRenderDetail2);
@@ -133,7 +134,6 @@ bool createCameraNavigationScene(
         q.normalize();
         targetModel->getMesh()->rotate(q);
     }
-
     return true;
 }
 

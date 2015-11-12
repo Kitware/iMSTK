@@ -1,18 +1,13 @@
-set(APP LaparoscopicCamera)
+set(APP LapCameraNavigationApp)
 
 add_executable(${APP} main.cpp)
 target_link_libraries(${APP}
   Core
   Geometry
   VTKRendering
-  # Rendering
-  # RenderDelegates
   Simulators
   Mesh
-  Collision
-  ContactHandling
   Event
-  # ExamplesCommon
   IO
   Devices
   VirtualTools
@@ -28,20 +23,17 @@ if(NOT EXISTS ${${APP}_DATA})
     file(MAKE_DIRECTORY ${${APP}_DATA})
 endif()
 
-set(FILE_URL http://midas3.kitware.com/midas/download/item/318708/box.tar)
-set(FILE_SHA1 928294a91477bc5d6fa494afb34016ba7f0b40c5)
-set(LOCAL_FILE ${EXAMPLES_DATA}/box.tar)
+set(FILE_URL http://midas3.kitware.com/midas/download/item/318829/CameraNavAppData.tar)
+set(FILE_SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709)
+set(LOCAL_FILE ${EXAMPLES_DATA}/CameraNavAppData.tar)
+
 
 midas_download(${FILE_URL} ${FILE_SHA1} ${LOCAL_FILE})
 
 # Extract data
 set(DATA
-    ${${APP}_DATA}/box.bou
-    ${${APP}_DATA}/box.config
-    ${${APP}_DATA}/box.interp
-    ${${APP}_DATA}/box.mass
-    ${${APP}_DATA}/box.vtk
-    ${${APP}_DATA}/box.veg
+    ${${APP}_DATA}/Target-marker.vtk
+    ${${APP}_DATA}/Target.vtk
 )
 
 add_custom_command(
