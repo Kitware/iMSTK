@@ -78,7 +78,7 @@ public:
                     {
                         if (this->screenCaptureData->triggerScreenCapture)
                         {
-                            //this->screenCaptureData->windowToImageFilter->Update();
+                            this->screenCaptureData->windowToImageFilter->Modified();
 
                             std::string captureName = "screenShot-"
                                 + std::to_string(this->screenCaptureData->screenShotNumber)

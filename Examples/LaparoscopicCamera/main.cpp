@@ -206,8 +206,8 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer)
 
     table->SetNumberOfRows(numPoints + 1);
 
-    double radius1 = range / 6;
-    double radius2 = range / 8;
+    double radius1 = range / 8;
+    double radius2 = range / 10;
     double theta;
 
     for (int i = 0; i < numPoints; i++)
