@@ -7,6 +7,7 @@ target_link_libraries(${APP}
   VTKRendering
   Simulators
   Mesh
+  Collision
   Event
   IO
   Devices
@@ -23,8 +24,8 @@ if(NOT EXISTS ${${APP}_DATA})
     file(MAKE_DIRECTORY ${${APP}_DATA})
 endif()
 
-set(FILE_URL http://midas3.kitware.com/midas/download/item/318829/CameraNavAppData.tar)
-set(FILE_SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709)
+set(FILE_URL http://midas3.kitware.com/midas/download/item/318830/CameraNavAppData.tar)
+set(FILE_SHA1 928294a91477bc5d6fa494afb34016ba7f0b40c5)
 set(LOCAL_FILE ${EXAMPLES_DATA}/CameraNavAppData.tar)
 
 

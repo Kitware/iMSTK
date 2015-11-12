@@ -75,18 +75,9 @@ find_path(LIBUSB_INCLUDE_DIR
 		libusb-1.0
 	)
 
-<<<<<<< HEAD
 set(LIBUSB1_LIBRARY ${LIBUSB_LIBRARY})
 set(LIBUSB1_INCLUDE_DIR ${LIBUSB_INCLUDE_DIR})
-=======
-<<<<<<< HEAD
-set(LIBUSB1_LIBRARY E:/SimMedTK/libusb-1.0.20/MS64/static/libusb-1.0.lib)
->>>>>>> Camera scope tip bending implementation.
 
-=======
-	set(LIBUSB1_LIBRARY E:/SimMedTK/libusb-1.0.20/MS64/static/libusb-1.0.lib)
-	
->>>>>>> Camera scope tip bending works!
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Libusb1
 	REQUIRED_VARS
