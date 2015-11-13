@@ -8,7 +8,7 @@
 #include <string>
 #include <cmath>
 
-// Core SimMedTK includes
+// Core iMSTK includes
 #include "Core/SDK.h"
 #include "Core/StaticSceneObject.h"
 #include "Devices/VRPNForceDevice.h"
@@ -19,22 +19,110 @@
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "IO/initIO.h"
-
-// VTK includes
 #include "VTKRendering/initVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkPNGWriter.h"
-#include "vtkChartXY.h"
-#include "vtkContextScene.h"
-#include "vtkContextActor.h"
-#include "vtkFloatArray.h"
-#include "vtkPlotPoints.h"
-#include "vtkTable.h"
-#include "vtkAxis.h"
-#include "vtkNew.h"
+
+// VTK includes
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+#include <vtkChartXY.h>
+#include <vtkContextScene.h>
+#include <vtkContextActor.h>
+#include <vtkFloatArray.h>
+#include <vtkPlotPoints.h>
+#include <vtkTable.h>
+#include <vtkAxis.h>
+#include <vtkNew.h>
+#include <vtkSmartPointer.h>
+#include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderWindow.h>
+#include <vtkObjectFactory.h>
 
 #define SPACE_EXPLORER_DEVICE true
+
+
+// Define custom interaction style
+class ScreenCaptureKeyPressEvent : public vtkInteractorStyleTrackballCamera
+{
+public:
+    struct screenShotData
+    {
+        vtkNew<vtkWindowToImageFilter> windowToImageFilter;
+        vtkNew<vtkPNGWriter> pngWriter;
+        bool triggerScreenCapture;
+        int screenShotNumber;
+
+        screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
+        {
+            windowToImageFilter->SetMagnification(1);
+
+            windowToImageFilter->SetInputBufferTypeToRGB();
+
+            windowToImageFilter->ReadFrontBufferOff();
+
+            windowToImageFilter->Update();
+
+            pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
+        };
+
+        ~screenShotData(){};
+    };
+
+    static ScreenCaptureKeyPressEvent* New();
+    vtkTypeMacro(ScreenCaptureKeyPressEvent, vtkInteractorStyleTrackballCamera);
+
+    virtual void OnKeyPress()
+    {
+        // Get the key press
+        vtkRenderWindowInteractor *rwi = this->Interactor;
+        std::string key = rwi->GetKeySym();
+
+        // Capture the screen
+        if (key == " ");// || key == "S")
+        {
+            this->screenCaptureData->triggerScreenCapture = true;
+
+            if (this->screenCaptureData != nullptr)
+            {
+                if (this->screenCaptureData->triggerScreenCapture)
+                {
+                    this->screenCaptureData->windowToImageFilter->Modified();
+
+                    std::string captureName = "screenShot-"
+                        + std::to_string(this->screenCaptureData->screenShotNumber)
+                        + ".png";
+
+                    this->screenCaptureData->pngWriter->SetFileName(
+                        captureName.data());
+
+                    this->screenCaptureData->pngWriter->Write();
+
+                    std::cout <<
+                        "Screen shot "<<
+                        this->screenCaptureData->screenShotNumber <<" saved.\n";
+
+                    this->screenCaptureData->screenShotNumber++;
+                    this->screenCaptureData->triggerScreenCapture = false;
+                }
+            }
+        }
+
+        // Forward events
+        vtkInteractorStyleTrackballCamera::OnKeyPress();
+    }
+
+    void initialize(vtkWindow* rw)
+    {
+        this->screenCaptureData = std::make_shared<screenShotData>();
+        this->screenCaptureData->windowToImageFilter->SetInput(rw);
+    };
+
+private:
+
+    std::shared_ptr<screenShotData> screenCaptureData;
+};
+vtkStandardNewMacro(ScreenCaptureKeyPressEvent);
 
 ///
 /// \brief Create camera navigation scene
@@ -413,15 +501,19 @@ int main(int ac, char** av)
 
     //-------------------------------------------------------
 
-    // Add a camera controller
-    std::shared_ptr<LaparoscopicCameraController> camController =
-        addCameraController(sdk);
+    std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
     // Enable screenshot capture
-    camController->enableScreenCapture();
+    auto style = vtkSmartPointer<ScreenCaptureKeyPressEvent>::New();
+    style->initialize(vtkViewer->getRenderWindow());
+    vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style);
+    style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
-    std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
-    vtkViewer->setScreenCaptureData(camController->getScreenCaptureData());
+    // Add a camera controller
+    // NOTE: This has to come after the ScreenCaptureKeyPressEvent initialization
+    // since for this to work the mouse events need disabled which are
+    // left as is after ScreenCaptureKeyPressEvent initialization
+    std::shared_ptr<LaparoscopicCameraController> camController = addCameraController(sdk);
 
     // Add a 2D overlay on the 3D scene
     add2DOverlay(vtkViewer);

@@ -51,29 +51,6 @@ struct cameraConfigurationData
     ~cameraConfigurationData(){};
 };
 
-struct screenShotData
-{
-    vtkNew<vtkWindowToImageFilter> windowToImageFilter;
-    vtkNew<vtkPNGWriter> pngWriter;
-    bool triggerScreenCapture;
-    int screenShotNumber;
-
-    screenShotData() : triggerScreenCapture(false), screenShotNumber(0)
-    {
-        windowToImageFilter->SetMagnification(1);
-
-        windowToImageFilter->SetInputBufferTypeToRGB();
-
-        windowToImageFilter->ReadFrontBufferOff();
-
-        windowToImageFilter->Update();
-
-        pngWriter->SetInputConnection(windowToImageFilter->GetOutputPort());
-    };
-
-    ~screenShotData(){};
-};
-
 ///
 /// \class LaparoscopicCameraController
 ///
@@ -218,16 +195,6 @@ public:
     double getBendingRadius() const;
     void setBendingRadius(const double val);
 
-	///
-	/// \brief Get the screen capture related data
-	///
-    std::shared_ptr<screenShotData> getScreenCaptureData();
-
-	///
-	/// \brief Initializes screen capture capability
-	///
-    void enableScreenCapture();
-
     ///
     /// \brief Module overrides
     ///
@@ -271,10 +238,6 @@ private:
     double deltaAngleXY;
 
     std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
-
-    std::shared_ptr<screenShotData> screenCaptureData;
-
-    std::shared_ptr<vtkWindowToImageFilter> windowToImageFilter;
 };
 
 #endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

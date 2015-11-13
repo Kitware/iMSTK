@@ -156,11 +156,6 @@ void LaparoscopicCameraController::exec()
             this->terminate();
         }
 
-        if (this->inputDevice->getButton(1))
-        {
-            this->screenCaptureData->triggerScreenCapture = true;
-        }
-
         std::this_thread::sleep_for(poolDelay);
     }
     this->inputDevice->closeDevice();
@@ -176,22 +171,22 @@ bool LaparoscopicCameraController::updateCamera()
         return false;
     }
 
-    if (this->inputDevice->getButton(0) && angleY < maxAngleY)
+    if (this->inputDevice->getButton(3) && angleY < maxAngleY)
     {
         angleY += deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(1) && angleY > minAngleY)
+    if (this->inputDevice->getButton(4) && angleY > minAngleY)
     {
         angleY -= deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(3) && angleX < maxAngleX)
+    if (this->inputDevice->getButton(0) && angleX < maxAngleX)
     {
         angleX += deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(4) && angleX > minAngleX)
+    if (this->inputDevice->getButton(1) && angleX > minAngleX)
     {
         angleX -= deltaAngleXY;
     }
@@ -250,14 +245,4 @@ double LaparoscopicCameraController::getBendingRadius() const
 void LaparoscopicCameraController::setBendingRadius(const double val)
 {
     bendingRadius = val;
-}
-
-std::shared_ptr<screenShotData> LaparoscopicCameraController::getScreenCaptureData()
-{
-    return screenCaptureData;
-}
-
-void LaparoscopicCameraController::enableScreenCapture()
-{
-    this->screenCaptureData = std::make_shared<screenShotData>();
 }

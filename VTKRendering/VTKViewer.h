@@ -24,12 +24,17 @@
 #ifndef VTKVIEWER_H
 #define VTKVIEWER_H
 
+
 #include "Core/ViewerBase.h"
 #include "VirtualTools/LaparoscopicCameraController.h"
 #include "vtkContextActor.h"
 #include "vtkContextScene.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkRenderWindowInteractor.h"
 
 class vtkCamera;
+class vtkRenderWindowInteractor;
+class vtkRenderer;
 
 class VTKViewer : public ViewerBase
 {
@@ -93,14 +98,21 @@ public:
     void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
 
 	///
-	/// \brief Set the data related to screen capture
+	/// \brief
 	///
-    void setScreenCaptureData(std::shared_ptr<screenShotData> data);
+    vtkRenderer* getVtkRenderer();
+
+	///
+	/// \brief
+	///
+    vtkRenderWindowInteractor* getVtkRenderWindowInteractor();
 
     ///
     /// \brief Add chart actor to the renderer
     ///
     void addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene);
+
+    vtkRenderWindow* getRenderWindow() const;
 
 protected:
     ///
@@ -156,7 +168,6 @@ protected:
     /// \brief Render scene
     ///
     void render() override;
-
 private:
     class VTKRenderer;
     std::unique_ptr<VTKRenderer> renderer;

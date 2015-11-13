@@ -41,6 +41,7 @@
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
 
+
 ///
 /// \brief Wrapper to the vtkRendering pipeline
 ///
@@ -74,25 +75,6 @@ public:
                         updateCamera();
                     }
 
-                    if (this->screenCaptureData != nullptr)
-                    {
-                        if (this->screenCaptureData->triggerScreenCapture)
-                        {
-                            this->screenCaptureData->windowToImageFilter->Modified();
-
-                            std::string captureName = "screenShot-"
-                                + std::to_string(this->screenCaptureData->screenShotNumber)
-                                + ".png";
-
-                            this->screenCaptureData->pngWriter->SetFileName(
-                                captureName.data());
-
-                            this->screenCaptureData->pngWriter->Write();
-
-                            this->screenCaptureData->screenShotNumber++;
-                            this->screenCaptureData->triggerScreenCapture = false;
-                        }
-                    }
                     this->renderWindow->Render();
                 }
                 break;
@@ -340,7 +322,6 @@ public:
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
     std::shared_ptr<cameraConfigurationData> cameraControllerData;
-    std::shared_ptr<screenShotData> screenCaptureData;
 };
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
@@ -371,6 +352,11 @@ void VTKViewer::render()
     this->endModule();
 }
 
+vtkRenderWindow* VTKViewer::getRenderWindow() const
+{
+    return this->renderer->getRenderWindow();
+}
+
 vtkCamera* VTKViewer::getVtkCamera()
 {
     return this->renderer->getRenderWindow()->GetRenderers()->
@@ -382,14 +368,14 @@ void VTKViewer::setCameraControllerData(std::shared_ptr<cameraConfigurationData>
     renderer->cameraControllerData = camData;
 }
 
-void VTKViewer::setScreenCaptureData(std::shared_ptr<screenShotData> data)
+vtkRenderer* VTKViewer::getVtkRenderer()
 {
-    renderer->screenCaptureData = data;
+    return this->renderer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+}
 
-    this->renderer->getRenderWindow()->SetAlphaBitPlanes(1);
-
-    renderer->screenCaptureData->windowToImageFilter->SetInput(
-        this->renderer->getRenderWindow());
+vtkRenderWindowInteractor* VTKViewer::getVtkRenderWindowInteractor()
+{
+    return this->renderer->renderWindowInteractor.GetPointer();
 }
 
 void VTKViewer::addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene)
