@@ -76,10 +76,10 @@ public:
     {
         // Get the key press
         vtkRenderWindowInteractor *rwi = this->Interactor;
-        std::string key = rwi->GetKeySym();
+        std::string keySym = rwi->GetKeySym();
 
         // Capture the screen
-        if (key == " ");// || key == "S")
+        if (keySym == "space")
         {
             this->screenCaptureData->triggerScreenCapture = true;
 
