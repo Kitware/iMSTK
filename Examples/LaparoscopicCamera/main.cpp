@@ -116,7 +116,7 @@ public:
     {
         this->screenCaptureData = std::make_shared<screenShotData>();
         this->screenCaptureData->windowToImageFilter->SetInput(rw);
-    };
+    }
 
 private:
 
@@ -129,8 +129,8 @@ vtkStandardNewMacro(ScreenCaptureKeyPressEvent);
 ///
 bool createCameraNavigationScene(
     std::shared_ptr<SDK> sdk,
-    char* fileName,
-    char* fileNameTarget)
+    const char* fileName,
+    const char* fileNameTarget)
 {
     //-------------------------------------------------------
     // Create plane
@@ -459,11 +459,10 @@ std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_pt
     return camController;
 }
 
-int main(int ac, char** av)
+int main()
 {
     initVTKRendering();
     initIODelegates();
-    const bool useVTKRenderer = true;
 
     auto sdk = SDK::createStandardSDK();
 
