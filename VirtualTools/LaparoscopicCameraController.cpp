@@ -43,7 +43,7 @@ LaparoscopicCameraController::LaparoscopicCameraController(
 
     this->camera = camera;
 
-    cameraPosOrientData = std::make_shared<cameraConfigurationData>();
+    this->cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
 LaparoscopicCameraController::LaparoscopicCameraController(
@@ -56,7 +56,7 @@ LaparoscopicCameraController::LaparoscopicCameraController(
 
     initializeCameraScopeConfiguration();
 
-    cameraPosOrientData = std::make_shared<cameraConfigurationData>();
+    this->cameraPosOrientData = std::make_shared<cameraConfigurationData>();
 }
 
 LaparoscopicCameraController::~LaparoscopicCameraController()
@@ -66,11 +66,11 @@ LaparoscopicCameraController::~LaparoscopicCameraController()
 void LaparoscopicCameraController::initializeCameraScopeConfiguration()
 {
     this->bendingRadius = 1.0; // default bending radius
-    angleX = 0.0;
+    this->angleX = 0.0;
     angleY = 0.0;
-    maxAngleX = maxAngleY = 11.0 / 7; // 90 deg
-    minAngleX = minAngleY = -11.0 / 7; //- 90 deg
-    deltaAngleXY = (4.0 / 360)*(22.0 / 7);// 2 deg
+    this->maxAngleX = this->maxAngleY = 11.0 / 7; // 90 deg
+    this->minAngleX = this->minAngleY = -11.0 / 7; //- 90 deg
+    this->deltaAngleXY = (4.0 / 360)*(22.0 / 7);// 2 deg
 }
 
 void LaparoscopicCameraController::setInputDevice(
@@ -156,7 +156,7 @@ void LaparoscopicCameraController::exec()
             this->terminate();
         }
 
-        std::this_thread::sleep_for(poolDelay);
+        std::this_thread::sleep_for(this->poolDelay);
     }
     this->inputDevice->closeDevice();
 
@@ -171,41 +171,41 @@ bool LaparoscopicCameraController::updateCamera()
         return false;
     }
 
-    if (this->inputDevice->getButton(3) && angleY < maxAngleY)
+    if (this->inputDevice->getButton(3) && this->angleY < this->maxAngleY)
     {
-        angleY += deltaAngleXY;
+        this->angleY += this->deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(4) && angleY > minAngleY)
+    if (this->inputDevice->getButton(4) && this->angleY > this->minAngleY)
     {
-        angleY -= deltaAngleXY;
+        this->angleY -= this->deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(0) && angleX < maxAngleX)
+    if (this->inputDevice->getButton(0) && this->angleX < this->maxAngleX)
     {
-        angleX += deltaAngleXY;
+        this->angleX += this->deltaAngleXY;
     }
 
-    if (this->inputDevice->getButton(1) && angleX > minAngleX)
+    if (this->inputDevice->getButton(1) && this->angleX > this->minAngleX)
     {
-        angleX -= deltaAngleXY;
+        this->angleX -= this->deltaAngleXY;
     }
 
-    core::Quaterniond newDeviceRot = inputDevice->getOrientation();
-    core::Vec3d newDevicePos = inputDevice->getPosition()*this->scalingFactor;
+    core::Quaterniond newDeviceRot = this->inputDevice->getOrientation();
+    core::Vec3d newDevicePos = this->inputDevice->getPosition()*this->scalingFactor;
 
     core::Vec3d bendingOffset = core::Vec3d(0, 0, this->bendingRadius);
 
-    core::Quaterniond bendingRot(cos(angleY/2), 0, sin(angleY/2), 0);
+    core::Quaterniond bendingRot(cos(this->angleY/2), 0, sin(this->angleY/2), 0);
     bendingRot.normalize();
-    bendingRot = bendingRot*core::Quaterniond(cos(angleX/2), sin(angleX/2), 0, 0);
+    bendingRot = bendingRot*core::Quaterniond(cos(this->angleX/2), sin(this->angleX/2), 0, 0);
     bendingRot.normalize();
 
     // update the camera position, focus and up vector data
-    cameraPosOrientData->focus = newDeviceRot*bendingRot*core::Vec3d(0, 0, -200.0);
-    cameraPosOrientData->upVector = newDeviceRot*bendingRot*core::Vec3d(0, 1.0, 0);
+    this->cameraPosOrientData->focus = newDeviceRot*bendingRot*core::Vec3d(0, 0, -200.0);
+    this->cameraPosOrientData->upVector = newDeviceRot*bendingRot*core::Vec3d(0, 1.0, 0);
 
-    cameraPosOrientData->position =
+    this->cameraPosOrientData->position =
         newDeviceRot*(bendingOffset - bendingRot*bendingOffset) + newDevicePos;
 
     return true;
@@ -234,15 +234,15 @@ const core::Vec3d & LaparoscopicCameraController::getOffsetPosition() const
 
 std::shared_ptr<cameraConfigurationData> LaparoscopicCameraController::getCameraData()
 {
-    return cameraPosOrientData;
+    return this->cameraPosOrientData;
 };
 
 double LaparoscopicCameraController::getBendingRadius() const
 {
-    return bendingRadius;
+    return this->bendingRadius;
 }
 
 void LaparoscopicCameraController::setBendingRadius(const double val)
 {
-    bendingRadius = val;
+    this->bendingRadius = val;
 }
