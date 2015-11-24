@@ -25,7 +25,7 @@ if(NOT EXISTS ${${APP}_DATA})
 endif()
 
 set(FILE_URL http://midas3.kitware.com/midas/download/item/318830/CameraNavAppData.tar)
-set(FILE_SHA1 928294a91477bc5d6fa494afb34016ba7f0b40c5)
+set(FILE_SHA1 ef20afc9043178a4b9e2245560702f82168261fa)
 set(LOCAL_FILE ${EXAMPLES_DATA}/CameraNavAppData.tar)
 
 
