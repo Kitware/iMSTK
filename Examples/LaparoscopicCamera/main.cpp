@@ -23,27 +23,37 @@
 #include "VTKRendering/VTKViewer.h"
 
 // VTK includes
-#include <vtkWindowToImageFilter.h>
-#include <vtkPNGWriter.h>
-#include <vtkChartXY.h>
-#include <vtkContextScene.h>
-#include <vtkContextActor.h>
-#include <vtkFloatArray.h>
-#include <vtkPlotPoints.h>
-#include <vtkTable.h>
-#include <vtkAxis.h>
 #include <vtkNew.h>
-#include <vtkSmartPointer.h>
+// Screenshot
+#include <vtkObjectFactory.h>
 #include <vtkInteractorStyleTrackballCamera.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
-#include <vtkObjectFactory.h>
+#include <vtkWindowToImageFilter.h>
+#include <vtkPNGWriter.h>
+// 2d overlay
+#include <vtkPNGReader.h>
+#include <vtkImageResize.h>
+#include <vtkImageTranslateExtent.h>
+#include <vtkImageMapper.h>
+#include <vtkActor2D.h>
+#include <vtkRendererCollection.h>
+#include <vtkRenderer.h>
 
 #define SPACE_EXPLORER_DEVICE true
 
+const float X = 8;
+const float Y = 6;
+const float Z = 6;
+const float pY = 0.25;
+const float pZ = 0.25;
+const double radius = 3.0;
+const double scaling = 0.15;
+const double planeWidth = 10;
+const int overlaySize = 400;
 
 // Define custom interaction style
-class ScreenCaptureKeyPressEvent : public vtkInteractorStyleTrackballCamera
+class ScreenCaptureInteractorStyle : public vtkInteractorStyleTrackballCamera
 {
 public:
     struct screenShotData
@@ -69,8 +79,8 @@ public:
         ~screenShotData(){};
     };
 
-    static ScreenCaptureKeyPressEvent* New();
-    vtkTypeMacro(ScreenCaptureKeyPressEvent, vtkInteractorStyleTrackballCamera);
+    static ScreenCaptureInteractorStyle* New();
+    vtkTypeMacro(ScreenCaptureInteractorStyle, vtkInteractorStyleTrackballCamera);
 
     virtual void OnKeyPress()
     {
@@ -122,105 +132,157 @@ private:
 
     std::shared_ptr<screenShotData> screenCaptureData;
 };
-vtkStandardNewMacro(ScreenCaptureKeyPressEvent);
+vtkStandardNewMacro(ScreenCaptureInteractorStyle);
 
 ///
 /// \brief Create camera navigation scene
 ///
 bool createCameraNavigationScene(
-    std::shared_ptr<SDK> sdk,
-    const char* fileName,
-    const char* fileNameTarget)
+    std::shared_ptr<Scene> scene,
+    const char* targetFileName)
 {
-    //-------------------------------------------------------
-    // Create plane
-    //-------------------------------------------------------
-    auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
-
-    // create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<StaticSceneObject>();
-
-    auto plane = std::make_shared<PlaneCollisionModel>(
-        core::Vec3d(0.0, -0.01, 0.0),
-        core::Vec3d(0.0, 1.0, 0.0));
-
-    plane->getPlaneModel()->setWidth(5);
-    staticObject->setModel(plane);
-
-    auto planeRendDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
-
-    planeRendDetail->setAmbientColor(Color(0.4, 0.4, 0.4, 1.0));
-    planeRendDetail->setDiffuseColor(Color(0.4, 0.4, 0.4, 1.0));
-    planeRendDetail->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
-    planeRendDetail->setShininess(50.0);
-
-    plane->getPlaneModel()->setRenderDetail(planeRendDetail);
-
-    sdk->getScene(0)->addSceneObject(staticObject);
 
     //-------------------------------------------------------
-    // Create target blocks
+    // Lights
+    //-------------------------------------------------------
+    auto light1 = Light::getDefaultLighting();
+    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    scene->addLight(light1);
+
+    auto light2 = Light::getDefaultLighting();
+    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    scene->addLight(light2);
+
+    auto light3 = Light::getDefaultLighting();
+    light3->lightPos.setPosition(core::Vec3d(0.0, 25.0, 0.0));
+    scene->addLight(light3);
+
+    //-------------------------------------------------------
+    // Plane
     //-------------------------------------------------------
 
-    Color grey(0.32, 0.32, 0.32, 1.0);
+    Color planeColor(0.4, 0.4, 0.4, 1.0);
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+    auto planeRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+    planeRenderDetail->setAmbientColor(planeColor);
+    planeRenderDetail->setDiffuseColor(planeColor);
+    planeRenderDetail->setSpecularColor(planeColor);
+    planeRenderDetail->setShininess(50.0);
 
-    meshRenderDetail->setAmbientColor(grey);
-    meshRenderDetail->setDiffuseColor(grey);
-    meshRenderDetail->setSpecularColor(grey);
-    meshRenderDetail->setShininess(100.0);
+    auto planeModel = std::make_shared<PlaneCollisionModel>(
+          core::Vec3d(0.0, -0.01, 0.0),
+          core::Vec3d(0.0, 1.0, 0.0));
+    planeModel->getPlaneModel()->setRenderDetail(planeRenderDetail);
+    planeModel->getPlaneModel()->setWidth(planeWidth);
 
-    double radius = 3.0;
+    auto planeObject = std::make_shared<StaticSceneObject>();
+    planeObject->setModel(planeModel);
+
+    scene->addSceneObject(planeObject);
+
+    //-------------------------------------------------------
+    // Blocks
+    //-------------------------------------------------------
+
+    Color meshColor(0.32, 0.32, 0.32, 1.0);
+
+    std::shared_ptr<RenderDetail> targetRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_TEXTURE);
+    std::shared_ptr<RenderDetail> blockRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+    blockRenderDetail->setAmbientColor(meshColor);
+    blockRenderDetail->setDiffuseColor(meshColor);
+    blockRenderDetail->setSpecularColor(meshColor);
+    blockRenderDetail->setShininess(100.0);
+
     for (int i = 0; i < 6; i++)
     {
-        auto staticBlock = std::make_shared<StaticSceneObject>();
-
-        auto targetBlock = std::make_shared<MeshCollisionModel>();
-        targetBlock->loadTriangleMesh(fileName);
-        targetBlock->getMesh()->scale(Eigen::UniformScaling<double>(0.15));//0.2
-        staticBlock->setModel(targetBlock);
-
-        targetBlock->setRenderDetail(meshRenderDetail);
-
-        sdk->getScene(0)->addSceneObject(staticBlock);
-
-        targetBlock->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
-
+        // transformations
+        Eigen::UniformScaling<double> s(scaling);
+        Eigen::Translation3d t1(0, 0, -radius);
+        Eigen::Translation3d t2(0, 0, -radius+0.01);
         Eigen::Quaterniond q(cos(i*22.0/42), 0, sin(i*22.0/42), 0);
         q.normalize();
-        targetBlock->getMesh()->rotate(q);
-    }
 
-    //-------------------------------------------------------
-    // Create targets
-    //-------------------------------------------------------
-    auto meshRenderDetail2 = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+        // BLOCKS
+        // surface mesh
+        std::vector<core::Vec3d> blockPts = {core::Vec3d( X/2, 0, -Z/2), core::Vec3d( X/2, 0, Z/2),
+                                             core::Vec3d( -X/2, 0, Z/2), core::Vec3d( -X/2, 0, -Z/2),
+                                             core::Vec3d( -X/2, Y, -Z/2), core::Vec3d( X/2, Y, -Z/2),
+                                             core::Vec3d( -X/2, Y, Z*(pZ-0.5)), core::Vec3d( X/2, Y, Z*(pZ-0.5)),
+                                             core::Vec3d( -X/2, Y*pY, Z/2), core::Vec3d( X/2, Y*pY, Z/2)};
+        std::vector<std::array<size_t,3>> blockTriangles = {{{ 0, 1, 2}}, {{ 0, 2, 3}},
+                                                            {{ 0, 3, 4}}, {{ 5, 0, 4}},
+                                                            {{ 5, 4, 6}}, {{ 7, 5, 6}},
+                                                            {{ 6, 8, 9}}, {{ 6, 9, 7}},
+                                                            {{ 2, 1, 9}}, {{ 8, 2, 9}},
+                                                            {{ 3, 6, 4}}, {{ 3, 8, 6}},
+                                                            {{ 3, 2, 8}}, {{ 5, 7, 0}},
+                                                            {{ 7, 9, 0}}, {{ 9, 1, 0}}};
+        std::shared_ptr<SurfaceMesh> blockMesh = std::make_shared<SurfaceMesh>();
+        blockMesh->setVertices(blockPts);
+        blockMesh->setTriangles(blockTriangles);
 
-    meshRenderDetail2->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-    meshRenderDetail2->setDiffuseColor(Color(0.8, 0.0, 0.0, 1.0));
-    meshRenderDetail2->setSpecularColor(Color(0.4, 0.4, 0.4, 1.0));
-    meshRenderDetail2->setShininess(100.0);
+        // model
+        std::shared_ptr<MeshCollisionModel> blockModel = std::make_shared<MeshCollisionModel>();
+        blockModel->setMesh(blockMesh);
+        blockModel->setRenderDetail(blockRenderDetail);
+        blockModel->getMesh()->scale(s);
+        blockModel->getMesh()->translate(t1);
+        blockModel->getMesh()->rotate(q);
 
-    for (int i = 0; i < 6; i++)
-    {
-        auto staticTarget = std::make_shared<StaticSceneObject>();
+        // object
+        std::shared_ptr<StaticSceneObject> blockObject = std::make_shared<StaticSceneObject>();
+        blockObject->setModel(blockModel);
+        scene->addSceneObject(blockObject);
 
-        auto targetModel = std::make_shared<MeshCollisionModel>();
-        targetModel->loadTriangleMesh(fileNameTarget);
-        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0.02, 0.02));
-        targetModel->getMesh()->scale(Eigen::UniformScaling<double>(0.15));
-        staticTarget->setModel(targetModel);
+        // TARGETS
+        // surface mesh
+        core::Vec3d topLeftEdge(-X/2, Y, Z*(pZ-0.5));
+        core::Vec3d topRightEdge(X/2, Y, Z*(pZ-0.5));
+        core::Vec3d bottomLeftEdge(-X/2, Y*pY, Z/2);
+        core::Vec3d bottomRightEdge(X/2, Y*pY, Z/2);
+        std::vector<core::Vec3d> points = {topLeftEdge, topRightEdge, bottomLeftEdge, bottomRightEdge};
+        std::array<size_t, 3> tri1 = {{ 0, 1, 2}};
+        std::array<size_t, 3> tri2 = {{ 1, 2, 3}};
+        std::vector<std::array<size_t,3>> triArray = {tri1, tri2};
+        std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
+        surfaceMesh->setVertices(points);
+        surfaceMesh->setTriangles(triArray);
 
-        targetModel->setRenderDetail(meshRenderDetail2);
-
-        sdk->getScene(0)->addSceneObject(staticTarget);
-
-        targetModel->getMesh()->translate(Eigen::Translation3d(0, 0, -radius));
-
-        Eigen::Quaterniond q(cos(i*22.0 / 42), 0, sin(i*22.0 / 42), 0);
-        q.normalize();
+        // model
+        std::shared_ptr<MeshCollisionModel> targetModel = std::make_shared<MeshCollisionModel>();
+        targetModel->setMesh(surfaceMesh);
+        targetModel->setRenderDetail(targetRenderDetail);
+        targetModel->getMesh()->scale(s);
+        targetModel->getMesh()->translate(t2);
         targetModel->getMesh()->rotate(q);
+        targetModel->addTexture(targetFileName, "target");
+
+        // Texture Coordinates
+        double height = (bottomLeftEdge - topLeftEdge).norm();
+        double width = (bottomLeftEdge - bottomRightEdge).norm();
+        double dist = std::min(height, width);
+        double dx = 0.0, dy = 0.0;
+        if(dist == height)
+        {
+            double x_a = bottomLeftEdge[0];
+            double x_b = bottomRightEdge[0];
+            dx = std::abs((x_b-x_a-dist)/(2*dist));
+        }
+        else
+        {
+            double y_a = bottomLeftEdge[1];
+            double y_b = topLeftEdge[1];
+            dy = std::abs((y_b-y_a-dist)/(2*dist));
+        }
+        surfaceMesh->addTextureCoordinate(1.0+dx,-dy);
+        surfaceMesh->addTextureCoordinate(-dx,-dy);
+        surfaceMesh->addTextureCoordinate(1.0+dx,1.0+dy);
+        surfaceMesh->addTextureCoordinate(-dx,1.0+dy);
+
+        // object
+        std::shared_ptr<StaticSceneObject> targetObject = std::make_shared<StaticSceneObject>();
+        targetObject->setModel(targetModel);
+        scene->addSceneObject(targetObject);
     }
     return true;
 }
@@ -228,175 +290,41 @@ bool createCameraNavigationScene(
 ///
 ///	 \brief Add a 2D overlay of target markers on a 3D scene
 ///
-void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer)
+void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
+                  const char* fileName)
 {
-    vtkNew<vtkChartXY> chart;
-    vtkNew<vtkContextScene> chartScene;
-    vtkNew<vtkContextActor> chartActor;
+    // Read the image
+    vtkNew<vtkPNGReader> reader;
+    reader->SetFileName(fileName);
+    reader->Update();
 
-    // configure the chart
-    chart->SetAutoSize(true);
-    chart->SetSize(vtkRectf(0.0, 0.0, 300, 200));
+    int dim[3] = {overlaySize, overlaySize, 1};
 
-    chart->GetAxis(0)->SetGridVisible(false);
-    chart->GetAxis(1)->SetGridVisible(false);
+    // Resize image
+    vtkNew<vtkImageResize> resize;
+    resize->SetInputConnection(reader->GetOutputPort());
+    resize->SetOutputDimensions(dim);
 
-    chart->GetAxis(0)->SetAxisVisible(false);
-    chart->GetAxis(1)->SetAxisVisible(false);
+    // Translate image extent (origin to its center)
+    vtkNew<vtkImageTranslateExtent> translateExtent;
+    translateExtent->SetInputConnection(resize->GetOutputPort());
+    translateExtent->SetTranslation(-dim[0]/2,-dim[1]/2,0);
 
-    chart->GetAxis(0)->SetTicksVisible(false);
-    chart->GetAxis(1)->SetTicksVisible(false);
+    // Mapper
+    vtkNew<vtkImageMapper> imageMapper;
+    imageMapper->SetInputConnection(translateExtent->GetOutputPort());
+    imageMapper->SetColorWindow(255);
+    imageMapper->SetColorLevel(127);
 
-    chart->GetAxis(0)->SetLabelsVisible(false);
-    chart->GetAxis(1)->SetLabelsVisible(false);
+    // Actor
+    vtkNew<vtkActor2D> imageActor;
+    imageActor->SetMapper(imageMapper.GetPointer());
+    imageActor->GetPositionCoordinate()->SetCoordinateSystemToNormalizedDisplay();
+    imageActor->SetPosition(0.5, 0.5);
 
-    chart->GetAxis(0)->SetTitle("");
-    chart->GetAxis(1)->SetTitle("");
-
-    chartScene->AddItem(chart.GetPointer());
-    chartActor->SetScene(chartScene.GetPointer());
-
-    //Add both to the renderer
-    vtkViewer->addChartActor(chartActor.GetPointer(), chartScene.GetPointer());
-
-    //----------------------------------------------------
-    // Add data points representing the concentric circles
-    //----------------------------------------------------
-    vtkNew<vtkTable> table;
-
-    vtkNew<vtkFloatArray> circle1X;
-    circle1X->SetName("Circle 1 X");
-    table->AddColumn(circle1X.GetPointer());
-
-    vtkNew<vtkFloatArray> circle1Y;
-    circle1Y->SetName("Circle 1 Y");
-    table->AddColumn(circle1Y.GetPointer());
-
-    vtkNew<vtkFloatArray> circle2X;
-    circle2X->SetName("Circle 2 X");
-    table->AddColumn(circle2X.GetPointer());
-
-    vtkNew<vtkFloatArray> circle2Y;
-    circle2Y->SetName("Circle 2 Y");
-    table->AddColumn(circle2Y.GetPointer());
-
-    // Test charting with a few more points...
-    int numPoints = 100;
-    float range = 10.0;
-    double xRange[2] = { 0.0, range };
-    double yRange[2] = { 0.0, range };
-
-    chart->GetAxis(0)->SetRange(xRange);
-    chart->GetAxis(1)->SetRange(yRange);
-
-    /*chart->GetAxis(0)->SetUnscaledRange(xRange);
-    chart->GetAxis(1)->SetUnscaledRange(yRange);*/
-
-    table->SetNumberOfRows(numPoints + 1);
-
-    double radius1 = range / 8;
-    double radius2 = range / 10;
-    double theta;
-
-    for (int i = 0; i < numPoints; i++)
-    {
-        theta = 11.0 / 7 + i * 44.0 / (7 * numPoints);
-
-        table->SetValue(i, 0, range / 2 + radius1*cos(theta));
-        table->SetValue(i, 1, range / 2 + radius1*sin(theta));
-
-        table->SetValue(i, 2, range / 2 + radius2*cos(theta));
-        table->SetValue(i, 3, range / 2 + radius2*sin(theta));
-    }
-    theta = 11.0 / 7;
-    table->SetValue(numPoints, 0, range / 2 + radius1*cos(theta));
-    table->SetValue(numPoints, 1, range / 2 + radius1*sin(theta));
-    table->SetValue(numPoints, 2, range / 2 + radius2*cos(theta));
-    table->SetValue(numPoints, 3, range / 2 + radius2*sin(theta));
-
-    double lineWidth = 2.0;
-    vtkPlot *points1 = chart->AddPlot(vtkChart::LINE);
-    points1->SetInputData(table.GetPointer(), 0, 1);
-    points1->SetColor(1, 0, 0, 255);
-    points1->SetWidth(lineWidth);
-
-    vtkPlot *points2 = chart->AddPlot(vtkChart::LINE);
-    points2->SetInputData(table.GetPointer(), 2, 3);
-    points2->SetColor(1, 0, 0, 255);
-    points2->SetWidth(lineWidth);
-
-    //--------------------------------------------------
-    // Add data points representing the parallel lines
-    //--------------------------------------------------
-    vtkNew<vtkTable> table2;
-
-    vtkNew<vtkFloatArray> parallelLineTopX;
-    parallelLineTopX->SetName("parallel Line Top X");
-    table2->AddColumn(parallelLineTopX.GetPointer());
-
-    vtkNew<vtkFloatArray> parallelLineTopY;
-    parallelLineTopY->SetName("parallel Line Top Y");
-    table2->AddColumn(parallelLineTopY.GetPointer());
-
-    vtkNew<vtkFloatArray> parallelLineBottomX;
-    parallelLineBottomX->SetName("parallel Line Bottom X");
-    table2->AddColumn(parallelLineBottomX.GetPointer());
-
-    vtkNew<vtkFloatArray> parallelLineBottomY;
-    parallelLineBottomY->SetName("parallel Line Bottom Y");
-    table2->AddColumn(parallelLineBottomY.GetPointer());
-
-    table2->SetNumberOfRows(2);
-    double deltaTheta=0.07;
-
-    theta = 11.0 / 7 + (1 - deltaTheta)*11.0 / 7;
-    table2->SetValue(0, 0, range / 2 + radius1*cos(theta));
-    table2->SetValue(0, 1, range / 2 + radius1*sin(theta));
-
-    theta = deltaTheta*11.0 / 7;
-    table2->SetValue(1, 0, range / 2 + radius1*cos(theta));
-    table2->SetValue(1, 1, range / 2 + radius1*sin(theta));
-
-    theta = 11.0 / 7 + (1 + deltaTheta)*11.0 / 7;
-    table2->SetValue(0, 2, range / 2 + radius1*cos(theta));
-    table2->SetValue(0, 3, range / 2 + radius1*sin(theta));
-
-    theta = -deltaTheta*11.0 / 7;
-    table2->SetValue(1, 2, range / 2 + radius1*cos(theta));
-    table2->SetValue(1, 3, range / 2 + radius1*sin(theta));
-
-    vtkPlot *points3 = chart->AddPlot(vtkChart::LINE);
-    points3->SetInputData(table2.GetPointer(), 0, 1);
-    points3->SetColor(1, 0, 0, 255);
-    points3->SetWidth(lineWidth);
-
-    vtkPlot *points4 = chart->AddPlot(vtkChart::LINE);
-    points4->SetInputData(table2.GetPointer(), 2, 3);
-    points4->SetColor(1, 0, 0, 255);
-    points4->SetWidth(lineWidth);
-
-    //-----------------------------------------------------------
-    // Add data points to hack disabling the autoscaling of chart
-    //-----------------------------------------------------------
-    vtkNew<vtkTable> table3;
-
-    vtkNew<vtkFloatArray> cornerPointX;
-    cornerPointX->SetName("Corner point X");
-    table3->AddColumn(cornerPointX.GetPointer());
-
-    vtkNew<vtkFloatArray> cornerPointY;
-    cornerPointY->SetName("Corner point Y");
-    table3->AddColumn(cornerPointY.GetPointer());
-
-    table3->SetNumberOfRows(2);
-    table3->SetValue(0, 0, 0);
-    table3->SetValue(0, 1, 0);
-    table3->SetValue(1, 0, range);
-    table3->SetValue(1, 1, range);
-
-    vtkPlot *points5 = chart->AddPlot(vtkChart::POINTS);
-    points5->SetInputData(table3.GetPointer(), 0, 1);
-    points5->SetColor(255, 255, 255, 0);
+    // Renderer
+    vtkRenderer* rendererVtk = vtkViewer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+    rendererVtk->AddActor2D(imageActor.GetPointer());
 }
 
 ///
@@ -433,8 +361,6 @@ std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_pt
     auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
     camController->setScalingFactor(40.0);
 
-    viewer->init(); // viewer should be initialized to be able to retrieve the camera
-
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
     vtkCamera* cam = vtkViewer->getVtkCamera();
@@ -464,58 +390,59 @@ int main()
     initVTKRendering();
     initIODelegates();
 
-    auto sdk = SDK::createStandardSDK();
-
-    // Create camera navigation scene
-    createCameraNavigationScene(sdk, "./Target.vtk", "./Target-marker.vtk");
+    std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
 
     //-------------------------------------------------------
     // Set up the viewer
     //-------------------------------------------------------
 
-    auto viewer = sdk->getViewerInstance();
+    std::shared_ptr<ViewerBase> viewer = sdk->getViewerInstance();
+    std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
+    // Set Render details
     viewer->setViewerRenderDetail(
         SIMMEDTK_VIEWERRENDER_GLOBALAXIS
         | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND
         | SIMMEDTK_DISABLE_MOUSE_INTERACTION
         );
 
-    // Get Scene
-    auto scene = sdk->getScene(0);
-    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
-
-    // Setup Scene lighting
-    auto light1 = Light::getDefaultLighting();
-    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
-    scene->addLight(light1);
-
-    auto light2 = Light::getDefaultLighting();
-    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
-    scene->addLight(light2);
-
-    auto light3 = Light::getDefaultLighting();
-    light3->lightPos.setPosition(core::Vec3d(0.0, 25.0, 0.0));
-    scene->addLight(light3);
-
+    //-------------------------------------------------------
+    // Set up the scene
     //-------------------------------------------------------
 
-    std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
+    std::shared_ptr<Scene> scene = sdk->getScene(0);
+    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
+
+    // Create camera navigation scene
+    createCameraNavigationScene(scene, "./CameraNavAppData/target.png");
+
+    // Initialize viewer with scene objects
+    // NOTE : Needs to be done before VTK Add ons since
+    // init create the needed renderer in the VTKView
+    viewer->init();
+
+    //-------------------------------------------------------
+    // Add ons (VTK)
+    //-------------------------------------------------------
 
     // Enable screenshot capture
-    auto style = vtkSmartPointer<ScreenCaptureKeyPressEvent>::New();
+    vtkNew<ScreenCaptureInteractorStyle> style;
     style->initialize(vtkViewer->getRenderWindow());
-    vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style);
+    vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
     // Add a camera controller
-    // NOTE: This has to come after the ScreenCaptureKeyPressEvent initialization
+    // NOTE: This has to come after the ScreenCaptureInteractorStyle initialization
     // since for this to work the mouse events need disabled which are
-    // left as is after ScreenCaptureKeyPressEvent initialization
+    // left as is after ScreenCaptureInteractorStyle initialization
     std::shared_ptr<LaparoscopicCameraController> camController = addCameraController(sdk);
 
     // Add a 2D overlay on the 3D scene
-    add2DOverlay(vtkViewer);
+    add2DOverlay(vtkViewer,"./CameraNavAppData/viewfinder.png");
+
+    //-------------------------------------------------------
+    // Start
+    //-------------------------------------------------------
 
     // Run the SDK
     sdk->run();

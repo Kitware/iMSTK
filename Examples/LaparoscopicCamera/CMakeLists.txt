@@ -24,8 +24,8 @@ if(NOT EXISTS ${${APP}_DATA})
     file(MAKE_DIRECTORY ${${APP}_DATA})
 endif()
 
-set(FILE_URL http://midas3.kitware.com/midas/download/item/318830/CameraNavAppData.tar)
-set(FILE_SHA1 ef20afc9043178a4b9e2245560702f82168261fa)
+set(FILE_URL http://midas3.kitware.com/midas/download/item/318840/CameraNavAppData.tar)
+set(FILE_SHA1 6032b3f2779f9fd479e67bf22b5a4fd6bbf13e11)
 set(LOCAL_FILE ${EXAMPLES_DATA}/CameraNavAppData.tar)
 
 
@@ -33,8 +33,8 @@ midas_download(${FILE_URL} ${FILE_SHA1} ${LOCAL_FILE})
 
 # Extract data
 set(DATA
-    ${${APP}_DATA}/Target-marker.vtk
-    ${${APP}_DATA}/Target.vtk
+    ${${APP}_DATA}/target.png
+    ${${APP}_DATA}/viewfinder.png
 )
 
 add_custom_command(
