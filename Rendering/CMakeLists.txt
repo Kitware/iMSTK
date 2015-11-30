@@ -37,6 +37,7 @@ target_link_libraries(Rendering
  PUBLIC
     ${VTK_LIBRARIES}
     vtkglew
+    sfml::graphics
     sfml::window
     sfml::system
     vtkglew
