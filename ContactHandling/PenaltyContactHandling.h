@@ -74,7 +74,6 @@ public:
 
                 sceneObject->setContactForce(nodeDofID, contact->point, force);
             }
-            return;
         }
     }
 

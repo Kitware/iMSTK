@@ -38,11 +38,11 @@ if(WIN32)
 	elseif(COMPILER_IS_GNUCXX)
 		set(_lib_suffixes MinGW64/static)
 	else()
-		if(MSVC)
-			set(_lib_suffixes MS32/static)
-		elseif(COMPILER_IS_GNUCXX)
-			set(_lib_suffixes MinGW32/static)
-		endif()
+        if(MSVC)
+            set(_lib_suffixes MS32/static)
+        elseif(COMPILER_IS_GNUCXX)
+            set(_lib_suffixes MinGW32/static)
+        endif()
 	endif()
 else()
 	set(_lib_suffixes)
@@ -52,38 +52,38 @@ else()
 	endif()
 endif()
 
-find_library(LIBUSB1_LIBRARY
-NAMES
-	usb-1.0
-	libusb-1.0
-PATHS
-	"${LIBUSB1_ROOT_DIR}"
-PATH_SUFFIXES
-	${_lib_suffixes}
+find_library(LIBUSB_LIBRARY
+    NAMES
+        usb-1.0
+        libusb-1.0
+    PATHS
+        C:/LibUSB-Win32
+        "${LIBUSB1_ROOT_DIR}"
+    PATH_SUFFIXES
+        "${_lib_suffixes}"
 )
-list(APPEND CMAKE_INCLUDE_PATH ${LIBUSB1_ROOT_DIR}/include/libusb-1.0/)
-if(EXISTS ${LIBUSB1_ROOT_DIR}/include/libusb-1.0/libusb.h)
 
-					message("CMAKE_INCLUDE_PATH=${CMAKE_INCLUDE_PATH}")
-endif()
-find_path(LIBUSB1_INCLUDE_DIR
+find_path(LIBUSB_INCLUDE_DIR
 	NAMES
 		libusb.h
 	PATHS
-		${LIBUSB1_ROOT_DIR}/include/libusb-1.0/
+        C:/LibUSB-Win32
+		"${LIBUSB1_ROOT_DIR}"
 	PATH_SUFFIXES
 		include/libusb-1.0
 		include
 		libusb-1.0
 	)
 
-		message("_lib_suffixes=${_lib_suffixes}")
-		message("LIBUSB1_LIBRARY=${LIBUSB1_LIBRARY}")
+# In windows find_* cant find the paths when a digit is included in the name
+set(LIBUSB1_LIBRARY ${LIBUSB_LIBRARY})
+set(LIBUSB1_INCLUDE_DIR ${LIBUSB_INCLUDE_DIR})
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(Libusb1
 	REQUIRED_VARS
 		LIBUSB1_LIBRARY
-#		LIBUSB1_INCLUDE_DIR
+		LIBUSB1_INCLUDE_DIR
 )
 
 if(LIBUSB1_FOUND)

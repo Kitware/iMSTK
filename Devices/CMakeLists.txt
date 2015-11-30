@@ -18,8 +18,15 @@ if(USE_VRPN_CLIENT)
                 OH::HLU
                 vrpn::phantom
                 )
-        endif()
+        endif(SimMedTK_USE_PHANTOM_OMNI)
         # --------------------------------
+        if(APPLE)
+            find_library(IOKIT_FRAMEWORK IOKit)
+            find_library(COREFOUNDATION_FRAMEWORK CoreFoundation)
+            list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
+                ${COREFOUNDATION_FRAMEWORK} ${IOKIT_FRAMEWORK}
+            )
+        endif(APPLE)
         list(APPEND EXTERNAL_DEVICES_TARGET_LIBRARIES
             vrpn::server
             vrpn::libusb

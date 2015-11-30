@@ -1,4 +1,6 @@
 
+include(${VTK_USE_FILE})
+
 simmedtk_add_library(VirtualTools
   SOURCES
 #     CurvedGrasper.cpp
@@ -16,4 +18,6 @@ target_link_libraries(VirtualTools
     Mesh
     Event
     Devices
+  PUBLIC
+    ${VTK_LIBRARIES}
 )

@@ -1,4 +1,3 @@
-
 set(LIBRARY_SUFFIX)
 if( MSVC )
   # each of the DLLs are suffixed with the major version and msvc prefix
@@ -27,7 +26,6 @@ find_library(ASSIMP_LIBRARY
     assimp${LIBRARY_SUFFIX}d
     )
 
-set(ASSIMP_ZLIB_INCLUDE_DIR)
 find_package(ZLIB QUIET)
 if(NOT ZLIB_FOUND)
   find_library(ZLIB_LIBRARY
@@ -35,8 +33,10 @@ if(NOT ZLIB_FOUND)
       zlibstaticd
       zlibstatic
     )
-  set(ASSIMP_ZLIB_INCLUDE_DIR "${ASSIMP_INCLUDE_DIR}")
+  set(ZLIB_INCLUDE_DIR ${ASSIMP_INCLUDE_DIR})
 endif()
+
+set(ASSIMP_ZLIB_INCLUDE_DIR "${ZLIB_INCLUDE_DIR}")
 
 set(ASSIMP_INCLUDE_DIRS "${ASSIMP_INCLUDE_DIR}")
 set(ASSIMP_LIBRARIES "${ASSIMP_LIBRARY}" "${ZLIB_LIBRARY}")

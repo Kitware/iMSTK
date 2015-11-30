@@ -2,8 +2,8 @@
 # Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
 ###########################################################################
 
-set(VRPN_TAG f733f16b7f978ffdcc722a453a0ed55e8c634cd7)
-set(VRPN_REPOSITORY https://github.com/sradigan/vrpn.git)
+set(VRPN_TAG 807ec7ac6453938af4b0ebeacfce864b37b149ee)
+set(VRPN_REPOSITORY https://github.com/vrpn/vrpn.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)

@@ -107,12 +107,11 @@ go_bandit([]() {
             f.push_back(0);
             f.push_back(0);
 
-            fem->setContactForce(0,core::Vec3d(0,0,0));
+            // TODO: Add a more rigurous test.
+            fem->setContactForce(0,core::Vec3d(-110000,0,0));
             auto &contactForce = fem->getContactForces();
 
             handler->resolveContacts();
-
-            std::cout << contactForce[0] << std::endl;
 
             AssertThat(contactForce[0][0]==-110000, IsTrue());
             AssertThat(contactForce[0][1] == 0, IsTrue());
