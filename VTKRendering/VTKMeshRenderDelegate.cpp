@@ -44,6 +44,7 @@
 #include <vtkCellArray.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkPNGReader.h>
 #include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
 #include <vtkTexture.h>
@@ -144,11 +145,23 @@ void MeshRenderDelegate::initDraw()
     vtkSmartPointer<vtkTexture> texture;
     if(renderDetail && renderDetail->renderTexture())
     {
-        vtkNew<vtkJPEGReader> jpegReader;
-        jpegReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
-
         texture = vtkTexture::New();
-        texture->SetInputConnection(jpegReader->GetOutputPort());
+        texture->RepeatOff();
+
+        std::string filename = mesh->getRenderDetail()->getTextureFilename();
+        std::string ext = filename.substr(filename.find_last_of(".") + 1);
+        if (ext == "png" || ext == "PNG")
+        {
+            vtkNew<vtkPNGReader> PNGreader;
+            PNGreader->SetFileName(filename.c_str());
+            texture->SetInputConnection(PNGreader->GetOutputPort());
+        }
+        else if (ext == "jpg" || ext == "JPG" || ext == "jpeg" || ext == "JPEG")
+        {
+            vtkNew<vtkJPEGReader> JPEGreader;
+            JPEGreader->SetFileName(filename.c_str());
+            texture->SetInputConnection(JPEGreader->GetOutputPort());
+        }
 
         vtkNew<vtkFloatArray> textureCoordinates;
         textureCoordinates->SetNumberOfComponents(3);
