@@ -57,11 +57,6 @@ public:
     void setWindowTitle(const std::string &str) override;
     /// \brief enable/disable VSync
     virtual void setVSync(bool sync) override;
-    virtual void addFBO(const std::string &p_fboName,
-                        Texture *p_colorTex,
-                        Texture *p_depthTex,
-                        unsigned int p_width,
-                        unsigned int p_height) override;
 
 protected:
     virtual void initRenderingCapabilities() override;

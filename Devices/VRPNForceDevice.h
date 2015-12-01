@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Initialize module
     ///
-    void init() override;
+    bool init() override;
 
     ///
     /// \brief Enable force feedback

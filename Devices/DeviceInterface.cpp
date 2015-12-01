@@ -123,7 +123,7 @@ long double DeviceInterface::getButtonETime(size_t i)
 }
 
 //---------------------------------------------------------------------------
-void DeviceInterface::init()
+bool DeviceInterface::init()
 {
     this->forceTimer.start();
     this->posTimer.start();
@@ -133,6 +133,7 @@ void DeviceInterface::init()
     {
         buttonTimer.start();
     }
+    return true;
 }
 
 //---------------------------------------------------------------------------

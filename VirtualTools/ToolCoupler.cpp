@@ -139,7 +139,7 @@ void ToolCoupler::setOrientation(
     this->orientation = newOrientation;
 }
 
-void ToolCoupler::init()
+bool ToolCoupler::init()
 {
     if(!this->outputDevice)
     {
@@ -151,6 +151,7 @@ void ToolCoupler::init()
 
     // Open communication for the device
     this->inputDevice->openDevice();
+    return true;
 }
 
 void ToolCoupler::beginFrame() {}

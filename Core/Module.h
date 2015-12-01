@@ -78,7 +78,7 @@ public:
     ///
     /// \brief Module initialization routine.
     ///
-    virtual void init() = 0;
+    virtual bool init() = 0;
 
     ///
     /// \brief Begin frame will be called before the cycle.

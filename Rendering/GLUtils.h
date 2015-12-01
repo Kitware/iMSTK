@@ -24,13 +24,19 @@
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
 
+#ifdef WIN32
+#   include<windows.h>
+#endif
+
 // VTK glew library
 #include <vtk_glew.h>
 
 #ifndef __APPLE__
 #  include <GL/gl.h> // for GLfloat, etc.
+#  include <GL/glu.h> // for GLfloat, etc.
 #else
 #  include <OpenGL/gl.h> // for GLfloat, etc.
+#  include <OpenGL/glu.h> // for GLfloat, etc.
 #endif
 
 // SimMedTK includes

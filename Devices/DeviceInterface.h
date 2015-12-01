@@ -141,7 +141,7 @@ public:
     ///
     /// \brief Initialize module
     ///
-    virtual void init() override;
+    virtual bool init() override;
 
     ///
     /// \brief Begin frame will be called before the cycle.

@@ -104,13 +104,14 @@ void LaparoscopicCameraCoupler::setOrientation(
     this->orientation = newOrientation;
 }
 
-void LaparoscopicCameraCoupler::init()
+bool LaparoscopicCameraCoupler::init()
 {
     this->orientation.setIdentity();
     this->position.setZero();
 
     // Open communication for the device
     this->inputDevice->openDevice();
+    return true;
 }
 
 void LaparoscopicCameraCoupler::beginFrame()

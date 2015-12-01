@@ -178,7 +178,7 @@ public:
     ///
     /// \brief Module overrides
     ///
-    void init() override;
+    bool init() override;
     void beginFrame() override;
     void endFrame() override;
 

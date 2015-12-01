@@ -68,11 +68,11 @@ void VRPNForceDevice::processChanges()
 }
 
 //---------------------------------------------------------------------------
-void VRPNForceDevice::init()
+bool VRPNForceDevice::init()
 {
     this->buttons.resize(2);
     this->buttonTimers.resize(2);
-    DeviceInterface::init();
+    return DeviceInterface::init();
 }
 
 //---------------------------------------------------------------------------

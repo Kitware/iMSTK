@@ -24,16 +24,6 @@
 #include "Rendering/GLUtils.h"
 #include "Rendering/TextureManager.h"
 
-// VTK glew library
-#include <vtk_glew.h>
-
-#ifndef __APPLE__
-#  include <GL/gl.h> // for GLfloat, etc.
-#  include <GL/glu.h> // for GLfloat, etc.
-#else
-#  include <OpenGL/gl.h> // for GLfloat, etc.
-#endif
-
 #ifndef _MSC_VER
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
