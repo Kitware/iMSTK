@@ -27,9 +27,9 @@
 
 #include "Core/ViewerBase.h"
 #include "VirtualTools/LaparoscopicCameraController.h"
-#include "vtkContextActor.h"
-#include "vtkContextScene.h"
 #include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkContextScene.h"
+#include "vtkContextActor.h"
 #include "vtkRenderWindowInteractor.h"
 
 class vtkCamera;

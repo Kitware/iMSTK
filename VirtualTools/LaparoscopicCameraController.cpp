@@ -125,13 +125,14 @@ void LaparoscopicCameraController::setOrientation(
     this->orientation = newOrientation;
 }
 
-void LaparoscopicCameraController::init()
+bool LaparoscopicCameraController::init()
 {
     this->orientation.setIdentity();
     this->position.setZero();
 
     // Open communication for the device
     this->inputDevice->openDevice();
+    return true;
 }
 
 void LaparoscopicCameraController::beginFrame()

@@ -24,9 +24,11 @@
 #ifndef SMGLUTILS_H
 #define SMGLUTILS_H
 
-#ifdef WIN32
-#   include<windows.h>
-#endif
+// SimMedTK includes
+#include "Core/CoreClass.h"
+#include "Core/Config.h"
+#include "Core/Vector.h"
+#include "Core/Matrix.h"
 
 // VTK glew library
 #include <vtk_glew.h>
@@ -39,11 +41,6 @@
 #  include <OpenGL/glu.h> // for GLfloat, etc.
 #endif
 
-// SimMedTK includes
-#include "Core/CoreClass.h"
-#include "Core/Config.h"
-#include "Core/Vector.h"
-#include "Core/Matrix.h"
 
 /// \brief stores the information about the ground
 struct GroundRenderInfo;

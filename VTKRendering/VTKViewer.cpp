@@ -388,7 +388,7 @@ void VTKViewer::addChartActor(vtkContextActor* chartActor, vtkContextScene* char
     chartScene->SetRenderer(rendererVtk);
 }
 
-void VTKViewer::initResources()
+void VTKViewer::initRenderingContext()
 {
     this->renderer->addRenderer();
 }

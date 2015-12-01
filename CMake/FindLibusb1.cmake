@@ -75,6 +75,7 @@ find_path(LIBUSB_INCLUDE_DIR
 		libusb-1.0
 	)
 
+# In windows find_* cant find the paths when a digit is included in the name
 set(LIBUSB1_LIBRARY ${LIBUSB_LIBRARY})
 set(LIBUSB1_INCLUDE_DIR ${LIBUSB_INCLUDE_DIR})
 
