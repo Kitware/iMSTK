@@ -34,11 +34,14 @@
 template<typename T>
 using Quaternion = Eigen::Quaternion<T>;
 
+namespace core
+{
 /// A quaternion of floats.
 using Quaternionf = Quaternion<float>;
 
 /// A quaternion of doubles.
 using Quaterniond = Quaternion<double>;
+} //core
 
 /// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type.

@@ -36,7 +36,7 @@
 MyStylus::MyStylus(const std::string& p_shaft, const std::string& p_lower, const std::string& p_upper)
 {
     angle = 0;
-    Quaterniond rot;
+    core::Quaterniond rot;
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX());
 
     SurfaceMesh *mesh = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);
@@ -185,7 +185,7 @@ void MyStylus::handleEvent (std::shared_ptr<core::Event> p_event)
 
 HookCautery::HookCautery(const std::string& p_pivot)
 {
-    Quaterniond rot;
+    core::Quaterniond rot;
     rot = Eigen::AngleAxisd(-M_PI_2, core::Vec3d::UnitX()).matrix();
 
     SurfaceMesh *mesh = new SurfaceMesh(Core::BaseMesh::MeshType::Rigid, nullptr);

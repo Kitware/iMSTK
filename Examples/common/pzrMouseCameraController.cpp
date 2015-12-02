@@ -82,16 +82,15 @@ void pzrMouseCameraController::handleEvent(std::shared_ptr<core::Event> event)
     auto mouseMoveEvent = std::dynamic_pointer_cast<event::MouseMoveEvent>(event);
     if(mouseMoveEvent != nullptr)
     {
-        core::Vec2f diff;
-        core::Vec2f newCoords;
-
-        newCoords = mouseMoveEvent->getWindowCoord().cast<float>();
-        diff = coords - newCoords;
+        auto newCoords = mouseMoveEvent->getWindowCoord().cast<float>();
+        auto diff = coords - newCoords;
 
         if(lmbPressed && rmbPressed)
         {
             //pan x and y
-            this->camera->pan(core::Vec3f(diff(0), diff(1), 0) * moveDistance);
+            core::Vec3f v;
+            v << diff, 0;
+            this->camera->pan(v* moveDistance);
             //reset coords for next mouse move event
             coords = newCoords;
         }

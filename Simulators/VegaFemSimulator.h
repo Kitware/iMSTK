@@ -28,7 +28,9 @@
 #include "Core/Config.h"
 #include "Core/ObjectSimulator.h"
 #include "Core/ErrorLog.h"
-#include "Simulators/VegaFemSceneObject.h"
+
+class ToolCoupler;
+class VegaFemSceneObject;
 
 /// \brief Interface class between Vega and SimMedTK core
 class VegaFemSimulator: public ObjectSimulator
@@ -56,9 +58,26 @@ public:
     /// \brief handle the keyboard and haptic button press events
     void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
+    ///
+    /// \brief Set haptic tool
+    ///
+    void setHapticTool(std::shared_ptr<ToolCoupler> tool);
+
+    ///
+    /// \brief Get haptic tool
+    ///
+    std::shared_ptr<ToolCoupler> getHapticTool() const;
+
+    ///
+    /// \brief Update haptic forces
+    ///
+    void updateHapticForces(std::shared_ptr<VegaFemSceneObject> sceneObject);
+
 private:
     core::Vec3d hapticPosition; ///< position of the haptic device end effector
     bool hapticButtonPressed; ///< true of the button is pressed
+
+    std::shared_ptr<ToolCoupler> hapticTool;
 };
 
 #endif

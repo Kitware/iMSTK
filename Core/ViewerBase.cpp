@@ -256,9 +256,6 @@ void ViewerBase::setWindowTitle(const std::string &str)
 
 void ViewerBase::exec()
 {
-    // Init the viewer
-    this->init();
-
     while (!terminateExecution)
     {
         this->processWindowEvents();
@@ -292,4 +289,9 @@ float ViewerBase::aspectRatio(void)
 void ViewerBase::setGlobalAxisLength(const float len)
 {
     this->globalAxisLength = len;
+}
+
+void ViewerBase::setViewerRenderDetail(const unsigned int newRenderDetail)
+{
+    this->viewerRenderDetail = newRenderDetail;
 }

@@ -64,7 +64,7 @@ protected:
     std::shared_ptr<ErrorLog> log;
     bool isObjectSimInitialized;
     ThreadPriority threadPriority;
-    Timer timer;
+    core::Timer timer;
     long double timerPerFrame;
     long double FPS;
     unsigned int frameCounter;

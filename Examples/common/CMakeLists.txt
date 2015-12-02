@@ -29,18 +29,6 @@ list(APPEND ExamplesCommon_link_libs
   Mesh
 )
 
-if(SimMedTK_USE_PHANTOM_OMNI)
-  list(APPEND ExamplesCommon_sources
-    vrpnPhantomObjectController.cpp
-  )
-  list(APPEND ExamplesCommon_headers
-    vrpnPhantomObjectController.h
-  )
-  list(APPEND ExamplesCommon_link_libs
-    Devices
-  )
-endif(SimMedTK_USE_PHANTOM_OMNI)
-
 simmedtk_add_library(ExamplesCommon
   SOURCES
     ${ExamplesCommon_sources}

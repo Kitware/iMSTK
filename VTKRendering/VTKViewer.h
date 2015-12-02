@@ -24,7 +24,17 @@
 #ifndef VTKVIEWER_H
 #define VTKVIEWER_H
 
+
 #include "Core/ViewerBase.h"
+#include "VirtualTools/LaparoscopicCameraController.h"
+#include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkContextScene.h"
+#include "vtkContextActor.h"
+#include "vtkRenderWindowInteractor.h"
+
+class vtkCamera;
+class vtkRenderWindowInteractor;
+class vtkRenderer;
 
 class VTKViewer : public ViewerBase
 {
@@ -76,6 +86,33 @@ public:
     /// \brief Run when frame ends
     ///
     void endFrame() override {}
+
+    ///
+    /// \brief Returns the pointer to the current vtk camera
+    ///
+    vtkCamera* getVtkCamera();
+
+	///
+	/// \brief Sets the position and orientation data from the camera controller
+	///
+    void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
+
+	///
+	/// \brief
+	///
+    vtkRenderer* getVtkRenderer();
+
+	///
+	/// \brief
+	///
+    vtkRenderWindowInteractor* getVtkRenderWindowInteractor();
+
+    ///
+    /// \brief Add chart actor to the renderer
+    ///
+    void addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene);
+
+    vtkRenderWindow* getRenderWindow() const;
 
 protected:
     ///
@@ -131,11 +168,9 @@ protected:
     /// \brief Render scene
     ///
     void render() override;
-
 private:
     class VTKRenderer;
     std::unique_ptr<VTKRenderer> renderer;
 };
-
 
 #endif // VTKVIEWER_H

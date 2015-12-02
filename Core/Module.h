@@ -28,57 +28,79 @@
 #include <memory>
 
 // SimMedTK includes
-#include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "Core/Dispatcher.h"
-#include "Core/Scene.h"
-#include "Core/SceneObject.h"
 
-///this class is module major. Every other thread should derive this class
+class Scene;
+class Dispatcher;
+
+/// \brief Abstract base class. Each module runs on its own thread.
+/// Every other thread should derive this class.
 class Module: public CoreClass
 {
-
-private:
-    friend class SDK;
-
-protected:
-    ///initialization flag
-    bool isInitialized;
-
-    ///execution termination..if it is true exit from the thread
-    bool terminateExecution;
-
-    ///When the terminatation is done by the module, this will be true
-    bool terminationCompleted;
-
-    ///scene list in the environment
-    std::vector<std::shared_ptr<Scene>> sceneList;
-    /// \brief call are made for begin module and end module before and after each frame
-    virtual void beginModule();
-    virtual void endModule();
-    /// \brief  dispatcher reference
-    std::shared_ptr<Dispatcher> dispathcer;
-
 public:
-    /// \brief  constructor initializes the module
+    ///
+    /// \brief Constructor initializes the module.
+    ///
     Module();
+    virtual ~Module();
 
-    /// \brief virtual functions
-    virtual bool init() = 0;
-    virtual void beginFrame() = 0;
-    virtual void endFrame() = 0;
-    virtual void exec() = 0;
-    /// \brief flags for termination
+    ///
+    /// \brief Set termination flags to true.
+    ///
     void terminate();
 
-    /// \brief  to check if the termination of the module is completed
+    ///
+    /// \brief Check if the termination of the module is completed.
+    ///
     bool isTerminationDone();
 
-    /// \brief  wait for termination
+    ///
+    /// \brief Check if the termination signal has being sent.
+    ///
+    bool isTerminated();
+
+    ///
+    /// \brief Wait for termination.
+    ///
     void waitTermination();
 
-    /// \brief  get module id
-    int getModuleId();
+    ///
+    /// \brief Get module id.
+    ///
+    short int getModuleId();
+
+    ///
+    /// \brief Call are made for begin module and end module before and after each frame.
+    ///
+    virtual void beginModule();
+    virtual void endModule();
+
+    ///
+    /// \brief Module initialization routine.
+    ///
+    virtual bool init() = 0;
+
+    ///
+    /// \brief Begin frame will be called before the cycle.
+    ///
+    virtual void beginFrame() = 0;
+
+    ///
+    /// \brief End frame will be called after the cycle.
+    ///
+    virtual void endFrame() = 0;
+
+    ///
+    /// \brief Execution function. Main module execution.
+    ///
+    virtual void exec() = 0;
+
+protected:
+    bool isInitialized;                     //!< Initialization flag
+    bool terminateExecution;                //!< Execution termination flag
+    bool terminationCompleted;              //!< True when the terminatation is completed
+    std::shared_ptr<Dispatcher> dispathcer; //!< Dispatcher references
+    std::vector<std::shared_ptr<Scene>> sceneList; //!< Scene list in the environment
 
 };
 

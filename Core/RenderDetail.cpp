@@ -62,9 +62,14 @@ void RenderDetail::reset()
     canGetShadow = true;
     opacity = 1.0;
     textureFilename = "";
-    background.rgba[0] = 81.0/255.0;
-    background.rgba[1] = 87.0/255.0;
-    background.rgba[2] = 110.0/255.0;
+
+    background.rgba[0] = 0.5;
+    background.rgba[1] = 0.5;
+    background.rgba[2] = 0.7;
+
+    faceBackgroundBottom.setValue(0.8, 0.8, 0.8, 1.0);
+    faceBackgroundTop.setValue(0.45, 0.45, 0.8, 1.0);
+
     background.rgba[3] = 1.0;
 }
 
@@ -219,4 +224,8 @@ void RenderDetail::setOpacity(const float &opacityValue)
 bool RenderDetail::renderWireframe() const
 {
     return this->renderType & SIMMEDTK_RENDER_WIREFRAME;
+}
+bool RenderDetail::renderFaces() const
+{
+    return this->renderType & SIMMEDTK_RENDER_FACES;
 }

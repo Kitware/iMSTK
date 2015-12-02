@@ -45,7 +45,9 @@ namespace Core {
 class BaseMesh: public CoreClass
 {
 public:
+    using TransformType = Eigen::Transform<double, 3, Eigen::Affine>;
 
+public:
     ///
     /// \brief designates what purpose/scenario the mesh is used for
     ///
@@ -79,7 +81,7 @@ public:
     ///
     /// \brief Copy vertices into origVerts
     ///
-    void updateOriginalVertsWithCurrent();
+    void updateInitialVertices();
 
     ///
     /// \brief Copy vertices into origVerts
@@ -148,12 +150,12 @@ public:
     ///
     /// \brief Apply a rotation to the vertices
     ///
-    void rotate(const Quaterniond &rotation);
+    void rotate(const core::Quaterniond &rotation);
 
     ///
     /// \brief Apply any affine tranformation to the vertices.
     ///
-    void transform(const Eigen::Transform<double,3,Eigen::Affine> &transformation);
+    void transform(const TransformType &transformation);
 
     ///
     /// \brief Apply any affine tranformation to the vertices.

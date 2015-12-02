@@ -66,16 +66,6 @@ std::shared_ptr<SceneObject> StaticSceneObject::clone()
     return safeDownCast<SceneObject>();
 }
 
-void StaticSceneObject::setModel(std::shared_ptr<Model> model)
-{
-    this->staticModel = model;
-}
-
-std::shared_ptr<Model> StaticSceneObject::getModel()
-{
-    return staticModel;
-}
-
 void StaticSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";

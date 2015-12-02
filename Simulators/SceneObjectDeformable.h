@@ -24,6 +24,9 @@
 #ifndef SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 #define SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 
+// STL includes
+#include <unordered_map>
+
 // SimMedTK includes
 #include "Mesh/SurfaceMesh.h"
 #include "Core/SceneObject.h"
@@ -69,20 +72,13 @@ public:
     /// \brief Append the contact forces (if any) to external forces
     void applyContactForces();
 
-    /// \brief Set all contact forces to zero (if any)
-    void setContactForcesToZero();
-
-    /// \brief  Sets the contact force at a given location
-    /// (not given node) in contact force vector
-    void setContactForceOfNodeWithDofID(const int dofID, const core::Vec3d force);
-
     /// \brief  returns displacement of at a given location
     /// (not given node) in contact force vector
     core::Vec3d getDisplacementOfNodeWithDofID(const int dofID) const;
 
     /// \brief  returns velocity of at a given location
     /// (not given node) in contact force vector
-    core::Vec3d getVelocityOfNodeWithDofID(const int dofID) const;
+    core::Vec3d getVelocity(const int dofID) const;
 
     /// \brief  returns acceleration of at a given location
     /// (not given node) in contact force vector
@@ -142,17 +138,6 @@ public:
         return this->f_ext;
     }
 
-    // Get contact forces vector
-    std::vector<double> &getContactForces()
-    {
-        return this->f_contact;
-    }
-
-    const std::vector<double> &getContactForces() const
-    {
-        return this->f_contact;
-    }
-
 protected:
     friend class SceneObjectDeformableRenderDelegate;
 
@@ -179,13 +164,13 @@ protected:
     std::vector<double> uSecondary; ///< interpolated displacement for secondary mesh
     std::vector<double> uInitial;   ///< initial displacement
     std::vector<double> velInitial; ///< initial velocity
-    std::vector<double> f_contact;  ///< contact forces (if any)
     std::vector<double> forceLoads; ///< discrete external load inputs
 
     std::vector<int> fixedVertices; ///< fixed vertcies
 
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
+
 };
 
 #endif // SMVEGAFEMSCENEOBJECT_DEFORMABLE_H

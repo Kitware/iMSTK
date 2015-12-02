@@ -51,7 +51,7 @@ public:
 
     const core::Vec3d &getUpDirection();
 
-    void applyRotation(const Quaterniond &quat)
+    void applyRotation(const core::Quaterniond &quat)
     {
         direction = quat*direction;
         upDirection = quat*upDirection;

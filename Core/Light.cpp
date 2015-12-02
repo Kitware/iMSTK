@@ -37,7 +37,7 @@ void Light::updateDirection()
     angle = std::acos(dirNorm.dot(defaultDir));
     core::Vec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
 
-    Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
+    core::Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;

@@ -27,12 +27,10 @@
 // STL includes
 #include <chrono>
 
-// SimMedTK includes
-#include "Core/Config.h"
-#include "Core/CoreClass.h"
+namespace core {
 
 /// \brief timer class
-class Timer: public CoreClass
+class Timer
 {
 public:
     using ClockType = std::chrono::high_resolution_clock;
@@ -40,19 +38,27 @@ public:
     using DurationType = ClockType::duration;
     using PeriodType = ClockType::period;
 
-    /// \brief constructor
+    ///
+    /// \brief Constructor
+    ///
     Timer();
 
-    /// \brief start the timer
+    ///
+    /// \brief Start the timer
+    ///
     void start();
 
-    /// \brief Gets the time passed between this call and start()
+    ///
+    /// \brief Gets the time passed between start() and this call
     ///
     /// \return Returns the time in seconds
+    ///
     long double elapsed();
 
 private:
-    TimePointType begin;
+    TimePointType begin; //!< Begining of time point
 };
+
+} //core
 
 #endif

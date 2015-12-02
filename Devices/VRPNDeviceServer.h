@@ -1,6 +1,5 @@
 // This file is part of the SimMedTK project.
-// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-//                        Rensselaer Polytechnic Institute
+// Copyright (c) Kitware, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,10 +20,34 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#ifndef VRPNSERVERDEVICE_H
+#define VRPNSERVERDEVICE_H
 
-#include "Devices/HapticInterface.h"
+#include<vector>
 
-HapticInterface::HapticInterface()
+#include "Devices/DeviceInterface.h"
+
+class vrpn_Analog;
+class vrpn_Tracker;
+class vrpn_ForceDeviceServer;
+class vrpn_Connection;
+
+class VRPNDeviceServer : public DeviceInterface
 {
+    VRPNDeviceServer(const VRPNDeviceServer& other) = delete;
+    VRPNDeviceServer& operator=(const VRPNDeviceServer& other) = delete;
 
+public:
+    VRPNDeviceServer();
+    ~VRPNDeviceServer() = default;
+
+    void exec() override;
+
+private:
+    std::vector<std::shared_ptr<vrpn_Analog>> analogServers;
+    std::vector<std::shared_ptr<vrpn_Tracker>> trackerServers;
+    std::vector<std::shared_ptr<vrpn_ForceDeviceServer>> forceServers;
+    std::shared_ptr<vrpn_Connection> connection;
 };
+
+#endif // VRPNSERVERDEVICE_H

@@ -9,9 +9,8 @@ simmedtk_add_library(ContactHandling
 )
 
 target_link_libraries(ContactHandling
-  PUBLIC
-    Core
   PRIVATE
+    Core
     Event
     Collision
     Simulators

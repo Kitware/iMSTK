@@ -153,10 +153,7 @@ public:
         return this->valid;
     }
 
-    virtual void setIsValid(const bool newValid)
-    {
-        this->valid = newValid;
-    }
+    void setViewerRenderDetail(const unsigned int newRenderDetail);
 
     std::string windowTitle;
     Color defaultDiffuseColor;

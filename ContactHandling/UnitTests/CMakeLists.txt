@@ -13,7 +13,6 @@ target_link_libraries(${Module}UnitTestRunner
     Event
     Collision
     Simulators
-    Rendering
     Mesh
     ContactHandling)
 

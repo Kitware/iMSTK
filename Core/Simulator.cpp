@@ -24,6 +24,9 @@
 #include "Core/Simulator.h"
 #include "Core/MakeUnique.h"
 
+// Threads includes
+#include <ThreadPool.h>
+
 /// \brief starts the tasks with the threads from thread pool
 void Simulator::beginFrame()
 {
@@ -85,7 +88,7 @@ void Simulator::run()
         }
     }
 
-    while (true && this->terminateExecution == false)
+    while (!this->terminateExecution)
     {
         beginModule();
 
@@ -98,7 +101,6 @@ void Simulator::run()
         {
             main = changedMain;
             changedMainTimeStamp = mainTimeStamp;
-
         }
 
         results.clear();
@@ -256,6 +258,7 @@ Simulator::Simulator(std::shared_ptr< ErrorLog > p_log)
     mainTimeStamp = 0;
     maxThreadCount = 0;
     asyncThreadPoolSize = 0;
+    this->name = "Simulator";
 }
 
 void Simulator::setMaxThreadCount(int p_threadMaxCount)
@@ -283,4 +286,9 @@ void Simulator::exec()
     }
 
     this->terminationCompleted = true;
+    std::cout << "Simulator terminated" <<std::endl;
+}
+void Simulator::addCollisionPair(std::shared_ptr< CollisionPair > pair)
+{
+    collisionPairs.emplace_back(pair);
 }

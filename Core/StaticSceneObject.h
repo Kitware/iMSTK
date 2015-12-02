@@ -70,14 +70,6 @@ public:
     void printInfo() const override;
 
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
-
-    void setModel(std::shared_ptr<Model> model);
-
-    std::shared_ptr<Model> getModel();
-
-public:
-    /// \brief static scene object contains a mesh
-    std::shared_ptr<Model> staticModel;
 };
 
 #endif

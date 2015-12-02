@@ -1,4 +1,4 @@
-
+message("VTK_USE_FILE=${VTK_USE_FILE}")
 include(${VTK_USE_FILE})
 
 simmedtk_add_library(VTKRendering
@@ -20,6 +20,7 @@ set(PRIVATE_LIBS
         Rendering
         Mesh
         Geometry
+        Devices
         )
 
 if(VTK_LIBRARIES)

@@ -44,35 +44,8 @@ PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 
 void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
-    int nodeDofID;
-    const double stiffness = 1.0e4, damping = 1.0e5;
-    core::Vec3d velocityProjection;
-
-    std::vector<std::shared_ptr<Contact>> contactInfo = this->getCollisionPairs()->getContacts();
-
-    if (this->getSecondSceneObject()->getType() == core::ClassType::VegaFemSceneObject
-        && this->getFirstSceneObject()->getType() == core::ClassType::StaticSceneObject)
-    {
-        auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(this->getSecondSceneObject());
-
-        femSceneObject->setContactForcesToZero();
-        core::Vec3d force;
-        for (size_t i = 0; i < contactInfo.size(); i++)
-        {
-            nodeDofID = 3 * contactInfo[i]->index;
-            velocityProjection = femSceneObject->getVelocityOfNodeWithDofID(nodeDofID);
-            velocityProjection = contactInfo[i]->normal.dot(velocityProjection) * contactInfo[i]->normal;
-
-            force = stiffness * -contactInfo[i]->depth * contactInfo[i]->normal - damping * velocityProjection;
-
-            femSceneObject->setContactForceOfNodeWithDofID(nodeDofID, force);
-
-        }
-    }
-    else
-    {
-        std::cout << "Error: Scene objects don't match the required types in 'PenaltyContactFemToStatic' \n";
-    }
+    auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(this->getSecondSceneObject());
+    this->computeForces(femSceneObject);
 }
 
 void PenaltyContactFemToStatic::computeBilateralContactForces()

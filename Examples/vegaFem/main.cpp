@@ -30,6 +30,9 @@
 #include "Simulators/VegaFemSceneObject.h"
 #include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
+#include "Devices/VRPNForceDevice.h"
+// #include "Devices/VRPNDeviceServer.h"
+#include "VirtualTools/ToolCoupler.h"
 
 // Include required simulators
 #include "Simulators/VegaFemSimulator.h"
@@ -42,8 +45,12 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
+// #include "../common/wasdCameraController.h"
+// #include "../common/KeyPressSDKShutdown.h"
+// #include "../common/pzrMouseCameraController.h"
+
 #include "IO/initIO.h"
-#include "RenderDelegates/initRenderDelegates.h"
+// #include "RenderDelegates/initRenderDelegates.h"
 #include "VTKRendering/initVTKRendering.h"
 
 int main(int ac, char** av)
@@ -54,7 +61,7 @@ int main(int ac, char** av)
         configFile = av[1];
     }
 
-    initRenderDelegates();
+    // initRenderDelegates();
     initVTKRendering();
     initIODelegates();
     const bool useVTKRenderer = true;
@@ -65,6 +72,22 @@ int main(int ac, char** av)
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
+    auto client = std::make_shared<VRPNForceDevice>();
+    // auto server = std::make_shared<VRPNDeviceServer>();
+
+    //get some user input and setup device url
+    std::string input = "Phantom@10.171.2.217";//"Phantom0@localhost";
+    std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
+    std::getline(std::cin, input);
+    if (!input.empty())
+    {
+        client->setDeviceURL(input);
+    }
+    auto controller = std::make_shared<ToolCoupler>(client);
+    controller->setScalingFactor(20.0);
+    // sdk->registerModule(server);
+    sdk->registerModule(client);
+    sdk->registerModule(controller);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
@@ -72,19 +95,21 @@ int main(int ac, char** av)
 
     // create a FEM simulator
     auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    //femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject = std::make_shared<VegaFemSceneObject>(
         sdk->getErrorLog(),configFile);
+    femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME //|
     //| SIMMEDTK_RENDER_VERTICES
-    SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
+    //SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
     );
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
-    meshRenderDetail->setShininess(20.0);
+    meshRenderDetail->setShininess(10.0);
 
     auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
     if(renderingMesh)
@@ -94,7 +119,7 @@ int main(int ac, char** av)
     sdk->addSceneActor(femObject, femSimulator);
 
     //-------------------------------------------------------
-    // Create scene actor 2:  plane + dummy simulator
+    // Create scene actor 2:  plane
     //-------------------------------------------------------
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
@@ -110,6 +135,35 @@ int main(int ac, char** av)
     staticObject->setModel(plane);
 
     sdk->addSceneActor(staticObject, staticSimulator);
+
+    //-------------------------------------------------------
+    // Create scene actor 2:  loli tool
+    // create a static object to hold the lolitool scene object of given normal and position
+    //-------------------------------------------------------
+    auto loliSceneObject = std::make_shared<StaticSceneObject>();
+
+    auto loliCollisionModel = std::make_shared<MeshCollisionModel>();
+    loliCollisionModel->loadTriangleMesh("./loli.vtk");
+    loliSceneObject->setModel(loliCollisionModel);
+
+    auto loliMesh = loliCollisionModel->getMesh();
+    Core::BaseMesh::TransformType transform =
+        Eigen::Translation3d(core::Vec3d(0,0,0))*Eigen::Scaling(0.1);
+
+    auto loliRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME);
+    loliRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 0.5));
+    loliRenderDetail->setDiffuseColor(Color::colorYellow);
+    loliRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
+    loliRenderDetail->setShininess(20.0);
+
+    loliMesh->setRenderDetail(loliRenderDetail);
+
+    loliMesh->transform(transform);
+    loliMesh->updateInitialVertices();
+
+    auto loliSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    sdk->addSceneActor(loliSceneObject, loliSimulator);
+    controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
     // Register both object simulators
@@ -128,6 +182,7 @@ int main(int ac, char** av)
     {
         meshModel->setMesh(collisionMesh);
     }
+    femObject->setModel(meshModel);
 
     auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
     planeMeshCollisionPairs->setModels(meshModel, plane);
@@ -152,13 +207,15 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto viewer = sdk->getViewerInstance();
 
-    if(!useVTKRenderer)
-    {
-        viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-                                    SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
-                                    SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
-        viewer->setGlobalAxisLength(0.8);
-    }
+    viewer->setViewerRenderDetail(SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS);
+
+    // if(!useVTKRenderer)
+    // {
+    //     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
+    //                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
+    //                                 SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+    //     viewer->setGlobalAxisLength(0.8);
+    // }
 
     // Get Scene
     auto scene = sdk->getScene(0);
@@ -172,6 +229,31 @@ int main(int ac, char** av)
     auto light2 = Light::getDefaultLighting();
     light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
+
+    // Setup Scene lighting
+    // if(!useVTKRenderer)
+    // {
+    //     // Camera setup
+    //     auto sceneCamera = Camera::getDefaultCamera();
+    //     sceneCamera->setPos(-60,0,0);
+    //     sceneCamera->setZoom(.5);
+    //     scene->addCamera(sceneCamera);
+    //
+    //     // Create the camera controller
+    //     auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
+    //     camCtl->setCamera(sceneCamera);
+    //
+    //     auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
+    //
+    //     auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
+    //     pzrCamCtl->setCamera(sceneCamera);
+    //
+    //     // Link up the event system between this the camera controller and the viewer
+    //     viewer->attachEvent(core::EventType::Keyboard, camCtl);
+    //     viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
+    //     viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
+    //     viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
+    // }
 
     //-------------------------------------------------------
     // Run the SDK

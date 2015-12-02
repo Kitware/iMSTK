@@ -207,7 +207,7 @@ void IOMesh3dsDelegate::read()
     }
 
     fclose(l_file);  // Closes the file stream
-    surfaceMesh->updateOriginalVertsWithCurrent();
+    surfaceMesh->updateInitialVertices();
     this->meshIO->setMesh(surfaceMesh);
 }
 

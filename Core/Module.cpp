@@ -1,4 +1,5 @@
 // This file is part of the SimMedTK project.
+// Copyright (c) Kitware, Inc.
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -22,46 +23,68 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Module.h"
+#include "Core/Dispatcher.h"
+#include "Core/Scene.h"
 
-/// \brief Begin frame will be called before the cycle
-void  Module::beginModule()
+Module::Module() :
+    isInitialized(false),
+    terminateExecution(false)
 {
-    dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()), core::CallerState::BeginFrame);
-    beginFrame();
-
+    this->name = "Module";
 }
 
-/// \brief End frame will be called after the cycle
-void  Module::endModule()
-{
-    endFrame();
-    dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()), core::CallerState::EndFrame);
-}
+//---------------------------------------------------------------------------
+Module::~Module() {}
+
+//---------------------------------------------------------------------------
 void Module::terminate()
 {
-    terminateExecution = true;
+    this->terminateExecution = true;
 }
+
+//---------------------------------------------------------------------------
 bool Module::isTerminationDone()
 {
-    return terminationCompleted;
+    return this->terminationCompleted;
 }
+
+//---------------------------------------------------------------------------
+bool Module::isTerminated()
+{
+    return this->terminateExecution;
+}
+
+//---------------------------------------------------------------------------
 void Module::waitTermination()
 {
     while ( 1 )
     {
-        if ( terminationCompleted == true )
+        //std::cout << this->name << std::endl;
+        if ( this->terminationCompleted == true )
         {
             break;
         }
     }
 }
-int Module::getModuleId()
+
+//---------------------------------------------------------------------------
+short int Module::getModuleId()
 {
     return this->getUniqueId()->getId();
 }
-Module::Module()
+
+//---------------------------------------------------------------------------
+void  Module::beginModule()
 {
-    terminateExecution = false;
-    isInitialized = false;
-    name = "Module";
+    this->dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()),
+                             core::CallerState::BeginFrame);
+    this->beginFrame();
+}
+
+//---------------------------------------------------------------------------
+void  Module::endModule()
+{
+    this->endFrame();
+    this->dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()),
+                             core::CallerState::EndFrame);
 }

@@ -1,15 +1,23 @@
 
+include(${VTK_USE_FILE})
+
 simmedtk_add_library(VirtualTools
   SOURCES
-    CurvedGrasper.cpp
+#     CurvedGrasper.cpp
+    ToolCoupler.cpp
+	LaparoscopicCameraController.cpp
   PUBLIC_HEADERS
-    CurvedGrasper.h
+    ToolCoupler.h
+	LaparoscopicCameraController.h
+#     CurvedGrasper.h
 )
 
 target_link_libraries(VirtualTools
   PRIVATE
     Core
     Mesh
-    Simulators
     Event
+    Devices
+  PUBLIC
+    ${VTK_LIBRARIES}
 )

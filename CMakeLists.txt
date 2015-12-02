@@ -47,11 +47,22 @@ option(SimMedTK_SUPERBUILD
 mark_as_advanced(SimMedTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
-# Device options
+# Devices options
 #
 option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
 option(SimMedTK_USE_ADU "Use the adu device." OFF)
 option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+option(SimMedTK_USE_FALCON "Use the Falcon device." OFF)
+
+#-----------------------------------------------------------------------------
+# VRPN options
+option(USE_VRPN_CLIENT "Use VRPN in client mode." ON)
+option(USE_VRPN_SERVER "Use VRPN in server mode." ON)
+
+if(SimMedTK_USE_PHANTOM_OMNI)
+    set(USE_VRPN_SERVER ON CACHE BOOL "Force the use of VRPN servers." FORCE)
+endif()
+
 
 #-----------------------------------------------------------------------------
 # Oculus Option - Disabled by default
@@ -188,10 +199,12 @@ find_package(VegaFEM REQUIRED CONFIG)
 find_package(ThreadPool REQUIRED)
 find_package(VTK REQUIRED)
 
+include(${VTK_USE_FILE})
+include_directories(SYSTEM ${VTK_INCLUDE_DIRS}/vtkglew/include)
+
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
-
   if(NOT WIN32)
     find_package(X11 REQUIRED)
   endif()
@@ -206,6 +219,25 @@ endif()
 
 if(SimMedTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics)
+endif()
+
+if(SimMedTK_USE_PHANTOM_OMNI)
+  find_package(OpenHaptics REQUIRED)
+endif()
+
+if(USE_VRPN_CLIENT)
+  set(components quat)
+  if(USE_VRPN_SERVER)
+    list(APPEND components vrpnserver Libusb1)
+  endif()
+  if(SimMedTK_USE_PHANTOM_OMNI)
+    list(APPEND components vrpn_phantom)
+  endif()
+  if(SimMedTK_USE_FALCON)
+    list(APPEND components LibNifalcon)
+  endif()
+  find_package(VRPN REQUIRED COMPONENTS ${components})
+  include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
 endif()
 
 if(SimMedTK_USE_ADU)
@@ -252,8 +284,7 @@ set(SimMedTK_exports
   RenderDelegates
   Rendering
   Simulators
-  VTKRendering
-#   VirtualTools
+  VirtualTools
   )
 
 if(SimMedTK_USE_OCULUS)
@@ -273,7 +304,7 @@ add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)
 add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)
-# add_subdirectory(VirtualTools)
+add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
 
 ################################################################################
@@ -292,6 +323,12 @@ endif()
 #
 
 export(PACKAGE SimMedTK)
+export(TARGETS
+  ${SimMedTK_exports}
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
+  NAMESPACE mstk::
+  EXPORT_LINK_INTERFACE_LIBRARIES
+)
 
 configure_file(
   CMake/SimMedTKConfig.cmake.in

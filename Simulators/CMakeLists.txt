@@ -27,6 +27,8 @@ target_link_libraries(Simulators
     Event
     Collision
     IO
+    Devices
+    VirtualTools
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts

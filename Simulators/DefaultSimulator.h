@@ -34,6 +34,8 @@
 #include "Core/ErrorLog.h"
 #include <Core/Vector.h>
 
+class ToolCoupler;
+class StaticSceneObject;
 ///
 /// \brief Default simulator that applies operations to the position array of the
 ///     undelying scene object model.
@@ -64,8 +66,11 @@ protected:
     void syncBuffers() override;
     void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
+    void updateHapticForces(std::shared_ptr<StaticSceneObject> sceneObject);
+
 private:
     std::vector<OperationType> operatorFunctions;
+    std::shared_ptr<ToolCoupler> hapticTool;
 
 };
 

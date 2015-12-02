@@ -27,7 +27,7 @@ namespace Core {
 
 BaseMesh::BaseMesh() {}
 BaseMesh::~BaseMesh() {}
-void BaseMesh::updateOriginalVertsWithCurrent()
+void BaseMesh::updateInitialVertices()
 {
     this->origVerts = this->vertices;
 }
@@ -116,7 +116,7 @@ void BaseMesh::translate( const Eigen::Translation3d& translation, bool setIniti
     } );
     if(setInitialPoints)
     {
-        this->updateOriginalVertsWithCurrent();
+        this->updateInitialVertices();
     }
 }
 void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
@@ -127,7 +127,7 @@ void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
         v = scaling*v;
     } );
 }
-void BaseMesh::rotate ( const Quaterniond& rotation )
+void BaseMesh::rotate ( const core::Quaterniond& rotation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
                     [rotation] ( core::Vec3d &v )
@@ -135,7 +135,7 @@ void BaseMesh::rotate ( const Quaterniond& rotation )
         v = rotation*v;
     } );
 }
-void BaseMesh::transform ( const Eigen::Transform<double,3,Eigen::Affine>& transformation )
+void BaseMesh::transform ( const TransformType& transformation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
                     [transformation] ( core::Vec3d &v )

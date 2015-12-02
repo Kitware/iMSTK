@@ -1,4 +1,5 @@
 // This file is part of the SimMedTK project.
+// Copyright (c) Kitware, Inc.
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -26,8 +27,10 @@
 #include "Core/RenderDelegate.h"
 
 #include <chrono>
-#include <thread>
 #include <string>
+
+// Threads includes
+#include <ThreadPool.h>
 
 /// \brief SDK is singlenton class
 std::once_flag SDK::sdkCallOnceFlag;
@@ -120,10 +123,7 @@ void SDK::initRegisteredModules()
 {
     for(auto &module : this->moduleList)
     {
-        if(module->getType() != core::ClassType::Viewer)
-        {
-            module->init();
-        }
+        module->init();
     }
 }
 
@@ -161,7 +161,7 @@ void SDK::shutDown()
 {
     for(auto &module : this->moduleList)
     {
-        module->terminateExecution = true;
+        module->terminate();
     }
     shutdown = true;
 }
@@ -169,26 +169,23 @@ void SDK::shutDown()
 /// \brief runs the simulator
 void SDK::run()
 {
-    updateSceneListAll();
-    initRegisteredModules();
+    this->updateSceneListAll();
+    this->initRegisteredModules();
 
-    runRegisteredModules();
-
-    this->viewer->exec();
-
-    // Now wait for other modules to shut down
-    while (this->viewer->isValid() && !shutdown)
+    this->runRegisteredModules();
+    if (nullptr != this->viewer)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        this->viewer->exec();
     }
 
-    // Tell framework threads to shutdown
-    terminateAll();
+    // Tell framework threads to shutdown if the viewer returs
+    this->shutDown();
+    this->terminateAll();
 
     // Wait for all threads to finish processing
-    for (auto &module : modules)
+    for (auto &moduleThread : this->modules)
     {
-        module.join();
+        moduleThread.join();
     }
 }
 
@@ -236,19 +233,8 @@ void SDK::terminateAll()
 {
     for(auto &module : this->moduleList)
     {
-        module->terminateExecution = true;
-    }
-
-    for(auto &module : this->moduleList)
-    {
-        bool moduleTerminated = false;
-        while(!moduleTerminated)
-        {
-            if(module->isTerminationDone())
-            {
-                moduleTerminated = true;
-            }
-        }
+        module->terminate();
+        module->waitTermination();
     }
 }
 
