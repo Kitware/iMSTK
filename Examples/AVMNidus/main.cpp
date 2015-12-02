@@ -95,10 +95,10 @@ int main(int ac, char **av)
 	//meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl","wetshader");
 	Shaders::createShader("wetshader", "shaders/wet_vert.glsl", "shaders/wet_frag.glsl", "");
     meshRenderDetail->addShaderProgram("wetshader");
-	/*meshRenderDetail->addTexture("decal", "textures/metal1.bmp", "textureDecal", "wetshader");
-	meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
-	meshRenderDetail->setTextureFilename("textures/cube.jpg");
-	*/
+	//meshRenderDetail->addTexture("decal", "textures/metal1.bmp", "textureDecal", "wetshader");
+	//meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
+	//meshRenderDetail->setTextureFilename("textures/cube.jpg");
+	
 	meshRenderDetail->addTexture("decal", "textures/brainx.bmp", "textureDecal", "wetshader");
 	meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
 	meshRenderDetail->setTextureFilename("textures/brainx.bmp");
@@ -177,7 +177,11 @@ int main(int ac, char **av)
 
 	auto cubeModel = std::make_shared<MeshModel>();
 	//cubeModel->load("models/blade2.obj");
-	cubeModel->load("models/brain.obj");
+	//cubeModel->load("models/brain.obj");
+	cubeModel->load("models/brain.3ds");
+
+	//cubeModel->load("models/blade.3ds");
+	
 	//cubeModel->getMesh()->scale(Eigen::UniformScaling<double>(10.0));
 	cubeModel->setRenderDetail(meshRenderDetail);
 

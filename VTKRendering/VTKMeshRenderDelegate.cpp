@@ -28,6 +28,7 @@
 #include "Core/RenderDelegate.h"
 #include "Mesh/SurfaceMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
+#include "IO/IOMesh.h"
 
 #include "VTKRendering/MeshNodalCoordinates.h"
 #include "VTKRendering/VTKRenderDelegate.h"
@@ -82,6 +83,18 @@ private:
 
     vtkSmartPointer<vtkDataSet> dataSet;
 };
+ 
+class vtkOpenGLTexture_Impl :public vtkOpenGLTexture{
+public:
+	static vtkOpenGLTexture_Impl* New();
+	void Load(vtkRenderer*p_renderer){
+		vtkOpenGLTexture::Load(p_renderer);
+		this->GetTextureObject()->SetLinearMagnification(true);
+		this->GetTextureObject()->SetMinificationFilter(true);
+	}
+
+};
+vtkStandardNewMacro(vtkOpenGLTexture_Impl)
 
 void MeshRenderDelegate::initDraw()
 {
@@ -126,6 +139,7 @@ void MeshRenderDelegate::initDraw()
     vtkNew<vtkUnstructuredGrid> unstructuredMesh;
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
+	//unstructuredMesh->SetCells(VTK_POLYGON, triangles.GetPointer());
 
     auto renderDetail = mesh->getRenderDetail();
     if(renderDetail)
@@ -157,7 +171,8 @@ void MeshRenderDelegate::initDraw()
     }
 
     //vtkSmartPointer<vtkTexture> texture;
-	vtkOpenGLTexture* texture;
+	vtkOpenGLTexture_Impl* textureImpl;
+	vtkOpenGLTexture *texture;
 	
 	
 	int nbrTextures = renderDetail->getNumberOfTextures();
@@ -171,6 +186,15 @@ void MeshRenderDelegate::initDraw()
 		for (auto &t : textures){
 			TextureDetail &textureDetail = t.second;
 			//textureDetail.fileName
+
+			if (TextureDetail::textures.find(textureDetail.fileName) != TextureDetail::textures.end()){
+
+				textureDetail.vtexture = TextureDetail::textures[textureDetail.fileName];
+				texture = textureDetail.vtexture;
+				
+				cout << "Image file:" << textureDetail.fileName << " is already loaded" << endl;
+				continue;
+			}
 			vtkSmartPointer<vtkImageReader2> imageReader =
 				readerFactory->CreateImageReader2(textureDetail.fileName.c_str());
 			if (imageReader == NULL)
@@ -180,18 +204,20 @@ void MeshRenderDelegate::initDraw()
 			}
 			imageReader->SetFileName(textureDetail.fileName.c_str());
 			imageReader->Update();
-			texture = vtkOpenGLTexture::New();
+			textureImpl = vtkOpenGLTexture_Impl::New();
 			//vtkTextureObject *textureObject = vtkTextureObject::New();
-			//texture->GetTextureObject()->SetLinearMagnification(true);
-			//texture->GetTextureObject()->SetGenerateMipmap(true);
-			texture->SetInputConnection(imageReader->GetOutputPort());
 		
+			//texture->GetTextureObject()->SetGenerateMipmap(true);
+			textureImpl->SetInputConnection(imageReader->GetOutputPort());
+			//texture->GetTextureObject()->SetLinearMagnification(true);
 		
 
 			
 			//texture->SetTextureObject(textureObject);
 			//textureObject->Create2D
-			textureDetail.vtexture = texture;
+			textureDetail.vtexture = textureImpl;
+			texture = textureImpl;
+			TextureDetail::textures.emplace(textureDetail.fileName, texture);
 			cout << "Image File Loaded"<<textureDetail.fileName.c_str() << endl;
 		}
 		
@@ -224,9 +250,12 @@ void MeshRenderDelegate::initDraw()
     if (renderDetail && renderDetail->renderNormals())
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
+		
         geometry->SetInputData(unstructuredMesh.GetPointer());
+		
 
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
+		normals->SetSplitting(false);
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
 
@@ -238,8 +267,10 @@ void MeshRenderDelegate::initDraw()
 		auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
 		mapperCustom->renderDetail = renderDetail;
 		mesh->computeVertexNeighbors();
-		mesh->setUseOBJTexture(true);
-		//mesh->setUseThreDSTexture(true);
+		if (mesh->getMeshType() == (int)IOMesh::MeshFileType::OBJ)
+			mesh->setUseOBJTexture(true);
+		else 
+			mesh->setUseThreDSTexture(true);
 		mesh->computeTriangleTangents();
 		
 		mapperCustom->tangents = mesh->getVertexTangents();
@@ -275,9 +306,10 @@ void MeshRenderDelegate::initDraw()
         mapper = vtkDataSetMapper::New();
         mapper->SetInputDataObject(unstructuredMesh.GetPointer());
     }
-
-    if(texture)
+	///al least one texture is needed to 
+	if (nbrTextures)
     {
+		
 		actor->SetTexture(texture);
     }
     actor->SetMapper(mapper.GetPointer());

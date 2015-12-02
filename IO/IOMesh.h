@@ -69,7 +69,7 @@ public:
     /// \brief Enum class for the type of files this mesh io expect,
     ///         add more types here to extend the mesh io.
     ///
-    enum class MeshFileType
+    enum class MeshFileType:int
     {
         VTK,
         VTU,

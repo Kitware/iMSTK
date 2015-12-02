@@ -40,6 +40,7 @@ void MeshModel::load(const std::string& meshName)
     reader->read(meshName);
 
     this->mesh = reader->getMesh();
+	this->mesh->setMeshType ((int)reader->getFileType());
 }
 
 const std::vector<core::Vec3d>& MeshModel::getVertices() const

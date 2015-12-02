@@ -183,6 +183,10 @@ private:
     // List of vertex tangents
     std::vector<core::Vec3d> vertexTangents;
 
+	// List of vertex tangents
+	std::vector<core::Vec3d> vertexTangentsDelete;
+
+
     // List of vertex neighbors
     std::vector<std::vector<size_t>> vertexNeighbors;
 

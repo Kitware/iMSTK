@@ -103,6 +103,8 @@ struct TextureDetail {
 	std::string shaderProgramName;
 	GLint shaderUniformGL;
 	vtkOpenGLTexture* vtexture;
+	static std::map<std::string, vtkOpenGLTexture*> textures;
+
 
 };
 

@@ -600,3 +600,6 @@ std::map<std::string, TextureDetail>  &RenderDetail::getTextures()
 int RenderDetail::getNumberOfTextures(){
 	return this->textures.size();
 }
+
+
+ std::map<std::string, vtkOpenGLTexture*> TextureDetail::textures;

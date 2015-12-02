@@ -32,6 +32,7 @@
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
+
 ///
 /// @brief Mesh representation of a model.
 /// Base class used by all models that can be represented by a mesh
@@ -93,6 +94,7 @@ public:
 
 protected:
     std::shared_ptr<Core::BaseMesh> mesh; // Underlying mesh
+	
 };
 
 #endif // SMMESHMODEL_H

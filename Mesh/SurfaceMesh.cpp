@@ -153,11 +153,11 @@ void SurfaceMesh::computeTriangleTangents()
 			this->triangleTangents[t][2] = (bb2*V1[2] - bb1*V2[2])*r;
 
 
-			if (this->useThreeDSTexureCoordinates)
+			/*if (this->useThreeDSTexureCoordinates)
 			{
 				float r = 1.0 / ((t1[0] - t0[0])*(t2[1] - t0[1]) - (t1[1] - t0[1])*(t2[0] - t0[0]));
 				this->triangleTangents[t] *= r;
-			}
+			}*/
 
 			this->triangleTangents[t].normalize();
 		}
@@ -206,7 +206,7 @@ void SurfaceMesh::computeTriangleTangents()
 	}
 
     // Calculate the vertex tangents
-    if(this->useThreeDSTexureCoordinates || this->useOBJDSTexureCoordinates)
+    /*if(this->useThreeDSTexureCoordinates || this->useOBJDSTexureCoordinates)
     {
 		this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
         for(size_t v = 0, end = this->vertices.size(); v < end; ++v)
@@ -222,7 +222,26 @@ void SurfaceMesh::computeTriangleTangents()
             this->vertexTangents[v] -= this->vertexNormals[v]*this->vertexNormals[v].dot(this->vertexTangents[v]);
             this->vertexTangents[v].normalize();
         }
-    }
+    }*/
+
+
+	this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
+	for (size_t v = 0, end = this->vertices.size(); v < end; ++v)
+	{
+			this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
+
+			for (size_t i = 0; i < this->vertexTriangleNeighbors[v].size(); i++)
+			{
+				this->vertexTangents[v] += this->triangleTangents[this->vertexTriangleNeighbors[v][i]];
+			}
+
+			this->vertexTangents[v].normalize();
+			this->vertexTangents[v] -= this->vertexNormals[v] * this->vertexNormals[v].dot(this->vertexTangents[v]);
+			this->vertexTangents[v].normalize();
+	}
+
+
+	
 }
 void SurfaceMesh::checkTriangleOrientation()
 {
@@ -309,10 +328,12 @@ bool SurfaceMesh::isMeshTextured() const
 void SurfaceMesh::setUseOBJTexture(bool use)
 {
     this->useOBJDSTexureCoordinates = use;
+	this->useThreeDSTexureCoordinates = !use;
 }
 void SurfaceMesh::setUseThreDSTexture(bool use)
 {
     this->useThreeDSTexureCoordinates = use;
+	this->useOBJDSTexureCoordinates = !use;
 }
 void SurfaceMesh::print() const
 {
