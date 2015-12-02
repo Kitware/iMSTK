@@ -28,7 +28,7 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
 #include "IO/IOMesh.h"
-#include "IO/initIO.h"
+#include "IO/InitIO.h"
 
 const std::string vegaMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
 
@@ -36,7 +36,7 @@ using namespace bandit;
 
 go_bandit([](){
 
-    initIODelegates();
+    InitIODelegates();
     describe("Vega Volumetric Mesh", []() {
         auto ioMesh = std::make_shared<IOMesh>();
         ioMesh->read(vegaMeshFileName);

@@ -42,13 +42,9 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
-#include "../common/wasdCameraController.h"
-#include "../common/KeyPressSDKShutdown.h"
-#include "../common/pzrMouseCameraController.h"
-
-#include "IO/initIO.h"
-#include "RenderDelegates/initRenderDelegates.h"
-#include "VTKRendering/initVTKRendering.h"
+#include "IO/InitIO.h"
+#include "RenderDelegates/InitRenderDelegates.h"
+#include "VTKRendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
 int main(int ac, char **av)
@@ -59,9 +55,9 @@ int main(int ac, char **av)
         configFile = av[1];
     }
 
-    initRenderDelegates();
-    initVTKRendering();
-    initIODelegates();
+    InitRenderDelegates();
+    InitVTKRendering();
+    InitIODelegates();
 
     Matrix33d mat;
 

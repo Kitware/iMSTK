@@ -2,7 +2,6 @@
 simmedtk_add_library(Collision
   SOURCES
     CollisionMoller.cpp
-    CollisionUtilities.cpp
     MeshCollisionModel.cpp
     MeshToMeshCollision.cpp
     OctreeCell.cpp
@@ -11,7 +10,6 @@ simmedtk_add_library(Collision
     SpatialHashCollision.cpp
   PUBLIC_HEADERS
     CollisionMoller.h
-    CollisionUtilities.h
     MeshCollisionModel.h
     MeshToMeshCollision.h
     OctreeCell.h

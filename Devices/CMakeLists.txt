@@ -44,16 +44,6 @@ if(USE_VRPN_CLIENT)
         )
 endif()
 
-if(SimMedTK_USE_ADU)
-  list(APPEND EXTERNAL_DEVICES_SOURCES
-    ADUInterface.cpp)
-endif()
-
-if(SimMedTK_USE_NIUSB6008)
-  list(APPEND EXTERNAL_DEVICES_SOURCES
-    NIUSB6008Interface.cpp)
-endif()
-
 simmedtk_add_library(Devices
   SOURCES
     DeviceInterface.cpp

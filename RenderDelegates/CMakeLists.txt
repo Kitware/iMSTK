@@ -6,11 +6,10 @@ simmedtk_add_library(RenderDelegates
     PlaneRenderDelegate.cpp
     SceneObjectDeformableRenderDelegate.cpp
     StaticSceneObjectRenderDelegate.cpp
-#     StylusRenderDelegate.cpp
     SurfaceTreeRenderDelegate.cpp
-    initRenderDelegates.cpp
+    InitRenderDelegates.cpp
   PUBLIC_HEADERS
-    initRenderDelegates.h
+    InitRenderDelegates.h
 )
 
 target_link_libraries(RenderDelegates

@@ -11,7 +11,6 @@ target_link_libraries(${APP}
   Collision
   ContactHandling
   Event
-  ExamplesCommon
   IO
   )
 
@@ -49,5 +48,5 @@ add_custom_command(
 #     BYPRODUCTS ${DATA}
     COMMAND ${CMAKE_COMMAND} -E tar xf ${LOCAL_FILE}
     WORKING_DIRECTORY ${${APP}_DATA}
-    COMMENT "Unpacking ${LOCAL_FILE}"
+    COMMENT "-- Unpacking ${LOCAL_FILE}"
 )

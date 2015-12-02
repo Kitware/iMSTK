@@ -1,4 +1,3 @@
-message("VTK_USE_FILE=${VTK_USE_FILE}")
 include(${VTK_USE_FILE})
 
 simmedtk_add_library(VTKRendering
@@ -8,10 +7,10 @@ simmedtk_add_library(VTKRendering
     VTKPlaneRenderDelegate.cpp
     VTKSceneObjectDeformableRenderDelegate.cpp
     VTKStaticSceneObjectRenderDelegate.cpp
-    initVTKRendering.cpp
+    InitVTKRendering.cpp
   PUBLIC_HEADERS
     VTKViewer.h
-    initVTKRendering.h
+    InitVTKRendering.h
 )
 set(PRIVATE_LIBS
     PRIVATE

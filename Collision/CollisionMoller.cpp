@@ -25,8 +25,8 @@
 
 // SimMedTK includes
 #include "Core/Matrix.h"
-#include "External/moller.h"
-#include "External/moller2.h"
+#include "External/Moller/moller.h"
+#include "External/Moller/moller2.h"
 
 bool CollisionMoller::tri2tri( core::Vec3d &tri1Point1,
                                    core::Vec3d &tri1Point2,

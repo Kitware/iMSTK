@@ -1,6 +1,6 @@
 simmedtk_add_library(IO
   SOURCES
-    initIO.cpp
+    InitIO.cpp
     IOMesh.cpp
     IOMesh3dsDelegate.cpp
     IOMeshAssimpDelegate.cpp
@@ -8,7 +8,7 @@ simmedtk_add_library(IO
     IOMeshVegaDelegate.cpp
     IOMeshVTKDelegate.cpp
   PUBLIC_HEADERS
-    initIO.h
+    InitIO.h
     IOMesh.h
     IOMeshDelegate.h
 )
