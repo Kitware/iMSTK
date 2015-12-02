@@ -28,7 +28,7 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Mesh/SurfaceMesh.h"
 #include "IO/IOMesh.h"
-#include "IO/initIO.h"
+#include "IO/InitIO.h"
 #include "Core/MakeUnique.h"
 
 const std::string ds3MeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.3ds";
@@ -45,7 +45,7 @@ using namespace bandit;
 
 go_bandit([](){
 
-    initIODelegates();
+    InitIODelegates();
     describe("IO Mesh Reader", [&]() {
         std::unique_ptr<IOMesh> ioMesh = Core::make_unique<IOMesh>();
 

@@ -1,14 +1,14 @@
-include(${VTK_USE_FILE})
+
 simmedtk_add_library(External
   SOURCES
-    FrameBufferObject.cpp
-    RenderBuffer.cpp
+    FrameBufferObject/FrameBufferObject.cpp
+    FrameBufferObject/RenderBuffer.cpp
   PUBLIC_HEADERS
-    FrameBufferObject.h
-    moller.h
-    moller2.h
-    RenderBuffer.h
-    tree.hh
+    FrameBufferObject/FrameBufferObject.h
+    FrameBufferObject/RenderBuffer.h
+    Moller/moller2.h
+    Moller/moller.h
+    Tree/tree.hh
 )
 
 target_compile_options(External

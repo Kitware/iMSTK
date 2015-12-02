@@ -45,13 +45,8 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
-// #include "../common/wasdCameraController.h"
-// #include "../common/KeyPressSDKShutdown.h"
-// #include "../common/pzrMouseCameraController.h"
-
-#include "IO/initIO.h"
-// #include "RenderDelegates/initRenderDelegates.h"
-#include "VTKRendering/initVTKRendering.h"
+#include "IO/InitIO.h"
+#include "VTKRendering/InitVTKRendering.h"
 
 int main(int ac, char** av)
 {
@@ -62,9 +57,8 @@ int main(int ac, char** av)
     }
 
     // initRenderDelegates();
-    initVTKRendering();
-    initIODelegates();
-    const bool useVTKRenderer = true;
+    InitVTKRendering();
+    InitIODelegates();
 
     //-------------------------------------------------------
     // 1. Create an instance of the SoFMIS framework/SDK
@@ -209,14 +203,6 @@ int main(int ac, char** av)
 
     viewer->setViewerRenderDetail(SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS);
 
-    // if(!useVTKRenderer)
-    // {
-    //     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-    //                                 SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
-    //                                 SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
-    //     viewer->setGlobalAxisLength(0.8);
-    // }
-
     // Get Scene
     auto scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
@@ -229,31 +215,6 @@ int main(int ac, char** av)
     auto light2 = Light::getDefaultLighting();
     light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
-
-    // Setup Scene lighting
-    // if(!useVTKRenderer)
-    // {
-    //     // Camera setup
-    //     auto sceneCamera = Camera::getDefaultCamera();
-    //     sceneCamera->setPos(-60,0,0);
-    //     sceneCamera->setZoom(.5);
-    //     scene->addCamera(sceneCamera);
-    //
-    //     // Create the camera controller
-    //     auto camCtl = std::make_shared<mstk::Examples::Common::wasdCameraController>();
-    //     camCtl->setCamera(sceneCamera);
-    //
-    //     auto keyShutdown = std::make_shared<mstk::Examples::Common::KeyPressSDKShutdown>();
-    //
-    //     auto pzrCamCtl = std::make_shared<mstk::Examples::Common::pzrMouseCameraController>();
-    //     pzrCamCtl->setCamera(sceneCamera);
-    //
-    //     // Link up the event system between this the camera controller and the viewer
-    //     viewer->attachEvent(core::EventType::Keyboard, camCtl);
-    //     viewer->attachEvent(core::EventType::Keyboard, keyShutdown);
-    //     viewer->attachEvent(core::EventType::MouseMove, pzrCamCtl);
-    //     viewer->attachEvent(core::EventType::MouseButton, pzrCamCtl);
-    // }
 
     //-------------------------------------------------------
     // Run the SDK

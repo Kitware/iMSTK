@@ -2,22 +2,16 @@
 simmedtk_add_library(Simulators
   SOURCES
     DefaultSimulator.cpp
-#     MyStylus.cpp
-#     StylusObject.cpp
-#     ToolSimulator.cpp
-    VegaObjectConfig.cpp
+    SceneObjectDeformable.cpp
     VegaFemSceneObject.cpp
     VegaFemSimulator.cpp
-	SceneObjectDeformable.cpp
+    VegaObjectConfig.cpp
   PUBLIC_HEADERS
     DefaultSimulator.h
-#     MyStylus.h
-#     StylusObject.h
-#     ToolSimulator.h
-    VegaObjectConfig.h
+    SceneObjectDeformable.h
     VegaFemSceneObject.h
     VegaFemSimulator.h
-    SceneObjectDeformable.h
+    VegaObjectConfig.h
 )
 
 target_link_libraries(Simulators

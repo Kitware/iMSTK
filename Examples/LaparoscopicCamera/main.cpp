@@ -18,8 +18,8 @@
 #include "Simulators/DefaultSimulator.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
-#include "IO/initIO.h"
-#include "VTKRendering/initVTKRendering.h"
+#include "IO/InitIO.h"
+#include "VTKRendering/InitVTKRendering.h"
 #include "VTKRendering/VTKViewer.h"
 
 // VTK includes
@@ -387,8 +387,8 @@ std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_pt
 
 int main()
 {
-    initVTKRendering();
-    initIODelegates();
+    InitVTKRendering();
+    InitIODelegates();
 
     std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
 

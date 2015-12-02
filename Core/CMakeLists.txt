@@ -9,7 +9,6 @@ simmedtk_add_library(Core
     ContactHandling.cpp
     CoreClass.cpp
     Dispatcher.cpp
-    DisplayText.cpp
     ErrorLog.cpp
     Event.cpp
     EventHandler.cpp
@@ -40,12 +39,13 @@ simmedtk_add_library(Core
     ContactHandling.h
     CoreClass.h
     DataStructures.h
+    DataStructures.hpp
     Dispatcher.h
-    DisplayText.h
     ErrorLog.h
     Event.h
     EventHandler.h
     Factory.h
+    Factory.hpp
     Geometry.h
     IOStream.h
     Light.h
@@ -71,8 +71,6 @@ simmedtk_add_library(Core
     Vector.h
     ViewerBase.h
     WorkerThread.h
-    DataStructures.hpp
-    Factory.hpp
 )
 
 target_link_libraries(Core

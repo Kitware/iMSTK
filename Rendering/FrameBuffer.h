@@ -31,8 +31,8 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
-#include "External/FrameBufferObject.h"
-#include "External/RenderBuffer.h"
+#include "External/FrameBufferObject/FrameBufferObject.h"
+#include "External/FrameBufferObject/RenderBuffer.h"
 #include "Rendering/TextureManager.h"
 
 /// \brief render buffer type used for frame buffer attachment
