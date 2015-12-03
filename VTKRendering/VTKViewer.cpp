@@ -72,7 +72,10 @@ public:
 
                     if (this->cameraControllerData != nullptr)
                     {
-                        updateCamera();
+                        vtkRenderer* renderer =
+                            this->renderWindow->GetRenderers()->GetFirstRenderer();
+                        updateCamera(renderer);
+                        renderer->ResetCameraClippingRange();
                     }
 
                     this->renderWindow->Render();
@@ -96,10 +99,9 @@ public:
 	///
 	/// \brief Update the camera from external source (optional)
 	///
-    void updateCamera()
+    void updateCamera(vtkRenderer* renderer)
     {
-        vtkCamera* camera = getRenderWindow()->GetRenderers()->
-            GetFirstRenderer()->GetActiveCamera();
+        vtkCamera* camera = renderer->GetActiveCamera();
 
         camera->SetPosition(
             cameraControllerData->position[0],
