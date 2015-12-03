@@ -11,7 +11,6 @@ simmedtk_add_library(Core
     ContactHandling.cpp
     CoreClass.cpp
     Dispatcher.cpp
-    DisplayText.cpp
     ErrorLog.cpp
     Event.cpp
     EventHandler.cpp
