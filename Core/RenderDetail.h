@@ -304,6 +304,11 @@ public:
     ///
     void setRenderWireframe(bool value);
     bool renderWireframe() const;
+
+    ///
+    /// \brief Returns true if you want to draw faces
+    ///
+    void setRenderFaces(bool value);
     bool renderFaces() const;
 
     ///

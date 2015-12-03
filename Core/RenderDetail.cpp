@@ -435,6 +435,19 @@ bool RenderDetail::renderWireframe() const
 }
 
 //---------------------------------------------------------------------------
+void RenderDetail::setRenderFaces(bool value)
+{
+    if(value)
+    {
+        this->renderType |= SIMMEDTK_RENDER_FACES;
+    }
+    else
+    {
+        this->renderType |= ~SIMMEDTK_RENDER_FACES;
+    }
+}
+
+//---------------------------------------------------------------------------
 bool RenderDetail::renderFaces() const
 {
     return this->renderType & SIMMEDTK_RENDER_FACES;
