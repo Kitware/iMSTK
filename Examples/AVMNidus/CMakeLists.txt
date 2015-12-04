@@ -8,7 +8,6 @@ target_link_libraries(${APP}
   Geometry
   VTKRendering
   Rendering
-  RenderDelegates
   Simulators
   Mesh
   Collision

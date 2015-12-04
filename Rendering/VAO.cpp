@@ -23,7 +23,7 @@
 
 #include "Rendering/VAO.h"
 #include "Rendering/Shader.h"
-#include "Rendering/OpenGLViewer.h"
+#include "Mesh/SurfaceMesh.h"
 
 std::unordered_map<int, std::shared_ptr<VAO>> VAO::VAOs;
 

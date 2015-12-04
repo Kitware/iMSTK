@@ -43,7 +43,6 @@
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
 #include "IO/InitIO.h"
-#include "RenderDelegates/InitRenderDelegates.h"
 #include "VTKRendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
@@ -57,7 +56,6 @@ int main(int ac, char **av)
         configFile = av[1];
     }
 
-    InitRenderDelegates();
     InitVTKRendering();
     InitIODelegates();
 

@@ -23,7 +23,6 @@
 
 #include "Core/ObjectSimulator.h"
 #include "Core/SDK.h"
-#include "Rendering/OpenGLViewer.h"
 
 ObjectSimulator::ObjectSimulator(std::shared_ptr<ErrorLog> p_log)
 {

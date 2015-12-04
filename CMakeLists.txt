@@ -281,7 +281,6 @@ set(SimMedTK_exports
   Geometry
   IO
   Mesh
-  RenderDelegates
   Rendering
   Simulators
   VirtualTools
@@ -300,7 +299,6 @@ add_subdirectory(External)
 add_subdirectory(Geometry)
 add_subdirectory(IO)
 add_subdirectory(Mesh)
-add_subdirectory(RenderDelegates)
 add_subdirectory(Rendering)
 add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)

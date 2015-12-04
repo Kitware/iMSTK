@@ -28,7 +28,6 @@
 #include <numeric> // for iota
 
 // SimMedTK includes
-#include "Rendering/OpenGLViewer.h"
 #include "Collision/SurfaceTreeIterator.h"
 #include "Event/KeyboardEvent.h"
 #include "Core/Factory.h"

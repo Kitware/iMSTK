@@ -30,7 +30,6 @@
 #include "Core/Matrix.h"
 
 #include "Core/Factory.h"
-#include "Rendering/OpenGLRenderer.h"
 #include "RenderDelegate.h"
 
 //forward declaration
