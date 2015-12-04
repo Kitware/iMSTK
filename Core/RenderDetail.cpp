@@ -364,18 +364,6 @@ const std::vector< bool >& RenderDetail::getVAOEnable() const
 }
 
 //---------------------------------------------------------------------------
-void RenderDetail::setTextureFilename(const std::string& filename)
-{
-    this->textureFilename = filename;
-}
-
-//---------------------------------------------------------------------------
-const std::string &RenderDetail::getTextureFilename() const
-{
-    return this->textureFilename;
-}
-
-//---------------------------------------------------------------------------
 void RenderDetail::setRenderTexture(bool value)
 {
     if(value)

@@ -97,11 +97,9 @@ int main(int ac, char **av)
     meshRenderDetail->addShaderProgram("wetshader");
 	//meshRenderDetail->addTexture("decal", "textures/metal1.bmp", "textureDecal", "wetshader");
 	//meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
-	//meshRenderDetail->setTextureFilename("textures/cube.jpg");
 	
-	meshRenderDetail->addTexture("decal", "textures/brainx.bmp", "textureDecal", "wetshader");
-	meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
-	meshRenderDetail->setTextureFilename("textures/brainx.bmp");
+  meshRenderDetail->addTexture("decal", "textures/brainx.bmp", "textureDecal", "wetshader");
+  meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
 
 
 	auto planeMeshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);

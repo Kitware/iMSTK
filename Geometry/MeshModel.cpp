@@ -70,25 +70,3 @@ void MeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)
 {
     this->mesh->setRenderDetail(renderDetail);
 }
-void MeshModel::addTexture(const std::string& textureFileName, const std::string& textureName)
-{
-    std::shared_ptr<SurfaceMesh> surfaceMesh = std::dynamic_pointer_cast<SurfaceMesh>(this->mesh);
-    if(!surfaceMesh)
-    {
-        std::cerr << "Cant assign texture to non-surface mesh." << std::endl;
-        return;
-    }
-
-    if(surfaceMesh->getRenderDetail())
-    {
-        surfaceMesh->getRenderDetail()->setTextureFilename(textureFileName);
-    }
-    else
-    {
-        auto renderDetail = std::make_shared<RenderDetail>();
-        renderDetail->setTextureFilename(textureFileName);
-        surfaceMesh->setRenderDetail(renderDetail);
-    }
-
-    surfaceMesh->assignTexture(textureName);
-}

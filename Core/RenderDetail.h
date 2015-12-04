@@ -258,12 +258,6 @@ public:
     const std::vector<bool> &getVAOEnable() const;
 
     ///
-    /// \brief Set/Get the binding texture filename
-    ///
-    void setTextureFilename(const std::string &filename);
-    const std::string &getTextureFilename() const;
-
-    ///
     /// \brief Set/Get the binding texture filename for a shader. shaderBinding is for texture name in the shader name
     ///
     void addTexture(const std::string &textureName, const std::string &filename,

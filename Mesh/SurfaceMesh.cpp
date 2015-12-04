@@ -236,14 +236,6 @@ std::vector< Eigen::Matrix< float, int(2), int(1) >, Eigen::aligned_allocator< E
 {
     return this->textureCoord;
 }
-const std::vector< std::shared_ptr< SurfaceMesh::TextureAttachment > >& SurfaceMesh::getTextures() const
-{
-    return this->textures;
-}
-const int& SurfaceMesh::getTextureId(size_t i) const
-{
-    return this->textures[i]->textureId;
-}
 void SurfaceMesh::addTextureCoordinate(const core::Vec2f& coord)
 {
     this->textureCoord.push_back(coord);
@@ -256,24 +248,6 @@ void SurfaceMesh::addTextureCoordinate(const float& x, const float& y)
 {
     this->textureCoord.emplace_back(x,y);
 }
-void SurfaceMesh::assignTexture(const std::string& referenceName)
-{
-    // TODO: This test has to be done at the rendrer level!
-//     int id;
-//     TextureManager::findTextureId(referenceName,id);
-//
-//     if(id < 0)
-//     {
-//         std::cerr << "The texture " << referenceName
-//             << " cant be attached because it has not been processed by the manager." << std::endl;
-//         return;
-//     }
-//
-    auto attachment = std::make_shared<TextureAttachment>();
-    attachment->textureId = this->textures.size();
-    attachment->textureName = referenceName;
-    this->textures.push_back(attachment);
-}
 bool SurfaceMesh::isMeshTextured() const
 {
     if(!this->renderDetail)
@@ -281,7 +255,7 @@ bool SurfaceMesh::isMeshTextured() const
         return false;
     }
 
-    return !this->renderDetail->getTextureFilename().empty();
+    return this->renderDetail->getNumberOfTextures();
 }
 void SurfaceMesh::setUseOBJTexture(bool use)
 {

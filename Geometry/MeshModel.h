@@ -87,11 +87,6 @@ public:
     ///
     std::shared_ptr<Core::BaseMesh> getMesh() override;
 
-    ///
-    /// \brief Assign texture to the surface mesh
-    ///
-    void addTexture(const std::string& textureFileName, const std::string& textureName);
-
 protected:
     std::shared_ptr<Core::BaseMesh> mesh; // Underlying mesh
 	
