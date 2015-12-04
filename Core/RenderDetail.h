@@ -26,6 +26,7 @@
 #include "Core/Config.h"
 #include "Core/Color.h"
 #include "Core/ConfigRendering.h"
+#include <GL/glew.h>
 
 #include <memory>
 #include <vector>

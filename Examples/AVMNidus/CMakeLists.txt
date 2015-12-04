@@ -5,6 +5,7 @@ include(${VTK_USE_FILE})
 add_executable(${APP} main.cpp)
 target_link_libraries(${APP}
   Core
+  Geometry
   VTKRendering
   Rendering
   RenderDelegates

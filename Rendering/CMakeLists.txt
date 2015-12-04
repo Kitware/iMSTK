@@ -40,7 +40,6 @@ target_link_libraries(Rendering
     sfml::graphics
     sfml::window
     sfml::system
-    vtkglew
 )
 
 
