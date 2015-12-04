@@ -10,21 +10,17 @@ class Shaders;
 
 class CustomGLPolyDataMapper :public vtkOpenGLPolyDataMapper{
 public:
-	static CustomGLPolyDataMapper* New();
-	std::shared_ptr<RenderDetail> renderDetail;
-	vtkOpenGLBufferObject * tangentsBuffer;
-	//vtkOpenGLVertexBufferObject* tangentsBuffer;
-	std::vector<core::Vec3d>tangents;
-	vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
-		virtual void initDraw();
-	virtual void modified() {}
-	virtual void draw() const { }
-	virtual void SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
-	void BuildBufferObjects(vtkRenderer *ren, vtkActor *act);
-
-
-
-
+    static CustomGLPolyDataMapper* New();
+    std::shared_ptr<RenderDetail> renderDetail;
+    vtkOpenGLBufferObject * tangentsBuffer;
+    //vtkOpenGLVertexBufferObject* tangentsBuffer;
+    std::vector<core::Vec3d>tangents;
+    vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
+      virtual void initDraw();
+    virtual void modified() {}
+    virtual void draw() const { }
+    virtual void SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
+    void BuildBufferObjects(vtkRenderer *ren, vtkActor *act);
 };
 
 class VTKRenderDelegate : public RenderDelegate

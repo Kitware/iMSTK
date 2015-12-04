@@ -84,15 +84,16 @@ private:
     vtkSmartPointer<vtkDataSet> dataSet;
 };
  
-class vtkOpenGLTexture_Impl :public vtkOpenGLTexture{
+class vtkOpenGLTexture_Impl :public vtkOpenGLTexture
+{
 public:
-	static vtkOpenGLTexture_Impl* New();
-	void Load(vtkRenderer*p_renderer){
-		vtkOpenGLTexture::Load(p_renderer);
-		this->GetTextureObject()->SetLinearMagnification(true);
-		this->GetTextureObject()->SetMinificationFilter(true);
-	}
-
+    static vtkOpenGLTexture_Impl* New();
+    void Load(vtkRenderer*p_renderer)
+    {
+        vtkOpenGLTexture::Load(p_renderer);
+        this->GetTextureObject()->SetLinearMagnification(true);
+        this->GetTextureObject()->SetMinificationFilter(true);
+    }
 };
 vtkStandardNewMacro(vtkOpenGLTexture_Impl)
 
@@ -139,7 +140,7 @@ void MeshRenderDelegate::initDraw()
     vtkNew<vtkUnstructuredGrid> unstructuredMesh;
     unstructuredMesh->SetPoints(vertices.GetPointer());
     unstructuredMesh->SetCells(VTK_TRIANGLE,triangles.GetPointer());
-	//unstructuredMesh->SetCells(VTK_POLYGON, triangles.GetPointer());
+    //unstructuredMesh->SetCells(VTK_POLYGON, triangles.GetPointer());
 
     auto renderDetail = mesh->getRenderDetail();
     if(renderDetail)
@@ -159,158 +160,129 @@ void MeshRenderDelegate::initDraw()
         actor->GetProperty()->SetOpacity(opacity);
     }
 
+    // Render Wireframe
     if(renderDetail && renderDetail->renderWireframe())
     {
         actor->GetProperty()->SetRepresentationToWireframe();
     }
 
+    // Render Faces
     if (renderDetail && renderDetail->renderFaces())
     {
         actor->GetProperty()->SetRepresentationToSurface();
         actor->GetProperty()->SetInterpolationToPhong();
     }
 
-    //vtkSmartPointer<vtkTexture> texture;
-	vtkOpenGLTexture_Impl* textureImpl;
-	vtkOpenGLTexture *texture;
-	
-	
-	int nbrTextures = renderDetail->getNumberOfTextures();
-	if ((renderDetail && renderDetail->renderTexture()) || nbrTextures>0)
+    // Render Textures
+    int nbrTextures = renderDetail->getNumberOfTextures();
+    if ((renderDetail && renderDetail->renderTexture()) || nbrTextures>0)
     {
-		// Read texture file
-		vtkSmartPointer<vtkImageReader2Factory> readerFactory =
-			vtkSmartPointer<vtkImageReader2Factory>::New();
-		std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
+        vtkOpenGLTexture_Impl* textureImpl;
+        vtkOpenGLTexture *texture;
+        vtkSmartPointer<vtkImageReader2Factory> readerFactory =
+            vtkSmartPointer<vtkImageReader2Factory>::New();
+        std::map<std::string, TextureDetail>& textures = renderDetail->getTextures();
 		
-		for (auto &t : textures){
-			TextureDetail &textureDetail = t.second;
-			//textureDetail.fileName
-
-			if (TextureDetail::textures.find(textureDetail.fileName) != TextureDetail::textures.end()){
-
-				textureDetail.vtexture = TextureDetail::textures[textureDetail.fileName];
-				texture = textureDetail.vtexture;
-				
-				cout << "Image file:" << textureDetail.fileName << " is already loaded" << endl;
-				continue;
-			}
-			vtkSmartPointer<vtkImageReader2> imageReader =
-				readerFactory->CreateImageReader2(textureDetail.fileName.c_str());
-			if (imageReader == NULL)
-			{
-				cout << "Error in opening the file" << endl;
-				continue;
-			}
-			imageReader->SetFileName(textureDetail.fileName.c_str());
-			imageReader->Update();
-			textureImpl = vtkOpenGLTexture_Impl::New();
-			//vtkTextureObject *textureObject = vtkTextureObject::New();
-		
-			//texture->GetTextureObject()->SetGenerateMipmap(true);
-			textureImpl->SetInputConnection(imageReader->GetOutputPort());
-			//texture->GetTextureObject()->SetLinearMagnification(true);
-		
-
-			
-			//texture->SetTextureObject(textureObject);
-			//textureObject->Create2D
-			textureDetail.vtexture = textureImpl;
-			texture = textureImpl;
-			TextureDetail::textures.emplace(textureDetail.fileName, texture);
-			cout << "Image File Loaded"<<textureDetail.fileName.c_str() << endl;
-		}
-		
-		//vtkSmartPointer<vtkImageReader2> imageReader =
-		///	readerFactory->CreateImageReader2(mesh->getRenderDetail()->getTextureFilename().c_str());
-		//cout << mesh->getRenderDetail()->getTextureFilename() << endl;
-		//imageReader->SetFileName(mesh->getRenderDetail()->getTextureFilename().c_str());
-
-        vtkNew<vtkFloatArray> textureCoordinates;
-        textureCoordinates->SetNumberOfComponents(3);
-        textureCoordinates->SetName("TextureCoordinates");
-
-        auto texCoords = mesh->getTextureCoordinates();
-        for(auto &coord : texCoords)
+        // Go through all TextureDetails
+        for (auto &t : textures)
         {
-            float tuple[3] = {coord[0],coord[1],0.0};
-            textureCoordinates->InsertNextTuple(tuple);
-        }
-        unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates.GetPointer());
-    }
-	//vtkNew<vtkDoubleArray> tangentArray;
-	//tangentArray->SetNumberOfComponents(3);
-	//tangentArray->SetName("Tangents");
+            TextureDetail &textureDetail = t.second;
 
-	//vtkNew<vtkPoints> tangents;
-	//tangents->SetNumberOfPoints(mesh->getVertices().size());
-	
-	
+            // Case Texture already loaded
+            if (TextureDetail::textures.find(textureDetail.fileName) != TextureDetail::textures.end())
+            {
+                textureDetail.vtexture = TextureDetail::textures[textureDetail.fileName];
+                texture = textureDetail.vtexture;
+
+                cout << "Image file " << textureDetail.fileName << " is already loaded." << endl;
+                continue;
+            }
+
+            // Read Image
+            vtkSmartPointer<vtkImageReader2> imageReader =
+                readerFactory->CreateImageReader2(textureDetail.fileName.c_str());
+            if (imageReader == NULL)
+            {
+                cout << "Error in opening the file" << endl;
+                continue;
+            }
+            imageReader->SetFileName(textureDetail.fileName.c_str());
+            imageReader->Update();
+
+            // Create Texture
+            textureImpl = vtkOpenGLTexture_Impl::New();
+            textureImpl->SetInputConnection(imageReader->GetOutputPort());
+
+            // Update TextureDetail
+            textureDetail.vtexture = textureImpl;
+            texture = textureImpl;
+            TextureDetail::textures.emplace(textureDetail.fileName, texture);
+
+            cout << "Image file "<<textureDetail.fileName << " loaded." << endl;
+        }
+
+        if(texture)
+        {
+            // With VTK, required to assign one of the textures
+            // to the actor in order to display all the textures
+            actor->SetTexture(texture);
+
+            // Set VTK Texture coordinates
+            vtkNew<vtkFloatArray> textureCoordinates;
+            textureCoordinates->SetNumberOfComponents(3);
+            textureCoordinates->SetName("TextureCoordinates");
+
+            auto texCoords = mesh->getTextureCoordinates();
+            for(auto &coord : texCoords)
+            {
+                float tuple[3] = {coord[0],coord[1],0.0};
+                textureCoordinates->InsertNextTuple(tuple);
+            }
+            unstructuredMesh->GetPointData()->SetTCoords(textureCoordinates.GetPointer());
+        }
+    }
+
+    // Render Normals
     dataSet = unstructuredMesh.GetPointer();
     if (renderDetail && renderDetail->renderNormals())
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
-		
         geometry->SetInputData(unstructuredMesh.GetPointer());
 		
-
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
-		normals->SetSplitting(false);
+        normals->SetSplitting(false);
         normals->SetInputConnection(geometry->GetOutputPort());
         normals->AutoOrientNormalsOn();
 
-		mapper = CustomGLPolyDataMapper::New();
+        mapper = CustomGLPolyDataMapper::New();
 
-
-		///The tangent computation needs to go out of the this block..tansel
+        /// TODO : The tangent computation needs to go out of the this block..tansel
         mapper->SetInputConnection(normals->GetOutputPort());
-		auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
-		mapperCustom->renderDetail = renderDetail;
-		mesh->computeVertexNeighbors();
-		if (mesh->getMeshType() == (int)IOMesh::MeshFileType::OBJ)
-			mesh->setUseOBJTexture(true);
-		else 
-			mesh->setUseThreDSTexture(true);
-		mesh->computeTriangleTangents();
-		
-		mapperCustom->tangents = mesh->getVertexTangents();
+        auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
+        mapperCustom->renderDetail = renderDetail;
+        mesh->computeVertexNeighbors();
+        if (mesh->getMeshType() == (int)IOMesh::MeshFileType::OBJ)
+        {
+            mesh->setUseOBJTexture(true);
+        }
+        else
+        {
+            mesh->setUseThreDSTexture(true);
+        }
+        mesh->computeTriangleTangents();
+        mapperCustom->tangents = mesh->getVertexTangents();
 		
         if(renderDetail->hasShaders())
         {
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);
-			//auto shadersPrograms = renderDetail->getShaderPrograms();
-			std::string shaderProgramName =renderDetail->getShaderProgram();
-			
-			this->setShadersProgram(glMapper, shaderProgramName);
-			/*for (auto&shaderProgramName : shadersPrograms){
-				if (shaderProgramName.second){
-					this->setShadersProgram(glMapper, shaderProgramName.first);
-					auto shadersProgramReplacements = renderDetail->getShaderProgramReplacements();
-					this->setShadersProgramReplacements(glMapper,shadersProgramReplacements);
-				}
-
-			}*/
-		
-		
-            
-		
-
-          
-			
-			
-			
+            std::string shaderProgramName =renderDetail->getShaderProgram();
+            this->setShadersProgram(glMapper, shaderProgramName);
         }
     }
     else
     {
         mapper = vtkDataSetMapper::New();
         mapper->SetInputDataObject(unstructuredMesh.GetPointer());
-    }
-	///al least one texture is needed to 
-	if (nbrTextures)
-    {
-		
-		actor->SetTexture(texture);
     }
     actor->SetMapper(mapper.GetPointer());
 }
@@ -332,120 +304,79 @@ vtkActor *MeshRenderDelegate::getActor()
 void MeshRenderDelegate::modified()
 {
     if (this->dataSet)
+    {
         dataSet->Modified();
+    }
 }
 
-void CustomGLPolyDataMapper::initDraw(){
-
-
-	cout << "init" << endl;
-
+void CustomGLPolyDataMapper::initDraw()
+{
+    cout << "init" << endl;
 }
-void CustomGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act){
-	
-	tangentsBuffer = vtkOpenGLBufferObject::New();
-	//tangentsBuffer=vtkOpenGLVertexBufferObject::New();
-	
-	tangentsBuffer->Bind();
-	if (tangentsBuffer->Upload(this->tangents, vtkOpenGLBufferObject::ArrayBuffer)){
-	//if (tangentsBuffer->Upload(this->tangents, vtkOpenGLVertexBufferObject::ArrayBuffer)){
-		cout << "Completed Tangents Binding"<<endl;
-	
-	
-	}
-	tangentsBuffer->Release();
-	vtkOpenGLPolyDataMapper::BuildBufferObjects(ren,act);
 
+void CustomGLPolyDataMapper::BuildBufferObjects(vtkRenderer *ren, vtkActor *act)
+{
+    tangentsBuffer = vtkOpenGLBufferObject::New();
+    tangentsBuffer->Bind();
+    if (tangentsBuffer->Upload(this->tangents, vtkOpenGLBufferObject::ArrayBuffer))
+    {
+        cout << "Completed Tangents Binding"<<endl;
+    }
+    tangentsBuffer->Release();
+    vtkOpenGLPolyDataMapper::BuildBufferObjects(ren,act);
 }
 
 void CustomGLPolyDataMapper::SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act)
 {
-	float lightPower = 5.0;
-	float roughness = 160.0;
-	static double testColor3 = 0.01;
-	vtkShaderProgram *program = cellBO.Program;
+    float lightPower = 5.0;
+    float roughness = 160.0;
+    static double testColor3 = 0.01;
+    vtkShaderProgram *program = cellBO.Program;
 
-	testColor3 += 0.01;
-	program->SetUniformf("lightPower", lightPower);
-	program->SetUniformf("roughness", roughness);
-	//program->SetUniformf("TestColor3", testColor3);
-	
-	std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
-	
-	
-	for (auto &t : textures){
-		TextureDetail &textureDetail = t.second;
-		textureDetail.vtexture->GetTextureObject();
-		long a = textureDetail.vtexture->GetIndex();
-		textureDetail.vtexture->Load(ren);
-	
-		
-		program->SetUniformi(textureDetail.shaderBinding.c_str(), textureDetail.vtexture->GetTextureUnit());
+    testColor3 += 0.01;
+    program->SetUniformf("lightPower", lightPower);
+    program->SetUniformf("roughness", roughness);
 
-	}
-	cellBO.VAO->Bind();
-	
-	if (!cellBO.VAO->AddAttributeArray(cellBO.Program, this->tangentsBuffer,
-		"vertTangents", 0,
-		0, VTK_DOUBLE, 3, false))
-	{
-		vtkErrorMacro(<< "Error setting 'vertTangents' in shader VAO.");
-	}
-	vtkOpenGLPolyDataMapper::SetMapperShaderParameters(cellBO, ren, act);
-		
+    std::map<std::string, TextureDetail>&  textures = renderDetail->getTextures();
+
+    for (auto &t : textures)
+    {
+        TextureDetail &textureDetail = t.second;
+        textureDetail.vtexture->GetTextureObject();
+        textureDetail.vtexture->Load(ren);
+
+        program->SetUniformi(textureDetail.shaderBinding.c_str(), textureDetail.vtexture->GetTextureUnit());
+    }
+    cellBO.VAO->Bind();
+
+    if (!cellBO.VAO->AddAttributeArray(cellBO.Program, this->tangentsBuffer,
+      "vertTangents", 0,
+      0, VTK_DOUBLE, 3, false))
+    {
+        vtkErrorMacro(<< "Error setting 'vertTangents' in shader VAO.");
+    }
+    vtkOpenGLPolyDataMapper::SetMapperShaderParameters(cellBO, ren, act);
 }
 
 void VTKRenderDelegate::setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
 	const std::string &shaderPrograms)
 {
-   
-	std::map<std::string, ShaderDetail>    &shaders = Shaders::getShaderPrograms();
-	
-	if (shaders.find(shaderPrograms) == shaders.end()){
+    std::map<std::string, ShaderDetail>& shaders = Shaders::getShaderPrograms();
+    if (shaders.find(shaderPrograms) == shaders.end())
+    {
+        return;
+    }
 
-		return;
-	}
-	ShaderDetail &shaderDetail=shaders[shaderPrograms];
+    ShaderDetail &shaderDetail = shaders[shaderPrograms];
+    if (shaderDetail.initialized)
+    {
+        return;
+    }
 
-	if (shaderDetail.initialized)
-		return;
-
-
-	mapper->SetFragmentShaderCode(shaderDetail.fragmentShaderSource.c_str());
-	mapper->SetVertexShaderCode(shaderDetail.vertexShaderSource.c_str());
-	if (shaderDetail.geometryShaderExists)
-	mapper->SetGeometryShaderCode(shaderDetail.geometryShaderSource.c_str());
-	
-	//This attachment can be further improved
-	//for(const auto &program : shaderPrograms)
-	//{
-
-
-	//if (program.second[]
-	/* switch(static_cast<vtkShader::Type>(program.first))
-	{
-	case vtkShader::Fragment:
-	{
-	mapper->SetFragmentShaderCode(program.second.c_str());
-
-	break;
-	}
-	case vtkShader::Vertex:
-	{
-	mapper->SetVertexShaderCode(program.second.c_str());
-	break;
-	}
-	case vtkShader::Geometry:
-	{
-	mapper->SetGeometryShaderCode(program.second.c_str());
-	break;
-	}
-	default:
-	{
-	std::cerr << "Unknown shader program." << std::endl;
-	}
-	}*/
-	// }
+    mapper->SetFragmentShaderCode(shaderDetail.fragmentShaderSource.c_str());
+    mapper->SetVertexShaderCode(shaderDetail.vertexShaderSource.c_str());
+    if (shaderDetail.geometryShaderExists)
+    mapper->SetGeometryShaderCode(shaderDetail.geometryShaderSource.c_str());
 }
 
 RegisterFactoryClass(RenderDelegate,

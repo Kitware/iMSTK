@@ -118,130 +118,88 @@ void SurfaceMesh::computeTriangleTangents()
         std::cerr << "Can't compute tangents without texture coordinates." << std::endl;
         return;
     }
-	if (this->useThreeDSTexureCoordinates){
-		this->triangleTangents.resize(this->triangleArray.size());
 
-		// First, calculate the triangle tangents
-		for (size_t t = 0, end = this->triangleArray.size(); t < end; ++t)
-		{
-			const auto &triangle = this->triangleArray[t];
-
-			// Get triangle vertices
-			const auto &v0 = this->vertices[triangle[0]];
-			const auto &v1 = this->vertices[triangle[1]];
-			const auto &v2 = this->vertices[triangle[2]];
-
-			// Get texture coordinates for triangle
-			const auto &t0 = this->textureCoord[triangle[0]];
-			const auto &t1 = this->textureCoord[triangle[1]];
-			const auto &t2 = this->textureCoord[triangle[2]];
-
-			// COMMENT: I am not sure why two different types of tangent calculations are used here.
-			//this->triangleTangents[t] = ((t1[1] - t0[1])*(v1 - v0) - (t2[1] - t0[1])*(v2 - v0));
-
-			double tt1 = t1[0] - t0[0];
-			double tt2 = t2[0] - t0[0];
-
-
-			double bb1 = t1[1] - t0[1];
-			double bb2 = t2[1] - t0[1];
-			auto V1 = v1 - v0;
-			auto V2 = v2 - v0;
-			double r = 1.0F / (tt1 * bb2 - tt2 * bb1);
-			this->triangleTangents[t][0] = (bb2*V1[0] - bb1*V2[0])*r;
-			this->triangleTangents[t][1] = (bb2*V1[1] - bb1*V2[1])*r;
-			this->triangleTangents[t][2] = (bb2*V1[2] - bb1*V2[2])*r;
-
-
-			/*if (this->useThreeDSTexureCoordinates)
-			{
-				float r = 1.0 / ((t1[0] - t0[0])*(t2[1] - t0[1]) - (t1[1] - t0[1])*(t2[0] - t0[0]));
-				this->triangleTangents[t] *= r;
-			}*/
-
-			this->triangleTangents[t].normalize();
-		}
-	}
-	else if (this->useOBJDSTexureCoordinates){
-		
-		this->triangleTangents.resize(this->triangleArray.size());
-		// First, calculate the triangle tangents
-		for (size_t t = 0, end = this->vertices.size()/3; t < end; ++t)
-		{
-		
-
-			// Get triangle vertices
-			const auto &v0 = this->vertices[t*3];
-			const auto &v1 = this->vertices[t*3+1];
-			const auto &v2 = this->vertices[t*3+2];
-
-			// Get texture coordinates for triangle
-			const auto &t0 = this->textureCoord[t * 3];
-			const auto &t1 = this->textureCoord[t * 3 + 1];
-			const auto &t2 = this->textureCoord[t * 3 + 2];
-
-			// COMMENT: I am not sure why two different types of tangent calculations are used here.
-			//this->triangleTangents[t] = ((t1[1] - t0[1])*(v1 - v0) - (t2[1] - t0[1])*(v2 - v0));
-
-			double tt1 = t1[0] - t0[0];
-			double tt2 = t2[0] - t0[0];
-
-
-			double bb1 = t1[1] - t0[1];
-			double bb2 = t2[1] - t0[1];
-			auto V1 = v1 - v0;
-			auto V2 = v2 - v0;
-			double r = 1.0F / (tt1 * bb2 - tt2 * bb1);
-			this->triangleTangents[t][0] = (bb2*V1[0] - bb1*V2[0])*r;
-			this->triangleTangents[t][1] = (bb2*V1[1] - bb1*V2[1])*r;
-			this->triangleTangents[t][2] = (bb2*V1[2] - bb1*V2[2])*r;
-
-
-			
-
-			this->triangleTangents[t].normalize();
-		}
-	
-	
-	}
-
-    // Calculate the vertex tangents
-    /*if(this->useThreeDSTexureCoordinates || this->useOBJDSTexureCoordinates)
+    if (this->useThreeDSTexureCoordinates)
     {
-		this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
-        for(size_t v = 0, end = this->vertices.size(); v < end; ++v)
+        this->triangleTangents.resize(this->triangleArray.size());
+
+        // First, calculate the triangle tangents
+        for (size_t t = 0, end = this->triangleArray.size(); t < end; ++t)
         {
-            this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
+            const auto &triangle = this->triangleArray[t];
 
-            for(size_t i = 0; i < this->vertexTriangleNeighbors[v].size(); i++)
-            {
-                this->vertexTangents[v] += this->triangleTangents[this->vertexTriangleNeighbors[v][i]];
-            }
+            // Get triangle vertices
+            const auto &v0 = this->vertices[triangle[0]];
+            const auto &v1 = this->vertices[triangle[1]];
+            const auto &v2 = this->vertices[triangle[2]];
 
-            this->vertexTangents[v].normalize();
-            this->vertexTangents[v] -= this->vertexNormals[v]*this->vertexNormals[v].dot(this->vertexTangents[v]);
-            this->vertexTangents[v].normalize();
+            // Get texture coordinates for triangle
+            const auto &t0 = this->textureCoord[triangle[0]];
+            const auto &t1 = this->textureCoord[triangle[1]];
+            const auto &t2 = this->textureCoord[triangle[2]];
+
+            double tt1 = t1[0] - t0[0];
+            double tt2 = t2[0] - t0[0];
+
+            double bb1 = t1[1] - t0[1];
+            double bb2 = t2[1] - t0[1];
+            auto V1 = v1 - v0;
+            auto V2 = v2 - v0;
+            double r = 1.0F / (tt1 * bb2 - tt2 * bb1);
+            this->triangleTangents[t][0] = (bb2*V1[0] - bb1*V2[0])*r;
+            this->triangleTangents[t][1] = (bb2*V1[1] - bb1*V2[1])*r;
+            this->triangleTangents[t][2] = (bb2*V1[2] - bb1*V2[2])*r;
+
+            this->triangleTangents[t].normalize();
         }
-    }*/
+    }
+    else if (this->useOBJDSTexureCoordinates)
+    {
+        this->triangleTangents.resize(this->triangleArray.size());
+        // First, calculate the triangle tangents
+        for (size_t t = 0, end = this->vertices.size()/3; t < end; ++t)
+        {
+            // Get triangle vertices
+            const auto &v0 = this->vertices[t*3];
+            const auto &v1 = this->vertices[t*3+1];
+            const auto &v2 = this->vertices[t*3+2];
+
+            // Get texture coordinates for triangle
+            const auto &t0 = this->textureCoord[t * 3];
+            const auto &t1 = this->textureCoord[t * 3 + 1];
+            const auto &t2 = this->textureCoord[t * 3 + 2];
+
+            double tt1 = t1[0] - t0[0];
+            double tt2 = t2[0] - t0[0];
 
 
-	this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
-	for (size_t v = 0, end = this->vertices.size(); v < end; ++v)
-	{
-			this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
+            double bb1 = t1[1] - t0[1];
+            double bb2 = t2[1] - t0[1];
+            auto V1 = v1 - v0;
+            auto V2 = v2 - v0;
+            double r = 1.0F / (tt1 * bb2 - tt2 * bb1);
+            this->triangleTangents[t][0] = (bb2*V1[0] - bb1*V2[0])*r;
+            this->triangleTangents[t][1] = (bb2*V1[1] - bb1*V2[1])*r;
+            this->triangleTangents[t][2] = (bb2*V1[2] - bb1*V2[2])*r;
 
-			for (size_t i = 0; i < this->vertexTriangleNeighbors[v].size(); i++)
-			{
-				this->vertexTangents[v] += this->triangleTangents[this->vertexTriangleNeighbors[v][i]];
-			}
+            this->triangleTangents[t].normalize();
+        }
+    }
 
-			this->vertexTangents[v].normalize();
-			this->vertexTangents[v] -= this->vertexNormals[v] * this->vertexNormals[v].dot(this->vertexTangents[v]);
-			this->vertexTangents[v].normalize();
-	}
+    this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
+    for (size_t v = 0, end = this->vertices.size(); v < end; ++v)
+    {
+        this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
 
+        for (size_t i = 0; i < this->vertexTriangleNeighbors[v].size(); i++)
+        {
+            this->vertexTangents[v] += this->triangleTangents[this->vertexTriangleNeighbors[v][i]];
+        }
 
-	
+        this->vertexTangents[v].normalize();
+        this->vertexTangents[v] -= this->vertexNormals[v] * this->vertexNormals[v].dot(this->vertexTangents[v]);
+        this->vertexTangents[v].normalize();
+    }
 }
 void SurfaceMesh::checkTriangleOrientation()
 {
@@ -328,12 +286,12 @@ bool SurfaceMesh::isMeshTextured() const
 void SurfaceMesh::setUseOBJTexture(bool use)
 {
     this->useOBJDSTexureCoordinates = use;
-	this->useThreeDSTexureCoordinates = !use;
+    this->useThreeDSTexureCoordinates = !use;
 }
 void SurfaceMesh::setUseThreDSTexture(bool use)
 {
     this->useThreeDSTexureCoordinates = use;
-	this->useOBJDSTexureCoordinates = !use;
+    this->useOBJDSTexureCoordinates = !use;
 }
 void SurfaceMesh::print() const
 {
