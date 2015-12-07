@@ -46,8 +46,6 @@
 #include "VTKRendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
-#include <vtkShader.h>
-
 int main(int ac, char **av)
 {
     std::string configFile = "./nidus.config";
@@ -59,140 +57,64 @@ int main(int ac, char **av)
     InitVTKRendering();
     InitIODelegates();
 
-    Matrix33d mat;
-
     //-------------------------------------------------------
     // 1. Create an instance of the SimMedTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
+    auto sdkSimulator = sdk->getSimulator();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
-
     // create a FEM simulator
-   // auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
-    //auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
+    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(//SIMMEDTK_RENDER_WIREFRAME |
-                                                             //| SIMMEDTK_RENDER_VERTICES
-                                                             SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
-                                                              );
-    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
-    meshRenderDetail->setDiffuseColor(Color::colorGray);
-    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
-    meshRenderDetail->setShininess(20.0);
-
-    // Set shader porograms
-
-	//meshRenderDetail->addShaderProgram(vtkShader::Vertex,"shaders/wet_vert.glsl","wetshader");
-	//meshRenderDetail->addShaderProgram(vtkShader::Fragment,"shaders/wet_frag.glsl","wetshader");
-	Shaders::createShader("wetshader", "shaders/wet_vert.glsl", "shaders/wet_frag.glsl", "");
-    meshRenderDetail->addShaderProgram("wetshader");
-	//meshRenderDetail->addTexture("decal", "textures/metal1.bmp", "textureDecal", "wetshader");
-	//meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
+    sdk->addSceneActor(femObject, femSimulator);
+    sdkSimulator->registerObjectSimulator(femSimulator);
 	
-  meshRenderDetail->addTexture("decal", "textures/brainx.bmp", "textureDecal", "wetshader");
-  meshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
-
-
-	auto planeMeshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);
-	planeMeshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-	planeMeshRenderDetail->setDiffuseColor(Color::colorGray);
-	planeMeshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
-	planeMeshRenderDetail->setShininess(20.0);
-
-	// Set shader porograms
-	planeMeshRenderDetail->addShaderProgram("wetshader");
-	planeMeshRenderDetail->addTexture("decal", "textures/brain_outside.jpg", "textureDecal", "wetshader");
-	planeMeshRenderDetail->addTexture("bump", "textures/metalbump.jpg", "textureBump", "wetshader");
-	
-
-   // auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
-   /* if(renderingMesh)
-    {
-        renderingMesh->setRenderDetail(meshRenderDetail);
-    }
-
-    sdk->addSceneActor(femObject, femSimulator);*/
-
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
-    // create a static plane scene object of given normal and position
-    //auto staticObject = std::make_shared<StaticSceneObject>();
+    // Create a static plane scene object of given normal and position
+    auto staticObject = std::make_shared<StaticSceneObject>();
 
-    //auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
-      //                                            core::Vec3d(0.0, 0.0, 1.0));
+    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
+                                                  core::Vec3d(0.0, 0.0, 1.0));
 
-    //staticObject->setModel(plane);
-    //sdk->addSceneActor(staticObject, staticSimulator);
-
-    //-------------------------------------------------------
-    // Register both object simulators
-    //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
-    //sdkSimulator->registerObjectSimulator(femSimulator);
+    staticObject->setModel(plane);
+    sdk->addSceneActor(staticObject, staticSimulator);
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    //auto meshModel = std::make_shared<MeshCollisionModel>();
+    auto meshModel = std::make_shared<MeshCollisionModel>();
+    meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
 
-    //meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
+    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+    planeMeshCollisionPairs->setModels(meshModel, plane);
 
-    //auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    //planeMeshCollisionPairs->setModels(meshModel, plane);
+    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
-    //sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
-
-    //auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
-
-    //sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
-    //auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+    planeToMeshContact->setSceneObjects(staticObject, femObject);
 
-    //planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
-
-    //planeToMeshContact->setSceneObjects(staticObject, femObject);
-
-    //sdkSimulator->registerContactHandling(planeToMeshContact);
-
-
-
-	auto cubeModel = std::make_shared<MeshModel>();
-	//cubeModel->load("models/blade2.obj");
-	//cubeModel->load("models/brain.obj");
-	cubeModel->load("models/brain.3ds");
-
-	//cubeModel->load("models/blade.3ds");
-	
-	//cubeModel->getMesh()->scale(Eigen::UniformScaling<double>(10.0));
-	cubeModel->setRenderDetail(meshRenderDetail);
-
-	auto cube = std::make_shared<StaticSceneObject>();
-	cube->setModel(cubeModel);
-
-
-
-	auto planeModel = std::make_shared<MeshModel>();
-	//cubeModel->load("models/blade2.obj");
-	planeModel->load("models/plane.obj");
-	planeModel->setRenderDetail(planeMeshRenderDetail);
-
-	auto plane = std::make_shared<StaticSceneObject>();
-	plane->setModel(planeModel);
+    sdkSimulator->registerContactHandling(planeToMeshContact);
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -205,13 +127,12 @@ int main(int ac, char **av)
 
     viewer->setGlobalAxisLength(0.8);
 
+    //-------------------------------------------------------
+    // Customize the scene
+    //-------------------------------------------------------
     // Get Scene
     auto scene = sdk->getScene(0);
     viewer->registerScene(scene);
-	
-	scene->addSceneObject(cube);
-	scene->addSceneObject(plane);
-
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();
