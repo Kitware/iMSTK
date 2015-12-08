@@ -77,9 +77,6 @@ public:
     ///
     void checkTriangleOrientation();
 
-    /// Texture handling
-
-    struct TextureAttachment;
     ///
     /// \brief Returns the texture coordinates array.
     ///
@@ -87,16 +84,6 @@ public:
     Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates() const;
     std::vector<core::Vec2f,
     Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates();
-
-    ///
-    /// \brief Returns the bounding box for this mesh.
-    ///
-    const std::vector<std::shared_ptr<TextureAttachment>> &getTextures() const;
-
-    ///
-    /// \brief Returns the bounding box for this mesh.
-    ///
-    const int &getTextureId(size_t i) const;
 
     ///
     /// \brief Return true if it contains texture coordinates
@@ -108,11 +95,6 @@ public:
     ///
     void addTextureCoordinate(const core::Vec2f &coord);
     void addTextureCoordinate(const float &x, const float &y);
-
-    ///
-    /// \brief Assign the texture
-    ///
-    void assignTexture(const std::string& referenceName);
 
     ///
     /// \brief Query if the mesh has textures available for rendering
@@ -183,14 +165,14 @@ private:
     // List of vertex tangents
     std::vector<core::Vec3d> vertexTangents;
 
+    // List of vertex tangents
+    std::vector<core::Vec3d> vertexTangentsDelete;
+
     // List of vertex neighbors
     std::vector<std::vector<size_t>> vertexNeighbors;
 
     // List of vertex neighbors
     std::vector<std::vector<size_t>> vertexTriangleNeighbors;
-
-    // Textures attached to this mesh.
-    std::vector<std::shared_ptr<TextureAttachment>> textures;
 
     // Texture coordinates
     std::vector<core::Vec2f,
@@ -198,24 +180,6 @@ private:
 
     bool useThreeDSTexureCoordinates;
     bool useOBJDSTexureCoordinates;
-};
-
-///
-/// \brief Texture management structure
-///
-struct SurfaceMesh::TextureAttachment
-{
-    TextureAttachment() :
-    textureId(-1),
-    textureName("")
-    {
-    }
-
-    // Texture id
-    int textureId;
-
-    // Texture internal name
-    std::string textureName;
 };
 
 #endif

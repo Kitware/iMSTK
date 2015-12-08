@@ -23,6 +23,7 @@ function(MIDAS_DOWNLOAD MIDAS_URL FILE_SHA1 LOCAL_FILE)
     endif()
 endfunction()
 
-add_subdirectory(vegaFem)
+add_subdirectory(FEMSimulator)
 add_subdirectory(LaparoscopicCamera)
 add_subdirectory(AVMNidus)
+add_subdirectory(Shaders)

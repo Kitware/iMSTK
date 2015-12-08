@@ -26,7 +26,6 @@
 #include <string.h>
 #include "Core/Config.h"
 #include "Rendering/TextureManager.h"
-#include "Rendering/OpenGLRenderer.h"
 
 bool FrameBuffer::checkStatus()
 {

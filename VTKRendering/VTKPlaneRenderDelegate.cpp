@@ -58,9 +58,9 @@ void PlaneRenderDelegate::initDraw()
     auto renderDetail = plane->getRenderDetail();
     if(renderDetail)
     {
-        auto ambientColor = renderDetail->getColorAmbient().getValue();
-        auto diffuseColor = renderDetail->getColorDiffuse().getValue();
-        auto specularColor = renderDetail->getColorSpecular().getValue();
+        auto ambientColor = renderDetail->getAmbientColor().getValue();
+        auto diffuseColor = renderDetail->getDiffuseColor().getValue();
+        auto specularColor = renderDetail->getSpecularColor().getValue();
         auto specularPower = renderDetail->getShininess();
         auto opacity = renderDetail->getOpacity();
         actor->GetProperty()->SetAmbient(ambientColor[3]);
@@ -82,9 +82,9 @@ void PlaneRenderDelegate::initDraw()
     auto normal = plane->getUnitNormal();
     core::Vec3d xp = normal.cross(core::Vec3d(0., 1., 0.));
     if (xp.squaredNorm() < 1e-8)
-      xp = normal.cross(core::Vec3d(0., 0., 1.)).normalized();
+        xp = normal.cross(core::Vec3d(0., 0., 1.)).normalized();
     else
-      xp = xp.normalized();
+        xp = xp.normalized();
     core::Vec3d yp = normal.cross(xp).normalized();
 
     double planeSize = plane->getWidth();

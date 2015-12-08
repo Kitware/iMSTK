@@ -32,6 +32,7 @@
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
+
 ///
 /// @brief Mesh representation of a model.
 /// Base class used by all models that can be represented by a mesh
@@ -86,13 +87,9 @@ public:
     ///
     std::shared_ptr<Core::BaseMesh> getMesh() override;
 
-    ///
-    /// \brief Assign texture to the surface mesh
-    ///
-    void addTexture(const std::string& textureFileName, const std::string& textureName);
-
 protected:
     std::shared_ptr<Core::BaseMesh> mesh; // Underlying mesh
+	
 };
 
 #endif // SMMESHMODEL_H

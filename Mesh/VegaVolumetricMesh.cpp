@@ -115,7 +115,7 @@ void VegaVolumetricMesh::updateAttachedMeshes(double *q)
         {
             vertices[i] = restPositions[i] + displacements[i];
         }
-//         renderingMesh->computeTriangleNormals();
+        renderingMesh->computeTriangleNormals();
         renderingMesh->getRenderDelegate()->modified();
 
     }

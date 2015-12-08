@@ -162,6 +162,9 @@ public:
     ///
     std::array<core::Vec3d,3> getTriangleVertices(size_t i) const;
 
+	int getMeshType();
+	void setMeshType(int);
+
 protected:
     // Data arrays - Vertices only
     // vertices co-ordinate data at time t
@@ -181,6 +184,9 @@ protected:
     // Render identification, only used in \StylusRenderDelegate.
     // TODO: Remove this
     size_t renderingID;
+
+	///mesh type set by the loader
+	int  meshType;
 };
 
 }// namespace Core

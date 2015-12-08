@@ -7,8 +7,6 @@ simmedtk_add_library(Rendering
     FrameBuffer.cpp
     GLUtils.cpp
     MetalShader.cpp
-    OpenGLRenderer.cpp
-    OpenGLViewer.cpp
     SceneTextureShader.cpp
     Shader.cpp
     TextureManager.cpp
@@ -19,8 +17,6 @@ simmedtk_add_library(Rendering
     FrameBuffer.h
     GLUtils.h
     MetalShader.h
-    OpenGLRenderer.h
-    OpenGLViewer.h
     SceneTextureShader.h
     Shader.h
     TextureManager.h
@@ -40,7 +36,6 @@ target_link_libraries(Rendering
     sfml::graphics
     sfml::window
     sfml::system
-    vtkglew
 )
 
 

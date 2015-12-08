@@ -38,6 +38,7 @@
 #include "Rendering/GLUtils.h"
 #include "Core/Timer.h"
 #include "Core/BaseMesh.h"
+#include "Mesh/SurfaceMesh.h"
 
 namespace Core {
 class BaseMesh;

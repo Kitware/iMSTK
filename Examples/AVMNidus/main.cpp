@@ -43,7 +43,6 @@
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
 #include "IO/InitIO.h"
-#include "RenderDelegates/InitRenderDelegates.h"
 #include "VTKRendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
@@ -55,11 +54,8 @@ int main(int ac, char **av)
         configFile = av[1];
     }
 
-    InitRenderDelegates();
     InitVTKRendering();
     InitIODelegates();
-
-    Matrix33d mat;
 
     //-------------------------------------------------------
     // 1. Create an instance of the SimMedTK framework/SDK
@@ -67,34 +63,19 @@ int main(int ac, char **av)
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
+    auto sdkSimulator = sdk->getSimulator();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
-
     // create a FEM simulator
     auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME |
-                                                             //| SIMMEDTK_RENDER_VERTICES
-                                                             SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
-                                                              );
-    meshRenderDetail->setNormalLength(0.02);
-    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
-    meshRenderDetail->setDiffuseColor(Color::colorGray);
-    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
-    meshRenderDetail->setShininess(20.0);
-
-    auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
-    if(renderingMesh)
-    {
-        renderingMesh->setRenderDetail(meshRenderDetail);
-    }
-
     sdk->addSceneActor(femObject, femSimulator);
+    sdkSimulator->registerObjectSimulator(femSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
@@ -102,7 +83,7 @@ int main(int ac, char **av)
     // Create dummy simulator
     auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
 
-    // create a static plane scene object of given normal and position
+    // Create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();
 
     auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
@@ -112,20 +93,12 @@ int main(int ac, char **av)
     sdk->addSceneActor(staticObject, staticSimulator);
 
     //-------------------------------------------------------
-    // Register both object simulators
-    //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
-    sdkSimulator->registerObjectSimulator(femSimulator);
-
-    //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
     auto meshModel = std::make_shared<MeshCollisionModel>();
-
     meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
 
     auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
-
     planeMeshCollisionPairs->setModels(meshModel, plane);
 
     sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
@@ -138,9 +111,7 @@ int main(int ac, char **av)
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
     auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
-
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
-
     planeToMeshContact->setSceneObjects(staticObject, femObject);
 
     sdkSimulator->registerContactHandling(planeToMeshContact);
@@ -156,6 +127,9 @@ int main(int ac, char **av)
 
     viewer->setGlobalAxisLength(0.8);
 
+    //-------------------------------------------------------
+    // Customize the scene
+    //-------------------------------------------------------
     // Get Scene
     auto scene = sdk->getScene(0);
     viewer->registerScene(scene);

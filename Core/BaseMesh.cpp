@@ -157,6 +157,13 @@ std::array<core::Vec3d,3> BaseMesh::getTriangleVertices(size_t i) const
     };
     return std::move(triangleVertices);
 }
-
+int BaseMesh::getMeshType()
+{
+  return this->meshType;
+}
+void BaseMesh::setMeshType(int meshType)
+{
+  this->meshType = meshType;
+}
 
 }

@@ -103,6 +103,7 @@ public:
     void SetValue(vtkIdType idx, Scalar value);
     vtkIdType InsertNextValue(Scalar v);
     void InsertValue(vtkIdType idx, Scalar v);
+    void InsertVariantValue(vtkIdType idx, vtkVariant value);
 
 protected:
     MeshNodalCoordinates();

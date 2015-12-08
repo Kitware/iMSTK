@@ -187,6 +187,8 @@ bool createCameraNavigationScene(
     Color meshColor(0.32, 0.32, 0.32, 1.0);
 
     std::shared_ptr<RenderDetail> targetRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_TEXTURE);
+    targetRenderDetail->addTexture("target", targetFileName, "", "");
+
     std::shared_ptr<RenderDetail> blockRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
     blockRenderDetail->setAmbientColor(meshColor);
     blockRenderDetail->setDiffuseColor(meshColor);
@@ -248,15 +250,6 @@ bool createCameraNavigationScene(
         surfaceMesh->setVertices(points);
         surfaceMesh->setTriangles(triArray);
 
-        // model
-        std::shared_ptr<MeshCollisionModel> targetModel = std::make_shared<MeshCollisionModel>();
-        targetModel->setMesh(surfaceMesh);
-        targetModel->setRenderDetail(targetRenderDetail);
-        targetModel->getMesh()->scale(s);
-        targetModel->getMesh()->translate(t2);
-        targetModel->getMesh()->rotate(q);
-        targetModel->addTexture(targetFileName, "target");
-
         // Texture Coordinates
         double height = (bottomLeftEdge - topLeftEdge).norm();
         double width = (bottomLeftEdge - bottomRightEdge).norm();
@@ -278,6 +271,14 @@ bool createCameraNavigationScene(
         surfaceMesh->addTextureCoordinate(-dx,-dy);
         surfaceMesh->addTextureCoordinate(1.0+dx,1.0+dy);
         surfaceMesh->addTextureCoordinate(-dx,1.0+dy);
+
+        // model
+        std::shared_ptr<MeshCollisionModel> targetModel = std::make_shared<MeshCollisionModel>();
+        targetModel->setMesh(surfaceMesh);
+        targetModel->setRenderDetail(targetRenderDetail);
+        targetModel->getMesh()->scale(s);
+        targetModel->getMesh()->translate(t2);
+        targetModel->getMesh()->rotate(q);
 
         // object
         std::shared_ptr<StaticSceneObject> targetObject = std::make_shared<StaticSceneObject>();
