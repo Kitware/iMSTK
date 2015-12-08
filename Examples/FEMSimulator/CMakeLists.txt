@@ -1,4 +1,4 @@
-set(APP vegaFemExample)
+set(APP FEMSimulator)
 
 add_executable(${APP} main.cpp)
 target_link_libraries(${APP}

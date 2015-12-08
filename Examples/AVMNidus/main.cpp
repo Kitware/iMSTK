@@ -76,7 +76,7 @@ int main(int ac, char **av)
 
     sdk->addSceneActor(femObject, femSimulator);
     sdkSimulator->registerObjectSimulator(femSimulator);
-	
+
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
@@ -153,7 +153,7 @@ int main(int ac, char **av)
     // Run the SDK
     //-------------------------------------------------------
     sdk->run();
-	 
+
     //cleanup
     sdk->releaseScene(scene);
 

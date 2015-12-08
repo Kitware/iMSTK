@@ -1,4 +1,4 @@
-set(APP LapCameraNavigationApp)
+set(APP LaparoscopicCamera)
 
 add_executable(${APP} main.cpp)
 target_link_libraries(${APP}
