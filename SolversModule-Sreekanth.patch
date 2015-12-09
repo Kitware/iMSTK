@@ -1,0 +1,1473 @@
+diff --git a/Solvers/CMakeLists.txt b/Solvers/CMakeLists.txt
+new file mode 100644
+index 0000000..75bbf52
+--- /dev/null
++++ b/Solvers/CMakeLists.txt
+@@ -0,0 +1,28 @@
++
++simmedtk_add_library(Solvers
++  SOURCES
++    SolverBase.cpp
++	LinearSolver.cpp
++	IterativeLinearSolver.cpp
++	DirectLinearSolver.cpp
++	ConjugateGradient.cpp
++	GaussSeidelSolver.cpp
++  PUBLIC_HEADERS
++	SystemOfEquations.h
++    SolverBase.h
++	LinearSolver.h
++	IterativeLinearSolver.h
++	DirectLinearSolver.h
++	ConjugateGradient.h
++	GaussSeidelSolver.h
++)
++
++target_link_libraries(Solvers
++  PUBLIC
++    Core
++  PRIVATE
++	VegaFEM::sparseSolver
++    VegaFEM::sparseMatrix
++    Event
++	Assembler
++)
+diff --git a/Solvers/ConjugateGradient.cpp b/Solvers/ConjugateGradient.cpp
+new file mode 100644
+index 0000000..3e3a73b
+--- /dev/null
++++ b/Solvers/ConjugateGradient.cpp
+@@ -0,0 +1,174 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++#include "Solvers/ConjugateGradient.h"
++
++ConjugateGradient::ConjugateGradient(
++    const int epsilon /*= 1.0e-6*/,
++    const int maxIterations /*= 100*/) :
++    IterativeLinearSolver(nullptr, epsilon, maxIterations)
++{
++}
++
++ConjugateGradient::ConjugateGradient(
++    const std::shared_ptr<SparseLinearSystem> linSys /*= nullptr*/,
++    const int epsilon /*= 1.0e-6*/,
++    const int maxIterations /*= 100*/) :
++    IterativeLinearSolver(linSys, epsilon, maxIterations)
++{
++}
++
++ConjugateGradient::~ConjugateGradient()
++{
++}
++
++void ConjugateGradient::Solve()
++{
++    if (this->sysOfEquations != nullptr)
++    {
++        auto linearSysSparse =
++            std::dynamic_pointer_cast<SparseLinearSystem>(this->sysOfEquations);
++
++        if (linearSysSparse != nullptr)
++        {
++            conjugateGradientSolve(
++                linearSysSparse->getMatrix(),
++                linearSysSparse->getUnknownVector(),
++                linearSysSparse->getForceVector());
++
++            return;
++        }
++        else
++        {
++            auto linearSysDense =
++                std::dynamic_pointer_cast<DenseLinearSystem>(this->sysOfEquations);
++
++            conjugateGradientSolve(
++                linearSysDense->getMatrix(),
++                linearSysDense->getUnknownVector(),
++                linearSysDense->getForceVector());
++
++            return;
++
++        }
++    }
++    else
++    {
++        std::cout << "Error: Linear system not set to the CG solver!\n";
++    }
++}
++
++void ConjugateGradient::conjugateGradientSolve(
++    std::shared_ptr<LinearSystem> linearSys,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++
++    if (linearSys != nullptr)
++    {
++        auto linearSysSparse =
++            std::dynamic_pointer_cast<SparseLinearSystem>(linearSys);
++        if (linearSysSparse != nullptr)
++        {
++            conjugateGradientSolve(
++                linearSysSparse->getMatrix(),
++                linearSysSparse->getUnknownVector(),
++                linearSysSparse->getForceVector());
++            return;
++        }
++
++        auto linearSysDense =
++            std::dynamic_pointer_cast<DenseLinearSystem>(linearSys);
++        if (linearSysDense)
++        {
++            conjugateGradientSolve(
++                linearSysDense->getMatrix(),
++                linearSysDense->getUnknownVector(),
++                linearSysDense->getForceVector());
++            return;
++        }
++
++        std::cout << "Error: The linear system points to a base class\n";
++        return;
++    }
++    else
++    {
++        std::cout << "Error: The linear system is non-existent\n";
++    }
++}
++
++void ConjugateGradient::conjugateGradientSolve(
++    Eigen::MatrixXd& A,
++    Eigen::VectorXd& x,
++    Eigen::VectorXd& b,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++
++}
++
++void ConjugateGradient::conjugateGradientSolve(
++    Eigen::SparseMatrix<double>& A,
++    Eigen::VectorXd& x,
++    Eigen::VectorXd& b,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++    auto eigenCgSolver = std::make_shared<
++        Eigen::ConjugateGradient<Eigen::SparseMatrix<double>>>(A) ;
++
++    eigenCgSolver->setMaxIterations(maxIter);
++    eigenCgSolver->setTolerance(epsilon);
++    x = eigenCgSolver->solve(b);
++}
++
++void ConjugateGradient::conjugateGradientIterations(
++    Eigen::SparseMatrix<double>& A,
++    Eigen::VectorXd& x,
++    Eigen::VectorXd& b,
++    const int numIter)
++{
++
++}
++
++void ConjugateGradient::conjugateGradientSolve(
++    std::shared_ptr <SparseMatrix> A,
++    double* x,
++    double* b,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++    auto cgSolver = std::make_shared<CGSolver>(A.get());
++    cgSolver->setEpsilon(epsilon);
++    cgSolver->setNumberOfIterations(maxIter);
++    cgSolver->SolveLinearSystem(x, b);
++}
++
++void ConjugateGradient::conjugateGradientIterations(
++    std::shared_ptr <SparseMatrix> A,
++    double* x,
++    double* b,
++    const int numIter)
++{
++
++}
+\ No newline at end of file
+diff --git a/Solvers/ConjugateGradient.h b/Solvers/ConjugateGradient.h
+new file mode 100644
+index 0000000..085ffa1
+--- /dev/null
++++ b/Solvers/ConjugateGradient.h
+@@ -0,0 +1,122 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_SPARSE_CG
++#define SM_SPARSE_CG
++
++#include <memory>
++
++// SimMedTK includes
++#include "Core/Config.h"
++#include "Assembler/Assembler.h"
++#include "Solvers/IterativeLinearSolver.h"
++#include "Solvers/SystemOfEquations.h"
++
++// vega includes
++#include "CGSolver.h"
++
++///
++/// \brief Conjugate gradient sparse linear solvers
++/// \todo write unit tests
++///
++class ConjugateGradient : public IterativeLinearSolver
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    ConjugateGradient(
++        const std::shared_ptr<SparseLinearSystem> linSys = nullptr,
++        const int epsilon = 1.0e-6,
++        const int maxIterations = 100);
++
++    ///
++    /// \brief default constructor
++    ///
++    ConjugateGradient(const int epsilon = 1.0e-6, const int maxIterations = 100);
++
++    ///
++    /// \brief destructor
++    ///
++    ~ConjugateGradient();
++
++	///
++	/// \brief Solve the linear system using Conjugate gradient iterations
++	///
++    void Solve() override;
++
++    //@{
++
++    ///
++	/// \brief Solve using the conjugate gradient iterations
++    /// Utility function to be called without an object of this class
++	///
++    static void conjugateGradientSolve(
++        Eigen::SparseMatrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b,
++        const int maxIter = 100,
++        const double epsilon = 1.0e-6);
++
++
++    static void conjugateGradientSolve(
++        std::shared_ptr<LinearSystem> linearSys,
++        const int maxIter /*= 100*/,
++        const double epsilon /*= 1.0e-6*/);
++
++    ststic void conjugateGradientSolve(
++        Eigen::Matrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b,
++        const int maxIter /*= 100*/,
++        const double epsilon /*= 1.0e-6*/);
++
++    static void conjugateGradientIterations(
++        Eigen::SparseMatrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b,
++        const int numIter);
++
++    static void conjugateGradientSolve(
++        std::shared_ptr <SparseMatrix> A,
++        double* x,
++        double* b,
++        const int maxIter = 100,
++        const double epsilon = 1.0e-6);
++
++    static void conjugateGradientIterations(
++        std::shared_ptr <SparseMatrix> A,
++        double* x,
++        double* b,
++        const int numIter);
++    //@}
++
++private:
++    // pointer to the Eigen's Conjugate gradient solver
++    std::shared_ptr<Eigen::ConjugateGradient<Eigen::SparseMatrix<double>>> eigenCgSolver;
++
++    // pointer to the vega's Conjugate gradient solver
++    std::shared_ptr<CGSolver> vegaCgSolver;
++};
++
++#endif // SM_SPARSE_CG
+diff --git a/Solvers/DirectLinearSolver.cpp b/Solvers/DirectLinearSolver.cpp
+new file mode 100644
+index 0000000..9103b44
+--- /dev/null
++++ b/Solvers/DirectLinearSolver.cpp
+@@ -0,0 +1,74 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++#include "Solvers/DirectLinearSolver.h"
++
++DirectLinearSolver::DirectLinearSolver(
++    const std::shared_ptr<LinearSystem> linSys /*= nullptr*/) :
++    LinearSolver(linSys)
++{
++}
++
++DirectLinearSolver::~DirectLinearSolver()
++{
++}
++
++Eigen::Vector<double>& DirectLinearSolver::getUnknownVector()
++{
++    return this->linSystem->getUnknownVector();
++}
++
++Eigen::Vector<double>& DirectLinearSolver::getForceVector()
++{
++    return this->linSystem->getForceVector();
++}
++
++void DirectLinearSolver::Solve()
++{
++    if (this->sysOfEquations != nullptr)
++    {
++        auto linearSysSparse =
++            std::dynamic_pointer_cast<SparseLinearSystem>(this->sysOfEquations);
++
++        if (linearSysSparse != nullptr)
++        {
++
++
++            return;
++        }
++        else
++        {
++            auto linearSysDense =
++                std::dynamic_pointer_cast<DenseLinearSystem>(this->sysOfEquations);
++
++
++
++            return;
++
++        }
++    }
++    else
++    {
++        std::cout << "Error: Linear system not set to the direct solver!\n";
++    }
++}
+diff --git a/Solvers/DirectLinearSolver.h b/Solvers/DirectLinearSolver.h
+new file mode 100644
+index 0000000..f424118
+--- /dev/null
++++ b/Solvers/DirectLinearSolver.h
+@@ -0,0 +1,75 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_DIRECT_LINEAR_SOLVER
++#define SM_DIRECT_LINEAR_SOLVER
++
++#include <memory>
++#include <iostream>
++#include <assert.h>
++
++// SimMedTK includes
++#include "Core/Config.h"
++#include "Assembler/Assembler.h"
++#include "Solvers/SystemOfEquations.h"
++#include "Solvers/SolverBase.h"
++#include "Solvers/LinearSolver.h"
++
++// vega includes
++#include "sparseMatrix.h"
++
++///
++/// \brief Base class for iterative linear solvers
++///
++class DirectLinearSolver : public LinearSolver
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    DirectLinearSolver(const std::shared_ptr<LinearSystem> linSys = nullptr);
++
++    ///
++    /// \brief destructor
++    ///
++    ~DirectLinearSolver();
++
++    ///
++    /// \brief Get the unknown vector
++    ///
++    virtual Eigen::Vector<double>& getUnknownVector() override;
++
++    ///
++    /// \brief Get the force vector on the r.h.s
++    ///
++    virtual Eigen::Vector<double>& getForceVector() override;
++
++    ///
++    /// \brief Solve the system of equations
++    ///
++    virtual void Solve() override;
++
++protected:
++};
++
++#endif // SM_DIRECT_LINEAR_SOLVER
+diff --git a/Solvers/GaussSeidelSolver.cpp b/Solvers/GaussSeidelSolver.cpp
+new file mode 100644
+index 0000000..86e62d6
+--- /dev/null
++++ b/Solvers/GaussSeidelSolver.cpp
+@@ -0,0 +1,135 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++
++#include "Solvers/GaussSeidelSolver.h"
++
++GaussSeidelSolver::GaussSeidelSolver(
++    const int epsilon,
++    const int maxIterations)
++    : IterativeLinearSolver(epsilon, maxIterations)
++{
++}
++
++GaussSeidelSolver::GaussSeidelSolver(
++    const std::shared_ptr<SparseLinearSystem> linSys /*= nullptr*/,
++    const int epsilon /*= 1.0e-6*/,
++    const int maxIterations /*= 100*/)
++    : IterativeLinearSolver(linSys, epsilon, maxIterations)
++{
++}
++
++GaussSeidelSolver::~GaussSeidelSolver()
++{
++}
++
++void GaussSeidelSolver::Solve()
++{
++    if (this->sysOfEquations != nullptr)
++    {
++        auto linearSys =
++            std::static_pointer_cast<SparseLinearSystem>(this->sysOfEquations);
++
++        GaussSeidelSolve(
++            linearSys->getMatrix(),
++            linearSys->getUnknownVector(),
++            linearSys->getForceVector());
++    }
++    else
++    {
++        std::cout << "Error: Linear system not set to the Gauss Seidel solver!\n";
++    }
++}
++
++void GaussSeidelSolver::GaussSeidelSolve(
++    Eigen::SparseMatrix<double>& A,
++    Eigen::VectorXd& x,
++    Eigen::VectorXd& b,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++    /*this->eigenGsSolver->setMaxIterations(numIter);
++    this->eigenCgSolver->setTolerance(epsilon);
++    eigenCgSolver.compute(A);
++    x = eigenCgSolver.solve(b);*/
++
++}
++
++void GaussSeidelSolver::GaussSeidelIteration(
++    Eigen::SparseMatrix<double>& A,
++    Eigen::VectorXd& x,
++    Eigen::VectorXd& b,
++    const int numIter)
++{
++    /* this->eigenCgSolver->setMaxIterations(this->maxIterations);
++    this->eigenCgSolver->setTolerance(this->tolerance);
++    eigenCgSolver.compute(A);
++    x = eigenCgSolver.solve(b);*/
++}
++
++void GaussSeidelSolver::GaussSeidelSolve(
++    std::shared_ptr <SparseMatrix> A,
++    double* x,
++    double* b,
++    const int maxIter /*= 100*/,
++    const double epsilon /*= 1.0e-6*/)
++{
++    int i, numIter = 0;
++    double res;
++
++    std::vector<double> r;
++    int size = A->GetNumColumns();
++    r.resize(size);
++
++    do{
++        A->DoOneGaussSeidelIteration(x, b);
++
++        A->ComputeResidual(x, b, r.data());
++
++        res = 0.0;
++        for (i = 0; i < size; i++)
++        {
++            res += r[i] * r[i];
++        }
++
++        if (res < epsilon*epsilon)
++        {
++            break;
++        }
++
++        numIter++;
++
++    } while (numIter < maxIter);
++}
++
++void GaussSeidelSolver::GaussSeidelIteration(
++    std::shared_ptr <SparseMatrix> A,
++    double* x,
++    double* b,
++    const int numIter)
++{
++    for (int i = 0; i < numIter; i++)
++    {
++        A->DoOneGaussSeidelIteration(x, b);
++    }
++}
+\ No newline at end of file
+diff --git a/Solvers/GaussSeidelSolver.h b/Solvers/GaussSeidelSolver.h
+new file mode 100644
+index 0000000..0b2275a
+--- /dev/null
++++ b/Solvers/GaussSeidelSolver.h
+@@ -0,0 +1,104 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_SPARSE_GAUSS_SEIDEL
++#define SM_SPARSE_GAUSS_SEIDEL
++
++#include <memory>
++#include <iostream>
++
++// SimMedTK includes
++#include "Core/Config.h"
++#include "Assembler/Assembler.h"
++#include "Solvers/IterativeLinearSolver.h"
++#include "Solvers/SystemOfEquations.h"
++
++///
++/// \brief Gauss Seidel sparse linear solver
++/// \todo write unit tests
++///
++class GaussSeidelSolver : public IterativeLinearSolver
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    GaussSeidelSolver(
++        const std::shared_ptr<SparseLinearSystem> linSys = nullptr,
++        const int epsilon = 1.0e-6,
++        const int maxIterations = 100);
++
++    ///
++    /// \brief default constructor
++    ///
++    GaussSeidelSolver(const int epsilon = 1.0e-6, const int maxIterations = 100);
++
++    ///
++    /// \brief destructor
++    ///
++    ~GaussSeidelSolver();
++
++	///
++	/// \brief Solve the linear system using Gauss-Seidel iterations
++	///
++    void Solve() override;
++
++    //@{
++
++    ///
++	/// \brief Solve using the Gauss-Seidel iterations
++    /// Utility function to be called without an object of this class
++    /// \todo optimize the residual computation
++	///
++    static void GaussSeidelSolve(
++        Eigen::SparseMatrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b,
++        const int maxIter = 100,
++        const double epsilon = 1.0e-6);
++
++    static void GaussSeidelIteration(
++        Eigen::SparseMatrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b,
++        const int numIter);
++
++    static void GaussSeidelSolve(
++        std::shared_ptr <SparseMatrix> A,
++        double* x,
++        double* b,
++        const int maxIter = 100,
++        const double epsilon = 1.0e-6);
++
++    static void GaussSeidelIteration(
++        std::shared_ptr <SparseMatrix> A,
++        double* x,
++        double* b,
++        const int numIter);
++
++    //@}
++
++private:
++};
++
++#endif // SM_SPARSE_GAUSS_SEIDEL
+\ No newline at end of file
+diff --git a/Solvers/IterativeLinearSolver.cpp b/Solvers/IterativeLinearSolver.cpp
+new file mode 100644
+index 0000000..1ebb2c0
+--- /dev/null
++++ b/Solvers/IterativeLinearSolver.cpp
+@@ -0,0 +1,64 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++#include "Solvers/SparseLinearSolver.h"
++
++IterativeLinearSolver::IterativeLinearSolver(
++    const int epsilon,
++    const int maxIter)
++    : tolerance(epsilon), maxIterations(maxIter), LinearSolver()
++{
++}
++
++IterativeLinearSolver::IterativeLinearSolver(
++    const std::shared_ptr<SparseLinearSystem> linSys/*=nullptr*/,
++    const int epsilon /*= 1.0e-6*/,
++    const int maxIter /*= 100*/)
++    : tolerance(epsilon), maxIterations(maxIter), LinearSolver()
++{
++}
++
++IterativeLinearSolver::~IterativeLinearSolver()
++{
++}
++
++
++void IterativeLinearSolver::setTolerance(const double epsilon)
++{
++    this->tolerance = epsilon;
++}
++
++void IterativeLinearSolver::setMaximumIterations(const int maxIter)
++{
++    this->maxIterations = maxIter;
++}
++
++int IterativeLinearSolver::getTolerance() const
++{
++    return this->tolerance;
++}
++
++int IterativeLinearSolver::getMaximumIterations() const
++{
++    return this->maxIterations;
++}
+diff --git a/Solvers/IterativeLinearSolver.h b/Solvers/IterativeLinearSolver.h
+new file mode 100644
+index 0000000..281c296
+--- /dev/null
++++ b/Solvers/IterativeLinearSolver.h
+@@ -0,0 +1,99 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_ITERATIVE_LINEAR_SOLVER
++#define SM_ITERATIVE_LINEAR_SOLVER
++
++#include <memory>
++#include <iostream>
++#include <assert.h>
++
++// SimMedTK includes
++#include "Core/Config.h"
++#include "Assembler/Assembler.h"
++#include "Solvers/SystemOfEquations.h"
++#include "Solvers/SolverBase.h"
++#include "Solvers/LinearSolver.h"
++
++// vega includes
++#include "sparseMatrix.h"
++
++///
++/// \brief Base class for iterative linear solvers
++///
++class IterativeLinearSolver : public LinearSolver
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    IterativeLinearSolver(
++        const std::shared_ptr<SparseLinearSystem> linSys=nullptr,
++        const int epsilon = 1.0e-6,
++        const int maxIterations = 100);
++
++    ///
++    /// \brief default constructor
++    ///
++    IterativeLinearSolver(const int epsilon = 1.0e-6, const int maxIterations = 100);
++
++    ///
++    /// \brief destructor
++    ///
++    ~IterativeLinearSolver();
++
++    // -------------------------------------------------
++    //  setters
++    // -------------------------------------------------
++
++    ///
++	/// \brief set the tolerance for the iterative solver
++	///
++    void setTolerance(const double epsilon);
++
++    ///
++    /// \brief set the maximum number of iterations for the iterative solver
++    ///
++    void setMaximumIterations(const int maxIter);
++
++    // -------------------------------------------------
++    // getters
++    // -------------------------------------------------
++
++    ///
++    /// \brief get the tolerance for the iterative solver
++    ///
++    int getTolerance() const;
++
++    ///
++    /// \brief get the maximum number of iterations for the iterative solver
++    ///
++    int getMaximumIterations() const;
++
++protected:
++    int maxIterations; ///> maximum limitation of interations to be performed
++
++    double tolerance; ///> convergence tolerance
++};
++
++#endif // SM_ITERATIVE_LINEAR_SOLVER
+diff --git a/Solvers/LinearSolver.cpp b/Solvers/LinearSolver.cpp
+new file mode 100644
+index 0000000..d076194
+--- /dev/null
++++ b/Solvers/LinearSolver.cpp
+@@ -0,0 +1,59 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++#include "Solvers/LinearSolver.h"
++
++LinearSolver::LinearSolver(
++    const std::shared_ptr<SparseLinearSystem> linSys /*= nullptr*/) : SolverBase()
++{
++    if (linSys != nullptr)
++    {
++        this->sysOfEquations = linSys;
++    }
++}
++
++int LinearSolver::getSystemSize() const
++{
++    if (this->sysOfEquations != nullptr)
++    {
++        return this->sysOfEquations->getSize();
++    }
++}
++
++void LinearSolver::setForceVector(std::shared_ptr<Eigen::Vector<double>> f)
++{
++    this->b = f;
++}
++
++void LinearSolver::setUnknownVector(std::shared_ptr<Eigen::Vector<double>> x)
++{
++    this->x = x;
++}
++
++void LinearSolver::setLinearSystem(
++    const std::shared_ptr<SparseLinearSystem> linSys)
++{
++    this->A = linSys->A;
++    this->x = linSys->x;
++    this->b = linSys->b;
++}
+\ No newline at end of file
+diff --git a/Solvers/LinearSolver.h b/Solvers/LinearSolver.h
+new file mode 100644
+index 0000000..22f796a
+--- /dev/null
++++ b/Solvers/LinearSolver.h
+@@ -0,0 +1,89 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_LINEAR_SOLVER
++#define SM_LINEAR_SOLVER
++
++// simmedtk includes
++#include "SolverBase/SolverBase.h"
++
++// vega includes
++#include "sparseMatrix.h"
++
++///
++/// \brief Base class for linear solver
++///
++class LinearSolver: public SolverBase
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    LinearSolver(const std::shared_ptr<SparseLinearSystem> linSys = nullptr);
++
++    ///
++    /// \brief destructor
++    ///
++    ~LinearSolver();
++
++    // -------------------------------------------------
++    //  getters
++    // -------------------------------------------------
++
++	///
++	/// \brief Return the size of the linear system
++	///
++    int getSystemSize() const;
++
++	///
++	/// \brief Get the unknown vector
++	///
++    virtual Eigen::Vector<double>& getUnknownVector() = 0;
++
++	///
++	/// \brief Get the force vector on the r.h.s
++	///
++    virtual Eigen::Vector<double>& getForceVector() = 0;
++
++    // -------------------------------------------------
++    //  setters
++    // -------------------------------------------------
++
++    ///
++    /// \brief set the Eigen force vector
++    ///
++    void setForceVector(Eigen::Vector<double>& f);
++
++    ///
++    /// \brief set the Eigen unknown vector
++    ///
++    void setUnknownVector(Eigen::Vector<double>& x);
++
++    ///
++    /// \brief Set the linear system of equations based on Eigen
++    ///
++    void setLinearSystem(const std::shared_ptr<SparseLinearSystem> linSys);
++
++};
++
++#endif // SM_LINEAR_SOLVER
+diff --git a/Solvers/SolverBase.cpp b/Solvers/SolverBase.cpp
+new file mode 100644
+index 0000000..0a4ef72
+--- /dev/null
++++ b/Solvers/SolverBase.cpp
+@@ -0,0 +1,24 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++
++#include "Solvers/SolverBase.h"
+diff --git a/Solvers/SolverBase.h b/Solvers/SolverBase.h
+new file mode 100644
+index 0000000..0d00723
+--- /dev/null
++++ b/Solvers/SolverBase.h
+@@ -0,0 +1,72 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_SOLVER_BASE
++#define SM_SOLVER_BASE
++
++// simmedtk includes
++#include "Assembler/Assembler.h"
++#include "Solver/SystemOfEquations.h"
++
++// vega includes
++#include "sparseMatrix.h"
++
++///
++/// \brief Base class for the solver module
++///
++class SolverBase : public CoreClass
++{
++public:
++    ///
++    /// \brief default constructor
++    ///
++    SolverBase(){};
++
++    ///
++    /// \brief constructor
++    ///
++    //SolverBase(std::shared_ptr<Assembler>& assembly);
++
++    ///
++    /// \brief destructor
++    ///
++    ~SolverBase(){};
++
++    // getters
++
++    ///
++    /// \brief Return the size of the linear system
++    ///
++    virtual int getSystemSize() const = 0;
++
++    ///
++    /// \brief Solve the system of equations
++    ///
++    virtual void Solve() = 0;
++
++protected:
++    std::shared_ptr<systemOfEquations> sysOfEquations; ///> system of equations
++
++    std::shared_ptr<Assembler> assembly;
++};
++
++#endif // SM_SOLVER_BASE
+\ No newline at end of file
+diff --git a/Solvers/SystemOfEquations.h b/Solvers/SystemOfEquations.h
+new file mode 100644
+index 0000000..da484fb
+--- /dev/null
++++ b/Solvers/SystemOfEquations.h
+@@ -0,0 +1,264 @@
++// This file is part of the SimMedTK project.
++// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
++//                        Rensselaer Polytechnic Institute
++//
++// Licensed under the Apache License, Version 2.0 (the "License");
++// you may not use this file except in compliance with the License.
++// You may obtain a copy of the License at
++//
++//     http://www.apache.org/licenses/LICENSE-2.0
++//
++// Unless required by applicable law or agreed to in writing, software
++// distributed under the License is distributed on an "AS IS" BASIS,
++// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++// See the License for the specific language governing permissions and
++// limitations under the License.
++//
++//---------------------------------------------------------------------------
++//
++// Authors:
++//
++// Contact:
++//---------------------------------------------------------------------------
++#ifndef SM_SYSTEM_OF_EQUATIONS
++#define SM_SYSTEM_OF_EQUATIONS
++
++#include <memory>
++
++//vega includes
++#include "sparseMatrix.h"
++
++///
++/// \class systemOfEquations
++///
++/// \brief Base class for system of equations
++///
++class systemOfEquations
++{
++public:
++    ///
++    /// \brief default constructor
++    ///
++    systemOfEquations();
++
++    ///
++    /// \brief destructor
++    ///
++    ~systemOfEquations();
++
++    ///
++    /// \brief Return the size of the matrix
++    ///
++    virtual int getSize() = 0;
++};
++
++///
++/// \class LinearSystem
++/// \brief linear system \f$ Ax = b \f$
++/// \todo Add more matrix properties
++///
++class LinearSystem : systemOfEquations
++{
++public:
++    ///
++    /// \brief default constructor
++    ///
++    LinearSystem();
++
++    ///
++    /// \brief destructor
++    ///
++    ~LinearSystem();
++
++    ///
++    /// \brief Check if the matrix is square
++    ///
++    virtual bool isSquare() const = 0;
++
++	///
++	/// \brief Check if the matrix is symmetric
++	///
++    virtual bool isSymmetric() const = 0;
++
++	///
++	/// \brief Check if the matrix is positive definite
++	///
++    virtual bool isPositiveDefinite() const = 0;
++
++	///
++	/// \brief Check if the matrix is full rank
++	///
++    virtual bool isFullRank() const = 0;
++
++    // -------------------------------------------------
++    //  setters
++    // -------------------------------------------------
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getUnknownVector() = 0;
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getForceVector() = 0;
++
++	///
++	/// \brief Return the rank
++	///
++    virtual int getRank() = 0;
++
++	///
++	/// \brief Compute the 2-norm of the residue as \f$\left \| b-Ax \right \|_2\f$
++	///
++    virtual double getResidue2Norm() = 0;
++};
++
++///
++/// \brief Sparse linear system \f$ Ax = b \f$ using Eigen sparse storage classes
++/// \note The linear system should be square
++///
++class SparseLinearSystem : LinearSystem
++{
++public:
++
++    ///
++    /// \brief default constructor
++    ///
++    SparseLinearSystem();
++
++    ///
++    /// \brief constructor
++    ///
++    SparseLinearSystem(
++        Eigen::SparseMatrix<double>& A,
++        Eigen::VectorXd& x,
++        Eigen::VectorXd& b) :
++        LinearSystem()
++    {
++        assert(A->rows() == A->cols());
++
++        this->A = A;
++        this->x = x;
++        this->b = b;
++    }
++
++    ///
++    /// \brief destructor
++    ///
++    ~SparseLinearSystem();
++
++    // -------------------------------------------------
++    //  getters
++    // -------------------------------------------------
++
++    ///
++    /// \brief
++    ///
++    Eigen::SparseMatrix<double>& getMatrix()
++    {
++        return A;
++    }
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getUnknownVector() override
++    {
++        return x;
++    }
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getForceVector() override
++    {
++        return b;
++    }
++
++    ///
++    /// \brief Return the size of the matrix
++    ///
++    virtual int getSize() override
++    {
++        return A.rows();
++    };
++
++private:
++    Eigen::SparseMatrix<double> A; ///> sparse matrix
++    Eigen::VectorXd x; ///> the l.h.s vector
++    Eigen::VectorXd b; ///> the r.h.s vector
++};
++
++///
++/// \brief Dense (fully stored) linear system Ax=b using Eigen storage classes
++/// \todo complete the class implementation
++///
++class DenseLinearSystem : LinearSystem
++{
++public:
++    ///
++    /// \brief default constructor
++    ///
++    DenseLinearSystem();
++
++    ///
++    /// \brief destructor
++    ///
++    ~DenseLinearSystem();
++
++    // -------------------------------------------------
++    //  getters
++    // -------------------------------------------------
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::MatrixXd& getMatrix()
++    {
++        return A;
++    }
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getUnknownVector() override
++    {
++        return x;
++    }
++
++    ///
++    /// \brief
++    ///
++    virtual Eigen::VectorXd& getForceVector() override
++    {
++        return b;
++    }
++
++private:
++    Eigen::MatrixXd A; ///> sparse matrix
++    Eigen::VectorXd x; ///> the l.h.s vector
++    Eigen::VectorXd b; ///> the r.h.s vector
++};
++
++///
++/// \brief linear system Ax=b
++/// \todo complete the class implementation
++///
++class LcpSystem : systemOfEquations
++{
++public:
++    ///
++    /// \brief default constructor
++    ///
++    LcpSystem();
++
++    ///
++    /// \brief destructor
++    ///
++    ~LcpSystem();
++
++private:
++};
++#endif // SM_SYSTEM_OF_EQUATIONS
+\ No newline at end of file
