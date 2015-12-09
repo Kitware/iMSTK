@@ -42,7 +42,7 @@ public:
     ///
     /// \brief Do one iteration of the method
     ///
-    virtual void iterate(core::Vectord &x) = 0;
+    virtual void iterate(core::Vectord &x, bool updateResidual = true) = 0;
 
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations

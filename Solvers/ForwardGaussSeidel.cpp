@@ -23,7 +23,9 @@
 
 #include "Solvers/ForwardGaussSeidel.h"
 
-ForwardGaussSeidel::ForwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs):
+ForwardGaussSeidel::ForwardGaussSeidel(
+    const core::SparseMatrixd &A,
+    const core::Vectord &rhs):
     U(A.triangularView<Eigen::StrictlyUpper>()),
     L(A.triangularView<Eigen::Lower>())
 {
@@ -31,9 +33,13 @@ ForwardGaussSeidel::ForwardGaussSeidel(const core::SparseMatrixd &A, const core:
 }
 
 //---------------------------------------------------------------------------
-void ForwardGaussSeidel::iterate(core::Vectord &x)
+void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 {
     x = this->linearSystem->getRHSVector() - U * x;
     L.solveInPlace(x);
-    this->linearSystem->computeResidual(x, this->residual);
+
+    if (updateResidual)
+    {
+        this->linearSystem->computeResidual(x, this->residual);
+    }
 }

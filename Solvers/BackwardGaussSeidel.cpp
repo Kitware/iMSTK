@@ -24,7 +24,9 @@
 #include "Solvers/BackwardGaussSeidel.h"
 #include <memory>
 
-BackwardGaussSeidel::BackwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs):
+BackwardGaussSeidel::BackwardGaussSeidel(
+    const core::SparseMatrixd &A,
+    const core::Vectord &rhs):
     U(A.triangularView<Eigen::Upper>()),
     L(A.triangularView<Eigen::StrictlyLower>())
 {
@@ -32,9 +34,13 @@ BackwardGaussSeidel::BackwardGaussSeidel(const core::SparseMatrixd &A, const cor
 }
 
 //---------------------------------------------------------------------------
-void BackwardGaussSeidel::iterate(core::Vectord &x)
+void BackwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 {
     x = this->linearSystem->getRHSVector() - L * x;
     U.solveInPlace(x);
-    this->linearSystem->computeResidual(x, this->residual);
+
+    if (updateResidual)
+    {
+        this->linearSystem->computeResidual(x, this->residual);
+    }
 }

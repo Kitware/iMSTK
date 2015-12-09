@@ -29,10 +29,10 @@ BackwardSOR::BackwardSOR(const core::SparseMatrixd &A,
 {}
 
 //---------------------------------------------------------------------------
-void BackwardSOR::iterate(core::Vectord &x)
+void BackwardSOR::iterate(core::Vectord &x, bool updateResidual)
 {
     auto old = x; // necessary copy
-    this->gaussSeidel.iterate(x);
+    this->gaussSeidel.iterate(x, updateResidual);
     x = this->weight * x + (1 - this->weight) * old;
 }
 

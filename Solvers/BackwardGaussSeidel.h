@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Do one iteration of the method
     ///
-    void iterate(core::Vectord &x) override;
+    void iterate(core::Vectord &x, bool updateResidual = true) override;
 
 private:
     Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::Upper> U;
