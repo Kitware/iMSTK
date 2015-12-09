@@ -28,8 +28,11 @@ ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
                                      const core::Vectord &rhs) : solver(A)
 {
     this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
+    this->maxIterations = rhs.size();
+    this->minTolerance = 1e-6;
     this->solver.setMaxIterations(this->maxIterations);
     this->solver.setTolerance(this->minTolerance);
+    this->solver.compute(A);
 }
 
 //---------------------------------------------------------------------------
@@ -43,6 +46,7 @@ void ConjugateGradient::solve(core::Vectord &x)
 {
     if(this->linearSystem)
     {
+        this->solver.compute(this->linearSystem->getMatrix());
         x = this->solver.solve(this->linearSystem->getRHSVector());
     }
 
@@ -58,7 +62,21 @@ void ConjugateGradient::solve(core::Vectord &x, double tolerance)
 }
 
 //---------------------------------------------------------------------------
-double ConjugateGradient::getError() const
+double ConjugateGradient::getError(const core::Vectord &)
 {
     return this->solver.error();
+}
+
+//---------------------------------------------------------------------------
+void ConjugateGradient::setTolerance(const double epsilon)
+{
+    this->minTolerance = epsilon;
+    this->solver.setTolerance(epsilon);
+}
+
+//---------------------------------------------------------------------------
+void ConjugateGradient::setMaximumIterations(const size_t maxIter)
+{
+    this->maxIterations = maxIter;
+    this->solver.setMaxIterations(maxIter);
 }

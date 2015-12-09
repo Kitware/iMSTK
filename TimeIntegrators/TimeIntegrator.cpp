@@ -21,32 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "ForwardSOR.h"
+#include "TimeIntegrator.h"
 
-ForwardSOR::ForwardSOR(): weight(.9) {}
-
-//---------------------------------------------------------------------------
-ForwardSOR::ForwardSOR(const core::SparseMatrixd &A,
-                       const core::Vectord &rhs,
-                       const double &w): ForwardGaussSeidel(A, rhs), weight(w)
-{}
-
-//---------------------------------------------------------------------------
-void ForwardSOR::iterate(core::Vectord &x, bool updateResidual)
+void TimeIntegrator::setFunction(const TimeIntegrator::FunctionType &newF)
 {
-    auto old = x; // necessary copy
-    ForwardGaussSeidel::iterate(x, updateResidual);
-    x = this->weight * x + (1 - this->weight) * old;
-}
-
-//---------------------------------------------------------------------------
-void ForwardSOR::setWeight(const double &newWeight)
-{
-    this->weight = newWeight;
-}
-
-//---------------------------------------------------------------------------
-const double &ForwardSOR::getWeight() const
-{
-    return this->weight;
+    this->F = newF;
 }

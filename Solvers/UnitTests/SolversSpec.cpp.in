@@ -23,6 +23,7 @@
 
 #include <bandit/bandit.h>
 #include <memory>
+#include <iostream>
 
 // SimMedTK includes
 #include "Solvers/ForwardGaussSeidel.h"
@@ -31,92 +32,205 @@
 #include "Solvers/BackwardSOR.h"
 #include "Solvers/DirectLinearSolver.h"
 #include "Solvers/ConjugateGradient.h"
+#include "Solvers/InexactNewton.h"
 #include "Core/Matrix.h"
 #include "Testing/ReadSparseMatrix.h"
 
 using namespace bandit;
 using namespace core;
 
-const std::string matrix = "@CMAKE_BINARY_DIR@/Testing/MatrixData/bcsstk27.mtx";
+const std::array<std::string,4> matrixFileNames =
+{
+    "@CMAKE_BINARY_DIR@/Testing/MatrixData/662_bus.mtx",
+    "@CMAKE_BINARY_DIR@/Testing/MatrixData/494_bus.mtx",
+    "@CMAKE_BINARY_DIR@/Testing/MatrixData/685_bus.mtx",
+    "@CMAKE_BINARY_DIR@/Testing/MatrixData/1138_bus.mtx",
+};
+
+template<typename SolverType>
+void SolveSystem(std::shared_ptr<SolverType> S, double epsilon = 1e-12)
+{
+    S->setTolerance(epsilon);
+    for (int i = 0; i < matrixFileNames.size(); ++i)
+    {
+        SparseMatrixd A,AT;
+        Vectord b,solution;
+        ReadSparseMatrix(matrixFileNames[i],A);
+        for (int k = 0; k < A.outerSize(); ++k)
+        {
+            A.coeffRef(k,k) *= 50;
+        }
+        solution.setZero(A.cols());
+        b.setRandom(A.cols());
+        auto system = std::make_shared<LinearSystem<SparseMatrixd>>(A,b);
+        S->setSystem(system);
+        S->solve(solution);
+        AssertThat(S->getError(solution)/b.squaredNorm(), IsLessThan(epsilon));
+    }
+}
+
 
 go_bandit([]()
 {
-    describe("Solver", []()
+    SparseMatrixd A;
+    Vectord b;
+    ReadSparseMatrix(matrixFileNames[0], A);
+    Matrixd Adense(A);
+    b.setRandom(A.cols());
+    Vectord solution(A.cols());
+
+    const double linearEspsilon= 1e-12;
+    const double nonLinearEpsilon = 1e-12;
+    describe("Backward Gauss-Seidel solver", [&]()
     {
-        SparseMatrixd A;
-        Vectord b;
-        ReadSparseMatrix(matrix, A);
-        Matrixd Adense(A);
-        b.setRandom(A.cols());
-        Vectord solution(A.cols());
-        auto BGSSolver = std::make_shared<BackwardGaussSeidel>(A, b);
-        auto BSORSolver = std::make_shared<BackwardSOR>(A, b);
-        auto CGSolver = std::make_shared<ConjugateGradient>(A, b);
-        auto DDSolver = std::make_shared<DirectLinearSolver<Matrixd>>(Adense, b);
-        auto DSSolver = std::make_shared<DirectLinearSolver<SparseMatrixd>>(A, b);
-        auto FGSSolver = std::make_shared<ForwardGaussSeidel>(A, b);
-        auto FSORSolver = std::make_shared<ForwardSOR>(A, b);
+        auto BGSSolver = std::make_shared<BackwardGaussSeidel>();
         it("constructs ", [&]()
         {
             AssertThat(BGSSolver != nullptr, IsTrue());
-            AssertThat(BSORSolver != nullptr, IsTrue());
-            AssertThat(CGSolver != nullptr, IsTrue());
-            AssertThat(DDSolver != nullptr, IsTrue());
-            AssertThat(DSSolver != nullptr, IsTrue());
+        });
+        it("solves", [&]()
+        {
+            BGSSolver->setMaximumIterations(A.cols());
+            SolveSystem(BGSSolver,linearEspsilon);
+        });
+
+    });
+
+    describe("Forward Gauss-Seidel linear solver",[&]()
+    {
+        auto FGSSolver = std::make_shared<ForwardGaussSeidel>();
+        it("constructs ", [&]()
+        {
             AssertThat(FGSSolver != nullptr, IsTrue());
+        });
+
+        it("solves", [&]()
+        {
+            FGSSolver->setMaximumIterations(100);
+            SolveSystem(FGSSolver,linearEspsilon);
+        });
+    });
+
+    describe("Conjugate gradient solver",[&]()
+    {
+        auto CGSolver = std::make_shared<ConjugateGradient>();
+        it("constructs ", [&]()
+        {
+            AssertThat(CGSolver != nullptr, IsTrue());
+        });
+
+        it("solves", [&]()
+        {
+            CGSolver->setMaximumIterations(A.cols());
+            SolveSystem(CGSolver,linearEspsilon);
+        });
+    });
+
+    describe("Backward SOR",[&]()
+    {
+        auto BSORSolver = std::make_shared<BackwardSOR>();
+        it("constructs ", [&]()
+        {
+            AssertThat(BSORSolver != nullptr, IsTrue());
+        });
+
+        it("solves", [&]()
+        {
+            BSORSolver->setMaximumIterations(A.cols());
+            SolveSystem(BSORSolver,linearEspsilon);
+        });
+    });
+
+    describe("Forward SOR",[&]()
+    {
+        auto FSORSolver = std::make_shared<ForwardSOR>();
+        it("constructs ", [&]()
+        {
             AssertThat(FSORSolver != nullptr, IsTrue());
         });
-        it("CG solves", [&]()
+
+        it("solves", [&]()
         {
-            solution.setRandom();
-            CGSolver->setMaximumIterations(A.cols());
-            CGSolver->setTolerance(1e-12);
-            CGSolver->solve(solution);
-            AssertThat(CGSolver->getResidual().norm(), IsLessThan(1e-8));
+            FSORSolver->setMaximumIterations(A.cols());
+            SolveSystem(FSORSolver,linearEspsilon);
         });
-        it("ForwardGaussSeidel solves", [&]()
+    });
+
+    describe("Direct solver for dense systems",[&]()
+    {
+        auto DDSolver = std::make_shared<DirectLinearSolver<Matrixd>>(Adense, b);
+        it("constructs ", [&]()
         {
-            solution.setRandom();
-            FGSSolver->setMaximumIterations(100);
-            FGSSolver->setTolerance(1e-12);
-            FGSSolver->solve(solution);
-            AssertThat(FGSSolver->getResidual().norm(), IsLessThan(1e-10));
+            AssertThat(DDSolver != nullptr, IsTrue());
         });
-        it("BackwardGaussSeidel solves", [&]()
-        {
-            solution.setRandom();
-            BGSSolver->setMaximumIterations(A.cols());
-            BGSSolver->setTolerance(1e-12);
-            BGSSolver->solve(solution);
-            AssertThat(BGSSolver->getResidual().norm(), IsLessThan(1e-10));
-        });
-        it("ForwardSOR solves", [&]()
-        {
-            solution.setRandom();
-            BGSSolver->setMaximumIterations(A.cols());
-            BGSSolver->setTolerance(1e-12);
-            BGSSolver->solve(solution);
-            AssertThat(BGSSolver->getResidual().norm(), IsLessThan(1e-10));
-        });
-        it("BackwardSOR solves", [&]()
-        {
-            solution.setRandom();
-            BGSSolver->setMaximumIterations(A.cols());
-            BGSSolver->setTolerance(1e-12);
-            BGSSolver->solve(solution);
-            AssertThat(BGSSolver->getResidual().norm(), IsLessThan(1e-10));
-        });
-        it("DirectLinearSolver solves dense system", [&]()
+
+        it("solves", [&]()
         {
             solution.setRandom();
             DDSolver->solve(solution);
-            AssertThat((b - A * solution).norm(), IsLessThan(1e-10));
+            AssertThat((b - A * solution).norm(), IsLessThan(linearEspsilon));
         });
-        it("DirectLinearSolver solves sparse system", [&]()
+    });
+
+    auto DSSolver = std::make_shared<DirectLinearSolver<SparseMatrixd>>(A, b);
+    describe("Direct solver for sparse systems (With Sparse LU)",[&]()
+    {
+        it("constructs ", [&]()
+        {
+            AssertThat(DSSolver != nullptr, IsTrue());
+        });
+
+        it("solves", [&]()
         {
             solution.setRandom();
             DSSolver->solve(solution);
-            AssertThat((b - A * solution).norm(), IsLessThan(1e-10));
+            AssertThat((b - A * solution).norm(), IsLessThan(linearEspsilon));
+        });
+    });
+
+    describe("Newton non-linear solver",[&]()
+    {
+        auto NewtonSolver = std::make_shared<InexactNewton>();
+        it("constructs ", [&]()
+        {
+            AssertThat(NewtonSolver != nullptr, IsTrue());
+        });
+
+        it("solves", [&]()
+        {
+            auto F = [](const Vectord &x, Vectord &y) -> Vectord&
+            {
+                y(0) = (x(0)+3)*(x(1)*x(1)*x(1)-7) + 18;
+                y(1) = std::sin(x(1)*std::exp(x(0))-1);
+                return y;
+            };
+
+            std::vector<Eigen::Triplet<double>> tripletList;
+            auto DF = [&](const Vectord &x, SparseMatrixd &J) -> void
+            {
+                tripletList.clear();
+                tripletList.emplace_back(0,0,x(1)*x(1)*x(1)-7);
+                tripletList.emplace_back(0,1,3*x(1)*x(1)*(x(0)+3));
+                tripletList.emplace_back(1,0,x(1)*std::exp(x(0))*std::cos(x(1)*std::exp(x(0))-1));
+                tripletList.emplace_back(1,1,std::exp(x(0))*std::cos(x(1)*std::exp(x(0))-1));
+
+                J.setFromTriplets(tripletList.begin(),tripletList.end());
+                J.makeCompressed();
+            };
+
+            NewtonSolver->setSystem(F);
+            NewtonSolver->setAbsoluteTolerance(nonLinearEpsilon);
+            NewtonSolver->setRelativeTolerance(nonLinearEpsilon);
+            NewtonSolver->setJacobian(DF);
+            NewtonSolver->setLinearSolver(DSSolver);
+
+            Vectord x(2);
+            x.setZero();
+            NewtonSolver->solve(x);
+            Vectord f(2);
+
+            AssertThat(F(x,f).norm(), IsLessThan(NewtonSolver->getAbsoluteTolerance()));
+
         });
     });
 });

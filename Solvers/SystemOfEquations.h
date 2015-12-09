@@ -21,12 +21,13 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SM_SYSTEM_OF_EQUATIONS
-#define SM_SYSTEM_OF_EQUATIONS
+#ifndef SYSTEM_OF_EQUATIONS
+#define SYSTEM_OF_EQUATIONS
 
 #include <memory>
 
 #include "Core/Vector.h"
+#include "Core/Matrix.h"
 
 ///
 /// \class systemOfEquations
@@ -47,15 +48,25 @@ public:
     virtual ~SystemOfEquations() = default;
 
     ///
-    /// \brief Set function
+    /// \brief Set function to evaluate.
     ///
-    void setFunction(const FunctionType &function)
+    inline void setFunction(const FunctionType &function)
     {
         this->F = function;
     }
 
+    ///
+    /// \brief Evaluate function at specified argument
+    ///
+    /// \param x
+    ///
+    inline void eval(const core::Vectord &x, core::Vectord &y)
+    {
+        this->F(x,y);
+    }
+
 protected:
-    //!< Function associated with the system of equation to solve: F(x)=b
+    //!< Function associated with the system of equation to solve.
     FunctionType F;
 };
 
@@ -75,14 +86,17 @@ public:
     ///     a matrix and rhs. Also, avoid copying this system.
     ///
     LinearSystem() = delete;
-    LinearSystem(const LinearSystem &) = delete;
-    LinearSystem &operator=(const LinearSystem &) = delete;
     virtual ~LinearSystem() = default;
+    LinearSystem(const LinearSystem &) = delete;
+
+    LinearSystem &operator=(const LinearSystem &) = delete;
 
     ///
-    /// \brief Constructor
+    /// \brief Constructor.
     ///
-    LinearSystem(const MatrixType &matrix, const core::Vectord &b) : A(matrix), rhs(b)
+    LinearSystem(const MatrixType &matrix, const core::Vectord &b) :
+        A(matrix),
+        rhs(b)
     {
         this->F = [this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
         {
@@ -95,15 +109,9 @@ public:
     // -------------------------------------------------
 
     ///
-    /// \brief Set new right hand side vector
+    ///  \brief Returns a reference to local right hand side vector.
     ///
-    void setRHSVector(const core::Vectord &newRhs)
-    {
-        this->rhs = newRhs;
-    }
-
-    ///
-    ///  \brief Get the right hand side vector
+    ///  \return Right hand side.
     ///
     inline const core::Vectord &getRHSVector() const
     {
@@ -111,7 +119,9 @@ public:
     }
 
     ///
-    /// \brief Return reference to local matrix
+    /// \brief Returns reference to local matrix.
+    ///
+    /// \return Systems matrix.
     ///
     inline const MatrixType &getMatrix() const
     {
@@ -119,7 +129,12 @@ public:
     }
 
     ///
-    /// \brief Compute the residual as \f$\left \| b-Ax \right \|_2\f$
+    /// \brief Compute the residual as \f$\left \| b-Ax \right \|_2\f$.
+    ///
+    /// \param x Current iterate.
+    /// \param r Upon return, contains the residual vector.
+    ///
+    /// \return Residual vector r.
     ///
     inline core::Vectord &computeResidual(const core::Vectord &x, core::Vectord &r) const
     {
@@ -127,9 +142,45 @@ public:
         return r;
     }
 
+    ///
+    /// \brief Returns template expression for the lower triangular part of A.
+    ///
+    inline Eigen::SparseTriangularView<MatrixType,Eigen::Lower>
+    getLowerTriangular() const
+    {
+        return this->A.template triangularView<Eigen::Lower>();
+    }
+
+    ///
+    /// \brief Returns template expression for the strict lower triangular part of A.
+    ///
+    inline Eigen::SparseTriangularView<MatrixType,Eigen::StrictlyLower>
+    getStrictLowerTriangular() const
+    {
+        return this->A.template triangularView<Eigen::StrictlyLower>();
+    }
+
+    ///
+    /// \brief Returns template expression for the upper triangular part of A.
+    ///
+    inline Eigen::SparseTriangularView<MatrixType,Eigen::Upper>
+    getUpperTrianglular() const
+    {
+        return this->A.template triangularView<Eigen::Upper>();
+    }
+
+    ///
+    /// \brief Returns template expression for the strict upper triangular part of A.
+    ///
+    inline Eigen::SparseTriangularView<MatrixType,Eigen::StrictlyUpper>
+    getStrictUpperTriangular() const
+    {
+        return this->A.template triangularView<Eigen::StrictlyUpper>();
+    }
+
 private:
     const MatrixType &A;
     const core::Vectord &rhs;
 };
 
-#endif // SM_SYSTEM_OF_EQUATIONS
+#endif // SYSTEM_OF_EQUATIONS

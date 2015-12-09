@@ -24,39 +24,53 @@
 #ifndef BACKWARDSOR_H
 #define BACKWARDSOR_H
 
-#include "Solvers//BackwardGaussSeidel.h"
+#include "Solvers/BackwardGaussSeidel.h"
 
-class BackwardSOR : public IterativeLinearSolver
+///
+/// \brief Forward version of the Gauss Seidel successive overrelaxation sparse
+///     linear solver.
+///
+class BackwardSOR : public BackwardGaussSeidel
 {
 public:
     ///
-    /// \brief Default constructor/destructor
+    /// \brief Default Constructor/Destructor
     ///
-    BackwardSOR() = delete;
+    BackwardSOR();
+    ~BackwardSOR() = default;
     BackwardSOR(const BackwardSOR &) = delete;
+
     BackwardSOR &operator=(const BackwardSOR &) = delete;
 
+    ///
+    /// \brief Constructor
+    ///
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param rhs Right hand side of the linear system of equations.
+    ///
     BackwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w = .5);
 
-    ~BackwardSOR() = default;
-
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Do one iteration of the method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual Compute residual if true.
     ///
     void iterate(core::Vectord &x, bool updateResidual = true) override;
 
     ///
-    /// \brief Set Weight
+    /// \brief Set acceleration parameter.
+    ///
+    /// \param newWeight New acceleration paramater.
     ///
     void setWeight(const double &newWeight);
 
     ///
-    /// \brief Get Weight
+    /// \brief Get Weight. Return current acceleration parameter.
     ///
     const double &getWeight() const;
 
 private:
-    BackwardGaussSeidel gaussSeidel;
     double weight;
 
 };

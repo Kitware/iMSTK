@@ -305,6 +305,7 @@ add_subdirectory(Simulators)
 add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
 add_subdirectory(Solvers)
+add_subdirectory(TimeIntegrators)
 
 ################################################################################
 # Build documentation
