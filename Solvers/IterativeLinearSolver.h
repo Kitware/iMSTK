@@ -23,77 +23,65 @@
 #ifndef SM_ITERATIVE_LINEAR_SOLVER
 #define SM_ITERATIVE_LINEAR_SOLVER
 
-#include <memory>
-#include <iostream>
-#include <assert.h>
-
 // SimMedTK includes
-#include "Core/Config.h"
-#include "Assembler/Assembler.h"
-#include "Solvers/SystemOfEquations.h"
-#include "Solvers/SolverBase.h"
 #include "Solvers/LinearSolver.h"
 
-// vega includes
-#include "sparseMatrix.h"
-
 ///
-/// \brief Base class for iterative linear solvers
+/// \brief Base class for iterative linear solvers. Only for sparse matrices, extend if
+///     other type of matrices are needed.
 ///
-class IterativeLinearSolver : public LinearSolver
+class IterativeLinearSolver : public LinearSolver<core::SparseMatrixd>
 {
 public:
+    ///
+    /// \brief Default constructor/destructor
+    ///
+    IterativeLinearSolver();
+    ~IterativeLinearSolver() = default;
 
     ///
-    /// \brief default constructor
+    /// \brief Do one iteration of the method
     ///
-    IterativeLinearSolver(
-        const std::shared_ptr<SparseLinearSystem> linSys=nullptr,
-        const int epsilon = 1.0e-6,
-        const int maxIterations = 100);
+    virtual void iterate(core::Vectord &x) = 0;
 
     ///
-    /// \brief default constructor
+    /// \brief Solve the linear system using Gauss-Seidel iterations
     ///
-    IterativeLinearSolver(const int epsilon = 1.0e-6, const int maxIterations = 100);
-
-    ///
-    /// \brief destructor
-    ///
-    ~IterativeLinearSolver();
+    virtual void solve(core::Vectord &x) override;
 
     // -------------------------------------------------
-    //  setters
+    //  Accessors
     // -------------------------------------------------
 
     ///
-	/// \brief set the tolerance for the iterative solver
-	///
-    void setTolerance(const double epsilon);
-
+    /// \brief set the tolerance for the iterative solver
     ///
-    /// \brief set the maximum number of iterations for the iterative solver
-    ///
-    void setMaximumIterations(const int maxIter);
-
-    // -------------------------------------------------
-    // getters
-    // -------------------------------------------------
+    virtual void setTolerance(const double epsilon);
 
     ///
     /// \brief get the tolerance for the iterative solver
     ///
-    int getTolerance() const;
+    virtual double getTolerance() const;
+
+    ///
+    /// \brief set the maximum number of iterations for the iterative solver
+    ///
+    virtual void setMaximumIterations(const int maxIter);
 
     ///
     /// \brief get the maximum number of iterations for the iterative solver
     ///
-    int getMaximumIterations() const;
+    virtual int getMaximumIterations() const;
+
+    ///
+    /// \brief Get residual
+    ///
+    const core::Vectord &getResidual();
 
 protected:
-    int maxIterations; ///> maximum limitation of interations to be performed
-
-    double tolerance; ///> convergence tolerance
+    int maxIterations;      ///> maximum number of iterations to be performed
+    double minTolerance;    ///> convergence tolerance
+    core::Vectord residual; ///> storage for residual vector
 };
 
 #endif // SM_ITERATIVE_LINEAR_SOLVER

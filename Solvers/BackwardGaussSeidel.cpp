@@ -21,44 +21,20 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Solvers/ConjugateGradient.h"
-#include <iostream>
+#include "Solvers/BackwardGaussSeidel.h"
+#include <memory>
 
-ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
-                                     const core::Vectord &rhs) : solver(A)
+BackwardGaussSeidel::BackwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs):
+    U(A.triangularView<Eigen::Upper>()),
+    L(A.triangularView<Eigen::StrictlyLower>())
 {
     this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
-    this->solver.setMaxIterations(this->maxIterations);
-    this->solver.setTolerance(this->minTolerance);
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::iterate(core::Vectord &)
+void BackwardGaussSeidel::iterate(core::Vectord &x)
 {
-    std::cout << "Nothing to do\n";
-}
-
-//---------------------------------------------------------------------------
-void ConjugateGradient::solve(core::Vectord &x)
-{
-    if(this->linearSystem)
-    {
-        x = this->solver.solve(this->linearSystem->getRHSVector());
-    }
-
+    x = this->linearSystem->getRHSVector() - L * x;
+    U.solveInPlace(x);
     this->linearSystem->computeResidual(x, this->residual);
-}
-
-//---------------------------------------------------------------------------
-void ConjugateGradient::solve(core::Vectord &x, double tolerance)
-{
-    this->setTolerance(tolerance);
-    this->solver.setTolerance(tolerance);
-    this->solve(x);
-}
-
-//---------------------------------------------------------------------------
-double ConjugateGradient::getError() const
-{
-    return this->solver.error();
 }

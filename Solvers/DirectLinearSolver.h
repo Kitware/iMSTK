@@ -20,56 +20,79 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+
 #ifndef SM_DIRECT_LINEAR_SOLVER
 #define SM_DIRECT_LINEAR_SOLVER
 
-#include <memory>
-#include <iostream>
-#include <assert.h>
-
 // SimMedTK includes
-#include "Core/Config.h"
-#include "Assembler/Assembler.h"
-#include "Solvers/SystemOfEquations.h"
-#include "Solvers/SolverBase.h"
 #include "Solvers/LinearSolver.h"
+#include "Core/Matrix.h"
+#include "Core/Vector.h"
 
-// vega includes
-#include "sparseMatrix.h"
+template<typename MatrixType>
+class DirectLinearSolver;
 
 ///
-/// \brief Base class for iterative linear solvers
+/// \brief Dense direct solvers
 ///
-class DirectLinearSolver : public LinearSolver
+template<>
+class DirectLinearSolver<core::Matrixd> : public LinearSolver<core::Matrixd>
 {
 public:
+    ///
+    /// \brief Default constructor/destructor
+    ///
+    DirectLinearSolver() = delete;
+    ~DirectLinearSolver() = default;
 
     ///
-    /// \brief default constructor
+    /// \brief Constructor
     ///
-    DirectLinearSolver(const std::shared_ptr<LinearSystem> linSys = nullptr);
-
-    ///
-    /// \brief destructor
-    ///
-    ~DirectLinearSolver();
-
-    ///
-    /// \brief Get the unknown vector
-    ///
-    virtual Eigen::Vector<double>& getUnknownVector() override;
-
-    ///
-    /// \brief Get the force vector on the r.h.s
-    ///
-    virtual Eigen::Vector<double>& getForceVector() override;
+    DirectLinearSolver(const core::Matrixd &matrix, const core::Vectord &b);
 
     ///
     /// \brief Solve the system of equations
     ///
-    virtual void Solve() override;
+    void solve(core::Vectord &x) override;
 
-protected:
+    ///
+    /// \brief Solve the system of equations
+    ///
+    void solve(const core::Vectord &rhs, core::Vectord &x);
+
+private:
+    Eigen::LDLT<core::Matrixd> solver;
 };
 
+///
+/// \brief Sparse direct solvers
+///
+template<>
+class DirectLinearSolver<core::SparseMatrixd> : public LinearSolver<core::SparseMatrixd>
+{
+public:
+    ///
+    /// \brief Default constructor/destructor
+    ///
+    DirectLinearSolver() = delete;
+    ~DirectLinearSolver() = default;
+
+    ///
+    /// \brief Constructor
+    ///
+    DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b);
+
+    ///
+    /// \brief Solve the system of equations
+    ///
+    void solve(core::Vectord &x) override;
+
+    ///
+    /// \brief Solve the system of equations
+    ///
+    void solve(const core::Vectord &rhs, core::Vectord &x);
+
+private:
+    Eigen::SparseLU<core::SparseMatrixd> solver;
+};
 #endif // SM_DIRECT_LINEAR_SOLVER

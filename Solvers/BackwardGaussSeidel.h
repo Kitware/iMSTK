@@ -20,55 +20,40 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef SM_LINEAR_SOLVER
-#define SM_LINEAR_SOLVER
 
-// simmedtk includes
-#include "Solvers/SystemOfEquations.h"
+#ifndef BACKWARD_GAUSS_SEIDEL_H
+#define BACKWARD_GAUSS_SEIDEL_H
+
+// SimMedTK includes
+#include "Solvers/IterativeLinearSolver.h"
 #include "Core/Matrix.h"
-
-template<typename SystemMatrixType>
-class LinearSystem;
+#include "Core/Vector.h"
 
 ///
-/// \brief Base class for linear solvers
+/// \brief Gauss Seidel sparse linear solver
 ///
-template<typename SystemMatrixType>
-class LinearSolver
+class BackwardGaussSeidel : public IterativeLinearSolver
 {
-public:
-    using MatrixType = SystemMatrixType;
-
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() = default;
-    virtual ~LinearSolver() = default;
+    BackwardGaussSeidel() = delete;
+    BackwardGaussSeidel(const BackwardGaussSeidel &) = delete;
+    BackwardGaussSeidel &operator=(const BackwardGaussSeidel &) = delete;
+
+    BackwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
+
+    ~BackwardGaussSeidel() = default;
 
     ///
-    /// \brief Main solve routine
+    /// \brief Do one iteration of the method
     ///
-    virtual void solve(core::Vectord &x) = 0;
+    void iterate(core::Vectord &x) override;
 
-    ///
-    /// \brief Set the system
-    ///
-    inline void setSystem(std::shared_ptr<LinearSystem<MatrixType>> newSystem)
-    {
-        this->linearSystem = newSystem;
-    }
-
-    ///
-    /// \brief Get the system
-    ///
-    inline std::shared_ptr<LinearSystem<MatrixType>> getSystem() const
-    {
-        return this->linearSystem;
-    }
-
-protected:
-    std::shared_ptr<LinearSystem<MatrixType>> linearSystem;
+private:
+    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::Upper> U;
+    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::StrictlyLower> L;
 };
 
-#endif // SM_LINEAR_SOLVER
+#endif // BACKWARDGAUSSSEIDEL_H

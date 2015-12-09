@@ -22,53 +22,58 @@
 //---------------------------------------------------------------------------
 
 #include "Solvers/DirectLinearSolver.h"
+#include "Solvers/SystemOfEquations.h"
 
-DirectLinearSolver::DirectLinearSolver(
-    const std::shared_ptr<LinearSystem> linSys /*= nullptr*/) :
-    LinearSolver(linSys)
+
+DirectLinearSolver<core::Matrixd>::DirectLinearSolver(const core::Matrixd &matrix, const core::Vectord &b)
 {
+    this->linearSystem = std::make_shared<LinearSystem<core::Matrixd>>(matrix, b);
+    this->solver.compute(matrix);
 }
 
-DirectLinearSolver::~DirectLinearSolver()
+//---------------------------------------------------------------------------
+void DirectLinearSolver<core::Matrixd>::solve(core::Vectord &x)
 {
-}
+    x.setZero();
 
-Eigen::Vector<double>& DirectLinearSolver::getUnknownVector()
-{
-    return this->linSystem->getUnknownVector();
-}
-
-Eigen::Vector<double>& DirectLinearSolver::getForceVector()
-{
-    return this->linSystem->getForceVector();
-}
-
-void DirectLinearSolver::Solve()
-{
-    if (this->sysOfEquations != nullptr)
+    if(!this->linearSystem)
     {
-        auto linearSysSparse =
-            std::dynamic_pointer_cast<SparseLinearSystem>(this->sysOfEquations);
-
-        if (linearSysSparse != nullptr)
-        {
-
-
-            return;
-        }
-        else
-        {
-            auto linearSysDense =
-                std::dynamic_pointer_cast<DenseLinearSystem>(this->sysOfEquations);
-
-
-
-            return;
-
-        }
+        return;
     }
-    else
+
+    auto b = this->linearSystem->getRHSVector();
+    x = this->solver.solve(b);
+}
+
+//---------------------------------------------------------------------------
+void DirectLinearSolver<core::Matrixd>::solve(const core::Vectord &rhs, core::Vectord &x)
+{
+    x = this->solver.solve(rhs);
+}
+
+//---------------------------------------------------------------------------
+DirectLinearSolver<core::SparseMatrixd>::DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b)
+{
+    this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(matrix, b);
+    this->solver.compute(matrix);
+}
+
+//---------------------------------------------------------------------------
+void DirectLinearSolver<core::SparseMatrixd>::solve(core::Vectord &x)
+{
+    x.setZero();
+
+    if(!this->linearSystem)
     {
-        std::cout << "Error: Linear system not set to the direct solver!\n";
+        return;
     }
+
+    auto b = this->linearSystem->getRHSVector();
+    x = this->solver.solve(b);
+}
+
+//---------------------------------------------------------------------------
+void DirectLinearSolver<core::SparseMatrixd>::solve(const core::Vectord &rhs, core::Vectord &x)
+{
+    x = this->solver.solve(rhs);
 }

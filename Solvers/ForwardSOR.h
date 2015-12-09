@@ -20,55 +20,51 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef SM_LINEAR_SOLVER
-#define SM_LINEAR_SOLVER
 
-// simmedtk includes
-#include "Solvers/SystemOfEquations.h"
+#ifndef FORWARD_SOR_H
+#define FORWARD_SOR_H
+
+// SimMedTK includes
+#include "Solvers/ForwardGaussSeidel.h"
 #include "Core/Matrix.h"
-
-template<typename SystemMatrixType>
-class LinearSystem;
+#include "Core/Vector.h"
 
 ///
-/// \brief Base class for linear solvers
+/// \brief Gauss Seidel successive overrelaxation sparse linear solver
 ///
-template<typename SystemMatrixType>
-class LinearSolver
+class ForwardSOR : public IterativeLinearSolver
 {
-public:
-    using MatrixType = SystemMatrixType;
-
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() = default;
-    virtual ~LinearSolver() = default;
+    ForwardSOR() = delete;
+    ForwardSOR(const ForwardSOR &) = delete;
+    ForwardSOR &operator=(const ForwardSOR &) = delete;
+
+    ForwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w = .5);
+
+    ~ForwardSOR() = default;
 
     ///
-    /// \brief Main solve routine
+    /// \brief Do one iteration of the method
     ///
-    virtual void solve(core::Vectord &x) = 0;
+    void iterate(core::Vectord &x) override;
 
     ///
-    /// \brief Set the system
+    /// \brief Set Weight
     ///
-    inline void setSystem(std::shared_ptr<LinearSystem<MatrixType>> newSystem)
-    {
-        this->linearSystem = newSystem;
-    }
+    void setWeight(const double &newWeight);
 
     ///
-    /// \brief Get the system
+    /// \brief Get Weight
     ///
-    inline std::shared_ptr<LinearSystem<MatrixType>> getSystem() const
-    {
-        return this->linearSystem;
-    }
+    const double &getWeight() const;
 
-protected:
-    std::shared_ptr<LinearSystem<MatrixType>> linearSystem;
+private:
+    ForwardGaussSeidel gaussSeidel;
+    double weight;
+
 };
 
-#endif // SM_LINEAR_SOLVER
+#endif // FORWARD_SOR_H

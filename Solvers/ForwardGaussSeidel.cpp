@@ -21,39 +21,19 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Solvers/LinearSolver.h"
+#include "Solvers/ForwardGaussSeidel.h"
 
-LinearSolver::LinearSolver(
-    const std::shared_ptr<SparseLinearSystem> linSys /*= nullptr*/) : SolverBase()
+ForwardGaussSeidel::ForwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs):
+    U(A.triangularView<Eigen::StrictlyUpper>()),
+    L(A.triangularView<Eigen::Lower>())
 {
-    if (linSys != nullptr)
-    {
-        this->sysOfEquations = linSys;
-    }
+    this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
 }
 
-int LinearSolver::getSystemSize() const
+//---------------------------------------------------------------------------
+void ForwardGaussSeidel::iterate(core::Vectord &x)
 {
-    if (this->sysOfEquations != nullptr)
-    {
-        return this->sysOfEquations->getSize();
-    }
-}
-
-void LinearSolver::setForceVector(std::shared_ptr<Eigen::Vector<double>> f)
-{
-    this->b = f;
-}
-
-void LinearSolver::setUnknownVector(std::shared_ptr<Eigen::Vector<double>> x)
-{
-    this->x = x;
-}
-
-void LinearSolver::setLinearSystem(
-    const std::shared_ptr<SparseLinearSystem> linSys)
-{
-    this->A = linSys->A;
-    this->x = linSys->x;
-    this->b = linSys->b;
+    x = this->linearSystem->getRHSVector() - U * x;
+    L.solveInPlace(x);
+    this->linearSystem->computeResidual(x, this->residual);
 }

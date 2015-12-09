@@ -20,55 +20,39 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
-#ifndef SM_LINEAR_SOLVER
-#define SM_LINEAR_SOLVER
+#ifndef SM_FORWARD_GAUSS_SEIDEL
+#define SM_FORWARD_GAUSS_SEIDEL
 
-// simmedtk includes
-#include "Solvers/SystemOfEquations.h"
+// SimMedTK includes
+#include "Solvers/IterativeLinearSolver.h"
 #include "Core/Matrix.h"
-
-template<typename SystemMatrixType>
-class LinearSystem;
+#include "Core/Vector.h"
 
 ///
-/// \brief Base class for linear solvers
+/// \brief Gauss Seidel sparse linear solver
 ///
-template<typename SystemMatrixType>
-class LinearSolver
+class ForwardGaussSeidel : public IterativeLinearSolver
 {
-public:
-    using MatrixType = SystemMatrixType;
-
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() = default;
-    virtual ~LinearSolver() = default;
+    ForwardGaussSeidel() = delete;
+    ForwardGaussSeidel(const ForwardGaussSeidel &) = delete;
+    ForwardGaussSeidel &operator=(const ForwardGaussSeidel &) = delete;
+
+    ForwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
+
+    ~ForwardGaussSeidel() = default;
 
     ///
-    /// \brief Main solve routine
+    /// \brief Do one iteration of the method
     ///
-    virtual void solve(core::Vectord &x) = 0;
+    void iterate(core::Vectord &x) override;
 
-    ///
-    /// \brief Set the system
-    ///
-    inline void setSystem(std::shared_ptr<LinearSystem<MatrixType>> newSystem)
-    {
-        this->linearSystem = newSystem;
-    }
-
-    ///
-    /// \brief Get the system
-    ///
-    inline std::shared_ptr<LinearSystem<MatrixType>> getSystem() const
-    {
-        return this->linearSystem;
-    }
-
-protected:
-    std::shared_ptr<LinearSystem<MatrixType>> linearSystem;
+private:
+    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::StrictlyUpper> U;
+    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::Lower> L;
 };
 
-#endif // SM_LINEAR_SOLVER
+#endif // SM_FORWARD_GAUSS_SEIDEL

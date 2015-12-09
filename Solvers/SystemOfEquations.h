@@ -20,245 +20,116 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+
 #ifndef SM_SYSTEM_OF_EQUATIONS
 #define SM_SYSTEM_OF_EQUATIONS
 
 #include <memory>
 
-//vega includes
-#include "sparseMatrix.h"
+#include "Core/Vector.h"
 
 ///
 /// \class systemOfEquations
 ///
 /// \brief Base class for system of equations
 ///
-class systemOfEquations
+class SystemOfEquations
 {
 public:
+    using FunctionType = std::function < core::Vectord &(const core::Vectord &,
+                         core::Vectord &) >;
+
+public:
     ///
-    /// \brief default constructor
+    /// \brief default Constructor/Destructor
     ///
-    systemOfEquations();
+    SystemOfEquations() = default;
+    virtual ~SystemOfEquations() = default;
 
     ///
-    /// \brief destructor
+    /// \brief Set function
     ///
-    ~systemOfEquations();
+    void setFunction(const FunctionType &function)
+    {
+        this->F = function;
+    }
 
-    ///
-    /// \brief Return the size of the matrix
-    ///
-    virtual int getSize() = 0;
+protected:
+    //!< Function associated with the system of equation to solve: F(x)=b
+    FunctionType F;
 };
 
 ///
 /// \class LinearSystem
-/// \brief linear system \f$ Ax = b \f$
-/// \todo Add more matrix properties
+/// \brief Represents the linear system \f$ Ax = b \f$
 ///
-class LinearSystem : systemOfEquations
+template<typename SystemMatrixType>
+class LinearSystem : public SystemOfEquations
 {
 public:
-    ///
-    /// \brief default constructor
-    ///
-    LinearSystem();
+    using MatrixType = SystemMatrixType;
 
-    ///
-    /// \brief destructor
-    ///
-    ~LinearSystem();
-
-    ///
-    /// \brief Check if the matrix is square
-    ///
-    virtual bool isSquare() const = 0;
-
-	///
-	/// \brief Check if the matrix is symmetric
-	///
-    virtual bool isSymmetric() const = 0;
-
-	///
-	/// \brief Check if the matrix is positive definite
-	///
-    virtual bool isPositiveDefinite() const = 0;
-
-	///
-	/// \brief Check if the matrix is full rank
-	///
-    virtual bool isFullRank() const = 0;
-
-    // -------------------------------------------------
-    //  setters
-    // -------------------------------------------------
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::VectorXd& getUnknownVector() = 0;
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::VectorXd& getForceVector() = 0;
-
-	///
-	/// \brief Return the rank
-	///
-    virtual int getRank() = 0;
-
-	///
-	/// \brief Compute the 2-norm of the residue as \f$\left \| b-Ax \right \|_2\f$
-	///
-    virtual double getResidue2Norm() = 0;
-};
-
-///
-/// \brief Sparse linear system \f$ Ax = b \f$ using Eigen sparse storage classes
-/// \note The linear system should be square
-///
-class SparseLinearSystem : LinearSystem
-{
 public:
+    ///
+    /// \brief Constructor/destructor(s). This class can't be constructed without
+    ///     a matrix and rhs. Also, avoid copying this system.
+    ///
+    LinearSystem() = delete;
+    LinearSystem(const LinearSystem &) = delete;
+    LinearSystem &operator=(const LinearSystem &) = delete;
+    virtual ~LinearSystem() = default;
 
     ///
-    /// \brief default constructor
+    /// \brief Constructor
     ///
-    SparseLinearSystem();
-
-    ///
-    /// \brief constructor
-    ///
-    SparseLinearSystem(
-        Eigen::SparseMatrix<double>& A,
-        Eigen::VectorXd& x,
-        Eigen::VectorXd& b) :
-        LinearSystem()
+    LinearSystem(const MatrixType &matrix, const core::Vectord &b) : A(matrix), rhs(b)
     {
-        assert(A->rows() == A->cols());
+        this->F = [this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+        {
+            return y = this->A * x;
+        };
+    }
 
-        this->A = A;
-        this->x = x;
-        this->b = b;
+    // -------------------------------------------------
+    //  Accessors
+    // -------------------------------------------------
+
+    ///
+    /// \brief Set new right hand side vector
+    ///
+    void setRHSVector(const core::Vectord &newRhs)
+    {
+        this->rhs = newRhs;
     }
 
     ///
-    /// \brief destructor
+    ///  \brief Get the right hand side vector
     ///
-    ~SparseLinearSystem();
+    inline const core::Vectord &getRHSVector() const
+    {
+        return this->rhs;
+    }
 
-    // -------------------------------------------------
-    //  getters
-    // -------------------------------------------------
-
     ///
-    /// \brief
+    /// \brief Return reference to local matrix
     ///
-    Eigen::SparseMatrix<double>& getMatrix()
+    inline const MatrixType &getMatrix() const
     {
         return A;
     }
 
     ///
-    /// \brief
+    /// \brief Compute the residual as \f$\left \| b-Ax \right \|_2\f$
     ///
-    virtual Eigen::VectorXd& getUnknownVector() override
+    inline core::Vectord &computeResidual(const core::Vectord &x, core::Vectord &r) const
     {
-        return x;
-    }
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::VectorXd& getForceVector() override
-    {
-        return b;
-    }
-
-    ///
-    /// \brief Return the size of the matrix
-    ///
-    virtual int getSize() override
-    {
-        return A.rows();
-    };
-
-private:
-    Eigen::SparseMatrix<double> A; ///> sparse matrix
-    Eigen::VectorXd x; ///> the l.h.s vector
-    Eigen::VectorXd b; ///> the r.h.s vector
-};
-
-///
-/// \brief Dense (fully stored) linear system Ax=b using Eigen storage classes
-/// \todo complete the class implementation
-///
-class DenseLinearSystem : LinearSystem
-{
-public:
-    ///
-    /// \brief default constructor
-    ///
-    DenseLinearSystem();
-
-    ///
-    /// \brief destructor
-    ///
-    ~DenseLinearSystem();
-
-    // -------------------------------------------------
-    //  getters
-    // -------------------------------------------------
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::MatrixXd& getMatrix()
-    {
-        return A;
-    }
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::VectorXd& getUnknownVector() override
-    {
-        return x;
-    }
-
-    ///
-    /// \brief
-    ///
-    virtual Eigen::VectorXd& getForceVector() override
-    {
-        return b;
+        r = this->rhs - this->F(x, r);
+        return r;
     }
 
 private:
-    Eigen::MatrixXd A; ///> sparse matrix
-    Eigen::VectorXd x; ///> the l.h.s vector
-    Eigen::VectorXd b; ///> the r.h.s vector
+    const MatrixType &A;
+    const core::Vectord &rhs;
 };
 
-///
-/// \brief linear system Ax=b
-/// \todo complete the class implementation
-///
-class LcpSystem : systemOfEquations
-{
-public:
-    ///
-    /// \brief default constructor
-    ///
-    LcpSystem();
-
-    ///
-    /// \brief destructor
-    ///
-    ~LcpSystem();
-
-private:
-};
 #endif // SM_SYSTEM_OF_EQUATIONS

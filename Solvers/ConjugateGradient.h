@@ -26,97 +26,71 @@
 #include <memory>
 
 // SimMedTK includes
-#include "Core/Config.h"
-#include "Assembler/Assembler.h"
 #include "Solvers/IterativeLinearSolver.h"
 #include "Solvers/SystemOfEquations.h"
 
-// vega includes
-#include "CGSolver.h"
+// Eigen includes
+#include <Eigen/IterativeLinearSolvers>
 
 ///
-/// \brief Conjugate gradient sparse linear solvers
-/// \todo write unit tests
+/// \brief Conjugate gradient sparse linear solver for SPD matrices
 ///
 class ConjugateGradient : public IterativeLinearSolver
 {
 public:
-
     ///
     /// \brief default constructor
     ///
-    ConjugateGradient(
-        const std::shared_ptr<SparseLinearSystem> linSys = nullptr,
-        const int epsilon = 1.0e-6,
-        const int maxIterations = 100);
-
-    ///
-    /// \brief default constructor
-    ///
-    ConjugateGradient(const int epsilon = 1.0e-6, const int maxIterations = 100);
+    ConjugateGradient() = delete;
+    ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs);
 
     ///
     /// \brief destructor
     ///
-    ~ConjugateGradient();
-
-	///
-	/// \brief Solve the linear system using Conjugate gradient iterations
-	///
-    void Solve() override;
-
-    //@{
+    ~ConjugateGradient() = default;
 
     ///
-	/// \brief Solve using the conjugate gradient iterations
-    /// Utility function to be called without an object of this class
-	///
-    static void conjugateGradientSolve(
-        Eigen::SparseMatrix<double>& A,
-        Eigen::VectorXd& x,
-        Eigen::VectorXd& b,
-        const int maxIter = 100,
-        const double epsilon = 1.0e-6);
+    /// \brief Do one iteration of the method
+    ///
+    void iterate(core::Vectord &x) override;
 
+    ///
+    /// \brief Solve the linear system using Conjugate gradient iterations
+    ///
+    void solve(core::Vectord &x) override;
 
-    static void conjugateGradientSolve(
-        std::shared_ptr<LinearSystem> linearSys,
-        const int maxIter /*= 100*/,
-        const double epsilon /*= 1.0e-6*/);
+    ///
+    /// \brief Solve the linear system using Conjugate gradient iterations to a
+    ///     specified tolerance
+    ///
+    void solve(core::Vectord &x, double tolerance);
 
-    ststic void conjugateGradientSolve(
-        Eigen::Matrix<double>& A,
-        Eigen::VectorXd& x,
-        Eigen::VectorXd& b,
-        const int maxIter /*= 100*/,
-        const double epsilon /*= 1.0e-6*/);
+    ///
+    /// Return the error calculated by the solver
+    ///
+    double getError() const;
 
-    static void conjugateGradientIterations(
-        Eigen::SparseMatrix<double>& A,
-        Eigen::VectorXd& x,
-        Eigen::VectorXd& b,
-        const int numIter);
+    ///
+    /// \brief Set the tolerance for the iterative solver
+    ///
+    void setTolerance(const double epsilon)
+    {
+        this->minTolerance = epsilon;
+        this->solver.setTolerance(epsilon);
+    }
 
-    static void conjugateGradientSolve(
-        std::shared_ptr <SparseMatrix> A,
-        double* x,
-        double* b,
-        const int maxIter = 100,
-        const double epsilon = 1.0e-6);
-
-    static void conjugateGradientIterations(
-        std::shared_ptr <SparseMatrix> A,
-        double* x,
-        double* b,
-        const int numIter);
-    //@}
+    ///
+    /// \brief Set the maximum number of iterations for the iterative solver
+    ///
+    void setMaximumIterations(const int maxIter)
+    {
+        this->maxIterations = maxIter;
+        this->solver.setMaxIterations(maxIter);
+    }
 
 private:
     // pointer to the Eigen's Conjugate gradient solver
-    std::shared_ptr<Eigen::ConjugateGradient<Eigen::SparseMatrix<double>>> eigenCgSolver;
-
-    // pointer to the vega's Conjugate gradient solver
-    std::shared_ptr<CGSolver> vegaCgSolver;
+    Eigen::ConjugateGradient<core::SparseMatrixd> solver;
 };
 
 #endif // SM_SPARSE_CG

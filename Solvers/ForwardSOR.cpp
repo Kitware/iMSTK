@@ -21,59 +21,29 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Solvers/IterativeLinearSolver.h"
+#include "ForwardSOR.h"
 
-IterativeLinearSolver::IterativeLinearSolver()
-    : maxIterations(100), minTolerance(1.0e-6)
+ForwardSOR::ForwardSOR(const core::SparseMatrixd &A,
+                       const core::Vectord &rhs,
+                       const double &w): gaussSeidel(A, rhs), weight(w)
+{}
+
+//---------------------------------------------------------------------------
+void ForwardSOR::iterate(core::Vectord &x)
 {
+    auto old = x; // necessary copy
+    this->gaussSeidel.iterate(x);
+    x = this->weight * x + (1 - this->weight) * old;
 }
 
 //---------------------------------------------------------------------------
-void IterativeLinearSolver::solve(core::Vectord &x)
+void ForwardSOR::setWeight(const double &newWeight)
 {
-    if(!this->linearSystem)
-    {
-        return;
-    }
-
-    auto epsilon  = this->minTolerance * this->minTolerance;
-    this->linearSystem->computeResidual(x, this->residual);
-
-    for(int i = 0; i < this->maxIterations; ++i)
-    {
-        if(this->residual.squaredNorm() < epsilon)
-        {
-            return;
-        }
-
-        this->iterate(x);
-    }
+    this->weight = newWeight;
 }
 
 //---------------------------------------------------------------------------
-void IterativeLinearSolver::setTolerance(const double epsilon)
+const double &ForwardSOR::getWeight() const
 {
-    this->minTolerance = epsilon;
-}
-
-//---------------------------------------------------------------------------
-double IterativeLinearSolver::getTolerance() const
-{
-    return this->minTolerance;
-}
-
-//---------------------------------------------------------------------------
-void IterativeLinearSolver::setMaximumIterations(const int maxIter)
-{
-    this->maxIterations = maxIter;
-}
-
-//---------------------------------------------------------------------------
-int IterativeLinearSolver::getMaximumIterations() const
-{
-    return this->maxIterations;
-}
-const core::Vectord &IterativeLinearSolver::getResidual()
-{
-    return this->residual;
+    return this->weight;
 }
