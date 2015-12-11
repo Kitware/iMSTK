@@ -23,19 +23,14 @@ function(simmedtk_install_library target)
   set(multiValueArgs DEPENDS)
   cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
   install(TARGETS ${target}
-    EXPORT ${target}Targets
-    RUNTIME DESTINATION bin COMPONENT Development
-    LIBRARY DESTINATION lib COMPONENT Development
-    ARCHIVE DESTINATION lib COMPONENT Development
-    INCLUDES DESTINATION include COMPONENT Development
+    EXPORT VegaFEMTargets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include
   )
   export(PACKAGE ${target})
-  install(EXPORT ${target}Targets
-    DESTINATION "CMake"
-    NAMESPACE mstk::
-    EXPORT_LINK_INTERFACE_LIBRARIES
-    COMPONENT Development
-  )
+  export(TARGETS ${target} ${target_DEPENDS} APPEND FILE ${target}-exports.cmake)
 endfunction()
 
 function(simmedtk_add_library target)
@@ -51,13 +46,13 @@ function(simmedtk_add_library target)
   target_include_directories(${target}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-      $<INSTALL_INTERFACE:include>
-      $<INSTALL_INTERFACE:include/${target}>
+      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}>
+      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}/${target}>
     )
   if (target_PUBLIC_HEADERS)
     simmedtk_install_library(${target})
     install(FILES ${target_PUBLIC_HEADERS}
-      DESTINATION include/${target}
+      DESTINATION include/v${SimMedTK_VERSION}/${target}
       COMPONENT Development
     )
   endif()
@@ -98,3 +93,30 @@ macro(configure_msvc_runtime)
     endforeach()
   endif()
 endmacro()
+
+# Download url to local filename
+function(DOWNLOAD_DATA url filename)
+    # If the file already exist then skip this function
+    if(EXISTS ${filename})
+        return()
+    endif()
+
+    # Set data directorty to the file path
+    get_filename_component(data_directory ${filename} DIRECTORY)
+
+    # Create a Matrix directory to store the matrix data
+    if(NOT EXISTS ${data_directory})
+        file(MAKE_DIRECTORY ${data_directory})
+    endif()
+
+    # Download file
+    file(DOWNLOAD "${url}" "${filename}"
+        SHOW_PROGRESS
+        STATUS DOWNLOAD_STATUS
+        LOG log)
+    list(GET DOWNLOAD_STATUS 0 STATUS0)
+    if(NOT STATUS0 STREQUAL "0")
+        list(GET DOWNLOAD_STATUS 1 STATUS1)
+        message("${STATUS1}")
+    endif()
+endfunction(DOWNLOAD_DATA)

@@ -37,13 +37,15 @@
 using namespace bandit;
 using namespace core;
 
+const std::string matrix = "@CMAKE_BINARY_DIR@/Testing/MatrixData/bcsstk27.mtx";
+
 go_bandit([]()
 {
     describe("Solver", []()
     {
         SparseMatrixd A;
         Vectord b;
-        ReadSparseMatrix("../Testing/MatrixData/bcsstk27.mtx", A);
+        ReadSparseMatrix(matrix, A);
         Matrixd Adense(A);
         b.setRandom(A.cols());
         Vectord solution(A.cols());
