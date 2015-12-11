@@ -70,7 +70,7 @@ go_bandit([]()
             CGSolver->setMaximumIterations(A.cols());
             CGSolver->setTolerance(1e-12);
             CGSolver->solve(solution);
-            AssertThat(CGSolver->getResidual().norm(), IsLessThan(1e-10));
+            AssertThat(CGSolver->getResidual().norm(), IsLessThan(1e-8));
         });
         it("ForwardGaussSeidel solves", [&]()
         {

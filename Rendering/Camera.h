@@ -147,12 +147,12 @@ public:
     /// \brief Returns the internal view matrix for the camera
     ///
     /// \return A 4 by 4 matrix containing the view matrix of the camera
-    const Matrix44f &getViewMat();
+    const core::Matrix44f &getViewMat();
 
     /// \brief Returns the internal projection matrix for the camera
     ///
     /// \return A 4 by 4 matrix containing the projection matrix of the camera
-    const Matrix44f &getProjMat();
+    const core::Matrix44f &getProjMat();
 
     /// \brief Pan the camera view
     ///
@@ -240,7 +240,7 @@ public:
     /// \param up Upward facing direction of the camera
     ///
     /// \return A 4 by 4 matrix containing the view matrix
-    Matrix44f lookAt(const core::Vec3f &pos,
+    core::Matrix44f lookAt(const core::Vec3f &pos,
                      const core::Vec3f &fp,
                      const core::Vec3f &up) const;
 
@@ -254,7 +254,7 @@ public:
     /// \param zFar The far clipping distance
     ///
     /// \return A 4 by 4 matrix containing the perspective matrix
-    Matrix44f perspective(const float &fovy, const float &ar,
+    core::Matrix44f perspective(const float &fovy, const float &ar,
                           const float &zNear, const float &zFar) const;
 
     //Create matrices
@@ -321,7 +321,7 @@ public:
     /// updated also
     ///
     /// \param m The new view matrix of the camera
-    void setViewMat(const Matrix44f &m);
+    void setViewMat(const core::Matrix44f &m);
 
     /// \brief Replace the internal projection matrix of the camera
     ///
@@ -329,7 +329,7 @@ public:
     /// updated also
     ///
     /// \param m The new projection matrix of the camera
-    void setProjMat(const Matrix44f &m);
+    void setProjMat(const core::Matrix44f &m);
 
     /// \brief Sets the orientation  of the camera from a given direction
     ///
@@ -348,7 +348,7 @@ private:
     std::mutex fpLock; //< Controls access to the fp variable
     core::Quaternionf orientation; ///< orientation of the camera
     std::mutex orientationLock; //< Controls access to the orientation variable
-    Matrix44f view; ///< View matrix for OpenGL
+    core::Matrix44f view; ///< View matrix for OpenGL
     std::mutex viewLock; //< Controls access to the view variable
     std::atomic_bool viewDirty; ///< True if view variables have been updated
     std::atomic_bool orientDirty; ///< True if orientation needs to be recalculated
@@ -359,7 +359,7 @@ private:
     std::atomic<float> angle; ///< angle in radians
     std::atomic<float> nearClip; ///< near clipping distance
     std::atomic<float> farClip; ///< far clipping distance
-    Matrix44f proj; ///< Projection matrix for OpenGL
+    core::Matrix44f proj; ///< Projection matrix for OpenGL
     std::mutex projLock; //< Controls access to the proj variable
     std::atomic_bool projDirty; ///< True if projection variables have been updated
 };

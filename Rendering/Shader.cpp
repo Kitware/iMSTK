@@ -856,7 +856,7 @@ bool Shader::setProjectionMatrixShaderName(const std::string& p_projectionName)
 }
 void Shader::updateGLSLMatwithOPENGL()
 {
-    Matrix44f proj, model;
+    core::Matrix44f proj, model;
     GLUtils::queryModelViewMatrix( model );
     GLUtils::queryProjectionMatrix( proj );
 

@@ -85,9 +85,9 @@ public:
     /// \brief draw unit quad
     static void drawUnitQuadOnScreen();
 
-    static void queryProjectionMatrix(Matrix44f &p_matrix);
+    static void queryProjectionMatrix(core::Matrix44f &p_matrix);
     /// \brief to query current model view matrix. p_matrix will have the final values.
-    static void queryModelViewMatrix(Matrix44f &p_matrix);
+    static void queryModelViewMatrix(core::Matrix44f &p_matrix);
 
 private:
     std::vector<std::string> openGLExtensions;

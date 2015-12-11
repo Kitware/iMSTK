@@ -31,10 +31,8 @@
 #include <Eigen/Sparse>
 #include <Eigen/Geometry>
 
-// namespace SimMedTK
-// {
-// namespace Math
-// {
+namespace core
+{
 
 /// A 2x2 matrix
 template<typename T>
@@ -61,8 +59,8 @@ template<typename T>
 using Matrix = Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 
 /// A dynamic size sparse column-major matrix
-// template<typename T, int StorageType = Eigen::ColMajor>
-// using SparseMatrix = Eigen::SparseMatrix<T,StorageType>;
+template<typename T, int StorageType = Eigen::RowMajor>
+using SparseMatrix = Eigen::SparseMatrix<T,StorageType>;
 
 /// A 2x2 matrix of floats.
 using Matrix22f = Matrix22<float>;
@@ -96,6 +94,9 @@ using Matrixf = Matrix<float>;
 
 /// A dynamic size matrix of doubles
 using Matrixd = Matrix<double>;
+
+/// A dynamic size sparse matrix of doubles
+using SparseMatrixd = SparseMatrix<double>;
 
 template<typename T, int StorageType>
 void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)
@@ -141,9 +142,6 @@ void conjugateGradient(const Eigen::SparseMatrix<T,StorageType> &A,
     x = solver.solve(b);
 }
 
-
-// } // Math
-// } // SimMedTK
-
+} // Core
 
 #endif // SMMATRIX_H

@@ -55,9 +55,9 @@ public:
 
     const core::Vec3d &getAngles();
 
-    const Matrix44d &getTransform();
+    const core::Matrix44d &getTransform();
 
-    void setTransform(const Matrix44d &deviceTransform);
+    void setTransform(const core::Matrix44d &deviceTransform);
 
     const core::Vec3d &getForce();
 
@@ -90,7 +90,7 @@ private:
     core::Vec3d angles; // angles
     core::Vec3d force; // input force
     core::Vec3d torque; // input torque
-    Matrix44d transform; // transformation matrix
+    core::Matrix44d transform; // transformation matrix
     std::array<bool,4> buttonState;//will be chnage later on
 };
 

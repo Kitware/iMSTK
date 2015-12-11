@@ -161,7 +161,7 @@ void Camera::setOrientation(const core::Quaternionf &q)
 
 void Camera::setOrientFromDir(const core::Vec3f &d)
 {
-    Matrix33f camAxes;
+    core::Matrix33f camAxes;
     core::Vec3f tempUp;
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(orientationLock);
@@ -184,7 +184,7 @@ const core::Quaternionf &Camera::getOrientation()
     return this->orientation;
 }
 
-const Matrix44f &Camera::getViewMat()
+const core::Matrix44f &Camera::getViewMat()
 {
     if (true == this->viewDirty.load())
     {
@@ -194,7 +194,7 @@ const Matrix44f &Camera::getViewMat()
     return this->view;
 }
 
-void Camera::setViewMat(const Matrix44f &m)
+void Camera::setViewMat(const core::Matrix44f &m)
 {
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(this->viewLock);
@@ -203,7 +203,7 @@ void Camera::setViewMat(const Matrix44f &m)
     this->viewDirty.store(false);
 }
 
-const Matrix44f &Camera::getProjMat()
+const core::Matrix44f &Camera::getProjMat()
 {
     if (true == this->projDirty.load())
     {
@@ -213,7 +213,7 @@ const Matrix44f &Camera::getProjMat()
     return this->proj;
 }
 
-void Camera::setProjMat(const Matrix44f &m)
+void Camera::setProjMat(const core::Matrix44f &m)
 {
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(this->projLock);
@@ -289,7 +289,7 @@ void Camera::rotateFocusZ(const float &angle)
     rotateFocus(angle, core::Vec3f::UnitZ());
 }
 
-Matrix44f Camera::lookAt(const core::Vec3f &pos,
+core::Matrix44f Camera::lookAt(const core::Vec3f &pos,
                          const core::Vec3f &fp,
                          const core::Vec3f &up) const
 {
@@ -298,7 +298,7 @@ Matrix44f Camera::lookAt(const core::Vec3f &pos,
     core::Vec3f s = f.cross(u).normalized();
     u = s.cross(f);
 
-    Matrix44f res;
+    core::Matrix44f res;
     res <<  s.x(),s.y(),s.z(),-s.dot(pos),
             u.x(),u.y(),u.z(),-u.dot(pos),
             -f.x(),-f.y(),-f.z(),f.dot(pos),
@@ -312,14 +312,14 @@ void Camera::genViewMat()
     this->setViewMat(Camera::lookAt(getPos(), getFocus(), getUpVec()));
 }
 
-Matrix44f Camera::perspective(const float &fovy, const float &ar,
+core::Matrix44f Camera::perspective(const float &fovy, const float &ar,
                               const float &zNear, const float &zFar) const
 {
     assert(ar > 0);
     assert(zFar > zNear);
 
     double tanHalfFovy = std::tan(fovy / 2.0);
-    Matrix44f res = Matrix44f::Zero();
+    core::Matrix44f res = core::Matrix44f::Zero();
 
     res(0,0) = 1.0 / (ar * tanHalfFovy);
     res(1,1) = 1.0 / (tanHalfFovy);
