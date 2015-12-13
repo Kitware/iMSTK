@@ -55,11 +55,11 @@ const core::Vec3d& HapticEvent::getAngles()
 {
     return this->angles;
 }
-const Matrix44d& HapticEvent::getTransform()
+const core::Matrix44d& HapticEvent::getTransform()
 {
     return this->transform;
 }
-void HapticEvent::setTransform(const Matrix44d& deviceTransform)
+void HapticEvent::setTransform(const core::Matrix44d& deviceTransform)
 {
     this->transform = deviceTransform;
 }

@@ -37,13 +37,15 @@
 using namespace bandit;
 using namespace core;
 
+const std::string matrix = "@CMAKE_BINARY_DIR@/Testing/MatrixData/bcsstk27.mtx";
+
 go_bandit([]()
 {
     describe("Solver", []()
     {
         SparseMatrixd A;
         Vectord b;
-        ReadSparseMatrix("../Testing/MatrixData/bcsstk27.mtx", A);
+        ReadSparseMatrix(matrix, A);
         Matrixd Adense(A);
         b.setRandom(A.cols());
         Vectord solution(A.cols());
@@ -70,7 +72,7 @@ go_bandit([]()
             CGSolver->setMaximumIterations(A.cols());
             CGSolver->setTolerance(1e-12);
             CGSolver->solve(solution);
-            AssertThat(CGSolver->getResidual().norm(), IsLessThan(1e-10));
+            AssertThat(CGSolver->getResidual().norm(), IsLessThan(1e-8));
         });
         it("ForwardGaussSeidel solves", [&]()
         {

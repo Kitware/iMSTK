@@ -144,8 +144,8 @@ void OculusViewer::renderToScreen(const RenderOperation &p_rop)
     //for each eye ...
     for (i = 0; i < 2; i++) {
         ovrEyeType eye = hmd->EyeRenderOrder[i];
-        Matrix44f proj;
-        Matrix44f view;
+        core::Matrix44f proj;
+        core::Matrix44f view;
         Eigen::Affine3f viewRotation;
         Eigen::Affine3f headTracking;
         Eigen::Affine3f playerHeight;
@@ -166,7 +166,7 @@ void OculusViewer::renderToScreen(const RenderOperation &p_rop)
         // OpenGL expects, so we have to transpose them.
         ovrProj = ovrMatrix4f_Projection(hmd->DefaultEyeFov[eye], 0.1, 500.0, 1);
         //copy the ovr matrix into a matrix and transpose it
-        proj = Eigen::Map<Matrix44f>(&(ovrProj.M[0][0]));
+        proj = Eigen::Map<core::Matrix44f>(&(ovrProj.M[0][0]));
         proj.transposeInPlace();
 
         // -- view/camera transformation --
@@ -196,7 +196,7 @@ void OculusViewer::renderToScreen(const RenderOperation &p_rop)
         playerHeight = (Eigen::Translation3f(
             0, -ovrHmd_GetFloat(hmd, OVR_KEY_EYE_HEIGHT, 1.65), 0));
 
-        Matrix44f trans = (viewRotation * headTracking * playerHeight).matrix();
+        core::Matrix44f trans = (viewRotation * headTracking * playerHeight).matrix();
         view = trans * view;
 
         //Render Scene

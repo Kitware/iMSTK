@@ -288,7 +288,7 @@ bool CollisionMoller::checkAABBTriangle( AABB &p_aabb, core::Vec3d &v1, core::Ve
 
     core::Vec3d boxhalfsize;
     core::Vec3d boxCenter;
-    Matrix33d triverts;
+    core::Matrix33d triverts;
     triverts << v1[0],v1[1],v1[2],
                 v2[0],v2[1],v2[2],
                 v3[0],v3[1],v3[2];

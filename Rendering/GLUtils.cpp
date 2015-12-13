@@ -139,11 +139,11 @@ void GLUtils::drawUnitQuadOnScreen()
     glVertex3d(-1, 1.0, -1);
     glEnd();
 }
-void GLUtils::queryProjectionMatrix(Matrix44f& p_matrix)
+void GLUtils::queryProjectionMatrix(core::Matrix44f& p_matrix)
 {
     glGetFloatv(GL_PROJECTION_MATRIX, p_matrix.data());
 }
-void GLUtils::queryModelViewMatrix(Matrix44f& p_matrix)
+void GLUtils::queryModelViewMatrix(core::Matrix44f& p_matrix)
 {
     glGetFloatv(GL_MODELVIEW_MATRIX, p_matrix.data());
 }

@@ -65,7 +65,7 @@ public:
     ~AnalyticalGeometry(){}
 
     virtual void translate(const core::Vec3d &t) = 0;
-    virtual void rotate(const Matrix33d &rot) = 0;
+    virtual void rotate(const core::Matrix33d &rot) = 0;
 };
 
 /// \brief  Simple Plane definition with unit normal and spatial location
@@ -148,7 +148,7 @@ public:
         this->movedOrRotated = true;
     }
 
-    void rotate(const Matrix33d &rot)
+    void rotate(const core::Matrix33d &rot)
     {
         this->unitNormal = rot * this->unitNormal;
 
@@ -182,7 +182,7 @@ public:
         ny.normalize();
         nz.normalize();
 
-        Matrix33d R;
+        core::Matrix33d R;
         R << this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2];
@@ -262,7 +262,7 @@ public:
         center += t;
     }
 
-    void rotate(const Matrix33d &/*rot*/)
+    void rotate(const core::Matrix33d &/*rot*/)
     {
         //Its a sphere! nothing to be done.
     }

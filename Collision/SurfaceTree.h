@@ -41,7 +41,7 @@ template<typename CellType>
 class SurfaceTree : public CoreClass
 {
 protected:
-  typedef Matrix44d MatrixType;
+  typedef core::Matrix44d MatrixType;
 
 protected:
     int minTreeRenderLevel; 						///< !!

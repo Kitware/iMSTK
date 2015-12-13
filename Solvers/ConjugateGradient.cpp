@@ -33,7 +33,7 @@ ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::iterate(core::Vectord &)
+void ConjugateGradient::iterate(core::Vectord &, bool)
 {
     std::cout << "Nothing to do\n";
 }

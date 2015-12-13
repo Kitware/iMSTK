@@ -304,6 +304,7 @@ add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)
 add_subdirectory(VirtualTools)
 add_subdirectory(Examples)
+add_subdirectory(Solvers)
 
 ################################################################################
 # Build documentation
