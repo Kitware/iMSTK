@@ -64,10 +64,10 @@ public:
 
     /// \brief Set the collision pair data structure in which the information
     /// needs to be stored
-    void setCollisionPairs(const std::shared_ptr< CollisionPair > colPair);
+    void setCollisionPairs(const std::shared_ptr<CollisionDataManager> colPair);
 
     /// \brief Get the colliison information contained in the collision pairs
-    std::shared_ptr<CollisionPair> getCollisionPairs() const;
+    std::shared_ptr<CollisionDataManager> getCollisionPairs() const;
 
     /// \brief Get if the contact handling is unilateral or bilateral
     ContactHandlingType getContactHandlingType() const;

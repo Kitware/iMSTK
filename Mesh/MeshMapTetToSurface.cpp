@@ -20,3 +20,28 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+
+#include "Mesh/MeshMapTetToSurface.h"
+
+MeshMapTetToSurface::MeshMapTetToSurface() : MeshMap()
+{
+}
+
+MeshMapTetToSurface::MeshMapTetToSurface(
+    std::shared_ptr<Core::BaseMesh>& masterMesh,
+    std::shared_ptr<Core::BaseMesh>& slaveMesh)
+    : MeshMap(masterMesh, slaveMesh)
+{
+}
+
+MeshMapTetToSurface::~MeshMapTetToSurface()
+{
+}
+
+void MeshMapTetToSurface::apply()
+{
+}
+
+void MeshMapTetToSurface::compute()
+{
+}

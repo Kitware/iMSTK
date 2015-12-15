@@ -78,6 +78,24 @@ public:
 };
 
 ///
+/// \brief Class containing the edge-edge collision data
+/// \todo implement this class
+///
+class EdgeEdgeCollisionData : public CollisionDataBase
+{
+
+};
+
+///
+/// \brief Class containing the vertex-triangle collision data
+/// \todo implement this class
+///
+class VertexTriangleCollisionData : public CollisionDataBase
+{
+
+};
+
+///
 /// \brief Contains pair of potential collision models
 ///   This class also stores contacts between those models.
 ///

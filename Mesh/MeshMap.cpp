@@ -21,48 +21,60 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMGEOMETRY_H
-#define SMGEOMETRY_H
+#include "Mesh/MeshMap.h"
 
-// SimMedTK includes
-#include "Core/Config.h"
-#include "Core/Vector.h"
-#include "Core/Matrix.h"
-
-#include "Core/Factory.h"
-#include "RenderDelegate.h"
-
-class VisualArtifact
+MeshMap::MeshMap()
 {
-public:
-  virtual void setRenderDelegate(RenderDelegate::Ptr delegate)
-    {
-    this->renderDelegate = delegate;
-    if (delegate)
-      this->renderDelegate->setSourceGeometry(this);
-    }
-  virtual void draw() const
-    {
-    if (this->renderDelegate)
-      this->renderDelegate->draw();
-    }
+    this->active = false;
+}
 
-    /// \brief Get render delegate
-    std::shared_ptr<RenderDelegate> getRenderDelegate() const
-    {
-        return this->renderDelegate;
-    }
-  RenderDelegate::Ptr renderDelegate;
-};
-
-class GeometryBase : public CoreClass
+MeshMap::MeshMap(
+    std::shared_ptr<Core::BaseMesh> masterMesh,
+    std::shared_ptr<Core::BaseMesh> slaveMesh)
 {
-public:
-    GeometryBase(){}
-    ~GeometryBase(){}
+    if (masterMesh != slaveMesh)
+    {
+        this->masterMesh = masterMesh;
+        this->slaveMesh = slaveMesh;
+    }
+    this->active = true;
+}
 
-    virtual void translate(const core::Vec3d &t) = 0;
-    virtual void rotate(const core::Matrix33d &rot) = 0;
-};
+MeshMap::~MeshMap()
+{
+}
 
-#endif
+void MeshMap::setMasterMesh(std::shared_ptr<Core::BaseMesh> masterMesh)
+{
+    this->masterMesh = masterMesh;
+}
+
+void MeshMap::setSlaveMesh(std::shared_ptr<Core::BaseMesh> slaveMesh)
+{
+    this->slaveMesh = slaveMesh;
+}
+
+std::shared_ptr<Core::BaseMesh> MeshMap::getMasterMesh()
+{
+    return masterMesh;
+}
+
+std::shared_ptr<Core::BaseMesh> MeshMap::getSlaveMesh()
+{
+    return this->slaveMesh;
+}
+
+void MeshMap::deactivate()
+{
+    this->active = false;
+}
+
+void MeshMap::activate()
+{
+    this->active = true;
+}
+
+bool MeshMap::isActive()
+{
+    return this->active;
+}

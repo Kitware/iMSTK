@@ -1,5 +1,6 @@
 simmedtk_add_library(Core
   SOURCES
+    AnalyticalGeometry.cpp
     BaseMesh.cpp
     CollisionConfig.cpp
     CollisionDetection.cpp
@@ -22,7 +23,8 @@ simmedtk_add_library(Core
     UnifiedId.cpp
     ViewerBase.cpp
   PUBLIC_HEADERS
-    BaseMesh.h
+    AnalyticalGeometry.h
+	BaseMesh.h
     CollisionConfig.h
     CollisionDetection.h
     CollisionManager.h

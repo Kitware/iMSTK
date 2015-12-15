@@ -21,48 +21,53 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMGEOMETRY_H
-#define SMGEOMETRY_H
+#ifndef SM_MESH_MAP_TET_TO_SURFACE
+#define SM_MESH_MAP_TET_TO_SURFACE
 
 // SimMedTK includes
-#include "Core/Config.h"
-#include "Core/Vector.h"
-#include "Core/Matrix.h"
+#include "Mesh/MeshMap.h"
 
-#include "Core/Factory.h"
-#include "RenderDelegate.h"
-
-class VisualArtifact
+///
+/// \brief Maps a tetrahedral volume mesh (master) to
+/// the surface mesh (slave) using custom interpolation
+///
+class MeshMapTetToSurface : public MeshMap
 {
-public:
-  virtual void setRenderDelegate(RenderDelegate::Ptr delegate)
-    {
-    this->renderDelegate = delegate;
-    if (delegate)
-      this->renderDelegate->setSourceGeometry(this);
-    }
-  virtual void draw() const
-    {
-    if (this->renderDelegate)
-      this->renderDelegate->draw();
-    }
 
-    /// \brief Get render delegate
-    std::shared_ptr<RenderDelegate> getRenderDelegate() const
-    {
-        return this->renderDelegate;
-    }
-  RenderDelegate::Ptr renderDelegate;
+public:
+    ///
+    /// \brief constructor
+    ///
+    MeshMapTetToSurface();
+
+    ///
+    /// \brief constructor with the two meshes being mapped
+    /// as parameters
+    ///
+    MeshMapTetToSurface(
+        std::shared_ptr<Core::BaseMesh>& masterMesh,
+        std::shared_ptr<Core::BaseMesh>& slaveMesh);
+
+    ///
+    /// \brief destructor
+    ///
+    ~MeshMapTetToSurface();
+
+    ///
+    /// \brief apply the map
+    ///
+    virtual void apply() override;
+
+    ///
+    /// \brief compute the map
+    ///
+    void compute() override;
+
+private:
+
+    std::vector<int> vertIndices;///> List of indices of vectors
+
+    std::vector<double> weights;///> List of weights
 };
 
-class GeometryBase : public CoreClass
-{
-public:
-    GeometryBase(){}
-    ~GeometryBase(){}
-
-    virtual void translate(const core::Vec3d &t) = 0;
-    virtual void rotate(const core::Matrix33d &rot) = 0;
-};
-
-#endif
+#endif //SM_MESH_MAP_TET_TO_SURFACE

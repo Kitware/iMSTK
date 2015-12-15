@@ -21,48 +21,43 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMGEOMETRY_H
-#define SMGEOMETRY_H
+#include "Mesh/MeshMapAffine.h"
 
-// SimMedTK includes
-#include "Core/Config.h"
-#include "Core/Vector.h"
-#include "Core/Matrix.h"
+#include <memory>
 
-#include "Core/Factory.h"
-#include "RenderDelegate.h"
-
-class VisualArtifact
+MeshMapAffine::MeshMapAffine(const TransformType& M)
 {
-public:
-  virtual void setRenderDelegate(RenderDelegate::Ptr delegate)
-    {
-    this->renderDelegate = delegate;
-    if (delegate)
-      this->renderDelegate->setSourceGeometry(this);
-    }
-  virtual void draw() const
-    {
-    if (this->renderDelegate)
-      this->renderDelegate->draw();
-    }
+    this->affineTransform = M;
+}
 
-    /// \brief Get render delegate
-    std::shared_ptr<RenderDelegate> getRenderDelegate() const
-    {
-        return this->renderDelegate;
-    }
-  RenderDelegate::Ptr renderDelegate;
-};
+MeshMapAffine::MeshMapAffine(std::shared_ptr<Core::BaseMesh>& masterMesh,
+                             std::shared_ptr<Core::BaseMesh>& slaveMesh,
+                             const TransformType& M)
+    : MeshMap(masterMesh,slaveMesh)
 
-class GeometryBase : public CoreClass
 {
-public:
-    GeometryBase(){}
-    ~GeometryBase(){}
+    this->affineTransform = M;
+}
 
-    virtual void translate(const core::Vec3d &t) = 0;
-    virtual void rotate(const core::Matrix33d &rot) = 0;
-};
+MeshMapAffine::~MeshMapAffine()
+{
+}
 
-#endif
+void MeshMapAffine::apply()
+{
+    // First copy the co-ordinates of the nodal points of master mesh to slave mesh
+    this->slaveMesh->setVertices(this->masterMesh->getVertices());
+
+    // Do the affine transform
+    this->slaveMesh->transform(this->affineTransform);
+}
+
+void MeshMapAffine::compute()
+{
+    // do nothing here since it is an identity map
+}
+
+const MeshMapAffine::TransformType& MeshMapAffine::getAffineTransform() const
+{
+    return this->affineTransform;
+}
