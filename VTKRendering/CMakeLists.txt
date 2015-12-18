@@ -37,6 +37,11 @@ else()
 
 endif()
 
+target_compile_options(VTKRendering
+  PUBLIC
+    $<$<CXX_COMPILER_ID:Clang>:-Wno-inconsistent-missing-override>
+)
+
 if(BUILD_TESTING)
   add_subdirectory(UnitTests)
 endif()
