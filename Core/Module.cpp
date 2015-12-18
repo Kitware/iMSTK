@@ -28,7 +28,8 @@
 
 Module::Module() :
     isInitialized(false),
-    terminateExecution(false)
+    terminateExecution(false),
+    terminationCompleted(false)
 {
     this->name = "Module";
 }
@@ -57,10 +58,10 @@ bool Module::isTerminated()
 //---------------------------------------------------------------------------
 void Module::waitTermination()
 {
-    while ( 1 )
+    while (1)
     {
         //std::cout << this->name << std::endl;
-        if ( this->terminationCompleted == true )
+        if (true == isTerminationDone())
         {
             break;
         }

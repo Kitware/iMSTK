@@ -178,7 +178,7 @@ void SDK::run()
         this->viewer->exec();
     }
 
-    // Tell framework threads to shutdown if the viewer returs
+    // Tell framework threads to shutdown if the viewer returns
     this->shutDown();
     this->terminateAll();
 

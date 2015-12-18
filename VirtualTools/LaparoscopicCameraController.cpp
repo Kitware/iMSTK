@@ -159,9 +159,16 @@ void LaparoscopicCameraController::exec()
 
         std::this_thread::sleep_for(this->poolDelay);
     }
+
+    // Ensure proper shutdown takes place for the inputDevice
+    //  -Thread MUST be terminated before calling closeDevice()
+    //    -This is to prevent mainloops that do not check for deleted objects
+    //     from running.
+    this->inputDevice->terminate();
+    this->inputDevice->waitTermination();
     this->inputDevice->closeDevice();
 
-    this->terminate();
+    this->terminationCompleted = true;
 }
 
 bool LaparoscopicCameraController::updateCamera()

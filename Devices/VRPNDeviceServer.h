@@ -27,9 +27,6 @@
 
 #include "Devices/DeviceInterface.h"
 
-class vrpn_Analog;
-class vrpn_Tracker;
-class vrpn_ForceDeviceServer;
 class vrpn_Connection;
 
 class VRPNDeviceServer : public DeviceInterface
@@ -44,10 +41,7 @@ public:
     void exec() override;
 
 private:
-    std::vector<std::shared_ptr<vrpn_Analog>> analogServers;
-    std::vector<std::shared_ptr<vrpn_Tracker>> trackerServers;
-    std::vector<std::shared_ptr<vrpn_ForceDeviceServer>> forceServers;
-    std::shared_ptr<vrpn_Connection> connection;
+    vrpn_Connection *connection;
 };
 
 #endif // VRPNSERVERDEVICE_H
