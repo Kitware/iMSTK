@@ -73,7 +73,7 @@ public:
     ///
     /// \brief Set the tolerance for the iterative solver
     ///
-    void setTolerance(const double epsilon)
+    void setTolerance(const double epsilon) override
     {
         this->minTolerance = epsilon;
         this->solver.setTolerance(epsilon);
@@ -82,7 +82,7 @@ public:
     ///
     /// \brief Set the maximum number of iterations for the iterative solver
     ///
-    void setMaximumIterations(const int maxIter)
+    void setMaximumIterations(const int maxIter) override
     {
         this->maxIterations = maxIter;
         this->solver.setMaxIterations(maxIter);

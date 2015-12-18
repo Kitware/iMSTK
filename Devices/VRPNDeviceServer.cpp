@@ -36,7 +36,7 @@
 #include <server_src/vrpn_Phantom.h>
 #endif
 
-VRPNDeviceServer::VRPNDeviceServer() : connection(vrpn_create_server_connection())
+VRPNDeviceServer::VRPNDeviceServer() : connection(nullptr)
 {
     this->name = "VRPNDeviceServer";
 
@@ -45,32 +45,41 @@ VRPNDeviceServer::VRPNDeviceServer() : connection(vrpn_create_server_connection(
 //---------------------------------------------------------------------------
 void VRPNDeviceServer::exec()
 {
+    connection = vrpn_create_server_connection();
+
+    if(!connection)
+    {
+        this->terminateExecution = true;
+        this->terminationCompleted = true;
+        return;
+    }
+
     // Create the various device objects
     std::shared_ptr<vrpn_3DConnexion_SpaceExplorer> explorer =
     std::make_shared<vrpn_3DConnexion_SpaceExplorer>("explorer",
-                                                         this->connection.get());
+                                                         this->connection);
     std::shared_ptr<vrpn_3DConnexion_Navigator> navigator =
     std::make_shared<vrpn_3DConnexion_Navigator>("navigator",
-                                                        this->connection.get());
+                                                        this->connection);
     std::shared_ptr<vrpn_Tracker_RazerHydra> razer =
-        std::make_shared<vrpn_Tracker_RazerHydra>("razer", this->connection.get());
+        std::make_shared<vrpn_Tracker_RazerHydra>("razer", this->connection);
     std::shared_ptr<vrpn_Tracker_FilterOneEuro> razerFiltered =
         std::make_shared<vrpn_Tracker_FilterOneEuro>("razer_filtered",
-                                                     this->connection.get(),
+                                                     this->connection,
                                                      "*razer",
                                                      7);
     std::shared_ptr<vrpn_Xkeys_XK3> xkeys =
-        std::make_shared<vrpn_Xkeys_XK3>("xkeys", this->connection.get());
+        std::make_shared<vrpn_Xkeys_XK3>("xkeys", this->connection);
 
 #ifdef VRPN_USE_PHANTOM_SERVER
     std::shared_ptr<vrpn_Phantom> phantom =
         std::make_shared<vrpn_Phantom>("Phantom0",
-                                       this->connection.get(),
+                                       this->connection,
                                        60.0f,
                                        "Default PHANToM");
     std::shared_ptr<vrpn_Tracker_FilterOneEuro> phantomFiltered =
         std::make_shared<vrpn_Tracker_FilterOneEuro>("phantom_filtered",
-                                                     this->connection.get(),
+                                                     this->connection,
                                                      "*phantom",
                                                      7);
 #endif
@@ -92,6 +101,10 @@ void VRPNDeviceServer::exec()
 
         std::this_thread::sleep_for(this->pollDelay);
     }
+
+    // connections allocated with vrpn_create_server_connection()
+    // must decrement their reference to be auto-deleted by VRPN
+    connection->removeReference();
 
     this->terminationCompleted = true;
 }
