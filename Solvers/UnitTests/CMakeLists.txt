@@ -1,5 +1,7 @@
 set(Module Solvers)
 
+include(MatrixMarket)
+
 configure_file(SolversSpec.cpp.in ${CMAKE_CURRENT_BINARY_DIR}/SolversSpec.cpp @ONLY)
 
 add_executable(${Module}UnitTestRunner

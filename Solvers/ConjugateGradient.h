@@ -39,57 +39,65 @@ class ConjugateGradient : public IterativeLinearSolver
 {
 public:
     ///
-    /// \brief default constructor
+    /// \brief Constructors/Destructor
     ///
-    ConjugateGradient() = delete;
-    ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs);
-
-    ///
-    /// \brief destructor
-    ///
+    ConjugateGradient() = default;
     ~ConjugateGradient() = default;
 
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Constructor
+    ///
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param rhs Right hand side of the linear system of equations.
+    ///
+    ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs);
+    ConjugateGradient(const ConjugateGradient &) = delete;
+    ConjugateGradient &operator=(const ConjugateGradient &) = delete;
+
+    ///
+    /// \brief Do one iteration of the method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual Compute residual if true.
     ///
     void iterate(core::Vectord &x, bool updateResidual = true) override;
 
     ///
-    /// \brief Solve the linear system using Conjugate gradient iterations
+    /// \brief Solve the system of equations.
+    ///
+    /// \param x Upon return it contains the approximate solution of the linear system.
     ///
     void solve(core::Vectord &x) override;
 
     ///
     /// \brief Solve the linear system using Conjugate gradient iterations to a
-    ///     specified tolerance
+    ///     specified tolerance.
+    ///
+    /// \param tolerance Specified tolerance.
     ///
     void solve(core::Vectord &x, double tolerance);
 
     ///
-    /// Return the error calculated by the solver
+    /// \brief Return the error calculated by the solver.
     ///
-    double getError() const;
+    double getError(const core::Vectord &x) override;
 
     ///
-    /// \brief Set the tolerance for the iterative solver
+    /// \brief Set the tolerance for the iterative solver.
     ///
-    void setTolerance(const double epsilon) override
-    {
-        this->minTolerance = epsilon;
-        this->solver.setTolerance(epsilon);
-    }
+    /// \param tolerance Specified tolerance.
+    ///
+    void setTolerance(const double tolerance) override;
 
     ///
     /// \brief Set the maximum number of iterations for the iterative solver
     ///
-    void setMaximumIterations(const int maxIter) override
-    {
-        this->maxIterations = maxIter;
-        this->solver.setMaxIterations(maxIter);
-    }
+    /// \param maxIter Specified maximum tolerance.
+    ///
+    void setMaximumIterations(const size_t maxIter) override;
 
 private:
-    // pointer to the Eigen's Conjugate gradient solver
+    ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<core::SparseMatrixd> solver;
 };
 

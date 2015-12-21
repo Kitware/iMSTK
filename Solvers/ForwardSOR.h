@@ -26,43 +26,52 @@
 
 // SimMedTK includes
 #include "Solvers/ForwardGaussSeidel.h"
-#include "Core/Matrix.h"
-#include "Core/Vector.h"
 
 ///
-/// \brief Gauss Seidel successive overrelaxation sparse linear solver
+/// \brief Forward version of the Gauss Seidel successive overrelaxation sparse
+///     linear solver.
 ///
-class ForwardSOR : public IterativeLinearSolver
+class ForwardSOR : public ForwardGaussSeidel
 {
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    ForwardSOR() = delete;
+    ForwardSOR();
+    ~ForwardSOR() = default;
     ForwardSOR(const ForwardSOR &) = delete;
+
     ForwardSOR &operator=(const ForwardSOR &) = delete;
 
+    ///
+    /// \brief This constructor creates a system object with A and rhs.
+    ///
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param rhs Right hand side of the linear equation.
+    ///
     ForwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w = .5);
 
-    ~ForwardSOR() = default;
-
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Do one iteration of the method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual True if you want to compute the residual.
     ///
     void iterate(core::Vectord &x, bool updateResidual = true) override;
 
     ///
-    /// \brief Set Weight
+    /// \brief Set acceleration parameter.
+    ///
+    /// \param newWeight New acceleration paramater.
     ///
     void setWeight(const double &newWeight);
 
     ///
-    /// \brief Get Weight
+    /// \brief Get Weight. Return current acceleration parameter.
     ///
     const double &getWeight() const;
 
 private:
-    ForwardGaussSeidel gaussSeidel;
     double weight;
 
 };

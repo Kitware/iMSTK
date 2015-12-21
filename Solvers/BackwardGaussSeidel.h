@@ -38,22 +38,43 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    BackwardGaussSeidel() = delete;
+    BackwardGaussSeidel() = default;
+    ~BackwardGaussSeidel() = default;
     BackwardGaussSeidel(const BackwardGaussSeidel &) = delete;
     BackwardGaussSeidel &operator=(const BackwardGaussSeidel &) = delete;
 
+    ///
+    /// \brief Constructor
+    ///
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param rhs Right hand side of the linear system of equations.
+    ///
     BackwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
 
-    ~BackwardGaussSeidel() = default;
-
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Do one iteration of the GaussSeidel method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual Compute residual if true.
     ///
     void iterate(core::Vectord &x, bool updateResidual = true) override;
 
-private:
-    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::Upper> U;
-    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::StrictlyLower> L;
+    ///
+    /// \brief Does one iteration of the GaussSeidel method. This version of the method
+    ///     traverses the sparse matrix container instead of relying on Eigen's template
+    ///     expressions. This routine assumes that the sparse matrix is row-major.
+    ///
+    /// \param x Current iterate.
+    ///
+    void relax(core::Vectord &x);
+
+    ///
+    /// \brief Set the system. Replaces the stored linear system of equations.
+    ///
+    /// \param newSystem New linear system of equations.
+    ///
+    void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
+
 };
 
 #endif // BACKWARDGAUSSSEIDEL_H

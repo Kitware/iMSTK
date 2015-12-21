@@ -96,7 +96,7 @@ using Matrixf = Matrix<float>;
 using Matrixd = Matrix<double>;
 
 /// A dynamic size sparse matrix of doubles
-using SparseMatrixd = SparseMatrix<double>;
+using SparseMatrixd = SparseMatrix<double,Eigen::RowMajor>;
 
 template<typename T, int StorageType>
 void fillSparseMatrix(const std::vector<Eigen::Triplet<T>> &triplets, Eigen::SparseMatrix<T,StorageType> &A)

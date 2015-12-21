@@ -25,9 +25,7 @@
 
 ForwardGaussSeidel::ForwardGaussSeidel(
     const core::SparseMatrixd &A,
-    const core::Vectord &rhs):
-    U(A.triangularView<Eigen::StrictlyUpper>()),
-    L(A.triangularView<Eigen::Lower>())
+    const core::Vectord &rhs)
 {
     this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
 }
@@ -35,11 +33,36 @@ ForwardGaussSeidel::ForwardGaussSeidel(
 //---------------------------------------------------------------------------
 void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 {
-    x = this->linearSystem->getRHSVector() - U * x;
-    L.solveInPlace(x);
+    x = this->linearSystem->getRHSVector() - this->linearSystem->getStrictUpperTriangular() * x;
+    this->linearSystem->getLowerTriangular().solveInPlace(x);
 
     if (updateResidual)
     {
         this->linearSystem->computeResidual(x, this->residual);
     }
+}
+
+//---------------------------------------------------------------------------
+void ForwardGaussSeidel::relax(core::Vectord& x)
+{
+    const auto &A = this->linearSystem->getMatrix();
+    const auto &b = this->linearSystem->getRHSVector();
+    //
+    // TODO: invD can be precomputed for further optimization.
+    const auto invD = 1.0/A.diagonal().array();
+    for (int k = 0; k < A.outerSize(); ++k)
+    {
+        double sum = b(k);
+        for (core::SparseMatrixd::InnerIterator it(A,k); it; ++it)
+        {
+            sum -= it.value()*x(it.col());
+        }
+        x(k) += sum*invD(k);
+    }
+}
+
+//---------------------------------------------------------------------------
+void ForwardGaussSeidel::setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+{
+    LinearSolver::setSystem(newSystem);
 }

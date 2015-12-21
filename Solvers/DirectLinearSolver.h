@@ -33,14 +33,15 @@ template<typename MatrixType>
 class DirectLinearSolver;
 
 ///
-/// \brief Dense direct solvers
+/// \brief Dense direct solvers. Solves a dense system of equations using Cholesky
+///     decomposition.
 ///
 template<>
 class DirectLinearSolver<core::Matrixd> : public LinearSolver<core::Matrixd>
 {
 public:
     ///
-    /// \brief Default constructor/destructor
+    /// \brief Default constructor/destructor.
     ///
     DirectLinearSolver() = delete;
     ~DirectLinearSolver() = default;
@@ -48,24 +49,40 @@ public:
     ///
     /// \brief Constructor
     ///
-    DirectLinearSolver(const core::Matrixd &matrix, const core::Vectord &b);
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param b Right hand side of the linear system of equations.
+    ///
+    DirectLinearSolver(const core::Matrixd &A, const core::Vectord &b);
 
     ///
-    /// \brief Solve the system of equations
+    /// \brief Solve the system of equations.
+    ///
+    /// \param x Upon return it contains the solution of the linear system.
     ///
     void solve(core::Vectord &x) override;
 
     ///
-    /// \brief Solve the system of equations
+    /// \brief Solve the system of equations for arbitrary right hand side vector.
+    ///
+    /// \param rhs Right hand side of the linear system of equations.
+    /// \param x Upon return it contains the solution of the linear system.
     ///
     void solve(const core::Vectord &rhs, core::Vectord &x);
+
+    ///
+    /// \brief Sets the system. System of linear equations.
+    ///
+    /// \param newSystem Linear system replacement.
+    ///
+    void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 private:
     Eigen::LDLT<core::Matrixd> solver;
 };
 
 ///
-/// \brief Sparse direct solvers
+/// \brief Sparse direct solvers. Solves a sparse system of equations using a sparse LU
+///     decomposition.
 ///
 template<>
 class DirectLinearSolver<core::SparseMatrixd> : public LinearSolver<core::SparseMatrixd>
@@ -80,17 +97,32 @@ public:
     ///
     /// \brief Constructor
     ///
+    /// \param matrix System matrix. Symmetric and positive definite.
+    /// \param b Right hand side of the linear system of equations.
+    ///
     DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b);
 
     ///
     /// \brief Solve the system of equations
     ///
+    /// \param x Upon return it contains the solution of the linear system.
+    ///
     void solve(core::Vectord &x) override;
 
     ///
-    /// \brief Solve the system of equations
+    /// \brief Solve the system of equations for arbitrary right hand side vector.
+    ///
+    /// \param rhs Right hand side of the linear system of equations.
+    /// \param x Upon return it contains the solution of the linear system.
     ///
     void solve(const core::Vectord &rhs, core::Vectord &x);
+
+    ///
+    /// \brief Sets the system. System of linear equations.
+    ///
+    /// \param newSystem Linear system replacement.
+    ///
+    void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 private:
     Eigen::SparseLU<core::SparseMatrixd> solver;

@@ -21,32 +21,41 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "BackwardSOR.h"
+#include "BackwarEuler.h"
 
-BackwardSOR::BackwardSOR(): weight(.9) {}
-
-//---------------------------------------------------------------------------
-BackwardSOR::BackwardSOR(const core::SparseMatrixd &A,
-                         const core::Vectord &rhs,
-                         const double &w): BackwardGaussSeidel(A, rhs), weight(w)
-{}
-
-//---------------------------------------------------------------------------
-void BackwardSOR::iterate(core::Vectord &x, bool updateResidual)
+void BackwardEuler::solve(core::Vectord &x0, double timeStep)
 {
-    auto old = x; // necessary copy
-    BackwardGaussSeidel::iterate(x, updateResidual);
-    x = this->weight * x + (1 - this->weight) * old;
+    if(!this->F || !this->DF)
+    {
+        return;
+    }
+
+    auto G = [ &, this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+    {
+        this->F(x, y);
+        y = x - (x0 + timeStep * y);
+        return y;
+    };
+
+    core::SparseMatrixd I(x0.size(), x0.size());
+    I.setIdentity();
+    auto DG = [ &, this](const core::Vectord & x, core::SparseMatrixd & J) -> void
+    {
+        this->DF(x, J);
+        J = I - timeStep * J;
+    };
+
+    auto NewtonSolver = std::make_shared<InexactNewton>();
+    auto solution = x0;
+
+    NewtonSolver->setSystem(G);
+    NewtonSolver->setJacobian(DG);
+    NewtonSolver->solve(solution);
+    x0 = solution;
 }
 
 //---------------------------------------------------------------------------
-void BackwardSOR::setWeight(const double &newWeight)
+void BackwardEuler::setJacobian(const NonLinearSolver::JacobianType &newJacobian)
 {
-    this->weight = newWeight;
-}
-
-//---------------------------------------------------------------------------
-const double &BackwardSOR::getWeight() const
-{
-    return this->weight;
+    this->DF = newJacobian;
 }

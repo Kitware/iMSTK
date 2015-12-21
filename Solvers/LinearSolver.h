@@ -38,12 +38,13 @@ class LinearSolver
 {
 public:
     using MatrixType = SystemMatrixType;
+    using LinearSystemType = LinearSystem<MatrixType>;
 
 public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() = default;
+    LinearSolver();
     virtual ~LinearSolver() = default;
 
     ///
@@ -52,23 +53,26 @@ public:
     virtual void solve(core::Vectord &x) = 0;
 
     ///
-    /// \brief Set the system
+    /// \brief Set/get the system. Replaces/Returns the stored linear system of equations.
     ///
-    inline void setSystem(std::shared_ptr<LinearSystem<MatrixType>> newSystem)
-    {
-        this->linearSystem = newSystem;
-    }
+    /// \param newSystem New linear system of equations.
+    ///
+    virtual void setSystem(std::shared_ptr<LinearSystemType> newSystem);
+    inline std::shared_ptr<LinearSystemType> getSystem() const;
 
     ///
-    /// \brief Get the system
+    /// \brief Set/Get the tolerance for the linear solver.
     ///
-    inline std::shared_ptr<LinearSystem<MatrixType>> getSystem() const
-    {
-        return this->linearSystem;
-    }
+    /// \param newTolerance New tolerance to be used.
+    ///
+    virtual void setTolerance(const double newTolerance);
+    inline double getTolerance() const;
 
 protected:
-    std::shared_ptr<LinearSystem<MatrixType>> linearSystem;
+    std::shared_ptr<LinearSystemType> linearSystem; /// Linear system of equations.
+    double minTolerance;    ///> Convergence tolerance
 };
+
+#include "Solvers/LinearSolver.hpp"
 
 #endif // SM_LINEAR_SOLVER

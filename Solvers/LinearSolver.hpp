@@ -20,33 +20,39 @@
 //
 // Contact:
 //---------------------------------------------------------------------------
+#ifndef SM_LINEAR_SOLVER_HPP
+#define SM_LINEAR_SOLVER_HPP
 
-#include "BackwardSOR.h"
-
-BackwardSOR::BackwardSOR(): weight(.9) {}
-
-//---------------------------------------------------------------------------
-BackwardSOR::BackwardSOR(const core::SparseMatrixd &A,
-                         const core::Vectord &rhs,
-                         const double &w): BackwardGaussSeidel(A, rhs), weight(w)
-{}
+template<typename SystemMatrixType>
+LinearSolver<SystemMatrixType>::LinearSolver() : linearSystem(nullptr), minTolerance(1.0e-6){}
 
 //---------------------------------------------------------------------------
-void BackwardSOR::iterate(core::Vectord &x, bool updateResidual)
+template<typename SystemMatrixType>
+void LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
 {
-    auto old = x; // necessary copy
-    BackwardGaussSeidel::iterate(x, updateResidual);
-    x = this->weight * x + (1 - this->weight) * old;
+    this->linearSystem.reset();
+    this->linearSystem = newSystem;
 }
 
 //---------------------------------------------------------------------------
-void BackwardSOR::setWeight(const double &newWeight)
+template<typename SystemMatrixType>
+std::shared_ptr<LinearSystem<SystemMatrixType>> LinearSolver<SystemMatrixType>::getSystem() const
 {
-    this->weight = newWeight;
+    return this->linearSystem;
 }
 
 //---------------------------------------------------------------------------
-const double &BackwardSOR::getWeight() const
+template<typename SystemMatrixType>
+void LinearSolver<SystemMatrixType>::setTolerance(const double newTolerance)
 {
-    return this->weight;
+    this->minTolerance = newTolerance;
 }
+
+//---------------------------------------------------------------------------
+template<typename SystemMatrixType>
+double LinearSolver<SystemMatrixType>::getTolerance() const
+{
+    return this->minTolerance;
+}
+
+#endif // SM_LINEAR_SOLVER

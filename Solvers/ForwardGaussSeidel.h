@@ -29,30 +29,50 @@
 #include "Core/Vector.h"
 
 ///
-/// \brief Gauss Seidel sparse linear solver
+/// \brief Forward Gauss-Seidel sparse linear system solver.
 ///
 class ForwardGaussSeidel : public IterativeLinearSolver
 {
 public:
     ///
-    /// \brief Default constructor/destructor
+    /// \brief Default Constructor/Destructor
     ///
-    ForwardGaussSeidel() = delete;
+    ForwardGaussSeidel() = default;
+    ~ForwardGaussSeidel() = default;
     ForwardGaussSeidel(const ForwardGaussSeidel &) = delete;
+
     ForwardGaussSeidel &operator=(const ForwardGaussSeidel &) = delete;
 
+    ///
+    /// \param A System matrix. Symmetric and positive definite.
+    /// \param rhs Right hand side of the linear equation.
+    ///
     ForwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
 
-    ~ForwardGaussSeidel() = default;
-
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Does one iteration of the GaussSeidel method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual True if you want to compute the residual.
     ///
     void iterate(core::Vectord &x, bool updateResidual = true) override;
 
-private:
-    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::StrictlyUpper> U;
-    Eigen::SparseTriangularView<core::SparseMatrixd, Eigen::Lower> L;
+    ///
+    /// \brief Does one iteration of the GaussSeidel method. This version of the method
+    ///     traverses the sparse matrix container instead of relying on Eigen's template
+    ///     expressions. This routine assumes that the sparse matrix is row-major.
+    ///
+    /// \param x Current iterate.
+    ///
+    void relax(core::Vectord &x);
+
+    ///
+    /// \brief Set the system. Sets the stored linear system of equations.
+    ///
+    /// \param newSystem New linear system of equations.
+    ///
+    void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
+
 };
 
 #endif // SM_FORWARD_GAUSS_SEIDEL

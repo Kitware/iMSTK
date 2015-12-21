@@ -44,7 +44,9 @@ Eigen::SparseMatrix<T,opt> &ReadSparseMatrix(const std::string &fileName, Eigen:
     fStream.ignore ( std::numeric_limits<std::streamsize>::max(), '\n' );
     fStream.precision(16);
     fStream >> numRows >> numCols >> numNonZeros;
-    std::cout << "Matrix size: cols [" << numCols << "]; rows [" << numRows << "]; nonZeros [" << numNonZeros << "]" << std::endl;
+
+//     std::cout << "Matrix " << fileName << std::endl;
+//     std::cout << "Matrix size: cols [" << numCols << "]; rows [" << numRows << "]; nonZeros [" << numNonZeros << "]" << std::endl;
     A.resize(numRows,numCols);
     A.reserve(2*numNonZeros);
     tripletList.reserve(2*numNonZeros);

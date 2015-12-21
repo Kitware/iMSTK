@@ -27,8 +27,7 @@
 #include "Solvers/LinearSolver.h"
 
 ///
-/// \brief Base class for iterative linear solvers. Only for sparse matrices, extend if
-///     other type of matrices are needed.
+/// \brief Base class for iterative linear solvers.
 ///
 class IterativeLinearSolver : public LinearSolver<core::SparseMatrixd>
 {
@@ -37,15 +36,20 @@ public:
     /// \brief Default constructor/destructor
     ///
     IterativeLinearSolver();
-    ~IterativeLinearSolver() = default;
+    virtual ~IterativeLinearSolver() = default;
 
     ///
-    /// \brief Do one iteration of the method
+    /// \brief Do one iteration of the method.
+    ///
+    /// \param x Current iterate.
+    /// \param updateResidual Compute residual if true.
     ///
     virtual void iterate(core::Vectord &x, bool updateResidual = true) = 0;
 
     ///
-    /// \brief Solve the linear system using Gauss-Seidel iterations
+    /// \brief Solve the linear system using Gauss-Seidel iterations.
+    ///
+    /// \param x Current iterate.
     ///
     virtual void solve(core::Vectord &x) override;
 
@@ -54,34 +58,30 @@ public:
     // -------------------------------------------------
 
     ///
-    /// \brief set the tolerance for the iterative solver
+    /// \brief set the maximum number of iterations for the iterative solver.
     ///
-    virtual void setTolerance(const double epsilon);
+    /// \param maxIter Maximum number of iterations.
+    ///
+    virtual void setMaximumIterations(const size_t maxIter);
 
     ///
-    /// \brief get the tolerance for the iterative solver
+    /// \brief get the maximum number of iterations for the iterative solver.
     ///
-    virtual double getTolerance() const;
+    virtual size_t getMaximumIterations() const;
 
     ///
-    /// \brief set the maximum number of iterations for the iterative solver
+    /// \brief Return residual vector. This fuction does not do any computation.
     ///
-    virtual void setMaximumIterations(const int maxIter);
+    virtual const core::Vectord &getResidual();
 
     ///
-    /// \brief get the maximum number of iterations for the iterative solver
+    /// \brief Return error computed from the residual.
     ///
-    virtual int getMaximumIterations() const;
-
-    ///
-    /// \brief Get residual
-    ///
-    const core::Vectord &getResidual();
+    virtual double getError(const core::Vectord &x);
 
 protected:
-    int maxIterations;      ///> maximum number of iterations to be performed
-    double minTolerance;    ///> convergence tolerance
-    core::Vectord residual; ///> storage for residual vector
+    size_t maxIterations;   ///> Maximum number of iterations to be performed.
+    core::Vectord residual; ///> Storage for residual vector.
 };
 
 #endif // SM_ITERATIVE_LINEAR_SOLVER

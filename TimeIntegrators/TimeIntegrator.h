@@ -21,32 +21,42 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "ForwardSOR.h"
+#ifndef TIMEINTEGRATOR_H
+#define TIMEINTEGRATOR_H
 
-ForwardSOR::ForwardSOR(): weight(.9) {}
+#include "Core/Vector.h"
+#include "Solvers/SystemOfEquations.h" // For FunctionType
 
-//---------------------------------------------------------------------------
-ForwardSOR::ForwardSOR(const core::SparseMatrixd &A,
-                       const core::Vectord &rhs,
-                       const double &w): ForwardGaussSeidel(A, rhs), weight(w)
-{}
-
-//---------------------------------------------------------------------------
-void ForwardSOR::iterate(core::Vectord &x, bool updateResidual)
+///
+/// @brief Base class for all time time integrators
+///
+class TimeIntegrator
 {
-    auto old = x; // necessary copy
-    ForwardGaussSeidel::iterate(x, updateResidual);
-    x = this->weight * x + (1 - this->weight) * old;
-}
+public:
+    using FunctionType = SystemOfEquations::FunctionType;
 
-//---------------------------------------------------------------------------
-void ForwardSOR::setWeight(const double &newWeight)
-{
-    this->weight = newWeight;
-}
+public:
+    ///
+    /// @brief Constructor/Destructor
+    ///
+    TimeIntegrator() = default;
+    ~TimeIntegrator() = default;
 
-//---------------------------------------------------------------------------
-const double &ForwardSOR::getWeight() const
-{
-    return this->weight;
-}
+    ///
+    /// @brief Perform one iteration of the method
+    ///
+    /// \param x Current iterate.
+    /// \param timeStep current timeStep
+    ///
+    virtual void solve(core::Vectord&,double) = 0;
+
+    ///
+    /// \brief Set the the right hand side function of the ODE system
+    ///
+    void setFunction(const FunctionType &newF);
+
+protected:
+    FunctionType F;
+};
+
+#endif // TIMEINTEGRATOR_H

@@ -24,7 +24,7 @@
 #include "Solvers/IterativeLinearSolver.h"
 
 IterativeLinearSolver::IterativeLinearSolver()
-    : maxIterations(100), minTolerance(1.0e-6)
+    : maxIterations(100)
 {
 }
 
@@ -39,7 +39,7 @@ void IterativeLinearSolver::solve(core::Vectord &x)
     auto epsilon  = this->minTolerance * this->minTolerance;
     this->linearSystem->computeResidual(x, this->residual);
 
-    for(int i = 0; i < this->maxIterations; ++i)
+    for(size_t i = 0; i < this->maxIterations; ++i)
     {
         if(this->residual.squaredNorm() < epsilon)
         {
@@ -51,29 +51,26 @@ void IterativeLinearSolver::solve(core::Vectord &x)
 }
 
 //---------------------------------------------------------------------------
-void IterativeLinearSolver::setTolerance(const double epsilon)
-{
-    this->minTolerance = epsilon;
-}
-
-//---------------------------------------------------------------------------
-double IterativeLinearSolver::getTolerance() const
-{
-    return this->minTolerance;
-}
-
-//---------------------------------------------------------------------------
-void IterativeLinearSolver::setMaximumIterations(const int maxIter)
+void IterativeLinearSolver::setMaximumIterations(const size_t maxIter)
 {
     this->maxIterations = maxIter;
 }
 
 //---------------------------------------------------------------------------
-int IterativeLinearSolver::getMaximumIterations() const
+size_t IterativeLinearSolver::getMaximumIterations() const
 {
     return this->maxIterations;
 }
+
+//---------------------------------------------------------------------------
 const core::Vectord &IterativeLinearSolver::getResidual()
 {
     return this->residual;
+}
+
+//---------------------------------------------------------------------------
+double IterativeLinearSolver::getError(const core::Vectord &x)
+{
+    this->linearSystem->computeResidual(x, this->residual);
+    return this->residual.squaredNorm();
 }
