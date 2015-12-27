@@ -44,10 +44,8 @@ void InexactNewton::solve(core::Vectord &x)
         return;
     }
 
-    // Set tolerances and other temporaries
-    this->f.resize(x.size());
-    this->nonLinearSystem->eval(x, this->f);
-    double fnorm = this->f.norm();
+    // Compute norms, set tolerances and other temporaries
+    double fnorm = this->nonLinearSystem->eval(x).norm();
     double stopTolerance = this->absoluteTolerance + this->relativeTolerance * fnorm;
     this->linearSolver->setTolerance(stopTolerance);
     core::Vectord dx = x;
@@ -61,16 +59,17 @@ void InexactNewton::solve(core::Vectord &x)
 
         this->updateJacobian(x);
         this->linearSolver->solve(dx);
-        x -= dx;
+        this->updateIterate(-dx,x);
 
         double newNorm = this->armijo(dx, x);
 
-        if(this->forcingTerm > 0 && fnorm > 0)
+        if(this->forcingTerm > 0 && newNorm > stopTolerance)
         {
             double ratio = newNorm / fnorm; // Ratio of succesive residual norms
             this->updateForcingTerm(ratio, stopTolerance, fnorm);
 
             // Reset tolerance in the linear solver according to the new forcing term
+            // to avoid over solving of the system.
             if(this->linearSolver)
             {
                 this->linearSolver->setTolerance(this->forcingTerm);
@@ -114,22 +113,22 @@ std::shared_ptr< InexactNewton::LinearSolverType > InexactNewton::getLinearSolve
 void InexactNewton::updateJacobian(const core::Vectord &x)
 {
     // Evaluate the Jacobian and sets the matrix
-    if(this->jacobian)
-    {
-        this->jacobianMatrix.resize(x.size(), x.size());
-        this->jacobian(x, this->jacobianMatrix);
+    if(!this->jacobian)
+    {// TODO: Print message or log error.
+        return;
     }
 
-    if(this->jacobianMatrix.innerSize() > 0)
-    {
-        auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
-                                this->jacobianMatrix, this->f);
-        this->linearSolver->setSystem(linearSystem);
+    const core::SparseMatrixd &jacobianMatrix = this->jacobian(x);
+
+    if(!(jacobianMatrix.innerSize() > 0))
+    {// TODO: Print message and/or log error.
+        return;
     }
-    else
-    {
-        std::cerr << "Error updating Jacobian" << std::endl;
-    }
+
+    auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
+                            jacobianMatrix, this->f);
+    this->linearSolver->setSystem(linearSystem);
+
 }
 
 //---------------------------------------------------------------------------

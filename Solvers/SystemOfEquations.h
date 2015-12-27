@@ -37,8 +37,7 @@
 class SystemOfEquations
 {
 public:
-    using FunctionType = std::function < core::Vectord &(const core::Vectord &,
-                         core::Vectord &) >;
+    using FunctionType = std::function<core::Vectord&(const core::Vectord &)>;
 
 public:
     ///
@@ -58,16 +57,28 @@ public:
     ///
     /// \brief Evaluate function at specified argument
     ///
-    /// \param x
+    /// \param x Value.
+    /// \return Function value.
     ///
-    inline void eval(const core::Vectord &x, core::Vectord &y)
+    inline const core::Vectord &evalF(const core::Vectord &x)
     {
-        this->F(x,y);
+        this->F(x,this->f);
+        return this->f;
+    }
+
+    ///
+    /// \brief Get the value of the function F
+    ///
+    /// \return Function value.
+    ///
+    inline core::Vectord &getF()
+    {
+        return this->f;
     }
 
 protected:
-    //!< Function associated with the system of equation to solve.
-    FunctionType F;
+    FunctionType F;  ///> Function associated with the system of equation to solve.
+    core::Vectord f; ///> Storage for function values
 };
 
 ///
@@ -138,7 +149,7 @@ public:
     ///
     inline core::Vectord &computeResidual(const core::Vectord &x, core::Vectord &r) const
     {
-        r = this->rhs - this->F(x, r);
+        r = this->rhs - this->F(x);
         return r;
     }
 

@@ -23,39 +23,52 @@
 
 #include "BackwarEuler.h"
 
-void BackwardEuler::solve(core::Vectord &x0, double timeStep)
+void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
 {
-    if(!this->F || !this->DF)
+    if(!this->system)
     {
         return;
     }
 
-    auto G = [ &, this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+    this->computeSystemRHS(state,newState,timeStep);
+    auto G = [&,this](const core::Vectord &) -> core::Vectord&
     {
-        this->F(x, y);
-        y = x - (x0 + timeStep * y);
-        return y;
+        return this->rhs;
     };
 
-    core::SparseMatrixd I(x0.size(), x0.size());
-    I.setIdentity();
-    auto DG = [ &, this](const core::Vectord & x, core::SparseMatrixd & J) -> void
+    auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
     {
-        this->DF(x, J);
-        J = I - timeStep * J;
+        this->computeSystemMatrix(newState,timeStep);
+        return this->systemMatrix;
+    };
+
+    auto updateIterate = [](const core::Vectord &dv, core::Vectord &v)
+    {
+        v += dv;
+        newState.getPositions() = state.getPositions() + timeStep*v;
     };
 
     auto NewtonSolver = std::make_shared<InexactNewton>();
-    auto solution = x0;
+
+    newState = state;
 
     NewtonSolver->setSystem(G);
     NewtonSolver->setJacobian(DG);
-    NewtonSolver->solve(solution);
-    x0 = solution;
+    NewtonSolver->solve(newState.getVelocities());
 }
 
 //---------------------------------------------------------------------------
-void BackwardEuler::setJacobian(const NonLinearSolver::JacobianType &newJacobian)
+BackwardEuler::SystemMatrixType BackwardEuler::getSystemMatrix()
 {
-    this->DF = newJacobian;
+    if(!this->system)
+    {
+        return;
+    }
+
+    auto DG = [ &, this](const core::Vectord &x) -> void
+    {
+        auto &C = this->system->evalDFv(x);
+        auto &K = this->system->evalDFx(x);
+
+    };
 }

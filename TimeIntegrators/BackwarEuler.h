@@ -28,37 +28,78 @@
 
 #include "Core/Vector.h"
 #include "Solvers/InexactNewton.h"
+#include "TimeIntegrators/OdeSystem.h"
 
 ///
-/// @brief Approximates the solution to the IVP: dv/dt = F(x,dx/dt,t), x(t0) = x0 with
+/// @brief Approximates the solution to the IVP: Mdv/dt = f(x,v,t), x(t0) = x0 with
 ///     a backward Euler scheme.
 ///
 class BackwardEuler : public TimeIntegrator
 {
 public:
+    using SystemMatrixType = std::function<const SparseMatrixd&(const Vectord &x)>;
+
+public:
     ///
-    /// @brief Constructor/Destructor.
+    /// @brief Default constructor/destructor.
     ///
     BackwardEuler() = default;
     ~BackwardEuler() = default;
 
     ///
+    /// \brief Constructor. Takes the system describing the ODE.
+    ///
+    BackwardEuler(std::shared_ptr<OdeSystem> system) : TimeIntegrator(system)
+    {}
+
+    ///
     /// @brief Perform one iteration of the Backward Euler method.
     ///
-    /// \param x Current iterate.
-    /// \param timeStep current timeStep.
+    /// \param state Current iterate.
+    /// \param newState New computed state.
+    /// \param timeStep Time step used to discretize  the system.
     ///
-    void solve(core::Vectord &x0, double timeStep) override;
+    void solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep) override;
 
     ///
-    /// @brief Set the Jacobian of the right hand side jacobian.
+    /// \brief Compute and store the system matrix.
     ///
-    /// \param newJacobian Function for updating the jacobian matrix.
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
     ///
-    void setJacobian(const InexactNewton::JacobianType &newJacobian);
+    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &newState, double timeStep, bool computeRHS = true)
+    {
+        auto &M = this->system->evalMass(newState);
+        auto &K = this->system->evalDFv(newState);
+        auto &C = this->system->evalDFx(newState);
 
-private:
-    InexactNewton::JacobianType DF;
+        this->systemMatrix = (1.0/dt) * M;
+        this->systemMatrix += C;
+        this->systemMatrix += dt * K;
+
+        if(computeRHS)
+        {
+            this->rhs = this->system->evalF(newState) + K*(newState.getPositions() - state.getPositions() - newState.getVelocities()*timeStep);
+            this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
+        }
+    }
+
+    ///
+    /// \brief Compute and store the right hand side of the system.
+    ///
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
+    ///
+    void computeSystemRHS(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
+    {
+        auto &M = this->system->evalMass(newState);
+        auto &K = this->system->evalDFv(newState);
+
+        this->rhs = this->system->evalF(newState) + K*(newState.getPositions() - state.getPositions() - newState.getVelocities()*timeStep);
+        this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
+    }
 };
 
 #endif // BACKWAREULER_H

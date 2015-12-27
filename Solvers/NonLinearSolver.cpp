@@ -27,65 +27,67 @@ NonLinearSolver::NonLinearSolver():
     sigma(std::array<double, 2> {.1, .5}),
     alpha(1e-4),
     armijoMax(30)
-{}
+{
+    this->updateIterate = [](const core::Vectord &dx, core::Vectord &x)
+    {
+        x += dx;
+    };
+}
 
 //---------------------------------------------------------------------------
 double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
 {
     /// Temporaries used in the line search
-    std::array<double, 3> lambda    = {this->sigma[0] *this->sigma[1], 1.0, 1.0};
-    std::array<double, 3> fnormSqr  = {this->f.squaredNorm(), 0.0, 0.0};
-    std::array<double, 3> fnorm     = {std::sqrt(fnormSqr[0]), 0.0, 0.0};
+    double previousFnorm = this->nonLinearSystem.getF().norm();
+    std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
+    std::array<double, 3> lambda    = {this->sigma[0]*this->sigma[1], 1.0, 1.0};
 
     /// Initialize temporaries
-    this->nonLinearSystem->eval(x, this->f);
-    fnormSqr[2] = fnormSqr[1] = this->f.squaredNorm();
-    fnorm[1] = std::sqrt(fnormSqr[1]);
+    double currentFnorm = this->nonLinearSystem->eval(x).norm();
 
-    // Exit if the function norm satisfies the Armijo-Goldstain condition
-    if(fnorm[1] < (1.0 - this->alpha * lambda[0]) *fnorm[0])
+    // Exit if the function norm satisfies the Armijo-Goldstein condition
+    if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
     {
-        return fnorm[1];
+        return currentFnorm;
     }
 
-    // Starts armijo line serach loop
+    // Starts Armijo line search loop
     for(size_t i = 0; i < this->armijoMax; ++i)
     {
         /// Update x and keep books on lambda
-        x -= lambda[0] * dx;
+        this->updateIterate(-lambda[0]*dx,x);
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
-        this->nonLinearSystem->eval(x, this->f);
+        currentFnorm = this->nonLinearSystem->eval(x).norm();
 
-        fnorm[1] = this->f.norm();
-
-        // Exit if the function norm satisfies the Armijo-Goldstain condition
-        if(fnorm[1] < (1.0 - this->alpha * lambda[0]) *fnorm[0])
+        // Exit if the function norm satisfies the Armijo-Goldstein condition
+        if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
         {
-            return fnorm[1];
+            return currentFnorm;
         }
 
         /// Update function norms
         fnormSqr[2] = fnormSqr[1];
-        fnormSqr[1] = fnorm[1] * fnorm[1];
+        fnormSqr[1] = currentFnorm * currentFnorm;
 
         /// Apply the three point parabolic model
         this->parabolicModel(fnormSqr, lambda);
     }
 
-    return fnorm[1];
+    return currentFnorm;
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::parabolicModel(const std::array< double, int(3) > &fnorm, std::array< double, int(3) > &lambda)
+void NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm,
+                                     std::array<double,3> &lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
     ///         d1 = (lambda[1] - lambda[2])*lambda[1]*lambda[2] < 0
     ///     if a > 0, then we have a concave up curvature and lambda defaults to:
     ///         lambda = sigma[0]*lambda
-    double a1 = lambda[2] * (fnorm[1] - fnorm[0]);
+    double a1 = lambda[2] * (currentFnorm - fnorm[0]);
     double a2 = lambda[1] * (fnorm[2] - fnorm[0]);
     double a = a1 - a2;
 
@@ -112,7 +114,7 @@ void NonLinearSolver::parabolicModel(const std::array< double, int(3) > &fnorm, 
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::setSigma(const std::array< double, int(2) > &newSigma)
+void NonLinearSolver::setSigma(const std::array<double,2> &newSigma)
 {
     this->sigma = newSigma;
 }

@@ -27,11 +27,13 @@
 #include <Core/RenderDelegate.h>
 
 SceneObjectDeformable::SceneObjectDeformable() :
+    OdeSystem(),
     renderSecondaryMesh(false),
     topologyAltered(false),
     pulledVertex(-1),
     timestepCounter(0),
-    subTimestepCounter(0)
+    subTimestepCounter(0),
+    integrationScheme(TimeIntegrator::ImplicitEuler)
 {
   this->setRenderDelegate(
       Factory<RenderDelegate>::createConcreteClassForGroup(

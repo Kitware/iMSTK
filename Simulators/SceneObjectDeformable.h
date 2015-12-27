@@ -31,10 +31,13 @@
 #include "Mesh/SurfaceMesh.h"
 #include "Core/SceneObject.h"
 #include "Core/ErrorLog.h"
-#include "VegaObjectConfig.h"
+#include "Simulators/VegaObjectConfig.h"
+#include "TimeIntegrators/TimeIntegrator.h"
+#include "TimeIntegrators/BackwarEuler.h"
+#include "TimeIntegrators/ForwardEuler.h"
 
 /// \brief Base class for any scene object that is defmormable
-class SceneObjectDeformable : public SceneObject
+class SceneObjectDeformable : public SceneObject, public OdeSystem
 {
 public:
 
@@ -138,6 +141,49 @@ public:
         return this->f_ext;
     }
 
+    void setTimeIntegrator(TimeIntegrator::IntegratorType integrator)
+    {
+        this->integrationScheme = integrator;
+    }
+
+    bool init()
+    {
+        auto thisPointer = this->safeDownCast<SceneObjectDeformable>();
+        switch(integrationScheme)
+        {
+            case TimeIntegrator::ImplicitEuler:
+            {
+                this->odeSolver = std::make_shared<BackwardEuler>(thisPointer);
+            }
+            case TimeIntegrator::ExplicitEuler:
+            {
+                this->odeSolver = std::make_shared<ForwardEuler>(thisPointer);
+            }
+            default:
+            {
+                std::cerr << "Invalid time integration scheme." << std::endl;
+            }
+
+            return false;
+        }
+    }
+
+    void update(double dt)
+    {
+        if(!this->odeSolver)
+        {
+            std::cerr << "Ode solver needs to be set." << std::endl;
+            return;
+        }
+
+        this->odeSolver->solve(currentState,newState,dt);
+
+        currentState.swap(previousState);
+        currentState.swap(newState);
+
+        // TODO: Check state validity
+    }
+
 protected:
     friend class SceneObjectDeformableRenderDelegate;
 
@@ -170,6 +216,22 @@ protected:
 
     std::shared_ptr<SurfaceMesh> primarySurfaceMesh;
     std::shared_ptr<SurfaceMesh> secondarySurfaceMesh;
+
+    std::shared_ptr<TimeIntegrator> odeSolver; ///> Integration scheme
+
+    // Consecutive system states
+    std::shared_ptr<OdeSystemState> currentState;
+    std::shared_ptr<OdeSystemState> previousState;
+    std::shared_ptr<OdeSystemState> newState;
+
+    std::shared_ptr<OdeSystemState> initialState;
+
+    core::Matrixd M; ///> Mass matrix
+    core::Matrixd C; ///> Damping matrix
+    core::Matrixd K; ///> Stiffness matrix
+    core::Vectord f; ///> Force loads
+
+    TimeIntegrator::IntegratorType integrationScheme;
 
 };
 

@@ -21,33 +21,4 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef FORWARDEULER_H
-#define FORWARDEULER_H
-
-#include "TimeIntegrators/TimeIntegrator.h"
-#include "Core/Vector.h"
-
-///
-/// @brief Approximates the solution to the Initial value problem: Mdv/dt = F(x,v,t),
-///     v(t0) = v0 using a forward Euler scheme; Mv(t1) = Mv(t0) + dtF(v(t0),t0)
-///
-class ForwardEuler : public TimeIntegrator
-{
-public:
-    ///
-    /// @brief Default constructor/destructor.
-    ///
-    ForwardEuler() = default;
-    ~ForwardEuler() = default;
-
-    ///
-    /// @brief Perform one iteration of the Forward Euler method.
-    ///
-    /// \param x Current iterate.
-    /// \param timeStep Current timeStep.
-    ///
-    void solve(core::Vectord &x, double timeStep) override;
-
-};
-
-#endif // FORWARDEULER_H
+#include "TimeIntegrators/OdeSystemState.h"

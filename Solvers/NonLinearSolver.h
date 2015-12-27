@@ -38,7 +38,8 @@
 class NonLinearSolver
 {
 public:
-    using JacobianType = std::function<void(const core::Vectord &, core::SparseMatrixd &)>;
+    using JacobianType = std::function<const core::SparseMatrixd&(const core::Vectord&)>;
+    using UpdateIterateType = std::function<void(const core::Vectord&,core::Vectord&)>;
     using FunctionType = SystemOfEquations::FunctionType;
 
 public:
@@ -114,12 +115,23 @@ public:
     ///
     void setSystem(const FunctionType &F);
 
+    ///
+    /// \brief Set a customized iterate update function.
+    ///
+    /// \param newUpdateIterate Function used to update iterates.
+    ///
+    void setUpdateIterate(const UpdateIterateType &newUpdateIterate)
+    {
+        this->updateIterate = newUpdateIterate;
+    }
+
 protected:
     core::Vectord f;                ///< Storage for function evaluations
     std::array<double, 2> sigma;    ///< Safeguarding bounds for the lineseach
     double alpha;                   ///< Parameter to measure decrease
     size_t armijoMax;               ///< Maximum number of steplength reductions
     std::shared_ptr<SystemOfEquations> nonLinearSystem; ///< System of non-linear equations
+    UpdateIterateType updateIterate; ///< Update iteration function
 };
 
 #endif // SM_LINEAR_SOLVER

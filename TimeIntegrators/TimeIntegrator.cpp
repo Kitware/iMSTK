@@ -22,8 +22,3 @@
 //---------------------------------------------------------------------------
 
 #include "TimeIntegrator.h"
-
-void TimeIntegrator::setFunction(const TimeIntegrator::FunctionType &newF)
-{
-    this->F = newF;
-}

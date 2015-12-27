@@ -25,7 +25,7 @@
 #define TIMEINTEGRATOR_H
 
 #include "Core/Vector.h"
-#include "Solvers/SystemOfEquations.h" // For FunctionType
+#include "TimeIntegrators/OdeSystem.h"
 
 ///
 /// @brief Base class for all time time integrators
@@ -33,7 +33,13 @@
 class TimeIntegrator
 {
 public:
-    using FunctionType = SystemOfEquations::FunctionType;
+    using FunctionType = OdeSystem::FunctionType;
+
+    enum IntegratorType
+    {
+        ImplicitEuler,
+        ExplicitEuler
+    };
 
 public:
     ///
@@ -43,20 +49,56 @@ public:
     ~TimeIntegrator() = default;
 
     ///
-    /// @brief Perform one iteration of the method
+    /// \brief Constructor. Takes the system describing the ODE.
     ///
-    /// \param x Current iterate.
-    /// \param timeStep current timeStep
-    ///
-    virtual void solve(core::Vectord&,double) = 0;
+    TimeIntegrator(std::shared_ptr<OdeSystem> odeSystem) : system(odeSystem)
+    {}
 
     ///
-    /// \brief Set the the right hand side function of the ODE system
+    /// \brief Perform one iteration of the method
     ///
-    void setFunction(const FunctionType &newF);
+    virtual void solve(OdeSystemState&,OdeSystemState&,double) = 0;
+
+    ///
+    /// \brief Return the Ode system of equations.
+    ///
+    std::shared_ptr<OdeSystem> getSystem() const
+    {
+        return this->system;
+    }
+
+    ///
+    /// \brief Set a new system of ODE.
+    ///
+    /// \param newSystem Ode system.
+    ///
+    void setSystem(std::shared_ptr<OdeSystem> newSystem) const
+    {
+        this->system = newSystem;
+    }
+
+    ///
+    /// \brief Set a new linear system matrix.
+    ///
+    /// \param newSystemMatrix System matrix corresponding to the solver used.
+    ///
+    void setSystemMatrix(core::SparseMatrixd &newSystemMatrix) const
+    {
+        this->systemMatrix = newSystemMatrix;
+    }
+
+    ///
+    /// \brief Return the Ode system of equations.
+    ///
+    const core::SparseMatrixd &getSystemMatrix() const
+    {
+        return this->systemMatrix;
+    }
 
 protected:
-    FunctionType F;
+    std::shared_ptr<OdeSystem> system; ///> System of differential equations.
+    core::SparseMatrixd systemMatrix; ///> Linear system matrix.
+    core::Vectord rhs; ///> Right hand side vector.
 };
 
 #endif // TIMEINTEGRATOR_H

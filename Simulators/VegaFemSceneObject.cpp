@@ -127,11 +127,16 @@ void VegaFemSceneObject::initialize()
     loadFixedBC();
 
     // make room for deformation and force vectors
+    // TODO: Clean these variables
     u.resize(3 * numNodes);
     uvel.resize(3 * numNodes);
     uaccel.resize(3 * numNodes);
     f_extBase.resize(3 * numNodes);
     f_ext.resize(3 * numNodes);
+
+    // New state variables
+    this->initialState->resize(3*numNodes);
+    *this->currentState = *this->initialState;
 
     loadInitialStates();
     loadScriptedExternalForces();
