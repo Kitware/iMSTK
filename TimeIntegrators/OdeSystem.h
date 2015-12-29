@@ -126,9 +126,9 @@ public:
     ///
     /// \brief Get the initial velocities and positions of the system.
     ///
-    const std::shared_ptr<OdeSystemState> getState() const
+    const std::shared_ptr<OdeSystemState> getInitialState() const
     {
-        return this->state;
+        return this->initialState;
     }
 
     ///
@@ -136,9 +136,9 @@ public:
     ///
     /// \param newState Current positions and velocities.
     ///
-    void setState(std::shared_ptr<OdeSystemState> newState) const
+    void setInitialState(std::shared_ptr<OdeSystemState> newState) const
     {
-        this->state = newState;
+        this->initialState = newState;
     }
 
 private:
@@ -147,7 +147,7 @@ private:
     MatrixFunctionType Mass; ///> Function to evaluate the mass matrix.
     FunctionType F; ///> Right hand side function
 
-    std::shared_ptr<OdeSystemState> state; ///> Initial state of the system.
+    std::shared_ptr<OdeSystemState> initialState; ///> Initial state of the system.
 };
 
 #endif // ODESYSTEM_H

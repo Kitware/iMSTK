@@ -83,7 +83,7 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
 {
     this->mesh = newMesh;
 
-    if(nullptr != this->mesh && generateGraph)
+    if(nullptr != this->mesh && this->generateGraph)
     {
         meshGraph.reset();
         meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(this->mesh.get()));

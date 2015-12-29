@@ -41,10 +41,6 @@ SceneObjectDeformable::SceneObjectDeformable() :
           RenderDelegate::RendererType::VTK));
 }
 
-SceneObjectDeformable::~SceneObjectDeformable()
-{
-}
-
 void SceneObjectDeformable::applyContactForces()
 {
     for(const auto &cf : this->getContactForces())

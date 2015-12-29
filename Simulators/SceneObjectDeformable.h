@@ -41,15 +41,13 @@ class SceneObjectDeformable : public SceneObject, public OdeSystem
 {
 public:
 
+    ///
     /// \brief Constructor
+    ///
     SceneObjectDeformable();
 
     /// \brief Destructor
-    ~SceneObjectDeformable();
-
-    /// \brief rest the object to inital configuration
-    /// and reset initial states
-    virtual void resetToInitialState() = 0;
+    virtual ~SceneObjectDeformable() = default;
 
     /// \brief Load specified meshes
     virtual void loadVolumeMesh() = 0;
@@ -168,6 +166,9 @@ public:
         }
     }
 
+    ///
+    /// \brief Update states
+    ///
     void update(double dt)
     {
         if(!this->odeSolver)
@@ -176,12 +177,37 @@ public:
             return;
         }
 
-        this->odeSolver->solve(currentState,newState,dt);
+        this->odeSolver->solve(this->currentState,this->newState,dt);
 
-        currentState.swap(previousState);
-        currentState.swap(newState);
+        this->currentState.swap(this->previousState);
+        this->currentState.swap(this->newState);
 
         // TODO: Check state validity
+    }
+
+    ///
+    /// \brief Reset the current state to the initial state
+    ///
+    virtual void resetToInitialState()
+    {
+        *this->currentState = *this->initialState;
+        *this->previousState = *this->initialState;
+    }
+
+    ///
+    /// \brief Return the current state.
+    ///
+    std::shared_ptr<OdeSystemState> getCurrentState()
+    {
+        this->currentState;
+    }
+
+    ///
+    /// \brief Return the previous state.
+    ///
+    std::shared_ptr<OdeSystemState> getPreviousState()
+    {
+        this->previousState;
     }
 
 protected:
@@ -224,12 +250,10 @@ protected:
     std::shared_ptr<OdeSystemState> previousState;
     std::shared_ptr<OdeSystemState> newState;
 
-    std::shared_ptr<OdeSystemState> initialState;
-
-    core::Matrixd M; ///> Mass matrix
-    core::Matrixd C; ///> Damping matrix
-    core::Matrixd K; ///> Stiffness matrix
-    core::Vectord f; ///> Force loads
+    core::SparseMatrixd M; ///> Mass matrix
+    core::SparseMatrixd C; ///> Damping matrix
+    core::SparseMatrixd K; ///> Stiffness matrix
+    core::Vectord f;       ///> Force loads
 
     TimeIntegrator::IntegratorType integrationScheme;
 

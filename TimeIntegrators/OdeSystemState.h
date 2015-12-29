@@ -25,6 +25,7 @@
 #define ODESYSTEMSTATE_H
 
 #include "Core/Vector.h"
+#include "Core/Matrix.h"
 
 ///
 /// \brief Stores the state of the differential equation.
@@ -32,10 +33,17 @@
 class OdeSystemState
 {
 public:
-
-    /// Default constructor/destructor
+    ///
+    /// \brief Default constructor/destructor.
+    ///
     OdeSystemState() = default;
     ~OdeSystemState() = default;
+
+    /// Constructor with system size.
+    OdeSystemState(const size_t size)
+    {
+        this->resize(size);
+    }
 
     ///
     /// \brief Set the derivative with respect to v of the right hand side.
@@ -82,14 +90,78 @@ public:
     ///
     /// \return Reference to velocities.
     ///
-    void resize(size_t size)
+    void resize(const size_t size)
     {
         positions.resize(size);
         velocities.resize(size);
+        positions.setZero();
+        velocities.setZero();
     }
+
+    ///
+    /// \brief Return vector containing the indices of fixed dofs
+    ///
+    /// \return Reference to vector indices.
+    ///
+    void setBoundaryConditions(const std::vector<size_t> &boundaryConditions)
+    {
+        this->fixedVertices = boundaryConditions;
+    }
+
+    ///
+    /// \brief Apply boundary conditions to sparse matrix.
+    ///
+    /// \param M Sparse matrix container.
+    /// \param withCompliance True if the fixed vertices should have complieance.
+    ///
+    void applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance = true)
+    {
+        double compliance = withCompliance ? 1.0 : 0.0;
+
+        for(auto &index : this->fixedVertices)
+        {
+            M.middleRows(index,1).setZero();
+            M.middleCols(index,1).setZero();
+            M.coeffRef(index,index) = compliance;
+        }
+    }
+
+    ///
+    /// \brief Apply boundary conditions to dense matrix.
+    ///
+    /// \param M Dense matrix container.
+    /// \param withCompliance True if the fixed vertices should have complieance.
+    ///
+    void applyBoundaryConditions(core::Matrixd &M, bool withCompliance = true)
+    {
+        double compliance = withCompliance ? 1.0 : 0.0;
+
+        for(auto &index : this->fixedVertices)
+        {
+            M.middleRows(index,1).setZero();
+            M.middleCols(index,1).setZero();
+            M(index,index) = compliance;
+        }
+    }
+
+    ///
+    /// \brief Apply boundary conditions to a vector.
+    ///
+    /// \param x vector container.
+    ///
+    void applyBoundaryConditions(core::Vectord &x)
+    {
+        for(auto &index : this->fixedVertices)
+        {
+            x(index) = 0.0;
+        }
+    }
+
 private:
     core::Vectord positions; ///> State position.
     core::Vectord velocities; ///> State velocity.
+
+    std::vector<size_t> fixedVertices; ///> Fixed dof ids
 };
 
 #endif // ODESYSTEMSTATE_H
