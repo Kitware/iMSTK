@@ -30,13 +30,14 @@
 
 ///
 /// \brief Ode system of equations. Represent a ODE system of equations written as
-///    Mdv/dt=f(t,x,v)
+///     dv/dt=f(t,x,v)
 ///     dx/dt=v, with initial conditions x(0)=x0; v(0)=v0.
 ///
 class OdeSystem
 {
 public:
-    using MatrixFunctionType = std::function<const SparseMatrixd&(const core::Vectord &,const core::Vectord &)>;
+    using MatrixFunctionType = std::function<const SparseMatrixd&(const core::Vectord &,
+                                                                  const core::Vectord &)>;
     using FunctionType = std::function<const core::Vectord &(const OdeSystemState &s)>;
 
 public:

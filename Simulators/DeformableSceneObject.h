@@ -150,9 +150,10 @@ protected:
     std::shared_ptr<OdeSystemState> newState;     ///> Storage for the next state
 
     core::SparseMatrixd M; ///> Mass matrix
-    core::SparseMatrixd C; ///> Damping matrix
+    core::SparseMatrixd C; ///> Raleigh Damping matrix
+    core::SparseMatrixd D; ///> Laplacian Damping matrix
     core::SparseMatrixd K; ///> Stiffness matrix
-    core::Vectord f;       ///> Force loads
+    core::Vectord f;       ///> Accumulative forces vector
 
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };

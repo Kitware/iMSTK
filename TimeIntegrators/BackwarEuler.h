@@ -74,9 +74,10 @@ public:
         auto &K = this->system->evalDFv(newState);
         auto &C = this->system->evalDFx(newState);
 
-        this->systemMatrix = (1.0/dt) * M;
+        this->systemMatrix = (1.0/timeStep) * M;
         this->systemMatrix += C;
-        this->systemMatrix += dt * K;
+        this->systemMatrix += timeStep * K;
+        state.applyBoundaryConditions(this->systemMatrix);
 
         if(computeRHS)
         {
