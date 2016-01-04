@@ -65,7 +65,7 @@ public:
     void loadInitialStates() override;
 
     /// \brief configure the static scene object using external config file (optional)
-    bool configure(const std::string ConfigFile) override;
+    bool configure(const std::string &ConfigFile) override;
 
     void printInfo() const override;
 

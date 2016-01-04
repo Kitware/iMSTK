@@ -5,12 +5,14 @@ simmedtk_add_library(Simulators
     VegaFemSceneObject.cpp
     VegaFemSimulator.cpp
     VegaObjectConfig.cpp
+    VegaFEMDeformableSceneObject.cpp
   PUBLIC_HEADERS
     DefaultSimulator.h
     SceneObjectDeformable.h
     VegaFemSceneObject.h
     VegaFemSimulator.h
     VegaObjectConfig.h
+    VegaFEMDeformableSceneObject.h
 )
 
 target_link_libraries(Simulators
@@ -22,6 +24,8 @@ target_link_libraries(Simulators
     IO
     Devices
     VirtualTools
+    Solvers
+    TimeIntegrators
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts
@@ -36,9 +40,14 @@ target_link_libraries(Simulators
     VegaFEM::loadList
     VegaFEM::objMesh
     VegaFEM::volumetricMesh
+    VegaFEM::forceModel
     )
 
 target_include_directories(Simulators
   PRIVATE
     ${CMAKE_SOURCE_DIR}/include
     )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

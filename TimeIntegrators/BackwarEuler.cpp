@@ -23,6 +23,10 @@
 
 #include "BackwarEuler.h"
 
+BackwardEuler::BackwardEuler(std::shared_ptr< OdeSystem > system): TimeIntegrator(system)
+{}
+
+//---------------------------------------------------------------------------
 void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
 {
     if(!this->system)
@@ -58,4 +62,37 @@ void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,
     NewtonSolver->setSystem(G);
     NewtonSolver->setJacobian(DG);
     NewtonSolver->solve(newState.getVelocities());
+}
+
+//---------------------------------------------------------------------------
+void BackwardEuler::computeSystemMatrix(const OdeSystemState &state, OdeSystemState &newState, const double timeStep, bool computeRHS)
+{
+    auto &M = this->system->evalMass(newState);
+    auto &K = this->system->evalDFv(newState);
+    auto &C = this->system->evalDFx(newState);
+
+    this->systemMatrix = (1.0 / timeStep) * M;
+    this->systemMatrix += C;
+    this->systemMatrix += timeStep * K;
+    state.applyBoundaryConditions(this->systemMatrix);
+
+    if(computeRHS)
+    {
+        this->rhs = this->system->evalF(newState) + K * (newState.getPositions() -
+                    state.getPositions() - newState.getVelocities() * timeStep);
+        this->rhs -= M * (newState.getVelocities() - state.getVelocities()) / timeStep;
+        state.applyBoundaryConditions(this->rhs);
+    }
+}
+
+//---------------------------------------------------------------------------
+void BackwardEuler::computeSystemRHS(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
+{
+    auto &M = this->system->evalMass(newState);
+    auto &K = this->system->evalDFv(newState);
+
+    this->rhs = this->system->evalF(newState) + K * (newState.getPositions() -
+                state.getPositions() - newState.getVelocities() * timeStep);
+    this->rhs -= M * (newState.getVelocities() - state.getVelocities()) / timeStep;
+    state.applyBoundaryConditions(this->rhs);
 }

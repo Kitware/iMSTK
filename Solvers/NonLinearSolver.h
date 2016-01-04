@@ -123,7 +123,6 @@ public:
     void setUpdateIterate(const UpdateIterateType &newUpdateIterate);
 
 protected:
-    core::Vectord f;                ///< Storage for function evaluations
     std::array<double, 2> sigma;    ///< Safeguarding bounds for the line search
     double alpha;                   ///< Parameter to measure decrease
     size_t armijoMax;               ///< Maximum number of step length reductions

@@ -73,7 +73,7 @@ std::shared_ptr<SceneObject> VegaFemSceneObject::clone()
     return safeDownCast<SceneObject>();
 }
 
-bool VegaFemSceneObject::configure(const std::string ConfigFile)
+bool VegaFemSceneObject::configure(const std::string &ConfigFile)
 {
     femConfig = std::make_shared<VegaObjectConfig>();
 

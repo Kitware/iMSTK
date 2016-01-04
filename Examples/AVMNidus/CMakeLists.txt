@@ -14,6 +14,7 @@ target_link_libraries(${APP}
   ContactHandling
   Event
   IO
+  Solvers
   )
 
 set_target_properties(${APP}

@@ -49,8 +49,7 @@ public:
     ///
     /// \brief Constructor. Takes the system describing the ODE.
     ///
-    BackwardEuler(std::shared_ptr<OdeSystem> system) : TimeIntegrator(system)
-    {}
+    BackwardEuler(std::shared_ptr<OdeSystem> system);
 
     ///
     /// @brief Perform one iteration of the Backward Euler method.
@@ -71,25 +70,7 @@ public:
     void computeSystemMatrix(const OdeSystemState &state,
                              OdeSystemState &newState,
                              const double timeStep,
-                             bool computeRHS = true)
-    {
-        auto &M = this->system->evalMass(newState);
-        auto &K = this->system->evalDFv(newState);
-        auto &C = this->system->evalDFx(newState);
-
-        this->systemMatrix = (1.0/timeStep) * M;
-        this->systemMatrix += C;
-        this->systemMatrix += timeStep * K;
-        state.applyBoundaryConditions(this->systemMatrix);
-
-        if(computeRHS)
-        {
-            this->rhs = this->system->evalF(newState) + K*(newState.getPositions() -
-                        state.getPositions() - newState.getVelocities()*timeStep);
-            this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
-            state.applyBoundaryConditions(this->rhs);
-        }
-    }
+                             bool computeRHS = true);
 
     ///
     /// \brief Compute and store the right hand side of the system.
@@ -100,16 +81,7 @@ public:
     ///
     void computeSystemRHS(const OdeSystemState &state,
                           OdeSystemState &newState,
-                          double timeStep)
-    {
-        auto &M = this->system->evalMass(newState);
-        auto &K = this->system->evalDFv(newState);
-
-        this->rhs = this->system->evalF(newState) + K*(newState.getPositions() -
-                    state.getPositions() - newState.getVelocities()*timeStep);
-        this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
-        state.applyBoundaryConditions(this->rhs);
-    }
+                          double timeStep);
 };
 
 #endif // BACKWAREULER_H

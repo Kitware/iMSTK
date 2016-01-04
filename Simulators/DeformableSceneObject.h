@@ -75,7 +75,7 @@ public:
     ///
     /// \brief Initialize the ode solver.
     ///
-    bool init()
+    void initialize() override
     {
         auto thisPointer = this->safeDownCast<DeformableSceneObject>();
         switch(integrationScheme)
@@ -92,9 +92,12 @@ public:
             {
                 std::cerr << "Invalid time integration scheme." << std::endl;
             }
-
-            return false;
         }
+    }
+
+    virtual bool configure(const std::string &)
+    {
+        return false;
     }
 
     ///
@@ -130,7 +133,7 @@ public:
     ///
     std::shared_ptr<OdeSystemState> getCurrentState()
     {
-        this->currentState;
+        return this->currentState;
     }
 
     ///
@@ -138,8 +141,28 @@ public:
     ///
     std::shared_ptr<OdeSystemState> getPreviousState()
     {
-        this->previousState;
+        return this->previousState;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////
+    //////////// TODO: These are pure virtual methods from superclass. ////////////
+    ////////////    They should be removed in the future.              ////////////
+    ///////////////////////////////////////////////////////////////////////////////
+
+    ///serialize function explicity writes the object to the memory block
+    ///each scene object should know how to write itself to a memory block
+    void serialize(void *){}
+
+    ///Unserialize function can recover the object from the memory location
+    void unSerialize(void *){};
+
+    ///this function may not be used
+    ///every Scene Object should know how to clone itself. Since the data structures will be
+    ///in the beginning of the modules(such as simulator, viewer, collision etc.)
+    std::shared_ptr<SceneObject> clone(){return nullptr;};
+
+    /// \brief print information related the scene object
+    void printInfo() const{};
 
 protected:
     std::shared_ptr<TimeIntegrator> odeSolver; ///> Integration scheme

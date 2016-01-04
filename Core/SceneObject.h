@@ -68,7 +68,7 @@ public:
     /// \brief Abstract object initialization
     virtual void initialize() = 0;
 
-    virtual bool configure(std::string ConfigFile) = 0;
+    virtual bool configure(const std::string &ConfigFile) = 0;
 
     /// \brief Load the initial posiitons, velocities etc.,
     virtual void loadInitialStates() = 0;

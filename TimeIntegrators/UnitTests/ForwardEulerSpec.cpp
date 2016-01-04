@@ -52,6 +52,7 @@ go_bandit([]()
         };
         odeSystem->setFunction(F);
 
+        // ODE system matrix
         std::vector<Eigen::Triplet<double>> tripletList;
         tripletList.emplace_back(0,0,1);
         core::SparseMatrixd M(1,1);

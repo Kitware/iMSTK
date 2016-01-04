@@ -12,6 +12,7 @@ target_link_libraries(${APP}
   IO
   Devices
   VirtualTools
+  Solvers
 )
 
 set_target_properties(${APP}

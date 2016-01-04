@@ -124,6 +124,7 @@ void InexactNewton::updateJacobian(const core::Vectord &x)
     }
 
     const core::SparseMatrixd &jacobianMatrix = this->jacobian(x);
+    const core::Vectord &f = this->nonLinearSystem->getFunctionValue();
 
     if(!(jacobianMatrix.innerSize() > 0))
     {// TODO: Print message and/or log error.
@@ -131,9 +132,8 @@ void InexactNewton::updateJacobian(const core::Vectord &x)
     }
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
-                            jacobianMatrix, this->f);
+                            jacobianMatrix, f);
     this->linearSolver->setSystem(linearSystem);
-
 }
 
 //---------------------------------------------------------------------------

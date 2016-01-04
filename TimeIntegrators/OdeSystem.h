@@ -48,98 +48,68 @@ public:
     ///
     /// \param newDFv Derivative.
     ///
-    void setJaconbianFv(MatrixFunctionType newDFv)
-    {
-        this->DFv = newDFv;
-    }
+    void setJaconbianFv(MatrixFunctionType newDFv);
 
     ///
     /// \brief Set the derivative with respect to x of the right hand side.
     ///
     /// \param newDFx Derivative.
     ///
-    void setJaconbianFx(MatrixFunctionType newDFx)
-    {
-        this->DFx = newDFx;
-    }
+    void setJaconbianFx(MatrixFunctionType newDFx);
 
     ///
     /// \brief Set the mass matrix evaluation function
     ///
     /// \param newMass New mass function.
     ///
-    void setMass(MatrixFunctionType newMass)
-    {
-        this->Mass = newMass;
-    }
+    void setMass(MatrixFunctionType newMass);
 
     ///
     /// \brief Set the right hand side evaluation function
     ///
     /// \param newF New rhs function.
     ///
-    void setFunction(FunctionType newF)
-    {
-        this->F = newF;
-    }
+    void setFunction(FunctionType newF);
 
     ///
     /// \brief Evaluate -df/dx function at specified argument.
     ///
     /// \param s Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFx(const OdeSystemState &s)
-    {
-        return this->DFx(s);
-    }
+    const core::SparseMatrixd& evalDFx(const OdeSystemState &s);
 
     ///
     /// \brief Evaluate -df/dv function at specified argument.
     ///
     /// \param s Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFv(const OdeSystemState &s)
-    {
-        return this->DFv(s);
-    }
+    const core::SparseMatrixd& evalDFv(const OdeSystemState &s);
 
     ///
     /// \brief Evaluate mass function at specified argument.
     ///
     /// \param s Current position and velocity.
     ///
-    const core::SparseMatrixd& evalMass(const OdeSystemState &s)
-    {
-        return this->Mass(s);
-    }
+    const core::SparseMatrixd& evalMass(const OdeSystemState &s);
 
     ///
     /// \brief Evaluate rhs function at specified argument.
     ///
     /// \param s Current position and velocity.
     ///
-    const core::Vectord& evalF(const OdeSystemState &s)
-    {
-        return this->F(s);
-    }
+    const core::Vectord& evalF(const OdeSystemState &s);
 
     ///
     /// \brief Get the initial velocities and positions of the system.
     ///
-    const std::shared_ptr<OdeSystemState> getInitialState() const
-    {
-        return this->initialState;
-    }
+    const std::shared_ptr<OdeSystemState> getInitialState() const;
 
     ///
     /// \brief Set the initial velocities and positions of the system.
     ///
     /// \param newState Current positions and velocities.
     ///
-    void setInitialState(std::shared_ptr<OdeSystemState> newState)
-    {
-        this->initialState = newState;
-    }
+    void setInitialState(std::shared_ptr<OdeSystemState> newState);
 
 private:
     MatrixFunctionType DFx; ///> Function to evaluate -dF/dx, required for implicit time stepping schemes.
@@ -147,6 +117,7 @@ private:
     MatrixFunctionType Mass; ///> Function to evaluate the mass matrix.
     FunctionType F; ///> Right hand side function
 
+protected:
     std::shared_ptr<OdeSystemState> initialState; ///> Initial state of the system.
 };
 

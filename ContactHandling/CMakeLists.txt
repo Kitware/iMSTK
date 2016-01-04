@@ -13,6 +13,7 @@ target_link_libraries(ContactHandling
     Event
     Collision
     Simulators
+    Solvers
 )
 
 if(BUILD_TESTING)

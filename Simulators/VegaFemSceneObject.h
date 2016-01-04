@@ -87,7 +87,7 @@ public:
     void initialize() override;
 
     /// \brief configure the vega fem scene object using external config file
-    bool configure(const std::string ConfigFile) override;
+    bool configure(const std::string &ConfigFile) override;
 
     /// \brief load initial displacements and velocities of the nodes
     void loadInitialStates() override;

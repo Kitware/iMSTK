@@ -46,7 +46,7 @@ public:
     /// @brief Constructor/Destructor
     ///
     TimeIntegrator() = default;
-    ~TimeIntegrator() = default;
+    virtual ~TimeIntegrator() = default;
 
     ///
     /// \brief Constructor. Takes the system describing the ODE.

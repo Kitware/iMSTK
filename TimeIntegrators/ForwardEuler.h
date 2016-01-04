@@ -41,9 +41,13 @@ public:
     ///
     /// @brief Default constructor/destructor.
     ///
-    ForwardEuler():
-        linearSolver(std::make_shared<ConjugateGradient>()){}
+    ForwardEuler();
     ~ForwardEuler() = default;
+
+    ///
+    /// \brief Constructor. Takes the system describing the ODE.
+    ///
+    ForwardEuler(std::shared_ptr<OdeSystem> system);
 
     ///
     /// @brief Perform one iteration of the Forward Euler method.
@@ -60,19 +64,7 @@ public:
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
     ///
-    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &, double timeStep, bool computeRHS = true)
-    {
-        auto &M = this->system->evalMass(state);
-
-        this->systemMatrix = (1.0/timeStep) * M;
-        state.applyBoundaryConditions(this->systemMatrix);
-
-        if(computeRHS)
-        {
-            this->rhs = this->system->evalF(state);
-            state.applyBoundaryConditions(this->rhs);
-        }
-    }
+    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &, double timeStep, bool computeRHS = true);
 
 private:
     std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.

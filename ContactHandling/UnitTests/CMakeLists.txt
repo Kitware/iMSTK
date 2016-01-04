@@ -14,6 +14,8 @@ target_link_libraries(${Module}UnitTestRunner
     Collision
     Simulators
     Mesh
-    ContactHandling)
+    ContactHandling
+    Solvers
+    )
 
 simple_test(${Module} --reporter=spec)

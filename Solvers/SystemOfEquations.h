@@ -37,7 +37,7 @@
 class SystemOfEquations
 {
 public:
-    using FunctionType = std::function<core::Vectord&(const core::Vectord &)>;
+    using FunctionType = std::function<const core::Vectord&(const core::Vectord &)>;
 
 public:
     ///
@@ -62,7 +62,8 @@ public:
     ///
     inline const core::Vectord &eval(const core::Vectord &x)
     {
-        return this->F(x);
+        this->f = this->F(x);
+        return this->f;
     }
 
     ///

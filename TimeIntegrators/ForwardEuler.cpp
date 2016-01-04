@@ -23,6 +23,14 @@
 
 #include "ForwardEuler.h"
 
+ForwardEuler::ForwardEuler() :
+linearSolver(std::make_shared<ConjugateGradient>()) {}
+
+//---------------------------------------------------------------------------
+ForwardEuler::ForwardEuler(std::shared_ptr< OdeSystem > system): TimeIntegrator(system),
+linearSolver(std::make_shared<ConjugateGradient>()) {}
+
+//---------------------------------------------------------------------------
 void ForwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,double timeStep)
 {
     this->computeSystemMatrix(state,newState,timeStep);
@@ -38,4 +46,19 @@ void ForwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,d
     this->linearSolver->solve(solution);
 
     newState.getVelocities() += state.getVelocities();
+}
+
+//---------------------------------------------------------------------------
+void ForwardEuler::computeSystemMatrix(const OdeSystemState &state, OdeSystemState &, double timeStep, bool computeRHS)
+{
+    auto &M = this->system->evalMass(state);
+
+    this->systemMatrix = (1.0 / timeStep) * M;
+    state.applyBoundaryConditions(this->systemMatrix);
+
+    if(computeRHS)
+    {
+        this->rhs = this->system->evalF(state);
+        state.applyBoundaryConditions(this->rhs);
+    }
 }

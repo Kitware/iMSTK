@@ -22,3 +22,62 @@
 //---------------------------------------------------------------------------
 
 #include "TimeIntegrators/OdeSystem.h"
+
+void OdeSystem::setJaconbianFv(OdeSystem::MatrixFunctionType newDFv)
+{
+    this->DFv = newDFv;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setJaconbianFx(OdeSystem::MatrixFunctionType newDFx)
+{
+    this->DFx = newDFx;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setMass(OdeSystem::MatrixFunctionType newMass)
+{
+    this->Mass = newMass;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setFunction(OdeSystem::FunctionType newF)
+{
+    this->F = newF;
+}
+
+//---------------------------------------------------------------------------
+const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &s)
+{
+    return this->DFx(s);
+}
+
+//---------------------------------------------------------------------------
+const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &s)
+{
+    return this->DFv(s);
+}
+
+//---------------------------------------------------------------------------
+const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &s)
+{
+    return this->Mass(s);
+}
+
+//---------------------------------------------------------------------------
+const core::Vectord &OdeSystem::evalF(const OdeSystemState &s)
+{
+    return this->F(s);
+}
+
+//---------------------------------------------------------------------------
+const std::shared_ptr< OdeSystemState > OdeSystem::getInitialState() const
+{
+    return this->initialState;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setInitialState(std::shared_ptr< OdeSystemState > newState)
+{
+    this->initialState = newState;
+}

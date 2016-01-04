@@ -1,14 +1,19 @@
+
 set(COMPONENT_MODULE TimeIntegrators)
 simmedtk_add_library(${COMPONENT_MODULE}
   SOURCES
     TimeIntegrator.cpp
     ForwardEuler.cpp
     BackwarEuler.cpp
+    OdeSystem.cpp
+    OdeSystemState.cpp
 
   PUBLIC_HEADERS
     TimeIntegrator.h
     ForwardEuler.h
     BackwarEuler.h
+    OdeSystem.h
+    OdeSystemState.h
 )
 
 target_compile_options(${COMPONENT_MODULE}

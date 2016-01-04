@@ -56,7 +56,7 @@ void StaticSceneObject::loadInitialStates()
 {
 }
 
-bool StaticSceneObject::configure(const std::string /*ConfigFile*/)
+bool StaticSceneObject::configure(const std::string &/*ConfigFile*/)
 {
     return false;
 }

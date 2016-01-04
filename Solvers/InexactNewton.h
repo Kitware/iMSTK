@@ -226,7 +226,7 @@ private:
     double relativeTolerance;                       ///> Relative (to the rhs) tolerance (Default: 1.0e-6).
     double gamma;                                   ///> Internal parameter used to update the forcing term  (Default: 0.9).
     double etaMax;                                  ///> Maximum tolerance for the linear solver (Default: 0.9).
-    size_t maxIterations;                           ///> Maximum number of nonlinear iterations (Default: 40).
+    size_t maxIterations;                           ///> Maximum number of nonlinear iterations (Default: 50).
     bool useArmijo;                                 ///> True if Armijo liner search is desired (Default: true).
 };
 

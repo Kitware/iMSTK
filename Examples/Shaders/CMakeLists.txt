@@ -11,6 +11,7 @@ target_link_libraries(${APP}
   Mesh
   Event
   IO
+  Solvers
   )
 
 set_target_properties(${APP}
