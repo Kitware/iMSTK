@@ -23,8 +23,19 @@
 
 #include "ForwardEuler.h"
 
-void ForwardEuler::solve(core::Vectord &x, double timeStep)
+void ForwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,double timeStep)
 {
-    core::Vectord y(x.size());
-    x += timeStep * this->F(x, y);
+    this->computeSystemMatrix(state,newState,timeStep);
+
+    auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
+                            this->systemMatrix, this->rhs);
+
+    this->linearSolver->setSystem(linearSystem);
+
+    newState.getPositions() = state.getPositions() + timeStep * state.getVelocities();
+
+    this->solution = state.getVelocities();
+    this->linearSolver->solve(solution);
+
+    newState.getVelocities() += state.getVelocities();
 }

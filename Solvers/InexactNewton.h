@@ -28,10 +28,10 @@
 #include "Solvers/LinearSolver.h"
 
 ///
-/// @brief Inexact Newtom method. This version of the newton method is based on the work
-///     Tim Kelly and others at NC Statu University. The algorithm is globally convergent
+/// @brief Inexact Newton method. This version of the newton method is based on the work
+///     Tim Kelly and others at NC State University. The algorithm is globally convergent
 ///     in the sense that for any initial  iterate the iteration either converge to a
-///     root of F or fails. Global convergence is achieved usign a line search subprocess
+///     root of F or fails. Global convergence is achieved using a line search sub-process
 ///     and the Armijo rule.
 ///
 class InexactNewton : public NonLinearSolver
@@ -201,16 +201,33 @@ public:
         return this->maxIterations;
     }
 
+    ///
+    /// \brief Set the useArmijo flag. If useArmijo is true a line search is performed
+    ///     using the Armijo-Goldstein condition.
+    ///
+    void setUseArmijo(const bool value)
+    {
+        this->useArmijo = value;
+    }
+
+    ///
+    /// \brief Get MaxIterations. Returns current maximum nonlinear iterations.
+    ///
+    bool getUseArmijo() const
+    {
+        return this->useArmijo;
+    }
+
 private:
-    std::shared_ptr<LinearSolverType> linearSolver;
-    JacobianType jacobian;
-    core::SparseMatrixd jacobianMatrix;
-    double forcingTerm;
-    double absoluteTolerance;
-    double relativeTolerance;
-    double gamma;
-    double etaMax;
-    size_t maxIterations;
+    std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.
+    JacobianType jacobian;                          ///> Jacobian matrix function.
+    double forcingTerm;                             ///> Method's forcing term (Default: 0.9).
+    double absoluteTolerance;                       ///> Tolerance for the method (Default: 1.0e-3).
+    double relativeTolerance;                       ///> Relative (to the rhs) tolerance (Default: 1.0e-6).
+    double gamma;                                   ///> Internal parameter used to update the forcing term  (Default: 0.9).
+    double etaMax;                                  ///> Maximum tolerance for the linear solver (Default: 0.9).
+    size_t maxIterations;                           ///> Maximum number of nonlinear iterations (Default: 40).
+    bool useArmijo;                                 ///> True if Armijo liner search is desired (Default: true).
 };
 
 #endif // INEXACT_NEWTON_H

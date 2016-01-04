@@ -30,7 +30,7 @@
 #include "Core/Matrix.h"
 
 ///
-/// \class systemOfEquations
+/// \class SystemOfEquations
 ///
 /// \brief Base class for system of equations
 ///
@@ -60,10 +60,9 @@ public:
     /// \param x Value.
     /// \return Function value.
     ///
-    inline const core::Vectord &evalF(const core::Vectord &x)
+    inline const core::Vectord &eval(const core::Vectord &x)
     {
-        this->F(x,this->f);
-        return this->f;
+        return this->F(x);
     }
 
     ///
@@ -71,7 +70,7 @@ public:
     ///
     /// \return Function value.
     ///
-    inline core::Vectord &getF()
+    inline core::Vectord &getFunctionValue()
     {
         return this->f;
     }
@@ -109,9 +108,10 @@ public:
         A(matrix),
         rhs(b)
     {
-        this->F = [this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+        this->F = [this](const core::Vectord & x) -> core::Vectord &
         {
-            return y = this->A * x;
+            this->f = this->A * x;
+            return this->f;
         };
     }
 

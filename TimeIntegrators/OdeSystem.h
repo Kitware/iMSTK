@@ -36,8 +36,7 @@
 class OdeSystem
 {
 public:
-    using MatrixFunctionType = std::function<const SparseMatrixd&(const core::Vectord &,
-                                                                  const core::Vectord &)>;
+    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const OdeSystemState &s)>;
     using FunctionType = std::function<const core::Vectord &(const OdeSystemState &s)>;
 
 public:
@@ -137,7 +136,7 @@ public:
     ///
     /// \param newState Current positions and velocities.
     ///
-    void setInitialState(std::shared_ptr<OdeSystemState> newState) const
+    void setInitialState(std::shared_ptr<OdeSystemState> newState)
     {
         this->initialState = newState;
     }

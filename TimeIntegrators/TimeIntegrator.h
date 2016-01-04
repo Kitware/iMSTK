@@ -57,7 +57,7 @@ public:
     ///
     /// \brief Perform one iteration of the method
     ///
-    virtual void solve(OdeSystemState&,OdeSystemState&,double) = 0;
+    virtual void solve(const OdeSystemState&,OdeSystemState&,double) = 0;
 
     ///
     /// \brief Return the Ode system of equations.
@@ -72,7 +72,7 @@ public:
     ///
     /// \param newSystem Ode system.
     ///
-    void setSystem(std::shared_ptr<OdeSystem> newSystem) const
+    void setSystem(std::shared_ptr<OdeSystem> newSystem)
     {
         this->system = newSystem;
     }
@@ -82,7 +82,7 @@ public:
     ///
     /// \param newSystemMatrix System matrix corresponding to the solver used.
     ///
-    void setSystemMatrix(core::SparseMatrixd &newSystemMatrix) const
+    void setSystemMatrix(const core::SparseMatrixd &newSystemMatrix)
     {
         this->systemMatrix = newSystemMatrix;
     }

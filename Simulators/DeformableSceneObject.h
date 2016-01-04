@@ -108,7 +108,7 @@ public:
             return;
         }
 
-        this->odeSolver->solve(this->currentState,this->newState,dt);
+        this->odeSolver->solve(*this->currentState,*this->newState,dt);
 
         this->currentState.swap(this->previousState);
         this->currentState.swap(this->newState);
@@ -151,7 +151,7 @@ protected:
 
     core::SparseMatrixd M; ///> Mass matrix
     core::SparseMatrixd C; ///> Raleigh Damping matrix
-    core::SparseMatrixd D; ///> Laplacian Damping matrix
+    core::SparseMatrixd D; ///> Raleigh Damping matrix
     core::SparseMatrixd K; ///> Stiffness matrix
     core::Vectord f;       ///> Accumulative forces vector
 

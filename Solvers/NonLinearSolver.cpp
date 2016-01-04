@@ -38,7 +38,7 @@ NonLinearSolver::NonLinearSolver():
 double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
 {
     /// Temporaries used in the line search
-    double previousFnorm = this->nonLinearSystem.getF().norm();
+    double previousFnorm = this->nonLinearSystem->getFunctionValue().norm();
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
     std::array<double, 3> lambda    = {this->sigma[0]*this->sigma[1], 1.0, 1.0};
 

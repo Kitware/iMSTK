@@ -37,7 +37,7 @@
 class BackwardEuler : public TimeIntegrator
 {
 public:
-    using SystemMatrixType = std::function<const SparseMatrixd&(const Vectord &x)>;
+    using SystemMatrixType = OdeSystem::MatrixFunctionType;
 
 public:
     ///
@@ -68,7 +68,10 @@ public:
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
     ///
-    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &newState, double timeStep, bool computeRHS = true)
+    void computeSystemMatrix(const OdeSystemState &state,
+                             OdeSystemState &newState,
+                             const double timeStep,
+                             bool computeRHS = true)
     {
         auto &M = this->system->evalMass(newState);
         auto &K = this->system->evalDFv(newState);
@@ -81,8 +84,10 @@ public:
 
         if(computeRHS)
         {
-            this->rhs = this->system->evalF(newState) + K*(newState.getPositions() - state.getPositions() - newState.getVelocities()*timeStep);
+            this->rhs = this->system->evalF(newState) + K*(newState.getPositions() -
+                        state.getPositions() - newState.getVelocities()*timeStep);
             this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
+            state.applyBoundaryConditions(this->rhs);
         }
     }
 
@@ -93,13 +98,17 @@ public:
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
     ///
-    void computeSystemRHS(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
+    void computeSystemRHS(const OdeSystemState &state,
+                          OdeSystemState &newState,
+                          double timeStep)
     {
         auto &M = this->system->evalMass(newState);
         auto &K = this->system->evalDFv(newState);
 
-        this->rhs = this->system->evalF(newState) + K*(newState.getPositions() - state.getPositions() - newState.getVelocities()*timeStep);
+        this->rhs = this->system->evalF(newState) + K*(newState.getPositions() -
+                    state.getPositions() - newState.getVelocities()*timeStep);
         this->rhs -= M*(newState.getVelocities()-state.getVelocities())/timeStep;
+        state.applyBoundaryConditions(this->rhs);
     }
 };
 

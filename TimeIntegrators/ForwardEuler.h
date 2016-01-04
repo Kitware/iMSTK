@@ -26,6 +26,7 @@
 
 #include "TimeIntegrators/TimeIntegrator.h"
 #include "Core/Vector.h"
+#include "Solvers/ConjugateGradient.h"
 
 ///
 /// @brief Approximates the solution to the Initial value problem: Mdv/dt = F(x,v,t),
@@ -34,10 +35,14 @@
 class ForwardEuler : public TimeIntegrator
 {
 public:
+    using LinearSolverType = LinearSolver<core::SparseMatrixd>;
+
+public:
     ///
     /// @brief Default constructor/destructor.
     ///
-    ForwardEuler() = default;
+    ForwardEuler():
+        linearSolver(std::make_shared<ConjugateGradient>()){}
     ~ForwardEuler() = default;
 
     ///
@@ -46,8 +51,32 @@ public:
     /// \param x Current iterate.
     /// \param timeStep Current timeStep.
     ///
-    void solve(core::Vectord &x, double timeStep) override;
+    void solve(const OdeSystemState &state,OdeSystemState &newState,double timeStep) override;
 
+    ///
+    /// \brief Compute and store the system matrix.
+    ///
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
+    ///
+    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &, double timeStep, bool computeRHS = true)
+    {
+        auto &M = this->system->evalMass(state);
+
+        this->systemMatrix = (1.0/timeStep) * M;
+        state.applyBoundaryConditions(this->systemMatrix);
+
+        if(computeRHS)
+        {
+            this->rhs = this->system->evalF(state);
+            state.applyBoundaryConditions(this->rhs);
+        }
+    }
+
+private:
+    std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.
+    core::Vectord solution; ///> Solution to the linear solve.
 };
 
 #endif // FORWARDEULER_H

@@ -31,44 +31,31 @@ void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,
     }
 
     this->computeSystemRHS(state,newState,timeStep);
-    auto G = [&,this](const core::Vectord &) -> core::Vectord&
+    auto G = [this](const core::Vectord &) -> core::Vectord&
     {
         return this->rhs;
     };
 
-    auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
+    const auto &cState = state;
+    auto &cNewState = newState;
+    auto DG = [&,this](const core::Vectord &)
     {
-        this->computeSystemMatrix(newState,timeStep);
+        this->computeSystemMatrix(cState,cNewState,timeStep);
         return this->systemMatrix;
     };
 
-    auto updateIterate = [](const core::Vectord &dv, core::Vectord &v)
+    auto updateIterate = [&](const core::Vectord &dv, core::Vectord &v)
     {
         v += dv;
-        newState.getPositions() = state.getPositions() + timeStep*v;
+        cNewState.getPositions() = cState.getPositions() + timeStep*v;
     };
 
     auto NewtonSolver = std::make_shared<InexactNewton>();
 
     newState = state;
 
+    NewtonSolver->setUpdateIterate(updateIterate);
     NewtonSolver->setSystem(G);
     NewtonSolver->setJacobian(DG);
     NewtonSolver->solve(newState.getVelocities());
-}
-
-//---------------------------------------------------------------------------
-BackwardEuler::SystemMatrixType BackwardEuler::getSystemMatrix()
-{
-    if(!this->system)
-    {
-        return;
-    }
-
-    auto DG = [ &, this](const core::Vectord &x) -> void
-    {
-        auto &C = this->system->evalDFv(x);
-        auto &K = this->system->evalDFx(x);
-
-    };
 }

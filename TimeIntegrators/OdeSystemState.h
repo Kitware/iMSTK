@@ -112,17 +112,30 @@ public:
     /// \brief Apply boundary conditions to sparse matrix.
     ///
     /// \param M Sparse matrix container.
-    /// \param withCompliance True if the fixed vertices should have complieance.
+    /// \param withCompliance True if the fixed vertices should have compliance.
     ///
-    void applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance = true)
+    void applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance = true) const
     {
         double compliance = withCompliance ? 1.0 : 0.0;
-
+        // Set column and row to zero.
         for(auto &index : this->fixedVertices)
         {
-            M.middleRows(index,1).setZero();
-            M.middleCols(index,1).setZero();
-            M.coeffRef(index,index) = compliance;
+            auto idx = static_cast<core::SparseMatrixd::Index>(index);
+            for (int k = 0; k < M.outerSize(); ++k)
+            {
+                for(core::SparseMatrixd::InnerIterator i(M,k); i; ++i)
+                {
+                    if(i.row() == idx || i.col() == idx)
+                    {
+                        i.valueRef() = 0.0;
+                    }
+
+                    if(i.row() == idx && i.col() == idx)
+                    {
+                        i.valueRef() = compliance;
+                    }
+                }
+            }
         }
     }
 
@@ -132,7 +145,7 @@ public:
     /// \param M Dense matrix container.
     /// \param withCompliance True if the fixed vertices should have complieance.
     ///
-    void applyBoundaryConditions(core::Matrixd &M, bool withCompliance = true)
+    void applyBoundaryConditions(core::Matrixd &M, bool withCompliance = true) const
     {
         double compliance = withCompliance ? 1.0 : 0.0;
 
@@ -149,7 +162,7 @@ public:
     ///
     /// \param x vector container.
     ///
-    void applyBoundaryConditions(core::Vectord &x)
+    void applyBoundaryConditions(core::Vectord &x) const
     {
         for(auto &index : this->fixedVertices)
         {

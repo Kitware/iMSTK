@@ -158,8 +158,7 @@ public:
     void generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMesh,
                          double radius = 1.0,
                          const bool saveToDisk = false,
-                         const std::string &filename = "mesh.interp"
-                        );
+                         const std::string &filename = "mesh.interp");
 
     ///
     /// \brief Apply a tranlation to all the vertices, including attached meshes.

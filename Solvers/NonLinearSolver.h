@@ -76,7 +76,7 @@ public:
                         std::array<double, 3> &lambda);
 
     ///
-    /// \brief Set/Get Sigma. Safeguard parameter for the the linesearch method.
+    /// \brief Set/Get Sigma. Safeguard parameter for the the line search method.
     ///
     /// \param newSigma New sigma parameter.
     ///
@@ -84,7 +84,7 @@ public:
     const std::array<double, 2> &getSigma() const;
 
     ///
-    /// \brief Set/Get Alpha. Parameter to measure sufficient decrease in the linerseach.
+    /// \brief Set/Get Alpha. Parameter to measure sufficient decrease in the line search.
     ///
     /// \param newAlpha New alpha parameter.
     ///
@@ -118,18 +118,15 @@ public:
     ///
     /// \brief Set a customized iterate update function.
     ///
-    /// \param newUpdateIterate Function used to update iterates.
+    /// \param newUpdateIterate Function used to update iterates. Default: x+=dx.
     ///
-    void setUpdateIterate(const UpdateIterateType &newUpdateIterate)
-    {
-        this->updateIterate = newUpdateIterate;
-    }
+    void setUpdateIterate(const UpdateIterateType &newUpdateIterate);
 
 protected:
     core::Vectord f;                ///< Storage for function evaluations
-    std::array<double, 2> sigma;    ///< Safeguarding bounds for the lineseach
+    std::array<double, 2> sigma;    ///< Safeguarding bounds for the line search
     double alpha;                   ///< Parameter to measure decrease
-    size_t armijoMax;               ///< Maximum number of steplength reductions
+    size_t armijoMax;               ///< Maximum number of step length reductions
     std::shared_ptr<SystemOfEquations> nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType updateIterate; ///< Update iteration function
 };

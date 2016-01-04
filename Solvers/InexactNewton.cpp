@@ -34,7 +34,8 @@ InexactNewton::InexactNewton():
     relativeTolerance(1e-6),
     gamma(0.9),
     etaMax(0.9),
-    maxIterations(50) {}
+    maxIterations(50),
+    useArmijo(true) {}
 
 //---------------------------------------------------------------------------
 void InexactNewton::solve(core::Vectord &x)
@@ -61,11 +62,15 @@ void InexactNewton::solve(core::Vectord &x)
         this->linearSolver->solve(dx);
         this->updateIterate(-dx,x);
 
-        double newNorm = this->armijo(dx, x);
+        double newNorm = fnorm;
+        if(this->useArmijo)
+        {
+            newNorm = this->armijo(dx, x);
+        }
 
         if(this->forcingTerm > 0 && newNorm > stopTolerance)
         {
-            double ratio = newNorm / fnorm; // Ratio of succesive residual norms
+            double ratio = newNorm / fnorm; // Ratio of successive residual norms
             this->updateForcingTerm(ratio, stopTolerance, fnorm);
 
             // Reset tolerance in the linear solver according to the new forcing term
@@ -88,7 +93,7 @@ void InexactNewton::updateForcingTerm(const double ratio,
     double eta = this->gamma * ratio * ratio;
     double forcingTermSqr = this->forcingTerm * this->forcingTerm;
 
-    // Saveguard to prevent the forcing term to become too small for far away iterates
+    // Save guard to prevent the forcing term to become too small for far away iterates
     if(this->gamma * forcingTermSqr > .1)
     {
         eta = std::max(eta, this->gamma * forcingTermSqr);
@@ -141,24 +146,6 @@ void InexactNewton::setJacobian(const NonLinearSolver::JacobianType &newJacobian
 const NonLinearSolver::JacobianType &InexactNewton::getJacobian() const
 {
     return this->jacobian;
-}
-
-//---------------------------------------------------------------------------
-void InexactNewton::setJacobianMatrix(const core::SparseMatrixd &newJacobianMatrix)
-{
-    this->jacobianMatrix = newJacobianMatrix;
-}
-
-//---------------------------------------------------------------------------
-const core::SparseMatrixd &InexactNewton::getJacobianMatrix() const
-{
-    return this->jacobianMatrix;
-}
-
-//---------------------------------------------------------------------------
-core::SparseMatrixd &InexactNewton::getJacobianMatrix()
-{
-    return this->jacobianMatrix;
 }
 
 //---------------------------------------------------------------------------

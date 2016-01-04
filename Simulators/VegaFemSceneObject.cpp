@@ -134,10 +134,6 @@ void VegaFemSceneObject::initialize()
     f_extBase.resize(3 * numNodes);
     f_ext.resize(3 * numNodes);
 
-    // New state variables
-    this->initialState->resize(3*numNodes);
-    *this->currentState = *this->initialState;
-
     loadInitialStates();
     loadScriptedExternalForces();
     createForceModel();
