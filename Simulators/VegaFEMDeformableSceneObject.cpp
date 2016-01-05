@@ -24,7 +24,32 @@
 #include "VegaFEMDeformableSceneObject.h"
 
 // VegaFEM includes
+#include "Mesh/VegaVolumetricMesh.h"
+#include "Core/MakeUnique.h"
+#include "IO/IOMesh.h"
+
+// Vega includes
 #include "configFile.h"
+#include "generateMassMatrix.h"
+#include "sparseMatrix.h"
+#include "forceModel.h"
+#include "StVKStiffnessMatrix.h"
+#include "StVKForceModel.h"
+#include "StVKElementABCD.h"
+#include "StVKElementABCDLoader.h"
+#include "StVKInternalForcesMT.h"
+#include "StVKStiffnessMatrixMT.h"
+#include "linearFEMForceModel.h"
+#include "corotationalLinearFEM.h"
+#include "corotationalLinearFEMMT.h"
+#include "corotationalLinearFEMForceModel.h"
+#include "isotropicHyperelasticFEM.h"
+#include "isotropicHyperelasticFEMMT.h"
+#include "isotropicHyperelasticFEMForceModel.h"
+#include "StVKIsotropicMaterial.h"
+#include "neoHookeanIsotropicMaterial.h"
+#include "MooneyRivlinIsotropicMaterial.h"
+#include "graph.h"
 
 ///
 /// \brief Vega configuration parser interface. This class interfaces with
