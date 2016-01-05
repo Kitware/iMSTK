@@ -36,8 +36,8 @@
 class OdeSystem
 {
 public:
-    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const OdeSystemState &s)>;
-    using FunctionType = std::function<const core::Vectord &(const OdeSystemState &s)>;
+    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const OdeSystemState &state)>;
+    using FunctionType = std::function<const core::Vectord &(const OdeSystemState &state)>;
 
 public:
     OdeSystem() = default;
@@ -46,61 +46,63 @@ public:
     ///
     /// \brief Set the derivative with respect to v of the right hand side.
     ///
-    /// \param newDFv Derivative.
+    /// \param newDFv Derivative function. Returns a sparse matrix.
     ///
     void setJaconbianFv(MatrixFunctionType newDFv);
 
     ///
     /// \brief Set the derivative with respect to x of the right hand side.
     ///
-    /// \param newDFx Derivative.
+    /// \param newDFx Derivative function. Returns a sparse matrix.
     ///
     void setJaconbianFx(MatrixFunctionType newDFx);
 
     ///
     /// \brief Set the mass matrix evaluation function
     ///
-    /// \param newMass New mass function.
+    /// \param newMass New mass function. Returns a sparse matrix.
     ///
     void setMass(MatrixFunctionType newMass);
 
     ///
     /// \brief Set the right hand side evaluation function
     ///
-    /// \param newF New rhs function.
+    /// \param newF New rhs function. Returns a vector.
     ///
     void setFunction(FunctionType newF);
 
     ///
     /// \brief Evaluate -df/dx function at specified argument.
     ///
-    /// \param s Current position and velocity.
+    /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFx(const OdeSystemState &s);
+    const core::SparseMatrixd& evalDFx(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate -df/dv function at specified argument.
     ///
-    /// \param s Current position and velocity.
+    /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFv(const OdeSystemState &s);
+    const core::SparseMatrixd& evalDFv(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate mass function at specified argument.
     ///
-    /// \param s Current position and velocity.
+    /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalMass(const OdeSystemState &s);
+    const core::SparseMatrixd& evalMass(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate rhs function at specified argument.
     ///
-    /// \param s Current position and velocity.
+    /// \param state Current position and velocity.
     ///
-    const core::Vectord& evalF(const OdeSystemState &s);
+    const core::Vectord& evalF(const OdeSystemState &state);
 
     ///
     /// \brief Get the initial velocities and positions of the system.
+    ///
+    /// \return Pinter to initial state.
     ///
     const std::shared_ptr<OdeSystemState> getInitialState() const;
 
@@ -115,10 +117,36 @@ private:
     MatrixFunctionType DFx; ///> Function to evaluate -dF/dx, required for implicit time stepping schemes.
     MatrixFunctionType DFv; ///> Function to evaluate -dF/dv, required for implicit time stepping schemes.
     MatrixFunctionType Mass; ///> Function to evaluate the mass matrix.
-    FunctionType F; ///> Right hand side function
+    FunctionType F; ///> ODE right hand side function
 
 protected:
     std::shared_ptr<OdeSystemState> initialState; ///> Initial state of the system.
 };
+
+/// Inlined functions
+
+//---------------------------------------------------------------------------
+inline const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &state)
+{
+    return this->DFx(state);
+}
+
+//---------------------------------------------------------------------------
+inline const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &state)
+{
+    return this->DFv(state);
+}
+
+//---------------------------------------------------------------------------
+inline const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &state)
+{
+    return this->Mass(state);
+}
+
+//---------------------------------------------------------------------------
+inline const core::Vectord &OdeSystem::evalF(const OdeSystemState &state)
+{
+    return this->F(state);
+}
 
 #endif // ODESYSTEM_H

@@ -34,7 +34,7 @@
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
 #include "Core/Light.h"
-#include "Core/SceneObject.h"
+#include "SceneModels/SceneObject.h"
 #include "Core/DataStructures.h"
 #include "Event/KeyboardEvent.h"
 #include "Event/MouseButtonEvent.h"

@@ -25,7 +25,7 @@
 #define SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
 
 // SimMedTK includes
-#include "Core/SceneObject.h"
+#include "SceneModels/SceneObject.h"
 #include "TimeIntegrators/TimeIntegrator.h"
 #include "TimeIntegrators/BackwarEuler.h"
 #include "TimeIntegrators/ForwardEuler.h"
@@ -103,7 +103,7 @@ public:
     ///
     /// \brief Update states
     ///
-    void update(double dt)
+    void update(const double dt)
     {
         if(!this->odeSolver)
         {

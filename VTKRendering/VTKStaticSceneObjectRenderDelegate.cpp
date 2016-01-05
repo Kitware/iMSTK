@@ -23,7 +23,7 @@
 
 #include "Core/Model.h"
 #include "Core/Geometry.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "VTKRendering/VTKRenderDelegate.h"
 #include "Geometry/PlaneModel.h"
 #include "Geometry/MeshModel.h"

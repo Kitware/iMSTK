@@ -14,6 +14,8 @@ target_link_libraries(${APP}
   Devices
   VirtualTools
   Solvers
+  SceneModels
+  SimulationManager
 )
 
 set_target_properties(${APP}

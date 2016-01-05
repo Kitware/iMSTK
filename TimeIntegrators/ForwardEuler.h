@@ -39,7 +39,7 @@ public:
 
 public:
     ///
-    /// @brief Default constructor/destructor.
+    /// @brief Default Constructor/Destructor.
     ///
     ForwardEuler();
     ~ForwardEuler() = default;
@@ -63,11 +63,15 @@ public:
     /// \param state Current state
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
+    /// \param computeRHS If true, this function computed the right hand side of the system.
     ///
-    void computeSystemMatrix(const OdeSystemState &state, OdeSystemState &, double timeStep, bool computeRHS = true);
+    virtual void computeSystemMatrix(const OdeSystemState &state,
+                                     OdeSystemState &,
+                                     double timeStep,
+                                     bool computeRHS = true);
 
 private:
-    std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.
+    std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. (Default: ConjugateGradient)
     core::Vectord solution; ///> Solution to the linear solve.
 };
 

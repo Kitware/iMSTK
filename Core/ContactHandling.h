@@ -26,7 +26,7 @@
 
 // SimMedTK includes
 #include "Core/CoreClass.h"
-#include "Core/SceneObject.h"
+#include "SceneModels/SceneObject.h"
 
 // STL includes
 #include <memory>

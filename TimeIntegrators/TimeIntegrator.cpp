@@ -22,3 +22,30 @@
 //---------------------------------------------------------------------------
 
 #include "TimeIntegrator.h"
+
+TimeIntegrator::TimeIntegrator(std::shared_ptr< OdeSystem > odeSystem): system(odeSystem)
+{}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< OdeSystem > TimeIntegrator::getSystem() const
+{
+    return this->system;
+}
+
+//---------------------------------------------------------------------------
+void TimeIntegrator::setSystem(std::shared_ptr< OdeSystem > newSystem)
+{
+    this->system = newSystem;
+}
+
+//---------------------------------------------------------------------------
+void TimeIntegrator::setSystemMatrix(const core::SparseMatrixd &newSystemMatrix)
+{
+    this->systemMatrix = newSystemMatrix;
+}
+
+//---------------------------------------------------------------------------
+const core::SparseMatrixd &TimeIntegrator::getSystemMatrix() const
+{
+    return this->systemMatrix;
+}

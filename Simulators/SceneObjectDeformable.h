@@ -29,7 +29,7 @@
 
 // SimMedTK includes
 #include "Mesh/SurfaceMesh.h"
-#include "Core/SceneObject.h"
+#include "SceneModels/SceneObject.h"
 #include "Core/ErrorLog.h"
 #include "VegaObjectConfig.h"
 

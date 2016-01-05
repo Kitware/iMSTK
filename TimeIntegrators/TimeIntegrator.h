@@ -51,54 +51,51 @@ public:
     ///
     /// \brief Constructor. Takes the system describing the ODE.
     ///
-    TimeIntegrator(std::shared_ptr<OdeSystem> odeSystem) : system(odeSystem)
-    {}
+    TimeIntegrator(std::shared_ptr<OdeSystem> odeSystem);
 
     ///
     /// \brief Perform one iteration of the method
     ///
-    virtual void solve(const OdeSystemState&,OdeSystemState&,double) = 0;
+    /// \param oldState Previous state.
+    /// \param newState New writable state.
+    /// \param timeStep Step size.
+    ///
+    virtual void solve(const OdeSystemState &oldState,
+                       OdeSystemState &newState,
+                       const double timeStep) = 0;
 
     ///
     /// \brief Return the Ode system of equations.
     ///
-    std::shared_ptr<OdeSystem> getSystem() const
-    {
-        return this->system;
-    }
+    /// \return Pointer to ODE system.
+    ///
+    std::shared_ptr<OdeSystem> getSystem() const;
 
     ///
-    /// \brief Set a new system of ODE.
+    /// \brief Set a new system of ODEs.
     ///
     /// \param newSystem Ode system.
     ///
-    void setSystem(std::shared_ptr<OdeSystem> newSystem)
-    {
-        this->system = newSystem;
-    }
+    void setSystem(std::shared_ptr<OdeSystem> newSystem);
 
     ///
     /// \brief Set a new linear system matrix.
     ///
     /// \param newSystemMatrix System matrix corresponding to the solver used.
     ///
-    void setSystemMatrix(const core::SparseMatrixd &newSystemMatrix)
-    {
-        this->systemMatrix = newSystemMatrix;
-    }
+    void setSystemMatrix(const core::SparseMatrixd &newSystemMatrix);
 
     ///
     /// \brief Return the Ode system of equations.
     ///
-    const core::SparseMatrixd &getSystemMatrix() const
-    {
-        return this->systemMatrix;
-    }
+    /// \return Constant reference to system matrix.
+    ///
+    const core::SparseMatrixd &getSystemMatrix() const;
 
 protected:
-    std::shared_ptr<OdeSystem> system; ///> System of differential equations.
-    core::SparseMatrixd systemMatrix; ///> Linear system matrix.
-    core::Vectord rhs; ///> Right hand side vector.
+    std::shared_ptr<OdeSystem> system;  ///> System of differential equations.
+    core::SparseMatrixd systemMatrix;   ///> Linear system matrix.
+    core::Vectord rhs;                  ///> Right hand side vector.
 };
 
 #endif // TIMEINTEGRATOR_H

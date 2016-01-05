@@ -31,11 +31,12 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Scene.h"
-#include "Core/Simulator.h"
+#include "SimulationManager/Simulator.h"
 #include "Core/Module.h"
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
 #include "Core/ViewerBase.h"
+#include "Core/BaseMesh.h"
 
 /// \brief maximum entities in the framework
 #define SIMMEDTK_SDK_MAXMESHES 100

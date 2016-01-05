@@ -21,26 +21,6 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include <bandit/bandit.h>
-#include <memory>
-#include <iostream>
-
 // SimMedTK includes
-#include "Simulators/VegaFEMDeformableSceneObject.h"
 
-using namespace bandit;
-using namespace core;
-
-go_bandit([]()
-{
-    describe("Vega Deformable Scene Object", [&]()
-    {
-        VegaFEMDeformableSceneObject sceneObject("box.veg","box.config");
-//         auto sceneObject = std::make_shared<VegaFEMDeformableSceneObject>("box.veg","box.config");
-//         it("constructs ", [&]()
-//         {
-//             AssertThat(sceneObject != nullptr, IsTrue());
-//         });
-     });
-
-});
+#include "SceneModels/DeformableSceneObject.h"

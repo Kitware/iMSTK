@@ -29,7 +29,7 @@
 
 // SimMedTK includes
 #include "Core/Module.h"
-#include "Core/ObjectSimulator.h"
+#include "Simulators/ObjectSimulator.h"
 #include "Core/MakeUnique.h"
 #include "Core/CollisionDetection.h"
 #include "Core/ContactHandling.h"

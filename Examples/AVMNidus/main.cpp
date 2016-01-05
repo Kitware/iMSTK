@@ -24,11 +24,11 @@
 #include <memory>
 
 // Core SimMedTK includes
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 
 // Include required types scene objects
 #include "Simulators/VegaFemSceneObject.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 
 // Include required simulators

@@ -27,8 +27,8 @@
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/Model.h"
-#include "Core/SceneObject.h"
-#include "CoreClass.h"
+#include "SceneModels/SceneObject.h"
+#include "Core/CoreClass.h"
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
@@ -70,6 +70,9 @@ public:
     void printInfo() const override;
 
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
+
+    void update(const double dt)
+    {}
 };
 
 #endif

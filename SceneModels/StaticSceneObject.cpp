@@ -21,9 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Core/Factory.h"
-#include "RenderDelegate.h"
+#include "Core/RenderDelegate.h"
 
 StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
 {

@@ -24,8 +24,9 @@
 #include <memory>
 
 // Core SimMedTK includes
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 #include "Geometry/MeshModel.h"
+#include "SceneModels/StaticSceneObject.h"
 
 #include "IO/InitIO.h"
 #include "VTKRendering/InitVTKRendering.h"

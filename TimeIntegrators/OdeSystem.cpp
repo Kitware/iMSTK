@@ -47,30 +47,6 @@ void OdeSystem::setFunction(OdeSystem::FunctionType newF)
 }
 
 //---------------------------------------------------------------------------
-const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &s)
-{
-    return this->DFx(s);
-}
-
-//---------------------------------------------------------------------------
-const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &s)
-{
-    return this->DFv(s);
-}
-
-//---------------------------------------------------------------------------
-const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &s)
-{
-    return this->Mass(s);
-}
-
-//---------------------------------------------------------------------------
-const core::Vectord &OdeSystem::evalF(const OdeSystemState &s)
-{
-    return this->F(s);
-}
-
-//---------------------------------------------------------------------------
 const std::shared_ptr< OdeSystemState > OdeSystem::getInitialState() const
 {
     return this->initialState;

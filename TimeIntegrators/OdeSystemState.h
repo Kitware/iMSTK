@@ -43,44 +43,43 @@ public:
     OdeSystemState(const size_t size);
 
     ///
-    /// \brief Set the derivative with respect to v of the right hand side.
+    /// \brief Get constant reference to positions.
     ///
     /// \return Constant reference to positions.
     ///
     const core::Vectord &getPositions() const;
 
     ///
-    /// \brief Set the derivative with respect to v of the right hand side.
+    /// \brief Get a writable reference to positions.
     ///
-    /// \return Reference to positions.
+    /// \return Writable reference to positions.
     ///
     core::Vectord &getPositions();
 
     ///
-    /// \brief Set the derivative with respect to v of the right hand side.
+    /// \brief Get a constant reference to velocities.
     ///
     /// \return Constant reference to velocities.
     ///
     const core::Vectord &getVelocities() const;
 
     ///
-    /// \brief Set the derivative with respect to v of the right hand side.
+    /// \brief Get a writable reference to velocities.
     ///
-    /// \return Reference to velocities.
+    /// \return Writable reference to velocities.
     ///
     core::Vectord &getVelocities();
 
     ///
     /// \brief Resize positions and velocity vectors.
-    ///
-    /// \return Reference to velocities.
+    ///     Note that this will effectively wipe the storage.
     ///
     void resize(const size_t size);
 
     ///
-    /// \brief Return vector containing the indices of fixed dofs
+    /// \brief Set a vector containing the indices of fixed dofs.
     ///
-    /// \return Reference to vector indices.
+    /// \param boundaryConditions Vector of indices.
     ///
     void setBoundaryConditions(const std::vector<size_t> &boundaryConditions);
 

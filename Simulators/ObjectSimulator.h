@@ -27,10 +27,10 @@
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "Core/SceneObject.h"
-#include "Scheduler.h"
+#include "SceneModels/SceneObject.h"
 #include "Core/ErrorLog.h"
 #include "Core/Timer.h"
+#include "SimulationManager/Scheduler.h"
 
 /// \brief  thread priority definitions
 enum ThreadPriority

@@ -207,6 +207,10 @@ public:
         return this->model;
     }
 
+    virtual void update(const double /*dt*/)
+    {
+    }
+
 protected:
     bool isActive;
 

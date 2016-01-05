@@ -15,6 +15,8 @@ target_link_libraries(${APP}
   Event
   IO
   Solvers
+  SceneModels
+  SimulationManager
   )
 
 set_target_properties(${APP}

@@ -29,7 +29,7 @@
 #include "Collision/PlaneCollisionModel.h"
 #include "Core/CollisionPair.h"
 #include "Simulators/VegaFemSceneObject.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 
 using namespace bandit;
 

@@ -27,7 +27,9 @@ BackwardEuler::BackwardEuler(std::shared_ptr< OdeSystem > system): TimeIntegrato
 {}
 
 //---------------------------------------------------------------------------
-void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
+void BackwardEuler::solve(const OdeSystemState &state,
+                          OdeSystemState &newState,
+                          double timeStep)
 {
     if(!this->system)
     {
@@ -65,7 +67,10 @@ void BackwardEuler::solve(const OdeSystemState &state, OdeSystemState &newState,
 }
 
 //---------------------------------------------------------------------------
-void BackwardEuler::computeSystemMatrix(const OdeSystemState &state, OdeSystemState &newState, const double timeStep, bool computeRHS)
+void BackwardEuler::computeSystemMatrix(const OdeSystemState &state,
+                                        OdeSystemState &newState,
+                                        const double timeStep,
+                                        bool computeRHS)
 {
     auto &M = this->system->evalMass(newState);
     auto &K = this->system->evalDFv(newState);
@@ -86,7 +91,9 @@ void BackwardEuler::computeSystemMatrix(const OdeSystemState &state, OdeSystemSt
 }
 
 //---------------------------------------------------------------------------
-void BackwardEuler::computeSystemRHS(const OdeSystemState &state, OdeSystemState &newState, double timeStep)
+void BackwardEuler::computeSystemRHS(const OdeSystemState &state,
+                                     OdeSystemState &newState,
+                                     double timeStep)
 {
     auto &M = this->system->evalMass(newState);
     auto &K = this->system->evalDFv(newState);

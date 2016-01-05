@@ -286,6 +286,8 @@ set(SimMedTK_exports
   TimeIntegrators
   VTKRendering
   VirtualTools
+  SceneModels
+  SimulationManager
   )
 
 if(SimMedTK_USE_OCULUS)
@@ -304,7 +306,9 @@ add_subdirectory(IO)
 add_subdirectory(Mesh)
 add_subdirectory(Rendering)
 add_subdirectory(Simulators)
+add_subdirectory(SimulationManager)
 add_subdirectory(Solvers)
+add_subdirectory(SceneModels)
 add_subdirectory(TimeIntegrators)
 add_subdirectory(VTKRendering)
 add_subdirectory(VirtualTools)

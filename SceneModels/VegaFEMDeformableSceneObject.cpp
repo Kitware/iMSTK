@@ -124,7 +124,7 @@ public:
 VegaFEMDeformableSceneObject::
 VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool verbose)
 {
-    if(this->vegaConfigFile.empty())
+    if(configurationFile.empty())
     {
         std::cout << "Empty configuration filename." << std::endl;
         return;
@@ -277,11 +277,7 @@ VegaFEMDeformableSceneObject::VegaFEMDeformableSceneObject(const std::string &me
     }
 
     this->configure(vegaConfigFileName);
-
-    this->loadInitialStates();
-
-    this->generateConstitutiveModel();
-    this->createForceModel();
+    this->initialize();
 }
 
 //---------------------------------------------------------------------------
@@ -306,7 +302,7 @@ void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::loadInitialStates()
 {
-    auto initialState = std::make_shared<OdeSystemState>(this->numOfDOF);
+    this->initialState = std::make_shared<OdeSystemState>(this->numOfDOF);
     auto &positions = initialState->getPositions();
 
     auto vertices = this->volumetricMesh->getVegaMesh()->getVertices();
@@ -326,7 +322,19 @@ void VegaFEMDeformableSceneObject::loadInitialStates()
     auto boundaryConditions = this->loadBoundaryConditions();
     initialState->setBoundaryConditions(boundaryConditions);
 
-    *this->currentState = *initialState;
+    this->currentState = std::make_shared<OdeSystemState>();
+    *this->currentState = *this->initialState;
+}
+
+//---------------------------------------------------------------------------
+void VegaFEMDeformableSceneObject::initialize()
+{
+    DeformableSceneObject::initialize();
+
+    this->loadInitialStates();
+
+    this->initConstitutiveModel();
+    this->initForceModel();
 }
 
 //---------------------------------------------------------------------------
@@ -362,16 +370,17 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
 
     // Flatten the internal mass matrix arrays and store them locally.
     this->flattenVegaSparseMatrix(this->vegaMassMatrix,
-                                  this->massMatrixColPointers,
+                                  this->massMatrixColIndices,
+                                  this->massMatrixRowPointers,
                                   this->massMatrixValues);
 
     // Construct the Eigen mass matrix by mapping the arrays
-    this->M = Eigen::MappedSparseMatrix<double>(
+    this->M = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
                   this->vegaMassMatrix->GetNumRows(),
                   this->vegaMassMatrix->GetNumColumns(),
                   this->vegaMassMatrix->GetNumEntries(),
-                  this->vegaMassMatrix->GetRowLengths(),
-                  this->massMatrixColPointers.data(),
+                  this->massMatrixRowPointers.data(),
+                  this->massMatrixColIndices.data(),
                   this->massMatrixValues.data());
 
     if(saveToDisk)
@@ -415,16 +424,17 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     // Flatten the internal mass matrix arrays and store them locally.
     this->flattenVegaSparseMatrix(this->vegaTangentStiffnessMatrix,
-                                  this->tangentStiffnessMatrixColPointers,
+                                  this->tangentStiffnessMatrixColIndices,
+                                  this->tangentStiffnessMatrixRowPointers,
                                   this->tangentStiffnessMatrixValues);
 
     // Construct the eigen stiffness matrix by mapping the arrays
-    this->K = Eigen::MappedSparseMatrix<double>(
+    this->K = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
                   this->vegaTangentStiffnessMatrix->GetNumRows(),
                   this->vegaTangentStiffnessMatrix->GetNumColumns(),
                   this->vegaTangentStiffnessMatrix->GetNumEntries(),
-                  this->vegaTangentStiffnessMatrix->GetRowLengths(),
-                  this->tangentStiffnessMatrixColPointers.data(),
+                  this->tangentStiffnessMatrixRowPointers.data(),
+                  this->tangentStiffnessMatrixColIndices.data(),
                   this->tangentStiffnessMatrixValues.data());
 }
 
@@ -453,21 +463,22 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
 
     // Flatten the internal mass matrix arrays and store them locally.
     this->flattenVegaSparseMatrix(this->dampingMatrix,
+                                  this->dampingMatrixColIndices,
                                   this->dampingMatrixColPointers,
                                   this->dampingMatrixValues);
 
     // Construct the Eigen damping matrix by mapping the arrays
-    this->D = Eigen::MappedSparseMatrix<double>(
+    this->D = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
                   this->dampingMatrix->GetNumRows(),
                   this->dampingMatrix->GetNumColumns(),
                   this->dampingMatrix->GetNumEntries(),
-                  this->dampingMatrix->GetRowLengths(),
                   this->dampingMatrixColPointers.data(),
+                  this->dampingMatrixColIndices.data(),
                   this->dampingMatrixValues.data());
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMDeformableSceneObject::generateConstitutiveModel()
+void VegaFEMDeformableSceneObject::initConstitutiveModel()
 {
     auto numThreads = this->vegaFemConfig->intsOptionMap.at("numberOfThreads");
     auto gravity = this->vegaFemConfig->floatsOptionMap.at("gravity");
@@ -485,25 +496,14 @@ void VegaFEMDeformableSceneObject::generateConstitutiveModel()
                 = StVKElementABCDLoader::load(mesh.get(),
                                               loadingFlag);
 
-            if(numThreads > 0)
+            if(!precomputedIntegrals)
             {
-                if(!precomputedIntegrals)
-                {
-                    std::cout << "VEGA: error! unable to load the StVK integrals."
-                              << std::endl;
-                    return;
-                }
-
-                this->stVKInternalForces = std::make_shared<StVKInternalForces>(
-                                               mesh.get(),
-                                               precomputedIntegrals,
-                                               withGravity,
-                                               gravity);
-
-                this->stVKStiffnessMatrix =
-                    std::make_shared<StVKStiffnessMatrix>(stVKInternalForces.get());
+                std::cout << "VEGA: error! unable to load the StVK integrals."
+                << std::endl;
+                return;
             }
-            else
+
+            if(numThreads > 0)
             {
                 this->stVKInternalForces = std::make_shared<StVKInternalForcesMT>(
                                                mesh.get(),
@@ -512,9 +512,20 @@ void VegaFEMDeformableSceneObject::generateConstitutiveModel()
                                                gravity,
                                                numThreads);
 
-                this->stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrixMT>(
-                                                stVKInternalForces.get(),
+                this->stVKStiffnessMatrix =
+                    std::make_shared<StVKStiffnessMatrixMT>(stVKInternalForces.get(),
                                                 numThreads);
+            }
+            else
+            {
+                this->stVKInternalForces = std::make_shared<StVKInternalForces>(
+                                               mesh.get(),
+                                               precomputedIntegrals,
+                                               withGravity,
+                                               gravity);
+
+                this->stVKStiffnessMatrix = std::make_shared<StVKStiffnessMatrix>(
+                                                stVKInternalForces.get());
             }
 
             break;
@@ -632,7 +643,7 @@ void VegaFEMDeformableSceneObject::generateConstitutiveModel()
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMDeformableSceneObject::createForceModel()
+void VegaFEMDeformableSceneObject::initForceModel()
 {
     switch(this->vegaFemConfig->forceModelType)
     {
@@ -729,6 +740,7 @@ std::vector< std::size_t > VegaFEMDeformableSceneObject::loadBoundaryConditions(
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::flattenVegaSparseMatrix(std::shared_ptr<SparseMatrix> matrix,
                                                            std::vector< int > &colIndices,
+                                                           std::vector<int> &rowPointers,
                                                            std::vector< double > &values)
 {
     auto rowLengths = matrix->GetRowLengths();
@@ -737,8 +749,10 @@ void VegaFEMDeformableSceneObject::flattenVegaSparseMatrix(std::shared_ptr<Spars
 
     // Clean the arrays
     colIndices.clear();
+    rowPointers.clear();
     values.clear();
 
+    rowPointers.push_back(0);
     // Flatten the internal mass matrix arrays an store them.
     for(int row = 0, end = matrix->GetNumRows(); row < end; ++row)
     {
@@ -749,6 +763,8 @@ void VegaFEMDeformableSceneObject::flattenVegaSparseMatrix(std::shared_ptr<Spars
         values.insert(std::end(values),
                       nonZeroValues[row],
                       nonZeroValues[row] + rowLengths[row]);
+
+        rowPointers.push_back(rowPointers[row]+rowLengths[row]);
     }
 }
 
@@ -764,6 +780,8 @@ void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<Sparse
 
     for(int row = 0, end = matrix->GetNumRows(); row < end; ++row)
     {
+        /// This operation should not add new values to the array since the matrices
+        /// structures should remain the same. It just replaces the values in the array.
         values.insert(pos,
                       nonZeroValues[row],
                       nonZeroValues[row] + rowLengths[row]);

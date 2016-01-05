@@ -31,7 +31,6 @@
 #include "Collision/OctreeCell.h"
 #include "Collision/CollisionMoller.h"
 #include "Collision/MeshCollisionModel.h"
-#include "Core/SDK.h"
 #include "Mesh/SurfaceMesh.h"
 
 

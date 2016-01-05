@@ -16,13 +16,8 @@ simmedtk_add_library(Core
     Light.cpp
     Model.cpp
     Module.cpp
-    ObjectSimulator.cpp
     RenderDetail.cpp
     Scene.cpp
-    SceneObject.cpp
-    SDK.cpp
-    Simulator.cpp
-    StaticSceneObject.cpp
     Timer.cpp
     UnifiedId.cpp
     ViewerBase.cpp
@@ -56,17 +51,10 @@ simmedtk_add_library(Core
     MemoryBlock.h
     Model.h
     Module.h
-    ObjectSimulator.h
     Quaternion.h
     RenderDelegate.h
     RenderDetail.h
     Scene.h
-    SceneObject.h
-    Scheduler.h
-    SDK.h
-    Simulator.h
-    StaticSceneObject.h
-    Synchronization.h
     Texture.h
     Timer.h
     UnifiedId.h

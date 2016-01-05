@@ -21,9 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/SceneObject.h"
-#include "Core/ObjectSimulator.h"
-#include "Core/SDK.h"
+#include "SceneModels/SceneObject.h"
+#include "Simulators/ObjectSimulator.h"
 
 SceneObject::SceneObject()
 {
@@ -31,7 +30,6 @@ SceneObject::SceneObject()
     isActive = true;
     objectSim = nullptr;
     customRender = nullptr;
-    //     SDK::getInstance()->registerSceneObject(safeDownCast<SceneObject>());
     flags.isViewerInit = false;
     flags.isSimulatorInit = false;
     name = "SceneObject" + std::to_string(this->getUniqueId()->getId());

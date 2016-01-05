@@ -26,7 +26,7 @@
 // SimMedTK includes
 #include "Geometry/MeshModel.h"
 #include "Core/RenderDetail.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Core/Scene.h"
 #include "VTKRendering/VTKViewer.h"
 #include "Testing/TestMesh.h"

@@ -26,7 +26,7 @@
 
 // SimMedTK includes
 #include "Core/Config.h"
-#include "Core/ObjectSimulator.h"
+#include "Simulators/ObjectSimulator.h"
 #include "Core/ErrorLog.h"
 
 class ToolCoupler;

@@ -23,7 +23,7 @@
 
 // SimMedTK includes
 #include "Simulators/DefaultSimulator.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Core/Event.h"
 #include "Event/KeyboardEvent.h"
 #include "Collision/MeshCollisionModel.h"
@@ -183,7 +183,7 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sce
 
     float norm = totalForce.norm();
     auto normal = totalForce.normalized();
-    auto d = totalForce.dot(contactPoint);
+//     auto d = totalForce.dot(contactPoint);
 
     outputDevice->setContactPlane(normal.cast<float>(),0);
     outputDevice->setDampingCoefficient(0.001);

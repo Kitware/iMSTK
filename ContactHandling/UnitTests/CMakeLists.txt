@@ -16,6 +16,7 @@ target_link_libraries(${Module}UnitTestRunner
     Mesh
     ContactHandling
     Solvers
+    SceneModels
     )
 
 simple_test(${Module} --reporter=spec)

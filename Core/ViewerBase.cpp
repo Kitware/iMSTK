@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Config.h"
-#include "Core/SDK.h"
 #include "Core/ViewerBase.h"
 #include "Core/DataStructures.h"
 #include "Core/RenderDelegate.h"
@@ -244,8 +243,6 @@ void ViewerBase::render()
 
 void ViewerBase::addObject(std::shared_ptr<CoreClass> object)
 {
-
-    SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 

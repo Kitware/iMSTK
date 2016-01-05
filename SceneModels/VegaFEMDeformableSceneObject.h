@@ -28,7 +28,7 @@
 #include <memory>
 
 // iMSTK includes
-#include "Simulators/DeformableSceneObject.h"
+#include "SceneModels/DeformableSceneObject.h"
 
 // iMSTK forward declarations
 class VegaVolumetricMesh;
@@ -71,6 +71,11 @@ public:
     void loadInitialStates();
 
     ///
+    /// \brief Initialize the ode solver.
+    ///
+    void initialize() override;
+
+    ///
     /// \brief Helper function to setup components.
     ///
     /// \param configFile Vega configuration file.
@@ -97,14 +102,14 @@ public:
     void initDampingMatrix();
 
     ///
-    /// \brief Initialize the constitutive model used by Vegas force model.
+    /// \brief Initialize the constitutive model used by Vega's force model.
     ///
-    void generateConstitutiveModel();
+    void initConstitutiveModel();
 
     ///
     /// \brief Instantiate the Vega force model.
     ///
-    void createForceModel();
+    void initForceModel();
 
     ///
     /// \brief Load boundary conditions. The file contains the indices of the degrees of
@@ -117,6 +122,7 @@ public:
     ///
     void flattenVegaSparseMatrix(std::shared_ptr<SparseMatrix> matrix,
                                  std::vector<int> &colIndices,
+                                 std::vector<int> &rowPointers,
                                  std::vector<double> &values);
 
     ///
@@ -162,16 +168,19 @@ private:
     // Vega mass matrix
     std::shared_ptr<SparseMatrix> vegaMassMatrix;
     std::vector<double> massMatrixValues;
-    std::vector<int> massMatrixColPointers;
+    std::vector<int> massMatrixColIndices;
+    std::vector<int> massMatrixRowPointers;
 
     // Vega Tangent stiffness matrix
     std::shared_ptr<SparseMatrix> vegaTangentStiffnessMatrix;
     std::vector<double> tangentStiffnessMatrixValues;
-    std::vector<int> tangentStiffnessMatrixColPointers;
+    std::vector<int> tangentStiffnessMatrixColIndices;
+    std::vector<int> tangentStiffnessMatrixRowPointers;
 
     // Vega Laplacian damping matrix
     std::shared_ptr<SparseMatrix> dampingMatrix;
     std::vector<double> dampingMatrixValues;
+    std::vector<int> dampingMatrixColIndices;
     std::vector<int> dampingMatrixColPointers;
 
     // Total number of degrees of freedom

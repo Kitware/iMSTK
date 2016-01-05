@@ -22,7 +22,7 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 #include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
 

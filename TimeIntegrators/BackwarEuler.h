@@ -58,7 +58,7 @@ public:
     /// \param newState New computed state.
     /// \param timeStep Time step used to discretize  the system.
     ///
-    void solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep) override;
+    virtual void solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep) override;
 
     ///
     /// \brief Compute and store the system matrix.
@@ -67,7 +67,7 @@ public:
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
     ///
-    void computeSystemMatrix(const OdeSystemState &state,
+    virtual void computeSystemMatrix(const OdeSystemState &state,
                              OdeSystemState &newState,
                              const double timeStep,
                              bool computeRHS = true);
@@ -79,7 +79,7 @@ public:
     /// \param newState New state
     /// \param timeStep Time step used to discretize the ODE.
     ///
-    void computeSystemRHS(const OdeSystemState &state,
+    virtual void computeSystemRHS(const OdeSystemState &state,
                           OdeSystemState &newState,
                           double timeStep);
 };

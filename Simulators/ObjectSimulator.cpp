@@ -21,13 +21,11 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include "Core/ObjectSimulator.h"
-#include "Core/SDK.h"
+#include "Simulators/ObjectSimulator.h"
 
 ObjectSimulator::ObjectSimulator(std::shared_ptr<ErrorLog> p_log)
 {
     this->log = p_log;
-//     SDK::getInstance()->registerObjectSim(safeDownCast<ObjectSimulator>());
     name = "objecSimulator" + std::to_string(this->getUniqueId()->getId());
 
     type = core::ClassType::Simulator;
