@@ -36,7 +36,6 @@ void BackwardEuler::solve(const OdeSystemState &state,
         return;
     }
 
-    this->computeSystemRHS(state,newState,timeStep);
     auto G = [this](const core::Vectord &) -> core::Vectord&
     {
         return this->rhs;
@@ -59,6 +58,7 @@ void BackwardEuler::solve(const OdeSystemState &state,
     auto NewtonSolver = std::make_shared<InexactNewton>();
 
     newState = state;
+    this->computeSystemRHS(state,newState,timeStep);
 
     NewtonSolver->setUpdateIterate(updateIterate);
     NewtonSolver->setSystem(G);
@@ -73,8 +73,8 @@ void BackwardEuler::computeSystemMatrix(const OdeSystemState &state,
                                         bool computeRHS)
 {
     auto &M = this->system->evalMass(newState);
-    auto &K = this->system->evalDFv(newState);
-    auto &C = this->system->evalDFx(newState);
+    auto &K = this->system->evalDFx(newState);
+    auto &C = this->system->evalDFv(newState);
 
     this->systemMatrix = (1.0 / timeStep) * M;
     this->systemMatrix += C;
@@ -96,7 +96,8 @@ void BackwardEuler::computeSystemRHS(const OdeSystemState &state,
                                      double timeStep)
 {
     auto &M = this->system->evalMass(newState);
-    auto &K = this->system->evalDFv(newState);
+    auto &K = this->system->evalDFx(newState);
+    this->system->evalDFv(newState);
 
     this->rhs = this->system->evalF(newState) + K * (newState.getPositions() -
                 state.getPositions() - newState.getVelocities() * timeStep);

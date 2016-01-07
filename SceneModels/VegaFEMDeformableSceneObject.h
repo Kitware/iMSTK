@@ -120,14 +120,6 @@ public:
     ///
     /// \brief Helper function to interface Vega sparse matrices with Eigen matrices.
     ///
-    void flattenVegaSparseMatrix(std::shared_ptr<SparseMatrix> matrix,
-                                 std::vector<int> &colIndices,
-                                 std::vector<int> &rowPointers,
-                                 std::vector<double> &values);
-
-    ///
-    /// \brief Helper function to interface Vega sparse matrices with Eigen matrices.
-    ///
     void updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
                                 std::vector<double> &values);
 

@@ -311,7 +311,6 @@ void VegaFEMDeformableSceneObject::loadInitialStates()
     {
         vertices[i]->convertToArray(positions.data()+idx);
     }
-
     auto boundaryConditions = this->loadBoundaryConditions();
     initialState->setBoundaryConditions(boundaryConditions);
 
@@ -367,13 +366,18 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
     GenerateMassMatrix::computeMassMatrix(this->volumetricMesh->getVegaMesh().get(),
                                           &matrix,
                                           true);
+
     this->vegaMassMatrix.reset(matrix);
 
-    // Flatten the internal mass matrix arrays and store them locally.
-    this->flattenVegaSparseMatrix(this->vegaMassMatrix,
-                                  this->massMatrixColIndices,
-                                  this->massMatrixRowPointers,
-                                  this->massMatrixValues);
+    auto nnz = this->vegaMassMatrix->GetNumEntries();
+    this->massMatrixRowPointers.resize(this->vegaMassMatrix->GetNumRows()+1);
+    this->massMatrixColIndices.resize(nnz);
+    this->massMatrixValues.resize(nnz);
+
+    this->vegaMassMatrix->
+    GenerateCompressedRowMajorFormat(this->massMatrixValues.data(),
+                                     this->massMatrixRowPointers.data(),
+                                     this->massMatrixColIndices.data());
 
     // Construct the Eigen mass matrix by mapping the arrays
     this->M = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
@@ -428,21 +432,34 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     this->vegaTangentStiffnessMatrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
 
-    // Flatten the internal mass matrix arrays and store them locally.
-    this->flattenVegaSparseMatrix(this->vegaTangentStiffnessMatrix,
-                                  this->tangentStiffnessMatrixColIndices,
-                                  this->tangentStiffnessMatrixRowPointers,
-                                  this->tangentStiffnessMatrixValues);
+    auto nnz = this->vegaTangentStiffnessMatrix->GetNumEntries();
+    this->tangentStiffnessMatrixRowPointers.resize(this->vegaTangentStiffnessMatrix->GetNumRows()+1);
+    this->tangentStiffnessMatrixColIndices.resize(nnz);
+    this->tangentStiffnessMatrixValues.resize(nnz);
+
+    this->vegaTangentStiffnessMatrix->
+    GenerateCompressedRowMajorFormat(this->tangentStiffnessMatrixValues.data(),
+                                     this->tangentStiffnessMatrixRowPointers.data(),
+                                     this->tangentStiffnessMatrixColIndices.data());
 
     // Construct the eigen stiffness matrix by mapping the arrays
     this->K = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
                   this->vegaTangentStiffnessMatrix->GetNumRows(),
                   this->vegaTangentStiffnessMatrix->GetNumColumns(),
-                  this->vegaTangentStiffnessMatrix->GetNumEntries(),
+                  nnz,
                   this->tangentStiffnessMatrixRowPointers.data(),
                   this->tangentStiffnessMatrixColIndices.data(),
                   this->tangentStiffnessMatrixValues.data());
+
     this->K.makeCompressed();
+
+    const auto &dampingStiffnessCoefficient =
+        this->vegaFemConfig->floatsOptionMap.at("dampingStiffnessCoefficient");
+
+    const auto &dampingMassCoefficient =
+        this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
+
+    this->C = this->M*dampingMassCoefficient + this->K*dampingStiffnessCoefficient;
 }
 
 //---------------------------------------------------------------------------
@@ -467,14 +484,18 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
 
     this->dampingMatrix.reset(matrix);
 
-    matrix->ScalarMultiply(
+    this->dampingMatrix->ScalarMultiply(
         this->vegaFemConfig->floatsOptionMap.at("dampingLaplacianCoefficient"));
 
-    // Flatten the internal mass matrix arrays and store them locally.
-    this->flattenVegaSparseMatrix(this->dampingMatrix,
-                                  this->dampingMatrixColIndices,
-                                  this->dampingMatrixColPointers,
-                                  this->dampingMatrixValues);
+    auto nnz = this->dampingMatrix->GetNumEntries();
+    this->dampingMatrixColPointers.resize(this->dampingMatrix->GetNumRows()+1);
+    this->dampingMatrixColIndices.resize(nnz);
+    this->dampingMatrixValues.resize(nnz);
+
+    this->dampingMatrix->
+    GenerateCompressedRowMajorFormat(this->dampingMatrixValues.data(),
+                                     this->dampingMatrixColPointers.data(),
+                                     this->dampingMatrixColIndices.data());
 
     // Construct the Eigen damping matrix by mapping the arrays
     this->D = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
@@ -748,37 +769,6 @@ std::vector< std::size_t > VegaFEMDeformableSceneObject::loadBoundaryConditions(
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMDeformableSceneObject::flattenVegaSparseMatrix(std::shared_ptr<SparseMatrix> matrix,
-                                                           std::vector< int > &colIndices,
-                                                           std::vector<int> &rowPointers,
-                                                           std::vector< double > &values)
-{
-    auto rowLengths = matrix->GetRowLengths();
-    auto colPointers = matrix->GetColumnIndices();
-    auto nonZeroValues = matrix->GetEntries();
-
-    // Clean the arrays
-    colIndices.clear();
-    rowPointers.clear();
-    values.clear();
-
-    rowPointers.push_back(0);
-    // Flatten the internal mass matrix arrays an store them.
-    for(int row = 0, end = matrix->GetNumRows(); row < end; ++row)
-    {
-        colIndices.insert(std::end(colIndices),
-                          colPointers[row],
-                          colPointers[row] + rowLengths[row]);
-
-        values.insert(std::end(values),
-                      nonZeroValues[row],
-                      nonZeroValues[row] + rowLengths[row]);
-
-        rowPointers.push_back(rowPointers[row]+rowLengths[row]);
-    }
-}
-
-//---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
                                                           std::vector<double> &values)
 {
@@ -786,24 +776,25 @@ void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<Sparse
     auto nonZeroValues = matrix->GetEntries();
 
     // Flatten the internal non-zeros value array and store it in values.
-    auto pos = std::begin(values);
+    int offset = 0;
 
     for(int row = 0, end = matrix->GetNumRows(); row < end; ++row)
     {
         /// This operation should not add new values to the array since the matrices
         /// structures should remain the same. It just replaces the values in the array.
-        values.insert(pos,
-                      nonZeroValues[row],
-                      nonZeroValues[row] + rowLengths[row]);
+        for(int j = 0, end_j = rowLengths[row]; j < end_j; ++j)
+        {
+            values[j+offset] = nonZeroValues[row][j];
+        }
 
-        pos += rowLengths[row];
+        offset += rowLengths[row];
     }
 }
 
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setOdeRHS()
 {
-    auto odeRHS = [this](const OdeSystemState & s)
+    auto odeRHS = [this](const OdeSystemState & s) -> const core::Vectord&
     {
         this->f = -this->C * s.getVelocities() - this->K * s.getPositions();
         return this->f;
@@ -814,13 +805,16 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 {
-    auto tangentStiffness = [&,this](const OdeSystemState & s)
+    auto tangentStiffness = [this](const OdeSystemState & s) -> const core::SparseMatrixd&
     {
         double *data = const_cast<double*>(s.getPositions().data());
-        this->forceModel->GetTangentStiffnessMatrix(data,
-                this->vegaTangentStiffnessMatrix.get());
+
+        this->forceModel->
+        GetTangentStiffnessMatrix(data,this->vegaTangentStiffnessMatrix.get());
+
         this->updateValuesFromMatrix(this->vegaTangentStiffnessMatrix,
                                      this->tangentStiffnessMatrixValues);
+        std::cout << this->K << std::endl;
         return this->K;
     };
     this->setJaconbianFx(tangentStiffness);
@@ -829,7 +823,7 @@ void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setMassMatrix()
 {
-    auto massMatrix = [this](const OdeSystemState & /*s*/)
+    auto massMatrix = [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
     {
         return this->M;
     };
@@ -845,10 +839,10 @@ void VegaFEMDeformableSceneObject::setDampingMatrix()
     const auto &dampingMassCoefficient =
         this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
-    auto raleighDamping = [&,this](const OdeSystemState & /*s*/)
+    auto raleighDamping = [&,this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
     {
-        this->C = dampingStiffnessCoefficient * this->K +
-                  dampingMassCoefficient * this->M;
+        this->C = this->M*dampingMassCoefficient;
+        this->C += this->K*dampingStiffnessCoefficient;
         return this->C;
     };
     this->setJaconbianFv(raleighDamping);
