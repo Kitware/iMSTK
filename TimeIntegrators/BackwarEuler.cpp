@@ -23,7 +23,7 @@
 
 #include "BackwarEuler.h"
 
-BackwardEuler::BackwardEuler(std::shared_ptr< OdeSystem > system): TimeIntegrator(system)
+BackwardEuler::BackwardEuler(OdeSystem *odeSystem): TimeIntegrator(odeSystem)
 {}
 
 //---------------------------------------------------------------------------

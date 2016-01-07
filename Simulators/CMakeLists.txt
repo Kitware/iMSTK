@@ -3,14 +3,14 @@ simmedtk_add_library(Simulators
     DefaultSimulator.cpp
     SceneObjectDeformable.cpp
     VegaFemSceneObject.cpp
-    VegaFemSimulator.cpp
+    VegaFEMModelSimulator.cpp
     VegaObjectConfig.cpp
     ObjectSimulator.cpp
   PUBLIC_HEADERS
     DefaultSimulator.h
     SceneObjectDeformable.h
     VegaFemSceneObject.h
-    VegaFemSimulator.h
+    VegaFEMModelSimulator.h
     VegaObjectConfig.h
     ObjectSimulator.h
 )

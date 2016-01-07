@@ -33,29 +33,28 @@ class ToolCoupler;
 class VegaFemSceneObject;
 
 /// \brief Interface class between Vega and SimMedTK core
-class VegaFemSimulator: public ObjectSimulator
+class VegaFEMModelSimulator : public ObjectSimulator
 {
 
 public:
+    ///
     /// \brief constructor
-    VegaFemSimulator(std::shared_ptr<ErrorLog> p_errorLog);
+    ///
+    VegaFEMModelSimulator();
 
-    /// \brief start the job
-    virtual void beginSim() override;
-
+    ///
     /// \brief !!
-    virtual void initCustom() override;
+    ///
+    virtual void initialize() override;
 
+    ///
     /// \brief implement the deformation computation through fem here
+    ///
     virtual void run() override;
 
-    /// \breif end the job
-    void endSim() override;
-
-    /// \brief synchronize the buffers in the object..do not call by yourself.
-    void syncBuffers() override;
-
+    ///
     /// \brief handle the keyboard and haptic button press events
+    ///
     void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
     ///

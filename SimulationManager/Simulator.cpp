@@ -45,7 +45,7 @@ void Simulator::initAsyncThreadPool()
 
     for (size_t i = 0; i < simulators.size(); i++)
     {
-        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        if (simulators[i]->getExecutionType() == ObjectSimulator::ExecutionType::AsyncMode)
         {
             asyncThreadPoolSize++;
         }
@@ -63,7 +63,7 @@ void Simulator::run()
 
     if (isInitialized == false)
     {
-        log->addError("Simulator is not initialized.");
+        // TODO: Log error
         return;
     }
 
@@ -75,13 +75,13 @@ void Simulator::run()
     asyncResults.reserve(this->asyncThreadPoolSize);
     for (size_t i = 0; i < simulators.size(); i++)
     {
-        if (simulators[i]->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+        if (simulators[i]->getExecutionType() == ObjectSimulator::ExecutionType::AsyncMode)
         {
             objectSimulator = simulators[i];
             asyncResults.emplace_back(asyncPool->enqueue(
                 [objectSimulator]()
                 {
-                    objectSimulator->run();
+                    objectSimulator->exec();
                     return 0; //this return is just so we have a results value
                 })
             );
@@ -108,12 +108,12 @@ void Simulator::run()
         {
             objectSimulator = simulators[i];
 
-            if (objectSimulator->execType == SIMMEDTK_SIMEXECUTION_ASYNCMODE)
+            if (objectSimulator->getExecutionType() == ObjectSimulator::ExecutionType::AsyncMode)
             {
                 continue;
             }
 
-            if (objectSimulator->enabled == false)
+            if (objectSimulator->isEnabled() == false)
             {
                 continue;
             }
@@ -122,7 +122,7 @@ void Simulator::run()
             results.emplace_back(threadPool->enqueue(
                 [objectSimulator]()
                 {
-                    objectSimulator->run();
+                    objectSimulator->exec();
                     return 0; //this return is just so we have a results value
                 })
             );
@@ -201,7 +201,7 @@ void Simulator::run()
 void Simulator::registerObjectSimulator(std::shared_ptr<ObjectSimulator> objectSimulator)
 {
     simulators.emplace_back(objectSimulator);
-    objectSimulator->enabled = true;
+    objectSimulator->setEnabled(true);
 }
 
 /// \brief
@@ -237,7 +237,7 @@ bool Simulator::init()
 
     for(size_t i = 0; i < this->simulators.size(); i++)
     {
-        simulators[i]->init();
+        simulators[i]->initialize();
     }
 
     initAsyncThreadPool();
@@ -246,11 +246,10 @@ bool Simulator::init()
     return true;
 }
 
-Simulator::Simulator(std::shared_ptr< ErrorLog > p_log)
+Simulator::Simulator()
 {
     type = core::ClassType::Simulator;
     isInitialized = false;
-    log = p_log;
     frameCounter = 0;
     main = nullptr;
     changedMain = nullptr;

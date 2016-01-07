@@ -21,26 +21,24 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#include "Simulators/VegaFEMModelSimulator.h"
+
 // SimMedTK includes
 #include "Devices/VRPNForceDevice.h"
 #include "Simulators/VegaFemSceneObject.h"
-#include "Simulators/VegaFemSimulator.h"
 #include "VirtualTools/ToolCoupler.h"
 
-VegaFemSimulator::VegaFemSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
+VegaFEMModelSimulator::VegaFEMModelSimulator( ) : ObjectSimulator(  )
 {
     hapticButtonPressed = false;
 }
 
-void VegaFemSimulator::beginSim()
-{
-}
-
-void VegaFemSimulator::initCustom()
+//---------------------------------------------------------------------------
+void VegaFEMModelSimulator::initialize()
 {//do nothing for now
-    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < simulatedModels.size(); i++ )
     {
-        auto object = objectsSimulated[i];
+        auto object = simulatedModels[i];
 
         switch ( object->getType() )
         {
@@ -55,36 +53,17 @@ void VegaFemSimulator::initCustom()
     }
 }
 
-void VegaFemSimulator::run()
+//---------------------------------------------------------------------------
+void VegaFEMModelSimulator::run()
 {
-    beginSim();
-
-    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
+    for(auto &model : this->simulatedModels)
     {
-        auto sceneObj = this->objectsSimulated[i];
-
-        //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == core::ClassType::VegaFemSceneObject )
-        {
-            auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(sceneObj);
-            //std::cout << "."; std::cout.flush();
-            femSceneObject->advanceDynamics();
-            //this->updateHapticForces(femSceneObject);
-        }
+        model->update(this->timeStep);
     }
-
-    endSim();
 }
 
-void VegaFemSimulator::endSim()
-{
-}
-
-void VegaFemSimulator::syncBuffers()
-{
-}
-
-void VegaFemSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
+//---------------------------------------------------------------------------
+void VegaFEMModelSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
 {
     if (!this->isListening())
     {
@@ -100,17 +79,23 @@ void VegaFemSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
     }*/
 
 }
-void VegaFemSimulator::setHapticTool(std::shared_ptr< ToolCoupler > tool)
+
+//---------------------------------------------------------------------------
+void VegaFEMModelSimulator::setHapticTool(std::shared_ptr< ToolCoupler > tool)
 {
     this->hapticTool = tool;
 }
-std::shared_ptr< ToolCoupler > VegaFemSimulator::getHapticTool() const
+
+//---------------------------------------------------------------------------
+std::shared_ptr< ToolCoupler > VegaFEMModelSimulator::getHapticTool() const
 {
     return this->hapticTool;
 }
-void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sceneObject)
+
+//---------------------------------------------------------------------------
+void VegaFEMModelSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sceneObject)
 {
-    if(!hapticTool)
+    if(!this->hapticTool)
     {
         return;
     }
@@ -122,7 +107,6 @@ void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sc
         outputDevice->setContactPlane(normal,100);
         return;
     }
-
 
     auto forces = sceneObject->getContactForces();
     auto points = sceneObject->getContactPoints();
@@ -156,5 +140,4 @@ void VegaFemSimulator::updateHapticForces(std::shared_ptr<VegaFemSceneObject> sc
     outputDevice->setDynamicFriction(0.0);
     outputDevice->setSpringCoefficient(norm);
     outputDevice->setStaticFriction(0.0);
-
 }

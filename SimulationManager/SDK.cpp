@@ -105,7 +105,7 @@ std::shared_ptr<Simulator> SDK::createSimulator()
 {
     if(!this->simulator)
     {
-        simulator = std::make_shared<Simulator>(errorLog);
+        simulator = std::make_shared<Simulator>();
         simulator->sceneList = this->sceneList;
         registerModule(simulator);
     }

@@ -61,7 +61,7 @@ public:
     bool init();
 
     /// \brief constructor gets error log
-    Simulator(std::shared_ptr<ErrorLog> p_log);
+    Simulator();
 
     void setMaxThreadCount(int p_threadMaxCount);
 
@@ -98,7 +98,6 @@ private:
 
     std::unique_ptr<ThreadPool> threadPool; //
     std::unique_ptr<ThreadPool> asyncPool; // asynchronous thread pool
-    std::shared_ptr<ErrorLog> log; // error log
     std::shared_ptr<SimulationMain> main; // Simulation main registration
     std::shared_ptr<SimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
 

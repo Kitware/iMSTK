@@ -47,7 +47,7 @@ public:
     ///
     /// \brief Constructor. Takes the system describing the ODE.
     ///
-    ForwardEuler(std::shared_ptr<OdeSystem> system);
+    ForwardEuler(OdeSystem *odeSystem);
 
     ///
     /// @brief Perform one iteration of the Forward Euler method.

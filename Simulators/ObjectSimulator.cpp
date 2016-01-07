@@ -22,138 +22,128 @@
 //---------------------------------------------------------------------------
 
 #include "Simulators/ObjectSimulator.h"
-
-ObjectSimulator::ObjectSimulator(std::shared_ptr<ErrorLog> p_log)
+ObjectSimulator::ObjectSimulator():
+    enabled(false),
+    isObjectSimInitialized(false),
+    timeStep(1.0/30.0),
+    timerPerFrame(0.0),
+    framesPerSecond(0.0),
+    frameCounter(0),
+    totalTime(0.0),
+    executionTypeStatusChanged(false),
+    executionType(ExecutionType::SyncMode)
 {
-    this->log = p_log;
-    name = "objecSimulator" + std::to_string(this->getUniqueId()->getId());
-
-    type = core::ClassType::Simulator;
-    isObjectSimInitialized = false;
-    threadPriority = SIMMEDTK_THREAD_NORMALPRIORITY;
-
-    objectsSimulated.clear();
-    FPS = 0.0;
-    frameCounter = 0;
-    totalTime = 0.0;
-    timer.start();
-    enabled = false;
-    executionTypeStatusChanged = false;
-    execType = SIMMEDTK_SIMEXECUTION_SYNCMODE;
+    this->name = "Controller-" + std::to_string(CoreClass::getUniqueId()->getId());
+    this->type = core::ClassType::Simulator;
 }
 
-void ObjectSimulator::addObject(std::shared_ptr<SceneObject> p_object)
+//---------------------------------------------------------------------------
+void ObjectSimulator::addObject(std::shared_ptr< SceneObject > model)
 {
-    p_object->objectSim = safeDownCast<ObjectSimulator>();
-    objectsSimulated.emplace_back( p_object );
-}
-
-void ObjectSimulator::removeObject(std::shared_ptr<SceneObject> /*p_object*/ )
-{
-}
-
-void ObjectSimulator::setPriority( ThreadPriority p_priority )
-{
-    threadPriority = p_priority;
-}
-
-void ObjectSimulator::setExecutionType( SimulatorExecutionType p_type )
-{
-    if ( execType != p_type )
+    if(!model)
     {
-        executionTypeStatusChanged = true;
+        // TODO: log this
+        return;
     }
 
-    execType = p_type;
+    model->objectSim = this->safeDownCast<ObjectSimulator>();
+    this->simulatedModels.emplace_back(model);
 }
 
-ThreadPriority ObjectSimulator::getPriority()
+//---------------------------------------------------------------------------
+void ObjectSimulator::removeObject(const std::shared_ptr< SceneObject > &model)
 {
-    return threadPriority;
-}
-
-void ObjectSimulator::init()
-{
-    if ( isObjectSimInitialized == false )
+    if(!model)
     {
-        initCustom();
-        //make the simulator true..it is initialized
-        isObjectSimInitialized = true;
+        // TODO: log this
+        return;
+    }
+
+    auto item = std::find(std::begin(this->simulatedModels),
+                          std::end(this->simulatedModels), model);
+
+    if(item != std::end(this->simulatedModels))
+    {
+        this->simulatedModels.erase(item);
+    }
+    else
+    {
+        // TODO: Log this.
     }
 }
 
-void ObjectSimulator::beginSim()
+//---------------------------------------------------------------------------
+void ObjectSimulator::setExecutionType(const ObjectSimulator::ExecutionType &type)
+{
+    this->executionType = type;
+    this->executionTypeStatusChanged = true;
+}
+
+//---------------------------------------------------------------------------
+ObjectSimulator::ExecutionType ObjectSimulator::getExecutionType() const
+{
+    return this->executionType;
+}
+
+//---------------------------------------------------------------------------
+bool ObjectSimulator::isEnabled()
+{
+    return this->enabled;
+}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::setEnabled(bool value)
+{
+    this->enabled = value;
+}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::initialize()
+{
+    if(!this->isObjectSimInitialized)
+    {
+        this->isObjectSimInitialized = true;
+    }
+}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::syncBuffers() {}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::exec()
+{
+    this->beginExecution();
+    this->run();
+    this->endExecution();
+}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::beginExecution()
 {
     frameCounter++;
     timer.start();
 }
-void ObjectSimulator::endSim()
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::endExecution()
 {
     timerPerFrame = timer.elapsed();
     totalTime += timerPerFrame;
 
-    if ( totalTime > 1.0 )
+    if(totalTime > 1.0)
     {
-        FPS = frameCounter;
+        framesPerSecond = frameCounter;
         frameCounter = 0.0;
         totalTime = 0.0;
     }
 }
 
-void ObjectSimulator::updateSceneList()
+//---------------------------------------------------------------------------
+void ObjectSimulator::setTimeStep(const double newTimeStep)
 {
+    this->timeStep = newTimeStep;
 }
-
-ObjectSimulator::ObjectSimulatorObjectIter::ObjectSimulatorObjectIter( ScheduleGroup &p_group,
-                                                                             std::vector<std::shared_ptr<SceneObject>> &p_objectsSimulated,
-                                                                             int p_threadIndex )
+double ObjectSimulator::getTimeStep() const
 {
-
-    int objectsPerThread;
-    int leap;
-    threadIndex = p_threadIndex;
-    int totalObjects = p_objectsSimulated.size();
-    leap = ( totalObjects % p_group.totalThreads );
-    objectsPerThread = p_objectsSimulated.size() / ( p_group.totalThreads );
-
-    if ( threadIndex == 0 )
-    {
-        beginIndex = 0;
-        endIndex = objectsPerThread + ( leap != 0 ? 1 : 0 );
-
-    }
-    else
-    {
-        beginIndex = objectsPerThread * threadIndex;
-
-        if ( threadIndex < leap && leap != 0 )
-        {
-            beginIndex += threadIndex;
-        }
-        else
-        {
-            beginIndex += leap;
-        }
-
-        endIndex = beginIndex + objectsPerThread;
-
-        if ( endIndex < leap && leap != 0 )
-        {
-            endIndex++;
-        }
-    }
-}
-void ObjectSimulator::ObjectSimulatorObjectIter::setThreadIndex( short int p_threadIndex )
-{
-    threadIndex = p_threadIndex;
-}
-
-int ObjectSimulator::ObjectSimulatorObjectIter::begin()
-{
-    return beginIndex;
-}
-
-int ObjectSimulator::ObjectSimulatorObjectIter::end()
-{
-    return endIndex;
+    return this->timeStep;
 }

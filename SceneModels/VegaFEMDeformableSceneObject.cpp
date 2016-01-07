@@ -78,8 +78,6 @@
 ///                                     [default = 500.0]
 ///     inversionThreshold          Inversion threshold parameter for the invertible methods
 ///                                     [default = -infinity]
-///     materialDensity             Homogenious material density
-///                                     [default = 1000]
 ///     numberOfThreads             Number of threads spawned by the force model
 ///                                     [default = 0]
 ///
@@ -126,8 +124,8 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
 {
     if(configurationFile.empty())
     {
+        // TODO: Log this.
         std::cout << "Empty configuration filename." << std::endl;
-        return;
     }
 
     this->vegaConfigFile = configurationFile;
@@ -184,20 +182,16 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
                                             &inversionThreshold,
                                             inversionThreshold);
 
-    double materialDensity = 1000.0;
-    vegaConfigFileOptions.addOptionOptional("materialDensity",
-                                            &materialDensity,
-                                            materialDensity);
-
     int numberOfThreads = 0;
     vegaConfigFileOptions.addOptionOptional("numberOfThreads",
                                             &numberOfThreads,
                                             numberOfThreads);
 
     // Parse the configuration file
-    if(vegaConfigFileOptions.parseOptions(configurationFile.data()) != 0)
+    if(!configurationFile.empty() &&
+        vegaConfigFileOptions.parseOptions(configurationFile.data()) != 0)
     {
-        std::cout << "VEGA: error! parsing options.\n";
+        /// TODO: Log this.
     }
 
     // Print option variables
@@ -221,7 +215,6 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
     this->floatsOptionMap.emplace("gravity", gravity);
     this->floatsOptionMap.emplace("compressionResistance", compressionResistance);
     this->floatsOptionMap.emplace("inversionThreshold", inversionThreshold);
-    this->floatsOptionMap.emplace("materialDensity", materialDensity);
 
     // Store parsed int values
     this->intsOptionMap.emplace("numberOfThreads", numberOfThreads);
@@ -272,7 +265,7 @@ VegaFEMDeformableSceneObject::VegaFEMDeformableSceneObject(const std::string &me
     this->loadVolumeMesh(meshFilename);
     if(!this->volumetricMesh)
     {
-        // TODO: Rise error
+        // TODO: Rise error and log
         return;
     }
 
@@ -324,6 +317,9 @@ void VegaFEMDeformableSceneObject::loadInitialStates()
 
     this->currentState = std::make_shared<OdeSystemState>();
     *this->currentState = *this->initialState;
+
+    this->newState = std::make_shared<OdeSystemState>();
+    this->previousState = std::make_shared<OdeSystemState>();
 }
 
 //---------------------------------------------------------------------------
@@ -335,6 +331,9 @@ void VegaFEMDeformableSceneObject::initialize()
 
     this->initConstitutiveModel();
     this->initForceModel();
+    this->initMassMatrix();
+    this->initDampingMatrix();
+    this->initTangentStiffnessMatrix();
 }
 
 //---------------------------------------------------------------------------
@@ -342,9 +341,10 @@ bool VegaFEMDeformableSceneObject::configure(const std::string &configFile)
 {
     this->vegaFemConfig = Core::make_unique<VegaConfiguration>(configFile);
 
-    this->initMassMatrix();
-    this->initTangentStiffnessMatrix();
-    this->initDampingMatrix();
+    this->setMassMatrix();
+    this->setTangentStiffnessMatrix();
+    this->setDampingMatrix();
+    this->setOdeRHS();
 
     size_t numNodes = this->volumetricMesh->getNumberOfVertices();
     this->numOfDOF = 3 * numNodes;
@@ -359,6 +359,7 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
 {
     if(!this->volumetricMesh)
     {
+        // TODO: log this
         return;
     }
 
@@ -383,6 +384,7 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
                   this->massMatrixColIndices.data(),
                   this->massMatrixValues.data());
 
+    this->M.makeCompressed();
     if(saveToDisk)
     {
         char name[] = "ComputedMassMatrix.mass";
@@ -395,6 +397,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 {
     if(!this->forceModel)
     {
+        // TODO: log this
         return;
     }
 
@@ -403,6 +406,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     if(!matrix)
     {
+        // TODO: log this
         return;
     }
 
@@ -410,6 +414,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     if(!this->vegaMassMatrix)
     {
+        // TODO: log this
         return;
     }
 
@@ -417,6 +422,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     if(!this->dampingMatrix)
     {
+        // TODO: log this
         return;
     }
 
@@ -436,6 +442,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
                   this->tangentStiffnessMatrixRowPointers.data(),
                   this->tangentStiffnessMatrixColIndices.data(),
                   this->tangentStiffnessMatrixValues.data());
+    this->K.makeCompressed();
 }
 
 //---------------------------------------------------------------------------
@@ -445,6 +452,7 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
 
     if(!meshGraph)
     {
+        // TODO: log this
         return;
     }
 
@@ -453,6 +461,7 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
 
     if(!matrix)
     {
+        // TODO: log this
         return;
     }
 
@@ -475,6 +484,7 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
                   this->dampingMatrixColPointers.data(),
                   this->dampingMatrixColIndices.data(),
                   this->dampingMatrixValues.data());
+    this->D.makeCompressed();
 }
 
 //---------------------------------------------------------------------------
@@ -804,7 +814,7 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 {
-    auto tangentStiffness = [this](const OdeSystemState & s)
+    auto tangentStiffness = [&,this](const OdeSystemState & s)
     {
         double *data = const_cast<double*>(s.getPositions().data());
         this->forceModel->GetTangentStiffnessMatrix(data,

@@ -38,9 +38,15 @@ go_bandit([]()
     describe("Vega Deformable Scene Object", [&]()
     {
         auto sceneObject = std::make_shared<VegaFEMDeformableSceneObject>("box.veg","box.config");
-        it("constructs ", [&]()
+        it("constructs", [&]()
         {
             AssertThat(sceneObject != nullptr, IsTrue());
+        });
+        it("updates", [&]()
+        {
+
+            sceneObject->update(0.01);
+
         });
      });
 

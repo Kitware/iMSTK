@@ -744,7 +744,7 @@ void VegaFemSceneObject::createForceModel()
 
 }
 
-void VegaFemSceneObject::advanceDynamics()
+void VegaFemSceneObject::update(double /*dt*/)
 {
     int i;
 

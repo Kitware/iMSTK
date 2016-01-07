@@ -24,11 +24,11 @@
 #include "ForwardEuler.h"
 
 ForwardEuler::ForwardEuler() :
-linearSolver(std::make_shared<ConjugateGradient>()) {}
+    linearSolver(std::make_shared<ConjugateGradient>()) {}
 
 //---------------------------------------------------------------------------
-ForwardEuler::ForwardEuler(std::shared_ptr< OdeSystem > system): TimeIntegrator(system),
-linearSolver(std::make_shared<ConjugateGradient>()) {}
+ForwardEuler::ForwardEuler(OdeSystem *odeSystem): TimeIntegrator(odeSystem),
+    linearSolver(std::make_shared<ConjugateGradient>()) {}
 
 //---------------------------------------------------------------------------
 void ForwardEuler::solve(const OdeSystemState &state,

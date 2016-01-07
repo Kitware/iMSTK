@@ -117,7 +117,7 @@ public:
     void printInfo() const override;
 
     /// \brief Update the deformations by time stepping
-    void advanceDynamics() override;
+    void update(const double dt) override;
 
     /// \brief Advance in time by a specificed amount and a chosen time stepping scheme
     inline void advanceOneTimeStep();

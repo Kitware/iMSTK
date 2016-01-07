@@ -51,7 +51,7 @@ public:
     ///
     /// \brief Constructor. Takes the system describing the ODE.
     ///
-    TimeIntegrator(std::shared_ptr<OdeSystem> odeSystem);
+    TimeIntegrator(OdeSystem *odeSystem);
 
     ///
     /// \brief Perform one iteration of the method
@@ -69,14 +69,14 @@ public:
     ///
     /// \return Pointer to ODE system.
     ///
-    std::shared_ptr<OdeSystem> getSystem() const;
+    OdeSystem *getSystem() const;
 
     ///
     /// \brief Set a new system of ODEs.
     ///
     /// \param newSystem Ode system.
     ///
-    void setSystem(std::shared_ptr<OdeSystem> newSystem);
+    void setSystem(OdeSystem *odeSystem);
 
     ///
     /// \brief Set a new linear system matrix.
@@ -93,7 +93,7 @@ public:
     const core::SparseMatrixd &getSystemMatrix() const;
 
 protected:
-    std::shared_ptr<OdeSystem> system;  ///> System of differential equations.
+    OdeSystem *system;  ///> System of differential equations.
     core::SparseMatrixd systemMatrix;   ///> Linear system matrix.
     core::Vectord rhs;                  ///> Right hand side vector.
 };

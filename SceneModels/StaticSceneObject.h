@@ -71,7 +71,7 @@ public:
 
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
 
-    void update(const double dt)
+    void update(const double /*dt*/)
     {}
 };
 

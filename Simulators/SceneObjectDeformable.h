@@ -66,9 +66,6 @@ public:
     /// update to interpolate to the secondary display mesh
     virtual void updateSecondaryRenderingMesh() = 0;
 
-    /// \brief Update the deformations by time stepping
-    virtual void advanceDynamics() = 0;
-
     /// \brief Append the contact forces (if any) to external forces
     void applyContactForces();
 

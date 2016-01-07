@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
-#define SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
+#ifndef DEFORMABLESCENEOBJECT_H
+#define DEFORMABLESCENEOBJECT_H
 
 // SimMedTK includes
 #include "SceneModels/SceneObject.h"
@@ -39,11 +39,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeformableSceneObject() :
-        OdeSystem(),
-        integrationScheme(TimeIntegrator::ImplicitEuler)
-    {
-    }
+    DeformableSceneObject();
 
     ///
     /// \brief Destructor
@@ -53,96 +49,39 @@ public:
     ///
     /// \brief Append the contact forces (if any) to external forces
     ///
-    void applyContactForces()
-    {
-        for(const auto &cf : this->getContactForces())
-        {
-            int i = cf.first;
-            f(i) += cf.second(0);
-            f(i+1) += cf.second(1);
-            f(i+2) += cf.second(2);
-        }
-    }
+    void applyContactForces();
 
     ///
     /// \brief Set the integration scheme used to solve the ODE system.
     ///
-    void setTimeIntegrator(TimeIntegrator::IntegratorType integrator)
-    {
-        this->integrationScheme = integrator;
-    }
+    void setTimeIntegrator(TimeIntegrator::IntegratorType integrator);
 
     ///
     /// \brief Initialize the ode solver.
     ///
-    void initialize() override
-    {
-        auto thisPointer = this->safeDownCast<DeformableSceneObject>();
-        switch(integrationScheme)
-        {
-            case TimeIntegrator::ImplicitEuler:
-            {
-                this->odeSolver = std::make_shared<BackwardEuler>(thisPointer);
-            }
-            case TimeIntegrator::ExplicitEuler:
-            {
-                this->odeSolver = std::make_shared<ForwardEuler>(thisPointer);
-            }
-            default:
-            {
-                std::cerr << "Invalid time integration scheme." << std::endl;
-            }
-        }
-    }
+    void initialize() override;
 
-    virtual bool configure(const std::string &)
-    {
-        return false;
-    }
+    virtual bool configure(const std::string &);
 
     ///
     /// \brief Update states
     ///
-    void update(const double dt)
-    {
-        if(!this->odeSolver)
-        {
-            std::cerr << "Ode solver needs to be set." << std::endl;
-            return;
-        }
-
-        this->odeSolver->solve(*this->currentState,*this->newState,dt);
-
-        this->currentState.swap(this->previousState);
-        this->currentState.swap(this->newState);
-
-        // TODO: Check state validity
-    }
+    void update(const double dt);
 
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState()
-    {
-        *this->currentState = *this->initialState;
-        *this->previousState = *this->initialState;
-    }
+    virtual void resetToInitialState();
 
     ///
     /// \brief Return the current state.
     ///
-    std::shared_ptr<OdeSystemState> getCurrentState()
-    {
-        return this->currentState;
-    }
+    std::shared_ptr<OdeSystemState> getCurrentState();
 
     ///
     /// \brief Return the previous state.
     ///
-    std::shared_ptr<OdeSystemState> getPreviousState()
-    {
-        return this->previousState;
-    }
+    std::shared_ptr<OdeSystemState> getPreviousState();
 
     ///////////////////////////////////////////////////////////////////////////////
     //////////// TODO: These are pure virtual methods from superclass. ////////////
@@ -181,4 +120,4 @@ protected:
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };
 
-#endif // SMVEGAFEMSCENEOBJECT_DEFORMABLE_H
+#endif // DEFORMABLESCENEOBJECT_H

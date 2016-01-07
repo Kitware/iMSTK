@@ -23,17 +23,17 @@
 
 #include "TimeIntegrator.h"
 
-TimeIntegrator::TimeIntegrator(std::shared_ptr< OdeSystem > odeSystem): system(odeSystem)
+TimeIntegrator::TimeIntegrator(OdeSystem *odeSystem): system(odeSystem)
 {}
 
 //---------------------------------------------------------------------------
-std::shared_ptr< OdeSystem > TimeIntegrator::getSystem() const
+OdeSystem *TimeIntegrator::getSystem() const
 {
     return this->system;
 }
 
 //---------------------------------------------------------------------------
-void TimeIntegrator::setSystem(std::shared_ptr< OdeSystem > newSystem)
+void TimeIntegrator::setSystem(OdeSystem *newSystem)
 {
     this->system = newSystem;
 }

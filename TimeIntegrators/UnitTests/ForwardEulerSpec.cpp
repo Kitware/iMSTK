@@ -75,7 +75,7 @@ go_bandit([]()
         initialState->getVelocities()[0] = a;
 
         odeSystem->setInitialState(initialState);
-        euler->setSystem(odeSystem);
+        euler->setSystem(odeSystem.get());
 
         it("solves dx/dt=lambda*x, x(0)=a ", [&]()
         {

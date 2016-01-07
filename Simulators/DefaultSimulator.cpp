@@ -30,7 +30,7 @@
 #include "Devices/VRPNForceDevice.h"
 #include "VirtualTools/ToolCoupler.h"
 
-DefaultSimulator::DefaultSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
+DefaultSimulator::DefaultSimulator(  ) : ObjectSimulator( )
 {
     this->addOperation([](std::vector<core::Vec3d>& array)
     {
@@ -40,16 +40,16 @@ DefaultSimulator::DefaultSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : Obj
         }
     });
 }
-void DefaultSimulator::beginSim()
+void DefaultSimulator::beginExecution()
 {
     //start the job
 }
-void DefaultSimulator::initCustom()
+void DefaultSimulator::initialize()
 {
     //do nothing for now
-    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < simulatedModels.size(); i++ )
     {
-        auto object = objectsSimulated[i];
+        auto object = simulatedModels[i];
 
         switch ( object->getType() )
         {
@@ -78,11 +78,11 @@ void DefaultSimulator::initCustom()
 }
 void DefaultSimulator::run()
 {
-    beginSim();
+    beginExecution();
 
-    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->simulatedModels.size(); i++ )
     {
-        auto sceneObj = this->objectsSimulated[i];
+        auto sceneObj = this->simulatedModels[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
@@ -97,17 +97,17 @@ void DefaultSimulator::run()
         }
     }
 
-    endSim();
+    endExecution();
 }
-void DefaultSimulator::endSim()
+void DefaultSimulator::endExecution()
 {
     //end the job
 }
 void DefaultSimulator::syncBuffers()
 {
-    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
+    for ( size_t i = 0; i < this->simulatedModels.size(); i++ )
     {
-        auto sceneObj = this->objectsSimulated[i];
+        auto sceneObj = this->simulatedModels[i];
 
         //ensure that dummy simulator will work on static scene objects only.
         if ( sceneObj->getType() == core::ClassType::StaticSceneObject )

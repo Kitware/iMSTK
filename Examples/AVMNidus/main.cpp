@@ -32,7 +32,7 @@
 #include "Mesh/VegaVolumetricMesh.h"
 
 // Include required simulators
-#include "Simulators/VegaFemSimulator.h"
+#include "Simulators/VegaFEMModelSimulator.h"
 #include "Simulators/DefaultSimulator.h"
 
 #include "Core/CollisionPair.h"
@@ -69,7 +69,7 @@ int main(int ac, char **av)
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
     // create a FEM simulator
-    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    auto femSimulator = std::make_shared<VegaFEMModelSimulator>();
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
@@ -81,7 +81,7 @@ int main(int ac, char **av)
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
-    auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto staticSimulator = std::make_shared<DefaultSimulator>();
 
     // Create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();

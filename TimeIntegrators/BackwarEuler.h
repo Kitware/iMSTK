@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Constructor. Takes the system describing the ODE.
     ///
-    BackwardEuler(std::shared_ptr<OdeSystem> system);
+    BackwardEuler(OdeSystem *odeSystem);
 
     ///
     /// @brief Perform one iteration of the Backward Euler method.

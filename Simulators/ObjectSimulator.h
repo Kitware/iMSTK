@@ -27,121 +27,120 @@
 // SimMedTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
-#include "SceneModels/SceneObject.h"
-#include "Core/ErrorLog.h"
 #include "Core/Timer.h"
 #include "SimulationManager/Scheduler.h"
+#include "SceneModels/SceneObject.h"
 
-/// \brief  thread priority definitions
-enum ThreadPriority
-{
-    SIMMEDTK_THREAD_IDLE,
-    SIMMEDTK_THREAD_LOWPRIORITY,
-    SIMMEDTK_THREAD_NORMALPRIORITY,
-    SIMMEDTK_THREAD_HIGHESTPRIORITY,
-    SIMMEDTK_THREAD_TIMECRITICAL,
-};
-
-enum SimulatorExecutionType
-{
-    SIMMEDTK_SIMEXECUTION_SYNCMODE,
-    SIMMEDTK_SIMEXECUTION_ASYNCMODE
-};
-
-//forward declarations
+// Forward declarations
 class SceneObject;
 
-///This is the major object simulator. Each object simulator should derive this class.
-///you want particular object simualtor to work over an object just set pointer of the object. the rest will be taken care of the simulator and object simulator.
+///
+/// \brief This is the major object simulator. Each object simulator should derive this class.
+///     you want particular object simulator to work over an object just set pointer of the
+///     object. The rest will be taken care of the simulator and object simulator.
+///
 class ObjectSimulator : public CoreClass
 {
-
-    ///friend class since Simulator is the encapsulates the other simulators.
-    friend class Simulator;
-
-protected:
-    ///log of the object
-    std::shared_ptr<ErrorLog> log;
-    bool isObjectSimInitialized;
-    ThreadPriority threadPriority;
-    core::Timer timer;
-    long double timerPerFrame;
-    long double FPS;
-    unsigned int frameCounter;
-    long double totalTime;
-    SimulatorExecutionType execType;
-    bool executionTypeStatusChanged;
+public:
+    enum class ExecutionType
+    {
+        SyncMode,
+        AsyncMode
+    };
 
 public:
-    ///This is for scheduler
-    ScheduleGroup scheduleGroup;
+    ///
+    /// \brief Constructor
+    ///
+    ObjectSimulator();
 
-    //std::shared_ptr<UnifiedId> objectSimulatorId;
-    bool enabled;
+    ///
+    /// \brief Add a scene model to the list.
+    ///     The function is re-entrant it is not thread safe.
+    ///
+    /// \param model Scene model.
+    ///
+    virtual void addObject(std::shared_ptr<SceneObject> model);
 
-    ///the function is reentrant it is not thread safe.
-    virtual void addObject(std::shared_ptr<SceneObject> p_object);
-
+    ///
     /// \brief remove object from the simulator
-    virtual void removeObject(std::shared_ptr<SceneObject> p_object);
+    ///
+    virtual void removeObject(const std::shared_ptr<SceneObject> &model);
 
-    ObjectSimulator(std::shared_ptr<ErrorLog> p_log);
+    ///
+    /// \brief Set the ExecutionType for this simulator.
+    ///
+    void setExecutionType(const ExecutionType &type);
 
+    ///
+    /// \brief Get the ExecutionType of this simulator.
+    ///
+    ExecutionType getExecutionType() const;
 
-    /// \brief  set thread priority
-    void setPriority(ThreadPriority p_priority);
-    /// \brief  set execution type
-    void setExecutionType(SimulatorExecutionType p_type);
+    ///
+    /// \brief Return the enabled variable.
+    ///
+    bool isEnabled();
 
-    /// \brief  get thread priority
-    ThreadPriority getPriority();
+    ///
+    /// \brief Return the enabled variable.
+    ///
+    void setEnabled(bool value);
+
+    ///
+    /// \brief Initialize simulator.
+    ///
+    virtual void initialize();
+
+    ///
+    /// \brief synchronization
+    ///
+    virtual void syncBuffers();
+
+    ///
+    /// \brief This is the actual work function for this simulator.
+    ///
+    void exec();
+
+    ///
+    /// \brief Set TimeStep
+    ///
+    void setTimeStep(const double newTimeStep);
+
+    ///
+    /// \brief Get TimeStep
+    ///
+    double getTimeStep() const;
 
 protected:
-    ///objects that are simulated by this will be added to the list
-    std::vector<std::shared_ptr<SceneObject>> objectsSimulated;
 
-    virtual void initCustom() = 0;
-
-    /// \brief  init simulator
-    void init();
-
-    /// \brief  the actual implementation will reside here
+    ///
+    /// \brief Execute the simulation.
+    ///
     virtual void run() = 0;
 
-    /// \brief  begining of simulator frame, this function is called
-    virtual void beginSim();
+    ///
+    /// \brief  Called at the beginning of the simulator frame.
+    ///
+    virtual void beginExecution();
 
-    /// \brief synchronization
-    virtual void syncBuffers() = 0;
+    ///
+    /// \brief Called at the end of simulation frame.
+    ///
+    virtual void endExecution();
 
-    /// \brief is called at the end of simulation frame.
-    virtual void endSim();
-
-    /// \brief updates scene list
-    virtual void updateSceneList();
-
-    /// \brief object simulator iterator. The default iteration is sequantial in the order of the insertion.
-    /// custom iteration requires extension of this class.
-    struct ObjectSimulatorObjectIter
-    {
-
-    private:
-        short beginIndex;
-        short endIndex;
-        short currentIndex;
-        short threadIndex;
-
-    public:
-        ObjectSimulatorObjectIter(ScheduleGroup &p_group,
-                                    std::vector<std::shared_ptr<SceneObject>> &p_objectsSimulated,
-                                    int p_threadIndex);
-
-        inline void setThreadIndex(short p_threadIndex);
-
-        inline int begin();
-
-        inline int end();
-    };
+protected:
+    bool enabled; ///> Set to enable/disable this simulator.
+    bool isObjectSimInitialized; ///> Initialization flag.
+    double timeStep;
+    long double timerPerFrame; ///> Time spent on each frame.
+    long double framesPerSecond; ///>
+    unsigned int frameCounter;
+    long double totalTime; ///> Total accumulated time.
+    bool executionTypeStatusChanged; ///> Set in order to indicate that this simulator changed its execution type.
+    ExecutionType executionType; ///> Either synchronous or asynchronous execution for this simulator.
+    core::Timer timer;          ///> Timer.
+    std::vector<std::shared_ptr<SceneObject>> simulatedModels; ///> List of simulated models to run.
 };
 
 #endif

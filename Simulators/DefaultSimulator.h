@@ -47,7 +47,7 @@ class DefaultSimulator: public ObjectSimulator
     typedef std::function<void(std::vector<core::Vec3d>&)> OperationType;
 public:
     /// \brief Constructor/Destructor
-    DefaultSimulator(std::shared_ptr<ErrorLog> p_errorLog);
+    DefaultSimulator();
     ~DefaultSimulator(){}
 
     void addOperation(const OperationType &op)
@@ -59,10 +59,10 @@ protected:
     ///
     /// Overriden methods
     ///
-    virtual void beginSim() override;
-    virtual void initCustom() override;
+    virtual void beginExecution() override;
+    virtual void initialize() override;
     virtual void run() override;
-    void endSim() override;
+    void endExecution() override;
     void syncBuffers() override;
     void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
