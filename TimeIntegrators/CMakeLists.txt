@@ -1,5 +1,5 @@
 
-set(COMPONENT_MODULE TimeIntegrator)
+set(COMPONENT_MODULE TimeIntegrators)
 simmedtk_add_library(${COMPONENT_MODULE}
   SOURCES
     TimeIntegrator.cpp

@@ -18,23 +18,29 @@ set(USE_OCULUS @SimMedTK_USE_OCULUS@)
 set(USE_PHANTOM_OMNI @SimMedTK_USE_PHANTOM_OMNI@)
 set(USE_ADU @SimMedTK_USE_ADU@)
 set(USE_NIUSB6008 @SimMedTK_USE_NIUSB6008@)
+set(USE_VRPN_CLIENT @USE_VRPN_CLIENT@)
+set(USE_VRPN_SERVER @USE_VRPN_SERVER@)
 
 set(VegaFEM_DIR @VegaFEM_DIR@)
+set(VTK_DIR @VTK_DIR@)
 
 ## Collect external libs includes and settings
 set(SimMedTK_INCLUDE_DIRS
+  ${SimMedTK_SOURCE_DIR}
 )
 
 find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(SFML REQUIRED)
-find_package(GLM REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(VegaFEM REQUIRED)
 find_package(ThreadPool REQUIRED)
 find_package(VRPN REQUIRED)
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
 if(USE_OCULUS)
   find_package(Oculus REQUIRED)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
@@ -60,10 +66,24 @@ if(USE_NIUSB6008)
   list(APPEND SimMedTK_INCLUDE_DIRS "${NIDAQ_INCLUDE_DIR}")
 endif()
 
+if(USE_VRPN_CLIENT)
+  set(components quat)
+  if(USE_VRPN_SERVER)
+    list(APPEND components vrpnserver Libusb1)
+  endif()
+  if(SimMedTK_USE_PHANTOM_OMNI)
+    list(APPEND components vrpn_phantom)
+  endif()
+  if(SimMedTK_USE_FALCON)
+    list(APPEND components LibNifalcon)
+  endif()
+  find_package(VRPN REQUIRED COMPONENTS ${components})
+  list(APPEND SimMedTK_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}")
+endif()
+
 list(APPEND SimMedTK_INCLUDE_DIRS
     "${ThreadPool_INCLUDE_DIR}"
     "${EIGEN3_INCLUDE_DIR}"
-    "${GLM_INCLUDE_DIR}"
     "${SFML_INCLUDE_DIRS}")
 
 include_directories("${SimMedTK_INCLUDE_DIRS}")
