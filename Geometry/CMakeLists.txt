@@ -1,4 +1,3 @@
-
 simmedtk_add_library(Geometry
   SOURCES
     MeshModel.cpp
