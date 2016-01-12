@@ -1,4 +1,3 @@
-
 simmedtk_add_library(External
   SOURCES
     FrameBufferObject/FrameBufferObject.cpp

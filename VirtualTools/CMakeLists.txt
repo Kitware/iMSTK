@@ -1,6 +1,3 @@
-
-include(${VTK_USE_FILE})
-
 simmedtk_add_library(VirtualTools
   SOURCES
     ToolCoupler.cpp

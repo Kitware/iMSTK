@@ -1,4 +1,3 @@
-
 simmedtk_add_library(Collision
   SOURCES
     CollisionMoller.cpp

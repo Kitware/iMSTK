@@ -1,4 +1,3 @@
-
 simmedtk_add_library(ContactHandling
   SOURCES
     PenaltyContactFemToStatic.cpp

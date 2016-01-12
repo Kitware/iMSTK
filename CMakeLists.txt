@@ -200,7 +200,6 @@ find_package(ThreadPool REQUIRED)
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
-include_directories(SYSTEM ${VTK_INCLUDE_DIRS}/vtkglew/include)
 
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
@@ -283,6 +282,9 @@ set(SimMedTK_exports
   Mesh
   Rendering
   Simulators
+  Solvers
+  TimeIntegrators
+  VTKRendering
   VirtualTools
   )
 
@@ -295,17 +297,17 @@ add_subdirectory(ContactHandling)
 add_subdirectory(Core)
 add_subdirectory(Devices)
 add_subdirectory(Event)
+add_subdirectory(Examples)
 add_subdirectory(External)
 add_subdirectory(Geometry)
 add_subdirectory(IO)
 add_subdirectory(Mesh)
 add_subdirectory(Rendering)
-add_subdirectory(VTKRendering)
 add_subdirectory(Simulators)
-add_subdirectory(VirtualTools)
-add_subdirectory(Examples)
 add_subdirectory(Solvers)
 add_subdirectory(TimeIntegrators)
+add_subdirectory(VTKRendering)
+add_subdirectory(VirtualTools)
 
 ################################################################################
 # Build documentation

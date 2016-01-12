@@ -1,4 +1,3 @@
-
 set(MODULE_NAME Solvers)
 simmedtk_add_library(${MODULE_NAME}
   SOURCES

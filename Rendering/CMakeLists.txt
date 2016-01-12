@@ -1,5 +1,3 @@
-include(${VTK_USE_FILE})
-
 simmedtk_add_library(Rendering
   SOURCES
     Camera.cpp
