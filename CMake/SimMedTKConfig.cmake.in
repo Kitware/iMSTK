@@ -23,6 +23,7 @@ set(USE_VRPN_SERVER @USE_VRPN_SERVER@)
 
 set(VegaFEM_DIR @VegaFEM_DIR@)
 set(VTK_DIR @VTK_DIR@)
+set(ThreadPool_DIR @ThreadPool_DIR@)
 
 ## Collect external libs includes and settings
 set(SimMedTK_INCLUDE_DIRS
@@ -31,7 +32,6 @@ set(SimMedTK_INCLUDE_DIRS
 
 find_package(PThreads REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(GLEW REQUIRED)
 find_package(SFML REQUIRED)
 find_package(Assimp REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -84,7 +84,8 @@ endif()
 list(APPEND SimMedTK_INCLUDE_DIRS
     "${ThreadPool_INCLUDE_DIR}"
     "${EIGEN3_INCLUDE_DIR}"
-    "${SFML_INCLUDE_DIRS}")
+    "${SFML_INCLUDE_DIRS}"
+    "${ThreadPool_INCLUDE_DIR}")
 
 include_directories("${SimMedTK_INCLUDE_DIRS}")
 

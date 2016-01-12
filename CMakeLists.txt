@@ -200,7 +200,6 @@ find_package(ThreadPool REQUIRED)
 find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
-include_directories(SYSTEM ${VTK_INCLUDE_DIRS}/vtkglew/include)
 
 if(SimMedTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
