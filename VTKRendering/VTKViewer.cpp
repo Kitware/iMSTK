@@ -69,15 +69,6 @@ public:
                 if(timerId == *static_cast<int*>(callData) &&
                     !this->viewer->isTerminated())
                 {
-
-                    if (this->cameraControllerData != nullptr)
-                    {
-                        vtkRenderer* renderer =
-                            this->renderWindow->GetRenderers()->GetFirstRenderer();
-                        updateCamera(renderer);
-                        renderer->ResetCameraClippingRange();
-                    }
-
                     this->renderWindow->Render();
                 }
                 break;
@@ -94,29 +85,6 @@ public:
                 break;
             }
         }
-    }
-
-	///
-	/// \brief Update the camera from external source (optional)
-	///
-    void updateCamera(vtkRenderer* renderer)
-    {
-        vtkCamera* camera = renderer->GetActiveCamera();
-
-        camera->SetPosition(
-            cameraControllerData->position[0],
-            cameraControllerData->position[1],
-            cameraControllerData->position[2]);
-
-        camera->SetViewUp(
-            cameraControllerData->upVector[0],
-            cameraControllerData->upVector[1],
-            cameraControllerData->upVector[2]);
-
-        camera->SetFocalPoint(
-            cameraControllerData->focus[0],
-            cameraControllerData->focus[1],
-            cameraControllerData->focus[2]);
     }
 
     ///
@@ -323,7 +291,6 @@ public:
     VTKViewer *viewer;
     vtkNew<vtkRenderWindow> renderWindow;
     vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
-    std::shared_ptr<cameraConfigurationData> cameraControllerData;
 };
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
@@ -363,11 +330,6 @@ vtkCamera* VTKViewer::getVtkCamera()
 {
     return this->renderer->getRenderWindow()->GetRenderers()->
         GetFirstRenderer()->GetActiveCamera();
-}
-
-void VTKViewer::setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData)
-{
-    renderer->cameraControllerData = camData;
 }
 
 vtkRenderer* VTKViewer::getVtkRenderer()

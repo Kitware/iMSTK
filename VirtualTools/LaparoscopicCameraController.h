@@ -41,16 +41,6 @@
 
 class DeviceInterface;
 
-struct cameraConfigurationData
-{
-    core::Vec3d position;
-    core::Vec3d focus;
-    core::Vec3d upVector;
-
-    cameraConfigurationData() : position(0, 0, 0), focus(0, 0, -1), upVector(0, 1, 0){};
-    ~cameraConfigurationData(){};
-};
-
 ///
 /// \class LaparoscopicCameraController
 ///
@@ -86,98 +76,34 @@ public:
     void initializeCameraScopeConfiguration();
 
     ///
-    /// \brief Set the input device for this tool
-    /// \param newDevice A pointer to an allocated device
+    /// \brief Set/Get the input device for this tool coupler
     ///
     void setInputDevice(std::shared_ptr<DeviceInterface> newDevice);
-
-    ///
-    /// \brief Set the output device for this tool coupler
-    ///
     std::shared_ptr<DeviceInterface> getInputDevice();
 
     ///
-    /// \brief Set the pointer to the mesh to control
-    /// \param newMesh A pointer to an allocated mesh
+    /// \brief Set/Get the pointer to the controlled camera
     ///
     void setCamera(vtkCamera* newCamera);
-
-    ///
-    /// \brief Get the output device for this tool coupler
-    ///
     vtkCamera* getcamera() const;
 
     ///
-    /// \brief Get the current pooling delay
-    /// \return The currently set polling delay
+    /// \brief Set/Get the pooling delay of the controller
     ///
+    void setPoolDelay(const std::chrono::milliseconds& delay);
     const std::chrono::milliseconds &getPoolDelay() const;
 
     ///
-    /// \brief Set the pooling delay of the controller to get new data from the device
-    /// \param delay The new polling delay to set
+    /// \brief Set/Get the bending radius of the tip of the scope
     ///
-    void setPoolDelay(const std::chrono::milliseconds &delay);
+    void setBendingRadius(const double val);
+    double getBendingRadius() const;
 
     ///
-    /// \brief Get the current scaling factor
-    /// \return The currently set scaling factor
-    ///
-    const double &getScalingFactor() const;
-
-    ///
-    /// \brief Set how much to scale the physical movement by in 3D space
-    /// \param The new scaling factor to set
+    /// \brief Set/Get the current scaling factor
     ///
     void setScalingFactor(const double factor);
-
-    ///
-    /// \brief Get the current orientation
-    /// \return The orientation
-    ///
-    const core::Quaterniond &getOrientation() const;
-
-    ///
-    /// \brief Set orientation much to scale the physical movement by in 3D space
-    /// \param  The new scaling factor to set
-    ///
-    void setOrientation(const Eigen::Map<core::Quaterniond> &newOrientation);
-
-    ///
-    /// \brief Get the current orientation
-    /// \return The currently set scaling factor
-    ///
-    const core::Vec3d &getPosition() const;
-
-    ///
-    /// \brief Set orientation much to scale the physical movement by in 3D space
-    /// \param  The new scaling factor to set
-    ///
-    void setPosition(const core::Vec3d &newPosition);
-
-    ///
-    /// \brief Set offset orientation much to scale the physical movement by in 3D space
-    /// \param  The new scaling factor to set
-    ///
-    void setOffsetOrientation(const Eigen::Map<core::Quaterniond> &offsetOrientation);
-
-    ///
-    /// \brief Get the offset orientation
-    /// \return The orientation
-    ///
-    const core::Quaterniond &getOffsetOrientation() const;
-
-    ///
-    /// \brief Get the offset position
-    /// \return The currently set scaling factor
-    ///
-    const core::Vec3d &getOffsetPosition() const;
-
-    ///
-    /// \brief Set offset orientation much to scale the physical movement by in 3D space
-    /// \param  The new scaling factor to set
-    ///
-    void setOffsetPosition(const core::Vec3d &offsetPosition);
+    const double &getScalingFactor() const;
 
     ///
     /// \brief Update position and orientation of the camera based on device data
@@ -185,59 +111,28 @@ public:
     bool updateCamera();
 
     ///
-	/// \brief Returns the pointer to the camera data that is updated by this controller
-	///
-    std::shared_ptr<cameraConfigurationData> getCameraData();
-
-    ///
-    /// \brief Getter and setter for the bending radius of the tip of the scope
-    ///
-    double getBendingRadius() const;
-    void setBendingRadius(const double val);
-
-    ///
     /// \brief Module overrides
     ///
     bool init() override;
     void beginFrame() override;
     void endFrame() override;
-
-    ///
-    /// \brief Update tracker and
-    ///
     void exec() override;
 
 private:
-    TransformType initialTransform; //!< Transform applied to the position
-                                    // obtained from device
 
-    core::Quaterniond orientation; //!< Previous rotation quaternion from device
+    vtkCamera* camera;                            //!< Pointer to rendering camera
+    std::shared_ptr<DeviceInterface> inputDevice; //!< Pointer to input device
+    std::chrono::milliseconds poolDelay;          //!< Pooling delay
+    double bendingRadius;                         //!< bending radius of the tip of the scope
+    double scalingFactor;                         //!< Scaling factor for physical to virtual translation
 
-    core::Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom
-    core::Vec3d prevPosition;          //!< Previous position from phantom
-
-    core::Vec3d position;          //!< Previous position from device
-    double scalingFactor;          //!< Scaling factor for physical to virtual translation
-
-    core::Quaterniond offsetOrientation; //!< Previous rotation quaternion from device
-    core::Vec3d offsetPosition;          //!< Previous position from device
-
-    std::chrono::milliseconds poolDelay;  //!< Pooling delay
-    vtkCamera* camera; //!< Pointer to rendering camera
-    std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
-
-    double bendingRadius;//!< bending radius of the tip of the scope
-
-    double angleY;
-    double maxAngleY;
-    double minAngleY;
-
-    double angleX;
+    double currentAngleX;
+    double currentAngleY;
     double maxAngleX;
+    double maxAngleY;
     double minAngleX;
+    double minAngleY;
     double deltaAngleXY;
-
-    std::shared_ptr<cameraConfigurationData> cameraPosOrientData;//!< camera config data
 };
 
 #endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

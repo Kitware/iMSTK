@@ -332,19 +332,16 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
 /// \brief Create a Laparoscopic camera controller and connect
 /// it to the vtk viewer
 ///
-std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_ptr<SDK> sdk)
+int addCameraController(std::shared_ptr<SDK> sdk)
 {
-    auto viewer = sdk->getViewerInstance();
 
-    auto camClient = std::make_shared<VRPNForceDevice>();
+    std::shared_ptr<VRPNForceDevice> camClient = std::make_shared<VRPNForceDevice>();
     std::shared_ptr<VRPNDeviceServer> server;
     std::string input;
 
     if (SPACE_EXPLORER_DEVICE)
     {
         server = std::make_shared<VRPNDeviceServer>();
-
-        //get some user input and setup device url
         input = "navigator@localhost";
     }
     else
@@ -354,36 +351,32 @@ std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_pt
         std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
         std::getline(std::cin, input);
     }
-
-    if (!input.empty())
+    if (input.empty())
     {
-        camClient->setDeviceURL(input);
+        return EXIT_FAILURE;
     }
-    auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
-    camController->setScalingFactor(40.0);
+    camClient->setDeviceURL(input);
 
+    // Get vtkCamera
+    auto viewer = sdk->getViewerInstance();
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
-
     vtkCamera* cam = vtkViewer->getVtkCamera();
-
-    // set the view angle of the camera. 80 deg for laparoscopic camera
     cam->SetViewAngle(80.0);
 
-    // set the camera to be controlled by the camera controller
+    // Set Camera Controller
+    auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
+    camController->setScalingFactor(40.0);
     camController->setCamera(cam);
 
-    // Connect the camera controller to the vtk viewer to enable camera manipulation
-    vtkViewer->setCameraControllerData(camController->getCameraData());
-
+    // Register modules
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
-
     if (SPACE_EXPLORER_DEVICE)
     {
         sdk->registerModule(server);
     }
 
-    return camController;
+    return EXIT_SUCCESS;
 }
 
 int main()
@@ -391,12 +384,10 @@ int main()
     InitVTKRendering();
     InitIODelegates();
 
-    std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
-
     //-------------------------------------------------------
     // Set up the viewer
     //-------------------------------------------------------
-
+    std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
     std::shared_ptr<ViewerBase> viewer = sdk->getViewerInstance();
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
