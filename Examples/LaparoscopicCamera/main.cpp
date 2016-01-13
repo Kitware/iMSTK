@@ -410,33 +410,35 @@ int main()
     //-------------------------------------------------------
     // Set up the scene
     //-------------------------------------------------------
-
     std::shared_ptr<Scene> scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Create camera navigation scene
     createCameraNavigationScene(scene, "./CameraNavAppData/target.png");
 
-    // Initialize viewer with scene objects
-    // NOTE : Needs to be done before VTK Add ons since
-    // init create the needed renderer in the VTKView
-    viewer->init();
-
     //-------------------------------------------------------
-    // Add ons (VTK)
-    //-------------------------------------------------------
-
     // Enable screenshot capture
+    //-------------------------------------------------------
+    // NOTE : Needs to be done before the viewer initialisation
+    // not to erase the changes on the observers made to the
+    // interactor in vtkViewer::addRenderer()
     vtkNew<ScreenCaptureInteractorStyle> style;
     style->initialize(vtkViewer->getRenderWindow());
     vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
+    //-------------------------------------------------------
+    // Initialize viewer with scene objects
+    //-------------------------------------------------------
+    // NOTE : Needs to be done before VTK Add ons since
+    // init create the needed renderer in the VTKViewer
+    viewer->init();
+
+    //-------------------------------------------------------
+    // Add ons (VTK)
+    //-------------------------------------------------------
     // Add a camera controller
-    // NOTE: This has to come after the ScreenCaptureInteractorStyle initialization
-    // since for this to work the mouse events need disabled which are
-    // left as is after ScreenCaptureInteractorStyle initialization
-    std::shared_ptr<LaparoscopicCameraController> camController = addCameraController(sdk);
+    addCameraController(sdk);
 
     // Add a 2D overlay on the 3D scene
     add2DOverlay(vtkViewer,"./CameraNavAppData/viewfinder.png");
@@ -444,7 +446,6 @@ int main()
     //-------------------------------------------------------
     // Start
     //-------------------------------------------------------
-
     // Run the SDK
     sdk->run();
 
