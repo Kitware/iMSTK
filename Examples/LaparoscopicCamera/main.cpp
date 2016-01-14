@@ -332,19 +332,16 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
 /// \brief Create a Laparoscopic camera controller and connect
 /// it to the vtk viewer
 ///
-std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_ptr<SDK> sdk)
+int addCameraController(std::shared_ptr<SDK> sdk)
 {
-    auto viewer = sdk->getViewerInstance();
 
-    auto camClient = std::make_shared<VRPNForceDevice>();
+    std::shared_ptr<VRPNForceDevice> camClient = std::make_shared<VRPNForceDevice>();
     std::shared_ptr<VRPNDeviceServer> server;
     std::string input;
 
     if (SPACE_EXPLORER_DEVICE)
     {
         server = std::make_shared<VRPNDeviceServer>();
-
-        //get some user input and setup device url
         input = "navigator@localhost";
     }
     else
@@ -354,36 +351,32 @@ std::shared_ptr<LaparoscopicCameraController> addCameraController(std::shared_pt
         std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
         std::getline(std::cin, input);
     }
-
-    if (!input.empty())
+    if (input.empty())
     {
-        camClient->setDeviceURL(input);
+        return EXIT_FAILURE;
     }
-    auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
-    camController->setScalingFactor(40.0);
+    camClient->setDeviceURL(input);
 
+    // Get vtkCamera
+    auto viewer = sdk->getViewerInstance();
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
-
     vtkCamera* cam = vtkViewer->getVtkCamera();
-
-    // set the view angle of the camera. 80 deg for laparoscopic camera
     cam->SetViewAngle(80.0);
 
-    // set the camera to be controlled by the camera controller
+    // Set Camera Controller
+    auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
+    camController->setScalingFactor(40.0);
     camController->setCamera(cam);
 
-    // Connect the camera controller to the vtk viewer to enable camera manipulation
-    vtkViewer->setCameraControllerData(camController->getCameraData());
-
+    // Register modules
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
-
     if (SPACE_EXPLORER_DEVICE)
     {
         sdk->registerModule(server);
     }
 
-    return camController;
+    return EXIT_SUCCESS;
 }
 
 int main()
@@ -391,12 +384,10 @@ int main()
     InitVTKRendering();
     InitIODelegates();
 
-    std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
-
     //-------------------------------------------------------
     // Set up the viewer
     //-------------------------------------------------------
-
+    std::shared_ptr<SDK> sdk = SDK::createStandardSDK();
     std::shared_ptr<ViewerBase> viewer = sdk->getViewerInstance();
     std::shared_ptr<VTKViewer> vtkViewer = std::static_pointer_cast<VTKViewer>(viewer);
 
@@ -410,33 +401,35 @@ int main()
     //-------------------------------------------------------
     // Set up the scene
     //-------------------------------------------------------
-
     std::shared_ptr<Scene> scene = sdk->getScene(0);
     viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Create camera navigation scene
     createCameraNavigationScene(scene, "./CameraNavAppData/target.png");
 
-    // Initialize viewer with scene objects
-    // NOTE : Needs to be done before VTK Add ons since
-    // init create the needed renderer in the VTKView
-    viewer->init();
-
     //-------------------------------------------------------
-    // Add ons (VTK)
-    //-------------------------------------------------------
-
     // Enable screenshot capture
+    //-------------------------------------------------------
+    // NOTE : Needs to be done before the viewer initialisation
+    // not to erase the changes on the observers made to the
+    // interactor in vtkViewer::addRenderer()
     vtkNew<ScreenCaptureInteractorStyle> style;
     style->initialize(vtkViewer->getRenderWindow());
     vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
+    //-------------------------------------------------------
+    // Initialize viewer with scene objects
+    //-------------------------------------------------------
+    // NOTE : Needs to be done before VTK Add ons since
+    // init create the needed renderer in the VTKViewer
+    viewer->init();
+
+    //-------------------------------------------------------
+    // Add ons (VTK)
+    //-------------------------------------------------------
     // Add a camera controller
-    // NOTE: This has to come after the ScreenCaptureInteractorStyle initialization
-    // since for this to work the mouse events need disabled which are
-    // left as is after ScreenCaptureInteractorStyle initialization
-    std::shared_ptr<LaparoscopicCameraController> camController = addCameraController(sdk);
+    addCameraController(sdk);
 
     // Add a 2D overlay on the 3D scene
     add2DOverlay(vtkViewer,"./CameraNavAppData/viewfinder.png");
@@ -444,7 +437,6 @@ int main()
     //-------------------------------------------------------
     // Start
     //-------------------------------------------------------
-
     // Run the SDK
     sdk->run();
 

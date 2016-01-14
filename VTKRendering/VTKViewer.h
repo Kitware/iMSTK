@@ -93,11 +93,6 @@ public:
     vtkCamera* getVtkCamera();
 
 	///
-	/// \brief Sets the position and orientation data from the camera controller
-	///
-    void setCameraControllerData(std::shared_ptr<cameraConfigurationData> camData);
-
-	///
 	/// \brief
 	///
     vtkRenderer* getVtkRenderer();
