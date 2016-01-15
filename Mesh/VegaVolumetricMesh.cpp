@@ -38,19 +38,29 @@
 VegaVolumetricMesh::VegaVolumetricMesh(bool generateMeshGraph) : generateGraph(generateMeshGraph)
 {
 }
+
+//---------------------------------------------------------------------------
 VegaVolumetricMesh::~VegaVolumetricMesh() {}
+
+//---------------------------------------------------------------------------
 std::shared_ptr<Graph> VegaVolumetricMesh::getMeshGraph()
 {
     return this->meshGraph;
 }
+
+//---------------------------------------------------------------------------
 size_t VegaVolumetricMesh::getNumberOfVertices() const
 {
     return this->mesh->getNumVertices();
 }
+
+//---------------------------------------------------------------------------
 size_t VegaVolumetricMesh::getNumberOfElements() const
 {
     return this->mesh->getNumElements();
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius)
 {
     // Keep copy of the mesh pointer
@@ -63,6 +73,8 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
     }
     this->generateWeigths(surfaceMesh,radius);
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string& fileName, const double &radius)
 {
     // Keep copy of the mesh pointer
@@ -75,10 +87,14 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
     }
     this->readWeights(surfaceMesh,fileName,radius);
 }
+
+//---------------------------------------------------------------------------
 std::shared_ptr<VolumetricMesh> VegaVolumetricMesh::getVegaMesh()
 {
     return this->mesh;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
 {
     this->mesh = newMesh;
@@ -89,13 +105,16 @@ void VegaVolumetricMesh::setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh)
         meshGraph = std::make_shared<Graph>(*GenerateMeshGraph::Generate(this->mesh.get()));
     }
 }
-void VegaVolumetricMesh::updateAttachedMeshes(double *q)
+
+//---------------------------------------------------------------------------
+void VegaVolumetricMesh::updateAttachedMeshes(const core::Vectord &q)
 {
     auto renderingMesh = this->getRenderingMesh();
+    auto *data = const_cast<double*>(q.data());
     if(renderingMesh)
     {
         std::vector<core::Vec3d> displacements(renderingMesh->getNumberOfVertices(),core::Vec3d::Zero());
-        VolumetricMesh::interpolate(q,
+        VolumetricMesh::interpolate(data,
                                     displacements.data()->data(),
                                     renderingMesh->getNumberOfVertices(),
                                     this->mesh->getNumElementVertices(),
@@ -123,7 +142,7 @@ void VegaVolumetricMesh::updateAttachedMeshes(double *q)
     auto collisionMesh = this->getCollisionMesh();
     if(collisionMesh)
     {
-        core::Matrix3MapType<double> displacementMap(q,3,this->mesh->getNumVertices());
+        core::Matrix3MapType<double> displacementMap(data,3,this->mesh->getNumVertices());
         auto &restPositions = collisionMesh->getOrigVertices();
         auto &vertices = collisionMesh->getVertices();
 
@@ -139,45 +158,63 @@ void VegaVolumetricMesh::updateAttachedMeshes(double *q)
         }
     }
 }
+
+//---------------------------------------------------------------------------
 const std::unordered_map<size_t,size_t>& VegaVolumetricMesh::getVertexMap() const
 {
     return this->vertexMap;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::setVertexMap(const std::unordered_map<size_t,size_t>& map)
 {
     this->vertexMap = map;
 }
+
+//---------------------------------------------------------------------------
 const std::vector< size_t >& VegaVolumetricMesh::getFixedVertices() const
 {
     return this->fixedVertices;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::setFixedVertices(const std::vector< size_t >& dofs)
 {
     this->fixedVertices.clear();
     this->fixedVertices = dofs;
 }
+
+//---------------------------------------------------------------------------
 std::shared_ptr<SurfaceMesh> VegaVolumetricMesh::getAttachedMesh(const size_t i)
 {
     return i < this->attachedMeshes.size() ?
             this->attachedMeshes.at(i) :
             nullptr;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::setRenderDetail(int i, std::shared_ptr< RenderDetail > newRenderDetail)
 {
     this->attachedMeshes.at(i)->setRenderDetail(newRenderDetail);
 }
+
+//---------------------------------------------------------------------------
 std::shared_ptr<SurfaceMesh> VegaVolumetricMesh::getRenderingMesh()
 {
     return attachedMeshes.size() > 1
            ? this->attachedMeshes.at(attachedMeshes.size() - 1)
            : nullptr;
 }
+
+//---------------------------------------------------------------------------
 std::shared_ptr<SurfaceMesh> VegaVolumetricMesh::getCollisionMesh()
 {
     return attachedMeshes.size() > 0
            ? this->attachedMeshes.at(0)
            : nullptr;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::saveWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string& filename) const
 {
     auto vertices = this->attachedVertices.at(surfaceMesh);
@@ -199,6 +236,8 @@ void VegaVolumetricMesh::saveWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, c
     fileStream << std::endl;
     fileStream.close();
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string& filename, const double radius)
 {
     std::ifstream fileStream(filename.c_str());
@@ -239,6 +278,8 @@ void VegaVolumetricMesh::readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh, c
 
     std::cout << "\tTotal # of weights read: " << weigths.size() / this->mesh->getNumElementVertices() << std::endl;
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMesh, double radius, const bool saveToDisk, const std::string& filename)
 {
     std::cerr << "Generating weights..." << std::endl;
@@ -305,14 +346,20 @@ void VegaVolumetricMesh::generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMes
         this->saveWeights(surfaceMesh, filename);
     }
 }
+
+//---------------------------------------------------------------------------
 const std::vector< double >& VegaVolumetricMesh::getAttachedWeights(std::shared_ptr<SurfaceMesh> surfaceMesh) const
 {
     return this->attachedWeights.at(surfaceMesh);
 }
+
+//---------------------------------------------------------------------------
 const std::vector< int >& VegaVolumetricMesh::getAttachedVertices(std::shared_ptr<SurfaceMesh> surfaceMesh) const
 {
     return this->attachedVertices.at(surfaceMesh);
 }
+
+//---------------------------------------------------------------------------
 void VegaVolumetricMesh::translate(const Eigen::Translation3d& translation, bool setInitialPoints)
 {
     for(auto meshes : this->attachedMeshes)

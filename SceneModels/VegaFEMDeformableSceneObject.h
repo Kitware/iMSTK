@@ -121,7 +121,7 @@ public:
     /// \brief Helper function to interface Vega sparse matrices with Eigen matrices.
     ///
     void updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
-                                std::vector<double> &values);
+                                double *values);
 
     ///
     /// \brief Set the ODE system right hand side function.
@@ -141,7 +141,12 @@ public:
     ///
     /// \brief Set the the Raleigh damping matrix function to be evaluated by the ODE solver.
     ///
-    void setDampingMatrix();
+    void setDampingMatrices();
+
+    ///
+    /// \brief Update underlying meshes with current state positions.
+    ///
+    void updateMesh() override;
 
 private:
     // Volumetric mesh
@@ -159,21 +164,12 @@ private:
 
     // Vega mass matrix
     std::shared_ptr<SparseMatrix> vegaMassMatrix;
-    std::vector<double> massMatrixValues;
-    std::vector<int> massMatrixColIndices;
-    std::vector<int> massMatrixRowPointers;
 
     // Vega Tangent stiffness matrix
     std::shared_ptr<SparseMatrix> vegaTangentStiffnessMatrix;
-    std::vector<double> tangentStiffnessMatrixValues;
-    std::vector<int> tangentStiffnessMatrixColIndices;
-    std::vector<int> tangentStiffnessMatrixRowPointers;
 
     // Vega Laplacian damping matrix
     std::shared_ptr<SparseMatrix> dampingMatrix;
-    std::vector<double> dampingMatrixValues;
-    std::vector<int> dampingMatrixColIndices;
-    std::vector<int> dampingMatrixColPointers;
 
     // Total number of degrees of freedom
     double numOfDOF;

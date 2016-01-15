@@ -48,6 +48,9 @@ public:
     ///
     /// \brief Constructor
     ///
+    /// \param generateMeshGraph True if you want to generate a mesh graph. The mesh
+    ///     graphs is used by the time stepping method to apply Lagrangian damping.
+    ///
     VegaVolumetricMesh(bool generateMeshGraph = true);
 
     ///
@@ -82,19 +85,19 @@ public:
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName, const double &radius = 5.0);
 
     ///
-    /// \brief Return mesh
+    /// \brief Return underlying Vega mesh data structure.
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
 
     ///
-    /// \brief Sets the vega mesh
+    /// \brief Sets the Vega underlying mesh.
     ///
     void setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
 
     ///
     /// \brief Update nodes to local arrays
     ///
-    void updateAttachedMeshes(double *q);
+    void updateAttachedMeshes(const core::Vectord &q);
 
     ///
     /// \brief Return the vertex map
@@ -169,7 +172,8 @@ private:
     // Vega mesh base object
     std::shared_ptr<VolumetricMesh> mesh;
 
-    // Vega mesh graph
+    // Vega mesh graph. The mesh graphs is used by the time stepping method to
+    // apply Lagrangian damping.
     std::shared_ptr<Graph> meshGraph;
 
     // Generate graph for this mesh

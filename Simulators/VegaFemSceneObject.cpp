@@ -780,7 +780,9 @@ void VegaFemSceneObject::update(double /*dt*/)
             u[i] = q[i];
         }
 
-        this->volumetricMesh->updateAttachedMeshes(q);
+        Eigen::Map<core::Vectord> positions(q,3*numNodes);
+
+        this->volumetricMesh->updateAttachedMeshes(positions);
 
         if (femConfig->singleStepMode == 1)
         {

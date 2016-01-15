@@ -24,6 +24,10 @@
 // SimMedTK includes
 
 #include "SceneModels/DeformableSceneObject.h"
+
+#include <cmath> // for std::isfinite()
+
+
 DeformableSceneObject::DeformableSceneObject():
     OdeSystem(),
     integrationScheme(TimeIntegrator::ImplicitEuler)
@@ -36,9 +40,9 @@ void DeformableSceneObject::applyContactForces()
     for(const auto & cf : this->getContactForces())
     {
         auto i = cf.first;
-        f(i) += cf.second(0);
-        f(i + 1) += cf.second(1);
-        f(i + 2) += cf.second(2);
+        this->f(i) += cf.second(0);
+        this->f(i + 1) += cf.second(1);
+        this->f(i + 2) += cf.second(2);
     }
 }
 
@@ -92,10 +96,18 @@ void DeformableSceneObject::update(const double dt)
 
     this->odeSolver->solve(*this->currentState, *this->newState, dt);
 
+    // TODO: Check state validity
+    if(!std::isfinite(this->newState->getPositions().sum()) ||
+       !std::isfinite(this->newState->getVelocities().sum()) )
+    {
+        // TODO: log this and throw exception, this is a fatal error
+        return;
+    }
+
     this->currentState.swap(this->previousState);
     this->currentState.swap(this->newState);
 
-    // TODO: Check state validity
+    this->updateMesh();
 }
 
 //---------------------------------------------------------------------------

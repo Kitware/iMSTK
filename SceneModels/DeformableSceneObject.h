@@ -69,6 +69,11 @@ public:
     void update(const double dt);
 
     ///
+    /// \brief Update states
+    ///
+    virtual void updateMesh() = 0;
+
+    ///
     /// \brief Reset the current state to the initial state
     ///
     virtual void resetToInitialState();

@@ -106,7 +106,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    VegaConfiguration(const std::string &configurationFile, bool verbose = false);
+    VegaConfiguration(const std::string &configurationFile, bool verbose = true);
 
     std::string vegaConfigFile; ///> Store configuration file.
 
@@ -342,7 +342,7 @@ bool VegaFEMDeformableSceneObject::configure(const std::string &configFile)
 
     this->setMassMatrix();
     this->setTangentStiffnessMatrix();
-    this->setDampingMatrix();
+    this->setDampingMatrices();
     this->setOdeRHS();
 
     size_t numNodes = this->volumetricMesh->getNumberOfVertices();
@@ -367,28 +367,25 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
                                           &matrix,
                                           true);
 
-    this->vegaMassMatrix.reset(matrix);
+    auto rowLengths = matrix->GetRowLengths();
+    auto nonZeroValues = matrix->GetEntries();
+    auto columnIndices = matrix->GetColumnIndices();
 
-    auto nnz = this->vegaMassMatrix->GetNumEntries();
-    this->massMatrixRowPointers.resize(this->vegaMassMatrix->GetNumRows()+1);
-    this->massMatrixColIndices.resize(nnz);
-    this->massMatrixValues.resize(nnz);
-
-    this->vegaMassMatrix->
-    GenerateCompressedRowMajorFormat(this->massMatrixValues.data(),
-                                     this->massMatrixRowPointers.data(),
-                                     this->massMatrixColIndices.data());
-
-    // Construct the Eigen mass matrix by mapping the arrays
-    this->M = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
-                  this->vegaMassMatrix->GetNumRows(),
-                  this->vegaMassMatrix->GetNumColumns(),
-                  this->vegaMassMatrix->GetNumEntries(),
-                  this->massMatrixRowPointers.data(),
-                  this->massMatrixColIndices.data(),
-                  this->massMatrixValues.data());
-
+    std::vector<Eigen::Triplet<double>> triplets;
+    triplets.reserve(matrix->GetNumEntries());
+    for(int i = 0, end = matrix->GetNumRows(); i < end; ++i)
+    {
+        for(int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
+        {
+            triplets.emplace_back(i,columnIndices[i][k],nonZeroValues[i][k]);
+        }
+    }
+    this->M.resize(matrix->GetNumRows(),
+                   matrix->GetNumColumns());
+    this->M.setFromTriplets(std::begin(triplets),std::end(triplets));
     this->M.makeCompressed();
+
+    this->vegaMassMatrix.reset(matrix);
     if(saveToDisk)
     {
         char name[] = "ComputedMassMatrix.mass";
@@ -414,7 +411,6 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
         return;
     }
 
-    this->vegaTangentStiffnessMatrix.reset(matrix);
 
     if(!this->vegaMassMatrix)
     {
@@ -422,7 +418,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
         return;
     }
 
-    this->vegaTangentStiffnessMatrix->BuildSubMatrixIndices(*this->vegaMassMatrix.get());
+    matrix->BuildSubMatrixIndices(*this->vegaMassMatrix.get());
 
     if(!this->dampingMatrix)
     {
@@ -430,28 +426,26 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
         return;
     }
 
-    this->vegaTangentStiffnessMatrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
+    matrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
 
-    auto nnz = this->vegaTangentStiffnessMatrix->GetNumEntries();
-    this->tangentStiffnessMatrixRowPointers.resize(this->vegaTangentStiffnessMatrix->GetNumRows()+1);
-    this->tangentStiffnessMatrixColIndices.resize(nnz);
-    this->tangentStiffnessMatrixValues.resize(nnz);
+    auto rowLengths = matrix->GetRowLengths();
+    auto columnIndices = matrix->GetColumnIndices();
 
-    this->vegaTangentStiffnessMatrix->
-    GenerateCompressedRowMajorFormat(this->tangentStiffnessMatrixValues.data(),
-                                     this->tangentStiffnessMatrixRowPointers.data(),
-                                     this->tangentStiffnessMatrixColIndices.data());
-
-    // Construct the eigen stiffness matrix by mapping the arrays
-    this->K = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
-                  this->vegaTangentStiffnessMatrix->GetNumRows(),
-                  this->vegaTangentStiffnessMatrix->GetNumColumns(),
-                  nnz,
-                  this->tangentStiffnessMatrixRowPointers.data(),
-                  this->tangentStiffnessMatrixColIndices.data(),
-                  this->tangentStiffnessMatrixValues.data());
-
+    std::vector<Eigen::Triplet<double>> triplets;
+    triplets.reserve(matrix->GetNumEntries());
+    for(int i = 0, end = matrix->GetNumRows(); i < end; ++i)
+    {
+        for(int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
+        {
+            triplets.emplace_back(i,columnIndices[i][k],0.001);
+        }
+    }
+    this->K.resize(matrix->GetNumRows(),
+                   matrix->GetNumColumns());
+    this->K.setFromTriplets(std::begin(triplets),std::end(triplets));
     this->K.makeCompressed();
+
+    this->vegaTangentStiffnessMatrix.reset(matrix);
 
     const auto &dampingStiffnessCoefficient =
         this->vegaFemConfig->floatsOptionMap.at("dampingStiffnessCoefficient");
@@ -459,12 +453,22 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
     const auto &dampingMassCoefficient =
         this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
+    // Initialize the Raleigh damping matrix
     this->C = this->M*dampingMassCoefficient + this->K*dampingStiffnessCoefficient;
 }
 
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::initDampingMatrix()
 {
+    auto dampingLaplacianCoefficient =
+        this->vegaFemConfig->floatsOptionMap.at("dampingLaplacianCoefficient");
+
+    if(!(dampingLaplacianCoefficient > 0.0))
+    {
+        /// TODO: add to log
+        return;
+    }
+
     auto meshGraph = this->volumetricMesh->getMeshGraph();
 
     if(!meshGraph)
@@ -482,30 +486,28 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
         return;
     }
 
-    this->dampingMatrix.reset(matrix);
+    matrix->ScalarMultiply(dampingLaplacianCoefficient);
 
-    this->dampingMatrix->ScalarMultiply(
-        this->vegaFemConfig->floatsOptionMap.at("dampingLaplacianCoefficient"));
+    auto rowLengths = matrix->GetRowLengths();
+    auto nonZeroValues = matrix->GetEntries();
+    auto columnIndices = matrix->GetColumnIndices();
 
-    auto nnz = this->dampingMatrix->GetNumEntries();
-    this->dampingMatrixColPointers.resize(this->dampingMatrix->GetNumRows()+1);
-    this->dampingMatrixColIndices.resize(nnz);
-    this->dampingMatrixValues.resize(nnz);
+    std::vector<Eigen::Triplet<double>> triplets;
+    triplets.reserve(matrix->GetNumEntries());
+    for(int i = 0, end = matrix->GetNumRows(); i < end; ++i)
+    {
+        for(int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
+        {
+            triplets.emplace_back(i,columnIndices[i][k],nonZeroValues[i][k]);
+        }
+    }
 
-    this->dampingMatrix->
-    GenerateCompressedRowMajorFormat(this->dampingMatrixValues.data(),
-                                     this->dampingMatrixColPointers.data(),
-                                     this->dampingMatrixColIndices.data());
-
-    // Construct the Eigen damping matrix by mapping the arrays
-    this->D = Eigen::MappedSparseMatrix<double,Eigen::RowMajor>(
-                  this->dampingMatrix->GetNumRows(),
-                  this->dampingMatrix->GetNumColumns(),
-                  this->dampingMatrix->GetNumEntries(),
-                  this->dampingMatrixColPointers.data(),
-                  this->dampingMatrixColIndices.data(),
-                  this->dampingMatrixValues.data());
+    this->D.resize(matrix->GetNumRows(),
+                   matrix->GetNumColumns());
+    this->D.setFromTriplets(std::begin(triplets),std::end(triplets));
     this->D.makeCompressed();
+
+    this->dampingMatrix.reset(matrix);
 }
 
 //---------------------------------------------------------------------------
@@ -689,9 +691,9 @@ void VegaFEMDeformableSceneObject::initForceModel()
                                    stVKInternalForces.get(),
                                    stVKStiffnessMatrix.get());
 
-            auto &uInitial = this->getInitialState()->getPositions();
-            auto &uCurrent = this->currentState->getPositions();
-            this->forceModel->GetInternalForce(uInitial.data(), uCurrent.data());
+//             auto &uInitial = this->getInitialState()->getPositions();
+//             auto &uCurrent = this->currentState->getPositions();
+//             this->forceModel->GetInternalForce(uInitial.data(), uCurrent.data());
             break;
         }
 
@@ -770,7 +772,7 @@ std::vector< std::size_t > VegaFEMDeformableSceneObject::loadBoundaryConditions(
 
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
-                                                          std::vector<double> &values)
+                                                          double *values)
 {
     auto rowLengths = matrix->GetRowLengths();
     auto nonZeroValues = matrix->GetEntries();
@@ -794,9 +796,32 @@ void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<Sparse
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setOdeRHS()
 {
-    auto odeRHS = [this](const OdeSystemState & s) -> const core::Vectord&
+    const auto &dampingStiffnessCoefficient =
+    this->vegaFemConfig->floatsOptionMap.at("dampingStiffnessCoefficient");
+
+    const auto &dampingMassCoefficient =
+    this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
+
+    auto odeRHS = [&,this](const OdeSystemState & s) -> const core::Vectord&
     {
-        this->f = -this->C * s.getVelocities() - this->K * s.getPositions();
+        double *data = const_cast<double*>(s.getPositions().data());
+        this->forceModel->GetInternalForce(data,this->f.data());
+
+        // Add the Raleigh damping force
+        if(dampingMassCoefficient > 0)
+        {
+            this->f += dampingMassCoefficient*this->M*s.getVelocities();
+        }
+        if(dampingStiffnessCoefficient > 0)
+        {
+            this->f += dampingStiffnessCoefficient*this->K*s.getVelocities();
+        }
+
+        // Apply contact forces
+        this->applyContactForces();
+
+        // Vega returns the negative of the force action on the material
+        this->f *= -1;
         return this->f;
     };
     this->setFunction(odeRHS);
@@ -813,8 +838,7 @@ void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
         GetTangentStiffnessMatrix(data,this->vegaTangentStiffnessMatrix.get());
 
         this->updateValuesFromMatrix(this->vegaTangentStiffnessMatrix,
-                                     this->tangentStiffnessMatrixValues);
-        std::cout << this->K << std::endl;
+                                     this->K.valuePtr());
         return this->K;
     };
     this->setJaconbianFx(tangentStiffness);
@@ -831,19 +855,42 @@ void VegaFEMDeformableSceneObject::setMassMatrix()
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMDeformableSceneObject::setDampingMatrix()
+void VegaFEMDeformableSceneObject::setDampingMatrices()
 {
     const auto &dampingStiffnessCoefficient =
-        this->vegaFemConfig->floatsOptionMap.at("dampingStiffnessCoefficient");
+    this->vegaFemConfig->floatsOptionMap.at("dampingStiffnessCoefficient");
 
     const auto &dampingMassCoefficient =
-        this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
+    this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
     auto raleighDamping = [&,this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
     {
-        this->C = this->M*dampingMassCoefficient;
-        this->C += this->K*dampingStiffnessCoefficient;
+        if(dampingMassCoefficient > 0)
+        {
+            this->C = dampingMassCoefficient*this->M;
+            if(dampingStiffnessCoefficient > 0)
+            {
+                this->C += dampingStiffnessCoefficient*this->K;
+            }
+        }
+        else if(dampingStiffnessCoefficient > 0)
+        {
+            this->C = dampingStiffnessCoefficient*this->K;
+        }
         return this->C;
     };
     this->setJaconbianFv(raleighDamping);
+
+    if(this->dampingMatrix)
+    {
+        auto lagrangianDamping = [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+        {
+            return this->D;
+        };
+        this->setDamping(lagrangianDamping);
+    }
+}
+void VegaFEMDeformableSceneObject::updateMesh()
+{
+    this->volumetricMesh->updateAttachedMeshes(this->currentState->getPositions());
 }
