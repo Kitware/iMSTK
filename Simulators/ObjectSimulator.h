@@ -29,7 +29,6 @@
 #include "Core/CoreClass.h"
 #include "Core/Timer.h"
 #include "SimulationManager/Scheduler.h"
-#include "SceneModels/SceneObject.h"
 
 // Forward declarations
 class SceneObject;
@@ -112,12 +111,12 @@ public:
     ///
     double getTimeStep() const;
 
-protected:
-
     ///
     /// \brief Execute the simulation.
     ///
-    virtual void run() = 0;
+    virtual void run();
+
+protected:
 
     ///
     /// \brief  Called at the beginning of the simulator frame.

@@ -32,9 +32,9 @@
 
 DefaultSimulator::DefaultSimulator(  ) : ObjectSimulator( )
 {
-    this->addOperation([](std::vector<core::Vec3d>& array)
+    this->addOperation([](std::shared_ptr<MeshModel> &model)
     {
-        for(auto &x : array)
+        for(auto &x : model->getMesh()->getVertices())
         {
             x.array() += 0.000001;
         }
@@ -47,54 +47,24 @@ void DefaultSimulator::beginExecution()
 void DefaultSimulator::initialize()
 {
     //do nothing for now
-    for ( size_t i = 0; i < simulatedModels.size(); i++ )
-    {
-        auto object = simulatedModels[i];
-
-        switch ( object->getType() )
-        {
-            case core::ClassType::StaticSceneObject:
-            {
-                auto sceneObject = std::static_pointer_cast<StaticSceneObject>(object);
-                auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
-                if(!model)
-                {
-                    std::cerr << "Unknown model type." << std::endl;
-                    break;
-                }
-                auto mesh = model->getMesh();
-
-                object->getLocalVertices().reserve( mesh->getNumberOfVertices() );
-                // WARNING:  Copy!!?
-                object->getLocalVertices() = mesh->getVertices();
-                object->getFlags().isSimulatorInit = true;
-                break;
-            }
-            default:
-                std::cerr << "Unknown scene object type." << std::endl;
-
-        }
-    }
 }
 void DefaultSimulator::run()
 {
     beginExecution();
 
-    for ( size_t i = 0; i < this->simulatedModels.size(); i++ )
+    for(auto &sceneModel : this->simulatedModels)
     {
-        auto sceneObj = this->simulatedModels[i];
-
-        //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
+        for(auto &apply : this->operatorFunctions)
         {
-            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-
-            for(auto apply : this->operatorFunctions)
+            auto meshModel = std::dynamic_pointer_cast<MeshModel>(sceneModel->getModel());
+            if(!meshModel)
             {
-                apply(sceneObject->getLocalVertices());
+                continue;
             }
-            this->updateHapticForces(sceneObject);
+            apply(meshModel);
         }
+
+        this->updateHapticForces(sceneModel);
     }
 
     endExecution();
@@ -105,25 +75,7 @@ void DefaultSimulator::endExecution()
 }
 void DefaultSimulator::syncBuffers()
 {
-    for ( size_t i = 0; i < this->simulatedModels.size(); i++ )
-    {
-        auto sceneObj = this->simulatedModels[i];
 
-        //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
-        {
-            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-            auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
-            if(!model)
-            {
-                std::cerr << "Unknown model type." << std::endl;
-                break;
-            }
-            auto mesh = std::static_pointer_cast<MeshCollisionModel>(model)->getMesh();
-            // WARNING: Copy??!
-            mesh->getVertices() = sceneObject->getLocalVertices();
-        }
-    }
 }
 void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
@@ -148,7 +100,7 @@ void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
     }
 }
 
-void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sceneObject)
+void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObject)
 {
     auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
     if(!outputDevice)
@@ -190,5 +142,4 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sce
     outputDevice->setDynamicFriction(0.0);
     outputDevice->setSpringCoefficient(norm);
     outputDevice->setStaticFriction(0.0);
-
 }

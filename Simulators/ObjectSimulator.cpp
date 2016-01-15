@@ -22,6 +22,8 @@
 //---------------------------------------------------------------------------
 
 #include "Simulators/ObjectSimulator.h"
+#include "SceneModels/SceneObject.h"
+
 ObjectSimulator::ObjectSimulator():
     enabled(false),
     isObjectSimInitialized(false),
@@ -46,7 +48,7 @@ void ObjectSimulator::addObject(std::shared_ptr< SceneObject > model)
         return;
     }
 
-    model->objectSim = this->safeDownCast<ObjectSimulator>();
+    model->attachObjectSimulator(this->safeDownCast<ObjectSimulator>());
     this->simulatedModels.emplace_back(model);
 }
 
@@ -143,7 +145,18 @@ void ObjectSimulator::setTimeStep(const double newTimeStep)
 {
     this->timeStep = newTimeStep;
 }
+
+//---------------------------------------------------------------------------
 double ObjectSimulator::getTimeStep() const
 {
     return this->timeStep;
+}
+
+//---------------------------------------------------------------------------
+void ObjectSimulator::run()
+{
+    for(auto & model : this->simulatedModels)
+    {
+        model->update(this->timeStep);
+    }
 }
