@@ -37,7 +37,7 @@ go_bandit([]()
         auto odeSystem = std::make_shared<OdeSystem>();
         auto initialState = std::make_shared<OdeSystemState>();
         // ODE parameters
-        double dt = 0.1;
+        double dt = 0.01;
         double t0 = 0, t1 = 3;
         size_t steps = (t1-t0)/dt;
         double lambda = -10;
@@ -58,7 +58,7 @@ go_bandit([]()
         core::SparseMatrixd M(1,1);
         M.setFromTriplets(tripletList.begin(),tripletList.end());
         M.makeCompressed();
-        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd
+        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd&
         {
             return M;
         };
@@ -79,13 +79,10 @@ go_bandit([]()
 
         it("solves dx/dt=lambda*x, x(0)=a ", [&]()
         {
-            // Initial value
-            core::Vectord x(1);
-            x(0) = a;
-
             // Find the solution for t = [0,1)
             OdeSystemState state, newState;
             state = *initialState;
+            newState = state;
 
             core::Vectord sol(steps), error(steps);
             sol(0) = a;

@@ -106,7 +106,7 @@ int main()
 
     auto planeObject = std::make_shared<StaticSceneObject>();
     planeObject->setModel(planeModel);
-    scene->addSceneObject(planeObject);
+//     scene->addSceneObject(planeObject);
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();

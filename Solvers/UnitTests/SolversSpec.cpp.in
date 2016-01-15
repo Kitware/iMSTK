@@ -32,7 +32,7 @@
 #include "Solvers/BackwardSOR.h"
 #include "Solvers/DirectLinearSolver.h"
 #include "Solvers/ConjugateGradient.h"
-#include "Solvers/InexactNewton.h"
+#include "Solvers/NewtonMethod.h"
 #include "Core/Matrix.h"
 #include "Testing/ReadSparseMatrix.h"
 
@@ -190,7 +190,7 @@ go_bandit([]()
 
     describe("Newton non-linear solver",[&]()
     {
-        auto NewtonSolver = std::make_shared<InexactNewton>();
+        auto NewtonSolver = std::make_shared<NewtonMethod>();
         it("constructs ", [&]()
         {
             AssertThat(NewtonSolver != nullptr, IsTrue());

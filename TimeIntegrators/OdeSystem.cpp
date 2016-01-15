@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "TimeIntegrators/OdeSystem.h"
+#include <iostream>
 
 void OdeSystem::setJaconbianFv(OdeSystem::MatrixFunctionType newDFv)
 {
@@ -41,6 +42,12 @@ void OdeSystem::setMass(OdeSystem::MatrixFunctionType newMass)
 }
 
 //---------------------------------------------------------------------------
+void OdeSystem::setDamping(OdeSystem::MatrixFunctionType newDamping)
+{
+    this->Damping = newDamping;
+}
+
+//---------------------------------------------------------------------------
 void OdeSystem::setFunction(OdeSystem::FunctionType newF)
 {
     this->F = newF;
@@ -56,4 +63,112 @@ const std::shared_ptr< OdeSystemState > OdeSystem::getInitialState() const
 void OdeSystem::setInitialState(std::shared_ptr< OdeSystemState > newState)
 {
     this->initialState = newState;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::computeImplicitSystemLHS(const OdeSystemState &previousState,
+                                    OdeSystemState &newState,
+                                    const double timeStep,
+                                    bool computeRHS)
+{
+    auto &M = this->evalMass(newState);
+    auto &K = this->evalDFx(newState);
+    auto &C = this->evalDFv(newState);
+
+    this->systemMatrix = (1.0 / timeStep) * M;
+    this->systemMatrix += C;
+    this->systemMatrix += timeStep * K;
+
+    if(this->Damping)
+    {
+        this->systemMatrix += this->Damping(newState);
+    }
+
+    previousState.applyBoundaryConditions(this->systemMatrix);
+
+    if(computeRHS)
+    {
+        auto &f = this->evalF(newState);
+        this->rhs = M * (newState.getVelocities() - previousState.getVelocities()) / timeStep;
+        this->rhs -= (f + K * (newState.getPositions() - previousState.getPositions() -
+                             newState.getVelocities() * timeStep));
+
+        if(this->Damping)
+        {
+            this->rhs -= timeStep*this->Damping(newState)*newState.getVelocities();
+        }
+        previousState.applyBoundaryConditions(this->rhs);
+    }
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::computeExplicitSystemLHS(const OdeSystemState &state,
+                                            OdeSystemState &,
+                                            double timeStep, bool computeRHS)
+{
+    auto &M = this->evalMass(state);
+
+    this->systemMatrix = (1.0 / timeStep) * M;
+    state.applyBoundaryConditions(this->systemMatrix);
+
+    if(computeRHS)
+    {
+        this->rhs = this->evalF(state);
+        state.applyBoundaryConditions(this->rhs);
+    }
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::computeImplicitSystemRHS(const OdeSystemState &state,
+                                 OdeSystemState &newState,
+                                 double timeStep)
+{
+    auto &M = this->evalMass(newState);
+    auto &K = this->evalDFx(newState);
+    auto &f = this->evalF(newState);
+
+    this->rhs = M * (newState.getVelocities() - state.getVelocities()) / timeStep;
+    this->rhs -= (f + K * (newState.getPositions() - state.getPositions() - newState.getVelocities() * timeStep));
+
+    if(this->Damping)
+    {
+        this->rhs -= timeStep*this->Damping(newState)*newState.getVelocities();
+    }
+    state.applyBoundaryConditions(this->rhs);
+}
+
+//---------------------------------------------------------------------------
+const core::SparseMatrixd &OdeSystem::getSystemMatrix() const
+{
+    return this->systemMatrix;
+}
+
+//---------------------------------------------------------------------------
+core::SparseMatrixd &OdeSystem::getSystemMatrix()
+{
+    return this->systemMatrix;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setSystemMatrix(const core::SparseMatrixd &newMatrix)
+{
+    this->systemMatrix = newMatrix;
+}
+
+//---------------------------------------------------------------------------
+const core::Vectord &OdeSystem::getRHS() const
+{
+    return this->rhs;
+}
+
+//---------------------------------------------------------------------------
+core::Vectord &OdeSystem::getRHS()
+{
+    return this->rhs;
+}
+
+//---------------------------------------------------------------------------
+void OdeSystem::setRHS(const core::Vectord &newRhs)
+{
+    this->rhs = newRhs;
 }

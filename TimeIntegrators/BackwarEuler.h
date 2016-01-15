@@ -27,7 +27,7 @@
 #include "TimeIntegrators/TimeIntegrator.h"
 
 #include "Core/Vector.h"
-#include "Solvers/InexactNewton.h"
+#include "Solvers/NewtonMethod.h"
 #include "TimeIntegrators/OdeSystem.h"
 
 ///
@@ -60,28 +60,8 @@ public:
     ///
     virtual void solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep) override;
 
-    ///
-    /// \brief Compute and store the system matrix.
-    ///
-    /// \param state Current state
-    /// \param newState New state
-    /// \param timeStep Time step used to discretize the ODE.
-    ///
-    virtual void computeSystemMatrix(const OdeSystemState &state,
-                             OdeSystemState &newState,
-                             const double timeStep,
-                             bool computeRHS = true);
-
-    ///
-    /// \brief Compute and store the right hand side of the system.
-    ///
-    /// \param state Current state
-    /// \param newState New state
-    /// \param timeStep Time step used to discretize the ODE.
-    ///
-    virtual void computeSystemRHS(const OdeSystemState &state,
-                          OdeSystemState &newState,
-                          double timeStep);
+private:
+    NewtonMethod newtonSolver;
 };
 
 #endif // BACKWAREULER_H

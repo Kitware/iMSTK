@@ -81,7 +81,7 @@ double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x, const 
     if(i == this->armijoMax)
     {
         // TODO: Add to logger
-        std::cout << "Maximum number of Armijo iterations reached." << std::endl;
+//         std::cout << "Maximum number of Armijo iterations reached." << std::endl;
     }
 
 

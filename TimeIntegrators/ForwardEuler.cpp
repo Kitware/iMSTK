@@ -35,34 +35,14 @@ void ForwardEuler::solve(const OdeSystemState &state,
                          OdeSystemState &newState,
                          double timeStep)
 {
-    this->computeSystemMatrix(state,newState,timeStep);
+    this->system->computeExplicitSystemLHS(state,newState,timeStep);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
-                            this->systemMatrix, this->rhs);
+                            this->system->getSystemMatrix(), this->system->getRHS());
 
     this->linearSolver->setSystem(linearSystem);
+    this->linearSolver->solve(newState.getVelocities());
 
+    newState.getVelocities() += state.getVelocities();
     newState.getPositions() = state.getPositions() + timeStep * state.getVelocities();
-
-    this->solution = state.getVelocities();
-    this->linearSolver->solve(this->solution);
-
-    newState.getVelocities() += this->solution;
-}
-
-//---------------------------------------------------------------------------
-void ForwardEuler::computeSystemMatrix(const OdeSystemState &state,
-                                       OdeSystemState &,
-                                       double timeStep, bool computeRHS)
-{
-    auto &M = this->system->evalMass(state);
-
-    this->systemMatrix = (1.0 / timeStep) * M;
-    state.applyBoundaryConditions(this->systemMatrix);
-
-    if(computeRHS)
-    {
-        this->rhs = this->system->evalF(state);
-        state.applyBoundaryConditions(this->rhs);
-    }
 }

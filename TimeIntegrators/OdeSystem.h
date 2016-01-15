@@ -37,7 +37,7 @@ class OdeSystem
 {
 public:
     using MatrixFunctionType = std::function<const core::SparseMatrixd&(const OdeSystemState &state)>;
-    using FunctionType = std::function<const core::Vectord &(const OdeSystemState &state)>;
+    using FunctionType = std::function<const core::Vectord&(const OdeSystemState &state)>;
 
 public:
     OdeSystem() = default;
@@ -58,14 +58,21 @@ public:
     void setJaconbianFx(MatrixFunctionType newDFx);
 
     ///
-    /// \brief Set the mass matrix evaluation function
+    /// \brief Set the mass matrix evaluation function.
     ///
     /// \param newMass New mass function. Returns a sparse matrix.
     ///
     void setMass(MatrixFunctionType newMass);
 
     ///
-    /// \brief Set the right hand side evaluation function
+    /// \brief Set the Lagrangian damping matrix evaluation function.
+    ///
+    /// \param newDamping New damping function. Returns a sparse matrix.
+    ///
+    void setDamping(MatrixFunctionType newDamping);
+
+    ///
+    /// \brief Set the right hand side evaluation function.
     ///
     /// \param newF New rhs function. Returns a vector.
     ///
@@ -76,28 +83,28 @@ public:
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFx(const OdeSystemState &state);
+    const core::SparseMatrixd &evalDFx(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate -df/dv function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalDFv(const OdeSystemState &state);
+    const core::SparseMatrixd &evalDFv(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate mass function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd& evalMass(const OdeSystemState &state);
+    const core::SparseMatrixd &evalMass(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate rhs function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::Vectord& evalF(const OdeSystemState &state);
+    const core::Vectord &evalF(const OdeSystemState &state);
 
     ///
     /// \brief Get the initial velocities and positions of the system.
@@ -109,15 +116,97 @@ public:
     ///
     /// \brief Set the initial velocities and positions of the system.
     ///
-    /// \param newState Current positions and velocities.
+    /// \param newState New positions and velocities.
     ///
     void setInitialState(std::shared_ptr<OdeSystemState> newState);
+
+    ///
+    /// \brief Compute and store the system matrix for implicit integration scheme.
+    ///
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
+    ///
+    virtual void computeImplicitSystemLHS(const OdeSystemState &state,
+                                          OdeSystemState &newState,
+                                          const double timeStep,
+                                          bool computeRHS = true);
+
+    ///
+    /// \brief Compute and store the system matrix for explicit integration scheme.
+    ///
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
+    ///
+    virtual void computeExplicitSystemLHS(const OdeSystemState &state,
+                                          OdeSystemState &newState,
+                                          const double timeStep,
+                                          bool computeRHS = true);
+
+    ///
+    /// \brief Compute and store the right hand side of the system for implicit
+    /// \integration scheme.
+    ///
+    /// \param state Current state
+    /// \param newState New state
+    /// \param timeStep Time step used to discretize the ODE.
+    ///
+    virtual void computeImplicitSystemRHS(const OdeSystemState &state,
+                                          OdeSystemState &newState,
+                                          double timeStep);
+
+    ///
+    /// \brief Get the system matrix corresponding to this ODE system.
+    ///
+    /// \return Sparse matrix constant reference.
+    ///
+    const core::SparseMatrixd &getSystemMatrix() const;
+
+    ///
+    /// \brief Get the system matrix corresponding to this ODE system.
+    ///
+    /// \return Sparse matrix constant reference.
+    ///
+    core::SparseMatrixd &getSystemMatrix();
+
+    ///
+    /// \brief Set the system matrix corresponding to this ODE system.
+    ///
+    /// \param newMatrix New matrix.
+    ///
+    void setSystemMatrix(const core::SparseMatrixd &newMatrix);
+
+    ///
+    /// \brief Get the system rhs corresponding to this ODE system.
+    ///
+    /// \return Vector constant reference.
+    ///
+    const core::Vectord &getRHS() const;
+
+    ///
+    /// \brief Get the system rhs corresponding to this ODE system.
+    ///
+    /// \return Vector reference.
+    ///
+    core::Vectord &getRHS();
+
+    ///
+    /// \brief Set the system rhs corresponding to this ODE system.
+    ///
+    /// \param newRhs new rhs.
+    ///
+    void setRHS(const core::Vectord &newRhs);
 
 private:
     MatrixFunctionType DFx; ///> Function to evaluate -dF/dx, required for implicit time stepping schemes.
     MatrixFunctionType DFv; ///> Function to evaluate -dF/dv, required for implicit time stepping schemes.
     MatrixFunctionType Mass; ///> Function to evaluate the mass matrix.
+    MatrixFunctionType Damping; ///> Additional damping matrix.
     FunctionType F; ///> ODE right hand side function
+
+    core::SparseMatrixd systemMatrix;   ///> Linear system matrix storage.
+    core::Vectord rhs;                  ///> Right hand side vector storage.
 
 protected:
     std::shared_ptr<OdeSystemState> initialState; ///> Initial state of the system.
@@ -128,24 +217,40 @@ protected:
 //---------------------------------------------------------------------------
 inline const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &state)
 {
+    if(!this->DFx)
+    {
+        /// Log this
+    }
     return this->DFx(state);
 }
 
 //---------------------------------------------------------------------------
 inline const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &state)
 {
+    if(!this->DFv)
+    {
+        /// Log this
+    }
     return this->DFv(state);
 }
 
 //---------------------------------------------------------------------------
 inline const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &state)
 {
+    if(!this->Mass)
+    {
+        /// Log this
+    }
     return this->Mass(state);
 }
 
 //---------------------------------------------------------------------------
 inline const core::Vectord &OdeSystem::evalF(const OdeSystemState &state)
 {
+    if(!this->F)
+    {
+        /// Log this
+    }
     return this->F(state);
 }
 

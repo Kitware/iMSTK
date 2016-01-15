@@ -22,6 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "BackwarEuler.h"
+#include "Solvers/DirectLinearSolver.h"
 
 BackwardEuler::BackwardEuler(OdeSystem *odeSystem): TimeIntegrator(odeSystem)
 {}
@@ -36,71 +37,31 @@ void BackwardEuler::solve(const OdeSystemState &state,
         return;
     }
 
-    auto G = [this](const core::Vectord &) -> core::Vectord&
-    {
-        return this->rhs;
-    };
-
-    const auto &cState = state;
-    auto &cNewState = newState;
-    auto DG = [&,this](const core::Vectord &)
-    {
-        this->computeSystemMatrix(cState,cNewState,timeStep);
-        return this->systemMatrix;
-    };
-
+    // This function updates the state.
     auto updateIterate = [&](const core::Vectord &dv, core::Vectord &v)
     {
         v += dv;
-        cNewState.getPositions() = cState.getPositions() + timeStep*v;
+        newState.getPositions() = state.getPositions() + timeStep*v;
     };
 
-    auto NewtonSolver = std::make_shared<InexactNewton>();
-
-    newState = state;
-    this->computeSystemRHS(state,newState,timeStep);
-
-    NewtonSolver->setUpdateIterate(updateIterate);
-    NewtonSolver->setSystem(G);
-    NewtonSolver->setJacobian(DG);
-    NewtonSolver->solve(newState.getVelocities());
-}
-
-//---------------------------------------------------------------------------
-void BackwardEuler::computeSystemMatrix(const OdeSystemState &state,
-                                        OdeSystemState &newState,
-                                        const double timeStep,
-                                        bool computeRHS)
-{
-    auto &M = this->system->evalMass(newState);
-    auto &K = this->system->evalDFx(newState);
-    auto &C = this->system->evalDFv(newState);
-
-    this->systemMatrix = (1.0 / timeStep) * M;
-    this->systemMatrix += C;
-    this->systemMatrix += timeStep * K;
-    state.applyBoundaryConditions(this->systemMatrix);
-
-    if(computeRHS)
+    // Function to evaluate the nonlinear objective function.
+    auto G = [&,this](const core::Vectord &) -> const core::Vectord&
     {
-        this->rhs = this->system->evalF(newState) + K * (newState.getPositions() -
-                    state.getPositions() - newState.getVelocities() * timeStep);
-        this->rhs -= M * (newState.getVelocities() - state.getVelocities()) / timeStep;
-        state.applyBoundaryConditions(this->rhs);
-    }
-}
+        this->system->computeImplicitSystemRHS(state,newState,timeStep);
+        return this->system->getRHS();
+    };
 
-//---------------------------------------------------------------------------
-void BackwardEuler::computeSystemRHS(const OdeSystemState &state,
-                                     OdeSystemState &newState,
-                                     double timeStep)
-{
-    auto &M = this->system->evalMass(newState);
-    auto &K = this->system->evalDFx(newState);
-    this->system->evalDFv(newState);
+    // Jacobian of the objective function.
+    auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
+    {
+        this->system->computeImplicitSystemLHS(state,newState,timeStep,false);
+        return this->system->getSystemMatrix();
+    };
 
-    this->rhs = this->system->evalF(newState) + K * (newState.getPositions() -
-                state.getPositions() - newState.getVelocities() * timeStep);
-    this->rhs -= M * (newState.getVelocities() - state.getVelocities()) / timeStep;
-    state.applyBoundaryConditions(this->rhs);
+    this->newtonSolver.setUpdateIterate(updateIterate);
+    this->newtonSolver.setSystem(G);
+    this->newtonSolver.setJacobian(DG);
+    this->newtonSolver.setRelativeTolerance(0);
+    this->newtonSolver.setLinearSolver(std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
+    this->newtonSolver.solve(newState.getVelocities());
 }

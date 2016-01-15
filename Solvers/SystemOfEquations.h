@@ -62,23 +62,11 @@ public:
     ///
     inline const core::Vectord &eval(const core::Vectord &x)
     {
-        this->f = this->F(x);
-        return this->f;
-    }
-
-    ///
-    /// \brief Get the value of the function F
-    ///
-    /// \return Function value.
-    ///
-    inline core::Vectord &getFunctionValue()
-    {
-        return this->f;
+        return this->F(x);
     }
 
 protected:
     FunctionType F;  ///> Function associated with the system of equation to solve.
-    core::Vectord f; ///> Storage for function values
 };
 
 ///
@@ -190,9 +178,20 @@ public:
         return this->A.template triangularView<Eigen::StrictlyUpper>();
     }
 
+    ///
+    /// \brief Get the value of the function F
+    ///
+    /// \return Function value.
+    ///
+    inline core::Vectord &getFunctionValue()
+    {
+        return this->f;
+    }
+
 private:
     const MatrixType &A;
     const core::Vectord &rhs;
+    core::Vectord f; ///> Storage for matrix vector product
 };
 
 #endif // SYSTEM_OF_EQUATIONS

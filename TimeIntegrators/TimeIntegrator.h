@@ -78,24 +78,8 @@ public:
     ///
     void setSystem(OdeSystem *odeSystem);
 
-    ///
-    /// \brief Set a new linear system matrix.
-    ///
-    /// \param newSystemMatrix System matrix corresponding to the solver used.
-    ///
-    void setSystemMatrix(const core::SparseMatrixd &newSystemMatrix);
-
-    ///
-    /// \brief Return the Ode system of equations.
-    ///
-    /// \return Constant reference to system matrix.
-    ///
-    const core::SparseMatrixd &getSystemMatrix() const;
-
 protected:
     OdeSystem *system;  ///> System of differential equations.
-    core::SparseMatrixd systemMatrix;   ///> Linear system matrix.
-    core::Vectord rhs;                  ///> Right hand side vector.
 };
 
 #endif // TIMEINTEGRATOR_H

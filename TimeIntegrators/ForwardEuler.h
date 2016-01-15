@@ -55,24 +55,12 @@ public:
     /// \param x Current iterate.
     /// \param timeStep Current timeStep.
     ///
-    void solve(const OdeSystemState &state,OdeSystemState &newState,double timeStep) override;
-
-    ///
-    /// \brief Compute and store the system matrix.
-    ///
-    /// \param state Current state
-    /// \param newState New state
-    /// \param timeStep Time step used to discretize the ODE.
-    /// \param computeRHS If true, this function computed the right hand side of the system.
-    ///
-    virtual void computeSystemMatrix(const OdeSystemState &state,
-                                     OdeSystemState &,
-                                     double timeStep,
-                                     bool computeRHS = true);
+    void solve(const OdeSystemState &state,
+               OdeSystemState &newState,
+               double timeStep) override;
 
 private:
     std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. (Default: ConjugateGradient)
-    core::Vectord solution; ///> Solution to the linear solve.
 };
 
 #endif // FORWARDEULER_H

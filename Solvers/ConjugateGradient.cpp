@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "Solvers/ConjugateGradient.h"
-#include <iostream>
 
 ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
                                      const core::Vectord &rhs) : solver(A)
@@ -46,7 +45,6 @@ void ConjugateGradient::solve(core::Vectord &x)
 {
     if(this->linearSystem)
     {
-        this->solver.compute(this->linearSystem->getMatrix());
         x = this->solver.solve(this->linearSystem->getRHSVector());
     }
 
@@ -57,7 +55,6 @@ void ConjugateGradient::solve(core::Vectord &x)
 void ConjugateGradient::solve(core::Vectord &x, double tolerance)
 {
     this->setTolerance(tolerance);
-    this->solver.setTolerance(tolerance);
     this->solve(x);
 }
 
@@ -79,4 +76,11 @@ void ConjugateGradient::setMaximumIterations(const size_t maxIter)
 {
     this->maxIterations = maxIter;
     this->solver.setMaxIterations(maxIter);
+}
+
+//---------------------------------------------------------------------------
+void ConjugateGradient::setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+{
+    LinearSolver<core::SparseMatrixd>::setSystem(newSystem);
+    this->solver.compute(this->linearSystem->getMatrix());
 }

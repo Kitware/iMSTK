@@ -37,15 +37,3 @@ void TimeIntegrator::setSystem(OdeSystem *newSystem)
 {
     this->system = newSystem;
 }
-
-//---------------------------------------------------------------------------
-void TimeIntegrator::setSystemMatrix(const core::SparseMatrixd &newSystemMatrix)
-{
-    this->systemMatrix = newSystemMatrix;
-}
-
-//---------------------------------------------------------------------------
-const core::SparseMatrixd &TimeIntegrator::getSystemMatrix() const
-{
-    return this->systemMatrix;
-}

@@ -37,36 +37,36 @@ go_bandit([]()
         auto euler = std::make_shared<BackwardEuler>();
         auto initialState = std::make_shared<OdeSystemState>();
         // ODE parameters
-        double dt = 0.1;
-        double t0 = 0, t1 = 1;
+        double dt = 0.01;
+        double t0 = 0, t1 = 3;
         size_t steps = (t1-t0)/dt;
-        double lambda = 1;
+        double lambda = -10;
         double a = 1;
 
         // ODE right hand side function
         core::Vectord y;
-        auto F = [&](const OdeSystemState &x) -> core::Vectord&
+        auto F = [&](const OdeSystemState &x) -> const core::Vectord&
         {
             y = lambda*x.getVelocities();
             return y;
         };
 
         std::vector<Eigen::Triplet<double>> tripletList;
-        tripletList.emplace_back(0,0,lambda);
+        tripletList.emplace_back(0,0,0);
         core::SparseMatrixd K(1,1);
         K.setFromTriplets(tripletList.begin(),tripletList.end());
         K.makeCompressed();
-        auto DFx = [&](const OdeSystemState &) -> const core::SparseMatrixd
+        auto DFx = [&](const OdeSystemState &) -> const core::SparseMatrixd&
         {
             return K;
         };
 
         core::SparseMatrixd C(1,1);
         tripletList.clear();
-        tripletList.emplace_back(0,0,0);
+        tripletList.emplace_back(0,0,-lambda);
         C.setFromTriplets(tripletList.begin(),tripletList.end());
         C.makeCompressed();
-        auto DFv = [&](const OdeSystemState &) -> const core::SparseMatrixd
+        auto DFv = [&](const OdeSystemState &) -> const core::SparseMatrixd&
         {
             return C;
         };
@@ -76,7 +76,7 @@ go_bandit([]()
         tripletList.emplace_back(0,0,1.0);
         M.setFromTriplets(tripletList.begin(),tripletList.end());
         M.makeCompressed();
-        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd
+        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd&
         {
             return M;
         };
@@ -104,6 +104,7 @@ go_bandit([]()
             // Find the solution for t = [0,1)
             OdeSystemState state, newState;
             state = *initialState;
+            newState = state;
 
             core::Vectord error(steps), sol(steps);
             error(0) = 0.0;
@@ -115,6 +116,9 @@ go_bandit([]()
                 sol(i) = state.getVelocities()(0);
                 error(i) = sol(i)-std::exp(lambda*i*dt);
             }
+
+            std::cout << error << std::endl;
+
             AssertThat(error.norm(), IsLessThan(dt*steps));
         });
     });
