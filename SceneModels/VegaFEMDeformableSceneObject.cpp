@@ -27,6 +27,7 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Core/MakeUnique.h"
 #include "IO/IOMesh.h"
+#include "Geometry/MeshModel.h"
 
 // Vega includes
 #include "configFile.h"
@@ -65,16 +66,20 @@
 ///     fixedDOFFilename             List of fixed degrees of freedom
 ///                                     [path to file containing indices]
 ///     dampingMassCoefficient       Mass matrix scaling factor for damping matrix computation
-///                                     [default = 0.1; C = dampingMassCoefficient*M + dampingStiffnessCoefficient*K]
-///     dampingStiffnessCoefficient  Stiffness matrix factor for damping matrix computation
-///                                     [default = 0.01; C = dampingMassCoefficient*M + dampingStiffnessCoefficient*K]
+///                                     [default = 0.1; C = dampingMassCoefficient*M +
+///                                                         dampingStiffnessCoefficient*K]
+///     dampingStiffnessCoefficient  Stiffness matrix factor for damping matrix
+///                                  computation
+///                                     [default = 0.01; C = dampingMassCoefficient*M +
+///                                                          dampingStiffnessCoefficient*K]
 ///     dampingLaplacianCoefficient  Laplacian damping matrix factor.
 ///                                     [default = 0.0]
 ///     deformationCompliance        Compliance factor.
 ///                                     [default = 1.0]
 ///     gravity                      Gravity constant.
 ///                                     [default = -9.81]
-///     compressionResistance       Compression resistance parameter for the invertible methods
+///     compressionResistance       Compression resistance parameter for the invertible
+///                                 methods
 ///                                     [default = 500.0]
 ///     inversionThreshold          Inversion threshold parameter for the invertible methods
 ///                                     [default = -infinity]
@@ -110,12 +115,15 @@ public:
 
     std::string vegaConfigFile; ///> Store configuration file.
 
-    std::map<std::string, double> floatsOptionMap;  ///> Map for floating point configuration variables.
-    std::map<std::string, int> intsOptionMap;       ///> Map for int configuration variables.
-    std::map<std::string, std::string> stringsOptionMap;///> Map for string configuration variables.
+    std::map<std::string, double> floatsOptionMap; ///> Map for floating point
+                                                   ///> configuration variables.
+    std::map<std::string, int> intsOptionMap; ///> Map for int configuration variables.
+    std::map<std::string, std::string> stringsOptionMap; ///> Map for string
+                                                         ///> configuration variables.
 
     MethodType forceModelType; ///> Force model type used.
-    InvertibleMaterialType isotropicMaterialType; ///> Constitutive law for nonlinear materials.
+    InvertibleMaterialType isotropicMaterialType; ///> Constitutive law for nonlinear
+                                                  ///> materials.
 };
 
 //---------------------------------------------------------------------------
@@ -260,7 +268,9 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
 }
 
 //---------------------------------------------------------------------------
-VegaFEMDeformableSceneObject::VegaFEMDeformableSceneObject(const std::string &meshFilename, const std::string &vegaConfigFileName)
+VegaFEMDeformableSceneObject::
+VegaFEMDeformableSceneObject(const std::string &meshFilename,
+                             const std::string &vegaConfigFileName)
 {
     this->loadVolumeMesh(meshFilename);
     if(!this->volumetricMesh)
@@ -279,15 +289,17 @@ VegaFEMDeformableSceneObject::~VegaFEMDeformableSceneObject() {}
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
 {
-    auto ioMesh = std::make_shared<IOMesh>();
-    ioMesh->read(fileName);
+    auto model = std::make_shared<MeshModel>();
 
-    this->volumetricMesh =
-        std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+    model->load(fileName);
 
-    if(!this->volumetricMesh)
+    this->setModel(model);
+
+    this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(model->getMesh());
+
+    if(!model->getMesh())
     {
-        // TODO: Print error message
+        // TODO: Print error message and log
         return;
     }
 }
@@ -420,13 +432,10 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
 
     matrix->BuildSubMatrixIndices(*this->vegaMassMatrix.get());
 
-    if(!this->dampingMatrix)
+    if(this->dampingMatrix)
     {
-        // TODO: log this
-        return;
+        matrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
     }
-
-    matrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
 
     auto rowLengths = matrix->GetRowLengths();
     auto columnIndices = matrix->GetColumnIndices();
@@ -771,8 +780,8 @@ std::vector< std::size_t > VegaFEMDeformableSceneObject::loadBoundaryConditions(
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMDeformableSceneObject::updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
-                                                          double *values)
+void VegaFEMDeformableSceneObject::
+updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix, double *values)
 {
     auto rowLengths = matrix->GetRowLengths();
     auto nonZeroValues = matrix->GetEntries();
@@ -830,7 +839,8 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 {
-    auto tangentStiffness = [this](const OdeSystemState & s) -> const core::SparseMatrixd&
+    auto tangentStiffness =
+        [this](const OdeSystemState & s) -> const core::SparseMatrixd&
     {
         double *data = const_cast<double*>(s.getPositions().data());
 
@@ -847,7 +857,8 @@ void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::setMassMatrix()
 {
-    auto massMatrix = [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+    auto massMatrix =
+        [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
     {
         return this->M;
     };
@@ -863,7 +874,8 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
     const auto &dampingMassCoefficient =
     this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
-    auto raleighDamping = [&,this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+    auto raleighDamping =
+        [&,this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
     {
         if(dampingMassCoefficient > 0)
         {
@@ -883,7 +895,8 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
 
     if(this->dampingMatrix)
     {
-        auto lagrangianDamping = [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+        auto lagrangianDamping =
+            [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
         {
             return this->D;
         };

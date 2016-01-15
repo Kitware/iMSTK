@@ -61,12 +61,10 @@ public:
     ///
     void initialize() override;
 
-    virtual bool configure(const std::string &);
-
     ///
     /// \brief Update states
     ///
-    void update(const double dt);
+    void update(const double dt) override;
 
     ///
     /// \brief Update states
@@ -88,6 +86,7 @@ public:
     ///
     std::shared_ptr<OdeSystemState> getPreviousState();
 
+private:
     ///////////////////////////////////////////////////////////////////////////////
     //////////// TODO: These are pure virtual methods from superclass. ////////////
     ////////////    They should be removed in the future.              ////////////

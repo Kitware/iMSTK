@@ -38,41 +38,83 @@ namespace core {
     class Event;
 }
 
-/// \brief static scene object
-class StaticSceneObject: public SceneObject
+///
+/// \brief This type of models are meant to be static in the sense that dynamics do not
+///     apply to them. They can be used to model objects that do not move in the scene or
+///     or objects that are controlled by external hardware, i.e. haptics devices.
+///
+class StaticSceneObject : public SceneObject
 {
 public:
-
-    /// \brief constructor
+    ///
+    /// \brief Constructor
+    ///
     StaticSceneObject(std::shared_ptr<ErrorLog> p_log = nullptr);
 
-    /// \brief destructor
-    ~StaticSceneObject();
+    ///
+    /// \brief Destructor
+    ///
+    ~StaticSceneObject() = default;
 
-    //not implemented yet..tansel
-    virtual void serialize(void *p_memoryBlock) override;
-
-    //not implemented yet..tansel
-    virtual void unSerialize(void *p_memoryBlock) override;
-
-    ///not implemented yet.
-    virtual std::shared_ptr<SceneObject> clone() override;
-
-    /// \brief Initialize the parameters and properties of the simulation object
+    ///
+    /// \brief Initialize this model.
+    ///
     void initialize() override;
 
-    /// \brief load initial displacements and velocities of the nodes
-    void loadInitialStates() override;
-
-    /// \brief configure the static scene object using external config file (optional)
-    bool configure(const std::string &ConfigFile) override;
-
+    ///
+    ///
+    ///
     void printInfo() const override;
 
+    ///
+    ///
+    ///
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
 
-    void update(const double /*dt*/)
+    ///
+    ///
+    ///
+    void update(const double /*dt*/) override
     {}
+
+    ///
+    /// \brief Initialize mesh for this model
+    ///
+    void loadMesh(const std::string &file)
+    {
+        this->fileName = file;
+        this->loadInitialStates();
+    }
+
+private:
+    ///
+    /// \brief Initialize the model for this scene model.
+    ///
+    void loadInitialStates() override;
+
+    ///////////////////////////////////////////////////////////////////////////////
+    ///////////                 DO NOT USE THIS API                     ///////////
+    ///////////////////////////////////////////////////////////////////////////////
+    //////////// TODO: These are pure virtual methods from superclass. ////////////
+    ////////////    They should be removed in the future.              ////////////
+    ///////////////////////////////////////////////////////////////////////////////
+    ///
+    ///not implemented yet.
+    ///
+    virtual std::shared_ptr<SceneObject> clone() override { return nullptr; }
+
+    ///
+    //not implemented yet..tansel
+    ///
+    virtual void serialize(void */*p_memoryBlock*/) override {}
+
+    ///
+    //not implemented yet..tansel
+    ///
+    virtual void unSerialize(void */*p_memoryBlock*/) override {}
+
+private:
+    std::string fileName;
 };
 
 #endif

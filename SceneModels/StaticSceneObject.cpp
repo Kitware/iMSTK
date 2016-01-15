@@ -24,6 +24,7 @@
 #include "SceneModels/StaticSceneObject.h"
 #include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
+#include "Geometry/MeshModel.h"
 
 StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
 {
@@ -36,39 +37,33 @@ StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : Scen
         "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::VTK));
 }
 
-StaticSceneObject::~StaticSceneObject()
-{
-}
-
-void StaticSceneObject::unSerialize ( void* /*p_memoryBlock*/ )
-{
-}
-
-void StaticSceneObject::serialize ( void* /*p_memoryBlock*/ )
-{
-}
-
+//---------------------------------------------------------------------------
 void StaticSceneObject::initialize()
 {
+    this->objectSim = nullptr;
+    this->flags.isSimulatorInit = false;
 }
 
-void StaticSceneObject::loadInitialStates()
-{
-}
-
-bool StaticSceneObject::configure(const std::string &/*ConfigFile*/)
-{
-    return false;
-}
-
-std::shared_ptr<SceneObject> StaticSceneObject::clone()
-{
-    return safeDownCast<SceneObject>();
-}
-
+//---------------------------------------------------------------------------
 void StaticSceneObject::printInfo() const
 {
     std::cout << "\t-------------------------------------\n";
     std::cout << "\t Name        : " << this->getName() << std::endl;
     std::cout << "\t-------------------------------------\n";
+}
+
+//---------------------------------------------------------------------------
+void StaticSceneObject::loadInitialStates()
+{
+    if(fileName.empty())
+    {
+        // TODO: log this
+        return;
+    }
+
+    auto model = std::make_shared<MeshModel>();
+
+    model->load(fileName);
+
+    this->setModel(model);
 }

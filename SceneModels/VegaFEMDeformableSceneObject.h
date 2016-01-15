@@ -68,7 +68,7 @@ public:
     /// \brief Set the initial state of the system. It assumes there is a valid mesh and
     ///     that numOfDOF is greater than zero.
     ///
-    void loadInitialStates();
+    void loadInitialStates() override;
 
     ///
     /// \brief Initialize the ode solver.
@@ -149,7 +149,7 @@ public:
     void updateMesh() override;
 
 private:
-    // Volumetric mesh
+    // Volumetric mesh, local copy of the actual mesh (stored in the model).
     std::shared_ptr<VegaVolumetricMesh> volumetricMesh;
 
     // Vega force model

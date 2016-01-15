@@ -68,7 +68,10 @@ public:
     /// \brief Abstract object initialization
     virtual void initialize() = 0;
 
-    virtual bool configure(const std::string &ConfigFile) = 0;
+    virtual bool configure(const std::string &/*ConfigFile*/)
+    {
+        return false;
+    };
 
     /// \brief Load the initial posiitons, velocities etc.,
     virtual void loadInitialStates() = 0;
@@ -213,8 +216,6 @@ public:
 
 protected:
     bool isActive;
-
-private:
     std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
     std::shared_ptr<CustomRenderer> customRender;
     std::vector<core::Vec3d> localVertices; //!< local copy of vertices

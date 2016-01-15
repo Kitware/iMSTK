@@ -78,12 +78,6 @@ void DeformableSceneObject::initialize()
 }
 
 //---------------------------------------------------------------------------
-bool DeformableSceneObject::configure(const std::string &)
-{
-    return false;
-}
-
-//---------------------------------------------------------------------------
 void DeformableSceneObject::update(const double dt)
 {
     if(!this->odeSolver)
