@@ -86,6 +86,15 @@ public:
     ///
     std::shared_ptr<OdeSystemState> getPreviousState();
 
+    ///
+    /// \brief Returns velocity of at a given location for the current state.
+    ///
+    Eigen::Map<core::Vec3d> getVelocity(const int index)
+    {
+        auto velocities = this->currentState->getVelocities();
+        return Eigen::Map<core::Vec3d>(&velocities(index));
+    }
+
 private:
     ///////////////////////////////////////////////////////////////////////////////
     //////////// TODO: These are pure virtual methods from superclass. ////////////

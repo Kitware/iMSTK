@@ -54,12 +54,10 @@ void SceneObjectDeformable::applyContactForces()
     }
 }
 
-
-core::Vec3d SceneObjectDeformable::getVelocity(const int dofID) const
+Eigen::Map<core::Vec3d> SceneObjectDeformable::getVelocity(const int dofID)
 {
-    core::Vec3d vel(uvel[dofID], uvel[dofID + 1], uvel[dofID + 2]);
-
-    return vel;
+    double *pointer = &uvel[dofID];
+    return Eigen::Map<core::Vec3d>(pointer);
 }
 
 core::Vec3d SceneObjectDeformable::getDisplacementOfNodeWithDofID(const int dofID) const

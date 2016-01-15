@@ -143,9 +143,10 @@ const std::unordered_map< int,core::Vec3d> &SceneObject::getContactPoints() cons
 }
 
 //---------------------------------------------------------------------------
-core::Vec3d SceneObject::getVelocity(const int) const
+Eigen::Map<core::Vec3d> SceneObject::getVelocity(const int)
 {
-    return core::Vec3d::Zero();
+    // TODO: Dangerous - Make this function pure virtual.
+    return Eigen::Map<core::Vec3d>(nullptr);
 }
 
 //---------------------------------------------------------------------------

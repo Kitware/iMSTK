@@ -75,7 +75,7 @@ public:
 
     /// \brief  returns velocity of at a given location
     /// (not given node) in contact force vector
-    core::Vec3d getVelocity(const int dofID) const;
+    Eigen::Map<core::Vec3d> getVelocity(const int dofID);
 
     /// \brief  returns acceleration of at a given location
     /// (not given node) in contact force vector

@@ -188,7 +188,7 @@ public:
     /// \brief Returns velocity of at a given location
     ///     (not given node) in contact force vector
     ///
-    virtual core::Vec3d getVelocity(const int) const;
+    virtual Eigen::Map<core::Vec3d> getVelocity(const int);
 
     ///
     /// \brief Set all contact forces to zero (if any)
