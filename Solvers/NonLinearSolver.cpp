@@ -35,10 +35,9 @@ NonLinearSolver::NonLinearSolver():
 }
 
 //---------------------------------------------------------------------------
-double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
+double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
 {
     /// Temporaries used in the line search
-    double previousFnorm = this->nonLinearSystem->getFunctionValue().norm();
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
     std::array<double, 3> lambda    = {this->sigma[0]*this->sigma[1], 1.0, 1.0};
 
@@ -51,8 +50,12 @@ double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
         return currentFnorm;
     }
 
+    // Save iterate in case this fails
+    auto x_old = x;
+
     // Starts Armijo line search loop
-    for(size_t i = 0; i < this->armijoMax; ++i)
+    size_t i;
+    for(i = 0; i < this->armijoMax; ++i)
     {
         /// Update x and keep books on lambda
         this->updateIterate(-lambda[0]*dx,x);
@@ -74,6 +77,13 @@ double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
         /// Apply the three point parabolic model
         this->parabolicModel(fnormSqr, lambda);
     }
+
+    if(i == this->armijoMax)
+    {
+        // TODO: Add to logger
+        std::cout << "Maximum number of Armijo iterations reached." << std::endl;
+    }
+
 
     return currentFnorm;
 }

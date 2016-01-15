@@ -60,7 +60,7 @@ public:
     /// \param dx Computed direction.
     /// \param x Current iterate.
     ///
-    double armijo(const core::Vectord &dx, core::Vectord &x);
+    double armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm);
 
     ///
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
