@@ -72,12 +72,6 @@ public:
     virtual void handleEvent(std::shared_ptr<core::Event>) override {}
 
     ///
-    ///
-    ///
-    void update(const double /*dt*/) override
-    {}
-
-    ///
     /// \brief Initialize mesh for this model
     ///
     void loadMesh(const std::string &file)

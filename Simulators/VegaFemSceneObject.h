@@ -150,10 +150,6 @@ public:
     /// certain threshold and set it to be the pulled vertex
     void setPulledVertex(const core::Vec3d &userPos);
 
-    /// \brief returns velocity given the
-    /// localtion in the global velocity vector
-    core::Vec3d getVelocity(const int dofID) const override;
-
     /// \brief returns displacement given the
     /// localtion in the global displacement vector
     core::Vec3d getDisplacementOfNodeWithDofID(const int dofID) const;

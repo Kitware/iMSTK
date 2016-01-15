@@ -53,178 +53,183 @@ struct ObjectInitFlags
 class SceneObject : public CoreClass
 {
     friend class SDK;
-    friend class ViewerBase;
-    friend class OpenGLViewer;
-    friend class Scene;
-    friend class ObjectSimulator;
 
 public:
-    /// \brief constructor
+    ///
+    /// \brief Constructor.
+    ///
     SceneObject();
 
-    /// \brief destructor
-    ~SceneObject();
+    ///
+    /// \brief Destructor.
+    ///
+    ~SceneObject() = default;
 
-    /// \brief Abstract object initialization
+    ///
+    /// \brief Abstract object initialization.
+    ///
     virtual void initialize() = 0;
 
-    virtual bool configure(const std::string &/*ConfigFile*/)
-    {
-        return false;
-    };
-
+    ///
     /// \brief Load the initial posiitons, velocities etc.,
+    ///
     virtual void loadInitialStates() = 0;
 
-    /// \brief attach simulator to the object.
-    /// This function that needs to be called to associate the simulator to the object
-    virtual void attachObjectSimulator(std::shared_ptr<ObjectSimulator> p_objectSim);
-
-    /// \brief to release the simulator
-    virtual void releaseObjectSimulator();
-
-    /// \brief freeze the scene object by stopping any further updates
-    void freeze();
-
-    /// \brief activate the scene object
-    void activate();
-
-    /// \brief get object simulator
-    std::shared_ptr<ObjectSimulator> getObjectSimulator();
-
-    /// \brief attach custome renderer for the object.
-    /// If the default rendering is not helpful
-    void attachCustomRenderer(std::shared_ptr<CustomRenderer> p_customeRenderer);
-
-    /// \brief release the renderer
-    void releaseCustomeRenderer();
-
-    /// \brief returns object id
-    int getObjectId();
-
-    /// \brief get unified object id
-    UnifiedId::Pointer getObjectUnifiedID();
-
-    std::vector<core::Vec3d> &getLocalVertices();
-
-    ObjectInitFlags &getFlags();
-
-    std::shared_ptr<CustomRenderer> getRenderer();
-
-    ///serialize function explicity writes the object to the memory block
-    ///each scene object should know how to write itself to a memory block
+    ///
+    /// \brief serialize function explicity writes the object to the memory block
+    ///     each scene object should know how to write itself to a memory block.
+    ///
     virtual void serialize(void *p_memoryBlock) = 0;
 
-    ///Unserialize function can recover the object from the memory location
+    ///
+    /// \brief Unserialize function can recover the object from the memory location.
+    ///
     virtual void unSerialize(void *p_memoryBlock) = 0;
 
-    ///this function may not be used
-    ///every Scene Object should know how to clone itself. Since the data structures will be
-    ///in the beginning of the modules(such as simulator, viewer, collision etc.)
+    ///
+    /// \brief This function may not be used
+    ///     every Scene Object should know how to clone itself. Since the data structures
+    ///     will be in the beginning of the modules(such as simulator, viewer,
+    ///     collision etc.)
+    ///
     virtual std::shared_ptr<SceneObject> clone() = 0;
 
-    /// \brief print information related the scene object
+    ///
+    /// \brief print information related the scene object.
+    ///
     virtual void printInfo() const = 0;
 
     ///
-    /// \brief Set to compute contact forces
+    /// \brief Define this function if you want to configure this scene model with using
+    ///     an external file.
     ///
-    bool computeContactForce()
-    {
-        return this->hasContactForces;
-    }
+    virtual bool configure(const std::string &/*ConfigFile*/);
 
     ///
-    /// \brief Set to not compute contact forces
+    /// \brief Attach simulator to the object.
+    ///     This function that needs to be called to associate the simulator
+    ///     to the object.
     ///
-    void setContactForcesOff()
-    {
-        this->hasContactForces = false;
-    }
+    virtual void attachObjectSimulator(std::shared_ptr<ObjectSimulator> p_objectSim);
 
     ///
-    /// \brief Set to not compute contact forces
+    /// \brief To release the simulator.
     ///
-    void setContactForcesOn()
-    {
-        this->hasContactForces = true;
-    }
+    virtual void releaseObjectSimulator();
 
-    // Get contact forces vector
-    std::unordered_map<int,core::Vec3d> &getContactForces()
-    {
-        return this->contactForces;
-    }
+    ///
+    /// \brief Freeze the scene object by stopping any further updates.
+    ///
+    void freeze();
 
-    const std::unordered_map<int,core::Vec3d> &getContactForces() const
-    {
-        return this->contactForces;
-    }
+    ///
+    /// \brief Get object simulator.
+    ///
+    std::shared_ptr<ObjectSimulator> getObjectSimulator();
 
-    // Get contact forces vector
-    std::unordered_map<int,core::Vec3d> &getContactPoints()
-    {
-        return this->contactPoints;
-    }
+    ///
+    /// \brief Returns object id.
+    ///
+    int getObjectId();
 
-    const std::unordered_map<int,core::Vec3d> &getContactPoints() const
-    {
-        return this->contactPoints;
-    }
+    ///
+    /// \brief Get unified object id.
+    ///
+    UnifiedId::Pointer getObjectUnifiedID();
 
-    /// \brief  returns velocity of at a given location
-    /// (not given node) in contact force vector
-    virtual core::Vec3d getVelocity(const int) const
-    {
-        return core::Vec3d::Zero();
-    }
+    ///
+    /// \brief Get local initialization flags.
+    ///
+    ObjectInitFlags &getFlags();
 
+    ///
+    /// \brief Set to activate this scene model.
+    ///
+    void activate();
+
+    ///
+    /// \brief Set to compute contact forces.
+    ///
+    bool computeContactForce();
+
+    ///
+    /// \brief Set to not compute contact forces.
+    ///
+    void setContactForcesOff();
+
+    ///
+    /// \brief Set to not compute contact forces.
+    ///
+    void setContactForcesOn();
+
+    ///
+    /// \brief Get contact forces vector.
+    ///
+    std::unordered_map<int,core::Vec3d> &getContactForces();
+
+    ///
+    /// \brief Get the map of contact forces.
+    ///
+    /// \return Map containing indices with contact points.
+    ///
+    const std::unordered_map<int,core::Vec3d> &getContactForces() const;
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    std::unordered_map<int,core::Vec3d> &getContactPoints();
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    const std::unordered_map<int,core::Vec3d> &getContactPoints() const;
+
+    ///
+    /// \brief Returns velocity of at a given location
+    ///     (not given node) in contact force vector
+    ///
+    virtual core::Vec3d getVelocity(const int) const;
+
+    ///
     /// \brief Set all contact forces to zero (if any)
-    void setContactForcesToZero()
-    {
-        this->contactForces.clear();
-        this->contactPoints.clear();
-    }
+    ///
+    void setContactForcesToZero();
 
-    void setContactForce(const int dofID, const core::Vec3d &force)
-    {
-        this->contactForces[dofID] = force;
-    }
+    ///
+    /// \brief Get contact forces vector
+    ///
+    void setContactForce(const int dofID, const core::Vec3d &force);
 
+    ///
+    /// \brief Get contact forces vector
+    ///
     void setContactForce(const int dofID,
                          const core::Vec3d &point,
-                         const core::Vec3d &force)
-    {
-        this->contactPoints[dofID] = point;
-        this->contactForces[dofID] = force;
-    }
+                         const core::Vec3d &force);
 
+    ///
+    /// \brief Get contact forces vector
+    ///
+    void setModel(std::shared_ptr<Model> m);
 
-    void setModel(std::shared_ptr<Model> m)
-    {
-        this->model = m;
-    }
+    ///
+    /// \brief Get contact forces vector
+    ///
+    std::shared_ptr<Model> getModel();
 
-    std::shared_ptr<Model> getModel()
-    {
-        return this->model;
-    }
-
-    virtual void update(const double /*dt*/)
-    {
-    }
+    ///
+    /// \brief Get contact forces vector
+    ///
+    virtual void update(const double /*dt*/);
 
 protected:
-    bool isActive;
-    std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
-    std::shared_ptr<CustomRenderer> customRender;
-    std::vector<core::Vec3d> localVertices; //!< local copy of vertices
-    ObjectInitFlags flags;
     bool hasContactForces;
+    bool isActive;
+    ObjectInitFlags flags;
+    std::shared_ptr<Model> model; //!< model attached to this scene object
+    std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
     std::unordered_map<int,core::Vec3d> contactForces;
     std::unordered_map<int,core::Vec3d> contactPoints;
-
-    std::shared_ptr<Model> model; //!< model attached to this scene object
 };
 
 #endif

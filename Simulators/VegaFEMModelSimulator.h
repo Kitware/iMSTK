@@ -28,6 +28,7 @@
 #include "Core/Config.h"
 #include "Simulators/ObjectSimulator.h"
 #include "Core/ErrorLog.h"
+#include "Core/Vector.h"
 
 class ToolCoupler;
 class VegaFemSceneObject;

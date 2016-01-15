@@ -74,10 +74,6 @@ void ViewerBase::initObjects()
         {
             i->initDraw();
         }
-        else
-        {
-            continue;
-        }
     }
 }
 
@@ -92,11 +88,6 @@ void ViewerBase::initScenes()
 
         for (const auto &sceneObject : scene->getSceneObjects())
         {
-            //initialize the custom Render if there is any
-            if ( sceneObject->customRender != nullptr && sceneObject->getType() != core::ClassType::Shader )
-            {
-                sceneObject->customRender->initDraw();
-            }
             sceneObject->initDraw();
         }
     }//scene traverse

@@ -26,77 +26,162 @@
 
 SceneObject::SceneObject()
 {
-    type = core::ClassType::Unknown;
-    isActive = true;
-    objectSim = nullptr;
-    customRender = nullptr;
-    flags.isViewerInit = false;
-    flags.isSimulatorInit = false;
-    name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
-    hasContactForces = false;
+    this->hasContactForces = false;
+    this->isActive = true;
+    this->flags.isViewerInit = false;
+    this->flags.isSimulatorInit = false;
+    this->type = core::ClassType::Unknown;
+    this->objectSim = nullptr;
+    this->name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
 }
 
-SceneObject::~SceneObject()
+//---------------------------------------------------------------------------
+bool SceneObject::configure(const std::string &)
 {
+    return false;
 }
 
+//---------------------------------------------------------------------------
 void SceneObject::attachObjectSimulator(std::shared_ptr<ObjectSimulator> p_objectSim)
 {
-    p_objectSim->addObject(safeDownCast<SceneObject>());
+    if(!p_objectSim)
+    {
+        // Log this
+        return;
+    }
+    this->objectSim = p_objectSim;
 }
 
+//---------------------------------------------------------------------------
 void SceneObject::releaseObjectSimulator()
 {
-    objectSim->removeObject(safeDownCast<SceneObject>());
-    objectSim = nullptr;
+    if(!this->objectSim)
+    {
+        // Log this
+        return;
+    }
+    this->objectSim->removeObject(safeDownCast<SceneObject>());
+    this->objectSim = nullptr;
 }
 
-std::shared_ptr<ObjectSimulator> SceneObject::getObjectSimulator()
-{
-    return objectSim;
-}
-
-void SceneObject::attachCustomRenderer(std::shared_ptr<CustomRenderer> p_customeRenderer)
-{
-    customRender = p_customeRenderer;
-}
-
-void SceneObject::releaseCustomeRenderer()
-{
-    customRender = nullptr;
-}
-
-int SceneObject::getObjectId()
-{
-    return this->getUniqueId()->getId();
-}
-
-UnifiedId::Pointer SceneObject::getObjectUnifiedID()
-{
-    return std::make_shared<UnifiedId>();
-}
-
-std::vector<core::Vec3d> & SceneObject::getLocalVertices()
-{
-    return localVertices;
-}
-
-ObjectInitFlags & SceneObject::getFlags()
-{
-    return flags;
-}
-
-std::shared_ptr<CustomRenderer> SceneObject::getRenderer()
-{
-    return customRender;
-}
-
+//---------------------------------------------------------------------------
 void SceneObject::freeze()
 {
     this->isActive = false;
 }
 
+//---------------------------------------------------------------------------
+std::shared_ptr<ObjectSimulator> SceneObject::getObjectSimulator()
+{
+    return this->objectSim;
+}
+
+//---------------------------------------------------------------------------
+int SceneObject::getObjectId()
+{
+    return this->getUniqueId()->getId();
+}
+
+//---------------------------------------------------------------------------
+UnifiedId::Pointer SceneObject::getObjectUnifiedID()
+{
+    return std::make_shared<UnifiedId>();
+}
+
+//---------------------------------------------------------------------------
+ObjectInitFlags & SceneObject::getFlags()
+{
+    return this->flags;
+}
+
+//---------------------------------------------------------------------------
 void SceneObject::activate()
 {
     this->isActive = true;
+}
+
+//---------------------------------------------------------------------------
+bool SceneObject::computeContactForce()
+{
+    return this->hasContactForces;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setContactForcesOff()
+{
+    this->hasContactForces = false;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setContactForcesOn()
+{
+    this->hasContactForces = true;
+}
+
+//---------------------------------------------------------------------------
+std::unordered_map< int, core::Vec3d> &SceneObject::getContactForces()
+{
+    return this->contactForces;
+}
+
+//---------------------------------------------------------------------------
+const std::unordered_map< int,core::Vec3d> &SceneObject::getContactForces() const
+{
+    return this->contactForces;
+}
+
+//---------------------------------------------------------------------------
+std::unordered_map< int,core::Vec3d> &SceneObject::getContactPoints()
+{
+    return this->contactPoints;
+}
+
+//---------------------------------------------------------------------------
+const std::unordered_map< int,core::Vec3d> &SceneObject::getContactPoints() const
+{
+    return this->contactPoints;
+}
+
+//---------------------------------------------------------------------------
+core::Vec3d SceneObject::getVelocity(const int) const
+{
+    return core::Vec3d::Zero();
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setContactForcesToZero()
+{
+    this->contactForces.clear();
+    this->contactPoints.clear();
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setContactForce(const int dofID, const core::Vec3d &force)
+{
+    this->contactForces[dofID] = force;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::
+setContactForce(const int dofID, const core::Vec3d &point, const core::Vec3d &force)
+{
+    this->contactPoints[dofID] = point;
+    this->contactForces[dofID] = force;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setModel(std::shared_ptr< Model > m)
+{
+    this->model = m;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< Model > SceneObject::getModel()
+{
+    return this->model;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::update(const double)
+{
 }

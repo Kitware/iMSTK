@@ -270,7 +270,8 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
 //---------------------------------------------------------------------------
 VegaFEMDeformableSceneObject::
 VegaFEMDeformableSceneObject(const std::string &meshFilename,
-                             const std::string &vegaConfigFileName)
+                             const std::string &vegaConfigFileName
+                            )
 {
     this->loadVolumeMesh(meshFilename);
     if(!this->volumetricMesh)
@@ -284,7 +285,9 @@ VegaFEMDeformableSceneObject(const std::string &meshFilename,
 }
 
 //---------------------------------------------------------------------------
-VegaFEMDeformableSceneObject::~VegaFEMDeformableSceneObject() {}
+VegaFEMDeformableSceneObject::~VegaFEMDeformableSceneObject()
+{ // This destructor must be defined here
+}
 
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
