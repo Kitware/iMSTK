@@ -25,7 +25,7 @@
 
 // SimMedTK includes
 #include "Core/ContactHandling.h"
-
+#include "Simulators/SceneObjectDeformable.h"
 #include "Core/CollisionPair.h"
 
 /// \brief Penalty based for contact handling
@@ -47,35 +47,6 @@ public:
 
     /// \brief Get the forces on both the scene objects using penalty method
     virtual void computeBilateralContactForces() = 0;
-
-    /// \brief Get the forces on both the scene objects using penalty method
-    virtual void computeForces(std::shared_ptr<SceneObject> sceneObject)
-    {
-        if(sceneObject->computeContactForce())
-        {
-            auto model = sceneObject->getModel();
-            if(!model)
-            {
-                return;
-            }
-
-            auto contactInfo = this->getCollisionPairs()->getContacts(model);
-            sceneObject->setContactForcesToZero();
-            core::Vec3d force;
-            core::Vec3d velocityProjection;
-            int nodeDofID;
-            for(auto &contact : contactInfo)
-            {
-                nodeDofID = 3 * contact->index;
-                velocityProjection = sceneObject->getVelocity(nodeDofID);
-                velocityProjection = contact->normal.dot(velocityProjection) * contact->normal;
-
-                force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
-
-                sceneObject->setContactForce(nodeDofID, contact->point, force);
-            }
-        }
-    }
 
     ///
     /// \brief Set stiffness coefficient
@@ -109,7 +80,7 @@ public:
         return this->damping;
     }
 
-private:
+protected:
     double stiffness;
     double damping;
 };

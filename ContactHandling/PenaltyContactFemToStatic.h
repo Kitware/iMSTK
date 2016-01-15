@@ -37,7 +37,7 @@ public:
 
     PenaltyContactFemToStatic(bool typeBilateral,
                              const std::shared_ptr<SceneObject>& sceneObjFirst,
-                             const std::shared_ptr<SceneObject>& sceneObjSecond);
+                             const std::shared_ptr<SceneObjectDeformable>& sceneObjSecond);
 
     virtual ~PenaltyContactFemToStatic();
 
@@ -46,6 +46,35 @@ public:
 
     /// \brief Get the forces on both the scene objects using penalty method
     virtual void computeBilateralContactForces() override;
+
+    /// \brief Get the forces on both the scene objects using penalty method
+    virtual void computeForces(std::shared_ptr<SceneObjectDeformable> sceneObject)
+    {
+        if(sceneObject->computeContactForce())
+        {
+            auto model = sceneObject->getModel();
+            if(!model)
+            {
+                return;
+            }
+
+            auto contactInfo = this->getCollisionPairs()->getContacts(model);
+            sceneObject->setContactForcesToZero();
+            core::Vec3d force;
+            core::Vec3d velocityProjection;
+            int nodeDofID;
+            for(auto &contact : contactInfo)
+            {
+                nodeDofID = 3 * contact->index;
+                velocityProjection = sceneObject->getVelocity(nodeDofID);
+                velocityProjection = contact->normal.dot(velocityProjection) * contact->normal;
+
+                force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
+
+                sceneObject->setContactForce(nodeDofID, contact->point, force);
+            }
+        }
+    }
 
 };
 

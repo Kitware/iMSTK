@@ -29,25 +29,29 @@ PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : Penal
     type = ContactHandlingType::PenaltyFemToStatic;
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(
                                                     bool typeBilateral,
                                                     const std::shared_ptr<SceneObject>& sceneObjFirst,
-                                                    const std::shared_ptr<SceneObject>& sceneObjSecond)
+                                                    const std::shared_ptr<SceneObjectDeformable>& sceneObjSecond)
                                                     : PenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
     type = ContactHandlingType::PenaltyFemToStatic;
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 {
 }
 
+//---------------------------------------------------------------------------
 void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
-    auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(this->getSecondSceneObject());
+    auto femSceneObject = std::static_pointer_cast<SceneObjectDeformable>(this->getSecondSceneObject());
     this->computeForces(femSceneObject);
 }
 
+//---------------------------------------------------------------------------
 void PenaltyContactFemToStatic::computeBilateralContactForces()
 {
 }

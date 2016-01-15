@@ -33,6 +33,7 @@ PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :
 {
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral,
                                                const std::shared_ptr<SceneObject>& sceneObjFirst,
                                                const std::shared_ptr<SceneObject>& sceneObjSecond) :
@@ -42,10 +43,12 @@ PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral,
 {
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactHandling::~PenaltyContactHandling()
 {
 };
 
+//---------------------------------------------------------------------------
 void PenaltyContactHandling::resolveContacts()
 {
     if (!isBilateral)
