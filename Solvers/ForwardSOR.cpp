@@ -26,9 +26,9 @@
 ForwardSOR::ForwardSOR(): weight(.9) {}
 
 //---------------------------------------------------------------------------
-ForwardSOR::ForwardSOR(const core::SparseMatrixd &A,
-                       const core::Vectord &rhs,
-                       const double &w): ForwardGaussSeidel(A, rhs), weight(w)
+ForwardSOR::
+ForwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w)
+    : ForwardGaussSeidel(A, rhs), weight(w)
 {}
 
 //---------------------------------------------------------------------------

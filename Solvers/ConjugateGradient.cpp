@@ -23,8 +23,8 @@
 
 #include "Solvers/ConjugateGradient.h"
 
-ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
-                                     const core::Vectord &rhs) : solver(A)
+ConjugateGradient::
+ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs) : solver(A)
 {
     this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
     this->maxIterations = rhs.size();
@@ -37,7 +37,7 @@ ConjugateGradient::ConjugateGradient(const core::SparseMatrixd &A,
 //---------------------------------------------------------------------------
 void ConjugateGradient::iterate(core::Vectord &, bool)
 {
-    std::cout << "Nothing to do\n";
+    // Nothing to do
 }
 
 //---------------------------------------------------------------------------
@@ -47,8 +47,6 @@ void ConjugateGradient::solve(core::Vectord &x)
     {
         x = this->solver.solve(this->linearSystem->getRHSVector());
     }
-
-    this->linearSystem->computeResidual(x, this->residual);
 }
 
 //---------------------------------------------------------------------------
@@ -79,8 +77,19 @@ void ConjugateGradient::setMaximumIterations(const size_t maxIter)
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+void ConjugateGradient::
+setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
 {
     LinearSolver<core::SparseMatrixd>::setSystem(newSystem);
     this->solver.compute(this->linearSystem->getMatrix());
+}
+
+//---------------------------------------------------------------------------
+void ConjugateGradient::print()
+{
+    /// TODO: Log this
+//     std::cout << "#iterations:     " << this->solver.iterations() << std::endl;
+//     std::cout << "estimated error: " << this->solver.error()      << std::endl;
+//     std::cout << "tolerance: " << this->solver.tolerance()      << std::endl;
+//     std::cout << "maxIterations: " << this->solver.maxIterations() << std::endl;
 }

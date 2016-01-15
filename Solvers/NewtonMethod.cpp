@@ -80,9 +80,8 @@ void NewtonMethod::solve(core::Vectord &x)
 }
 
 //---------------------------------------------------------------------------
-void NewtonMethod::updateForcingTerm(const double ratio,
-                                      const double stopTolerance,
-                                      const double fnorm)
+void NewtonMethod::
+updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
     double eta = this->gamma * ratio * ratio;
     double forcingTermSqr = this->forcingTerm * this->forcingTerm;
@@ -93,17 +92,19 @@ void NewtonMethod::updateForcingTerm(const double ratio,
         eta = std::max(eta, this->gamma * forcingTermSqr);
     }
 
-    this->forcingTerm = std::max(std::min(eta, this->etaMax), 0.5 * stopTolerance / fnorm);
+    this->forcingTerm = std::max(std::min(eta, this->etaMax),
+                                 0.5 * stopTolerance / fnorm);
 }
 
 //---------------------------------------------------------------------------
-void NewtonMethod::setLinearSolver(std::shared_ptr< NewtonMethod::LinearSolverType > newLinearSolver)
+void NewtonMethod::
+setLinearSolver(std::shared_ptr< NewtonMethod::LinearSolverType > newLinearSolver)
 {
     this->linearSolver = newLinearSolver;
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< NewtonMethod::LinearSolverType > NewtonMethod::getLinearSolver() const
+std::shared_ptr<NewtonMethod::LinearSolverType> NewtonMethod::getLinearSolver() const
 {
     return this->linearSolver;
 }

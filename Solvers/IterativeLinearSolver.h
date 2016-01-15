@@ -79,6 +79,11 @@ public:
     ///
     virtual double getError(const core::Vectord &x);
 
+    ///
+    /// \brief Print solver information.
+    ///
+    virtual void print();
+
 protected:
     size_t maxIterations;   ///> Maximum number of iterations to be performed.
     core::Vectord residual; ///> Storage for residual vector.

@@ -62,13 +62,15 @@ void OdeSystemState::resize(const size_t size)
 }
 
 //---------------------------------------------------------------------------
-void OdeSystemState::setBoundaryConditions(const std::vector< std::size_t > &boundaryConditions)
+void OdeSystemState::
+setBoundaryConditions(const std::vector< std::size_t > &boundaryConditions)
 {
     this->fixedVertices = boundaryConditions;
 }
 
 //---------------------------------------------------------------------------
-void OdeSystemState::applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance) const
+void OdeSystemState::
+applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 
@@ -96,7 +98,8 @@ void OdeSystemState::applyBoundaryConditions(core::SparseMatrixd &M, bool withCo
 }
 
 //---------------------------------------------------------------------------
-void OdeSystemState::applyBoundaryConditions(core::Matrixd &M, bool withCompliance) const
+void OdeSystemState::
+applyBoundaryConditions(core::Matrixd &M, bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 

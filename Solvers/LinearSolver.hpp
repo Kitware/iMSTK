@@ -24,11 +24,13 @@
 #define SM_LINEAR_SOLVER_HPP
 
 template<typename SystemMatrixType>
-LinearSolver<SystemMatrixType>::LinearSolver() : linearSystem(nullptr), minTolerance(1.0e-6){}
+LinearSolver<SystemMatrixType>::
+LinearSolver() : linearSystem(nullptr), minTolerance(1.0e-6){}
 
 //---------------------------------------------------------------------------
 template<typename SystemMatrixType>
-void LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
+void LinearSolver<SystemMatrixType>::
+setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
 {
     this->linearSystem.reset();
     this->linearSystem = newSystem;
@@ -36,7 +38,8 @@ void LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<Syst
 
 //---------------------------------------------------------------------------
 template<typename SystemMatrixType>
-std::shared_ptr<LinearSystem<SystemMatrixType>> LinearSolver<SystemMatrixType>::getSystem() const
+std::shared_ptr<LinearSystem<SystemMatrixType>> LinearSolver<SystemMatrixType>::
+getSystem() const
 {
     return this->linearSystem;
 }

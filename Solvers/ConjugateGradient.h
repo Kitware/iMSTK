@@ -103,6 +103,11 @@ public:
     ///
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
+    ///
+    /// \brief Print solver information
+    ///
+    void print();
+
 private:
     ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<core::SparseMatrixd> solver;

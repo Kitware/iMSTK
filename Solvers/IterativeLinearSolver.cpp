@@ -74,3 +74,9 @@ double IterativeLinearSolver::getError(const core::Vectord &x)
     this->linearSystem->computeResidual(x, this->residual);
     return this->residual.squaredNorm();
 }
+
+//---------------------------------------------------------------------------
+void IterativeLinearSolver::print()
+{
+    // Nothing to print
+}

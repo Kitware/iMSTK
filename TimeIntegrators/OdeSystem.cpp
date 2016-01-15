@@ -89,7 +89,8 @@ void OdeSystem::computeImplicitSystemLHS(const OdeSystemState &previousState,
     if(computeRHS)
     {
         auto &f = this->evalF(newState);
-        this->rhs = M * (newState.getVelocities() - previousState.getVelocities()) / timeStep;
+        this->rhs = M * (newState.getVelocities() -
+                         previousState.getVelocities()) / timeStep;
         this->rhs -= (f + K * (newState.getPositions() - previousState.getPositions() -
                              newState.getVelocities() * timeStep));
 
@@ -128,7 +129,8 @@ void OdeSystem::computeImplicitSystemRHS(const OdeSystemState &state,
     auto &f = this->evalF(newState);
 
     this->rhs = M * (newState.getVelocities() - state.getVelocities()) / timeStep;
-    this->rhs -= (f + K * (newState.getPositions() - state.getPositions() - newState.getVelocities() * timeStep));
+    this->rhs -= (f + K * (newState.getPositions() - state.getPositions() -
+                           newState.getVelocities() * timeStep));
 
     if(this->Damping)
     {

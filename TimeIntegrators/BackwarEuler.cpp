@@ -62,6 +62,7 @@ void BackwardEuler::solve(const OdeSystemState &state,
     this->newtonSolver.setSystem(G);
     this->newtonSolver.setJacobian(DG);
     this->newtonSolver.setRelativeTolerance(0);
-    this->newtonSolver.setLinearSolver(std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
+    this->newtonSolver.setLinearSolver(
+            std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
     this->newtonSolver.solve(newState.getVelocities());
 }

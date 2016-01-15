@@ -35,7 +35,8 @@ NonLinearSolver::NonLinearSolver():
 }
 
 //---------------------------------------------------------------------------
-double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
+double NonLinearSolver::
+armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
 {
     /// Temporaries used in the line search
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
@@ -89,15 +90,15 @@ double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x, const 
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm,
-                                     std::array<double,3> &lambda)
+void NonLinearSolver::
+parabolicModel(const std::array<double,3> &fnorm, std::array<double,3> &lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
     ///         d1 = (lambda[1] - lambda[2])*lambda[1]*lambda[2] < 0
     ///     if a > 0, then we have a concave up curvature and lambda defaults to:
     ///         lambda = sigma[0]*lambda
-    double a1 = lambda[2] * (currentFnorm - fnorm[0]);
+    double a1 = lambda[2] * (fnorm[1] - fnorm[0]);
     double a2 = lambda[1] * (fnorm[2] - fnorm[0]);
     double a = a1 - a2;
 
@@ -130,7 +131,7 @@ void NonLinearSolver::setSigma(const std::array<double,2> &newSigma)
 }
 
 //---------------------------------------------------------------------------
-const std::array< double, int(2) > &NonLinearSolver::getSigma() const
+const std::array<double,2> &NonLinearSolver::getSigma() const
 {
     return this->sigma;
 }
@@ -176,4 +177,11 @@ void NonLinearSolver::setSystem(const NonLinearSolver::FunctionType &F)
 {
     this->nonLinearSystem = std::make_shared<SystemOfEquations>();
     this->nonLinearSystem->setFunction(F);
+}
+
+//---------------------------------------------------------------------------
+void NonLinearSolver::
+setUpdateIterate(const NonLinearSolver::UpdateIterateType& newUpdateIterate)
+{
+    this->updateIterate = newUpdateIterate;
 }
