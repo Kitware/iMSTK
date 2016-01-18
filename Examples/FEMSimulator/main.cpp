@@ -27,16 +27,15 @@
 #include "SimulationManager/SDK.h"
 
 // Include required types scene objects
-#include "Simulators/VegaFemSceneObject.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Devices/VRPNForceDevice.h"
-// #include "Devices/VRPNDeviceServer.h"
+#include "Devices/VRPNDeviceServer.h"
 #include "VirtualTools/ToolCoupler.h"
 
 // Include required simulators
-#include "Simulators/VegaFEMModelSimulator.h"
+#include "Simulators/ObjectSimulator.h"
 #include "Simulators/DefaultSimulator.h"
 
 #include "Core/CollisionPair.h"
@@ -68,43 +67,33 @@ int main(int ac, char** av)
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
-//     auto client = std::make_shared<VRPNForceDevice>();
-    // auto server = std::make_shared<VRPNDeviceServer>();
+    auto client = std::make_shared<VRPNForceDevice>();
+    auto server = std::make_shared<VRPNDeviceServer>();
 
     //get some user input and setup device url
-//     std::string input = "Phantom@10.171.2.217";//"Phantom0@localhost";
-//     std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
-//     std::getline(std::cin, input);
-//     if (!input.empty())
-//     {
-//         client->setDeviceURL(input);
-//     }
-//     auto controller = std::make_shared<ToolCoupler>(client);
-//     controller->setScalingFactor(20.0);
-    // sdk->registerModule(server);
+    std::string input = "Phantom@localhost";
+    client->setDeviceURL(input);
+
+    auto controller = std::make_shared<ToolCoupler>(client);
+    controller->setScalingFactor(20.0);
+    sdk->registerModule(server);
 //     sdk->registerModule(client);
-//     sdk->registerModule(controller);
+    sdk->registerModule(controller);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
 
     // create a FEM simulator
-//     auto femSimulator = std::make_shared<VegaFEMModelSimulator>();
     auto femSimulator = std::make_shared<ObjectSimulator>();
-    //femSimulator->setHapticTool(controller);
+//     femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
-//     auto femObject = std::make_shared<VegaFemSceneObject>(
-//         nullptr,configFile);
-    auto femObject = std::make_shared<VegaFEMDeformableSceneObject>(
-        "./box.veg",configFile);
+    auto femObject =
+        std::make_shared<VegaFEMDeformableSceneObject>("./box.veg",configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME //|
-    //| SIMMEDTK_RENDER_VERTICES
-    //SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
-    );
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
@@ -130,7 +119,7 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     // Create scene actor 2:  plane
     //-------------------------------------------------------
-    auto staticSimulator = std::make_shared<DefaultSimulator>();
+    auto staticSimulator = std::make_shared<ObjectSimulator>();
 
     // create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();
@@ -170,21 +159,14 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
-    auto loliSimulator = std::make_shared<DefaultSimulator>();
+    auto loliSimulator = std::make_shared<ObjectSimulator>();
     sdk->addSceneActor(loliSceneObject, loliSimulator);
 //     controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
-    // Register both object simulators
-    //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
-    sdkSimulator->registerObjectSimulator(femSimulator);
-    //sdkSimulator->registerObjectSimulator(staticSimulator);
-
-
-    //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
+    auto sdkSimulator = sdk->getSimulator();
     auto meshModel = std::make_shared<MeshCollisionModel>();
 
     auto collisionMesh = volumeMesh->getCollisionMesh();
