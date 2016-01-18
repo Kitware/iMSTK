@@ -29,6 +29,7 @@
 // Include required types scene objects
 #include "Simulators/VegaFemSceneObject.h"
 #include "SceneModels/StaticSceneObject.h"
+#include "SceneModels/VegaFEMDeformableSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "Devices/VRPNForceDevice.h"
 // #include "Devices/VRPNDeviceServer.h"
@@ -45,6 +46,7 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
+#include "IO/IOMesh.h"
 #include "IO/InitIO.h"
 #include "VTKRendering/InitVTKRendering.h"
 
@@ -88,12 +90,15 @@ int main(int ac, char** av)
     //-------------------------------------------------------
 
     // create a FEM simulator
-    auto femSimulator = std::make_shared<VegaFEMModelSimulator>();
+//     auto femSimulator = std::make_shared<VegaFEMModelSimulator>();
+    auto femSimulator = std::make_shared<ObjectSimulator>();
     //femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(
-        sdk->getErrorLog(),configFile);
+//     auto femObject = std::make_shared<VegaFemSceneObject>(
+//         nullptr,configFile);
+    auto femObject = std::make_shared<VegaFEMDeformableSceneObject>(
+        "./box.veg",configFile);
     femObject->setContactForcesOn();
 
     auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME //|
@@ -105,10 +110,20 @@ int main(int ac, char** av)
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
     meshRenderDetail->setShininess(10.0);
 
-    auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
-    if(renderingMesh)
+    // Load rendering mesh
+    auto volumeMesh = std::static_pointer_cast<VegaVolumetricMesh>(femObject->getPhysicsModel()->getMesh());
+
+    auto visualModel = std::make_shared<MeshModel>();
+    visualModel->load("./box.vtk");
+    femObject->setVisualModel(visualModel);
+
+    auto visualMesh = visualModel->getMeshAs<SurfaceMesh>();
+
+    if(visualMesh)
     {
-        renderingMesh->setRenderDetail(meshRenderDetail);
+        visualMesh->updateInitialVertices();
+        visualMesh->setRenderDetail(meshRenderDetail);
+        volumeMesh->attachSurfaceMesh(visualMesh,"./box.interp");
     }
     sdk->addSceneActor(femObject, femSimulator);
 
@@ -172,12 +187,13 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto meshModel = std::make_shared<MeshCollisionModel>();
 
-    auto collisionMesh = femObject->getVolumetricMesh()->getCollisionMesh();
+    auto collisionMesh = volumeMesh->getCollisionMesh();
     if(collisionMesh)
     {
         meshModel->setMesh(collisionMesh);
     }
-    femObject->setModel(meshModel);
+
+    femObject->setCollisionModel(meshModel);
 
     auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
