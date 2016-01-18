@@ -301,7 +301,7 @@ void SDK::addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<Obje
         return;
     }
 
-    p_sco->attachObjectSimulator(p_os);
+    p_os->addModel(p_sco);
 
     this->registerObjectSimulator(p_os);
 

@@ -292,15 +292,17 @@ VegaFEMDeformableSceneObject::~VegaFEMDeformableSceneObject()
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
 {
-    auto model = std::make_shared<MeshModel>();
+    auto meshModel = std::make_shared<MeshModel>();
 
-    model->load(fileName);
+    meshModel->load(fileName);
 
-    this->setModel(model);
+    this->setPhysicsModel(meshModel);
+    std::cout << "meshmodel = " << meshModel << std::endl;
 
-    this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(model->getMesh());
+    this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(meshModel->getMesh());
+    std::cout << "volumetricMesh = " << this->volumetricMesh << std::endl;
 
-    if(!model->getMesh())
+    if(!this->volumetricMesh)
     {
         // TODO: Print error message and log
         return;
@@ -348,6 +350,10 @@ void VegaFEMDeformableSceneObject::initialize()
     this->initMassMatrix();
     this->initDampingMatrix();
     this->initTangentStiffnessMatrix();
+
+    this->gravityForce.resize(this->numOfDOF);
+    this->gravity *= this->vegaFemConfig->floatsOptionMap.at("gravity");
+    this->volumetricMesh->computeGravity(this->gravity,this->gravityForce);
 }
 
 //---------------------------------------------------------------------------
@@ -361,6 +367,7 @@ bool VegaFEMDeformableSceneObject::configure(const std::string &configFile)
     this->setOdeRHS();
 
     size_t numNodes = this->volumetricMesh->getNumberOfVertices();
+    this->numOfNodes = numNodes;
     this->numOfDOF = 3 * numNodes;
 
     this->f.resize(this->numOfDOF);
@@ -816,8 +823,8 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 
     auto odeRHS = [&,this](const OdeSystemState & s) -> const core::Vectord&
     {
-        double *data = const_cast<double*>(s.getPositions().data());
-        this->forceModel->GetInternalForce(data,this->f.data());
+        this->f = this->K*s.getPositions();
+        this->f -= this->gravityForce;
 
         // Add the Raleigh damping force
         if(dampingMassCoefficient > 0)
@@ -832,8 +839,6 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
         // Apply contact forces
         this->applyContactForces();
 
-        // Vega returns the negative of the force action on the material
-        this->f *= -1;
         return this->f;
     };
     this->setFunction(odeRHS);
@@ -852,6 +857,9 @@ void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 
         this->updateValuesFromMatrix(this->vegaTangentStiffnessMatrix,
                                      this->K.valuePtr());
+
+        // Vega returns the negative of the force action on the material
+        this->K *= -1;
         return this->K;
     };
     this->setJaconbianFx(tangentStiffness);
@@ -906,6 +914,8 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
         this->setDamping(lagrangianDamping);
     }
 }
+
+//---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::updateMesh()
 {
     this->volumetricMesh->updateAttachedMeshes(this->currentState->getPositions());

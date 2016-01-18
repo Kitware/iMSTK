@@ -52,19 +52,10 @@ void DefaultSimulator::run()
 {
     beginExecution();
 
-    for(auto &sceneModel : this->simulatedModels)
+    for(auto &model : this->simulatedModels)
     {
-        for(auto &apply : this->operatorFunctions)
-        {
-            auto meshModel = std::dynamic_pointer_cast<MeshModel>(sceneModel->getModel());
-            if(!meshModel)
-            {
-                continue;
-            }
-            apply(meshModel);
-        }
-
-        this->updateHapticForces(sceneModel);
+        model->update(this->timeStep);
+        this->updateHapticForces(model);
     }
 
     endExecution();

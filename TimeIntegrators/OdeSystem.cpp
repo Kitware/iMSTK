@@ -71,6 +71,11 @@ void OdeSystem::computeImplicitSystemLHS(const OdeSystemState &previousState,
                                     const double timeStep,
                                     bool computeRHS)
 {
+    if(!this->Mass || !this->DFx || !this->DFv || !this->F)
+    {
+        // TODO: Log this, fatal error
+        return;
+    }
     auto &M = this->evalMass(newState);
     auto &K = this->evalDFx(newState);
     auto &C = this->evalDFv(newState);
@@ -124,13 +129,19 @@ void OdeSystem::computeImplicitSystemRHS(const OdeSystemState &state,
                                  OdeSystemState &newState,
                                  double timeStep)
 {
+    if(!this->Mass || !this->DFx || !this->DFv || !this->F)
+    {
+        // TODO: Log this, fatal error
+        return;
+    }
     auto &M = this->evalMass(newState);
     auto &K = this->evalDFx(newState);
     auto &f = this->evalF(newState);
 
     this->rhs = M * (newState.getVelocities() - state.getVelocities()) / timeStep;
-    this->rhs -= (f + K * (newState.getPositions() - state.getPositions() -
-                           newState.getVelocities() * timeStep));
+    this->rhs -= K * (newState.getPositions() - state.getPositions() -
+                           newState.getVelocities() * timeStep);
+    this->rhs += f;
 
     if(this->Damping)
     {

@@ -27,7 +27,7 @@
 ObjectSimulator::ObjectSimulator():
     enabled(false),
     isObjectSimInitialized(false),
-    timeStep(1.0/30.0),
+    timeStep(.01),
     timerPerFrame(0.0),
     framesPerSecond(0.0),
     frameCounter(0),
@@ -40,7 +40,7 @@ ObjectSimulator::ObjectSimulator():
 }
 
 //---------------------------------------------------------------------------
-void ObjectSimulator::addObject(std::shared_ptr< SceneObject > model)
+void ObjectSimulator::addModel(std::shared_ptr< SceneObject > model)
 {
     if(!model)
     {
@@ -53,7 +53,7 @@ void ObjectSimulator::addObject(std::shared_ptr< SceneObject > model)
 }
 
 //---------------------------------------------------------------------------
-void ObjectSimulator::removeObject(const std::shared_ptr< SceneObject > &model)
+void ObjectSimulator::removeModel(const std::shared_ptr< SceneObject > &model)
 {
     if(!model)
     {

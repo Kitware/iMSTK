@@ -36,11 +36,15 @@
 #include "Core/ConfigRendering.h"
 #include "Rendering/CustomRenderer.h"
 
-//forward class declaration
+// Forward class declaration
 class ObjectSimulator;
-class CustomRenderer;
+namespace Core {
+    class BaseMesh;
+}
 
-///booleans for objects indicate whether they're initialized or not.
+///
+/// \brief Booleans for objects indicate whether they're initialized or not.
+///
 struct ObjectInitFlags
 {
     bool isViewerInit;
@@ -48,8 +52,10 @@ struct ObjectInitFlags
 
 };
 
+///
 /// \brief Base class for any object in the scene both
-/// physical and otherwise
+///     physical and otherwise
+///
 class SceneObject : public CoreClass
 {
     friend class SDK;
@@ -208,14 +214,39 @@ public:
                          const core::Vec3d &force);
 
     ///
+    ///
     /// \brief Get contact forces vector
     ///
     void setModel(std::shared_ptr<Model> m);
 
+    /// \brief Get contact forces vector
+    ///
+    void setVisualModel(std::shared_ptr<Model> m);
+
     ///
     /// \brief Get contact forces vector
     ///
-    std::shared_ptr<Model> getModel();
+    std::shared_ptr<Model> getVisualModel();
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    void setCollisionModel(std::shared_ptr<Model> m);
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    std::shared_ptr<Model> getCollisionModel();
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    void setPhysicsModel(std::shared_ptr<Model> m);
+
+    ///
+    /// \brief Get contact forces vector
+    ///
+    std::shared_ptr<Model> getPhysicsModel();
 
     ///
     /// \brief Get contact forces vector
@@ -226,7 +257,9 @@ protected:
     bool hasContactForces;
     bool isActive;
     ObjectInitFlags flags;
-    std::shared_ptr<Model> model; //!< model attached to this scene object
+    std::shared_ptr<Model> visualModel; //!< visual model attached to this scene object
+    std::shared_ptr<Model> collisionModel; //!< collision model attached to this scene object
+    std::shared_ptr<Model> physicsModel; //!< collision model attached to this scene object
     std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
     std::unordered_map<int,core::Vec3d> contactForces;
     std::unordered_map<int,core::Vec3d> contactPoints;

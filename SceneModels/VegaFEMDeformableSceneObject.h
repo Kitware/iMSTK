@@ -171,8 +171,8 @@ private:
     // Vega Laplacian damping matrix
     std::shared_ptr<SparseMatrix> dampingMatrix;
 
-    // Total number of degrees of freedom
-    double numOfDOF;
+    // Nodal vector of gravity forces
+    core::Vectord gravityForce;
 
     // Vega configuration parser interface
     class VegaConfiguration;

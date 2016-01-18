@@ -26,9 +26,8 @@
 
 // SimMedTK includes
 #include "SceneModels/SceneObject.h"
+#include "TimeIntegrators/OdeSystem.h"
 #include "TimeIntegrators/TimeIntegrator.h"
-#include "TimeIntegrators/BackwarEuler.h"
-#include "TimeIntegrators/ForwardEuler.h"
 
 ///
 /// \brief Base class for all deformable scene objects.
@@ -89,11 +88,12 @@ public:
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    Eigen::Map<core::Vec3d> getVelocity(const int index)
-    {
-        auto velocities = this->currentState->getVelocities();
-        return Eigen::Map<core::Vec3d>(&velocities(index));
-    }
+    Eigen::Map<core::Vec3d> getVelocity(const int index);
+
+    ///
+    /// \brief Returns velocity of at a given location for the current state.
+    ///
+    const core::Vec3d &getGravity() const;
 
 private:
     ///////////////////////////////////////////////////////////////////////////////
@@ -129,6 +129,13 @@ protected:
     core::SparseMatrixd D; ///> Raleigh Damping matrix
     core::SparseMatrixd K; ///> Stiffness matrix
     core::Vectord f;       ///> Accumulative forces vector
+
+    // Gravity
+    core::Vec3d gravity;
+
+    // Total number of degrees of freedom
+    double numOfDOF;
+    double numOfNodes;
 
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };

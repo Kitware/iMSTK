@@ -27,6 +27,7 @@
 #include "Core/RenderDelegate.h"
 #include "IO/IOMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
+#include "Geometry/MeshModel.h"
 
 #include <exception>
 
@@ -44,8 +45,7 @@ VegaFemSceneObject::VegaFemSceneObject() :
 }
 
 VegaFemSceneObject::VegaFemSceneObject(const std::shared_ptr<ErrorLog> /*p_log*/,
-                                       const std::string ConfigFile)
-    :
+                                       const std::string ConfigFile) :
     staticSolver(0),
     graphicFrame(0),
     explosionFlag(0),
@@ -191,10 +191,19 @@ void VegaFemSceneObject::loadVolumeMesh()
         std::cout << "VEGA: Loading volumetric mesh from file "
                   << femConfig->volumetricMeshFilename << "..." << std::endl;
 
-        auto ioMesh = std::make_shared<IOMesh>();
-        ioMesh->read(femConfig->volumetricMeshFilename);
+        auto meshModel = std::make_shared<MeshModel>();
 
-        this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+        meshModel->load(femConfig->volumetricMeshFilename);
+
+        this->physicsModel = meshModel;
+
+        this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(this->physicsModel->getMesh());
+
+        if(!this->volumetricMesh)
+        {
+            // TODO: Print error message and log
+            return;
+        }
 
         if (!this->volumetricMesh)
         {
@@ -320,11 +329,17 @@ void VegaFemSceneObject::loadSurfaceMesh()
             std::cerr << "VEGA:  error! no secondary rendering mesh interpolation filename specified." << std::endl;
             std::cerr << "VEGA:  error! weighs will be computed. Slow operation." << std::endl;
             this->volumetricMesh->attachSurfaceMesh(surfaceMesh);
+            auto meshModel = std::make_shared<MeshModel>();
+            meshModel->setModelMesh(surfaceMesh);
+            this->visualModel = meshModel;
         }
         else
         {
             this->volumetricMesh->attachSurfaceMesh(surfaceMesh,
                                                 femConfig->secondaryRenderingMeshInterpolationFilename);
+            auto meshModel = std::make_shared<MeshModel>();
+            meshModel->setModelMesh(surfaceMesh);
+            this->visualModel = meshModel;
         }
     }
 
@@ -756,7 +771,6 @@ void VegaFemSceneObject::update(double /*dt*/)
 
     if (femConfig->singleStepMode <= 1)
     {
-
         // apply external user interaction forces
         applyUserInteractionForces();
 
@@ -779,8 +793,10 @@ void VegaFemSceneObject::update(double /*dt*/)
         {
             u[i] = q[i];
         }
-
-        Eigen::Map<core::Vectord> positions(q,3*numNodes);
+        std::cout << core::Matrixd::Map(q,3,numNodes) << std::endl;
+        std::cout << std::endl;
+        std::cout << std::endl;
+        auto positions = core::Vectord::Map(q,3*numNodes);
 
         this->volumetricMesh->updateAttachedMeshes(positions);
 

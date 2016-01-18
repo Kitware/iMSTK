@@ -48,7 +48,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor()
     }
 
     auto planeModel = std::dynamic_pointer_cast<PlaneModel>(
-        geom->getModel());
+        geom->getVisualModel());
 
     if(planeModel)
     {
@@ -62,7 +62,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor()
         return delegate->getActor();
     }
 
-    auto meshModel = std::dynamic_pointer_cast<MeshModel>(geom->getModel());
+    auto meshModel = std::dynamic_pointer_cast<MeshModel>(geom->getVisualModel());
 
     if(meshModel)
     {

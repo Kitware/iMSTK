@@ -31,10 +31,6 @@ StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : Scen
     type = core::ClassType::StaticSceneObject;
 
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
-
-    this->setRenderDelegate(
-        Factory<RenderDelegate>::createConcreteClassForGroup(
-        "StaticSceneObjectRenderDelegate",RenderDelegate::RendererType::VTK));
 }
 
 //---------------------------------------------------------------------------

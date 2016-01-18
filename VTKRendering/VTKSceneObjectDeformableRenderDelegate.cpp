@@ -26,6 +26,7 @@
 #include "Simulators/VegaFemSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "VTKRendering/VTKRenderDelegate.h"
+#include "Geometry/MeshModel.h"
 
 // VTK includes
 #include <vtkActor.h>
@@ -48,17 +49,13 @@ vtkActor *SceneObjectDeformableRenderDelegate::getActor()
     {
         return nullptr;
     }
-    auto mesh = geom->getVolumetricMesh();
+    auto mesh = geom->getVisualModel()->getMesh();
     if(!mesh)
     {
         return nullptr;
     }
-    auto surfaceMesh = mesh->getRenderingMesh();
-    if(!surfaceMesh)
-    {
-        return nullptr;
-    }
-    auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(surfaceMesh->getRenderDelegate());
+
+    auto delegate = std::dynamic_pointer_cast<VTKRenderDelegate>(mesh->getRenderDelegate());
     if(!delegate)
     {
         return nullptr;

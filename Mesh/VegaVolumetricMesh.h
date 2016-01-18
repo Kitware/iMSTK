@@ -77,12 +77,17 @@ public:
     ///
     /// \brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
-    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                           const double &radius = -1.0,
+                           bool useForRendering = true);
 
     ///
     /// \brief Get attached surface mesh
     ///
-    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName, const double &radius = 5.0);
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                           const std::string &fileName,
+                           const double &radius = 5.0,
+                           bool useForRendering = true);
 
     ///
     /// \brief Return underlying Vega mesh data structure.
@@ -167,6 +172,20 @@ public:
     /// \brief Apply a tranlation to all the vertices, including attached meshes.
     ///
     void translate(const Eigen::Translation3d &translation, bool setInitialPoints = false);
+
+    ///
+    /// \brief Interpolate the displacements on to the given mesh.
+    ///
+    /// \param x Displacements.
+    /// \param mesh Mesh where the interpolation will be computed.
+    ///
+    void interpolate(const core::Vectord &x,
+                     std::shared_ptr< SurfaceMesh > mesh);
+
+    ///
+    /// \brief Compute gravity force
+    ///
+    void computeGravity(const core::Vec3d &gravity, core::Vectord &gravityForce);
 
 private:
     // Vega mesh base object

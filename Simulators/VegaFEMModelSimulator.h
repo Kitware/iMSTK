@@ -49,11 +49,6 @@ public:
     virtual void initialize() override;
 
     ///
-    /// \brief implement the deformation computation through fem here
-    ///
-    virtual void run() override;
-
-    ///
     /// \brief handle the keyboard and haptic button press events
     ///
     void handleEvent(std::shared_ptr<core::Event> p_event) override;

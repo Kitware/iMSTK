@@ -31,6 +31,7 @@
     SIMMEDTK_RUN_LOADER(register_PlaneRenderDelegate); \
     SIMMEDTK_RUN_LOADER(register_SceneObjectDeformableRenderDelegate); \
     SIMMEDTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate); \
+    SIMMEDTK_RUN_LOADER(register_SceneModelRenderDelegate); \
     SIMMEDTK_RUN_LOADER(register_VTKViewer);
 
 void InitVTKRendering();

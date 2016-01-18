@@ -24,6 +24,10 @@
 // SimMedTK includes
 
 #include "SceneModels/DeformableSceneObject.h"
+#include "TimeIntegrators/BackwarEuler.h"
+#include "TimeIntegrators/ForwardEuler.h"
+#include "Core/RenderDelegate.h"
+#include "Core/Factory.h"
 
 #include <cmath> // for std::isfinite()
 
@@ -32,6 +36,9 @@ DeformableSceneObject::DeformableSceneObject():
     OdeSystem(),
     integrationScheme(TimeIntegrator::ImplicitEuler)
 {
+    this->gravity = core::Vec3d::UnitY();
+    this->numOfDOF = 0;
+    this->numOfNodes = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -40,9 +47,9 @@ void DeformableSceneObject::applyContactForces()
     for(const auto & cf : this->getContactForces())
     {
         auto i = cf.first;
-        this->f(i) += cf.second(0);
-        this->f(i + 1) += cf.second(1);
-        this->f(i + 2) += cf.second(2);
+        this->f(i) -= cf.second(0);
+        this->f(i + 1) -= cf.second(1);
+        this->f(i + 2) -= cf.second(2);
     }
 }
 
@@ -90,9 +97,9 @@ void DeformableSceneObject::update(const double dt)
 
     this->odeSolver->solve(*this->currentState, *this->newState, dt);
 
-    // TODO: Check state validity
+    // Check state validity
     if(!std::isfinite(this->newState->getPositions().sum()) ||
-       !std::isfinite(this->newState->getVelocities().sum()) )
+       !std::isfinite(this->newState->getVelocities().sum()))
     {
         // TODO: log this and throw exception, this is a fatal error
         return;
@@ -121,4 +128,17 @@ std::shared_ptr< OdeSystemState > DeformableSceneObject::getCurrentState()
 std::shared_ptr< OdeSystemState > DeformableSceneObject::getPreviousState()
 {
     return this->previousState;
+}
+
+//---------------------------------------------------------------------------
+Eigen::Map<core::Vec3d> DeformableSceneObject::getVelocity(const int index)
+{
+    auto velocities = this->currentState->getVelocities();
+    return core::Vec3d::Map(&velocities(index));
+}
+
+//---------------------------------------------------------------------------
+const core::Vec3d& DeformableSceneObject::getGravity() const
+{
+    return this->gravity;
 }

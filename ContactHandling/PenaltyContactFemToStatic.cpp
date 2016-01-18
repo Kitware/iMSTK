@@ -55,3 +55,32 @@ void PenaltyContactFemToStatic::computeUnilateralContactForces()
 void PenaltyContactFemToStatic::computeBilateralContactForces()
 {
 }
+
+//---------------------------------------------------------------------------
+void PenaltyContactFemToStatic::computeForces(std::shared_ptr< SceneObjectDeformable > sceneObject)
+{
+    if(sceneObject->computeContactForce())
+    {
+        auto model = sceneObject->getCollisionModel();
+        if(!model)
+        {
+            return;
+        }
+
+        auto contactInfo = this->getCollisionPairs()->getContacts(model);
+        sceneObject->setContactForcesToZero();
+        core::Vec3d force;
+        core::Vec3d velocityProjection;
+        int nodeDofID;
+        for(auto &contact : contactInfo)
+        {
+            nodeDofID = 3 * contact->index;
+            velocityProjection = sceneObject->getVelocity(nodeDofID);
+            velocityProjection = contact->normal.dot(velocityProjection) * contact->normal;
+
+            force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
+
+            sceneObject->setContactForce(nodeDofID, contact->point, force);
+        }
+    }
+}

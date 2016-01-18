@@ -59,12 +59,12 @@ public:
     ///
     /// \param model Scene model.
     ///
-    virtual void addObject(std::shared_ptr<SceneObject> model);
+    virtual void addModel(std::shared_ptr<SceneObject> model);
 
     ///
     /// \brief remove object from the simulator
     ///
-    virtual void removeObject(const std::shared_ptr<SceneObject> &model);
+    virtual void removeModel(const std::shared_ptr<SceneObject> &model);
 
     ///
     /// \brief Set the ExecutionType for this simulator.
@@ -117,7 +117,6 @@ public:
     virtual void run();
 
 protected:
-
     ///
     /// \brief  Called at the beginning of the simulator frame.
     ///

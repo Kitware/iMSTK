@@ -27,8 +27,8 @@
 
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :
     ContactHandling(typeBilateral),
-    stiffness(1e4),
-    damping(1e5)
+    stiffness(1e6),
+    damping(10000)
 
 {
 }
@@ -38,8 +38,8 @@ PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral,
                                                const std::shared_ptr<SceneObject>& sceneObjFirst,
                                                const std::shared_ptr<SceneObject>& sceneObjSecond) :
     ContactHandling(typeBilateral,sceneObjFirst,sceneObjSecond),
-    stiffness(1e4),
-    damping(1e5)
+    stiffness(1e6),
+    damping(100)
 {
 }
 

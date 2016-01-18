@@ -23,6 +23,9 @@
 
 #include "SceneModels/SceneObject.h"
 #include "Simulators/ObjectSimulator.h"
+#include "Core/BaseMesh.h"
+#include "Core/Model.h"
+#include "Core/Factory.h"
 
 SceneObject::SceneObject()
 {
@@ -33,6 +36,10 @@ SceneObject::SceneObject()
     this->type = core::ClassType::Unknown;
     this->objectSim = nullptr;
     this->name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+
+    this->setRenderDelegate(
+        Factory<RenderDelegate>::createConcreteClassForGroup(
+        "SceneModelRenderDelegate",RenderDelegate::RendererType::VTK));
 }
 
 //---------------------------------------------------------------------------
@@ -60,7 +67,7 @@ void SceneObject::releaseObjectSimulator()
         // Log this
         return;
     }
-    this->objectSim->removeObject(safeDownCast<SceneObject>());
+    this->objectSim->removeModel(safeDownCast<SceneObject>());
     this->objectSim = nullptr;
 }
 
@@ -173,13 +180,45 @@ setContactForce(const int dofID, const core::Vec3d &point, const core::Vec3d &fo
 //---------------------------------------------------------------------------
 void SceneObject::setModel(std::shared_ptr< Model > m)
 {
-    this->model = m;
+    this->visualModel = m;
+    this->collisionModel = m;
+    this->physicsModel = m;
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< Model > SceneObject::getModel()
+void SceneObject::setVisualModel(std::shared_ptr< Model > m)
 {
-    return this->model;
+    this->visualModel = m;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< Model > SceneObject::getVisualModel()
+{
+    return this->visualModel;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setCollisionModel(std::shared_ptr< Model > m)
+{
+    this->collisionModel = m;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< Model > SceneObject::getCollisionModel()
+{
+    return this->collisionModel;
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::setPhysicsModel(std::shared_ptr< Model > m)
+{
+    this->physicsModel = m;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< Model > SceneObject::getPhysicsModel()
+{
+    return this->physicsModel;
 }
 
 //---------------------------------------------------------------------------

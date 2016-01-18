@@ -54,15 +54,6 @@ void VegaFEMModelSimulator::initialize()
 }
 
 //---------------------------------------------------------------------------
-void VegaFEMModelSimulator::run()
-{
-    for(auto &model : this->simulatedModels)
-    {
-        model->update(this->timeStep);
-    }
-}
-
-//---------------------------------------------------------------------------
 void VegaFEMModelSimulator::handleEvent(std::shared_ptr<core::Event> /*p_event*/ )
 {
     if (!this->isListening())
