@@ -25,7 +25,7 @@
 
 #include "Collision/MeshToMeshCollision.h"
 #include "Collision/MeshCollisionModel.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Core/MakeUnique.h"
 #include "Mesh/SurfaceMesh.h"
 
@@ -73,7 +73,7 @@ go_bandit([](){
 
             std::shared_ptr<Model> modelB = getModel(verticesB);
 
-            std::shared_ptr<CollisionPair> collisionPair = std::make_shared<CollisionPair>();
+            std::shared_ptr<CollisionManager> collisionPair = std::make_shared<CollisionManager>();
 
             collisionPair->setModels(modelA,modelB);
 

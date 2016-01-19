@@ -23,7 +23,7 @@
 
 #include "Core/ContactHandling.h"
 
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 
 ContactHandling::ContactHandling(const bool typeBilateral)
 {
@@ -36,7 +36,7 @@ ContactHandling::ContactHandling(const bool typeBilateral)
         isBilateral = false;
     }
 
-    type = ContactHandlingType::UNKNOWN;
+    type = Unknown;
 };
 
 ContactHandling::ContactHandling(const bool typeBilateral,
@@ -54,7 +54,7 @@ ContactHandling::ContactHandling(const bool typeBilateral,
 
     setSceneObjects(first, second);
 
-    type = ContactHandlingType::UNKNOWN;
+    type = Unknown;
 }
 
 ContactHandling::~ContactHandling()
@@ -69,17 +69,17 @@ void ContactHandling::setSceneObjects(const std::shared_ptr< SceneObject > first
     collidingSceneObjects.second = second;
 }
 
-void ContactHandling::setCollisionPairs(const std::shared_ptr< CollisionPair > colPair)
+void ContactHandling::setCollisionPairs(const std::shared_ptr< CollisionManager > colPair)
 {
     collisionPair = colPair;
 }
 
-std::shared_ptr<CollisionPair> ContactHandling::getCollisionPairs() const
+std::shared_ptr<CollisionManager> ContactHandling::getCollisionPairs() const
 {
     return collisionPair;
 }
 
-ContactHandlingType ContactHandling::getContactHandlingType() const
+ContactHandling::MethodType ContactHandling::getContactHandlingType() const
 {
     return type;
 }

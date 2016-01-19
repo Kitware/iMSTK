@@ -287,7 +287,7 @@ void Simulator::exec()
     this->terminationCompleted = true;
     std::cout << "Simulator terminated" <<std::endl;
 }
-void Simulator::addCollisionPair(std::shared_ptr< CollisionPair > pair)
+void Simulator::addCollisionPair(std::shared_ptr< CollisionManager > pair)
 {
     collisionPairs.emplace_back(pair);
 }

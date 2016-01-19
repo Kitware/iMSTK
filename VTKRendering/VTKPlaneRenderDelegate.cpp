@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Model.h"
-#include "Core/AnalyticalGeometry.h"
+#include "Core/Geometry.h"
 
 // VTK incudes
 #include <vtkActor.h>

@@ -88,12 +88,12 @@ public:
     /// \brief this is called by SDK. it lanuches the simulator module
     virtual void exec();
 
-    void addCollisionPair(std::shared_ptr<CollisionPair> pair);
+    void addCollisionPair(std::shared_ptr<CollisionManager> pair);
 
 private:
     std::vector<std::shared_ptr<ObjectSimulator>> simulators;
     std::vector<std::shared_ptr<CollisionDetection>> collisionDetectors;
-    std::vector<std::shared_ptr<CollisionPair>> collisionPairs;
+    std::vector<std::shared_ptr<CollisionManager>> collisionPairs;
     std::vector<std::shared_ptr<ContactHandling>> contactHandlers;
 
     std::unique_ptr<ThreadPool> threadPool; //

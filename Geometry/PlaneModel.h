@@ -33,7 +33,7 @@
 
 // SimMedTK includes
 #include "Core/Model.h"
-#include "Core/AnalyticalGeometry.h"
+#include "Core/Geometry.h"
 
 ///
 /// @brief Plane representation of a model.

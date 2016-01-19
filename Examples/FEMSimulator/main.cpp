@@ -31,7 +31,7 @@
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Devices/VRPNDeviceServer.h"
 #include "Devices/VRPNForceDevice.h"
 #include "IO/InitIO.h"
@@ -57,7 +57,7 @@ int main(int ac, char** av)
     InitIODelegates();
 
     //-------------------------------------------------------
-    // 1. Create an instance of the iMSTK framework/SDK
+    // 1. Create an instance of the SoFMIS framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
@@ -162,34 +162,37 @@ int main(int ac, char** av)
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
-    auto meshModel = femObject->getCollisionModel();
-    if(!meshModel)
+    auto meshModel = std::make_shared<MeshCollisionModel>();
+
+    auto collisionMesh = volumeMesh->getCollisionMesh();
+    if(collisionMesh)
     {
-        std::cout << "There is no collision model attached to this scene object" << std::endl;
+        meshModel->setMesh(collisionMesh);
     }
-    else
-    {
-        auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
-        planeMeshCollisionPairs->setModels(meshModel, plane);
+    femObject->setCollisionModel(meshModel);
 
-        sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+    auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
 
-        auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+    planeMeshCollisionPairs->setModels(meshModel, plane);
 
-        sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-        //-------------------------------------------------------
-        // Enable contact handling between scene actors 1 and 2
-        //-------------------------------------------------------
-        auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
-        planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
-        planeToMeshContact->setSceneObjects(staticObject, femObject);
+    //-------------------------------------------------------
+    // Enable contact handling between scene actors 1 and 2
+    //-------------------------------------------------------
+    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
 
-        sdkSimulator->registerContactHandling(planeToMeshContact);
-    }
+    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+
+    planeToMeshContact->setSceneObjects(staticObject, femObject);
+
+    sdkSimulator->registerContactHandling(planeToMeshContact);
+
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------

@@ -36,40 +36,51 @@
 
 class Model;
 
+class CollisionData
+{
+public:
+    CollisionData(){};
+    virtual ~CollisionData(){};
+
+    virtual void printCollisionPair() = 0;
+};
+
 ///
 /// \brief Contact point representation
 ///
-class Contact
+class PenetrationDepthCollisionData : public CollisionData
 {
 public:
-    Contact (const double penetrationDepth,
-             const core::Vec3d& p,
-             const int ind,
-             const core::Vec3d& contactNornmal) :
-                depth(penetrationDepth),
-                point(p),
-                normal(contactNornmal),
-                index(ind),
-                model(nullptr){}
-    Contact (std::shared_ptr<Model> m,
-             const double penetrationDepth,
-             const core::Vec3d& p,
-             const int ind,
-             const core::Vec3d& contactNornmal) :
-                depth(penetrationDepth),
-                point(p),
-                normal(contactNornmal),
-                index(ind),
-                model(m){}
+    PenetrationDepthCollisionData (const double penetrationDepth,
+                                   const core::Vec3d& p,
+                                   const int ind,
+                                   const core::Vec3d& contactNornmal) :
+                                    depth(penetrationDepth),
+                                    point(p),
+                                    normal(contactNornmal),
+                                    index(ind),
+                                    model(nullptr){}
+    PenetrationDepthCollisionData (std::shared_ptr<Model> m,
+                                   const double penetrationDepth,
+                                   const core::Vec3d& p,
+                                   const int ind,
+                                   const core::Vec3d& contactNornmal) :
+                                    depth(penetrationDepth),
+                                    point(p),
+                                    normal(contactNornmal),
+                                    index(ind),
+                                    model(m){}
 
-    void printInfo()
+    void printCollisionPair()
     {
-        std::cout << "\tDepth  : " << depth << std::endl;
-        std::cout << "\tIndex  : " << depth << std::endl;
-        std::cout << "\tNoramal: (" << normal(0) << ", " << normal(1) << ", " << normal(2) << ")\n";
-        std::cout << "\tVertex : (" << point(0) << ", " << point(1) << ", " << point(2) << ")\n\n";
+        std::cout << "\tDepth  :" << depth << std::endl;
+        std::cout << "\tIndex  :" << depth << std::endl;
+        std::cout << "\tNormal :" << normal << std::endl;
+        std::cout << "\tVertex :" << point << std::endl;
+        std::cout << "\tModel  :" << model << std::endl;
     }
 
+public: // Data
     double depth;
     core::Vec3d point;
     core::Vec3d normal;
@@ -78,32 +89,14 @@ public:
 };
 
 ///
-/// \brief Class containing the edge-edge collision data
-/// \todo implement this class
-///
-class EdgeEdgeCollisionData : public CollisionDataBase
-{
-
-};
-
-///
-/// \brief Class containing the vertex-triangle collision data
-/// \todo implement this class
-///
-class VertexTriangleCollisionData : public CollisionDataBase
-{
-
-};
-
-///
 /// \brief Contains pair of potential collision models
 ///   This class also stores contacts between those models.
 ///
-class CollisionPair
+class CollisionManager
 {
 public:
-    CollisionPair();
-    ~CollisionPair();
+    CollisionManager() = default;
+    ~CollisionManager() = default;
 
     ///
     /// @brief Set the pair of collision models
@@ -150,7 +143,7 @@ public:
     std::shared_ptr<Model> getSecond();
 
     ///
-    /// @brief Returns wether the contact container is empty
+    /// @brief Returns whether the contact container is empty
     ///
     bool hasContacts();
 
@@ -162,14 +155,16 @@ public:
     ///
     /// @brief Returns contact array for these two models
     ///
-    std::vector<std::shared_ptr<Contact>> &getContacts();
-    const std::vector<std::shared_ptr<Contact>> &getContacts() const;
+    std::vector<std::shared_ptr<PenetrationDepthCollisionData>> &getContacts();
+    const std::vector<std::shared_ptr<PenetrationDepthCollisionData>> &getContacts() const;
 
     ///
     /// @brief Returns contact array for a particular model
     ///
-    std::vector<std::shared_ptr<Contact>> &getContacts(const std::shared_ptr<Model> &model);
-    const std::vector<std::shared_ptr<Contact>> &getContacts(const std::shared_ptr<Model> &model) const;
+    std::vector<std::shared_ptr<PenetrationDepthCollisionData>> &getContacts(
+        const std::shared_ptr<Model> &model);
+    const std::vector<std::shared_ptr<PenetrationDepthCollisionData>> &getContacts(
+        const std::shared_ptr<Model> &model) const;
 
     ///
     /// @brief Returns contact array for these two models
@@ -179,9 +174,9 @@ public:
 private:
     std::pair<std::shared_ptr<Model>,
         std::shared_ptr<Model>> modelRepresentations; //!< Models
-    std::vector<std::shared_ptr<Contact>> contacts; //!< List of contacts
+    std::vector<std::shared_ptr<PenetrationDepthCollisionData>> contacts; //!< List of contacts
     std::map<std::shared_ptr<Model>,
-               std::vector<std::shared_ptr<Contact>>> modelContacts; //!< Contacts per model
+        std::vector<std::shared_ptr<PenetrationDepthCollisionData>>> modelContacts; //!< Contacts per model
 };
 
 #endif // SMCOLLISIONPAIR_H

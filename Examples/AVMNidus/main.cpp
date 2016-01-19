@@ -32,7 +32,7 @@
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
 #include "Simulators/ObjectSimulator.h"
 
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
@@ -99,7 +99,7 @@ int main(int ac, char **av)
     }
     else
     {
-        auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+        auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
         planeMeshCollisionPairs->setModels(meshModel, plane);
 
         sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
@@ -117,7 +117,6 @@ int main(int ac, char **av)
 
         sdkSimulator->registerContactHandling(planeToMeshContact);
     }
-
 
     //-------------------------------------------------------
     // Customize the viewer

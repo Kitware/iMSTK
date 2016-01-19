@@ -23,7 +23,7 @@
 
 #include <bandit/bandit.h>
 
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Core/Model.h"
 #include "Core/MakeUnique.h"
@@ -33,10 +33,10 @@ using namespace bandit;
 go_bandit([](){
     describe("Collision pair", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
+            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
         });
         it("attaches models ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
+            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
 
             std::shared_ptr<Model> modelA = std::make_shared<MeshCollisionModel>();
             std::shared_ptr<Model> modelB = std::make_shared<MeshCollisionModel>();
@@ -48,14 +48,14 @@ go_bandit([](){
 
         });
         it("attaches contacts ", []() {
-            std::unique_ptr<CollisionPair> collisionPair(Core::make_unique<CollisionPair>());
+            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
 
             float depth = 1.0;
             core::Vec3d contactPoint(0,0,1);
             core::Vec3d normal(1,0,0);
             collisionPair->addContact(depth,contactPoint,1,normal);
 
-            std::shared_ptr<Contact> contact = collisionPair->getContacts().back();
+            std::shared_ptr<PenetrationDepthCollisionData> contact = collisionPair->getContacts().back();
 
             AssertThat(collisionPair->hasContacts(), IsTrue());
             AssertThat(contact->normal, Equals(normal));

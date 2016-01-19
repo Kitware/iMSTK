@@ -27,7 +27,7 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 #include "Collision/PlaneCollisionModel.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
 
@@ -45,9 +45,9 @@ std::shared_ptr<StaticSceneObject> createStaticPlaneSceneObject()
 }
 
 
-std::shared_ptr<CollisionPair> createSampleCollisionPair()
+std::shared_ptr<CollisionManager> createSampleCollisionPair()
 {
-    auto collisionPair = std::make_shared<CollisionPair>();
+    auto collisionPair = std::make_shared<CollisionManager>();
 
     float depth = 1.0;
     core::Vec3d contactPoint(0,0,1);

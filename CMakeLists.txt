@@ -295,6 +295,7 @@ if(SimMedTK_USE_OCULUS)
 endif()
 
 add_subdirectory(Collision)
+add_subdirectory(CollisionContext)
 add_subdirectory(ContactHandling)
 add_subdirectory(Core)
 add_subdirectory(Devices)

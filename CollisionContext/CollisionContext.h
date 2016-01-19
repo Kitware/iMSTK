@@ -27,41 +27,19 @@
 
 // SimMedTK includes
 #include "Core/CoreClass.h"
-#include "Core/SDK.h"
 #include "Core/Matrix.h"
 #include "Core/Config.h"
-#include "Core/SceneObject.h"
+#include "SceneModels/SceneObject.h"
 
 // collision detection includes
 #include "Core/CollisionDetection.h"
-#include "Core/CollisionDataManager.h"
+#include "Core/CollisionManager.h"
 #include "Collision/PlaneToMeshCollision.h"
 #include "Collision/SpatialHashCollision.h"
 
 // contact handling includes
 #include "Core/ContactHandling.h"
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-
-///
-/// \brief Contains the information required to define an interaction
-///
-struct InteractionDataElement
-{
-    int sceneObj1Id;
-    int sceneObj2Id;
-    core::CollisionDetectionType collDetectionType;
-    core::ContactHandlingType contHandlingType1;
-    core::ContactHandlingType contHandlingType2;
-    core::CollisionPairType collPairType;
-
-    InteractionDataElement(
-        int so1,
-        int so2,
-        core::CollisionDetectionType cd,
-        core::ContactHandlingType ch1,
-        core::ContactHandlingType ch2,
-        core::CollisionPairType cp);
-};
 
 ///
 /// \brief This class manages all the information related to
@@ -78,38 +56,46 @@ public:
 
     /// This type hold a pair of potential scene objects that need to
     /// be queried for interaction
-    using InteractionPairType = std::tuple < std::shared_ptr<SceneObject>,
-        std::shared_ptr < SceneObject >> ;
+    using InteractionPairType = std::tuple<std::shared_ptr<SceneObject>,
+                                           std::shared_ptr<SceneObject>> ;
 
     /// This type holds the algorithms and data types for the interaction pair
-    using InteractionPairDataType = std::tuple < std::shared_ptr<CollisionDetection>,
-        std::shared_ptr<ContactHandling>,
-        std::shared_ptr<ContactHandling>,
-        std::shared_ptr<CollisionDataBase>,
-        bool > ;
+    using InteractionPairDataType = std::tuple<std::shared_ptr<CollisionDetection>,
+                                               std::shared_ptr<ContactHandling>,
+                                               std::shared_ptr<ContactHandling>,
+                                               std::shared_ptr<CollisionManager>,
+                                               bool> ;
 
-    /// Stores interaction types and their algorithms and data
-    auto hash = [](const InteractionPairType &pair)
+    /// Stores interaction types, their algorithms and data
+    struct HashType
     {
-        size_t h1 = std::hash(std::get<ObjectA>(pair));
-        size_t h2 = std::hash(std::get<ObjectB>(pair));
-        return h1 ^ (h2 << 1);
+        size_t operator()(const InteractionPairType &pair) const
+        {
+            size_t h1 = std::hash<std::shared_ptr<SceneObject>>()(std::get<ObjectA>(pair));
+            size_t h2 = std::hash<std::shared_ptr<SceneObject>>()(std::get<ObjectB>(pair));
+            return h1 ^ (h2 << 1);
+        };
     };
-    auto equal = [](const InteractionPairType &pairA, const InteractionPairType &pairB)
+    struct ComparisonType
     {
-        auto pairC = std::make_tuple(std::get<ObjectB>(pairA), std::get<ObjectA>(pairA));
-        return pairA == pairB || pairC == pairB;
+        bool operator()(const InteractionPairType &pairA,
+                        const InteractionPairType &pairB) const
+        {
+            auto pairC = std::make_tuple(std::get<ObjectB>(pairA), std::get<ObjectA>(pairA));
+            return pairA == pairB || pairC == pairB;
+        };
     };
-    using InteractionMapType = std::unordered_map < InteractionPairType,
-        InteractionPairDataType,
-        decltype(hash),
-        decltype(equal) > ;
+
+    using InteractionMapType = std::unordered_map<InteractionPairType,
+                                                  InteractionPairDataType,
+                                                  HashType,
+                                                  ComparisonType>;
 
 public:
     ///
     /// \brief Constructor/Destructor
     ///
-    CollisionContext() = default;
+    CollisionContext() : totalNumberOfSceneModels(0) {}
     ~CollisionContext() = default;
 
     ///
@@ -120,12 +106,12 @@ public:
     ///
     /// \note Scene objects passed as arguments should be registered
     ///
-    bool addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
+    void addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB,
         std::shared_ptr<CollisionDetection> collisionDetection,
         std::shared_ptr<ContactHandling> contactHandlingA,
         std::shared_ptr<ContactHandling> contactHandlingB,
-        std::shared_ptr<CollisionDataBase> contactType,
+        std::shared_ptr<CollisionManager> contactType,
         bool active = true);
 
     ///
@@ -133,7 +119,7 @@ public:
     /// in the scene to the collision context. Assigns collision
     /// detection method. This does not assign contact handler.
     ///
-    bool addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
+    void addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB,
         std::shared_ptr<CollisionDetection> collisionDetection);
 
@@ -141,7 +127,7 @@ public:
     /// \brief Adds two given scene objects will interact
     ///  in the scene to the collision context. Assigns contact handling method.
     ///
-    bool addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
+    void addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB,
         std::shared_ptr<ContactHandling> contactHandler);
 
@@ -149,7 +135,7 @@ public:
     /// \brief Adds two given scene objects that will interact in the scene to the
     ///  collision context
     ///
-    bool addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
+    void addInteraction(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB);
 
     ///
@@ -167,14 +153,14 @@ public:
     ///
     /// \brief Assign a collision detection method between two scene given scene objects
     ///
-    bool setCollisionDetection(std::shared_ptr<SceneObject> sceneObjectA,
+    void setCollisionDetection(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB,
         std::shared_ptr<CollisionDetection> collisionDetection);
 
     ///
     /// \brief Assign a contact handler method between two scene given scene objects
     ///
-    bool setContactHandling(std::shared_ptr<SceneObject> sceneObjectA,
+    void setContactHandling(std::shared_ptr<SceneObject> sceneObjectA,
         std::shared_ptr<SceneObject> sceneObjectB,
         std::shared_ptr<ContactHandling> contactHandler);
 
@@ -192,15 +178,24 @@ public:
     ///
     void createAssemblerAdjacencyMatrix();
 
-    void solveTogether(
-        std::shared_ptr< SceneObject > sceneObjectA,
-        std::shared_ptr< SceneObject > sceneObjectB);
-
     ///
     /// \brief Count the number of interaction of type T.
     ///
     template<typename T>
-    int numberOfInteractions() const;
+    size_t numberOfInteractions() const
+    {
+        size_t count = 0;
+        auto counter = [&](const InteractionPairDataType &data)
+        {
+            if (std::dynamic_pointer_cast<T>(std::get<HandlingA>(data)) ||
+                std::dynamic_pointer_cast<T>(std::get<HandlingB>(data)))
+            {
+                ++count;
+            }
+        };
+        std::for_each(this->interactionMap.begin(), this->interactionMap.end(), counter);
+        return count;
+    }
 
     ///
     /// \brief Forms the islands based on the adjacency matrix
@@ -226,12 +221,12 @@ public:
     /// collision context. Maximum is nC2 where n is the total
     /// number of objects in the scene
     ///
-    size_t getNumberOfInterations() const;
+    size_t getNumberOfInteractions() const;
 
     ///
     /// \brief Returns the list of interactions defined
     ///
-    InteractionMapType& getInteractions() const;
+    const InteractionMapType& getInteractions() const;
 
     ///
     /// \brief Returns the list of contact handlers
@@ -243,23 +238,39 @@ public:
     ///
     void findIslands();
 
+    ///
+    /// \brief Find the islands in the adjacency matrix
+    ///
+    size_t getNumOfIslands();
 
-    int getNumOfIslands();
-
+    ///
+    /// \brief Return the island graph.
+    ///
+    /// \return Reference to graph.
+    ///
     std::vector<std::vector<int>>& getIslands();
 
-    std::shared_ptr<SceneObject> getObjectWithIndex(const int objIndex);
+    ///
+    /// \brief Add pair of scene models to the list to they can be resolved simultaneously.
+    ///
+    /// \param sceneObjectA
+    /// \param sceneObjectB
+    ///
+    void solveSimultaneously(std::shared_ptr<SceneObject> sceneObjectA,
+                             std::shared_ptr<SceneObject> sceneObjectB);
 
 private:
     std::vector<std::vector<int>> interactionMatrix; ///> Adjacency matrix for the
-    ///> assembly graph (unidirected)
+                                                     ///> assembly graph (undirected)
+
     InteractionMapType interactionMap;
     std::unordered_map<std::shared_ptr<SceneObject>, int> objectIndexMap;
 
-    std::list<std::pair<std::shared_ptr<SceneObject>, std::shared_ptr<SceneObject >>> solveTogether;
+    std::list<std::pair<std::shared_ptr<SceneObject>,
+                        std::shared_ptr<SceneObject>>> modelPairs;
 
     std::vector<std::vector<int>> islands;
-
+    int totalNumberOfSceneModels;
 };
 
 #endif // SM_COLLISION_CONTEXT

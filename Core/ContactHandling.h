@@ -32,19 +32,26 @@
 #include <memory>
 
 class Mesh;
-class CollisionPair;
+class CollisionManager;
 
-enum class ContactHandlingType
-{
-    PenaltyFemToStatic,
-    UNKNOWN
-};
 
 /// \brief Base class to for handling contact for collision response
 /// Input: collision pairs containing the collision information
 /// Output: contact forces or Jacobians or projection/PBD constraints
 class ContactHandling: public CoreClass
 {
+public:
+    /// \brief class types.
+    /// Each contact handling algorithm should have type of itself
+    enum MethodType
+    {
+        Penalty=1,
+        Lcp,
+        PenaltyFemToStatic,
+        NoContact,
+        Unknown=-1
+    };
+
 public:
 
     ContactHandling(const bool typeBilateral);
@@ -64,13 +71,13 @@ public:
 
     /// \brief Set the collision pair data structure in which the information
     /// needs to be stored
-    void setCollisionPairs(const std::shared_ptr<CollisionDataManager> colPair);
+    void setCollisionPairs(const std::shared_ptr<CollisionManager> colPair);
 
     /// \brief Get the colliison information contained in the collision pairs
-    std::shared_ptr<CollisionDataManager> getCollisionPairs() const;
+    std::shared_ptr<CollisionManager> getCollisionPairs() const;
 
     /// \brief Get if the contact handling is unilateral or bilateral
-    ContactHandlingType getContactHandlingType() const;
+    MethodType getContactHandlingType() const;
 
     /// \brief Get the first scene object
     std::shared_ptr<SceneObject> getFirstSceneObject() const;
@@ -84,13 +91,13 @@ public:
 
 protected:
 
-    ContactHandlingType type;
+    MethodType type;
 
     bool isBilateral;
 
     std::pair<std::shared_ptr<SceneObject>, std::shared_ptr<SceneObject>> collidingSceneObjects;
 
-    std::shared_ptr<CollisionPair> collisionPair;
+    std::shared_ptr<CollisionManager> collisionPair;
 };
 
 #endif //SMCONTACTHANDLING_H

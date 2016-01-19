@@ -23,7 +23,7 @@
 
 #include "Core/CollisionDetection.h"
 
-void CollisionDetection::computeCollision(std::shared_ptr< CollisionPair > pairs)
+void CollisionDetection::computeCollision(std::shared_ptr< CollisionManager > pairs)
 {
     this->doComputeCollision(pairs);
 }

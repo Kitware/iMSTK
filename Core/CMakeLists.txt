@@ -1,10 +1,9 @@
 simmedtk_add_library(Core
   SOURCES
-    AnalyticalGeometry.cpp
     BaseMesh.cpp
     CollisionConfig.cpp
     CollisionDetection.cpp
-    CollisionPair.cpp
+    CollisionManager.cpp
     Color.cpp
     ContactHandling.cpp
     CoreClass.cpp
@@ -23,13 +22,12 @@ simmedtk_add_library(Core
     UnifiedId.cpp
     ViewerBase.cpp
   PUBLIC_HEADERS
-    AnalyticalGeometry.h
 	BaseMesh.h
     CollisionConfig.h
     CollisionDetection.h
     CollisionManager.h
     CollisionModelIterator.h
-    CollisionPair.h
+    CollisionManager.h
     Color.h
     Config.h
     ConfigRendering.h

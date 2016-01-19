@@ -25,14 +25,14 @@
 
 // SimMedTK includes
 #include "Collision/CollisionMoller.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/PlaneCollisionModel.h"
 
 // STL includes
 #include <limits>
 
-void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pair)
+void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> pair)
 {
     auto meshModel = std::static_pointer_cast<MeshCollisionModel>(pair->getFirst());
     auto planeModel = std::static_pointer_cast<PlaneCollisionModel>(pair->getSecond());

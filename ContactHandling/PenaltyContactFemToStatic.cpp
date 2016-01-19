@@ -22,11 +22,11 @@
 //---------------------------------------------------------------------------
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : PenaltyContactHandling(typeBilateral)
 {
-    type = ContactHandlingType::PenaltyFemToStatic;
+    type = PenaltyFemToStatic;
 }
 
 //---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ PenaltyContactFemToStatic::PenaltyContactFemToStatic(
                                                     const std::shared_ptr<DeformableSceneObject>& sceneObjSecond)
                                                     : PenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
-    type = ContactHandlingType::PenaltyFemToStatic;
+    type = PenaltyFemToStatic;
 }
 
 //---------------------------------------------------------------------------

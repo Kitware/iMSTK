@@ -22,7 +22,7 @@
 //---------------------------------------------------------------------------
 
 #include "ContactHandling/PenaltyContactHandling.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :
     ContactHandling(typeBilateral),

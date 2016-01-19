@@ -18,22 +18,14 @@
 //
 // Authors:
 //
-// Contact:
+// Contacts:
 //---------------------------------------------------------------------------
 
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Core/Model.h"
 
-CollisionPair::CollisionPair()
-{
-}
-
-//---------------------------------------------------------------------------
-CollisionPair::~CollisionPair() {}
-
-//---------------------------------------------------------------------------
-void CollisionPair::setModels(std::shared_ptr<Model> first,
-                              std::shared_ptr<Model> second)
+void CollisionManager::setModels(std::shared_ptr<Model> first,
+                                 std::shared_ptr<Model> second)
 {
     this->modelRepresentations.first = first;
     this->modelRepresentations.second = second;
@@ -42,42 +34,42 @@ void CollisionPair::setModels(std::shared_ptr<Model> first,
 }
 
 //---------------------------------------------------------------------------
-void CollisionPair::addContact(const double& penetrationDepth,
-                               const core::Vec3d& vert,
-                               const int index,
-                               const core::Vec3d& contactNornmal)
+void CollisionManager::addContact(const double& penetrationDepth,
+                                  const core::Vec3d& vert,
+                                  const int index,
+                                  const core::Vec3d& contactNornmal)
 {
-    auto contact = std::make_shared<Contact>(penetrationDepth,
-                                             vert,
-                                             index,
-                                             contactNornmal);
+    auto contact = std::make_shared<PenetrationDepthCollisionData>(penetrationDepth,
+                   vert,
+                   index,
+                   contactNornmal);
     this->contacts.emplace_back(contact);
 }
 
 //---------------------------------------------------------------------------
-void CollisionPair::addContact(std::shared_ptr<Model> model,
-                               const double& penetrationDepth,
-                               const core::Vec3d& vert,
-                               const int index,
-                               const core::Vec3d& contactNornmal)
+void CollisionManager::addContact(std::shared_ptr<Model> model,
+                                  const double& penetrationDepth,
+                                  const core::Vec3d& vert,
+                                  const int index,
+                                  const core::Vec3d& contactNornmal)
 {
-    auto contact = std::make_shared<Contact>(penetrationDepth,
-                                             vert,
-                                             index,
-                                             contactNornmal);
+    auto contact = std::make_shared<PenetrationDepthCollisionData>(penetrationDepth,
+                   vert,
+                   index,
+                   contactNornmal);
     this->contacts.emplace_back(contact);
     this->modelContacts[model].emplace_back(contact);
 }
 
 //---------------------------------------------------------------------------
 const std::pair< std::shared_ptr<Model>, std::shared_ptr<Model> >&
-CollisionPair::getModels() const
+CollisionManager::getModels() const
 {
     return this->modelRepresentations;
 }
 
 //---------------------------------------------------------------------------
-void CollisionPair::clearContacts()
+void CollisionManager::clearContacts()
 {
     this->contacts.clear();
     this->modelContacts[this->modelRepresentations.first].clear();
@@ -85,64 +77,64 @@ void CollisionPair::clearContacts()
 }
 
 //---------------------------------------------------------------------------
-int CollisionPair::getNumberOfContacts()
+int CollisionManager::getNumberOfContacts()
 {
     return this->contacts.size();
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr<Model> CollisionPair::getFirst()
+std::shared_ptr<Model> CollisionManager::getFirst()
 {
     return this->modelRepresentations.first;
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr<Model> CollisionPair::getSecond()
+std::shared_ptr<Model> CollisionManager::getSecond()
 {
     return this->modelRepresentations.second;
 }
 
 //---------------------------------------------------------------------------
-bool CollisionPair::hasContacts()
+bool CollisionManager::hasContacts()
 {
     return !this->contacts.empty();
 }
 
 //---------------------------------------------------------------------------
-std::vector<std::shared_ptr<Contact>>& CollisionPair::getContacts()
+std::vector<std::shared_ptr<PenetrationDepthCollisionData>>& CollisionManager::getContacts()
 {
     return this->contacts;
 }
 
 //---------------------------------------------------------------------------
-const std::vector<std::shared_ptr<Contact>>&
-CollisionPair::getContacts() const
+const std::vector<std::shared_ptr<PenetrationDepthCollisionData>>&
+CollisionManager::getContacts() const
 {
     return this->contacts;
 }
 
 //---------------------------------------------------------------------------
-std::vector<std::shared_ptr<Contact>>&
-CollisionPair::getContacts(const std::shared_ptr<Model> &model)
+std::vector<std::shared_ptr<PenetrationDepthCollisionData>>&
+CollisionManager::getContacts(const std::shared_ptr<Model> &model)
 {
     return this->modelContacts.at(model);
 }
 
 //---------------------------------------------------------------------------
-const std::vector<std::shared_ptr<Contact>>&
-CollisionPair::getContacts(const std::shared_ptr<Model> &model) const
+const std::vector<std::shared_ptr<PenetrationDepthCollisionData>>&
+CollisionManager::getContacts(const std::shared_ptr<Model> &model) const
 {
     return this->modelContacts.at(model);
 }
 
 //---------------------------------------------------------------------------
-void CollisionPair::printCollisionPairs()
+void CollisionManager::printCollisionPairs()
 {
     std::cout << "# Contacts: " << this->contacts.size() << std::endl;
     for (size_t i = 0; i < this->contacts.size(); i++)
     {
-        std::cout << "Contact no: " << i << std::endl;
-        this->contacts[0]->printInfo();
+        std::cout << "PenetrationDepthCollisionData no: " << i << std::endl;
+        this->contacts[0]->printCollisionPair();
     }
 
 }

@@ -25,7 +25,7 @@
 
 // SimMedTK includes
 #include "Core/ContactHandling.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 
 /// \brief Penalty based for contact handling
 class PenaltyContactHandling : public ContactHandling

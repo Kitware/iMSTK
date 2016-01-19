@@ -23,39 +23,26 @@
 
 #include "CollisionContext/CollisionContext.h"
 
-InteractionDataElement::InteractionDataElement(
-    int so1,
-    int so2,
-    core::CollisionDetectionType cd,
-    core::ContactHandlingType ch1,
-    core::ContactHandlingType ch2,
-    core::CollisionPairType cp)
-{
-    sceneObj1Id = so1;
-    sceneObj2Id = so2;
-    collDetectionType = cd;
-    contHandlingType1 = ch1;
-    contHandlingType2 = ch2;
-    collPairType = cp;
-}
-
 //---------------------------------------------------------------------------
-bool CollisionContext::addInteraction(
+void CollisionContext::addInteraction(
     std::shared_ptr< SceneObject > sceneObjectA,
     std::shared_ptr< SceneObject > sceneObjectB,
     std::shared_ptr< CollisionDetection > collisionDetection,
     std::shared_ptr< ContactHandling > contactHandlingA,
     std::shared_ptr< ContactHandling > contactHandlingB,
-    std::shared_ptr< CollisionDataBase > contactType, bool active)
+    std::shared_ptr< CollisionManager > contactType, bool active)
 {
-    if (!sceneObjectA ||
-        !sceneObjectB ||
-        !collisionDetection ||
-        !contactHandlingA ||
-        !contactHandlingB ||
-        !contactType)
+    if (!sceneObjectA || !sceneObjectB ||
+        !collisionDetection || !contactHandlingA ||
+        !contactHandlingB || !contactType)
     {
-        return false;
+        // TODO: log this
+        return;
+    }
+
+    if(sceneObjectA != sceneObjectB)
+    {
+        this->totalNumberOfSceneModels++;
     }
 
     auto scenePair = std::make_tuple(sceneObjectA, sceneObjectB);
@@ -64,26 +51,49 @@ bool CollisionContext::addInteraction(
         contactHandlingB,
         contactType,
         active);
+
     this->interactionMap.emplace(scenePair, scenePairData);
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::addInteraction(
+void CollisionContext::addInteraction(
     std::shared_ptr< SceneObject > sceneObjectA,
     std::shared_ptr< SceneObject > sceneObjectB,
     std::shared_ptr< CollisionDetection > collisionDetection)
 {
+    if (!sceneObjectA || !sceneObjectB || !collisionDetection)
+    {
+        // TODO: log this
+        return;
+    }
+
+    if(sceneObjectA != sceneObjectB)
+    {
+        this->totalNumberOfSceneModels++;
+    }
+
     auto pair = std::make_tuple(sceneObjectA, sceneObjectB);
     std::get<Detection>(this->interactionMap[pair]) = collisionDetection;
     std::get<Enabled>(this->interactionMap[pair]) = true;
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::addInteraction(
+void CollisionContext::addInteraction(
     std::shared_ptr< SceneObject > sceneObjectA,
     std::shared_ptr< SceneObject > sceneObjectB,
     std::shared_ptr< ContactHandling > contactHandler)
 {
+    if (!sceneObjectA || !sceneObjectB)
+    {
+        // TODO: log this
+        return;
+    }
+
+    if(sceneObjectA != sceneObjectB)
+    {
+        this->totalNumberOfSceneModels++;
+    }
+
     auto pair = std::make_tuple(sceneObjectA, sceneObjectB);
     std::get<HandlingA>(this->interactionMap[pair]) = contactHandler;
     std::get<HandlingB>(this->interactionMap[pair]) = contactHandler;
@@ -91,18 +101,28 @@ bool CollisionContext::addInteraction(
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::addInteraction(
+void CollisionContext::addInteraction(
     std::shared_ptr< SceneObject > sceneObjectA,
     std::shared_ptr< SceneObject > sceneObjectB)
 {
+    if (!sceneObjectA || !sceneObjectB)
+    {
+        // TODO: log this
+        return;
+    }
+
+    if(sceneObjectA != sceneObjectB)
+    {
+        this->totalNumberOfSceneModels++;
+    }
+
     auto pair = std::make_tuple(sceneObjectA, sceneObjectB);
     this->interactionMap[pair] = std::make_tuple(nullptr, nullptr, nullptr, nullptr, false);
 }
 
 //---------------------------------------------------------------------------
-void CollisionContext::disableInteraction(
-    std::shared_ptr< SceneObject > sceneObject1,
-    std::shared_ptr< SceneObject > sceneObject2)
+void CollisionContext::disableInteraction(std::shared_ptr< SceneObject > sceneObject1,
+                                          std::shared_ptr< SceneObject > sceneObject2)
 {
     auto it = this->interactionMap.find(std::make_tuple(sceneObject1, sceneObject2));
 
@@ -120,46 +140,58 @@ void CollisionContext::disableInteraction(
 
 //---------------------------------------------------------------------------
 void CollisionContext::removeInteraction(
-    std::shared_ptr< SceneObject > sceneObject1,
-    std::shared_ptr< SceneObject > sceneObject2)
+    std::shared_ptr< SceneObject > sceneObjectA,
+    std::shared_ptr< SceneObject > sceneObjectB)
 {
-    auto it = this->interactionMap.find(std::make_tuple(sceneObject1, sceneObject2));
+    if (!sceneObjectA || !sceneObjectB)
+    {
+        // TODO: log this
+        return;
+    }
+
+    auto it = this->interactionMap.find(std::make_tuple(sceneObjectA, sceneObjectB));
 
     if (it == std::end(this->interactionMap))
     {
-        std::cout
-            << "Warning: The interaction to be disabled is not found!"
-            << std::endl;
+        // TODO: Log this
+        return;
     }
 
-    else
-    {
-        this->interactionMap.erase(it);
-    }
+    this->interactionMap.erase(it);
+    this->totalNumberOfSceneModels--;
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::setCollisionDetection(
-    std::shared_ptr< SceneObject > sceneObjectA,
-    std::shared_ptr< SceneObject > sceneObjectB,
-    std::shared_ptr< CollisionDetection > collisionDetection)
+void CollisionContext::
+setCollisionDetection(std::shared_ptr< SceneObject > sceneObjectA,
+                      std::shared_ptr< SceneObject > sceneObjectB,
+                      std::shared_ptr< CollisionDetection > collisionDetection)
 {
+    if (!sceneObjectA || !sceneObjectB || !collisionDetection)
+    {
+        // TODO: log this
+        return;
+    }
     this->addInteraction(sceneObjectA, sceneObjectB, collisionDetection);
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::setContactHandling(
-    std::shared_ptr< SceneObject > sceneObjectA,
-    std::shared_ptr< SceneObject > sceneObjectB,
-    std::shared_ptr< ContactHandling > contactHandler)
+void CollisionContext::
+setContactHandling(std::shared_ptr< SceneObject > sceneObjectA,
+                   std::shared_ptr< SceneObject > sceneObjectB,
+                   std::shared_ptr< ContactHandling > contactHandler)
 {
+    if (!sceneObjectA || !sceneObjectB || !contactHandler)
+    {
+        // TODO: log this
+        return;
+    }
     this->addInteraction(sceneObjectA, sceneObjectB, contactHandler);
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::exist(
-    std::shared_ptr< SceneObject > sceneObject1,
-    std::shared_ptr< SceneObject > sceneObject2)
+bool CollisionContext::exist(std::shared_ptr< SceneObject > sceneObject1,
+                             std::shared_ptr< SceneObject > sceneObject2)
 {
     auto it = this->interactionMap.find(std::make_tuple(sceneObject1, sceneObject2));
     return it != std::end(this->interactionMap);
@@ -194,15 +226,12 @@ void CollisionContext::createAssemblerAdjacencyMatrix()
 
     // set the size of the adjacency matrix
     this->interactionMatrix.resize(numSceneObjects);
-    for (int i = 0; i < numSceneObjects; ++i)
+    for (size_t i = 0; i < numSceneObjects; ++i)
     {
         this->interactionMatrix[i].resize(numSceneObjects);
     }
 
     std::vector<Eigen::Triplet<int>> triplets;
-
-    // Populate the assembly adjacency matrix
-    int i = 0, j = 0;
 
     for (auto & interaction : this->interactionMap)
     {
@@ -224,31 +253,31 @@ void CollisionContext::createAssemblerAdjacencyMatrix()
         }
         else
         {
-            this->interactionMatrix[i.second][j.second] = 1;
+            this->interactionMatrix[i->second][j->second] = 1;
         }
     }
 
-    for (auto & st : this->solveTogether)//
+    for (auto & st : this->modelPairs)//
     {
-        auto objA = this->objectIndexMap.find(st.first);
-        auto objB = this->objectIndexMap.find(st.second);
+        auto i = this->objectIndexMap.find(st.first);
+        auto j = this->objectIndexMap.find(st.second);
 
-        if (objA == std::end(this->objectIndexMap) || objB == std::end(this->objectIndexMap))
+        if (i == std::end(this->objectIndexMap) || j == std::end(this->objectIndexMap))
         {
             std::cout << "Warning: scene object does not have an index" << std::endl;
             continue;
         }
         else
         {
-            this->interactionMatrix[objA.second][objB.second] = 1;
+            this->interactionMatrix[i->second][j->second] = 1;
         }
 
     }
 }
+
 //---------------------------------------------------------------------------
-void CollisionContext::solveTogether(
-    std::shared_ptr< SceneObject > sceneObjectA,
-    std::shared_ptr< SceneObject > sceneObjectB)
+void CollisionContext::solveSimultaneously(std::shared_ptr< SceneObject > sceneObjectA,
+                                           std::shared_ptr< SceneObject > sceneObjectB)
 {
     auto i = this->objectIndexMap.find(sceneObjectA);
     auto j = this->objectIndexMap.find(sceneObjectB);
@@ -259,8 +288,7 @@ void CollisionContext::solveTogether(
     }
     else
     {
-        auto objPair = std::make_pair(sceneObjectA, sceneObjectB);
-        this->solveTogether.push_back(objPair);
+        this->modelPairs.emplace_back(sceneObjectA, sceneObjectB);
     }
 }
 
@@ -272,19 +300,19 @@ bool CollisionContext::configure()
 }
 
 //---------------------------------------------------------------------------
-std::size_t CollisionContext::getNumberOfInterations() const
+std::size_t CollisionContext::getNumberOfInteractions() const
 {
     return this->interactionMap.size();
 }
 
 //---------------------------------------------------------------------------
-CollisionContext::InteractionMapType &CollisionContext::getInteractions() const
+const CollisionContext::InteractionMapType &CollisionContext::getInteractions() const
 {
     return this->interactionMap;
 }
 
 //---------------------------------------------------------------------------
-std::vector< std::shared_ptr< ContactHandling > > CollisionContext::getContactHandlers()
+std::vector<std::shared_ptr<ContactHandling>> CollisionContext::getContactHandlers()
 {
     std::vector<std::shared_ptr<ContactHandling>> handlerList;
 
@@ -318,62 +346,39 @@ void CollisionContext::findIslands()
 
 }
 
-int CollisionContext::getNumOfIslands()
+//---------------------------------------------------------------------------
+size_t CollisionContext::getNumOfIslands()
 {
-    return this->islands->size();
+    return this->islands.size();
 }
 
+//---------------------------------------------------------------------------
 std::vector<std::vector<int>>& CollisionContext::getIslands()
 {
     return this->islands;
 }
 
-std::shared_ptr<SceneObject> CollisionContext::getObjectWithIndex(const int objIndex)
-{
-    for (int i = 0; i < this->objectIndexMap.size(); ++i)
-    {
-        if (this->objectIndexMap.at(i).second == objIndex)
-        {
-            return this->objectIndexMap.at(i).second;
-        }
-    }
-}
-
 //---------------------------------------------------------------------------
-template<typename T>
-int CollisionContext::numberOfInteractions() const
-{
-    int count = 0;
-    auto counter = [&](const InteractionPairDataType &data)
-    {
-        if (std::dynamic_pointer_cast<T>(std::get<HandlingA>(data)) ||
-            std::dynamic_pointer_cast<T>(std::get<HandlingB>(data)))
-        {
-            ++count;
-        }
-    };
-    std::for_each(this->interactionMap.begin(), interactionMap.end(), counter);
-    return count;
-}
-
-//---------------------------------------------------------------------------
-// \todo test
 void CollisionContext::formIslands()
 {
-    int nSceneObj, nIslands;
-    std::vector<bool> visited;
-    visited.resize(nSceneObj);
+    if(this->totalNumberOfSceneModels == 0)
+    {
+        // TODO: Log this
+        return;
+    }
 
-    nIslands = 0;
-    for (int i = 0; i < nSceneObj; i++)
+    std::vector<bool> visited(this->totalNumberOfSceneModels,false);
+
+    int nIslands = 0;
+    for (int i = 0; i < this->totalNumberOfSceneModels; i++)
     {
         if (!visited[i])
         {
-            nIslands++;
             std::vector<int> memberList;
-            appendNeighbors(visited, memberList, i);
-
-            visited[i] = 1;
+            memberList.push_back(i);
+            visited[i] = true;
+            nIslands++;
+            this->appendNeighbors(visited, memberList, i);
 
             this->islands.push_back(memberList);
         }
@@ -382,18 +387,21 @@ void CollisionContext::formIslands()
 
 //---------------------------------------------------------------------------
 // \todo test
-void CollisionContext::appendNeighbors(
-    std::vector<bool>& visited, std::vector<int>& memberList, int row)
+void CollisionContext::appendNeighbors(std::vector<bool>& visited,
+                                       std::vector<int>& memberList,
+                                       int row)
 {
-    for (int i = row; i < interactionMatrix.size(); ++i)// only check the upper triangular matrix for now
+    // NOTE: only check the upper triangular matrix for now
+    for (size_t col = row, end = interactionMatrix.size(); col < end; ++col)
     {
-        if (interactionMatrix[row][i] != 0
-            && std::find(memberList.begin(), memberList.end(), interactionMatrix[row][i]) != memberList.end())
+        const auto &entry = interactionMatrix[row][col];
+        if (entry != 0 &&
+            std::find(std::begin(memberList), std::end(memberList), entry) != memberList.end())
         {
-            memberList.push_back(interactionMatrix[row][i]);
-            if (!visited[interactionMatrix[row][i]])
+            memberList.push_back(interactionMatrix[row][col]);
+            if (!visited[interactionMatrix[row][col]])
             {
-                appendNeighbors(visited, memberList, interactionMatrix[row][i]);
+                this->appendNeighbors(visited, memberList, interactionMatrix[row][col]);
             }
         }
     }
