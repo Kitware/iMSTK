@@ -28,6 +28,7 @@
 #include "Core/MakeUnique.h"
 #include "IO/IOMesh.h"
 #include "Geometry/MeshModel.h"
+#include "Collision/MeshCollisionModel.h"
 
 // Vega includes
 #include "configFile.h"
@@ -134,6 +135,7 @@ VegaConfiguration::VegaConfiguration(const std::string &configurationFile, bool 
     {
         // TODO: Log this.
         std::cout << "Empty configuration filename." << std::endl;
+        return;
     }
 
     this->vegaConfigFile = configurationFile;
@@ -285,6 +287,11 @@ VegaFEMDeformableSceneObject(const std::string &meshFilename,
 }
 
 //---------------------------------------------------------------------------
+VegaFEMDeformableSceneObject::
+VegaFEMDeformableSceneObject() : vegaFemConfig(new VegaConfiguration(""))
+{}
+
+//---------------------------------------------------------------------------
 VegaFEMDeformableSceneObject::~VegaFEMDeformableSceneObject()
 { // This destructor must be defined here
 }
@@ -297,10 +304,14 @@ void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
     meshModel->load(fileName);
 
     this->setPhysicsModel(meshModel);
-    std::cout << "meshmodel = " << meshModel << std::endl;
 
     this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(meshModel->getMesh());
-    std::cout << "volumetricMesh = " << this->volumetricMesh << std::endl;
+
+    auto collisionModel = std::make_shared<MeshCollisionModel>();
+
+    collisionModel->setMesh(this->volumetricMesh->getCollisionMesh());
+
+    this->setCollisionModel(collisionModel);
 
     if(!this->volumetricMesh)
     {

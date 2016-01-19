@@ -3,7 +3,6 @@ simmedtk_add_library(VTKRendering
     VTKViewer.cpp
     VTKMeshRenderDelegate.cpp
     VTKPlaneRenderDelegate.cpp
-    VTKSceneObjectDeformableRenderDelegate.cpp
     VTKStaticSceneObjectRenderDelegate.cpp
     VTKSceneModelRenderDelegate.cpp
     InitVTKRendering.cpp

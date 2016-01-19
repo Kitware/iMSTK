@@ -53,7 +53,7 @@ public:
     VegaFEMDeformableSceneObject(const std::string &meshFilename,
                                  const std::string &vegaConfigFileName);
 
-    VegaFEMDeformableSceneObject() = delete;
+    VegaFEMDeformableSceneObject();
     ~VegaFEMDeformableSceneObject();
 
     ///

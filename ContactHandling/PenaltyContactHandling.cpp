@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "ContactHandling/PenaltyContactHandling.h"
-#include "Simulators/VegaFemSceneObject.h"
 #include "Core/CollisionPair.h"
 
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :

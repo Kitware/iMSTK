@@ -27,26 +27,21 @@
 #include "SimulationManager/SDK.h"
 
 // Include required types scene objects
+#include "Collision/MeshCollisionModel.h"
+#include "Collision/PlaneCollisionModel.h"
+#include "Collision/PlaneToMeshCollision.h"
+#include "ContactHandling/PenaltyContactFemToStatic.h"
+#include "Core/CollisionPair.h"
+#include "Devices/VRPNDeviceServer.h"
+#include "Devices/VRPNForceDevice.h"
+#include "IO/InitIO.h"
+#include "IO/IOMesh.h"
+#include "Mesh/VegaVolumetricMesh.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
-#include "Mesh/VegaVolumetricMesh.h"
-#include "Devices/VRPNForceDevice.h"
-#include "Devices/VRPNDeviceServer.h"
-#include "VirtualTools/ToolCoupler.h"
-
-// Include required simulators
-#include "Simulators/ObjectSimulator.h"
 #include "Simulators/DefaultSimulator.h"
-
-#include "Core/CollisionPair.h"
-#include "Collision/PlaneCollisionModel.h"
-#include "Collision/MeshCollisionModel.h"
-#include "Collision/PlaneToMeshCollision.h"
-
-#include "ContactHandling/PenaltyContactFemToStatic.h"
-
-#include "IO/IOMesh.h"
-#include "IO/InitIO.h"
+#include "Simulators/ObjectSimulator.h"
+#include "VirtualTools/ToolCoupler.h"
 #include "VTKRendering/InitVTKRendering.h"
 
 int main(int ac, char** av)
@@ -62,7 +57,7 @@ int main(int ac, char** av)
     InitIODelegates();
 
     //-------------------------------------------------------
-    // 1. Create an instance of the SoFMIS framework/SDK
+    // 1. Create an instance of the iMSTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
@@ -167,37 +162,34 @@ int main(int ac, char** av)
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
-    auto meshModel = std::make_shared<MeshCollisionModel>();
-
-    auto collisionMesh = volumeMesh->getCollisionMesh();
-    if(collisionMesh)
+    auto meshModel = femObject->getCollisionModel();
+    if(!meshModel)
     {
-        meshModel->setMesh(collisionMesh);
+        std::cout << "There is no collision model attached to this scene object" << std::endl;
     }
+    else
+    {
+        auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
 
-    femObject->setCollisionModel(meshModel);
+        planeMeshCollisionPairs->setModels(meshModel, plane);
 
-    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+        sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    planeMeshCollisionPairs->setModels(meshModel, plane);
+        auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
-    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+        sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
-    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+        //-------------------------------------------------------
+        // Enable contact handling between scene actors 1 and 2
+        //-------------------------------------------------------
+        auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
 
-    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+        planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
-    //-------------------------------------------------------
-    // Enable contact handling between scene actors 1 and 2
-    //-------------------------------------------------------
-    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+        planeToMeshContact->setSceneObjects(staticObject, femObject);
 
-    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
-
-    planeToMeshContact->setSceneObjects(staticObject, femObject);
-
-    sdkSimulator->registerContactHandling(planeToMeshContact);
-
+        sdkSimulator->registerContactHandling(planeToMeshContact);
+    }
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------

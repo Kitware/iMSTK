@@ -17,6 +17,7 @@ target_link_libraries(${Module}UnitTestRunner
     ContactHandling
     Solvers
     SceneModels
+    TimeIntegrators
     )
 
 simple_test(${Module} --reporter=spec)

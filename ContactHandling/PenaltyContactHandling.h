@@ -25,7 +25,6 @@
 
 // SimMedTK includes
 #include "Core/ContactHandling.h"
-#include "Simulators/SceneObjectDeformable.h"
 #include "Core/CollisionPair.h"
 
 /// \brief Penalty based for contact handling

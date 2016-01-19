@@ -1,17 +1,9 @@
 simmedtk_add_library(Simulators
   SOURCES
     DefaultSimulator.cpp
-    SceneObjectDeformable.cpp
-    VegaFemSceneObject.cpp
-    VegaFEMModelSimulator.cpp
-    VegaObjectConfig.cpp
     ObjectSimulator.cpp
   PUBLIC_HEADERS
     DefaultSimulator.h
-    SceneObjectDeformable.h
-    VegaFemSceneObject.h
-    VegaFEMModelSimulator.h
-    VegaObjectConfig.h
     ObjectSimulator.h
 )
 
