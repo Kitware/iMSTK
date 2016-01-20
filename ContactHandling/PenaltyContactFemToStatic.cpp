@@ -69,6 +69,7 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
 
         auto contactInfo = this->getCollisionPairs()->getContacts(model);
         sceneObject->setContactForcesToZero();
+        this->clearContactForces();
         core::Vec3d force;
         core::Vec3d velocityProjection;
         int nodeDofID;
@@ -81,6 +82,7 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
             force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
 
             sceneObject->setContactForce(nodeDofID, contact->point, force);
+            this->setContactForce(contact->index, force);
         }
     }
 }

@@ -337,7 +337,7 @@ std::vector<std::shared_ptr<ContactHandling>> CollisionContext::getContactHandle
         }
     }
 
-    return std::move(handlerList);
+    return handlerList;
 }
 
 //---------------------------------------------------------------------------
@@ -386,7 +386,6 @@ void CollisionContext::formIslands()
 }
 
 //---------------------------------------------------------------------------
-// \todo test
 void CollisionContext::appendNeighbors(std::vector<bool>& visited,
                                        std::vector<int>& memberList,
                                        int row)
@@ -396,12 +395,13 @@ void CollisionContext::appendNeighbors(std::vector<bool>& visited,
     {
         const auto &entry = interactionMatrix[row][col];
         if (entry != 0 &&
-            std::find(std::begin(memberList), std::end(memberList), entry) != memberList.end())
+            std::find(std::begin(memberList), std::end(memberList), entry) != std::end(memberList))
         {
-            memberList.push_back(interactionMatrix[row][col]);
-            if (!visited[interactionMatrix[row][col]])
+            memberList.push_back(col);
+            if (!visited[col])
             {
-                this->appendNeighbors(visited, memberList, interactionMatrix[row][col]);
+                this->appendNeighbors(visited, memberList, col);
+                visited[col] = true;
             }
         }
     }

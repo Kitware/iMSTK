@@ -48,60 +48,54 @@
 class Assembler : public CoreClass
 {
 public:
+    using LinearSystemType = LinearSystem<core::SparseMatrixd>;
+
+public:
     ///
-    /// \brief default constructor
+    /// \brief Default constructor
     ///
-    Assembler();
+    Assembler() = default;
 
     ///
-    /// \brief constructor
+    /// \brief Destructor
     ///
-    Assembler(std::shared_ptr<CollisionContext>& collContext);
+    ~Assembler() = default;
 
     ///
-    /// \brief destructor
+    /// \brief Constructor. Takes a collision context.
     ///
-    ~Assembler();
+    Assembler(std::shared_ptr<CollisionContext> collisionContext);
 
 	///
 	/// \brief consolidate the forces/projectors from type 1 interactions such as
     /// forces from penalty based contact handling
 	///
-    void consolidateType1Interactions();
-
-    ///
-    /// \brief consolidate the forces/projectors from type 2 interactions such as
-    /// lcp
-    ///
-    void updateSubsystems();
-
-    void stackSparseMatrices(SparseMatrixd& parent, SparseMatrixd& addOn);
-    ///
-	/// \brief Get the number of system of equations
-	///
-    int getNumSystemOfEquations() const;
-
-    ///
-    /// \brief Get the number of linear system of equations
-    ///
-    int getNumLinearSystemOfEquations() const;
-
-    ///
-    /// \brief Get the number of Lcp system of equations
-    ///
-    int getNumLcpSystemOfEquations() const;
+    void type1Interactions();
 
 	///
 	/// \brief
 	///
-    void initiateSystemOfEquations();
+    void initSystem();
+
+    ///
+    /// \brief Helper to concatenate the matrix Q into an block of R.
+    ///
+    /// \param Q Submatrix
+    /// \param R Supermatrix
+    /// \param i row offset
+    /// \param j column offset
+    ///
+    void concatenateMatrix(const core::SparseMatrixd &Q, core::SparseMatrixd &R, size_t i, size_t j);
 
 private:
     // inputs
     std::shared_ptr<CollisionContext> collisionContext;
 
     // output
-    std::vector<std::shared_ptr<SystemOfEquations>> systemOfEquationsList;
+    std::vector<std::shared_ptr<LinearSystem<core::SparseMatrixd>>> systemOfEquationsList;
+
+    std::vector<core::SparseMatrixd> A;
+    std::vector<core::Vectord> b;
 };
 
 #endif // SM_ASSEMBLY

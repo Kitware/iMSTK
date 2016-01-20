@@ -23,6 +23,7 @@ target_link_libraries(SceneModels
     VirtualTools
     Solvers
     TimeIntegrators
+    Geometry
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts

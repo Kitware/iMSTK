@@ -259,6 +259,25 @@ public:
     void solveSimultaneously(std::shared_ptr<SceneObject> sceneObjectA,
                              std::shared_ptr<SceneObject> sceneObjectB);
 
+    ///
+    /// \brief Get the scene model associated with ith index if exists.
+    ///
+    /// \param index
+    ///
+    std::shared_ptr<SceneObject> getSceneModel(int index)
+    {
+        auto fn = [=](const std::unordered_map<std::shared_ptr<SceneObject>,int>::value_type& vt)
+        {
+            return vt.second == index;
+        };
+        auto it = std::find_if(std::begin(this->objectIndexMap), std::end(this->objectIndexMap),fn);
+        if(it != std::end(this->objectIndexMap))
+        {
+            return it->first;
+        }
+        return nullptr;
+    }
+
 private:
     std::vector<std::vector<int>> interactionMatrix; ///> Adjacency matrix for the
                                                      ///> assembly graph (undirected)

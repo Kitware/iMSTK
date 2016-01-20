@@ -169,6 +169,7 @@ void SDK::shutDown()
 /// \brief runs the simulator
 void SDK::run()
 {
+    // TODO: Remove this function call.
     this->updateSceneListAll();
     this->initRegisteredModules();
 
@@ -179,6 +180,7 @@ void SDK::run()
     }
 
     // Tell framework threads to shutdown if the viewer returns
+    // TODO: Remove redundant function call.
     this->shutDown();
     this->terminateAll();
 

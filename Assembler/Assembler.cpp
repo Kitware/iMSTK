@@ -22,63 +22,90 @@
 //---------------------------------------------------------------------------
 
 #include "Assembler/Assembler.h"
+#include "Core/ContactHandling.h"
+#include "Core/Model.h"
+#include "TimeIntegrators/OdeSystem.h"
 
-Assembler::Assembler()
-{
-}
-
-Assembler::Assembler(std::shared_ptr<CollisionContext>& collContext)
+Assembler::Assembler(std::shared_ptr<CollisionContext> collContext)
 {
     this->collisionContext = collContext;
-    initiateSystemOfEquations();
+    this->initSystem();
 }
 
-Assembler::~Assembler()
+//---------------------------------------------------------------------------
+void Assembler::type1Interactions()
 {
-}
+    if(!this->collisionContext)
+    {
+        // TODO: Log this
+        return;
+    }
 
-void Assembler::consolidateType1Interactions()
-{
     auto ch = this->collisionContext->getContactHandlers();
 
-    for (auto it = ch.begin(); it != ch.end(); ++it)
+    for(auto &ch : this->collisionContext->getContactHandlers())
     {
-        if ((*it)->getType() == core::ContactHandlingType::Penalty)
+        const auto &forces = ch->getContactForces();
+        auto sceneModel = ch->getSecondSceneObject();
+        sceneModel->updateExternalForces(forces);
+    }
+}
+
+//---------------------------------------------------------------------------
+void Assembler::initSystem()
+{
+    for(auto &rows : this->collisionContext->getIslands())
+    {
+        size_t dofSize = 0;
+        size_t nnz = 0;
+        std::vector<const core::SparseMatrixd*> systemMatrices;
+        std::vector<const core::Vectord*> rhsVector;
+        for(auto &col : rows)
         {
-            (*it)->getFirstSceneObject()->setCumulativeContactForces(
-                std::static_cast<std::shared_ptr<PenaltyContactHandling>>
-                (*it)->getContactForce());
+            auto sceneModel = this->collisionContext->getSceneModel(col);
+            auto odeSystem = std::dynamic_pointer_cast<OdeSystem>(
+                    this->collisionContext->getSceneModel(col));
+            if(sceneModel && odeSystem)
+            {
+                dofSize += sceneModel->getNumOfDOF();
+                systemMatrices.push_back(&odeSystem->getSystemMatrix());
+                rhsVector.push_back(&odeSystem->getRHS());
+                nnz += systemMatrices.back()->nonZeros();
+            }
+        }
+
+        if(dofSize > 0)
+        {
+            this->A.emplace_back(dofSize,dofSize);
+            this->A.back().reserve(nnz);
+            this->b.emplace_back(dofSize);
+            auto system = std::make_shared<LinearSystemType>(this->A.back(),this->b.back());
+
+            this->systemOfEquationsList.push_back(system);
+
+            size_t size = 0;
+            for(size_t i = 0, end = systemMatrices.size(); i < end; ++i)
+            {
+                auto M = systemMatrices[i];
+                auto rhs = rhsVector[i];
+
+                this->concatenateMatrix(*M,this->A.back(),size,size);
+                this->b.back().segment(size,rhs->size());
+
+                size += rhs->size();
+            }
         }
     }
 }
 
-void Assembler::initiateSystemOfEquations()
+//---------------------------------------------------------------------------
+void Assembler::concatenateMatrix(const core::SparseMatrixd &Q, core::SparseMatrixd &R, std::size_t i, std::size_t j)
 {
-    int dofSize;
-    auto islands = this->collisionContext->getIslands();
-
-    for (auto i = islands.begin(); i != islands.end(); ++i)
+    for(size_t k = i; k < i+Q.outerSize(); ++k)
     {
-        dofSize = 0;
-        for (auto j = i->begin(); j != i->end(); ++j)
+        for(core::SparseMatrixd::InnerIterator it(Q,k); it; ++it)
         {
-            dofSize += this->collisionContext->getObjectWithIndex(*j)->getNumDof();
+            R.insert(k,it.col()+j) = it.value();
         }
     }
-}
-
-void Assembler::updateSubsystems()
-{
-
-}
-
-void Assembler::stackSparseMatrices(SparseMatrixd& parent, SparseMatrixd& addOn)
-{
-    int expandedSize = parent.size() + addOn.size();
-    parent.resize(expandedSize, expandedSize);
-
-
-
-    for (int i = 0; i < )
-
 }

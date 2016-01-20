@@ -313,7 +313,7 @@ readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh,
     vertices.clear();
     weigths.clear();
 
-    auto verticesPerElement = this->mesh->getNumElementVertices();
+    const auto verticesPerElement = this->mesh->getNumElementVertices();
 
     int index;
     int v[verticesPerElement];

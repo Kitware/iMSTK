@@ -253,6 +253,21 @@ public:
     ///
     virtual void update(const double /*dt*/);
 
+    ///
+    /// \brief Update cumulative forces
+    ///
+    virtual void updateExternalForces(const std::unordered_map<size_t,core::Vec3d>&);
+
+    ///
+    /// \brief Return the number of nodes for the underlying physics geometric model.
+    ///
+    size_t getNumOfDOF() const;
+
+    ///
+    /// \brief Return the number of nodes for the underlying physics geometric model.
+    ///
+    size_t getNumOfNodes() const;
+
 protected:
     bool hasContactForces;
     bool isActive;
@@ -263,6 +278,10 @@ protected:
     std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
     std::unordered_map<int,core::Vec3d> contactForces;
     std::unordered_map<int,core::Vec3d> contactPoints;
+
+    // Total number of degrees of freedom
+    size_t numOfDOF;
+    size_t numOfNodes;
 };
 
 #endif

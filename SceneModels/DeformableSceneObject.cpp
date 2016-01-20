@@ -37,8 +37,6 @@ DeformableSceneObject::DeformableSceneObject():
     integrationScheme(TimeIntegrator::ImplicitEuler)
 {
     this->gravity = core::Vec3d::UnitY();
-    this->numOfDOF = 0;
-    this->numOfNodes = 0;
 }
 
 //---------------------------------------------------------------------------

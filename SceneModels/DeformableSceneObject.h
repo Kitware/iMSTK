@@ -95,6 +95,19 @@ public:
     ///
     const core::Vec3d &getGravity() const;
 
+    ///
+    /// \brief Update cumulative forces
+    ///
+    void updateExternalForces(const std::unordered_map<size_t,core::Vec3d> &forces)
+    {
+        auto externalForce = core::Matrixd::Map(this->f.data(),3,this->numOfNodes);
+        for(const auto &force : forces)
+        {
+            auto i = force.first;
+            externalForce.col(i) -= force.second;
+        }
+    }
+
 private:
     ///////////////////////////////////////////////////////////////////////////////
     //////////// TODO: These are pure virtual methods from superclass. ////////////
@@ -132,10 +145,6 @@ protected:
 
     // Gravity
     core::Vec3d gravity;
-
-    // Total number of degrees of freedom
-    double numOfDOF;
-    double numOfNodes;
 
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };

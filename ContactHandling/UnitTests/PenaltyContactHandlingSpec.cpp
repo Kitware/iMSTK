@@ -67,10 +67,10 @@ go_bandit([]() {
         it("initializes properly ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             AssertThat(handler != nullptr, IsTrue());
-            AssertThat(handler->getContactHandlingType() == ContactHandlingType::PenaltyFemToStatic, IsTrue());
+            AssertThat(handler->getContactHandlingType() == ContactHandling::PenaltyFemToStatic, IsTrue());
         });
 
-        it("attches a collision pair ", []() {
+        it("attaches a collision pair ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             auto collisionPair  = createSampleCollisionPair();
             handler->setCollisionPairs(collisionPair);

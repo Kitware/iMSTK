@@ -39,6 +39,7 @@ ContactHandling::ContactHandling(const bool typeBilateral)
     type = Unknown;
 };
 
+//---------------------------------------------------------------------------
 ContactHandling::ContactHandling(const bool typeBilateral,
                                      const std::shared_ptr< SceneObject > first,
                                      const std::shared_ptr< SceneObject > second)
@@ -57,6 +58,7 @@ ContactHandling::ContactHandling(const bool typeBilateral,
     type = Unknown;
 }
 
+//---------------------------------------------------------------------------
 ContactHandling::~ContactHandling()
 {
 }
@@ -69,32 +71,62 @@ void ContactHandling::setSceneObjects(const std::shared_ptr< SceneObject > first
     collidingSceneObjects.second = second;
 }
 
+//---------------------------------------------------------------------------
 void ContactHandling::setCollisionPairs(const std::shared_ptr< CollisionManager > colPair)
 {
     collisionPair = colPair;
 }
 
+//---------------------------------------------------------------------------
 std::shared_ptr<CollisionManager> ContactHandling::getCollisionPairs() const
 {
     return collisionPair;
 }
 
+//---------------------------------------------------------------------------
 ContactHandling::MethodType ContactHandling::getContactHandlingType() const
 {
     return type;
 }
 
+//---------------------------------------------------------------------------
 std::shared_ptr<SceneObject> ContactHandling::getFirstSceneObject() const
 {
 	return this->collidingSceneObjects.first;
 }
 
+//---------------------------------------------------------------------------
 std::shared_ptr<SceneObject> ContactHandling::getSecondSceneObject() const
 {
   return this->collidingSceneObjects.second;
 }
 
+//---------------------------------------------------------------------------
 bool ContactHandling::isUnilateral() const
 {
     return !isBilateral;
+}
+
+//---------------------------------------------------------------------------
+std::unordered_map< size_t, core::Vec3d> &ContactHandling::getContactForces()
+{
+    return this->contactForces;
+}
+
+//---------------------------------------------------------------------------
+const std::unordered_map< size_t,core::Vec3d> &ContactHandling::getContactForces() const
+{
+    return this->contactForces;
+}
+
+//---------------------------------------------------------------------------
+void ContactHandling::setContactForce(const size_t dofID, const core::Vec3d &force)
+{
+    this->contactForces[dofID] = force;
+}
+
+//---------------------------------------------------------------------------
+void ContactHandling::clearContactForces()
+{
+    this->contactForces.clear();
 }

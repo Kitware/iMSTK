@@ -294,6 +294,7 @@ if(SimMedTK_USE_OCULUS)
   list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
+add_subdirectory(Assembler)
 add_subdirectory(Collision)
 add_subdirectory(CollisionContext)
 add_subdirectory(ContactHandling)

@@ -36,6 +36,8 @@ SceneObject::SceneObject()
     this->type = core::ClassType::Unknown;
     this->objectSim = nullptr;
     this->name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
+    this->numOfDOF = 0;
+    this->numOfNodes = 0;
 
     this->setRenderDelegate(
         Factory<RenderDelegate>::createConcreteClassForGroup(
@@ -224,4 +226,21 @@ std::shared_ptr< Model > SceneObject::getPhysicsModel()
 //---------------------------------------------------------------------------
 void SceneObject::update(const double)
 {
+}
+
+//---------------------------------------------------------------------------
+void SceneObject::updateExternalForces(const std::unordered_map<size_t,core::Vec3d>&)
+{
+}
+
+//---------------------------------------------------------------------------
+std::size_t SceneObject::getNumOfDOF() const
+{
+    return this->numOfDOF;
+}
+
+//---------------------------------------------------------------------------
+std::size_t SceneObject::getNumOfNodes() const
+{
+    return this->numOfNodes;
 }

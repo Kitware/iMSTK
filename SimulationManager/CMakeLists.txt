@@ -13,6 +13,7 @@ simmedtk_add_library(SimulationManager
 target_link_libraries(SimulationManager
   PRIVATE
     Core
+    Simulators
     )
 
 if(BUILD_TESTING)
