@@ -21,37 +21,37 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#include <bandit/bandit.h>
-#include <memory>
-#include <iostream>
+#ifndef READ_PATHS_H
+#define READ_PATHS_H
 
-// SimMedTK includes
-#include "SceneModels/VegaFEMDeformableSceneObject.h"
-#include "IO/InitIO.h"
-#include "Testing/ReadPaths.h"
+#include <fstream>
+#include <tuple>
 
-using namespace bandit;
-using namespace core;
-
-go_bandit([]()
+namespace imstk
 {
-    InitIODelegates();
-    auto paths = imstk::ReadPaths("./SceneModelsConfig.paths");
 
-    describe("Vega Deformable Scene Object", [&]()
+enum Path { Source = 0, Binary };
+
+static std::tuple<std::string, std::string> ReadPaths(const std::string &configFile)
+{
+    std::fstream stream(configFile);
+    static std::string source;
+    static std::string binary;
+
+    if(stream.is_open())
     {
-        auto sceneObject = std::make_shared<VegaFEMDeformableSceneObject>(std::get<imstk::Path::Binary>(paths)+"/box.veg",
-                                                                          std::get<imstk::Path::Binary>(paths)+"/box.config");
-        it("constructs", [&]()
-        {
-            AssertThat(sceneObject != nullptr, IsTrue());
-        });
-        it("updates", [&]()
-        {
+        stream >> source;
+        stream >> binary;
+    }
+    else
+    {
+        std::cerr << "Error opening file " << configFile << "." << std::endl;
+    }
 
-            sceneObject->update(0.01);
+    return std::make_tuple(source, binary);
+}
 
-        });
-     });
+}
 
-});
+
+#endif

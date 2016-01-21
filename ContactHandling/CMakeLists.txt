@@ -14,6 +14,7 @@ target_link_libraries(ContactHandling
     Collision
     Simulators
     Solvers
+    SceneModels
 )
 
 if(BUILD_TESTING)

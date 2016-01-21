@@ -19,6 +19,7 @@ target_link_libraries(VTKRendering
     Mesh
     Geometry
     Devices
+    SceneModels
   PUBLIC
     ${VTK_LIBRARIES}
     )

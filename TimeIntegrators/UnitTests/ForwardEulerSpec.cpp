@@ -77,7 +77,7 @@ go_bandit([]()
         odeSystem->setInitialState(initialState);
         euler->setSystem(odeSystem.get());
 
-        it("solves dx/dt=lambda*x, x(0)=a ", [&]()
+        it("solves dx/dt-lambda*x=0, x(0)=a ", [&]()
         {
             // Find the solution for t = [0,1)
             OdeSystemState state, newState;

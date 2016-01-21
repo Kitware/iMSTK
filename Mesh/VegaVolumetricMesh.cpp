@@ -316,8 +316,8 @@ readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh,
     const auto verticesPerElement = this->mesh->getNumElementVertices();
 
     int index;
-    int v[verticesPerElement];
-    double w[verticesPerElement];
+    std::vector<int> v(verticesPerElement,0.0);
+    std::vector<double> w(verticesPerElement,0.0);
 
     while(fileStream >> index
             >> v[0] >> w[0]

@@ -14,4 +14,7 @@ target_link_libraries(Assembler
     Event
 	ContactHandling
 	Simulators
+	CollisionContext
+	TimeIntegrators
+	SceneModels
 )

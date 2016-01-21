@@ -23,35 +23,20 @@
 
 #include <bandit/bandit.h>
 #include <memory>
-#include <iostream>
 
 // SimMedTK includes
-#include "SceneModels/VegaFEMDeformableSceneObject.h"
-#include "IO/InitIO.h"
-#include "Testing/ReadPaths.h"
+
+#include "CollisionContext/CollisionContext.h"
 
 using namespace bandit;
-using namespace core;
 
-go_bandit([]()
-{
-    InitIODelegates();
-    auto paths = imstk::ReadPaths("./SceneModelsConfig.paths");
+go_bandit([](){
+    describe("Vega Volumetric Mesh", []() {
 
-    describe("Vega Deformable Scene Object", [&]()
-    {
-        auto sceneObject = std::make_shared<VegaFEMDeformableSceneObject>(std::get<imstk::Path::Binary>(paths)+"/box.veg",
-                                                                          std::get<imstk::Path::Binary>(paths)+"/box.config");
-        it("constructs", [&]()
-        {
-            AssertThat(sceneObject != nullptr, IsTrue());
-        });
-        it("updates", [&]()
-        {
+    it("constructs", []() {
+        auto collisionContext = std::make_shared<CollisionContext>();
+        AssertThat(collisionContext != nullptr, IsTrue());
+    });
 
-            sceneObject->update(0.01);
-
-        });
-     });
-
+    });
 });

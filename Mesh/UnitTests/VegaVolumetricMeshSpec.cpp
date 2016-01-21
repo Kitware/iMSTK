@@ -29,17 +29,17 @@
 #include "Mesh/SurfaceMesh.h"
 #include "IO/IOMesh.h"
 #include "IO/InitIO.h"
-
-const std::string vegaMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
+#include "Testing/ReadPaths.h"
 
 using namespace bandit;
 
 go_bandit([](){
-
     InitIODelegates();
-    describe("Vega Volumetric Mesh", []() {
+    auto paths = imstk::ReadPaths("./MeshConfig.paths");
+
+    describe("Vega Volumetric Mesh", [&]() {
         auto ioMesh = std::make_shared<IOMesh>();
-        ioMesh->read(vegaMeshFileName);
+        ioMesh->read(std::get<imstk::Path::Source>(paths)+"/SampleMesh.veg");
         auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
 
         it("constructs", []() {

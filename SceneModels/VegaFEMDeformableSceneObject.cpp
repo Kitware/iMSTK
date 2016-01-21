@@ -363,6 +363,7 @@ void VegaFEMDeformableSceneObject::initialize()
     this->initTangentStiffnessMatrix();
 
     this->gravityForce.resize(this->numOfDOF);
+    this->gravityForce.setZero();
     this->gravity *= this->vegaFemConfig->floatsOptionMap.at("gravity");
     this->volumetricMesh->computeGravity(this->gravity,this->gravityForce);
 }

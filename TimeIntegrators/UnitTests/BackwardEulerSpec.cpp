@@ -47,7 +47,7 @@ go_bandit([]()
         core::Vectord y;
         auto F = [&](const OdeSystemState &x) -> const core::Vectord&
         {
-            y = lambda*x.getVelocities();
+            y = -lambda*x.getVelocities();
             return y;
         };
 
@@ -99,7 +99,7 @@ go_bandit([]()
         odeSystem->setInitialState(initialState);
         euler->setSystem(odeSystem.get());
 
-        it("solves dx/dt=lambda*x, x(0)=a ", [&]()
+        it("solves dx/dt-lambda*x=0, x(0)=a ", [&]()
         {
             // Find the solution for t = [0,1)
             OdeSystemState state, newState;
@@ -116,9 +116,6 @@ go_bandit([]()
                 sol(i) = state.getVelocities()(0);
                 error(i) = sol(i)-std::exp(lambda*i*dt);
             }
-
-            std::cout << error << std::endl;
-
             AssertThat(error.norm(), IsLessThan(dt*steps));
         });
     });

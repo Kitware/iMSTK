@@ -21,6 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#ifndef TEST_MESH_H
+#define TEST_MESH_H
+
 #include <memory>
 
 #include "Mesh/SurfaceMesh.h"
@@ -77,3 +80,5 @@ std::shared_ptr<SurfaceMesh> makeSurfaceMesh()
 
     return mesh;
 }
+
+#endif

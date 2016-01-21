@@ -30,16 +30,19 @@
 #include "IO/IOMesh.h"
 #include "IO/InitIO.h"
 #include "Core/MakeUnique.h"
+#include "Testing/ReadPaths.h"
 
-const std::string ds3MeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.3ds";
-const std::string objMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/cube.obj";
-const std::string vegMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/SampleMesh.veg";
-const std::string plyMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.ply";
-const std::string stlMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.stl";
-const std::string vtkMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtk";
-const std::string vtuMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtu";
-const std::string vtuPropFileName = "@CMAKE_BINARY_DIR@/Testing/Models/TestMesh.vtu";
-const std::string vtpMeshFileName = "@CMAKE_SOURCE_DIR@/Testing/Models/sphere.vtp";
+auto paths = imstk::ReadPaths("./IOConfig.paths");
+
+const std::string ds3MeshFileName = std::get<imstk::Path::Source>(paths)+"/cube.3ds";
+const std::string objMeshFileName = std::get<imstk::Path::Source>(paths)+"/cube.obj";
+const std::string vegMeshFileName = std::get<imstk::Path::Source>(paths)+"/SampleMesh.veg";
+const std::string plyMeshFileName = std::get<imstk::Path::Source>(paths)+"/sphere.ply";
+const std::string stlMeshFileName = std::get<imstk::Path::Source>(paths)+"/sphere.stl";
+const std::string vtkMeshFileName = std::get<imstk::Path::Source>(paths)+"/sphere.vtk";
+const std::string vtuMeshFileName = std::get<imstk::Path::Source>(paths)+"/sphere.vtu";
+const std::string vtuPropFileName = std::get<imstk::Path::Binary>(paths)+"/TestMesh.vtu";
+const std::string vtpMeshFileName = std::get<imstk::Path::Source>(paths)+"/sphere.vtp";
 
 using namespace bandit;
 

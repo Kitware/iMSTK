@@ -15,3 +15,7 @@ target_link_libraries(CollisionContext
     Simulators
 	ContactHandling
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()
