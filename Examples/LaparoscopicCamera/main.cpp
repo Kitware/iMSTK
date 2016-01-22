@@ -1,3 +1,22 @@
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
+// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
+//                        Rensselaer Polytechnic Institute
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 //---------------------------------------------------------------------------
 //
 // Camera navigation application build on iMSTK
@@ -163,7 +182,7 @@ bool createCameraNavigationScene(
 
     Color planeColor(0.4, 0.4, 0.4, 1.0);
 
-    auto planeRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+    auto planeRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_NORMALS);
     planeRenderDetail->setAmbientColor(planeColor);
     planeRenderDetail->setDiffuseColor(planeColor);
     planeRenderDetail->setSpecularColor(planeColor);
@@ -186,10 +205,10 @@ bool createCameraNavigationScene(
 
     Color meshColor(0.32, 0.32, 0.32, 1.0);
 
-    std::shared_ptr<RenderDetail> targetRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_TEXTURE);
+    std::shared_ptr<RenderDetail> targetRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_TEXTURE);
     targetRenderDetail->addTexture("target", targetFileName, "", "");
 
-    std::shared_ptr<RenderDetail> blockRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_NORMALS);
+    std::shared_ptr<RenderDetail> blockRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_NORMALS);
     blockRenderDetail->setAmbientColor(meshColor);
     blockRenderDetail->setDiffuseColor(meshColor);
     blockRenderDetail->setSpecularColor(meshColor);
@@ -393,16 +412,16 @@ int main()
 
     // Set Render details
     viewer->setViewerRenderDetail(
-        SIMMEDTK_VIEWERRENDER_GLOBALAXIS
-        | SIMMEDTK_VIEWERRENDER_FADEBACKGROUND
-        | SIMMEDTK_DISABLE_MOUSE_INTERACTION
+        IMSTK_VIEWERRENDER_GLOBALAXIS
+        | IMSTK_VIEWERRENDER_FADEBACKGROUND
+        | IMSTK_DISABLE_MOUSE_INTERACTION
         );
 
     //-------------------------------------------------------
     // Set up the scene
     //-------------------------------------------------------
     std::shared_ptr<Scene> scene = sdk->getScene(0);
-    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
+    viewer->registerScene(scene, IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Create camera navigation scene
     createCameraNavigationScene(scene, "./CameraNavAppData/target.png");

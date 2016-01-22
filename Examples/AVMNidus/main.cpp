@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include <memory>
 
-// Core SimMedTK includes
+// Core iMSTK includes
 #include "SimulationManager/SDK.h"
 
 // Include required types scene objects
@@ -55,7 +51,7 @@ int main(int ac, char **av)
     InitIODelegates();
 
     //-------------------------------------------------------
-    // 1. Create an instance of the SimMedTK framework/SDK
+    // 1. Create an instance of the iMSTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
@@ -124,8 +120,8 @@ int main(int ac, char **av)
     auto viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-                                SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
-                                SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+                                IMSTK_VIEWERRENDER_FADEBACKGROUND |
+                                IMSTK_VIEWERRENDER_GLOBAL_AXIS;
 
     viewer->setGlobalAxisLength(0.8);
 

@@ -1,5 +1,5 @@
 ###########################################
-SimMedTK: Simulations for Medicine Tool Kit
+iMSTK: Simulations for Medicine Tool Kit
 ###########################################
 
 .. highlight:: c++
@@ -7,7 +7,7 @@ SimMedTK: Simulations for Medicine Tool Kit
 .. role:: cxx(code)
    :language: c++
 
-.. findimage:: SimMedTK-logo.*
+.. findimage:: iMSTK-logo.*
 
 Contents:
 

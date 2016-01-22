@@ -1,6 +1,23 @@
 ###########################################################################
-# Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
+#
+# Copyright (c) Kitware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
 ###########################################################################
+#
+# VTK
+#
 
 set(VTK_VERSION_NUM 6.3)
 # set(VTK_TAG v${VTK_VERSION_NUM}.0)
@@ -22,7 +39,7 @@ endif()
 set(VTK_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(VTK)
+iMSTKCheckDependencies(VTK)
 
 set(proj VTK)
 if(NOT DEFINED ${proj}_DIR)
@@ -50,8 +67,8 @@ if(NOT DEFINED ${proj}_DIR)
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/SimMedTK-build
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/iMSTK-build
+      -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
       -DVTK_Group_StandAlone:BOOL=OFF
@@ -78,11 +95,11 @@ if(NOT DEFINED ${proj}_DIR)
 #     LOG_TEST 1                # Wrap test in script to log output
 #     LOG_INSTALL 1             # Wrap install in script to log output
     )
-  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SimMedTK-build/lib/cmake/vtk-${VTK_VERSION_NUM})
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/iMSTK-build/lib/cmake/vtk-${VTK_VERSION_NUM})
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SimMedTK-build/include/vtk-${VTK_VERSION_NUM}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DVTK_DIR:PATH=${${proj}_DIR})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/iMSTK-build/include/vtk-${VTK_VERSION_NUM}/${sep}${iMSTK_CMAKE_INCLUDE_PATH})
+list(APPEND iMSTK_SUPERBUILD_EP_ARGS -DVTK_DIR:PATH=${${proj}_DIR})

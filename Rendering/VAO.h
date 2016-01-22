@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,22 +16,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMVAO_H
-#define SMVAO_H
+#ifndef RENDERING_VAO_H
+#define RENDERING_VAO_H
 
 // STL includes
 #include <cassert>
 #include <unordered_map>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/BaseMesh.h"
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
@@ -74,7 +70,7 @@ class VAO: public CoreClass
 {
 public:
     /// \brief need error log and totalBuffer Size
-    VAO(std::shared_ptr<ErrorLog> p_log, VBOType p_vboType = SIMMEDTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
+    VAO(std::shared_ptr<ErrorLog> p_log, VBOType p_vboType = IMSTK_VBO_DYNAMIC, bool p_bindShaderObjects = true);
 
     /// \brief set internal buffer manually. type, attrib name, number of elements and pointer to the data
     void setBufferData(VBOBufferType p_type, std::string p_ShaderAttribName, int p_nbrElements, void *p_ptr);
@@ -115,9 +111,9 @@ public:
 public:
     GLuint vaObject;
     int totalNbrBuffers;
-    GLuint bufferIndices[SIMMEDTK_MAX_VBOBUFFERS];
+    GLuint bufferIndices[IMSTK_MAX_VBOBUFFERS];
     int indexBufferLocation;///stores the index buffer location in the bufferIndices array to easy access
-    VBOBufferEntryInfo bufferInfo[SIMMEDTK_MAX_VBOBUFFERS];
+    VBOBufferEntryInfo bufferInfo[IMSTK_MAX_VBOBUFFERS];
     VBOType vboType;
     ///All VBOs are stored here
     static std::unordered_map<int, std::shared_ptr<VAO>> VAOs;

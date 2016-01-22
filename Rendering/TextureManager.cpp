@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Rendering/TextureManager.h"
 #include "Rendering/GLUtils.h"
@@ -46,14 +42,14 @@ TextureReturnType TextureManager::initGLTextures()
 
         glEnable(GL_TEXTURE_2D);
 
-        if (texture->imageColorType == SIMMEDTK_IMAGECOLOR_DEPTH)
+        if (texture->imageColorType == IMSTK_IMAGECOLOR_DEPTH)
         {
             initDepthTexture(texture);
 
             continue;
         }
 
-        if (texture->imageColorType == SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA)
+        if (texture->imageColorType == IMSTK_IMAGECOLOR_OFFSCREENRGBA)
         {
             initColorTexture(texture);
 
@@ -89,7 +85,7 @@ TextureReturnType TextureManager::initGLTextures()
 
     isInitializedGL = true;
 
-    return  SIMMEDTK_TEXTURE_OK;
+    return  IMSTK_TEXTURE_OK;
 }
 /// \brief
 TextureReturnType TextureManager::addTexture(const std::string& p_fileName, const std::string& p_textureReferenceName)
@@ -97,12 +93,12 @@ TextureReturnType TextureManager::addTexture(const std::string& p_fileName, cons
     if(p_fileName.length() == 0 || p_textureReferenceName.length() == 0)
     {
         std::cerr << "TextureManager: Invalid file names." << std::endl;
-        return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
+        return IMSTK_TEXTURE_IMAGELOADINGERROR;
     }
 
 //     if (!isInitialized)
 //     {
-//         return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
+//         return IMSTK_TEXTURE_DRIVERNOTINITIALIZED;
 //     }
 
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
@@ -112,7 +108,7 @@ TextureReturnType TextureManager::addTexture(const std::string& p_fileName, cons
     textures.push_back(texture);
     activeTextures = textures.size()-1;
     textureIndexId[p_textureReferenceName] = activeTextures;
-    return SIMMEDTK_TEXTURE_OK;
+    return IMSTK_TEXTURE_OK;
 }
 /// \brief load the texture and associated it with reference name.
 /// Also you could use texture Id for activation of the texture
@@ -120,7 +116,7 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName,
         const std::string& p_textureReferenceName, int &p_textureId)
 {
     TextureReturnType ret = loadTexture(p_fileName, p_textureReferenceName, true);
-    if (ret == SIMMEDTK_TEXTURE_OK)
+    if (ret == IMSTK_TEXTURE_OK)
     {
         p_textureId = textureIndexId[p_textureReferenceName];
     }
@@ -133,12 +129,12 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName, con
     if(p_fileName.length() == 0 || p_textureReferenceName.length() == 0)
     {
         std::cerr << "TextureManager: Invalid file names." << std::endl;
-        return SIMMEDTK_TEXTURE_IMAGELOADINGERROR;
+        return IMSTK_TEXTURE_IMAGELOADINGERROR;
     }
 
     //if (!isInitialized)
     //{
-    //    return SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED;
+    //    return IMSTK_TEXTURE_DRIVERNOTINITIALIZED;
     //}
 
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
@@ -146,7 +142,7 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName, con
     if (false == texture->image.loadFromFile(p_fileName))
     {
         std::cout << "[TextureManager::loadTexture] Texture not found: \"" << p_fileName << "\"\n";
-        return SIMMEDTK_TEXTURE_NOTFOUND;
+        return IMSTK_TEXTURE_NOTFOUND;
     }
 
     if (p_flipImage)
@@ -163,7 +159,7 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName, con
     textures.push_back(texture);
     activeTextures = textures.size()-1;
     textureIndexId[p_textureReferenceName] = activeTextures;
-    return SIMMEDTK_TEXTURE_OK;
+    return IMSTK_TEXTURE_OK;
 }
 
 /// \brief if the texture is not loaded previously, create and the texture return the id
@@ -175,10 +171,10 @@ TextureReturnType TextureManager::findTextureId(const std::string& p_textureRefe
     if(it == std::end(textureIndexId))
     {
         p_textureId = -1;
-        return SIMMEDTK_TEXTURE_NOTFOUND;
+        return IMSTK_TEXTURE_NOTFOUND;
     }
     p_textureId = it->second;
-    return SIMMEDTK_TEXTURE_OK;
+    return IMSTK_TEXTURE_OK;
 }
 
 /// \brief  activate the texture with given texture reference name
@@ -321,7 +317,7 @@ void TextureManager::createDepthTexture(const std::string& p_textureReferenceNam
     texture->width = p_width;
     texture->GLtype = GL_TEXTURE_2D;
     texture->textureFileName = p_textureReferenceName;
-    texture->imageColorType = SIMMEDTK_IMAGECOLOR_DEPTH;
+    texture->imageColorType = IMSTK_IMAGECOLOR_DEPTH;
     textures.push_back(texture);
     activeTextures = textures.size()-1;
     textureIndexId[p_textureReferenceName] = activeTextures;
@@ -365,7 +361,7 @@ void TextureManager::createColorTexture(const std::string& p_textureReferenceNam
     texture->width = p_width;
     texture->GLtype = GL_TEXTURE_2D;
     texture->textureFileName = p_textureReferenceName;
-    texture->imageColorType = SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA;
+    texture->imageColorType = IMSTK_IMAGECOLOR_OFFSCREENRGBA;
     textures.push_back(texture);
     activeTextures = textures.size()-1;
     textureIndexId[p_textureReferenceName] = activeTextures;

@@ -1,10 +1,10 @@
 [hooks]
 	url = http://public.kitware.com/GitSetup.git
 [upstream]
-	url = https://gitlab.kitware.com/SimMedTK/SimMedTK.git
+	url = https://gitlab.kitware.com/iMSTK/iMSTK.git
 [gitlab]
 	host = gitlab.kitware.com
-	group-path = SimMedTK
-	group-name = SimMedTK
-	project-path = SimMedTK
-	project-name = SimMedTK
+	group-path = iMSTK
+	group-name = iMSTK
+	project-path = iMSTK
+	project-name = iMSTK

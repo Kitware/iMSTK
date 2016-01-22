@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include <bandit/bandit.h>
 #include <memory>
@@ -35,16 +31,20 @@
 #include "Solvers/NewtonMethod.h"
 #include "Core/Matrix.h"
 #include "Testing/ReadSparseMatrix.h"
+#include "Testing/ReadPaths.h"
 
 using namespace bandit;
 using namespace core;
 
+
+auto paths = imstk::ReadPaths("./SolversConfig.paths");
+
 const std::array<std::string,4> matrixFileNames =
 {
-    "@CMAKE_BINARY_DIR@/Testing/MatrixData/662_bus.mtx",
-    "@CMAKE_BINARY_DIR@/Testing/MatrixData/494_bus.mtx",
-    "@CMAKE_BINARY_DIR@/Testing/MatrixData/685_bus.mtx",
-    "@CMAKE_BINARY_DIR@/Testing/MatrixData/1138_bus.mtx",
+    std::get<imstk::Path::Binary>(paths)+"/662_bus.mtx",
+    std::get<imstk::Path::Binary>(paths)+"/494_bus.mtx",
+    std::get<imstk::Path::Binary>(paths)+"/685_bus.mtx",
+    std::get<imstk::Path::Binary>(paths)+"/1138_bus.mtx",
 };
 
 template<typename SolverType>

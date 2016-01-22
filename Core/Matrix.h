@@ -1,4 +1,4 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //            Rensselaer Polytechnic Institute
 //
@@ -21,8 +21,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMMATRIX_H
-#define SMMATRIX_H
+#ifndef CORE_MATRIX_H
+#define CORE_MATRIX_H
 
 // STL includes
 #include<vector>
@@ -144,4 +144,4 @@ void conjugateGradient(const Eigen::SparseMatrix<T,StorageType> &A,
 
 } // Core
 
-#endif // SMMATRIX_H
+#endif // CORE_MATRIX_H

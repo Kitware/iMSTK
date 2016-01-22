@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMEVENTHANDLER_H
-#define SMEVENTHANDLER_H
+#ifndef CORE_EVENTHANDLER_H
+#define CORE_EVENTHANDLER_H
 
 // STL includes
 #include <functional>
@@ -32,7 +28,7 @@
 #include <list>
 #include <algorithm>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Event.h"
 
 class CoreClass;
@@ -146,4 +142,4 @@ private:
 
 } // core namespace
 
-#endif // SMEVENTHANDLER_H
+#endif // CORE_EVENTHANDLER_H

@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,7 +17,7 @@
 ###########################################################################
 
 #! \brief Automatically create dependencies between external projects.
-macro(SimMedTKCheckDependencies proj)
+macro(iMSTKCheckDependencies proj)
   # Set indent variable if needed
   if(NOT DEFINED __indent)
     set(__indent "")
@@ -72,7 +71,7 @@ endmacro()
 #! Doing so allows to keep the external project dependency system happy.
 #!
 #! \ingroup CMakeUtilities
-macro(SimMedTKEmptyExternalProject proj dependencies)
+macro(iMSTKEmptyExternalProject proj dependencies)
 
   ExternalProject_Add(${proj}
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}

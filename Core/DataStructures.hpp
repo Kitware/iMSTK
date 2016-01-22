@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMDATASTUCTURES_HPP
-#define SMDATASTUCTURES_HPP
+#ifndef CORE_DATASTUCTURES_HPP
+#define CORE_DATASTUCTURES_HPP
 
 #include <iostream>
 
@@ -132,7 +128,7 @@ Hash<T>::Hash( int p_tableSize )
     num_prim = 0;
 }
 template<typename T>
-SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex )
+IMSTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex )
 {
     EntryList<T> *currentBucket;
     EntryList<T> *prevBucket;
@@ -147,7 +143,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex 
             break;
         }
 
-        if ( emptySpace == nullptr && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
+        if ( emptySpace == nullptr && currentBucket->totalEntries < IMSTK_HASHBUCKET_SIZE )
         {
             emptySpace = currentBucket;
             break;
@@ -163,7 +159,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex 
         prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries] = p_triangle;
         prevBucket->p_entry->totalEntries++;
         num_prim++;
-        return  SIMMEDTK_HASH_ALLOCATED_INSERTED;
+        return  IMSTK_HASH_ALLOCATED_INSERTED;
     }
     else
     {
@@ -172,10 +168,10 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::insert( T p_triangle, unsigned int hashIndex 
     }
 
     num_prim++;
-    return SIMMEDTK_HASH_ENTRYINSERTED;
+    return IMSTK_HASH_ENTRYINSERTED;
 }
 template<typename T>
-SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int hashIndex )
+IMSTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int hashIndex )
 {
     EntryList<T> *currentBucket;
     EntryList<T> *prevBucket;
@@ -192,10 +188,10 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
 
         if ( checkIdentical( *currentBucket, p_triangle ) )
         {
-            return SIMMEDTK_HASH_ENTRYALREADYEXISTS;
+            return IMSTK_HASH_ENTRYALREADYEXISTS;
         }
 
-        if ( emptySpace == nullptr && currentBucket->totalEntries < SIMMEDTK_HASHBUCKET_SIZE )
+        if ( emptySpace == nullptr && currentBucket->totalEntries < IMSTK_HASHBUCKET_SIZE )
         {
             emptySpace = currentBucket;
             break;
@@ -211,7 +207,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
         prevBucket->p_entry->ID[prevBucket->p_entry->totalEntries] = p_triangle;
         prevBucket->p_entry->totalEntries++;
         num_prim++;
-        return SIMMEDTK_HASH_ALLOCATED_INSERTED;
+        return IMSTK_HASH_ALLOCATED_INSERTED;
     }
     else
     {
@@ -220,7 +216,7 @@ SIMMEDTK_HASHRETURN_CODES Hash<T>::checkAndInsert( T p_triangle, unsigned int ha
     }
 
     num_prim++;
-    return SIMMEDTK_HASH_ENTRYINSERTED;
+    return IMSTK_HASH_ENTRYINSERTED;
 }
 template<typename T>
 void Hash<T>::startIteration()

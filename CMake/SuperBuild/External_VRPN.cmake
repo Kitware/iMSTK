@@ -1,6 +1,23 @@
 ###########################################################################
-# Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
+#
+# Copyright (c) Kitware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
 ###########################################################################
+#
+# VRPN
+#
 
 set(VRPN_TAG 807ec7ac6453938af4b0ebeacfce864b37b149ee)
 set(VRPN_REPOSITORY https://github.com/vrpn/vrpn.git)
@@ -18,22 +35,22 @@ if(DEFINED VRPN_DIR AND NOT EXISTS ${VRPN_DIR})
 endif()
 
 set(VRPN_DEPENDENCIES "")
-if(SimMedTK_USE_FALCON)
+if(iMSTK_USE_FALCON)
     set(VRPN_DEPENDENCIES "LibNifalcon;${VRPN_DEPENDENCIES}")
 endif()
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(VRPN)
+iMSTKCheckDependencies(VRPN)
 
 set(proj VRPN)
 
 if(NOT DEFINED ${proj}_DIR)
   set(VRPN_EP_ARGS)
-  if(SimMedTK_USE_FALCON)
+  if(iMSTK_USE_FALCON)
       list(APPEND VRPN_EP_ARGS
           -DVRPN_USE_LIBNIFALCON:BOOL=ON
           -DLibNifalcon_DIR=${LibNifalcon_DIR}
-          -DCMAKE_INCLUDE_PATH=${SimMedTK_CMAKE_INCLUDE_PATH}
+          -DCMAKE_INCLUDE_PATH=${iMSTK_CMAKE_INCLUDE_PATH}
           )
   endif()
 
@@ -64,11 +81,11 @@ if(NOT DEFINED ${proj}_DIR)
         -DVRPN_BUILD_SERVERS:BOOL=ON
         -DVRPN_USE_HID:BOOL=ON
         )
-    if(SimMedTK_USE_PHANTOM_OMNI)
+    if(iMSTK_USE_PHANTOM_OMNI)
         list(APPEND SERVER_ARGS
             -DVRPN_USE_HDAPI:BOOL=ON
             -DVRPN_USE_PHANTOM_SERVER:BOOL=ON)
-    endif(SimMedTK_USE_PHANTOM_OMNI)
+    endif(iMSTK_USE_PHANTOM_OMNI)
   endif()
 
 #   message(STATUS "Adding project:${proj}")
@@ -85,8 +102,8 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
-      -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
+      -DCMAKE_INCLUDE_PATH:STRING=${iMSTK_CMAKE_INCLUDE_PATH}
+      -DCMAKE_LIBRARY_PATH:STRING=${iMSTK_CMAKE_LIBRARY_PATH}
       -DVRPN_SUBPROJECT_BUILD:BOOL=ON
       -DVRPN_BUILD_CLIENTS:BOOL=OFF
       -DVRPN_BUILD_SERVERS:BOOL=OFF
@@ -109,16 +126,16 @@ if(NOT DEFINED ${proj}_DIR)
 #     LOG_TEST 1                # Wrap test in script to log output
 #     LOG_INSTALL 1             # Wrap install in script to log output
     )
-  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SimMedTK-build/lib)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/iMSTK-build/lib)
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DVRPN_DIR:PATH=${${proj}_DIR})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${iMSTK_CMAKE_INCLUDE_PATH})
+list(APPEND iMSTK_SUPERBUILD_EP_ARGS -DVRPN_DIR:PATH=${${proj}_DIR})
 if(MSVC)
-    list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
+    list(APPEND iMSTK_SUPERBUILD_EP_ARGS
         ${CMAKE_MSVC_EXTERNAL_PROJECT_ARGS}
     )
 endif(MSVC)

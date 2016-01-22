@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,19 +16,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 
-#ifndef SMCOLLISIONPAIR_H
-#define SMCOLLISIONPAIR_H
+#ifndef CORE_COLLISIONPAIR_H
+#define CORE_COLLISIONPAIR_H
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Vector.h"
 
 // STL includes
@@ -179,4 +175,4 @@ private:
         std::vector<std::shared_ptr<PenetrationDepthCollisionData>>> modelContacts; //!< Contacts per model
 };
 
-#endif // SMCOLLISIONPAIR_H
+#endif // CORE_COLLISIONPAIR_H

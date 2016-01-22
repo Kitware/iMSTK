@@ -1,5 +1,8 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
 // Copyright (c) Kitware, Inc.
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -22,8 +25,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef VRPNDEVICE_H
-#define VRPNDEVICE_H
+#ifndef DEVICES_VRPNDEVICECLIENT_H
+#define DEVICES_VRPNDEVICECLIENT_H
 
 #include "Devices/DeviceInterface.h"
 

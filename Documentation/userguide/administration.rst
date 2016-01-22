@@ -4,25 +4,25 @@
 .. role:: arg(code)
    :language: sh
 
-.. _simmedtk-administration:
+.. _imstk-administration:
 
 **********************
-Administering SimMedTK
+Administering iMSTK
 **********************
 
-Previous sections covered the concepts and tools for using SimMedTK.
-This section is for system administrators who wish to make SimMedTK
+Previous sections covered the concepts and tools for using iMSTK.
+This section is for system administrators who wish to make iMSTK
 available to users
 
-* via a desktop application for end users of SimMedTK,
+* via a desktop application for end users of iMSTK,
 * via command-line utilities for experts preparing simulation scenes, and/or
-* as a library for people developing SimMedTK-based applications.
+* as a library for people developing iMSTK-based applications.
 
 End-user tool installation
 ==========================
 
 This type of installation should be as simple as downloading a
-binary package of SimMedTK and clicking install.
+binary package of iMSTK and clicking install.
 
 .. todo:: Expand on details of installation and configuration.
 
@@ -31,19 +31,19 @@ Developer installation
 
 In addition to the binary installer, there should also be a development
 package that contains header and configuration files needed to build
-C++ applications using SimMedTK. Install this the same way you installed
+C++ applications using iMSTK. Install this the same way you installed
 the binary above.
 
 You can also download the source code from the git repostory and
-follow the instructions for building and installing SimMedTK in the
+follow the instructions for building and installing iMSTK in the
 toplevel :file:`ReadMe.mkd` file.
 
 .. todo:: Expand on details of installation and configuration.
 
-Configuration of SimMedTK
+Configuration of iMSTK
 =========================
 
-Some components of SimMedTK will not be available unless
+Some components of iMSTK will not be available unless
 they are properly configured.
 One example is access to haptic or virtual reality display
 devices.
@@ -58,41 +58,41 @@ Search paths
 
 .. todo::
 
-   Explain how SimMedTK searches for simulation inputs.
+   Explain how iMSTK searches for simulation inputs.
 
-The default locations that SimMedTK searches for these
+The default locations that iMSTK searches for these
 worker files varies by operating system:
 
 Linux
-    SimMedTK searches the current working directory of the
-    process, followed by the :file:`var/simmedtk` subdirectory
+    iMSTK searches the current working directory of the
+    process, followed by the :file:`var/imstk` subdirectory
     of the toplevel installation directory.
-    For example, if SimMedTK is installed into :file:`/usr`
-    then it will search :file:`/usr/var/simmedtk`.
+    For example, if iMSTK is installed into :file:`/usr`
+    then it will search :file:`/usr/var/imstk`.
 
-    If the :cxx:`SimMedTK_CONFIG_DIR` environment variable is set
+    If the :cxx:`iMSTK_CONFIG_DIR` environment variable is set
     to a valid path, then it is searched as well.
 
 Mac OS X
-    SimMedTK searches the current working directory of the
-    process, followed by the :file:`var/simmedtk` subdirectory
-    of the toplevel installation directory if SimMedTK is not part of a bundle.
-    For example, if SimMedTK is installed into :file:`/usr`
-    then it will search :file:`/usr/var/simmedtk/workers`.
+    iMSTK searches the current working directory of the
+    process, followed by the :file:`var/imstk` subdirectory
+    of the toplevel installation directory if iMSTK is not part of a bundle.
+    For example, if iMSTK is installed into :file:`/usr`
+    then it will search :file:`/usr/var/imstk/workers`.
 
-    If an application built with SimMedTK is part of a bundle (such as an app),
-    then SimMedTK will search the :file:`Contents/Resources` directory
+    If an application built with iMSTK is part of a bundle (such as an app),
+    then iMSTK will search the :file:`Contents/Resources` directory
     of the bundle.
 
-    If the :cxx:`SimMedTK_CONFIG_DIR` environment variable is set
+    If the :cxx:`iMSTK_CONFIG_DIR` environment variable is set
     to a valid path, then it is searched as well.
 
 Windows
-    SimMedTK searches the current working directory of the process
+    iMSTK searches the current working directory of the process
     followed by the directory containing the process executable
-    (when provided to SimMedTK by the application).
+    (when provided to iMSTK by the application).
 
-    If the :cxx:`SimMedTK_CONFIG_DIR` environment variable is set
+    If the :cxx:`iMSTK_CONFIG_DIR` environment variable is set
     to a valid path, then it is searched as well.
 
 Creating simulation scenes
@@ -102,9 +102,9 @@ Other portions of this manual have covered how to create a
 custom simulation by writing C++ code.
 However, in some cases, it is sufficient to just create new
 or adapt existing configuration files and use the simulation
-program that comes with SimMedTK.
+program that comes with iMSTK.
 
-The simulation program that comes with SimMedTK is a
+The simulation program that comes with iMSTK is a
 command-line utility named :file:`vegaFemExample`.
 You can run
 

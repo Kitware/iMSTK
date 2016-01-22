@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -21,10 +24,10 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef SMOCULUSVIEWER_H
-#define SMOCULUSVIEWER_H
+#ifndef RENDERING_OCULUSVIEWER_H
+#define RENDERING_OCULUSVIEWER_H
 
-// SimMedTK includes
+// iMSTK includes
 #include "Rendering/OpenGLViewer.h"
 
 // OculusSDK includes

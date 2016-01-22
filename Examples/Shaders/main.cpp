@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include <memory>
 
-// Core SimMedTK includes
+// Core iMSTK includes
 #include "SimulationManager/SDK.h"
 #include "Geometry/MeshModel.h"
 #include "SceneModels/StaticSceneObject.h"
@@ -38,7 +34,7 @@ int main()
     InitIODelegates();
 
     //-------------------------------------------------------
-    // 1. Create an instance of the SimMedTK framework/SDK
+    // 1. Create an instance of the iMSTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
@@ -50,8 +46,8 @@ int main()
     auto viewer = sdk->getViewerInstance();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
-                                SIMMEDTK_VIEWERRENDER_FADEBACKGROUND |
-                                SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS;
+                                IMSTK_VIEWERRENDER_FADEBACKGROUND |
+                                IMSTK_VIEWERRENDER_GLOBAL_AXIS;
 
     viewer->setGlobalAxisLength(0.8);
 
@@ -61,7 +57,7 @@ int main()
     Shaders::createShader("wetshader", "ShadersData/shaders/wet_vert.glsl", "ShadersData/shaders/wet_frag.glsl", "");
 
     // Mesh render detail
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS );
+    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS );
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
@@ -72,7 +68,7 @@ int main()
     meshRenderDetail->addTexture("bump", "ShadersData/textures/metalbump.jpg", "textureBump", "wetshader");
 
     // Plane render detail
-    auto planeMeshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS);
+    auto planeMeshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS);
     planeMeshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
     planeMeshRenderDetail->setDiffuseColor(Color::colorGray);
     planeMeshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
