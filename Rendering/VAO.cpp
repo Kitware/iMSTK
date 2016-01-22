@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Rendering/VAO.h"
 #include "Rendering/Shader.h"
@@ -37,7 +33,7 @@ void VAO::initBuffers()
     ///Create Vertex Buffer Objects(VBOs)
     glGenBuffers(totalNbrBuffers, bufferIndices);
 
-    SM_CHECKERROR(log, error);
+    IMSTK_CHECKERROR(log, error);
 
     ///Initialize and file the VBOs
     for (int i = 0; i < totalNbrBuffers; i++)
@@ -46,11 +42,11 @@ void VAO::initBuffers()
         {
             glBindBuffer(GL_ARRAY_BUFFER, bufferIndices[i]);
 
-            if (vboType == SIMMEDTK_VBO_STATIC)
+            if (vboType == IMSTK_VBO_STATIC)
             {
                 glBufferData(GL_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_STATIC_DRAW);
             }
-            else if (vboType == SIMMEDTK_VBO_DYNAMIC)
+            else if (vboType == IMSTK_VBO_DYNAMIC)
             {
                 glBufferData(GL_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_DYNAMIC_DRAW);
             }
@@ -60,17 +56,17 @@ void VAO::initBuffers()
             ///if it is index array, the buffer should be GL_ELEMENT_ARRAY_BUFFER
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIndices[i]);
 
-            if (vboType == SIMMEDTK_VBO_STATIC)
+            if (vboType == IMSTK_VBO_STATIC)
             {
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_STATIC_DRAW);
             }
-            else if (vboType == SIMMEDTK_VBO_DYNAMIC)
+            else if (vboType == IMSTK_VBO_DYNAMIC)
             {
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, bufferInfo[i].size, bufferInfo[i].attribPointer, GL_DYNAMIC_DRAW);
             }
 
             indexBufferLocation = i;
-            SM_CHECKERROR(log, error);
+            IMSTK_CHECKERROR(log, error);
             continue;
         }
 
@@ -118,7 +114,7 @@ void VAO::initBuffers()
         shader->enableShader();
         shader->disableShader();
         //Check the error
-        SM_CHECKERROR(log, error);
+        IMSTK_CHECKERROR(log, error);
     }
 
     ///Go back to the default buffer state
@@ -130,12 +126,12 @@ void VAO::initBuffers()
 bool VAO::updateStreamData() const
 {
 
-    if (this->vboType == SIMMEDTK_VBO_STATIC)
+    if (this->vboType == IMSTK_VBO_STATIC)
     {
         return false;
     }
 
-    else if (vboType == SIMMEDTK_VBO_NOINDICESCHANGE || vboType == SIMMEDTK_VBO_DYNAMIC)
+    else if (vboType == IMSTK_VBO_NOINDICESCHANGE || vboType == IMSTK_VBO_DYNAMIC)
     {
         for (int i = 0; i < totalNbrBuffers; i++)
         {
@@ -148,7 +144,7 @@ bool VAO::updateStreamData() const
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
 
-            if (vboType == SIMMEDTK_VBO_DYNAMIC && bufferInfo[i].arrayBufferType == SMVBO_INDEX)
+            if (vboType == IMSTK_VBO_DYNAMIC && bufferInfo[i].arrayBufferType == SMVBO_INDEX)
             {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferIndices[i]);
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, bufferInfo[i].size, bufferInfo[i].attribPointer);

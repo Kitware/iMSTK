@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@
 #
 ###########################################################################
 
-function(simmedtk_install_library target)
+function(imstk_install_library target)
   set(options)
   set(oneValueArgs)
   set(multiValueArgs DEPENDS)
@@ -33,7 +32,7 @@ function(simmedtk_install_library target)
   export(TARGETS ${target} ${target_DEPENDS} APPEND FILE ${target}-exports.cmake)
 endfunction()
 
-function(simmedtk_add_library target)
+function(imstk_add_library target)
   set(options)
   set(oneValueArgs)
   set(multiValueArgs SOURCES PUBLIC_HEADERS)
@@ -46,13 +45,13 @@ function(simmedtk_add_library target)
   target_include_directories(${target}
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}>
-      $<INSTALL_INTERFACE:include/v${SimMedTK_VERSION}/${target}>
+      $<INSTALL_INTERFACE:include/v${iMSTK_VERSION}>
+      $<INSTALL_INTERFACE:include/v${iMSTK_VERSION}/${target}>
     )
   if (target_PUBLIC_HEADERS)
-    simmedtk_install_library(${target})
+    imstk_install_library(${target})
     install(FILES ${target_PUBLIC_HEADERS}
-      DESTINATION include/v${SimMedTK_VERSION}/${target}
+      DESTINATION include/v${iMSTK_VERSION}/${target}
       COMPONENT Development
     )
   endif()

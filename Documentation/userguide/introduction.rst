@@ -4,22 +4,22 @@
 .. role:: arg(code)
    :language: sh
 
-.. _simmedtk-introduction:
+.. _imstk-introduction:
 
 ********************
-Introducing SimMedTK
+Introducing iMSTK
 ********************
 
-SimMedTK is a set of libraries, each of which provides capabilities aimed at
+iMSTK is a set of libraries, each of which provides capabilities aimed at
 interactive simulations of medical procedures.
 The capabilities are split into different libraries to allow for smaller
 executables and fewer external dependencies for applications that use only
 a fraction of them.
 
-.. findfigure:: simmedtk-dataflow.*
+.. findfigure:: imstk-dataflow.*
 
    This diagram illustrates how data flows over time in
-   a SimMedTK application.
+   a iMSTK application.
 
 The base library provides an abstract framework for simulations, and
 its core object, :sm:`smSDK`, holds references to all of the potential
@@ -37,7 +37,7 @@ Scene graphs
 ============
 
 Although the data-flow diagram above shows only one scene graph,
-you can think of SimMedTK as having two separate scene graphs:
+you can think of iMSTK as having two separate scene graphs:
 
 + **(simulation scene)** one scene graph for advancing time in the simulation,
   whose objects are surface and volume meshes, collision detectors and responders,
@@ -62,7 +62,7 @@ forcing divergence or small timesteps.
 
 .. _fig-scene-interactions:
 
-.. findfigure:: simmedtk-mesh-interactions.*
+.. findfigure:: imstk-mesh-interactions.*
 
    Two simulations with the same number of objects, but different
    interactions. On the left, all objects interact directly except
@@ -82,7 +82,7 @@ The net effect of this is illustrated with examples in
 
 .. _fig-scene-solvers:
 
-.. findfigure:: simmedtk-interaction-types.*
+.. findfigure:: imstk-interaction-types.*
 
    Continuing the example from the *left* of
    :num:`Figure #fig-scene-interactions`,
@@ -98,7 +98,7 @@ In general, performance will suffer as collision pairs are added
 so keeping the graph small is advised.
 
 Once the collisions have been detected, responses can be computed
-using different methods (although currently SimMedTK only provides
+using different methods (although currently iMSTK only provides
 a penalty-based response) and the reaction forces applied to the
 right-hand side of the equations of motion for each of the
 degrees of freedom involved.

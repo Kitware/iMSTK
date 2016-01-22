@@ -1,5 +1,5 @@
-#ifndef SMFACTORY_H
-#define SMFACTORY_H
+#ifndef CORE_FACTORY_H
+#define CORE_FACTORY_H
 
 #include "Core/CoreClass.h"
 
@@ -12,17 +12,17 @@
   * A macro to help register a concrete subclass with a factory.
   * It should be called inside dynamic loader macros like so:
   * <pre>
-  *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  *     SIMMEDTK_BEGIN_ONLOAD(register_base_class_children)
-  *       SIMMEDTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName1,integerClassGroupId);
-  *       SIMMEDTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName2,integerClassGroupId);
+  *   IMSTK_BEGIN_DYNAMIC_LOADER()
+  *     IMSTK_BEGIN_ONLOAD(register_base_class_children)
+  *       IMSTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName1,integerClassGroupId);
+  *       IMSTK_REGISTER_CLASS(baseClassName,abstractClassName,concreteClassName2,integerClassGroupId);
   *       ...
-  *     SIMMEDTK_FINISH_ONLOAD()
-  *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
+  *     IMSTK_FINISH_ONLOAD()
+  *   IMSTK_FINISH_DYNAMIC_LOADER()
   * </pre>
-  * If you build SimMedTK with static libraries, then your
+  * If you build iMSTK with static libraries, then your
   * application should call (for the example above)
-  * <pre>simmedtk_register_base_class_children_onload();</pre>
+  * <pre>imstk_register_base_class_children_onload();</pre>
   * during your application's startup.
   *
   * This macro should only be used outside of the Core library;
@@ -34,19 +34,19 @@
   * A more specific example is the way the Rendering library
   * registers the Viewer class as a concrete child of ViewerBase:
   * <pre>
-  *   SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  *     SIMMEDTK_BEGIN_ONLOAD(register_viewer_children)
-  *       SIMMEDTK_REGISTER_CLASS(CoreClass,ViewerBase,Viewer,0);
-  *     SIMMEDTK_FINISH_ONLOAD()
-  *   SIMMEDTK_FINISH_DYNAMIC_LOADER()
+  *   IMSTK_BEGIN_DYNAMIC_LOADER()
+  *     IMSTK_BEGIN_ONLOAD(register_viewer_children)
+  *       IMSTK_REGISTER_CLASS(CoreClass,ViewerBase,Viewer,0);
+  *     IMSTK_FINISH_ONLOAD()
+  *   IMSTK_FINISH_DYNAMIC_LOADER()
   * </pre>
-  * When SimMedTK is built as dynamic libraries, this registration is
+  * When iMSTK is built as dynamic libraries, this registration is
   * automatic whenever linking to Rendering. Versions with a static
   * Rendering library require you to call
-  * simmedtk_register_viewer_children_onload()
+  * imstk_register_viewer_children_onload()
   * at startup.
   */
-#define SIMMEDTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
+#define IMSTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
        Factory<BASECLASS>::registerClassConfiguration( \
          #TARGETCLASS, \
          #SUBCLASS, \
@@ -54,11 +54,11 @@
          GROUP);
 
 #define RegisterFactoryClass(BASECLASS,SUBCLASS,GROUP) \
-    SIMMEDTK_BEGIN_DYNAMIC_LOADER() \
-        SIMMEDTK_BEGIN_ONLOAD(register_##SUBCLASS) \
-        SIMMEDTK_REGISTER_CLASS(BASECLASS, BASECLASS, SUBCLASS, GROUP) \
-        SIMMEDTK_FINISH_ONLOAD() \
-    SIMMEDTK_FINISH_DYNAMIC_LOADER()
+    IMSTK_BEGIN_DYNAMIC_LOADER() \
+        IMSTK_BEGIN_ONLOAD(register_##SUBCLASS) \
+        IMSTK_REGISTER_CLASS(BASECLASS, BASECLASS, SUBCLASS, GROUP) \
+        IMSTK_FINISH_ONLOAD() \
+    IMSTK_FINISH_DYNAMIC_LOADER()
 
 /**\brief A factory provides a way to discover and construct subclasses of abstract classes.
   *
@@ -158,4 +158,4 @@ protected:
 
 #include "Core/Factory.hpp"
 
-#endif // SMFACTORY_H
+#endif // CORE_FACTORY_H

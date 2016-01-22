@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Core/RenderDetail.h"
 #include <fstream>
@@ -368,18 +364,18 @@ void RenderDetail::setRenderTexture(bool value)
 {
     if(value)
     {
-        this->renderType |= SIMMEDTK_RENDER_TEXTURE;
+        this->renderType |= IMSTK_RENDER_TEXTURE;
     }
     else
     {
-        this->renderType |= ~SIMMEDTK_RENDER_TEXTURE;
+        this->renderType |= ~IMSTK_RENDER_TEXTURE;
     }
 }
 
 //---------------------------------------------------------------------------
 bool RenderDetail::renderTexture() const
 {
-    return !this->textureFilename.empty() && (this->renderType & SIMMEDTK_RENDER_TEXTURE);
+    return !this->textureFilename.empty() && (this->renderType & IMSTK_RENDER_TEXTURE);
 }
 
 //---------------------------------------------------------------------------
@@ -387,18 +383,18 @@ void RenderDetail::setRenderNormals(bool value)
 {
     if(value)
     {
-        this->renderType |= SIMMEDTK_RENDER_NORMALS;
+        this->renderType |= IMSTK_RENDER_NORMALS;
     }
     else
     {
-        this->renderType |= ~SIMMEDTK_RENDER_NORMALS;
+        this->renderType |= ~IMSTK_RENDER_NORMALS;
     }
 }
 
 //---------------------------------------------------------------------------
 bool RenderDetail::renderNormals() const
 {
-    return  this->renderType & SIMMEDTK_RENDER_NORMALS;
+    return  this->renderType & IMSTK_RENDER_NORMALS;
 }
 
 //---------------------------------------------------------------------------
@@ -406,18 +402,18 @@ void RenderDetail::setRenderWireframe(bool value)
 {
     if(value)
     {
-        this->renderType |= SIMMEDTK_RENDER_WIREFRAME;
+        this->renderType |= IMSTK_RENDER_WIREFRAME;
     }
     else
     {
-        this->renderType |= ~SIMMEDTK_RENDER_WIREFRAME;
+        this->renderType |= ~IMSTK_RENDER_WIREFRAME;
     }
 }
 
 //---------------------------------------------------------------------------
 bool RenderDetail::renderWireframe() const
 {
-    return this->renderType & SIMMEDTK_RENDER_WIREFRAME;
+    return this->renderType & IMSTK_RENDER_WIREFRAME;
 }
 
 //---------------------------------------------------------------------------
@@ -425,18 +421,18 @@ void RenderDetail::setRenderFaces(bool value)
 {
     if(value)
     {
-        this->renderType |= SIMMEDTK_RENDER_FACES;
+        this->renderType |= IMSTK_RENDER_FACES;
     }
     else
     {
-        this->renderType |= ~SIMMEDTK_RENDER_FACES;
+        this->renderType |= ~IMSTK_RENDER_FACES;
     }
 }
 
 //---------------------------------------------------------------------------
 bool RenderDetail::renderFaces() const
 {
-    return this->renderType & SIMMEDTK_RENDER_FACES;
+    return this->renderType & IMSTK_RENDER_FACES;
 }
 
 //---------------------------------------------------------------------------

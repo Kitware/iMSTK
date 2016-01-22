@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SMPENALTY_CONTACTHANDLING_H
-#define SMPENALTY_CONTACTHANDLING_H
 
-// SimMedTK includes
+#ifndef CONTACT_HANDLING_PENALTYCONTACTHANDLING_H
+#define CONTACT_HANDLING_PENALTYCONTACTHANDLING_H
+
+// iMSTK includes
 #include "Core/ContactHandling.h"
 #include "Core/CollisionManager.h"
 
@@ -84,4 +81,4 @@ protected:
     double damping;
 };
 
-#endif // SMPENALTY_CONTACTHANDLING_H
+#endif // CONTACT_HANDLING_PENALTY_CONTACTHANDLING_H

@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_ITERATIVE_LINEAR_SOLVER
-#define SM_ITERATIVE_LINEAR_SOLVER
 
-// SimMedTK includes
+#ifndef SOLVERS_ITERATIVELINEARSOLVER_H
+#define SOLVERS_ITERATIVELINEARSOLVER_H
+
+// iMSTK includes
 #include "Solvers/LinearSolver.h"
 
 ///
@@ -89,4 +86,4 @@ protected:
     core::Vectord residual; ///> Storage for residual vector.
 };
 
-#endif // SM_ITERATIVE_LINEAR_SOLVER
+#endif // SOLVERS_ITERATIVE_LINEAR_SOLVER

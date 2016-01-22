@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,15 +16,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Timer.h"
 
 namespace core {

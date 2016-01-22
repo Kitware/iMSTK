@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMPLANEMODEL_H
-#define SMPLANEMODEL_H
+#ifndef GEOMETRY_PLANEMODEL_H
+#define GEOMETRY_PLANEMODEL_H
 
 // STL includes
 #include <memory>
@@ -31,7 +27,7 @@
 // Eigne includes
 #include <Eigen/Geometry>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Model.h"
 #include "Core/Geometry.h"
 
@@ -103,4 +99,4 @@ protected:
     RigidTransformType transform;
 };
 
-#endif // SMPLANEMODEL_H
+#endif // GEOMETRY_PLANEMODEL_H

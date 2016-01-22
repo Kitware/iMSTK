@@ -1,5 +1,5 @@
 ************************
-Contributing to SimMedTK
+Contributing to iMSTK
 ************************
 
 .. role:: cxx(code)
@@ -10,25 +10,25 @@ Contributing to SimMedTK
 
 .. contents::
 
-The first step to contributing to SimMedTK is to obtain the source code and build it.
-The top-level ReadMe.mkd file in the source code includes instructions for building SimMedTK.
+The first step to contributing to iMSTK is to obtain the source code and build it.
+The top-level ReadMe.mkd file in the source code includes instructions for building iMSTK.
 The rest of this section discusses how the source and documentation are organized
-and provides guidelines for how to match the SimMedTK style.
+and provides guidelines for how to match the iMSTK style.
 
 Source code organization
 ========================
 
-SimMedTK currently keeps its header and implementation files in parallel directory structures.
+iMSTK currently keeps its header and implementation files in parallel directory structures.
 Implementation files live in :file:`src` while header files live in :file:`include`.
 Inside each of these directories are a number of subdirectories corresponding to
-libraries that encapsulate difference components of SimMedTK.
+libraries that encapsulate difference components of iMSTK.
 With that in mind:
 
-* include — This directory contains all of the header files for SimMedTK libraries
-* src — This directory contains all of the source code for SimMedTK libraries and unit tests.
+* include — This directory contains all of the header files for iMSTK libraries
+* src — This directory contains all of the source code for iMSTK libraries and unit tests.
   The directories correspond to library names.
 
-  * smCore — a library for classes used throughout SimMedTK
+  * smCore — a library for classes used throughout iMSTK
   * smMesh — scene objects that participate in the physics simulation
   * smTools — models of surgical instruments
   * smCollision — implementations of collision *detection* algorithms
@@ -41,9 +41,9 @@ With that in mind:
   * smExternal — third-party code that is not part of a library
   * smExternalDevices — interfaces to haptics devices
 
-* examples — demonstration applications that use SimMedTK libraries
+* examples — demonstration applications that use iMSTK libraries
 * documentation — user's guide documentation and configuration for the in-source documentation
-* CMake — scripts to aid in configuring, installing, and packaging SimMedTK
+* CMake — scripts to aid in configuring, installing, and packaging iMSTK
 
 Inside some :file:`src/`, subdirectories, there are :file:`UnitTests/` directories that
 contain Bandit_-based unit tests.
@@ -61,11 +61,11 @@ Code style
 * Use shared pointers and a static :cxx:`create()` method for classes that own significant storage or must be passed by
   reference to their superclass.
 
-Submitting and reviewing changes to SimMedTK
+Submitting and reviewing changes to iMSTK
 ============================================
 
-Once you have made a change to SimMedTK that you would like to contribute,
-you should submit a merge request to the canonical SimMedTK gitlab repository.
+Once you have made a change to iMSTK that you would like to contribute,
+you should submit a merge request to the canonical iMSTK gitlab repository.
 When you submit the merge request, please use the following checklist to
 make reviewing the change as painless as possible:
 
@@ -73,7 +73,7 @@ make reviewing the change as painless as possible:
   (a) **buildbot**,
   (b) any potential (human) **reviewers**, and
   (c) **owners** of dashboard buildslaves
-  read access to your SimMedTK repository.
+  read access to your iMSTK repository.
   This is mandatory because Gitlab_ enforces permissions even on branches you have
   submitted for review.
   If reviewers do not have permission, they will not approve your branch for merging.
@@ -98,7 +98,7 @@ make reviewing the change as painless as possible:
     * use a "-1" comment to veto the merge request (and explain why)
     * use a "+1" comment to indicate you've looked at the source changes and approve
     * use a "+2" comment to indicate you've fetched the source, built, and tested it yourself
-    * do **not** "accept" the merge request (i.e., merge the branch into the master SimMedTK repository)
+    * do **not** "accept" the merge request (i.e., merge the branch into the master iMSTK repository)
       unless you are certain that the submitter does not have the authority to perform the merge.
       The submitter should perform the merge whenever possible;
       whoever performs the merge is responsible for monitoring the dashboard for failing tests.
@@ -108,7 +108,7 @@ make reviewing the change as painless as possible:
       platform tests performed by dashboards that only test the master branch.)
 
 * If you have submitted a request, you may "accept" it (i.e., merge the branch in to the master
-  SimMedTK repository) when
+  iMSTK repository) when
     * your request has a "+2" or two "+1" comments and no unresolved "-1" comments.
       (Resolving a "-1" must include the submitting reviewer agreeing to remove the object
       or another reviewer explicitly overriding the objection in a comment.)
@@ -121,17 +121,17 @@ make reviewing the change as painless as possible:
    (Failures can be introduced by intervening commits in other merges or by additional
    platform tests performed by dashboards that only test the master branch.)
 
-Using SimMedTK from another project
+Using iMSTK from another project
 ===================================
 
 .. todo::
 
-  SimMedTK does not currently export a SimMedTKConfig.cmake file like it should.
+  iMSTK does not currently export a iMSTKConfig.cmake file like it should.
 
-Extending SimMedTK
+Extending iMSTK
 ==================
 
-See the tutorials for in-depth guides on how to extend SimMedTK
+See the tutorials for in-depth guides on how to extend iMSTK
 in certain obvious directions,
 
 * Preparing a scene for a simulation
@@ -141,7 +141,7 @@ in certain obvious directions,
 Documentation style
 ===================
 
-There are two types of documentation in SimMedTK:
+There are two types of documentation in iMSTK:
 Doxygen_ documentation written as comments in C++ code and
 Sphinx_ documentation written in reStructuredText_ files (and optionally Python documentation strings).
 The former is used to create reference documentation; the latter is used for the user's guide and tutorials.
@@ -208,7 +208,7 @@ These packages can all be installed with pip:
   sudo pip install webcolor
 
 If you are unfamiliar with the documentation packages here, see these links for examples of their use
-(or use SimMedTK by example):
+(or use iMSTK by example):
 
 * `Sphinx Table of Contents <http://sphinx-doc.org/contents.html>`_
 * `Sphinx conf.py configuration <http://sphinx-doc.org/config.html>`_
@@ -232,6 +232,6 @@ Finally, if you are looking for a way to contribute,
 helping with the documentation would be great.
 A list of incomplete documentation (or incomplete features)
 is below.
-You can also look on the SimMedTK issue tracker for things to do.
+You can also look on the iMSTK issue tracker for things to do.
 
 .. todolist::

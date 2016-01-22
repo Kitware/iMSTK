@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMERRORLOG_H
-#define SMERRORLOG_H
+#ifndef CORE_ERRORLOG_H
+#define CORE_ERRORLOG_H
 
 // STL includes
 #include <string>
@@ -31,14 +27,14 @@
 #include <mutex>
 #include <vector>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Timer.h"
 
 #define PRINT_ERROR_LOCATION std::cout << "Error! In file: " << __FILE__ << "; at line: " << __LINE__ << std::endl;
 
-/// \brief This is class is for error logging of the whole SimMedTK system.
+/// \brief This is class is for error logging of the whole iMSTK system.
 /// All errors should be reported to the instance of this class.
 /// Functions are thread-safe unless indicated.
 class ErrorLog : public CoreClass
@@ -57,7 +53,7 @@ public:
 
     /// \brief Add the error in the repository.It is thread safe. It can be called by multiple threads.
     ///
-    /// \detail If the error message is longer than SIMMEDTK_MAX_ERRORLOG or
+    /// \detail If the error message is longer than IMSTK_MAX_ERRORLOG or
     /// empty, function will return with error
     /// \param p_text A string containing the error message
     /// \return Returns true if the error was successfully logged, and false on error

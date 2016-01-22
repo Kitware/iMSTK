@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,27 +16,20 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef  SMLIGHT_H
-#define  SMLIGHT_H
+#ifndef  CORE_LIGHT_H
+#define  CORE_LIGHT_H
 
 // STL includes
 #include <string>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Vector.h"
 #include "Core/ConfigRendering.h"
 
-#define SMLIGHT_SPOTMAX 128
+#define IMSTK_LIGHT_SPOTMAX 128
 
 class Light;
 /// \brief light position. light at inifinite position can be defined with w

@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,15 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_LINEAR_SOLVER_HPP
-#define SM_LINEAR_SOLVER_HPP
+
+#ifndef SOLVERS_LINEARSOLVER_HPP
+#define SOLVERS_LINEARSOLVER_HPP
 
 template<typename SystemMatrixType>
 LinearSolver<SystemMatrixType>::
@@ -58,4 +55,4 @@ double LinearSolver<SystemMatrixType>::getTolerance() const
     return this->minTolerance;
 }
 
-#endif // SM_LINEAR_SOLVER
+#endif // SOLVERS_LINEAR_SOLVER

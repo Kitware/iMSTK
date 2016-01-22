@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,8 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#ifndef SMCOLOR_H
-#define SMCOLOR_H
+
+#ifndef CORE_COLOR_H
+#define CORE_COLOR_H
 
 #include "Core/Config.h"
 
@@ -90,4 +94,4 @@ struct Color
     static Color colorYellow;
 };
 
-#endif // SMCOLOR_H
+#endif // CORE_COLOR_H

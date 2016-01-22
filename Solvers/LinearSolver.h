@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_LINEAR_SOLVER
-#define SM_LINEAR_SOLVER
 
-// simmedtk includes
+#ifndef SOLVERS_LINEARSOLVER_H
+#define SOLVERS_LINEARSOLVER_H
+
+// imstk includes
 #include "Solvers/SystemOfEquations.h"
 #include "Core/Matrix.h"
 
@@ -72,4 +69,4 @@ protected:
 
 #include "Solvers/LinearSolver.hpp"
 
-#endif // SM_LINEAR_SOLVER
+#endif // SOLVERS_LINEAR_SOLVER

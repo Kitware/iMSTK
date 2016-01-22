@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,15 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SMRENDERDETAIL_H
-#define SMRENDERDETAIL_H
+
+#ifndef CORE_RENDERDETAIL_H
+#define CORE_RENDERDETAIL_H
 
 #include "Core/Config.h"
 #include "Core/Color.h"
@@ -388,4 +385,4 @@ private:
     std::map<std::string, TextureDetail> textures;
 };
 
-#endif // SMRENDERDETAIL_H
+#endif // CORE_RENDERDETAIL_H

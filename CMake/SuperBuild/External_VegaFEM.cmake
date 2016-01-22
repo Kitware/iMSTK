@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,6 +18,7 @@
 #
 # VegaFEM
 #
+
 set(VegaFEM_TAG "simmedtk")
 set(VegaFEM_REPOSITORY git@gitlab.kitware.com:SimMedTK/VegaFEM-CMake.git)
 
@@ -40,7 +40,7 @@ if(WIN32)
 endif(WIN32)
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(VegaFEM)
+iMSTKCheckDependencies(VegaFEM)
 
 set(proj VegaFEM)
 
@@ -71,13 +71,13 @@ if(NOT DEFINED VegaFEM_DIR)
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
       -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
       -DVegaFEM_ENABLE_OpenGL_SUPPORT:BOOL=OFF
       -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
       -DVegaFEM_BUILD_UTILITIES:BOOL=ON
-      -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
-      -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
+      -DCMAKE_INCLUDE_PATH:STRING=${iMSTK_CMAKE_INCLUDE_PATH}
+      -DCMAKE_LIBRARY_PATH:STRING=${iMSTK_CMAKE_LIBRARY_PATH}
       -DCMAKE_REQUIRED_INCLUDES:STRING=${ep_install_dir}/include
       ${OUTPUT_DIRECTORIES}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
@@ -94,7 +94,7 @@ if(NOT DEFINED VegaFEM_DIR)
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build/VegaFEM)
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})
+list(APPEND iMSTK_SUPERBUILD_EP_ARGS -D${proj}_DIR:PATH=${${proj}_DIR})

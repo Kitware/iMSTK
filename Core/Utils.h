@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,23 +16,16 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMUTILS_H
-#define SMUTILS_H
+#ifndef CORE_UTILS_H
+#define CORE_UTILS_H
 
 /// \brief query,  logs and diplays opengl error
-#define SM_CHECKGLERROR_DISPLAY(log,error)  GLUtils::queryGLError(error);\
+#define IMSTK_CHECKGLERROR_DISPLAY(log,error)  GLUtils::queryGLError(error);\
                                             log->addError(error);\
                                             log->printLastErrUnsafe();\
-/// \brief query,  logs opengl error 
-#define SM_CHECKERROR(log,error) GLUtils::queryGLError(error);\
+/// \brief query,  logs opengl error
+#define IMSTK_CHECKERROR(log,error) GLUtils::queryGLError(error);\
                                  log->addError(error);\
- 
+
 #endif

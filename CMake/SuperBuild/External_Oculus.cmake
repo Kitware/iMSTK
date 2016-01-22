@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +20,7 @@
 #
 
 set(Oculus_TAG "8ea873223fa0e2491a8ebe946b9f0fefe449fdc8")
-set(Oculus_REPOSITORY git@bitbucket.org:simmedtk/oculussdk.git)
+set(Oculus_REPOSITORY git@bitbucket.org:imstk/oculussdk.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
@@ -38,7 +37,7 @@ endif()
 set(Oculus_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Oculus)
+iMSTKCheckDependencies(Oculus)
 
 set(proj Oculus)
 
@@ -67,8 +66,8 @@ if(NOT DEFINED ${proj}_DIR)
     CMAKE_ARGS
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/SimMedTK-build
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_BINARY_DIR}/iMSTK-build
+      -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
       -DOCULUS_BUILD_SAMPLES:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${OUTPUT_DIRECTORIES}
@@ -84,8 +83,8 @@ if(NOT DEFINED ${proj}_DIR)
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/SuperBuild/${proj}-build)
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Src/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Include/${sep}${iMSTK_CMAKE_INCLUDE_PATH})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/LibOVR/Src/${sep}${iMSTK_CMAKE_INCLUDE_PATH})

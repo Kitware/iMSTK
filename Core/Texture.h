@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -14,8 +17,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SMTEXTURE_H
-#define SMTEXTURE_H
+#ifndef CORE_TEXTURE_H
+#define CORE_TEXTURE_H
 
 // VTK glew library
 #include <vtk_glew.h>
@@ -30,24 +33,24 @@
 #include <unordered_map>
 #include <cstring>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/ErrorLog.h"
 
 enum TextureReturnType
 {
-    SIMMEDTK_TEXTURE_NOTFOUND,
-    SIMMEDTK_TEXTURE_IMAGELOADINGERROR,
-    SIMMEDTK_TEXTURE_DRIVERNOTINITIALIZED,
-    SIMMEDTK_TEXTURE_OK
+    IMSTK_TEXTURE_NOTFOUND,
+    IMSTK_TEXTURE_IMAGELOADINGERROR,
+    IMSTK_TEXTURE_DRIVERNOTINITIALIZED,
+    IMSTK_TEXTURE_OK
 };
 
 enum ImageColorType
 {
-    SIMMEDTK_IMAGECOLOR_RGB,
-    SIMMEDTK_IMAGECOLOR_RGBA,
-    SIMMEDTK_IMAGECOLOR_OFFSCREENRGBA,
-    SIMMEDTK_IMAGECOLOR_DEPTH
+    IMSTK_IMAGECOLOR_RGB,
+    IMSTK_IMAGECOLOR_RGBA,
+    IMSTK_IMAGECOLOR_OFFSCREENRGBA,
+    IMSTK_IMAGECOLOR_DEPTH
 };
 /// \brief texture structure
 struct Texture
@@ -84,4 +87,4 @@ struct Texture
     }
 };
 
-#endif // SMTEXTURE_H
+#endif // CORE_TEXTURE_H

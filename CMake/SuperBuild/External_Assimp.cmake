@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,6 +18,7 @@
 #
 # Assimp
 #
+
 set(Assimp_TAG "b700cd917f433801e594187af57d334b04a3c2ba")
 set(Assimp_REPOSITORY ${git_protocol}://github.com/assimp/assimp.git)
 
@@ -37,7 +37,7 @@ endif()
 set(Assimp_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Assimp)
+iMSTKCheckDependencies(Assimp)
 
 set(proj Assimp)
 
@@ -67,7 +67,7 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
       -DASSIMP_BUILD_ASSIMP_TOOLS:BOOL=OFF
       -DASSIMP_BUILD_TESTS:BOOL=OFF
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
@@ -85,7 +85,7 @@ if(NOT DEFINED ${proj}_DIR)
   set(${proj}_DIR ${ep_install_dir}/lib/cmake/assimp-3.1)
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${iMSTK_CMAKE_INCLUDE_PATH})

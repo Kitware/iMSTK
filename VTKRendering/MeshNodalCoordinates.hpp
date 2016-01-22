@@ -1,4 +1,6 @@
 // This file is part of the SimMedTK project.
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +15,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef MESHNODALCOORDINATES_TXX
-#define MESHNODALCOORDINATES_TXX
+#ifndef RENDERING_MESHNODALCOORDINATES_TXX
+#define RENDERING_MESHNODALCOORDINATES_TXX
 
 #include "vtkIdList.h"
 #include "vtkObjectFactory.h"

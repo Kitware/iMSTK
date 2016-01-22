@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef FORWARDEULER_H
-#define FORWARDEULER_H
+#ifndef TIME_INTEGRATORS_FORWARDEULER_H
+#define TIME_INTEGRATORS_FORWARDEULER_H
 
 #include "TimeIntegrators/TimeIntegrator.h"
 #include "Core/Vector.h"

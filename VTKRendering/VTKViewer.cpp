@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "VTKRendering/VTKViewer.h"
 #include "VTKRendering/VTKRenderDelegate.h"
@@ -218,7 +214,7 @@ public:
             this->renderWindow->AddRenderer(renderer.GetPointer());
         }
 
-        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FULLSCREEN)
+        if (viewer->viewerRenderDetail & IMSTK_VIEWERRENDER_FULLSCREEN)
         {
             this->renderWindow->FullScreenOn();
         }
@@ -232,7 +228,7 @@ public:
         this->renderWindowInteractor->AddObserver(vtkCommand::TimerEvent,this);
         this->renderWindowInteractor->AddObserver(vtkCommand::ExitEvent, this);
 
-        if (viewer->viewerRenderDetail & SIMMEDTK_DISABLE_MOUSE_INTERACTION)
+        if (viewer->viewerRenderDetail & IMSTK_DISABLE_MOUSE_INTERACTION)
         {
             renderWindowInteractor->RemoveObservers("LeftButtonPressEvent");
             renderWindowInteractor->RemoveObservers("RightButtonPressEvent");
@@ -251,14 +247,14 @@ public:
         this->renderWindowInteractor->Initialize();
         this->timerId = renderWindowInteractor->CreateRepeatingTimer(1000.0/60.0);
 
-        if ( viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBALAXIS)
+        if ( viewer->viewerRenderDetail & IMSTK_VIEWERRENDER_GLOBALAXIS)
         {
             vtkSmartPointer<vtkAxesActor> axes = vtkSmartPointer<vtkAxesActor>::New();
 
             renderer->AddActor(axes);
         }
 
-        //if(0)// viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS)
+        //if(0)// viewer->viewerRenderDetail & IMSTK_VIEWERRENDER_GLOBAL_AXIS)
         //{
         //    // FIXME: This causes the renderer to crash.
         //    vtkNew<vtkAxesActor> axesActor;
@@ -270,7 +266,7 @@ public:
         //}
 
         // Set up background
-        if (viewer->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_FADEBACKGROUND)
+        if (viewer->viewerRenderDetail & IMSTK_VIEWERRENDER_FADEBACKGROUND)
         {
             auto bgTop = this->viewer->getRenderDetail()->getBackgroundTop().getValue();
             auto bgBottom = this->viewer->getRenderDetail()->getBackgroundBottom().getValue();
@@ -309,7 +305,7 @@ void VTKViewer::exec()
 }
 void VTKViewer::render()
 {
-    if(this->viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
+    if(this->viewerRenderDetail & IMSTK_VIEWERRENDER_DISABLE)
     {
         return;
     }

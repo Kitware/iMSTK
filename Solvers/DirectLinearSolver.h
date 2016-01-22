@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,18 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SM_DIRECT_LINEAR_SOLVER
-#define SM_DIRECT_LINEAR_SOLVER
+#ifndef SOLVERS_DIRECTLINEARSOLVER_H
+#define SOLVERS_DIRECTLINEARSOLVER_H
 
-// SimMedTK includes
+// iMSTK includes
 #include "Solvers/LinearSolver.h"
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
@@ -127,4 +123,4 @@ public:
 private:
     Eigen::SparseLU<core::SparseMatrixd> solver;
 };
-#endif // SM_DIRECT_LINEAR_SOLVER
+#endif // SOLVERS_DIRECT_LINEAR_SOLVER

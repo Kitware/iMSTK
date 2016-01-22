@@ -22,18 +22,18 @@ public:
   virtual std::string stupid() const { return "B"; }
 };
 
-SIMMEDTK_BEGIN_DYNAMIC_LOADER()
-  SIMMEDTK_BEGIN_ONLOAD(register_abstract_children)
-    SIMMEDTK_REGISTER_CLASS(CoreClass, abstract, A, 65);
-    SIMMEDTK_REGISTER_CLASS(CoreClass, abstract, B, 66);
-  SIMMEDTK_FINISH_ONLOAD()
-SIMMEDTK_FINISH_DYNAMIC_LOADER()
+IMSTK_BEGIN_DYNAMIC_LOADER()
+  IMSTK_BEGIN_ONLOAD(register_abstract_children)
+    IMSTK_REGISTER_CLASS(CoreClass, abstract, A, 65);
+    IMSTK_REGISTER_CLASS(CoreClass, abstract, B, 66);
+  IMSTK_FINISH_ONLOAD()
+IMSTK_FINISH_DYNAMIC_LOADER()
 
 using namespace bandit;
 
 go_bandit([](){
   describe("factory", []() {
-    SIMMEDTK_RUN_LOADER(register_abstract_children);
+    IMSTK_RUN_LOADER(register_abstract_children);
 
     it("shows 2 subclasses of \"abstract\"", [&]() {
       AssertThat(Factory<CoreClass>::optionsForClass("abstract").size(), Equals(2));

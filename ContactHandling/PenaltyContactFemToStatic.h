@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT
-#define SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT
 
-// SimMedTK includes
+#ifndef CONTACT_HANDLING_PENALTYCONTACTFEMTOSTATIC_H
+#define CONTACT_HANDLING_PENALTYCONTACTFEMTOSTATIC_H
+
+// iMSTK includes
 #include "ContactHandling/PenaltyContactHandling.h"
 #include "SceneModels/DeformableSceneObject.h"
 
@@ -52,4 +49,4 @@ public:
 
 };
 
-#endif // SMPENALTY_FEM_TO_STATIC_SCENE_OBJECT
+#endif // CONTACT_HANDLING_PENALTY_FEM_TO_STATIC_SCENE_OBJECT

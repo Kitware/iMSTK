@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,15 +16,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/IOStream.h"
 
 ConsoleStream::ConsoleStream()
@@ -43,7 +39,7 @@ WindowString::WindowString()
     x = 0;
     y = 0;
     string = "";
-    string.reserve(SM_WINDOW_MAXSTRINGSIZE);
+    string.reserve(IMSTK_WINDOW_MAXSTRINGSIZE);
 }
 WindowString::WindowString(std::string p_string)
 {
@@ -114,7 +110,7 @@ int OpenGLWindowStream::addText(const std::string& p_tag, const std::string& p_s
 }
 bool OpenGLWindowStream::addText(std::string p_tag, WindowString& p_string)
 {
-    if (p_string.string.size() > SM_WINDOW_MAXSTRINGSIZE)
+    if (p_string.string.size() > IMSTK_WINDOW_MAXSTRINGSIZE)
     {
         return false;
     }
@@ -129,7 +125,7 @@ bool OpenGLWindowStream::updateText(std::string p_tag, std::string p_string)
 {
     int index = -1;
 
-    if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
+    if (p_string.size() > IMSTK_WINDOW_MAXSTRINGSIZE)
     {
         return false;
     }
@@ -149,7 +145,7 @@ bool OpenGLWindowStream::updateText(int p_textHandle, std::string p_string)
 {
     int index = p_textHandle;
 
-    if (p_string.size() > SM_WINDOW_MAXSTRINGSIZE)
+    if (p_string.size() > IMSTK_WINDOW_MAXSTRINGSIZE)
     {
         return false;
     }

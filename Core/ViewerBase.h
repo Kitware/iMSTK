@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,18 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMVIEWERBASE_H
-#define SMVIEWERBASE_H
+#ifndef CORE_VIEWERBASE_H
+#define CORE_VIEWERBASE_H
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/Scene.h"
 #include "Core/Dispatcher.h"
@@ -40,16 +36,16 @@ struct Texture;
 
 enum RenderingStageType
 {
-    SMRENDERSTAGE_SHADOWPASS,
-    SMRENDERSTAGE_DPMAPPASS,
-    SMRENDERSTAGE_CUSTOMPASS,
-    SMRENDERSTAGE_FINALPASS
+    IMSTK_RENDERSTAGE_SHADOWPASS,
+    IMSTK_RENDERSTAGE_DPMAPPASS,
+    IMSTK_RENDERSTAGE_CUSTOMPASS,
+    IMSTK_RENDERSTAGE_FINALPASS
 };
 
 enum RenderTargetType
 {
-    SMRENDERTARGET_SCREEN,
-    SMRENDERTARGET_FBO
+    IMSTK_RENDERTARGET_SCREEN,
+    IMSTK_RENDERTARGET_FBO
 };
 
 /// \brief Describes what to render and where the rendering should take place
@@ -129,7 +125,7 @@ public:
     /// \brief set the window title
     virtual void setWindowTitle(const std::string &str);
     /// \brief Registers a scene for rendering with the viewer
-    virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target = SMRENDERTARGET_SCREEN, const std::string &fboName = "");
+    virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target = IMSTK_RENDERTARGET_SCREEN, const std::string &fboName = "");
     /// \brief Adds an FBO to the viewer to allow rendering to it.
     ///
     /// \detail The FBO will be created an initialized in the viewer.
@@ -200,4 +196,4 @@ protected:
     void adjustFPS();
 };
 
-#endif // SMVIEWERBASE_H
+#endif // CORE_VIEWERBASE_H

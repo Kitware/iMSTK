@@ -1,5 +1,5 @@
-#ifndef SMFACTORY_HPP
-#define SMFACTORY_HPP
+#ifndef CORE_FACTORY_HPP
+#define CORE_FACTORY_HPP
 
 #include <cstdlib> // for std::atexit
 
@@ -151,4 +151,4 @@ std::shared_ptr<T> Factory<T>::createSubclassForGroup(
 template<typename T>
 std::map<std::string, typename Factory<T>::FactoryConfigurationOptions>* Factory<T>::s_catalog = nullptr;
 
-#endif // SMFACTORY_HPP
+#endif // CORE_FACTORY_HPP
