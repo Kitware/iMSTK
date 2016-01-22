@@ -95,6 +95,15 @@ public:
     void setMesh(std::shared_ptr<Core::BaseMesh> newMesh);
 
     ///
+    /// \brief Mesh accessors
+    ///
+    template<typename MeshType>
+    std::shared_ptr<MeshType> getMeshAs()
+    {
+        return std::dynamic_pointer_cast<MeshType>(this->mesh);
+    }
+
+    ///
     /// \brief Filename accessors
     ///
     const std::string &getFileName() const;

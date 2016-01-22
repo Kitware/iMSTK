@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    DirectLinearSolver() = delete;
+    DirectLinearSolver() = default;
     ~DirectLinearSolver() = default;
 
     ///

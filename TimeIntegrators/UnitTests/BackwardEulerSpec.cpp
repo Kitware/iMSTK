@@ -33,50 +33,87 @@ go_bandit([]()
 {
     describe("Implicit Euler ODE Solver", []()
     {
+        auto odeSystem = std::make_shared<OdeSystem>();
         auto euler = std::make_shared<BackwardEuler>();
+        auto initialState = std::make_shared<OdeSystemState>();
         // ODE parameters
-        double dt = 0.1;
-        double t0 = 0, t1 = 1;
+        double dt = 0.01;
+        double t0 = 0, t1 = 3;
         size_t steps = (t1-t0)/dt;
-        double lambda = 1;
+        double lambda = -10;
         double a = 1;
 
         // ODE right hand side function
-        auto F = [&](const core::Vectord &x, core::Vectord &y) -> core::Vectord&
+        core::Vectord y;
+        auto F = [&](const OdeSystemState &x) -> const core::Vectord&
         {
-            y = lambda*x;
+            y = -lambda*x.getVelocities();
             return y;
         };
 
         std::vector<Eigen::Triplet<double>> tripletList;
-        auto DF = [&](const core::Vectord &, core::SparseMatrixd &J)
+        tripletList.emplace_back(0,0,0);
+        core::SparseMatrixd K(1,1);
+        K.setFromTriplets(tripletList.begin(),tripletList.end());
+        K.makeCompressed();
+        auto DFx = [&](const OdeSystemState &) -> const core::SparseMatrixd&
         {
-            tripletList.clear();
-            tripletList.emplace_back(0,0,lambda);
-            J.setFromTriplets(tripletList.begin(),tripletList.end());
+            return K;
         };
-        euler->setFunction(F);
-        euler->setJacobian(DF);
+
+        core::SparseMatrixd C(1,1);
+        tripletList.clear();
+        tripletList.emplace_back(0,0,-lambda);
+        C.setFromTriplets(tripletList.begin(),tripletList.end());
+        C.makeCompressed();
+        auto DFv = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        {
+            return C;
+        };
+
+        core::SparseMatrixd M(1,1);
+        tripletList.clear();
+        tripletList.emplace_back(0,0,1.0);
+        M.setFromTriplets(tripletList.begin(),tripletList.end());
+        M.makeCompressed();
+        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        {
+            return M;
+        };
+
+        odeSystem->setFunction(F);
+        odeSystem->setJaconbianFx(DFx);
+        odeSystem->setJaconbianFv(DFv);
+        odeSystem->setMass(Mass);
 
         it("constructs ", [&]()
         {
             AssertThat(euler != nullptr, IsTrue());
+            AssertThat(odeSystem != nullptr, IsTrue());
         });
 
-        it("solves dx/dt=lambda*x, x(0)=a ", [&]()
-        {
-            // Initial value
-            core::Vectord x(1);
-            x(0) = a;
+        // Initial state
+        initialState->resize(1);
+        initialState->getVelocities()(0) = a;
 
+        odeSystem->setInitialState(initialState);
+        euler->setSystem(odeSystem.get());
+
+        it("solves dx/dt-lambda*x=0, x(0)=a ", [&]()
+        {
             // Find the solution for t = [0,1)
-            core::Vectord sol(steps), error(steps);
-            sol(0) = x(0);
+            OdeSystemState state, newState;
+            state = *initialState;
+            newState = state;
+
+            core::Vectord error(steps), sol(steps);
             error(0) = 0.0;
+            sol(0) = a;
             for(size_t i = 1; i < steps; ++i)
             {
-                euler->solve(x,dt);
-                sol(i) = x(0);
+                euler->solve(state,newState,dt);
+                state = newState;
+                sol(i) = state.getVelocities()(0);
                 error(i) = sol(i)-std::exp(lambda*i*dt);
             }
             AssertThat(error.norm(), IsLessThan(dt*steps));

@@ -38,7 +38,8 @@
 class NonLinearSolver
 {
 public:
-    using JacobianType = std::function<void(const core::Vectord &, core::SparseMatrixd &)>;
+    using JacobianType = std::function<const core::SparseMatrixd&(const core::Vectord&)>;
+    using UpdateIterateType = std::function<void(const core::Vectord&,core::Vectord&)>;
     using FunctionType = SystemOfEquations::FunctionType;
 
 public:
@@ -59,7 +60,7 @@ public:
     /// \param dx Computed direction.
     /// \param x Current iterate.
     ///
-    double armijo(const core::Vectord &dx, core::Vectord &x);
+    double armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm);
 
     ///
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
@@ -75,7 +76,7 @@ public:
                         std::array<double, 3> &lambda);
 
     ///
-    /// \brief Set/Get Sigma. Safeguard parameter for the the linesearch method.
+    /// \brief Set/Get Sigma. Safeguard parameter for the the line search method.
     ///
     /// \param newSigma New sigma parameter.
     ///
@@ -83,7 +84,7 @@ public:
     const std::array<double, 2> &getSigma() const;
 
     ///
-    /// \brief Set/Get Alpha. Parameter to measure sufficient decrease in the linerseach.
+    /// \brief Set/Get Alpha. Parameter to measure sufficient decrease in the line search.
     ///
     /// \param newAlpha New alpha parameter.
     ///
@@ -114,12 +115,19 @@ public:
     ///
     void setSystem(const FunctionType &F);
 
+    ///
+    /// \brief Set a customized iterate update function.
+    ///
+    /// \param newUpdateIterate Function used to update iterates. Default: x+=dx.
+    ///
+    void setUpdateIterate(const UpdateIterateType &newUpdateIterate);
+
 protected:
-    core::Vectord f;                ///< Storage for function evaluations
-    std::array<double, 2> sigma;    ///< Safeguarding bounds for the lineseach
+    std::array<double, 2> sigma;    ///< Safeguarding bounds for the line search
     double alpha;                   ///< Parameter to measure decrease
-    size_t armijoMax;               ///< Maximum number of steplength reductions
+    size_t armijoMax;               ///< Maximum number of step length reductions
     std::shared_ptr<SystemOfEquations> nonLinearSystem; ///< System of non-linear equations
+    UpdateIterateType updateIterate; ///< Update iteration function
 };
 
 #endif // SM_LINEAR_SOLVER

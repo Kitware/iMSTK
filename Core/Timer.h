@@ -56,7 +56,7 @@ public:
     long double elapsed();
 
 private:
-    TimePointType begin; //!< Begining of time point
+    TimePointType begin; //!< Beginning of time point
 };
 
 } //core

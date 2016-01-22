@@ -48,6 +48,9 @@ public:
     ///
     /// \brief Constructor
     ///
+    /// \param generateMeshGraph True if you want to generate a mesh graph. The mesh
+    ///     graphs is used by the time stepping method to apply Lagrangian damping.
+    ///
     VegaVolumetricMesh(bool generateMeshGraph = true);
 
     ///
@@ -74,27 +77,32 @@ public:
     ///
     /// \brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
-    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const double &radius = -1.0);
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                           const double &radius = -1.0,
+                           bool useForRendering = true);
 
     ///
     /// \brief Get attached surface mesh
     ///
-    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh, const std::string &fileName, const double &radius = 5.0);
+    void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
+                           const std::string &fileName,
+                           const double &radius = 5.0,
+                           bool useForRendering = true);
 
     ///
-    /// \brief Return mesh
+    /// \brief Return underlying Vega mesh data structure.
     ///
     std::shared_ptr<VolumetricMesh> getVegaMesh();
 
     ///
-    /// \brief Sets the vega mesh
+    /// \brief Sets the Vega underlying mesh.
     ///
     void setVegaMesh(std::shared_ptr<VolumetricMesh> newMesh);
 
     ///
     /// \brief Update nodes to local arrays
     ///
-    void updateAttachedMeshes(double *q);
+    void updateAttachedMeshes(const core::Vectord &q);
 
     ///
     /// \brief Return the vertex map
@@ -158,19 +166,33 @@ public:
     void generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMesh,
                          double radius = 1.0,
                          const bool saveToDisk = false,
-                         const std::string &filename = "mesh.interp"
-                        );
+                         const std::string &filename = "mesh.interp");
 
     ///
     /// \brief Apply a tranlation to all the vertices, including attached meshes.
     ///
     void translate(const Eigen::Translation3d &translation, bool setInitialPoints = false);
 
+    ///
+    /// \brief Interpolate the displacements on to the given mesh.
+    ///
+    /// \param x Displacements.
+    /// \param mesh Mesh where the interpolation will be computed.
+    ///
+    void interpolate(const core::Vectord &x,
+                     std::shared_ptr< SurfaceMesh > mesh);
+
+    ///
+    /// \brief Compute gravity force
+    ///
+    void computeGravity(const core::Vec3d &gravity, core::Vectord &gravityForce);
+
 private:
     // Vega mesh base object
     std::shared_ptr<VolumetricMesh> mesh;
 
-    // Vega mesh graph
+    // Vega mesh graph. The mesh graphs is used by the time stepping method to
+    // apply Lagrangian damping.
     std::shared_ptr<Graph> meshGraph;
 
     // Generate graph for this mesh

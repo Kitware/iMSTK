@@ -25,7 +25,7 @@
 #define TIMEINTEGRATOR_H
 
 #include "Core/Vector.h"
-#include "Solvers/SystemOfEquations.h" // For FunctionType
+#include "TimeIntegrators/OdeSystem.h"
 
 ///
 /// @brief Base class for all time time integrators
@@ -33,30 +33,53 @@
 class TimeIntegrator
 {
 public:
-    using FunctionType = SystemOfEquations::FunctionType;
+    using FunctionType = OdeSystem::FunctionType;
+
+    enum IntegratorType
+    {
+        ImplicitEuler,
+        ExplicitEuler
+    };
 
 public:
     ///
     /// @brief Constructor/Destructor
     ///
     TimeIntegrator() = default;
-    ~TimeIntegrator() = default;
+    virtual ~TimeIntegrator() = default;
 
     ///
-    /// @brief Perform one iteration of the method
+    /// \brief Constructor. Takes the system describing the ODE.
     ///
-    /// \param x Current iterate.
-    /// \param timeStep current timeStep
-    ///
-    virtual void solve(core::Vectord&,double) = 0;
+    TimeIntegrator(OdeSystem *odeSystem);
 
     ///
-    /// \brief Set the the right hand side function of the ODE system
+    /// \brief Perform one iteration of the method
     ///
-    void setFunction(const FunctionType &newF);
+    /// \param oldState Previous state.
+    /// \param newState New writable state.
+    /// \param timeStep Step size.
+    ///
+    virtual void solve(const OdeSystemState &oldState,
+                       OdeSystemState &newState,
+                       const double timeStep) = 0;
+
+    ///
+    /// \brief Return the Ode system of equations.
+    ///
+    /// \return Pointer to ODE system.
+    ///
+    OdeSystem *getSystem() const;
+
+    ///
+    /// \brief Set a new system of ODEs.
+    ///
+    /// \param newSystem Ode system.
+    ///
+    void setSystem(OdeSystem *odeSystem);
 
 protected:
-    FunctionType F;
+    OdeSystem *system;  ///> System of differential equations.
 };
 
 #endif // TIMEINTEGRATOR_H

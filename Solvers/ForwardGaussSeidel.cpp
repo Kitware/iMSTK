@@ -33,7 +33,9 @@ ForwardGaussSeidel::ForwardGaussSeidel(
 //---------------------------------------------------------------------------
 void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 {
-    x = this->linearSystem->getRHSVector() - this->linearSystem->getStrictUpperTriangular() * x;
+    x = this->linearSystem->getRHSVector() -
+        this->linearSystem->getStrictUpperTriangular() * x;
+
     this->linearSystem->getLowerTriangular().solveInPlace(x);
 
     if (updateResidual)
@@ -62,7 +64,8 @@ void ForwardGaussSeidel::relax(core::Vectord& x)
 }
 
 //---------------------------------------------------------------------------
-void ForwardGaussSeidel::setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+void ForwardGaussSeidel::
+setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
 {
     LinearSolver::setSystem(newSystem);
 }

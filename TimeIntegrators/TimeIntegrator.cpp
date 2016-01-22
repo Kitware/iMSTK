@@ -23,7 +23,17 @@
 
 #include "TimeIntegrator.h"
 
-void TimeIntegrator::setFunction(const TimeIntegrator::FunctionType &newF)
+TimeIntegrator::TimeIntegrator(OdeSystem *odeSystem): system(odeSystem)
+{}
+
+//---------------------------------------------------------------------------
+OdeSystem *TimeIntegrator::getSystem() const
 {
-    this->F = newF;
+    return this->system;
+}
+
+//---------------------------------------------------------------------------
+void TimeIntegrator::setSystem(OdeSystem *newSystem)
+{
+    this->system = newSystem;
 }

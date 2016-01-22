@@ -24,7 +24,7 @@
 #include "MeshToMeshCollision.h"
 
 // SimMedTK includes
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Collision/CollisionMoller.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/SurfaceTree.h"
@@ -32,7 +32,7 @@
 // STL includes
 #include <vector>
 
-void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionPair> pairs)
+void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> pairs)
 {
     auto meshA = std::static_pointer_cast<MeshCollisionModel>(pairs->getFirst());
     auto meshB = std::static_pointer_cast<MeshCollisionModel>(pairs->getSecond());

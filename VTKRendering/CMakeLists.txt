@@ -3,8 +3,8 @@ simmedtk_add_library(VTKRendering
     VTKViewer.cpp
     VTKMeshRenderDelegate.cpp
     VTKPlaneRenderDelegate.cpp
-    VTKSceneObjectDeformableRenderDelegate.cpp
     VTKStaticSceneObjectRenderDelegate.cpp
+    VTKSceneModelRenderDelegate.cpp
     InitVTKRendering.cpp
   PUBLIC_HEADERS
     VTKViewer.h
@@ -19,6 +19,7 @@ target_link_libraries(VTKRendering
     Mesh
     Geometry
     Devices
+    SceneModels
   PUBLIC
     ${VTK_LIBRARIES}
     )

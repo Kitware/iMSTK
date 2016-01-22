@@ -1,16 +1,10 @@
 simmedtk_add_library(Simulators
   SOURCES
     DefaultSimulator.cpp
-    SceneObjectDeformable.cpp
-    VegaFemSceneObject.cpp
-    VegaFemSimulator.cpp
-    VegaObjectConfig.cpp
+    ObjectSimulator.cpp
   PUBLIC_HEADERS
     DefaultSimulator.h
-    SceneObjectDeformable.h
-    VegaFemSceneObject.h
-    VegaFemSimulator.h
-    VegaObjectConfig.h
+    ObjectSimulator.h
 )
 
 target_link_libraries(Simulators
@@ -22,6 +16,9 @@ target_link_libraries(Simulators
     IO
     Devices
     VirtualTools
+    Solvers
+    TimeIntegrators
+    SceneModels
   PUBLIC
     VegaFEM::configFile
     VegaFEM::vega-getopts
@@ -36,6 +33,7 @@ target_link_libraries(Simulators
     VegaFEM::loadList
     VegaFEM::objMesh
     VegaFEM::volumetricMesh
+    VegaFEM::forceModel
     )
 
 target_include_directories(Simulators

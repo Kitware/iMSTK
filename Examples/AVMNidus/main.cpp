@@ -24,18 +24,15 @@
 #include <memory>
 
 // Core SimMedTK includes
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 
 // Include required types scene objects
-#include "Simulators/VegaFemSceneObject.h"
-#include "Core/StaticSceneObject.h"
 #include "Mesh/VegaVolumetricMesh.h"
+#include "SceneModels/StaticSceneObject.h"
+#include "SceneModels/VegaFEMDeformableSceneObject.h"
+#include "Simulators/ObjectSimulator.h"
 
-// Include required simulators
-#include "Simulators/VegaFemSimulator.h"
-#include "Simulators/DefaultSimulator.h"
-
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
@@ -69,25 +66,25 @@ int main(int ac, char **av)
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
     // create a FEM simulator
-    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
+    auto femSimulator = std::make_shared<ObjectSimulator>();
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(sdk->getErrorLog(),configFile);
+    auto femModel = std::make_shared<VegaFEMDeformableSceneObject>("nidusV1764.vtk",
+                                                                   configFile);
 
-    sdk->addSceneActor(femObject, femSimulator);
-    sdkSimulator->registerObjectSimulator(femSimulator);
+    sdk->addSceneActor(femModel, femSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
-    auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto staticSimulator = std::make_shared<ObjectSimulator>();
 
     // Create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();
 
-    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0, 0.0, -35.0),
-                                                  core::Vec3d(0.0, 0.0, 1.0));
+    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0,0.0,-35.0),
+                                                       core::Vec3d(0.0,0.0,1.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -95,26 +92,31 @@ int main(int ac, char **av)
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    auto meshModel = std::make_shared<MeshCollisionModel>();
-    meshModel->setMesh(femObject->getVolumetricMesh()->getAttachedMesh(0));
+    auto meshModel = femModel->getCollisionModel();
+    if(!meshModel)
+    {
+        std::cout << "There is no collision model attached to this scene object" << std::endl;
+    }
+    else
+    {
+        auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
+        planeMeshCollisionPairs->setModels(meshModel, plane);
 
-    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
-    planeMeshCollisionPairs->setModels(meshModel, plane);
+        sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
+        auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
 
-    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+        sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
-    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+        //-------------------------------------------------------
+        // Enable contact handling between scene actors 1 and 2
+        //-------------------------------------------------------
+        auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+        planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
+        planeToMeshContact->setSceneObjects(staticObject, femModel);
 
-    //-------------------------------------------------------
-    // Enable contact handling between scene actors 1 and 2
-    //-------------------------------------------------------
-    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
-    planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
-    planeToMeshContact->setSceneObjects(staticObject, femObject);
-
-    sdkSimulator->registerContactHandling(planeToMeshContact);
+        sdkSimulator->registerContactHandling(planeToMeshContact);
+    }
 
     //-------------------------------------------------------
     // Customize the viewer

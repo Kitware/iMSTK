@@ -286,13 +286,17 @@ set(SimMedTK_exports
   TimeIntegrators
   VTKRendering
   VirtualTools
+  SceneModels
+  SimulationManager
   )
 
 if(SimMedTK_USE_OCULUS)
   list(APPEND SimMedTK_exports RenderingOculus)
 endif()
 
+add_subdirectory(Assembler)
 add_subdirectory(Collision)
+add_subdirectory(CollisionContext)
 add_subdirectory(ContactHandling)
 add_subdirectory(Core)
 add_subdirectory(Devices)
@@ -304,7 +308,9 @@ add_subdirectory(IO)
 add_subdirectory(Mesh)
 add_subdirectory(Rendering)
 add_subdirectory(Simulators)
+add_subdirectory(SimulationManager)
 add_subdirectory(Solvers)
+add_subdirectory(SceneModels)
 add_subdirectory(TimeIntegrators)
 add_subdirectory(VTKRendering)
 add_subdirectory(VirtualTools)

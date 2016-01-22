@@ -30,12 +30,12 @@
 
 // SimMedTK includes
 #include "Core/Config.h"
-#include "Core/ObjectSimulator.h"
+#include "Simulators/ObjectSimulator.h"
 #include "Core/ErrorLog.h"
-#include <Core/Vector.h>
+#include "Core/Vector.h"
 
 class ToolCoupler;
-class StaticSceneObject;
+class MeshModel;
 ///
 /// \brief Default simulator that applies operations to the position array of the
 ///     undelying scene object model.
@@ -44,10 +44,10 @@ class StaticSceneObject;
 ///
 class DefaultSimulator: public ObjectSimulator
 {
-    typedef std::function<void(std::vector<core::Vec3d>&)> OperationType;
+    typedef std::function<void(std::shared_ptr<MeshModel> &sceneObject)> OperationType;
 public:
     /// \brief Constructor/Destructor
-    DefaultSimulator(std::shared_ptr<ErrorLog> p_errorLog);
+    DefaultSimulator();
     ~DefaultSimulator(){}
 
     void addOperation(const OperationType &op)
@@ -59,14 +59,14 @@ protected:
     ///
     /// Overriden methods
     ///
-    virtual void beginSim() override;
-    virtual void initCustom() override;
+    virtual void beginExecution() override;
+    virtual void initialize() override;
     virtual void run() override;
-    void endSim() override;
+    void endExecution() override;
     void syncBuffers() override;
     void handleEvent(std::shared_ptr<core::Event> p_event) override;
 
-    void updateHapticForces(std::shared_ptr<StaticSceneObject> sceneObject);
+    void updateHapticForces(std::shared_ptr<SceneObject> sceneObject);
 
 private:
     std::vector<OperationType> operatorFunctions;

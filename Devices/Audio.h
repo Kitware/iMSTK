@@ -29,7 +29,7 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 #include "Event/AudioEvent.h"
 
 /// \brief class to enable audio rendering

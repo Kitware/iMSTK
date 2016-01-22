@@ -29,7 +29,6 @@
 #include "Core/Scene.h"
 #include "Core/Dispatcher.h"
 #include "Core/Module.h"
-#include "Core/StaticSceneObject.h"
 #include "Core/DataStructures.h"
 
 // Forward declaration

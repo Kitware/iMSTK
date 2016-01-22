@@ -26,15 +26,12 @@
 
 #include "Rendering/TextureManager.h"
 #include "Core/Event.h"
-#include "Core/SDK.h"
 #include "Event/KeyboardEvent.h"
 
 MetalShader::MetalShader( const std::string &p_verteShaderFileName,
                               const std::string &p_fragmentFileName ) :
-                              Shader(SDK::getInstance()->getErrorLog())
+                              Shader(nullptr)
 {
-    this->log = SDK::getInstance()->getErrorLog();
-    this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName( p_verteShaderFileName, nullptr, p_fragmentFileName );
     createParam( "DecalTex" );

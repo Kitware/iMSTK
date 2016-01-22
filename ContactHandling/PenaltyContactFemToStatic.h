@@ -25,7 +25,7 @@
 
 // SimMedTK includes
 #include "ContactHandling/PenaltyContactHandling.h"
-#include "Simulators/VegaFemSceneObject.h"
+#include "SceneModels/DeformableSceneObject.h"
 
 ///
 /// @brief Penalty based for contact handling
@@ -37,7 +37,7 @@ public:
 
     PenaltyContactFemToStatic(bool typeBilateral,
                              const std::shared_ptr<SceneObject>& sceneObjFirst,
-                             const std::shared_ptr<SceneObject>& sceneObjSecond);
+                             const std::shared_ptr<DeformableSceneObject>& sceneObjSecond);
 
     virtual ~PenaltyContactFemToStatic();
 
@@ -46,6 +46,9 @@ public:
 
     /// \brief Get the forces on both the scene objects using penalty method
     virtual void computeBilateralContactForces() override;
+
+    /// \brief Get the forces on both the scene objects using penalty method
+    virtual void computeForces(std::shared_ptr<DeformableSceneObject> sceneObject);
 
 };
 

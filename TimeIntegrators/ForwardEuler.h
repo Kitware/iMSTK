@@ -26,28 +26,41 @@
 
 #include "TimeIntegrators/TimeIntegrator.h"
 #include "Core/Vector.h"
+#include "Solvers/ConjugateGradient.h"
 
 ///
-/// @brief Approximates the solution to the Initial value problem: dx/dt = F(x,t),
-///     v(t0) = v0 using a forward Euler scheme; v(t1) = v(t0) + dtF(v(t0),t0)
+/// @brief Approximates the solution to the Initial value problem: Mdv/dt = F(x,v,t),
+///     v(t0) = v0 using a forward Euler scheme; Mv(t1) = Mv(t0) + dtF(v(t0),t0)
 ///
 class ForwardEuler : public TimeIntegrator
 {
 public:
+    using LinearSolverType = LinearSolver<core::SparseMatrixd>;
+
+public:
     ///
-    /// @brief Constructor/Destructor.
+    /// @brief Default Constructor/Destructor.
     ///
-    ForwardEuler() = default;
+    ForwardEuler();
     ~ForwardEuler() = default;
+
+    ///
+    /// \brief Constructor. Takes the system describing the ODE.
+    ///
+    ForwardEuler(OdeSystem *odeSystem);
 
     ///
     /// @brief Perform one iteration of the Forward Euler method.
     ///
     /// \param x Current iterate.
-    /// \param timeStep current timeStep.
+    /// \param timeStep Current timeStep.
     ///
-    void solve(core::Vectord &x, double timeStep) override;
+    void solve(const OdeSystemState &state,
+               OdeSystemState &newState,
+               double timeStep) override;
 
+private:
+    std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. (Default: ConjugateGradient)
 };
 
 #endif // FORWARDEULER_H

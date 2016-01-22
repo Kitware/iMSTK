@@ -22,7 +22,6 @@
 //---------------------------------------------------------------------------
 
 #include "Core/Config.h"
-#include "Core/SDK.h"
 #include "Core/ViewerBase.h"
 #include "Core/DataStructures.h"
 #include "Core/RenderDelegate.h"
@@ -75,10 +74,6 @@ void ViewerBase::initObjects()
         {
             i->initDraw();
         }
-        else
-        {
-            continue;
-        }
     }
 }
 
@@ -93,11 +88,6 @@ void ViewerBase::initScenes()
 
         for (const auto &sceneObject : scene->getSceneObjects())
         {
-            //initialize the custom Render if there is any
-            if ( sceneObject->customRender != nullptr && sceneObject->getType() != core::ClassType::Shader )
-            {
-                sceneObject->customRender->initDraw();
-            }
             sceneObject->initDraw();
         }
     }//scene traverse
@@ -244,8 +234,6 @@ void ViewerBase::render()
 
 void ViewerBase::addObject(std::shared_ptr<CoreClass> object)
 {
-
-    SDK::getInstance()->addRef(object);
     objectList.push_back(object);
 }
 

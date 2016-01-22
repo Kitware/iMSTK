@@ -26,9 +26,9 @@
 BackwardSOR::BackwardSOR(): weight(.9) {}
 
 //---------------------------------------------------------------------------
-BackwardSOR::BackwardSOR(const core::SparseMatrixd &A,
-                         const core::Vectord &rhs,
-                         const double &w): BackwardGaussSeidel(A, rhs), weight(w)
+BackwardSOR::
+BackwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w)
+    : BackwardGaussSeidel(A, rhs), weight(w)
 {}
 
 //---------------------------------------------------------------------------

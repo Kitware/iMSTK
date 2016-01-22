@@ -1,0 +1,51 @@
+
+simmedtk_add_library(SceneModels
+  SOURCES
+    DeformableSceneObject.cpp
+    SceneObject.cpp
+    StaticSceneObject.cpp
+    VegaFEMDeformableSceneObject.cpp
+  PUBLIC_HEADERS
+    DeformableSceneObject.h
+    SceneObject.h
+    StaticSceneObject.h
+    VegaFEMDeformableSceneObject.h
+)
+
+target_link_libraries(SceneModels
+  PRIVATE
+    Core
+    Mesh
+    Event
+    Collision
+    IO
+    Devices
+    VirtualTools
+    Solvers
+    TimeIntegrators
+    Geometry
+  PUBLIC
+    VegaFEM::configFile
+    VegaFEM::vega-getopts
+    VegaFEM::performanceCounter
+    VegaFEM::volumetricMesh
+    VegaFEM::stvk
+    VegaFEM::integratorSparse
+    VegaFEM::massSpringSystem
+    VegaFEM::corotationalLinearFEM
+    VegaFEM::elasticForceModel
+    VegaFEM::isotropicHyperelasticFEM
+    VegaFEM::loadList
+    VegaFEM::objMesh
+    VegaFEM::volumetricMesh
+    VegaFEM::forceModel
+    )
+
+target_include_directories(SceneModels
+  PRIVATE
+    ${CMAKE_SOURCE_DIR}/include
+    )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

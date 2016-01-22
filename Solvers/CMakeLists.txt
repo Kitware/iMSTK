@@ -8,7 +8,7 @@ simmedtk_add_library(${MODULE_NAME}
     DirectLinearSolver.cpp
     ForwardGaussSeidel.cpp
     ForwardSOR.cpp
-    InexactNewton.cpp
+    NewtonMethod.cpp
     IterativeLinearSolver.cpp
     NonLinearSolver.cpp
   PUBLIC_HEADERS
@@ -19,7 +19,7 @@ simmedtk_add_library(${MODULE_NAME}
     DirectLinearSolver.h
     ForwardGaussSeidel.h
     ForwardSOR.h
-    InexactNewton.h
+    NewtonMethod.h
     IterativeLinearSolver.h
     LinearSolver.h
     LinearSolver.hpp

@@ -30,15 +30,14 @@
 #include "Core/Matrix.h"
 
 ///
-/// \class systemOfEquations
+/// \class SystemOfEquations
 ///
 /// \brief Base class for system of equations
 ///
 class SystemOfEquations
 {
 public:
-    using FunctionType = std::function < core::Vectord &(const core::Vectord &,
-                         core::Vectord &) >;
+    using FunctionType = std::function<const core::Vectord&(const core::Vectord &)>;
 
 public:
     ///
@@ -58,16 +57,16 @@ public:
     ///
     /// \brief Evaluate function at specified argument
     ///
-    /// \param x
+    /// \param x Value.
+    /// \return Function value.
     ///
-    inline void eval(const core::Vectord &x, core::Vectord &y)
+    inline const core::Vectord &eval(const core::Vectord &x)
     {
-        this->F(x,y);
+        return this->F(x);
     }
 
 protected:
-    //!< Function associated with the system of equation to solve.
-    FunctionType F;
+    FunctionType F;  ///> Function associated with the system of equation to solve.
 };
 
 ///
@@ -98,9 +97,10 @@ public:
         A(matrix),
         rhs(b)
     {
-        this->F = [this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+        this->F = [this](const core::Vectord & x) -> core::Vectord &
         {
-            return y = this->A * x;
+            this->f = this->A * x;
+            return this->f;
         };
     }
 
@@ -138,7 +138,7 @@ public:
     ///
     inline core::Vectord &computeResidual(const core::Vectord &x, core::Vectord &r) const
     {
-        r = this->rhs - this->F(x, r);
+        r = this->rhs - this->F(x);
         return r;
     }
 
@@ -178,9 +178,20 @@ public:
         return this->A.template triangularView<Eigen::StrictlyUpper>();
     }
 
+    ///
+    /// \brief Get the value of the function F
+    ///
+    /// \return Function value.
+    ///
+    inline core::Vectord &getFunctionValue()
+    {
+        return this->f;
+    }
+
 private:
     const MatrixType &A;
     const core::Vectord &rhs;
+    core::Vectord f; ///> Storage for matrix vector product
 };
 
 #endif // SYSTEM_OF_EQUATIONS

@@ -28,7 +28,7 @@
 // SimMedTK includes
 #include "Core/CollisionDetection.h"
 
-class CollisionPair;
+class CollisionManager;
 
 ///
 /// @brief COllision detection based on BVH queries and
@@ -43,7 +43,7 @@ public:
     MeshToMeshCollision(const MeshToMeshCollision &) = delete;
 
 private:
-    virtual void doComputeCollision(std::shared_ptr<CollisionPair> pairs) override;
+    virtual void doComputeCollision(std::shared_ptr<CollisionManager> pairs) override;
 
 };
 

@@ -27,9 +27,6 @@
 #include "Solvers/SystemOfEquations.h"
 #include "Core/Matrix.h"
 
-template<typename SystemMatrixType>
-class LinearSystem;
-
 ///
 /// \brief Base class for linear solvers
 ///

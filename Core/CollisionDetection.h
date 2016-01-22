@@ -31,7 +31,7 @@
 #include "Core/CoreClass.h"
 
 class Mesh;
-class CollisionPair;
+class CollisionManager;
 
 /// \brief Base class to calculate contact information between two meshes
 /// It determines if two meshes are in close proximity and calculates contacts
@@ -43,10 +43,10 @@ public:
 
     virtual ~CollisionDetection() {}
 
-    void computeCollision(std::shared_ptr<CollisionPair> pairs);
+    void computeCollision(std::shared_ptr<CollisionManager> pairs);
 
 private:
-    virtual void doComputeCollision(std::shared_ptr<CollisionPair> pairs) = 0;
+    virtual void doComputeCollision(std::shared_ptr<CollisionManager> pairs) = 0;
 };
 
 #endif

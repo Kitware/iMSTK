@@ -23,12 +23,10 @@
 
 // SimMedTK includes
 #include "Rendering/SceneTextureShader.h"
-#include "Core/SDK.h"
 
 SceneTextureShader::SceneTextureShader(const std::string &p_verteShaderFileName, const std::string &p_fragmentFileName)
-: Shader(SDK::getInstance()->getErrorLog())
+: Shader(nullptr)
 {
-    this->log = SDK::getInstance()->getErrorLog();
     this->log->isOutputtoConsoleEnabled = false;
     this->checkErrorEnabled = true;
     setShaderFileName(p_verteShaderFileName, "", p_fragmentFileName);

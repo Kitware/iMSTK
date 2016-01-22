@@ -23,107 +23,50 @@
 
 // SimMedTK includes
 #include "Simulators/DefaultSimulator.h"
-#include "Core/StaticSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Core/Event.h"
 #include "Event/KeyboardEvent.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Devices/VRPNForceDevice.h"
 #include "VirtualTools/ToolCoupler.h"
 
-DefaultSimulator::DefaultSimulator( std::shared_ptr<ErrorLog> p_errorLog ) : ObjectSimulator( p_errorLog )
+DefaultSimulator::DefaultSimulator(  ) : ObjectSimulator( )
 {
-    this->addOperation([](std::vector<core::Vec3d>& array)
+    this->addOperation([](std::shared_ptr<MeshModel> &model)
     {
-        for(auto &x : array)
+        for(auto &x : model->getMesh()->getVertices())
         {
             x.array() += 0.000001;
         }
     });
 }
-void DefaultSimulator::beginSim()
+void DefaultSimulator::beginExecution()
 {
     //start the job
 }
-void DefaultSimulator::initCustom()
+void DefaultSimulator::initialize()
 {
     //do nothing for now
-    for ( size_t i = 0; i < objectsSimulated.size(); i++ )
-    {
-        auto object = objectsSimulated[i];
-
-        switch ( object->getType() )
-        {
-            case core::ClassType::StaticSceneObject:
-            {
-                auto sceneObject = std::static_pointer_cast<StaticSceneObject>(object);
-                auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
-                if(!model)
-                {
-                    std::cerr << "Unknown model type." << std::endl;
-                    break;
-                }
-                auto mesh = model->getMesh();
-
-                object->getLocalVertices().reserve( mesh->getNumberOfVertices() );
-                // WARNING:  Copy!!?
-                object->getLocalVertices() = mesh->getVertices();
-                object->getFlags().isSimulatorInit = true;
-                break;
-            }
-            default:
-                std::cerr << "Unknown scene object type." << std::endl;
-
-        }
-    }
 }
 void DefaultSimulator::run()
 {
-    beginSim();
+    beginExecution();
 
-    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
+    for(auto &model : this->simulatedModels)
     {
-        auto sceneObj = this->objectsSimulated[i];
-
-        //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
-        {
-            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-
-            for(auto apply : this->operatorFunctions)
-            {
-                apply(sceneObject->getLocalVertices());
-            }
-            this->updateHapticForces(sceneObject);
-        }
+        model->update(this->timeStep);
+        this->updateHapticForces(model);
     }
 
-    endSim();
+    endExecution();
 }
-void DefaultSimulator::endSim()
+void DefaultSimulator::endExecution()
 {
     //end the job
 }
 void DefaultSimulator::syncBuffers()
 {
-    for ( size_t i = 0; i < this->objectsSimulated.size(); i++ )
-    {
-        auto sceneObj = this->objectsSimulated[i];
 
-        //ensure that dummy simulator will work on static scene objects only.
-        if ( sceneObj->getType() == core::ClassType::StaticSceneObject )
-        {
-            auto sceneObject = std::static_pointer_cast<StaticSceneObject>(sceneObj);
-            auto model = std::dynamic_pointer_cast<MeshCollisionModel>(sceneObject->getModel());
-            if(!model)
-            {
-                std::cerr << "Unknown model type." << std::endl;
-                break;
-            }
-            auto mesh = std::static_pointer_cast<MeshCollisionModel>(model)->getMesh();
-            // WARNING: Copy??!
-            mesh->getVertices() = sceneObject->getLocalVertices();
-        }
-    }
 }
 void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
 {
@@ -148,7 +91,7 @@ void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
     }
 }
 
-void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sceneObject)
+void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObject)
 {
     auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
     if(!outputDevice)
@@ -183,12 +126,11 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<StaticSceneObject> sce
 
     float norm = totalForce.norm();
     auto normal = totalForce.normalized();
-    auto d = totalForce.dot(contactPoint);
+//     auto d = totalForce.dot(contactPoint);
 
     outputDevice->setContactPlane(normal.cast<float>(),0);
     outputDevice->setDampingCoefficient(0.001);
     outputDevice->setDynamicFriction(0.0);
     outputDevice->setSpringCoefficient(norm);
     outputDevice->setStaticFriction(0.0);
-
 }

@@ -22,40 +22,47 @@
 //---------------------------------------------------------------------------
 
 #include "BackwarEuler.h"
+#include "Solvers/DirectLinearSolver.h"
 
-void BackwardEuler::solve(core::Vectord &x0, double timeStep)
+BackwardEuler::BackwardEuler(OdeSystem *odeSystem): TimeIntegrator(odeSystem)
+{}
+
+//---------------------------------------------------------------------------
+void BackwardEuler::solve(const OdeSystemState &state,
+                          OdeSystemState &newState,
+                          double timeStep)
 {
-    if(!this->F || !this->DF)
+    if(!this->system)
     {
         return;
     }
 
-    auto G = [ &, this](const core::Vectord & x, core::Vectord & y) -> core::Vectord &
+    // This function updates the state.
+    auto updateIterate = [&](const core::Vectord &dv, core::Vectord &v)
     {
-        this->F(x, y);
-        y = x - (x0 + timeStep * y);
-        return y;
+        v += dv;
+        newState.getPositions() = state.getPositions() + timeStep*v;
     };
 
-    core::SparseMatrixd I(x0.size(), x0.size());
-    I.setIdentity();
-    auto DG = [ &, this](const core::Vectord & x, core::SparseMatrixd & J) -> void
+    // Function to evaluate the nonlinear objective function.
+    auto G = [&,this](const core::Vectord &) -> const core::Vectord&
     {
-        this->DF(x, J);
-        J = I - timeStep * J;
+        this->system->computeImplicitSystemRHS(state,newState,timeStep);
+        return this->system->getRHS();
     };
 
-    auto NewtonSolver = std::make_shared<InexactNewton>();
-    auto solution = x0;
+    // Jacobian of the objective function.
+    auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
+    {
+        this->system->computeImplicitSystemLHS(state,newState,timeStep,false);
+        return this->system->getSystemMatrix();
+    };
 
-    NewtonSolver->setSystem(G);
-    NewtonSolver->setJacobian(DG);
-    NewtonSolver->solve(solution);
-    x0 = solution;
-}
-
-//---------------------------------------------------------------------------
-void BackwardEuler::setJacobian(const NonLinearSolver::JacobianType &newJacobian)
-{
-    this->DF = newJacobian;
+    this->newtonSolver.setUpdateIterate(updateIterate);
+    this->newtonSolver.setSystem(G);
+    this->newtonSolver.setJacobian(DG);
+    this->newtonSolver.setRelativeTolerance(0);
+    this->newtonSolver.setLinearSolver(
+            std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
+    this->newtonSolver.solve(newState.getVelocities());
 }

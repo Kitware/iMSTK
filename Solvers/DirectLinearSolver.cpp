@@ -25,7 +25,8 @@
 #include "Solvers/SystemOfEquations.h"
 #include <iostream>
 
-DirectLinearSolver<core::Matrixd>::DirectLinearSolver(const core::Matrixd &matrix, const core::Vectord &b)
+DirectLinearSolver<core::Matrixd>::
+DirectLinearSolver(const core::Matrixd &matrix, const core::Vectord &b)
 {
     this->linearSystem = std::make_shared<LinearSystem<core::Matrixd>>(matrix, b);
     this->solver.compute(matrix);
@@ -52,14 +53,16 @@ void DirectLinearSolver<core::Matrixd>::solve(const core::Vectord &rhs, core::Ve
 }
 
 //---------------------------------------------------------------------------
-void DirectLinearSolver<core::Matrixd>::setSystem(std::shared_ptr<LinearSystem<core::Matrixd>> newSystem)
+void DirectLinearSolver<core::Matrixd>::
+setSystem(std::shared_ptr<LinearSystem<core::Matrixd>> newSystem)
 {
     LinearSolver<core::Matrixd>::setSystem(newSystem);
     this->solver.compute(this->linearSystem->getMatrix());
 }
 
 //---------------------------------------------------------------------------
-DirectLinearSolver<core::SparseMatrixd>::DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b)
+DirectLinearSolver<core::SparseMatrixd>::
+DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b)
 {
     this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(matrix, b);
     this->solver.compute(matrix);
@@ -80,13 +83,15 @@ void DirectLinearSolver<core::SparseMatrixd>::solve(core::Vectord &x)
 }
 
 //---------------------------------------------------------------------------
-void DirectLinearSolver<core::SparseMatrixd>::solve(const core::Vectord &rhs, core::Vectord &x)
+void DirectLinearSolver<core::SparseMatrixd>::
+solve(const core::Vectord &rhs, core::Vectord &x)
 {
     x = this->solver.solve(rhs);
 }
 
 //---------------------------------------------------------------------------
-void DirectLinearSolver<core::SparseMatrixd>::setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+void DirectLinearSolver<core::SparseMatrixd>::
+setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
 {
     LinearSolver<core::SparseMatrixd>::setSystem(newSystem);
     this->solver.compute(this->linearSystem->getMatrix());

@@ -9,8 +9,8 @@
 #include <cmath>
 
 // Core iMSTK includes
-#include "Core/SDK.h"
-#include "Core/StaticSceneObject.h"
+#include "SimulationManager/SDK.h"
+#include "SceneModels/StaticSceneObject.h"
 #include "Devices/VRPNForceDevice.h"
 #include "Devices/VRPNDeviceServer.h"
 #include "VirtualTools/ToolCoupler.h"

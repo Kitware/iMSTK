@@ -27,9 +27,9 @@
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 #include "Collision/PlaneCollisionModel.h"
-#include "Core/CollisionPair.h"
-#include "Simulators/VegaFemSceneObject.h"
-#include "Core/StaticSceneObject.h"
+#include "Core/CollisionManager.h"
+#include "SceneModels/StaticSceneObject.h"
+#include "SceneModels/VegaFEMDeformableSceneObject.h"
 
 using namespace bandit;
 
@@ -45,9 +45,9 @@ std::shared_ptr<StaticSceneObject> createStaticPlaneSceneObject()
 }
 
 
-std::shared_ptr<CollisionPair> createSampleCollisionPair()
+std::shared_ptr<CollisionManager> createSampleCollisionPair()
 {
-    auto collisionPair = std::make_shared<CollisionPair>();
+    auto collisionPair = std::make_shared<CollisionManager>();
 
     float depth = 1.0;
     core::Vec3d contactPoint(0,0,1);
@@ -67,10 +67,10 @@ go_bandit([]() {
         it("initializes properly ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             AssertThat(handler != nullptr, IsTrue());
-            AssertThat(handler->getContactHandlingType() == ContactHandlingType::PenaltyFemToStatic, IsTrue());
+            AssertThat(handler->getContactHandlingType() == ContactHandling::PenaltyFemToStatic, IsTrue());
         });
 
-        it("attches a collision pair ", []() {
+        it("attaches a collision pair ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
             auto collisionPair  = createSampleCollisionPair();
             handler->setCollisionPairs(collisionPair);
@@ -79,35 +79,32 @@ go_bandit([]() {
 
         it("attaches a scene object ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
-            auto fem            = std::make_shared<VegaFemSceneObject>();
+            auto fem            = std::make_shared<VegaFEMDeformableSceneObject>();
             auto plane          = createStaticPlaneSceneObject();
             handler->setSceneObjects(plane,fem);
             AssertThat(handler->getFirstSceneObject() == plane, IsTrue());
             AssertThat(handler->getSecondSceneObject() == fem, IsTrue());
-            AssertThat(handler->getFirstSceneObject()->getType() == core::ClassType::StaticSceneObject, IsTrue());
-            AssertThat(handler->getSecondSceneObject()->getType() == core::ClassType::VegaFemSceneObject, IsTrue());
         });
 
         it("computes contact force ", []() {
             auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
-            auto fem            = std::make_shared<VegaFemSceneObject>();
+            auto fem            = std::make_shared<VegaFEMDeformableSceneObject>();
             auto collisionPair  = createSampleCollisionPair();
             auto plane          = createStaticPlaneSceneObject();
 
             handler->setSceneObjects(plane,fem);
             handler->setCollisionPairs(collisionPair);
 
-            auto &v = fem->getVelocities();
-            v.push_back(1);
-            v.push_back(1);
-            v.push_back(1);
+            auto state = fem->getCurrentState();
+            state = std::make_shared<OdeSystemState>();
+            state->resize(3);
 
-            auto &f = fem->getForces();
-            f.push_back(0);
-            f.push_back(0);
-            f.push_back(0);
+            auto &v = state->getVelocities();
+            v(0) = 1;
+            v(1) = 1;
+            v(2) = 1;
 
-            // TODO: Add a more rigurous test.
+            // TODO: Add a more rigorous test.
             fem->setContactForce(0,core::Vec3d(-110000,0,0));
             auto &contactForce = fem->getContactForces();
 

@@ -104,9 +104,9 @@ using StdVector3d = StdVector3<double>;
 template<typename T>
 using VectorMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>>;
 
-// Nx3 matrix map
+// kxN matrix map
 template<typename T>
-using Matrix3MapType = Eigen::Map<Eigen::Matrix<T,3,Eigen::Dynamic>>;
+using MatrixMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>;
 
 } // core
 

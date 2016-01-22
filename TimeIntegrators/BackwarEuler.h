@@ -27,38 +27,41 @@
 #include "TimeIntegrators/TimeIntegrator.h"
 
 #include "Core/Vector.h"
-#include "Solvers/InexactNewton.h"
+#include "Solvers/NewtonMethod.h"
+#include "TimeIntegrators/OdeSystem.h"
 
 ///
-/// @brief Approximates the solution to the IVP: dv/dt = F(x,dx/dt,t), x(t0) = x0 with
+/// @brief Approximates the solution to the IVP: Mdv/dt = f(x,v,t), x(t0) = x0 with
 ///     a backward Euler scheme.
 ///
 class BackwardEuler : public TimeIntegrator
 {
 public:
+    using SystemMatrixType = OdeSystem::MatrixFunctionType;
+
+public:
     ///
-    /// @brief Constructor/Destructor.
+    /// @brief Default constructor/destructor.
     ///
     BackwardEuler() = default;
     ~BackwardEuler() = default;
 
     ///
+    /// \brief Constructor. Takes the system describing the ODE.
+    ///
+    BackwardEuler(OdeSystem *odeSystem);
+
+    ///
     /// @brief Perform one iteration of the Backward Euler method.
     ///
-    /// \param x Current iterate.
-    /// \param timeStep current timeStep.
+    /// \param state Current iterate.
+    /// \param newState New computed state.
+    /// \param timeStep Time step used to discretize  the system.
     ///
-    void solve(core::Vectord &x0, double timeStep) override;
-
-    ///
-    /// @brief Set the Jacobian of the right hand side jacobian.
-    ///
-    /// \param newJacobian Function for updating the jacobian matrix.
-    ///
-    void setJacobian(const InexactNewton::JacobianType &newJacobian);
+    virtual void solve(const OdeSystemState &state, OdeSystemState &newState, double timeStep) override;
 
 private:
-    InexactNewton::JacobianType DF;
+    NewtonMethod newtonSolver;
 };
 
 #endif // BACKWAREULER_H

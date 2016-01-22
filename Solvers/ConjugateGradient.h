@@ -96,6 +96,18 @@ public:
     ///
     void setMaximumIterations(const size_t maxIter) override;
 
+    ///
+    /// \brief Sets the system. System of linear equations.
+    ///
+    /// \param newSystem Linear system replacement.
+    ///
+    void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
+
+    ///
+    /// \brief Print solver information
+    ///
+    void print();
+
 private:
     ///> Pointer to the Eigen's Conjugate gradient solver
     Eigen::ConjugateGradient<core::SparseMatrixd> solver;

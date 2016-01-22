@@ -27,58 +27,71 @@ NonLinearSolver::NonLinearSolver():
     sigma(std::array<double, 2> {.1, .5}),
     alpha(1e-4),
     armijoMax(30)
-{}
+{
+    this->updateIterate = [](const core::Vectord &dx, core::Vectord &x)
+    {
+        x += dx;
+    };
+}
 
 //---------------------------------------------------------------------------
-double NonLinearSolver::armijo(const core::Vectord &dx, core::Vectord &x)
+double NonLinearSolver::
+armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
 {
     /// Temporaries used in the line search
-    std::array<double, 3> lambda    = {this->sigma[0] *this->sigma[1], 1.0, 1.0};
-    std::array<double, 3> fnormSqr  = {this->f.squaredNorm(), 0.0, 0.0};
-    std::array<double, 3> fnorm     = {std::sqrt(fnormSqr[0]), 0.0, 0.0};
+    std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
+    std::array<double, 3> lambda    = {this->sigma[0]*this->sigma[1], 1.0, 1.0};
 
     /// Initialize temporaries
-    this->nonLinearSystem->eval(x, this->f);
-    fnormSqr[2] = fnormSqr[1] = this->f.squaredNorm();
-    fnorm[1] = std::sqrt(fnormSqr[1]);
+    double currentFnorm = this->nonLinearSystem->eval(x).norm();
 
-    // Exit if the function norm satisfies the Armijo-Goldstain condition
-    if(fnorm[1] < (1.0 - this->alpha * lambda[0]) *fnorm[0])
+    // Exit if the function norm satisfies the Armijo-Goldstein condition
+    if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
     {
-        return fnorm[1];
+        return currentFnorm;
     }
 
-    // Starts armijo line serach loop
-    for(size_t i = 0; i < this->armijoMax; ++i)
+    // Save iterate in case this fails
+    auto x_old = x;
+
+    // Starts Armijo line search loop
+    size_t i;
+    for(i = 0; i < this->armijoMax; ++i)
     {
         /// Update x and keep books on lambda
-        x -= lambda[0] * dx;
+        this->updateIterate(-lambda[0]*dx,x);
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
-        this->nonLinearSystem->eval(x, this->f);
+        currentFnorm = this->nonLinearSystem->eval(x).norm();
 
-        fnorm[1] = this->f.norm();
-
-        // Exit if the function norm satisfies the Armijo-Goldstain condition
-        if(fnorm[1] < (1.0 - this->alpha * lambda[0]) *fnorm[0])
+        // Exit if the function norm satisfies the Armijo-Goldstein condition
+        if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
         {
-            return fnorm[1];
+            return currentFnorm;
         }
 
         /// Update function norms
         fnormSqr[2] = fnormSqr[1];
-        fnormSqr[1] = fnorm[1] * fnorm[1];
+        fnormSqr[1] = currentFnorm * currentFnorm;
 
         /// Apply the three point parabolic model
         this->parabolicModel(fnormSqr, lambda);
     }
 
-    return fnorm[1];
+    if(i == this->armijoMax)
+    {
+        // TODO: Add to logger
+//         std::cout << "Maximum number of Armijo iterations reached." << std::endl;
+    }
+
+
+    return currentFnorm;
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::parabolicModel(const std::array< double, int(3) > &fnorm, std::array< double, int(3) > &lambda)
+void NonLinearSolver::
+parabolicModel(const std::array<double,3> &fnorm, std::array<double,3> &lambda)
 {
     /// Compute the coefficients for the interpolation polynomial:
     ///     p(lambda) = fnorm[0] + (b*lambda + a*lambda^2)/d1, where
@@ -112,13 +125,13 @@ void NonLinearSolver::parabolicModel(const std::array< double, int(3) > &fnorm, 
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::setSigma(const std::array< double, int(2) > &newSigma)
+void NonLinearSolver::setSigma(const std::array<double,2> &newSigma)
 {
     this->sigma = newSigma;
 }
 
 //---------------------------------------------------------------------------
-const std::array< double, int(2) > &NonLinearSolver::getSigma() const
+const std::array<double,2> &NonLinearSolver::getSigma() const
 {
     return this->sigma;
 }
@@ -164,4 +177,11 @@ void NonLinearSolver::setSystem(const NonLinearSolver::FunctionType &F)
 {
     this->nonLinearSystem = std::make_shared<SystemOfEquations>();
     this->nonLinearSystem->setFunction(F);
+}
+
+//---------------------------------------------------------------------------
+void NonLinearSolver::
+setUpdateIterate(const NonLinearSolver::UpdateIterateType& newUpdateIterate)
+{
+    this->updateIterate = newUpdateIterate;
 }

@@ -24,28 +24,24 @@
 #include <memory>
 
 // Core SimMedTK includes
-#include "Core/SDK.h"
+#include "SimulationManager/SDK.h"
 
 // Include required types scene objects
-#include "Simulators/VegaFemSceneObject.h"
-#include "Core/StaticSceneObject.h"
-#include "Mesh/VegaVolumetricMesh.h"
-#include "Devices/VRPNForceDevice.h"
-// #include "Devices/VRPNDeviceServer.h"
-#include "VirtualTools/ToolCoupler.h"
-
-// Include required simulators
-#include "Simulators/VegaFemSimulator.h"
-#include "Simulators/DefaultSimulator.h"
-
-#include "Core/CollisionPair.h"
-#include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
+#include "Collision/PlaneCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
-
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-
+#include "Core/CollisionManager.h"
+#include "Devices/VRPNDeviceServer.h"
+#include "Devices/VRPNForceDevice.h"
 #include "IO/InitIO.h"
+#include "IO/IOMesh.h"
+#include "Mesh/VegaVolumetricMesh.h"
+#include "SceneModels/StaticSceneObject.h"
+#include "SceneModels/VegaFEMDeformableSceneObject.h"
+#include "Simulators/DefaultSimulator.h"
+#include "Simulators/ObjectSimulator.h"
+#include "VirtualTools/ToolCoupler.h"
 #include "VTKRendering/InitVTKRendering.h"
 
 int main(int ac, char** av)
@@ -67,20 +63,16 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
     auto client = std::make_shared<VRPNForceDevice>();
-    // auto server = std::make_shared<VRPNDeviceServer>();
+    auto server = std::make_shared<VRPNDeviceServer>();
 
     //get some user input and setup device url
-    std::string input = "Phantom@10.171.2.217";//"Phantom0@localhost";
-    std::cout << "Enter the VRPN device URL(" << client->getDeviceURL() << "): ";
-    std::getline(std::cin, input);
-    if (!input.empty())
-    {
-        client->setDeviceURL(input);
-    }
+    std::string input = "Phantom@localhost";
+    client->setDeviceURL(input);
+
     auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(20.0);
-    // sdk->registerModule(server);
-    sdk->registerModule(client);
+    sdk->registerModule(server);
+//     sdk->registerModule(client);
     sdk->registerModule(controller);
 
     //-------------------------------------------------------
@@ -88,34 +80,41 @@ int main(int ac, char** av)
     //-------------------------------------------------------
 
     // create a FEM simulator
-    auto femSimulator = std::make_shared<VegaFemSimulator>(sdk->getErrorLog());
-    //femSimulator->setHapticTool(controller);
+    auto femSimulator = std::make_shared<ObjectSimulator>();
+//     femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject = std::make_shared<VegaFemSceneObject>(
-        sdk->getErrorLog(),configFile);
+    auto femObject =
+        std::make_shared<VegaFEMDeformableSceneObject>("./box.veg",configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME //|
-    //| SIMMEDTK_RENDER_VERTICES
-    //SIMMEDTK_RENDER_FACES | SIMMEDTK_RENDER_NORMALS
-    );
+    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
     meshRenderDetail->setShininess(10.0);
 
-    auto renderingMesh = femObject->getVolumetricMesh()->getRenderingMesh();
-    if(renderingMesh)
+    // Load rendering mesh
+    auto volumeMesh = std::static_pointer_cast<VegaVolumetricMesh>(femObject->getPhysicsModel()->getMesh());
+
+    auto visualModel = std::make_shared<MeshModel>();
+    visualModel->load("./box.vtk");
+    femObject->setVisualModel(visualModel);
+
+    auto visualMesh = visualModel->getMeshAs<SurfaceMesh>();
+
+    if(visualMesh)
     {
-        renderingMesh->setRenderDetail(meshRenderDetail);
+        visualMesh->updateInitialVertices();
+        visualMesh->setRenderDetail(meshRenderDetail);
+        volumeMesh->attachSurfaceMesh(visualMesh,"./box.interp");
     }
     sdk->addSceneActor(femObject, femSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane
     //-------------------------------------------------------
-    auto staticSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto staticSimulator = std::make_shared<ObjectSimulator>();
 
     // create a static plane scene object of given normal and position
     auto staticObject = std::make_shared<StaticSceneObject>();
@@ -155,31 +154,25 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
-    auto loliSimulator = std::make_shared<DefaultSimulator>(sdk->getErrorLog());
+    auto loliSimulator = std::make_shared<ObjectSimulator>();
     sdk->addSceneActor(loliSceneObject, loliSimulator);
-    controller->setMesh(loliCollisionModel->getMesh());
-
-    //-------------------------------------------------------
-    // Register both object simulators
-    //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
-    sdkSimulator->registerObjectSimulator(femSimulator);
-    //sdkSimulator->registerObjectSimulator(staticSimulator);
-
+//     controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
+    auto sdkSimulator = sdk->getSimulator();
     auto meshModel = std::make_shared<MeshCollisionModel>();
 
-    auto collisionMesh = femObject->getVolumetricMesh()->getCollisionMesh();
+    auto collisionMesh = volumeMesh->getCollisionMesh();
     if(collisionMesh)
     {
         meshModel->setMesh(collisionMesh);
     }
-    femObject->setModel(meshModel);
 
-    auto planeMeshCollisionPairs = std::make_shared<CollisionPair>();
+    femObject->setCollisionModel(meshModel);
+
+    auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
 
     planeMeshCollisionPairs->setModels(meshModel, plane);
 

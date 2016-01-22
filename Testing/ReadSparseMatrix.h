@@ -21,6 +21,9 @@
 // Contact:
 //---------------------------------------------------------------------------
 
+#ifndef READ_SPARSE_MATRIX_H
+#define READ_SPARSE_MATRIX_H
+
 #include<iostream>
 #include<fstream>
 #include<Eigen/Core>
@@ -63,3 +66,5 @@ Eigen::SparseMatrix<T,opt> &ReadSparseMatrix(const std::string &fileName, Eigen:
   fStream.close();
   return A;
 }
+
+#endif

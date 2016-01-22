@@ -22,32 +22,67 @@
 //---------------------------------------------------------------------------
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-#include "Core/CollisionPair.h"
+#include "Core/CollisionManager.h"
 
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : PenaltyContactHandling(typeBilateral)
 {
-    type = ContactHandlingType::PenaltyFemToStatic;
+    type = PenaltyFemToStatic;
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(
                                                     bool typeBilateral,
                                                     const std::shared_ptr<SceneObject>& sceneObjFirst,
-                                                    const std::shared_ptr<SceneObject>& sceneObjSecond)
+                                                    const std::shared_ptr<DeformableSceneObject>& sceneObjSecond)
                                                     : PenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
-    type = ContactHandlingType::PenaltyFemToStatic;
+    type = PenaltyFemToStatic;
 }
 
+//---------------------------------------------------------------------------
 PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 {
 }
 
+//---------------------------------------------------------------------------
 void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
-    auto femSceneObject = std::static_pointer_cast<VegaFemSceneObject>(this->getSecondSceneObject());
+    auto femSceneObject = std::static_pointer_cast<DeformableSceneObject>(this->getSecondSceneObject());
     this->computeForces(femSceneObject);
 }
 
+//---------------------------------------------------------------------------
 void PenaltyContactFemToStatic::computeBilateralContactForces()
 {
+}
+
+//---------------------------------------------------------------------------
+void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneObject > sceneObject)
+{
+    if(sceneObject->computeContactForce())
+    {
+        auto model = sceneObject->getCollisionModel();
+        if(!model)
+        {
+            return;
+        }
+
+        auto contactInfo = this->getCollisionPairs()->getContacts(model);
+        sceneObject->setContactForcesToZero();
+        this->clearContactForces();
+        core::Vec3d force;
+        core::Vec3d velocityProjection;
+        int nodeDofID;
+        for(auto &contact : contactInfo)
+        {
+            nodeDofID = 3 * contact->index;
+            velocityProjection = sceneObject->getVelocity(nodeDofID);
+            velocityProjection = contact->normal.dot(velocityProjection) * contact->normal;
+
+            force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
+
+            sceneObject->setContactForce(nodeDofID, contact->point, force);
+            this->setContactForce(contact->index, force);
+        }
+    }
 }
