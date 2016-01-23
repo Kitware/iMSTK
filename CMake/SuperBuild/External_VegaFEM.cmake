@@ -20,7 +20,7 @@
 #
 
 set(VegaFEM_TAG "simmedtk")
-set(VegaFEM_REPOSITORY git@gitlab.kitware.com:SimMedTK/VegaFEM-CMake.git)
+set(VegaFEM_REPOSITORY git@gitlab.kitware.com:iMSTK/VegaFEM-CMake.git)
 
 # Make sure this file is included only once
 get_filename_component(CMAKE_CURRENT_LIST_FILENAME ${CMAKE_CURRENT_LIST_FILE} NAME_WE)
