@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMSHADER_H
-#define SMSHADER_H
+#ifndef RENDERING_SHADER_H
+#define RENDERING_SHADER_H
 
 // STL includes
 #include <unordered_map>
@@ -31,7 +27,7 @@
 #include <vector>
 #include <memory>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/ErrorLog.h"
@@ -58,7 +54,7 @@ struct TextureShaderAssignment
 class Shader: public CoreClass
 {
 public:
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     // \brief creates GLSL vertex shader
     void createVertexShaderGLSL();
 
@@ -183,7 +179,7 @@ public:
     // \brief Initialize the shader..This is called automatically.
     virtual void initDraw();
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     // \brief add parameter for Vertex Shader
     GLint addVertexShaderParam(const std::string& p_paramVertex);
 
@@ -306,7 +302,7 @@ private:
     static std::shared_ptr<Shader> currentShader; // stores the current Active shader.
     static std::shared_ptr<Shader> savedShader; // It is also used to save and restore the current shader is disabled for a while to use
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     GLhandleARB vertexShaderObject; // vertex shader object
     GLhandleARB fragmentShaderObject; // fragment  shader object
     GLhandleARB geometryShaderObject; // fragment  shader object

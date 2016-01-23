@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,24 +16,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 
-#ifndef MESHNODALCOORDINATES_H
-#define MESHNODALCOORDINATES_H
+#ifndef RENDERING_MESHNODALCOORDINATES_H
+#define RENDERING_MESHNODALCOORDINATES_H
 
 #include "vtkMappedDataArray.h"
 
 #include "vtkTypeTemplate.h" // For templated vtkObject API
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Vector.h"
 
 // STL includes
@@ -119,6 +115,6 @@ private:
     core::Vec3d TempDoubleArray;
 };
 
-#include "MeshNodalCoordinates.txx"
+#include "MeshNodalCoordinates.hpp"
 
 #endif // MESHNODALCOORDINATES_H

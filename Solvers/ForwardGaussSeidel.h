@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_FORWARD_GAUSS_SEIDEL
-#define SM_FORWARD_GAUSS_SEIDEL
 
-// SimMedTK includes
+#ifndef SOLVERS_FORWARDGAUSSSEIDEL_H
+#define SOLVERS_FORWARDGAUSSSEIDEL_H
+
+// iMSTK includes
 #include "Solvers/IterativeLinearSolver.h"
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
@@ -75,4 +72,4 @@ public:
 
 };
 
-#endif // SM_FORWARD_GAUSS_SEIDEL
+#endif // SOLVERS_FORWARD_GAUSS_SEIDEL

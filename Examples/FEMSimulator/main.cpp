@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include <memory>
 
-// Core SimMedTK includes
+// Core iMSTK includes
 #include "SimulationManager/SDK.h"
 
 // Include required types scene objects
@@ -88,7 +84,7 @@ int main(int ac, char** av)
         std::make_shared<VegaFEMDeformableSceneObject>("./box.veg",configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_FACES);
+    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES);
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
@@ -143,7 +139,7 @@ int main(int ac, char** av)
     Core::BaseMesh::TransformType transform =
         Eigen::Translation3d(core::Vec3d(0,0,0))*Eigen::Scaling(0.1);
 
-    auto loliRenderDetail = std::make_shared<RenderDetail>(SIMMEDTK_RENDER_WIREFRAME);
+    auto loliRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_WIREFRAME);
     loliRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 0.5));
     loliRenderDetail->setDiffuseColor(Color::colorYellow);
     loliRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
@@ -198,11 +194,11 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     auto viewer = sdk->getViewerInstance();
 
-    viewer->setViewerRenderDetail(SIMMEDTK_VIEWERRENDER_GLOBAL_AXIS);
+    viewer->setViewerRenderDetail(IMSTK_VIEWERRENDER_GLOBAL_AXIS);
 
     // Get Scene
     auto scene = sdk->getScene(0);
-    viewer->registerScene(scene, SMRENDERTARGET_SCREEN, "Collision pipeline demo");
+    viewer->registerScene(scene, IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
     auto light1 = Light::getDefaultLighting();

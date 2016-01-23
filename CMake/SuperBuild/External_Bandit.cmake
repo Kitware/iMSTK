@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -38,7 +37,7 @@ endif()
 set(Bandit_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(Bandit)
+iMSTKCheckDependencies(Bandit)
 
 set(proj Bandit)
 
@@ -64,7 +63,7 @@ if(NOT DEFINED ${proj}_DIR)
   set(${proj}_DIR ${ep_install_dir})
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${iMSTK_CMAKE_INCLUDE_PATH})

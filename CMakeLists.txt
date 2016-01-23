@@ -1,9 +1,27 @@
+###########################################################################
+#
+# Copyright (c) Kitware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
 cmake_minimum_required(VERSION 3.1)
 
 if (POLICY CMP0058)
   cmake_policy(SET CMP0058 NEW)
 endif()
-project(SimMedTK)
+project(iMSTK)
 
 #-----------------------------------------------------------------------------
 # Update CMake module path
@@ -25,7 +43,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Include macros
 #
-include(SimMedTKMacros)
+include(iMSTKMacros)
 
 #-----------------------------------------------------------------------------
 # Library mode: SHARED (default in Linux/Mac) or STATIC (Required in Win32)
@@ -36,30 +54,30 @@ if(WIN32 AND MSVC)
   # shared externals. Add logic to take this into consideration.
   # set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
 endif()
-set(SimMedTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+set(iMSTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
 mark_as_advanced(BUILD_SHARED_LIBS)
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #
-option(SimMedTK_SUPERBUILD
-    "Build SimMedTK and the projects it depends on via SuperBuild.cmake." ON)
-mark_as_advanced(SimMedTK_SUPERBUILD)
+option(iMSTK_SUPERBUILD
+    "Build iMSTK and the projects it depends on via SuperBuild.cmake." ON)
+mark_as_advanced(iMSTK_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
 # Devices options
 #
-option(SimMedTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
-option(SimMedTK_USE_ADU "Use the adu device." OFF)
-option(SimMedTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
-option(SimMedTK_USE_FALCON "Use the Falcon device." OFF)
+option(iMSTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
+option(iMSTK_USE_ADU "Use the adu device." OFF)
+option(iMSTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
+option(iMSTK_USE_FALCON "Use the Falcon device." OFF)
 
 #-----------------------------------------------------------------------------
 # VRPN options
 option(USE_VRPN_CLIENT "Use VRPN in client mode." ON)
 option(USE_VRPN_SERVER "Use VRPN in server mode." ON)
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(iMSTK_USE_PHANTOM_OMNI)
     set(USE_VRPN_SERVER ON CACHE BOOL "Force the use of VRPN servers." FORCE)
 endif()
 
@@ -67,7 +85,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Oculus Option - Disabled by default
 #
-option(SimMedTK_USE_OCULUS "Build SimMedTK with Oculus Support" OFF)
+option(iMSTK_USE_OCULUS "Build iMSTK with Oculus Support" OFF)
 
 #-----------------------------------------------------------------------------
 # Output directories - this is where built library and executable
@@ -76,7 +94,7 @@ option(SimMedTK_USE_OCULUS "Build SimMedTK with Oculus Support" OFF)
 # build systems, so it is necessary to handle both cases on a
 # conditional basis.
 #
-include(SimMedTKOutputDirectories)
+include(iMSTKOutputDirectories)
 
 #-----------------------------------------------------------------------------
 # Prerequisites
@@ -87,12 +105,12 @@ if(NOT GIT_FOUND)
 endif()
 
 #-----------------------------------------------------------------------------
-# SimMedTK version number.  An even minor number corresponds to releases.
+# iMSTK version number.  An even minor number corresponds to releases.
 #
-set(SimMedTK_VERSION_MAJOR 0)
-set(SimMedTK_VERSION_MINOR 0)
-set(SimMedTK_VERSION_PATCH 1)
-set(SimMedTK_VERSION "${SimMedTK_VERSION_MAJOR}.${SimMedTK_VERSION_MINOR}.${SimMedTK_VERSION_PATCH}")
+set(iMSTK_VERSION_MAJOR 0)
+set(iMSTK_VERSION_MINOR 0)
+set(iMSTK_VERSION_PATCH 1)
+set(iMSTK_VERSION "${iMSTK_VERSION_MAJOR}.${iMSTK_VERSION_MINOR}.${iMSTK_VERSION_PATCH}")
 
 #-----------------------------------------------------------------------------
 # Testing
@@ -102,9 +120,9 @@ option(BUILD_TESTING "Test the project" ON)
 #-----------------------------------------------------------------------------
 # Documentation options
 #
-option(SimMedTK_ENABLE_DOCUMENTATION
+option(iMSTK_ENABLE_DOCUMENTATION
   "Include targets for Doxygen- and Sphinx-generated documentation" OFF)
-if (SimMedTK_ENABLE_DOCUMENTATION)
+if (iMSTK_ENABLE_DOCUMENTATION)
   find_package(Doxygen)
   find_package(Sphinx)
 endif()
@@ -134,10 +152,10 @@ set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
 mark_as_advanced(ADDITIONAL_CXX_FLAGS)
 
 #-----------------------------------------------------------------------------
-# SimMedTK C/CXX Flags
+# iMSTK C/CXX Flags
 #
-set(SimMedTK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(SimMedTK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(iMSTK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(iMSTK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
@@ -148,11 +166,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   if(MINGW)
     # suppress warnings about auto imported symbols
-    set(SimMedTK_CXX_FLAGS "-Wl,--enable-auto-import ${SimMedTK_CXX_FLAGS}")
+    set(iMSTK_CXX_FLAGS "-Wl,--enable-auto-import ${iMSTK_CXX_FLAGS}")
   endif()
 
-  set(SimMedTK_C_FLAGS "${cflags} ${SimMedTK_C_FLAGS}")
-  set(SimMedTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${SimMedTK_CXX_FLAGS}")
+  set(iMSTK_C_FLAGS "${cflags} ${iMSTK_C_FLAGS}")
+  set(iMSTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${iMSTK_CXX_FLAGS}")
 endif()
 
 if(MSVC)
@@ -165,8 +183,8 @@ if(MSVC)
   # Enable C++ Exceptions
     "/EHsc"
   )
-  set(SimMedTK_CXX_FLAGS
-    "${SimMedTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
+  set(iMSTK_CXX_FLAGS
+    "${iMSTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
@@ -180,7 +198,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Superbuild script
 #
-if(SimMedTK_SUPERBUILD)
+if(iMSTK_SUPERBUILD)
   include(SuperBuild)
   return()
 endif()
@@ -201,7 +219,7 @@ find_package(VTK REQUIRED)
 
 include(${VTK_USE_FILE})
 
-if(SimMedTK_USE_OCULUS)
+if(iMSTK_USE_OCULUS)
   find_package(Oculus REQUIRED)
   include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
   if(NOT WIN32)
@@ -213,14 +231,14 @@ endif()
 # Testing framework
 #
 if(BUILD_TESTING)
-  include(SimMedTKTesting)
+  include(iMSTKTesting)
 endif()
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(iMSTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics)
 endif()
 
-if(SimMedTK_USE_PHANTOM_OMNI)
+if(iMSTK_USE_PHANTOM_OMNI)
   find_package(OpenHaptics REQUIRED)
 endif()
 
@@ -229,22 +247,22 @@ if(USE_VRPN_CLIENT)
   if(USE_VRPN_SERVER)
     list(APPEND components vrpnserver Libusb1)
   endif()
-  if(SimMedTK_USE_PHANTOM_OMNI)
+  if(iMSTK_USE_PHANTOM_OMNI)
     list(APPEND components vrpn_phantom)
   endif()
-  if(SimMedTK_USE_FALCON)
+  if(iMSTK_USE_FALCON)
     list(APPEND components LibNifalcon)
   endif()
   find_package(VRPN REQUIRED COMPONENTS ${components})
   include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
 endif()
 
-if(SimMedTK_USE_ADU)
+if(iMSTK_USE_ADU)
   find_package(ADU REQUIRED)
   include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
 endif()
 
-if(SimMedTK_USE_NIUSB6008)
+if(iMSTK_USE_NIUSB6008)
   find_package(NIDAQ REQUIRED)
   include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
 endif()
@@ -254,23 +272,23 @@ include_directories(SYSTEM "${SFML_INCLUDE_DIRS}")
 include_directories(SYSTEM "${ThreadPool_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
-# SimMedTK_SUPERBUILD_BINARY_DIR
+# iMSTK_SUPERBUILD_BINARY_DIR
 #
-# If SimMedTK_SUPERBUILD_BINARY_DIR isn't defined, it means SimMedTK is *NOT* build using
+# If iMSTK_SUPERBUILD_BINARY_DIR isn't defined, it means iMSTK is *NOT* build using
 # Superbuild.
-# In that case, SimMedTK_SUPERBUILD_BINARY_DIR should default to SimMedTK_BINARY_DIR
+# In that case, iMSTK_SUPERBUILD_BINARY_DIR should default to iMSTK_BINARY_DIR
 #
-if(NOT DEFINED SimMedTK_SUPERBUILD_BINARY_DIR)
-  set(SimMedTK_SUPERBUILD_BINARY_DIR ${SimMedTK_BINARY_DIR})
+if(NOT DEFINED iMSTK_SUPERBUILD_BINARY_DIR)
+  set(iMSTK_SUPERBUILD_BINARY_DIR ${iMSTK_BINARY_DIR})
 endif()
 
 #-----------------------------------------------------------------------------
 # Set C/CXX Flags
 #
-set(CMAKE_CXX_FLAGS ${SimMedTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
-set(CMAKE_C_FLAGS ${SimMedTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
+set(CMAKE_CXX_FLAGS ${iMSTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
+set(CMAKE_C_FLAGS ${iMSTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 
-set(SimMedTK_exports
+set(iMSTK_exports
   Collision
   ContactHandling
   Core
@@ -290,8 +308,8 @@ set(SimMedTK_exports
   SimulationManager
   )
 
-if(SimMedTK_USE_OCULUS)
-  list(APPEND SimMedTK_exports RenderingOculus)
+if(iMSTK_USE_OCULUS)
+  list(APPEND iMSTK_exports RenderingOculus)
 endif()
 
 add_subdirectory(Assembler)
@@ -322,7 +340,7 @@ add_subdirectory(VirtualTools)
 # come after those targets have been declared.
 #
 
-if (SimMedTK_ENABLE_DOCUMENTATION)
+if (iMSTK_ENABLE_DOCUMENTATION)
   add_subdirectory(Documentation)
 endif()
 
@@ -330,22 +348,22 @@ endif()
 # Create and install package configuration files.
 #
 
-export(PACKAGE SimMedTK)
+export(PACKAGE iMSTK)
 export(TARGETS
-  ${SimMedTK_exports}
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKTargets.cmake"
-  NAMESPACE mstk::
+  ${iMSTK_exports}
+  FILE "${CMAKE_CURRENT_BINARY_DIR}/iMSTKTargets.cmake"
+  NAMESPACE imstk::
   EXPORT_LINK_INTERFACE_LIBRARIES
 )
 
 configure_file(
-  CMake/SimMedTKConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
+  CMake/iMSTKConfig.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/iMSTKConfig.cmake"
   @ONLY
 )
 
 install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/SimMedTKConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/iMSTKConfig.cmake"
   DESTINATION "CMake"
   COMPONENT Development
 )

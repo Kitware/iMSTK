@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,19 +16,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_ASSEMBLY
-#define SM_ASSEMBLY
+
+#ifndef ASSEMBLER_ASSEMBLER_H
+#define ASSEMBLER_ASSEMBLER_H
 
 #include <memory>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/CoreClass.h"
 
 //#include "Core/SDK.h"
@@ -98,4 +95,4 @@ private:
     std::vector<core::Vectord> b;
 };
 
-#endif // SM_ASSEMBLY
+#endif // ASSEMBLER_ASSEMBLER_H

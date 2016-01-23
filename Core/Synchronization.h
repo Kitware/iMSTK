@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMSYNCHRONIZATION_H
-#define SMSYNCHRONIZATION_H
+#ifndef CORE_SYNCHRONIZATION_H
+#define CORE_SYNCHRONIZATION_H
 
 // STL includes
 #include <mutex>
@@ -30,7 +26,7 @@
 #include <chrono>
 #include <thread>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 
@@ -128,9 +124,9 @@ public:
 
         Event *eventSynch;
         eventSynch = new Event();
-        eventSynch->eventType = SIMMEDTK_EVENTTYPE_SYNCH;
+        eventSynch->eventType = IMSTK_EVENTTYPE_SYNCH;
         eventSynch->senderId = moduleId;
-        eventSynch->senderType = SIMMEDTK_SENDERTYPE_EVENTSOURCE;
+        eventSynch->senderType = IMSTK_SENDERTYPE_EVENTSOURCE;
 
         std::unique_lock<std::mutex> uniLock(serverMutex, std::defer_lock);
         uniLock.lock();

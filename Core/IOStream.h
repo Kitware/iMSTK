@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMIOSTREAM_H
-#define SMIOSTREAM_H
+#ifndef CORE_IOSTREAM_H
+#define CORE_IOSTREAM_H
 
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
@@ -32,9 +28,9 @@
 #include <unordered_map>
 
 /// \brief I/O definitions
-#define SM_CONSOLE_INPUTBUFFER  512
-#define SM_WINDOW_MAXSTRINGSIZE 255
-#define SM_WINDOW_TOTALSTRINGS_ONWINDOW 100
+#define IMSTK_CONSOLE_INPUTBUFFER  512
+#define IMSTK_WINDOW_MAXSTRINGSIZE 255
+#define IMSTK_WINDOW_TOTALSTRINGS_ONWINDOW 100
 
 namespace core {
     class Event;
@@ -113,7 +109,7 @@ public:
     Color textColor;
 
     /// \brief constructors
-    OpenGLWindowStream(int p_totalTexts = SM_WINDOW_TOTALSTRINGS_ONWINDOW);
+    OpenGLWindowStream(int p_totalTexts = IMSTK_WINDOW_TOTALSTRINGS_ONWINDOW);
 
     /// \brief add text on window
     virtual int addText(const std::string &p_tag, const std::string &p_string);

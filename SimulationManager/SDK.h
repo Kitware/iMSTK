@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,21 +16,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMSDK_H
-#define SMSDK_H
+#ifndef SIMULATION_MANAGER_SDK_H
+#define SIMULATION_MANAGER_SDK_H
 
 // STL includes
 #include <thread>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Scene.h"
@@ -39,11 +35,11 @@
 #include "Core/BaseMesh.h"
 
 /// \brief maximum entities in the framework
-#define SIMMEDTK_SDK_MAXMESHES 100
-#define SIMMEDTK_SDK_MAXMODULES 100
-#define SIMMEDTK_SDK_MAXOBJECTSIMULATORS 100
-#define SIMMEDTK_SDK_MAXSCENES 100
-#define SIMMEDTK_SDK_MAXSCENEOBJTECTS 100
+#define IMSTK_SDK_MAXMESHES 100
+#define IMSTK_SDK_MAXMODULES 100
+#define IMSTK_SDK_MAXOBJECTSIMULATORS 100
+#define IMSTK_SDK_MAXSCENES 100
+#define IMSTK_SDK_MAXSCENEOBJTECTS 100
 
 template<typename T> class IndiceArray;
 class Scene;

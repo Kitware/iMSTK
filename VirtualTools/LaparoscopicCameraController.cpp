@@ -1,5 +1,8 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
 // Copyright (c) Kitware, Inc.
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //

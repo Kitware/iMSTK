@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,18 +16,18 @@
 #
 ###########################################################################
 
-set(SimMedTK_DEPENDENCIES VegaFEM Assimp SFML Eigen ThreadPool VTK VRPN)
+set(iMSTK_DEPENDENCIES VegaFEM Assimp SFML Eigen ThreadPool VTK VRPN)
 if(BUILD_TESTING)
-  list(APPEND SimMedTK_DEPENDENCIES Bandit)
+  list(APPEND iMSTK_DEPENDENCIES Bandit)
 endif()
 
 if(WIN32)
-  list(APPEND SimMedTK_DEPENDENCIES PTHREAD)
+  list(APPEND iMSTK_DEPENDENCIES PTHREAD)
 endif(WIN32)
 
-if(SimMedTK_USE_OCULUS)
-  list(APPEND SimMedTK_DEPENDENCIES Oculus)
-endif(SimMedTK_USE_OCULUS)
+if(iMSTK_USE_OCULUS)
+  list(APPEND iMSTK_DEPENDENCIES Oculus)
+endif(iMSTK_USE_OCULUS)
 
 #-----------------------------------------------------------------------------
 # WARNING - No change should be required after this comment
@@ -38,25 +37,25 @@ endif(SimMedTK_USE_OCULUS)
 #-----------------------------------------------------------------------------
 # Git protocol option
 #
-option(SimMedTK_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." ON)
+option(iMSTK_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." ON)
 
 set(git_protocol "git")
-if(NOT SimMedTK_USE_GIT_PROTOCOL)
+if(NOT iMSTK_USE_GIT_PROTOCOL)
   set(git_protocol "http")
 endif()
 
 #-----------------------------------------------------------------------------
 # Make sure the binary directory exists
 #
-if(NOT EXISTS ${SimMedTK_BINARY_DIR}/SimMedTK-build/bin)
-  file(MAKE_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build/bin)
+if(NOT EXISTS ${iMSTK_BINARY_DIR}/iMSTK-build/bin)
+  file(MAKE_DIRECTORY ${iMSTK_BINARY_DIR}/iMSTK-build/bin)
 endif()
 
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
 #
 include(ExternalProject)
-include(SimMedTKCheckDependencies)
+include(iMSTKCheckDependencies)
 
 set(ep_install_dir ${CMAKE_BINARY_DIR}/SuperBuild/Install)
 set(ep_suffix "-cmake")
@@ -92,67 +91,67 @@ set(sep "^^")
 # Set output directories for external projects
 #
 set(OUTPUT_DIRECTORIES )
-set(SimMedTK_OUTPUT_DIRECTORIES )
-set(SimMedTK_CMAKE_INCLUDE_PATH)
-set(SimMedTK_CMAKE_LIBRARY_PATH)
+set(iMSTK_OUTPUT_DIRECTORIES )
+set(iMSTK_CMAKE_INCLUDE_PATH)
+set(iMSTK_CMAKE_LIBRARY_PATH)
 if(CMAKE_CONFIGURATION_TYPES)
   foreach(CFG_TYPE ${CMAKE_CONFIGURATION_TYPES})
     string(TOUPPER "${CFG_TYPE}" CFG_TYPE_UPPER)
     list(APPEND OUTPUT_DIRECTORIES
-    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
     list(APPEND OUTPUT_DIRECTORIES
-    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    -DCMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
     list(APPEND OUTPUT_DIRECTORIES
-    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
-    -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
-    -DSimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
-    list(APPEND SimMedTK_OUTPUT_DIRECTORIES
-    -DSimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND iMSTK_OUTPUT_DIRECTORIES
+    -DiMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND iMSTK_OUTPUT_DIRECTORIES
+    -DiMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
+    list(APPEND iMSTK_OUTPUT_DIRECTORIES
+    -DiMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}:STRING=${iMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}})
 
-    set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_LIBRARY_PATH}${sep}${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
-    set(SimMedTK_CMAKE_LIBRARY_PATH "${SimMedTK_CMAKE_LIBRARY_PATH}${sep}${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
+    set(iMSTK_CMAKE_LIBRARY_PATH "${iMSTK_CMAKE_LIBRARY_PATH}${sep}${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
+    set(iMSTK_CMAKE_LIBRARY_PATH "${iMSTK_CMAKE_LIBRARY_PATH}${sep}${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CFG_TYPE_UPPER}}")
   endforeach()
 else()
   list(APPEND OUTPUT_DIRECTORIES
-  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-  -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+  -DCMAKE_RUNTIME_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  -DCMAKE_LIBRARY_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+  -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
   )
-  list(APPEND SimMedTK_OUTPUT_DIRECTORIES
-  -DSimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-  -DSimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
-  -DSimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:STRING=${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
+  list(APPEND iMSTK_OUTPUT_DIRECTORIES
+  -DiMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+  -DiMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+  -DiMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:STRING=${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
   )
-  set(SimMedTK_CMAKE_LIBRARY_PATH
-  "${SimMedTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
-  set(SimMedTK_CMAKE_LIBRARY_PATH
-  "${SimMedTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}${sep}${SimMedTK_CMAKE_LIBRARY_PATH}")
+  set(iMSTK_CMAKE_LIBRARY_PATH
+  "${iMSTK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}${sep}${iMSTK_CMAKE_LIBRARY_PATH}")
+  set(iMSTK_CMAKE_LIBRARY_PATH
+  "${iMSTK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}${sep}${iMSTK_CMAKE_LIBRARY_PATH}")
 endif()
 
 #-----------------------------------------------------------------------------
 # This variable will contain the list of CMake variable specific to each external project
-# that SimMedTK depends on.
+# that iMSTK depends on.
 # The item of this list should have the following form: -D<EP>_DIR:PATH=${<EP>_DIR}
 # where '<EP>' is an external project name.
 #
-set(SimMedTK_SUPERBUILD_EP_ARGS
+set(iMSTK_SUPERBUILD_EP_ARGS
 )
 
 #-----------------------------------------------------------------------------
 # Check for the dependencies
 #
-SimMedTKCheckDependencies(SimMedTK)
+iMSTKCheckDependencies(iMSTK)
 
 #-----------------------------------------------------------------------------
 # Set directories where to find the external projects
 #
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS
-  -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
-  -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
+list(APPEND iMSTK_SUPERBUILD_EP_ARGS
+  -DCMAKE_INCLUDE_PATH:STRING=${iMSTK_CMAKE_INCLUDE_PATH}
+  -DCMAKE_LIBRARY_PATH:STRING=${iMSTK_CMAKE_LIBRARY_PATH}
 )
-list(REMOVE_DUPLICATES SimMedTK_SUPERBUILD_EP_ARGS)
+list(REMOVE_DUPLICATES iMSTK_SUPERBUILD_EP_ARGS)
 
 #-----------------------------------------------------------------------------
 # Set CMake OSX variable to pass down the external project
@@ -166,86 +165,86 @@ if(APPLE)
 endif()
 
 #-----------------------------------------------------------------------------
-# SimMedTK Configure
+# iMSTK Configure
 #
-SET(proj SimMedTK-Configure)
+SET(proj iMSTK-Configure)
 
 ExternalProject_Add(${proj}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
   LIST_SEPARATOR ${sep}
   CMAKE_ARGS
-    -DSimMedTK_SUPERBUILD:BOOL=OFF
-#     -DSimMedTK_SUPERBUILD_BINARY_DIR:PATH=${SimMedTK_BINARY_DIR}
-#     -DSimMedTK_INSTALL_BIN_DIR:STRING=${SimMedTK_INSTALL_BIN_DIR}
-#     -DSimMedTK_INSTALL_LIB_DIR:STRING=${SimMedTK_INSTALL_LIB_DIR}
-#     -DSimMedTK_INSTALL_INCLUDE_DIR:STRING=${SimMedTK_INSTALL_INCLUDE_DIR}
-#     -DSimMedTK_INSTALL_DOC_DIR:STRING=${SimMedTK_INSTALL_DOC_DIR}
+    -DiMSTK_SUPERBUILD:BOOL=OFF
+#     -DiMSTK_SUPERBUILD_BINARY_DIR:PATH=${iMSTK_BINARY_DIR}
+#     -DiMSTK_INSTALL_BIN_DIR:STRING=${iMSTK_INSTALL_BIN_DIR}
+#     -DiMSTK_INSTALL_LIB_DIR:STRING=${iMSTK_INSTALL_LIB_DIR}
+#     -DiMSTK_INSTALL_INCLUDE_DIR:STRING=${iMSTK_INSTALL_INCLUDE_DIR}
+#     -DiMSTK_INSTALL_DOC_DIR:STRING=${iMSTK_INSTALL_DOC_DIR}
     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-    -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+    -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DSimMedTK_CXX_FLAGS:STRING=${SimMedTK_CXX_FLAGS}
-    -DSimMedTK_C_FLAGS:STRING=${SimMedTK_C_FLAGS}
+    -DiMSTK_CXX_FLAGS:STRING=${iMSTK_CXX_FLAGS}
+    -DiMSTK_C_FLAGS:STRING=${iMSTK_C_FLAGS}
     # Pass Projects options down to the superbuild #
     # Use Options #
-    -DSimMedTK_USE_PHANTOM_OMNI:BOOL=${SimMedTK_USE_PHANTOM_OMNI}
-    -DSimMedTK_USE_FALCON:BOOL=${SimMedTK_USE_FALCON}
+    -DiMSTK_USE_PHANTOM_OMNI:BOOL=${iMSTK_USE_PHANTOM_OMNI}
+    -DiMSTK_USE_FALCON:BOOL=${iMSTK_USE_FALCON}
     -DUSE_VRPN_SERVER:BOOL=${USE_VRPN_SERVER}
     -DUSE_VRPN_CLIENT:BOOL=${USE_VRPN_CLIENT}
-    -DSimMedTK_USE_ADU:BOOL=${SimMedTK_USE_ADU}
-    -DSimMedTK_USE_OCULUS:BOOL=${SimMedTK_USE_OCULUS}
-    -DSimMedTK_USE_NIUSB6008:BOOL=${SimMedTK_USE_NIUSB6008}
+    -DiMSTK_USE_ADU:BOOL=${iMSTK_USE_ADU}
+    -DiMSTK_USE_OCULUS:BOOL=${iMSTK_USE_OCULUS}
+    -DiMSTK_USE_NIUSB6008:BOOL=${iMSTK_USE_NIUSB6008}
     # Options #
     -DBUILD_TESTING:BOOL=${BUILD_TESTING}
-    -DSimMedTK_ENABLE_DOCUMENTATION:BOOL=${SimMedTK_ENABLE_DOCUMENTATION}
-    ${SimMedTK_SUPERBUILD_CMAKE_OPTIONS}
-    ${SimMedTK_OUTPUT_DIRECTORIES}
-    ${SimMedTK_SUPERBUILD_EP_ARGS}
+    -DiMSTK_ENABLE_DOCUMENTATION:BOOL=${iMSTK_ENABLE_DOCUMENTATION}
+    ${iMSTK_SUPERBUILD_CMAKE_OPTIONS}
+    ${iMSTK_OUTPUT_DIRECTORIES}
+    ${iMSTK_SUPERBUILD_EP_ARGS}
     #${dependency_args}
-  SOURCE_DIR ${SimMedTK_SOURCE_DIR}
-  BINARY_DIR ${SimMedTK_BINARY_DIR}/SimMedTK-build
-  PREFIX ${SimMedTK_BINARY_DIR}/SimMedTK${ep_suffix}
+  SOURCE_DIR ${iMSTK_SOURCE_DIR}
+  BINARY_DIR ${iMSTK_BINARY_DIR}/iMSTK-build
+  PREFIX ${iMSTK_BINARY_DIR}/iMSTK${ep_suffix}
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS
-    ${SimMedTK_DEPENDENCIES}
+    ${iMSTK_DEPENDENCIES}
   )
 
 if(CMAKE_GENERATOR MATCHES "Unix Makefiles")
-    set(simmedtk_build_cmd "$(MAKE)")
+    set(imstk_build_cmd "$(MAKE)")
 else()
-    set(simmedtk_build_cmd ${CMAKE_COMMAND} --build ${SimMedTK_BINARY_DIR}/SimMedTK-build --config ${CMAKE_CFG_INTDIR})
+    set(imstk_build_cmd ${CMAKE_COMMAND} --build ${iMSTK_BINARY_DIR}/iMSTK-build --config ${CMAKE_CFG_INTDIR})
 endif()
 #-----------------------------------------------------------------------------
-# SimMedTK
+# iMSTK
 #
-#MESSAGE(STATUS SUPERBUILD_EXCLUDE_SimMedTKBUILD_TARGET:${SUPERBUILD_EXCLUDE_SimMedTKBUILD_TARGET})
-if(NOT DEFINED SUPERBUILD_EXCLUDE_SimMedTKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_SimMedTKBUILD_TARGET)
-  set(SimMedTKBUILD_TARGET_ALL_OPTION "ALL")
+#MESSAGE(STATUS SUPERBUILD_EXCLUDE_iMSTKBUILD_TARGET:${SUPERBUILD_EXCLUDE_iMSTKBUILD_TARGET})
+if(NOT DEFINED SUPERBUILD_EXCLUDE_iMSTKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_iMSTKBUILD_TARGET)
+  set(iMSTKBUILD_TARGET_ALL_OPTION "ALL")
 else()
-  set(SimMedTKBUILD_TARGET_ALL_OPTION "")
+  set(iMSTKBUILD_TARGET_ALL_OPTION "")
 endif()
 
-# If SimMedTK_SUPERBUILD_SUBPROJECT_DASHBOARD is set (by a buildbot slave's
+# If iMSTK_SUPERBUILD_SUBPROJECT_DASHBOARD is set (by a buildbot slave's
 # initial cache, for example), then don't just build the "all" target
-if(SimMedTK_SUPERBUILD_SUBPROJECT_DASHBOARD)
-  set(simmedtk_target --target Experimental)
+if(iMSTK_SUPERBUILD_SUBPROJECT_DASHBOARD)
+  set(imstk_target --target Experimental)
 else()
-  set(simmedtk_target)
+  set(imstk_target)
 endif()
 
-add_custom_target(SimMedTK-build ${SimMedTKBUILD_TARGET_ALL_OPTION}
-  COMMAND ${simmedtk_build_cmd} ${simmedtk_target}
-  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
+add_custom_target(iMSTK-build ${iMSTKBUILD_TARGET_ALL_OPTION}
+  COMMAND ${imstk_build_cmd} ${imstk_target}
+  WORKING_DIRECTORY ${iMSTK_BINARY_DIR}/iMSTK-build
   )
-add_dependencies(SimMedTK-build SimMedTK-Configure)
+add_dependencies(iMSTK-build iMSTK-Configure)
 
 #-----------------------------------------------------------------------------
-# Custom target allowing to drive the build of SimMedTK project itself
+# Custom target allowing to drive the build of iMSTK project itself
 #
-add_custom_target(SimMedTK
-  COMMAND ${simmedtk_build_cmd}
-  WORKING_DIRECTORY ${SimMedTK_BINARY_DIR}/SimMedTK-build
+add_custom_target(iMSTK
+  COMMAND ${imstk_build_cmd}
+  WORKING_DIRECTORY ${iMSTK_BINARY_DIR}/iMSTK-build
   )
 
 #-----------------------------------------------------------------------------

@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,17 +16,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include <memory>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Geometry/MeshModel.h"
 #include "Core/RenderDetail.h"
 #include "SceneModels/StaticSceneObject.h"
@@ -59,7 +55,7 @@ go_bandit([](){
 //             auto mesh = std::static_pointer_cast<SurfaceMesh>(io->getMesh());
 //             auto viewer = std::make_shared<VTKViewer>();
 //             TextureManager::addTexture("/home/rortiz/tmp/CollisionHash_resources/textures/voronoi.jpg","blood");
-//             mesh->getRenderDetail()->renderType |= SIMMEDTK_RENDER_NORMALS;
+//             mesh->getRenderDetail()->renderType |= IMSTK_RENDER_NORMALS;
 //             mesh->assignTexture("blood");
 //             viewer->addObject(mesh);
 //

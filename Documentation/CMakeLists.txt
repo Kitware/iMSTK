@@ -1,42 +1,60 @@
-####### SimMedTK Documentation
+###########################################################################
+#
+# Copyright (c) Kitware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+###########################################################################
+
+####### iMSTK Documentation
 ## Reference Documentation
 #
-# If we have doxygen, create reference API documentation for SimMedTK.
+# If we have doxygen, create reference API documentation for iMSTK.
 #
 # This can also generate tag-files and documentation for third-party
-# libraries for cross-referencing with SimMedTK's docs.
+# libraries for cross-referencing with iMSTK's docs.
 #
 if(DOXYGEN_FOUND)
-  file(MAKE_DIRECTORY "${SimMedTK_BINARY_DIR}/documentation/reference")
+  file(MAKE_DIRECTORY "${iMSTK_BINARY_DIR}/documentation/reference")
   configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/SimMedTK.doxyfile.in
-    ${CMAKE_CURRENT_BINARY_DIR}/SimMedTK.doxyfile
+    ${CMAKE_CURRENT_SOURCE_DIR}/iMSTK.doxyfile.in
+    ${CMAKE_CURRENT_BINARY_DIR}/iMSTK.doxyfile
     @ONLY
   )
   add_custom_command(
-    OUTPUT ${SimMedTK_BINARY_DIR}/doc/reference/SimMedTK.tags
-    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/SimMedTK.doxyfile
+    OUTPUT ${iMSTK_BINARY_DIR}/doc/reference/iMSTK.tags
+    COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/iMSTK.doxyfile
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/reference"
     DEPENDS
-      "${CMAKE_CURRENT_BINARY_DIR}/SimMedTK.doxyfile"
+      "${CMAKE_CURRENT_BINARY_DIR}/iMSTK.doxyfile"
       # TODO: Add tag files for external dependencies here.
-    COMMENT "Generating SimMedTK API documentation with Doxygen" VERBATIM
+    COMMENT "Generating iMSTK API documentation with Doxygen" VERBATIM
   )
   add_custom_target(doc
-    DEPENDS ${SimMedTK_BINARY_DIR}/doc/reference/SimMedTK.tags
+    DEPENDS ${iMSTK_BINARY_DIR}/doc/reference/iMSTK.tags
   )
 endif(DOXYGEN_FOUND)
 
 ## End-user Documentation
 #
-# If we have rst2html, create the user's guide for SimMedTK
+# If we have rst2html, create the user's guide for iMSTK
 # as an HTML document.
 
 # Define a macro for processing reStructuredText files
 # if docutils were found.
 if (SPHINX_FOUND)
-  include(SimMedTKSphinxDocs)
-  set(SimMedTK_USERGUIDE_DOCS
+  include(iMSTKSphinxDocs)
+  set(iMSTK_USERGUIDE_DOCS
     index.rst
     userguide/index.rst
     userguide/contributing.rst
@@ -44,19 +62,19 @@ if (SPHINX_FOUND)
   )
   if (DOXYGEN_FOUND)
     # Need doxygen docs built if possible
-    list(APPEND SimMedTK_USERGUIDE_DOCS
-      ${SimMedTK_BINARY_DIR}/documentation/reference/SimMedTK.tags)
+    list(APPEND iMSTK_USERGUIDE_DOCS
+      ${iMSTK_BINARY_DIR}/documentation/reference/iMSTK.tags)
   endif()
 
-  set(SimMedTK_USERGUIDE_FIGS
+  set(iMSTK_USERGUIDE_FIGS
     #userguide/figures/architecture.svg
   )
   # Add the top-level reStructuredText file.
   # All others are included by it.
-  simmedtk_add_doc(userguide
-    DEPENDS ${SimMedTK_USERGUIDE_DOCS}
-    FIGURES ${SimMedTK_USERGUIDE_FIGS}
+  imstk_add_doc(userguide
+    DEPENDS ${iMSTK_USERGUIDE_DOCS}
+    FIGURES ${iMSTK_USERGUIDE_FIGS}
     BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/user
-    DESTINATION share/doc/SimMedTK/userguide
+    DESTINATION share/doc/iMSTK/userguide
   )
 endif()

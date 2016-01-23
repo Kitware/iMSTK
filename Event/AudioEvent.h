@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,21 +16,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMAUDIOEVENT_H
-#define SMAUDIOEVENT_H
+#ifndef EVENT_AUDIOEVENT_H
+#define EVENT_AUDIOEVENT_H
 
 // STL includes
 #include <string>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Event.h"
 
 namespace event {
@@ -67,4 +63,4 @@ private:
 
 } // event namespace
 
-#endif // SMAUDIOEVENT_H
+#endif // EVENT_AUDIOEVENT_H

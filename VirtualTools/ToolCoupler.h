@@ -1,5 +1,8 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
 // Copyright (c) Kitware, Inc.
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -22,8 +25,8 @@
 // Contact:
 //---------------------------------------------------------------------------
 
-#ifndef TOOLCOUPLER_H
-#define TOOLCOUPLER_H
+#ifndef VIRTUAL_TOOLS_TOOLCOUPLER_H
+#define VIRTUAL_TOOLS_TOOLCOUPLER_H
 
 #include <memory>
 #include <chrono>

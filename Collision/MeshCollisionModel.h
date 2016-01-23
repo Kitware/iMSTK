@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,22 +16,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-
-#ifndef SMMESHCOLLISIONMODEL_H
-#define SMMESHCOLLISIONMODEL_H
+#ifndef COLLISION_MESHCOLLISIONMODEL_H
+#define COLLISION_MESHCOLLISIONMODEL_H
 
 // STL includes
 #include <memory>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Mesh/SurfaceMesh.h"
 #include "Collision/OctreeCell.h"
 #include "Geometry/MeshModel.h"
@@ -132,4 +127,4 @@ private:
     std::shared_ptr<CollisionGroup> collisionGroup;
 };
 
-#endif // SMMESHMODEL_H
+#endif // COLLISION_MESHMODEL_H

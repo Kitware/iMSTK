@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Rendering/VBO.h"
 
@@ -41,9 +37,9 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
                                   const core::Vectorf &p_textureCoords,
                                   size_t p_objectId)
 {
-    if (vboType == SIMMEDTK_VBO_STATIC)
+    if (vboType == IMSTK_VBO_STATIC)
     {
-        return SIMMEDTK_VBO_INVALIDOPERATION;
+        return IMSTK_VBO_INVALIDOPERATION;
     }
 
     // Bind the vertices's VBO
@@ -55,7 +51,7 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
     {
         std::cerr << "VBO could not map the buffer" << std::endl;
         renderingError = true;
-        return SIMMEDTK_VBO_BUFFERPOINTERERROR;
+        return IMSTK_VBO_BUFFERPOINTERERROR;
     }
 
     // Copy vertices
@@ -78,14 +74,14 @@ VBOResult VBO::updateVertices(const core::Vectorf &p_vectors,
 
     // Unmap the buffer
     glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }
 
 VBOResult VBO::updateTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId)
 {
-    if ((vboType == SIMMEDTK_VBO_STATIC) | (vboType == SIMMEDTK_VBO_DYNAMIC))
+    if ((vboType == IMSTK_VBO_STATIC) | (vboType == IMSTK_VBO_DYNAMIC))
     {
-        return SIMMEDTK_VBO_INVALIDOPERATION;
+        return IMSTK_VBO_INVALIDOPERATION;
     }
 
     // Bind the indices' VBO
@@ -97,7 +93,7 @@ VBOResult VBO::updateTriangleIndices(const Vector<GLuint> &p_indices, size_t p_o
     {
         std::cerr << "VBO could not map the buffer" << std::endl;
         renderingError = true;
-        return SIMMEDTK_VBO_BUFFERPOINTERERROR;
+        return IMSTK_VBO_BUFFERPOINTERERROR;
     }
 
     // Copy indices
@@ -107,7 +103,7 @@ VBOResult VBO::updateTriangleIndices(const Vector<GLuint> &p_indices, size_t p_o
 
     // Unmap the buffer
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }
 
 VBOResult VBO::drawElements(size_t p_objectId)
@@ -146,19 +142,19 @@ VBOResult VBO::drawElements(size_t p_objectId)
     //return back to original buffer
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }
 
 ///Static Binding of the buffers. It is mandatory to call this function
-/// this function must be called when the binding is SIMMEDTK_VBO_STATIC
+/// this function must be called when the binding is IMSTK_VBO_STATIC
 VBOResult VBO::initStaticVertices(const core::Vectorf &p_vectors,
                                       const core::Vectorf &p_normals,
                                       const core::Vectorf &p_textureCoords,
                                       size_t p_objectId)
 {
-    if (vboType == SIMMEDTK_VBO_DYNAMIC)
+    if (vboType == IMSTK_VBO_DYNAMIC)
     {
-        return SIMMEDTK_VBO_INVALIDOPERATION;
+        return IMSTK_VBO_INVALIDOPERATION;
     }
 
     size_t dataOffset = dataOffsetMap[p_objectId];
@@ -179,19 +175,19 @@ VBOResult VBO::initStaticVertices(const core::Vectorf &p_vectors,
 
     // Unmap the buffer
     glUnmapBufferARB(GL_ARRAY_BUFFER_ARB);
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }
 
 ///init Triangle Indices for the very first time for static objects
 ///this function must be called when the indices are not changing
-///SIMMEDTK_VBO_NOINDICESCHANGE
+///IMSTK_VBO_NOINDICESCHANGE
 VBOResult VBO::initTriangleIndices(const Vector<GLuint> &p_indices, size_t p_objectId)
 {
     size_t indexOffset;
 
-    if (vboType == SIMMEDTK_VBO_DYNAMIC)
+    if (vboType == IMSTK_VBO_DYNAMIC)
     {
-        return SIMMEDTK_VBO_INVALIDOPERATION;
+        return IMSTK_VBO_INVALIDOPERATION;
     }
 
     indexOffset = indexOffsetMap[p_objectId];
@@ -200,7 +196,7 @@ VBOResult VBO::initTriangleIndices(const Vector<GLuint> &p_indices, size_t p_obj
 
     // Unmap the buffer
     glUnmapBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB);
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }
 
 void VBO::init( VBOType p_vboType )
@@ -213,31 +209,31 @@ void VBO::init( VBOType p_vboType )
 
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboDataId);
 
-    if (p_vboType == SIMMEDTK_VBO_STATIC)
+    if (p_vboType == IMSTK_VBO_STATIC)
     {
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, IMSTK_VBOBUFFER_DATASIZE, 0, GL_STATIC_DRAW);
     }
-    else if (p_vboType == SIMMEDTK_VBO_DYNAMIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
+    else if (p_vboType == IMSTK_VBO_DYNAMIC || p_vboType == IMSTK_VBO_NOINDICESCHANGE)
     {
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB, IMSTK_VBOBUFFER_DATASIZE, 0, GL_STREAM_DRAW);
     }
 
-//     SM_CHECKERROR(log, error)
+//     IMSTK_CHECKERROR(log, error)
     glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, vboIndexId);
 
-    if (p_vboType == SIMMEDTK_VBO_STATIC || p_vboType == SIMMEDTK_VBO_NOINDICESCHANGE)
+    if (p_vboType == IMSTK_VBO_STATIC || p_vboType == IMSTK_VBO_NOINDICESCHANGE)
     {
-        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
+        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, IMSTK_VBOBUFFER_INDEXSIZE, 0, GL_STATIC_DRAW);
     }
-    else if (p_vboType == SIMMEDTK_VBO_DYNAMIC)
+    else if (p_vboType == IMSTK_VBO_DYNAMIC)
     {
-        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, SIMMEDTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
+        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, IMSTK_VBOBUFFER_INDEXSIZE, 0, GL_STREAM_DRAW);
     }
 
-//     SM_CHECKERROR(log, error);
+//     IMSTK_CHECKERROR(log, error);
     vboType = p_vboType;
-    sizeOfDataBuffer = SIMMEDTK_VBOBUFFER_DATASIZE;
-    sizeOfIndexBuffer = SIMMEDTK_VBOBUFFER_INDEXSIZE;
+    sizeOfDataBuffer = IMSTK_VBOBUFFER_DATASIZE;
+    sizeOfIndexBuffer = IMSTK_VBOBUFFER_INDEXSIZE;
     currentDataOffset = 0;
     currentIndexOffset = 0;
     glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
@@ -248,12 +244,12 @@ VBOResult VBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_n
 {
     if ( sizeof( core::Vec3d )*p_nbrVertices + sizeof( core::Vec3d )*p_nbrVertices + sizeof( std::array<float,2> )*p_nbrVertices > sizeOfDataBuffer - currentDataOffset )
     {
-        return SIMMEDTK_VBO_NODATAMEMORY;
+        return IMSTK_VBO_NODATAMEMORY;
     }
 
     if ( sizeof( int )*p_nbrTriangles * 3 > size_t(sizeOfIndexBuffer - currentIndexOffset))
     {
-        return SIMMEDTK_VBO_NODATAMEMORY;
+        return IMSTK_VBO_NODATAMEMORY;
     }
 
     dataOffsetMap[p_objectId] = currentDataOffset;
@@ -263,5 +259,5 @@ VBOResult VBO::addVerticestoBuffer( const size_t p_nbrVertices, const size_t p_n
     ///add the vertices and normals and the texture coordinates
     currentDataOffset += sizeof( core::Vec3d ) * p_nbrVertices + sizeof( core::Vec3d ) * p_nbrVertices + sizeof( std::array<float,2> ) * p_nbrVertices;
     currentIndexOffset += p_nbrTriangles * sizeof( std::array<size_t,3> );
-    return SIMMEDTK_VBO_OK;
+    return IMSTK_VBO_OK;
 }

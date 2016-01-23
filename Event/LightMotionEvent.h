@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,18 +16,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMLIGHTMOTIONEVENT_H
-#define SMLIGHTMOTIONEVENT_H
+#ifndef EVENT_LIGHTMOTIONEVENT_H
+#define EVENT_LIGHTMOTIONEVENT_H
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
@@ -58,4 +54,4 @@ private:
 
 } // event namespace
 
-#endif // SMLIGHTMOTIONEVENT_H
+#endif // EVENT_LIGHTMOTIONEVENT_H

@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,16 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMTEXTUREMANAGER_H
-#define SMTEXTUREMANAGER_H
+#ifndef RENDERING_TEXTUREMANAGER_H
+#define RENDERING_TEXTUREMANAGER_H
 
 // STL includes
 #include <unordered_map>
@@ -31,7 +27,7 @@
 // 3rd Party includes
 #include <SFML/Graphics/Image.hpp>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 #include "ConfigRendering.h"
 #include "Core/Texture.h"
@@ -58,7 +54,7 @@ public:
         if(!isInitialized)
         {
             errorLog = p_errorLog;
-            textures.resize(SIMMEDTK_MAX_TEXTURENBR);
+            textures.resize(IMSTK_MAX_TEXTURENBR);
             textures.clear();
             activeTextures = 0;
             isDeleteImagesEnabled = true;

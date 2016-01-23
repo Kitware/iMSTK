@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,24 +16,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
-#ifndef SMDATASTRUTCTURES_H
-#define SMDATASTRUTCTURES_H
+#ifndef CORE_DATASTRUTCTURES_H
+#define CORE_DATASTRUTCTURES_H
 
 #include <iostream>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Core/Config.h"
 
 /// \brief hash bucket size
-#define SIMMEDTK_HASHBUCKET_SIZE    10
+#define IMSTK_HASHBUCKET_SIZE    10
 /// \brief a hash entry; bucket
 template <class T>
 struct EntryList
@@ -38,7 +34,7 @@ struct EntryList
 public:
     EntryList();
 
-    T ID[SIMMEDTK_HASHBUCKET_SIZE];
+    T ID[IMSTK_HASHBUCKET_SIZE];
     unsigned int totalEntries;
     EntryList* p_entry;
 };
@@ -65,15 +61,15 @@ struct HashIterator
     friend std::ostream &operator<<(std::ostream &out, HashIterator<K> &p);
 };
 /// \brief hash return codes
-enum SIMMEDTK_HASHRETURN_CODES
+enum IMSTK_HASHRETURN_CODES
 {
-    SIMMEDTK_HASH_ENTRYREMOVED,
-    SIMMEDTK_HASH_ENTRYALREADYEXISTS,
-    SIMMEDTK_HASH_ENTRYOTEXIST,
-    SIMMEDTK_HASH_NOTBUCKETS,
-    SIMMEDTK_HASH_ENTRYINSERTED,
-    SIMMEDTK_HASH_ALLOCATED_INSERTED,
-    SIMMEDTK_HASH_SUCCESS
+    IMSTK_HASH_ENTRYREMOVED,
+    IMSTK_HASH_ENTRYALREADYEXISTS,
+    IMSTK_HASH_ENTRYOTEXIST,
+    IMSTK_HASH_NOTBUCKETS,
+    IMSTK_HASH_ENTRYINSERTED,
+    IMSTK_HASH_ALLOCATED_INSERTED,
+    IMSTK_HASH_SUCCESS
 };
 /// \brief hash implementation. Table->
 template <class T>
@@ -108,9 +104,9 @@ public:
     Hash(int p_tableSize);
     /// \brief  insert the entry; indicate as p_triangle. It can be any type not only a triangle
     /// hashindex is the has number generated for the entry
-    inline SIMMEDTK_HASHRETURN_CODES insert(T p_triangle, unsigned int hashIndex);
+    inline IMSTK_HASHRETURN_CODES insert(T p_triangle, unsigned int hashIndex);
     /// \brief check if there is an entry and index
-    inline SIMMEDTK_HASHRETURN_CODES checkAndInsert(T p_triangle, unsigned int hashIndex);
+    inline IMSTK_HASHRETURN_CODES checkAndInsert(T p_triangle, unsigned int hashIndex);
     /// \brief starts the iteration. reset the indices
     inline void startIteration();
     /// \brief  go to next table index
@@ -129,8 +125,8 @@ public:
 /// \brief sliding  storage type
 enum StorageSlideType
 {
-    SIMMEDTK_STORAGESLIDING_FRONTFIRST,
-    SIMMEDTK_STORAGESLIDING_LASTFIRST
+    IMSTK_STORAGESLIDING_FRONTFIRST,
+    IMSTK_STORAGESLIDING_LASTFIRST
 };
 
 #include "Core/DataStructures.hpp"

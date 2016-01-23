@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Core/Config.h"
 #include "Core/ViewerBase.h"
@@ -36,7 +32,7 @@ RenderOperation::RenderOperation()
 ViewerBase::ViewerBase()
 {
     type = core::ClassType::Viewer;
-    viewerRenderDetail = SIMMEDTK_VIEWERRENDER_FADEBACKGROUND;
+    viewerRenderDetail = IMSTK_VIEWERRENDER_FADEBACKGROUND;
 
     defaultAmbientColor.setValue(0.1, 0.1, 0.1, 1.0);
     defaultDiffuseColor.setValue(0.8, 0.8, 0.8, 1.0);
@@ -138,10 +134,10 @@ void ViewerBase::processRenderOperation(const RenderOperation &p_rop)
 {
     switch (p_rop.target)
     {
-    case SMRENDERTARGET_SCREEN:
+    case IMSTK_RENDERTARGET_SCREEN:
         renderToScreen(p_rop);
         break;
-    case SMRENDERTARGET_FBO:
+    case IMSTK_RENDERTARGET_FBO:
         renderToFBO(p_rop);
         break;
     default:
@@ -159,7 +155,7 @@ void ViewerBase::registerScene(std::shared_ptr<Scene> scene,
         return;
     }
 
-    if (target == SMRENDERTARGET_FBO && fboName.length() == 0)
+    if (target == IMSTK_RENDERTARGET_FBO && fboName.length() == 0)
     {
         std::cerr << "Error: unvalid FBO name." << std::endl;
         return;
@@ -200,7 +196,7 @@ void ViewerBase::adjustFPS()
 ///main drawing routine for Rendering of all objects in the scene
 void ViewerBase::render()
 {
-    if (viewerRenderDetail & SIMMEDTK_VIEWERRENDER_DISABLE)
+    if (viewerRenderDetail & IMSTK_VIEWERRENDER_DISABLE)
     {
         return;
     }

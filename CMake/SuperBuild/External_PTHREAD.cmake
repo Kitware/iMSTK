@@ -1,7 +1,6 @@
 ###########################################################################
 #
-# Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-#                        Rensselaer Polytechnic Institute
+# Copyright (c) Kitware, Inc.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -38,7 +37,7 @@ endif()
 set(PTHREAD_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(PTHREAD)
+iMSTKCheckDependencies(PTHREAD)
 
 set(proj PTHREAD)
 
@@ -67,7 +66,7 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
       -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-      -DBUILD_SHARED_LIBS:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
+      -DBUILD_SHARED_LIBS:BOOL=${iMSTK_BUILD_SHARED_LIBS}
       ${OUTPUT_DIRECTORIES}
       ${CMAKE_OSX_EXTERNAL_PROJECT_ARGS}
       ${ep_config_flags}
@@ -83,7 +82,7 @@ if(NOT DEFINED ${proj}_DIR)
   set(${proj}_DIR ${ep_install_dir})
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/include/${sep}${iMSTK_CMAKE_INCLUDE_PATH})

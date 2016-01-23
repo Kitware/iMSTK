@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,15 +16,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SMMAKEUNIQUE_H
-#define SMMAKEUNIQUE_H
+
+#ifndef CORE_MAKEUNIQUE_H
+#define CORE_MAKEUNIQUE_H
 
 #include <memory>
 
@@ -32,4 +29,4 @@ namespace Core {
         return std::unique_ptr<T>(new T(std::forward<Ts>(params)...));
     }
 }
-#endif // SMMAKEUNIQUE_H
+#endif // CORE_MAKEUNIQUE_H

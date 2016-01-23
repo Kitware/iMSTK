@@ -1,6 +1,23 @@
 ###########################################################################
-# Copyright 2015 by Kitware and RPI. See toplevel LICENSE.txt for details.
+#
+# Copyright (c) Kitware, Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0.txt
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
 ###########################################################################
+#
+# LibNifalcon
+#
 
 set(LibNifalcon_TAG 7e98c9f2bdf936d236260176921c865f8fd1b108)
 set(LibNifalcon_REPOSITORY git@github.com:qdot/libnifalcon.git)
@@ -20,7 +37,7 @@ endif()
 set(LibNifalcon_DEPENDENCIES "")
 
 # Include dependent projects if any
-SimMedTKCheckDependencies(LibNifalcon)
+iMSTKCheckDependencies(LibNifalcon)
 
 set(proj LibNifalcon)
 
@@ -52,9 +69,9 @@ if(NOT DEFINED ${proj}_DIR)
       -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
       -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
       -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-      -DBUILD_SHARED:BOOL=${SimMedTK_BUILD_SHARED_LIBS}
-      -DCMAKE_INCLUDE_PATH:STRING=${SimMedTK_CMAKE_INCLUDE_PATH}
-      -DCMAKE_LIBRARY_PATH:STRING=${SimMedTK_CMAKE_LIBRARY_PATH}
+      -DBUILD_SHARED:BOOL=${iMSTK_BUILD_SHARED_LIBS}
+      -DCMAKE_INCLUDE_PATH:STRING=${iMSTK_CMAKE_INCLUDE_PATH}
+      -DCMAKE_LIBRARY_PATH:STRING=${iMSTK_CMAKE_LIBRARY_PATH}
       -DBUILD_TESTING:BOOL=OFF
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_SWIG_BINDINGS:BOOL=OFF
@@ -69,11 +86,11 @@ if(NOT DEFINED ${proj}_DIR)
 #     LOG_TEST 1                # Wrap test in script to log output
 #     LOG_INSTALL 1             # Wrap install in script to log output
     )
-  set(${proj}_DIR ${CMAKE_BINARY_DIR}/SimMedTK-build/lib)
+  set(${proj}_DIR ${CMAKE_BINARY_DIR}/iMSTK-build/lib)
 
 else()
-  SimMedTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
+  iMSTKEmptyExternalProject(${proj} "${${proj}_DEPENDENCIES}")
 endif()
 
-set(SimMedTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${SimMedTK_CMAKE_INCLUDE_PATH})
-list(APPEND SimMedTK_SUPERBUILD_EP_ARGS -DLibNifalcon_DIR:PATH=${${proj}_DIR})
+set(iMSTK_CMAKE_INCLUDE_PATH ${CMAKE_BINARY_DIR}/SuperBuild/${proj}/${sep}${iMSTK_CMAKE_INCLUDE_PATH})
+list(APPEND iMSTK_SUPERBUILD_EP_ARGS -DLibNifalcon_DIR:PATH=${${proj}_DIR})

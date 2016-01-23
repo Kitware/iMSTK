@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,13 +16,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "Rendering/Shader.h"
 
@@ -28,7 +24,7 @@
 #include <iostream>
 #include <chrono>
 
-// SimMedTK includes
+// iMSTK includes
 #include "TextureManager.h"
 
 std::unordered_map<int, std::shared_ptr<Shader>> Shader::shaders;
@@ -141,7 +137,7 @@ bool Shader::initShaders(const std::string& p_vertexProgFileName,
             return false;
         }
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         createVertexShaderGLSL();
         vertexShaderContent.clear(); //No need for the contents anymore
         checkGLError();
@@ -164,7 +160,7 @@ bool Shader::initShaders(const std::string& p_vertexProgFileName,
         {
             return false;
         }
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         createFragmentShaderGLSL();
         fragmentShaderContent.clear();
         checkGLError();
@@ -187,7 +183,7 @@ bool Shader::initShaders(const std::string& p_vertexProgFileName,
         {
             return false;
         }
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         createGeometryShaderGLSL();
         geometryShaderContent.clear();
         checkGLError();
@@ -298,7 +294,7 @@ bool Shader::checkGLError()
 void Shader::enableShader()
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
 
     if (vertexProgramExist)
     {
@@ -326,7 +322,7 @@ void Shader::enableShader()
 void Shader::disableShader()
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
 
     if (vertexProgramExist)
     {
@@ -353,7 +349,7 @@ void Shader::disableShader()
 void Shader::restoreAndEnableCurrent()
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
 
     if (Shader::savedShader != nullptr)
     {
@@ -385,7 +381,7 @@ void Shader::restoreAndEnableCurrent()
 void Shader::saveAndDisableCurrent()
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
 
     if (currentShader != nullptr)
     {
@@ -446,14 +442,14 @@ GLint Shader::addGeometryShaderParamGLSL(const std::string& p_paramNameGeometry)
 GLint Shader::addVertexShaderParam(const std::string& p_paramNameVertex)
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     return addVertexShaderParamGLSL(p_paramNameVertex);
 #endif
 }
 GLint Shader::addFragmentShaderParam(const std::string& p_paramNameFragment)
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     return addFragmentShaderParamGLSL(p_paramNameFragment);
 #endif
 }
@@ -461,7 +457,7 @@ GLint Shader::addFragmentShaderParam(const std::string& p_paramNameFragment)
 GLint Shader::addGeometryShaderParam(const std::string& p_paramNameGeometry)
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     return addGeometryShaderParamGLSL(p_paramNameGeometry);
 #endif
 }
@@ -469,7 +465,7 @@ GLint Shader::addGeometryShaderParam(const std::string& p_paramNameGeometry)
 GLint Shader::addShaderParamForAll(const std::string& p_paramName)
 {
 
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     GLint param;
     param = glGetUniformLocation(shaderProgramObject, p_paramName.data());
     vertexShaderParamsString.push_back(p_paramName);
@@ -488,7 +484,7 @@ GLint Shader::addShaderParamForAll(const std::string& p_paramName)
 
 GLint Shader::getShaderParamForAll(const std::string& p_paramName) const
 {
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     for (size_t i = 0; i < vertexShaderParamsString.size(); i++)
     {
         if (vertexShaderParamsString[i] == p_paramName)
@@ -503,7 +499,7 @@ GLint Shader::getShaderParamForAll(const std::string& p_paramName) const
 
 GLint Shader::getFragmentShaderParam(const std::string& p_paramName) const
 {
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     for (size_t i = 0; i < fragmentShaderParamsString.size(); i++)
     {
         if (fragmentShaderParamsString[i] == p_paramName)
@@ -518,7 +514,7 @@ GLint Shader::getFragmentShaderParam(const std::string& p_paramName) const
 
 GLint Shader::getShaderAtrribParam(const std::string& p_paramName) const
 {
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
     for (size_t i = 0; i < attribParamsString.size(); i++)
     {
         if (attribParamsString[i] == p_paramName)
@@ -554,7 +550,7 @@ bool Shader::reLoadAllShaders()
         {
             return false;
         }
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         reloadVertexShaderGLSL();
         vertexShaderContent.clear();
 
@@ -573,7 +569,7 @@ bool Shader::reLoadAllShaders()
         {
             return false;
         }
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         reloadFragmentShaderGLSL();
         fragmentShaderContent.clear();
 
@@ -593,7 +589,7 @@ bool Shader::reLoadAllShaders()
         {
             return false;
         }
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
         reloadGeometryShaderGLSL();
         geometryShaderContent.clear();
 
@@ -644,7 +640,7 @@ bool Shader::attachTexture(std::shared_ptr<UnifiedId> p_meshID,
 
     TextureShaderAssignment assign;
 
-    if (TextureManager::findTextureId(p_textureName, assign.textureId) == SIMMEDTK_TEXTURE_NOTFOUND)
+    if (TextureManager::findTextureId(p_textureName, assign.textureId) == IMSTK_TEXTURE_NOTFOUND)
     {
         std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID->getId() <<  "\n";
         return false;
@@ -874,7 +870,7 @@ std::shared_ptr<Shader> Shader::getShader( std::shared_ptr<UnifiedId> p_shaderID
 }
 Shader::~Shader()
 {
-#ifdef SIMMEDTK_OPENGL_SHADER
+#ifdef IMSTK_OPENGL_SHADER
 
     if(vertexProgramExist)
     {

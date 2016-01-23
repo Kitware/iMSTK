@@ -1,4 +1,7 @@
-// This file is part of the SimMedTK project.
+// This file is part of the iMSTK project.
+//
+// Copyright (c) Kitware, Inc.
+//
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
 //
@@ -13,19 +16,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
-#ifndef SM_SPARSE_CG
-#define SM_SPARSE_CG
+
+#ifndef SOLVERS_CONJUGATEGRADIENT_H
+#define SOLVERS_CONJUGATEGRADIENT_H
 
 #include <memory>
 
-// SimMedTK includes
+// iMSTK includes
 #include "Solvers/IterativeLinearSolver.h"
 #include "Solvers/SystemOfEquations.h"
 
@@ -113,4 +110,4 @@ private:
     Eigen::ConjugateGradient<core::SparseMatrixd> solver;
 };
 
-#endif // SM_SPARSE_CG
+#endif // SOLVERS_SPARSE_CG
