@@ -24,6 +24,7 @@
 #include "Core/Config.h"
 #include "Core/Model.h"
 #include "SceneModels/SceneObject.h"
+#include "TimeIntegrators/OdeSystem.h"
 #include "Core/CoreClass.h"
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
@@ -39,7 +40,7 @@ namespace core {
 ///     apply to them. They can be used to model objects that do not move in the scene or
 ///     or objects that are controlled by external hardware, i.e. haptics devices.
 ///
-class StaticSceneObject : public SceneObject
+class StaticSceneObject : public SceneObject, public OdeSystem
 {
 public:
     ///

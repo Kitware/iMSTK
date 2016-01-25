@@ -99,9 +99,16 @@ bool CollisionMoller::tri2tri( core::Vec3d &p_tri1Point1,
 
 bool CollisionMoller::tri2tri( core::Vec3d &p_tri1Point1, core::Vec3d &p_tri1Point2, core::Vec3d &p_tri1Point3, core::Vec3d &p_tri2Point1, core::Vec3d &p_tri2Point2, core::Vec3d &p_tri2Point3 )
 {
-    return ( tri_tri_intersect( p_tri1Point1.data(), p_tri1Point2.data(),
-                                p_tri1Point3.data(), p_tri2Point1.data(),
-                                p_tri2Point2.data(), p_tri2Point3.data() ) == 1 ? true : false );
+    if(tri_tri_intersect(p_tri1Point1.data(), p_tri1Point2.data(),
+                         p_tri1Point3.data(), p_tri2Point1.data(),
+                         p_tri2Point2.data(), p_tri2Point3.data()) == 1)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 bool CollisionMoller::checkOverlapAABBAABB( AABB &aabbA, AABB &aabbB, AABB &result )

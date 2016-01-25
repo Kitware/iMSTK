@@ -36,13 +36,14 @@ NewtonMethod::NewtonMethod():
 //---------------------------------------------------------------------------
 void NewtonMethod::solve(core::Vectord &x)
 {
-    if(!this->linearSolver)
+    if(!this->nonLinearSystem)
     {
+        // TODO: log this
         return;
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm = this->nonLinearSystem->eval(x).norm();
+    double fnorm = this->nonLinearSystem->evalF(x).norm();
     double stopTolerance = this->absoluteTolerance + this->relativeTolerance * fnorm;
     this->linearSolver->setTolerance(stopTolerance);
     core::Vectord dx = x;
@@ -51,6 +52,7 @@ void NewtonMethod::solve(core::Vectord &x)
     {
         if(fnorm < stopTolerance)
         {
+            /// TODO Log this
             return;
         }
         this->updateJacobian(x);
@@ -85,6 +87,7 @@ updateForcingTerm(const double ratio, const double stopTolerance, const double f
     // Save guard to prevent the forcing term to become too small for far away iterates
     if(this->gamma * forcingTermSqr > .1)
     {
+        // TODO: Log this
         eta = std::max(eta, this->gamma * forcingTermSqr);
     }
 
@@ -109,34 +112,22 @@ std::shared_ptr<NewtonMethod::LinearSolverType> NewtonMethod::getLinearSolver() 
 void NewtonMethod::updateJacobian(const core::Vectord &x)
 {
     // Evaluate the Jacobian and sets the matrix
-    if(!this->jacobian)
+    if(!this->nonLinearSystem)
     {// TODO: Print message or log error.
         return;
     }
 
-    const core::SparseMatrixd &jacobianMatrix = this->jacobian(x);
-    const core::Vectord &f = this->nonLinearSystem->eval(x);
+    auto &A = this->nonLinearSystem->DF(x);
 
-    if(!(jacobianMatrix.innerSize() > 0))
+    if(A.innerSize() == 0)
     {// TODO: Print message and/or log error.
         return;
     }
 
-    auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
-                            jacobianMatrix, f);
+    auto &b = this->nonLinearSystem->F(x);
+
+    auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
     this->linearSolver->setSystem(linearSystem);
-}
-
-//---------------------------------------------------------------------------
-void NewtonMethod::setJacobian(const NonLinearSolver::JacobianType &newJacobian)
-{
-    this->jacobian = newJacobian;
-}
-
-//---------------------------------------------------------------------------
-const NonLinearSolver::JacobianType &NewtonMethod::getJacobian() const
-{
-    return this->jacobian;
 }
 
 //---------------------------------------------------------------------------

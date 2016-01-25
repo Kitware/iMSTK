@@ -29,7 +29,7 @@
 class TimeIntegrator
 {
 public:
-    using FunctionType = OdeSystem::FunctionType;
+    using FunctionType = OdeSystem::FunctionOperatorType;
 
     enum IntegratorType
     {

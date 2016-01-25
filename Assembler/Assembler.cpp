@@ -18,14 +18,46 @@
 // limitations under the License.
 
 #include "Assembler/Assembler.h"
+
+// iMSTK includes
+#include "CollisionContext/CollisionContext.h"
 #include "Core/ContactHandling.h"
 #include "Core/Model.h"
 #include "TimeIntegrators/OdeSystem.h"
+#include "Solvers/SystemOfEquations.h"
 
-Assembler::Assembler(std::shared_ptr<CollisionContext> collContext)
+Assembler::Assembler(std::shared_ptr <CollisionContext> collContext)
 {
     this->collisionContext = collContext;
     this->initSystem();
+}
+
+//---------------------------------------------------------------------------
+void Assembler::
+setCollisionContext(std::shared_ptr< CollisionContext > newCollisionContext)
+{
+    this->collisionContext = newCollisionContext;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr<CollisionContext > Assembler::getCollisionContext() const
+{
+    return this->collisionContext;
+}
+
+//---------------------------------------------------------------------------
+void Assembler::
+setSystemOfEquations(
+    std::vector<std::shared_ptr<SparseLinearSystem>> newSystemOfEquations)
+{
+    this->equationList = newSystemOfEquations;
+}
+
+//---------------------------------------------------------------------------
+std::vector<std::shared_ptr<Assembler::SparseLinearSystem>> Assembler::
+getSystemOfEquations() const
+{
+    return this->equationList;
 }
 
 //---------------------------------------------------------------------------
@@ -39,7 +71,7 @@ void Assembler::type1Interactions()
 
     auto ch = this->collisionContext->getContactHandlers();
 
-    for(auto &ch : this->collisionContext->getContactHandlers())
+    for(auto & ch : this->collisionContext->getContactHandlers())
     {
         const auto &forces = ch->getContactForces();
         auto sceneModel = ch->getSecondSceneObject();
@@ -50,58 +82,57 @@ void Assembler::type1Interactions()
 //---------------------------------------------------------------------------
 void Assembler::initSystem()
 {
-    for(auto &rows : this->collisionContext->getIslands())
+    for(auto & rows : this->collisionContext->getIslands())
     {
         size_t dofSize = 0;
         size_t nnz = 0;
-        std::vector<const core::SparseMatrixd*> systemMatrices;
-        std::vector<const core::Vectord*> rhsVector;
-        for(auto &col : rows)
+        std::vector<const core::SparseMatrixd *> systemMatrices;
+        std::vector<const core::Vectord *> rhsVector;
+
+        for(auto & col : rows)
         {
+            // For the moment only DeformableSceneObject are SystemsOfEquations
             auto sceneModel = this->collisionContext->getSceneModel(col);
-            auto odeSystem = std::dynamic_pointer_cast<OdeSystem>(
-                    this->collisionContext->getSceneModel(col));
-            if(sceneModel && odeSystem)
+            auto linearSystem = std::dynamic_pointer_cast<SparseLinearSystem>(sceneModel);
+            if(sceneModel && linearSystem)
             {
-                dofSize += sceneModel->getNumOfDOF();
-                systemMatrices.push_back(&odeSystem->getSystemMatrix());
-                rhsVector.push_back(&odeSystem->getRHS());
-                nnz += systemMatrices.back()->nonZeros();
+                this->equationList.push_back(linearSystem);
+                nnz += linearSystem->getMatrix().nonZeros();
+                dofSize += linearSystem->getRHSVector().size();
             }
         }
 
         if(dofSize > 0)
         {
-            this->A.emplace_back(dofSize,dofSize);
+            this->A.emplace_back(dofSize, dofSize);
             this->A.back().reserve(nnz);
             this->b.emplace_back(dofSize);
-            auto system = std::make_shared<LinearSystemType>(this->A.back(),this->b.back());
-
-            this->systemOfEquationsList.push_back(system);
 
             size_t size = 0;
-            for(size_t i = 0, end = systemMatrices.size(); i < end; ++i)
+            for(auto &equation : this->equationList)
             {
-                auto M = systemMatrices[i];
-                auto rhs = rhsVector[i];
+                auto &M = equation->getMatrix();
+                auto &rhs = equation->getRHSVector();
+                this->concatenateMatrix(M, this->A.back(), size, size);
+                this->b.back().segment(size, rhs.size());
 
-                this->concatenateMatrix(*M,this->A.back(),size,size);
-                this->b.back().segment(size,rhs->size());
-
-                size += rhs->size();
+                size += rhs.size();
             }
         }
     }
 }
 
 //---------------------------------------------------------------------------
-void Assembler::concatenateMatrix(const core::SparseMatrixd &Q, core::SparseMatrixd &R, std::size_t i, std::size_t j)
+void Assembler::concatenateMatrix(const core::SparseMatrixd &Q,
+                                  core::SparseMatrixd &R,
+                                  std::size_t i,
+                                  std::size_t j)
 {
-    for(size_t k = i; k < i+Q.outerSize(); ++k)
+    for(size_t k = i; k < i + Q.outerSize(); ++k)
     {
-        for(core::SparseMatrixd::InnerIterator it(Q,k); it; ++it)
+        for(core::SparseMatrixd::InnerIterator it(Q, k); it; ++it)
         {
-            R.insert(k,it.col()+j) = it.value();
+            R.insert(k, it.col() + j) = it.value();
         }
     }
 }

@@ -544,18 +544,17 @@ bool Shader::reLoadAllShaders()
     std::ifstream fragmentShaderFile;
     std::ifstream geometryShaderFile;
 
-    if (vertexProgramExist == true)
+    if (vertexProgramExist)
     {
-        if (false == readShaderContent(this->vertexProgFileName, this->vertexShaderContent))
+        if (!readShaderContent(this->vertexProgFileName, this->vertexShaderContent))
         {
             return false;
         }
+
 #ifdef IMSTK_OPENGL_SHADER
         reloadVertexShaderGLSL();
         vertexShaderContent.clear();
-
         checkGLError();
-
 #endif
     }
     else
@@ -563,18 +562,17 @@ bool Shader::reLoadAllShaders()
         vertexShaderObject = 0;
     }
 
-    if (fragmentProgramExist == true)
+    if (fragmentProgramExist)
     {
-        if (false == readShaderContent(this->fragmentProgFileName, this->fragmentShaderContent))
+        if (!readShaderContent(this->fragmentProgFileName, this->fragmentShaderContent))
         {
             return false;
         }
+
 #ifdef IMSTK_OPENGL_SHADER
         reloadFragmentShaderGLSL();
         fragmentShaderContent.clear();
-
         checkGLError();
-
 #endif
     }
     else
@@ -583,18 +581,17 @@ bool Shader::reLoadAllShaders()
     }
 
 
-    if (geometryProgramExist == true)
+    if (geometryProgramExist)
     {
-        if (false == readShaderContent(this->geometryProgFileName, this->geometryShaderContent))
+        if (!readShaderContent(this->geometryProgFileName, this->geometryShaderContent))
         {
             return false;
         }
+
 #ifdef IMSTK_OPENGL_SHADER
         reloadGeometryShaderGLSL();
         geometryShaderContent.clear();
-
         checkGLError();
-
 #endif
     }
     else
@@ -642,7 +639,8 @@ bool Shader::attachTexture(std::shared_ptr<UnifiedId> p_meshID,
 
     if (TextureManager::findTextureId(p_textureName, assign.textureId) == IMSTK_TEXTURE_NOTFOUND)
     {
-        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName << "  for mesh id:" << p_meshID->getId() <<  "\n";
+        std::cout << "texture " << p_textureName << " is not found in shader:" << p_textureShaderName <<
+                "  for mesh id:" << p_meshID->getId() <<  "\n";
         return false;
     }
 

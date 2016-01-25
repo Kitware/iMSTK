@@ -20,42 +20,35 @@
 #ifndef ASSEMBLER_ASSEMBLER_H
 #define ASSEMBLER_ASSEMBLER_H
 
+// STL includes
 #include <memory>
 
 // iMSTK includes
 #include "Core/CoreClass.h"
-
-//#include "Core/SDK.h"
-#include "Core/Config.h"
-#include "Core/ContactHandling.h"
-#include "CollisionContext/CollisionContext.h"
-#include "Solvers/SystemOfEquations.h"
-//#include "Core/SceneObject.h"
 #include "Core/Matrix.h"
+#include "Core/Vector.h"
+
+// Forward declarations
+class CollisionContext;
+
+template<typename T>
+class LinearSystem;
 
 ///
-/// \class Assembler
-///
-/// \brief This class is responsible for using the
-/// information in the collision context and the
-/// internal, external forces from scene objects
-/// to output systems of equations to be solved by
-/// solver module.
+/// \class Assembler This class is responsible for using the information in the
+///     collision context, the internal and external forces from scene objects
+///     to assemble an augmented systems of equations.
 ///
 class Assembler : public CoreClass
 {
 public:
-    using LinearSystemType = LinearSystem<core::SparseMatrixd>;
+    using SparseLinearSystem = LinearSystem<core::SparseMatrixd>;
 
 public:
     ///
-    /// \brief Default constructor
+    /// \brief Default constructor/destructor
     ///
     Assembler() = default;
-
-    ///
-    /// \brief Destructor
-    ///
     ~Assembler() = default;
 
     ///
@@ -63,36 +56,52 @@ public:
     ///
     Assembler(std::shared_ptr<CollisionContext> collisionContext);
 
+    ///
+    /// \brief Set/Get Collision context.
+    ///
+    void setCollisionContext(std::shared_ptr<CollisionContext> newCollisionContext);
+    std::shared_ptr<CollisionContext> getCollisionContext() const;
+
+    ///
+    /// \brief Set/Get System of equations.
+    ///
+    void setSystemOfEquations(std::vector<std::shared_ptr<SparseLinearSystem>> newSystemOfEquations);
+    std::vector<std::shared_ptr<SparseLinearSystem>> getSystemOfEquations() const;
+
 	///
-	/// \brief consolidate the forces/projectors from type 1 interactions such as
-    /// forces from penalty based contact handling
+	/// \brief Consolidate the forces/projectors from type 1 interactions such as
+    /// forces from penalty based contact handling.
 	///
     void type1Interactions();
 
 	///
-	/// \brief
+	/// \brief Initialize the system of equations from the scene models provided by the
+    ///     interaction context.
 	///
     void initSystem();
 
     ///
-    /// \brief Helper to concatenate the matrix Q into an block of R.
+    /// \brief Helper to concatenate the matrix Q into a block of R.
     ///
     /// \param Q Submatrix
     /// \param R Supermatrix
     /// \param i row offset
     /// \param j column offset
     ///
-    void concatenateMatrix(const core::SparseMatrixd &Q, core::SparseMatrixd &R, size_t i, size_t j);
+    void concatenateMatrix(const core::SparseMatrixd &Q,
+                           core::SparseMatrixd &R,
+                           size_t i,
+                           size_t j);
 
 private:
-    // inputs
-    std::shared_ptr<CollisionContext> collisionContext;
+    std::shared_ptr<CollisionContext> collisionContext; ///> Interaction context
 
-    // output
-    std::vector<std::shared_ptr<LinearSystem<core::SparseMatrixd>>> systemOfEquationsList;
+    ///> List of systems to be solved, these can be linear, nonlinear or constrained.
+    ///> Each system correspond to one type of interaction in the interaction graph.
+    std::vector<std::shared_ptr<SparseLinearSystem>> equationList;
 
-    std::vector<core::SparseMatrixd> A;
-    std::vector<core::Vectord> b;
+    std::vector<core::SparseMatrixd> A; ///> Matrices storage
+    std::vector<core::Vectord> b; ///> Right hand sides storage
 };
 
 #endif // ASSEMBLER_ASSEMBLER_H

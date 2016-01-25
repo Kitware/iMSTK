@@ -33,10 +33,9 @@
 namespace Core {
 
 ///
-///
 /// \brief Base class for all meshes used in the simulation.
 ///
-/// \see \SurfaceMesh
+/// \see SurfaceMesh VegaVolumetricMesh
 ///
 class BaseMesh: public CoreClass
 {
@@ -49,24 +48,13 @@ public:
     ///
     enum class MeshType
     {
+        Surface,
+        Volume,
+        Rigid,
         Deformable,
         DeformableCutable,
-        RigidCutable,
-        Volume,
-        Surface,
-        Rigid
+        RigidCutable
     };
-
-    ///
-    /// \brief designates input mesh file type
-    ///
-//     enum class MeshFileType
-//     {
-//         None,
-//         Obj,
-//         ThreeDS,
-//         VTK
-//     };
 
     ///
     /// \brief constructor/Destructor

@@ -79,7 +79,7 @@ public:
     int open(const std::string& fileName,
                const std::string& p_referenceName)
     {
-        if (false == soundBuffer.loadFromFile(fileName))
+        if (!soundBuffer.loadFromFile(fileName))
         {
             if (nullptr != this->log)
             {

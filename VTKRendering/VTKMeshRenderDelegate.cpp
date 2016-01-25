@@ -79,7 +79,7 @@ private:
 
     vtkSmartPointer<vtkDataSet> dataSet;
 };
- 
+
 class vtkOpenGLTexture_Impl :public vtkOpenGLTexture
 {
 public:
@@ -101,17 +101,8 @@ void MeshRenderDelegate::initDraw()
     auto geom = this->getSourceGeometryAs<SurfaceMesh>();
     if (!geom)
     {
-        auto vega = this->getSourceGeometryAs<VegaVolumetricMesh>();
-        if(!vega)
-        {
-            return;
-        }
-        auto surfaceMesh = vega->getRenderingMesh();
-        if (!surfaceMesh)
-        {
-            return;
-        }
-        geom = surfaceMesh.get();
+        // TODO Log this
+        return;
     }
 
     auto mesh = std::static_pointer_cast<SurfaceMesh>(geom->shared_from_this());
@@ -171,14 +162,14 @@ void MeshRenderDelegate::initDraw()
 
     // Render Textures
     int nbrTextures = renderDetail->getNumberOfTextures();
-    if ((renderDetail && renderDetail->renderTexture()) || nbrTextures>0)
+    if (renderDetail && (renderDetail->renderTexture() || nbrTextures > 0))
     {
         vtkOpenGLTexture_Impl* textureImpl;
         vtkOpenGLTexture *texture;
         vtkSmartPointer<vtkImageReader2Factory> readerFactory =
             vtkSmartPointer<vtkImageReader2Factory>::New();
         std::map<std::string, TextureDetail>& textures = renderDetail->getTextures();
-		
+
         // Go through all TextureDetails
         for (auto &t : textures)
         {
@@ -244,7 +235,7 @@ void MeshRenderDelegate::initDraw()
     {
         vtkSmartPointer<vtkGeometryFilter> geometry = vtkGeometryFilter::New();
         geometry->SetInputData(unstructuredMesh.GetPointer());
-		
+
         vtkSmartPointer<vtkPolyDataNormals> normals = vtkPolyDataNormals::New();
         normals->SetSplitting(false);
         normals->SetInputConnection(geometry->GetOutputPort());
@@ -257,7 +248,7 @@ void MeshRenderDelegate::initDraw()
         auto mapperCustom = CustomGLPolyDataMapper::SafeDownCast(mapper);
         mapperCustom->renderDetail = renderDetail;
         mesh->computeVertexNeighbors();
-        if (mesh->getMeshType() == (int)IOMesh::MeshFileType::OBJ)
+        if (mesh->getMeshType() == int(IOMesh::MeshFileType::OBJ))
         {
             mesh->setUseOBJTexture(true);
         }
@@ -267,7 +258,7 @@ void MeshRenderDelegate::initDraw()
         }
         mesh->computeTriangleTangents();
         mapperCustom->tangents = mesh->getVertexTangents();
-		
+
         if(renderDetail->hasShaders())
         {
             auto glMapper = vtkOpenGLPolyDataMapper::SafeDownCast(mapper);

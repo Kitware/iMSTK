@@ -84,30 +84,6 @@ public:
     void updateJacobian(const core::Vectord &x);
 
     ///
-    /// \brief Set Jacobian. This sets the jacobian function, used to compute the jacobian matrix.
-    ///
-    /// \param newJacobian Jacobian function.
-    ///
-    void setJacobian(const JacobianType &newJacobian);
-
-    ///
-    /// \brief Get Jacobian. Returns the Jacobian function.
-    ///
-    const JacobianType &getJacobian() const;
-
-    ///
-    /// \brief Set JacobianMatrix.
-    ///
-    /// \param newJacobianMatrix Replaces the stored jacobian matrix.
-    ///
-    void setJacobianMatrix(const core::SparseMatrixd &newJacobianMatrix);
-
-    ///
-    /// \brief Get JacobianMatrix. Returns jacobian matrix.
-    ///
-    const core::SparseMatrixd &getJacobianMatrix() const;
-
-    ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix.
     ///
     core::SparseMatrixd &getJacobianMatrix();
@@ -242,7 +218,6 @@ public:
 
 private:
     std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.
-    JacobianType jacobian;                          ///> Jacobian matrix function.
     double forcingTerm;                             ///> Method's forcing term (Default: 0.9).
     double absoluteTolerance;                       ///> Tolerance for the method (Default: 1.0e-3).
     double relativeTolerance;                       ///> Relative (to the rhs) tolerance (Default: 1.0e-6).

@@ -34,7 +34,7 @@ void ForwardEuler::solve(const OdeSystemState &state,
     this->system->computeExplicitSystemLHS(state,newState,timeStep);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(
-                            this->system->getSystemMatrix(), this->system->getRHS());
+                            this->system->getMatrix(), this->system->getRHSVector());
 
     this->linearSolver->setSystem(linearSystem);
     this->linearSolver->solve(newState.getVelocities());

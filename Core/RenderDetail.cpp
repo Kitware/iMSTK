@@ -458,14 +458,17 @@ void RenderDetail::addShaderProgram(int shaderType, const std::string& programFi
     std::stringstream buffer;
     buffer << shaderFileStream.rdbuf();
     std::map<std::string, ShaderDetail> &shaderPrograms = Shaders::getShaderPrograms();
-    if (!(shaderPrograms.find(shaderProgramName) == shaderPrograms.end())){
+    if (shaderPrograms.find(shaderProgramName) != shaderPrograms.end())
+    {
       shaderDetail = shaderPrograms[shaderProgramName];
     }
-    if (shaderType == 0/*vtkShader::Vertex*/){//the numeric value will be changed with vtkShader::Vertex
+    if (shaderType == 0/*vtkShader::Vertex*/)
+    {//the numeric value will be changed with vtkShader::Vertex
       shaderDetail.vertexShaderFileName=programFilename;
       shaderDetail.vertexShaderSource=buffer.str();
     }
-    if (shaderType == 1/*vtkShader::Fragment*/){//the numeric value will be changed with  vtkShader::Fragment
+    if (shaderType == 1/*vtkShader::Fragment*/)
+    {//the numeric value will be changed with  vtkShader::Fragment
       //auto &shaderDetail = shaderPrograms[shaderProgramName];
       shaderDetail.fragmentShaderFileName=programFilename;
       shaderDetail.fragmentShaderSource=buffer.str();

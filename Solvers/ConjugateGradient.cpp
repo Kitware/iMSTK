@@ -39,10 +39,12 @@ void ConjugateGradient::iterate(core::Vectord &, bool)
 //---------------------------------------------------------------------------
 void ConjugateGradient::solve(core::Vectord &x)
 {
-    if(this->linearSystem)
+    if(!this->linearSystem)
     {
-        x = this->solver.solve(this->linearSystem->getRHSVector());
+        // TODO: Log this
+        return;
     }
+    x = this->solver.solve(this->linearSystem->getRHSVector());
 }
 
 //---------------------------------------------------------------------------

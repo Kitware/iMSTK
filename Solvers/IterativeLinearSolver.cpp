@@ -29,9 +29,9 @@ void IterativeLinearSolver::solve(core::Vectord &x)
 {
     if(!this->linearSystem)
     {
+        // TODO: Log this
         return;
     }
-
     auto epsilon  = this->minTolerance * this->minTolerance;
     this->linearSystem->computeResidual(x, this->residual);
 

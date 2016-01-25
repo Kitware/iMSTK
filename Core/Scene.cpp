@@ -266,7 +266,7 @@ void Scene::copySceneToLocal(SceneLocal &p_local)
 {
     std::lock_guard<std::mutex> lock(this->sceneLock); //Lock is released when leaves scope
 
-    if(!(this->sceneUpdatedTimeStamp > p_local.sceneUpdatedTimeStamp))
+    if(this->sceneUpdatedTimeStamp <= p_local.sceneUpdatedTimeStamp)
     {
         return;
     }

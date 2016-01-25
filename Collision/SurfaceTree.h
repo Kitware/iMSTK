@@ -37,7 +37,8 @@ template<typename CellType>
 class SurfaceTree : public CoreClass
 {
 protected:
-  typedef core::Matrix44d MatrixType;
+    using MatrixType = core::Matrix44d;
+    using CellPairType = std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>;
 
 protected:
     int minTreeRenderLevel; 						///< !!
@@ -101,10 +102,10 @@ public:
         return root;
     }
 
-    std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>>
+    std::vector<CellPairType>
     getIntersectingNodes(std::shared_ptr<SurfaceTree<CellType>> otherTree)
     {
-        std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> intersectingNodes;
+        std::vector<CellPairType> intersectingNodes;
         getIntersectingNodes(root, otherTree->getRoot(),intersectingNodes);
 
         return intersectingNodes;
@@ -112,7 +113,7 @@ public:
 
     void getIntersectingNodes(const std::shared_ptr<CellType> left,
                               const std::shared_ptr<CellType> right,
-                              std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result );
+                              std::vector<CellPairType> &result );
 };
 
 #include "Collision/SurfaceTree.hpp"

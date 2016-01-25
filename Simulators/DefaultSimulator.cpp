@@ -92,8 +92,7 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObje
     auto outputDevice = std::dynamic_pointer_cast<VRPNForceDevice>(this->hapticTool->getOutputDevice());
     if(!outputDevice)
     {
-        core::Vec3f normal(0,1,0);
-        outputDevice->setContactPlane(normal,100);
+        // TODO: log this
         return;
     }
 
@@ -122,7 +121,6 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObje
 
     float norm = totalForce.norm();
     auto normal = totalForce.normalized();
-//     auto d = totalForce.dot(contactPoint);
 
     outputDevice->setContactPlane(normal.cast<float>(),0);
     outputDevice->setDampingCoefficient(0.001);

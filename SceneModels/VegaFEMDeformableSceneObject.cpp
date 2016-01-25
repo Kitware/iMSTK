@@ -301,7 +301,8 @@ void VegaFEMDeformableSceneObject::loadVolumeMesh(const std::string &fileName)
 
     this->setPhysicsModel(meshModel);
 
-    this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(meshModel->getMesh());
+    this->volumetricMesh = std::static_pointer_cast<VegaVolumetricMesh>(
+        meshModel->getMesh());
 
     auto collisionModel = std::make_shared<MeshCollisionModel>();
 
@@ -490,7 +491,7 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
     auto dampingLaplacianCoefficient =
         this->vegaFemConfig->floatsOptionMap.at("dampingLaplacianCoefficient");
 
-    if(!(dampingLaplacianCoefficient > 0.0))
+    if(dampingLaplacianCoefficient <= 0.0)
     {
         /// TODO: add to log
         return;
@@ -542,7 +543,15 @@ void VegaFEMDeformableSceneObject::initConstitutiveModel()
 {
     auto numThreads = this->vegaFemConfig->intsOptionMap.at("numberOfThreads");
     auto gravity = this->vegaFemConfig->floatsOptionMap.at("gravity");
-    auto withGravity = gravity != 0.0 ? true : false;
+    bool withGravity;
+    if(gravity != 0.0)
+    {
+        withGravity = true;
+    }
+    else
+    {
+        withGravity = false;
+    }
     auto mesh = this->volumetricMesh->getVegaMesh();
     auto tetMesh = std::dynamic_pointer_cast<TetMesh>(mesh);
 
@@ -849,7 +858,7 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 
         return this->f;
     };
-    this->setFunction(odeRHS);
+    this->setRHSFunction(odeRHS);
 }
 
 //---------------------------------------------------------------------------
