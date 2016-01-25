@@ -169,7 +169,11 @@ void VRPNDeviceServer::exec()
 
     // connections allocated with vrpn_create_server_connection()
     // must decrement their reference to be auto-deleted by VRPN
+    std::cout<<"VRPNDeviceServer: removing connection references"<<std::endl;
     this->connection->removeReference();
+
+    std::cout<<"VRPNDeviceServer: closing server"<<std::endl;
+    delete(this->connection);
 
     this->terminationCompleted = true;
 }
