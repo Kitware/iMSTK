@@ -44,21 +44,26 @@ void BackwardEuler::solve(const OdeSystemState &state,
     auto G = [&,this](const core::Vectord &) -> const core::Vectord&
     {
         this->system->computeImplicitSystemRHS(state,newState,timeStep);
-        return this->system->getRHS();
+        return this->system->getRHSVector();
     };
 
     // Jacobian of the objective function.
     auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
     {
         this->system->computeImplicitSystemLHS(state,newState,timeStep,false);
-        return this->system->getSystemMatrix();
+        return this->system->getMatrix();
     };
 
+    this->system->setFunction(G);
+    this->system->setJacobian(DG);
+    this->newtonSolver.setSystem(this->system);
     this->newtonSolver.setUpdateIterate(updateIterate);
-    this->newtonSolver.setSystem(G);
-    this->newtonSolver.setJacobian(DG);
-    this->newtonSolver.setRelativeTolerance(0);
-    this->newtonSolver.setLinearSolver(
+    this->newtonSolver.setRelativeTolerance(.001/this->system->getRHSVector().norm());
+    // For small systems use a direct solver
+    if(state.getPositions().size() < 100)
+    {
+        this->newtonSolver.setLinearSolver(
             std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
+    }
     this->newtonSolver.solve(newState.getVelocities());
 }

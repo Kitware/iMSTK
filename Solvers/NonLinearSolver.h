@@ -36,7 +36,7 @@ class NonLinearSolver
 public:
     using JacobianType = std::function<const core::SparseMatrixd&(const core::Vectord&)>;
     using UpdateIterateType = std::function<void(const core::Vectord&,core::Vectord&)>;
-    using FunctionType = SystemOfEquations::FunctionType;
+    using FunctionType = SystemOfEquations::VectorFunctionType;
 
 public:
     ///
@@ -100,16 +100,8 @@ public:
     ///
     /// \param newSystem Non-linear system replacement.
     ///
-    void setSystem(std::shared_ptr<SystemOfEquations> newSystem);
-    std::shared_ptr<SystemOfEquations> getSystem() const;
-
-    ///
-    /// \brief Set the system. This utility function allows you to set the system with
-    ///     just a lambda function.
-    ///
-    /// \param F Function describing the nonlinear system.
-    ///
-    void setSystem(const FunctionType &F);
+    void setSystem(SystemOfEquations *newSystem);
+    SystemOfEquations *getSystem() const;
 
     ///
     /// \brief Set a customized iterate update function.
@@ -122,7 +114,7 @@ protected:
     std::array<double, 2> sigma;    ///< Safeguarding bounds for the line search
     double alpha;                   ///< Parameter to measure decrease
     size_t armijoMax;               ///< Maximum number of step length reductions
-    std::shared_ptr<SystemOfEquations> nonLinearSystem; ///< System of non-linear equations
+    SystemOfEquations *nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType updateIterate; ///< Update iteration function
 };
 

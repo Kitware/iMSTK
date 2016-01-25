@@ -117,7 +117,7 @@ void OculusViewer::cleanUp()
 
 void OculusViewer::beginFrame()
 {
-    if (terminateExecution == true)
+    if (terminateExecution)
     {
         terminationCompleted = true;
     }

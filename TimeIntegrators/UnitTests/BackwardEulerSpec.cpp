@@ -77,7 +77,7 @@ go_bandit([]()
             return M;
         };
 
-        odeSystem->setFunction(F);
+        odeSystem->setRHSFunction(F);
         odeSystem->setJaconbianFx(DFx);
         odeSystem->setJaconbianFv(DFv);
         odeSystem->setMass(Mass);

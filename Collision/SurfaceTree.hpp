@@ -20,8 +20,10 @@
 #ifndef COLLISION_SURFACETREE_HPP
 #define COLLISION_SURFACETREE_HPP
 
+#include "Collision/SurfaceTree.h"
+
 // STD includes
-#include <numeric> // for iota
+#include<numeric> // for iota
 
 // iMSTK includes
 #include "Collision/SurfaceTreeIterator.h"
@@ -30,17 +32,18 @@
 #include "Collision/MeshCollisionModel.h"
 
 /// \brief initialize the surface tree structure
-template <typename CellType>
+template<typename CellType>
 void SurfaceTree<CellType>::initStructure()
 {
     if(!this->model->getMesh() || this->model->getMesh()->getNumberOfVertices() == 0)
     {
-        std::cerr << "Error: Empty or unvalid mesh." << std::endl;
+        std::cerr << "Error: Empty or invalid mesh." << std::endl;
         return;
     }
+
     core::Vec3d center;
     std::vector<int> triangles(this->model->getMesh()->getTriangles().size());
-    std::iota(std::begin(triangles),std::end(triangles),0);
+    std::iota(std::begin(triangles), std::end(triangles), 0);
 
     root = std::make_shared<CellType>();
 
@@ -73,7 +76,7 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceMo
     currentLevel = maxLevel = maxLevels;
 
     //compute the total cells
-    for (int i = 0; i < maxLevel; ++i)
+    for(int i = 0; i < maxLevel; ++i)
     {
         totalCells += std::pow(int(CellType::numberOfSubdivisions), i);
     }
@@ -85,13 +88,13 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceMo
     //compute the levels start and end
     levelStartIndex[0][0] = 0;
 
-    for (int i = 1; i < maxLevel; ++i)
+    for(int i = 1; i < maxLevel; ++i)
     {
         levelStartIndex[i][0] = levelStartIndex[i-1][0] + std::pow(int(CellType::numberOfSubdivisions), i-1);
         levelStartIndex[i-1][1] = levelStartIndex[i][0];
     }
 
-    levelStartIndex[maxLevel-1][1] = totalCells;
+    levelStartIndex[maxLevel - 1][1] = totalCells;
 
     minTreeRenderLevel = 0;
     renderSurface = false;
@@ -102,8 +105,8 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceMo
 
     this->model->computeBoundingBoxes();
     this->setRenderDelegate(
-      Factory<RenderDelegate>::createConcreteClass(
-        "SurfaceTreeRenderDelegate"));
+        Factory<RenderDelegate>::createConcreteClass(
+            "SurfaceTreeRenderDelegate"));
 }
 
 /// \brief handle key press events
@@ -114,10 +117,13 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
     {
         return;
     }
+
     auto keyBoardEvent = std::static_pointer_cast<event::KeyboardEvent>(event);
+
     if(keyBoardEvent != nullptr)
     {
         event::Key keyPressed = keyBoardEvent->getKeyPressed();
+
         switch(keyPressed)
         {
             case event::Key::Add:
@@ -183,8 +189,8 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
 /// \brief create the surface tree
 template<typename CellType>
 bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
-                                         const std::vector<int> &triangles,
-                                         int siblingIndex)
+                                       const std::vector<int> &triangles,
+                                       int siblingIndex)
 {
     std::array<CellType, CellType::numberOfSubdivisions> subDividedNodes;
     std::array<std::vector<int>, CellType::numberOfSubdivisions> triangleMatrix;
@@ -198,21 +204,22 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         return false;
     }
 
-    if (level == maxLevel-1)
+    if(level == maxLevel - 1)
     {
         Node->setIsLeaf(true);
         double totalDistance = 0.0;
 
-        for(auto &t : triangles)
+        for(auto & t : triangles)
         {
-            Node->addTriangleData(this->model->getAabb(t),t);
+            Node->addTriangleData(this->model->getAabb(t), t);
             Node->addVertexIndex(meshTriangles[t][0]);
             Node->addVertexIndex(meshTriangles[t][1]);
             Node->addVertexIndex(meshTriangles[t][2]);
         }
+
         Node->update();
 
-        for(const auto &i : Node->getVerticesIndices())
+        for(const auto & i : Node->getVerticesIndices())
         {
             totalDistance += (Node->getCenter() - vertices[i]).norm();
         }
@@ -221,15 +228,15 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         float weight;
         float totalDistance2 = totalDistance * totalDistance;
 
-        for(const auto &i : Node->getVerticesIndices())
+        for(const auto & i : Node->getVerticesIndices())
         {
             // TODO: make sure this is what is meant: 1-d^2/D^2 and not (1-d^2)/D^2
-            weight = 1-(Node->getCenter()-vertices[i]).squaredNorm() / totalDistance2;
+            weight = 1 - (Node->getCenter() - vertices[i]).squaredNorm() / totalDistance2;
             weightSum += weight;
             Node->addWeight(weight);
         }
 
-        for(auto &w : Node->getWeights())
+        for(auto & w : Node->getWeights())
         {
             w /= weightSum;
         }
@@ -239,17 +246,17 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
 
     Node->subDivide(2, subDividedNodes);
 
-    for (int i = 0; i < CellType::numberOfSubdivisions; ++i)
+    for(int i = 0; i < CellType::numberOfSubdivisions; ++i)
     {
         //aabb[i].expand(0.2);
         subDividedNodes[i].expand(0.01);
     }
 
-    for (int i = 0; i < triangles.size(); ++i)
+    for(int i = 0; i < triangles.size(); ++i)
     {
-        for (int j = 0; j < CellType::numberOfSubdivisions; ++j)
+        for(int j = 0; j < CellType::numberOfSubdivisions; ++j)
         {
-            if (subDividedNodes[j].isCollidedWithTri(
+            if(subDividedNodes[j].isCollidedWithTri(
                         vertices[meshTriangles[triangles[i]][0]],
                         vertices[meshTriangles[triangles[i]][1]],
                         vertices[meshTriangles[triangles[i]][2]]))
@@ -259,31 +266,32 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
         }
     }
 
-    int parentLevel = level == 0 ? 0 : level-1;
-    int offset = CellType::numberOfSubdivisions * (siblingIndex-levelStartIndex[parentLevel][0]);
+    int parentLevel = level == 0 ? 0 : level - 1;
+    int offset = CellType::numberOfSubdivisions * (siblingIndex - levelStartIndex[parentLevel][0]);
 
-    for (int j = 0; j < CellType::numberOfSubdivisions; ++j)
+    for(int j = 0; j < CellType::numberOfSubdivisions; ++j)
     {
 
         int childIndex = levelStartIndex[level][1] + offset + j;
 
-        if (triangleMatrix[j].size() > 0)
+        if(triangleMatrix[j].size() > 0)
         {
             std::shared_ptr<CellType> childNode = std::make_shared<CellType>();
             childNode->copyShape(subDividedNodes[j]);
             childNode->setLevel(level + 1);
             childNode->setParentNode(Node);
-            Node->setChildNode(j,childNode);
+            Node->setChildNode(j, childNode);
 
             treeAllLevels[childIndex] = *childNode.get();
 
             // Set triangle and aabb data for the child node
-            if(childNode->getLevel() != maxLevel-1)
+            if(childNode->getLevel() != maxLevel - 1)
             {
-                for(auto &t : triangleMatrix[j])
+                for(auto & t : triangleMatrix[j])
                 {
-                    childNode->addTriangleData(this->model->getAabb(t),t);
+                    childNode->addTriangleData(this->model->getAabb(t), t);
                 }
+
                 childNode->update();
             }
 
@@ -297,7 +305,7 @@ bool SurfaceTree<CellType>::createTree(std::shared_ptr<CellType> Node,
 }
 
 /// \brief !!
-template <typename CellType>
+template<typename CellType>
 CollisionModelIterator<CellType> SurfaceTree<CellType>::getLevelIterator(int level)
 {
     SurfaceTreeIterator<CellType> iter(this);
@@ -308,7 +316,7 @@ CollisionModelIterator<CellType> SurfaceTree<CellType>::getLevelIterator(int lev
 }
 
 /// \brief !!
-template <typename CellType>
+template<typename CellType>
 CollisionModelIterator<CellType>  SurfaceTree<CellType>::getLevelIterator()
 {
     SurfaceTreeIterator<CellType> iter(this);
@@ -319,23 +327,24 @@ CollisionModelIterator<CellType>  SurfaceTree<CellType>::getLevelIterator()
 }
 
 /// \brief update the surface tree
-template <typename CellType>
+template<typename CellType>
 void SurfaceTree<CellType>::updateStructure()
 {
     CellType *current;
     auto const &vertices = this->model->getVertices();
     auto const &origVertices = this->model->getMesh()->getOrigVertices();
-    for (int i = levelStartIndex[maxLevel-1][0]; i < levelStartIndex[maxLevel-1][1]; ++i)
+
+    for(int i = levelStartIndex[maxLevel - 1][0]; i < levelStartIndex[maxLevel - 1][1]; ++i)
     {
         current = &treeAllLevels[i];
         core::Vec3d tempCenter(0, 0, 0);
         int counter = 0;
 
-        if (!current->isEmpty())
+        if(!current->isEmpty())
         {
-            for(auto &i : current->getVerticesIndices())
+            for(auto & i : current->getVerticesIndices())
             {
-                tempCenter = tempCenter + (vertices[i]-origVertices[i]) * current->getWeight(counter);
+                tempCenter = tempCenter + (vertices[i] - origVertices[i]) * current->getWeight(counter);
                 counter++;
             }
 
@@ -345,30 +354,31 @@ void SurfaceTree<CellType>::updateStructure()
 }
 
 /// \brief !!
-template <typename CellType>
+template<typename CellType>
 void SurfaceTree<CellType>::translateRot()
 {
     CellType *current;
     CellType *initial;
 
-    for (int i = levelStartIndex[maxLevel-1][0];
-            i < levelStartIndex[maxLevel-1][1]; ++i)
+    for(int i = levelStartIndex[maxLevel - 1][0];
+            i < levelStartIndex[maxLevel - 1][1]; ++i)
     {
 
         current = &treeAllLevels[i];
         initial = &initialTreeAllLevels[i];
 
-        if (!current->isEmpty())
+        if(!current->isEmpty())
         {
-            current->getCube().center = this->transRot.block(0,0,3,3) * initial->getCube().center + this->transRot.col(3).head(3);
+            current->getCube().center =
+                this->transRot.block(0, 0, 3, 3) * initial->getCube().center + this->transRot.col(3).head(3);
         }
     }
 }
 
-template <typename CellType>
+template<typename CellType>
 void SurfaceTree<CellType>::getIntersectingNodes(const std::shared_ptr<CellType> left,
-                                                          const std::shared_ptr<CellType> right,
-                                                          std::vector<std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>> &result )
+        const std::shared_ptr<CellType> right,
+        std::vector<SurfaceTree<CellType>::CellPairType> &result)
 {
     if(left->getAabb().intersection(right->getAabb()).isEmpty())
     {
@@ -377,40 +387,55 @@ void SurfaceTree<CellType>::getIntersectingNodes(const std::shared_ptr<CellType>
 
     if(left->getIsLeaf() && right->getIsLeaf())
     {
-        result.emplace_back(left,right);
+        result.emplace_back(left, right);
     }
+
     else if(left->getIsLeaf())
     {
-        for(const auto &child : right->getChildNodes())
+        for(const auto & child : right->getChildNodes())
         {
-            if(!child) continue;
-            this->getIntersectingNodes(left,child,result);
+            if(!child)
+            {
+                continue;
+            }
+
+            this->getIntersectingNodes(left, child, result);
         }
     }
     else if(right->getIsLeaf())
     {
-        for(const auto &child : left->getChildNodes())
+        for(const auto & child : left->getChildNodes())
         {
-            if(!child) continue;
-            this->getIntersectingNodes(child,right,result);
+            if(!child)
+            {
+                continue;
+            }
+
+            this->getIntersectingNodes(child, right, result);
         }
     }
     else
     {
-        for(const auto &rightChild : right->getChildNodes())
+        for(const auto & rightChild : right->getChildNodes())
         {
-            if(!rightChild) continue;
-            for(const auto &leftChild : left->getChildNodes())
+            if(!rightChild)
             {
-                if(!leftChild) continue;
-                this->getIntersectingNodes(leftChild,rightChild,result);
+                continue;
+            }
+
+            for(const auto & leftChild : left->getChildNodes())
+            {
+                if(!leftChild)
+                {
+                    continue;
+                }
+
+                this->getIntersectingNodes(leftChild, rightChild, result);
             }
         }
     }
 
 }
-
-
 
 #endif
 

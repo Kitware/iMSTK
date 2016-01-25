@@ -132,14 +132,9 @@ TextureReturnType TextureManager::loadTexture(const std::string& p_fileName, con
         return IMSTK_TEXTURE_IMAGELOADINGERROR;
     }
 
-    //if (!isInitialized)
-    //{
-    //    return IMSTK_TEXTURE_DRIVERNOTINITIALIZED;
-    //}
-
     std::shared_ptr<Texture> texture = std::make_shared<Texture>();
 
-    if (false == texture->image.loadFromFile(p_fileName))
+    if (!texture->image.loadFromFile(p_fileName))
     {
         std::cout << "[TextureManager::loadTexture] Texture not found: \"" << p_fileName << "\"\n";
         return IMSTK_TEXTURE_NOTFOUND;

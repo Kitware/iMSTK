@@ -134,15 +134,10 @@ static const std::map<int, Key> sfmlToSmKeyMap = {
 
 inline const Key& SFMLKeyToSmKey(const int key)
 {
-    try
+    auto it = sfmlToSmKeyMap.find(key);
+    if(it != std::end(sfmlToSmKeyMap))
     {
-        const Key & out = sfmlToSmKeyMap.at(key);
-        return out;
-    }
-    catch (std::out_of_range &e)
-    {
-        std::cout << e.what() << std::endl;
-        return sfmlToSmKeyMap.at(sf::Keyboard::Unknown);
+        return it->second;
     }
     return sfmlToSmKeyMap.at(sf::Keyboard::Unknown);
 }

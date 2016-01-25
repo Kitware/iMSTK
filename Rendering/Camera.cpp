@@ -172,7 +172,7 @@ void Camera::setOrientFromDir(const core::Vec3f &d)
 
 const core::Quaternionf &Camera::getOrientation()
 {
-    if (true == this->orientDirty.load())
+    if (this->orientDirty.load())
     {
         this->setOrientFromDir((this->getFocus() - this->getPos()).normalized());
     }
@@ -182,7 +182,7 @@ const core::Quaternionf &Camera::getOrientation()
 
 const core::Matrix44f &Camera::getViewMat()
 {
-    if (true == this->viewDirty.load())
+    if (this->viewDirty.load())
     {
         this->genViewMat();
     }
@@ -201,7 +201,7 @@ void Camera::setViewMat(const core::Matrix44f &m)
 
 const core::Matrix44f &Camera::getProjMat()
 {
-    if (true == this->projDirty.load())
+    if (this->projDirty.load())
     {
         this->genProjMat();
     }

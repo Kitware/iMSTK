@@ -386,12 +386,11 @@ bool SpatialHashCollision::findCandidates()
     {
         for(size_t j = i + 1; j < collisionModels.size(); j++)
         {
-            if(collisionModels[i]->getCollisionGroup()->isCollisionPermitted(collisionModels[j]->getCollisionGroup()))
+            if(findCandidateTris(collisionModels[i], collisionModels[j]) == false &&
+               collisionModels[i]->getCollisionGroup()->isCollisionPermitted(collisionModels[j]->getCollisionGroup()) !=
+               NULL)
             {
-                if(findCandidateTris(collisionModels[i], collisionModels[j]) == false)
-                {
-                    continue;
-                }
+                continue;
             }
         }
     }

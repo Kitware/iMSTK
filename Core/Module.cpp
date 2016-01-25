@@ -64,7 +64,7 @@ void Module::waitTermination()
     while (1)
     {
         //std::cout << this->name << std::endl;
-        if (true == isTerminationDone())
+        if (this->isTerminationDone())
         {
             break;
         }

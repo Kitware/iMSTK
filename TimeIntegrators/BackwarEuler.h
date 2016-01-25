@@ -33,7 +33,7 @@
 class BackwardEuler : public TimeIntegrator
 {
 public:
-    using SystemMatrixType = OdeSystem::MatrixFunctionType;
+    using SystemMatrixType = OdeSystem::JacobianOperatorType;
 
 public:
     ///

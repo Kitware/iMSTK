@@ -22,18 +22,21 @@
 
 #include <memory>
 
+// iMSTK includes
 #include "Core/Vector.h"
 #include "Core/Matrix.h"
 
 ///
 /// \class SystemOfEquations
 ///
-/// \brief Base class for system of equations
+/// \brief Base class for all system of equations. This includes linear, nonlinear,
+///     constrained, and differential equation systems.
 ///
 class SystemOfEquations
 {
 public:
-    using FunctionType = std::function<const core::Vectord&(const core::Vectord &)>;
+    using VectorFunctionType = std::function<const core::Vectord&(const core::Vectord &)>;
+    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const core::Vectord &)>;
 
 public:
     ///
@@ -45,9 +48,17 @@ public:
     ///
     /// \brief Set function to evaluate.
     ///
-    inline void setFunction(const FunctionType &function)
+    inline virtual void setFunction(const VectorFunctionType &function)
     {
         this->F = function;
+    }
+
+    ///
+    /// \brief Set function to evaluate.
+    ///
+    inline virtual void setJacobian(const MatrixFunctionType &function)
+    {
+        this->DF = function;
     }
 
     ///
@@ -56,13 +67,25 @@ public:
     /// \param x Value.
     /// \return Function value.
     ///
-    inline const core::Vectord &eval(const core::Vectord &x)
+    inline virtual const core::Vectord &evalF(const core::Vectord &x)
     {
         return this->F(x);
     }
 
-protected:
-    FunctionType F;  ///> Function associated with the system of equation to solve.
+    ///
+    /// \brief Evaluate function at specified argument
+    ///
+    /// \param x Value.
+    /// \return Function value.
+    ///
+    inline virtual const core::SparseMatrixd &evalDF(const core::Vectord &x)
+    {
+        return this->DF(x);
+    }
+
+public:
+    VectorFunctionType F;  ///> Function associated with the system of equation to solve.
+    MatrixFunctionType DF;  ///> Function associated with the system of equation to solve.
 };
 
 ///
@@ -115,6 +138,16 @@ public:
     }
 
     ///
+    /// \brief Set the system rhs corresponding to this system.
+    ///
+    /// \param newRhs new rhs.
+    ///
+    inline void setRHSVector(const core::Vectord &newRhs)
+    {
+        this->rhs = newRhs;
+    }
+
+    ///
     /// \brief Returns reference to local matrix.
     ///
     /// \return Systems matrix.
@@ -122,6 +155,16 @@ public:
     inline const MatrixType &getMatrix() const
     {
         return A;
+    }
+
+    ///
+    /// \brief Set the system matrix corresponding to this ODE system.
+    ///
+    /// \param newMatrix New matrix.
+    ///
+    inline void setMatrix(const core::SparseMatrixd &newMatrix)
+    {
+        this->A = newMatrix;
     }
 
     ///
@@ -187,7 +230,7 @@ public:
 private:
     const MatrixType &A;
     const core::Vectord &rhs;
-    core::Vectord f; ///> Storage for matrix vector product
+    core::Vectord f; ///> Scratch storage for matrix-vector operations
 };
 
 #endif // SYSTEM_OF_EQUATIONS

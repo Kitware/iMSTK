@@ -101,10 +101,21 @@ public:
 
     bool operator < (const FactoryEntry& other) const
       {
-      return
-        (this->group < other.group ||
-         (this->group == other.group &&
-          this->subclassname < other.subclassname)) ? true : false;
+          if(this->group < other.group)
+          {
+              return true;
+          }
+          else
+          {
+              if(this->group == other.group)
+              {
+                  return this->subclassname < other.subclassname;
+              }
+              else
+              {
+                  return false;
+              }
+          }
       }
   };
 

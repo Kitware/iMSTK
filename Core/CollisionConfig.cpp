@@ -21,12 +21,12 @@
 
 bool CellTriangle::operator==( unsigned int p_ID )
 {
-    return ( primID == p_ID ? true : false );
+    return primID == p_ID;
 }
 
 bool CellTriangle::operator==( CellTriangle &p_tri )
 {
-    return ( p_tri.primID == primID ? true : false );
+    return p_tri.primID == primID;
 }
 
 std::ostream &operator<<( std::ostream &out, CellTriangle &tri )
@@ -37,12 +37,12 @@ std::ostream &operator<<( std::ostream &out, CellTriangle &tri )
 
 bool CellLine::operator==( unsigned int p_ID )
 {
-    return ( primID == p_ID ? true : false );
+    return primID == p_ID;
 }
 
 bool CellLine::operator==( CellLine &p_line )
 {
-    return ( p_line.primID == primID ? true : false );
+    return p_line.primID == primID;
 }
 
 std::ostream &operator<<( std::ostream &out, CellLine &p )
@@ -53,11 +53,11 @@ std::ostream &operator<<( std::ostream &out, CellLine &p )
 
 bool CellModel::operator==( unsigned int p_ID )
 {
-    return ( primID == p_ID ? true : false );
+    return primID == p_ID;
 }
 bool CellModel::operator==( CellModel &p_model )
 {
-    return ( p_model.primID == primID ? true : false );
+    return p_model.primID == primID;
 }
 
 std::ostream &operator<<( std::ostream &out, CellModel &p )
@@ -68,12 +68,12 @@ std::ostream &operator<<( std::ostream &out, CellModel &p )
 
 bool CellPoint::operator==( unsigned int p_ID )
 {
-    return ( primID == p_ID ? true : false );
+    return primID == p_ID;
 }
 
 bool CellPoint::operator==( CellPoint &p_point )
 {
-    return ( p_point.primID == primID ? true : false );
+    return p_point.primID == primID;
 }
 
 std::ostream &operator<<( std::ostream &out, CellPoint &p )
@@ -110,5 +110,12 @@ void CollisionGroup::forbidCollision( std::shared_ptr<CollisionGroup> p_group )
 
 bool CollisionGroup::isCollisionPermitted( std::shared_ptr<CollisionGroup> p_group ) const
 {
-    return ( ( groupId & p_group->groupId ) == 0 ? ( ( groupId & p_group->groupMask ) == 0 ? false : true ) : true );
+    if((groupId & p_group->groupId) == 0)
+    {
+        return (groupId & p_group->groupMask) != 0;
+    }
+    else
+    {
+        return true;
+    }
 }

@@ -29,14 +29,17 @@
 ///     dv/dt=f(t,x,v)
 ///     dx/dt=v, with initial conditions x(0)=x0; v(0)=v0.
 ///
-class OdeSystem
+class OdeSystem : public LinearSystem<core::SparseMatrixd>
 {
 public:
-    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const OdeSystemState &state)>;
-    using FunctionType = std::function<const core::Vectord&(const OdeSystemState &state)>;
+    using BaseSystem = LinearSystem<core::SparseMatrixd>;
+    using FunctionOperatorType =
+        std::function<const core::Vectord&(const OdeSystemState &)>;
+    using JacobianOperatorType =
+        std::function<const core::SparseMatrixd&(const OdeSystemState &)>;
 
 public:
-    OdeSystem() = default;
+    OdeSystem();
     ~OdeSystem() = default;
 
     ///
@@ -44,35 +47,35 @@ public:
     ///
     /// \param newDFv Derivative function. Returns a sparse matrix.
     ///
-    void setJaconbianFv(MatrixFunctionType newDFv);
+    void setJaconbianFv(JacobianOperatorType newDFv);
 
     ///
     /// \brief Set the derivative with respect to x of the right hand side.
     ///
     /// \param newDFx Derivative function. Returns a sparse matrix.
     ///
-    void setJaconbianFx(MatrixFunctionType newDFx);
+    void setJaconbianFx(JacobianOperatorType newDFx);
 
     ///
     /// \brief Set the mass matrix evaluation function.
     ///
     /// \param newMass New mass function. Returns a sparse matrix.
     ///
-    void setMass(MatrixFunctionType newMass);
+    void setMass(JacobianOperatorType newMass);
 
     ///
     /// \brief Set the Lagrangian damping matrix evaluation function.
     ///
     /// \param newDamping New damping function. Returns a sparse matrix.
     ///
-    void setDamping(MatrixFunctionType newDamping);
+    void setDamping(JacobianOperatorType newDamping);
 
     ///
     /// \brief Set the right hand side evaluation function.
     ///
     /// \param newF New rhs function. Returns a vector.
     ///
-    void setFunction(FunctionType newF);
+    void setRHSFunction(FunctionOperatorType newF);
 
     ///
     /// \brief Evaluate -df/dx function at specified argument.
@@ -100,7 +103,7 @@ public:
     ///
     /// \param state Current position and velocity.
     ///
-    const core::Vectord &evalF(const OdeSystemState &state);
+    const core::Vectord &evalRHS(const OdeSystemState &state);
 
     ///
     /// \brief Get the initial velocities and positions of the system.
@@ -152,54 +155,12 @@ public:
                                           OdeSystemState &newState,
                                           double timeStep);
 
-    ///
-    /// \brief Get the system matrix corresponding to this ODE system.
-    ///
-    /// \return Sparse matrix constant reference.
-    ///
-    const core::SparseMatrixd &getSystemMatrix() const;
-
-    ///
-    /// \brief Get the system matrix corresponding to this ODE system.
-    ///
-    /// \return Sparse matrix constant reference.
-    ///
-    core::SparseMatrixd &getSystemMatrix();
-
-    ///
-    /// \brief Set the system matrix corresponding to this ODE system.
-    ///
-    /// \param newMatrix New matrix.
-    ///
-    void setSystemMatrix(const core::SparseMatrixd &newMatrix);
-
-    ///
-    /// \brief Get the system rhs corresponding to this ODE system.
-    ///
-    /// \return Vector constant reference.
-    ///
-    const core::Vectord &getRHS() const;
-
-    ///
-    /// \brief Get the system rhs corresponding to this ODE system.
-    ///
-    /// \return Vector reference.
-    ///
-    core::Vectord &getRHS();
-
-    ///
-    /// \brief Set the system rhs corresponding to this ODE system.
-    ///
-    /// \param newRhs new rhs.
-    ///
-    void setRHS(const core::Vectord &newRhs);
-
 private:
-    MatrixFunctionType DFx; ///> Function to evaluate -dF/dx, required for implicit time stepping schemes.
-    MatrixFunctionType DFv; ///> Function to evaluate -dF/dv, required for implicit time stepping schemes.
-    MatrixFunctionType Mass; ///> Function to evaluate the mass matrix.
-    MatrixFunctionType Damping; ///> Additional damping matrix.
-    FunctionType F; ///> ODE right hand side function
+    JacobianOperatorType DFx; ///> Function to evaluate -dF/dx, required for implicit time stepping schemes.
+    JacobianOperatorType DFv; ///> Function to evaluate -dF/dv, required for implicit time stepping schemes.
+    JacobianOperatorType Mass; ///> Function to evaluate the mass matrix.
+    JacobianOperatorType Damping; ///> Additional damping matrix.
+    FunctionOperatorType F; ///> ODE right hand side function
 
     core::SparseMatrixd systemMatrix;   ///> Linear system matrix storage.
     core::Vectord rhs;                  ///> Right hand side vector storage.
@@ -241,7 +202,7 @@ inline const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &stat
 }
 
 //---------------------------------------------------------------------------
-inline const core::Vectord &OdeSystem::evalF(const OdeSystemState &state)
+inline const core::Vectord &OdeSystem::evalRHS(const OdeSystemState &state)
 {
     if(!this->F)
     {

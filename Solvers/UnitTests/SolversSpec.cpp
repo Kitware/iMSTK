@@ -220,10 +220,13 @@ go_bandit([]()
                 return J;
             };
 
-            NewtonSolver->setSystem(F);
+            auto system = std::make_shared<SystemOfEquations>();
+            system->setFunction(F);
+            system->setJacobian(DF);
+
+            NewtonSolver->setSystem(system.get());
             NewtonSolver->setAbsoluteTolerance(nonLinearEpsilon);
             NewtonSolver->setRelativeTolerance(nonLinearEpsilon);
-            NewtonSolver->setJacobian(DF);
             NewtonSolver->setLinearSolver(DSSolver);
 
             Vectord x(2);

@@ -74,16 +74,14 @@ public:
     /// \brief Attach surface mesh to the volume mesh and stores interpolation weights
     ///
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-                           const double &radius = -1.0,
-                           bool useForRendering = true);
+                           const double &radius = -1.0);
 
     ///
     /// \brief Get attached surface mesh
     ///
     void attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                            const std::string &fileName,
-                           const double &radius = 5.0,
-                           bool useForRendering = true);
+                           const double &radius = 5.0);
 
     ///
     /// \brief Return underlying Vega mesh data structure.

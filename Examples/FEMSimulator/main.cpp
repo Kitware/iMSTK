@@ -84,7 +84,7 @@ int main(int ac, char** av)
         std::make_shared<VegaFEMDeformableSceneObject>("./box.veg",configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES);
+    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_WIREFRAME);
     meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(Color::colorGray);
     meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
@@ -102,7 +102,7 @@ int main(int ac, char** av)
     if(visualMesh)
     {
         visualMesh->updateInitialVertices();
-        visualMesh->setRenderDetail(meshRenderDetail);
+//         visualMesh->setRenderDetail(meshRenderDetail);
         volumeMesh->attachSurfaceMesh(visualMesh,"./box.interp");
     }
     sdk->addSceneActor(femObject, femSimulator);

@@ -17,8 +17,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef SOLVERS_BACKWARD_GAUSS_SEIDEL_H
-#define SOLVERS_BACKWARD_GAUSS_SEIDEL_H
+#ifndef SOLVERS_BACKWARDGAUSSSEIDEL_H
+#define SOLVERS_BACKWARDGAUSSSEIDEL_H
 
 // iMSTK includes
 #include "Solvers/IterativeLinearSolver.h"

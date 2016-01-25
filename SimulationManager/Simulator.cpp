@@ -57,7 +57,7 @@ void Simulator::run()
     std::vector< std::future<int> > asyncResults;
     std::shared_ptr<ObjectSimulator> objectSimulator;
 
-    if (isInitialized == false)
+    if (!isInitialized)
     {
         // TODO: Log error
         return;
@@ -109,7 +109,7 @@ void Simulator::run()
                 continue;
             }
 
-            if (objectSimulator->isEnabled() == false)
+            if (!objectSimulator->isEnabled())
             {
                 continue;
             }
@@ -221,7 +221,7 @@ void Simulator::registerSimulationMain(std::shared_ptr<SimulationMain> p_main)
 
 bool Simulator::init()
 {
-    if(isInitialized == true)
+    if(isInitialized)
     {
         return false;
     }

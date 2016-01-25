@@ -39,11 +39,18 @@ armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
     std::array<double, 3> lambda    = {this->sigma[0]*this->sigma[1], 1.0, 1.0};
 
     /// Initialize temporaries
-    double currentFnorm = this->nonLinearSystem->eval(x).norm();
+    if(!this->nonLinearSystem)
+    {
+        // TODO: log this
+        return previousFnorm;
+    }
+
+    double currentFnorm = this->nonLinearSystem->F(x).norm();
 
     // Exit if the function norm satisfies the Armijo-Goldstein condition
     if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
     {
+        // TODO: Log this
         return currentFnorm;
     }
 
@@ -59,11 +66,12 @@ armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
-        currentFnorm = this->nonLinearSystem->eval(x).norm();
+        currentFnorm = this->nonLinearSystem->F(x).norm();
 
         // Exit if the function norm satisfies the Armijo-Goldstein condition
         if(currentFnorm < (1.0 - this->alpha * lambda[0])*previousFnorm)
         {
+        // TODO: Log this
             return currentFnorm;
         }
 
@@ -157,22 +165,15 @@ size_t NonLinearSolver::getArmijoMax() const
 }
 
 //---------------------------------------------------------------------------
-void NonLinearSolver::setSystem(std::shared_ptr< SystemOfEquations > newSystem)
+void NonLinearSolver::setSystem(SystemOfEquations *newSystem)
 {
     this->nonLinearSystem = newSystem;
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< SystemOfEquations > NonLinearSolver::getSystem() const
+SystemOfEquations *NonLinearSolver::getSystem() const
 {
     return this->nonLinearSystem;
-}
-
-//---------------------------------------------------------------------------
-void NonLinearSolver::setSystem(const NonLinearSolver::FunctionType &F)
-{
-    this->nonLinearSystem = std::make_shared<SystemOfEquations>();
-    this->nonLinearSystem->setFunction(F);
 }
 
 //---------------------------------------------------------------------------

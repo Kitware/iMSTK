@@ -46,7 +46,7 @@ go_bandit([]()
             y = lambda*x.getVelocities();
             return y;
         };
-        odeSystem->setFunction(F);
+        odeSystem->setRHSFunction(F);
 
         // ODE system matrix
         std::vector<Eigen::Triplet<double>> tripletList;

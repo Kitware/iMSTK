@@ -33,6 +33,7 @@ void DirectLinearSolver<core::Matrixd>::solve(core::Vectord &x)
 {
     if(!this->linearSystem)
     {
+        // TODO: Log this 
         return;
     }
 

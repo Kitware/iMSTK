@@ -58,8 +58,7 @@ size_t VegaVolumetricMesh::getNumberOfElements() const
 
 //---------------------------------------------------------------------------
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
-                                           const double &radius,
-                                           bool useForRendering)
+                                           const double &radius)
 {
     // Keep copy of the mesh pointer
     this->attachedMeshes.push_back(surfaceMesh);
@@ -71,20 +70,12 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
     }
     this->generateWeigths(surfaceMesh,radius);
 
-    // If this surface mesh is the rendering mesh then pass along its delegate to this
-    // volumetric mesh.
-    if(useForRendering)
-    {
-        this->setRenderDelegate(surfaceMesh->getRenderDelegate());
-    }
 }
 
 //---------------------------------------------------------------------------
 void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh,
                                            const std::string& fileName,
-                                           const double &radius,
-                                           bool useForRendering
-                                          )
+                                           const double &radius)
 {
     // Keep copy of the mesh pointer
     this->attachedMeshes.push_back(surfaceMesh);
@@ -95,13 +86,6 @@ void VegaVolumetricMesh::attachSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceM
         return;
     }
     this->readWeights(surfaceMesh,fileName,radius);
-
-    // If this surface mesh is the rendering mesh then pass along its delegate to this
-    // volumetric mesh.
-    if(useForRendering)
-    {
-        this->setRenderDelegate(surfaceMesh->getRenderDelegate());
-    }
 }
 
 //---------------------------------------------------------------------------

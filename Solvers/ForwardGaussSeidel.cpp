@@ -29,6 +29,12 @@ ForwardGaussSeidel::ForwardGaussSeidel(
 //---------------------------------------------------------------------------
 void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 {
+    if(!this->linearSystem)
+    {
+        // TODO: Log this
+        return;
+    }
+
     x = this->linearSystem->getRHSVector() -
         this->linearSystem->getStrictUpperTriangular() * x;
 
@@ -43,6 +49,12 @@ void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 //---------------------------------------------------------------------------
 void ForwardGaussSeidel::relax(core::Vectord& x)
 {
+    if(!this->linearSystem)
+    {
+        // TODO: Log this
+        return;
+    }
+    
     const auto &A = this->linearSystem->getMatrix();
     const auto &b = this->linearSystem->getRHSVector();
     //
