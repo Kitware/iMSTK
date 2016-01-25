@@ -49,6 +49,8 @@ typedef struct _vrpn_TRACKERVELCB vrpn_TRACKERVELCB;
 typedef struct _vrpn_TRACKERCB vrpn_TRACKERCB;
 typedef struct _vrpn_ANALOGCB vrpn_ANALOGCB;
 
+// Add support for VRPN devices by adding a DeviceType
+// here and constructing the connection in VRPNDeviceServer.cpp
 enum class DeviceType { SPACE_EXPLORER_3DCONNEXION,
                         NAVIGATOR_3DCONNEXION,
                         RAZER_HYDRA,
