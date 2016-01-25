@@ -23,8 +23,8 @@
 // VRPN includes
 #include <vrpn_ForceDevice.h>
 
-VRPNForceDevice::VRPNForceDevice()
-    :
+VRPNForceDevice::VRPNForceDevice(std::string deviceURL)
+    : VRPNDeviceClient(DeviceType::PHANTOM_OMNI, deviceURL),
     enableForce(true),
     contactPlane(core::Vec4f(0.0,1.0,0.0,100)),
     dampingCoefficient(0.5),
@@ -33,7 +33,6 @@ VRPNForceDevice::VRPNForceDevice()
     staticFriction(0.0),
     vrpnForce(nullptr)
 {
-    this->setDeviceURL("Phantom0@localhost");
     this->name = "VRPNForceDevice";
 }
 

@@ -21,8 +21,9 @@
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>
 
-VRPNDeviceClient::VRPNDeviceClient()
-    : deviceURL("Device0@localhost")
+VRPNDeviceClient::VRPNDeviceClient(DeviceType deviceType, std::string deviceURL)
+    : deviceType(deviceType),
+    deviceURL(deviceURL)
     {
         this->name = "VRPNDeviceClient";
     }
@@ -71,6 +72,18 @@ void VRPNDeviceClient::exec()
 }
 
 //---------------------------------------------------------------------------
+void VRPNDeviceClient::setDeviceType(const DeviceType t)
+{
+    this->deviceType = t;
+}
+
+//---------------------------------------------------------------------------
+const DeviceType &VRPNDeviceClient::getDeviceType() const
+{
+    return this->deviceType;
+}
+
+//---------------------------------------------------------------------------
 void VRPNDeviceClient::setDeviceURL(const std::string s)
 {
     this->deviceURL = s;
@@ -87,12 +100,15 @@ void VRPNDeviceClient::processChanges()
 {
     this->vrpnButton->mainloop();
     this->vrpnTracker->mainloop();
+    this->vrpnAnalog->mainloop();
 }
 
 //---------------------------------------------------------------------------
 void VRPN_CALLBACK
 VRPNDeviceClient::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 {
+    //std::cout<<"- Button "<< b.button << " : " << b.state << std::endl;
+
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     if (b.button < vrpn_int32(handler->buttons.size()))
@@ -106,6 +122,8 @@ VRPNDeviceClient::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 void VRPN_CALLBACK
 VRPNDeviceClient::velocityChangeHandler(void *userData, const vrpn_TRACKERVELCB v)
 {
+    //std::cout<<"- Velocity : ["<< v.vel[0] <<", "<< v.vel[1]<<", "<< v.vel[2] <<"]"<< std::endl;
+
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     handler->velocity << v.vel[0], v.vel[1], v.vel[2];
@@ -116,6 +134,9 @@ VRPNDeviceClient::velocityChangeHandler(void *userData, const vrpn_TRACKERVELCB 
 void VRPN_CALLBACK
 VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
+    //std::cout<<"Position : ["<< t.pos[0] <<", "<< t.pos[1] <<", "<< t.pos[2] <<"]"<< std::endl;
+    //std::cout<<"Orientation : ["<< t.quat <<", "<< t.quat <<", "<< t.quat <<"]"<< std::endl;
+
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     handler->position << t.pos[0], t.pos[1], t.pos[2];
@@ -132,6 +153,10 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 void VRPN_CALLBACK
 VRPNDeviceClient::analogChangeHandler(void* userData, const vrpn_ANALOGCB a)
 {
+    //std::cout << "Analog : ";
+    //for( int i=0; i < a.num_channel; i++ ) std::cout << a.channel[i] << " ";
+    //std::cout << std::endl;
+
     auto handler = reinterpret_cast< VRPNDeviceClient * >( userData );
 
     if(a.num_channel > 0)

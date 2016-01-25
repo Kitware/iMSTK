@@ -23,6 +23,7 @@
 #include "SimulationManager/SDK.h"
 
 // Include required types scene objects
+#include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/PlaneToMeshCollision.h"
@@ -58,18 +59,21 @@ int main(int ac, char** av)
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
     auto sdk = SDK::createStandardSDK();
-    auto client = std::make_shared<VRPNForceDevice>();
-    auto server = std::make_shared<VRPNDeviceServer>();
 
-    //get some user input and setup device url
-    std::string input = "Phantom@localhost";
-    client->setDeviceURL(input);
+    // setup device client
+    std::string deviceURL = "Phantom@localhost";
+    auto client = std::make_shared<VRPNForceDevice>(deviceURL);
+    sdk->registerModule(client);
 
+    // setup controller
     auto controller = std::make_shared<ToolCoupler>(client);
     controller->setScalingFactor(20.0);
-    sdk->registerModule(server);
-//     sdk->registerModule(client);
     sdk->registerModule(controller);
+
+    // setup server
+     auto server = std::make_shared<VRPNDeviceServer>();
+     server->addDeviceClient(client);
+     sdk->registerModule(server);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator

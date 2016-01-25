@@ -49,13 +49,21 @@ typedef struct _vrpn_TRACKERVELCB vrpn_TRACKERVELCB;
 typedef struct _vrpn_TRACKERCB vrpn_TRACKERCB;
 typedef struct _vrpn_ANALOGCB vrpn_ANALOGCB;
 
+enum class DeviceType { SPACE_EXPLORER_3DCONNEXION,
+                        NAVIGATOR_3DCONNEXION,
+                        RAZER_HYDRA,
+                        XKEYS_XK3,
+                        PHANTOM_OMNI,
+                        OSVR_HDK
+                        };
+
 class VRPNDeviceClient: public DeviceInterface
 {
 public:
     ///
     /// \brief Constructor/Destructor
     ///
-    VRPNDeviceClient();
+    VRPNDeviceClient(DeviceType deviceType, std::string deviceURL);
     virtual ~VRPNDeviceClient();
 
     ///
@@ -71,6 +79,19 @@ public:
     /// DeviceInterface::Message::Failure on failure
     ///
     virtual DeviceInterface::Message closeDevice() override;
+
+    ///
+    /// \brief Set the type used to instantiate the VRPN device
+    /// \detail Check DeviceType enumeration for more information
+    /// \param t The new device type to use.
+    ///
+    void setDeviceType(const DeviceType t);
+
+    ///
+    /// \brief Get the phantom's device type
+    /// \return The current device type used to instantiate the VRPN device
+    ///
+    const DeviceType &getDeviceType() const;
 
     ///
     /// \brief Set the url used to connect to the VRPN server
@@ -135,12 +156,13 @@ private:
     static void VRPN_CALLBACK analogChangeHandler(void *userData, const vrpn_ANALOGCB a);
 
 protected:
+    DeviceType deviceType;                              //!< Device type
     std::string deviceURL;                              //!< Connection device URL
 
 private:
     std::shared_ptr<vrpn_Button_Remote> vrpnButton;     //!< VRPN button interface
     std::shared_ptr<vrpn_Tracker_Remote> vrpnTracker;   //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Analog_Remote> vrpnAnalog;   //!< VRPN position/orientation interface
+    std::shared_ptr<vrpn_Analog_Remote> vrpnAnalog;     //!< VRPN analog interface
 };
 
 #endif // VRPNDEVICE_H
