@@ -26,7 +26,6 @@
 #include <vrpn_Tracker_RazerHydra.h>
 #include <vrpn_Xkeys.h>
 #include <vrpn_Tracker_OSVRHackerDevKit.h>
-
 #ifdef VRPN_USE_PHANTOM_SERVER
 #include <server_src/vrpn_Phantom.h>
 #endif
@@ -87,13 +86,19 @@ bool VRPNDeviceServer::addDeviceClient(
         vrpnButtonDevice = std::make_shared<vrpn_Xkeys_XK3>
                 (newDeviceName.c_str(), this->connection);
     break;
-//    case DeviceType::PHANTOM_OMNI:
-//        vrpnDevice = std::make_shared<vrpn_Phantom> // TODO
-//                (newDeviceName.c_str(), this->connection, 60.0f, "Default PHANToM");
-//    break;
     case DeviceType::OSVR_HDK:
         vrpnTrackerDevice = std::make_shared<vrpn_Tracker_OSVRHackerDevKit>
                 (newDeviceName.c_str(), this->connection);
+    break;
+    case DeviceType::PHANTOM_OMNI:
+#ifdef VRPN_USE_PHANTOM_SERVER
+        vrpnDevice = std::make_shared<vrpn_Phantom> // TODO
+                (newDeviceName.c_str(), this->connection, 60.0f, "Default PHANToM");
+#else
+        std::cerr<< "addDeviceClient error: needs VRPN_USE_PHANTOM_SERVER to be true "
+                 << "to connect a Panthom omni device." << std::endl;
+        return EXIT_FAILURE;
+#endif
     break;
     default:
         std::cerr<< "addDeviceClient error: unknown device type."
