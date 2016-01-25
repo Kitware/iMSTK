@@ -27,12 +27,7 @@
 #include "Core/Module.h"
 #include "Core/DataStructures.h"
 
-// Forward declaration
-class SDK;
-class OpenGLWindowStream;
-class MetalShader;
-class FrameBuffer;
-struct Texture;
+namespace imstk {
 
 enum RenderingStageType
 {
@@ -58,19 +53,8 @@ struct RenderOperation
         fboName(fbName)
     {}
     std::shared_ptr<Scene> scene; ///< The scene full of objects to render
-    FrameBuffer *fbo; ///< Only required if rendering to FBO, specifies the FBO to render to
     RenderTargetType target; ///< Specifies where the rendered result should be placed see RenderTargetType
     std::string fboName; ///< Only required if rendering to FBO, named reference to look up the FBO pointer
-};
-
-struct FboListItem
-{
-    std::string fboName; ///< String identification
-    FrameBuffer* fbo; ///< The FBO pointer
-    std::shared_ptr<Texture> depthTex; ///< The FBO depth texture pointer
-    std::shared_ptr<Texture> colorTex; ///< The FBO color texture pointer
-    unsigned int width; ///< The width of the FBO
-    unsigned int height; ///< The height of the FBO
 };
 
 /// \brief Handles all rendering routines.
@@ -79,13 +63,11 @@ class ViewerBase : public Module
 protected:
     std::vector<std::shared_ptr<CoreClass>> objectList;
     std::vector<RenderOperation> renderOperations;
-    std::vector<FboListItem> fboListItems;
     std::shared_ptr<ErrorLog> log;
     int unlimitedFPSVariableChanged;
     bool unlimitedFPSEnabled;
     int screenResolutionWidth;
     int screenResolutionHeight;
-    friend class SDK;
 
 public:
 
@@ -126,20 +108,6 @@ public:
     virtual void setWindowTitle(const std::string &str);
     /// \brief Registers a scene for rendering with the viewer
     virtual void registerScene(std::shared_ptr<Scene> scene, RenderTargetType target = IMSTK_RENDERTARGET_SCREEN, const std::string &fboName = "");
-    /// \brief Adds an FBO to the viewer to allow rendering to it.
-    ///
-    /// \detail The FBO will be created an initialized in the viewer.
-    ///
-    /// \param p_fboName String to reference the FBO by
-    /// \param p_colorTex A texture that will contain the fbo's color texture.
-    /// \param p_depthTex A texture that will contain the fbo's depth texture.
-    /// \param p_width The width of the fbo
-    /// \param p_height The height of the fbo
-    void addFBO(
-        const std::string &p_fboName,
-        std::shared_ptr<Texture> p_colorTex,
-        std::shared_ptr<Texture> p_depthTex,
-        unsigned int p_width, unsigned int p_height);
 
     virtual void setGlobalAxisLength(const float len);
 
@@ -195,5 +163,7 @@ protected:
     /// \brief adjust  rendering FPS
     void adjustFPS();
 };
+
+}
 
 #endif // CORE_VIEWERBASE_H

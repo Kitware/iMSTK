@@ -28,6 +28,8 @@
 // STL includes
 #include <vector>
 
+namespace imstk {
+
 void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> pairs)
 {
     auto meshA = std::static_pointer_cast<MeshCollisionModel>(pairs->getFirst());
@@ -37,8 +39,8 @@ void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> p
     intersectionNodes = meshA->getAABBTree()->getIntersectingNodes(meshB->getAABBTree());
 
     double depth;
-    core::Vec3d normal;
-    core::Vec3d contactPoint;
+    Vec3d normal;
+    Vec3d contactPoint;
     for(auto & intersection : intersectionNodes)
     {
         auto nodeA = intersection.first;
@@ -52,7 +54,7 @@ void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> p
 
         for(const auto & i : triangleListA)
         {
-            const core::Vec3d& normalA = meshA->getSurfaceNormal(i);
+            const Vec3d& normalA = meshA->getSurfaceNormal(i);
             if(normalA.isZero())
             {
                 continue;
@@ -61,7 +63,7 @@ void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> p
             auto verticesA = meshA->getElementPositions(i);
             for(auto & j : triangleListB)
             {
-                const core::Vec3d& normalB = meshB->getSurfaceNormal(j);
+                const Vec3d& normalB = meshB->getSurfaceNormal(j);
                 if(normalB.isZero())
                 {
                     continue;
@@ -80,4 +82,6 @@ void MeshToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> p
             }
         }
     }
+}
+
 }

@@ -28,14 +28,16 @@
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for non-linear solvers
 ///
 class NonLinearSolver
 {
 public:
-    using JacobianType = std::function<const core::SparseMatrixd&(const core::Vectord&)>;
-    using UpdateIterateType = std::function<void(const core::Vectord&,core::Vectord&)>;
+    using JacobianType = std::function<const SparseMatrixd&(const Vectord&)>;
+    using UpdateIterateType = std::function<void(const Vectord&,Vectord&)>;
     using FunctionType = SystemOfEquations::VectorFunctionType;
 
 public:
@@ -48,7 +50,7 @@ public:
     ///
     /// \brief Main solve routine.
     ///
-    virtual void solve(core::Vectord &x) = 0;
+    virtual void solve(Vectord &x) = 0;
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition
@@ -56,7 +58,7 @@ public:
     /// \param dx Computed direction.
     /// \param x Current iterate.
     ///
-    double armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm);
+    double armijo(const Vectord &dx, Vectord &x, const double previousFnorm);
 
     ///
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
@@ -117,5 +119,7 @@ protected:
     SystemOfEquations *nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType updateIterate; ///< Update iteration function
 };
+
+}
 
 #endif // SOLVERS_LINEAR_SOLVER

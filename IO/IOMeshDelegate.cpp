@@ -17,7 +17,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <IO/IOMeshDelegate.h>
+#include "IO/IOMeshDelegate.h"
+
+namespace imstk {
 
 //----------------------------------------------------------------------------------------
 IOMeshDelegate::IOMeshDelegate(): meshProps(0) {}
@@ -36,7 +38,7 @@ void IOMeshDelegate::write() { }
 
 //----------------------------------------------------------------------------------------
 void IOMeshDelegate
-::setSurfaceMesh(const std::vector<core::Vec3d> &vertices,
+::setSurfaceMesh(const std::vector<Vec3d> &vertices,
                  const std::vector<std::array<size_t,3>> &triangleArray)
 {
     auto mesh = std::make_shared<SurfaceMesh>();
@@ -48,10 +50,10 @@ void IOMeshDelegate
 }
 
 //----------------------------------------------------------------------------------------
-void IOMeshDelegate::setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
+void IOMeshDelegate::setVegaTetraMesh(const std::vector<Vec3d> &vertices,
                                       const std::vector<std::array<size_t,4>> &tetraArray,
                                       const std::vector<size_t> &bdConditions,
-                                      const core::Vec3d &material)
+                                      const Vec3d &material)
 {
     auto tetraMesh = std::make_shared<VegaVolumetricMesh>();
     std::vector<int> vegaElements;
@@ -85,7 +87,7 @@ void IOMeshDelegate::setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
 
 //----------------------------------------------------------------------------------------
 void IOMeshDelegate
-::setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
+::setVegaTetraMesh(const std::vector<Vec3d> &vertices,
                    const std::vector<std::array<size_t,4>> &tetraArray)
 {
     auto tetraMesh = std::make_shared<VegaVolumetricMesh>();
@@ -113,7 +115,7 @@ void IOMeshDelegate
 }
 
 //----------------------------------------------------------------------------------------
-void IOMeshDelegate::setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
+void IOMeshDelegate::setVegaHexaMesh(const std::vector<Vec3d> &vertices,
                                      const std::vector<std::array<size_t,8>> &hexaArray,
                                      const std::vector<size_t> &bdConditions,
                                      const std::array<double,3> &material)
@@ -151,7 +153,7 @@ void IOMeshDelegate::setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
 }
 
 //----------------------------------------------------------------------------------------
-void IOMeshDelegate::setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
+void IOMeshDelegate::setVegaHexaMesh(const std::vector<Vec3d> &vertices,
                                      const std::vector<std::array<size_t,8>> &hexaArray)
 {
     auto hexaMesh = std::make_shared<VegaVolumetricMesh>();
@@ -184,8 +186,8 @@ void IOMeshDelegate::setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
 
 //----------------------------------------------------------------------------------------
 void IOMeshDelegate
-::reorderSurfaceTopology(const std::vector<core::Vec3d> &vertices,
-                         std::vector<core::Vec3d> &surfaceVertices,
+::reorderSurfaceTopology(const std::vector<Vec3d> &vertices,
+                         std::vector<Vec3d> &surfaceVertices,
                          std::vector<std::array<size_t,3>> &triangleArray,
                          std::unordered_map<size_t,size_t> &uniqueVertexArray)
 {
@@ -225,4 +227,6 @@ void IOMeshDelegate
     {
         surfaceVertices.emplace_back(vertices[v]);
     }
+}
+
 }

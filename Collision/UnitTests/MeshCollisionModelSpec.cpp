@@ -29,12 +29,12 @@ using namespace bandit;
 go_bandit([](){
     describe("the mesh collision model used by collision detection algorithms.", []() {
         it("constructs", []() {
-            auto meshCollisionModel = Core::make_unique<MeshCollisionModel>();
+            auto meshCollisionModel = imstk::make_unique<imstk::MeshCollisionModel>();
             AssertThat(meshCollisionModel != nullptr, IsTrue());
         });
         it("loads the mesh", []() {
-            auto meshCollisionModel = Core::make_unique<MeshCollisionModel>();
-            std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
+            auto meshCollisionModel = imstk::make_unique<imstk::MeshCollisionModel>();
+            auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
             meshCollisionModel->setModelMesh(mesh);
 
@@ -42,11 +42,11 @@ go_bandit([](){
 
         });
         it("can access positions", []() {
-            auto meshCollisionModel = std::make_shared<MeshCollisionModel>();
+            auto meshCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
 
-            auto mesh = std::make_shared<SurfaceMesh>();
+            auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
-            std::vector<core::Vec3d> vertices;
+            std::vector<imstk::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,-1.0);
             vertices.emplace_back(2.0,3.0,1.0);
             vertices.emplace_back(2.0,1.0,-1.0);
@@ -75,9 +75,9 @@ go_bandit([](){
             AssertThat(p1[2], Equals(vertices[3]));
         });
         it("can access normals", []() {
-            auto meshCollisionModel = std::make_shared<MeshCollisionModel>();
+            auto meshCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
 
-            auto mesh = std::make_shared<SurfaceMesh>();
+            auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
             auto &vertices = mesh->getVertices();
             vertices.emplace_back(1.0,2.0,-1.0);
@@ -102,9 +102,9 @@ go_bandit([](){
             AssertThat((meshCollisionModel->getSurfaceNormal(1)-normalB).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
         it("can create BVH", []() {
-            auto meshCollisionModel = std::make_shared<MeshCollisionModel>();
+            auto meshCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
 
-            auto mesh = std::make_shared<SurfaceMesh>();
+            auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
             // Add two triangles to the data structure
             auto &vertices = mesh->getVertices();
@@ -125,7 +125,7 @@ go_bandit([](){
             meshCollisionModel->setMesh(mesh);
             meshCollisionModel->computeBoundingBoxes();
 
-            auto modelAabbTree = std::make_shared<MeshCollisionModel::AABBTreeType>(
+            auto modelAabbTree = std::make_shared<imstk::MeshCollisionModel::AABBTreeType>(
                     meshCollisionModel,6);
             modelAabbTree->initStructure();
 

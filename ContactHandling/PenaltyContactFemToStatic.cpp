@@ -20,6 +20,8 @@
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 #include "Core/CollisionManager.h"
 
+namespace imstk {
+
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : PenaltyContactHandling(typeBilateral)
 {
     type = PenaltyFemToStatic;
@@ -66,8 +68,8 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
         auto contactInfo = this->getCollisionPairs()->getContacts(model);
         sceneObject->setContactForcesToZero();
         this->clearContactForces();
-        core::Vec3d force;
-        core::Vec3d velocityProjection;
+        Vec3d force;
+        Vec3d velocityProjection;
         int nodeDofID;
         for(auto &contact : contactInfo)
         {
@@ -81,4 +83,6 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
             this->setContactForce(contact->index, force);
         }
     }
+}
+
 }

@@ -19,15 +19,15 @@
 
 #include "Event/MouseMoveEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType MouseMoveEvent::EventName = core::EventType::MouseMove;
+EventType MouseMoveEvent::EventName = EventType::MouseMove;
 
-void MouseMoveEvent::setWindowCoord(const core::Vec2d& coordinates)
+void MouseMoveEvent::setWindowCoord(const Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec2d& MouseMoveEvent::getWindowCoord()
+const Vec2d& MouseMoveEvent::getWindowCoord()
 {
     return this->coord;
 }

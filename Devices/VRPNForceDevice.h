@@ -25,6 +25,8 @@
 class vrpn_ForceDevice_Remote;
 typedef struct _vrpn_FORCECB vrpn_FORCECB;
 
+namespace imstk {
+
 ///
 /// \brief An interface for the Phantom Omni or Geomagic Touch using VRPN.
 ///     This is the main client code.
@@ -76,7 +78,7 @@ public:
     ///
     /// \brief Set contact plane
     ///
-    void setContactPlane(const core::Vec4f &plane)
+    void setContactPlane(const Vec4f &plane)
     {
         this->contactPlane = plane;
     }
@@ -84,7 +86,7 @@ public:
     ///
     /// \brief Set contact plane
     ///
-    void setContactPlane(const core::Vec3f &plane, const float d)
+    void setContactPlane(const Vec3f &plane, const float d)
     {
         this->contactPlane << plane,d;
     }
@@ -92,7 +94,7 @@ public:
     ///
     /// \brief Get contact plane
     ///
-    const core::Vec4f &getContactPlane() const
+    const Vec4f &getContactPlane() const
     {
         return this->contactPlane;
     }
@@ -179,7 +181,7 @@ private:
 
 private:
     bool enableForce;           //!< Enable force feedback
-    core::Vec4f contactPlane;   //!< Contact plane as [normal,d] where dot(n,x) = d.
+    Vec4f contactPlane;   //!< Contact plane as [normal,d] where dot(n,x) = d.
     double dampingCoefficient;  //!< Damping damping coefficient.
     double dynamicFriction;     //!< Dynamic friction coefficient.
     double springCoefficient;   //!< Spring constant.
@@ -187,5 +189,7 @@ private:
     std::shared_ptr<vrpn_ForceDevice_Remote> vrpnForce; //!< VRPN force interface
 
 };
+
+}
 
 #endif

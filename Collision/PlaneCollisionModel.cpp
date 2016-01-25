@@ -20,10 +20,14 @@
 
 #include "Collision/PlaneCollisionModel.h"
 
-PlaneCollisionModel::PlaneCollisionModel(const core::Vec3d& p, const core::Vec3d& n)
+namespace imstk {
+
+PlaneCollisionModel::PlaneCollisionModel(const Vec3d& p, const Vec3d& n)
     : PlaneModel(p, n)
 {
 
 }
 
 PlaneCollisionModel::~PlaneCollisionModel() {}
+
+}

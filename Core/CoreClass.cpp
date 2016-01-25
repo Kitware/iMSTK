@@ -22,13 +22,15 @@
 #include "Core/EventHandler.h"
 #include "Core/RenderDelegate.h"
 
-std::shared_ptr<core::EventHandler>
-CoreClass::eventHandler = std::make_shared<core::EventHandler>();
+namespace imstk {
+
+std::shared_ptr<EventHandler>
+CoreClass::eventHandler = std::make_shared<EventHandler>();
 
 CoreClass::CoreClass() :
     name(""), listening(false)
 {
-    drawOrder = core::ClassDrawOrder::BeforeObjects;
+    drawOrder = ClassDrawOrder::BeforeObjects;
     uniqueId = std::make_shared<UnifiedId>();
     renderDetail = std::make_shared<RenderDetail>();
 }
@@ -36,17 +38,17 @@ CoreClass::CoreClass() :
 CoreClass::CoreClass(const std::string &_name) :
     name(_name), listening(false)
 {
-    drawOrder = core::ClassDrawOrder::BeforeObjects;
+    drawOrder = ClassDrawOrder::BeforeObjects;
     uniqueId = std::make_shared<UnifiedId>();
     renderDetail = std::make_shared<RenderDetail>();
 }
 
-const core::ClassType &CoreClass::getType() const
+const ClassType &CoreClass::getType() const
 {
     return type;
 }
 
-void CoreClass::setType(const core::ClassType& newType)
+void CoreClass::setType(const ClassType& newType)
 {
     this->type = newType;
 }
@@ -66,12 +68,12 @@ void CoreClass::print() const
     std::cout << "Default print" << std::endl;
 }
 
-void CoreClass::handleEvent(std::shared_ptr< core::Event > event)
+void CoreClass::handleEvent(std::shared_ptr< Event > event)
 {
     std::cout << "Default handleEvent" << std::endl;
     std::cout << "Sender " << int(event->getSender()) << std::endl;
     std::cout << "Priority " << int(event->getPriority()) << std::endl;
-    std::cout << "Type " << int(core::Event::EventName) << std::endl;
+    std::cout << "Type " << int(Event::EventName) << std::endl;
 }
 
 void CoreClass::setName( const std::string &p_objectName )
@@ -109,4 +111,6 @@ void CoreClass::draw() const
 {
   if (this->renderDelegate)
     this->renderDelegate->draw();
+}
+
 }

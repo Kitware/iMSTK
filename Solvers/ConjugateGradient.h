@@ -29,6 +29,8 @@
 // Eigen includes
 #include <Eigen/IterativeLinearSolvers>
 
+namespace imstk {
+
 ///
 /// \brief Conjugate gradient sparse linear solver for SPD matrices
 ///
@@ -47,7 +49,7 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param rhs Right hand side of the linear system of equations.
     ///
-    ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs);
+    ConjugateGradient(const SparseMatrixd &A, const Vectord &rhs);
     ConjugateGradient(const ConjugateGradient &) = delete;
     ConjugateGradient &operator=(const ConjugateGradient &) = delete;
 
@@ -57,14 +59,14 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual Compute residual if true.
     ///
-    void iterate(core::Vectord &x, bool updateResidual = true) override;
+    void iterate(Vectord &x, bool updateResidual = true) override;
 
     ///
     /// \brief Solve the system of equations.
     ///
     /// \param x Upon return it contains the approximate solution of the linear system.
     ///
-    void solve(core::Vectord &x) override;
+    void solve(Vectord &x) override;
 
     ///
     /// \brief Solve the linear system using Conjugate gradient iterations to a
@@ -72,12 +74,12 @@ public:
     ///
     /// \param tolerance Specified tolerance.
     ///
-    void solve(core::Vectord &x, double tolerance);
+    void solve(Vectord &x, double tolerance);
 
     ///
     /// \brief Return the error calculated by the solver.
     ///
-    double getError(const core::Vectord &x) override;
+    double getError(const Vectord &x) override;
 
     ///
     /// \brief Set the tolerance for the iterative solver.
@@ -107,7 +109,9 @@ public:
 
 private:
     ///> Pointer to the Eigen's Conjugate gradient solver
-    Eigen::ConjugateGradient<core::SparseMatrixd> solver;
+    Eigen::ConjugateGradient<SparseMatrixd> solver;
 };
+
+}
 
 #endif // SOLVERS_SPARSE_CG

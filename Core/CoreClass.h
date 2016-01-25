@@ -33,11 +33,11 @@
 #include "Core/ConfigRendering.h"
 #include "Core/RenderDetail.h"
 
-class SDK;
+namespace imstk {
+
 class CoreClass;
 class RenderDelegate;
 class ObjectSimulator;
-class OpenGLViewer;
 
 /// \brief simulator calls object and sends this structure
 struct SimulationParam
@@ -72,7 +72,7 @@ class CoreClass : public std::enable_shared_from_this<CoreClass>
 public:
     using Pointer = std::shared_ptr<CoreClass>;
 
-    static std::shared_ptr<core::EventHandler> eventHandler;
+    static std::shared_ptr<EventHandler> eventHandler;
 
 public:
     ///
@@ -93,12 +93,12 @@ public:
     ///
     /// \brief get type of the class
     ///
-    const core::ClassType &getType() const ;
+    const ClassType &getType() const ;
 
     ///
     /// \brief set type of the class
     ///
-    void setType(const core::ClassType &newType);
+    void setType(const ClassType &newType);
 
     ///
     /// \brief his function is called by the renderer.
@@ -130,7 +130,7 @@ public:
     /// This function is called by the event handler after observing
     /// events.
     ///
-    virtual void handleEvent(std::shared_ptr<core::Event>);
+    virtual void handleEvent(std::shared_ptr<Event>);
 
     ///
     /// \brief set the name of object
@@ -180,26 +180,26 @@ public:
     /// \brief Event index used by the event handler to unregister event observers
     /// \return eventIndex
     ///
-    const core::EventHandler::FunctionContainerType::iterator
-    &getEventIndex(const core::EventType &eventType) const
+    const EventHandler::FunctionContainerType::iterator
+    &getEventIndex(const EventType &eventType) const
     { return eventIndexMap.at(eventType); }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void setEventIndex(const core::EventType &eventType, core::EventHandler::FunctionContainerType::iterator index)
+    void setEventIndex(const EventType &eventType, EventHandler::FunctionContainerType::iterator index)
     { eventIndexMap[eventType] = index; }
 
     ///
     /// \brief Set event index used by the event handler to unregister event observers
     ///
-    void removeEventIndex(const core::EventType &eventType)
+    void removeEventIndex(const EventType &eventType)
     { eventIndexMap.erase(eventType); }
 
     ///
     /// \brief Set the order on which the objects are painted.
     ///
-    void setDrawOrder(const core::ClassDrawOrder &order) { drawOrder = order; }
+    void setDrawOrder(const ClassDrawOrder &order) { drawOrder = order; }
 
     ///
     /// \brief Get the unique id of this object
@@ -217,7 +217,7 @@ public:
     std::shared_ptr<RenderDelegate> getRenderDelegate() const;
     void setRenderDelegate(std::shared_ptr<RenderDelegate> delegate);
 
-    void attachEvent(const core::EventType &eventType, std::shared_ptr<CoreClass> component)
+    void attachEvent(const EventType &eventType, std::shared_ptr<CoreClass> component)
     {
         eventHandler->attachEvent(eventType,component);
     }
@@ -234,18 +234,20 @@ protected:
 
 protected:
     std::atomic_int referenceCounter; ///< reference counter to identify the count the usage
-    core::ClassType type; ///< class type
+    ClassType type; ///< class type
     std::string name; ///< name of the class
     bool listening; ///< parameter to determine if this object is listening for events
     std::map<
-    core::EventType,
-    core::EventHandler::FunctionContainerType::iterator> eventIndexMap;
+    EventType,
+    EventHandler::FunctionContainerType::iterator> eventIndexMap;
     std::shared_ptr<RenderDelegate> renderDelegate; ///!< Class that can render this class
     std::shared_ptr<RenderDetail> renderDetail; ///< specifies visualization type
 
 private:
     std::shared_ptr<UnifiedId> uniqueId; ///< unique Id
-    core::ClassDrawOrder drawOrder; ///< draw order of the object
+    ClassDrawOrder drawOrder; ///< draw order of the object
 };
+
+}
 
 #endif

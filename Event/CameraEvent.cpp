@@ -19,37 +19,37 @@
 
 #include "Event/CameraEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType CameraEvent::EventName = core::EventType::CameraUpdate;
+EventType CameraEvent::EventName = EventType::CameraUpdate;
 
 CameraEvent::CameraEvent()
 {
-    position = core::Vec3d::Zero();
-    direction = core::Vec3d::Zero();
-    upDirection = core::Vec3d::Zero();
+    position = Vec3d::Zero();
+    direction = Vec3d::Zero();
+    upDirection = Vec3d::Zero();
 }
-void CameraEvent::setPosition(const core::Vec3d& cameraPosition)
+void CameraEvent::setPosition(const Vec3d& cameraPosition)
 {
     this->position = cameraPosition;
 }
-const core::Vec3d& CameraEvent::getPosition()
+const Vec3d& CameraEvent::getPosition()
 {
     return this->position;
 }
-void CameraEvent::setDirection(const core::Vec3d& cameraDirection)
+void CameraEvent::setDirection(const Vec3d& cameraDirection)
 {
     this->direction = cameraDirection;
 }
-const core::Vec3d& CameraEvent::getDirection()
+const Vec3d& CameraEvent::getDirection()
 {
     return this->direction;
 }
-void CameraEvent::setUpDirection(const core::Vec3d& cameraUpDirection)
+void CameraEvent::setUpDirection(const Vec3d& cameraUpDirection)
 {
     this->upDirection = cameraUpDirection;
 }
-const core::Vec3d& CameraEvent::getUpDirection()
+const Vec3d& CameraEvent::getUpDirection()
 {
     return this->upDirection;
 }

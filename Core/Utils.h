@@ -20,6 +20,8 @@
 #ifndef CORE_UTILS_H
 #define CORE_UTILS_H
 
+namespace imstk {
+
 /// \brief query,  logs and diplays opengl error
 #define IMSTK_CHECKGLERROR_DISPLAY(log,error)  GLUtils::queryGLError(error);\
                                             log->addError(error);\
@@ -29,3 +31,5 @@
                                  log->addError(error);\
 
 #endif
+
+}

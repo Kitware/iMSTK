@@ -29,9 +29,9 @@ go_bandit([]()
 {
     describe("Implicit Euler ODE Solver", []()
     {
-        auto odeSystem = std::make_shared<OdeSystem>();
-        auto euler = std::make_shared<BackwardEuler>();
-        auto initialState = std::make_shared<OdeSystemState>();
+        auto odeSystem = std::make_shared<imstk::OdeSystem>();
+        auto euler = std::make_shared<imstk::BackwardEuler>();
+        auto initialState = std::make_shared<imstk::OdeSystemState>();
         // ODE parameters
         double dt = 0.01;
         double t0 = 0, t1 = 3;
@@ -40,8 +40,8 @@ go_bandit([]()
         double a = 1;
 
         // ODE right hand side function
-        core::Vectord y;
-        auto F = [&](const OdeSystemState &x) -> const core::Vectord&
+        imstk::Vectord y;
+        auto F = [&](const imstk::OdeSystemState &x) -> const imstk::Vectord&
         {
             y = -lambda*x.getVelocities();
             return y;
@@ -49,30 +49,30 @@ go_bandit([]()
 
         std::vector<Eigen::Triplet<double>> tripletList;
         tripletList.emplace_back(0,0,0);
-        core::SparseMatrixd K(1,1);
+        imstk::SparseMatrixd K(1,1);
         K.setFromTriplets(tripletList.begin(),tripletList.end());
         K.makeCompressed();
-        auto DFx = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        auto DFx = [&](const imstk::OdeSystemState &) -> const imstk::SparseMatrixd&
         {
             return K;
         };
 
-        core::SparseMatrixd C(1,1);
+        imstk::SparseMatrixd C(1,1);
         tripletList.clear();
         tripletList.emplace_back(0,0,-lambda);
         C.setFromTriplets(tripletList.begin(),tripletList.end());
         C.makeCompressed();
-        auto DFv = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        auto DFv = [&](const imstk::OdeSystemState &) -> const imstk::SparseMatrixd&
         {
             return C;
         };
 
-        core::SparseMatrixd M(1,1);
+        imstk::SparseMatrixd M(1,1);
         tripletList.clear();
         tripletList.emplace_back(0,0,1.0);
         M.setFromTriplets(tripletList.begin(),tripletList.end());
         M.makeCompressed();
-        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        auto Mass = [&](const imstk::OdeSystemState &) -> const imstk::SparseMatrixd&
         {
             return M;
         };
@@ -98,11 +98,11 @@ go_bandit([]()
         it("solves dx/dt-lambda*x=0, x(0)=a ", [&]()
         {
             // Find the solution for t = [0,1)
-            OdeSystemState state, newState;
+            imstk::OdeSystemState state, newState;
             state = *initialState;
             newState = state;
 
-            core::Vectord error(steps), sol(steps);
+            imstk::Vectord error(steps), sol(steps);
             error(0) = 0.0;
             sol(0) = a;
             for(size_t i = 1; i < steps; ++i)

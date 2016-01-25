@@ -27,9 +27,9 @@
 
 using namespace bandit;
 
-std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
+std::shared_ptr<imstk::MeshModel> getModel(const std::vector<imstk::Vec3d> &vertices)
 {
-    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
+    auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
     // Add one triangle to the data structure
     mesh->setVertices(vertices);
@@ -41,7 +41,7 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
     mesh->computeTriangleNormals();
     mesh->computeVertexNormals();
 
-    std::shared_ptr<MeshCollisionModel> model = std::make_shared<MeshCollisionModel>();
+    auto model = std::make_shared<imstk::MeshCollisionModel>();
     model->setMesh(mesh);
     return model;
 }
@@ -49,27 +49,27 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 go_bandit([](){
     describe("BVH Collision Detection Algorithm", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
+            auto meshToMeshCollision = imstk::make_unique<imstk::MeshToMeshCollision>();
             AssertThat(meshToMeshCollision == nullptr, IsFalse());
         });
         it("performs collision detection ", []() {
-            std::unique_ptr<CollisionDetection> meshToMeshCollision = Core::make_unique<MeshToMeshCollision>();
+            auto meshToMeshCollision = imstk::make_unique<imstk::MeshToMeshCollision>();
 
-            std::vector<core::Vec3d> verticesA;
+            std::vector<imstk::Vec3d> verticesA;
             verticesA.emplace_back(1.0,2.0,0);
             verticesA.emplace_back(2.0,3.0,0);
             verticesA.emplace_back(2.0,1.0,0);
 
-            std::vector<core::Vec3d> verticesB;
+            std::vector<imstk::Vec3d> verticesB;
             verticesB.emplace_back(1.0,2.0,0.5);
             verticesB.emplace_back(2.0,3.0,0);
             verticesB.emplace_back(2.0,1.0,0);
 
-            std::shared_ptr<Model> modelA = getModel(verticesA);
+            auto modelA = getModel(verticesA);
 
-            std::shared_ptr<Model> modelB = getModel(verticesB);
+            auto modelB = getModel(verticesB);
 
-            std::shared_ptr<CollisionManager> collisionPair = std::make_shared<CollisionManager>();
+            auto collisionPair = std::make_shared<imstk::CollisionManager>();
 
             collisionPair->setModels(modelA,modelB);
 

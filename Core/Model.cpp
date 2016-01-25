@@ -19,10 +19,11 @@
 
 #include "Core/Model.h"
 
+namespace imstk {
 
 Model::Model() {}
 Model::~Model() {}
-std::shared_ptr< Core::BaseMesh > Model::getMesh()
+std::shared_ptr< BaseMesh > Model::getMesh()
 {
     return nullptr;
 }
@@ -43,4 +44,6 @@ void Model::setRenderDelegate(RenderDelegate::Ptr delegate)
     {
         this->renderDelegate->setSourceGeometry(this);
     }
+}
+
 }

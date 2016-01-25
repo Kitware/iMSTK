@@ -24,6 +24,8 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 
+namespace imstk {
+
 /// \brief The dispacther class is responsible of taking care of the tasks that need to
 ///     proppgated over the whole modules. For instance, adding a new phyiscs at run-time.
 class Dispatcher: public CoreClass
@@ -44,8 +46,8 @@ public:
     ///     moment of the function called. Such as whether it is the beginning
     ///     of the simulator frameor end of the simulator frame for now etc..
     ///
-    core::ResultDispatcher handle(std::shared_ptr<CoreClass> p_caller,
-                                  core::CallerState p_callerState);
+    ResultDispatcher handle(std::shared_ptr<CoreClass> p_caller,
+                                  CallerState p_callerState);
 
 private:
     ///
@@ -55,7 +57,7 @@ private:
     ///     called which is predefined at the Config.h
     ///
     void handleViewer(std::shared_ptr<CoreClass> p_caller,
-                      core::CallerState p_callerState);
+                      CallerState p_callerState);
 
     ///
     /// \brief Handle simulator events
@@ -64,7 +66,7 @@ private:
     ///     called which is predefined at the Config.h
     ///
     void handleSimulator(std::shared_ptr<CoreClass> p_caller,
-                         core::CallerState p_callerState);
+                         CallerState p_callerState);
 
     ///
     /// \brief Handle collision detection events
@@ -73,7 +75,7 @@ private:
     ///     called which is predefined at the Config.h
     ///
     void handleCollisionDetection(std::shared_ptr<CoreClass> p_caller,
-                                  core::CallerState p_callerState);
+                                  CallerState p_callerState);
 
     ///
     /// \brief Handle collision response events
@@ -82,7 +84,7 @@ private:
     ///     called which is predefined at the Config.h
     ///
     void handleCollisionResponse(std::shared_ptr<CoreClass> p_caller,
-                                 core::CallerState p_callerState);
+                                 CallerState p_callerState);
 
     ///
     /// \brief Handle all events
@@ -90,5 +92,7 @@ private:
     void handleAll();
 
 };
+
+}
 
 #endif

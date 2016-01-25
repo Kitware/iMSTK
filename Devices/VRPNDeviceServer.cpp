@@ -26,9 +26,12 @@
 #include <vrpn_Tracker_RazerHydra.h>
 #include <vrpn_Xkeys.h>
 #include <vrpn_Tracker_OSVRHackerDevKit.h>
+
 #ifdef VRPN_USE_PHANTOM_SERVER
 #include <server_src/vrpn_Phantom.h>
 #endif
+
+namespace imstk {
 
 VRPNDeviceServer::VRPNDeviceServer()
 {
@@ -181,4 +184,6 @@ void VRPNDeviceServer::exec()
     delete(this->connection);
 
     this->terminationCompleted = true;
+}
+
 }

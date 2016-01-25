@@ -23,8 +23,10 @@
 // iMSTK includes
 #include "Core/BaseMesh.h"
 
+namespace imstk {
+
 /// \brief this is the Surface Mesh class derived from generic Mesh class.
-class SurfaceMesh: public Core::BaseMesh
+class SurfaceMesh: public BaseMesh
 {
 
 public:
@@ -41,7 +43,7 @@ public:
     ///
     /// \brief calculates the normal of a triangle
     ///
-    core::Vec3d computeTriangleNormal(int triangle);
+    Vec3d computeTriangleNormal(int triangle);
 
     ///
     /// \brief Calculate normals for all triangles
@@ -76,10 +78,10 @@ public:
     ///
     /// \brief Returns the texture coordinates array.
     ///
-    const std::vector<core::Vec2f,
-    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates() const;
-    std::vector<core::Vec2f,
-    Eigen::aligned_allocator<core::Vec2f>> &getTextureCoordinates();
+    const std::vector<Vec2f,
+    Eigen::aligned_allocator<Vec2f>> &getTextureCoordinates() const;
+    std::vector<Vec2f,
+    Eigen::aligned_allocator<Vec2f>> &getTextureCoordinates();
 
     ///
     /// \brief Return true if it contains texture coordinates
@@ -89,7 +91,7 @@ public:
     ///
     /// \brief Add texture coordinates
     ///
-    void addTextureCoordinate(const core::Vec2f &coord);
+    void addTextureCoordinate(const Vec2f &coord);
     void addTextureCoordinate(const float &x, const float &y);
 
     ///
@@ -106,26 +108,26 @@ public:
     ///
     /// \brief Get triangle normals
     ///
-    const core::Vec3d &getTriangleNormal(size_t i) const;
+    const Vec3d &getTriangleNormal(size_t i) const;
 
     ///
     /// \brief Get tangents
     ///
-    const core::Vec3d &getTriangleTangent(size_t i) const;
+    const Vec3d &getTriangleTangent(size_t i) const;
 
     ///
     /// \brief Get vertex normal
     ///
-    const core::Vec3d &getVertexNormal(size_t i) const;
+    const Vec3d &getVertexNormal(size_t i) const;
 
     ///
     /// \brief Get vertex normal
     ///
-    const std::vector<core::Vec3d> &getVertexNormals() const
+    const std::vector<Vec3d> &getVertexNormals() const
     {
         return this->vertexNormals;
     }
-    std::vector<core::Vec3d> &getVertexNormals()
+    std::vector<Vec3d> &getVertexNormals()
     {
         return this->vertexNormals;
     }
@@ -133,9 +135,9 @@ public:
     ///
     /// \brief Get vertex tangents
     ///
-    const core::Vec3d &getVertexTangent(size_t i) const;
-    const std::vector<core::Vec3d> &getVertexTangents() const;
-    std::vector<core::Vec3d> &getVertexTangents();
+    const Vec3d &getVertexTangent(size_t i) const;
+    const std::vector<Vec3d> &getVertexTangents() const;
+    std::vector<Vec3d> &getVertexTangents();
 
     ///
     /// \brief print the details of the mesh
@@ -150,19 +152,19 @@ public:
 
 private:
     // List of triangle normals
-    std::vector<core::Vec3d> triangleNormals;
+    std::vector<Vec3d> triangleNormals;
 
     // List of vertex normals
-    std::vector<core::Vec3d> vertexNormals;
+    std::vector<Vec3d> vertexNormals;
 
     // List of triangle tangents
-    std::vector<core::Vec3d> triangleTangents;
+    std::vector<Vec3d> triangleTangents;
 
     // List of vertex tangents
-    std::vector<core::Vec3d> vertexTangents;
+    std::vector<Vec3d> vertexTangents;
 
     // List of vertex tangents
-    std::vector<core::Vec3d> vertexTangentsDelete;
+    std::vector<Vec3d> vertexTangentsDelete;
 
     // List of vertex neighbors
     std::vector<std::vector<size_t>> vertexNeighbors;
@@ -171,14 +173,13 @@ private:
     std::vector<std::vector<size_t>> vertexTriangleNeighbors;
 
     // Texture coordinates
-    std::vector<core::Vec2f,
-    Eigen::aligned_allocator<core::Vec2f>> textureCoord;
+    std::vector<Vec2f,
+    Eigen::aligned_allocator<Vec2f>> textureCoord;
 
     bool useThreeDSTexureCoordinates;
     bool useOBJDSTexureCoordinates;
 };
 
+}
+
 #endif
-
-
-

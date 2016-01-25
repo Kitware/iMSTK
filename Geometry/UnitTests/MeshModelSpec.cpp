@@ -24,9 +24,9 @@
 
 using namespace bandit;
 
-std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
+std::shared_ptr<imstk::MeshModel> getModel(const std::vector<imstk::Vec3d> &vertices)
 {
-    std::shared_ptr<SurfaceMesh> mesh = std::make_shared<SurfaceMesh>();
+    auto mesh = std::make_shared<imstk::SurfaceMesh>();
 
     // Add one triangle to the data structure
     mesh->setVertices(vertices);
@@ -38,7 +38,7 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
     mesh->computeTriangleNormals();
     mesh->computeVertexNormals();
 
-    std::shared_ptr<MeshModel> model = std::make_shared<MeshModel>();
+    auto model = std::make_shared<imstk::MeshModel>();
     model->setModelMesh(mesh);
     return model;
 }
@@ -46,12 +46,12 @@ std::shared_ptr<MeshModel> getModel(const std::vector<core::Vec3d> &vertices)
 go_bandit([](){
     describe("Mesh model", []() {
         it("constructs", []() {
-            auto model = Core::make_unique<MeshModel>();
+            auto model = imstk::make_unique<imstk::MeshModel>();
             AssertThat(model != nullptr, IsTrue());
         });
         it("can access mesh vertices", []() {
 
-            std::vector<core::Vec3d> vertices;
+            std::vector<imstk::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
@@ -65,16 +65,16 @@ go_bandit([](){
         });
         it("can access mesh face normals", []() {
 
-            std::vector<core::Vec3d> vertices;
+            std::vector<imstk::Vec3d> vertices;
             vertices.emplace_back(1.0,2.0,0);
             vertices.emplace_back(2.0,3.0,0);
             vertices.emplace_back(2.0,1.0,0);
 
             auto model = getModel(vertices);
 
-            core::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
+            imstk::Vec3d normalA = (vertices[1]-vertices[0]).cross(vertices[2]-vertices[0]).normalized();
 
-            auto mesh = std::static_pointer_cast<SurfaceMesh>(model->getMesh());
+            auto mesh = std::static_pointer_cast<imstk::SurfaceMesh>(model->getMesh());
             AssertThat((mesh->getTriangleNormal(0)-normalA).squaredNorm(), EqualsWithDelta(0.0,.00001));
         });
 

@@ -24,6 +24,8 @@
 #include "Core/Vector.h"
 #include "Solvers/ConjugateGradient.h"
 
+namespace imstk {
+
 ///
 /// @brief Approximates the solution to the Initial value problem: Mdv/dt = F(x,v,t),
 ///     v(t0) = v0 using a forward Euler scheme; Mv(t1) = Mv(t0) + dtF(v(t0),t0)
@@ -31,7 +33,7 @@
 class ForwardEuler : public TimeIntegrator
 {
 public:
-    using LinearSolverType = LinearSolver<core::SparseMatrixd>;
+    using LinearSolverType = LinearSolver<SparseMatrixd>;
 
 public:
     ///
@@ -58,5 +60,7 @@ public:
 private:
     std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. (Default: ConjugateGradient)
 };
+
+}
 
 #endif // FORWARDEULER_H

@@ -24,19 +24,21 @@
 #include "Solvers/SystemOfEquations.h"
 #include "Core/Matrix.h"
 
+namespace imstk {
+
 ///
 /// \brief Ode system of equations. Represent a ODE system of equations written as
 ///     dv/dt=f(t,x,v)
 ///     dx/dt=v, with initial conditions x(0)=x0; v(0)=v0.
 ///
-class OdeSystem : public LinearSystem<core::SparseMatrixd>
+class OdeSystem : public LinearSystem<SparseMatrixd>
 {
 public:
-    using BaseSystem = LinearSystem<core::SparseMatrixd>;
+    using BaseSystem = LinearSystem<SparseMatrixd>;
     using FunctionOperatorType =
-        std::function<const core::Vectord&(const OdeSystemState &)>;
+        std::function<const Vectord&(const OdeSystemState &)>;
     using JacobianOperatorType =
-        std::function<const core::SparseMatrixd&(const OdeSystemState &)>;
+        std::function<const SparseMatrixd&(const OdeSystemState &)>;
 
 public:
     OdeSystem();
@@ -82,28 +84,28 @@ public:
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd &evalDFx(const OdeSystemState &state);
+    const SparseMatrixd &evalDFx(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate -df/dv function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd &evalDFv(const OdeSystemState &state);
+    const SparseMatrixd &evalDFv(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate mass function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::SparseMatrixd &evalMass(const OdeSystemState &state);
+    const SparseMatrixd &evalMass(const OdeSystemState &state);
 
     ///
     /// \brief Evaluate rhs function at specified argument.
     ///
     /// \param state Current position and velocity.
     ///
-    const core::Vectord &evalRHS(const OdeSystemState &state);
+    const Vectord &evalRHS(const OdeSystemState &state);
 
     ///
     /// \brief Get the initial velocities and positions of the system.
@@ -162,8 +164,8 @@ private:
     JacobianOperatorType Damping; ///> Additional damping matrix.
     FunctionOperatorType F; ///> ODE right hand side function
 
-    core::SparseMatrixd systemMatrix;   ///> Linear system matrix storage.
-    core::Vectord rhs;                  ///> Right hand side vector storage.
+    SparseMatrixd systemMatrix;   ///> Linear system matrix storage.
+    Vectord rhs;                  ///> Right hand side vector storage.
 
 protected:
     std::shared_ptr<OdeSystemState> initialState; ///> Initial state of the system.
@@ -172,7 +174,7 @@ protected:
 /// Inlined functions
 
 //---------------------------------------------------------------------------
-inline const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &state)
+inline const SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &state)
 {
     if(!this->DFx)
     {
@@ -182,7 +184,7 @@ inline const core::SparseMatrixd &OdeSystem::evalDFx(const OdeSystemState &state
 }
 
 //---------------------------------------------------------------------------
-inline const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &state)
+inline const SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &state)
 {
     if(!this->DFv)
     {
@@ -192,7 +194,7 @@ inline const core::SparseMatrixd &OdeSystem::evalDFv(const OdeSystemState &state
 }
 
 //---------------------------------------------------------------------------
-inline const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &state)
+inline const SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &state)
 {
     if(!this->Mass)
     {
@@ -202,13 +204,15 @@ inline const core::SparseMatrixd &OdeSystem::evalMass(const OdeSystemState &stat
 }
 
 //---------------------------------------------------------------------------
-inline const core::Vectord &OdeSystem::evalRHS(const OdeSystemState &state)
+inline const Vectord &OdeSystem::evalRHS(const OdeSystemState &state)
 {
     if(!this->F)
     {
         /// Log this
     }
     return this->F(state);
+}
+
 }
 
 #endif // ODESYSTEM_H

@@ -20,7 +20,7 @@
 #include "Core/EventHandler.h"
 #include "Core/CoreClass.h"
 
-namespace core {
+namespace imstk {
 
 void EventHandler::attachEvent(const EventType& eventType, std::shared_ptr<CoreClass> component)
 {

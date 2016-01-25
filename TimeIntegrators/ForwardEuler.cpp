@@ -19,6 +19,8 @@
 
 #include "ForwardEuler.h"
 
+namespace imstk {
+
 ForwardEuler::ForwardEuler() :
     linearSolver(std::make_shared<ConjugateGradient>()) {}
 
@@ -41,4 +43,6 @@ void ForwardEuler::solve(const OdeSystemState &state,
 
     newState.getVelocities() += state.getVelocities();
     newState.getPositions() = state.getPositions() + timeStep * state.getVelocities();
+}
+
 }

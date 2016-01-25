@@ -19,10 +19,12 @@
 
 #include "Solvers/ConjugateGradient.h"
 
+namespace imstk {
+
 ConjugateGradient::
-ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs) : solver(A)
+ConjugateGradient(const SparseMatrixd &A, const Vectord &rhs) : solver(A)
 {
-    this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
+    this->linearSystem = std::make_shared<LinearSystem<SparseMatrixd>>(A, rhs);
     this->maxIterations = rhs.size();
     this->minTolerance = 1e-6;
     this->solver.setMaxIterations(this->maxIterations);
@@ -31,13 +33,13 @@ ConjugateGradient(const core::SparseMatrixd &A, const core::Vectord &rhs) : solv
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::iterate(core::Vectord &, bool)
+void ConjugateGradient::iterate(Vectord &, bool)
 {
     // Nothing to do
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::solve(core::Vectord &x)
+void ConjugateGradient::solve(Vectord &x)
 {
     if(!this->linearSystem)
     {
@@ -48,14 +50,14 @@ void ConjugateGradient::solve(core::Vectord &x)
 }
 
 //---------------------------------------------------------------------------
-void ConjugateGradient::solve(core::Vectord &x, double tolerance)
+void ConjugateGradient::solve(Vectord &x, double tolerance)
 {
     this->setTolerance(tolerance);
     this->solve(x);
 }
 
 //---------------------------------------------------------------------------
-double ConjugateGradient::getError(const core::Vectord &)
+double ConjugateGradient::getError(const Vectord &)
 {
     return this->solver.error();
 }
@@ -76,9 +78,9 @@ void ConjugateGradient::setMaximumIterations(const size_t maxIter)
 
 //---------------------------------------------------------------------------
 void ConjugateGradient::
-setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 {
-    LinearSolver<core::SparseMatrixd>::setSystem(newSystem);
+    LinearSolver<SparseMatrixd>::setSystem(newSystem);
     this->solver.compute(this->linearSystem->getMatrix());
 }
 
@@ -90,4 +92,6 @@ void ConjugateGradient::print()
 //     std::cout << "estimated error: " << this->solver.error()      << std::endl;
 //     std::cout << "tolerance: " << this->solver.tolerance()      << std::endl;
 //     std::cout << "maxIterations: " << this->solver.maxIterations() << std::endl;
+}
+
 }

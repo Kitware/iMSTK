@@ -24,7 +24,7 @@ add_executable(${APP} main.cpp)
 target_link_libraries(${APP}
   Core
   Geometry
-  VTKRendering
+  Rendering
   Rendering
   Mesh
   Event

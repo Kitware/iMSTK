@@ -29,6 +29,8 @@
 #include <mutex>
 #include <atomic>
 
+namespace imstk {
+
 /// \brief A simple camera class to calculate view and projection matrices
 ///
 /// \detail The camera will be oriented facing down the -Z axis with an +Y axis
@@ -50,12 +52,12 @@ public:
     /// \brief Set the position of the camera
     ///
     /// \param v 3 Dimensional vector describing the position of the camera
-    void setPos(const core::Vec3f &v);
+    void setPos(const Vec3f &v);
 
     /// \brief Get the position of the camera
     ///
     /// \return 3 Dimensional vector containing the position of the camera
-    const core::Vec3f &getPos() const;
+    const Vec3f &getPos() const;
 
     /// \brief Set the focal point of the camera
     ///
@@ -67,22 +69,22 @@ public:
     /// \brief Set the focal point of the camera
     ///
     /// \param v 3 Dimensional vector describing the focal point of the camera
-    void setFocus(const core::Vec3f &v);
+    void setFocus(const Vec3f &v);
 
     /// \brief Get the focal point of the camera
     ///
     /// \return 3 Dimensional vector containing the focal point of the camera
-    const core::Vec3f &getFocus() const;
+    const Vec3f &getFocus() const;
 
     /// \brief Get the up direction of the camera
     ///
     /// \return 3 Dimensional vector containing the up direction of the camera
-    const core::Vec3f &getUpVec();
+    const Vec3f &getUpVec();
 
     /// \brief Get the direction the camera is facing
     ///
     /// \return 3 Dimensional vector containing the direction of the camera
-    const core::Vec3f &getDirection() ;
+    const Vec3f &getDirection() ;
 
     //Projection settings
     /// \brief Set the aspect ratio of the camera
@@ -143,12 +145,12 @@ public:
     /// \brief Returns the internal view matrix for the camera
     ///
     /// \return A 4 by 4 matrix containing the view matrix of the camera
-    const core::Matrix44f &getViewMat();
+    const Matrix44f &getViewMat();
 
     /// \brief Returns the internal projection matrix for the camera
     ///
     /// \return A 4 by 4 matrix containing the projection matrix of the camera
-    const core::Matrix44f &getProjMat();
+    const Matrix44f &getProjMat();
 
     /// \brief Pan the camera view
     ///
@@ -156,7 +158,7 @@ public:
     /// amount
     ///
     /// \param v Vector describing how much to pan by in each direction
-    core::Vec3f pan(const core::Vec3f &v);
+    Vec3f pan(const Vec3f &v);
 
     /// \brief Zoom the camera
     ///
@@ -170,13 +172,13 @@ public:
     ///
     /// \param angle The angle in radians to rotate
     /// \param axis The axis to rotate about
-    void rotateLocal(const float &angle, const core::Vec3f &axis);
+    void rotateLocal(const float &angle, const Vec3f &axis);
 
     /// \brief Rotates about an arbitrary axis in focus point coordinates
     ///
     /// \param angle The angle in radians to rotate
     /// \param axis The axis to rotate about
-    void rotateFocus(const float &angle, const core::Vec3f &axis);
+    void rotateFocus(const float &angle, const Vec3f &axis);
 
     /// \brief Rotates about the camera's local X axis
     ///
@@ -236,9 +238,9 @@ public:
     /// \param up Upward facing direction of the camera
     ///
     /// \return A 4 by 4 matrix containing the view matrix
-    core::Matrix44f lookAt(const core::Vec3f &pos,
-                     const core::Vec3f &fp,
-                     const core::Vec3f &up) const;
+    Matrix44f lookAt(const Vec3f &pos,
+                     const Vec3f &fp,
+                     const Vec3f &up) const;
 
     /// \brief Creates a perspective matrix for use with OpenGL
     ///     Implementation adapted from Sylvain Pointeau's Blog:
@@ -250,7 +252,7 @@ public:
     /// \param zFar The far clipping distance
     ///
     /// \return A 4 by 4 matrix containing the perspective matrix
-    core::Matrix44f perspective(const float &fovy, const float &ar,
+    Matrix44f perspective(const float &fovy, const float &ar,
                           const float &zNear, const float &zFar) const;
 
     //Create matrices
@@ -304,12 +306,12 @@ public:
     /// \brief Replaces the internal quaternion with the one provided
     ///
     /// \param q New internal orientation quaternion
-    void setOrientation(const core::Quaternionf &q);
+    void setOrientation(const Quaternionf &q);
 
     /// \brief Returns the orientation of the camera
     ///
     /// \return The orientation of the camera as a quaternion
-    const core::Quaternionf &getOrientation();
+    const Quaternionf &getOrientation();
 
     /// \brief Replace the internal view matrix of the camera
     ///
@@ -317,7 +319,7 @@ public:
     /// updated also
     ///
     /// \param m The new view matrix of the camera
-    void setViewMat(const core::Matrix44f &m);
+    void setViewMat(const Matrix44f &m);
 
     /// \brief Replace the internal projection matrix of the camera
     ///
@@ -325,26 +327,26 @@ public:
     /// updated also
     ///
     /// \param m The new projection matrix of the camera
-    void setProjMat(const core::Matrix44f &m);
+    void setProjMat(const Matrix44f &m);
 
     /// \brief Sets the orientation  of the camera from a given direction
     ///
     /// \detail Generally used to orient the camera toward the focal point
     ///
     /// \param d Directional vector to orient the camera with
-    void setOrientFromDir(const core::Vec3f &d);
+    void setOrientFromDir(const Vec3f &d);
 
 private:
     //View matrix variables
-    core::Vec3f upVector;
-    core::Vec3f direction;
-    core::Vec3f pos; ///< position of the camera
+    Vec3f upVector;
+    Vec3f direction;
+    Vec3f pos; ///< position of the camera
     std::mutex posLock; //< Controls access to the pos variable
-    core::Vec3f fp; ///< focal point of the camera
+    Vec3f fp; ///< focal point of the camera
     std::mutex fpLock; //< Controls access to the fp variable
-    core::Quaternionf orientation; ///< orientation of the camera
+    Quaternionf orientation; ///< orientation of the camera
     std::mutex orientationLock; //< Controls access to the orientation variable
-    core::Matrix44f view; ///< View matrix for OpenGL
+    Matrix44f view; ///< View matrix for OpenGL
     std::mutex viewLock; //< Controls access to the view variable
     std::atomic_bool viewDirty; ///< True if view variables have been updated
     std::atomic_bool orientDirty; ///< True if orientation needs to be recalculated
@@ -355,9 +357,11 @@ private:
     std::atomic<float> angle; ///< angle in radians
     std::atomic<float> nearClip; ///< near clipping distance
     std::atomic<float> farClip; ///< far clipping distance
-    core::Matrix44f proj; ///< Projection matrix for OpenGL
+    Matrix44f proj; ///< Projection matrix for OpenGL
     std::mutex projLock; //< Controls access to the proj variable
     std::atomic_bool projDirty; ///< True if projection variables have been updated
 };
+
+}
 
 #endif

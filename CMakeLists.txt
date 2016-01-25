@@ -294,7 +294,6 @@ set(iMSTK_exports
   Core
   Devices
   Event
-  External
   Geometry
   IO
   Mesh
@@ -302,7 +301,6 @@ set(iMSTK_exports
   Simulators
   Solvers
   TimeIntegrators
-  VTKRendering
   VirtualTools
   SceneModels
   SimulationManager
@@ -320,7 +318,6 @@ add_subdirectory(Core)
 add_subdirectory(Devices)
 add_subdirectory(Event)
 add_subdirectory(Examples)
-add_subdirectory(External)
 add_subdirectory(Geometry)
 add_subdirectory(IO)
 add_subdirectory(Mesh)
@@ -330,7 +327,6 @@ add_subdirectory(SimulationManager)
 add_subdirectory(Solvers)
 add_subdirectory(SceneModels)
 add_subdirectory(TimeIntegrators)
-add_subdirectory(VTKRendering)
 add_subdirectory(VirtualTools)
 
 ################################################################################

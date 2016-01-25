@@ -31,7 +31,7 @@
 #include "Core/Module.h"
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
-#include "Core/ViewerBase.h"
+#include "Rendering/ViewerBase.h"
 #include "Core/BaseMesh.h"
 
 /// \brief maximum entities in the framework
@@ -40,6 +40,8 @@
 #define IMSTK_SDK_MAXOBJECTSIMULATORS 100
 #define IMSTK_SDK_MAXSCENES 100
 #define IMSTK_SDK_MAXSCENEOBJTECTS 100
+
+namespace imstk {
 
 template<typename T> class IndiceArray;
 class Scene;
@@ -116,7 +118,7 @@ public:
     void removeRef(std::shared_ptr<CoreClass> p_coreClass);
 
     /// \brief register functions
-    void registerMesh(std::shared_ptr<Core::BaseMesh> p_mesh);
+    void registerMesh(std::shared_ptr<BaseMesh> p_mesh);
 
     void registerModule(std::shared_ptr<Module> p_mod);
 
@@ -144,7 +146,7 @@ private:
     std::shared_ptr<Simulator> simulator; ///< Reference to the sdk simulator object
 
     ///holds the references to the entities in the framework
-    std::vector<std::shared_ptr<Core::BaseMesh>> meshList;
+    std::vector<std::shared_ptr<BaseMesh>> meshList;
     std::vector<std::shared_ptr<Module>> moduleList;
     std::vector<std::shared_ptr<ObjectSimulator>> simulatorList;
     std::vector<std::shared_ptr<CollisionDetection>> collisionDetectionList;
@@ -156,5 +158,7 @@ private:
     /// \brief constructor
     SDK();
 };
+
+}
 
 #endif

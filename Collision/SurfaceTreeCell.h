@@ -29,6 +29,8 @@
 #include "Core/Config.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 /// \brief contains the cell of the surface tree structure
 template <typename Derived>
 class SurfaceTreeCell
@@ -62,13 +64,13 @@ public:
     }
 
     /// \brief checks if the cell collided with a triangle primitive
-    inline bool isCollidedWithTri(const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2)
+    inline bool isCollidedWithTri(const Vec3d &v0, const Vec3d &v1, const Vec3d &v2)
     {
         return derived()->isCollidedWithTri(v0,v1,v2);
     }
 
     /// \brief checks if the cell contains the point primitive
-    inline bool isCollidedWithPoint(const core::Vec3d &point)
+    inline bool isCollidedWithPoint(const Vec3d &point)
     {
         return derived()->isCollidedWithPoint(point);
     }
@@ -80,7 +82,7 @@ public:
     }
 
     /// \brief set the center of the cell of surface tree
-    inline void setCenter(const core::Vec3d &center)
+    inline void setCenter(const Vec3d &center)
     {
         derived()->setCenter(center);
     }
@@ -92,7 +94,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline core::Vec3d &getCenter()
+    inline Vec3d &getCenter()
     {
         return derived()->getCenter();
     }
@@ -104,7 +106,7 @@ public:
     }
 
     /// \brief get the center of the cell of surface tree
-    inline const core::Vec3d &getCenter()  const
+    inline const Vec3d &getCenter()  const
     {
         return derived()->getCenter();
     }
@@ -218,5 +220,7 @@ private:
     std::vector<float> weights; ///< !!
     std::set<int> verticesIndices; ///< indices of vertices
 };
+
+}
 
 #endif

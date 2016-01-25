@@ -42,6 +42,8 @@
 #include <vtkPNGWriter.h>
 #include "vtkNew.h"
 
+namespace imstk {
+
 class DeviceInterface;
 
 ///
@@ -137,5 +139,7 @@ private:
     double minAngleY;
     double deltaAngleXY;
 };
+
+}
 
 #endif // iSMTK_LAPAROSCOPIC_CAMERA_COUPLER_H

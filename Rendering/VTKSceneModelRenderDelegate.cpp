@@ -20,31 +20,30 @@
 #include "Core/Model.h"
 #include "Core/Geometry.h"
 #include "SceneModels/StaticSceneObject.h"
-#include "VTKRendering/VTKRenderDelegate.h"
+#include "Rendering/VTKRenderDelegate.h"
 #include "Geometry/PlaneModel.h"
 #include "Geometry/MeshModel.h"
 
 // VTK includes
 #include <vtkActor.h>
 
-class StaticSceneObjectRenderDelegate : public VTKRenderDelegate
+namespace imstk {
+
+class SceneModelRenderDelegate : public VTKRenderDelegate
 {
 public:
     vtkActor *getActor() override;
-    void draw() const override
-    { }
 };
 
-vtkActor *StaticSceneObjectRenderDelegate::getActor()
+vtkActor *SceneModelRenderDelegate::getActor()
 {
-    StaticSceneObject* geom = this->getSourceGeometryAs<StaticSceneObject>();
+    SceneObject* geom = this->getSourceGeometryAs<SceneObject>();
     if (!geom)
     {
         return nullptr;
     }
 
-    auto planeModel = std::dynamic_pointer_cast<PlaneModel>(
-        geom->getVisualModel());
+    auto planeModel = std::dynamic_pointer_cast<PlaneModel>(geom->getVisualModel());
 
     if(planeModel)
     {
@@ -75,5 +74,7 @@ vtkActor *StaticSceneObjectRenderDelegate::getActor()
 }
 
 RegisterFactoryClass(RenderDelegate,
-                     StaticSceneObjectRenderDelegate,
+                     SceneModelRenderDelegate,
                      RenderDelegate::RendererType::VTK)
+
+}

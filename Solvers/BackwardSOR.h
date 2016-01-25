@@ -22,6 +22,8 @@
 
 #include "Solvers/BackwardGaussSeidel.h"
 
+namespace imstk {
+
 ///
 /// \brief Forward version of the Gauss Seidel successive overrelaxation sparse
 ///     linear solver.
@@ -44,7 +46,7 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param rhs Right hand side of the linear system of equations.
     ///
-    BackwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w = .5);
+    BackwardSOR(const SparseMatrixd &A, const Vectord &rhs, const double &w = .5);
 
     ///
     /// \brief Do one iteration of the method.
@@ -52,7 +54,7 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual Compute residual if true.
     ///
-    void iterate(core::Vectord &x, bool updateResidual = true) override;
+    void iterate(Vectord &x, bool updateResidual = true) override;
 
     ///
     /// \brief Set acceleration parameter.
@@ -70,5 +72,7 @@ private:
     double weight;
 
 };
+
+}
 
 #endif // BACKWARDSOR_H

@@ -31,8 +31,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/Geometry>
 
-namespace core
-{
+namespace imstk {
 
 /// A 2x2 matrix
 template<typename T>

@@ -30,13 +30,15 @@
 #include "Core/ErrorLog.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 class ToolCoupler;
 class MeshModel;
 ///
 /// \brief Default simulator that applies operations to the position array of the
 ///     undelying scene object model.
 ///     Operations can be added to the list of operator using \addOperation.
-///     This function takes a lambda with void(std::vector<core::Vec3d>&) signature.
+///     This function takes a lambda with void(std::vector<Vec3d>&) signature.
 ///
 class DefaultSimulator: public ObjectSimulator
 {
@@ -60,7 +62,7 @@ protected:
     virtual void run() override;
     void endExecution() override;
     void syncBuffers() override;
-    void handleEvent(std::shared_ptr<core::Event> p_event) override;
+    void handleEvent(std::shared_ptr<Event> p_event) override;
 
     void updateHapticForces(std::shared_ptr<SceneObject> sceneObject);
 
@@ -69,5 +71,7 @@ private:
     std::shared_ptr<ToolCoupler> hapticTool;
 
 };
+
+}
 
 #endif

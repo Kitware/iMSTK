@@ -28,6 +28,7 @@
 #include "Collision/OctreeCell.h"
 #include "Geometry/MeshModel.h"
 
+namespace imstk {
 
 class CollisionGroup;
 template<typename T>
@@ -80,12 +81,12 @@ public:
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const core::Vec3d& getSurfaceNormal(size_t i) const;
+    const Vec3d& getSurfaceNormal(size_t i) const;
 
     ///
     /// @brief Returns array of vertices for triangle on surface
     ///
-    std::array<core::Vec3d,3> getElementPositions(size_t i) const;
+    std::array<Vec3d,3> getElementPositions(size_t i) const;
 
     ///
     /// \brief Set/get bounding box
@@ -126,5 +127,7 @@ private:
     // Collision group this model belongs to.
     std::shared_ptr<CollisionGroup> collisionGroup;
 };
+
+}
 
 #endif // COLLISION_MESHMODEL_H

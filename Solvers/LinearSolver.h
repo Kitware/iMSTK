@@ -24,6 +24,8 @@
 #include "Solvers/SystemOfEquations.h"
 #include "Core/Matrix.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for linear solvers
 ///
@@ -44,7 +46,7 @@ public:
     ///
     /// \brief Main solve routine
     ///
-    virtual void solve(core::Vectord &x) = 0;
+    virtual void solve(Vectord &x) = 0;
 
     ///
     /// \brief Set/get the system. Replaces/Returns the stored linear system of equations.
@@ -66,6 +68,8 @@ protected:
     std::shared_ptr<LinearSystemType> linearSystem; /// Linear system of equations.
     double minTolerance;    ///> Convergence tolerance
 };
+
+}
 
 #include "Solvers/LinearSolver.hpp"
 

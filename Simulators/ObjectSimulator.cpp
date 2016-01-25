@@ -20,6 +20,8 @@
 #include "Simulators/ObjectSimulator.h"
 #include "SceneModels/SceneObject.h"
 
+namespace imstk {
+
 ObjectSimulator::ObjectSimulator():
     enabled(false),
     isObjectSimInitialized(false),
@@ -32,7 +34,7 @@ ObjectSimulator::ObjectSimulator():
     executionType(ExecutionType::SyncMode)
 {
     this->name = "Controller-" + std::to_string(CoreClass::getUniqueId()->getId());
-    this->type = core::ClassType::Simulator;
+    this->type = ClassType::Simulator;
 }
 
 //---------------------------------------------------------------------------
@@ -155,4 +157,6 @@ void ObjectSimulator::run()
     {
         model->update(this->timeStep);
     }
+}
+
 }

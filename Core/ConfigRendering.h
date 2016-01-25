@@ -20,6 +20,8 @@
 #ifndef CORE_CONFIGRENDERING_H
 #define CORE_CONFIGRENDERING_H
 
+namespace imstk {
+
 /// \brief this shows the Vertex Buffer Object Size
 ///It should be bigger than the total data of vertices and indices of the scene objects.
 ///the value is in bytes
@@ -83,5 +85,7 @@ enum VBOResult
 #define    IMSTK_VIEWERRENDER_DYNAMICREFLECTION              (1<<12)
 #define    IMSTK_VIEWERRENDER_GLOBAL_AXIS                    (1<<13)
 #define    IMSTK_DISABLE_MOUSE_INTERACTION                   (1<<14)
+
+}
 
 #endif // CORE_CONFIGRENDERING_H

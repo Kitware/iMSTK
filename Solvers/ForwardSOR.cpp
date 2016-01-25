@@ -19,16 +19,18 @@
 
 #include "ForwardSOR.h"
 
+namespace imstk {
+
 ForwardSOR::ForwardSOR(): weight(.9) {}
 
 //---------------------------------------------------------------------------
 ForwardSOR::
-ForwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w)
+ForwardSOR(const SparseMatrixd &A, const Vectord &rhs, const double &w)
     : ForwardGaussSeidel(A, rhs), weight(w)
 {}
 
 //---------------------------------------------------------------------------
-void ForwardSOR::iterate(core::Vectord &x, bool updateResidual)
+void ForwardSOR::iterate(Vectord &x, bool updateResidual)
 {
     auto old = x; // necessary copy
     ForwardGaussSeidel::iterate(x, updateResidual);
@@ -45,4 +47,6 @@ void ForwardSOR::setWeight(const double &newWeight)
 const double &ForwardSOR::getWeight() const
 {
     return this->weight;
+}
+
 }

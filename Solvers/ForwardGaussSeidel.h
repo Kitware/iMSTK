@@ -25,6 +25,8 @@
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 ///
 /// \brief Forward Gauss-Seidel sparse linear system solver.
 ///
@@ -44,7 +46,7 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param rhs Right hand side of the linear equation.
     ///
-    ForwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
+    ForwardGaussSeidel(const SparseMatrixd &A, const Vectord &rhs);
 
     ///
     /// \brief Does one iteration of the GaussSeidel method.
@@ -52,7 +54,7 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual True if you want to compute the residual.
     ///
-    void iterate(core::Vectord &x, bool updateResidual = true) override;
+    void iterate(Vectord &x, bool updateResidual = true) override;
 
     ///
     /// \brief Does one iteration of the GaussSeidel method. This version of the method
@@ -61,7 +63,7 @@ public:
     ///
     /// \param x Current iterate.
     ///
-    void relax(core::Vectord &x);
+    void relax(Vectord &x);
 
     ///
     /// \brief Set the system. Sets the stored linear system of equations.
@@ -71,5 +73,7 @@ public:
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 };
+
+}
 
 #endif // SOLVERS_FORWARD_GAUSS_SEIDEL

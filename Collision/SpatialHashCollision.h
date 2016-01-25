@@ -28,6 +28,8 @@
 #include "Core/DataStructures.h"
 #include "Core/MakeUnique.h"
 
+namespace imstk {
+
 class CellLine;
 class CellModel;
 class CellPoint;
@@ -137,5 +139,7 @@ private:
     struct HashFunction;
     std::unique_ptr<HashFunction> hasher;
 };
+
+}
 
 #endif

@@ -24,7 +24,7 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace event {
+namespace imstk {
 
 enum class MouseButton
 {
@@ -37,10 +37,10 @@ enum class MouseButton
     Reset
 };
 
-class MouseButtonEvent : public core::Event
+class MouseButtonEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     MouseButtonEvent(const MouseButton &button);
@@ -53,14 +53,14 @@ public:
 
     const bool &togglePressed();
 
-    void setWindowCoord(const core::Vec2d &coordinates);
+    void setWindowCoord(const Vec2d &coordinates);
 
-    const core::Vec2d &getWindowCoord();
+    const Vec2d &getWindowCoord();
 
 private:
     bool pressed; // If the button was pressed or released in this event
     MouseButton mouseButton; // Which mouse button was pressed
-    core::Vec2d coord; // X,Y coorindate relative to left edge
+    Vec2d coord; // X,Y coorindate relative to left edge
 };
 
 } // event namespace

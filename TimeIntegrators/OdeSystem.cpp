@@ -19,6 +19,8 @@
 
 #include "TimeIntegrators/OdeSystem.h"
 
+namespace imstk {
+
 OdeSystem::OdeSystem(): BaseSystem(systemMatrix, rhs)
 {
 }
@@ -148,4 +150,6 @@ void OdeSystem::computeImplicitSystemRHS(const OdeSystemState &state,
         this->rhs -= timeStep*this->Damping(newState)*newState.getVelocities();
     }
     state.applyBoundaryConditions(this->rhs);
+}
+
 }

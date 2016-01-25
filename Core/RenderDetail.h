@@ -20,23 +20,26 @@
 #ifndef CORE_RENDERDETAIL_H
 #define CORE_RENDERDETAIL_H
 
-#include "Core/Config.h"
-#include "Core/Color.h"
-#include "Core/ConfigRendering.h"
-#include <vtk_glew.h>
-
 #include <memory>
 #include <vector>
 #include <string>
 #include <map>
 #include <array>
 
+#include <vtk_glew.h>
+
+#include "Core/Config.h"
+#include "Core/Color.h"
+#include "Core/ConfigRendering.h"
+
+class vtkOpenGLTexture;
+
+namespace imstk {
+
 class VisualArtifact;
 class CoreClass;
 class Model;
 struct UnifiedId;
-
-class vtkOpenGLTexture;
 
 ///
 /// \brief Hold a pointer to a source of geometry that render details can use for drawing.
@@ -384,5 +387,7 @@ private:
     std::map<std::string,int> shaderAttributes;
     std::map<std::string, TextureDetail> textures;
 };
+
+}
 
 #endif // CORE_RENDERDETAIL_H

@@ -35,3 +35,7 @@ target_link_libraries(Assembler
 	TimeIntegrators
 	SceneModels
 )
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

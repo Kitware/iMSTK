@@ -22,7 +22,7 @@
 
 #include "Core/Config.h"
 
-namespace event {
+namespace imstk {
 
 enum class ModKey : unsigned int
 {

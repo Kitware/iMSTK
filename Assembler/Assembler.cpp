@@ -26,6 +26,8 @@
 #include "TimeIntegrators/OdeSystem.h"
 #include "Solvers/SystemOfEquations.h"
 
+namespace imstk {
+
 Assembler::Assembler(std::shared_ptr <CollisionContext> collContext)
 {
     this->collisionContext = collContext;
@@ -86,8 +88,8 @@ void Assembler::initSystem()
     {
         size_t dofSize = 0;
         size_t nnz = 0;
-        std::vector<const core::SparseMatrixd *> systemMatrices;
-        std::vector<const core::Vectord *> rhsVector;
+        std::vector<const SparseMatrixd *> systemMatrices;
+        std::vector<const Vectord *> rhsVector;
 
         for(auto & col : rows)
         {
@@ -123,16 +125,18 @@ void Assembler::initSystem()
 }
 
 //---------------------------------------------------------------------------
-void Assembler::concatenateMatrix(const core::SparseMatrixd &Q,
-                                  core::SparseMatrixd &R,
+void Assembler::concatenateMatrix(const SparseMatrixd &Q,
+                                  SparseMatrixd &R,
                                   std::size_t i,
                                   std::size_t j)
 {
     for(size_t k = i; k < i + Q.outerSize(); ++k)
     {
-        for(core::SparseMatrixd::InnerIterator it(Q, k); it; ++it)
+        for(SparseMatrixd::InnerIterator it(Q, k); it; ++it)
         {
             R.insert(k, it.col() + j) = it.value();
         }
     }
+}
+
 }

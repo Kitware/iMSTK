@@ -21,6 +21,8 @@
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>
 
+namespace imstk {
+
 VRPNDeviceClient::VRPNDeviceClient(DeviceType deviceType, std::string deviceURL)
     : deviceType(deviceType),
     deviceURL(deviceURL)
@@ -107,8 +109,6 @@ void VRPNDeviceClient::processChanges()
 void VRPN_CALLBACK
 VRPNDeviceClient::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 {
-    //std::cout<<"- Button "<< b.button << " : " << b.state << std::endl;
-
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     if (b.button < vrpn_int32(handler->buttons.size()))
@@ -122,8 +122,6 @@ VRPNDeviceClient::buttonChangeHandler(void *userData, const vrpn_BUTTONCB b)
 void VRPN_CALLBACK
 VRPNDeviceClient::velocityChangeHandler(void *userData, const vrpn_TRACKERVELCB v)
 {
-    //std::cout<<"- Velocity : ["<< v.vel[0] <<", "<< v.vel[1]<<", "<< v.vel[2] <<"]"<< std::endl;
-
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     handler->velocity << v.vel[0], v.vel[1], v.vel[2];
@@ -134,9 +132,6 @@ VRPNDeviceClient::velocityChangeHandler(void *userData, const vrpn_TRACKERVELCB 
 void VRPN_CALLBACK
 VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 {
-    //std::cout<<"Position : ["<< t.pos[0] <<", "<< t.pos[1] <<", "<< t.pos[2] <<"]"<< std::endl;
-    //std::cout<<"Orientation : ["<< t.quat <<", "<< t.quat <<", "<< t.quat <<"]"<< std::endl;
-
     auto handler = reinterpret_cast<VRPNDeviceClient*>(userData);
 
     handler->position << t.pos[0], t.pos[1], t.pos[2];
@@ -153,10 +148,6 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const vrpn_TRACKERCB t)
 void VRPN_CALLBACK
 VRPNDeviceClient::analogChangeHandler(void* userData, const vrpn_ANALOGCB a)
 {
-    //std::cout << "Analog : ";
-    //for( int i=0; i < a.num_channel; i++ ) std::cout << a.channel[i] << " ";
-    //std::cout << std::endl;
-
     auto handler = reinterpret_cast< VRPNDeviceClient * >( userData );
 
     if(a.num_channel > 0)
@@ -166,10 +157,12 @@ VRPNDeviceClient::analogChangeHandler(void* userData, const vrpn_ANALOGCB a)
     }
     if(a.num_channel > 3)
     {
-        handler->orientation = Eigen::AngleAxisd(a.channel[3]*M_PI,core::Vec3d::UnitX())*
-                               Eigen::AngleAxisd(a.channel[4]*M_PI,core::Vec3d::UnitY())*
-                               Eigen::AngleAxisd(a.channel[5]*M_PI,core::Vec3d::UnitZ());
+        handler->orientation = Eigen::AngleAxisd(a.channel[3]*M_PI,Vec3d::UnitX())*
+                               Eigen::AngleAxisd(a.channel[4]*M_PI,Vec3d::UnitY())*
+                               Eigen::AngleAxisd(a.channel[5]*M_PI,Vec3d::UnitZ());
         handler->quatTimer.start();
     }
     return;
+}
+
 }

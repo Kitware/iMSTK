@@ -24,22 +24,24 @@
 #include "External/Moller/moller.h"
 #include "External/Moller/moller2.h"
 
-bool CollisionMoller::tri2tri( core::Vec3d &tri1Point1,
-                                   core::Vec3d &tri1Point2,
-                                   core::Vec3d &tri1Point3,
-                                   core::Vec3d &tri2Point1,
-                                   core::Vec3d &tri2Point2,
-                                   core::Vec3d &tri2Point3,
+namespace imstk {
+
+bool CollisionMoller::tri2tri( Vec3d &tri1Point1,
+                                   Vec3d &tri1Point2,
+                                   Vec3d &tri1Point3,
+                                   Vec3d &tri2Point1,
+                                   Vec3d &tri2Point2,
+                                   Vec3d &tri2Point3,
                                    double &depth,
-                                   core::Vec3d &contactPoint,
-                                   core::Vec3d &normal)
+                                   Vec3d &contactPoint,
+                                   Vec3d &normal)
 {
     int coplanar;
-    core::Vec3d intersectionPoint2;
+    Vec3d intersectionPoint2;
     short tri1SinglePointIndex;
     short tri2SinglePointIndex;
-    core::Vec3d projPoint1;
-    core::Vec3d projPoint2;
+    Vec3d projPoint1;
+    Vec3d projPoint2;
     if ( tri_tri_intersect_with_isectline_penetrationDepth( tri1Point1.data(),
                                                             tri1Point2.data(),
                                                             tri1Point3.data(),
@@ -62,22 +64,22 @@ bool CollisionMoller::tri2tri( core::Vec3d &tri1Point1,
     return false;
 }
 
-bool CollisionMoller::tri2tri( core::Vec3d &p_tri1Point1,
-                                   core::Vec3d &p_tri1Point2,
-                                   core::Vec3d &p_tri1Point3,
-                                   core::Vec3d &p_tri2Point1,
-                                   core::Vec3d &p_tri2Point2,
-                                   core::Vec3d &p_tri2Point3,
+bool CollisionMoller::tri2tri( Vec3d &p_tri1Point1,
+                                   Vec3d &p_tri1Point2,
+                                   Vec3d &p_tri1Point3,
+                                   Vec3d &p_tri2Point1,
+                                   Vec3d &p_tri2Point2,
+                                   Vec3d &p_tri2Point3,
                                    int &coplanar,
-                                   core::Vec3d &p_intersectionPoint1,
-                                   core::Vec3d &p_intersectionPoint2,
+                                   Vec3d &p_intersectionPoint1,
+                                   Vec3d &p_intersectionPoint2,
                                    short &p_tri1SinglePointIndex,
                                    short &p_tri2SinglePointIndex,
-                                   core::Vec3d &p_projPoint1,
-                                   core::Vec3d &p_projPoint2 )
+                                   Vec3d &p_projPoint1,
+                                   Vec3d &p_projPoint2 )
 {
     double depth;
-    core::Vec3d normal;
+    Vec3d normal;
     if ( tri_tri_intersect_with_isectline_penetrationDepth( p_tri1Point1.data(),
                                                             p_tri1Point2.data(),
                                                             p_tri1Point3.data(),
@@ -97,7 +99,7 @@ bool CollisionMoller::tri2tri( core::Vec3d &p_tri1Point1,
     return false;
 }
 
-bool CollisionMoller::tri2tri( core::Vec3d &p_tri1Point1, core::Vec3d &p_tri1Point2, core::Vec3d &p_tri1Point3, core::Vec3d &p_tri2Point1, core::Vec3d &p_tri2Point2, core::Vec3d &p_tri2Point3 )
+bool CollisionMoller::tri2tri( Vec3d &p_tri1Point1, Vec3d &p_tri1Point2, Vec3d &p_tri1Point3, Vec3d &p_tri2Point1, Vec3d &p_tri2Point2, Vec3d &p_tri2Point3 )
 {
     if(tri_tri_intersect(p_tri1Point1.data(), p_tri1Point2.data(),
                          p_tri1Point3.data(), p_tri2Point1.data(),
@@ -139,8 +141,8 @@ bool CollisionMoller::checkOverlapAABBAABB( AABB &aabbA, AABB &aabbB, AABB &resu
 bool CollisionMoller::checkOverlapAABBAABB( const AABB &aabbA, const AABB &aabbB )
 {
 
-    const core::Vec3d &min = aabbA.getMin();
-    const core::Vec3d &max = aabbA.getMax();
+    const Vec3d &min = aabbA.getMin();
+    const Vec3d &max = aabbA.getMax();
 
     if ( min[0] > aabbB.aabbMax[0] ||
          max[0] < aabbB.aabbMin[0] ||
@@ -157,7 +159,7 @@ bool CollisionMoller::checkOverlapAABBAABB( const AABB &aabbA, const AABB &aabbB
     }
 }
 
-bool CollisionMoller::checkOverlapAABBAABB( AABB &aabbA, core::Vec3d &p_vertex )
+bool CollisionMoller::checkOverlapAABBAABB( AABB &aabbA, Vec3d &p_vertex )
 {
 
     if ( aabbA.aabbMin[0] <= p_vertex[0] && aabbA.aabbMax[0] >= p_vertex[0] &&
@@ -172,7 +174,7 @@ bool CollisionMoller::checkOverlapAABBAABB( AABB &aabbA, core::Vec3d &p_vertex )
     }
 }
 
-bool CollisionMoller::checkAABBPoint( const AABB &p_aabb, const core::Vec3d &p_v )
+bool CollisionMoller::checkAABBPoint( const AABB &p_aabb, const Vec3d &p_v )
 {
     if ( p_v[0] >= p_aabb.aabbMin[0] &&
          p_v[1] >= p_aabb.aabbMin[1] &&
@@ -189,19 +191,19 @@ bool CollisionMoller::checkAABBPoint( const AABB &p_aabb, const core::Vec3d &p_v
     }
 }
 
-bool CollisionMoller::checkLineTri( core::Vec3d &p_linePoint1, core::Vec3d &p_linePoint2, core::Vec3d &p_tri1Point1, core::Vec3d &p_tri1Point2, core::Vec3d &p_tri1Point3, core::Vec3d &p_interSection )
+bool CollisionMoller::checkLineTri( Vec3d &p_linePoint1, Vec3d &p_linePoint2, Vec3d &p_tri1Point1, Vec3d &p_tri1Point2, Vec3d &p_tri1Point3, Vec3d &p_interSection )
 {
 
     //First find that ray intersect the polygon or not
     int i1, i2;
-    core::Vec3d U, V;
+    Vec3d U, V;
     double plane[4], P[3], u[3], v[3], alpha, beta;
 
     //Now find the Normal vector
     U = p_tri1Point2 - p_tri1Point1;
     V = p_tri1Point3 - p_tri1Point1;
 
-    core::Vec3d cProd;
+    Vec3d cProd;
     cProd = U.cross( V );
     cProd.normalize();
 
@@ -212,7 +214,7 @@ bool CollisionMoller::checkLineTri( core::Vec3d &p_linePoint1, core::Vec3d &p_li
 
     //Now we got the plane equation and we can test whether our ray intersect or not
     double d1, d2, d, t;
-    core::Vec3d dir;
+    Vec3d dir;
 
     d1 = p_linePoint1.dot( cProd ) + plane[3];
     d2 = p_linePoint2.dot( cProd ) + plane[3];
@@ -286,12 +288,12 @@ bool CollisionMoller::checkLineTri( core::Vec3d &p_linePoint1, core::Vec3d &p_li
     return false;
 }
 
-bool CollisionMoller::checkAABBTriangle( AABB &p_aabb, core::Vec3d &v1, core::Vec3d &v2, core::Vec3d &v3 )
+bool CollisionMoller::checkAABBTriangle( AABB &p_aabb, Vec3d &v1, Vec3d &v2, Vec3d &v3 )
 {
 
-    core::Vec3d boxhalfsize;
-    core::Vec3d boxCenter;
-    core::Matrix33d triverts;
+    Vec3d boxhalfsize;
+    Vec3d boxCenter;
+    Matrix33d triverts;
     triverts << v1[0],v1[1],v1[2],
                 v2[0],v2[1],v2[2],
                 v3[0],v3[1],v3[2];
@@ -306,4 +308,6 @@ bool CollisionMoller::checkAABBTriangle( AABB &p_aabb, core::Vec3d &v1, core::Ve
         return true;
     }
     return false;
+}
+
 }

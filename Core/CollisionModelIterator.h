@@ -20,6 +20,8 @@
 #ifndef CORE_CORE_COLLISIONMODELITERATOR_H
 #define CORE_CORE_COLLISIONMODELITERATOR_H
 
+namespace imstk {
+
 /// \brief !!
 template <typename T>
 class CollisionModelIterator
@@ -37,5 +39,7 @@ public:
     inline void operator--(){}
     inline T operator[](int /*p_index*/){ return T(); }
 };
+
+}
 
 #endif

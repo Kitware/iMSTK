@@ -36,7 +36,7 @@
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
 #include "IO/InitIO.h"
-#include "VTKRendering/InitVTKRendering.h"
+#include "Rendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
 int main(int ac, char **av)
@@ -47,25 +47,25 @@ int main(int ac, char **av)
         configFile = av[1];
     }
 
-    InitVTKRendering();
-    InitIODelegates();
+    imstk::InitVTKRendering();
+    imstk::InitIODelegates();
 
     //-------------------------------------------------------
     // 1. Create an instance of the iMSTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
-    auto sdk = SDK::createStandardSDK();
+    auto sdk = imstk::SDK::createStandardSDK();
     auto sdkSimulator = sdk->getSimulator();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
     // create a FEM simulator
-    auto femSimulator = std::make_shared<ObjectSimulator>();
+    auto femSimulator = std::make_shared<imstk::ObjectSimulator>();
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femModel = std::make_shared<VegaFEMDeformableSceneObject>("nidusV1764.vtk",
+    auto femModel = std::make_shared<imstk::VegaFEMDeformableSceneObject>("nidusV1764.vtk",
                                                                    configFile);
 
     sdk->addSceneActor(femModel, femSimulator);
@@ -74,13 +74,13 @@ int main(int ac, char **av)
     // Create scene actor 2:  plane + dummy simulator
     //-------------------------------------------------------
     // Create dummy simulator
-    auto staticSimulator = std::make_shared<ObjectSimulator>();
+    auto staticSimulator = std::make_shared<imstk::ObjectSimulator>();
 
     // Create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<StaticSceneObject>();
+    auto staticObject = std::make_shared<imstk::StaticSceneObject>();
 
-    auto plane = std::make_shared<PlaneCollisionModel>(core::Vec3d(0.0,0.0,-35.0),
-                                                       core::Vec3d(0.0,0.0,1.0));
+    auto plane = std::make_shared<imstk::PlaneCollisionModel>(imstk::Vec3d(0.0,0.0,-35.0),
+                                                       imstk::Vec3d(0.0,0.0,1.0));
 
     staticObject->setModel(plane);
     sdk->addSceneActor(staticObject, staticSimulator);
@@ -95,19 +95,19 @@ int main(int ac, char **av)
     }
     else
     {
-        auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
+        auto planeMeshCollisionPairs = std::make_shared<imstk::CollisionManager>();
         planeMeshCollisionPairs->setModels(meshModel, plane);
 
         sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-        auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+        auto planeToMeshCollisionDetection = std::make_shared<imstk::PlaneToMeshCollision>();
 
         sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
         //-------------------------------------------------------
         // Enable contact handling between scene actors 1 and 2
         //-------------------------------------------------------
-        auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+        auto planeToMeshContact = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
         planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
         planeToMeshContact->setSceneObjects(staticObject, femModel);
 
@@ -133,16 +133,16 @@ int main(int ac, char **av)
     viewer->registerScene(scene);
 
     // Setup Scene lighting
-    auto light1 = Light::getDefaultLighting();
-    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    auto light1 = imstk::Light::getDefaultLighting();
+    light1->lightPos.setPosition(imstk::Vec3d(-25.0, 10.0, 10.0));
     scene->addLight(light1);
 
-    auto light2 = Light::getDefaultLighting();
-    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    auto light2 = imstk::Light::getDefaultLighting();
+    light2->lightPos.setPosition(imstk::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
 
     // Camera setup
-    auto sceneCamera = Camera::getDefaultCamera();
+    auto sceneCamera = imstk::Camera::getDefaultCamera();
     sceneCamera->setPos(-60,0,0);
     sceneCamera->setZoom(.5);
     scene->addCamera(sceneCamera);

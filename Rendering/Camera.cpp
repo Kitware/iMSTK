@@ -21,6 +21,8 @@
 #include "Core/Vector.h"
 #include "Rendering/Camera.h"
 
+namespace imstk {
+
 Camera::Camera()
     : pos(0, 0, 0),
       fp(0, 0, -1),
@@ -35,7 +37,7 @@ Camera::Camera()
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3f &Camera::getPos() const
+const Vec3f &Camera::getPos() const
 {
     std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(this->posLock));
     return this->pos;
@@ -44,10 +46,10 @@ const core::Vec3f &Camera::getPos() const
 //---------------------------------------------------------------------------
 void Camera::setPos(const float &x, const float &y, const float &z)
 {
-    this->setPos(core::Vec3f(x, y, z));
+    this->setPos(Vec3f(x, y, z));
 }
 
-void Camera::setPos(const core::Vec3f &v)
+void Camera::setPos(const Vec3f &v)
 {
     {//scoped for mutex release
         std::lock_guard<std::mutex> lock(this->posLock);
@@ -57,7 +59,7 @@ void Camera::setPos(const core::Vec3f &v)
     this->orientDirty.store(true);
 }
 
-const core::Vec3f &Camera::getFocus() const
+const Vec3f &Camera::getFocus() const
 {
     std::lock_guard<std::mutex> lock(const_cast<std::mutex&>(this->fpLock));
     return this->fp;
@@ -65,10 +67,10 @@ const core::Vec3f &Camera::getFocus() const
 
 void Camera::setFocus(const float &x, const float &y, const float &z)
 {
-    this->setFocus(core::Vec3f(x, y, z));
+    this->setFocus(Vec3f(x, y, z));
 }
 
-void Camera::setFocus(const core::Vec3f &v)
+void Camera::setFocus(const Vec3f &v)
 {
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(this->fpLock);
@@ -78,15 +80,15 @@ void Camera::setFocus(const core::Vec3f &v)
     this->orientDirty.store(true);
 }
 
-const core::Vec3f &Camera::getUpVec()
+const Vec3f &Camera::getUpVec()
 {
-    this->upVector = getOrientation() * core::Vec3f::UnitY();
+    this->upVector = getOrientation() * Vec3f::UnitY();
     return this->upVector;
 }
 
-const core::Vec3f &Camera::getDirection()
+const Vec3f &Camera::getDirection()
 {
-    this->direction = -(getOrientation() * core::Vec3f::UnitZ());
+    this->direction = -(getOrientation() * Vec3f::UnitZ());
     return this->direction;
 }
 
@@ -146,7 +148,7 @@ void Camera::setFarClipDist(const float &d)
     this->projDirty.store(true);
 }
 
-void Camera::setOrientation(const core::Quaternionf &q)
+void Camera::setOrientation(const Quaternionf &q)
 {
     { //scoped for mutex release
     std::lock_guard<std::mutex> lock(orientationLock);
@@ -155,22 +157,22 @@ void Camera::setOrientation(const core::Quaternionf &q)
     this->orientDirty.store(false);
 }
 
-void Camera::setOrientFromDir(const core::Vec3f &d)
+void Camera::setOrientFromDir(const Vec3f &d)
 {
-    core::Matrix33f camAxes;
-    core::Vec3f tempUp;
+    Matrix33f camAxes;
+    Vec3f tempUp;
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(orientationLock);
-        tempUp = this->orientation * core::Vec3f::UnitY();
+        tempUp = this->orientation * Vec3f::UnitY();
     }
 
     camAxes.col(2) = (-d).normalized();
     camAxes.col(0) = tempUp.cross( camAxes.col(2) ).normalized();
     camAxes.col(1) = camAxes.col(2).cross( camAxes.col(0) ).normalized();
-    this->setOrientation(core::Quaternionf(camAxes));
+    this->setOrientation(Quaternionf(camAxes));
 }
 
-const core::Quaternionf &Camera::getOrientation()
+const Quaternionf &Camera::getOrientation()
 {
     if (this->orientDirty.load())
     {
@@ -180,7 +182,7 @@ const core::Quaternionf &Camera::getOrientation()
     return this->orientation;
 }
 
-const core::Matrix44f &Camera::getViewMat()
+const Matrix44f &Camera::getViewMat()
 {
     if (this->viewDirty.load())
     {
@@ -190,7 +192,7 @@ const core::Matrix44f &Camera::getViewMat()
     return this->view;
 }
 
-void Camera::setViewMat(const core::Matrix44f &m)
+void Camera::setViewMat(const Matrix44f &m)
 {
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(this->viewLock);
@@ -199,7 +201,7 @@ void Camera::setViewMat(const core::Matrix44f &m)
     this->viewDirty.store(false);
 }
 
-const core::Matrix44f &Camera::getProjMat()
+const Matrix44f &Camera::getProjMat()
 {
     if (this->projDirty.load())
     {
@@ -209,7 +211,7 @@ const core::Matrix44f &Camera::getProjMat()
     return this->proj;
 }
 
-void Camera::setProjMat(const core::Matrix44f &m)
+void Camera::setProjMat(const Matrix44f &m)
 {
     { //scoped for mutex release
         std::lock_guard<std::mutex> lock(this->projLock);
@@ -218,7 +220,7 @@ void Camera::setProjMat(const core::Matrix44f &m)
     this->projDirty.store(false);
 }
 
-core::Vec3f Camera::pan(const core::Vec3f &v)
+Vec3f Camera::pan(const Vec3f &v)
 {
     auto u = this->getOrientation() * v;
     this->setPos(this->getPos() + u);
@@ -235,20 +237,20 @@ void Camera::zoom(const float &d)
     }
 }
 
-void Camera::rotateLocal(const float &angle, const core::Vec3f &axis)
+void Camera::rotateLocal(const float &angle, const Vec3f &axis)
 {
     float dist = (this->getPos() - this->getFocus()).norm();
-    core::Quaternionf q;
+    Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(this->getOrientation() * q);
     setFocus(this->getPos() + dist * this->getDirection());
 }
 
-void Camera::rotateFocus(const float &angle, const core::Vec3f &axis)
+void Camera::rotateFocus(const float &angle, const Vec3f &axis)
 {
     float dist = (this->getFocus() - this->getPos()).norm();
-    core::Quaternionf q;
+    Quaternionf q;
     q = Eigen::AngleAxisf(angle, axis.normalized());
 
     setOrientation(this->getOrientation() * q);
@@ -257,44 +259,44 @@ void Camera::rotateFocus(const float &angle, const core::Vec3f &axis)
 
 void Camera::rotateLocalX(const float &angle)
 {
-    rotateLocal(angle, core::Vec3f::UnitX());
+    rotateLocal(angle, Vec3f::UnitX());
 }
 
 void Camera::rotateLocalY(const float &angle)
 {
-    rotateLocal(angle, core::Vec3f::UnitY());
+    rotateLocal(angle, Vec3f::UnitY());
 }
 
 void Camera::rotateLocalZ(const float &angle)
 {
-    rotateLocal(angle, core::Vec3f::UnitZ());
+    rotateLocal(angle, Vec3f::UnitZ());
 }
 
 void Camera::rotateFocusX(const float &angle)
 {
-    rotateFocus(angle, core::Vec3f::UnitX());
+    rotateFocus(angle, Vec3f::UnitX());
 }
 
 void Camera::rotateFocusY(const float &angle)
 {
-    rotateFocus(angle, core::Vec3f::UnitY());
+    rotateFocus(angle, Vec3f::UnitY());
 }
 
 void Camera::rotateFocusZ(const float &angle)
 {
-    rotateFocus(angle, core::Vec3f::UnitZ());
+    rotateFocus(angle, Vec3f::UnitZ());
 }
 
-core::Matrix44f Camera::lookAt(const core::Vec3f &pos,
-                         const core::Vec3f &fp,
-                         const core::Vec3f &up) const
+Matrix44f Camera::lookAt(const Vec3f &pos,
+                         const Vec3f &fp,
+                         const Vec3f &up) const
 {
-    core::Vec3f f = (fp - pos).normalized();
-    core::Vec3f u = up.normalized();
-    core::Vec3f s = f.cross(u).normalized();
+    Vec3f f = (fp - pos).normalized();
+    Vec3f u = up.normalized();
+    Vec3f s = f.cross(u).normalized();
     u = s.cross(f);
 
-    core::Matrix44f res;
+    Matrix44f res;
     res <<  s.x(),s.y(),s.z(),-s.dot(pos),
             u.x(),u.y(),u.z(),-u.dot(pos),
             -f.x(),-f.y(),-f.z(),f.dot(pos),
@@ -308,14 +310,14 @@ void Camera::genViewMat()
     this->setViewMat(Camera::lookAt(getPos(), getFocus(), getUpVec()));
 }
 
-core::Matrix44f Camera::perspective(const float &fovy, const float &ar,
+Matrix44f Camera::perspective(const float &fovy, const float &ar,
                               const float &zNear, const float &zFar) const
 {
     assert(ar > 0);
     assert(zFar > zNear);
 
     double tanHalfFovy = std::tan(fovy / 2.0);
-    core::Matrix44f res = core::Matrix44f::Zero();
+    Matrix44f res = Matrix44f::Zero();
 
     res(0,0) = 1.0 / (ar * tanHalfFovy);
     res(1,1) = 1.0 / (tanHalfFovy);
@@ -329,4 +331,6 @@ void Camera::genProjMat()
 {
     this->setProjMat(Camera::perspective(getViewAngle(), getAspectRatio(),
                                          getNearClipDist(), getFarClipDist()));
+}
+
 }

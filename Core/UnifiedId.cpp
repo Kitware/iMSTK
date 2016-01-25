@@ -19,6 +19,8 @@
 
 #include "Core/UnifiedId.h"
 
+namespace imstk {
+
 std::atomic_int UnifiedId::IDcounter;
 UnifiedId::UnifiedId()
 {
@@ -31,4 +33,6 @@ bool UnifiedId::operator==(const UnifiedId* id)
 bool UnifiedId::operator!=(const short int& id)
 {
     return (ID != id);
+}
+
 }

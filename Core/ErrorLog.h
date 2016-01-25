@@ -34,6 +34,8 @@
 
 #define PRINT_ERROR_LOCATION std::cout << "Error! In file: " << __FILE__ << "; at line: " << __LINE__ << std::endl;
 
+namespace imstk {
+
 /// \brief This is class is for error logging of the whole iMSTK system.
 /// All errors should be reported to the instance of this class.
 /// Functions are thread-safe unless indicated.
@@ -44,7 +46,7 @@ private:
     std::vector<std::string> errors; ///< error messages
     std::vector<int> timeStamps; ///< time stamps for errors
     std::mutex logLock; ///< mutex to sync access to logs
-    core::Timer time; ///< Timer for timestamps
+    Timer time; ///< Timer for timestamps
     bool consoleOutput; ///< Flag to print errors to stdout
 
 public:
@@ -76,5 +78,7 @@ public:
     /// \param flag Set true to enable, false to disable copy to console
     void setConsoleOutput(bool flag);
 };
+
+}
 
 #endif

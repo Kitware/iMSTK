@@ -28,6 +28,8 @@
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 // Forward declarations
 class CollisionContext;
 
@@ -42,7 +44,7 @@ class LinearSystem;
 class Assembler : public CoreClass
 {
 public:
-    using SparseLinearSystem = LinearSystem<core::SparseMatrixd>;
+    using SparseLinearSystem = LinearSystem<SparseMatrixd>;
 
 public:
     ///
@@ -88,8 +90,8 @@ public:
     /// \param i row offset
     /// \param j column offset
     ///
-    void concatenateMatrix(const core::SparseMatrixd &Q,
-                           core::SparseMatrixd &R,
+    void concatenateMatrix(const SparseMatrixd &Q,
+                           SparseMatrixd &R,
                            size_t i,
                            size_t j);
 
@@ -100,8 +102,10 @@ private:
     ///> Each system correspond to one type of interaction in the interaction graph.
     std::vector<std::shared_ptr<SparseLinearSystem>> equationList;
 
-    std::vector<core::SparseMatrixd> A; ///> Matrices storage
-    std::vector<core::Vectord> b; ///> Right hand sides storage
+    std::vector<SparseMatrixd> A; ///> Matrices storage
+    std::vector<Vectord> b; ///> Right hand sides storage
 };
+
+}
 
 #endif // ASSEMBLER_ASSEMBLER_H

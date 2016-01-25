@@ -30,6 +30,8 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 
+namespace imstk {
+
 /// \brief Synchronization class for sync the start/end of multiple threads
 ///simply set number of worker threads in the constructor
 ///then each worker threads should call waitTaskStart function when the taks
@@ -51,7 +53,7 @@ public:
     /// \param p_threadsForWorkers  choose the number of worker threads
     Synchronization(int p_threadsForWorkers)
     {
-        type =   core::ClassType::Synchronization;
+        type =   ClassType::Synchronization;
         totalWorkers = p_threadsForWorkers;
         finishedWorkerCounter = 0;
         startedWorkerCounter = 0;
@@ -135,5 +137,7 @@ public:
         uniLock.unlock();
     }
 };
+
+}
 
 #endif

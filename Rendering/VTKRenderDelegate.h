@@ -21,20 +21,21 @@
 
 #include <vtkOpenGLPolyDataMapper.h>
 #include "Core/RenderDelegate.h"
-//#include "Core/RenderDetail.h"
 
 class vtkActor;
-class Shaders;
 
-class CustomGLPolyDataMapper :public vtkOpenGLPolyDataMapper{
+namespace imstk {
+
+class CustomGLPolyDataMapper : public vtkOpenGLPolyDataMapper
+{
 public:
     static CustomGLPolyDataMapper* New();
     std::shared_ptr<RenderDetail> renderDetail;
     vtkOpenGLBufferObject * tangentsBuffer;
     //vtkOpenGLVertexBufferObject* tangentsBuffer;
-    std::vector<core::Vec3d>tangents;
+    std::vector<Vec3d>tangents;
     vtkTypeMacro(CustomGLPolyDataMapper, vtkOpenGLPolyDataMapper)
-      virtual void initDraw();
+    virtual void initDraw();
     virtual void modified() {}
     virtual void draw() const { }
     virtual void SetMapperShaderParameters(vtkOpenGLHelper &cellBO, vtkRenderer *ren, vtkActor *act) override;
@@ -57,9 +58,6 @@ public:
                                        const ShaderProgramType &shaderPrograms);
 };
 
-
-
-
 template<typename ShaderProgramType>
 void VTKRenderDelegate::setShadersProgramReplacements(vtkOpenGLPolyDataMapper *mapper,
                                                       const ShaderProgramType &shaderPrograms)
@@ -76,6 +74,8 @@ void VTKRenderDelegate::setShadersProgramReplacements(vtkOpenGLPolyDataMapper *m
 
         }
     }
+}
+
 }
 
 #endif // SMRENDERABLE_H

@@ -26,9 +26,6 @@
 // iMSTK includes
 #include "SceneModels/DeformableSceneObject.h"
 
-// iMSTK forward declarations
-class VegaVolumetricMesh;
-
 // Vega forward declarations
 class SparseMatrix;
 class VolumetricMesh;
@@ -38,6 +35,11 @@ class CorotationalLinearFEM;
 class StVKStiffnessMatrix;
 class IsotropicMaterial;
 class IsotropicHyperelasticFEM;
+
+namespace imstk {
+
+// iMSTK forward declarations
+class VegaVolumetricMesh;
 
 class VegaFEMDeformableSceneObject : public DeformableSceneObject
 {
@@ -116,7 +118,7 @@ public:
     ///
     /// \brief Helper function to interface Vega sparse matrices with Eigen matrices.
     ///
-    void updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix,
+    void updateValuesFromMatrix(std::shared_ptr<::SparseMatrix> matrix,
                                 double *values);
 
     ///
@@ -159,21 +161,22 @@ private:
     std::shared_ptr<IsotropicHyperelasticFEM> isotropicHyperElasticForces;
 
     // Vega mass matrix
-    std::shared_ptr<SparseMatrix> vegaMassMatrix;
+    std::shared_ptr<::SparseMatrix> vegaMassMatrix;
 
     // Vega Tangent stiffness matrix
-    std::shared_ptr<SparseMatrix> vegaTangentStiffnessMatrix;
+    std::shared_ptr<::SparseMatrix> vegaTangentStiffnessMatrix;
 
     // Vega Laplacian damping matrix
-    std::shared_ptr<SparseMatrix> dampingMatrix;
+    std::shared_ptr<::SparseMatrix> dampingMatrix;
 
     // Nodal vector of gravity forces
-    core::Vectord gravityForce;
+    Vectord gravityForce;
 
     // Vega configuration parser interface
     class VegaConfiguration;
     std::unique_ptr<VegaConfiguration> vegaFemConfig;
 };
 
+}
 
 #endif // VEGAFEMDEFORMABLESCENEOBJECT_H

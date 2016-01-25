@@ -16,9 +16,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-#include "VTKRendering/InitVTKRendering.h"
+#include "Rendering/InitVTKRendering.h"
+
+namespace imstk {
 
 void InitVTKRendering()
 {
     IMSTK_REGISTER_VTKRENDER_DELEGATES();
+}
+
 }

@@ -23,6 +23,8 @@
 // iMSTK includes
 #include "Solvers/ForwardGaussSeidel.h"
 
+namespace imstk {
+
 ///
 /// \brief Forward version of the Gauss Seidel successive overrelaxation sparse
 ///     linear solver.
@@ -45,7 +47,7 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param rhs Right hand side of the linear equation.
     ///
-    ForwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w = .5);
+    ForwardSOR(const SparseMatrixd &A, const Vectord &rhs, const double &w = .5);
 
     ///
     /// \brief Do one iteration of the method.
@@ -53,7 +55,7 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual True if you want to compute the residual.
     ///
-    void iterate(core::Vectord &x, bool updateResidual = true) override;
+    void iterate(Vectord &x, bool updateResidual = true) override;
 
     ///
     /// \brief Set acceleration parameter.
@@ -71,5 +73,7 @@ private:
     double weight;
 
 };
+
+}
 
 #endif // FORWARD_SOR_H

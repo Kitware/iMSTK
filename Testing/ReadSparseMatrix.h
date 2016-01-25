@@ -25,6 +25,8 @@
 #include<Eigen/Core>
 #include<Eigen/Sparse>
 
+namespace imstk {
+
 //
 // @brief Reads a sparse matrix form the Matrix market.
 //
@@ -61,6 +63,8 @@ Eigen::SparseMatrix<T,opt> &ReadSparseMatrix(const std::string &fileName, Eigen:
   }
   fStream.close();
   return A;
+}
+
 }
 
 #endif

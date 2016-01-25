@@ -26,18 +26,17 @@
 // iMSTK includes
 #include "Core/Matrix.h"
 
+namespace imstk {
+
 /// A quaternion.
 template<typename T>
 using Quaternion = Eigen::Quaternion<T>;
 
-namespace core
-{
 /// A quaternion of floats.
 using Quaternionf = Quaternion<float>;
 
 /// A quaternion of doubles.
 using Quaterniond = Quaternion<double>;
-} //core
 
 /// Create a quaternion rotation corresponding to the specified angle (in radians) and axis.
 /// \tparam T the numeric data type.
@@ -49,6 +48,8 @@ template <typename T, int VOpt>
 inline Eigen::Quaternion<T> getRotationQuaternion(const T& angle, const Eigen::Matrix<T, 3, 1, VOpt>& axis)
 {
     return Eigen::Quaternion<T>(Eigen::AngleAxis<T>(angle, axis));
+}
+
 }
 
 #endif

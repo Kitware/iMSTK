@@ -23,7 +23,7 @@
 // STL includes
 #include <memory>
 
-namespace core {
+namespace imstk {
 
 enum class EventType
 {

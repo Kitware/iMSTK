@@ -30,7 +30,7 @@ go_bandit([](){
     describe("Vega Volumetric Mesh", []() {
 
     it("constructs", []() {
-        auto collisionContext = std::make_shared<CollisionContext>();
+        auto collisionContext = std::make_shared<imstk::CollisionContext>();
         AssertThat(collisionContext != nullptr, IsTrue());
     });
 

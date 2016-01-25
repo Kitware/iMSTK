@@ -25,6 +25,8 @@
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 template<typename MatrixType>
 class DirectLinearSolver;
 
@@ -33,7 +35,7 @@ class DirectLinearSolver;
 ///     decomposition.
 ///
 template<>
-class DirectLinearSolver<core::Matrixd> : public LinearSolver<core::Matrixd>
+class DirectLinearSolver<Matrixd> : public LinearSolver<Matrixd>
 {
 public:
     ///
@@ -48,14 +50,14 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param b Right hand side of the linear system of equations.
     ///
-    DirectLinearSolver(const core::Matrixd &A, const core::Vectord &b);
+    DirectLinearSolver(const Matrixd &A, const Vectord &b);
 
     ///
     /// \brief Solve the system of equations.
     ///
     /// \param x Upon return it contains the solution of the linear system.
     ///
-    void solve(core::Vectord &x) override;
+    void solve(Vectord &x) override;
 
     ///
     /// \brief Solve the system of equations for arbitrary right hand side vector.
@@ -63,7 +65,7 @@ public:
     /// \param rhs Right hand side of the linear system of equations.
     /// \param x Upon return it contains the solution of the linear system.
     ///
-    void solve(const core::Vectord &rhs, core::Vectord &x);
+    void solve(const Vectord &rhs, Vectord &x);
 
     ///
     /// \brief Sets the system. System of linear equations.
@@ -73,7 +75,7 @@ public:
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 private:
-    Eigen::LDLT<core::Matrixd> solver;
+    Eigen::LDLT<Matrixd> solver;
 };
 
 ///
@@ -81,7 +83,7 @@ private:
 ///     decomposition.
 ///
 template<>
-class DirectLinearSolver<core::SparseMatrixd> : public LinearSolver<core::SparseMatrixd>
+class DirectLinearSolver<SparseMatrixd> : public LinearSolver<SparseMatrixd>
 {
 public:
     ///
@@ -96,14 +98,14 @@ public:
     /// \param matrix System matrix. Symmetric and positive definite.
     /// \param b Right hand side of the linear system of equations.
     ///
-    DirectLinearSolver(const core::SparseMatrixd &matrix, const core::Vectord &b);
+    DirectLinearSolver(const SparseMatrixd &matrix, const Vectord &b);
 
     ///
     /// \brief Solve the system of equations
     ///
     /// \param x Upon return it contains the solution of the linear system.
     ///
-    void solve(core::Vectord &x) override;
+    void solve(Vectord &x) override;
 
     ///
     /// \brief Solve the system of equations for arbitrary right hand side vector.
@@ -111,7 +113,7 @@ public:
     /// \param rhs Right hand side of the linear system of equations.
     /// \param x Upon return it contains the solution of the linear system.
     ///
-    void solve(const core::Vectord &rhs, core::Vectord &x);
+    void solve(const Vectord &rhs, Vectord &x);
 
     ///
     /// \brief Sets the system. System of linear equations.
@@ -121,6 +123,9 @@ public:
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 private:
-    Eigen::SparseLU<core::SparseMatrixd> solver;
+    Eigen::SparseLU<SparseMatrixd> solver;
 };
+
+}
+
 #endif // SOLVERS_DIRECT_LINEAR_SOLVER

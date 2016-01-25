@@ -35,6 +35,8 @@
 // Threads includes
 #include <ThreadPool.h>
 
+namespace imstk {
+
 /// \brief SDK is singlenton class
 std::once_flag SDK::sdkCallOnceFlag;
 
@@ -44,7 +46,7 @@ SDK::SDK()
     shutdown = false;
     sceneIdCounter = 1;
     isModulesStarted = false;
-    type = core::ClassType::Sdk;
+    type = ClassType::Sdk;
     viewer = nullptr;
     simulator = nullptr;
     sceneList.clear();
@@ -77,7 +79,6 @@ std::shared_ptr<ViewerBase> SDK::createViewer()
         Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
     if (this->viewer)
     {
-        this->viewer->log = this->errorLog;
         this->registerModule(this->viewer);
     }
     else
@@ -94,7 +95,6 @@ void SDK::addViewer(std::shared_ptr<ViewerBase> p_viewer)
 
     this->viewer.reset();
     this->viewer = p_viewer;
-    this->viewer->log = this->errorLog;
     this->registerModule(p_viewer);
 }
 
@@ -244,7 +244,7 @@ void SDK::terminateAll()
 }
 
 /// \brief register functions
-void SDK::registerMesh(std::shared_ptr<Core::BaseMesh> newMesh)
+void SDK::registerMesh(std::shared_ptr<BaseMesh> newMesh)
 {
     if(std::end(this->meshList) ==
         std::find(std::begin(this->meshList),std::end(this->meshList),newMesh) )
@@ -324,4 +324,6 @@ std::shared_ptr<ErrorLog> SDK::getErrorLog()
 std::shared_ptr<Simulator> SDK::getSimulator()
 {
     return this->simulator;
+}
+
 }

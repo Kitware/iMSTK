@@ -23,6 +23,8 @@
 // VRPN includes
 #include <vrpn_ForceDevice.h>
 
+namespace imstk {
+
 VRPNForceDevice::VRPNForceDevice(std::string deviceURL)
     : VRPNDeviceClient(DeviceType::PHANTOM_OMNI, deviceURL),
     enableForce(true),
@@ -92,4 +94,6 @@ VRPNForceDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
     handler->vrpnForce->setSurfaceTextureAmplitude( 0.00 ); // meters
     handler->vrpnForce->setSurfaceTextureWavelength( 0.01f ); // meters
     handler->vrpnForce->setRecoveryTime( 10 );
+}
+
 }

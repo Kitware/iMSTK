@@ -28,6 +28,8 @@
 #include "Core/Vector.h"
 #include "Core/Timer.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for all devices. Device specific implementation should be done
 ///     by instantiating this class
@@ -88,37 +90,37 @@ public:
     /// \brief Get the force of the phantom omni
     /// \return The absolute force emitting from the device
     ///
-    const core::Vec3d &getForce() const;
+    const Vec3d &getForce() const;
 
     ///
     /// \brief Get the force of the phantom omni
     /// \return The absolute force emitting from the device
     ///
-    void setForce(const core::Vec3d &f);
+    void setForce(const Vec3d &f);
 
     ///
     /// \brief Get the torque of the phantom omni
     /// \return The absolute force emitting from the device
     ///
-    const core::Vec3d &getTorque() const;
+    const Vec3d &getTorque() const;
 
     ///
     /// \brief Get the position of the phantom omni
     /// \return The absolute position of the device
     ///
-    const core::Vec3d &getPosition() const;
+    const Vec3d &getPosition() const;
 
     ///
     /// \brief Get the velocity of the phantom omni
     /// \return The absolute position of the device
     ///
-    const core::Vec3d &getVelocity() const;
+    const Vec3d &getVelocity() const;
 
     ///
     /// \brief Get the orientation of the phantom omni
     /// \return The absolute orientation of the device
     ///
-    const core::Quaterniond &getOrientation() const;
+    const Quaterniond &getOrientation() const;
 
     ///
     /// \brief Get the status of a button
@@ -176,19 +178,21 @@ public:
 
 protected:
     bool driverInstalled;   //!< true if device driver is installed
-    core::Timer forceTimer; //!< Timer to track last update for force
-    core::Timer posTimer;   //!< Timer to track last update for position
-    core::Timer quatTimer;  //!< Timer to track last update for orientation
-    core::Timer velTimer;   //!< Timer to track last update for velocity
-    core::Vec3d force;      //!< Force vector
-    core::Vec3d torque;     //!< Torque vector
-    core::Vec3d position;   //!< Position of end effector
-    core::Vec3d velocity;   //!< Linear velocity of end effector
-    core::Quaterniond orientation; //!< Orientation of the end effector
+    Timer forceTimer; //!< Timer to track last update for force
+    Timer posTimer;   //!< Timer to track last update for position
+    Timer quatTimer;  //!< Timer to track last update for orientation
+    Timer velTimer;   //!< Timer to track last update for velocity
+    Vec3d force;      //!< Force vector
+    Vec3d torque;     //!< Torque vector
+    Vec3d position;   //!< Position of end effector
+    Vec3d velocity;   //!< Linear velocity of end effector
+    Quaterniond orientation; //!< Orientation of the end effector
 
     std::vector<bool> buttons; //!< Buttons: true = pressed/false = not pressed
-    std::vector<core::Timer> buttonTimers; //!< Timer to track last update for buttons
+    std::vector<Timer> buttonTimers; //!< Timer to track last update for buttons
     std::chrono::milliseconds pollDelay; //!< Poll delay
 };
+
+}
 
 #endif

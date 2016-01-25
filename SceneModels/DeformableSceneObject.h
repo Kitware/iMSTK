@@ -25,6 +25,8 @@
 #include "TimeIntegrators/OdeSystem.h"
 #include "TimeIntegrators/TimeIntegrator.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for all deformable scene objects.
 ///
@@ -84,19 +86,19 @@ public:
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    Eigen::Map<core::Vec3d> getVelocity(const int index);
+    Eigen::Map<Vec3d> getVelocity(const int index);
 
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    const core::Vec3d &getGravity() const;
+    const Vec3d &getGravity() const;
 
     ///
     /// \brief Update cumulative forces
     ///
-    void updateExternalForces(const std::unordered_map<size_t,core::Vec3d> &forces)
+    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces)
     {
-        auto externalForce = core::Matrixd::Map(this->f.data(),3,this->numOfNodes);
+        auto externalForce = Matrixd::Map(this->f.data(),3,this->numOfNodes);
         for(const auto &force : forces)
         {
             auto i = force.first;
@@ -133,16 +135,18 @@ protected:
     std::shared_ptr<OdeSystemState> previousState;///> Previous model state
     std::shared_ptr<OdeSystemState> newState;     ///> Storage for the next state
 
-    core::SparseMatrixd M; ///> Mass matrix
-    core::SparseMatrixd C; ///> Raleigh Damping matrix
-    core::SparseMatrixd D; ///> Raleigh Damping matrix
-    core::SparseMatrixd K; ///> Stiffness matrix
-    core::Vectord f;       ///> Accumulative forces vector
+    SparseMatrixd M; ///> Mass matrix
+    SparseMatrixd C; ///> Raleigh Damping matrix
+    SparseMatrixd D; ///> Raleigh Damping matrix
+    SparseMatrixd K; ///> Stiffness matrix
+    Vectord f;       ///> Accumulative forces vector
 
     // Gravity
-    core::Vec3d gravity;
+    Vec3d gravity;
 
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };
+
+}
 
 #endif // DEFORMABLESCENEOBJECT_H

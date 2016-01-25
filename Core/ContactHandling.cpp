@@ -21,6 +21,8 @@
 
 #include "Core/CollisionManager.h"
 
+namespace imstk {
+
 ContactHandling::ContactHandling(const bool typeBilateral)
 {
     if (typeBilateral)
@@ -104,19 +106,19 @@ bool ContactHandling::isUnilateral() const
 }
 
 //---------------------------------------------------------------------------
-std::unordered_map< size_t, core::Vec3d> &ContactHandling::getContactForces()
+std::unordered_map< size_t, Vec3d> &ContactHandling::getContactForces()
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-const std::unordered_map< size_t,core::Vec3d> &ContactHandling::getContactForces() const
+const std::unordered_map< size_t,Vec3d> &ContactHandling::getContactForces() const
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-void ContactHandling::setContactForce(const size_t dofID, const core::Vec3d &force)
+void ContactHandling::setContactForce(const size_t dofID, const Vec3d &force)
 {
     this->contactForces[dofID] = force;
 }
@@ -125,4 +127,6 @@ void ContactHandling::setContactForce(const size_t dofID, const core::Vec3d &for
 void ContactHandling::clearContactForces()
 {
     this->contactForces.clear();
+}
+
 }

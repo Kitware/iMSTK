@@ -37,7 +37,7 @@
 // #   pragma inline_depth(255)
 #endif
 
-namespace core {
+namespace imstk {
 
 enum
 {
@@ -121,7 +121,6 @@ enum class ClassDrawOrder
     AfterObjects
 };
 
-} // namespace core
 // FIXME: This is currently hardwired into CMake, but must change
 //        once we get iMSTK declspec'd and building dynamically
 //        on Windows.
@@ -214,6 +213,6 @@ enum class ClassDrawOrder
 ///iMSTK uses opengl now. So all API should have the definition.
 #define IMSTK_OPENGL_SHADER 1
 
-
+} // namespace core
 
 #endif // CORE_CONFIG_H

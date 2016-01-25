@@ -7,6 +7,8 @@
 #include <set>
 #include <string>
 
+namespace imstk {
+
 /**\brief A macro to register a concrete subclass of an abstract base class with Factory.
   *
   * A macro to help register a concrete subclass with a factory.
@@ -47,7 +49,7 @@
   * at startup.
   */
 #define IMSTK_REGISTER_CLASS(BASECLASS,TARGETCLASS,SUBCLASS,GROUP) \
-       Factory<BASECLASS>::registerClassConfiguration( \
+    ::imstk::Factory<BASECLASS>::registerClassConfiguration( \
          #TARGETCLASS, \
          #SUBCLASS, \
          []() { return std::shared_ptr<BASECLASS>(new SUBCLASS); }, \
@@ -166,6 +168,8 @@ public:
 protected:
   static std::map<std::string, FactoryConfigurationOptions>* s_catalog;
 };
+
+}
 
 #include "Core/Factory.hpp"
 

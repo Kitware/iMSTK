@@ -29,6 +29,8 @@
 #include "Core/Vector.h"
 #include "Core/ConfigRendering.h"
 
+namespace imstk {
+
 #define IMSTK_LIGHT_SPOTMAX 128
 
 class Light;
@@ -38,19 +40,19 @@ struct LightPos
 public:
 
     LightPos(float p_x = 0.0, float p_y = 0.0, float p_z = 0.0, float p_w = 1.0);
-    void setPosition(const core::Vec3d &p)
+    void setPosition(const Vec3d &p)
     {
         position = p;
     }
 
-    const core::Vec3d &getPosition() const
+    const Vec3d &getPosition() const
     {
         return position;
     }
 
 private:
     float w;
-    core::Vec3d position;
+    Vec3d position;
     friend Light;
 };
 
@@ -115,16 +117,16 @@ public:
     ///angle between 0-90 and 180 is also accepted
     float spotCutOffAngle;
     /// \brief light direction, up vector, transverse direction, focus point
-    core::Vec3d direction;
-    core::Vec3d upVector;
-    core::Vec3d transverseDir;
-    core::Vec3d focusPosition;//it is for shadow
+    Vec3d direction;
+    Vec3d upVector;
+    Vec3d transverseDir;
+    Vec3d focusPosition;//it is for shadow
     /// \brief update light direction
     void updateDirection();
     /// \brief  default direction for light, upvector and transverse direction
-    static core::Vec3d defaultDir;
-    static core::Vec3d defaultUpDir;
-    static core::Vec3d defaultTransDir;
+    static Vec3d defaultDir;
+    static Vec3d defaultUpDir;
+    static Vec3d defaultTransDir;
 
     /// \brief if the light casts shadow, this should be enabled. Unfortunately, we only support one light at a time for shadows
     bool castShadow;
@@ -138,12 +140,12 @@ public:
     {
         std::shared_ptr<Light>
         light = std::make_shared<Light>(name, Spotlight, World);
-        light->lightPos.setPosition(core::Vec3d(10.0, 10.0, 10.0));
+        light->lightPos.setPosition(Vec3d(10.0, 10.0, 10.0));
         light->lightColorDiffuse.setValue(0.8, 0.8, 0.8, 1);
         light->lightColorAmbient.setValue(0.1, 0.1, 0.1, 1);
         light->lightColorSpecular.setValue(0.9, 0.9, 0.9, 1);
         light->spotCutOffAngle = 60;
-        light->direction = core::Vec3d(0.0, 0.0, -1.0);
+        light->direction = Vec3d(0.0, 0.0, -1.0);
         light->drawEnabled = false;
         light->attn_constant = 1.0;
         light->attn_linear = 0.0;
@@ -152,5 +154,7 @@ public:
         return light;
     }
 };
+
+}
 
 #endif

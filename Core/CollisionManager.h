@@ -30,6 +30,8 @@
 #include <iostream>
 #include <map>
 
+namespace imstk {
+
 class Model;
 
 class CollisionData
@@ -48,9 +50,9 @@ class PenetrationDepthCollisionData : public CollisionData
 {
 public:
     PenetrationDepthCollisionData (const double penetrationDepth,
-                                   const core::Vec3d& p,
+                                   const Vec3d& p,
                                    const int ind,
-                                   const core::Vec3d& contactNornmal) :
+                                   const Vec3d& contactNornmal) :
                                     depth(penetrationDepth),
                                     point(p),
                                     normal(contactNornmal),
@@ -58,9 +60,9 @@ public:
                                     model(nullptr){}
     PenetrationDepthCollisionData (std::shared_ptr<Model> m,
                                    const double penetrationDepth,
-                                   const core::Vec3d& p,
+                                   const Vec3d& p,
                                    const int ind,
-                                   const core::Vec3d& contactNornmal) :
+                                   const Vec3d& contactNornmal) :
                                     depth(penetrationDepth),
                                     point(p),
                                     normal(contactNornmal),
@@ -78,8 +80,8 @@ public:
 
 public: // Data
     double depth;
-    core::Vec3d point;
-    core::Vec3d normal;
+    Vec3d point;
+    Vec3d normal;
     int index;
     std::shared_ptr<Model> model;
 };
@@ -110,18 +112,18 @@ public:
     /// @brief Add contact between the models
     ///
     void addContact( const double& penetrationDepth,
-                     const core::Vec3d& vert,
+                     const Vec3d& vert,
                      const int index,
-                     const core::Vec3d& contactNornmal);
+                     const Vec3d& contactNornmal);
 
     ///
     /// @brief Add contact between the models
     ///
     void addContact( std::shared_ptr<Model> model,
                      const double& penetrationDepth,
-                     const core::Vec3d& vert,
+                     const Vec3d& vert,
                      const int index,
-                     const core::Vec3d& contactNornmal);
+                     const Vec3d& contactNornmal);
 
     ///
     /// @brief Clear contact list
@@ -174,5 +176,7 @@ private:
     std::map<std::shared_ptr<Model>,
         std::vector<std::shared_ptr<PenetrationDepthCollisionData>>> modelContacts; //!< Contacts per model
 };
+
+}
 
 #endif // CORE_COLLISIONPAIR_H

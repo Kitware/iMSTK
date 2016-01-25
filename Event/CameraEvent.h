@@ -25,38 +25,38 @@
 #include "Core/Vector.h"
 #include "Core/Quaternion.h"
 
-namespace event {
+namespace imstk {
 
-class CameraEvent : public core::Event
+class CameraEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     CameraEvent();
 
-    void setPosition(const core::Vec3d &cameraPosition);
+    void setPosition(const Vec3d &cameraPosition);
 
-    const core::Vec3d &getPosition();
+    const Vec3d &getPosition();
 
-    void setDirection(const core::Vec3d &cameraDirection);
+    void setDirection(const Vec3d &cameraDirection);
 
-    const core::Vec3d &getDirection();
+    const Vec3d &getDirection();
 
-    void setUpDirection(const core::Vec3d &cameraUpDirection);
+    void setUpDirection(const Vec3d &cameraUpDirection);
 
-    const core::Vec3d &getUpDirection();
+    const Vec3d &getUpDirection();
 
-    void applyRotation(const core::Quaterniond &quat)
+    void applyRotation(const Quaterniond &quat)
     {
         direction = quat*direction;
         upDirection = quat*upDirection;
     }
 
 private:
-    core::Vec3d position; //  camera position
-    core::Vec3d direction; // direction
-    core::Vec3d upDirection; //  upward direction
+    Vec3d position; //  camera position
+    Vec3d direction; // direction
+    Vec3d upDirection; //  upward direction
 };
 
 } // event namespace

@@ -19,9 +19,9 @@
 
 #include "Event/MouseButtonEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType MouseButtonEvent::EventName = core::EventType::MouseButton;
+EventType MouseButtonEvent::EventName = EventType::MouseButton;
 
 MouseButtonEvent::MouseButtonEvent(const MouseButton& button): pressed(false), mouseButton(button)
 {}
@@ -41,11 +41,11 @@ const bool& MouseButtonEvent::togglePressed()
 {
     return this->pressed = !this->pressed;
 }
-void MouseButtonEvent::setWindowCoord(const core::Vec2d& coordinates)
+void MouseButtonEvent::setWindowCoord(const Vec2d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec2d& MouseButtonEvent::getWindowCoord()
+const Vec2d& MouseButtonEvent::getWindowCoord()
 {
     return this->coord;
 }

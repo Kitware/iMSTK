@@ -24,6 +24,8 @@
 #include "Core/CollisionModelIterator.h"
 #include "Collision/SurfaceTree.h"
 
+namespace imstk {
+
 /// \brief !!
 template<typename CellType>
 class SurfaceTreeIterator: public CollisionModelIterator<CellType>
@@ -96,5 +98,7 @@ public:
 
     friend SurfaceTree<CellType>;
 };
+
+}
 
 #endif

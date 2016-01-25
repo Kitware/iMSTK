@@ -28,11 +28,13 @@
 #  include <OpenGL/gl.h> // for GLfloat, etc.
 #endif
 
+namespace imstk {
+
 Scene::Scene(std::shared_ptr<ErrorLog> p_log) :
     CoreClass()
 {
     this->log = p_log;
-    type = core::ClassType::Scene;
+    type = ClassType::Scene;
     sceneUpdatedTimeStamp = 0;
     lightsEnabled = false;
 }
@@ -121,7 +123,7 @@ std::shared_ptr<Scene> Scene::operator=(std::shared_ptr<Scene> p_scene)
 
 void Scene::initLights()
 {
-    core::Vec3f casted;
+    Vec3f casted;
 
     for (auto light: lights)
     {
@@ -147,7 +149,7 @@ int Scene::addLight(std::shared_ptr<Light> p_light)
 
 void Scene::refreshLights()
 {
-    core::Vec3f casted;
+    Vec3f casted;
 
     for (auto light: lights)
     {
@@ -171,7 +173,7 @@ void Scene::setLightPos(int p_lightId, LightPos p_pos)
     temp->updateDirection();
 }
 
-void Scene::setLightPos(int p_lightId, LightPos p_pos, core::Vec3d p_direction)
+void Scene::setLightPos(int p_lightId, LightPos p_pos, Vec3d p_direction)
 {
     std::shared_ptr<Light> temp = lights.at(p_lightId);
     temp->lightPos = p_pos;
@@ -230,7 +232,7 @@ void Scene::placeLights()
 
     for (auto light: lights)
     {
-        core::Vec3f casted;
+        Vec3f casted;
         if (!(light->isEnabled()))
         {
             continue;
@@ -273,4 +275,6 @@ void Scene::copySceneToLocal(SceneLocal &p_local)
 
     p_local.sceneObjects = this->sceneObjects;
     p_local.sceneUpdatedTimeStamp = sceneUpdatedTimeStamp;
+}
+
 }

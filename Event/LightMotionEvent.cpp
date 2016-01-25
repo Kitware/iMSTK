@@ -19,28 +19,28 @@
 
 #include "Event/LightMotionEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType LightMotionEvent::EventName = core::EventType::LightMotion;
+EventType LightMotionEvent::EventName = EventType::LightMotion;
 
 LightMotionEvent::LightMotionEvent(const int& lightIndex): index(lightIndex)
 {
-    position = core::Vec3d::Zero();
-    direction = core::Vec3d::Zero();
+    position = Vec3d::Zero();
+    direction = Vec3d::Zero();
 }
-void LightMotionEvent::setPosition(const core::Vec3d& lightPosition)
+void LightMotionEvent::setPosition(const Vec3d& lightPosition)
 {
     this->position = lightPosition;
 }
-const core::Vec3d& LightMotionEvent::getPosition()
+const Vec3d& LightMotionEvent::getPosition()
 {
     return this->position;
 }
-void LightMotionEvent::setDirection(const core::Vec3d& lightDirection)
+void LightMotionEvent::setDirection(const Vec3d& lightDirection)
 {
     this->direction = lightDirection;
 }
-const core::Vec3d& LightMotionEvent::getDirection()
+const Vec3d& LightMotionEvent::getDirection()
 {
     return this->direction;
 }

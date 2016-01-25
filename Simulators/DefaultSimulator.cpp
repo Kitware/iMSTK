@@ -26,6 +26,8 @@
 #include "Devices/VRPNForceDevice.h"
 #include "VirtualTools/ToolCoupler.h"
 
+namespace imstk {
+
 DefaultSimulator::DefaultSimulator(  ) : ObjectSimulator( )
 {
     this->addOperation([](std::shared_ptr<MeshModel> &model)
@@ -64,19 +66,19 @@ void DefaultSimulator::syncBuffers()
 {
 
 }
-void DefaultSimulator::handleEvent(std::shared_ptr<core::Event> p_event )
+void DefaultSimulator::handleEvent(std::shared_ptr<Event> p_event )
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyboardEvent = std::static_pointer_cast<event::KeyboardEvent>(p_event);
+    auto keyboardEvent = std::static_pointer_cast<imstk::KeyboardEvent>(p_event);
     if(keyboardEvent)
     {
         switch(keyboardEvent->getKeyPressed())
         {
-            case event::Key::F1:
+            case imstk::Key::F1:
             {
                 std::cout << "F1 Keyboard is pressed " ;//<< keyboardEvent->getKeyPressed() << std::endl;
                 break;
@@ -101,17 +103,17 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObje
 
     if(forces.size() == 0)
     {
-        core::Vec3f normal(0,1,0);
+        Vec3f normal(0,1,0);
         outputDevice->setContactPlane(normal,100);
         return;
     }
 
-    core::Vec3d totalForce = core::Vec3d::Zero();
+    Vec3d totalForce = Vec3d::Zero();
     for(const auto &f : forces)
     {
         totalForce = f.second;
     }
-    core::Vec3d contactPoint = core::Vec3d::Zero();
+    Vec3d contactPoint = Vec3d::Zero();
 
     for(const auto &p : points)
     {
@@ -127,4 +129,6 @@ void DefaultSimulator::updateHapticForces(std::shared_ptr<SceneObject> sceneObje
     outputDevice->setDynamicFriction(0.0);
     outputDevice->setSpringCoefficient(norm);
     outputDevice->setStaticFriction(0.0);
+}
+
 }

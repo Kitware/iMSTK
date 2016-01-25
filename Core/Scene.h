@@ -37,6 +37,8 @@
 #include "Event/MouseMoveEvent.h"
 #include "Rendering/Camera.h"
 
+namespace imstk {
+
 class Scene;
 class SDK;
 
@@ -130,7 +132,7 @@ public:
 
     void setLightPos(int p_lightId, LightPos p_pos);
 
-    void setLightPos(int p_lightId, LightPos p_pos, core::Vec3d p_direction);
+    void setLightPos(int p_lightId, LightPos p_pos, Vec3d p_direction);
 
     std::shared_ptr<Camera> getCamera()
     {
@@ -164,5 +166,7 @@ private:
     unsigned int sceneUpdatedTimeStamp;                               // last updated time stamp
     bool lightsEnabled; ///< Enables/Disables lights for the whole scene
 };
+
+}
 
 #endif

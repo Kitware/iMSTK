@@ -31,6 +31,8 @@
 #include "Core/Model.h"
 #include "Core/Geometry.h"
 
+namespace imstk {
+
 ///
 /// @brief Plane representation of a model.
 /// Base class used by all models that can be represented by a plane
@@ -46,7 +48,7 @@ public:
     ///
     /// @brief Constructor
     ///
-    PlaneModel(const core::Vec3d& p, const core::Vec3d& n);
+    PlaneModel(const Vec3d& p, const Vec3d& n);
 
     ///
     /// @brief Destructor
@@ -61,17 +63,17 @@ public:
     ///
     /// @brief Returns normal vectors for triangles on mesh surface
     ///
-    const core::Vec3d &getSurfaceNormal() const;
+    const Vec3d &getSurfaceNormal() const;
 
     ///
     /// @brief Set plane normal
     ///
-    void setNormal(const core::Vec3d &normal);
+    void setNormal(const Vec3d &normal);
 
     ///
     /// @brief Get relative position of the plane
     ///
-    const core::Vec3d &getPosition() const;
+    const Vec3d &getPosition() const;
 
     ///
     /// @brief Get transformation operator
@@ -98,5 +100,7 @@ protected:
     std::shared_ptr<Plane> plane;
     RigidTransformType transform;
 };
+
+}
 
 #endif // GEOMETRY_PLANEMODEL_H

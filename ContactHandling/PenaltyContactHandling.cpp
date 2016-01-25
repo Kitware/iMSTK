@@ -20,6 +20,8 @@
 #include "ContactHandling/PenaltyContactHandling.h"
 #include "Core/CollisionManager.h"
 
+namespace imstk {
+
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :
     ContactHandling(typeBilateral),
     stiffness(1e6),
@@ -54,4 +56,6 @@ void PenaltyContactHandling::resolveContacts()
     {
         computeBilateralContactForces();
     }
+}
+
 }

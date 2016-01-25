@@ -26,6 +26,8 @@
 // iMSTK includes
 #include "Core/CoreClass.h"
 
+namespace imstk {
+
 class Mesh;
 class CollisionManager;
 
@@ -44,5 +46,7 @@ public:
 private:
     virtual void doComputeCollision(std::shared_ptr<CollisionManager> pairs) = 0;
 };
+
+}
 
 #endif

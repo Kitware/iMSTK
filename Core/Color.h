@@ -22,6 +22,8 @@
 
 #include "Core/Config.h"
 
+namespace imstk {
+
 struct Color
 {
     union
@@ -93,5 +95,7 @@ struct Color
     static Color colorPink;
     static Color colorYellow;
 };
+
+}
 
 #endif // CORE_COLOR_H

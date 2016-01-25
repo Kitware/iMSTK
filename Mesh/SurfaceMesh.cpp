@@ -22,6 +22,8 @@
 #include "Core/Factory.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureCoordinates(false)
 {
     this->setRenderDelegate(
@@ -30,17 +32,17 @@ SurfaceMesh::SurfaceMesh() : useThreeDSTexureCoordinates(false), useOBJDSTexureC
 SurfaceMesh::~SurfaceMesh()
 {
 }
-core::Vec3d SurfaceMesh::computeTriangleNormal(int triangle)
+Vec3d SurfaceMesh::computeTriangleNormal(int triangle)
 {
     auto t = this->triangleArray[triangle];
 
-    const core::Vec3d &v0 = this->vertices[t[0]];
+    const Vec3d &v0 = this->vertices[t[0]];
 
     return (this->vertices[t[1]]-v0).cross(this->vertices[t[2]]-v0).normalized();
 }
 void SurfaceMesh::computeTriangleNormals()
 {
-    this->triangleNormals.resize(this->triangleArray.size(),core::Vec3d::Zero());
+    this->triangleNormals.resize(this->triangleArray.size(),Vec3d::Zero());
 
     for(size_t i = 0, end = this->triangleArray.size(); i < end; ++i)
     {
@@ -52,7 +54,7 @@ void SurfaceMesh::computeTriangleNormals()
 }
 void SurfaceMesh::computeVertexNormals()
 {
-    this->vertexNormals.resize(this->vertices.size(),core::Vec3d::Zero());
+    this->vertexNormals.resize(this->vertices.size(),Vec3d::Zero());
 
     if(this->vertexTriangleNeighbors.size() == 0)
     {
@@ -182,7 +184,7 @@ void SurfaceMesh::computeTriangleTangents()
         }
     }
 
-    this->vertexTangents.resize(this->vertices.size(), core::Vec3d::Zero());
+    this->vertexTangents.resize(this->vertices.size(), Vec3d::Zero());
     for (size_t v = 0, end = this->vertices.size(); v < end; ++v)
     {
         this->vertexTangents[v][0] = this->vertexTangents[v][1] = this->vertexTangents[v][2] = 0;
@@ -232,7 +234,7 @@ std::vector< Eigen::Matrix< float, int(2), int(1) >, Eigen::aligned_allocator< E
 {
     return this->textureCoord;
 }
-void SurfaceMesh::addTextureCoordinate(const core::Vec2f& coord)
+void SurfaceMesh::addTextureCoordinate(const Vec2f& coord)
 {
     this->textureCoord.push_back(coord);
 }
@@ -272,27 +274,27 @@ void SurfaceMesh::print() const
     std::cout << "Is mesh textured: " << this->isMeshTextured() << "\n";
     std::cout << "----------------------------\n";
 }
-const core::Vec3d& SurfaceMesh::getTriangleNormal(size_t i) const
+const Vec3d& SurfaceMesh::getTriangleNormal(size_t i) const
 {
     return this->triangleNormals[i];
 }
-const core::Vec3d& SurfaceMesh::getTriangleTangent(size_t i) const
+const Vec3d& SurfaceMesh::getTriangleTangent(size_t i) const
 {
     return this->triangleTangents[i];
 }
-const core::Vec3d& SurfaceMesh::getVertexNormal(size_t i) const
+const Vec3d& SurfaceMesh::getVertexNormal(size_t i) const
 {
     return this->vertexNormals[i];
 }
-const core::Vec3d& SurfaceMesh::getVertexTangent(size_t i) const
+const Vec3d& SurfaceMesh::getVertexTangent(size_t i) const
 {
     return this->vertexTangents[i];
 }
-const std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents() const
+const std::vector<Vec3d>& SurfaceMesh::getVertexTangents() const
 {
     return this->vertexTangents;
 }
-std::vector<core::Vec3d>& SurfaceMesh::getVertexTangents()
+std::vector<Vec3d>& SurfaceMesh::getVertexTangents()
 {
     return this->vertexTangents;
 }
@@ -301,3 +303,4 @@ size_t SurfaceMesh::getNumberOfTriangles() const
     return this->triangleArray.size();
 }
 
+}

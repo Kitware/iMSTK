@@ -28,6 +28,8 @@
 #include "Collision/SurfaceTreeCell.h"
 #include "Core/Geometry.h"
 
+namespace imstk {
+
 /// \brief cell of an octree
 class OctreeCell : public SurfaceTreeCell<OctreeCell>
 {
@@ -51,13 +53,13 @@ public:
     void setCube(const Cube &other);
 
     /// \brief get the center of the octree cell
-    core::Vec3d &getCenter();
+    Vec3d &getCenter();
 
     /// \brief get constant reference to the center of the octree cell
-    const core::Vec3d &getCenter() const;
+    const Vec3d &getCenter() const;
 
     /// \brief set the center of the octree cell
-    void setCenter ( const core::Vec3d &center );
+    void setCenter ( const Vec3d &center );
 
     /// \brief get reference to the side length of the octree cell
     double &getLength ();
@@ -75,7 +77,7 @@ public:
     void setLength ( const double length );
 
     /// \brief check if a triangle is intersecting the octree cell
-    bool isCollidedWithTri ( const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2 ) const;
+    bool isCollidedWithTri ( const Vec3d &v0, const Vec3d &v1, const Vec3d &v2 ) const;
 
     /// \brief check if a point lies inside an octree cell
     bool isCollidedWithPoint ();
@@ -166,6 +168,8 @@ private:
     std::vector<std::pair<Eigen::AlignedBox3d,size_t>> data;
 
 };
+
+}
 
 #endif
 

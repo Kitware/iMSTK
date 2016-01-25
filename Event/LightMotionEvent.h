@@ -24,23 +24,23 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace event {
+namespace imstk {
 
-    class LightMotionEvent : public core::Event
+class LightMotionEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     LightMotionEvent(const int &lightIndex);
 
-    void setPosition(const core::Vec3d &lightPosition);
+    void setPosition(const Vec3d &lightPosition);
 
-    const core::Vec3d &getPosition();
+    const Vec3d &getPosition();
 
-    void setDirection(const core::Vec3d &lightDirection);
+    void setDirection(const Vec3d &lightDirection);
 
-    const core::Vec3d &getDirection();
+    const Vec3d &getDirection();
 
     void setLightIndex(const int &lightIndex);
 
@@ -48,8 +48,8 @@ public:
 
 private:
     int index; // light index
-    core::Vec3d position; // light position
-    core::Vec3d direction; // direction
+    Vec3d position; // light position
+    Vec3d direction; // direction
 };
 
 } // event namespace

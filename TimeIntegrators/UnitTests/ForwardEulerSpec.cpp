@@ -29,9 +29,9 @@ go_bandit([]()
 {
     describe("Explicit Euler ODE Solver", []()
     {
-        auto euler = std::make_shared<ForwardEuler>();
-        auto odeSystem = std::make_shared<OdeSystem>();
-        auto initialState = std::make_shared<OdeSystemState>();
+        auto euler = std::make_shared<imstk::ForwardEuler>();
+        auto odeSystem = std::make_shared<imstk::OdeSystem>();
+        auto initialState = std::make_shared<imstk::OdeSystemState>();
         // ODE parameters
         double dt = 0.01;
         double t0 = 0, t1 = 3;
@@ -40,8 +40,8 @@ go_bandit([]()
         double a = 1;
 
         // ODE right hand side function
-        core::Vectord y;
-        auto F = [&](const OdeSystemState &x) -> core::Vectord&
+        imstk::Vectord y;
+        auto F = [&](const imstk::OdeSystemState &x) -> imstk::Vectord&
         {
             y = lambda*x.getVelocities();
             return y;
@@ -51,10 +51,10 @@ go_bandit([]()
         // ODE system matrix
         std::vector<Eigen::Triplet<double>> tripletList;
         tripletList.emplace_back(0,0,1);
-        core::SparseMatrixd M(1,1);
+        imstk::SparseMatrixd M(1,1);
         M.setFromTriplets(tripletList.begin(),tripletList.end());
         M.makeCompressed();
-        auto Mass = [&](const OdeSystemState &) -> const core::SparseMatrixd&
+        auto Mass = [&](const imstk::OdeSystemState &) -> const imstk::SparseMatrixd&
         {
             return M;
         };
@@ -76,11 +76,11 @@ go_bandit([]()
         it("solves dx/dt-lambda*x=0, x(0)=a ", [&]()
         {
             // Find the solution for t = [0,1)
-            OdeSystemState state, newState;
+            imstk::OdeSystemState state, newState;
             state = *initialState;
             newState = state;
 
-            core::Vectord sol(steps), error(steps);
+            imstk::Vectord sol(steps), error(steps);
             sol(0) = a;
             error(0) = 0.0;
             for(size_t i = 1; i < steps; ++i)

@@ -23,6 +23,8 @@
 #include <string>
 #include <chrono>
 
+namespace imstk {
+
 ErrorLog::ErrorLog()
 {
 
@@ -81,3 +83,4 @@ void ErrorLog::setConsoleOutput(bool flag)
     consoleOutput = flag;
 }
 
+}

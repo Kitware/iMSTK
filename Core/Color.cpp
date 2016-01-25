@@ -19,6 +19,8 @@
 
 #include "Core/Color.h"
 
+namespace imstk {
+
 Color Color::colorWhite(1.0, 1.0, 1.0, 1.0);
 Color Color::colorBlue(0.0, 0.0, 1.0, 1.0);
 Color Color::colorGreen(0.0, 1.0, 0.0, 1.0);
@@ -91,4 +93,6 @@ void Color::setValue( float p_red, float p_green, float p_blue, float p_alpha )
     rgba[1] = p_green;
     rgba[2] = p_blue;
     rgba[3] = p_alpha;
+}
+
 }

@@ -25,6 +25,8 @@
 // iMSTK includes
 #include "Core/Config.h"
 
+namespace imstk {
+
 /// \brief hash bucket size
 #define IMSTK_HASHBUCKET_SIZE    10
 /// \brief a hash entry; bucket
@@ -128,6 +130,8 @@ enum StorageSlideType
     IMSTK_STORAGESLIDING_FRONTFIRST,
     IMSTK_STORAGESLIDING_LASTFIRST
 };
+
+}
 
 #include "Core/DataStructures.hpp"
 

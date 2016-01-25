@@ -23,6 +23,8 @@
 #include "Core/Vector.h"
 #include "TimeIntegrators/OdeSystem.h"
 
+namespace imstk {
+
 ///
 /// @brief Base class for all time time integrators
 ///
@@ -77,5 +79,7 @@ public:
 protected:
     OdeSystem *system;  ///> System of differential equations.
 };
+
+}
 
 #endif // TIMEINTEGRATOR_H

@@ -37,6 +37,8 @@
 #include "Core/Config.h"
 #include "Core/ErrorLog.h"
 
+namespace imstk {
+
 enum TextureReturnType
 {
     IMSTK_TEXTURE_NOTFOUND,
@@ -86,5 +88,7 @@ struct Texture
         return myCopy;
     }
 };
+
+}
 
 #endif // CORE_TEXTURE_H

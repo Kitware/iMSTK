@@ -3,6 +3,8 @@
 
 #include <cstdlib> // for std::atexit
 
+namespace imstk {
+
 template<typename T>
 void Factory<T>::registerClassConfiguration(
   const std::string& classname,
@@ -150,5 +152,7 @@ std::shared_ptr<T> Factory<T>::createSubclassForGroup(
 /// Class-static map from abstract class names to registered concrete children.
 template<typename T>
 std::map<std::string, typename Factory<T>::FactoryConfigurationOptions>* Factory<T>::s_catalog = nullptr;
+
+}
 
 #endif // CORE_FACTORY_HPP

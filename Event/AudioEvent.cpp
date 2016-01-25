@@ -19,11 +19,9 @@
 
 #include "Event/AudioEvent.h"
 
+namespace imstk {
 
-namespace event
-{
-
-core::EventType AudioEvent::EventName = core::EventType::Audio;
+EventType AudioEvent::EventName = EventType::Audio;
 
 AudioEvent::AudioEvent(): state(AudioState::Stop), sound(""), volume(-1.0)
 {

@@ -21,16 +21,17 @@
 #ifndef RENDERING_MESHNODALCOORDINATES_H
 #define RENDERING_MESHNODALCOORDINATES_H
 
-#include "vtkMappedDataArray.h"
+// STL includes
+#include <array>
 
-#include "vtkTypeTemplate.h" // For templated vtkObject API
-#include "vtkObjectFactory.h" // for vtkStandardNewMacro
+#include <vtkMappedDataArray.h>
+#include <vtkTypeTemplate.h> // For templated vtkObject API
+#include <vtkObjectFactory.h> // for vtkStandardNewMacro
 
 // iMSTK includes
 #include "Core/Vector.h"
 
-// STL includes
-#include <array>
+namespace imstk {
 
 template <class Scalar>
 class MeshNodalCoordinates:
@@ -112,9 +113,11 @@ private:
     void operator=(const MeshNodalCoordinates &); // Not implemented.
 
     vtkIdType Lookup(const Scalar &val, vtkIdType startIndex);
-    core::Vec3d TempDoubleArray;
+    Vec3d TempDoubleArray;
 };
 
-#include "MeshNodalCoordinates.hpp"
+}
+
+#include "Rendering/MeshNodalCoordinates.hpp"
 
 #endif // MESHNODALCOORDINATES_H

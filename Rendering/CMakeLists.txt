@@ -19,50 +19,27 @@
 imstk_add_library(Rendering
   SOURCES
     Camera.cpp
-    ConfigRendering.cpp
-    FrameBuffer.cpp
-    GLUtils.cpp
-    MetalShader.cpp
-    SceneTextureShader.cpp
-    Shader.cpp
-    TextureManager.cpp
-    VAO.cpp
-    VBO.cpp
+    VTKViewer.cpp
+    VTKMeshRenderDelegate.cpp
+    VTKPlaneRenderDelegate.cpp
+    VTKStaticSceneObjectRenderDelegate.cpp
+    VTKSceneModelRenderDelegate.cpp
+    InitVTKRendering.cpp
+    ViewerBase.cpp
   PUBLIC_HEADERS
-    CustomRenderer.h
-    FrameBuffer.h
-    GLUtils.h
-    MetalShader.h
-    SceneTextureShader.h
-    Shader.h
-    TextureManager.h
-    VAO.h
-    VBO.h
+    Camera.h
+    VTKViewer.h
+    InitVTKRendering.h
+    ViewerBase.h
 )
-
-target_link_libraries(Rendering
-  PRIVATE
-    Core
-    External
-    Event
-    Mesh
- PUBLIC
-    ${VTK_LIBRARIES}
-    vtkglew
-    sfml::graphics
-    sfml::window
-    sfml::system
-)
-
 
 #
 # Because of the way oculus SDK is required to build, a new library needs
 # to be created to link the runtime.
 # This might change in the future.
 #
+set(OCULUS_LINK_LIBRARIES)
 if (iMSTK_USE_OCULUS)
-
-  set(OCULUS_LINK_LIBRARIES)
   if (NOT WIN32)
     list(APPEND OCULUS_LINK_LIBRARIES
         ${X11_LIBRARIES}
@@ -74,18 +51,27 @@ if (iMSTK_USE_OCULUS)
     list(APPEND OCULUS_LINK_LIBRARIES rt)
   endif()
 
-  imstk_add_library(RenderingOculus
-    SOURCES
-      OculusViewer.cpp
-    PUBLIC_HEADERS
-      OculusViewer.h
-  )
-
-  target_link_libraries(RenderingOculus
-    PRIVATE
-      Core
-      Rendering
-    PUBLIC
-      ${OCULUS_LINK_LIBRARIES}
-  )
 endif(iMSTK_USE_OCULUS)
+
+
+target_link_libraries(Rendering
+  PRIVATE
+    Core
+    Event
+    Mesh
+    Simulators
+    Geometry
+    Devices
+    SceneModels
+ PUBLIC
+    ${VTK_LIBRARIES}
+    ${OCULUS_LINK_LIBRARIES}
+    vtkglew
+    sfml::graphics
+    sfml::window
+    sfml::system
+)
+
+if(BUILD_TESTING)
+  add_subdirectory(UnitTests)
+endif()

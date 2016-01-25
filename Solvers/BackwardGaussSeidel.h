@@ -25,6 +25,8 @@
 #include "Core/Matrix.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 ///
 /// \brief Gauss Seidel sparse linear solver
 ///
@@ -45,7 +47,7 @@ public:
     /// \param A System matrix. Symmetric and positive definite.
     /// \param rhs Right hand side of the linear system of equations.
     ///
-    BackwardGaussSeidel(const core::SparseMatrixd &A, const core::Vectord &rhs);
+    BackwardGaussSeidel(const SparseMatrixd &A, const Vectord &rhs);
 
     ///
     /// \brief Do one iteration of the GaussSeidel method.
@@ -53,7 +55,7 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual Compute residual if true.
     ///
-    void iterate(core::Vectord &x, bool updateResidual = true) override;
+    void iterate(Vectord &x, bool updateResidual = true) override;
 
     ///
     /// \brief Does one iteration of the GaussSeidel method. This version of the method
@@ -62,7 +64,7 @@ public:
     ///
     /// \param x Current iterate.
     ///
-    void relax(core::Vectord &x);
+    void relax(Vectord &x);
 
     ///
     /// \brief Set the system. Replaces the stored linear system of equations.
@@ -72,5 +74,7 @@ public:
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
 };
+
+}
 
 #endif // BACKWARDGAUSSSEIDEL_H

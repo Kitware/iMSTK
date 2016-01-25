@@ -31,6 +31,8 @@
 #include "Core/Factory.h"
 #include "Collision/MeshCollisionModel.h"
 
+namespace imstk {
+
 /// \brief initialize the surface tree structure
 template<typename CellType>
 void SurfaceTree<CellType>::initStructure()
@@ -41,7 +43,7 @@ void SurfaceTree<CellType>::initStructure()
         return;
     }
 
-    core::Vec3d center;
+    Vec3d center;
     std::vector<int> triangles(this->model->getMesh()->getTriangles().size());
     std::iota(std::begin(triangles), std::end(triangles), 0);
 
@@ -111,22 +113,22 @@ SurfaceTree<CellType>::SurfaceTree(std::shared_ptr<MeshCollisionModel> surfaceMo
 
 /// \brief handle key press events
 template<typename CellType>
-void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
+void SurfaceTree<CellType>::handleEvent(std::shared_ptr<Event> event)
 {
     if(!this->isListening())
     {
         return;
     }
 
-    auto keyBoardEvent = std::static_pointer_cast<event::KeyboardEvent>(event);
+    auto keyBoardEvent = std::static_pointer_cast<imstk::KeyboardEvent>(event);
 
     if(keyBoardEvent != nullptr)
     {
-        event::Key keyPressed = keyBoardEvent->getKeyPressed();
+        imstk::Key keyPressed = keyBoardEvent->getKeyPressed();
 
         switch(keyPressed)
         {
-            case event::Key::Add:
+            case imstk::Key::Add:
             {
                 minTreeRenderLevel++;
 
@@ -143,7 +145,7 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
                 currentLevel = minTreeRenderLevel;
             }
 
-            case event::Key::Subtract:
+            case imstk::Key::Subtract:
             {
                 minTreeRenderLevel--;
 
@@ -160,22 +162,22 @@ void SurfaceTree<CellType>::handleEvent(std::shared_ptr<core::Event> event)
                 currentLevel = minTreeRenderLevel;
             }
 
-            case event::Key::R:
+            case imstk::Key::R:
             {
                 this->renderSurface = !this->renderSurface;
             }
 
-            case event::Key::P:
+            case imstk::Key::P:
             {
                 this->enableShiftPos = !this->enableShiftPos;
             }
 
-            case event::Key::K:
+            case imstk::Key::K:
             {
                 this->renderOnlySurface = !this->renderOnlySurface;
             }
 
-            case event::Key::T:
+            case imstk::Key::T:
             {
                 updateStructure();
             }
@@ -337,7 +339,7 @@ void SurfaceTree<CellType>::updateStructure()
     for(int i = levelStartIndex[maxLevel - 1][0]; i < levelStartIndex[maxLevel - 1][1]; ++i)
     {
         current = &treeAllLevels[i];
-        core::Vec3d tempCenter(0, 0, 0);
+        Vec3d tempCenter(0, 0, 0);
         int counter = 0;
 
         if(!current->isEmpty())
@@ -437,6 +439,6 @@ void SurfaceTree<CellType>::getIntersectingNodes(const std::shared_ptr<CellType>
 
 }
 
+}
+
 #endif
-
-

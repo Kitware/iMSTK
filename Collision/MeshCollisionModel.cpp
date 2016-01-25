@@ -21,6 +21,8 @@
 #include "Collision/SurfaceTree.h"
 #include "Core/CollisionConfig.h"
 
+namespace imstk {
+
 //----------------------------------------------------------------------------------------
 MeshCollisionModel::MeshCollisionModel()
 {
@@ -73,14 +75,14 @@ void MeshCollisionModel::initAABBTree(const int& numLevels)
 }
 
 //----------------------------------------------------------------------------------------
-const core::Vec3d& MeshCollisionModel::getSurfaceNormal(size_t i) const
+const Vec3d& MeshCollisionModel::getSurfaceNormal(size_t i) const
 {
     auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(this->mesh);
     return surfaceMesh->getTriangleNormal(i);
 }
 
 //----------------------------------------------------------------------------------------
-std::array<core::Vec3d,3>
+std::array<Vec3d,3>
 MeshCollisionModel::getElementPositions(size_t i) const
 {
     auto surfaceMesh = std::static_pointer_cast<SurfaceMesh>(this->mesh);
@@ -132,4 +134,6 @@ const Eigen::AlignedBox3d& MeshCollisionModel::getAabb() const
 std::shared_ptr< CollisionGroup >& MeshCollisionModel::getCollisionGroup()
 {
     return this->collisionGroup;
+}
+
 }

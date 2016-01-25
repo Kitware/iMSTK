@@ -23,7 +23,7 @@
 // STL includes
 #include <chrono>
 
-namespace core {
+namespace imstk {
 
 /// \brief timer class
 class Timer

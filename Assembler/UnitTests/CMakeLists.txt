@@ -16,37 +16,15 @@
 #
 ###########################################################################
 
-imstk_add_library(VTKRendering
-  SOURCES
-    VTKViewer.cpp
-    VTKMeshRenderDelegate.cpp
-    VTKPlaneRenderDelegate.cpp
-    VTKStaticSceneObjectRenderDelegate.cpp
-    VTKSceneModelRenderDelegate.cpp
-    InitVTKRendering.cpp
-  PUBLIC_HEADERS
-    VTKViewer.h
-    InitVTKRendering.h
-)
+set(Module Assembler)
 
-target_link_libraries(VTKRendering
-  PRIVATE
-    Core
-    Simulators
-    Rendering
-    Mesh
-    Geometry
-    Devices
-    SceneModels
-  PUBLIC
-    ${VTK_LIBRARIES}
-    )
+add_executable(${Module}UnitTestRunner
+  ${BANDIT_RUNNER}
+  AssemblerSpec.cpp
+  )
 
-target_compile_options(VTKRendering
-  PUBLIC
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-inconsistent-missing-override>
-)
+target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
 
-if(BUILD_TESTING)
-  add_subdirectory(UnitTests)
-endif()
+target_link_libraries(${Module}UnitTestRunner Assembler)
+
+simple_test(${Module} --reporter=spec)
