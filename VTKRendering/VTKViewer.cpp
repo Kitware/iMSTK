@@ -49,7 +49,6 @@ public:
         timerId(-1),
         viewer(activeViewer)
     {
-
     }
     VTKRenderer(){}
 
@@ -89,6 +88,18 @@ public:
     vtkRenderWindow *getRenderWindow() const
     {
         return this->renderWindow.GetPointer();
+    }
+
+    ///
+    /// \brief Set the render window
+    ///
+    void *setRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
+    {
+        this->renderWindow = renWin;
+        if(this->renderWindow->GetInteractor())
+        {
+            this->renderWindowInteractor = this->renderWindow->GetInteractor();
+        }
     }
 
     ///
@@ -165,7 +176,17 @@ public:
     ///
     void addRenderer()
     {
-        // Create a new renderer and add actors to it.
+        // Check if renderWindow and interactor exist
+        if(this->renderWindow == nullptr)
+        {
+            this->renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+        }
+        if(this->renderWindowInteractor == nullptr)
+        {
+            this->renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+        }
+
+        // Create a new renderer
         vtkNew<vtkRenderer> renderer;
 
         // The actors are obtained from VTKRenderDelegates
@@ -285,8 +306,8 @@ public:
 public:
     int timerId;
     VTKViewer *viewer;
-    vtkNew<vtkRenderWindow> renderWindow;
-    vtkNew<vtkRenderWindowInteractor> renderWindowInteractor;
+    vtkSmartPointer<vtkRenderWindow> renderWindow;
+    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 };
 
 VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
@@ -317,20 +338,24 @@ void VTKViewer::render()
     this->endModule();
 }
 
-vtkRenderWindow* VTKViewer::getRenderWindow() const
+vtkRenderWindow* VTKViewer::getVtkRenderWindow() const
 {
     return this->renderer->getRenderWindow();
 }
 
+void VTKViewer::setVtkRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
+{
+    this->renderer->setRenderWindow(renWin);
+}
+
 vtkCamera* VTKViewer::getVtkCamera()
 {
-    return this->renderer->getRenderWindow()->GetRenderers()->
-        GetFirstRenderer()->GetActiveCamera();
+    return this->getVtkRenderer()->GetActiveCamera();
 }
 
 vtkRenderer* VTKViewer::getVtkRenderer()
 {
-    return this->renderer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+    return this->getVtkRenderWindow()->GetRenderers()->GetFirstRenderer();
 }
 
 vtkRenderWindowInteractor* VTKViewer::getVtkRenderWindowInteractor()

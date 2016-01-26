@@ -342,7 +342,7 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
     imageActor->SetPosition(0.5, 0.5);
 
     // Renderer
-    vtkRenderer* rendererVtk = vtkViewer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* rendererVtk = vtkViewer->getVtkRenderer();
     rendererVtk->AddActor2D(imageActor.GetPointer());
 }
 
@@ -432,7 +432,7 @@ int main()
     // not to erase the changes on the observers made to the
     // interactor in vtkViewer::addRenderer()
     vtkNew<ScreenCaptureInteractorStyle> style;
-    style->initialize(vtkViewer->getRenderWindow());
+    style->initialize(vtkViewer->getVtkRenderWindow());
     vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
