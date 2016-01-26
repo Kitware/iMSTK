@@ -102,7 +102,8 @@ public:
     ///
     void addChartActor(vtkContextActor* chartActor, vtkContextScene* chartScene);
 
-    vtkRenderWindow* getRenderWindow() const;
+    vtkRenderWindow* getVtkRenderWindow() const;
+    void setVtkRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin);
 
 protected:
     ///

@@ -20,6 +20,10 @@
 #include<vector>
 
 #include "Devices/DeviceInterface.h"
+#include "VRPNDeviceClient.h"
+#include <vrpn_Analog.h>
+#include <vrpn_Tracker.h>
+#include <vrpn_Button.h>
 
 class vrpn_Connection;
 
@@ -32,10 +36,23 @@ public:
     VRPNDeviceServer();
     ~VRPNDeviceServer() = default;
 
+    bool addDeviceClient(const std::shared_ptr<VRPNDeviceClient> deviceClient,
+                         const bool addFiltering=false);
     void exec() override;
 
 private:
     vrpn_Connection *connection;
+
+    /* Devices list
+    * The best would be to store only one map of all devices
+    * by using `vrpn_BaseClass` but this upcast is too many
+    * times ambiguous. Using `vprn_BaseClassUnique` solves the
+    * ambiguity problem but doesn't allow to run `mainloop()`.
+    */
+    std::map<std::string, std::shared_ptr<vrpn_Analog>> analogDevicesList;
+    std::map<std::string, std::shared_ptr<vrpn_Tracker>> trackerDevicesList;
+    std::map<std::string, std::shared_ptr<vrpn_Button>> buttonDevicesList;
+
 };
 
 #endif // VRPNSERVERDEVICE_H

@@ -35,7 +35,7 @@ public:
     ///
     /// \brief Constructor/Destructor
     ///
-    VRPNForceDevice();
+    VRPNForceDevice(std::string deviceURL);
     ~VRPNForceDevice();
 
     ///

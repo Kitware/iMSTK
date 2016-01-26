@@ -754,7 +754,7 @@ inline int tri_tri_intersect_with_isectline(double V0[3],double V1[3],double V2[
   double b,c,max;
   int smallest1,smallest2;
   //tansel
-  double temp;
+  double temp = 0.0;
    //end tansel
 
   /* compute plane equation of triangle(V0,V1,V2) */

@@ -59,8 +59,7 @@
 #include <vtkRendererCollection.h>
 #include <vtkRenderer.h>
 
-#define SPACE_EXPLORER_DEVICE true
-
+const DeviceType controllerType = DeviceType::NAVIGATOR_3DCONNEXION;
 const float X = 8;
 const float Y = 6;
 const float Z = 6;
@@ -343,7 +342,7 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
     imageActor->SetPosition(0.5, 0.5);
 
     // Renderer
-    vtkRenderer* rendererVtk = vtkViewer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* rendererVtk = vtkViewer->getVtkRenderer();
     rendererVtk->AddActor2D(imageActor.GetPointer());
 }
 
@@ -351,30 +350,35 @@ void add2DOverlay(std::shared_ptr<VTKViewer> vtkViewer,
 /// \brief Create a Laparoscopic camera controller and connect
 /// it to the vtk viewer
 ///
-int addCameraController(std::shared_ptr<SDK> sdk)
+void addCameraController(std::shared_ptr<SDK> sdk)
 {
+    std::string deviceURL;
 
-    std::shared_ptr<VRPNForceDevice> camClient = std::make_shared<VRPNForceDevice>();
-    std::shared_ptr<VRPNDeviceServer> server;
-    std::string input;
+    // Set Camera Client
+    switch( controllerType )
+    {
+        case DeviceType::NAVIGATOR_3DCONNEXION:
+            deviceURL = "navigator@localhost";
+        break;
+        case DeviceType::SPACE_EXPLORER_3DCONNEXION:
+            deviceURL = "device0@localhost";
+        break;
+        case DeviceType::PHANTOM_OMNI:
+            deviceURL = "Phantom0@localhost"; //"Phantom@10.171.2.217"
+        break;
+        case DeviceType::XKEYS_XK3:
+            deviceURL = "xkeys0@localhost";
+        break;
+        case DeviceType::OSVR_HDK:
+            deviceURL = "com_osvr_Multiserver/OSVRHackerDevKit0@localhost";
+        break;
+    }
+    auto camClient = std::make_shared<VRPNDeviceClient>(controllerType, deviceURL);
+    std::cout<<"Device URL = "<<camClient->getDeviceURL()<<std::endl;
 
-    if (SPACE_EXPLORER_DEVICE)
-    {
-        server = std::make_shared<VRPNDeviceServer>();
-        input = "navigator@localhost";
-    }
-    else
-    {
-        //get some user input and setup device url
-        std::string input = "Phantom0@localhost";//"Phantom@10.171.2.217"
-        std::cout << "Enter the VRPN device URL(" << camClient->getDeviceURL() << "): ";
-        std::getline(std::cin, input);
-    }
-    if (input.empty())
-    {
-        return EXIT_FAILURE;
-    }
-    camClient->setDeviceURL(input);
+    // Set server
+    std::shared_ptr<VRPNDeviceServer> server = std::make_shared<VRPNDeviceServer>();
+    server->addDeviceClient(camClient);
 
     // Get vtkCamera
     auto viewer = sdk->getViewerInstance();
@@ -384,18 +388,13 @@ int addCameraController(std::shared_ptr<SDK> sdk)
 
     // Set Camera Controller
     auto camController = std::make_shared<LaparoscopicCameraController>(camClient);
-    camController->setScalingFactor(40.0);
+    camController->setScalingFactor(8);
     camController->setCamera(cam);
 
     // Register modules
+    sdk->registerModule(server);
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
-    if (SPACE_EXPLORER_DEVICE)
-    {
-        sdk->registerModule(server);
-    }
-
-    return EXIT_SUCCESS;
 }
 
 int main()
@@ -433,7 +432,7 @@ int main()
     // not to erase the changes on the observers made to the
     // interactor in vtkViewer::addRenderer()
     vtkNew<ScreenCaptureInteractorStyle> style;
-    style->initialize(vtkViewer->getRenderWindow());
+    style->initialize(vtkViewer->getVtkRenderWindow());
     vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 
