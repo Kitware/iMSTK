@@ -126,7 +126,7 @@ std::shared_ptr< OdeSystemState > DeformableSceneObject::getPreviousState()
 }
 
 //---------------------------------------------------------------------------
-Eigen::Map<Vec3d> DeformableSceneObject::getVelocity(const int index)
+Eigen::Map<Vec3d> DeformableSceneObject::getVelocity(const int index) const
 {
     auto velocities = this->currentState->getVelocities();
     return Vec3d::Map(&velocities(index));
@@ -136,6 +136,18 @@ Eigen::Map<Vec3d> DeformableSceneObject::getVelocity(const int index)
 const Vec3d& DeformableSceneObject::getGravity() const
 {
     return this->gravity;
+}
+
+//---------------------------------------------------------------------------
+void DeformableSceneObject::updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces)
+{
+    auto externalForce = Matrixd::Map(this->f.data(), 3, this->numOfNodes);
+
+    for(const auto & force : forces)
+    {
+        auto i = force.first;
+        externalForce.col(i) -= force.second;
+    }
 }
 
 }

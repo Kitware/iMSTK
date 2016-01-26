@@ -39,12 +39,37 @@
 #include "Rendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
-int main(int ac, char **av)
+#include "Testing/ReadPaths.h"
+
+int main(int ac, char** av)
 {
-    std::string configFile = "./nidus.config";
-    if(ac == 2)
+    std::string configPaths = "./Config.paths";
+    if(ac > 1)
     {
-        configFile = av[1];
+        configPaths = av[1];
+    }
+
+    auto paths = imstk::ReadPaths(configPaths);
+    if(std::get<imstk::Path::Binary>(paths).empty() &&
+        std::get<imstk::Path::Source>(paths).empty())
+    {
+        std::cerr << "Error: Configuration file not found." << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "\tUsage: " << av[0] << " /path_to/Config.paths" << std::endl;
+        std::cerr << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    auto dataPath = std::get<imstk::Path::Binary>(paths);
+    std::string configFile = dataPath+"/nidus.config";
+    std::string meshFile = dataPath+"/nidusV1764.vtk";
+    std::string meshWeightsFile = dataPath+"/nidusV1764.interp";
+    std::string meshSurfaceFile = dataPath+"/nidusS7415.vtk";
+
+    if(configFile.empty())
+    {
+        std::cerr << "Configuration file not found." << std::endl;
+        return EXIT_FAILURE;
     }
 
     imstk::InitVTKRendering();
@@ -65,54 +90,47 @@ int main(int ac, char **av)
     auto femSimulator = std::make_shared<imstk::ObjectSimulator>();
 
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femModel = std::make_shared<imstk::VegaFEMDeformableSceneObject>("nidusV1764.vtk",
-                                                                   configFile);
+    auto femModel = std::make_shared<imstk::VegaFEMDeformableSceneObject>(meshFile,configFile);
 
+    // Load rendering mesh
+    auto volumeMesh = std::static_pointer_cast<imstk::VegaVolumetricMesh>(femModel->getPhysicsModel()->getMesh());
+
+    auto visualModel = std::make_shared<imstk::MeshModel>();
+    visualModel->load(meshSurfaceFile);
+
+    auto visualMesh = visualModel->getMeshAs<imstk::SurfaceMesh>();
+
+    //-------------------------------------------------------
+    // Mesh render detail
+    // Setup Shaders and textures
+    //-------------------------------------------------------
+    imstk::Shaders::createShader("wetshader", dataPath+"/shaders/wet_vert.glsl", dataPath+"/shaders/wet_frag.glsl", "");
+
+    auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS );
+    meshRenderDetail->setAmbientColor(imstk::Color(0.2,0.2,0.2,1.0));
+    meshRenderDetail->setDiffuseColor(imstk::Color::colorRed);
+    meshRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0,0.5));
+    meshRenderDetail->setShininess(100);
+
+//     meshRenderDetail->addShaderProgram("wetshader");
+//     meshRenderDetail->addTexture("decal",
+//                                  dataPath+"/textures/brainx.bmp",
+//                                  "textureDecal",
+//                                  "wetshader");
+//
+//     meshRenderDetail->addTexture("bump",
+//                                  dataPath+"/textures/metalbump.jpg",
+//                                  "textureBump",
+//                                  "wetshader");
+
+    if(visualMesh)
+    {
+        visualMesh->updateInitialVertices();
+        visualMesh->setRenderDetail(meshRenderDetail);
+        volumeMesh->attachSurfaceMesh(visualMesh/*,meshWeightsFile*/);
+    }
+    femModel->setVisualModel(visualModel);
     sdk->addSceneActor(femModel, femSimulator);
-
-    //-------------------------------------------------------
-    // Create scene actor 2:  plane + dummy simulator
-    //-------------------------------------------------------
-    // Create dummy simulator
-    auto staticSimulator = std::make_shared<imstk::ObjectSimulator>();
-
-    // Create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<imstk::StaticSceneObject>();
-
-    auto plane = std::make_shared<imstk::PlaneCollisionModel>(imstk::Vec3d(0.0,0.0,-35.0),
-                                                       imstk::Vec3d(0.0,0.0,1.0));
-
-    staticObject->setModel(plane);
-    sdk->addSceneActor(staticObject, staticSimulator);
-
-    //-------------------------------------------------------
-    // Enable collision between scene actors 1 and 2
-    //-------------------------------------------------------
-    auto meshModel = femModel->getCollisionModel();
-    if(!meshModel)
-    {
-        std::cout << "There is no collision model attached to this scene object" << std::endl;
-    }
-    else
-    {
-        auto planeMeshCollisionPairs = std::make_shared<imstk::CollisionManager>();
-        planeMeshCollisionPairs->setModels(meshModel, plane);
-
-        sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
-
-        auto planeToMeshCollisionDetection = std::make_shared<imstk::PlaneToMeshCollision>();
-
-        sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
-
-        //-------------------------------------------------------
-        // Enable contact handling between scene actors 1 and 2
-        //-------------------------------------------------------
-        auto planeToMeshContact = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
-        planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
-        planeToMeshContact->setSceneObjects(staticObject, femModel);
-
-        sdkSimulator->registerContactHandling(planeToMeshContact);
-    }
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -143,7 +161,7 @@ int main(int ac, char **av)
 
     // Camera setup
     auto sceneCamera = imstk::Camera::getDefaultCamera();
-    sceneCamera->setPos(-60,0,0);
+    sceneCamera->setPos(60,0,0);
     sceneCamera->setZoom(.5);
     scene->addCamera(sceneCamera);
 

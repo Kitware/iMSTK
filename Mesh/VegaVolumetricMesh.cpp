@@ -317,7 +317,7 @@ readWeights(std::shared_ptr<SurfaceMesh> surfaceMesh,
         weigths.push_back(w[3]);
     }
 
-    std::cout << "\tTotal # of weights read: " << weigths.size() / this->mesh->getNumElementVertices() << std::endl;
+    std::cout << "\tTotal # of weights read: " << weigths.size() / verticesPerElement << std::endl;
 }
 
 //---------------------------------------------------------------------------
@@ -388,6 +388,7 @@ generateWeigths(std::shared_ptr<SurfaceMesh> surfaceMesh,
 
     if(saveToDisk)
     {
+        // TODO: add to logger
         this->saveWeights(surfaceMesh, filename);
     }
 }

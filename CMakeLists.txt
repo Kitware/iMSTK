@@ -317,7 +317,6 @@ add_subdirectory(ContactHandling)
 add_subdirectory(Core)
 add_subdirectory(Devices)
 add_subdirectory(Event)
-add_subdirectory(Examples)
 add_subdirectory(Geometry)
 add_subdirectory(IO)
 add_subdirectory(Mesh)
@@ -366,6 +365,7 @@ install(FILES
 
 if(BUILD_TESTING)
   add_subdirectory(Testing)
+  add_subdirectory(Examples)
 endif()
 
 set(CPACK_COMPONENTS_ALL Development)

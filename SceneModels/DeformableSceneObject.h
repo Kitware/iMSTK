@@ -86,7 +86,7 @@ public:
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    Eigen::Map<Vec3d> getVelocity(const int index);
+    Eigen::Map<Vec3d> getVelocity(const int index) const override;
 
     ///
     /// \brief Returns velocity of at a given location for the current state.
@@ -96,15 +96,7 @@ public:
     ///
     /// \brief Update cumulative forces
     ///
-    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces)
-    {
-        auto externalForce = Matrixd::Map(this->f.data(),3,this->numOfNodes);
-        for(const auto &force : forces)
-        {
-            auto i = force.first;
-            externalForce.col(i) -= force.second;
-        }
-    }
+    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces);
 
 private:
     ///////////////////////////////////////////////////////////////////////////////
@@ -114,18 +106,18 @@ private:
 
     ///serialize function explicity writes the object to the memory block
     ///each scene object should know how to write itself to a memory block
-    void serialize(void *){}
+    void serialize(void *) override {}
 
     ///Unserialize function can recover the object from the memory location
-    void unSerialize(void *){};
+    void unSerialize(void *) override {};
 
     ///this function may not be used
     ///every Scene Object should know how to clone itself. Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    std::shared_ptr<SceneObject> clone(){return nullptr;};
+    std::shared_ptr<SceneObject> clone() override { return nullptr; };
 
     /// \brief print information related the scene object
-    void printInfo() const{};
+    void printInfo() const override {};
 
 protected:
     std::shared_ptr<TimeIntegrator> odeSolver; ///> Integration scheme
@@ -137,7 +129,7 @@ protected:
 
     SparseMatrixd M; ///> Mass matrix
     SparseMatrixd C; ///> Raleigh Damping matrix
-    SparseMatrixd D; ///> Raleigh Damping matrix
+    SparseMatrixd D; ///> Lagrangian Damping matrix
     SparseMatrixd K; ///> Stiffness matrix
     Vectord f;       ///> Accumulative forces vector
 

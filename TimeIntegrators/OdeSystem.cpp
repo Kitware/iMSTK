@@ -26,6 +26,9 @@ OdeSystem::OdeSystem(): BaseSystem(systemMatrix, rhs)
 }
 
 //---------------------------------------------------------------------------
+OdeSystem::~OdeSystem() {}
+
+//---------------------------------------------------------------------------
 void OdeSystem::setJaconbianFv(OdeSystem::JacobianOperatorType newDFv)
 {
     this->DFv = newDFv;

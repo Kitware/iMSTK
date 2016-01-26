@@ -41,15 +41,38 @@
 #include "VirtualTools/ToolCoupler.h"
 #include "Rendering/InitVTKRendering.h"
 
+#include "Testing/ReadPaths.h"
+
 int main(int ac, char** av)
 {
-    std::string configFile = "./box.config";
+    std::string configPaths = "./Config.paths";
     if(ac > 1)
     {
-        configFile = av[1];
+        configPaths = av[1];
+    }
+    auto paths = imstk::ReadPaths(configPaths);
+    if(std::get<imstk::Path::Binary>(paths).empty() &&
+       std::get<imstk::Path::Source>(paths).empty())
+    {
+        std::cerr << "Error: Configuration file not found." << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "\tUsage: " << av[0] << " /path_to/Config.paths" << std::endl;
+        std::cerr << std::endl;
+        return EXIT_FAILURE;
     }
 
-    // initRenderDelegates();
+    std::string configFile = std::get<imstk::Path::Binary>(paths)+"/box.config";
+    std::string meshFile = std::get<imstk::Path::Binary>(paths)+"/box.veg";
+    std::string meshWeightsFile = std::get<imstk::Path::Binary>(paths)+"/box.interp";
+    std::string meshSurfaceFile = std::get<imstk::Path::Binary>(paths)+"/box.vtk";
+    std::string loliMeshFile = std::get<imstk::Path::Binary>(paths)+"/loli.vtk";
+
+    if(configFile.empty())
+    {
+        std::cerr << "Vega configuration file not found." << std::endl;
+        return EXIT_FAILURE;
+    }
+
     imstk::InitVTKRendering();
     imstk::InitIODelegates();
 
@@ -85,10 +108,10 @@ int main(int ac, char** av)
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject =
-    std::make_shared<imstk::VegaFEMDeformableSceneObject>("./box.veg",configFile);
+    std::make_shared<imstk::VegaFEMDeformableSceneObject>(meshFile,configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_WIREFRAME);
+    auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_SURFACE);
     meshRenderDetail->setAmbientColor(imstk::Color(0.2,0.2,0.2,1.0));
     meshRenderDetail->setDiffuseColor(imstk::Color::colorGray);
     meshRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0,0.5));
@@ -98,7 +121,7 @@ int main(int ac, char** av)
     auto volumeMesh = std::static_pointer_cast<imstk::VegaVolumetricMesh>(femObject->getPhysicsModel()->getMesh());
 
     auto visualModel = std::make_shared<imstk::MeshModel>();
-    visualModel->load("./box.vtk");
+    visualModel->load(meshSurfaceFile);
     femObject->setVisualModel(visualModel);
 
     auto visualMesh = visualModel->getMeshAs<imstk::SurfaceMesh>();
@@ -106,8 +129,8 @@ int main(int ac, char** av)
     if(visualMesh)
     {
         visualMesh->updateInitialVertices();
-//         visualMesh->setRenderDetail(meshRenderDetail);
-        volumeMesh->attachSurfaceMesh(visualMesh,"./box.interp");
+        visualMesh->setRenderDetail(meshRenderDetail);
+        volumeMesh->attachSurfaceMesh(visualMesh);
     }
     sdk->addSceneActor(femObject, femSimulator);
 
@@ -136,16 +159,16 @@ int main(int ac, char** av)
     auto loliSceneObject = std::make_shared<imstk::StaticSceneObject>();
 
     auto loliCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
-    loliCollisionModel->loadTriangleMesh("./loli.vtk");
+    loliCollisionModel->loadTriangleMesh(loliMeshFile);
     loliSceneObject->setModel(loliCollisionModel);
 
     auto loliMesh = loliCollisionModel->getMesh();
     imstk::BaseMesh::TransformType transform =
         Eigen::Translation3d(imstk::Vec3d(0,0,0))*Eigen::Scaling(0.1);
 
-    auto loliRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_WIREFRAME);
+    auto loliRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_SURFACE);
     loliRenderDetail->setAmbientColor(imstk::Color(0.2, 0.2, 0.2, 0.5));
-    loliRenderDetail->setDiffuseColor(imstk::Color::colorYellow);
+    loliRenderDetail->setDiffuseColor(imstk::Color::colorGray);
     loliRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0, 0.5));
     loliRenderDetail->setShininess(20.0);
 

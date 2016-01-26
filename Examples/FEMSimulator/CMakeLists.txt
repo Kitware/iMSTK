@@ -40,3 +40,7 @@ set_target_properties(${APP}
     PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
+
+set(SOURCE_PATH ${PROJECT_SOURCE_DIR}/Testing)
+set(BINARY_PATH ${PROJECT_BINARY_DIR}/Testing/ExamplesData/Box)
+configure_file(${PROJECT_SOURCE_DIR}/Testing/path.in ${CMAKE_CURRENT_BINARY_DIR}/Config.paths @ONLY)
