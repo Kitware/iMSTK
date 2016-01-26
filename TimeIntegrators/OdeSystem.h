@@ -40,7 +40,7 @@ public:
 
 public:
     OdeSystem();
-    ~OdeSystem() = default;
+    virtual ~OdeSystem() = default;
 
     ///
     /// \brief Set the derivative with respect to v of the right hand side.

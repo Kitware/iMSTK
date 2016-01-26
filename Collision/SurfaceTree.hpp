@@ -378,7 +378,7 @@ void SurfaceTree<CellType>::translateRot()
 template<typename CellType>
 void SurfaceTree<CellType>::getIntersectingNodes(const std::shared_ptr<CellType> left,
         const std::shared_ptr<CellType> right,
-        std::vector<SurfaceTree<CellType>::CellPairType> &result)
+        std::vector<CellPairType> &result)
 {
     if(left->getAabb().intersection(right->getAabb()).isEmpty())
     {

@@ -40,7 +40,7 @@ namespace core {
 ///     apply to them. They can be used to model objects that do not move in the scene or
 ///     or objects that are controlled by external hardware, i.e. haptics devices.
 ///
-class StaticSceneObject : public SceneObject, public OdeSystem
+class StaticSceneObject : public SceneObject
 {
 public:
     ///

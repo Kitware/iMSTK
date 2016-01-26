@@ -93,7 +93,7 @@ public:
     ///
     /// \brief Set the render window
     ///
-    void *setRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
+    void setRenderWindow(vtkSmartPointer<vtkRenderWindow> renWin)
     {
         this->renderWindow = renWin;
         if(this->renderWindow->GetInteractor())
