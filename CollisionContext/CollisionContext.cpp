@@ -21,6 +21,8 @@
 
 #include "Solvers/SystemOfEquations.h"
 
+namespace imstk {
+
 //---------------------------------------------------------------------------
 void CollisionContext::addInteraction(
     std::shared_ptr< SystemOfEquations > sceneObjectA,
@@ -403,4 +405,6 @@ void CollisionContext::appendNeighbors(std::vector<bool>& visited,
             }
         }
     }
+}
+
 }

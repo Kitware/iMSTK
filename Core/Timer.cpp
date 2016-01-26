@@ -20,7 +20,7 @@
 // iMSTK includes
 #include "Core/Timer.h"
 
-namespace core {
+namespace imstk {
 
 Timer::Timer()
 {

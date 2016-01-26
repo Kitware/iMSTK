@@ -19,9 +19,9 @@
 
 #include "Event/KeyboardEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType KeyboardEvent::EventName = core::EventType::Keyboard;
+EventType KeyboardEvent::EventName = EventType::Keyboard;
 
 KeyboardEvent::KeyboardEvent(const Key& button)
     : pressed(false), key(button), modKey(ModKey::none)

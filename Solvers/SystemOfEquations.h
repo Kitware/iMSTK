@@ -26,6 +26,8 @@
 #include "Core/Vector.h"
 #include "Core/Matrix.h"
 
+namespace imstk {
+
 ///
 /// \class SystemOfEquations
 ///
@@ -35,8 +37,8 @@
 class SystemOfEquations
 {
 public:
-    using VectorFunctionType = std::function<const core::Vectord&(const core::Vectord &)>;
-    using MatrixFunctionType = std::function<const core::SparseMatrixd&(const core::Vectord &)>;
+    using VectorFunctionType = std::function<const Vectord&(const Vectord &)>;
+    using MatrixFunctionType = std::function<const SparseMatrixd&(const Vectord &)>;
 
 public:
     ///
@@ -67,7 +69,7 @@ public:
     /// \param x Value.
     /// \return Function value.
     ///
-    inline virtual const core::Vectord &evalF(const core::Vectord &x)
+    inline virtual const Vectord &evalF(const Vectord &x)
     {
         return this->F(x);
     }
@@ -78,7 +80,7 @@ public:
     /// \param x Value.
     /// \return Function value.
     ///
-    inline virtual const core::SparseMatrixd &evalDF(const core::Vectord &x)
+    inline virtual const SparseMatrixd &evalDF(const Vectord &x)
     {
         return this->DF(x);
     }
@@ -112,11 +114,11 @@ public:
     ///
     /// \brief Constructor.
     ///
-    LinearSystem(const MatrixType &matrix, const core::Vectord &b) :
+    LinearSystem(const MatrixType &matrix, const Vectord &b) :
         A(matrix),
         rhs(b)
     {
-        this->F = [this](const core::Vectord & x) -> core::Vectord &
+        this->F = [this](const Vectord & x) -> Vectord &
         {
             this->f = this->A * x;
             return this->f;
@@ -132,7 +134,7 @@ public:
     ///
     ///  \return Right hand side.
     ///
-    inline const core::Vectord &getRHSVector() const
+    inline const Vectord &getRHSVector() const
     {
         return this->rhs;
     }
@@ -142,7 +144,7 @@ public:
     ///
     /// \param newRhs new rhs.
     ///
-    inline void setRHSVector(const core::Vectord &newRhs)
+    inline void setRHSVector(const Vectord &newRhs)
     {
         this->rhs = newRhs;
     }
@@ -162,7 +164,7 @@ public:
     ///
     /// \param newMatrix New matrix.
     ///
-    inline void setMatrix(const core::SparseMatrixd &newMatrix)
+    inline void setMatrix(const SparseMatrixd &newMatrix)
     {
         this->A = newMatrix;
     }
@@ -175,7 +177,7 @@ public:
     ///
     /// \return Residual vector r.
     ///
-    inline core::Vectord &computeResidual(const core::Vectord &x, core::Vectord &r) const
+    inline Vectord &computeResidual(const Vectord &x, Vectord &r) const
     {
         r = this->rhs - this->F(x);
         return r;
@@ -222,15 +224,17 @@ public:
     ///
     /// \return Function value.
     ///
-    inline core::Vectord &getFunctionValue()
+    inline Vectord &getFunctionValue()
     {
         return this->f;
     }
 
 private:
     const MatrixType &A;
-    const core::Vectord &rhs;
-    core::Vectord f; ///> Scratch storage for matrix-vector operations
+    const Vectord &rhs;
+    Vectord f; ///> Scratch storage for matrix-vector operations
 };
+
+}
 
 #endif // SYSTEM_OF_EQUATIONS

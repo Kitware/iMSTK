@@ -19,17 +19,17 @@
 
 #include "Event/ObjectClickedEvent.h"
 
-namespace event {
+namespace imstk {
 
-core::EventType ObjectClickedEvent::EventName = core::EventType::ObjectClicked;
+EventType ObjectClickedEvent::EventName = EventType::ObjectClicked;
 
 ObjectClickedEvent::ObjectClickedEvent(const size_t& objectId): id(objectId)
 {}
-void ObjectClickedEvent::setWindowCoord(const core::Vec3d& coordinates)
+void ObjectClickedEvent::setWindowCoord(const Vec3d& coordinates)
 {
     this->coord = coordinates;
 }
-const core::Vec3d& ObjectClickedEvent::getWindowCoord()
+const Vec3d& ObjectClickedEvent::getWindowCoord()
 {
     return this->coord;
 }

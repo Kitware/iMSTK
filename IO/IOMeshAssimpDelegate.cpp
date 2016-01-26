@@ -17,7 +17,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 #include "Core/Factory.h"
 #include "IO/IOMeshDelegate.h"
 #include "Mesh/SurfaceMesh.h"
@@ -26,6 +25,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+
+namespace imstk {
 
 class IOMeshAssimpDelegate : public IOMeshDelegate
 {
@@ -63,7 +64,7 @@ void IOMeshAssimpDelegate::read()
     // Extract the information from the aiScene's mesh objects
     aiMesh *mesh = scene->mMeshes[0]; //Guarenteed to have atleast one mesh
 
-    std::vector<core::Vec3d> vertices;
+    std::vector<Vec3d> vertices;
     vertices.reserve(mesh->mNumVertices);
 
     // Get indexed vertex data
@@ -120,3 +121,5 @@ void IOMeshAssimpDelegate::read()
 }
 
 RegisterFactoryClass(IOMeshDelegate,IOMeshAssimpDelegate,IOMesh::ReaderGroup::Assimp);
+
+}

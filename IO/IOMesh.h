@@ -20,13 +20,14 @@
 #ifndef IO_MESH_H
 #define IO_MESH_H
 
-#include "Core/Factory.h"
 #include <memory>
 
+#include "Core/Factory.h"
+
+namespace imstk {
+
 class IOMeshDelegate;
-namespace Core{
-    class BaseMesh;
-}
+class BaseMesh;
 
 ///
 /// \brief Mesh input/output class. This class is used to read/write meshes on
@@ -88,8 +89,8 @@ public:
     ///
     /// \brief Mesh accessors
     ///
-    std::shared_ptr<Core::BaseMesh> getMesh();
-    void setMesh(std::shared_ptr<Core::BaseMesh> newMesh);
+    std::shared_ptr<BaseMesh> getMesh();
+    void setMesh(std::shared_ptr<BaseMesh> newMesh);
 
     ///
     /// \brief Mesh accessors
@@ -128,11 +129,13 @@ private:
     MeshFileType fileType;
 
     // Mesh pointer.
-    std::shared_ptr<Core::BaseMesh> mesh;
+    std::shared_ptr<BaseMesh> mesh;
 
     // Handle delegation of readers.
     class DelegatorType;
     std::unique_ptr<DelegatorType> delegator;
 };
+
+}
 
 #endif // MESHIO_H

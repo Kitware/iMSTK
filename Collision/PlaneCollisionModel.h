@@ -22,14 +22,18 @@
 
 #include "Geometry/PlaneModel.h"
 
+namespace imstk {
+
 class PlaneCollisionModel : public PlaneModel
 {
 public:
-    PlaneCollisionModel(const core::Vec3d &p, const core::Vec3d &n);
+    PlaneCollisionModel(const Vec3d &p, const Vec3d &n);
 
     ~PlaneCollisionModel();
 
 
 };
+
+}
 
 #endif // COLLISION_PLANECOLLISIONMODEL_H_H

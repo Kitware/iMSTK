@@ -23,6 +23,8 @@
 #include "Solvers/ConjugateGradient.h"
 #include <iostream>
 
+namespace imstk {
+
 NewtonMethod::NewtonMethod():
     linearSolver(std::make_shared<ConjugateGradient>()),
     forcingTerm(0.9),
@@ -34,7 +36,7 @@ NewtonMethod::NewtonMethod():
     useArmijo(true) {}
 
 //---------------------------------------------------------------------------
-void NewtonMethod::solve(core::Vectord &x)
+void NewtonMethod::solve(Vectord &x)
 {
     if(!this->nonLinearSystem)
     {
@@ -46,7 +48,7 @@ void NewtonMethod::solve(core::Vectord &x)
     double fnorm = this->nonLinearSystem->evalF(x).norm();
     double stopTolerance = this->absoluteTolerance + this->relativeTolerance * fnorm;
     this->linearSolver->setTolerance(stopTolerance);
-    core::Vectord dx = x;
+    Vectord dx = x;
 
     for(size_t i = 0; i < this->maxIterations; ++i)
     {
@@ -109,7 +111,7 @@ std::shared_ptr<NewtonMethod::LinearSolverType> NewtonMethod::getLinearSolver() 
 }
 
 //---------------------------------------------------------------------------
-void NewtonMethod::updateJacobian(const core::Vectord &x)
+void NewtonMethod::updateJacobian(const Vectord &x)
 {
     // Evaluate the Jacobian and sets the matrix
     if(!this->nonLinearSystem)
@@ -140,4 +142,6 @@ void NewtonMethod::setAbsoluteTolerance(const double aTolerance)
 double NewtonMethod::getAbsoluteTolerance() const
 {
     return this->absoluteTolerance;
+}
+
 }

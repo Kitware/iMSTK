@@ -29,11 +29,10 @@
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
-class ErrorLog;
+namespace imstk {
 
-namespace core {
-    class Event;
-}
+class ErrorLog;
+class Event;
 
 ///
 /// \brief This type of models are meant to be static in the sense that dynamics do not
@@ -66,7 +65,7 @@ public:
     ///
     ///
     ///
-    virtual void handleEvent(std::shared_ptr<core::Event>) override {}
+    virtual void handleEvent(std::shared_ptr<Event>) override {}
 
     ///
     /// \brief Initialize mesh for this model
@@ -107,5 +106,7 @@ private:
 private:
     std::string fileName;
 };
+
+}
 
 #endif

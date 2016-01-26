@@ -27,9 +27,7 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
-// namespace iMSTK
-// {
-
+namespace imstk {
 
 /// Aliases for vectors
 
@@ -58,8 +56,6 @@ template<typename T>
 using StdVector3 = std::vector<Vector3<T>,
     Eigen::aligned_allocator<Vector3<T>>>;
 
-namespace core
-{
 /// A 2D vector of floats.
 using Vec2f = Vector2<float>;
 
@@ -104,10 +100,10 @@ using VectorMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,1>>;
 template<typename T>
 using MatrixMapType = Eigen::Map<Eigen::Matrix<T,Eigen::Dynamic,Eigen::Dynamic>>;
 
-} // core
+} // imstk
 
 template<typename T>
-std::ostream& operator<<(std::ostream& os, const std::vector<Vector3<T>>& obj)
+std::ostream& operator<<(std::ostream& os, const std::vector<imstk::Vector3<T>>& obj)
 {
     for(auto v : obj)
     {
@@ -116,6 +112,5 @@ std::ostream& operator<<(std::ostream& os, const std::vector<Vector3<T>>& obj)
     return os;
 }
 
-// } // iMSTK
 
 #endif // CORE_VECTOR_H

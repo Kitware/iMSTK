@@ -24,6 +24,8 @@
 #include "Core/ContactHandling.h"
 #include "Core/CollisionManager.h"
 
+namespace imstk {
+
 /// \brief Penalty based for contact handling
 class PenaltyContactHandling : public ContactHandling
 {
@@ -80,5 +82,7 @@ protected:
     double stiffness;
     double damping;
 };
+
+}
 
 #endif // CONTACT_HANDLING_PENALTY_CONTACTHANDLING_H

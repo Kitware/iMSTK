@@ -19,7 +19,9 @@
 
 #include "Geometry/PlaneModel.h"
 
-PlaneModel::PlaneModel(const core::Vec3d& p, const core::Vec3d& n)
+namespace imstk {
+
+PlaneModel::PlaneModel(const Vec3d& p, const Vec3d& n)
 {
     this->plane = std::make_shared<Plane>(p, n);
     this->transform = RigidTransformType::Identity();
@@ -34,18 +36,18 @@ void PlaneModel::draw()
 {
     this->plane->draw();
 }
-const core::Vec3d& PlaneModel::getSurfaceNormal() const
+const Vec3d& PlaneModel::getSurfaceNormal() const
 {
     return this->transform.linear() * this->plane->getUnitNormal();
 }
-void PlaneModel::setNormal(const core::Vec3d& normal)
+void PlaneModel::setNormal(const Vec3d& normal)
 {
     this->plane->setUnitNormal(normal);
 }
-const core::Vec3d& PlaneModel::getPosition() const
+const Vec3d& PlaneModel::getPosition() const
 {
   // NB: This static variable makes the function thread-unsafe.
-  static core::Vec3d result;
+  static Vec3d result;
   result = this->transform * this->plane->getPoint();
   return result;
 }
@@ -66,4 +68,6 @@ void PlaneModel::setPlaneModel(const std::shared_ptr<Plane> &p)
 std::shared_ptr<Plane> PlaneModel::getPlaneModel() const
 {
     return plane;
+}
+
 }

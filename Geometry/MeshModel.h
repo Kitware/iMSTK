@@ -28,6 +28,8 @@
 #include "Core/Model.h"
 #include "Mesh/SurfaceMesh.h"
 
+namespace imstk {
+
 ///
 /// @brief Mesh representation of a model.
 /// Base class used by all models that can be represented by a mesh
@@ -60,7 +62,7 @@ public:
     ///
     /// @brief Returns array of vertices
     ///
-    const std::vector<core::Vec3d> &getVertices() const;
+    const std::vector<Vec3d> &getVertices() const;
 
     ///
     /// @brief Returns array of triangles
@@ -75,12 +77,12 @@ public:
     ///
     /// @brief Set internal mesh data structure
     ///
-    void setModelMesh(std::shared_ptr<Core::BaseMesh> modelMesh);
+    void setModelMesh(std::shared_ptr<BaseMesh> modelMesh);
 
     ///
     /// @brief Returns pointer to undelying mesh object.
     ///
-    std::shared_ptr<Core::BaseMesh> getMesh() override;
+    std::shared_ptr<BaseMesh> getMesh() override;
 
     ///
     /// \brief Mesh accessors
@@ -92,8 +94,10 @@ public:
     }
 
 protected:
-    std::shared_ptr<Core::BaseMesh> mesh; // Underlying mesh
+    std::shared_ptr<BaseMesh> mesh; // Underlying mesh
 
 };
+
+}
 
 #endif // GEOMETRY_MESHMODEL_H

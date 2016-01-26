@@ -19,47 +19,46 @@
 
 #include <memory>
 
-#include "Core/Model.h"
 #include "Core/Geometry.h"
+#include "Core/Model.h"
 #include "Core/RenderDelegate.h"
+#include "Core/RenderDetail.h"
+#include "IO/IOMesh.h"
 #include "Mesh/SurfaceMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
-#include "IO/IOMesh.h"
-
-#include "VTKRendering/MeshNodalCoordinates.h"
-#include "VTKRendering/VTKRenderDelegate.h"
+#include "Rendering/MeshNodalCoordinates.h"
+#include "Rendering/VTKRenderDelegate.h"
 
 // VTK incudes
-#include <vtkSmartPointer.h>
-#include <vtkNew.h>
 #include <vtkActor.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkDataSetMapper.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPoints.h>
-#include <vtkPointData.h>
 #include <vtkCellArray.h>
-#include <vtkGeometryFilter.h>
-#include <vtkPolyDataNormals.h>
-
+#include <vtkDataSetMapper.h>
 #include <vtkFloatArray.h>
-#include <vtkTexture.h>
-#include <vtkOpenGLPolyDataMapper.h>
-#include <vtkProperty.h>
-#include "vtkShaderProgram.h"
-#include "vtkOpenGLVertexArrayObject.h"
-#include "vtkOpenGLVertexBufferObject.h"
-#include <vtkXMLImageDataReader.h>
-#include <vtkImageReader.h>
+#include <vtkGeometryFilter.h>
 #include <vtkImageReader2Factory.h>
-#include "RenderDetail.h"
-#include "vtkTextureObject.h"
-#include "vtkOpenGLTexture.h"
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkIndent.h"
+#include <vtkImageReader.h>
+#include <vtkIndent.h>
+#include <vtkNew.h>
+#include <vtkOpenGLPolyDataMapper.h>
+#include <vtkOpenGLRenderWindow.h>
+#include <vtkOpenGLTexture.h>
+#include <vtkOpenGLVertexArrayObject.h>
+#include <vtkOpenGLVertexBufferObject.h>
+#include <vtkPointData.h>
+#include <vtkPoints.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPolyDataNormals.h>
+#include <vtkProperty.h>
+#include <vtkShaderProgram.h>
+#include <vtkSmartPointer.h>
+#include <vtkTexture.h>
+#include <vtkTextureObject.h>
+#include <vtkUnstructuredGrid.h>
+#include <vtkXMLImageDataReader.h>
+
+namespace imstk {
 
 vtkStandardNewMacro(CustomGLPolyDataMapper)
-
 
 class MeshRenderDelegate : public VTKRenderDelegate
 {
@@ -80,7 +79,7 @@ private:
     vtkSmartPointer<vtkDataSet> dataSet;
 };
 
-class vtkOpenGLTexture_Impl :public vtkOpenGLTexture
+class vtkOpenGLTexture_Impl : public vtkOpenGLTexture
 {
 public:
     static vtkOpenGLTexture_Impl* New();
@@ -369,3 +368,5 @@ void VTKRenderDelegate::setShadersProgram(vtkOpenGLPolyDataMapper *mapper,
 RegisterFactoryClass(RenderDelegate,
                      MeshRenderDelegate,
                      RenderDelegate::RendererType::VTK)
+
+}

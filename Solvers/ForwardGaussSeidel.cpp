@@ -19,15 +19,17 @@
 
 #include "Solvers/ForwardGaussSeidel.h"
 
+namespace imstk {
+
 ForwardGaussSeidel::ForwardGaussSeidel(
-    const core::SparseMatrixd &A,
-    const core::Vectord &rhs)
+    const SparseMatrixd &A,
+    const Vectord &rhs)
 {
-    this->linearSystem = std::make_shared<LinearSystem<core::SparseMatrixd>>(A, rhs);
+    this->linearSystem = std::make_shared<LinearSystem<SparseMatrixd>>(A, rhs);
 }
 
 //---------------------------------------------------------------------------
-void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
+void ForwardGaussSeidel::iterate(Vectord &x, bool updateResidual)
 {
     if(!this->linearSystem)
     {
@@ -47,14 +49,14 @@ void ForwardGaussSeidel::iterate(core::Vectord &x, bool updateResidual)
 }
 
 //---------------------------------------------------------------------------
-void ForwardGaussSeidel::relax(core::Vectord& x)
+void ForwardGaussSeidel::relax(Vectord& x)
 {
     if(!this->linearSystem)
     {
         // TODO: Log this
         return;
     }
-    
+
     const auto &A = this->linearSystem->getMatrix();
     const auto &b = this->linearSystem->getRHSVector();
     //
@@ -63,7 +65,7 @@ void ForwardGaussSeidel::relax(core::Vectord& x)
     for (int k = 0; k < A.outerSize(); ++k)
     {
         double sum = b(k);
-        for (core::SparseMatrixd::InnerIterator it(A,k); it; ++it)
+        for (SparseMatrixd::InnerIterator it(A,k); it; ++it)
         {
             sum -= it.value()*x(it.col());
         }
@@ -73,7 +75,9 @@ void ForwardGaussSeidel::relax(core::Vectord& x)
 
 //---------------------------------------------------------------------------
 void ForwardGaussSeidel::
-setSystem(std::shared_ptr<LinearSystem<core::SparseMatrixd>> newSystem)
+setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 {
     LinearSolver::setSystem(newSystem);
+}
+
 }

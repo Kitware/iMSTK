@@ -23,6 +23,8 @@
 #include "Core/Geometry.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 AABB::AABB()
 {
     this->reset();
@@ -33,9 +35,9 @@ AABB::AABB()
       this->renderDelegate->setSourceGeometry(this);
 }
 
-core::Vec3d AABB::center() const
+Vec3d AABB::center() const
 {
-    core::Vec3d output;
+    Vec3d output;
     output << 0.5f * ( this->aabbMin[0] + this->aabbMax[0] ),
            0.5f * ( this->aabbMin[1] + this->aabbMax[1] ),
            0.5f * ( this->aabbMin[2] + this->aabbMax[2] );
@@ -166,7 +168,7 @@ Cube::Cube()
 
 void Cube::subDivide( int p_divisionPerAxis, Cube *p_cube )
 {
-    core::Vec3d minPoint;
+    Vec3d minPoint;
     double divLength = ( sideLength / p_divisionPerAxis );
     int index = 0;
     minPoint << center[0] - sideLength * 0.5,
@@ -192,16 +194,16 @@ void Cube::expand( double p_expansion )
     sideLength = sideLength + sideLength * p_expansion;
 }
 
-core::Vec3d Cube::leftMinCorner() const
+Vec3d Cube::leftMinCorner() const
 {
-    return core::Vec3d( center[0] - sideLength * 0.5,
+    return Vec3d( center[0] - sideLength * 0.5,
                     center[1] - sideLength * 0.5,
                     center[2] - sideLength * 0.5 );
 }
 
-core::Vec3d Cube::rightMaxCorner() const
+Vec3d Cube::rightMaxCorner() const
 {
-    return core::Vec3d( center[0] + sideLength * 0.5,
+    return Vec3d( center[0] + sideLength * 0.5,
                     center[1] + sideLength * 0.5,
                     center[2] + sideLength * 0.5 );
 }
@@ -219,4 +221,6 @@ Sphere Cube::getInscribedSphere()
 Sphere Cube::getTangent2EdgeSphere()
 {
     return Sphere( center, sideLength * 0.707106 );
+}
+
 }

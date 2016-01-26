@@ -24,6 +24,8 @@
 #include "ContactHandling/PenaltyContactHandling.h"
 #include "SceneModels/DeformableSceneObject.h"
 
+namespace imstk {
+
 ///
 /// @brief Penalty based for contact handling
 ///
@@ -48,5 +50,7 @@ public:
     virtual void computeForces(std::shared_ptr<DeformableSceneObject> sceneObject);
 
 };
+
+}
 
 #endif // CONTACT_HANDLING_PENALTY_FEM_TO_STATIC_SCENE_OBJECT

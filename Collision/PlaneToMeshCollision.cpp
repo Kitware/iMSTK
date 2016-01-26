@@ -28,6 +28,8 @@
 // STL includes
 #include <limits>
 
+namespace imstk {
+
 void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> pair)
 {
     auto meshModel = std::static_pointer_cast<MeshCollisionModel>(pair->getFirst());
@@ -38,8 +40,8 @@ void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> 
         return;
     }
 
-    core::Vec3d normal = planeModel->getPlaneModel()->getUnitNormal();
-    core::Vec3d contactPoint = planeModel->getPlaneModel()->getPoint();
+    Vec3d normal = planeModel->getPlaneModel()->getUnitNormal();
+    Vec3d contactPoint = planeModel->getPlaneModel()->getPoint();
 
     pair->clearContacts();
     const auto &vertices = meshModel->getVertices();
@@ -54,4 +56,6 @@ void PlaneToMeshCollision::doComputeCollision(std::shared_ptr<CollisionManager> 
             pair->addContact(planeModel, d, vertex-d*normal, i, -normal);// Create contact
         }
     }
+}
+
 }

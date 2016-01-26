@@ -19,7 +19,7 @@
 
 #include "Core/BaseMesh.h"
 
-namespace Core {
+namespace imstk {
 
 BaseMesh::BaseMesh() {}
 BaseMesh::~BaseMesh() {}
@@ -31,11 +31,11 @@ void BaseMesh::resetVertices()
 {
     this->vertices = this->origVerts;
 }
-const std::vector<core::Vec3d>& BaseMesh::getVertices() const
+const std::vector<Vec3d>& BaseMesh::getVertices() const
 {
     return this->vertices;
 }
-std::vector<core::Vec3d>& BaseMesh::getVertices()
+std::vector<Vec3d>& BaseMesh::getVertices()
 {
     return this->vertices;
 }
@@ -75,19 +75,19 @@ void BaseMesh::setHexahedrons(const std::vector<std::array< std::size_t,8>>& hex
 {
     this->hexahedraArray = hexahedrons;
 }
-const core::Vec3d& BaseMesh::getVertex ( const size_t i ) const
+const Vec3d& BaseMesh::getVertex ( const size_t i ) const
 {
     return this->vertices[i];
 }
-core::Vec3d& BaseMesh::getVertex ( const size_t i )
+Vec3d& BaseMesh::getVertex ( const size_t i )
 {
     return this->vertices[i];
 }
-const std::vector<core::Vec3d>& BaseMesh::getOrigVertices() const
+const std::vector<Vec3d>& BaseMesh::getOrigVertices() const
 {
     return this->origVerts;
 }
-std::vector<core::Vec3d>& BaseMesh::getOrigVertices()
+std::vector<Vec3d>& BaseMesh::getOrigVertices()
 {
     return this->origVerts;
 }
@@ -106,7 +106,7 @@ void BaseMesh::setRenderingId( size_t id )
 void BaseMesh::translate( const Eigen::Translation3d& translation, bool setInitialPoints )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
-                    [translation] ( core::Vec3d &v )
+                    [translation] ( Vec3d &v )
     {
         v = translation*v;
     } );
@@ -118,15 +118,15 @@ void BaseMesh::translate( const Eigen::Translation3d& translation, bool setIniti
 void BaseMesh::scale ( const Eigen::UniformScaling<double>& scaling )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
-                    [scaling] ( core::Vec3d &v )
+                    [scaling] ( Vec3d &v )
     {
         v = scaling*v;
     } );
 }
-void BaseMesh::rotate ( const core::Quaterniond& rotation )
+void BaseMesh::rotate ( const Quaterniond& rotation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
-                    [rotation] ( core::Vec3d &v )
+                    [rotation] ( Vec3d &v )
     {
         v = rotation*v;
     } );
@@ -134,18 +134,18 @@ void BaseMesh::rotate ( const core::Quaterniond& rotation )
 void BaseMesh::transform ( const TransformType& transformation )
 {
     std::for_each ( std::begin(vertices),std::end(vertices),
-                    [transformation] ( core::Vec3d &v )
+                    [transformation] ( Vec3d &v )
     {
         v = transformation*v;
     } );
 }
-void BaseMesh::setVertices(const std::vector<core::Vec3d>& vertices)
+void BaseMesh::setVertices(const std::vector<Vec3d>& vertices)
 {
     this->vertices = vertices;
 }
-std::array<core::Vec3d,3> BaseMesh::getTriangleVertices(size_t i) const
+std::array<Vec3d,3> BaseMesh::getTriangleVertices(size_t i) const
 {
-    std::array<core::Vec3d,3> triangleVertices =
+    std::array<Vec3d,3> triangleVertices =
     {
         this->vertices[this->triangleArray[i][0]],
         this->vertices[this->triangleArray[i][1]],

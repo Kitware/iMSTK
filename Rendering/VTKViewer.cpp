@@ -17,8 +17,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "VTKRendering/VTKViewer.h"
-#include "VTKRendering/VTKRenderDelegate.h"
+#include "Rendering/VTKViewer.h"
+#include "Rendering/VTKRenderDelegate.h"
 #include "Core/MakeUnique.h"
 #include "Core/Factory.h"
 
@@ -37,6 +37,7 @@
 #include <vtkAxesActor.h>
 #include <vtkOrientationMarkerWidget.h>
 
+namespace imstk {
 
 ///
 /// \brief Wrapper to the vtkRendering pipeline
@@ -153,7 +154,7 @@ public:
     {
         auto position = camera->getPos();
         auto focus = camera->getFocus();
-        auto upView = camera->getOrientation() * core::Vec3f::UnitZ();
+        auto upView = camera->getOrientation() * Vec3f::UnitZ();
         auto viewangle = camera->getViewAngleDeg();
         auto nearClippingRange = camera->getNearClipDist();
         auto farClippingRange = camera->getFarClipDist();
@@ -310,7 +311,7 @@ public:
     vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 };
 
-VTKViewer::VTKViewer() : renderer(Core::make_unique<VTKRenderer> (this))
+VTKViewer::VTKViewer() : renderer(imstk::make_unique<VTKRenderer> (this))
 {
     this->name = "VTKViewer";
 }
@@ -381,3 +382,5 @@ void VTKViewer::initRenderingContext()
 RegisterFactoryClass(ViewerBase,
                      VTKViewer,
                      RenderDelegate::RendererType::VTK)
+
+}

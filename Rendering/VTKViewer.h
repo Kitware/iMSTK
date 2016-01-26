@@ -20,7 +20,7 @@
 #ifndef RENDERING_VTKVIEWER_H
 #define RENDERING_VTKVIEWER_H
 
-#include "Core/ViewerBase.h"
+#include "Rendering/ViewerBase.h"
 #include "VirtualTools/LaparoscopicCameraController.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkContextScene.h"
@@ -30,6 +30,8 @@
 class vtkCamera;
 class vtkRenderWindowInteractor;
 class vtkRenderer;
+
+namespace imstk {
 
 class VTKViewer : public ViewerBase
 {
@@ -163,5 +165,7 @@ private:
     class VTKRenderer;
     std::unique_ptr<VTKRenderer> renderer;
 };
+
+}
 
 #endif // VTKVIEWER_H

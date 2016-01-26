@@ -34,6 +34,8 @@
 #include "generateSurfaceMesh.h"
 #include "objMesh.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for mesh IO delegates.
 ///
@@ -82,7 +84,7 @@ protected:
     /// \brief Creates a new surface mesh with vertices and triangleArray and stores
     /// it in the meshIO.
     ///
-    void setSurfaceMesh(const std::vector<core::Vec3d> &vertices,
+    void setSurfaceMesh(const std::vector<Vec3d> &vertices,
                         const std::vector<std::array<size_t,3>> &triangleArray);
 
     ///
@@ -90,16 +92,16 @@ protected:
     /// it in the meshIO. Uses the vega mesh constructor that takes boundary conditions
     /// and material properties.
     ///
-    void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
+    void setVegaTetraMesh(const std::vector<Vec3d> &vertices,
                           const std::vector<std::array<size_t,4>> &tetraArray,
                           const std::vector<size_t> &bdConditions,
-                          const core::Vec3d &material);
+                          const Vec3d &material);
 
     ///
     /// \brief Creates a new vega volumetric mesh with vertices and tetraArray and stores
     /// it in the meshIO.
     ///
-    void setVegaTetraMesh(const std::vector<core::Vec3d> &vertices,
+    void setVegaTetraMesh(const std::vector<Vec3d> &vertices,
                           const std::vector<std::array<size_t,4>> &tetraArray);
 
     ///
@@ -107,7 +109,7 @@ protected:
     /// it in the meshIO. Uses the vega mesh constructor that takes boundary conditions
     /// and material properties.
     ///
-    void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
+    void setVegaHexaMesh(const std::vector<Vec3d> &vertices,
                          const std::vector<std::array<size_t,8>> &hexaArray,
                          const std::vector<size_t> &bdConditions,
                          const std::array<double,3> &material);
@@ -118,7 +120,7 @@ protected:
     /// \param vertices Vertex array
     /// \param hexaArray Hexahedron array
     ///
-    void setVegaHexaMesh(const std::vector<core::Vec3d> &vertices,
+    void setVegaHexaMesh(const std::vector<Vec3d> &vertices,
                          const std::vector<std::array<size_t,8>> &hexaArray);
 
     ///
@@ -131,8 +133,8 @@ protected:
     /// \param uniqueVertexArray Output map of the vertices. Maps indices from the
     ///     surfaceVertices to vertices.
     ///
-    void reorderSurfaceTopology(const std::vector<core::Vec3d> &vertices,
-                                std::vector<core::Vec3d> &surfaceVertices,
+    void reorderSurfaceTopology(const std::vector<Vec3d> &vertices,
+                                std::vector<Vec3d> &surfaceVertices,
                                 std::vector<std::array<size_t,3>> &triangleArray,
                                 std::unordered_map<size_t,size_t> &uniqueVertexArray
                                );
@@ -140,4 +142,7 @@ protected:
 protected:
     IOMesh *meshIO;
 };
+
+}
+
 #endif // READERDELEGATE_H

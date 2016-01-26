@@ -24,23 +24,23 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace event {
+namespace imstk {
 
-class ObjectClickedEvent : public core::Event
+class ObjectClickedEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     ObjectClickedEvent(const size_t &objectId);
 
-    void setWindowCoord(const core::Vec3d &coordinates);
+    void setWindowCoord(const Vec3d &coordinates);
 
-    const core::Vec3d &getWindowCoord();
+    const Vec3d &getWindowCoord();
 
 private:
     size_t id; // object id
-    core::Vec3d coord; // position
+    Vec3d coord; // position
 };
 
 } // event namespace

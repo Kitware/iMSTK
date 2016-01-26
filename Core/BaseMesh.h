@@ -23,14 +23,11 @@
 // STD includes
 #include <array>
 
-// Eigen includes
-#include <Eigen/Geometry>
-
-#include "Core/CoreClass.h"
 #include "Core/Vector.h"
 #include "Core/Quaternion.h"
+#include "Core/CoreClass.h"
 
-namespace Core {
+namespace imstk {
 
 ///
 /// \brief Base class for all meshes used in the simulation.
@@ -75,9 +72,9 @@ public:
     ///
     /// \brief Accessors for vertex coordinates
     ///
-    const std::vector<core::Vec3d> &getVertices() const;
-    std::vector<core::Vec3d> &getVertices();
-    void setVertices(const std::vector<core::Vec3d> &vertices);
+    const std::vector<Vec3d> &getVertices() const;
+    std::vector<Vec3d> &getVertices();
+    void setVertices(const std::vector<Vec3d> &vertices);
 
     ///
     /// \brief Topology data accessors
@@ -97,14 +94,14 @@ public:
     ///
     /// \brief Returns vertex ith coordinate
     ///
-    const core::Vec3d &getVertex(const size_t i) const;
-    core::Vec3d &getVertex(const size_t i);
+    const Vec3d &getVertex(const size_t i) const;
+    Vec3d &getVertex(const size_t i);
 
     ///
     /// \brief Returns original vertex coordinates
     ///
-    const std::vector<core::Vec3d> &getOrigVertices() const;
-    std::vector<core::Vec3d> &getOrigVertices();
+    const std::vector<Vec3d> &getOrigVertices() const;
+    std::vector<Vec3d> &getOrigVertices();
 
     ///
     /// \brief Get the total number of vertices
@@ -134,7 +131,7 @@ public:
     ///
     /// \brief Apply a rotation to the vertices
     ///
-    void rotate(const core::Quaterniond &rotation);
+    void rotate(const Quaterniond &rotation);
 
     ///
     /// \brief Apply any affine tranformation to the vertices.
@@ -144,7 +141,7 @@ public:
     ///
     /// \brief Apply any affine tranformation to the vertices.
     ///
-    std::array<core::Vec3d,3> getTriangleVertices(size_t i) const;
+    std::array<Vec3d,3> getTriangleVertices(size_t i) const;
 
 	int getMeshType();
 	void setMeshType(int);
@@ -152,10 +149,10 @@ public:
 protected:
     // Data arrays - Vertices only
     // vertices co-ordinate data at time t
-    std::vector<core::Vec3d> vertices;
+    std::vector<Vec3d> vertices;
 
     // vertices co-ordinate data at time t=0
-    std::vector<core::Vec3d> origVerts;
+    std::vector<Vec3d> origVerts;
 
     // Topology arrays
     std::vector<std::array<size_t,3>> triangleArray;
@@ -173,5 +170,6 @@ protected:
 	int  meshType;
 };
 
-}// namespace Core
+}// namespace imstk
+
 #endif //

@@ -49,6 +49,8 @@ typedef struct _vrpn_TRACKERVELCB vrpn_TRACKERVELCB;
 typedef struct _vrpn_TRACKERCB vrpn_TRACKERCB;
 typedef struct _vrpn_ANALOGCB vrpn_ANALOGCB;
 
+namespace imstk {
+
 // Add support for VRPN devices by adding a DeviceType
 // here and constructing the connection in VRPNDeviceServer.cpp
 enum class DeviceType { SPACE_EXPLORER_3DCONNEXION,
@@ -164,7 +166,9 @@ protected:
 private:
     std::shared_ptr<vrpn_Button_Remote> vrpnButton;     //!< VRPN button interface
     std::shared_ptr<vrpn_Tracker_Remote> vrpnTracker;   //!< VRPN position/orientation interface
-    std::shared_ptr<vrpn_Analog_Remote> vrpnAnalog;     //!< VRPN analog interface
+    std::shared_ptr<vrpn_Analog_Remote> vrpnAnalog;   //!< VRPN position/orientation interface
 };
+
+}
 
 #endif // VRPNDEVICE_H

@@ -16,37 +16,14 @@
 #
 ###########################################################################
 
-imstk_add_library(VTKRendering
-  SOURCES
-    VTKViewer.cpp
-    VTKMeshRenderDelegate.cpp
-    VTKPlaneRenderDelegate.cpp
-    VTKStaticSceneObjectRenderDelegate.cpp
-    VTKSceneModelRenderDelegate.cpp
-    InitVTKRendering.cpp
-  PUBLIC_HEADERS
-    VTKViewer.h
-    InitVTKRendering.h
+set(Module VtkRendering)
+
+add_executable(${Module}UnitTestRunner
+  ${BANDIT_RUNNER}
+  MeshNodalCoordinatesSpec.cpp
+  VtkViewerSpec.cpp
 )
 
-target_link_libraries(VTKRendering
-  PRIVATE
-    Core
-    Simulators
-    Rendering
-    Mesh
-    Geometry
-    Devices
-    SceneModels
-  PUBLIC
-    ${VTK_LIBRARIES}
-    )
-
-target_compile_options(VTKRendering
-  PUBLIC
-    $<$<CXX_COMPILER_ID:Clang>:-Wno-inconsistent-missing-override>
-)
-
-if(BUILD_TESTING)
-  add_subdirectory(UnitTests)
-endif()
+target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
+target_link_libraries(${Module}UnitTestRunner Core Mesh Rendering Geometry IO SceneModels)
+simple_test(${Module} --reporter=xunit)

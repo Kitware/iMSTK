@@ -24,6 +24,8 @@
 #include "vtkVariant.h"
 #include "vtkVariantCast.h"
 
+namespace imstk {
+
 //------------------------------------------------------------------------------
 // Can't use vtkStandardNewMacro with a template.
 template <class Scalar> MeshNodalCoordinates<Scalar> *
@@ -501,6 +503,8 @@ template <class Scalar> vtkIdType MeshNodalCoordinates<Scalar>
         }
     }
     return -1;
+}
+
 }
 
 #endif // MESHNODALCOORDINATES_H

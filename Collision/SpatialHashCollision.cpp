@@ -29,6 +29,7 @@
 #include "Collision/MeshCollisionModel.h"
 #include "Mesh/SurfaceMesh.h"
 
+namespace imstk {
 
 struct SpatialHashCollision::HashFunction
 {
@@ -55,7 +56,7 @@ SpatialHashCollision::SpatialHashCollision(int hashTableSize,
     cellsForTri2Line(hashTableSize),
     cellsForModel(hashTableSize),
     cellsForModelPoints(hashTableSize),
-    hasher(Core::make_unique<HashFunction>())
+    hasher(make_unique<HashFunction>())
 {
     cellSizeX = _cellSizeX;
     cellSizeY = _cellSizeY;
@@ -132,7 +133,7 @@ void SpatialHashCollision::computeCollisionTri2Tri()
 
     CellTriangle triA;
     CellTriangle triB;
-    core::Vec3d proj1, proj2, inter1, inter2;
+    Vec3d proj1, proj2, inter1, inter2;
     short point1, point2;
     int coPlanar;
 
@@ -181,7 +182,7 @@ void  SpatialHashCollision::computeCollisionLine2Tri()
     HashIterator<CellTriangle > iteratorTri;
     CellLine line;
     CellTriangle tri;
-    core::Vec3d intersection;
+    Vec3d intersection;
 
     while (cellLines.next(iteratorLine) && cellsForTri2Line.next(iteratorTri))
     {
@@ -250,7 +251,7 @@ void SpatialHashCollision::computeCollisionModel2Points()
 
 void SpatialHashCollision::computeHash(std::shared_ptr<MeshCollisionModel> model, const std::vector<int> &triangleIndexes)
 {
-    core::Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
+    Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
     for(auto&& i : triangleIndexes)
     {
         auto startIndices = model->getAabb(i).min().array()*cellSize.array();
@@ -279,7 +280,7 @@ void SpatialHashCollision::addTriangle(std::shared_ptr<MeshCollisionModel> model
     triangle.meshID = model->getMesh()->getUniqueId();
     triangle.primID = triangleId;
 
-    core::Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
+    Vec3d cellSize(1.0/cellSizeX,1.0/cellSizeY,1.0/cellSizeZ);
 
     auto startIndices = model->getAabb(triangleId).min().array()*cellSize.array();
     auto endIndices = model->getAabb(triangleId).max().array()*cellSize.array();
@@ -387,8 +388,7 @@ bool SpatialHashCollision::findCandidates()
         for(size_t j = i + 1; j < collisionModels.size(); j++)
         {
             if(findCandidateTris(collisionModels[i], collisionModels[j]) == false &&
-               collisionModels[i]->getCollisionGroup()->isCollisionPermitted(collisionModels[j]->getCollisionGroup()) !=
-               NULL)
+               collisionModels[i]->getCollisionGroup()->isCollisionPermitted(collisionModels[j]->getCollisionGroup()))
             {
                 continue;
             }
@@ -411,4 +411,6 @@ const std::vector< std::shared_ptr< CollidedTriangles > >& SpatialHashCollision:
 std::vector< std::shared_ptr< CollidedTriangles > >& SpatialHashCollision::getCollidedTriangles()
 {
     return collidedTriangles;
+}
+
 }

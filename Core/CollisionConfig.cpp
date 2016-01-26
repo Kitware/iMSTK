@@ -19,6 +19,8 @@
 
 #include "CollisionConfig.h"
 
+namespace imstk {
+
 bool CellTriangle::operator==( unsigned int p_ID )
 {
     return primID == p_ID;
@@ -118,4 +120,6 @@ bool CollisionGroup::isCollisionPermitted( std::shared_ptr<CollisionGroup> p_gro
     {
         return true;
     }
+}
+
 }

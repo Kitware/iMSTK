@@ -31,6 +31,7 @@ target_link_libraries(SimulationManager
   PRIVATE
     Core
     Simulators
+    Rendering
     )
 
 if(BUILD_TESTING)

@@ -23,6 +23,8 @@
 #include "Core/Vector.h"
 #include "Core/Matrix.h"
 
+namespace imstk {
+
 ///
 /// \brief Stores the state of the differential equation.
 ///
@@ -43,28 +45,28 @@ public:
     ///
     /// \return Constant reference to positions.
     ///
-    const core::Vectord &getPositions() const;
+    const Vectord &getPositions() const;
 
     ///
     /// \brief Get a writable reference to positions.
     ///
     /// \return Writable reference to positions.
     ///
-    core::Vectord &getPositions();
+    Vectord &getPositions();
 
     ///
     /// \brief Get a constant reference to velocities.
     ///
     /// \return Constant reference to velocities.
     ///
-    const core::Vectord &getVelocities() const;
+    const Vectord &getVelocities() const;
 
     ///
     /// \brief Get a writable reference to velocities.
     ///
     /// \return Writable reference to velocities.
     ///
-    core::Vectord &getVelocities();
+    Vectord &getVelocities();
 
     ///
     /// \brief Resize positions and velocity vectors.
@@ -85,7 +87,7 @@ public:
     /// \param M Sparse matrix container.
     /// \param withCompliance True if the fixed vertices should have compliance.
     ///
-    void applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance = true) const;
+    void applyBoundaryConditions(SparseMatrixd &M, bool withCompliance = true) const;
 
     ///
     /// \brief Apply boundary conditions to dense matrix.
@@ -93,20 +95,22 @@ public:
     /// \param M Dense matrix container.
     /// \param withCompliance True if the fixed vertices should have complieance.
     ///
-    void applyBoundaryConditions(core::Matrixd &M, bool withCompliance = true) const;
+    void applyBoundaryConditions(Matrixd &M, bool withCompliance = true) const;
 
     ///
     /// \brief Apply boundary conditions to a vector.
     ///
     /// \param x vector container.
     ///
-    void applyBoundaryConditions(core::Vectord &x) const;
+    void applyBoundaryConditions(Vectord &x) const;
 
 private:
-    core::Vectord positions; ///> State position.
-    core::Vectord velocities; ///> State velocity.
+    Vectord positions; ///> State position.
+    Vectord velocities; ///> State velocity.
 
     std::vector<size_t> fixedVertices; ///> Fixed dof ids
 };
+
+}
 
 #endif // ODESYSTEMSTATE_H

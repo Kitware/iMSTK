@@ -29,39 +29,39 @@
 #include <Core/Vector.h>
 #include <Core/Matrix.h>
 
-namespace event {
+namespace imstk {
 
-class HapticEvent : public core::Event
+class HapticEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     HapticEvent(const size_t &deviceId, const std::string &deviceName);
 
-    void setPosition(const core::Vec3d &coordinates);
+    void setPosition(const Vec3d &coordinates);
 
-    const core::Vec3d &getPosition();
+    const Vec3d &getPosition();
 
-    void setVelocity(const core::Vec3d &deviceVelocity);
+    void setVelocity(const Vec3d &deviceVelocity);
 
-    const core::Vec3d &getVelocity();
+    const Vec3d &getVelocity();
 
-    void setAngles(const core::Vec3d &deviceAngles);
+    void setAngles(const Vec3d &deviceAngles);
 
-    const core::Vec3d &getAngles();
+    const Vec3d &getAngles();
 
-    const core::Matrix44d &getTransform();
+    const Matrix44d &getTransform();
 
-    void setTransform(const core::Matrix44d &deviceTransform);
+    void setTransform(const Matrix44d &deviceTransform);
 
-    const core::Vec3d &getForce();
+    const Vec3d &getForce();
 
-    void setForce(const core::Vec3d &deviceForce);
+    void setForce(const Vec3d &deviceForce);
 
-    const core::Vec3d &getTorque();
+    const Vec3d &getTorque();
 
-    void setTorque(const core::Vec3d &deviceTorque);
+    void setTorque(const Vec3d &deviceTorque);
 
     size_t getDeviceId()
     {
@@ -81,12 +81,12 @@ public:
 private:
     size_t id; // device id
     std::string name; // device name
-    core::Vec3d position; // position
-    core::Vec3d velocity; // velocity of the tip
-    core::Vec3d angles; // angles
-    core::Vec3d force; // input force
-    core::Vec3d torque; // input torque
-    core::Matrix44d transform; // transformation matrix
+    Vec3d position; // position
+    Vec3d velocity; // velocity of the tip
+    Vec3d angles; // angles
+    Vec3d force; // input force
+    Vec3d torque; // input torque
+    Matrix44d transform; // transformation matrix
     std::array<bool,4> buttonState;//will be chnage later on
 };
 

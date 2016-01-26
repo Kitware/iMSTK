@@ -25,7 +25,7 @@
 #include <SFML/Window/Keyboard.hpp>
 #include <map>
 
-namespace event {
+namespace imstk {
 
 static const std::map<int, Key> sfmlToSmKeyMap = {
     {sf::Keyboard::A, Key::A},

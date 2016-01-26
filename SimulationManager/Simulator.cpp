@@ -23,6 +23,8 @@
 // Threads includes
 #include <ThreadPool.h>
 
+namespace imstk {
+
 /// \brief starts the tasks with the threads from thread pool
 void Simulator::beginFrame()
 {
@@ -47,7 +49,7 @@ void Simulator::initAsyncThreadPool()
         }
     }
 
-    asyncPool = Core::make_unique<ThreadPool>(asyncThreadPoolSize);
+    asyncPool = make_unique<ThreadPool>(asyncThreadPoolSize);
 }
 
 /// \brief the main simulation loop
@@ -229,7 +231,7 @@ bool Simulator::init()
     {
         maxThreadCount = std::max(simulators.size(), collisionDetectors.size());
     }
-    threadPool = Core::make_unique<ThreadPool>(maxThreadCount);
+    threadPool = make_unique<ThreadPool>(maxThreadCount);
 
     for(size_t i = 0; i < this->simulators.size(); i++)
     {
@@ -244,7 +246,7 @@ bool Simulator::init()
 
 Simulator::Simulator()
 {
-    type = core::ClassType::Simulator;
+    type = ClassType::Simulator;
     isInitialized = false;
     frameCounter = 0;
     main = nullptr;
@@ -286,4 +288,6 @@ void Simulator::exec()
 void Simulator::addCollisionPair(std::shared_ptr< CollisionManager > pair)
 {
     collisionPairs.emplace_back(pair);
+}
+
 }

@@ -22,9 +22,11 @@
 #include "Core/RenderDelegate.h"
 #include "Geometry/MeshModel.h"
 
+namespace imstk {
+
 StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
 {
-    type = core::ClassType::StaticSceneObject;
+    type = ClassType::StaticSceneObject;
 
     name = "Static_SceneObject_" + std::to_string(this->getUniqueId()->getId());
 }
@@ -58,4 +60,6 @@ void StaticSceneObject::loadInitialStates()
     model->load(fileName);
 
     this->setModel(model);
+}
+
 }

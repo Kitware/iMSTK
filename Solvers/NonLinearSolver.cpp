@@ -19,12 +19,14 @@
 
 #include "Solvers/NonLinearSolver.h"
 
+namespace imstk {
+
 NonLinearSolver::NonLinearSolver():
     sigma(std::array<double, 2> {.1, .5}),
     alpha(1e-4),
     armijoMax(30)
 {
-    this->updateIterate = [](const core::Vectord &dx, core::Vectord &x)
+    this->updateIterate = [](const Vectord &dx, Vectord &x)
     {
         x += dx;
     };
@@ -32,7 +34,7 @@ NonLinearSolver::NonLinearSolver():
 
 //---------------------------------------------------------------------------
 double NonLinearSolver::
-armijo(const core::Vectord &dx, core::Vectord &x, const double previousFnorm)
+armijo(const Vectord &dx, Vectord &x, const double previousFnorm)
 {
     /// Temporaries used in the line search
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
@@ -181,4 +183,6 @@ void NonLinearSolver::
 setUpdateIterate(const NonLinearSolver::UpdateIterateType& newUpdateIterate)
 {
     this->updateIterate = newUpdateIterate;
+}
+
 }

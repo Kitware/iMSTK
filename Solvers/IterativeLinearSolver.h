@@ -23,10 +23,12 @@
 // iMSTK includes
 #include "Solvers/LinearSolver.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for iterative linear solvers.
 ///
-class IterativeLinearSolver : public LinearSolver<core::SparseMatrixd>
+class IterativeLinearSolver : public LinearSolver<SparseMatrixd>
 {
 public:
     ///
@@ -41,14 +43,14 @@ public:
     /// \param x Current iterate.
     /// \param updateResidual Compute residual if true.
     ///
-    virtual void iterate(core::Vectord &x, bool updateResidual = true) = 0;
+    virtual void iterate(Vectord &x, bool updateResidual = true) = 0;
 
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations.
     ///
     /// \param x Current iterate.
     ///
-    virtual void solve(core::Vectord &x) override;
+    virtual void solve(Vectord &x) override;
 
     // -------------------------------------------------
     //  Accessors
@@ -69,12 +71,12 @@ public:
     ///
     /// \brief Return residual vector. This fuction does not do any computation.
     ///
-    virtual const core::Vectord &getResidual();
+    virtual const Vectord &getResidual();
 
     ///
     /// \brief Return error computed from the residual.
     ///
-    virtual double getError(const core::Vectord &x);
+    virtual double getError(const Vectord &x);
 
     ///
     /// \brief Print solver information.
@@ -83,7 +85,9 @@ public:
 
 protected:
     size_t maxIterations;   ///> Maximum number of iterations to be performed.
-    core::Vectord residual; ///> Storage for residual vector.
+    Vectord residual; ///> Storage for residual vector.
 };
+
+}
 
 #endif // SOLVERS_ITERATIVE_LINEAR_SOLVER

@@ -28,6 +28,8 @@
 #include "SimulationManager/SDK.h"
 #include "Event/AudioEvent.h"
 
+namespace imstk {
+
 /// \brief class to enable audio rendering
 class Audio: public CoreClass
 {
@@ -37,8 +39,8 @@ private:
 
     std::shared_ptr<ErrorLog> log; ///< log for errors
     std::string referenceName; ///< A human readable string to refer to the object
-    event::AudioEvent::AudioState state; ///< state of audio
-    event::AudioEvent::AudioState prevState; ///< state of audio in previous cycle
+    imstk::AudioEvent::AudioState state; ///< state of audio
+    imstk::AudioEvent::AudioState prevState; ///< state of audio in previous cycle
     float prevVolume; ///< state of audio volume in previous cycle
     float volume; ///< volume (max volume is 1.0)
     bool loop; ///< play the song in a loop
@@ -46,8 +48,8 @@ private:
 public:
     Audio() :
         referenceName(""),
-        state{event::AudioEvent::AudioState::Unknown },
-        prevState{event::AudioEvent::AudioState::Unknown },
+        state{imstk::AudioEvent::AudioState::Unknown },
+        prevState{imstk::AudioEvent::AudioState::Unknown },
         prevVolume{1.0},
         volume{1.0},
         loop{false}
@@ -67,7 +69,7 @@ public:
             assert(false);
         }
 
-        prevState = state = event::AudioEvent::AudioState::Stop;
+        prevState = state = imstk::AudioEvent::AudioState::Stop;
         volume = prevVolume = 1.0f;
     }
 
@@ -116,16 +118,16 @@ public:
     }
 
     /// \brief set the state of audio and continue playing
-    void setState(event::AudioEvent::AudioState p_state)
+    void setState(imstk::AudioEvent::AudioState p_state)
     {
         assert("" != referenceName);
 
         switch (state)
         {
-        case event::AudioEvent::AudioState::Play:
+        case imstk::AudioEvent::AudioState::Play:
             this->play();
             break;
-        case event::AudioEvent::AudioState::Stop:
+        case imstk::AudioEvent::AudioState::Stop:
             this->stop();
             break;
         default:
@@ -151,5 +153,7 @@ public:
         this->loop = p_loop;
     }
 };
+
+}
 
 #endif

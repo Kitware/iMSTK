@@ -27,6 +27,8 @@
 #include <string>
 #include <unordered_map>
 
+namespace imstk {
+
 /// \brief I/O definitions
 #define IMSTK_CONSOLE_INPUTBUFFER  512
 #define IMSTK_WINDOW_MAXSTRINGSIZE 255
@@ -45,7 +47,7 @@ public:
     virtual IOStream& operator >>(std::string &p_string) = 0;
     virtual IOStream& operator <<(std::string p_string) = 0;
 protected:
-    std::shared_ptr<core::EventHandler> eventHanlder;
+    std::shared_ptr<EventHandler> eventHanlder;
 };
 
 /// \brief  console stream; for printing text on the console
@@ -127,7 +129,7 @@ public:
     bool removeText(std::string p_tag);
 
     /// \brief  handle events
-    virtual void handleEvent(std::shared_ptr<core::Event> /*p_event*/) override {}
+    virtual void handleEvent(std::shared_ptr<Event> /*p_event*/) override {}
 
 protected:
     /// \brief  fonts
@@ -167,5 +169,7 @@ protected:
     /// \brief background color
     Color backGroundColor;
 };
+
+}
 
 #endif

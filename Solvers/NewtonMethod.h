@@ -23,6 +23,8 @@
 #include "Solvers/NonLinearSolver.h"
 #include "Solvers/LinearSolver.h"
 
+namespace imstk {
+
 ///
 /// @brief Newton method. This version of the newton method is based on the work
 ///     by Tim Kelly and others at NC State University. The algorithm is globally convergent
@@ -33,7 +35,7 @@
 class NewtonMethod : public NonLinearSolver
 {
 public:
-    using LinearSolverType = LinearSolver<core::SparseMatrixd>;
+    using LinearSolverType = LinearSolver<SparseMatrixd>;
 
 public:
     ///
@@ -50,7 +52,7 @@ public:
     ///
     /// \param x Current iterate.
     ///
-    void solve(core::Vectord &x) override;
+    void solve(Vectord &x) override;
 
     ///
     /// \brief Update forcing term according to Eisenstat-Walker criteria.
@@ -81,12 +83,12 @@ public:
     ///
     /// \param x Current iterate.
     ///
-    void updateJacobian(const core::Vectord &x);
+    void updateJacobian(const Vectord &x);
 
     ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix.
     ///
-    core::SparseMatrixd &getJacobianMatrix();
+    SparseMatrixd &getJacobianMatrix();
 
     ///
     /// \brief Set AbsoluteTolerance.
@@ -227,5 +229,7 @@ private:
     bool useArmijo;                                 ///> True if Armijo liner search is desired (Default: true).
     std::vector<double> fnorms;                     ///> Consecutive function norms
 };
+
+}
 
 #endif // INEXACT_NEWTON_H

@@ -19,16 +19,18 @@
 
 #include "BackwardSOR.h"
 
+namespace imstk {
+
 BackwardSOR::BackwardSOR(): weight(.9) {}
 
 //---------------------------------------------------------------------------
 BackwardSOR::
-BackwardSOR(const core::SparseMatrixd &A, const core::Vectord &rhs, const double &w)
+BackwardSOR(const SparseMatrixd &A, const Vectord &rhs, const double &w)
     : BackwardGaussSeidel(A, rhs), weight(w)
 {}
 
 //---------------------------------------------------------------------------
-void BackwardSOR::iterate(core::Vectord &x, bool updateResidual)
+void BackwardSOR::iterate(Vectord &x, bool updateResidual)
 {
     auto old = x; // necessary copy
     BackwardGaussSeidel::iterate(x, updateResidual);
@@ -45,4 +47,6 @@ void BackwardSOR::setWeight(const double &newWeight)
 const double &BackwardSOR::getWeight() const
 {
     return this->weight;
+}
+
 }

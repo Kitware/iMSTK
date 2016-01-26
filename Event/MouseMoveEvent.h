@@ -24,20 +24,20 @@
 #include "Core/Event.h"
 #include "Core/Vector.h"
 
-namespace event {
+namespace imstk {
 
-class MouseMoveEvent : public core::Event
+class MouseMoveEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
-    void setWindowCoord(const core::Vec2d &coordinates);
+    void setWindowCoord(const Vec2d &coordinates);
 
-    const core::Vec2d &getWindowCoord();
+    const Vec2d &getWindowCoord();
 
 private:
-    core::Vec2d coord; // X,Y coorindate relative to left edge
+    Vec2d coord; // X,Y coorindate relative to left edge
 };
 
 } // event namespace

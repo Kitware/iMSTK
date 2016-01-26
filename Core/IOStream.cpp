@@ -20,6 +20,8 @@
 // iMSTK includes
 #include "Core/IOStream.h"
 
+namespace imstk {
+
 ConsoleStream::ConsoleStream()
 {
 }
@@ -76,7 +78,7 @@ void OpenGLWindowStream::init(int p_totalTexts)
     textColor.setValue(1.0, 1.0, 1.0, 1.0);
     totalTexts = p_totalTexts;
     windowTexts = new WindowData[totalTexts];
-    this->setDrawOrder(core::ClassDrawOrder::AfterObjects);
+    this->setDrawOrder(ClassDrawOrder::AfterObjects);
 
     for (int i = 0; i < totalTexts; i++)
     {
@@ -170,7 +172,7 @@ WindowConsole::WindowConsole(int p_totalTexts)
 {
     init(p_totalTexts);
     backGroundColor.setValue(1.0, 1.0, 1.0, 0.15);
-    this->eventHanlder->attachEvent(core::EventType::Keyboard,shared_from_this());
+    this->eventHanlder->attachEvent(EventType::Keyboard,shared_from_this());
     left = 0.0;
     bottom = 0.0;
     right = 1.0;
@@ -203,4 +205,6 @@ int WindowConsole::addText(const std::string &p_tag, const std::string& p_string
 
     currentIndex = (currentIndex + 1) % totalTexts;
     return currentIndex;
+}
+
 }

@@ -25,6 +25,8 @@
 #include "Core/Vector.h"
 #include "Core/CoreClass.h"
 
+namespace imstk {
+
 struct GeometryRepresentation {};
 
 /// \brief Contains information related to the triangles that are present in a cell
@@ -35,7 +37,7 @@ struct CellTriangle : public GeometryRepresentation
     CellTriangle(const unsigned int &id) : primID(id) {}
     unsigned int primID;
     std::shared_ptr<UnifiedId> meshID;
-    core::Vec3d vert[3];
+    Vec3d vert[3];
 
     bool operator ==(unsigned int p_ID);
 
@@ -52,7 +54,7 @@ struct CellLine : public GeometryRepresentation
     CellLine(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Edge id
     std::shared_ptr<UnifiedId> meshID; ///< MeshLine id
-    core::Vec3d vert[2]; ///< Vertices
+    Vec3d vert[2]; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
     bool operator ==(CellLine &p_line);
@@ -67,7 +69,7 @@ struct CellModel : public GeometryRepresentation
     CellModel(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Model Prim id
     std::shared_ptr<UnifiedId> meshID; ///< MeshLine id
-    core::Vec3d center; ///< Vertices
+    Vec3d center; ///< Vertices
     double radius;
 
     bool operator ==(unsigned int p_ID);
@@ -86,7 +88,7 @@ struct CellPoint : public GeometryRepresentation
     CellPoint(const unsigned int &id) : primID(id) {}
     unsigned int primID; ///< Model Prim id
     std::shared_ptr<UnifiedId> meshID; ///< MeshLine id
-    core::Vec3d vert; ///< Vertices
+    Vec3d vert; ///< Vertices
 
     bool operator ==(unsigned int p_ID);
 
@@ -101,7 +103,7 @@ struct CollidedTriangles
 {
     CellTriangle tri1;
     CellTriangle tri2;
-    core::Vec3d proj1, proj2;
+    Vec3d proj1, proj2;
     short point1, point2;
 };
 
@@ -110,7 +112,7 @@ struct CollidedLineTris
 {
     CellTriangle tri;
     CellLine line;
-    core::Vec3d intersection;
+    Vec3d intersection;
 };
 
 /// \brief Contains model-point pair that have collided
@@ -146,5 +148,7 @@ public:
     bool isCollisionPermitted(std::shared_ptr<CollisionGroup> p_group) const;
 
 };
+
+}
 
 #endif

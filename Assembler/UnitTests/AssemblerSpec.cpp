@@ -17,19 +17,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef RENDERING_VTKRENDERING_H
-#define RENDERING_VTKRENDERING_H
+#include <bandit/bandit.h>
 
-#include "Core/Config.h"
+#include "Core/MakeUnique.h"
+#include "Assembler/Assembler.h"
 
-/// NOTE: Make sure that this file is included only once per application.
-#define IMSTK_REGISTER_VTKRENDER_DELEGATES() \
-    IMSTK_RUN_LOADER(register_MeshRenderDelegate); \
-    IMSTK_RUN_LOADER(register_PlaneRenderDelegate); \
-    IMSTK_RUN_LOADER(register_StaticSceneObjectRenderDelegate); \
-    IMSTK_RUN_LOADER(register_SceneModelRenderDelegate); \
-    IMSTK_RUN_LOADER(register_VTKViewer);
+using namespace bandit;
 
-void InitVTKRendering();
+go_bandit([](){
+    describe("Collision pair", []() {
+        it("constructs ", []() {
+            std::unique_ptr<imstk::Assembler> assembler(imstk::make_unique<imstk::Assembler>());
+            AssertThat(assembler != nullptr, IsTrue());
+        });
 
-#endif // VTKRENDERING_H
+    });
+
+});

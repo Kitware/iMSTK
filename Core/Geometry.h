@@ -28,6 +28,8 @@
 #include "Core/Factory.h"
 #include "RenderDelegate.h"
 
+namespace imstk {
+
 //forward declaration
 struct Sphere;
 
@@ -60,8 +62,8 @@ public:
     AnalyticalGeometry(){}
     ~AnalyticalGeometry(){}
 
-    virtual void translate(const core::Vec3d &t) = 0;
-    virtual void rotate(const core::Matrix33d &rot) = 0;
+    virtual void translate(const Vec3d &t) = 0;
+    virtual void rotate(const Matrix33d &rot) = 0;
 };
 
 /// \brief  Simple Plane definition with unit normal and spatial location
@@ -79,16 +81,16 @@ public:
     ~Plane(){}
 
     /// \brief create a plane with point and unit normal
-    Plane(const core::Vec3d &p, const core::Vec3d &n)
+    Plane(const Vec3d &p, const Vec3d &n)
     {
         this->point = p;
         this->unitNormal = n.normalized();
         this->width = 100.0;
 
-        this->drawPointsOrig[0] = core::Vec3d(width, 0, 0);
-        this->drawPointsOrig[1] = core::Vec3d(0, width, 0);
-        this->drawPointsOrig[2] = core::Vec3d(-width, 0, 0);
-        this->drawPointsOrig[3] = core::Vec3d(0, -width, 0);
+        this->drawPointsOrig[0] = Vec3d(width, 0, 0);
+        this->drawPointsOrig[1] = Vec3d(0, width, 0);
+        this->drawPointsOrig[2] = Vec3d(-width, 0, 0);
+        this->drawPointsOrig[3] = Vec3d(0, -width, 0);
 
         this->movedOrRotated = true;
 
@@ -97,18 +99,18 @@ public:
             "RenderDelegate", "PlaneRenderDelegate"));
     }
 
-    double distance(const core::Vec3d &p_vector)
+    double distance(const Vec3d &p_vector)
     {
         auto m = (p_vector - this->point).dot(this->unitNormal);
         return m;
     };
 
-    core::Vec3d project(const core::Vec3d &p_vector)
+    Vec3d project(const Vec3d &p_vector)
     {
         return p_vector - ((this->point - p_vector)*this->unitNormal.transpose())*this->unitNormal;
     };
 
-    const core::Vec3d &getUnitNormal() const
+    const Vec3d &getUnitNormal() const
     {
         return this->unitNormal;
     }
@@ -118,40 +120,40 @@ public:
         this->movedOrRotated = s;
     };
 
-    void setUnitNormal(const core::Vec3d &normal)
+    void setUnitNormal(const Vec3d &normal)
     {
         this->unitNormal = normal;
 
         this->movedOrRotated = true;
     }
 
-    const core::Vec3d &getPoint() const
+    const Vec3d &getPoint() const
     {
         return this->point;
     }
 
-    void setPoint(const core::Vec3d &p)
+    void setPoint(const Vec3d &p)
     {
         this->point = p;
 
         this->movedOrRotated = true;
     }
 
-    void translate(const core::Vec3d &t)
+    void translate(const Vec3d &t)
     {
         this->point += t;
 
         this->movedOrRotated = true;
     }
 
-    void rotate(const core::Matrix33d &rot)
+    void rotate(const Matrix33d &rot)
     {
         this->unitNormal = rot * this->unitNormal;
 
         this->movedOrRotated = true;
     }
 
-    void setDrawPoint(const core::Vec3d &p1, const core::Vec3d &p2, const core::Vec3d &p3, const core::Vec3d &p4)
+    void setDrawPoint(const Vec3d &p1, const Vec3d &p2, const Vec3d &p3, const Vec3d &p4)
     {
         this->drawPointsOrig[0] = p1;
         this->drawPointsOrig[1] = p2;
@@ -173,12 +175,12 @@ public:
 
     void updateDrawPoints()
     {
-        core::Vec3d ny = core::Vec3d(0.0, unitNormal[2], -unitNormal[1]);
-        core::Vec3d nz = ny.cross(unitNormal);
+        Vec3d ny = Vec3d(0.0, unitNormal[2], -unitNormal[1]);
+        Vec3d nz = ny.cross(unitNormal);
         ny.normalize();
         nz.normalize();
 
-        core::Matrix33d R;
+        Matrix33d R;
         R << this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2],
              this->unitNormal[0], ny[1], nz[2];
@@ -200,10 +202,10 @@ public:
 
 private:
     /// \brief unit normal of the plane
-    core::Vec3d unitNormal;
+    Vec3d unitNormal;
 
     /// \brief any point on the plane
-    core::Vec3d point;
+    Vec3d point;
 
     /// \brief true if the plane is static
     bool movedOrRotated;
@@ -212,10 +214,10 @@ private:
     double width;
 
     /// \brief four points used to render plane
-    core::Vec3d drawPoints[4];
+    Vec3d drawPoints[4];
 
     /// \brief four points used to render plane
-    core::Vec3d drawPointsOrig[4];
+    Vec3d drawPointsOrig[4];
 
     /// Render details
     std::shared_ptr<RenderDetail> renderDetail;
@@ -230,7 +232,7 @@ public:
     Sphere();
 
     /// \brief sphere constructor with center and radius
-    Sphere(const core::Vec3d &c, const double &r)
+    Sphere(const Vec3d &c, const double &r)
     {
         this->center = c;
         this->radius = r;
@@ -243,7 +245,7 @@ public:
         this->radius = r;
     }
 
-    void setCenter(const core::Vec3d& c)
+    void setCenter(const Vec3d& c)
     {
         this->center = c;
     }
@@ -253,12 +255,12 @@ public:
         this->radius += r;
     }
 
-    void translate(const core::Vec3d &t)
+    void translate(const Vec3d &t)
     {
         center += t;
     }
 
-    void rotate(const core::Matrix33d &/*rot*/)
+    void rotate(const Matrix33d &/*rot*/)
     {
         //Its a sphere! nothing to be done.
     }
@@ -268,14 +270,14 @@ public:
         return this->radius;
     }
 
-    const core::Vec3d &getCenter() const
+    const Vec3d &getCenter() const
     {
         return this->center;
     }
 
 private:
     /// \brief center of sphere
-    core::Vec3d center;
+    Vec3d center;
 
     /// \brief radius of sshere
     double radius;
@@ -285,7 +287,7 @@ private:
 struct Cube
 {
     /// \brief cube center
-    core::Vec3d center;
+    Vec3d center;
 
     /// \brief cube length
     double sideLength;
@@ -300,10 +302,10 @@ struct Cube
     void expand(double p_expansion);
 
     /// \brief returns the left most corner
-    core::Vec3d leftMinCorner() const ;
+    Vec3d leftMinCorner() const ;
 
     /// \brief returns right most corner
-    core::Vec3d rightMaxCorner() const;
+    Vec3d rightMaxCorner() const;
 
     /// \brief returns the smallest sphere encapsulates the cube
     Sphere getCircumscribedSphere();
@@ -323,17 +325,17 @@ class AABB : public VisualArtifact
 {
 public:
     /// \brief minimum x,y,z point
-    core::Vec3d aabbMin;
+    Vec3d aabbMin;
 
     /// \brief maximum x,y,z point
-    core::Vec3d aabbMax;
+    Vec3d aabbMax;
 
-    const core::Vec3d &getMax() const
+    const Vec3d &getMax() const
     {
         return aabbMax;
     }
 
-    const core::Vec3d &getMin() const
+    const Vec3d &getMin() const
     {
         return aabbMin;
     }
@@ -342,7 +344,7 @@ public:
     AABB();
 
     /// \brief center of the AABB
-    core::Vec3d center() const;
+    Vec3d center() const;
 
     /// \brief check if two AABB overlaps
     static bool checkOverlap(const AABB &p_aabbA, const AABB &p_aabbB);
@@ -393,5 +395,7 @@ public:
         this->aabbMax = this->aabbMax.array().max(other.getMax().array());
     }
 };
+
+}
 
 #endif

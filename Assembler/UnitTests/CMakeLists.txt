@@ -16,14 +16,15 @@
 #
 ###########################################################################
 
-set(Module VtkRendering)
+set(Module Assembler)
 
 add_executable(${Module}UnitTestRunner
   ${BANDIT_RUNNER}
-  MeshNodalCoordinatesSpec.cpp
-  VtkViewerSpec.cpp
-)
+  AssemblerSpec.cpp
+  )
 
 target_compile_options(${Module}UnitTestRunner PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-old-style-cast -Wno-multichar -Wno-type-limits>)
-target_link_libraries(${Module}UnitTestRunner Core Mesh VTKRendering Geometry Rendering IO)
-simple_test(${Module} --reporter=xunit)
+
+target_link_libraries(${Module}UnitTestRunner Assembler)
+
+simple_test(${Module} --reporter=spec)

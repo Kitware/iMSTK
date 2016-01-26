@@ -20,6 +20,8 @@
 #ifndef SOLVERS_LINEARSOLVER_HPP
 #define SOLVERS_LINEARSOLVER_HPP
 
+namespace imstk {
+
 template<typename SystemMatrixType>
 LinearSolver<SystemMatrixType>::
 LinearSolver() : linearSystem(nullptr), minTolerance(1.0e-6){}
@@ -53,6 +55,8 @@ template<typename SystemMatrixType>
 double LinearSolver<SystemMatrixType>::getTolerance() const
 {
     return this->minTolerance;
+}
+
 }
 
 #endif // SOLVERS_LINEAR_SOLVER

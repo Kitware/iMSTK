@@ -23,13 +23,15 @@
 #include "Core/Model.h"
 #include "Core/Factory.h"
 
+namespace imstk {
+
 SceneObject::SceneObject()
 {
     this->hasContactForces = false;
     this->isActive = true;
     this->flags.isViewerInit = false;
     this->flags.isSimulatorInit = false;
-    this->type = core::ClassType::Unknown;
+    this->type = ClassType::Unknown;
     this->objectSim = nullptr;
     this->name = "SceneObject" + std::to_string(this->getUniqueId()->getId());
     this->numOfDOF = 0;
@@ -124,34 +126,34 @@ void SceneObject::setContactForcesOn()
 }
 
 //---------------------------------------------------------------------------
-std::unordered_map< int, core::Vec3d> &SceneObject::getContactForces()
+std::unordered_map< int, Vec3d> &SceneObject::getContactForces()
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-const std::unordered_map< int,core::Vec3d> &SceneObject::getContactForces() const
+const std::unordered_map< int,Vec3d> &SceneObject::getContactForces() const
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-std::unordered_map< int,core::Vec3d> &SceneObject::getContactPoints()
+std::unordered_map< int,Vec3d> &SceneObject::getContactPoints()
 {
     return this->contactPoints;
 }
 
 //---------------------------------------------------------------------------
-const std::unordered_map< int,core::Vec3d> &SceneObject::getContactPoints() const
+const std::unordered_map< int,Vec3d> &SceneObject::getContactPoints() const
 {
     return this->contactPoints;
 }
 
 //---------------------------------------------------------------------------
-Eigen::Map<core::Vec3d> SceneObject::getVelocity(const int)
+Eigen::Map<Vec3d> SceneObject::getVelocity(const int) const
 {
     // TODO: Dangerous - Make this function pure virtual.
-    return Eigen::Map<core::Vec3d>(nullptr);
+    return Eigen::Map<Vec3d>(nullptr);
 }
 
 //---------------------------------------------------------------------------
@@ -162,14 +164,14 @@ void SceneObject::setContactForcesToZero()
 }
 
 //---------------------------------------------------------------------------
-void SceneObject::setContactForce(const int dofID, const core::Vec3d &force)
+void SceneObject::setContactForce(const int dofID, const Vec3d &force)
 {
     this->contactForces[dofID] = force;
 }
 
 //---------------------------------------------------------------------------
 void SceneObject::
-setContactForce(const int dofID, const core::Vec3d &point, const core::Vec3d &force)
+setContactForce(const int dofID, const Vec3d &point, const Vec3d &force)
 {
     this->contactPoints[dofID] = point;
     this->contactForces[dofID] = force;
@@ -225,7 +227,7 @@ void SceneObject::update(const double)
 }
 
 //---------------------------------------------------------------------------
-void SceneObject::updateExternalForces(const std::unordered_map<size_t,core::Vec3d>&)
+void SceneObject::updateExternalForces(const std::unordered_map<size_t,Vec3d>&)
 {
 }
 
@@ -239,4 +241,6 @@ std::size_t SceneObject::getNumOfDOF() const
 std::size_t SceneObject::getNumOfNodes() const
 {
     return this->numOfNodes;
+}
+
 }

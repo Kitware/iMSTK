@@ -21,19 +21,21 @@
 #include "Core/Light.h"
 #include "Core/Quaternion.h"
 
-core::Vec3d Light::defaultDir(0, 0, -1.0);
-core::Vec3d Light::defaultUpDir(0, 1, 0.0);
-core::Vec3d Light::defaultTransDir(1, 0, 0.0);
+namespace imstk {
+
+Vec3d Light::defaultDir(0, 0, -1.0);
+Vec3d Light::defaultUpDir(0, 1, 0.0);
+Vec3d Light::defaultTransDir(1, 0, 0.0);
 
 void Light::updateDirection()
 {
     double angle;
-    core::Vec3d dirNorm = direction.normalized();
+    Vec3d dirNorm = direction.normalized();
 
     angle = std::acos(dirNorm.dot(defaultDir));
-    core::Vec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
+    Vec3d axisOfRot = dirNorm.cross(defaultDir).normalized();
 
-    core::Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
+    Quaterniond rot = getRotationQuaternion(-angle,axisOfRot);
 
     upVector = rot*defaultUpDir;
     transverseDir = rot*defaultTransDir;
@@ -49,7 +51,7 @@ Light::Light( std::string p_name, LightType p_lightType, LightLocationType p_lig
     name = p_name;
     enabled = false;
     previousState = false;
-    lightPos.setPosition(core::Vec3d::Zero());
+    lightPos.setPosition(Vec3d::Zero());
 
     if ( p_lightType == InfiniteLight )
     {
@@ -102,4 +104,6 @@ void Light::activate( bool p_state )
 {
     enabled = p_state;
     previousState = enabled;
+}
+
 }

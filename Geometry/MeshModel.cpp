@@ -21,6 +21,8 @@
 #include "IO/IOMesh.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 MeshModel::MeshModel()
 {
     this->setRenderDelegate(
@@ -36,10 +38,10 @@ void MeshModel::load(const std::string& meshName)
     reader->read(meshName);
 
     this->mesh = reader->getMesh();
-	this->mesh->setMeshType ((int)reader->getFileType());
+	this->mesh->setMeshType (int(reader->getFileType()));
 }
 
-const std::vector<core::Vec3d>& MeshModel::getVertices() const
+const std::vector<Vec3d>& MeshModel::getVertices() const
 {
     return mesh->getVertices();
 }
@@ -53,16 +55,18 @@ void MeshModel::draw()
     if (delegate)
       delegate->draw();
 }
-void MeshModel::setModelMesh(std::shared_ptr< Core::BaseMesh > modelMesh)
+void MeshModel::setModelMesh(std::shared_ptr< BaseMesh > modelMesh)
 {
     this->mesh.reset();
     this->mesh = modelMesh;
 }
-std::shared_ptr<Core::BaseMesh> MeshModel::getMesh()
+std::shared_ptr<BaseMesh> MeshModel::getMesh()
 {
     return this->mesh;
 }
 void MeshModel::setRenderDetail(std::shared_ptr< RenderDetail > renderDetail)
 {
     this->mesh->setRenderDetail(renderDetail);
+}
+
 }

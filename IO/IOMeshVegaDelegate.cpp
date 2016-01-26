@@ -33,6 +33,8 @@
 #include "cubicMesh.h"
 #include "tetMesh.h"
 
+namespace imstk {
+
 ///
 /// \brief Class delegate to read the Vega (.veg) volumetric file format. This
 /// reader also computes the surface of the mesh and stores it as a \SurfaceMesh.
@@ -98,17 +100,17 @@ void IOMeshVegaDelegate::read()
     delete vegaObjMesh;
 
     // copy vertices
-    std::vector<core::Vec3d> vertices;
+    std::vector<Vec3d> vertices;
 
     for(size_t i = 0, end = mesh->getNumVertices(); i < end; ++i)
     {
-        const Vec3d &v = *mesh->getVertex(i);
+        const ::Vec3d &v = *mesh->getVertex(i);
         vertices.emplace_back(v[0],
                               v[1],
                               v[2]);
     }
 
-    std::vector<core::Vec3d> surfaceVertices;
+    std::vector<Vec3d> surfaceVertices;
     std::unordered_map<size_t, size_t> uniqueVertexArray;
     this->reorderSurfaceTopology(
         vertices,
@@ -127,3 +129,5 @@ void IOMeshVegaDelegate::read()
 }
 
 RegisterFactoryClass(IOMeshDelegate,IOMeshVegaDelegate,IOMesh::ReaderGroup::Vega);
+
+}

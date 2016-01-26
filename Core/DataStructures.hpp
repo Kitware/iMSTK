@@ -22,6 +22,8 @@
 
 #include <iostream>
 
+namespace imstk {
+
 template<typename T>
 EntryList<T>::EntryList()
 {
@@ -356,6 +358,8 @@ void Hash<T>::clearAll()
     }
 
     num_prim = 0;
+}
+
 }
 
 #endif

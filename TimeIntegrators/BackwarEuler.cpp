@@ -20,6 +20,8 @@
 #include "BackwarEuler.h"
 #include "Solvers/DirectLinearSolver.h"
 
+namespace imstk {
+
 BackwardEuler::BackwardEuler(OdeSystem *odeSystem): TimeIntegrator(odeSystem)
 {}
 
@@ -34,21 +36,21 @@ void BackwardEuler::solve(const OdeSystemState &state,
     }
 
     // This function updates the state.
-    auto updateIterate = [&](const core::Vectord &dv, core::Vectord &v)
+    auto updateIterate = [&](const Vectord &dv, Vectord &v)
     {
         v += dv;
         newState.getPositions() = state.getPositions() + timeStep*v;
     };
 
     // Function to evaluate the nonlinear objective function.
-    auto G = [&,this](const core::Vectord &) -> const core::Vectord&
+    auto G = [&,this](const Vectord &) -> const Vectord&
     {
         this->system->computeImplicitSystemRHS(state,newState,timeStep);
         return this->system->getRHSVector();
     };
 
     // Jacobian of the objective function.
-    auto DG = [&,this](const core::Vectord &) -> const core::SparseMatrixd&
+    auto DG = [&,this](const Vectord &) -> const SparseMatrixd&
     {
         this->system->computeImplicitSystemLHS(state,newState,timeStep,false);
         return this->system->getMatrix();
@@ -63,7 +65,9 @@ void BackwardEuler::solve(const OdeSystemState &state,
     if(state.getPositions().size() < 100)
     {
         this->newtonSolver.setLinearSolver(
-            std::make_shared<DirectLinearSolver<core::SparseMatrixd>>());
+            std::make_shared<DirectLinearSolver<SparseMatrixd>>());
     }
     this->newtonSolver.solve(newState.getVelocities());
+}
+
 }

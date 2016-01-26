@@ -27,6 +27,8 @@
 #include "Core/CollisionManager.h"
 #include "Core/Model.h"
 
+namespace imstk {
+
 void CollisionManager::setModels(std::shared_ptr<Model> first,
                                  std::shared_ptr<Model> second)
 {
@@ -38,9 +40,9 @@ void CollisionManager::setModels(std::shared_ptr<Model> first,
 
 //---------------------------------------------------------------------------
 void CollisionManager::addContact(const double& penetrationDepth,
-                                  const core::Vec3d& vert,
+                                  const Vec3d& vert,
                                   const int index,
-                                  const core::Vec3d& contactNornmal)
+                                  const Vec3d& contactNornmal)
 {
     auto contact = std::make_shared<PenetrationDepthCollisionData>(penetrationDepth,
                    vert,
@@ -52,9 +54,9 @@ void CollisionManager::addContact(const double& penetrationDepth,
 //---------------------------------------------------------------------------
 void CollisionManager::addContact(std::shared_ptr<Model> model,
                                   const double& penetrationDepth,
-                                  const core::Vec3d& vert,
+                                  const Vec3d& vert,
                                   const int index,
-                                  const core::Vec3d& contactNornmal)
+                                  const Vec3d& contactNornmal)
 {
     auto contact = std::make_shared<PenetrationDepthCollisionData>(penetrationDepth,
                    vert,
@@ -139,5 +141,7 @@ void CollisionManager::printCollisionPairs()
         std::cout << "PenetrationDepthCollisionData no: " << i << std::endl;
         this->contacts[0]->printCollisionPair();
     }
+
+}
 
 }

@@ -19,13 +19,15 @@
 
 #include "Solvers/IterativeLinearSolver.h"
 
+namespace imstk {
+
 IterativeLinearSolver::IterativeLinearSolver()
     : maxIterations(100)
 {
 }
 
 //---------------------------------------------------------------------------
-void IterativeLinearSolver::solve(core::Vectord &x)
+void IterativeLinearSolver::solve(Vectord &x)
 {
     if(!this->linearSystem)
     {
@@ -59,13 +61,13 @@ size_t IterativeLinearSolver::getMaximumIterations() const
 }
 
 //---------------------------------------------------------------------------
-const core::Vectord &IterativeLinearSolver::getResidual()
+const Vectord &IterativeLinearSolver::getResidual()
 {
     return this->residual;
 }
 
 //---------------------------------------------------------------------------
-double IterativeLinearSolver::getError(const core::Vectord &x)
+double IterativeLinearSolver::getError(const Vectord &x)
 {
     this->linearSystem->computeResidual(x, this->residual);
     return this->residual.squaredNorm();
@@ -75,4 +77,6 @@ double IterativeLinearSolver::getError(const core::Vectord &x)
 void IterativeLinearSolver::print()
 {
     // Nothing to print
+}
+
 }

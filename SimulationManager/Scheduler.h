@@ -20,6 +20,8 @@
 #ifndef SIMULATION_MANAGER_SCHEDULER_H
 #define SIMULATION_MANAGER_SCHEDULER_H
 
+namespace imstk {
+
 class Simulator;
 
 struct ScheduleGroup
@@ -51,5 +53,7 @@ public:
     float minTargetFPS;
     friend class Simulator;
 };
+
+}
 
 #endif

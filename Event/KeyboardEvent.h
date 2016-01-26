@@ -24,12 +24,12 @@
 #include "Core/Event.h"
 #include "Event/Key.h"
 
-namespace event {
+namespace imstk {
 
-class KeyboardEvent : public core::Event
+class KeyboardEvent : public Event
 {
 public:
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     KeyboardEvent(const Key &button);

@@ -19,31 +19,33 @@
 
 #include "TimeIntegrators/OdeSystemState.h"
 
+namespace imstk {
+
 OdeSystemState::OdeSystemState(const size_t size)
 {
     this->resize(size);
 }
 
 //---------------------------------------------------------------------------
-const core::Vectord &OdeSystemState::getPositions() const
+const Vectord &OdeSystemState::getPositions() const
 {
     return this->positions;
 }
 
 //---------------------------------------------------------------------------
-core::Vectord &OdeSystemState::getPositions()
+Vectord &OdeSystemState::getPositions()
 {
     return this->positions;
 }
 
 //---------------------------------------------------------------------------
-const core::Vectord &OdeSystemState::getVelocities() const
+const Vectord &OdeSystemState::getVelocities() const
 {
     return this->velocities;
 }
 
 //---------------------------------------------------------------------------
-core::Vectord &OdeSystemState::getVelocities()
+Vectord &OdeSystemState::getVelocities()
 {
     return this->velocities;
 }
@@ -66,18 +68,18 @@ setBoundaryConditions(const std::vector< std::size_t > &boundaryConditions)
 
 //---------------------------------------------------------------------------
 void OdeSystemState::
-applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance) const
+applyBoundaryConditions(SparseMatrixd &M, bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 
     // Set column and row to zero.
     for(auto & index : this->fixedVertices)
     {
-        auto idx = static_cast<core::SparseMatrixd::Index>(index);
+        auto idx = static_cast<SparseMatrixd::Index>(index);
 
         for(int k = 0; k < M.outerSize(); ++k)
         {
-            for(core::SparseMatrixd::InnerIterator i(M, k); i; ++i)
+            for(SparseMatrixd::InnerIterator i(M, k); i; ++i)
             {
                 if(i.row() == idx || i.col() == idx)
                 {
@@ -95,7 +97,7 @@ applyBoundaryConditions(core::SparseMatrixd &M, bool withCompliance) const
 
 //---------------------------------------------------------------------------
 void OdeSystemState::
-applyBoundaryConditions(core::Matrixd &M, bool withCompliance) const
+applyBoundaryConditions(Matrixd &M, bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 
@@ -108,10 +110,12 @@ applyBoundaryConditions(core::Matrixd &M, bool withCompliance) const
 }
 
 //---------------------------------------------------------------------------
-void OdeSystemState::applyBoundaryConditions(core::Vectord &x) const
+void OdeSystemState::applyBoundaryConditions(Vectord &x) const
 {
     for(auto & index : this->fixedVertices)
     {
         x(index) = 0.0;
     }
+}
+
 }

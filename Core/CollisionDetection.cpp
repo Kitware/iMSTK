@@ -19,7 +19,11 @@
 
 #include "Core/CollisionDetection.h"
 
+namespace imstk {
+
 void CollisionDetection::computeCollision(std::shared_ptr< CollisionManager > pairs)
 {
     this->doComputeCollision(pairs);
+}
+
 }

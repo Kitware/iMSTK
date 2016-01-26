@@ -27,6 +27,8 @@
 
 class vrpn_Connection;
 
+namespace imstk {
+
 class VRPNDeviceServer : public DeviceInterface
 {
     VRPNDeviceServer(const VRPNDeviceServer& other) = delete;
@@ -54,5 +56,7 @@ private:
     std::map<std::string, std::shared_ptr<vrpn_Button>> buttonDevicesList;
 
 };
+
+}
 
 #endif // VRPNSERVERDEVICE_H

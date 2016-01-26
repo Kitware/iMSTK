@@ -18,7 +18,11 @@
 // limitations under the License.
 #include "IO/InitIO.h"
 
+namespace imstk {
+
 void InitIODelegates()
 {
     IMSTK_REGISTER_IO_DELEGATES();
+}
+
 }

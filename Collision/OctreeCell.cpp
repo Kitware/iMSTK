@@ -25,6 +25,8 @@
 // iMSTK includes
 #include "Collision/CollisionMoller.h"
 
+namespace imstk {
+
 OctreeCell::OctreeCell() : BaseType()
 {
 
@@ -35,17 +37,17 @@ OctreeCell::~OctreeCell()
 
 }
 
-core::Vec3d &OctreeCell::getCenter()
+Vec3d &OctreeCell::getCenter()
 {
     return  cube.center;
 }
 
-const core::Vec3d &OctreeCell::getCenter() const
+const Vec3d &OctreeCell::getCenter() const
 {
     return  cube.center;
 }
 
-void OctreeCell::setCenter( const core::Vec3d &center )
+void OctreeCell::setCenter( const Vec3d &center )
 {
     cube.center = center;
 }
@@ -75,7 +77,7 @@ void OctreeCell::expand( const double expandScale )
     cube.expand( expandScale );
 }
 
-bool OctreeCell::isCollidedWithTri(const core::Vec3d &v0, const core::Vec3d &v1, const core::Vec3d &v2 ) const
+bool OctreeCell::isCollidedWithTri(const Vec3d &v0, const Vec3d &v1, const Vec3d &v2 ) const
 {
     Eigen::AlignedBox3d box;
     box.min() = cube.leftMinCorner();
@@ -120,4 +122,6 @@ void OctreeCell::setCube(const Cube &otherCube)
 {
     this->cube.center = otherCube.center;
     this->cube.sideLength = otherCube.sideLength;
+}
+
 }

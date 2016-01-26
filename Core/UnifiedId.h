@@ -24,6 +24,7 @@
 #include <atomic>
 #include <memory>
 
+namespace imstk {
 
 /// \brief  This class creates a unique unified id of each object in the framework
 struct UnifiedId
@@ -55,5 +56,7 @@ private:
     UnifiedId(const UnifiedId&) = delete;
     UnifiedId &operator=(const UnifiedId&) = delete;
 };
+
+}
 
 #endif // CORE_UNIFIEDID_H

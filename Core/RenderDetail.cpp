@@ -22,10 +22,12 @@
 #include <sstream>
 #include <iostream>
 
+namespace imstk {
 //---------------------------------------------------------------------------
 // Shaders
 //---------------------------------------------------------------------------
 std::map<std::string, ShaderDetail> Shaders::shaderPrograms;
+
 
 //---------------------------------------------------------------------------
 bool Shaders::shaderExists(std::string shaderProgramName)
@@ -560,7 +562,7 @@ void RenderDetail::setRenderType(unsigned int p_renderType)
 }
 
 //---------------------------------------------------------------------------
-void RenderDetail::addShaderAttribute(int shaderType, const std::string &attributeName)
+void RenderDetail::addShaderAttribute(int /*shaderType*/, const std::string &/*attributeName*/)
 {
     // TODO (Tansel)
     std::cerr<<"Error: RenderDetail::addShaderAttribute not yet implemented."<<std::endl;
@@ -591,3 +593,5 @@ int RenderDetail::getNumberOfTextures()
 
 // static
 std::map<std::string, vtkOpenGLTexture*> TextureDetail::textures;
+
+}

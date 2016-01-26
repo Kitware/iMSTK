@@ -20,6 +20,7 @@
 
 #include "Devices/DeviceInterface.h"
 
+namespace imstk {
 
 DeviceInterface::DeviceInterface(): driverInstalled(false), pollDelay(100)
 {
@@ -63,37 +64,37 @@ long double DeviceInterface::getOrientationETime()
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3d &DeviceInterface::getForce() const
+const Vec3d &DeviceInterface::getForce() const
 {
     return this->force;
 }
 
 //---------------------------------------------------------------------------
-void DeviceInterface::setForce(const core::Vec3d& f)
+void DeviceInterface::setForce(const Vec3d& f)
 {
     this->force = f;
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3d &DeviceInterface::getTorque() const
+const Vec3d &DeviceInterface::getTorque() const
 {
     return this->torque;
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3d &DeviceInterface::getPosition() const
+const Vec3d &DeviceInterface::getPosition() const
 {
     return this->position;
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3d &DeviceInterface::getVelocity() const
+const Vec3d &DeviceInterface::getVelocity() const
 {
     return this->velocity;
 }
 
 //---------------------------------------------------------------------------
-const core::Quaterniond &DeviceInterface::getOrientation() const
+const Quaterniond &DeviceInterface::getOrientation() const
 {
     return this->orientation;
 }
@@ -169,4 +170,6 @@ DeviceInterface::Message DeviceInterface::write(void*, int, void*)
 DeviceInterface::Message DeviceInterface::read(void*, int, void*)
 {
     return Message::Unknown;
+}
+
 }

@@ -27,9 +27,9 @@
 #include "Core/CoreClass.h"
 #include "Core/RenderDelegate.h"
 
-namespace Core {
-    class BaseMesh;
-}
+namespace imstk {
+
+class BaseMesh;
 class CoreClass;
 
 class Model
@@ -38,7 +38,7 @@ public:
     Model();
     ~Model();
 
-    virtual std::shared_ptr<Core::BaseMesh> getMesh();
+    virtual std::shared_ptr<BaseMesh> getMesh();
     virtual std::shared_ptr<CoreClass> getObject();
     virtual void draw();
 
@@ -52,5 +52,7 @@ public:
 private:
     RenderDelegate::Ptr renderDelegate;
 };
+
+}
 
 #endif // CORE_MODEL

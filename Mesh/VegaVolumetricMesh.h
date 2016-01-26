@@ -31,14 +31,18 @@
 #include <memory>
 #include <unordered_map>
 
+// Vega forward declarations
 class Graph;
-class SurfaceMesh;
 class VolumetricMesh;
+
+namespace imstk {
+
+class SurfaceMesh;
 
 //
 // Interface to VegaFEM's volumetric mesh class
 //
-class VegaVolumetricMesh : public Core::BaseMesh
+class VegaVolumetricMesh : public BaseMesh
 {
 public:
     ///
@@ -96,7 +100,7 @@ public:
     ///
     /// \brief Update nodes to local arrays
     ///
-    void updateAttachedMeshes(const core::Vectord &q);
+    void updateAttachedMeshes(const Vectord &q);
 
     ///
     /// \brief Return the vertex map
@@ -173,13 +177,13 @@ public:
     /// \param x Displacements.
     /// \param mesh Mesh where the interpolation will be computed.
     ///
-    void interpolate(const core::Vectord &x,
+    void interpolate(const Vectord &x,
                      std::shared_ptr< SurfaceMesh > mesh);
 
     ///
     /// \brief Compute gravity force
     ///
-    void computeGravity(const core::Vec3d &gravity, core::Vectord &gravityForce);
+    void computeGravity(const Vec3d &gravity, Vectord &gravityForce);
 
 private:
     // Vega mesh base object
@@ -209,5 +213,6 @@ private:
 
 };
 
+}
 
-#endif // SMVEGAMESH_H
+#endif //

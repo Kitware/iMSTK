@@ -29,13 +29,14 @@ using namespace bandit;
 go_bandit([](){
     describe("Collision pair", []() {
         it("constructs ", []() {
-            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
+            auto collisionPair = imstk::make_unique<imstk::CollisionManager>();
+            AssertThat(collisionPair != nullptr, IsTrue());
         });
         it("attaches models ", []() {
-            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
+            auto collisionPair = imstk::make_unique<imstk::CollisionManager>();
 
-            std::shared_ptr<Model> modelA = std::make_shared<MeshCollisionModel>();
-            std::shared_ptr<Model> modelB = std::make_shared<MeshCollisionModel>();
+            auto modelA = std::make_shared<imstk::MeshCollisionModel>();
+            auto modelB = std::make_shared<imstk::MeshCollisionModel>();
 
             collisionPair->setModels(modelA,modelB);
 
@@ -44,14 +45,14 @@ go_bandit([](){
 
         });
         it("attaches contacts ", []() {
-            std::unique_ptr<CollisionManager> collisionPair(Core::make_unique<CollisionManager>());
+            auto collisionPair = imstk::make_unique<imstk::CollisionManager>();
 
             float depth = 1.0;
-            core::Vec3d contactPoint(0,0,1);
-            core::Vec3d normal(1,0,0);
+            imstk::Vec3d contactPoint(0,0,1);
+            imstk::Vec3d normal(1,0,0);
             collisionPair->addContact(depth,contactPoint,1,normal);
 
-            std::shared_ptr<PenetrationDepthCollisionData> contact = collisionPair->getContacts().back();
+            auto contact = collisionPair->getContacts().back();
 
             AssertThat(collisionPair->hasContacts(), IsTrue());
             AssertThat(contact->normal, Equals(normal));

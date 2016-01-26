@@ -26,6 +26,8 @@
 // iMSTK includes
 #include "Core/CoreClass.h"
 
+namespace imstk {
+
 class Scene;
 class Dispatcher;
 
@@ -99,5 +101,7 @@ protected:
     std::vector<std::shared_ptr<Scene>> sceneList; //!< Scene list in the environment
 
 };
+
+}
 
 #endif

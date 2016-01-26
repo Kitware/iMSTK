@@ -25,20 +25,41 @@
 #include "SceneModels/StaticSceneObject.h"
 
 #include "IO/InitIO.h"
-#include "VTKRendering/InitVTKRendering.h"
+#include "Rendering/InitVTKRendering.h"
 #include "IO/IOMesh.h"
 
-int main()
+#include "Testing/ReadPaths.h"
+
+int main(int ac, char** av)
 {
-    InitVTKRendering();
-    InitIODelegates();
+    std::string configPaths = "./Config.paths";
+    if(ac > 1)
+    {
+        configPaths = av[1];
+    }
+
+    auto paths = imstk::ReadPaths(configPaths);
+    if(std::get<imstk::Path::Binary>(paths).empty() &&
+        std::get<imstk::Path::Source>(paths).empty())
+    {
+        std::cerr << "Error: Configuration file not found." << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "\tUsage: " << av[0] << " /path_to/Config.paths" << std::endl;
+        std::cerr << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    auto dataPath = std::get<imstk::Path::Binary>(paths);
+
+    imstk::InitVTKRendering();
+    imstk::InitIODelegates();
 
     //-------------------------------------------------------
     // 1. Create an instance of the iMSTK framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
-    auto sdk = SDK::createStandardSDK();
+    auto sdk = imstk::SDK::createStandardSDK();
 
     //-------------------------------------------------------
     // Customize the viewer
@@ -54,29 +75,31 @@ int main()
     //-------------------------------------------------------
     // Setup Shaders and textures
     //-------------------------------------------------------
-    Shaders::createShader("wetshader", "ShadersData/shaders/wet_vert.glsl", "ShadersData/shaders/wet_frag.glsl", "");
+    imstk::Shaders::createShader("wetshader",
+                                 dataPath+"/shaders/wet_vert.glsl",
+                                 dataPath+"/shaders/wet_frag.glsl", "");
 
     // Mesh render detail
-    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS );
-    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
-    meshRenderDetail->setDiffuseColor(Color::colorGray);
-    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
+    auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS );
+    meshRenderDetail->setAmbientColor(imstk::Color(0.2,0.2,0.2,1.0));
+    meshRenderDetail->setDiffuseColor(imstk::Color::colorGray);
+    meshRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0,0.5));
     meshRenderDetail->setShininess(20.0);
 
     meshRenderDetail->addShaderProgram("wetshader");
-    meshRenderDetail->addTexture("decal", "ShadersData/textures/brainx.bmp", "textureDecal", "wetshader");
-    meshRenderDetail->addTexture("bump", "ShadersData/textures/metalbump.jpg", "textureBump", "wetshader");
+    meshRenderDetail->addTexture("decal", dataPath+"/textures/brainx.bmp", "textureDecal", "wetshader");
+    meshRenderDetail->addTexture("bump", dataPath+"/textures/metalbump.jpg", "textureBump", "wetshader");
 
     // Plane render detail
-    auto planeMeshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS);
-    planeMeshRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 1.0));
-    planeMeshRenderDetail->setDiffuseColor(Color::colorGray);
-    planeMeshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
+    auto planeMeshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_FACES | IMSTK_RENDER_NORMALS);
+    planeMeshRenderDetail->setAmbientColor(imstk::Color(0.2, 0.2, 0.2, 1.0));
+    planeMeshRenderDetail->setDiffuseColor(imstk::Color::colorGray);
+    planeMeshRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0, 0.5));
     planeMeshRenderDetail->setShininess(20.0);
 
     planeMeshRenderDetail->addShaderProgram("wetshader");
-    planeMeshRenderDetail->addTexture("decal", "ShadersData/textures/brain_outside.jpg", "textureDecal", "wetshader");
-    planeMeshRenderDetail->addTexture("bump", "ShadersData/textures/metalbump.jpg", "textureBump", "wetshader");
+    planeMeshRenderDetail->addTexture("decal", dataPath+"/textures/brain_outside.jpg", "textureDecal", "wetshader");
+    planeMeshRenderDetail->addTexture("bump", dataPath+"/textures/metalbump.jpg", "textureBump", "wetshader");
 
     //-------------------------------------------------------
     // Customize the scene
@@ -86,35 +109,35 @@ int main()
     viewer->registerScene(scene);
 
     // Setup Cube
-    auto cubeModel = std::make_shared<MeshModel>();
-    cubeModel->load("ShadersData/models/brain.obj");
+    auto cubeModel = std::make_shared<imstk::MeshModel>();
+    cubeModel->load(dataPath+"/models/brain.obj");
     //cubeModel->load("ShadersData/models/brain.3ds");
     cubeModel->setRenderDetail(meshRenderDetail);
 
-    auto cube = std::make_shared<StaticSceneObject>();
+    auto cube = std::make_shared<imstk::StaticSceneObject>();
     cube->setModel(cubeModel);
     scene->addSceneObject(cube);
 
     // Setup Plane
-    auto planeModel = std::make_shared<MeshModel>();
-    planeModel->load("ShadersData/models/plane.obj");
+    auto planeModel = std::make_shared<imstk::MeshModel>();
+    planeModel->load(dataPath+"/models/plane.obj");
     planeModel->setRenderDetail(planeMeshRenderDetail);
 
-    auto planeObject = std::make_shared<StaticSceneObject>();
+    auto planeObject = std::make_shared<imstk::StaticSceneObject>();
     planeObject->setModel(planeModel);
 //     scene->addSceneObject(planeObject);
 
     // Setup Scene lighting
-    auto light1 = Light::getDefaultLighting();
-    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    auto light1 = imstk::Light::getDefaultLighting();
+    light1->lightPos.setPosition(imstk::Vec3d(-25.0, 10.0, 10.0));
     scene->addLight(light1);
 
-    auto light2 = Light::getDefaultLighting();
-    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    auto light2 = imstk::Light::getDefaultLighting();
+    light2->lightPos.setPosition(imstk::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
 
     // Camera setup
-    auto sceneCamera = Camera::getDefaultCamera();
+    auto sceneCamera = imstk::Camera::getDefaultCamera();
     sceneCamera->setPos(-200,0,0);
     sceneCamera->setZoom(.5);
     scene->addCamera(sceneCamera);

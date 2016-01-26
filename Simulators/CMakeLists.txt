@@ -18,10 +18,8 @@
 
 imstk_add_library(Simulators
   SOURCES
-    DefaultSimulator.cpp
     ObjectSimulator.cpp
   PUBLIC_HEADERS
-    DefaultSimulator.h
     ObjectSimulator.h
 )
 

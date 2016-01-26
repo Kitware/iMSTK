@@ -32,6 +32,8 @@
 
 class ThreadPool;
 
+namespace imstk {
+
 struct SimulationMainParam
 {
     std::vector<std::shared_ptr<Scene>> sceneList;
@@ -103,5 +105,7 @@ private:
     int mainTimeStamp; // time stamp when main callback is registered
     int asyncThreadPoolSize; // Tracks the number of threads the async threadpool is running
 };
+
+}
 
 #endif

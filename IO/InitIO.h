@@ -22,6 +22,8 @@
 
 #include "Core/Config.h"
 
+namespace imstk {
+
 /// NOTE: Make sure that this file is included only once per application.
 
 #define IMSTK_REGISTER_IO_DELEGATES() \
@@ -31,5 +33,7 @@
     IMSTK_RUN_LOADER(register_IOMeshVTKDelegate);
 
 void InitIODelegates();
+
+}
 
 #endif // IOConfig_H

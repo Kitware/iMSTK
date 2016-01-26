@@ -38,7 +38,6 @@ imstk_add_library(Core
     Scene.cpp
     Timer.cpp
     UnifiedId.cpp
-    ViewerBase.cpp
   PUBLIC_HEADERS
 	BaseMesh.h
     CollisionConfig.h
@@ -78,7 +77,6 @@ imstk_add_library(Core
     UnifiedId.h
     Utils.h
     Vector.h
-    ViewerBase.h
     WorkerThread.h
 )
 

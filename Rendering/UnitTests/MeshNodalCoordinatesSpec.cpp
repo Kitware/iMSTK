@@ -34,12 +34,12 @@ go_bandit([](){
 
     describe("VTK mapped array.", []() {
         it("constructs", []() {
-            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            vtkNew<imstk::MeshNodalCoordinates<double>> meshMapper;
             AssertThat(meshMapper.GetPointer() != nullptr, IsTrue());
         });
 
         it("initializes", []() {
-            vtkNew<MeshNodalCoordinates<double>> meshMapper;
+            vtkNew<imstk::MeshNodalCoordinates<double>> meshMapper;
             meshMapper->Initialize();
             AssertThat(meshMapper->GetMaxId() == -1, IsTrue());
             AssertThat(meshMapper->GetSize() == 0, IsTrue());
@@ -47,8 +47,8 @@ go_bandit([](){
         });
 
         it("wraps data", []() {
-            vtkNew<MeshNodalCoordinates<double>> meshMapper;
-            std::vector<core::Vec3d> vertices;
+            vtkNew<imstk::MeshNodalCoordinates<double>> meshMapper;
+            std::vector<imstk::Vec3d> vertices;
             vertices.emplace_back(0,1,0);
             vertices.emplace_back(1,0,0);
             vertices.emplace_back(0,0,1);
@@ -62,8 +62,8 @@ go_bandit([](){
         });
 
         it("is used by vtkPoints", []() {
-            vtkNew<MeshNodalCoordinates<double>> meshMapper;
-            std::vector<core::Vec3d> vertices;
+            vtkNew<imstk::MeshNodalCoordinates<double>> meshMapper;
+            std::vector<imstk::Vec3d> vertices;
             vertices.emplace_back(0,1,0);
             vertices.emplace_back(1,0,0);
             vertices.emplace_back(0,0,1);
@@ -83,4 +83,3 @@ go_bandit([](){
     });
 
 });
-

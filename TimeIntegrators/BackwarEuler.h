@@ -26,6 +26,8 @@
 #include "Solvers/NewtonMethod.h"
 #include "TimeIntegrators/OdeSystem.h"
 
+namespace imstk {
+
 ///
 /// @brief Approximates the solution to the IVP: Mdv/dt = f(x,v,t), x(t0) = x0 with
 ///     a backward Euler scheme.
@@ -59,5 +61,7 @@ public:
 private:
     NewtonMethod newtonSolver;
 };
+
+}
 
 #endif // BACKWAREULER_H

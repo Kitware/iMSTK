@@ -26,9 +26,9 @@
 // iMSTK includes
 #include "Core/Event.h"
 
-namespace event {
+namespace imstk {
 
-class AudioEvent: public core::Event
+class AudioEvent: public Event
 {
 public:
     /// \brief contains state of the audio driver
@@ -38,7 +38,7 @@ public:
         Play = 0,
         Stop,
     };
-    static core::EventType EventName;
+    static EventType EventName;
 
 public:
     AudioEvent();

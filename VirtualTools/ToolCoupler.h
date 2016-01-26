@@ -35,11 +35,10 @@
 #include "Core/Quaternion.h"
 #include "Core/Vector.h"
 
+namespace imstk {
+
 class DeviceInterface;
-namespace Core
-{
 class BaseMesh;
-}
 
 class ToolCoupler : public Module
 {
@@ -54,13 +53,13 @@ public:
     ~ToolCoupler();
 
     ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice,
-                std::shared_ptr<Core::BaseMesh> toolMesh);
+                std::shared_ptr<BaseMesh> toolMesh);
 
     ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice);
 
     ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice,
 				std::shared_ptr<DeviceInterface> outputDevice,
-                std::shared_ptr<Core::BaseMesh> toolMesh);
+                std::shared_ptr<BaseMesh> toolMesh);
 
 
     ///
@@ -89,12 +88,12 @@ public:
     /// \brief Set the pointer to the mesh to control
     /// \param newMesh A pointer to an allocated mesh
     ///
-    void setMesh(std::shared_ptr<Core::BaseMesh> newMesh);
+    void setMesh(std::shared_ptr<BaseMesh> newMesh);
 
     ///
     /// \brief Get the output device for this tool coupler
     ///
-    std::shared_ptr<Core::BaseMesh> getMesh() const;
+    std::shared_ptr<BaseMesh> getMesh() const;
 
     ///
     /// \brief Get the current polling delay
@@ -124,59 +123,59 @@ public:
     /// \brief Get the current orientation
     /// \return The currently set scaling factor
     ///
-    const core::Quaterniond &getOrientation() const;
+    const Quaterniond &getOrientation() const;
 
     ///
     /// \brief Set orientationmuch to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
-    void setOrientation(const Eigen::Map<core::Quaterniond> &newOrientation);
+    void setOrientation(const Eigen::Map<Quaterniond> &newOrientation);
 
     ///
     /// \brief Get the current orientation
     /// \return The currently set scaling factor
     ///
-    const core::Vec3d &getPosition() const;
+    const Vec3d &getPosition() const;
 
     ///
     /// \brief Set orientationmuch to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
-    void setPosition(const core::Vec3d &newOrientation);
+    void setPosition(const Vec3d &newOrientation);
 
     ///
     /// \brief Set offset orientation much to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
-    void setOffsetOrientation(const Eigen::Map<core::Quaterniond> &offsetOrientation);
+    void setOffsetOrientation(const Eigen::Map<Quaterniond> &offsetOrientation);
 
     ///
     /// \brief Get the offset orientation
     /// \return The orientation
     ///
-    const core::Quaterniond &getOffsetOrientation() const;
+    const Quaterniond &getOffsetOrientation() const;
 
     ///
     /// \brief Get the offset position
     /// \return The currently set scaling factor
     ///
-    const core::Vec3d &getOffsetPosition() const;
+    const Vec3d &getOffsetPosition() const;
 
 	///
 	/// \brief Return the previous position
 	///
-    const core::Vec3d& getPrevPosition() const;
+    const Vec3d& getPrevPosition() const;
 
 	///
 	/// \brief Return the previous orientation
 	///
-    const core::Quaterniond& getPrevOrientation() const;
+    const Quaterniond& getPrevOrientation() const;
 
     ///
     /// \brief Set offset orientation much to scale the physical movement by in 3D space
     /// \param  The new scaling factor to set
     ///
-    void setOffsetPosition(const core::Vec3d &offsetPosition);
+    void setOffsetPosition(const Vec3d &offsetPosition);
 
     ///
     /// \brief Module overrides
@@ -201,22 +200,24 @@ public:
     bool updateForces();
 
 private:
-    core::Quaterniond orientation; //!< Previous rotation quaternion from phantom
-    core::Vec3d position;          //!< Previous position from phantom
+    Quaterniond orientation; //!< Previous rotation quaternion from phantom
+    Vec3d position;          //!< Previous position from phantom
 
-    core::Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom
-    core::Vec3d prevPosition;          //!< Previous position from phantom
+    Quaterniond prevOrientation; //!< Previous rotation quaternion from phantom
+    Vec3d prevPosition;          //!< Previous position from phantom
 
     double scalingFactor;          //!< Scaling factor for physical to virtual translation
 
-    core::Quaterniond offsetOrientation; //!< Previous rotation quaternion from device
-    core::Vec3d offsetPosition;          //!< Previous position from device
+    Quaterniond offsetOrientation; //!< Previous rotation quaternion from device
+    Vec3d offsetPosition;          //!< Previous position from device
 
     std::chrono::milliseconds pollDelay;  //!< Polling delay
-    std::shared_ptr<Core::BaseMesh> mesh; //!< Pointer to controlled mesh
+    std::shared_ptr<BaseMesh> mesh; //!< Pointer to controlled mesh
     std::shared_ptr<DeviceInterface> inputDevice;  //!< Pointer to input device
     std::shared_ptr<DeviceInterface> outputDevice; //!< Pointer to output device
     TransformType initialTransform; //!< Transform applied to the position obtained from device
 };
+
+}
 
 #endif // TOOLCOUPLER_H

@@ -34,8 +34,6 @@
 #include "Testing/ReadPaths.h"
 
 using namespace bandit;
-using namespace core;
-
 
 auto paths = imstk::ReadPaths("./SolversConfig.paths");
 
@@ -53,16 +51,16 @@ void SolveSystem(std::shared_ptr<SolverType> S, double epsilon = 1e-12)
     S->setTolerance(epsilon);
     for (int i = 0; i < matrixFileNames.size(); ++i)
     {
-        SparseMatrixd A,AT;
-        Vectord b,solution;
-        ReadSparseMatrix(matrixFileNames[i],A);
+        imstk::SparseMatrixd A,AT;
+        imstk::Vectord b,solution;
+        imstk::ReadSparseMatrix(matrixFileNames[i],A);
         for (int k = 0; k < A.outerSize(); ++k)
         {
             A.coeffRef(k,k) *= 50;
         }
         solution.setZero(A.cols());
         b.setRandom(A.cols());
-        auto system = std::make_shared<LinearSystem<SparseMatrixd>>(A,b);
+        auto system = std::make_shared<imstk::LinearSystem<imstk::SparseMatrixd>>(A,b);
         S->setSystem(system);
         S->solve(solution);
         AssertThat(S->getError(solution)/b.squaredNorm(), IsLessThan(epsilon));
@@ -72,18 +70,18 @@ void SolveSystem(std::shared_ptr<SolverType> S, double epsilon = 1e-12)
 
 go_bandit([]()
 {
-    SparseMatrixd A;
-    Vectord b;
-    ReadSparseMatrix(matrixFileNames[0], A);
-    Matrixd Adense(A);
+    imstk::SparseMatrixd A;
+    imstk::Vectord b;
+    imstk::ReadSparseMatrix(matrixFileNames[0], A);
+    imstk::Matrixd Adense(A);
     b.setRandom(A.cols());
-    Vectord solution(A.cols());
+    imstk::Vectord solution(A.cols());
 
     const double linearEspsilon= 1e-12;
     const double nonLinearEpsilon = 1e-12;
     describe("Backward Gauss-Seidel solver", [&]()
     {
-        auto BGSSolver = std::make_shared<BackwardGaussSeidel>();
+        auto BGSSolver = std::make_shared<imstk::BackwardGaussSeidel>();
         it("constructs ", [&]()
         {
             AssertThat(BGSSolver != nullptr, IsTrue());
@@ -98,7 +96,7 @@ go_bandit([]()
 
     describe("Forward Gauss-Seidel linear solver",[&]()
     {
-        auto FGSSolver = std::make_shared<ForwardGaussSeidel>();
+        auto FGSSolver = std::make_shared<imstk::ForwardGaussSeidel>();
         it("constructs ", [&]()
         {
             AssertThat(FGSSolver != nullptr, IsTrue());
@@ -113,7 +111,7 @@ go_bandit([]()
 
     describe("Conjugate gradient solver",[&]()
     {
-        auto CGSolver = std::make_shared<ConjugateGradient>();
+        auto CGSolver = std::make_shared<imstk::ConjugateGradient>();
         it("constructs ", [&]()
         {
             AssertThat(CGSolver != nullptr, IsTrue());
@@ -128,7 +126,7 @@ go_bandit([]()
 
     describe("Backward SOR",[&]()
     {
-        auto BSORSolver = std::make_shared<BackwardSOR>();
+        auto BSORSolver = std::make_shared<imstk::BackwardSOR>();
         it("constructs ", [&]()
         {
             AssertThat(BSORSolver != nullptr, IsTrue());
@@ -143,7 +141,7 @@ go_bandit([]()
 
     describe("Forward SOR",[&]()
     {
-        auto FSORSolver = std::make_shared<ForwardSOR>();
+        auto FSORSolver = std::make_shared<imstk::ForwardSOR>();
         it("constructs ", [&]()
         {
             AssertThat(FSORSolver != nullptr, IsTrue());
@@ -158,7 +156,7 @@ go_bandit([]()
 
     describe("Direct solver for dense systems",[&]()
     {
-        auto DDSolver = std::make_shared<DirectLinearSolver<Matrixd>>(Adense, b);
+        auto DDSolver = std::make_shared<imstk::DirectLinearSolver<imstk::Matrixd>>(Adense, b);
         it("constructs ", [&]()
         {
             AssertThat(DDSolver != nullptr, IsTrue());
@@ -172,7 +170,7 @@ go_bandit([]()
         });
     });
 
-    auto DSSolver = std::make_shared<DirectLinearSolver<SparseMatrixd>>(A, b);
+    auto DSSolver = std::make_shared<imstk::DirectLinearSolver<imstk::SparseMatrixd>>(A, b);
     describe("Direct solver for sparse systems (With Sparse LU)",[&]()
     {
         it("constructs ", [&]()
@@ -190,7 +188,7 @@ go_bandit([]()
 
     describe("Newton non-linear solver",[&]()
     {
-        auto NewtonSolver = std::make_shared<NewtonMethod>();
+        auto NewtonSolver = std::make_shared<imstk::NewtonMethod>();
         it("constructs ", [&]()
         {
             AssertThat(NewtonSolver != nullptr, IsTrue());
@@ -198,8 +196,8 @@ go_bandit([]()
 
         it("solves", [&]()
         {
-            core::Vectord y(2);
-            auto F = [&](const Vectord &x) -> const Vectord&
+            imstk::Vectord y(2);
+            auto F = [&](const imstk::Vectord &x) -> const imstk::Vectord&
             {
                 y(0) = (x(0)+3)*(x(1)*x(1)*x(1)-7) + 18;
                 y(1) = std::sin(x(1)*std::exp(x(0))-1);
@@ -207,10 +205,10 @@ go_bandit([]()
             };
 
             std::vector<Eigen::Triplet<double>> tripletList;
-            core::SparseMatrixd J(2,2);
-            auto DF = [&](const Vectord &x) -> const core::SparseMatrixd&
+            imstk::SparseMatrixd J(2,2);
+            auto DF = [&](const imstk::Vectord &x) -> const imstk::SparseMatrixd&
             {
-                core::Matrixd M(2,2);
+                imstk::Matrixd M(2,2);
                 M(0,0) = x(1)*x(1)*x(1)-7;
                 M(0,1) = 3*x(1)*x(1)*(x(0)+3);
                 M(1,0) = x(1)*std::exp(x(0))*std::cos(x(1)*std::exp(x(0))-1);
@@ -220,7 +218,7 @@ go_bandit([]()
                 return J;
             };
 
-            auto system = std::make_shared<SystemOfEquations>();
+            auto system = std::make_shared<imstk::SystemOfEquations>();
             system->setFunction(F);
             system->setJacobian(DF);
 
@@ -229,7 +227,7 @@ go_bandit([]()
             NewtonSolver->setRelativeTolerance(nonLinearEpsilon);
             NewtonSolver->setLinearSolver(DSSolver);
 
-            Vectord x(2);
+            imstk::Vectord x(2);
             x.setZero();
             NewtonSolver->solve(x);
 

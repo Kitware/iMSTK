@@ -19,16 +19,18 @@
 
 #include "Core/Dispatcher.h"
 
+namespace imstk {
+
 Dispatcher::Dispatcher()
 {
-    type = core::ClassType::Dispathcer;
+    type = ClassType::Dispathcer;
 }
 
 //---------------------------------------------------------------------------
-core::ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, core::CallerState p_callerState)
+ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, CallerState p_callerState)
 {
 
-    core::ClassType classType;
+    ClassType classType;
 
     //get the type of the class which is calling
     classType = p_caller->getType();
@@ -36,15 +38,15 @@ core::ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, c
     switch (classType)
     {
         //handle for viewer
-    case core::ClassType::Viewer:
+    case ClassType::Viewer:
         handleViewer(p_caller, p_callerState);
         break;
         //handle for simulator
-    case core::ClassType::Simulator:
+    case ClassType::Simulator:
         handleSimulator(p_caller, p_callerState);
         break;
         //handle for collision detection
-    case core::ClassType::CollisionDetection:
+    case ClassType::CollisionDetection:
         handleCollisionDetection(p_caller, p_callerState);
         break;
     default:
@@ -52,33 +54,33 @@ core::ResultDispatcher Dispatcher::handle(std::shared_ptr<CoreClass> p_caller, c
     }
 
     handleAll();
-    return core::ResultDispatcher::Success;
+    return ResultDispatcher::Success;
 }
 
 //---------------------------------------------------------------------------
 void Dispatcher::handleViewer(std::shared_ptr<CoreClass> /*p_caller*/,
-                              core::CallerState /*p_callerState*/)
+                              CallerState /*p_callerState*/)
 {
 
 }
 
 //---------------------------------------------------------------------------
 void Dispatcher::handleSimulator(std::shared_ptr<CoreClass> /*p_caller*/,
-                                 core::CallerState /*p_callerState*/)
+                                 CallerState /*p_callerState*/)
 {
 
 }
 
 //---------------------------------------------------------------------------
 void Dispatcher::handleCollisionDetection(std::shared_ptr<CoreClass> /*p_caller*/,
-                                          core::CallerState /*p_callerState*/)
+                                          CallerState /*p_callerState*/)
 {
 
 }
 
 //---------------------------------------------------------------------------
 void Dispatcher::handleCollisionResponse(std::shared_ptr<CoreClass> /*p_caller*/,
-                                         core::CallerState /*p_callerState*/)
+                                         CallerState /*p_callerState*/)
 {
 
 }
@@ -86,5 +88,7 @@ void Dispatcher::handleCollisionResponse(std::shared_ptr<CoreClass> /*p_caller*/
 //---------------------------------------------------------------------------
 void Dispatcher::handleAll()
 {
+
+}
 
 }

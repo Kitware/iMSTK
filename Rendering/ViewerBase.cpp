@@ -18,20 +18,21 @@
 // limitations under the License.
 
 #include "Core/Config.h"
-#include "Core/ViewerBase.h"
+#include "Rendering/ViewerBase.h"
 #include "Core/DataStructures.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 RenderOperation::RenderOperation()
 {
-    fbo = nullptr;
     scene = nullptr;
     fboName = "";
 }
 
 ViewerBase::ViewerBase()
 {
-    type = core::ClassType::Viewer;
+    type = ClassType::Viewer;
     viewerRenderDetail = IMSTK_VIEWERRENDER_FADEBACKGROUND;
 
     defaultAmbientColor.setValue(0.1, 0.1, 0.1, 1.0);
@@ -49,7 +50,7 @@ ViewerBase::ViewerBase()
     valid = true;
 }
 
-///affects the framebuffer size and depth buffer size
+///affects the  size and depth buffer size
 void ViewerBase::setScreenResolution(int p_width, int p_height)
 {
     this->screenResolutionHeight = p_height;
@@ -66,7 +67,7 @@ void ViewerBase::initObjects()
 {
     for (const auto &i : this->objectList)
     {
-        if (i->getType() != core::ClassType::Shader)
+        if (i->getType() != ClassType::Shader)
         {
             i->initDraw();
         }
@@ -106,28 +107,6 @@ bool ViewerBase::init()
     isInitialized = true;
 
     return true;
-}
-
-void ViewerBase::addFBO(const std::string &p_fboName,
-                        std::shared_ptr<Texture> p_colorTex,
-                        std::shared_ptr<Texture> p_depthTex,
-                        unsigned int p_width, unsigned int p_height)
-{
-    FboListItem item;
-
-    item.fboName = p_fboName;
-    item.width = p_width;
-    item.height = p_height;
-    if (p_colorTex)
-    {
-        item.colorTex = p_colorTex;
-    }
-    if (p_depthTex)
-    {
-        item.depthTex = p_depthTex;
-    }
-
-    this->fboListItems.push_back(item);
 }
 
 void ViewerBase::processRenderOperation(const RenderOperation &p_rop)
@@ -278,4 +257,6 @@ void ViewerBase::setGlobalAxisLength(const float len)
 void ViewerBase::setViewerRenderDetail(const unsigned int newRenderDetail)
 {
     this->viewerRenderDetail = newRenderDetail;
+}
+
 }

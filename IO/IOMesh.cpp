@@ -31,11 +31,13 @@
 #include "Core/MakeUnique.h"
 #include "IO/IOMeshDelegate.h"
 
+namespace imstk {
+
 ///
 /// \brief DelegatorType. Holds a list of factory delegates that take care the
 /// actual read operation. This is the dispatcher of delegators for readers
 /// and writers for mesh formats.
-class IOMesh::DelegatorType
+class imstk::IOMesh::DelegatorType
 {
     typedef std::function<std::shared_ptr<IOMeshDelegate>()> DelegatorFunction;
 
@@ -119,7 +121,7 @@ IOMesh::IOMesh(const IOMesh::ReaderGroup &priorityGroup) :
     fileName(""),
     fileType(MeshFileType::Unknown),
     mesh(nullptr),
-    delegator(Core::make_unique<DelegatorType>(this))
+    delegator(make_unique<DelegatorType>(this))
 {
     //
     // VTK io for some vtk files (use only vtk to read these files)
@@ -226,13 +228,13 @@ IOMesh::MeshFileType IOMesh::getFileExtension() const
 }
 
 //----------------------------------------------------------------------------------------
-std::shared_ptr<Core::BaseMesh> IOMesh::getMesh()
+std::shared_ptr<BaseMesh> IOMesh::getMesh()
 {
     return this->mesh;
 }
 
 //----------------------------------------------------------------------------------------
-void IOMesh::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
+void IOMesh::setMesh(std::shared_ptr< BaseMesh > newMesh)
 {
     this->mesh = newMesh;
 }
@@ -253,4 +255,6 @@ void IOMesh::setFilename(const std::string& filePath)
 const IOMesh::MeshFileType &IOMesh::getFileType() const
 {
     return fileType;
+}
+
 }

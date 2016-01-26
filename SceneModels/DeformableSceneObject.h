@@ -25,6 +25,8 @@
 #include "TimeIntegrators/OdeSystem.h"
 #include "TimeIntegrators/TimeIntegrator.h"
 
+namespace imstk {
+
 ///
 /// \brief Base class for all deformable scene objects.
 ///
@@ -84,25 +86,17 @@ public:
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    Eigen::Map<core::Vec3d> getVelocity(const int index);
+    Eigen::Map<Vec3d> getVelocity(const int index) const override;
 
     ///
     /// \brief Returns velocity of at a given location for the current state.
     ///
-    const core::Vec3d &getGravity() const;
+    const Vec3d &getGravity() const;
 
     ///
     /// \brief Update cumulative forces
     ///
-    void updateExternalForces(const std::unordered_map<size_t,core::Vec3d> &forces)
-    {
-        auto externalForce = core::Matrixd::Map(this->f.data(),3,this->numOfNodes);
-        for(const auto &force : forces)
-        {
-            auto i = force.first;
-            externalForce.col(i) -= force.second;
-        }
-    }
+    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces) override;
 
 private:
     ///////////////////////////////////////////////////////////////////////////////
@@ -112,18 +106,18 @@ private:
 
     ///serialize function explicity writes the object to the memory block
     ///each scene object should know how to write itself to a memory block
-    void serialize(void *){}
+    void serialize(void *) override {}
 
     ///Unserialize function can recover the object from the memory location
-    void unSerialize(void *){};
+    void unSerialize(void *) override {};
 
     ///this function may not be used
     ///every Scene Object should know how to clone itself. Since the data structures will be
     ///in the beginning of the modules(such as simulator, viewer, collision etc.)
-    std::shared_ptr<SceneObject> clone(){return nullptr;};
+    std::shared_ptr<SceneObject> clone() override { return nullptr; };
 
     /// \brief print information related the scene object
-    void printInfo() const{};
+    void printInfo() const override {};
 
 protected:
     std::shared_ptr<TimeIntegrator> odeSolver; ///> Integration scheme
@@ -133,16 +127,18 @@ protected:
     std::shared_ptr<OdeSystemState> previousState;///> Previous model state
     std::shared_ptr<OdeSystemState> newState;     ///> Storage for the next state
 
-    core::SparseMatrixd M; ///> Mass matrix
-    core::SparseMatrixd C; ///> Raleigh Damping matrix
-    core::SparseMatrixd D; ///> Raleigh Damping matrix
-    core::SparseMatrixd K; ///> Stiffness matrix
-    core::Vectord f;       ///> Accumulative forces vector
+    SparseMatrixd M; ///> Mass matrix
+    SparseMatrixd C; ///> Raleigh Damping matrix
+    SparseMatrixd D; ///> Lagrangian Damping matrix
+    SparseMatrixd K; ///> Stiffness matrix
+    Vectord f;       ///> Accumulative forces vector
 
     // Gravity
-    core::Vec3d gravity;
+    Vec3d gravity;
 
     TimeIntegrator::IntegratorType integrationScheme; ///> Integration scheme used.
 };
+
+}
 
 #endif // DEFORMABLESCENEOBJECT_H

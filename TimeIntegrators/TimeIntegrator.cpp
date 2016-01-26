@@ -19,6 +19,8 @@
 
 #include "TimeIntegrator.h"
 
+namespace imstk {
+
 TimeIntegrator::TimeIntegrator(OdeSystem *odeSystem): system(odeSystem)
 {}
 
@@ -32,4 +34,6 @@ OdeSystem *TimeIntegrator::getSystem() const
 void TimeIntegrator::setSystem(OdeSystem *newSystem)
 {
     this->system = newSystem;
+}
+
 }

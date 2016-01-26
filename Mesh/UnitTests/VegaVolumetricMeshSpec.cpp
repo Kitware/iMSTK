@@ -30,16 +30,16 @@
 using namespace bandit;
 
 go_bandit([](){
-    InitIODelegates();
+    imstk::InitIODelegates();
     auto paths = imstk::ReadPaths("./MeshConfig.paths");
 
     describe("Vega Volumetric Mesh", [&]() {
-        auto ioMesh = std::make_shared<IOMesh>();
+        auto ioMesh = std::make_shared<imstk::IOMesh>();
         ioMesh->read(std::get<imstk::Path::Source>(paths)+"/SampleMesh.veg");
-        auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(ioMesh->getMesh());
+        auto vegaMesh = std::static_pointer_cast<imstk::VegaVolumetricMesh>(ioMesh->getMesh());
 
         it("constructs", []() {
-            std::shared_ptr<VegaVolumetricMesh> vegaMesh = std::make_shared<VegaVolumetricMesh>();
+            auto vegaMesh = std::make_shared<imstk::VegaVolumetricMesh>();
             AssertThat(vegaMesh != nullptr, IsTrue());
         });
         it("generates graph", [&]() {
@@ -47,7 +47,7 @@ go_bandit([](){
             AssertThat(vegaMesh->getMeshGraph() != nullptr, IsTrue());
         });
         it("attaches surface mesh", [&]() {
-            std::shared_ptr<SurfaceMesh> surfaceMesh = std::make_shared<SurfaceMesh>();
+            auto surfaceMesh = std::make_shared<imstk::SurfaceMesh>();
 
             // These vertices coincide with vertices on the volume mesh. So the weights take a special form.
             auto &vertices = surfaceMesh->getVertices();

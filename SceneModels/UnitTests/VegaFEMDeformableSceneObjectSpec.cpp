@@ -27,16 +27,15 @@
 #include "Testing/ReadPaths.h"
 
 using namespace bandit;
-using namespace core;
 
 go_bandit([]()
 {
-    InitIODelegates();
+    imstk::InitIODelegates();
     auto paths = imstk::ReadPaths("./SceneModelsConfig.paths");
 
     describe("Vega Deformable Scene Object", [&]()
     {
-        auto sceneObject = std::make_shared<VegaFEMDeformableSceneObject>(std::get<imstk::Path::Binary>(paths)+"/box.veg",
+        auto sceneObject = std::make_shared<imstk::VegaFEMDeformableSceneObject>(std::get<imstk::Path::Binary>(paths)+"/box.veg",
                                                                           std::get<imstk::Path::Binary>(paths)+"/box.config");
         it("constructs", [&]()
         {
@@ -44,9 +43,11 @@ go_bandit([]()
         });
         it("updates", [&]()
         {
-
             sceneObject->update(0.01);
-
+            auto sum1 = sceneObject->getCurrentState()->getPositions().sum();
+            auto sum2 = sceneObject->getCurrentState()->getVelocities().sum();
+            bool validState = std::isfinite(sum1) && std::isfinite(sum2);
+            AssertThat(validState, IsTrue());
         });
      });
 

@@ -27,6 +27,8 @@
 // STL includes
 #include <memory>
 
+namespace imstk {
+
 class Mesh;
 class CollisionManager;
 
@@ -88,19 +90,19 @@ public:
     ///
     /// \brief Get contact forces vector
     ///
-    void setContactForce(const size_t dofID, const core::Vec3d &force);
+    void setContactForce(const size_t dofID, const Vec3d &force);
 
     ///
     /// \brief Get contact forces vector.
     ///
-    std::unordered_map<size_t,core::Vec3d> &getContactForces();
+    std::unordered_map<size_t,Vec3d> &getContactForces();
 
     ///
     /// \brief Get the map of contact forces.
     ///
     /// \return Map containing indices with contact points.
     ///
-    const std::unordered_map<size_t,core::Vec3d> &getContactForces() const;
+    const std::unordered_map<size_t,Vec3d> &getContactForces() const;
 
     ///
     /// \brief Set all contact forces to zero (if any)
@@ -118,7 +120,9 @@ protected:
     std::shared_ptr<CollisionManager> collisionPair;
 
     // Map of contact forces to node indices in the mesh of the second scene object.
-    std::unordered_map<size_t,core::Vec3d> contactForces;
+    std::unordered_map<size_t,Vec3d> contactForces;
 };
+
+}
 
 #endif //CORE_CONTACTHANDLING_H

@@ -24,9 +24,11 @@
 
 #include "Mesh/SurfaceMesh.h"
 
+namespace imstk {
+
 std::shared_ptr<SurfaceMesh> makeSurfaceMesh()
 {
-    std::vector<core::Vec3d> vertices =
+    std::vector<imstk::Vec3d> vertices =
     {
         {-0.5,-0.5, -0.5},
         {-0.5, -0.5, 0.5},
@@ -75,6 +77,8 @@ std::shared_ptr<SurfaceMesh> makeSurfaceMesh()
     }
 
     return mesh;
+}
+
 }
 
 #endif

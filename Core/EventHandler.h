@@ -31,9 +31,9 @@
 // iMSTK includes
 #include "Core/Event.h"
 
-class CoreClass;
+namespace imstk {
 
-namespace core {
+class CoreClass;
 
 ///
 /// @brief Event handler. This class implement a generic observer design
@@ -42,7 +42,7 @@ namespace core {
 /// https://juanchopanzacpp.wordpress.com/2013/02/24/simple-observer-pattern-implementation-c11/
 ///
 /// The only requirement is that the observer function to bind has
-/// the following signature: void handleEvent(std::shared_ptr<core::Event> e)
+/// the following signature: void handleEvent(std::shared_ptr<Event> e)
 /// This means that anything inheriting from the CoreClass can be
 /// binded to an event.
 ///

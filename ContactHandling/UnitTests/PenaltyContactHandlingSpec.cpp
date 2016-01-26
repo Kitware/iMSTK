@@ -29,11 +29,12 @@
 
 using namespace bandit;
 
-std::shared_ptr<StaticSceneObject> createStaticPlaneSceneObject()
+std::shared_ptr<imstk::StaticSceneObject> createStaticPlaneSceneObject()
 {
-    auto staticPlane = std::make_shared<StaticSceneObject>();
+    auto staticPlane = std::make_shared<imstk::StaticSceneObject>();
 
-    std::shared_ptr<PlaneCollisionModel> plane = std::make_shared<PlaneCollisionModel>( core::Vec3d(0.0, 0.0, 0.0), core::Vec3d(0.0, 0.0, 1.0) );
+    auto plane = std::make_shared<imstk::PlaneCollisionModel>(imstk::Vec3d(0.0, 0.0, 0.0),
+                                                              imstk::Vec3d(0.0, 0.0, 1.0));
 
     staticPlane->setModel(plane);
 
@@ -41,13 +42,13 @@ std::shared_ptr<StaticSceneObject> createStaticPlaneSceneObject()
 }
 
 
-std::shared_ptr<CollisionManager> createSampleCollisionPair()
+std::shared_ptr<imstk::CollisionManager> createSampleCollisionPair()
 {
-    auto collisionPair = std::make_shared<CollisionManager>();
+    auto collisionPair = std::make_shared<imstk::CollisionManager>();
 
     float depth = 1.0;
-    core::Vec3d contactPoint(0,0,1);
-    core::Vec3d normal(1,0,0);
+    imstk::Vec3d contactPoint(0,0,1);
+    imstk::Vec3d normal(1,0,0);
 
     collisionPair->addContact(depth,contactPoint,1,normal);
 
@@ -61,21 +62,21 @@ go_bandit([]() {
 
 
         it("initializes properly ", []() {
-            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
             AssertThat(handler != nullptr, IsTrue());
-            AssertThat(handler->getContactHandlingType() == ContactHandling::PenaltyFemToStatic, IsTrue());
+            AssertThat(handler->getContactHandlingType() == imstk::ContactHandling::PenaltyFemToStatic, IsTrue());
         });
 
         it("attaches a collision pair ", []() {
-            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
+            auto handler        = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
             auto collisionPair  = createSampleCollisionPair();
             handler->setCollisionPairs(collisionPair);
             AssertThat(handler->getCollisionPairs() == collisionPair, IsTrue());
         });
 
         it("attaches a scene object ", []() {
-            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
-            auto fem            = std::make_shared<VegaFEMDeformableSceneObject>();
+            auto handler        = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
+            auto fem            = std::make_shared<imstk::VegaFEMDeformableSceneObject>();
             auto plane          = createStaticPlaneSceneObject();
             handler->setSceneObjects(plane,fem);
             AssertThat(handler->getFirstSceneObject() == plane, IsTrue());
@@ -83,8 +84,8 @@ go_bandit([]() {
         });
 
         it("computes contact force ", []() {
-            auto handler        = std::make_shared<PenaltyContactFemToStatic>(false);
-            auto fem            = std::make_shared<VegaFEMDeformableSceneObject>();
+            auto handler        = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
+            auto fem            = std::make_shared<imstk::VegaFEMDeformableSceneObject>();
             auto collisionPair  = createSampleCollisionPair();
             auto plane          = createStaticPlaneSceneObject();
 
@@ -92,7 +93,7 @@ go_bandit([]() {
             handler->setCollisionPairs(collisionPair);
 
             auto state = fem->getCurrentState();
-            state = std::make_shared<OdeSystemState>();
+            state = std::make_shared<imstk::OdeSystemState>();
             state->resize(3);
 
             auto &v = state->getVelocities();
@@ -101,7 +102,7 @@ go_bandit([]() {
             v(2) = 1;
 
             // TODO: Add a more rigorous test.
-            fem->setContactForce(0,core::Vec3d(-110000,0,0));
+            fem->setContactForce(0,imstk::Vec3d(-110000,0,0));
             auto &contactForce = fem->getContactForces();
 
             handler->resolveContacts();

@@ -35,6 +35,8 @@
 #include "Core/ContactHandling.h"
 #include "ContactHandling/PenaltyContactFemToStatic.h"
 
+namespace imstk {
+
 class SystemOfEquations;
 
 ///
@@ -299,5 +301,7 @@ private:
     std::vector<std::vector<int>> islands;
     int totalNumberOfSceneModels;
 };
+
+}
 
 #endif // SM_COLLISION_CONTEXT

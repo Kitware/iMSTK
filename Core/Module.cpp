@@ -29,6 +29,8 @@
 #include "Core/Dispatcher.h"
 #include "Core/Scene.h"
 
+namespace imstk {
+
 Module::Module() :
     isInitialized(false),
     terminateExecution(false),
@@ -81,7 +83,7 @@ short int Module::getModuleId()
 void  Module::beginModule()
 {
     this->dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()),
-                             core::CallerState::BeginFrame);
+                             CallerState::BeginFrame);
     this->beginFrame();
 }
 
@@ -90,5 +92,7 @@ void  Module::endModule()
 {
     this->endFrame();
     this->dispathcer->handle(std::static_pointer_cast<CoreClass>(shared_from_this()),
-                             core::CallerState::EndFrame);
+                             CallerState::EndFrame);
+}
+
 }

@@ -30,6 +30,8 @@
 #include "Collision/CollisionMoller.h"
 #include "Mesh/SurfaceMesh.h"
 
+namespace imstk {
+
 class MeshCollisionModel;
 
 /// \brief !!
@@ -37,7 +39,7 @@ template<typename CellType>
 class SurfaceTree : public CoreClass
 {
 protected:
-    using MatrixType = core::Matrix44d;
+    using MatrixType = Matrix44d;
     using CellPairType = std::pair<std::shared_ptr<CellType>,std::shared_ptr<CellType>>;
 
 protected:
@@ -89,7 +91,7 @@ public:
     }
 
     /// \brief !!
-    void handleEvent(std::shared_ptr<core::Event> p_event) override;
+    void handleEvent(std::shared_ptr<Event> p_event) override;
 
     /// \brief !! SurfaceTree structure
     void updateStructure();
@@ -115,6 +117,8 @@ public:
                               const std::shared_ptr<CellType> right,
                               std::vector<CellPairType> &result );
 };
+
+}
 
 #include "Collision/SurfaceTree.hpp"
 

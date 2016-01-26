@@ -26,6 +26,8 @@
 #include "Core/Timer.h"
 #include "SimulationManager/Scheduler.h"
 
+namespace imstk {
+
 // Forward declarations
 class SceneObject;
 
@@ -133,8 +135,10 @@ protected:
     long double totalTime; ///> Total accumulated time.
     bool executionTypeStatusChanged; ///> Set in order to indicate that this simulator changed its execution type.
     ExecutionType executionType; ///> Either synchronous or asynchronous execution for this simulator.
-    core::Timer timer;          ///> Timer.
+    Timer timer;          ///> Timer.
     std::vector<std::shared_ptr<SceneObject>> simulatedModels; ///> List of simulated models to run.
 };
+
+}
 
 #endif

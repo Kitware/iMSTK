@@ -49,6 +49,8 @@
 #include "MooneyRivlinIsotropicMaterial.h"
 #include "graph.h"
 
+namespace imstk {
+
 ///
 /// \brief Vega configuration parser interface. This class interfaces with
 ///  Vega's configuration parser and define relevant configurations for our
@@ -368,7 +370,7 @@ void VegaFEMDeformableSceneObject::initialize()
 //---------------------------------------------------------------------------
 bool VegaFEMDeformableSceneObject::configure(const std::string &configFile)
 {
-    this->vegaFemConfig = Core::make_unique<VegaConfiguration>(configFile);
+    this->vegaFemConfig = imstk::make_unique<VegaConfiguration>(configFile);
 
     this->setMassMatrix();
     this->setTangentStiffnessMatrix();
@@ -393,7 +395,7 @@ void VegaFEMDeformableSceneObject::initMassMatrix(bool saveToDisk)
         return;
     }
 
-    SparseMatrix *matrix;
+    ::SparseMatrix *matrix;
     GenerateMassMatrix::computeMassMatrix(this->volumetricMesh->getVegaMesh().get(),
                                           &matrix,
                                           true);
@@ -433,7 +435,7 @@ void VegaFEMDeformableSceneObject::initTangentStiffnessMatrix()
         return;
     }
 
-    SparseMatrix *matrix;
+    ::SparseMatrix *matrix;
     this->forceModel->GetTangentStiffnessMatrixTopology(&matrix);
 
     if(!matrix)
@@ -505,7 +507,7 @@ void VegaFEMDeformableSceneObject::initDampingMatrix()
         return;
     }
 
-    SparseMatrix *matrix;
+    ::SparseMatrix *matrix;
     meshGraph->GetLaplacian(&matrix, 1);
 
     if(!matrix)
@@ -808,7 +810,7 @@ std::vector< std::size_t > VegaFEMDeformableSceneObject::loadBoundaryConditions(
 
 //---------------------------------------------------------------------------
 void VegaFEMDeformableSceneObject::
-updateValuesFromMatrix(std::shared_ptr<SparseMatrix> matrix, double *values)
+updateValuesFromMatrix(std::shared_ptr<::SparseMatrix> matrix, double *values)
 {
     auto rowLengths = matrix->GetRowLengths();
     auto nonZeroValues = matrix->GetEntries();
@@ -838,7 +840,7 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
     const auto &dampingMassCoefficient =
     this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
-    auto odeRHS = [&,this](const OdeSystemState & s) -> const core::Vectord&
+    auto odeRHS = [&,this](const OdeSystemState & s) -> const Vectord&
     {
         this->f = this->K*s.getPositions();
         this->f -= this->gravityForce;
@@ -865,7 +867,7 @@ void VegaFEMDeformableSceneObject::setOdeRHS()
 void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 {
     auto tangentStiffness =
-        [this](const OdeSystemState & s) -> const core::SparseMatrixd&
+        [this](const OdeSystemState & s) -> const SparseMatrixd&
     {
         double *data = const_cast<double*>(s.getPositions().data());
 
@@ -886,7 +888,7 @@ void VegaFEMDeformableSceneObject::setTangentStiffnessMatrix()
 void VegaFEMDeformableSceneObject::setMassMatrix()
 {
     auto massMatrix =
-        [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+        [this](const OdeSystemState & /*s*/) -> const SparseMatrixd&
     {
         return this->M;
     };
@@ -903,7 +905,7 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
     this->vegaFemConfig->floatsOptionMap.at("dampingMassCoefficient");
 
     auto raleighDamping =
-        [&,this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+        [&,this](const OdeSystemState & /*s*/) -> const SparseMatrixd&
     {
         if(dampingMassCoefficient > 0)
         {
@@ -924,7 +926,7 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
     if(this->dampingMatrix)
     {
         auto lagrangianDamping =
-            [this](const OdeSystemState & /*s*/) -> const core::SparseMatrixd&
+            [this](const OdeSystemState & /*s*/) -> const SparseMatrixd&
         {
             return this->D;
         };
@@ -936,4 +938,6 @@ void VegaFEMDeformableSceneObject::setDampingMatrices()
 void VegaFEMDeformableSceneObject::updateMesh()
 {
     this->volumetricMesh->updateAttachedMeshes(this->currentState->getPositions());
+}
+
 }

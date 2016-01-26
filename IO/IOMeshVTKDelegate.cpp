@@ -39,6 +39,8 @@
 #include <vtkPointData.h>
 #include <vtkFloatArray.h>
 
+namespace imstk {
+
 ///
 /// \brief This delegate implements the VTK based readers/writers. It creates
 /// a VegaVolumetric mesh for tetra/hexaarrays and a surface mesh otherwise.
@@ -56,7 +58,7 @@ public:
     /// \param points VTK point taken from the dataset.
     /// \param vertices Array oof vertices holding coordinates.
     ///
-    void copyPoints(vtkPoints *points, std::vector<core::Vec3d> &vertices) const;
+    void copyPoints(vtkPoints *points, std::vector<Vec3d> &vertices) const;
 
     ///
     /// \brief Copy vtk cells into triangles.
@@ -78,25 +80,25 @@ public:
     ///
     void copyData(vtkFieldData *fields,
                   std::vector<size_t> &constraints,
-                  core::Vec3d &material);
+                  Vec3d &material);
 
     ///
     /// \brief Copy texture coodinates
     /// \param tcoord Texture coordinates
     ///
     void copyTextureCoordinates(vtkPointData* pointData,
-         std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &tcoordsArray);
+         std::vector<Vec2f,Eigen::aligned_allocator<Vec2f>> &tcoordsArray);
 
     void write(){}
 
     template<typename GenericReader>
     void readGenericFormat(const std::string &name,
-                           std::vector<core::Vec3d> &vertices,
+                           std::vector<Vec3d> &vertices,
                            std::vector<std::array<size_t,3>> &triangleArray,
                            std::vector<std::array<size_t,4>> &tetraArray,
                            std::vector<std::array<size_t,8>> &hexaArray,
                            std::vector<size_t> &bdConditions,
-                           core::Vec3d &materials);
+                           Vec3d &materials);
 
 };
 
@@ -105,13 +107,13 @@ void IOMeshVTKDelegate::read()
 {
     // Get file name and define some variables.
     auto name = this->meshIO->getFileName().c_str();
-    std::vector<core::Vec3d> vertices;
+    std::vector<Vec3d> vertices;
     std::vector<std::array<size_t, 3>> triangleArray;
     std::vector<std::array<size_t, 4>> tetraArray;
     std::vector<std::array<size_t, 8>> hexaArray;
-    std::vector<core::Vec2f, Eigen::aligned_allocator<core::Vec2f>> tcoordsArray;
+    std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>> tcoordsArray;
     std::vector<size_t> bdConditions;
-    core::Vec3d materials;
+    Vec3d materials;
 
     // Record the type of mesh we have.
     this->meshProps = 0;
@@ -244,7 +246,7 @@ void IOMeshVTKDelegate::read()
         {
             auto vegaMesh = std::static_pointer_cast<VegaVolumetricMesh>(
                                 this->meshIO->getMesh());
-            std::vector<core::Vec3d> surfaceVertices;
+            std::vector<Vec3d> surfaceVertices;
             std::unordered_map<size_t, size_t> uniqueVertexArray;
             this->reorderSurfaceTopology(
                 vertices,
@@ -276,7 +278,7 @@ void IOMeshVTKDelegate::read()
             }
 
             delete vegaObjMesh;
-            std::vector<core::Vec3d> surfaceVertices;
+            std::vector<Vec3d> surfaceVertices;
             std::unordered_map<size_t, size_t> uniqueVertexArray;
             this->reorderSurfaceTopology(
                 vertices,
@@ -314,7 +316,7 @@ void IOMeshVTKDelegate::read()
 
 //----------------------------------------------------------------------------------------
 void IOMeshVTKDelegate::copyPoints(vtkPoints *points,
-                                   std::vector<core::Vec3d> &vertices) const
+                                   std::vector<Vec3d> &vertices) const
 {
     if(!points)
     {
@@ -406,7 +408,7 @@ void IOMeshVTKDelegate::copyCells(vtkCellArray *cells,
 //----------------------------------------------------------------------------------------
 void IOMeshVTKDelegate::copyData(vtkFieldData *fields,
                                  std::vector<size_t> &constraints,
-                                 core::Vec3d &material)
+                                 Vec3d &material)
 {
     if(!fields)
     {
@@ -453,7 +455,7 @@ void IOMeshVTKDelegate::copyData(vtkFieldData *fields,
 //----------------------------------------------------------------------------------------
 void IOMeshVTKDelegate
 ::copyTextureCoordinates(vtkPointData* pointData,
-                         std::vector<core::Vec2f,Eigen::aligned_allocator<core::Vec2f>> &tcoordsArray)
+                         std::vector<Vec2f,Eigen::aligned_allocator<Vec2f>> &tcoordsArray)
 {
     if(pointData)
     {
@@ -478,12 +480,12 @@ void IOMeshVTKDelegate
 //----------------------------------------------------------------------------------------
 template<typename GenericReader> void IOMeshVTKDelegate
 ::readGenericFormat(const std::string &name,
-                    std::vector<core::Vec3d> &vertices,
+                    std::vector<Vec3d> &vertices,
                     std::vector<std::array<size_t,3>> &triangleArray,
                     std::vector<std::array<size_t,4>> &tetraArray,
                     std::vector<std::array<size_t,8>> &hexaArray,
                     std::vector<size_t> &bdConditions,
-                    core::Vec3d &materials)
+                    Vec3d &materials)
 {
     vtkNew<GenericReader> reader;
     reader->SetFileName(name.c_str());
@@ -516,3 +518,5 @@ template<typename GenericReader> void IOMeshVTKDelegate
 }
 
 RegisterFactoryClass(IOMeshDelegate,IOMeshVTKDelegate,IOMesh::ReaderGroup::VTK)
+
+}

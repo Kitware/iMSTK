@@ -29,7 +29,9 @@
 #include <vtkProperty.h>
 #include <vtkJPEGReader.h>
 #include <vtkFloatArray.h>
-#include "VTKRendering/VTKRenderDelegate.h"
+#include "Rendering/VTKRenderDelegate.h"
+
+namespace imstk {
 
 class PlaneRenderDelegate : public VTKRenderDelegate
 {
@@ -76,12 +78,12 @@ void PlaneRenderDelegate::initDraw()
     vtkNew<vtkPlaneSource> planeSource;
     auto center = plane->getPoint();
     auto normal = plane->getUnitNormal();
-    core::Vec3d xp = normal.cross(core::Vec3d(0., 1., 0.));
+    Vec3d xp = normal.cross(Vec3d(0., 1., 0.));
     if (xp.squaredNorm() < 1e-8)
-        xp = normal.cross(core::Vec3d(0., 0., 1.)).normalized();
+        xp = normal.cross(Vec3d(0., 0., 1.)).normalized();
     else
         xp = xp.normalized();
-    core::Vec3d yp = normal.cross(xp).normalized();
+    Vec3d yp = normal.cross(xp).normalized();
 
     double planeSize = plane->getWidth();
     xp *= planeSize;
@@ -106,3 +108,5 @@ vtkActor *PlaneRenderDelegate::getActor()
 RegisterFactoryClass(RenderDelegate,
                      PlaneRenderDelegate,
                      RenderDelegate::RendererType::VTK)
+
+}

@@ -30,13 +30,11 @@
 #include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/ConfigRendering.h"
-#include "Rendering/CustomRenderer.h"
+
+namespace imstk {
 
 // Forward class declaration
 class ObjectSimulator;
-namespace Core {
-    class BaseMesh;
-}
 
 ///
 /// \brief Booleans for objects indicate whether they're initialized or not.
@@ -54,8 +52,6 @@ struct ObjectInitFlags
 ///
 class SceneObject : public CoreClass
 {
-    friend class SDK;
-
 public:
     ///
     /// \brief Constructor.
@@ -167,30 +163,30 @@ public:
     ///
     /// \brief Get contact forces vector.
     ///
-    std::unordered_map<int,core::Vec3d> &getContactForces();
+    std::unordered_map<int,Vec3d> &getContactForces();
 
     ///
     /// \brief Get the map of contact forces.
     ///
     /// \return Map containing indices with contact points.
     ///
-    const std::unordered_map<int,core::Vec3d> &getContactForces() const;
+    const std::unordered_map<int,Vec3d> &getContactForces() const;
 
     ///
     /// \brief Get contact forces vector
     ///
-    std::unordered_map<int,core::Vec3d> &getContactPoints();
+    std::unordered_map<int,Vec3d> &getContactPoints();
 
     ///
     /// \brief Get contact forces vector
     ///
-    const std::unordered_map<int,core::Vec3d> &getContactPoints() const;
+    const std::unordered_map<int,Vec3d> &getContactPoints() const;
 
     ///
     /// \brief Returns velocity of at a given location
     ///     (not given node) in contact force vector
     ///
-    virtual Eigen::Map<core::Vec3d> getVelocity(const int);
+    virtual Eigen::Map<Vec3d> getVelocity(const int) const;
 
     ///
     /// \brief Set all contact forces to zero (if any)
@@ -200,14 +196,14 @@ public:
     ///
     /// \brief Get contact forces vector
     ///
-    void setContactForce(const int dofID, const core::Vec3d &force);
+    void setContactForce(const int dofID, const Vec3d &force);
 
     ///
     /// \brief Get contact forces vector
     ///
     void setContactForce(const int dofID,
-                         const core::Vec3d &point,
-                         const core::Vec3d &force);
+                         const Vec3d &point,
+                         const Vec3d &force);
 
     ///
     ///
@@ -252,7 +248,7 @@ public:
     ///
     /// \brief Update cumulative forces
     ///
-    virtual void updateExternalForces(const std::unordered_map<size_t,core::Vec3d>&);
+    virtual void updateExternalForces(const std::unordered_map<size_t,Vec3d>&);
 
     ///
     /// \brief Return the number of nodes for the underlying physics geometric model.
@@ -272,12 +268,14 @@ protected:
     std::shared_ptr<Model> collisionModel; //!< collision model attached to this scene object
     std::shared_ptr<Model> physicsModel; //!< collision model attached to this scene object
     std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
-    std::unordered_map<int,core::Vec3d> contactForces;
-    std::unordered_map<int,core::Vec3d> contactPoints;
+    std::unordered_map<int,Vec3d> contactForces;
+    std::unordered_map<int,Vec3d> contactPoints;
 
     // Total number of degrees of freedom
     size_t numOfDOF;
     size_t numOfNodes;
 };
+
+}
 
 #endif

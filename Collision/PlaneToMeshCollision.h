@@ -23,6 +23,8 @@
 // iMSTK includes
 #include "Core/CollisionDetection.h"
 
+namespace imstk {
+
 class CollisionManager;
 
 ///
@@ -40,5 +42,7 @@ private:
     virtual void doComputeCollision(std::shared_ptr<CollisionManager> pairs) override;
 
 };
+
+}
 
 #endif // COLLISION_PLANETOMESHCOLLISION_H

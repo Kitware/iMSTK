@@ -27,12 +27,13 @@
 
 #include <cmath> // for std::isfinite()
 
+namespace imstk {
 
 DeformableSceneObject::DeformableSceneObject():
     OdeSystem(),
     integrationScheme(TimeIntegrator::ImplicitEuler)
 {
-    this->gravity = core::Vec3d::UnitY();
+    this->gravity = Vec3d::UnitY();
 }
 
 //---------------------------------------------------------------------------
@@ -96,6 +97,7 @@ void DeformableSceneObject::update(const double dt)
        !std::isfinite(this->newState->getVelocities().sum()))
     {
         // TODO: log this and throw exception, this is a fatal error
+        std::cerr << "Error: Invalid state." << std::endl;
         return;
     }
 
@@ -125,14 +127,28 @@ std::shared_ptr< OdeSystemState > DeformableSceneObject::getPreviousState()
 }
 
 //---------------------------------------------------------------------------
-Eigen::Map<core::Vec3d> DeformableSceneObject::getVelocity(const int index)
+Eigen::Map<Vec3d> DeformableSceneObject::getVelocity(const int index) const
 {
     auto velocities = this->currentState->getVelocities();
-    return core::Vec3d::Map(&velocities(index));
+    return Vec3d::Map(&velocities(index));
 }
 
 //---------------------------------------------------------------------------
-const core::Vec3d& DeformableSceneObject::getGravity() const
+const Vec3d& DeformableSceneObject::getGravity() const
 {
     return this->gravity;
+}
+
+//---------------------------------------------------------------------------
+void DeformableSceneObject::updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces)
+{
+    auto externalForce = Matrixd::Map(this->f.data(), 3, this->numOfNodes);
+
+    for(const auto & force : forces)
+    {
+        auto i = force.first;
+        externalForce.col(i) -= force.second;
+    }
+}
+
 }

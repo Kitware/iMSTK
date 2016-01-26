@@ -19,7 +19,7 @@
 
 #include "Core/Event.h"
 
-namespace core {
+namespace imstk {
 
 EventType Event::EventName = EventType::None;
 

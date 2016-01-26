@@ -36,42 +36,64 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
-#include "Simulators/DefaultSimulator.h"
 #include "Simulators/ObjectSimulator.h"
 #include "VirtualTools/ToolCoupler.h"
-#include "VTKRendering/InitVTKRendering.h"
+#include "Rendering/InitVTKRendering.h"
+
+#include "Testing/ReadPaths.h"
 
 int main(int ac, char** av)
 {
-    std::string configFile = "./box.config";
+    std::string configPaths = "./Config.paths";
     if(ac > 1)
     {
-        configFile = av[1];
+        configPaths = av[1];
+    }
+    auto paths = imstk::ReadPaths(configPaths);
+    if(std::get<imstk::Path::Binary>(paths).empty() &&
+       std::get<imstk::Path::Source>(paths).empty())
+    {
+        std::cerr << "Error: Configuration file not found." << std::endl;
+        std::cerr << std::endl;
+        std::cerr << "\tUsage: " << av[0] << " /path_to/Config.paths" << std::endl;
+        std::cerr << std::endl;
+        return EXIT_FAILURE;
     }
 
-    // initRenderDelegates();
-    InitVTKRendering();
-    InitIODelegates();
+    std::string configFile = std::get<imstk::Path::Binary>(paths)+"/box.config";
+    std::string meshFile = std::get<imstk::Path::Binary>(paths)+"/box.veg";
+    std::string meshWeightsFile = std::get<imstk::Path::Binary>(paths)+"/box.interp";
+    std::string meshSurfaceFile = std::get<imstk::Path::Binary>(paths)+"/box.vtk";
+    std::string loliMeshFile = std::get<imstk::Path::Binary>(paths)+"/loli.vtk";
+
+    if(configFile.empty())
+    {
+        std::cerr << "Vega configuration file not found." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    imstk::InitVTKRendering();
+    imstk::InitIODelegates();
 
     //-------------------------------------------------------
     // 1. Create an instance of the SoFMIS framework/SDK
     // 2. Create viewer
     // 3. Create default scene (scene 0)
     //-------------------------------------------------------
-    auto sdk = SDK::createStandardSDK();
+    auto sdk = imstk::SDK::createStandardSDK();
 
     // setup device client
     std::string deviceURL = "Phantom@localhost";
-    auto client = std::make_shared<VRPNForceDevice>(deviceURL);
+    auto client = std::make_shared<imstk::VRPNForceDevice>(deviceURL);
     sdk->registerModule(client);
 
     // setup controller
-    auto controller = std::make_shared<ToolCoupler>(client);
+    auto controller = std::make_shared<imstk::ToolCoupler>(client);
     controller->setScalingFactor(20.0);
     sdk->registerModule(controller);
 
     // setup server
-     auto server = std::make_shared<VRPNDeviceServer>();
+     auto server = std::make_shared<imstk::VRPNDeviceServer>();
      server->addDeviceClient(client);
      sdk->registerModule(server);
 
@@ -80,48 +102,48 @@ int main(int ac, char** av)
     //-------------------------------------------------------
 
     // create a FEM simulator
-    auto femSimulator = std::make_shared<ObjectSimulator>();
+    auto femSimulator = std::make_shared<imstk::ObjectSimulator>();
 //     femSimulator->setHapticTool(controller);
 
     // create a Vega based FEM object and attach it to the fem simulator
     auto femObject =
-        std::make_shared<VegaFEMDeformableSceneObject>("./box.veg",configFile);
+    std::make_shared<imstk::VegaFEMDeformableSceneObject>(meshFile,configFile);
     femObject->setContactForcesOn();
 
-    auto meshRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_WIREFRAME);
-    meshRenderDetail->setAmbientColor(Color(0.2,0.2,0.2,1.0));
-    meshRenderDetail->setDiffuseColor(Color::colorGray);
-    meshRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0,0.5));
+    auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_SURFACE);
+    meshRenderDetail->setAmbientColor(imstk::Color(0.2,0.2,0.2,1.0));
+    meshRenderDetail->setDiffuseColor(imstk::Color::colorGray);
+    meshRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0,0.5));
     meshRenderDetail->setShininess(10.0);
 
     // Load rendering mesh
-    auto volumeMesh = std::static_pointer_cast<VegaVolumetricMesh>(femObject->getPhysicsModel()->getMesh());
+    auto volumeMesh = std::static_pointer_cast<imstk::VegaVolumetricMesh>(femObject->getPhysicsModel()->getMesh());
 
-    auto visualModel = std::make_shared<MeshModel>();
-    visualModel->load("./box.vtk");
+    auto visualModel = std::make_shared<imstk::MeshModel>();
+    visualModel->load(meshSurfaceFile);
     femObject->setVisualModel(visualModel);
 
-    auto visualMesh = visualModel->getMeshAs<SurfaceMesh>();
+    auto visualMesh = visualModel->getMeshAs<imstk::SurfaceMesh>();
 
     if(visualMesh)
     {
         visualMesh->updateInitialVertices();
-//         visualMesh->setRenderDetail(meshRenderDetail);
-        volumeMesh->attachSurfaceMesh(visualMesh,"./box.interp");
+        visualMesh->setRenderDetail(meshRenderDetail);
+        volumeMesh->attachSurfaceMesh(visualMesh);
     }
     sdk->addSceneActor(femObject, femSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane
     //-------------------------------------------------------
-    auto staticSimulator = std::make_shared<ObjectSimulator>();
+    auto staticSimulator = std::make_shared<imstk::ObjectSimulator>();
 
     // create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<StaticSceneObject>();
+    auto staticObject = std::make_shared<imstk::StaticSceneObject>();
 
-    auto plane = std::make_shared<PlaneCollisionModel>(
-      core::Vec3d(0.0, -3.0, 0.0),
-      core::Vec3d(0.0, 1.0, 0.0));
+    auto plane = std::make_shared<imstk::PlaneCollisionModel>(
+      imstk::Vec3d(0.0, -3.0, 0.0),
+      imstk::Vec3d(0.0, 1.0, 0.0));
     plane->getPlaneModel()->setWidth(5);
     if (ac > 2)
       plane->getPlaneModel()->setWidth(atof(av[2]));
@@ -133,20 +155,20 @@ int main(int ac, char** av)
     // Create scene actor 2:  loli tool
     // create a static object to hold the lolitool scene object of given normal and position
     //-------------------------------------------------------
-    auto loliSceneObject = std::make_shared<StaticSceneObject>();
+    auto loliSceneObject = std::make_shared<imstk::StaticSceneObject>();
 
-    auto loliCollisionModel = std::make_shared<MeshCollisionModel>();
-    loliCollisionModel->loadTriangleMesh("./loli.vtk");
+    auto loliCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
+    loliCollisionModel->loadTriangleMesh(loliMeshFile);
     loliSceneObject->setModel(loliCollisionModel);
 
     auto loliMesh = loliCollisionModel->getMesh();
-    Core::BaseMesh::TransformType transform =
-        Eigen::Translation3d(core::Vec3d(0,0,0))*Eigen::Scaling(0.1);
+    imstk::BaseMesh::TransformType transform =
+        Eigen::Translation3d(imstk::Vec3d(0,0,0))*Eigen::Scaling(0.1);
 
-    auto loliRenderDetail = std::make_shared<RenderDetail>(IMSTK_RENDER_WIREFRAME);
-    loliRenderDetail->setAmbientColor(Color(0.2, 0.2, 0.2, 0.5));
-    loliRenderDetail->setDiffuseColor(Color::colorYellow);
-    loliRenderDetail->setSpecularColor(Color(1.0, 1.0, 1.0, 0.5));
+    auto loliRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_SURFACE);
+    loliRenderDetail->setAmbientColor(imstk::Color(0.2, 0.2, 0.2, 0.5));
+    loliRenderDetail->setDiffuseColor(imstk::Color::colorGray);
+    loliRenderDetail->setSpecularColor(imstk::Color(1.0, 1.0, 1.0, 0.5));
     loliRenderDetail->setShininess(20.0);
 
     loliMesh->setRenderDetail(loliRenderDetail);
@@ -154,7 +176,7 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
-    auto loliSimulator = std::make_shared<ObjectSimulator>();
+    auto loliSimulator = std::make_shared<imstk::ObjectSimulator>();
     sdk->addSceneActor(loliSceneObject, loliSimulator);
 //     controller->setMesh(loliCollisionModel->getMesh());
 
@@ -162,7 +184,7 @@ int main(int ac, char** av)
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
     auto sdkSimulator = sdk->getSimulator();
-    auto meshModel = std::make_shared<MeshCollisionModel>();
+    auto meshModel = std::make_shared<imstk::MeshCollisionModel>();
 
     auto collisionMesh = volumeMesh->getCollisionMesh();
     if(collisionMesh)
@@ -172,20 +194,20 @@ int main(int ac, char** av)
 
     femObject->setCollisionModel(meshModel);
 
-    auto planeMeshCollisionPairs = std::make_shared<CollisionManager>();
+    auto planeMeshCollisionPairs = std::make_shared<imstk::CollisionManager>();
 
     planeMeshCollisionPairs->setModels(meshModel, plane);
 
     sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
 
-    auto planeToMeshCollisionDetection = std::make_shared<PlaneToMeshCollision>();
+    auto planeToMeshCollisionDetection = std::make_shared<imstk::PlaneToMeshCollision>();
 
     sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
     //-------------------------------------------------------
-    auto planeToMeshContact = std::make_shared<PenaltyContactFemToStatic>(false);
+    auto planeToMeshContact = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
 
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
@@ -202,15 +224,15 @@ int main(int ac, char** av)
 
     // Get Scene
     auto scene = sdk->getScene(0);
-    viewer->registerScene(scene, IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
+    viewer->registerScene(scene, imstk::IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
 
     // Setup Scene lighting
-    auto light1 = Light::getDefaultLighting();
-    light1->lightPos.setPosition(core::Vec3d(-25.0, 10.0, 10.0));
+    auto light1 = imstk::Light::getDefaultLighting();
+    light1->lightPos.setPosition(imstk::Vec3d(-25.0, 10.0, 10.0));
     scene->addLight(light1);
 
-    auto light2 = Light::getDefaultLighting();
-    light2->lightPos.setPosition(core::Vec3d(25.0, 10.0, 10.0));
+    auto light2 = imstk::Light::getDefaultLighting();
+    light2->lightPos.setPosition(imstk::Vec3d(25.0, 10.0, 10.0));
     scene->addLight(light2);
 
     //-------------------------------------------------------

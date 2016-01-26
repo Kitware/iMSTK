@@ -39,6 +39,8 @@
     }
 #endif
 
+namespace imstk {
+
 class IOMesh3dsDelegate : public IOMeshDelegate
 {
 public:
@@ -70,7 +72,7 @@ void IOMesh3dsDelegate::read()
         return;
     }
 
-    core::Vec3d v;
+    Vec3d v;
     std::array<size_t, 3> t;
 
     //Loop to scan the whole file
@@ -208,3 +210,5 @@ void IOMesh3dsDelegate::read()
 }
 
 RegisterFactoryClass(IOMeshDelegate,IOMesh3dsDelegate,IOMesh::ReaderGroup::Other);
+
+}

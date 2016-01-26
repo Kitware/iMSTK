@@ -33,6 +33,8 @@
 #include "Devices/DeviceInterface.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 LaparoscopicCameraController::LaparoscopicCameraController(
     std::shared_ptr< DeviceInterface > inputDevice, vtkCamera* camera)
 {
@@ -191,22 +193,24 @@ bool LaparoscopicCameraController::updateCamera()
     {
         this->currentAngleX -= this->deltaAngleXY;
     }
-    core::Quaterniond newDeviceRot = this->inputDevice->getOrientation();
-    core::Vec3d newDevicePos = this->inputDevice->getPosition()*this->scalingFactor;
-    core::Vec3d bendingOffset = core::Vec3d(0, 0, this->bendingRadius);
-    core::Quaterniond bendingRot(cos(this->currentAngleY/2), 0, sin(this->currentAngleY/2), 0);
+    Quaterniond newDeviceRot = this->inputDevice->getOrientation();
+    Vec3d newDevicePos = this->inputDevice->getPosition()*this->scalingFactor;
+    Vec3d bendingOffset = Vec3d(0, 0, this->bendingRadius);
+    Quaterniond bendingRot(cos(this->currentAngleY/2), 0, sin(this->currentAngleY/2), 0);
     bendingRot.normalize();
-    bendingRot = bendingRot*core::Quaterniond(cos(this->currentAngleX/2), sin(this->currentAngleX/2), 0, 0);
+    bendingRot = bendingRot*Quaterniond(cos(this->currentAngleX/2), sin(this->currentAngleX/2), 0, 0);
     bendingRot.normalize();
 
     // Update the camera position, focus and up vector data
-    core::Vec3d position = newDeviceRot*(bendingOffset - bendingRot*bendingOffset) + newDevicePos;
-    core::Vec3d upVector = newDeviceRot*bendingRot*core::Vec3d(0, 1.0, 0);
-    core::Vec3d focus = newDeviceRot*bendingRot*core::Vec3d(0, 0, -200.0);
+    Vec3d position = newDeviceRot*(bendingOffset - bendingRot*bendingOffset) + newDevicePos;
+    Vec3d upVector = newDeviceRot*bendingRot*Vec3d(0, 1.0, 0);
+    Vec3d focus = newDeviceRot*bendingRot*Vec3d(0, 0, -200.0);
 
     this->camera->SetPosition(position[0], position[1], position[2]);
     this->camera->SetViewUp(upVector[0], upVector[1], upVector[2]);
     this->camera->SetFocalPoint(focus[0], focus[1], focus[2]);
 
     return true;
+}
+
 }

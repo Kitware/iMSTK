@@ -33,8 +33,10 @@
 #include "Devices/DeviceInterface.h"
 #include "Core/RenderDelegate.h"
 
+namespace imstk {
+
 ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
-                         std::shared_ptr< Core::BaseMesh > toolMesh)
+                         std::shared_ptr< BaseMesh > toolMesh)
 {
     this->inputDevice = inputDevice;
     this->outputDevice = inputDevice;
@@ -63,7 +65,7 @@ ToolCoupler::ToolCoupler(std::shared_ptr<DeviceInterface> inputDevice)
 
 ToolCoupler::ToolCoupler(std::shared_ptr< DeviceInterface > inputDevice,
                          std::shared_ptr< DeviceInterface > outputDevice,
-                         std::shared_ptr< Core::BaseMesh > toolMesh)
+                         std::shared_ptr< BaseMesh > toolMesh)
 {
     this->inputDevice = inputDevice;
     this->outputDevice = outputDevice;
@@ -101,12 +103,12 @@ std::shared_ptr< DeviceInterface > ToolCoupler::getOutputDevice()
     return this->outputDevice;
 }
 
-void ToolCoupler::setMesh(std::shared_ptr< Core::BaseMesh > newMesh)
+void ToolCoupler::setMesh(std::shared_ptr< BaseMesh > newMesh)
 {
     this->mesh = newMesh;
 }
 
-std::shared_ptr< Core::BaseMesh > ToolCoupler::getMesh() const
+std::shared_ptr< BaseMesh > ToolCoupler::getMesh() const
 {
     return this->mesh;
 }
@@ -192,8 +194,8 @@ bool ToolCoupler::updateTracker()
     this->prevPosition = this->position;
     this->prevOrientation = this->orientation;
 
-    core::Quaterniond newRot = inputDevice->getOrientation();
-    core::Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
+    Quaterniond newRot = inputDevice->getOrientation();
+    Vec3d newPos = inputDevice->getPosition() * this->scalingFactor;
 
     Eigen::Quaterniond deltaRotation(newRot * this->orientation.conjugate());
     Eigen::Translation3d translationPrev(-this->position);
@@ -228,32 +230,34 @@ bool ToolCoupler::updateForces()
 }
 
 void ToolCoupler::setOffsetOrientation(
-    const Eigen::Map<core::Quaterniond> &offsetOrientation)
+    const Eigen::Map<Quaterniond> &offsetOrientation)
 {
     this->offsetOrientation = offsetOrientation;
 }
 
-void ToolCoupler::setOffsetPosition(const core::Vec3d &offsetPosition)
+void ToolCoupler::setOffsetPosition(const Vec3d &offsetPosition)
 {
     this->offsetPosition = offsetPosition;
 }
 
-const core::Quaterniond& ToolCoupler::getOffsetOrientation() const
+const Quaterniond& ToolCoupler::getOffsetOrientation() const
 {
     return this->offsetOrientation;
 }
 
-const core::Vec3d& ToolCoupler::getOffsetPosition() const
+const Vec3d& ToolCoupler::getOffsetPosition() const
 {
     return this->offsetPosition;
 }
 
-const core::Vec3d& ToolCoupler::getPrevPosition() const
+const Vec3d& ToolCoupler::getPrevPosition() const
 {
     return this->prevPosition;
 }
 
-const core::Quaterniond& ToolCoupler::getPrevOrientation() const
+const Quaterniond& ToolCoupler::getPrevOrientation() const
 {
     return this->prevOrientation;
+}
+
 }

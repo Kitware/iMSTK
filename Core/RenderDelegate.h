@@ -24,6 +24,8 @@
 
 #include <memory> // for shared_ptr
 
+namespace imstk {
+
 class RenderDelegate
 {
 public:
@@ -63,6 +65,8 @@ protected:
     GeometrySource sourceGeometry; // object to render when draw() is called
     std::string type;
 };
+
+}
 
 #endif // CORE_RENDERABLE_H
 
