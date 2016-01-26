@@ -311,7 +311,7 @@ public:
     vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor;
 };
 
-VTKViewer::VTKViewer() : renderer(make_unique<VTKRenderer> (this))
+VTKViewer::VTKViewer() : renderer(imstk::make_unique<VTKRenderer> (this))
 {
     this->name = "VTKViewer";
 }

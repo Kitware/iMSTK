@@ -34,12 +34,11 @@
 #include "Devices/VRPNDeviceServer.h"
 #include "VirtualTools/ToolCoupler.h"
 #include "VirtualTools/LaparoscopicCameraController.h"
-#include "Simulators/DefaultSimulator.h"
 #include "Collision/PlaneCollisionModel.h"
 #include "Collision/MeshCollisionModel.h"
 #include "IO/InitIO.h"
-#include "VTKRendering/InitVTKRendering.h"
-#include "VTKRendering/VTKViewer.h"
+#include "Rendering/InitVTKRendering.h"
+#include "Rendering/VTKViewer.h"
 
 // VTK includes
 #include <vtkNew.h>
@@ -342,7 +341,7 @@ void add2DOverlay(std::shared_ptr<imstk::VTKViewer> vtkViewer,
     imageActor->SetPosition(0.5, 0.5);
 
     // Renderer
-    vtkRenderer* rendererVtk = vtkViewer->getRenderWindow()->GetRenderers()->GetFirstRenderer();
+    vtkRenderer* rendererVtk = vtkViewer->getVtkRenderWindow()->GetRenderers()->GetFirstRenderer();
     rendererVtk->AddActor2D(imageActor.GetPointer());
 }
 
@@ -358,26 +357,45 @@ int addCameraController(std::shared_ptr<imstk::SDK> sdk)
     switch( controllerType )
     {
         case imstk::DeviceType::NAVIGATOR_3DCONNEXION:
+        {
             deviceURL = "navigator@localhost";
         break;
+        }
         case imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION:
+        {
             deviceURL = "device0@localhost";
         break;
+        }
         case imstk::DeviceType::PHANTOM_OMNI:
+        {
             deviceURL = "Phantom0@localhost"; //"Phantom@10.171.2.217"
         break;
+        }
         case imstk::DeviceType::XKEYS_XK3:
+        {
             deviceURL = "xkeys0@localhost";
         break;
+        }
         case imstk::DeviceType::OSVR_HDK:
+        {
             deviceURL = "com_osvr_Multiserver/OSVRHackerDevKit0@localhost";
         break;
+        }
+        case imstk::DeviceType::RAZER_HYDRA:
+        {
+            deviceURL = "razer@localhost";
+            break;
+        }
+        default:
+        {
+            std::cerr << "Unknown controller type" << std::endl;
+        }
     }
     auto camClient = std::make_shared<imstk::VRPNDeviceClient>(controllerType, deviceURL);
     std::cout<<"Device URL = "<<camClient->getDeviceURL()<<std::endl;
 
     // Set server
-    std::shared_ptr<imstk::VRPNDeviceServer> server = std::make_shared<VRPNDeviceServer>();
+    std::shared_ptr<imstk::VRPNDeviceServer> server = std::make_shared<imstk::VRPNDeviceServer>();
     server->addDeviceClient(camClient);
 
     // Get vtkCamera
@@ -395,6 +413,7 @@ int addCameraController(std::shared_ptr<imstk::SDK> sdk)
     sdk->registerModule(server);
     sdk->registerModule(camClient);
     sdk->registerModule(camController);
+    return 0;
 }
 
 int main()
@@ -432,7 +451,7 @@ int main()
     // not to erase the changes on the observers made to the
     // interactor in vtkViewer::addRenderer()
     vtkNew<ScreenCaptureInteractorStyle> style;
-    style->initialize(vtkViewer->getRenderWindow());
+    style->initialize(vtkViewer->getVtkRenderWindow());
     vtkViewer->getVtkRenderWindowInteractor()->SetInteractorStyle(style.GetPointer());
     style->SetCurrentRenderer(vtkViewer->getVtkRenderer());
 

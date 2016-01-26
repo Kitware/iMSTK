@@ -160,6 +160,7 @@ private:
     static void VRPN_CALLBACK analogChangeHandler(void *userData, const vrpn_ANALOGCB a);
 
 protected:
+    DeviceType deviceType;                              //!< Device type
     std::string deviceURL;                              //!< Connection device URL
 
 private:

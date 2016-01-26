@@ -28,7 +28,7 @@ namespace imstk {
 VRPNForceDevice::VRPNForceDevice(std::string deviceURL)
     : VRPNDeviceClient(DeviceType::PHANTOM_OMNI, deviceURL),
     enableForce(true),
-    contactPlane(core::Vec4f(0.0,1.0,0.0,100)),
+    contactPlane(Vec4f(0.0,1.0,0.0,100)),
     dampingCoefficient(0.5),
     dynamicFriction(0.0),
     springCoefficient(1.0),

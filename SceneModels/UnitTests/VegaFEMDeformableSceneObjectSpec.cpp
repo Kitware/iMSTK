@@ -44,8 +44,9 @@ go_bandit([]()
         it("updates", [&]()
         {
             sceneObject->update(0.01);
-            bool validState = !std::isfinite(sceneObject->getCurrentState()->getPositions().sum()) ||
-                   !std::isfinite(sceneObject->getCurrentState()->getVelocities().sum());
+            auto sum1 = sceneObject->getCurrentState()->getPositions().sum();
+            auto sum2 = sceneObject->getCurrentState()->getVelocities().sum();
+            bool validState = std::isfinite(sum1) && std::isfinite(sum2);
             AssertThat(validState, IsTrue());
         });
      });

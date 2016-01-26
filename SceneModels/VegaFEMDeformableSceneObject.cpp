@@ -370,7 +370,7 @@ void VegaFEMDeformableSceneObject::initialize()
 //---------------------------------------------------------------------------
 bool VegaFEMDeformableSceneObject::configure(const std::string &configFile)
 {
-    this->vegaFemConfig = make_unique<VegaConfiguration>(configFile);
+    this->vegaFemConfig = imstk::make_unique<VegaConfiguration>(configFile);
 
     this->setMassMatrix();
     this->setTangentStiffnessMatrix();

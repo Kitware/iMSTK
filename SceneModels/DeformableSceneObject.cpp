@@ -97,6 +97,7 @@ void DeformableSceneObject::update(const double dt)
        !std::isfinite(this->newState->getVelocities().sum()))
     {
         // TODO: log this and throw exception, this is a fatal error
+        std::cerr << "Error: Invalid state." << std::endl;
         return;
     }
 

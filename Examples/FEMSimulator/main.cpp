@@ -36,7 +36,6 @@
 #include "Mesh/VegaVolumetricMesh.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
-#include "Simulators/DefaultSimulator.h"
 #include "Simulators/ObjectSimulator.h"
 #include "VirtualTools/ToolCoupler.h"
 #include "Rendering/InitVTKRendering.h"

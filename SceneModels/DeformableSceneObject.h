@@ -96,7 +96,7 @@ public:
     ///
     /// \brief Update cumulative forces
     ///
-    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces);
+    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces) override;
 
 private:
     ///////////////////////////////////////////////////////////////////////////////
