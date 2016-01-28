@@ -41,6 +41,9 @@
 #include "Core/ContactHandling.h"
 #include "Core/CollisionManager.h"
 #include "Core/CollisionDetection.h"
+#include "Devices/VRPNDeviceServer.h"
+#include "Devices/VRPNForceDevice.h"
+#include "VirtualTools/ToolCoupler.h"
 
 namespace imstk {
 
@@ -185,6 +188,18 @@ public:
     void addInteraction(std::shared_ptr<CollisionManager> collisionPair,
                         std::shared_ptr<CollisionDetection> collisionDetection,
                         std::shared_ptr<ContactHandling> contactHandling);
+
+    ///
+    /// \brief Utility function to create a device server
+    ///
+    std::shared_ptr<VRPNDeviceServer> createDeviceServer();
+
+    ///
+    /// \brief Utility function to create a device client, server and controller
+    ///
+    /// \param deviceURL Client name to make the connection
+    ///
+    std::shared_ptr<ToolCoupler> createForceDeviceController(std::string &deviceURL);
 
 private:
     SDK() = default;

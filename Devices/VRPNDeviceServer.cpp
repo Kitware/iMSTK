@@ -116,10 +116,10 @@ bool VRPNDeviceServer::addDeviceClient(
             // TODO: Add an extra parameter to set the name of the phantom omni.
             // This is necessary because vrpn_Phantom only take non-const names.
             char * deviceName = const_cast<char*>(newDeviceName.c_str());
-            vrpnTrackerDevice =
-                std::make_shared<vrpn_Phantom>(deviceName,
-                                               this->connection,
-                                               60.0f, "Default PHANToM");
+            vrpnTrackerDevice = std::make_shared<vrpn_Phantom>(deviceName,
+                                                               this->connection,
+                                                               60.0f,
+                                                               "Default PHANToM");
  #else
             // TODO: add to logger
             std::cerr<< "addDeviceClient error: needs VRPN_USE_PHANTOM_SERVER defined "

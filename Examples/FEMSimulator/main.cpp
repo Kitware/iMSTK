@@ -81,20 +81,9 @@ int main(int ac, char** av)
         return EXIT_FAILURE;
     }
 
-    // setup device client
+    // Set up a controller to control a mesh with an external device
     std::string deviceURL = "Phantom@localhost";
-//     auto client = std::make_shared<imstk::VRPNForceDevice>(deviceURL);
-//     sdk->addModule(client);
-
-    // setup controller
-//     auto controller = std::make_shared<imstk::ToolCoupler>(client);
-//     controller->setScalingFactor(20.0);
-//     sdk->addModule(controller);
-
-    // setup server
-     auto server = std::make_shared<imstk::VRPNDeviceServer>();
-//      server->addDeviceClient(client);
-     sdk->addModule(server);
+    auto controller = sdk->createForceDeviceController(deviceURL);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
@@ -168,7 +157,7 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
-//     controller->setMesh(loliCollisionModel->getMesh());
+    controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2

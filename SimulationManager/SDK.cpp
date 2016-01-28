@@ -251,4 +251,28 @@ void SDK::addInteraction(std::shared_ptr< CollisionManager > collisionPair,
                                          contactHandling);
 }
 
+//---------------------------------------------------------------------------
+std::shared_ptr< VRPNDeviceServer > SDK::createDeviceServer()
+{
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    this->addModule(server);
+    return server;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< ToolCoupler > SDK::createForceDeviceController(std::string &deviceURL)
+{
+    auto server = this->createDeviceServer();
+
+    auto client = std::make_shared<VRPNForceDevice>(deviceURL);
+    this->addModule(client);
+
+    server->addDeviceClient(client);
+
+    auto controller = std::make_shared<ToolCoupler>(client);
+    this->addModule(controller);
+
+    return controller;
+}
+
 }
