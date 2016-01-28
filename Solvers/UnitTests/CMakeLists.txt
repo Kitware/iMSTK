@@ -18,6 +18,10 @@
 
 set(Module Solvers)
 
+if(WIN32)
+    remove_definitions(-DWIN32_LEAN_AND_MEAN)
+endif(WIN32)
+
 include(MatrixMarket)
 
 add_executable(${Module}UnitTestRunner

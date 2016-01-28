@@ -17,6 +17,11 @@
 ###########################################################################
 
 set(MODULE_NAME Assembler)
+
+if(WIN32)
+    remove_definitions(-DWIN32_LEAN_AND_MEAN)
+endif(WIN32)
+
 imstk_add_library(${MODULE_NAME}
   SOURCES
     Assembler.cpp

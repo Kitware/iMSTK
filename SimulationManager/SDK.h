@@ -199,7 +199,7 @@ public:
     ///
     /// \param deviceURL Client name to make the connection
     ///
-    std::shared_ptr<ToolCoupler> createForceDeviceController(std::string &deviceURL);
+    std::shared_ptr<ToolCoupler> createForceDeviceController(std::string &deviceURL, bool createServer = false);
 
 private:
     SDK() = default;

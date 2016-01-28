@@ -260,14 +260,16 @@ std::shared_ptr< VRPNDeviceServer > SDK::createDeviceServer()
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr< ToolCoupler > SDK::createForceDeviceController(std::string &deviceURL)
+std::shared_ptr< ToolCoupler > SDK::createForceDeviceController(std::string &deviceURL, bool createServer)
 {
-    auto server = this->createDeviceServer();
-
     auto client = std::make_shared<VRPNForceDevice>(deviceURL);
     this->addModule(client);
 
-    server->addDeviceClient(client);
+    if(createServer)
+    {
+        auto server = this->createDeviceServer();
+        server->addDeviceClient(client);
+    }
 
     auto controller = std::make_shared<ToolCoupler>(client);
     this->addModule(controller);

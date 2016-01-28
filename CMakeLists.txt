@@ -177,7 +177,7 @@ if(MSVC)
   set(msvc_suppressed_warnings
   # C++ exception specification ignored except to indicate a function is not
   # __declspec(nothrow)
-    "/wd4290"
+    "/wd4290 /wd4267"
   )
   set(msvc_other_flags
   # Enable C++ Exceptions

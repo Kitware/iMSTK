@@ -21,10 +21,8 @@
 #define SIMULATORS_OBJECTSIMULATOR_H
 
 // iMSTK includes
-#include "Core/Config.h"
 #include "Core/CoreClass.h"
 #include "Core/Timer.h"
-#include "SimulationManager/Scheduler.h"
 
 namespace imstk {
 

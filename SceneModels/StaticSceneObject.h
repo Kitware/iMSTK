@@ -85,12 +85,12 @@ private:
     ///
     //not implemented yet..tansel
     ///
-    virtual void serialize(void */*p_memoryBlock*/) override {}
+    virtual void serialize(void *) override {}
 
     ///
     //not implemented yet..tansel
     ///
-    virtual void unSerialize(void */*p_memoryBlock*/) override {}
+    virtual void unSerialize(void *) override {}
 
 private:
     std::string fileName;

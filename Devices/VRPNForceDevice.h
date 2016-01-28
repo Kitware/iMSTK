@@ -62,106 +62,67 @@ public:
     ///
     /// \brief Enable force feedback
     ///
-    void setEnableForce(const bool &enable)
-    {
-        this->enableForce = enable;
-    }
+    void setEnableForce(const bool &enable);
 
     ///
     /// \brief Get enabling force variable
     ///
-    const bool &getEnableForce() const
-    {
-        return this->enableForce;
-    }
+    const bool &getEnableForce() const;
 
     ///
     /// \brief Set contact plane
     ///
-    void setContactPlane(const Vec4f &plane)
-    {
-        this->contactPlane = plane;
-    }
+    void setContactPlane(const Vec4f &plane);
 
     ///
     /// \brief Set contact plane
     ///
-    void setContactPlane(const Vec3f &plane, const float d)
-    {
-        this->contactPlane << plane,d;
-    }
+    void setContactPlane(const Vec3f &plane, const float d);
 
     ///
     /// \brief Get contact plane
     ///
-    const Vec4f &getContactPlane() const
-    {
-        return this->contactPlane;
-    }
+    const Vec4f &getContactPlane() const;
 
     ///
     /// \brief Set damping coefficient
     ///
-    void setDampingCoefficient(const double &coeff)
-    {
-        this->dampingCoefficient = coeff;
-    }
+    void setDampingCoefficient(const double &coeff);
 
     ///
     /// \brief Get damping coefficient
     ///
-    const double &getDampingCoefficient() const
-    {
-        return this->dampingCoefficient;
-    }
+    const double &getDampingCoefficient() const;
 
     ///
     /// \brief Set dynamic friction coefficient
     ///
-    void setDynamicFriction(const double &coeff)
-    {
-        this->dynamicFriction = coeff;
-    }
+    void setDynamicFriction(const double &coeff);
 
     ///
     /// \brief Get dynamic friction coefficient
     ///
-    const double &getDynamicFriction() const
-    {
-        return this->dynamicFriction;
-    }
+    const double &getDynamicFriction() const;
 
     ///
     /// \brief Set spring coefficient
     ///
-    void setSpringCoefficient(const double &coeff)
-    {
-        this->springCoefficient = coeff;
-    }
+    void setSpringCoefficient(const double &coeff);
 
     ///
     /// \brief Get spring coefficient
     ///
-    const double &getSpringCoefficient() const
-    {
-        return this->springCoefficient;
-    }
+    const double &getSpringCoefficient() const;
 
     ///
     /// \brief Set static friction coefficient
     ///
-    void setStaticFriction(const double &coeff)
-    {
-        this->staticFriction = coeff;
-    }
+    void setStaticFriction(const double &coeff);
 
     ///
     /// \brief Get static friction coefficient
     ///
-    const double &getStaticFriction() const
-    {
-        return this->staticFriction;
-    }
+    const double &getStaticFriction() const;
 
 protected:
     ///

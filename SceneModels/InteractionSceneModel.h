@@ -26,22 +26,23 @@
 
 namespace imstk {
 
+///
+/// \brief Base class for all deformable scene objects.
+///
+class InteractionSceneModel : public SceneObject, public OdeSystem
+{
+public:
     ///
-    /// \brief Base class for all deformable scene objects.
+    /// \brief Constructor
     ///
-    class InteractionSceneModel : public SceneObject, public OdeSystem
-    {
-    public:
-        ///
-        /// \brief Constructor
-        ///
-        InteractionSceneModel() = default;
+    InteractionSceneModel() = default;
 
-        ///
-        /// \brief Destructor
-        ///
-        virtual ~InteractionSceneModel() = default;
-    };
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~InteractionSceneModel() = default;
+};
+
 }
 
 #endif // SCENE_MODELS_INTERACTIONSCENEMODEL_H

@@ -81,10 +81,6 @@ int main(int ac, char** av)
         return EXIT_FAILURE;
     }
 
-    // Set up a controller to control a mesh with an external device
-    std::string deviceURL = "Phantom@localhost";
-    auto controller = sdk->createForceDeviceController(deviceURL);
-
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
@@ -157,6 +153,10 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
+    // Set up a controller to control this mesh
+    std::string deviceURL = "Phantom1@10.171.2.217";
+    auto controller = sdk->createForceDeviceController(deviceURL);
+    controller->setScalingFactor(30.0);
     controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
