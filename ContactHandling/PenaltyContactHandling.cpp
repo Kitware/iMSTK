@@ -19,6 +19,7 @@
 
 #include "ContactHandling/PenaltyContactHandling.h"
 #include "Core/CollisionManager.h"
+#include "SceneModels/InteractionSceneModel.h"
 
 namespace imstk {
 
@@ -32,8 +33,8 @@ PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral) :
 
 //---------------------------------------------------------------------------
 PenaltyContactHandling::PenaltyContactHandling(bool typeBilateral,
-                                               const std::shared_ptr<SceneObject>& sceneObjFirst,
-                                               const std::shared_ptr<SceneObject>& sceneObjSecond) :
+                                               const std::shared_ptr<InteractionSceneModel>& sceneObjFirst,
+                                               const std::shared_ptr<InteractionSceneModel>& sceneObjSecond) :
     ContactHandling(typeBilateral,sceneObjFirst,sceneObjSecond),
     stiffness(1e6),
     damping(100)

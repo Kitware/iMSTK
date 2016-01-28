@@ -25,9 +25,10 @@
 
 namespace imstk {
 
+std::once_flag ErrorLog::sdkCallOnceFlag;
+
 ErrorLog::ErrorLog()
 {
-
     time.start();
     consoleOutput = true;
 }

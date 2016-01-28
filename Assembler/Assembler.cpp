@@ -23,8 +23,9 @@
 #include "CollisionContext/CollisionContext.h"
 #include "Core/ContactHandling.h"
 #include "Core/Model.h"
-#include "TimeIntegrators/OdeSystem.h"
 #include "Solvers/SystemOfEquations.h"
+#include "TimeIntegrators/OdeSystem.h"
+#include "SceneModels/InteractionSceneModel.h"
 
 namespace imstk {
 
@@ -71,19 +72,14 @@ void Assembler::type1Interactions()
         return;
     }
 
-    auto ch = this->collisionContext->getContactHandlers();
-
-    for(auto & ch : this->collisionContext->getContactHandlers())
-    {
-        const auto &forces = ch->getContactForces();
-        auto sceneModel = ch->getSecondSceneObject();
-        sceneModel->updateExternalForces(forces);
-    }
+    this->collisionContext->computeCollisions();
+    this->collisionContext->resolveContacts();
 }
 
 //---------------------------------------------------------------------------
 void Assembler::initSystem()
 {
+    this->collisionContext->createAdjacencyMatrix();
     for(auto & rows : this->collisionContext->getIslands())
     {
         size_t dofSize = 0;
@@ -95,12 +91,11 @@ void Assembler::initSystem()
         {
             // For the moment only DeformableSceneObject are SystemsOfEquations
             auto sceneModel = this->collisionContext->getSceneModel(col);
-            auto linearSystem = std::dynamic_pointer_cast<SparseLinearSystem>(sceneModel);
-            if(sceneModel && linearSystem)
+            if(sceneModel)
             {
-                this->equationList.push_back(linearSystem);
-                nnz += linearSystem->getMatrix().nonZeros();
-                dofSize += linearSystem->getRHSVector().size();
+                this->equationList.push_back(sceneModel);
+                nnz += sceneModel->getMatrix().nonZeros();
+                dofSize += sceneModel->getRHSVector().size();
             }
         }
 

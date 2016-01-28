@@ -32,6 +32,14 @@
 
 int main(int ac, char** av)
 {
+    //-------------------------------------------------------
+    // 1. Create an instance of the iMSTK framework/SDK
+    // 2. Create viewer
+    // 3. Create default scene (scene 0)
+    //-------------------------------------------------------
+    auto sdk = imstk::SDK::createSDK();
+    sdk->initialize();
+
     std::string configPaths = "./Config.paths";
     if(ac > 1)
     {
@@ -51,20 +59,10 @@ int main(int ac, char** av)
 
     auto dataPath = std::get<imstk::Path::Binary>(paths);
 
-    imstk::InitVTKRendering();
-    imstk::InitIODelegates();
-
-    //-------------------------------------------------------
-    // 1. Create an instance of the iMSTK framework/SDK
-    // 2. Create viewer
-    // 3. Create default scene (scene 0)
-    //-------------------------------------------------------
-    auto sdk = imstk::SDK::createStandardSDK();
-
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    auto viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewer();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 IMSTK_VIEWERRENDER_FADEBACKGROUND |
@@ -105,7 +103,7 @@ int main(int ac, char** av)
     // Customize the scene
     //-------------------------------------------------------
     // Get Scene
-    auto scene = sdk->getScene(0);
+    auto scene = sdk->getScene();
     viewer->registerScene(scene);
 
     // Setup Cube
@@ -146,9 +144,6 @@ int main(int ac, char** av)
     // Run the SDK
     //-------------------------------------------------------
     sdk->run();
-
-    //cleanup
-    sdk->releaseScene(scene);
 
     return 0;
 }

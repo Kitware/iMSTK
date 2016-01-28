@@ -37,12 +37,20 @@
 
 #include "IO/InitIO.h"
 #include "Rendering/InitVTKRendering.h"
+#include "Rendering/ViewerBase.h"
 #include "IO/IOMesh.h"
 
 #include "Testing/ReadPaths.h"
 
 int main(int ac, char** av)
 {
+    //-------------------------------------------------------
+    // 1. Create an instance of the iMSTK framework/SDK
+    // 2. Create viewer
+    // 3. Create default scene (scene 0)
+    //-------------------------------------------------------
+    auto sdk = imstk::SDK::createSDK();
+    sdk->initialize();
     std::string configPaths = "./Config.paths";
     if(ac > 1)
     {
@@ -72,16 +80,6 @@ int main(int ac, char** av)
         return EXIT_FAILURE;
     }
 
-    imstk::InitVTKRendering();
-    imstk::InitIODelegates();
-
-    //-------------------------------------------------------
-    // 1. Create an instance of the iMSTK framework/SDK
-    // 2. Create viewer
-    // 3. Create default scene (scene 0)
-    //-------------------------------------------------------
-    auto sdk = imstk::SDK::createStandardSDK();
-    auto sdkSimulator = sdk->getSimulator();
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
@@ -135,7 +133,7 @@ int main(int ac, char** av)
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    auto viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewer();
 
     viewer->viewerRenderDetail = viewer->viewerRenderDetail |
                                 IMSTK_VIEWERRENDER_FADEBACKGROUND |
@@ -147,8 +145,7 @@ int main(int ac, char** av)
     // Customize the scene
     //-------------------------------------------------------
     // Get Scene
-    auto scene = sdk->getScene(0);
-    viewer->registerScene(scene);
+    auto scene = sdk->getScene();
 
     // Setup Scene lighting
     auto light1 = imstk::Light::getDefaultLighting();
@@ -169,9 +166,6 @@ int main(int ac, char** av)
     // Run the SDK
     //-------------------------------------------------------
     sdk->run();
-
-    //cleanup
-    sdk->releaseScene(scene);
 
     return 0;
 }

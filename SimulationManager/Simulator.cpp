@@ -20,23 +20,50 @@
 #include "SimulationManager/Simulator.h"
 #include "Core/MakeUnique.h"
 
+#include "Core/CollisionDetection.h"
+#include "Core/ContactHandling.h"
+#include "Assembler/Assembler.h"
+#include "Simulators/ObjectSimulator.h"
+#include "CollisionContext/CollisionContext.h"
+#include "Core/CollisionManager.h"
+
 // Threads includes
 #include <ThreadPool.h>
 
 namespace imstk {
 
+//---------------------------------------------------------------------------
+Simulator::Simulator()
+{
+    type = ClassType::Simulator;
+    isInitialized = false;
+    frameCounter = 0;
+    changedMainTimeStamp = 0;
+    mainTimeStamp = 0;
+    maxThreadCount = 0;
+    asyncThreadPoolSize = 0;
+    this->name = "Simulator";
+
+    this->assembler = std::make_shared<Assembler>();
+    auto interactionConContext = std::make_shared<CollisionContext>();
+    this->assembler->setCollisionContext(interactionConContext);
+}
+
 /// \brief starts the tasks with the threads from thread pool
+//---------------------------------------------------------------------------
 void Simulator::beginFrame()
 {
     frameCounter++;
 }
 
 /// \brief waits until the frame ends
+//---------------------------------------------------------------------------
 void Simulator::endFrame()
 {
 
 }
 
+//---------------------------------------------------------------------------
 void Simulator::initAsyncThreadPool()
 {
     asyncThreadPoolSize = 0;
@@ -53,21 +80,20 @@ void Simulator::initAsyncThreadPool()
 }
 
 /// \brief the main simulation loop
+//---------------------------------------------------------------------------
 void Simulator::run()
 {
     std::vector< std::future<int> > results;
     std::vector< std::future<int> > asyncResults;
     std::shared_ptr<ObjectSimulator> objectSimulator;
 
-    if (!isInitialized)
+    if (!this->isInitialized)
     {
         // TODO: Log error
         return;
     }
 
     results.reserve(this->simulators.size()); //make space for results
-    SimulationMainParam param;
-    param.sceneList = sceneList;
 
     //Start up async threads
     asyncResults.reserve(this->asyncThreadPoolSize);
@@ -90,17 +116,6 @@ void Simulator::run()
     {
         beginModule();
 
-        if (main != nullptr)
-        {
-            main->simulateMain(param);
-        }
-
-        if (changedMainTimeStamp > mainTimeStamp)
-        {
-            main = changedMain;
-            changedMainTimeStamp = mainTimeStamp;
-        }
-
         results.clear();
         for (size_t i = 0; i < this->simulators.size(); i++)
         {
@@ -118,7 +133,7 @@ void Simulator::run()
 
             //start each simulator in it's own thread (as max threads allow...)
             results.emplace_back(threadPool->enqueue(
-                [objectSimulator]()
+                [objectSimulator,this]()
                 {
                     objectSimulator->exec();
                     return 0; //this return is just so we have a results value
@@ -138,53 +153,17 @@ void Simulator::run()
         }
 
         results.clear(); //clear the results buffer for new
-        std::shared_ptr<CollisionDetection> collisionDetection;
-        for (size_t i = 0; i < this->collisionDetectors.size(); i++)
-        {
-            collisionDetection = collisionDetectors[i];
-            //start each simulator in it's own thread (as max threads allow...)
-
-            for(const auto &pair : collisionPairs)
+        results.emplace_back(threadPool->enqueue(
+            [this]()
             {
-                results.emplace_back(threadPool->enqueue(
-                    [collisionDetection,pair]()
-                    {
-                        collisionDetection->computeCollision(pair);
-                        return 0; //this return is just so we have a results value
-                    })
-                );
-            }
-        }
+                this->assembler->type1Interactions();
+                return 0; //this return is just so we have a results value
+            }));
 
         for (auto&& result : results)
         { //Wait until there is a valid return value from each thread
             result.get(); //waits for result value
         }
-
-        //for (const auto &x : contactHandlers)
-        //{
-        //    results.emplace_back(threadPool->enqueue(
-        //        [x]()
-        //    {
-        //        x->resolveContacts();
-        //        return 0; //this return is just so we have a results value
-        //    })
-        //    );
-        //}
-
-        results.clear(); //clear the results buffer for new
-        std::shared_ptr<ContactHandling> contactHandling;
-        for (size_t i = 0; i < this->contactHandlers.size(); i++)
-        {
-            contactHandlers[i]->resolveContacts();
-        }
-
-
-        for (auto&& result : results)
-        { //Wait until there is a valid return value from each thread
-            result.get(); //waits for result value
-        }
-
         endModule();
     }
 
@@ -196,6 +175,7 @@ void Simulator::run()
 }
 
 /// \brief
+//---------------------------------------------------------------------------
 void Simulator::registerObjectSimulator(std::shared_ptr<ObjectSimulator> objectSimulator)
 {
     simulators.emplace_back(objectSimulator);
@@ -203,24 +183,20 @@ void Simulator::registerObjectSimulator(std::shared_ptr<ObjectSimulator> objectS
 }
 
 /// \brief
+//---------------------------------------------------------------------------
 void Simulator::registerCollisionDetection(std::shared_ptr<CollisionDetection> p_collisionDetection)
 {
     collisionDetectors.emplace_back(p_collisionDetection);
 }
 
 /// \brief
+//---------------------------------------------------------------------------
 void Simulator::registerContactHandling(std::shared_ptr<ContactHandling> p_contactHandling)
 {
     contactHandlers.emplace_back(p_contactHandling);
 }
 
-/// \brief
-void Simulator::registerSimulationMain(std::shared_ptr<SimulationMain> p_main)
-{
-    changedMain = p_main;
-    this->changedMainTimeStamp++;
-}
-
+//---------------------------------------------------------------------------
 bool Simulator::init()
 {
     if(isInitialized)
@@ -239,25 +215,13 @@ bool Simulator::init()
     }
 
     initAsyncThreadPool();
+    this->initAssembler();
     isInitialized = true;
 
     return true;
 }
 
-Simulator::Simulator()
-{
-    type = ClassType::Simulator;
-    isInitialized = false;
-    frameCounter = 0;
-    main = nullptr;
-    changedMain = nullptr;
-    changedMainTimeStamp = 0;
-    mainTimeStamp = 0;
-    maxThreadCount = 0;
-    asyncThreadPoolSize = 0;
-    this->name = "Simulator";
-}
-
+//---------------------------------------------------------------------------
 void Simulator::setMaxThreadCount(int p_threadMaxCount)
 {
     if(p_threadMaxCount < 0)
@@ -270,6 +234,7 @@ void Simulator::setMaxThreadCount(int p_threadMaxCount)
     }
 }
 
+//---------------------------------------------------------------------------
 void Simulator::exec()
 {
     if(isInitialized)
@@ -285,9 +250,43 @@ void Simulator::exec()
     this->terminationCompleted = true;
     std::cout << "Simulator terminated" <<std::endl;
 }
+
+//---------------------------------------------------------------------------
 void Simulator::addCollisionPair(std::shared_ptr< CollisionManager > pair)
 {
     collisionPairs.emplace_back(pair);
+}
+//---------------------------------------------------------------------------
+void Simulator::initAssembler()
+{
+    this->assembler->initSystem();
+}
+
+//---------------------------------------------------------------------------
+void Simulator::registerInteraction(std::shared_ptr<CollisionManager> pair,
+                                    std::shared_ptr<CollisionDetection> collisionDetection,
+                                    std::shared_ptr<ContactHandling> contactHandling)
+{
+    auto interactionConContext = this->assembler->getCollisionContext();
+
+    if(!interactionConContext)
+    {
+        // TODO: Log this
+        return;
+    }
+
+    /// TODO: These are legacy functions, will be removed ///
+    this->addCollisionPair(pair);
+    this->registerCollisionDetection(collisionDetection);
+    this->registerContactHandling(contactHandling);
+    ////////////////////////////////////////////////////////
+
+    interactionConContext->addInteraction(contactHandling->getFirstInteractionSceneModel(),
+                                                contactHandling->getSecondInteractionSceneModel(),
+                                                collisionDetection,
+                                                contactHandling,
+                                                contactHandling,
+                                                pair);
 }
 
 }

@@ -25,15 +25,9 @@ imstk_add_library(${MODULE_NAME}
 )
 
 target_link_libraries(Assembler
-  PUBLIC
-    Core
   PRIVATE
-    Event
-	ContactHandling
-	Simulators
+    Core
 	CollisionContext
-	TimeIntegrators
-	SceneModels
 )
 
 if(BUILD_TESTING)

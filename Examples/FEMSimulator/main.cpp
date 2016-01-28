@@ -31,19 +31,28 @@
 #include "Core/CollisionManager.h"
 #include "Devices/VRPNDeviceServer.h"
 #include "Devices/VRPNForceDevice.h"
-#include "IO/InitIO.h"
 #include "IO/IOMesh.h"
 #include "Mesh/VegaVolumetricMesh.h"
 #include "SceneModels/StaticSceneObject.h"
 #include "SceneModels/VegaFEMDeformableSceneObject.h"
 #include "Simulators/ObjectSimulator.h"
 #include "VirtualTools/ToolCoupler.h"
-#include "Rendering/InitVTKRendering.h"
+#include "SimulationManager/Simulator.h"
+#include "Rendering/ViewerBase.h"
 
 #include "Testing/ReadPaths.h"
 
 int main(int ac, char** av)
 {
+    //-------------------------------------------------------
+    // 1. Create an instance of the iMSTK framework/SDK
+    // 2. Create viewer
+    // 3. Create default scene (scene 0)
+    //-------------------------------------------------------
+    auto sdk = imstk::SDK::createSDK();
+    sdk->initialize();
+
+    // Load paths for configuration files.
     std::string configPaths = "./Config.paths";
     if(ac > 1)
     {
@@ -72,42 +81,27 @@ int main(int ac, char** av)
         return EXIT_FAILURE;
     }
 
-    imstk::InitVTKRendering();
-    imstk::InitIODelegates();
-
-    //-------------------------------------------------------
-    // 1. Create an instance of the SoFMIS framework/SDK
-    // 2. Create viewer
-    // 3. Create default scene (scene 0)
-    //-------------------------------------------------------
-    auto sdk = imstk::SDK::createStandardSDK();
-
     // setup device client
     std::string deviceURL = "Phantom@localhost";
-    auto client = std::make_shared<imstk::VRPNForceDevice>(deviceURL);
-    sdk->registerModule(client);
+//     auto client = std::make_shared<imstk::VRPNForceDevice>(deviceURL);
+//     sdk->addModule(client);
 
     // setup controller
-    auto controller = std::make_shared<imstk::ToolCoupler>(client);
-    controller->setScalingFactor(20.0);
-    sdk->registerModule(controller);
+//     auto controller = std::make_shared<imstk::ToolCoupler>(client);
+//     controller->setScalingFactor(20.0);
+//     sdk->addModule(controller);
 
     // setup server
      auto server = std::make_shared<imstk::VRPNDeviceServer>();
-     server->addDeviceClient(client);
-     sdk->registerModule(server);
+//      server->addDeviceClient(client);
+     sdk->addModule(server);
 
     //-------------------------------------------------------
     // Create scene actor 1:  fem scene object + fem simulator
     //-------------------------------------------------------
 
-    // create a FEM simulator
-    auto femSimulator = std::make_shared<imstk::ObjectSimulator>();
-//     femSimulator->setHapticTool(controller);
-
     // create a Vega based FEM object and attach it to the fem simulator
-    auto femObject =
-    std::make_shared<imstk::VegaFEMDeformableSceneObject>(meshFile,configFile);
+    auto femObject = sdk->createDeformableModel(meshFile,configFile);
     femObject->setContactForcesOn();
 
     auto meshRenderDetail = std::make_shared<imstk::RenderDetail>(IMSTK_RENDER_SURFACE);
@@ -131,31 +125,29 @@ int main(int ac, char** av)
         visualMesh->setRenderDetail(meshRenderDetail);
         volumeMesh->attachSurfaceMesh(visualMesh);
     }
-    sdk->addSceneActor(femObject, femSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  plane
     //-------------------------------------------------------
-    auto staticSimulator = std::make_shared<imstk::ObjectSimulator>();
 
     // create a static plane scene object of given normal and position
-    auto staticObject = std::make_shared<imstk::StaticSceneObject>();
+    auto staticObject = sdk->createStaticModel();
 
     auto plane = std::make_shared<imstk::PlaneCollisionModel>(
       imstk::Vec3d(0.0, -3.0, 0.0),
       imstk::Vec3d(0.0, 1.0, 0.0));
     plane->getPlaneModel()->setWidth(5);
     if (ac > 2)
+    {
       plane->getPlaneModel()->setWidth(atof(av[2]));
+    }
     staticObject->setModel(plane);
-
-    sdk->addSceneActor(staticObject, staticSimulator);
 
     //-------------------------------------------------------
     // Create scene actor 2:  loli tool
     // create a static object to hold the lolitool scene object of given normal and position
     //-------------------------------------------------------
-    auto loliSceneObject = std::make_shared<imstk::StaticSceneObject>();
+    auto loliSceneObject = sdk->createStaticModel();
 
     auto loliCollisionModel = std::make_shared<imstk::MeshCollisionModel>();
     loliCollisionModel->loadTriangleMesh(loliMeshFile);
@@ -176,14 +168,11 @@ int main(int ac, char** av)
     loliMesh->transform(transform);
     loliMesh->updateInitialVertices();
 
-    auto loliSimulator = std::make_shared<imstk::ObjectSimulator>();
-    sdk->addSceneActor(loliSceneObject, loliSimulator);
 //     controller->setMesh(loliCollisionModel->getMesh());
 
     //-------------------------------------------------------
     // Enable collision between scene actors 1 and 2
     //-------------------------------------------------------
-    auto sdkSimulator = sdk->getSimulator();
     auto meshModel = std::make_shared<imstk::MeshCollisionModel>();
 
     auto collisionMesh = volumeMesh->getCollisionMesh();
@@ -195,14 +184,9 @@ int main(int ac, char** av)
     femObject->setCollisionModel(meshModel);
 
     auto planeMeshCollisionPairs = std::make_shared<imstk::CollisionManager>();
-
-    planeMeshCollisionPairs->setModels(meshModel, plane);
-
-    sdkSimulator->addCollisionPair(planeMeshCollisionPairs);
-
     auto planeToMeshCollisionDetection = std::make_shared<imstk::PlaneToMeshCollision>();
 
-    sdkSimulator->registerCollisionDetection(planeToMeshCollisionDetection);
+    planeMeshCollisionPairs->setModels(meshModel, plane);
 
     //-------------------------------------------------------
     // Enable contact handling between scene actors 1 and 2
@@ -211,20 +195,21 @@ int main(int ac, char** av)
 
     planeToMeshContact->setCollisionPairs(planeMeshCollisionPairs);
 
-    planeToMeshContact->setSceneObjects(staticObject, femObject);
+    planeToMeshContact->setInteractionSceneModels(staticObject, femObject);
 
-    sdkSimulator->registerContactHandling(planeToMeshContact);
+    sdk->addInteraction(planeMeshCollisionPairs,
+                        planeToMeshCollisionDetection,
+                        planeToMeshContact);
 
     //-------------------------------------------------------
     // Customize the viewer
     //-------------------------------------------------------
-    auto viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewer();
 
     viewer->setViewerRenderDetail(IMSTK_VIEWERRENDER_GLOBAL_AXIS);
 
     // Get Scene
-    auto scene = sdk->getScene(0);
-    viewer->registerScene(scene, imstk::IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
+    auto scene = sdk->getScene();
 
     // Setup Scene lighting
     auto light1 = imstk::Light::getDefaultLighting();
@@ -239,9 +224,6 @@ int main(int ac, char** av)
     // Run the SDK
     //-------------------------------------------------------
     sdk->run();
-
-    //cleanup
-    sdk->releaseScene(scene);
 
     return 0;
 }

@@ -22,7 +22,6 @@
 
 // iMSTK includes
 #include "ContactHandling/PenaltyContactHandling.h"
-#include "SceneModels/DeformableSceneObject.h"
 
 namespace imstk {
 
@@ -35,8 +34,8 @@ public:
     PenaltyContactFemToStatic(bool typeBilateral);
 
     PenaltyContactFemToStatic(bool typeBilateral,
-                             const std::shared_ptr<SceneObject>& sceneObjFirst,
-                             const std::shared_ptr<DeformableSceneObject>& sceneObjSecond);
+                             const std::shared_ptr<InteractionSceneModel>& sceneObjFirst,
+                             const std::shared_ptr<InteractionSceneModel>& sceneObjSecond);
 
     virtual ~PenaltyContactFemToStatic();
 
@@ -47,7 +46,7 @@ public:
     virtual void computeBilateralContactForces() override;
 
     /// \brief Get the forces on both the scene objects using penalty method
-    virtual void computeForces(std::shared_ptr<DeformableSceneObject> sceneObject);
+    virtual void computeForces(std::shared_ptr<InteractionSceneModel> sceneObject);
 
 };
 

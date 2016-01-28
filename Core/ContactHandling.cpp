@@ -20,6 +20,7 @@
 #include "Core/ContactHandling.h"
 
 #include "Core/CollisionManager.h"
+#include "SceneModels/InteractionSceneModel.h"
 
 namespace imstk {
 
@@ -39,8 +40,8 @@ ContactHandling::ContactHandling(const bool typeBilateral)
 
 //---------------------------------------------------------------------------
 ContactHandling::ContactHandling(const bool typeBilateral,
-                                     const std::shared_ptr< SceneObject > first,
-                                     const std::shared_ptr< SceneObject > second)
+                                     const std::shared_ptr< InteractionSceneModel > first,
+                                     const std::shared_ptr< InteractionSceneModel > second)
 {
     if (typeBilateral)
     {
@@ -51,7 +52,7 @@ ContactHandling::ContactHandling(const bool typeBilateral,
         isBilateral = false;
     }
 
-    setSceneObjects(first, second);
+    setInteractionSceneModels(first, second);
 
     type = Unknown;
 }
@@ -62,11 +63,11 @@ ContactHandling::~ContactHandling()
 }
 
 /// \brief Set the scene objects that are colliding
-void ContactHandling::setSceneObjects(const std::shared_ptr< SceneObject > first,
-                                        const std::shared_ptr< SceneObject > second)
+void ContactHandling::setInteractionSceneModels(const std::shared_ptr< InteractionSceneModel > first,
+                                        const std::shared_ptr< InteractionSceneModel > second)
 {
-    collidingSceneObjects.first = first;
-    collidingSceneObjects.second = second;
+    collidingInteractionSceneModels.first = first;
+    collidingInteractionSceneModels.second = second;
 }
 
 //---------------------------------------------------------------------------
@@ -88,45 +89,21 @@ ContactHandling::MethodType ContactHandling::getContactHandlingType() const
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr<SceneObject> ContactHandling::getFirstSceneObject() const
+std::shared_ptr<InteractionSceneModel> ContactHandling::getFirstInteractionSceneModel() const
 {
-	return this->collidingSceneObjects.first;
+	return this->collidingInteractionSceneModels.first;
 }
 
 //---------------------------------------------------------------------------
-std::shared_ptr<SceneObject> ContactHandling::getSecondSceneObject() const
+std::shared_ptr<InteractionSceneModel> ContactHandling::getSecondInteractionSceneModel() const
 {
-  return this->collidingSceneObjects.second;
+  return this->collidingInteractionSceneModels.second;
 }
 
 //---------------------------------------------------------------------------
 bool ContactHandling::isUnilateral() const
 {
     return !isBilateral;
-}
-
-//---------------------------------------------------------------------------
-std::unordered_map< size_t, Vec3d> &ContactHandling::getContactForces()
-{
-    return this->contactForces;
-}
-
-//---------------------------------------------------------------------------
-const std::unordered_map< size_t,Vec3d> &ContactHandling::getContactForces() const
-{
-    return this->contactForces;
-}
-
-//---------------------------------------------------------------------------
-void ContactHandling::setContactForce(const size_t dofID, const Vec3d &force)
-{
-    this->contactForces[dofID] = force;
-}
-
-//---------------------------------------------------------------------------
-void ContactHandling::clearContactForces()
-{
-    this->contactForces.clear();
 }
 
 }

@@ -78,9 +78,9 @@ go_bandit([]() {
             auto handler        = std::make_shared<imstk::PenaltyContactFemToStatic>(false);
             auto fem            = std::make_shared<imstk::VegaFEMDeformableSceneObject>();
             auto plane          = createStaticPlaneSceneObject();
-            handler->setSceneObjects(plane,fem);
-            AssertThat(handler->getFirstSceneObject() == plane, IsTrue());
-            AssertThat(handler->getSecondSceneObject() == fem, IsTrue());
+            handler->setInteractionSceneModels(plane,fem);
+            AssertThat(handler->getFirstInteractionSceneModel() == plane, IsTrue());
+            AssertThat(handler->getSecondInteractionSceneModel() == fem, IsTrue());
         });
 
         it("computes contact force ", []() {
@@ -89,7 +89,7 @@ go_bandit([]() {
             auto collisionPair  = createSampleCollisionPair();
             auto plane          = createStaticPlaneSceneObject();
 
-            handler->setSceneObjects(plane,fem);
+            handler->setInteractionSceneModels(plane,fem);
             handler->setCollisionPairs(collisionPair);
 
             auto state = fem->getCurrentState();

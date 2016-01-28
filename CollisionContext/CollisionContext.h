@@ -20,24 +20,19 @@
 #ifndef COLLISION_CONTEXT_COLLISION_CONTEXT_H
 #define COLLISION_CONTEXT_COLLISION_CONTEXT_H
 
-// iMSTK includes
-#include "Core/CoreClass.h"
-#include "Core/Matrix.h"
-#include "Core/Config.h"
-
-// collision detection includes
-#include "Core/CollisionDetection.h"
-#include "Core/CollisionManager.h"
-#include "Collision/PlaneToMeshCollision.h"
-#include "Collision/SpatialHashCollision.h"
-
-// contact handling includes
-#include "Core/ContactHandling.h"
-#include "ContactHandling/PenaltyContactFemToStatic.h"
+#include<memory>
+#include<tuple>
+#include<vector>
+#include<list>
+#include<algorithm>
+#include<unordered_map>
 
 namespace imstk {
 
-class SystemOfEquations;
+class CollisionDetection;
+class CollisionManager;
+class ContactHandling;
+class InteractionSceneModel;
 
 ///
 /// \brief This class manages all the information related to
@@ -54,8 +49,8 @@ public:
 
     /// This type hold a pair of potential scene objects that need to
     /// be queried for interaction
-    using InteractionPairType = std::tuple<std::shared_ptr<SystemOfEquations>,
-                                           std::shared_ptr<SystemOfEquations>> ;
+    using InteractionPairType = std::tuple<std::shared_ptr<InteractionSceneModel>,
+                                           std::shared_ptr<InteractionSceneModel>> ;
 
     /// This type holds the algorithms and data types for the interaction pair
     using InteractionPairDataType = std::tuple<std::shared_ptr<CollisionDetection>,
@@ -69,8 +64,8 @@ public:
     {
         size_t operator()(const InteractionPairType &pair) const
         {
-            size_t h1 = std::hash<std::shared_ptr<SystemOfEquations>>()(std::get<ObjectA>(pair));
-            size_t h2 = std::hash<std::shared_ptr<SystemOfEquations>>()(std::get<ObjectB>(pair));
+            size_t h1 = std::hash<std::shared_ptr<InteractionSceneModel>>()(std::get<ObjectA>(pair));
+            size_t h2 = std::hash<std::shared_ptr<InteractionSceneModel>>()(std::get<ObjectB>(pair));
             return h1 ^ (h2 << 1);
         };
     };
@@ -104,8 +99,8 @@ public:
     ///
     /// \note Scene objects passed as arguments should be registered
     ///
-    void addInteraction(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                        std::shared_ptr<SystemOfEquations> sceneObjectB,
+    void addInteraction(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                        std::shared_ptr<InteractionSceneModel> sceneObjectB,
                         std::shared_ptr<CollisionDetection> collisionDetection,
                         std::shared_ptr<ContactHandling> contactHandlingA,
                         std::shared_ptr<ContactHandling> contactHandlingB,
@@ -117,63 +112,63 @@ public:
     /// in the scene to the collision context. Assigns collision
     /// detection method. This does not assign contact handler.
     ///
-    void addInteraction(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                        std::shared_ptr<SystemOfEquations> sceneObjectB,
+    void addInteraction(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                        std::shared_ptr<InteractionSceneModel> sceneObjectB,
                         std::shared_ptr<CollisionDetection> collisionDetection);
 
     ///
     /// \brief Adds two given scene objects will interact
     ///  in the scene to the collision context. Assigns contact handling method.
     ///
-    void addInteraction(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                        std::shared_ptr<SystemOfEquations> sceneObjectB,
+    void addInteraction(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                        std::shared_ptr<InteractionSceneModel> sceneObjectB,
                         std::shared_ptr<ContactHandling> contactHandler);
 
     ///
     /// \brief Adds two given scene objects that will interact in the scene to the
     ///  collision context
     ///
-    void addInteraction(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                        std::shared_ptr<SystemOfEquations> sceneObjectB);
+    void addInteraction(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                        std::shared_ptr<InteractionSceneModel> sceneObjectB);
 
     ///
     /// \brief Disables interaction between two given scene objects
     ///
-    void disableInteraction(std::shared_ptr<SystemOfEquations> sceneObject1,
-                            std::shared_ptr<SystemOfEquations> sceneObject2);
+    void disableInteraction(std::shared_ptr<InteractionSceneModel> sceneObject1,
+                            std::shared_ptr<InteractionSceneModel> sceneObject2);
 
     ///
     /// \brief Removes interaction from the context between two given scene objects
     ///
-    void removeInteraction(std::shared_ptr<SystemOfEquations> sceneObject1,
-                           std::shared_ptr<SystemOfEquations> sceneObject2);
+    void removeInteraction(std::shared_ptr<InteractionSceneModel> sceneObject1,
+                           std::shared_ptr<InteractionSceneModel> sceneObject2);
 
     ///
     /// \brief Assign a collision detection method between two scene given scene objects
     ///
-    void setCollisionDetection(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                               std::shared_ptr<SystemOfEquations> sceneObjectB,
+    void setCollisionDetection(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                               std::shared_ptr<InteractionSceneModel> sceneObjectB,
                                std::shared_ptr<CollisionDetection> collisionDetection);
 
     ///
     /// \brief Assign a contact handler method between two scene given scene objects
     ///
-    void setContactHandling(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                            std::shared_ptr<SystemOfEquations> sceneObjectB,
+    void setContactHandling(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                            std::shared_ptr<InteractionSceneModel> sceneObjectB,
                             std::shared_ptr<ContactHandling> contactHandler);
 
     ///
     /// \brief check if the interaction between two scene objects
     /// already exists
     ///
-    bool exist(std::shared_ptr<SystemOfEquations> sceneObject1,
-               std::shared_ptr<SystemOfEquations> sceneObject2);
+    bool exist(std::shared_ptr<InteractionSceneModel> sceneObject1,
+               std::shared_ptr<InteractionSceneModel> sceneObject2);
 
     ///
     /// \brief Populate the assembler adjacency matrix based on input
     /// interactions
     ///
-    void createAssemblerAdjacencyMatrix();
+    void createAdjacencyMatrix();
 
     ///
     /// \brief Count the number of interaction of type T.
@@ -253,27 +248,15 @@ public:
     /// \param sceneObjectA
     /// \param sceneObjectB
     ///
-    void solveSimultaneously(std::shared_ptr<SystemOfEquations> sceneObjectA,
-                             std::shared_ptr<SystemOfEquations> sceneObjectB);
+    void solveSimultaneously(std::shared_ptr<InteractionSceneModel> sceneObjectA,
+                             std::shared_ptr<InteractionSceneModel> sceneObjectB);
 
     ///
     /// \brief Get the scene model associated with ith index if exists.
     ///
     /// \param index
     ///
-    std::shared_ptr<SystemOfEquations> getSceneModel(int index)
-    {
-        auto fn = [=](const std::unordered_map<std::shared_ptr<SystemOfEquations>,int>::value_type& vt)
-        {
-            return vt.second == index;
-        };
-        auto it = std::find_if(std::begin(this->objectIndexMap), std::end(this->objectIndexMap),fn);
-        if(it != std::end(this->objectIndexMap))
-        {
-            return it->first;
-        }
-        return nullptr;
-    }
+    std::shared_ptr<InteractionSceneModel> getSceneModel(int index);
 
     ///
     /// \brief Get the scene model associated with ith index if exists.
@@ -281,22 +264,32 @@ public:
     /// \param index
     ///
     template<typename T>
-    std::shared_ptr<SystemOfEquations> getSceneModelAs(int index)
+    std::shared_ptr<InteractionSceneModel> getSceneModelAs(int index)
     {
         auto sm = this->getSceneModel(index);
 
         return std::dynamic_pointer_cast<T>(sm);
     }
 
+    ///
+    /// \brief Compute collision for all models in the scene
+    ///
+    void computeCollisions();
+
+    ///
+    /// \brief Resolve contacts for all models in the scene
+    ///
+    void resolveContacts();
+
 private:
     std::vector<std::vector<int>> interactionMatrix; ///> Adjacency matrix for the
                                                      ///> assembly graph (undirected)
 
     InteractionMapType interactionMap;
-    std::unordered_map<std::shared_ptr<SystemOfEquations>, int> objectIndexMap;
+    std::unordered_map<std::shared_ptr<InteractionSceneModel>, int> objectIndexMap;
 
-    std::list<std::pair<std::shared_ptr<SystemOfEquations>,
-                        std::shared_ptr<SystemOfEquations>>> modelPairs;
+    std::list<std::pair<std::shared_ptr<InteractionSceneModel>,
+                        std::shared_ptr<InteractionSceneModel>>> modelPairs;
 
     std::vector<std::vector<int>> islands;
     int totalNumberOfSceneModels;

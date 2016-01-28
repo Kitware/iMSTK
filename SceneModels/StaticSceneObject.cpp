@@ -24,7 +24,7 @@
 
 namespace imstk {
 
-StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/) : SceneObject()
+StaticSceneObject::StaticSceneObject(std::shared_ptr<ErrorLog> /*p_log*/)
 {
     type = ClassType::StaticSceneObject;
 
@@ -60,6 +60,11 @@ void StaticSceneObject::loadInitialStates()
     model->load(fileName);
 
     this->setModel(model);
+}
+void StaticSceneObject::loadMesh(const std::string &file)
+{
+    this->fileName = file;
+    this->loadInitialStates();
 }
 
 }

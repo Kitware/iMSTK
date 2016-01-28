@@ -32,6 +32,8 @@ target_link_libraries(SimulationManager
     Core
     Simulators
     Rendering
+    CollisionContext
+    Assembler
     )
 
 if(BUILD_TESTING)

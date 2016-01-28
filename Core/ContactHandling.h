@@ -20,17 +20,19 @@
 #ifndef CORE_CONTACTHANDLING_H
 #define CORE_CONTACTHANDLING_H
 
-// iMSTK includes
-#include "Core/CoreClass.h"
-#include "SceneModels/SceneObject.h"
-
 // STL includes
 #include <memory>
+#include <unordered_map>
+
+// iMSTK includes
+#include "Core/CoreClass.h"
+#include "Core/Vector.h"
 
 namespace imstk {
 
 class Mesh;
 class CollisionManager;
+class InteractionSceneModel;
 
 
 /// \brief Base class to for handling contact for collision response
@@ -55,8 +57,8 @@ public:
     ContactHandling(const bool typeBilateral);
 
     ContactHandling(const bool typeBilateral,
-                      const std::shared_ptr<SceneObject> sceneObjFirst,
-                      const std::shared_ptr<SceneObject> sceneObjSecond);
+                      const std::shared_ptr<InteractionSceneModel> sceneObjFirst,
+                      const std::shared_ptr<InteractionSceneModel> sceneObjSecond);
 
     virtual ~ContactHandling();
 
@@ -64,8 +66,8 @@ public:
     bool isUnilateral() const;
 
     /// \brief Set the scene objects that are colliding
-    void setSceneObjects(const std::shared_ptr< SceneObject > first,
-                         const std::shared_ptr< SceneObject > second);
+    void setInteractionSceneModels(const std::shared_ptr< InteractionSceneModel > first,
+                         const std::shared_ptr< InteractionSceneModel > second);
 
     /// \brief Set the collision pair data structure in which the information
     /// needs to be stored
@@ -78,36 +80,14 @@ public:
     MethodType getContactHandlingType() const;
 
     /// \brief Get the first scene object
-    std::shared_ptr<SceneObject> getFirstSceneObject() const;
+    std::shared_ptr<InteractionSceneModel> getFirstInteractionSceneModel() const;
 
     /// \brief Get the second scene object
-    std::shared_ptr<SceneObject> getSecondSceneObject() const;
+    std::shared_ptr<InteractionSceneModel> getSecondInteractionSceneModel() const;
 
     /// \brief Implementation of how the contacts between colliding
     /// objects is resolved
     virtual void resolveContacts() = 0;
-
-    ///
-    /// \brief Get contact forces vector
-    ///
-    void setContactForce(const size_t dofID, const Vec3d &force);
-
-    ///
-    /// \brief Get contact forces vector.
-    ///
-    std::unordered_map<size_t,Vec3d> &getContactForces();
-
-    ///
-    /// \brief Get the map of contact forces.
-    ///
-    /// \return Map containing indices with contact points.
-    ///
-    const std::unordered_map<size_t,Vec3d> &getContactForces() const;
-
-    ///
-    /// \brief Set all contact forces to zero (if any)
-    ///
-    void clearContactForces();
 
 protected:
 
@@ -115,12 +95,9 @@ protected:
 
     bool isBilateral;
 
-    std::pair<std::shared_ptr<SceneObject>, std::shared_ptr<SceneObject>> collidingSceneObjects;
+    std::pair<std::shared_ptr<InteractionSceneModel>, std::shared_ptr<InteractionSceneModel>> collidingInteractionSceneModels;
 
     std::shared_ptr<CollisionManager> collisionPair;
-
-    // Map of contact forces to node indices in the mesh of the second scene object.
-    std::unordered_map<size_t,Vec3d> contactForces;
 };
 
 }
