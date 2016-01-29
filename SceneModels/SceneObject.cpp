@@ -126,25 +126,32 @@ void SceneObject::setContactForcesOn()
 }
 
 //---------------------------------------------------------------------------
-std::unordered_map< int, Vec3d> &SceneObject::getContactForces()
+std::unordered_map< size_t, Vec3d> &SceneObject::getContactForces()
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-const std::unordered_map< int,Vec3d> &SceneObject::getContactForces() const
+void SceneObject::setContactForces(const std::unordered_map<size_t,Vec3d> &forces)
+{
+    this->contactForces.clear();
+    this->contactForces = forces;
+}
+
+//---------------------------------------------------------------------------
+const std::unordered_map< size_t,Vec3d> &SceneObject::getContactForces() const
 {
     return this->contactForces;
 }
 
 //---------------------------------------------------------------------------
-std::unordered_map< int,Vec3d> &SceneObject::getContactPoints()
+std::unordered_map< size_t,Vec3d> &SceneObject::getContactPoints()
 {
     return this->contactPoints;
 }
 
 //---------------------------------------------------------------------------
-const std::unordered_map< int,Vec3d> &SceneObject::getContactPoints() const
+const std::unordered_map< size_t,Vec3d> &SceneObject::getContactPoints() const
 {
     return this->contactPoints;
 }
@@ -227,8 +234,9 @@ void SceneObject::update(const double)
 }
 
 //---------------------------------------------------------------------------
-void SceneObject::updateExternalForces(const std::unordered_map<size_t,Vec3d>&)
+void SceneObject::updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces)
 {
+    this->contactForces = forces;
 }
 
 //---------------------------------------------------------------------------

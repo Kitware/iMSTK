@@ -50,6 +50,7 @@ bool VRPNDeviceServer::addDeviceClient(
     std::string newDeviceIP = newDeviceURL.substr(newDeviceURL.find_last_of("@") + 1);
     if (newDeviceIP != "localhost")
     {
+        // TODO: Log this
         std::cerr<< "addDeviceClient error: VRPNDeviceServer can only communicate "
                  << "with devices connected locally (devicename@localhost)." << std::endl;
         return EXIT_FAILURE;
@@ -62,6 +63,7 @@ bool VRPNDeviceServer::addDeviceClient(
             && this->buttonDevicesList.find(newDeviceName) != this->buttonDevicesList.end()
             )
     {
+        // TODO: Log this
         std::cerr<< "addDeviceClient error: name already use by another client ("
                  << newDeviceName << ")" << std::endl;
         return EXIT_FAILURE;
@@ -73,60 +75,90 @@ bool VRPNDeviceServer::addDeviceClient(
     std::shared_ptr<vrpn_Button> vrpnButtonDevice;
     switch( newDeviceClient->getDeviceType() )
     {
-    case DeviceType::SPACE_EXPLORER_3DCONNEXION:
-        vrpnAnalogDevice = std::make_shared<vrpn_3DConnexion_SpaceExplorer>
-                (newDeviceName.c_str(), this->connection);
-    break;
-    case DeviceType::NAVIGATOR_3DCONNEXION:
-        vrpnAnalogDevice = std::make_shared<vrpn_3DConnexion_Navigator>
-                (newDeviceName.c_str(), this->connection);
-    break;
-    case DeviceType::RAZER_HYDRA:
-        vrpnTrackerDevice = std::make_shared<vrpn_Tracker_RazerHydra>
-                (newDeviceName.c_str(), this->connection);
-    break;
-    case DeviceType::XKEYS_XK3:
-        vrpnButtonDevice = std::make_shared<vrpn_Xkeys_XK3>
-                (newDeviceName.c_str(), this->connection);
-    break;
-    case DeviceType::OSVR_HDK:
-        vrpnTrackerDevice = std::make_shared<vrpn_Tracker_OSVRHackerDevKit>
-                (newDeviceName.c_str(), this->connection);
-    break;
-    case DeviceType::PHANTOM_OMNI:
-#ifdef VRPN_USE_PHANTOM_SERVER
-        vrpnDevice = std::make_shared<vrpn_Phantom> // TODO
-                (newDeviceName.c_str(), this->connection, 60.0f, "Default PHANToM");
-#else
-        std::cerr<< "addDeviceClient error: needs VRPN_USE_PHANTOM_SERVER to be true "
-                 << "to connect a Panthom omni device." << std::endl;
-        return EXIT_FAILURE;
-#endif
-    break;
-    default:
-        std::cerr<< "addDeviceClient error: unknown device type."
-                 << std::endl;
-        return EXIT_FAILURE;
+        case DeviceType::SPACE_EXPLORER_3DCONNEXION:
+        {
+            vrpnAnalogDevice =
+                std::make_shared<vrpn_3DConnexion_SpaceExplorer>(newDeviceName.c_str(),
+                                                                 this->connection);
+            break;
+        }
+        case DeviceType::NAVIGATOR_3DCONNEXION:
+        {
+            vrpnAnalogDevice =
+                std::make_shared<vrpn_3DConnexion_Navigator>(newDeviceName.c_str(),
+                                                             this->connection);
+            break;
+        }
+        case DeviceType::RAZER_HYDRA:
+        {
+            vrpnTrackerDevice =
+                std::make_shared<vrpn_Tracker_RazerHydra>(newDeviceName.c_str(),
+                                                          this->connection);
+            break;
+        }
+        case DeviceType::XKEYS_XK3:
+        {
+            vrpnButtonDevice =
+                std::make_shared<vrpn_Xkeys_XK3>(newDeviceName.c_str(),
+                                                 this->connection);
+            break;
+        }
+        case DeviceType::OSVR_HDK:
+        {
+            vrpnTrackerDevice =
+                std::make_shared<vrpn_Tracker_OSVRHackerDevKit>(newDeviceName.c_str(),
+                                                                this->connection);
+            break;
+        }
+        case DeviceType::PHANTOM_OMNI:
+        {
+ #ifdef VRPN_USE_PHANTOM_SERVER
+            // TODO: Add an extra parameter to set the name of the phantom omni.
+            // This is necessary because vrpn_Phantom only take non-const names.
+            char * deviceName = const_cast<char*>(newDeviceName.c_str());
+            vrpnTrackerDevice = std::make_shared<vrpn_Phantom>(deviceName,
+                                                               this->connection,
+                                                               60.0f,
+                                                               "Default PHANToM");
+ #else
+            // TODO: add to logger
+            std::cerr<< "addDeviceClient error: needs VRPN_USE_PHANTOM_SERVER defined "
+                     << "to connect a Panthom omni device." << std::endl;
+            return EXIT_FAILURE;
+ #endif
+            break;
+        }
+        default:
+        {
+            // TODO: add to logger
+            std::cerr<< "addDeviceClient error: unknown device type."
+                    << std::endl;
+            return EXIT_FAILURE;
+        }
     }
 
     // Add vrpn device in list
     if(vrpnAnalogDevice != nullptr)
     {
         this->analogDevicesList[newDeviceName] = vrpnAnalogDevice;
+        // TODO: add to logger
         std::cout<<newDeviceName<<" successfully added."<<std::endl;
     }
     else if(vrpnTrackerDevice != nullptr)
     {
         this->trackerDevicesList[newDeviceName] = vrpnTrackerDevice;
+        // TODO: add to logger
         std::cout<<newDeviceName<<" successfully added."<<std::endl;
     }
     else if(vrpnButtonDevice != nullptr)
     {
         this->buttonDevicesList[newDeviceName] = vrpnButtonDevice;
+        // TODO: add to logger
         std::cout<<newDeviceName<<" successfully added."<<std::endl;
     }
     else
     {
+        // TODO: add to logger
         std::cerr<< "addDeviceClient error: could not instantiate VRPN device."
                  << std::endl;
         return EXIT_FAILURE;
@@ -137,15 +169,18 @@ bool VRPNDeviceServer::addDeviceClient(
     {
         std::string filterName = newDeviceName +"_Filter";
 
-        std::shared_ptr<vrpn_Tracker_FilterOneEuro> filter =
-                std::make_shared<vrpn_Tracker_FilterOneEuro>
-                (filterName.c_str(), this->connection, newDeviceName.c_str(), 7);
+        auto filter = std::make_shared<vrpn_Tracker_FilterOneEuro>(filterName.c_str(),
+                                                                   this->connection,
+                                                                   newDeviceName.c_str(),
+                                                                   7);
 
         this->trackerDevicesList[filterName] = filter;
+        // TODO: add to logger
         std::cout<<filterName<<" successfully added."<<std::endl;
     }
     else if( addFiltering )
     {
+        // TODO: add to logger
         std::cerr<< "addDeviceClient warning: can not filter device which is not a tracker."
                  << std::endl;
     }
@@ -177,9 +212,11 @@ void VRPNDeviceServer::exec()
 
     // connections allocated with vrpn_create_server_connection()
     // must decrement their reference to be auto-deleted by VRPN
+    // TODO: add to logger
     std::cout<<"VRPNDeviceServer: removing connection references"<<std::endl;
     this->connection->removeReference();
 
+    // TODO: add to logger
     std::cout<<"VRPNDeviceServer: closing server"<<std::endl;
     delete(this->connection);
 

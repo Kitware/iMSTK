@@ -21,8 +21,7 @@
 #define SCENE_MODELS_DEFORMABLESCENEOBJECT_H
 
 // iMSTK includes
-#include "SceneModels/SceneObject.h"
-#include "TimeIntegrators/OdeSystem.h"
+#include "SceneModels/InteractionSceneModel.h"
 #include "TimeIntegrators/TimeIntegrator.h"
 
 namespace imstk {
@@ -30,7 +29,7 @@ namespace imstk {
 ///
 /// \brief Base class for all deformable scene objects.
 ///
-class DeformableSceneObject : public SceneObject, public OdeSystem
+class DeformableSceneObject : public InteractionSceneModel
 {
 public:
     ///
@@ -92,11 +91,6 @@ public:
     /// \brief Returns velocity of at a given location for the current state.
     ///
     const Vec3d &getGravity() const;
-
-    ///
-    /// \brief Update cumulative forces
-    ///
-    void updateExternalForces(const std::unordered_map<size_t,Vec3d> &forces) override;
 
 private:
     ///////////////////////////////////////////////////////////////////////////////

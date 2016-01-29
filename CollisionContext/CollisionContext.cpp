@@ -19,14 +19,17 @@
 
 #include "CollisionContext/CollisionContext.h"
 
-#include "Solvers/SystemOfEquations.h"
+#include "SceneModels/InteractionSceneModel.h"
+#include "Core/CollisionDetection.h"
+#include "Core/CollisionManager.h"
+#include "Core/ContactHandling.h"
 
 namespace imstk {
 
 //---------------------------------------------------------------------------
 void CollisionContext::addInteraction(
-    std::shared_ptr< SystemOfEquations > sceneObjectA,
-    std::shared_ptr< SystemOfEquations > sceneObjectB,
+    std::shared_ptr< InteractionSceneModel > sceneObjectA,
+    std::shared_ptr< InteractionSceneModel > sceneObjectB,
     std::shared_ptr< CollisionDetection > collisionDetection,
     std::shared_ptr< ContactHandling > contactHandlingA,
     std::shared_ptr< ContactHandling > contactHandlingB,
@@ -57,8 +60,8 @@ void CollisionContext::addInteraction(
 
 //---------------------------------------------------------------------------
 void CollisionContext::addInteraction(
-    std::shared_ptr< SystemOfEquations > sceneObjectA,
-    std::shared_ptr< SystemOfEquations > sceneObjectB,
+    std::shared_ptr< InteractionSceneModel > sceneObjectA,
+    std::shared_ptr< InteractionSceneModel > sceneObjectB,
     std::shared_ptr< CollisionDetection > collisionDetection)
 {
     if (!sceneObjectA || !sceneObjectB || !collisionDetection)
@@ -79,8 +82,8 @@ void CollisionContext::addInteraction(
 
 //---------------------------------------------------------------------------
 void CollisionContext::addInteraction(
-    std::shared_ptr< SystemOfEquations > sceneObjectA,
-    std::shared_ptr< SystemOfEquations > sceneObjectB,
+    std::shared_ptr< InteractionSceneModel > sceneObjectA,
+    std::shared_ptr< InteractionSceneModel > sceneObjectB,
     std::shared_ptr< ContactHandling > contactHandler)
 {
     if (!sceneObjectA || !sceneObjectB)
@@ -102,8 +105,8 @@ void CollisionContext::addInteraction(
 
 //---------------------------------------------------------------------------
 void CollisionContext::addInteraction(
-    std::shared_ptr< SystemOfEquations > sceneObjectA,
-    std::shared_ptr< SystemOfEquations > sceneObjectB)
+    std::shared_ptr< InteractionSceneModel > sceneObjectA,
+    std::shared_ptr< InteractionSceneModel > sceneObjectB)
 {
     if (!sceneObjectA || !sceneObjectB)
     {
@@ -121,8 +124,8 @@ void CollisionContext::addInteraction(
 }
 
 //---------------------------------------------------------------------------
-void CollisionContext::disableInteraction(std::shared_ptr< SystemOfEquations > sceneObject1,
-                                          std::shared_ptr< SystemOfEquations > sceneObject2)
+void CollisionContext::disableInteraction(std::shared_ptr< InteractionSceneModel > sceneObject1,
+                                          std::shared_ptr< InteractionSceneModel > sceneObject2)
 {
     auto it = this->interactionMap.find(std::make_tuple(sceneObject1, sceneObject2));
 
@@ -140,8 +143,8 @@ void CollisionContext::disableInteraction(std::shared_ptr< SystemOfEquations > s
 
 //---------------------------------------------------------------------------
 void CollisionContext::removeInteraction(
-    std::shared_ptr< SystemOfEquations > sceneObjectA,
-    std::shared_ptr< SystemOfEquations > sceneObjectB)
+    std::shared_ptr< InteractionSceneModel > sceneObjectA,
+    std::shared_ptr< InteractionSceneModel > sceneObjectB)
 {
     if (!sceneObjectA || !sceneObjectB)
     {
@@ -163,8 +166,8 @@ void CollisionContext::removeInteraction(
 
 //---------------------------------------------------------------------------
 void CollisionContext::
-setCollisionDetection(std::shared_ptr< SystemOfEquations > sceneObjectA,
-                      std::shared_ptr< SystemOfEquations > sceneObjectB,
+setCollisionDetection(std::shared_ptr< InteractionSceneModel > sceneObjectA,
+                      std::shared_ptr< InteractionSceneModel > sceneObjectB,
                       std::shared_ptr< CollisionDetection > collisionDetection)
 {
     if (!sceneObjectA || !sceneObjectB || !collisionDetection)
@@ -177,8 +180,8 @@ setCollisionDetection(std::shared_ptr< SystemOfEquations > sceneObjectA,
 
 //---------------------------------------------------------------------------
 void CollisionContext::
-setContactHandling(std::shared_ptr< SystemOfEquations > sceneObjectA,
-                   std::shared_ptr< SystemOfEquations > sceneObjectB,
+setContactHandling(std::shared_ptr< InteractionSceneModel > sceneObjectA,
+                   std::shared_ptr< InteractionSceneModel > sceneObjectB,
                    std::shared_ptr< ContactHandling > contactHandler)
 {
     if (!sceneObjectA || !sceneObjectB || !contactHandler)
@@ -190,15 +193,15 @@ setContactHandling(std::shared_ptr< SystemOfEquations > sceneObjectA,
 }
 
 //---------------------------------------------------------------------------
-bool CollisionContext::exist(std::shared_ptr< SystemOfEquations > sceneObject1,
-                             std::shared_ptr< SystemOfEquations > sceneObject2)
+bool CollisionContext::exist(std::shared_ptr< InteractionSceneModel > sceneObject1,
+                             std::shared_ptr< InteractionSceneModel > sceneObject2)
 {
     auto it = this->interactionMap.find(std::make_tuple(sceneObject1, sceneObject2));
     return it != std::end(this->interactionMap);
 }
 
 //---------------------------------------------------------------------------
-void CollisionContext::createAssemblerAdjacencyMatrix()
+void CollisionContext::createAdjacencyMatrix()
 {
     // Extract all potential interactive scene objects and create an index map
     // in order to create the adjacency matrix
@@ -222,13 +225,13 @@ void CollisionContext::createAssemblerAdjacencyMatrix()
     }
 
     // Populate the triplets for the adjacency matrix
-    auto numSystemOfEquationss = this->objectIndexMap.size();
+    auto numInteractionSceneModels = this->objectIndexMap.size();
 
     // set the size of the adjacency matrix
-    this->interactionMatrix.resize(numSystemOfEquationss);
-    for (size_t i = 0; i < numSystemOfEquationss; ++i)
+    this->interactionMatrix.resize(numInteractionSceneModels);
+    for (size_t i = 0; i < numInteractionSceneModels; ++i)
     {
-        this->interactionMatrix[i].resize(numSystemOfEquationss);
+        this->interactionMatrix[i].resize(numInteractionSceneModels);
     }
 
     std::vector<Eigen::Triplet<int>> triplets;
@@ -248,6 +251,7 @@ void CollisionContext::createAssemblerAdjacencyMatrix()
 
         if (i == std::end(this->objectIndexMap) || j == std::end(this->objectIndexMap))
         {
+            // TODO: Log this
             std::cout << "Warning: scene object does not have an index" << std::endl;
             continue;
         }
@@ -264,38 +268,37 @@ void CollisionContext::createAssemblerAdjacencyMatrix()
 
         if (i == std::end(this->objectIndexMap) || j == std::end(this->objectIndexMap))
         {
+            // TODO: Log this
             std::cout << "Warning: scene object does not have an index" << std::endl;
             continue;
         }
-        else
-        {
-            this->interactionMatrix[i->second][j->second] = 1;
-        }
+
+        this->interactionMatrix[i->second][j->second] = 1;
 
     }
 }
 
 //---------------------------------------------------------------------------
-void CollisionContext::solveSimultaneously(std::shared_ptr< SystemOfEquations > sceneObjectA,
-                                           std::shared_ptr< SystemOfEquations > sceneObjectB)
+void CollisionContext::solveSimultaneously(std::shared_ptr< InteractionSceneModel > sceneObjectA,
+                                           std::shared_ptr< InteractionSceneModel > sceneObjectB)
 {
     auto i = this->objectIndexMap.find(sceneObjectA);
     auto j = this->objectIndexMap.find(sceneObjectB);
 
     if (i == std::end(this->objectIndexMap) || j == std::end(this->objectIndexMap))
     {
+        // TODO: Log this
         std::cout << "Warning: scene object does not have an index" << std::endl;
+        return;
     }
-    else
-    {
-        this->modelPairs.emplace_back(sceneObjectA, sceneObjectB);
-    }
+
+    this->modelPairs.emplace_back(sceneObjectA, sceneObjectB);
 }
 
 //---------------------------------------------------------------------------
 bool CollisionContext::configure()
 {
-    this->createAssemblerAdjacencyMatrix();
+    this->createAdjacencyMatrix();
     return true;
 }
 
@@ -331,7 +334,7 @@ std::vector<std::shared_ptr<ContactHandling>> CollisionContext::getContactHandle
             handlerList.emplace_back(hA);
         }
 
-        if (hB)
+        if (hB && hB != hA)
         {
             handlerList.emplace_back(hB);
         }
@@ -404,6 +407,49 @@ void CollisionContext::appendNeighbors(std::vector<bool>& visited,
                 visited[col] = true;
             }
         }
+    }
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< InteractionSceneModel > CollisionContext::getSceneModel(int index)
+{
+    auto fn = [ = ](const std::unordered_map<std::shared_ptr<InteractionSceneModel>, int>::value_type & vt)
+    {
+        return vt.second == index;
+    };
+    auto it = std::find_if(std::begin(this->objectIndexMap), std::end(this->objectIndexMap), fn);
+
+    if(it != std::end(this->objectIndexMap))
+    {
+        return it->first;
+    }
+
+    return nullptr;
+}
+
+//---------------------------------------------------------------------------
+void CollisionContext::computeCollisions()
+{
+    for(auto & interaction : this->interactionMap)
+    {
+        if(!std::get<Enabled>(interaction.second))
+        {
+            continue;
+        }
+
+        auto collisionDetection = std::get<Detection>(interaction.second);
+        auto collisionData = std::get<Data>(interaction.second);
+
+        collisionDetection->computeCollision(collisionData);
+    }
+}
+
+//---------------------------------------------------------------------------
+void CollisionContext::resolveContacts()
+{
+    for(auto & ch : this->getContactHandlers())
+    {
+        ch->resolveContacts();
     }
 }
 

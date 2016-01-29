@@ -1,7 +1,6 @@
 // This file is part of the iMSTK project.
 //
 // Copyright (c) Kitware, Inc.
-// Copyright (c) Kitware, Inc.
 //
 // Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
 //                        Rensselaer Polytechnic Institute
@@ -17,111 +16,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
-//---------------------------------------------------------------------------
-//
-// Authors:
-//
-// Contact:
-//---------------------------------------------------------------------------
 
 #include "SimulationManager/SDK.h"
-#include "Core/Factory.h"
-#include "Core/RenderDelegate.h"
-
-#include <chrono>
-#include <string>
 
 // Threads includes
 #include <ThreadPool.h>
 
 namespace imstk {
 
-/// \brief SDK is singlenton class
 std::once_flag SDK::sdkCallOnceFlag;
 
-/// \brief constructor
-SDK::SDK()
-{
-    shutdown = false;
-    sceneIdCounter = 1;
-    isModulesStarted = false;
-    type = ClassType::Sdk;
-    viewer = nullptr;
-    simulator = nullptr;
-    sceneList.clear();
-
-    errorLog = std::make_shared<ErrorLog>();
-}
-
-SDK::~SDK()
-{
-    std::cout << "Killing SDK" << std::endl;
-}
-
-/// \brief creates the scene of the simulator
-std::shared_ptr<Scene> SDK::createScene()
-{
-    auto scene = std::make_shared<Scene>(errorLog);
-    registerScene(scene);
-    scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
-    return scene;
-}
-
-void SDK::releaseScene(std::shared_ptr<Scene> scene)
-{
-    scene.reset();
-}
-
-std::shared_ptr<ViewerBase> SDK::createViewer()
-{
-    this->viewer =
-        Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
-    if (this->viewer)
-    {
-        this->registerModule(this->viewer);
-    }
-    else
-    {
-        std::cerr << "Error: Unable to create viewer." << std::endl;
-    }
-
-    return this->viewer;
-}
-
-void SDK::addViewer(std::shared_ptr<ViewerBase> p_viewer)
-{
-    assert(p_viewer);
-
-    this->viewer.reset();
-    this->viewer = p_viewer;
-    this->registerModule(p_viewer);
-}
-
-std::shared_ptr<ViewerBase> SDK::getViewerInstance()
-{
-    return this->viewer;
-}
-
-/// \brief
-std::shared_ptr<Simulator> SDK::createSimulator()
-{
-    if(!this->simulator)
-    {
-        simulator = std::make_shared<Simulator>();
-        simulator->sceneList = this->sceneList;
-        registerModule(simulator);
-    }
-
-    return simulator;
-}
-
-/// \brief
-void SDK::updateSceneListAll()
-{
-}
-
-/// \brief Initialize all modules registered to the iMSTK SDK
+//---------------------------------------------------------------------------
 void SDK::initRegisteredModules()
 {
     for(auto &module : this->moduleList)
@@ -130,19 +35,11 @@ void SDK::initRegisteredModules()
     }
 }
 
-/** \brief Run the registered modules
-  *
-  * This will not run any modules that inherit ViewerBase as
-  * on some platforms (Mac OS X) only the main thread can run
-  * user interface code. The return value is -1 if the modules
-  * are already running or no module inherits ViewerBase.
-  * Otherwise, the index of the last viewer module encountered
-  * is returned.
-  * Note: This function assumes that there is only one viewer.
-  */
+//---------------------------------------------------------------------------
 void SDK::runRegisteredModules()
 {
-    if (isModulesStarted)
+    // Make sure modules are ran only once
+    if (modulesInitialized)
     {
         return;
     }
@@ -156,84 +53,115 @@ void SDK::runRegisteredModules()
         }
     }
 
-    isModulesStarted = true;
+    modulesInitialized = true;
 }
 
-///\brief shutdowns all the modules
-void SDK::shutDown()
+//---------------------------------------------------------------------------
+void SDK::initialize()
 {
-    for(auto &module : this->moduleList)
+    InitVTKRendering();
+    InitIODelegates();
+    this->modulesInitialized = false;
+    this->sceneList.clear();
+    this->simulator = this->createSimulator();
+    auto scene = this->createScene();
+    this->errorLog = ErrorLog::getDefaultLogger();
+    this->viewer = this->createViewer();
+    if(this->viewer)
     {
-        module->terminate();
-    }
-    shutdown = true;
-}
-
-/// \brief runs the simulator
-void SDK::run()
-{
-    // TODO: Remove this function call.
-    this->updateSceneListAll();
-    this->initRegisteredModules();
-
-    this->runRegisteredModules();
-    if (nullptr != this->viewer)
-    {
-        this->viewer->exec();
-    }
-
-    // Tell framework threads to shutdown if the viewer returns
-    // TODO: Remove redundant function call.
-    this->shutDown();
-    this->terminateAll();
-
-    // Wait for all threads to finish processing
-    for (auto &moduleThread : this->modules)
-    {
-        moduleThread.join();
+        this->viewer->registerScene(scene,
+                                    imstk::IMSTK_RENDERTARGET_SCREEN,
+                                    "Collision pipeline demo");
     }
 }
 
-/// \brief
-void SDK::addRef(std::shared_ptr<CoreClass> p_coreClass)
+//---------------------------------------------------------------------------
+std::shared_ptr<Scene> SDK::createScene()
 {
-    ++*p_coreClass;
+    auto scene = std::make_shared<Scene>(errorLog);
+    scene->setName("Scene" + std::to_string(scene->getUniqueId()->getId()));
+    this->sceneList.emplace_back(scene);
+    return scene;
 }
 
-/// \brief
-void SDK::removeRef(std::shared_ptr<CoreClass> p_coreClass)
+//---------------------------------------------------------------------------
+std::shared_ptr<ViewerBase> SDK::createViewer()
 {
-    --*p_coreClass;
+    this->viewer =
+        Factory<ViewerBase>::createSubclassForGroup("ViewerBase",RenderDelegate::VTK);
+
+    if(!this->viewer)
+    {
+        // TODO: Log this
+        return nullptr;
+    }
+
+    this->addModule(this->viewer);
+    return this->viewer;
 }
 
+//---------------------------------------------------------------------------
+void SDK::setViewer(std::shared_ptr<ViewerBase> newViewer)
+{
+    if(!newViewer)
+    {
+        // TODO: log this
+        return;
+    }
+
+    this->viewer.reset();
+    this->viewer = newViewer;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr<ViewerBase> SDK::getViewer()
+{
+    return this->viewer;
+}
+
+//---------------------------------------------------------------------------
 std::shared_ptr<SDK> SDK::createSDK()
 {
     static std::shared_ptr<SDK> sdk; ///< singleton sdk.
     std::call_once(sdkCallOnceFlag,
                    []
-                    {
-                        sdk.reset(new SDK);
-                    });
+                   {
+                       sdk.reset(new SDK);
+                   });
     return sdk;
 }
 
-std::shared_ptr<SDK> SDK::createStandardSDK()
+//---------------------------------------------------------------------------
+std::shared_ptr<Simulator> SDK::createSimulator()
 {
-    auto sdk = createSDK();
+    if(!this->simulator)
+    {
+        this->simulator = std::make_shared<Simulator>();
+        this->addModule(simulator);
+    }
 
-    sdk->createScene();
-    sdk->createViewer();
-
-    sdk->createSimulator();
-
-    return sdk;
+    return simulator;
 }
 
-std::shared_ptr<SDK> SDK::getInstance()
+//---------------------------------------------------------------------------
+std::shared_ptr<Simulator> SDK::getSimulator()
 {
-    return SDK::createSDK();
+    return this->simulator;
 }
 
+//---------------------------------------------------------------------------
+std::shared_ptr< Scene > SDK::getScene()
+{
+    return sceneList.at(0);
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr<ErrorLog> SDK::getErrorLog()
+{
+    return errorLog;
+}
+
+//---------------------------------------------------------------------------
 void SDK::terminateAll()
 {
     for(auto &module : this->moduleList)
@@ -243,87 +171,110 @@ void SDK::terminateAll()
     }
 }
 
-/// \brief register functions
-void SDK::registerMesh(std::shared_ptr<BaseMesh> newMesh)
-{
-    if(std::end(this->meshList) ==
-        std::find(std::begin(this->meshList),std::end(this->meshList),newMesh) )
-    {
-        this->meshList.emplace_back(newMesh);
-    }
-}
-
-void SDK::registerModule(std::shared_ptr<Module> newModule)
+//---------------------------------------------------------------------------
+void SDK::addModule(std::shared_ptr<Module> newModule)
 {
     if(std::end(this->moduleList) ==
         std::find(std::begin(this->moduleList),std::end(this->moduleList),newModule) )
     {
         this->moduleList.emplace_back(newModule);
     }
-}
-
-void SDK::registerObjectSimulator(std::shared_ptr<ObjectSimulator> newObjectSimulator)
-{
-    if(std::end(this->simulatorList) ==
-        std::find(std::begin(this->simulatorList),std::end(this->simulatorList),newObjectSimulator) )
+    else
     {
-        this->simulatorList.emplace_back(newObjectSimulator);
+        // TODO: LOg this
     }
 }
 
-void SDK::registerCollisionDetection(std::shared_ptr<CollisionDetection> newCollisionDetection)
-{
-    if(std::end(this->collisionDetectionList) ==
-        std::find(std::begin(this->collisionDetectionList),std::end(this->collisionDetectionList),newCollisionDetection) )
-    {
-        this->collisionDetectionList.emplace_back(newCollisionDetection);
-    }
-}
-
-void SDK::registerScene(std::shared_ptr<Scene> newScene)
-{
-    if(std::end(this->sceneList) ==
-        std::find(std::begin(this->sceneList),std::end(this->sceneList),newScene) )
-    {
-        this->sceneList.emplace_back(newScene);
-    }
-}
-
-void SDK::registerSceneObject(std::shared_ptr<SceneObject> newSceneObject)
-{
-    if(std::end(this->sceneObjectList) ==
-        std::find(std::begin(this->sceneObjectList),std::end(this->sceneObjectList),newSceneObject) )
-    {
-        this->sceneObjectList.emplace_back(newSceneObject);
-    }
-}
-
-void SDK::addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<ObjectSimulator> p_os, int p_scId)
+//---------------------------------------------------------------------------
+void SDK::addSceneActor(std::shared_ptr<SceneObject> p_sco,
+                        std::shared_ptr<ObjectSimulator> p_os)
 {
     if(!p_sco || !p_os)
     {
+        // TODO: LOG this
         std::cerr << "Empty objects" << std::endl;
         return;
     }
 
     p_os->addModel(p_sco);
-
     this->simulator->registerObjectSimulator(p_os);
-
-    this->registerSceneObject(p_sco);
-
-    this->getScene(p_scId)->addSceneObject(p_sco);
+    // TODO: This only uses one scene
+    this->getScene()->addSceneObject(p_sco);
 }
 
-///SDK returns logger for the system
-std::shared_ptr<ErrorLog> SDK::getErrorLog()
+//---------------------------------------------------------------------------
+void SDK::run()
 {
-    return errorLog;
-};
+    this->initRegisteredModules();
+    this->runRegisteredModules();
+    if (this->viewer)
+    {
+        this->viewer->exec();
+    }
 
-std::shared_ptr<Simulator> SDK::getSimulator()
+    // Tell framework threads to shutdown if the viewer returns
+    this->terminateAll();
+
+    // Wait for all threads to finish processing
+    for (auto &moduleThread : this->modules)
+    {
+        moduleThread.join();
+    }
+    std::cout << "Killing SDK" << std::endl;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< DeformableSceneObject > SDK::createDeformableModel(const std::string &meshFile, const std::string &configFile)
 {
-    return this->simulator;
+    auto model = std::make_shared<VegaFEMDeformableSceneObject>(meshFile, configFile);
+    auto simulator = std::make_shared<ObjectSimulator>();
+    this->addSceneActor(model, simulator);
+    return model;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< StaticSceneObject > SDK::createStaticModel()
+{
+    auto model = std::make_shared<StaticSceneObject>();
+    auto simulator = std::make_shared<ObjectSimulator>();
+    this->addSceneActor(model, simulator);
+    return model;
+}
+
+//---------------------------------------------------------------------------
+void SDK::addInteraction(std::shared_ptr< CollisionManager > collisionPair,
+                         std::shared_ptr< CollisionDetection > collisionDetection,
+                         std::shared_ptr< ContactHandling > contactHandling)
+{
+    this->simulator->registerInteraction(collisionPair,
+                                         collisionDetection,
+                                         contactHandling);
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< VRPNDeviceServer > SDK::createDeviceServer()
+{
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    this->addModule(server);
+    return server;
+}
+
+//---------------------------------------------------------------------------
+std::shared_ptr< ToolCoupler > SDK::createForceDeviceController(std::string &deviceURL, bool createServer)
+{
+    auto client = std::make_shared<VRPNForceDevice>(deviceURL);
+    this->addModule(client);
+
+    if(createServer)
+    {
+        auto server = this->createDeviceServer();
+        server->addDeviceClient(client);
+    }
+
+    auto controller = std::make_shared<ToolCoupler>(client);
+    this->addModule(controller);
+
+    return controller;
 }
 
 }

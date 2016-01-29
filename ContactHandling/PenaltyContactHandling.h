@@ -33,8 +33,8 @@ public:
     PenaltyContactHandling(bool typeBilateral);
 
     PenaltyContactHandling(bool typeBilateral,
-                           const std::shared_ptr<SceneObject>& sceneObjFirst,
-                           const std::shared_ptr<SceneObject>& sceneObjSecond);
+                           const std::shared_ptr<InteractionSceneModel>& sceneObjFirst,
+                           const std::shared_ptr<InteractionSceneModel>& sceneObjSecond);
 
     virtual ~PenaltyContactHandling();
 

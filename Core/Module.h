@@ -74,6 +74,16 @@ public:
     virtual void endModule();
 
     ///
+    /// \brief Set SceneList
+    ///
+    void setSceneList(const std::vector<std::shared_ptr<Scene>> &newSceneList);
+
+    ///
+    /// \brief Get SceneList
+    ///
+    const std::vector<std::shared_ptr<Scene>> &getSceneList() const;
+
+    ///
     /// \brief Module initialization routine.
     ///
     virtual bool init() = 0;

@@ -18,6 +18,10 @@
 
 set(Module Event)
 
+if(WIN32)
+    remove_definitions(-DWIN32_LEAN_AND_MEAN)
+endif(WIN32)
+
 add_executable(${Module}UnitTestRunner
   ${BANDIT_RUNNER}
   EventHandlerSpec.cpp

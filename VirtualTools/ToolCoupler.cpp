@@ -187,6 +187,7 @@ bool ToolCoupler::updateTracker()
 
     if(!this->inputDevice)
     {
+        //TODO: Log this
         std::cout << "Invalid input device" << std::endl;
         return false;
     }
@@ -222,6 +223,7 @@ bool ToolCoupler::updateForces()
 
     if(!this->outputDevice)
     {
+        //TODO: Log this
         std::cout << "Invalid output device" << std::endl;
         return false;
     }

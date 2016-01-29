@@ -163,24 +163,29 @@ public:
     ///
     /// \brief Get contact forces vector.
     ///
-    std::unordered_map<int,Vec3d> &getContactForces();
+    std::unordered_map<size_t,Vec3d> &getContactForces();
+
+    ///
+    /// \brief Get contact forces vector.
+    ///
+    void setContactForces(const std::unordered_map<size_t,Vec3d> &forces);
 
     ///
     /// \brief Get the map of contact forces.
     ///
     /// \return Map containing indices with contact points.
     ///
-    const std::unordered_map<int,Vec3d> &getContactForces() const;
+    const std::unordered_map<size_t,Vec3d> &getContactForces() const;
 
     ///
     /// \brief Get contact forces vector
     ///
-    std::unordered_map<int,Vec3d> &getContactPoints();
+    std::unordered_map<size_t,Vec3d> &getContactPoints();
 
     ///
     /// \brief Get contact forces vector
     ///
-    const std::unordered_map<int,Vec3d> &getContactPoints() const;
+    const std::unordered_map<size_t,Vec3d> &getContactPoints() const;
 
     ///
     /// \brief Returns velocity of at a given location
@@ -268,8 +273,8 @@ protected:
     std::shared_ptr<Model> collisionModel; //!< collision model attached to this scene object
     std::shared_ptr<Model> physicsModel; //!< collision model attached to this scene object
     std::shared_ptr<ObjectSimulator> objectSim; //!< object simulator that will simulate the object
-    std::unordered_map<int,Vec3d> contactForces;
-    std::unordered_map<int,Vec3d> contactPoints;
+    std::unordered_map<size_t,Vec3d> contactForces;
+    std::unordered_map<size_t,Vec3d> contactPoints;
 
     // Total number of degrees of freedom
     size_t numOfDOF;

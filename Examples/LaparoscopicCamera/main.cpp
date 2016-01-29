@@ -399,7 +399,7 @@ int addCameraController(std::shared_ptr<imstk::SDK> sdk)
     server->addDeviceClient(camClient);
 
     // Get vtkCamera
-    auto viewer = sdk->getViewerInstance();
+    auto viewer = sdk->getViewer();
     auto vtkViewer = std::static_pointer_cast<imstk::VTKViewer>(viewer);
     vtkCamera* cam = vtkViewer->getVtkCamera();
     cam->SetViewAngle(80.0);
@@ -410,22 +410,21 @@ int addCameraController(std::shared_ptr<imstk::SDK> sdk)
     camController->setCamera(cam);
 
     // Register modules
-    sdk->registerModule(server);
-    sdk->registerModule(camClient);
-    sdk->registerModule(camController);
+    sdk->addModule(server);
+    sdk->addModule(camClient);
+    sdk->addModule(camController);
     return 0;
 }
 
 int main()
 {
-    imstk::InitVTKRendering();
-    imstk::InitIODelegates();
+    auto sdk = imstk::SDK::createSDK();
+    sdk->initialize();
 
     //-------------------------------------------------------
     // Set up the viewer
     //-------------------------------------------------------
-    std::shared_ptr<imstk::SDK> sdk = imstk::SDK::createStandardSDK();
-    std::shared_ptr<imstk::ViewerBase> viewer = sdk->getViewerInstance();
+    std::shared_ptr<imstk::ViewerBase> viewer = sdk->getViewer();
     std::shared_ptr<imstk::VTKViewer> vtkViewer = std::static_pointer_cast<imstk::VTKViewer>(viewer);
 
     // Set Render details
@@ -438,8 +437,7 @@ int main()
     //-------------------------------------------------------
     // Set up the scene
     //-------------------------------------------------------
-    std::shared_ptr<imstk::Scene> scene = sdk->getScene(0);
-    viewer->registerScene(scene, imstk::IMSTK_RENDERTARGET_SCREEN, "Collision pipeline demo");
+    auto scene = sdk->getScene();
 
     // Create camera navigation scene
     createCameraNavigationScene(scene, "./CameraNavAppData/target.png");
@@ -476,9 +474,6 @@ int main()
     //-------------------------------------------------------
     // Run the SDK
     sdk->run();
-
-    // Cleanup
-    sdk->releaseScene(scene);
 
     return 0;
 }

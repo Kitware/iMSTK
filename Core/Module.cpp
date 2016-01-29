@@ -95,4 +95,16 @@ void  Module::endModule()
                              CallerState::EndFrame);
 }
 
+//---------------------------------------------------------------------------
+void Module::setSceneList(const std::vector< std::shared_ptr< Scene > > &newSceneList)
+{
+    this->sceneList = newSceneList;
+}
+
+//---------------------------------------------------------------------------
+const std::vector< std::shared_ptr< Scene > > &Module::getSceneList() const
+{
+    return this->sceneList;
+}
+
 }

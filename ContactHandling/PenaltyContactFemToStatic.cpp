@@ -18,7 +18,7 @@
 // limitations under the License.
 
 #include "ContactHandling/PenaltyContactFemToStatic.h"
-#include "Core/CollisionManager.h"
+#include "SceneModels/InteractionSceneModel.h"
 
 namespace imstk {
 
@@ -30,8 +30,8 @@ PenaltyContactFemToStatic::PenaltyContactFemToStatic(bool typeBilateral) : Penal
 //---------------------------------------------------------------------------
 PenaltyContactFemToStatic::PenaltyContactFemToStatic(
                                                     bool typeBilateral,
-                                                    const std::shared_ptr<SceneObject>& sceneObjFirst,
-                                                    const std::shared_ptr<DeformableSceneObject>& sceneObjSecond)
+                                                    const std::shared_ptr<InteractionSceneModel>& sceneObjFirst,
+                                                    const std::shared_ptr<InteractionSceneModel>& sceneObjSecond)
                                                     : PenaltyContactHandling(typeBilateral, sceneObjFirst, sceneObjSecond)
 {
     type = PenaltyFemToStatic;
@@ -45,8 +45,7 @@ PenaltyContactFemToStatic::~PenaltyContactFemToStatic()
 //---------------------------------------------------------------------------
 void PenaltyContactFemToStatic::computeUnilateralContactForces()
 {
-    auto femSceneObject = std::static_pointer_cast<DeformableSceneObject>(this->getSecondSceneObject());
-    this->computeForces(femSceneObject);
+    this->computeForces(this->getSecondInteractionSceneModel());
 }
 
 //---------------------------------------------------------------------------
@@ -55,7 +54,7 @@ void PenaltyContactFemToStatic::computeBilateralContactForces()
 }
 
 //---------------------------------------------------------------------------
-void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneObject > sceneObject)
+void PenaltyContactFemToStatic::computeForces(std::shared_ptr< InteractionSceneModel > sceneObject)
 {
     if(sceneObject->computeContactForce())
     {
@@ -67,7 +66,6 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
 
         auto contactInfo = this->getCollisionPairs()->getContacts(model);
         sceneObject->setContactForcesToZero();
-        this->clearContactForces();
         Vec3d force;
         Vec3d velocityProjection;
         int nodeDofID;
@@ -80,7 +78,6 @@ void PenaltyContactFemToStatic::computeForces(std::shared_ptr< DeformableSceneOb
             force = -stiffness * contact->depth * contact->normal - damping * velocityProjection;
 
             sceneObject->setContactForce(nodeDofID, contact->point, force);
-            this->setContactForce(contact->index, force);
         }
     }
 }

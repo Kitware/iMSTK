@@ -65,14 +65,6 @@ void VRPNForceDevice::processChanges()
 }
 
 //---------------------------------------------------------------------------
-bool VRPNForceDevice::init()
-{
-    this->buttons.resize(2);
-    this->buttonTimers.resize(2);
-    return DeviceInterface::init();
-}
-
-//---------------------------------------------------------------------------
 void VRPN_CALLBACK
 VRPNForceDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
 {
@@ -94,6 +86,92 @@ VRPNForceDevice::forceChangeHandler(void *userData, const vrpn_FORCECB f)
     handler->vrpnForce->setSurfaceTextureAmplitude( 0.00 ); // meters
     handler->vrpnForce->setSurfaceTextureWavelength( 0.01f ); // meters
     handler->vrpnForce->setRecoveryTime( 10 );
+}
+
+//---------------------------------------------------------------------------
+bool VRPNForceDevice::init()
+{
+    this->buttons.resize(2);
+    this->buttonTimers.resize(2);
+    return DeviceInterface::init();
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setEnableForce(const bool &enable)
+{
+    this->enableForce = enable;
+}
+
+//---------------------------------------------------------------------------
+const bool &VRPNForceDevice::getEnableForce() const
+{
+    return this->enableForce;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setContactPlane(const Vec4f &plane)
+{
+    this->contactPlane = plane;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setContactPlane(const Vec3f &plane, const float d)
+{
+    this->contactPlane << plane, d;
+}
+
+//---------------------------------------------------------------------------
+const Vec4f &VRPNForceDevice::getContactPlane() const
+{
+    return this->contactPlane;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setDampingCoefficient(const double &coeff)
+{
+    this->dampingCoefficient = coeff;
+}
+
+//---------------------------------------------------------------------------
+const double &VRPNForceDevice::getDampingCoefficient() const
+{
+    return this->dampingCoefficient;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setDynamicFriction(const double &coeff)
+{
+    this->dynamicFriction = coeff;
+}
+
+//---------------------------------------------------------------------------
+const double &VRPNForceDevice::getDynamicFriction() const
+{
+    return this->dynamicFriction;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setSpringCoefficient(const double &coeff)
+{
+    this->springCoefficient = coeff;
+}
+
+//---------------------------------------------------------------------------
+const double &VRPNForceDevice::getSpringCoefficient() const
+{
+    return this->springCoefficient;
+}
+
+//---------------------------------------------------------------------------
+void VRPNForceDevice::setStaticFriction(const double &coeff)
+{
+    this->staticFriction = coeff;
+}
+
+//---------------------------------------------------------------------------
+const double &VRPNForceDevice::getStaticFriction() const
+{
+    return this->staticFriction;
 }
 
 }

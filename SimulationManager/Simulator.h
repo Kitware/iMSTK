@@ -25,31 +25,20 @@
 
 // iMSTK includes
 #include "Core/Module.h"
-#include "Simulators/ObjectSimulator.h"
-#include "Core/MakeUnique.h"
-#include "Core/CollisionDetection.h"
-#include "Core/ContactHandling.h"
 
 class ThreadPool;
 
 namespace imstk {
 
-struct SimulationMainParam
-{
-    std::vector<std::shared_ptr<Scene>> sceneList;
-};
-
-/// \brief call back for simulator module. simulateMain is called in every simulation module frame.
-class SimulationMain
-{
-public:
-    virtual void simulateMain(const SimulationMainParam &) = 0;
-};
+class ObjectSimulator;
+class CollisionDetection;
+class ContactHandling;
+class Assembler;
+class CollisionManager;
+class CollisionContext;
 
 class Simulator: public Module
 {
-    friend class SDK;
-
 private:
     /// \brief Initializes up asynchronous threadpool
     void initAsyncThreadPool();
@@ -71,8 +60,12 @@ public:
 
     void registerContactHandling(std::shared_ptr<ContactHandling> p_contactHandling);
 
-    ///Registration of the Simulation main. It is called in each and every frame
-    void registerSimulationMain(std::shared_ptr<SimulationMain> p_main);
+    void addCollisionPair(std::shared_ptr<CollisionManager> pair);
+
+    void registerInteraction(
+        std::shared_ptr<CollisionManager> pair,
+        std::shared_ptr<CollisionDetection> p_collisionDetection,
+        std::shared_ptr<ContactHandling> p_contactHandling);
 
     /// \brief the actual implementation of the simulator module resides in run function
     void run();
@@ -86,7 +79,10 @@ public:
     /// \brief this is called by SDK. it lanuches the simulator module
     virtual void exec();
 
-    void addCollisionPair(std::shared_ptr<CollisionManager> pair);
+    ///
+    /// \brief Initializes the assembler with interaction context
+    ///
+    void initAssembler();
 
 private:
     std::vector<std::shared_ptr<ObjectSimulator>> simulators;
@@ -94,10 +90,10 @@ private:
     std::vector<std::shared_ptr<CollisionManager>> collisionPairs;
     std::vector<std::shared_ptr<ContactHandling>> contactHandlers;
 
+    std::shared_ptr<Assembler> assembler; // Main interaction objects assembler
+
     std::unique_ptr<ThreadPool> threadPool; //
     std::unique_ptr<ThreadPool> asyncPool; // asynchronous thread pool
-    std::shared_ptr<SimulationMain> main; // Simulation main registration
-    std::shared_ptr<SimulationMain> changedMain; // for updating the main in real-time. The change has effect after a frame is completed
 
     unsigned int frameCounter; // module keeps track of frame number
     int maxThreadCount; // maximum number of threads

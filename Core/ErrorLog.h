@@ -42,13 +42,6 @@ namespace imstk {
 class ErrorLog : public CoreClass
 {
 
-private:
-    std::vector<std::string> errors; ///< error messages
-    std::vector<int> timeStamps; ///< time stamps for errors
-    std::mutex logLock; ///< mutex to sync access to logs
-    Timer time; ///< Timer for timestamps
-    bool consoleOutput; ///< Flag to print errors to stdout
-
 public:
     bool isOutputtoConsoleEnabled;
     ErrorLog();
@@ -77,6 +70,26 @@ public:
     ///
     /// \param flag Set true to enable, false to disable copy to console
     void setConsoleOutput(bool flag);
+
+    static std::shared_ptr<ErrorLog> getDefaultLogger()
+    {
+        static std::shared_ptr<ErrorLog> logger; ///< singleton sdk.
+        std::call_once(sdkCallOnceFlag,
+                       []
+                       {
+                           logger.reset(new ErrorLog);
+                       });
+        return logger;
+    }
+
+private:
+    static std::once_flag sdkCallOnceFlag;
+    std::vector<std::string> errors; ///< error messages
+    std::vector<int> timeStamps; ///< time stamps for errors
+    std::mutex logLock; ///< mutex to sync access to logs
+    Timer time; ///< Timer for timestamps
+    bool consoleOutput; ///< Flag to print errors to stdout
+
 };
 
 }

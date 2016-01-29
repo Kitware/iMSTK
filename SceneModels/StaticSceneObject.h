@@ -21,25 +21,18 @@
 #define SCENE_MODELS_STATICSCENEOBJECT_H
 
 // iMSTK includes
-#include "Core/Config.h"
-#include "Core/Model.h"
-#include "SceneModels/SceneObject.h"
-#include "TimeIntegrators/OdeSystem.h"
-#include "Core/CoreClass.h"
-#include "Core/Model.h"
-#include "Mesh/SurfaceMesh.h"
+#include "SceneModels/InteractionSceneModel.h"
 
 namespace imstk {
 
-class ErrorLog;
-class Event;
+    class ErrorLog;
 
 ///
 /// \brief This type of models are meant to be static in the sense that dynamics do not
 ///     apply to them. They can be used to model objects that do not move in the scene or
 ///     or objects that are controlled by external hardware, i.e. haptics devices.
 ///
-class StaticSceneObject : public SceneObject
+class StaticSceneObject : public InteractionSceneModel
 {
 public:
     ///
@@ -70,11 +63,7 @@ public:
     ///
     /// \brief Initialize mesh for this model
     ///
-    void loadMesh(const std::string &file)
-    {
-        this->fileName = file;
-        this->loadInitialStates();
-    }
+    void loadMesh(const std::string &file);
 
 private:
     ///
@@ -96,12 +85,12 @@ private:
     ///
     //not implemented yet..tansel
     ///
-    virtual void serialize(void */*p_memoryBlock*/) override {}
+    virtual void serialize(void *) override {}
 
     ///
     //not implemented yet..tansel
     ///
-    virtual void unSerialize(void */*p_memoryBlock*/) override {}
+    virtual void unSerialize(void *) override {}
 
 private:
     std::string fileName;

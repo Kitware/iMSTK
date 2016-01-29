@@ -21,142 +21,203 @@
 #define SIMULATION_MANAGER_SDK_H
 
 // STL includes
+#include <memory>
 #include <thread>
+#include <mutex>
+#include <vector>
 
 // iMSTK includes
-#include "Core/Config.h"
-#include "Core/CoreClass.h"
-#include "Core/Scene.h"
-#include "SimulationManager/Simulator.h"
 #include "Core/Module.h"
-#include "Core/DataStructures.h"
-#include "Core/MakeUnique.h"
+#include "Rendering/InitVTKRendering.h"
+#include "IO/InitIO.h"
+#include "Core/ErrorLog.h"
 #include "Rendering/ViewerBase.h"
-#include "Core/BaseMesh.h"
-
-/// \brief maximum entities in the framework
-#define IMSTK_SDK_MAXMESHES 100
-#define IMSTK_SDK_MAXMODULES 100
-#define IMSTK_SDK_MAXOBJECTSIMULATORS 100
-#define IMSTK_SDK_MAXSCENES 100
-#define IMSTK_SDK_MAXSCENEOBJTECTS 100
+#include "Core/Factory.h"
+#include "Core/RenderDelegate.h"
+#include "SimulationManager/Simulator.h"
+#include "Simulators/ObjectSimulator.h"
+#include "SceneModels/VegaFEMDeformableSceneObject.h"
+#include "SceneModels/StaticSceneObject.h"
+#include "Core/ContactHandling.h"
+#include "Core/CollisionManager.h"
+#include "Core/CollisionDetection.h"
+#include "Devices/VRPNDeviceServer.h"
+#include "Devices/VRPNForceDevice.h"
+#include "VirtualTools/ToolCoupler.h"
 
 namespace imstk {
 
-template<typename T> class IndiceArray;
-class Scene;
-
-/// \brief SDK class. it is a singlenton class for each machine runs the framework
-class SDK: public CoreClass
+///
+/// \brief SDK class. It is a Singleton implementation of the framework simulation driver.
+///     Use the static method
+///
+///  Note: SDK::createSDK() to get the instance.
+///
+class SDK
 {
 public:
-    /// \brief destructor
-    ~SDK();
-
-    /// \brief update scene list. not implemented
-    void updateSceneListAll();
-
-    void initRegisteredModules();
-    void runRegisteredModules();
-    void shutDown();
-
-    ///for now both functions below are the same. But it maybe subject to change.
-    static std::shared_ptr<SDK> createSDK();
-
-    ///Creates the sdk, viewer and scene 0
-    static std::shared_ptr<SDK> createStandardSDK();
-
-    static std::shared_ptr<SDK> getInstance();
-
-    /// \brief Registers a viewer object with the SDK
     ///
-    void addViewer(std::shared_ptr<ViewerBase> p_viewer);
+    /// \brief Constructor/Destructor
+    ///
+    ~SDK() = default;
 
+    ///
+    /// \brief Prevent use of assignment operator
+    ///
+    SDK &operator=(const SDK&) = delete;
+
+    ///
+    /// \brief Initialize modules. Run the initialization method for each module.
+    ///
+    void initRegisteredModules();
+
+    ///
+    /// \brief Run the registered modules. This will not run any modules that inherit
+    ///     ViewerBase as on some platforms (Mac OS X) only the main thread can run user
+    ///     interface code. The return value is -1 if the modules are already running or
+    ///     no module inherits ViewerBase. Otherwise, the index of the last viewer module
+    ///     encountered is returned.
+    ///
+    ///  NOTE: This function assumes that there is only one viewer.
+    ///
+    void runRegisteredModules();
+
+    ///
+    /// \brief Initialize the SDK.
+    ///
+    void initialize();
+
+    ///
+    /// \brief SDK creates scene
+    ///
+    std::shared_ptr<Scene> createScene();
+
+    ///
     /// \brief Creates and registers a viewer object with the SDK
     ///
     std::shared_ptr<ViewerBase> createViewer();
 
     ///
+    /// \brief Create a singleton SDK
+    ///
+    static std::shared_ptr<SDK> createSDK();
+
+    ///
+    /// \brief Replaces the internal viewer object with the SDK.
+    ///
+    /// \param newViewer Pointer to new external viewer
+    ///
+    void setViewer(std::shared_ptr<ViewerBase> newViewer);
+
+    ///
     /// \brief Returns a pointer to the viewer object
     ///
-    std::shared_ptr<ViewerBase> getViewerInstance();
+    std::shared_ptr<ViewerBase> getViewer();
 
-    ///SDK creates simualtor
+    ///
+    /// \brief SDK creates simualtor
+    ///
     std::shared_ptr<Simulator> createSimulator();
 
-    ///SDK creates simualtor
+    ///
+    /// \brief SDK creates simualtor
+    ///
     std::shared_ptr<Simulator> getSimulator();
 
-    ///SDK creates scene
-    std::shared_ptr<Scene> createScene();
+    ///
+    /// \brief SDK creates scene
+    ///
+    std::shared_ptr<Scene> getScene();
 
-    ///SDK creates scene
-    std::shared_ptr<Scene> getScene(size_t sceneId)
-    {
-        return sceneList.at(sceneId);
-    }
-
-    ///SDK returns logger for the system
+    ///
+    /// \brief SDK returns logger for the system
+    ///
     std::shared_ptr<ErrorLog> getErrorLog();
 
-    ///terminates every module. Do it later on with Messager
+    ///
+    /// \brief Terminate all modules.
+    ///
     void terminateAll();
 
-    ///release the scene from the SDK..not implemented yet
-    void releaseScene(std::shared_ptr<Scene> scene);
+    ///
+    /// \brief Add a module to the module list.
+    ///     This module will not be inserted if it already exist in the list.
+    ///
+    /// \param newModule Reference to a new module
+    ///
+    void addModule(std::shared_ptr<Module> newModule);
 
-    /// Prevent use of assignament operator
-    SDK &operator=(const SDK&) = delete;
+    ///
+    /// \brief Adds a scene object and its simulator to the scene and simulator list
+    ///     respectively. It also saves a reference to the simulator in the scene object.
+    ///
+    ///  \param sceneObject Scene object to attache to the scene.
+    ///  \param objectSimulator Object simulator to attach to the simulator manager.
+    ///
+    void addSceneActor(std::shared_ptr<SceneObject> sceneObject,
+                       std::shared_ptr<ObjectSimulator> objectSimulator);
 
-    /// \brief run the SDK
+    ///
+    /// \brief Run registered modules and viewer.
+    ///
     void run();
 
-    /// \brief add reference to a core class
-    void addRef(std::shared_ptr<CoreClass> p_coreClass);
+    ///
+    /// \brief Utility function to create a FEM model.
+    ///
+    /// \param meshFile File containing a tetrahedral mesh.
+    /// \param configFile Configuration file containing parameters for the FEM method.
+    ///
+    /// \see VegaFEMDeformableSceneObject
+    ///
+    std::shared_ptr<DeformableSceneObject> createDeformableModel(const std::string &meshFile,
+                                                                 const std::string &configFile);
 
-    /// \brief removes reference on core class
-    void removeRef(std::shared_ptr<CoreClass> p_coreClass);
+    ///
+    /// \brief Utility function to create a Static model.
+    ///
+    std::shared_ptr<StaticSceneObject> createStaticModel();
 
-    /// \brief register functions
-    void registerMesh(std::shared_ptr<BaseMesh> p_mesh);
+    ///
+    /// \brief Utility function to add an interaction to the simulator
+    ///
+    /// \param collisionPair Holds the collision data used by the collision handler
+    /// \param collisinDetection Populates the collision pair data
+    /// \param contactHandling Collision response.
+    ///
+    void addInteraction(std::shared_ptr<CollisionManager> collisionPair,
+                        std::shared_ptr<CollisionDetection> collisionDetection,
+                        std::shared_ptr<ContactHandling> contactHandling);
 
-    void registerModule(std::shared_ptr<Module> p_mod);
+    ///
+    /// \brief Utility function to create a device server
+    ///
+    std::shared_ptr<VRPNDeviceServer> createDeviceServer();
 
-    void registerObjectSimulator(std::shared_ptr<ObjectSimulator> p_os);
-
-    void registerCollisionDetection(std::shared_ptr<CollisionDetection> p_col);
-
-    void registerScene(std::shared_ptr<Scene> p_sc);
-
-    void registerSceneObject(std::shared_ptr<SceneObject> p_sco);
-
-    void addSceneActor(std::shared_ptr<SceneObject> p_sco, std::shared_ptr<ObjectSimulator> p_os, int p_scId=0);
+    ///
+    /// \brief Utility function to create a device client, server and controller
+    ///
+    /// \param deviceURL Client name to make the connection
+    ///
+    std::shared_ptr<ToolCoupler> createForceDeviceController(std::string &deviceURL, bool createServer = false);
 
 private:
-    static std::once_flag sdkCallOnceFlag;
+    SDK() = default;
+
+private:
+    static std::once_flag sdkCallOnceFlag; ///< Flag to make sure that only one call of
+                                           ///< the SDK singleton creator is ran to completion
 
     bool shutdown; ///< Tells the SDK to terminate
-    int sceneIdCounter; ///< this id is incremented when a scene is created
-    int argc;
-    char argv;
-    bool isModulesStarted;
+    bool modulesInitialized; ///< Flag to make sure modules are ran only once
 
-    std::shared_ptr<ErrorLog> errorLog; ///< error log
+    std::shared_ptr<ErrorLog> errorLog; ///< Reference to singleton error log
     std::shared_ptr<ViewerBase> viewer; ///< Reference to the sdk viewer object
     std::shared_ptr<Simulator> simulator; ///< Reference to the sdk simulator object
 
-    ///holds the references to the entities in the framework
-    std::vector<std::shared_ptr<BaseMesh>> meshList;
-    std::vector<std::shared_ptr<Module>> moduleList;
-    std::vector<std::shared_ptr<ObjectSimulator>> simulatorList;
-    std::vector<std::shared_ptr<CollisionDetection>> collisionDetectionList;
-    std::vector<std::shared_ptr<Scene>> sceneList; ///< scene list
-    std::vector<std::shared_ptr<SceneObject>> sceneObjectList;
-
+    std::vector<std::shared_ptr<Scene>> sceneList; ///< List of scenes containers
+    std::vector<std::shared_ptr<Module>> moduleList; ///< Modules to be ran in parallel
     std::vector<std::thread> modules; ///< Stores a list of running module threads
-private:
-    /// \brief constructor
-    SDK();
 };
 
 }

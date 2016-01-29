@@ -169,12 +169,12 @@ public:
     ///
     /// \brief write data (for ADU interface device)
     ///
-    virtual Message write(void */*Interfacehandle*/, int /*port*/, void */*data*/);
+    virtual Message write(void *Interfacehandle, int port, void *data);
 
     ///
     /// \brief read data (for ADU interface device)
     ///
-    virtual Message read(void */*Interfacehandle*/, int /*port*/, void */*data*/);
+    virtual Message read(void *Interfacehandle, int port, void *data);
 
 protected:
     bool driverInstalled;   //!< true if device driver is installed
