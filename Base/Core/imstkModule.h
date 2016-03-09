@@ -21,15 +21,40 @@
 #ifndef imstkModule_h
 #define imstkModule_h
 
+#include <iostream>
+
 namespace imstk {
+
+enum class ModuleStatus
+{
+    INACTIVE,
+    RUNNING,
+    PAUSED,
+    TERMINATING
+};
 
 class Module
 {
 public:
     ~Module() = default;
 
-private:
-    Module() = default;
+    void exec();
+    void run();
+    void pause();
+    void terminate();
+
+    const ModuleStatus& getStatus() const;
+    const std::string& getName() const;
+
+protected:
+    Module(std::string name) : m_name(name) {}
+
+    virtual void initModule() = 0;
+    virtual void runModule() = 0;
+    virtual void cleanUpModule() = 0;
+
+    ModuleStatus m_status = ModuleStatus::INACTIVE;
+    std::string m_name;
 };
 
 }
