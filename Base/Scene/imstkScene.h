@@ -21,6 +21,8 @@
 #ifndef imstkScene_h
 #define imstkScene_h
 
+#include <iostream>
+
 #include "imstkModule.h"
 
 namespace imstk {
@@ -28,10 +30,14 @@ namespace imstk {
 class Scene : public Module
 {
 public:
+    Scene(std::string name) : Module(name){}
     ~Scene() = default;
 
-private:
-    Scene() = default;
+protected:
+
+    void initModule() override;
+    void runModule() override;
+    void cleanUpModule() override;
 
 };
 

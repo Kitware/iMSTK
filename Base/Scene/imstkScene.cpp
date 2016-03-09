@@ -22,4 +22,19 @@
 
 namespace imstk {
 
+void Scene::initModule()
+{
+    std::cout<<std::endl<<m_name<<" : init"<<std::endl;
+}
+
+void Scene::cleanUpModule()
+{
+    std::cout<<std::endl<<m_name<<" : cleanUp"<<std::endl;
+}
+
+void Scene::runModule()
+{
+    std::cout<<"."<<std::flush;
+}
+
 }
