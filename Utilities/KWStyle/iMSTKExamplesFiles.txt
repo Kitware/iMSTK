@@ -1,2 +1,0 @@
-/home/virtualfls/Projects/IMSTK/src_refactoring/Examples/*/*.h
-/home/virtualfls/Projects/IMSTK/src_refactoring/Examples/*/*.cxx

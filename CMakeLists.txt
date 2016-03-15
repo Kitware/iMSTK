@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
 
 project(iMSTK VERSION 0.0.1 LANGUAGES CXX)
 
@@ -58,17 +58,9 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
-# Define ThirdParty dependencies
-#-----------------------------------------------------------------------------
-# KWStyle
-option(${PROJECT_NAME}_USE_KWSTYLE "Use KWStyle to check for coding standards violations." ON)
-option(USE_SYSTEM_KWSTYLE "Exclude KWStyle from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_KWSTYLE)
-
-#-----------------------------------------------------------------------------
 # Git protocol option
 #-----------------------------------------------------------------------------
-if(NOT GIT_EXECUTABL )
+if(NOT GIT_EXECUTABLE)
   find_package(Git REQUIRED)
 endif()
 
@@ -79,6 +71,19 @@ if(NOT ${PROJECT_NAME}_USE_GIT_PROTOCOL)
 endif()
 
 #-----------------------------------------------------------------------------
+# Define ThirdParty dependencies
+#-----------------------------------------------------------------------------
+# KWStyle
+option(${PROJECT_NAME}_USE_KWSTYLE "Use KWStyle to check for coding standards violations." OFF)
+option(USE_SYSTEM_KWSTYLE "Exclude KWStyle from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_KWSTYLE)
+
+# Uncrustify
+option(${PROJECT_NAME}_USE_UNCRUSTIFY "Use Uncrustify to check for coding standards violations." ON)
+option(USE_SYSTEM_UNCRUSTIFY "Exclude Uncrustify from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_UNCRUSTIFY)
+
+#-----------------------------------------------------------------------------
 # Superbuild
 #-----------------------------------------------------------------------------
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
@@ -86,7 +91,15 @@ mark_as_advanced(${PROJECT_NAME}_SUPERBUILD)
 set(${PROJECT_NAME}_BINARY_INNER_SUBDIR ${PROJECT_NAME}-build)
 
 if(${PROJECT_NAME}_SUPERBUILD)
-  include(External_KWStyle)
+
+  if(${PROJECT_NAME}_USE_KWSTYLE)
+    include(External_KWStyle)
+  endif()
+
+  if(${PROJECT_NAME}_USE_UNCRUSTIFY)
+    include(External_Uncrustify)
+  endif()
+
 endif()
 
 #-----------------------------------------------------------------------------
@@ -94,7 +107,12 @@ endif()
 #-----------------------------------------------------------------------------
 # KWStyle
 if(${PROJECT_NAME}_USE_KWSTYLE)
-  include(ConfigKWStyle)
+  include(SetupKWStyleHook)
+endif()
+
+# Uncrustify
+if(${PROJECT_NAME}_USE_UNCRUSTIFY)
+  include(SetupUncrustifyHook)
 endif()
 
 #--------------------------------------------------------------------------
