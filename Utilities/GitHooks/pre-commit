@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+#-----------------------------------------------------------------------------
+# Define egrep-q
+#-----------------------------------------------------------------------------
+egrep-q() {
+  egrep "$@" >/dev/null 2>/dev/null
+}
+
+#-----------------------------------------------------------------------------
+# Define Error and Exit
+#-----------------------------------------------------------------------------
+printErrorAndExit() {
+  echo 'pre-commit hook failure' 1>&2
+  echo '-----------------------' 1>&2
+  echo '' 1>&2
+  echo "$@" 1>&2
+  exit 1
+}
+
+#-----------------------------------------------------------------------------
+# Check that development setup is up-to-date
+#-----------------------------------------------------------------------------
+lastSetupForDevelopment=$(git config --get setup.version || echo 0)
+eval $(grep '^SetupForDevelopment_VERSION=' "${BASH_SOURCE%/*}/../../Utilities/SetupForDevelopment.sh")
+test -n "$SetupForDevelopment_VERSION" || SetupForDevelopment_VERSION=0
+if test $lastSetupForDevelopment -lt $SetupForDevelopment_VERSION; then
+  printErrorAndExit 'Developer setup in this work tree is out of date.  Please re-run
+  ./Utilities/SetupForDevelopment.sh
+'
+fi

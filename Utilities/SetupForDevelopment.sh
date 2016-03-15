@@ -54,4 +54,4 @@ echo
 # this script and/or hooks have been modified.
 #-----------------------------------------------------------------------------
 SetupForDevelopment_VERSION=1
-git config hooks.SetupForDevelopment ${SetupForDevelopment_VERSION}
+git config setup.version ${SetupForDevelopment_VERSION}
