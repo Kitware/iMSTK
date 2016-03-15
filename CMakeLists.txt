@@ -66,14 +66,17 @@ add_subdirectory(Base/SimulationManager)
 #--------------------------------------------------------------------------
 # Export Targets
 #--------------------------------------------------------------------------
-export(EXPORT iMSTK_TARGETS
-  FILE ${CMAKE_CURRENT_BINARY_DIR}/iMSTKTargets.cmake
-  NAMESPACE imstk::
+string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
+set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
+
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
   )
 
-install(EXPORT iMSTK_TARGETS
-  FILE iMSTKTargets.cmake
-  NAMESPACE imstk::
+install(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
   COMPONENT Development
   DESTINATION ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
   )
