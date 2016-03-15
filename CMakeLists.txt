@@ -7,6 +7,7 @@ project(iMSTK VERSION 0.0.1 LANGUAGES CXX)
 #-----------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Superbuild
     ${CMAKE_MODULE_PATH}
     )
 set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
@@ -54,6 +55,46 @@ elseif(COMPILER_SUPPORTS_CXX0X)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread")
 else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+#-----------------------------------------------------------------------------
+# Define ThirdParty dependencies
+#-----------------------------------------------------------------------------
+# KWStyle
+option(${PROJECT_NAME}_USE_KWSTYLE "Use KWStyle to check for coding standards violations." ON)
+option(USE_SYSTEM_KWSTYLE "Exclude KWStyle from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_KWSTYLE)
+
+#-----------------------------------------------------------------------------
+# Git protocol option
+#-----------------------------------------------------------------------------
+if(NOT GIT_EXECUTABL )
+  find_package(Git REQUIRED)
+endif()
+
+option(${PROJECT_NAME}_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." ON)
+set(git_protocol "git")
+if(NOT ${PROJECT_NAME}_USE_GIT_PROTOCOL)
+  set(git_protocol "http")
+endif()
+
+#-----------------------------------------------------------------------------
+# Superbuild
+#-----------------------------------------------------------------------------
+option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
+mark_as_advanced(${PROJECT_NAME}_SUPERBUILD)
+set(${PROJECT_NAME}_BINARY_INNER_SUBDIR ${PROJECT_NAME}-build)
+
+if(${PROJECT_NAME}_SUPERBUILD)
+  include(External_KWStyle)
+endif()
+
+#-----------------------------------------------------------------------------
+# Include ThirdParty dependencies
+#-----------------------------------------------------------------------------
+# KWStyle
+if(${PROJECT_NAME}_USE_KWSTYLE)
+  include(ConfigKWStyle)
 endif()
 
 #--------------------------------------------------------------------------
