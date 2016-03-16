@@ -28,21 +28,42 @@
 
 #include <imstkScene.h>
 
-
 namespace imstk {
+using SimulationStatus = ModuleStatus;
+
 class SimulationManager
 {
 public:
 
+    SimulationManager()  = default;
     ~SimulationManager() = default;
+
+    const SimulationStatus& getStatus() const;
+
+    // Scene
+    std::shared_ptr<Scene>  createNewScene(std::string newSceneName);
+    std::shared_ptr<Scene>  createNewScene();
+    void                    addScene(std::shared_ptr<Scene>newScene);
+    void                    removeScene(std::string sceneName);
+    std::shared_ptr<Scene>  getScene(std::string sceneName);
+    bool                    isSceneRegistered(std::string sceneName);
+
+    // Simulation
+    void                    startSimulation(std::string sceneName);
+    void                    switchScene(std::string newSceneName,
+                                        bool        unloadCurrentScene);
+    void                    runSimulation();
+    void                    pauseSimulation();
+    void                    endSimulation();
 
 private:
 
-    SimulationManager() = default;
+    void startModuleInNewThread(std::shared_ptr<Module>module);
 
-    std::map<std::string, std::shared_ptr<Scene> > sceneMap;
-    std::size_t activeSceneID;
-    std::vector<std::thread> threads;
+    std::string m_currentSceneName;
+    std::map<std::string, std::shared_ptr<Scene> > m_sceneMap;
+    std::map<std::string, std::thread> m_threadMap;
+    SimulationStatus m_status = SimulationStatus::INACTIVE;
 };
 }
 

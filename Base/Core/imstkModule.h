@@ -23,14 +23,17 @@
 #define imstkModule_h
 
 #include <iostream>
+#include <thread>
 
 namespace imstk {
 enum class ModuleStatus
 {
-    INACTIVE,
+    STARTING,
     RUNNING,
+    PAUSING,
     PAUSED,
-    TERMINATING
+    TERMINATING,
+    INACTIVE
 };
 
 class Module
@@ -39,13 +42,15 @@ public:
 
     ~Module() = default;
 
-    void                exec();
+    void                start();
     void                run();
     void                pause();
-    void                terminate();
+    void                end();
 
     const ModuleStatus& getStatus() const;
     const std::string & getName() const;
+    const int         & getLoopDelay() const;
+    void                setLoopDelay(int milliseconds);
 
 protected:
 
@@ -57,6 +62,7 @@ protected:
 
     ModuleStatus m_status = ModuleStatus::INACTIVE;
     std::string  m_name;
+    int m_loopDelay = 0;
 };
 }
 

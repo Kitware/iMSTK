@@ -27,5 +27,5 @@ add_executable(${PROJECT_NAME} main.cpp)
 # Link libraries to executable
 #-----------------------------------------------------------------------------
 target_link_libraries(${PROJECT_NAME}
-  Scene
+  SimulationManager
 )

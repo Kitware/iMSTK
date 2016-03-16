@@ -24,92 +24,105 @@
 #include <iostream>
 
 namespace imstk {
-void Module::exec()
+void
+Module::start()
 {
-    m_status = ModuleStatus::RUNNING;
-    this->initModule();
+    if (m_status != ModuleStatus::INACTIVE)
+    {
+        std::cerr << "Can not start " << m_name << std::endl
+                  << "Module already/still active." << std::endl;
+        return;
+    }
 
+    // Init
+    m_status = ModuleStatus::STARTING;
+    this->initModule();
+    m_status = ModuleStatus::RUNNING;
+
+    // Keep active, wait for terminating call
     while (m_status !=  ModuleStatus::TERMINATING)
     {
-        if (m_status == ModuleStatus::RUNNING)
+        if (m_status == ModuleStatus::PAUSING)
+        {
+            m_status = ModuleStatus::PAUSED;
+        }
+        else if (m_status == ModuleStatus::RUNNING)
         {
             this->runModule();
+            std::this_thread::sleep_for(std::chrono::milliseconds(m_loopDelay));
         }
     }
+
+    // Cleanup
     this->cleanUpModule();
     m_status = ModuleStatus::INACTIVE;
 }
 
-void Module::run()
+void
+Module::run()
 {
-    switch (m_status)
+    if (m_status != ModuleStatus::PAUSED)
     {
-    case ModuleStatus::PAUSED:
-        m_status = ModuleStatus::RUNNING;
-        break;
-
-    case ModuleStatus::RUNNING:
         std::cerr << "Can not run " << m_name << std::endl
-                  << "Module already running." << std::endl;
-        break;
-
-    default:
-        std::cerr << "Can not run " << m_name << std::endl
-                  << "Module terminating or not active."
-                  << "Run `module::exec()` to launch your module." << std::endl;
-        break;
+                  << "Module not paused." << std::endl;
+        return;
     }
+
+    m_status = ModuleStatus::RUNNING;
 }
 
-void Module::pause()
+void
+Module::pause()
 {
-    switch (m_status)
+    if (m_status != ModuleStatus::RUNNING)
     {
-    case ModuleStatus::RUNNING:
-        m_status = ModuleStatus::PAUSED;
-        break;
-
-    case ModuleStatus::PAUSED:
         std::cerr << "Can not pause " << m_name << std::endl
-                  << "Module already running." << std::endl;
-        break;
-
-    default:
-        std::cerr << "Can not pause " << m_name << std::endl
-                  << "Module terminating or not active."
-                  << "Run `module::exec()` to launch your module." << std::endl;
-        break;
+                  << "Module not running." << std::endl;
+        return;
     }
+
+    m_status = ModuleStatus::PAUSING;
+
+    while (m_status != ModuleStatus::PAUSED) {}
 }
 
-void Module::terminate()
+void
+Module::end()
 {
-    switch (m_status)
+    if ((m_status == ModuleStatus::INACTIVE) ||
+        (m_status == ModuleStatus::TERMINATING))
     {
-    case ModuleStatus::TERMINATING:
-        std::cerr << "Can not terminate " << m_name << std::endl
-                  << "Module already terminating." << std::endl;
-        break;
-
-    case ModuleStatus::INACTIVE:
-        std::cerr << "Can not terminate " << m_name << std::endl
-                  << "Module not active."
-                  << "Run `module::exec()` to launch your module." << std::endl;
-        break;
-
-    default:
-        m_status = ModuleStatus::TERMINATING;
-        break;
+        std::cerr << "Can not end " << m_name << std::endl
+                  << "Module alreading inactive or terminating." << std::endl;
+        return;
     }
+
+    m_status = ModuleStatus::TERMINATING;
+
+    while (m_status != ModuleStatus::INACTIVE) {}
 }
 
-const ModuleStatus& Module::getStatus() const
+const ModuleStatus&
+Module::getStatus() const
 {
     return m_status;
 }
 
-const std::string& Module::getName() const
+const std::string&
+Module::getName() const
 {
     return m_name;
+}
+
+const int&
+Module::getLoopDelay() const
+{
+    return m_loopDelay;
+}
+
+void
+Module::setLoopDelay(int milliseconds)
+{
+    m_loopDelay = milliseconds;
 }
 }
