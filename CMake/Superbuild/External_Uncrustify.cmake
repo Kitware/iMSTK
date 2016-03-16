@@ -31,12 +31,13 @@ if(NOT DEFINED ${PROJ}_EXECUTABLE AND NOT ${USE_SYSTEM_${PROJ}})
   # Set project Git info
   #-----------------------------------------------------------------------------
   set(${proj}_REPOSITORY ${git_protocol}://github.com/uncrustify/uncrustify.git)
-  set(${proj}_GIT_TAG cf7bbac22c65df32dea3f0abf949cba80fc66d00)
+  set(${proj}_GIT_TAG uncrustify-0.62)
   
   #-----------------------------------------------------------------------------
   # Set project directory
   #-----------------------------------------------------------------------------
-  set(${proj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/Superbuild/${proj})
+  set(${proj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/Superbuild/${proj}-src)
+  set(${proj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/Superbuild/${proj}-prefix)
   set(${proj}_DIR ${CMAKE_BINARY_DIR}/Superbuild/${proj}-build)
 
   #-----------------------------------------------------------------------------
@@ -47,9 +48,10 @@ if(NOT DEFINED ${PROJ}_EXECUTABLE AND NOT ${USE_SYSTEM_${PROJ}})
     GIT_REPOSITORY ${${proj}_REPOSITORY}
     GIT_TAG ${${proj}_GIT_TAG}
     UPDATE_COMMAND ""
+    PREFIX ${${proj}_PREFIX_DIR}
     SOURCE_DIR ${${proj}_SOURCE_DIR}
     BINARY_DIR ${${proj}_DIR}
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${${proj}_DIR}
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<BINARY_DIR>
     DEPENDS ${${proj}_DEPENDENCIES}
     )
   set(${PROJ}_EXECUTABLE ${${proj}_DIR}/bin/uncrustify)
