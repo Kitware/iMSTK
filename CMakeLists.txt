@@ -73,11 +73,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Define ThirdParty dependencies
 #-----------------------------------------------------------------------------
-# KWStyle
-option(${PROJECT_NAME}_USE_KWSTYLE "Use KWStyle to check for coding standards violations." OFF)
-option(USE_SYSTEM_KWSTYLE "Exclude KWStyle from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_KWSTYLE)
-
 # Uncrustify
 option(${PROJECT_NAME}_USE_UNCRUSTIFY "Use Uncrustify to check for coding standards violations." ON)
 option(USE_SYSTEM_UNCRUSTIFY "Exclude Uncrustify from superbuild and use an existing build." OFF)
@@ -92,10 +87,6 @@ set(${PROJECT_NAME}_BINARY_INNER_SUBDIR ${PROJECT_NAME}-build)
 
 if(${PROJECT_NAME}_SUPERBUILD)
 
-  if(${PROJECT_NAME}_USE_KWSTYLE)
-    include(External_KWStyle)
-  endif()
-
   if(${PROJECT_NAME}_USE_UNCRUSTIFY)
     include(External_Uncrustify)
   endif()
@@ -105,11 +96,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Include ThirdParty dependencies
 #-----------------------------------------------------------------------------
-# KWStyle
-if(${PROJECT_NAME}_USE_KWSTYLE)
-  include(SetupKWStyleHook)
-endif()
-
 # Uncrustify
 if(${PROJECT_NAME}_USE_UNCRUSTIFY)
   include(SetupUncrustifyHook)

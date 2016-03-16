@@ -4,7 +4,7 @@
 set(UNCRUSTIFY_CONFIG "${CMAKE_SOURCE_DIR}/Utilities/Uncrustify/${PROJECT_NAME}Uncrustify.cfg")
 
 #-----------------------------------------------------------------------------
-# Setup git hook for KWStyle executable path
+# Setup git hook for Uncrustify executable path
 #-----------------------------------------------------------------------------
 find_package(Git)
 if(GIT_FOUND)
