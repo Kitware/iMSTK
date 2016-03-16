@@ -47,6 +47,12 @@ fi
 
 ##################################################################
 # CONFIGURATION
+# set if uncrustify is enabled or not
+ENABLED=$(git config --get uncrustify.enabled)
+
+# set if uncrustify can ne skipped
+SKIP=$(git config --get uncrustify.skip)
+
 # set uncrustify path or executable
 # UNCRUSTIFY="/usr/bin/uncrustify"
 UNCRUSTIFY=$(git config --get uncrustify.path)
@@ -81,6 +87,25 @@ FILE_EXTS=".c .h .cpp .hpp"
 
 # exit on error
 set -e
+
+# if uncrustify disabled, quit
+if [[ ! "$ENABLED" == "true" ]]; then
+    printf "Uncrustify is disabled in Git config, can not run style checking.\n"
+    printf "\nTo enable Uncrustify, do:\n"
+    printf "\tgit config uncrustify.enabled true\n"
+    printf "\tgit config uncrustify.path path/to/uncrustify #should be in Superbuild/Uncrustify-build/bin\n"
+    printf "\tgit config uncrustify.conf path/to/config.cfg #should be in Utilities/Uncrustify\n"
+
+    if [[ "$SKIP" == "true" ]]; then
+        printf "\nTo stop skipping style checking (recommended), do:\n"
+        printf "\tgit config uncrustify.skip false\n\n"
+        exit 0;
+    else
+        printf "\nTo skip style checking (not recommended), do:\n"
+        printf "\tgit config uncrustify.skip true\n\n"
+        exit 1;
+    fi
+fi
 
 # check whether the given file matches any of the set extensions
 matches_extension() {
