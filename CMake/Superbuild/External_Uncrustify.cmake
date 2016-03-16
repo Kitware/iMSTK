@@ -51,7 +51,7 @@ if(NOT DEFINED ${PROJ}_EXECUTABLE AND NOT ${USE_SYSTEM_${PROJ}})
     PREFIX ${${proj}_PREFIX_DIR}
     SOURCE_DIR ${${proj}_SOURCE_DIR}
     BINARY_DIR ${${proj}_DIR}
-    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<BINARY_DIR>
+    CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<BINARY_DIR> #TODO: does not work on Windows, see --host= option
     DEPENDS ${${proj}_DEPENDENCIES}
     )
   set(${PROJ}_EXECUTABLE ${${proj}_DIR}/bin/uncrustify)
