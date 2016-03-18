@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(iMSTK VERSION 0.0.1 LANGUAGES CXX)
+project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
 # Update CMake module path & cmake dir
 #-----------------------------------------------------------------------------
 set(CMAKE_MODULE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/CMake
-    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Superbuild
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
     ${CMAKE_MODULE_PATH}
     )
 set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
@@ -58,48 +58,44 @@ else()
 endif()
 
 #-----------------------------------------------------------------------------
-# Git protocol option
+# Define External dependencies
 #-----------------------------------------------------------------------------
-if(NOT GIT_EXECUTABLE)
-  find_package(Git REQUIRED)
-endif()
+# g3log
+list(APPEND ${PROJECT_NAME}_DEPENDENCIES g3log)
+option(USE_SYSTEM_g3log "Exclude g3log from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_g3log)
 
-option(${PROJECT_NAME}_USE_GIT_PROTOCOL "If behind a firewall turn this OFF to use http instead." ON)
-set(git_protocol "git")
-if(NOT ${PROJECT_NAME}_USE_GIT_PROTOCOL)
-  set(git_protocol "http")
-endif()
-
-#-----------------------------------------------------------------------------
-# Define ThirdParty dependencies
-#-----------------------------------------------------------------------------
 # Uncrustify
-option(${PROJECT_NAME}_USE_UNCRUSTIFY "Use Uncrustify to check for coding standards violations." ON)
-option(USE_SYSTEM_UNCRUSTIFY "Exclude Uncrustify from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_UNCRUSTIFY)
+list(APPEND ${PROJECT_NAME}_DEPENDENCIES Uncrustify)
+option(USE_SYSTEM_Uncrustify "Exclude Uncrustify from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_Uncrustify)
 
 #-----------------------------------------------------------------------------
-# Superbuild
+# SUPERBUILD
 #-----------------------------------------------------------------------------
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
-mark_as_advanced(${PROJECT_NAME}_SUPERBUILD)
-set(${PROJECT_NAME}_BINARY_INNER_SUBDIR ${PROJECT_NAME}-build)
 
 if(${PROJECT_NAME}_SUPERBUILD)
-
-  if(${PROJECT_NAME}_USE_UNCRUSTIFY)
-    include(External_Uncrustify)
-  endif()
-
+  # Call CMakeLists.txt in CMake/External which will solve the dependencies
+  # and add the External projects, including this one: this top-level
+  # CMakeLists.txt will be called back with SUPERBUILD=OFF, to execute
+  # the rest of the code below (INNERBUILD), which explains the `return`
+  add_subdirectory(CMake/External)
+  return()
 endif()
 
 #-----------------------------------------------------------------------------
-# Include ThirdParty dependencies
+# INNERBUILD
 #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+# Find external dependencies
+#-----------------------------------------------------------------------------
+# g3log
+find_package( g3log REQUIRED )
+include_directories( ${g3log_INCLUDE_DIRS} )
+
 # Uncrustify
-if(${PROJECT_NAME}_USE_UNCRUSTIFY)
-  include(SetupUncrustifyHook)
-endif()
+include(SetupUncrustifyConfig)
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
