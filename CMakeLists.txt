@@ -92,7 +92,7 @@ endif()
 #-----------------------------------------------------------------------------
 # g3log
 find_package( g3log REQUIRED )
-include_directories( ${g3log_INCLUDE_DIRS} )
+include_directories( ${g3log_INCLUDE_DIR} )
 
 # Uncrustify
 include(SetupUncrustifyConfig)

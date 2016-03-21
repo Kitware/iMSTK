@@ -95,5 +95,8 @@ macro(imstk_add_external_project extProj)
   #-----------------------------------------------------------------------------
   # Keep track of project path to add it in the superbuild cache
   #-----------------------------------------------------------------------------
-  list( APPEND ${PROJECT_NAME}_EXTERNAL_PROJECTS_PATHS -D${extProj}_DIR:PATH=${${extProj}_DIR} )
+  list( APPEND ${PROJECT_NAME}_EXTERNAL_PROJECTS_PATHS
+    -D${extProj}_SOURCE_DIR:PATH=${${extProj}_SOURCE_DIR}
+    -D${extProj}_DIR:PATH=${${extProj}_DIR}
+    )
 endmacro()
