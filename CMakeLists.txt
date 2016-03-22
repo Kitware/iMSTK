@@ -70,6 +70,11 @@ list(APPEND ${PROJECT_NAME}_DEPENDENCIES Uncrustify)
 option(USE_SYSTEM_Uncrustify "Exclude Uncrustify from superbuild and use an existing build." OFF)
 mark_as_advanced(USE_SYSTEM_Uncrustify)
 
+# Eigen
+list(APPEND ${PROJECT_NAME}_DEPENDENCIES Eigen)
+option(USE_SYSTEM_Eigen "Exclude Eigen from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_Eigen)
+
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
@@ -97,11 +102,16 @@ include_directories( ${g3log_INCLUDE_DIR} )
 # Uncrustify
 include(SetupUncrustifyConfig)
 
+# Eigen
+find_package( Eigen 3.1.2 REQUIRED )
+include_directories( ${Eigen_INCLUDE_DIR} )
+
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Base/Utilities)
 add_subdirectory(Base/Core)
+add_subdirectory(Base/Geometry)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/SimulationManager)
 

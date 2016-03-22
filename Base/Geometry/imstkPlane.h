@@ -19,28 +19,37 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
+#ifndef imstkPlane_h
+#define imstkPlane_h
 
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk {
-void
-Scene::initModule()
+class Plane : public AnalyticalGeometry
 {
-    LOG(DEBUG) << m_name << " : init";
+public:
+
+    Plane(const Vec3d & position = Vec3d(),
+          const Vec3d & normal = UP,
+          const double& width = 100) :
+        AnalyticalGeometry(GeometryType::Plane,
+                           position,
+                           Quatd::FromTwoVectors(UP, normal)),
+        m_width(width)
+    {}
+
+    ~Plane() = default;
+
+    Vec3d         getNormal();
+    void          setNormal(const Vec3d& normal);
+
+    const double& getWidth() const;
+    void          setWidth(const double& width);
+
+protected:
+
+    double m_width;
+};
 }
 
-void
-Scene::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-}
-
-void
-Scene::runModule()
-{
-    LOG(DEBUG) << m_name << " : running";
-}
-}
+#endif // ifndef imstkPlane_h

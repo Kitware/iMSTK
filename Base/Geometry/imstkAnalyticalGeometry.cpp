@@ -19,28 +19,48 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
-
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include "imstkAnalyticalGeometry.h"
 
 namespace imstk {
 void
-Scene::initModule()
+AnalyticalGeometry::translate(const Vec3d& t)
 {
-    LOG(DEBUG) << m_name << " : init";
+    m_position += t;
 }
 
 void
-Scene::cleanUpModule()
+AnalyticalGeometry::rotate(const Quatd& r)
 {
-    LOG(DEBUG) << m_name << " : cleanUp";
+    m_orientation *= r;
 }
 
 void
-Scene::runModule()
+AnalyticalGeometry::rotate(const Vec3d& axis, const double& angle)
 {
-    LOG(DEBUG) << m_name << " : running";
+    this->rotate(Quatd(Eigen::AngleAxisd(angle, axis)));
+}
+
+const Vec3d&
+AnalyticalGeometry::getPosition() const
+{
+    return m_position;
+}
+
+void
+AnalyticalGeometry::setPosition(const Vec3d& position)
+{
+    m_position = position;
+}
+
+void
+AnalyticalGeometry::setOrientation(const Quatd& orientation)
+{
+    m_orientation = orientation;
+}
+
+const Quatd&
+AnalyticalGeometry::getOrientation() const
+{
+    return m_orientation;
 }
 }

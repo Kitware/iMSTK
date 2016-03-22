@@ -19,28 +19,12 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
-
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include "imstkGeometry.h"
 
 namespace imstk {
-void
-Scene::initModule()
+const GeometryType&
+Geometry::getType() const
 {
-    LOG(DEBUG) << m_name << " : init";
-}
-
-void
-Scene::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-}
-
-void
-Scene::runModule()
-{
-    LOG(DEBUG) << m_name << " : running";
+    return m_type;
 }
 }

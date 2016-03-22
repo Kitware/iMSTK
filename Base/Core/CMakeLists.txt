@@ -4,6 +4,7 @@
 include(imstkAddLibrary)
 imstk_add_library( Core
   H_FILES
+    imstkMath.h
     imstkModule.h
   CPP_FILES
     imstkModule.cpp

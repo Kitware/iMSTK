@@ -19,28 +19,30 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
-
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include "imstkPlane.h"
 
 namespace imstk {
-void
-Scene::initModule()
+Vec3d
+Plane::getNormal()
 {
-    LOG(DEBUG) << m_name << " : init";
+    return m_orientation._transformVector(UP);
 }
 
 void
-Scene::cleanUpModule()
+Plane::setNormal(const Vec3d& normal)
 {
-    LOG(DEBUG) << m_name << " : cleanUp";
+    this->setOrientation(Quatd::FromTwoVectors(UP, normal));
+}
+
+const double&
+Plane::getWidth() const
+{
+    return m_width;
 }
 
 void
-Scene::runModule()
+Plane::setWidth(const double& width)
 {
-    LOG(DEBUG) << m_name << " : running";
+    m_width = width;
 }
 }

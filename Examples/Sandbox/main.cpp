@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "imstkSimulationManager.h"
+#include "imstkPlane.h"
 
 int main()
 {
@@ -11,53 +12,83 @@ int main()
               << "Starting Sandbox" << std::endl
               << "****************" << std::endl;
 
-    // Creating SimulationManager
-    std::shared_ptr<imstk::SimulationManager> sdk =
-        std::make_shared<imstk::SimulationManager>();
+    // Geometry
+    // - Plane
+    std::cout << "-- Plane : Init" << std::endl;
+    auto pos  = imstk::Vec3d(5, 2, 5);
+    auto norm = imstk::LEFT;
 
-    LOG(INFO) << "-- Test add scenes";
+    norm.normalize();
+    auto width = 10;
+    std::cout << "p = " << pos << std::endl;
+    std::cout << "n = " << norm << std::endl;
+    std::cout << "w = " << width << std::endl;
 
-    // Create scene and add it (scene1)
-    std::shared_ptr<imstk::Scene> scene1 =
-        std::make_shared<imstk::Scene>("scene1");
+    std::cout << "-- Plane : Create" << std::endl;
+    auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
+    std::cout << "p = " << plane->getPosition() << std::endl;
+    std::cout << "n = " << plane->getNormal() << std::endl;
+    std::cout << "w = " << plane->getWidth() << std::endl;
 
-    scene1->setLoopDelay(500);
-    sdk->addScene(scene1);
+    std::cout << "-- Plane : Translate" << std::endl;
+    plane->translate(imstk::Vec3d(2, 1, -3));
+    std::cout << "p = " << plane->getPosition() << std::endl;
 
-    // Create new scene through sdk (scene2)
-    sdk->createNewScene("scene2");
-    std::shared_ptr<imstk::Scene> scene2 = sdk->getScene("scene2");
-    scene2->setLoopDelay(500);
+    std::cout << "-- Plane : Rotate" << std::endl;
+    plane->rotate(imstk::UP, 0.25);
+    std::cout << "p = " << plane->getPosition() << std::endl;
+    std::cout << "n = " << plane->getNormal() << std::endl;
 
-    // Create new scene through sdk (auto : "Scene_X")
-    std::shared_ptr<imstk::Scene> scene3 = sdk->createNewScene();
+    /*
+       // Creating SimulationManager
+       std::shared_ptr<imstk::SimulationManager> sdk =
+       std::make_shared<imstk::SimulationManager>();
 
-    // Remove scene3
-    sdk->removeScene("Scene_3");
+       LOG(INFO) << "-- Test add scenes";
 
-    // Test switch
-    LOG(INFO) << "-- Test scene switch";
-    sdk->startSimulation("scene1");
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->switchScene("scene2", false);
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->switchScene("scene1", true);
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->endSimulation();
+       // Create scene and add it (scene1)
+       std::shared_ptr<imstk::Scene> scene1 =
+       std::make_shared<imstk::Scene>("scene1");
 
-    // Test pause/run
-    LOG(INFO) << "-- Test simulation pause/run";
-    sdk->startSimulation("scene2");
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->pauseSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->runSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->pauseSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    sdk->endSimulation();
+       scene1->setLoopDelay(500);
+       sdk->addScene(scene1);
 
-    // Quit
-    while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
+       // Create new scene through sdk (scene2)
+       sdk->createNewScene("scene2");
+       std::shared_ptr<imstk::Scene> scene2 = sdk->getScene("scene2");
+       scene2->setLoopDelay(500);
+
+       // Create new scene through sdk (auto : "Scene_X")
+       std::shared_ptr<imstk::Scene> scene3 = sdk->createNewScene();
+
+       // Remove scene3
+       sdk->removeScene("Scene_3");
+
+       // Test switch
+       LOG(INFO) << "-- Test scene switch";
+       sdk->startSimulation("scene1");
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->switchScene("scene2", false);
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->switchScene("scene1", true);
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->endSimulation();
+
+       // Test pause/run
+       LOG(INFO) << "-- Test simulation pause/run";
+       sdk->startSimulation("scene2");
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->pauseSimulation();
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->runSimulation();
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->pauseSimulation();
+       std::this_thread::sleep_for(std::chrono::seconds(2));
+       sdk->endSimulation();
+
+       // Quit
+       while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
+
+     */
     return 0;
 }

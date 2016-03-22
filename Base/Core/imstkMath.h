@@ -19,28 +19,36 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
+#ifndef imstkMath_h
+#define imstkMath_h
 
-#include <thread>
+#include <vector>
 
-#include "g3log/g3log.hpp"
+#include <Eigen/Geometry>
 
 namespace imstk {
-void
-Scene::initModule()
-{
-    LOG(DEBUG) << m_name << " : init";
+// 2D vector
+using Vec2f = Eigen::Vector2f;
+using Vec2d = Eigen::Vector2d;
+
+// 3D vector
+using Vec3f = Eigen::Vector3f;
+using Vec3d = Eigen::Vector3d;
+
+// Dynamic size vector
+using VecNf = Eigen::VectorXf;
+using VecNd = Eigen::VectorXd;
+
+// Quaternion
+using Quatf = Eigen::Quaternionf;
+using Quatd = Eigen::Quaterniond;
+
+#define UP Vec3d(0.0, 1.0, 0.0)
+#define DOWN Vec3d(0, -1, 0)
+#define RIGHT Vec3d(1, 0, 0)
+#define LEFT Vec3d(-1, 0, 0)
+#define FORWARD Vec3d(0, 0, 1)
+#define BACKWARD Vec3d(0, 0, -1)
 }
 
-void
-Scene::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-}
-
-void
-Scene::runModule()
-{
-    LOG(DEBUG) << m_name << " : running";
-}
-}
+#endif // ifndef imstkMath_h

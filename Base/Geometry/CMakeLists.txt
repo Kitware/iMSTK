@@ -2,14 +2,17 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
+imstk_add_library( Geometry
   H_FILES
-    imstkScene.h
+    imstkGeometry.h
+    imstkAnalyticalGeometry.h
+    imstkPlane.h
   CPP_FILES
-    imstkScene.cpp
+    imstkGeometry.cpp
+    imstkAnalyticalGeometry.cpp
+    imstkPlane.cpp
   LIBRARIES
     Core
-    Geometry
   )
 
 #-----------------------------------------------------------------------------

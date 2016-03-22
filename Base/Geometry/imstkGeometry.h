@@ -19,28 +19,41 @@
 
    =========================================================================*/
 
-#include "imstkScene.h"
+#ifndef imstkGeometry_h
+#define imstkGeometry_h
 
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include "imstkMath.h"
 
 namespace imstk {
-void
-Scene::initModule()
+enum class GeometryType
 {
-    LOG(DEBUG) << m_name << " : init";
+    Plane,
+    Sphere,
+    Cube,
+    SurfaceMesh,
+    TetrahedralMesh,
+    HexahedralMesh
+};
+
+class Geometry
+{
+public:
+
+    ~Geometry() = default;
+
+    virtual void        translate(const Vec3d& t) = 0;
+    virtual void        rotate(const Quatd& r)    = 0;
+    virtual void        rotate(const Vec3d & axis,
+                               const double& angle) = 0;
+
+    const GeometryType& getType() const;
+
+protected:
+
+    Geometry(GeometryType type) : m_type(type) {}
+
+    GeometryType m_type;
+};
 }
 
-void
-Scene::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-}
-
-void
-Scene::runModule()
-{
-    LOG(DEBUG) << m_name << " : running";
-}
-}
+#endif // ifndef imstkGeometry_h
