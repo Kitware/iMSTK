@@ -100,6 +100,7 @@ include(SetupUncrustifyConfig)
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
+add_subdirectory(Base/Utilities)
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/SimulationManager)

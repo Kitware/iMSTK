@@ -23,14 +23,16 @@
 
 #include <iostream>
 
+#include "g3log/g3log.hpp"
+
 namespace imstk {
 void
 Module::start()
 {
     if (m_status != ModuleStatus::INACTIVE)
     {
-        std::cerr << "Can not start " << m_name << std::endl
-                  << "Module already/still active." << std::endl;
+        LOG(WARNING) << "Can not start '" << m_name << "'.\n"
+                     << "Module already/still active.";
         return;
     }
 
@@ -63,8 +65,8 @@ Module::run()
 {
     if (m_status != ModuleStatus::PAUSED)
     {
-        std::cerr << "Can not run " << m_name << std::endl
-                  << "Module not paused." << std::endl;
+        LOG(WARNING) << "Can not run '" << m_name << "'.\n"
+                     << "Module not paused.";
         return;
     }
 
@@ -76,8 +78,8 @@ Module::pause()
 {
     if (m_status != ModuleStatus::RUNNING)
     {
-        std::cerr << "Can not pause " << m_name << std::endl
-                  << "Module not running." << std::endl;
+        LOG(WARNING) << "Can not pause '" << m_name << "'.\n"
+                     << "Module not running.";
         return;
     }
 
@@ -92,8 +94,8 @@ Module::end()
     if ((m_status == ModuleStatus::INACTIVE) ||
         (m_status == ModuleStatus::TERMINATING))
     {
-        std::cerr << "Can not end " << m_name << std::endl
-                  << "Module alreading inactive or terminating." << std::endl;
+        LOG(WARNING) << "Can not end '" << m_name << "'.\n"
+                     << "Module alreading inactive or terminating.";
         return;
     }
 

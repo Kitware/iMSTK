@@ -23,6 +23,8 @@
 
 #include <string>
 
+#include "g3log/g3log.hpp"
+
 namespace imstk {
 const
 SimulationStatus& SimulationManager::getStatus() const
@@ -41,8 +43,8 @@ SimulationManager::getScene(std::string sceneName)
 {
     if (!this->isSceneRegistered(sceneName))
     {
-        std::cerr << "No scene named '" << sceneName
-                  << "' was registered in this simulation." << std::endl;
+        LOG(WARNING) << "No scene named '" << sceneName
+                     << "' was registered in this simulation.";
         return nullptr;
     }
 
@@ -54,14 +56,14 @@ SimulationManager::createNewScene(std::string newSceneName)
 {
     if (this->isSceneRegistered(newSceneName))
     {
-        std::cerr << "Can not create new scene: '" << newSceneName
-                  << "' is already registered in this simulation." << std::endl
-                  << "You can create a new scene using an unique name." << std::endl;
+        LOG(WARNING) << "Can not create new scene: '" << newSceneName
+                     << "' is already registered in this simulation.\n"
+                     << "You can create a new scene using an unique name.";
         return nullptr;
     }
 
     m_sceneMap[newSceneName] = std::make_shared<Scene>(newSceneName);
-    std::cout << "New scene added: " << newSceneName << std::endl;
+    LOG(INFO) << "New scene added: " << newSceneName;
     return m_sceneMap.at(newSceneName);
 }
 
@@ -81,14 +83,14 @@ SimulationManager::addScene(std::shared_ptr<Scene>newScene)
 
     if (this->isSceneRegistered(newSceneName))
     {
-        std::cerr << "Can not add scene: '" << newSceneName
-                  << "' is already registered in this simulation." << std::endl
-                  << "Set this scene name to a unique name first." << std::endl;
+        LOG(WARNING) << "Can not add scene: '" << newSceneName
+                     << "' is already registered in this simulation.\n"
+                     << "Set this scene name to a unique name first.";
         return;
     }
 
     m_sceneMap[newSceneName] = newScene;
-    std::cout << "Scene added: " << newSceneName << std::endl;
+    LOG(INFO) << "Scene added: " << newSceneName;
 }
 
 void
@@ -96,23 +98,23 @@ SimulationManager::removeScene(std::string sceneName)
 {
     if (!this->isSceneRegistered(sceneName))
     {
-        std::cerr << "No scene named '" << sceneName
-                  << "' was registered in this simulation." << std::endl;
+        LOG(WARNING) << "No scene named '" << sceneName
+                     << "' was registered in this simulation.";
         return;
     }
 
     m_sceneMap.erase(sceneName);
-    std::cout << "Scene removed: " << sceneName << std::endl;
+    LOG(INFO) << "Scene removed: " << sceneName;
 }
 
 void
 SimulationManager::startSimulation(std::string sceneName)
 {
-    std::cout << "Starting simulation." << std::endl;
+    LOG(INFO) << "Starting simulation.";
 
     if (m_status != SimulationStatus::INACTIVE)
     {
-        std::cerr << "Simulation already active." << std::endl;
+        LOG(WARNING) << "Simulation already active.";
         return;
     }
 
@@ -120,14 +122,14 @@ SimulationManager::startSimulation(std::string sceneName)
 
     if (!startingScene)
     {
-        std::cerr << "Simulation canceled." << std::endl;
+        LOG(WARNING) << "Simulation canceled.";
         return;
     }
 
     if (startingScene->getStatus() != ModuleStatus::INACTIVE)
     {
-        std::cerr << "Scene '" << sceneName << "' is already active." << std::endl
-                  << "Simulation canceled." << std::endl;
+        LOG(WARNING) << "Scene '" << sceneName << "' is already active.\n"
+                     << "Simulation canceled.";
         return;
     }
 
@@ -142,18 +144,18 @@ SimulationManager::startSimulation(std::string sceneName)
 void
 SimulationManager::switchScene(std::string newSceneName, bool unloadCurrentScene)
 {
-    std::cout << "Switching scene." << std::endl;
+    LOG(INFO) << "Switching scene.";
 
     if ((m_status != SimulationStatus::RUNNING) &&
         (m_status != SimulationStatus::PAUSED))
     {
-        std::cerr << "Simulation not active, can not switch scenes." << std::endl;
+        LOG(WARNING) << "Simulation not active, can not switch scenes.";
         return;
     }
 
     if (newSceneName == m_currentSceneName)
     {
-        std::cerr << "Scene '" << newSceneName << "' is already running." << std::endl;
+        LOG(WARNING) << "Scene '" << newSceneName << "' is already running.";
         return;
     }
 
@@ -161,14 +163,14 @@ SimulationManager::switchScene(std::string newSceneName, bool unloadCurrentScene
 
     if (!newScene)
     {
-        std::cerr << "Can not switch scenes." << std::endl;
+        LOG(WARNING) << "Can not switch scenes.";
         return;
     }
 
     if (unloadCurrentScene)
     {
         // Stop current scene
-        std::cout << "Unloading '" << m_currentSceneName << "'." << std::endl;
+        LOG(INFO) << "Unloading '" << m_currentSceneName << "'.";
         m_sceneMap.at(m_currentSceneName)->end();
         m_threadMap.at(m_currentSceneName).join();
     }
@@ -194,11 +196,11 @@ SimulationManager::switchScene(std::string newSceneName, bool unloadCurrentScene
 void
 SimulationManager::runSimulation()
 {
-    std::cout << "Running simulation." << std::endl;
+    LOG(INFO) << "Running simulation.";
 
     if (m_status != SimulationStatus::PAUSED)
     {
-        std::cerr << "Simulation not paused, can not run." << std::endl;
+        LOG(WARNING) << "Simulation not paused, can not run.";
         return;
     }
 
@@ -210,11 +212,11 @@ SimulationManager::runSimulation()
 void
 SimulationManager::pauseSimulation()
 {
-    std::cout << "Pausing simulation." << std::endl;
+    LOG(INFO) << "Pausing simulation.";
 
     if (m_status != SimulationStatus::RUNNING)
     {
-        std::cerr << "Simulation not running, can not pause." << std::endl;
+        LOG(WARNING) << "Simulation not running, can not pause.";
         return;
     }
 
@@ -228,12 +230,12 @@ SimulationManager::pauseSimulation()
 void
 SimulationManager::endSimulation()
 {
-    std::cout << "Ending simulation." << std::endl;
+    LOG(INFO) << "Ending simulation.";
 
     if ((m_status != SimulationStatus::RUNNING) &&
         (m_status != SimulationStatus::PAUSED))
     {
-        std::cerr << "Simulation already terminated." << std::endl;
+        LOG(WARNING) << "Simulation already terminated.";
         return;
     }
 

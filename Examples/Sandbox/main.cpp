@@ -15,7 +15,7 @@ int main()
     std::shared_ptr<imstk::SimulationManager> sdk =
         std::make_shared<imstk::SimulationManager>();
 
-    std::cout << "-- Test add scenes" << std::endl;
+    LOG(INFO) << "-- Test add scenes";
 
     // Create scene and add it (scene1)
     std::shared_ptr<imstk::Scene> scene1 =
@@ -36,7 +36,7 @@ int main()
     sdk->removeScene("Scene_3");
 
     // Test switch
-    std::cout << "-- Test scene switch" << std::endl;
+    LOG(INFO) << "-- Test scene switch";
     sdk->startSimulation("scene1");
     std::this_thread::sleep_for(std::chrono::seconds(2));
     sdk->switchScene("scene2", false);
@@ -46,7 +46,7 @@ int main()
     sdk->endSimulation();
 
     // Test pause/run
-    std::cout << "-- Test simulation pause/run" << std::endl;
+    LOG(INFO) << "-- Test simulation pause/run";
     sdk->startSimulation("scene2");
     std::this_thread::sleep_for(std::chrono::seconds(2));
     sdk->pauseSimulation();

@@ -25,8 +25,10 @@
 #include <map>
 #include <vector>
 #include <thread>
+#include <memory>
 
-#include <imstkScene.h>
+#include "imstkScene.h"
+#include "imstkLogUtility.h"
 
 namespace imstk {
 using SimulationStatus = ModuleStatus;
@@ -35,7 +37,12 @@ class SimulationManager
 {
 public:
 
-    SimulationManager()  = default;
+    SimulationManager()
+    {
+        // Init g3logger
+        m_logUtil->createLogger("simulation", "./");
+    }
+
     ~SimulationManager() = default;
 
     const SimulationStatus& getStatus() const;
@@ -60,10 +67,13 @@ private:
 
     void startModuleInNewThread(std::shared_ptr<Module>module);
 
+    SimulationStatus m_status = SimulationStatus::INACTIVE;
+
     std::string m_currentSceneName;
     std::map<std::string, std::shared_ptr<Scene> > m_sceneMap;
     std::map<std::string, std::thread> m_threadMap;
-    SimulationStatus m_status = SimulationStatus::INACTIVE;
+
+    std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 }
 

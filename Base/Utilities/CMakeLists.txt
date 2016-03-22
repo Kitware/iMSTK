@@ -2,16 +2,13 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SimulationManager
+imstk_add_library( Utilities
   H_FILES
-    imstkSimulationManager.h
-  CPP_FILES
-    imstkSimulationManager.cpp
+    imstkLogUtility.h
   LIBRARIES
-    Scene
-    Utilities
+   g3log
   )
-  
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

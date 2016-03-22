@@ -23,19 +23,21 @@
 
 #include <thread>
 
+#include "g3log/g3log.hpp"
+
 namespace imstk {
 void Scene::initModule()
 {
-    std::cout << m_name << " : init" << std::endl;
+    LOG(DEBUG) << m_name << " : init";
 }
 
 void Scene::cleanUpModule()
 {
-    std::cout << m_name << " : cleanUp" << std::endl;
+    LOG(DEBUG) << m_name << " : cleanUp";
 }
 
 void Scene::runModule()
 {
-    std::cout << m_name << " : running" << std::endl;
+    LOG(DEBUG) << m_name << " : running";
 }
 }
