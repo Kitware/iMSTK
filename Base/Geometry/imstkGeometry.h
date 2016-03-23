@@ -41,22 +41,42 @@ public:
 
     ~Geometry() = default;
 
-    virtual void        translate(const Vec3d& t) = 0;
-    virtual void        translate(const double& x,
-                                  const double& y,
-                                  const double& z) = 0;
-    virtual void        rotate(const Quatd& r)     = 0;
-    virtual void        rotate(const Vec3d & axis,
-                               const double& angle) = 0;
-    virtual void        rotate(const Mat3d& r)      = 0;
+    void         translate(const Vec3d& t);
+    void         translate(const double& x,
+                           const double& y,
+                           const double& z);
+    void         rotate(const Quatd& r);
+    void         rotate(const Mat3d& r);
+    void         rotate(const Vec3d & axis,
+                        const double& angle);
+
+    const Vec3d& getPosition() const;
+    void         setPosition(const Vec3d& position);
+    void         setPosition(const double& x,
+                             const double& y,
+                             const double& z);
+
+    const Quatd       & getOrientation() const;
+    void                setOrientation(const Quatd& orientation);
+    void                setOrientation(const Mat3d& orientation);
+    void                setOrientation(const Vec3d & axis,
+                                       const double& angle);
 
     const GeometryType& getType() const;
 
 protected:
 
-    Geometry(GeometryType type) : m_type(type) {}
+    Geometry(GeometryType type,
+             const Vec3d& position = Vec3d(),
+             const Quatd& orientation = Quatd()) :
+        m_type(type),
+        m_position(position),
+        m_orientation(orientation)
+    {}
 
     GeometryType m_type;
+    Vec3d m_position;
+    Quatd m_orientation;
 };
 }
 

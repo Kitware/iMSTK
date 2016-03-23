@@ -22,18 +22,18 @@
 #ifndef imstkSphere_h
 #define imstkSphere_h
 
-#include "imstkAnalyticalGeometry.h"
+#include "imstkGeometry.h"
 
 namespace imstk {
-class Sphere : public AnalyticalGeometry
+class Sphere : public Geometry
 {
 public:
 
     Sphere(const Vec3d & position = ORIGIN,
            const double& radius = 10) :
-        AnalyticalGeometry(GeometryType::Sphere,
-                           position,
-                           Quatd()),
+        Geometry(GeometryType::Sphere,
+                 position,
+                 Quatd()),
         m_radius(radius)
     {}
 

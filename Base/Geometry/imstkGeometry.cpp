@@ -22,6 +22,82 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+void
+Geometry::translate(const Vec3d& t)
+{
+    m_position += t;
+}
+
+void
+Geometry::translate(const double& x,
+                    const double& y,
+                    const double& z)
+{
+    this->translate(Vec3d(x, y, z));
+}
+
+void
+Geometry::rotate(const Quatd& r)
+{
+    m_orientation = r * m_orientation;
+}
+
+void
+Geometry::rotate(const Mat3d& r)
+{
+    this->rotate(Quatd(r));
+}
+
+void
+Geometry::rotate(const Vec3d& axis, const double& angle)
+{
+    this->rotate(Quatd(Eigen::AngleAxisd(angle, axis)));
+}
+
+const Vec3d&
+Geometry::getPosition() const
+{
+    return m_position;
+}
+
+void
+Geometry::setPosition(const Vec3d& position)
+{
+    m_position = position;
+}
+
+void
+Geometry::setPosition(const double& x,
+                      const double& y,
+                      const double& z)
+{
+    this->setPosition(Vec3d(x, y, z));
+}
+
+const Quatd&
+Geometry::getOrientation() const
+{
+    return m_orientation;
+}
+
+void
+Geometry::setOrientation(const Quatd& orientation)
+{
+    m_orientation = orientation;
+}
+
+void
+Geometry::setOrientation(const Mat3d& orientation)
+{
+    this->setOrientation(Quatd(orientation));
+}
+
+void
+Geometry::setOrientation(const Vec3d& axis, const double& angle)
+{
+    this->setOrientation(Quatd(Eigen::AngleAxisd(angle, axis)));
+}
+
 const GeometryType&
 Geometry::getType() const
 {

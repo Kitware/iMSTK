@@ -22,18 +22,18 @@
 #ifndef imstkCube_h
 #define imstkCube_h
 
-#include "imstkAnalyticalGeometry.h"
+#include "imstkGeometry.h"
 
 namespace imstk {
-class Cube : public AnalyticalGeometry
+class Cube : public Geometry
 {
 public:
 
     Cube(const Vec3d & position = ORIGIN,
          const double& width = 10) :
-        AnalyticalGeometry(GeometryType::Cube,
-                           position,
-                           Quatd()),
+        Geometry(GeometryType::Cube,
+                 position,
+                 Quatd()),
         m_width(width)
     {}
 

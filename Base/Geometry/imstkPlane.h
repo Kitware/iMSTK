@@ -22,19 +22,19 @@
 #ifndef imstkPlane_h
 #define imstkPlane_h
 
-#include "imstkAnalyticalGeometry.h"
+#include "imstkGeometry.h"
 
 namespace imstk {
-class Plane : public AnalyticalGeometry
+class Plane : public Geometry
 {
 public:
 
     Plane(const Vec3d & position = ORIGIN,
           const Vec3d & normal = UP,
           const double& width = 100) :
-        AnalyticalGeometry(GeometryType::Plane,
-                           position,
-                           Quatd::FromTwoVectors(UP, normal)),
+        Geometry(GeometryType::Plane,
+                 position,
+                 Quatd::FromTwoVectors(UP, normal)),
         m_width(width)
     {}
 
