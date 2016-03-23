@@ -54,6 +54,12 @@ Geometry::rotate(const Vec3d& axis, const double& angle)
     this->rotate(Quatd(Eigen::AngleAxisd(angle, axis)));
 }
 
+void
+Geometry::scale(const double& scaling)
+{
+    m_scaling *= scaling;
+}
+
 const Vec3d&
 Geometry::getPosition() const
 {
@@ -96,6 +102,18 @@ void
 Geometry::setOrientation(const Vec3d& axis, const double& angle)
 {
     this->setOrientation(Quatd(Eigen::AngleAxisd(angle, axis)));
+}
+
+const double&
+Geometry::getScaling() const
+{
+    return m_scaling;
+}
+
+void
+Geometry::setScaling(const double& scaling)
+{
+    m_scaling = scaling;
 }
 
 const GeometryType&

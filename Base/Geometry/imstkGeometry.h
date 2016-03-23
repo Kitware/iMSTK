@@ -49,6 +49,7 @@ public:
     void         rotate(const Mat3d& r);
     void         rotate(const Vec3d & axis,
                         const double& angle);
+    void         scale(const double& scaling);
 
     const Vec3d& getPosition() const;
     void         setPosition(const Vec3d& position);
@@ -61,6 +62,9 @@ public:
     void                setOrientation(const Mat3d& orientation);
     void                setOrientation(const Vec3d & axis,
                                        const double& angle);
+
+    const double      & getScaling() const;
+    void                setScaling(const double& scaling);
 
     const GeometryType& getType() const;
 
@@ -75,8 +79,9 @@ protected:
     {}
 
     GeometryType m_type;
-    Vec3d m_position;
-    Quatd m_orientation;
+    Vec3d  m_position;
+    Quatd  m_orientation;
+    double m_scaling = 1;
 };
 }
 
