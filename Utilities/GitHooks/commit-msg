@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+
+#-----------------------------------------------------------------------------
+# Define egrep-q
+#-----------------------------------------------------------------------------
+egrep-q() {
+  egrep "$@" >/dev/null 2>/dev/null
+}
+
+#-----------------------------------------------------------------------------
+# Prepare a copy of the message:
+#-----------------------------------------------------------------------------
+# - strip comment lines
+# - stop at "diff --git" (git commit -v)
+commit_msg="$GIT_DIR/COMMIT_MSG"
+sed -n -e '/^#/d' -e '/^diff --git/q' -e 'p;d' "$1" > "$commit_msg"
+
+#-----------------------------------------------------------------------------
+# Define Error and Exit
+#-----------------------------------------------------------------------------
+advice='
+To continue editing, run the command
+  git commit -e -F '"$commit_msg"'
+(assuming your working directory is at the top).'
+
+printErrorAndExit() {
+  echo 'commit-msg hook failure' 1>&2
+  echo '-----------------------' 1>&2
+  echo '' 1>&2
+  echo "$@" 1>&2
+  test -n "$advice" && echo "$advice" 1>&2
+  exit 1
+}
+
+#-----------------------------------------------------------------------------
+# Merge message layout
+#-----------------------------------------------------------------------------
+msg_is_merge() {
+  echo "$line" | grep "^Merge " >/dev/null 2>&1
+}
+
+#-----------------------------------------------------------------------------
+# Revert message layout
+#-----------------------------------------------------------------------------
+msg_is_revert() {
+  echo "$line" | grep "^Revert " >/dev/null 2>&1
+}
+
+#-----------------------------------------------------------------------------
+# First line message layout
+#-----------------------------------------------------------------------------
+msg_first() {
+  len=$(echo -n "$line" | wc -c)
+  
+  # if empty line
+  if test $len -eq 0; then
+    return
+    
+  # if short line
+  elif test $len -lt 8; then
+    printErrorAndExit 'The first line must be at least 8 characters:
+--------
+'"$line"'
+--------'
+
+  # if long line
+  elif test $len -gt 50 && ! msg_is_merge && ! msg_is_revert; then
+    printErrorAndExit 'The first line may be at most 50 characters:
+--------------------------------------------------
+'"$line"'
+--------------------------------------------------'
+
+  # if trailing spaces
+  elif echo "$line" | grep "^[	 ]\|[	 ]$" >/dev/null 2>&1; then
+    printErrorAndExit 'The first line may not have leading or trailing space:
+['"$line"']'
+  fi
+  
+  # good line
+  firstLetters=$(echo "$line" | cut -c1-8)
+  if [ "${firstLetters:0:5}" == "BUG: " -o \
+    "${firstLetters:0:6}" == "COMP: " -o \
+    "${firstLetters:0:5}" == "DOC: " -o \
+    "${firstLetters:0:5}" == "ENH: " -o \
+    "${firstLetters:0:6}" == "PERF: " -o \
+    "${firstLetters:0:7}" == "STYLE: " -o \
+    "${firstLetters:0:5}" == "WIP: " ]; then
+    state=second
+  
+  # wrong first letters  
+  else
+  printErrorAndExit 'Git Commits to iMSTK require a standard prefix followed by a space.
+Valid commit types are as followed:
+  BUG:    - fix for runtime crash or incorrect result
+  COMP:   - compiler error or warning fix
+  DOC:    - documentation change
+  ENH:    - new functionality
+  PERF:   - performance improvement
+  STYLE:  - no logic impact (indentation, comments)
+  WIP:    - Work In Progress not ready for merge
+'
+  fi
+}
+
+#-----------------------------------------------------------------------------
+# Second line message layout
+#-----------------------------------------------------------------------------
+msg_second() {
+  if test "x$line" != "x"; then
+    printErrorAndExit 'The second line must be empty:
+'"$line"
+  else
+    state=rest
+  fi
+}
+
+#-----------------------------------------------------------------------------
+# Check the commit message layout with a simple state machine
+#-----------------------------------------------------------------------------
+state=first
+cat "$commit_msg" |
+while IFS='' read line; do
+  msg_$state || break
+done &&
+rm -f "$commit_msg" || exit 1
+
+advice='' # No more temporary message file.
