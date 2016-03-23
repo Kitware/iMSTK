@@ -2,6 +2,7 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <iomanip>
 
 #include "imstkSimulationManager.h"
 #include "imstkPlane.h"
@@ -13,12 +14,12 @@ int main()
               << "****************" << std::endl;
 
     // Geometry
+    std::cout << std::fixed << std::setprecision(2);
+
     // - Plane
     std::cout << "-- Plane : Init" << std::endl;
-    auto pos  = imstk::Vec3d(5, 2, 5);
-    auto norm = imstk::LEFT;
-
-    norm.normalize();
+    auto pos   = imstk::Vec3d(5, 2, 5);
+    auto norm  = imstk::Vec3d(0, 1, 1);
     auto width = 10;
     std::cout << "p = " << pos << std::endl;
     std::cout << "n = " << norm << std::endl;
@@ -30,13 +31,20 @@ int main()
     std::cout << "n = " << plane->getNormal() << std::endl;
     std::cout << "w = " << plane->getWidth() << std::endl;
 
+    std::cout << "-- Plane : Set Position" << std::endl;
+    plane->setPosition(imstk::Vec3d(1, 1, 1));
+    std::cout << "p = " << plane->getPosition() << std::endl;
+
     std::cout << "-- Plane : Translate" << std::endl;
     plane->translate(imstk::Vec3d(2, 1, -3));
     std::cout << "p = " << plane->getPosition() << std::endl;
 
+    std::cout << "-- Plane : Set Normal" << std::endl;
+    plane->setNormal(imstk::FORWARD);
+    std::cout << "n = " << plane->getNormal() << std::endl;
+
     std::cout << "-- Plane : Rotate" << std::endl;
-    plane->rotate(imstk::UP, 0.25);
-    std::cout << "p = " << plane->getPosition() << std::endl;
+    plane->rotate(imstk::UP, M_PI / 2);
     std::cout << "n = " << plane->getNormal() << std::endl;
 
     /*

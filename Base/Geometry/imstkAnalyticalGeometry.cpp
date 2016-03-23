@@ -31,7 +31,7 @@ AnalyticalGeometry::translate(const Vec3d& t)
 void
 AnalyticalGeometry::rotate(const Quatd& r)
 {
-    m_orientation *= r;
+    m_orientation = r * m_orientation;
 }
 
 void
