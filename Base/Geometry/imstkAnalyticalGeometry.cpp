@@ -29,9 +29,23 @@ AnalyticalGeometry::translate(const Vec3d& t)
 }
 
 void
+AnalyticalGeometry::translate(const double& x,
+                              const double& y,
+                              const double& z)
+{
+    this->translate(Vec3d(x, y, z));
+}
+
+void
 AnalyticalGeometry::rotate(const Quatd& r)
 {
     m_orientation = r * m_orientation;
+}
+
+void
+AnalyticalGeometry::rotate(const Mat3d& r)
+{
+    this->rotate(Quatd(r));
 }
 
 void
@@ -53,14 +67,34 @@ AnalyticalGeometry::setPosition(const Vec3d& position)
 }
 
 void
-AnalyticalGeometry::setOrientation(const Quatd& orientation)
+AnalyticalGeometry::setPosition(const double& x,
+                                const double& y,
+                                const double& z)
 {
-    m_orientation = orientation;
+    this->setPosition(Vec3d(x, y, z));
 }
 
 const Quatd&
 AnalyticalGeometry::getOrientation() const
 {
     return m_orientation;
+}
+
+void
+AnalyticalGeometry::setOrientation(const Quatd& orientation)
+{
+    m_orientation = orientation;
+}
+
+void
+AnalyticalGeometry::setOrientation(const Mat3d& orientation)
+{
+    this->setOrientation(Quatd(orientation));
+}
+
+void
+AnalyticalGeometry::setOrientation(const Vec3d& axis, const double& angle)
+{
+    this->setOrientation(Quatd(Eigen::AngleAxisd(angle, axis)));
 }
 }

@@ -32,15 +32,25 @@ public:
     ~AnalyticalGeometry() = default;
 
     void         translate(const Vec3d& t) override;
+    void         translate(const double& x,
+                           const double& y,
+                           const double& z) override;
     void         rotate(const Quatd& r) override;
+    void         rotate(const Mat3d& r) override;
     void         rotate(const Vec3d & axis,
                         const double& angle) override;
 
     const Vec3d& getPosition() const;
     void         setPosition(const Vec3d& position);
+    void         setPosition(const double& x,
+                             const double& y,
+                             const double& z);
 
     const Quatd& getOrientation() const;
     void         setOrientation(const Quatd& orientation);
+    void         setOrientation(const Mat3d& orientation);
+    void         setOrientation(const Vec3d & axis,
+                                const double& angle);
 
 protected:
 

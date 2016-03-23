@@ -29,7 +29,7 @@ class Plane : public AnalyticalGeometry
 {
 public:
 
-    Plane(const Vec3d & position = Vec3d(),
+    Plane(const Vec3d & position = ORIGIN,
           const Vec3d & normal = UP,
           const double& width = 100) :
         AnalyticalGeometry(GeometryType::Plane,
@@ -40,7 +40,7 @@ public:
 
     ~Plane() = default;
 
-    Vec3d         getNormal();
+    Vec3d         getNormal() const;
     void          setNormal(const Vec3d& normal);
 
     const double& getWidth() const;

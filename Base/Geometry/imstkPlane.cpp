@@ -23,7 +23,7 @@
 
 namespace imstk {
 Vec3d
-Plane::getNormal()
+Plane::getNormal() const
 {
     return m_orientation._transformVector(UP);
 }

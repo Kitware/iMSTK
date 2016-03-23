@@ -43,12 +43,17 @@ using VecNd = Eigen::VectorXd;
 using Quatf = Eigen::Quaternionf;
 using Quatd = Eigen::Quaterniond;
 
+// 3x3 Matrix
+using Mat3f = Eigen::Matrix<float, 3, 3>;
+using Mat3d = Eigen::Matrix<double, 3, 3>;
+
 #define UP Vec3d(0.0, 1.0, 0.0)
 #define DOWN Vec3d(0, -1, 0)
 #define RIGHT Vec3d(1, 0, 0)
 #define LEFT Vec3d(-1, 0, 0)
 #define FORWARD Vec3d(0, 0, 1)
 #define BACKWARD Vec3d(0, 0, -1)
+#define ORIGIN Vec3d(0, 0, 0)
 }
 
 #endif // ifndef imstkMath_h

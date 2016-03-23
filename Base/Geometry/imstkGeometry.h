@@ -42,9 +42,13 @@ public:
     ~Geometry() = default;
 
     virtual void        translate(const Vec3d& t) = 0;
-    virtual void        rotate(const Quatd& r)    = 0;
+    virtual void        translate(const double& x,
+                                  const double& y,
+                                  const double& z) = 0;
+    virtual void        rotate(const Quatd& r)     = 0;
     virtual void        rotate(const Vec3d & axis,
                                const double& angle) = 0;
+    virtual void        rotate(const Mat3d& r)      = 0;
 
     const GeometryType& getType() const;
 
