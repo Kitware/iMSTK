@@ -33,7 +33,7 @@ public:
            const double& radius = 10) :
         Geometry(GeometryType::Sphere,
                  position,
-                 Quatd()),
+                 Quatd::Identity()),
         m_radius(radius)
     {}
 

@@ -33,7 +33,7 @@ public:
          const double& width = 10) :
         Geometry(GeometryType::Cube,
                  position,
-                 Quatd()),
+                 Quatd::Identity()),
         m_width(width)
     {}
 

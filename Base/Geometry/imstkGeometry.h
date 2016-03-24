@@ -71,8 +71,8 @@ public:
 protected:
 
     Geometry(GeometryType type,
-             const Vec3d& position = Vec3d(),
-             const Quatd& orientation = Quatd()) :
+             const Vec3d& position = ORIGIN,
+             const Quatd& orientation = Quatd::Identity()) :
         m_type(type),
         m_position(position),
         m_orientation(orientation)
