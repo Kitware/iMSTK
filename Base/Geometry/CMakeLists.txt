@@ -25,6 +25,7 @@ imstk_add_library( Geometry
     imstkHexahedralMesh.cpp
   LIBRARIES
     Core
+    VegaFEM::volumetricMesh
   )
 
 #-----------------------------------------------------------------------------

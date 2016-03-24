@@ -75,6 +75,11 @@ list(APPEND ${PROJECT_NAME}_DEPENDENCIES Eigen)
 option(USE_SYSTEM_Eigen "Exclude Eigen from superbuild and use an existing build." OFF)
 mark_as_advanced(USE_SYSTEM_Eigen)
 
+# VegaFEM
+list(APPEND ${PROJECT_NAME}_DEPENDENCIES VegaFEM)
+option(USE_SYSTEM_VegaFEM "Exclude VegaFEM from superbuild and use an existing build." OFF)
+mark_as_advanced(USE_SYSTEM_VegaFEM)
+
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
@@ -105,6 +110,9 @@ include(SetupUncrustifyConfig)
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
+
+# VegaFEM
+find_package( VegaFEM REQUIRED CONFIG)
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories

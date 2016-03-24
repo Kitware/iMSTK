@@ -2,7 +2,7 @@ macro(imstk_add_external_project extProj)
 
   set(options VERBOSE)
   set(oneValueArgs REPOSITORY GIT_TAG)
-  set(multiValueArgs DEPENDENCIES)
+  set(multiValueArgs CMAKE_ARGS DEPENDENCIES)
   include(CMakeParseArguments)
   cmake_parse_arguments(${extProj} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -45,6 +45,8 @@ macro(imstk_add_external_project extProj)
     set(${extProj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/src)
     set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/cmake)
     set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build-${CMAKE_BUILD_TYPE})
+    set(${extProj}_INCLUDE_PATH ${${extProj}_DIR}/include)
+    set(${extProj}_LIBRARY_PATH ${${extProj}_DIR}/library)
 
     #-----------------------------------------------------------------------------
     # Add project
@@ -61,6 +63,9 @@ macro(imstk_add_external_project extProj)
       CMAKE_ARGS
         ${CMAKE_CONFIG_ARGS}
         ${CMAKE_CONFIG_OSX_ARGS}
+        ${${extProj}_CMAKE_ARGS}
+        -DCMAKE_INCLUDE_PATH:STRING=${${extProj}_INCLUDE_PATH}
+        -DCMAKE_LIBRARY_PATH:STRING=${${extProj}_LIBRARY_PATH}
         #-DBUILD_SHARED_LIBS:BOOL=${shared}
         #-DBUILD_EXAMPLES:BOOL=OFF
         #-DBUILD_TESTING:BOOL=OFF
