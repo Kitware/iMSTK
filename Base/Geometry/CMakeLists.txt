@@ -8,11 +8,15 @@ imstk_add_library( Geometry
     imstkPlane.h
     imstkSphere.h
     imstkCube.h
+    imstkMesh.h
+    imstkSurfaceMesh.h
   CPP_FILES
     imstkGeometry.cpp
     imstkPlane.cpp
     imstkSphere.cpp
     imstkCube.cpp
+    imstkMesh.cpp
+    imstkSurfaceMesh.cpp
   LIBRARIES
     Core
   )

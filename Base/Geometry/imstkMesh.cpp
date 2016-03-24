@@ -19,45 +19,42 @@
 
    =========================================================================*/
 
-#ifndef imstkMath_h
-#define imstkMath_h
-
-#include <vector>
-
-#include <Eigen/Geometry>
+#include "imstkMesh.h"
 
 namespace imstk {
-// 2D vector
-using Vec2f = Eigen::Vector2f;
-using Vec2d = Eigen::Vector2d;
-
-// 3D vector
-using Vec3f = Eigen::Vector3f;
-using Vec3d = Eigen::Vector3d;
-
-// 4D vector
-using Vec4f = Eigen::Vector4f;
-using Vec4d = Eigen::Vector4d;
-
-// Dynamic size vector
-using VecNf = Eigen::VectorXf;
-using VecNd = Eigen::VectorXd;
-
-// Quaternion
-using Quatf = Eigen::Quaternionf;
-using Quatd = Eigen::Quaterniond;
-
-// 3x3 Matrix
-using Mat3f = Eigen::Matrix<float, 3, 3>;
-using Mat3d = Eigen::Matrix<double, 3, 3>;
-
-#define UP Vec3d(0.0, 1.0, 0.0)
-#define DOWN Vec3d(0, -1, 0)
-#define RIGHT Vec3d(1, 0, 0)
-#define LEFT Vec3d(-1, 0, 0)
-#define FORWARD Vec3d(0, 0, 1)
-#define BACKWARD Vec3d(0, 0, -1)
-#define ORIGIN Vec3d::Zero()
+const std::vector<Vec3d>&
+Mesh::getInitialVertexPositions() const
+{
+    return m_initialVertexPositions;
 }
 
-#endif // ifndef imstkMath_h
+void
+Mesh::setInitialVertexPositions(const std::vector<Vec3d>& vertices)
+{
+    m_initialVertexPositions = vertices;
+}
+
+const std::vector<Vec3d>&
+Mesh::getVertexPositions() const
+{
+    return m_vertexPositions;
+}
+
+void
+Mesh::setVertexPositions(const std::vector<Vec3d>& vertices)
+{
+    m_vertexPositions = vertices;
+}
+
+const std::vector<Vec3d>&
+Mesh::getVertexDeformations() const
+{
+    return m_vertexDeformations;
+}
+
+void
+Mesh::setVertexDeformations(const std::vector<Vec3d>& diff)
+{
+    m_vertexDeformations = diff;
+}
+}
