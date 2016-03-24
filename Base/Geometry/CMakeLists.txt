@@ -10,6 +10,9 @@ imstk_add_library( Geometry
     imstkCube.h
     imstkMesh.h
     imstkSurfaceMesh.h
+    imstkVolumetricMesh.h
+    imstkTetrahedralMesh.h
+    imstkHexahedralMesh.h
   CPP_FILES
     imstkGeometry.cpp
     imstkPlane.cpp
@@ -17,6 +20,9 @@ imstk_add_library( Geometry
     imstkCube.cpp
     imstkMesh.cpp
     imstkSurfaceMesh.cpp
+    imstkVolumetricMesh.cpp
+    imstkTetrahedralMesh.cpp
+    imstkHexahedralMesh.cpp
   LIBRARIES
     Core
   )
