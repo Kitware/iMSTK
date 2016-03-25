@@ -37,8 +37,8 @@ public:
     const std::vector<Vec3d>& getVertexPositions() const;
     void                      setVertexPositions(const std::vector<Vec3d>& vertices);
 
-    const std::vector<Vec3d>& getVertexDeformations() const;
-    void                      setVertexDeformations(const std::vector<Vec3d>& diff);
+    const std::vector<Vec3d>& getVertexDisplacements() const;
+    void                      setVertexDisplacements(const std::vector<Vec3d>& diff);
 
 protected:
 
@@ -46,11 +46,11 @@ protected:
 
     //   Orientation * Scaling * initialVertexPositions
     // + Position
-    // + vertexDeformations
+    // + vertexDisplacements
     // = vertexPositions
     std::vector<Vec3d> m_initialVertexPositions;
     std::vector<Vec3d> m_vertexPositions;
-    std::vector<Vec3d> m_vertexDeformations;
+    std::vector<Vec3d> m_vertexDisplacements;
 };
 }
 

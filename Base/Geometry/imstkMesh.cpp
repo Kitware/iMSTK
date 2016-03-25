@@ -47,14 +47,14 @@ Mesh::setVertexPositions(const std::vector<Vec3d>& vertices)
 }
 
 const std::vector<Vec3d>&
-Mesh::getVertexDeformations() const
+Mesh::getVertexDisplacements() const
 {
-    return m_vertexDeformations;
+    return m_vertexDisplacements;
 }
 
 void
-Mesh::setVertexDeformations(const std::vector<Vec3d>& diff)
+Mesh::setVertexDisplacements(const std::vector<Vec3d>& diff)
 {
-    m_vertexDeformations = diff;
+    m_vertexDisplacements = diff;
 }
 }
