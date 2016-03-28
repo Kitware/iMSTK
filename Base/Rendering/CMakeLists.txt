@@ -2,17 +2,17 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SimulationManager
+imstk_add_library( Rendering
   H_FILES
-    imstkSimulationManager.h
+    imstkViewer.h
   CPP_FILES
-    imstkSimulationManager.cpp
+    imstkViewer.cpp
   LIBRARIES
+    ${VTK_LIBRARIES}
+    Core
     Scene
-    Rendering
-    Utilities
   )
-  
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 #include <memory>
 
 #include "imstkScene.h"
+#include "imstkViewer.h"
 #include "imstkLogUtility.h"
 
 namespace imstk {
@@ -55,6 +56,9 @@ public:
     void                    addScene(std::shared_ptr<Scene>newScene);
     void                    removeScene(std::string sceneName);
 
+    // Viewer
+    std::shared_ptr<Viewer> getViewer() const;
+
     // Simulation
     void                    startSimulation(std::string sceneName);
     void                    switchScene(std::string newSceneName,
@@ -72,6 +76,8 @@ private:
     std::string m_currentSceneName;
     std::unordered_map<std::string, std::shared_ptr<Scene> > m_sceneMap;
     std::unordered_map<std::string, std::thread> m_threadMap;
+
+    std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>();
 
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };

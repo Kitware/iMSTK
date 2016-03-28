@@ -107,6 +107,12 @@ SimulationManager::removeScene(std::string sceneName)
     LOG(INFO) << "Scene removed: " << sceneName;
 }
 
+std::shared_ptr<Viewer>
+SimulationManager::getViewer() const
+{
+    return m_viewer;
+}
+
 void
 SimulationManager::startSimulation(std::string sceneName)
 {
@@ -132,6 +138,10 @@ SimulationManager::startSimulation(std::string sceneName)
                      << "Simulation canceled.";
         return;
     }
+
+    // Start viewer
+    m_viewer->setCurrentScene(startingScene);
+    this->startModuleInNewThread(m_viewer);
 
     // Start scene
     this->startModuleInNewThread(startingScene);
@@ -166,6 +176,8 @@ SimulationManager::switchScene(std::string newSceneName, bool unloadCurrentScene
         LOG(WARNING) << "Can not switch scenes.";
         return;
     }
+
+    // TODO : update viewer
 
     if (unloadCurrentScene)
     {
@@ -204,8 +216,13 @@ SimulationManager::runSimulation()
         return;
     }
 
+    // Run viewer
+    m_viewer->run();
+
+    // Run scene
     m_sceneMap.at(m_currentSceneName)->run();
 
+    // Update simulation status
     m_status = SimulationStatus::RUNNING;
 }
 
@@ -219,6 +236,9 @@ SimulationManager::pauseSimulation()
         LOG(WARNING) << "Simulation not running, can not pause.";
         return;
     }
+
+    // Pause viewer
+    m_viewer->pause();
 
     // Pause scene
     m_sceneMap.at(m_currentSceneName)->pause();
@@ -238,6 +258,10 @@ SimulationManager::endSimulation()
         LOG(WARNING) << "Simulation already terminated.";
         return;
     }
+
+    // End viewer
+    m_viewer->end();
+    m_threadMap.at(m_viewer->getName()).join();
 
     // End all scenes
     for (auto pair : m_sceneMap)
