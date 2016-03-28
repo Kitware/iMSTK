@@ -60,25 +60,17 @@ endif()
 #-----------------------------------------------------------------------------
 # Define External dependencies
 #-----------------------------------------------------------------------------
-# g3log
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES g3log)
-option(USE_SYSTEM_g3log "Exclude g3log from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_g3log)
+macro(imstk_define_dependency extProj)
+  list(APPEND ${PROJECT_NAME}_DEPENDENCIES ${extProj})
+  option(USE_SYSTEM_${extProj} "Exclude ${extProj} from superbuild and use an existing build." OFF)
+  mark_as_advanced(USE_SYSTEM_${extProj})
+endmacro()
 
-# Uncrustify
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES Uncrustify)
-option(USE_SYSTEM_Uncrustify "Exclude Uncrustify from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_Uncrustify)
-
-# Eigen
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES Eigen)
-option(USE_SYSTEM_Eigen "Exclude Eigen from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_Eigen)
-
-# VegaFEM
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES VegaFEM)
-option(USE_SYSTEM_VegaFEM "Exclude VegaFEM from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_VegaFEM)
+imstk_define_dependency(g3log)
+imstk_define_dependency(Uncrustify)
+imstk_define_dependency(Eigen)
+imstk_define_dependency(VegaFEM)
+imstk_define_dependency(VTK)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -112,7 +104,11 @@ find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
 
 # VegaFEM
-find_package( VegaFEM REQUIRED CONFIG)
+find_package( VegaFEM REQUIRED CONFIG )
+
+# VTK
+find_package( VTK REQUIRED )
+include( ${VTK_USE_FILE} )
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories

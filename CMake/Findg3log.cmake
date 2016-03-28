@@ -9,7 +9,7 @@ find_path(g3log_INCLUDE_DIR
     ${g3log_SOURCE_DIR}/src
     )
 mark_as_advanced(g3log_INCLUDE_DIR)
-message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
+#message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -21,7 +21,7 @@ find_library(g3log_LIBRARY
     ${g3log_DIR}
   )
 mark_as_advanced(g3log_LIBRARY)
-message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
+#message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
 
 #-----------------------------------------------------------------------------
 # Find package

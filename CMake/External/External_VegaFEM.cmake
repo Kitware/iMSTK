@@ -11,5 +11,5 @@ imstk_add_external_project( VegaFEM
     -DVegaFEM_BUILD_MODEL_REDUCTION:BOOL=OFF
     -DVegaFEM_BUILD_UTILITIES:BOOL=ON
   DEPENDENCIES ""
-  VERBOSE
+  #VERBOSE
   )

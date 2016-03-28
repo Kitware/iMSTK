@@ -28,7 +28,7 @@ endmacro(_eigen_check_version)
 #-----------------------------------------------------------------------------
 set(Eigen_INCLUDE_DIR ${Eigen_SOURCE_DIR})
 mark_as_advanced(Eigen_INCLUDE_DIR)
-message(STATUS "Eigen_INCLUDE_DIR : ${Eigen_INCLUDE_DIR}")
+#message(STATUS "Eigen_INCLUDE_DIR : ${Eigen_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Macro checking version
