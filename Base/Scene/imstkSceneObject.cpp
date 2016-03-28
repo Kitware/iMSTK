@@ -19,36 +19,36 @@
 
    =========================================================================*/
 
-#ifndef imstkScene_h
-#define imstkScene_h
-
-#include <unordered_map>
-#include <memory>
-
-#include "imstkModule.h"
 #include "imstkSceneObject.h"
 
 namespace imstk {
-class Scene : public Module
+std::shared_ptr<Geometry>
+SceneObject::getVisualGeometry() const
 {
-public:
-
-    Scene(std::string name) : Module(name) {}
-
-    ~Scene() = default;
-
-    bool isObjectRegistered(std::string sceneObjectName) const;
-    void addSceneObject(std::shared_ptr<SceneObject>newSceneObject);
-    void removeSceneObject(std::string sceneObjectName);
-
-protected:
-
-    void initModule() override;
-    void runModule() override;
-    void cleanUpModule() override;
-
-    std::unordered_map<std::string, std::shared_ptr<SceneObject> > m_sceneObjectsMap;
-};
+    return m_visualGeometry;
 }
 
-#endif // ifndef imstkScene_h
+void
+SceneObject::setVisualGeometry(std::shared_ptr<Geometry>geometry)
+{
+    m_visualGeometry = geometry;
+}
+
+const SceneObjectType&
+SceneObject::getType() const
+{
+    return m_type;
+}
+
+const std::string&
+SceneObject::getName() const
+{
+    return m_name;
+}
+
+void
+SceneObject::setName(std::string name)
+{
+    m_name = name;
+}
+}

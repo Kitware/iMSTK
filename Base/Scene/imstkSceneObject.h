@@ -19,36 +19,49 @@
 
    =========================================================================*/
 
-#ifndef imstkScene_h
-#define imstkScene_h
+#ifndef imstkSceneObject_h
+#define imstkSceneObject_h
 
-#include <unordered_map>
 #include <memory>
 
-#include "imstkModule.h"
-#include "imstkSceneObject.h"
+#include "imstkGeometry.h"
 
 namespace imstk {
-class Scene : public Module
+enum class SceneObjectType
+{
+    Visual,
+    Static,
+    VirtualCoupled,
+    Rigid,
+    Deformable
+};
+
+class SceneObject
 {
 public:
 
-    Scene(std::string name) : Module(name) {}
+    SceneObject(std::string name) :
+        m_name(name)
+    {}
 
-    ~Scene() = default;
+    ~SceneObject() = default;
 
-    bool isObjectRegistered(std::string sceneObjectName) const;
-    void addSceneObject(std::shared_ptr<SceneObject>newSceneObject);
-    void removeSceneObject(std::string sceneObjectName);
+    const SceneObjectType  & getType() const;
+
+    const std::string      & getName() const;
+    void                     setName(std::string name);
+
+    std::shared_ptr<Geometry>getVisualGeometry() const;
+    void                     setVisualGeometry(std::shared_ptr<Geometry>geometry);
 
 protected:
 
-    void initModule() override;
-    void runModule() override;
-    void cleanUpModule() override;
-
-    std::unordered_map<std::string, std::shared_ptr<SceneObject> > m_sceneObjectsMap;
+    SceneObjectType m_type = SceneObjectType::Visual;
+    std::string     m_name;
+    std::shared_ptr<Geometry> m_visualGeometry;
 };
+
+using VisualObject = SceneObject;
 }
 
-#endif // ifndef imstkScene_h
+#endif // ifndef imstkSceneObject_h

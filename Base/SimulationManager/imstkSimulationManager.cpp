@@ -33,13 +33,13 @@ SimulationStatus& SimulationManager::getStatus() const
 }
 
 bool
-SimulationManager::isSceneRegistered(std::string sceneName)
+SimulationManager::isSceneRegistered(std::string sceneName) const
 {
-    return !(m_sceneMap.find(sceneName) == m_sceneMap.end());
+    return m_sceneMap.find(sceneName) != m_sceneMap.end();
 }
 
 std::shared_ptr<Scene>
-SimulationManager::getScene(std::string sceneName)
+SimulationManager::getScene(std::string sceneName) const
 {
     if (!this->isSceneRegistered(sceneName))
     {

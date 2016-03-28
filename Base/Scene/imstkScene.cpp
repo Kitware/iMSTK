@@ -21,11 +21,45 @@
 
 #include "imstkScene.h"
 
-#include <thread>
-
-#include "g3log/g3log.hpp"
+#include <g3log/g3log.hpp>
 
 namespace imstk {
+bool
+Scene::isObjectRegistered(std::string sceneObjectName) const
+{
+    return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
+}
+
+void
+Scene::addSceneObject(std::shared_ptr<SceneObject>newSceneObject)
+{
+    std::string newSceneObjectName = newSceneObject->getName();
+
+    if (this->isObjectRegistered(newSceneObjectName))
+    {
+        LOG(WARNING) << "Can not add object: '" << newSceneObjectName
+                     << "' is already registered in this scene.";
+        return;
+    }
+
+    m_sceneObjectsMap[newSceneObjectName] = newSceneObject;
+    LOG(INFO) << newSceneObjectName << " object added to " << m_name;
+}
+
+void
+Scene::removeSceneObject(std::string sceneObjectName)
+{
+    if (!this->isObjectRegistered(sceneObjectName))
+    {
+        LOG(WARNING) << "No object named '" << sceneObjectName
+                     << "' was registered in this scene.";
+        return;
+    }
+
+    m_sceneObjectsMap.erase(sceneObjectName);
+    LOG(INFO) << sceneObjectName << " object removed from " << m_name;
+}
+
 void
 Scene::initModule()
 {

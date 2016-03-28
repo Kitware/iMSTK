@@ -4,8 +4,9 @@
 #include <thread>
 #include <iomanip>
 
-#include "imstkSimulationManager.h"
+#include "imstkSceneObject.h"
 #include "imstkPlane.h"
+#include "imstkSimulationManager.h"
 
 int main()
 {
@@ -13,90 +14,102 @@ int main()
               << "Starting Sandbox" << std::endl
               << "****************" << std::endl;
 
-    // Geometry
-    std::cout << std::fixed << std::setprecision(2);
+    // --------------------------------------------
+    // VisualObject
+    // --------------------------------------------
+    auto sdk           = std::make_shared<imstk::SimulationManager>();
+    auto sceneTest     = sdk->createNewScene("SceneTest");
+    auto planeGeometry = std::make_shared<imstk::Plane>();
+    auto visualPlane   = std::make_shared<imstk::VisualObject>("VisualPlane");
 
-    // - Plane
-    std::cout << "-- Plane : Init" << std::endl;
-    auto pos   = imstk::Vec3d(5, 2, 5);
-    auto norm  = imstk::Vec3d(0, 1, 1);
-    auto width = 10;
-    std::cout << "p = " << pos << std::endl;
-    std::cout << "n = " << norm << std::endl;
-    std::cout << "w = " << width << std::endl;
-
-    std::cout << "-- Plane : Create" << std::endl;
-    auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
-    std::cout << "p = " << plane->getPosition() << std::endl;
-    std::cout << "n = " << plane->getNormal() << std::endl;
-    std::cout << "w = " << plane->getWidth() << std::endl;
-
-    std::cout << "-- Plane : Set Position" << std::endl;
-    plane->setPosition(imstk::Vec3d(1, 1, 1));
-    std::cout << "p = " << plane->getPosition() << std::endl;
-
-    std::cout << "-- Plane : Translate" << std::endl;
-    plane->translate(imstk::Vec3d(2, 1, -3));
-    std::cout << "p = " << plane->getPosition() << std::endl;
-
-    std::cout << "-- Plane : Set Normal" << std::endl;
-    plane->setNormal(imstk::FORWARD);
-    std::cout << "n = " << plane->getNormal() << std::endl;
-
-    std::cout << "-- Plane : Rotate" << std::endl;
-    plane->rotate(imstk::UP, M_PI / 2);
-    std::cout << "n = " << plane->getNormal() << std::endl;
+    visualPlane->setVisualGeometry(planeGeometry);
+    sceneTest->addSceneObject(visualPlane);
 
     /*
-       // Creating SimulationManager
-       std::shared_ptr<imstk::SimulationManager> sdk =
-       std::make_shared<imstk::SimulationManager>();
+        //--------------------------------------------
+        // Geometry
+        //--------------------------------------------
+        std::cout << std::fixed << std::setprecision(2);
 
-       LOG(INFO) << "-- Test add scenes";
+        // Plane
+        std::cout << "-- Plane : Init" << std::endl;
+        auto pos   = imstk::Vec3d(5, 2, 5);
+        auto norm  = imstk::Vec3d(0, 1, 1);
+        auto width = 10;
+        std::cout << "p = " << pos << std::endl;
+        std::cout << "n = " << norm << std::endl;
+        std::cout << "w = " << width << std::endl;
 
-       // Create scene and add it (scene1)
-       std::shared_ptr<imstk::Scene> scene1 =
-       std::make_shared<imstk::Scene>("scene1");
+        std::cout << "-- Plane : Create" << std::endl;
+        auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
+        std::cout << "p = " << plane->getPosition() << std::endl;
+        std::cout << "n = " << plane->getNormal() << std::endl;
+        std::cout << "w = " << plane->getWidth() << std::endl;
 
-       scene1->setLoopDelay(500);
-       sdk->addScene(scene1);
+        std::cout << "-- Plane : Set Position" << std::endl;
+        plane->setPosition(imstk::Vec3d(1, 1, 1));
+        std::cout << "p = " << plane->getPosition() << std::endl;
 
-       // Create new scene through sdk (scene2)
-       sdk->createNewScene("scene2");
-       std::shared_ptr<imstk::Scene> scene2 = sdk->getScene("scene2");
-       scene2->setLoopDelay(500);
+        std::cout << "-- Plane : Translate" << std::endl;
+        plane->translate(imstk::Vec3d(2, 1, -3));
+        std::cout << "p = " << plane->getPosition() << std::endl;
 
-       // Create new scene through sdk (auto : "Scene_X")
-       std::shared_ptr<imstk::Scene> scene3 = sdk->createNewScene();
+        std::cout << "-- Plane : Set Normal" << std::endl;
+        plane->setNormal(imstk::FORWARD);
+        std::cout << "n = " << plane->getNormal() << std::endl;
 
-       // Remove scene3
-       sdk->removeScene("Scene_3");
-
-       // Test switch
-       LOG(INFO) << "-- Test scene switch";
-       sdk->startSimulation("scene1");
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->switchScene("scene2", false);
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->switchScene("scene1", true);
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->endSimulation();
-
-       // Test pause/run
-       LOG(INFO) << "-- Test simulation pause/run";
-       sdk->startSimulation("scene2");
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->pauseSimulation();
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->runSimulation();
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->pauseSimulation();
-       std::this_thread::sleep_for(std::chrono::seconds(2));
-       sdk->endSimulation();
-
-       // Quit
-       while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
-
+        std::cout << "-- Plane : Rotate" << std::endl;
+        plane->rotate(imstk::UP, M_PI / 2);
+        std::cout << "n = " << plane->getNormal() << std::endl;
      */
+
+    /*
+        //--------------------------------------------
+        // SimulationManager
+        //--------------------------------------------
+        std::shared_ptr<imstk::SimulationManager> sdk =
+                std::make_shared<imstk::SimulationManager>();
+
+        // Scenes
+        LOG(INFO) << "-- Test add scenes";
+
+        std::shared_ptr<imstk::Scene> scene1 =
+        std::make_shared<imstk::Scene>("scene1");
+        scene1->setLoopDelay(500);
+        sdk->addScene(scene1);
+
+        sdk->createNewScene("scene2");
+        std::shared_ptr<imstk::Scene> scene2 = sdk->getScene("scene2");
+        scene2->setLoopDelay(500);
+
+        std::shared_ptr<imstk::Scene> scene3 = sdk->createNewScene();
+        sdk->removeScene("Scene_3");
+
+        // switch
+        LOG(INFO) << "-- Test scene switch";
+        sdk->startSimulation("scene1");
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->switchScene("scene2", false);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->switchScene("scene1", true);
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->endSimulation();
+
+        // pause/run
+        LOG(INFO) << "-- Test simulation pause/run";
+        sdk->startSimulation("scene2");
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->pauseSimulation();
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->runSimulation();
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->pauseSimulation();
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        sdk->endSimulation();
+
+        // Quit
+        while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
+     */
+
     return 0;
 }
