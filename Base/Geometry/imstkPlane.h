@@ -29,7 +29,7 @@ class Plane : public Geometry
 {
 public:
 
-    Plane(const Vec3d & position = ORIGIN,
+    Plane(const Vec3d & position = WORLD_ORIGIN,
           const Vec3d & normal = UP,
           const double& width = 100) :
         Geometry(GeometryType::Plane,

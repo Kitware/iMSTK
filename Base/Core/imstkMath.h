@@ -57,7 +57,7 @@ using Mat3d = Eigen::Matrix<double, 3, 3>;
 #define LEFT Vec3d(-1, 0, 0)
 #define FORWARD Vec3d(0, 0, 1)
 #define BACKWARD Vec3d(0, 0, -1)
-#define ORIGIN Vec3d::Zero()
+#define WORLD_ORIGIN Vec3d::Zero()
 }
 
 #endif // ifndef imstkMath_h

@@ -29,7 +29,7 @@ class Sphere : public Geometry
 {
 public:
 
-    Sphere(const Vec3d & position = ORIGIN,
+    Sphere(const Vec3d & position = WORLD_ORIGIN,
            const double& radius = 10) :
         Geometry(GeometryType::Sphere,
                  position,

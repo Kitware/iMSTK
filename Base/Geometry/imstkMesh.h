@@ -42,7 +42,7 @@ public:
 
 protected:
 
-    Mesh(GeometryType type) : Geometry(type, ORIGIN, Quatd()) {}
+    Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
 
     //   Orientation * Scaling * initialVertexPositions
     // + Position

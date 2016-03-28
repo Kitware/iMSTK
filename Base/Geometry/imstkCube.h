@@ -29,7 +29,7 @@ class Cube : public Geometry
 {
 public:
 
-    Cube(const Vec3d & position = ORIGIN,
+    Cube(const Vec3d & position = WORLD_ORIGIN,
          const double& width = 10) :
         Geometry(GeometryType::Cube,
                  position,
