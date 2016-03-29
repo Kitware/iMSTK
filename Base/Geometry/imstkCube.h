@@ -30,7 +30,7 @@ class Cube : public Geometry
 public:
 
     Cube(const Vec3d & position = WORLD_ORIGIN,
-         const double& width = 10) :
+         const double& width = 1) :
         Geometry(GeometryType::Cube,
                  position,
                  Quatd::Identity()),

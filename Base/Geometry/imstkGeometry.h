@@ -39,7 +39,7 @@ class Geometry
 {
 public:
 
-    ~Geometry() = default;
+    virtual ~Geometry() {}
 
     void         translate(const Vec3d& t);
     void         translate(const double& x,

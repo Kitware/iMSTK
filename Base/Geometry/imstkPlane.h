@@ -31,7 +31,7 @@ public:
 
     Plane(const Vec3d & position = WORLD_ORIGIN,
           const Vec3d & normal = UP,
-          const double& width = 100) :
+          const double& width = 1) :
         Geometry(GeometryType::Plane,
                  position,
                  Quatd::FromTwoVectors(UP, normal)),
