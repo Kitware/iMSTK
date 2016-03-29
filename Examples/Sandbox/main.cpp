@@ -6,10 +6,9 @@
 
 #include "imstkSceneObject.h"
 #include "imstkPlane.h"
+#include "imstkSphere.h"
+#include "imstkCube.h"
 #include "imstkSimulationManager.h"
-
-#include "vtkSmartPointer.h"
-#include "vtkRenderer.h"
 
 int main()
 {
@@ -22,32 +21,39 @@ int main()
     // --------------------------------------------
     auto sdk = std::make_shared<imstk::SimulationManager>();
 
-    sdk->getViewer()->setLoopDelay(500);
+    auto planeGeom = std::make_shared<imstk::Plane>();
+
+    planeGeom->scale(5);
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+
+    auto cubeGeom = std::make_shared<imstk::Cube>();
+    cubeGeom->scale(0.5);
+    cubeGeom->rotate(imstk::UP,    M_PI_4);
+    cubeGeom->rotate(imstk::RIGHT, M_PI_4);
+    cubeGeom->translate(2, 1, 0.5);
+    auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
+    cubeObj->setVisualGeometry(cubeGeom);
+
+    auto sphereGeom = std::make_shared<imstk::Sphere>();
+    sphereGeom->scale(0.3);
+    sphereGeom->translate(-0.75, 1.5, -0.5);
+    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereObj->setVisualGeometry(sphereGeom);
 
     auto sceneTest = sdk->createNewScene("SceneTest");
-    sceneTest->setLoopDelay(500);
+    sceneTest->setLoopDelay(1000);
+    sceneTest->addSceneObject(planeObj);
+    sceneTest->addSceneObject(cubeObj);
+    sceneTest->addSceneObject(sphereObj);
 
     sdk->startSimulation("SceneTest");
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     sdk->pauseSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     sdk->runSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     sdk->endSimulation();
-
-    /*
-       // --------------------------------------------
-       // VisualObject
-       // --------------------------------------------
-       auto sdk           = std::make_shared<imstk::SimulationManager>();
-       auto sceneTest     = sdk->createNewScene("SceneTest");
-       auto planeGeometry = std::make_shared<imstk::Plane>();
-       auto visualPlane   =
-          std::make_shared<imstk::VisualObject>("VisualPlane");
-
-       visualPlane->setVisualGeometry(planeGeometry);
-       sceneTest->addSceneObject(visualPlane);
-     */
 
     /*
         //--------------------------------------------

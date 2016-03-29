@@ -22,10 +22,13 @@
 #include "imstkViewer.h"
 
 #include "vtkRenderer.h"
-#include "vtkPlaneSource.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkCamera.h"
+#include "vtkLight.h"
+#include "vtkAxesActor.h"
 
 #include "g3log/g3log.hpp"
+
+#include "imstkRenderDelegate.h"
 
 namespace imstk {
 void
@@ -45,26 +48,39 @@ Viewer::initRenderer()
         m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     }
 
-    // Create renderer
-    vtkSmartPointer<vtkRenderer> renderer =
-        vtkSmartPointer<vtkRenderer>::New();
+    // Create and add renderer
+    auto renderer = vtkSmartPointer<vtkRenderer>::New();
     m_renderWindow->AddRenderer(renderer);
 
-    // WIP : Create renderdelegates with actors
-    // based on the current scene objects.
-    vtkSmartPointer<vtkPlaneSource> planeSource =
-        vtkSmartPointer<vtkPlaneSource>::New();
-    planeSource->SetCenter(1.0, 0.0, 0.0);
-    planeSource->SetNormal(1.0, 0.0, 1.0);
-    planeSource->Update();
-    vtkPolyData *plane                        = planeSource->GetOutput();
-    vtkSmartPointer<vtkPolyDataMapper> mapper =
-        vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(plane);
-    vtkSmartPointer<vtkActor> actor =
-        vtkSmartPointer<vtkActor>::New();
-    actor->SetMapper(mapper);
-    renderer->AddActor(actor);
+    // Create and add actors
+    for (const auto& obj : m_currentScene->getSceneObjects())
+    {
+        auto geom     = obj->getVisualGeometry();
+        auto delegate = RenderDelegate::make_delegate(geom);
+        renderer->AddActor(delegate->getVtkActor());
+    }
+
+    /// WIP : the following
+    // Light
+    auto light = vtkSmartPointer<vtkLight>::New();
+    light->SetLightTypeToSceneLight();
+    light->SetPosition(5, 10, 5);
+    light->SetFocalPoint(0, 0, 0);
+
+    // light->SetPositional(true);
+    // light->SetConeAngle(10);
+    renderer->AddLight(light);
+
+    // Camera
+    auto camera = renderer->MakeCamera();
+    camera->SetPosition(5, 5, 5);
+    camera->SetFocalPoint(0, 0, 0);
+    renderer->SetActiveCamera(camera);
+    renderer->ResetCameraClippingRange();
+
+    // Global Axis
+    auto axes = vtkSmartPointer<vtkAxesActor>::New();
+    renderer->AddActor(axes);
 }
 
 vtkSmartPointer<vtkRenderWindow>
@@ -110,7 +126,6 @@ Viewer::cleanUpModule()
 void
 Viewer::runModule()
 {
-    LOG(DEBUG) << m_name << " : running";
     m_renderWindow->Render();
 }
 }
