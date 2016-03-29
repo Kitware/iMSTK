@@ -216,9 +216,6 @@ SimulationManager::runSimulation()
         return;
     }
 
-    // Run viewer
-    m_viewer->run();
-
     // Run scene
     m_sceneMap.at(m_currentSceneName)->run();
 
@@ -236,9 +233,6 @@ SimulationManager::pauseSimulation()
         LOG(WARNING) << "Simulation not running, can not pause.";
         return;
     }
-
-    // Pause viewer
-    m_viewer->pause();
 
     // Pause scene
     m_sceneMap.at(m_currentSceneName)->pause();
