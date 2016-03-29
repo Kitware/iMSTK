@@ -55,8 +55,8 @@ using Mat3d = Eigen::Matrix<double, 3, 3>;
 #define DOWN Vec3d(0, -1, 0)
 #define RIGHT Vec3d(1, 0, 0)
 #define LEFT Vec3d(-1, 0, 0)
-#define FORWARD Vec3d(0, 0, 1)
-#define BACKWARD Vec3d(0, 0, -1)
+#define FORWARD Vec3d(0, 0, -1)
+#define BACKWARD Vec3d(0, 0, 1)
 #define WORLD_ORIGIN Vec3d::Zero()
 }
 
