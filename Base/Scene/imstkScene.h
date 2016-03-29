@@ -22,6 +22,7 @@
 #ifndef imstkScene_h
 #define imstkScene_h
 
+#include <vector>
 #include <unordered_map>
 #include <memory>
 
@@ -37,9 +38,14 @@ public:
 
     ~Scene() = default;
 
-    bool isObjectRegistered(std::string sceneObjectName) const;
-    void addSceneObject(std::shared_ptr<SceneObject>newSceneObject);
-    void removeSceneObject(std::string sceneObjectName);
+    bool                                            isObjectRegistered(std::string sceneObjectName)
+    const;
+    const std::vector<std::shared_ptr<SceneObject> >getSceneObjects() const;
+    std::shared_ptr<SceneObject>                    getSceneObject(std::string sceneObjectName)
+    const;
+    void                                            addSceneObject(
+        std::shared_ptr<SceneObject>newSceneObject);
+    void                                            removeSceneObject(std::string sceneObjectName);
 
 protected:
 

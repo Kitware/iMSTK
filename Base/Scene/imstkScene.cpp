@@ -30,6 +30,34 @@ Scene::isObjectRegistered(std::string sceneObjectName) const
     return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
 }
 
+const std::vector<std::shared_ptr<SceneObject> >
+Scene::getSceneObjects() const
+{
+    std::vector<std::shared_ptr<SceneObject> > v;
+
+    for (auto it = m_sceneObjectsMap.begin();
+         it != m_sceneObjectsMap.end();
+         ++it)
+    {
+        v.push_back(it->second);
+    }
+
+    return v;
+}
+
+std::shared_ptr<SceneObject>
+Scene::getSceneObject(std::string sceneObjectName) const
+{
+    if (!this->isObjectRegistered(sceneObjectName))
+    {
+        LOG(WARNING) << "No scene object named '" << sceneObjectName
+                     << "' was registered in this scene.";
+        return nullptr;
+    }
+
+    return m_sceneObjectsMap.at(sceneObjectName);
+}
+
 void
 Scene::addSceneObject(std::shared_ptr<SceneObject>newSceneObject)
 {
