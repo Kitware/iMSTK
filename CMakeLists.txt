@@ -71,6 +71,7 @@ imstk_define_dependency(Uncrustify)
 imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
+imstk_define_dependency(PThreads)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
