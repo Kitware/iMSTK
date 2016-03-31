@@ -44,7 +44,7 @@ macro(imstk_add_external_project extProj)
     #-----------------------------------------------------------------------------
     set(${extProj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/src)
     set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/cmake)
-    set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build-${CMAKE_BUILD_TYPE})
+    set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build)
     set(${extProj}_INCLUDE_PATH ${${extProj}_DIR}/include)
     set(${extProj}_LIBRARY_PATH ${${extProj}_DIR}/library)
 
