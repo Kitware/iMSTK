@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 find_path(g3log_INCLUDE_DIR
   NAMES
-    g3log.hpp
-    logworker.hpp
+    g3log/g3log.hpp
+    g3log/logworker.hpp
     )
 mark_as_advanced(g3log_INCLUDE_DIR)
 #message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
@@ -15,6 +15,7 @@ mark_as_advanced(g3log_INCLUDE_DIR)
 find_library(g3log_LIBRARY
   NAMES
     g3logger_shared
+    g3logger
   )
 mark_as_advanced(g3log_LIBRARY)
 #message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
