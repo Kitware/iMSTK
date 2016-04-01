@@ -22,6 +22,7 @@
 #ifndef imstkSurfaceMesh_h
 #define imstkSurfaceMesh_h
 
+#include <array>
 #include <set>
 
 #include "imstkMesh.h"
