@@ -66,8 +66,12 @@ macro(imstk_define_dependency extProj)
   mark_as_advanced(USE_SYSTEM_${extProj})
 endmacro()
 
+option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." OFF)
+if(${PROJECT_NAME}_USE_Uncrustify)
+  imstk_define_dependency(Uncrustify)
+endif()
+
 imstk_define_dependency(g3log)
-imstk_define_dependency(Uncrustify)
 imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
@@ -93,12 +97,12 @@ endif()
 #-----------------------------------------------------------------------------
 # Find external dependencies
 #-----------------------------------------------------------------------------
+# Uncrustify
+include(SetupUncrustifyConfig)
+
 # g3log
 find_package( g3log REQUIRED )
 include_directories( ${g3log_INCLUDE_DIR} )
-
-# Uncrustify
-include(SetupUncrustifyConfig)
 
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
