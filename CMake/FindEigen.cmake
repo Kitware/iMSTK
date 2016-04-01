@@ -16,17 +16,13 @@ if(NOT Eigen_FIND_VERSION)
 endif()
 
 #-----------------------------------------------------------------------------
-# Macro checking version
-#-----------------------------------------------------------------------------
-macro(_eigen_check_version)
-
-endmacro(_eigen_check_version)
-
-
-#-----------------------------------------------------------------------------
 # Find path
 #-----------------------------------------------------------------------------
-set(Eigen_INCLUDE_DIR ${Eigen_SOURCE_DIR})
+find_path(Eigen_INCLUDE_DIR
+  NAMES
+    eigen/Eigen
+    Eigen
+    )
 mark_as_advanced(Eigen_INCLUDE_DIR)
 #message(STATUS "Eigen_INCLUDE_DIR : ${Eigen_INCLUDE_DIR}")
 
@@ -66,7 +62,7 @@ find_package_handle_standard_args(Eigen
 #-----------------------------------------------------------------------------
 # If missing target, create it
 #-----------------------------------------------------------------------------
-if(G3LOG_FOUND AND NOT TARGET Eigen)
+if(Eigen_FOUND AND NOT TARGET Eigen)
   add_library(Eigen INTERFACE IMPORTED)
   set_target_properties(Eigen PROPERTIES
     INTERFACE_LINK_LIBRARIES "${Eigen_LIBRARY}"

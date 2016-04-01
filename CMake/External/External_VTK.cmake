@@ -21,6 +21,7 @@ imstk_add_external_project( VTK
       -DModule_vtkRenderingContext2D:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
-  DEPENDENCIES ""
+  #RELATIVE_INCLUDE_PATH ""
+  #DEPENDENCIES ""
   #VERBOSE
   )
