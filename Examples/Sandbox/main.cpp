@@ -50,12 +50,6 @@ int main()
     sceneTest->addSceneObject(sphereObj);
 
     sdk->startSimulation("SceneTest");
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    sdk->pauseSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    sdk->runSimulation();
-    std::this_thread::sleep_for(std::chrono::seconds(10));
-    sdk->endSimulation();
 
     /*
         //--------------------------------------------

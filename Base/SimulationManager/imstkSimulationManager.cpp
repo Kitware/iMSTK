@@ -139,9 +139,9 @@ SimulationManager::startSimulation(std::string sceneName)
         return;
     }
 
-    // Start viewer
+    // Init viewer renderer
     m_viewer->setCurrentScene(startingScene);
-    this->startModuleInNewThread(m_viewer);
+    m_viewer->initRenderer();
 
     // Start scene
     this->startModuleInNewThread(startingScene);
@@ -149,6 +149,10 @@ SimulationManager::startSimulation(std::string sceneName)
 
     // Update simulation status
     m_status = SimulationStatus::RUNNING;
+
+    // Start Rendering
+    m_viewer->startRenderingLoop();
+    this->endSimulation();
 }
 
 void
@@ -252,10 +256,6 @@ SimulationManager::endSimulation()
         LOG(WARNING) << "Simulation already terminated.";
         return;
     }
-
-    // End viewer
-    m_viewer->end();
-    m_threadMap.at(m_viewer->getName()).join();
 
     // End all scenes
     for (auto pair : m_sceneMap)

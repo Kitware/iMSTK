@@ -24,22 +24,28 @@
 
 #include <memory>
 
-#include "imstkModule.h"
 #include "imstkScene.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
+#include "vtkRenderWindowInteractor.h"
 
 namespace imstk {
-class Viewer : public Module
+class Viewer
 {
 public:
 
-    Viewer(std::string name = "iMSTK Viewer") : Module(name) {}
+    Viewer(std::string name = "iMSTK Viewer")
+    {
+        m_renderWindow->SetWindowName(name.data());
+        m_renderWindow->SetSize(1000,800);
+    }
 
     ~Viewer() = default;
 
     void                            initRenderer();
+    void                            startRenderingLoop();
+    void                            endRenderingLoop();
 
     vtkSmartPointer<vtkRenderWindow>getRenderWindow() const;
     void                            setRenderWindow(vtkSmartPointer<vtkRenderWindow>renWin);
@@ -49,11 +55,8 @@ public:
 
 protected:
 
-    void initModule() override;
-    void runModule() override;
-    void cleanUpModule() override;
-
-    vtkSmartPointer<vtkRenderWindow> m_renderWindow;
+    vtkSmartPointer<vtkRenderWindow> m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     std::shared_ptr<Scene> m_currentScene;
 };
 }

@@ -25,6 +25,7 @@
 #include "vtkCamera.h"
 #include "vtkLight.h"
 #include "vtkAxesActor.h"
+#include "vtkInteractorStyleTrackballCamera.h"
 
 #include "g3log/g3log.hpp"
 
@@ -39,13 +40,6 @@ Viewer::initRenderer()
     {
         LOG(WARNING) << "No scene specified, nothing to render.";
         return;
-    }
-
-    // Check RenderWindow
-    if (m_renderWindow == nullptr)
-    {
-        LOG(INFO) << "No render window specified, creating default render window.";
-        m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     }
 
     // Create and add renderer
@@ -83,6 +77,21 @@ Viewer::initRenderer()
     renderer->AddActor(axes);
 }
 
+void
+Viewer::startRenderingLoop()
+{
+    auto style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+    interactor->SetInteractorStyle( style );
+    interactor->SetRenderWindow( m_renderWindow );
+    interactor->Start();
+}
+
+void
+Viewer::endRenderingLoop()
+{
+    interactor->TerminateApp();
+}
+
 vtkSmartPointer<vtkRenderWindow>
 Viewer::getRenderWindow() const
 {
@@ -105,27 +114,5 @@ void
 Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
 {
     m_currentScene = scene;
-}
-
-void
-Viewer::initModule()
-{
-    LOG(DEBUG) << m_name << " : init";
-    this->initRenderer();
-    m_renderWindow->SetWindowName(m_name.data());
-    m_renderWindow->Start();
-}
-
-void
-Viewer::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-    m_renderWindow->Finalize();
-}
-
-void
-Viewer::runModule()
-{
-    m_renderWindow->Render();
 }
 }
