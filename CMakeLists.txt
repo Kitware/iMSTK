@@ -71,11 +71,14 @@ if(${PROJECT_NAME}_USE_Uncrustify)
   imstk_define_dependency(Uncrustify)
 endif()
 
+if(WIN32)
+  imstk_define_dependency(PThreads)
+endif()
+
 imstk_define_dependency(g3log)
 imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
-imstk_define_dependency(PThreads)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD

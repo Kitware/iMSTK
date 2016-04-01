@@ -17,7 +17,6 @@ imstk_add_library( Rendering
     imstkCubeRenderDelegate.cpp
   LIBRARIES
     ${VTK_LIBRARIES}
-    Core
     Scene
   )
 

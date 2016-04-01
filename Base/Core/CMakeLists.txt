@@ -8,6 +8,9 @@ imstk_add_library( Core
     imstkModule.h
   CPP_FILES
     imstkModule.cpp
+  LIBRARIES
+    Utilities
+    Eigen
   )
 
 #-----------------------------------------------------------------------------

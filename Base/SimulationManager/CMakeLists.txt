@@ -10,7 +10,6 @@ imstk_add_library( SimulationManager
   LIBRARIES
     Scene
     Rendering
-    Utilities
   )
   
 #-----------------------------------------------------------------------------
