@@ -24,7 +24,6 @@ function(imstk_add_library target)
     ${target_H_FILES}
     ${target_CPP_FILES}
     )
-  set_target_properties(${target} PROPERTIES LINKER_LANGUAGE CXX)
 
   #-----------------------------------------------------------------------------
   # Link libraries to current target

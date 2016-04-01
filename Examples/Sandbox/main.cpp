@@ -10,6 +10,8 @@
 #include "imstkCube.h"
 #include "imstkSimulationManager.h"
 
+#include "g3log/g3log.hpp"
+
 int main()
 {
     std::cout << "****************" << std::endl
