@@ -8,6 +8,7 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
+#include "imstkLight.h"
 #include "imstkMath.h"
 #include "imstkSimulationManager.h"
 
@@ -49,6 +50,10 @@ int main()
     sphereGeom->translate(-0.75, 1.5, -0.5);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
+
+    auto light = std::make_shared<imstk::Light>("MainLight");
+    light->setPosition(imstk::Vec3d(1,2,3));
+    light->setColor(imstk::Color::Green);
 
     auto sceneTest = sdk->createNewScene("SceneTest");
     sceneTest->setLoopDelay(1000);
