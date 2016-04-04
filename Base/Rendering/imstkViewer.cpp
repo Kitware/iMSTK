@@ -73,8 +73,15 @@ Viewer::initRenderer()
     renderer->ResetCameraClippingRange();
 
     // Global Axis
+    /// TODO : make this a renderer setting and optional
     auto axes = vtkSmartPointer<vtkAxesActor>::New();
     renderer->AddActor(axes);
+
+    // Customize background colors
+    /// TODO : make this a renderer setting and optional
+    renderer->GradientBackgroundOn();
+    renderer->SetBackground(0.8, 0.8, 0.8);
+    renderer->SetBackground2(0.45, 0.45, 0.8);
 }
 
 void
