@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkAffineMap_h
-#define imstkAffineMap_h
+#ifndef imstkIsometricMap_h
+#define imstkIsometricMap_h
 
 #include "imstkGeometryMap.h"
 
@@ -45,4 +45,4 @@ protected:
 };
 }
 
-#endif // imstkGeometryMap_h
+#endif // imstkIsometricMap_h
