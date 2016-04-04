@@ -8,6 +8,7 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
+#include "imstkMath.h"
 #include "imstkSimulationManager.h"
 
 #include "g3log/g3log.hpp"
@@ -31,9 +32,9 @@ int main()
 
     auto cubeGeom = std::make_shared<imstk::Cube>();
     cubeGeom->scale(0.5);
-    cubeGeom->rotate(imstk::UP_VECTOR,    M_PI/4);
-    cubeGeom->rotate(imstk::RIGHT_VECTOR, M_PI / 4);
-    cubeGeom->translate(2, 1, 0.5);
+    cubeGeom->rotate(imstk::UP_VECTOR, imstk::iMSTK_PI_4);
+    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::iMSTK_PI_4);
+    cubeGeom->translate(2.0, 1.0, 0.5);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
@@ -81,11 +82,11 @@ int main()
         std::cout << "p = " << plane->getPosition() << std::endl;
 
         std::cout << "-- Plane : Set Normal" << std::endl;
-        plane->setNormal(imstk::FORWARD);
+        plane->setNormal(imstk::FORWARD_VECTOR);
         std::cout << "n = " << plane->getNormal() << std::endl;
 
         std::cout << "-- Plane : Rotate" << std::endl;
-        plane->rotate(imstk::UP, M_PI / 2);
+        plane->rotate(imstk::UP_VECTOR, imstk::iMSTK_PI_2);
         std::cout << "n = " << plane->getNormal() << std::endl;
      */
 
