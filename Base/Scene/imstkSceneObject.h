@@ -58,7 +58,7 @@ protected:
 
     SceneObjectType m_type = SceneObjectType::Visual;
     std::string     m_name;
-    std::shared_ptr<Geometry> m_visualGeometry;
+    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
 };
 
 using VisualObject = SceneObject;

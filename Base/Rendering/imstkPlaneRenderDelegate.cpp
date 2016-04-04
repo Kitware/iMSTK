@@ -30,7 +30,7 @@ PlaneRenderDelegate::PlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     auto source = vtkSmartPointer<vtkPlaneSource>::New();
 
     source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
-    source->SetNormal(UP[0], UP[1], UP[2]);
+    source->SetNormal(UP_VECTOR[0], UP_VECTOR[1], UP_VECTOR[2]);
 
     this->setActorMapper(source->GetOutputPort());
     this->setActorTransform(m_geometry);

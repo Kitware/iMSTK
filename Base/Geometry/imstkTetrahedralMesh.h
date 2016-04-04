@@ -37,13 +37,14 @@ public:
 
     ~TetrahedralMesh() = default;
 
+    // Accessors
     const std::vector<TetraArray>& getTetrahedronVertices() const;
     void                           setTetrahedronVertices(
         const std::vector<TetraArray>& tetrahedrons);
 
 protected:
 
-    std::vector<TetraArray> m_tetrahedronVertices;
+    std::vector<TetraArray> m_tetrahedronVertices; ///< vertices of the tetrahedra
 };
 }
 

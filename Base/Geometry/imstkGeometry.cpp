@@ -60,6 +60,13 @@ Geometry::scale(const double& scaling)
     m_scaling *= scaling;
 }
 
+void
+Geometry::transform(const RigidTransform3d& transform)
+{
+    this->rotate(transform.rotation());
+    this->translate(transform.translation());
+}
+
 const Vec3d&
 Geometry::getPosition() const
 {

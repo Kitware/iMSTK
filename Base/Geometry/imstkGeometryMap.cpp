@@ -19,32 +19,46 @@
 
    =========================================================================*/
 
-#ifndef imstkVolumetricMesh_h
-#define imstkVolumetricMesh_h
-
-#include <memory>
-
-#include "imstkMesh.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk {
-class VolumetricMesh : public Mesh
-{
-public:
+    void GeometryMap::muteMap()
+    {
+        m_isActive = false;
+    }
 
-    ~VolumetricMesh() = default;
+    void GeometryMap::activateMap()
+    {
+        m_isActive = true;
+    }
 
-    // Accessors
-    std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
+    const GeometryMapType& GeometryMap::getType() const
+    {
+        return m_type;
+    }
 
-    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh);
+    void GeometryMap::setMaster(std::shared_ptr<Geometry> master)
+    {
+        m_master = master;
+    }
 
-protected:
+    std::shared_ptr<Geometry> GeometryMap::getMaster() const
+    {
+        return m_master;
+    }
 
-    VolumetricMesh(GeometryType type) : Mesh(type) {}
+    void GeometryMap::setSlave(std::shared_ptr<Geometry> slave)
+    {
+        m_slave = slave;
+    }
 
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;
-};
+    std::shared_ptr<Geometry> GeometryMap::getSlave() const
+    {
+        return m_slave;
+    }
+
+    bool GeometryMap::isActive() const
+    {
+        return m_isActive;
+    }
 }
-
-#endif // ifndef imstkVolumetricMesh_h

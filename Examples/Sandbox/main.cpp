@@ -31,8 +31,8 @@ int main()
 
     auto cubeGeom = std::make_shared<imstk::Cube>();
     cubeGeom->scale(0.5);
-    cubeGeom->rotate(imstk::UP,    M_PI/4);
-    cubeGeom->rotate(imstk::RIGHT, M_PI/4);
+    cubeGeom->rotate(imstk::UP_VECTOR,    M_PI/4);
+    cubeGeom->rotate(imstk::RIGHT_VECTOR, M_PI / 4);
     cubeGeom->translate(2, 1, 0.5);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);

@@ -45,7 +45,7 @@ protected:
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
 
     //   Orientation * Scaling * initialVertexPositions
-    // + Position
+    // + Position (Initial translation)
     // + vertexDisplacements
     // = vertexPositions
     std::vector<Vec3d> m_initialVertexPositions;

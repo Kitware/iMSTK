@@ -25,13 +25,13 @@ namespace imstk {
 Vec3d
 Plane::getNormal() const
 {
-    return m_orientation._transformVector(UP);
+    return m_orientation._transformVector(UP_VECTOR);
 }
 
 void
 Plane::setNormal(const Vec3d& normal)
 {
-    this->setOrientation(Quatd::FromTwoVectors(UP, normal));
+    this->setOrientation(Quatd::FromTwoVectors(UP_VECTOR, normal));
 }
 
 const double&

@@ -30,11 +30,11 @@ class Plane : public Geometry
 public:
 
     Plane(const Vec3d & position = WORLD_ORIGIN,
-          const Vec3d & normal = UP,
+          const Vec3d & normal = UP_VECTOR,
           const double& width = 1) :
         Geometry(GeometryType::Plane,
                  position,
-                 Quatd::FromTwoVectors(UP, normal)),
+                 Quatd::FromTwoVectors(UP_VECTOR, normal)),
         m_width(width)
     {}
 

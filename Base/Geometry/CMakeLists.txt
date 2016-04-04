@@ -13,6 +13,8 @@ imstk_add_library( Geometry
     imstkVolumetricMesh.h
     imstkTetrahedralMesh.h
     imstkHexahedralMesh.h
+	imstkGeometryMap.h
+	imstkIsometricMap.h
   CPP_FILES
     imstkGeometry.cpp
     imstkPlane.cpp
@@ -23,6 +25,8 @@ imstk_add_library( Geometry
     imstkVolumetricMesh.cpp
     imstkTetrahedralMesh.cpp
     imstkHexahedralMesh.cpp
+	imstkGeometryMap.cpp
+	imstkIsometricMap.cpp
   LIBRARIES
     Core
     VegaFEM::volumetricMesh

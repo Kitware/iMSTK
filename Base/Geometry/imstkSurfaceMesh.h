@@ -45,6 +45,7 @@ public:
     void                              computeVertexNormals();
     void                              computeVertexTangents();
 
+    // Accessors
     void                              setTriangleVertices(
         const std::vector<TriangleArray>& triangles);
 

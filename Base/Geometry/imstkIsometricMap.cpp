@@ -19,32 +19,28 @@
 
    =========================================================================*/
 
-#ifndef imstkVolumetricMesh_h
-#define imstkVolumetricMesh_h
-
-#include <memory>
-
-#include "imstkMesh.h"
-#include "imstkSurfaceMesh.h"
-
+#include "imstkIsometricMap.h"
 namespace imstk {
-class VolumetricMesh : public Mesh
-{
-public:
+    void IsometricMap::setTransform(const RigidTransform3d& affineTransform)
+    {
+        m_rigidTransform = affineTransform;
+    }
 
-    ~VolumetricMesh() = default;
+    const imstk::RigidTransform3d& IsometricMap::getTransform() const
+    {
+        return m_rigidTransform;
+    }
 
-    // Accessors
-    std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
+    void IsometricMap::applyMap()
+    {
+        if (m_isActive)
+        {
+            // First set the follower mesh configuration to that of master
+            m_slave->setPosition(m_master->getPosition());
+            m_slave->setOrientation(m_master->getOrientation());
 
-    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh);
-
-protected:
-
-    VolumetricMesh(GeometryType type) : Mesh(type) {}
-
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;
-};
+            // Now, apply the offset transform
+            m_slave->transform(m_rigidTransform);
+        }
+    }
 }
-
-#endif // ifndef imstkVolumetricMesh_h

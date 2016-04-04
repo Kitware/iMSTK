@@ -51,6 +51,9 @@ public:
                         const double& angle);
     void         scale(const double& scaling);
 
+    void        transform(const RigidTransform3d& transform);
+
+    // Accessors
     const Vec3d& getPosition() const;
     void         setPosition(const Vec3d& position);
     void         setPosition(const double& x,

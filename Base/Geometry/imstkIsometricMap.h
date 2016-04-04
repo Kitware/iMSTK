@@ -19,32 +19,30 @@
 
    =========================================================================*/
 
-#ifndef imstkVolumetricMesh_h
-#define imstkVolumetricMesh_h
+#ifndef imstkAffineMap_h
+#define imstkAffineMap_h
 
-#include <memory>
-
-#include "imstkMesh.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk {
-class VolumetricMesh : public Mesh
+
+class IsometricMap : public GeometryMap
 {
 public:
 
-    ~VolumetricMesh() = default;
+    ~IsometricMap() = default;
+
+    IsometricMap() : GeometryMap(GeometryMapType::Isometric), m_rigidTransform(RigidTransform3d::Identity()){}
+
+    void applyMap();
 
     // Accessors
-    std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
-
-    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh);
+    void setTransform(const RigidTransform3d& affineTransform);
+    const RigidTransform3d& getTransform() const;
 
 protected:
-
-    VolumetricMesh(GeometryType type) : Mesh(type) {}
-
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;
+    RigidTransform3d m_rigidTransform;
 };
 }
 
-#endif // ifndef imstkVolumetricMesh_h
+#endif // imstkGeometryMap_h
