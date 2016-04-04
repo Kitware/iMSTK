@@ -36,6 +36,8 @@ public:
 
     void applyMap();
 
+    void computeMap(){};
+
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);
     const RigidTransform3d& getTransform() const;

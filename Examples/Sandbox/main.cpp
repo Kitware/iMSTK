@@ -11,10 +11,16 @@
 #include "imstkMath.h"
 #include "imstkSimulationManager.h"
 
+// Maps
+#include "imstkIsometricMap.h"
+
 #include "g3log/g3log.hpp"
+
+void testGeometryMaps();
 
 int main()
 {
+
     std::cout << "****************" << std::endl
               << "Starting Sandbox" << std::endl
               << "****************" << std::endl;
@@ -51,6 +57,7 @@ int main()
     sceneTest->addSceneObject(sphereObj);
 
     sdk->startSimulation("SceneTest");
+
 
     /*
         //--------------------------------------------
@@ -139,4 +146,53 @@ int main()
      */
 
     return 0;
+}
+
+void testGeometryMaps()
+{
+    std::cout << "****************" << std::endl
+        << "Test: Geometric maps" << std::endl
+        << "****************" << std::endl;
+
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
+    // Scene object 1
+    auto cubeGeom = std::make_shared<imstk::Cube>();
+    cubeGeom->scale(0.5);
+    auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
+    cubeObj->setVisualGeometry(cubeGeom);
+
+    // Scene object 2
+    auto sphereGeom = std::make_shared<imstk::Sphere>();
+    sphereGeom->scale(0.3);
+    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereObj->setVisualGeometry(sphereGeom);
+
+    // Isometric Map
+    auto rigidMap = std::make_shared<imstk::IsometricMap>();
+
+    rigidMap->setMaster(sphereObj->getVisualGeometry());
+    rigidMap->setSlave(cubeObj->getVisualGeometry());
+
+    auto trans = imstk::RigidTransform3d::Identity();
+    trans.translate(imstk::Vec3d(1.5, 1.5, 1.5));
+
+    auto rz = imstk::RigidTransform3d(Eigen::AngleAxisd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
+    trans.rotate(rz.rotation());
+
+    rigidMap->setTransform(trans);
+
+    // Apply map
+    rigidMap->applyMap();
+
+    // Move master and Apply map again
+    sphereObj->getVisualGeometry()->setPosition(-1.0, 0, 0);
+    rigidMap->applyMap();
+
+    auto geometryMapTest = sdk->createNewScene("geometryMapTest");
+    geometryMapTest->setLoopDelay(1000);
+    geometryMapTest->addSceneObject(cubeObj);
+    geometryMapTest->addSceneObject(sphereObj);
+
+    sdk->startSimulation("geometryMapTest");
 }
