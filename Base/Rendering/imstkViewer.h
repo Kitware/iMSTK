@@ -56,7 +56,7 @@ public:
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    vtkSmartPointer<vtkRenderWindowInteractor> m_interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     std::shared_ptr<Scene> m_currentScene;
 };
 }

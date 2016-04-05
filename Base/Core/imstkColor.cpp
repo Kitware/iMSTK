@@ -89,7 +89,10 @@ Color::operator()( int p_i ) const
 
 std::ostream& operator<<(std::ostream& os, const Color& c)
 {
-    os << c.r << ' ' << c.g << ' ' << c.b << ' ' << c.a;
+    os << "R = " << c.r << '\n'
+       << "G = " << c.g << '\n'
+       << "B = " << c.b << '\n'
+       << "\u03B1 = " << c.a ;
     return os;
 }
 

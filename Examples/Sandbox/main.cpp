@@ -33,7 +33,7 @@ int main()
 
     auto planeGeom = std::make_shared<imstk::Plane>();
 
-    planeGeom->scale(5);
+    planeGeom->scale(8);
     auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
@@ -41,25 +41,34 @@ int main()
     cubeGeom->scale(0.5);
     cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4);
     cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
-    cubeGeom->translate(2.0, 1.0, 0.5);
+    cubeGeom->translate(1.0, - 1.0, 0.5);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
     auto sphereGeom = std::make_shared<imstk::Sphere>();
     sphereGeom->scale(0.3);
-    sphereGeom->translate(-0.75, 1.5, -0.5);
+    sphereGeom->translate(1, 2, 0.5);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
-    auto light = std::make_shared<imstk::Light>("MainLight");
-    light->setPosition(imstk::Vec3d(1,2,3));
-    light->setColor(imstk::Color::Green);
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(imstk::Vec3d(5,8,5));
+    whiteLight->setPositional();
+
+    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    colorLight->setPosition(imstk::Vec3d(4,-3,1));
+    colorLight->setFocalPoint(imstk::Vec3d(0,0,0));
+    colorLight->setColor(imstk::Color::Green);
+    colorLight->setPositional();
+    colorLight->setSpotAngle(15);
 
     auto sceneTest = sdk->createNewScene("SceneTest");
     sceneTest->setLoopDelay(1000);
     sceneTest->addSceneObject(planeObj);
     sceneTest->addSceneObject(cubeObj);
     sceneTest->addSceneObject(sphereObj);
+    sceneTest->addLight(whiteLight);
+    sceneTest->addLight(colorLight);
 
     sdk->startSimulation("SceneTest");
 

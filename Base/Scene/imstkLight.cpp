@@ -24,6 +24,31 @@
 #include <g3log/g3log.hpp>
 
 namespace imstk {
+
+const LightType
+Light::getType()
+{
+    if( m_vtkLight->LightTypeIsSceneLight() )
+    {
+        return LightType::SCENE_LIGHT;
+    }
+
+    return LightType::HEAD_LIGHT;
+}
+
+void
+Light::setType(const LightType& type)
+{
+    if( type == LightType::SCENE_LIGHT )
+    {
+        m_vtkLight->SetLightTypeToSceneLight();
+    }
+    else
+    {
+        m_vtkLight->SetLightTypeToHeadlight();
+    }
+}
+
 const Vec3d
 Light::getPosition() const
 {
@@ -35,7 +60,7 @@ Light::getPosition() const
 void
 Light::setPosition(const Vec3d& p)
 {
-    m_vtkLight->SetPosition(p[0], p[1], p[2]);
+    this->setPosition(p[0], p[1], p[2]);
 }
 
 void
@@ -43,7 +68,67 @@ Light::setPosition(const double& x,
                    const double& y,
                    const double& z)
 {
+    this->warningIfHeadLight();
     m_vtkLight->SetPosition(x, y, z);
+}
+
+const Vec3d
+Light::getFocalPoint() const
+{
+    double p[3];
+    m_vtkLight->GetFocalPoint(p);
+    return Vec3d(p[0], p[1], p[2]);
+}
+
+void
+Light::setFocalPoint(const Vec3d& p)
+{
+    this->setFocalPoint(p[0], p[1], p[2]);
+}
+
+void
+Light::setFocalPoint(const double& x,
+                   const double& y,
+                   const double& z)
+{
+    this->warningIfHeadLight();
+    m_vtkLight->SetFocalPoint(x, y, z);
+}
+
+const bool
+Light::isDirectional()
+{
+    return !this->isPositional();
+}
+
+void
+Light::setDirectional()
+{
+    m_vtkLight->PositionalOff();
+}
+
+const bool
+Light::isPositional()
+{
+    return m_vtkLight->GetPositional();
+}
+
+void
+Light::setPositional()
+{
+    m_vtkLight->PositionalOn();
+}
+
+const double
+Light::getSpotAngle() const
+{
+    return m_vtkLight->GetConeAngle();
+}
+
+void
+Light::setSpotAngle(const double& angle)
+{
+    m_vtkLight->SetConeAngle(angle);
 }
 
 const Color
@@ -57,7 +142,13 @@ Light::getColor() const
 void
 Light::setColor(const Color& c)
 {
-    m_vtkLight->SetColor(c(0), c(1), c(2));
+    m_vtkLight->SetDiffuseColor(c(0), c(1), c(2));
+}
+
+vtkSmartPointer<vtkLight>
+Light::getVtkLight() const
+{
+    return m_vtkLight;
 }
 
 const std::string&
@@ -70,5 +161,17 @@ void
 Light::setName(std::string name)
 {
     m_name = name;
+}
+
+void
+Light::warningIfHeadLight()
+{
+    if( this->getType() == LightType::HEAD_LIGHT )
+    {
+        LOG(WARNING) << "Can not change position or focal point "
+                     << "for a HEAD_LIGHT (linked to the active camera).\n"
+                     << "Set your light type to SCENE_LIGHT to manually "
+                     << "edit those parameters.";
+    }
 }
 }

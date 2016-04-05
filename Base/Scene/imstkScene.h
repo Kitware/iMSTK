@@ -28,6 +28,7 @@
 
 #include "imstkModule.h"
 #include "imstkSceneObject.h"
+#include "imstkLight.h"
 
 namespace imstk {
 class Scene : public Module
@@ -38,14 +39,17 @@ public:
 
     ~Scene() = default;
 
-    bool                                            isObjectRegistered(std::string sceneObjectName)
-    const;
-    const std::vector<std::shared_ptr<SceneObject> >getSceneObjects() const;
-    std::shared_ptr<SceneObject>                    getSceneObject(std::string sceneObjectName)
-    const;
-    void                                            addSceneObject(
-        std::shared_ptr<SceneObject>newSceneObject);
-    void                                            removeSceneObject(std::string sceneObjectName);
+    bool isObjectRegistered(std::string sceneObjectName) const;
+    const std::vector<std::shared_ptr<SceneObject>>getSceneObjects() const;
+    std::shared_ptr<SceneObject> getSceneObject(std::string sceneObjectName) const;
+    void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
+    void removeSceneObject(std::string sceneObjectName);
+
+    bool isLightRegistered(std::string lightName) const;
+    const std::vector<std::shared_ptr<Light>>getLights() const;
+    std::shared_ptr<Light> getLight(std::string lightName) const;
+    void addLight(std::shared_ptr<Light> newLight);
+    void removeLight(std::string lightName);
 
 protected:
 
@@ -54,6 +58,7 @@ protected:
     void cleanUpModule() override;
 
     std::unordered_map<std::string, std::shared_ptr<SceneObject> > m_sceneObjectsMap;
+    std::unordered_map<std::string, std::shared_ptr<Light> > m_lightsMap;
 };
 }
 

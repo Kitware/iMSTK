@@ -31,6 +31,12 @@
 #include "imstkColor.h"
 
 namespace imstk {
+enum class LightType
+{
+    SCENE_LIGHT,
+    HEAD_LIGHT
+};
+
 class Light
 {
 public:
@@ -41,19 +47,41 @@ public:
 
     ~Light() = default;
 
+    const LightType getType();
+    void setType(const LightType& type);
+
     const Vec3d getPosition() const;
     void setPosition(const Vec3d& p);
     void setPosition(const double& x,
                      const double& y,
                      const double& z);
 
+    const Vec3d getFocalPoint() const;
+    void setFocalPoint(const Vec3d& p);
+    void setFocalPoint(const double& x,
+                     const double& y,
+                     const double& z);
+
+    const bool isDirectional();
+    void setDirectional();
+
+    const bool isPositional();
+    void setPositional();
+
+    const double getSpotAngle() const;
+    void setSpotAngle(const double& angle);
+
     const Color getColor() const;
     void setColor(const Color& c);
+
+    vtkSmartPointer<vtkLight> getVtkLight() const;
 
     const std::string& getName() const;
     void setName(std::string name);
 
 protected:
+
+    void warningIfHeadLight();
 
     vtkSmartPointer<vtkLight> m_vtkLight = vtkSmartPointer<vtkLight>::New();
     std::string m_name;

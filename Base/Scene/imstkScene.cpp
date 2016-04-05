@@ -88,6 +88,70 @@ Scene::removeSceneObject(std::string sceneObjectName)
     LOG(INFO) << sceneObjectName << " object removed from " << m_name;
 }
 
+bool
+Scene::isLightRegistered(std::string lightName) const
+{
+    return m_lightsMap.find(lightName) != m_lightsMap.end();
+}
+
+const std::vector<std::shared_ptr<Light>>
+Scene::getLights() const
+{
+    std::vector<std::shared_ptr<Light>> v;
+
+    for (auto it = m_lightsMap.begin();
+         it != m_lightsMap.end();
+         ++it)
+    {
+        v.push_back(it->second);
+    }
+
+    return v;
+}
+
+std::shared_ptr<Light>
+Scene::getLight(std::string lightName) const
+{
+    if (!this->isLightRegistered(lightName))
+    {
+        LOG(WARNING) << "No scene light named '" << lightName
+                     << "' was registered in this scene.";
+        return nullptr;
+    }
+
+    return m_lightsMap.at(lightName);
+}
+
+void
+Scene::addLight(std::shared_ptr<Light>newLight)
+{
+    std::string newlightName = newLight->getName();
+
+    if (this->isLightRegistered(newlightName))
+    {
+        LOG(WARNING) << "Can not add light: '" << newlightName
+                     << "' is already registered in this scene.";
+        return;
+    }
+
+    m_lightsMap[newlightName] = newLight;
+    LOG(INFO) << newlightName << " light added to " << m_name;
+}
+
+void
+Scene::removeLight(std::string lightName)
+{
+    if (!this->isLightRegistered(lightName))
+    {
+        LOG(WARNING) << "No light named '" << lightName
+                     << "' was registered in this scene.";
+        return;
+    }
+
+    m_lightsMap.erase(lightName);
+    LOG(INFO) << lightName << " light removed from " << m_name;
+}
+
 void
 Scene::initModule()
 {

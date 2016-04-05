@@ -24,6 +24,7 @@
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 #include "vtkLight.h"
+#include "vtkLightActor.h"
 #include "vtkAxesActor.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -54,49 +55,51 @@ Viewer::initRenderer()
         renderer->AddActor(delegate->getVtkActor());
     }
 
-    /// WIP : the following
-    // Light
-    auto light = vtkSmartPointer<vtkLight>::New();
-    light->SetLightTypeToSceneLight();
-    light->SetPosition(5, 10, 5);
-    light->SetFocalPoint(0, 0, 0);
+    // Add lights
+    for (const auto& light : m_currentScene->getLights())
+    {
+        renderer->AddLight( light->getVtkLight() );
+        if( light->isPositional() )
+        {
+            auto lightActor = vtkSmartPointer<vtkLightActor>::New();
+            lightActor->SetLight(light->getVtkLight());
+            renderer->AddViewProp(lightActor);
+        }
+    }
 
-    // light->SetPositional(true);
-    // light->SetConeAngle(10);
-    renderer->AddLight(light);
-
+    /// WIP : make the following a renderer setting and optional
     // Camera
     auto camera = renderer->MakeCamera();
-    camera->SetPosition(5, 5, 5);
+    camera->SetPosition(8, 8, 8);
     camera->SetFocalPoint(0, 0, 0);
     renderer->SetActiveCamera(camera);
     renderer->ResetCameraClippingRange();
 
     // Global Axis
-    /// TODO : make this a renderer setting and optional
     auto axes = vtkSmartPointer<vtkAxesActor>::New();
     renderer->AddActor(axes);
 
     // Customize background colors
-    /// TODO : make this a renderer setting and optional
+    renderer->SetBackground(0.66,0.66,0.66);
+    renderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
     renderer->GradientBackgroundOn();
-    renderer->SetBackground(0.8, 0.8, 0.8);
-    renderer->SetBackground2(0.45, 0.45, 0.8);
+
+    //renderer->UseShadowsOn();
 }
 
 void
 Viewer::startRenderingLoop()
 {
     auto style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-    interactor->SetInteractorStyle( style );
-    interactor->SetRenderWindow( m_renderWindow );
-    interactor->Start();
+    m_interactor->SetInteractorStyle( style );
+    m_interactor->SetRenderWindow( m_renderWindow );
+    m_interactor->Start();
 }
 
 void
 Viewer::endRenderingLoop()
 {
-    interactor->TerminateApp();
+    m_interactor->TerminateApp();
 }
 
 vtkSmartPointer<vtkRenderWindow>
