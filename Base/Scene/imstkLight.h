@@ -50,6 +50,8 @@ public:
     const LightType getType();
     void setType(const LightType& type);
 
+
+
     const Vec3d getPosition() const;
     void setPosition(const Vec3d& p);
     void setPosition(const double& x,
@@ -62,11 +64,17 @@ public:
                      const double& y,
                      const double& z);
 
-    const bool isDirectional();
-    void setDirectional();
+    const bool isOn();
+    void switchOn();
+
+    const bool isOff();
+    void switchOff();
 
     const bool isPositional();
     void setPositional();
+
+    const bool isDirectional();
+    void setDirectional();
 
     const double getSpotAngle() const;
     void setSpotAngle(const double& angle);

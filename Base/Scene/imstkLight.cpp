@@ -96,15 +96,27 @@ Light::setFocalPoint(const double& x,
 }
 
 const bool
-Light::isDirectional()
+Light::isOn()
 {
-    return !this->isPositional();
+    return m_vtkLight->GetSwitch();
 }
 
 void
-Light::setDirectional()
+Light::switchOn()
 {
-    m_vtkLight->PositionalOff();
+    m_vtkLight->SwitchOn();
+}
+
+const bool
+Light::isOff()
+{
+    return !this->isOn();
+}
+
+void
+Light::switchOff()
+{
+    m_vtkLight->SwitchOff();
 }
 
 const bool
@@ -117,6 +129,18 @@ void
 Light::setPositional()
 {
     m_vtkLight->PositionalOn();
+}
+
+const bool
+Light::isDirectional()
+{
+    return !this->isPositional();
+}
+
+void
+Light::setDirectional()
+{
+    m_vtkLight->PositionalOff();
 }
 
 const double
