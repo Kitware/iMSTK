@@ -121,7 +121,6 @@ include( ${VTK_USE_FILE} )
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Base/Utilities)
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Geometry)
 add_subdirectory(Base/Scene)

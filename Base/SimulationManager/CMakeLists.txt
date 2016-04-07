@@ -3,12 +3,7 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( SimulationManager
-  H_FILES
-    imstkSimulationManager.h
-  CPP_FILES
-    imstkSimulationManager.cpp
-  LIBRARIES
-    Scene
+  DEPENDS
     Rendering
   )
   

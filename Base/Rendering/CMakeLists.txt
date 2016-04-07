@@ -3,21 +3,7 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Rendering
-  H_FILES
-    imstkViewer.h
-    imstkRenderer.h
-    imstkRenderDelegate.h
-    imstkPlaneRenderDelegate.h
-    imstkSphereRenderDelegate.h
-    imstkCubeRenderDelegate.h
-  CPP_FILES
-    imstkViewer.cpp
-    imstkRenderer.cpp
-    imstkRenderDelegate.cpp
-    imstkPlaneRenderDelegate.cpp
-    imstkSphereRenderDelegate.cpp
-    imstkCubeRenderDelegate.cpp
-  LIBRARIES
+  DEPENDS
     ${VTK_LIBRARIES}
     Scene
   )

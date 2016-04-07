@@ -2,7 +2,7 @@ function(imstk_add_library target)
 
   set(options VERBOSE)
   set(oneValueArgs)
-  set(multiValueArgs H_FILES CPP_FILES LIBRARIES)
+  set(multiValueArgs H_FILES CPP_FILES DEPENDS)
   include(CMakeParseArguments)
   cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -20,6 +20,12 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Create target (library)
   #-----------------------------------------------------------------------------
+  file(GLOB target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+  file(GLOB target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+
+  #-----------------------------------------------------------------------------
+  # Create target (library)
+  #-----------------------------------------------------------------------------
   add_library( ${target} STATIC
     ${target_H_FILES}
     ${target_CPP_FILES}
@@ -29,7 +35,7 @@ function(imstk_add_library target)
   # Link libraries to current target
   #-----------------------------------------------------------------------------
   target_link_libraries( ${target}
-    ${target_LIBRARIES}
+    ${target_DEPENDS}
     )
 
   #-----------------------------------------------------------------------------
