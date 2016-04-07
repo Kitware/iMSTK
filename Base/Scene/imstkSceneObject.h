@@ -40,9 +40,7 @@ class SceneObject
 {
 public:
 
-    SceneObject(std::string name) :
-        m_name(name)
-    {}
+    SceneObject(std::string name) : m_name(name) {}
 
     ~SceneObject() = default;
 

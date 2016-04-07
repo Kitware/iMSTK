@@ -4,13 +4,14 @@
 #include <thread>
 #include <iomanip>
 
+#include "imstkMath.h"
+#include "imstkSimulationManager.h"
 #include "imstkSceneObject.h"
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkLight.h"
-#include "imstkMath.h"
-#include "imstkSimulationManager.h"
+#include "imstkCamera.h"
 
 // Maps
 #include "imstkIsometricMap.h"
@@ -47,18 +48,18 @@ int main()
 
     auto sphereGeom = std::make_shared<imstk::Sphere>();
     sphereGeom->scale(0.3);
-    sphereGeom->translate(1, 2, 0.5);
+    sphereGeom->translate(0, 2, 0);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
     auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
-    whiteLight->setPosition(imstk::Vec3d(5,8,5));
+    whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
     whiteLight->setPositional();
 
     auto colorLight = std::make_shared<imstk::Light>("colorLight");
-    colorLight->setPosition(imstk::Vec3d(4,-3,1));
-    colorLight->setFocalPoint(imstk::Vec3d(0,0,0));
-    colorLight->setColor(imstk::Color::Green);
+    colorLight->setPosition(imstk::Vec3d(4, -3, 1));
+    colorLight->setFocalPoint(imstk::Vec3d(0, 0, 0));
+    colorLight->setColor(imstk::Color::Red);
     colorLight->setPositional();
     colorLight->setSpotAngle(15);
 
@@ -69,6 +70,10 @@ int main()
     sceneTest->addSceneObject(sphereObj);
     sceneTest->addLight(whiteLight);
     sceneTest->addLight(colorLight);
+
+    auto cam1 = sceneTest->getCamera();
+    cam1->setPosition(imstk::Vec3d(-5.5, 2.5, 32));
+    cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
     sdk->startSimulation("SceneTest");
 

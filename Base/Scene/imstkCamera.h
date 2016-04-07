@@ -19,36 +19,25 @@
 
    =========================================================================*/
 
-#ifndef imstkLight_h
-#define imstkLight_h
+#ifndef imstkCamera_h
+#define imstkCamera_h
 
 #include <string>
 
 #include <vtkSmartPointer.h>
-#include <vtkLight.h>
+#include <vtkCamera.h>
 
 #include "imstkMath.h"
-#include "imstkColor.h"
 
 namespace imstk {
-enum class LightType
-{
-    SCENE_LIGHT,
-    HEAD_LIGHT
-};
 
-class Light
+class Camera
 {
 public:
 
-    Light(std::string name) : m_name(name) {}
+    Camera() = default;
 
-    ~Light() = default;
-
-    const LightType getType();
-    void setType(const LightType& type);
-
-
+    ~Camera() = default;
 
     const Vec3d getPosition() const;
     void setPosition(const Vec3d& p);
@@ -59,40 +48,25 @@ public:
     const Vec3d getFocalPoint() const;
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
-                     const double& y,
-                     const double& z);
+                       const double& y,
+                       const double& z);
 
-    const bool isOn();
-    void switchOn();
+    const Vec3d getViewUp() const;
+    void setViewUp(const Vec3d& v);
+    void setViewUp(const double& x,
+                   const double& y,
+                   const double& z);
 
-    const bool isOff();
-    void switchOff();
+    const double getViewAngle() const;
+    void setViewAngle(const double& angle);
 
-    const bool isPositional();
-    void setPositional();
-
-    const bool isDirectional();
-    void setDirectional();
-
-    const double getSpotAngle() const;
-    void setSpotAngle(const double& angle);
-
-    const Color getColor() const;
-    void setColor(const Color& c);
-
-    vtkSmartPointer<vtkLight> getVtkLight() const;
-
-    const std::string& getName() const;
-    void setName(std::string name);
+    vtkSmartPointer<vtkCamera> getVtkCamera() const;
 
 protected:
 
-    void warningIfHeadLight();
-
-    vtkSmartPointer<vtkLight> m_vtkLight = vtkSmartPointer<vtkLight>::New();
-    std::string m_name;
+    vtkSmartPointer<vtkCamera> m_vtkCamera = vtkSmartPointer<vtkCamera>::New();
 
 };
 }
 
-#endif // ifndef imstkLight_h
+#endif // ifndef imstkCamera_h

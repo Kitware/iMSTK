@@ -30,10 +30,10 @@ Scene::isObjectRegistered(std::string sceneObjectName) const
     return m_sceneObjectsMap.find(sceneObjectName) != m_sceneObjectsMap.end();
 }
 
-const std::vector<std::shared_ptr<SceneObject> >
+const std::vector<std::shared_ptr<SceneObject>>
 Scene::getSceneObjects() const
 {
-    std::vector<std::shared_ptr<SceneObject> > v;
+    std::vector<std::shared_ptr<SceneObject>> v;
 
     for (auto it = m_sceneObjectsMap.begin();
          it != m_sceneObjectsMap.end();
@@ -114,7 +114,7 @@ Scene::getLight(std::string lightName) const
 {
     if (!this->isLightRegistered(lightName))
     {
-        LOG(WARNING) << "No scene light named '" << lightName
+        LOG(WARNING) << "No light named '" << lightName
                      << "' was registered in this scene.";
         return nullptr;
     }
@@ -152,6 +152,12 @@ Scene::removeLight(std::string lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
+std::shared_ptr<Camera>
+Scene::getCamera()
+{
+    return m_camera;
+}
+
 void
 Scene::initModule()
 {
@@ -168,5 +174,6 @@ void
 Scene::runModule()
 {
     LOG(DEBUG) << m_name << " : running";
+    LOG(INFO) << m_camera->getPosition();
 }
 }

@@ -22,9 +22,10 @@
 #include "imstkViewer.h"
 
 #include "vtkRenderer.h"
-#include "vtkCamera.h"
 #include "vtkLight.h"
 #include "vtkLightActor.h"
+#include "vtkCamera.h"
+#include "vtkCameraActor.h"
 #include "vtkAxesActor.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -45,6 +46,7 @@ Viewer::initRenderer()
 
     // Create and add renderer
     auto renderer = vtkSmartPointer<vtkRenderer>::New();
+    //renderer->UseShadowsOn();
     m_renderWindow->AddRenderer(renderer);
 
     // Create and add actors
@@ -62,18 +64,19 @@ Viewer::initRenderer()
         if( light->isPositional() )
         {
             auto lightActor = vtkSmartPointer<vtkLightActor>::New();
-            lightActor->SetLight(light->getVtkLight());
-            renderer->AddViewProp(lightActor);
+            lightActor->SetLight( light->getVtkLight() );
+            renderer->AddActor( lightActor );
         }
     }
 
-    /// WIP : make the following a renderer setting and optional
-    // Camera
-    auto camera = renderer->MakeCamera();
-    camera->SetPosition(8, 8, 8);
-    camera->SetFocalPoint(0, 0, 0);
-    renderer->SetActiveCamera(camera);
+    // Add camera
+    //auto camActor = vtkSmartPointer<vtkCameraActor>::New();
+    //camActor->SetCamera(  m_currentScene->getCamera()->getVtkCamera() );
+    //renderer->AddActor( camActor );
+    //renderer->GetActiveCamera()->SetFocalPoint(0,0,0);
+    renderer->SetActiveCamera( m_currentScene->getCamera()->getVtkCamera() );
     renderer->ResetCameraClippingRange();
+
 
     // Global Axis
     auto axes = vtkSmartPointer<vtkAxesActor>::New();
@@ -83,8 +86,6 @@ Viewer::initRenderer()
     renderer->SetBackground(0.66,0.66,0.66);
     renderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
     renderer->GradientBackgroundOn();
-
-    //renderer->UseShadowsOn();
 }
 
 void
