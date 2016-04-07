@@ -60,7 +60,8 @@ public:
     std::shared_ptr<Viewer> getViewer() const;
 
     // Simulation
-    void                    startSimulation(std::string sceneName);
+    void                    startSimulation(std::string sceneName,
+                                            Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
     void                    switchScene(std::string newSceneName,
                                         bool        unloadCurrentScene);
     void                    runSimulation();

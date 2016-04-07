@@ -114,7 +114,7 @@ SimulationManager::getViewer() const
 }
 
 void
-SimulationManager::startSimulation(std::string sceneName)
+SimulationManager::startSimulation(std::string sceneName, Renderer::Mode renderMode)
 {
     LOG(INFO) << "Starting simulation.";
 
@@ -139,9 +139,9 @@ SimulationManager::startSimulation(std::string sceneName)
         return;
     }
 
-    // Init viewer renderer
+    // Init viewer
     m_viewer->setCurrentScene(startingScene);
-    m_viewer->initRenderer();
+    m_viewer->setRenderingMode(renderMode);
 
     // Start scene
     this->startModuleInNewThread(startingScene);
@@ -181,7 +181,9 @@ SimulationManager::switchScene(std::string newSceneName, bool unloadCurrentScene
         return;
     }
 
-    // TODO : update viewer
+    // Update viewer
+    m_viewer->setCurrentScene(newScene);
+    m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
 
     if (unloadCurrentScene)
     {

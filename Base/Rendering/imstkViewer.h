@@ -23,8 +23,10 @@
 #define imstkViewer_h
 
 #include <memory>
+#include <unordered_map>
 
 #include "imstkScene.h"
+#include "imstkRenderer.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
@@ -37,27 +39,28 @@ public:
 
     Viewer(std::string name = "iMSTK Viewer")
     {
-        m_renderWindow->SetWindowName(name.data());
-        m_renderWindow->SetSize(1000,800);
+        m_vtkInteractor->SetRenderWindow( m_vtkRenderWindow );
+        m_vtkRenderWindow->SetWindowName(name.data());
+        m_vtkRenderWindow->SetSize(1000,800);
     }
 
     ~Viewer() = default;
 
-    void                            initRenderer();
-    void                            startRenderingLoop();
-    void                            endRenderingLoop();
+    std::shared_ptr<Scene> getCurrentScene() const;
+    void setCurrentScene(std::shared_ptr<Scene>scene);
+    void setRenderingMode(Renderer::Mode mode);
+    void startRenderingLoop();
+    void endRenderingLoop();
 
-    vtkSmartPointer<vtkRenderWindow>getRenderWindow() const;
-    void                            setRenderWindow(vtkSmartPointer<vtkRenderWindow>renWin);
+    vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
 
-    std::shared_ptr<Scene>          getCurrentScene() const;
-    void                            setCurrentScene(std::shared_ptr<Scene>scene);
 
 protected:
 
-    vtkSmartPointer<vtkRenderWindow> m_renderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> m_interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
+    vtkSmartPointer<vtkRenderWindowInteractor> m_vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
     std::shared_ptr<Scene> m_currentScene;
+    std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
 };
 }
 

@@ -34,7 +34,7 @@ int main()
 
     auto planeGeom = std::make_shared<imstk::Plane>();
 
-    planeGeom->scale(8);
+    planeGeom->scale(10);
     auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
@@ -75,7 +75,7 @@ int main()
     cam1->setPosition(imstk::Vec3d(-5.5, 2.5, 32));
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
-    sdk->startSimulation("SceneTest");
+    sdk->startSimulation("SceneTest", imstk::Renderer::Mode::DEBUG );
 
 
     /*
