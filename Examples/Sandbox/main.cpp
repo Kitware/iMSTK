@@ -12,32 +12,43 @@
 #include "imstkCube.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
-
-// Maps
 #include "imstkIsometricMap.h"
 
 #include "g3log/g3log.hpp"
 
+void testViewer();
+void testAnalyticalGeometry();
+void testScenesManagement();
 void testGeometryMaps();
 
 int main()
 {
+    std::cout << "****************\n"
+              << "Starting Sandbox\n"
+              << "****************\n";
 
-    std::cout << "****************" << std::endl
-              << "Starting Sandbox" << std::endl
-              << "****************" << std::endl;
+    testViewer();
+    //testAnalyticalGeometry();
+    //testScenesManagement();
+    //testGeometryMaps();
 
-    // --------------------------------------------
-    // Rendering
-    // --------------------------------------------
+    return 0;
+}
+
+void testViewer()
+{
+    // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto sceneTest = sdk->createNewScene("SceneTest");
+    sceneTest->setLoopDelay(1000);
 
+    // Plane
     auto planeGeom = std::make_shared<imstk::Plane>();
-
     planeGeom->scale(10);
     auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
     planeObj->setVisualGeometry(planeGeom);
 
+    // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();
     cubeGeom->scale(0.5);
     cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4);
@@ -46,16 +57,19 @@ int main()
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
+    // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
     sphereGeom->scale(0.3);
     sphereGeom->translate(0, 2, 0);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
+    // Light (white)
     auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
     whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
     whiteLight->setPositional();
 
+    // Light (red)
     auto colorLight = std::make_shared<imstk::Light>("colorLight");
     colorLight->setPosition(imstk::Vec3d(4, -3, 1));
     colorLight->setFocalPoint(imstk::Vec3d(0, 0, 0));
@@ -63,155 +77,150 @@ int main()
     colorLight->setPositional();
     colorLight->setSpotAngle(15);
 
-    auto sceneTest = sdk->createNewScene("SceneTest");
-    sceneTest->setLoopDelay(1000);
+    // Add in scene
     sceneTest->addSceneObject(planeObj);
     sceneTest->addSceneObject(cubeObj);
     sceneTest->addSceneObject(sphereObj);
     sceneTest->addLight(whiteLight);
     sceneTest->addLight(colorLight);
 
+    // Update Camera
     auto cam1 = sceneTest->getCamera();
     cam1->setPosition(imstk::Vec3d(-5.5, 2.5, 32));
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
-    sdk->startSimulation("SceneTest", imstk::Renderer::Mode::DEBUG );
+    // Run
+    sdk->setCurrentScene("SceneTest");
+    sdk->startSimulation(true);
+}
 
+void testAnalyticalGeometry()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
 
-    /*
-        //--------------------------------------------
-        // Geometry
-        //--------------------------------------------
-        std::cout << std::fixed << std::setprecision(2);
+    // Plane
+    LOG(INFO) << "-- Plane : Init";
+    auto pos   = imstk::Vec3d(5, 2, 5);
+    auto norm  = imstk::Vec3d(0, 1, 1);
+    auto width = 10;
+    LOG(INFO) << "p = " << pos;
+    LOG(INFO) << "n = " << norm;
+    LOG(INFO) << "w = " << width;
 
-        // Plane
-        std::cout << "-- Plane : Init" << std::endl;
-        auto pos   = imstk::Vec3d(5, 2, 5);
-        auto norm  = imstk::Vec3d(0, 1, 1);
-        auto width = 10;
-        std::cout << "p = " << pos << std::endl;
-        std::cout << "n = " << norm << std::endl;
-        std::cout << "w = " << width << std::endl;
+    LOG(INFO) << "-- Plane : Create";
+    auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
+    LOG(INFO) << "p = " << plane->getPosition();
+    LOG(INFO) << "n = " << plane->getNormal();
+    LOG(INFO) << "w = " << plane->getWidth();
 
-        std::cout << "-- Plane : Create" << std::endl;
-        auto plane = std::make_shared<imstk::Plane>(pos, norm, width);
-        std::cout << "p = " << plane->getPosition() << std::endl;
-        std::cout << "n = " << plane->getNormal() << std::endl;
-        std::cout << "w = " << plane->getWidth() << std::endl;
+    LOG(INFO) << "-- Plane : Set Position";
+    plane->setPosition(imstk::Vec3d(1, 1, 1));
+    LOG(INFO) << "p = " << plane->getPosition();
 
-        std::cout << "-- Plane : Set Position" << std::endl;
-        plane->setPosition(imstk::Vec3d(1, 1, 1));
-        std::cout << "p = " << plane->getPosition() << std::endl;
+    LOG(INFO) << "-- Plane : Translate";
+    plane->translate(imstk::Vec3d(2, 1, -3));
+    LOG(INFO) << "p = " << plane->getPosition();
 
-        std::cout << "-- Plane : Translate" << std::endl;
-        plane->translate(imstk::Vec3d(2, 1, -3));
-        std::cout << "p = " << plane->getPosition() << std::endl;
+    LOG(INFO) << "-- Plane : Set Normal";
+    plane->setNormal(imstk::FORWARD_VECTOR);
+    LOG(INFO) << "n = " << plane->getNormal();
 
-        std::cout << "-- Plane : Set Normal" << std::endl;
-        plane->setNormal(imstk::FORWARD_VECTOR);
-        std::cout << "n = " << plane->getNormal() << std::endl;
+    LOG(INFO) << "-- Plane : Rotate";
+    plane->rotate(imstk::UP_VECTOR, imstk::PI_2);
+    LOG(INFO) << "n = " << plane->getNormal();
+}
 
-        std::cout << "-- Plane : Rotate" << std::endl;
-        plane->rotate(imstk::UP_VECTOR, imstk::PI_2);
-        std::cout << "n = " << plane->getNormal() << std::endl;
-     */
+void testScenesManagement()
+{
+    // THIS TESTS NEEDS TO DISABLE STANDALONE VIEWER RENDERING
 
-    /*
-        //--------------------------------------------
-        // SimulationManager
-        //--------------------------------------------
-        std::shared_ptr<imstk::SimulationManager> sdk =
-                std::make_shared<imstk::SimulationManager>();
+    auto sdk = std::make_shared<imstk::SimulationManager>();
 
-        // Scenes
-        LOG(INFO) << "-- Test add scenes";
+    // Scenes
+    LOG(INFO) << "-- Test add scenes";
+    auto scene1 = std::make_shared<imstk::Scene>("scene1");
+    scene1->setLoopDelay(500);
+    sdk->addScene(scene1);
 
-        std::shared_ptr<imstk::Scene> scene1 =
-        std::make_shared<imstk::Scene>("scene1");
-        scene1->setLoopDelay(500);
-        sdk->addScene(scene1);
+    sdk->createNewScene("scene2");
+    auto scene2 = sdk->getScene("scene2");
+    scene2->setLoopDelay(500);
 
-        sdk->createNewScene("scene2");
-        std::shared_ptr<imstk::Scene> scene2 = sdk->getScene("scene2");
-        scene2->setLoopDelay(500);
+    auto scene3 = sdk->createNewScene();
+    sdk->removeScene("Scene_3");
 
-        std::shared_ptr<imstk::Scene> scene3 = sdk->createNewScene();
-        sdk->removeScene("Scene_3");
+    // switch
+    LOG(INFO) << "-- Test scene switch";
+    int delay = 5;
+    sdk->setCurrentScene("scene1");
+    sdk->startSimulation();
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->setCurrentScene("scene2", false);
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->setCurrentScene("scene1", true);
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->endSimulation();
 
-        // switch
-        LOG(INFO) << "-- Test scene switch";
-        sdk->startSimulation("scene1");
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->switchScene("scene2", false);
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->switchScene("scene1", true);
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->endSimulation();
+    // pause/run
+    LOG(INFO) << "-- Test simulation pause/run";
+    sdk->setCurrentScene("scene2");
+    sdk->startSimulation();
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->pauseSimulation();
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->runSimulation();
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->pauseSimulation();
+    std::this_thread::sleep_for(std::chrono::seconds(delay));
+    sdk->endSimulation();
 
-        // pause/run
-        LOG(INFO) << "-- Test simulation pause/run";
-        sdk->startSimulation("scene2");
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->pauseSimulation();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->runSimulation();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->pauseSimulation();
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        sdk->endSimulation();
-
-        // Quit
-        while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
-     */
-
-    return 0;
+    // Quit
+    while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
 }
 
 void testGeometryMaps()
 {
-    std::cout << "****************" << std::endl
-        << "Test: Geometric maps" << std::endl
-        << "****************" << std::endl;
-
+    // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto geometryMapTest = sdk->createNewScene("geometryMapTest");
+    geometryMapTest->setLoopDelay(1000);
 
-    // Scene object 1
+    // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();
     cubeGeom->scale(0.5);
     auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
     cubeObj->setVisualGeometry(cubeGeom);
 
-    // Scene object 2
+    // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
     sphereGeom->scale(0.3);
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
 
-    // Isometric Map
-    auto rigidMap = std::make_shared<imstk::IsometricMap>();
-
-    rigidMap->setMaster(sphereObj->getVisualGeometry());
-    rigidMap->setSlave(cubeObj->getVisualGeometry());
-
-    auto trans = imstk::RigidTransform3d::Identity();
-    trans.translate(imstk::Vec3d(1.5, 1.5, 1.5));
-
-    auto rz = imstk::RigidTransform3d(Eigen::AngleAxisd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
-    trans.rotate(rz.rotation());
-
-    rigidMap->setTransform(trans);
-
-    // Apply map
-    rigidMap->applyMap();
-
-    // Move master and Apply map again
-    sphereObj->getVisualGeometry()->setPosition(-1.0, 0, 0);
-    rigidMap->applyMap();
-
-    auto geometryMapTest = sdk->createNewScene("geometryMapTest");
-    geometryMapTest->setLoopDelay(1000);
+    // Add objects in Scene
     geometryMapTest->addSceneObject(cubeObj);
     geometryMapTest->addSceneObject(sphereObj);
 
-    sdk->startSimulation("geometryMapTest");
+    // Isometric Map
+    auto transform = imstk::RigidTransform3d::Identity();
+    transform.translate(imstk::Vec3d(0.0, 1.0, 0.0));
+    transform.rotate(Eigen::AngleAxisd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
+    auto rigidMap = std::make_shared<imstk::IsometricMap>();
+    rigidMap->setMaster(sphereObj->getVisualGeometry());
+    rigidMap->setSlave(cubeObj->getVisualGeometry());
+    rigidMap->setTransform(transform);
+
+    // Test map
+    LOG(INFO) << cubeGeom->getPosition();
+
+    rigidMap->applyMap();
+    LOG(INFO) << cubeGeom->getPosition();
+
+    sphereGeom->setPosition(1.0, 0.0, 1.0);
+    rigidMap->applyMap();
+    LOG(INFO) << cubeGeom->getPosition();
+
+    // Start simulation
+    sdk->setCurrentScene("geometryMapTest");
+    sdk->startSimulation(imstk::Renderer::Mode::DEBUG);
 }

@@ -21,8 +21,6 @@
 
 #include "imstkViewer.h"
 
-#include "vtkInteractorStyleTrackballCamera.h"
-
 #include "g3log/g3log.hpp"
 
 #include "imstkRenderDelegate.h"
@@ -65,6 +63,9 @@ Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
 
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(m_rendererMap.at(m_currentScene)->getVtkRenderer());
+
+    // Set name to renderWindow
+    m_vtkRenderWindow->SetWindowName(m_currentScene->getName().data());
 }
 
 void
@@ -79,36 +80,47 @@ Viewer::setRenderingMode(Renderer::Mode mode)
 
     // Setup renderer
     m_rendererMap.at(m_currentScene)->setup(mode);
+    m_vtkRenderWindow->Render();
 
-    // Setup interactor style
-    if( mode == Renderer::Mode::DEBUG )
+    // Setup render window
+    if( mode == Renderer::Mode::SIMULATION )
     {
-        auto style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-        m_vtkInteractor->SetInteractorStyle( style );
+        m_interactorStyle->HighlightProp(nullptr);
+        m_vtkRenderWindow->HideCursor();
+        //m_vtkRenderWindow->BordersOff();
+        //m_vtkRenderWindow->FullScreenOn(1);
     }
-    else if( mode == Renderer::Mode::SIMULATION )
+    else
     {
-        auto style = vtkSmartPointer<vtkInteractorStyle>::New();
-        m_vtkInteractor->SetInteractorStyle( style );
+        m_vtkRenderWindow->ShowCursor();
+        //m_vtkRenderWindow->BordersOn();
+        //m_vtkRenderWindow->FullScreenOff(1);
     }
 }
 
 void
 Viewer::startRenderingLoop()
 {
-    // Start interaction loop
-    m_vtkInteractor->Start();
+    m_running = true;
+    m_vtkRenderWindow->GetInteractor()->Start();
+    m_running = false;
 }
 
 void
 Viewer::endRenderingLoop()
 {
-    m_vtkInteractor->TerminateApp();
+    m_vtkRenderWindow->GetInteractor()->TerminateApp();
 }
 
 vtkSmartPointer<vtkRenderWindow>
 Viewer::getVtkRenderWindow() const
 {
     return m_vtkRenderWindow;
+}
+
+const bool&
+Viewer::isRendering() const
+{
+    return m_running;
 }
 }

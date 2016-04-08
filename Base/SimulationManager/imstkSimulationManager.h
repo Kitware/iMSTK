@@ -60,13 +60,11 @@ public:
     std::shared_ptr<Viewer> getViewer() const;
 
     // Simulation
-    void                    startSimulation(std::string sceneName,
-                                            Renderer::Mode renderMode = Renderer::Mode::SIMULATION);
-    void                    switchScene(std::string newSceneName,
-                                        bool        unloadCurrentScene);
-    void                    runSimulation();
-    void                    pauseSimulation();
-    void                    endSimulation();
+    void setCurrentScene(std::string newSceneName, bool unloadCurrentScene = false);
+    void startSimulation(bool debug = false);
+    void runSimulation();
+    void pauseSimulation();
+    void endSimulation();
 
 private:
 
@@ -74,12 +72,11 @@ private:
 
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 
-    std::string m_currentSceneName;
+    std::string m_currentSceneName = "";
     std::unordered_map<std::string, std::shared_ptr<Scene> > m_sceneMap;
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>();
-
+    std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>(this);
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 }

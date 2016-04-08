@@ -174,6 +174,5 @@ void
 Scene::runModule()
 {
     LOG(DEBUG) << m_name << " : running";
-    LOG(INFO) << m_camera->getPosition();
 }
 }

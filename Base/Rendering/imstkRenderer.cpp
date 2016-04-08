@@ -31,7 +31,6 @@
 
 #include "g3log/g3log.hpp"
 
-
 namespace imstk {
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
@@ -55,21 +54,24 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
         }
     }
 
+    // Global Axis
+    auto axes = vtkSmartPointer<vtkAxesActor>::New();
+    m_debugVtkActors.push_back( axes );
+
     // Camera and camera actor
     m_sceneVtkCamera = scene->getCamera()->getVtkCamera();
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
     camActor->SetCamera(  m_sceneVtkCamera );
     m_debugVtkActors.push_back( camActor );
 
-    // Global Axis
-    auto axes = vtkSmartPointer<vtkAxesActor>::New();
-    m_debugVtkActors.push_back( axes );
-
     ///TODO : based on scene properties
     // Customize background colors
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
     m_vtkRenderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
     m_vtkRenderer->GradientBackgroundOn();
+
+    this->setup(Mode::SIMULATION);
+
 }
 
 vtkSmartPointer<vtkRenderer>
@@ -83,8 +85,6 @@ Renderer::setup(Mode mode)
 {
     if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
     {
-        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
-
         this->removeActors(m_objectVtkActors);
         m_vtkRenderer->RemoveAllLights();
 
@@ -92,11 +92,11 @@ Renderer::setup(Mode mode)
         {
             this->removeActors(m_debugVtkActors);
         }
+
+        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
     }
     else if( mode == Mode::DEBUG && m_currentMode != Mode::DEBUG )
     {
-        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
-
         this->addActors(m_debugVtkActors);
 
         if( m_currentMode == Mode::EMPTY )
@@ -107,11 +107,12 @@ Renderer::setup(Mode mode)
                 m_vtkRenderer->AddLight(light);
             }
         }
+
+        m_vtkRenderer->SetActiveCamera(m_defaultVtkCamera);
+        m_vtkRenderer->ResetCamera();
     }
     else if ( mode == Mode::SIMULATION && m_currentMode != Mode::SIMULATION )
     {
-        m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
-
         if( m_currentMode == Mode::EMPTY )
         {
             this->addActors(m_objectVtkActors);
@@ -124,6 +125,9 @@ Renderer::setup(Mode mode)
         {
             this->removeActors(m_debugVtkActors);
         }
+
+        m_vtkRenderer->SetActiveCamera(m_sceneVtkCamera);
+        m_vtkRenderer->ResetCameraClippingRange();
     }
 
     m_currentMode = mode;

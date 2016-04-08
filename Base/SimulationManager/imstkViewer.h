@@ -27,20 +27,26 @@
 
 #include "imstkScene.h"
 #include "imstkRenderer.h"
+#include "imstkInteractorStyle.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
+
 namespace imstk {
+
+class SimulationManager;
+
 class Viewer
 {
 public:
 
-    Viewer(std::string name = "iMSTK Viewer")
+    Viewer(SimulationManager* manager = nullptr)
     {
-        m_vtkInteractor->SetRenderWindow( m_vtkRenderWindow );
-        m_vtkRenderWindow->SetWindowName(name.data());
+        m_interactorStyle->setSimulationManager(manager);
+        m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
+        m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
         m_vtkRenderWindow->SetSize(1000,800);
     }
 
@@ -54,13 +60,18 @@ public:
 
     vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
 
+    const bool& isRendering() const;
 
 protected:
 
+    void debugModeKeyPressCallback(vtkObject*, long unsigned int, void*);
+    void simulationModeKeyPressCallback(vtkObject*, long unsigned int, void*);
+
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<vtkRenderWindowInteractor> m_vtkInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    vtkSmartPointer<InteractorStyle> m_interactorStyle = vtkSmartPointer<InteractorStyle>::New();
     std::shared_ptr<Scene> m_currentScene;
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
+    bool m_running = false;
 };
 }
 
