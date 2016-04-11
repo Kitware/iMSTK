@@ -19,34 +19,28 @@
 
    =========================================================================*/
 
-#include "imstkIsometricMap.h"
+#include "imstkIdentityMap.h"
+
 namespace imstk {
-    void IsometricMap::setTransform(const RigidTransform3d& affineTransform)
+
+    const imstk::RigidTransform3d& IdentityMap::getTransform() const
     {
-        m_rigidTransform = affineTransform;
+        return imstk::RigidTransform3d::Identity();
     }
 
-    const imstk::RigidTransform3d& IsometricMap::getTransform() const
-    {
-        return m_rigidTransform;
-    }
-
-    void IsometricMap::applyMap()
+    void IdentityMap::applyMap()
     {
         if (m_isActive)
         {
             if (!m_master || !m_slave)
             {
-                //LOG(WARNING) << "Isometric map is being applied without valid geometries\n";
+                LOG(WARNING) << "Identity map is being applied without valid geometries\n";
                 return;
             }
 
-            // First set the follower mesh configuration to that of master
+            // Set the follower mesh configuration to be same as that of master
             m_slave->setPosition(m_master->getPosition());
             m_slave->setOrientation(m_master->getOrientation());
-
-            // Now, apply the offset transform
-            m_slave->transform(m_rigidTransform);
         }
     }
 }

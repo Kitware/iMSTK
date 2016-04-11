@@ -25,12 +25,14 @@
 #include <memory>
 
 #include "imstkGeometry.h"
+#include "g3log/g3log.hpp"
 
 namespace imstk {
 
 enum class GeometryMapType
 {
     Isometric,
+    Identity,
     TetraTriangle,
     HexaTriangle,
     TetraTetra
@@ -63,13 +65,12 @@ public:
     void activateMap();
 
     // Accessors
-
     const GeometryMapType& getType() const;
 
-    void setMaster(std::shared_ptr<Geometry> master);
+    virtual void setMaster(std::shared_ptr<Geometry> master);
     std::shared_ptr<Geometry> getMaster() const;
 
-    void setSlave(std::shared_ptr<Geometry> slave);
+    virtual void setSlave(std::shared_ptr<Geometry> slave);
     std::shared_ptr<Geometry> getSlave() const;
 
     ///
