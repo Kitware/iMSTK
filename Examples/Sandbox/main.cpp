@@ -30,7 +30,7 @@ int main()
     testViewer();
     //testAnalyticalGeometry();
     //testScenesManagement();
-    //testGeometryMaps();
+    //testIsometricMaps();
 
     return 0;
 }
@@ -178,7 +178,15 @@ void testScenesManagement()
     while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
 }
 
-void testGeometryMaps()
+void testTetraTriangleMap()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto geometryMapTest = sdk->createNewScene("geometryMapTest");
+    geometryMapTest->setLoopDelay(1000);
+}
+
+void testIsometricMaps()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();

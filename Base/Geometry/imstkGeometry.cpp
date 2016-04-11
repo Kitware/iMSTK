@@ -22,6 +22,7 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+
 void
 Geometry::translate(const Vec3d& t)
 {

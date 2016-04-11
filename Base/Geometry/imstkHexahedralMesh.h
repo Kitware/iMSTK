@@ -37,8 +37,16 @@ public:
 
     ~HexahedralMesh() = default;
 
-    const std::vector<HexaArray>& getHexahedronVertices() const;
-    void                          setHexahedronVertices(const std::vector<HexaArray>& hexahedrons);
+    const std::vector<HexaArray>& getHexahedronMeshVertices() const;
+    void                          setHexahedronMeshVertices(const std::vector<HexaArray>& hexahedrons);
+
+    const imstk::HexahedralMesh::HexaArray& getHexahedronVertices(const int hexaNum) const;
+    int getNumHexahedra() const;
+
+    ///
+    /// \brief Get the total volume of the hexahedral mesh
+    ///
+    double getVolume() const;
 
 protected:
 

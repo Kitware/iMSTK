@@ -39,8 +39,32 @@ public:
 
     // Accessors
     const std::vector<TetraArray>& getTetrahedronVertices() const;
-    void                           setTetrahedronVertices(
-        const std::vector<TetraArray>& tetrahedrons);
+    void setTetrahedronVertices(const std::vector<TetraArray>& tetrahedrons);
+
+    ///
+    /// \brief Returns the number of tetrahedra
+    ///
+    int getNumTetrahedra() const;
+
+    ///
+    /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
+    ///
+    void computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4> weights) const;
+
+    ///
+    /// \brief get the indices vertices of a given tetrahedra in an array
+    ///
+    const TetraArray& getTetrahedronVertices(const int tetraNum) const;
+
+    ///
+    /// \brief Compute the bounding box of a given tetrahedra
+    ///
+    void computeTetrahedraBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const int tetNum) const;
+
+    ///
+    /// \brief Compute and return the volume of the tetrahedral mesh
+    ///
+    double getVolume() const;
 
 protected:
 

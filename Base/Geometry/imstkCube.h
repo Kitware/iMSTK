@@ -42,6 +42,7 @@ public:
     const double& getWidth() const;
     void          setWidth(const double& width);
 
+    double getVolume() const;
 protected:
 
     double m_width;

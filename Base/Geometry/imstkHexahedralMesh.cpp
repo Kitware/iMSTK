@@ -22,15 +22,77 @@
 #include "imstkHexahedralMesh.h"
 
 namespace imstk {
+
 const std::vector<HexahedralMesh::HexaArray>&
-HexahedralMesh::getHexahedronVertices() const
+HexahedralMesh::getHexahedronMeshVertices() const
 {
     return m_hexahedronVertices;
 }
 
 void
-HexahedralMesh::setHexahedronVertices(const std::vector<HexaArray>& hexahedrons)
+HexahedralMesh::setHexahedronMeshVertices(const std::vector<HexaArray>& hexahedrons)
 {
     m_hexahedronVertices = hexahedrons;
 }
+
+
+const imstk::HexahedralMesh::HexaArray&
+HexahedralMesh::getHexahedronVertices(const int hexaNum) const
+{
+    return m_hexahedronVertices.at(hexaNum);
+}
+
+int
+HexahedralMesh::getNumHexahedra() const
+{
+    return m_hexahedronVertices.size();
+}
+
+double
+HexahedralMesh::getVolume() const
+{
+    double volume = 0.0;
+    imstk::Vec3d v[8];
+    imstk::Vec3d a, b, c;
+    imstk::Mat3d A;
+    for (int i = 0; i < getNumHexahedra(); ++i)
+    {
+        auto hexVerts = getHexahedronVertices(i);
+        for (int i = 0; i < 8; ++i)
+        {
+            v[i] = getVertexPosition(hexVerts[i]);
+        }
+
+        a = v[7] - v[0];
+        b = v[1] - v[0];
+        c = v[3] - v[5];
+
+        A << a[0], b[0], c[0],
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
+
+        volume += A.determinant();
+
+        b = v[4] - v[0];
+        c = v[5] - v[6];
+
+        A << a[0], b[0], c[0],
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
+
+        volume += A.determinant();
+
+        b = v[2] - v[0];
+        c = v[6] - v[3];
+
+        A << a[0], b[0], c[0],
+            a[1], b[1], c[1],
+            a[2], b[2], c[2];
+
+        volume += A.determinant();
+    }
+
+    return volume/6;
+}
+
 }

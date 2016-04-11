@@ -45,4 +45,10 @@ Plane::setWidth(const double& width)
 {
     m_width = width;
 }
+
+double
+Plane::getVolume() const
+{
+    return 0.0;
+}
 }

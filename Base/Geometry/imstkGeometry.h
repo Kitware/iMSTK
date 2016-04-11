@@ -22,6 +22,7 @@
 #ifndef imstkGeometry_h
 #define imstkGeometry_h
 
+#include "g3log/g3log.hpp"
 #include "imstkMath.h"
 
 namespace imstk {
@@ -70,6 +71,8 @@ public:
     void                setScaling(const double& scaling);
 
     const GeometryType& getType() const;
+
+    virtual double getVolume() const = 0;
 
 protected:
 

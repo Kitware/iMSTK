@@ -23,24 +23,27 @@
 
 namespace imstk {
 
-    const imstk::RigidTransform3d& IdentityMap::getTransform() const
-    {
-        return imstk::RigidTransform3d::Identity();
-    }
+const imstk::RigidTransform3d&
+IdentityMap::getTransform() const
+{
+    return imstk::RigidTransform3d::Identity();
+}
 
-    void IdentityMap::applyMap()
+void
+IdentityMap::applyMap()
+{
+    if (m_isActive)
     {
-        if (m_isActive)
+        if (!m_master || !m_slave)
         {
-            if (!m_master || !m_slave)
-            {
-                LOG(WARNING) << "Identity map is being applied without valid geometries\n";
-                return;
-            }
-
-            // Set the follower mesh configuration to be same as that of master
-            m_slave->setPosition(m_master->getPosition());
-            m_slave->setOrientation(m_master->getOrientation());
+            LOG(WARNING) << "Identity map is being applied without valid geometries\n";
+            return;
         }
+
+        // Set the follower mesh configuration to be same as that of master
+        m_slave->setPosition(m_master->getPosition());
+        m_slave->setOrientation(m_master->getOrientation());
     }
+}
+
 }

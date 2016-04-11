@@ -28,6 +28,11 @@ Mesh::getInitialVertexPositions() const
     return m_initialVertexPositions;
 }
 
+const imstk::Vec3d& Mesh::getInitialVertexPosition(const int vertNum) const
+{
+    return m_initialVertexPositions.at(vertNum);
+}
+
 void
 Mesh::setInitialVertexPositions(const std::vector<Vec3d>& vertices)
 {
@@ -46,6 +51,16 @@ Mesh::setVertexPositions(const std::vector<Vec3d>& vertices)
     m_vertexPositions = vertices;
 }
 
+const imstk::Vec3d& Mesh::getVertexPosition(const int vertNum) const
+{
+    return m_vertexPositions.at(vertNum);
+}
+
+void Mesh::setVertexPosition(const int vertNum, const imstk::Vec3d& pos)
+{
+    m_vertexPositions.at(vertNum) = pos;
+}
+
 const std::vector<Vec3d>&
 Mesh::getVertexDisplacements() const
 {
@@ -57,4 +72,46 @@ Mesh::setVertexDisplacements(const std::vector<Vec3d>& diff)
 {
     m_vertexDisplacements = diff;
 }
+
+const imstk::Vec3d& Mesh::getVertexDisplacement(const int vertNum) const
+{
+    return m_vertexDisplacements.at(vertNum);
+}
+
+int Mesh::getNumVertices() const
+{
+    return m_initialVertexPositions.size();
+}
+
+void Mesh::computeBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const double percent) const
+{
+    min = imstk::Vec3d(std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max(),
+        std::numeric_limits<double>::max());
+
+    max = imstk::Vec3d(std::numeric_limits<double>::min(),
+        std::numeric_limits<double>::min(),
+        std::numeric_limits<double>::min());
+
+    for (auto it = m_vertexPositions.begin(); it != m_vertexPositions.end(); ++it)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            min[i] = std::min(min[i], (*it)[i]);
+            max[i] = std::max(max[i], (*it)[i]);
+        }
+    }
+
+    if (percent == 0.0)
+    {
+        return;
+    }
+    else
+    {
+        imstk::Vec3d range = max - min;
+        min = min - range*(percent / 100);
+        max = max + range*(percent / 100);
+    }
+}
+
 }

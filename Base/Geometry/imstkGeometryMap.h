@@ -68,10 +68,10 @@ public:
     const GeometryMapType& getType() const;
 
     virtual void setMaster(std::shared_ptr<Geometry> master);
-    std::shared_ptr<Geometry> getMaster() const;
+    virtual std::shared_ptr<Geometry> getMaster() const;
 
     virtual void setSlave(std::shared_ptr<Geometry> slave);
-    std::shared_ptr<Geometry> getSlave() const;
+    virtual std::shared_ptr<Geometry> getSlave() const;
 
     ///
     /// \brief Returns true if the map is actively applied at runtime, else false.

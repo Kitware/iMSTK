@@ -31,14 +31,26 @@ public:
 
     ~Mesh() = default;
 
+    // Accessors
     const std::vector<Vec3d>& getInitialVertexPositions() const;
     void                      setInitialVertexPositions(const std::vector<Vec3d>& vertices);
+
+    const imstk::Vec3d& getInitialVertexPosition(const int vertNum) const;
 
     const std::vector<Vec3d>& getVertexPositions() const;
     void                      setVertexPositions(const std::vector<Vec3d>& vertices);
 
+    const imstk::Vec3d& getVertexPosition(const int vertNum) const;
+    void setVertexPosition(const int vertNum, const imstk::Vec3d& pos);
+
     const std::vector<Vec3d>& getVertexDisplacements() const;
     void                      setVertexDisplacements(const std::vector<Vec3d>& diff);
+
+    const imstk::Vec3d& getVertexDisplacement(const int vertNum) const;
+
+    int getNumVertices() const;
+
+    void computeBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const double percent = 0.0) const;
 
 protected:
 

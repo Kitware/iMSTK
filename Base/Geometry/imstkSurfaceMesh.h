@@ -62,6 +62,10 @@ public:
     const std::vector<Vec4d>& getVertexTangents() const;
     const Vec4d             & getVertexTangent(size_t i) const;
 
+    const Vec3d             & getVertexInitialPosition(size_t i) const;
+    const Vec3d             & getVertexPosition(size_t i) const;
+
+    double getVolume() const;
 protected:
 
     std::vector<TriangleArray> m_triangleVertices;

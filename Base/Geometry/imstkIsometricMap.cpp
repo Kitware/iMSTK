@@ -21,32 +21,37 @@
 
 #include "imstkIsometricMap.h"
 namespace imstk {
-    void IsometricMap::setTransform(const RigidTransform3d& affineTransform)
-    {
-        m_rigidTransform = affineTransform;
-    }
 
-    const imstk::RigidTransform3d& IsometricMap::getTransform() const
-    {
-        return m_rigidTransform;
-    }
+void
+IsometricMap::setTransform(const RigidTransform3d& affineTransform)
+{
+    m_rigidTransform = affineTransform;
+}
 
-    void IsometricMap::applyMap()
+const imstk::RigidTransform3d&
+IsometricMap::getTransform() const
+{
+    return m_rigidTransform;
+}
+
+void
+IsometricMap::applyMap()
+{
+    if (m_isActive)
     {
-        if (m_isActive)
+        if (!m_master || !m_slave)
         {
-            if (!m_master || !m_slave)
-            {
-                //LOG(WARNING) << "Isometric map is being applied without valid geometries\n";
-                return;
-            }
-
-            // First set the follower mesh configuration to that of master
-            m_slave->setPosition(m_master->getPosition());
-            m_slave->setOrientation(m_master->getOrientation());
-
-            // Now, apply the offset transform
-            m_slave->transform(m_rigidTransform);
+            LOG(WARNING) << "Isometric map is being applied without valid geometries\n";
+            return;
         }
+
+        // First set the follower mesh configuration to that of master
+        m_slave->setPosition(m_master->getPosition());
+        m_slave->setOrientation(m_master->getOrientation());
+
+        // Now, apply the offset transform
+        m_slave->transform(m_rigidTransform);
     }
+}
+
 }

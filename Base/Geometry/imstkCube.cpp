@@ -22,6 +22,7 @@
 #include "imstkCube.h"
 
 namespace imstk {
+
 const double&
 Cube::getWidth() const
 {
@@ -33,4 +34,11 @@ Cube::setWidth(const double& width)
 {
     m_width = width;
 }
+
+double
+Cube::getVolume() const
+{
+    return m_width*m_width;
+}
+
 }

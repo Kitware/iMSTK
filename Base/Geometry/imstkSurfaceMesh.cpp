@@ -237,4 +237,27 @@ SurfaceMesh::getVertexTangent(size_t i) const
 {
     return m_vertexTangents.at(i);
 }
+
+const imstk::Vec3d & SurfaceMesh::getVertexInitialPosition(size_t i) const
+{
+    return m_initialVertexPositions.at(i);
+}
+
+const imstk::Vec3d & SurfaceMesh::getVertexPosition(size_t i) const
+{
+    return m_vertexPositions.at(i);
+}
+
+double
+SurfaceMesh::getVolume() const
+{
+    // TODO
+    // 1. Check for water tightness
+    // 2. Compute volume based on signed distance
+
+    LOG(WARNING) << "Not supported yet, returns 0.0!\n";
+
+    return 0.0;
+}
+
 }

@@ -22,43 +22,52 @@
 #include "imstkGeometryMap.h"
 
 namespace imstk {
-    void GeometryMap::muteMap()
-    {
-        m_isActive = false;
-    }
 
-    void GeometryMap::activateMap()
-    {
-        m_isActive = true;
-    }
+void
+GeometryMap::muteMap()
+{
+    m_isActive = false;
+}
 
-    const GeometryMapType& GeometryMap::getType() const
-    {
-        return m_type;
-    }
+void
+GeometryMap::activateMap()
+{
+    m_isActive = true;
+}
 
-    void GeometryMap::setMaster(std::shared_ptr<Geometry> master)
-    {
-        m_master = master;
-    }
+const
+GeometryMapType& GeometryMap::getType() const
+{
+    return m_type;
+}
 
-    std::shared_ptr<Geometry> GeometryMap::getMaster() const
-    {
-        return m_master;
-    }
+void
+GeometryMap::setMaster(std::shared_ptr<Geometry> master)
+{
+    m_master = master;
+}
 
-    void GeometryMap::setSlave(std::shared_ptr<Geometry> slave)
-    {
-        m_slave = slave;
-    }
+std::shared_ptr<Geometry>
+GeometryMap::getMaster() const
+{
+    return m_master;
+}
 
-    std::shared_ptr<Geometry> GeometryMap::getSlave() const
-    {
-        return m_slave;
-    }
+void
+GeometryMap::setSlave(std::shared_ptr<Geometry> slave)
+{
+    m_slave = slave;
+}
 
-    bool GeometryMap::isActive() const
-    {
-        return m_isActive;
-    }
+std::shared_ptr<Geometry>
+GeometryMap::getSlave() const
+{
+    return m_slave;
+}
+
+bool
+GeometryMap::isActive() const
+{
+    return m_isActive;
+}
 }

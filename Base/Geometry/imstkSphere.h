@@ -42,6 +42,7 @@ public:
     const double& getRadius() const;
     void          setRadius(const double& radius);
 
+    double getVolume() const;
 protected:
 
     double m_radius;
