@@ -69,11 +69,12 @@ public:
     const GeometryMapType& getType() const;
 
     virtual void setMaster(std::shared_ptr<Geometry> master);
-    const std::string& getTypeName() const;
     virtual std::shared_ptr<Geometry> getMaster() const;
 
     virtual void setSlave(std::shared_ptr<Geometry> slave);
     virtual std::shared_ptr<Geometry> getSlave() const;
+
+    const std::string getTypeName() const;
 
     ///
     /// \brief Returns true if the map is actively applied at runtime, else false.
@@ -83,11 +84,11 @@ public:
     ///
     /// \brief Print the map
     ///
-    virtual void printMap() const = 0;
+    virtual void print() const = 0;
 
 protected:
 
-    GeometryMap(GeometryMapType type) : m_isActive(true) {}
+    GeometryMap(GeometryMapType type) : m_type(type), m_isActive(true) {}
 
     GeometryMapType m_type; ///> type of the map
 

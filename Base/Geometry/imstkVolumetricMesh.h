@@ -37,7 +37,7 @@ public:
     // Accessors
     std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
 
-    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh>surfaceMesh);
+    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
 

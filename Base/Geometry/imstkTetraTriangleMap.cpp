@@ -37,8 +37,8 @@ TetraTriangleMap::computeMap()
     auto tetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh> (m_master);
     auto triMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh> (m_slave);
 
-    int numSurfaceVertices = triMesh->getNumVertices();
-    int numTetrahedra = tetMesh->getNumTetrahedra();
+    const int numSurfaceVertices = triMesh->getNumVertices();
+    const int numTetrahedra = tetMesh->getNumTetrahedra();
 
     for (int i = 0; i < numSurfaceVertices; ++i)
     {
@@ -64,7 +64,7 @@ TetraTriangleMap::computeMap()
 }
 
 int
-TetraTriangleMap::findClosestTetrahedra(const std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
+TetraTriangleMap::findClosestTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
 {
     // search
     double closestDistance = std::numeric_limits<double>::max();
@@ -90,7 +90,7 @@ TetraTriangleMap::findClosestTetrahedra(const std::shared_ptr<imstk::Tetrahedral
 }
 
 int
-TetraTriangleMap::findEclosingTetrahedra(const std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
+TetraTriangleMap::findEclosingTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
 {
     imstk::Vec3d boundingBoxMin;
     imstk::Vec3d boundingBoxMax;
@@ -152,18 +152,18 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 
 }
 
-void TetraTriangleMap::printMap() const
+void TetraTriangleMap::print() const
 {
     std::cout << this->getTypeName() << std::endl;
 
-    std::cout << "Vertex (<vertNum>): Tetrahedra: <TetNum> - Weights: (w1, w2, w3, w4)\n\n";
+    std::cout << "Vertex (<vertNum>): Tetrahedra: <TetNum> - Weights: (w1, w2, w3, w4)\n" << std::endl;
 
     for (size_t i = 0; i < this->m_enclosingTetra.size(); i++)
     {
-        std::cout << "\tVertex (" << i << "):" << "\tTetrahedra: " << m_enclosingTetra[i];
+        std::cout << "Vertex (" << i << "):" << "\tTetrahedra: " << m_enclosingTetra[i];
         std::cout << " - Weights: "
             << "(" << m_weights.at(i)[0] << ", " << m_weights.at(i)[1] <<
-            ", " << m_weights.at(i)[2] << ", " << m_weights.at(i)[3] << ")\n";
+            ", " << m_weights.at(i)[2] << ", " << m_weights.at(i)[3] << ")" << std::endl;
     }
 }
 

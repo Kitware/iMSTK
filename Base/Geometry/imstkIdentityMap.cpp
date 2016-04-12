@@ -23,7 +23,7 @@
 
 namespace imstk {
 
-const imstk::RigidTransform3d&
+const imstk::RigidTransform3d
 IdentityMap::getTransform() const
 {
     return imstk::RigidTransform3d::Identity();

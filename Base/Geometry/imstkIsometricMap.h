@@ -40,9 +40,9 @@ public:
 
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);
-    const RigidTransform3d& getTransform() const;
+    const RigidTransform3d getTransform() const;
 
-    void printMap() const;
+    void print() const;
 
 protected:
     RigidTransform3d m_rigidTransform;

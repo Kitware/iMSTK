@@ -47,9 +47,10 @@ GeometryMap::setMaster(std::shared_ptr<Geometry> master)
     m_master = master;
 }
 
-const std::string& GeometryMap::getTypeName() const
+const
+std::string GeometryMap::getTypeName() const
 {
-    switch (getType())
+    switch (m_type)
     {
         case GeometryMapType::Isometric:
             return "Isometric map";

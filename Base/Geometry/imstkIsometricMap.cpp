@@ -28,13 +28,13 @@ IsometricMap::setTransform(const RigidTransform3d& affineTransform)
     m_rigidTransform = affineTransform;
 }
 
-const imstk::RigidTransform3d&
+const imstk::RigidTransform3d
 IsometricMap::getTransform() const
 {
     return m_rigidTransform;
 }
 
-void IsometricMap::printMap() const
+void IsometricMap::print() const
 {
     std::cout << this->getTypeName() << std::endl;
 }

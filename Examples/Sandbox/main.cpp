@@ -267,7 +267,7 @@ void testTetraTriangleMap()
     tetTriMap->setSlave(triMesh);
     tetTriMap->computeMap();
 
-    tetTriMap->printMap();
+    tetTriMap->print();
 
     getchar();
 }

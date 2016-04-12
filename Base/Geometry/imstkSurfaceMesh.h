@@ -46,8 +46,7 @@ public:
     void                              computeVertexTangents();
 
     // Accessors
-    void                              setTriangleVertices(
-        const std::vector<TriangleArray>& triangles);
+    void                              setTriangleVertices(const std::vector<TriangleArray>& triangles);
 
     void                              setTextureCoordinates(const std::vector<Vec2f>& coords);
 

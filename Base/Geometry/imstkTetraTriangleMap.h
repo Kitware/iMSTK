@@ -61,12 +61,12 @@ public:
     ///
     /// \brief Find the closest tetrahedra based on the distance to their centroids for a given point in 3D space
     ///
-    static int findClosestTetrahedra(const std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
+    static int findClosestTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
 
     ///
     /// \brief Find the tetrahedra that encloses a given point in 3D space
     ///
-    static int findEclosingTetrahedra(const std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
+    static int findEclosingTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
 
     // Accessors
 
@@ -83,7 +83,7 @@ public:
     ///
     /// \brief Print the map
     ///
-    void printMap() const;
+    void print() const;
 
 protected:
     std::vector<weightsArray> m_weights; ///> weights

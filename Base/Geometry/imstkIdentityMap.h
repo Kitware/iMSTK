@@ -43,7 +43,7 @@ public:
     // Accessors
 
     void setTransform(const RigidTransform3d& affineTransform);
-    const RigidTransform3d& getTransform() const;
+    const RigidTransform3d getTransform() const;
 };
 }
 
