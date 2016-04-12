@@ -37,7 +37,6 @@ TetraTriangleMap::computeMap()
     auto tetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh> (m_master);
     auto triMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh> (m_slave);
 
-    weightsArray weights;
     int numSurfaceVertices = triMesh->getNumVertices();
     int numTetrahedra = tetMesh->getNumTetrahedra();
 
@@ -56,6 +55,7 @@ TetraTriangleMap::computeMap()
         }
 
         // compute the weights
+        weightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
         tetMesh->computeBarycentricWeights(closestEle, surfVertPos, weights);
 
         m_enclosingTetra.push_back(closestEle);// store nearest tetrahedra
@@ -111,7 +111,7 @@ TetraTriangleMap::findEclosingTetrahedra(const std::shared_ptr<imstk::Tetrahedra
 
     // Check which probable tetrahedra the point belongs to
     int elclosingTetra = -1;
-    weightsArray weights;
+    weightsArray weights = {0.0, 0.0, 0.0, 0.0};
     for (auto it = probables.begin(); it != probables.end(); ++it)
     {
         tetraMesh->computeBarycentricWeights(*it, p, weights);
@@ -150,6 +150,21 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
         LOG(WARNING) << "The geometry provided is not of surface triangular type\n";
     }
 
+}
+
+void TetraTriangleMap::printMap() const
+{
+    std::cout << this->getTypeName() << std::endl;
+
+    std::cout << "Vertex (<vertNum>): Tetrahedra: <TetNum> - Weights: (w1, w2, w3, w4)\n\n";
+
+    for (size_t i = 0; i < this->m_enclosingTetra.size(); i++)
+    {
+        std::cout << "\tVertex (" << i << "):" << "\tTetrahedra: " << m_enclosingTetra[i];
+        std::cout << " - Weights: "
+            << "(" << m_weights.at(i)[0] << ", " << m_weights.at(i)[1] <<
+            ", " << m_weights.at(i)[2] << ", " << m_weights.at(i)[3] << ")\n";
+    }
 }
 
 void

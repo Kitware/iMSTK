@@ -47,6 +47,25 @@ GeometryMap::setMaster(std::shared_ptr<Geometry> master)
     m_master = master;
 }
 
+const std::string& GeometryMap::getTypeName() const
+{
+    switch (getType())
+    {
+        case GeometryMapType::Isometric:
+            return "Isometric map";
+        case GeometryMapType::Identity:
+            return "Identity map";
+        case GeometryMapType::TetraTriangle:
+            return "Tetra-Triangle map";
+        case GeometryMapType::HexaTriangle:
+            return "Hexa-Triangle map";
+        case GeometryMapType::TetraTetra:
+            return "Tetra-Tetra map";
+        default:
+            return "Map type not determined!";
+    }
+}
+
 std::shared_ptr<Geometry>
 GeometryMap::getMaster() const
 {

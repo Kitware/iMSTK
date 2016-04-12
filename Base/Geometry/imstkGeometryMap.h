@@ -23,6 +23,7 @@
 #define imstkGeometryMap_h
 
 #include <memory>
+#include <iostream>
 
 #include "imstkGeometry.h"
 #include "g3log/g3log.hpp"
@@ -68,6 +69,7 @@ public:
     const GeometryMapType& getType() const;
 
     virtual void setMaster(std::shared_ptr<Geometry> master);
+    const std::string& getTypeName() const;
     virtual std::shared_ptr<Geometry> getMaster() const;
 
     virtual void setSlave(std::shared_ptr<Geometry> slave);
@@ -77,6 +79,11 @@ public:
     /// \brief Returns true if the map is actively applied at runtime, else false.
     ///
     bool isActive() const;
+
+    ///
+    /// \brief Print the map
+    ///
+    virtual void printMap() const = 0;
 
 protected:
 

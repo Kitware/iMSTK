@@ -49,7 +49,7 @@ public:
     ///
     /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
     ///
-    void computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4> weights) const;
+    void computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4>& weights) const;
 
     ///
     /// \brief get the indices vertices of a given tetrahedra in an array

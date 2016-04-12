@@ -34,6 +34,11 @@ IsometricMap::getTransform() const
     return m_rigidTransform;
 }
 
+void IsometricMap::printMap() const
+{
+    std::cout << this->getTypeName() << std::endl;
+}
+
 void
 IsometricMap::applyMap()
 {

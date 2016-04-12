@@ -42,6 +42,8 @@ public:
     void setTransform(const RigidTransform3d& affineTransform);
     const RigidTransform3d& getTransform() const;
 
+    void printMap() const;
+
 protected:
     RigidTransform3d m_rigidTransform;
 };

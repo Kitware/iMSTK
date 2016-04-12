@@ -29,6 +29,11 @@ IdentityMap::getTransform() const
     return imstk::RigidTransform3d::Identity();
 }
 
+void IdentityMap::printMap() const
+{
+    std::cout << this->getTypeName() << std::endl;
+}
+
 void
 IdentityMap::applyMap()
 {

@@ -40,7 +40,7 @@ TetrahedralMesh::setTetrahedronVertices(const std::vector<TetraArray>& tetrahedr
 }
 
 void
-TetrahedralMesh::computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4> weights) const
+TetrahedralMesh::computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4>& weights) const
 {
     TetraArray vertIndices = getTetrahedronVertices(closestEle);
     imstk::Vec3d v[4];

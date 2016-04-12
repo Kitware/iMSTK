@@ -38,6 +38,8 @@ public:
 
     void computeMap(){};
 
+    void printMap() const;
+
     // Accessors
 
     void setTransform(const RigidTransform3d& affineTransform);

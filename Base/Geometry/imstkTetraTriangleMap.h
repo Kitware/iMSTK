@@ -80,6 +80,11 @@ public:
     ///
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
+    ///
+    /// \brief Print the map
+    ///
+    void printMap() const;
+
 protected:
     std::vector<weightsArray> m_weights; ///> weights
     std::vector<int> m_enclosingTetra; ///> Enclosing tetrahedra to interpolate the weights upon
