@@ -88,6 +88,11 @@ InteractorStyle::OnChar()
     case 'f' :
     case 'F' :
     {
+        if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+        {
+            return;
+        }
+
         if(this->CurrentRenderer != 0)
         {
             this->AnimState = VTKIS_ANIM_ON;
@@ -118,6 +123,11 @@ InteractorStyle::OnChar()
     case 'r' :
     case 'R' :
     {
+        if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+        {
+            return;
+        }
+
         if(this->CurrentRenderer!=0)
         {
             this->CurrentRenderer->ResetCamera();
