@@ -1,3 +1,15 @@
+macro(imstk_subdir_list result curdir)
+  file(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  set(dirlist "")
+  foreach(child ${children})
+    if(IS_DIRECTORY ${curdir}/${child})
+      list(APPEND dirlist ${child})
+    endif()
+  endforeach()
+  set(${result} ${dirlist})
+endmacro()
+
+
 function(imstk_add_library target)
 
   set(options VERBOSE)
@@ -18,10 +30,11 @@ function(imstk_add_library target)
   endif()
 
   #-----------------------------------------------------------------------------
-  # Create target (library)
+  # Get files and directories
   #-----------------------------------------------------------------------------
-  file(GLOB target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-  file(GLOB target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+  file(GLOB_RECURSE target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+  file(GLOB_RECURSE target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+  imstk_subdir_list(target_SUBDIR_LIST ${CMAKE_CURRENT_SOURCE_DIR})
 
   #-----------------------------------------------------------------------------
   # Create target (library)
@@ -41,8 +54,13 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Include directories
   #-----------------------------------------------------------------------------
+  list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
+  foreach(subdir ${target_SUBDIR_LIST})
+    list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${subdir}>")
+  endforeach()
+
   target_include_directories( ${target} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    ${target_BUILD_INTERFACE_LIST}
     $<INSTALL_INTERFACE:${iMSTK_INSTALL_INCLUDE_DIR}>
     )
 
