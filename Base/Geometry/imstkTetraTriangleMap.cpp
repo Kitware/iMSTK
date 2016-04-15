@@ -25,173 +25,176 @@ namespace imstk
 {
 
 void
-TetraTriangleMap::computeMap()
+TetraTriangleMap::compute()
 {
     if (!m_master || !m_slave)
     {
-        LOG(WARNING) << "TetraTriangle map is being applied without valid geometries\n";
+        LOG(WARNING) << "TetraTriangle map is being applied without valid geometries";
         return;
     }
 
-    // Proceed to generate the map
-    auto tetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh> (m_master);
-    auto triMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh> (m_slave);
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
+    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
 
-    const int numSurfaceVertices = triMesh->getNumVertices();
-    const int numTetrahedra = tetMesh->getNumTetrahedra();
-
-    for (int i = 0; i < numSurfaceVertices; ++i)
+    for (const Vec3d& surfVertPos : triMesh->getInitialVerticesPositions())
     {
-        imstk::Vec3d surfVertPos = triMesh->getVertexInitialPosition(i);
-
-        // find the enclosing element
-        int closestEle = findEclosingTetrahedra(tetMesh, surfVertPos);
-
-        // if not inside of any element,
-        // find the tetrahedra whose centroid is the closest
-        if (closestEle < 0)
+        // Find the enclosing or closest tetrahedron
+        int closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
+        if (closestTetId < 0)
         {
-            closestEle = findClosestTetrahedra(tetMesh, surfVertPos);
+            closestTetId = findClosestTetrahedron(tetMesh, surfVertPos);
+        }
+        if (closestTetId < 0)
+        {
+            LOG(WARNING) << "Could not find closest tetrahedron";
+            return;
         }
 
-        // compute the weights
-        weightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
-        tetMesh->computeBarycentricWeights(closestEle, surfVertPos, weights);
+        // Compute the weights
+        TetrahedralMesh::WeightsArray weights = { 0.0, 0.0, 0.0, 0.0 };
+        tetMesh->computeBarycentricWeights(closestTetId, surfVertPos, weights);
 
-        m_enclosingTetra.push_back(closestEle);// store nearest tetrahedra
-        m_weights.push_back(weights);// store weights
+        m_verticesEnclosingTetraId.push_back(closestTetId); // store nearest tetrahedron
+        m_verticesWeights.push_back(weights); // store weights
     }
 }
 
-int
-TetraTriangleMap::findClosestTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
+void
+TetraTriangleMap::apply()
 {
-    // search
-    double closestDistance = std::numeric_limits<double>::max();
-    int closestTetrahedra = -1;
-    for (int t = 0; t < tetraMesh->getNumTetrahedra(); ++t)
+    // Check Map active
+    if (!m_isActive)
     {
-        imstk::Vec3d center(0, 0, 0);
-        auto vert = tetraMesh->getTetrahedronVertices(t);
-        for (int i = 0; i < 4; ++i)
-        {
-            center += tetraMesh->getInitialVertexPosition(vert[i]);
-        }
-
-        double dist = (p - center).norm();
-        if (dist < closestDistance)
-        {
-            closestDistance = dist;
-            closestTetrahedra = t;
-        }
+        LOG(WARNING) << "TetraTriangle map is not active";
+        return;
     }
 
-    return closestTetrahedra;
+    // Check geometries
+    if (!m_master || !m_slave)
+    {
+        LOG(WARNING) << "TetraTriangle map is being applied without valid geometries";
+        return;
+    }
+
+    auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
+    auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
+
+    Vec3d newPos;
+    for (size_t vertexId = 0; vertexId < triMesh->getNumVertices(); ++vertexId)
+    {
+        newPos.setZero();
+        size_t tetId = m_verticesEnclosingTetraId.at(vertexId);
+        auto tetVerts = tetMesh->getTetrahedronVertices(tetId);
+        auto weights = m_verticesWeights.at(vertexId);
+        for (size_t i = 0; i < 4; ++i)
+        {
+            newPos += tetMesh->getInitialVerticePosition(tetVerts[i]) * weights[i];
+        }
+        triMesh->setVerticePosition(vertexId, newPos);
+    }
 }
 
-int
-TetraTriangleMap::findEclosingTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p)
+void
+TetraTriangleMap::print() const
 {
-    imstk::Vec3d boundingBoxMin;
-    imstk::Vec3d boundingBoxMax;
-    std::vector<int> probables;
+    // Print Type
+    GeometryMap::print();
 
-    // Eliminate the improbables based in bounding box test
-    for (int t = 0; t < tetraMesh->getNumTetrahedra(); ++t)
+    // Print vertices and weight info
+    LOG(INFO) << "Vertex (<vertNum>): Tetrahedra: <TetNum> - Weights: (w1, w2, w3, w4)\n";
+    for (size_t vertexId = 0; vertexId < m_verticesEnclosingTetraId.size(); ++vertexId)
     {
-        tetraMesh->computeTetrahedraBoundingBox(boundingBoxMin, boundingBoxMax, t);
-
-        if ((p[0] >= boundingBoxMin[0] && p[0] <= boundingBoxMax[0]) &&
-            (p[1] >= boundingBoxMin[1] && p[1] <= boundingBoxMax[1]) &&
-            (p[2] >= boundingBoxMin[2] && p[2] <= boundingBoxMax[2]))
-        {
-            probables.push_back(t);
-        }
+        LOG(INFO) << "Vertex (" << vertexId << "):"
+                  << "\tTetrahedra: " << m_verticesEnclosingTetraId.at(vertexId)
+                  << " - Weights: " << "("
+                  << m_verticesWeights.at(vertexId)[0] << ", "
+                  << m_verticesWeights.at(vertexId)[1] << ", "
+                  << m_verticesWeights.at(vertexId)[2] << ", "
+                  << m_verticesWeights.at(vertexId)[3] << ")";
     }
-
-    // Check which probable tetrahedra the point belongs to
-    int elclosingTetra = -1;
-    weightsArray weights = {0.0, 0.0, 0.0, 0.0};
-    for (auto it = probables.begin(); it != probables.end(); ++it)
-    {
-        tetraMesh->computeBarycentricWeights(*it, p, weights);
-
-        if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
-        {
-            elclosingTetra = *it;
-            break;
-        }
-    }
-    return elclosingTetra;
 }
 
 void
 TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
 {
-    if (master->getType() == imstk::GeometryType::TetrahedralMesh)
+    if (master->getType() != GeometryType::TetrahedralMesh)
     {
-        m_master = master;
+        LOG(WARNING) << "The geometry provided as master is not of tetrahedral type";
+        return;
     }
-    else
-    {
-        LOG(WARNING) << "The geometry provided is not of tetrahedral type\n";
-    }
+    GeometryMap::setMaster(master);
 }
 
 void
 TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 {
-    if (slave->getType() == imstk::GeometryType::SurfaceMesh)
+    if (slave->getType() != GeometryType::SurfaceMesh)
     {
-        m_slave = slave;
+        LOG(WARNING) << "The geometry provided as slave is not of triangular type (surface)";
+        return;
     }
-    else
-    {
-        LOG(WARNING) << "The geometry provided is not of surface triangular type\n";
-    }
-
+    GeometryMap::setSlave(slave);
 }
 
-void TetraTriangleMap::print() const
+int
+TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+                                         const Vec3d& pos)
 {
-    std::cout << this->getTypeName() << std::endl;
-
-    std::cout << "Vertex (<vertNum>): Tetrahedra: <TetNum> - Weights: (w1, w2, w3, w4)\n" << std::endl;
-
-    for (size_t i = 0; i < this->m_enclosingTetra.size(); i++)
+    double closestDistance = MAX_D;
+    int closestTetrahedron = -1;
+    for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
-        std::cout << "Vertex (" << i << "):" << "\tTetrahedra: " << m_enclosingTetra[i];
-        std::cout << " - Weights: "
-            << "(" << m_weights.at(i)[0] << ", " << m_weights.at(i)[1] <<
-            ", " << m_weights.at(i)[2] << ", " << m_weights.at(i)[3] << ")" << std::endl;
+        Vec3d center(0, 0, 0);
+        auto vert = tetraMesh->getTetrahedronVertices(tetId);
+        for (size_t i = 0; i < 4; ++i)
+        {
+            center += tetraMesh->getInitialVerticePosition(vert[i]);
+        }
+
+        double dist = (pos - center).norm();
+        if (dist < closestDistance)
+        {
+            closestDistance = dist;
+            closestTetrahedron = tetId;
+        }
     }
+    return closestTetrahedron;
 }
 
-void
-TetraTriangleMap::applyMap()
+int
+TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+                                           const Vec3d& pos)
 {
-    if (m_isActive)
+    Vec3d boundingBoxMin;
+    Vec3d boundingBoxMax;
+    std::vector<size_t> probablesTetId;
+
+    // Eliminate the improbables based in bounding box test
+    for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
-        if (!m_master || !m_slave)
-        {
-            LOG(WARNING) << "TetraTriangle map is not completely defined!\n";
-            return;
-        }
+        tetraMesh->computeTetrahedronBoundingBox(tetId, boundingBoxMin, boundingBoxMax);
 
-        auto tetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh> (m_master);
-        auto triMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh> (m_slave);
-
-        imstk::Vec3d newPos;
-        for (int v = 0; v < triMesh->getNumVertices(); ++v)
+        if ((pos[0] >= boundingBoxMin[0] && pos[0] <= boundingBoxMax[0]) &&
+            (pos[1] >= boundingBoxMin[1] && pos[1] <= boundingBoxMax[1]) &&
+            (pos[2] >= boundingBoxMin[2] && pos[2] <= boundingBoxMax[2]))
         {
-            newPos.setZero();
-            auto tetVerts = tetMesh->getTetrahedronVertices(m_enclosingTetra[v]);
-            for (int i = 0; i < 4; ++i)
-            {
-                newPos += tetMesh->getInitialVertexPosition(tetVerts[i]) * m_weights.at(v)[i];
-            }
-            triMesh->setVertexPosition(v, newPos);
+            probablesTetId.push_back(tetId);
         }
     }
+
+    // Check which probable tetrahedron the point belongs to
+    int enclosingTetrahedron = -1;
+    TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
+    for (const size_t& tetId : probablesTetId)
+    {
+        tetraMesh->computeBarycentricWeights(tetId, pos, weights);
+
+        if ((weights[0] >= 0) && (weights[1] >= 0) && (weights[2] >= 0) && (weights[3] >= 0))
+        {
+            enclosingTetrahedron = tetId;
+            break;
+        }
+    }
+    return enclosingTetrahedron;
 }
 }

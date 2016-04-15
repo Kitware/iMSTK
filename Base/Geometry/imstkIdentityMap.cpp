@@ -22,33 +22,31 @@
 #include "imstkIdentityMap.h"
 
 namespace imstk {
+void
+IdentityMap::apply()
+{
+    // Check Map active
+    if (!m_isActive)
+    {
+        LOG(WARNING) << "Identity map is not active";
+        return;
+    }
 
-const imstk::RigidTransform3d
+    // Check geometries
+    if (!m_master || !m_slave)
+    {
+        LOG(WARNING) << "Identity map is being applied without valid geometries";
+        return;
+    }
+
+    // Set the follower mesh configuration to be same as that of master
+    m_slave->setPosition(m_master->getPosition());
+    m_slave->setOrientation(m_master->getOrientation());
+}
+
+const RigidTransform3d
 IdentityMap::getTransform() const
 {
-    return imstk::RigidTransform3d::Identity();
+    return RigidTransform3d::Identity();
 }
-
-void IdentityMap::printMap() const
-{
-    std::cout << this->getTypeName() << std::endl;
-}
-
-void
-IdentityMap::applyMap()
-{
-    if (m_isActive)
-    {
-        if (!m_master || !m_slave)
-        {
-            LOG(WARNING) << "Identity map is being applied without valid geometries\n";
-            return;
-        }
-
-        // Set the follower mesh configuration to be same as that of master
-        m_slave->setPosition(m_master->getPosition());
-        m_slave->setOrientation(m_master->getOrientation());
-    }
-}
-
 }

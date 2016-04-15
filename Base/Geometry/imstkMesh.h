@@ -32,37 +32,34 @@ public:
     ~Mesh() = default;
 
     // Accessors
-    const std::vector<Vec3d>& getInitialVertexPositions() const;
-    void                      setInitialVertexPositions(const std::vector<Vec3d>& vertices);
+    void setInitialVerticesPositions(const std::vector<Vec3d>& vertices);
+    const std::vector<Vec3d>& getInitialVerticesPositions() const;
+    const Vec3d& getInitialVerticePosition(const int& vertNum) const;
 
-    const imstk::Vec3d& getInitialVertexPosition(const int vertNum) const;
+    void setVerticesPositions(const std::vector<Vec3d>& vertices);
+    const std::vector<Vec3d>& getVerticesPositions() const;
+    void setVerticePosition(const int &vertNum, const Vec3d& pos);
+    const Vec3d& getVerticePosition(const int& vertNum) const;
 
-    const std::vector<Vec3d>& getVertexPositions() const;
-    void                      setVertexPositions(const std::vector<Vec3d>& vertices);
+    void setVerticesDisplacements(const std::vector<Vec3d>& diff);
+    const std::vector<Vec3d>& getVerticesDisplacements() const;
+    const Vec3d& getVerticeDisplacement(const int& vertNum) const;
 
-    const imstk::Vec3d& getVertexPosition(const int vertNum) const;
-    void setVertexPosition(const int vertNum, const imstk::Vec3d& pos);
+    const int getNumVertices() const;
 
-    const std::vector<Vec3d>& getVertexDisplacements() const;
-    void                      setVertexDisplacements(const std::vector<Vec3d>& diff);
-
-    const imstk::Vec3d& getVertexDisplacement(const int vertNum) const;
-
-    int getNumVertices() const;
-
-    void computeBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const double percent = 0.0) const;
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
 
 protected:
 
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
 
-    //   Orientation * Scaling * initialVertexPositions
+    //   Orientation * Scaling * initialVerticesPositions
     // + Position (Initial translation)
-    // + vertexDisplacements
-    // = vertexPositions
-    std::vector<Vec3d> m_initialVertexPositions;
-    std::vector<Vec3d> m_vertexPositions;
-    std::vector<Vec3d> m_vertexDisplacements;
+    // + verticesDisplacements
+    // = verticesPositions
+    std::vector<Vec3d> m_initialVerticesPositions;
+    std::vector<Vec3d> m_verticesPositions;
+    std::vector<Vec3d> m_verticesDisplacements;
 };
 }
 

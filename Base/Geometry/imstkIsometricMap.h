@@ -30,22 +30,31 @@ class IsometricMap : public GeometryMap
 {
 public:
 
+    IsometricMap() :
+        GeometryMap(GeometryMapType::Isometric),
+        m_rigidTransform(RigidTransform3d::Identity())
+    {}
+
     ~IsometricMap() = default;
 
-    IsometricMap() : GeometryMap(GeometryMapType::Isometric), m_rigidTransform(RigidTransform3d::Identity()){}
+    ///
+    /// \brief Compute the map
+    ///
+    void compute() override {}
 
-    void applyMap();
-
-    void computeMap(){};
+    ///
+    /// \brief Apply the map
+    ///
+    void apply() override;
 
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);
-    const RigidTransform3d getTransform() const;
-
-    void print() const;
+    const RigidTransform3d& getTransform() const;
 
 protected:
+
     RigidTransform3d m_rigidTransform;
+
 };
 }
 

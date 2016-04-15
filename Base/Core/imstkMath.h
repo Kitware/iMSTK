@@ -27,6 +27,8 @@
 #include <Eigen/Geometry>
 
 namespace imstk {
+
+
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
@@ -50,6 +52,10 @@ using Quatd = Eigen::Quaterniond;
 // 3x3 Matrix
 using Mat3f = Eigen::Matrix3f;
 using Mat3d = Eigen::Matrix3d;
+
+// 4x4 Matrix
+using Mat4f = Eigen::Matrix4f;
+using Mat4d = Eigen::Matrix4d;
 
 // Rigid transform (translation and rotation)
 using RigidTransform3f = Eigen::Isometry3f;
@@ -83,6 +89,8 @@ const double LOG10E = 0.434294481903251827651;
 const double LN2 = 0.693147180559945309417;
 const double LN10 = 2.30258509299404568402;
 
+const double MAX_D = std::numeric_limits<double>::max();
+const double MIN_D = std::numeric_limits<double>::min();
 }
 
 #endif // ifndef imstkMath_h

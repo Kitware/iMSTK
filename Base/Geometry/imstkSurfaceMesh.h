@@ -30,52 +30,50 @@
 namespace imstk {
 class SurfaceMesh : public Mesh
 {
+public:
+
     using TriangleArray = std::array<size_t, 3>;
     using NeighborsType = std::set<size_t>;
-
-public:
 
     SurfaceMesh() : Mesh(GeometryType::SurfaceMesh) {}
 
     ~SurfaceMesh() = default;
 
-    void                              computeVertexNeighborTriangles();
-    void                              computeVertexNeighborVertices();
-    void                              computeTriangleNormals();
-    void                              computeVertexNormals();
-    void                              computeVertexTangents();
+    void computeVerticesNeighborTriangles();
+    void computeVerticesNeighborVertices();
+    void computeTrianglesNormals();
+    void computeVerticesNormals();
+    void computeVerticesTangents();
 
     // Accessors
-    void                              setTriangleVertices(const std::vector<TriangleArray>& triangles);
+    void setTrianglesVertices(const std::vector<TriangleArray>& triangles);
+    const std::vector<TriangleArray>& getTrianglesVertices() const;
 
-    void                              setTextureCoordinates(const std::vector<Vec2f>& coords);
+    void setTextureCoordinates(const std::vector<Vec2f>& coords);
+    const std::vector<Vec2f>& getTextureCoordinates() const;
 
-    const std::vector<TriangleArray>& getTriangleVertices() const;
-    const std::vector<Vec2f>        & getTextureCoordinates() const;
-    const std::vector<Vec3d>        & getTriangleNormals() const;
-    const Vec3d             & getTriangleNormal(size_t i) const;
+    const std::vector<Vec3d>& getTrianglesNormals() const;
+    const Vec3d& getTriangleNormal(size_t i) const;
 
-    const std::vector<Vec3d>& getVertexNormals() const;
-    const Vec3d             & getVertexNormal(size_t i) const;
+    const std::vector<Vec3d>& getVerticesNormals() const;
+    const Vec3d& getVerticeNormal(size_t i) const;
 
-    const std::vector<Vec4d>& getVertexTangents() const;
-    const Vec4d             & getVertexTangent(size_t i) const;
-
-    const Vec3d             & getVertexInitialPosition(size_t i) const;
-    const Vec3d             & getVertexPosition(size_t i) const;
+    const std::vector<Vec4d>& getVerticesTangents() const;
+    const Vec4d& getVerticeTangent(size_t i) const;
 
     double getVolume() const;
+
 protected:
 
-    std::vector<TriangleArray> m_triangleVertices;
+    std::vector<TriangleArray> m_trianglesVertices;
     std::vector<Vec2f> m_textureCoordinates;
 
-    std::vector<NeighborsType> m_vertexNeighborTriangles;
-    std::vector<NeighborsType> m_vertexNeighborVertices;
+    std::vector<NeighborsType> m_verticesNeighborTriangles;
+    std::vector<NeighborsType> m_verticesNeighborVertices;
 
-    std::vector<Vec3d> m_triangleNormals;
-    std::vector<Vec3d> m_vertexNormals;
-    std::vector<Vec4d> m_vertexTangents;
+    std::vector<Vec3d> m_trianglesNormals;
+    std::vector<Vec3d> m_verticesNormals;
+    std::vector<Vec4d> m_verticesTangents;
 };
 }
 

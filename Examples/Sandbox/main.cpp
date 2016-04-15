@@ -26,7 +26,7 @@
 void testViewer();
 void testAnalyticalGeometry();
 void testScenesManagement();
-void testGeometryMaps();
+void testIsometricMap();
 void testTetraTriangleMap();
 
 int main()
@@ -38,7 +38,7 @@ int main()
     //testViewer();
     //testAnalyticalGeometry();
     //testScenesManagement();
-    //testIsometricMaps();
+    //testIsometricMap();
     testTetraTriangleMap();
 
     return 0;
@@ -187,7 +187,7 @@ void testScenesManagement()
     while (sdk->getStatus() != imstk::SimulationStatus::INACTIVE) {}
 }
 
-void testIsometricMaps()
+void testIsometricMap()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
@@ -223,11 +223,11 @@ void testIsometricMaps()
     // Test map
     LOG(INFO) << cubeGeom->getPosition();
 
-    rigidMap->applyMap();
+    rigidMap->apply();
     LOG(INFO) << cubeGeom->getPosition();
 
     sphereGeom->setPosition(1.0, 0.0, 1.0);
-    rigidMap->applyMap();
+    rigidMap->apply();
     LOG(INFO) << cubeGeom->getPosition();
 
     // Start simulation
@@ -237,6 +237,8 @@ void testIsometricMaps()
 
 void testTetraTriangleMap()
 {
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
     // Tetrahedral mesh
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
     std::vector<imstk::Vec3d> vertList;
@@ -244,13 +246,13 @@ void testTetraTriangleMap()
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
     vertList.push_back(imstk::Vec3d(0, 0, 1.0));
-    tetMesh->setInitialVertexPositions(vertList);
-    tetMesh->setVertexPositions(vertList);
+    tetMesh->setInitialVerticesPositions(vertList);
+    tetMesh->setVerticesPositions(vertList);
 
-    std::vector<std::array<size_t, 4>> tetConnectivity;
-    std::array<size_t, 4 > tet1 = { 0, 1, 2, 3 };
+    std::vector<imstk::TetrahedralMesh::TetraArray> tetConnectivity;
+    imstk::TetrahedralMesh::TetraArray tet1 = { 0, 1, 2, 3 };
     tetConnectivity.push_back(tet1);
-    tetMesh->setTetrahedronVertices(tetConnectivity);
+    tetMesh->setTetrahedraVertices(tetConnectivity);
 
     // Triangular mesh
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -258,14 +260,14 @@ void testTetraTriangleMap()
     SurfVertList.push_back(imstk::Vec3d(0, 0, 1));// coincides with one vertex
     SurfVertList.push_back(imstk::Vec3d(0.25, 0.25, 0.25));// centroid
     SurfVertList.push_back(imstk::Vec3d(1.05, 0, 0));
-    triMesh->setInitialVertexPositions(SurfVertList);
-    triMesh->setVertexPositions(SurfVertList);
+    triMesh->setInitialVerticesPositions(SurfVertList);
+    triMesh->setVerticesPositions(SurfVertList);
 
     // Construct a map
     auto tetTriMap = std::make_shared<imstk::TetraTriangleMap>();
     tetTriMap->setMaster(tetMesh);
     tetTriMap->setSlave(triMesh);
-    tetTriMap->computeMap();
+    tetTriMap->compute();
 
     tetTriMap->print();
 

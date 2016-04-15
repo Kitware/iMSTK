@@ -22,45 +22,42 @@
 #include "imstkHexahedralMesh.h"
 
 namespace imstk {
+void
+HexahedralMesh::setHexahedraVertices(const std::vector<HexaArray>& hexahedra)
+{
+    m_hexahedraVertices = hexahedra;
+}
 
 const std::vector<HexahedralMesh::HexaArray>&
-HexahedralMesh::getHexahedronMeshVertices() const
+HexahedralMesh::getHexahedraVertices() const
 {
-    return m_hexahedronVertices;
+    return m_hexahedraVertices;
 }
 
-void
-HexahedralMesh::setHexahedronMeshVertices(const std::vector<HexaArray>& hexahedrons)
+const HexahedralMesh::HexaArray&
+HexahedralMesh::getHexahedronVertices(const int& hexaNum) const
 {
-    m_hexahedronVertices = hexahedrons;
-}
-
-
-const imstk::HexahedralMesh::HexaArray&
-HexahedralMesh::getHexahedronVertices(const int hexaNum) const
-{
-    return m_hexahedronVertices.at(hexaNum);
+    return m_hexahedraVertices.at(hexaNum);
 }
 
 int
 HexahedralMesh::getNumHexahedra() const
 {
-    return m_hexahedronVertices.size();
+    return m_hexahedraVertices.size();
 }
 
 double
 HexahedralMesh::getVolume() const
 {
+    Vec3d v[8];
+    Mat3d A;
+    Vec3d a, b, c;
     double volume = 0.0;
-    imstk::Vec3d v[8];
-    imstk::Vec3d a, b, c;
-    imstk::Mat3d A;
-    for (int i = 0; i < getNumHexahedra(); ++i)
+    for (const HexaArray& hexArray : m_hexahedraVertices)
     {
-        auto hexVerts = getHexahedronVertices(i);
         for (int i = 0; i < 8; ++i)
         {
-            v[i] = getVertexPosition(hexVerts[i]);
+            v[i] = this->getVerticePosition(hexArray[i]);
         }
 
         a = v[7] - v[0];
@@ -68,8 +65,8 @@ HexahedralMesh::getVolume() const
         c = v[3] - v[5];
 
         A << a[0], b[0], c[0],
-            a[1], b[1], c[1],
-            a[2], b[2], c[2];
+             a[1], b[1], c[1],
+             a[2], b[2], c[2];
 
         volume += A.determinant();
 
@@ -77,8 +74,8 @@ HexahedralMesh::getVolume() const
         c = v[5] - v[6];
 
         A << a[0], b[0], c[0],
-            a[1], b[1], c[1],
-            a[2], b[2], c[2];
+             a[1], b[1], c[1],
+             a[2], b[2], c[2];
 
         volume += A.determinant();
 
@@ -86,13 +83,12 @@ HexahedralMesh::getVolume() const
         c = v[6] - v[3];
 
         A << a[0], b[0], c[0],
-            a[1], b[1], c[1],
-            a[2], b[2], c[2];
+             a[1], b[1], c[1],
+             a[2], b[2], c[2];
 
         volume += A.determinant();
     }
 
     return volume/6;
 }
-
 }

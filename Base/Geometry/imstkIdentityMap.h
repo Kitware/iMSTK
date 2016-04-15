@@ -30,19 +30,22 @@ class IdentityMap : public GeometryMap
 {
 public:
 
+    IdentityMap() : GeometryMap(GeometryMapType::Identity) {}
+
     ~IdentityMap() = default;
 
-    IdentityMap() : GeometryMap(GeometryMapType::Identity){}
+    ///
+    /// \brief Compute the map
+    ///
+    void compute() override {}
 
-    void applyMap();
-
-    void computeMap(){};
-
-    void printMap() const;
+    ///
+    /// \brief Apply the map
+    ///
+    void apply() override;
 
     // Accessors
-
-    void setTransform(const RigidTransform3d& affineTransform);
+    void setTransform(const RigidTransform3d& affineTransform) = delete;
     const RigidTransform3d getTransform() const;
 };
 }

@@ -22,29 +22,34 @@
 #include "imstkGeometryMap.h"
 
 namespace imstk {
-
 void
-GeometryMap::muteMap()
+GeometryMap::mute()
 {
     m_isActive = false;
 }
 
 void
-GeometryMap::activateMap()
+GeometryMap::activate()
 {
     m_isActive = true;
+}
+
+void
+GeometryMap::print() const
+{
+    LOG(INFO) << this->getTypeName();
+}
+
+bool
+GeometryMap::isActive() const
+{
+    return m_isActive;
 }
 
 const
 GeometryMapType& GeometryMap::getType() const
 {
     return m_type;
-}
-
-void
-GeometryMap::setMaster(std::shared_ptr<Geometry> master)
-{
-    m_master = master;
 }
 
 const
@@ -67,6 +72,12 @@ std::string GeometryMap::getTypeName() const
     }
 }
 
+void
+GeometryMap::setMaster(std::shared_ptr<Geometry> master)
+{
+    m_master = master;
+}
+
 std::shared_ptr<Geometry>
 GeometryMap::getMaster() const
 {
@@ -83,11 +94,5 @@ std::shared_ptr<Geometry>
 GeometryMap::getSlave() const
 {
     return m_slave;
-}
-
-bool
-GeometryMap::isActive() const
-{
-    return m_isActive;
 }
 }

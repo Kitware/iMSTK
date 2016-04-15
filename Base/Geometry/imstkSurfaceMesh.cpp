@@ -23,40 +23,40 @@
 
 namespace imstk {
 void
-SurfaceMesh::computeVertexNeighborTriangles()
+SurfaceMesh::computeVerticesNeighborTriangles()
 {
-    m_vertexNeighborTriangles.resize(m_vertexPositions.size());
+    m_verticesNeighborTriangles.resize(m_verticesPositions.size());
 
     size_t triangleId = 0;
 
-    for (const auto& t : m_triangleVertices)
+    for (const auto& t : m_trianglesVertices)
     {
-        m_vertexNeighborTriangles.at(t.at(0)).insert(triangleId);
-        m_vertexNeighborTriangles.at(t.at(1)).insert(triangleId);
-        m_vertexNeighborTriangles.at(t.at(2)).insert(triangleId);
+        m_verticesNeighborTriangles.at(t.at(0)).insert(triangleId);
+        m_verticesNeighborTriangles.at(t.at(1)).insert(triangleId);
+        m_verticesNeighborTriangles.at(t.at(2)).insert(triangleId);
         triangleId++;
     }
 }
 
 void
-SurfaceMesh::computeVertexNeighborVertices()
+SurfaceMesh::computeVerticesNeighborVertices()
 {
-    m_vertexNeighborVertices.resize(m_vertexPositions.size());
+    m_verticesNeighborVertices.resize(m_verticesPositions.size());
 
-    if (!m_vertexNeighborTriangles.size())
+    if (!m_verticesNeighborTriangles.size())
     {
-        this->computeVertexNeighborTriangles();
+        this->computeVerticesNeighborTriangles();
     }
 
-    for (size_t vertexId = 0; vertexId < m_vertexNeighborVertices.size(); ++vertexId)
+    for (size_t vertexId = 0; vertexId < m_verticesNeighborVertices.size(); ++vertexId)
     {
-        for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
+        for (const size_t& triangleId : m_verticesNeighborTriangles.at(vertexId))
         {
-            for (const size_t& vertexId2 : m_triangleVertices.at(triangleId))
+            for (const size_t& vertexId2 : m_trianglesVertices.at(triangleId))
             {
                 if (vertexId2 != vertexId)
                 {
-                    m_vertexNeighborVertices.at(vertexId).insert(vertexId2);
+                    m_verticesNeighborVertices.at(vertexId).insert(vertexId2);
                 }
             }
         }
@@ -64,49 +64,49 @@ SurfaceMesh::computeVertexNeighborVertices()
 }
 
 void
-SurfaceMesh::computeTriangleNormals()
+SurfaceMesh::computeTrianglesNormals()
 {
-    m_triangleNormals.resize(m_triangleVertices.size());
+    m_trianglesNormals.resize(m_trianglesVertices.size());
 
-    for (size_t triangleId = 0; triangleId < m_triangleNormals.size(); ++triangleId)
+    for (size_t triangleId = 0; triangleId < m_trianglesNormals.size(); ++triangleId)
     {
-        const auto& t  = m_triangleVertices.at(triangleId);
-        const auto& p0 = m_vertexPositions.at(t.at(0));
-        const auto& p1 = m_vertexPositions.at(t.at(1));
-        const auto& p2 = m_vertexPositions.at(t.at(2));
+        const auto& t  = m_trianglesVertices.at(triangleId);
+        const auto& p0 = m_verticesPositions.at(t.at(0));
+        const auto& p1 = m_verticesPositions.at(t.at(1));
+        const auto& p2 = m_verticesPositions.at(t.at(2));
 
-        m_triangleNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
+        m_trianglesNormals.at(triangleId) = ((p1 - p0).cross(p2 - p0)).normalized();
     }
 }
 
 void
-SurfaceMesh::computeVertexNormals()
+SurfaceMesh::computeVerticesNormals()
 {
-    m_vertexNormals.resize(m_vertexPositions.size());
+    m_verticesNormals.resize(m_verticesPositions.size());
 
-    if (!m_vertexNeighborTriangles.size())
+    if (!m_verticesNeighborTriangles.size())
     {
-        this->computeVertexNeighborTriangles();
+        this->computeVerticesNeighborTriangles();
     }
 
-    if (!m_triangleNormals.size())
+    if (!m_trianglesNormals.size())
     {
-        this->computeTriangleNormals();
+        this->computeTrianglesNormals();
     }
 
-    for (size_t vertexId = 0; vertexId < m_vertexNormals.size(); ++vertexId)
+    for (size_t vertexId = 0; vertexId < m_verticesNormals.size(); ++vertexId)
     {
-        for (const size_t& triangleId : m_vertexNeighborTriangles.at(vertexId))
+        for (const size_t& triangleId : m_verticesNeighborTriangles.at(vertexId))
         {
-            m_vertexNormals.at(vertexId) += m_triangleNormals.at(triangleId);
+            m_verticesNormals.at(vertexId) += m_trianglesNormals.at(triangleId);
         }
 
-        m_vertexNormals.at(vertexId).normalize();
+        m_verticesNormals.at(vertexId).normalize();
     }
 }
 
 void
-SurfaceMesh::computeVertexTangents()
+SurfaceMesh::computeVerticesTangents()
 {
     /*
        Derived from
@@ -118,18 +118,18 @@ SurfaceMesh::computeVertexTangents()
 
     std::vector<Vec3d> tan1, tan2;
 
-    tan1.resize(m_vertexPositions.size());
-    tan2.resize(m_vertexPositions.size());
+    tan1.resize(m_verticesPositions.size());
+    tan2.resize(m_verticesPositions.size());
 
-    for (const auto& triangle : m_triangleVertices)
+    for (const auto& triangle : m_trianglesVertices)
     {
         const size_t& id0 = triangle.at(0);
         const size_t& id1 = triangle.at(1);
         const size_t& id2 = triangle.at(2);
 
-        const Vec3d& p0 = m_vertexPositions.at(id0);
-        const Vec3d& p1 = m_vertexPositions.at(id1);
-        const Vec3d& p2 = m_vertexPositions.at(id2);
+        const Vec3d& p0 = m_verticesPositions.at(id0);
+        const Vec3d& p1 = m_verticesPositions.at(id1);
+        const Vec3d& p2 = m_verticesPositions.at(id2);
 
         const Vec2f& uv0 = m_textureCoordinates.at(id0);
         const Vec2f& uv1 = m_textureCoordinates.at(id1);
@@ -157,11 +157,11 @@ SurfaceMesh::computeVertexTangents()
         tan2.at(id2) += v_dir;
     }
 
-    m_vertexTangents.resize(m_vertexPositions.size());
+    m_verticesTangents.resize(m_verticesPositions.size());
 
-    for (size_t vertexId = 0; vertexId < m_vertexTangents.size(); ++vertexId)
+    for (size_t vertexId = 0; vertexId < m_verticesTangents.size(); ++vertexId)
     {
-        const Vec3d& n  = m_vertexNormals.at(vertexId);
+        const Vec3d& n  = m_verticesNormals.at(vertexId);
         const Vec3d& t1 = tan1.at(0);
         const Vec3d& t2 = tan2.at(0);
 
@@ -169,25 +169,25 @@ SurfaceMesh::computeVertexTangents()
         Vec3d tangente = (t1 - n * n.dot(t1));
         tangente.normalize();
 
-        m_vertexTangents.at(vertexId)[0] = tangente[0];
-        m_vertexTangents.at(vertexId)[1] = tangente[1];
-        m_vertexTangents.at(vertexId)[2] = tangente[2];
+        m_verticesTangents.at(vertexId)[0] = tangente[0];
+        m_verticesTangents.at(vertexId)[1] = tangente[1];
+        m_verticesTangents.at(vertexId)[2] = tangente[2];
 
         // Calculate handedness
-        m_vertexTangents.at(vertexId)[3] = ((n.cross(t1)).dot(t2) < 0.0f) ? -1.0f : 1.0f;
+        m_verticesTangents.at(vertexId)[3] = ((n.cross(t1)).dot(t2) < 0.0f) ? -1.0f : 1.0f;
     }
 }
 
 const std::vector<SurfaceMesh::TriangleArray>&
-SurfaceMesh::getTriangleVertices() const
+SurfaceMesh::getTrianglesVertices() const
 {
-    return m_triangleVertices;
+    return m_trianglesVertices;
 }
 
 void
-SurfaceMesh::setTriangleVertices(const std::vector<TriangleArray>& triangles)
+SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
 {
-    m_triangleVertices = triangles;
+    m_trianglesVertices = triangles;
 }
 
 const std::vector<Vec2f>&
@@ -203,49 +203,39 @@ SurfaceMesh::setTextureCoordinates(const std::vector<Vec2f>& coords)
 }
 
 const std::vector<Vec3d>&
-SurfaceMesh::getTriangleNormals() const
+SurfaceMesh::getTrianglesNormals() const
 {
-    return m_triangleNormals;
+    return m_trianglesNormals;
 }
 
 const Vec3d&
 SurfaceMesh::getTriangleNormal(size_t i) const
 {
-    return m_triangleNormals.at(i);
+    return m_trianglesNormals.at(i);
 }
 
 const std::vector<Vec3d>&
-SurfaceMesh::getVertexNormals() const
+SurfaceMesh::getVerticesNormals() const
 {
-    return m_vertexNormals;
+    return m_verticesNormals;
 }
 
 const Vec3d&
-SurfaceMesh::getVertexNormal(size_t i) const
+SurfaceMesh::getVerticeNormal(size_t i) const
 {
-    return m_vertexNormals.at(i);
+    return m_verticesNormals.at(i);
 }
 
 const std::vector<Vec4d>&
-SurfaceMesh::getVertexTangents() const
+SurfaceMesh::getVerticesTangents() const
 {
-    return m_vertexTangents;
+    return m_verticesTangents;
 }
 
 const Vec4d&
-SurfaceMesh::getVertexTangent(size_t i) const
+SurfaceMesh::getVerticeTangent(size_t i) const
 {
-    return m_vertexTangents.at(i);
-}
-
-const imstk::Vec3d & SurfaceMesh::getVertexInitialPosition(size_t i) const
-{
-    return m_initialVertexPositions.at(i);
-}
-
-const imstk::Vec3d & SurfaceMesh::getVertexPosition(size_t i) const
-{
-    return m_vertexPositions.at(i);
+    return m_verticesTangents.at(i);
 }
 
 double

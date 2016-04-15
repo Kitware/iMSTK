@@ -37,7 +37,7 @@ Sphere::setRadius(const double& radius)
 double
 Sphere::getVolume() const
 {
-    return 0.75*imstk::PI*m_radius*m_radius*m_radius;
+    return 0.75*PI*m_radius*m_radius*m_radius;
 }
 
 }

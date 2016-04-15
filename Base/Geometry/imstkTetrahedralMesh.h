@@ -29,17 +29,19 @@
 namespace imstk {
 class TetrahedralMesh : public VolumetricMesh
 {
-    using TetraArray = std::array<size_t, 4>;
-
 public:
+
+    using TetraArray = std::array<size_t, 4>;
+    using WeightsArray = std::array<double, 4>;
 
     TetrahedralMesh() : VolumetricMesh(GeometryType::TetrahedralMesh) {}
 
     ~TetrahedralMesh() = default;
 
     // Accessors
-    const std::vector<TetraArray>& getTetrahedronVertices() const;
-    void setTetrahedronVertices(const std::vector<TetraArray>& tetrahedrons);
+    void setTetrahedraVertices(const std::vector<TetraArray>& tetrahedrons);
+    const std::vector<TetraArray>& getTetrahedraVertices() const;
+    const TetraArray& getTetrahedronVertices(const size_t& tetId) const;
 
     ///
     /// \brief Returns the number of tetrahedra
@@ -47,28 +49,23 @@ public:
     int getNumTetrahedra() const;
 
     ///
-    /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
-    ///
-    void computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4>& weights) const;
-
-    ///
-    /// \brief get the indices vertices of a given tetrahedra in an array
-    ///
-    const TetraArray& getTetrahedronVertices(const int tetraNum) const;
-
-    ///
-    /// \brief Compute the bounding box of a given tetrahedra
-    ///
-    void computeTetrahedraBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const int tetNum) const;
-
-    ///
     /// \brief Compute and return the volume of the tetrahedral mesh
     ///
     double getVolume() const;
 
+    ///
+    /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
+    ///
+    void computeBarycentricWeights(const size_t& tetId, const Vec3d& pos, WeightsArray& weights) const;
+
+    ///
+    /// \brief Compute the bounding box of a given tetrahedron
+    ///
+    void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
+
 protected:
 
-    std::vector<TetraArray> m_tetrahedronVertices; ///< vertices of the tetrahedra
+    std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra
 };
 }
 

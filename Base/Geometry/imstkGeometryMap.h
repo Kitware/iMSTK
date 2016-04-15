@@ -48,43 +48,42 @@ public:
     ///
     /// \brief Compute the map
     ///
-    virtual void computeMap() = 0;
+    virtual void compute() = 0;
 
     ///
     /// \brief Apply the map
     ///
-    virtual void applyMap() = 0;
+    virtual void apply() = 0;
+
+    ///
+    /// \brief Print the map
+    ///
+    virtual void print() const;
 
     ///
     /// \brief Deactivate the map
     ///
-    void muteMap();
+    void mute();
 
     ///
     /// \brief Activate the map
     ///
-    void activateMap();
-
-    // Accessors
-    const GeometryMapType& getType() const;
-
-    virtual void setMaster(std::shared_ptr<Geometry> master);
-    virtual std::shared_ptr<Geometry> getMaster() const;
-
-    virtual void setSlave(std::shared_ptr<Geometry> slave);
-    virtual std::shared_ptr<Geometry> getSlave() const;
-
-    const std::string getTypeName() const;
+    void activate();
 
     ///
     /// \brief Returns true if the map is actively applied at runtime, else false.
     ///
     bool isActive() const;
 
-    ///
-    /// \brief Print the map
-    ///
-    virtual void print() const = 0;
+    // Accessors
+    const GeometryMapType& getType() const;
+    const std::string getTypeName() const;
+
+    virtual void setMaster(std::shared_ptr<Geometry> master);
+    virtual std::shared_ptr<Geometry> getMaster() const;
+
+    virtual void setSlave(std::shared_ptr<Geometry> slave);
+    virtual std::shared_ptr<Geometry> getSlave() const;
 
 protected:
 

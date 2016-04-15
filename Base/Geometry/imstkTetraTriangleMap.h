@@ -38,37 +38,26 @@ namespace imstk {
 ///
 class TetraTriangleMap : public GeometryMap
 {
-    using weightsArray = std::array<double, 4>;
-
 public:
-
-    ~TetraTriangleMap() = default;
 
     TetraTriangleMap() : GeometryMap(GeometryMapType::TetraTriangle){}
 
-    ///
-    /// \brief Apply (if active) the tetra-triangle mesh map
-    ///
-    void applyMap();
+    ~TetraTriangleMap() = default;
 
     ///
     /// \brief Compute the tetra-triangle mesh map
     ///
-    void computeMap();
-
-    // Generic utility functions
+    void compute() override;
 
     ///
-    /// \brief Find the closest tetrahedra based on the distance to their centroids for a given point in 3D space
+    /// \brief Apply (if active) the tetra-triangle mesh map
     ///
-    static int findClosestTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
+    void apply() override;
 
     ///
-    /// \brief Find the tetrahedra that encloses a given point in 3D space
+    /// \brief Print the map
     ///
-    static int findEclosingTetrahedra(std::shared_ptr<imstk::TetrahedralMesh> tetraMesh, const imstk::Vec3d& p);
-
-    // Accessors
+    void print() const override;
 
     ///
     /// \brief Set the geometry that dictates the map
@@ -81,13 +70,22 @@ public:
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
     ///
-    /// \brief Print the map
+    /// \brief Find the closest tetrahedron based on the distance to their centroids for a given point in 3D space
     ///
-    void print() const;
+    static int findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+                                      const Vec3d& pos);
+
+    ///
+    /// \brief Find the tetrahedron that encloses a given point in 3D space
+    ///
+    static int findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
+                                        const Vec3d& pos);
 
 protected:
-    std::vector<weightsArray> m_weights; ///> weights
-    std::vector<int> m_enclosingTetra; ///> Enclosing tetrahedra to interpolate the weights upon
+
+    std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
+    std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
+
 };
 }
 

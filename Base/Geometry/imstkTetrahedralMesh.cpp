@@ -22,37 +22,73 @@
 #include "imstkTetrahedralMesh.h"
 
 namespace imstk {
+void
+TetrahedralMesh::setTetrahedraVertices(const std::vector<TetraArray>& tetrahedra)
+{
+    m_tetrahedraVertices = tetrahedra;
+}
 const std::vector<TetrahedralMesh::TetraArray>&
-TetrahedralMesh::getTetrahedronVertices() const
+TetrahedralMesh::getTetrahedraVertices() const
 {
-    return m_tetrahedronVertices;
+    return m_tetrahedraVertices;
 }
 
-const imstk::TetrahedralMesh::TetraArray& TetrahedralMesh::getTetrahedronVertices(const int tetraNum) const
+const TetrahedralMesh::TetraArray&
+TetrahedralMesh::getTetrahedronVertices(const size_t& tetId) const
 {
-    return m_tetrahedronVertices.at(tetraNum);
+    return m_tetrahedraVertices.at(tetId);
+}
+
+int
+TetrahedralMesh::getNumTetrahedra() const
+{
+    return m_tetrahedraVertices.size();
+}
+
+double
+TetrahedralMesh::getVolume() const
+{
+    Vec3d v[4];
+    Mat4d A;
+    double volume = 0.0;
+    for (const TetraArray& tetVertices : m_tetrahedraVertices)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            v[i] = this->getVerticePosition(tetVertices[i]);
+        }
+
+        A << v[0][0], v[0][1], v[0][2], 1,
+             v[1][0], v[1][1], v[1][2], 1,
+             v[2][0], v[2][1], v[2][2], 1,
+             v[3][0], v[3][1], v[3][2], 1;
+
+        double det = A.determinant();
+        if (det < 0)
+        {
+            LOG(WARNING) << "Tetrahedron is inverted, has negative volume!";
+        }
+
+        volume += std::abs(det)/6;
+    }
+
+    return volume;
 }
 
 void
-TetrahedralMesh::setTetrahedronVertices(const std::vector<TetraArray>& tetrahedrons)
+TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos,
+                                           WeightsArray& weights) const
 {
-    m_tetrahedronVertices = tetrahedrons;
-}
-
-void
-TetrahedralMesh::computeBarycentricWeights(const int closestEle, const imstk::Vec3d& p, std::array<double, 4>& weights) const
-{
-    TetraArray vertIndices = getTetrahedronVertices(closestEle);
-    imstk::Vec3d v[4];
-    double dets[4];
+    const TetraArray& tetVertices = m_tetrahedraVertices.at(tetId);
+    Vec3d v[4];
     double det;
 
     for (int i = 0; i < 4; i++)
     {
-        v[i] = getVertexPosition(vertIndices[i]);
+        v[i] = this->getVerticePosition(tetVertices[i]);
     }
 
-    Eigen::Matrix4d A;
+    Mat4d A;
     A << v[0][0], v[0][1], v[0][2], 1,
          v[1][0], v[1][1], v[1][2], 1,
          v[2][0], v[2][1], v[2][2], 1,
@@ -62,21 +98,21 @@ TetrahedralMesh::computeBarycentricWeights(const int closestEle, const imstk::Ve
 
     for (int i = 0; i < 4; i++)
     {
-        Eigen::Matrix4d B = A;
-        B(i, 0) = p[0];
-        B(i, 1) = p[1];
-        B(i, 2) = p[2];
+        Mat4d B = A;
+        B(i, 0) = pos[0];
+        B(i, 1) = pos[1];
+        B(i, 2) = pos[2];
         weights[i] = B.determinant() / det;
     }
 }
 
 void
-TetrahedralMesh::computeTetrahedraBoundingBox(imstk::Vec3d& min, imstk::Vec3d& max, const int tetNum) const
+TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const
 {
-    auto v1 = getVertexPosition(m_tetrahedronVertices.at(tetNum)[0]);
-    auto v2 = getVertexPosition(m_tetrahedronVertices.at(tetNum)[1]);
-    auto v3 = getVertexPosition(m_tetrahedronVertices.at(tetNum)[2]);
-    auto v4 = getVertexPosition(m_tetrahedronVertices.at(tetNum)[3]);
+    auto v1 = this->getVerticePosition(m_tetrahedraVertices.at(tetId)[0]);
+    auto v2 = this->getVerticePosition(m_tetrahedraVertices.at(tetId)[1]);
+    auto v3 = this->getVerticePosition(m_tetrahedraVertices.at(tetId)[2]);
+    auto v4 = this->getVerticePosition(m_tetrahedraVertices.at(tetId)[3]);
 
     std::array<double, 4> arrayx = { v1[0], v2[0], v3[0], v4[0] };
     std::array<double, 4> arrayy = { v1[1], v2[1], v3[1], v4[1] };
@@ -90,41 +126,4 @@ TetrahedralMesh::computeTetrahedraBoundingBox(imstk::Vec3d& min, imstk::Vec3d& m
     max[1] = *std::max_element(arrayy.begin(), arrayy.end());
     max[2] = *std::max_element(arrayz.begin(), arrayz.end());
 }
-
-double
-TetrahedralMesh::getVolume() const
-{
-    imstk::Vec3d v[4];
-    Eigen::Matrix4d A;
-    double volume = 0.0;
-    for (auto it = m_tetrahedronVertices.begin(); it != m_tetrahedronVertices.end(); ++it)
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            v[i] = getVertexPosition((*it)[i]);
-        }
-
-        A << v[0][0], v[0][1], v[0][2], 1,
-            v[1][0], v[1][1], v[1][2], 1,
-            v[2][0], v[2][1], v[2][2], 1,
-            v[3][0], v[3][1], v[3][2], 1;
-
-        double det = A.determinant();
-        if (det < 0)
-        {
-            LOG(WARNING) << "Tetrahedon is inverted, has negative volume!\n";
-        }
-
-        volume += std::abs(det)/6;
-    }
-
-    return volume;
-}
-
-int
-TetrahedralMesh::getNumTetrahedra() const
-{
-    return m_tetrahedronVertices.size();
-}
-
 }
