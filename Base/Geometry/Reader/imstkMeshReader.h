@@ -19,43 +19,41 @@
 
    =========================================================================*/
 
-#ifndef imstkHexahedralMesh_h
-#define imstkHexahedralMesh_h
+#ifndef imstkMeshReader_h
+#define imstkMeshReader_h
 
-#include <set>
+#include <memory>
 
-#include "imstkVolumetricMesh.h"
+#include "imstkMesh.h"
 
 namespace imstk {
-class HexahedralMesh : public VolumetricMesh
+
+class MeshReader
 {
 public:
 
-    using HexaArray = std::array<size_t, 8>;
+    enum FileType
+    {
+        UNKNOWN,
+        VTK,
+        VTU,
+        VTP,
+        STL,
+        PLY,
+        OBJ,
+        VEG
+    };
 
-    HexahedralMesh() : VolumetricMesh(GeometryType::HexahedralMesh) {}
+    MeshReader() = default;
+    ~MeshReader() = default;
 
-    ~HexahedralMesh() = default;
-
-    // Accessors
-    void setHexahedraVertices(const std::vector<HexaArray>& hexahedra);
-    const std::vector<HexaArray>& getHexahedraVertices() const;
-    const HexaArray& getHexahedronVertices(const int& hexaNum) const;
-
-    ///
-    /// \brief Returns the number of hexahedra
-    ///
-    int getNumHexahedra() const;
-
-    ///
-    /// \brief Compute and return the volume of the hexahedral mesh
-    ///
-    double getVolume() const;
+    static std::shared_ptr<Mesh> read(const std::string& filePath);
 
 protected:
 
-    std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra
+    static const FileType getFileType(const std::string& filePath);
+
 };
 }
 
-#endif // ifndef imstkHexahedralMesh_h
+#endif // ifndef imstkMeshReader_h
