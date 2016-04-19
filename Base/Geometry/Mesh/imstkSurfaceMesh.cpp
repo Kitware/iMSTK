@@ -43,7 +43,7 @@ SurfaceMesh::computeVerticesNeighborVertices()
 {
     m_verticesNeighborVertices.resize(m_verticesPositions.size());
 
-    if (!m_verticesNeighborTriangles.size())
+    if (m_verticesNeighborTriangles.empty())
     {
         this->computeVerticesNeighborTriangles();
     }
@@ -84,12 +84,12 @@ SurfaceMesh::computeVerticesNormals()
 {
     m_verticesNormals.resize(m_verticesPositions.size());
 
-    if (!m_verticesNeighborTriangles.size())
+    if (m_verticesNeighborTriangles.empty())
     {
         this->computeVerticesNeighborTriangles();
     }
 
-    if (!m_trianglesNormals.size())
+    if (m_trianglesNormals.empty())
     {
         this->computeTrianglesNormals();
     }
@@ -108,6 +108,12 @@ SurfaceMesh::computeVerticesNormals()
 void
 SurfaceMesh::computeVerticesTangents()
 {
+    if (m_textureCoordinates.empty())
+    {
+        LOG(DEBUG) << "SurfaceMesh::computeVerticesTangents debug: no textureCoordinates, can not compute vertices tangents.";
+        return;
+    }
+
     /*
        Derived from
        Lengyel, Eric. "Computing Tangent Space Basis Vectors for an Arbitrary
@@ -158,6 +164,11 @@ SurfaceMesh::computeVerticesTangents()
     }
 
     m_verticesTangents.resize(m_verticesPositions.size());
+
+    if (m_verticesNormals.empty())
+    {
+        this->computeVerticesNormals();
+    }
 
     for (size_t vertexId = 0; vertexId < m_verticesTangents.size(); ++vertexId)
     {
