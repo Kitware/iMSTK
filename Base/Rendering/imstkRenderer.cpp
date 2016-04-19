@@ -38,7 +38,21 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     for ( const auto& obj : scene->getSceneObjects() )
     {
         auto geom     = obj->getVisualGeometry();
+        if (geom == nullptr)
+        {
+            LOG(WARNING) << "Renderer::Renderer error: Could not retrieve visual geometry for '"
+                         << obj->getName() << "'.";
+            continue;
+        }
+
         auto delegate = RenderDelegate::make_delegate( geom );
+        if (delegate == nullptr)
+        {
+            LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
+                         << obj->getName() << "'.";
+            continue;
+        }
+
         m_objectVtkActors.push_back( delegate->getVtkActor() );
     }
 

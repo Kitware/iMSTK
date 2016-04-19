@@ -26,6 +26,9 @@
 #include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
+#include "imstkSurfaceMesh.h"
+#include "imstkVolumetricMesh.h"
+#include "imstkCube.h"
 #include "imstkPlaneRenderDelegate.h"
 #include "imstkSphereRenderDelegate.h"
 #include "imstkCubeRenderDelegate.h"
@@ -43,32 +46,36 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
     {
         auto plane = std::dynamic_pointer_cast<Plane>(geom);
         return std::make_shared<PlaneRenderDelegate>(plane);
-
-        break;
     }
-
     case GeometryType::Sphere:
     {
         auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
         return std::make_shared<SphereRenderDelegate>(sphere);
-
-        break;
     }
-
     case GeometryType::Cube:
     {
         auto cube = std::dynamic_pointer_cast<Cube>(geom);
         return std::make_shared<CubeRenderDelegate>(cube);
-
-        break;
     }
-
+    case GeometryType::SurfaceMesh:
+    {
+        auto surface = std::dynamic_pointer_cast<SurfaceMesh>(geom);
+        LOG(WARNING) << "RenderDelegate::make_delegate error: SurfaceMeshRenderDelegate not implemented yet.";
+        return nullptr;
+        //return std::make_shared<SurfaceMeshRenderDelegate>(surface);
+    }
+    case GeometryType::TetrahedralMesh:
+    case GeometryType::HexahedralMesh:
+    {
+        auto mesh = std::dynamic_pointer_cast<VolumetricMesh>(geom);
+        LOG(WARNING) << "RenderDelegate::make_delegate error: VolumetricMeshRenderDelegate not implemented yet.";
+        return nullptr;
+        //return std::make_shared<VolumetricMeshRenderDelegate>(mesh);
+    }
     default:
     {
-        LOG(WARNING) << "Unknown geometry type.";
+        LOG(WARNING) << "RenderDelegate::make_delegate error: Geometry type incorrect.";
         return nullptr;
-
-        break;
     }
     }
 }
