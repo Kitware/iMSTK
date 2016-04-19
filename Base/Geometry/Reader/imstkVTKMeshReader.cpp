@@ -29,6 +29,7 @@
 #include "vtkSTLReader.h"
 #include "vtkPolyData.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkFloatArray.h"
 
 #include "g3log/g3log.hpp"
 
@@ -36,41 +37,32 @@ namespace imstk {
 std::shared_ptr<Mesh>
 VTKMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
 {
-    std::vector<Vec3d> vertices;
-    std::vector<Vec2f> textCoords;
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    std::vector<TetrahedralMesh::TetraArray> tetrahedra;
-    std::vector<HexahedralMesh::HexaArray> hexahedra;
-
-    // Populate vectors and arrays
     switch (meshType)
     {
     case MeshReader::FileType::VTK :
     {
-        VTKMeshReader::readAsGenericFormatData<vtkGenericDataObjectReader>
-                (filePath, vertices, triangles, tetrahedra, hexahedra);
+        return VTKMeshReader::readAsGenericFormatData<vtkGenericDataObjectReader>(filePath);
         break;
     }
     case MeshReader::FileType::VTU :
     case MeshReader::FileType::VTP :
     {
-        VTKMeshReader::readAsGenericFormatData<vtkXMLGenericDataObjectReader>
-                (filePath, vertices, triangles, tetrahedra, hexahedra);
+        return VTKMeshReader::readAsGenericFormatData<vtkXMLGenericDataObjectReader>(filePath);
         break;
     }
     case MeshReader::FileType::STL :
     {
-        VTKMeshReader::readAsAbstractPolyData<vtkSTLReader>(filePath, vertices, triangles);
+        return VTKMeshReader::readAsAbstractPolyData<vtkSTLReader>(filePath);
         break;
     }
     case MeshReader::FileType::PLY :
     {
-        VTKMeshReader::readAsAbstractPolyData<vtkSTLReader>(filePath, vertices, triangles);
+        return VTKMeshReader::readAsAbstractPolyData<vtkPLYReader>(filePath);
         break;
     }
     case MeshReader::FileType::OBJ :
     {
-        VTKMeshReader::readAsAbstractPolyData<vtkSTLReader>(filePath, vertices, triangles);
+        return VTKMeshReader::readAsAbstractPolyData<vtkOBJReader>(filePath);
         break;
     }
     default :
@@ -82,13 +74,15 @@ VTKMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
 }
 
 template<typename ReaderType>
-void
-VTKMeshReader::readAsGenericFormatData(const std::string& filePath,
-                                       std::vector<Vec3d>& vertices,
-                                       std::vector<SurfaceMesh::TriangleArray>& triangles,
-                                       std::vector<TetrahedralMesh::TetraArray>& tetrahedra,
-                                       std::vector<HexahedralMesh::HexaArray>& hexahedra)
+std::shared_ptr<Mesh>
+VTKMeshReader::readAsGenericFormatData(const std::string& filePath)
 {
+    std::vector<Vec3d> vertices;
+    std::vector<Vec2f> textCoords;
+    std::vector<SurfaceMesh::TriangleArray> triangles;
+    std::vector<TetrahedralMesh::TetraArray> tetrahedra;
+    std::vector<HexahedralMesh::HexaArray> hexahedra;
+
     auto reader = vtkSmartPointer<ReaderType>::New();
     reader->SetFileName(filePath.c_str());
     reader->Update();
@@ -97,7 +91,7 @@ VTKMeshReader::readAsGenericFormatData(const std::string& filePath,
     if(!output)
     {
         LOG(WARNING) << "VTKMeshReader::readAsGenericFormatData error: could not read with VTK reader.";
-        return;
+        return nullptr;
     }
 
     VTKMeshReader::copyVertices(output->GetPoints(), vertices);
@@ -116,11 +110,13 @@ VTKMeshReader::readAsGenericFormatData(const std::string& filePath,
 }
 
 template<typename ReaderType>
-void
-VTKMeshReader::readAsAbstractPolyData(const std::string& filePath,
-                                      std::vector<Vec3d>& vertices,
-                                      std::vector<SurfaceMesh::TriangleArray>& triangles)
+std::shared_ptr<SurfaceMesh>
+VTKMeshReader::readAsAbstractPolyData(const std::string& filePath)
 {
+    std::vector<Vec3d> vertices;
+    std::vector<Vec2f> textCoords;
+    std::vector<SurfaceMesh::TriangleArray> triangles;
+
     auto reader = vtkSmartPointer<ReaderType>::New();
     reader->SetFileName(filePath.c_str());
     reader->Update();
@@ -129,13 +125,14 @@ VTKMeshReader::readAsAbstractPolyData(const std::string& filePath,
     if(!vtkMesh)
     {
         LOG(WARNING) << "VTKMeshReader::readAsAbstractPolyData error: could not read with VTK reader.";
-        return;
+        return nullptr;
     }
 
     VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
     VTKMeshReader::copyCells<3>(vtkMesh->GetPolys(), triangles);
+    VTKMeshReader::copyTextureCoordinates(vtkMesh->GetPointData(), textCoords);
 
-    LOG(WARNING) << "VTKMeshReader::readAsAbstractPolyData not finished.";
+    return MeshReader::createSurfaceMesh(vertices, triangles, textCoords);
 }
 
 void
@@ -177,4 +174,27 @@ VTKMeshReader::copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,d
         cells.emplace_back(cell);
     }
 }
+
+void
+VTKMeshReader::copyTextureCoordinates(vtkPointData* pointData, std::vector<Vec2f>& textCoords)
+{
+    if(!pointData)
+    {
+        return;
+    }
+
+    auto tcoords = vtkFloatArray::SafeDownCast(pointData->GetTCoords());
+    if(!tcoords)
+    {
+        return;
+    }
+
+    for(vtkIdType i = 0; i < tcoords->GetNumberOfTuples(); ++i)
+    {
+        float uv[2];
+        tcoords->GetTupleValue(i, uv);
+        textCoords.emplace_back(uv[0], uv[1]);
+    }
+}
+
 }

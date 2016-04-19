@@ -43,15 +43,38 @@ MeshReader::read(const std::string& filePath)
     case FileType::STL :
     case FileType::PLY :
     case FileType::OBJ :
-        LOG(DEBUG) << "Read using VTK Mesh reader";
-        VTKMeshReader::read(filePath, meshType);
+        LOG(DEBUG) << "MeshReader::read debug: Read using VTK Mesh reader.";
+        return VTKMeshReader::read(filePath, meshType);
         break;
     case FileType::VEG :
-        LOG(DEBUG) << "Read using Vega Mesh reader";
+        LOG(DEBUG) << "MeshReader::read debug: Read using Vega Mesh reader.";
+        LOG(WARNING) << "MeshReader::read error: vega reader not yet implemented.";
+        return nullptr;
         break;
     }
 
+    LOG(WARNING) << "MeshReader::read error: file type not supported";
     return nullptr;
+}
+
+std::shared_ptr<SurfaceMesh>
+MeshReader::createSurfaceMesh(const std::vector<Vec3d>& vertices,
+                              const std::vector<SurfaceMesh::TriangleArray>& triangles,
+                              const std::vector<Vec2f>& textCoords)
+{
+    auto surfaceMesh = std::make_shared<SurfaceMesh>();
+    surfaceMesh->setInitialVerticesPositions(vertices);
+    surfaceMesh->setVerticesPositions(vertices);
+    surfaceMesh->setTrianglesVertices(triangles);
+    surfaceMesh->setTextureCoordinates(textCoords);
+
+    surfaceMesh->computeVerticesNormals();
+    if(!textCoords.empty())
+    {
+        surfaceMesh->computeVerticesTangents();
+    }
+
+    return surfaceMesh;
 }
 
 const MeshReader::FileType
@@ -101,4 +124,5 @@ MeshReader::getFileType(const std::string& filePath)
 
     return meshType;
 }
+
 }

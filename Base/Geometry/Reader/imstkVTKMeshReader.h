@@ -26,6 +26,7 @@
 
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
+#include "vtkPointData.h"
 //#include "vtkFieldData.h"
 
 #include "imstkMeshReader.h"
@@ -47,20 +48,17 @@ public:
 protected:
 
     template<typename ReaderType>
-    static void readAsGenericFormatData(const std::string& filePath,
-                                        std::vector<Vec3d>& vertices,
-                                        std::vector<SurfaceMesh::TriangleArray>& triangles,
-                                        std::vector<TetrahedralMesh::TetraArray>& tetrahedra,
-                                        std::vector<HexahedralMesh::HexaArray>& hexahedra);
+    static std::shared_ptr<Mesh> readAsGenericFormatData(const std::string& filePath);
+
     template<typename ReaderType>
-    static void readAsAbstractPolyData(const std::string& filePath,
-                                       std::vector<Vec3d>& vertices,
-                                       std::vector<SurfaceMesh::TriangleArray>& triangles);
+    static std::shared_ptr<SurfaceMesh> readAsAbstractPolyData(const std::string& filePath);
 
     static void copyVertices(vtkPoints* points, std::vector<Vec3d>& vertices);
 
     template<size_t dim>
     static void copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells);
+
+    static void copyTextureCoordinates(vtkPointData* pointData, std::vector<Vec2f>& textCoords);
 
     //static void copyData(vtkFieldData* fields, ...);
 };

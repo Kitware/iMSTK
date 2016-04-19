@@ -16,6 +16,7 @@
 // Geometry
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkMeshReader.h"
 
 // Map
 #include "imstkTetraTriangleMap.h"
@@ -24,6 +25,7 @@
 #include "g3log/g3log.hpp"
 
 void testViewer();
+void testReadMesh();
 void testAnalyticalGeometry();
 void testScenesManagement();
 void testIsometricMap();
@@ -36,12 +38,35 @@ int main()
               << "****************\n";
 
     //testViewer();
+    testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
     //testIsometricMap();
-    testTetraTriangleMap();
+    //testTetraTriangleMap();
 
     return 0;
+}
+
+void testReadMesh()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestMesh");
+    scene->setLoopDelay(1000);
+
+    // Read mesh
+    std::string filePath = "/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.obj";
+    auto mesh = imstk::MeshReader::read(filePath);
+
+    // Create and add obj
+    auto obj = std::make_shared<imstk::VisualObject>("meshObject");
+    obj->setVisualGeometry(mesh);
+    scene->addSceneObject(obj);
+
+    // Run
+    sdk->setCurrentScene("SceneTestMesh");
+    sdk->startSimulation(true);
+
 }
 
 void testViewer()
