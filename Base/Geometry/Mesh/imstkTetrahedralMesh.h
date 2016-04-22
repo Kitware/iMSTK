@@ -23,6 +23,7 @@
 #define imstkTetrahedralMesh_h
 
 #include <set>
+#include <list>
 
 #include "imstkVolumetricMesh.h"
 
@@ -78,9 +79,12 @@ public:
     ///
     /// \brief Extract the confirming triangular mesh from the tetrahedral mesh
     ///
-    static bool extractSurfaceMesh(std::shared_ptr<TetrahedralMesh> tetMesh,
-                                   std::shared_ptr<SurfaceMesh> surfaceMesh);
+    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    void clear();
 protected:
 
     std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra

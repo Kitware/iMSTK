@@ -49,6 +49,10 @@ public:
 
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
 
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    virtual void clear();
 protected:
 
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}

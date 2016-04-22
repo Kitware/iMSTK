@@ -118,4 +118,13 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
         max = max + range*(percent / 100);
     }
 }
+
+void
+Mesh::clear()
+{
+    m_initialVerticesPositions.clear();
+    m_verticesPositions.clear();
+    m_verticesDisplacements.clear();
+}
+
 }

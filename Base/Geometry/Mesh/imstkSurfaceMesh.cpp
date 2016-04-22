@@ -22,7 +22,24 @@
 #include "imstkSurfaceMesh.h"
 
 namespace imstk {
-void
+
+    void SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
+        const std::vector<TriangleArray>& triangles,
+        const std::vector<Vec2f>& texCoords,
+        const bool computDerivedData)
+    {
+        this->clear();
+        setInitialVerticesPositions(vertices);
+        setInitialVerticesPositions(vertices);
+        setTrianglesVertices(triangles);
+        setTextureCoordinates(texCoords);
+
+        computeVerticesNormals();
+        computeTrianglesNormals();
+        computeVerticesTangents();
+    }
+
+    void
 SurfaceMesh::computeVerticesNeighborTriangles()
 {
     m_verticesNeighborTriangles.resize(m_verticesPositions.size());
@@ -259,6 +276,20 @@ SurfaceMesh::getVolume() const
     LOG(WARNING) << "Not supported yet, returns 0.0!\n";
 
     return 0.0;
+}
+
+void
+SurfaceMesh::clear()
+{
+    m_trianglesVertices.clear();
+    m_textureCoordinates.clear();
+    m_verticesNeighborTriangles.clear();
+    m_verticesNeighborVertices.clear();
+    m_trianglesNormals.clear();
+    m_verticesNormals.clear();
+    m_verticesTangents.clear();
+
+    Mesh::clear();
 }
 
 }

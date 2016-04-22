@@ -39,6 +39,15 @@ public:
 
     ~SurfaceMesh() = default;
 
+    ///
+    /// \brief Initializes the rest of the data structures gives vertex positions and
+    ///     triangle connectivity
+    ///
+    void initialize(const std::vector<Vec3d>& vertices,
+                    const std::vector<TriangleArray>& triangles,
+                    const std::vector<Vec2f>& texCoords = std::vector<Vec2f>(),
+                    const bool computDerivedData = false);
+
     void computeVerticesNeighborTriangles();
     void computeVerticesNeighborVertices();
     void computeTrianglesNormals();
@@ -63,6 +72,10 @@ public:
 
     double getVolume() const;
 
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    void clear();
 protected:
 
     std::vector<TriangleArray> m_trianglesVertices;
