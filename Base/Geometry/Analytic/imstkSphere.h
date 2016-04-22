@@ -25,6 +25,12 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+
+///
+/// \class Sphere
+///
+/// \brief Sphere geometry
+///
 class Sphere : public Geometry
 {
 public:
@@ -39,13 +45,23 @@ public:
 
     ~Sphere() = default;
 
+    ///
+    /// \brief Returns the radius of the sphere
+    ///
     const double& getRadius() const;
+
+    ///
+    /// \brief Sets the radius of the sphere
+    ///
     void          setRadius(const double& radius);
 
+    ///
+    /// \brief Returns the volume of the sphere
+    ///
     double getVolume() const;
 protected:
 
-    double m_radius;
+    double m_radius; ///> Radius of the sphere
 };
 }
 

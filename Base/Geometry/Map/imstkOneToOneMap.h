@@ -85,7 +85,7 @@ public:
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
 protected:
-    std::map<int, int> m_oneToOneMap;
+    std::map<int, int> m_oneToOneMap; ///> One to one mapping data
 };
 }
 

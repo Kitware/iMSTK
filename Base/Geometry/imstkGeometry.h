@@ -36,42 +36,76 @@ enum class GeometryType
     HexahedralMesh
 };
 
+///
+/// \class Geometry
+///
+/// \brief Base class for any geometrical representation
+///
 class Geometry
 {
 public:
 
     virtual ~Geometry() {}
 
+    ///
+    /// \brief Translate the geometry in Cartesian space
+    ///
     void         translate(const Vec3d& t);
     void         translate(const double& x,
                            const double& y,
                            const double& z);
+
+    ///
+    /// \brief Rotate the geometry in Cartesian space
+    ///
     void         rotate(const Quatd& r);
     void         rotate(const Mat3d& r);
     void         rotate(const Vec3d & axis,
                         const double& angle);
+
+    ///
+    /// \brief Scale in Cartesian directions
+    ///
     void         scale(const double& scaling);
 
+    ///
+    /// \brief Applies a rigid transform to the geometry
+    ///
     void        transform(const RigidTransform3d& transform);
 
     // Accessors
+
+    ///
+    /// \brief Get/Set position
+    ///
     const Vec3d& getPosition() const;
     void         setPosition(const Vec3d& position);
     void         setPosition(const double& x,
                              const double& y,
                              const double& z);
 
+    ///
+    /// \brief Get/Set orientation
+    ///
     const Quatd       & getOrientation() const;
     void                setOrientation(const Quatd& orientation);
     void                setOrientation(const Mat3d& orientation);
     void                setOrientation(const Vec3d & axis,
                                        const double& angle);
-
+    ///
+    /// \brief Get/Set scaling
+    ///
     const double      & getScaling() const;
     void                setScaling(const double& scaling);
 
+    ///
+    /// \brief Returns the type of the geometry
+    ///
     const GeometryType& getType() const;
 
+    ///
+    /// \brief Returns the volume of the geometry (if valid)
+    ///
     virtual double getVolume() const = 0;
 
 protected:
@@ -81,13 +115,12 @@ protected:
              const Quatd& orientation = Quatd::Identity()) :
         m_type(type),
         m_position(position),
-        m_orientation(orientation)
-    {}
+        m_orientation(orientation){}
 
-    GeometryType m_type;
-    Vec3d  m_position;
-    Quatd  m_orientation;
-    double m_scaling = 1;
+    GeometryType m_type; ///> Geometry type
+    Vec3d  m_position; ///> position
+    Quatd  m_orientation; ///> orientation
+    double m_scaling = 1; ///> Scaling
 };
 }
 

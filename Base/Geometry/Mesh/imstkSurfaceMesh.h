@@ -28,6 +28,12 @@
 #include "imstkMesh.h"
 
 namespace imstk {
+
+///
+/// \class SurfaceMesh
+///
+/// \brief Surface triangular mesh
+///
 class SurfaceMesh : public Mesh
 {
 public:
@@ -48,45 +54,91 @@ public:
                     const std::vector<Vec2f>& texCoords = std::vector<Vec2f>(),
                     const bool computDerivedData = false);
 
+    ///
+    /// \brief Computes neighboring triangles for all vertices
+    ///
     void computeVerticesNeighborTriangles();
+
+    ///
+    /// \brief Computes neighboring vertices for all vertices
+    ///
     void computeVerticesNeighborVertices();
+
+    ///
+    /// \brief Compute the normals to the triangles
+    ///
     void computeTrianglesNormals();
+
+    ///
+    /// \brief Computes the normals of all the vertices
+    ///
     void computeVerticesNormals();
+
+    ///
+    /// \brief Computes the tangents
+    ///
     void computeVerticesTangents();
 
-    // Accessors
-    void setTrianglesVertices(const std::vector<TriangleArray>& triangles);
-    const std::vector<TriangleArray>& getTrianglesVertices() const;
-
-    void setTextureCoordinates(const std::vector<Vec2f>& coords);
-    const std::vector<Vec2f>& getTextureCoordinates() const;
-
-    const std::vector<Vec3d>& getTrianglesNormals() const;
-    const Vec3d& getTriangleNormal(size_t i) const;
-
-    const std::vector<Vec3d>& getVerticesNormals() const;
-    const Vec3d& getVerticeNormal(size_t i) const;
-
-    const std::vector<Vec4d>& getVerticesTangents() const;
-    const Vec4d& getVerticeTangent(size_t i) const;
-
+    ///
+    /// \brief Get the volume enclosed by the surface mesh
+    ///
     double getVolume() const;
 
     ///
     /// \brief Clear all the mesh data
     ///
     void clear();
+
+    // Accessors
+
+    ///
+    /// \brief Get/Set triangle connectivity
+    ///
+    void setTrianglesVertices(const std::vector<TriangleArray>& triangles);
+    const std::vector<TriangleArray>& getTrianglesVertices() const;
+
+    ///
+    /// \brief Get/Set texture coordinates
+    ///
+    void setTextureCoordinates(const std::vector<Vec2f>& coords);
+    const std::vector<Vec2f>& getTextureCoordinates() const;
+
+    ///
+    /// \brief Get vector of normals of all the triangles
+    ///
+    const std::vector<Vec3d>& getTrianglesNormals() const;
+
+    ///
+    /// \brief Get normal of a triangle given its index
+    ///
+    const Vec3d& getTriangleNormal(size_t i) const;
+
+    ///
+    /// \brief Get vector of normals of all the vertices
+    ///
+    const std::vector<Vec3d>& getVerticesNormals() const;
+
+    ///
+    /// \brief Get normal of a vertex given its index
+    ///
+    const Vec3d& getVerticeNormal(size_t i) const;
+
+    ///
+    /// \brief Get/Set vertex tangents
+    ///
+    const std::vector<Vec4d>& getVerticesTangents() const;
+    const Vec4d& getVerticeTangent(size_t i) const;
 protected:
 
-    std::vector<TriangleArray> m_trianglesVertices;
-    std::vector<Vec2f> m_textureCoordinates;
+    std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
+    std::vector<Vec2f> m_textureCoordinates; ///> Texture coordinates
 
-    std::vector<NeighborsType> m_verticesNeighborTriangles;
-    std::vector<NeighborsType> m_verticesNeighborVertices;
+    std::vector<NeighborsType> m_verticesNeighborTriangles; ///> Neighbor triangles to vertices
+    std::vector<NeighborsType> m_verticesNeighborVertices; ///> Neighbor vertices to vertices
 
-    std::vector<Vec3d> m_trianglesNormals;
-    std::vector<Vec3d> m_verticesNormals;
-    std::vector<Vec4d> m_verticesTangents;
+    std::vector<Vec3d> m_trianglesNormals; ///> Normals to the triangles
+    std::vector<Vec3d> m_verticesNormals; ///> Normals of the vertices
+    std::vector<Vec4d> m_verticesTangents; ///> Tangents of the vertices
 };
 }
 

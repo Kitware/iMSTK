@@ -25,6 +25,12 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+
+///
+/// \class Plane
+///
+/// \brief Plane geometry
+///
 class Plane : public Geometry
 {
 public:
@@ -40,16 +46,33 @@ public:
 
     ~Plane() = default;
 
+    ///
+    /// \brief Returns the normal of the plane
+    ///
     Vec3d         getNormal() const;
+
+    ///
+    /// \brief Sets the normal to the plane
+    ///
     void          setNormal(const Vec3d& normal);
 
+    ///
+    /// \brief Returns the width of the plane
+    ///
     const double& getWidth() const;
+
+    ///
+    /// \brief Sets the width of the plane
+    ///
     void          setWidth(const double& width);
 
+    ///
+    /// \brief Returns the volume (=0.0) for the plane
+    ///
     double getVolume() const;
 protected:
 
-    double m_width;
+    double m_width; ///> Width of the plane (for display)
 };
 }
 

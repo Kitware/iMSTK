@@ -28,6 +28,12 @@
 #include "imstkSurfaceMesh.h"
 
 namespace imstk {
+
+///
+/// \class VolumetricMesh
+///
+/// \brief Base class for all volume mesh types
+///
 class VolumetricMesh : public Mesh
 {
 public:
@@ -35,15 +41,22 @@ public:
     ~VolumetricMesh() = default;
 
     // Accessors
+
+    ///
+    /// \brief Returns the attached surface mesh
+    ///
     std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
 
+    ///
+    /// \brief Sets the surface mesh that is attached
+    ///
     void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
 
     VolumetricMesh(GeometryType type) : Mesh(type) {}
 
-    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh;
+    std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh; ///> Attached surface mesh
 };
 }
 

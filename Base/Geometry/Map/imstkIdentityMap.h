@@ -26,6 +26,11 @@
 
 namespace imstk {
 
+///
+/// \class IdentityMap
+///
+/// \brief A maps that lets the slave follow the master's position and orientation
+///
 class IdentityMap : public GeometryMap
 {
 public:
@@ -50,7 +55,15 @@ public:
     bool isValid() const { return true; };
 
     // Accessors
+
+    ///
+    /// \brief DISABLED: Set the transform of the Identity map
+    ///
     void setTransform(const RigidTransform3d& affineTransform) = delete;
+
+    ///
+    /// \brief Get the transform of Identity map which is an Identity (3x3)
+    ///
     const RigidTransform3d getTransform() const;
 };
 }

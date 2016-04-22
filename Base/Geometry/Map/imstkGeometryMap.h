@@ -40,6 +40,11 @@ enum class GeometryMapType
     TetraTetra
 };
 
+///
+/// \class GeometryMap
+///
+/// \brief Base class for any geometric map
+///
 class GeometryMap
 {
 public:
@@ -82,12 +87,26 @@ public:
     bool isActive() const;
 
     // Accessors
+
+    ///
+    /// \brief Returns the type of the map
+    ///
     const GeometryMapType& getType() const;
+
+    ///
+    /// \brief Returns the string representing the type name of the map
+    ///
     const std::string getTypeName() const;
 
+    ///
+    /// \brief Get/Set master geometry
+    ///
     virtual void setMaster(std::shared_ptr<Geometry> master);
     virtual std::shared_ptr<Geometry> getMaster() const;
 
+    ///
+    /// \brief Get/Set slace geometry
+    ///
     virtual void setSlave(std::shared_ptr<Geometry> slave);
     virtual std::shared_ptr<Geometry> getSlave() const;
 

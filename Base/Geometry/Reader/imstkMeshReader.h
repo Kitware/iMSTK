@@ -29,6 +29,11 @@
 
 namespace imstk {
 
+///
+/// \class MeshReader
+///
+/// \brief
+///
 class MeshReader
 {
 public:
@@ -48,8 +53,14 @@ public:
     MeshReader() = default;
     ~MeshReader() = default;
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<Mesh> read(const std::string& filePath);
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<SurfaceMesh> createSurfaceMesh(const std::vector<Vec3d>& vertices,
                                                           const std::vector<SurfaceMesh::TriangleArray>& triangles,
                                                           const std::vector<Vec2f>& textCoords);

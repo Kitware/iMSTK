@@ -27,6 +27,12 @@
 #include "imstkVolumetricMesh.h"
 
 namespace imstk {
+
+///
+/// \class HexahedralMesh
+///
+/// \brief Hexahedral mesh
+///
 class HexahedralMesh : public VolumetricMesh
 {
 public:
@@ -38,8 +44,16 @@ public:
     ~HexahedralMesh() = default;
 
     // Accessors
+
+    ///
+    /// \brief Sets/Returns the hexahedral connectivity
+    ///
     void setHexahedraVertices(const std::vector<HexaArray>& hexahedra);
     const std::vector<HexaArray>& getHexahedraVertices() const;
+
+    ///
+    /// \brief Returns the connectivity of a hexahedron given its index
+    ///
     const HexaArray& getHexahedronVertices(const int& hexaNum) const;
 
     ///

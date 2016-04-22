@@ -26,6 +26,12 @@
 
 namespace imstk {
 
+///
+/// \class IsometricMap
+///
+/// \brief A maps that lets the slave follow the master with a
+/// specified offset in position and orientation
+///
 class IsometricMap : public GeometryMap
 {
 public:
@@ -58,7 +64,7 @@ public:
 
 protected:
 
-    RigidTransform3d m_rigidTransform;
+    RigidTransform3d m_rigidTransform; ///> Rigid transform
 
 };
 }

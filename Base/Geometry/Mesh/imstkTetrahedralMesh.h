@@ -28,6 +28,12 @@
 #include "imstkVolumetricMesh.h"
 
 namespace imstk {
+
+///
+/// \class TetrahedralMesh
+///
+/// \brief Tetrahedral mesh
+///
 class TetrahedralMesh : public VolumetricMesh
 {
 public:

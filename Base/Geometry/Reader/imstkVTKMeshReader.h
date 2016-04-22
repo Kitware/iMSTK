@@ -36,6 +36,11 @@
 
 namespace imstk {
 
+///
+/// \class VTKMeshReader
+///
+/// \brief
+///
 class VTKMeshReader
 {
 public:
@@ -43,21 +48,39 @@ public:
     VTKMeshReader() = default;
     ~VTKMeshReader() = default;
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<Mesh> read(const std::string& filePath, MeshReader::FileType meshType);
 
 protected:
 
+    ///
+    /// \brief
+    ///
     template<typename ReaderType>
     static std::shared_ptr<Mesh> readAsGenericFormatData(const std::string& filePath);
 
+    ///
+    /// \brief
+    ///
     template<typename ReaderType>
     static std::shared_ptr<SurfaceMesh> readAsAbstractPolyData(const std::string& filePath);
 
+    ///
+    /// \brief
+    ///
     static void copyVertices(vtkPoints* points, std::vector<Vec3d>& vertices);
 
+    ///
+    /// \brief
+    ///
     template<size_t dim>
     static void copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells);
 
+    ///
+    /// \brief
+    ///
     static void copyTextureCoordinates(vtkPointData* pointData, std::vector<Vec2f>& textCoords);
 
     //static void copyData(vtkFieldData* fields, ...);

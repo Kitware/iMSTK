@@ -25,6 +25,12 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+
+///
+/// \class Cube
+///
+/// \brief Cube geometry
+///
 class Cube : public Geometry
 {
 public:
@@ -39,13 +45,26 @@ public:
 
     ~Cube() = default;
 
-    const double& getWidth() const;
-    void          setWidth(const double& width);
-
+    ///
+    /// \brief Returns the volume of the cube
+    ///
     double getVolume() const;
+
+    // Accessors
+
+    ///
+    /// \brief Returns the width of the cube
+    ///
+    const double& getWidth() const;
+
+    ///
+    /// \brief Sets the width of the cube
+    ///
+    void setWidth(const double& width);
+
 protected:
 
-    double m_width;
+    double m_width; ///> width of the cube
 };
 }
 

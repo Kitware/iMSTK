@@ -25,34 +25,84 @@
 #include "imstkGeometry.h"
 
 namespace imstk {
+
+///
+/// \class Mesh
+///
+/// \brief Base class for all geometries represented by discrete points and elements
+///
 class Mesh : public Geometry
 {
 public:
 
     ~Mesh() = default;
 
-    // Accessors
-    void setInitialVerticesPositions(const std::vector<Vec3d>& vertices);
-    const std::vector<Vec3d>& getInitialVerticesPositions() const;
-    const Vec3d& getInitialVertexPosition(const int& vertNum) const;
-
-    void setVerticesPositions(const std::vector<Vec3d>& vertices);
-    const std::vector<Vec3d>& getVerticesPositions() const;
-    void setVerticePosition(const int &vertNum, const Vec3d& pos);
-    const Vec3d& getVertexPosition(const int& vertNum) const;
-
-    void setVerticesDisplacements(const std::vector<Vec3d>& diff);
-    const std::vector<Vec3d>& getVerticesDisplacements() const;
-    const Vec3d& getVerticeDisplacement(const int& vertNum) const;
-
-    const int getNumVertices() const;
-
+    ///
+    /// \brief Compute the bounding box for the entire mesh
+    ///
     void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
 
     ///
-    /// \brief Clear all the mesh data
+    /// \brief Clears all the mesh data
     ///
     virtual void clear();
+
+    // Accessors
+
+    ///
+    /// \brief Sets initial positions from an array
+    ///
+    void setInitialVerticesPositions(const std::vector<Vec3d>& vertices);
+
+    ///
+    /// \brief Returns the vector of initial positions of the mesh vertices
+    ///
+    const std::vector<Vec3d>& getInitialVerticesPositions() const;
+
+    ///
+    /// \brief Returns the initial position of a vertex given its index
+    ///
+    const Vec3d& getInitialVertexPosition(const int& vertNum) const;
+
+    ///
+    /// \brief Sets current vertex positions of the mesh from an array
+    ///
+    void setVerticesPositions(const std::vector<Vec3d>& vertices);
+
+    ///
+    /// \brief Returns the vector of current positions of the mesh vertices
+    ///
+    const std::vector<Vec3d>& getVerticesPositions() const;
+
+    ///
+    /// \brief Set the current position of a vertex given its index to certain position
+    ///
+    void setVerticePosition(const int &vertNum, const Vec3d& pos);
+
+    ///
+    /// \brief Returns the position of a vertex given its index
+    ///
+    const Vec3d& getVertexPosition(const int& vertNum) const;
+
+    ///
+    /// \brief Sets the displacements of mesh vertices from an array
+    ///
+    void setVerticesDisplacements(const std::vector<Vec3d>& diff);
+
+    ///
+    /// \brief Returns the vector displacements of mesh vertices
+    ///
+    const std::vector<Vec3d>& getVerticesDisplacements() const;
+
+    ///
+    /// \brief Returns the displacement of a given vertex
+    ///
+    const Vec3d& getVerticeDisplacement(const int& vertNum) const;
+
+    ///
+    /// \brief Returns the number of total vertices in the mesh
+    ///
+    const int getNumVertices() const;
 protected:
 
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
@@ -61,9 +111,9 @@ protected:
     // + Position (Initial translation)
     // + verticesDisplacements
     // = verticesPositions
-    std::vector<Vec3d> m_initialVerticesPositions;
-    std::vector<Vec3d> m_verticesPositions;
-    std::vector<Vec3d> m_verticesDisplacements;
+    std::vector<Vec3d> m_initialVerticesPositions; //> Initial positions of vertices
+    std::vector<Vec3d> m_verticesPositions; //> Current positions of vertices
+    std::vector<Vec3d> m_verticesDisplacements; //> Displacements of vertices
 };
 }
 
