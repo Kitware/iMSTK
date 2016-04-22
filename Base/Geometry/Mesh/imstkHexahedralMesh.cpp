@@ -57,7 +57,7 @@ HexahedralMesh::getVolume() const
     {
         for (int i = 0; i < 8; ++i)
         {
-            v[i] = this->getVerticePosition(hexArray[i]);
+            v[i] = this->getVertexPosition(hexArray[i]);
         }
 
         a = v[7] - v[0];

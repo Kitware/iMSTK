@@ -36,6 +36,8 @@ TetraTriangleMap::compute()
     auto tetMesh = std::dynamic_pointer_cast<TetrahedralMesh> (m_master);
     auto triMesh = std::dynamic_pointer_cast<SurfaceMesh> (m_slave);
 
+    m_verticesEnclosingTetraId.clear();
+    m_verticesWeights.clear();
     for (const Vec3d& surfVertPos : triMesh->getInitialVerticesPositions())
     {
         // Find the enclosing or closest tetrahedron
@@ -88,7 +90,7 @@ TetraTriangleMap::apply()
         auto weights = m_verticesWeights.at(vertexId);
         for (size_t i = 0; i < 4; ++i)
         {
-            newPos += tetMesh->getInitialVerticePosition(tetVerts[i]) * weights[i];
+            newPos += tetMesh->getInitialVertexPosition(tetVerts[i]) * weights[i];
         }
         triMesh->setVerticePosition(vertexId, newPos);
     }
@@ -112,6 +114,23 @@ TetraTriangleMap::print() const
                   << m_verticesWeights.at(vertexId)[2] << ", "
                   << m_verticesWeights.at(vertexId)[3] << ")";
     }
+}
+
+bool
+TetraTriangleMap::isValid() const
+{
+    auto meshMaster = std::dynamic_pointer_cast<TetrahedralMesh>(m_master);
+    auto totalElementsMaster = meshMaster->getNumTetrahedra();
+
+    for (size_t tetId = 0; tetId < m_verticesEnclosingTetraId.size(); ++tetId)
+    {
+        if (!(m_verticesEnclosingTetraId.at(tetId) < totalElementsMaster &&
+            m_verticesEnclosingTetraId.at(tetId) >= 0))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 void
@@ -148,7 +167,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
         auto vert = tetraMesh->getTetrahedronVertices(tetId);
         for (size_t i = 0; i < 4; ++i)
         {
-            center += tetraMesh->getInitialVerticePosition(vert[i]);
+            center += tetraMesh->getInitialVertexPosition(vert[i]);
         }
 
         double dist = (pos - center).norm();

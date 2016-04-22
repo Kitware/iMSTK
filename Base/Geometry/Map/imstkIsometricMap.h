@@ -47,6 +47,11 @@ public:
     ///
     void apply() override;
 
+    ///
+    /// \brief Check the validity of the map
+    ///
+    bool isValid() const { return true; };
+
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);
     const RigidTransform3d& getTransform() const;

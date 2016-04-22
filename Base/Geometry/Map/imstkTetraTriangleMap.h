@@ -60,6 +60,11 @@ public:
     void print() const override;
 
     ///
+    /// \brief Check the validity of the map
+    ///
+    bool isValid() const;
+
+    ///
     /// \brief Set the geometry that dictates the map
     ///
     void setMaster(std::shared_ptr<Geometry> master) override;

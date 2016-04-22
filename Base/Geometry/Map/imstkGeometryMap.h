@@ -34,6 +34,7 @@ enum class GeometryMapType
 {
     Isometric,
     Identity,
+    OneToOne,
     TetraTriangle,
     HexaTriangle,
     TetraTetra
@@ -64,6 +65,11 @@ public:
     /// \brief Deactivate the map
     ///
     void mute();
+
+    ///
+    /// \brief Check the validity of the map
+    ///
+    virtual bool isValid() const = 0;
 
     ///
     /// \brief Activate the map

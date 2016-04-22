@@ -35,7 +35,7 @@ Mesh::getInitialVerticesPositions() const
 }
 
 const Vec3d&
-Mesh::getInitialVerticePosition(const int& vertNum) const
+Mesh::getInitialVertexPosition(const int& vertNum) const
 {
     return m_initialVerticesPositions.at(vertNum);
 }
@@ -58,7 +58,7 @@ void Mesh::setVerticePosition(const int& vertNum, const Vec3d& pos)
 }
 
 const Vec3d&
-Mesh::getVerticePosition(const int& vertNum) const
+Mesh::getVertexPosition(const int& vertNum) const
 {
     return m_verticesPositions.at(vertNum);
 }

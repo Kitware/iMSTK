@@ -34,12 +34,12 @@ public:
     // Accessors
     void setInitialVerticesPositions(const std::vector<Vec3d>& vertices);
     const std::vector<Vec3d>& getInitialVerticesPositions() const;
-    const Vec3d& getInitialVerticePosition(const int& vertNum) const;
+    const Vec3d& getInitialVertexPosition(const int& vertNum) const;
 
     void setVerticesPositions(const std::vector<Vec3d>& vertices);
     const std::vector<Vec3d>& getVerticesPositions() const;
     void setVerticePosition(const int &vertNum, const Vec3d& pos);
-    const Vec3d& getVerticePosition(const int& vertNum) const;
+    const Vec3d& getVertexPosition(const int& vertNum) const;
 
     void setVerticesDisplacements(const std::vector<Vec3d>& diff);
     const std::vector<Vec3d>& getVerticesDisplacements() const;

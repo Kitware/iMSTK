@@ -39,8 +39,20 @@ public:
     ~TetrahedralMesh() = default;
 
     // Accessors
+
+    ///
+    /// \brief set the vector of array of IDs for the mesh
+    ///
     void setTetrahedraVertices(const std::vector<TetraArray>& tetrahedrons);
+
+    ///
+    /// \brief Return the vector of array of IDs for all the tetrahedra
+    ///
     const std::vector<TetraArray>& getTetrahedraVertices() const;
+
+    ///
+    /// \brief Return the array of IDs for a given tetrahedron
+    ///
     const TetraArray& getTetrahedronVertices(const size_t& tetId) const;
 
     ///
@@ -62,6 +74,12 @@ public:
     /// \brief Compute the bounding box of a given tetrahedron
     ///
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
+
+    ///
+    /// \brief Extract the confirming triangular mesh from the tetrahedral mesh
+    ///
+    static bool extractSurfaceMesh(std::shared_ptr<TetrahedralMesh> tetMesh,
+                                   std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
 
