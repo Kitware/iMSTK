@@ -22,6 +22,7 @@
 #include "imstkIdentityMap.h"
 
 namespace imstk {
+
 void
 IdentityMap::apply()
 {

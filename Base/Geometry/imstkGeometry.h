@@ -73,6 +73,21 @@ public:
     ///
     void        transform(const RigidTransform3d& transform);
 
+    ///
+    /// \brief Returns the volume of the geometry (if valid)
+    ///
+    virtual double getVolume() const = 0;
+
+    ///
+    /// \brief Returns true if the geometry is a mesh, else returns false
+    ///
+    bool isMesh() const;
+
+    ///
+    /// \brief Print
+    ///
+    virtual void print() const;
+
     // Accessors
 
     ///
@@ -104,10 +119,9 @@ public:
     const GeometryType& getType() const;
 
     ///
-    /// \brief Returns the volume of the geometry (if valid)
+    /// \brief Returns the string representing the type name of the geometry
     ///
-    virtual double getVolume() const = 0;
-
+    const std::string getTypeName() const;
 protected:
 
     Geometry(GeometryType type,

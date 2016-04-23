@@ -90,9 +90,9 @@ public:
     void clear();
 
     ///
-    /// \brief Print the mesh
+    /// \brief Print the surface mesh
     ///
-    void print() const;
+    void print() const override;
 
     // Accessors
 

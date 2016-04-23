@@ -23,26 +23,31 @@
 
 namespace imstk {
 
-    void SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
-        const std::vector<TriangleArray>& triangles,
-        const std::vector<Vec2f>& texCoords,
-        const bool computDerivedData)
-    {
-        this->clear();
-        setInitialVerticesPositions(vertices);
-        setInitialVerticesPositions(vertices);
-        setTrianglesVertices(triangles);
-        setTextureCoordinates(texCoords);
+void
+SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
+const std::vector<TriangleArray>& triangles,
+const std::vector<Vec2f>& texCoords,
+const bool computDerivedData)
+{
+    this->clear();
+    setInitialVerticesPositions(vertices);
+    setInitialVerticesPositions(vertices);
+    setTrianglesVertices(triangles);
 
-        if (computDerivedData)
-        {
-            computeVerticesNormals();
-            computeTrianglesNormals();
-            computeVerticesTangents();
-        }
+    if (texCoords.size() > 0)
+    {
+        setTextureCoordinates(texCoords);
     }
 
-    void
+    if (computDerivedData)
+    {
+        computeVerticesNormals();
+        computeTrianglesNormals();
+        computeVerticesTangents();
+    }
+}
+
+void
 SurfaceMesh::computeVerticesNeighborTriangles()
 {
     m_verticesNeighborTriangles.resize(m_verticesPositions.size());
@@ -304,19 +309,21 @@ SurfaceMesh::clear()
 void
 SurfaceMesh::print() const
 {
+    Geometry::print();
+
     LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
     LOG(INFO) << "Number of triangles: " << this->getNumTriangles() << "\n";
 
     LOG(INFO) << "Triangles:\n";
     for (auto &triVerts : this->getTrianglesVertices())
     {
-        LOG(INFO) << "(" << triVerts[0] << ", " << triVerts[1] << "," << triVerts[2] << ")\n";
+        LOG(INFO) << "(" << triVerts[0] << ", " << triVerts[1] << ", " << triVerts[2] << ")\n";
     }
 
     LOG(INFO) << "Vertex positions:\n";
-    for (auto &verts : this->getInitialVerticesPositions())
+    for (auto &verts : this->getVerticesPositions())
     {
-        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << "," << verts.z() << ")\n";
+        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << ", " << verts.z() << ")\n";
     }
 }
 

@@ -23,6 +23,14 @@
 
 namespace imstk {
 
+void
+Cube::print() const
+{
+    Geometry::print();
+
+    LOG(INFO) << "Width: " << m_width << "\n";
+}
+
 const double&
 Cube::getWidth() const
 {

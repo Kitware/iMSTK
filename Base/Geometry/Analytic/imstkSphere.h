@@ -46,6 +46,11 @@ public:
     ~Sphere() = default;
 
     ///
+    /// \brief Print the sphere info
+    ///
+    void print() const override;
+
+    ///
     /// \brief Returns the radius of the sphere
     ///
     const double& getRadius() const;

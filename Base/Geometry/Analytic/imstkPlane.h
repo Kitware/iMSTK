@@ -47,6 +47,11 @@ public:
     ~Plane() = default;
 
     ///
+    /// \brief Print the plane info
+    ///
+    void print() const override;
+
+    ///
     /// \brief Returns the normal of the plane
     ///
     Vec3d         getNormal() const;

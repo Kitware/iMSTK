@@ -22,6 +22,7 @@
 #include "imstkGeometryMap.h"
 
 namespace imstk {
+
 void
 GeometryMap::mute()
 {

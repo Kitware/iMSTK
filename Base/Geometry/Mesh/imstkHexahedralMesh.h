@@ -46,6 +46,11 @@ public:
     // Accessors
 
     ///
+    /// \brief Print the hexahedral mesh
+    ///
+    void print() const override;
+
+    ///
     /// \brief Sets/Returns the hexahedral connectivity
     ///
     void setHexahedraVertices(const std::vector<HexaArray>& hexahedra);

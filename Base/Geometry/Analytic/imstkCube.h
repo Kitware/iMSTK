@@ -50,8 +50,12 @@ public:
     ///
     double getVolume() const;
 
-    // Accessors
+    ///
+    /// \brief Print the cube info
+    ///
+    void print() const;
 
+    // Accessors
     ///
     /// \brief Returns the width of the cube
     ///

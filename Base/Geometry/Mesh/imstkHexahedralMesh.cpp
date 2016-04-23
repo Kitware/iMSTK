@@ -22,6 +22,30 @@
 #include "imstkHexahedralMesh.h"
 
 namespace imstk {
+
+void
+HexahedralMesh::print() const
+{
+    Geometry::print();
+
+    LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
+    LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra() << "\n";
+
+    LOG(INFO) << "Hexahedra:\n";
+    for (auto &hexVerts : this->getHexahedraVertices())
+    {
+        LOG(INFO) << "(" << hexVerts[0] << ", " << hexVerts[1] << "," << hexVerts[2] <<
+            hexVerts[3] << ", " << hexVerts[4] << "," << hexVerts[5] << ", " <<
+            hexVerts[6] << "," << hexVerts[7] << ")\n";
+    }
+
+    LOG(INFO) << "Vertex positions:\n";
+    for (auto &verts : this->getVerticesPositions())
+    {
+        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << "," << verts.z() << ")\n";
+    }
+}
+
 void
 HexahedralMesh::setHexahedraVertices(const std::vector<HexaArray>& hexahedra)
 {

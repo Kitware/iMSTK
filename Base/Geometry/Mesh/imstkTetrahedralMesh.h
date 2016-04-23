@@ -95,6 +95,11 @@ public:
     /// \brief Clear all the mesh data
     ///
     void clear();
+
+    ///
+    /// \brief Print the tetrahedral mesh
+    ///
+    void print() const override;
 protected:
 
     std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra

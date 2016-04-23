@@ -46,8 +46,8 @@ int main()
     //testScenesManagement();
     //testIsometricMap();
     //testTetraTriangleMap();
-    testExtractSurfaceMesh();
-    //testOneToOneNodalMap();
+    //testExtractSurfaceMesh();
+    testOneToOneNodalMap();
 
     return 0;
 }
@@ -356,6 +356,8 @@ void testOneToOneNodalMap()
     tetMesh->setInitialVerticesPositions(vertList);
     tetMesh->setVerticesPositions(vertList);
 
+    tetMesh->print();
+
     // b. Construct a surface mesh
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
 
@@ -378,6 +380,8 @@ void testOneToOneNodalMap()
     triConnectivity.push_back({ { 1, 3, 4 } });
     triConnectivity.push_back({ { 2, 3, 4 } });
     triMesh->setTrianglesVertices(triConnectivity);
+
+    triMesh->print();
 
     // c. Construct the one to one nodal map based on the above meshes
     auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();

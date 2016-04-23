@@ -22,6 +22,15 @@
 #include "imstkSphere.h"
 
 namespace imstk {
+
+void
+Sphere::print() const
+{
+    Geometry::print();
+
+    LOG(INFO) << "Radius: " << m_radius << "\n";
+}
+
 const double&
 Sphere::getRadius() const
 {

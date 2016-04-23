@@ -141,9 +141,7 @@ OneToOneMap::print() const
 void
 OneToOneMap::setMaster(std::shared_ptr<Geometry> master)
 {
-    if (master->getType() != GeometryType::HexahedralMesh &&
-        master->getType() != GeometryType::SurfaceMesh &&
-        master->getType() != GeometryType::TetrahedralMesh)
+    if (!master->isMesh())
     {
         LOG(WARNING) << "The geometry provided is not a mesh!\n";
         return;
@@ -154,9 +152,7 @@ OneToOneMap::setMaster(std::shared_ptr<Geometry> master)
 void
 OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
 {
-    if (slave->getType() != GeometryType::HexahedralMesh &&
-        slave->getType() != GeometryType::SurfaceMesh &&
-        slave->getType() != GeometryType::TetrahedralMesh)
+    if (!slave->isMesh())
     {
         LOG(WARNING) << "The geometry provided is not a mesh!\n";
         return;

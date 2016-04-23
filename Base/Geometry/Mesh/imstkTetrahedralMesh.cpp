@@ -135,15 +135,12 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
         LOG(WARNING) << "Cannot extract SurfaceMesh: The surface mesh provided is not instantiated!";
         return false;
     }
+    using triArray = SurfaceMesh::TriangleArray;
 
-    std::vector<SurfaceMesh::TriangleArray> facePattern;
-    facePattern.push_back({ { 0, 1, 2 } });
-    facePattern.push_back({ { 0, 1, 3 } });
-    facePattern.push_back({ { 0, 2, 3 } });
-    facePattern.push_back({ { 1, 2, 3 } });
+    const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
 
     // Find number of common vertices
-    auto getNumCommonVerts = [facePattern](const TetraArray& array1, const TetraArray& array2, SurfaceMesh::TriangleArray& commonFace) -> int
+    auto getNumCommonVerts = [facePattern](const TetraArray& array1, const TetraArray& array2, triArray& commonFace) -> int
     {
         int numCommonVerts = 0;
         std::array<bool, 4> tmpFace = {{0,0,0,0}};
@@ -163,7 +160,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
                 {
                     for (size_t j = 0; j < 3; ++j)
                     {
-                        commonFace[j] = array1[facePattern[3-i][j]];// this is specific to the above pattern
+                        commonFace[j] = array1[facePattern[3-i][j]];
                     }
                 }
             }
@@ -171,8 +168,8 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
         return numCommonVerts;
     };
 
-    // Find the common face irrespecive of the order
-    auto findCommonFace = [facePattern](const TetraArray& tetVertArray, const SurfaceMesh::TriangleArray& triVertArray) -> int
+    // Find the common face irrespective of the order
+    auto findCommonFace = [facePattern](const TetraArray& tetVertArray, const triArray& triVertArray) -> int
     {
         for (size_t i = 0; i < 4; ++i)
         {
@@ -188,19 +185,18 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
             }
         }
         LOG(WARNING) << "There is no common face!";
-        return -1;// something wrong if you are here
+        return -1;// something wrong if you reach this point
     };
 
     // Find and store the tetrahedral faces that are unique
-    std::vector<SurfaceMesh::TriangleArray> surfaceTri;
+    auto vertArray = this->getTetrahedraVertices();
+    std::vector<triArray> surfaceTri;
     std::vector<int> surfaceTriTet;
     std::vector<int> tetRemainingVert;
-    auto vertArray = this->getTetrahedraVertices();
-    SurfaceMesh::TriangleArray possibleFaces[4];
-    SurfaceMesh::TriangleArray commonFace;
+    triArray possibleFaces[4];
+    triArray commonFace;
     bool foundFaces[4];
 
-    std::cout << this->getNumTetrahedra() << std::endl;
     for (size_t tetId = 0; tetId < this->getNumTetrahedra(); ++tetId)
     {
         auto tetVertArray = vertArray.at(tetId);
@@ -236,7 +232,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
         {
             for (size_t faceId = 0; faceId < 4; ++faceId)
             {
-                possibleFaces[faceId] = SurfaceMesh::TriangleArray{ {
+                possibleFaces[faceId] = triArray{ {
                         tetVertArray[facePattern[faceId].at(0)],
                         tetVertArray[facePattern[faceId].at(1)],
                         tetVertArray[facePattern[faceId].at(2)] } };
@@ -315,5 +311,26 @@ TetrahedralMesh::clear()
 {
     m_tetrahedraVertices.clear();
     Mesh::clear();
+}
+
+void
+TetrahedralMesh::print() const
+{
+    Geometry::print();
+
+    LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
+    LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra() << "\n";
+
+    LOG(INFO) << "Tetrahedra:\n";
+    for (auto &tetVerts : this->getTetrahedraVertices())
+    {
+        LOG(INFO) << "(" << tetVerts[0] << ", " << tetVerts[1] << ", " << tetVerts[2] << ", " << tetVerts[3] << ")\n";
+    }
+
+    LOG(INFO) << "Vertex positions:\n";
+    for (auto &verts : this->getVerticesPositions())
+    {
+        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << ", " << verts.z() << ")\n";
+    }
 }
 }

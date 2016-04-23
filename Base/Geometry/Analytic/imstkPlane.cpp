@@ -22,6 +22,15 @@
 #include "imstkPlane.h"
 
 namespace imstk {
+
+void
+Plane::print() const
+{
+    Geometry::print();
+
+    LOG(INFO) << "Width: " << m_width << "\n";
+}
+
 Vec3d
 Plane::getNormal() const
 {
