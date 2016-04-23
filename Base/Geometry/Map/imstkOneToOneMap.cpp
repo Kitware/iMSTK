@@ -33,6 +33,19 @@ OneToOneMap::compute()
         return;
     }
 
+    // returns the first matching vertex
+    auto findMatchingVertex = [](std::shared_ptr<Mesh> masterMesh, const Vec3d& p) -> int
+    {
+        for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
+        {
+            if (masterMesh->getInitialVertexPosition(nodeId) == p)
+            {
+                return nodeId;
+            }
+        }
+        return -1;
+    };
+
     auto meshMaster = std::dynamic_pointer_cast<Mesh>(m_master);
     auto meshSlave = std::dynamic_pointer_cast<Mesh>(m_slave);
 
@@ -40,7 +53,7 @@ OneToOneMap::compute()
     for (size_t nodeId = 0; nodeId < meshSlave->getNumVertices(); ++nodeId)
     {
         // Find the enclosing or closest tetrahedron
-        int matchingNodeId = findMatchingVertex(meshMaster, meshSlave->getInitialVertexPosition(nodeId));
+        int matchingNodeId = findMatchingVertex(meshMaster, meshSlave->getVertexPosition(nodeId));
 
         if (matchingNodeId < 0)
         {
@@ -52,20 +65,6 @@ OneToOneMap::compute()
         // Note: This replaces the map if one with <nodeId> already exists
         m_oneToOneMap[nodeId] = matchingNodeId;
     }
-}
-
-int
-OneToOneMap::findMatchingVertex(std::shared_ptr<Mesh> masterMesh, const Vec3d& p) const
-{
-    // returns the first matching vertex
-    for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
-    {
-        if (masterMesh->getInitialVertexPosition(nodeId) == p)
-        {
-            return nodeId;
-        }
-    }
-    return -1;
 }
 
 bool
@@ -132,7 +131,7 @@ OneToOneMap::print() const
     GeometryMap::print();
 
     // Print the one-to-one map
-    LOG(INFO) << "[vertexId1, vertexId2]\n";
+    LOG(INFO) << "[slaveVertId, masterVertexId]\n";
     for (auto const& mapValue : this->m_oneToOneMap)
     {
         LOG(INFO) << "[" << mapValue.first << ", " << mapValue.second << "]\n";
@@ -142,9 +141,9 @@ OneToOneMap::print() const
 void
 OneToOneMap::setMaster(std::shared_ptr<Geometry> master)
 {
-    if (master->getType() == GeometryType::HexahedralMesh ||
-        master->getType() == GeometryType::SurfaceMesh ||
-        master->getType() == GeometryType::TetrahedralMesh)
+    if (master->getType() != GeometryType::HexahedralMesh &&
+        master->getType() != GeometryType::SurfaceMesh &&
+        master->getType() != GeometryType::TetrahedralMesh)
     {
         LOG(WARNING) << "The geometry provided is not a mesh!\n";
         return;
@@ -155,9 +154,9 @@ OneToOneMap::setMaster(std::shared_ptr<Geometry> master)
 void
 OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
 {
-    if (slave->getType() == GeometryType::HexahedralMesh ||
-        slave->getType() == GeometryType::SurfaceMesh ||
-        slave->getType() == GeometryType::TetrahedralMesh)
+    if (slave->getType() != GeometryType::HexahedralMesh &&
+        slave->getType() != GeometryType::SurfaceMesh &&
+        slave->getType() != GeometryType::TetrahedralMesh)
     {
         LOG(WARNING) << "The geometry provided is not a mesh!\n";
         return;

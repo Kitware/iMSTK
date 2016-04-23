@@ -50,11 +50,6 @@ public:
     void compute() override;
 
     ///
-    /// \brief Find the matching node
-    ///
-    int findMatchingVertex(std::shared_ptr<Mesh> tetraMesh, const Vec3d& p) const;
-
-    ///
     /// \brief Check the validity of the map
     ///
     bool isValid() const;

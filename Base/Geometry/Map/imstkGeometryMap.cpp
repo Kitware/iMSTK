@@ -67,6 +67,8 @@ std::string GeometryMap::getTypeName() const
             return "Hexa-Triangle map";
         case GeometryMapType::TetraTetra:
             return "Tetra-Tetra map";
+        case GeometryMapType::OneToOne:
+            return "One-to-One nodal map";
         default:
             return "Map type not determined!";
     }

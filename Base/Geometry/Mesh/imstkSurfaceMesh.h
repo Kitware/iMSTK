@@ -89,6 +89,11 @@ public:
     ///
     void clear();
 
+    ///
+    /// \brief Print the mesh
+    ///
+    void print() const;
+
     // Accessors
 
     ///
@@ -128,6 +133,12 @@ public:
     ///
     const std::vector<Vec4d>& getVerticesTangents() const;
     const Vec4d& getVerticeTangent(size_t i) const;
+
+    ///
+    /// \brief Returns the number of triangles
+    ///
+    int getNumTriangles() const;
+
 protected:
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity

@@ -24,6 +24,7 @@
 
 #include <set>
 #include <list>
+#include <iostream>
 
 #include "imstkVolumetricMesh.h"
 
@@ -83,7 +84,10 @@ public:
     void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
 
     ///
-    /// \brief Extract the confirming triangular mesh from the tetrahedral mesh
+    /// \brief This method
+    /// (a)Extract the confirming triangular mesh from the tetrahedral mesh
+    /// (b) Checks and flips the triangle connectivity order if it is not consistent
+    /// (c) Renumbers the vertices
     ///
     bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 

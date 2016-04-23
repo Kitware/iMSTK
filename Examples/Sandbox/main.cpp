@@ -18,9 +18,10 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshReader.h"
 
-// Map
+// Maps
 #include "imstkTetraTriangleMap.h"
 #include "imstkIsometricMap.h"
+#include "imstkOneToOneMap.h"
 
 #include "g3log/g3log.hpp"
 
@@ -30,6 +31,8 @@ void testAnalyticalGeometry();
 void testScenesManagement();
 void testIsometricMap();
 void testTetraTriangleMap();
+void testOneToOneNodalMap();
+void testExtractSurfaceMesh();
 
 int main()
 {
@@ -38,11 +41,13 @@ int main()
               << "****************\n";
 
     //testViewer();
-    testReadMesh();
+    //testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
     //testIsometricMap();
     //testTetraTriangleMap();
+    testExtractSurfaceMesh();
+    //testOneToOneNodalMap();
 
     return 0;
 }
@@ -295,6 +300,98 @@ void testTetraTriangleMap()
     tetTriMap->compute();
 
     tetTriMap->print();
+
+    getchar();
+}
+
+void testExtractSurfaceMesh()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
+    // a. Construct a sample tetrahedral mesh
+
+    // a.1 add vertex positions
+    auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
+    std::vector<imstk::Vec3d> vertList;
+    vertList.push_back(imstk::Vec3d(0, 0, 0));
+    vertList.push_back(imstk::Vec3d(1.0, 0, 0));
+    vertList.push_back(imstk::Vec3d(0, 1.0, 0));
+    vertList.push_back(imstk::Vec3d(0, 0, 1.0));
+    vertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
+    tetMesh->setInitialVerticesPositions(vertList);
+    tetMesh->setVerticesPositions(vertList);
+
+    // a.2 add connectivity
+    std::vector<imstk::TetrahedralMesh::TetraArray> tetConnectivity;
+    imstk::TetrahedralMesh::TetraArray tet1 = { 0, 1, 2, 3 };
+    imstk::TetrahedralMesh::TetraArray tet2 = { 1, 2, 3, 4 };
+    tetConnectivity.push_back(tet1);
+    tetConnectivity.push_back(tet2);
+    tetMesh->setTetrahedraVertices(tetConnectivity);
+
+    // b. Extract the surface mesh
+    auto extractedSurfMesh = std::make_shared<imstk::SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(extractedSurfMesh);
+
+    // c. Print the resulting mesh
+    extractedSurfMesh->print();
+
+    getchar();
+}
+
+void testOneToOneNodalMap()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
+    // a. Construct a sample tetrahedral mesh
+
+    // a.1 add vertex positions
+    auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
+    std::vector<imstk::Vec3d> vertList;
+    vertList.push_back(imstk::Vec3d(0, 0, 0));
+    vertList.push_back(imstk::Vec3d(1.0, 0, 0));
+    vertList.push_back(imstk::Vec3d(0, 1.0, 0));
+    vertList.push_back(imstk::Vec3d(0, 0, 1.0));
+    vertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
+    tetMesh->setInitialVerticesPositions(vertList);
+    tetMesh->setVerticesPositions(vertList);
+
+    // b. Construct a surface mesh
+    auto triMesh = std::make_shared<imstk::SurfaceMesh>();
+
+    // b.1 Add vertex positions
+    std::vector<imstk::Vec3d> SurfVertList;
+    SurfVertList.push_back(imstk::Vec3d(0, 0, 0));
+    SurfVertList.push_back(imstk::Vec3d(1.0, 0, 0));
+    SurfVertList.push_back(imstk::Vec3d(0, 1.0, 0));
+    SurfVertList.push_back(imstk::Vec3d(0, 0, 1.0));
+    SurfVertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
+    triMesh->setInitialVerticesPositions(SurfVertList);
+    triMesh->setVerticesPositions(SurfVertList);
+
+    // b.2 Add vertex connectivity
+    std::vector<imstk::SurfaceMesh::TriangleArray> triConnectivity;
+    triConnectivity.push_back({ { 0, 1, 2 } });
+    triConnectivity.push_back({ { 0, 1, 3 } });
+    triConnectivity.push_back({ { 0, 2, 3 } });
+    triConnectivity.push_back({ { 1, 2, 4 } });
+    triConnectivity.push_back({ { 1, 3, 4 } });
+    triConnectivity.push_back({ { 2, 3, 4 } });
+    triMesh->setTrianglesVertices(triConnectivity);
+
+    // c. Construct the one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(triMesh);
+
+    // d. Compute the map
+    oneToOneNodalMap->compute();
+
+    // e. Print the computed nodal map if valid
+    if (oneToOneNodalMap->isValid())
+    {
+        oneToOneNodalMap->print();
+    }
 
     getchar();
 }

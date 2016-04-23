@@ -34,9 +34,12 @@ namespace imstk {
         setTrianglesVertices(triangles);
         setTextureCoordinates(texCoords);
 
-        computeVerticesNormals();
-        computeTrianglesNormals();
-        computeVerticesTangents();
+        if (computDerivedData)
+        {
+            computeVerticesNormals();
+            computeTrianglesNormals();
+            computeVerticesTangents();
+        }
     }
 
     void
@@ -260,6 +263,12 @@ SurfaceMesh::getVerticesTangents() const
     return m_verticesTangents;
 }
 
+int
+SurfaceMesh::getNumTriangles() const
+{
+    return this->m_trianglesVertices.size();
+}
+
 const Vec4d&
 SurfaceMesh::getVerticeTangent(size_t i) const
 {
@@ -290,6 +299,25 @@ SurfaceMesh::clear()
     m_verticesTangents.clear();
 
     Mesh::clear();
+}
+
+void
+SurfaceMesh::print() const
+{
+    LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
+    LOG(INFO) << "Number of triangles: " << this->getNumTriangles() << "\n";
+
+    LOG(INFO) << "Triangles:\n";
+    for (auto &triVerts : this->getTrianglesVertices())
+    {
+        LOG(INFO) << "(" << triVerts[0] << ", " << triVerts[1] << "," << triVerts[2] << ")\n";
+    }
+
+    LOG(INFO) << "Vertex positions:\n";
+    for (auto &verts : this->getInitialVerticesPositions())
+    {
+        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << "," << verts.z() << ")\n";
+    }
 }
 
 }
