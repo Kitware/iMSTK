@@ -31,7 +31,7 @@ const bool computDerivedData)
 {
     this->clear();
     setInitialVerticesPositions(vertices);
-    setInitialVerticesPositions(vertices);
+    setVerticesPositions(vertices);
     setTrianglesVertices(triangles);
 
     if (texCoords.size() > 0)
@@ -238,6 +238,12 @@ SurfaceMesh::setTextureCoordinates(const std::vector<Vec2f>& coords)
     m_textureCoordinates = coords;
 }
 
+const Vec2f&
+SurfaceMesh::getVertTextureCoordinate(const int vertNum) const
+{
+    return m_textureCoordinates.at(vertNum);
+}
+
 const std::vector<Vec3d>&
 SurfaceMesh::getTrianglesNormals() const
 {
@@ -327,4 +333,119 @@ SurfaceMesh::print() const
     }
 }
 
+void
+SurfaceMesh::optimizeForDataLocality()
+{
+    const int numVertices = this->getNumVertices();
+    const int numTriangles = this->getNumTriangles();
+
+    // First find the list of triangles a given vertex is part of
+    std::vector<std::vector<int>> vertexNeighbors;
+    vertexNeighbors.resize(this->getNumVertices());
+    int triId = 0;
+    for (const auto &tri : this->getTrianglesVertices())
+    {
+        vertexNeighbors[tri[0]].push_back(triId);
+        vertexNeighbors[tri[1]].push_back(triId);
+        vertexNeighbors[tri[2]].push_back(triId);
+
+        triId++;
+    }
+
+    std::vector<TriangleArray> optimizedConnectivity;
+    std::vector<int> optimallyOrderedNodes;
+    std::list<int> triUnderConsideration;
+    std::vector<bool> isNodeAdded(numVertices, false);
+    std::vector<bool> isTriangleAdded(numTriangles, false);
+    std::list<int> newlyAddedNodes;
+
+    // A. Initialize
+    optimallyOrderedNodes.push_back(0);
+    isNodeAdded.at(0) = true;
+    for (const auto &neighTriId : vertexNeighbors[0])
+    {
+        triUnderConsideration.push_back(neighTriId);
+    }
+
+    // B. Iterate till all the nodes are added to optimized mesh
+    int vertId[3];
+    auto connectivity = this->getTrianglesVertices();
+    while (triUnderConsideration.size() != 0)
+    {
+        // B.1 Add new nodes and triangles
+        for (const auto &triId : triUnderConsideration)
+        {
+            for (int i = 0; i < 3; ++i)
+            {
+                if (!isNodeAdded.at(connectivity.at(triId)[i]))
+                {
+                    optimallyOrderedNodes.push_back(connectivity.at(triId)[i]);
+                    isNodeAdded.at(connectivity.at(triId)[i]) = true;
+                    newlyAddedNodes.push_back(connectivity.at(triId)[i]);
+                }
+                vertId[i] = *std::find(optimallyOrderedNodes.begin(),
+                                       optimallyOrderedNodes.end(),
+                                       connectivity.at(triId)[i]);
+            }
+            TriangleArray tmpTri = { { vertId[0], vertId[1], vertId[2] } };
+            optimizedConnectivity.push_back(tmpTri);
+            isTriangleAdded.at(triId) = true;
+        }
+
+        // B.2 Setup triangles to be considered for next iteration
+        triUnderConsideration.clear();
+        std::vector<bool> triangleAdded;
+
+        for (const auto &newNodes : newlyAddedNodes)
+        {
+            for (const auto &neighTriId : vertexNeighbors[newNodes])
+            {
+                if (!isTriangleAdded[neighTriId])
+                {
+                    triUnderConsideration.push_back(neighTriId);
+                }
+            }
+        }
+        triUnderConsideration.sort();
+        triUnderConsideration.unique();
+
+        newlyAddedNodes.clear();
+    }
+
+    // C. Initialize this mesh with the newly computed ones
+    std::vector<Vec3d> optimallyOrderedNodalPos;
+    std::vector<TriangleArray> optConnectivityRenumbered;
+    std::vector<Vec2f> newTexCoordinates;
+
+    bool texCoorExist = (this->m_textureCoordinates.size()!=0) ? true : false;
+
+    // C.1 Get the positions
+    for (const auto &nodalId : optimallyOrderedNodes)
+    {
+        optimallyOrderedNodalPos.push_back(this->getInitialVertexPosition(nodalId));
+
+        if (texCoorExist)
+        {
+            newTexCoordinates.push_back(this->getVertTextureCoordinate(nodalId));
+        }
+    }
+
+    // C.2 Get the renumbered connectivity
+    for (size_t i = 0; i < numTriangles; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            vertId[j] = (std::find(optimallyOrderedNodes.begin(),
+                                   optimallyOrderedNodes.end(),
+                                   optimizedConnectivity.at(i)[j]) -
+                                   optimallyOrderedNodes.begin()) ;
+        }
+
+        TriangleArray tmpTriArray = { { vertId[0], vertId[1], vertId[2] } };
+        optConnectivityRenumbered.push_back(tmpTriArray);
+    }
+
+    // D. Assign the rewired mesh data to the mesh
+    this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered, newTexCoordinates);
+}
 }

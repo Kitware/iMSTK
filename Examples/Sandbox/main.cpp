@@ -33,6 +33,7 @@ void testIsometricMap();
 void testTetraTriangleMap();
 void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
+void testSurfaceMeshOptimizer();
 
 int main()
 {
@@ -46,8 +47,9 @@ int main()
     //testScenesManagement();
     //testIsometricMap();
     //testTetraTriangleMap();
-    //testExtractSurfaceMesh();
-    testOneToOneNodalMap();
+    testExtractSurfaceMesh();
+    //testOneToOneNodalMap();
+    //testSurfaceMeshOptimizer();
 
     return 0;
 }
@@ -396,6 +398,62 @@ void testOneToOneNodalMap()
     {
         oneToOneNodalMap->print();
     }
+
+    getchar();
+}
+
+void testSurfaceMeshOptimizer()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
+    // a. Construct a sample triangular mesh
+
+    // b. Add nodal data
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    std::vector<imstk::Vec3d> vertList;
+    vertList.push_back(imstk::Vec3d(0, 0, 0));
+    vertList.push_back(imstk::Vec3d(0.5, 0.5, 0));
+    vertList.push_back(imstk::Vec3d(1, 1, 0));
+    vertList.push_back(imstk::Vec3d(1, 0, 0));
+    vertList.push_back(imstk::Vec3d(0, 1, 0));
+    vertList.push_back(imstk::Vec3d(0.5, 1, 0));
+    vertList.push_back(imstk::Vec3d(0, 0.5, 0));
+    vertList.push_back(imstk::Vec3d(1, 0.5, 0));
+    vertList.push_back(imstk::Vec3d(0.5, 0, 0));
+    surfMesh->setInitialVerticesPositions(vertList);
+    surfMesh->setVerticesPositions(vertList);
+
+    // c. Add connectivity data
+    std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+    imstk::SurfaceMesh::TriangleArray tri[8];
+    tri[0] = { { 0, 8, 6 } };
+    tri[1] = { { 7, 2, 5 } };
+    tri[2] = { { 1, 5, 4 } };
+    tri[3] = { { 3, 7, 1 } };
+    tri[4] = { { 8, 1, 6 } };
+    tri[5] = { { 1, 4, 6 } };
+    tri[6] = { { 1, 7, 5 } };
+    tri[7] = { { 3, 1, 8 } };
+
+    for (int i = 0; i < 8; i++)
+    {
+        triangles.push_back(tri[i]);
+    }
+
+    surfMesh->setTrianglesVertices(triangles);
+
+    // d. Print the mesh
+    surfMesh->print();
+
+    // e. Rewire the mesh position and connectivity
+    surfMesh->optimizeForDataLocality();
+
+    // f. Print the resulting mesh
+    surfMesh->print();
+
+    // Cross-check
+    // Connectivity: 0:(0, 1, 2), 1:(1, 3, 2), 2:(3, 4, 2), 3:(5, 3, 1), 4:(3, 6, 4), 5:(5, 7, 3), 6:(3, 7, 6), 7:(7, 8, 6)
+    // Nodal data: 0:(0, 0, 0), 1:(0.5, 0, 0), 2:(0, 0.5, 0), 3:(0.5, 0.5, 0), 4:(0, 1, 0), 5:(1, 0, 0), 6:(0.5, 1, 0), 7:(1, 0.5, 0), 8:(1, 1, 0)
 
     getchar();
 }

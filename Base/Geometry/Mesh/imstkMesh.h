@@ -105,8 +105,7 @@ public:
     const int getNumVertices() const;
 protected:
 
-    Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
-
+    Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}    
     //   Orientation * Scaling * initialVerticesPositions
     // + Position (Initial translation)
     // + verticesDisplacements

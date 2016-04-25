@@ -23,6 +23,7 @@
 #define imstkSurfaceMesh_h
 
 #include <array>
+#include <list>
 #include <set>
 
 #include "imstkMesh.h"
@@ -90,6 +91,13 @@ public:
     void clear();
 
     ///
+    /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
+    ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
+    ///  TODO: Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
+    ///
+    void optimizeForDataLocality();
+
+    ///
     /// \brief Print the surface mesh
     ///
     void print() const override;
@@ -107,6 +115,11 @@ public:
     ///
     void setTextureCoordinates(const std::vector<Vec2f>& coords);
     const std::vector<Vec2f>& getTextureCoordinates() const;
+
+    ///
+    /// \brief Returns the texture coordinates for a given vertex
+    ///
+    const Vec2f& getVertTextureCoordinate(const int vertNum) const;
 
     ///
     /// \brief Get vector of normals of all the triangles

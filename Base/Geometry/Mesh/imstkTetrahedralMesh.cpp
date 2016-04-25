@@ -273,7 +273,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 
     // Renumber the vertices
     std::list<int> uniqueVertIdList;
-    for (auto &face : surfaceTri)
+    for (const auto &face : surfaceTri)
     {
         uniqueVertIdList.push_back(face[0]);
         uniqueVertIdList.push_back(face[1]);

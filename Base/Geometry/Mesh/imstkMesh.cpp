@@ -98,12 +98,12 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
         std::numeric_limits<double>::min(),
         std::numeric_limits<double>::min());
 
-    for (auto it = m_verticesPositions.begin(); it != m_verticesPositions.end(); ++it)
+    for (auto& pos : m_verticesPositions)
     {
         for (int i = 0; i < 3; ++i)
         {
-            min[i] = std::min(min[i], (*it)[i]);
-            max[i] = std::max(max[i], (*it)[i]);
+            min[i] = std::min(min[i], pos[i]);
+            max[i] = std::max(max[i], pos[i]);
         }
     }
 
