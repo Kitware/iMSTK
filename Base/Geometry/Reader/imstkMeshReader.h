@@ -23,9 +23,10 @@
 #define imstkMeshReader_h
 
 #include <memory>
+#include <vector>
+#include <array>
 
 #include "imstkMesh.h"
-#include "imstkSurfaceMesh.h"
 
 namespace imstk {
 
@@ -57,13 +58,6 @@ public:
     /// \brief
     ///
     static std::shared_ptr<Mesh> read(const std::string& filePath);
-
-    ///
-    /// \brief
-    ///
-    static std::shared_ptr<SurfaceMesh> createSurfaceMesh(const std::vector<Vec3d>& vertices,
-                                                          const std::vector<SurfaceMesh::TriangleArray>& triangles,
-                                                          const std::vector<Vec2f>& textCoords);
 
 protected:
 

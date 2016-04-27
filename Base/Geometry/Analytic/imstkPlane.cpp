@@ -27,8 +27,13 @@ void
 Plane::print() const
 {
     Geometry::print();
+    LOG(INFO) << "Width: " << m_width;
+}
 
-    LOG(INFO) << "Width: " << m_width << "\n";
+double
+Plane::getVolume() const
+{
+    return 0.0;
 }
 
 Vec3d
@@ -53,11 +58,5 @@ void
 Plane::setWidth(const double& width)
 {
     m_width = width;
-}
-
-double
-Plane::getVolume() const
-{
-    return 0.0;
 }
 }

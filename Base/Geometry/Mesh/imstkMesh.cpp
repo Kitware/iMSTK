@@ -23,6 +23,60 @@
 
 namespace imstk {
 void
+Mesh::initialize(const std::vector<Vec3d>& vertices)
+{
+    this->setInitialVerticesPositions(vertices);
+    this->setVerticesPositions(vertices);
+}
+
+void
+Mesh::clear()
+{
+    m_initialVerticesPositions.clear();
+    m_verticesPositions.clear();
+    m_verticesDisplacements.clear();
+}
+
+void
+Mesh::print() const
+{
+    Geometry::print();
+    LOG(INFO) << "Number of vertices: " << this->getNumVertices();
+    LOG(INFO) << "Vertex positions:";
+    for (auto &verts : m_verticesPositions)
+    {
+        LOG(INFO) << verts.x() << ", " << verts.y() << ", " << verts.z();
+    }
+}
+
+void
+Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
+{
+    min = Vec3d(MAX_D, MAX_D, MAX_D);
+    max = Vec3d(MIN_D, MIN_D, MIN_D);
+
+    for (auto& pos : m_verticesPositions)
+    {
+        for (int i = 0; i < 3; ++i)
+        {
+            min[i] = std::min(min[i], pos[i]);
+            max[i] = std::max(max[i], pos[i]);
+        }
+    }
+
+    if (percent == 0.0)
+    {
+        return;
+    }
+    else
+    {
+        Vec3d range = max - min;
+        min = min - range*(percent / 100);
+        max = max + range*(percent / 100);
+    }
+}
+
+void
 Mesh::setInitialVerticesPositions(const std::vector<Vec3d>& vertices)
 {
     m_initialVerticesPositions = vertices;
@@ -86,45 +140,4 @@ Mesh::getNumVertices() const
 {
     return m_initialVerticesPositions.size();
 }
-
-void
-Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
-{
-    min = Vec3d(std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max(),
-        std::numeric_limits<double>::max());
-
-    max = Vec3d(std::numeric_limits<double>::min(),
-        std::numeric_limits<double>::min(),
-        std::numeric_limits<double>::min());
-
-    for (auto& pos : m_verticesPositions)
-    {
-        for (int i = 0; i < 3; ++i)
-        {
-            min[i] = std::min(min[i], pos[i]);
-            max[i] = std::max(max[i], pos[i]);
-        }
-    }
-
-    if (percent == 0.0)
-    {
-        return;
-    }
-    else
-    {
-        Vec3d range = max - min;
-        min = min - range*(percent / 100);
-        max = max + range*(percent / 100);
-    }
-}
-
-void
-Mesh::clear()
-{
-    m_initialVerticesPositions.clear();
-    m_verticesPositions.clear();
-    m_verticesDisplacements.clear();
-}
-
 }

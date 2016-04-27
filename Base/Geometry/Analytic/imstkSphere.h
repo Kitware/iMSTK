@@ -51,6 +51,12 @@ public:
     void print() const override;
 
     ///
+    /// \brief Returns the volume of the sphere
+    ///
+    double getVolume() const override;
+
+    // Accessors
+    ///
     /// \brief Returns the radius of the sphere
     ///
     const double& getRadius() const;
@@ -58,12 +64,8 @@ public:
     ///
     /// \brief Sets the radius of the sphere
     ///
-    void          setRadius(const double& radius);
+    void setRadius(const double& radius);
 
-    ///
-    /// \brief Returns the volume of the sphere
-    ///
-    double getVolume() const;
 protected:
 
     double m_radius; ///> Radius of the sphere

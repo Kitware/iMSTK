@@ -40,7 +40,10 @@ public:
 
     ~VolumetricMesh() = default;
 
-    // Accessors
+    ///
+    /// \brief Computes the attached surface mesh
+    ///
+    virtual void computeAttachedSurfaceMesh() = 0;
 
     ///
     /// \brief Returns the attached surface mesh
@@ -50,13 +53,14 @@ public:
     ///
     /// \brief Sets the surface mesh that is attached
     ///
-    void                        setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
+    void setAttachedSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
 protected:
 
     VolumetricMesh(GeometryType type) : Mesh(type) {}
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh; ///> Attached surface mesh
+
 };
 }
 

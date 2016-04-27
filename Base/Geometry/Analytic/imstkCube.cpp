@@ -27,8 +27,13 @@ void
 Cube::print() const
 {
     Geometry::print();
+    LOG(INFO) << "Width: " << m_width;
+}
 
-    LOG(INFO) << "Width: " << m_width << "\n";
+double
+Cube::getVolume() const
+{
+    return m_width*m_width;
 }
 
 const double&
@@ -41,12 +46,6 @@ void
 Cube::setWidth(const double& width)
 {
     m_width = width;
-}
-
-double
-Cube::getVolume() const
-{
-    return m_width*m_width;
 }
 
 }

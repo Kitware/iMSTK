@@ -38,14 +38,24 @@ public:
     ~Mesh() = default;
 
     ///
-    /// \brief Compute the bounding box for the entire mesh
+    /// \brief Initializes the data structure given vertex positions
     ///
-    void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
+    void initialize(const std::vector<Vec3d>& vertices);
 
     ///
     /// \brief Clears all the mesh data
     ///
     virtual void clear();
+
+    ///
+    /// \brief Print the mesh info
+    ///
+    virtual void print() const override;
+
+    ///
+    /// \brief Compute the bounding box for the entire mesh
+    ///
+    void computeBoundingBox(Vec3d& min, Vec3d& max, const double percent = 0.0) const;
 
     // Accessors
 
@@ -103,6 +113,7 @@ public:
     /// \brief Returns the number of total vertices in the mesh
     ///
     const int getNumVertices() const;
+
 protected:
 
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}    

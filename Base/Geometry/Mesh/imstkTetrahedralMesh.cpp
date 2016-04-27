@@ -23,26 +23,34 @@
 
 namespace imstk {
 void
-TetrahedralMesh::setTetrahedraVertices(const std::vector<TetraArray>& tetrahedra)
+TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
+                            const std::vector<TetraArray>& tetrahedra)
 {
-    m_tetrahedraVertices = tetrahedra;
-}
-const std::vector<TetrahedralMesh::TetraArray>&
-TetrahedralMesh::getTetrahedraVertices() const
-{
-    return m_tetrahedraVertices;
+    Mesh::initialize(vertices);
+    this->setTetrahedraVertices(tetrahedra);
 }
 
-const TetrahedralMesh::TetraArray&
-TetrahedralMesh::getTetrahedronVertices(const size_t& tetId) const
+void
+TetrahedralMesh::clear()
 {
-    return m_tetrahedraVertices.at(tetId);
+    Mesh::clear();
+    m_tetrahedraVertices.clear();
 }
 
-int
-TetrahedralMesh::getNumTetrahedra() const
+void
+TetrahedralMesh::print() const
 {
-    return m_tetrahedraVertices.size();
+    Mesh::print();
+
+    LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra();
+    LOG(INFO) << "Tetrahedra:";
+    for (auto &tet : m_tetrahedraVertices)
+    {
+        LOG(INFO) << tet.at(0) << ", "
+                  << tet.at(1) << ", "
+                  << tet.at(2) << ", "
+                  << tet.at(3);
+    }
 }
 
 double
@@ -76,65 +84,8 @@ TetrahedralMesh::getVolume() const
 }
 
 void
-TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos,
-                                           WeightsArray& weights) const
+TetrahedralMesh::computeAttachedSurfaceMesh()
 {
-    const TetraArray& tetVertices = m_tetrahedraVertices.at(tetId);
-    Vec3d v[4];
-    double det;
-
-    for (int i = 0; i < 4; i++)
-    {
-        v[i] = this->getVertexPosition(tetVertices[i]);
-    }
-
-    Mat4d A;
-    A << v[0][0], v[0][1], v[0][2], 1,
-         v[1][0], v[1][1], v[1][2], 1,
-         v[2][0], v[2][1], v[2][2], 1,
-         v[3][0], v[3][1], v[3][2], 1;
-
-    det = A.determinant();
-
-    for (int i = 0; i < 4; i++)
-    {
-        Mat4d B = A;
-        B(i, 0) = pos[0];
-        B(i, 1) = pos[1];
-        B(i, 2) = pos[2];
-        weights[i] = B.determinant() / det;
-    }
-}
-
-void
-TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const
-{
-    auto v1 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[0]);
-    auto v2 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[1]);
-    auto v3 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[2]);
-    auto v4 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[3]);
-
-    std::array<double, 4> arrayx = { v1[0], v2[0], v3[0], v4[0] };
-    std::array<double, 4> arrayy = { v1[1], v2[1], v3[1], v4[1] };
-    std::array<double, 4> arrayz = { v1[2], v2[2], v3[2], v4[2] };
-
-    min[0] = *std::min_element(arrayx.begin(), arrayx.end());
-    min[1] = *std::min_element(arrayy.begin(), arrayy.end());
-    min[2] = *std::min_element(arrayz.begin(), arrayz.end());
-
-    max[0] = *std::max_element(arrayx.begin(), arrayx.end());
-    max[1] = *std::max_element(arrayy.begin(), arrayy.end());
-    max[2] = *std::max_element(arrayz.begin(), arrayz.end());
-}
-
-bool
-TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
-{
-    if (!surfaceMesh)
-    {
-        LOG(WARNING) << "Cannot extract SurfaceMesh: The surface mesh provided is not instantiated!";
-        return false;
-    }
     using triArray = SurfaceMesh::TriangleArray;
 
     const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
@@ -300,37 +251,84 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
         }
     }
 
-    // add vertices and triangles
+    // Create and attach surface mesh
+    auto surfaceMesh = std::make_shared<SurfaceMesh>();
     surfaceMesh->initialize(vertPositions, surfaceTri);
-
-    return true;
+    this->setAttachedSurfaceMesh(surfaceMesh);
 }
 
 void
-TetrahedralMesh::clear()
+TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos,
+                                           WeightsArray& weights) const
 {
-    m_tetrahedraVertices.clear();
-    Mesh::clear();
+    const TetraArray& tetVertices = m_tetrahedraVertices.at(tetId);
+    Vec3d v[4];
+    double det;
+
+    for (int i = 0; i < 4; i++)
+    {
+        v[i] = this->getVertexPosition(tetVertices[i]);
+    }
+
+    Mat4d A;
+    A << v[0][0], v[0][1], v[0][2], 1,
+         v[1][0], v[1][1], v[1][2], 1,
+         v[2][0], v[2][1], v[2][2], 1,
+         v[3][0], v[3][1], v[3][2], 1;
+
+    det = A.determinant();
+
+    for (int i = 0; i < 4; i++)
+    {
+        Mat4d B = A;
+        B(i, 0) = pos[0];
+        B(i, 1) = pos[1];
+        B(i, 2) = pos[2];
+        weights[i] = B.determinant() / det;
+    }
 }
 
 void
-TetrahedralMesh::print() const
+TetrahedralMesh::computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const
 {
-    Geometry::print();
+    auto v1 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[0]);
+    auto v2 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[1]);
+    auto v3 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[2]);
+    auto v4 = this->getVertexPosition(m_tetrahedraVertices.at(tetId)[3]);
 
-    LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
-    LOG(INFO) << "Number of tetrahedra: " << this->getNumTetrahedra() << "\n";
+    std::array<double, 4> arrayx = { v1[0], v2[0], v3[0], v4[0] };
+    std::array<double, 4> arrayy = { v1[1], v2[1], v3[1], v4[1] };
+    std::array<double, 4> arrayz = { v1[2], v2[2], v3[2], v4[2] };
 
-    LOG(INFO) << "Tetrahedra:\n";
-    for (auto &tetVerts : this->getTetrahedraVertices())
-    {
-        LOG(INFO) << "(" << tetVerts[0] << ", " << tetVerts[1] << ", " << tetVerts[2] << ", " << tetVerts[3] << ")\n";
-    }
+    min[0] = *std::min_element(arrayx.begin(), arrayx.end());
+    min[1] = *std::min_element(arrayy.begin(), arrayy.end());
+    min[2] = *std::min_element(arrayz.begin(), arrayz.end());
 
-    LOG(INFO) << "Vertex positions:\n";
-    for (auto &verts : this->getVerticesPositions())
-    {
-        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << ", " << verts.z() << ")\n";
-    }
+    max[0] = *std::max_element(arrayx.begin(), arrayx.end());
+    max[1] = *std::max_element(arrayy.begin(), arrayy.end());
+    max[2] = *std::max_element(arrayz.begin(), arrayz.end());
+}
+
+void
+TetrahedralMesh::setTetrahedraVertices(const std::vector<TetraArray>& tetrahedra)
+{
+    m_tetrahedraVertices = tetrahedra;
+}
+const std::vector<TetrahedralMesh::TetraArray>&
+TetrahedralMesh::getTetrahedraVertices() const
+{
+    return m_tetrahedraVertices;
+}
+
+const TetrahedralMesh::TetraArray&
+TetrahedralMesh::getTetrahedronVertices(const size_t& tetId) const
+{
+    return m_tetrahedraVertices.at(tetId);
+}
+
+int
+TetrahedralMesh::getNumTetrahedra() const
+{
+    return m_tetrahedraVertices.size();
 }
 }

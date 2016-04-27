@@ -22,52 +22,35 @@
 #include "imstkHexahedralMesh.h"
 
 namespace imstk {
+void
+HexahedralMesh::initialize(const std::vector<Vec3d>& vertices,
+                            const std::vector<HexaArray>& hexahedra)
+{
+    Mesh::initialize(vertices);
+    this->setHexahedraVertices(hexahedra);
+}
+
+void
+HexahedralMesh::clear()
+{
+    Mesh::clear();
+    m_hexahedraVertices.clear();
+}
 
 void
 HexahedralMesh::print() const
 {
     Geometry::print();
 
-    LOG(INFO) << "Number of vertices: " << this->getNumVertices() << "\n";
-    LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra() << "\n";
-
-    LOG(INFO) << "Hexahedra:\n";
-    for (auto &hexVerts : this->getHexahedraVertices())
+    LOG(INFO) << "Number of Hexahedra: " << this->getNumHexahedra();
+    LOG(INFO) << "Hexahedra:";
+    for (auto &hex : m_hexahedraVertices)
     {
-        LOG(INFO) << "(" << hexVerts[0] << ", " << hexVerts[1] << "," << hexVerts[2] <<
-            hexVerts[3] << ", " << hexVerts[4] << "," << hexVerts[5] << ", " <<
-            hexVerts[6] << "," << hexVerts[7] << ")\n";
+        LOG(INFO) << hex.at(0) << ", " << hex.at(1) << ", "
+                  << hex.at(2) << ", " << hex.at(3) << ", "
+                  << hex.at(4) << ", " << hex.at(5) << ", "
+                  << hex.at(6) << ", " << hex.at(7);
     }
-
-    LOG(INFO) << "Vertex positions:\n";
-    for (auto &verts : this->getVerticesPositions())
-    {
-        LOG(INFO) << "(" << verts.x() << ", " << verts.y() << "," << verts.z() << ")\n";
-    }
-}
-
-void
-HexahedralMesh::setHexahedraVertices(const std::vector<HexaArray>& hexahedra)
-{
-    m_hexahedraVertices = hexahedra;
-}
-
-const std::vector<HexahedralMesh::HexaArray>&
-HexahedralMesh::getHexahedraVertices() const
-{
-    return m_hexahedraVertices;
-}
-
-const HexahedralMesh::HexaArray&
-HexahedralMesh::getHexahedronVertices(const int& hexaNum) const
-{
-    return m_hexahedraVertices.at(hexaNum);
-}
-
-int
-HexahedralMesh::getNumHexahedra() const
-{
-    return m_hexahedraVertices.size();
 }
 
 double
@@ -114,5 +97,35 @@ HexahedralMesh::getVolume() const
     }
 
     return volume/6;
+}
+
+void
+HexahedralMesh::computeAttachedSurfaceMesh()
+{
+    LOG(WARNING) << "HexahedralMesh::computeAttachedSurfaceMesh error: not implemented.";
+}
+
+void
+HexahedralMesh::setHexahedraVertices(const std::vector<HexaArray>& hexahedra)
+{
+    m_hexahedraVertices = hexahedra;
+}
+
+const std::vector<HexahedralMesh::HexaArray>&
+HexahedralMesh::getHexahedraVertices() const
+{
+    return m_hexahedraVertices;
+}
+
+const HexahedralMesh::HexaArray&
+HexahedralMesh::getHexahedronVertices(const int& hexaNum) const
+{
+    return m_hexahedraVertices.at(hexaNum);
+}
+
+int
+HexahedralMesh::getNumHexahedra() const
+{
+    return m_hexahedraVertices.size();
 }
 }

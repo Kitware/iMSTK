@@ -47,13 +47,28 @@ public:
     ~SurfaceMesh() = default;
 
     ///
-    /// \brief Initializes the rest of the data structures gives vertex positions and
-    ///     triangle connectivity
+    /// \brief Initializes the rest of the data structures given vertex positions and
+    ///  triangle connectivity and texture coordinates
     ///
     void initialize(const std::vector<Vec3d>& vertices,
                     const std::vector<TriangleArray>& triangles,
                     const std::vector<Vec2f>& texCoords = std::vector<Vec2f>(),
-                    const bool computDerivedData = false);
+                    const bool computeDerivedData = false);
+
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    void clear() override;
+
+    ///
+    /// \brief Print the surface mesh
+    ///
+    void print() const override;
+
+    ///
+    /// \brief Get the volume enclosed by the surface mesh
+    ///
+    double getVolume() const override;
 
     ///
     /// \brief Computes neighboring triangles for all vertices
@@ -81,26 +96,11 @@ public:
     void computeVerticesTangents();
 
     ///
-    /// \brief Get the volume enclosed by the surface mesh
-    ///
-    double getVolume() const;
-
-    ///
-    /// \brief Clear all the mesh data
-    ///
-    void clear();
-
-    ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
     ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
     ///  TODO: Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
     ///
     void optimizeForDataLocality();
-
-    ///
-    /// \brief Print the surface mesh
-    ///
-    void print() const override;
 
     // Accessors
 

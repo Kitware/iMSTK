@@ -46,6 +46,46 @@ public:
 
     ~TetrahedralMesh() = default;
 
+    ///
+    /// \brief Initializes the rest of the data structures given vertex positions and
+    ///  tetrahedra connectivity
+    ///
+    void initialize(const std::vector<Vec3d>& vertices,
+                    const std::vector<TetraArray>& tetrahedra);
+
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    void clear();
+
+    ///
+    /// \brief Print the tetrahedral mesh
+    ///
+    void print() const override;
+
+    ///
+    /// \brief Compute and return the volume of the tetrahedral mesh
+    ///
+    double getVolume() const override;
+
+    ///
+    /// \brief This method
+    /// (a) Extracts the confirming triangular mesh from the tetrahedral mesh
+    /// (b) Checks and flips the triangle connectivity order if it is not consistent
+    /// (c) Renumbers the vertices
+    ///
+    void computeAttachedSurfaceMesh() override;
+
+    ///
+    /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
+    ///
+    void computeBarycentricWeights(const size_t& tetId, const Vec3d& pos, WeightsArray& weights) const;
+
+    ///
+    /// \brief Compute the bounding box of a given tetrahedron
+    ///
+    void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
+
     // Accessors
 
     ///
@@ -68,38 +108,6 @@ public:
     ///
     int getNumTetrahedra() const;
 
-    ///
-    /// \brief Compute and return the volume of the tetrahedral mesh
-    ///
-    double getVolume() const;
-
-    ///
-    /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra
-    ///
-    void computeBarycentricWeights(const size_t& tetId, const Vec3d& pos, WeightsArray& weights) const;
-
-    ///
-    /// \brief Compute the bounding box of a given tetrahedron
-    ///
-    void computeTetrahedronBoundingBox(const size_t& tetId, Vec3d& min, Vec3d& max) const;
-
-    ///
-    /// \brief This method
-    /// (a)Extract the confirming triangular mesh from the tetrahedral mesh
-    /// (b) Checks and flips the triangle connectivity order if it is not consistent
-    /// (c) Renumbers the vertices
-    ///
-    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
-
-    ///
-    /// \brief Clear all the mesh data
-    ///
-    void clear();
-
-    ///
-    /// \brief Print the tetrahedral mesh
-    ///
-    void print() const override;
 protected:
 
     std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra

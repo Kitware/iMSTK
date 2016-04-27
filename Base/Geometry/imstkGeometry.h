@@ -48,6 +48,16 @@ public:
     virtual ~Geometry() {}
 
     ///
+    /// \brief Print
+    ///
+    virtual void print() const;
+
+    ///
+    /// \brief Returns the volume of the geometry (if valid)
+    ///
+    virtual double getVolume() const = 0;
+
+    ///
     /// \brief Translate the geometry in Cartesian space
     ///
     void         translate(const Vec3d& t);
@@ -74,19 +84,9 @@ public:
     void        transform(const RigidTransform3d& transform);
 
     ///
-    /// \brief Returns the volume of the geometry (if valid)
-    ///
-    virtual double getVolume() const = 0;
-
-    ///
     /// \brief Returns true if the geometry is a mesh, else returns false
     ///
     bool isMesh() const;
-
-    ///
-    /// \brief Print
-    ///
-    virtual void print() const;
 
     // Accessors
 

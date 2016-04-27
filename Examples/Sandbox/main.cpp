@@ -331,12 +331,14 @@ void testExtractSurfaceMesh()
     tetConnectivity.push_back(tet2);
     tetMesh->setTetrahedraVertices(tetConnectivity);
 
-    // b. Extract the surface mesh
-    auto extractedSurfMesh = std::make_shared<imstk::SurfaceMesh>();
-    tetMesh->extractSurfaceMesh(extractedSurfMesh);
+    // b. Print tetrahedral mesh
+    tetMesh->print();
 
-    // c. Print the resulting mesh
-    extractedSurfMesh->print();
+    // c. Extract the surface mesh
+    tetMesh->computeAttachedSurfaceMesh();
+
+    // d. Print the resulting mesh
+    tetMesh->getAttachedSurfaceMesh()->print();
 
     getchar();
 }

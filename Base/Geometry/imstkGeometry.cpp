@@ -24,6 +24,15 @@
 namespace imstk {
 
 void
+Geometry::print() const
+{
+    LOG(INFO) << this->getTypeName();
+    LOG(INFO) << "Position: " << "(" << m_position.x() << ", " << m_position.y() << ", " << m_position.z() << ")";
+    LOG(INFO) << "Orientation:\n" << m_orientation.toRotationMatrix();
+    LOG(INFO) << "Scaling: " << m_scaling;
+}
+
+void
 Geometry::translate(const Vec3d& t)
 {
     m_position += t;
@@ -74,14 +83,6 @@ Geometry::isMesh() const
     return (this->m_type == GeometryType::HexahedralMesh ||
             this->m_type == GeometryType::SurfaceMesh ||
             this->m_type == GeometryType::TetrahedralMesh) ? true : false;
-}
-
-void
-Geometry::print() const
-{
-    LOG(INFO) << this->getTypeName();
-    LOG(INFO) << "Position: " << "(" << this->m_position.x() << ", " << this->m_position.y() << ", " << this->m_position.z() << ")\n";
-    LOG(INFO) << "Scaling: " << m_scaling << "\n";
 }
 
 const Vec3d&
@@ -158,7 +159,7 @@ Geometry::getTypeName() const
     case GeometryType::Sphere:
         return "Sphere";
     case GeometryType::SurfaceMesh:
-        return "Surface trianglar mesh";
+        return "Surface triangular mesh";
     case GeometryType::TetrahedralMesh:
         return "Tetrahedral mesh";
     case GeometryType::HexahedralMesh:

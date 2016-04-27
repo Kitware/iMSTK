@@ -57,26 +57,6 @@ MeshReader::read(const std::string& filePath)
     return nullptr;
 }
 
-std::shared_ptr<SurfaceMesh>
-MeshReader::createSurfaceMesh(const std::vector<Vec3d>& vertices,
-                              const std::vector<SurfaceMesh::TriangleArray>& triangles,
-                              const std::vector<Vec2f>& textCoords)
-{
-    auto surfaceMesh = std::make_shared<SurfaceMesh>();
-    surfaceMesh->setInitialVerticesPositions(vertices);
-    surfaceMesh->setVerticesPositions(vertices);
-    surfaceMesh->setTrianglesVertices(triangles);
-    surfaceMesh->setTextureCoordinates(textCoords);
-
-    surfaceMesh->computeVerticesNormals();
-    if(!textCoords.empty())
-    {
-        surfaceMesh->computeVerticesTangents();
-    }
-
-    return surfaceMesh;
-}
-
 const MeshReader::FileType
 MeshReader::getFileType(const std::string& filePath)
 {

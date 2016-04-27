@@ -27,8 +27,13 @@ void
 Sphere::print() const
 {
     Geometry::print();
+    LOG(INFO) << "Radius: " << m_radius;
+}
 
-    LOG(INFO) << "Radius: " << m_radius << "\n";
+double
+Sphere::getVolume() const
+{
+    return 0.75*PI*m_radius*m_radius*m_radius;
 }
 
 const double&
@@ -42,11 +47,4 @@ Sphere::setRadius(const double& radius)
 {
     m_radius = radius;
 }
-
-double
-Sphere::getVolume() const
-{
-    return 0.75*PI*m_radius*m_radius*m_radius;
-}
-
 }

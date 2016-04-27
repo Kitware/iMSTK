@@ -46,14 +46,14 @@ public:
     ~Cube() = default;
 
     ///
-    /// \brief Returns the volume of the cube
-    ///
-    double getVolume() const;
-
-    ///
     /// \brief Print the cube info
     ///
     void print() const;
+
+    ///
+    /// \brief Returns the volume of the cube
+    ///
+    double getVolume() const override;
 
     // Accessors
     ///

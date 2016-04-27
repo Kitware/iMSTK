@@ -43,12 +43,34 @@ public:
 
     ~HexahedralMesh() = default;
 
-    // Accessors
+    ///
+    /// \brief Initializes the rest of the data structures given vertex positions and
+    ///  hexahedra connectivity
+    ///
+    void initialize(const std::vector<Vec3d>& vertices,
+                    const std::vector<HexaArray>& hexahedra);
+
+    ///
+    /// \brief Clear all the mesh data
+    ///
+    void clear();
 
     ///
     /// \brief Print the hexahedral mesh
     ///
     void print() const override;
+
+    ///
+    /// \brief Compute and return the volume of the hexahedral mesh
+    ///
+    double getVolume() const override;
+
+    ///
+    /// \brief Computes the attached surface mesh
+    ///
+    void computeAttachedSurfaceMesh() override;
+
+    // Accessors
 
     ///
     /// \brief Sets/Returns the hexahedral connectivity
@@ -65,11 +87,6 @@ public:
     /// \brief Returns the number of hexahedra
     ///
     int getNumHexahedra() const;
-
-    ///
-    /// \brief Compute and return the volume of the hexahedral mesh
-    ///
-    double getVolume() const;
 
 protected:
 

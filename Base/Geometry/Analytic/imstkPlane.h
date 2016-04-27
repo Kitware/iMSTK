@@ -52,14 +52,20 @@ public:
     void print() const override;
 
     ///
+    /// \brief Returns the volume (=0.0) for the plane
+    ///
+    double getVolume() const override;
+
+    // Accessors
+    ///
     /// \brief Returns the normal of the plane
     ///
-    Vec3d         getNormal() const;
+    Vec3d getNormal() const;
 
     ///
     /// \brief Sets the normal to the plane
     ///
-    void          setNormal(const Vec3d& normal);
+    void setNormal(const Vec3d& normal);
 
     ///
     /// \brief Returns the width of the plane
@@ -69,12 +75,8 @@ public:
     ///
     /// \brief Sets the width of the plane
     ///
-    void          setWidth(const double& width);
+    void setWidth(const double& width);
 
-    ///
-    /// \brief Returns the volume (=0.0) for the plane
-    ///
-    double getVolume() const;
 protected:
 
     double m_width; ///> Width of the plane (for display)
