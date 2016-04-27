@@ -51,7 +51,8 @@ public:
     ///  tetrahedra connectivity
     ///
     void initialize(const std::vector<Vec3d>& vertices,
-                    const std::vector<TetraArray>& tetrahedra);
+                    const std::vector<TetraArray>& tetrahedra,
+                    bool computeAttachedSurfaceMesh = false);
 
     ///
     /// \brief Clear all the mesh data

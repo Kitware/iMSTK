@@ -24,6 +24,8 @@
 
 #include <memory>
 
+#include "vtkUnstructuredGrid.h"
+#include "vtkPolyData.h"
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
@@ -59,13 +61,20 @@ protected:
     /// \brief
     ///
     template<typename ReaderType>
-    static std::shared_ptr<Mesh> readAsGenericFormatData(const std::string& filePath);
+    static std::shared_ptr<Mesh> readVtkGenericFormatData(const std::string& filePath);
 
     ///
     /// \brief
     ///
     template<typename ReaderType>
-    static std::shared_ptr<SurfaceMesh> readAsAbstractPolyData(const std::string& filePath);
+    static std::shared_ptr<SurfaceMesh> readVtkPolyData(const std::string& filePath);
+
+    template<typename ReaderType>
+    static std::shared_ptr<VolumetricMesh> readVtkUnstructuredGrid(const std::string& filePath);
+
+    static std::shared_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh);
+
+    static std::shared_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh);
 
     ///
     /// \brief

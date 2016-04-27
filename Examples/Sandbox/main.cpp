@@ -42,12 +42,12 @@ int main()
               << "****************\n";
 
     //testViewer();
-    //testReadMesh();
+    testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
     //testIsometricMap();
     //testTetraTriangleMap();
-    testExtractSurfaceMesh();
+    //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
 
@@ -62,18 +62,20 @@ void testReadMesh()
     scene->setLoopDelay(1000);
 
     // Read mesh
-    std::string filePath = "/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.obj";
-    auto mesh = imstk::MeshReader::read(filePath);
+    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.obj");
+    auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
+    auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
+    auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
+    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");
 
-    // Create and add obj
-    auto obj = std::make_shared<imstk::VisualObject>("meshObject");
-    obj->setVisualGeometry(mesh);
-    scene->addSceneObject(obj);
+    // Create and add object
+    auto object = std::make_shared<imstk::VisualObject>("meshObject");
+    object->setVisualGeometry(objMesh);
+    scene->addSceneObject(object);
 
     // Run
     sdk->setCurrentScene("SceneTestMesh");
     sdk->startSimulation(true);
-
 }
 
 void testViewer()

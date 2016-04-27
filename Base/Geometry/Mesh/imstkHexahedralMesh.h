@@ -48,7 +48,8 @@ public:
     ///  hexahedra connectivity
     ///
     void initialize(const std::vector<Vec3d>& vertices,
-                    const std::vector<HexaArray>& hexahedra);
+                    const std::vector<HexaArray>& hexahedra,
+                    bool computeAttachedSurfaceMesh = false);
 
     ///
     /// \brief Clear all the mesh data

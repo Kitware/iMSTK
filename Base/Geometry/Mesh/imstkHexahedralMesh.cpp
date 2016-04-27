@@ -24,10 +24,16 @@
 namespace imstk {
 void
 HexahedralMesh::initialize(const std::vector<Vec3d>& vertices,
-                            const std::vector<HexaArray>& hexahedra)
+                           const std::vector<HexaArray>& hexahedra,
+                           bool computeAttachedSurfaceMesh)
 {
     Mesh::initialize(vertices);
     this->setHexahedraVertices(hexahedra);
+
+    if(computeAttachedSurfaceMesh)
+    {
+        this->computeAttachedSurfaceMesh();
+    }
 }
 
 void

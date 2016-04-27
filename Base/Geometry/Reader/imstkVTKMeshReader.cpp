@@ -23,12 +23,11 @@
 
 #include "vtkSmartPointer.h"
 #include "vtkGenericDataObjectReader.h"
-#include "vtkXMLGenericDataObjectReader.h"
+#include "vtkXMLUnstructuredGridReader.h"
+#include "vtkXMLPolyDataReader.h"
 #include "vtkPLYReader.h"
 #include "vtkOBJReader.h"
 #include "vtkSTLReader.h"
-#include "vtkPolyData.h"
-#include "vtkUnstructuredGrid.h"
 #include "vtkFloatArray.h"
 
 #include "g3log/g3log.hpp"
@@ -41,28 +40,32 @@ VTKMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
     {
     case MeshReader::FileType::VTK :
     {
-        return VTKMeshReader::readAsGenericFormatData<vtkGenericDataObjectReader>(filePath);
+        return VTKMeshReader::readVtkGenericFormatData<vtkGenericDataObjectReader>(filePath);
         break;
     }
     case MeshReader::FileType::VTU :
+    {
+        return VTKMeshReader::readVtkUnstructuredGrid<vtkXMLUnstructuredGridReader>(filePath);
+        break;
+    }
     case MeshReader::FileType::VTP :
     {
-        return VTKMeshReader::readAsGenericFormatData<vtkXMLGenericDataObjectReader>(filePath);
+        return VTKMeshReader::readVtkPolyData<vtkXMLPolyDataReader>(filePath);
         break;
     }
     case MeshReader::FileType::STL :
     {
-        return VTKMeshReader::readAsAbstractPolyData<vtkSTLReader>(filePath);
+        return VTKMeshReader::readVtkPolyData<vtkSTLReader>(filePath);
         break;
     }
     case MeshReader::FileType::PLY :
     {
-        return VTKMeshReader::readAsAbstractPolyData<vtkPLYReader>(filePath);
+        return VTKMeshReader::readVtkPolyData<vtkPLYReader>(filePath);
         break;
     }
     case MeshReader::FileType::OBJ :
     {
-        return VTKMeshReader::readAsAbstractPolyData<vtkOBJReader>(filePath);
+        return VTKMeshReader::readVtkPolyData<vtkOBJReader>(filePath);
         break;
     }
     default :
@@ -75,64 +78,113 @@ VTKMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
 
 template<typename ReaderType>
 std::shared_ptr<Mesh>
-VTKMeshReader::readAsGenericFormatData(const std::string& filePath)
+VTKMeshReader::readVtkGenericFormatData(const std::string& filePath)
 {
-    std::vector<Vec3d> vertices;
-    std::vector<Vec2f> textCoords;
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    std::vector<TetrahedralMesh::TetraArray> tetrahedra;
-    std::vector<HexahedralMesh::HexaArray> hexahedra;
-
     auto reader = vtkSmartPointer<ReaderType>::New();
     reader->SetFileName(filePath.c_str());
     reader->Update();
 
-    vtkPointSet* output = vtkPointSet::SafeDownCast(reader->GetOutput());
-    if(!output)
+    if (vtkPolyData* vtkMesh = reader->GetPolyDataOutput())
     {
-        LOG(WARNING) << "VTKMeshReader::readAsGenericFormatData error: could not read with VTK reader.";
+        return VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+    }
+    else if (vtkUnstructuredGrid* vtkMesh = reader->GetUnstructuredGridOutput())
+    {
+        return VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+    }
+    else
+    {
+        LOG(WARNING) << "VTKMeshReader::readVtkGenericFormatData error: could not read with VTK reader.";
         return nullptr;
     }
-
-    VTKMeshReader::copyVertices(output->GetPoints(), vertices);
-
-    if(auto vtkMesh = reader->GetPolyDataOutput())
-    {
-        VTKMeshReader::copyCells<3>(vtkMesh->GetPolys(), triangles);
-    }
-    else if (auto vtkMesh = reader->GetUnstructuredGridOutput())
-    {
-        VTKMeshReader::copyCells<4>(vtkMesh->GetCells(), tetrahedra);
-        //TODO : And hexahedra??
-    }
-
-    LOG(WARNING) << "VTKMeshReader::readAsGenericFormatData not finished.";
 }
 
 template<typename ReaderType>
 std::shared_ptr<SurfaceMesh>
-VTKMeshReader::readAsAbstractPolyData(const std::string& filePath)
+VTKMeshReader::readVtkPolyData(const std::string& filePath)
 {
-    std::vector<Vec3d> vertices;
-    std::vector<Vec2f> textCoords;
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-
     auto reader = vtkSmartPointer<ReaderType>::New();
     reader->SetFileName(filePath.c_str());
     reader->Update();
 
     vtkPolyData* vtkMesh = reader->GetOutput();
+    return VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkMesh);
+}
+
+template<typename ReaderType>
+std::shared_ptr<VolumetricMesh>
+VTKMeshReader::readVtkUnstructuredGrid(const std::string& filePath)
+{
+    auto reader = vtkSmartPointer<ReaderType>::New();
+    reader->SetFileName(filePath.c_str());
+    reader->Update();
+
+    vtkUnstructuredGrid* vtkMesh = reader->GetOutput();
+    return VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkMesh);
+}
+
+std::shared_ptr<SurfaceMesh>
+VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
+{
     if(!vtkMesh)
     {
-        LOG(WARNING) << "VTKMeshReader::readAsAbstractPolyData error: could not read with VTK reader.";
+        LOG(WARNING) << "VTKMeshReader::convertVtkPolyDataToSurfaceMesh error: could not read with VTK reader.";
         return nullptr;
     }
 
+    std::vector<Vec3d> vertices;
     VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
+
+    std::vector<SurfaceMesh::TriangleArray> triangles;
     VTKMeshReader::copyCells<3>(vtkMesh->GetPolys(), triangles);
+
+    std::vector<Vec2f> textCoords;
     VTKMeshReader::copyTextureCoordinates(vtkMesh->GetPointData(), textCoords);
 
-    return MeshReader::createSurfaceMesh(vertices, triangles, textCoords);
+    auto mesh = std::make_shared<SurfaceMesh>();
+    mesh->initialize(vertices, triangles, textCoords, true);
+    return mesh;
+}
+
+std::shared_ptr<VolumetricMesh>
+VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh)
+{
+    if(!vtkMesh)
+    {
+        LOG(WARNING) << "VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh error: could not read with VTK reader.";
+        return nullptr;
+    }
+
+    std::vector<Vec3d> vertices;
+    VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
+
+    vtkIdType cellType;
+    vtkMesh->GetCellType(cellType);
+    if( cellType == VTK_TETRA )
+    {
+        std::vector<TetrahedralMesh::TetraArray> cells;
+        VTKMeshReader::copyCells<4>(vtkMesh->GetCells(), cells);
+
+        auto mesh = std::make_shared<TetrahedralMesh>();
+        mesh->initialize(vertices, cells, true);
+        return mesh;
+    }
+    else if( cellType == VTK_HEXAHEDRON )
+    {
+        const size_t dim = 8;
+        std::vector<HexahedralMesh::HexaArray> cells;
+        VTKMeshReader::copyCells<8>(vtkMesh->GetCells(), cells);
+
+        auto mesh = std::make_shared<HexahedralMesh>();
+        mesh->initialize(vertices, cells, true);
+        return mesh;
+    }
+    else
+    {
+        LOG(WARNING) << "VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh error: No support for vtkCellType="
+                     << cellType << ".";
+        return nullptr;
+    }
 }
 
 void

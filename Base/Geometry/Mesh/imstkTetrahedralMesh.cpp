@@ -24,10 +24,16 @@
 namespace imstk {
 void
 TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
-                            const std::vector<TetraArray>& tetrahedra)
+                            const std::vector<TetraArray>& tetrahedra,
+                            bool computeAttachedSurfaceMesh)
 {
     Mesh::initialize(vertices);
     this->setTetrahedraVertices(tetrahedra);
+
+    if(computeAttachedSurfaceMesh)
+    {
+        this->computeAttachedSurfaceMesh();
+    }
 }
 
 void
