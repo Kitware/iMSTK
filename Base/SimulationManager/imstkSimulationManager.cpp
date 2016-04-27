@@ -131,14 +131,27 @@ SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentS
         return;
     }
 
-    // Update viewer
+    // Update viewer scene
     m_viewer->setCurrentScene(newScene);
+
+    // If not yet rendering: update current scene and return
+    if(!m_viewer->isRendering())
+    {
+        m_currentSceneName = newSceneName;
+        return;
+    }
+
+    // If rendering and simulation not active:
+    // render scene in debug, update current scene, and return
     if (m_status == SimulationStatus::INACTIVE)
     {
         m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
         m_currentSceneName = newSceneName;
         return;
     }
+
+    // If rendering and simulation active:
+    // render scene in simulation mode, and update simulation
     m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
 
     // Stop/Pause running scene
@@ -194,6 +207,11 @@ SimulationManager::startSimulation(bool debug)
         m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
         this->startModuleInNewThread(startingScene);
         m_status = SimulationStatus::RUNNING;
+    }
+    // Start Debug
+    else
+    {
+        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
     }
 
     // Start Rendering

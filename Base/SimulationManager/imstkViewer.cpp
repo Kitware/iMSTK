@@ -80,6 +80,12 @@ Viewer::setRenderingMode(Renderer::Mode mode)
 
     // Setup renderer
     m_rendererMap.at(m_currentScene)->setup(mode);
+    if( !m_running )
+    {
+        return;
+    }
+
+    // Render to update displayed actors
     m_vtkRenderWindow->Render();
 
     // Setup render window
