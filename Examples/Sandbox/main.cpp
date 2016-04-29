@@ -73,6 +73,7 @@ void testReadMesh()
     // Read volumetricMesh
     auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(mesh);
+
     auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
 
     // Create object and add to scene

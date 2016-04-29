@@ -146,6 +146,7 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
     };
 
     // Find and store the tetrahedral faces that are unique
+    const int numTet = this->getNumTetrahedra();
     auto vertArray = this->getTetrahedraVertices();
     std::vector<triArray> surfaceTri;
     std::vector<int> surfaceTriTet;
@@ -154,12 +155,12 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
     triArray commonFace;
     bool foundFaces[4];
 
-    for (size_t tetId = 0; tetId < this->getNumTetrahedra(); ++tetId)
+    for (size_t tetId = 0; tetId < numTet; tetId++)
     {
         auto tetVertArray = vertArray.at(tetId);
         foundFaces[0] = foundFaces[1] = foundFaces[2] = foundFaces[3] = false;
 
-        for (size_t tetIdInner = 0 ; tetIdInner < this->getNumTetrahedra(); ++tetIdInner)
+        for (size_t tetIdInner = 0; tetIdInner < numTet; ++tetIdInner)
         {
             if (tetId == tetIdInner)
             {
@@ -181,11 +182,7 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
         }
 
         // break if all the faces are already found
-        if (foundFaces[0] && foundFaces[1] && foundFaces[2] && foundFaces[3])
-        {
-            break;
-        }
-        else
+        if (!(foundFaces[0] && foundFaces[1] && foundFaces[2] && foundFaces[3]))
         {
             for (size_t faceId = 0; faceId < 4; ++faceId)
             {
