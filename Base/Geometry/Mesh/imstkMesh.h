@@ -116,7 +116,14 @@ public:
 
 protected:
 
-    Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}    
+    Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
+
+    friend class SurfaceMeshRenderDelegate;
+    std::vector<Vec3d>& getVerticesPositionsNotConst()
+    {
+        return m_verticesPositions;
+    }
+
     //   Orientation * Scaling * initialVerticesPositions
     // + Position (Initial translation)
     // + verticesDisplacements

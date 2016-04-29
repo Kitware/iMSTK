@@ -32,6 +32,7 @@
 #include "imstkPlaneRenderDelegate.h"
 #include "imstkSphereRenderDelegate.h"
 #include "imstkCubeRenderDelegate.h"
+#include "imstkSurfaceMeshRenderDelegate.h"
 
 #include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
@@ -60,9 +61,7 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
     case GeometryType::SurfaceMesh:
     {
         auto surface = std::dynamic_pointer_cast<SurfaceMesh>(geom);
-        LOG(WARNING) << "RenderDelegate::make_delegate error: SurfaceMeshRenderDelegate not implemented yet.";
-        return nullptr;
-        //return std::make_shared<SurfaceMeshRenderDelegate>(surface);
+        return std::make_shared<SurfaceMeshRenderDelegate>(surface);
     }
     case GeometryType::TetrahedralMesh:
     case GeometryType::HexahedralMesh:
