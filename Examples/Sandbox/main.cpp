@@ -61,16 +61,23 @@ void testReadMesh()
     auto scene = sdk->createNewScene("SceneTestMesh");
     scene->setLoopDelay(1000);
 
-    // Read mesh
-    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.obj");
+    // Read surface mesh
+    /*
+    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
     auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
     auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
     auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");
+    */
 
-    // Create and add object
+    // Read volumetricMesh
+    auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
+    auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(mesh);
+    auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
+
+    // Create object and add to scene
     auto object = std::make_shared<imstk::VisualObject>("meshObject");
-    object->setVisualGeometry(objMesh);
+    object->setVisualGeometry(surfaceMesh);
     scene->addSceneObject(object);
 
     // Run

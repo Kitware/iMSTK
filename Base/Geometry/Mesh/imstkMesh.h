@@ -119,6 +119,7 @@ protected:
     Mesh(GeometryType type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
 
     friend class SurfaceMeshRenderDelegate;
+    friend class TetrahedralMeshRenderDelegate;
     std::vector<Vec3d>& getVerticesPositionsNotConst()
     {
         return m_verticesPositions;

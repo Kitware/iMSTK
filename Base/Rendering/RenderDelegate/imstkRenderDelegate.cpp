@@ -27,12 +27,13 @@
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkSurfaceMesh.h"
-#include "imstkVolumetricMesh.h"
-#include "imstkCube.h"
+#include "imstkTetrahedralMesh.h"
+#include "imstkHexahedralMesh.h"
 #include "imstkPlaneRenderDelegate.h"
 #include "imstkSphereRenderDelegate.h"
 #include "imstkCubeRenderDelegate.h"
 #include "imstkSurfaceMeshRenderDelegate.h"
+#include "imstkTetrahedralMeshRenderDelegate.h"
 
 #include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
@@ -64,12 +65,15 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
         return std::make_shared<SurfaceMeshRenderDelegate>(surface);
     }
     case GeometryType::TetrahedralMesh:
+    {
+        auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
+        return std::make_shared<TetrahedralMeshRenderDelegate>(mesh);
+    }
     case GeometryType::HexahedralMesh:
     {
-        auto mesh = std::dynamic_pointer_cast<VolumetricMesh>(geom);
-        LOG(WARNING) << "RenderDelegate::make_delegate error: VolumetricMeshRenderDelegate not implemented yet.";
+        auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
+        LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
         return nullptr;
-        //return std::make_shared<VolumetricMeshRenderDelegate>(mesh);
     }
     default:
     {

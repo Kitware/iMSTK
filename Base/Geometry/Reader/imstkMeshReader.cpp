@@ -43,11 +43,9 @@ MeshReader::read(const std::string& filePath)
     case FileType::STL :
     case FileType::PLY :
     case FileType::OBJ :
-        LOG(DEBUG) << "MeshReader::read debug: Read using VTK Mesh reader.";
         return VTKMeshReader::read(filePath, meshType);
         break;
     case FileType::VEG :
-        LOG(DEBUG) << "MeshReader::read debug: Read using Vega Mesh reader.";
         LOG(WARNING) << "MeshReader::read error: vega reader not yet implemented.";
         return nullptr;
         break;
