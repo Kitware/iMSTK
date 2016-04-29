@@ -158,8 +158,7 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
     std::vector<Vec3d> vertices;
     VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
 
-    vtkIdType cellType;
-    vtkMesh->GetCellType(cellType);
+    int cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells()-1);
     if( cellType == VTK_TETRA )
     {
         std::vector<TetrahedralMesh::TetraArray> cells;
@@ -219,6 +218,10 @@ VTKMeshReader::copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,d
     std::array<size_t, dim> cell;
     while(vtkCells->GetNextCell(vtkCell))
     {
+        if (vtkCell->GetNumberOfIds() != dim)
+        {
+            continue;
+        }
         for(size_t i = 0; i < dim; ++i)
         {
             cell[i] = vtkCell->GetId(i);
