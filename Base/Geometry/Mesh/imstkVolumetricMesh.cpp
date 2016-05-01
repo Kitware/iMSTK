@@ -21,10 +21,17 @@
 
 #include "imstkVolumetricMesh.h"
 
+#include "g3log/g3log.hpp"
+
 namespace imstk {
 std::shared_ptr<SurfaceMesh>
 VolumetricMesh::getAttachedSurfaceMesh()
 {
+    if(m_attachedSurfaceMesh == nullptr)
+    {
+        LOG(WARNING) << "VolumetricMesh::getAttachedSurfaceMesh warning: attachedSurfaceMesh not set.\n"
+                     << "Extract a surface mesh to attach using computeAttachedSurfaceMesh().";
+    }
     return m_attachedSurfaceMesh;
 }
 

@@ -165,7 +165,7 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
         VTKMeshReader::copyCells<4>(vtkMesh->GetCells(), cells);
 
         auto mesh = std::make_shared<TetrahedralMesh>();
-        mesh->initialize(vertices, cells, true);
+        mesh->initialize(vertices, cells, false);
         return mesh;
     }
     else if( cellType == VTK_HEXAHEDRON )
@@ -175,7 +175,7 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
         VTKMeshReader::copyCells<8>(vtkMesh->GetCells(), cells);
 
         auto mesh = std::make_shared<HexahedralMesh>();
-        mesh->initialize(vertices, cells, true);
+        mesh->initialize(vertices, cells, false);
         return mesh;
     }
     else
