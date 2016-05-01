@@ -349,7 +349,7 @@ void testExtractSurfaceMesh()
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
     if (tetMesh->extractSurfaceMesh(surfMesh))
     {
-        // d. Print the resulting mesh
+        // c.1. Print the resulting mesh
         surfMesh->print();
     }
     else

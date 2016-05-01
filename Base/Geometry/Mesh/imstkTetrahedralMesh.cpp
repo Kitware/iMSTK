@@ -103,56 +103,29 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     }
 
     using triArray = SurfaceMesh::TriangleArray;
-
     const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
 
-    // Find number of common vertices
-    auto getNumCommonVerts = [facePattern](const TetraArray& array1, const TetraArray& array2, triArray& commonFace) -> int
+    auto isUnique = [](std::vector<triArray>& triangles, const int a, const int b, const int c) -> bool
     {
-        int numCommonVerts = 0;
-        std::array<bool, 4> tmpFace = {{0,0,0,0}};
-        for (size_t i = 0; i < 4; ++i)
-        {
-            if (array1[i] == array2[0] || array1[i] == array2[1] || array1[i] == array2[2] || array1[i] == array2[3])
-            {
-                tmpFace[i] = true;
-                numCommonVerts++;
-            }
-        }
-        if (numCommonVerts == 3)
-        {
-            for (size_t i = 0; i < 4; ++i)
-            {
-                if (!tmpFace[i])
-                {
-                    for (size_t j = 0; j < 3; ++j)
-                    {
-                        commonFace[j] = array1[facePattern[3-i][j]];
-                    }
-                }
-            }
-        }
-        return numCommonVerts;
-    };
+        bool unique = true;
+        int foundAt = 0;
 
-    // Find the common face irrespective of the order
-    auto findCommonFace = [facePattern](const TetraArray& tetVertArray, const triArray& triVertArray) -> int
-    {
-        for (size_t i = 0; i < 4; ++i)
+        // search in reverse
+        for (int i = triangles.size() - 1; i >= 0; i--)
         {
-            if (tetVertArray[i] != triVertArray[0] && tetVertArray[i] != triVertArray[1] && tetVertArray[i] != triVertArray[2])
+            auto triA = triangles.at(i);
+            if (((triA[0] == a) && ((triA[1] == b && triA[2] == c) || (triA[1] == c && triA[2] == b))) ||
+                ((triA[1] == a) && ((triA[0] == b && triA[2] == c) || (triA[0] == c && triA[2] == b))) ||
+                ((triA[2] == a) && ((triA[1] == b && triA[0] == c) || (triA[1] == c && triA[0] == b))))
             {
-                for (size_t j = 0; j < 4; ++j)
-                {
-                    if (i != facePattern[j].at(0) && i != facePattern[j].at(1) && i != facePattern[j].at(2))
-                    {
-                        return (int)j;
-                    }
-                }
+                unique = false;
+                foundAt = i;
+                break;
             }
         }
-        LOG(WARNING) << "There is no common face!";
-        return -1;// something wrong if you reach this point
+
+        unique ? triangles.push_back(triArray{ { a, b, c } }) : triangles.erase(triangles.begin() + foundAt);
+        return unique;
     };
 
     // Find and store the tetrahedral faces that are unique
@@ -161,53 +134,18 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     std::vector<triArray> surfaceTri;
     std::vector<int> surfaceTriTet;
     std::vector<int> tetRemainingVert;
-    triArray possibleFaces[4];
-    triArray commonFace;
-    bool foundFaces[4];
 
-    for (size_t tetId = 0; tetId < numTet; tetId++)
+    for (size_t tetId = 0; tetId < numTet; ++tetId)
     {
         //std::cout << "tet: " << tetId << std::endl;
         auto tetVertArray = vertArray.at(tetId);
-        foundFaces[0] = foundFaces[1] = foundFaces[2] = foundFaces[3] = false;
 
-        for (size_t tetIdInner = 0; tetIdInner < numTet; ++tetIdInner)
+        for (int t = 0; t < 4; ++t)
         {
-            if (tetId == tetIdInner)
+            if (isUnique(surfaceTri, tetVertArray[facePattern[t][0]], tetVertArray[facePattern[t][1]], tetVertArray[facePattern[t][2]]))
             {
-                continue;
-            }
-            auto tetVertArrayInner = vertArray.at(tetIdInner);
-
-            // check if there is common face
-            if (getNumCommonVerts(tetVertArray, tetVertArrayInner, commonFace) == 3)
-            {
-                foundFaces[findCommonFace(tetVertArray, commonFace)] = true;
-            }
-
-            // break if all the faces are already found
-            if (foundFaces[0] && foundFaces[1] && foundFaces[2] && foundFaces[3])
-            {
-                break;
-            }
-        }
-
-        // break if all the faces are already found
-        if (!(foundFaces[0] && foundFaces[1] && foundFaces[2] && foundFaces[3]))
-        {
-            for (size_t faceId = 0; faceId < 4; ++faceId)
-            {
-                possibleFaces[faceId] = triArray{ {
-                        tetVertArray[facePattern[faceId].at(0)],
-                        tetVertArray[facePattern[faceId].at(1)],
-                        tetVertArray[facePattern[faceId].at(2)] } };
-
-                if (foundFaces[faceId] == false)
-                {
-                    surfaceTri.push_back(possibleFaces[faceId]);
-                    surfaceTriTet.push_back(tetId);
-                    tetRemainingVert.push_back(3 - faceId);
-                }
+                surfaceTriTet.push_back(tetId);
+                tetRemainingVert.push_back(3-t);
             }
         }
     }
@@ -225,7 +163,6 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
         centroid = (v0 + v1 + v2) / 3;
 
         normal = ((v0 - v1).cross(v0 - v2));
-        //normal.normalize();
 
         if (normal.dot(centroid - this->getVertexPosition(tetRemainingVert.at(faceId))) > 0)
         {
@@ -250,7 +187,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     int vertId;
     std::list<int>::iterator it;
     std::vector<Vec3d> vertPositions;
-    for (vertId=0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
+    for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
     {
         vertPositions.push_back(this->getVertexPosition(*it));
         for (auto &face : surfaceTri)
