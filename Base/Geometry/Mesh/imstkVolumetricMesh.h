@@ -43,12 +43,12 @@ public:
     ///
     /// \brief Computes the attached surface mesh
     ///
-    virtual void computeAttachedSurfaceMesh() = 0;
+    virtual bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh) = 0;
 
     ///
     /// \brief Returns the attached surface mesh
     ///
-    std::shared_ptr<SurfaceMesh>getAttachedSurfaceMesh();
+    std::shared_ptr<SurfaceMesh> getAttachedSurfaceMesh();
 
     ///
     /// \brief Sets the surface mesh that is attached

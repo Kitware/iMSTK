@@ -71,11 +71,11 @@ void testReadMesh()
     */
 
     // Read volumetricMesh
-    auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
+    auto mesh = imstk::MeshReader::read("nidus10KTet.vtk");
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(mesh);
 
-    volumeMesh->computeAttachedSurfaceMesh();
-    auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
+    auto surfaceMesh = std::make_shared<imstk::SurfaceMesh>();
+    volumeMesh->extractSurfaceMesh(surfaceMesh);
 
     // Create object and add to scene
     auto object = std::make_shared<imstk::VisualObject>("meshObject");
@@ -346,10 +346,16 @@ void testExtractSurfaceMesh()
     tetMesh->print();
 
     // c. Extract the surface mesh
-    tetMesh->computeAttachedSurfaceMesh();
-
-    // d. Print the resulting mesh
-    tetMesh->getAttachedSurfaceMesh()->print();
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    if (tetMesh->extractSurfaceMesh(surfMesh))
+    {
+        // d. Print the resulting mesh
+        surfMesh->print();
+    }
+    else
+    {
+        LOG(WARNING) << "Surface mesh was not extracted!";
+    }
 
     getchar();
 }

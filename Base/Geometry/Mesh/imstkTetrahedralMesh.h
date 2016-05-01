@@ -74,8 +74,8 @@ public:
     /// (a) Extracts the confirming triangular mesh from the tetrahedral mesh
     /// (b) Checks and flips the triangle connectivity order if it is not consistent
     /// (c) Renumbers the vertices
-    ///
-    void computeAttachedSurfaceMesh() override;
+    /// TODO: OPTMIZE FOR SPEED
+    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh) override;
 
     ///
     /// \brief compute the barycentric weights of a given point in 3D space for a given the tetrahedra

@@ -30,9 +30,13 @@ TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
     Mesh::initialize(vertices);
     this->setTetrahedraVertices(tetrahedra);
 
-    if(computeAttachedSurfaceMesh)
+    if (computeAttachedSurfaceMesh)
     {
-        this->computeAttachedSurfaceMesh();
+        this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
+        if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
+        {
+            LOG(WARNING) << "Surface mesh was not extracted!";
+        }
     }
 }
 
@@ -89,9 +93,15 @@ TetrahedralMesh::getVolume() const
     return volume;
 }
 
-void
-TetrahedralMesh::computeAttachedSurfaceMesh()
+bool
+TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
+    if (!surfaceMesh)
+    {
+        LOG(WARNING) << "Cannot extract SurfaceMesh: The surface mesh provided is not instantiated!";
+        return false;
+    }
+
     using triArray = SurfaceMesh::TriangleArray;
 
     const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
@@ -157,6 +167,7 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
 
     for (size_t tetId = 0; tetId < numTet; tetId++)
     {
+        //std::cout << "tet: " << tetId << std::endl;
         auto tetVertArray = vertArray.at(tetId);
         foundFaces[0] = foundFaces[1] = foundFaces[2] = foundFaces[3] = false;
 
@@ -255,9 +266,9 @@ TetrahedralMesh::computeAttachedSurfaceMesh()
     }
 
     // Create and attach surface mesh
-    auto surfaceMesh = std::make_shared<SurfaceMesh>();
     surfaceMesh->initialize(vertPositions, surfaceTri);
-    this->setAttachedSurfaceMesh(surfaceMesh);
+
+    return true;
 }
 
 void

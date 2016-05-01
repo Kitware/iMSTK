@@ -69,7 +69,7 @@ public:
     ///
     /// \brief Computes the attached surface mesh
     ///
-    void computeAttachedSurfaceMesh() override;
+    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh) override;
 
     // Accessors
 

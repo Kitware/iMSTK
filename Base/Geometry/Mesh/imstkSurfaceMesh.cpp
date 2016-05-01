@@ -208,7 +208,7 @@ SurfaceMesh::computeVerticesTangents()
         double v2 = uv2[1] - uv0[1];
 
         double div = u1 * v2 - u2 * v1;
-        double r   = (div = 0.0f) ? 0.0f : (1.0f / div);
+        double r   = (div == 0.0f) ? 0.0f : (1.0f / div);
 
         Vec3d u_dir = (v2 * P1 - v1 * P2) * r;
         Vec3d v_dir = (u2 * P1 - u1 * P2) * r;
