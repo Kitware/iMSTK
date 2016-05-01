@@ -37,7 +37,10 @@ SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
     if (computeDerivedData)
     {
         computeVerticesNormals();
-        computeVerticesTangents();
+        if (!texCoords.empty())
+        {
+            computeVerticesTangents();
+        }
     }
 }
 
