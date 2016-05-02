@@ -104,10 +104,10 @@ Module::end()
     while (m_status != ModuleStatus::INACTIVE) {}
 }
 
-const ModuleStatus&
+const ModuleStatus
 Module::getStatus() const
 {
-    return m_status;
+    return m_status.load();
 }
 
 const std::string&

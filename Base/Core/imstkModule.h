@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <thread>
+#include <atomic>
 
 namespace imstk {
 enum class ModuleStatus
@@ -47,10 +48,10 @@ public:
     void                pause();
     void                end();
 
-    const ModuleStatus& getStatus() const;
-    const std::string & getName() const;
-    const int         & getLoopDelay() const;
-    void                setLoopDelay(int milliseconds);
+    const ModuleStatus getStatus() const;
+    const std::string& getName() const;
+    const int& getLoopDelay() const;
+    void setLoopDelay(int milliseconds);
 
 protected:
 
@@ -60,7 +61,7 @@ protected:
     virtual void runModule()     = 0;
     virtual void cleanUpModule() = 0;
 
-    ModuleStatus m_status = ModuleStatus::INACTIVE;
+    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};
     std::string  m_name;
     int m_loopDelay = 0;
 };
