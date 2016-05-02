@@ -22,6 +22,7 @@
 #include "imstkMeshReader.h"
 
 #include "imstkVTKMeshReader.h"
+#include "imstkVegaMeshReader.h"
 
 #include "g3log/g3log.hpp"
 
@@ -46,8 +47,7 @@ MeshReader::read(const std::string& filePath)
         return VTKMeshReader::read(filePath, meshType);
         break;
     case FileType::VEG :
-        LOG(WARNING) << "MeshReader::read error: vega reader not yet implemented.";
-        return nullptr;
+        return VegaMeshReader::read(filePath, meshType);
         break;
     }
 

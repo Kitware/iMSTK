@@ -62,24 +62,24 @@ void testReadMesh()
     scene->setLoopDelay(1000);
 
     // Read surface mesh
-    /*
     auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
     auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
     auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
     auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");
-    */
 
     // Read volumetricMesh
-    auto mesh = imstk::MeshReader::read("nidus10KTet.vtk");
-    auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(mesh);
+    auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
+    auto vegaMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.veg");
 
+    // Extract surface mesh
+    auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
     volumeMesh->computeAttachedSurfaceMesh();
     auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
 
     // Create object and add to scene
     auto object = std::make_shared<imstk::VisualObject>("meshObject");
-    object->setVisualGeometry(surfaceMesh);
+    object->setVisualGeometry(surfaceMesh); // change to any mesh created above
     scene->addSceneObject(object);
 
     // Run
