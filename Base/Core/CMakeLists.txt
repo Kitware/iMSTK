@@ -3,10 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Core
-  H_FILES
-    imstkModule.h
-  CPP_FILES
-    imstkModule.cpp
+  DEPENDS
+    g3log
   )
 
 #-----------------------------------------------------------------------------

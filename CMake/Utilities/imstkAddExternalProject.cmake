@@ -1,8 +1,8 @@
 macro(imstk_add_external_project extProj)
 
   set(options VERBOSE)
-  set(oneValueArgs REPOSITORY GIT_TAG)
-  set(multiValueArgs DEPENDENCIES)
+  set(oneValueArgs REPOSITORY GIT_TAG RELATIVE_INCLUDE_PATH)
+  set(multiValueArgs CMAKE_ARGS DEPENDENCIES)
   include(CMakeParseArguments)
   cmake_parse_arguments(${extProj} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -43,8 +43,8 @@ macro(imstk_add_external_project extProj)
     # Set project directory
     #-----------------------------------------------------------------------------
     set(${extProj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/src)
-    set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/prefix)
-    set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build-${CMAKE_BUILD_TYPE})
+    set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/cmake)
+    set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build)
 
     #-----------------------------------------------------------------------------
     # Add project
@@ -58,12 +58,13 @@ macro(imstk_add_external_project extProj)
       UPDATE_COMMAND ""
       INSTALL_COMMAND ""
       CMAKE_GENERATOR ${CMAKE_GENERATOR}
+      LIST_SEPARATOR ${_sep_}
       CMAKE_ARGS
         ${CMAKE_CONFIG_ARGS}
         ${CMAKE_CONFIG_OSX_ARGS}
-        #-DBUILD_SHARED_LIBS:BOOL=${shared}
-        #-DBUILD_EXAMPLES:BOOL=OFF
-        #-DBUILD_TESTING:BOOL=OFF
+        ${CMAKE_OUTPUT_DIRECTORIES}
+        ${${extProj}_CMAKE_ARGS}
+        -DCMAKE_INCLUDE_PATH:STRING=${CMAKE_INCLUDE_PATH}
       DEPENDS ${${extProj}_DEPENDENCIES}
       )
 
@@ -93,10 +94,14 @@ macro(imstk_add_external_project extProj)
   endif()
 
   #-----------------------------------------------------------------------------
-  # Keep track of project path to add it in the superbuild cache
+  # Keep track of include path for superbuild
+  #-----------------------------------------------------------------------------
+  set(CMAKE_INCLUDE_PATH "${${extProj}_SOURCE_DIR}${${extProj}_RELATIVE_INCLUDE_PATH}^^${CMAKE_INCLUDE_PATH}")
+
+  #-----------------------------------------------------------------------------
+  # Keep track of build path to add it in the innerbuild cache
   #-----------------------------------------------------------------------------
   list( APPEND ${PROJECT_NAME}_EXTERNAL_PROJECTS_PATHS
-    -D${extProj}_SOURCE_DIR:PATH=${${extProj}_SOURCE_DIR}
     -D${extProj}_DIR:PATH=${${extProj}_DIR}
     )
 endmacro()

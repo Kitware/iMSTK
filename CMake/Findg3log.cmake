@@ -5,11 +5,9 @@ find_path(g3log_INCLUDE_DIR
   NAMES
     g3log/g3log.hpp
     g3log/logworker.hpp
-  HINTS
-    ${g3log_SOURCE_DIR}/src
     )
 mark_as_advanced(g3log_INCLUDE_DIR)
-message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
+#message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -17,11 +15,10 @@ message(STATUS "g3log_INCLUDE_DIR : ${g3log_INCLUDE_DIR}")
 find_library(g3log_LIBRARY
   NAMES
     g3logger_shared
-  HINTS
-    ${g3log_DIR}
+    g3logger
   )
 mark_as_advanced(g3log_LIBRARY)
-message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
+#message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
 
 #-----------------------------------------------------------------------------
 # Find package

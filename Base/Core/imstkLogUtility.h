@@ -34,37 +34,12 @@ struct stdSink {
     // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
     enum FG_Color { YELLOW = 33, RED = 31, GREEN = 32, WHITE = 97 };
 
-    FG_Color GetColor(const LEVELS level) const
-    {
-        if (level.value == WARNING.value)   return YELLOW;
-
-        if (level.value == DEBUG.value)   return GREEN;
-
-        if (level.value == FATAL.value)   return RED;
-
-        return WHITE;
-    }
-
-    void ReceiveLogMessage(g3::LogMessageMover logEntry)
-    {
-        auto level = logEntry.get()._level;
-        auto color = GetColor(level);
-
-        std::cout << "\033[" << color << "m"
-                  << logEntry.get().message()
-                  << "\033[m" << std::endl;
-    }
+    FG_Color GetColor(const LEVELS level) const;
+    void ReceiveLogMessage(g3::LogMessageMover logEntry);
 };
 
 struct LogUtility {
-    void createLogger(std::string name, std::string path)
-    {
-        m_g3logWorker    = g3::LogWorker::createLogWorker();
-        m_fileSinkHandle = m_g3logWorker->addDefaultLogger(name, path);
-        m_stdSinkHandle  = m_g3logWorker->addSink(
-            std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
-        g3::initializeLogging(m_g3logWorker.get());
-    }
+    void createLogger(std::string name, std::string path);
 
     std::unique_ptr<g3::LogWorker>                m_g3logWorker;
     std::unique_ptr<g3::SinkHandle<g3::FileSink> >m_fileSinkHandle;

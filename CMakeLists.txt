@@ -57,18 +57,32 @@ else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 #-----------------------------------------------------------------------------
 # Define External dependencies
 #-----------------------------------------------------------------------------
-# g3log
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES g3log)
-option(USE_SYSTEM_g3log "Exclude g3log from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_g3log)
+macro(imstk_define_dependency extProj)
+  list(APPEND ${PROJECT_NAME}_DEPENDENCIES ${extProj})
+  option(USE_SYSTEM_${extProj} "Exclude ${extProj} from superbuild and use an existing build." OFF)
+  mark_as_advanced(USE_SYSTEM_${extProj})
+endmacro()
 
-# Uncrustify
-list(APPEND ${PROJECT_NAME}_DEPENDENCIES Uncrustify)
-option(USE_SYSTEM_Uncrustify "Exclude Uncrustify from superbuild and use an existing build." OFF)
-mark_as_advanced(USE_SYSTEM_Uncrustify)
+option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." OFF)
+if(${PROJECT_NAME}_USE_Uncrustify)
+  imstk_define_dependency(Uncrustify)
+endif()
+
+if(WIN32)
+  imstk_define_dependency(PThreads)
+endif()
+
+imstk_define_dependency(g3log)
+imstk_define_dependency(Eigen)
+imstk_define_dependency(VegaFEM)
+imstk_define_dependency(VTK)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -90,19 +104,31 @@ endif()
 #-----------------------------------------------------------------------------
 # Find external dependencies
 #-----------------------------------------------------------------------------
+# Uncrustify
+include(SetupUncrustifyConfig)
+
 # g3log
 find_package( g3log REQUIRED )
 include_directories( ${g3log_INCLUDE_DIR} )
 
-# Uncrustify
-include(SetupUncrustifyConfig)
+# Eigen
+find_package( Eigen 3.1.2 REQUIRED )
+include_directories( ${Eigen_INCLUDE_DIR} )
+
+# VegaFEM
+find_package( VegaFEM REQUIRED CONFIG )
+
+# VTK
+find_package( VTK REQUIRED )
+include( ${VTK_USE_FILE} )
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Base/Utilities)
 add_subdirectory(Base/Core)
+add_subdirectory(Base/Geometry)
 add_subdirectory(Base/Scene)
+add_subdirectory(Base/Rendering)
 add_subdirectory(Base/SimulationManager)
 
 #--------------------------------------------------------------------------

@@ -22,12 +22,13 @@
 #ifndef imstkSimulationManager_h
 #define imstkSimulationManager_h
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <thread>
 #include <memory>
 
 #include "imstkScene.h"
+#include "imstkViewer.h"
 #include "imstkLogUtility.h"
 
 namespace imstk {
@@ -48,20 +49,22 @@ public:
     const SimulationStatus& getStatus() const;
 
     // Scene
+    bool                    isSceneRegistered(std::string sceneName) const;
+    std::shared_ptr<Scene>  getScene(std::string sceneName) const;
     std::shared_ptr<Scene>  createNewScene(std::string newSceneName);
     std::shared_ptr<Scene>  createNewScene();
     void                    addScene(std::shared_ptr<Scene>newScene);
     void                    removeScene(std::string sceneName);
-    std::shared_ptr<Scene>  getScene(std::string sceneName);
-    bool                    isSceneRegistered(std::string sceneName);
+
+    // Viewer
+    std::shared_ptr<Viewer> getViewer() const;
 
     // Simulation
-    void                    startSimulation(std::string sceneName);
-    void                    switchScene(std::string newSceneName,
-                                        bool        unloadCurrentScene);
-    void                    runSimulation();
-    void                    pauseSimulation();
-    void                    endSimulation();
+    void setCurrentScene(std::string newSceneName, bool unloadCurrentScene = false);
+    void startSimulation(bool debug = false);
+    void runSimulation();
+    void pauseSimulation();
+    void endSimulation();
 
 private:
 
@@ -69,10 +72,11 @@ private:
 
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 
-    std::string m_currentSceneName;
-    std::map<std::string, std::shared_ptr<Scene> > m_sceneMap;
-    std::map<std::string, std::thread> m_threadMap;
+    std::string m_currentSceneName = "";
+    std::unordered_map<std::string, std::shared_ptr<Scene> > m_sceneMap;
+    std::unordered_map<std::string, std::thread> m_threadMap;
 
+    std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>(this);
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 }

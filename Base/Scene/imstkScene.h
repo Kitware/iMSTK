@@ -22,24 +22,50 @@
 #ifndef imstkScene_h
 #define imstkScene_h
 
-#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <memory>
 
 #include "imstkModule.h"
+#include "imstkSceneObject.h"
+#include "imstkLight.h"
+#include "imstkCamera.h"
 
 namespace imstk {
 class Scene : public Module
 {
+    template<class T>
+    using NamedMap = std::unordered_map<std::string, std::shared_ptr<T>>;
+
 public:
 
     Scene(std::string name) : Module(name) {}
 
     ~Scene() = default;
 
+    bool isObjectRegistered(std::string sceneObjectName) const;
+    const std::vector<std::shared_ptr<SceneObject>> getSceneObjects() const;
+    std::shared_ptr<SceneObject> getSceneObject(std::string sceneObjectName) const;
+    void addSceneObject(std::shared_ptr<SceneObject> newSceneObject);
+    void removeSceneObject(std::string sceneObjectName);
+
+    bool isLightRegistered(std::string lightName) const;
+    const std::vector<std::shared_ptr<Light>> getLights() const;
+    std::shared_ptr<Light> getLight(std::string lightName) const;
+    void addLight(std::shared_ptr<Light> newLight);
+    void removeLight(std::string lightName);
+
+    std::shared_ptr<Camera> getCamera();
+
 protected:
 
     void initModule() override;
     void runModule() override;
     void cleanUpModule() override;
+
+    NamedMap<SceneObject>   m_sceneObjectsMap;
+    NamedMap<Light>         m_lightsMap;
+    std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
 };
 }
 

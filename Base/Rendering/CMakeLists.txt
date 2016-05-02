@@ -2,11 +2,10 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Utilities
-  H_FILES
-    imstkLogUtility.h
-  LIBRARIES
-   g3log
+imstk_add_library( Rendering
+  DEPENDS
+    ${VTK_LIBRARIES}
+    Scene
   )
 
 #-----------------------------------------------------------------------------

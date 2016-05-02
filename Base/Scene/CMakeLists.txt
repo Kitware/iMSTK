@@ -3,12 +3,9 @@
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
 imstk_add_library( Scene
-  H_FILES
-    imstkScene.h
-  CPP_FILES
-    imstkScene.cpp
-  LIBRARIES
+  DEPENDS
     Core
+    Geometry
   )
 
 #-----------------------------------------------------------------------------

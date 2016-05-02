@@ -26,7 +26,7 @@ ExternalProject_Include_Dependencies( ${extProj}
 # Set extProject directory
 #-----------------------------------------------------------------------------
 set(${extProj}_SOURCE_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/src)
-set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/prefix)
+set(${extProj}_PREFIX_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/cmake)
 set(${extProj}_DIR ${CMAKE_BINARY_DIR}/External/${extProj}/build)
 
 #-----------------------------------------------------------------------------
