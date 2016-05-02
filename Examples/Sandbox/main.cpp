@@ -74,8 +74,8 @@ void testReadMesh()
     auto mesh = imstk::MeshReader::read("nidus10KTet.vtk");
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(mesh);
 
-    auto surfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-    volumeMesh->extractSurfaceMesh(surfaceMesh);
+    volumeMesh->computeAttachedSurfaceMesh();
+    auto surfaceMesh = volumeMesh->getAttachedSurfaceMesh();
 
     // Create object and add to scene
     auto object = std::make_shared<imstk::VisualObject>("meshObject");

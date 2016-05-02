@@ -67,9 +67,13 @@ public:
     double getVolume() const override;
 
     ///
-    /// \brief Computes the attached surface mesh
+    /// \brief Compute and set the attached surface mesh
     ///
-    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh) override;
+    void computeAttachedSurfaceMesh() override;
+
+    ///
+    /// \brief Extract surface Mesh
+    bool extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
     // Accessors
 

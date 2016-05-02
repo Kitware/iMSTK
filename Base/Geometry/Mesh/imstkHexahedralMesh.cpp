@@ -32,11 +32,7 @@ HexahedralMesh::initialize(const std::vector<Vec3d>& vertices,
 
     if(computeAttachedSurfaceMesh)
     {
-        this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-        if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-        {
-            LOG(WARNING) << "Surface mesh was not extracted!";
-        }
+        this->computeAttachedSurfaceMesh();
     }
 }
 
@@ -109,10 +105,20 @@ HexahedralMesh::getVolume() const
     return volume/6;
 }
 
+void
+HexahedralMesh::computeAttachedSurfaceMesh()
+{
+    this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
+    if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
+    {
+        LOG(WARNING) << "HexahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
+    }
+}
+
 bool
 HexahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
-    LOG(WARNING) << "HexahedralMesh::computeAttachedSurfaceMesh error: not implemented.";
+    LOG(WARNING) << "HexahedralMesh::extractSurfaceMesh error: not implemented.";
     return false;
 }
 

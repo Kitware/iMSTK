@@ -32,11 +32,7 @@ TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
 
     if (computeAttachedSurfaceMesh)
     {
-        this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
-        if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
-        {
-            LOG(WARNING) << "Surface mesh was not extracted!";
-        }
+        this->computeAttachedSurfaceMesh();
     }
 }
 
@@ -93,12 +89,22 @@ TetrahedralMesh::getVolume() const
     return volume;
 }
 
+void
+TetrahedralMesh::computeAttachedSurfaceMesh()
+{
+    this->m_attachedSurfaceMesh = std::make_shared<imstk::SurfaceMesh>();
+    if (!this->extractSurfaceMesh(this->m_attachedSurfaceMesh))
+    {
+        LOG(WARNING) << "TetrahedralMesh::computeAttachedSurfaceMesh error: surface mesh was not extracted.";
+    }
+}
+
 bool
 TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 {
     if (!surfaceMesh)
     {
-        LOG(WARNING) << "Cannot extract SurfaceMesh: The surface mesh provided is not instantiated!";
+        LOG(WARNING) << "TetrahedralMesh::extractSurfaceMesh error: the surface mesh provided is not instantiated.";
         return false;
     }
 
