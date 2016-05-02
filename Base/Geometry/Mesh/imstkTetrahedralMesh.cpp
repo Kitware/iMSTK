@@ -105,49 +105,53 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     using triArray = SurfaceMesh::TriangleArray;
     const std::vector<triArray> facePattern = { triArray{ { 0, 1, 2 } }, triArray{ { 0, 1, 3 } }, triArray{ { 0, 2, 3 } }, triArray{ { 1, 2, 3 } } };
 
-    auto isUnique = [](std::vector<triArray>& triangles, const int a, const int b, const int c) -> bool
-    {
-        bool unique = true;
-        int foundAt = 0;
-
-        // search in reverse
-        for (int i = triangles.size() - 1; i >= 0; i--)
-        {
-            auto triA = triangles.at(i);
-            if (((triA[0] == a) && ((triA[1] == b && triA[2] == c) || (triA[1] == c && triA[2] == b))) ||
-                ((triA[1] == a) && ((triA[0] == b && triA[2] == c) || (triA[0] == c && triA[2] == b))) ||
-                ((triA[2] == a) && ((triA[1] == b && triA[0] == c) || (triA[1] == c && triA[0] == b))))
-            {
-                unique = false;
-                foundAt = i;
-                break;
-            }
-        }
-
-        unique ? triangles.push_back(triArray{ { a, b, c } }) : triangles.erase(triangles.begin() + foundAt);
-        return unique;
-    };
-
     // Find and store the tetrahedral faces that are unique
-    const int numTet = this->getNumTetrahedra();
     auto vertArray = this->getTetrahedraVertices();
     std::vector<triArray> surfaceTri;
     std::vector<int> surfaceTriTet;
     std::vector<int> tetRemainingVert;
+    bool unique = true;
+    int foundAt = 0, tetId = 0;
+    int a, b, c;
 
-    for (size_t tetId = 0; tetId < numTet; ++tetId)
+    for (auto &tetVertArray : vertArray)
     {
         //std::cout << "tet: " << tetId << std::endl;
-        auto tetVertArray = vertArray.at(tetId);
 
         for (int t = 0; t < 4; ++t)
         {
-            if (isUnique(surfaceTri, tetVertArray[facePattern[t][0]], tetVertArray[facePattern[t][1]], tetVertArray[facePattern[t][2]]))
+            unique = true;
+            foundAt = 0;
+            a = tetVertArray[facePattern[t][0]];
+            b = tetVertArray[facePattern[t][1]];
+            c = tetVertArray[facePattern[t][2]];
+
+            // search in reverse
+            for (int i = surfaceTri.size() - 1; i >= 0; i--)
             {
+                const auto &triA = surfaceTri.at(i);
+                if (((triA[0] == a) && ((triA[1] == b && triA[2] == c) || (triA[1] == c && triA[2] == b))) ||
+                    ((triA[1] == a) && ((triA[0] == b && triA[2] == c) || (triA[0] == c && triA[2] == b))) ||
+                    ((triA[2] == a) && ((triA[1] == b && triA[0] == c) || (triA[1] == c && triA[0] == b))))
+                {
+                    unique = false;
+                    foundAt = i;
+                    break;
+                }
+            }
+
+            if (unique)
+            {
+                surfaceTri.push_back(triArray{ { a, b, c } });
                 surfaceTriTet.push_back(tetId);
-                tetRemainingVert.push_back(3-t);
+                tetRemainingVert.push_back(3 - t);
+            }
+            else
+            {
+                surfaceTri.erase(surfaceTri.begin() + foundAt);
             }
         }
+        tetId++;
     }
 
     // Arrange the surface triangle faces found in order
