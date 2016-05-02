@@ -21,6 +21,8 @@
 
 #include "imstkMeshReader.h"
 
+#include <sys/stat.h>
+
 #include "imstkVTKMeshReader.h"
 #include "imstkVegaMeshReader.h"
 
@@ -30,12 +32,13 @@ namespace imstk {
 std::shared_ptr<Mesh>
 MeshReader::read(const std::string& filePath)
 {
-    FileType meshType = MeshReader::getFileType(filePath);
-    if (meshType == FileType::UNKNOWN)
+    if (!MeshReader::fileExists(filePath))
     {
+        LOG(WARNING) << "MeshReader::read error: file not found: " << filePath;
         return nullptr;
     }
 
+    FileType meshType = MeshReader::getFileType(filePath);
     switch (meshType)
     {
     case FileType::VTK :
@@ -53,6 +56,13 @@ MeshReader::read(const std::string& filePath)
 
     LOG(WARNING) << "MeshReader::read error: file type not supported";
     return nullptr;
+}
+
+bool
+MeshReader::fileExists(const std::string& file)
+{
+    struct stat buf;
+    return (stat(file.c_str(), &buf) == 0);
 }
 
 const MeshReader::FileType

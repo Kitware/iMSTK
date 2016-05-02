@@ -55,9 +55,14 @@ public:
     ~MeshReader() = default;
 
     ///
-    /// \brief
+    /// \brief read
     ///
     static std::shared_ptr<Mesh> read(const std::string& filePath);
+
+    ///
+    /// \brief fileExists
+    ///
+    static bool fileExists(const std::string& file);
 
 protected:
 
