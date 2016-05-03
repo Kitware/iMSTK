@@ -25,6 +25,7 @@
 
 // Devices
 #include "imstkVRPNDeviceClient.h"
+#include "imstkVRPNDeviceServer.h"
 
 #include "g3log/g3log.hpp"
 
@@ -63,11 +64,21 @@ void testDeviceClient()
 {
     auto sdk = std::make_shared<imstk::SimulationManager>();
 
-    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0",
-                                                            "localhost",
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost",
                                                             imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
-    client->setLoopDelay(1000);
+
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    server->addDeviceClient(client);
+
+    // Start server in other thread
+    std::thread([server] { server->start(); });
+
+    // Start client here
     client->start();
+
+    // When client quits, end server
+    server->end();
+
 }
 
 void testReadMesh()
