@@ -2,12 +2,12 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SimulationManager
+imstk_add_library( Devices
   DEPENDS
-    Rendering
-    Devices
+    Core
+    VRPN
   )
-  
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------

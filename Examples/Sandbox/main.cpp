@@ -23,10 +23,14 @@
 #include "imstkIsometricMap.h"
 #include "imstkOneToOneMap.h"
 
+// Devices
+#include "imstkVRPNDeviceClient.h"
+
 #include "g3log/g3log.hpp"
 
-void testViewer();
+void testDeviceClient();
 void testReadMesh();
+void testViewer();
 void testAnalyticalGeometry();
 void testScenesManagement();
 void testIsometricMap();
@@ -41,8 +45,9 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
+    testDeviceClient();
     //testViewer();
-    testReadMesh();
+    //testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
     //testIsometricMap();
@@ -52,6 +57,17 @@ int main()
     //testSurfaceMeshOptimizer();
 
     return 0;
+}
+
+void testDeviceClient()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0",
+                                                            "localhost",
+                                                            imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
+    client->setLoopDelay(1000);
+    client->start();
 }
 
 void testReadMesh()

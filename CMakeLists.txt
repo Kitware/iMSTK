@@ -83,6 +83,8 @@ imstk_define_dependency(g3log)
 imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
+imstk_define_dependency(VRPN)
+#imstk_define_dependency(LibNiFalcon)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -122,11 +124,16 @@ find_package( VegaFEM REQUIRED CONFIG )
 find_package( VTK REQUIRED )
 include( ${VTK_USE_FILE} )
 
+# VRPN
+find_package( VRPN REQUIRED )
+include_directories( ${VRPN_INCLUDE_DIRS} )
+
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Geometry)
+add_subdirectory(Base/Devices)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/Rendering)
 add_subdirectory(Base/SimulationManager)
