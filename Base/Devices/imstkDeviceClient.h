@@ -29,12 +29,6 @@
 
 namespace imstk {
 
-enum class DeviceType
-{
-    SPACE_EXPLORER_3DCONNEXION,
-    NAVIGATOR_3DCONNEXION
-};
-
 ///
 /// \class DeviceClient
 /// \brief Base class for any device client
@@ -47,16 +41,10 @@ public:
 
     // Accessors
     ///
-    /// \brief Get/Set the type of the device
+    /// \brief Get/Set the device IP
     ///
-    const DeviceType& getType();
-    void setType(const DeviceType& type);
-
-    ///
-    /// \brief Get/Set the device URL
-    ///
-    const std::string& getUrl();
-    void setUrl(const std::string& url);
+    const std::string& getIp();
+    void setIp(const std::string& ip);
 
     ///
     /// \brief Get/Set what listeners to enable on the device: tracking, analogic, force, buttons.
@@ -107,14 +95,12 @@ public:
 
 protected:
 
-    DeviceClient(std::string name, std::string url, DeviceType type):
+    DeviceClient(std::string name, std::string ip):
         Module(name),
-        m_url(url),
-        m_type(type)
+        m_ip(ip)
     {}
 
-    DeviceType m_type; //!< Device type
-    std::string m_url; //!< Connection device URL
+    std::string m_ip; //!< Connection device IP
 
     bool m_trackingEnabled = true; //!< Tracking enabled if true
     bool m_analogicEnabled = true; //!< Analogic enabled if true

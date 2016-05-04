@@ -27,38 +27,33 @@
 
 namespace imstk {
 bool
-VRPNDeviceServer::addDeviceClient(const std::shared_ptr<VRPNDeviceClient> deviceClient)
+VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType)
 {
-    // Check that url is localhost
-    if (deviceClient->getUrl() != "localhost")
-    {
-        LOG(WARNING) << "VRPNDeviceServer::addDeviceClient error: can not connect to "
-                     << deviceClient->getUrl() << "\n"
-                     << "Can only communicate with devices locally (url = localhost).";
-        return EXIT_FAILURE;
-    }
-
-    m_clientsList.push_back(deviceClient);
+    m_deviceInfoMap[deviceName] = deviceType;
 }
 
 void
 VRPNDeviceServer::initModule()
 {
-    m_connection = vrpn_create_server_connection();
+    std::string ip = m_machine + ":" + std::to_string(m_port);
+    m_serverConnection = vrpn_create_server_connection(ip.c_str());
 
-    for (const auto& client : m_clientsList)
+    m_deviceConnections = new vrpn_MainloopContainer();
+
+    for (const auto& device : m_deviceInfoMap)
     {
-        std::string name = client->getName();
+        std::string name = device.first;
+        DeviceType type = device.second;
 
-        switch (client->getType())
+        switch (type)
         {
         case DeviceType::SPACE_EXPLORER_3DCONNEXION:
         {
-            m_devices->add(new vrpn_3DConnexion_SpaceExplorer(name.c_str(), m_connection));
+            m_deviceConnections->add(new vrpn_3DConnexion_SpaceExplorer(name.c_str(), m_serverConnection));
         } break;
         case DeviceType::NAVIGATOR_3DCONNEXION:
         {
-            m_devices->add(new vrpn_3DConnexion_Navigator(name.c_str(), m_connection));
+            m_deviceConnections->add(new vrpn_3DConnexion_Navigator(name.c_str(), m_serverConnection));
         } break;
         default:
         {
@@ -72,17 +67,17 @@ VRPNDeviceServer::initModule()
 void
 VRPNDeviceServer::runModule()
 {
-    m_connection->mainloop();
-    m_devices->mainloop();
+    m_serverConnection->mainloop();
+    m_deviceConnections->mainloop();
 }
 
 void
 VRPNDeviceServer::cleanUpModule()
 {
-    m_devices->clear();
-    delete(m_devices);
+    m_deviceConnections->clear();
+    delete(m_deviceConnections);
 
-    m_connection->removeReference();
-    delete(m_connection);
+    m_serverConnection->removeReference();
+    //delete(m_connection);
 }
 }

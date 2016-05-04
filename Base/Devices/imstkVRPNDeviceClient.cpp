@@ -28,12 +28,12 @@ namespace imstk {
 void
 VRPNDeviceClient::initModule()
 {
-    std::string fullDeviceUrl = this->getName() + "@" + this->getUrl();
+    std::string fullDeviceIp = this->getName() + "@" + this->getIp();
 
-    m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceUrl.c_str());
-    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceUrl.c_str());
-    m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceUrl.c_str());
-    m_vrpnForceDevice = std::make_shared<vrpn_ForceDevice_Remote>(fullDeviceUrl.c_str());
+    m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp.c_str());
+    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp.c_str());
+    m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceIp.c_str());
+    m_vrpnForceDevice = std::make_shared<vrpn_ForceDevice_Remote>(fullDeviceIp.c_str());
 
     m_vrpnTracker->register_change_handler(this, trackerChangeHandler);
     m_vrpnTracker->register_change_handler(this, velocityChangeHandler);

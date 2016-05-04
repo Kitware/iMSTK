@@ -24,28 +24,17 @@
 #include "g3log/g3log.hpp"
 
 namespace imstk {
-const DeviceType&
-DeviceClient::getType()
-{
-    return m_type;
-}
-
-void
-DeviceClient::setType(const DeviceType& type)
-{
-    m_type = type;
-}
 
 const std::string&
-DeviceClient::getUrl()
+DeviceClient::getIp()
 {
-    return m_url;
+    return m_ip;
 }
 
 void
-DeviceClient::setUrl(const std::string& url)
+DeviceClient::setIp(const std::string& ip)
 {
-    m_url = url;
+    m_ip = ip;
 }
 
 const bool&

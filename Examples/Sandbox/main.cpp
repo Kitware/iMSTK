@@ -29,7 +29,7 @@
 
 #include "g3log/g3log.hpp"
 
-void testDeviceClient();
+void testDevices();
 void testReadMesh();
 void testViewer();
 void testAnalyticalGeometry();
@@ -46,7 +46,7 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testDeviceClient();
+    testDevices();
     //testViewer();
     //testReadMesh();
     //testAnalyticalGeometry();
@@ -60,25 +60,24 @@ int main()
     return 0;
 }
 
-void testDeviceClient()
+void testDevices()
 {
     auto sdk = std::make_shared<imstk::SimulationManager>();
 
-    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost",
-                                                            imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
+    auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
+    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
 
-    auto server = std::make_shared<imstk::VRPNDeviceServer>();
-    server->addDeviceClient(client);
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
 
     // Start server in other thread
-    std::thread([server] { server->start(); });
+    auto t = std::thread([server] { server->start(); });
 
     // Start client here
     client->start();
 
     // When client quits, end server
     server->end();
-
+    t.join();
 }
 
 void testReadMesh()

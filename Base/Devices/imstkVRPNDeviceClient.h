@@ -42,8 +42,8 @@ class VRPNDeviceClient : public DeviceClient
 {
 public:
 
-    VRPNDeviceClient(std::string name, std::string url, DeviceType type):
-        DeviceClient(name, url, type)
+    VRPNDeviceClient(std::string name, std::string ip):
+        DeviceClient(name, ip)
     {}
 
     virtual ~VRPNDeviceClient() {}

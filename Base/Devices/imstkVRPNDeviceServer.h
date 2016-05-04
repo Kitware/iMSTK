@@ -34,6 +34,12 @@
 
 namespace imstk {
 
+enum class DeviceType
+{
+    SPACE_EXPLORER_3DCONNEXION,
+    NAVIGATOR_3DCONNEXION
+};
+
 ///
 /// \class VRPNDeviceServer
 /// \brief Devices server using VRPN
@@ -42,11 +48,15 @@ class VRPNDeviceServer : public Module
 {
 public:
 
-    VRPNDeviceServer(std::string name = "VRPN Device Server"): Module(name) {}
+    VRPNDeviceServer(std::string machine = "localhost", int port = vrpn_DEFAULT_LISTEN_PORT_NO):
+        m_machine(machine),
+        m_port(port),
+        Module(machine + ":" + std::to_string(port))
+    {}
 
     virtual ~VRPNDeviceServer() {}
 
-    bool addDeviceClient(const std::shared_ptr<VRPNDeviceClient> deviceClient);
+    bool addDevice(std::string deviceName, DeviceType deviceType);
 
 protected:
 
@@ -56,10 +66,13 @@ protected:
 
 private:
 
-    vrpn_Connection * m_connection; //!< VRPN server connection
-    vrpn_MainloopContainer* m_devices; //!< VRPN devices connection
+    const std::string m_machine; //!< machine name or IP
+    const int m_port;            //!< connection port
 
-    std::vector<std::shared_ptr<VRPNDeviceClient>> m_clientsList; //!< list of iMSTK client info
+    std::map<std::string, DeviceType> m_deviceInfoMap; //!< list of iMSTK client info
+    vrpn_Connection * m_serverConnection;              //!< VRPN server connection
+    vrpn_MainloopContainer* m_deviceConnections;       //!< VRPN device connections
+
 };
 }
 
