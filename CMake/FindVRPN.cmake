@@ -7,11 +7,21 @@ find_path(VRPN_INCLUDE_DIR
     )
 mark_as_advanced(VRPN_INCLUDE_DIR)
 
+#-----------------------------------------------------------------------------
+# Find dependencies
+#-----------------------------------------------------------------------------
+list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+find_package(Libusb1)
+
+#-----------------------------------------------------------------------------
+# Set up include dirs
+#-----------------------------------------------------------------------------
 set(VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}")
 list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/quat")
 list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/atmellib")
-list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/server_src")
-list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/client_src")
+#list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/server_src")
+#list(APPEND VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}/client_src")
+list(APPEND VRPN_INCLUDE_DIRS "${LIBUSB1_INCLUDE_DIR}")
 message(STATUS "VRPN_INCLUDE_DIRS : ${VRPN_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
@@ -19,8 +29,8 @@ message(STATUS "VRPN_INCLUDE_DIRS : ${VRPN_INCLUDE_DIRS}")
 #-----------------------------------------------------------------------------
 find_library(VRPN_LIBRARY
   NAMES
-    vrpn
-    vrpnb
+    vrpnserver
+    vrpnserverd
   )
 mark_as_advanced(VRPN_LIBRARY)
 
@@ -31,7 +41,14 @@ find_library(QUAT_LIBRARY
   )
 mark_as_advanced(QUAT_LIBRARY)
 
-set(VRPN_LIBRARIES ${VRPN_LIBRARY} ${QUAT_LIBRARY})
+#-----------------------------------------------------------------------------
+# Set up libraries
+#-----------------------------------------------------------------------------
+set(VRPN_LIBRARIES
+  ${VRPN_LIBRARY}
+  ${QUAT_LIBRARY}
+  ${LIBUSB1_LIBRARY}
+  )
 message(STATUS "VRPN_LIBRARIES : ${VRPN_LIBRARIES}")
 
 #-----------------------------------------------------------------------------
