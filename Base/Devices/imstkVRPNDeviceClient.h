@@ -26,6 +26,8 @@
 
 #include "imstkDeviceClient.h"
 
+#include <memory>
+
 #include <vrpn_Configure.h>
 #include <vrpn_Tracker.h>
 #include <vrpn_Analog.h>

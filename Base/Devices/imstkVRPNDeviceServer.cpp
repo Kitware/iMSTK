@@ -26,7 +26,7 @@
 #include "g3log/g3log.hpp"
 
 namespace imstk {
-bool
+void
 VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType)
 {
     m_deviceInfoMap[deviceName] = deviceType;

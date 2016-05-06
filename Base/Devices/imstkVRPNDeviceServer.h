@@ -56,7 +56,7 @@ public:
 
     virtual ~VRPNDeviceServer() {}
 
-    bool addDevice(std::string deviceName, DeviceType deviceType);
+    void addDevice(std::string deviceName, DeviceType deviceType);
 
 protected:
 
