@@ -1,6 +1,11 @@
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+set(VRPN_DEPENDENCIES "")
+if(WIN32)
+  list(APPEND VRPN_DEPENDENCIES Libusb) # "LibNiFalcon"
+endif(WIN32)
+
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://github.com/vrpn/vrpn.git
@@ -16,9 +21,10 @@ imstk_add_external_project( VRPN
     -DVRPN_INSTALL:BOOL=OFF
     -DVRPN_BUILD_PYTHON:BOOL=OFF
     -DVRPN_USE_GPM_MOUSE:BOOL=OFF
+    -DVRPN_USE_LIBUSB_1_0:BOOL=ON
     -DVRPN_USE_HID:BOOL=ON
     #-DVRPN_USE_LIBNIFALCON:BOOL=ON
-  #DEPENDENCIES "LibNiFalcon"
+  DEPENDENCIES ${VRPN_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH ""
   #VERBOSE
   )
