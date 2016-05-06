@@ -84,6 +84,7 @@ endif()
 
 if(WIN32)
   imstk_define_dependency(PThreads)
+  imstk_define_dependency(Libusb)
 endif()
 
 imstk_define_dependency(g3log)
