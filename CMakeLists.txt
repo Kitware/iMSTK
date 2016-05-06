@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.2)
-
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
@@ -25,23 +24,31 @@ endif()
 #-----------------------------------------------------------------------------
 # Project build directories
 #-----------------------------------------------------------------------------
-set(${PROJECT_NAME}_BIN_DIR "bin")
-set(${PROJECT_NAME}_LIB_DIR "lib/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_INCLUDE_DIR "include/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_SHARE_DIR "share/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+if(NOT DEFINED ${PROJECT_NAME}_BIN_DIR)
+  set(${PROJECT_NAME}_BIN_DIR "bin")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_LIB_DIR)
+  set(${PROJECT_NAME}_LIB_DIR "lib")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_INCLUDE_DIR)
+  set(${PROJECT_NAME}_INCLUDE_DIR "include")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_SHARE_DIR)
+  set(${PROJECT_NAME}_SHARE_DIR "share")
+endif()
 
 #-----------------------------------------------------------------------------
 # Project install directories
 #-----------------------------------------------------------------------------
 if(APPLE)
-  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents/") # Set to create Bundle
+  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
 else()
-  set(${PROJECT_NAME}_INSTALL_ROOT "./")
+  set(${PROJECT_NAME}_INSTALL_ROOT ".")
 endif()
-set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_BIN_DIR}")
-set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_LIB_DIR}")
-set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_INCLUDE_DIR}")
-set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_SHARE_DIR}")
+set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_BIN_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_SHARE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 
 #-----------------------------------------------------------------------------
 # C++11 Support
@@ -107,6 +114,7 @@ endif()
 # Find external dependencies
 #-----------------------------------------------------------------------------
 # Uncrustify
+find_program(Uncrustify_EXECUTABLE Uncrustify)
 include(SetupUncrustifyConfig)
 
 # g3log
@@ -121,7 +129,7 @@ include_directories( ${Eigen_INCLUDE_DIR} )
 find_package( VegaFEM REQUIRED CONFIG )
 
 # VTK
-find_package( VTK REQUIRED )
+find_package( VTK REQUIRED CONFIG )
 include( ${VTK_USE_FILE} )
 
 # VRPN

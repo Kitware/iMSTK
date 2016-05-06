@@ -3,8 +3,9 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
-  REPOSITORY ${git_protocol}://github.com/Kitware/VTK.git
+  GIT_REPOSITORY ${git_protocol}://github.com/Kitware/VTK.git
   GIT_TAG v7.0.0
+  INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF
       -DBUILD_TESTING:BOOL=OFF
@@ -21,7 +22,7 @@ imstk_add_external_project( VTK
       -DModule_vtkRenderingContext2D:BOOL=ON
       -DVTK_RENDERING_BACKEND:STRING=OpenGL2
       -DVTK_WRAP_PYTHON:BOOL=OFF
-  #RELATIVE_INCLUDE_PATH ""
-  #DEPENDENCIES ""
+  RELATIVE_INCLUDE_PATH ""
+  DEPENDENCIES ""
   #VERBOSE
   )

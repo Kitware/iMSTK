@@ -3,8 +3,9 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
-  REPOSITORY https://github.com/vrpn/vrpn.git
+  GIT_REPOSITORY https://github.com/vrpn/vrpn.git
   GIT_TAG bc1788410478f4fbedab479524537f2524ca9262
+  INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DBUILD_TESTING:BOOL=OFF
     -DVRPN_SUBPROJECT_BUILD:BOOL=ON
@@ -18,6 +19,6 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_HID:BOOL=ON
     #-DVRPN_USE_LIBNIFALCON:BOOL=ON
   #DEPENDENCIES "LibNiFalcon"
-  #RELATIVE_INCLUDE_PATH ""
+  RELATIVE_INCLUDE_PATH ""
   #VERBOSE
   )
