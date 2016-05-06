@@ -92,7 +92,7 @@ imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
 imstk_define_dependency(VRPN)
-#imstk_define_dependency(LibNiFalcon)
+imstk_define_dependency(LibNiFalcon)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD

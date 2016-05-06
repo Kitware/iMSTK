@@ -1,0 +1,17 @@
+#-----------------------------------------------------------------------------
+# Add External Project
+#-----------------------------------------------------------------------------
+include(imstkAddExternalProject)
+imstk_add_external_project( LibNiFalcon
+  GIT_REPOSITORY https://github.com/agirault/libnifalcon
+  GIT_TAG improve-cmake
+  INSTALL_COMMAND ${SKIP_STEP_COMMAND}
+  CMAKE_ARGS
+    -DBUILD_TESTING:BOOL=OFF
+    -DBUILD_EXAMPLES:BOOL=OFF
+    -DBUILD_SWIG_BINDINGS:BOOL=OFF
+    -DBUILD_SHARED:BOOL=OFF
+  DEPENDENCIES ""
+  RELATIVE_INCLUDE_PATH "include"
+  #VERBOSE
+  )
