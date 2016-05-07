@@ -23,6 +23,7 @@ mark_as_advanced(VRPN_INCLUDE_DIR)
 find_path(LIBUSB1_INCLUDE_DIR
   NAMES
     libusb.h
+    libusb-1.0/libusb.h
   )
 mark_as_advanced(LIBUSB1_INCLUDE_DIR)
 
@@ -58,6 +59,7 @@ mark_as_advanced(QUAT_LIBRARY)
 find_library(LIBUSB1_LIBRARY
   NAMES
     libusb-1.0
+    usb-1.0
   )
 mark_as_advanced(LIBUSB1_LIBRARY)
 
