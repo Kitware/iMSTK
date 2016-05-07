@@ -1,9 +1,9 @@
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
-set(VRPN_DEPENDENCIES "")
+set(VRPN_DEPENDENCIES "LibNiFalcon")
 if(WIN32)
-  list(APPEND VRPN_DEPENDENCIES Libusb LibNiFalcon)
+  list(APPEND VRPN_DEPENDENCIES "Libusb")
 endif(WIN32)
 
 include(imstkAddExternalProject)
