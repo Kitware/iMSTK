@@ -22,6 +22,9 @@
 #include "imstkVRPNDeviceServer.h"
 
 #include "vrpn_3DConnexion.h"
+#define VRPN_USE_LIBNIFALCON
+#define VERBOSE
+#include "vrpn_Tracker_NovintFalcon.h"
 
 #include "g3log/g3log.hpp"
 
@@ -54,6 +57,12 @@ VRPNDeviceServer::initModule()
         case DeviceType::NAVIGATOR_3DCONNEXION:
         {
             m_deviceConnections->add(new vrpn_3DConnexion_Navigator(name.c_str(), m_serverConnection));
+        } break;
+        case DeviceType::NOVINT_FALCON:
+        {
+            auto vrpn_device = new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
+                                                             0, "4-button", "stamper");
+            m_deviceConnections->add(vrpn_device);
         } break;
         default:
         {

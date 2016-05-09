@@ -65,9 +65,11 @@ void testDevices()
     auto sdk = std::make_shared<imstk::SimulationManager>();
 
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
+    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
+    server->setLoopDelay(100);
 
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
+    client->setLoopDelay(100);
 
     // Start server in other thread
     auto t = std::thread([server] { server->start(); });
