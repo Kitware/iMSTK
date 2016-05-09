@@ -8,8 +8,8 @@ endif(WIN32)
 
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
-  GIT_REPOSITORY https://github.com/vrpn/vrpn.git
-  GIT_TAG bc1788410478f4fbedab479524537f2524ca9262
+  GIT_REPOSITORY https://github.com/agirault/vrpn
+  GIT_TAG improve-noving-falcon
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DBUILD_TESTING:BOOL=OFF
