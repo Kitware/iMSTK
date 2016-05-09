@@ -20,6 +20,12 @@ find_path(VRPN_INCLUDE_DIR
     )
 mark_as_advanced(VRPN_INCLUDE_DIR)
 
+find_path(LIBNIFALCON_INCLUDE_DIR
+  NAMES
+    falcon/core/FalconDevice.h
+  )
+mark_as_advanced(LIBNIFALCON_INCLUDE_DIR)
+
 find_path(LIBUSB1_INCLUDE_DIR
   NAMES
     libusb.h
@@ -34,6 +40,7 @@ list(APPEND VRPN_INCLUDE_DIRS
   ${VRPN_INCLUDE_DIR}
   ${VRPN_INCLUDE_DIR}/quat
   ${VRPN_INCLUDE_DIR}/atmellib
+  ${LIBNIFALCON_INCLUDE_DIR}
   ${LIBUSB1_INCLUDE_DIR}
   )
 message(STATUS "VRPN_INCLUDE_DIRS : ${VRPN_INCLUDE_DIRS}")
@@ -54,6 +61,13 @@ find_library(QUAT_LIBRARY
     quatd
   )
 mark_as_advanced(QUAT_LIBRARY)
+
+find_library(LIBNIFALCON_LIBRARY
+  NAMES
+    libnifalcon
+    nifalcon
+  )
+mark_as_advanced(LIBNIFALCON_LIBRARY)
 
 #works on windows, but sounds like it is needed only on linux, check vrpn/submodules/hidapi.cmake
 find_library(LIBUSB1_LIBRARY
@@ -78,6 +92,7 @@ endif()
 set(VRPN_LIBRARIES
   ${VRPN_LIBRARY}
   ${QUAT_LIBRARY}
+  ${LIBNIFALCON_LIBRARY}
   ${LIBUSB1_LIBRARY}
   ${HIDAPI_LIBRARY}
   )
