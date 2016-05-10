@@ -1,6 +1,11 @@
 #-----------------------------------------------------------------------------
 # Add External Project
 #-----------------------------------------------------------------------------
+set(LIBNIFALCON_DEPENDENCIES "")
+if(WIN32)
+  list(APPEND LIBNIFALCON_DEPENDENCIES "Libusb")
+endif(WIN32)
+
 include(imstkAddExternalProject)
 imstk_add_external_project( LibNiFalcon
   GIT_REPOSITORY https://github.com/agirault/libnifalcon
@@ -11,7 +16,7 @@ imstk_add_external_project( LibNiFalcon
     -DBUILD_EXAMPLES:BOOL=OFF
     -DBUILD_SWIG_BINDINGS:BOOL=OFF
     -DBUILD_SHARED:BOOL=OFF
-  DEPENDENCIES ""
+  DEPENDENCIES ${LIBNIFALCON_DEPENDENCIES}
   RELATIVE_INCLUDE_PATH "include"
   #VERBOSE
   )
