@@ -28,6 +28,9 @@
 #include <memory>
 
 #include "imstkScene.h"
+#include "imstkVRPNDeviceServer.h"
+#include "imstkDeviceClient.h"
+#include "imstkScene.h"
 #include "imstkViewer.h"
 #include "imstkLogUtility.h"
 
@@ -49,12 +52,24 @@ public:
     const SimulationStatus& getStatus() const;
 
     // Scene
-    bool                    isSceneRegistered(std::string sceneName) const;
-    std::shared_ptr<Scene>  getScene(std::string sceneName) const;
-    std::shared_ptr<Scene>  createNewScene(std::string newSceneName);
-    std::shared_ptr<Scene>  createNewScene();
-    void                    addScene(std::shared_ptr<Scene>newScene);
-    void                    removeScene(std::string sceneName);
+    bool isSceneRegistered(std::string sceneName) const;
+    std::shared_ptr<Scene> getScene(std::string sceneName) const;
+    std::shared_ptr<Scene> createNewScene(std::string newSceneName);
+    std::shared_ptr<Scene> createNewScene();
+    void addScene(std::shared_ptr<Scene> newScene);
+    void removeScene(std::string sceneName);
+
+    // Device Server
+    bool isDeviceServerRegistered(std::string serverName) const;
+    std::shared_ptr<VRPNDeviceServer> getDeviceServer(std::string serverName) const;
+    void addDeviceServer(std::shared_ptr<VRPNDeviceServer> newServer);
+    void removeDeviceServer(std::string serverName);
+
+    // Device Client
+    bool isDeviceClientRegistered(std::string deviceClientName) const;
+    std::shared_ptr<DeviceClient> getDeviceClient(std::string deviceClientName) const;
+    void addDeviceClient(std::shared_ptr<DeviceClient> newDeviceClient);
+    void removeDeviceClient(std::string deviceClientName);
 
     // Viewer
     std::shared_ptr<Viewer> getViewer() const;
@@ -73,7 +88,11 @@ private:
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 
     std::string m_currentSceneName = "";
-    std::unordered_map<std::string, std::shared_ptr<Scene> > m_sceneMap;
+    std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap;
+
+    std::unordered_map<std::string, std::shared_ptr<VRPNDeviceServer>> m_deviceServerMap;
+    std::unordered_map<std::string, std::shared_ptr<DeviceClient>> m_deviceClientMap;
+
     std::unordered_map<std::string, std::thread> m_threadMap;
 
     std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>(this);

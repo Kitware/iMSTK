@@ -62,24 +62,32 @@ int main()
 
 void testDevices()
 {
+    // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestDevice");
+    scene->setLoopDelay(1000);
 
+    // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
     server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
     server->setLoopDelay(100);
+    sdk->addDeviceServer(server);
 
+    // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
     client->setLoopDelay(100);
+    sdk->addDeviceClient(client);
 
-    // Start server in other thread
-    auto t = std::thread([server] { server->start(); });
+    // Sphere
+    auto sphereGeom = std::make_shared<imstk::Sphere>();
+    sphereGeom->scale(0.1);
+    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereObj->setVisualGeometry(sphereGeom);
+    scene->addSceneObject(sphereObj);
 
-    // Start client here
-    client->start();
-
-    // When client quits, end server
-    server->end();
-    t.join();
+    // Run
+    sdk->setCurrentScene("SceneTestDevice");
+    sdk->startSimulation(true);
 }
 
 void testReadMesh()
