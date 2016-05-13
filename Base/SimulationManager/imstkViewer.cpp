@@ -108,7 +108,10 @@ void
 Viewer::startRenderingLoop()
 {
     m_running = true;
+    m_vtkRenderWindow->GetInteractor()->Initialize();
+    m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(1000.0/60);
     m_vtkRenderWindow->GetInteractor()->Start();
+    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     m_running = false;
 }
 
