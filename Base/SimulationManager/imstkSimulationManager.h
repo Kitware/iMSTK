@@ -54,6 +54,7 @@ public:
     // Scene
     bool isSceneRegistered(std::string sceneName) const;
     std::shared_ptr<Scene> getScene(std::string sceneName) const;
+    std::shared_ptr<Scene> getCurrentScene() const;
     std::shared_ptr<Scene> createNewScene(std::string newSceneName);
     std::shared_ptr<Scene> createNewScene();
     void addScene(std::shared_ptr<Scene> newScene);
@@ -83,7 +84,7 @@ public:
 
 private:
 
-    void startModuleInNewThread(std::shared_ptr<Module>module);
+    void startModuleInNewThread(std::shared_ptr<Module> module);
 
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 

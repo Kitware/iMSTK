@@ -52,6 +52,12 @@ SimulationManager::getScene(std::string sceneName) const
 }
 
 std::shared_ptr<Scene>
+SimulationManager::getCurrentScene() const
+{
+    return this->getScene(m_currentSceneName);
+}
+
+std::shared_ptr<Scene>
 SimulationManager::createNewScene(std::string newSceneName)
 {
     if (this->isSceneRegistered(newSceneName))
