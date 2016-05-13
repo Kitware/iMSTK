@@ -21,6 +21,8 @@
 
 #include "imstkScene.h"
 
+#include "imstkCameraController.h"
+
 #include <g3log/g3log.hpp>
 
 namespace imstk {
@@ -162,17 +164,35 @@ void
 Scene::initModule()
 {
     LOG(DEBUG) << m_name << " : init";
+
+
+    if (auto camController = m_camera->getController())
+    {
+        this->startModuleInNewThread(camController);
+    }
 }
 
 void
 Scene::cleanUpModule()
 {
     LOG(DEBUG) << m_name << " : cleanUp";
+
+    if (auto camController = m_camera->getController())
+    {
+        camController->end();
+        m_threadMap.at(camController->getName()).join();
+    }
 }
 
 void
 Scene::runModule()
 {
     LOG(DEBUG) << m_name << " : running";
+}
+
+void
+Scene::startModuleInNewThread(std::shared_ptr<Module>module)
+{
+    m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
 }

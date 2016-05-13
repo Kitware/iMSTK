@@ -23,48 +23,54 @@
 #define imstkCamera_h
 
 #include <string>
-
-#include <vtkSmartPointer.h>
-#include <vtkCamera.h>
+#include <memory>
 
 #include "imstkMath.h"
 
 namespace imstk {
+
+class CameraController;
+class DeviceClient;
 
 class Camera
 {
 public:
 
     Camera() = default;
-
     ~Camera() = default;
 
-    const Vec3d getPosition() const;
+    const Vec3d& getPosition() const;
     void setPosition(const Vec3d& p);
     void setPosition(const double& x,
                      const double& y,
                      const double& z);
 
-    const Vec3d getFocalPoint() const;
+    const Vec3d& getFocalPoint() const;
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
                        const double& y,
                        const double& z);
 
-    const Vec3d getViewUp() const;
+    const Vec3d& getViewUp() const;
     void setViewUp(const Vec3d& v);
     void setViewUp(const double& x,
                    const double& y,
                    const double& z);
 
-    const double getViewAngle() const;
+    const double& getViewAngle() const;
     void setViewAngle(const double& angle);
 
-    vtkSmartPointer<vtkCamera> getVtkCamera() const;
+    std::shared_ptr<CameraController> getController() const;
+    std::shared_ptr<CameraController> setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling = 1.0);
 
 protected:
 
-    vtkSmartPointer<vtkCamera> m_vtkCamera = vtkSmartPointer<vtkCamera>::New();
+    std::shared_ptr<CameraController> m_cameraController;
+
+    Vec3d m_position;
+    Vec3d m_focalPoint;
+    Vec3d m_viewUp;
+    double m_viewAngle;
 
 };
 }

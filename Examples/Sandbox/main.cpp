@@ -70,12 +70,12 @@ void testDevices()
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
     server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
-    server->setLoopDelay(100);
+    server->setLoopDelay(1);
     sdk->addDeviceServer(server);
 
     // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
-    client->setLoopDelay(100);
+    client->setLoopDelay(1);
     sdk->addDeviceClient(client);
 
     // Sphere
@@ -84,6 +84,11 @@ void testDevices()
     auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
     sphereObj->setVisualGeometry(sphereGeom);
     scene->addSceneObject(sphereObj);
+
+    // Update Camera controller using the device client
+    auto cam = scene->getCamera();
+    cam->setPosition(4*imstk::BACKWARD_VECTOR);
+    cam->setupController(client, 10);
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");

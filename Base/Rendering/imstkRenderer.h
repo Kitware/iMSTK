@@ -57,7 +57,7 @@ protected:
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
     vtkSmartPointer<vtkRenderer> m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();
-    vtkSmartPointer<vtkCamera> m_defaultVtkCamera = m_vtkRenderer->GetActiveCamera();
+    vtkSmartPointer<vtkCamera> m_defaultVtkCamera;
     vtkSmartPointer<vtkCamera> m_sceneVtkCamera;
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;

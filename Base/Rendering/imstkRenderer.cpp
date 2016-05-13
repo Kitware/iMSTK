@@ -73,10 +73,14 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     m_debugVtkActors.push_back( axes );
 
     // Camera and camera actor
-    m_sceneVtkCamera = scene->getCamera()->getVtkCamera();
+    m_sceneVtkCamera = vtkSmartPointer<vtkCamera>::New();
+    // TODO: init vtkCamera based on imstkCamera
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
     camActor->SetCamera(  m_sceneVtkCamera );
     m_debugVtkActors.push_back( camActor );
+
+    // Debug camera
+    m_defaultVtkCamera = m_vtkRenderer->GetActiveCamera();
 
     ///TODO : based on scene properties
     // Customize background colors

@@ -63,8 +63,11 @@ protected:
     void runModule() override;
     void cleanUpModule() override;
 
-    NamedMap<SceneObject>   m_sceneObjectsMap;
-    NamedMap<Light>         m_lightsMap;
+    void startModuleInNewThread(std::shared_ptr<Module> module);
+    std::unordered_map<std::string, std::thread> m_threadMap;
+
+    NamedMap<SceneObject> m_sceneObjectsMap;
+    NamedMap<Light> m_lightsMap;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
 };
 }
