@@ -88,8 +88,8 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const _vrpn_TRACKERCB t)
     deviceClient->m_orientation.z() = t.quat[2];
     deviceClient->m_orientation.w() = t.quat[3];
 
-    LOG(DEBUG) << "tracker: position = " << deviceClient->m_position;
-    LOG(DEBUG) << "tracker: orientation = " << deviceClient->m_orientation.matrix();
+    //LOG(DEBUG) << "tracker: position = " << t.pos[0] << " " << t.pos[1] << " " << t.pos[2];
+    //LOG(DEBUG) << "tracker: orientation = " << deviceClient->m_orientation.matrix();
 }
 
 void VRPN_CALLBACK
@@ -100,7 +100,7 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
     if (a.num_channel > 0)
     {
         deviceClient->m_position << a.channel[0], a.channel[1], a.channel[2];
-        LOG(DEBUG) << "analog: position = " << deviceClient->m_position;
+        //LOG(DEBUG) << "analog: position = " << deviceClient->m_position;
     }
     if (a.num_channel > 3)
     {
@@ -108,7 +108,7 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
                 Eigen::AngleAxisd(a.channel[3]*M_PI,Vec3d::UnitX())*
                 Eigen::AngleAxisd(a.channel[4]*M_PI,Vec3d::UnitY())*
                 Eigen::AngleAxisd(a.channel[5]*M_PI,Vec3d::UnitZ());
-        LOG(DEBUG) << "analog: orientation = " << deviceClient->m_orientation.matrix();
+        //LOG(DEBUG) << "analog: orientation = " << deviceClient->m_orientation.matrix();
     }
 }
 
@@ -117,7 +117,7 @@ VRPNDeviceClient::velocityChangeHandler(void *userData, const _vrpn_TRACKERVELCB
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_velocity << v.vel[0], v.vel[1], v.vel[2];
-    LOG(DEBUG) << "tracker: velocity = " << deviceClient->m_velocity;
+    //LOG(DEBUG) << "tracker: velocity = " << deviceClient->m_velocity;
 }
 
 void VRPN_CALLBACK
@@ -133,6 +133,6 @@ VRPNDeviceClient::forceChangeHandler(void *userData, const _vrpn_FORCECB f)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_force << f.force[0], f.force[1], f.force[2];
-    LOG(DEBUG) << "forceDevice: force = " << deviceClient->m_force;
+    //LOG(DEBUG) << "forceDevice: force = " << deviceClient->m_force;
 }
 }
