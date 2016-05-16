@@ -190,6 +190,13 @@ InteractorStyle::OnChar()
         }
     }
     break;
+
+    // Quit Viewer
+    case '\u001B':
+    {
+        m_simManager->getViewer()->endRenderingLoop();
+    }break;
+
     }
 }
 
