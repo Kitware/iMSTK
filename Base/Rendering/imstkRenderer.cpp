@@ -74,7 +74,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
 
     // Camera and camera actor
     m_sceneVtkCamera = vtkSmartPointer<vtkCamera>::New();
-    // TODO: init vtkCamera based on imstkCamera
+    this->updateSceneCamera(scene->getCamera());
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
     camActor->SetCamera(  m_sceneVtkCamera );
     m_debugVtkActors.push_back( camActor );

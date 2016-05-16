@@ -28,7 +28,6 @@
 
 namespace imstk {
 
-
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
@@ -48,6 +47,10 @@ using VecNd = Eigen::VectorXd;
 // Quaternion
 using Quatf = Eigen::Quaternionf;
 using Quatd = Eigen::Quaterniond;
+
+// Angle-Axis
+using Rotf = Eigen::AngleAxisf;
+using Rotd = Eigen::AngleAxisd;
 
 // 3x3 Matrix
 using Mat3f = Eigen::Matrix3f;

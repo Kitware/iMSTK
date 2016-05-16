@@ -61,7 +61,7 @@ Geometry::rotate(const Mat3d& r)
 void
 Geometry::rotate(const Vec3d& axis, const double& angle)
 {
-    this->rotate(Quatd(Eigen::AngleAxisd(angle, axis)));
+    this->rotate(Quatd(Rotd(angle, axis)));
 }
 
 void
@@ -126,7 +126,7 @@ Geometry::setOrientation(const Mat3d& orientation)
 void
 Geometry::setOrientation(const Vec3d& axis, const double& angle)
 {
-    this->setOrientation(Quatd(Eigen::AngleAxisd(angle, axis)));
+    this->setOrientation(Quatd(Rotd(angle, axis)));
 }
 
 const double&

@@ -297,7 +297,7 @@ void testIsometricMap()
     // Isometric Map
     auto transform = imstk::RigidTransform3d::Identity();
     transform.translate(imstk::Vec3d(0.0, 1.0, 0.0));
-    transform.rotate(Eigen::AngleAxisd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
+    transform.rotate(imstk::Rotd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
 
     auto rigidMap = std::make_shared<imstk::IsometricMap>();
     rigidMap->setMaster(sphereObj->getVisualGeometry());
