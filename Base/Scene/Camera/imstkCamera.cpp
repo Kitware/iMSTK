@@ -18,11 +18,14 @@
    limitations under the License.
 
    =========================================================================*/
+
 #include "imstkCamera.h"
+
 #include "imstkCameraController.h"
 
-#include <g3log/g3log.hpp>
 #include <memory>
+
+#include <g3log/g3log.hpp>
 
 namespace imstk {
 const Vec3d&
@@ -111,6 +114,9 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scali
     }
     m_cameraController->setDeviceClient(deviceClient);
     m_cameraController->setTranslationScaling(scaling);
+    m_cameraController->setTranslationOffset(m_position);
+    //m_cameraController->setRotationOffset(m_orientation);
+    //m_cameraController->setLoopDelay(1000);
 
     return m_cameraController;
 }

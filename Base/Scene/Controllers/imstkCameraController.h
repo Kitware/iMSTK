@@ -24,11 +24,10 @@
 
 #include "imstkModule.h"
 #include "imstkMath.h"
+#include "imstkCamera.h"
+#include "imstkDeviceClient.h"
 
 namespace imstk {
-
-class Camera;
-class DeviceClient;
 
 class CameraController : public Module
 {
@@ -44,7 +43,14 @@ public:
         rotZ   = 0x20
     };
 
-    ~CameraController() {}
+    CameraController(std::string name, Camera& camera,
+                     std::shared_ptr<DeviceClient> deviceClient = nullptr) :
+        Module(name),
+        m_camera(camera),
+        m_deviceClient(deviceClient)
+    {}
+
+    ~CameraController() = default;
 
     ///
     /// \brief Get/Set the device client
@@ -70,14 +76,13 @@ public:
     const Quatd& getRotationOffset();
     void setRotationOffset(const Quatd& r);
 
-protected:
+    ///
+    /// \brief Get/Set the inversion flags
+    ///
+    unsigned char getInversionFlags();
+    void setInversionFlags(unsigned char f);
 
-    CameraController(std::string name, Camera& camera,
-                     std::shared_ptr<DeviceClient> deviceClient = nullptr) :
-        Module(name),
-        m_camera(camera),
-        m_deviceClient(deviceClient)
-    {}
+protected:
 
     void initModule() override;
     void runModule() override;
@@ -87,10 +92,8 @@ protected:
     std::shared_ptr<DeviceClient> m_deviceClient; //!< Reports device tracking information
     double m_scaling = 1.0;                       //!< Scaling factor for physical to virtual translations
     Vec3d m_translationOffset = WORLD_ORIGIN;     //!< Translation concatenated to the device translation
-    Quatd m_rotationOffset = Quatd();             //!< Rotation concatenated to the device rotation
-    unsigned char m_invertFlags = 0;              //!< Invert flags to be masked with CameraController::InvertFlag
-
-    friend class Camera;
+    Quatd m_rotationOffset = Quatd::Identity();   //!< Rotation concatenated to the device rotation
+    unsigned char m_invertFlags = 0x00;           //!< Invert flags to be masked with CameraController::InvertFlag
 };
 }
 

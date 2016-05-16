@@ -21,8 +21,7 @@
 
 #include "imstkCameraController.h"
 
-#include "imstkCamera.h"
-#include "imstkDeviceClient.h"
+#include <utility>
 
 #include <g3log/g3log.hpp>
 
@@ -44,13 +43,25 @@ CameraController::runModule()
     }
 
     // Retrieve device info
-    Vec3d devicePos = m_translationOffset + m_deviceClient->getPosition();
-    Quatd deviceRot = m_rotationOffset * m_deviceClient->getOrientation();
+    Vec3d p = m_deviceClient->getPosition();
+    Quatd r = m_deviceClient->getOrientation();
+
+    // Apply inverse if needed
+    if(m_invertFlags & InvertFlag::transX) p[0] = -p[0];
+    if(m_invertFlags & InvertFlag::transY) p[1] = -p[1];
+    if(m_invertFlags & InvertFlag::transZ) p[2] = -p[2];
+    if(m_invertFlags & InvertFlag::rotX) std::swap(r.y(), r.z());
+    if(m_invertFlags & InvertFlag::rotY) std::swap(r.x(), r.z());
+    if(m_invertFlags & InvertFlag::rotZ) std::swap(r.x(), r.y());
+
+    // Apply Offsets
+    p = m_rotationOffset * p * m_scaling + m_translationOffset;
+    r *= m_rotationOffset;
 
     // Set camera info
-    m_camera.setPosition(devicePos*m_scaling);
-    m_camera.setFocalPoint((deviceRot*FORWARD_VECTOR)+(devicePos*m_scaling));
-    m_camera.setViewUp(deviceRot*DOWN_VECTOR);
+    m_camera.setPosition(p);
+    m_camera.setFocalPoint((r*FORWARD_VECTOR)+p);
+    m_camera.setViewUp(r*UP_VECTOR);
 }
 
 void
@@ -105,5 +116,17 @@ void
 CameraController::setRotationOffset(const Quatd& r)
 {
     m_rotationOffset = r;
+}
+
+unsigned char
+CameraController::getInversionFlags()
+{
+    return m_invertFlags;
+}
+
+void
+CameraController::setInversionFlags(unsigned char f)
+{
+    m_invertFlags = f;
 }
 }

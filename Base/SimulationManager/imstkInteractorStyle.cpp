@@ -43,6 +43,7 @@ InteractorStyle::OnTimer()
         return;
     }
 
+    // Update Camera
     auto scene = m_simManager->getCurrentScene();
     m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(scene->getCamera());
 

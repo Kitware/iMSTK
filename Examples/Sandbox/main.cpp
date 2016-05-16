@@ -26,6 +26,7 @@
 // Devices
 #include "imstkVRPNDeviceClient.h"
 #include "imstkVRPNDeviceServer.h"
+#include "imstkCameraController.h"
 
 #include "g3log/g3log.hpp"
 
@@ -85,10 +86,23 @@ void testDevices()
     sphereObj->setVisualGeometry(sphereGeom);
     scene->addSceneObject(sphereObj);
 
-    // Update Camera controller using the device client
+    // Mesh
+    auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
+    auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
+    meshObject->setVisualGeometry(mesh); // change to any mesh created above
+    scene->addSceneObject(meshObject);
+
+    // Update Camera position
     auto cam = scene->getCamera();
-    cam->setPosition(4*imstk::BACKWARD_VECTOR);
-    cam->setupController(client, 10);
+    cam->setPosition(8*imstk::RIGHT_VECTOR);
+    //LOG(INFO) << cam->getPosition();
+
+    // Set camera controller
+    auto controller = cam->setupController(client, 100);
+    //LOG(INFO) << controller->getTranslationOffset(); // should be the same than initial cam position
+    controller->setRotationOffset(imstk::Quatd(imstk::Rotd(imstk::PI_2, imstk::UP_VECTOR)));
+    //LOG(INFO) << controller->getRotationOffset().toRotationMatrix();
+    //controller->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
