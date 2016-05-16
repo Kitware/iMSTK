@@ -48,6 +48,7 @@ public:
     ~ Renderer() = default;
 
     void setup(Mode mode);
+    void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
 
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
 

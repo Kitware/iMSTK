@@ -38,22 +38,13 @@ vtkStandardNewMacro(InteractorStyle);
 void
 InteractorStyle::OnTimer()
 {
-    if (m_simManager->getStatus() == SimulationStatus::INACTIVE)
+    if (m_simManager->getStatus() != SimulationStatus::RUNNING)
     {
         return;
     }
 
-    // Get Cameras
-    auto imstkCam = m_simManager->getCurrentScene()->getCamera();
-    auto p = imstkCam->getPosition();
-    auto f = imstkCam->getFocalPoint();
-    auto v = imstkCam->getViewUp();
-
-    // Update Camera
-    auto vtkCam = this->CurrentRenderer->GetActiveCamera();
-    vtkCam->SetPosition(p[0], p[1], p[2]);
-    vtkCam->SetFocalPoint(f[0], f[1], f[2]);
-    vtkCam->SetViewUp(v[0], v[1], v[2]);
+    auto scene = m_simManager->getCurrentScene();
+    m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(scene->getCamera());
 
     // Render
     this->CurrentRenderer->ResetCameraClippingRange();
