@@ -27,6 +27,8 @@
 #include "imstkCamera.h"
 #include "imstkDeviceClient.h"
 
+#include <memory>
+
 namespace imstk {
 
 class CameraController : public Module
