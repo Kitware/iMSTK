@@ -111,5 +111,7 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scali
     }
     m_cameraController->setDeviceClient(deviceClient);
     m_cameraController->setTranslationScaling(scaling);
+
+    return m_cameraController;
 }
 }
