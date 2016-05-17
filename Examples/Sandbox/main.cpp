@@ -94,14 +94,11 @@ void testDevices()
 
     // Update Camera position
     auto cam = scene->getCamera();
-    cam->setPosition(8*imstk::RIGHT_VECTOR);
-    //LOG(INFO) << cam->getPosition();
+    cam->setPosition(imstk::Vec3d(8,-8,8));
 
     // Set camera controller
     auto controller = cam->setupController(client, 100);
     //LOG(INFO) << controller->getTranslationOffset(); // should be the same than initial cam position
-    controller->setRotationOffset(imstk::Quatd(imstk::Rotd(imstk::PI_2, imstk::UP_VECTOR)));
-    //LOG(INFO) << controller->getRotationOffset().toRotationMatrix();
     //controller->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
 
     // Run

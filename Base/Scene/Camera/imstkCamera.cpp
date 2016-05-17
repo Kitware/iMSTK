@@ -85,7 +85,7 @@ Camera::setViewUp(const double& x,
                   const double& y,
                   const double& z)
 {
-    m_viewUp = Vec3d(x,y,z);
+    m_viewUp = Vec3d(x,y,z).normalized();
 }
 
 const double& Camera::getViewAngle() const
@@ -115,8 +115,15 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scali
     m_cameraController->setDeviceClient(deviceClient);
     m_cameraController->setTranslationScaling(scaling);
     m_cameraController->setTranslationOffset(m_position);
-    //m_cameraController->setRotationOffset(m_orientation);
-    //m_cameraController->setLoopDelay(1000);
+
+    auto viewNormal = (m_position - m_focalPoint).normalized();
+    auto viewSide = m_viewUp.cross(viewNormal).normalized();
+    m_viewUp = viewNormal.cross(viewSide);
+    Mat3d rot;
+    rot.col(0) = viewSide;
+    rot.col(1) = m_viewUp;
+    rot.col(2) = viewNormal;
+    m_cameraController->setRotationOffset(Quatd(rot));
 
     return m_cameraController;
 }
