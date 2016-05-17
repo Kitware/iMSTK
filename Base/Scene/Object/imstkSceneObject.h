@@ -24,38 +24,41 @@
 
 #include <memory>
 
-#include "imstkGeometry.h"
-
 namespace imstk {
-enum class SceneObjectType
-{
-    Visual,
-    Static,
-    VirtualCoupled,
-    Rigid,
-    Deformable
-};
+
+class Geometry;
 
 class SceneObject
 {
 public:
 
+    enum class Type
+    {
+        Visual,
+        Static,
+        VirtualCoupled,
+        Rigid,
+        Deformable
+    };
+
     SceneObject(std::string name) : m_name(name) {}
 
     ~SceneObject() = default;
 
-    const SceneObjectType  & getType() const;
+    const Type& getType() const;
 
-    const std::string      & getName() const;
-    void                     setName(std::string name);
+    const std::string& getName() const;
+    void setName(std::string name);
 
-    std::shared_ptr<Geometry>getVisualGeometry() const;
-    void                     setVisualGeometry(std::shared_ptr<Geometry>geometry);
+    std::shared_ptr<Geometry> getVisualGeometry() const;
+    void setVisualGeometry(std::shared_ptr<Geometry> geometry);
 
 protected:
 
-    SceneObjectType m_type = SceneObjectType::Visual;
-    std::string     m_name;
+    void setType(Type type);
+
+    Type m_type = Type::Visual;
+    std::string m_name;
     std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
 };
 

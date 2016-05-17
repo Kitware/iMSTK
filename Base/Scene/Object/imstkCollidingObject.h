@@ -19,44 +19,40 @@
 
    =========================================================================*/
 
+#ifndef imstkCollidingObject_h
+#define imstkCollidingObject_h
+
+#include <memory>
+
 #include "imstkSceneObject.h"
 
-#include "imstkGeometry.h"
-
 namespace imstk {
-std::shared_ptr<Geometry>
-SceneObject::getVisualGeometry() const
+
+class Geometry;
+class GeometryMap;
+
+class CollidingObject : public SceneObject
 {
-    return m_visualGeometry;
+public:
+
+    CollidingObject(std::string name) : SceneObject(name)
+    {
+        m_type = Type::Static;
+    }
+
+    ~CollidingObject() = default;
+
+    std::shared_ptr<Geometry> getCollidingGeometry() const;
+    void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
+
+protected:
+
+    std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
+    std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
+
+};
+
+using StaticObject = CollidingObject;
 }
 
-void
-SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
-{
-    m_visualGeometry = geometry;
-}
-
-const SceneObject::Type&
-SceneObject::getType() const
-{
-    return m_type;
-}
-
-void
-SceneObject::setType(Type type)
-{
-    m_type = type;
-}
-
-const std::string&
-SceneObject::getName() const
-{
-    return m_name;
-}
-
-void
-SceneObject::setName(std::string name)
-{
-    m_name = name;
-}
-}
+#endif // ifndef imstkCollidingObject_h
