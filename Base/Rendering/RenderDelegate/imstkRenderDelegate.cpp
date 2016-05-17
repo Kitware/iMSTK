@@ -94,24 +94,23 @@ RenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
 }
 
 void
-RenderDelegate::setActorTransform(std::shared_ptr<Geometry>geom)
+RenderDelegate::updateActorTransform()
 {
-    auto scaling   = geom->getScaling();
-    auto quat      = geom->getOrientation();
+    auto scaling   = this->getGeometry()->getScaling();
+    auto pos       = this->getGeometry()->getPosition();
+    auto quat      = this->getGeometry()->getOrientation();
     auto angleAxis = Rotd(quat);
-    auto pos       = geom->getPosition();
 
-    auto transform = vtkSmartPointer<vtkTransform>::New();
-
-    transform->PostMultiply();
-    transform->Scale(scaling, scaling, scaling);
-    transform->RotateWXYZ(angleAxis.angle() * 180 / M_PI,
+    m_transform->Identity();
+    m_transform->PostMultiply();
+    m_transform->Scale(scaling, scaling, scaling);
+    m_transform->RotateWXYZ(angleAxis.angle() * 180 / M_PI,
                           angleAxis.axis()[0],
                           angleAxis.axis()[1],
                           angleAxis.axis()[2]);
-    transform->Translate(pos[0], pos[1], pos[2]);
+    m_transform->Translate(pos[0], pos[1], pos[2]);
 
-    m_actor->SetUserTransform(transform);
+    m_actor->SetUserTransform(m_transform);
 }
 
 vtkSmartPointer<vtkActor>

@@ -21,11 +21,11 @@
 
 #include "imstkRenderer.h"
 
+#include "imstkScene.h"
+#include "imstkCamera.h"
 #include "imstkRenderDelegate.h"
 
-#include "vtkLight.h"
 #include "vtkLightActor.h"
-#include "vtkCamera.h"
 #include "vtkCameraActor.h"
 #include "vtkAxesActor.h"
 
@@ -53,6 +53,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
             continue;
         }
 
+        m_renderDelegates.push_back( delegate );
         m_objectVtkActors.push_back( delegate->getVtkActor() );
     }
 
@@ -163,6 +164,15 @@ Renderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
     m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
     m_sceneVtkCamera->SetFocalPoint(f[0], f[1], f[2]);
     m_sceneVtkCamera->SetViewUp(v[0], v[1], v[2]);
+}
+
+void
+Renderer::updateRenderDelegates()
+{
+    for (auto delegate : m_renderDelegates)
+    {
+        delegate->updateActorTransform();
+    }
 }
 
 void

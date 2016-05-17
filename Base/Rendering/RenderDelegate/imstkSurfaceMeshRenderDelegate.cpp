@@ -61,7 +61,7 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
     source->SetOutput(polydata);
 
     this->setActorMapper(source->GetOutputPort());
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>

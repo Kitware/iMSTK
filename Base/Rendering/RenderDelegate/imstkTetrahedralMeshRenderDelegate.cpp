@@ -70,7 +70,7 @@ TetrahedralMeshRenderDelegate::TetrahedralMeshRenderDelegate(std::shared_ptr<Tet
     mapper->SetInputConnection(source->GetOutputPort());
     m_actor->SetMapper(mapper);
 
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>

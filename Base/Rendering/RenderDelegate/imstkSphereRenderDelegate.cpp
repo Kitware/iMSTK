@@ -33,7 +33,7 @@ SphereRenderDelegate::SphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
     source->SetRadius(m_geometry->getRadius());
 
     this->setActorMapper(source->GetOutputPort());
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>
