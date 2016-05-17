@@ -23,66 +23,25 @@
 #define imstkCameraController_h
 
 #include "imstkModule.h"
-#include "imstkMath.h"
+#include "imstkTrackingController.h"
 #include "imstkCamera.h"
-#include "imstkDeviceClient.h"
 
 #include <memory>
 
 namespace imstk {
 
-class CameraController : public Module
+class CameraController : public Module, public TrackingController
 {
 public:
-
-    enum InvertFlag
-    {
-        transX = 0x01,
-        transY = 0x02,
-        transZ = 0x04,
-        rotX   = 0x08,
-        rotY   = 0x10,
-        rotZ   = 0x20
-    };
 
     CameraController(std::string name, Camera& camera,
                      std::shared_ptr<DeviceClient> deviceClient = nullptr) :
         Module(name),
         m_camera(camera),
-        m_deviceClient(deviceClient)
+        TrackingController(deviceClient)
     {}
 
     ~CameraController() = default;
-
-    ///
-    /// \brief Get/Set the device client
-    ///
-    std::shared_ptr<DeviceClient> getDeviceClient() const;
-    void setDeviceClient(std::shared_ptr<DeviceClient> deviceClient);
-
-    ///
-    /// \brief Get/Set the current scaling factor
-    ///
-    double getTranslationScaling() const;
-    void setTranslationScaling(double scaling);
-
-    ///
-    /// \brief Get/Set the translation offset
-    ///
-    const Vec3d& getTranslationOffset() const;
-    void setTranslationOffset(const Vec3d& t);
-
-    ///
-    /// \brief Get/Set the rotation offset
-    ///
-    const Quatd& getRotationOffset();
-    void setRotationOffset(const Quatd& r);
-
-    ///
-    /// \brief Get/Set the inversion flags
-    ///
-    unsigned char getInversionFlags();
-    void setInversionFlags(unsigned char f);
 
 protected:
 
@@ -90,12 +49,8 @@ protected:
     void runModule() override;
     void cleanUpModule() override;
 
-    Camera& m_camera;                             //!< Camera controlled by the external device
-    std::shared_ptr<DeviceClient> m_deviceClient; //!< Reports device tracking information
-    double m_scaling = 1.0;                       //!< Scaling factor for physical to virtual translations
-    Vec3d m_translationOffset = WORLD_ORIGIN;     //!< Translation concatenated to the device translation
-    Quatd m_rotationOffset = Quatd::Identity();   //!< Rotation concatenated to the device rotation
-    unsigned char m_invertFlags = 0x00;           //!< Invert flags to be masked with CameraController::InvertFlag
+    Camera& m_camera; //!< Camera controlled by the external device
+
 };
 }
 
