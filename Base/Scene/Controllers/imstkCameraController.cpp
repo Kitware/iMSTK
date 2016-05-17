@@ -41,7 +41,7 @@ CameraController::runModule()
 
     if (!this->computeTrackingData(p, r))
     {
-        LOG(WARNING) << "CameraController::runModule warning: could not update camera info.";
+        LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
         return;
     }
 

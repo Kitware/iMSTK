@@ -33,4 +33,16 @@ CollidingObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_collidingGeometry = geometry;
 }
+
+std::shared_ptr<GeometryMap>
+CollidingObject::getCollidingToVisualMap() const
+{
+    return m_collidingToVisualMap;
+}
+
+void
+CollidingObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
+{
+    m_collidingToVisualMap = map;
+}
 }

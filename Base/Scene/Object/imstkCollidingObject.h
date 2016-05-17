@@ -45,6 +45,9 @@ public:
     std::shared_ptr<Geometry> getCollidingGeometry() const;
     void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
 
+    std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
+    void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
+
 protected:
 
     std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
