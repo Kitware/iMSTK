@@ -22,6 +22,7 @@
 #include "imstkSceneManager.h"
 
 #include "imstkCameraController.h"
+#include "imstkVirtualCouplingObject.h"
 
 #include "g3log/g3log.hpp"
 
@@ -46,6 +47,21 @@ SceneManager::initModule()
 }
 
 void
+SceneManager::runModule()
+{
+    LOG(DEBUG) << m_name << " manager : running";
+
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
+        {
+            virtualCoupling->updateFromDevice();
+        }
+    }
+}
+
+
+void
 SceneManager::cleanUpModule()
 {
     LOG(DEBUG) << m_name << " manager : cleanUp";
@@ -56,13 +72,6 @@ SceneManager::cleanUpModule()
         m_threadMap.at(camController->getName()).join();
     }
 }
-
-void
-SceneManager::runModule()
-{
-    LOG(DEBUG) << m_name << " manager : running";
-}
-
 void
 SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)
 {

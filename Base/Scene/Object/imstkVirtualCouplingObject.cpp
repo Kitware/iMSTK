@@ -19,50 +19,37 @@
 
    =========================================================================*/
 
-#ifndef imstkSceneObject_h
-#define imstkSceneObject_h
+#include "imstkVirtualCouplingObject.h"
 
 #include <memory>
 
+#include "imstkGeometry.h"
+#include "imstkGeometryMap.h"
+
+#include <g3log/g3log.hpp>
+
 namespace imstk {
 
-class Geometry;
-
-class SceneObject
+void
+VirtualCouplingObject::updateFromDevice()
 {
-public:
+    Vec3d p;
+    Quatd r;
 
-    enum class Type
+    if (!this->computeTrackingData(p, r))
     {
-        Visual,
-        Static,
-        VirtualCoupling,
-        Rigid,
-        Deformable
-    };
+        LOG(WARNING) << "VirtualCouplingObject::updateFromDevice warning: could not update tracking info.";
+        return;
+    }
 
-    SceneObject(std::string name) : m_name(name) {}
+    // Update colliding geometry
+    m_collidingGeometry->setPosition(p);
+    m_collidingGeometry->setOrientation(r);
 
-    virtual ~SceneObject() = default;
-
-    const Type& getType() const;
-
-    const std::string& getName() const;
-    void setName(std::string name);
-
-    std::shared_ptr<Geometry> getVisualGeometry() const;
-    void setVisualGeometry(std::shared_ptr<Geometry> geometry);
-
-protected:
-
-    void setType(Type type);
-
-    Type m_type = Type::Visual;
-    std::string m_name;
-    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
-};
-
-using VisualObject = SceneObject;
+    // Update visual geometry
+    if(m_collidingToVisualMap)
+    {
+        m_collidingToVisualMap->apply();
+    }
 }
-
-#endif // ifndef imstkSceneObject_h
+}

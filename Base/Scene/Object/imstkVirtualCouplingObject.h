@@ -19,50 +19,36 @@
 
    =========================================================================*/
 
-#ifndef imstkSceneObject_h
-#define imstkSceneObject_h
+#ifndef imstkVirtualCouplingObject_h
+#define imstkVirtualCouplingObject_h
 
-#include <memory>
+#include "imstkCollidingObject.h"
+#include "imstkTrackingController.h"
 
 namespace imstk {
 
 class Geometry;
+class GeometryMap;
 
-class SceneObject
+class VirtualCouplingObject : public CollidingObject, public TrackingController
 {
 public:
 
-    enum class Type
+    VirtualCouplingObject(std::string name,
+                          std::shared_ptr<DeviceClient> deviceClient = nullptr,
+                          double scaling = 1.0) :
+        CollidingObject(name),
+        TrackingController(deviceClient, scaling)
     {
-        Visual,
-        Static,
-        VirtualCoupling,
-        Rigid,
-        Deformable
-    };
+        m_type = Type::VirtualCoupling;
+    }
 
-    SceneObject(std::string name) : m_name(name) {}
+    ~VirtualCouplingObject() = default;
 
-    virtual ~SceneObject() = default;
+    void updateFromDevice();
 
-    const Type& getType() const;
-
-    const std::string& getName() const;
-    void setName(std::string name);
-
-    std::shared_ptr<Geometry> getVisualGeometry() const;
-    void setVisualGeometry(std::shared_ptr<Geometry> geometry);
-
-protected:
-
-    void setType(Type type);
-
-    Type m_type = Type::Visual;
-    std::string m_name;
-    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
 };
 
-using VisualObject = SceneObject;
 }
 
-#endif // ifndef imstkSceneObject_h
+#endif // ifndef imstkVirtualCouplingObject_h
