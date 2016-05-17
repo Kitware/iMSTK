@@ -1,4 +1,11 @@
 #-----------------------------------------------------------------------------
+# Find dependencies
+#-----------------------------------------------------------------------------
+if(WIN32)
+  find_library(DbgHelp_LIBRARY NAMES DbgHelp)
+endif()
+
+#-----------------------------------------------------------------------------
 # Find path
 #-----------------------------------------------------------------------------
 find_path(g3log_INCLUDE_DIR
@@ -20,6 +27,8 @@ find_library(g3log_LIBRARY
 mark_as_advanced(g3log_LIBRARY)
 #message(STATUS "g3log_LIBRARY : ${g3log_LIBRARY}")
 
+set(g3log_LIBRARIES ${g3log_LIBRARY} ${DbgHelp_LIBRARY})
+
 #-----------------------------------------------------------------------------
 # Find package
 #-----------------------------------------------------------------------------
@@ -27,7 +36,7 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(g3log
   REQUIRED_VARS
     g3log_INCLUDE_DIR
-    g3log_LIBRARY)
+    g3log_LIBRARIES)
 
 #-----------------------------------------------------------------------------
 # If missing target, create it
@@ -35,7 +44,7 @@ find_package_handle_standard_args(g3log
 if(G3LOG_FOUND AND NOT TARGET g3log)
   add_library(g3log INTERFACE IMPORTED)
   set_target_properties(g3log PROPERTIES
-    INTERFACE_LINK_LIBRARIES "${g3log_LIBRARY}"
+    INTERFACE_LINK_LIBRARIES "${g3log_LIBRARIES}"
     INTERFACE_INCLUDE_DIRECTORIES "${g3log_INCLUDE_DIR}"
   )
 endif()

@@ -73,10 +73,14 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     m_debugVtkActors.push_back( axes );
 
     // Camera and camera actor
-    m_sceneVtkCamera = scene->getCamera()->getVtkCamera();
+    m_sceneVtkCamera = vtkSmartPointer<vtkCamera>::New();
+    this->updateSceneCamera(scene->getCamera());
     auto camActor = vtkSmartPointer<vtkCameraActor>::New();
     camActor->SetCamera(  m_sceneVtkCamera );
     m_debugVtkActors.push_back( camActor );
+
+    // Debug camera
+    m_defaultVtkCamera = m_vtkRenderer->GetActiveCamera();
 
     ///TODO : based on scene properties
     // Customize background colors
@@ -145,6 +149,20 @@ Renderer::setup(Mode mode)
     }
 
     m_currentMode = mode;
+}
+
+void
+Renderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
+{
+    // Get imstk Camera info
+    auto p = imstkCam->getPosition();
+    auto f = imstkCam->getFocalPoint();
+    auto v = imstkCam->getViewUp();
+
+    // Update vtk Camera
+    m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
+    m_sceneVtkCamera->SetFocalPoint(f[0], f[1], f[2]);
+    m_sceneVtkCamera->SetViewUp(v[0], v[1], v[2]);
 }
 
 void

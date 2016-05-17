@@ -114,11 +114,11 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     // Find and store the tetrahedral faces that are unique
     auto vertArray = this->getTetrahedraVertices();
     std::vector<triArray> surfaceTri;
-    std::vector<int> surfaceTriTet;
-    std::vector<int> tetRemainingVert;
+    std::vector<size_t> surfaceTriTet;
+    std::vector<size_t> tetRemainingVert;
     bool unique = true;
-    int foundAt = 0, tetId = 0;
-    int a, b, c;
+    size_t foundAt = 0, tetId = 0;
+    size_t a, b, c;
 
     for (auto &tetVertArray : vertArray)
     {
@@ -184,7 +184,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     }
 
     // Renumber the vertices
-    std::list<int> uniqueVertIdList;
+    std::list<size_t> uniqueVertIdList;
     for (const auto &face : surfaceTri)
     {
         uniqueVertIdList.push_back(face[0]);
@@ -194,8 +194,8 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
     uniqueVertIdList.sort();
     uniqueVertIdList.unique();
 
-    int vertId;
-    std::list<int>::iterator it;
+    size_t vertId;
+    std::list<size_t>::iterator it;
     std::vector<Vec3d> vertPositions;
     for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
     {

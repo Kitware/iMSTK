@@ -21,90 +21,110 @@
 
 #include "imstkCamera.h"
 
+#include "imstkCameraController.h"
+
+#include <memory>
+
 #include <g3log/g3log.hpp>
 
 namespace imstk {
-const Vec3d
+const Vec3d&
 Camera::getPosition() const
 {
-    double p[3];
-    m_vtkCamera->GetPosition(p);
-    return Vec3d(p[0], p[1], p[2]);
+    return m_position;
 }
 
 void
 Camera::setPosition(const Vec3d& p)
 {
-    this->setPosition(p[0], p[1], p[2]);
+    m_position = p;
 }
 
 void
 Camera::setPosition(const double& x,
-                   const double& y,
-                   const double& z)
+                    const double& y,
+                    const double& z)
 {
-    m_vtkCamera->SetPosition(x, y, z);
+    m_position = Vec3d(x,y,z);
 }
 
-const Vec3d
+const Vec3d&
 Camera::getFocalPoint() const
 {
-    double p[3];
-    m_vtkCamera->GetFocalPoint(p);
-    return Vec3d(p[0], p[1], p[2]);
+    return m_focalPoint;
 }
 
 void
 Camera::setFocalPoint(const Vec3d& p)
 {
-    this->setFocalPoint(p[0], p[1], p[2]);
+    m_focalPoint = p;
 }
 
 void
 Camera::setFocalPoint(const double& x,
-                   const double& y,
-                   const double& z)
+                      const double& y,
+                      const double& z)
 {
-    m_vtkCamera->SetFocalPoint(x, y, z);
+    m_focalPoint = Vec3d(x,y,z);
 }
 
-const Vec3d
+const Vec3d&
 Camera::getViewUp() const
 {
-    double v[3];
-    m_vtkCamera->GetViewUp(v);
-    return Vec3d(v[0], v[1], v[2]);
+    return m_viewUp;
 }
 
 void
 Camera::setViewUp(const Vec3d& v)
 {
-    this->setViewUp(v[0], v[1], v[2]);
+    m_viewUp = v;
 }
 
 void
 Camera::setViewUp(const double& x,
-                   const double& y,
-                   const double& z)
+                  const double& y,
+                  const double& z)
 {
-    m_vtkCamera->SetViewUp(x, y, z);
+    m_viewUp = Vec3d(x,y,z).normalized();
 }
 
-const double
-Camera::getViewAngle() const
+const double& Camera::getViewAngle() const
 {
-    return m_vtkCamera->GetViewAngle();
+    return m_viewAngle;
 }
 
 void
 Camera::setViewAngle(const double& angle)
 {
-    m_vtkCamera->SetViewAngle(angle);
+    m_viewAngle = angle;
 }
 
-vtkSmartPointer<vtkCamera>
-Camera::getVtkCamera() const
+std::shared_ptr<CameraController>
+Camera::getController() const
 {
-    return m_vtkCamera;
+    return m_cameraController;
+}
+
+std::shared_ptr<CameraController>
+Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling)
+{
+    if(m_cameraController == nullptr)
+    {
+        m_cameraController = std::make_shared<CameraController>("Camera controller", *this);
+    }
+    m_cameraController->setDeviceClient(deviceClient);
+    m_cameraController->setTranslationScaling(scaling);
+    m_cameraController->setTranslationOffset(m_position);
+
+    auto viewNormal = (m_position - m_focalPoint).normalized();
+    auto viewSide = m_viewUp.cross(viewNormal).normalized();
+    m_viewUp = viewNormal.cross(viewSide);
+    Mat3d rot;
+    rot.col(0) = viewSide;
+    rot.col(1) = m_viewUp;
+    rot.col(2) = viewNormal;
+    m_cameraController->setRotationOffset(Quatd(rot));
+
+    return m_cameraController;
 }
 }

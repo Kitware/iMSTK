@@ -6,6 +6,7 @@ imstk_add_library( Geometry
   DEPENDS
     Core
     VegaFEM::volumetricMesh
+    ${VTK_LIBRARIES}
   )
 
 #-----------------------------------------------------------------------------

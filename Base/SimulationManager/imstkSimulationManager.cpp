@@ -52,6 +52,12 @@ SimulationManager::getScene(std::string sceneName) const
 }
 
 std::shared_ptr<Scene>
+SimulationManager::getCurrentScene() const
+{
+    return this->getScene(m_currentSceneName);
+}
+
+std::shared_ptr<Scene>
 SimulationManager::createNewScene(std::string newSceneName)
 {
     if (this->isSceneRegistered(newSceneName))
@@ -105,6 +111,105 @@ SimulationManager::removeScene(std::string sceneName)
 
     m_sceneMap.erase(sceneName);
     LOG(INFO) << "Scene removed: " << sceneName;
+}
+
+bool
+SimulationManager::isDeviceServerRegistered(std::string serverName) const
+{
+    return m_deviceServerMap.find(serverName) != m_deviceServerMap.end();
+}
+
+std::shared_ptr<VRPNDeviceServer>
+SimulationManager::getDeviceServer(std::string serverName) const
+{
+    if (!this->isDeviceServerRegistered(serverName))
+    {
+        LOG(WARNING) << "No device server at '" << serverName
+                     << "' was registered in this simulation";
+        return nullptr;
+    }
+
+    return m_deviceServerMap.at(serverName);
+}
+void
+SimulationManager::addDeviceServer(std::shared_ptr<VRPNDeviceServer> newServer)
+{
+    std::string newServerName = newServer->getName();
+
+    if (this->isDeviceServerRegistered(newServerName))
+    {
+        LOG(WARNING) << "Can not add device server: '" << newServerName
+                     << "' is already registered in this simulation\n"
+                     << "Set this server address to a unique ip:port first";
+        return;
+    }
+
+    m_deviceServerMap[newServerName] = newServer;
+    LOG(INFO) << "Device server added: " << newServerName;
+}
+
+void
+SimulationManager::removeDeviceServer(std::string serverName)
+{
+    if (!this->isDeviceServerRegistered(serverName))
+    {
+        LOG(WARNING) << "No device server at '" << serverName
+                     << "' was registered in this simulation";
+        return;
+    }
+
+    m_deviceServerMap.erase(serverName);
+    LOG(INFO) << "Device server removed: " << serverName;
+}
+
+bool
+SimulationManager::isDeviceClientRegistered(std::string deviceClientName) const
+{
+    return m_deviceClientMap.find(deviceClientName) != m_deviceClientMap.end();
+}
+
+std::shared_ptr<DeviceClient>
+SimulationManager::getDeviceClient(std::string deviceClientName) const
+{
+    if (!this->isDeviceClientRegistered(deviceClientName))
+    {
+        LOG(WARNING) << "No device client named '" << deviceClientName
+                     << "' was registered in this simulation";
+        return nullptr;
+    }
+
+    return m_deviceClientMap.at(deviceClientName);
+}
+
+void
+SimulationManager::addDeviceClient(std::shared_ptr<DeviceClient> newDeviceClient)
+{
+    std::string newDeviceClientName = newDeviceClient->getName();
+
+    if (this->isDeviceClientRegistered(newDeviceClientName))
+    {
+        LOG(WARNING) << "Can not add device client: '" << newDeviceClientName
+                     << "' is already registered in this simulation\n"
+                     << "Set this device name to a unique name first";
+        return;
+    }
+
+    m_deviceClientMap[newDeviceClientName] = newDeviceClient;
+    LOG(INFO) << "Device client added: " << newDeviceClientName;
+}
+
+void
+SimulationManager::removeDeviceClient(std::string deviceClientName)
+{
+    if (!this->isDeviceClientRegistered(deviceClientName))
+    {
+        LOG(WARNING) << "No device client named '" << deviceClientName
+                     << "' was registered in this simulation";
+        return;
+    }
+
+    m_deviceClientMap.erase(deviceClientName);
+    LOG(INFO) << "Device client removed: " << deviceClientName;
 }
 
 std::shared_ptr<Viewer>
@@ -200,15 +305,30 @@ SimulationManager::startSimulation(bool debug)
         return;
     }
 
-    // Start Simulation
+    // Simulation
     if( !debug )
     {
         LOG(INFO) << "Starting simulation";
         m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+
+        // Start device servers
+        for(const auto& pair : m_deviceServerMap)
+        {
+            this->startModuleInNewThread(pair.second);
+        }
+
+        // Start device clients
+        for(const auto& pair : m_deviceClientMap)
+        {
+            this->startModuleInNewThread(pair.second);
+        }
+
+        // Start scene
         this->startModuleInNewThread(startingScene);
+
         m_status = SimulationStatus::RUNNING;
     }
-    // Start Debug
+    // Debug
     else
     {
         m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
@@ -243,6 +363,18 @@ SimulationManager::runSimulation()
     // Run scene
     m_sceneMap.at(m_currentSceneName)->run();
 
+    // Run device servers
+    for(const auto& pair : m_deviceServerMap)
+    {
+        (pair.second)->run();
+    }
+
+    // Run device clients
+    for(const auto& pair : m_deviceClientMap)
+    {
+        (pair.second)->run();
+    }
+
     // Update simulation status
     m_status = SimulationStatus::RUNNING;
 }
@@ -260,6 +392,18 @@ SimulationManager::pauseSimulation()
 
     // Pause scene
     m_sceneMap.at(m_currentSceneName)->pause();
+
+    // Pause device clients
+    for(const auto& pair : m_deviceClientMap)
+    {
+        (pair.second)->pause();
+    }
+
+    // Pause device servers
+    for(const auto& pair : m_deviceServerMap)
+    {
+        (pair.second)->pause();
+    }
 
     // Update simulation status
     m_status = SimulationStatus::PAUSED;
@@ -279,6 +423,20 @@ SimulationManager::endSimulation()
 
     // Update Renderer
     m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+
+    // End device clients
+    for(const auto& pair : m_deviceClientMap)
+    {
+        (pair.second)->end();
+        m_threadMap.at(pair.first).join();
+    }
+
+    // Pause device servers
+    for(const auto& pair : m_deviceServerMap)
+    {
+        (pair.second)->end();
+        m_threadMap.at(pair.first).join();
+    }
 
     // End all scenes
     for (auto pair : m_sceneMap)

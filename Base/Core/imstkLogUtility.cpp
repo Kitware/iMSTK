@@ -35,11 +35,24 @@ void
 stdSink::ReceiveLogMessage(g3::LogMessageMover logEntry)
 {
     auto level = logEntry.get()._level;
-    auto color = GetColor(level);
+	auto message = logEntry.get().message();
 
+#ifndef WIN32
+    auto color = GetColor(level);
     std::cout << "\033[" << color << "m"
-              << logEntry.get().message()
-              << "\033[m" << std::endl;
+              << message
+			  << "\033[m" << std::endl;
+#else
+	if (level.value == WARNING.value || level.value == FATAL.value)
+	{
+		std::cerr << message << std::endl;
+	}
+	else
+	{
+		std::cout << message << std::endl;
+	}
+#endif
+
 }
 
 void

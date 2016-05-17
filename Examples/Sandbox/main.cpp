@@ -23,10 +23,16 @@
 #include "imstkIsometricMap.h"
 #include "imstkOneToOneMap.h"
 
+// Devices
+#include "imstkVRPNDeviceClient.h"
+#include "imstkVRPNDeviceServer.h"
+#include "imstkCameraController.h"
+
 #include "g3log/g3log.hpp"
 
-void testViewer();
+void testDevices();
 void testReadMesh();
+void testViewer();
 void testAnalyticalGeometry();
 void testScenesManagement();
 void testIsometricMap();
@@ -41,8 +47,9 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
+    testDevices();
     //testViewer();
-    testReadMesh();
+    //testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
     //testIsometricMap();
@@ -52,6 +59,51 @@ int main()
     //testSurfaceMeshOptimizer();
 
     return 0;
+}
+
+void testDevices()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestDevice");
+    scene->setLoopDelay(1000);
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
+    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
+    server->setLoopDelay(1);
+    sdk->addDeviceServer(server);
+
+    // Device Client
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
+    client->setLoopDelay(1);
+    sdk->addDeviceClient(client);
+
+    // Sphere
+    auto sphereGeom = std::make_shared<imstk::Sphere>();
+    sphereGeom->scale(0.1);
+    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereObj->setVisualGeometry(sphereGeom);
+    scene->addSceneObject(sphereObj);
+
+    // Mesh
+    auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
+    auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
+    meshObject->setVisualGeometry(mesh); // change to any mesh created above
+    scene->addSceneObject(meshObject);
+
+    // Update Camera position
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(8,-8,8));
+
+    // Set camera controller
+    auto controller = cam->setupController(client, 100);
+    //LOG(INFO) << controller->getTranslationOffset(); // should be the same than initial cam position
+    //controller->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
+
+    // Run
+    sdk->setCurrentScene("SceneTestDevice");
+    sdk->startSimulation(true);
 }
 
 void testReadMesh()
@@ -256,7 +308,7 @@ void testIsometricMap()
     // Isometric Map
     auto transform = imstk::RigidTransform3d::Identity();
     transform.translate(imstk::Vec3d(0.0, 1.0, 0.0));
-    transform.rotate(Eigen::AngleAxisd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
+    transform.rotate(imstk::Rotd(imstk::PI_4, imstk::Vec3d(0, 1.0, 0)));
 
     auto rigidMap = std::make_shared<imstk::IsometricMap>();
     rigidMap->setMaster(sphereObj->getVisualGeometry());

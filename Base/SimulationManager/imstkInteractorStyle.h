@@ -37,6 +37,7 @@ public:
     static InteractorStyle *New();
     vtkTypeMacro(InteractorStyle, vtkBaseInteractorStyle);
 
+    virtual void OnTimer() override;
     virtual void OnChar() override;
     virtual void OnMouseMove() override;
     virtual void OnLeftButtonDown() override;

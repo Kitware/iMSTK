@@ -54,6 +54,8 @@ public:
 
     std::shared_ptr<Scene> getCurrentScene() const;
     void setCurrentScene(std::shared_ptr<Scene>scene);
+    std::shared_ptr<Renderer> getCurrentRenderer() const;
+
     void setRenderingMode(Renderer::Mode mode);
     void startRenderingLoop();
     void endRenderingLoop();
@@ -63,9 +65,6 @@ public:
     const bool& isRendering() const;
 
 protected:
-
-    void debugModeKeyPressCallback(vtkObject*, long unsigned int, void*);
-    void simulationModeKeyPressCallback(vtkObject*, long unsigned int, void*);
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     vtkSmartPointer<InteractorStyle> m_interactorStyle = vtkSmartPointer<InteractorStyle>::New();

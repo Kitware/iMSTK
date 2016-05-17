@@ -31,9 +31,27 @@
 #include "vtkAssemblyPath.h"
 #include "vtkAbstractPropPicker.h"
 
-vtkStandardNewMacro(imstk::InteractorStyle);
-
 namespace imstk {
+
+vtkStandardNewMacro(InteractorStyle);
+
+void
+InteractorStyle::OnTimer()
+{
+    if (m_simManager->getStatus() != SimulationStatus::RUNNING)
+    {
+        return;
+    }
+
+    // Update Camera
+    auto scene = m_simManager->getCurrentScene();
+    m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(scene->getCamera());
+
+    // Render
+    this->CurrentRenderer->ResetCameraClippingRange();
+    this->Interactor->Render();
+}
+
 void
 InteractorStyle::OnChar()
 {
@@ -172,6 +190,13 @@ InteractorStyle::OnChar()
         }
     }
     break;
+
+    // Quit Viewer
+    case '\u001B':
+    {
+        m_simManager->getViewer()->endRenderingLoop();
+    }break;
+
     }
 }
 

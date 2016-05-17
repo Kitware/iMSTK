@@ -45,7 +45,7 @@ Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
     // If the current scene has a renderer, remove it
     if( m_currentScene )
     {
-        auto vtkRenderer = m_rendererMap.at(m_currentScene)->getVtkRenderer();
+        auto vtkRenderer = this->getCurrentRenderer()->getVtkRenderer();
         if(m_vtkRenderWindow->HasRenderer(vtkRenderer))
         {
             m_vtkRenderWindow->RemoveRenderer(vtkRenderer);
@@ -62,10 +62,16 @@ Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
     }
 
     // Set renderer to renderWindow
-    m_vtkRenderWindow->AddRenderer(m_rendererMap.at(m_currentScene)->getVtkRenderer());
+    m_vtkRenderWindow->AddRenderer(this->getCurrentRenderer()->getVtkRenderer());
 
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_currentScene->getName().data());
+}
+
+std::shared_ptr<Renderer>
+Viewer::getCurrentRenderer() const
+{
+    return m_rendererMap.at(m_currentScene);
 }
 
 void
@@ -79,7 +85,7 @@ Viewer::setRenderingMode(Renderer::Mode mode)
     }
 
     // Setup renderer
-    m_rendererMap.at(m_currentScene)->setup(mode);
+    this->getCurrentRenderer()->setup(mode);
     if( !m_running )
     {
         return;
@@ -108,7 +114,10 @@ void
 Viewer::startRenderingLoop()
 {
     m_running = true;
+    m_vtkRenderWindow->GetInteractor()->Initialize();
+    m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(1000.0/60);
     m_vtkRenderWindow->GetInteractor()->Start();
+    m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     m_running = false;
 }
 

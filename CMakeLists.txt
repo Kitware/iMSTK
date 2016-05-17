@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.2)
-
 project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
@@ -25,23 +24,31 @@ endif()
 #-----------------------------------------------------------------------------
 # Project build directories
 #-----------------------------------------------------------------------------
-set(${PROJECT_NAME}_BIN_DIR "bin")
-set(${PROJECT_NAME}_LIB_DIR "lib/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_INCLUDE_DIR "include/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
-set(${PROJECT_NAME}_SHARE_DIR "share/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+if(NOT DEFINED ${PROJECT_NAME}_BIN_DIR)
+  set(${PROJECT_NAME}_BIN_DIR "bin")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_LIB_DIR)
+  set(${PROJECT_NAME}_LIB_DIR "lib")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_INCLUDE_DIR)
+  set(${PROJECT_NAME}_INCLUDE_DIR "include")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_SHARE_DIR)
+  set(${PROJECT_NAME}_SHARE_DIR "share")
+endif()
 
 #-----------------------------------------------------------------------------
 # Project install directories
 #-----------------------------------------------------------------------------
 if(APPLE)
-  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents/") # Set to create Bundle
+  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
 else()
-  set(${PROJECT_NAME}_INSTALL_ROOT "./")
+  set(${PROJECT_NAME}_INSTALL_ROOT ".")
 endif()
-set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_BIN_DIR}")
-set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_LIB_DIR}")
-set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_INCLUDE_DIR}")
-set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}${${PROJECT_NAME}_SHARE_DIR}")
+set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_BIN_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_SHARE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 
 #-----------------------------------------------------------------------------
 # C++11 Support
@@ -50,15 +57,15 @@ include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
 CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
 if(COMPILER_SUPPORTS_CXX11)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread" CACHE STRING "compile flags" FORCE)
 elseif(COMPILER_SUPPORTS_CXX0X)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread" CACHE STRING "compile flags" FORCE)
 else()
   message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" CACHE STRING "compile flags" FORCE)
 endif()
 
 #-----------------------------------------------------------------------------
@@ -77,12 +84,15 @@ endif()
 
 if(WIN32)
   imstk_define_dependency(PThreads)
+  imstk_define_dependency(Libusb)
 endif()
 
 imstk_define_dependency(g3log)
 imstk_define_dependency(Eigen)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
+imstk_define_dependency(VRPN)
+imstk_define_dependency(LibNiFalcon)
 
 #-----------------------------------------------------------------------------
 # SUPERBUILD
@@ -105,6 +115,7 @@ endif()
 # Find external dependencies
 #-----------------------------------------------------------------------------
 # Uncrustify
+find_program(Uncrustify_EXECUTABLE Uncrustify)
 include(SetupUncrustifyConfig)
 
 # g3log
@@ -119,14 +130,19 @@ include_directories( ${Eigen_INCLUDE_DIR} )
 find_package( VegaFEM REQUIRED CONFIG )
 
 # VTK
-find_package( VTK REQUIRED )
+find_package( VTK REQUIRED CONFIG )
 include( ${VTK_USE_FILE} )
+
+# VRPN
+find_package( VRPN REQUIRED )
+include_directories( ${VRPN_INCLUDE_DIRS} )
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Geometry)
+add_subdirectory(Base/Devices)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/Rendering)
 add_subdirectory(Base/SimulationManager)

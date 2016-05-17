@@ -98,7 +98,7 @@ RenderDelegate::setActorTransform(std::shared_ptr<Geometry>geom)
 {
     auto scaling   = geom->getScaling();
     auto quat      = geom->getOrientation();
-    auto angleAxis = Eigen::AngleAxisd(quat);
+    auto angleAxis = Rotd(quat);
     auto pos       = geom->getPosition();
 
     auto transform = vtkSmartPointer<vtkTransform>::New();
