@@ -76,12 +76,10 @@ void testObjectController()
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
     server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
-    server->setLoopDelay(1);
     sdk->addDeviceServer(server);
 
     // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
-    client->setLoopDelay(1);
     sdk->addDeviceClient(client);
 
     // Plane
@@ -120,12 +118,10 @@ void testCameraController()
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
     server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
-    server->setLoopDelay(1);
     sdk->addDeviceServer(server);
 
     // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
-    client->setLoopDelay(1);
     sdk->addDeviceClient(client);
 
     // Mesh
