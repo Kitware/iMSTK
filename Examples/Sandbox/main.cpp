@@ -66,7 +66,6 @@ void testDevices()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestDevice");
-    scene->setLoopDelay(1000);
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
@@ -111,7 +110,6 @@ void testReadMesh()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestMesh");
-    scene->setLoopDelay(1000);
 
     // Read surface mesh
     auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
@@ -144,7 +142,6 @@ void testViewer()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto sceneTest = sdk->createNewScene("SceneTest");
-    sceneTest->setLoopDelay(1000);
 
     // Plane
     auto planeGeom = std::make_shared<imstk::Plane>();
@@ -243,12 +240,10 @@ void testScenesManagement()
     // Scenes
     LOG(INFO) << "-- Test add scenes";
     auto scene1 = std::make_shared<imstk::Scene>("scene1");
-    scene1->setLoopDelay(500);
     sdk->addScene(scene1);
 
     sdk->createNewScene("scene2");
     auto scene2 = sdk->getScene("scene2");
-    scene2->setLoopDelay(500);
 
     auto scene3 = sdk->createNewScene();
     sdk->removeScene("Scene_3");
@@ -287,7 +282,6 @@ void testIsometricMap()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto geometryMapTest = sdk->createNewScene("geometryMapTest");
-    geometryMapTest->setLoopDelay(1000);
 
     // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();

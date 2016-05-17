@@ -30,7 +30,7 @@
 #include "imstkScene.h"
 #include "imstkVRPNDeviceServer.h"
 #include "imstkDeviceClient.h"
-#include "imstkScene.h"
+#include "imstkSceneManager.h"
 #include "imstkViewer.h"
 #include "imstkLogUtility.h"
 
@@ -89,7 +89,7 @@ private:
     SimulationStatus m_status = SimulationStatus::INACTIVE;
 
     std::string m_currentSceneName = "";
-    std::unordered_map<std::string, std::shared_ptr<Scene>> m_sceneMap;
+    std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
 
     std::unordered_map<std::string, std::shared_ptr<VRPNDeviceServer>> m_deviceServerMap;
     std::unordered_map<std::string, std::shared_ptr<DeviceClient>> m_deviceClientMap;

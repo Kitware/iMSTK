@@ -19,55 +19,43 @@
 
    =========================================================================*/
 
-#ifndef imstkModule_h
-#define imstkModule_h
+#ifndef imstkSceneManager_h
+#define imstkSceneManager_h
 
-#include <iostream>
+#include <unordered_map>
+#include <memory>
 #include <thread>
-#include <atomic>
+
+#include "imstkModule.h"
+#include "imstkScene.h"
 
 namespace imstk {
-enum class ModuleStatus
-{
-    STARTING,
-    RUNNING,
-    PAUSING,
-    PAUSED,
-    TERMINATING,
-    INACTIVE
-};
 
-class Module
+class SceneManager : public Module
 {
 public:
 
-    ~Module() = default;
+    SceneManager(std::shared_ptr<Scene> scene) :
+        Module(scene->getName(), 1000),
+        m_scene(scene)
+    {}
 
-    void                start();
-    void                run();
-    void                pause();
-    void                end();
+    ~SceneManager() = default;
 
-    const ModuleStatus getStatus() const;
-    const std::string& getName() const;
-    const int& getLoopDelay() const;
-    void setLoopDelay(int milliseconds);
+    std::shared_ptr<Scene> getScene();
 
 protected:
 
-    Module(std::string name, int loopDelay = 0) :
-        m_name(name),
-        m_loopDelay(loopDelay)
-    {}
+    void initModule() override;
+    void runModule() override;
+    void cleanUpModule() override;
 
-    virtual void initModule()    = 0;
-    virtual void runModule()     = 0;
-    virtual void cleanUpModule() = 0;
+    std::shared_ptr<Scene> m_scene;
 
-    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};
-    std::string  m_name;
-    int m_loopDelay;
+    void startModuleInNewThread(std::shared_ptr<Module> module);
+    std::unordered_map<std::string, std::thread> m_threadMap;
+
 };
 }
 
-#endif // ifndef imstkModule_h
+#endif // ifndef imstkSceneManager_h

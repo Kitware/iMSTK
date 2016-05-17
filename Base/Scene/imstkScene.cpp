@@ -154,45 +154,15 @@ Scene::removeLight(std::string lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
+const std::string&
+Scene::getName() const
+{
+    return m_name;
+}
+
 std::shared_ptr<Camera>
-Scene::getCamera()
+Scene::getCamera() const
 {
     return m_camera;
-}
-
-void
-Scene::initModule()
-{
-    LOG(DEBUG) << m_name << " : init";
-
-
-    if (auto camController = m_camera->getController())
-    {
-        this->startModuleInNewThread(camController);
-    }
-}
-
-void
-Scene::cleanUpModule()
-{
-    LOG(DEBUG) << m_name << " : cleanUp";
-
-    if (auto camController = m_camera->getController())
-    {
-        camController->end();
-        m_threadMap.at(camController->getName()).join();
-    }
-}
-
-void
-Scene::runModule()
-{
-    LOG(DEBUG) << m_name << " : running";
-}
-
-void
-Scene::startModuleInNewThread(std::shared_ptr<Module>module)
-{
-    m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
 }
