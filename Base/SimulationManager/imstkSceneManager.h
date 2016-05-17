@@ -36,7 +36,7 @@ class SceneManager : public Module
 public:
 
     SceneManager(std::shared_ptr<Scene> scene) :
-        Module(scene->getName(), 1000),
+        Module(scene->getName()),
         m_scene(scene)
     {}
 

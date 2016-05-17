@@ -37,9 +37,7 @@ SceneManager::getScene()
 void
 SceneManager::initModule()
 {
-    LOG(DEBUG) << m_name << " manager : init";
-
-
+    // Start Camera Controller (asynchronous)
     if (auto camController = m_scene->getCamera()->getController())
     {
         this->startModuleInNewThread(camController);
@@ -49,8 +47,7 @@ SceneManager::initModule()
 void
 SceneManager::runModule()
 {
-    LOG(DEBUG) << m_name << " manager : running";
-
+    // Update virtualCoupling objects based on devices
     for (auto obj : m_scene->getSceneObjects())
     {
         if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
@@ -60,12 +57,10 @@ SceneManager::runModule()
     }
 }
 
-
 void
 SceneManager::cleanUpModule()
 {
-    LOG(DEBUG) << m_name << " manager : cleanUp";
-
+    // End Camera Controller
     if (auto camController = m_scene->getCamera()->getController())
     {
         camController->end();

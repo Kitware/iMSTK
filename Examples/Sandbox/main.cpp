@@ -6,14 +6,18 @@
 
 #include "imstkMath.h"
 #include "imstkSimulationManager.h"
+
+// Objects
 #include "imstkSceneObject.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkCube.h"
+#include "imstkCollidingObject.h"
+#include "imstkVirtualCouplingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 
 // Geometry
+#include "imstkPlane.h"
+#include "imstkSphere.h"
+#include "imstkCube.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshReader.h"
@@ -30,7 +34,8 @@
 
 #include "g3log/g3log.hpp"
 
-void testDevices();
+void testObjectController();
+void testCameraController();
 void testReadMesh();
 void testViewer();
 void testAnalyticalGeometry();
@@ -47,7 +52,8 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testDevices();
+    testObjectController();
+    //testCameraController();
     //testViewer();
     //testReadMesh();
     //testAnalyticalGeometry();
@@ -61,7 +67,7 @@ int main()
     return 0;
 }
 
-void testDevices()
+void testObjectController()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
@@ -78,17 +84,54 @@ void testDevices()
     client->setLoopDelay(1);
     sdk->addDeviceClient(client);
 
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(5);
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
     // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->scale(0.1);
-    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereGeom->setPosition(imstk::UP_VECTOR); //does not matter, need to set offset on object if controlled
+    sphereGeom->scale(0.2);
+    auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("VirtualSphere", client, 20);
     sphereObj->setVisualGeometry(sphereGeom);
+    sphereObj->setCollidingGeometry(sphereGeom);
+    sphereObj->setTranslationOffset(imstk::UP_VECTOR); // this will work though
     scene->addSceneObject(sphereObj);
+
+    // Update Camera position
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0,3,10));
+    cam->setFocalPoint(sphereGeom->getPosition());
+
+    // Run
+    sdk->setCurrentScene("SceneTestDevice");
+    sdk->startSimulation(true);
+}
+
+void testCameraController()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestDevice");
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
+    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
+    server->setLoopDelay(1);
+    sdk->addDeviceServer(server);
+
+    // Device Client
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
+    client->setLoopDelay(1);
+    sdk->addDeviceClient(client);
 
     // Mesh
     auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
-    meshObject->setVisualGeometry(mesh); // change to any mesh created above
+    meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
 
     // Update Camera position
