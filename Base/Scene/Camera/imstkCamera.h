@@ -61,7 +61,7 @@ public:
     void setViewAngle(const double& angle);
 
     std::shared_ptr<CameraController> getController() const;
-    std::shared_ptr<CameraController> setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling = 1.0);
+    void setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling = 1.0);
 
 protected:
 

@@ -105,7 +105,7 @@ Camera::getController() const
     return m_cameraController;
 }
 
-std::shared_ptr<CameraController>
+void
 Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling)
 {
     if(m_cameraController == nullptr)
@@ -114,17 +114,5 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scali
     }
     m_cameraController->setDeviceClient(deviceClient);
     m_cameraController->setTranslationScaling(scaling);
-    m_cameraController->setTranslationOffset(m_position);
-
-    auto viewNormal = (m_position - m_focalPoint).normalized();
-    auto viewSide = m_viewUp.cross(viewNormal).normalized();
-    m_viewUp = viewNormal.cross(viewSide);
-    Mat3d rot;
-    rot.col(0) = viewSide;
-    rot.col(1) = m_viewUp;
-    rot.col(2) = viewNormal;
-    m_cameraController->setRotationOffset(Quatd(rot));
-
-    return m_cameraController;
 }
 }

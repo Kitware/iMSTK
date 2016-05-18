@@ -30,7 +30,20 @@ namespace imstk {
 void
 CameraController::initModule()
 {
+    auto pos = m_camera.getPosition();
+    auto viewUp = m_camera.getViewUp();
+    auto focus = m_camera.getFocalPoint();
 
+    m_translationOffset = pos;
+
+    auto viewNormal = (pos - focus).normalized();
+    auto viewSide = viewUp.cross(viewNormal).normalized();
+    viewUp = viewNormal.cross(viewSide);
+    Mat3d rot;
+    rot.col(0) = viewSide;
+    rot.col(1) = viewUp;
+    rot.col(2) = viewNormal;
+    m_rotationOffset = Quatd(rot);
 }
 
 void

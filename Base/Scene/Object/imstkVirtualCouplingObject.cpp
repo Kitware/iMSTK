@@ -31,6 +31,13 @@
 namespace imstk {
 
 void
+VirtualCouplingObject::initOffsets()
+{
+    m_translationOffset = m_collidingGeometry->getPosition();
+    m_rotationOffset = m_collidingGeometry->getOrientation();
+}
+
+void
 VirtualCouplingObject::updateFromDevice()
 {
     Vec3d p;

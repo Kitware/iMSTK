@@ -42,6 +42,15 @@ SceneManager::initModule()
     {
         this->startModuleInNewThread(camController);
     }
+
+    // Init virtual coupling objects offsets
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
+        {
+            virtualCoupling->initOffsets();
+        }
+    }
 }
 
 void

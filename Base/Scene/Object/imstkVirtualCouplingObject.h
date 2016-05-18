@@ -45,6 +45,14 @@ public:
 
     ~VirtualCouplingObject() = default;
 
+    ///
+    /// \brief Initialise offset based on object geometry
+    ///
+    void initOffsets();
+
+    ///
+    /// \brief Update geometries transformations
+    ///
     void updateFromDevice();
 
 };

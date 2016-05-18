@@ -91,12 +91,11 @@ void testObjectController()
 
     // Sphere
     auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->setPosition(imstk::UP_VECTOR); //does not matter, need to set offset on object if controlled
+    sphereGeom->setPosition(imstk::UP_VECTOR);
     sphereGeom->scale(0.2);
     auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("VirtualSphere", client, 20);
     sphereObj->setVisualGeometry(sphereGeom);
     sphereObj->setCollidingGeometry(sphereGeom);
-    sphereObj->setTranslationOffset(imstk::UP_VECTOR); // this will work though
     scene->addSceneObject(sphereObj);
 
     // Update Camera position
@@ -135,9 +134,9 @@ void testCameraController()
     cam->setPosition(imstk::Vec3d(8,-8,8));
 
     // Set camera controller
-    auto controller = cam->setupController(client, 100);
-    //LOG(INFO) << controller->getTranslationOffset(); // should be the same than initial cam position
-    //controller->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
+    cam->setupController(client, 100);
+    //LOG(INFO) << cam->getController()->getTranslationOffset(); // should be the same than initial cam position
+    //cam->getController()->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
