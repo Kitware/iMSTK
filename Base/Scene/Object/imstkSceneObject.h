@@ -23,6 +23,7 @@
 #define imstkSceneObject_h
 
 #include <memory>
+#include <string>
 
 namespace imstk {
 

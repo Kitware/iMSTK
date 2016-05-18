@@ -22,6 +22,7 @@
 #include "imstkDeformableObject.h"
 
 namespace imstk {
+
 std::shared_ptr<Geometry>
 DeformableObject::getPhysicsGeometry() const
 {
@@ -33,4 +34,11 @@ DeformableObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_physicsGeometry = geometry;
 }
+
+int
+DeformableObject::getNumOfDOF() const
+{
+    return numDOF;
+}
+
 }
