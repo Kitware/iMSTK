@@ -123,6 +123,8 @@ void testTwoFalcons()
     cam->setPosition(imstk::Vec3d(0,18,20));
     cam->setFocalPoint(imstk::UP_VECTOR*18);
     cam->setupController(hdk);
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
 
     // Run
     sdk->setCurrentScene("FalconsTestScene");
@@ -199,7 +201,8 @@ void testCameraController()
     // Set camera controller
     cam->setupController(client, 100);
     //LOG(INFO) << cam->getController()->getTranslationOffset(); // should be the same than initial cam position
-    //cam->getController()->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
