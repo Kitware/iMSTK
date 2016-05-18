@@ -38,7 +38,8 @@ enum class DeviceType
 {
     SPACE_EXPLORER_3DCONNEXION,
     NAVIGATOR_3DCONNEXION,
-    NOVINT_FALCON
+    NOVINT_FALCON,
+    OSVR_HDK
 };
 
 ///
