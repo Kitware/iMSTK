@@ -34,6 +34,7 @@
 
 #include "g3log/g3log.hpp"
 
+void testTwoFalcons();
 void testObjectController();
 void testCameraController();
 void testReadMesh();
@@ -52,7 +53,8 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testObjectController();
+    testTwoFalcons();
+    //testObjectController();
     //testCameraController();
     //testViewer();
     //testReadMesh();
@@ -67,6 +69,60 @@ int main()
     return 0;
 }
 
+void testTwoFalcons()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("FalconsTestScene");
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    server->addDevice("falcon0", imstk::DeviceType::NOVINT_FALCON, 0);
+    server->addDevice("falcon1", imstk::DeviceType::NOVINT_FALCON, 1);
+    sdk->addDeviceServer(server);
+
+    // Falcon clients
+    auto falcon0 = std::make_shared<imstk::VRPNDeviceClient>("falcon0", "localhost");
+    sdk->addDeviceClient(falcon0);
+    auto falcon1 = std::make_shared<imstk::VRPNDeviceClient>("falcon1", "localhost");
+    sdk->addDeviceClient(falcon1);
+
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(50);
+    planeGeom->translate(imstk::FORWARD_VECTOR * 15);
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Sphere0
+    auto sphere0Geom = std::make_shared<imstk::Sphere>();
+    sphere0Geom->setPosition(imstk::Vec3d(3,1.5,0));
+    sphere0Geom->scale(0.5);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 25);
+    sphere0Obj->setVisualGeometry(sphere0Geom);
+    sphere0Obj->setCollidingGeometry(sphere0Geom);
+    scene->addSceneObject(sphere0Obj);
+
+    // Sphere1
+    auto sphere1Geom = std::make_shared<imstk::Sphere>();
+    sphere1Geom->setPosition(imstk::Vec3d(-3,1.5,0));
+    sphere1Geom->scale(0.5);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 25);
+    sphere1Obj->setVisualGeometry(sphere1Geom);
+    sphere1Obj->setCollidingGeometry(sphere1Geom);
+    scene->addSceneObject(sphere1Obj);
+
+    // Update Camera position
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0,3,15));
+    cam->setFocalPoint(imstk::UP_VECTOR);
+
+    // Run
+    sdk->setCurrentScene("FalconsTestScene");
+    sdk->startSimulation(true);
+}
+
 void testObjectController()
 {
     // SDK and Scene
@@ -75,7 +131,7 @@ void testObjectController()
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
+    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
     sdk->addDeviceServer(server);
 
     // Device Client
@@ -116,7 +172,7 @@ void testCameraController()
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
+    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
     sdk->addDeviceServer(server);
 
     // Device Client

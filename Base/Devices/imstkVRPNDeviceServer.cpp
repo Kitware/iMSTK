@@ -30,9 +30,9 @@
 
 namespace imstk {
 void
-VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType)
+VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, size_t id)
 {
-    m_deviceInfoMap[deviceName] = deviceType;
+    m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
 }
 
 void
@@ -46,7 +46,8 @@ VRPNDeviceServer::initModule()
     for (const auto& device : m_deviceInfoMap)
     {
         std::string name = device.first;
-        DeviceType type = device.second;
+        DeviceType type = device.second.first;
+        size_t id = device.second.second;
 
         switch (type)
         {
@@ -61,7 +62,7 @@ VRPNDeviceServer::initModule()
         case DeviceType::NOVINT_FALCON:
         {
             auto vrpn_device = new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
-                                                             0, "4-button", "stamper");
+                                                             id, "4-button", "stamper");
             m_deviceConnections->add(vrpn_device);
         } break;
         default:
