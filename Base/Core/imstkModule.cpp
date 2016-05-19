@@ -42,6 +42,8 @@ Module::start()
     m_status = ModuleStatus::RUNNING;
 
     // Keep active, wait for terminating call
+    std::chrono::steady_clock::time_point pre_t;
+    std::chrono::steady_clock::time_point post_t;
     while (m_status !=  ModuleStatus::TERMINATING)
     {
         if (m_status == ModuleStatus::PAUSING)
@@ -50,8 +52,11 @@ Module::start()
         }
         else if (m_status == ModuleStatus::RUNNING)
         {
+            pre_t = std::chrono::steady_clock::now();
             this->runModule();
-            std::this_thread::sleep_for(std::chrono::milliseconds(m_loopDelay));
+            post_t = std::chrono::steady_clock::now();
+            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(post_t - pre_t);
+            std::this_thread::sleep_for(std::chrono::milliseconds(m_loopDelay) - elapsed);
         }
     }
 
