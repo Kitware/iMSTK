@@ -62,6 +62,7 @@ SceneManager::runModule()
         if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
         {
             virtualCoupling->updateFromDevice();
+            virtualCoupling->applyForces();
         }
     }
 }

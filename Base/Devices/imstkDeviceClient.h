@@ -84,14 +84,10 @@ public:
     bool getButton(size_t buttonId) const;
 
     ///
-    /// \brief Get the device force
+    /// \brief Get/Set the device force
     ///
     const Vec3d& getForce() const;
-
-    ///
-    /// \brief Get the device torque
-    ///
-    const Vec3d& getTorque() const;
+    void setForce(Vec3d force);
 
 protected:
 
@@ -112,7 +108,6 @@ protected:
     Quatd m_orientation = Quatd::Identity(); //!< Orientation of the end effector
     std::map<size_t, bool> m_buttons;        //!< Buttons: true = pressed/false = not pressed
     Vec3d m_force = Vec3d::Zero();           //!< Force vector
-    Vec3d m_torque = Vec3d::Zero();          //!< Torque vector
 };
 }
 

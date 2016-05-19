@@ -42,6 +42,10 @@ VRPNDeviceClient::initModule()
     m_vrpnAnalog->register_change_handler(this, analogChangeHandler);
     m_vrpnButton->register_change_handler(this, buttonChangeHandler);
     m_vrpnForceDevice->register_force_change_handler(this, forceChangeHandler);
+
+    m_vrpnForceDevice->setFF_Origin(0,0,0);
+    m_vrpnForceDevice->setFF_Jacobian(0,0,0,0,0,0,0,0,0);
+    m_vrpnForceDevice->setFF_Radius(2);
 }
 
 void
@@ -61,6 +65,8 @@ VRPNDeviceClient::runModule()
     }
     if (this->getForceEnabled())
     {
+        m_vrpnForceDevice->setFF_Force(m_force[0], m_force[1], m_force[2]);
+        m_vrpnForceDevice->sendForceField();
         m_vrpnForceDevice->mainloop();
     }
 }
@@ -73,6 +79,8 @@ VRPNDeviceClient::cleanUpModule()
     m_vrpnAnalog->unregister_change_handler(this, analogChangeHandler);
     m_vrpnButton->unregister_change_handler(this, buttonChangeHandler);
     m_vrpnForceDevice->unregister_force_change_handler(this, forceChangeHandler);
+
+    m_vrpnForceDevice->stopForceField();
 
     m_vrpnTracker.reset();
     m_vrpnAnalog.reset();
@@ -109,12 +117,12 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
 
-    if (a.num_channel > 0)
+    if (a.num_channel >= 3)
     {
         deviceClient->m_position << a.channel[0], a.channel[1], a.channel[2];
         //LOG(DEBUG) << "analog: position = " << deviceClient->m_position;
     }
-    if (a.num_channel > 3)
+    if (a.num_channel >= 6)
     {
         deviceClient->m_orientation =
                 Rotd(a.channel[3]*M_PI,Vec3d::UnitX())*
@@ -137,7 +145,7 @@ VRPNDeviceClient::buttonChangeHandler(void *userData, const _vrpn_BUTTONCB b)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_buttons[b.button] = (b.state == 1);
-    LOG(DEBUG) << "buttons: " << b.button << " = " << deviceClient->m_buttons[b.button];
+    //LOG(DEBUG) << "buttons: " << b.button << " = " << deviceClient->m_buttons[b.button];
 }
 
 void VRPN_CALLBACK

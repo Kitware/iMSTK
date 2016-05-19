@@ -55,6 +55,21 @@ public:
     ///
     void updateFromDevice();
 
+    ///
+    /// \brief Apply forces to the haptic device
+    ///
+    void applyForces();
+
+    ///
+    /// \brief Get/Set the force to apply to the device
+    ///
+    const Vec3d& getForce() const;
+    void setForce(Vec3d force);
+
+protected:
+
+    bool m_forceModified;
+    Vec3d m_force = Vec3d::Zero();
 };
 
 }
