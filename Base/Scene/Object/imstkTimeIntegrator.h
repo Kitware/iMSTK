@@ -23,6 +23,7 @@
 #define imstkTimeIntegrator_h
 
 #include <array>
+#include "g3log/g3log.hpp"
 
 namespace imstk {
 

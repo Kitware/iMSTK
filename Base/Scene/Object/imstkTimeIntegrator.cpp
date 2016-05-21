@@ -49,9 +49,9 @@ TimeIntegrator::setCoefficients(const Type type)
     switch (type)
     {
     case Type::BackwardEuler:
-        m_alpha = {1, 0, 0};
-        m_beta = {1, -1, 0};
-        m_gamma = {1, -2, -1};
+        m_alpha = { { 1, 0, 0 } };
+        m_beta = { { 1, -1, 0 } };
+        m_gamma = { { 1, -2, -1 } };
         break;
 
     case Type::ForwardEuler:
