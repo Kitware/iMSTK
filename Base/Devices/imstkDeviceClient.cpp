@@ -151,10 +151,9 @@ DeviceClient::getForce() const
     return m_force;
 }
 
-const Vec3d&
-DeviceClient::getTorque() const
+void
+DeviceClient::setForce(Vec3d force)
 {
-    return m_torque;
+    m_force = force;
 }
-
 }

@@ -59,4 +59,22 @@ VirtualCouplingObject::updateFromDevice()
         m_collidingToVisualMap->apply();
     }
 }
+
+void
+VirtualCouplingObject::applyForces()
+{
+    m_deviceClient->setForce(m_force);
+}
+
+const Vec3d&
+VirtualCouplingObject::getForce() const
+{
+    return m_force;
+}
+
+void
+VirtualCouplingObject::setForce(Vec3d force)
+{
+    m_force = force;
+}
 }

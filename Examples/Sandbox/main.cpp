@@ -79,6 +79,7 @@ void testTwoFalcons()
     auto server = std::make_shared<imstk::VRPNDeviceServer>();
     server->addDevice("falcon0", imstk::DeviceType::NOVINT_FALCON, 0);
     server->addDevice("falcon1", imstk::DeviceType::NOVINT_FALCON, 1);
+    server->addDevice("hdk", imstk::DeviceType::OSVR_HDK);
     sdk->addDeviceServer(server);
 
     // Falcon clients
@@ -86,6 +87,10 @@ void testTwoFalcons()
     sdk->addDeviceClient(falcon0);
     auto falcon1 = std::make_shared<imstk::VRPNDeviceClient>("falcon1", "localhost");
     sdk->addDeviceClient(falcon1);
+
+    // Cam Client
+    auto hdk = std::make_shared<imstk::VRPNDeviceClient>("hdk", "localhost");
+    sdk->addDeviceClient(hdk);
 
     // Plane
     auto planeGeom = std::make_shared<imstk::Plane>();
@@ -97,26 +102,29 @@ void testTwoFalcons()
 
     // Sphere0
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
-    sphere0Geom->setPosition(imstk::Vec3d(3,1.5,0));
-    sphere0Geom->scale(0.5);
-    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 25);
+    sphere0Geom->setPosition(imstk::Vec3d(16,4.5,0));
+    sphere0Geom->scale(1);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 30);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
-    sphere1Geom->setPosition(imstk::Vec3d(-3,1.5,0));
-    sphere1Geom->scale(0.5);
-    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 25);
+    sphere1Geom->setPosition(imstk::Vec3d(-16,4.5,0));
+    sphere1Geom->scale(1);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 30);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
 
-    // Update Camera position
+    // Camera
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(0,3,15));
-    cam->setFocalPoint(imstk::UP_VECTOR);
+    cam->setPosition(imstk::Vec3d(0,18,20));
+    cam->setFocalPoint(imstk::UP_VECTOR*18);
+    cam->setupController(hdk);
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
 
     // Run
     sdk->setCurrentScene("FalconsTestScene");
@@ -172,11 +180,12 @@ void testCameraController()
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
+    server->addDevice("device0", imstk::DeviceType::OSVR_HDK);
     sdk->addDeviceServer(server);
 
     // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
+    //client->setLoopDelay(1000);
     sdk->addDeviceClient(client);
 
     // Mesh
@@ -187,12 +196,13 @@ void testCameraController()
 
     // Update Camera position
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(8,-8,8));
+    cam->setPosition(imstk::Vec3d(0,0,10));
 
     // Set camera controller
     cam->setupController(client, 100);
     //LOG(INFO) << cam->getController()->getTranslationOffset(); // should be the same than initial cam position
-    //cam->getController()->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");

@@ -44,9 +44,9 @@ TrackingController::computeTrackingData(Vec3d& p, Quatd& r)
     if(m_invertFlags & InvertFlag::transX) p[0] = -p[0];
     if(m_invertFlags & InvertFlag::transY) p[1] = -p[1];
     if(m_invertFlags & InvertFlag::transZ) p[2] = -p[2];
-    if(m_invertFlags & InvertFlag::rotX) std::swap(r.y(), r.z());
-    if(m_invertFlags & InvertFlag::rotY) std::swap(r.x(), r.z());
-    if(m_invertFlags & InvertFlag::rotZ) std::swap(r.x(), r.y());
+    if(m_invertFlags & InvertFlag::rotX) r.x() = -r.x();
+    if(m_invertFlags & InvertFlag::rotY) r.y() = -r.y();
+    if(m_invertFlags & InvertFlag::rotZ) r.z() = -r.z();
 
     // Apply Offsets
     p = m_rotationOffset * p * m_scaling + m_translationOffset;

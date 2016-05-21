@@ -25,6 +25,7 @@
 #define VRPN_USE_LIBNIFALCON
 #define VERBOSE
 #include "vrpn_Tracker_NovintFalcon.h"
+#include "vrpn_Tracker_OSVRHackerDevKit.h"
 
 #include "g3log/g3log.hpp"
 
@@ -61,9 +62,12 @@ VRPNDeviceServer::initModule()
         } break;
         case DeviceType::NOVINT_FALCON:
         {
-            auto vrpn_device = new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
-                                                             id, "4-button", "stamper");
-            m_deviceConnections->add(vrpn_device);
+            m_deviceConnections->add(new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
+                                                                   id, "4-button", "stamper"));
+        } break;
+        case DeviceType::OSVR_HDK:
+        {
+            m_deviceConnections->add(new vrpn_Tracker_OSVRHackerDevKit(name.c_str(), m_serverConnection));
         } break;
         default:
         {
