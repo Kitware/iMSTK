@@ -5,6 +5,7 @@
 #include <iomanip>
 
 #include "imstkMath.h"
+#include "imstkTimer.h"
 #include "imstkSimulationManager.h"
 
 // Objects
@@ -750,6 +751,12 @@ void testSurfaceMeshOptimizer()
 
     surfMesh->setTrianglesVertices(triangles);
 
+    imstk::StopWatch wwt;
+    imstk::CpuTimer ct;
+
+    wwt.start();
+    ct.start();
+
     // d. Print the mesh
     surfMesh->print();
 
@@ -758,6 +765,14 @@ void testSurfaceMeshOptimizer()
 
     // f. Print the resulting mesh
     surfMesh->print();
+
+    /*wwt.storeLap("opDataLoc");
+    wwt.printLapTimes();*/
+
+    wwt.printTimeElapsed("opDataLoc");
+
+    //std::cout << "wall clock time: " << wwt.getTimeElapsed() << " ms." << std::endl;
+    LOG(INFO) << "CPU time: " << ct.getTimeElapsed() << " ms.";
 
     // Cross-check
     // Connectivity: 0:(0, 1, 2), 1:(1, 3, 2), 2:(3, 4, 2), 3:(5, 3, 1), 4:(3, 6, 4), 5:(5, 7, 3), 6:(3, 7, 6), 7:(7, 8, 6)
