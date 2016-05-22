@@ -25,28 +25,26 @@
 #include <memory>
 #include <string>
 
-#include "imstkCollidingObject.h"
+#include "imstkDynamicObject.h"
+#include "imstkDynamicalModel.h"
 
 namespace imstk {
-
-class Geometry;
-class GeometryMap;
 
 ///
 /// \class DeformableObject
 ///
-/// \brief Base class for scene objects that deform
+/// \brief Scene objects that can deform
 ///
-class DeformableObject : public CollidingObject
+class DeformableObject : public DynamicObject
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    DeformableObject(std::string name) : CollidingObject(name)
+    DeformableObject(std::string name) : DynamicObject(name)
     {
-        m_type = Type::Deformable;
+        m_type = SceneObjectType::Deformable;
     }
 
     ///
@@ -54,28 +52,9 @@ public:
     ///
     ~DeformableObject() = default;
 
-    ///
-    /// \brief Returns the geometry used for Physics computations
-    ///
-    std::shared_ptr<Geometry> getPhysicsGeometry() const;
-
-    ///
-    /// \brief Assigns the geometry used for Physics related computations
-    ///
-    void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
-
-    ///
-    /// \brief Returns the number of degree of freedom
-    ///
-    int getNumOfDOF() const;
-
 protected:
 
-    std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps transformations to colliding geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps transformations to colliding geometry
-
-    int numDOF; ///> Number of degree of freedom of the body in the discretized model
+    std::shared_ptr<DynamicalModel> dynamicalModel; ///> Dynamical model
 };
 
 }

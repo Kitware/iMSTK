@@ -19,10 +19,51 @@
 
    =========================================================================*/
 
-#include "imstkDeformableObject.h"
+#include "imstkDynamicObject.h"
 
 namespace imstk
 {
 
+std::shared_ptr<Geometry>
+DynamicObject::getPhysicsGeometry() const
+{
+    return m_physicsGeometry;
+}
+
+void
+DynamicObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
+{
+    m_physicsGeometry = geometry;
+}
+
+std::shared_ptr<GeometryMap>
+DynamicObject::getPhysicsToCollidingMap() const
+{
+    return m_physicsToCollidingGeomMap;
+}
+
+void
+DynamicObject::setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map)
+{
+    m_physicsToCollidingGeomMap = map;
+}
+
+std::shared_ptr<GeometryMap>
+DynamicObject::getPhysicsToVisualMap() const
+{
+    return m_physicsToVisualGeomMap;
+}
+
+void
+DynamicObject::setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map)
+{
+    m_physicsToVisualGeomMap = map;
+}
+
+size_t
+DynamicObject::getNumOfDOF() const
+{
+    return numDOF;
+}
 
 }

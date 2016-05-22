@@ -19,10 +19,30 @@
 
    =========================================================================*/
 
-#include "imstkDeformableObject.h"
+#ifndef imstkDynamicalModel_h
+#define imstkDynamicalModel_h
 
-namespace imstk
+namespace imstk {
+
+///
+/// \class DynamicalModel
+///
+/// \brief Base class for mathematical model of the physics governing the dynamic object
+///
+class DynamicalModel
 {
+public:
+    ///
+    /// \brief Constructor
+    ///
+    DynamicalModel(std::string name){}
 
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~DynamicalModel() = default;
+};
 
 }
+
+#endif // ifndef imstkDynamicalModel_h
