@@ -41,8 +41,8 @@ using Vec4f = Eigen::Vector4f;
 using Vec4d = Eigen::Vector4d;
 
 // Dynamic size vector
-using VecNf = Eigen::VectorXf;
-using VecNd = Eigen::VectorXd;
+using Vectorf = Eigen::VectorXf;
+using Vectord = Eigen::VectorXd;
 
 // Quaternion
 using Quatf = Eigen::Quaternion<float,Eigen::DontAlign>;

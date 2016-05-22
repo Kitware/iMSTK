@@ -74,6 +74,7 @@ protected:
 
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
 
+    //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
 };

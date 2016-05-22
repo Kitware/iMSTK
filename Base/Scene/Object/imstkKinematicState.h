@@ -19,44 +19,44 @@
 
    =========================================================================*/
 
-#ifndef imstkDeformableBodyModel_h
-#define imstkDeformableBodyModel_h
+#ifndef imstkKinematicState_h
+#define imstkKinematicState_h
 
-#include <memory>
 
-#include "imstkDynamicalModel.h"
-#include "imstkTimeIntegrator.h"
-
-namespace imstk {
+namespace imstk
+{
 
 ///
-/// \class DeformableBodyModel
+/// \class KinematicState
 ///
-/// \brief Mathematical model of the physics governing the dynamic deformable object
+/// \brief Kinematic state of the body in time
 ///
-class DeformableBodyModel : public DynamicalModel
+template<class T>
+class KinematicState
 {
 public:
+
     ///
     /// \brief Constructor
     ///
-    DeformableBodyModel();
+    KinematicState() = default;
+    KinematicState(const T& u, const T& v);
+
+    ///
+    /// \brief Set the state to a given one
+    ///
+    void setState(const T& u, const T& v);
 
     ///
     /// \brief Destructor
     ///
-    virtual ~DeformableBodyModel() = default;
-
-    ///
-    /// \brief Returns the tangent linear system for a given state
-    ///
-    void getLinearSystem();
+    ~KinematicState(){}
 
 protected:
-    //std::shared_ptr<ForceModel> forceModel; ///> Mathematical model for intenal forces
-    std::shared_ptr<TimeIntegrator> m_timeIntegrator; ///> Time integrator
+    T m_displacement;
+    T m_velocity;
 };
 
 }
 
-#endif // ifndef imstkDeformableBodyModel_h
+#endif // ifndef imstkKinematicState_h
