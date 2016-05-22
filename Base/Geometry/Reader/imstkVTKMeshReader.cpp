@@ -34,36 +34,36 @@
 
 namespace imstk {
 std::shared_ptr<Mesh>
-VTKMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
+VTKMeshReader::read(const std::string& filePath, MeshFileType meshType)
 {
     switch (meshType)
     {
-    case MeshReader::FileType::VTK :
+    case MeshFileType::VTK :
     {
         return VTKMeshReader::readVtkGenericFormatData<vtkGenericDataObjectReader>(filePath);
         break;
     }
-    case MeshReader::FileType::VTU :
+    case MeshFileType::VTU :
     {
         return VTKMeshReader::readVtkUnstructuredGrid<vtkXMLUnstructuredGridReader>(filePath);
         break;
     }
-    case MeshReader::FileType::VTP :
+    case MeshFileType::VTP :
     {
         return VTKMeshReader::readVtkPolyData<vtkXMLPolyDataReader>(filePath);
         break;
     }
-    case MeshReader::FileType::STL :
+    case MeshFileType::STL :
     {
         return VTKMeshReader::readVtkPolyData<vtkSTLReader>(filePath);
         break;
     }
-    case MeshReader::FileType::PLY :
+    case MeshFileType::PLY :
     {
         return VTKMeshReader::readVtkPolyData<vtkPLYReader>(filePath);
         break;
     }
-    case MeshReader::FileType::OBJ :
+    case MeshFileType::OBJ :
     {
         return VTKMeshReader::readVtkPolyData<vtkOBJReader>(filePath);
         break;

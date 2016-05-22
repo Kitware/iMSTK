@@ -26,7 +26,9 @@
 #include <thread>
 #include <atomic>
 
-namespace imstk {
+namespace imstk 
+{
+
 enum class ModuleStatus
 {
     STARTING,

@@ -21,9 +21,9 @@
 
 #include "imstkSceneObject.h"
 
-#include "imstkGeometry.h"
+namespace imstk
+{
 
-namespace imstk {
 std::shared_ptr<Geometry>
 SceneObject::getVisualGeometry() const
 {
@@ -36,14 +36,14 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     m_visualGeometry = geometry;
 }
 
-const SceneObject::Type&
+const SceneObjectType&
 SceneObject::getType() const
 {
     return m_type;
 }
 
 void
-SceneObject::setType(Type type)
+SceneObject::setType(SceneObjectType type)
 {
     m_type = type;
 }
@@ -55,8 +55,32 @@ SceneObject::getName() const
 }
 
 void
-SceneObject::setName(std::string name)
+SceneObject::setName(const std::string& name)
 {
     m_name = name;
+}
+
+std::shared_ptr<Geometry>
+SceneObject::getCollidingGeometry() const
+{
+    return m_collidingGeometry;
+}
+
+void
+SceneObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
+{
+    m_collidingGeometry = geometry;
+}
+
+std::shared_ptr<GeometryMap>
+SceneObject::getCollidingToVisualMap() const
+{
+    return m_collidingToVisualMap;
+}
+
+void
+SceneObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
+{
+    m_collidingToVisualMap = map;
 }
 }

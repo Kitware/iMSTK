@@ -33,9 +33,9 @@
 
 namespace imstk{
 std::shared_ptr<VolumetricMesh>
-VegaMeshReader::read(const std::string& filePath, MeshReader::FileType meshType)
+VegaMeshReader::read(const std::string& filePath, MeshFileType meshType)
 {
-    if (meshType != MeshReader::FileType::VEG)
+    if (meshType != MeshFileType::VEG)
     {
         LOG(WARNING) << "VegaMeshReader::read error: file type not supported";
         return nullptr;

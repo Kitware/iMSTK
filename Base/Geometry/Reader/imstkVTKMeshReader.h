@@ -52,7 +52,7 @@ public:
     ///
     /// \brief
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshReader::FileType meshType);
+    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType);
 
 protected:
 

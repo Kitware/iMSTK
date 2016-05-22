@@ -29,6 +29,11 @@
 
 namespace imstk {
 
+///
+/// \class TrackingController
+///
+/// \brief This class reports external device's position and orientation with a given offset
+///
 class TrackingController
 {
 public:
@@ -43,6 +48,9 @@ public:
         rotZ   = 0x20
     };
 
+    ///
+    /// \brief Destructor
+    ///
     ~TrackingController() = default;
 
     ///
@@ -81,7 +89,9 @@ public:
     void setInversionFlags(unsigned char f);
 
 protected:
-
+    ///
+    /// \brief Constructor
+    ///
     TrackingController(std::shared_ptr<DeviceClient> deviceClient = nullptr, double scaling = 1.0) :
         m_deviceClient(deviceClient),
         m_scaling(scaling)

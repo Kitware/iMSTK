@@ -30,7 +30,9 @@
 #include "imstkMath.h"
 #include "imstkColor.h"
 
-namespace imstk {
+namespace imstk
+{
+
 enum class LightType
 {
     SCENE_LIGHT,

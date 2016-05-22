@@ -30,43 +30,45 @@
 
 namespace imstk {
 
+enum MeshFileType
+{
+    UNKNOWN,
+    VTK,
+    VTU,
+    VTP,
+    STL,
+    PLY,
+    OBJ,
+    VEG
+};
+
 ///
 /// \class MeshReader
 ///
-/// \brief
+/// \brief Mesh data reader
 ///
 class MeshReader
 {
 public:
 
-    enum FileType
-    {
-        UNKNOWN,
-        VTK,
-        VTU,
-        VTP,
-        STL,
-        PLY,
-        OBJ,
-        VEG
-    };
-
     MeshReader() = default;
     ~MeshReader() = default;
 
     ///
-    /// \brief read
+    /// \brief Read external file
     ///
     static std::shared_ptr<Mesh> read(const std::string& filePath);
 
     ///
-    /// \brief fileExists
+    /// \brief Returns true if the file exists, else false
     ///
     static bool fileExists(const std::string& file);
 
 protected:
-
-    static const FileType getFileType(const std::string& filePath);
+    ///
+    /// \brief Returns the type of the file
+    ///
+    static const MeshFileType getFileType(const std::string& filePath);
 
 };
 }

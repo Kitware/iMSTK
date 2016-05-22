@@ -64,7 +64,7 @@ TetraTriangleMap::compute()
 void
 TetraTriangleMap::apply()
 {
-    // Check Map active
+    // Check if map is active
     if (!m_isActive)
     {
         LOG(WARNING) << "TetraTriangle map is not active";

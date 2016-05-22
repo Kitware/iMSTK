@@ -32,7 +32,8 @@
 #include "imstkModule.h"
 #include "imstkVRPNDeviceClient.h"
 
-namespace imstk {
+namespace imstk 
+{
 
 enum class DeviceType
 {

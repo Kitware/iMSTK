@@ -25,7 +25,16 @@
 #include <array>
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
+enum class TimeIntegratorType
+{
+    forwardEuler,
+    backwardEuler,
+    newmarkBeta,
+    centralDifference
+};
 
 ///
 /// \class TimeIntegrator

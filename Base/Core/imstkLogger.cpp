@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk {
 stdSink::FG_Color

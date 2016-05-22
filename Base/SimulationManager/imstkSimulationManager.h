@@ -32,7 +32,7 @@
 #include "imstkDeviceClient.h"
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
-#include "imstkLogUtility.h"
+#include "imstkLogger.h"
 
 namespace imstk {
 using SimulationStatus = ModuleStatus;

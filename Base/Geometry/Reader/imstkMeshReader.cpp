@@ -38,18 +38,18 @@ MeshReader::read(const std::string& filePath)
         return nullptr;
     }
 
-    FileType meshType = MeshReader::getFileType(filePath);
+    MeshFileType meshType = MeshReader::getFileType(filePath);
     switch (meshType)
     {
-    case FileType::VTK :
-    case FileType::VTU :
-    case FileType::VTP :
-    case FileType::STL :
-    case FileType::PLY :
-    case FileType::OBJ :
+    case MeshFileType::VTK :
+    case MeshFileType::VTU :
+    case MeshFileType::VTP :
+    case MeshFileType::STL :
+    case MeshFileType::PLY :
+    case MeshFileType::OBJ :
         return VTKMeshReader::read(filePath, meshType);
         break;
-    case FileType::VEG :
+    case MeshFileType::VEG :
         return VegaMeshReader::read(filePath, meshType);
         break;
     }
@@ -65,10 +65,10 @@ MeshReader::fileExists(const std::string& file)
     return (stat(file.c_str(), &buf) == 0);
 }
 
-const MeshReader::FileType
+const MeshFileType
 MeshReader::getFileType(const std::string& filePath)
 {
-    FileType meshType = FileType::UNKNOWN;
+    MeshFileType meshType = MeshFileType::UNKNOWN;
 
     std::string extString = filePath.substr(filePath.find_last_of(".") + 1);
     if (extString.empty())
@@ -79,31 +79,31 @@ MeshReader::getFileType(const std::string& filePath)
 
     if (extString == "vtk" || extString == "VTK")
     {
-        meshType = FileType::VTK;
+        meshType = MeshFileType::VTK;
     }
     else if (extString == "vtp" || extString == "VTP")
     {
-        meshType = FileType::VTP;
+        meshType = MeshFileType::VTP;
     }
     else if (extString == "vtu" || extString == "VTU")
     {
-        meshType = FileType::VTU;
+        meshType = MeshFileType::VTU;
     }
     else if (extString == "obj" || extString == "OBJ")
     {
-        meshType = FileType::OBJ;
+        meshType = MeshFileType::OBJ;
     }
     else if (extString == "stl" || extString == "STL")
     {
-        meshType = FileType::STL;
+        meshType = MeshFileType::STL;
     }
     else if (extString == "ply" || extString == "PLY")
     {
-        meshType = FileType::PLY;
+        meshType = MeshFileType::PLY;
     }
     else if (extString == "veg" || extString == "VEG")
     {
-        meshType = FileType::VEG;
+        meshType = MeshFileType::VEG;
     }
     else
     {

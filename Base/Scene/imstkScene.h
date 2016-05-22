@@ -30,7 +30,9 @@
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
 
-namespace imstk {
+namespace imstk
+{
+
 class Scene
 {
     template<class T>
