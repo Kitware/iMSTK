@@ -21,46 +21,48 @@ limitations under the License.
 
 #include "imstkTimeIntegrator.h"
 
+#include <g3log/g3log.hpp>
+
 namespace imstk {
 
-TimeIntegrator::TimeIntegrator(const timeIntegratorType type)
+TimeIntegrator::TimeIntegrator(const Type type)
 {
     this->setType(type);
 }
 
 void
-TimeIntegrator::setType(const timeIntegratorType type)
+TimeIntegrator::setType(const Type type)
 {
-    this->m_type = type;
+    m_type = type;
     this->setCoefficients(type);
 }
 
-const Type&
+const TimeIntegrator::Type&
 TimeIntegrator::getType() const
 {
     return m_type;
 }
 
 void
-TimeIntegrator::setCoefficients(const timeIntegratorType type)
+TimeIntegrator::setCoefficients(const Type type)
 {
-    switch (type) {
-    case timeIntegratorType::backwardEuler:
+    switch (type)
+    {
+    case Type::BackwardEuler:
         m_alpha = {1, 0, 0};
         m_beta = {1, -1, 0};
         m_gamma = {1, -2, -1};
         break;
 
-    case timeIntegratorType::forwardEuler:
-    case timeIntegratorType::newmarkBeta:
-    case timeIntegratorType::centralDifference:
-        LOG(WARNING) << "Type of the time integrator not supported!";
+    case Type::ForwardEuler:
+    case Type::NewmarkBeta:
+    case Type::CentralDifference:
+        LOG(WARNING) << "TimeIntegrator::setCoefficients error: type of the time integrator not supported.";
         break;
 
     default:
-        LOG(WARNING) << "Type of the time integrator not identified!";
+        LOG(WARNING) << "TimeIntegrator::setCoefficients error: type of the time integrator not identified!";
         break;
     }
 }
-
 }

@@ -22,6 +22,8 @@
 #ifndef imstkTimeIntegrator_h
 #define imstkTimeIntegrator_h
 
+#include <array>
+
 namespace imstk {
 
 ///
@@ -34,19 +36,19 @@ namespace imstk {
 ///
 class TimeIntegrator
 {
-    enum class timeIntegratorType
+    enum class Type
     {
-        forwardEuler,
-        backwardEuler,
-        newmarkBeta,
-        centralDifference
+        ForwardEuler,
+        BackwardEuler,
+        NewmarkBeta,
+        CentralDifference
     };
 
 public:
     ///
     /// \brief Constructor
     ///
-    TimeIntegrator(const timeIntegratorType type);
+    TimeIntegrator(const Type type);
 
     ///
     /// \brief Destructor
@@ -56,21 +58,21 @@ public:
     ///
     /// \brief Set/Get type of the time integrator
     ///
-    void setType(const timeIntegratorType type);
+    void setType(const Type type);
     const Type& getType() const;
 
     ///
     /// \brief Set coefficients for a given time integrator type
     ///
-    void setCoefficients(const timeIntegratorType type);
+    void setCoefficients(const Type type);
 
 protected:
-    timeIntegratorType m_type; ///> Type of the time integrator
+    Type m_type; ///> Type of the time integrator
 
     // Coefficients of the time integrator
-    double m_alpha[3];
-    double m_gamma[3];
-    double m_beta[3];
+    std::array<double,3> m_alpha;
+    std::array<double,3> m_gamma;
+    std::array<double,3> m_beta;
 };
 
 }
