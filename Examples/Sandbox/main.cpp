@@ -32,8 +32,14 @@
 #include "imstkVRPNDeviceServer.h"
 #include "imstkCameraController.h"
 
+// Collisions
+#include "imstkInteractionPair.h"
+
 #include "g3log/g3log.hpp"
 
+using namespace imstk;
+
+void testInteractionPair();
 void testTwoFalcons();
 void testObjectController();
 void testCameraController();
@@ -53,7 +59,8 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testTwoFalcons();
+    testInteractionPair();
+    //testTwoFalcons();
     //testObjectController();
     //testCameraController();
     //testViewer();
@@ -67,6 +74,48 @@ int main()
     //testSurfaceMeshOptimizer();
 
     return 0;
+}
+
+void testInteractionPair()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("InteractionPairTest");
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    server->addDevice("device", imstk::DeviceType::NOVINT_FALCON);
+    sdk->addDeviceServer(server);
+
+    // Falcon clients
+    auto client = std::make_shared<imstk::VRPNDeviceClient>("device", "localhost");
+    sdk->addDeviceClient(client);
+
+    // Plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(5);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Sphere
+    auto sphereGeom = std::make_shared<Sphere>();
+    sphereGeom->scale(0.2);
+    auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("Sphere", client, 30);
+    sphereObj->setVisualGeometry(sphereGeom);
+    sphereObj->setCollidingGeometry(sphereGeom);
+    scene->addSceneObject(sphereObj);
+
+    // Interaction
+    auto pair = std::make_shared<InteractionPair>(planeObj, sphereObj,
+                                                  CollisionDetection::Type::PlaneToMesh,
+                                                  CollisionHandling::Type::None,
+                                                  CollisionHandling::Type::Penalty);
+
+    // Run
+    sdk->setCurrentScene("InteractionPairTest");
+    sdk->startSimulation(true);
 }
 
 void testTwoFalcons()

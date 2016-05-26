@@ -2,13 +2,11 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SimulationManager
+imstk_add_library( Collision
   DEPENDS
-    Rendering
-    Devices
-    Collision
+    Scene
   )
-  
+
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
