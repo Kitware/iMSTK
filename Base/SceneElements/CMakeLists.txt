@@ -2,11 +2,11 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
+imstk_add_library( SceneElements
   DEPENDS
     Core
-    SceneElements
-    Collision
+    Geometry
+    Devices
   )
 
 #-----------------------------------------------------------------------------
