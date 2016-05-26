@@ -70,7 +70,8 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
        CHA = CollisionHandling::make_collision_handling(CHAType, A);
        if (CHA == nullptr)
        {
-           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for object A.";
+           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
+                        << A->getName() << "' object.";
            return;
        }
     }
@@ -82,7 +83,8 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
        CHB = CollisionHandling::make_collision_handling(CHBType, B);
        if (CHB == nullptr)
        {
-           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for object B.";
+           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
+                        << B->getName() << "' object.";
            return;
        }
     }
@@ -139,6 +141,12 @@ const bool&
 InteractionPair::isValid()
 {
     return m_valid;
+}
+
+const InteractionPair::ObjectsPair&
+InteractionPair::getObjectsPair() const
+{
+    return m_objects;
 }
 
 }

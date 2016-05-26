@@ -71,6 +71,11 @@ public:
     ///
     const bool& isValid();
 
+    ///
+    /// \brief Returns objects pair
+    ///
+    const ObjectsPair& getObjectsPair() const;
+
 protected:
 
     ObjectsPair m_objects;                           //!< Colliding objects
