@@ -67,7 +67,7 @@ protected:
 
     std::shared_ptr<CameraController> m_cameraController;
 
-    Vec3d m_position = Vec3d(1,1,1);
+    Vec3d m_position = Vec3d(0,2,5);
     Vec3d m_focalPoint = WORLD_ORIGIN;
     Vec3d m_viewUp = UP_VECTOR;
     double m_viewAngle = 60;
