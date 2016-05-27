@@ -21,6 +21,11 @@
 
 #include "imstkCollisionDetection.h"
 
+#include "imstkPlaneToSphereCD.h"
+
+#include "imstkCollidingObject.h"
+#include "imstkGeometry.h"
+
 #include <g3log/g3log.hpp>
 
 namespace imstk {
@@ -30,8 +35,31 @@ CollisionDetection::make_collision_detection(const Type& type,
                                              std::shared_ptr<CollidingObject> objA,
                                              std::shared_ptr<CollidingObject> objB)
 {
-    LOG(WARNING) << "CollisionDetection::make_collision_detection not implemented.";
-    return nullptr;
+    switch (type)
+    {
+    case Type::PlaneToSphere:
+    {
+        if (objA->getCollidingGeometry()->getType() != Geometry::Type::Plane ||
+            objB->getCollidingGeometry()->getType() != Geometry::Type::Sphere)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                         << "invalid object geometries for PlaneToSphere collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<PlaneToSphereCD>();
+    }break;
+    default:
+    {
+        LOG(WARNING) << "CollisionDetection::make_collision_detection error: type not implemented.";
+        return nullptr;
+    }
+    }
+
 }
 
+const CollisionDetection::Type&
+CollisionDetection::getType() const
+{
+    return m_type;
+}
 }

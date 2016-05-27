@@ -26,10 +26,17 @@
 
 namespace imstk {
 
-struct VertexNormalCollisionData
+struct PositionDirectionCollisionData
+{
+    Vec3d position;
+    Vec3d direction;
+    double penetrationDepth;
+};
+
+struct VertexDirectionCollisionData
 {
     size_t vertexId;
-    Vec3d normal;
+    Vec3d direction;
     double penetrationDepth;
 };
 
@@ -49,9 +56,10 @@ struct EdgeEdgeCollisionData
 
 struct CollisionData
 {
-    std::vector<VertexNormalCollisionData> VNColData;   //!< Vertex Normal collision data
-    std::vector<VertexTriangleCollisionData> VTColData; //!< Vertex Triangle collision data
-    std::vector<EdgeEdgeCollisionData> EEColData;       //!< Edge Edge collision data
+    std::vector<PositionDirectionCollisionData> PDColData; //!< Position Direction collision data
+    std::vector<VertexDirectionCollisionData> VDColData;   //!< Vertex Direction collision data
+    std::vector<VertexTriangleCollisionData> VTColData;    //!< Vertex Triangle collision data
+    std::vector<EdgeEdgeCollisionData> EEColData;          //!< Edge Edge collision data
 };
 }
 
