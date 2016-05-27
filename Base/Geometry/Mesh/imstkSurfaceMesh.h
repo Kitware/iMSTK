@@ -42,7 +42,7 @@ public:
     using TriangleArray = std::array<size_t, 3>;
     using NeighborsType = std::set<size_t>;
 
-    SurfaceMesh() : Mesh(GeometryType::SurfaceMesh) {}
+    SurfaceMesh() : Mesh(Geometry::Type::SurfaceMesh) {}
 
     ~SurfaceMesh() = default;
 

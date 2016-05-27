@@ -37,7 +37,7 @@ class IsometricMap : public GeometryMap
 public:
 
     IsometricMap() :
-        GeometryMap(GeometryMapType::Isometric),
+        GeometryMap(GeometryMap::Type::Isometric),
         m_rigidTransform(RigidTransform3d::Identity())
     {}
 

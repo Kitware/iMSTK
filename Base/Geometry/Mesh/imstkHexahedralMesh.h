@@ -39,7 +39,7 @@ public:
 
     using HexaArray = std::array<size_t, 8>;
 
-    HexahedralMesh() : VolumetricMesh(GeometryType::HexahedralMesh) {}
+    HexahedralMesh() : VolumetricMesh(Geometry::Type::HexahedralMesh) {}
 
     ~HexahedralMesh() = default;
 

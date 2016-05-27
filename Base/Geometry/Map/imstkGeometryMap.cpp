@@ -47,28 +47,28 @@ GeometryMap::isActive() const
     return m_isActive;
 }
 
-const
-GeometryMapType& GeometryMap::getType() const
+const GeometryMap::Type&
+GeometryMap::getType() const
 {
     return m_type;
 }
 
-const
-std::string GeometryMap::getTypeName() const
+const std::string
+GeometryMap::getTypeName() const
 {
     switch (m_type)
     {
-        case GeometryMapType::Isometric:
+        case Type::Isometric:
             return "Isometric map";
-        case GeometryMapType::Identity:
+        case Type::Identity:
             return "Identity map";
-        case GeometryMapType::TetraTriangle:
+        case Type::TetraTriangle:
             return "Tetra-Triangle map";
-        case GeometryMapType::HexaTriangle:
+        case Type::HexaTriangle:
             return "Hexa-Triangle map";
-        case GeometryMapType::TetraTetra:
+        case Type::TetraTetra:
             return "Tetra-Tetra map";
-        case GeometryMapType::OneToOne:
+        case Type::OneToOne:
             return "One-to-One nodal map";
         default:
             return "Map type not determined!";

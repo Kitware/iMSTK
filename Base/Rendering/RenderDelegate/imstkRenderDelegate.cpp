@@ -44,32 +44,32 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 {
     switch (geom->getType())
     {
-    case GeometryType::Plane:
+    case Geometry::Type::Plane:
     {
         auto plane = std::dynamic_pointer_cast<Plane>(geom);
         return std::make_shared<PlaneRenderDelegate>(plane);
     }
-    case GeometryType::Sphere:
+    case Geometry::Type::Sphere:
     {
         auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
         return std::make_shared<SphereRenderDelegate>(sphere);
     }
-    case GeometryType::Cube:
+    case Geometry::Type::Cube:
     {
         auto cube = std::dynamic_pointer_cast<Cube>(geom);
         return std::make_shared<CubeRenderDelegate>(cube);
     }
-    case GeometryType::SurfaceMesh:
+    case Geometry::Type::SurfaceMesh:
     {
         auto surface = std::dynamic_pointer_cast<SurfaceMesh>(geom);
         return std::make_shared<SurfaceMeshRenderDelegate>(surface);
     }
-    case GeometryType::TetrahedralMesh:
+    case Geometry::Type::TetrahedralMesh:
     {
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
         return std::make_shared<TetrahedralMeshRenderDelegate>(mesh);
     }
-    case GeometryType::HexahedralMesh:
+    case Geometry::Type::HexahedralMesh:
     {
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
         LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";

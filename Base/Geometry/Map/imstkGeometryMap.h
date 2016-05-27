@@ -30,16 +30,6 @@
 
 namespace imstk {
 
-enum class GeometryMapType
-{
-    Isometric,
-    Identity,
-    OneToOne,
-    TetraTriangle,
-    HexaTriangle,
-    TetraTetra
-};
-
 ///
 /// \class GeometryMap
 ///
@@ -49,6 +39,19 @@ class GeometryMap
 {
 public:
 
+    enum class Type
+    {
+        Isometric,
+        Identity,
+        OneToOne,
+        TetraTriangle,
+        HexaTriangle,
+        TetraTetra
+    };
+
+    ///
+    /// \brief Destructor
+    ///
     ~GeometryMap() = default;
 
     ///
@@ -91,7 +94,7 @@ public:
     ///
     /// \brief Returns the type of the map
     ///
-    const GeometryMapType& getType() const;
+    const Type &getType() const;
 
     ///
     /// \brief Returns the string representing the type name of the map
@@ -112,9 +115,12 @@ public:
 
 protected:
 
-    GeometryMap(GeometryMapType type) : m_type(type), m_isActive(true) {}
+    ///
+    /// \brief Constructor
+    ///
+    GeometryMap(Type type) : m_type(type), m_isActive(true) {}
 
-    GeometryMapType m_type; ///> type of the map
+    Type m_type; ///> type of the map
 
     bool m_isActive; ///> true if the map us active at runtime
 

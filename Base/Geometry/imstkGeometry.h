@@ -26,15 +26,6 @@
 #include "imstkMath.h"
 
 namespace imstk {
-enum class GeometryType
-{
-    Plane,
-    Sphere,
-    Cube,
-    SurfaceMesh,
-    TetrahedralMesh,
-    HexahedralMesh
-};
 
 ///
 /// \class Geometry
@@ -44,7 +35,19 @@ enum class GeometryType
 class Geometry
 {
 public:
+    enum class Type
+    {
+        Plane,
+        Sphere,
+        Cube,
+        SurfaceMesh,
+        TetrahedralMesh,
+        HexahedralMesh
+    };
 
+    ///
+    /// \brief Destructor
+    ///
     virtual ~Geometry() {}
 
     ///
@@ -116,7 +119,7 @@ public:
     ///
     /// \brief Returns the type of the geometry
     ///
-    const GeometryType& getType() const;
+    const Type& getType() const;
 
     ///
     /// \brief Returns the string representing the type name of the geometry
@@ -124,14 +127,17 @@ public:
     const std::string getTypeName() const;
 protected:
 
-    Geometry(GeometryType type,
+    ///
+    /// \brief Constructor
+    ///
+    Geometry(Type type,
              const Vec3d& position = WORLD_ORIGIN,
              const Quatd& orientation = Quatd::Identity()) :
         m_type(type),
         m_position(position),
         m_orientation(orientation){}
 
-    GeometryType m_type; ///> Geometry type
+    Type m_type; ///> Geometry type
     Vec3d  m_position; ///> position
     Quatd  m_orientation; ///> orientation
     double m_scaling = 1; ///> Scaling

@@ -57,7 +57,7 @@ public:
 
 protected:
 
-    VolumetricMesh(GeometryType type) : Mesh(type) {}
+    VolumetricMesh(Geometry::Type type) : Mesh(type) {}
 
     std::shared_ptr<SurfaceMesh> m_attachedSurfaceMesh; ///> Attached surface mesh
 

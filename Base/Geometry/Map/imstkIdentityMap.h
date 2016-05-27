@@ -35,7 +35,7 @@ class IdentityMap : public GeometryMap
 {
 public:
 
-    IdentityMap() : GeometryMap(GeometryMapType::Identity) {}
+    IdentityMap() : GeometryMap(GeometryMap::Type::Identity) {}
 
     ~IdentityMap() = default;
 

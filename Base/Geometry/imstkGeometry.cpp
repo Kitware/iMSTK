@@ -80,9 +80,9 @@ Geometry::transform(const RigidTransform3d& transform)
 bool
 Geometry::isMesh() const
 {
-    return (this->m_type == GeometryType::HexahedralMesh ||
-            this->m_type == GeometryType::SurfaceMesh ||
-            this->m_type == GeometryType::TetrahedralMesh) ? true : false;
+    return (this->m_type == Type::HexahedralMesh ||
+            this->m_type == Type::SurfaceMesh ||
+            this->m_type == Type::TetrahedralMesh) ? true : false;
 }
 
 const Vec3d&
@@ -141,7 +141,7 @@ Geometry::setScaling(const double& scaling)
     m_scaling = scaling;
 }
 
-const GeometryType&
+const Geometry::Type&
 Geometry::getType() const
 {
     return m_type;
@@ -152,17 +152,17 @@ Geometry::getTypeName() const
 {
     switch (m_type)
     {
-    case GeometryType::Cube:
+    case Type::Cube:
         return "Cube";
-    case GeometryType::Plane:
+    case Type::Plane:
         return "Plane";
-    case GeometryType::Sphere:
+    case Type::Sphere:
         return "Sphere";
-    case GeometryType::SurfaceMesh:
+    case Type::SurfaceMesh:
         return "Surface triangular mesh";
-    case GeometryType::TetrahedralMesh:
+    case Type::TetrahedralMesh:
         return "Tetrahedral mesh";
-    case GeometryType::HexahedralMesh:
+    case Type::HexahedralMesh:
         return "Hexahedral Mesh";
     default:
         return "Mesh type not determined!";

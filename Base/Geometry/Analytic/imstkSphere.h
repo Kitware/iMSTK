@@ -37,7 +37,7 @@ public:
 
     Sphere(const Vec3d & position = WORLD_ORIGIN,
            const double& radius = 1) :
-        Geometry(GeometryType::Sphere,
+        Geometry(Geometry::Type::Sphere,
                  position,
                  Quatd::Identity()),
         m_radius(radius)

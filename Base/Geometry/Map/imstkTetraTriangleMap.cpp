@@ -136,7 +136,7 @@ TetraTriangleMap::isValid() const
 void
 TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
 {
-    if (master->getType() != GeometryType::TetrahedralMesh)
+    if (master->getType() != Geometry::Type::TetrahedralMesh)
     {
         LOG(WARNING) << "The geometry provided as master is not of tetrahedral type";
         return;
@@ -147,7 +147,7 @@ TetraTriangleMap::setMaster(std::shared_ptr<Geometry> master)
 void
 TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
 {
-    if (slave->getType() != GeometryType::SurfaceMesh)
+    if (slave->getType() != Geometry::Type::SurfaceMesh)
     {
         LOG(WARNING) << "The geometry provided as slave is not of triangular type (surface)";
         return;
