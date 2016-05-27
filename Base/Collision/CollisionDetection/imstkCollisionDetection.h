@@ -24,9 +24,6 @@
 
 #include <memory>
 
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-
 namespace imstk {
 
 class CollidingObject;
@@ -38,10 +35,7 @@ public:
 
     enum class Type
     {
-        PlaneToMesh,
-        CubeToMesh,
-        SphereToMesh,
-        MeshToMesh
+        PlaneToSphere
     };
 
     ///

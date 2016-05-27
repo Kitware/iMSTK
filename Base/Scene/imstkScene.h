@@ -28,6 +28,7 @@
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
+#include "imstkCollisionGraph.h"
 
 namespace imstk {
 class Scene
@@ -56,6 +57,7 @@ public:
     const std::string& getName() const;
 
     std::shared_ptr<Camera> getCamera() const;
+    std::shared_ptr<CollisionGraph> getCollisionGraph() const;
 
 protected:
 
@@ -63,6 +65,7 @@ protected:
     NamedMap<SceneObject> m_sceneObjectsMap;
     NamedMap<Light> m_lightsMap;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
+    std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
 };
 }
 

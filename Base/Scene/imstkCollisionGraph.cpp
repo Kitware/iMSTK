@@ -39,6 +39,26 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
                      << A->getName() << " & " << B->getName() << ".";
         return nullptr;
     }
+
+    // Create interaction pair
+    auto intPair = std::make_shared<InteractionPair>(A, B, CDType, CHAType, CHBType);
+
+    // Check validity
+    if (!intPair->isValid())
+    {
+        LOG(WARNING) << "CollisionGraph::addInteractionPair error: could not create interaction for "
+                     << A->getName() << " & " << B->getName() << " with those parameters.";
+        intPair.reset();
+        return nullptr;
+    }
+
+    // Populate book-keeping
+    m_interactionPairList.push_back(intPair);
+    m_interactionPairMap[A].push_back(intPair);
+    m_interactionPairMap[B].push_back(intPair);
+
+    // Return interaction pair
+    return intPair;
 }
 
 bool

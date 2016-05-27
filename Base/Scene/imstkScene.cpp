@@ -165,4 +165,9 @@ Scene::getCamera() const
 {
     return m_camera;
 }
+std::shared_ptr<CollisionGraph>
+Scene::getCollisionGraph() const
+{
+    return m_collisionGraph;
+}
 }

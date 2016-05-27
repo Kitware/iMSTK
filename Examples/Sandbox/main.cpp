@@ -107,11 +107,12 @@ void testInteractionPair()
     sphereObj->setCollidingGeometry(sphereGeom);
     scene->addSceneObject(sphereObj);
 
-    // Interaction
-    auto pair = std::make_shared<InteractionPair>(planeObj, sphereObj,
-                                                  CollisionDetection::Type::PlaneToMesh,
-                                                  CollisionHandling::Type::None,
-                                                  CollisionHandling::Type::Penalty);
+    // Collisions
+    auto colGraph = scene->getCollisionGraph();
+    colGraph->addInteractionPair(planeObj, sphereObj,
+                                 CollisionDetection::Type::PlaneToSphere,
+                                 CollisionHandling::Type::None,
+                                 CollisionHandling::Type::Penalty);
 
     // Run
     sdk->setCurrentScene("InteractionPairTest");
