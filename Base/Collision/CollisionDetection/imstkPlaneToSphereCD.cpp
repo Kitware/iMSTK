@@ -48,7 +48,7 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
 
     // Get geometry properties
     Vec3d sP = sphereGeom->getPosition();
-    double r = sphereGeom->getRadius();
+    double r = sphereGeom->getRadius() * sphereGeom->getScaling();
     Vec3d pP = planeGeom->getPosition();
     Vec3d n = planeGeom->getNormal();
 
@@ -65,7 +65,7 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
 
     // Return if no penetration
     double penetrationDepth = r-d;
-    if ( penetrationDepth < 0)
+    if ( penetrationDepth <= 0)
     {
         return;
     }
@@ -75,15 +75,8 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
     Vec3d sC = sP + dir*r;
 
     // Set collisionData
-    PositionDirectionCollisionData cdA = {pC, -dir, penetrationDepth};
-    PositionDirectionCollisionData cdB = {sC, dir, penetrationDepth};
     colDataA.PDColData.push_back({pC, dir, penetrationDepth});
-    colDataB.PDColData.push_back(cdB);
-
-    LOG(DEBUG) << "Collision between "
-               << objA->getName() << " & " << objB->getName()
-               << " : " << penetrationDepth;
-
+    colDataB.PDColData.push_back({sC, dir, penetrationDepth});
 }
 
 }

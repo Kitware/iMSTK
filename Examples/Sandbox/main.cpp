@@ -101,7 +101,8 @@ void testInteractionPair()
 
     // Sphere
     auto sphereGeom = std::make_shared<Sphere>();
-    sphereGeom->scale(0.2);
+    sphereGeom->scale(0.5);
+    sphereGeom->translate(Vec3d(0, 0.3, 0));
     auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("Sphere", client, 30);
     sphereObj->setVisualGeometry(sphereGeom);
     sphereObj->setCollidingGeometry(sphereGeom);
