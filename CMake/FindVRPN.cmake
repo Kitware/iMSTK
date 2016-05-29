@@ -77,14 +77,18 @@ find_library(LIBUSB1_LIBRARY
   )
 mark_as_advanced(LIBUSB1_LIBRARY)
 
-#windows only, libusb1 sounds enough on unix, check vrpn/submodules/hidapi.cmake
+#check vrpn/submodules/hidapi.cmake
 if(WIN32)
   find_library(HIDAPI_LIBRARY
     NAMES
       setupapi
     )
-  mark_as_advanced(HIDAPI_LIBRARY)
+elseif(APPLE)
+  find_library(MACHID_CoreFoundation_LIBRARY CoreFoundation)
+  find_library(MACHID_IOKit_LIBRARY IOKit)
+  set(HIDAPI_LIBRARY ${MACHID_CoreFoundation_LIBRARY} ${MACHID_IOKit_LIBRARY})
 endif()
+mark_as_advanced(HIDAPI_LIBRARY)
 
 #-----------------------------------------------------------------------------
 # Set up libraries
