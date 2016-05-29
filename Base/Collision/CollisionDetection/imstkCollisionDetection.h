@@ -35,7 +35,8 @@ public:
 
     enum class Type
     {
-        PlaneToSphere
+        PlaneToSphere,
+        SphereToSphere
     };
 
     ///
