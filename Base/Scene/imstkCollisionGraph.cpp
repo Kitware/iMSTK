@@ -123,4 +123,15 @@ CollisionGraph::getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
     return nullptr;
 }
 
+const std::vector<std::shared_ptr<InteractionPair>>&
+CollisionGraph::getInteractionPairList() const
+{
+    return m_interactionPairList;
+}
+
+const std::unordered_map<std::shared_ptr<CollidingObject>, std::vector<std::shared_ptr<InteractionPair>>>&
+CollisionGraph::getInteractionPairMap() const
+{
+    return m_interactionPairMap;
+}
 }

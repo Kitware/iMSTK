@@ -64,6 +64,18 @@ public:
     ///
     InteractionPairPtr getInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B);
 
+    ///
+    /// \brief Returns a vector of all interaction pairs in the collision graph
+    ///
+    const std::vector<InteractionPairPtr>& getInteractionPairList() const;
+
+    ///
+    /// \brief Returns a map of all interaction pairs per object
+    ///
+    const std::unordered_map<
+      CollidingObjectPtr,
+      std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
+
 protected:
 
     std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
