@@ -60,11 +60,11 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
     double d = (sP-pP).dot(n);
 
     // Define sphere to plane direction
-    Vec3d dir = -n;
+    Vec3d dirBToA = -n;
     if( d < 0 )
     {
         d = -d;
-        dir = n;
+        dirBToA = n;
     }
 
     // Return if no penetration
@@ -75,12 +75,12 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
     }
 
     // Compute collision points
-    Vec3d pC = sP + dir*d;
-    Vec3d sC = sP + dir*r;
+    Vec3d pC = sP + dirBToA*d;
+    Vec3d sC = sP + dirBToA*r;
 
     // Set collisionData
-    colDataA.PDColData.push_back({pC, dir, penetrationDepth});
-    colDataB.PDColData.push_back({sC, dir, penetrationDepth});
+    colDataA.PDColData.push_back({pC, dirBToA, penetrationDepth});
+    colDataB.PDColData.push_back({sC, -dirBToA, penetrationDepth});
 }
 
 }
