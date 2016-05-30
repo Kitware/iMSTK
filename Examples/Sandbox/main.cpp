@@ -89,11 +89,12 @@ void testInteractionPair()
 
     // Falcon clients
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device", "localhost");
+    client->setForceEnabled(true);
     sdk->addDeviceClient(client);
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
-    planeGeom->scale(5);
+    planeGeom->scale(10);
     auto planeObj = std::make_shared<CollidingObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);
@@ -102,16 +103,29 @@ void testInteractionPair()
     // Sphere
     auto sphereGeom = std::make_shared<Sphere>();
     sphereGeom->scale(0.5);
-    sphereGeom->translate(Vec3d(0, 0.3, 0));
-    auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("Sphere", client, 30);
+    sphereGeom->translate(Vec3d(-0.25,0.5,0));
+    auto sphereObj = std::make_shared<CollidingObject>("Sphere");
     sphereObj->setVisualGeometry(sphereGeom);
     sphereObj->setCollidingGeometry(sphereGeom);
     scene->addSceneObject(sphereObj);
 
+    // Tool
+    auto toolGeom = std::make_shared<Sphere>();
+    toolGeom->scale(0.5);
+    toolGeom->translate(Vec3d(1.0,1,0.5));
+    auto toolObj = std::make_shared<imstk::VirtualCouplingObject>("Tool", client, 50);
+    toolObj->setVisualGeometry(toolGeom);
+    toolObj->setCollidingGeometry(toolGeom);
+    scene->addSceneObject(toolObj);
+
     // Collisions
     auto colGraph = scene->getCollisionGraph();
-    colGraph->addInteractionPair(planeObj, sphereObj,
+    colGraph->addInteractionPair(planeObj, toolObj,
                                  CollisionDetection::Type::PlaneToSphere,
+                                 CollisionHandling::Type::None,
+                                 CollisionHandling::Type::Penalty);
+    colGraph->addInteractionPair(sphereObj, toolObj,
+                                 CollisionDetection::Type::SphereToSphere,
                                  CollisionHandling::Type::None,
                                  CollisionHandling::Type::Penalty);
 

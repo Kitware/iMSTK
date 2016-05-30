@@ -19,42 +19,41 @@
 
    =========================================================================*/
 
-#include "imstkCollisionHandling.h"
-
 #include "imstkPenaltyRigidCH.h"
+
+#include "imstkVirtualCouplingObject.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk {
 
-std::shared_ptr<CollisionHandling>
-CollisionHandling::make_collision_handling(const Type& type,
-                                           std::shared_ptr<CollidingObject> obj)
+void
+PenaltyRigidCH::computeContactForces(std::shared_ptr<CollidingObject> obj,
+                                     CollisionData& colData)
 {
-    switch (type)
+    auto movableObj = std::dynamic_pointer_cast<VirtualCouplingObject>(obj);
+    if(movableObj == nullptr)
     {
-    case Type::Penalty:
-    {
-        if (obj->getType() == SceneObject::Type::VirtualCoupling ||
-            obj->getType() == SceneObject::Type::Rigid)
-        {
-            return std::make_shared<PenaltyRigidCH>();
-        }
-        else
-        {
-            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                         << "penalty collision handling not yet implemented for non-rigid objects.";
-            return nullptr;
-        }
-
-    }break;
-
-    default:
-    {
-        LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";
-        return nullptr;
+        LOG(WARNING) << "PenaltyRigidCH::computeContactForces error: "
+                     << obj->getName() << " is not a virtualcoupling object. "
+                     << "(Rigid not yet supported, coming soon)";
+        return;
     }
+
+    // Get current force applied
+    Vec3d force = movableObj->getForce();
+
+    // If collision data, append forces
+    if(!colData.PDColData.empty())
+    {
+        for(const auto& cd : colData.PDColData)
+        {
+            force += cd.direction * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*5;
+        }
     }
+
+    // Update object force
+    movableObj->setForce(force);
 }
 
 }

@@ -19,61 +19,38 @@
 
    =========================================================================*/
 
-#ifndef imstkCollisionHandling_h
-#define imstkCollisionHandling_h
+#ifndef imstkPenaltyRigidCH_h
+#define imstkPenaltyRigidCH_h
 
 #include <memory>
 
+#include "imstkCollisionHandling.h"
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 
 namespace imstk {
 
-class InteractionPair;
-
-class CollisionHandling
+class PenaltyRigidCH : public CollisionHandling
 {
 public:
-
-    enum class Type
-    {
-        None,
-        Penalty
-    };
-
-    ///
-    /// \brief Static factory for collision handling sub classes
-    ///
-    static std::shared_ptr<CollisionHandling> make_collision_handling(
-            const Type& type,
-            std::shared_ptr<CollidingObject> obj);
 
     ///
     /// \brief Constructor
     ///
-    CollisionHandling(const Type& type) : m_type(type) {}
+    PenaltyRigidCH() : CollisionHandling(CollisionHandling::Type::Penalty) {}
 
     ///
     /// \brief Destructor
     ///
-    ~CollisionHandling() = default;
+    ~PenaltyRigidCH() = default;
 
     ///
     /// \brief Compute forces based on collision data (pure virtual)
     ///
     virtual void computeContactForces(std::shared_ptr<CollidingObject> obj,
-                                      CollisionData& colData) = 0;
-
-    ///
-    /// \brief Returns collision handling type
-    ///
-    const Type& getType() const;
-
-protected:
-
-    Type m_type; //!< Collision handling algorithm type
+                                      CollisionData& colData);
 
 };
 }
 
-#endif // ifndef imstkCollisionHandling_h
+#endif // ifndef imstkPenaltyRigidCH_h

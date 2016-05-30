@@ -64,6 +64,7 @@ void
 VirtualCouplingObject::applyForces()
 {
     m_deviceClient->setForce(m_force);
+    this->setForce(Vec3d::Zero());
 }
 
 const Vec3d&
