@@ -131,6 +131,11 @@ InteractionPair::computeContactForces(std::shared_ptr<CollidingObject> obj)
         return;
     }
 
+    if (obj->getType() == SceneObject::Type::Static)
+    {
+        return;
+    }
+
     m_colHandlingMap.at(obj)->computeContactForces(obj, m_colDataMap.at(obj));
 }
 
