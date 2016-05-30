@@ -45,6 +45,10 @@ SphereToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
         return;
     }
 
+    // Clear collisionData
+    colDataA.clearAll();
+    colDataB.clearAll();
+
     // Get geometry properties
     Vec3d sAP = sphereGeomA->getPosition();
     double rA = sphereGeomA->getRadius() * sphereGeomA->getScaling();

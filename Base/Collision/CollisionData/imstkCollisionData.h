@@ -54,8 +54,18 @@ struct EdgeEdgeCollisionData
     double shortestDistance;
 };
 
-struct CollisionData
+class CollisionData
 {
+public:
+
+    void clearAll()
+    {
+        PDColData.clear();
+        VDColData.clear();
+        VTColData.clear();
+        EEColData.clear();
+    }
+
     std::vector<PositionDirectionCollisionData> PDColData; //!< Position Direction collision data
     std::vector<VertexDirectionCollisionData> VDColData;   //!< Vertex Direction collision data
     std::vector<VertexTriangleCollisionData> VTColData;    //!< Vertex Triangle collision data

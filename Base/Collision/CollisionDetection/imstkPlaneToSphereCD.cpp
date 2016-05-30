@@ -46,6 +46,10 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
         return;
     }
 
+    // Clear collisionData
+    colDataA.clearAll();
+    colDataB.clearAll();
+
     // Get geometry properties
     Vec3d sP = sphereGeom->getPosition();
     double r = sphereGeom->getRadius() * sphereGeom->getScaling();
