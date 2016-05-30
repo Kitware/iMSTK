@@ -26,7 +26,6 @@
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
-#include "imstkContactForces.h"
 
 namespace imstk {
 
@@ -65,8 +64,7 @@ public:
     /// \brief Compute forces based on collision data (pure virtual)
     ///
     virtual void computeContactForces(std::shared_ptr<CollidingObject> obj,
-                                      CollisionData& colData,
-                                      ContactForces& contactForces) = 0;
+                                      CollisionData& colData) = 0;
 
     ///
     /// \brief Returns collision handling type

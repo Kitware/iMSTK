@@ -96,8 +96,6 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_colHandlingMap[B] = CHB;
     m_colDataMap[A] = CollisionData();
     m_colDataMap[B] = CollisionData();
-    m_contactForcesMap[A] = ContactForces();
-    m_contactForcesMap[B] = ContactForces();
     m_valid = true;
 
 }
@@ -133,8 +131,7 @@ InteractionPair::computeContactForces(std::shared_ptr<CollidingObject> obj)
         return;
     }
 
-    m_colHandlingMap.at(obj)->computeContactForces(obj, m_colDataMap.at(obj),
-                                                   m_contactForcesMap.at(obj));
+    m_colHandlingMap.at(obj)->computeContactForces(obj, m_colDataMap.at(obj));
 }
 
 const bool&

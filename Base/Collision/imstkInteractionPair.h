@@ -29,7 +29,6 @@
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionHandling.h"
-#include "imstkContactForces.h"
 
 namespace imstk {
 
@@ -38,7 +37,6 @@ class InteractionPair
     using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
     using CollisionDataMap = std::map<std::shared_ptr<CollidingObject>, CollisionData>;
     using CollisionHandlingMap = std::map<std::shared_ptr<CollidingObject>, std::shared_ptr<CollisionHandling>>;
-    using ContactForcesMap = std::map<std::shared_ptr<CollidingObject>, ContactForces>;
 
 public:
 
@@ -82,7 +80,6 @@ protected:
     std::shared_ptr<CollisionDetection> m_colDetect; //!< Collision detection algorithm
     CollisionDataMap m_colDataMap;                   //!< Map of collision data per colliding object
     CollisionHandlingMap m_colHandlingMap;           //!< Map of collision handling algorithm per colliding object
-    ContactForcesMap m_contactForcesMap;             //!< Map of contact forces per colliding object
 
     bool m_valid;
 };
