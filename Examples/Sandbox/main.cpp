@@ -39,7 +39,7 @@
 
 using namespace imstk;
 
-void testInteractionPair();
+void testPenaltyRigidCollision();
 void testTwoFalcons();
 void testObjectController();
 void testCameraController();
@@ -59,7 +59,7 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testInteractionPair();
+    testPenaltyRigidCollision();
     //testTwoFalcons();
     //testObjectController();
     //testCameraController();
@@ -76,7 +76,7 @@ int main()
     return 0;
 }
 
-void testInteractionPair()
+void testPenaltyRigidCollision()
 {
     // SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
@@ -84,13 +84,17 @@ void testInteractionPair()
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>();
-    server->addDevice("device", imstk::DeviceType::NOVINT_FALCON);
+    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON, 0);
+    server->addDevice("device1", imstk::DeviceType::NOVINT_FALCON, 1);
     sdk->addDeviceServer(server);
 
     // Falcon clients
-    auto client = std::make_shared<imstk::VRPNDeviceClient>("device", "localhost");
-    client->setForceEnabled(true);
-    sdk->addDeviceClient(client);
+    auto controller0 = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost");
+    auto controller1 = std::make_shared<imstk::VRPNDeviceClient>("device1", "localhost");
+    controller0->setForceEnabled(true);
+    controller1->setForceEnabled(true);
+    sdk->addDeviceClient(controller0);
+    sdk->addDeviceClient(controller1);
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
@@ -100,33 +104,37 @@ void testInteractionPair()
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
-    // Sphere
-    auto sphereGeom = std::make_shared<Sphere>();
-    sphereGeom->scale(0.5);
-    sphereGeom->translate(Vec3d(-0.25,0.5,0));
-    auto sphereObj = std::make_shared<CollidingObject>("Sphere");
-    sphereObj->setVisualGeometry(sphereGeom);
-    sphereObj->setCollidingGeometry(sphereGeom);
-    scene->addSceneObject(sphereObj);
+    // Sphere0
+    auto sphere0Geom = std::make_shared<Sphere>();
+    sphere0Geom->scale(0.5);
+    sphere0Geom->translate(Vec3d(1,0.5,0));
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", controller0, 40);
+    sphere0Obj->setVisualGeometry(sphere0Geom);
+    sphere0Obj->setCollidingGeometry(sphere0Geom);
+    scene->addSceneObject(sphere0Obj);
 
-    // Tool
-    auto toolGeom = std::make_shared<Sphere>();
-    toolGeom->scale(0.5);
-    toolGeom->translate(Vec3d(1.0,1,0.5));
-    auto toolObj = std::make_shared<imstk::VirtualCouplingObject>("Tool", client, 50);
-    toolObj->setVisualGeometry(toolGeom);
-    toolObj->setCollidingGeometry(toolGeom);
-    scene->addSceneObject(toolObj);
+    // Sphere1
+    auto sphere1Geom = std::make_shared<Sphere>();
+    sphere1Geom->scale(0.5);
+    sphere1Geom->translate(Vec3d(-1,0.5,0));
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", controller1, 40);
+    sphere1Obj->setVisualGeometry(sphere1Geom);
+    sphere1Obj->setCollidingGeometry(sphere1Geom);
+    scene->addSceneObject(sphere1Obj);
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
-    colGraph->addInteractionPair(planeObj, toolObj,
+    colGraph->addInteractionPair(planeObj, sphere0Obj,
                                  CollisionDetection::Type::PlaneToSphere,
                                  CollisionHandling::Type::None,
                                  CollisionHandling::Type::Penalty);
-    colGraph->addInteractionPair(sphereObj, toolObj,
-                                 CollisionDetection::Type::SphereToSphere,
+    colGraph->addInteractionPair(planeObj, sphere1Obj,
+                                 CollisionDetection::Type::PlaneToSphere,
                                  CollisionHandling::Type::None,
+                                 CollisionHandling::Type::Penalty);
+    colGraph->addInteractionPair(sphere0Obj, sphere1Obj,
+                                 CollisionDetection::Type::SphereToSphere,
+                                 CollisionHandling::Type::Penalty,
                                  CollisionHandling::Type::Penalty);
 
     // Run
