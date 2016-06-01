@@ -24,10 +24,4 @@
 namespace imstk
 {
 
-KinematicState::KinematicState(const T& u, const T& v)
-{
-    m_displacement = u;
-    m_velocity = v;
-}
-
 }

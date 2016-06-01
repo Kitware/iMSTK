@@ -30,15 +30,6 @@
 
 namespace imstk {
 
-enum class SceneObjectType
-{
-    Static,
-    Dynamic,
-    Rigid,
-    Deformable,
-    VirtualTool,
-};
-
 //class Geometry;
 //class GeometryMap;
 
@@ -51,6 +42,14 @@ enum class SceneObjectType
 class SceneObject
 {
 public:
+    enum class Type
+    {
+        Static,
+        Dynamic,
+        Rigid,
+        Deformable,
+        VirtualCoupling
+    };
 
     ///
     /// \brief Constructor
@@ -65,7 +64,7 @@ public:
     ///
     /// \brief Get the type of the object
     ///
-    const SceneObjectType& getType() const;
+    const Type& getType() const;
 
     ///
     /// \brief Get/Set the custom name of the scene object
@@ -95,9 +94,9 @@ protected:
     ///
     /// \brief Assigns the type of the object
     ///
-    void setType(SceneObjectType type);
+    void setType(Type type);
 
-    SceneObjectType m_type = SceneObjectType::Static; ///> Type of the scene object
+    Type m_type = Type::Static; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
 
     std::shared_ptr<Geometry> m_visualGeometry;          ///> Geometry for rendering

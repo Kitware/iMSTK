@@ -36,14 +36,14 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     m_visualGeometry = geometry;
 }
 
-const SceneObjectType&
+const SceneObject::Type&
 SceneObject::getType() const
 {
     return m_type;
 }
 
 void
-SceneObject::setType(SceneObjectType type)
+SceneObject::setType(SceneObject::Type type)
 {
     m_type = type;
 }

@@ -10,7 +10,7 @@
 
 // Objects
 #include "imstkSceneObject.h"
-#include "imstkVirtualToolObject.h"
+#include "imstkVirtualCouplingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 
@@ -253,7 +253,7 @@ void testTwoFalcons()
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
     sphere0Geom->setPosition(imstk::Vec3d(16,4.5,0));
     sphere0Geom->scale(1);
-    auto sphere0Obj = std::make_shared<imstk::VirtualToolObject>("Sphere0", falcon0, 30);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 30);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
@@ -262,7 +262,7 @@ void testTwoFalcons()
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
     sphere1Geom->setPosition(imstk::Vec3d(-16,4.5,0));
     sphere1Geom->scale(1);
-    auto sphere1Obj = std::make_shared<imstk::VirtualToolObject>("Sphere1", falcon1, 30);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 30);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);

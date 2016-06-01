@@ -27,7 +27,7 @@
 
 #include "imstkDynamicObject.h"
 #include "imstkDynamicalModel.h"
-#include "imstkTimeIntegrator.h"
+//#include "imstkTimeIntegrator.h"
 #include "imstkKinematicState.h"
 #include "imstkMath.h"
 
@@ -48,7 +48,7 @@ public:
     ///
     DeformableObject(std::string name) : DynamicObject(name)
     {
-        m_type = SceneObjectType::Deformable;
+        m_type = SceneObject::Type::Deformable;
     }
 
     ///
@@ -86,7 +86,7 @@ public:
     ///
     /// \brief Set the integration scheme used to solve the ODE system.
     ///
-    void setTimeIntegrator(TimeIntegratorType integrator);
+    //void setTimeIntegrator(TimeIntegrator::Type integrator);
 
 protected:
 

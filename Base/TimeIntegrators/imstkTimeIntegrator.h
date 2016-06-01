@@ -28,14 +28,6 @@
 namespace imstk
 {
 
-enum class TimeIntegratorType
-{
-    forwardEuler,
-    backwardEuler,
-    newmarkBeta,
-    centralDifference
-};
-
 ///
 /// \class TimeIntegrator
 ///
