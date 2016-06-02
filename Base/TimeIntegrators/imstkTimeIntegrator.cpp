@@ -25,13 +25,13 @@ limitations under the License.
 
 namespace imstk {
 
-TimeIntegrator::TimeIntegrator(const Type type)
+TimeIntegrator::TimeIntegrator(const TimeIntegrator::Type type)
 {
     this->setType(type);
 }
 
 void
-TimeIntegrator::setType(const Type type)
+TimeIntegrator::setType(const TimeIntegrator::Type type)
 {
     m_type = type;
     this->setCoefficients(type);
@@ -44,19 +44,19 @@ TimeIntegrator::getType() const
 }
 
 void
-TimeIntegrator::setCoefficients(const Type type)
+TimeIntegrator::setCoefficients(const TimeIntegrator::Type type)
 {
     switch (type)
     {
-    case Type::BackwardEuler:
+    case TimeIntegrator::Type::BackwardEuler:
         m_alpha = { { 1, 0, 0 } };
         m_beta = { { 1, -1, 0 } };
         m_gamma = { { 1, -2, -1 } };
         break;
 
-    case Type::ForwardEuler:
-    case Type::NewmarkBeta:
-    case Type::CentralDifference:
+    case TimeIntegrator::Type::ForwardEuler:
+    case TimeIntegrator::Type::NewmarkBeta:
+    case TimeIntegrator::Type::CentralDifference:
         LOG(WARNING) << "TimeIntegrator::setCoefficients error: type of the time integrator not supported.";
         break;
 

@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    TimeIntegrator(const Type type);
+    TimeIntegrator(const TimeIntegrator::Type type);
 
     ///
     /// \brief Destructor
@@ -60,16 +60,16 @@ public:
     ///
     /// \brief Set/Get type of the time integrator
     ///
-    void setType(const Type type);
+    void setType(const TimeIntegrator::Type type);
     const Type& getType() const;
 
     ///
     /// \brief Set coefficients for a given time integrator type
     ///
-    void setCoefficients(const Type type);
+    void setCoefficients(const TimeIntegrator::Type type);
 
 protected:
-    Type m_type; ///> Type of the time integrator
+    TimeIntegrator::Type m_type; ///> Type of the time integrator
 
     // Coefficients of the time integrator
     std::array<double,3> m_alpha;

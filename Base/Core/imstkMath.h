@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <Eigen/Geometry>
+#include <Eigen/Sparse>
 
 namespace imstk {
 
@@ -59,6 +60,9 @@ using Mat3d = Eigen::Matrix3d;
 // 4x4 Matrix
 using Mat4f = Eigen::Matrix4f;
 using Mat4d = Eigen::Matrix4d;
+
+// A dynamic size sparse matrix of doubles
+using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor > ;
 
 // Rigid transform (translation and rotation)
 using RigidTransform3f = Eigen::Isometry3f;
