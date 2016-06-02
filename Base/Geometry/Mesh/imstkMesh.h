@@ -116,7 +116,7 @@ public:
 
 protected:
 
-    Mesh(Geometry::Type type) : Geometry(type, WORLD_ORIGIN, Quatd()) {}
+    Mesh(Geometry::Type type) : Geometry(type) {}
 
     friend class SurfaceMeshRenderDelegate;
     friend class TetrahedralMeshRenderDelegate;
