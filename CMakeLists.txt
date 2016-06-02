@@ -89,6 +89,7 @@ endif()
 
 imstk_define_dependency(g3log)
 imstk_define_dependency(Eigen)
+imstk_define_dependency(SCCD)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
 imstk_define_dependency(VRPN)
@@ -125,6 +126,10 @@ include_directories( ${g3log_INCLUDE_DIR} )
 # Eigen
 find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
+
+# SCCD
+find_package( SCCD REQUIRED )
+include_directories( ${SCCD_INCLUDE_DIR} )
 
 # VegaFEM
 find_package( VegaFEM REQUIRED CONFIG )

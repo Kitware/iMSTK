@@ -23,6 +23,7 @@
 
 #include "imstkPlaneToSphereCD.h"
 #include "imstkSphereToSphereCD.h"
+#include "imstkMeshToMeshCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
@@ -59,6 +60,17 @@ CollisionDetection::make_collision_detection(const Type& type,
             return nullptr;
         }
         return std::make_shared<SphereToSphereCD>();
+    }break;
+    case Type::MeshToMesh:
+    {
+        if (objA->getCollidingGeometry()->getType() != Geometry::Type::SurfaceMesh ||
+            objB->getCollidingGeometry()->getType() != Geometry::Type::SurfaceMesh)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                         << "invalid object geometries for MeshToMesh collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToMeshCD>();
     }break;
     default:
     {
