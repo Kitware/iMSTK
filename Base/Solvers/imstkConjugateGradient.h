@@ -65,7 +65,7 @@ public:
     /// \brief Solve the linear system using Conjugate gradient iterations to a
     ///     specified tolerance.
     ///
-    void solve(Vectord& x, double tolerance);
+    void solve(Vectord& x, const double tolerance);
 
     ///
     /// \brief Return the error calculated by the solver.

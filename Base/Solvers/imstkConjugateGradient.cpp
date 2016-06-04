@@ -33,13 +33,11 @@ ConjugateGradient::ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs)
     cgSolver.compute(A);
 }
 
-
 void
 ConjugateGradient::iterate(Vectord& , bool)
 {
     // Nothing to do
 }
-
 
 void
 ConjugateGradient::solve(Vectord& x)
@@ -52,21 +50,11 @@ ConjugateGradient::solve(Vectord& x)
     x = cgSolver.solve(m_linearSystem->getRHSVector());
 }
 
-
-void
-ConjugateGradient::solve(Vectord& x, double tolerance)
-{
-    setTolerance(tolerance);
-    solve(x);
-}
-
-
 double
 ConjugateGradient::getResidual(const Vectord& )
 {
     return cgSolver.error();
 }
-
 
 void
 ConjugateGradient::setTolerance(const double epsilon)
@@ -75,7 +63,6 @@ ConjugateGradient::setTolerance(const double epsilon)
     cgSolver.setTolerance(epsilon);
 }
 
-
 void
 ConjugateGradient::setMaxNumIterations(const size_t maxIter)
 {
@@ -83,14 +70,12 @@ ConjugateGradient::setMaxNumIterations(const size_t maxIter)
     cgSolver.setMaxIterations(maxIter);
 }
 
-
 void
 ConjugateGradient::setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 {
     LinearSolver<SparseMatrixd>::setSystem(newSystem);
     this->cgSolver.compute(this->m_linearSystem->getMatrix());
 }
-
 
 void
 ConjugateGradient::print()
@@ -100,6 +85,13 @@ ConjugateGradient::print()
     LOG(INFO) << "Solver: Conjugate gradient";
     LOG(INFO) << "Tolerance: " << m_tolerance;
     LOG(INFO) << "max. iterations: " << m_maxIterations;
+}
+
+void
+ConjugateGradient::solve(Vectord& x, const double tolerance)
+{
+    setTolerance(tolerance);
+    solve(x);
 }
 
 }

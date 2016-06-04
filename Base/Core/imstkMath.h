@@ -61,6 +61,15 @@ using Mat3d = Eigen::Matrix3d;
 using Mat4f = Eigen::Matrix4f;
 using Mat4d = Eigen::Matrix4d;
 
+/// A dynamic size matrix of floats
+using Matrixf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
+
+/// A dynamic size matrix of doubles
+using Matrixd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+
+// A dynamic size sparse matrix of doubles
+using SparseMatrixf = Eigen::SparseMatrix < float, Eigen::RowMajor >;
+
 // A dynamic size sparse matrix of doubles
 using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor > ;
 

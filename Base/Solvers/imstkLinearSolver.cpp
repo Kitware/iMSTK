@@ -32,15 +32,15 @@ template<typename SystemMatrixType>
 void
 LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
 {
-    this->m_linearSystem.reset();
-    this->m_linearSystem = newSystem;
+    m_linearSystem.reset();
+    m_linearSystem = newSystem;
 }
 
 template<typename SystemMatrixType>
 std::shared_ptr<LinearSystem<SystemMatrixType>>
 LinearSolver<SystemMatrixType>::getSystem() const
 {
-    return this->m_linearSystem;
+    return m_linearSystem;
 }
 
 
