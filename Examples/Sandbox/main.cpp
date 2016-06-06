@@ -84,45 +84,8 @@ void testMeshCCD()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MeshCCDTest");
 
-    // Vertices
-    std::vector<Vec3d> vertList;
-    vertList.push_back(Vec3d(0, 0, 0));
-    vertList.push_back(Vec3d(0.5, 0.5, 0));
-    vertList.push_back(Vec3d(1, 1, 0));
-    vertList.push_back(Vec3d(1, 0, 0));
-    vertList.push_back(Vec3d(0, 1, 0));
-    vertList.push_back(Vec3d(0.5, 1, 0));
-    vertList.push_back(Vec3d(0, 0.5, 0));
-    vertList.push_back(Vec3d(1, 0.5, 0));
-    vertList.push_back(Vec3d(0.5, 0, 0));
-
-    // Triangles
-    std::vector<SurfaceMesh::TriangleArray> triangles;
-    triangles.push_back({ { 0, 8, 6 } });
-    triangles.push_back({ { 7, 2, 5 } });
-    triangles.push_back({ { 1, 5, 4 } });
-    triangles.push_back({ { 3, 7, 1 } });
-    triangles.push_back({ { 8, 1, 6 } });
-    triangles.push_back({ { 1, 4, 6 } });
-    triangles.push_back({ { 1, 7, 5 } });
-    triangles.push_back({ { 3, 1, 8 } });
-
-    // SurfaceMesh 1
-    auto mesh1 = std::make_shared<SurfaceMesh>();
-    mesh1->setInitialVerticesPositions(vertList);
-    mesh1->setVerticesPositions(vertList);
-    mesh1->setTrianglesVertices(triangles);
-    mesh1->optimizeForDataLocality();
-
-    // SurfaceMesh 2
-    auto mesh2 = std::make_shared<SurfaceMesh>();
-    mesh2->setInitialVerticesPositions(vertList);
-    mesh2->setVerticesPositions(vertList);
-    mesh2->setTrianglesVertices(triangles);
-    mesh2->optimizeForDataLocality();
-    mesh2->scale(1.5);
-    mesh2->translate(BACKWARD_VECTOR*0.25);
-    mesh2->rotate(imstk::UP_VECTOR, imstk::PI_4);
+    auto mesh1 = imstk::MeshReader::read("/Users/alexis/Projects/IMSTK/data/collidingspheres/big.vtk");
+    auto mesh2 = imstk::MeshReader::read("/Users/alexis/Projects/IMSTK/data/collidingspheres/small.vtk");
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");

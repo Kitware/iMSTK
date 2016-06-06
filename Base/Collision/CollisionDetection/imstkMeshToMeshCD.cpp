@@ -29,6 +29,26 @@
 
 namespace imstk {
 
+
+void
+EECallback(unsigned int e1_v1, unsigned int e1_v2,
+           unsigned int e2_v1, unsigned int e2_v2,
+           float t, void *userdata)
+{
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    CD->getType();
+    LOG(INFO) <<"EE: e1("<<e1_v1<<", "<<e1_v2<<"), e2("<<e2_v1<<", "<<e2_v2<<") \t@ t="<<t;
+}
+
+void
+VFCallback(unsigned int vid, unsigned int fid,
+           float t, void *userdata)
+{
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    CD->getType();
+    LOG(INFO) <<"VF: v("<<vid<<"), f("<<fid<<") \t\t@ t="<<t;
+}
+
 void
 MeshToMeshCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
                                    std::shared_ptr<CollidingObject> objB,
@@ -45,7 +65,6 @@ MeshToMeshCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
         return;
     }
 
-
     // Init models for continuous CD
     if(!m_initialized)
     {
@@ -54,12 +73,14 @@ MeshToMeshCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
         modelB = std::make_shared<DeformModel>(geomB->getVerticesPositions(), geomB->getTrianglesVertices());
 
         // Setup Callbacks
-        modelA->SetEECallBack((ccdEETestCallback*)nullptr);
-        modelA->SetVFCallBack((ccdVFTestCallback*)nullptr);
+        modelA->SetEECallBack(EECallback, this);
+        modelA->SetVFCallBack(VFCallback, this);
 
         // Build BVH
-        modelA->BuildBVH(true);
-        modelB->BuildBVH(true);
+        modelA->BuildBVH(false);
+        modelB->BuildBVH(false);
+
+        m_initialized = true;
     }
     else
     {
@@ -73,23 +94,13 @@ MeshToMeshCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
         modelA->RefitBVH();
         modelB->RefitBVH();
 
+        // Reset Results
+        modelA->ResetCounter();
+        modelB->ResetCounter();
+
         // Collide
         modelA->Collide(modelB.get());
     }
-}
-
-void
-MeshToMeshCD::EECallback(unsigned int e1_v1, unsigned int e1_v2,
-                         unsigned int e2_v1, unsigned int e2_v2, float t)
-{
-
-    LOG(INFO) <<"EE: e1("<<e1_v1<<", "<<e1_v2<<"), e2("<<e2_v1<<", "<<e2_v2<<") \t@ t="<<t;
-}
-
-void
-MeshToMeshCD::VFCallback(unsigned int vid, unsigned int fid, float t)
-{
-    LOG(INFO) <<"VF: v("<<vid<<"), f("<<fid<<") \t\t@ t="<<t;
 }
 
 }

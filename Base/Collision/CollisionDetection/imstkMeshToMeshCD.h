@@ -57,9 +57,6 @@ public:
 
 private:
 
-    void EECallback(unsigned int e1_v1, unsigned int e1_v2, unsigned int e2_v1, unsigned int e2_v2, float t);
-    void VFCallback(unsigned int vid, unsigned int fid, float t);
-
     bool m_initialized = false;
     std::shared_ptr<DeformModel> modelA;
     std::shared_ptr<DeformModel> modelB;
