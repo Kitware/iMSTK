@@ -26,6 +26,7 @@
 
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
+#include "imstkInternalForceModel.h"
 
 namespace imstk {
 
@@ -53,8 +54,16 @@ public:
     void getLinearSystem();
 
 protected:
-    //std::shared_ptr<ForceModel> forceModel; ///> Mathematical model for intenal forces
+    std::shared_ptr<InternalForceModel> m_internalForceModel; ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator> m_timeIntegrator; ///> Time integrator
+
+    // Matrices typical to a elasto-dynamics and 2nd order analogous systems
+    std::shared_ptr<SparseMatrixd> m_massMatrix;                ///> Mass matrix
+    std::shared_ptr<SparseMatrixd> m_dampingMatrix;             ///> Damping coefficient matrix (usually a linear combination of mass and tangent stiffness)
+    std::shared_ptr<SparseMatrixd> m_tangentStiffnessMatrix;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+
+    std::shared_ptr<SparseMatrixd> m_effectiveStiffnessMatrix;  ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+
 };
 
 }

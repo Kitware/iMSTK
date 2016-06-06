@@ -27,7 +27,7 @@
 
 #include "imstkDynamicObject.h"
 #include "imstkDynamicalModel.h"
-//#include "imstkTimeIntegrator.h"
+
 #include "imstkKinematicState.h"
 #include "imstkMath.h"
 

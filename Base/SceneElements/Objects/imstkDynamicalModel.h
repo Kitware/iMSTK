@@ -22,6 +22,8 @@
 #ifndef imstkDynamicalModel_h
 #define imstkDynamicalModel_h
 
+#include <string>
+
 namespace imstk {
 
 ///

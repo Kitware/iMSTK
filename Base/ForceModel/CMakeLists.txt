@@ -2,13 +2,12 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SceneElements
+imstk_add_library( ForceModel
   DEPENDS
     Core
-    Geometry
-    Devices
-	TimeIntegrators
-	ForceModel
+    VegaFEM::massSpringSystem
+    VegaFEM::corotationalLinearFEM
+    VegaFEM::isotropicHyperelasticFEM
   )
 
 #-----------------------------------------------------------------------------

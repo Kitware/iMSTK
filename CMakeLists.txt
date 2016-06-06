@@ -163,6 +163,7 @@ add_subdirectory(Base/Rendering)
 add_subdirectory(Base/SimulationManager)
 add_subdirectory(Base/Solvers)
 add_subdirectory(Base/TimeIntegrators)
+add_subdirectory(Base/ForceModel)
 
 #--------------------------------------------------------------------------
 # Export Targets
