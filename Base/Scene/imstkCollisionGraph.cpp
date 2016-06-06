@@ -100,6 +100,8 @@ CollisionGraph::removeInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B
     {
         m_interactionPairMap.erase(B);
     }
+
+    return true;
 }
 
 bool
