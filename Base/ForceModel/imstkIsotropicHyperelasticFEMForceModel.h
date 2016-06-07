@@ -39,21 +39,21 @@ class IsotropicHyperelasticFEForceModel : virtual public InternalForceModel
 {
 
 public:
-    IsotropicHyperelasticFEForceModel(hyperElasticMaterialType materialType, std::shared_ptr<vega::VolumetricMesh> mesh, double inversionThreshold, bool withGravity = true, double gravity = 10.0)
+    IsotropicHyperelasticFEForceModel(HyperElasticMaterialType materialType, std::shared_ptr<vega::VolumetricMesh> mesh, double inversionThreshold, bool withGravity = true, double gravity = 10.0)
     {
         int enableCompressionResistance = 1;
         double compressionResistance = 500;
         switch (materialType)
         {
-            case hyperElasticMaterialType::StVK:
+            case HyperElasticMaterialType::StVK:
                 m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
                 break;
 
-            case hyperElasticMaterialType::NeoHookean:
+            case HyperElasticMaterialType::NeoHookean:
                 m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
                 break;
 
-            case hyperElasticMaterialType::MooneyRivlin:
+            case HyperElasticMaterialType::MooneyRivlin:
                 m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
                 break;
 

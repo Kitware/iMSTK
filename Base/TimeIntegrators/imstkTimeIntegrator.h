@@ -75,6 +75,8 @@ protected:
     std::array<double,3> m_alpha;
     std::array<double,3> m_gamma;
     std::array<double,3> m_beta;
+
+    double dT; ///> Delta T
 };
 
 }

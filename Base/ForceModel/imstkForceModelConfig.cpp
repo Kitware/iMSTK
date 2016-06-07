@@ -24,7 +24,7 @@ limitations under the License.
 namespace imstk
 {
 
-ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const bool verbose)
+ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const bool verbose) : m_loadSuccessful(false)
 {
     if (configurationFile.empty())
     {
@@ -95,13 +95,12 @@ ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const b
     if (!configurationFile.empty() &&
         vegaConfigFileOptions.parseOptions(configurationFile.data()) != 0)
     {
-        /// TODO: Log this.
-    }
-
-    // Print option variables
-    if (verbose)
-    {
-        vegaConfigFileOptions.printOptions();
+        m_loadSuccessful = true;
+        // Print option variables
+        if (verbose)
+        {
+            vegaConfigFileOptions.printOptions();
+        }
     }
 
     // Store parsed string values
@@ -111,10 +110,8 @@ ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const b
 
     // Store parsed floating point values
     this->m_floatsOptionMap.emplace("dampingMassCoefficient", dampingMassCoefficient);
-    this->m_floatsOptionMap.emplace("dampingLaplacianCoefficient",
-        dampingLaplacianCoefficient);
-    this->m_floatsOptionMap.emplace("dampingStiffnessCoefficient",
-        dampingStiffnessCoefficient);
+    this->m_floatsOptionMap.emplace("dampingLaplacianCoefficient", dampingLaplacianCoefficient);
+    this->m_floatsOptionMap.emplace("dampingStiffnessCoefficient", dampingStiffnessCoefficient);
     this->m_floatsOptionMap.emplace("deformationCompliance", deformationCompliance);
     this->m_floatsOptionMap.emplace("gravity", gravity);
     this->m_floatsOptionMap.emplace("compressionResistance", compressionResistance);
@@ -122,45 +119,52 @@ ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const b
 
     // Store parsed int values
     this->m_intsOptionMap.emplace("numberOfThreads", numberOfThreads);
+};
 
+
+ForceModelType ForceModelConfig::getForceModelType()
+{
     // Set up some variables
     if (this->m_stringsOptionMap["femMethod"] == "StVK")
     {
-        this->m_forceModelType = ForceModelType::StVK;
+        return ForceModelType::StVK;
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Corotational")
     {
-        this->m_forceModelType = ForceModelType::StVK;
+        return ForceModelType::StVK;
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Linear")
     {
-        this->m_forceModelType = ForceModelType::StVK;
+        return ForceModelType::StVK;
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Invertible")
     {
-        this->m_forceModelType = ForceModelType::StVK;
+        return ForceModelType::StVK;
     }
     else
     {
-        this->m_forceModelType = ForceModelType::none;
+        return ForceModelType::none;
     }
+}
 
+HyperElasticMaterialType ForceModelConfig::gethyperElasticMaterialType()
+{
     if (this->m_stringsOptionMap["invertibleMaterial"] == "StVK")
     {
-        this->m_isotropicMaterialType = hyperElasticMaterialType::StVK;
+        return HyperElasticMaterialType::StVK;
     }
     else if (this->m_stringsOptionMap["invertibleMaterial"] == "NeoHookean")
     {
-        this->m_isotropicMaterialType = hyperElasticMaterialType::NeoHookean;
+        return HyperElasticMaterialType::NeoHookean;
     }
     else if (this->m_stringsOptionMap["invertibleMaterial"] == "MooneyRivlin")
     {
-        this->m_isotropicMaterialType = hyperElasticMaterialType::MooneyRivlin;
+        return HyperElasticMaterialType::MooneyRivlin;
     }
     else
     {
-        this->m_isotropicMaterialType = hyperElasticMaterialType::none;
+        return HyperElasticMaterialType::none;
     }
-};
+}
 
 } // imstk

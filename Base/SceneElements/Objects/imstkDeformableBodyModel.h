@@ -24,9 +24,11 @@
 
 #include <memory>
 
+#include "imstkGeometry.h"
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
+#include "imstkForceModelConfig.h"
 
 namespace imstk {
 
@@ -49,23 +51,96 @@ public:
     virtual ~DeformableBodyModel() = default;
 
     ///
+    /// \brief Set the geometry on which the force model acts
+    ///
+    void setForceModelGeometry(std::shared_ptr<Geometry> fmGeometry);
+
+    ///
+    /// \brief Set/Get force model configuration
+    ///
+    void setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig);
+    std::shared_ptr<ForceModelConfig> getForceModelConfiguration();
+
+    ///
+    /// \brief Set/Get force model
+    ///
+    void setForceModel(std::shared_ptr<InternalForceModel> fm);
+    std::shared_ptr<InternalForceModel> getForceModel();
+
+    ///
+    /// \brief Set/Get time integrator
+    ///
+    void setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator);
+    std::shared_ptr<TimeIntegrator> getTimeIntegrator();
+
+    ///
     /// \brief Returns the tangent linear system for a given state
     ///
     void getLinearSystem();
 
+    ///
+    /// \brief Configure the force model from external file
+    ///
+    void loadForceModelConfiguration(std::string& configFileName);
+
+    ///
+    /// \brief Initialize the force model
+    ///
+    void initializeForceModel();
+
+    ///
+    /// \brief Load the boundary conditions from external file
+    ///
+    bool loadBoundaryConditions();
+
+    ///
+    /// \brief Initialize the mass matrix from the mesh
+    ///
+    void initializeMassMatrix(bool saveToDisk = false);
+
+    ///
+    /// \brief Initialize the damping (combines structural and viscous damping) matrix
+    ///
+    void initializeDampingMatrix();
+
+    ///
+    /// \brief Initialize the tangent stiffness matrix
+    ///
+    void initializeTangentStiffness();
+
+    ///
+    /// \brief Initialize the gravity force
+    ///
+    void initializeGravity();
+
+    ///
+    /// \brief Initialize explicit external forces
+    ///
+    void initializeExplicitExternalForces();
+
 protected:
-    std::shared_ptr<InternalForceModel> m_internalForceModel; ///> Mathematical model for intenal forces
-    std::shared_ptr<TimeIntegrator> m_timeIntegrator; ///> Time integrator
+    std::shared_ptr<Geometry> m_forceModelGeometry;    ///> Geometry used by force model
 
-    // Matrices typical to a elasto-dynamics and 2nd order analogous systems
-    std::shared_ptr<SparseMatrixd> m_massMatrix;                ///> Mass matrix
-    std::shared_ptr<SparseMatrixd> m_dampingMatrix;             ///> Damping coefficient matrix (usually a linear combination of mass and tangent stiffness)
-    std::shared_ptr<SparseMatrixd> m_tangentStiffnessMatrix;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
+    std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
+    std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
 
-    std::shared_ptr<SparseMatrixd> m_effectiveStiffnessMatrix;  ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+    // Matrices typical to a elastodynamics and 2nd order analogous systems
+    std::shared_ptr<SparseMatrixd> m_M;    ///> Mass matrix
+    std::shared_ptr<SparseMatrixd> m_C;    ///> Damping coefficient matrix (usually a linear combination of mass and tangent stiffness)
+    std::shared_ptr<SparseMatrixd> m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
 
+    std::shared_ptr<SparseMatrixd> m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+
+    // External field forces
+    Vectord m_gravityForce;   ///> Vector of gravity forces
+
+    // Explicit external forces
+    Vectord m_explicitExternalForce;   ///> Vector of explicitly defined external forces
+
+    std::size_t m_numDOF; ///> Total number of degree of freedom
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkDeformableBodyModel_h

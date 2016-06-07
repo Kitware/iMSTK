@@ -47,7 +47,7 @@ namespace imstk
     };
 
     // TODO: Move to appropriate place
-    enum class hyperElasticMaterialType
+    enum class HyperElasticMaterialType
     {
         StVK,
         NeoHookean,
@@ -108,15 +108,19 @@ public:
         return m_floatsOptionMap;
     }
 
-    const std::map<std::string, int>& getIntsOptionsMap()
+    const std::map<std::string, int>& getIntegerOptionsMap()
     {
         return m_intsOptionMap;
     }
 
-    const std::map<std::string, std::string>& getStringsOptionsMap()
+    const std::map<std::string, std::string>& getStringOptionsMap()
     {
         return m_stringsOptionMap;
     }
+
+    ForceModelType getForceModelType();
+
+    HyperElasticMaterialType gethyperElasticMaterialType();
 
 protected:
     std::string m_vegaConfigFile;                          ///> Store configuration file.
@@ -124,8 +128,7 @@ protected:
     std::map<std::string, int> m_intsOptionMap;            ///> Map for int configuration variables
     std::map<std::string, std::string> m_stringsOptionMap; ///> Map for string
 
-    ForceModelType m_forceModelType;                  ///> Force model type used
-    hyperElasticMaterialType m_isotropicMaterialType; ///> Hyperelastic constitutive law model
+    bool m_loadSuccessful;
 };
 
 } // imstk
