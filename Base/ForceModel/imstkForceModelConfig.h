@@ -94,36 +94,85 @@ namespace imstk
 ///
 class ForceModelConfig
 {
+    // TODO: Do this in a better way
+    struct customOptionsList
+    {
+        char femMethod[256];
+        char invertibleMaterial[256];
+        char fixedDOFFilename[256];
+        double dampingMassCoefficient = 0.1;
+        double dampingStiffnessCoefficient = 0.01;
+        double dampingLaplacianCoefficient = 0.0;
+        double deformationCompliance = 1.0;
+        double gravity = -9.81;
+        double compressionResistance = 500.0;
+        double inversionThreshold = -std::numeric_limits< double >::max();
+        int numberOfThreads = 0;
+    };
+    struct customOptionsNameList
+    {
+        const char femMethodName[256] = "femMethod";
+        const char invertibleMaterialName[256] = "invertibleMaterial";
+        const char fixedDOFFilenameName[256] = "fixedDOFFilename";
+        const char dampingMassCoefficientName[256] = "dampingMassCoefficient";
+        const char dampingLaplacianCoefficientName[256] = "dampingLaplacianCoefficient";
+        const char dampingStiffnessCoefficientName[256] = "dampingStiffnessCoefficient";
+        const char deformationComplianceName[256] = "deformationCompliance";
+        const char compressionResistanceName[256] = "compressionResistance";
+        const char inversionThresholdName[256] = "inversionThreshold";
+        const char numberOfThreadsName[256] = "numberOfThreads";
+        const char gravityName[256] = "gravity";
+    };
 public:
 
     ///
     /// \brief Constructor
     ///
-    ForceModelConfig(const std::string &configurationFile, const bool verbose = false);
+    ForceModelConfig(const std::string &configurationFileName);
 
     ~ForceModelConfig(){};
 
+    ///
+    /// \brief
+    ///
+    bool parseConfig(const std::string &configFileName);
+
+    ///
+    /// \brief
+    ///
     const std::map<std::string, double>& getFloatsOptionsMap()
     {
         return m_floatsOptionMap;
     }
 
+    ///
+    /// \brief
+    ///
     const std::map<std::string, int>& getIntegerOptionsMap()
     {
         return m_intsOptionMap;
     }
 
+    ///
+    /// \brief
+    ///
     const std::map<std::string, std::string>& getStringOptionsMap()
     {
         return m_stringsOptionMap;
     }
 
+    ///
+    /// \brief
+    ///
     ForceModelType getForceModelType();
 
+    ///
+    /// \brief
+    ///
     HyperElasticMaterialType gethyperElasticMaterialType();
 
 protected:
-    std::string m_vegaConfigFile;                          ///> Store configuration file.
+    std::string m_vegaConfigFileName;                      ///> Store configuration file.
     std::map<std::string, double> m_floatsOptionMap;       ///> Map for floating point
     std::map<std::string, int> m_intsOptionMap;            ///> Map for int configuration variables
     std::map<std::string, std::string> m_stringsOptionMap; ///> Map for string

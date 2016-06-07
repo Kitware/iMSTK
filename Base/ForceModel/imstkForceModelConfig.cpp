@@ -24,103 +24,77 @@ limitations under the License.
 namespace imstk
 {
 
-ForceModelConfig::ForceModelConfig(const std::string &configurationFile, const bool verbose) : m_loadSuccessful(false)
+ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSuccessful(false)
 {
-    if (configurationFile.empty())
+    if (configFileName.empty())
     {
         LOG(INFO) << "WARNING: Empty configuration filename." << std::endl;
         return;
     }
+    else
+    {
+        parseConfig(configFileName);
+    }
+};
 
-    this->m_vegaConfigFile = configurationFile;
+void setOptions(vega::ConfigFile& vegaConfigFileOptions)
+{
 
+
+}
+
+bool ForceModelConfig::parseConfig(const std::string &configFileName)
+{
     vega::ConfigFile vegaConfigFileOptions;
+    ForceModelConfig::customOptionsList optList;
+    ForceModelConfig::customOptionsNameList optNameList;
 
-    char femMethod[256];
-    vegaConfigFileOptions.addOptionOptional("femMethod",
-        femMethod,
-        "StVK");
+    vegaConfigFileOptions.addOptionOptional(optNameList.femMethodName, optList.femMethod, "StVK");
+    vegaConfigFileOptions.addOptionOptional(optNameList.invertibleMaterialName, optList.invertibleMaterial, "StVK");
+    vegaConfigFileOptions.addOptionOptional(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename, "");
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingMassCoefficientName, &optList.dampingMassCoefficient, optList.dampingMassCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingStiffnessCoefficientName, &optList.dampingStiffnessCoefficient, optList.dampingStiffnessCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingLaplacianCoefficientName, &optList.dampingLaplacianCoefficient, optList.dampingLaplacianCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.deformationComplianceName, &optList.deformationCompliance, optList.deformationCompliance);
+    vegaConfigFileOptions.addOptionOptional(optNameList.gravityName, &optList.gravity, optList.gravity);
+    vegaConfigFileOptions.addOptionOptional(optNameList.compressionResistanceName, &optList.compressionResistance, optList.compressionResistance);
+    vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName, &optList.inversionThreshold, optList.inversionThreshold);
+    vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName, &optList.numberOfThreads, optList.numberOfThreads);
 
-    char invertibleMaterial[256];
-    vegaConfigFileOptions.addOptionOptional("invertibleMaterial",
-        invertibleMaterial,
-        "StVK");
-
-    char fixedDOFFilename[256];
-    vegaConfigFileOptions.addOptionOptional("fixedDOFFilename",
-        fixedDOFFilename,
-        "");
-
-    double dampingMassCoefficient = 0.1;
-    vegaConfigFileOptions.addOptionOptional("dampingMassCoefficient",
-        &dampingMassCoefficient,
-        dampingMassCoefficient);
-
-    double dampingStiffnessCoefficient = 0.01;
-    vegaConfigFileOptions.addOptionOptional("dampingStiffnessCoefficient",
-        &dampingStiffnessCoefficient,
-        dampingStiffnessCoefficient);
-
-    double dampingLaplacianCoefficient = 0.0;
-    vegaConfigFileOptions.addOptionOptional("dampingLaplacianCoefficient",
-        &dampingLaplacianCoefficient,
-        dampingLaplacianCoefficient);
-
-    double deformationCompliance = 1.0;
-    vegaConfigFileOptions.addOptionOptional("deformationCompliance",
-        &deformationCompliance,
-        deformationCompliance);
-
-    double gravity = -9.81;
-    vegaConfigFileOptions.addOptionOptional("gravity",
-        &gravity,
-        gravity);
-
-    double compressionResistance = 500.0;
-    vegaConfigFileOptions.addOptionOptional("compressionResistance",
-        &compressionResistance,
-        compressionResistance);
-
-    double inversionThreshold = -std::numeric_limits< double >::max();
-    vegaConfigFileOptions.addOptionOptional("inversionThreshold",
-        &inversionThreshold,
-        inversionThreshold);
-
-    int numberOfThreads = 0;
-    vegaConfigFileOptions.addOptionOptional("numberOfThreads",
-        &numberOfThreads,
-        numberOfThreads);
 
     // Parse the configuration file
-    if (!configurationFile.empty() &&
-        vegaConfigFileOptions.parseOptions(configurationFile.data()) != 0)
+    if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
     {
+        this->m_vegaConfigFileName = configFileName;
         m_loadSuccessful = true;
+
         // Print option variables
-        if (verbose)
-        {
-            vegaConfigFileOptions.printOptions();
-        }
+        vegaConfigFileOptions.printOptions();
+    }
+    else
+    {
+        return false;
     }
 
     // Store parsed string values
-    this->m_stringsOptionMap.emplace("femMethod", femMethod);
-    this->m_stringsOptionMap.emplace("invertibleMaterial", invertibleMaterial);
-    this->m_stringsOptionMap.emplace("fixedDOFFilename", fixedDOFFilename);
+    this->m_stringsOptionMap.emplace(optNameList.femMethodName, optList.femMethod);
+    this->m_stringsOptionMap.emplace(optNameList.invertibleMaterialName, optList.invertibleMaterial);
+    this->m_stringsOptionMap.emplace(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename);
 
     // Store parsed floating point values
-    this->m_floatsOptionMap.emplace("dampingMassCoefficient", dampingMassCoefficient);
-    this->m_floatsOptionMap.emplace("dampingLaplacianCoefficient", dampingLaplacianCoefficient);
-    this->m_floatsOptionMap.emplace("dampingStiffnessCoefficient", dampingStiffnessCoefficient);
-    this->m_floatsOptionMap.emplace("deformationCompliance", deformationCompliance);
-    this->m_floatsOptionMap.emplace("gravity", gravity);
-    this->m_floatsOptionMap.emplace("compressionResistance", compressionResistance);
-    this->m_floatsOptionMap.emplace("inversionThreshold", inversionThreshold);
+    this->m_floatsOptionMap.emplace(optNameList.dampingMassCoefficientName, optList.dampingMassCoefficient);
+    this->m_floatsOptionMap.emplace(optNameList.dampingLaplacianCoefficientName, optList.dampingLaplacianCoefficient);
+    this->m_floatsOptionMap.emplace(optNameList.dampingStiffnessCoefficientName, optList.dampingStiffnessCoefficient);
+    this->m_floatsOptionMap.emplace(optNameList.deformationComplianceName, optList.deformationCompliance);
+    this->m_floatsOptionMap.emplace(optNameList.gravityName, optList.gravity);
+    this->m_floatsOptionMap.emplace(optNameList.compressionResistanceName, optList.compressionResistance);
+    this->m_floatsOptionMap.emplace(optNameList.inversionThresholdName, optList.inversionThreshold);
 
     // Store parsed int values
-    this->m_intsOptionMap.emplace("numberOfThreads", numberOfThreads);
-};
+    this->m_intsOptionMap.emplace(optNameList.numberOfThreadsName, optList.numberOfThreads);
 
+    return true;
+}
 
 ForceModelType ForceModelConfig::getForceModelType()
 {
