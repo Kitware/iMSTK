@@ -22,41 +22,78 @@
 #ifndef imstkKinematicState_h
 #define imstkKinematicState_h
 
-
 namespace imstk
 {
 
 ///
-/// \class KinematicState
+/// \class ProblemState
 ///
-/// \brief Kinematic state of the body in time
+/// \brief This class stores the state of the unknown field variable of the problem
 ///
 template<class T>
-class KinematicState
+class ProblemState
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    KinematicState() = default;
-    KinematicState(const T& u, const T& v);
-
-    ///
-    /// \brief Set the state to a given one
-    ///
-    void setState(const T& u, const T& v);
+    ProblemState() = default;
+    ProblemState(const T& u, const T& v, const T& a = 0);
 
     ///
     /// \brief Destructor
     ///
-    ~KinematicState(){}
+    ~ProblemState(){}
+
+    ///
+    /// \brief Set the state to a given one
+    ///
+    void setState(const T& u, const T& v, const T& a = 0)
+    {
+        m_q = u;
+        m_qDot = v;
+        m_qDotDot = a;
+    }
+
+    ///
+    /// \brief Get the state
+    ///
+    T& getQ() const
+    {
+        return m_q;
+    }
+
+    ///
+    /// \brief Get the derivative of state w.r.t time
+    ///
+    T& getQDot() const
+    {
+        return m_qDot;
+    }
+
+    ///
+    /// \brief Get the double derivative of state w.r.t time
+    ///
+    T& getQDotDot() const
+    {
+        return m_qDotDot;
+    }
+
+    ///
+    /// \brief Get the state
+    ///
+    T& getState()
+    {
+        return getQ();
+    }
 
 protected:
-    T m_displacement;
-    T m_velocity;
+    T m_q;         // State
+    T m_qDot;      // Derivative of state w.r.t time
+    T m_qDotDot;   // Double derivative of state w.r.t time
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkKinematicState_h

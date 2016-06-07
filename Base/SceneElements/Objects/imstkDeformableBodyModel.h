@@ -29,6 +29,7 @@
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
+#include "imstkKinematicState.h"
 
 namespace imstk {
 
@@ -39,6 +40,7 @@ namespace imstk {
 ///
 class DeformableBodyModel : public DynamicalModel
 {
+    using kinematicState = ProblemState<Vectord>;
 public:
     ///
     /// \brief Constructor
@@ -59,19 +61,19 @@ public:
     /// \brief Set/Get force model configuration
     ///
     void setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig);
-    std::shared_ptr<ForceModelConfig> getForceModelConfiguration();
+    std::shared_ptr<ForceModelConfig> getForceModelConfiguration() const;
 
     ///
     /// \brief Set/Get force model
     ///
     void setForceModel(std::shared_ptr<InternalForceModel> fm);
-    std::shared_ptr<InternalForceModel> getForceModel();
+    std::shared_ptr<InternalForceModel> getForceModel() const;
 
     ///
     /// \brief Set/Get time integrator
     ///
     void setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator);
-    std::shared_ptr<TimeIntegrator> getTimeIntegrator();
+    std::shared_ptr<TimeIntegrator> getTimeIntegrator() const;
 
     ///
     /// \brief Returns the tangent linear system for a given state
@@ -81,12 +83,7 @@ public:
     ///
     /// \brief Configure the force model from external file
     ///
-    void loadForceModelConfiguration(std::string& configFileName);
-
-    ///
-    /// \brief Initialize the force model
-    ///
-    void initializeForceModel();
+    void configure(const std::string& configFileName);
 
     ///
     /// \brief Load the boundary conditions from external file
@@ -94,9 +91,14 @@ public:
     bool loadBoundaryConditions();
 
     ///
+    /// \brief Initialize the force model
+    ///
+    void initializeForceModel();
+
+    ///
     /// \brief Initialize the mass matrix from the mesh
     ///
-    void initializeMassMatrix(bool saveToDisk = false);
+    void initializeMassMatrix(const bool saveToDisk = false);
 
     ///
     /// \brief Initialize the damping (combines structural and viscous damping) matrix
@@ -119,18 +121,24 @@ public:
     void initializeExplicitExternalForces();
 
 protected:
-    std::shared_ptr<Geometry> m_forceModelGeometry;    ///> Geometry used by force model
 
     std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
+
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
 
-    // Matrices typical to a elastodynamics and 2nd order analogous systems
-    std::shared_ptr<SparseMatrixd> m_M;    ///> Mass matrix
-    std::shared_ptr<SparseMatrixd> m_C;    ///> Damping coefficient matrix (usually a linear combination of mass and tangent stiffness)
-    std::shared_ptr<SparseMatrixd> m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    std::shared_ptr<Geometry> m_forceModelGeometry;    ///> Geometry used by force model
 
+    /// Matrices typical to a elastodynamics and 2nd order analogous systems
+    std::shared_ptr<SparseMatrixd> m_M;    ///> Mass matrix
+    std::shared_ptr<SparseMatrixd> m_C;    ///> Damping coefficient matrix
+    std::shared_ptr<SparseMatrixd> m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
     std::shared_ptr<SparseMatrixd> m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+
+    // Body states
+    std::shared_ptr<kinematicState> m_initialState;      ///> Initial state
+    std::shared_ptr<kinematicState> m_currentState;      ///> Current state
+    std::shared_ptr<kinematicState> m_previousState;     ///> Previous state
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces

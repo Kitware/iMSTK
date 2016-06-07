@@ -24,6 +24,11 @@
 namespace imstk
 {
 
+void DeformableBodyModel::configure(const std::string& configFileName)
+{
+    m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
+}
+
 void DeformableBodyModel::initializeForceModel()
 {
 

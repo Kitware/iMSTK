@@ -40,7 +40,6 @@ namespace imstk {
 ///
 class DeformableObject : public DynamicObject
 {
-    using objectState = KinematicState <Vectord>;
 public:
 
     ///
@@ -71,32 +70,21 @@ public:
     ///
     /// \brief Return the current state of the body
     ///
-    std::shared_ptr<objectState> getCurrentState();
+    std::shared_ptr<kinematicState> getCurrentState();
 
     ///
     /// \brief Return the current state of the body
     ///
-    std::shared_ptr<objectState> getPreviousState();
+    std::shared_ptr<kinematicState> getPreviousState();
 
     ///
     /// \brief Reset the current state to the initial state
     ///
     virtual void resetToInitialState();
 
-    ///
-    /// \brief Set the integration scheme used to solve the ODE system.
-    ///
-    //void setTimeIntegrator(TimeIntegrator::Type integrator);
-
 protected:
 
     std::shared_ptr<DynamicalModel> m_dynamicalModel; ///> Dynamical model
-
-    // States
-    std::shared_ptr<objectState> m_initialState; ///> Initial state
-    std::shared_ptr<objectState> m_currentState; ///> Current state
-    std::shared_ptr<objectState> m_previousState;///> Previous state
-    //std::shared_ptr<kinematicState> m_newState;     ///> Storage for the next state
 };
 
 }
