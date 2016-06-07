@@ -37,12 +37,6 @@ ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSu
     }
 };
 
-void setOptions(vega::ConfigFile& vegaConfigFileOptions)
-{
-
-
-}
-
 bool ForceModelConfig::parseConfig(const std::string &configFileName)
 {
     vega::ConfigFile vegaConfigFileOptions;
@@ -117,11 +111,12 @@ ForceModelType ForceModelConfig::getForceModelType()
     }
     else
     {
+        LOG(INFO) << "Force model type not assigned";
         return ForceModelType::none;
     }
 }
 
-HyperElasticMaterialType ForceModelConfig::gethyperElasticMaterialType()
+HyperElasticMaterialType ForceModelConfig::getHyperelasticMaterialType()
 {
     if (this->m_stringsOptionMap["invertibleMaterial"] == "StVK")
     {
@@ -137,6 +132,7 @@ HyperElasticMaterialType ForceModelConfig::gethyperElasticMaterialType()
     }
     else
     {
+        LOG(INFO) << "Hyperelastic model type not assigned";
         return HyperElasticMaterialType::none;
     }
 }

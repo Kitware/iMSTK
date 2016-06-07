@@ -169,7 +169,7 @@ public:
     ///
     /// \brief
     ///
-    HyperElasticMaterialType gethyperElasticMaterialType();
+    HyperElasticMaterialType getHyperelasticMaterialType();
 
 protected:
     std::string m_vegaConfigFileName;                      ///> Store configuration file.
