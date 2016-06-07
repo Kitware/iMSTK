@@ -67,21 +67,6 @@ public:
     const Vectord& getVelocities() const;
     const Vectord& getPrevVelocities() const;
 
-    ///
-    /// \brief Return the current state of the body
-    ///
-    std::shared_ptr<kinematicState> getCurrentState();
-
-    ///
-    /// \brief Return the current state of the body
-    ///
-    std::shared_ptr<kinematicState> getPreviousState();
-
-    ///
-    /// \brief Reset the current state to the initial state
-    ///
-    virtual void resetToInitialState();
-
 protected:
 
     std::shared_ptr<DynamicalModel> m_dynamicalModel; ///> Dynamical model

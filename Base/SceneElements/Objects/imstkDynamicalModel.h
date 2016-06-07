@@ -33,6 +33,7 @@ namespace imstk {
 ///
 class DynamicalModel
 {
+    using kinematicState = ProblemState <Vectord> ; // for now!
 public:
     ///
     /// \brief Constructor
@@ -43,6 +44,43 @@ public:
     /// \brief Destructor
     ///
     virtual ~DynamicalModel() = default;
+
+    ///
+    /// \brief Return the current state of the body
+    ///
+    std::shared_ptr<kinematicState> getInitialState();
+
+    ///
+    /// \brief Return the current state of the body
+    ///
+    std::shared_ptr<kinematicState> getCurrentState();
+
+    ///
+    /// \brief Return the current state of the body
+    ///
+    std::shared_ptr<kinematicState> getPreviousState();
+
+    ///
+    /// \brief Reset the current state to the initial state
+    ///
+    virtual void resetToInitialState();
+
+    ///
+    /// \brief Returns the number of degrees of freedom
+    ///
+    std::size_t getNumDegreeOfFreedom()
+    {
+        return m_numDOF;
+    }
+
+protected:
+
+    // Body states
+    std::shared_ptr<kinematicState> m_initialState;      ///> Initial state
+    std::shared_ptr<kinematicState> m_currentState;      ///> Current state
+    std::shared_ptr<kinematicState> m_previousState;     ///> Previous state
+
+    std::size_t m_numDOF; ///> Total number of degree of freedom
 };
 
 }

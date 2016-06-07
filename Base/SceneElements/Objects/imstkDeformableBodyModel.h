@@ -40,7 +40,6 @@ namespace imstk {
 ///
 class DeformableBodyModel : public DynamicalModel
 {
-    using kinematicState = ProblemState<Vectord>;
 public:
     ///
     /// \brief Constructor
@@ -135,18 +134,11 @@ protected:
     std::shared_ptr<SparseMatrixd> m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
     std::shared_ptr<SparseMatrixd> m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
 
-    // Body states
-    std::shared_ptr<kinematicState> m_initialState;      ///> Initial state
-    std::shared_ptr<kinematicState> m_currentState;      ///> Current state
-    std::shared_ptr<kinematicState> m_previousState;     ///> Previous state
-
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces
 
     // Explicit external forces
     Vectord m_explicitExternalForce;   ///> Vector of explicitly defined external forces
-
-    std::size_t m_numDOF; ///> Total number of degree of freedom
 };
 
 } // imstk
