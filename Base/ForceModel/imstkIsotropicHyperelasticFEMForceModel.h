@@ -25,6 +25,7 @@
 #include <g3log/g3log.hpp>
 
 #include "imstkInternalForceModel.h"
+#include "imstkForceModelConfig.h"
 
 //vega
 #include "isotropicHyperelasticFEM.h"
@@ -34,16 +35,8 @@
 
 namespace imstk
 {
-
 class IsotropicHyperelasticFEForceModel : virtual public InternalForceModel
 {
-
-    enum class hyperElasticMaterialType
-    {
-        StVK,
-        NeoHookean,
-        MooneyRivlin
-    };
 
 public:
     IsotropicHyperelasticFEForceModel(hyperElasticMaterialType materialType, std::shared_ptr<vega::VolumetricMesh> mesh, double inversionThreshold, bool withGravity = true, double gravity = 10.0)

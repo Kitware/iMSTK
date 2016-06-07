@@ -21,7 +21,9 @@
 
 #include "imstkTetrahedralMesh.h"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
                             const std::vector<TetraArray>& tetrahedra,
