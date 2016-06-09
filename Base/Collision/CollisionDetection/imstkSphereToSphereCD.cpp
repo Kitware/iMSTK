@@ -30,30 +30,17 @@
 namespace imstk {
 
 void
-SphereToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                                       std::shared_ptr<CollidingObject> objB,
-                                       CollisionData& colDataA,
-                                       CollisionData& colDataB)
+SphereToSphereCD::computeCollisionData()
 {
-    auto sphereGeomA = std::dynamic_pointer_cast<Sphere>(objA->getCollidingGeometry());
-    auto sphereGeomB = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
-
-    // Geometries check
-    if (sphereGeomA == nullptr || sphereGeomB == nullptr)
-    {
-        LOG(WARNING) << "SphereToSphereCD::computeCollisionData error: invalid geometries.";
-        return;
-    }
-
     // Clear collisionData
-    colDataA.clearAll();
-    colDataB.clearAll();
+    m_CDA.clearAll();
+    m_CDB.clearAll();
 
     // Get geometry properties
-    Vec3d sAP = sphereGeomA->getPosition();
-    double rA = sphereGeomA->getRadius() * sphereGeomA->getScaling();
-    Vec3d sBP = sphereGeomB->getPosition();
-    double rB = sphereGeomB->getRadius() * sphereGeomB->getScaling();
+    Vec3d sAP = m_sphereA->getPosition();
+    double rA = m_sphereA->getRadius() * m_sphereA->getScaling();
+    Vec3d sBP = m_sphereB->getPosition();
+    double rB = m_sphereB->getRadius() * m_sphereB->getScaling();
 
     // Compute direction vector
     Vec3d dirBToA = sAP - sBP;
@@ -74,8 +61,8 @@ SphereToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
     Vec3d sBC = sBP + dirBToA*rB;
 
     // Set collisionData
-    colDataA.PDColData.push_back({sAC, dirBToA, penetrationDepth});
-    colDataB.PDColData.push_back({sBC, -dirBToA, penetrationDepth});
+    m_CDA.PDColData.push_back({sAC, dirBToA, penetrationDepth});
+    m_CDB.PDColData.push_back({sBC, -dirBToA, penetrationDepth});
 }
 
 }

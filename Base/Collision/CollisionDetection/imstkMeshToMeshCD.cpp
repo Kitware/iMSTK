@@ -21,7 +21,6 @@
 
 #include "imstkMeshToMeshCD.h"
 
-#include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkSurfaceMesh.h"
 
@@ -41,66 +40,63 @@ EECallback(unsigned int e1_v1, unsigned int e1_v2,
 }
 
 void
-VFCallback(unsigned int vid, unsigned int fid,
-           float t, void *userdata)
+VFCallback1(unsigned int fid1, unsigned int vid2,
+            float t, void *userdata)
 {
     auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
     CD->getType();
-    LOG(INFO) <<"VF: v("<<vid<<"), f("<<fid<<") \t\t@ t="<<t;
+    LOG(INFO) <<"VF: v2("<<vid2<<"), f1("<<fid1<<") \t\t@ t="<<t;
 }
 
 void
-MeshToMeshCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                                   std::shared_ptr<CollidingObject> objB,
-                                   CollisionData& colDataA,
-                                   CollisionData& colDataB)
+VFCallback2(unsigned int fid2, unsigned int vid1,
+            float t, void *userdata)
 {
-    auto geomA = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry());
-    auto geomB = std::dynamic_pointer_cast<SurfaceMesh>(objB->getCollidingGeometry());
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    CD->getType();
+    LOG(INFO) <<"VF: v1("<<vid1<<"), f2("<<fid2<<") \t\t@ t="<<t;
+}
 
-    // Geometries check
-    if (geomA == nullptr || geomB == nullptr)
-    {
-        LOG(WARNING) << "MeshToMeshCD::computeCollisionData error: invalid geometries.";
-        return;
-    }
+MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
+                           std::shared_ptr<SurfaceMesh> meshB,
+                           CollisionData& CDA,
+                           CollisionData& CDB) :
+    CollisionDetection(CollisionDetection::Type::PlaneToSphere, CDA, CDB),
+    m_meshA(meshA),
+    m_meshB(meshB)
+{
+    m_modelA = std::make_shared<DeformModel>(meshA->getVerticesPositions(), meshA->getTrianglesVertices());
+    m_modelB = std::make_shared<DeformModel>(meshB->getVerticesPositions(), meshB->getTrianglesVertices());
 
-    // Init models for continuous CD
-    if(!m_initialized)
-    {
-        // Init
-        modelA = std::make_shared<DeformModel>(geomA->getVerticesPositions(), geomA->getTrianglesVertices());
-        modelB = std::make_shared<DeformModel>(geomB->getVerticesPositions(), geomB->getTrianglesVertices());
+    // Setup Callbacks
+    m_modelA->SetEECallBack(EECallback, this);
+    m_modelA->SetVFCallBack(VFCallback1, this);
+    m_modelB->SetVFCallBack(VFCallback2, this);
 
-        // Setup Callbacks
-        modelA->SetEECallBack(EECallback, this);
-        modelA->SetVFCallBack(VFCallback, this);
+    // Build BVH
+    m_modelA->BuildBVH(false);
+    m_modelB->BuildBVH(false);
+}
 
-        // Build BVH
-        modelA->BuildBVH(false);
-        modelB->BuildBVH(false);
+void
+MeshToMeshCD::computeCollisionData()
+{
+    // Update model
+    m_modelA->UpdateVert(m_meshA->getVerticesPositions());
+    m_modelB->UpdateVert(m_meshB->getVerticesPositions());
+    m_modelB->UpdateBoxes();
+    m_modelB->UpdateBoxes();
 
-        m_initialized = true;
-    }
-    else
-    {
-        // Update model
-        modelA->UpdateVert(geomA->getVerticesPositions());
-        modelB->UpdateVert(geomB->getVerticesPositions());
-        modelB->UpdateBoxes();
-        modelB->UpdateBoxes();
+    // Update BVH
+    m_modelA->RefitBVH();
+    m_modelB->RefitBVH();
 
-        // Update BVH
-        modelA->RefitBVH();
-        modelB->RefitBVH();
+    // Reset Results
+    m_modelA->ResetCounter();
+    m_modelB->ResetCounter();
 
-        // Reset Results
-        modelA->ResetCounter();
-        modelB->ResetCounter();
-
-        // Collide
-        modelA->Collide(modelB.get());
-    }
+    // Collide
+    m_modelA->Collide(m_modelB.get());
 }
 
 }

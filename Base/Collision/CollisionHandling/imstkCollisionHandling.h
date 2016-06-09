@@ -46,7 +46,9 @@ public:
     ///
     static std::shared_ptr<CollisionHandling> make_collision_handling(
             const Type& type,
-            std::shared_ptr<CollidingObject> obj);
+            std::shared_ptr<CollidingObject> objA,
+            CollisionData& CDA,
+            std::shared_ptr<CollidingObject> objB = nullptr);
 
     ///
     /// \brief Constructor
@@ -61,8 +63,7 @@ public:
     ///
     /// \brief Compute forces based on collision data (pure virtual)
     ///
-    virtual void computeContactForces(std::shared_ptr<CollidingObject> obj,
-                                      CollisionData& colData) = 0;
+    virtual void computeContactForces() = 0;
 
     ///
     /// \brief Returns collision handling type

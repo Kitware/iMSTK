@@ -52,11 +52,14 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         B->getType() == SceneObject::Type::Static)
     {
        LOG(WARNING) << "InteractionPair error: can not create interaction between two static objects.";
-       return;
+       //return;
     }
 
     // Collision Detection
-    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B);
+    m_colDataMap[A] = CollisionData();
+    m_colDataMap[B] = CollisionData();
+    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B,
+                                                                                          m_colDataMap[A], m_colDataMap[B]);
     if (CD == nullptr)
     {
         LOG(WARNING) << "InteractionPair error: can not instantiate collision detection algorithm.";
@@ -67,7 +70,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     std::shared_ptr<CollisionHandling> CHA;
     if (A->getType() != SceneObject::Type::Static)
     {
-       CHA = CollisionHandling::make_collision_handling(CHAType, A);
+       CHA = CollisionHandling::make_collision_handling(CHAType, A, m_colDataMap[A], B);
        if (CHA == nullptr)
        {
            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
@@ -80,7 +83,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     std::shared_ptr<CollisionHandling> CHB;
     if (B->getType() != SceneObject::Type::Static)
     {
-       CHB = CollisionHandling::make_collision_handling(CHBType, B);
+       CHB = CollisionHandling::make_collision_handling(CHBType, B, m_colDataMap[B], A);
        if (CHB == nullptr)
        {
            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
@@ -94,10 +97,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     m_colDetect = CD;
     m_colHandlingMap[A] = CHA;
     m_colHandlingMap[B] = CHB;
-    m_colDataMap[A] = CollisionData();
-    m_colDataMap[B] = CollisionData();
     m_valid = true;
-
 }
 
 void
@@ -109,10 +109,7 @@ InteractionPair::computeCollisionData()
         return;
     }
 
-    m_colDetect->computeCollisionData(m_objects.first,
-                                      m_objects.second,
-                                      m_colDataMap.at(m_objects.first),
-                                      m_colDataMap.at(m_objects.second));
+    m_colDetect->computeCollisionData();
 }
 
 void
@@ -136,7 +133,7 @@ InteractionPair::computeContactForces(std::shared_ptr<CollidingObject> obj)
         return;
     }
 
-    m_colHandlingMap.at(obj)->computeContactForces(obj, m_colDataMap.at(obj));
+    m_colHandlingMap.at(obj)->computeContactForces();
 }
 
 const bool&

@@ -28,7 +28,8 @@
 
 namespace imstk {
 
-class CollidingObject;
+class Plane;
+class Sphere;
 class CollisionData;
 
 class PlaneToSphereCD : public CollisionDetection
@@ -38,7 +39,14 @@ public:
     ///
     /// \brief Constructor
     ///
-    PlaneToSphereCD() : CollisionDetection(CollisionDetection::Type::PlaneToSphere) {}
+    PlaneToSphereCD(std::shared_ptr<Plane> planeA,
+                    std::shared_ptr<Sphere> sphereB,
+                    CollisionData& CDA,
+                    CollisionData& CDB) :
+        CollisionDetection(CollisionDetection::Type::PlaneToSphere, CDA, CDB),
+        m_planeA(planeA),
+        m_sphereB(sphereB)
+    {}
 
     ///
     /// \brief Destructor
@@ -48,10 +56,12 @@ public:
     ///
     /// \brief Detect collision and compute collision data
     ///
-    void computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                              std::shared_ptr<CollidingObject> objB,
-                              CollisionData& colDataA,
-                              CollisionData& colDataB) override;
+    void computeCollisionData() override;
+
+private:
+
+    std::shared_ptr<Plane> m_planeA;
+    std::shared_ptr<Sphere> m_sphereB;
 
 };
 }

@@ -43,15 +43,20 @@ public:
     ///
     /// \brief Static factory for collision detection sub classes
     ///
-    static std::shared_ptr<CollisionDetection> make_collision_detection(
-            const Type& type,
+    static std::shared_ptr<CollisionDetection> make_collision_detection(const Type& type,
             std::shared_ptr<CollidingObject> objA,
-            std::shared_ptr<CollidingObject> objB);
+            std::shared_ptr<CollidingObject> objB,
+            CollisionData& CDA,
+            CollisionData& CDB);
 
     ///
     /// \brief Constructor
     ///
-    CollisionDetection(const Type& type) : m_type(type) {}
+    CollisionDetection(const Type& type, CollisionData& CDA, CollisionData& CDB) :
+        m_type(type),
+        m_CDA(CDA),
+        m_CDB(CDB)
+    {}
 
     ///
     /// \brief Destructor
@@ -61,10 +66,7 @@ public:
     ///
     /// \brief Detect collision and compute collision data (pure virtual)
     ///
-    virtual void computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                                      std::shared_ptr<CollidingObject> objB,
-                                      CollisionData& colDataA,
-                                      CollisionData& colDataB) = 0;
+    virtual void computeCollisionData() = 0;
 
     ///
     /// \brief Returns collision detection type
@@ -74,6 +76,8 @@ public:
 protected:
 
     Type m_type; //!< Collision detection algorithm type
+    CollisionData& m_CDA;
+    CollisionData& m_CDB;
 
 };
 }

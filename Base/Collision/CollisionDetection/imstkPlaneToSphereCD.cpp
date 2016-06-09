@@ -31,30 +31,17 @@
 namespace imstk {
 
 void
-PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                                      std::shared_ptr<CollidingObject> objB,
-                                      CollisionData& colDataA,
-                                      CollisionData& colDataB)
+PlaneToSphereCD::computeCollisionData()
 {
-    auto planeGeom = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
-    auto sphereGeom = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
-
-    // Geometries check
-    if (planeGeom == nullptr || sphereGeom == nullptr)
-    {
-        LOG(WARNING) << "PlaneToSphereCD::computeCollisionData error: invalid geometries.";
-        return;
-    }
-
     // Clear collisionData
-    colDataA.clearAll();
-    colDataB.clearAll();
+    m_CDA.clearAll();
+    m_CDB.clearAll();
 
     // Get geometry properties
-    Vec3d sP = sphereGeom->getPosition();
-    double r = sphereGeom->getRadius() * sphereGeom->getScaling();
-    Vec3d pP = planeGeom->getPosition();
-    Vec3d n = planeGeom->getNormal();
+    Vec3d sP = m_sphereB->getPosition();
+    double r = m_sphereB->getRadius() * m_sphereB->getScaling();
+    Vec3d pP = m_planeA->getPosition();
+    Vec3d n = m_planeA->getNormal();
 
     // Compute shortest distance
     double d = (sP-pP).dot(n);
@@ -79,8 +66,8 @@ PlaneToSphereCD::computeCollisionData(std::shared_ptr<CollidingObject> objA,
     Vec3d sC = sP + dirBToA*r;
 
     // Set collisionData
-    colDataA.PDColData.push_back({pC, dirBToA, penetrationDepth});
-    colDataB.PDColData.push_back({sC, -dirBToA, penetrationDepth});
+    m_CDA.PDColData.push_back({pC, dirBToA, penetrationDepth});
+    m_CDB.PDColData.push_back({sC, -dirBToA, penetrationDepth});
 }
 
 }

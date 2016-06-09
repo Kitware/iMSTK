@@ -29,24 +29,22 @@ namespace imstk {
 
 std::shared_ptr<CollisionHandling>
 CollisionHandling::make_collision_handling(const Type& type,
-                                           std::shared_ptr<CollidingObject> obj)
+                                           std::shared_ptr<CollidingObject> objA,
+                                           CollisionData &CDA,
+                                           std::shared_ptr<CollidingObject> objB)
 {
     switch (type)
     {
     case Type::Penalty:
     {
-        if (obj->getType() == SceneObject::Type::VirtualCoupling ||
-            obj->getType() == SceneObject::Type::Rigid)
-        {
-            return std::make_shared<PenaltyRigidCH>();
-        }
-        else
+        if (objA->getType() != SceneObject::Type::VirtualCoupling &&
+            objA->getType() == SceneObject::Type::Rigid)
         {
             LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
                          << "penalty collision handling not yet implemented for non-rigid objects.";
             return nullptr;
         }
-
+        return std::make_shared<PenaltyRigidCH>(objA, CDA);
     }break;
 
     default:

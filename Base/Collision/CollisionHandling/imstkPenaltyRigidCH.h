@@ -22,13 +22,14 @@
 #ifndef imstkPenaltyRigidCH_h
 #define imstkPenaltyRigidCH_h
 
+#include "imstkCollisionHandling.h"
+
 #include <memory>
 
-#include "imstkCollisionHandling.h"
-#include "imstkCollidingObject.h"
-#include "imstkCollisionData.h"
-
 namespace imstk {
+
+class CollidingObject;
+class CollisionData;
 
 class PenaltyRigidCH : public CollisionHandling
 {
@@ -37,7 +38,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    PenaltyRigidCH() : CollisionHandling(CollisionHandling::Type::Penalty) {}
+    PenaltyRigidCH(std::shared_ptr<CollidingObject> obj,
+                   CollisionData& colData) :
+        CollisionHandling(CollisionHandling::Type::Penalty),
+        m_obj(obj),
+        m_colData(colData)
+    {}
 
     ///
     /// \brief Destructor
@@ -47,8 +53,12 @@ public:
     ///
     /// \brief Compute forces based on collision data (pure virtual)
     ///
-    virtual void computeContactForces(std::shared_ptr<CollidingObject> obj,
-                                      CollisionData& colData);
+    void computeContactForces() override;
+
+private:
+
+    std::shared_ptr<CollidingObject> m_obj;
+    CollisionData& m_colData;
 
 };
 }

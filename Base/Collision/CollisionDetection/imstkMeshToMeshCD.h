@@ -30,7 +30,7 @@
 
 namespace imstk {
 
-class CollidingObject;
+class SurfaceMesh;
 class CollisionData;
 
 class MeshToMeshCD : public CollisionDetection
@@ -40,7 +40,10 @@ public:
     ///
     /// \brief Constructor
     ///
-    MeshToMeshCD() : CollisionDetection(CollisionDetection::Type::MeshToMesh) {}
+    MeshToMeshCD(std::shared_ptr<SurfaceMesh> planeA,
+                 std::shared_ptr<SurfaceMesh> sphereB,
+                 CollisionData& CDA,
+                 CollisionData& CDB);
 
     ///
     /// \brief Destructor
@@ -50,16 +53,15 @@ public:
     ///
     /// \brief Detect collision and compute collision data
     ///
-    void computeCollisionData(std::shared_ptr<CollidingObject> objA,
-                              std::shared_ptr<CollidingObject> objB,
-                              CollisionData& colDataA,
-                              CollisionData& colDataB) override;
+    void computeCollisionData() override;
 
 private:
 
     bool m_initialized = false;
-    std::shared_ptr<DeformModel> modelA;
-    std::shared_ptr<DeformModel> modelB;
+    std::shared_ptr<SurfaceMesh> m_meshA;
+    std::shared_ptr<SurfaceMesh> m_meshB;
+    std::shared_ptr<DeformModel> m_modelA;
+    std::shared_ptr<DeformModel> m_modelB;
 };
 }
 

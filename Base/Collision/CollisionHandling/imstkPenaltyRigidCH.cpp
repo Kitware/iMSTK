@@ -21,21 +21,22 @@
 
 #include "imstkPenaltyRigidCH.h"
 
+#include "imstkCollidingObject.h"
 #include "imstkVirtualCouplingObject.h"
+#include "imstkCollisionData.h"
 
 #include <g3log/g3log.hpp>
 
 namespace imstk {
 
 void
-PenaltyRigidCH::computeContactForces(std::shared_ptr<CollidingObject> obj,
-                                     CollisionData& colData)
+PenaltyRigidCH::computeContactForces()
 {
-    auto movableObj = std::dynamic_pointer_cast<VirtualCouplingObject>(obj);
+    auto movableObj = std::dynamic_pointer_cast<VirtualCouplingObject>(m_obj);
     if(movableObj == nullptr)
     {
         LOG(WARNING) << "PenaltyRigidCH::computeContactForces error: "
-                     << obj->getName() << " is not a virtualcoupling object. "
+                     << m_obj->getName() << " is not a virtualcoupling object. "
                      << "(Rigid not yet supported, coming soon)";
         return;
     }
@@ -44,11 +45,11 @@ PenaltyRigidCH::computeContactForces(std::shared_ptr<CollidingObject> obj,
     Vec3d force = movableObj->getForce();
 
     // If collision data, append forces
-    if(!colData.PDColData.empty())
+    if(!m_colData.PDColData.empty())
     {
-        for(const auto& cd : colData.PDColData)
+        for(const auto& cd : m_colData.PDColData)
         {
-            force += cd.direction * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*5;
+            force += cd.direction * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
         }
     }
 
