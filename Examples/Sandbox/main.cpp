@@ -138,12 +138,12 @@ void testPenaltyRigidCollision()
     sdk->addDeviceServer(server);
 
     // Falcon clients
-    auto controller0 = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost");
-    auto controller1 = std::make_shared<imstk::VRPNDeviceClient>("device1", "localhost");
-    controller0->setForceEnabled(true);
-    controller1->setForceEnabled(true);
-    sdk->addDeviceClient(controller0);
-    sdk->addDeviceClient(controller1);
+    auto client0 = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost");
+    auto client1 = std::make_shared<imstk::VRPNDeviceClient>("device1", "localhost");
+    client0->setForceEnabled(true);
+    client1->setForceEnabled(true);
+    sdk->addDeviceClient(client0);
+    sdk->addDeviceClient(client1);
 
     // Plane
     auto planeGeom = std::make_shared<Plane>();
@@ -157,7 +157,7 @@ void testPenaltyRigidCollision()
     auto sphere0Geom = std::make_shared<Sphere>();
     sphere0Geom->scale(0.5);
     sphere0Geom->translate(Vec3d(1,0.5,0));
-    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", controller0, 40);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 40);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
@@ -166,7 +166,7 @@ void testPenaltyRigidCollision()
     auto sphere1Geom = std::make_shared<Sphere>();
     sphere1Geom->scale(0.5);
     sphere1Geom->translate(Vec3d(-1,0.5,0));
-    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", controller1, 40);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1, 40);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
