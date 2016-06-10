@@ -42,8 +42,7 @@ public:
     ///
     MeshToMeshCD(std::shared_ptr<SurfaceMesh> planeA,
                  std::shared_ptr<SurfaceMesh> sphereB,
-                 CollisionData& CDA,
-                 CollisionData& CDB);
+                 CollisionData& colData);
 
     ///
     /// \brief Destructor
@@ -57,7 +56,23 @@ public:
 
 private:
 
-    bool m_initialized = false;
+    ///
+    /// \brief Callback defining edge to edge collision (A - B)
+    ///
+    static void EECallback(unsigned int eA_v1, unsigned int eA_v2,
+                           unsigned int eB_v1, unsigned int eB_v2,
+                           float t, void *userdata);
+    ///
+    /// \brief Callback defining vertex to triangle collision (A - B)
+    ///
+    static void VFCallbackA(unsigned int fidA, unsigned int vidB,
+                            float t, void *userdata);
+    ///
+    /// \brief Callback defining vertex to triangle collision (B - A)
+    ///
+    static void VFCallbackB(unsigned int fidB, unsigned int vidA,
+                            float t, void *userdata);
+
     std::shared_ptr<SurfaceMesh> m_meshA;
     std::shared_ptr<SurfaceMesh> m_meshB;
     std::shared_ptr<DeformModel> m_modelA;

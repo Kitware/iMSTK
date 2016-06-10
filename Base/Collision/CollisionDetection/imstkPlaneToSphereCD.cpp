@@ -34,24 +34,23 @@ void
 PlaneToSphereCD::computeCollisionData()
 {
     // Clear collisionData
-    m_CDA.clearAll();
-    m_CDB.clearAll();
+    m_colData.clearAll();
 
     // Get geometry properties
-    Vec3d sP = m_sphereB->getPosition();
+    Vec3d sphereBPos = m_sphereB->getPosition();
     double r = m_sphereB->getRadius() * m_sphereB->getScaling();
-    Vec3d pP = m_planeA->getPosition();
+    Vec3d planeAPos = m_planeA->getPosition();
     Vec3d n = m_planeA->getNormal();
 
     // Compute shortest distance
-    double d = (sP-pP).dot(n);
+    double d = (sphereBPos-planeAPos).dot(n);
 
     // Define sphere to plane direction
-    Vec3d dirBToA = -n;
+    Vec3d dirAToB = n;
     if( d < 0 )
     {
         d = -d;
-        dirBToA = n;
+        dirAToB = -n;
     }
 
     // Return if no penetration
@@ -62,12 +61,11 @@ PlaneToSphereCD::computeCollisionData()
     }
 
     // Compute collision points
-    Vec3d pC = sP + dirBToA*d;
-    Vec3d sC = sP + dirBToA*r;
+    Vec3d planeAColPt = sphereBPos - dirAToB*d;
+    Vec3d sphereBColPt = sphereBPos - dirAToB*r;
 
     // Set collisionData
-    m_CDA.PDColData.push_back({pC, dirBToA, penetrationDepth});
-    m_CDB.PDColData.push_back({sC, -dirBToA, penetrationDepth});
+    m_colData.PDColData.push_back({planeAColPt, sphereBColPt, dirAToB, penetrationDepth});
 }
 
 }

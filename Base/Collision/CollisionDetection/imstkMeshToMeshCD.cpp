@@ -28,40 +28,10 @@
 
 namespace imstk {
 
-
-void
-EECallback(unsigned int e1_v1, unsigned int e1_v2,
-           unsigned int e2_v1, unsigned int e2_v2,
-           float t, void *userdata)
-{
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    CD->getType();
-    LOG(INFO) <<"EE: e1("<<e1_v1<<", "<<e1_v2<<"), e2("<<e2_v1<<", "<<e2_v2<<") \t@ t="<<t;
-}
-
-void
-VFCallback1(unsigned int fid1, unsigned int vid2,
-            float t, void *userdata)
-{
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    CD->getType();
-    LOG(INFO) <<"VF: v2("<<vid2<<"), f1("<<fid1<<") \t\t@ t="<<t;
-}
-
-void
-VFCallback2(unsigned int fid2, unsigned int vid1,
-            float t, void *userdata)
-{
-    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
-    CD->getType();
-    LOG(INFO) <<"VF: v1("<<vid1<<"), f2("<<fid2<<") \t\t@ t="<<t;
-}
-
 MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                            std::shared_ptr<SurfaceMesh> meshB,
-                           CollisionData& CDA,
-                           CollisionData& CDB) :
-    CollisionDetection(CollisionDetection::Type::PlaneToSphere, CDA, CDB),
+                           CollisionData& colData) :
+    CollisionDetection(CollisionDetection::Type::PlaneToSphere, colData),
     m_meshA(meshA),
     m_meshB(meshB)
 {
@@ -69,9 +39,9 @@ MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
     m_modelB = std::make_shared<DeformModel>(meshB->getVerticesPositions(), meshB->getTrianglesVertices());
 
     // Setup Callbacks
-    m_modelA->SetEECallBack(EECallback, this);
-    m_modelA->SetVFCallBack(VFCallback1, this);
-    m_modelB->SetVFCallBack(VFCallback2, this);
+    m_modelA->SetEECallBack(MeshToMeshCD::EECallback, this);
+    m_modelA->SetVFCallBack(MeshToMeshCD::VFCallbackA, this);
+    m_modelB->SetVFCallBack(MeshToMeshCD::VFCallbackB, this);
 
     // Build BVH
     m_modelA->BuildBVH(false);
@@ -97,6 +67,51 @@ MeshToMeshCD::computeCollisionData()
 
     // Collide
     m_modelA->Collide(m_modelB.get());
+}
+
+void
+MeshToMeshCD::EECallback(unsigned int eA_v1, unsigned int eA_v2,
+                         unsigned int eB_v1, unsigned int eB_v2,
+                         float t, void *userdata)
+{
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    if(CD == nullptr)
+    {
+        return;
+    }
+
+    auto colData = CD->getCollisionData();
+    colData.EEColData.push_back(EdgeEdgeCollisionData(eA_v1, eA_v2, eB_v1, eB_v2, t));
+    //LOG(INFO) <<"EE: eA("<<eA_v1<<", "<<eA_v2<<"), eB("<<eB_v1<<", "<<eB_v2<<") \t@ t="<<t;
+}
+
+void
+MeshToMeshCD::VFCallbackA(unsigned int fidA, unsigned int vidB,
+                          float t, void *userdata)
+{
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    if(CD == nullptr)
+    {
+        return;
+    }
+
+    auto colData = CD->getCollisionData();
+    colData.TVColData.push_back(TriangleVertexCollisionData(fidA, vidB, t));
+    //LOG(INFO) <<"VF: fA("<<fidA<<"), vB("<<vidB<<") \t\t@ t="<<t;
+}
+
+void
+MeshToMeshCD::VFCallbackB(unsigned int fidB, unsigned int vidA,
+                          float t, void *userdata)
+{
+    auto CD = reinterpret_cast<MeshToMeshCD*>(userdata);
+    if(CD == nullptr)
+    {
+        return;
+    }
+    auto colData = CD->getCollisionData();
+    colData.VTColData.push_back(VertexTriangleCollisionData(vidA, fidB, t));
+    //LOG(INFO) <<"VF: vA("<<vidA<<"), fB("<<fidB<<") \t\t@ t="<<t;
 }
 
 }

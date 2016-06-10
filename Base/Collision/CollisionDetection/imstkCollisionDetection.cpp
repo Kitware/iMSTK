@@ -38,8 +38,7 @@ std::shared_ptr<CollisionDetection>
 CollisionDetection::make_collision_detection(const Type& type,
                                              std::shared_ptr<CollidingObject> objA,
                                              std::shared_ptr<CollidingObject> objB,
-                                             CollisionData &CDA,
-                                             CollisionData &CDB)
+                                             CollisionData &colData)
 {
     switch (type)
     {
@@ -55,7 +54,7 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for PlaneToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<PlaneToSphereCD>(plane, sphere, CDA, CDB);
+        return std::make_shared<PlaneToSphereCD>(plane, sphere, colData);
     }break;
     case Type::SphereToSphere:
     {
@@ -69,7 +68,7 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for SphereToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<SphereToSphereCD>(sphereA, sphereB, CDA, CDB);
+        return std::make_shared<SphereToSphereCD>(sphereA, sphereB, colData);
     }break;
     case Type::MeshToMesh:
     {
@@ -83,7 +82,7 @@ CollisionDetection::make_collision_detection(const Type& type,
                          << "invalid object geometries for MeshToMesh collision detection.";
             return nullptr;
         }
-        return std::make_shared<MeshToMeshCD>(meshA, meshB, CDA, CDB);
+        return std::make_shared<MeshToMeshCD>(meshA, meshB, colData);
     }break;
     default:
     {
@@ -97,5 +96,11 @@ const CollisionDetection::Type&
 CollisionDetection::getType() const
 {
     return m_type;
+}
+
+const CollisionData&
+CollisionDetection::getCollisionData() const
+{
+    return m_colData;
 }
 }

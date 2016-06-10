@@ -49,7 +49,14 @@ PenaltyRigidCH::computeContactForces()
     {
         for(const auto& cd : m_colData.PDColData)
         {
-            force += cd.direction * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
+            if (m_side == CollisionHandling::Side::A)
+            {
+                force -= cd.dirAtoB * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
+            }
+            else if (m_side == CollisionHandling::Side::B)
+            {
+                force += cd.dirAtoB * ((cd.penetrationDepth+1)*(cd.penetrationDepth+1)-1)*10;
+            }
         }
     }
 

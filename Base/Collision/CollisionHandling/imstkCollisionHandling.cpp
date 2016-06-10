@@ -29,8 +29,9 @@ namespace imstk {
 
 std::shared_ptr<CollisionHandling>
 CollisionHandling::make_collision_handling(const Type& type,
+                                           const Side& side,
+                                           const CollisionData &colData,
                                            std::shared_ptr<CollidingObject> objA,
-                                           CollisionData &CDA,
                                            std::shared_ptr<CollidingObject> objB)
 {
     switch (type)
@@ -44,7 +45,7 @@ CollisionHandling::make_collision_handling(const Type& type,
                          << "penalty collision handling not yet implemented for non-rigid objects.";
             return nullptr;
         }
-        return std::make_shared<PenaltyRigidCH>(objA, CDA);
+        return std::make_shared<PenaltyRigidCH>(side, colData, objA);
     }break;
 
     default:

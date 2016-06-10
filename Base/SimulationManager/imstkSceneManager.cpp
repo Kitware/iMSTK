@@ -60,17 +60,7 @@ SceneManager::runModule()
     for (auto intPair : m_scene->getCollisionGraph()->getInteractionPairList())
     {
         intPair->computeCollisionData();
-    }
-
-    // Compute contact forces per objects
-    for (auto objIntPair : m_scene->getCollisionGraph()->getInteractionPairMap())
-    {
-        auto obj = objIntPair.first;
-        auto intPairVector = objIntPair.second;
-        for (auto intPair : intPairVector)
-        {
-            intPair->computeContactForces(obj);
-        }
+        intPair->computeContactForces();
     }
 
     // Update virtualCoupling objects based on devices

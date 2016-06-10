@@ -38,11 +38,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    PenaltyRigidCH(std::shared_ptr<CollidingObject> obj,
-                   CollisionData& colData) :
-        CollisionHandling(CollisionHandling::Type::Penalty),
-        m_obj(obj),
-        m_colData(colData)
+    PenaltyRigidCH(const Side& side,
+                   const CollisionData& colData,
+                   std::shared_ptr<CollidingObject> obj) :
+        CollisionHandling(CollisionHandling::Type::Penalty,
+                          side,
+                          colData),
+        m_obj(obj)
     {}
 
     ///
@@ -58,7 +60,6 @@ public:
 private:
 
     std::shared_ptr<CollidingObject> m_obj;
-    CollisionData& m_colData;
 
 };
 }

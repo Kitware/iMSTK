@@ -56,10 +56,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     }
 
     // Collision Detection
-    m_colDataMap[A] = CollisionData();
-    m_colDataMap[B] = CollisionData();
-    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B,
-                                                                                          m_colDataMap[A], m_colDataMap[B]);
+    std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B, m_colData);
     if (CD == nullptr)
     {
         LOG(WARNING) << "InteractionPair error: can not instantiate collision detection algorithm.";
@@ -70,7 +67,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     std::shared_ptr<CollisionHandling> CHA;
     if (A->getType() != SceneObject::Type::Static)
     {
-       CHA = CollisionHandling::make_collision_handling(CHAType, A, m_colDataMap[A], B);
+       CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
        if (CHA == nullptr)
        {
            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
@@ -83,7 +80,7 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     std::shared_ptr<CollisionHandling> CHB;
     if (B->getType() != SceneObject::Type::Static)
     {
-       CHB = CollisionHandling::make_collision_handling(CHBType, B, m_colDataMap[B], A);
+       CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
        if (CHB == nullptr)
        {
            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
@@ -95,8 +92,8 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
     // Init interactionPair
     m_objects = ObjectsPair(A, B);
     m_colDetect = CD;
-    m_colHandlingMap[A] = CHA;
-    m_colHandlingMap[B] = CHB;
+    m_colHandlingA = CHA;
+    m_colHandlingB = CHB;
     m_valid = true;
 }
 
@@ -113,7 +110,7 @@ InteractionPair::computeCollisionData()
 }
 
 void
-InteractionPair::computeContactForces(std::shared_ptr<CollidingObject> obj)
+InteractionPair::computeContactForces()
 {
     if (!m_valid)
     {
@@ -121,19 +118,14 @@ InteractionPair::computeContactForces(std::shared_ptr<CollidingObject> obj)
         return;
     }
 
-    if (obj != m_objects.first && obj != m_objects.second)
+    if(m_colHandlingA)
     {
-        LOG(WARNING) << "InteractionPair::computeContactForces error: "
-                     << obj->getName() << " is not part of this interaction Pair.";
-        return;
+        m_colHandlingA->computeContactForces();
     }
-
-    if (obj->getType() == SceneObject::Type::Static)
+    if(m_colHandlingB)
     {
-        return;
+        m_colHandlingB->computeContactForces();
     }
-
-    m_colHandlingMap.at(obj)->computeContactForces();
 }
 
 const bool&

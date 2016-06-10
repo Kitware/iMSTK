@@ -22,36 +22,60 @@
 #ifndef imstkCollisionData_h
 #define imstkCollisionData_h
 
+//#include <pair>
+
 #include "imstkMath.h"
 
 namespace imstk {
 
 struct PositionDirectionCollisionData
 {
-    Vec3d position;
-    Vec3d direction;
-    double penetrationDepth;
-};
-
-struct VertexDirectionCollisionData
-{
-    size_t vertexId;
-    Vec3d direction;
+    Vec3d posA;
+    Vec3d posB;
+    Vec3d dirAtoB;
     double penetrationDepth;
 };
 
 struct VertexTriangleCollisionData
 {
-    size_t vertexId;
-    size_t triangleId;
-    double penetrationDepth;
+    size_t vertexIdA;
+    size_t triIdB;
+    float time;
+
+    VertexTriangleCollisionData(size_t vIdA, size_t fIdB, float t = -1)
+    {
+        vertexIdA = vIdA;
+        triIdB = fIdB;
+        time = t;
+    }
+};
+
+struct TriangleVertexCollisionData
+{
+    size_t triIdA;
+    size_t vertexIdB;
+    float time;
+
+    TriangleVertexCollisionData(size_t fIdA, size_t vIdB, float t = -1)
+    {
+        triIdA = fIdA;
+        vertexIdB = vIdB;
+        time = t;
+    }
 };
 
 struct EdgeEdgeCollisionData
 {
-    size_t edgeId1;
-    size_t edgeId2;
-    double shortestDistance;
+    std::pair<size_t, size_t> edgeIdA;
+    std::pair<size_t, size_t> edgeIdB;
+    float time;
+
+    EdgeEdgeCollisionData(size_t eA_v1, size_t eA_v2, size_t eB_v1, size_t eB_v2, float t = -1)
+    {
+        edgeIdA = std::pair<size_t, size_t>(eA_v1, eA_v2);
+        edgeIdB = std::pair<size_t, size_t>(eB_v1, eB_v2);
+        time = t;
+    }
 };
 
 class CollisionData
@@ -61,14 +85,14 @@ public:
     void clearAll()
     {
         PDColData.clear();
-        VDColData.clear();
         VTColData.clear();
+        TVColData.clear();
         EEColData.clear();
     }
 
     std::vector<PositionDirectionCollisionData> PDColData; //!< Position Direction collision data
-    std::vector<VertexDirectionCollisionData> VDColData;   //!< Vertex Direction collision data
     std::vector<VertexTriangleCollisionData> VTColData;    //!< Vertex Triangle collision data
+    std::vector<TriangleVertexCollisionData> TVColData;    //!< Triangle Vertex collision data
     std::vector<EdgeEdgeCollisionData> EEColData;          //!< Edge Edge collision data
 };
 }

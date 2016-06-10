@@ -41,9 +41,8 @@ public:
     ///
     PlaneToSphereCD(std::shared_ptr<Plane> planeA,
                     std::shared_ptr<Sphere> sphereB,
-                    CollisionData& CDA,
-                    CollisionData& CDB) :
-        CollisionDetection(CollisionDetection::Type::PlaneToSphere, CDA, CDB),
+                    CollisionData& colData) :
+        CollisionDetection(CollisionDetection::Type::PlaneToSphere, colData),
         m_planeA(planeA),
         m_sphereB(sphereB)
     {}

@@ -84,8 +84,8 @@ void testMeshCCD()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MeshCCDTest");
 
-    auto mesh1 = imstk::MeshReader::read("/Users/alexis/Projects/IMSTK/data/collidingspheres/big.vtk");
-    auto mesh2 = imstk::MeshReader::read("/Users/alexis/Projects/IMSTK/data/collidingspheres/small.vtk");
+    auto mesh1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/big.vtk");
+    auto mesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_0.vtk");
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");
@@ -106,9 +106,23 @@ void testMeshCCD()
                                  CollisionHandling::Type::None,
                                  CollisionHandling::Type::None);
 
+    auto t = std::thread([mesh2]
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_1.vtk");
+        mesh2->setVerticesPositions(mesh2_1->getVerticesPositions());
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_2.vtk");
+        mesh2->setVerticesPositions(mesh2_2->getVerticesPositions());
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_3 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_3.vtk");
+        mesh2->setVerticesPositions(mesh2_3->getVerticesPositions());
+    });
+
     // Run
     sdk->setCurrentScene("MeshCCDTest");
     sdk->startSimulation(true);
+    t.join();
 }
 
 void testPenaltyRigidCollision()

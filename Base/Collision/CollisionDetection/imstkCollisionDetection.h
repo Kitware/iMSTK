@@ -46,16 +46,14 @@ public:
     static std::shared_ptr<CollisionDetection> make_collision_detection(const Type& type,
             std::shared_ptr<CollidingObject> objA,
             std::shared_ptr<CollidingObject> objB,
-            CollisionData& CDA,
-            CollisionData& CDB);
+            CollisionData& colData);
 
     ///
     /// \brief Constructor
     ///
-    CollisionDetection(const Type& type, CollisionData& CDA, CollisionData& CDB) :
+    CollisionDetection(const Type& type, CollisionData& colData) :
         m_type(type),
-        m_CDA(CDA),
-        m_CDB(CDB)
+        m_colData(colData)
     {}
 
     ///
@@ -73,11 +71,15 @@ public:
     ///
     const Type& getType() const;
 
+    ///
+    /// \brief Returns collision data
+    ///
+    const CollisionData& getCollisionData() const;
+
 protected:
 
-    Type m_type; //!< Collision detection algorithm type
-    CollisionData& m_CDA;
-    CollisionData& m_CDB;
+    Type m_type;              //!< Collision detection algorithm type
+    CollisionData& m_colData; //!< Collision data
 
 };
 }

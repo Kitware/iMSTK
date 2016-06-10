@@ -35,8 +35,6 @@ namespace imstk {
 class InteractionPair
 {
     using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
-    using CollisionDataMap = std::map<std::shared_ptr<CollidingObject>, CollisionData>;
-    using CollisionHandlingMap = std::map<std::shared_ptr<CollidingObject>, std::shared_ptr<CollisionHandling>>;
 
 public:
 
@@ -62,7 +60,7 @@ public:
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object
     ///
-    void computeContactForces(std::shared_ptr<CollidingObject> A);
+    void computeContactForces();
 
     ///
     /// \brief Call collision handling algorithm to compute contact forces for an object
@@ -76,10 +74,11 @@ public:
 
 protected:
 
-    ObjectsPair m_objects;                           //!< Colliding objects
-    std::shared_ptr<CollisionDetection> m_colDetect; //!< Collision detection algorithm
-    CollisionDataMap m_colDataMap;                   //!< Map of collision data per colliding object
-    CollisionHandlingMap m_colHandlingMap;           //!< Map of collision handling algorithm per colliding object
+    ObjectsPair m_objects;                             //!< Colliding objects
+    std::shared_ptr<CollisionDetection> m_colDetect;   //!< Collision detection algorithm
+    CollisionData m_colData;                           //!< Common Collision Data
+    std::shared_ptr<CollisionHandling> m_colHandlingA; //!< Collision handling algorithm for A
+    std::shared_ptr<CollisionHandling> m_colHandlingB; //!< Collision handling algorithm for B
 
     bool m_valid;
 };
