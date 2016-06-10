@@ -36,6 +36,7 @@
 #include "imstkTetrahedralMeshRenderDelegate.h"
 
 #include "vtkPolyDataMapper.h"
+#include "vtkPolyDataNormals.h"
 #include "vtkTransform.h"
 
 namespace imstk {
@@ -86,9 +87,13 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 void
 RenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
 {
-    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 
-    mapper->SetInputConnection(source);
+    auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
+    normalGen->SetInputConnection(source);
+    normalGen->SplittingOff();
+
+    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(normalGen->GetOutputPort());
 
     m_actor->SetMapper(mapper);
 }
