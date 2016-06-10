@@ -107,8 +107,8 @@ CollisionGraph::removeInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B
 bool
 CollisionGraph::removeInteractionPair(InteractionPairPtr intPair)
 {
-    this->removeInteractionPair(intPair->getObjectsPair().first,
-                                intPair->getObjectsPair().second);
+    return this->removeInteractionPair(intPair->getObjectsPair().first,
+                                       intPair->getObjectsPair().second);
 }
 
 std::shared_ptr<InteractionPair>
