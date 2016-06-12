@@ -33,12 +33,22 @@ namespace imstk {
 ///
 class DynamicalModel
 {
+public:
+    enum class Type
+    {
+        elastoDynamics,
+        NavierStokes,
+        HeatEquation,
+        none
+    };
+
     using kinematicState = ProblemState <Vectord> ; // for now!
+
 public:
     ///
     /// \brief Constructor
     ///
-    DynamicalModel(std::string name){}
+    DynamicalModel(DynamicalModel::Type type = Type::none) : m_type(type){}
 
     ///
     /// \brief Destructor
@@ -48,22 +58,35 @@ public:
     ///
     /// \brief Return the current state of the body
     ///
-    std::shared_ptr<kinematicState> getInitialState();
+    std::shared_ptr<kinematicState> getInitialState()
+    {
+        return m_initialState;
+    }
 
     ///
     /// \brief Return the current state of the body
     ///
-    std::shared_ptr<kinematicState> getCurrentState();
+    std::shared_ptr<kinematicState> getCurrentState()
+    {
+        return m_currentState;
+    }
 
     ///
     /// \brief Return the current state of the body
     ///
-    std::shared_ptr<kinematicState> getPreviousState();
+    std::shared_ptr<kinematicState> getPreviousState()
+    {
+        return m_previousState;
+    }
 
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState();
+    virtual void resetToInitialState()
+    {
+        m_currentState->setState(m_initialState);
+        m_previousState->setState(m_initialState);
+    }
 
     ///
     /// \brief Returns the number of degrees of freedom
@@ -74,6 +97,8 @@ public:
     }
 
 protected:
+
+    Type m_type; ///> Mathematical model type
 
     // Body states
     std::shared_ptr<kinematicState> m_initialState;      ///> Initial state
