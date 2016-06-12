@@ -23,12 +23,10 @@ limitations under the License.
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
-
-TimeIntegrator::TimeIntegrator(const TimeIntegrator::Type type)
+namespace imstk
 {
-    this->setType(type);
-}
+
+TimeIntegrator::TimeIntegrator(const TimeIntegrator::Type type, double dT) : m_type(type), m_dT(dT){}
 
 void
 TimeIntegrator::setType(const TimeIntegrator::Type type)
@@ -65,4 +63,11 @@ TimeIntegrator::setCoefficients(const TimeIntegrator::Type type)
         break;
     }
 }
+
+void
+TimeIntegrator::setTimestepSize(const double dT)
+{
+    m_dT = dT;
+}
+
 }

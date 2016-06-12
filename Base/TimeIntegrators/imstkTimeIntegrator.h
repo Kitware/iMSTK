@@ -43,14 +43,15 @@ class TimeIntegrator
         ForwardEuler,
         BackwardEuler,
         NewmarkBeta,
-        CentralDifference
+        CentralDifference,
+        none
     };
 
 public:
     ///
     /// \brief Constructor
     ///
-    TimeIntegrator(const TimeIntegrator::Type type);
+    TimeIntegrator(const TimeIntegrator::Type type, double dT);
 
     ///
     /// \brief Destructor
@@ -68,6 +69,15 @@ public:
     ///
     void setCoefficients(const TimeIntegrator::Type type);
 
+    ///
+    /// \brief Set the time step size
+    ///
+    void setTimestepSize(const double dT);
+    double getTimestepSize() const
+    {
+        return m_dT;
+    }
+
 protected:
     TimeIntegrator::Type m_type; ///> Type of the time integrator
 
@@ -76,9 +86,9 @@ protected:
     std::array<double,3> m_gamma;
     std::array<double,3> m_beta;
 
-    double dT; ///> Delta T
+    double m_dT; ///> Delta T
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkTimeIntegrator_h
