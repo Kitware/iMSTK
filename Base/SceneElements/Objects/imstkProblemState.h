@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkKinematicState_h
-#define imstkKinematicState_h
+#ifndef imstkProblemState_h
+#define imstkProblemState_h
 
 namespace imstk
 {
@@ -49,11 +49,25 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(const T& u, const T& v, const T& a = 0)
+    void setState(const T& u, const T& v = 0, const T& a = 0)
     {
         m_q = u;
         m_qDot = v;
         m_qDotDot = a;
+    }
+
+    void setState(const ProblemState& rhs)
+    {
+        m_q = rhs.getQ();
+        m_qDot = rhs.getQDot();
+        m_qDotDot = rhs.getQDotDot();
+    }
+
+    void setState(std::shared_ptr<ProblemState> rhs)
+    {
+        m_q = rhs->getQ();
+        m_qDot = rhs->getQDot();
+        m_qDotDot = rhs->getQDotDot();
     }
 
     ///
@@ -61,6 +75,10 @@ public:
     ///
     T& getQ() const
     {
+        if (!m_q)
+        {
+            LOG(WARNING) << "State variable is not initialized!"
+        }
         return m_q;
     }
 
@@ -69,6 +87,10 @@ public:
     ///
     T& getQDot() const
     {
+        if (!m_qDot)
+        {
+            LOG(WARNING) << "Time derivative of state variable is not initialized!"
+        }
         return m_qDot;
     }
 
@@ -77,6 +99,10 @@ public:
     ///
     T& getQDotDot() const
     {
+        if (!m_qDotDot)
+        {
+            LOG(WARNING) << "Double time derivative of state variable is not initialized!"
+        }
         return m_qDotDot;
     }
 
@@ -96,4 +122,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkKinematicState_h
+#endif // ifndef imstkProblemState_h
