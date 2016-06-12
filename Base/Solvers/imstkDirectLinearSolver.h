@@ -66,6 +66,14 @@ public:
     ///
     void setSystem(std::shared_ptr<LinearSystemType> newSystem) override;
 
+    ///
+    /// \brief Returns true if the solver is iterative
+    ///
+    bool isIterative() const
+    {
+        return false;
+    };
+
 private:
     Eigen::LDLT<Matrixd> solver;
 };

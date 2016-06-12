@@ -36,7 +36,18 @@ class LinearSolver
 {
 public:
     using MatrixType = SystemMatrixType;
-    using LinearSystemType = LinearSystem<MatrixType>;
+    using LinearSystemType = LinearSystem < MatrixType > ;
+
+    enum class Type
+    {
+        ConjugateGradient,
+        LUFactorization,
+        GaussSeidel,
+        SuccessiveOverRelaxation,
+        Jacobi,
+        GMRES,
+        none
+    };
 
 public:
     ///
@@ -57,12 +68,29 @@ public:
     std::shared_ptr<LinearSystemType> getSystem() const;
 
     ///
+    /// \brief Set solver tolerance
+    ///
+    void setTolerance(const double tolerance);
+
+    ///
+    /// \brief Get solver tolerance
+    ///
+    double getTolerance() const;
+
+    ///
     /// \brief Print solver information.
     ///
-    virtual void print();
+    virtual void print() const;
+
+    ///
+    /// \brief Returns true if the solver is iterative
+    ///
+    virtual bool isIterative() const = 0;
 
 protected:
-    std::shared_ptr<LinearSystemType> m_linearSystem; /// Linear system of equations
+    Type m_Type;                                        ///> Type of the scene object
+    double m_tolerance = MACHINE_PRECISION;             ///> default tolerance
+    std::shared_ptr<LinearSystemType> m_linearSystem;   /// Linear system of equations
 };
 
 }

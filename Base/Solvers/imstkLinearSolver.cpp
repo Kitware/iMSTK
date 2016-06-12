@@ -46,9 +46,23 @@ LinearSolver<SystemMatrixType>::getSystem() const
 
 template<typename SystemMatrixType>
 void
-imstk::LinearSolver<SystemMatrixType>::print()
+LinearSolver<SystemMatrixType>::print()
 {
     LOG(INFO) << "Solver type (broad): Linear";
+}
+
+template<typename SystemMatrixType>
+void
+LinearSolver<SystemMatrixType>::setTolerance(const double tolerance)
+{
+    m_tolerance = tolerance;
+}
+
+template<typename SystemMatrixType>
+double
+LinearSolver<SystemMatrixType>::getTolerance() const
+{
+    return m_tolerance;
 }
 
 } //imstk

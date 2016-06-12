@@ -61,23 +61,24 @@ public:
     virtual double getResidual(const Vectord &x);
 
     ///
-    /// \brief Get/set solver tolerance
-    ///
-    void setTolerance(const double tolerance);
-    double getTolerance() const;
-
-    ///
     /// \brief Print solver information.
     ///
-    virtual void print() override;
+    virtual void print() const override;
 
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations.
     ///
     virtual void solve(Vectord &x) override;
 
+    ///
+    /// \brief Returns true if the solver is iterative
+    ///
+    bool isIterative() const
+    {
+        return true;
+    };
+
 protected:
-    double m_tolerance;       ///> residual tolerance
     size_t m_maxIterations;   ///> Maximum number of iterations to be performed.
     Vectord m_residual;       ///> Storage for residual vector.
 };

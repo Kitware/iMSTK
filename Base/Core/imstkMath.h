@@ -107,6 +107,10 @@ const double LN10 = 2.30258509299404568402;
 
 const double MAX_D = std::numeric_limits<double>::max();
 const double MIN_D = std::numeric_limits<double>::min();
+const double MAX_F = std::numeric_limits<float>::max();
+const double MIN_F = std::numeric_limits<float>::min();
+
+const double MACHINE_PRECISION = std::numeric_limits<double>::denorm_min();
 }
 
 #endif // ifndef imstkMath_h

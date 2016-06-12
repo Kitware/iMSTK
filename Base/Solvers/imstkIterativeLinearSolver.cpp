@@ -60,18 +60,12 @@ IterativeLinearSolver::getResidual(const Vectord& x)
 }
 
 void
-IterativeLinearSolver::print()
+IterativeLinearSolver::print() const
 {
     // Print Type
     LinearSolver::print();
 
     LOG(INFO) << "Solver type (direct/iterative): Iterative";
-}
-
-double
-IterativeLinearSolver::getTolerance() const
-{
-    return m_tolerance;
 }
 
 void
@@ -95,12 +89,6 @@ IterativeLinearSolver::solve(Vectord& x)
 
         this->iterate(x);
     }
-}
-
-void
-IterativeLinearSolver::setTolerance(const double tolerance)
-{
-    m_tolerance = tolerance;
 }
 
 } //imstk
