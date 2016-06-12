@@ -27,12 +27,18 @@
 #include "imstkMeshReader.h"
 #include "imstkVolumetricMesh.h"
 
-namespace imstk {
+// Vega
+#include "volumetricMeshLoader.h"
+#include "volumetricMesh.h"
+
+namespace imstk
+{
 
 ///
 /// \class VegaMeshReader
 ///
-/// \brief
+/// \brief Contains utility classes that convert vega volume mesh to volume mesh and
+/// vice-versa
 ///
 class VegaMeshReader
 {
@@ -42,10 +48,21 @@ public:
     ~VegaMeshReader() = default;
 
     ///
-    /// \brief
+    /// \brief Generate volumetric mesh given a external vega mesh file
     ///
-    static std::shared_ptr<VolumetricMesh> read(const std::string& filePath, MeshFileType meshType);
+    static std::shared_ptr<VolumetricMesh> getVolumeMeshFromVegaVolumeMesh(const std::string& filePath, MeshFileType meshType);
+
+    ///
+    /// \brief Generate volumetric mesh given a vega mesh object
+    ///
+    static std::shared_ptr<VolumetricMesh> getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
+
+    ///
+    /// \brief Generate a vega volume mesh given volumetric mesh
+    ///
+    static std::shared_ptr<vega::VolumetricMesh> getVegaVolumeMeshFromVolumeMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkVegaMeshReader_h
