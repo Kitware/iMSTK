@@ -24,14 +24,29 @@
 
 #include <memory>
 
+#include "Eigen/Sparse"
+
 #include "imstkGeometry.h"
 #include "imstkDynamicalModel.h"
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
-#include "imstkKinematicState.h"
+#include "imstkProblemState.h"
+#include "imstkNonlinearSystem.h"
+#include "imstkVegaMeshReader.h"
 
-namespace imstk {
+//force models
+#include "imstkStVKForceModel.h"
+#include "imstkLinearFEMForceModel.h"
+#include "imstkCorotationalFEMForceModel.h"
+#include "imstkIsotropicHyperelasticFEMForceModel.h"
+#include "imstkVegaMeshReader.h"
+
+//vega
+#include "sparseMatrix.h"
+
+namespace imstk
+{
 
 ///
 /// \class DeformableBodyModel
@@ -52,21 +67,16 @@ public:
     virtual ~DeformableBodyModel() = default;
 
     ///
-    /// \brief Set the geometry on which the force model acts
-    ///
-    void setForceModelGeometry(std::shared_ptr<Geometry> fmGeometry);
-
-    ///
     /// \brief Set/Get force model configuration
     ///
     void setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig);
     std::shared_ptr<ForceModelConfig> getForceModelConfiguration() const;
 
     ///
-    /// \brief Set/Get force model
+    /// \brief Set/Get internal force model
     ///
-    void setForceModel(std::shared_ptr<InternalForceModel> fm);
-    std::shared_ptr<InternalForceModel> getForceModel() const;
+    void setInternalForceModel(std::shared_ptr<InternalForceModel> fm);
+    std::shared_ptr<InternalForceModel> getInternalForceModel() const;
 
     ///
     /// \brief Set/Get time integrator
@@ -75,14 +85,25 @@ public:
     std::shared_ptr<TimeIntegrator> getTimeIntegrator() const;
 
     ///
-    /// \brief Returns the tangent linear system for a given state
+    /// \brief Set/Get the geometry used by force model
     ///
-    void getLinearSystem();
+    void setModelGeometry(std::shared_ptr<Geometry> geometry);
+    std::shared_ptr<Geometry> getModelGeometry();
+
+    ///
+    /// \brief Returns the tangent linear system given curent state
+    ///
+    void getTangent(Vectord& q);
 
     ///
     /// \brief Configure the force model from external file
     ///
     void configure(const std::string& configFileName);
+
+    ///
+    /// \brief Initialize the deformable body model
+    ///
+    void initialize();
 
     ///
     /// \brief Load the boundary conditions from external file
@@ -115,30 +136,58 @@ public:
     void initializeGravity();
 
     ///
+    /// \brief Compute the RHS of the resulting linear system
+    ///
+    void computeImplicitSystemRHS(const kinematicState& prevState,
+                                  const kinematicState& newState);
+
+    ///
+    /// \brief Compute the LHS of the resulting linear system
+    ///
+    void computeImplicitSystemLHS(const kinematicState& prevState,
+                                  const kinematicState& newState);
+    ///
     /// \brief Initialize explicit external forces
     ///
     void initializeExplicitExternalForces();
 
+    ///
+    /// \brief Returns the "function" that evaluates the nonlinear function given
+    /// the state vector
+    ///
+    NonLinearSystem::VectorFunctionType& getFunction(const Vectord& q);
+
+    ///
+    /// \brief Returns the "function" that evaluates the gradient of the nonlinear
+    /// function given the state vector
+    ///
+    NonLinearSystem::MatrixFunctionType& getFunctionGradient(const Vectord& q);
+
 protected:
-
-    std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
-
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
 
-    std::shared_ptr<Geometry> m_forceModelGeometry;    ///> Geometry used by force model
+    std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
+    std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
+
+    bool m_damped;
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
-    std::shared_ptr<SparseMatrixd> m_M;    ///> Mass matrix
-    std::shared_ptr<SparseMatrixd> m_C;    ///> Damping coefficient matrix
-    std::shared_ptr<SparseMatrixd> m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
-    std::shared_ptr<SparseMatrixd> m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+    SparseMatrixd m_M;    ///> Mass matrix
+    SparseMatrixd m_C;    ///> Damping coefficient matrix
+    SparseMatrixd m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    SparseMatrixd m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+
+    Vectord m_Feff;       ///> Vector of gravity forces
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces
 
     // Explicit external forces
     Vectord m_explicitExternalForce;   ///> Vector of explicitly defined external forces
+
+    // Dirichlet boundary conditions
+    std::vector<std::size_t> m_fixedNodeIds;
 };
 
 } // imstk

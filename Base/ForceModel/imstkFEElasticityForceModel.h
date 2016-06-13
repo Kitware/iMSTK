@@ -24,6 +24,7 @@
 
 #include "g3log/g3log.hpp"
 
+#include "imstkInternalForceModel.h"
 #include "imstkMath.h"
 
 // Vega
@@ -45,7 +46,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    FEElasticityForceModel(const TimeIntegrator::Type type);
+    FEElasticityForceModel();
 
     ///
     /// \brief Destructor
@@ -55,9 +56,9 @@ public:
     void getInternalForce(Vectord& u, Vectord& internalForce) override
     {
         m_feElasticForceModel->GetInternalForce(u.data(), internalForce.data());
-    };
+    }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix) override
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
         m_feElasticForceModel->GetTangentStiffnessMatrixTopology(u.data(), );
     }
