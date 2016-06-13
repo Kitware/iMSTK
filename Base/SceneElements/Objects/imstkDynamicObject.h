@@ -23,6 +23,7 @@
 #define imstkDynamicObject_h
 
 #include "imstkSceneObject.h"
+#include "imstkDynamicalModel.h"
 
 namespace imstk {
 
@@ -70,13 +71,15 @@ protected:
     ///
     DynamicObject(std::string name) : SceneObject(name){}
 
-    size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
+    std::shared_ptr<DynamicalModel> m_dynamicalModel;           ///> Dynamical model
 
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
+
+    size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
 }

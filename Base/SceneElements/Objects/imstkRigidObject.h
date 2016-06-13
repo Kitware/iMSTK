@@ -38,14 +38,17 @@ class RigidObject : public DynamicObject
 public:
 
     ///
+    /// \brief Constructor
+    ///
+    RigidObject(std::string name) : DynamicObject(name)
+    {
+        m_type = SceneObject::Type::Rigid;
+    }
+
+    ///
     /// \brief Destructor
     ///
     ~RigidObject() = default;
-
-    ///
-    /// \brief Constructor
-    ///
-    RigidObject(std::string name) : DynamicObject(name){}
 
     ///
     /// \brief Translate the physics geometric model

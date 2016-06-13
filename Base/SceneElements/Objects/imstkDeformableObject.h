@@ -26,9 +26,8 @@
 #include <string>
 
 #include "imstkDynamicObject.h"
-#include "imstkDynamicalModel.h"
 
-#include "imstkKinematicState.h"
+#include "imstkProblemState.h"
 #include "imstkMath.h"
 
 namespace imstk {
@@ -62,14 +61,37 @@ public:
     void initializeState(const Vectord& p, const Vectord& v);
 
     // Get/Set States of the body
-    const Vectord& getDisplacements() const;
-    const Vectord& getPrevDisplacements() const;
-    const Vectord& getVelocities() const;
-    const Vectord& getPrevVelocities() const;
+    const Vectord& getDisplacements() const
+    {
+        m_dynamicalModel->getCurrentState()->getQ();
+    }
+
+    const Vectord& getPrevDisplacements() const
+    {
+        m_dynamicalModel->getPreviousState()->getQ();
+    }
+
+    const Vectord& getVelocities() const
+    {
+        m_dynamicalModel->getCurrentState()->getQDot();
+    }
+
+    const Vectord& getPrevVelocities() const
+    {
+        m_dynamicalModel->getPreviousState()->getQDot();
+    }
+
+    const Vectord& getAccelerations() const
+    {
+        m_dynamicalModel->getCurrentState()->getQDotDot();
+    }
+
+    const Vectord& getPrevAccelerations() const
+    {
+        m_dynamicalModel->getPreviousState()->getQDotDot();
+    }
 
 protected:
-
-    std::shared_ptr<DynamicalModel> m_dynamicalModel; ///> Dynamical model
 };
 
 }

@@ -9,6 +9,7 @@ imstk_add_library( SceneElements
     Devices
 	TimeIntegrators
 	ForceModel
+	Solvers
   )
 
 #-----------------------------------------------------------------------------

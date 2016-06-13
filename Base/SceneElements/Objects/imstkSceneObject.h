@@ -54,7 +54,10 @@ public:
     ///
     /// \brief Constructor
     ///
-    SceneObject(std::string name) : m_name(name) {}
+    SceneObject(std::string name) : m_name(name)
+    {
+        SceneObject::Type::Static;
+    }
 
     ///
     /// \brief Destructor
