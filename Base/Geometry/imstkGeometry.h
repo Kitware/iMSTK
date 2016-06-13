@@ -142,6 +142,7 @@ protected:
     Quatd  m_orientation; ///> orientation
     double m_scaling = 1; ///> Scaling
 };
-}
+
+} //imstk
 
 #endif // ifndef imstkGeometry_h

@@ -24,7 +24,8 @@
 
 #include "imstkGeometryMap.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class IdentityMap

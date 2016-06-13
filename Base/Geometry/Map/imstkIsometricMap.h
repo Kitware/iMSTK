@@ -56,7 +56,10 @@ public:
     ///
     /// \brief Check the validity of the map
     ///
-    bool isValid() const { return true; };
+    bool isValid() const
+    {
+        return true;
+    };
 
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);
