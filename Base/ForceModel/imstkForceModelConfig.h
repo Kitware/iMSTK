@@ -92,6 +92,7 @@ namespace imstk
 ///     numberOfThreads             Number of threads spawned by the force model
 ///                                     [default = 0]
 ///
+///   TODO: Convert this to input through JSON format
 class ForceModelConfig
 {
     // TODO: Do this in a better way
@@ -109,6 +110,7 @@ class ForceModelConfig
         double inversionThreshold = -std::numeric_limits< double >::max();
         int numberOfThreads = 0;
     };
+
     struct customOptionsNameList
     {
         const char femMethodName[256] = "femMethod";

@@ -37,7 +37,8 @@ ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSu
     }
 };
 
-bool ForceModelConfig::parseConfig(const std::string &configFileName)
+bool
+ForceModelConfig::parseConfig(const std::string &configFileName)
 {
     vega::ConfigFile vegaConfigFileOptions;
     ForceModelConfig::customOptionsList optList;
@@ -90,7 +91,8 @@ bool ForceModelConfig::parseConfig(const std::string &configFileName)
     return true;
 }
 
-ForceModelType ForceModelConfig::getForceModelType()
+ForceModelType
+ForceModelConfig::getForceModelType()
 {
     // Set up some variables
     if (this->m_stringsOptionMap["femMethod"] == "StVK")
@@ -99,15 +101,15 @@ ForceModelType ForceModelConfig::getForceModelType()
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Corotational")
     {
-        return ForceModelType::StVK;
+        return ForceModelType::Corotational;
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Linear")
     {
-        return ForceModelType::StVK;
+        return ForceModelType::Linear;
     }
     else if (this->m_stringsOptionMap["femMethod"] == "Invertible")
     {
-        return ForceModelType::StVK;
+        return ForceModelType::Invertible;
     }
     else
     {
@@ -116,7 +118,8 @@ ForceModelType ForceModelConfig::getForceModelType()
     }
 }
 
-HyperElasticMaterialType ForceModelConfig::getHyperelasticMaterialType()
+HyperElasticMaterialType
+ForceModelConfig::getHyperelasticMaterialType()
 {
     if (this->m_stringsOptionMap["invertibleMaterial"] == "StVK")
     {
