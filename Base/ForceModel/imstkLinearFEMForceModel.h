@@ -22,12 +22,15 @@
 #ifndef imstkLinearFEMForceModel_h
 #define imstkLinearFEMForceModel_h
 
+#include <memory>
+
 #include "g3log/g3log.hpp"
 
 #include "imstkInternalForceModel.h"
 
 //vega
 #include "StVKInternalForces.h"
+#include "StVKStiffnessMatrix.h"
 
 namespace imstk
 {
@@ -35,22 +38,33 @@ namespace imstk
 class LinearFEMForceModel : virtual public InternalForceModel
 {
 public:
-    LinearFEMForceModel(std::shared_ptr<vega::StVKInternalForces> stVKInternalForces);
+    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81)
+    {
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
+
+        auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
+        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&m_stiffnessMatrix.get());
+        double * zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
+        stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
+        free(zero);
+        delete(stVKStiffnessMatrix);
+    };
+
     virtual ~LinearFEMForceModel();
 
     void getInternalForce(Vectord& u, Vectord& internalForce)
     {
-        m_stiffnessMatrix->MultiplyVector(u.data(), internalForces.data());
+        m_stiffnessMatrix->MultiplyVector(u.data(), internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd tangentStiffnessMatrix)
     {
-        InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
 protected:
-
     std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix;
+    std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;
 };
 
 } // imstk

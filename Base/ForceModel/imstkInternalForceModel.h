@@ -32,7 +32,8 @@ namespace imstk
 ///
 /// \class InternalForceModel
 ///
-/// \brief Base class for internal force model
+/// \brief Base class for internal force model within the following context:
+///
 ///
 class InternalForceModel
 {
@@ -48,32 +49,25 @@ public:
     ///
     ~InternalForceModel() = default;
 
+    ///
+    /// \brief Get the internal force given the present state
+    ///
     virtual void getInternalForce(Vectord& u, Vectord& internalForce) = 0;
 
-    virtual void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix) = 0;
+    ///
+    /// \brief Return the tangent stiffness matrix the present state
+    ///
+    virtual void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
-    virtual void GetForceAndMatrix(Vectord& u, Vectord& internalForce, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix) = 0;
+    ///
+    /// \brief Return both internal force and tangent stiffness matrix given the present state
+    ///
+    virtual void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
-    static void updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values)
-    {
-        auto rowLengths = vegaMatrix->GetRowLengths();
-        auto nonZeroValues = vegaMatrix->GetEntries();
-
-        // Flatten the internal non-zeros value array and store it in values.
-        int offset = 0;
-
-        for (int row = 0, end = vegaMatrix->GetNumRows(); row < end; ++row)
-        {
-            /// This operation should not add new values to the array since the matrices
-            /// structures should remain the same. It just replaces the values in the array.
-            for (int j = 0, end_j = rowLengths[row]; j < end_j; ++j)
-            {
-                values[j + offset] = nonZeroValues[row][j];
-            }
-
-            offset += rowLengths[row];
-        }
-    }
+    ///
+    /// \brief Update the values of the Eigen sparse matrix given the linearized array of data from the Vega matrix
+    ///
+    static void updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values);
 protected:
 
 };

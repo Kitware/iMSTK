@@ -46,10 +46,10 @@ public:
         m_massSpringSystem->ComputeForce(u.data(), internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_massSpringSystem->ComputeStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
 protected:

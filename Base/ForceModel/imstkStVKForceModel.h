@@ -39,10 +39,7 @@ class StVKForceModel : virtual public InternalForceModel
 public:
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = 10.0)
     {
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(),
-                                                                          0,
-                                                                          withGravity,
-                                                                          gravity);
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
 
         m_vegaTangentStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
@@ -54,10 +51,10 @@ public:
         m_stVKInternalForces->ComputeForces(u.data(), internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_stVKInternalForces->ComputeStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
 protected:

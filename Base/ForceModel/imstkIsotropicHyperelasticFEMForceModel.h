@@ -35,7 +35,7 @@
 
 namespace imstk
 {
-class IsotropicHyperelasticFEForceModel : virtual public InternalForceModel
+class IsotropicHyperelasticFEForceModel : public InternalForceModel
 {
 
 public:
@@ -71,16 +71,16 @@ public:
         m_isotropicHyperelasticFEM->ComputeForces(u.data(), internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_isotropicHyperelasticFEM->GetTangentStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
-    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_isotropicHyperelasticFEM->GetForceAndTangentStiffnessMatrix(u.data(), internalForce.data(), m_vegaTangentStiffnessMatrix.get());
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
 protected:

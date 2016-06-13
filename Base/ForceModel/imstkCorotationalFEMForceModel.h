@@ -50,16 +50,16 @@ public:
         m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), internalForce.data(), nullptr, m_warp);
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), nullptr, m_vegaTangentStiffnessMatrix.get(), m_warp);
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
-    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, std::shared_ptr<SparseMatrixd> tangentStiffnessMatrix)
+    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix->valuePtr());
+        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
     void SetWarp(const int warp)
