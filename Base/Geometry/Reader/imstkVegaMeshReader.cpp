@@ -25,15 +25,13 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 
-// Vega
-#include "volumetricMeshLoader.h"
-#include "volumetricMesh.h"
-
 #include "g3log/g3log.hpp"
 
-namespace imstk{
+namespace imstk
+{
+
 std::shared_ptr<VolumetricMesh>
-VegaMeshReader::read(const std::string& filePath, MeshFileType meshType)
+VegaMeshReader::getVolumeMeshFromVegaVolumeMesh(const std::string& filePath, MeshFileType meshType)
 {
     if (meshType != MeshFileType::VEG)
     {
@@ -45,6 +43,12 @@ VegaMeshReader::read(const std::string& filePath, MeshFileType meshType)
     auto fileName = const_cast<char*>(filePath.c_str());
     std::shared_ptr<vega::VolumetricMesh> vegaMesh(vega::VolumetricMeshLoader::load(fileName));
 
+    return getVolumeMeshFromVegaVolumeMesh(vegaMesh);
+}
+
+std::shared_ptr<imstk::VolumetricMesh>
+VegaMeshReader::getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
+{
     // Copy vertices
     std::vector<Vec3d> vertices;
     for(size_t i = 0; i < vegaMesh->getNumVertices(); ++i)
