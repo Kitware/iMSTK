@@ -29,7 +29,7 @@ namespace imstk {
 ///
 /// \class NonLinearSystem
 ///
-/// \brief Base class for a nonlinear system of equations
+/// \brief Base class for a multi-variable nonlinear system
 ///
 class NonLinearSystem
 {
@@ -45,28 +45,22 @@ public:
     virtual ~NonLinearSystem() = default;
 
     ///
-    /// \brief Set function to evaluate.
+    /// \brief Set nonlinear method that evaluates the nonlinear function.
     ///
     virtual void setFunction(const VectorFunctionType& function);
 
     ///
-    /// \brief Set gradient function to evaluate.
+    /// \brief Set the method that evaluates the gradient of the nonlinear function
     ///
     virtual void setJacobian(const MatrixFunctionType& function);
 
     ///
-    /// \brief Evaluate function at specified argument
-    ///
-    /// \param x Value.
-    /// \return Function value.
+    /// \brief Evaluate function at a given state
     ///
     virtual const Vectord& evaluateF(const Vectord& x);
 
     ///
-    /// \brief Evaluate function at specified argument
-    ///
-    /// \param x Value.
-    /// \return Function value.
+    /// \brief Evaluate gradient of the function at a given state
     ///
     virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
 

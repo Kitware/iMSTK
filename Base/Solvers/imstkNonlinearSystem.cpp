@@ -27,25 +27,25 @@ namespace imstk
 {
 
 void
-NonLinearSystem::setFunction(const VectorFunctionType &function)
+NonLinearSystem::setFunction(const VectorFunctionType& function)
 {
     this->m_F = function;
 }
 
 void
-NonLinearSystem::setJacobian(const MatrixFunctionType &function)
+NonLinearSystem::setJacobian(const MatrixFunctionType& function)
 {
     this->m_dF = function;
 }
 
-const Vectord &
-NonLinearSystem::evaluateF(const Vectord &x)
+const Vectord&
+NonLinearSystem::evaluateF(const Vectord& x)
 {
     return this->m_F(x);
 }
 
-const SparseMatrixd &
-NonLinearSystem::evaluateJacobian(const Vectord &x)
+const SparseMatrixd&
+NonLinearSystem::evaluateJacobian(const Vectord& x)
 {
     return this->m_dF(x);
 }
