@@ -43,7 +43,6 @@ list(APPEND VRPN_INCLUDE_DIRS
   ${LIBNIFALCON_INCLUDE_DIR}
   ${LIBUSB1_INCLUDE_DIR}
   )
-message(STATUS "VRPN_INCLUDE_DIRS : ${VRPN_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -105,15 +104,21 @@ list(APPEND VRPN_LIBRARIES
 # Phantom Omni support
 #-----------------------------------------------------------------------------
 if(${${PROJECT_NAME}_USE_OMNI})
+  list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_package(OpenHaptics)
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
   find_library(VRPN_PHANTOM_LIBRARY
     NAMES
       vrpn_phantom
-      vrpn_phantom
+      vrpn_phantomd
     )
   mark_as_advanced(VRPN_PHANTOM_LIBRARY)
-  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY})
+  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY} ${OPENHAPTICS_LIBRARIES})
+  list(APPEND VRPN_INCLUDE_DIRS ${OPENHAPTICS_INCLUDE_DIRS})
 endif()
-message(STATUS "VRPN_LIBRARIES : ${VRPN_LIBRARIES}")
+
+message(STATUS "OPENHAPTICS_LIBRARIES : ${OPENHAPTICS_LIBRARIES}")
+message(STATUS "OPENHAPTICS_INCLUDE_DIRS : ${OPENHAPTICS_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Find package

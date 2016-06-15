@@ -31,7 +31,7 @@ endif()
 include(imstkAddExternalProject)
 imstk_add_external_project( VRPN
   GIT_REPOSITORY https://github.com/agirault/vrpn
-  GIT_TAG improve-noving-falcon
+  GIT_TAG improve-openhaptics
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DBUILD_TESTING:BOOL=OFF
@@ -46,6 +46,7 @@ imstk_add_external_project( VRPN
     -DVRPN_USE_LIBUSB_1_0:BOOL=ON
     -DVRPN_USE_HID:BOOL=ON
     -DVRPN_USE_LIBNIFALCON:BOOL=ON
+    -DVRPN_BUILD_SERVERS:BOOL=${${PROJECT_NAME}_USE_OMNI}
     -DVRPN_USE_PHANTOM_SERVER:BOOL=${${PROJECT_NAME}_USE_OMNI}
     -DVRPN_USE_HDAPI:BOOL=${${PROJECT_NAME}_USE_OMNI}
     -DOPENHAPTICS_ROOT_DIR:PATH=${OPENHAPTICS_ROOT_DIR}
