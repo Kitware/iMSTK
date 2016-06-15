@@ -22,9 +22,8 @@
 #include "imstkVRPNDeviceServer.h"
 
 #include "vrpn_3DConnexion.h"
-#define VRPN_USE_LIBNIFALCON
-#define VERBOSE
 #include "vrpn_Tracker_NovintFalcon.h"
+#include "server_src/vrpn_Phantom.h"
 #include "vrpn_Tracker_OSVRHackerDevKit.h"
 
 #include "g3log/g3log.hpp"
@@ -62,8 +61,23 @@ VRPNDeviceServer::initModule()
         } break;
         case DeviceType::NOVINT_FALCON:
         {
+#ifdef VRPN_USE_LIBNIFALCON
             m_deviceConnections->add(new vrpn_Tracker_NovintFalcon(name.c_str(), m_serverConnection,
                                                                    id, "4-button", "stamper"));
+#else
+            LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Novint Falcon in VRPN. "
+                         << "Build VRPN with VRPN_USE_LIBNIFALCON.";
+#endif
+        } break;
+        case DeviceType::PHANTOM_OMNI:
+        {
+#ifdef VRPN_USE_PHANTOM_SERVER
+            auto test = new vrpn_Phantom(name.c_str(), m_serverConnection);
+            m_deviceConnections->add(test);
+#else
+            LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Phantom Omni in VRPN. "
+                         << "Install OpenHaptics SDK, the omni driver, and build VRPN with VRPN_USE_PHANTOM_SERVER.";
+#endif
         } break;
         case DeviceType::OSVR_HDK:
         {

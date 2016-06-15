@@ -93,13 +93,26 @@ mark_as_advanced(HIDAPI_LIBRARY)
 #-----------------------------------------------------------------------------
 # Set up libraries
 #-----------------------------------------------------------------------------
-set(VRPN_LIBRARIES
+list(APPEND VRPN_LIBRARIES
   ${VRPN_LIBRARY}
   ${QUAT_LIBRARY}
   ${LIBNIFALCON_LIBRARY}
   ${LIBUSB1_LIBRARY}
   ${HIDAPI_LIBRARY}
   )
+
+#-----------------------------------------------------------------------------
+# Phantom Omni support
+#-----------------------------------------------------------------------------
+if(${${PROJECT_NAME}_USE_OMNI})
+  find_library(VRPN_PHANTOM_LIBRARY
+    NAMES
+      vrpn_phantom
+      vrpn_phantom
+    )
+  mark_as_advanced(VRPN_PHANTOM_LIBRARY)
+  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY})
+endif()
 message(STATUS "VRPN_LIBRARIES : ${VRPN_LIBRARIES}")
 
 #-----------------------------------------------------------------------------
