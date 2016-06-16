@@ -45,8 +45,8 @@ using VecNf = Eigen::VectorXf;
 using VecNd = Eigen::VectorXd;
 
 // Quaternion
-using Quatf = Eigen::Quaternionf;
-using Quatd = Eigen::Quaterniond;
+using Quatf = Eigen::Quaternion<float,Eigen::DontAlign>;
+using Quatd = Eigen::Quaternion<double,Eigen::DontAlign>;
 
 // Angle-Axis
 using Rotf = Eigen::AngleAxisf;
