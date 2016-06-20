@@ -25,6 +25,10 @@
 #include <array>
 #include "g3log/g3log.hpp"
 
+#include "Eigen/sparse"
+
+#include "imstkProblemState.h"
+
 namespace imstk
 {
 
@@ -38,12 +42,14 @@ namespace imstk
 ///
 class TimeIntegrator
 {
+public:
     enum class Type
     {
         ForwardEuler,
         BackwardEuler,
         NewmarkBeta,
         CentralDifference,
+        NoTimeStepper,
         none
     };
 
@@ -51,7 +57,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    TimeIntegrator(const TimeIntegrator::Type type, double dT);
+    TimeIntegrator(double dT) : m_type(Type::none), m_dT(dT){};
 
     ///
     /// \brief Destructor
@@ -59,33 +65,26 @@ public:
     ~TimeIntegrator() = default;
 
     ///
-    /// \brief Set/Get type of the time integrator
+    /// \brief Return the type of the time integrator
     ///
-    void setType(const TimeIntegrator::Type type);
-    const Type& getType() const;
+    TimeIntegrator::Type getType() const { return m_type; };
 
     ///
-    /// \brief Set coefficients for a given time integrator type
+    /// \brief Set/Get the time step size
     ///
-    void setCoefficients(const TimeIntegrator::Type type);
+    void setTimestepSize(const double dT){ m_dT = dT; }
+    double getTimestepSize() const { return m_dT; }
 
     ///
-    /// \brief Set the time step size
+    /// \brief Update states given the updates in different forms
     ///
-    void setTimestepSize(const double dT);
-    double getTimestepSize() const
-    {
-        return m_dT;
-    }
+    virtual void updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV) = 0;
+    virtual void updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU) = 0;
+    virtual void updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v) = 0;
+    virtual void updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u) = 0;
 
 protected:
-    TimeIntegrator::Type m_type; ///> Type of the time integrator
-
-    // Coefficients of the time integrator
-    std::array<double,3> m_alpha;
-    std::array<double,3> m_gamma;
-    std::array<double,3> m_beta;
-
+    Type m_type; ///> Type of the time integrator
     double m_dT; ///> Delta T
 };
 
