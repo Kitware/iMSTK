@@ -33,6 +33,13 @@ void
 VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, size_t id)
 {
     m_deviceInfoMap[deviceName] = std::make_pair(deviceType,id);
+
+    if (deviceType == DeviceType::PHANTOM_OMNI)
+    {
+        LOG(WARNING) << "VRPNDeviceServer::addDevice warning: OpenHaptics support on VRPN "
+                     << "currently unstable for the Phantom Omni (no force feedback implemented).\n"
+                     << "Use HDAPIDeviceClient instead of VRPNDeviceServer/Client for ";
+    }
 }
 
 void
@@ -73,7 +80,7 @@ VRPNDeviceServer::initModule()
         {
 #ifdef VRPN_USE_PHANTOM_SERVER
 			char * deviceName = const_cast<char*>(name.c_str());
-			m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 1.0f, deviceName));
+			m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 90.0f, deviceName));
 #else
             LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Phantom Omni in VRPN. "
                          << "Install OpenHaptics SDK, the omni driver, and build VRPN with VRPN_USE_PHANTOM_SERVER.";
