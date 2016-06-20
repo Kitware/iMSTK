@@ -28,6 +28,7 @@
 #include "imstkOneToOneMap.h"
 
 // Devices
+#include "imstkHDAPIDeviceClient.h"
 #include "imstkVRPNDeviceClient.h"
 #include "imstkVRPNDeviceServer.h"
 #include "imstkCameraController.h"
@@ -259,35 +260,23 @@ void testObjectController()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestDevice");
 
-    // Device server
-    auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::SPACE_EXPLORER_3DCONNEXION);
-    sdk->addDeviceServer(server);
-
     // Device Client
-    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default PHANToM", "localhost"); // localhost = 127.0.0.1
     sdk->addDeviceClient(client);
 
-    // Plane
-    auto planeGeom = std::make_shared<imstk::Plane>();
-    planeGeom->scale(5);
-    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
-    planeObj->setVisualGeometry(planeGeom);
-    scene->addSceneObject(planeObj);
-
-    // Sphere
-    auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->setPosition(imstk::UP_VECTOR);
-    sphereGeom->scale(0.2);
-    auto sphereObj = std::make_shared<imstk::VirtualCouplingObject>("VirtualSphere", client, 20);
-    sphereObj->setVisualGeometry(sphereGeom);
-    sphereObj->setCollidingGeometry(sphereGeom);
-    scene->addSceneObject(sphereObj);
+    // Object
+    auto geom = std::make_shared<imstk::Cube>();
+    geom->setPosition(imstk::UP_VECTOR);
+    geom->scale(2);
+    auto object = std::make_shared<imstk::VirtualCouplingObject>("VirtualObject", client, 0.1);
+    object->setVisualGeometry(geom);
+    object->setCollidingGeometry(geom);
+    scene->addSceneObject(object);
 
     // Update Camera position
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(0,3,10));
-    cam->setFocalPoint(sphereGeom->getPosition());
+    cam->setPosition(imstk::Vec3d(0,0,10));
+    cam->setFocalPoint(geom->getPosition());
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
