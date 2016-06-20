@@ -123,6 +123,16 @@ Mesh::setVerticesDisplacements(const std::vector<Vec3d>& diff)
     m_verticesDisplacements = diff;
 }
 
+void Mesh::setVerticesDisplacements(const Vectord& u)
+{
+    size_t dofId = 0;
+    for (auto vDisp : m_verticesDisplacements)
+    {
+        vDisp = Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
+        dofId += 3;
+    }
+}
+
 const std::vector<Vec3d>&
 Mesh::getVerticesDisplacements() const
 {

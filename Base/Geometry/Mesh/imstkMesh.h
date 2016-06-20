@@ -100,6 +100,11 @@ public:
     void setVerticesDisplacements(const std::vector<Vec3d>& diff);
 
     ///
+    /// \brief Sets the displacements of mesh vertices from a linearized displacement vector
+    ///
+    void setVerticesDisplacements(const Vectord& u);
+
+    ///
     /// \brief Returns the vector displacements of mesh vertices
     ///
     const std::vector<Vec3d>& getVerticesDisplacements() const;
