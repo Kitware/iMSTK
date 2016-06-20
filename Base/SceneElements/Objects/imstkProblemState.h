@@ -22,6 +22,8 @@
 #ifndef imstkProblemState_h
 #define imstkProblemState_h
 
+#include "imstkMath.h"
+
 namespace imstk
 {
 
@@ -30,7 +32,6 @@ namespace imstk
 ///
 /// \brief This class stores the state of the unknown field variable of the problem
 ///
-template<class T>
 class ProblemState
 {
 public:
@@ -39,17 +40,24 @@ public:
     /// \brief Constructor
     ///
     ProblemState() = default;
-    ProblemState(const T& u, const T& v, const T& a = 0);
+    ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
     ~ProblemState(){}
 
+    void initialize(const size_t numDof)
+    {
+        m_q.resize(numDof);
+        m_qDot.resize(numDof);
+        m_qDotDot.resize(numDof);
+    };
+
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(const T& u, const T& v = 0, const T& a = 0)
+    void setState(const Vectord& u, const Vectord& v, const Vectord& a)
     {
         m_q = u;
         m_qDot = v;
@@ -73,51 +81,27 @@ public:
     ///
     /// \brief Get the state
     ///
-    T& getQ() const
-    {
-        if (!m_q)
-        {
-            LOG(WARNING) << "State variable is not initialized!"
-        }
-        return m_q;
-    }
+    Vectord& getQ() { return m_q; }
 
     ///
     /// \brief Get the derivative of state w.r.t time
     ///
-    T& getQDot() const
-    {
-        if (!m_qDot)
-        {
-            LOG(WARNING) << "Time derivative of state variable is not initialized!"
-        }
-        return m_qDot;
-    }
+    Vectord& getQDot() { return m_qDot; }
 
     ///
     /// \brief Get the double derivative of state w.r.t time
     ///
-    T& getQDotDot() const
-    {
-        if (!m_qDotDot)
-        {
-            LOG(WARNING) << "Double time derivative of state variable is not initialized!"
-        }
-        return m_qDotDot;
-    }
+    Vectord& getQDotDot() { return m_qDotDot; }
 
     ///
     /// \brief Get the state
     ///
-    T& getState()
-    {
-        return getQ();
-    }
+    Vectord& getState() { return getQ(); }
 
 protected:
-    T m_q;         // State
-    T m_qDot;      // Derivative of state w.r.t time
-    T m_qDotDot;   // Double derivative of state w.r.t time
+    Vectord m_q;         // State
+    Vectord m_qDot;      // Derivative of state w.r.t time
+    Vectord m_qDotDot;   // Double derivative of state w.r.t time
 };
 
 } // imstk
