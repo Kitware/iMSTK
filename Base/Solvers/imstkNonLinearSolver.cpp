@@ -22,10 +22,9 @@
 namespace imstk
 {
 
-NonLinearSolver::NonLinearSolver():
-m_sigma(std::array < double, 2 > {{0.1, 0.5}}),
-    m_alpha(1e-4),
-    m_armijoMax(30)
+NonLinearSolver::NonLinearSolver(): m_sigma(std::array < double, 2 > {{0.1, 0.5}}),
+                                    m_alpha(1e-4),
+                                    m_armijoMax(30)
 {
     this->m_updateIterate = [](const Vectord& dx, Vectord& x)
     {

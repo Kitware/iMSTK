@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Main solve routine.
     ///
-    virtual void solve(Vectord &x) = 0;
+    virtual void solve(Vectord& x) = 0;
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition
@@ -57,7 +57,7 @@ public:
     /// \param dx Computed direction.
     /// \param x Current iterate.
     ///
-    double armijo(const Vectord &dx, Vectord &x, const double previousFnorm);
+    double armijo(const Vectord& dx, Vectord& x, const double previousFnorm);
 
     ///
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
@@ -69,16 +69,16 @@ public:
     ///        fnorm[1] Value of |F(x + lambda[1]*dx)|^2
     ///        fnorm[2] Value of |F(x + lambda[2]*dx)|^2
     ///
-    void parabolicModel(const std::array<double, 3> &fnorm,
-                        std::array<double, 3> &lambda);
+    void parabolicModel(const std::array<double, 3>& fnorm,
+                        std::array<double, 3>& lambda);
 
     ///
     /// \brief Set/Get Sigma. Safeguard parameter for the the line search method.
     ///
     /// \param newSigma New sigma parameter.
     ///
-    void setSigma(const std::array<double, 2> &newSigma);
-    const std::array<double, 2> &getSigma() const;
+    void setSigma(const std::array<double, 2>& newSigma);
+    const std::array<double, 2>& getSigma() const;
 
     ///
     /// \brief Set/Get Alpha. Parameter to measure sufficient decrease in the line search.
@@ -101,15 +101,15 @@ public:
     ///
     /// \param newSystem Non-linear system replacement.
     ///
-    void setSystem(NonLinearSystem *newSystem);
-    NonLinearSystem *getSystem() const;
+    void setSystem(NonLinearSystem* newSystem);
+    NonLinearSystem* getSystem() const;
 
     ///
     /// \brief Set a customized iterate update function.
     ///
     /// \param newUpdateIterate Function used to update iterates. Default: x+=dx.
     ///
-    void setUpdateIterate(const UpdateIterateType &newUpdateIterate);
+    void setUpdateIterate(const UpdateIterateType& newUpdateIterate);
 
 protected:
     std::array<double, 2> m_sigma;      ///< Safeguarding bounds for the line search
