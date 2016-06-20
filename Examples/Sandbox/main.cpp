@@ -261,7 +261,7 @@ void testObjectController()
     auto scene = sdk->createNewScene("SceneTestDevice");
 
     // Device Client
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default PHANToM", "localhost"); // localhost = 127.0.0.1
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default PHANToM"); // localhost = 127.0.0.1
     sdk->addDeviceClient(client);
 
     // Object
