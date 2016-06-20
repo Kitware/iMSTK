@@ -35,7 +35,7 @@ namespace imstk
 class MassSpringForceModel : virtual public InternalForceModel
 {
 public:
-    MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem)
+    MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem) : InternalForceModel()
     {
         m_massSpringSystem = massSpringSystem;
     }
@@ -44,6 +44,11 @@ public:
     void getInternalForce(Vectord& u, Vectord& internalForce)
     {
         m_massSpringSystem->ComputeForce(u.data(), internalForce.data());
+    }
+
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    {
+        m_massSpringSystem->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
     void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)

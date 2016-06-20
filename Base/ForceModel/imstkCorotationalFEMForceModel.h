@@ -56,6 +56,11 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    {
+        m_corotationalLinearFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
+    }
+
     void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
         m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);

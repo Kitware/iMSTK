@@ -39,29 +39,47 @@ class IsotropicHyperelasticFEForceModel : public InternalForceModel
 {
 
 public:
-    IsotropicHyperelasticFEForceModel(HyperElasticMaterialType materialType, std::shared_ptr<vega::VolumetricMesh> mesh, double inversionThreshold, bool withGravity = true, double gravity = 10.0)
+    IsotropicHyperelasticFEForceModel(HyperElasticMaterialType materialType,
+        std::shared_ptr<vega::VolumetricMesh> mesh,
+        double inversionThreshold,
+        bool withGravity = true,
+        double gravity = 10.0) : InternalForceModel()
     {
         int enableCompressionResistance = 1;
         double compressionResistance = 500;
         switch (materialType)
         {
             case HyperElasticMaterialType::StVK:
-                m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
+                m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(
+                    mesh.get(),
+                    enableCompressionResistance,
+                    compressionResistance);
                 break;
 
             case HyperElasticMaterialType::NeoHookean:
-                m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
+                m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(
+                    mesh.get(),
+                    enableCompressionResistance,
+                    compressionResistance);
                 break;
 
             case HyperElasticMaterialType::MooneyRivlin:
-                m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(mesh.get(), enableCompressionResistance, compressionResistance);
+                m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(
+                    mesh.get(),
+                    enableCompressionResistance,
+                    compressionResistance);
                 break;
 
             default:
                 LOG(ERROR) << "Error: Invalid hyperelastic material type.";
         }
 
-        m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(mesh.get(), m_isotropicMaterial, inversionThreshold, withGravity, gravity);
+        m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
+            mesh.get(),
+            m_isotropicMaterial,
+            inversionThreshold,
+            withGravity,
+            gravity);
     }
 
     virtual ~IsotropicHyperelasticFEForceModel();
@@ -75,6 +93,11 @@ public:
     {
         m_isotropicHyperelasticFEM->GetTangentStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
+    }
+
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    {
+        m_isotropicHyperelasticFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
     void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)

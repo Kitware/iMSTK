@@ -60,6 +60,11 @@ public:
     virtual void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
     ///
+    /// \brief Return the tangent stiffness matrix the present state
+    ///
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) = 0;
+
+    ///
     /// \brief Return both internal force and tangent stiffness matrix given the present state
     ///
     virtual void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;

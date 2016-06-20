@@ -38,7 +38,7 @@ namespace imstk
 class LinearFEMForceModel : virtual public InternalForceModel
 {
 public:
-    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81)
+    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81) : InternalForceModel()
     {
         m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
 

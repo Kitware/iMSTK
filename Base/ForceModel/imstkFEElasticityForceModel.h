@@ -40,7 +40,7 @@ namespace imstk
 ///
 class FEElasticityForceModel : public InternalForceModel
 {
-    using class vega::ForceModel FEElasticForceModel;
+    using class vega::LinearFEMForceModel FEElasticForceModel;
 
 public:
     ///
@@ -56,6 +56,11 @@ public:
     void getInternalForce(Vectord& u, Vectord& internalForce) override
     {
         m_feElasticForceModel->GetInternalForce(u.data(), internalForce.data());
+    }
+
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    {
+        m_feElasticForceModel->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
     void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
