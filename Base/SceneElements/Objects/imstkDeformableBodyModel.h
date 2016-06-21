@@ -52,6 +52,8 @@ namespace imstk
 /// \class DeformableBodyModel
 ///
 /// \brief Mathematical model of the physics governing the dynamic deformable object
+/// Note: Vega specifics will removed in future when the inertial and damping calculations
+/// are done with in-house code
 ///
 class DeformableBodyModel : public DynamicalModel
 {
@@ -106,9 +108,14 @@ public:
     void initialize();
 
     ///
+    /// \brief Load the initial conditions of the deformable object
+    ///
+    void loadInitialStates();
+
+    ///
     /// \brief Load the boundary conditions from external file
     ///
-    bool loadBoundaryConditions();
+    void loadBoundaryConditions();
 
     ///
     /// \brief Initialize the force model
@@ -133,7 +140,7 @@ public:
     ///
     /// \brief Initialize the gravity force
     ///
-    void initializeGravity();
+    void initializeGravityForce();
 
     ///
     /// \brief Compute the RHS of the resulting linear system
@@ -152,6 +159,27 @@ public:
     void initializeExplicitExternalForces();
 
     ///
+    /// \brief Update damping Matrix
+    ///
+    void updateDampingMatrix();
+
+    ///
+    /// \brief Update mass matrix
+    /// Note: Not supported yet!
+    ///
+    void updateMassMatrix();
+
+    ///
+    /// \brief Updates the Physics geometry
+    ///
+    void updatePhysicsGeometry(const kinematicState& state);
+
+    ///
+    /// \brief Update states
+    ///
+    void updateBodyStates(const Vectord& delataV);
+
+    ///
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
@@ -162,6 +190,12 @@ public:
     /// function given the state vector
     ///
     NonLinearSystem::MatrixFunctionType& getFunctionGradient(const Vectord& q);
+
+
+    ///
+    /// \brief
+    ///
+    static void initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix);
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
@@ -178,6 +212,9 @@ protected:
     SparseMatrixd m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
     SparseMatrixd m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
 
+    std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///> Nonlinear system resulting from TI and force model
+
+    Vectord m_Finternal;       ///> Vector of gravity forces
     Vectord m_Feff;       ///> Vector of gravity forces
 
     // External field forces
@@ -188,6 +225,11 @@ protected:
 
     // Dirichlet boundary conditions
     std::vector<std::size_t> m_fixedNodeIds;
+
+    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;
+    std::shared_ptr<vega::SparseMatrix> m_vegaMassMatrix;///> Vega mass matrix
+    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;///> Vega Tangent stiffness matrix
+    std::shared_ptr<vega::SparseMatrix> m_vegaDampingMatrix;///> Vega Laplacian damping matrix
 };
 
 } // imstk

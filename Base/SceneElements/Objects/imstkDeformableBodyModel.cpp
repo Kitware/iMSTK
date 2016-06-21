@@ -22,7 +22,10 @@
 #include <fstream>
 
 #include "imstkDeformableBodyModel.h"
+
+// vega
 #include "generateMassMatrix.h"
+#include "generateMeshGraph.h"
 
 namespace imstk
 {
@@ -83,7 +86,41 @@ DeformableBodyModel::configure(const std::string& configFileName)
     m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
 }
 
-bool
+void
+DeformableBodyModel::initialize()
+{
+    // prerequisite of for successfully initializing
+    if (!m_forceModelGeometry || !m_forceModelConfiguration)
+    {
+        LOG(WARNING) << "DeformableBodyModel::initialize: Physics mesh or force model configuration not set yet!";
+        return;
+    }
+
+    m_vegaPhysicsMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry));
+
+    initializeForceModel();//c
+    initializeMassMatrix();//c
+    initializeDampingMatrix();//c
+    initializeTangentStiffness();//c
+    loadInitialStates();
+    loadBoundaryConditions();
+    initializeGravityForce();
+    initializeExplicitExternalForces();
+
+    m_Feff.resize(m_numDOF);
+    m_Finternal.resize(m_numDOF);
+}
+
+void
+DeformableBodyModel::loadInitialStates()
+{
+    // Initialize the states
+    m_initialState->initialize(m_numDOF);
+    m_previousState->initialize(m_numDOF);
+    m_currentState->initialize(m_numDOF);
+}
+
+void
 DeformableBodyModel::loadBoundaryConditions()
 {
     auto fileName = m_forceModelConfiguration->getStringOptionsMap().at("fixedDOFFilename");
@@ -91,7 +128,7 @@ DeformableBodyModel::loadBoundaryConditions()
     if (fileName.empty())
     {
         LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: The external boundary conditions file name is empty";
-        return false;
+        return;
     }
     else
     {
@@ -109,40 +146,40 @@ DeformableBodyModel::loadBoundaryConditions()
         else
         {
             LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: Could not open external file with boundary conditions";
-            return false;
+            return;
         }
 
         file.close();
-        return true;
+        return;
     }
 }
 
 void
 DeformableBodyModel::initializeForceModel()
 {
-    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
-    std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
+    const float g = m_forceModelConfiguration->getFloatsOptionsMap.at("gravity");
+    const bool isGravityPresent = (g > 0) ? true : false;
 
     switch (m_forceModelConfiguration->getForceModelType())
     {
     case ForceModelType::StVK:
 
-        this->m_internalForceModel = std::make_shared<StVKForceModel>(vegaMesh);
+        this->m_internalForceModel = std::make_shared<StVKForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
     case ForceModelType::Linear:
 
-        this->m_internalForceModel = std::make_shared<LinearFEMForceModel>(vegaMesh);
+        this->m_internalForceModel = std::make_shared<LinearFEMForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
     case ForceModelType::Corotational:
 
-        this->m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(vegaMesh);
+        this->m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
         break;
 
     case ForceModelType::Invertible:
 
-        this->m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(vegaMesh, -MAX_D);
+        this->m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(m_vegaPhysicsMesh, -MAX_D, isGravityPresent, g);
         break;
 
     default:
@@ -156,70 +193,49 @@ DeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 {
     if (!this->m_forceModelGeometry)
     {
-        LOG(INFO) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
+        LOG(WARNING) << "DeformableBodyModel::initializeMassMatrix Force model geometry not set!";
         return;
     }
 
     vega::SparseMatrix *vegaMatrix;
-    auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
-    std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
-    vega::GenerateMassMatrix::computeMassMatrix(vegaMesh.get(), &vegaMatrix, true);
+    vega::GenerateMassMatrix::computeMassMatrix(m_vegaPhysicsMesh.get(), &vegaMatrix, true);//caveat
 
-    auto rowLengths = vegaMatrix->GetRowLengths();
-    auto nonZeroValues = vegaMatrix->GetEntries();
-    auto columnIndices = vegaMatrix->GetColumnIndices();
+    this->m_vegaMassMatrix.reset(vegaMatrix);
 
-    std::vector<Eigen::Triplet<double>> triplets;
-    triplets.reserve(vegaMatrix->GetNumEntries());
-    for (int i = 0, end = vegaMatrix->GetNumRows(); i < end; ++i)
-    {
-        for (int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
-        {
-            triplets.emplace_back(i, columnIndices[i][k], nonZeroValues[i][k]);
-        }
-    }
-    m_M.resize(vegaMatrix->GetNumRows(), vegaMatrix->GetNumColumns());
-    m_M.setFromTriplets(std::begin(triplets), std::end(triplets));
-    m_M.makeCompressed();
+    this->initializeEigenMatrixFromVegaMatrix(*vegaMatrix, m_M);
 
-    /*this->vegaMassMatrix.reset(vegaMatrix);
-
+    /*
     if (saveToDisk)
     {
     char name[] = "ComputedMassMatrix.mass";
     this->vegaMassMatrix->Save(name);
-    }*/
+    }
+    */
 }
 
 void
 DeformableBodyModel::initializeDampingMatrix()
 {
-    auto dampingLaplacianCoefficient =
-        this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
+    auto dampingLaplacianCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
+    auto dampingMassCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
 
-    auto dampingMassCoefficient =
-        this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+    m_damped = (dampingLaplacianCoefficient == 0.0 || dampingMassCoefficient == 0.0) ? false : true;
 
-    if (dampingLaplacianCoefficient == 0.0 || dampingMassCoefficient == 0.0)
+    if (!m_damped)
     {
-        m_damped = false;
         return;
-    }
-    else
-    {
-        m_damped = true;
     }
 
     if (dampingLaplacianCoefficient <= 0.0)
     {
-        LOG(INFO) << "DeformableBodyModel::initializeDampingMatrix Damping coefficient is negative!";
+        LOG(WARNING) << "DeformableBodyModel::initializeDampingMatrix Damping coefficient is negative!";
         return;
     }
 
     auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
     std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
-    auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(this->m_forceModelGeometry.get()));
+    auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(vegaMesh.get()));
 
     if (!meshGraph)
     {
@@ -238,25 +254,9 @@ DeformableBodyModel::initializeDampingMatrix()
 
     matrix->ScalarMultiply(dampingLaplacianCoefficient);
 
-    auto rowLengths = matrix->GetRowLengths();
-    auto nonZeroValues = matrix->GetEntries();
-    auto columnIndices = matrix->GetColumnIndices();
+    this->m_vegaDampingMatrix.reset(matrix);
 
-    std::vector<Eigen::Triplet<double>> triplets;
-    triplets.reserve(matrix->GetNumEntries());
-    for (int i = 0, end = matrix->GetNumRows(); i < end; ++i)
-    {
-        for (int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
-        {
-            triplets.emplace_back(i, columnIndices[i][k], nonZeroValues[i][k]);
-        }
-    }
-
-    m_C.resize(matrix->GetNumRows(), matrix->GetNumColumns());
-    m_C.setFromTriplets(std::begin(triplets), std::end(triplets));
-    m_C.makeCompressed();
-
-    //this->dampingMatrix.reset(matrix);
+    this->initializeEigenMatrixFromVegaMatrix(*matrix, m_C);
 }
 
 void
@@ -264,12 +264,12 @@ DeformableBodyModel::initializeTangentStiffness()
 {
     if (!m_internalForceModel)
     {
-        LOG(WARNING) << "Tangent stiffness cannot be initialized without force model";
+        LOG(WARNING) << "DeformableBodyModel::initializeTangentStiffness: Tangent stiffness cannot be initialized without force model";
         return;
     }
 
     vega::SparseMatrix *matrix;
-    m_internalForceModel->GetTangentStiffnessMatrixTopology(&matrix);
+    m_internalForceModel->getTangentStiffnessMatrixTopology(&matrix);
 
     if (!matrix)
     {
@@ -277,61 +277,45 @@ DeformableBodyModel::initializeTangentStiffness()
         return;
     }
 
-    if (!this->vegaMassMatrix)
+    if (!this->m_vegaMassMatrix)
     {
         // TODO: log this
         return;
     }
 
-    matrix->BuildSubMatrixIndices(*this->vegaMassMatrix.get());
+    matrix->BuildSubMatrixIndices(*this->m_vegaMassMatrix.get());
 
-    if (this->dampingMatrix)
+    if (this->m_vegaDampingMatrix)
     {
-        matrix->BuildSubMatrixIndices(*this->dampingMatrix.get(), 1);
+        matrix->BuildSubMatrixIndices(*this->m_vegaDampingMatrix.get(), 1);
     }
 
-    auto rowLengths = matrix->GetRowLengths();
-    auto columnIndices = matrix->GetColumnIndices();
+    this->m_vegaTangentStiffnessMatrix.reset(matrix);
 
-    std::vector<Eigen::Triplet<double>> triplets;
-    triplets.reserve(matrix->GetNumEntries());
-    for (int i = 0, end = matrix->GetNumRows(); i < end; ++i)
+    this->initializeEigenMatrixFromVegaMatrix(*matrix, m_K);
+
+    if (m_damped)
     {
-        for (int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
-        {
-            triplets.emplace_back(i, columnIndices[i][k], 0.001);
-        }
+        const auto &dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
+        const auto &dampingMassCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+
+        // Initialize the Raleigh damping matrix
+        m_C = dampingMassCoefficient*m_M + dampingStiffnessCoefficient*m_K;
     }
-    m_K.resize(matrix->GetNumRows(),
-        matrix->GetNumColumns());
-    m_K.setFromTriplets(std::begin(triplets), std::end(triplets));
-    m_K.makeCompressed();
-
-    this->vegaTangentStiffnessMatrix.reset(matrix);
-
-    const auto &dampingStiffnessCoefficient =
-        m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
-
-    const auto &dampingMassCoefficient =
-        m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
-
-    // Initialize the Raleigh damping matrix
-    m_C = dampingMassCoefficient*m_M + m_K*dampingStiffnessCoefficient;
 }
 
 void
-DeformableBodyModel::initializeGravity()
+DeformableBodyModel::initializeGravityForce()
 {
     m_gravityForce.resize(m_numDOF);
     m_gravityForce.setZero();
-    double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const float gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
 
-    auto vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry));
-    vegaMesh->computeGravity(m_gravityForce.data(), gravity);
+    m_vegaPhysicsMesh->computeGravity(m_gravityForce.data(), gravity);
 }
 
 void
-DeformableBodyModel::computeImplicitSystemRHS(const kinematicState& state,
+DeformableBodyModel::computeImplicitSystemRHS(const kinematicState& stateAtT,
                                               const kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
@@ -342,22 +326,27 @@ DeformableBodyModel::computeImplicitSystemRHS(const kinematicState& state,
 
     m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
 
-    double timeStep = m_timeIntegrator->getTimestepSize();
+    const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Feff = m_M * (newState.getQDot() - state.getQDot()) / timeStep;
-    m_Feff -= m_K * (newState.getQ() - state.getQ() - newState.getQDot() * timeStep);
-    m_Feff += m_explicitExternalForce;
-    m_Feff += m_gravityForce;
+    m_Feff = m_M * (newState.getQDot() - stateAtT.getQDot()) / dT;
+    m_Feff -= m_K * (newState.getQ() - stateAtT.getQ() - stateAtT.getQDot() * dT);
 
     if (m_damped)
     {
-        m_Feff -= timeStep*this->Damping(newState)*newState.getQDot();
+        m_Feff -= dT*m_C*newState.getQDot();
     }
+
+    m_internalForceModel->getInternalForce(m_Finternal, newState.getQ());
+    m_Feff += m_Finternal;
+
+    m_Feff += m_explicitExternalForce;
+    m_Feff += m_gravityForce;
+
     //state.applyBoundaryConditions(this->rhs);
 }
 
 void
-DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& state,
+DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                               const kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
@@ -367,23 +356,18 @@ DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& state,
     auto &K = this->evalDFx(newState);
     auto &C = this->evalDFv(newState);*/
 
+    updateMassMatrix();
     m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
+    updateDampingMatrix();
 
-    double timeStep = m_timeIntegrator->getTimestepSize();
+    const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Keff = (1.0 / timeStep) * m_M;
+    m_Keff = m_M;
     if (m_damped)
     {
-        const auto &dampingStiffnessCoefficient =
-            m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
-
-        const auto &dampingMassCoefficient =
-            m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
-
-        m_C = dampingMassCoefficient*m_M + m_K*dampingStiffnessCoefficient;
-        m_Keff += m_C;
+        m_Keff += dT*m_C;
     }
-    m_Keff += timeStep * m_K;
+    m_Keff += (dT*dT) * m_K;
 
     //previousState.applyBoundaryConditions(this->systemMatrix);
 }
@@ -393,13 +377,63 @@ DeformableBodyModel::initializeExplicitExternalForces()
 {
     m_explicitExternalForce.resize(m_numDOF);
     m_explicitExternalForce.setZero();
+
+    // Not supported for now
+}
+
+void
+DeformableBodyModel::updateDampingMatrix()
+{
+    if (m_damped)
+    {
+        const auto &dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
+        const auto &dampingMassCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+
+        if (dampingMassCoefficient > 0)
+        {
+            m_C = dampingMassCoefficient*m_M;
+
+            if (dampingStiffnessCoefficient > 0)
+            {
+                m_C += m_K*dampingStiffnessCoefficient;
+            }
+        }
+        else if(dampingStiffnessCoefficient > 0)
+        {
+            m_C = m_K*dampingStiffnessCoefficient;
+        }
+    }
+}
+
+void
+DeformableBodyModel::updateMassMatrix()
+{
+    // Do nothing for now as topology changes are not supported yet!
+}
+
+void
+DeformableBodyModel::updatePhysicsGeometry(const kinematicState& state)
+{
+    auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
+    volMesh->setVerticesDisplacements(m_currentState->getQ());
+}
+
+void
+DeformableBodyModel::updateBodyStates(const Vectord& delataV)
+{
+    auto uPrev = m_previousState->getQ();
+    auto u = m_currentState->getQ();
+    auto v = m_currentState->getQDot();
+
+    v += delataV;
+    u = uPrev + m_timeIntegrator->getTimestepSize()*v;
 }
 
 NonLinearSystem::VectorFunctionType&
 DeformableBodyModel::getFunction(const Vectord& q)
 {
-    // Function to evaluate the nonlinear objective function.
-    return [&, this](const Vectord &) -> const Vectord&
+    // Function to evaluate the nonlinear objective function given the current state
+    return [&, this](const Vectord&) -> const Vectord&
     {
         computeImplicitSystemRHS(state, newState);
         return m_Feff;
@@ -409,12 +443,33 @@ DeformableBodyModel::getFunction(const Vectord& q)
 NonLinearSystem::MatrixFunctionType&
 DeformableBodyModel::getFunctionGradient(const Vectord& q)
 {
-    // Gradient of the nonlinear objective function.
-    return [&, this](const Vectord &) -> const SparseMatrixd&
+    // Gradient of the nonlinear objective function given the current state
+    return [&, this](const Vectord&) -> const SparseMatrixd&
     {
         computeImplicitSystemLHS(state, newState);
         return m_Keff;
     };
+}
+
+void
+DeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix)
+{
+    auto rowLengths = vegaMatrix.GetRowLengths();
+    auto nonZeroValues = vegaMatrix.GetEntries();
+    auto columnIndices = vegaMatrix.GetColumnIndices();
+
+    std::vector<Eigen::Triplet<double>> triplets;
+    triplets.reserve(vegaMatrix.GetNumEntries());
+    for (int i = 0, end = vegaMatrix.GetNumRows(); i < end; ++i)
+    {
+        for (int k = 0, k_end = rowLengths[i]; k < k_end; ++k)
+        {
+            triplets.emplace_back(i, columnIndices[i][k], nonZeroValues[i][k]);
+        }
+    }
+    eigenMatrix.resize(vegaMatrix.GetNumRows(), vegaMatrix.GetNumColumns());
+    eigenMatrix.setFromTriplets(std::begin(triplets), std::end(triplets));
+    eigenMatrix.makeCompressed();
 }
 
 }

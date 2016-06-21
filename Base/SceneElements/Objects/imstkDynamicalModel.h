@@ -42,7 +42,7 @@ public:
         none
     };
 
-    using kinematicState = ProblemState <Vectord> ; // for now!
+    using kinematicState = ProblemState;
 
 public:
     ///
@@ -95,6 +95,11 @@ public:
     {
         return m_numDOF;
     }
+
+    ///
+    /// \brief Update states
+    ///
+    virtual void updateBodyStates(const Vectord& q) = 0;
 
 protected:
 

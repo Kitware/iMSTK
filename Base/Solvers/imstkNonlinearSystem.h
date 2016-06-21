@@ -41,8 +41,10 @@ public:
     ///
     /// \brief default Constructor/Destructor
     ///
-    NonLinearSystem() = default;
+    NonLinearSystem(){};
+    NonLinearSystem(VectorFunctionType& F, MatrixFunctionType& dF);
     virtual ~NonLinearSystem() = default;
+
 
     ///
     /// \brief Set nonlinear method that evaluates the nonlinear function.
