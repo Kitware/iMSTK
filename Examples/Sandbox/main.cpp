@@ -256,6 +256,7 @@ void testTwoFalcons()
 
 void testObjectController()
 {
+#ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestDevice");
@@ -281,6 +282,7 @@ void testObjectController()
     // Run
     sdk->setCurrentScene("SceneTestDevice");
     sdk->startSimulation(true);
+#endif
 }
 
 void testCameraController()

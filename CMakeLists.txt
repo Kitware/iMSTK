@@ -143,7 +143,11 @@ find_package( VRPN REQUIRED )
 include_directories( ${VRPN_INCLUDE_DIRS} )
 add_definitions( -DVRPN_USE_LIBNIFALCON )
 if(${PROJECT_NAME}_USE_OMNI)
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )
   add_definitions( -DVRPN_USE_PHANTOM_SERVER )
+else()
+  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
 endif()
 
 #--------------------------------------------------------------------------

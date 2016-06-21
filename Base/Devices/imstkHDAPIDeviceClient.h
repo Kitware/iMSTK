@@ -19,6 +19,8 @@
 
    =========================================================================*/
 
+#ifdef iMSTK_USE_OPENHAPTICS
+
 #ifndef imstkHDAPIDeviceClient_h
 #define imstkHDAPIDeviceClient_h
 
@@ -71,3 +73,4 @@ private:
 }
 
 #endif // ifndef imstkHDAPIDeviceClient_h
+#endif // ifdef iMSTK_USE_OMNI

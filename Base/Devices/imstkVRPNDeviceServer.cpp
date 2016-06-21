@@ -79,8 +79,8 @@ VRPNDeviceServer::initModule()
         case DeviceType::PHANTOM_OMNI:
         {
 #ifdef VRPN_USE_PHANTOM_SERVER
-			char * deviceName = const_cast<char*>(name.c_str());
-			m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 90.0f, deviceName));
+            char * deviceName = const_cast<char*>(name.c_str());
+            m_deviceConnections->add(new vrpn_Phantom(deviceName, m_serverConnection, 90.0f, deviceName));
 #else
             LOG(WARNING) << "VRPNDeviceServer::initModule error: no support for Phantom Omni in VRPN. "
                          << "Install OpenHaptics SDK, the omni driver, and build VRPN with VRPN_USE_PHANTOM_SERVER.";

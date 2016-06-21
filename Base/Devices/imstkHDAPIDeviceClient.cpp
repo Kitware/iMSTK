@@ -19,6 +19,8 @@
 
    =========================================================================*/
 
+#ifdef iMSTK_USE_OPENHAPTICS
+
 #include "imstkHDAPIDeviceClient.h"
 
 #include <HDU/hduVector.h>
@@ -100,3 +102,4 @@ HDAPIDeviceClient::hapticCallback(void* pData)
     return HD_CALLBACK_CONTINUE;
 }
 }
+#endif // ifdef iMSTK_USE_OPENHAPTICS
