@@ -78,7 +78,7 @@ ConjugateGradient::setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSys
 }
 
 void
-ConjugateGradient::print()
+ConjugateGradient::print() const
 {
     IterativeLinearSolver::print();
 

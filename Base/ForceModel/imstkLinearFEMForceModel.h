@@ -43,21 +43,23 @@ public:
         m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
 
         auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
-        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&m_stiffnessMatrix.get());
+        auto s = m_stiffnessMatrix.get();
+        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&s);
         double * zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
         stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
         free(zero);
-        delete(stVKStiffnessMatrix);
+        //delete(stVKStiffnessMatrix);
     };
 
     virtual ~LinearFEMForceModel();
 
-    void getInternalForce(Vectord& u, Vectord& internalForce)
+    void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
-        m_stiffnessMatrix->MultiplyVector(u.data(), internalForce.data());
+        double *data = const_cast<double*>(u.data());
+        m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd tangentStiffnessMatrix)
     {
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }

@@ -41,31 +41,34 @@ public:
     {
         m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
 
-        m_vegaTangentStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
+        m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
 
     virtual ~StVKForceModel();
 
-    void getInternalForce(Vectord& u, Vectord& internalForce)
+    void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
-        m_stVKInternalForces->ComputeForces(u.data(), internalForce.data());
+        double *data = const_cast<double*>(u.data());
+        m_stVKInternalForces->ComputeForces(data, internalForce.data());
     }
 
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
     {
-        m_vegaTangentStiffnessMatrix->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
+        m_vegaStVKStiffnessMatrix->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_vegaTangentStiffnessMatrix->ComputeStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
+        double *data = const_cast<double*>(u.data());
+        m_vegaStVKStiffnessMatrix->ComputeStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
 protected:
 
     std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;
-    std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::StVKStiffnessMatrix> m_vegaStVKStiffnessMatrix;
     bool ownStiffnessMatrix;
 };
 

@@ -146,13 +146,13 @@ public:
     /// \brief Compute the RHS of the resulting linear system
     ///
     void computeImplicitSystemRHS(const kinematicState& prevState,
-                                  const kinematicState& newState);
+                                  kinematicState& newState);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
     ///
     void computeImplicitSystemLHS(const kinematicState& prevState,
-                                  const kinematicState& newState);
+                                  kinematicState& newState);
     ///
     /// \brief Initialize explicit external forces
     ///
@@ -183,13 +183,13 @@ public:
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType& getFunction(const Vectord& q);
+    NonLinearSystem::VectorFunctionType getFunction(const Vectord& q);
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear
     /// function given the state vector
     ///
-    NonLinearSystem::MatrixFunctionType& getFunctionGradient(const Vectord& q);
+    NonLinearSystem::MatrixFunctionType getFunctionGradient(const Vectord& q);
 
 
     ///

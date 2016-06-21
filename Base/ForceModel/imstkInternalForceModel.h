@@ -26,6 +26,9 @@
 
 #include "imstkMath.h"
 
+//vega
+#include "forceModel.h"
+
 namespace imstk
 {
 
@@ -52,12 +55,12 @@ public:
     ///
     /// \brief Get the internal force given the present state
     ///
-    virtual void getInternalForce(Vectord& u, Vectord& internalForce) = 0;
+    virtual void getInternalForce(const Vectord& u, Vectord& internalForce) = 0;
 
     ///
     /// \brief Return the tangent stiffness matrix the present state
     ///
-    virtual void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) = 0;
+    virtual void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
     ///
     /// \brief Return the tangent stiffness matrix the present state
@@ -67,7 +70,7 @@ public:
     ///
     /// \brief Return both internal force and tangent stiffness matrix given the present state
     ///
-    virtual void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
+    virtual void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
     ///
     /// \brief Update the values of the Eigen sparse matrix given the linearized array of data from the Vega matrix

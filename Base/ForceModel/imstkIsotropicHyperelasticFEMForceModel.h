@@ -71,7 +71,7 @@ public:
                 break;
 
             default:
-                LOG(ERROR) << "Error: Invalid hyperelastic material type.";
+                LOG(WARNING) << "Error: Invalid hyperelastic material type.";
         }
 
         m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
@@ -84,14 +84,16 @@ public:
 
     virtual ~IsotropicHyperelasticFEForceModel();
 
-    void getInternalForce(Vectord& u, Vectord& internalForce)
+    void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
-        m_isotropicHyperelasticFEM->ComputeForces(u.data(), internalForce.data());
+        double *data = const_cast<double*>(u.data());
+        m_isotropicHyperelasticFEM->ComputeForces(data, internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_isotropicHyperelasticFEM->GetTangentStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
+        double *data = const_cast<double*>(u.data());
+        m_isotropicHyperelasticFEM->GetTangentStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
@@ -100,9 +102,10 @@ public:
         m_isotropicHyperelasticFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
-    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_isotropicHyperelasticFEM->GetForceAndTangentStiffnessMatrix(u.data(), internalForce.data(), m_vegaTangentStiffnessMatrix.get());
+        double *data = const_cast<double*>(u.data());
+        m_isotropicHyperelasticFEM->GetForceAndTangentStiffnessMatrix(data, internalForce.data(), m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 

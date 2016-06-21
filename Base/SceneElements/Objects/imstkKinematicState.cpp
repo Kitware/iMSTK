@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkKinematicState.h"
+#include "imstkProblemState.h"
 
 namespace imstk
 {

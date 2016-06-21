@@ -80,7 +80,10 @@ public:
     ///
     /// \brief Print solver information.
     ///
-    virtual void print() const;
+    virtual void print() const
+    {
+        LOG(INFO) << "Solver type (broad): Linear";
+    };
 
     ///
     /// \brief Returns true if the solver is iterative

@@ -157,7 +157,7 @@ DeformableBodyModel::loadBoundaryConditions()
 void
 DeformableBodyModel::initializeForceModel()
 {
-    const float g = m_forceModelConfiguration->getFloatsOptionsMap.at("gravity");
+    const float g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
     const bool isGravityPresent = (g > 0) ? true : false;
 
     switch (m_forceModelConfiguration->getForceModelType())
@@ -316,7 +316,7 @@ DeformableBodyModel::initializeGravityForce()
 
 void
 DeformableBodyModel::computeImplicitSystemRHS(const kinematicState& stateAtT,
-                                              const kinematicState& newState)
+                                              kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
 
@@ -347,7 +347,7 @@ DeformableBodyModel::computeImplicitSystemRHS(const kinematicState& stateAtT,
 
 void
 DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
-                                              const kinematicState& newState)
+                                              kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
 
@@ -429,18 +429,18 @@ DeformableBodyModel::updateBodyStates(const Vectord& delataV)
     u = uPrev + m_timeIntegrator->getTimestepSize()*v;
 }
 
-NonLinearSystem::VectorFunctionType&
+NonLinearSystem::VectorFunctionType
 DeformableBodyModel::getFunction(const Vectord& q)
 {
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord&) -> const Vectord&
     {
         computeImplicitSystemRHS(state, newState);
-        return m_Feff;
+        return this->m_Feff;
     };
 }
 
-NonLinearSystem::MatrixFunctionType&
+NonLinearSystem::MatrixFunctionType
 DeformableBodyModel::getFunctionGradient(const Vectord& q)
 {
     // Gradient of the nonlinear objective function given the current state

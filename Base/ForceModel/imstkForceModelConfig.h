@@ -113,17 +113,17 @@ class ForceModelConfig
 
     struct customOptionsNameList
     {
-        const char femMethodName[256] = "femMethod";
-        const char invertibleMaterialName[256] = "invertibleMaterial";
-        const char fixedDOFFilenameName[256] = "fixedDOFFilename";
-        const char dampingMassCoefficientName[256] = "dampingMassCoefficient";
-        const char dampingLaplacianCoefficientName[256] = "dampingLaplacianCoefficient";
-        const char dampingStiffnessCoefficientName[256] = "dampingStiffnessCoefficient";
-        const char deformationComplianceName[256] = "deformationCompliance";
-        const char compressionResistanceName[256] = "compressionResistance";
-        const char inversionThresholdName[256] = "inversionThreshold";
-        const char numberOfThreadsName[256] = "numberOfThreads";
-        const char gravityName[256] = "gravity";
+        char femMethodName[256] = "femMethod";
+        char invertibleMaterialName[256] = "invertibleMaterial";
+        char fixedDOFFilenameName[256] = "fixedDOFFilename";
+        char dampingMassCoefficientName[256] = "dampingMassCoefficient";
+        char dampingLaplacianCoefficientName[256] = "dampingLaplacianCoefficient";
+        char dampingStiffnessCoefficientName[256] = "dampingStiffnessCoefficient";
+        char deformationComplianceName[256] = "deformationCompliance";
+        char compressionResistanceName[256] = "compressionResistance";
+        char inversionThresholdName[256] = "inversionThreshold";
+        char numberOfThreadsName[256] = "numberOfThreads";
+        char gravityName[256] = "gravity";
     };
 public:
 
@@ -132,15 +132,18 @@ public:
     ///
     ForceModelConfig(const std::string &configurationFileName);
 
+    ///
+    /// \brief Destructor
+    ///
     ~ForceModelConfig(){};
 
     ///
-    /// \brief
+    /// \brief Parse the deformable objeyc config file
     ///
     bool parseConfig(const std::string &configFileName);
 
     ///
-    /// \brief
+    /// \brief Get the options set that are floating points types
     ///
     const std::map<std::string, double>& getFloatsOptionsMap()
     {
@@ -148,7 +151,7 @@ public:
     }
 
     ///
-    /// \brief
+    /// \brief Get the options set that are integer points types
     ///
     const std::map<std::string, int>& getIntegerOptionsMap()
     {
@@ -156,7 +159,7 @@ public:
     }
 
     ///
-    /// \brief
+    /// \brief Get the options set that are string points types
     ///
     const std::map<std::string, std::string>& getStringOptionsMap()
     {
@@ -164,12 +167,12 @@ public:
     }
 
     ///
-    /// \brief
+    /// \brief Get the type of the force model
     ///
     ForceModelType getForceModelType();
 
     ///
-    /// \brief
+    /// \brief Get the type of the hyperelastic model
     ///
     HyperElasticMaterialType getHyperelasticMaterialType();
 
@@ -179,7 +182,7 @@ protected:
     std::map<std::string, int> m_intsOptionMap;            ///> Map for int configuration variables
     std::map<std::string, std::string> m_stringsOptionMap; ///> Map for string
 
-    bool m_loadSuccessful;
+    bool m_loadSuccessful; ///> Configuration loading is successful
 };
 
 } // imstk

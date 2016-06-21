@@ -63,7 +63,7 @@ public:
     ///
     /// \brief Print solver information.
     ///
-    virtual void print() const override;
+    void print() const override;
 
     ///
     /// \brief Solve the linear system using Gauss-Seidel iterations.

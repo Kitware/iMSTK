@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "imstkProblemState.h"
+
 namespace imstk {
 
 ///

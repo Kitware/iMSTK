@@ -41,9 +41,10 @@ public:
     }
     virtual ~MassSpringForceModel();
 
-    void getInternalForce(Vectord& u, Vectord& internalForce)
+    void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
-        m_massSpringSystem->ComputeForce(u.data(), internalForce.data());
+        double *data = const_cast<double*>(u.data());
+        m_massSpringSystem->ComputeForce(data, internalForce.data());
     }
 
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
@@ -51,9 +52,10 @@ public:
         m_massSpringSystem->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_massSpringSystem->ComputeStiffnessMatrix(u.data(), m_vegaTangentStiffnessMatrix.get());
+        double *data = const_cast<double*>(u.data());
+        m_massSpringSystem->ComputeStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 

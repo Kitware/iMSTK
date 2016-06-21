@@ -9,10 +9,15 @@
 #include "imstkSimulationManager.h"
 
 // Objects
+#include "imstkDeformableObject.h"
 #include "imstkSceneObject.h"
 #include "imstkVirtualCouplingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
+
+// Solvers
+#include "imstkNonlinearSystem.h"
+#include "imstkNonlinearSolver.h"
 
 // Geometry
 #include "imstkPlane.h"
@@ -55,6 +60,7 @@ void testTetraTriangleMap();
 void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
+void testDeformableBody();
 
 int main()
 {
@@ -77,6 +83,7 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
+    //testDeformableBody();
 
     return 0;
 }
@@ -778,4 +785,58 @@ void testSurfaceMeshOptimizer()
     // Nodal data: 0:(0, 0, 0), 1:(0.5, 0, 0), 2:(0, 0.5, 0), 3:(0.5, 0.5, 0), 4:(0, 1, 0), 5:(1, 0, 0), 6:(0.5, 1, 0), 7:(1, 0.5, 0), 8:(1, 1, 0)
 
     getchar();
+}
+
+
+void testDeformableBody()
+{
+    // a. SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("MeshCCDTest");
+
+    // b. Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshReader::read("dragon.veg");
+
+    // c. Extract the surface mesh
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    tetMesh->extractSurfaceMesh(surfMesh);
+
+    // d. Construct a map
+
+    // d.1 Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+
+    // d.2 Compute the map
+    oneToOneNodalMap->compute();
+
+    // e. Scene object 1: Dragon
+    auto deformableObj = std::make_shared<DeformableObject>("Dragon");
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setCollidingGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(tetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    scene->addSceneObject(deformableObj);
+
+    // f. Scene object 2: Plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(10);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // g. Add collision detection
+    auto collisioDet = std::make_shared<CollisionDetection>();
+
+    // h. Add collision handling
+
+
+    // create a nonlinear system
+    auto nlSys = std::make_shared<NonLinearSystem>();
+
+    // Run the simulation
+    sdk->setCurrentScene("DeformableBodyTest");
+    sdk->startSimulation(true);
 }

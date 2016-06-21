@@ -90,7 +90,7 @@ public:
     ///
     /// \brief Print solver information
     ///
-    void print() override;
+    void print() const override;
 
 private:
     ///> Pointer to the Eigen's Conjugate gradient solver

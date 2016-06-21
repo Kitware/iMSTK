@@ -24,6 +24,8 @@
 
 #include "imstkMath.h"
 
+#include <memory>
+
 namespace imstk
 {
 
@@ -64,13 +66,6 @@ public:
         m_qDotDot = a;
     }
 
-    void setState(const ProblemState& rhs)
-    {
-        m_q = rhs.getQ();
-        m_qDot = rhs.getQDot();
-        m_qDotDot = rhs.getQDotDot();
-    }
-
     void setState(std::shared_ptr<ProblemState> rhs)
     {
         m_q = rhs->getQ();
@@ -81,21 +76,25 @@ public:
     ///
     /// \brief Get the state
     ///
+    const Vectord& getQ() const { return m_q; }
     Vectord& getQ() { return m_q; }
 
     ///
     /// \brief Get the derivative of state w.r.t time
     ///
+    const Vectord& getQDot() const { return m_qDot; }
     Vectord& getQDot() { return m_qDot; }
 
     ///
     /// \brief Get the double derivative of state w.r.t time
     ///
+    const Vectord& getQDotDot() const { return m_qDotDot; }
     Vectord& getQDotDot() { return m_qDotDot; }
 
     ///
     /// \brief Get the state
     ///
+    const Vectord& getState() const { return getQ(); }
     Vectord& getState() { return getQ(); }
 
 protected:

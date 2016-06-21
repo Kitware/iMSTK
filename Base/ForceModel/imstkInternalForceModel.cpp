@@ -24,7 +24,7 @@ limitations under the License.
 namespace imstk
 {
 
-static void
+void
 InternalForceModel::updateValuesFromMatrix(std::shared_ptr<vega::SparseMatrix> vegaMatrix, double *values)
 {
     auto rowLengths = vegaMatrix->GetRowLengths();

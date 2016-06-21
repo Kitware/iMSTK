@@ -53,9 +53,10 @@ public:
     ///
     ~FEElasticityForceModel() = default;
 
-    void getInternalForce(Vectord& u, Vectord& internalForce) override
+    void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
-        m_feElasticForceModel->GetInternalForce(u.data(), internalForce.data());
+        double *data = const_cast<double*>(u.data());
+        m_feElasticForceModel->GetInternalForce(data, internalForce.data());
     }
 
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
@@ -63,9 +64,10 @@ public:
         m_feElasticForceModel->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
-        m_feElasticForceModel->GetTangentStiffnessMatrixTopology(u.data(), );
+        double *data = const_cast<double*>(u.data());
+        m_feElasticForceModel->GetTangentStiffnessMatrixTopology(data, );
     }
 
 protected:

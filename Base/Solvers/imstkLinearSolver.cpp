@@ -43,14 +43,6 @@ LinearSolver<SystemMatrixType>::getSystem() const
     return m_linearSystem;
 }
 
-
-template<typename SystemMatrixType>
-void
-LinearSolver<SystemMatrixType>::print()
-{
-    LOG(INFO) << "Solver type (broad): Linear";
-}
-
 template<typename SystemMatrixType>
 void
 LinearSolver<SystemMatrixType>::setTolerance(const double tolerance)

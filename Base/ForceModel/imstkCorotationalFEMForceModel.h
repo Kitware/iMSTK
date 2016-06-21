@@ -45,14 +45,16 @@ public:
 
     virtual ~CorotationalFEMForceModel();
 
-    void getInternalForce(Vectord& u, Vectord& internalForce)
+    void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
-        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), internalForce.data(), nullptr, m_warp);
+        double *data = const_cast<double*>(u.data());
+        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(data, internalForce.data(), nullptr, m_warp);
     }
 
-    void getTangentStiffnessMatrix(Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), nullptr, m_vegaTangentStiffnessMatrix.get(), m_warp);
+        double *data = const_cast<double*>(u.data());
+        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(data, nullptr, m_vegaTangentStiffnessMatrix.get(), m_warp);
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
@@ -61,9 +63,10 @@ public:
         m_corotationalLinearFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
-    void GetForceAndMatrix(Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
-        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(u.data(), internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
+        double *data = const_cast<double*>(u.data());
+        m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(data, internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
