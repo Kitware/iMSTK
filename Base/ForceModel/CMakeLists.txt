@@ -11,8 +11,6 @@ imstk_add_library( ForceModel
 	VegaFEM::forceModel
     VegaFEM::stvk
     VegaFEM::graph
-	VegaFEM::generateMassMatrix
-	VegaFEM::generateMeshGraph
   )
 
 #-----------------------------------------------------------------------------
