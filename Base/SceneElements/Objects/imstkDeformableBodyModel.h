@@ -61,7 +61,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeformableBodyModel();
+    DeformableBodyModel(DynamicalModel::Type type = DynamicalModel::Type::elastoDynamics);
 
     ///
     /// \brief Destructor
@@ -93,7 +93,7 @@ public:
     std::shared_ptr<Geometry> getModelGeometry();
 
     ///
-    /// \brief Returns the tangent linear system given curent state
+    /// \brief Returns the tangent linear system given current state
     ///
     void getTangent(Vectord& q);
 
@@ -183,17 +183,16 @@ public:
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType getFunction(const Vectord& q);
+    NonLinearSystem::VectorFunctionType getFunction();
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear
     /// function given the state vector
     ///
-    NonLinearSystem::MatrixFunctionType getFunctionGradient(const Vectord& q);
-
+    NonLinearSystem::MatrixFunctionType getFunctionGradient();
 
     ///
-    /// \brief
+    /// \brief Initialize the Eigen matrix with data inside vega sparse matrix
     ///
     static void initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix);
 
@@ -212,7 +211,7 @@ protected:
     std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
     std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
 
-    bool m_damped;
+    bool m_damped;      ///> Viscous or structurally damped system
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
     SparseMatrixd m_M;    ///> Mass matrix
@@ -233,12 +232,12 @@ protected:
     Vectord m_explicitExternalForce;   ///> Vector of explicitly defined external forces
 
     // Dirichlet boundary conditions
-    std::vector<std::size_t> m_fixedNodeIds;
+    std::vector<std::size_t> m_fixedNodeIds;    ///> Nodal IDs of the nodes that are fixed
 
-    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;
-    std::shared_ptr<vega::SparseMatrix> m_vegaMassMatrix;///> Vega mass matrix
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;///> Vega Tangent stiffness matrix
-    std::shared_ptr<vega::SparseMatrix> m_vegaDampingMatrix;///> Vega Laplacian damping matrix
+    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;            ///> Mesh used for Physics
+    std::shared_ptr<vega::SparseMatrix> m_vegaMassMatrix;               ///> Vega mass matrix
+    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;   ///> Vega Tangent stiffness matrix
+    std::shared_ptr<vega::SparseMatrix> m_vegaDampingMatrix;            ///> Vega Laplacian damping matrix
 };
 
 } // imstk

@@ -100,4 +100,5 @@ VegaMeshReader::getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::Volumetric
         return nullptr;
     }
 }
+
 }

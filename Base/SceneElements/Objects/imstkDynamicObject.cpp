@@ -60,6 +60,18 @@ DynamicObject::setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map)
     m_physicsToVisualGeomMap = map;
 }
 
+std::shared_ptr<DynamicalModel>
+DynamicObject::getDynamicalModel() const
+{
+    return m_dynamicalModel;
+}
+
+void
+DynamicObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaModel)
+{
+    m_dynamicalModel = dynaModel;
+}
+
 size_t
 DynamicObject::getNumOfDOF() const
 {

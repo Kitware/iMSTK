@@ -60,6 +60,12 @@ public:
     void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map);
 
     ///
+    /// \brief Set/Get dynamical model
+    ///
+    std::shared_ptr<DynamicalModel> getDynamicalModel() const;
+    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaModel);
+
+    ///
     /// \brief Returns the number of degree of freedom
     ///
     size_t getNumOfDOF() const;

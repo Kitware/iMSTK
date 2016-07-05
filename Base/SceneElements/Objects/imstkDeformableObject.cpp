@@ -24,5 +24,27 @@
 namespace imstk
 {
 
+Vectord&
+DeformableObject::getContactForce()
+{
+    auto defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
+
+    if (!defModel)
+    {
+        LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::getContactForce()";
+    }
+
+    return defModel->getContactForce();
+}
+
+void
+DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel)
+{
+    if (!dynaDefModel || dynaDefModel->getType() != DynamicalModel::Type::elastoDynamics)
+    {
+        LOG(WARNING) << "Dynamic model set is not of expected type (elastodynamics)!";
+    }
+    m_dynamicalModel = dynaDefModel;
+}
 
 }

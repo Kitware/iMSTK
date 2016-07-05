@@ -121,6 +121,7 @@ ForceModelConfig::getForceModelType()
 HyperElasticMaterialType
 ForceModelConfig::getHyperelasticMaterialType()
 {
+    // Set up some variables
     if (this->m_stringsOptionMap["invertibleMaterial"] == "StVK")
     {
         return HyperElasticMaterialType::StVK;
@@ -135,7 +136,7 @@ ForceModelConfig::getHyperelasticMaterialType()
     }
     else
     {
-        LOG(INFO) << "Hyperelastic model type not assigned";
+        LOG(INFO) << "Force model type not assigned";
         return HyperElasticMaterialType::none;
     }
 }

@@ -103,6 +103,14 @@ public:
     ///
     virtual void updateBodyStates(const Vectord& q) = 0;
 
+    ///
+    /// \brief Get the type of the object
+    ///
+    const Type& getType() const
+    {
+        return m_type;
+    }
+
 protected:
 
     Type m_type; ///> Mathematical model type

@@ -40,7 +40,9 @@ class LinearFEMForceModel : virtual public InternalForceModel
 public:
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81) : InternalForceModel()
     {
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
+        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), nullptr, withGravity, gravity);
 
         auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
         auto s = m_stiffnessMatrix.get();
@@ -59,11 +61,21 @@ public:
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd tangentStiffnessMatrix)
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    {
+        *tangentStiffnessMatrix = new vega::SparseMatrix(*m_stiffnessMatrix.get());
+    }
+
+    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    {
+        getInternalForce(u, internalForce);
+        getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
+    }
 protected:
     std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix;
     std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;

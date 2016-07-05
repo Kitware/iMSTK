@@ -45,27 +45,29 @@ public:
         bool withGravity = true,
         double gravity = 10.0) : InternalForceModel()
     {
+        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+
         int enableCompressionResistance = 1;
         double compressionResistance = 500;
         switch (materialType)
         {
             case HyperElasticMaterialType::StVK:
                 m_isotropicMaterial = std::make_shared<vega::StVKIsotropicMaterial>(
-                    mesh.get(),
+                    tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
                 break;
 
             case HyperElasticMaterialType::NeoHookean:
                 m_isotropicMaterial = std::make_shared<vega::NeoHookeanIsotropicMaterial>(
-                    mesh.get(),
+                    tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
                 break;
 
             case HyperElasticMaterialType::MooneyRivlin:
                 m_isotropicMaterial = std::make_shared<vega::MooneyRivlinIsotropicMaterial>(
-                    mesh.get(),
+                    tetMesh.get(),
                     enableCompressionResistance,
                     compressionResistance);
                 break;
@@ -75,12 +77,14 @@ public:
         }
 
         m_isotropicHyperelasticFEM = std::make_shared<vega::IsotropicHyperelasticFEM>(
-            mesh.get(),
-            m_isotropicMaterial,
+            tetMesh.get(),
+            m_isotropicMaterial.get(),
             inversionThreshold,
             withGravity,
             gravity);
     }
+
+    IsotropicHyperelasticFEForceModel() = delete;
 
     virtual ~IsotropicHyperelasticFEForceModel();
 

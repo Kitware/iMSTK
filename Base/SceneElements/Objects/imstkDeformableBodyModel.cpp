@@ -21,6 +21,7 @@
 
 #include <fstream>
 
+//imstk
 #include "imstkDeformableBodyModel.h"
 
 // vega
@@ -30,7 +31,7 @@
 namespace imstk
 {
 
-DeformableBodyModel::DeformableBodyModel() : DynamicalModel(DynamicalModel::Type::elastoDynamics), m_damped(false){}
+DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false){}
 
 void
 DeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
@@ -98,10 +99,10 @@ DeformableBodyModel::initialize()
 
     m_vegaPhysicsMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry));
 
-    initializeForceModel();//c
-    initializeMassMatrix();//c
-    initializeDampingMatrix();//c
-    initializeTangentStiffness();//c
+    initializeForceModel();
+    initializeMassMatrix();
+    initializeDampingMatrix();
+    initializeTangentStiffness();
     loadInitialStates();
     loadBoundaryConditions();
     initializeGravityForce();
@@ -175,12 +176,17 @@ DeformableBodyModel::initializeForceModel()
 
     case ForceModelType::Corotational:
 
-        this->m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(m_vegaPhysicsMesh, isGravityPresent, g);
+        this->m_internalForceModel = std::make_shared<CorotationalFEMForceModel>(m_vegaPhysicsMesh);
         break;
 
     case ForceModelType::Invertible:
 
-        this->m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(m_vegaPhysicsMesh, -MAX_D, isGravityPresent, g);
+        this->m_internalForceModel = std::make_shared<IsotropicHyperelasticFEForceModel>(
+                                        m_forceModelConfiguration->getHyperelasticMaterialType(),
+                                        m_vegaPhysicsMesh,
+                                        -MAX_D,
+                                        isGravityPresent,
+                                        g);
         break;
 
     default:
@@ -431,23 +437,25 @@ DeformableBodyModel::updateBodyStates(const Vectord& delataV)
 }
 
 NonLinearSystem::VectorFunctionType
-DeformableBodyModel::getFunction(const Vectord& q)
+DeformableBodyModel::getFunction()
 {
+    //const Vectord& q
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord&) -> const Vectord&
     {
-        computeImplicitSystemRHS(state, newState);
+        computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get());
         return this->m_Feff;
     };
 }
 
 NonLinearSystem::MatrixFunctionType
-DeformableBodyModel::getFunctionGradient(const Vectord& q)
+DeformableBodyModel::getFunctionGradient()
 {
+    //const Vectord& q
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord&) -> const SparseMatrixd&
     {
-        computeImplicitSystemLHS(state, newState);
+        computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get());
         return m_Keff;
     };
 }

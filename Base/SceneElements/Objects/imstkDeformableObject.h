@@ -26,6 +26,7 @@
 #include <string>
 
 #include "imstkDynamicObject.h"
+#include "imstkDeformableBodyModel.h"
 
 #include "imstkProblemState.h"
 #include "imstkMath.h"
@@ -60,35 +61,45 @@ public:
     void initializeState();
     void initializeState(const Vectord& p, const Vectord& v);
 
+    ///
+    /// \brief Set/Get dynamical model
+    ///
+    void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel) override;
+
+    ///
+    /// \brief Get the vector that holds the contact forces
+    ///
+    Vectord& getContactForce();
+
     // Get/Set States of the body
     const Vectord& getDisplacements() const
     {
-        m_dynamicalModel->getCurrentState()->getQ();
+        return m_dynamicalModel->getCurrentState()->getQ();
     }
 
     const Vectord& getPrevDisplacements() const
     {
-        m_dynamicalModel->getPreviousState()->getQ();
+        return m_dynamicalModel->getPreviousState()->getQ();
     }
 
     const Vectord& getVelocities() const
     {
-        m_dynamicalModel->getCurrentState()->getQDot();
+        return m_dynamicalModel->getCurrentState()->getQDot();
     }
 
     const Vectord& getPrevVelocities() const
     {
-        m_dynamicalModel->getPreviousState()->getQDot();
+        return m_dynamicalModel->getPreviousState()->getQDot();
     }
 
     const Vectord& getAccelerations() const
     {
-        m_dynamicalModel->getCurrentState()->getQDotDot();
+        return m_dynamicalModel->getCurrentState()->getQDotDot();
     }
 
     const Vectord& getPrevAccelerations() const
     {
-        m_dynamicalModel->getPreviousState()->getQDotDot();
+        return m_dynamicalModel->getPreviousState()->getQDotDot();
     }
 
 protected:

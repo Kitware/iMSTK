@@ -89,7 +89,7 @@ public:
     double getAlpha() const;
 
     ///
-    /// \brief Set/Get ArmijoMax. Maximum number of steplength reductions.
+    /// \brief Set/Get ArmijoMax. Maximum number of step length reductions.
     ///
     /// \param newArmijoMax New iteration parameter.
     ///
@@ -101,8 +101,8 @@ public:
     ///
     /// \param newSystem Non-linear system replacement.
     ///
-    void setSystem(NonLinearSystem* newSystem);
-    NonLinearSystem* getSystem() const;
+    void setSystem(std::shared_ptr<NonLinearSystem> newSystem);
+    std::shared_ptr<NonLinearSystem> getSystem() const;
 
     ///
     /// \brief Set a customized iterate update function.
@@ -115,8 +115,9 @@ protected:
     std::array<double, 2> m_sigma;      ///< Safeguarding bounds for the line search
     double m_alpha;                     ///< Parameter to measure decrease
     size_t m_armijoMax;                 ///< Maximum number of step length reductions
-    NonLinearSystem *m_nonLinearSystem; ///< System of non-linear equations
-    UpdateIterateType m_updateIterate;  ///< Update iteration function
+
+    std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///< System of non-linear equations
+    UpdateIterateType m_updateIterate;                  ///< Update iteration function
 };
 
 }

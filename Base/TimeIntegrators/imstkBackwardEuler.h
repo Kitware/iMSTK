@@ -40,7 +40,13 @@ public:
     ///
     /// \brief Constructor
     ///
-    BackwardEuler(const double dT) : TimeIntegrator(dT), m_type(Type::BackwardEuler){};
+    BackwardEuler(const double dT = 0.01) : TimeIntegrator(dT)
+    {
+        m_type = Type::BackwardEuler;
+        m_alpha = { { 1, 0, 0 } };
+        m_beta = { { 1, -1, 0 } };
+        m_gamma = { { 1, -2, -1 } };
+    };
 
     ///
     /// \brief Destructor
@@ -73,9 +79,9 @@ public:
 protected:
 
     // Coefficients of the time integrator
-    std::array<double, 3> m_alpha = { { 1, 0, 0 } };
-    std::array<double, 3> m_beta = { { 1, -1, 0 } };
-    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
+    std::array<double, 3> m_alpha;
+    std::array<double, 3> m_beta;
+    std::array<double, 3> m_gamma;
 
     double m_dT; ///> Delta T
 };

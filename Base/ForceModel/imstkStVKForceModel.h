@@ -30,6 +30,7 @@
 //vega
 #include "StVKInternalForces.h"
 #include "StVKStiffnessMatrix.h"
+#include "tetMesh.h"
 
 namespace imstk
 {
@@ -39,7 +40,9 @@ class StVKForceModel : virtual public InternalForceModel
 public:
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = 10.0) : InternalForceModel()
     {
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(mesh.get(), 0, withGravity, gravity);
+        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), nullptr, withGravity, gravity);
 
         m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
@@ -62,6 +65,12 @@ public:
         double *data = const_cast<double*>(u.data());
         m_vegaStVKStiffnessMatrix->ComputeStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
+    }
+
+    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    {
+        getInternalForce(u, internalForce);
+        getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
     }
 
 protected:

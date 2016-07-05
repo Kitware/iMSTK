@@ -37,11 +37,14 @@ namespace imstk
 class CorotationalFEMForceModel : virtual public InternalForceModel
 {
 public:
-    CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, int warp = 1)
+    CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, int warp = 1) : InternalForceModel()
     {
-        m_corotationalLinearFEM = std::make_shared<vega::CorotationalLinearFEM>(mesh.get());
+        auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
+
+        m_corotationalLinearFEM = std::make_shared<vega::CorotationalLinearFEM>(tetMesh.get());
         m_warp = warp;
     }
+    CorotationalFEMForceModel() = delete;
 
     virtual ~CorotationalFEMForceModel();
 
