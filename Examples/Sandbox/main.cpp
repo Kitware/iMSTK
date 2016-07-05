@@ -9,15 +9,21 @@
 #include "imstkSimulationManager.h"
 
 // Objects
+#include "imstkForceModelConfig.h"
+#include "imstkDeformableBodyModel.h"
 #include "imstkDeformableObject.h"
 #include "imstkSceneObject.h"
 #include "imstkVirtualCouplingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 
+// Time Integrators
+#include "imstkBackwardEuler.h"
+
 // Solvers
 #include "imstkNonlinearSystem.h"
-#include "imstkNonlinearSolver.h"
+#include "imstkNewtonMethod.h"
+#include "imstkConjugateGradient.h"
 
 // Geometry
 #include "imstkPlane.h"
@@ -41,6 +47,7 @@
 // Collisions
 #include "imstkInteractionPair.h"
 
+// logger
 #include "g3log/g3log.hpp"
 
 using namespace imstk;
@@ -787,19 +794,23 @@ void testSurfaceMeshOptimizer()
     getchar();
 }
 
-
 void testDeformableBody()
 {
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("MeshCCDTest");
+    auto scene = sdk->createNewScene("DeformableBodyTest");
 
     // b. Load a tetrahedral mesh
     auto tetMesh = imstk::MeshReader::read("dragon.veg");
 
     // c. Extract the surface mesh
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    tetMesh->extractSurfaceMesh(surfMesh);
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
 
     // d. Construct a map
 
@@ -812,11 +823,22 @@ void testDeformableBody()
     oneToOneNodalMap->compute();
 
     // e. Scene object 1: Dragon
+
+    // Configure dynamic model
+    auto dynaModel = std::make_shared<DeformableBodyModel>(DynamicalModel::Type::elastoDynamics);
+    dynaModel->configure("dragon.config");
+    dynaModel->setModelGeometry(volTetMesh);
+    dynaModel->initialize();
+    auto timeIntegrator = std::make_shared<BackwardEuler>();// Create and add Backward Euler time integrator
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setCollidingGeometry(surfMesh);
-    deformableObj->setPhysicsGeometry(tetMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->setDynamicalModel(dynaModel);
     scene->addSceneObject(deformableObj);
 
     // f. Scene object 2: Plane
@@ -828,13 +850,23 @@ void testDeformableBody()
     scene->addSceneObject(planeObj);
 
     // g. Add collision detection
-    auto collisioDet = std::make_shared<CollisionDetection>();
+    //auto collisioDet = std::make_shared<CollisionDetection>();
 
     // h. Add collision handling
 
 
     // create a nonlinear system
-    auto nlSys = std::make_shared<NonLinearSystem>();
+    auto nlSystem = std::make_shared<NonLinearSystem>();
+    nlSystem->setFunction(dynaModel->getFunction());
+    nlSystem->setJacobian(dynaModel->getFunctionGradient());
+
+    // create a linear solver
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();
+
+    // create a non-linear solver
+    auto nlSolver = std::make_shared<NewtonMethod>();
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
 
     // Run the simulation
     sdk->setCurrentScene("DeformableBodyTest");
