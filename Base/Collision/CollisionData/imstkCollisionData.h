@@ -36,6 +36,12 @@ struct PositionDirectionCollisionData
     double penetrationDepth;
 };
 
+struct MeshToAnalyticalPointDepthCollisionData
+{
+    int nodeId;
+    Vec3d penetrationVector;
+};
+
 struct VertexTriangleCollisionData
 {
     size_t vertexIdA;
@@ -94,6 +100,8 @@ public:
     std::vector<VertexTriangleCollisionData> VTColData;    //!< Vertex Triangle collision data
     std::vector<TriangleVertexCollisionData> TVColData;    //!< Triangle Vertex collision data
     std::vector<EdgeEdgeCollisionData> EEColData;          //!< Edge Edge collision data
+
+    std::vector<MeshToAnalyticalPointDepthCollisionData> PDMeshAnaColData;
 };
 }
 

@@ -109,6 +109,7 @@ DeformableBodyModel::initialize()
 
     m_Feff.resize(m_numDOF);
     m_Finternal.resize(m_numDOF);
+    m_Fcontact.resize(m_numDOF);
 }
 
 void

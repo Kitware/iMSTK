@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkPenaltyRigidCH_h
-#define imstkPenaltyRigidCH_h
+#ifndef imstkPenaltyMeshToRigidCH_h
+#define imstkPenaltyMeshToRigidCH_h
 
 #include "imstkCollisionHandling.h"
 
@@ -31,26 +31,24 @@ namespace imstk {
 class CollidingObject;
 class CollisionData;
 
-class PenaltyRigidCH : public CollisionHandling
+class PenaltyMeshToRigidCH : public CollisionHandling
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    PenaltyRigidCH(const Side& side,
-                   const CollisionData& colData,
-                   std::shared_ptr<CollidingObject> obj) :
-        CollisionHandling(CollisionHandling::Type::Penalty,
-                          side,
-                          colData),
-        m_obj(obj)
-    {}
+    PenaltyMeshToRigidCH(const Side& side, const CollisionData& colData, std::shared_ptr<CollidingObject> obj) :
+        CollisionHandling(CollisionHandling::Type::Penalty, side, colData), m_object(obj)
+    {
+        m_stiffness = 1000;
+        m_damping = 0.5;
+    }
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyRigidCH() = default;
+    ~PenaltyMeshToRigidCH() = default;
 
     ///
     /// \brief Compute forces based on collision data
@@ -58,10 +56,11 @@ public:
     void computeContactForces() override;
 
 private:
+    std::shared_ptr<CollidingObject> m_object; ///> The mesh object under collision
 
-    std::shared_ptr<CollidingObject> m_obj;
-
+    double m_stiffness; ///> Stiffness of contact
+    double m_damping; ///> Damping of the contact
 };
 }
 
-#endif // ifndef imstkPenaltyRigidCH_h
+#endif // ifndef imstkPenaltyMeshToRigidCH_h

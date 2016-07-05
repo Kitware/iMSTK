@@ -197,6 +197,14 @@ public:
     ///
     static void initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix);
 
+    ///
+    /// \brief Get the contact force vector
+    ///
+    Vectord& getContactForce()
+    {
+        return m_Fcontact;
+    }
+
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
@@ -214,8 +222,9 @@ protected:
 
     std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///> Nonlinear system resulting from TI and force model
 
-    Vectord m_Finternal;       ///> Vector of gravity forces
-    Vectord m_Feff;       ///> Vector of gravity forces
+    Vectord m_Finternal;    ///> Vector of gravity forces
+    Vectord m_Feff;         ///> Vector of effective forces
+    Vectord m_Fcontact;     ///> Vector of contact forces
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces
