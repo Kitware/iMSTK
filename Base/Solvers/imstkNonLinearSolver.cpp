@@ -164,7 +164,8 @@ NonLinearSolver::getArmijoMax() const
     return this->m_armijoMax;
 }
 
-void NonLinearSolver::setSystem(std::shared_ptr<NonLinearSystem> newSystem)
+void
+NonLinearSolver::setSystem(std::shared_ptr<NonLinearSystem> newSystem)
 {
     this->m_nonLinearSystem = newSystem;
 }

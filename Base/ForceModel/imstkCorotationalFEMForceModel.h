@@ -46,7 +46,7 @@ public:
     }
     CorotationalFEMForceModel() = delete;
 
-    virtual ~CorotationalFEMForceModel();
+    virtual ~CorotationalFEMForceModel(){};
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

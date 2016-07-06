@@ -52,30 +52,11 @@ public:
     /// \brief Destructor
     ///
     ~BackwardEuler() = default;
-
-    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV)
-    {
-        currentState->getQDot() = prevState->getQDot() + dV;
-        currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
-    }
-
-    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU)
-    {
-        currentState->getQ() = prevState->getQ() + dU;
-        currentState->getQDot() = (currentState->getQ() - prevState->getQ())/m_dT;
-    }
-
-    void updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v)
-    {
-        currentState->getQDot() = v;
-        currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
-    }
-
-    void updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u)
-    {
-        currentState->getQ() = u;
-        currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
-    }
+    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV);
+    
+    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU);
+    void updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v);
+    void updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u);
 protected:
 
     // Coefficients of the time integrator

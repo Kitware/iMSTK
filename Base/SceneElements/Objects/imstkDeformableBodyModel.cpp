@@ -97,7 +97,7 @@ DeformableBodyModel::initialize()
         return;
     }
 
-    m_vegaPhysicsMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry));
+    m_vegaPhysicsMesh = VegaMeshReader::readVegaMesh(m_forceModelConfiguration->getStringOptionsMap().at("asianDragon/asianDragon.veg"));// remove hard coded name after test
 
     initializeForceModel();
     initializeMassMatrix();

@@ -54,7 +54,7 @@ public:
     /// \brief Default constructor/destructor
     ///
     LinearSolver();
-    virtual ~LinearSolver() = default;
+    virtual ~LinearSolver(){};
 
     ///
     /// \brief Main solve routine

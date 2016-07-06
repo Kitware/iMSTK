@@ -101,4 +101,11 @@ VegaMeshReader::getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::Volumetric
     }
 }
 
+std::shared_ptr<vega::VolumetricMesh> VegaMeshReader::readVegaMesh(const std::string& filePath)
+{
+    auto fileName = const_cast<char*>(filePath.c_str());
+    std::shared_ptr<vega::VolumetricMesh> vegaMesh(vega::VolumetricMeshLoader::load(fileName));
+    return vegaMesh;
+}
+
 }

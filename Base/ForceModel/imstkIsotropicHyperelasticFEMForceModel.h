@@ -86,7 +86,7 @@ public:
 
     IsotropicHyperelasticFEForceModel() = delete;
 
-    virtual ~IsotropicHyperelasticFEForceModel();
+    virtual ~IsotropicHyperelasticFEForceModel(){};
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

@@ -40,7 +40,7 @@ public:
         m_massSpringSystem = massSpringSystem;
     }
     MassSpringForceModel() = delete;
-    virtual ~MassSpringForceModel();
+    virtual ~MassSpringForceModel(){};
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

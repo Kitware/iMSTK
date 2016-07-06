@@ -47,7 +47,7 @@ public:
         m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
 
-    virtual ~StVKForceModel();
+    virtual ~StVKForceModel(){};
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

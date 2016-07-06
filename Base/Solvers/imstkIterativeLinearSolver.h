@@ -36,7 +36,7 @@ public:
     /// \brief Default constructor/destructor
     ///
     IterativeLinearSolver();
-    virtual ~IterativeLinearSolver() = default;
+    virtual ~IterativeLinearSolver() {};
 
     ///
     /// \brief Do one iteration of the method.

@@ -113,17 +113,17 @@ class ForceModelConfig
 
     struct customOptionsNameList
     {
-        char femMethodName[256] = "femMethod";
-        char invertibleMaterialName[256] = "invertibleMaterial";
-        char fixedDOFFilenameName[256] = "fixedDOFFilename";
-        char dampingMassCoefficientName[256] = "dampingMassCoefficient";
-        char dampingLaplacianCoefficientName[256] = "dampingLaplacianCoefficient";
-        char dampingStiffnessCoefficientName[256] = "dampingStiffnessCoefficient";
-        char deformationComplianceName[256] = "deformationCompliance";
-        char compressionResistanceName[256] = "compressionResistance";
-        char inversionThresholdName[256] = "inversionThreshold";
-        char numberOfThreadsName[256] = "numberOfThreads";
-        char gravityName[256] = "gravity";
+        std::string femMethodName = "femMethod";
+        std::string invertibleMaterialName = "invertibleMaterial";
+        std::string fixedDOFFilenameName = "fixedDOFFilename";
+        std::string dampingMassCoefficientName = "dampingMassCoefficient";
+        std::string dampingLaplacianCoefficientName = "dampingLaplacianCoefficient";
+        std::string dampingStiffnessCoefficientName = "dampingStiffnessCoefficient";
+        std::string deformationComplianceName = "deformationCompliance";
+        std::string compressionResistanceName = "compressionResistance";
+        std::string inversionThresholdName = "inversionThreshold";
+        std::string numberOfThreadsName = "numberOfThreads";
+        std::string gravityName = "gravity";
     };
 public:
 

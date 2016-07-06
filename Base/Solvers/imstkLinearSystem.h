@@ -46,7 +46,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~LinearSystem() = default;
+    virtual ~LinearSystem(){};
 
     ///
     ///  \brief Returns a reference to local right hand side vector.

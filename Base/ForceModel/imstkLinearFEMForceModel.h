@@ -53,7 +53,7 @@ public:
         //delete(stVKStiffnessMatrix);
     };
 
-    virtual ~LinearFEMForceModel();
+    virtual ~LinearFEMForceModel(){};
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

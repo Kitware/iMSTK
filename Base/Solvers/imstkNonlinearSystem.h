@@ -43,7 +43,7 @@ public:
     ///
     NonLinearSystem(){};
     NonLinearSystem(VectorFunctionType& F, MatrixFunctionType& dF);
-    virtual ~NonLinearSystem() = default;
+    virtual ~NonLinearSystem(){};
 
 
     ///

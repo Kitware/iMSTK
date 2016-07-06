@@ -58,14 +58,19 @@ public:
     static std::shared_ptr<VolumetricMesh> getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
 
     ///
+    /// \brief Read and generate volumetric mesh given a external vega mesh file
+    ///
+    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType) { return getVolumeMeshFromVegaVolumeMesh(filePath, meshType); };
+
+    ///
     /// \brief Generate a vega volume mesh given volumetric mesh
     ///
     static std::shared_ptr<vega::VolumetricMesh> getVegaVolumeMeshFromVolumeMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
 
     ///
-    /// \brief Read and generate volumetric mesh given a external vega mesh file
+    /// \brief Read vega volume mesh from a file
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType) { return getVolumeMeshFromVegaVolumeMesh(filePath, meshType); };
+    static std::shared_ptr<vega::VolumetricMesh> readVegaMesh(const std::string& filePath);
 };
 
 } // imstk

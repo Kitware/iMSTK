@@ -42,7 +42,7 @@ public:
     /// \brief Constructors/Destructor
     ///
     ConjugateGradient() = default;
-    ~ConjugateGradient() = default;
+    ~ConjugateGradient() {};
 
     ///
     /// \brief Constructor

@@ -801,7 +801,7 @@ void testDeformableBody()
     auto scene = sdk->createNewScene("DeformableBodyTest");
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("dragon.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
 
     // c. Extract the surface mesh
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -829,7 +829,7 @@ void testDeformableBody()
     dynaModel->configure("dragon.config");
     dynaModel->setModelGeometry(volTetMesh);
     dynaModel->initialize();
-    auto timeIntegrator = std::make_shared<BackwardEuler>();// Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     // Scene Object

@@ -156,14 +156,14 @@ endif()
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Geometry)
 add_subdirectory(Base/Devices)
-add_subdirectory(Base/SceneElements)
-add_subdirectory(Base/Collision)
-add_subdirectory(Base/Scene)
 add_subdirectory(Base/Rendering)
-add_subdirectory(Base/SimulationManager)
 add_subdirectory(Base/Solvers)
 add_subdirectory(Base/TimeIntegrators)
 add_subdirectory(Base/ForceModel)
+add_subdirectory(Base/SceneElements)
+add_subdirectory(Base/Collision)
+add_subdirectory(Base/Scene)
+add_subdirectory(Base/SimulationManager)
 
 #--------------------------------------------------------------------------
 # Export Targets

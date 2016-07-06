@@ -44,17 +44,17 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     ForceModelConfig::customOptionsList optList;
     ForceModelConfig::customOptionsNameList optNameList;
 
-    vegaConfigFileOptions.addOptionOptional(optNameList.femMethodName, optList.femMethod, "StVK");
-    vegaConfigFileOptions.addOptionOptional(optNameList.invertibleMaterialName, optList.invertibleMaterial, "StVK");
-    vegaConfigFileOptions.addOptionOptional(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename, "");
-    vegaConfigFileOptions.addOptionOptional(optNameList.dampingMassCoefficientName, &optList.dampingMassCoefficient, optList.dampingMassCoefficient);
-    vegaConfigFileOptions.addOptionOptional(optNameList.dampingStiffnessCoefficientName, &optList.dampingStiffnessCoefficient, optList.dampingStiffnessCoefficient);
-    vegaConfigFileOptions.addOptionOptional(optNameList.dampingLaplacianCoefficientName, &optList.dampingLaplacianCoefficient, optList.dampingLaplacianCoefficient);
-    vegaConfigFileOptions.addOptionOptional(optNameList.deformationComplianceName, &optList.deformationCompliance, optList.deformationCompliance);
-    vegaConfigFileOptions.addOptionOptional(optNameList.gravityName, &optList.gravity, optList.gravity);
-    vegaConfigFileOptions.addOptionOptional(optNameList.compressionResistanceName, &optList.compressionResistance, optList.compressionResistance);
-    vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName, &optList.inversionThreshold, optList.inversionThreshold);
-    vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName, &optList.numberOfThreads, optList.numberOfThreads);
+    vegaConfigFileOptions.addOptionOptional(optNameList.femMethodName.c_str(), optList.femMethod, "StVK");
+    vegaConfigFileOptions.addOptionOptional(optNameList.invertibleMaterialName.c_str(), optList.invertibleMaterial, "StVK");
+    vegaConfigFileOptions.addOptionOptional(optNameList.fixedDOFFilenameName.c_str(), optList.fixedDOFFilename, "");
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingMassCoefficientName.c_str(), &optList.dampingMassCoefficient, optList.dampingMassCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingStiffnessCoefficientName.c_str(), &optList.dampingStiffnessCoefficient, optList.dampingStiffnessCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.dampingLaplacianCoefficientName.c_str(), &optList.dampingLaplacianCoefficient, optList.dampingLaplacianCoefficient);
+    vegaConfigFileOptions.addOptionOptional(optNameList.deformationComplianceName.c_str(), &optList.deformationCompliance, optList.deformationCompliance);
+    vegaConfigFileOptions.addOptionOptional(optNameList.gravityName.c_str(), &optList.gravity, optList.gravity);
+    vegaConfigFileOptions.addOptionOptional(optNameList.compressionResistanceName.c_str(), &optList.compressionResistance, optList.compressionResistance);
+    vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName.c_str(), &optList.inversionThreshold, optList.inversionThreshold);
+    vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName.c_str(), &optList.numberOfThreads, optList.numberOfThreads);
 
 
     // Parse the configuration file
