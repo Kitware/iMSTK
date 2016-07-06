@@ -35,7 +35,7 @@
 namespace imstk
 {
 
-class LinearFEMForceModel : virtual public InternalForceModel
+class LinearFEMForceModel : public InternalForceModel
 {
 public:
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81) : InternalForceModel()

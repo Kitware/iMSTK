@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    InternalForceModel();
+    InternalForceModel(){};
 
     ///
     /// \brief Destructor

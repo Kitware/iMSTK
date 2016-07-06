@@ -41,7 +41,24 @@ public:
     LinearSystem() = delete;
     LinearSystem(const LinearSystem&) = delete;
     LinearSystem& operator=(const LinearSystem&) = delete;
-    LinearSystem(const SystemMatrixType& matrix, const Vectord& b);
+    LinearSystem(const SystemMatrixType& matrix, const Vectord& b) : m_A(matrix), m_b(b)
+    {
+        /*if (m_A.size() == m_b.size())
+        {
+        m_A = &matrix;
+        m_b = &b;
+        }
+        else
+        {
+        LOG(ERROR) << "LinearSystem::LinearSystem: The size of the matrix and the r.h.s doesn't match.";
+        }*/
+
+        /*this->F = [this](const Vectord& x) -> Vectord&
+        {
+            this->m_f = this->m_A * x;
+            return this->m_f;
+        };*/
+    }
 
     ///
     /// \brief Destructor
@@ -51,27 +68,42 @@ public:
     ///
     ///  \brief Returns a reference to local right hand side vector.
     ///
-    const Vectord& getRHSVector() const;
+    const Vectord& getRHSVector() const
+    {
+        return m_b;
+    }
 
     ///
     /// \brief Set the system rhs corresponding to this system.
     ///
-    void setRHSVector(const Vectord& newRhs);
+    void setRHSVector(const Vectord& newRhs)
+    {
+        m_b = newRhs;
+    }
 
     ///
     /// \brief Returns reference to local matrix.
     ///
-    const SystemMatrixType& getMatrix() const;
+    const SystemMatrixType& getMatrix() const
+    {
+        return m_A;
+    }
 
     ///
     /// \brief Set the system matrix corresponding to this ODE system.
     ///
-    void setMatrix(const SparseMatrixd& newMatrix);
+    void setMatrix(const SparseMatrixd& newMatrix)
+    {
+        m_A = newMatrix;
+    }
 
     ///
     /// \brief Compute the residual as \f$\left \| b-Ax \right \|_2\f$.
     ///
-    Vectord& computeResidual(const Vectord& x, Vectord& r) const;
+    void computeResidual(const Vectord& x, Vectord& r) const
+    {
+        r = m_b - m_A * x;
+    }
 
     ///
     /// \brief Returns template expression for the lower triangular part of A.

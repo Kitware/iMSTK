@@ -35,7 +35,7 @@
 namespace imstk
 {
 
-class StVKForceModel : virtual public InternalForceModel
+class StVKForceModel : public InternalForceModel
 {
 public:
     StVKForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = 10.0) : InternalForceModel()

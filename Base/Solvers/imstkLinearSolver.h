@@ -26,7 +26,8 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \brief Base class for linear solvers
@@ -53,7 +54,7 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver();
+    LinearSolver() : m_linearSystem(nullptr){};
     virtual ~LinearSolver(){};
 
     ///
@@ -64,18 +65,32 @@ public:
     ///
     /// \brief Set/get the system. Replaces/Returns the stored linear system of equations.
     ///
-    virtual void setSystem(std::shared_ptr<LinearSystemType> newSystem);
-    std::shared_ptr<LinearSystemType> getSystem() const;
+    virtual void setSystem(std::shared_ptr<LinearSystemType> newSystem)
+    {
+        m_linearSystem.reset();
+        m_linearSystem = newSystem;
+    }
+
+    std::shared_ptr<LinearSystemType> getSystem() const
+    {
+        return m_linearSystem;
+    }
 
     ///
     /// \brief Set solver tolerance
     ///
-    void setTolerance(const double tolerance);
+    void setTolerance(const double tolerance)
+    {
+        m_tolerance = tolerance;
+    }
 
     ///
     /// \brief Get solver tolerance
     ///
-    double getTolerance() const;
+    double getTolerance() const
+    {
+        return m_tolerance;
+    }
 
     ///
     /// \brief Print solver information.

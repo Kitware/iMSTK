@@ -26,61 +26,25 @@
 namespace imstk
 {
 
-template<typename SystemMatrixType>
-LinearSystem<SystemMatrixType>::LinearSystem(const SystemMatrixType &matrix, const Vectord &b)
-{
-    if (m_A.size() == m_b.size())
-    {
-        m_A = &matrix;
-        m_b = &b;
-    }
-    else
-    {
-        LOG(ERROR) << "LinearSystem::LinearSystem: The size of the matrix and the r.h.s doesn't match.";
-    }
-
-    this->F = [this](const Vectord& x) -> Vectord&
-    {
-        this->m_f = this->m_A * x;
-        return this->m_f;
-    };
-}
-
-template<typename SystemMatrixType>
-const Vectord&
-LinearSystem<SystemMatrixType>::getRHSVector() const
-{
-    return m_b;
-}
-
-template<typename SystemMatrixType>
-void
-LinearSystem<SystemMatrixType>::setRHSVector(const Vectord& newRhs)
-{
-    m_b = newRhs;
-}
-
-template<typename SystemMatrixType>
-const SystemMatrixType&
-LinearSystem<SystemMatrixType>::getMatrix() const
-{
-    return m_A;
-}
-
-template<typename SystemMatrixType>
-void
-LinearSystem<SystemMatrixType>::setMatrix(const SparseMatrixd &newMatrix)
-{
-    m_A = newMatrix;
-}
-
-template<typename SystemMatrixType>
-Vectord&
-LinearSystem<SystemMatrixType>::computeResidual(const Vectord &x, Vectord &r) const
-{
-    r = m_b - F(x);
-    return r;
-}
+//template<typename SystemMatrixType>
+//LinearSystem<SystemMatrixType>::LinearSystem(const SystemMatrixType &matrix, const Vectord &b)
+//{
+//    if (m_A.size() == m_b.size())
+//    {
+//        m_A = &matrix;
+//        m_b = &b;
+//    }
+//    else
+//    {
+//        LOG(ERROR) << "LinearSystem::LinearSystem: The size of the matrix and the r.h.s doesn't match.";
+//    }
+//
+//    this->F = [this](const Vectord& x) -> Vectord&
+//    {
+//        this->m_f = this->m_A * x;
+//        return this->m_f;
+//    };
+//}
 
 template<typename SystemMatrixType>
 Eigen::SparseTriangularView < SystemMatrixType, Eigen::Lower >

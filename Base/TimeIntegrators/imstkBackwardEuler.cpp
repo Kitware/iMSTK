@@ -23,28 +23,41 @@
 
 namespace imstk
 {
-    void BackwardEuler::updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV)
-    {
-        currentState->getQDot() = prevState->getQDot() + dV;
-        currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
-    }
 
-    void BackwardEuler::updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU)
-    {
-        currentState->getQ() = prevState->getQ() + dU;
-        currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
-    }
+void
+BackwardEuler::updateStateGivenDv(std::shared_ptr<ProblemState> prevState,
+                                  std::shared_ptr<ProblemState> currentState,
+                                  Vectord& dV)
+{
+    currentState->getQDot() = prevState->getQDot() + dV;
+    currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
+}
 
-    void BackwardEuler::updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v)
-    {
-        currentState->getQDot() = v;
-        currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
-    }
+void
+BackwardEuler::updateStateGivenDu(std::shared_ptr<ProblemState> prevState,
+                                  std::shared_ptr<ProblemState> currentState,
+                                  Vectord& dU)
+{
+    currentState->getQ() = prevState->getQ() + dU;
+    currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
+}
 
-    void BackwardEuler::updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u)
-    {
-        currentState->getQ() = u;
-        currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
-    }
+void
+BackwardEuler::updateStateGivenV(std::shared_ptr<ProblemState> prevState,
+                                 std::shared_ptr<ProblemState> currentState,
+                                 Vectord& v)
+{
+    currentState->getQDot() = v;
+    currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot();
+}
+
+void
+BackwardEuler::updateStateGivenU(std::shared_ptr<ProblemState> prevState,
+                                 std::shared_ptr<ProblemState> currentState,
+                                 Vectord& u)
+{
+    currentState->getQ() = u;
+    currentState->getQDot() = (currentState->getQ() - prevState->getQ()) / m_dT;
+}
 
 } // imstk

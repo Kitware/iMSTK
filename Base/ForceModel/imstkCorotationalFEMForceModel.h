@@ -34,7 +34,7 @@
 namespace imstk
 {
 
-class CorotationalFEMForceModel : virtual public InternalForceModel
+class CorotationalFEMForceModel : public InternalForceModel
 {
 public:
     CorotationalFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, int warp = 1) : InternalForceModel()

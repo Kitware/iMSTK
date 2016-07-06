@@ -32,7 +32,7 @@
 namespace imstk
 {
 
-class MassSpringForceModel : virtual public InternalForceModel
+class MassSpringForceModel : public InternalForceModel
 {
 public:
     MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem) : InternalForceModel()

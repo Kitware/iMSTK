@@ -22,39 +22,25 @@
 namespace imstk
 {
 
-template<typename SystemMatrixType>
-LinearSolver<SystemMatrixType>::LinearSolver() : m_linearSystem(nullptr)
-{
+//template<typename SystemMatrixType>
+//LinearSolver<SystemMatrixType>::LinearSolver() : m_linearSystem(nullptr)
+//{
+//
+//}
 
-}
-
-template<typename SystemMatrixType>
-void
-LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
-{
-    m_linearSystem.reset();
-    m_linearSystem = newSystem;
-}
-
-template<typename SystemMatrixType>
-std::shared_ptr<LinearSystem<SystemMatrixType>>
-LinearSolver<SystemMatrixType>::getSystem() const
-{
-    return m_linearSystem;
-}
-
-template<typename SystemMatrixType>
-void
-LinearSolver<SystemMatrixType>::setTolerance(const double tolerance)
-{
-    m_tolerance = tolerance;
-}
-
-template<typename SystemMatrixType>
-double
-LinearSolver<SystemMatrixType>::getTolerance() const
-{
-    return m_tolerance;
-}
+//template<typename SystemMatrixType>
+//void
+//LinearSolver<SystemMatrixType>::setSystem(std::shared_ptr<LinearSystem<SystemMatrixType>> newSystem)
+//{
+//    m_linearSystem.reset();
+//    m_linearSystem = newSystem;
+//}
+//
+//template<typename SystemMatrixType>
+//std::shared_ptr<LinearSystem<SystemMatrixType>>
+//LinearSolver<SystemMatrixType>::getSystem() const
+//{
+//    return m_linearSystem;
+//}
 
 } //imstk

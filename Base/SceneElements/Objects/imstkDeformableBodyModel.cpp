@@ -101,7 +101,7 @@ DeformableBodyModel::initialize()
 
     initializeForceModel();
     initializeMassMatrix();
-    initializeDampingMatrix();
+    //initializeDampingMatrix();
     initializeTangentStiffness();
     loadInitialStates();
     loadBoundaryConditions();
@@ -221,7 +221,7 @@ DeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 }
 
 void
-DeformableBodyModel::initializeDampingMatrix()
+DeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
 {
     auto dampingLaplacianCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
     auto dampingMassCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
@@ -240,7 +240,7 @@ DeformableBodyModel::initializeDampingMatrix()
     }
 
     auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
-    std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
+    //std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
     auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(vegaMesh.get()));
 

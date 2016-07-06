@@ -52,11 +52,34 @@ public:
     /// \brief Destructor
     ///
     ~BackwardEuler() = default;
-    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV);
-    
-    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU);
-    void updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v);
-    void updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u);
+
+    ///
+    /// \brief Update state given change in velocity
+    ///
+    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState,
+                            std::shared_ptr<ProblemState> currentState,
+                            Vectord& dV);
+
+    ///
+    /// \brief Update state given change in displacement
+    ///
+    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState,
+                            std::shared_ptr<ProblemState> currentState,
+                            Vectord& dU);
+
+    ///
+    /// \brief Update state given updated velocity
+    ///
+    void updateStateGivenV(std::shared_ptr<ProblemState> prevState,
+                           std::shared_ptr<ProblemState> currentState,
+                           Vectord& v);
+
+    ///
+    /// \brief Update state given updated displacement
+    ///
+    void updateStateGivenU(std::shared_ptr<ProblemState> prevState,
+                           std::shared_ptr<ProblemState> currentState,
+                           Vectord& u);
 protected:
 
     // Coefficients of the time integrator
