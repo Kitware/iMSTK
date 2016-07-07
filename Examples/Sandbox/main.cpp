@@ -369,15 +369,15 @@ void testReadMesh()
     auto scene = sdk->createNewScene("SceneTestMesh");
 
     // Read surface mesh
-    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
+    /*auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
     auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
     auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
-    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");
+    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");*/
 
     // Read volumetricMesh
-    auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
-    auto vegaMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.veg");
+    //auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
+    auto vegaMesh = imstk::MeshReader::read("asianDragon.veg");
 
     // Extract surface mesh
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
@@ -801,7 +801,7 @@ void testDeformableBody()
     auto scene = sdk->createNewScene("DeformableBodyTest");
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
 
     // c. Extract the surface mesh
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -826,9 +826,8 @@ void testDeformableBody()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<DeformableBodyModel>(DynamicalModel::Type::elastoDynamics);
-    dynaModel->configure("dragon.config");
-    dynaModel->setModelGeometry(volTetMesh);
-    dynaModel->initialize();
+    dynaModel->configure("asianDragon.config");
+    dynaModel->initialize(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
@@ -856,17 +855,17 @@ void testDeformableBody()
 
 
     // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem>();
-    nlSystem->setFunction(dynaModel->getFunction());
-    nlSystem->setJacobian(dynaModel->getFunctionGradient());
+    //auto nlSystem = std::make_shared<NonLinearSystem>();
+    //nlSystem->setFunction(dynaModel->getFunction());
+    //nlSystem->setJacobian(dynaModel->getFunctionGradient());
 
-    // create a linear solver
-    auto cgLinSolver = std::make_shared<ConjugateGradient>();
+    //// create a linear solver
+    //auto cgLinSolver = std::make_shared<ConjugateGradient>();
 
-    // create a non-linear solver
-    auto nlSolver = std::make_shared<NewtonMethod>();
-    nlSolver->setLinearSolver(cgLinSolver);
-    nlSolver->setSystem(nlSystem);
+    //// create a non-linear solver
+    //auto nlSolver = std::make_shared<NewtonMethod>();
+    //nlSolver->setLinearSolver(cgLinSolver);
+    //nlSolver->setSystem(nlSystem);
 
     // Run the simulation
     sdk->setCurrentScene("DeformableBodyTest");

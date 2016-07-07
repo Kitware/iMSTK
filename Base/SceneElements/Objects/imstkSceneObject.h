@@ -28,7 +28,8 @@
 #include <memory>
 #include <string>
 
-namespace imstk {
+namespace imstk
+{
 
 //class Geometry;
 //class GeometryMap;

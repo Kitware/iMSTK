@@ -88,8 +88,10 @@ DeformableBodyModel::configure(const std::string& configFileName)
 }
 
 void
-DeformableBodyModel::initialize()
+DeformableBodyModel::initialize(std::shared_ptr<Geometry> geometry)
 {
+    setModelGeometry(geometry);
+
     // prerequisite of for successfully initializing
     if (!m_forceModelGeometry || !m_forceModelConfiguration)
     {
@@ -97,7 +99,7 @@ DeformableBodyModel::initialize()
         return;
     }
 
-    m_vegaPhysicsMesh = VegaMeshReader::readVegaMesh(m_forceModelConfiguration->getStringOptionsMap().at("asianDragon/asianDragon.veg"));// remove hard coded name after test
+    m_vegaPhysicsMesh = VegaMeshReader::readVegaMesh("asianDragon/asianDragon.veg");// remove hard coded name after test
 
     initializeForceModel();
     initializeMassMatrix();
@@ -116,10 +118,10 @@ DeformableBodyModel::initialize()
 void
 DeformableBodyModel::loadInitialStates()
 {
-    // Initialize the states
-    m_initialState->initialize(m_numDOF);
-    m_previousState->initialize(m_numDOF);
-    m_currentState->initialize(m_numDOF);
+    // For now the initial states are set to zero
+    m_initialState = std::make_shared<kinematicState>(m_numDOF);
+    m_initialState = std::make_shared<kinematicState>(m_numDOF);
+    m_initialState = std::make_shared<kinematicState>(m_numDOF);
 }
 
 void
@@ -161,6 +163,8 @@ DeformableBodyModel::initializeForceModel()
 {
     const float g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
     const bool isGravityPresent = (g > 0) ? true : false;
+
+    m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
 
     switch (m_forceModelConfiguration->getForceModelType())
     {

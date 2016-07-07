@@ -33,7 +33,9 @@ class GeometryMap;
 class VirtualCouplingObject : public CollidingObject, public TrackingController
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     VirtualCouplingObject(std::string name,
                           std::shared_ptr<DeviceClient> deviceClient = nullptr,
                           double scaling = 1.0) :
@@ -43,10 +45,13 @@ public:
         m_type = Type::VirtualCoupling;
     }
 
+    ///
+    /// \brief Destructor
+    ///
     ~VirtualCouplingObject() = default;
 
     ///
-    /// \brief Initialise offset based on object geometry
+    /// \brief Initialize offset based on object geometry
     ///
     void initOffsets();
 

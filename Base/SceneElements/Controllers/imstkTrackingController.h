@@ -27,7 +27,8 @@
 
 #include <memory>
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class TrackingController
@@ -103,6 +104,7 @@ protected:
     Quatd m_rotationOffset = Quatd::Identity();   //!< Rotation concatenated to the device rotation
     unsigned char m_invertFlags = 0x00;           //!< Invert flags to be masked with TrackingController::InvertFlag
 };
+
 }
 
 #endif // ifndef imstkTrackingController_h

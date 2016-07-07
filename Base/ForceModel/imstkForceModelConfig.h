@@ -138,7 +138,7 @@ public:
     ~ForceModelConfig(){};
 
     ///
-    /// \brief Parse the deformable objeyc config file
+    /// \brief Parse the deformable object config file
     ///
     bool parseConfig(const std::string &configFileName);
 
@@ -175,6 +175,11 @@ public:
     /// \brief Get the type of the hyperelastic model
     ///
     HyperElasticMaterialType getHyperelasticMaterialType();
+
+    ///
+    /// \brief Print the parsed options
+    ///
+    void print();
 
 protected:
     std::string m_vegaConfigFileName;                      ///> Store configuration file.

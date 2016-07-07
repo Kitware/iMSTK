@@ -41,19 +41,27 @@ public:
     ///
     /// \brief Constructor
     ///
-    ProblemState() = default;
-    ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
+    ProblemState(){};
+    ProblemState(const size_t size){ initialize(size); };
+    //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
     ~ProblemState(){}
 
+    ///
+    /// \brief Initialize the problem state
+    ///
     void initialize(const size_t numDof)
     {
         m_q.resize(numDof);
         m_qDot.resize(numDof);
         m_qDotDot.resize(numDof);
+
+        m_q.setZero();
+        m_qDot.setZero();
+        m_qDotDot.setZero();
     };
 
     ///
@@ -66,6 +74,9 @@ public:
         m_qDotDot = a;
     }
 
+    ///
+    /// \brief Set the state to a given one
+    ///
     void setState(std::shared_ptr<ProblemState> rhs)
     {
         m_q = rhs->getQ();

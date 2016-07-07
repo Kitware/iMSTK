@@ -28,7 +28,7 @@ ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSu
 {
     if (configFileName.empty())
     {
-        LOG(INFO) << "WARNING: Empty configuration filename." << std::endl;
+        LOG(INFO) << "WARNING: Empty configuration filename.";
         return;
     }
     else
@@ -56,19 +56,19 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     vegaConfigFileOptions.addOptionOptional(optNameList.inversionThresholdName.c_str(), &optList.inversionThreshold, optList.inversionThreshold);
     vegaConfigFileOptions.addOptionOptional(optNameList.numberOfThreadsName.c_str(), &optList.numberOfThreads, optList.numberOfThreads);
 
-
     // Parse the configuration file
     if (vegaConfigFileOptions.parseOptions(configFileName.data()) != 0)
+    {
+        LOG(WARNING) << "ForceModelConfig::parseConfig - Unable to load the configuration file";
+        return false;
+    }
+    else
     {
         this->m_vegaConfigFileName = configFileName;
         m_loadSuccessful = true;
 
         // Print option variables
         vegaConfigFileOptions.printOptions();
-    }
-    else
-    {
-        return false;
     }
 
     // Store parsed string values
@@ -107,7 +107,7 @@ ForceModelConfig::getForceModelType()
     {
         return ForceModelType::Linear;
     }
-    else if (this->m_stringsOptionMap["femMethod"] == "Invertible")
+    else if (this->m_stringsOptionMap["femMethod"] == "InvertibleFEM")
     {
         return ForceModelType::Invertible;
     }
@@ -138,6 +138,16 @@ ForceModelConfig::getHyperelasticMaterialType()
     {
         LOG(INFO) << "Force model type not assigned";
         return HyperElasticMaterialType::none;
+    }
+}
+
+void
+ForceModelConfig::print()
+{
+    LOG(INFO) << "Floating point type options:\n";
+    for (auto const &fo : m_floatsOptionMap)
+    {
+        LOG(INFO) << fo.first << ": " << fo.second;
     }
 }
 

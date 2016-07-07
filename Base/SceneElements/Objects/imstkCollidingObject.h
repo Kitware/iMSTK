@@ -34,17 +34,28 @@ class GeometryMap;
 class CollidingObject : public SceneObject
 {
 public:
-
+    ///
+    /// \brief
+    ///
     CollidingObject(std::string name) : SceneObject(name)
     {
         m_type = SceneObject::Type::Static;
     }
 
+    ///
+    /// \brief
+    ///
     ~CollidingObject() = default;
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Geometry> getCollidingGeometry() const;
     void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
     void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
 

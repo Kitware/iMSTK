@@ -95,6 +95,7 @@ protected:
     std::string m_name;
 
 };
+
 }
 
 #endif // ifndef imstkLight_h

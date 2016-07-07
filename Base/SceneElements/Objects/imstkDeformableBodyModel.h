@@ -105,7 +105,7 @@ public:
     ///
     /// \brief Initialize the deformable body model
     ///
-    void initialize();
+    void initialize(std::shared_ptr<Geometry> geometry);
 
     ///
     /// \brief Load the initial conditions of the deformable object
@@ -145,14 +145,13 @@ public:
     ///
     /// \brief Compute the RHS of the resulting linear system
     ///
-    void computeImplicitSystemRHS(const kinematicState& prevState,
-                                  kinematicState& newState);
+    void computeImplicitSystemRHS(const kinematicState& prevState, kinematicState& newState);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
     ///
-    void computeImplicitSystemLHS(const kinematicState& prevState,
-                                  kinematicState& newState);
+    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState);
+
     ///
     /// \brief Initialize explicit external forces
     ///
