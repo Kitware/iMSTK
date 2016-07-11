@@ -36,11 +36,26 @@ namespace imstk {
 class DynamicalModel
 {
 public:
+    ///
+    /// \brief Type of the time dependent mathematical model
+    ///
     enum class Type
     {
         elastoDynamics,
         NavierStokes,
         HeatEquation,
+        none
+    };
+
+    ///
+    /// \brief Type of the update of the state of the body
+    ///
+    enum class stateUpdateType
+    {
+        displacement,
+        velocity,
+        deltaDisplacement,
+        deltaVelocity,
         none
     };
 
@@ -93,7 +108,7 @@ public:
     ///
     /// \brief Returns the number of degrees of freedom
     ///
-    std::size_t getNumDegreeOfFreedom()
+    std::size_t getNumDegreeOfFreedom() const
     {
         return m_numDOF;
     }
@@ -101,7 +116,7 @@ public:
     ///
     /// \brief Update states
     ///
-    virtual void updateBodyStates(const Vectord& q) = 0;
+    virtual void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) = 0;
 
     ///
     /// \brief Get the type of the object
@@ -110,6 +125,8 @@ public:
     {
         return m_type;
     }
+
+    virtual void updatePhysicsGeometry() = 0;
 
 protected:
 

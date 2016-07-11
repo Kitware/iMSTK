@@ -25,7 +25,9 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
+
 bool
 Scene::isObjectRegistered(std::string sceneObjectName) const
 {
@@ -165,9 +167,22 @@ Scene::getCamera() const
 {
     return m_camera;
 }
+
 std::shared_ptr<CollisionGraph>
 Scene::getCollisionGraph() const
 {
     return m_collisionGraph;
 }
+
+const std::vector<std::shared_ptr<imstk::NonLinearSolver>>
+Scene::getNonlinearSolvers()
+{
+    return m_nonLinearSolvers;
+}
+
+void Scene::addNonlinearSolver(std::shared_ptr<NonLinearSolver> solver)
+{
+    m_nonLinearSolvers.push_back(solver);
+}
+
 }

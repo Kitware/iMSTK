@@ -834,7 +834,7 @@ void testDeformableBody()
     // Scene Object
     auto deformableObj = std::make_shared<DeformableObject>("Dragon");
     deformableObj->setVisualGeometry(surfMesh);
-    deformableObj->setCollidingGeometry(surfMesh);
+    //deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
@@ -855,17 +855,17 @@ void testDeformableBody()
 
 
     // create a nonlinear system
-    //auto nlSystem = std::make_shared<NonLinearSystem>();
-    //nlSystem->setFunction(dynaModel->getFunction());
-    //nlSystem->setJacobian(dynaModel->getFunctionGradient());
+    auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
 
-    //// create a linear solver
-    //auto cgLinSolver = std::make_shared<ConjugateGradient>();
+    // create a linear solver
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();
 
-    //// create a non-linear solver
-    //auto nlSolver = std::make_shared<NewtonMethod>();
-    //nlSolver->setLinearSolver(cgLinSolver);
-    //nlSolver->setSystem(nlSystem);
+    // create a non-linear solver and add to the scene
+    auto nlSolver = std::make_shared<NewtonMethod>();
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
+    scene->addNonlinearSolver(nlSolver);
 
     // Run the simulation
     sdk->setCurrentScene("DeformableBodyTest");

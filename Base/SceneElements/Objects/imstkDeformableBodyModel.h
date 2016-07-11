@@ -168,12 +168,12 @@ public:
     ///
     /// \brief Updates the Physics geometry
     ///
-    void updatePhysicsGeometry(const kinematicState& state);
+    void updatePhysicsGeometry() override;
 
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& delataV);
+    void updateBodyStates(const Vectord& delataV, const stateUpdateType updateType = stateUpdateType::displacement);
 
     ///
     /// \brief Returns the "function" that evaluates the nonlinear function given

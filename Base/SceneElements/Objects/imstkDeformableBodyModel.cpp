@@ -31,7 +31,10 @@
 namespace imstk
 {
 
-DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false){}
+DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false)
+{
+
+}
 
 void
 DeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
@@ -122,8 +125,8 @@ DeformableBodyModel::loadInitialStates()
 {
     // For now the initial states are set to zero
     m_initialState = std::make_shared<kinematicState>(m_numDOF);
-    m_initialState = std::make_shared<kinematicState>(m_numDOF);
-    m_initialState = std::make_shared<kinematicState>(m_numDOF);
+    m_previousState = std::make_shared<kinematicState>(m_numDOF);
+    m_currentState = std::make_shared<kinematicState>(m_numDOF);
 }
 
 void
@@ -428,21 +431,40 @@ DeformableBodyModel::updateMassMatrix()
 }
 
 void
-DeformableBodyModel::updatePhysicsGeometry(const kinematicState& state)
+DeformableBodyModel::updatePhysicsGeometry()
 {
     auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
-    volMesh->setVerticesDisplacements(m_currentState->getQ());
+    auto u = m_currentState->getQ();
+    u.setConstant(100.0);//?
+    volMesh->setVerticesDisplacements(u);
 }
 
 void
-DeformableBodyModel::updateBodyStates(const Vectord& delataV)
+DeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
 {
     auto uPrev = m_previousState->getQ();
     auto u = m_currentState->getQ();
     auto v = m_currentState->getQDot();
 
-    v += delataV;
-    u = uPrev + m_timeIntegrator->getTimestepSize()*v;
+    switch(updateType)
+    {
+    case stateUpdateType::deltaVelocity:
+        v += solution;
+        u = uPrev + m_timeIntegrator->getTimestepSize()*v;
+
+        u.setConstant(1);
+
+        break;
+
+    case stateUpdateType::velocity:
+        v = solution;
+        u = uPrev + m_timeIntegrator->getTimestepSize()*v;
+
+        break;
+
+    default:
+        LOG(WARNING) << "DeformableBodyModel::updateBodyStates: Unknown state update type";
+    }
 }
 
 NonLinearSystem::VectorFunctionType
@@ -450,10 +472,11 @@ DeformableBodyModel::getFunction()
 {
     //const Vectord& q
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord&) -> const Vectord&
+    return [&, this](const Vectord& q) -> const Vectord&
     {
+        updateBodyStates(q, stateUpdateType::deltaVelocity);
         computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get());
-        return this->m_Feff;
+        return m_Feff;
     };
 }
 
@@ -462,7 +485,7 @@ DeformableBodyModel::getFunctionGradient()
 {
     //const Vectord& q
     // Gradient of the nonlinear objective function given the current state
-    return [&, this](const Vectord&) -> const SparseMatrixd&
+    return [&, this](const Vectord& q) -> const SparseMatrixd&
     {
         computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get());
         return m_Keff;
@@ -488,6 +511,12 @@ DeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatri
     eigenMatrix.resize(vegaMatrix.GetNumRows(), vegaMatrix.GetNumColumns());
     eigenMatrix.setFromTriplets(std::begin(triplets), std::end(triplets));
     eigenMatrix.makeCompressed();
+}
+
+Vectord&
+DeformableBodyModel::getContactForce()
+{
+    return m_Fcontact;
 }
 
 }

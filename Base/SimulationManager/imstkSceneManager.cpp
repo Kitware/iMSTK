@@ -23,6 +23,7 @@
 
 #include "imstkCameraController.h"
 #include "imstkVirtualCouplingObject.h"
+#include "imstkDynamicObject.h"
 
 #include "g3log/g3log.hpp"
 
@@ -63,6 +64,25 @@ SceneManager::runModule()
         intPair->computeContactForces();
     }
 
+    // Update collision handlers
+
+    // Update the nonlinear solvers
+    for (auto nlSolvers : m_scene->getNonlinearSolvers())
+    {
+        //nlSolvers->solveSimple();
+    }
+
+    // Apply the geometry maps
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
+        {
+            dynaObj->getDynamicalModel()->updatePhysicsGeometry();
+            //dynaObj->getPhysicsToCollidingMap()->apply();
+            dynaObj->getPhysicsToVisualMap()->apply();
+        }
+    }
+
     // Update virtualCoupling objects based on devices
     for (auto obj : m_scene->getSceneObjects())
     {
@@ -89,4 +109,5 @@ SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)
 {
     m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
+
 }
