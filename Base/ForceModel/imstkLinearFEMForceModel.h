@@ -26,6 +26,7 @@
 
 #include "g3log/g3log.hpp"
 
+//imstk
 #include "imstkInternalForceModel.h"
 
 //vega
@@ -38,7 +39,9 @@ namespace imstk
 class LinearFEMForceModel : public InternalForceModel
 {
 public:
-    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh, bool withGravity = true, double gravity = -9.81) : InternalForceModel()
+    LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
+        const bool withGravity = true,
+        const double gravity = -9.81) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
@@ -53,7 +56,7 @@ public:
         //delete(stVKStiffnessMatrix);
     };
 
-    virtual ~LinearFEMForceModel(){};
+    virtual ~LinearFEMForceModel() = default;
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

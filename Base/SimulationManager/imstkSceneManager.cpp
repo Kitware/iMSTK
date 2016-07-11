@@ -69,7 +69,7 @@ SceneManager::runModule()
     // Update the nonlinear solvers
     for (auto nlSolvers : m_scene->getNonlinearSolvers())
     {
-        //nlSolvers->solveSimple();
+        nlSolvers->solveSimple();
     }
 
     // Apply the geometry maps

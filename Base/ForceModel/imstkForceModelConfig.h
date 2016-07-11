@@ -135,7 +135,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~ForceModelConfig(){};
+    ~ForceModelConfig() = default;
 
     ///
     /// \brief Parse the deformable object config file

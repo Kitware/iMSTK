@@ -32,33 +32,39 @@
 namespace imstk
 {
 
+///
+/// \class MassSpringForceModel
+///
+/// \brief Mathematical model for the MassSpring
+///
 class MassSpringForceModel : public InternalForceModel
 {
 public:
-    MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem) : InternalForceModel()
-    {
-        m_massSpringSystem = massSpringSystem;
-    }
+    ///
+    /// \brief
+    ///
+    MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem);
     MassSpringForceModel() = delete;
-    virtual ~MassSpringForceModel(){};
 
-    void getInternalForce(const Vectord& u, Vectord& internalForce)
-    {
-        double *data = const_cast<double*>(u.data());
-        m_massSpringSystem->ComputeForce(data, internalForce.data());
-    }
+    ///
+    /// \brief
+    ///
+    virtual ~MassSpringForceModel() = default;
 
-    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
-    {
-        m_massSpringSystem->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
-    }
+    ///
+    /// \brief
+    ///
+    void getInternalForce(const Vectord& u, Vectord& internalForce);
 
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
-    {
-        double *data = const_cast<double*>(u.data());
-        m_massSpringSystem->ComputeStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
-        InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
-    }
+    ///
+    /// \brief
+    ///
+    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix);
+
+    ///
+    /// \brief
+    ///
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix);
 
 protected:
     std::shared_ptr<vega::MassSpringSystem> m_massSpringSystem;// Need to be initialized

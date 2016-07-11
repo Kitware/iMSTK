@@ -24,6 +24,7 @@
 
 #include <g3log/g3log.hpp>
 
+//imstk
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
 
@@ -35,20 +36,21 @@
 
 namespace imstk
 {
+
 class IsotropicHyperelasticFEForceModel : public InternalForceModel
 {
 
 public:
-    IsotropicHyperelasticFEForceModel(HyperElasticMaterialType materialType,
+    IsotropicHyperelasticFEForceModel(const HyperElasticMaterialType materialType,
         std::shared_ptr<vega::VolumetricMesh> mesh,
-        double inversionThreshold,
-        bool withGravity = true,
-        double gravity = 10.0) : InternalForceModel()
+        const double inversionThreshold,
+        const bool withGravity = true,
+        const double gravity = 10.0) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
-        int enableCompressionResistance = 1;
-        double compressionResistance = 500;
+        const int enableCompressionResistance = 1;
+        const double compressionResistance = 500;
         switch (materialType)
         {
             case HyperElasticMaterialType::StVK:
@@ -86,7 +88,7 @@ public:
 
     IsotropicHyperelasticFEForceModel() = delete;
 
-    virtual ~IsotropicHyperelasticFEForceModel(){};
+    virtual ~IsotropicHyperelasticFEForceModel() = default;
 
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {

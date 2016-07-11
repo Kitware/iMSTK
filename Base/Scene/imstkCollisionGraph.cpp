@@ -23,7 +23,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 std::shared_ptr<InteractionPair>
 CollisionGraph::addInteractionPair(CollidingObjectPtr A,
@@ -136,4 +137,5 @@ CollisionGraph::getInteractionPairMap() const
 {
     return m_interactionPairMap;
 }
+
 }

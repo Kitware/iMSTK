@@ -97,13 +97,13 @@ NewtonMethod::solveSimple()
 
     // Compute norms, set tolerances and other temporaries
     //double fnorm = this->m_nonLinearSystem->evaluateF(x).norm();
-    double stopTolerance = 1.0e-6;
+    const double stopTolerance = 1.0e-6;
 
     this->linearSolver->setTolerance(stopTolerance);
 
     //Vectord dx = x;
 
-    for (size_t i = 0; i < this->maxIterations; ++i)
+    for (size_t i = 0; i < 5; ++i) //this->maxIterations
     {
         /*if (fnorm < stopTolerance)
         {

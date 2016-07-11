@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~InternalForceModel(){};
+    virtual ~InternalForceModel() = default;
 
     ///
     /// \brief Get the internal force given the present state

@@ -197,6 +197,9 @@ public:
     ///
     Vectord& getContactForce();
 
+    ///
+    /// \brief
+    ///
     Vectord& getUnknownVec()
     {
         return m_qSol;

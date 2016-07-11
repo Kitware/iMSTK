@@ -435,7 +435,7 @@ DeformableBodyModel::updatePhysicsGeometry()
 {
     auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
     auto u = m_currentState->getQ();
-    u.setConstant(1.0);//?
+    //u.setConstant(1.0);//?
     volMesh->setVerticesDisplacements(u);
 }
 
