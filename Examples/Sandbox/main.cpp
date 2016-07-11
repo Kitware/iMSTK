@@ -799,6 +799,7 @@ void testDeformableBody()
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DeformableBodyTest");
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
     auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
@@ -842,7 +843,8 @@ void testDeformableBody()
 
     // f. Scene object 2: Plane
     auto planeGeom = std::make_shared<Plane>();
-    planeGeom->scale(10);
+    planeGeom->scale(40);
+    planeGeom->translate(0, -6, 0);
     auto planeObj = std::make_shared<CollidingObject>("Plane");
     planeObj->setVisualGeometry(planeGeom);
     planeObj->setCollidingGeometry(planeGeom);

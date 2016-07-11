@@ -31,7 +31,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
     // Object actors
