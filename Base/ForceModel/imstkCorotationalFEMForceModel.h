@@ -78,6 +78,11 @@ public:
         this->m_warp = warp;
     }
 
+    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
+    {
+        m_vegaTangentStiffnessMatrix = K;
+    }
+
 protected:
     std::shared_ptr<vega::CorotationalLinearFEM> m_corotationalLinearFEM;
     std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;

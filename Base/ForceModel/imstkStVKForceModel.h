@@ -73,6 +73,11 @@ public:
         getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
     }
 
+    //?
+    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
+    {
+    }
+
 protected:
 
     std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;

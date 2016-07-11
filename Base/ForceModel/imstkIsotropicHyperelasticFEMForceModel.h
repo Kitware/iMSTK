@@ -113,6 +113,11 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
+    {
+        m_vegaTangentStiffnessMatrix = K;
+    }
+
 protected:
     std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFEM;
     std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;

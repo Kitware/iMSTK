@@ -313,6 +313,9 @@ DeformableBodyModel::initializeTangentStiffness()
         // Initialize the Raleigh damping matrix
         m_C = dampingMassCoefficient*m_M + dampingStiffnessCoefficient*m_K;
     }
+
+    //?
+    this->m_internalForceModel->setTangentStiffness(m_vegaTangentStiffnessMatrix);
 }
 
 void
