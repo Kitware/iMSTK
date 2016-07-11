@@ -86,7 +86,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     ///TODO : based on scene properties
     // Customize background colors
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
-    m_vtkRenderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
+    m_vtkRenderer->SetBackground2(157.0/255.0*0.66, 186/255.0*0.66, 192.0/255.0*0.66);
     m_vtkRenderer->GradientBackgroundOn();
 
     this->setup(Mode::SIMULATION);

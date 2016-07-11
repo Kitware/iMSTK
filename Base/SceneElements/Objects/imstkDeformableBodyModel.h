@@ -57,6 +57,8 @@ namespace imstk
 ///
 class DeformableBodyModel : public DynamicalModel
 {
+
+
 public:
     ///
     /// \brief Constructor
@@ -66,7 +68,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    virtual ~DeformableBodyModel() = default;
+    ~DeformableBodyModel() = default;
 
     ///
     /// \brief Set/Get force model configuration
@@ -91,11 +93,6 @@ public:
     ///
     void setModelGeometry(std::shared_ptr<Geometry> geometry);
     std::shared_ptr<Geometry> getModelGeometry();
-
-    ///
-    /// \brief Returns the tangent linear system given current state
-    ///
-    void getTangent(Vectord& q);
 
     ///
     /// \brief Configure the force model from external file

@@ -39,7 +39,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~DynamicObject() = default;
+    virtual ~DynamicObject() = default;
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
@@ -78,7 +78,6 @@ protected:
     DynamicObject(std::string name) : SceneObject(name){}
 
     std::shared_ptr<DynamicalModel> m_dynamicalModel;           ///> Dynamical model
-
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
 
     //Maps

@@ -59,6 +59,11 @@ public:
     StopWatch(){};
 
     ///
+    /// \brief Destructor
+    ///
+    ~StopWatch() = default;
+
+    ///
     /// \brief Start the appropriate timer
     ///
     virtual void start();
@@ -122,6 +127,11 @@ public:
     /// \brief Constructor
     ///
     CpuTimer() : StopWatch(){};
+
+    ///
+    /// \brief Destructor
+    ///
+    ~CpuTimer() = default;
 
     ///
     /// \brief Start the appropriate timer

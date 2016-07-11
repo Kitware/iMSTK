@@ -29,33 +29,55 @@
 #include "imstkModule.h"
 #include "imstkScene.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class SceneManager : public Module
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     SceneManager(std::shared_ptr<Scene> scene) :
         Module(scene->getName()),
-        m_scene(scene)
-    {}
+        m_scene(scene){}
 
+    ///
+    /// \brief Destructor
+    ///
     ~SceneManager() = default;
 
+    ///
+    /// \brief Get the scene that the scene manager is managing
+    ///
     std::shared_ptr<Scene> getScene();
 
 protected:
-
+    ///
+    /// \brief Initialize the module
+    ///
     void initModule() override;
+
+    ///
+    /// \brief Run the module
+    ///
     void runModule() override;
+
+    ///
+    /// \brief Clean up the module
+    ///
     void cleanUpModule() override;
 
-    std::shared_ptr<Scene> m_scene;
-
+    ///
+    /// \brief
+    ///
     void startModuleInNewThread(std::shared_ptr<Module> module);
+
+    std::shared_ptr<Scene> m_scene; ///> Scene that is being managed
     std::unordered_map<std::string, std::thread> m_threadMap;
 
 };
+
 }
 
 #endif // ifndef imstkSceneManager_h
