@@ -43,7 +43,7 @@ NewtonMethod::solve(Vectord& x)
 {
     if(!this->m_nonLinearSystem)
     {
-        // TODO: log this
+        LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
@@ -84,6 +84,37 @@ NewtonMethod::solve(Vectord& x)
     }
 }
 
+void
+NewtonMethod::solveSimple()
+{
+    auto x = this->m_nonLinearSystem->getUnknownVector();
+
+    if (!this->m_nonLinearSystem)
+    {
+        LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
+        return;
+    }
+
+    // Compute norms, set tolerances and other temporaries
+    //double fnorm = this->m_nonLinearSystem->evaluateF(x).norm();
+    double stopTolerance = 1.0e-6;
+
+    this->linearSolver->setTolerance(stopTolerance);
+
+    //Vectord dx = x;
+
+    for (size_t i = 0; i < this->maxIterations; ++i)
+    {
+        /*if (fnorm < stopTolerance)
+        {
+        return;
+        }*/
+        this->updateJacobian(x);
+        this->linearSolver->solve(x);
+        //this->m_updateIterate(-dx, x);
+    }
+}
+
 
 void
 NewtonMethod::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
@@ -121,18 +152,19 @@ NewtonMethod::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
     if(!this->m_nonLinearSystem)
-    {// TODO: Print message or log error.
-        return;
-    }
-
-    auto &A = this->m_nonLinearSystem->m_dF(x);
-
-    if(A.innerSize() == 0)
-    {// TODO: Print message and/or log error.
+    {
+        LOG(WARNING) << "NewtonMethod::updateJacobian - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
     auto &b = this->m_nonLinearSystem->m_F(x);
+    auto &A = this->m_nonLinearSystem->m_dF(x);
+
+    if(A.innerSize() == 0)
+    {
+        // TODO: Print message and/or log error.
+        return;
+    }
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
     this->linearSolver->setSystem(linearSystem);

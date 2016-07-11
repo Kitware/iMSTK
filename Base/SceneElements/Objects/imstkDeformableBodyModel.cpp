@@ -112,7 +112,9 @@ DeformableBodyModel::initialize(std::shared_ptr<Geometry> geometry)
 
     m_Feff.resize(m_numDOF);
     m_Finternal.resize(m_numDOF);
+    m_Finternal.setConstant(0.0);//?
     m_Fcontact.resize(m_numDOF);
+    m_qSol.resize(m_numDOF);
 }
 
 void

@@ -24,7 +24,8 @@
 
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class NonLinearSystem
@@ -35,7 +36,7 @@ class NonLinearSystem
 {
 public:
     using VectorFunctionType = std::function < const Vectord&(const Vectord&) >;
-    using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) > ;
+    using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) >;
 
 public:
     ///
@@ -66,9 +67,26 @@ public:
     ///
     virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
 
+    ///
+    /// \brief
+    ///
+    void setUnknownVector(Vectord& v)
+    {
+        m_unknown = v;
+    }
+
+    ///
+    /// \brief
+    ///
+    Vectord& getUnknownVector()
+    {
+        return m_unknown;
+    }
+
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
-    MatrixFunctionType m_dF;  ///> Gradient of the Nonlinear function with respect to the unknown vector
+    MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
+    Vectord m_unknown;
 };
 
 }

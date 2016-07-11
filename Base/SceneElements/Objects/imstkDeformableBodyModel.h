@@ -195,9 +195,11 @@ public:
     ///
     /// \brief Get the contact force vector
     ///
-    Vectord& getContactForce()
+    Vectord& getContactForce();
+
+    Vectord& getUnknownVec()
     {
-        return m_Fcontact;
+        return m_qSol;
     }
 
 protected:
@@ -220,6 +222,7 @@ protected:
     Vectord m_Finternal;    ///> Vector of gravity forces
     Vectord m_Feff;         ///> Vector of effective forces
     Vectord m_Fcontact;     ///> Vector of contact forces
+    Vectord m_qSol;         ///> Vector to maintain solution at each iteration of nonlinear solver
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces

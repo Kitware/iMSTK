@@ -50,6 +50,7 @@ public:
     /// \brief Main solve routine.
     ///
     virtual void solve(Vectord& x) = 0;
+    virtual void solveSimple() = 0;
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition
