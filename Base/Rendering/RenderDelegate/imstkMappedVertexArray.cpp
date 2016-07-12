@@ -206,9 +206,21 @@ MappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
 
 //------------------------------------------------------------------------------
 double
-MappedVertexArray::GetValue(vtkIdType idx)
+MappedVertexArray::GetValue(vtkIdType idx) const
 {
-    return this->GetValueReference(idx);
+    const vtkIdType tuple = idx / this->NumberOfComponents;
+    const vtkIdType comp = idx % this->NumberOfComponents;
+    switch(comp)
+    {
+        case 0:
+            return (*this->vertexArray)[tuple](0);
+        case 1:
+            return (*this->vertexArray)[tuple](1);
+        case 2:
+            return (*this->vertexArray)[tuple](2);
+        default:
+            return 0;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -230,6 +242,15 @@ MappedVertexArray::GetValueReference(vtkIdType idx)
             static double dummy(0);
             return dummy;
     }
+}
+
+//------------------------------------------------------------------------------
+void
+MappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
+{
+  tuple[0] = (*this->vertexArray)[tupleId](0);
+  tuple[1] = (*this->vertexArray)[tupleId](1);
+  tuple[2] = (*this->vertexArray)[tupleId](2);
 }
 
 //------------------------------------------------------------------------------

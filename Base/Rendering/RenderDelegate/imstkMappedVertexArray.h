@@ -58,8 +58,9 @@ public:
     void GetTuple(vtkIdType i, double *tuple);
     vtkIdType LookupTypedValue(double value);
     void LookupTypedValue(double value, vtkIdList *ids);
-    double GetValue(vtkIdType idx);
+    double GetValue(vtkIdType idx) const;
     double& GetValueReference(vtkIdType idx);
+    void GetTypedTuple(vtkIdType idx, ValueType *t) const;
     void GetTupleValue(vtkIdType idx, double *t);
 
     // Description:
@@ -98,6 +99,9 @@ public:
     vtkIdType InsertNextValue(double v);
     void InsertValue(vtkIdType idx, double v);
     void InsertVariantValue(vtkIdType idx, vtkVariant value);
+    void SetTypedTuple(vtkIdType i, const ValueType *t) {}
+    void InsertTypedTuple(vtkIdType i, const ValueType *t) {}
+    virtual vtkIdType InsertNextTypedTuple(const ValueType *t) {}
 
 protected:
     MappedVertexArray() {}
