@@ -75,7 +75,7 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testMultiTextures();
+    //testMultiTextures();
     //testMeshCCD();
     //testPenaltyRigidCollision();
     //testTwoFalcons();
@@ -90,7 +90,7 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    //testDeformableBody();
+    testDeformableBody();
 
     return 0;
 }
@@ -803,6 +803,11 @@ void testDeformableBody()
 
     // b. Load a tetrahedral mesh
     auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
 
     // c. Extract the surface mesh
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
@@ -810,6 +815,7 @@ void testDeformableBody()
     if (!volTetMesh)
     {
         LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
 
@@ -854,7 +860,6 @@ void testDeformableBody()
     //auto collisioDet = std::make_shared<CollisionDetection>();
 
     // h. Add collision handling
-
 
     // create a nonlinear system
     auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());

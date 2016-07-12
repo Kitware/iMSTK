@@ -117,22 +117,22 @@ public:
     ///
     /// \brief Sets the point data for all arrays at each vertice
     ///
-    void setPointDataMap(const std::map<std::string, std::vector<VecNf>>& pointData);
+    void setPointDataMap(const std::map<std::string, std::vector<Vectorf>>& pointData);
 
     ///
     /// \brief Get the map of the point data for all arrays at each vertice
     ///
-    const std::map<std::string, std::vector<VecNf>>& getPointDataMap() const;
+    const std::map<std::string, std::vector<Vectorf>>& getPointDataMap() const;
 
     ///
     /// \brief Set a data array holding some point data
     ///
-    void setPointDataArray(const std::string& arrayName, const std::vector<VecNf>& arrayData);
+    void setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>& arrayData);
 
     ///
     /// \brief Get a specific data array
     ///
-    const std::vector<VecNf>& getPointDataArray(const std::string& arrayName) const;
+    const std::vector<Vectorf>& getPointDataArray(const std::string& arrayName) const;
 
     ///
     /// \brief Returns the number of total vertices in the mesh
@@ -158,7 +158,7 @@ protected:
     std::vector<Vec3d> m_verticesPositions; //> Current positions of vertices
     std::vector<Vec3d> m_verticesDisplacements; //> Displacements of vertices
 
-    std::map<std::string, std::vector<VecNf>> m_pointDataMap; ///> vector of data arrays per vertice
+    std::map<std::string, std::vector<Vectorf>> m_pointDataMap; ///> vector of data arrays per vertice
 };
 }
 

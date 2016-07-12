@@ -153,19 +153,19 @@ Mesh::getVerticeDisplacement(const int& vertNum) const
 }
 
 void
-Mesh::setPointDataMap(const std::map<std::string, std::vector<VecNf>>& pointData)
+Mesh::setPointDataMap(const std::map<std::string, std::vector<Vectorf>>& pointData)
 {
     m_pointDataMap = pointData;
 }
 
-const std::map<std::string, std::vector<VecNf>>&
+const std::map<std::string, std::vector<Vectorf>>&
 Mesh::getPointDataMap() const
 {
     return m_pointDataMap;
 }
 
 void
-Mesh::setPointDataArray(const std::string& arrayName, const std::vector<VecNf>& arrayData)
+Mesh::setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>& arrayData)
 {
     if ( arrayData.size() != this->getNumVertices())
     {
@@ -176,13 +176,13 @@ Mesh::setPointDataArray(const std::string& arrayName, const std::vector<VecNf>& 
     m_pointDataMap[arrayName] = arrayData;
 }
 
-const std::vector<VecNf>&
+const std::vector<Vectorf>&
 Mesh::getPointDataArray(const std::string& arrayName) const
 {
     if (!m_pointDataMap.count(arrayName))
     {
         LOG(WARNING) << "No array with such name holds any point data.";
-        return std::vector<VecNf>();
+        return std::vector<Vectorf>();
     }
     return m_pointDataMap.at(arrayName);
 }

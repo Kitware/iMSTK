@@ -43,7 +43,7 @@ public:
     /// \brief default Constructor/Destructor
     ///
     NonLinearSystem(){};
-    NonLinearSystem(VectorFunctionType& F, MatrixFunctionType& dF);
+    NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
     virtual ~NonLinearSystem(){};
 
 

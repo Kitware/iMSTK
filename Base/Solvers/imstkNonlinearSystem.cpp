@@ -26,13 +26,13 @@
 namespace imstk
 {
 
-NonLinearSystem::NonLinearSystem(VectorFunctionType& F, MatrixFunctionType& dF)
+NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF)
 {
     m_F = F;
     m_dF = dF;
 }
 
-    void
+void
 NonLinearSystem::setFunction(const VectorFunctionType& function)
 {
     this->m_F = function;

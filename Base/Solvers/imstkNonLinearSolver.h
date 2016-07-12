@@ -21,7 +21,8 @@
 #define SOLVERS_NONLINEARSOLVER_H
 
 // STL includes
-#include<array>
+#include <array>
+#include <functional>
 
 // imstk includes
 #include "imstkNonlinearSystem.h"

@@ -142,7 +142,7 @@ VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
     mesh->initialize(vertices, triangles, true);
 
     // Point Data
-    std::map<std::string, std::vector<VecNf>> dataMap;
+    std::map<std::string, std::vector<Vectorf>> dataMap;
     VTKMeshReader::copyPointData(vtkMesh->GetPointData(), dataMap);
     if (!dataMap.empty())
     {
@@ -244,7 +244,7 @@ VTKMeshReader::copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,d
 }
 
 void
-VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<VecNf>>& dataMap)
+VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap)
 {
     if(!pointData)
     {
@@ -257,12 +257,12 @@ VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std:
         std::string name = array->GetName();
         int nbrOfComp = array->GetNumberOfComponents();
         int nbrOfTuples = array->GetNumberOfTuples();
-        std::vector<VecNf> data;
+        std::vector<Vectorf> data;
         for(unsigned int j = 0; j < nbrOfTuples; ++j)
         {
             double tupleData[nbrOfComp];
             array->GetTuple(j, tupleData);
-            VecNf tuple(nbrOfComp);
+            Vectorf tuple(nbrOfComp);
             for (unsigned int k = 0; k < nbrOfComp; k++)
               {
               tuple[k] = tupleData[k];

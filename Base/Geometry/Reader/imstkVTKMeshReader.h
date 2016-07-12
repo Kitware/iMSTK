@@ -98,7 +98,7 @@ protected:
     ///
     /// \brief
     ///
-    static void copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<VecNf>>& dataMap);
+    static void copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap);
 
 };
 }

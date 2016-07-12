@@ -25,7 +25,7 @@
 #include <array>
 #include "g3log/g3log.hpp"
 
-#include "Eigen/sparse"
+#include "Eigen/Sparse"
 
 #include "imstkProblemState.h"
 

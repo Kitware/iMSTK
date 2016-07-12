@@ -37,7 +37,7 @@ MassSpringForceModel::getInternalForce(const Vectord& u, Vectord& internalForce)
     m_massSpringSystem->ComputeForce(data, internalForce.data());
 }
 
-virtual void
+void
 MassSpringForceModel::getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
 {
     m_massSpringSystem->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
@@ -52,5 +52,3 @@ MassSpringForceModel::getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd&
 }
 
 } // imstk
-
-#endif // imstkMassSpringForceModel_h
