@@ -24,6 +24,13 @@
 #include "imstkMappedVertexArray.h"
 
 #include <vtkTrivialProducer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPointData.h>
+#include <vtkFloatArray.h>
+#include <vtkImageReader2Factory.h>
+#include <vtkImageReader2.h>
+#include <vtkTexture.h>
+#include <vtkProperty.h>
 
 #include "g3log/g3log.hpp"
 
@@ -60,7 +67,55 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
 
-    this->setActorMapper(source->GetOutputPort());
+    // Mapper
+    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputData(polydata);
+
+    // Copy textures
+    int unit = 0;
+    auto readerFactory = vtkSmartPointer<vtkImageReader2Factory>::New();
+    for (auto const &texturePair : surfaceMesh->getTextureMap())
+    {
+        std::string tCoordsName = texturePair.first;
+        std::string tFileName = texturePair.second;
+
+        // Convert texture coordinates
+        auto tcoords = surfaceMesh->getPointDataArray(tCoordsName);
+        auto vtkTCoords = vtkSmartPointer<vtkFloatArray>::New();
+        vtkTCoords->SetNumberOfComponents(2);
+        vtkTCoords->SetName(tCoordsName.c_str());
+        for (auto const tcoord : tcoords)
+        {
+            double tuple[2] = {tcoord[0], tcoord[1]};
+            vtkTCoords->InsertNextTuple(tuple);
+        }
+        polydata->GetPointData()->AddArray(vtkTCoords);
+
+        // Read texture image
+        auto imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
+        if (!imgReader)
+        {
+            LOG(WARNING) << "Could not find reader for " << tFileName;
+            continue;
+        }
+        imgReader->SetFileName(tFileName.c_str());
+        imgReader->Update();
+        auto texture = vtkSmartPointer<vtkTexture>::New();
+        texture->SetInputConnection(imgReader->GetOutputPort());
+        texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        texture->SetWrapMode(vtkTexture::VTKTextureWrapMode::ClampToBorder);
+
+        // Link textures
+        mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
+                    vtkDataObject::FIELD_ASSOCIATION_POINTS);
+        m_actor->GetProperty()->SetTexture(unit, texture);
+        unit++;
+    }
+
+    // Actor
+    m_actor->SetMapper(mapper);
+
+    // Transform
     this->updateActorTransform();
 }
 

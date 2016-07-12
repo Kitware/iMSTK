@@ -40,6 +40,7 @@
 
 using namespace imstk;
 
+void testMultiTextures();
 void testMeshCCD();
 void testPenaltyRigidCollision();
 void testTwoFalcons();
@@ -61,7 +62,8 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testMeshCCD();
+    testMultiTextures();
+    //testMeshCCD();
     //testPenaltyRigidCollision();
     //testTwoFalcons();
     //testObjectController();
@@ -77,6 +79,30 @@ int main()
     //testSurfaceMeshOptimizer();
 
     return 0;
+}
+
+void testMultiTextures()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("multitexturestest");
+
+    // Read surface mesh
+    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull.obj");
+    auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
+    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_0.jpg",
+                        "material_0");
+    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_1.jpg",
+                        "material_1");
+
+    // Create object and add to scene
+    auto object = std::make_shared<imstk::VisualObject>("meshObject");
+    object->setVisualGeometry(surfaceMesh); // change to any mesh created above
+    scene->addSceneObject(object);
+
+    // Run
+    sdk->setCurrentScene("multitexturestest");
+    sdk->startSimulation(true);
 }
 
 void testMeshCCD()

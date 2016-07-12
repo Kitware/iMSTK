@@ -135,6 +135,41 @@ Mesh::getVerticeDisplacement(const int& vertNum) const
     return m_verticesDisplacements.at(vertNum);
 }
 
+void
+Mesh::setPointDataMap(const std::map<std::string, std::vector<VecNf>>& pointData)
+{
+    m_pointDataMap = pointData;
+}
+
+const std::map<std::string, std::vector<VecNf>>&
+Mesh::getPointDataMap() const
+{
+    return m_pointDataMap;
+}
+
+void
+Mesh::setPointDataArray(const std::string& arrayName, const std::vector<VecNf>& arrayData)
+{
+    if ( arrayData.size() != this->getNumVertices())
+    {
+        LOG(WARNING) << "Specified array should have " << this->getNumVertices()
+                     << " tuples, has " << arrayData.size();
+        return;
+    }
+    m_pointDataMap[arrayName] = arrayData;
+}
+
+const std::vector<VecNf>&
+Mesh::getPointDataArray(const std::string& arrayName) const
+{
+    if (!m_pointDataMap.count(arrayName))
+    {
+        LOG(WARNING) << "No array with such name holds any point data.";
+        return std::vector<VecNf>();
+    }
+    return m_pointDataMap.at(arrayName);
+}
+
 const int
 Mesh::getNumVertices() const
 {

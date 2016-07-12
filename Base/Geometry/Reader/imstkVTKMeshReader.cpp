@@ -138,11 +138,24 @@ VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
     std::vector<SurfaceMesh::TriangleArray> triangles;
     VTKMeshReader::copyCells<3>(vtkMesh->GetPolys(), triangles);
 
-    std::vector<Vec2f> textCoords;
-    VTKMeshReader::copyTextureCoordinates(vtkMesh->GetPointData(), textCoords);
-
     auto mesh = std::make_shared<SurfaceMesh>();
-    mesh->initialize(vertices, triangles, textCoords, true);
+    mesh->initialize(vertices, triangles, true);
+
+    // Point Data
+    std::map<std::string, std::vector<VecNf>> dataMap;
+    VTKMeshReader::copyPointData(vtkMesh->GetPointData(), dataMap);
+    if (!dataMap.empty())
+    {
+      mesh->setPointDataMap(dataMap);
+    }
+
+    // Active Texture
+    if (auto pointData = vtkMesh->GetPointData())
+    if (auto tcoords = pointData->GetTCoords())
+    {
+        mesh->setDefaultTCoords(tcoords->GetName());
+    }
+
     return mesh;
 }
 
@@ -231,25 +244,32 @@ VTKMeshReader::copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,d
 }
 
 void
-VTKMeshReader::copyTextureCoordinates(vtkPointData* pointData, std::vector<Vec2f>& textCoords)
+VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<VecNf>>& dataMap)
 {
     if(!pointData)
     {
         return;
     }
 
-    auto tcoords = vtkFloatArray::SafeDownCast(pointData->GetTCoords());
-    if(!tcoords)
+    for (unsigned int i = 0; i < pointData->GetNumberOfArrays(); ++i)
     {
-        return;
-    }
-
-    for(vtkIdType i = 0; i < tcoords->GetNumberOfTuples(); ++i)
-    {
-        float uv[2];
-        tcoords->GetTupleValue(i, uv);
-        textCoords.emplace_back(uv[0], uv[1]);
+        vtkDataArray* array = pointData->GetArray(i);
+        std::string name = array->GetName();
+        int nbrOfComp = array->GetNumberOfComponents();
+        int nbrOfTuples = array->GetNumberOfTuples();
+        std::vector<VecNf> data;
+        for(unsigned int j = 0; j < nbrOfTuples; ++j)
+        {
+            double tupleData[nbrOfComp];
+            array->GetTuple(j, tupleData);
+            VecNf tuple(nbrOfComp);
+            for (unsigned int k = 0; k < nbrOfComp; k++)
+              {
+              tuple[k] = tupleData[k];
+              }
+            data.push_back(tuple);
+        }
+        dataMap[name] = data;
     }
 }
-
 }

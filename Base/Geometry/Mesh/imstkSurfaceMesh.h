@@ -52,7 +52,6 @@ public:
     ///
     void initialize(const std::vector<Vec3d>& vertices,
                     const std::vector<TriangleArray>& triangles,
-                    const std::vector<Vec2f>& texCoords = std::vector<Vec2f>(),
                     const bool computeDerivedData = false);
 
     ///
@@ -91,11 +90,6 @@ public:
     void computeVerticesNormals();
 
     ///
-    /// \brief Computes the tangents
-    ///
-    void computeVerticesTangents();
-
-    ///
     /// \brief Rewire the node order and triangle connectivity to optimize for memory layout
     ///  The intended use is for large meshes that doesn't fit into CPU/GPU memory.
     ///  TODO: Further optimization to find a 1-d uninterrupted sub-graph at each iteration.
@@ -109,17 +103,6 @@ public:
     ///
     void setTrianglesVertices(const std::vector<TriangleArray>& triangles);
     const std::vector<TriangleArray>& getTrianglesVertices() const;
-
-    ///
-    /// \brief Get/Set texture coordinates
-    ///
-    void setTextureCoordinates(const std::vector<Vec2f>& coords);
-    const std::vector<Vec2f>& getTextureCoordinates() const;
-
-    ///
-    /// \brief Returns the texture coordinates for a given vertex
-    ///
-    const Vec2f& getVertTextureCoordinate(const int vertNum) const;
 
     ///
     /// \brief Get vector of normals of all the triangles
@@ -142,27 +125,35 @@ public:
     const Vec3d& getVerticeNormal(size_t i) const;
 
     ///
-    /// \brief Get/Set vertex tangents
-    ///
-    const std::vector<Vec4d>& getVerticesTangents() const;
-    const Vec4d& getVerticeTangent(size_t i) const;
-
-    ///
     /// \brief Returns the number of triangles
     ///
     int getNumTriangles() const;
 
+    ///
+    /// \brief Set/Get the array defining the default texture coordinates
+    ///
+    void setDefaultTCoords(std::string arrayName);
+    std::string getDefaultTCoords();
+
+    ///
+    /// \brief Add texture by giving the texture file name and the texture coordinates array name
+    ///
+    void addTexture(std::string tFileName, std::string tCoordsName = "");
+    const std::map<std::string, std::string>& getTextureMap() const;
+    std::string getTexture(std::string tCoordsName) const;
+
 protected:
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
-    std::vector<Vec2f> m_textureCoordinates; ///> Texture coordinates
 
     std::vector<NeighborsType> m_verticesNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_verticesNeighborVertices; ///> Neighbor vertices to vertices
 
     std::vector<Vec3d> m_trianglesNormals; ///> Normals to the triangles
     std::vector<Vec3d> m_verticesNormals; ///> Normals of the vertices
-    std::vector<Vec4d> m_verticesTangents; ///> Tangents of the vertices
+
+    std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
+    std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture
 };
 }
 
