@@ -41,10 +41,12 @@ public:
     static std::shared_ptr<RenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
 
     void setActorMapper(vtkAlgorithmOutput *source);
-    void updateActorTransform();
 
     virtual std::shared_ptr<Geometry> getGeometry() const = 0;
     vtkSmartPointer<vtkActor> getVtkActor() const;
+
+    virtual void update();
+    void updateActorTransform();
 
 protected:
 

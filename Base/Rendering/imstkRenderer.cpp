@@ -174,7 +174,7 @@ Renderer::updateRenderDelegates()
 {
     for (auto delegate : m_renderDelegates)
     {
-        delegate->updateActorTransform();
+        delegate->update();
     }
 }
 

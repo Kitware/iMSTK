@@ -98,6 +98,19 @@ RenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
     m_actor->SetMapper(mapper);
 }
 
+vtkSmartPointer<vtkActor>
+RenderDelegate::getVtkActor() const
+{
+    return m_actor;
+}
+
+void
+RenderDelegate::update()
+{
+    // TODO : only when rigid transform applied
+    this->updateActorTransform();
+}
+
 void
 RenderDelegate::updateActorTransform()
 {
@@ -116,11 +129,5 @@ RenderDelegate::updateActorTransform()
     m_transform->Translate(pos[0], pos[1], pos[2]);
 
     m_actor->SetUserTransform(m_transform);
-}
-
-vtkSmartPointer<vtkActor>
-RenderDelegate::getVtkActor() const
-{
-    return m_actor;
 }
 }

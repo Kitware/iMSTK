@@ -21,8 +21,6 @@
 
 #include "imstkSurfaceMeshRenderDelegate.h"
 
-#include "imstkMappedVertexArray.h"
-
 #include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPointData.h>
@@ -39,13 +37,13 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
     m_geometry(surfaceMesh)
 {
     // Map vertices
-    auto mappedVertexArray = vtkSmartPointer<MappedVertexArray>::New();
-    mappedVertexArray->SetVertexArray(m_geometry->getVerticesPositionsNotConst());
+    m_mappedVertexArray = vtkSmartPointer<MappedVertexArray>::New();
+    m_mappedVertexArray->SetVertexArray(m_geometry->getVerticesPositionsNotConst());
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_geometry->getNumVertices());
-    points->SetData(mappedVertexArray);
+    points->SetData(m_mappedVertexArray);
 
     // Copy triangles
     auto triangles = vtkSmartPointer<vtkCellArray>::New();
@@ -62,10 +60,6 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
     polydata->SetPolys(triangles);
-
-    // Create Source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(polydata);
 
     // Mapper
     auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -117,6 +111,16 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
 
     // Transform
     this->updateActorTransform();
+}
+
+void
+SurfaceMeshRenderDelegate::update()
+{
+    // Base class update
+    RenderDelegate::update();
+
+    // TODO: only when vertices modified
+    m_mappedVertexArray->Modified();
 }
 
 std::shared_ptr<Geometry>
