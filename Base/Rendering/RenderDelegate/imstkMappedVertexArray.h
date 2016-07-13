@@ -101,7 +101,7 @@ public:
     void InsertVariantValue(vtkIdType idx, vtkVariant value);
     void SetTypedTuple(vtkIdType i, const ValueType *t) {}
     void InsertTypedTuple(vtkIdType i, const ValueType *t) {}
-    virtual vtkIdType InsertNextTypedTuple(const ValueType *t) {}
+    vtkIdType InsertNextTypedTuple(const ValueType *t) { return 0; }
 
 protected:
     MappedVertexArray() {}
