@@ -183,7 +183,6 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
     }
     else if( cellType == VTK_HEXAHEDRON )
     {
-        const size_t dim = 8;
         std::vector<HexahedralMesh::HexaArray> cells;
         VTKMeshReader::copyCells<8>(vtkMesh->GetCells(), cells);
 

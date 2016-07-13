@@ -91,9 +91,9 @@ DeformableBodyModel::configure(const std::string& configFileName)
 }
 
 void
-DeformableBodyModel::initialize(std::shared_ptr<Geometry> geometry)
+DeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
 {
-    setModelGeometry(geometry);
+    this->setModelGeometry(physicsMesh);
 
     // prerequisite of for successfully initializing
     if (!m_forceModelGeometry || !m_forceModelConfiguration)
@@ -102,7 +102,7 @@ DeformableBodyModel::initialize(std::shared_ptr<Geometry> geometry)
         return;
     }
 
-    m_vegaPhysicsMesh = VegaMeshReader::readVegaMesh("asianDragon/asianDragon.veg");// remove hard coded name after test
+    m_vegaPhysicsMesh = physicsMesh->getAttachedVegaMesh();
 
     initializeForceModel();
     initializeMassMatrix();

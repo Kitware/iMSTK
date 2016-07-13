@@ -102,7 +102,7 @@ public:
     ///
     /// \brief Initialize the deformable body model
     ///
-    void initialize(std::shared_ptr<Geometry> geometry);
+    void initialize(std::shared_ptr<VolumetricMesh> physicsMesh);
 
     ///
     /// \brief Load the initial conditions of the deformable object

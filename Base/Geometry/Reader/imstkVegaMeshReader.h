@@ -48,32 +48,36 @@ public:
     ~VegaMeshReader() = default;
 
     ///
-    /// \brief Generate volumetric mesh given a external vega mesh file
-    ///
-    static std::shared_ptr<VolumetricMesh> getVolumeMeshFromVegaVolumeMesh(const std::string& filePath, MeshFileType meshType);
-
-    ///
-    /// \brief Generate volumetric mesh given a vega mesh object
-    ///
-    static std::shared_ptr<VolumetricMesh> getVolumeMeshFromVegaVolumeMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
-
-    ///
     /// \brief Read and generate volumetric mesh given a external vega mesh file
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType)
-    {
-        return getVolumeMeshFromVegaVolumeMesh(filePath, meshType);
-    }
-
-    ///
-    /// \brief Generate a vega volume mesh given volumetric mesh
-    ///
-    static std::shared_ptr<vega::VolumetricMesh> getVegaVolumeMeshFromVolumeMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
+    static std::shared_ptr<VolumetricMesh> read(const std::string& filePath, MeshFileType meshType);
 
     ///
     /// \brief Read vega volume mesh from a file
     ///
     static std::shared_ptr<vega::VolumetricMesh> readVegaMesh(const std::string& filePath);
+
+protected:
+    ///
+    /// \brief Generate volumetric mesh given a vega volume mesh
+    ///
+    static std::shared_ptr<VolumetricMesh> convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaVolumeMesh);
+
+    ///
+    /// \brief Generate a vega volume mesh given volumetric mesh
+    ///
+    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
+
+    ///
+    /// \brief
+    ///
+    static void copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<Vec3d>& vertices);
+
+    ///
+    /// \brief
+    ///
+    template<size_t dim>
+    static void copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<std::array<size_t,dim>>& cells);
 };
 
 } // imstk
