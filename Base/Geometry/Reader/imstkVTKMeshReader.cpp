@@ -260,7 +260,7 @@ VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std:
         std::vector<Vectorf> data;
         for(unsigned int j = 0; j < nbrOfTuples; ++j)
         {
-            double tupleData[nbrOfComp];
+            double* tupleData = new double [nbrOfComp];
             array->GetTuple(j, tupleData);
             Vectorf tuple(nbrOfComp);
             for (unsigned int k = 0; k < nbrOfComp; k++)
