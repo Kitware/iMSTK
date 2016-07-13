@@ -40,7 +40,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    NewmarkBeta(const double dT, const double beta = 0.25, const double gamma = 0.5) : TimeIntegrator(dT), m_type(Type::NewmarkBeta), m_gamma(gamma), m_beta(beta){};
+    NewmarkBeta(const double dT, const double beta = 0.25, const double gamma = 0.5) : TimeIntegrator(Type::NewmarkBeta, dT), m_gamma(gamma), m_beta(beta)
+    {}
 
     ///
     /// \brief Destructor
@@ -74,12 +75,10 @@ protected:
     double m_beta;
     double m_gamma;
 
-    // Coefficients of the time integrator
-    std::array<double, 3> m_alpha = { { 1, 0, 0 } };
-    std::array<double, 3> m_beta = { { 1, -1, 0 } };
-    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
-
-    double m_dT; ///> Delta T
+//    // Coefficients of the time integrator
+//    std::array<double, 3> m_alpha = { { 1, 0, 0 } };
+//    std::array<double, 3> m_beta = { { 1, -1, 0 } };
+//    std::array<double, 3> m_gamma = { { 1, -2, -1 } };
 };
 
 } // imstk

@@ -57,7 +57,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    TimeIntegrator(double dT) : m_type(Type::none), m_dT(dT){};
+    TimeIntegrator(Type type, double dT) : m_type(type), m_dT(dT)
+    {}
 
     ///
     /// \brief Destructor
@@ -67,7 +68,7 @@ public:
     ///
     /// \brief Return the type of the time integrator
     ///
-    TimeIntegrator::Type getType() const { return m_type; };
+    TimeIntegrator::Type getType() const { return m_type; }
 
     ///
     /// \brief Set/Get the time step size
