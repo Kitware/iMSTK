@@ -47,6 +47,8 @@ ConjugateGradient::solve(Vectord& x)
         // TODO: Log this
         return;
     }
+    cgSolver.setMaxIterations(1000);
+    cgSolver.setTolerance(1.0e-5);
     x = cgSolver.solve(m_linearSystem->getRHSVector());
 }
 

@@ -28,7 +28,8 @@
 #include "imstkNonlinearSystem.h"
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \brief Base class for non-linear solvers

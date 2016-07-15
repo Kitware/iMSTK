@@ -218,7 +218,6 @@ public:
         return this->forcingTerm;
     }
 
-
 private:
     std::shared_ptr<LinearSolverType> linearSolver; ///> Linear solver to use. Default: Conjugate gradient.
     double forcingTerm;                             ///> Method's forcing term (Default: 0.9).

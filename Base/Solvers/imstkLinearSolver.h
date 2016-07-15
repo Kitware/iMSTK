@@ -108,7 +108,7 @@ public:
 protected:
     Type m_Type;                                        ///> Type of the scene object
     double m_tolerance = MACHINE_PRECISION;             ///> default tolerance
-    std::shared_ptr<LinearSystemType> m_linearSystem;   /// Linear system of equations
+    std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };
 
 }

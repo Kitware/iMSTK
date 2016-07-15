@@ -74,6 +74,21 @@ public:
         m_qDotDot = a;
     }
 
+    void setU(const Vectord& u)
+    {
+        m_q = u;
+    }
+
+    void setV(const Vectord& v)
+    {
+        m_qDot = v;
+    }
+
+    void setA(const Vectord& a)
+    {
+        m_qDotDot = a;
+    }
+
     ///
     /// \brief Set the state to a given one
     ///
@@ -87,25 +102,25 @@ public:
     ///
     /// \brief Get the state
     ///
-    const Vectord& getQ() const { return m_q; }
+    //const Vectord& getQ() const { return m_q; }
     Vectord& getQ() { return m_q; }
 
     ///
     /// \brief Get the derivative of state w.r.t time
     ///
-    const Vectord& getQDot() const { return m_qDot; }
+    //const Vectord& getQDot() const { return m_qDot; }
     Vectord& getQDot() { return m_qDot; }
 
     ///
     /// \brief Get the double derivative of state w.r.t time
     ///
-    const Vectord& getQDotDot() const { return m_qDotDot; }
+    //const Vectord& getQDotDot() const { return m_qDotDot; }
     Vectord& getQDotDot() { return m_qDotDot; }
 
     ///
     /// \brief Get the state
     ///
-    const Vectord& getState() const { return getQ(); }
+    //const Vectord& getState() const { return getQ(); }
     Vectord& getState() { return getQ(); }
 
 protected:

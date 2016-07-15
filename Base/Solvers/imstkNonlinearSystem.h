@@ -32,61 +32,72 @@ namespace imstk
 ///
 /// \brief Base class for a multi-variable nonlinear system
 ///
-class NonLinearSystem
-{
-public:
-    using VectorFunctionType = std::function < const Vectord&(const Vectord&) >;
-    using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) >;
-
-public:
-    ///
-    /// \brief default Constructor/Destructor
-    ///
-    NonLinearSystem(){};
-    NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
-    virtual ~NonLinearSystem(){};
-
-
-    ///
-    /// \brief Set nonlinear method that evaluates the nonlinear function.
-    ///
-    virtual void setFunction(const VectorFunctionType& function);
-
-    ///
-    /// \brief Set the method that evaluates the gradient of the nonlinear function
-    ///
-    virtual void setJacobian(const MatrixFunctionType& function);
-
-    ///
-    /// \brief Evaluate function at a given state
-    ///
-    virtual const Vectord& evaluateF(const Vectord& x);
-
-    ///
-    /// \brief Evaluate gradient of the function at a given state
-    ///
-    virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
-
-    ///
-    /// \brief
-    ///
-    void setUnknownVector(Vectord& v)
+    class NonLinearSystem
     {
-        m_unknown = v;
-    }
+    public:
+        using VectorFunctionType = std::function < const Vectord&(const Vectord&) > ;
+        using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) > ;
+        using UpdateFunctionType = std::function < void(const Vectord&) > ;
 
-    ///
-    /// \brief
-    ///
-    Vectord& getUnknownVector()
-    {
-        return m_unknown;
-    }
+    public:
+        ///
+        /// \brief default Constructor/Destructor
+        ///
+        NonLinearSystem(){};
+        NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+        virtual ~NonLinearSystem(){};
+
+
+        ///
+        /// \brief Set nonlinear method that evaluates the nonlinear function.
+        ///
+        virtual void setFunction(const VectorFunctionType& function);
+
+        ///
+        /// \brief Set the method that evaluates the gradient of the nonlinear function
+        ///
+        virtual void setJacobian(const MatrixFunctionType& function);
+
+        ///
+        /// \brief Evaluate function at a given state
+        ///
+        virtual const Vectord& evaluateF(const Vectord& x);
+
+        ///
+        /// \brief Evaluate gradient of the function at a given state
+        ///
+        virtual const SparseMatrixd& evaluateJacobian(const Vectord& x);
+
+        ///
+        /// \brief
+        ///
+        void setUnknownVector(Vectord& v)
+        {
+            m_unknown = v;
+        }
+
+        ///
+        /// \brief Get the vector used to populate the solution
+        ///
+        Vectord& getUnknownVector()
+        {
+            return m_unknown;
+        }
+
+        ///
+        /// \brief Set the update function
+        ///
+        void setUpdateFunction(const UpdateFunctionType& updateFunc)
+        {
+            m_FUpdate = updateFunc;
+        }
 
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
     MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
     Vectord m_unknown;
+
+    UpdateFunctionType m_FUpdate;
 };
 
 }

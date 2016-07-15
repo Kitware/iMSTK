@@ -864,6 +864,7 @@ void testDeformableBody()
     // create a nonlinear system
     auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
+    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
 
     // create a linear solver
     auto cgLinSolver = std::make_shared<ConjugateGradient>();

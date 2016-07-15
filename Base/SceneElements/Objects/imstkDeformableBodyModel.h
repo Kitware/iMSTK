@@ -34,6 +34,7 @@
 #include "imstkProblemState.h"
 #include "imstkNonlinearSystem.h"
 #include "imstkVegaMeshReader.h"
+#include "imstkNewtonMethod.h"
 
 //force models
 #include "imstkStVKForceModel.h"
@@ -142,7 +143,12 @@ public:
     ///
     /// \brief Compute the RHS of the resulting linear system
     ///
-    void computeImplicitSystemRHS(const kinematicState& prevState, kinematicState& newState);
+    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState);
+
+    ///
+    /// \brief Compute the RHS of the resulting linear system using semi-implicit scheme
+    ///
+    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
@@ -158,6 +164,12 @@ public:
     /// \brief Update damping Matrix
     ///
     void updateDampingMatrix();
+
+    ///
+    /// \brief Applies boundary conditions to matrix and a vector
+    ///
+    void applyBoundaryConditions(SparseMatrixd &M, const bool withCompliance = false) const;
+    void applyBoundaryConditions(Vectord &x) const;
 
     ///
     /// \brief Update mass matrix
@@ -179,7 +191,12 @@ public:
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType getFunction();
+    NonLinearSystem::VectorFunctionType getFunction(const bool semiImplicit = true);
+
+    ///
+    /// \brief Get the function that updates the model given the solution
+    ///
+    NonLinearSystem::UpdateFunctionType getUpdateFunction();
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear
@@ -226,6 +243,7 @@ protected:
     Vectord m_Feff;         ///> Vector of effective forces
     Vectord m_Fcontact;     ///> Vector of contact forces
     Vectord m_qSol;         ///> Vector to maintain solution at each iteration of nonlinear solver
+    Vectord m_tmpStorage;
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces

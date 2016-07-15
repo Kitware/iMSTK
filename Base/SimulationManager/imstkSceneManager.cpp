@@ -70,6 +70,7 @@ SceneManager::runModule()
     for (auto nlSolvers : m_scene->getNonlinearSolvers())
     {
         nlSolvers->solveSimple();
+        std::cout << "stepped" << std::endl;
     }
 
     // Apply the geometry maps
