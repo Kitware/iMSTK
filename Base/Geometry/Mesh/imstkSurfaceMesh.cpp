@@ -25,22 +25,16 @@ namespace imstk {
 void
 SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
                         const std::vector<TriangleArray>& triangles,
-                        const std::vector<Vec2f>& texCoords,
                         const bool computeDerivedData)
 {
     this->clear();
 
     Mesh::initialize(vertices);
     setTrianglesVertices(triangles);
-    setTextureCoordinates(texCoords);
 
     if (computeDerivedData)
     {
         computeVerticesNormals();
-        if (!texCoords.empty())
-        {
-            computeVerticesTangents();
-        }
     }
 }
 
@@ -49,12 +43,10 @@ SurfaceMesh::clear()
 {
     Mesh::clear();
     m_trianglesVertices.clear();
-    m_textureCoordinates.clear();
     m_verticesNeighborTriangles.clear();
     m_verticesNeighborVertices.clear();
     m_trianglesNormals.clear();
     m_verticesNormals.clear();
-    m_verticesTangents.clear();
 }
 
 void
@@ -165,90 +157,6 @@ SurfaceMesh::computeVerticesNormals()
 }
 
 void
-SurfaceMesh::computeVerticesTangents()
-{
-    if (m_textureCoordinates.empty())
-    {
-        LOG(DEBUG) << "SurfaceMesh::computeVerticesTangents debug: no textureCoordinates, can not compute vertices tangents.";
-        return;
-    }
-
-    /*
-       Derived from
-       Lengyel, Eric. "Computing Tangent Space Basis Vectors for an Arbitrary
-          Mesh".
-       Terathon Software 3D Graphics Library, 2001.
-       [url]http://www.terathon.com/code/tangent.html[/url]
-     */
-
-    std::vector<Vec3d> tan1, tan2;
-
-    tan1.resize(m_verticesPositions.size());
-    tan2.resize(m_verticesPositions.size());
-
-    for (const auto& triangle : m_trianglesVertices)
-    {
-        const size_t& id0 = triangle.at(0);
-        const size_t& id1 = triangle.at(1);
-        const size_t& id2 = triangle.at(2);
-
-        const Vec3d& p0 = m_verticesPositions.at(id0);
-        const Vec3d& p1 = m_verticesPositions.at(id1);
-        const Vec3d& p2 = m_verticesPositions.at(id2);
-
-        const Vec2f& uv0 = m_textureCoordinates.at(id0);
-        const Vec2f& uv1 = m_textureCoordinates.at(id1);
-        const Vec2f& uv2 = m_textureCoordinates.at(id2);
-
-        Vec3d  P1 = p1 - p0;
-        Vec3d  P2 = p2 - p0;
-        double u1 = uv1[0] - uv0[0];
-        double u2 = uv2[0] - uv0[0];
-        double v1 = uv1[1] - uv0[1];
-        double v2 = uv2[1] - uv0[1];
-
-        double div = u1 * v2 - u2 * v1;
-        double r   = (div == 0.0f) ? 0.0f : (1.0f / div);
-
-        Vec3d u_dir = (v2 * P1 - v1 * P2) * r;
-        Vec3d v_dir = (u2 * P1 - u1 * P2) * r;
-
-        tan1.at(id0) += u_dir;
-        tan1.at(id1) += u_dir;
-        tan1.at(id2) += u_dir;
-
-        tan2.at(id0) += v_dir;
-        tan2.at(id1) += v_dir;
-        tan2.at(id2) += v_dir;
-    }
-
-    m_verticesTangents.resize(m_verticesPositions.size());
-
-    if (m_verticesNormals.empty())
-    {
-        this->computeVerticesNormals();
-    }
-
-    for (size_t vertexId = 0; vertexId < m_verticesTangents.size(); ++vertexId)
-    {
-        const Vec3d& n  = m_verticesNormals.at(vertexId);
-        const Vec3d& t1 = tan1.at(0);
-        const Vec3d& t2 = tan2.at(0);
-
-        // Gram-Schmidt orthogonalize
-        Vec3d tangente = (t1 - n * n.dot(t1));
-        tangente.normalize();
-
-        m_verticesTangents.at(vertexId)[0] = tangente[0];
-        m_verticesTangents.at(vertexId)[1] = tangente[1];
-        m_verticesTangents.at(vertexId)[2] = tangente[2];
-
-        // Calculate handedness
-        m_verticesTangents.at(vertexId)[3] = ((n.cross(t1)).dot(t2) < 0.0f) ? -1.0f : 1.0f;
-    }
-}
-
-void
 SurfaceMesh::optimizeForDataLocality()
 {
     const int numVertices = this->getNumVertices();
@@ -328,19 +236,11 @@ SurfaceMesh::optimizeForDataLocality()
     // C. Initialize this mesh with the newly computed ones
     std::vector<Vec3d> optimallyOrderedNodalPos;
     std::vector<TriangleArray> optConnectivityRenumbered;
-    std::vector<Vec2f> newTexCoordinates;
-
-    bool texCoorExist = (this->m_textureCoordinates.size()!=0) ? true : false;
 
     // C.1 Get the positions
     for (const auto &nodalId : optimallyOrderedNodes)
     {
         optimallyOrderedNodalPos.push_back(this->getInitialVertexPosition(nodalId));
-
-        if (texCoorExist)
-        {
-            newTexCoordinates.push_back(this->getVertTextureCoordinate(nodalId));
-        }
     }
 
     // C.2 Get the renumbered connectivity
@@ -359,7 +259,7 @@ SurfaceMesh::optimizeForDataLocality()
     }
 
     // D. Assign the rewired mesh data to the mesh
-    this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered, newTexCoordinates);
+    this->initialize(optimallyOrderedNodalPos, optConnectivityRenumbered);
 }
 
 const std::vector<SurfaceMesh::TriangleArray>&
@@ -372,24 +272,6 @@ void
 SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
 {
     m_trianglesVertices = triangles;
-}
-
-const std::vector<Vec2f>&
-SurfaceMesh::getTextureCoordinates() const
-{
-    return m_textureCoordinates;
-}
-
-void
-SurfaceMesh::setTextureCoordinates(const std::vector<Vec2f>& coords)
-{
-    m_textureCoordinates = coords;
-}
-
-const Vec2f&
-SurfaceMesh::getVertTextureCoordinate(const int vertNum) const
-{
-    return m_textureCoordinates.at(vertNum);
 }
 
 const std::vector<Vec3d>&
@@ -416,21 +298,61 @@ SurfaceMesh::getVerticeNormal(size_t i) const
     return m_verticesNormals.at(i);
 }
 
-const std::vector<Vec4d>&
-SurfaceMesh::getVerticesTangents() const
-{
-    return m_verticesTangents;
-}
-
 int
 SurfaceMesh::getNumTriangles() const
 {
     return this->m_trianglesVertices.size();
 }
 
-const Vec4d&
-SurfaceMesh::getVerticeTangent(size_t i) const
+void
+SurfaceMesh::setDefaultTCoords(std::string arrayName)
 {
-    return m_verticesTangents.at(i);
+    m_defaultTCoords = arrayName;
+}
+
+std::string
+SurfaceMesh::getDefaultTCoords()
+{
+    return m_defaultTCoords;
+}
+
+void
+SurfaceMesh::addTexture(std::string tFileName, std::string tCoordsName)
+{
+    if (tCoordsName == "")
+    {
+        tCoordsName = m_defaultTCoords;
+        if (tCoordsName == "")
+        {
+            LOG(WARNING) << "Can not add texture without default texture coordinates. ";
+            return;
+        }
+    }
+
+    if (!m_pointDataMap.count(tCoordsName))
+    {
+        LOG(WARNING) << "Mesh does not hold any array named " << tCoordsName << ". "
+                     << "Can not add texture.";
+        return;
+    }
+
+    m_textureMap[tCoordsName] = tFileName;
+}
+const std::map<std::string, std::string>&
+SurfaceMesh::getTextureMap() const
+{
+    return m_textureMap;
+}
+
+std::string
+SurfaceMesh::getTexture(std::string tCoordsName) const
+{
+    if (!m_textureMap.count(tCoordsName))
+    {
+        LOG(WARNING) << "No texture filename associated with coordinates " << tCoordsName << ".";
+        return "";
+    }
+
+    return m_textureMap.at(tCoordsName);
 }
 }

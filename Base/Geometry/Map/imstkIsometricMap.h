@@ -37,7 +37,7 @@ class IsometricMap : public GeometryMap
 public:
 
     IsometricMap() :
-        GeometryMap(GeometryMapType::Isometric),
+        GeometryMap(GeometryMap::Type::Isometric),
         m_rigidTransform(RigidTransform3d::Identity())
     {}
 
@@ -56,7 +56,10 @@ public:
     ///
     /// \brief Check the validity of the map
     ///
-    bool isValid() const { return true; };
+    bool isValid() const
+    {
+        return true;
+    };
 
     // Accessors
     void setTransform(const RigidTransform3d& affineTransform);

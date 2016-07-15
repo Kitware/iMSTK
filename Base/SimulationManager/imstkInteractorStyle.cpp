@@ -47,8 +47,16 @@ InteractorStyle::OnTimer()
     auto scene = m_simManager->getCurrentScene();
     m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(scene->getCamera());
 
+    // Update render delegates
+    m_simManager->getViewer()->getCurrentRenderer()->updateRenderDelegates();
+
+    // Reset camera clipping range
+    if(this->CurrentRenderer != nullptr)
+    {
+        this->CurrentRenderer->ResetCameraClippingRange();
+    }
+
     // Render
-    this->CurrentRenderer->ResetCameraClippingRange();
     this->Interactor->Render();
 }
 

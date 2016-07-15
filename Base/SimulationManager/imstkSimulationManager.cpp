@@ -35,7 +35,7 @@ SimulationStatus& SimulationManager::getStatus() const
 bool
 SimulationManager::isSceneRegistered(std::string sceneName) const
 {
-    return m_sceneMap.find(sceneName) != m_sceneMap.end();
+    return m_sceneManagerMap.find(sceneName) != m_sceneManagerMap.end();
 }
 
 std::shared_ptr<Scene>
@@ -48,7 +48,7 @@ SimulationManager::getScene(std::string sceneName) const
         return nullptr;
     }
 
-    return m_sceneMap.at(sceneName);
+    return m_sceneManagerMap.at(sceneName)->getScene();
 }
 
 std::shared_ptr<Scene>
@@ -68,22 +68,23 @@ SimulationManager::createNewScene(std::string newSceneName)
         return nullptr;
     }
 
-    m_sceneMap[newSceneName] = std::make_shared<Scene>(newSceneName);
+    auto newScene = std::make_shared<Scene>(newSceneName);
+    m_sceneManagerMap[newSceneName] = std::make_shared<SceneManager>(newScene);
     LOG(INFO) << "New scene added: " << newSceneName;
-    return m_sceneMap.at(newSceneName);
+    return newScene;
 }
 
 std::shared_ptr<Scene>
 SimulationManager::createNewScene()
 {
-    int id                   = m_sceneMap.size() + 1;
+    int id                   = m_sceneManagerMap.size() + 1;
     std::string newSceneName = "Scene_" + std::to_string(id);
 
     return this->createNewScene(newSceneName);
 }
 
 void
-SimulationManager::addScene(std::shared_ptr<Scene>newScene)
+SimulationManager::addScene(std::shared_ptr<Scene> newScene)
 {
     std::string newSceneName = newScene->getName();
 
@@ -95,7 +96,7 @@ SimulationManager::addScene(std::shared_ptr<Scene>newScene)
         return;
     }
 
-    m_sceneMap[newSceneName] = newScene;
+    m_sceneManagerMap[newSceneName] = std::make_shared<SceneManager>(newScene);
     LOG(INFO) << "Scene added: " << newSceneName;
 }
 
@@ -109,7 +110,7 @@ SimulationManager::removeScene(std::string sceneName)
         return;
     }
 
-    m_sceneMap.erase(sceneName);
+    m_sceneManagerMap.erase(sceneName);
     LOG(INFO) << "Scene removed: " << sceneName;
 }
 
@@ -260,25 +261,27 @@ SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentS
     m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
 
     // Stop/Pause running scene
+    auto oldSceneManager = m_sceneManagerMap.at(m_currentSceneName);
     if (unloadCurrentScene)
     {
         LOG(INFO) << "Unloading '" << m_currentSceneName << "'";
-        m_sceneMap.at(m_currentSceneName)->end();
+        oldSceneManager->end();
         m_threadMap.at(m_currentSceneName).join();
     }
     else
     {
-        m_sceneMap.at(m_currentSceneName)->pause();
+        oldSceneManager->pause();
     }
 
     // Start/Run new scene
-    if (newScene->getStatus() == ModuleStatus::INACTIVE)
+    auto newSceneManager = m_sceneManagerMap.at(newSceneName);
+    if (newSceneManager->getStatus() == ModuleStatus::INACTIVE)
     {
-        this->startModuleInNewThread(newScene);
+        this->startModuleInNewThread(newSceneManager);
     }
-    else if (newScene->getStatus() == ModuleStatus::PAUSED)
+    else if (newSceneManager->getStatus() == ModuleStatus::PAUSED)
     {
-        newScene->run();
+        newSceneManager->run();
     }
     m_currentSceneName = newSceneName;
 }
@@ -292,14 +295,15 @@ SimulationManager::startSimulation(bool debug)
         return;
     }
 
-    std::shared_ptr<Scene> startingScene = this->getScene(m_currentSceneName);
+    std::shared_ptr<Scene> startingScene = this->getCurrentScene();
     if (!startingScene)
     {
         LOG(WARNING) << "Simulation canceled";
         return;
     }
 
-    if (startingScene->getStatus() != ModuleStatus::INACTIVE)
+    auto startingSceneManager = m_sceneManagerMap.at(m_currentSceneName);
+    if (startingSceneManager->getStatus() != ModuleStatus::INACTIVE)
     {
         LOG(WARNING) << "Scene '" << m_currentSceneName << "' is already active";
         return;
@@ -324,7 +328,7 @@ SimulationManager::startSimulation(bool debug)
         }
 
         // Start scene
-        this->startModuleInNewThread(startingScene);
+        this->startModuleInNewThread(startingSceneManager);
 
         m_status = SimulationStatus::RUNNING;
     }
@@ -361,7 +365,7 @@ SimulationManager::runSimulation()
     }
 
     // Run scene
-    m_sceneMap.at(m_currentSceneName)->run();
+    m_sceneManagerMap.at(m_currentSceneName)->run();
 
     // Run device servers
     for(const auto& pair : m_deviceServerMap)
@@ -391,7 +395,7 @@ SimulationManager::pauseSimulation()
     }
 
     // Pause scene
-    m_sceneMap.at(m_currentSceneName)->pause();
+    m_sceneManagerMap.at(m_currentSceneName)->pause();
 
     // Pause device clients
     for(const auto& pair : m_deviceClientMap)
@@ -439,14 +443,14 @@ SimulationManager::endSimulation()
     }
 
     // End all scenes
-    for (auto pair : m_sceneMap)
+    for (auto pair : m_sceneManagerMap)
     {
         std::string  sceneName   = pair.first;
-        ModuleStatus sceneStatus = m_sceneMap.at(sceneName)->getStatus();
+        ModuleStatus sceneStatus = pair.second->getStatus();
 
         if (sceneStatus != ModuleStatus::INACTIVE)
         {
-            m_sceneMap.at(sceneName)->end();
+            m_sceneManagerMap.at(sceneName)->end();
             m_threadMap.at(sceneName).join();
         }
     }

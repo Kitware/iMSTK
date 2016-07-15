@@ -6,6 +6,7 @@ imstk_add_library( SimulationManager
   DEPENDS
     Rendering
     Devices
+    Collision
   )
   
 #-----------------------------------------------------------------------------

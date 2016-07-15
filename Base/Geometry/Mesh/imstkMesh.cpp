@@ -80,6 +80,7 @@ void
 Mesh::setInitialVerticesPositions(const std::vector<Vec3d>& vertices)
 {
     m_initialVerticesPositions = vertices;
+    m_verticesDisplacements= vertices;
 }
 
 const std::vector<Vec3d>&
@@ -123,6 +124,22 @@ Mesh::setVerticesDisplacements(const std::vector<Vec3d>& diff)
     m_verticesDisplacements = diff;
 }
 
+void
+Mesh::setVerticesDisplacements(const Vectord& u)
+{
+    size_t dofId = 0;
+    for (auto &vDisp : m_verticesDisplacements)
+    {
+        vDisp = Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
+        dofId += 3;
+    }
+
+    for (auto i = 0; i < m_verticesPositions.size(); i++)
+    {
+        m_verticesPositions[i] = m_initialVerticesPositions[i] + m_verticesDisplacements[i];
+    }
+}
+
 const std::vector<Vec3d>&
 Mesh::getVerticesDisplacements() const
 {
@@ -133,6 +150,41 @@ const Vec3d&
 Mesh::getVerticeDisplacement(const int& vertNum) const
 {
     return m_verticesDisplacements.at(vertNum);
+}
+
+void
+Mesh::setPointDataMap(const std::map<std::string, std::vector<Vectorf>>& pointData)
+{
+    m_pointDataMap = pointData;
+}
+
+const std::map<std::string, std::vector<Vectorf>>&
+Mesh::getPointDataMap() const
+{
+    return m_pointDataMap;
+}
+
+void
+Mesh::setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>& arrayData)
+{
+    if ( arrayData.size() != this->getNumVertices())
+    {
+        LOG(WARNING) << "Specified array should have " << this->getNumVertices()
+                     << " tuples, has " << arrayData.size();
+        return;
+    }
+    m_pointDataMap[arrayName] = arrayData;
+}
+
+const std::vector<Vectorf>&
+Mesh::getPointDataArray(const std::string& arrayName) const
+{
+    if (!m_pointDataMap.count(arrayName))
+    {
+        LOG(WARNING) << "No array with such name holds any point data.";
+        return std::vector<Vectorf>();
+    }
+    return m_pointDataMap.at(arrayName);
 }
 
 const int

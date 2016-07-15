@@ -31,9 +31,11 @@ SphereRenderDelegate::SphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
 
     source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
     source->SetRadius(m_geometry->getRadius());
+    source->SetPhiResolution(20);
+    source->SetThetaResolution(20);
 
     this->setActorMapper(source->GetOutputPort());
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>

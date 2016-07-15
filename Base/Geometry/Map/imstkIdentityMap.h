@@ -24,7 +24,8 @@
 
 #include "imstkGeometryMap.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class IdentityMap
@@ -35,7 +36,7 @@ class IdentityMap : public GeometryMap
 {
 public:
 
-    IdentityMap() : GeometryMap(GeometryMapType::Identity) {}
+    IdentityMap() : GeometryMap(GeometryMap::Type::Identity) {}
 
     ~IdentityMap() = default;
 

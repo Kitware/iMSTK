@@ -5,15 +5,30 @@
 #include <iomanip>
 
 #include "imstkMath.h"
+#include "imstkTimer.h"
 #include "imstkSimulationManager.h"
+
+// Objects
+#include "imstkForceModelConfig.h"
+#include "imstkDeformableBodyModel.h"
+#include "imstkDeformableObject.h"
 #include "imstkSceneObject.h"
-#include "imstkPlane.h"
-#include "imstkSphere.h"
-#include "imstkCube.h"
+#include "imstkVirtualCouplingObject.h"
 #include "imstkLight.h"
 #include "imstkCamera.h"
 
+// Time Integrators
+#include "imstkBackwardEuler.h"
+
+// Solvers
+#include "imstkNonlinearSystem.h"
+#include "imstkNewtonMethod.h"
+#include "imstkConjugateGradient.h"
+
 // Geometry
+#include "imstkPlane.h"
+#include "imstkSphere.h"
+#include "imstkCube.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshReader.h"
@@ -24,13 +39,25 @@
 #include "imstkOneToOneMap.h"
 
 // Devices
+#include "imstkHDAPIDeviceClient.h"
 #include "imstkVRPNDeviceClient.h"
 #include "imstkVRPNDeviceServer.h"
 #include "imstkCameraController.h"
 
+// Collisions
+#include "imstkInteractionPair.h"
+
+// logger
 #include "g3log/g3log.hpp"
 
-void testDevices();
+using namespace imstk;
+
+void testMultiTextures();
+void testMeshCCD();
+void testPenaltyRigidCollision();
+void testTwoFalcons();
+void testObjectController();
+void testCameraController();
 void testReadMesh();
 void testViewer();
 void testAnalyticalGeometry();
@@ -40,6 +67,7 @@ void testTetraTriangleMap();
 void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
+void testDeformableBody();
 
 int main()
 {
@@ -47,7 +75,12 @@ int main()
               << "Starting Sandbox\n"
               << "****************\n";
 
-    testDevices();
+    //testMultiTextures();
+    //testMeshCCD();
+    //testPenaltyRigidCollision();
+    //testTwoFalcons();
+    //testObjectController();
+    //testCameraController();
     //testViewer();
     //testReadMesh();
     //testAnalyticalGeometry();
@@ -57,49 +90,272 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
+    testDeformableBody();
 
     return 0;
 }
 
-void testDevices()
+void testMultiTextures()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("multitexturestest");
+
+    // Read surface mesh
+    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull.obj");
+    auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
+    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_0.jpg",
+                        "material_0");
+    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_1.jpg",
+                        "material_1");
+
+    // Create object and add to scene
+    auto object = std::make_shared<imstk::VisualObject>("meshObject");
+    object->setVisualGeometry(surfaceMesh); // change to any mesh created above
+    scene->addSceneObject(object);
+
+    // Run
+    sdk->setCurrentScene("multitexturestest");
+    sdk->startSimulation(true);
+}
+
+void testMeshCCD()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("MeshCCDTest");
+
+    auto mesh1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/big.vtk");
+    auto mesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_0.vtk");
+
+    // Obj1
+    auto obj1 = std::make_shared<CollidingObject>("obj1");
+    obj1->setVisualGeometry(mesh1);
+    obj1->setCollidingGeometry(mesh1);
+    scene->addSceneObject(obj1);
+
+    // Obj2
+    auto obj2 = std::make_shared<CollidingObject>("obj2");
+    obj2->setVisualGeometry(mesh2);
+    obj2->setCollidingGeometry(mesh2);
+    scene->addSceneObject(obj2);
+
+    // Collisions
+    auto colGraph = scene->getCollisionGraph();
+    colGraph->addInteractionPair(obj1, obj2,
+                                 CollisionDetection::Type::MeshToMesh,
+                                 CollisionHandling::Type::None,
+                                 CollisionHandling::Type::None);
+
+    auto t = std::thread([mesh2]
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_1.vtk");
+        mesh2->setVerticesPositions(mesh2_1->getVerticesPositions());
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_2.vtk");
+        mesh2->setVerticesPositions(mesh2_2->getVerticesPositions());
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        auto mesh2_3 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_3.vtk");
+        mesh2->setVerticesPositions(mesh2_3->getVerticesPositions());
+    });
+
+    // Run
+    sdk->setCurrentScene("MeshCCDTest");
+    sdk->startSimulation(true);
+    t.join();
+}
+
+void testPenaltyRigidCollision()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("InteractionPairTest");
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON, 0);
+    server->addDevice("device1", imstk::DeviceType::NOVINT_FALCON, 1);
+    sdk->addDeviceServer(server);
+
+    // Falcon clients
+    auto client0 = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost");
+    auto client1 = std::make_shared<imstk::VRPNDeviceClient>("device1", "localhost");
+    client0->setForceEnabled(true);
+    client1->setForceEnabled(true);
+    sdk->addDeviceClient(client0);
+    sdk->addDeviceClient(client1);
+
+    // Plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(10);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Sphere0
+    auto sphere0Geom = std::make_shared<Sphere>();
+    sphere0Geom->scale(0.5);
+    sphere0Geom->translate(Vec3d(1,0.5,0));
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 40);
+    sphere0Obj->setVisualGeometry(sphere0Geom);
+    sphere0Obj->setCollidingGeometry(sphere0Geom);
+    scene->addSceneObject(sphere0Obj);
+
+    // Sphere1
+    auto sphere1Geom = std::make_shared<Sphere>();
+    sphere1Geom->scale(0.5);
+    sphere1Geom->translate(Vec3d(-1,0.5,0));
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1, 40);
+    sphere1Obj->setVisualGeometry(sphere1Geom);
+    sphere1Obj->setCollidingGeometry(sphere1Geom);
+    scene->addSceneObject(sphere1Obj);
+
+    // Collisions
+    auto colGraph = scene->getCollisionGraph();
+    colGraph->addInteractionPair(planeObj, sphere0Obj,
+                                 CollisionDetection::Type::PlaneToSphere,
+                                 CollisionHandling::Type::None,
+                                 CollisionHandling::Type::Penalty);
+    colGraph->addInteractionPair(planeObj, sphere1Obj,
+                                 CollisionDetection::Type::PlaneToSphere,
+                                 CollisionHandling::Type::None,
+                                 CollisionHandling::Type::Penalty);
+    colGraph->addInteractionPair(sphere0Obj, sphere1Obj,
+                                 CollisionDetection::Type::SphereToSphere,
+                                 CollisionHandling::Type::Penalty,
+                                 CollisionHandling::Type::Penalty);
+
+    // Run
+    sdk->setCurrentScene("InteractionPairTest");
+    sdk->startSimulation(true);
+}
+
+void testTwoFalcons()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("FalconsTestScene");
+
+    // Device server
+    auto server = std::make_shared<imstk::VRPNDeviceServer>();
+    server->addDevice("falcon0", imstk::DeviceType::NOVINT_FALCON, 0);
+    server->addDevice("falcon1", imstk::DeviceType::NOVINT_FALCON, 1);
+    server->addDevice("hdk", imstk::DeviceType::OSVR_HDK);
+    sdk->addDeviceServer(server);
+
+    // Falcon clients
+    auto falcon0 = std::make_shared<imstk::VRPNDeviceClient>("falcon0", "localhost");
+    sdk->addDeviceClient(falcon0);
+    auto falcon1 = std::make_shared<imstk::VRPNDeviceClient>("falcon1", "localhost");
+    sdk->addDeviceClient(falcon1);
+
+    // Cam Client
+    auto hdk = std::make_shared<imstk::VRPNDeviceClient>("hdk", "localhost");
+    sdk->addDeviceClient(hdk);
+
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(50);
+    planeGeom->translate(imstk::FORWARD_VECTOR * 15);
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // Sphere0
+    auto sphere0Geom = std::make_shared<imstk::Sphere>();
+    sphere0Geom->setPosition(imstk::Vec3d(16,4.5,0));
+    sphere0Geom->scale(1);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 30);
+    sphere0Obj->setVisualGeometry(sphere0Geom);
+    sphere0Obj->setCollidingGeometry(sphere0Geom);
+    scene->addSceneObject(sphere0Obj);
+
+    // Sphere1
+    auto sphere1Geom = std::make_shared<imstk::Sphere>();
+    sphere1Geom->setPosition(imstk::Vec3d(-16,4.5,0));
+    sphere1Geom->scale(1);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 30);
+    sphere1Obj->setVisualGeometry(sphere1Geom);
+    sphere1Obj->setCollidingGeometry(sphere1Geom);
+    scene->addSceneObject(sphere1Obj);
+
+    // Camera
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0,18,20));
+    cam->setFocalPoint(imstk::UP_VECTOR*18);
+    cam->setupController(hdk);
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
+
+    // Run
+    sdk->setCurrentScene("FalconsTestScene");
+    sdk->startSimulation(true);
+}
+
+void testObjectController()
+{
+#ifdef iMSTK_USE_OPENHAPTICS
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestDevice");
+
+    // Device Client
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default PHANToM"); // localhost = 127.0.0.1
+    sdk->addDeviceClient(client);
+
+    // Object
+    auto geom = std::make_shared<imstk::Cube>();
+    geom->setPosition(imstk::UP_VECTOR);
+    geom->scale(2);
+    auto object = std::make_shared<imstk::VirtualCouplingObject>("VirtualObject", client, 0.1);
+    object->setVisualGeometry(geom);
+    object->setCollidingGeometry(geom);
+    scene->addSceneObject(object);
+
+    // Update Camera position
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0,0,10));
+    cam->setFocalPoint(geom->getPosition());
+
+    // Run
+    sdk->setCurrentScene("SceneTestDevice");
+    sdk->startSimulation(true);
+#endif
+}
+
+void testCameraController()
 {
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestDevice");
-    scene->setLoopDelay(1000);
 
     // Device server
     auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::NOVINT_FALCON);
-    server->setLoopDelay(1);
+    server->addDevice("device0", imstk::DeviceType::OSVR_HDK);
     sdk->addDeviceServer(server);
 
     // Device Client
     auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
-    client->setLoopDelay(1);
+    //client->setLoopDelay(1000);
     sdk->addDeviceClient(client);
-
-    // Sphere
-    auto sphereGeom = std::make_shared<imstk::Sphere>();
-    sphereGeom->scale(0.1);
-    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
-    sphereObj->setVisualGeometry(sphereGeom);
-    scene->addSceneObject(sphereObj);
 
     // Mesh
     auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
-    meshObject->setVisualGeometry(mesh); // change to any mesh created above
+    meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
 
     // Update Camera position
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(8,-8,8));
+    cam->setPosition(imstk::Vec3d(0,0,10));
 
     // Set camera controller
-    auto controller = cam->setupController(client, 100);
-    //LOG(INFO) << controller->getTranslationOffset(); // should be the same than initial cam position
-    //controller->setInversionFlags( (imstk::CameraController::InvertFlag::transX | imstk::CameraController::InvertFlag::transY) );
+    cam->setupController(client, 100);
+    //LOG(INFO) << cam->getController()->getTranslationOffset(); // should be the same than initial cam position
+    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                            imstk::CameraController::InvertFlag::rotZ );
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
@@ -111,18 +367,17 @@ void testReadMesh()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestMesh");
-    scene->setLoopDelay(1000);
 
     // Read surface mesh
-    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
+    /*auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
     auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
     auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
     auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
-    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");
+    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");*/
 
     // Read volumetricMesh
-    auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
-    auto vegaMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.veg");
+    //auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
+    auto vegaMesh = imstk::MeshReader::read("asianDragon.veg");
 
     // Extract surface mesh
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
@@ -144,7 +399,6 @@ void testViewer()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto sceneTest = sdk->createNewScene("SceneTest");
-    sceneTest->setLoopDelay(1000);
 
     // Plane
     auto planeGeom = std::make_shared<imstk::Plane>();
@@ -243,12 +497,10 @@ void testScenesManagement()
     // Scenes
     LOG(INFO) << "-- Test add scenes";
     auto scene1 = std::make_shared<imstk::Scene>("scene1");
-    scene1->setLoopDelay(500);
     sdk->addScene(scene1);
 
     sdk->createNewScene("scene2");
     auto scene2 = sdk->getScene("scene2");
-    scene2->setLoopDelay(500);
 
     auto scene3 = sdk->createNewScene();
     sdk->removeScene("Scene_3");
@@ -287,7 +539,6 @@ void testIsometricMap()
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto geometryMapTest = sdk->createNewScene("geometryMapTest");
-    geometryMapTest->setLoopDelay(1000);
 
     // Cube
     auto cubeGeom = std::make_shared<imstk::Cube>();
@@ -513,6 +764,12 @@ void testSurfaceMeshOptimizer()
 
     surfMesh->setTrianglesVertices(triangles);
 
+    imstk::StopWatch wwt;
+    imstk::CpuTimer ct;
+
+    wwt.start();
+    ct.start();
+
     // d. Print the mesh
     surfMesh->print();
 
@@ -522,9 +779,103 @@ void testSurfaceMeshOptimizer()
     // f. Print the resulting mesh
     surfMesh->print();
 
+    /*wwt.storeLap("opDataLoc");
+    wwt.printLapTimes();*/
+
+    wwt.printTimeElapsed("opDataLoc");
+
+    //std::cout << "wall clock time: " << wwt.getTimeElapsed() << " ms." << std::endl;
+    LOG(INFO) << "CPU time: " << ct.getTimeElapsed() << " ms.";
+
     // Cross-check
     // Connectivity: 0:(0, 1, 2), 1:(1, 3, 2), 2:(3, 4, 2), 3:(5, 3, 1), 4:(3, 6, 4), 5:(5, 7, 3), 6:(3, 7, 6), 7:(7, 8, 6)
     // Nodal data: 0:(0, 0, 0), 1:(0.5, 0, 0), 2:(0, 0.5, 0), 3:(0.5, 0.5, 0), 4:(0, 1, 0), 5:(1, 0, 0), 6:(0.5, 1, 0), 7:(1, 0.5, 0), 8:(1, 1, 0)
 
     getchar();
+}
+
+void testDeformableBody()
+{
+    // a. SDK and Scene
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("DeformableBodyTest");
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
+
+    // b. Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    // c. Extract the surface mesh
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    // d. Construct a map
+
+    // d.1 Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+
+    // d.2 Compute the map
+    oneToOneNodalMap->compute();
+
+    // e. Scene object 1: Dragon
+
+    // Configure dynamic model
+    auto dynaModel = std::make_shared<DeformableBodyModel>(DynamicalModel::Type::elastoDynamics);
+    dynaModel->configure("asianDragon.config");
+    dynaModel->initialize(volTetMesh);
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    // Scene Object
+    auto deformableObj = std::make_shared<DeformableObject>("Dragon");
+    deformableObj->setVisualGeometry(surfMesh);
+    //deformableObj->setCollidingGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->setDynamicalModel(dynaModel);
+    scene->addSceneObject(deformableObj);
+
+    // f. Scene object 2: Plane
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(40);
+    planeGeom->translate(0, -6, 0);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    // g. Add collision detection
+    //auto collisioDet = std::make_shared<CollisionDetection>();
+
+    // h. Add collision handling
+
+    // create a nonlinear system
+    auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
+    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
+
+    // create a linear solver
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();
+
+    // create a non-linear solver and add to the scene
+    auto nlSolver = std::make_shared<NewtonMethod>();
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
+    scene->addNonlinearSolver(nlSolver);
+
+    // Run the simulation
+    sdk->setCurrentScene("DeformableBodyTest");
+    sdk->startSimulation(true);
 }

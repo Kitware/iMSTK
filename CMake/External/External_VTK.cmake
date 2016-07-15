@@ -3,8 +3,8 @@
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( VTK
-  GIT_REPOSITORY ${git_protocol}://github.com/Kitware/VTK.git
-  GIT_TAG v7.0.0
+  GIT_REPOSITORY git@gitlab.kitware.com:iMSTK/vtk.git
+  GIT_TAG multi-textures
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
       -DBUILD_EXAMPLES:BOOL=OFF

@@ -42,7 +42,7 @@ public:
     using TetraArray = std::array<size_t, 4>;
     using WeightsArray = std::array<double, 4>;
 
-    TetrahedralMesh() : VolumetricMesh(GeometryType::TetrahedralMesh) {}
+    TetrahedralMesh() : VolumetricMesh(Geometry::Type::TetrahedralMesh) {}
 
     ~TetrahedralMesh() = default;
 

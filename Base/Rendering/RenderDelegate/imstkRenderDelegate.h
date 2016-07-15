@@ -29,6 +29,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkActor.h"
+#include "vtkTransform.h"
 
 namespace imstk {
 class RenderDelegate
@@ -37,19 +38,22 @@ public:
 
     ~RenderDelegate() = default;
 
-    static std::shared_ptr<RenderDelegate>make_delegate(std::shared_ptr<Geometry>geom);
+    static std::shared_ptr<RenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
 
-    void                                  setActorMapper(vtkAlgorithmOutput *source);
-    void                                  setActorTransform(std::shared_ptr<Geometry>geom);
+    void setActorMapper(vtkAlgorithmOutput *source);
 
-    virtual std::shared_ptr<Geometry>     getGeometry() const = 0;
-    vtkSmartPointer<vtkActor>             getVtkActor() const;
+    virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+    vtkSmartPointer<vtkActor> getVtkActor() const;
+
+    virtual void update();
+    void updateActorTransform();
 
 protected:
 
     RenderDelegate() {}
 
     vtkSmartPointer<vtkActor> m_actor = vtkSmartPointer<vtkActor>::New();
+    vtkSmartPointer<vtkTransform> m_transform = vtkSmartPointer<vtkTransform>::New();
 };
 }
 

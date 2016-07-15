@@ -5,8 +5,8 @@ include(imstkAddLibrary)
 imstk_add_library( Scene
   DEPENDS
     Core
-    Geometry
-    Devices
+    SceneElements
+    Collision
   )
 
 #-----------------------------------------------------------------------------

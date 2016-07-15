@@ -25,13 +25,17 @@
 #include <memory>
 #include <vector>
 
-#include "imstkScene.h"
-
 #include "vtkSmartPointer.h"
 #include "vtkRenderer.h"
 #include "vtkProp.h"
+#include "vtkCamera.h"
+#include "vtkLight.h"
 
 namespace imstk {
+
+class Scene;
+class Camera;
+class RenderDelegate;
 
 class Renderer
 {
@@ -49,6 +53,7 @@ public:
 
     void setup(Mode mode);
     void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
+    void updateRenderDelegates();
 
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
 
@@ -63,6 +68,8 @@ protected:
     std::vector<vtkSmartPointer<vtkLight>> m_vtkLights;
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
+
+    std::vector<std::shared_ptr<RenderDelegate>> m_renderDelegates;
 
     Mode m_currentMode = Mode::EMPTY;
 };

@@ -25,6 +25,7 @@
 #include <vector>
 
 #include <Eigen/Geometry>
+#include <Eigen/Sparse>
 
 namespace imstk {
 
@@ -41,12 +42,12 @@ using Vec4f = Eigen::Vector4f;
 using Vec4d = Eigen::Vector4d;
 
 // Dynamic size vector
-using VecNf = Eigen::VectorXf;
-using VecNd = Eigen::VectorXd;
+using Vectorf = Eigen::VectorXf;
+using Vectord = Eigen::VectorXd;
 
 // Quaternion
-using Quatf = Eigen::Quaternionf;
-using Quatd = Eigen::Quaterniond;
+using Quatf = Eigen::Quaternion<float,Eigen::DontAlign>;
+using Quatd = Eigen::Quaternion<double,Eigen::DontAlign>;
 
 // Angle-Axis
 using Rotf = Eigen::AngleAxisf;
@@ -59,6 +60,18 @@ using Mat3d = Eigen::Matrix3d;
 // 4x4 Matrix
 using Mat4f = Eigen::Matrix4f;
 using Mat4d = Eigen::Matrix4d;
+
+/// A dynamic size matrix of floats
+using Matrixf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic>;
+
+/// A dynamic size matrix of doubles
+using Matrixd = Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic>;
+
+// A dynamic size sparse matrix of doubles
+using SparseMatrixf = Eigen::SparseMatrix < float, Eigen::RowMajor >;
+
+// A dynamic size sparse matrix of doubles
+using SparseMatrixd = Eigen::SparseMatrix < double, Eigen::RowMajor > ;
 
 // Rigid transform (translation and rotation)
 using RigidTransform3f = Eigen::Isometry3f;
@@ -94,6 +107,10 @@ const double LN10 = 2.30258509299404568402;
 
 const double MAX_D = std::numeric_limits<double>::max();
 const double MIN_D = std::numeric_limits<double>::min();
+const double MAX_F = std::numeric_limits<float>::max();
+const double MIN_F = std::numeric_limits<float>::min();
+
+const double MACHINE_PRECISION = std::numeric_limits<double>::denorm_min();
 }
 
 #endif // ifndef imstkMath_h

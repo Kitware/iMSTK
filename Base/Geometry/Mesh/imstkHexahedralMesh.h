@@ -31,7 +31,7 @@ namespace imstk {
 ///
 /// \class HexahedralMesh
 ///
-/// \brief Hexahedral mesh
+/// \brief Hexahedral mesh class
 ///
 class HexahedralMesh : public VolumetricMesh
 {
@@ -39,7 +39,7 @@ public:
 
     using HexaArray = std::array<size_t, 8>;
 
-    HexahedralMesh() : VolumetricMesh(GeometryType::HexahedralMesh) {}
+    HexahedralMesh() : VolumetricMesh(Geometry::Type::HexahedralMesh) {}
 
     ~HexahedralMesh() = default;
 
@@ -97,6 +97,7 @@ protected:
 
     std::vector<HexaArray> m_hexahedraVertices; ///< vertices of the hexahedra
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkHexahedralMesh_h

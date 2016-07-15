@@ -33,7 +33,7 @@ PlaneRenderDelegate::PlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     source->SetNormal(UP_VECTOR[0], UP_VECTOR[1], UP_VECTOR[2]);
 
     this->setActorMapper(source->GetOutputPort());
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>

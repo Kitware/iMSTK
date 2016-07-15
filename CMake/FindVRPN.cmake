@@ -43,7 +43,6 @@ list(APPEND VRPN_INCLUDE_DIRS
   ${LIBNIFALCON_INCLUDE_DIR}
   ${LIBUSB1_INCLUDE_DIR}
   )
-message(STATUS "VRPN_INCLUDE_DIRS : ${VRPN_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -77,26 +76,49 @@ find_library(LIBUSB1_LIBRARY
   )
 mark_as_advanced(LIBUSB1_LIBRARY)
 
-#windows only, libusb1 sounds enough on unix, check vrpn/submodules/hidapi.cmake
+#check vrpn/submodules/hidapi.cmake
 if(WIN32)
   find_library(HIDAPI_LIBRARY
     NAMES
       setupapi
     )
-  mark_as_advanced(HIDAPI_LIBRARY)
+elseif(APPLE)
+  find_library(MACHID_CoreFoundation_LIBRARY CoreFoundation)
+  find_library(MACHID_IOKit_LIBRARY IOKit)
+  set(HIDAPI_LIBRARY ${MACHID_CoreFoundation_LIBRARY} ${MACHID_IOKit_LIBRARY})
 endif()
+mark_as_advanced(HIDAPI_LIBRARY)
 
 #-----------------------------------------------------------------------------
 # Set up libraries
 #-----------------------------------------------------------------------------
-set(VRPN_LIBRARIES
+list(APPEND VRPN_LIBRARIES
   ${VRPN_LIBRARY}
   ${QUAT_LIBRARY}
   ${LIBNIFALCON_LIBRARY}
   ${LIBUSB1_LIBRARY}
   ${HIDAPI_LIBRARY}
   )
-message(STATUS "VRPN_LIBRARIES : ${VRPN_LIBRARIES}")
+
+#-----------------------------------------------------------------------------
+# Phantom Omni support
+#-----------------------------------------------------------------------------
+if(${${PROJECT_NAME}_USE_OMNI})
+  list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_package(OpenHaptics)
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_library(VRPN_PHANTOM_LIBRARY
+    NAMES
+      vrpn_phantom
+      vrpn_phantomd
+    )
+  mark_as_advanced(VRPN_PHANTOM_LIBRARY)
+  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY} ${OPENHAPTICS_LIBRARIES})
+  list(APPEND VRPN_INCLUDE_DIRS ${OPENHAPTICS_INCLUDE_DIRS})
+endif()
+
+message(STATUS "OPENHAPTICS_LIBRARIES : ${OPENHAPTICS_LIBRARIES}")
+message(STATUS "OPENHAPTICS_INCLUDE_DIRS : ${OPENHAPTICS_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Find package

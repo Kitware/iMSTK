@@ -21,17 +21,19 @@
 
 #include "imstkRenderer.h"
 
+#include "imstkScene.h"
+#include "imstkCamera.h"
 #include "imstkRenderDelegate.h"
 
-#include "vtkLight.h"
 #include "vtkLightActor.h"
-#include "vtkCamera.h"
 #include "vtkCameraActor.h"
 #include "vtkAxesActor.h"
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
     // Object actors
@@ -53,6 +55,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
             continue;
         }
 
+        m_renderDelegates.push_back( delegate );
         m_objectVtkActors.push_back( delegate->getVtkActor() );
     }
 
@@ -85,7 +88,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     ///TODO : based on scene properties
     // Customize background colors
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
-    m_vtkRenderer->SetBackground2(157.0/255.0*0.66,186/255.0*0.66,192.0/255.0*0.66);
+    m_vtkRenderer->SetBackground2(157.0/255.0*0.66, 186/255.0*0.66, 192.0/255.0*0.66);
     m_vtkRenderer->GradientBackgroundOn();
 
     this->setup(Mode::SIMULATION);
@@ -163,6 +166,16 @@ Renderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
     m_sceneVtkCamera->SetPosition(p[0], p[1], p[2]);
     m_sceneVtkCamera->SetFocalPoint(f[0], f[1], f[2]);
     m_sceneVtkCamera->SetViewUp(v[0], v[1], v[2]);
+    m_sceneVtkCamera->SetViewAngle(imstkCam->getViewAngle());
+}
+
+void
+Renderer::updateRenderDelegates()
+{
+    for (auto delegate : m_renderDelegates)
+    {
+        delegate->update();
+    }
 }
 
 void

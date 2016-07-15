@@ -40,7 +40,7 @@ class TetraTriangleMap : public GeometryMap
 {
 public:
 
-    TetraTriangleMap() : GeometryMap(GeometryMapType::TetraTriangle){}
+    TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle){}
 
     ~TetraTriangleMap() = default;
 

@@ -26,7 +26,9 @@
 #include <thread>
 #include <atomic>
 
-namespace imstk {
+namespace imstk 
+{
+
 enum class ModuleStatus
 {
     STARTING,
@@ -55,7 +57,10 @@ public:
 
 protected:
 
-    Module(std::string name) : m_name(name) {}
+    Module(std::string name, int loopDelay = 0) :
+        m_name(name),
+        m_loopDelay(loopDelay)
+    {}
 
     virtual void initModule()    = 0;
     virtual void runModule()     = 0;
@@ -63,7 +68,7 @@ protected:
 
     std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};
     std::string  m_name;
-    int m_loopDelay = 0;
+    int m_loopDelay;
 };
 }
 

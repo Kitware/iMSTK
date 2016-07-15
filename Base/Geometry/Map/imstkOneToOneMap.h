@@ -40,7 +40,7 @@ class OneToOneMap : public GeometryMap
 {
 public:
 
-    OneToOneMap() : GeometryMap(GeometryMapType::OneToOne){}
+    OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne){}
 
     ~OneToOneMap() = default;
 

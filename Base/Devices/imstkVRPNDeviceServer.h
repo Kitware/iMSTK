@@ -32,13 +32,16 @@
 #include "imstkModule.h"
 #include "imstkVRPNDeviceClient.h"
 
-namespace imstk {
+namespace imstk 
+{
 
 enum class DeviceType
 {
     SPACE_EXPLORER_3DCONNEXION,
     NAVIGATOR_3DCONNEXION,
-    NOVINT_FALCON
+    NOVINT_FALCON,
+    PHANTOM_OMNI,
+    OSVR_HDK
 };
 
 ///
@@ -57,7 +60,7 @@ public:
 
     virtual ~VRPNDeviceServer() {}
 
-    void addDevice(std::string deviceName, DeviceType deviceType);
+    void addDevice(std::string deviceName, DeviceType deviceType, size_t id = 0);
 
 protected:
 
@@ -70,9 +73,9 @@ private:
     const std::string m_machine; //!< machine name or IP
     const int m_port;            //!< connection port
 
-    std::map<std::string, DeviceType> m_deviceInfoMap; //!< list of iMSTK client info
-    vrpn_Connection * m_serverConnection;              //!< VRPN server connection
-    vrpn_MainloopContainer* m_deviceConnections;       //!< VRPN device connections
+    std::map<std::string, std::pair<DeviceType, size_t>> m_deviceInfoMap; //!< list of iMSTK client info
+    vrpn_Connection * m_serverConnection;                                //!< VRPN server connection
+    vrpn_MainloopContainer* m_deviceConnections;                         //!< VRPN device connections
 
 };
 }

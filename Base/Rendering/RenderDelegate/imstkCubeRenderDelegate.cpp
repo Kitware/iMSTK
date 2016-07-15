@@ -37,7 +37,7 @@ CubeRenderDelegate::CubeRenderDelegate(std::shared_ptr<Cube>cube) :
     source->SetZLength(width);
 
     this->setActorMapper(source->GetOutputPort());
-    this->setActorTransform(m_geometry);
+    this->updateActorTransform();
 }
 
 std::shared_ptr<Geometry>

@@ -29,7 +29,6 @@
 #include "vtkPoints.h"
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
-//#include "vtkFieldData.h"
 
 #include "imstkMeshReader.h"
 #include "imstkSurfaceMesh.h"
@@ -53,7 +52,7 @@ public:
     ///
     /// \brief
     ///
-    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshReader::FileType meshType);
+    static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType);
 
 protected:
 
@@ -69,11 +68,20 @@ protected:
     template<typename ReaderType>
     static std::shared_ptr<SurfaceMesh> readVtkPolyData(const std::string& filePath);
 
+    ///
+    /// \brief
+    ///
     template<typename ReaderType>
     static std::shared_ptr<VolumetricMesh> readVtkUnstructuredGrid(const std::string& filePath);
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh);
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh);
 
     ///
@@ -90,9 +98,8 @@ protected:
     ///
     /// \brief
     ///
-    static void copyTextureCoordinates(vtkPointData* pointData, std::vector<Vec2f>& textCoords);
+    static void copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap);
 
-    //static void copyData(vtkFieldData* fields, ...);
 };
 }
 

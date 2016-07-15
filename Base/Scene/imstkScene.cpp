@@ -25,7 +25,9 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
+
 bool
 Scene::isObjectRegistered(std::string sceneObjectName) const
 {
@@ -154,45 +156,33 @@ Scene::removeLight(std::string lightName)
     LOG(INFO) << lightName << " light removed from " << m_name;
 }
 
+const std::string&
+Scene::getName() const
+{
+    return m_name;
+}
+
 std::shared_ptr<Camera>
-Scene::getCamera()
+Scene::getCamera() const
 {
     return m_camera;
 }
 
-void
-Scene::initModule()
+std::shared_ptr<CollisionGraph>
+Scene::getCollisionGraph() const
 {
-    LOG(DEBUG) << m_name << " : init";
-
-
-    if (auto camController = m_camera->getController())
-    {
-        this->startModuleInNewThread(camController);
-    }
+    return m_collisionGraph;
 }
 
-void
-Scene::cleanUpModule()
+const std::vector<std::shared_ptr<imstk::NonLinearSolver>>
+Scene::getNonlinearSolvers()
 {
-    LOG(DEBUG) << m_name << " : cleanUp";
-
-    if (auto camController = m_camera->getController())
-    {
-        camController->end();
-        m_threadMap.at(camController->getName()).join();
-    }
+    return m_nonLinearSolvers;
 }
 
-void
-Scene::runModule()
+void Scene::addNonlinearSolver(std::shared_ptr<NonLinearSolver> solver)
 {
-    LOG(DEBUG) << m_name << " : running";
+    m_nonLinearSolvers.push_back(solver);
 }
 
-void
-Scene::startModuleInNewThread(std::shared_ptr<Module>module)
-{
-    m_threadMap[module->getName()] = std::thread([module] { module->start(); });
-}
 }

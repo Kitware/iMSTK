@@ -89,6 +89,7 @@ endif()
 
 imstk_define_dependency(g3log)
 imstk_define_dependency(Eigen)
+imstk_define_dependency(SCCD)
 imstk_define_dependency(VegaFEM)
 imstk_define_dependency(VTK)
 imstk_define_dependency(VRPN)
@@ -126,6 +127,10 @@ include_directories( ${g3log_INCLUDE_DIR} )
 find_package( Eigen 3.1.2 REQUIRED )
 include_directories( ${Eigen_INCLUDE_DIR} )
 
+# SCCD
+find_package( SCCD REQUIRED )
+include_directories( ${SCCD_INCLUDE_DIR} )
+
 # VegaFEM
 find_package( VegaFEM REQUIRED CONFIG )
 
@@ -136,6 +141,14 @@ include( ${VTK_USE_FILE} )
 # VRPN
 find_package( VRPN REQUIRED )
 include_directories( ${VRPN_INCLUDE_DIRS} )
+add_definitions( -DVRPN_USE_LIBNIFALCON )
+if(${PROJECT_NAME}_USE_OMNI)
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
+else()
+  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
+endif()
 
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
@@ -143,8 +156,13 @@ include_directories( ${VRPN_INCLUDE_DIRS} )
 add_subdirectory(Base/Core)
 add_subdirectory(Base/Geometry)
 add_subdirectory(Base/Devices)
-add_subdirectory(Base/Scene)
 add_subdirectory(Base/Rendering)
+add_subdirectory(Base/Solvers)
+add_subdirectory(Base/TimeIntegrators)
+add_subdirectory(Base/ForceModel)
+add_subdirectory(Base/SceneElements)
+add_subdirectory(Base/Collision)
+add_subdirectory(Base/Scene)
 add_subdirectory(Base/SimulationManager)
 
 #--------------------------------------------------------------------------
