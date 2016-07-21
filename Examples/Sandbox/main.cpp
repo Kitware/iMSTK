@@ -50,6 +50,19 @@
 // logger
 #include "g3log/g3log.hpp"
 
+// testVTKTexture
+#include <vtkOBJReader.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <string>
+#include <vtkJPEGReader.h>
+
+
+
 using namespace imstk;
 
 void testMultiTextures();
@@ -68,31 +81,145 @@ void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
 void testDeformableBody();
+void testVTKTexture();
+void testMultiObjectWithTextures();
 
 int main()
 {
-    std::cout << "****************\n"
-              << "Starting Sandbox\n"
-              << "****************\n";
+	std::cout << "****************\n"
+		<< "Starting Sandbox\n"
+		<< "****************\n";
 
-    //testMultiTextures();
-    //testMeshCCD();
-    //testPenaltyRigidCollision();
-    //testTwoFalcons();
-    //testObjectController();
-    //testCameraController();
-    //testViewer();
-    //testReadMesh();
-    //testAnalyticalGeometry();
-    //testScenesManagement();
-    //testIsometricMap();
-    //testTetraTriangleMap();
-    //testExtractSurfaceMesh();
-    //testOneToOneNodalMap();
-    //testSurfaceMeshOptimizer();
-    testDeformableBody();
+	//testMultiTextures();
+	//testMeshCCD();
+	//testPenaltyRigidCollision();
+	//testTwoFalcons();
+	//testObjectController();
+	//testCameraController();
+	//testViewer();
+	//testReadMesh();
+	//testAnalyticalGeometry();
+	//testScenesManagement();
+	//testIsometricMap();
+	//testTetraTriangleMap();
+	//testExtractSurfaceMesh();
+	//testOneToOneNodalMap();
+	//testSurfaceMeshOptimizer();
+	//testDeformableBody();
+	//testVTKTexture();
+	testMultiObjectWithTextures();
+	return 0;
+}
 
-    return 0;
+void testVTKTexture()
+{
+	// Parse command line arguments
+
+	std::string inputFilename = "../ETI/resources/OperatingRoom/cloth.obj";
+	std::string texturename = "../ETI/resources/TextureOR/cloth.jpg";
+
+	std::string inputFilename1 = "../ETI/resources/OperatingRoom/bed1.obj";
+	std::string texturename1 = "../ETI/resources/TextureOR/bed-1.jpg";
+
+	vtkSmartPointer<vtkOBJReader> reader =
+		vtkSmartPointer<vtkOBJReader>::New();
+	reader->SetFileName(inputFilename.c_str());
+	reader->Update();
+
+
+	vtkSmartPointer<vtkOBJReader> reader1 =
+		vtkSmartPointer<vtkOBJReader>::New();
+	reader1->SetFileName(inputFilename1.c_str());
+	reader1->Update();
+
+	// Visualize
+	vtkSmartPointer<vtkPolyDataMapper> mapper =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper->SetInputConnection(reader->GetOutputPort());
+
+	vtkSmartPointer<vtkPolyDataMapper> mapper1 =
+		vtkSmartPointer<vtkPolyDataMapper>::New();
+	mapper1->SetInputConnection(reader1->GetOutputPort());
+
+	vtkSmartPointer<vtkActor> actor =
+		vtkSmartPointer<vtkActor>::New();
+	actor->SetMapper(mapper);
+
+	vtkSmartPointer<vtkActor> actor1 =
+		vtkSmartPointer<vtkActor>::New();
+	actor1->SetMapper(mapper1);
+
+	vtkSmartPointer<vtkJPEGReader> jpgReader =
+		vtkSmartPointer<vtkJPEGReader>::New();
+	jpgReader->SetFileName(texturename.c_str());
+	jpgReader->Update();
+	vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+	texture->SetInputConnection(jpgReader->GetOutputPort());
+	texture->InterpolateOn();
+	actor->SetTexture(texture);
+
+	vtkSmartPointer<vtkJPEGReader> jpgReader1 =
+		vtkSmartPointer<vtkJPEGReader>::New();
+	jpgReader1->SetFileName(texturename1.c_str());
+	jpgReader1->Update();
+	vtkSmartPointer<vtkTexture> texture1 = vtkSmartPointer<vtkTexture>::New();
+	texture1->SetInputConnection(jpgReader1->GetOutputPort());
+	texture1->InterpolateOn();
+	actor1->SetTexture(texture1);
+
+	vtkSmartPointer<vtkRenderer> renderer =
+		vtkSmartPointer<vtkRenderer>::New();
+	renderer->AddActor(actor);
+	renderer->AddActor(actor1);
+	renderer->SetBackground(.3, .6, .3); // Background color green
+
+	vtkSmartPointer<vtkRenderWindow> renderWindow =
+		vtkSmartPointer<vtkRenderWindow>::New();
+	renderWindow->AddRenderer(renderer);
+
+	vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+		vtkSmartPointer<vtkRenderWindowInteractor>::New();
+	renderWindowInteractor->SetRenderWindow(renderWindow);
+
+	renderWindowInteractor->Start();
+
+}
+
+
+void testMultiObjectWithTextures()
+{
+	// SDK and Scene
+	auto sdk = std::make_shared<SimulationManager>();
+	auto scene = sdk->createNewScene("multiObjectWithTexturesTest");
+
+	// Read surface mesh
+	auto objMesh = imstk::MeshReader::read("../ETI/resources/OperatingRoom/cloth.obj");
+	auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
+	surfaceMesh->addTexture("../ETI/resources/TextureOR/cloth.jpg");
+
+	// Create object and add to scene
+	auto object = std::make_shared<imstk::VisualObject>("meshObject");
+	object->setVisualGeometry(surfaceMesh); // change to any mesh created above
+	scene->addSceneObject(object);
+
+	bool secondObject = true;
+	bool secondObjectTexture = false;
+
+	if (secondObject){
+		// Read surface mesh1
+		auto objMesh1 = imstk::MeshReader::read("../ETI/resources/OperatingRoom/bed1.obj");
+		auto surfaceMesh1 = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh1);
+		if (secondObjectTexture)
+			surfaceMesh1->addTexture("../ETI/resources/TextureOR/bed-1.jpg");
+
+		// Create object and add to scene
+		auto object1 = std::make_shared<imstk::VisualObject>("meshObject1");
+		object1->setVisualGeometry(surfaceMesh1); // change to any mesh created above
+		scene->addSceneObject(object1);
+	}
+	// Run
+	sdk->setCurrentScene("multiObjectWithTexturesTest");
+	sdk->startSimulation(true);
 }
 
 void testMultiTextures()
