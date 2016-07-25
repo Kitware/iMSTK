@@ -25,11 +25,17 @@
 #include "imstkCollidingObject.h"
 #include "imstkTrackingController.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class Geometry;
 class GeometryMap;
 
+///
+/// \class VirtualCouplingObject
+///
+/// \brief
+///
 class VirtualCouplingObject : public CollidingObject, public TrackingController
 {
 public:
@@ -66,9 +72,13 @@ public:
     void applyForces();
 
     ///
-    /// \brief Get/Set the force to apply to the device
+    /// \brief Get the force to apply to the device
     ///
     const Vec3d& getForce() const;
+
+    ///
+    /// \brief Set the force to apply to the device
+    ///
     void setForce(Vec3d force);
 
 protected:
@@ -77,6 +87,6 @@ protected:
     Vec3d m_force = Vec3d::Zero();
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkVirtualCouplingObject_h

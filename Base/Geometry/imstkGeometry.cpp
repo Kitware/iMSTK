@@ -21,7 +21,8 @@
 
 #include "imstkGeometry.h"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 Geometry::print() const
@@ -169,4 +170,4 @@ Geometry::getTypeName() const
     }
 }
 
-}
+} // imstk

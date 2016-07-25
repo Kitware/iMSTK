@@ -21,7 +21,8 @@
 
 #include "imstkGeometryMap.h"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 GeometryMap::mute()
@@ -98,4 +99,5 @@ GeometryMap::getSlave() const
 {
     return m_slave;
 }
-}
+
+} // imstk

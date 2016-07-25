@@ -22,15 +22,23 @@
 #ifndef imstkPenaltyRigidCH_h
 #define imstkPenaltyRigidCH_h
 
-#include "imstkCollisionHandling.h"
-
+// std library
 #include <memory>
 
-namespace imstk {
+// imstk
+#include "imstkCollisionHandling.h"
+
+namespace imstk
+{
 
 class CollidingObject;
 class CollisionData;
 
+///
+/// \class PenaltyRigidCH
+///
+/// \brief Penalty-to-rigid collision handling
+///
 class PenaltyRigidCH : public CollisionHandling
 {
 public:
@@ -59,9 +67,10 @@ public:
 
 private:
 
-    std::shared_ptr<CollidingObject> m_obj;
+    std::shared_ptr<CollidingObject> m_obj;    ///>
 
 };
+
 }
 
 #endif // ifndef imstkPenaltyRigidCH_h

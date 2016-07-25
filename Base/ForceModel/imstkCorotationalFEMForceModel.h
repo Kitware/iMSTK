@@ -35,6 +35,11 @@
 namespace imstk
 {
 
+///
+/// \class CorotationalFEMForceModel
+///
+/// \brief Force model for corotational based finite elements formulation
+///
 class CorotationalFEMForceModel : public InternalForceModel
 {
 public:

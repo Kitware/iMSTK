@@ -24,15 +24,24 @@
 
 #include <memory>
 
-namespace imstk {
+namespace imstk
+{
 
 class CollidingObject;
 class CollisionData;
 
+///
+/// \class CollisionDetection
+///
+/// \brief Base class for all collsion detection classes
+///
 class CollisionDetection
 {
 public:
 
+    ///
+    /// \brief Type of the collision detection
+    ///
     enum class Type
     {
         PlaneToSphere,
@@ -78,10 +87,11 @@ public:
 
 protected:
 
-    Type m_type;              //!< Collision detection algorithm type
-    CollisionData& m_colData; //!< Collision data
+    Type m_type;              ///< Collision detection algorithm type
+    CollisionData& m_colData; ///< Collision data
 
 };
+
 }
 
 #endif // ifndef imstkCollisionDetection_h

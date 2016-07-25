@@ -26,10 +26,18 @@
 
 #include "vtkInteractorStyleTrackballCamera.h"
 
-namespace imstk {
+namespace imstk
+{
+
 class SimulationManager;
 
 using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
+
+///
+/// \class classname
+///
+/// \brief
+///
 class InteractorStyle : public vtkBaseInteractorStyle
 {
 public:
@@ -37,25 +45,72 @@ public:
     static InteractorStyle *New();
     vtkTypeMacro(InteractorStyle, vtkBaseInteractorStyle);
 
+    ///
+    /// \brief
+    ///
     virtual void OnTimer() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnChar() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnMouseMove() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnLeftButtonDown() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnLeftButtonUp() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnMiddleButtonDown() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnMiddleButtonUp() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnRightButtonDown() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnRightButtonUp() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnMouseWheelForward() override;
+
+    ///
+    /// \brief
+    ///
     virtual void OnMouseWheelBackward() override;
 
+    ///
+    /// \brief
+    ///
     void setSimulationManager(SimulationManager* simManager);
 
 private:
 
-    SimulationManager* m_simManager;
+    SimulationManager* m_simManager;    ///>
 
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkInteractorStyle_h

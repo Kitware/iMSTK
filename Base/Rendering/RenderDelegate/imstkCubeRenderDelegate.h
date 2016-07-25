@@ -29,20 +29,36 @@
 
 #include "vtkCubeSource.h"
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class CubeRenderDelegate
+///
+/// \brief Cube render delegate
+///
 class CubeRenderDelegate : public RenderDelegate
 {
 public:
-
-    ~CubeRenderDelegate() = default;
+    ///
+    /// \brief Constructor
+    ///
     CubeRenderDelegate(std::shared_ptr<Cube>cube);
 
+    ///
+    /// \brief Destructor
+    ///
+    ~CubeRenderDelegate() = default;
+
+    ///
+    /// \brief Get the geometry
+    ///
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-
-    std::shared_ptr<Cube> m_geometry;
+    std::shared_ptr<Cube> m_geometry;   ///> Geometry
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkCubeRenderDelegate_h

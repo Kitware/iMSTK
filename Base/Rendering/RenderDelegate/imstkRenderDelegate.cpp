@@ -39,7 +39,9 @@
 #include "vtkPolyDataNormals.h"
 #include "vtkTransform.h"
 
-namespace imstk {
+namespace imstk
+{
+
 std::shared_ptr<RenderDelegate>
 RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 {
@@ -130,4 +132,5 @@ RenderDelegate::updateActorTransform()
 
     m_actor->SetUserTransform(m_transform);
 }
-}
+
+} // imstk

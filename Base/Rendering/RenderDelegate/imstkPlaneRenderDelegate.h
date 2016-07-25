@@ -29,20 +29,37 @@
 
 #include "vtkPlaneSource.h"
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class PlaneRenderDelegate
+///
+/// \brief
+///
 class PlaneRenderDelegate : public RenderDelegate
 {
 public:
-
-    ~PlaneRenderDelegate() = default;
+    ///
+    /// \brief
+    ///
     PlaneRenderDelegate(std::shared_ptr<Plane>plane);
 
+    ///
+    /// \brief
+    ///
+    ~PlaneRenderDelegate() = default;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
 
-    std::shared_ptr<Plane> m_geometry;
+    std::shared_ptr<Plane> m_geometry;  ///> Geometry
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkPlaneRenderDelegate_h

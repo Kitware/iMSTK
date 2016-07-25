@@ -25,7 +25,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 Module::start()
 {
@@ -132,4 +134,5 @@ Module::setLoopDelay(int milliseconds)
 {
     m_loopDelay = milliseconds;
 }
+
 }

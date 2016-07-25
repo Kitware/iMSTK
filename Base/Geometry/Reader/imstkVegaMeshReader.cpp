@@ -20,7 +20,6 @@
    =========================================================================*/
 
 #include "imstkVegaMeshReader.h"
-
 #include "imstkMeshReader.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
@@ -121,4 +120,5 @@ VegaMeshReader::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
         cells.emplace_back(cell);
     }
 }
-}
+
+} // imstk

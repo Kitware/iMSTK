@@ -138,4 +138,4 @@ CollisionGraph::getInteractionPairMap() const
     return m_interactionPairMap;
 }
 
-}
+} // imstk

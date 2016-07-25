@@ -29,20 +29,36 @@
 
 #include "vtkUnstructuredGrid.h"
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class TetrahedralMeshRenderDelegate
+///
+/// \brief
+///
 class TetrahedralMeshRenderDelegate : public RenderDelegate
 {
 public:
-
+    ///
+    /// \brief
+    ///
     ~TetrahedralMeshRenderDelegate() = default;
+
+    ///
+    /// \brief
+    ///
     TetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh);
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
-
-    std::shared_ptr<TetrahedralMesh> m_geometry;
+    std::shared_ptr<TetrahedralMesh> m_geometry;    ///>
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkTetrahedralMeshRenderDelegate_h

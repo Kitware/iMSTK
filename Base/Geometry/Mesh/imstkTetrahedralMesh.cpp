@@ -294,4 +294,5 @@ TetrahedralMesh::getNumTetrahedra() const
 {
     return m_tetrahedraVertices.size();
 }
-}
+
+} // imstk

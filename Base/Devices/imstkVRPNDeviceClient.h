@@ -34,7 +34,8 @@
 #include <vrpn_Button.h>
 #include <vrpn_ForceDevice.h>
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class VRPNDeviceClient
@@ -44,16 +45,32 @@ class VRPNDeviceClient : public DeviceClient
 {
 public:
 
-    VRPNDeviceClient(std::string name, std::string ip):
-        DeviceClient(name, ip)
+    ///
+    /// \brief Constructor
+    ///
+    VRPNDeviceClient(std::string name, std::string ip):DeviceClient(name, ip)
     {}
 
-    virtual ~VRPNDeviceClient() {}
+    ///
+    /// \brief Destructor
+    ///
+    virtual ~VRPNDeviceClient()
+    {}
 
 protected:
-
+    ///
+    /// \brief Initialize device client module
+    ///
     void initModule() override;
+
+    ///
+    /// \brief Run the device client
+    ///
     void runModule() override;
+
+    ///
+    /// \brief Clean the device client module
+    ///
     void cleanUpModule() override;
 
 private:

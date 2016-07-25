@@ -25,7 +25,8 @@
 #include "g3log/g3log.hpp"
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class Geometry
@@ -35,6 +36,9 @@ namespace imstk {
 class Geometry
 {
 public:
+    ///
+    /// \brief Enumeration for the geometry type
+    ///
     enum class Type
     {
         Plane,

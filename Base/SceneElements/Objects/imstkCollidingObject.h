@@ -26,7 +26,8 @@
 
 #include "imstkSceneObject.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class Geometry;
 class GeometryMap;
@@ -67,6 +68,7 @@ protected:
 };
 
 using StaticObject = CollidingObject;
-}
+
+}// imstk
 
 #endif // ifndef imstkCollidingObject_h

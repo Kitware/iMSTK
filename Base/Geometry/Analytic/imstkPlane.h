@@ -22,9 +22,11 @@
 #ifndef imstkPlane_h
 #define imstkPlane_h
 
+// imstk
 #include "imstkGeometry.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class Plane
@@ -34,7 +36,9 @@ namespace imstk {
 class Plane : public Geometry
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     Plane(const Vec3d & position = WORLD_ORIGIN,
           const Vec3d & normal = UP_VECTOR,
           const double& width = 1) :
@@ -44,6 +48,9 @@ public:
         m_width(width)
     {}
 
+    ///
+    /// \brief Default destructor
+    ///
     ~Plane() = default;
 
     ///
@@ -78,9 +85,9 @@ public:
     void setWidth(const double& width);
 
 protected:
-
     double m_width; ///> Width of the plane (for display)
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkPlane_h

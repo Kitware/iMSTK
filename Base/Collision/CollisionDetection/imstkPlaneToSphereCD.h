@@ -22,16 +22,22 @@
 #ifndef imstkPlaneToSphereCD_h
 #define imstkPlaneToSphereCD_h
 
-#include "imstkCollisionDetection.h"
-
 #include <memory>
 
-namespace imstk {
+#include "imstkCollisionDetection.h"
+
+namespace imstk
+{
 
 class Plane;
 class Sphere;
 class CollisionData;
 
+///
+/// \class PlaneToSphereCD
+///
+/// \brief Plane to sphere collision detection
+///
 class PlaneToSphereCD : public CollisionDetection
 {
 public:
@@ -59,10 +65,10 @@ public:
 
 private:
 
-    std::shared_ptr<Plane> m_planeA;
-    std::shared_ptr<Sphere> m_sphereB;
-
+    std::shared_ptr<Plane> m_planeA;    ///>
+    std::shared_ptr<Sphere> m_sphereB;  ///>
 };
+
 }
 
 #endif // ifndef imstkPlaneToSphereCD_h

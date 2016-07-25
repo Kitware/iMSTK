@@ -28,7 +28,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 VRPNDeviceServer::addDevice(std::string deviceName, DeviceType deviceType, size_t id)
 {
@@ -115,4 +117,5 @@ VRPNDeviceServer::cleanUpModule()
     m_serverConnection->removeReference();
     //delete(m_connection);
 }
-}
+
+} // imstk

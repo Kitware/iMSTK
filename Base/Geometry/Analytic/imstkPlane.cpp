@@ -21,7 +21,8 @@
 
 #include "imstkPlane.h"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 Plane::print() const
@@ -59,4 +60,5 @@ Plane::setWidth(const double& width)
 {
     m_width = width;
 }
-}
+
+} // imstk

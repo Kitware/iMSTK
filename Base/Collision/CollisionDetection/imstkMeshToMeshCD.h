@@ -22,17 +22,24 @@
 #ifndef imstkMeshToMeshCD_h
 #define imstkMeshToMeshCD_h
 
-#include "imstkCollisionDetection.h"
-
-#include "DeformModel.h"
-
+// std library
 #include <memory>
 
-namespace imstk {
+// imstk
+#include "imstkCollisionDetection.h"
+#include "DeformModel.h"
+
+namespace imstk
+{
 
 class SurfaceMesh;
 class CollisionData;
 
+///
+/// \class MeshToMeshCD
+///
+/// \brief Base class for mesh-to-mesh collision detection
+///
 class MeshToMeshCD : public CollisionDetection
 {
 public:
@@ -73,11 +80,12 @@ private:
     static void VFCallbackB(unsigned int fidB, unsigned int vidA,
                             float t, void *userdata);
 
-    std::shared_ptr<SurfaceMesh> m_meshA;
-    std::shared_ptr<SurfaceMesh> m_meshB;
-    std::shared_ptr<DeformModel> m_modelA;
-    std::shared_ptr<DeformModel> m_modelB;
+    std::shared_ptr<SurfaceMesh> m_meshA;   ///> Mesh A
+    std::shared_ptr<SurfaceMesh> m_meshB;   ///> Mesh B
+    std::shared_ptr<DeformModel> m_modelA;  ///>
+    std::shared_ptr<DeformModel> m_modelB;  ///>
 };
+
 }
 
 #endif // ifndef imstkMeshToMeshCD_h

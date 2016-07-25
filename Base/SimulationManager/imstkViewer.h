@@ -33,15 +33,22 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
-
-namespace imstk {
+namespace imstk
+{
 
 class SimulationManager;
 
+///
+/// \class Viewer
+///
+/// \brief Viewer
+///
 class Viewer
 {
 public:
-
+    ///
+    /// \brief
+    ///
     Viewer(SimulationManager* manager = nullptr)
     {
         m_interactorStyle->setSimulationManager(manager);
@@ -50,18 +57,49 @@ public:
         m_vtkRenderWindow->SetSize(1000,800);
     }
 
+    ///
+    /// \brief
+    ///
     ~Viewer() = default;
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> getCurrentScene() const;
+
+    ///
+    /// \brief
+    ///
     void setCurrentScene(std::shared_ptr<Scene>scene);
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Renderer> getCurrentRenderer() const;
 
+    ///
+    /// \brief
+    ///
     void setRenderingMode(Renderer::Mode mode);
+
+    ///
+    /// \brief
+    ///
     void startRenderingLoop();
+
+    ///
+    /// \brief
+    ///
     void endRenderingLoop();
 
+    ///
+    /// \brief
+    ///
     vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
 
+    ///
+    /// \brief
+    ///
     const bool& isRendering() const;
 
 protected:
@@ -72,6 +110,7 @@ protected:
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
     bool m_running = false;
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkViewer_h

@@ -25,13 +25,20 @@
 #include <vector>
 #include <unordered_map>
 
+// imstk
 #include "imstkCollidingObject.h"
 #include "imstkInteractionPair.h"
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionHandling.h"
 
-namespace imstk {
+namespace imstk
+{
 
+///
+/// \class CollisionGraph
+///
+/// \brief
+///
 class CollisionGraph
 {
 public:
@@ -39,9 +46,13 @@ public:
     using InteractionPairPtr = std::shared_ptr<InteractionPair>;
 
     ///
-    /// \brief Constructor/Destructor
+    /// \brief Default constructor
     ///
     CollisionGraph() = default;
+
+    ///
+    /// \brief Default destructor
+    ///
     ~CollisionGraph() = default;
 
     ///
@@ -72,17 +83,13 @@ public:
     ///
     /// \brief Returns a map of all interaction pairs per object
     ///
-    const std::unordered_map<
-      CollidingObjectPtr,
-      std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
+    const std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
 
 protected:
 
     std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
-    std::unordered_map<
-      CollidingObjectPtr,
-      std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
+    std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
 };
-}
 
+}
 #endif // ifndef imstkCollisionGraph_h

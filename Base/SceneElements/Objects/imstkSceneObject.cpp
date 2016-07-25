@@ -83,4 +83,5 @@ SceneObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
 {
     m_collidingToVisualMap = map;
 }
-}
+
+} // imstk

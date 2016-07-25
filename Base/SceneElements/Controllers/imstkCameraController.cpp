@@ -25,7 +25,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 void
 CameraController::initModule()
@@ -66,7 +67,6 @@ CameraController::runModule()
 
 void
 CameraController::cleanUpModule()
-{
+{}
 
-}
-}
+} // imstk

@@ -100,6 +100,6 @@ public:
     UpdateFunctionType m_FUpdate;
 };
 
-}
+} // imstk
 
 #endif // imstkNonlinearSystem_h

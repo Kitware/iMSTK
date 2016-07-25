@@ -25,7 +25,9 @@
 
 #include "imstkRenderDelegate.h"
 
-namespace imstk {
+namespace imstk
+{
+
 std::shared_ptr<Scene>
 Viewer::getCurrentScene() const
 {
@@ -138,4 +140,5 @@ Viewer::isRendering() const
 {
     return m_running;
 }
-}
+
+} //

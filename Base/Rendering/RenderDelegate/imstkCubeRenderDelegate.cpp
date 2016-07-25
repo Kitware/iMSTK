@@ -23,7 +23,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 CubeRenderDelegate::CubeRenderDelegate(std::shared_ptr<Cube>cube) :
     m_geometry(cube)
 {
@@ -45,4 +47,5 @@ CubeRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-}
+
+} // imstk

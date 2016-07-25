@@ -27,52 +27,101 @@
 
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class CameraController;
 class DeviceClient;
 
+///
+/// \class Camera
+///
+/// \brief Generic camera class
+///
 class Camera
 {
 public:
-
+    ///
+    /// \brief
+    ///
     Camera() {}
+
+    ///
+    /// \brief
+    ///
     ~Camera() = default;
 
+    ///
+    /// \brief
+    ///
     const Vec3d& getPosition() const;
+
+    ///
+    /// \brief
+    ///
     void setPosition(const Vec3d& p);
     void setPosition(const double& x,
                      const double& y,
                      const double& z);
 
+    ///
+    /// \brief
+    ///
     const Vec3d& getFocalPoint() const;
+
+    ///
+    /// \brief
+    ///
     void setFocalPoint(const Vec3d& p);
     void setFocalPoint(const double& x,
                        const double& y,
                        const double& z);
 
+    ///
+    /// \brief
+    ///
     const Vec3d& getViewUp() const;
+
+    ///
+    /// \brief
+    ///
     void setViewUp(const Vec3d& v);
+
+    ///
+    /// \brief
+    ///
     void setViewUp(const double& x,
                    const double& y,
                    const double& z);
-
+    ///
+    /// \brief
+    ///
     const double& getViewAngle() const;
+
+    ///
+    /// \brief
+    ///
     void setViewAngle(const double& angle);
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<CameraController> getController() const;
+
+    ///
+    /// \brief
+    ///
     void setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling = 1.0);
 
 protected:
+    std::shared_ptr<CameraController> m_cameraController;   ///>
 
-    std::shared_ptr<CameraController> m_cameraController;
-
-    Vec3d m_position = Vec3d(0,2,5);
-    Vec3d m_focalPoint = WORLD_ORIGIN;
-    Vec3d m_viewUp = UP_VECTOR;
-    double m_viewAngle = 60;
-
+    Vec3d m_position = Vec3d(0,2,5);    ///>
+    Vec3d m_focalPoint = WORLD_ORIGIN;  ///>
+    Vec3d m_viewUp = UP_VECTOR;         ///>
+    double m_viewAngle = 60;            ///>
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkCamera_h

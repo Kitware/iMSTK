@@ -47,4 +47,4 @@ DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel
     m_dynamicalModel = dynaDefModel;
 }
 
-}
+} // imstk

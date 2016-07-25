@@ -35,7 +35,8 @@
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class VTKMeshReader
@@ -46,7 +47,14 @@ class VTKMeshReader
 {
 public:
 
+    ///
+    /// \brief Default constructor
+    ///
     VTKMeshReader() = default;
+
+    ///
+    /// \brief Default destructor
+    ///
     ~VTKMeshReader() = default;
 
     ///
@@ -101,6 +109,7 @@ protected:
     static void copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap);
 
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkVTKMeshReader_h

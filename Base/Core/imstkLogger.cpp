@@ -21,7 +21,9 @@
 
 #include "imstkLogger.h"
 
-namespace imstk {
+namespace imstk
+{
+
 stdSink::FG_Color
 stdSink::GetColor(const LEVELS level) const
 {
@@ -64,4 +66,5 @@ LogUtility::createLogger(std::string name, std::string path)
         std2::make_unique<stdSink>(), &stdSink::ReceiveLogMessage);
     g3::initializeLogging(m_g3logWorker.get());
 }
+
 }

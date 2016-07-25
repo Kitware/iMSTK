@@ -21,7 +21,9 @@
 
 #include "imstkHexahedralMesh.h"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 HexahedralMesh::initialize(const std::vector<Vec3d>& vertices,
                            const std::vector<HexaArray>& hexahedra,
@@ -145,4 +147,5 @@ HexahedralMesh::getNumHexahedra() const
 {
     return m_hexahedraVertices.size();
 }
-}
+
+} // imstk

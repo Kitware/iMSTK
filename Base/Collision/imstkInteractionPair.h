@@ -22,16 +22,24 @@
 #ifndef imstkInteractionPair_h
 #define imstkInteractionPair_h
 
+// std library
 #include <map>
 #include <memory>
 
+// imstk
 #include "imstkCollidingObject.h"
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionData.h"
 #include "imstkCollisionHandling.h"
 
-namespace imstk {
+namespace imstk
+{
 
+///
+/// \class InteractionPair
+///
+/// \brief This class implements collision interaction between two given scene objects
+///
 class InteractionPair
 {
     using ObjectsPair = std::pair<std::shared_ptr<CollidingObject>, std::shared_ptr<CollidingObject>>;
@@ -74,14 +82,15 @@ public:
 
 protected:
 
-    ObjectsPair m_objects;                             //!< Colliding objects
-    std::shared_ptr<CollisionDetection> m_colDetect;   //!< Collision detection algorithm
-    CollisionData m_colData;                           //!< Common Collision Data
-    std::shared_ptr<CollisionHandling> m_colHandlingA; //!< Collision handling algorithm for A
-    std::shared_ptr<CollisionHandling> m_colHandlingB; //!< Collision handling algorithm for B
+    ObjectsPair m_objects;                             ///< Colliding objects
+    std::shared_ptr<CollisionDetection> m_colDetect;   ///< Collision detection algorithm
+    CollisionData m_colData;                           ///< Common Collision Data
+    std::shared_ptr<CollisionHandling> m_colHandlingA; ///< Collision handling algorithm for A
+    std::shared_ptr<CollisionHandling> m_colHandlingB; ///< Collision handling algorithm for B
 
     bool m_valid;
 };
+
 }
 
 #endif // ifndef imstkInteractionPair_h

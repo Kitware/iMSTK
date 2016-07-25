@@ -28,7 +28,8 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 HDAPIDeviceClient::initModule()
@@ -47,13 +48,13 @@ HDAPIDeviceClient::initModule()
 
     // Calibration
     if (hdCheckCalibration() != HD_CALIBRATION_OK)
-    {   
+    {
         LOG(INFO) << "Move " << this->getName() << " in its dock to calibrate it.";
         while (hdCheckCalibration() != HD_CALIBRATION_OK)
         {
         }
     }
-    
+
     // Success
 	LOG(INFO) << this->getName() << " successfully initialized.";
     hdEnable(HD_FORCE_OUTPUT);
@@ -101,5 +102,6 @@ HDAPIDeviceClient::hapticCallback(void* pData)
 
     return HD_CALLBACK_CONTINUE;
 }
-}
+
+} // imstk
 #endif // ifdef iMSTK_USE_OPENHAPTICS

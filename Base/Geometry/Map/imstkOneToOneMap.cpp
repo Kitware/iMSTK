@@ -160,4 +160,4 @@ OneToOneMap::setSlave(std::shared_ptr<Geometry> slave)
     GeometryMap::setSlave(slave);
 }
 
-}
+} // imstk

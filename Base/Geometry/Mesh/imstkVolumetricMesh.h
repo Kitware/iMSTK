@@ -30,7 +30,8 @@
 // Vega
 #include "volumetricMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class VolumetricMesh
@@ -41,6 +42,9 @@ class VolumetricMesh : public Mesh
 {
 public:
 
+    ///
+    /// \brief Default destructor
+    ///
     ~VolumetricMesh() = default;
 
     ///
@@ -76,6 +80,7 @@ protected:
     std::shared_ptr<vega::VolumetricMesh> m_attachedVegaMesh = nullptr; ///> Attached vega mesh
 
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkVolumetricMesh_h

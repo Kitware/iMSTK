@@ -19,15 +19,16 @@
 
    =========================================================================*/
 
+// imstk
 #include "imstkSceneManager.h"
-
 #include "imstkCameraController.h"
 #include "imstkVirtualCouplingObject.h"
 #include "imstkDynamicObject.h"
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
 
 std::shared_ptr<Scene>
 SceneManager::getScene()
@@ -111,4 +112,4 @@ SceneManager::startModuleInNewThread(std::shared_ptr<Module> module)
     m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
 
-}
+} // imstk

@@ -97,6 +97,6 @@ private:
     Eigen::ConjugateGradient<SparseMatrixd> cgSolver;
 };
 
-}
+} // imstk
 
-#endif // SOLVERS_SPARSE_CG
+#endif // imstkConjugateGradient_h

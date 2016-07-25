@@ -28,8 +28,16 @@
 #include "g3log/logmessage.hpp"
 #include "g3log/logworker.hpp"
 
-namespace imstk {
-struct stdSink {
+namespace imstk
+{
+
+///
+/// \struct stdSink
+///
+/// \brief
+///
+struct stdSink
+{
     // Linux xterm color
     // http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
     enum FG_Color { YELLOW = 33, RED = 31, GREEN = 32, WHITE = 97 };
@@ -38,13 +46,19 @@ struct stdSink {
     void ReceiveLogMessage(g3::LogMessageMover logEntry);
 };
 
-struct LogUtility {
+///
+/// \struct LogUtility
+///
+/// \brief
+///
+struct LogUtility
+{
     void createLogger(std::string name, std::string path);
 
     std::unique_ptr<g3::LogWorker>                m_g3logWorker;
     std::unique_ptr<g3::SinkHandle<g3::FileSink> >m_fileSinkHandle;
     std::unique_ptr<g3::SinkHandle<stdSink> >     m_stdSinkHandle;
 };
-}
 
+}
 #endif // ifndef imstkLogUtility_h

@@ -21,7 +21,9 @@
 
 #include "imstkCollidingObject.h"
 
-namespace imstk {
+namespace imstk
+{
+
 std::shared_ptr<Geometry>
 CollidingObject::getCollidingGeometry() const
 {
@@ -45,4 +47,5 @@ CollidingObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
 {
     m_collidingToVisualMap = map;
 }
-}
+
+} // imstk

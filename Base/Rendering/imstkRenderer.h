@@ -31,16 +31,24 @@
 #include "vtkCamera.h"
 #include "vtkLight.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class Scene;
 class Camera;
 class RenderDelegate;
 
+///
+/// \class Renderer
+///
+/// \brief
+///
 class Renderer
 {
 public:
-
+    ///
+    /// \brief Enumerations for the render mode
+    ///
     enum Mode
     {
         EMPTY,
@@ -48,18 +56,45 @@ public:
         SIMULATION
     };
 
+    ///
+    /// \brief Constructor
+    ///
     Renderer(std::shared_ptr<Scene> scene);
+
+    ///
+    /// \brief Default destructor
+    ///
     ~ Renderer() = default;
 
+    ///
+    /// \brief
+    ///
     void setup(Mode mode);
+
+    ///
+    /// \brief
+    ///
     void updateSceneCamera(std::shared_ptr<Camera> imstkCam);
+
+    ///
+    /// \brief
+    ///
     void updateRenderDelegates();
 
+    ///
+    /// \brief
+    ///
     vtkSmartPointer<vtkRenderer> getVtkRenderer() const;
 
 protected:
-
+    ///
+    /// \brief
+    ///
     void removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
+
+    ///
+    /// \brief
+    ///
     void addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList);
 
     vtkSmartPointer<vtkRenderer> m_vtkRenderer = vtkSmartPointer<vtkRenderer>::New();

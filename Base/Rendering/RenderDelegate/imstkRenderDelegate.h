@@ -31,25 +31,57 @@
 #include "vtkActor.h"
 #include "vtkTransform.h"
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class RenderDelegate
+///
+/// \brief Base class for render delegates
+///
 class RenderDelegate
 {
 public:
 
+    ///
+    /// \brief Default destructor
+    ///
     ~RenderDelegate() = default;
 
+    ///
+    /// \brief
+    ///
     static std::shared_ptr<RenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
 
+    ///
+    /// \brief
+    ///
     void setActorMapper(vtkAlgorithmOutput *source);
 
+    ///
+    /// \brief
+    ///
     virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+
+    ///
+    /// \brief
+    ///
     vtkSmartPointer<vtkActor> getVtkActor() const;
 
+    ///
+    /// \brief
+    ///
     virtual void update();
+
+    ///
+    /// \brief
+    ///
     void updateActorTransform();
 
 protected:
-
+    ///
+    /// \brief Default constructor (protected)
+    ///
     RenderDelegate() {}
 
     vtkSmartPointer<vtkActor> m_actor = vtkSmartPointer<vtkActor>::New();

@@ -22,11 +22,11 @@
 #ifndef imstkSceneObject_h
 #define imstkSceneObject_h
 
-#include "imstkGeometry.h"
-#include "imstkGeometryMap.h"
-
 #include <memory>
 #include <string>
+
+#include "imstkGeometry.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk
 {
@@ -109,6 +109,7 @@ protected:
 };
 
 using VisualObject = SceneObject;
-}
+
+} // imstk
 
 #endif // ifndef imstkSceneObject_h

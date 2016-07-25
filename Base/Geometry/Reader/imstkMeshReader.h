@@ -22,14 +22,20 @@
 #ifndef imstkMeshReader_h
 #define imstkMeshReader_h
 
+// std library
 #include <memory>
 #include <vector>
 #include <array>
 
+// imstk
 #include "imstkMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
+///
+/// \brief Enumeration the mesh file type
+///
 enum MeshFileType
 {
     UNKNOWN,
@@ -51,7 +57,14 @@ class MeshReader
 {
 public:
 
+    ///
+    /// \brief Constructor
+    ///
     MeshReader() = default;
+
+    ///
+    /// \brief Destructor
+    ///
     ~MeshReader() = default;
 
     ///
@@ -71,6 +84,7 @@ protected:
     static const MeshFileType getFileType(const std::string& filePath);
 
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkMeshReader_h
