@@ -4,6 +4,8 @@
 #include "imstkSceneObject.h"
 #include "imstkPbdModel.h"
 
+#include <stdarg.h>
+
 namespace imstk {
 
 ///
@@ -54,7 +56,7 @@ public:
         m_type = SceneObject::Type::Deformable;
     }
 
-    void init();
+    void init(int fem, ...);
 
 protected:
 

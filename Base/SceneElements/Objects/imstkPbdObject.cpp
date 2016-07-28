@@ -57,25 +57,66 @@ PbdObject::getNumOfDOF() const
     return numDOF;
 }
 
-void PbdObject::init()
+void PbdObject::init(int fem, ...)
 {
+    va_list args;
+    va_start(args, fem);
+
     m_pbdModel = std::make_shared<PositionBasedModel>();
     auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
     m_pbdModel->setModelGeometry(mesh.get());
-    m_pbdModel->setElasticModulus(100.0, 0.3);
-    Vec3d g(0.0,0.0,-9.8);
     auto state = m_pbdModel->getState();
-    state->setUniformMass(1.0);
+    char* gstring = va_arg(args,char*);
+    float x,y,z;
+    sscanf(gstring,"%f %f %f", &x, &y, &z);
+    Vec3d g(x,y,z);
     state->setGravity(g);
-    state->setTimeStep(1e-3);
-    int fixedPoints[] = {51,52,103,104,155,156,207,208};
-    for (int i = 0; i < sizeof(fixedPoints)/sizeof(int); ++i) {
-        state->setFixedPoint(fixedPoints[i]-1);
+    state->setUniformMass(va_arg(args,double));
+    state->setTimeStep(va_arg(args,double));
+    char *s = va_arg(args,char*);
+    while (1)
+    {
+        int idx = atoi(s);
+        state->setFixedPoint(idx-1);
+        while (*s != ' ' && *s != '\0') ++s;
+        if (*s == '\0') break; else ++s;
     }
-    m_pbdModel->initConstraints(PbdConstraint::Type::FEMTet);
-//    m_pbdModel->initConstraints(PbdConstraint::Type::Distance);
-//    m_pbdModel->initConstraints(PbdConstraint::Type::Volume);
-    m_pbdModel->setNumberOfInterations(20);
+
+    s = va_arg(args,char*);
+    int pos = 0;
+    while (1)
+    {
+        int len = 0;
+        while (s[pos+len] != ' ' && s[pos+len] != '\0') {
+            ++len;
+        }
+
+        if (strncmp("FEM",&s[pos],len)==0) {
+            m_pbdModel->initConstraints(PbdConstraint::Type::FEMTet);
+        }
+        else if (strncmp("Volume",&s[pos],len)==0) {
+            m_pbdModel->initConstraints(PbdConstraint::Type::Volume);
+        }
+        else if (strncmp("Distance",&s[pos],len)==0) {
+            m_pbdModel->initConstraints(PbdConstraint::Type::Distance);
+        }
+        else if (strncmp("Area",&s[pos],len)==0) {
+            m_pbdModel->initConstraints(PbdConstraint::Type::Area);
+        }
+        else if (strncmp("Dihedral",&s[pos],len)==0) {
+            m_pbdModel->initConstraints(PbdConstraint::Type::Dihedral);
+        }
+
+        if (s[pos+len] == '\0') break; else pos += len+1;
+    }
+
+    m_pbdModel->setNumberOfInterations(va_arg(args,int));
+    if (fem)
+    {
+        double YoungModulus = va_arg(args,double);
+        double PoissonRatio = va_arg(args,double);
+        m_pbdModel->setElasticModulus(YoungModulus, PoissonRatio);
+    }
 }
 
 }

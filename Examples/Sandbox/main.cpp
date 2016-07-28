@@ -70,7 +70,8 @@ void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
 void testDeformableBody();
-void testPbd();
+void testPbdVolume();
+void testPbdCloth();
 int main()
 {
     std::cout << "****************\n"
@@ -93,8 +94,8 @@ int main()
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
 //    testDeformableBody();
-    testPbd();
-
+//    testPbdVolume();
+    testPbdCloth();
     return 0;
 }
 
@@ -882,14 +883,14 @@ void testDeformableBody()
     sdk->setCurrentScene("DeformableBodyTest");
     sdk->startSimulation(true);
 }
-void testPbd()
+void testPbdVolume()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("beam3_tet.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -920,7 +921,15 @@ void testPbd()
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init();
+    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/1,
+                        /*Gravity*/"0 -9.8 0",
+                        /*Mass*/1.0,
+                        /*TimeStep*/0.001,
+                        /*FixedPoint*/"51 127 178",
+                        /*TypeofConstraint*/"FEM",
+                        /*NumberOfIterationInConstraintSolver*/5,
+                        /*YoungModulus*/100.0,
+                        /*PoissonRatio*/0.3);
     scene->addSceneObject(deformableObj);
 
 
@@ -935,4 +944,75 @@ void testPbd()
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
 
+}
+void testPbdCloth()
+{
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    // a. Construct a sample triangular mesh
+
+    // b. Add nodal data
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    std::vector<imstk::Vec3d> vertList;
+    double width = 10.0;
+    double height = 10.0;
+    int nRows = 20;
+    int nCols = 20;
+    vertList.resize(nRows*nCols);
+    const double dy = width / (double)(nCols - 1);
+    const double dx = height / (double)(nRows - 1);
+    for (int i = 0; i < nRows; i++)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            const double y = (double)dy*j;
+            const double x = (double)dx*i;
+            vertList[i*nCols + j] = Vec3d(x, 1.0, y);
+
+        }
+    }
+    surfMesh->setInitialVerticesPositions(vertList);
+    surfMesh->setVerticesPositions(vertList);
+
+    // c. Add connectivity data
+    std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+    for (int i = 0; i < nRows - 1; i++)
+    {
+        for (int j = 0; j < nCols - 1; j++)
+        {
+            imstk::SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { i*nCols + j, (i + 1)*nCols + j , i*nCols + j + 1 } };
+            tri[1] = { { (i + 1)*nCols + j + 1, i*nCols + j + 1, (i + 1)*nCols + j } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+
+    surfMesh->setTrianglesVertices(triangles);
+
+    auto visuMesh = std::make_shared<imstk::SurfaceMesh>();
+    visuMesh->setInitialVerticesPositions(vertList);
+    visuMesh->setVerticesPositions(vertList);
+    visuMesh->setTrianglesVertices(triangles);
+
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(surfMesh);
+    oneToOneNodalMap->setSlave(visuMesh);
+    oneToOneNodalMap->compute();
+
+    auto deformableObj = std::make_shared<PbdObject>("Cloth");
+    deformableObj->setVisualGeometry(visuMesh);
+    deformableObj->setPhysicsGeometry(surfMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/0,
+                        /*Gravity*/"0 -9.8 0",
+                        /*Mass*/1.0,
+                        /*TimeStep*/0.001,
+                        /*FixedPoint*/"1 20",
+                        /*TypeofConstraint*/"Distance Dihedral",
+                        /*NumberOfIterationInConstraintSolver*/5);
+    scene->addSceneObject(deformableObj);
+    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->startSimulation(true);
 }
