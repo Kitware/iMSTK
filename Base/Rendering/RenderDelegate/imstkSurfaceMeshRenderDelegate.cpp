@@ -83,7 +83,7 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
             double tuple[2] = {tcoord[0], tcoord[1]};
             vtkTCoords->InsertNextTuple(tuple);
         }
-        polydata->GetPointData()->AddArray(vtkTCoords);
+        polydata->GetPointData()->SetTCoords(vtkTCoords);
 
         // Read texture image
         auto imgReader = readerFactory->CreateImageReader2(tFileName.c_str());
@@ -105,6 +105,18 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
         m_actor->GetProperty()->SetTexture(unit, texture);
         unit++;
     }
+
+	// Update normals
+	auto normals = surfaceMesh->getPointDataArray("Normals");
+	auto vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
+	vtkNormals->SetNumberOfComponents(3);
+	vtkNormals->SetName("Normals");
+	for (auto const normal : normals)
+	{
+		double triple[3] = { normal[0], normal[1], normal[2] };
+		vtkNormals->InsertNextTuple(triple);
+	}
+	polydata->GetPointData()->SetNormals(vtkNormals);
 
     // Actor
     m_actor->SetMapper(mapper);
