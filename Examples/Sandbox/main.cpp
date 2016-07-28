@@ -50,6 +50,8 @@
 // logger
 #include "g3log/g3log.hpp"
 
+#include "imstkPbdObject.h"
+
 using namespace imstk;
 
 void testMultiTextures();
@@ -68,7 +70,7 @@ void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
 void testDeformableBody();
-
+void testPbd();
 int main()
 {
     std::cout << "****************\n"
@@ -81,7 +83,7 @@ int main()
     //testTwoFalcons();
     //testObjectController();
     //testCameraController();
-    //testViewer();
+//    testViewer();
     //testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
@@ -90,7 +92,8 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    testDeformableBody();
+//    testDeformableBody();
+    testPbd();
 
     return 0;
 }
@@ -802,7 +805,7 @@ void testDeformableBody()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -878,4 +881,58 @@ void testDeformableBody()
     // Run the simulation
     sdk->setCurrentScene("DeformableBodyTest");
     sdk->startSimulation(true);
+}
+void testPbd()
+{
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
+
+    // b. Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshReader::read("beam3_tet.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    // c. Extract the surface mesh
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    // d. Construct a map
+
+    // d.1 Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+
+    // d.2 Compute the map
+    oneToOneNodalMap->compute();
+
+    auto deformableObj = std::make_shared<PbdObject>("Beam");
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->init();
+    scene->addSceneObject(deformableObj);
+
+
+    auto planeGeom = std::make_shared<Plane>();
+    planeGeom->scale(40);
+    planeGeom->translate(0, -6, 0);
+    auto planeObj = std::make_shared<CollidingObject>("Plane");
+    planeObj->setVisualGeometry(planeGeom);
+    planeObj->setCollidingGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->startSimulation(true);
+
 }

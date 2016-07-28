@@ -6,6 +6,7 @@ imstk_add_library( SceneElements
   DEPENDS
     Core
     Geometry
+    Constraint
     Devices
 	TimeIntegrators
 	ForceModel
