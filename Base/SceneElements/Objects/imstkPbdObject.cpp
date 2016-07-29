@@ -27,6 +27,16 @@ PbdObject::setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map)
     m_physicsToCollidingGeomMap = map;
 }
 
+std::shared_ptr<GeometryMap> PbdObject::getCollidingToPhysicsMap() const
+{
+    return m_collidingToPhysicsGeomMap;
+}
+
+void PbdObject::setCollidingToPhysicsMap(std::shared_ptr<GeometryMap> map)
+{
+    m_collidingToPhysicsGeomMap = map;
+}
+
 std::shared_ptr<GeometryMap>
 PbdObject::getPhysicsToVisualMap() const
 {

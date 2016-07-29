@@ -17,6 +17,7 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
             LOG(WARNING) << "FEM Tetrahedral constraint should come with tetrahedral mesh";
             return false;
         }
+        LOG(INFO) << "Creating FEM constraints";
         // ok, now create constraints
         auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
         std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
@@ -35,6 +36,7 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
             LOG(WARNING) << "Volume constraint should come with volumetric mesh";
             return false;
         }
+        LOG(INFO) << "Creating Volume constraints";
         // ok, now create constraints
         auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
         std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
@@ -53,6 +55,7 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
             LOG(WARNING) << "Area constraint should come with a triangular mesh";
             return false;
         }
+        LOG(INFO) << "Creating Area constraints";
         // ok, now create constraints
         auto triMesh = static_cast<SurfaceMesh*>(m_mesh);
         std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
@@ -71,6 +74,7 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
             LOG(WARNING) << "Dihedral constraint should come with a triangular mesh";
             return false;
         }
+        LOG(INFO) << "Creating Dihedral constraints";
         // ok, now create constraints
         auto triMesh = static_cast<SurfaceMesh*>(m_mesh);
         std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
@@ -158,6 +162,7 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
         break;
     }
     case PbdConstraint::Type::Distance : {
+        LOG(INFO) << "Creating Distance constraints";
         if (m_mesh->getType() == Geometry::Type::TetrahedralMesh) {
             auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
             int nV = tetMesh->getNumVertices();

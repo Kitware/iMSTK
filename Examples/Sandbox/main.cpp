@@ -72,6 +72,7 @@ void testSurfaceMeshOptimizer();
 void testDeformableBody();
 void testPbdVolume();
 void testPbdCloth();
+void testPbdCollision();
 int main()
 {
     std::cout << "****************\n"
@@ -95,7 +96,8 @@ int main()
     //testSurfaceMeshOptimizer();
 //    testDeformableBody();
 //    testPbdVolume();
-    testPbdCloth();
+//    testPbdCloth();
+    testPbdCollision();
     return 0;
 }
 
