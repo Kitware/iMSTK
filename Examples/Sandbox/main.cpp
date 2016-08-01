@@ -83,6 +83,7 @@ void testSurfaceMeshOptimizer();
 void testDeformableBody();
 void testVTKTexture();
 void testMultiObjectWithTextures();
+void testTwoOmnis();
 
 int main()
 {
@@ -108,6 +109,7 @@ int main()
 	//testDeformableBody();
 	//testVTKTexture();
 	testMultiObjectWithTextures();
+	//testTwoOmnis();
 	return 0;
 }
 
@@ -203,7 +205,7 @@ void testMultiObjectWithTextures()
 	scene->addSceneObject(object);
 
 	bool secondObject = true;
-	bool secondObjectTexture = false;
+	bool secondObjectTexture = true;
 
 	if (secondObject){
 		// Read surface mesh1
@@ -219,7 +221,7 @@ void testMultiObjectWithTextures()
 	}
 	// Run
 	sdk->setCurrentScene("multiObjectWithTexturesTest");
-	sdk->startSimulation(true);
+	sdk->startSimulation(false);
 }
 
 void testMultiTextures()
@@ -421,6 +423,54 @@ void testTwoFalcons()
     sdk->startSimulation(true);
 }
 
+void testTwoOmnis(){
+	// SDK and Scene
+	auto sdk = std::make_shared<imstk::SimulationManager>();
+	auto scene = sdk->createNewScene("OmnisTestScene");
+
+	// Device clients
+	auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+	sdk->addDeviceClient(client0);
+	auto client1 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 2");
+	sdk->addDeviceClient(client1);
+
+	//// Plane
+	auto planeGeom = std::make_shared<imstk::Plane>();
+	planeGeom->scale(50);
+	planeGeom->translate(imstk::FORWARD_VECTOR * 15);
+	auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+	planeObj->setVisualGeometry(planeGeom);
+	scene->addSceneObject(planeObj);
+
+	// Sphere0
+	auto sphere0Geom = std::make_shared<imstk::Sphere>();
+	sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
+	sphere0Geom->scale(1);
+	auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 0.05);
+	sphere0Obj->setVisualGeometry(sphere0Geom);
+	sphere0Obj->setCollidingGeometry(sphere0Geom);
+	scene->addSceneObject(sphere0Obj);
+
+
+	// Sphere1
+	auto sphere1Geom = std::make_shared<imstk::Sphere>();
+	sphere1Geom->setPosition(imstk::Vec3d(-2, 2.5, 0));
+	sphere1Geom->scale(1);
+	auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1, 0.05);
+	sphere1Obj->setVisualGeometry(sphere1Geom);
+	sphere1Obj->setCollidingGeometry(sphere1Geom);
+	scene->addSceneObject(sphere1Obj);
+
+	// Update Camera position
+	auto cam = scene->getCamera();
+	cam->setPosition(imstk::Vec3d(0, 0, 10));
+	cam->setFocalPoint(sphere0Geom->getPosition());
+
+	// Run
+	sdk->setCurrentScene("OmnisTestScene");
+	sdk->startSimulation(false);
+}
+
 void testObjectController()
 {
 #ifdef iMSTK_USE_OPENHAPTICS
@@ -448,7 +498,7 @@ void testObjectController()
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");
-    sdk->startSimulation(true);
+    sdk->startSimulation(false);
 #endif
 }
 

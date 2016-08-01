@@ -11,6 +11,12 @@
 #include "imstkSurfaceMesh.h"
 #include "g3log/g3log.hpp"
 
+// Devices
+#include "imstkHDAPIDeviceClient.h"
+
+#include "imstkSphere.h"
+#include "imstkVirtualCouplingObject.h"
+
 #include "ETI.h"
 
 using namespace imstk;
@@ -56,8 +62,22 @@ int main()
 	if (loadModel)
 		initializeHumanModel(modelMesh, staticModelSurfaceMesh, model, scene);
 
+	//// Device clients
+	//auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+	//sdk->addDeviceClient(client0);
 
-	
+
+	//// Sphere0
+	//auto sphere0Geom = std::make_shared<imstk::Sphere>();
+	//sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
+	//sphere0Geom->scale(1);
+	//auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 0.05);
+	//sphere0Obj->setVisualGeometry(sphere0Geom);
+	//sphere0Obj->setCollidingGeometry(sphere0Geom);
+	//scene->addSceneObject(sphere0Obj);
+
+
+
 	/*
 	auto mesh3 = imstk::MeshReader::read("resources/human/teeth.obj");
 	auto obj3 = std::make_shared<imstk::VisualObject>("obj3");
@@ -86,7 +106,7 @@ int main()
 
 
 	sdk->setCurrentScene("ETI simulator");
-    sdk->startSimulation(true);
+    sdk->startSimulation(false);
 }
 
 void initializeText()
@@ -189,144 +209,145 @@ void initializeOR(MeshList _staticORObjectMesh, SurfaceMeshList _staticORObjectS
 	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("bed4"));
 	textureName.push_back("resources/TextureOR/bed-4.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceiling.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceiling"));
-	textureName.push_back("resources/TextureOR/ceiling.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceiling.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceiling"));
+	//textureName.push_back("resources/TextureOR/ceiling.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceilingframe.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceilingframe"));
-	textureName.push_back("resources/TextureOR/ceiling frame.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceilingframe.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceilingframe"));
+	//textureName.push_back("resources/TextureOR/ceiling frame.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceilinglight.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceilinglight"));
-	textureName.push_back("resources/TextureOR/ceiling light.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/ceilinglight.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("ceilinglight"));
+	//textureName.push_back("resources/TextureOR/ceiling light.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/floor.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("floor"));
-	textureName.push_back("resources/TextureOR/floor.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/floor.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("floor"));
+	//textureName.push_back("resources/TextureOR/floor.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/infusionpole.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("infusionpole"));
-	textureName.push_back("resources/TextureOR/infusion pole.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/infusionpole.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("infusionpole"));
+	//textureName.push_back("resources/TextureOR/infusion pole.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/instrument_cart.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("instrument_cart"));
-	textureName.push_back("resources/TextureOR/instrument cart.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/instrument_cart.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("instrument_cart"));
+	//textureName.push_back("resources/TextureOR/instrument cart.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor1.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor1"));
-	textureName.push_back("resources/TextureOR/light_monitor-1.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor1.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor1"));
+	//textureName.push_back("resources/TextureOR/light_monitor-1.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor2.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor2"));
-	textureName.push_back("resources/TextureOR/light_monitor-2.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor2.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor2"));
+	//textureName.push_back("resources/TextureOR/light_monitor-2.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor3.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor3"));
-	textureName.push_back("resources/TextureOR/light_monitor-3.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor3.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor3"));
+	//textureName.push_back("resources/TextureOR/light_monitor-3.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor4.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor4"));
-	textureName.push_back("resources/TextureOR/light_monitor-4.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor4.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor4"));
+	//textureName.push_back("resources/TextureOR/light_monitor-4.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor5.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor5"));
-	textureName.push_back("resources/TextureOR/light_monitor-5.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor5.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor5"));
+	//textureName.push_back("resources/TextureOR/light_monitor-5.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor6.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor6"));
-	textureName.push_back("resources/TextureOR/light_monitor-6.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor6.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor6"));
+	//textureName.push_back("resources/TextureOR/light_monitor-6.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor7.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor7"));
-	textureName.push_back("resources/TextureOR/light_monitor-7.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/light_monitor7.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("light_monitor7"));
+	//textureName.push_back("resources/TextureOR/light_monitor-7.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor1.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor1"));
-	textureName.push_back("resources/TextureOR/monitor-1.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor1.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor1"));
+	//textureName.push_back("resources/TextureOR/monitor-1.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor2.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor2"));
-	textureName.push_back("resources/TextureOR/monitor-2.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor2.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor2"));
+	//textureName.push_back("resources/TextureOR/monitor-2.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor3.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor3"));
-	textureName.push_back("resources/TextureOR/monitor-3.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor3.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor3"));
+	//textureName.push_back("resources/TextureOR/monitor-3.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor4.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor4"));
-	textureName.push_back("resources/TextureOR/monitor-4.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor4.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor4"));
+	//textureName.push_back("resources/TextureOR/monitor-4.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor5.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor5"));
-	textureName.push_back("resources/TextureOR/monitor-5.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/monitor5.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("monitor5"));
+	//textureName.push_back("resources/TextureOR/monitor-5.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight1.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight1"));
-	textureName.push_back("resources/TextureOR/operation light-1.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight1.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight1"));
+	//textureName.push_back("resources/TextureOR/operation light-1.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight2.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight2"));
-	textureName.push_back("resources/TextureOR/operation light-2.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight2.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight2"));
+	//textureName.push_back("resources/TextureOR/operation light-2.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight3.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight3"));
-	textureName.push_back("resources/TextureOR/operation light-3.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/operationlight3.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("operationlight3"));
+	//textureName.push_back("resources/TextureOR/operation light-3.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor1.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor1"));
-	textureName.push_back("resources/TextureOR/w_monitor-1.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor1.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor1"));
+	//textureName.push_back("resources/TextureOR/w_monitor-1.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor2.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor2"));
-	textureName.push_back("resources/TextureOR/w_monitor-2.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor2.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor2"));
+	//textureName.push_back("resources/TextureOR/w_monitor-2.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor3.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor3"));
-	textureName.push_back("resources/TextureOR/w_monitor-3.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor3.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor3"));
+	//textureName.push_back("resources/TextureOR/w_monitor-3.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor4.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor4"));
-	textureName.push_back("resources/TextureOR/w_monitor-4.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor4.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor4"));
+	//textureName.push_back("resources/TextureOR/w_monitor-4.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor5.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor5"));
-	textureName.push_back("resources/TextureOR/w_monitor-5.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor5.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor5"));
+	//textureName.push_back("resources/TextureOR/w_monitor-5.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor6.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor6"));
-	textureName.push_back("resources/TextureOR/w_monitor-6.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor6.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor6"));
+	//textureName.push_back("resources/TextureOR/w_monitor-6.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor7.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor7"));
-	textureName.push_back("resources/TextureOR/w_monitor-7.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor7.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor7"));
+	//textureName.push_back("resources/TextureOR/w_monitor-7.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor8.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor8"));
-	textureName.push_back("resources/TextureOR/w_monitor-8.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/w_monitor8.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("w_monitor8"));
+	//textureName.push_back("resources/TextureOR/w_monitor-8.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/wall.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("wall"));
-	textureName.push_back("resources/TextureOR/wall.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/wall.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("wall"));
+	//textureName.push_back("resources/TextureOR/wall.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/wallcurtain.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("wallcurtain"));
-	textureName.push_back("resources/TextureOR/window curtain.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/wallcurtain.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("wallcurtain"));
+	//textureName.push_back("resources/TextureOR/window curtain.jpg");
 
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/windowframe.obj"));
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("windowframe"));
-	textureName.push_back("resources/TextureOR/window_frame.jpg");
-
-	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/cloth.obj"));
-	_staticORObjectMesh[_staticORObjectMesh.size() - 1]->translate(0.0, 12.0, 6.0);
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("cloth"));
-	textureName.push_back("resources/TextureOR/cloth.jpg");
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/windowframe.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("windowframe"));
+	//textureName.push_back("resources/TextureOR/window_frame.jpg");
 
 
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/cloth.obj"));
+	//_staticORObjectMesh[_staticORObjectMesh.size() - 1]->translate(0.0, 12.0, 6.0);
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("cloth"));
+	//textureName.push_back("resources/TextureOR/cloth.jpg");
+
+	std::cout << "Number of OR scene object: " << _staticORObjectMesh.size() << std::endl;
 //	std::shared_ptr<imstk::SurfaceMesh> surfaceMesh;
 	for (unsigned int i = 0; i < _staticORObjectMesh.size(); i++){
 		_staticORObjectSurfaceMesh.push_back(std::dynamic_pointer_cast<imstk::SurfaceMesh>(_staticORObjectMesh[i]));
-		if (i == (_staticORObjectMesh.size()-1))
+//		if (i == (_staticORObjectMesh.size()-1))
 		_staticORObjectSurfaceMesh[i]->addTexture(textureName[i]);
 		_staticORObject[i]->setVisualGeometry(_staticORObjectSurfaceMesh[i]);
 		_scene->addSceneObject(_staticORObject[i]);
