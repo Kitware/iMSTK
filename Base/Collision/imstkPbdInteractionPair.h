@@ -4,27 +4,22 @@
 #include "imstkInteractionPair.h"
 
 #include "imstkPbdCollisionConstraint.h"
-#include "imstkPbdCollidingObject.h"
+#include "imstkPbdObject.h"
 
 namespace imstk {
 
-class PbdInteractionPair : public InteractionPair
+class PbdInteractionPair
 {
 private:
     std::vector<CollisionConstraint*>    m_collisionConstraints;
-    std::shared_ptr<PbdCollidingObject> first;
-    std::shared_ptr<PbdCollidingObject> second;
+    std::shared_ptr<PbdObject> first;
+    std::shared_ptr<PbdObject> second;
     unsigned int maxIter;
 public:
-    PbdInteractionPair(std::shared_ptr<CollidingObject> A,
-                       std::shared_ptr<CollidingObject> B,
-                       CollisionDetection::Type CDType,
-                       CollisionHandling::Type CHAType,
-                       CollisionHandling::Type CHBType)
-        : InteractionPair(A,B,CDType,CHAType, CHBType)
+    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B)
+     : first (A), second (B)
     {
-        first = std::static_pointer_cast<PbdCollidingObject>(A);
-        second = std::static_pointer_cast<PbdCollidingObject>(B);
+
     }
 
     inline void resetConstraints()

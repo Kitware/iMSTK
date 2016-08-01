@@ -1020,5 +1020,100 @@ void testPbdCloth()
 }
 void testPbdCollision()
 {
+    auto sdk = std::make_shared<SimulationManager>();
+    auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
+    scene->getCamera()->setPosition(0, 2.0, 15.0);
 
+    // dragon
+    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+    oneToOneNodalMap->compute();
+
+    auto deformableObj = std::make_shared<PbdObject>("Dragon");
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setCollidingGeometry(surfMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToCollidingMap(oneToOneNodalMap);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/1,
+                        /*Gravity*/"0 -9.8 0",
+                        /*Mass*/1.0,
+                        /*TimeStep*/0.001,
+                        /*FixedPoint*/"",
+                        /*TypeofConstraint*/"FEM",
+                        /*NumberOfIterationInConstraintSolver*/5,
+                        /*YoungModulus*/100.0,
+                        /*PoissonRatio*/0.3);
+    scene->addSceneObject(deformableObj);
+
+    // floor
+    auto floorMesh = std::make_shared<imstk::SurfaceMesh>();
+    std::vector<imstk::Vec3d> vertList;
+    double width = 100.0;
+    double height = 100.0;
+    int nRows = 2;
+    int nCols = 2;
+    vertList.resize(nRows*nCols);
+    const double dy = width / (double)(nCols - 1);
+    const double dx = height / (double)(nRows - 1);
+    for (int i = 0; i < nRows; i++)
+    {
+        for (int j = 0; j < nCols; j++)
+        {
+            const double y = (double)dy*j;
+            const double x = (double)dx*i;
+            vertList[i*nCols + j] = Vec3d(x, -10.0, y);
+
+        }
+    }
+    floorMesh->setInitialVerticesPositions(vertList);
+    floorMesh->setVerticesPositions(vertList);
+
+    // c. Add connectivity data
+    std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+    for (int i = 0; i < nRows - 1; i++)
+    {
+        for (int j = 0; j < nCols - 1; j++)
+        {
+            imstk::SurfaceMesh::TriangleArray tri[2];
+            tri[0] = { { i*nCols + j, (i + 1)*nCols + j , i*nCols + j + 1 } };
+            tri[1] = { { (i + 1)*nCols + j + 1, i*nCols + j + 1, (i + 1)*nCols + j } };
+            triangles.push_back(tri[0]);
+            triangles.push_back(tri[1]);
+        }
+    }
+    floorMesh->setTrianglesVertices(triangles);
+
+    auto floor = std::make_shared<PbdObject>("Floor");
+    floor->setCollidingGeometry(floorMesh);
+    floor->setVisualGeometry(floorMesh);
+    floor->setPhysicsGeometry(floorMesh);
+    scene->addSceneObject(floor);
+
+    // Collisions
+    auto colGraph = scene->getCollisionGraph();
+    auto pair = std::make_shared<PbdInteractionPair>(PbdInteractionPair(deformableObj, floor));
+    pair->setNumberOfInterations(5);
+
+    colGraph->addInteractionPair(pair);
+
+    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->startSimulation(true);
 }

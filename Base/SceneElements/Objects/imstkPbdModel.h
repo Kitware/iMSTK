@@ -22,7 +22,8 @@ private:
     std::vector<PbdConstraint*>   m_constraints;
     double mu, lambda;            // Lame's constants
     unsigned int maxIter;
-
+    double m_proximity;
+    double m_contactStiffness;
 public:
     PositionBasedModel()
     {
@@ -66,7 +67,30 @@ public:
         return lambda;
     }
 
-    inline void setNumberOfInterations(const unsigned int& n) { maxIter = n; }
+    inline void setNumberOfInterations(const unsigned int& n)
+    {
+        maxIter = n;
+    }
+
+    inline void setProximity(const double& prox)
+    {
+        m_proximity = prox;
+    }
+
+    inline double getProximity()
+    {
+        return m_proximity;
+    }
+
+    inline void setContactStiffness(const double& stiffness)
+    {
+        m_contactStiffness = stiffness;
+    }
+
+    inline double getContactStiffness()
+    {
+        return m_contactStiffness;
+    }
 
     ///
     /// \brief create constraints from the underlying mesh structure

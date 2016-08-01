@@ -62,6 +62,11 @@ CollisionGraph::addInteractionPair(CollidingObjectPtr A,
     return intPair;
 }
 
+void CollisionGraph::addInteractionPair(std::shared_ptr<PbdInteractionPair> pair)
+{
+    m_interactionPbdPairList.push_back(pair);
+}
+
 bool
 CollisionGraph::removeInteractionPair(CollidingObjectPtr A, CollidingObjectPtr B)
 {
@@ -110,6 +115,11 @@ CollisionGraph::removeInteractionPair(InteractionPairPtr intPair)
 {
     return this->removeInteractionPair(intPair->getObjectsPair().first,
                                        intPair->getObjectsPair().second);
+}
+
+const std::vector<std::shared_ptr<PbdInteractionPair> > &CollisionGraph::getPbdPairList() const
+{
+    return m_interactionPbdPairList;
 }
 
 std::shared_ptr<InteractionPair>

@@ -1,11 +1,11 @@
-#include "imstkPbdCollidingObject.h"
+#include "imstkPbdModel.h"
 #include "imstkPbdCollisionConstraint.h"
 
 namespace imstk
 {
 
-void EdgeEdgeConstraint::initConstraint( PbdCollidingObject* model1, const unsigned int &pIdx1, const unsigned int &pIdx2,
-                                         PbdCollidingObject* model2, const unsigned int &pIdx3, const unsigned int &pIdx4)
+void EdgeEdgeConstraint::initConstraint( PositionBasedModel* model1, const unsigned int &pIdx1, const unsigned int &pIdx2,
+                                         PositionBasedModel* model2, const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
     m_model1 = model1;
     m_model2 = model2;
@@ -23,13 +23,13 @@ bool EdgeEdgeConstraint::solvePositionConstraint()
     const unsigned int i2 = m_bodiesSecond[0];
     const unsigned int i3 = m_bodiesSecond[1];
 
-//    auto state1 = m_model1->getState();
-//    auto state2 = m_model2->getState();
+    auto state1 = m_model1->getState();
+    auto state2 = m_model2->getState();
 
-    Vec3d x0 = m_model1->getVertexPosition(i0);
-    Vec3d x1 = m_model1->getVertexPosition(i1);
-    Vec3d x2 = m_model2->getVertexPosition(i2);
-    Vec3d x3 = m_model2->getVertexPosition(i3);
+    Vec3d& x0 = state1->getVertexPosition(i0);
+    Vec3d& x1 = state1->getVertexPosition(i1);
+    Vec3d& x2 = state2->getVertexPosition(i2);
+    Vec3d& x3 = state2->getVertexPosition(i3);
 
     double a = (x3-x2).dot(x1-x0);
     double b = (x1-x0).dot(x1-x0);
@@ -70,10 +70,10 @@ bool EdgeEdgeConstraint::solvePositionConstraint()
     Vec3d grad2 = (1-s)*n;
     Vec3d grad3 = (s)*n;
 
-    const double im0 = m_model1->getInvMass(i0);
-    const double im1 = m_model1->getInvMass(i1);
-    const double im2 = m_model2->getInvMass(i2);
-    const double im3 = m_model2->getInvMass(i3);
+    const double im0 = state1->getInvMass(i0);
+    const double im1 = state1->getInvMass(i1);
+    const double im2 = state2->getInvMass(i2);
+    const double im3 = state2->getInvMass(i3);
 
     double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm();
 
@@ -88,17 +88,11 @@ bool EdgeEdgeConstraint::solvePositionConstraint()
     if (im3 > 0)
         x3 += -im3*lambda*grad3*m_model2->getContactStiffness();
 
-    m_model1->setVertexPosition(i0,x0);
-    m_model1->setVertexPosition(i1,x1);
-
-    m_model2->setVertexPosition(i2,x2);
-    m_model2->setVertexPosition(i3,x3);
-
     return true;
 }
 
-void PointTriangleConstraint::initConstraint(PbdCollidingObject* model1, const unsigned int &pIdx1,
-                                             PbdCollidingObject* model2, const unsigned int &pIdx2, const unsigned int &pIdx3, const unsigned int &pIdx4)
+void PointTriangleConstraint::initConstraint(PositionBasedModel* model1, const unsigned int &pIdx1,
+                                             PositionBasedModel* model2, const unsigned int &pIdx2, const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
     m_model1 = model1;
     m_model2 = model2;
@@ -115,14 +109,14 @@ bool PointTriangleConstraint::solvePositionConstraint()
     const unsigned int i2 = m_bodiesSecond[1];
     const unsigned int i3 = m_bodiesSecond[2];
 
-//    auto state1 = m_model1->getState();
-//    auto state2 = m_model2->getState();
+    auto state1 = m_model1->getState();
+    auto state2 = m_model2->getState();
 
-    Vec3d x0 = m_model1->getVertexPosition(i0);
+    Vec3d x0 = state1->getVertexPosition(i0);
 
-    Vec3d x1 = m_model2->getVertexPosition(i1);
-    Vec3d x2 = m_model2->getVertexPosition(i2);
-    Vec3d x3 = m_model2->getVertexPosition(i3);
+    Vec3d x1 = state2->getVertexPosition(i1);
+    Vec3d x2 = state2->getVertexPosition(i2);
+    Vec3d x3 = state2->getVertexPosition(i3);
 
     Vec3d x12 = x2 - x1;
     Vec3d x13 = x3 - x1;
@@ -133,7 +127,6 @@ bool PointTriangleConstraint::solvePositionConstraint()
     double beta  = n.dot(x01.cross(x13))/ (n.dot(n));
 
     if (alpha < 0 || beta < 0 || alpha + beta > 1 ) {
-//        printf("WARNING: barycentric coordinate out of bounds ! \n");
         return false;
     }
 
@@ -152,11 +145,11 @@ bool PointTriangleConstraint::solvePositionConstraint()
     Vec3d grad2 = -beta*n;
     Vec3d grad3 = -gamma*n;
 
-    const double im0 = m_model1->getInvMass(i0);
+    const double im0 = state1->getInvMass(i0);
 
-    const double im1 = m_model2->getInvMass(i1);
-    const double im2 = m_model2->getInvMass(i2);
-    const double im3 = m_model2->getInvMass(i3);
+    const double im1 = state2->getInvMass(i1);
+    const double im2 = state2->getInvMass(i2);
+    const double im3 = state2->getInvMass(i3);
 
     double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm();
 
@@ -170,12 +163,6 @@ bool PointTriangleConstraint::solvePositionConstraint()
         x2 += -im2*lambda*grad2*m_model2->getContactStiffness();
     if (im3 > 0)
         x3 += -im3*lambda*grad3*m_model2->getContactStiffness();
-
-    m_model1->setVertexPosition(i0,x0);
-
-    m_model2->setVertexPosition(i1,x1);
-    m_model2->setVertexPosition(i2,x2);
-    m_model2->setVertexPosition(i3,x3);
 
     return true;
 }

@@ -28,14 +28,14 @@ public:
     std::shared_ptr<Geometry> getPhysicsGeometry() const;
     void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
 
+    std::shared_ptr<Geometry> getCollidingGeometry() const;
+    void setColldingGeometry(std::shared_ptr<Geometry> geometry);
     ///
     /// \brief Set/Get the Physics-to-Collision map
     ///
     std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const;
     void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map);
 
-    std::shared_ptr<GeometryMap> getCollidingToPhysicsMap() const;
-    void setCollidingToPhysicsMap(std::shared_ptr<GeometryMap> map);
     ///
     /// \brief Set/Get the Physics-to-Visual map
     ///
@@ -63,11 +63,11 @@ public:
 protected:
 
     std::shared_ptr<PositionBasedModel> m_pbdModel;
-    std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
+    std::shared_ptr<Geometry> m_physicsGeometry;
+    std::shared_ptr<Geometry> m_collidingGeometry;
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_collidingToPhysicsGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
 
     size_t numDOF; ///> Number of degree of freedom of the body in the discretized model

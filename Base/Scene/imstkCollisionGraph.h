@@ -30,6 +30,8 @@
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionHandling.h"
 
+#include "imstkPbdInteractionPair.h"
+
 namespace imstk {
 
 class CollisionGraph
@@ -53,6 +55,8 @@ public:
                                           CollisionHandling::Type CHAType,
                                           CollisionHandling::Type CHBType);
 
+    void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
+
     ///
     /// \brief Remove interaction pair in collision graph
     ///
@@ -69,6 +73,8 @@ public:
     ///
     const std::vector<InteractionPairPtr>& getInteractionPairList() const;
 
+    const std::vector<std::shared_ptr<PbdInteractionPair> > &getPbdPairList() const;
+
     ///
     /// \brief Returns a map of all interaction pairs per object
     ///
@@ -77,6 +83,7 @@ public:
       std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
 
 protected:
+    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList;
 
     std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
     std::unordered_map<

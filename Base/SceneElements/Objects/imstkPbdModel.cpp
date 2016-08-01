@@ -81,10 +81,10 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
         // following algorithm is terrible, should use half-edge instead
         std::vector<std::vector<unsigned int>> onering(triMesh->getNumVertices());
         for (int k = 0; k < elements.size(); ++k) {
-           SurfaceMesh::TriangleArray& tri = elements[k];
-           onering[tri[0]].push_back(k);
-           onering[tri[1]].push_back(k);
-           onering[tri[2]].push_back(k);
+            SurfaceMesh::TriangleArray& tri = elements[k];
+            onering[tri[0]].push_back(k);
+            onering[tri[1]].push_back(k);
+            onering[tri[2]].push_back(k);
         }
         std::vector<std::vector<bool>> E(triMesh->getNumVertices(), std::vector<bool>(triMesh->getNumVertices(), 1));
         for (int k = 0; k < elements.size(); ++k) {
@@ -106,10 +106,10 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
                     int idx = (rs[0] == k)?1:0;
                     SurfaceMesh::TriangleArray& t = elements[rs[idx]];
                     for (int i = 0; i < 3; ++i) {
-                       if (t[i] != tri[0] && t[i] != tri[1]) {
-                           idx = i;
-                           break;
-                       }
+                        if (t[i] != tri[0] && t[i] != tri[1]) {
+                            idx = i;
+                            break;
+                        }
                     }
 
                     DihedralConstraint* c = new DihedralConstraint;
@@ -126,10 +126,10 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
                     int idx = (rs[0] == k)?1:0;
                     SurfaceMesh::TriangleArray& t = elements[rs[idx]];
                     for (int i = 0; i < 3; ++i) {
-                       if (t[i] != tri[1] && t[i] != tri[2]) {
-                           idx = i;
-                           break;
-                       }
+                        if (t[i] != tri[1] && t[i] != tri[2]) {
+                            idx = i;
+                            break;
+                        }
                     }
 
                     DihedralConstraint* c = new DihedralConstraint;
@@ -146,10 +146,10 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
                     int idx = (rs[0] == k)?1:0;
                     SurfaceMesh::TriangleArray& t = elements[rs[idx]];
                     for (int i = 0; i < 3; ++i) {
-                       if (t[i] != tri[2] && t[i] != tri[0]) {
-                           idx = i;
-                           break;
-                       }
+                        if (t[i] != tri[2] && t[i] != tri[0]) {
+                            idx = i;
+                            break;
+                        }
                     }
 
                     DihedralConstraint* c = new DihedralConstraint;
@@ -273,10 +273,13 @@ bool PositionBasedModel::initConstraints(PbdConstraint::Type type)
 
 void PositionBasedModel::constraintProjection()
 {
-    int i = 0;
-    while (++i < maxIter) {
-        for (int k = 0; k < m_constraints.size(); ++k) {
-            m_constraints[k]->solvePositionConstraint(*this);
+    if (!m_constraints.empty())
+    {
+        int i = 0;
+        while (++i < maxIter) {
+            for (int k = 0; k < m_constraints.size(); ++k) {
+                m_constraints[k]->solvePositionConstraint(*this);
+            }
         }
     }
 }
@@ -284,7 +287,7 @@ void PositionBasedModel::constraintProjection()
 void PositionBasedModel::updatePhysicsGeometry()
 {
     for (int i = 0; i < m_mesh->getNumVertices(); ++i) {
-       m_mesh->setVerticePosition(i, m_state->getVertexPosition(i));
+        m_mesh->setVerticePosition(i, m_state->getVertexPosition(i));
     }
 }
 

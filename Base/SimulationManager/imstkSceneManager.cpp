@@ -87,6 +87,24 @@ SceneManager::runModule()
         {
             pbdObj->getDynamicalModel()->getState()->integratePosition();
             pbdObj->getDynamicalModel()->constraintProjection();
+            pbdObj->getPhysicsToCollidingMap()->apply();
+        }
+    }
+
+    for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
+    {
+        intPair->resetConstraints();
+        if (intPair->doBroadPhase())
+        {
+            intPair->doNarrowPhase();
+        }
+        intPair->doCollision();
+    }
+
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+        {
             pbdObj->getDynamicalModel()->getState()->integrateVelocity();
             pbdObj->getDynamicalModel()->updatePhysicsGeometry();
             pbdObj->getPhysicsToVisualMap()->apply();

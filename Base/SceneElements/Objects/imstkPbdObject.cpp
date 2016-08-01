@@ -15,6 +15,16 @@ PbdObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
     m_physicsGeometry = geometry;
 }
 
+std::shared_ptr<Geometry> PbdObject::getCollidingGeometry() const
+{
+    return m_collidingGeometry;
+}
+
+void PbdObject::setColldingGeometry(std::shared_ptr<Geometry> geometry)
+{
+    m_collidingGeometry = geometry;
+}
+
 std::shared_ptr<GeometryMap>
 PbdObject::getPhysicsToCollidingMap() const
 {
@@ -25,16 +35,6 @@ void
 PbdObject::setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map)
 {
     m_physicsToCollidingGeomMap = map;
-}
-
-std::shared_ptr<GeometryMap> PbdObject::getCollidingToPhysicsMap() const
-{
-    return m_collidingToPhysicsGeomMap;
-}
-
-void PbdObject::setCollidingToPhysicsMap(std::shared_ptr<GeometryMap> map)
-{
-    m_collidingToPhysicsGeomMap = map;
 }
 
 std::shared_ptr<GeometryMap>
@@ -84,14 +84,15 @@ void PbdObject::init(int fem, ...)
     state->setUniformMass(va_arg(args,double));
     state->setTimeStep(va_arg(args,double));
     char *s = va_arg(args,char*);
-    while (1)
-    {
-        int idx = atoi(s);
-        state->setFixedPoint(idx-1);
-        while (*s != ' ' && *s != '\0') ++s;
-        if (*s == '\0') break; else ++s;
+    if (strlen(s) > 0) {
+        while (1)
+        {
+            int idx = atoi(s);
+            state->setFixedPoint(idx-1);
+            while (*s != ' ' && *s != '\0') ++s;
+            if (*s == '\0') break; else ++s;
+        }
     }
-
     s = va_arg(args,char*);
     int pos = 0;
     while (1)

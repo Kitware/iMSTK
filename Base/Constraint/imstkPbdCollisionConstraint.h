@@ -6,7 +6,7 @@
 namespace imstk
 {
 
-class PbdCollidingObject;
+class PositionBasedModel;
 
 class CollisionConstraint
 {
@@ -18,8 +18,8 @@ public:
     };
     std::vector<unsigned int> m_bodiesFirst;        // index of points for the first object
     std::vector<unsigned int> m_bodiesSecond;   // index of points for the second object
-    PbdCollidingObject* m_model1;
-    PbdCollidingObject* m_model2;
+    PositionBasedModel* m_model1;
+    PositionBasedModel* m_model2;
 public:
     CollisionConstraint(const unsigned int& n1, const unsigned int& n2)
     {
@@ -51,8 +51,8 @@ public:
     /// \param pIdx4 second point of the edge from object2
     /// \return  true if succeeded
     ///
-    void initConstraint( PbdCollidingObject* model1, const unsigned int& pIdx1, const unsigned int& pIdx2,
-                         PbdCollidingObject* model2, const unsigned int& pIdx3, const unsigned int& pIdx4);
+    void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1, const unsigned int& pIdx2,
+                         PositionBasedModel* model2, const unsigned int& pIdx3, const unsigned int& pIdx4);
 
     bool solvePositionConstraint();
 };
@@ -77,8 +77,8 @@ public:
     /// \param pIdx4 third point of the triangle from object2
     /// \return
     ///
-    void initConstraint( PbdCollidingObject* model1, const unsigned int& pIdx1,
-                         PbdCollidingObject* model2, const unsigned int& pIdx2,  const unsigned int& pIdx3, const unsigned int& pIdx4);
+    void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1,
+                         PositionBasedModel* model2, const unsigned int& pIdx2,  const unsigned int& pIdx3, const unsigned int& pIdx4);
 
     bool solvePositionConstraint();
 };
