@@ -21,6 +21,7 @@ public:
                        CollisionDetection::Type CDType,
                        CollisionHandling::Type CHAType,
                        CollisionHandling::Type CHBType)
+        : InteractionPair(A,B,CDType,CHAType, CHBType)
     {
         first = std::static_pointer_cast<PbdCollidingObject>(A);
         second = std::static_pointer_cast<PbdCollidingObject>(B);

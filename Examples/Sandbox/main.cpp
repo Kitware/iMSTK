@@ -1018,3 +1018,7 @@ void testPbdCloth()
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
 }
+void testPbdCollision()
+{
+
+}

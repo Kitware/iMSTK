@@ -76,8 +76,8 @@ bool PbdInteractionPair::doBroadPhase()
     mesh2->computeBoundingBox(min2, max2);
     double prox1 = first->getProximity();
     double prox2 = second->getProximity();
-    return  testAABBvsAABB(min1_x - prox1, max1_x + prox1, min1_y - prox1, max1_y + prox1, min1_z - prox1, max1_z + prox1,
-                           min2_x - prox2, max2_x + prox2, min2_y - prox2, max2_y + prox2, min2_z - prox2, max2_z + prox2);
+    return  testAABBvsAABB(min1[0] - prox1, max1[0] + prox1, min1[1] - prox1, max1[1] + prox1, min1[2] - prox1, max1[2] + prox1,
+                           min2[0] - prox2, max2[0] + prox2, min2[1] - prox2, max2[1] + prox2, min2[2] - prox2, max2[2] + prox2);
 
 }
 
@@ -94,13 +94,13 @@ void PbdInteractionPair::doNarrowPhase()
     // brute force, use BVH or spatial grid woulbe be much better
     // point
     for (int i = 0; i < mesh1->getNumVertices(); ++i) {
-        Vec3d& p = mesh1->getVertexPosition(i);
+        Vec3d p = mesh1->getVertexPosition(i);
         std::vector<SurfaceMesh::TriangleArray> elements = mesh2->getTrianglesVertices();
         for (int j = 0; j < elements.size(); ++j) {
-            Vec3i& e = elements[j];
-            Vec3d& p0 = mesh2->getVertexPosition(e[0]);
-            Vec3d& p1 = mesh2->getVertexPosition(e[1]);
-            Vec3d& p2 = mesh2->getVertexPosition(e[2]);
+            SurfaceMesh::TriangleArray& e = elements[j];
+            Vec3d p0 = mesh2->getVertexPosition(e[0]);
+            Vec3d p1 = mesh2->getVertexPosition(e[1]);
+            Vec3d p2 = mesh2->getVertexPosition(e[2]);
 
             if (testPOINTvsTRIANGLE(p[0],p[1],p[2],
                                     p0[0],p0[1],p0[2],
@@ -108,7 +108,7 @@ void PbdInteractionPair::doNarrowPhase()
                                     p2[0],p2[1],p2[2], prox1, prox2))
             {
                 PointTriangleConstraint* c = new PointTriangleConstraint;
-                c->initConstraint(first, i, second, e[0], e[1], e[2]);
+                c->initConstraint(first.get(), i, second.get(), e[0], e[1], e[2]);
                 m_collisionConstraints.push_back(c);
             }
         }
@@ -119,27 +119,27 @@ void PbdInteractionPair::doNarrowPhase()
     std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
     std::vector<SurfaceMesh::TriangleArray> elements = mesh1->getTrianglesVertices();
     for (int k = 0; k < elements.size(); ++k) {
-       Vec3i& tri = elements[k];
+       SurfaceMesh::TriangleArray& tri = elements[k];
        unsigned int i1;
        unsigned int i2;
        i1 = tri[0];
        i2 = tri[1];
        if (E[i1][i2] && E[i2][i1]) {
-           Vec3d& P = mesh1->getVertexPosition(i1);
-           Vec3d& Q = mesh1->getVertexPosition(i2);
+           Vec3d P = mesh1->getVertexPosition(i1);
+           Vec3d Q = mesh1->getVertexPosition(i2);
            std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
            for (int j = 0; j < elements2.size(); ++j) {
-               Vec3i& e = elements2[j];
-               Vec3d& p0 = mesh2->getVertexPosition(e[0]);
-               Vec3d& p1 = mesh2->getVertexPosition(e[1]);
-               Vec3d& p2 = mesh2->getVertexPosition(e[2]);
+               SurfaceMesh::TriangleArray& e = elements2[j];
+               Vec3d p0 = mesh2->getVertexPosition(e[0]);
+               Vec3d p1 = mesh2->getVertexPosition(e[1]);
+               Vec3d p2 = mesh2->getVertexPosition(e[2]);
                if (testLINEvsLINE(P[0],P[1],P[2],
                                   Q[0],Q[1],Q[2],
                                   p0[0],p0[1],p0[2],
                                   p1[0],p1[1],p1[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[0], e[1]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[0], e[1]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -148,7 +148,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p2[0],p2[1],p2[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[1], e[2]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[1], e[2]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -157,7 +157,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p0[0],p0[1],p0[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[2], e[0]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[2], e[0]);
                    m_collisionConstraints.push_back(c);
                }
            }
@@ -167,21 +167,21 @@ void PbdInteractionPair::doNarrowPhase()
        i1 = tri[1];
        i2 = tri[2];
        if (E[i1][i2] && E[i2][i1]) {
-           Vec3d& P = mesh1->getVertexPosition(i1);
-           Vec3d& Q = mesh1->getVertexPosition(i2);
+           Vec3d P = mesh1->getVertexPosition(i1);
+           Vec3d Q = mesh1->getVertexPosition(i2);
            std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
            for (int j = 0; j < elements2.size(); ++j) {
-               Vec3i& e = elements2[j];
-               Vec3d& p0 = mesh2->getVertexPosition(e[0]);
-               Vec3d& p1 = mesh2->getVertexPosition(e[1]);
-               Vec3d& p2 = mesh2->getVertexPosition(e[2]);
+               SurfaceMesh::TriangleArray& e = elements2[j];
+               Vec3d p0 = mesh2->getVertexPosition(e[0]);
+               Vec3d p1 = mesh2->getVertexPosition(e[1]);
+               Vec3d p2 = mesh2->getVertexPosition(e[2]);
                if (testLINEvsLINE(P[0],P[1],P[2],
                                   Q[0],Q[1],Q[2],
                                   p0[0],p0[1],p0[2],
                                   p1[0],p1[1],p1[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[0], e[1]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[0], e[1]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -190,7 +190,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p2[0],p2[1],p2[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[1], e[2]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[1], e[2]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -199,7 +199,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p0[0],p0[1],p0[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[2], e[0]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[2], e[0]);
                    m_collisionConstraints.push_back(c);
                }
            }
@@ -208,21 +208,21 @@ void PbdInteractionPair::doNarrowPhase()
        i1 = tri[2];
        i2 = tri[0];
        if (E[i1][i2] && E[i2][i1]) {
-           Vec3d& P = mesh1->getVertexPosition(i1);
-           Vec3d& Q = mesh1->getVertexPosition(i2);
+           Vec3d P = mesh1->getVertexPosition(i1);
+           Vec3d Q = mesh1->getVertexPosition(i2);
            std::vector<SurfaceMesh::TriangleArray> elements2 = mesh2->getTrianglesVertices();
            for (int j = 0; j < elements2.size(); ++j) {
-               Vec3i& e = elements2[j];
-               Vec3d& p0 = mesh2->getVertexPosition(e[0]);
-               Vec3d& p1 = mesh2->getVertexPosition(e[1]);
-               Vec3d& p2 = mesh2->getVertexPosition(e[2]);
+               SurfaceMesh::TriangleArray& e = elements2[j];
+               Vec3d p0 = mesh2->getVertexPosition(e[0]);
+               Vec3d p1 = mesh2->getVertexPosition(e[1]);
+               Vec3d p2 = mesh2->getVertexPosition(e[2]);
                if (testLINEvsLINE(P[0],P[1],P[2],
                                   Q[0],Q[1],Q[2],
                                   p0[0],p0[1],p0[2],
                                   p1[0],p1[1],p1[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[0], e[1]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[0], e[1]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -231,7 +231,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p2[0],p2[1],p2[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[1], e[2]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[1], e[2]);
                    m_collisionConstraints.push_back(c);
                }
                if (testLINEvsLINE(P[0],P[1],P[2],
@@ -240,7 +240,7 @@ void PbdInteractionPair::doNarrowPhase()
                                   p0[0],p0[1],p0[2], prox1, prox2))
                {
                    EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                   c->initConstraint(first, i1, i2, second, e[2], e[0]);
+                   c->initConstraint(first.get(), i1, i2, second.get(), e[2], e[0]);
                    m_collisionConstraints.push_back(c);
                }
            }
