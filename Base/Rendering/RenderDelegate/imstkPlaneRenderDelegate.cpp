@@ -23,7 +23,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 PlaneRenderDelegate::PlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     m_geometry(plane)
 {
@@ -41,4 +43,5 @@ PlaneRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-}
+
+} // imstk

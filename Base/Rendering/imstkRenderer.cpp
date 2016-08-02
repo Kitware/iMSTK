@@ -195,4 +195,5 @@ Renderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
         m_vtkRenderer->AddActor(actor);
     }
 }
-}
+
+} // imstk

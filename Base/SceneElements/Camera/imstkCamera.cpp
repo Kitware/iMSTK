@@ -19,15 +19,16 @@
 
    =========================================================================*/
 
-#include "imstkCamera.h"
-
-#include "imstkCameraController.h"
-
 #include <memory>
+
+#include "imstkCamera.h"
+#include "imstkCameraController.h"
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
+
 const Vec3d&
 Camera::getPosition() const
 {
@@ -115,4 +116,5 @@ Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scali
     m_cameraController->setDeviceClient(deviceClient);
     m_cameraController->setTranslationScaling(scaling);
 }
-}
+
+} // imstk

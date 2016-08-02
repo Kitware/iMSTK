@@ -22,9 +22,9 @@
 #ifndef imstkProblemState_h
 #define imstkProblemState_h
 
-#include "imstkMath.h"
-
 #include <memory>
+
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -74,16 +74,25 @@ public:
         m_qDotDot = a;
     }
 
+    ///
+    /// \brief
+    ///
     void setU(const Vectord& u)
     {
         m_q = u;
     }
 
+    ///
+    /// \brief
+    ///
     void setV(const Vectord& v)
     {
         m_qDot = v;
     }
 
+    ///
+    /// \brief
+    ///
     void setA(const Vectord& a)
     {
         m_qDotDot = a;

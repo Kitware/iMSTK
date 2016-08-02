@@ -24,11 +24,13 @@
 
 #include <limits>
 
+// imstk
 #include "imstkGeometryMap.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class OneToOneMap
@@ -39,9 +41,14 @@ namespace imstk {
 class OneToOneMap : public GeometryMap
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     OneToOneMap() : GeometryMap(GeometryMap::Type::OneToOne){}
 
+    ///
+    /// \brief Default destructor
+    ///
     ~OneToOneMap() = default;
 
     ///
@@ -80,10 +87,9 @@ public:
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
 protected:
-
     std::map<int, int> m_oneToOneMap; ///> One to one mapping data
-
 };
-}
+
+} // imstk
 
 #endif // imstkOneToOneMap_h

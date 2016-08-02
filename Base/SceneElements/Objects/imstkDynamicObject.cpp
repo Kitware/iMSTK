@@ -78,4 +78,4 @@ DynamicObject::getNumOfDOF() const
     return numDOF;
 }
 
-}
+} // imstk

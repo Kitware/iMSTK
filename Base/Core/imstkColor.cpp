@@ -23,7 +23,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 bool isColorRangeCorrect( double c )
 {

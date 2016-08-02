@@ -27,7 +27,8 @@
 #include <Eigen/Geometry>
 #include <Eigen/Sparse>
 
-namespace imstk {
+namespace imstk
+{
 
 // 2D vector
 using Vec2f = Eigen::Vector2f;
@@ -81,7 +82,7 @@ using RigidTransform3d = Eigen::Isometry3d;
 using AffineTransform3f = Eigen::Affine3f;
 using AffineTransform3d = Eigen::Affine3d;
 
-// Handy cartesian vectors in 3d
+// Handy Cartesian vectors in 3d
 #define UP_VECTOR Vec3d(0.0, 1.0, 0.0)
 #define DOWN_VECTOR Vec3d(0, -1, 0)
 #define RIGHT_VECTOR Vec3d(1, 0, 0)
@@ -90,7 +91,7 @@ using AffineTransform3d = Eigen::Affine3d;
 #define BACKWARD_VECTOR Vec3d(0, 0, 1)
 #define WORLD_ORIGIN Vec3d::Zero()
 
-// Some commonly used math constants
+/// Some commonly used math constants
 const double PI = 3.14159265358979323846;
 const double PI_2 = 1.57079632679489661923;
 const double PI_4 = 0.785398163397448309616;
@@ -111,6 +112,6 @@ const double MAX_F = std::numeric_limits<float>::max();
 const double MIN_F = std::numeric_limits<float>::min();
 
 const double MACHINE_PRECISION = std::numeric_limits<double>::denorm_min();
-}
 
+}
 #endif // ifndef imstkMath_h

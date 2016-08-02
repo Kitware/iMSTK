@@ -24,7 +24,8 @@
 
 #include "imstkGeometryMap.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class IsometricMap
@@ -36,11 +37,17 @@ class IsometricMap : public GeometryMap
 {
 public:
 
+    ///
+    /// \brief Constructor
+    ///
     IsometricMap() :
         GeometryMap(GeometryMap::Type::Isometric),
         m_rigidTransform(RigidTransform3d::Identity())
     {}
 
+    ///
+    /// \brief Destructor
+    ///
     ~IsometricMap() = default;
 
     ///
@@ -61,8 +68,14 @@ public:
         return true;
     };
 
-    // Accessors
+    ///
+    /// \brief Set the transform
+    ///
     void setTransform(const RigidTransform3d& affineTransform);
+
+    ///
+    /// \brief Get the transform
+    ///
     const RigidTransform3d& getTransform() const;
 
 protected:
@@ -70,6 +83,7 @@ protected:
     RigidTransform3d m_rigidTransform; ///> Rigid transform
 
 };
-}
+
+} // imstk
 
 #endif // imstkIsometricMap_h

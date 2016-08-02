@@ -182,4 +182,4 @@ NonLinearSolver::setUpdateIterate(const NonLinearSolver::UpdateIterateType& newU
     this->m_updateIterate = newUpdateIterate;
 }
 
-}
+} // imstk

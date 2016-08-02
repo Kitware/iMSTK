@@ -83,6 +83,6 @@ protected:
     Vectord m_residual;       ///> Storage for residual vector.
 };
 
-}
+} //imstk
 
-#endif // SOLVERS_ITERATIVE_LINEAR_SOLVER
+#endif // imstkIterativeLinearSystem_h

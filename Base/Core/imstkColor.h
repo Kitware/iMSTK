@@ -24,7 +24,14 @@
 
 #include <iostream>
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \struct Color
+///
+/// \brief Color in RGB space
+///
 struct Color
 {
     union
@@ -39,29 +46,53 @@ struct Color
         };
     };
 
+    ///
+    /// \brief Constructor
+    ///
     Color();
     Color(double r, double g, double b, double a = 1.0);
+
+    ///
+    /// \brief Equality operator
+    ///
     Color &operator=(const Color &p_color);
+
+    ///
+    /// \brief Bitwise operator
+    ///
     friend std::ostream& operator<<(std::ostream& os, const Color& c);
 
+    ///
     /// \brief returns the color value given with the index
+    ///
     double operator()(int p_i) const;
 
+    ///
     /// \brief Dark ratio. the valu is between 0 and 1.0
+    ///
     void darken(double p_darkFactor);
 
+    ///
     /// \brief lighten the color
+    ///
     void lighten(double p_darkFactor);
 
+    ///
     /// \brief set RGB color
+    ///
     void setValue(double p_red, double p_green, double p_blue, double p_alpha = 1.0);
 
+    ///
     /// \brief get RGB color
+    ///
     void getValue(double color[4]);
 
+    ///
     /// \brief get RGB color
+    ///
     const double *getValue() const;
 
+    /// Various commonly used colors
     static Color White;
     static Color Black;
     static Color DarkGray;
@@ -72,6 +103,6 @@ struct Color
     static Color Pink;
     static Color Yellow;
 };
-}
 
+}
 #endif // ifndef imstkColor_h

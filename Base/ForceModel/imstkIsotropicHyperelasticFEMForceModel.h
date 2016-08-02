@@ -37,10 +37,18 @@
 namespace imstk
 {
 
+///
+/// \class IsotropicHyperelasticFEForceModel
+///
+/// \brief Force model for the isotropic hyperelastic material
+///
 class IsotropicHyperelasticFEForceModel : public InternalForceModel
 {
 
 public:
+    ///
+    /// \brief Constructor
+    ///
     IsotropicHyperelasticFEForceModel(const HyperElasticMaterialType materialType,
         std::shared_ptr<vega::VolumetricMesh> mesh,
         const double inversionThreshold,
@@ -86,16 +94,28 @@ public:
             gravity);
     }
 
+    ///
+    /// \brief Constructor type that is not allowed
+    ///
     IsotropicHyperelasticFEForceModel() = delete;
 
+    ///
+    /// \brief Destructor
+    ///
     virtual ~IsotropicHyperelasticFEForceModel() = default;
 
+    ///
+    /// \brief Get the internal force
+    ///
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
         double *data = const_cast<double*>(u.data());
         m_isotropicHyperelasticFEM->ComputeForces(data, internalForce.data());
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix
+    ///
     void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         double *data = const_cast<double*>(u.data());
@@ -103,11 +123,17 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix topology
+    ///
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
     {
         m_isotropicHyperelasticFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix and internal force
+    ///
     void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
         double *data = const_cast<double*>(u.data());
@@ -115,15 +141,18 @@ public:
         InternalForceModel::updateValuesFromMatrix(m_vegaTangentStiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    ///
+    /// \brief Set the tangent stiffness matrix
+    ///
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
     {
         m_vegaTangentStiffnessMatrix = K;
     }
 
 protected:
-    std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFEM;
-    std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;
+    std::shared_ptr<vega::IsotropicHyperelasticFEM> m_isotropicHyperelasticFEM; ///>
+    std::shared_ptr<vega::IsotropicMaterial> m_isotropicMaterial;               ///>
+    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;           ///>
 };
 
 } // imstk

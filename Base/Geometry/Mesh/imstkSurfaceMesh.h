@@ -22,13 +22,16 @@
 #ifndef imstkSurfaceMesh_h
 #define imstkSurfaceMesh_h
 
+// std library
 #include <array>
 #include <list>
 #include <set>
 
+// imstk
 #include "imstkMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class SurfaceMesh
@@ -42,8 +45,14 @@ public:
     using TriangleArray = std::array<size_t, 3>;
     using NeighborsType = std::set<size_t>;
 
+    ///
+    /// \brief Constructor
+    ///
     SurfaceMesh() : Mesh(Geometry::Type::SurfaceMesh) {}
 
+    ///
+    /// \brief Default destructor
+    ///
     ~SurfaceMesh() = default;
 
     ///
@@ -155,6 +164,7 @@ protected:
     std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
     std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkSurfaceMesh_h

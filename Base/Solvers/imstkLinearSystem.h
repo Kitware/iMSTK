@@ -146,6 +146,6 @@ private:
     Vectord m_f; ///> Scratch storage for matrix-vector operations
 };
 
-}
+} // imstk
 
 #endif // imstkLinearSystem_h

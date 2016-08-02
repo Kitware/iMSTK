@@ -216,4 +216,5 @@ TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetr
     }
     return enclosingTetrahedron;
 }
-}
+
+} // imstk

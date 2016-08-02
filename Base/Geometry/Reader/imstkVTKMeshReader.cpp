@@ -32,7 +32,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 std::shared_ptr<Mesh>
 VTKMeshReader::read(const std::string& filePath, MeshFileType meshType)
 {
@@ -271,4 +273,5 @@ VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std:
         dataMap[name] = data;
     }
 }
-}
+
+} // imstk

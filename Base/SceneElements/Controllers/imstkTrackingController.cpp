@@ -25,7 +25,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 bool
 TrackingController::computeTrackingData(Vec3d& p, Quatd& r)
@@ -114,4 +115,5 @@ TrackingController::setInversionFlags(unsigned char f)
 {
     m_invertFlags = f;
 }
-}
+
+} // imstk

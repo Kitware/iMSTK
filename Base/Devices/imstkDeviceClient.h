@@ -27,7 +27,8 @@
 #include "imstkModule.h"
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class DeviceClient
@@ -37,9 +38,11 @@ class DeviceClient : public Module
 {
 public:
 
+    ///
+    /// \brief Destructor
+    ///
     virtual ~DeviceClient() {}
 
-    // Accessors
     ///
     /// \brief Get/Set the device IP
     ///
@@ -91,24 +94,28 @@ public:
 
 protected:
 
+    ///
+    /// \brief Constructor
+    ///
     DeviceClient(std::string name, std::string ip):
         Module(name),
         m_ip(ip)
     {}
 
-    std::string m_ip; //!< Connection device IP
+    std::string m_ip; ///< Connection device IP
 
-    bool m_trackingEnabled = true; //!< Tracking enabled if true
-    bool m_analogicEnabled = true; //!< Analogic enabled if true
-    bool m_buttonsEnabled = true;  //!< Buttons enabled if true
-    bool m_forceEnabled = false;   //!< Force enabled if true
+    bool m_trackingEnabled = true; ///< Tracking enabled if true
+    bool m_analogicEnabled = true; ///< Analogic enabled if true
+    bool m_buttonsEnabled = true;  ///< Buttons enabled if true
+    bool m_forceEnabled = false;   ///< Force enabled if true
 
-    Vec3d m_position = Vec3d::Zero();        //!< Position of end effector
-    Vec3d m_velocity = Vec3d::Zero();        //!< Linear velocity of end effector
-    Quatd m_orientation = Quatd::Identity(); //!< Orientation of the end effector
-    std::map<size_t, bool> m_buttons;        //!< Buttons: true = pressed/false = not pressed
-    Vec3d m_force = Vec3d::Zero();           //!< Force vector
+    Vec3d m_position = Vec3d::Zero();        ///< Position of end effector
+    Vec3d m_velocity = Vec3d::Zero();        ///< Linear velocity of end effector
+    Quatd m_orientation = Quatd::Identity(); ///< Orientation of the end effector
+    std::map<size_t, bool> m_buttons;        ///< Buttons: true = pressed/false = not pressed
+    Vec3d m_force = Vec3d::Zero();           ///< Force vector
 };
+
 }
 
 #endif // ifndef imstkDeviceClient_h

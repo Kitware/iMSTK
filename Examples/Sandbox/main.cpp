@@ -49,6 +49,7 @@
 
 // logger
 #include "g3log/g3log.hpp"
+#include "imstkUtils.h"
 
 using namespace imstk;
 
@@ -68,6 +69,7 @@ void testOneToOneNodalMap();
 void testExtractSurfaceMesh();
 void testSurfaceMeshOptimizer();
 void testDeformableBody();
+void testVectorPlotters();
 
 int main()
 {
@@ -90,7 +92,8 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    testDeformableBody();
+    //testDeformableBody();
+    testVectorPlotters();
 
     return 0;
 }
@@ -819,6 +822,12 @@ void testDeformableBody()
     }
     volTetMesh->extractSurfaceMesh(surfMesh);
 
+    imstk::StopWatch wct;
+    imstk::CpuTimer cput;
+
+    wct.start();
+    cput.start();
+
     // d. Construct a map
 
     // d.1 Construct one to one nodal map based on the above meshes
@@ -828,6 +837,9 @@ void testDeformableBody()
 
     // d.2 Compute the map
     oneToOneNodalMap->compute();
+
+    LOG(INFO) << "wall clock time: " << wct.getTimeElapsed() << " ms.";
+    LOG(INFO) << "CPU time: " << cput.getTimeElapsed() << " ms.";
 
     // e. Scene object 1: Dragon
 
@@ -862,7 +874,10 @@ void testDeformableBody()
     // h. Add collision handling
 
     // create a nonlinear system
-    auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    auto nlSystem = std::make_shared<NonLinearSystem>(
+        dynaModel->getFunction(),
+        dynaModel->getFunctionGradient());
+
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
 
@@ -878,4 +893,23 @@ void testDeformableBody()
     // Run the simulation
     sdk->setCurrentScene("DeformableBodyTest");
     sdk->startSimulation(true);
+}
+
+void testVectorPlotters()
+{
+    Vectord a;
+    a.resize(100);
+    a.setConstant(1.0001);
+
+    Vectord b;
+    b.resize(100);
+    b.setConstant(2.0);
+
+    plotters::writePlotterVectorMatlab(a, "plotX.m");
+    plotters::writePlotterVecVsVecMatlab(a, b, "plotXvsY.m");
+
+    plotters::writePlotterVectorMatPlotlib(a, "plotX.py");
+    plotters::writePlotterVecVsVecMatPlotlib(a, b, "plotXvsY.py");
+
+    getchar();
 }

@@ -43,8 +43,14 @@ namespace imstk
 class VegaMeshReader
 {
 public:
-
+    ///
+    /// \brief Default constructor
+    ///
     VegaMeshReader() = default;
+
+    ///
+    /// \brief Default destructor
+    ///
     ~VegaMeshReader() = default;
 
     ///

@@ -19,10 +19,11 @@
 
    =========================================================================*/
 
+// imstk
 #include "imstkInteractorStyle.h"
-
 #include "imstkSimulationManager.h"
 
+// vtk
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
@@ -31,7 +32,8 @@
 #include "vtkAssemblyPath.h"
 #include "vtkAbstractPropPicker.h"
 
-namespace imstk {
+namespace imstk
+{
 
 vtkStandardNewMacro(InteractorStyle);
 
@@ -312,4 +314,5 @@ InteractorStyle::setSimulationManager(SimulationManager *simManager)
 {
     m_simManager = simManager;
 }
-}
+
+} // imstk

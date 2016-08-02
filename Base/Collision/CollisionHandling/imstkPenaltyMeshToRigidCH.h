@@ -22,15 +22,23 @@
 #ifndef imstkPenaltyMeshToRigidCH_h
 #define imstkPenaltyMeshToRigidCH_h
 
-#include "imstkCollisionHandling.h"
-
+// std library
 #include <memory>
 
-namespace imstk {
+// imstk
+#include "imstkCollisionHandling.h"
+
+namespace imstk
+{
 
 class CollidingObject;
 class CollisionData;
 
+///
+/// \class PenaltyMeshToRigidCH
+///
+/// \brief Mesh-to-Rigid collision handling based on penalty approach
+///
 class PenaltyMeshToRigidCH : public CollisionHandling
 {
 public:
@@ -59,8 +67,9 @@ private:
     std::shared_ptr<CollidingObject> m_object; ///> The mesh object under collision
 
     double m_stiffness; ///> Stiffness of contact
-    double m_damping; ///> Damping of the contact
+    double m_damping;   ///> Damping of the contact
 };
+
 }
 
 #endif // ifndef imstkPenaltyMeshToRigidCH_h

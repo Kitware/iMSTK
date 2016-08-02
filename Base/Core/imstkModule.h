@@ -26,9 +26,12 @@
 #include <thread>
 #include <atomic>
 
-namespace imstk 
+namespace imstk
 {
 
+///
+/// \brief Enumerations for the status of the module
+///
 enum class ModuleStatus
 {
     STARTING,
@@ -39,37 +42,89 @@ enum class ModuleStatus
     INACTIVE
 };
 
+///
+/// \class Module
+///
+/// \brief iMSTK module
+///
 class Module
 {
 public:
-
+    ///
+    /// \brief Destructor
+    ///
     ~Module() = default;
 
-    void                start();
-    void                run();
-    void                pause();
-    void                end();
+    ///
+    /// \brief Start the module
+    ///
+    void start();
 
+    ///
+    /// \brief Run module
+    ///
+    void run();
+
+    ///
+    /// \brief Pause the module
+    ///
+    void pause();
+
+    ///
+    /// \brief End the module
+    ///
+    void end();
+
+    ///
+    /// \brief Get the status of the module
+    ///
     const ModuleStatus getStatus() const;
+
+    ///
+    /// \brief Get the name of the module
+    ///
     const std::string& getName() const;
+
+    ///
+    /// \brief Get loop delay
+    ///
     const int& getLoopDelay() const;
+
+    ///
+    /// \brief Set the loop delay
+    ///
     void setLoopDelay(int milliseconds);
 
 protected:
-
+    ///
+    /// \brief Protected constructor
+    ///
     Module(std::string name, int loopDelay = 0) :
         m_name(name),
         m_loopDelay(loopDelay)
     {}
 
+    ///
+    /// \brief Initialize module
+    ///
     virtual void initModule()    = 0;
+
+    ///
+    /// \brief Run the module
+    ///
     virtual void runModule()     = 0;
+
+    ///
+    /// \brief Clean the module
+    ///
     virtual void cleanUpModule() = 0;
 
-    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};
-    std::string  m_name;
-    int m_loopDelay;
+    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};///> Module status
+
+    std::string  m_name;    ///> Name of the module
+    int m_loopDelay;        ///> Loop delay
 };
+
 }
 
 #endif // ifndef imstkModule_h

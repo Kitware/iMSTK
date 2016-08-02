@@ -29,7 +29,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 TetrahedralMeshRenderDelegate::TetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
     m_geometry(tetrahedralMesh)
 {
@@ -78,4 +80,5 @@ TetrahedralMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-}
+
+} // imstk

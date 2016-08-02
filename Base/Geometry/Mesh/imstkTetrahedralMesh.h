@@ -26,9 +26,11 @@
 #include <list>
 #include <iostream>
 
+// imstk
 #include "imstkVolumetricMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class TetrahedralMesh
@@ -42,8 +44,14 @@ public:
     using TetraArray = std::array<size_t, 4>;
     using WeightsArray = std::array<double, 4>;
 
+    ///
+    /// \brief Constructor
+    ///
     TetrahedralMesh() : VolumetricMesh(Geometry::Type::TetrahedralMesh) {}
 
+    ///
+    /// \brief Destructor
+    ///
     ~TetrahedralMesh() = default;
 
     ///
@@ -114,9 +122,9 @@ public:
     int getNumTetrahedra() const;
 
 protected:
-
     std::vector<TetraArray> m_tetrahedraVertices; ///< vertices of the tetrahedra
 };
+
 }
 
 #endif // ifndef imstkTetrahedralMesh_h

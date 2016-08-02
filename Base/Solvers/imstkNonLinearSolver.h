@@ -123,6 +123,6 @@ protected:
     UpdateIterateType m_updateIterate;                  ///< Update iteration function
 };
 
-}
+} // imstk
 
-#endif // SOLVERS_LINEAR_SOLVER
+#endif // SOLVERS_NONLINEARSOLVER_H

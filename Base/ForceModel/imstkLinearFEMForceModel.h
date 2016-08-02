@@ -36,9 +36,17 @@
 namespace imstk
 {
 
+///
+/// \class LinearFEMForceModel
+///
+/// \brief Force model for linear finite element formulation
+///
 class LinearFEMForceModel : public InternalForceModel
 {
 public:
+    ///
+    /// \brief Constructor
+    ///
     LinearFEMForceModel(std::shared_ptr<vega::VolumetricMesh> mesh,
         const bool withGravity = true,
         const double gravity = -9.81) : InternalForceModel()
@@ -56,30 +64,48 @@ public:
         //delete(stVKStiffnessMatrix);
     };
 
+    ///
+    /// \brief Destructor
+    ///
     virtual ~LinearFEMForceModel() = default;
 
+    ///
+    /// \brief Get the internal force
+    ///
     void getInternalForce(const Vectord& u, Vectord& internalForce)
     {
         double *data = const_cast<double*>(u.data());
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix
+    ///
     void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
     {
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix topology
+    ///
     void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
     {
         *tangentStiffnessMatrix = new vega::SparseMatrix(*m_stiffnessMatrix.get());
     }
 
+    ///
+    /// \brief Get the tangent stiffness matrix and internal force
+    ///
     void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
     {
         getInternalForce(u, internalForce);
         getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
     }
 
+    ///
+    /// \brief Set the tangent stiffness matrix
+    ///
     virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
     {
         m_stiffnessMatrix = K;

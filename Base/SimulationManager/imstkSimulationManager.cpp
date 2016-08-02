@@ -25,7 +25,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 const
 SimulationStatus& SimulationManager::getStatus() const
 {
@@ -464,4 +466,5 @@ SimulationManager::startModuleInNewThread(std::shared_ptr<Module>module)
 {
     m_threadMap[module->getName()] = std::thread([module] { module->start(); });
 }
-}
+
+} // imstk
