@@ -85,9 +85,9 @@ SceneManager::runModule()
         }
         if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
-            pbdObj->getDynamicalModel()->getState()->integratePosition();
-            pbdObj->getDynamicalModel()->constraintProjection();
-            pbdObj->getPhysicsToCollidingMap()->apply();
+            pbdObj->integratePosition();
+            pbdObj->constraintProjection();
+            pbdObj->applyPhysicsToColliding();
         }
     }
 
@@ -105,9 +105,9 @@ SceneManager::runModule()
     {
         if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
-            pbdObj->getDynamicalModel()->getState()->integrateVelocity();
-            pbdObj->getDynamicalModel()->updatePhysicsGeometry();
-            pbdObj->getPhysicsToVisualMap()->apply();
+            pbdObj->integrateVelocity();
+            pbdObj->updateGeometry();
+            pbdObj->applyPhysicsToVisual();
         }
     }
 

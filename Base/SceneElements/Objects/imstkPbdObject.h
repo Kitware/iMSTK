@@ -17,10 +17,28 @@ class PbdObject : public SceneObject
 {
 public:
 
+    PbdObject(std::string name) : SceneObject(name)
+    {
+        m_type = SceneObject::Type::Deformable;
+    }
     ///
     /// \brief Destructor
     ///
     virtual ~PbdObject() = default;
+
+    void init(int nCons, ...);
+
+    void integratePosition();
+
+    void integrateVelocity();
+
+    void updateGeometry();
+
+    void constraintProjection();
+
+    void applyPhysicsToColliding();
+
+    void applyPhysicsToVisual();
 
     ///
     /// \brief Set/Get the geometry used for Physics computations
@@ -28,8 +46,6 @@ public:
     std::shared_ptr<Geometry> getPhysicsGeometry() const;
     void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
 
-    std::shared_ptr<Geometry> getCollidingGeometry() const;
-    void setColldingGeometry(std::shared_ptr<Geometry> geometry);
     ///
     /// \brief Set/Get the Physics-to-Collision map
     ///
@@ -53,18 +69,10 @@ public:
     ///
     size_t getNumOfDOF() const;
 
-    PbdObject(std::string name) : SceneObject(name)
-    {
-        m_type = SceneObject::Type::Deformable;
-    }
-
-    void init(int fem, ...);
-
 protected:
 
     std::shared_ptr<PositionBasedModel> m_pbdModel;
     std::shared_ptr<Geometry> m_physicsGeometry;
-    std::shared_ptr<Geometry> m_collidingGeometry;
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry

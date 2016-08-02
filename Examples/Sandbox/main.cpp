@@ -923,15 +923,14 @@ void testPbdVolume()
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/1,
+    deformableObj->init(/*Number of Constraints*/1,
+                        /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
                         /*Gravity*/"0 -9.8 0",
-                        /*Mass*/1.0,
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"51 127 178",
-                        /*TypeofConstraint*/"FEM",
                         /*NumberOfIterationInConstraintSolver*/5,
-                        /*YoungModulus*/100.0,
-                        /*PoissonRatio*/0.3);
+                        /*Mass*/1.0);
+
     scene->addSceneObject(deformableObj);
 
 
@@ -1007,13 +1006,15 @@ void testPbdCloth()
     deformableObj->setVisualGeometry(visuMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/0,
+    deformableObj->init(/*Number of constraints*/2,
+                        /*Constraint configuration*/"Distance 0.1",
+                        /*Constraint configuration*/"Dihedral 0.001",
                         /*Gravity*/"0 -9.8 0",
-                        /*Mass*/1.0,
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"1 20",
-                        /*TypeofConstraint*/"Distance Dihedral",
-                        /*NumberOfIterationInConstraintSolver*/5);
+                        /*NumberOfIterationInConstraintSolver*/5,
+                        /*Mass*/1.0);
+
     scene->addSceneObject(deformableObj);
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
@@ -1022,7 +1023,7 @@ void testPbdCollision()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon
     auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
@@ -1052,15 +1053,16 @@ void testPbdCollision()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(oneToOneNodalMap);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init(/*FEM or not, if yes Young and Poisson must be provided*/1,
+    deformableObj->init(/*Number of Constraints*/1,
+                        /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
                         /*Gravity*/"0 -9.8 0",
-                        /*Mass*/1.0,
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"",
-                        /*TypeofConstraint*/"FEM",
                         /*NumberOfIterationInConstraintSolver*/5,
-                        /*YoungModulus*/100.0,
-                        /*PoissonRatio*/0.3);
+                        /*Mass*/1.0,
+                        /*Proximity*/0.1,
+                        /*Contact stiffness*/0.01);
+
     scene->addSceneObject(deformableObj);
 
     // floor
@@ -1079,7 +1081,7 @@ void testPbdCollision()
         {
             const double y = (double)dy*j;
             const double x = (double)dx*i;
-            vertList[i*nCols + j] = Vec3d(x, -10.0, y);
+            vertList[i*nCols + j] = Vec3d(x-50, -10.0, y-50);
 
         }
     }
@@ -1093,18 +1095,28 @@ void testPbdCollision()
         for (int j = 0; j < nCols - 1; j++)
         {
             imstk::SurfaceMesh::TriangleArray tri[2];
-            tri[0] = { { i*nCols + j, (i + 1)*nCols + j , i*nCols + j + 1 } };
-            tri[1] = { { (i + 1)*nCols + j + 1, i*nCols + j + 1, (i + 1)*nCols + j } };
+            tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
+            tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j , i*nCols + j + 1} };
             triangles.push_back(tri[0]);
             triangles.push_back(tri[1]);
         }
     }
     floorMesh->setTrianglesVertices(triangles);
 
+    auto oneToOneFloor = std::make_shared<imstk::OneToOneMap>();
+    oneToOneFloor->setMaster(floorMesh);
+    oneToOneFloor->setSlave(floorMesh);
+    oneToOneFloor->compute();
+
     auto floor = std::make_shared<PbdObject>("Floor");
     floor->setCollidingGeometry(floorMesh);
     floor->setVisualGeometry(floorMesh);
     floor->setPhysicsGeometry(floorMesh);
+    floor->setPhysicsToCollidingMap(oneToOneFloor);
+    floor->init(/*Number of Constraints*/0,
+                /*Mass*/0.0,
+                /*Proximity*/0.1,
+                /*Contact stiffness*/1.0);
     scene->addSceneObject(floor);
 
     // Collisions

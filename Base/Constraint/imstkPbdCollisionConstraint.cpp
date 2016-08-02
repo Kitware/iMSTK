@@ -1,5 +1,6 @@
 #include "imstkPbdModel.h"
 #include "imstkPbdCollisionConstraint.h"
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
@@ -50,7 +51,7 @@ bool EdgeEdgeConstraint::solvePositionConstraint()
         }
     }
     else {
-        printf("WARNING: det is null \n");
+        LOG(WARNING) << "det is null";
     }
 
     Vec3d P = x0 + t*(x1-x0);
@@ -78,6 +79,8 @@ bool EdgeEdgeConstraint::solvePositionConstraint()
     double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm();
 
     lambda = (l - dist)/lambda;
+
+//    LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
 
     if (im0 > 0)
         x0 += -im0*lambda*grad0*m_model1->getContactStiffness();
@@ -112,11 +115,11 @@ bool PointTriangleConstraint::solvePositionConstraint()
     auto state1 = m_model1->getState();
     auto state2 = m_model2->getState();
 
-    Vec3d x0 = state1->getVertexPosition(i0);
+    Vec3d& x0 = state1->getVertexPosition(i0);
 
-    Vec3d x1 = state2->getVertexPosition(i1);
-    Vec3d x2 = state2->getVertexPosition(i2);
-    Vec3d x3 = state2->getVertexPosition(i3);
+    Vec3d& x1 = state2->getVertexPosition(i1);
+    Vec3d& x2 = state2->getVertexPosition(i2);
+    Vec3d& x3 = state2->getVertexPosition(i3);
 
     Vec3d x12 = x2 - x1;
     Vec3d x13 = x3 - x1;
@@ -127,6 +130,7 @@ bool PointTriangleConstraint::solvePositionConstraint()
     double beta  = n.dot(x01.cross(x13))/ (n.dot(n));
 
     if (alpha < 0 || beta < 0 || alpha + beta > 1 ) {
+        LOG(WARNING) << "Projection point not inside the triangle";
         return false;
     }
 
@@ -154,6 +158,8 @@ bool PointTriangleConstraint::solvePositionConstraint()
     double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm();
 
     lambda = (l - dist)/lambda;
+
+//    LOG(INFO) << "Lambda:" << lambda <<" Normal:" << n[0] <<" " << n[1] <<" "<<n[2];
 
     if (im0 > 0)
         x0 += -im0*lambda*grad0*m_model1->getContactStiffness();

@@ -94,9 +94,12 @@ public:
 
     ///
     /// \brief create constraints from the underlying mesh structure
-    /// \param type could be Distance,Dihedral, Area, Volume, FEMTet, FEMHex, EdgeEdge, PointTriangle
     ///
-    bool initConstraints(PbdConstraint::Type type);
+    bool initFEMConstraints(FEMConstraint::MaterialType type);
+    bool initVolumeConstraints(const double& stiffness);
+    bool initDistanceConstraints(const double& stiffness);
+    bool initAreaConstraints(const double& stiffness);
+    bool initDihedralConstraints(const double& stiffness);
     ///
     /// \brief addConstraint add elastic constraint
     /// \param constraint
@@ -112,6 +115,11 @@ public:
     void constraintProjection();
 
     void updatePhysicsGeometry();
+
+    inline bool hasConstraints() const
+    {
+        return !m_constraints.empty();
+    }
 
 };
 

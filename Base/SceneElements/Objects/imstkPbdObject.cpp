@@ -1,4 +1,5 @@
 #include "imstkPbdObject.h"
+#include <g3log/g3log.hpp>
 
 namespace imstk
 {
@@ -13,16 +14,9 @@ void
 PbdObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_physicsGeometry = geometry;
-}
-
-std::shared_ptr<Geometry> PbdObject::getCollidingGeometry() const
-{
-    return m_collidingGeometry;
-}
-
-void PbdObject::setColldingGeometry(std::shared_ptr<Geometry> geometry)
-{
-    m_collidingGeometry = geometry;
+    m_pbdModel = std::make_shared<PositionBasedModel>();
+    auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
+    m_pbdModel->setModelGeometry(mesh.get());
 }
 
 std::shared_ptr<GeometryMap>
@@ -67,66 +61,141 @@ PbdObject::getNumOfDOF() const
     return numDOF;
 }
 
-void PbdObject::init(int fem, ...)
+void PbdObject::init(int nCons, ...)
 {
-    va_list args;
-    va_start(args, fem);
-
-    m_pbdModel = std::make_shared<PositionBasedModel>();
-    auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
-    m_pbdModel->setModelGeometry(mesh.get());
     auto state = m_pbdModel->getState();
-    char* gstring = va_arg(args,char*);
-    float x,y,z;
-    sscanf(gstring,"%f %f %f", &x, &y, &z);
-    Vec3d g(x,y,z);
-    state->setGravity(g);
-    state->setUniformMass(va_arg(args,double));
-    state->setTimeStep(va_arg(args,double));
-    char *s = va_arg(args,char*);
-    if (strlen(s) > 0) {
-        while (1)
-        {
-            int idx = atoi(s);
-            state->setFixedPoint(idx-1);
-            while (*s != ' ' && *s != '\0') ++s;
-            if (*s == '\0') break; else ++s;
-        }
-    }
-    s = va_arg(args,char*);
-    int pos = 0;
-    while (1)
-    {
+
+    va_list args;
+    va_start(args, nCons);
+    for(int i = 0; i < nCons; ++i) {
+        char* s = va_arg(args,char*);
         int len = 0;
-        while (s[pos+len] != ' ' && s[pos+len] != '\0') {
+        while (s[len] != ' ' && s[len] != '\0') {
             ++len;
         }
+        if (strncmp("FEM",&s[0],len)==0) {
+            int pos = len+1;
+            len = 0;
+            while (s[pos+len] != ' ' && s[pos+len] != '\0') {
+                ++len;
+            }
+            if (strncmp("Corotation",&s[pos],len)==0) {
+                LOG(INFO) << "Creating Corotation constraints";
+                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::Corotation);
+            }
+            else if (strncmp("NeoHookean",&s[pos],len)==0) {
+                LOG(INFO) << "Creating Neohookean constraints";
+                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::NeoHookean);
+            }
+            else if (strncmp("Stvk",&s[pos],len)==0) {
+                LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
+                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
+            }
+            else { // default
+                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
+            }
+            float YoungModulus, PoissonRatio;
+            sscanf(&s[pos+len+1], "%f %f", &YoungModulus, &PoissonRatio);
+            m_pbdModel->setElasticModulus(YoungModulus, PoissonRatio);
+        }
+        else if (strncmp("Volume",&s[0],len)==0) {
+            float stiffness;
+            sscanf(&s[len+1], "%f", &stiffness);
+            LOG(INFO) << "Creating Volume constraints " << stiffness ;
+            m_pbdModel->initVolumeConstraints(stiffness);
+        }
+        else if (strncmp("Distance",&s[0],len)==0) {
+            float stiffness;
+            sscanf(&s[len+1], "%f", &stiffness);
+            LOG(INFO) << "Creating Distance constraints " << stiffness;
+            m_pbdModel->initDistanceConstraints(stiffness);
+        }
+        else if (strncmp("Area",&s[0],len)==0) {
+            float stiffness;
+            sscanf(&s[len+1], "%f", &stiffness);
+            LOG(INFO) << "Creating Area constraints " << stiffness;
+            m_pbdModel->initAreaConstraints(stiffness);
+        }
+        else if (strncmp("Dihedral",&s[0],len)==0) {
+            float stiffness;
+            sscanf(&s[len+1], "%f", &stiffness);
+            LOG(INFO) << "Creating Dihedral constraints " << stiffness;
+            m_pbdModel->initDihedralConstraints(stiffness);
+        }
+        else {
+            exit(0);
+        }
+    }
+    if (nCons > 0)
+    {
+        char* gstring = va_arg(args,char*);
+        float x,y,z;
+        sscanf(gstring,"%f %f %f", &x, &y, &z);
+        Vec3d g(x,y,z);
+        state->setGravity(g);
+        state->setTimeStep(va_arg(args,double));
+        char *s = va_arg(args,char*);
+        if (strlen(s) > 0) {
+            while (1)
+            {
+                int idx = atoi(s);
+                state->setFixedPoint(idx-1);
+                while (*s != ' ' && *s != '\0') ++s;
+                if (*s == '\0') break; else ++s;
+            }
+        }
 
-        if (strncmp("FEM",&s[pos],len)==0) {
-            m_pbdModel->initConstraints(PbdConstraint::Type::FEMTet);
-        }
-        else if (strncmp("Volume",&s[pos],len)==0) {
-            m_pbdModel->initConstraints(PbdConstraint::Type::Volume);
-        }
-        else if (strncmp("Distance",&s[pos],len)==0) {
-            m_pbdModel->initConstraints(PbdConstraint::Type::Distance);
-        }
-        else if (strncmp("Area",&s[pos],len)==0) {
-            m_pbdModel->initConstraints(PbdConstraint::Type::Area);
-        }
-        else if (strncmp("Dihedral",&s[pos],len)==0) {
-            m_pbdModel->initConstraints(PbdConstraint::Type::Dihedral);
-        }
-
-        if (s[pos+len] == '\0') break; else pos += len+1;
+        m_pbdModel->setNumberOfInterations(va_arg(args,int));
     }
 
-    m_pbdModel->setNumberOfInterations(va_arg(args,int));
-    if (fem)
+    state->setUniformMass(va_arg(args,double));
+
+    if (m_physicsToCollidingGeomMap && m_collidingGeometry)
     {
-        double YoungModulus = va_arg(args,double);
-        double PoissonRatio = va_arg(args,double);
-        m_pbdModel->setElasticModulus(YoungModulus, PoissonRatio);
+        m_pbdModel->setProximity(va_arg(args,double));
+        m_pbdModel->setContactStiffness(va_arg(args,double));
+    }
+}
+
+void PbdObject::integratePosition()
+{
+    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+        m_pbdModel->getState()->integratePosition();
+    }
+}
+
+void PbdObject::integrateVelocity()
+{
+    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+        m_pbdModel->getState()->integrateVelocity();
+    }
+}
+
+void PbdObject::updateGeometry()
+{
+    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+        m_pbdModel->updatePhysicsGeometry();
+    }
+}
+
+void PbdObject::constraintProjection()
+{
+    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+        m_pbdModel->constraintProjection();
+    }
+}
+
+void PbdObject::applyPhysicsToColliding()
+{
+    if (m_physicsToCollidingGeomMap && m_collidingGeometry) {
+        m_physicsToCollidingGeomMap->apply();
+    }
+}
+
+void PbdObject::applyPhysicsToVisual()
+{
+    if (m_physicsToVisualGeomMap && m_visualGeometry) {
+        m_physicsToVisualGeomMap->apply();
     }
 }
 
