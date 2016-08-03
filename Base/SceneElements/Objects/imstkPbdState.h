@@ -60,7 +60,7 @@ public:
     }
 
     inline void setFixedPoint(const unsigned int& idx)
-    {
+    {        
         if ( idx < m_pos.size())
             m_invMass[idx] = 0;
     }
@@ -88,7 +88,6 @@ public:
 
     void integrateVelocity();
 
-    void computeAABB(double& min_x, double& max_x, double& min_y, double& max_y, double& min_z, double& max_z);
 };
 
 }

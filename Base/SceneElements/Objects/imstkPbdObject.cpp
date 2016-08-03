@@ -126,6 +126,9 @@ void PbdObject::init(int nCons, ...)
             exit(0);
         }
     }
+
+    state->setUniformMass(va_arg(args,double));
+
     if (nCons > 0)
     {
         char* gstring = va_arg(args,char*);
@@ -147,8 +150,6 @@ void PbdObject::init(int nCons, ...)
 
         m_pbdModel->setNumberOfInterations(va_arg(args,int));
     }
-
-    state->setUniformMass(va_arg(args,double));
 
     if (m_physicsToCollidingGeomMap && m_collidingGeometry)
     {

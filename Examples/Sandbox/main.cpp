@@ -925,11 +925,12 @@ void testPbdVolume()
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->init(/*Number of Constraints*/1,
                         /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
+                        /*Mass*/1.0,
                         /*Gravity*/"0 -9.8 0",
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"51 127 178",
-                        /*NumberOfIterationInConstraintSolver*/5,
-                        /*Mass*/1.0);
+                        /*NumberOfIterationInConstraintSolver*/5
+                        );
 
     scene->addSceneObject(deformableObj);
 
@@ -1009,11 +1010,12 @@ void testPbdCloth()
     deformableObj->init(/*Number of constraints*/2,
                         /*Constraint configuration*/"Distance 0.1",
                         /*Constraint configuration*/"Dihedral 0.001",
+                        /*Mass*/1.0,
                         /*Gravity*/"0 -9.8 0",
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"1 20",
-                        /*NumberOfIterationInConstraintSolver*/5,
-                        /*Mass*/1.0);
+                        /*NumberOfIterationInConstraintSolver*/5
+                        );
 
     scene->addSceneObject(deformableObj);
     sdk->setCurrentScene("PositionBasedDynamicsTest");
@@ -1055,11 +1057,11 @@ void testPbdCollision()
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->init(/*Number of Constraints*/1,
                         /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
+                        /*Mass*/1.0,
                         /*Gravity*/"0 -9.8 0",
                         /*TimeStep*/0.001,
                         /*FixedPoint*/"",
                         /*NumberOfIterationInConstraintSolver*/5,
-                        /*Mass*/1.0,
                         /*Proximity*/0.1,
                         /*Contact stiffness*/0.01);
 
