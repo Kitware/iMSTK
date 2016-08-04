@@ -2,15 +2,11 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( SceneElements
+imstk_add_library( Constraint
   DEPENDS
     Core
     Geometry
-    Constraint
-    Devices
-	TimeIntegrators
-	ForceModel
-	Solvers
+    SceneElements
   )
 
 #-----------------------------------------------------------------------------

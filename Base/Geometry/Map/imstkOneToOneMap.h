@@ -86,6 +86,10 @@ public:
     ///
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
+    unsigned int getMapIdx(const unsigned int& idx)
+    {
+        return m_oneToOneMap[idx];
+    }
 protected:
     std::map<int, int> m_oneToOneMap; ///> One to one mapping data
 };

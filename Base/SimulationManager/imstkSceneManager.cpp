@@ -24,6 +24,7 @@
 #include "imstkCameraController.h"
 #include "imstkVirtualCouplingObject.h"
 #include "imstkDynamicObject.h"
+#include "imstkPbdObject.h"
 
 #include "g3log/g3log.hpp"
 
@@ -82,6 +83,32 @@ SceneManager::runModule()
             dynaObj->getDynamicalModel()->updatePhysicsGeometry();
             //dynaObj->getPhysicsToCollidingMap()->apply();
             dynaObj->getPhysicsToVisualMap()->apply();
+        }
+        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+        {
+            pbdObj->integratePosition();
+            pbdObj->constraintProjection();
+            pbdObj->applyPhysicsToColliding();
+        }
+    }
+
+    for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
+    {
+        intPair->resetConstraints();
+        if (intPair->doBroadPhase())
+        {
+            intPair->doNarrowPhase();
+        }
+        intPair->doCollision();
+    }
+
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+        {
+            pbdObj->integrateVelocity();
+            pbdObj->updateGeometry();
+            pbdObj->applyPhysicsToVisual();
         }
     }
 

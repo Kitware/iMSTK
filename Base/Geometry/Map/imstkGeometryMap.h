@@ -114,6 +114,15 @@ public:
     virtual void setSlave(std::shared_ptr<Geometry> slave);
     virtual std::shared_ptr<Geometry> getSlave() const;
 
+    ///
+    /// \brief getMapIdx
+    /// \param idx
+    /// \return index of Master corresponding to the idx of Slave
+    ///
+    virtual unsigned int getMapIdx(const unsigned int& idx)
+    {
+        return 0;
+    }
 protected:
 
     ///
