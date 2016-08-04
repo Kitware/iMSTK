@@ -73,6 +73,7 @@ void testDeformableBody();
 void testPbdVolume();
 void testPbdCloth();
 void testPbdCollision();
+
 int main()
 {
     std::cout << "****************\n"
@@ -85,7 +86,7 @@ int main()
     //testTwoFalcons();
     //testObjectController();
     //testCameraController();
-//    testViewer();
+    //testViewer();
     //testReadMesh();
     //testAnalyticalGeometry();
     //testScenesManagement();
@@ -94,9 +95,9 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-//    testDeformableBody();
-//    testPbdVolume();
-//    testPbdCloth();
+    //testDeformableBody();
+    //testPbdVolume();
+    //testPbdCloth();
     testPbdCollision();
     return 0;
 }
@@ -885,6 +886,7 @@ void testDeformableBody()
     sdk->setCurrentScene("DeformableBodyTest");
     sdk->startSimulation(true);
 }
+
 void testPbdVolume()
 {
     auto sdk = std::make_shared<SimulationManager>();
@@ -892,7 +894,7 @@ void testPbdVolume()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -947,6 +949,7 @@ void testPbdVolume()
     sdk->startSimulation(true);
 
 }
+
 void testPbdCloth()
 {
     auto sdk = std::make_shared<imstk::SimulationManager>();
@@ -1021,6 +1024,7 @@ void testPbdCloth()
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
 }
+
 void testPbdCollision()
 {
     auto sdk = std::make_shared<SimulationManager>();
@@ -1028,7 +1032,7 @@ void testPbdCollision()
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon
-    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";

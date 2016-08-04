@@ -6,7 +6,8 @@
 
 #include <stdarg.h>
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class PbdObject
@@ -16,28 +17,52 @@ namespace imstk {
 class PbdObject : public SceneObject
 {
 public:
-
+    ///
+    /// \brief
+    ///
     PbdObject(std::string name) : SceneObject(name)
     {
         m_type = SceneObject::Type::Deformable;
     }
+
     ///
     /// \brief Destructor
     ///
     virtual ~PbdObject() = default;
 
+    ///
+    /// \brief
+    ///
     void init(int nCons, ...);
 
+    ///
+    /// \brief
+    ///
     void integratePosition();
 
+    ///
+    /// \brief
+    ///
     void integrateVelocity();
 
+    ///
+    /// \brief
+    ///
     void updateGeometry();
 
+    ///
+    /// \brief
+    ///
     void constraintProjection();
 
+    ///
+    /// \brief
+    ///
     void applyPhysicsToColliding();
 
+    ///
+    /// \brief
+    ///
     void applyPhysicsToVisual();
 
     ///
@@ -81,6 +106,6 @@ protected:
     size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
-}
+} // imstk
 
 #endif // IMSTKPBDOBJECT_H

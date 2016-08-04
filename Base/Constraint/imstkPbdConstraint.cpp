@@ -28,7 +28,8 @@ namespace  imstk
 using Vec3d = Eigen::Vector3d;
 using Mat3d = Eigen::Matrix3d;
 
-bool FEMTetConstraint::initConstraint (PositionBasedModel &model,
+bool
+FEMTetConstraint::initConstraint (PositionBasedModel &model,
                                   const unsigned int &pIdx1, const unsigned int &pIdx2,
                                   const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
@@ -60,7 +61,8 @@ bool FEMTetConstraint::initConstraint (PositionBasedModel &model,
     return false;
 }
 
-bool FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
+bool
+FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];
@@ -99,9 +101,9 @@ bool FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
     case MaterialType::StVK :
     {
         Mat3d E;
-        E(0, 0) = 0.5*(F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);		// xx
-        E(1, 1) = 0.5*(F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);		// yy
-        E(2, 2) = 0.5*(F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);		// zz
+        E(0, 0) = 0.5*(F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);	// xx
+        E(1, 1) = 0.5*(F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);	// yy
+        E(2, 2) = 0.5*(F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);	// zz
         E(0, 1) = 0.5*(F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));			// xy
         E(0, 2) = 0.5*(F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));			// xz
         E(1, 2) = 0.5*(F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));			// yz
@@ -207,7 +209,9 @@ bool FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
 
 }
 
-void DistanceConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1, const unsigned int &pIdx2, const double k)
+void
+DistanceConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+                                   const unsigned int &pIdx2, const double k)
 {
     m_bodies[0] = pIdx1;
     m_bodies[1] = pIdx2;
@@ -218,7 +222,8 @@ void DistanceConstraint::initConstraint(PositionBasedModel &model, const unsigne
     m_restLength = (p1 - p2).norm();
 }
 
-bool DistanceConstraint::solvePositionConstraint(PositionBasedModel &model)
+bool
+DistanceConstraint::solvePositionConstraint(PositionBasedModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];
@@ -248,7 +253,11 @@ bool DistanceConstraint::solvePositionConstraint(PositionBasedModel &model)
     return true;
 }
 
-void DihedralConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1, const unsigned int &pIdx2, const unsigned int &pIdx3, const unsigned int &pIdx4, const double k)
+void
+DihedralConstraint::initConstraint(PositionBasedModel &model,
+                                    const unsigned int &pIdx1, const unsigned int &pIdx2,
+                                    const unsigned int &pIdx3, const unsigned int &pIdx4,
+                                    const double k)
 {
     m_bodies[0] = pIdx1;
     m_bodies[1] = pIdx2;
@@ -269,7 +278,8 @@ void DihedralConstraint::initConstraint(PositionBasedModel &model, const unsigne
     m_restAngle = atan2(n1.cross(n2).dot(p3-p2), (p3-p2).norm()*n1.dot(n2));
 }
 
-bool DihedralConstraint::solvePositionConstraint(PositionBasedModel &model)
+bool
+DihedralConstraint::solvePositionConstraint(PositionBasedModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];
@@ -312,7 +322,10 @@ bool DihedralConstraint::solvePositionConstraint(PositionBasedModel &model)
     Vec3d grad2 = (e.dot(e1)/(A1*l))*n1 + (e.dot(e3)/(A2*l))*n2 ;
     Vec3d grad3 = (e.dot(e2)/(A1*l))*n1 + (e.dot(e4)/(A2*l))*n2 ;
 
-    double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm();
+    double lambda = im0*grad0.squaredNorm() +
+                    im1*grad1.squaredNorm() +
+                    im2*grad2.squaredNorm() +
+                    im3*grad3.squaredNorm();
 
     // huge difference if use acos instead of atan2
     lambda = (atan2(n1.cross(n2).dot(e), l*n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;
@@ -329,7 +342,10 @@ bool DihedralConstraint::solvePositionConstraint(PositionBasedModel &model)
     return true;
 }
 
-void AreaConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1, const unsigned int &pIdx2, const unsigned int &pIdx3, const double k)
+void
+AreaConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+                               const unsigned int &pIdx2, const unsigned int &pIdx3,
+                               const double k)
 {
     m_bodies[0] = pIdx1;
     m_bodies[1] = pIdx2;
@@ -346,7 +362,8 @@ void AreaConstraint::initConstraint(PositionBasedModel &model, const unsigned in
     m_restArea = 0.5*(p1 - p0).cross(p2 - p0).norm();
 }
 
-bool AreaConstraint::solvePositionConstraint(PositionBasedModel &model)
+bool
+AreaConstraint::solvePositionConstraint(PositionBasedModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];
@@ -393,7 +410,10 @@ bool AreaConstraint::solvePositionConstraint(PositionBasedModel &model)
     return true;
 }
 
-void VolumeConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1, const unsigned int &pIdx2, const unsigned int &pIdx3, const unsigned int &pIdx4, const double k)
+void
+VolumeConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+                                 const unsigned int &pIdx2, const unsigned int &pIdx3,
+                                 const unsigned int &pIdx4, const double k)
 {
     m_bodies[0] = pIdx1;
     m_bodies[1] = pIdx2;
@@ -412,7 +432,8 @@ void VolumeConstraint::initConstraint(PositionBasedModel &model, const unsigned 
     m_restVolume = (1.0/6.0)*((p1-p0).cross(p2-p0)).dot(p3-p0);
 }
 
-bool VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
+bool
+VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];
@@ -440,7 +461,10 @@ bool VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
 
     double V = grad4.dot(x4-x1);
 
-    double lambda = im1*grad1.squaredNorm() + im2*grad2.squaredNorm() + im3*grad3.squaredNorm() + im4*grad4.squaredNorm();
+    double lambda = im1*grad1.squaredNorm() +
+                    im2*grad2.squaredNorm() +
+                    im3*grad3.squaredNorm() +
+                    im4*grad4.squaredNorm();
 
     lambda = (V - m_restVolume)/lambda * m_stiffness;
 
@@ -457,4 +481,4 @@ bool VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
 
 }
 
-}
+} // imstk

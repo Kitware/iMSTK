@@ -61,68 +61,85 @@ PbdObject::getNumOfDOF() const
     return numDOF;
 }
 
-void PbdObject::init(int nCons, ...)
+void
+PbdObject::init(int nCons, ...)
 {
     auto state = m_pbdModel->getState();
 
     va_list args;
     va_start(args, nCons);
-    for(int i = 0; i < nCons; ++i) {
+    for(int i = 0; i < nCons; ++i)
+    {
         char* s = va_arg(args,char*);
         int len = 0;
-        while (s[len] != ' ' && s[len] != '\0') {
+        while (s[len] != ' ' && s[len] != '\0')
+        {
             ++len;
         }
-        if (strncmp("FEM",&s[0],len)==0) {
+
+        if (strncmp("FEM",&s[0],len)==0)
+        {
             int pos = len+1;
             len = 0;
-            while (s[pos+len] != ' ' && s[pos+len] != '\0') {
+            while (s[pos+len] != ' ' && s[pos+len] != '\0')
+            {
                 ++len;
             }
-            if (strncmp("Corotation",&s[pos],len)==0) {
+
+            if (strncmp("Corotation",&s[pos],len)==0)
+            {
                 LOG(INFO) << "Creating Corotation constraints";
                 m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::Corotation);
             }
-            else if (strncmp("NeoHookean",&s[pos],len)==0) {
+            else if (strncmp("NeoHookean",&s[pos],len)==0)
+            {
                 LOG(INFO) << "Creating Neohookean constraints";
                 m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::NeoHookean);
             }
-            else if (strncmp("Stvk",&s[pos],len)==0) {
+            else if (strncmp("Stvk",&s[pos],len)==0)
+            {
                 LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
                 m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
             }
-            else { // default
+            else
+            { // default
                 m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
             }
+
             float YoungModulus, PoissonRatio;
             sscanf(&s[pos+len+1], "%f %f", &YoungModulus, &PoissonRatio);
             m_pbdModel->setElasticModulus(YoungModulus, PoissonRatio);
         }
-        else if (strncmp("Volume",&s[0],len)==0) {
+        else if (strncmp("Volume",&s[0],len)==0)
+        {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Volume constraints " << stiffness ;
             m_pbdModel->initVolumeConstraints(stiffness);
         }
-        else if (strncmp("Distance",&s[0],len)==0) {
+        else if (strncmp("Distance",&s[0],len)==0)
+        {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Distance constraints " << stiffness;
             m_pbdModel->initDistanceConstraints(stiffness);
         }
-        else if (strncmp("Area",&s[0],len)==0) {
+        else if (strncmp("Area",&s[0],len)==0)
+        {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Area constraints " << stiffness;
             m_pbdModel->initAreaConstraints(stiffness);
         }
-        else if (strncmp("Dihedral",&s[0],len)==0) {
+        else if (strncmp("Dihedral",&s[0],len)==0)
+        {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Dihedral constraints " << stiffness;
             m_pbdModel->initDihedralConstraints(stiffness);
         }
-        else {
+        else
+        {
             exit(0);
         }
     }
@@ -138,16 +155,28 @@ void PbdObject::init(int nCons, ...)
         state->setGravity(g);
         state->setTimeStep(va_arg(args,double));
         char *s = va_arg(args,char*);
-        if (strlen(s) > 0) {
+
+        if (strlen(s) > 0)
+        {
             while (1)
             {
                 int idx = atoi(s);
                 state->setFixedPoint(idx-1);
-                while (*s != ' ' && *s != '\0') ++s;
-                if (*s == '\0') break; else ++s;
+                while (*s != ' ' && *s != '\0')
+                {
+                    ++s;
+                }
+
+                if (*s == '\0')
+                {
+                    break;
+                }
+                else
+                {
+                    ++s;
+                }
             }
         }
-
         m_pbdModel->setNumberOfInterations(va_arg(args,int));
     }
 
@@ -160,44 +189,50 @@ void PbdObject::init(int nCons, ...)
 
 void PbdObject::integratePosition()
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+    if (m_pbdModel && m_pbdModel->hasConstraints())
+    {
         m_pbdModel->getState()->integratePosition();
     }
 }
 
 void PbdObject::integrateVelocity()
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+    if (m_pbdModel && m_pbdModel->hasConstraints())
+    {
         m_pbdModel->getState()->integrateVelocity();
     }
 }
 
 void PbdObject::updateGeometry()
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+    if (m_pbdModel && m_pbdModel->hasConstraints())
+    {
         m_pbdModel->updatePhysicsGeometry();
     }
 }
 
 void PbdObject::constraintProjection()
 {
-    if (m_pbdModel && m_pbdModel->hasConstraints()) {
+    if (m_pbdModel && m_pbdModel->hasConstraints())
+    {
         m_pbdModel->constraintProjection();
     }
 }
 
 void PbdObject::applyPhysicsToColliding()
 {
-    if (m_physicsToCollidingGeomMap && m_collidingGeometry) {
+    if (m_physicsToCollidingGeomMap && m_collidingGeometry)
+    {
         m_physicsToCollidingGeomMap->apply();
     }
 }
 
 void PbdObject::applyPhysicsToVisual()
 {
-    if (m_physicsToVisualGeomMap && m_visualGeometry) {
+    if (m_physicsToVisualGeomMap && m_visualGeometry)
+    {
         m_physicsToVisualGeomMap->apply();
     }
 }
 
-}
+} //imstk

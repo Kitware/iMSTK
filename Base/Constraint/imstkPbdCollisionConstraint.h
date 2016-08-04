@@ -8,41 +8,59 @@ namespace imstk
 
 class PositionBasedModel;
 
+///
+/// \class CollisionConstraint
+///
+/// \brief
+///
 class CollisionConstraint
 {
 public:
     enum class Type
     {
-       EdgeEdge,
-       PointTriangle
+        EdgeEdge,
+        PointTriangle
     };
-    std::vector<unsigned int> m_bodiesFirst;        // index of points for the first object
-    std::vector<unsigned int> m_bodiesSecond;   // index of points for the second object
-    PositionBasedModel* m_model1;
-    PositionBasedModel* m_model2;
-public:
+
+    ///
+    /// \brief
+    ///
     CollisionConstraint(const unsigned int& n1, const unsigned int& n2)
     {
         m_bodiesFirst.resize(n1);
         m_bodiesSecond.resize(n2);
     }
+
+    ///
+    /// \brief
+    ///
     virtual bool solvePositionConstraint()
     {
         return true;
     }
+
+public:
+    std::vector<unsigned int> m_bodiesFirst;    ///> index of points for the first object
+    std::vector<unsigned int> m_bodiesSecond;   ///> index of points for the second object
+    PositionBasedModel* m_model1;
+    PositionBasedModel* m_model2;
 };
 
 ///
 /// \brief The EdgeEdgeConstraint class for edge-edge collision response
 ///
-
 class EdgeEdgeConstraint : public CollisionConstraint
 {
 
 public:
-    EdgeEdgeConstraint() : CollisionConstraint(2,2) {}
+    EdgeEdgeConstraint() : CollisionConstraint(2,2)
+    {}
 
-    Type getType() const { return Type::EdgeEdge; }
+    Type getType() const
+    {
+        return Type::EdgeEdge;
+    }
+
     ///
     /// \brief initialize constraint
     /// \param pIdx1 first point of the edge from object1
@@ -54,21 +72,27 @@ public:
     void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1, const unsigned int& pIdx2,
                          PositionBasedModel* model2, const unsigned int& pIdx3, const unsigned int& pIdx4);
 
+    ///
+    /// \brief
+    ///
     bool solvePositionConstraint();
 };
 
 ///
 /// \brief The PointTriangleConstraint class for point-triangle collision response
 ///
-
-
 class PointTriangleConstraint : public CollisionConstraint
 {
 
 public:
-    PointTriangleConstraint() : CollisionConstraint(1,3) {}
+    PointTriangleConstraint() : CollisionConstraint(1,3)
+    {}
 
-    Type getType() const { return Type::PointTriangle; }
+    Type getType() const
+    {
+        return Type::PointTriangle;
+    }
+
     ///
     /// \brief initialize constraint
     /// \param pIdx1 index of the point from object1
@@ -80,10 +104,12 @@ public:
     void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1,
                          PositionBasedModel* model2, const unsigned int& pIdx2,  const unsigned int& pIdx3, const unsigned int& pIdx4);
 
+    ///
+    /// \brief
+    ///
     bool solvePositionConstraint();
 };
 
 }
-
 
 #endif // IMSTKPBDCOLLISIONCONSTRAINT_H

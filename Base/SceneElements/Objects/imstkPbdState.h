@@ -11,22 +11,22 @@ namespace imstk
 
 using Vec3d = Eigen::Vector3d;
 
+///
+/// \class PbdState
+///
+/// \brief
+///
 class PbdState
 {
-private:
-
-    std::vector<Vec3d> m_pos;
-    std::vector<Vec3d> m_initPos;
-    std::vector<Vec3d> m_vel;
-    std::vector<Vec3d> m_acc;
-    std::vector<Vec3d> m_oldPos;
-    std::vector<double> m_mass;
-    std::vector<double> m_invMass;
-    double dt;
-    Vec3d gravity;
 public:
+    ///
+    /// \brief
+    ///
     PbdState() = default;
 
+    ///
+    /// \brief
+    ///
     void initialize(Mesh* m)
     {
         m_pos = m->getVerticesPositions(); // share the same data with Mesh
@@ -39,6 +39,9 @@ public:
         m_mass.resize(nP, 0);
     }
 
+    ///
+    /// \brief
+    ///
     inline void setUniformMass(const double& val)
     {
         if (val != 0.0) {
@@ -51,6 +54,9 @@ public:
         }
     }
 
+    ///
+    /// \brief
+    ///
     inline void setParticleMass(const double& val, const unsigned int& idx)
     {
         if ( idx < m_pos.size()) {
@@ -59,38 +65,73 @@ public:
         }
     }
 
+    ///
+    /// \brief
+    ///
     inline void setFixedPoint(const unsigned int& idx)
-    {        
+    {
         if ( idx < m_pos.size())
             m_invMass[idx] = 0;
     }
 
+    ///
+    /// \brief
+    ///
     inline double getInvMass(const unsigned int& idx)
     {
         return m_invMass[idx];
     }
 
+    ///
+    /// \brief
+    ///
     inline Vec3d& getInitialVertexPosition(const unsigned int& idx)
     {
         return m_initPos.at(idx);
     }
 
+    ///
+    /// \brief
+    ///
     inline Vec3d& getVertexPosition(const unsigned int& idx)
     {
         return m_pos.at(idx);
     }
 
+    ///
+    /// \brief
+    ///
     inline void setTimeStep(const double& timeStep) { dt = timeStep; }
 
+    ///
+    /// \brief
+    ///
     inline void setGravity(const Vec3d& g) { gravity = g; }
 
+    ///
+    /// \brief
+    ///
     void integratePosition();
 
+    ///
+    /// \brief
+    ///
     void integrateVelocity();
 
+private:
+    std::vector<Vec3d> m_pos;
+    std::vector<Vec3d> m_initPos;
+    std::vector<Vec3d> m_vel;
+    std::vector<Vec3d> m_acc;
+    std::vector<Vec3d> m_oldPos;
+
+    std::vector<double> m_mass;
+    std::vector<double> m_invMass;
+
+    double dt;
+    Vec3d gravity;
 };
 
-}
-
+} // imstk
 
 #endif // IMSTKPBDSTATE_H
