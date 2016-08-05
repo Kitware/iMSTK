@@ -15,6 +15,7 @@
 #include "imstkHDAPIDeviceClient.h"
 
 #include "imstkSphere.h"
+#include "imstkCube.h"
 #include "imstkVirtualCouplingObject.h"
 
 #include "ETI.h"
@@ -42,7 +43,7 @@ int main()
 {
 	auto sdk = std::make_shared<SimulationManager>();
 	auto scene = sdk->createNewScene("ETI simulator");
-	bool loadScene = true;
+	bool loadScene = false;
 	bool loadModel = false;
 	
 	// initialize text record
@@ -62,21 +63,57 @@ int main()
 	if (loadModel)
 		initializeHumanModel(modelMesh, staticModelSurfaceMesh, model, scene);
 
-	//// Device clients
-	//auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
-	//sdk->addDeviceClient(client0);
+	// Device clients
+	auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+	sdk->addDeviceClient(client0);
 
 
 	//// Sphere0
 	//auto sphere0Geom = std::make_shared<imstk::Sphere>();
-	//sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
+	//sphere0Geom->setPosition(imstk::Vec3d(0, 0, 0));
 	//sphere0Geom->scale(1);
 	//auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 0.05);
 	//sphere0Obj->setVisualGeometry(sphere0Geom);
 	//sphere0Obj->setCollidingGeometry(sphere0Geom);
 	//scene->addSceneObject(sphere0Obj);
 
+	bool coarseMesh = true;
 
+	std::string path2obj;
+
+	if (coarseMesh)
+		path2obj = "resources/Tools/handle2.obj";
+	else
+		path2obj = "resources/Tools/handle.obj";
+	
+	auto mesh = imstk::MeshReader::read(path2obj);
+
+	auto meshObj = std::make_shared<imstk::VirtualCouplingObject>("mesh", client0, 0.05);
+
+	mesh->setPosition(imstk::Vec3d(0, 0, 0));	
+	mesh->scale(0.1);
+	meshObj->setVisualGeometry(mesh);
+	meshObj->setCollidingGeometry(mesh);
+	scene->addSceneObject(meshObj);
+
+	if (coarseMesh)
+		path2obj = "resources/Tools/blade2.obj";
+	else
+		path2obj = "resources/Tools/blade.obj";
+
+	auto mesh1 = imstk::MeshReader::read(path2obj);
+	auto meshObj1 = std::make_shared<imstk::VirtualCouplingObject>("mesh1", client0, 0.05);
+	meshObj1->setCollidingGeometry(mesh1);
+	mesh1->scale(0.1);
+//	mesh1->rotate(Vec3d(0.0, 0.0, 1.0), -PI / 2);
+	mesh1->setPosition(imstk::Vec3d(0, 0, 0));
+	meshObj1->setVisualGeometry(mesh1);
+	
+	scene->addSceneObject(meshObj1);
+
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/bed1.obj"));
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("bed1"));
+	//textureName.push_back("resources/TextureOR/bed-1.jpg");
 
 	/*
 	auto mesh3 = imstk::MeshReader::read("resources/human/teeth.obj");
