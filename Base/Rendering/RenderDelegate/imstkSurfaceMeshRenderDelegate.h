@@ -37,7 +37,8 @@ public:
 
     ~SurfaceMeshRenderDelegate() = default;
     SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
-
+	
+	void mapVertices();
     void update();
 
     std::shared_ptr<Geometry>getGeometry() const override;
@@ -45,7 +46,7 @@ public:
 protected:
 
     std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<MappedVertexArray> m_mappedVertexArray;
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
 };
 }
 

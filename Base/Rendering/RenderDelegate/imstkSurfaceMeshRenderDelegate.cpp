@@ -25,6 +25,7 @@
 #include <vtkPolyDataMapper.h>
 #include <vtkPointData.h>
 #include <vtkFloatArray.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkImageReader2.h>
 #include <vtkTexture.h>
@@ -37,13 +38,18 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
     m_geometry(surfaceMesh)
 {
     // Map vertices
-    m_mappedVertexArray = vtkSmartPointer<MappedVertexArray>::New();
-    m_mappedVertexArray->SetVertexArray(m_geometry->getVerticesPositionsNotConst());
+	m_mappedVertexArray = vtkDoubleArray::New();
+	m_mappedVertexArray->SetNumberOfComponents(3);
+	auto vertices = m_geometry->getVerticesPositionsNotConst();
+	for (int i = 0; i < vertices.size(); i++) {
+		m_mappedVertexArray->InsertNextTuple3(vertices[i][0], vertices[i][1], vertices[i][2]);
+	}
+	this->mapVertices();
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_geometry->getNumVertices());
-    points->SetData(m_mappedVertexArray);
+	points->SetData(m_mappedVertexArray);
 
     // Copy triangles
     auto triangles = vtkSmartPointer<vtkCellArray>::New();
@@ -126,13 +132,25 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
 }
 
 void
+SurfaceMeshRenderDelegate::mapVertices()
+{
+	auto vertices = m_geometry->getVerticesPositionsNotConst();
+
+	for (int i = 0; i < vertices.size(); i++) {
+		m_mappedVertexArray->SetTuple3(i, vertices[i][0], vertices[i][1], vertices[i][2]);
+	}
+
+	// TODO: only when vertices modified
+	m_mappedVertexArray->Modified();
+}
+
+void
 SurfaceMeshRenderDelegate::update()
 {
     // Base class update
     RenderDelegate::update();
 
-    // TODO: only when vertices modified
-    m_mappedVertexArray->Modified();
+	this->mapVertices();
 }
 
 std::shared_ptr<Geometry>
