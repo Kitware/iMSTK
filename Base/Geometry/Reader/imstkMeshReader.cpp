@@ -28,7 +28,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 std::shared_ptr<Mesh>
 MeshReader::read(const std::string& filePath)
 {
@@ -113,4 +115,4 @@ MeshReader::getFileType(const std::string& filePath)
     return meshType;
 }
 
-}
+} // imstk

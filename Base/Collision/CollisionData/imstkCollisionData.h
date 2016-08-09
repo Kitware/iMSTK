@@ -22,12 +22,17 @@
 #ifndef imstkCollisionData_h
 #define imstkCollisionData_h
 
-//#include <pair>
-
+// imstk
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
+///
+/// \struct PositionDirectionCollisionData
+///
+/// \brief Point-penetration depth collision data
+///
 struct PositionDirectionCollisionData
 {
     Vec3d posA;
@@ -36,12 +41,22 @@ struct PositionDirectionCollisionData
     double penetrationDepth;
 };
 
+///
+/// \struct MeshToAnalyticalPointDepthCollisionData
+///
+/// \brief Mesh to analytical point-penetration depth collision data
+///
 struct MeshToAnalyticalPointDepthCollisionData
 {
     int nodeId;
     Vec3d penetrationVector;
 };
 
+///
+/// \struct VertexTriangleCollisionData
+///
+/// \brief Vertex-triangle collision data
+///
 struct VertexTriangleCollisionData
 {
     size_t vertexIdA;
@@ -56,6 +71,11 @@ struct VertexTriangleCollisionData
     }
 };
 
+///
+/// \struct TriangleVertexCollisionData
+///
+/// \brief Triangle-vertex collision data
+///
 struct TriangleVertexCollisionData
 {
     size_t triIdA;
@@ -70,6 +90,11 @@ struct TriangleVertexCollisionData
     }
 };
 
+///
+/// \struct EdgeEdgeCollisionData
+///
+/// \brief Edge-Edge collision data
+///
 struct EdgeEdgeCollisionData
 {
     std::pair<size_t, size_t> edgeIdA;
@@ -84,6 +109,11 @@ struct EdgeEdgeCollisionData
     }
 };
 
+///
+/// \struct CollisionData
+///
+/// \brief Class that is the holder of all types of collision data
+///
 class CollisionData
 {
 public:
@@ -103,6 +133,7 @@ public:
 
     std::vector<MeshToAnalyticalPointDepthCollisionData> PDMeshAnaColData;
 };
+
 }
 
 #endif // ifndef imstkCollisionData_h

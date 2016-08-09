@@ -25,13 +25,22 @@
 #include <vector>
 #include <unordered_map>
 
+// imstk
 #include "imstkCollidingObject.h"
 #include "imstkInteractionPair.h"
 #include "imstkCollisionDetection.h"
 #include "imstkCollisionHandling.h"
 
-namespace imstk {
+#include "imstkPbdInteractionPair.h"
 
+namespace imstk
+{
+
+///
+/// \class CollisionGraph
+///
+/// \brief
+///
 class CollisionGraph
 {
 public:
@@ -39,9 +48,13 @@ public:
     using InteractionPairPtr = std::shared_ptr<InteractionPair>;
 
     ///
-    /// \brief Constructor/Destructor
+    /// \brief Default constructor
     ///
     CollisionGraph() = default;
+
+    ///
+    /// \brief Default destructor
+    ///
     ~CollisionGraph() = default;
 
     ///
@@ -52,6 +65,8 @@ public:
                                           CollisionDetection::Type CDType,
                                           CollisionHandling::Type CHAType,
                                           CollisionHandling::Type CHBType);
+
+    void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
 
     ///
     /// \brief Remove interaction pair in collision graph
@@ -69,20 +84,19 @@ public:
     ///
     const std::vector<InteractionPairPtr>& getInteractionPairList() const;
 
+    const std::vector<std::shared_ptr<PbdInteractionPair> > &getPbdPairList() const;
+
     ///
     /// \brief Returns a map of all interaction pairs per object
     ///
-    const std::unordered_map<
-      CollidingObjectPtr,
-      std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
+    const std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
 
 protected:
+    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList;
 
     std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
-    std::unordered_map<
-      CollidingObjectPtr,
-      std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
+    std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
 };
-}
 
+}
 #endif // ifndef imstkCollisionGraph_h

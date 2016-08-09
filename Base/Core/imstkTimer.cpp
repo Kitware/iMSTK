@@ -21,15 +21,18 @@
 
 #include "imstkTimer.h"
 
-namespace imstk {
+namespace imstk
+{
 
-const double StopWatch::wcTimerConstants[] = {
+const double
+StopWatch::wcTimerConstants[] = {
     1.0,
     1 / 1000.0,
     1 / (1000.0*60.0),
     1 / (1000.0*60.0 * 60) };
 
-const double CpuTimer::cpuTimerConstants[] = {
+const double
+CpuTimer::cpuTimerConstants[] = {
     1000.0 / CLOCKS_PER_SEC,
     1.0 / CLOCKS_PER_SEC,
     1.0 / (CLOCKS_PER_SEC * 60.0),
@@ -38,16 +41,16 @@ const double CpuTimer::cpuTimerConstants[] = {
 void
 StopWatch::start()
 {
-    wallClockTimeKeeper = std::chrono::high_resolution_clock::now();
+//    wallClockTimeKeeper = std::chrono::high_resolution_clock::now();
     this->state = TimerState::started;
-};
+}
 
 void
 StopWatch::stop()
 {
     this->storeLap();
     this->state = TimerState::stopped;
-};
+}
 
 void
 StopWatch::reset()
@@ -89,7 +92,7 @@ StopWatch::storeLap(std::string const& lapName)
     }
 
     this->state = TimerState::stopped;
-};
+}
 
 void
 StopWatch::storeLap()
@@ -145,9 +148,10 @@ StopWatch::printTimeElapsed(std::string const& name /* = std::string("noName")*/
 double
 StopWatch::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
-    return std::chrono::duration<double, std::milli>
-        (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
-        wcTimerConstants[(int)unitType];
+    return 0;
+//    return std::chrono::duration<double, std::milli>
+//        (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
+//        wcTimerConstants[(int)unitType];
 }
 
 double

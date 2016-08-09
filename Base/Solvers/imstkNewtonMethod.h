@@ -230,6 +230,6 @@ private:
     std::vector<double> fnorms;                     ///> Consecutive function norms
 };
 
-}
+} // imstk
 
-#endif // INEXACT_NEWTON_H
+#endif // SOLVERS_INEXACTNEWTON_H

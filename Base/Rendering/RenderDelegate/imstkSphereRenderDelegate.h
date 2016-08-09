@@ -29,20 +29,36 @@
 
 #include "vtkSphereSource.h"
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class SphereRenderDelegate
+///
+/// \brief
+///
 class SphereRenderDelegate : public RenderDelegate
 {
 public:
-
+    ///
+    /// \brief
+    ///
     ~SphereRenderDelegate() = default;
+
+    ///
+    /// \brief
+    ///
     SphereRenderDelegate(std::shared_ptr<Sphere>sphere);
 
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-
-    std::shared_ptr<Sphere> m_geometry;
+    std::shared_ptr<Sphere> m_geometry; ///>
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkSphereRenderDelegate_h

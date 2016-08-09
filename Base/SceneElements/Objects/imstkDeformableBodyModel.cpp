@@ -32,9 +32,7 @@ namespace imstk
 {
 
 DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false)
-{
-
-}
+{}
 
 void
 DeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
@@ -611,4 +609,4 @@ DeformableBodyModel::getContactForce()
     return m_Fcontact;
 }
 
-}
+} // imstk

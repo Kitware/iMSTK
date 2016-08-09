@@ -25,7 +25,8 @@
 #include "imstkSceneObject.h"
 #include "imstkDynamicalModel.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class DynamicObject
@@ -87,6 +88,6 @@ protected:
     size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkDynamicObject_h

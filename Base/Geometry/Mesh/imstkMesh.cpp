@@ -21,7 +21,9 @@
 
 #include "imstkMesh.h"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 Mesh::initialize(const std::vector<Vec3d>& vertices)
 {
@@ -192,4 +194,5 @@ Mesh::getNumVertices() const
 {
     return m_initialVerticesPositions.size();
 }
-}
+
+} // imstk

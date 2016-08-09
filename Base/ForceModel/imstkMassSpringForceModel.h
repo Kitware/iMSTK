@@ -41,28 +41,28 @@ class MassSpringForceModel : public InternalForceModel
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
     ///
     MassSpringForceModel(std::shared_ptr<vega::MassSpringSystem> massSpringSystem);
     MassSpringForceModel() = delete;
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
     virtual ~MassSpringForceModel() = default;
 
     ///
-    /// \brief
+    /// \brief Set the internal force
     ///
     void getInternalForce(const Vectord& u, Vectord& internalForce);
 
     ///
-    /// \brief
+    /// \brief Set the tangent stiffness matrix topology
     ///
     virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix);
 
     ///
-    /// \brief
+    /// \brief Set the tangent stiffness matrix
     ///
     void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix);
 

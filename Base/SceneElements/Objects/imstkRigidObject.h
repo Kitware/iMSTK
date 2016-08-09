@@ -22,6 +22,7 @@
 #ifndef imstkRigidObject_h
 #define imstkRigidObject_h
 
+// imstk
 #include "imstkDynamicObject.h"
 #include "imstkMath.h"
 
@@ -67,6 +68,6 @@ protected:
 
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkRigidObject_h

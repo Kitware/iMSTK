@@ -29,7 +29,8 @@
 #include <string>
 #include <vector>
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \brief Stop Watch utility class

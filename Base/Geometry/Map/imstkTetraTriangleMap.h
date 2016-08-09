@@ -24,11 +24,13 @@
 
 #include <limits>
 
+// imstk
 #include "imstkGeometryMap.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class TetraTriangleMap
@@ -39,9 +41,14 @@ namespace imstk {
 class TetraTriangleMap : public GeometryMap
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     TetraTriangleMap() : GeometryMap(GeometryMap::Type::TetraTriangle){}
 
+    ///
+    /// \brief Destructor
+    ///
     ~TetraTriangleMap() = default;
 
     ///
@@ -87,11 +94,10 @@ public:
                                         const Vec3d& pos);
 
 protected:
-
     std::vector<TetrahedralMesh::WeightsArray> m_verticesWeights; ///> weights
     std::vector<size_t> m_verticesEnclosingTetraId; ///> Enclosing tetrahedra to interpolate the weights upon
-
 };
-}
+
+} // imstk
 
 #endif // imstkTetraTriangleMap_h

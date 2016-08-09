@@ -164,7 +164,7 @@ add_subdirectory(Base/SceneElements)
 add_subdirectory(Base/Collision)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/SimulationManager)
-
+add_subdirectory(Base/Constraint)
 #--------------------------------------------------------------------------
 # Export Targets
 #--------------------------------------------------------------------------

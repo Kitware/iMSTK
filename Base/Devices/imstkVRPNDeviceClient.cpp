@@ -23,7 +23,8 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 VRPNDeviceClient::initModule()
@@ -155,4 +156,5 @@ VRPNDeviceClient::forceChangeHandler(void *userData, const _vrpn_FORCECB f)
     deviceClient->m_force << f.force[0], f.force[1], f.force[2];
     //LOG(DEBUG) << "forceDevice: force = " << deviceClient->m_force;
 }
-}
+
+} // imstk

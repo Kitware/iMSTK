@@ -67,6 +67,7 @@ public:
     ///
     const RigidTransform3d getTransform() const;
 };
-}
+
+} // imstk
 
 #endif // imstkIdentityMap_h

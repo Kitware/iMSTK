@@ -22,25 +22,38 @@
 #ifndef imstkCollisionHandling_h
 #define imstkCollisionHandling_h
 
+// Std library
 #include <memory>
 
+// imstk
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
 
-namespace imstk {
+namespace imstk
+{
 
 class InteractionPair;
 
+///
+/// \class CollisionHandling
+///
+/// \brief Base class for all collision handling classes
+///
 class CollisionHandling
 {
 public:
-
+    ///
+    /// \brief Type of the collision handling
+    ///
     enum class Type
     {
         None,
         Penalty
     };
 
+    ///
+    /// \brief Direction of the collision handling
+    ///
     enum class Side
     {
         A,
@@ -91,6 +104,7 @@ protected:
     const CollisionData& m_colData; //!< Collision data
 
 };
+
 }
 
 #endif // ifndef imstkCollisionHandling_h

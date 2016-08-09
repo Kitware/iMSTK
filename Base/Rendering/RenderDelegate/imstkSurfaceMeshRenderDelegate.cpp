@@ -33,7 +33,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
     m_geometry(surfaceMesh)
 {
@@ -158,4 +160,5 @@ SurfaceMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-}
+
+} // imstk

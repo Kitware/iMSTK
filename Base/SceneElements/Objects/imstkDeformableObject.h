@@ -25,13 +25,14 @@
 #include <memory>
 #include <string>
 
+// imstk
 #include "imstkDynamicObject.h"
 #include "imstkDeformableBodyModel.h"
-
 #include "imstkProblemState.h"
 #include "imstkMath.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class DeformableObject
@@ -71,32 +72,49 @@ public:
     ///
     Vectord& getContactForce();
 
-    // Get/Set States of the body
+    ///
+    ///  \brief Get the vector of current displacements
+    ///
     const Vectord& getDisplacements() const
     {
         return m_dynamicalModel->getCurrentState()->getQ();
     }
 
+    ///
+    /// \brief Get the vector of displacements from previous time step
+    ///
     const Vectord& getPrevDisplacements() const
     {
         return m_dynamicalModel->getPreviousState()->getQ();
     }
 
+    ///
+    /// \brief Get the vector of current velocities
+    ///
     const Vectord& getVelocities() const
     {
         return m_dynamicalModel->getCurrentState()->getQDot();
     }
 
+    ///
+    /// \brief Get the vector of velocities from previous time step
+    ///
     const Vectord& getPrevVelocities() const
     {
         return m_dynamicalModel->getPreviousState()->getQDot();
     }
 
+    ///
+    /// \brief Get the vector of current accelerations
+    ///
     const Vectord& getAccelerations() const
     {
         return m_dynamicalModel->getCurrentState()->getQDotDot();
     }
 
+    ///
+    /// \brief Get the vector of accelerations from previous time step
+    ///
     const Vectord& getPrevAccelerations() const
     {
         return m_dynamicalModel->getPreviousState()->getQDotDot();
@@ -105,6 +123,6 @@ public:
 protected:
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkDeformableObject_h

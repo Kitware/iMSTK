@@ -114,21 +114,30 @@ public:
     virtual void setSlave(std::shared_ptr<Geometry> slave);
     virtual std::shared_ptr<Geometry> getSlave() const;
 
+    ///
+    /// \brief getMapIdx
+    /// \param idx
+    /// \return index of Master corresponding to the idx of Slave
+    ///
+    virtual unsigned int getMapIdx(const unsigned int& idx)
+    {
+        return 0;
+    }
 protected:
 
     ///
-    /// \brief Constructor
+    /// \brief Protected constructor
     ///
     GeometryMap(Type type) : m_type(type), m_isActive(true) {}
 
-    Type m_type; ///> type of the map
-
+    Type m_type;     ///> type of the map
     bool m_isActive; ///> true if the map us active at runtime
 
     std::shared_ptr<Geometry> m_master; ///> the geometry which dictates the configuration
-    std::shared_ptr<Geometry> m_slave; ///> the geometry which follows the master
+    std::shared_ptr<Geometry> m_slave;  ///> the geometry which follows the master
 
 };
+
 }
 
 #endif // imstkGeometryMap_h

@@ -23,7 +23,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 const LightType
 Light::getType()
@@ -198,4 +199,5 @@ Light::warningIfHeadLight()
                      << "edit those parameters.";
     }
 }
-}
+
+} // imstk

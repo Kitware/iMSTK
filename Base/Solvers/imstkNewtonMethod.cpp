@@ -23,7 +23,6 @@
 #include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
 
-
 namespace imstk
 {
 
@@ -173,4 +172,4 @@ NewtonMethod::getAbsoluteTolerance() const
     return this->absoluteTolerance;
 }
 
-}
+} // imstk

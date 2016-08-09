@@ -21,7 +21,8 @@
 
 #include "imstkSphere.h"
 
-namespace imstk {
+namespace imstk
+{
 
 void
 Sphere::print() const
@@ -47,4 +48,5 @@ Sphere::setRadius(const double& radius)
 {
     m_radius = radius;
 }
-}
+
+} // imstk

@@ -34,52 +34,146 @@
 #include "imstkViewer.h"
 #include "imstkLogger.h"
 
-namespace imstk {
+namespace imstk
+{
+
 using SimulationStatus = ModuleStatus;
 
+///
+/// \class SimulationManager
+///
+/// \brief
+///
 class SimulationManager
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     SimulationManager()
     {
         // Init g3logger
         m_logUtil->createLogger("simulation", "./");
     }
 
+    ///
+    /// \brief Default destructor
+    ///
     ~SimulationManager() = default;
 
+    ///
+    /// \brief
+    ///
     const SimulationStatus& getStatus() const;
 
     // Scene
+
+    ///
+    /// \brief
+    ///
     bool isSceneRegistered(std::string sceneName) const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> getScene(std::string sceneName) const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> getCurrentScene() const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> createNewScene(std::string newSceneName);
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> createNewScene();
+
+    ///
+    /// \brief
+    ///
     void addScene(std::shared_ptr<Scene> newScene);
+
+    ///
+    /// \brief
+    ///
     void removeScene(std::string sceneName);
 
     // Device Server
+
+    ///
+    /// \brief
+    ///
     bool isDeviceServerRegistered(std::string serverName) const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<VRPNDeviceServer> getDeviceServer(std::string serverName) const;
+
+    ///
+    /// \brief
+    ///
     void addDeviceServer(std::shared_ptr<VRPNDeviceServer> newServer);
+
+    ///
+    /// \brief
+    ///
     void removeDeviceServer(std::string serverName);
 
     // Device Client
+
+    ///
+    /// \brief
+    ///
     bool isDeviceClientRegistered(std::string deviceClientName) const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<DeviceClient> getDeviceClient(std::string deviceClientName) const;
+
+    ///
+    /// \brief
+    ///
     void addDeviceClient(std::shared_ptr<DeviceClient> newDeviceClient);
+
+    ///
+    /// \brief
+    ///
     void removeDeviceClient(std::string deviceClientName);
 
     // Viewer
     std::shared_ptr<Viewer> getViewer() const;
 
     // Simulation
+    ///
+    /// \brief
+    ///
     void setCurrentScene(std::string newSceneName, bool unloadCurrentScene = false);
+
+    ///
+    /// \brief
+    ///
     void startSimulation(bool debug = false);
+
+    ///
+    /// \brief
+    ///
     void runSimulation();
+
+    ///
+    /// \brief
+    ///
     void pauseSimulation();
+
+    ///
+    /// \brief
+    ///
     void endSimulation();
 
 private:
@@ -99,6 +193,7 @@ private:
     std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>(this);
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkSimulationManager_h

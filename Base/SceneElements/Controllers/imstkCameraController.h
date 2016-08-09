@@ -28,12 +28,20 @@
 
 #include <memory>
 
-namespace imstk {
+namespace imstk
+{
 
+///
+/// \class CameraController
+///
+/// \brief
+///
 class CameraController : public Module, public TrackingController
 {
 public:
-
+    ///
+    /// \brief
+    ///
     CameraController(std::string name, Camera& camera,
                      std::shared_ptr<DeviceClient> deviceClient = nullptr) :
         Module(name),
@@ -41,17 +49,30 @@ public:
         TrackingController(deviceClient)
     {}
 
+    ///
+    /// \brief
+    ///
     ~CameraController() = default;
 
 protected:
-
+    ///
+    /// \brief
+    ///
     void initModule() override;
+
+    ///
+    /// \brief
+    ///
     void runModule() override;
+
+    ///
+    /// \brief
+    ///
     void cleanUpModule() override;
 
-    Camera& m_camera; //!< Camera controlled by the external device
+    Camera& m_camera; ///< Camera controlled by the external device
 
 };
-}
 
+} // imstk
 #endif // ifndef imstkCameraController_h

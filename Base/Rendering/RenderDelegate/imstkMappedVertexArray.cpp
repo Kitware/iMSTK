@@ -26,11 +26,11 @@
 #include "vtkVariant.h"
 #include "vtkVariantCast.h"
 
-namespace imstk {
+namespace imstk
+{
 
 vtkStandardNewMacro(MappedVertexArray);
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
 {
@@ -41,7 +41,6 @@ MappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
     os << "TempDoubleArray : " << this->TempDoubleArray << std::endl;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
 {
@@ -53,7 +52,6 @@ MappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
     this->Modified();
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::Initialize()
 {
@@ -63,7 +61,6 @@ MappedVertexArray::Initialize()
     this->NumberOfComponents = 1;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::GetTuples(vtkIdList *ptIds, vtkAbstractArray *output)
 {
@@ -86,7 +83,6 @@ MappedVertexArray::GetTuples(vtkIdList *ptIds, vtkAbstractArray *output)
     }
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *output)
 {
@@ -109,14 +105,12 @@ MappedVertexArray::GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *outpu
     }
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::Squeeze()
 {
     // noop
 }
 
-//------------------------------------------------------------------------------
 vtkArrayIterator*
 MappedVertexArray::NewIterator()
 {
@@ -124,7 +118,6 @@ MappedVertexArray::NewIterator()
     return NULL;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::LookupValue(vtkVariant value)
 {
@@ -137,7 +130,6 @@ MappedVertexArray::LookupValue(vtkVariant value)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::LookupValue(vtkVariant value, vtkIdList *ids)
 {
@@ -154,21 +146,18 @@ MappedVertexArray::LookupValue(vtkVariant value, vtkIdList *ids)
     }
 }
 
-//------------------------------------------------------------------------------
 vtkVariant
 MappedVertexArray::GetVariantValue(vtkIdType idx)
 {
     return vtkVariant(this->GetValueReference(idx));
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::ClearLookup()
 {
     // no-op, no fast lookup implemented.
 }
 
-//------------------------------------------------------------------------------
 double*
 MappedVertexArray::GetTuple(vtkIdType i)
 {
@@ -176,7 +165,6 @@ MappedVertexArray::GetTuple(vtkIdType i)
     return this->TempDoubleArray.data();
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::GetTuple(vtkIdType i, double *tuple)
 {
@@ -185,14 +173,12 @@ MappedVertexArray::GetTuple(vtkIdType i, double *tuple)
     tuple[2] = static_cast<double>((*this->vertexArray)[i][2]);
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::LookupTypedValue(double value)
 {
     return this->Lookup(value, 0);
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
 {
@@ -204,7 +190,6 @@ MappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
     }
 }
 
-//------------------------------------------------------------------------------
 double
 MappedVertexArray::GetValue(vtkIdType idx) const
 {
@@ -223,7 +208,6 @@ MappedVertexArray::GetValue(vtkIdType idx) const
     }
 }
 
-//------------------------------------------------------------------------------
 double&
 MappedVertexArray::GetValueReference(vtkIdType idx)
 {
@@ -244,7 +228,6 @@ MappedVertexArray::GetValueReference(vtkIdType idx)
     }
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
 {
@@ -253,7 +236,6 @@ MappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
   tuple[2] = (*this->vertexArray)[tupleId](2);
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::GetTupleValue(vtkIdType tupleId, double *tuple)
 {
@@ -262,7 +244,6 @@ MappedVertexArray::GetTupleValue(vtkIdType tupleId, double *tuple)
     tuple[2] = (*this->vertexArray)[tupleId](2);
 }
 
-//------------------------------------------------------------------------------
 int
 MappedVertexArray::Allocate(vtkIdType, vtkIdType)
 {
@@ -270,7 +251,6 @@ MappedVertexArray::Allocate(vtkIdType, vtkIdType)
     return 0;
 }
 
-//------------------------------------------------------------------------------
 int
 MappedVertexArray::Resize(vtkIdType)
 {
@@ -278,7 +258,6 @@ MappedVertexArray::Resize(vtkIdType)
     return 0;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetNumberOfTuples(vtkIdType)
 {
@@ -286,7 +265,6 @@ MappedVertexArray::SetNumberOfTuples(vtkIdType)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
 {
@@ -294,7 +272,6 @@ MappedVertexArray::SetTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetTuple(vtkIdType, const float *)
 {
@@ -302,7 +279,6 @@ MappedVertexArray::SetTuple(vtkIdType, const float *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetTuple(vtkIdType, const double *)
 {
@@ -310,7 +286,6 @@ MappedVertexArray::SetTuple(vtkIdType, const double *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
 {
@@ -318,7 +293,6 @@ MappedVertexArray::InsertTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTuple(vtkIdType, const float *)
 {
@@ -326,7 +300,6 @@ MappedVertexArray::InsertTuple(vtkIdType, const float *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTuple(vtkIdType, const double *)
 {
@@ -334,7 +307,6 @@ MappedVertexArray::InsertTuple(vtkIdType, const double *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTuples(vtkIdList *, vtkIdList *, vtkAbstractArray *)
 {
@@ -342,7 +314,6 @@ MappedVertexArray::InsertTuples(vtkIdList *, vtkIdList *, vtkAbstractArray *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTuples(vtkIdType,vtkIdType,vtkIdType,vtkAbstractArray*)
 {
@@ -350,7 +321,6 @@ MappedVertexArray::InsertTuples(vtkIdType,vtkIdType,vtkIdType,vtkAbstractArray*)
     return;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::InsertNextTuple(vtkIdType, vtkAbstractArray *)
 {
@@ -358,7 +328,6 @@ MappedVertexArray::InsertNextTuple(vtkIdType, vtkAbstractArray *)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::InsertNextTuple(const float *)
 {
@@ -367,7 +336,6 @@ MappedVertexArray::InsertNextTuple(const float *)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::InsertNextTuple(const double *)
 {
@@ -375,7 +343,6 @@ MappedVertexArray::InsertNextTuple(const double *)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::DeepCopy(vtkAbstractArray *)
 {
@@ -383,7 +350,6 @@ MappedVertexArray::DeepCopy(vtkAbstractArray *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::DeepCopy(vtkDataArray *)
 {
@@ -391,7 +357,6 @@ MappedVertexArray::DeepCopy(vtkDataArray *)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdList *, vtkAbstractArray *,
                                     double *)
@@ -400,7 +365,6 @@ MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdList *, vtkAbstractArray *,
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdType, vtkAbstractArray*,
                                     vtkIdType, vtkAbstractArray*, double)
@@ -409,7 +373,6 @@ MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdType, vtkAbstractArray*,
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetVariantValue(vtkIdType, vtkVariant)
 {
@@ -417,7 +380,6 @@ MappedVertexArray::SetVariantValue(vtkIdType, vtkVariant)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::RemoveTuple(vtkIdType)
 {
@@ -425,7 +387,6 @@ MappedVertexArray::RemoveTuple(vtkIdType)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::RemoveFirstTuple()
 {
@@ -433,7 +394,6 @@ MappedVertexArray::RemoveFirstTuple()
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::RemoveLastTuple()
 {
@@ -441,7 +401,6 @@ MappedVertexArray::RemoveLastTuple()
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetTupleValue(vtkIdType, const double*)
 {
@@ -449,7 +408,6 @@ MappedVertexArray::SetTupleValue(vtkIdType, const double*)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertTupleValue(vtkIdType, const double*)
 {
@@ -457,7 +415,6 @@ MappedVertexArray::InsertTupleValue(vtkIdType, const double*)
     return;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::InsertNextTupleValue(const double *)
 {
@@ -465,7 +422,6 @@ MappedVertexArray::InsertNextTupleValue(const double *)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::SetValue(vtkIdType, double)
 {
@@ -473,7 +429,6 @@ MappedVertexArray::SetValue(vtkIdType, double)
     return;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::InsertNextValue(double)
 {
@@ -481,7 +436,6 @@ MappedVertexArray::InsertNextValue(double)
     return -1;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertValue(vtkIdType, double)
 {
@@ -489,7 +443,6 @@ MappedVertexArray::InsertValue(vtkIdType, double)
     return;
 }
 
-//------------------------------------------------------------------------------
 void
 MappedVertexArray::InsertVariantValue(vtkIdType, vtkVariant)
 {
@@ -497,7 +450,6 @@ MappedVertexArray::InsertVariantValue(vtkIdType, vtkVariant)
     return;
 }
 
-//------------------------------------------------------------------------------
 vtkIdType
 MappedVertexArray::Lookup(const double &val, vtkIdType index)
 {
@@ -511,4 +463,4 @@ MappedVertexArray::Lookup(const double &val, vtkIdType index)
     return -1;
 }
 
-}
+} // imstk

@@ -20,7 +20,6 @@
    =========================================================================*/
 
 #include "imstkScene.h"
-
 #include "imstkCameraController.h"
 
 #include <g3log/g3log.hpp>
@@ -185,4 +184,4 @@ void Scene::addNonlinearSolver(std::shared_ptr<NonLinearSolver> solver)
     m_nonLinearSolvers.push_back(solver);
 }
 
-}
+} // imstk

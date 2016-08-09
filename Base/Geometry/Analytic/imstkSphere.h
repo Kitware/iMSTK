@@ -22,9 +22,11 @@
 #ifndef imstkSphere_h
 #define imstkSphere_h
 
+// imstk
 #include "imstkGeometry.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class Sphere
@@ -34,7 +36,9 @@ namespace imstk {
 class Sphere : public Geometry
 {
 public:
-
+    ///
+    /// \brief Constructor
+    ///
     Sphere(const Vec3d & position = WORLD_ORIGIN,
            const double& radius = 1) :
         Geometry(Geometry::Type::Sphere,
@@ -43,6 +47,9 @@ public:
         m_radius(radius)
     {}
 
+    ///
+    /// \brief Default destructor
+    ///
     ~Sphere() = default;
 
     ///
@@ -70,6 +77,7 @@ protected:
 
     double m_radius; ///> Radius of the sphere
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkSphere_h

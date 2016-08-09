@@ -24,7 +24,8 @@
 
 #include "imstkGeometry.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class Mesh
@@ -34,7 +35,9 @@ namespace imstk {
 class Mesh : public Geometry
 {
 public:
-
+    ///
+    /// \brief Destructor
+    ///
     ~Mesh() = default;
 
     ///
@@ -141,10 +144,17 @@ public:
 
 protected:
 
+    ///
+    /// \brief Protected constructor
+    ///
     Mesh(Geometry::Type type) : Geometry(type) {}
 
     friend class SurfaceMeshRenderDelegate;
     friend class TetrahedralMeshRenderDelegate;
+
+    ///
+    /// \brief Get vertices positions
+    ///
     std::vector<Vec3d>& getVerticesPositionsNotConst()
     {
         return m_verticesPositions;
@@ -160,6 +170,7 @@ protected:
 
     std::map<std::string, std::vector<Vectorf>> m_pointDataMap; ///> vector of data arrays per vertice
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkMesh_h

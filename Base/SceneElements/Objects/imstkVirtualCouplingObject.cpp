@@ -19,16 +19,16 @@
 
    =========================================================================*/
 
-#include "imstkVirtualCouplingObject.h"
-
 #include <memory>
 
+#include "imstkVirtualCouplingObject.h"
 #include "imstkGeometry.h"
 #include "imstkGeometryMap.h"
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 void
 VirtualCouplingObject::initOffsets()
@@ -78,4 +78,5 @@ VirtualCouplingObject::setForce(Vec3d force)
 {
     m_force = force;
 }
-}
+
+} // imstk

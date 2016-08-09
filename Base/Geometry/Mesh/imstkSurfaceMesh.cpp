@@ -21,7 +21,9 @@
 
 #include "imstkSurfaceMesh.h"
 
-namespace imstk {
+namespace imstk
+{
+
 void
 SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
                         const std::vector<TriangleArray>& triangles,
@@ -355,4 +357,5 @@ SurfaceMesh::getTexture(std::string tCoordsName) const
 
     return m_textureMap.at(tCoordsName);
 }
-}
+
+} // imstk

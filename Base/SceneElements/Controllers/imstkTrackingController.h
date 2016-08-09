@@ -22,10 +22,11 @@
 #ifndef imstkTrackingController_h
 #define imstkTrackingController_h
 
+#include <memory>
+
+// imstk
 #include "imstkMath.h"
 #include "imstkDeviceClient.h"
-
-#include <memory>
 
 namespace imstk
 {
@@ -98,13 +99,13 @@ protected:
         m_scaling(scaling)
     {}
 
-    std::shared_ptr<DeviceClient> m_deviceClient; //!< Reports device tracking information
-    double m_scaling;                             //!< Scaling factor for physical to virtual translations
-    Vec3d m_translationOffset = WORLD_ORIGIN;     //!< Translation concatenated to the device translation
-    Quatd m_rotationOffset = Quatd::Identity();   //!< Rotation concatenated to the device rotation
-    unsigned char m_invertFlags = 0x00;           //!< Invert flags to be masked with TrackingController::InvertFlag
+    std::shared_ptr<DeviceClient> m_deviceClient; ///< Reports device tracking information
+    double m_scaling;                             ///< Scaling factor for physical to virtual translations
+    Vec3d m_translationOffset = WORLD_ORIGIN;     ///< Translation concatenated to the device translation
+    Quatd m_rotationOffset = Quatd::Identity();   ///< Rotation concatenated to the device rotation
+    unsigned char m_invertFlags = 0x00;           ///< Invert flags to be masked with TrackingController::InvertFlag
 };
 
-}
+} // imstk
 
 #endif // ifndef imstkTrackingController_h

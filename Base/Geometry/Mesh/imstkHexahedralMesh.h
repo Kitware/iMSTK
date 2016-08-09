@@ -26,7 +26,8 @@
 
 #include "imstkVolumetricMesh.h"
 
-namespace imstk {
+namespace imstk
+{
 
 ///
 /// \class HexahedralMesh
@@ -39,8 +40,14 @@ public:
 
     using HexaArray = std::array<size_t, 8>;
 
+    ///
+    /// \brief Constructor
+    ///
     HexahedralMesh() : VolumetricMesh(Geometry::Type::HexahedralMesh) {}
 
+    ///
+    /// \brief Destructor
+    ///
     ~HexahedralMesh() = default;
 
     ///

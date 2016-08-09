@@ -43,7 +43,7 @@ int main()
 {
 	auto sdk = std::make_shared<SimulationManager>();
 	auto scene = sdk->createNewScene("ETI simulator");
-	bool loadScene = false;
+	bool loadScene = true;
 	bool loadModel = false;
 	
 	// initialize text record

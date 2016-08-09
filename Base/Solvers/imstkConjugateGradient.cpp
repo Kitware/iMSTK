@@ -96,4 +96,4 @@ ConjugateGradient::solve(Vectord& x, const double tolerance)
     solve(x);
 }
 
-}
+} // imstk

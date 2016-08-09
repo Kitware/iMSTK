@@ -25,13 +25,20 @@
 #include "vtkMappedDataArray.h"
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
 
-// iMSTK includes
+// imstk
 #include "imstkMath.h"
 
 // STL includes
 #include <array>
 
-namespace imstk {
+namespace imstk
+{
+
+///
+/// \class MappedVertexArray
+///
+/// \brief
+///
 class MappedVertexArray: public vtkMappedDataArray<double>
 {
 public:
@@ -104,18 +111,30 @@ public:
     vtkIdType InsertNextTypedTuple(const ValueType *t) { return 0; }
 
 protected:
+    ///
+    /// \brief Constructor
+    ///
     MappedVertexArray() {}
+
+    ///
+    /// \brief Destructor
+    ///
     ~MappedVertexArray() {}
 
-    std::vector<Vec3d> *vertexArray;
+    std::vector<Vec3d> *vertexArray;    ///>
 
 private:
     MappedVertexArray(const MappedVertexArray &); // Not implemented.
     void operator=(const MappedVertexArray &); // Not implemented.
 
+    ///
+    /// \brief
+    ///
     vtkIdType Lookup(const double &val, vtkIdType startIndex);
-    Vec3d TempDoubleArray;
+
+    Vec3d TempDoubleArray;  ///>
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkMappedVertexArray_h

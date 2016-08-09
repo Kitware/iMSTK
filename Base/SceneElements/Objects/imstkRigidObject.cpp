@@ -23,6 +23,7 @@
 
 namespace imstk
 {
+
 void
 RigidObject::translate(const Vec3d& t)
 {
@@ -52,4 +53,5 @@ RigidObject::rotate(const Vec3d& axis, const double& angle)
 {
     m_physicsGeometry->rotate(Quatd(Rotd(angle, axis)));
 }
-}
+
+} // imstk

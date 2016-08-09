@@ -34,6 +34,11 @@
 namespace imstk
 {
 
+///
+/// \class Scene
+///
+/// \brief
+///
 class Scene
 {
     template<class T>
@@ -128,6 +133,7 @@ protected:
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
     std::vector<std::shared_ptr<NonLinearSolver>> m_nonLinearSolvers; ///> List of non-linear solvers
 };
-}
+
+} // imstk
 
 #endif // ifndef imstkScene_h

@@ -23,7 +23,9 @@
 
 #include "g3log/g3log.hpp"
 
-namespace imstk {
+namespace imstk
+{
+
 SphereRenderDelegate::SphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
     m_geometry(sphere)
 {
@@ -43,4 +45,5 @@ SphereRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }
-}
+
+} // imstk

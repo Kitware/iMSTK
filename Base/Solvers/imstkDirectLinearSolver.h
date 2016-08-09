@@ -116,6 +116,6 @@ private:
     Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::Index>> solver;//?
 };
 
-}
+} // imstk
 
-#endif // SOLVERS_DIRECT_LINEAR_SOLVER
+#endif // imstkDirectLinearSolver_h
