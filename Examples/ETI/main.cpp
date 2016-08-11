@@ -9,14 +9,26 @@
 
 #include "imstkMeshReader.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkTetrahedralMesh.h"
 #include "g3log/g3log.hpp"
+
+
+// Maps
+#include "imstkTetraTriangleMap.h"
+#include "imstkIsometricMap.h"
+#include "imstkOneToOneMap.h"
 
 // Devices
 #include "imstkHDAPIDeviceClient.h"
-
+#include "imstkPlane.h"
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkVirtualCouplingObject.h"
+#include "imstkVirtualCouplingPBDObject.h"
+// Collisions
+#include "imstkInteractionPair.h"
+
+#include "imstkPbdObject.h"
 
 #include "ETI.h"
 
@@ -43,7 +55,7 @@ int main()
 {
 	auto sdk = std::make_shared<SimulationManager>();
 	auto scene = sdk->createNewScene("ETI simulator");
-	bool loadScene = true;
+	bool loadScene = false;
 	bool loadModel = false;
 	
 	// initialize text record
@@ -67,16 +79,6 @@ int main()
 	auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
 	sdk->addDeviceClient(client0);
 
-
-	//// Sphere0
-	//auto sphere0Geom = std::make_shared<imstk::Sphere>();
-	//sphere0Geom->setPosition(imstk::Vec3d(0, 0, 0));
-	//sphere0Geom->scale(1);
-	//auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 0.05);
-	//sphere0Obj->setVisualGeometry(sphere0Geom);
-	//sphere0Obj->setCollidingGeometry(sphere0Geom);
-	//scene->addSceneObject(sphere0Obj);
-
 	bool coarseMesh = true;
 
 	std::string path2obj;
@@ -87,14 +89,36 @@ int main()
 		path2obj = "resources/Tools/handle.obj";
 	
 	auto mesh = imstk::MeshReader::read(path2obj);
+	auto visualMesh = imstk::MeshReader::read(path2obj);
+	
+	auto handle = std::make_shared<imstk::VirtualCouplingPBDObject>("handle", client0, 0.5);
 
-	auto meshObj = std::make_shared<imstk::VirtualCouplingObject>("mesh", client0, 0.05);
+	auto oneToOneHandle = std::make_shared<imstk::OneToOneMap>();
+	oneToOneHandle->setMaster(mesh);
+	oneToOneHandle->setSlave(mesh);
+	oneToOneHandle->compute();
 
-	mesh->setPosition(imstk::Vec3d(0, 0, 0));	
-	mesh->scale(0.1);
-	meshObj->setVisualGeometry(mesh);
-	meshObj->setCollidingGeometry(mesh);
-	scene->addSceneObject(meshObj);
+	auto C2VHandle = std::make_shared<imstk::OneToOneMap>();
+	C2VHandle->setMaster(mesh);
+	C2VHandle->setSlave(visualMesh);
+	C2VHandle->compute();
+
+	handle->setCollidingGeometry(mesh);
+	handle->setVisualGeometry(visualMesh);
+	handle->setPhysicsGeometry(mesh);
+	handle->setPhysicsToCollidingMap(oneToOneHandle);
+	handle->setCollidingToVisualMap(C2VHandle);
+	handle->setPhysicsToVisualMap(oneToOneHandle);
+	handle->init(/*Number of constraints*/0,
+		/*Mass*/0.0,
+		/*Gravity*/"0 0 0",
+		/*TimeStep*/0.001,
+		/*FixedPoint*/"",
+		/*NumberOfIterationInConstraintSolver*/5,
+		/*Proximity*/0.1,
+		/*Contact stiffness*/0.01);
+	scene->addSceneObject(handle);
+
 
 	if (coarseMesh)
 		path2obj = "resources/Tools/blade2.obj";
@@ -102,48 +126,122 @@ int main()
 		path2obj = "resources/Tools/blade.obj";
 
 	auto mesh1 = imstk::MeshReader::read(path2obj);
-	auto meshObj1 = std::make_shared<imstk::VirtualCouplingObject>("mesh1", client0, 0.05);
-	meshObj1->setCollidingGeometry(mesh1);
-	mesh1->scale(0.1);
-//	mesh1->rotate(Vec3d(0.0, 0.0, 1.0), -PI / 2);
-	mesh1->setPosition(imstk::Vec3d(0, 0, 0));
-	meshObj1->setVisualGeometry(mesh1);
-	
-	scene->addSceneObject(meshObj1);
+	auto viusalMesh1 = imstk::MeshReader::read(path2obj);
+	auto blade = std::make_shared<imstk::VirtualCouplingPBDObject>("blade", client0, 0.5);
 
-	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/bed1.obj"));
-	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("bed1"));
-	//textureName.push_back("resources/TextureOR/bed-1.jpg");
+	auto oneToOneBlade = std::make_shared<imstk::OneToOneMap>();
+	oneToOneBlade->setMaster(mesh1);
+	oneToOneBlade->setSlave(mesh1);
+	oneToOneBlade->compute();
 
-	/*
-	auto mesh3 = imstk::MeshReader::read("resources/human/teeth.obj");
-	auto obj3 = std::make_shared<imstk::VisualObject>("obj3");
-	obj3->setVisualGeometry(mesh3);
-	obj3->setCollidingGeometry(mesh3);
-	scene->addSceneObject(obj3);
+	auto C2VBlade = std::make_shared<imstk::OneToOneMap>();
+	C2VBlade->setMaster(mesh1);
+	C2VBlade->setSlave(viusalMesh1);
+	C2VBlade->compute();
 
-	auto mesh4 = imstk::MeshReader::read("resources/human/trachea.obj");
-	auto obj4 = std::make_shared<imstk::VisualObject>("obj4");
-	obj4->setVisualGeometry(mesh4);
-	obj4->setCollidingGeometry(mesh4);
-	scene->addSceneObject(obj4);
-	*/
-	
+	blade->setCollidingGeometry(mesh1);
+	blade->setVisualGeometry(viusalMesh1);
+	blade->setPhysicsGeometry(mesh1);
+	blade->setPhysicsToCollidingMap(oneToOneBlade);
+	blade->setCollidingToVisualMap(C2VBlade);
+	blade->setPhysicsToVisualMap(C2VBlade);
+	blade->init(/*Number of constraints*/0,
+		/*Mass*/0.0,
+		/*Gravity*/"0 0 0",
+		/*TimeStep*/0.001,
+		/*FixedPoint*/"",
+		/*NumberOfIterationInConstraintSolver*/5,
+		/*Proximity*/0.1,
+		/*Contact stiffness*/0.01);
+	scene->addSceneObject(blade);
 
-
-	/*
-	auto mesh6 = imstk::MeshReader::read("resources/human/dude_111.obj");
-	auto obj6 = std::make_shared<imstk::VisualObject>("obj6");
-	obj6->setVisualGeometry(mesh6);
-	obj6->setCollidingGeometry(mesh6);
-	scene->addSceneObject(obj6);
-	*/
-	//	auto mesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_0.vtk");
+//	scene->addSceneObject(meshObj1);
 
 
+	// floor
+	auto floorMesh = std::make_shared<imstk::SurfaceMesh>();
+	std::vector<imstk::Vec3d> vertList;
+	double width = 60.0;
+	double height = 60.0;
+	int nRows = 20;
+	int nCols = 20;
+	int corner[4] = { 1, nRows, nRows*nCols - nCols+1,nRows*nCols };
+	char intStr[33];
+	std::string fixed_corner;
+	for (unsigned int i = 0; i < 4; i++){
+		itoa(corner[i], intStr, 10);
+		fixed_corner += std::string(intStr) + ' ';
+	}
+	vertList.resize(nRows*nCols);
+	const double dy = width / (double)(nCols - 1);
+	const double dx = height / (double)(nRows - 1);
+	for (int i = 0; i < nRows; i++)
+	{
+		for (int j = 0; j < nCols; j++)
+		{
+			const double y = (double)dy*j;
+			const double x = (double)dx*i;
+			vertList[i*nCols + j] = Vec3d(x - 30, -25, y-60);
 
+		}
+	}
+	floorMesh->setInitialVerticesPositions(vertList);
+	floorMesh->setVerticesPositions(vertList);
+
+	// c. Add connectivity data
+	std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+	for (int i = 0; i < nRows - 1; i++)
+	{
+		for (int j = 0; j < nCols - 1; j++)
+		{
+			imstk::SurfaceMesh::TriangleArray tri[2];
+			tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
+			tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+			triangles.push_back(tri[0]);
+			triangles.push_back(tri[1]);
+		}		
+	}
+	floorMesh->setTrianglesVertices(triangles);
+
+	auto oneToOneFloor = std::make_shared<imstk::OneToOneMap>();
+	oneToOneFloor->setMaster(floorMesh);
+	oneToOneFloor->setSlave(floorMesh);
+	oneToOneFloor->compute();
+
+	auto floor = std::make_shared<PbdObject>("Floor");
+	floor->setCollidingGeometry(floorMesh);
+	floor->setVisualGeometry(floorMesh);
+	floor->setPhysicsGeometry(floorMesh);
+	floor->setPhysicsToCollidingMap(oneToOneFloor);
+	floor->setPhysicsToVisualMap(oneToOneFloor);
+	floor->setCollidingToVisualMap(oneToOneFloor);
+	floor->init(/*Number of constraints*/2,
+		/*Constraint configuration*/"Distance 0.1",
+		/*Constraint configuration*/"Dihedral 0.001",
+		/*Mass*/0.5,
+		/*Gravity*/"0 -9.8 0",
+		/*TimeStep*/0.01,
+		/*FixedPoint*/fixed_corner.c_str(),		
+		/*NumberOfIterationInConstraintSolver*/5,
+		/*Proximity*/0.1,
+		/*Contact stiffness*/0.01);
+	scene->addSceneObject(floor);
+
+	// Collisions
+	auto colGraph = scene->getCollisionGraph();
+	auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(blade, floor));
+	auto pair2 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(handle, floor));
+	pair1->setNumberOfInterations(5);
+	pair2->setNumberOfInterations(5);
+
+	colGraph->addInteractionPair(pair1);
+	colGraph->addInteractionPair(pair2);
+
+	Vec3d cameraPos = scene->getCamera()->getPosition();
+	std::cout << cameraPos << std::endl;
+	scene->getCamera()->setPosition(0,0,50);
 	sdk->setCurrentScene("ETI simulator");
-    sdk->startSimulation(false);
+    sdk->startSimulation(true);
 }
 
 void initializeText()

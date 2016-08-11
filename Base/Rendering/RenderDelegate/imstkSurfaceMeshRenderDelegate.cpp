@@ -114,17 +114,17 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
         unit++;
     }
 
-	// Update normals
-	auto normals = surfaceMesh->getPointDataArray("Normals");
-	auto vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
-	vtkNormals->SetNumberOfComponents(3);
-	vtkNormals->SetName("Normals");
-	for (auto const normal : normals)
-	{
-		double triple[3] = { normal[0], normal[1], normal[2] };
-		vtkNormals->InsertNextTuple(triple);
-	}
-	polydata->GetPointData()->SetNormals(vtkNormals);
+	//// Update normals
+	//auto normals = surfaceMesh->getPointDataArray("Normals");
+	//auto vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
+	//vtkNormals->SetNumberOfComponents(3);
+	//vtkNormals->SetName("Normals");
+	//for (auto const normal : normals)
+	//{
+	//	double triple[3] = { normal[0], normal[1], normal[2] };
+	//	vtkNormals->InsertNextTuple(triple);
+	//}
+	//polydata->GetPointData()->SetNormals(vtkNormals);
 
     // Actor
     m_actor->SetMapper(mapper);

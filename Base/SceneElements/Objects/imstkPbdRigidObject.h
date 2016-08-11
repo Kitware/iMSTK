@@ -1,0 +1,80 @@
+/*=========================================================================
+
+   Library: iMSTK
+
+   Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+   & Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0.txt
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   =========================================================================*/
+
+#ifndef imstkPbdRigidObject_h
+#define imstkPbdRigidObject_h
+
+#include "imstkPbdObject.h"
+namespace imstk
+{
+
+class Geometry;
+class GeometryMap;
+
+///
+/// \class PbdRigidObject
+///
+/// \brief
+///
+class PbdRigidObject : public PbdObject
+{
+public:
+    ///
+    /// \brief Constructor
+    ///
+	PbdRigidObject(std::string name) : PbdObject(name)
+	{
+		m_type = Type::VirtualCoupling;
+		m_type = SceneObject::Type::Deformable;
+	}
+
+    ///
+    /// \brief Destructor
+    ///
+	~PbdRigidObject() = default;
+
+	///
+	/// \brief
+	///
+	virtual void integratePosition(){ return; }
+
+	///
+	/// \brief
+	///
+	virtual void integrateVelocity(){ return; }
+
+	///
+	/// \brief
+	///
+	virtual void updateGeometry();
+
+	///
+	/// \brief
+	///
+	virtual void constraintProjection(){ return; }
+
+protected:
+
+};
+
+} // imstk
+
+#endif // ifndef imstkVirtualCouplingObject_h

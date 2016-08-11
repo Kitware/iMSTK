@@ -23,6 +23,7 @@
 #include "imstkSceneManager.h"
 #include "imstkCameraController.h"
 #include "imstkVirtualCouplingObject.h"
+#include "imstkVirtualCouplingPBDObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdObject.h"
 
@@ -53,12 +54,32 @@ SceneManager::initModule()
         {
             virtualCoupling->initOffsets();
         }
+		if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+		{
+			virtualCouplingPBD->initOffsets();
+		}
     }
 }
 
 void
 SceneManager::runModule()
 {
+	// Update virtualCoupling objects based on devices
+	for (auto obj : m_scene->getSceneObjects())
+	{
+		if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
+		{
+			virtualCoupling->updateFromDevice();
+			virtualCoupling->applyForces();
+		}
+		else if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+		{
+			virtualCouplingPBD->updateFromDevice();
+			virtualCouplingPBD->applyForces();
+			virtualCouplingPBD->updateGeometry();
+		}
+	}
+
     // Compute collision data per interaction pair
     for (auto intPair : m_scene->getCollisionGraph()->getInteractionPairList())
     {
@@ -84,7 +105,10 @@ SceneManager::runModule()
             //dynaObj->getPhysicsToCollidingMap()->apply();
             dynaObj->getPhysicsToVisualMap()->apply();
         }
-        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+		if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj)){
+			continue;
+		}
+        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
             pbdObj->integratePosition();
             pbdObj->constraintProjection();
@@ -104,7 +128,12 @@ SceneManager::runModule()
 
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+		if (auto pbdRigidObj = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+		{
+			pbdRigidObj->resetCollidingGeo();
+			pbdRigidObj->getCollidingToVisualMap()->apply();
+		}
+        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
             pbdObj->integrateVelocity();
             pbdObj->updateGeometry();
@@ -112,15 +141,6 @@ SceneManager::runModule()
         }
     }
 
-    // Update virtualCoupling objects based on devices
-    for (auto obj : m_scene->getSceneObjects())
-    {
-        if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
-        {
-            virtualCoupling->updateFromDevice();
-            virtualCoupling->applyForces();
-        }
-    }
 }
 
 void
