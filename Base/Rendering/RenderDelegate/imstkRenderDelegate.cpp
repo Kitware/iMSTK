@@ -27,12 +27,14 @@
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 #include "imstkPlaneRenderDelegate.h"
 #include "imstkSphereRenderDelegate.h"
 #include "imstkCubeRenderDelegate.h"
 #include "imstkSurfaceMeshRenderDelegate.h"
+#include "imstkLineMeshRenderDelegate.h"
 #include "imstkTetrahedralMeshRenderDelegate.h"
 
 #include "vtkPolyDataMapper.h"
@@ -72,6 +74,11 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
         return std::make_shared<TetrahedralMeshRenderDelegate>(mesh);
     }
+	case Geometry::Type::LineMesh:
+	{
+		auto mesh = std::dynamic_pointer_cast<LineMesh>(geom);
+		return std::make_shared<LineMeshRenderDelegate>(mesh);
+	}
     case Geometry::Type::HexahedralMesh:
     {
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);

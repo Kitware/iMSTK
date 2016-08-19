@@ -57,7 +57,9 @@ int main()
 	auto scene = sdk->createNewScene("ETI simulator");
 	bool loadScene = false;
 	bool loadModel = false;
-	
+	bool clothTest = false;
+	bool tongueTest = !clothTest;
+
 	// initialize text record
 	// initializeText();
 
@@ -87,10 +89,10 @@ int main()
 		path2obj = "resources/Tools/handle2.obj";
 	else
 		path2obj = "resources/Tools/handle.obj";
-	
+
 	auto mesh = imstk::MeshReader::read(path2obj);
 	auto visualMesh = imstk::MeshReader::read(path2obj);
-	
+
 	auto handle = std::make_shared<imstk::VirtualCouplingPBDObject>("handle", client0, 0.5);
 
 	auto oneToOneHandle = std::make_shared<imstk::OneToOneMap>();
@@ -155,93 +157,148 @@ int main()
 		/*Contact stiffness*/0.01);
 	scene->addSceneObject(blade);
 
-//	scene->addSceneObject(meshObj1);
+	if (tongueTest){
+		/*auto tongueMesh = imstk::MeshReader::read("resources/Human/tongue.veg");
+		auto viusalTongueMesh = imstk::MeshReader::read("resources/Human/tongue.veg");*/
 
-
-	// floor
-	auto floorMesh = std::make_shared<imstk::SurfaceMesh>();
-	std::vector<imstk::Vec3d> vertList;
-	double width = 60.0;
-	double height = 60.0;
-	int nRows = 20;
-	int nCols = 20;
-	int corner[4] = { 1, nRows, nRows*nCols - nCols+1,nRows*nCols };
-	char intStr[33];
-	std::string fixed_corner;
-	for (unsigned int i = 0; i < 4; i++){
-		itoa(corner[i], intStr, 10);
-		fixed_corner += std::string(intStr) + ' ';
-	}
-	vertList.resize(nRows*nCols);
-	const double dy = width / (double)(nCols - 1);
-	const double dx = height / (double)(nRows - 1);
-	for (int i = 0; i < nRows; i++)
-	{
-		for (int j = 0; j < nCols; j++)
+		
+		auto tetMesh = imstk::MeshReader::read("../Sandbox/asianDragon/asianDragon.veg");
+		if (!tetMesh)
 		{
-			const double y = (double)dy*j;
-			const double x = (double)dx*i;
-			vertList[i*nCols + j] = Vec3d(x - 30, -25, y-60);
-
+			LOG(WARNING) << "Could not read mesh from file.";
+			return 1;
 		}
-	}
-	floorMesh->setInitialVerticesPositions(vertList);
-	floorMesh->setVerticesPositions(vertList);
 
-	// c. Add connectivity data
-	std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-	for (int i = 0; i < nRows - 1; i++)
-	{
-		for (int j = 0; j < nCols - 1; j++)
+		auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+		auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+		if (!volTetMesh)
 		{
-			imstk::SurfaceMesh::TriangleArray tri[2];
-			tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
-			tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
-			triangles.push_back(tri[0]);
-			triangles.push_back(tri[1]);
-		}		
+			LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+			return 1;
+		}
+		volTetMesh->extractSurfaceMesh(surfMesh);
+
+		auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+		oneToOneNodalMap->setMaster(tetMesh);
+		oneToOneNodalMap->setSlave(surfMesh);
+		oneToOneNodalMap->compute();
+
+		auto deformableObj = std::make_shared<PbdObject>("Dragon");
+		deformableObj->setVisualGeometry(surfMesh);
+		deformableObj->setCollidingGeometry(surfMesh);
+		deformableObj->setPhysicsGeometry(volTetMesh);
+		deformableObj->setPhysicsToCollidingMap(oneToOneNodalMap);
+		deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+		deformableObj->init(/*Number of Constraints*/1,
+			/*Constraint configuration*/"Volume 0.5",
+			/*Mass*/0.1,
+			/*Gravity*/"0 -9.8 0",
+			/*TimeStep*/0.001,
+			/*FixedPoint*/"2 22 33 66 88",
+			/*NumberOfIterationInConstraintSolver*/5,
+			/*Proximity*/0.1,
+			/*Contact stiffness*/0.01);
+
+		scene->addSceneObject(deformableObj);
+		std::cout << "nbr of vertices in tongue mesh = " << surfMesh->getNumVertices() << std::endl;
+		// Collisions
+		auto deformableColGraph = scene->getCollisionGraph();
+		auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(blade, deformableObj));
+//		auto pair2 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(handle, deformableObj));
+		pair1->setNumberOfInterations(5);
+//		pair2->setNumberOfInterations(5);
+
+		deformableColGraph->addInteractionPair(pair1);
+//		deformableColGraph->addInteractionPair(pair2);
+		scene->getCamera()->setPosition(0, 5, 25);
+		scene->getCamera()->setFocalPoint(surfMesh.get()->getInitialVertexPosition(20));
 	}
-	floorMesh->setTrianglesVertices(triangles);
 
-	auto oneToOneFloor = std::make_shared<imstk::OneToOneMap>();
-	oneToOneFloor->setMaster(floorMesh);
-	oneToOneFloor->setSlave(floorMesh);
-	oneToOneFloor->compute();
+	else if (clothTest){
+		auto clothMesh = std::make_shared<imstk::SurfaceMesh>();
+		std::vector<imstk::Vec3d> vertList;
+		double width = 60.0;
+		double height = 60.0;
+		int nRows = 20;
+		int nCols = 20;
+		int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
+		char intStr[33];
+		std::string fixed_corner;
+		for (unsigned int i = 0; i < 4; i++){
+			itoa(corner[i], intStr, 10);
+			fixed_corner += std::string(intStr) + ' ';
+		}
+		vertList.resize(nRows*nCols);
+		const double dy = width / (double)(nCols - 1);
+		const double dx = height / (double)(nRows - 1);
+		for (int i = 0; i < nRows; i++)
+		{
+			for (int j = 0; j < nCols; j++)
+			{
+				const double y = (double)dy*j;
+				const double x = (double)dx*i;
+				vertList[i*nCols + j] = Vec3d(x - 30, -25, y - 60);
 
-	auto floor = std::make_shared<PbdObject>("Floor");
-	floor->setCollidingGeometry(floorMesh);
-	floor->setVisualGeometry(floorMesh);
-	floor->setPhysicsGeometry(floorMesh);
-	floor->setPhysicsToCollidingMap(oneToOneFloor);
-	floor->setPhysicsToVisualMap(oneToOneFloor);
-	floor->setCollidingToVisualMap(oneToOneFloor);
-	floor->init(/*Number of constraints*/2,
-		/*Constraint configuration*/"Distance 0.1",
-		/*Constraint configuration*/"Dihedral 0.001",
-		/*Mass*/0.5,
-		/*Gravity*/"0 -9.8 0",
-		/*TimeStep*/0.01,
-		/*FixedPoint*/fixed_corner.c_str(),		
-		/*NumberOfIterationInConstraintSolver*/5,
-		/*Proximity*/0.1,
-		/*Contact stiffness*/0.01);
-	scene->addSceneObject(floor);
+			}
+		}
+		clothMesh->setInitialVerticesPositions(vertList);
+		clothMesh->setVerticesPositions(vertList);
 
-	// Collisions
-	auto colGraph = scene->getCollisionGraph();
-	auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(blade, floor));
-	auto pair2 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(handle, floor));
-	pair1->setNumberOfInterations(5);
-	pair2->setNumberOfInterations(5);
+		// c. Add connectivity data
+		std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
+		for (int i = 0; i < nRows - 1; i++)
+		{
+			for (int j = 0; j < nCols - 1; j++)
+			{
+				imstk::SurfaceMesh::TriangleArray tri[2];
+				tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };
+				tri[1] = { { (i + 1)*nCols + j + 1, (i + 1)*nCols + j, i*nCols + j + 1 } };
+				triangles.push_back(tri[0]);
+				triangles.push_back(tri[1]);
+			}
+		}
+		clothMesh->setTrianglesVertices(triangles);
 
-	colGraph->addInteractionPair(pair1);
-	colGraph->addInteractionPair(pair2);
+		auto oneToOneFloor = std::make_shared<imstk::OneToOneMap>();
+		oneToOneFloor->setMaster(clothMesh);
+		oneToOneFloor->setSlave(clothMesh);
+		oneToOneFloor->compute();
 
-	Vec3d cameraPos = scene->getCamera()->getPosition();
-	std::cout << cameraPos << std::endl;
-	scene->getCamera()->setPosition(0,0,50);
+		auto floor = std::make_shared<PbdObject>("Floor");
+		floor->setCollidingGeometry(clothMesh);
+		floor->setVisualGeometry(clothMesh);
+		floor->setPhysicsGeometry(clothMesh);
+		floor->setPhysicsToCollidingMap(oneToOneFloor);
+		floor->setPhysicsToVisualMap(oneToOneFloor);
+		floor->setCollidingToVisualMap(oneToOneFloor);
+		floor->init(/*Number of constraints*/2,
+			/*Constraint configuration*/"Distance 0.1",
+			/*Constraint configuration*/"Dihedral 0.001",
+			/*Mass*/0.5,
+			/*Gravity*/"0 -9.8 0",
+			/*TimeStep*/0.01,
+			/*FixedPoint*/fixed_corner.c_str(),
+			/*NumberOfIterationInConstraintSolver*/5,
+			/*Proximity*/0.1,
+			/*Contact stiffness*/0.01);
+		scene->addSceneObject(floor);
+
+		std::cout << "nbr of vertices in cloth mesh" << clothMesh->getNumVertices() << std::endl;
+
+		// Collisions
+		auto clothTestcolGraph = scene->getCollisionGraph();
+		auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(blade, floor));
+//		auto pair2 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(handle, floor));
+		pair1->setNumberOfInterations(5);
+//		pair2->setNumberOfInterations(5);
+
+		clothTestcolGraph->addInteractionPair(pair1);
+//		clothTestcolGraph->addInteractionPair(pair2);
+		scene->getCamera()->setPosition(0, 0, 50);
+	}
+
 	sdk->setCurrentScene("ETI simulator");
-    sdk->startSimulation(true);
+	sdk->startSimulation(true);
 }
 
 void initializeText()
@@ -331,7 +388,7 @@ void initializeOR(MeshList _staticORObjectMesh, SurfaceMeshList _staticORObjectS
 
 	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/bed2.obj"));
 	_staticORObjectMesh[_staticORObjectMesh.size() - 1]->translate(0.0, 0.0, -10.0);
-	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("bed2"));	
+	_staticORObject.push_back(std::make_shared<imstk::VisualObject>("bed2"));
 	textureName.push_back("resources/TextureOR/bed-2.jpg");
 
 	_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/bed3.obj"));
@@ -473,19 +530,20 @@ void initializeOR(MeshList _staticORObjectMesh, SurfaceMeshList _staticORObjectS
 	//textureName.push_back("resources/TextureOR/window_frame.jpg");
 
 
-	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/cloth.obj"));
+	//_staticORObjectMesh.push_back(imstk::MeshReader::read("resources/OperatingRoom/tongue.obj"));
 	//_staticORObjectMesh[_staticORObjectMesh.size() - 1]->translate(0.0, 12.0, 6.0);
-	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("cloth"));
-	//textureName.push_back("resources/TextureOR/cloth.jpg");
+	//_staticORObject.push_back(std::make_shared<imstk::VisualObject>("tongue"));
+	//textureName.push_back("resources/TextureOR/tongue.jpg");
 
 	std::cout << "Number of OR scene object: " << _staticORObjectMesh.size() << std::endl;
-//	std::shared_ptr<imstk::SurfaceMesh> surfaceMesh;
+	//	std::shared_ptr<imstk::SurfaceMesh> surfaceMesh;
 	for (unsigned int i = 0; i < _staticORObjectMesh.size(); i++){
 		_staticORObjectSurfaceMesh.push_back(std::dynamic_pointer_cast<imstk::SurfaceMesh>(_staticORObjectMesh[i]));
-//		if (i == (_staticORObjectMesh.size()-1))
+		//		if (i == (_staticORObjectMesh.size()-1))
 		_staticORObjectSurfaceMesh[i]->addTexture(textureName[i]);
 		_staticORObject[i]->setVisualGeometry(_staticORObjectSurfaceMesh[i]);
 		_scene->addSceneObject(_staticORObject[i]);
+		std::cout << "nbr of vertices in mesh" << i << " = " << _staticORObjectSurfaceMesh[i]->getNumVertices() << std::endl;
 	}
 
 
@@ -502,17 +560,17 @@ void initializeHumanModel(MeshList _staticModelMesh, SurfaceMeshList _staticMode
 
 	_staticModelMesh.push_back(imstk::MeshReader::read("resources/Human/head.obj"));
 	_staticModel.push_back(std::make_shared<imstk::VisualObject>("head"));
-	textureName.push_back("resources/TextureOR/cloth.jpg");
+	textureName.push_back("resources/TextureOR/tongue.jpg");
 
 	//_staticModelMesh.push_back(imstk::MeshReader::read("resources/Human/teeth.obj"));
 	//_staticModel.push_back(std::make_shared<imstk::VisualObject>("teeth"));
 
 	//_staticModelMesh.push_back(imstk::MeshReader::read("resources/Human/tracheal.obj"));
 	//_staticModel.push_back(std::make_shared<imstk::VisualObject>("tracheal"));
-	
-	
-	
-//	std::shared_ptr<imstk::SurfaceMesh> surfaceMesh;
+
+
+
+	//	std::shared_ptr<imstk::SurfaceMesh> surfaceMesh;
 	for (unsigned int i = 0; i < _staticModel.size(); i++){
 		_staticModelSurfaceMesh.push_back(std::dynamic_pointer_cast<imstk::SurfaceMesh>(_staticModelMesh[i]));
 		_staticModelSurfaceMesh[i]->addTexture(textureName[i]);

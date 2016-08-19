@@ -19,61 +19,61 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdRigidObject_h
-#define imstkPbdRigidObject_h
+#ifndef imstkLineMeshRenderDelegate_h
+#define imstkLineMeshRenderDelegate_h
 
-#include "imstkPbdObject.h"
+#include <memory>
+
+#include "imstkRenderDelegate.h"
+#include "imstkLineMesh.h"
+#include <vtkLineSource.h>
+#include "vtkPolyData.h"
+#include "imstkMappedVertexArray.h"
+
 namespace imstk
 {
 
-class Geometry;
-class GeometryMap;
-
 ///
-/// \class PbdRigidObject
+/// \class LineMeshRenderDelegate
 ///
 /// \brief
 ///
-class PbdRigidObject : public PbdObject
+class LineMeshRenderDelegate : public RenderDelegate
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief
     ///
-	PbdRigidObject(std::string name) : PbdObject(name)
-	{
-		m_type = SceneObject::Type::Deformable;
-	}
+    ~LineMeshRenderDelegate() = default;
 
     ///
-    /// \brief Destructor
+    /// \brief
     ///
-	~PbdRigidObject() = default;
+    LineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
 
 	///
 	/// \brief
-	///
-	virtual void integratePosition(){ return; }
+	///	
+	void mapVertices();
 
-	///
-	/// \brief
-	///
-	virtual void integrateVelocity(){ return; }
 
-	///
-	/// \brief
-	///
-	virtual void updatePbdStates();
+    ///
+    /// \brief
+    ///
+    void update();
 
-	///
-	/// \brief
-	///
-	virtual void constraintProjection(){ return; }
+    ///
+    /// \brief
+    ///
+    std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
+	vtkSmartPointer<vtkLineSource> m_lines;
+    std::shared_ptr<LineMesh> m_geometry;
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
 
 };
 
-} // imstk
+}
 
-#endif // ifndef imstkVirtualCouplingObject_h
+#endif // ifndef imstkLineMeshRenderDelegate_h

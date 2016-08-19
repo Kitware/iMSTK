@@ -83,7 +83,9 @@ Geometry::isMesh() const
 {
     return (this->m_type == Type::HexahedralMesh ||
             this->m_type == Type::SurfaceMesh ||
-            this->m_type == Type::TetrahedralMesh) ? true : false;
+            this->m_type == Type::TetrahedralMesh ||
+			this->m_type == Type::LineMesh
+			) ? true : false;
 }
 
 const Vec3d&

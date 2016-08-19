@@ -47,7 +47,6 @@ public:
 		TrackingController(deviceClient, scaling), PbdRigidObject(name)
 	{
 		m_type = Type::VirtualCoupling;
-		m_type = SceneObject::Type::Deformable;		
 	}
 
     ///
@@ -83,18 +82,28 @@ public:
 	///
 	/// \brief Reset CollidingGeometry
 	///
-	void resetCollidingGeo();
+	void resetCollidingGeometry();
 
 	///
 	/// \brief compute (offsetted)transform matrix
 	///
 	void computeTransform(Vec3d& p, Quatd& r, Eigen::Matrix4d& t);
 
+	///
+	/// \brief Set/Get the Colliding-to-Physics map
+	///
+	std::shared_ptr<GeometryMap> getColldingToPhysicsMap() const;
+	void setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map);
+
+	void applyCollidingToPhysics();
+
 protected:
 
 	bool m_forceModified;
 	Vec3d m_force = Vec3d::Zero();
 	Eigen::Matrix4d transform = Eigen::Matrix4d();
+	//Maps
+	std::shared_ptr<GeometryMap> m_collidingToPhysicsGeomMap;   ///> Maps from collision to physics geometry
 };
 
 

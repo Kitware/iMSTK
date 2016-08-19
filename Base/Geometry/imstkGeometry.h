@@ -46,7 +46,8 @@ public:
         Cube,
         SurfaceMesh,
         TetrahedralMesh,
-        HexahedralMesh
+        HexahedralMesh,
+		LineMesh
     };
 
     ///

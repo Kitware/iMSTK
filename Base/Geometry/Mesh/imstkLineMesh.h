@@ -19,61 +19,52 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdRigidObject_h
-#define imstkPbdRigidObject_h
+#ifndef imstkLineMesh_h
+#define imstkLineMesh_h
 
-#include "imstkPbdObject.h"
+#include <memory>
+
+#include "imstkMesh.h"
+
+
 namespace imstk
 {
 
-class Geometry;
-class GeometryMap;
-
 ///
-/// \class PbdRigidObject
+/// \class LineMesh
 ///
-/// \brief
+/// \brief Base class for all volume mesh types
 ///
-class PbdRigidObject : public PbdObject
+class LineMesh : public Mesh
 {
 public:
+	LineMesh() : Mesh(Geometry::Type::LineMesh) {}
     ///
-    /// \brief Constructor
+    /// \brief Default destructor
     ///
-	PbdRigidObject(std::string name) : PbdObject(name)
-	{
-		m_type = SceneObject::Type::Deformable;
-	}
+    ~LineMesh() = default;
 
-    ///
-    /// \brief Destructor
-    ///
-	~PbdRigidObject() = default;
+	virtual void clear();
 
 	///
-	/// \brief
+	/// \brief Print the mesh info
 	///
-	virtual void integratePosition(){ return; }
+	virtual void print() const override;
 
-	///
-	/// \brief
-	///
-	virtual void integrateVelocity(){ return; }
+	virtual double getVolume() const;
+	
+	void setConnectivity(const std::vector<std::vector<int> >& lines);
 
-	///
-	/// \brief
-	///
-	virtual void updatePbdStates();
+	int getNumLines();
 
-	///
-	/// \brief
-	///
-	virtual void constraintProjection(){ return; }
+	std::vector<std::vector<int> > getLines() const;
 
-protected:
+	std::vector<int> getLine(int index) const;
 
+private:
+	std::vector<std::vector<int> > m_lines; ///> line connectivity
 };
 
 } // imstk
 
-#endif // ifndef imstkVirtualCouplingObject_h
+#endif // ifndef imstkLineMesh_h

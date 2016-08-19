@@ -19,61 +19,34 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdRigidObject_h
-#define imstkPbdRigidObject_h
+#include "imstkLineMesh.h"
 
-#include "imstkPbdObject.h"
+#include "g3log/g3log.hpp"
+
 namespace imstk
 {
+	void LineMesh::clear(){}
 
-class Geometry;
-class GeometryMap;
-
-///
-/// \class PbdRigidObject
-///
-/// \brief
-///
-class PbdRigidObject : public PbdObject
-{
-public:
-    ///
-    /// \brief Constructor
-    ///
-	PbdRigidObject(std::string name) : PbdObject(name)
-	{
-		m_type = SceneObject::Type::Deformable;
+	void LineMesh::print() const {
+		Mesh::print();
+	}
+	double LineMesh::getVolume() const{
+		return 0.0;
+	}
+	void LineMesh::setConnectivity(const std::vector<std::vector<int> >& lines){
+		m_lines = lines;
 	}
 
-    ///
-    /// \brief Destructor
-    ///
-	~PbdRigidObject() = default;
+	int LineMesh::getNumLines(){
+		return m_lines.size();
+	}
 
-	///
-	/// \brief
-	///
-	virtual void integratePosition(){ return; }
+	std::vector<std::vector<int> > LineMesh::getLines() const{
+		return m_lines;
+	}
 
-	///
-	/// \brief
-	///
-	virtual void integrateVelocity(){ return; }
-
-	///
-	/// \brief
-	///
-	virtual void updatePbdStates();
-
-	///
-	/// \brief
-	///
-	virtual void constraintProjection(){ return; }
-
-protected:
-
-};
+	std::vector<int>  LineMesh::getLine(int index) const{
+		return m_lines[index];
+	}
 
 } // imstk
-
-#endif // ifndef imstkVirtualCouplingObject_h

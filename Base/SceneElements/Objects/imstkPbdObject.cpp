@@ -146,8 +146,7 @@ PbdObject::init(int nCons, ...)
 
     state->setUniformMass(va_arg(args,double));
 
- //   if (nCons > 0)
-	if (true)
+    if (nCons > 0)
     {
         char* gstring = va_arg(args,char*);
         float x,y,z;

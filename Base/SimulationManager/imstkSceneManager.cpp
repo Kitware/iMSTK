@@ -74,9 +74,10 @@ SceneManager::runModule()
 		}
 		else if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
 		{
+			// reset Colliding Geometry so that the transform obtained from device can be applied
+			virtualCouplingPBD->resetCollidingGeometry();
 			virtualCouplingPBD->updateFromDevice();
 			virtualCouplingPBD->applyForces();
-			virtualCouplingPBD->updateGeometry();
 		}
 	}
 
@@ -106,12 +107,14 @@ SceneManager::runModule()
             dynaObj->getPhysicsToVisualMap()->apply();
         }
 		if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj)){
+			// Skip VirtualCouplingPBDObject from internal constraint projection
 			continue;
 		}
         else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
             pbdObj->integratePosition();
             pbdObj->constraintProjection();
+			pbdObj->updateGeometry();
             pbdObj->applyPhysicsToColliding();
         }
     }
@@ -130,8 +133,8 @@ SceneManager::runModule()
     {
 		if (auto pbdRigidObj = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
 		{
-			pbdRigidObj->resetCollidingGeo();
-			pbdRigidObj->getCollidingToVisualMap()->apply();
+			// Skip VirtualCouplingPBDObject from internal constraint projection
+			continue;
 		}
         else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {

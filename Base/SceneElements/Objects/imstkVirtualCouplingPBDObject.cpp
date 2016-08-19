@@ -42,38 +42,40 @@ VirtualCouplingPBDObject::updateFromDevice()
 {
     Vec3d p;
     Quatd r;	
-	Eigen::Matrix4d t;	
-	
     if (!this->computeTrackingData(p, r))
     {
         LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
         return;
     }
 
-    // Update colliding geometry
-  m_visualGeometry->setPosition(p);
-  m_visualGeometry->setOrientation(r);
+	// Update colliding geometry
+	m_visualGeometry->setPosition(p);
+	m_visualGeometry->setOrientation(r);
 
-   computeTransform(p, r, t);
+	computeTransform(p, r, transform);
 
-   transform = t;
-  
-   Vec4d vertexPos;
-   vertexPos.w() = 1;
-   Vec3d vertexPos0;
    auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
+
+   Vec4d vertexPos4;
+   vertexPos4.w() = 1;
+   Vec3d vertexPos3;
+
 	for (int i = 0; i < collidingMesh->getNumVertices(); ++i)
    {
-	   vertexPos0 = collidingMesh->getVertexPosition(i);
-	   vertexPos.x() = vertexPos0.x();
-	   vertexPos.y() = vertexPos0.y();
-	   vertexPos.z() = vertexPos0.z();
-	   vertexPos.applyOnTheLeft(transform);
-	   vertexPos0.x() = vertexPos.x();
-	   vertexPos0.y() = vertexPos.y();
-	   vertexPos0.z() = vertexPos.z();	  
-	   collidingMesh->setVerticePosition(i, vertexPos0);
-   }    
+	   vertexPos3 = collidingMesh->getVertexPosition(i);
+	   vertexPos4.x() = vertexPos3.x();
+	   vertexPos4.y() = vertexPos3.y();
+	   vertexPos4.z() = vertexPos3.z();
+
+	   vertexPos4.applyOnTheLeft(transform);
+	   vertexPos3.x() = vertexPos4.x();
+	   vertexPos3.y() = vertexPos4.y();
+	   vertexPos3.z() = vertexPos4.z();
+
+	   collidingMesh->setVerticePosition(i, vertexPos3);
+	}
+	applyCollidingToPhysics();
+	updatePbdStates();
 }
 
 void 
@@ -117,11 +119,29 @@ VirtualCouplingPBDObject::setForce(Vec3d force)
 }
 
 void
-VirtualCouplingPBDObject::resetCollidingGeo(){
+VirtualCouplingPBDObject::resetCollidingGeometry(){
 
-	auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
-	collidingMesh->setVerticesPositions(collidingMesh->getInitialVerticesPositions());
-
+	if (m_collidingGeometry->isMesh()){
+		auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
+		collidingMesh->setVerticesPositions(collidingMesh->getInitialVerticesPositions());
+	}
+	else{
+		std::cout << "Not a mesh." << std::endl;
+	}
 }
 
+std::shared_ptr<GeometryMap> VirtualCouplingPBDObject::getColldingToPhysicsMap() const{
+	return m_collidingToPhysicsGeomMap;
+}
+
+void VirtualCouplingPBDObject::setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map){
+	m_collidingToPhysicsGeomMap = map;
+}
+
+void VirtualCouplingPBDObject::applyCollidingToPhysics(){
+	if (m_collidingToPhysicsGeomMap && m_physicsGeometry)
+	{
+		m_collidingToPhysicsGeomMap->apply();
+	}
+}
 } // imstk

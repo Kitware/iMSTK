@@ -29,7 +29,7 @@
 
 namespace imstk
 {
-	void PbdRigidObject::updateGeometry(){
+	void PbdRigidObject::updatePbdStates(){
 		m_pbdModel->updatePbdStateFromPhysicsGeometry();
 	}
 

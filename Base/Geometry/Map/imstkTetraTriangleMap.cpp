@@ -90,7 +90,7 @@ TetraTriangleMap::apply()
         auto weights = m_verticesWeights.at(vertexId);
         for (size_t i = 0; i < 4; ++i)
         {
-            newPos += tetMesh->getInitialVertexPosition(tetVerts[i]) * weights[i];
+            newPos += tetMesh->getVertexPosition(tetVerts[i]) * weights[i];
         }
         triMesh->setVerticePosition(vertexId, newPos);
     }
@@ -169,8 +169,8 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
         {
             center += tetraMesh->getInitialVertexPosition(vert[i]);
         }
-
-        double dist = (pos - center).norm();
+		center = center / 4;
+		double dist = (pos - center).norm();
         if (dist < closestDistance)
         {
             closestDistance = dist;
