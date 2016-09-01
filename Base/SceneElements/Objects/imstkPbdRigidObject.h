@@ -19,61 +19,61 @@
 
    =========================================================================*/
 
-#ifndef imstkSurfaceMeshRenderDelegate_h
-#define imstkSurfaceMeshRenderDelegate_h
+#ifndef imstkPbdRigidObject_h
+#define imstkPbdRigidObject_h
 
-#include <memory>
-
-#include "imstkRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
-
-#include "vtkPolyData.h"
-#include "imstkMappedVertexArray.h"
-
+#include "imstkPbdObject.h"
 namespace imstk
 {
 
+class Geometry;
+class GeometryMap;
+
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class PbdRigidObject
 ///
 /// \brief
 ///
-class SurfaceMeshRenderDelegate : public RenderDelegate
+class PbdRigidObject : public PbdObject
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
     ///
-    ~SurfaceMeshRenderDelegate() = default;
+	PbdRigidObject(std::string name) : PbdObject(name)
+	{
+		m_type = SceneObject::Type::Deformable;
+	}
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
-    SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
+	~PbdRigidObject() = default;
 
 	///
 	/// \brief
-	///	
-	void mapVertices();
+	///
+	virtual void integratePosition(){ return; }
 
+	///
+	/// \brief
+	///
+	virtual void integrateVelocity(){ return; }
 
-    ///
-    /// \brief
-    ///
-    void update();
+	///
+	/// \brief
+	///
+	virtual void updatePbdStates();
 
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+	///
+	/// \brief
+	///
+	virtual void constraintProjection(){ return; }
 
 protected:
-	
-    std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
 
 };
 
-}
+} // imstk
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+#endif // ifndef imstkVirtualCouplingObject_h

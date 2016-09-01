@@ -19,61 +19,52 @@
 
    =========================================================================*/
 
-#ifndef imstkSurfaceMeshRenderDelegate_h
-#define imstkSurfaceMeshRenderDelegate_h
+#ifndef imstkLineMesh_h
+#define imstkLineMesh_h
 
 #include <memory>
 
-#include "imstkRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkMesh.h"
 
-#include "vtkPolyData.h"
-#include "imstkMappedVertexArray.h"
 
 namespace imstk
 {
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class LineMesh
 ///
-/// \brief
+/// \brief Base class for all volume mesh types
 ///
-class SurfaceMeshRenderDelegate : public RenderDelegate
+class LineMesh : public Mesh
 {
 public:
+	LineMesh() : Mesh(Geometry::Type::LineMesh) {}
     ///
-    /// \brief
+    /// \brief Default destructor
     ///
-    ~SurfaceMeshRenderDelegate() = default;
+    ~LineMesh() = default;
 
-    ///
-    /// \brief
-    ///
-    SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
+	virtual void clear();
 
 	///
-	/// \brief
-	///	
-	void mapVertices();
+	/// \brief Print the mesh info
+	///
+	virtual void print() const override;
 
-
-    ///
-    /// \brief
-    ///
-    void update();
-
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
-
-protected:
+	virtual double getVolume() const;
 	
-    std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+	void setConnectivity(const std::vector<std::vector<int> >& lines);
 
+	int getNumLines();
+
+	std::vector<std::vector<int> > getLines() const;
+
+	std::vector<int> getLine(int index) const;
+
+private:
+	std::vector<std::vector<int> > m_lines; ///> line connectivity
 };
 
-}
+} // imstk
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+#endif // ifndef imstkLineMesh_h

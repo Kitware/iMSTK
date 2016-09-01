@@ -38,22 +38,22 @@ public:
     ///
     /// \brief
     ///
-    void integratePosition();
+    virtual void integratePosition();
 
     ///
     /// \brief
     ///
-    void integrateVelocity();
+    virtual void integrateVelocity();
 
     ///
     /// \brief
     ///
-    void updateGeometry();
+    virtual void updateGeometry();
 
     ///
     /// \brief
     ///
-    void constraintProjection();
+    virtual void constraintProjection();
 
     ///
     /// \brief

@@ -186,4 +186,4 @@ install(EXPORT ${PROJECT_NAME}_TARGETS
 #--------------------------------------------------------------------------
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
-add_subdirectory(Examples/Sandbox)
+add_subdirectory(Examples)

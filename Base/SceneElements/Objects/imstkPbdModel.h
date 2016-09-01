@@ -165,6 +165,11 @@ public:
     ///
     void updatePhysicsGeometry();
 
+	///
+	/// \brief
+	///
+	void updatePbdStateFromPhysicsGeometry();
+
     ///
     /// \brief
     ///

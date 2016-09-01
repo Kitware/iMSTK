@@ -55,7 +55,7 @@ void
 Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 {
     min = Vec3d(MAX_D, MAX_D, MAX_D);
-    max = Vec3d(MIN_D, MIN_D, MIN_D);
+	max = Vec3d(-MAX_D, -MAX_D, -MAX_D);
 
     for (auto& pos : m_verticesPositions)
     {

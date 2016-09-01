@@ -19,61 +19,18 @@
 
    =========================================================================*/
 
-#ifndef imstkSurfaceMeshRenderDelegate_h
-#define imstkSurfaceMeshRenderDelegate_h
-
 #include <memory>
 
-#include "imstkRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkPbdRigidObject.h"
+#include "imstkGeometry.h"
+#include "imstkGeometryMap.h"
 
-#include "vtkPolyData.h"
-#include "imstkMappedVertexArray.h"
+#include <g3log/g3log.hpp>
 
 namespace imstk
 {
+	void PbdRigidObject::updatePbdStates(){
+		m_pbdModel->updatePbdStateFromPhysicsGeometry();
+	}
 
-///
-/// \class SurfaceMeshRenderDelegate
-///
-/// \brief
-///
-class SurfaceMeshRenderDelegate : public RenderDelegate
-{
-public:
-    ///
-    /// \brief
-    ///
-    ~SurfaceMeshRenderDelegate() = default;
-
-    ///
-    /// \brief
-    ///
-    SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
-
-	///
-	/// \brief
-	///	
-	void mapVertices();
-
-
-    ///
-    /// \brief
-    ///
-    void update();
-
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
-
-protected:
-	
-    std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
-
-};
-
-}
-
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+} //imstk

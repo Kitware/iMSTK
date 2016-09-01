@@ -56,7 +56,7 @@ EdgeEdgeConstraint::solvePositionConstraint()
     }
     else
     {
-        LOG(WARNING) << "det is null";
+//        LOG(WARNING) << "det is null";
     }
 
     Vec3d P = x0 + t*(x1-x0);
@@ -155,7 +155,7 @@ PointTriangleConstraint::solvePositionConstraint()
 
     if (alpha < 0 || beta < 0 || alpha + beta > 1 )
     {
-        LOG(WARNING) << "Projection point not inside the triangle";
+        //LOG(WARNING) << "Projection point not inside the triangle";
         return false;
     }
 

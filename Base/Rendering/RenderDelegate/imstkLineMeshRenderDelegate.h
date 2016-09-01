@@ -19,14 +19,14 @@
 
    =========================================================================*/
 
-#ifndef imstkSurfaceMeshRenderDelegate_h
-#define imstkSurfaceMeshRenderDelegate_h
+#ifndef imstkLineMeshRenderDelegate_h
+#define imstkLineMeshRenderDelegate_h
 
 #include <memory>
 
 #include "imstkRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
-
+#include "imstkLineMesh.h"
+#include <vtkLineSource.h>
 #include "vtkPolyData.h"
 #include "imstkMappedVertexArray.h"
 
@@ -34,22 +34,22 @@ namespace imstk
 {
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class LineMeshRenderDelegate
 ///
 /// \brief
 ///
-class SurfaceMeshRenderDelegate : public RenderDelegate
+class LineMeshRenderDelegate : public RenderDelegate
 {
 public:
     ///
     /// \brief
     ///
-    ~SurfaceMeshRenderDelegate() = default;
+    ~LineMeshRenderDelegate() = default;
 
     ///
     /// \brief
     ///
-    SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
+    LineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
 
 	///
 	/// \brief
@@ -68,12 +68,12 @@ public:
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-	
-    std::shared_ptr<SurfaceMesh> m_geometry;
+	vtkSmartPointer<vtkLineSource> m_lines;
+    std::shared_ptr<LineMesh> m_geometry;
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
 
 };
 
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+#endif // ifndef imstkLineMeshRenderDelegate_h
