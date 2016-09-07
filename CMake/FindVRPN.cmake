@@ -1,106 +1,142 @@
-###########################################################################
-#
-# Copyright (c) Kitware, Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-###########################################################################
+# Comments by Alexis:
+# VRPN has a FindVRPN, Findquatlib, FindLibusb1, FindHIDAPI in cmake folder:
+# - FindLibusb1 finds the include but not the lib. Updating it from usb-1.0 to
+#   libusb-1.0 fixes the issue.
+# - Findquatlib does not find lib or include. Updating lib from quat.lib/libquat.a
+#   to quat and quatd resolved the library. No way to resolve the include since
+#   QUATLIB_ROOT_DIR is not defined in this scope.
+# - FindHIDAPI does not find lib or include. Using submodules/hidapi.cmake
+#   instead would help finding the good variables but requires more includes and
+#   to be in VRPN scope.
+# - FindVRPN uses Findquatlib and FindLibusb1 therefore fails. It also does not
+#   look for HIDAPI.
 
+#-----------------------------------------------------------------------------
+# Find path
+#-----------------------------------------------------------------------------
 find_path(VRPN_INCLUDE_DIR
   NAMES
     vrpn_Configure.h
     )
+mark_as_advanced(VRPN_INCLUDE_DIR)
 
+find_path(LIBNIFALCON_INCLUDE_DIR
+  NAMES
+    falcon/core/FalconDevice.h
+  )
+mark_as_advanced(LIBNIFALCON_INCLUDE_DIR)
+
+find_path(LIBUSB1_INCLUDE_DIR
+  NAMES
+    libusb.h
+    libusb-1.0/libusb.h
+  )
+mark_as_advanced(LIBUSB1_INCLUDE_DIR)
+
+#-----------------------------------------------------------------------------
+# Set up include dirs
+#-----------------------------------------------------------------------------
+list(APPEND VRPN_INCLUDE_DIRS
+  ${VRPN_INCLUDE_DIR}
+  ${VRPN_INCLUDE_DIR}/quat
+  ${VRPN_INCLUDE_DIR}/atmellib
+  ${LIBNIFALCON_INCLUDE_DIR}
+  ${LIBUSB1_INCLUDE_DIR}
+  )
+
+#-----------------------------------------------------------------------------
+# Find library
+#-----------------------------------------------------------------------------
 find_library(VRPN_LIBRARY
   NAMES
-    vrpn
-    vrpnd)
+    vrpnserver
+    vrpnserverd
+  )
+mark_as_advanced(VRPN_LIBRARY)
 
-set(VRPN_INCLUDE_DIRS "${VRPN_INCLUDE_DIR}")
-set(VRPN_LIBRARIES "${VRPN_LIBRARY}")
+find_library(QUAT_LIBRARY
+  NAMES
+    quat
+    quatd
+  )
+mark_as_advanced(QUAT_LIBRARY)
 
-# Macro used to create link to target library
-macro(CREATE_VRPN_TARGET_LINK TARGET_NAME TARGET_LIBRARY TARGET_INCLUDES)
-  if(NOT TARGET ${TARGET_NAME})
-    add_library(${TARGET_NAME} INTERFACE IMPORTED)
-    set_target_properties(${TARGET_NAME} PROPERTIES
-        INTERFACE_LINK_LIBRARIES "${TARGET_LIBRARY}"
-        INTERFACE_INCLUDE_DIRECTORIES "${TARGET_INCLUDES}")
-  endif()
-endmacro()
+find_library(LIBNIFALCON_LIBRARY
+  NAMES
+    libnifalcon
+    nifalcon
+  )
+mark_as_advanced(LIBNIFALCON_LIBRARY)
 
-set(VRPN_REQUIRED_VARS)
-if(VRPN_FIND_COMPONENTS)
-  # Treat dependencies as components
-  foreach(component ${VRPN_FIND_COMPONENTS})
-    string(TOUPPER ${component} _COMPONENT)
-    if(${_COMPONENT} STREQUAL "LIBNIFALCON")
-      find_package(${component} QUIET)
-      list(APPEND VRPN_INCLUDE_DIRS "${${_COMPONENT}_INCLUDE_DIR}")
-      list(APPEND VRPN_REQUIRED_VARS ${_COMPONENT}_LIBRARY ${_COMPONENT}_INCLUDE_DIR)
-    elseif(${_COMPONENT} STREQUAL "LIBUSB1")
-      find_package(${component})
-      list(APPEND VRPN_INCLUDE_DIRS "${${_COMPONENT}_INCLUDE_DIR}")
-      list(APPEND VRPN_REQUIRED_VARS ${_COMPONENT}_LIBRARY ${_COMPONENT}_INCLUDE_DIR)
-    else()
-      find_library(${_COMPONENT}_LIBRARY
-        NAMES
-          ${component}
-          ${component}d)
-    endif()
-    list(APPEND VRPN_LIBRARIES "${${_COMPONENT}_LIBRARY}")
-    list(APPEND VRPN_REQUIRED_VARS
-      ${_COMPONENT}_LIBRARY)
+#works on windows, but sounds like it is needed only on linux, check vrpn/submodules/hidapi.cmake
+find_library(LIBUSB1_LIBRARY
+  NAMES
+    libusb-1.0
+    usb-1.0
+  )
+mark_as_advanced(LIBUSB1_LIBRARY)
 
-  endforeach()
+#check vrpn/submodules/hidapi.cmake
+if(WIN32)
+  find_library(HIDAPI_LIBRARY
+    NAMES
+      setupapi
+    )
+elseif(APPLE)
+  find_library(MACHID_CoreFoundation_LIBRARY CoreFoundation)
+  find_library(MACHID_IOKit_LIBRARY IOKit)
+  set(HIDAPI_LIBRARY ${MACHID_CoreFoundation_LIBRARY} ${MACHID_IOKit_LIBRARY})
+endif()
+mark_as_advanced(HIDAPI_LIBRARY)
+
+#-----------------------------------------------------------------------------
+# Set up libraries
+#-----------------------------------------------------------------------------
+list(APPEND VRPN_LIBRARIES
+  ${VRPN_LIBRARY}
+  ${QUAT_LIBRARY}
+  ${LIBNIFALCON_LIBRARY}
+  ${LIBUSB1_LIBRARY}
+  ${HIDAPI_LIBRARY}
+  )
+
+#-----------------------------------------------------------------------------
+# Phantom Omni support
+#-----------------------------------------------------------------------------
+if(${${PROJECT_NAME}_USE_OMNI})
+  list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_package(OpenHaptics)
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_library(VRPN_PHANTOM_LIBRARY
+    NAMES
+      vrpn_phantom
+      vrpn_phantomd
+    )
+  mark_as_advanced(VRPN_PHANTOM_LIBRARY)
+  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY} ${OPENHAPTICS_LIBRARIES})
+  list(APPEND VRPN_INCLUDE_DIRS ${OPENHAPTICS_INCLUDE_DIRS})
 endif()
 
-include(FindPackageHandleStandardArgs)
+message(STATUS "OPENHAPTICS_LIBRARIES : ${OPENHAPTICS_LIBRARIES}")
+message(STATUS "OPENHAPTICS_INCLUDE_DIRS : ${OPENHAPTICS_INCLUDE_DIRS}")
 
+#-----------------------------------------------------------------------------
+# Find package
+#-----------------------------------------------------------------------------
+include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(VRPN
   REQUIRED_VARS
-    VRPN_INCLUDE_DIR
-    VRPN_LIBRARY
-    ${VRPN_REQUIRED_VARS})
+    VRPN_INCLUDE_DIRS
+    VRPN_LIBRARIES)
 
-mark_as_advanced(
-  VRPN_INCLUDE_DIR
-  VRPN_LIBRARY
-  ${VRPN_REQUIRED_VARS})
+#-----------------------------------------------------------------------------
+# If missing target, create it
+#-----------------------------------------------------------------------------
 
-if(VRPN_FOUND)
-  create_vrpn_target_link(vrpn::vrpn ${VRPN_LIBRARY} ${VRPN_INCLUDE_DIR})
-  if(VRPN_FIND_COMPONENTS)
-    foreach(component ${VRPN_FIND_COMPONENTS})
-      string(TOUPPER ${component} _COMPONENT)
-      set(_target)
-      if(${_COMPONENT} STREQUAL "LIBNIFALCON")
-        set(_target vrpn::libfalcon)
-      elseif(${_COMPONENT} STREQUAL "LIBUSB1")
-        set(_target vrpn::libusb)
-      elseif(${_COMPONENT} STREQUAL "QUAT")
-        set(_target vrpn::${component})
-        set(${_COMPONENT}_INCLUDE_DIR "${VRPN_INCLUDE_DIR}/quat")
-      elseif(${_COMPONENT} STREQUAL "VRPNSERVER")
-        set(_target vrpn::server)
-        set(${_COMPONENT}_INCLUDE_DIR "${VRPN_INCLUDE_DIR}/server_src")
-      elseif(${_COMPONENT} STREQUAL "VRPN_PHANTOM")
-        set(_target vrpn::phantom)
-        set(${_COMPONENT}_INCLUDE_DIR "${VRPN_INCLUDE_DIR}/server_src")
-      else()
-        set(_target vrpn::${component})
-      endif()
-      create_vrpn_target_link(${_target} "${${_COMPONENT}_LIBRARY}" "${${_COMPONENT}_INCLUDE_DIR}")
-    endforeach()
-  endif()
+if(VRPN_FOUND AND NOT TARGET VRPN)
+  add_library(VRPN INTERFACE IMPORTED)
+  set_target_properties(VRPN PROPERTIES
+    INTERFACE_LINK_LIBRARIES "${VRPN_LIBRARIES}"
+    INTERFACE_INCLUDE_DIRECTORIES "${VRPN_INCLUDE_DIRS}"
+  )
 endif()

@@ -1,372 +1,189 @@
-###########################################################################
-#
-# Copyright (c) Kitware, Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License");
-#  you may not use this file except in compliance with the License.
-#  You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0.txt
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS,
-#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#  See the License for the specific language governing permissions and
-#  limitations under the License.
-#
-###########################################################################
-
-cmake_minimum_required(VERSION 3.1)
-
-if (POLICY CMP0058)
-  cmake_policy(SET CMP0058 NEW)
-endif()
-project(iMSTK)
+cmake_minimum_required(VERSION 3.2)
+project(iMSTK VERSION 0.0.1 LANGUAGES C CXX)
 
 #-----------------------------------------------------------------------------
-# Update CMake module path
-#
-list(INSERT CMAKE_MODULE_PATH 0
-  "${CMAKE_CURRENT_SOURCE_DIR}/CMake" "${CMAKE_CURRENT_SOURCE_DIR}/CMake/SuperBuild")
+# Update CMake module path & cmake dir
+#-----------------------------------------------------------------------------
+set(CMAKE_MODULE_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMake/Utilities
+    ${CMAKE_MODULE_PATH}
+    )
+set(${PROJECT_NAME}_CMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 
 #-----------------------------------------------------------------------------
 # Set a default build type if none was specified
-#
+#-----------------------------------------------------------------------------
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Debug' as none was specified.")
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
   # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
 #-----------------------------------------------------------------------------
-# Include macros
-#
-include(iMSTKMacros)
-
+# Project build directories
 #-----------------------------------------------------------------------------
-# Library mode: SHARED (default in Linux/Mac) or STATIC (Required in Win32)
-#
-option(BUILD_SHARED_LIBS "Build shared libraries" ON)
-if(WIN32 AND MSVC)
-  # TODO: In windows iMSTK needs to build static libraries but still link to
-  # shared externals. Add logic to take this into consideration.
-  # set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries" FORCE)
+if(NOT DEFINED ${PROJECT_NAME}_BIN_DIR)
+  set(${PROJECT_NAME}_BIN_DIR "bin")
 endif()
-set(iMSTK_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-mark_as_advanced(BUILD_SHARED_LIBS)
-
-#-----------------------------------------------------------------------------
-# Superbuild Option - Enabled by default
-#
-option(iMSTK_SUPERBUILD
-    "Build iMSTK and the projects it depends on via SuperBuild.cmake." ON)
-mark_as_advanced(iMSTK_SUPERBUILD)
-
-#-----------------------------------------------------------------------------
-# Devices options
-#
-option(iMSTK_USE_PHANTOM_OMNI "Use the phantom omni device." OFF)
-option(iMSTK_USE_ADU "Use the adu device." OFF)
-option(iMSTK_USE_NIUSB6008 "Use the NIUSB6008 device." OFF)
-option(iMSTK_USE_FALCON "Use the Falcon device." OFF)
-
-#-----------------------------------------------------------------------------
-# VRPN options
-option(USE_VRPN_CLIENT "Use VRPN in client mode." ON)
-option(USE_VRPN_SERVER "Use VRPN in server mode." ON)
-
-if(iMSTK_USE_PHANTOM_OMNI)
-    set(USE_VRPN_SERVER ON CACHE BOOL "Force the use of VRPN servers." FORCE)
+if(NOT DEFINED ${PROJECT_NAME}_LIB_DIR)
+  set(${PROJECT_NAME}_LIB_DIR "lib")
 endif()
-
-
-#-----------------------------------------------------------------------------
-# Oculus Option - Disabled by default
-#
-option(iMSTK_USE_OCULUS "Build iMSTK with Oculus Support" OFF)
-
-#-----------------------------------------------------------------------------
-# Output directories - this is where built library and executable
-# files will be placed after building but prior to install.  The
-# necessary variables change between single and multi configuration
-# build systems, so it is necessary to handle both cases on a
-# conditional basis.
-#
-include(iMSTKOutputDirectories)
-
-#-----------------------------------------------------------------------------
-# Prerequisites
-#
-find_package(Git)
-if(NOT GIT_FOUND)
-  message(FATAL_ERROR "error: Install Git and try to re-configure")
+if(NOT DEFINED ${PROJECT_NAME}_INCLUDE_DIR)
+  set(${PROJECT_NAME}_INCLUDE_DIR "include")
+endif()
+if(NOT DEFINED ${PROJECT_NAME}_SHARE_DIR)
+  set(${PROJECT_NAME}_SHARE_DIR "share")
 endif()
 
 #-----------------------------------------------------------------------------
-# iMSTK version number.  An even minor number corresponds to releases.
-#
-set(iMSTK_VERSION_MAJOR 0)
-set(iMSTK_VERSION_MINOR 0)
-set(iMSTK_VERSION_PATCH 1)
-set(iMSTK_VERSION "${iMSTK_VERSION_MAJOR}.${iMSTK_VERSION_MINOR}.${iMSTK_VERSION_PATCH}")
+# Project install directories
+#-----------------------------------------------------------------------------
+if(APPLE)
+  set(${PROJECT_NAME}_INSTALL_ROOT "${${PROJECT_NAME}_MAIN_PROJECT_APPLICATION_NAME}.app/Contents") # Set to create Bundle
+else()
+  set(${PROJECT_NAME}_INSTALL_ROOT ".")
+endif()
+set(${PROJECT_NAME}_INSTALL_BIN_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_BIN_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_LIB_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_LIB_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_INCLUDE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_INCLUDE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
+set(${PROJECT_NAME}_INSTALL_SHARE_DIR "${${PROJECT_NAME}_INSTALL_ROOT}/${${PROJECT_NAME}_SHARE_DIR}/${PROJECT_NAME}-${${PROJECT_NAME}_VERSION}")
 
 #-----------------------------------------------------------------------------
-# Testing
-#
-option(BUILD_TESTING "Test the project" ON)
-
+# C++11 Support
 #-----------------------------------------------------------------------------
-# Documentation options
-#
-option(iMSTK_ENABLE_DOCUMENTATION
-  "Include targets for Doxygen- and Sphinx-generated documentation" OFF)
-if (iMSTK_ENABLE_DOCUMENTATION)
-  find_package(Doxygen)
-  find_package(Sphinx)
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++0x" COMPILER_SUPPORTS_CXX0X)
+if(COMPILER_SUPPORTS_CXX11)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread" CACHE STRING "compile flags" FORCE)
+elseif(COMPILER_SUPPORTS_CXX0X)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -pthread" CACHE STRING "compile flags" FORCE)
+else()
+  message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Please use a different C++ compiler.")
+endif()
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++" CACHE STRING "compile flags" FORCE)
 endif()
 
 #-----------------------------------------------------------------------------
-# Coverage
-#
-option(WITH_COVERAGE "Enable/Disable coverage" OFF)
-
+# Define External dependencies
 #-----------------------------------------------------------------------------
-# Set coverage Flags
-#
-if(WITH_COVERAGE)
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    set(coverage_flags "-g -fprofile-arcs -ftest-coverage -O0 -DNDEBUG")
-    set(COVERAGE_CXX_FLAGS ${coverage_flags})
-    set(COVERAGE_C_FLAGS ${coverage_flags})
-  endif()
+macro(imstk_define_dependency extProj)
+  list(APPEND ${PROJECT_NAME}_DEPENDENCIES ${extProj})
+  option(USE_SYSTEM_${extProj} "Exclude ${extProj} from superbuild and use an existing build." OFF)
+  mark_as_advanced(USE_SYSTEM_${extProj})
+endmacro()
+
+option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." OFF)
+if(${PROJECT_NAME}_USE_Uncrustify)
+  imstk_define_dependency(Uncrustify)
 endif()
 
-#-----------------------------------------------------------------------------
-# Additional CXX/C Flags
-#
-set(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
-mark_as_advanced(ADDITIONAL_C_FLAGS)
-set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
-mark_as_advanced(ADDITIONAL_CXX_FLAGS)
-
-#-----------------------------------------------------------------------------
-# iMSTK C/CXX Flags
-#
-set(iMSTK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(iMSTK_CXX_FLAGS "${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-  set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings")
-
-  if(NOT ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-    set(cflags "${cflags} -D_FORTIFY_SOURCE=2")
-  endif()
-
-  if(MINGW)
-    # suppress warnings about auto imported symbols
-    set(iMSTK_CXX_FLAGS "-Wl,--enable-auto-import ${iMSTK_CXX_FLAGS}")
-  endif()
-
-  set(iMSTK_C_FLAGS "${cflags} ${iMSTK_C_FLAGS}")
-  set(iMSTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${iMSTK_CXX_FLAGS}")
+if(WIN32)
+  imstk_define_dependency(PThreads)
+  imstk_define_dependency(Libusb)
 endif()
 
-if(MSVC)
-  set(msvc_suppressed_warnings
-  # C++ exception specification ignored except to indicate a function is not
-  # __declspec(nothrow)
-    "/wd4290 /wd4267"
-  )
-  set(msvc_other_flags
-  # Enable C++ Exceptions
-    "/EHsc"
-  )
-  set(iMSTK_CXX_FLAGS
-    "${iMSTK_CXX_FLAGS} ${msvc_suppressed_warnings} ${msvc_other_flags}")
-  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
-  add_definitions(-D_SCL_SECURE_NO_DEPRECATE)
-  add_definitions(-D_USE_MATH_DEFINES)
-  add_definitions(-DWIN32_LEAN_AND_MEAN)
-  add_definitions(-DWINDOWS_EXTRA_LEAN)
-  configure_msvc_runtime()
-endif()
+imstk_define_dependency(g3log)
+imstk_define_dependency(Eigen)
+imstk_define_dependency(SCCD)
+imstk_define_dependency(VegaFEM)
+imstk_define_dependency(VTK)
+imstk_define_dependency(VRPN)
+imstk_define_dependency(LibNiFalcon)
 
 #-----------------------------------------------------------------------------
-# Superbuild script
-#
-if(iMSTK_SUPERBUILD)
-  include(SuperBuild)
+# SUPERBUILD
+#-----------------------------------------------------------------------------
+option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
+
+if(${PROJECT_NAME}_SUPERBUILD)
+  # Call CMakeLists.txt in CMake/External which will solve the dependencies
+  # and add the External projects, including this one: this top-level
+  # CMakeLists.txt will be called back with SUPERBUILD=OFF, to execute
+  # the rest of the code below (INNERBUILD), which explains the `return`
+  add_subdirectory(CMake/External)
   return()
 endif()
 
-include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
-
 #-----------------------------------------------------------------------------
-# Find required packages
-#
-find_package(PThreads REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(SFML REQUIRED)
-find_package(Assimp REQUIRED)
-find_package(Eigen3 REQUIRED)
-find_package(VegaFEM REQUIRED CONFIG)
-find_package(ThreadPool REQUIRED)
-find_package(VTK REQUIRED)
-
-include(${VTK_USE_FILE})
-
-if(iMSTK_USE_OCULUS)
-  find_package(Oculus REQUIRED)
-  include_directories(SYSTEM "${Oculus_INCLUDE_DIRS}")
-  if(NOT WIN32)
-    find_package(X11 REQUIRED)
-  endif()
-endif()
-
+# INNERBUILD
 #-----------------------------------------------------------------------------
-# Testing framework
-#
-if(BUILD_TESTING)
-  include(iMSTKTesting)
-endif()
-
-if(iMSTK_USE_PHANTOM_OMNI)
-  find_package(OpenHaptics)
-endif()
-
-if(iMSTK_USE_PHANTOM_OMNI)
-  find_package(OpenHaptics REQUIRED)
-endif()
-
-if(USE_VRPN_CLIENT)
-  set(components quat)
-  if(USE_VRPN_SERVER)
-    list(APPEND components vrpnserver Libusb1)
-  endif()
-  if(iMSTK_USE_PHANTOM_OMNI)
-    list(APPEND components vrpn_phantom)
-  endif()
-  if(iMSTK_USE_FALCON)
-    list(APPEND components LibNifalcon)
-  endif()
-  find_package(VRPN REQUIRED COMPONENTS ${components})
-  include_directories(SYSTEM ${VRPN_INCLUDE_DIR})
-endif()
-
-if(iMSTK_USE_ADU)
-  find_package(ADU REQUIRED)
-  include_directories(SYSTEM "${ADU_INCLUDE_DIR}")
-endif()
-
-if(iMSTK_USE_NIUSB6008)
-  find_package(NIDAQ REQUIRED)
-  include_directories(SYSTEM "${NIDAQ_INCLUDE_DIR}")
-endif()
-
-include_directories(SYSTEM "${EIGEN3_INCLUDE_DIR}")
-include_directories(SYSTEM "${SFML_INCLUDE_DIRS}")
-include_directories(SYSTEM "${ThreadPool_INCLUDE_DIR}")
-
 #-----------------------------------------------------------------------------
-# iMSTK_SUPERBUILD_BINARY_DIR
-#
-# If iMSTK_SUPERBUILD_BINARY_DIR isn't defined, it means iMSTK is *NOT* build using
-# Superbuild.
-# In that case, iMSTK_SUPERBUILD_BINARY_DIR should default to iMSTK_BINARY_DIR
-#
-if(NOT DEFINED iMSTK_SUPERBUILD_BINARY_DIR)
-  set(iMSTK_SUPERBUILD_BINARY_DIR ${iMSTK_BINARY_DIR})
+# Find external dependencies
+#-----------------------------------------------------------------------------
+# Uncrustify
+find_program(Uncrustify_EXECUTABLE Uncrustify)
+include(SetupUncrustifyConfig)
+
+# g3log
+find_package( g3log REQUIRED )
+include_directories( ${g3log_INCLUDE_DIR} )
+
+# Eigen
+find_package( Eigen 3.1.2 REQUIRED )
+include_directories( ${Eigen_INCLUDE_DIR} )
+
+# SCCD
+find_package( SCCD REQUIRED )
+include_directories( ${SCCD_INCLUDE_DIR} )
+
+# VegaFEM
+find_package( VegaFEM REQUIRED CONFIG )
+
+# VTK
+find_package( VTK REQUIRED CONFIG )
+include( ${VTK_USE_FILE} )
+
+# VRPN
+find_package( VRPN REQUIRED )
+include_directories( ${VRPN_INCLUDE_DIRS} )
+add_definitions( -DVRPN_USE_LIBNIFALCON )
+if(${PROJECT_NAME}_USE_OMNI)
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
+else()
+  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
 endif()
 
-#-----------------------------------------------------------------------------
-# Set C/CXX Flags
-#
-set(CMAKE_CXX_FLAGS ${iMSTK_CXX_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
-set(CMAKE_C_FLAGS ${iMSTK_C_FLAGS} CACHE STRING "CMake C Flags" FORCE)
+#--------------------------------------------------------------------------
+# Add Source code subdirectories
+#--------------------------------------------------------------------------
+add_subdirectory(Base/Core)
+add_subdirectory(Base/Geometry)
+add_subdirectory(Base/Devices)
+add_subdirectory(Base/Rendering)
+add_subdirectory(Base/Solvers)
+add_subdirectory(Base/TimeIntegrators)
+add_subdirectory(Base/ForceModel)
+add_subdirectory(Base/SceneElements)
+add_subdirectory(Base/Collision)
+add_subdirectory(Base/Scene)
+add_subdirectory(Base/SimulationManager)
+add_subdirectory(Base/Constraint)
+#--------------------------------------------------------------------------
+# Export Targets
+#--------------------------------------------------------------------------
+string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
+set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
 
-set(iMSTK_exports
-  Collision
-  ContactHandling
-  Core
-  Devices
-  Event
-  Geometry
-  IO
-  Mesh
-  Rendering
-  Simulators
-  Solvers
-  TimeIntegrators
-  VirtualTools
-  SceneModels
-  SimulationManager
+export(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
   )
 
-if(iMSTK_USE_OCULUS)
-  list(APPEND iMSTK_exports RenderingOculus)
-endif()
-
-add_subdirectory(Assembler)
-add_subdirectory(Collision)
-add_subdirectory(CollisionContext)
-add_subdirectory(ContactHandling)
-add_subdirectory(Core)
-add_subdirectory(Devices)
-add_subdirectory(Event)
-add_subdirectory(Geometry)
-add_subdirectory(IO)
-add_subdirectory(Mesh)
-add_subdirectory(Rendering)
-add_subdirectory(Simulators)
-add_subdirectory(SimulationManager)
-add_subdirectory(Solvers)
-add_subdirectory(SceneModels)
-add_subdirectory(TimeIntegrators)
-add_subdirectory(VirtualTools)
-
-################################################################################
-# Build documentation
-# This also includes tutorials and other documentation that runs
-# examples and/or has its source linked to libraries, so it must
-# come after those targets have been declared.
-#
-
-if (iMSTK_ENABLE_DOCUMENTATION)
-  add_subdirectory(Documentation)
-endif()
-
-################################################################################
-# Create and install package configuration files.
-#
-
-export(PACKAGE iMSTK)
-export(TARGETS
-  ${iMSTK_exports}
-  FILE "${CMAKE_CURRENT_BINARY_DIR}/iMSTKTargets.cmake"
-  NAMESPACE imstk::
-  EXPORT_LINK_INTERFACE_LIBRARIES
-)
-
-configure_file(
-  CMake/iMSTKConfig.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/iMSTKConfig.cmake"
-  @ONLY
-)
-
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/iMSTKConfig.cmake"
-  DESTINATION "CMake"
+install(EXPORT ${PROJECT_NAME}_TARGETS
+  FILE ${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAMESPACE}
   COMPONENT Development
-)
+  DESTINATION ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
+  )
 
-if(BUILD_TESTING)
-  add_subdirectory(Testing)
-  add_subdirectory(Examples)
-endif()
-
-set(CPACK_COMPONENTS_ALL Development)
-include(CPack)
+#--------------------------------------------------------------------------
+# Add Examples subdirectories
+#--------------------------------------------------------------------------
+add_subdirectory(Examples)
