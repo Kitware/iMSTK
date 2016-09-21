@@ -23,11 +23,14 @@ set(copy_ftd2xx_shared_command
   ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
   )
-  
 set(copy_ftd2xx_static_command
-  ${CMAKE_COMMAND} -E rename
+  ${CMAKE_COMMAND} -E copy
+  ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx.lib
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+  )
+set(remove_ftd2xx_static_command
+  ${CMAKE_COMMAND} -E remove
   ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/ftd2xx.lib
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/ftd2xx.lib
   )
 
 #-----------------------------------------------------------------------------
@@ -46,6 +49,7 @@ imstk_add_external_project( FTD2XX
   INSTALL_COMMAND
     ${copy_ftd2xx_shared_command}
     COMMAND ${copy_ftd2xx_static_command}
+    COMMAND ${remove_ftd2xx_static_command}
   RELATIVE_INCLUDE_PATH "/"
   #VERBOSE
   )
