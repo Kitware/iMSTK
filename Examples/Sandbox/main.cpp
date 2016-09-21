@@ -448,6 +448,7 @@ void testTwoFalcons()
 }
 
 void testTwoOmnis(){
+#ifdef iMSTK_USE_OPENHAPTICS
 	// SDK and Scene
 	auto sdk = std::make_shared<imstk::SimulationManager>();
 	auto scene = sdk->createNewScene("OmnisTestScene");
@@ -493,6 +494,7 @@ void testTwoOmnis(){
 	// Run
 	sdk->setCurrentScene("OmnisTestScene");
 	sdk->startSimulation(false);
+#endif
 }
 
 void testObjectController()
@@ -1545,7 +1547,9 @@ void testPbdCollision()
 	sdk->startSimulation(true);
 }
 
-void testLineMesh(){
+void testLineMesh()
+{
+#ifdef iMSTK_USE_OPENHAPTICS
 	// SDK and Scene
 	auto sdk = std::make_shared<imstk::SimulationManager>();
 	auto scene = sdk->createNewScene("SceneTestMesh");
@@ -1870,4 +1874,5 @@ void testLineMesh(){
 	// Run
 	sdk->setCurrentScene("SceneTestMesh");
 	sdk->startSimulation(true);
+#endif
 }
