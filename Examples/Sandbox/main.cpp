@@ -1323,8 +1323,9 @@ void testPbdCollision()
 		int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
 		char intStr[33];
 		std::string fixed_corner;
-		for (unsigned int i = 0; i < 4; i++){
-			itoa(corner[i], intStr, 10);
+        for (unsigned int i = 0; i < 4; i++)
+        {
+            std::sprintf(intStr, "%d", corner[i]);
 			fixed_corner += std::string(intStr) + ' ';
 		}
 		vertList.resize(nRows*nCols);
@@ -1700,8 +1701,9 @@ void testLineMesh()
 		int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
 		char intStr[33];
 		std::string fixed_corner;
-		for (unsigned int i = 0; i < 4; i++){
-			itoa(corner[i], intStr, 10);
+        for (unsigned int i = 0; i < 4; i++)
+        {
+            std::sprintf(intStr, "%d", corner[i]);
 			fixed_corner += std::string(intStr) + ' ';
 		}
 		vertList.resize(nRows*nCols);
