@@ -39,7 +39,7 @@ set(remove_ftd2xx_static_command
 include(imstkAddExternalProject)
 imstk_add_external_project( FTD2XX
   URL http://www.ftdichip.com/Drivers/CDM/CDM%20v2.12.18%20WHQL%20Certified.zip
-  URL_MD5 E1A194765D7BCC58968D523484B74140
+  URL_MD5 e1a194765d7bcc58968d523484b74140
   DOWNLOAD_DIR ${FTD2XX_PREFIX}
   SOURCE_DIR ${FTD2XX_EXTRACT_DIR}
   BINARY_DIR ${FTD2XX_EXTRACT_DIR}
