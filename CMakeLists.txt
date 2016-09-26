@@ -78,7 +78,8 @@ endif()
 
 if(WIN32)
   imstk_define_dependency(PThreads)
-  imstk_define_dependency(Libusb)
+  imstk_define_dependency(Libusb) #for VRPN
+  imstk_define_dependency(FTD2XX) #for LibNiFalcon
 endif()
 
 imstk_define_dependency(g3log)

@@ -19,12 +19,18 @@ find_path(VRPN_INCLUDE_DIR
     vrpn_Configure.h
     )
 mark_as_advanced(VRPN_INCLUDE_DIR)
+list(APPEND VRPN_INCLUDE_DIRS
+  ${VRPN_INCLUDE_DIR}
+  ${VRPN_INCLUDE_DIR}/quat
+  ${VRPN_INCLUDE_DIR}/atmellib
+  )
 
 find_path(LIBNIFALCON_INCLUDE_DIR
   NAMES
     falcon/core/FalconDevice.h
   )
 mark_as_advanced(LIBNIFALCON_INCLUDE_DIR)
+list(APPEND VRPN_INCLUDE_DIRS ${LIBNIFALCON_INCLUDE_DIR})
 
 find_path(LIBUSB1_INCLUDE_DIR
   NAMES
@@ -32,17 +38,16 @@ find_path(LIBUSB1_INCLUDE_DIR
     libusb-1.0/libusb.h
   )
 mark_as_advanced(LIBUSB1_INCLUDE_DIR)
+list(APPEND VRPN_INCLUDE_DIRS ${LIBUSB1_INCLUDE_DIR})
 
-#-----------------------------------------------------------------------------
-# Set up include dirs
-#-----------------------------------------------------------------------------
-list(APPEND VRPN_INCLUDE_DIRS
-  ${VRPN_INCLUDE_DIR}
-  ${VRPN_INCLUDE_DIR}/quat
-  ${VRPN_INCLUDE_DIR}/atmellib
-  ${LIBNIFALCON_INCLUDE_DIR}
-  ${LIBUSB1_INCLUDE_DIR}
-  )
+if(WIN32)
+  find_path(LIBFTD2XX_INCLUDE_DIR
+    NAMES
+      ftd2xx.h
+    )
+  mark_as_advanced(LIBFTD2XX_INCLUDE_DIR)
+  list(APPEND VRPN_INCLUDE_DIRS ${LIBFTD2XX_INCLUDE_DIR})
+endif()
 
 #-----------------------------------------------------------------------------
 # Find library
@@ -53,6 +58,7 @@ find_library(VRPN_LIBRARY
     vrpnserverd
   )
 mark_as_advanced(VRPN_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${VRPN_LIBRARY})
 
 find_library(QUAT_LIBRARY
   NAMES
@@ -60,6 +66,7 @@ find_library(QUAT_LIBRARY
     quatd
   )
 mark_as_advanced(QUAT_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${QUAT_LIBRARY})
 
 find_library(LIBNIFALCON_LIBRARY
   NAMES
@@ -67,6 +74,7 @@ find_library(LIBNIFALCON_LIBRARY
     nifalcon
   )
 mark_as_advanced(LIBNIFALCON_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${LIBNIFALCON_LIBRARY})
 
 #works on windows, but sounds like it is needed only on linux, check vrpn/submodules/hidapi.cmake
 find_library(LIBUSB1_LIBRARY
@@ -75,6 +83,17 @@ find_library(LIBUSB1_LIBRARY
     usb-1.0
   )
 mark_as_advanced(LIBUSB1_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${LIBUSB1_LIBRARY})
+
+if(WIN32)
+  find_library(LIBFTD2XX_LIBRARY
+    NAMES
+      ftd2xx
+      libftd2xx
+    )
+  mark_as_advanced(LIBFTD2XX_LIBRARY)
+  list(APPEND VRPN_LIBRARIES ${LIBFTD2XX_LIBRARY})
+endif()
 
 #check vrpn/submodules/hidapi.cmake
 if(WIN32)
@@ -87,18 +106,8 @@ elseif(APPLE)
   find_library(MACHID_IOKit_LIBRARY IOKit)
   set(HIDAPI_LIBRARY ${MACHID_CoreFoundation_LIBRARY} ${MACHID_IOKit_LIBRARY})
 endif()
+list(APPEND VRPN_LIBRARIES ${HIDAPI_LIBRARY})
 mark_as_advanced(HIDAPI_LIBRARY)
-
-#-----------------------------------------------------------------------------
-# Set up libraries
-#-----------------------------------------------------------------------------
-list(APPEND VRPN_LIBRARIES
-  ${VRPN_LIBRARY}
-  ${QUAT_LIBRARY}
-  ${LIBNIFALCON_LIBRARY}
-  ${LIBUSB1_LIBRARY}
-  ${HIDAPI_LIBRARY}
-  )
 
 #-----------------------------------------------------------------------------
 # Phantom Omni support

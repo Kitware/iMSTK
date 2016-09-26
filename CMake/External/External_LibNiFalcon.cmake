@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 set(LIBNIFALCON_DEPENDENCIES "")
 if(WIN32)
-  list(APPEND LIBNIFALCON_DEPENDENCIES "Libusb")
+  list(APPEND LIBNIFALCON_DEPENDENCIES "FTD2XX")
 endif(WIN32)
 
 include(imstkAddExternalProject)
