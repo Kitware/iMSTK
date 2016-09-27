@@ -26,7 +26,7 @@ set(copy_ftd2xx_shared_command
 set(copy_ftd2xx_static_command
   ${CMAKE_COMMAND} -E copy
   ${FTD2XX_EXTRACT_DIR}/${ftd2xx_libdir}/ftd2xx.lib
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/ftd2xx.lib
   )
 set(remove_ftd2xx_static_command
   ${CMAKE_COMMAND} -E remove
