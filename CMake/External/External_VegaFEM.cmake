@@ -9,7 +9,7 @@ endif(WIN32)
 include(imstkAddExternalProject)
 imstk_add_external_project( VegaFEM
   GIT_REPOSITORY git@gitlab.kitware.com:iMSTK/VegaFEM-CMake.git
-  GIT_TAG iMSTK
+  GIT_TAG d1ab0858675d9dbc64345038b3e25cac19b99bbe
   INSTALL_COMMAND ${SKIP_STEP_COMMAND}
   CMAKE_ARGS
     -DVegaFEM_ENABLE_PTHREADS_SUPPORT:BOOL=ON
