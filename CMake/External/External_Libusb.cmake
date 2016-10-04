@@ -20,22 +20,22 @@ if(${CMAKE_GENERATOR} MATCHES "Win64")
   set(libusb_exedir "bin64")
 endif()
 
-set(copy_libusb_static_command
-  ${CMAKE_COMMAND} -E copy_directory
-  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/static
-  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+set(copy_libusb_lib_command
+  ${CMAKE_COMMAND} -E copy
+  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
+  ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/libusb-1.0.lib
   )
   
-set(copy_libusb_shared_command
-  ${CMAKE_COMMAND} -E copy_directory
-  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+set(copy_libusb_dll_command
+  ${CMAKE_COMMAND} -E copy
+  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/libusb-1.0.dll
   )
 
-set(copy_libusb_exe_command
-  ${CMAKE_COMMAND} -E copy_directory
-  ${Libusb_EXTRACT_DIR}/examples/${libusb_exedir}
-  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}
+set(copy_libusb_pdb_command
+  ${CMAKE_COMMAND} -E copy
+  ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.pdb
+  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/libusb-1.0.pdb
   )
 
 #-----------------------------------------------------------------------------
@@ -52,9 +52,9 @@ imstk_add_external_project( Libusb
   CONFIGURE_COMMAND ${SKIP_STEP_COMMAND}
   BUILD_COMMAND ${SKIP_STEP_COMMAND}
   INSTALL_COMMAND
-    ${copy_libusb_static_command}
-    COMMAND ${copy_libusb_shared_command}
-    COMMAND ${copy_libusb_exe_command}
+    ${copy_libusb_lib_command}
+    COMMAND ${copy_libusb_dll_command}
+    COMMAND ${copy_libusb_pdb_command}
   RELATIVE_INCLUDE_PATH "include/libusb-1.0"
   #VERBOSE
   )
