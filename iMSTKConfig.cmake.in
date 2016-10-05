@@ -1,0 +1,49 @@
+# Include and library paths
+set(CMAKE_INCLUDE_PATH "@CMAKE_INCLUDE_PATH@")
+set(CMAKE_LIBRARY_PATH "@CMAKE_LIBRARY_PATH@")
+
+# Path to iMSTK source directory
+set(iMSTK_SOURCE_DIR "@CMAKE_CURRENT_SOURCE_DIR@")
+
+# Update CMake module path
+list(INSERT CMAKE_MODULE_PATH 0 "${iMSTK_SOURCE_DIR}/CMake")
+
+# iMSTK settings
+set(iMSTK_USE_OMNI @iMSTK_USE_OMNI@)
+set(VegaFEM_DIR @VegaFEM_DIR@)
+set(VTK_DIR @VTK_DIR@)
+
+# g3log
+find_package( g3log REQUIRED )
+include_directories( ${g3log_INCLUDE_DIR} )
+
+# Eigen
+find_package( Eigen 3.1.2 REQUIRED )
+include_directories( ${Eigen_INCLUDE_DIR} )
+
+# SCCD
+find_package( SCCD REQUIRED )
+include_directories( ${SCCD_INCLUDE_DIR} )
+
+# VegaFEM
+find_package( VegaFEM REQUIRED CONFIG )
+
+# VTK
+find_package( VTK REQUIRED CONFIG )
+include( ${VTK_USE_FILE} )
+
+# VRPN
+find_package( VRPN REQUIRED )
+include_directories( ${VRPN_INCLUDE_DIRS} )
+add_definitions( -DVRPN_USE_LIBNIFALCON )
+if(${PROJECT_NAME}_USE_OMNI)
+  add_definitions( -DiMSTK_USE_OPENHAPTICS )
+  add_definitions( -DVRPN_USE_PHANTOM_SERVER )
+else()
+  remove_definitions( -DiMSTK_USE_OPENHAPTICS )
+  remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
+endif()
+
+# iMSTK
+#link_directories(@CMAKE_LIBRARY_PATH@)
+include("@CMAKE_CURRENT_BINARY_DIR@/iMSTKTargets.cmake")

@@ -166,16 +166,37 @@ add_subdirectory(Base/Constraint)
 string(TOLOWER "${PROJECT_NAME}" PROJECT_NAMESPACE)
 set(PROJECT_NAMESPACE "${PROJECT_NAMESPACE}::")
 
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+  VERSION ${Upstream_VERSION}
+  COMPATIBILITY AnyNewerVersion
+  )
 export(EXPORT ${PROJECT_NAME}_TARGETS
   FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake
   NAMESPACE ${PROJECT_NAMESPACE}
   )
+configure_file(${PROJECT_NAME}Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  @ONLY
+  )
 
 install(EXPORT ${PROJECT_NAME}_TARGETS
-  FILE ${PROJECT_NAME}Targets.cmake
-  NAMESPACE ${PROJECT_NAMESPACE}
-  COMPONENT Development
-  DESTINATION ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
+  FILE
+    ${PROJECT_NAME}Targets.cmake
+  NAMESPACE
+    ${PROJECT_NAMESPACE}
+  DESTINATION
+    ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
+  )
+install(
+  FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+  DESTINATION
+    ${${PROJECT_NAME}_INSTALL_SHARE_DIR}
+  COMPONENT
+    Devel
   )
 
 #--------------------------------------------------------------------------
