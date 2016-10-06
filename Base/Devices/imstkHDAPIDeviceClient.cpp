@@ -32,46 +32,37 @@ namespace imstk
 {
 
 void
-HDAPIDeviceClient::initModule()
+HDAPIDeviceClient::init()
 {
 	// Open Device
-    m_handle = hdInitDevice(this->getName().c_str());
+    m_handle = hdInitDevice(this->getDeviceName().c_str());
 
 	// If failed
 	HDErrorInfo error;
 	if (HD_DEVICE_ERROR(error = hdGetError()))
 	{
-		LOG(FATAL) << "Failed to initialize Phantom Omni " << this->getName();
+        LOG(FATAL) << "Failed to initialize Phantom Omni " << this->getDeviceName();
 		m_handle = -1;
         return;
-	}
-
-    // Calibration
-    if (hdCheckCalibration() != HD_CALIBRATION_OK)
-    {
-        LOG(INFO) << "Move " << this->getName() << " in its dock to calibrate it.";
-        while (hdCheckCalibration() != HD_CALIBRATION_OK)
-        {
-        }
     }
 
-    // Success
-	LOG(INFO) << this->getName() << " successfully initialized.";
+    // Enable forces
     hdEnable(HD_FORCE_OUTPUT);
     hdEnable(HD_FORCE_RAMPING);
-    hdStartScheduler();
+
+    // Success
+    LOG(INFO) << this->getDeviceName() << " successfully initialized.";
 }
 
 void
-HDAPIDeviceClient::runModule()
+HDAPIDeviceClient::run()
 {
     hdScheduleSynchronous(hapticCallback, this, HD_MAX_SCHEDULER_PRIORITY);
 }
 
 void
-HDAPIDeviceClient::cleanUpModule()
+HDAPIDeviceClient::cleanUp()
 {
-    hdStopScheduler();
     hdDisableDevice(m_handle);
 }
 
@@ -83,13 +74,12 @@ HDAPIDeviceClient::hapticCallback(void* pData)
     auto state = client->m_state;
 
 	hdBeginFrame(handle);
-
+    hdMakeCurrentDevice(handle);
     hdSetDoublev(HD_CURRENT_FORCE, client->m_force.data());
     hdGetDoublev(HD_CURRENT_POSITION, state.pos);
     hdGetDoublev(HD_CURRENT_VELOCITY, state.vel);
     hdGetDoublev(HD_CURRENT_TRANSFORM, state.trans);
     hdGetIntegerv(HD_CURRENT_BUTTONS, &state.buttons);
-
     hdEndFrame(handle);
 
     client->m_position << state.pos[0], state.pos[1], state.pos[2];
@@ -100,7 +90,7 @@ HDAPIDeviceClient::hapticCallback(void* pData)
     client->m_buttons[2] = state.buttons & HD_DEVICE_BUTTON_3;
     client->m_buttons[3] = state.buttons & HD_DEVICE_BUTTON_4;
 
-    return HD_CALLBACK_CONTINUE;
+    return HD_CALLBACK_DONE;
 }
 
 } // imstk

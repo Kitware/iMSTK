@@ -25,6 +25,7 @@
 #include <map>
 
 #include "imstkDeviceClient.h"
+#include "imstkModule.h"
 
 #include <memory>
 
@@ -41,14 +42,16 @@ namespace imstk
 /// \class VRPNDeviceClient
 /// \brief Subclass of DeviceClient using VRPN
 ///
-class VRPNDeviceClient : public DeviceClient
+class VRPNDeviceClient : public DeviceClient, public Module
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    VRPNDeviceClient(std::string name, std::string ip):DeviceClient(name, ip)
+    VRPNDeviceClient(std::string deviceName, std::string ip):
+        DeviceClient(deviceName, ip),
+        Module(deviceName+"@"+ip)
     {}
 
     ///
