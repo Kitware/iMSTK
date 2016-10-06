@@ -32,7 +32,6 @@
 
 // imstk
 #include "imstkModule.h"
-#include "imstkVRPNDeviceClient.h"
 
 namespace imstk
 {
