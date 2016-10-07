@@ -29,14 +29,14 @@ namespace imstk
 void
 VRPNDeviceClient::initModule()
 {
-    std::string fullDeviceIp = this->getName() + "@" + this->getIp();
+    auto fullDeviceIp = this->getName().c_str();
 
     m_offsetSet = false;
 
-    m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp.c_str());
-    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp.c_str());
-    m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceIp.c_str());
-    m_vrpnForceDevice = std::make_shared<vrpn_ForceDevice_Remote>(fullDeviceIp.c_str());
+    m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp);
+    m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
+    m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceIp);
+    m_vrpnForceDevice = std::make_shared<vrpn_ForceDevice_Remote>(fullDeviceIp);
 
     m_vrpnTracker->register_change_handler(this, trackerChangeHandler);
     m_vrpnTracker->register_change_handler(this, velocityChangeHandler);
@@ -154,7 +154,7 @@ VRPNDeviceClient::forceChangeHandler(void *userData, const _vrpn_FORCECB f)
 {
     auto deviceClient = reinterpret_cast<VRPNDeviceClient*>(userData);
     deviceClient->m_force << f.force[0], f.force[1], f.force[2];
-    //LOG(DEBUG) << "forceDevice: force = " << deviceClient->m_force;
+    LOG(DEBUG) << "forceDevice: force = " << deviceClient->m_force;
 }
 
 } // imstk

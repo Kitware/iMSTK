@@ -21,57 +21,50 @@
 
 #ifdef iMSTK_USE_OPENHAPTICS
 
-#ifndef imstkHDAPIDeviceClient_h
-#define imstkHDAPIDeviceClient_h
-
-#include <map>
-
-#include "imstkDeviceClient.h"
+#include "imstkHDAPIDeviceServer.h"
 
 #include <HD/hd.h>
 
-#include <memory>
+#include "g3log/g3log.hpp"
 
-namespace imstk {
-
-struct HD_state
+namespace imstk
 {
-    HDdouble pos[3];
-    HDdouble vel[3];
-    HDdouble trans[16];
-    HDint buttons;
-};
 
-///
-/// \class HDAPIDeviceClient
-/// \brief Subclass of DeviceClient for phantom omni
-///
-class HDAPIDeviceClient : public DeviceClient
+void
+HDAPIDeviceServer::addDeviceClient(std::shared_ptr<HDAPIDeviceClient> client)
 {
-public:
-
-    HDAPIDeviceClient(std::string name):
-        DeviceClient(name, "localhost")
-    {}
-
-    virtual ~HDAPIDeviceClient() {}
-
-protected:
-
-    friend class HDAPIDeviceServer;
-    void init();
-    void run();
-    void cleanUp();
-
-private:
-
-    static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
-	
-    HHD m_handle; //!< device handle
-    HD_state m_state; //!< device reading state
-
-};
+    m_deviceClients.push_back(client);
 }
 
-#endif // ifndef imstkHDAPIDeviceClient_h
+void
+HDAPIDeviceServer::initModule()
+{
+    for(const auto& client : m_deviceClients)
+    {
+        client->init();
+    }
+    hdStartScheduler();
+}
+
+void
+HDAPIDeviceServer::runModule()
+{
+    for(const auto& client : m_deviceClients)
+    {
+        client->run();
+    }
+}
+
+void
+HDAPIDeviceServer::cleanUpModule()
+{
+    hdStopScheduler();
+    for(const auto& client : m_deviceClients)
+    {
+        client->cleanUp();
+    }
+}
+
+} // imstk
+
 #endif // ifdef iMSTK_USE_OMNI

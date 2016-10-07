@@ -117,102 +117,51 @@ SimulationManager::removeScene(std::string sceneName)
 }
 
 bool
-SimulationManager::isDeviceServerRegistered(std::string serverName) const
+SimulationManager::isModuleRegistered(std::string moduleName) const
 {
-    return m_deviceServerMap.find(serverName) != m_deviceServerMap.end();
+    return m_modulesMap.find(moduleName) != m_modulesMap.end();
 }
 
-std::shared_ptr<VRPNDeviceServer>
-SimulationManager::getDeviceServer(std::string serverName) const
+std::shared_ptr<Module>
+SimulationManager::getModule(std::string moduleName) const
 {
-    if (!this->isDeviceServerRegistered(serverName))
+    if (!this->isModuleRegistered(moduleName))
     {
-        LOG(WARNING) << "No device server at '" << serverName
+        LOG(WARNING) << "No module named '" << moduleName
                      << "' was registered in this simulation";
         return nullptr;
     }
 
-    return m_deviceServerMap.at(serverName);
+    return m_modulesMap.at(moduleName);
 }
 void
-SimulationManager::addDeviceServer(std::shared_ptr<VRPNDeviceServer> newServer)
+SimulationManager::addModule(std::shared_ptr<Module> newModule)
 {
-    std::string newServerName = newServer->getName();
+    std::string newModuleName = newModule->getName();
 
-    if (this->isDeviceServerRegistered(newServerName))
+    if (this->isModuleRegistered(newModuleName))
     {
-        LOG(WARNING) << "Can not add device server: '" << newServerName
-                     << "' is already registered in this simulation\n"
-                     << "Set this server address to a unique ip:port first";
+        LOG(WARNING) << "Can not addmodule: '" << newModuleName
+                     << "' is already registered in this simulation\n";
         return;
     }
 
-    m_deviceServerMap[newServerName] = newServer;
-    LOG(INFO) << "Device server added: " << newServerName;
+    m_modulesMap[newModuleName] = newModule;
+    LOG(INFO) << "Module added: " << newModuleName;
 }
 
 void
-SimulationManager::removeDeviceServer(std::string serverName)
+SimulationManager::removeModule(std::string moduleName)
 {
-    if (!this->isDeviceServerRegistered(serverName))
+    if (!this->isModuleRegistered(moduleName))
     {
-        LOG(WARNING) << "No device server at '" << serverName
+        LOG(WARNING) << "No module named '" << moduleName
                      << "' was registered in this simulation";
         return;
     }
 
-    m_deviceServerMap.erase(serverName);
-    LOG(INFO) << "Device server removed: " << serverName;
-}
-
-bool
-SimulationManager::isDeviceClientRegistered(std::string deviceClientName) const
-{
-    return m_deviceClientMap.find(deviceClientName) != m_deviceClientMap.end();
-}
-
-std::shared_ptr<DeviceClient>
-SimulationManager::getDeviceClient(std::string deviceClientName) const
-{
-    if (!this->isDeviceClientRegistered(deviceClientName))
-    {
-        LOG(WARNING) << "No device client named '" << deviceClientName
-                     << "' was registered in this simulation";
-        return nullptr;
-    }
-
-    return m_deviceClientMap.at(deviceClientName);
-}
-
-void
-SimulationManager::addDeviceClient(std::shared_ptr<DeviceClient> newDeviceClient)
-{
-    std::string newDeviceClientName = newDeviceClient->getName();
-
-    if (this->isDeviceClientRegistered(newDeviceClientName))
-    {
-        LOG(WARNING) << "Can not add device client: '" << newDeviceClientName
-                     << "' is already registered in this simulation\n"
-                     << "Set this device name to a unique name first";
-        return;
-    }
-
-    m_deviceClientMap[newDeviceClientName] = newDeviceClient;
-    LOG(INFO) << "Device client added: " << newDeviceClientName;
-}
-
-void
-SimulationManager::removeDeviceClient(std::string deviceClientName)
-{
-    if (!this->isDeviceClientRegistered(deviceClientName))
-    {
-        LOG(WARNING) << "No device client named '" << deviceClientName
-                     << "' was registered in this simulation";
-        return;
-    }
-
-    m_deviceClientMap.erase(deviceClientName);
-    LOG(INFO) << "Device client removed: " << deviceClientName;
+    m_modulesMap.erase(moduleName);
+    LOG(INFO) << "Module removed: " << moduleName;
 }
 
 std::shared_ptr<Viewer>
@@ -317,14 +266,8 @@ SimulationManager::startSimulation(bool debug)
         LOG(INFO) << "Starting simulation";
         m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
 
-        // Start device servers
-        for(const auto& pair : m_deviceServerMap)
-        {
-            this->startModuleInNewThread(pair.second);
-        }
-
-        // Start device clients
-        for(const auto& pair : m_deviceClientMap)
+        // Start modules
+        for(const auto& pair : m_modulesMap)
         {
             this->startModuleInNewThread(pair.second);
         }
@@ -369,14 +312,8 @@ SimulationManager::runSimulation()
     // Run scene
     m_sceneManagerMap.at(m_currentSceneName)->run();
 
-    // Run device servers
-    for(const auto& pair : m_deviceServerMap)
-    {
-        (pair.second)->run();
-    }
-
-    // Run device clients
-    for(const auto& pair : m_deviceClientMap)
+    // Run modules
+    for(const auto& pair : m_modulesMap)
     {
         (pair.second)->run();
     }
@@ -399,14 +336,8 @@ SimulationManager::pauseSimulation()
     // Pause scene
     m_sceneManagerMap.at(m_currentSceneName)->pause();
 
-    // Pause device clients
-    for(const auto& pair : m_deviceClientMap)
-    {
-        (pair.second)->pause();
-    }
-
-    // Pause device servers
-    for(const auto& pair : m_deviceServerMap)
+    // Pause modules
+    for(const auto& pair : m_modulesMap)
     {
         (pair.second)->pause();
     }
@@ -430,15 +361,8 @@ SimulationManager::endSimulation()
     // Update Renderer
     m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
 
-    // End device clients
-    for(const auto& pair : m_deviceClientMap)
-    {
-        (pair.second)->end();
-        m_threadMap.at(pair.first).join();
-    }
-
-    // Pause device servers
-    for(const auto& pair : m_deviceServerMap)
+    // End modules
+    for(const auto& pair : m_modulesMap)
     {
         (pair.second)->end();
         m_threadMap.at(pair.first).join();

@@ -24,7 +24,6 @@
 
 #include <map>
 
-#include "imstkModule.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -34,7 +33,7 @@ namespace imstk
 /// \class DeviceClient
 /// \brief Base class for any device client
 ///
-class DeviceClient : public Module
+class DeviceClient
 {
 public:
 
@@ -48,6 +47,12 @@ public:
     ///
     const std::string& getIp();
     void setIp(const std::string& ip);
+
+    ///
+    /// \brief Get/Set the device name
+    ///
+    const std::string& getDeviceName();
+    void setDeviceName(const std::string& deviceName);
 
     ///
     /// \brief Get/Set what listeners to enable on the device: tracking, analogic, force, buttons.
@@ -98,11 +103,12 @@ protected:
     /// \brief Constructor
     ///
     DeviceClient(std::string name, std::string ip):
-        Module(name),
+        m_deviceName(name),
         m_ip(ip)
     {}
 
-    std::string m_ip; ///< Connection device IP
+    std::string m_deviceName; ///< Device Name
+    std::string m_ip;         ///< Connection device IP
 
     bool m_trackingEnabled = true; ///< Tracking enabled if true
     bool m_analogicEnabled = true; ///< Analogic enabled if true

@@ -38,6 +38,18 @@ DeviceClient::setIp(const std::string& ip)
     m_ip = ip;
 }
 
+const std::string&
+DeviceClient::getDeviceName()
+{
+    return m_deviceName;
+}
+
+void
+DeviceClient::setDeviceName(const std::string& deviceName)
+{
+    m_deviceName = deviceName;
+}
+
 const bool&
 DeviceClient::getTrackingEnabled() const
 {
@@ -47,12 +59,6 @@ DeviceClient::getTrackingEnabled() const
 void
 DeviceClient::setTrackingEnabled(const bool& status)
 {
-    if (this->getStatus() != ModuleStatus::INACTIVE)
-    {
-        LOG(WARNING) << "DeviceClient::setTrackingEnabled error: can not change listeners for"
-                     << this->getName() << " while the device is active.";
-        return;
-    }
     m_trackingEnabled = status;
 }
 
@@ -65,12 +71,6 @@ DeviceClient::getAnalogicEnabled() const
 void
 DeviceClient::setAnalogicEnabled(const bool& status)
 {
-    if (this->getStatus() != ModuleStatus::INACTIVE)
-    {
-        LOG(WARNING) << "DeviceClient::setAnalogicEnabled error: can not change listeners for"
-                     << this->getName() << " while the device is active.";
-        return;
-    }
     m_analogicEnabled = status;
 }
 
@@ -83,12 +83,6 @@ DeviceClient::getButtonsEnabled() const
 void
 DeviceClient::setButtonsEnabled(const bool& status)
 {
-    if (this->getStatus() != ModuleStatus::INACTIVE)
-    {
-        LOG(WARNING) << "DeviceClient::setButtonsEnabled error: can not change listeners for"
-                     << this->getName() << " while the device is active.";
-        return;
-    }
     m_buttonsEnabled = status;
 }
 
@@ -101,12 +95,6 @@ DeviceClient::getForceEnabled() const
 void
 DeviceClient::setForceEnabled(const bool& status)
 {
-    if (this->getStatus() != ModuleStatus::INACTIVE)
-    {
-        LOG(WARNING) << "DeviceClient::setForceEnabled error: can not change listeners for"
-                     << this->getName() << " while the device is active.";
-        return;
-    }
     m_forceEnabled = status;
 }
 

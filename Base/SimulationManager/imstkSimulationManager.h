@@ -28,8 +28,7 @@
 #include <memory>
 
 #include "imstkScene.h"
-#include "imstkVRPNDeviceServer.h"
-#include "imstkDeviceClient.h"
+#include "imstkModule.h"
 #include "imstkSceneManager.h"
 #include "imstkViewer.h"
 #include "imstkLogger.h"
@@ -103,49 +102,27 @@ public:
     ///
     void removeScene(std::string sceneName);
 
-    // Device Server
+    // Modules
 
     ///
     /// \brief
     ///
-    bool isDeviceServerRegistered(std::string serverName) const;
+    bool isModuleRegistered(std::string moduleName) const;
 
     ///
     /// \brief
     ///
-    std::shared_ptr<VRPNDeviceServer> getDeviceServer(std::string serverName) const;
+    std::shared_ptr<Module> getModule(std::string moduleName) const;
 
     ///
     /// \brief
     ///
-    void addDeviceServer(std::shared_ptr<VRPNDeviceServer> newServer);
+    void addModule(std::shared_ptr<Module> newModule);
 
     ///
     /// \brief
     ///
-    void removeDeviceServer(std::string serverName);
-
-    // Device Client
-
-    ///
-    /// \brief
-    ///
-    bool isDeviceClientRegistered(std::string deviceClientName) const;
-
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<DeviceClient> getDeviceClient(std::string deviceClientName) const;
-
-    ///
-    /// \brief
-    ///
-    void addDeviceClient(std::shared_ptr<DeviceClient> newDeviceClient);
-
-    ///
-    /// \brief
-    ///
-    void removeDeviceClient(std::string deviceClientName);
+    void removeModule(std::string moduleName);
 
     // Viewer
     std::shared_ptr<Viewer> getViewer() const;
@@ -185,8 +162,7 @@ private:
     std::string m_currentSceneName = "";
     std::unordered_map<std::string, std::shared_ptr<SceneManager>> m_sceneManagerMap;
 
-    std::unordered_map<std::string, std::shared_ptr<VRPNDeviceServer>> m_deviceServerMap;
-    std::unordered_map<std::string, std::shared_ptr<DeviceClient>> m_deviceClientMap;
+    std::unordered_map<std::string, std::shared_ptr<Module>> m_modulesMap;
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
