@@ -28,8 +28,8 @@ Supported by:
 - [NIH-NIBIB] SBIR award [1R44EB019802-01A1](https://www.sbir.gov/sbirsearch/detail/1047037)
 
 Developed at:
-- [Kitware, Inc.]
-- [Rensselaer Polytechnic Institute]
+- [Kitware, Inc.] (http://www.kitware.com/)
+- [Rensselaer Polytechnic Institute] (http://rpi.edu/)
 
 ### Licensing
 *Coming soon*
