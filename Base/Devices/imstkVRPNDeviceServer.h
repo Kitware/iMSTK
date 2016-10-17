@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <typeinfo>
+#include <string>
 
 // vrpn
 #include <vrpn_Connection.h>
