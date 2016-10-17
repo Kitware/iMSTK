@@ -50,15 +50,49 @@ if(WIN32)
 endif()
 
 #-----------------------------------------------------------------------------
+# Phantom Omni support
+#-----------------------------------------------------------------------------
+if(${iMSTK_USE_OMNI})
+
+  find_library(VRPN_PHANTOM_LIBRARY
+    NAMES
+      vrpn_phantom
+      vrpn_phantomd
+    )
+  mark_as_advanced(VRPN_PHANTOM_LIBRARY)
+  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY})
+
+  list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+  find_package(OpenHaptics)
+  list(APPEND VRPN_LIBRARIES ${OPENHAPTICS_LIBRARIES})
+  list(APPEND VRPN_INCLUDE_DIRS ${OPENHAPTICS_INCLUDE_DIRS})
+  list(REMOVE_ITEM CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
+
+  find_package(OpenGL)
+  list(APPEND VRPN_INCLUDE_DIRS ${OPENGL_INCLUDE_DIR})
+  list(APPEND VRPN_LIBRARIES ${OPENGL_LIBRARY})
+
+endif()
+
+#-----------------------------------------------------------------------------
 # Find library
 #-----------------------------------------------------------------------------
+
 find_library(VRPN_LIBRARY
+  NAMES
+    vrpn
+    vrpnd
+  )
+mark_as_advanced(VRPN_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${VRPN_LIBRARY})
+
+find_library(VRPNSERVER_LIBRARY
   NAMES
     vrpnserver
     vrpnserverd
   )
-mark_as_advanced(VRPN_LIBRARY)
-list(APPEND VRPN_LIBRARIES ${VRPN_LIBRARY})
+mark_as_advanced(VRPNSERVER_LIBRARY)
+list(APPEND VRPN_LIBRARIES ${VRPNSERVER_LIBRARY})
 
 find_library(QUAT_LIBRARY
   NAMES
@@ -108,26 +142,6 @@ elseif(APPLE)
 endif()
 list(APPEND VRPN_LIBRARIES ${HIDAPI_LIBRARY})
 mark_as_advanced(HIDAPI_LIBRARY)
-
-#-----------------------------------------------------------------------------
-# Phantom Omni support
-#-----------------------------------------------------------------------------
-if(${${PROJECT_NAME}_USE_OMNI})
-  list(APPEND CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
-  find_package(OpenHaptics)
-  list(REMOVE_ITEM CMAKE_MODULE_PATH ${VRPN_INCLUDE_DIR}/cmake)
-  find_library(VRPN_PHANTOM_LIBRARY
-    NAMES
-      vrpn_phantom
-      vrpn_phantomd
-    )
-  mark_as_advanced(VRPN_PHANTOM_LIBRARY)
-  list(APPEND VRPN_LIBRARIES ${VRPN_PHANTOM_LIBRARY} ${OPENHAPTICS_LIBRARIES})
-  list(APPEND VRPN_INCLUDE_DIRS ${OPENHAPTICS_INCLUDE_DIRS})
-endif()
-
-message(STATUS "OPENHAPTICS_LIBRARIES : ${OPENHAPTICS_LIBRARIES}")
-message(STATUS "OPENHAPTICS_INCLUDE_DIRS : ${OPENHAPTICS_INCLUDE_DIRS}")
 
 #-----------------------------------------------------------------------------
 # Find package
