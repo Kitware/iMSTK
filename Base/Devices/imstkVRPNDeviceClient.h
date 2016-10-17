@@ -125,9 +125,6 @@ private:
     std::shared_ptr<vrpn_Analog_Remote> m_vrpnAnalog;           //!< VRPN position/orientation interface
     std::shared_ptr<vrpn_Button_Remote> m_vrpnButton;           //!< VRPN button interface
     std::shared_ptr<vrpn_ForceDevice_Remote> m_vrpnForceDevice; //!< VRPN force interface
-
-    bool m_offsetSet = false;
-    Quatd m_rotOffset = Quatd::Identity();
 };
 }
 

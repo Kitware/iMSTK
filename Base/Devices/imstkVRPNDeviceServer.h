@@ -25,6 +25,7 @@
 #include <vector>
 #include <map>
 #include <typeinfo>
+#include <string>
 
 // vrpn
 #include <vrpn_Connection.h>
@@ -32,7 +33,6 @@
 
 // imstk
 #include "imstkModule.h"
-#include "imstkVRPNDeviceClient.h"
 
 namespace imstk
 {

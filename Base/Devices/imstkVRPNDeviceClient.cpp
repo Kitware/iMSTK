@@ -31,8 +31,6 @@ VRPNDeviceClient::initModule()
 {
     auto fullDeviceIp = this->getName().c_str();
 
-    m_offsetSet = false;
-
     m_vrpnTracker = std::make_shared<vrpn_Tracker_Remote>(fullDeviceIp);
     m_vrpnAnalog = std::make_shared<vrpn_Analog_Remote>(fullDeviceIp);
     m_vrpnButton = std::make_shared<vrpn_Button_Remote>(fullDeviceIp);
@@ -100,14 +98,7 @@ VRPNDeviceClient::trackerChangeHandler(void *userData, const _vrpn_TRACKERCB t)
     quat.y() = t.quat[1];
     quat.z() = t.quat[2];
     quat.w() = t.quat[3];
-
-    if(!deviceClient->m_offsetSet)
-    {
-        deviceClient->m_rotOffset = quat.inverse();
-        deviceClient->m_offsetSet = true;
-        return;
-    }
-    deviceClient->m_orientation = deviceClient->m_rotOffset * quat;
+    deviceClient->m_orientation = quat;
 
     //LOG(DEBUG) << "tracker: position = " << t.pos[0] << " " << t.pos[1] << " " << t.pos[2];
     //LOG(DEBUG) << "tracker: orientation = " << deviceClient->m_orientation.matrix();
