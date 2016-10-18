@@ -342,12 +342,11 @@ PositionBasedModel::updatePhysicsGeometry()
 void
 PositionBasedModel::updatePbdStateFromPhysicsGeometry()
 {
-	Vec3d pos;
-	for (int i = 0; i < m_mesh->getNumVertices(); ++i)
-	{
-		pos = m_mesh->getVertexPosition(i);
-		m_state->setVertexPosition(i, pos);
-
-	}
+    Vec3d pos;
+    for (int i = 0; i < m_mesh->getNumVertices(); ++i)
+    {
+        pos = m_mesh->getVertexPosition(i);
+        m_state->setVertexPosition(i, pos);
+    }
 }
 } // imstk

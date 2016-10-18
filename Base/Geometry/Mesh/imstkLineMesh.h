@@ -38,31 +38,54 @@ namespace imstk
 class LineMesh : public Mesh
 {
 public:
-	LineMesh() : Mesh(Geometry::Type::LineMesh) {}
+
+    ///
+    /// \brief Constructor
+    ///
+    LineMesh() : Mesh(Geometry::Type::LineMesh) {}
+
     ///
     /// \brief Default destructor
     ///
     ~LineMesh() = default;
 
-	virtual void clear();
+    ///
+    /// \brief
+    ///
+    virtual void clear();
 
-	///
-	/// \brief Print the mesh info
-	///
-	virtual void print() const override;
+    ///
+    /// \brief
+    ///
+    virtual void print() const override;
 
-	virtual double getVolume() const;
-	
-	void setConnectivity(const std::vector<std::vector<int> >& lines);
+    ///
+    /// \brief
+    ///
+    virtual double getVolume() const;
 
-	int getNumLines();
+    ///
+    /// \brief
+    ///
+    void setConnectivity(const std::vector<std::vector<int> >& lines);
 
-	std::vector<std::vector<int> > getLines() const;
+    ///
+    /// \brief
+    ///
+    int getNumLines();
 
-	std::vector<int> getLine(int index) const;
+    ///
+    /// \brief
+    ///
+    std::vector<std::vector<int> > getLines() const;
+
+    ///
+    /// \brief
+    ///
+    std::vector<int> getLine(int index) const;
 
 private:
-	std::vector<std::vector<int> > m_lines; ///> line connectivity
+    std::vector<std::vector<int> > m_lines; ///> line connectivity
 };
 
 } // imstk

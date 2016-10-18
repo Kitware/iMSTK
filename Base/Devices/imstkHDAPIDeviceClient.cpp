@@ -34,15 +34,15 @@ namespace imstk
 void
 HDAPIDeviceClient::init()
 {
-	// Open Device
+    // Open Device
     m_handle = hdInitDevice(this->getDeviceName().c_str());
 
-	// If failed
-	HDErrorInfo error;
-	if (HD_DEVICE_ERROR(error = hdGetError()))
-	{
+    // If failed
+    HDErrorInfo error;
+    if (HD_DEVICE_ERROR(error = hdGetError()))
+    {
         LOG(FATAL) << "Failed to initialize Phantom Omni " << this->getDeviceName();
-		m_handle = -1;
+        m_handle = -1;
         return;
     }
 
@@ -73,7 +73,7 @@ HDAPIDeviceClient::hapticCallback(void* pData)
     auto handle = client->m_handle;
     auto state = client->m_state;
 
-	hdBeginFrame(handle);
+    hdBeginFrame(handle);
     hdMakeCurrentDevice(handle);
     hdSetDoublev(HD_CURRENT_FORCE, client->m_force.data());
     hdGetDoublev(HD_CURRENT_POSITION, state.pos);

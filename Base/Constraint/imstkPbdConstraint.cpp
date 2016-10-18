@@ -58,6 +58,7 @@ FEMTetConstraint::initConstraint (PositionBasedModel &model,
         m_invRestMat = m.inverse();
         return true;
     }
+
     return false;
 }
 
@@ -101,12 +102,12 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
     case MaterialType::StVK :
     {
         Mat3d E;
-        E(0, 0) = 0.5*(F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);	// xx
-        E(1, 1) = 0.5*(F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);	// yy
-        E(2, 2) = 0.5*(F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);	// zz
-        E(0, 1) = 0.5*(F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));			// xy
-        E(0, 2) = 0.5*(F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));			// xz
-        E(1, 2) = 0.5*(F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));			// yz
+        E(0, 0) = 0.5*(F(0, 0) * F(0, 0) + F(1, 0) * F(1, 0) + F(2, 0) * F(2, 0) - 1.0);    // xx
+        E(1, 1) = 0.5*(F(0, 1) * F(0, 1) + F(1, 1) * F(1, 1) + F(2, 1) * F(2, 1) - 1.0);    // yy
+        E(2, 2) = 0.5*(F(0, 2) * F(0, 2) + F(1, 2) * F(1, 2) + F(2, 2) * F(2, 2) - 1.0);    // zz
+        E(0, 1) = 0.5*(F(0, 0) * F(0, 1) + F(1, 0) * F(1, 1) + F(2, 0) * F(2, 1));          // xy
+        E(0, 2) = 0.5*(F(0, 0) * F(0, 2) + F(1, 0) * F(1, 2) + F(2, 0) * F(2, 2));          // xz
+        E(1, 2) = 0.5*(F(0, 1) * F(0, 2) + F(1, 1) * F(1, 2) + F(2, 1) * F(2, 2));          // yz
         E(1, 0) = E(0, 1);
         E(2, 0) = E(0, 2);
         E(2, 1) = E(1, 2);
@@ -206,7 +207,6 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
         p3 += s*im4*(gradC.col(0) + gradC.col(1) + gradC.col(2));
 
     return true;
-
 }
 
 void
@@ -250,14 +250,15 @@ DistanceConstraint::solvePositionConstraint(PositionBasedModel &model)
         p0 += im1*gradC;
     if (im2 > 0)
         p1 += -im2*gradC;
+
     return true;
 }
 
 void
 DihedralConstraint::initConstraint(PositionBasedModel &model,
-                                    const unsigned int &pIdx1, const unsigned int &pIdx2,
-                                    const unsigned int &pIdx3, const unsigned int &pIdx4,
-                                    const double k)
+                                   const unsigned int &pIdx1, const unsigned int &pIdx2,
+                                   const unsigned int &pIdx3, const unsigned int &pIdx4,
+                                   const double k)
 {
     m_bodies[0] = pIdx1;
     m_bodies[1] = pIdx2;
@@ -478,7 +479,6 @@ VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
         x4 += -im4*lambda*grad4;
 
     return true;
-
 }
 
 } // imstk

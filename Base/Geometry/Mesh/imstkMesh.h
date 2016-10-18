@@ -151,7 +151,7 @@ protected:
 
     friend class SurfaceMeshRenderDelegate;
     friend class TetrahedralMeshRenderDelegate;
-	friend class LineMeshRenderDelegate;
+    friend class LineMeshRenderDelegate;
 
     ///
     /// \brief Get vertices positions

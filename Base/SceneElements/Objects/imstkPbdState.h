@@ -93,18 +93,18 @@ public:
     ///
     /// \brief
     ///
-	inline void setVertexPosition(const unsigned int& idx, Vec3d& pos)
+    inline void setVertexPosition(const unsigned int& idx, Vec3d& pos)
     {
-		m_pos.at(idx) = pos;
+        m_pos.at(idx) = pos;
     }
 
-	///
-	/// \brief
-	///
-	inline Vec3d& getVertexPosition(const unsigned int& idx)
-	{
-		return m_pos.at(idx);
-	}
+    ///
+    /// \brief
+    ///
+    inline Vec3d& getVertexPosition(const unsigned int& idx)
+    {
+        return m_pos.at(idx);
+    }
 
     ///
     /// \brief

@@ -51,11 +51,10 @@ public:
     ///
     LineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
 
-	///
-	/// \brief
-	///	
-	void mapVertices();
-
+    ///
+    /// \brief
+    ///
+    void mapVertices();
 
     ///
     /// \brief
@@ -68,7 +67,7 @@ public:
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-	vtkSmartPointer<vtkLineSource> m_lines;
+    vtkSmartPointer<vtkLineSource> m_lines;
     std::shared_ptr<LineMesh> m_geometry;
     vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
 
