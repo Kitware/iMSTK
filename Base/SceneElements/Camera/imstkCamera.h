@@ -111,7 +111,7 @@ public:
     ///
     /// \brief
     ///
-    void setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling = 1.0);
+    std::shared_ptr<CameraController> setupController(std::shared_ptr<DeviceClient> deviceClient);
 
 protected:
     std::shared_ptr<CameraController> m_cameraController;   ///>

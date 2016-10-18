@@ -42,11 +42,11 @@ public:
     /// \brief Constructor
     ///
     VirtualCouplingPBDObject(std::string name,
-                             std::shared_ptr<DeviceClient> deviceClient = nullptr,
-                             double scaling = 1.0) :
-        TrackingController(deviceClient, scaling), PbdRigidObject(name)
-    {
-        m_type = Type::VirtualCoupling;
+                             std::shared_ptr<DeviceClient> deviceClient) :
+        TrackingController(deviceClient),
+        PbdRigidObject(name)
+	{
+		m_type = Type::VirtualCoupling;
     }
 
     ///

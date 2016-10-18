@@ -353,7 +353,8 @@ void testPenaltyRigidCollision()
     auto sphere0Geom = std::make_shared<Sphere>();
     sphere0Geom->scale(0.5);
     sphere0Geom->translate(Vec3d(1, 0.5, 0));
-    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 40);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0);
+    sphere0Obj->setTranslationScaling(40);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
@@ -362,7 +363,8 @@ void testPenaltyRigidCollision()
     auto sphere1Geom = std::make_shared<Sphere>();
     sphere1Geom->scale(0.5);
     sphere1Geom->translate(Vec3d(-1, 0.5, 0));
-    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1, 40);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1);
+    sphere1Obj->setTranslationScaling(40);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
@@ -422,7 +424,8 @@ void testTwoFalcons()
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
     sphere0Geom->setPosition(imstk::Vec3d(16, 4.5, 0));
     sphere0Geom->scale(1);
-    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0, 30);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", falcon0);
+    sphere0Obj->setTranslationScaling(30);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
@@ -431,7 +434,8 @@ void testTwoFalcons()
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
     sphere1Geom->setPosition(imstk::Vec3d(-16, 4.5, 0));
     sphere1Geom->scale(1);
-    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1, 30);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", falcon1);
+    sphere1Obj->setTranslationScaling(30);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
@@ -440,9 +444,9 @@ void testTwoFalcons()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 18, 20));
     cam->setFocalPoint(imstk::UP_VECTOR * 18);
-    cam->setupController(hdk);
-    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
-        imstk::CameraController::InvertFlag::rotZ);
+    auto camController = cam->setupController(hdk);
+    camController->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                     imstk::CameraController::InvertFlag::rotZ);
 
     // Run
     sdk->setCurrentScene("FalconsTestScene");
@@ -477,7 +481,8 @@ void testTwoOmnis(){
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
     sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
     sphere0Geom->scale(1);
-    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0, 0.05);
+    auto sphere0Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere0", client0);
+    sphere0Obj->setTranslationScaling(0.05);
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
@@ -486,7 +491,8 @@ void testTwoOmnis(){
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
     sphere1Geom->setPosition(imstk::Vec3d(-2, 2.5, 0));
     sphere1Geom->scale(1);
-    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1, 0.05);
+    auto sphere1Obj = std::make_shared<imstk::VirtualCouplingObject>("Sphere1", client1);
+    sphere1Obj->setTranslationScaling(0.05);
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
@@ -521,7 +527,8 @@ void testObjectController()
     auto geom = std::make_shared<imstk::Cube>();
     geom->setPosition(imstk::UP_VECTOR);
     geom->scale(2);
-    auto object = std::make_shared<imstk::VirtualCouplingObject>("VirtualObject", client, 0.1);
+    auto object = std::make_shared<imstk::VirtualCouplingObject>("VirtualObject", client);
+    object->setTranslationScaling(0.1);
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
@@ -564,10 +571,11 @@ void testCameraController()
     cam->setPosition(imstk::Vec3d(0, 0, 10));
 
     // Set camera controller
-    cam->setupController(client, 100);
-    //LOG(INFO) << cam->getController()->getTranslationOffset(); // should be the same than initial cam position
-    cam->getController()->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
-        imstk::CameraController::InvertFlag::rotZ);
+    auto camController = cam->setupController(client);
+    camController->setTranslationScaling(100);
+    //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
+    camController->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
+                                     imstk::CameraController::InvertFlag::rotZ);
 
     // Run
     sdk->setCurrentScene("SceneTestDevice");

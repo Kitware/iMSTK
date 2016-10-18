@@ -106,15 +106,18 @@ Camera::getController() const
     return m_cameraController;
 }
 
-void
-Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling)
+std::shared_ptr<CameraController>
+Camera::setupController(std::shared_ptr<DeviceClient> deviceClient)
 {
     if(m_cameraController == nullptr)
     {
-        m_cameraController = std::make_shared<CameraController>("Camera controller", *this);
+        m_cameraController = std::make_shared<CameraController>(*this, deviceClient);
     }
-    m_cameraController->setDeviceClient(deviceClient);
-    m_cameraController->setTranslationScaling(scaling);
+    else
+    {
+        m_cameraController->setDeviceClient(deviceClient);
+    }
+    return m_cameraController;
 }
 
 } // imstk

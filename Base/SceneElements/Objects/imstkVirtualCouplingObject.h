@@ -43,10 +43,9 @@ public:
     /// \brief Constructor
     ///
     VirtualCouplingObject(std::string name,
-                          std::shared_ptr<DeviceClient> deviceClient = nullptr,
-                          double scaling = 1.0) :
+                          std::shared_ptr<DeviceClient> deviceClient) :
         CollidingObject(name),
-        TrackingController(deviceClient, scaling)
+        TrackingController(deviceClient)
     {
         m_type = Type::VirtualCoupling;
     }
