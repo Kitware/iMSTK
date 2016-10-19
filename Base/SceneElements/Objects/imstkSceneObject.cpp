@@ -36,6 +36,12 @@ SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
     m_visualGeometry = geometry;
 }
 
+std::shared_ptr<Geometry>
+SceneObject::getMasterGeometry() const
+{
+    return m_visualGeometry;
+}
+
 const SceneObject::Type&
 SceneObject::getType() const
 {

@@ -55,6 +55,11 @@ public:
     void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
 
     ///
+    /// \brief Get the master geometry
+    ///
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+
+    ///
     /// \brief
     ///
     std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;

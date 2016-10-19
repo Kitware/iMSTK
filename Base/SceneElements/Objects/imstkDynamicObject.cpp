@@ -36,6 +36,12 @@ DynamicObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
     m_physicsGeometry = geometry;
 }
 
+std::shared_ptr<Geometry>
+DynamicObject::getMasterGeometry() const
+{
+    return m_physicsGeometry;
+}
+
 std::shared_ptr<GeometryMap>
 DynamicObject::getPhysicsToCollidingMap() const
 {

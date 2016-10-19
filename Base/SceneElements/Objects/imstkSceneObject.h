@@ -83,6 +83,11 @@ public:
     void setVisualGeometry(std::shared_ptr<Geometry> geometry);
 
     ///
+    /// \brief Get the master geometry
+    ///
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+
+    ///
     /// \brief Set/Get the geometry used for collisions
     ///
     std::shared_ptr<Geometry> getCollidingGeometry() const;
