@@ -114,7 +114,7 @@ public:
     std::shared_ptr<CameraController> setupController(std::shared_ptr<DeviceClient> deviceClient);
 
 protected:
-    std::shared_ptr<CameraController> m_cameraController;   ///>
+    std::shared_ptr<CameraController> m_controller;   ///>
 
     Vec3d m_position = Vec3d(0,2,5);    ///>
     Vec3d m_focalPoint = WORLD_ORIGIN;  ///>
