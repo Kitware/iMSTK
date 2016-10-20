@@ -1,6 +1,7 @@
 #include "imstkPbdInteractionPair.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk
 {

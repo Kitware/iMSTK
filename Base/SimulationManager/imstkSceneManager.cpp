@@ -26,6 +26,7 @@
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdObject.h"
+#include "imstkGeometryMap.h"
 
 #include "g3log/g3log.hpp"
 

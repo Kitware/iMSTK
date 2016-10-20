@@ -28,6 +28,9 @@
 namespace imstk
 {
 
+class Geometry;
+class GeometryMap;
+
 ///
 /// \class DynamicObject
 ///

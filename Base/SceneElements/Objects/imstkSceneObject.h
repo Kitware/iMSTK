@@ -25,14 +25,10 @@
 #include <memory>
 #include <string>
 
-#include "imstkGeometry.h"
-#include "imstkGeometryMap.h"
-
 namespace imstk
 {
 
-//class Geometry;
-//class GeometryMap;
+class Geometry;
 
 ///
 /// \class SceneObject
