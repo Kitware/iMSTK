@@ -19,11 +19,12 @@
 
    =========================================================================*/
 
-#include <memory>
+#include "imstkSceneObjectController.h"
 
-#include "imstkVirtualCouplingObject.h"
+#include "imstkCollidingObject.h"
 #include "imstkGeometry.h"
-#include "imstkGeometryMap.h"
+
+#include <utility>
 
 #include <g3log/g3log.hpp>
 
@@ -31,52 +32,36 @@ namespace imstk
 {
 
 void
-VirtualCouplingObject::initOffsets()
+SceneObjectController::initOffsets()
 {
-    m_translationOffset = m_collidingGeometry->getPosition();
-    m_rotationOffset = m_collidingGeometry->getOrientation();
+    m_translationOffset = m_sceneObject.getMasterGeometry()->getPosition();
+    m_rotationOffset = m_sceneObject.getMasterGeometry()->getOrientation();
 }
 
 void
-VirtualCouplingObject::updateFromDevice()
+SceneObjectController::updateFromDevice()
 {
     Vec3d p;
     Quatd r;
 
     if (!this->computeTrackingData(p, r))
     {
-        LOG(WARNING) << "VirtualCouplingObject::updateFromDevice warning: could not update tracking info.";
+        LOG(WARNING) << "SceneObjectController::updateFromDevice warning: could not update tracking info.";
         return;
     }
 
     // Update colliding geometry
-    m_collidingGeometry->setPosition(p);
-    m_collidingGeometry->setOrientation(r);
+    m_sceneObject.getMasterGeometry()->setPosition(p);
+    m_sceneObject.getMasterGeometry()->setOrientation(r);
+}
 
-    // Update visual geometry
-    if(m_collidingToVisualMap)
+void
+SceneObjectController::applyForces()
+{
+    if(auto collidingObject = dynamic_cast<CollidingObject*>(&m_sceneObject))
     {
-        m_collidingToVisualMap->apply();
+        m_deviceClient->setForce(collidingObject->getForce());
     }
-}
-
-void
-VirtualCouplingObject::applyForces()
-{
-    m_deviceClient->setForce(m_force);
-    this->setForce(Vec3d::Zero());
-}
-
-const Vec3d&
-VirtualCouplingObject::getForce() const
-{
-    return m_force;
-}
-
-void
-VirtualCouplingObject::setForce(Vec3d force)
-{
-    m_force = force;
 }
 
 } // imstk

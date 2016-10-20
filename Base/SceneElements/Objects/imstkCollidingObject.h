@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "imstkSceneObject.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -65,10 +66,17 @@ public:
     std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
     void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
 
+    ///
+    /// \brief Set/Get the force to be applied to the object
+    ///
+    const Vec3d& getForce() const;
+    void setForce(Vec3d force);
+
 protected:
 
     std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
     std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
+    Vec3d m_force = Vec3d::Zero();
 
 };
 

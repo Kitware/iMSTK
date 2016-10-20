@@ -22,7 +22,6 @@
 #include "imstkPenaltyMeshToRigidCH.h"
 
 #include "imstkCollidingObject.h"
-#include "imstkVirtualCouplingObject.h"
 #include "imstkCollisionData.h"
 #include "imstkDeformableObject.h"
 

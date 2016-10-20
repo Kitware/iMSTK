@@ -29,6 +29,8 @@ namespace imstk
 {
 
 class Geometry;
+class SceneObjectController;
+class DeviceClient;
 
 ///
 /// \class SceneObject
@@ -44,8 +46,7 @@ public:
         Visual,
         Colliding,
         Rigid,
-        Deformable,
-        VirtualCoupling
+        Deformable
     };
 
     ///
@@ -83,6 +84,16 @@ public:
     ///
     virtual std::shared_ptr<Geometry> getMasterGeometry() const;
 
+    ///
+    /// \brief Get the object controller
+    ///
+    std::shared_ptr<SceneObjectController> getController() const;
+
+    ///
+    /// \brief Setup a controller for the object for a given device client
+    ///
+    std::shared_ptr<SceneObjectController> setupController(std::shared_ptr<DeviceClient> deviceClient);
+
 protected:
     ///
     /// \brief Assigns the type of the object
@@ -91,9 +102,9 @@ protected:
 
     Type m_type; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
-
-    std::shared_ptr<Geometry> m_visualGeometry;          ///> Geometry for rendering
-};
+    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
+    std::shared_ptr<SceneObjectController> m_controller; ///> Object controller
+ };
 
 using VisualObject = SceneObject;
 

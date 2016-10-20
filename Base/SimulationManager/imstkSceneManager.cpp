@@ -22,10 +22,10 @@
 // imstk
 #include "imstkSceneManager.h"
 #include "imstkCameraController.h"
-#include "imstkVirtualCouplingObject.h"
-#include "imstkVirtualCouplingPBDObject.h"
+#include "imstkSceneObjectController.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdObject.h"
+#include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
 
 #include "g3log/g3log.hpp"
@@ -51,9 +51,9 @@ SceneManager::initModule()
     // Init virtual coupling objects offsets
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
+        if (auto controller = obj->getController())
         {
-            virtualCoupling->initOffsets();
+            controller->initOffsets();
         }
         if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
         {
@@ -68,10 +68,14 @@ SceneManager::runModule()
     // Update virtualCoupling objects based on devices
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto virtualCoupling = std::dynamic_pointer_cast<VirtualCouplingObject>(obj))
+        if (auto controller = obj->getController())
         {
-            virtualCoupling->updateFromDevice();
-            virtualCoupling->applyForces();
+            controller->updateFromDevice();
+            if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
+            {
+                controller->applyForces();
+                collidingObj->setForce(Vec3d(0,0,0));
+            }
         }
         else if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
         {

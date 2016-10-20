@@ -22,7 +22,7 @@
 #ifndef imstkVirtualCouplingPBDObject_h
 #define imstkVirtualCouplingPBDObject_h
 
-#include "imstkVirtualCouplingObject.h"
+#include "imstkTrackingController.h"
 #include "imstkPbdRigidObject.h"
 namespace imstk
 {
@@ -45,8 +45,7 @@ public:
                              std::shared_ptr<DeviceClient> deviceClient) :
         TrackingController(deviceClient),
         PbdRigidObject(name)
-	{
-		m_type = Type::VirtualCoupling;
+    {
     }
 
     ///
