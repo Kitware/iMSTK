@@ -48,7 +48,7 @@ public:
     ///
     DeformableObject(std::string name) : DynamicObject(name)
     {
-        m_type = SceneObject::Type::Deformable;
+        m_type = Type::Deformable;
     }
 
     ///

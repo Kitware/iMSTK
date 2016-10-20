@@ -47,14 +47,6 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
         return;
     }
 
-    // Check that at least one object is not static
-    if (A->getType() == SceneObject::Type::Static &&
-        B->getType() == SceneObject::Type::Static)
-    {
-       LOG(WARNING) << "InteractionPair error: can not create interaction between two static objects.";
-       //return;
-    }
-
     // Collision Detection
     std::shared_ptr<CollisionDetection> CD = CollisionDetection::make_collision_detection(CDType, A, B, m_colData);
     if (CD == nullptr)
@@ -65,28 +57,28 @@ InteractionPair::InteractionPair(std::shared_ptr<CollidingObject> A,
 
     // Collision Handling A
     std::shared_ptr<CollisionHandling> CHA;
-    if (A->getType() != SceneObject::Type::Static)
+    if(CHAType != CollisionHandling::Type::None)
     {
-       CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
-       if (CHA == nullptr)
-       {
-           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
+        CHA = CollisionHandling::make_collision_handling(CHAType, CollisionHandling::Side::A, m_colData, A, B);
+        if (CHA == nullptr)
+        {
+            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
                         << A->getName() << "' object.";
-           return;
-       }
+            return;
+        }
     }
 
     // Collision Handling B
     std::shared_ptr<CollisionHandling> CHB;
-    if (B->getType() != SceneObject::Type::Static)
+    if(CHBType != CollisionHandling::Type::None)
     {
-       CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
-       if (CHB == nullptr)
-       {
-           LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
+        CHB = CollisionHandling::make_collision_handling(CHBType, CollisionHandling::Side::B, m_colData, B, A);
+        if (CHB == nullptr)
+        {
+            LOG(WARNING) << "InteractionPair error: can not instantiate collision handling for '"
                         << B->getName() << "' object.";
-           return;
-       }
+            return;
+        }
     }
 
     // Init interactionPair

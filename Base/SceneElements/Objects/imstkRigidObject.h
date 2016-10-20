@@ -43,7 +43,7 @@ public:
     ///
     RigidObject(std::string name) : DynamicObject(name)
     {
-        m_type = SceneObject::Type::Rigid;
+        m_type = Type::Rigid;
     }
 
     ///

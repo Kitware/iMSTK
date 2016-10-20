@@ -40,7 +40,7 @@ public:
     ///
     CollidingObject(std::string name) : SceneObject(name)
     {
-        m_type = SceneObject::Type::Static;
+        m_type = Type::Colliding;
     }
 
     ///

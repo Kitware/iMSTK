@@ -45,8 +45,8 @@ class SceneObject
 public:
     enum class Type
     {
-        Static,
-        Dynamic,
+        Visual,
+        Colliding,
         Rigid,
         Deformable,
         VirtualCoupling
@@ -57,7 +57,7 @@ public:
     ///
     SceneObject(std::string name) : m_name(name)
     {
-        SceneObject::Type::Static;
+        m_type = Type::Visual;
     }
 
     ///
@@ -87,30 +87,16 @@ public:
     ///
     virtual std::shared_ptr<Geometry> getMasterGeometry() const;
 
-    ///
-    /// \brief Set/Get the geometry used for collisions
-    ///
-    std::shared_ptr<Geometry> getCollidingGeometry() const;
-    void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
-
-    ///
-    /// \brief Set/Get the Colliding-to-Visual map
-    ///
-    std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
-    void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
-
 protected:
     ///
     /// \brief Assigns the type of the object
     ///
     void setType(Type type);
 
-    Type m_type = Type::Static; ///> Type of the scene object
+    Type m_type; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
 
     std::shared_ptr<Geometry> m_visualGeometry;          ///> Geometry for rendering
-    std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
-    std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
 };
 
 using VisualObject = SceneObject;
