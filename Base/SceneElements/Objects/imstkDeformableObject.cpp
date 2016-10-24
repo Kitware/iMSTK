@@ -47,4 +47,40 @@ DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel
     m_dynamicalModel = dynaDefModel;
 }
 
+const Vectord&
+DeformableObject::getDisplacements() const
+{
+    return m_dynamicalModel->getCurrentState()->getQ();
+}
+
+const Vectord&
+DeformableObject::getPrevDisplacements() const
+{
+    return m_dynamicalModel->getPreviousState()->getQ();
+}
+
+const Vectord&
+DeformableObject::getVelocities() const
+{
+    return m_dynamicalModel->getCurrentState()->getQDot();
+}
+
+const Vectord&
+DeformableObject::getPrevVelocities() const
+{
+    return m_dynamicalModel->getPreviousState()->getQDot();
+}
+
+const Vectord&
+DeformableObject::getAccelerations() const
+{
+    return m_dynamicalModel->getCurrentState()->getQDotDot();
+}
+
+const Vectord&
+DeformableObject::getPrevAccelerations() const
+{
+    return m_dynamicalModel->getPreviousState()->getQDotDot();
+}
+
 } // imstk
