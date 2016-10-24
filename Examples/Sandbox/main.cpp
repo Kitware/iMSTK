@@ -440,7 +440,7 @@ void testTwoFalcons()
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere0Obj->setupController(falcon1);
+    auto sphere1Controller = sphere1Obj->setupController(falcon1);
     sphere1Controller->setTranslationScaling(30);
     scene->addSceneObject(sphere1Obj);
 
@@ -499,8 +499,8 @@ void testTwoOmnis(){
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere0Controller = sphere0Obj->setupController(client1);
-    sphere0Controller->setTranslationScaling(0.05);
+    auto sphere1Controller = sphere1Obj->setupController(client1);
+    sphere1Controller->setTranslationScaling(0.05);
     scene->addSceneObject(sphere1Obj);
 
     // Update Camera position
@@ -536,7 +536,7 @@ void testObjectController()
     auto object = std::make_shared<imstk::CollidingObject>("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
-    auto controller = sphere0Obj->setupController(client);
+    auto controller = object->setupController(client);
     controller->setTranslationScaling(0.1);
     scene->addSceneObject(object);
 
@@ -1587,9 +1587,9 @@ void testLineMesh()
     server->addDeviceClient(client0);
     sdk->addModule(server);
 
-    auto blade = std::make_shared<imstk::VirtualCouplingPBDObject>("blade", client0, 0.5);
-    auto linesTool = std::make_shared<imstk::VirtualCouplingPBDObject>("linesTool", client0, 0.5);
-    auto tool = std::make_shared<imstk::VirtualCouplingPBDObject>("tool", client0, 0.5);
+    auto blade = std::make_shared<imstk::VirtualCouplingPBDObject>("blade", client0);
+    auto linesTool = std::make_shared<imstk::VirtualCouplingPBDObject>("linesTool", client0);
+    auto tool = std::make_shared<imstk::VirtualCouplingPBDObject>("tool", client0);
 
     bool line;
     bool clothTest;
