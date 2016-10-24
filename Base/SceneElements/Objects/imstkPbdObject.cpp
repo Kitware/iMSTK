@@ -1,4 +1,7 @@
 #include "imstkPbdObject.h"
+
+#include "imstkGeometryMap.h"
+
 #include <g3log/g3log.hpp>
 
 namespace imstk

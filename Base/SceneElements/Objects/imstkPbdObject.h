@@ -1,7 +1,7 @@
 #ifndef IMSTKPBDOBJECT_H
 #define IMSTKPBDOBJECT_H
 
-#include "imstkSceneObject.h"
+#include "imstkCollidingObject.h"
 #include "imstkPbdModel.h"
 
 #include <stdarg.h>
@@ -9,18 +9,21 @@
 namespace imstk
 {
 
+class Geometry;
+class GeometryMap;
+
 ///
 /// \class PbdObject
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-class PbdObject : public SceneObject
+class PbdObject : public CollidingObject
 {
 public:
     ///
     /// \brief
     ///
-    PbdObject(std::string name) : SceneObject(name)
+    PbdObject(std::string name) : CollidingObject(name)
     {
         m_type = SceneObject::Type::Deformable;
     }

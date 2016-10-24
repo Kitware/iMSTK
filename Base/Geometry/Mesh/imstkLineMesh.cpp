@@ -25,28 +25,44 @@
 
 namespace imstk
 {
-	void LineMesh::clear(){}
+void
+LineMesh::clear()
+{}
 
-	void LineMesh::print() const {
-		Mesh::print();
-	}
-	double LineMesh::getVolume() const{
-		return 0.0;
-	}
-	void LineMesh::setConnectivity(const std::vector<std::vector<int> >& lines){
-		m_lines = lines;
-	}
+void
+LineMesh::print() const
+{
+    Mesh::print();
+}
 
-	int LineMesh::getNumLines(){
-		return m_lines.size();
-	}
+double
+LineMesh::getVolume() const
+{
+    return 0.0;
+}
 
-	std::vector<std::vector<int> > LineMesh::getLines() const{
-		return m_lines;
-	}
+void
+LineMesh::setConnectivity(const std::vector<std::vector<int> >& lines)
+{
+    m_lines = lines;
+}
 
-	std::vector<int>  LineMesh::getLine(int index) const{
-		return m_lines[index];
-	}
+int
+LineMesh::getNumLines()
+{
+    return m_lines.size();
+}
+
+std::vector<std::vector<int>>
+LineMesh::getLines() const
+{
+    return m_lines;
+}
+
+std::vector<int>
+LineMesh::getLine(int index) const
+{
+    return m_lines[index];
+}
 
 } // imstk

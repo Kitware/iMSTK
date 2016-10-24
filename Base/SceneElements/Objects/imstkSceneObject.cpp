@@ -21,6 +21,9 @@
 
 #include "imstkSceneObject.h"
 
+#include "imstkSceneObjectController.h"
+#include "imstkDeviceClient.h"
+
 namespace imstk
 {
 
@@ -34,6 +37,12 @@ void
 SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_visualGeometry = geometry;
+}
+
+std::shared_ptr<Geometry>
+SceneObject::getMasterGeometry() const
+{
+    return m_visualGeometry;
 }
 
 const SceneObject::Type&
@@ -60,28 +69,24 @@ SceneObject::setName(const std::string& name)
     m_name = name;
 }
 
-std::shared_ptr<Geometry>
-SceneObject::getCollidingGeometry() const
+std::shared_ptr<SceneObjectController>
+SceneObject::getController() const
 {
-    return m_collidingGeometry;
+    return m_controller;
 }
 
-void
-SceneObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
+std::shared_ptr<SceneObjectController>
+SceneObject::setupController(std::shared_ptr<DeviceClient> deviceClient)
 {
-    m_collidingGeometry = geometry;
-}
-
-std::shared_ptr<GeometryMap>
-SceneObject::getCollidingToVisualMap() const
-{
-    return m_collidingToVisualMap;
-}
-
-void
-SceneObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
-{
-    m_collidingToVisualMap = map;
+    if(m_controller == nullptr)
+    {
+        m_controller = std::make_shared<SceneObjectController>(*this, deviceClient);
+    }
+    else
+    {
+        m_controller->setDeviceClient(deviceClient);
+    }
+    return m_controller;
 }
 
 } // imstk

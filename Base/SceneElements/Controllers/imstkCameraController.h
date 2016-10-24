@@ -42,9 +42,9 @@ public:
     ///
     /// \brief
     ///
-    CameraController(std::string name, Camera& camera,
-                     std::shared_ptr<DeviceClient> deviceClient = nullptr) :
-        Module(name),
+    CameraController(Camera& camera,
+                     std::shared_ptr<DeviceClient> deviceClient) :
+        Module("Camera controller"),
         m_camera(camera),
         TrackingController(deviceClient)
     {}

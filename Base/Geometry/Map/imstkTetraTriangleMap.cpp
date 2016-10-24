@@ -169,8 +169,8 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
         {
             center += tetraMesh->getInitialVertexPosition(vert[i]);
         }
-		center = center / 4;
-		double dist = (pos - center).norm();
+        center = center / 4;
+        double dist = (pos - center).norm();
         if (dist < closestDistance)
         {
             closestDistance = dist;

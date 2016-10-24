@@ -19,42 +19,38 @@
 
    =========================================================================*/
 
-#ifndef imstkVirtualCouplingObject_h
-#define imstkVirtualCouplingObject_h
+#ifndef imstkSceneObjectController_h
+#define imstkSceneObjectController_h
 
-#include "imstkCollidingObject.h"
 #include "imstkTrackingController.h"
+#include "imstkSceneObject.h"
+
+#include <memory>
 
 namespace imstk
 {
 
-class Geometry;
-class GeometryMap;
-
 ///
-/// \class VirtualCouplingObject
+/// \class SceneObjectController
 ///
 /// \brief
 ///
-class VirtualCouplingObject : public CollidingObject, public TrackingController
+class SceneObjectController : public TrackingController
 {
 public:
     ///
     /// \brief Constructor
     ///
-    VirtualCouplingObject(std::string name,
-                          std::shared_ptr<DeviceClient> deviceClient = nullptr,
-                          double scaling = 1.0) :
-        CollidingObject(name),
-        TrackingController(deviceClient, scaling)
-    {
-        m_type = Type::VirtualCoupling;
-    }
+    SceneObjectController(SceneObject& sceneObject,
+                          std::shared_ptr<DeviceClient> deviceClient) :
+        TrackingController(deviceClient),
+        m_sceneObject(sceneObject)
+    {}
 
     ///
     /// \brief Destructor
     ///
-    ~VirtualCouplingObject() = default;
+    ~SceneObjectController() = default;
 
     ///
     /// \brief Initialize offset based on object geometry
@@ -71,22 +67,11 @@ public:
     ///
     void applyForces();
 
-    ///
-    /// \brief Get the force to apply to the device
-    ///
-    const Vec3d& getForce() const;
-
-    ///
-    /// \brief Set the force to apply to the device
-    ///
-    void setForce(Vec3d force);
-
 protected:
 
-    bool m_forceModified;
-    Vec3d m_force = Vec3d::Zero();
+    SceneObject& m_sceneObject; ///< SceneObject controlled by the external device
+
 };
 
 } // imstk
-
-#endif // ifndef imstkVirtualCouplingObject_h
+#endif // ifndef imstkSceneObjectController_h

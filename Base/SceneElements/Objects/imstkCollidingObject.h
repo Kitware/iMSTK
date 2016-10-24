@@ -25,6 +25,7 @@
 #include <memory>
 
 #include "imstkSceneObject.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
@@ -40,7 +41,7 @@ public:
     ///
     CollidingObject(std::string name) : SceneObject(name)
     {
-        m_type = SceneObject::Type::Static;
+        m_type = Type::Colliding;
     }
 
     ///
@@ -55,15 +56,27 @@ public:
     void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
 
     ///
+    /// \brief Get the master geometry
+    ///
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+
+    ///
     /// \brief
     ///
     std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
     void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
 
+    ///
+    /// \brief Set/Get the force to be applied to the object
+    ///
+    const Vec3d& getForce() const;
+    void setForce(Vec3d force);
+
 protected:
 
     std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
     std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
+    Vec3d m_force = Vec3d::Zero();
 
 };
 

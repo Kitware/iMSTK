@@ -25,14 +25,12 @@
 #include <memory>
 #include <string>
 
-#include "imstkGeometry.h"
-#include "imstkGeometryMap.h"
-
 namespace imstk
 {
 
-//class Geometry;
-//class GeometryMap;
+class Geometry;
+class SceneObjectController;
+class DeviceClient;
 
 ///
 /// \class SceneObject
@@ -45,11 +43,10 @@ class SceneObject
 public:
     enum class Type
     {
-        Static,
-        Dynamic,
+        Visual,
+        Colliding,
         Rigid,
-        Deformable,
-        VirtualCoupling
+        Deformable
     };
 
     ///
@@ -57,7 +54,7 @@ public:
     ///
     SceneObject(std::string name) : m_name(name)
     {
-        SceneObject::Type::Static;
+        m_type = Type::Visual;
     }
 
     ///
@@ -83,16 +80,19 @@ public:
     void setVisualGeometry(std::shared_ptr<Geometry> geometry);
 
     ///
-    /// \brief Set/Get the geometry used for collisions
+    /// \brief Get the master geometry
     ///
-    std::shared_ptr<Geometry> getCollidingGeometry() const;
-    void setCollidingGeometry(std::shared_ptr<Geometry> geometry);
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
 
     ///
-    /// \brief Set/Get the Colliding-to-Visual map
+    /// \brief Get the object controller
     ///
-    std::shared_ptr<GeometryMap> getCollidingToVisualMap() const;
-    void setCollidingToVisualMap(std::shared_ptr<GeometryMap> map);
+    std::shared_ptr<SceneObjectController> getController() const;
+
+    ///
+    /// \brief Setup a controller for the object for a given device client
+    ///
+    std::shared_ptr<SceneObjectController> setupController(std::shared_ptr<DeviceClient> deviceClient);
 
 protected:
     ///
@@ -100,13 +100,11 @@ protected:
     ///
     void setType(Type type);
 
-    Type m_type = Type::Static; ///> Type of the scene object
+    Type m_type; ///> Type of the scene object
     std::string m_name; ///> Custom name of the scene object
-
-    std::shared_ptr<Geometry> m_visualGeometry;          ///> Geometry for rendering
-    std::shared_ptr<Geometry> m_collidingGeometry;       ///> Geometry for collisions
-    std::shared_ptr<GeometryMap> m_collidingToVisualMap; ///> Maps transformations to visual geometry
-};
+    std::shared_ptr<Geometry> m_visualGeometry; ///> Geometry for rendering
+    std::shared_ptr<SceneObjectController> m_controller; ///> Object controller
+ };
 
 using VisualObject = SceneObject;
 

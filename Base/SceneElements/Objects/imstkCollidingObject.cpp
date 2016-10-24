@@ -36,6 +36,12 @@ CollidingObject::setCollidingGeometry(std::shared_ptr<Geometry> geometry)
     m_collidingGeometry = geometry;
 }
 
+std::shared_ptr<Geometry>
+CollidingObject::getMasterGeometry() const
+{
+    return m_collidingGeometry;
+}
+
 std::shared_ptr<GeometryMap>
 CollidingObject::getCollidingToVisualMap() const
 {
@@ -46,6 +52,18 @@ void
 CollidingObject::setCollidingToVisualMap(std::shared_ptr<GeometryMap> map)
 {
     m_collidingToVisualMap = map;
+}
+
+const Vec3d&
+CollidingObject::getForce() const
+{
+    return m_force;
+}
+
+void
+CollidingObject::setForce(Vec3d force)
+{
+    m_force = force;
 }
 
 } // imstk

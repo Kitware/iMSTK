@@ -24,34 +24,4 @@
 namespace imstk
 {
 
-void
-RigidObject::translate(const Vec3d& t)
-{
-    m_physicsGeometry->translate(t);
-}
-
-void
-RigidObject::translate(const double& x, const double& y, const double& z)
-{
-    m_physicsGeometry->translate(Vec3d(x, y, z));
-}
-
-void
-RigidObject::rotate(const Quatd& r)
-{
-    m_physicsGeometry->rotate(r);
-}
-
-void
-RigidObject::rotate(const Mat3d& r)
-{
-    m_physicsGeometry->rotate(Quatd(r));
-}
-
-void
-RigidObject::rotate(const Vec3d& axis, const double& angle)
-{
-    m_physicsGeometry->rotate(Quatd(Rotd(angle, axis)));
-}
-
 } // imstk

@@ -28,6 +28,9 @@
 namespace imstk
 {
 
+class Geometry;
+class GeometryMap;
+
 ///
 /// \class DynamicObject
 ///
@@ -47,6 +50,11 @@ public:
     ///
     std::shared_ptr<Geometry> getPhysicsGeometry() const;
     void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
+
+    ///
+    /// \brief Get the master geometry
+    ///
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
 
     ///
     /// \brief Set/Get the Physics-to-Collision map

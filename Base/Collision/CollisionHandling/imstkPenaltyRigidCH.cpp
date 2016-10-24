@@ -22,7 +22,6 @@
 #include "imstkPenaltyRigidCH.h"
 
 #include "imstkCollidingObject.h"
-#include "imstkVirtualCouplingObject.h"
 #include "imstkCollisionData.h"
 
 #include <g3log/g3log.hpp>
@@ -32,7 +31,7 @@ namespace imstk {
 void
 PenaltyRigidCH::computeContactForces()
 {
-    auto movableObj = std::dynamic_pointer_cast<VirtualCouplingObject>(m_obj);
+    auto movableObj = std::dynamic_pointer_cast<CollidingObject>(m_obj);
     if(movableObj == nullptr)
     {
         LOG(WARNING) << "PenaltyRigidCH::computeContactForces error: "

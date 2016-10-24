@@ -40,35 +40,35 @@ public:
     ///
     /// \brief Constructor
     ///
-	PbdRigidObject(std::string name) : PbdObject(name)
-	{
-		m_type = SceneObject::Type::Deformable;
-	}
+    PbdRigidObject(std::string name) : PbdObject(name)
+    {
+        m_type = SceneObject::Type::Deformable;
+    }
 
     ///
     /// \brief Destructor
     ///
-	~PbdRigidObject() = default;
+    ~PbdRigidObject() = default;
 
-	///
-	/// \brief
-	///
-	virtual void integratePosition(){ return; }
+    ///
+    /// \brief
+    ///
+    virtual void integratePosition(){ return; }
 
-	///
-	/// \brief
-	///
-	virtual void integrateVelocity(){ return; }
+    ///
+    /// \brief
+    ///
+    virtual void integrateVelocity(){ return; }
 
-	///
-	/// \brief
-	///
-	virtual void updatePbdStates();
+    ///
+    /// \brief
+    ///
+    virtual void updatePbdStates();
 
-	///
-	/// \brief
-	///
-	virtual void constraintProjection(){ return; }
+    ///
+    /// \brief
+    ///
+    virtual void constraintProjection(){ return; }
 
 protected:
 

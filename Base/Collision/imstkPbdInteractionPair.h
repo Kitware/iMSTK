@@ -20,11 +20,9 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B)
-     : first (A), second (B)
-    {
-
-    }
+    PbdInteractionPair(std::shared_ptr<PbdObject> A, std::shared_ptr<PbdObject> B):
+        first(A), second(B)
+    {}
 
     ///
     /// \brief
@@ -58,7 +56,7 @@ public:
     void doCollision();
 
 private:
-    std::vector<CollisionConstraint*>    m_collisionConstraints;
+    std::vector<CollisionConstraint*> m_collisionConstraints;
     std::shared_ptr<PbdObject> first;
     std::shared_ptr<PbdObject> second;
     unsigned int maxIter;

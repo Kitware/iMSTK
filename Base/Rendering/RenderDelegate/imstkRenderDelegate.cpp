@@ -74,11 +74,11 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
         return std::make_shared<TetrahedralMeshRenderDelegate>(mesh);
     }
-	case Geometry::Type::LineMesh:
-	{
-		auto mesh = std::dynamic_pointer_cast<LineMesh>(geom);
-		return std::make_shared<LineMeshRenderDelegate>(mesh);
-	}
+    case Geometry::Type::LineMesh:
+    {
+        auto mesh = std::dynamic_pointer_cast<LineMesh>(geom);
+        return std::make_shared<LineMeshRenderDelegate>(mesh);
+    }
     case Geometry::Type::HexahedralMesh:
     {
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);

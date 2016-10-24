@@ -38,11 +38,10 @@ CollisionHandling::make_collision_handling(const Type& type,
     {
     case Type::Penalty:
     {
-        if (objA->getType() != SceneObject::Type::VirtualCoupling &&
-            objA->getType() == SceneObject::Type::Rigid)
+        if (objA->getType() == SceneObject::Type::Visual)
         {
             LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                         << "penalty collision handling not yet implemented for non-rigid objects.";
+                         << "penalty collision handling only implemented for colliding objects.";
             return nullptr;
         }
         return std::make_shared<PenaltyRigidCH>(side, colData, objA);

@@ -24,7 +24,6 @@
 
 // imstk
 #include "imstkDynamicObject.h"
-#include "imstkMath.h"
 
 namespace imstk
 {
@@ -43,26 +42,13 @@ public:
     ///
     RigidObject(std::string name) : DynamicObject(name)
     {
-        m_type = SceneObject::Type::Rigid;
+        m_type = Type::Rigid;
     }
 
     ///
     /// \brief Destructor
     ///
     ~RigidObject() = default;
-
-    ///
-    /// \brief Translate the physics geometric model
-    ///
-    void translate(const Vec3d& t);
-    void translate(const double& x, const double& y, const double& z);
-
-    ///
-    /// \brief Rotate the physics geometric model
-    ///
-    void rotate(const Quatd& r);
-    void rotate(const Mat3d& r);
-    void rotate(const Vec3d & axis, const double& angle);
 
 protected:
 

@@ -94,9 +94,8 @@ protected:
     ///
     /// \brief Constructor
     ///
-    TrackingController(std::shared_ptr<DeviceClient> deviceClient = nullptr, double scaling = 1.0) :
-        m_deviceClient(deviceClient),
-        m_scaling(scaling)
+    TrackingController(std::shared_ptr<DeviceClient> deviceClient) :
+        m_deviceClient(deviceClient)
     {}
 
     std::shared_ptr<DeviceClient> m_deviceClient; ///< Reports device tracking information

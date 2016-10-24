@@ -41,18 +41,18 @@ void
 VirtualCouplingPBDObject::updateFromDevice()
 {
     Vec3d p;
-    Quatd r;	
+    Quatd r;
     if (!this->computeTrackingData(p, r))
     {
         LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
         return;
     }
 
-	// Update colliding geometry
-	m_visualGeometry->setPosition(p);
-	m_visualGeometry->setOrientation(r);
+    // Update colliding geometry
+    m_visualGeometry->setPosition(p);
+    m_visualGeometry->setOrientation(r);
 
-	computeTransform(p, r, transform);
+    computeTransform(p, r, transform);
 
    auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
 
@@ -60,43 +60,45 @@ VirtualCouplingPBDObject::updateFromDevice()
    vertexPos4.w() = 1;
    Vec3d vertexPos3;
 
-	for (int i = 0; i < collidingMesh->getNumVertices(); ++i)
+    for (int i = 0; i < collidingMesh->getNumVertices(); ++i)
    {
-	   vertexPos3 = collidingMesh->getVertexPosition(i);
-	   vertexPos4.x() = vertexPos3.x();
-	   vertexPos4.y() = vertexPos3.y();
-	   vertexPos4.z() = vertexPos3.z();
+       vertexPos3 = collidingMesh->getVertexPosition(i);
+       vertexPos4.x() = vertexPos3.x();
+       vertexPos4.y() = vertexPos3.y();
+       vertexPos4.z() = vertexPos3.z();
 
-	   vertexPos4.applyOnTheLeft(transform);
-	   vertexPos3.x() = vertexPos4.x();
-	   vertexPos3.y() = vertexPos4.y();
-	   vertexPos3.z() = vertexPos4.z();
+       vertexPos4.applyOnTheLeft(transform);
+       vertexPos3.x() = vertexPos4.x();
+       vertexPos3.y() = vertexPos4.y();
+       vertexPos3.z() = vertexPos4.z();
 
-	   collidingMesh->setVerticePosition(i, vertexPos3);
-	}
-	applyCollidingToPhysics();
-	updatePbdStates();
+       collidingMesh->setVerticePosition(i, vertexPos3);
+    }
+    applyCollidingToPhysics();
+    updatePbdStates();
 }
 
 void 
 VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matrix4d& t){
-	auto scaling = m_collidingGeometry->getScaling();
-	auto angleAxis = Rotd(quat);
+    auto scaling = m_collidingGeometry->getScaling();
+    auto angleAxis = Rotd(quat);
 
-	t.setIdentity();
-	t(0, 0) = scaling;
-	t(1, 1) = scaling;
-	t(2, 2) = scaling;
-	
-	Eigen::Affine3d rot =
-		Eigen::Affine3d(Eigen::AngleAxisd(angleAxis.angle() * 180 / M_PI, 
-		Eigen::Vector3d(angleAxis.axis()[0],angleAxis.axis()[1],angleAxis.axis()[2])));
-	Eigen::Affine3d trans(Eigen::Translation3d(Eigen::Vector3d(pos[0], pos[1], pos[2])));
-	
-	
-	t *= trans.matrix();
-	t *= rot.matrix();
-	
+    t.setIdentity();
+    t(0, 0) = scaling;
+    t(1, 1) = scaling;
+    t(2, 2) = scaling;
+
+    Eigen::Affine3d rot =
+            Eigen::Affine3d(
+                Eigen::AngleAxisd(
+                    angleAxis.angle() * 180 / M_PI,
+                    Eigen::Vector3d(angleAxis.axis()[0],angleAxis.axis()[1],angleAxis.axis()[2])
+                )
+            );
+    Eigen::Affine3d trans(Eigen::Translation3d(Eigen::Vector3d(pos[0], pos[1], pos[2])));
+
+    t *= trans.matrix();
+    t *= rot.matrix();
 }
 
 void
@@ -121,27 +123,27 @@ VirtualCouplingPBDObject::setForce(Vec3d force)
 void
 VirtualCouplingPBDObject::resetCollidingGeometry(){
 
-	if (m_collidingGeometry->isMesh()){
-		auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
-		collidingMesh->setVerticesPositions(collidingMesh->getInitialVerticesPositions());
-	}
-	else{
-		std::cout << "Not a mesh." << std::endl;
-	}
+    if (m_collidingGeometry->isMesh()){
+        auto collidingMesh = std::dynamic_pointer_cast<imstk::Mesh>(m_collidingGeometry);
+        collidingMesh->setVerticesPositions(collidingMesh->getInitialVerticesPositions());
+    }
+    else{
+        std::cout << "Not a mesh." << std::endl;
+    }
 }
 
 std::shared_ptr<GeometryMap> VirtualCouplingPBDObject::getColldingToPhysicsMap() const{
-	return m_collidingToPhysicsGeomMap;
+    return m_collidingToPhysicsGeomMap;
 }
 
 void VirtualCouplingPBDObject::setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map){
-	m_collidingToPhysicsGeomMap = map;
+    m_collidingToPhysicsGeomMap = map;
 }
 
 void VirtualCouplingPBDObject::applyCollidingToPhysics(){
-	if (m_collidingToPhysicsGeomMap && m_physicsGeometry)
-	{
-		m_collidingToPhysicsGeomMap->apply();
-	}
+    if (m_collidingToPhysicsGeomMap && m_physicsGeometry)
+    {
+        m_collidingToPhysicsGeomMap->apply();
+    }
 }
 } // imstk

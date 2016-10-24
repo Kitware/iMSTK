@@ -165,10 +165,10 @@ public:
     ///
     void updatePhysicsGeometry();
 
-	///
-	/// \brief
-	///
-	void updatePbdStateFromPhysicsGeometry();
+    ///
+    /// \brief
+    ///
+    void updatePbdStateFromPhysicsGeometry();
 
     ///
     /// \brief

@@ -16,7 +16,6 @@ EdgeEdgeConstraint::initConstraint( PositionBasedModel* model1, const unsigned i
     m_bodiesFirst[1] = pIdx2;
     m_bodiesSecond[0] = pIdx3;
     m_bodiesSecond[1] = pIdx4;
-
 }
 
 bool
@@ -117,8 +116,8 @@ EdgeEdgeConstraint::solvePositionConstraint()
 
 void
 PointTriangleConstraint::initConstraint(PositionBasedModel* model1, const unsigned int &pIdx1,
-                                             PositionBasedModel* model2, const unsigned int &pIdx2,
-                                             const unsigned int &pIdx3, const unsigned int &pIdx4)
+                                        PositionBasedModel* model2, const unsigned int &pIdx2,
+                                        const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
     m_model1 = model1;
     m_model2 = model2;

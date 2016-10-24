@@ -22,7 +22,7 @@
 #ifndef imstkVirtualCouplingPBDObject_h
 #define imstkVirtualCouplingPBDObject_h
 
-#include "imstkVirtualCouplingObject.h"
+#include "imstkTrackingController.h"
 #include "imstkPbdRigidObject.h"
 namespace imstk
 {
@@ -41,69 +41,68 @@ public:
     ///
     /// \brief Constructor
     ///
-	VirtualCouplingPBDObject(std::string name,
-		std::shared_ptr<DeviceClient> deviceClient = nullptr,
-		double scaling = 1.0) :
-		TrackingController(deviceClient, scaling), PbdRigidObject(name)
-	{
-		m_type = Type::VirtualCoupling;
-	}
+    VirtualCouplingPBDObject(std::string name,
+                             std::shared_ptr<DeviceClient> deviceClient) :
+        TrackingController(deviceClient),
+        PbdRigidObject(name)
+    {
+    }
 
     ///
     /// \brief Destructor
     ///
     ~VirtualCouplingPBDObject() = default;
 
-	///
-	/// \brief Initialize offset based on object geometry
-	///
-	void initOffsets();
+    ///
+    /// \brief Initialize offset based on object geometry
+    ///
+    void initOffsets();
 
-	///
-	/// \brief Update geometries transformations
-	///
-	void updateFromDevice();
+    ///
+    /// \brief Update geometries transformations
+    ///
+    void updateFromDevice();
 
-	///
-	/// \brief Apply forces to the haptic device
-	///
-	void applyForces();
+    ///
+    /// \brief Apply forces to the haptic device
+    ///
+    void applyForces();
 
-	///
-	/// \brief Get the force to apply to the device
-	///
-	const Vec3d& getForce() const;
+    ///
+    /// \brief Get the force to apply to the device
+    ///
+    const Vec3d& getForce() const;
 
-	///
-	/// \brief Set the force to apply to the device
-	///
-	void setForce(Vec3d force);
+    ///
+    /// \brief Set the force to apply to the device
+    ///
+    void setForce(Vec3d force);
 
-	///
-	/// \brief Reset CollidingGeometry
-	///
-	void resetCollidingGeometry();
+    ///
+    /// \brief Reset CollidingGeometry
+    ///
+    void resetCollidingGeometry();
 
-	///
-	/// \brief compute (offsetted)transform matrix
-	///
-	void computeTransform(Vec3d& p, Quatd& r, Eigen::Matrix4d& t);
+    ///
+    /// \brief compute (offsetted)transform matrix
+    ///
+    void computeTransform(Vec3d& p, Quatd& r, Eigen::Matrix4d& t);
 
-	///
-	/// \brief Set/Get the Colliding-to-Physics map
-	///
-	std::shared_ptr<GeometryMap> getColldingToPhysicsMap() const;
-	void setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map);
+    ///
+    /// \brief Set/Get the Colliding-to-Physics map
+    ///
+    std::shared_ptr<GeometryMap> getColldingToPhysicsMap() const;
+    void setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map);
 
-	void applyCollidingToPhysics();
+    void applyCollidingToPhysics();
 
 protected:
 
-	bool m_forceModified;
-	Vec3d m_force = Vec3d::Zero();
-	Eigen::Matrix4d transform = Eigen::Matrix4d();
-	//Maps
-	std::shared_ptr<GeometryMap> m_collidingToPhysicsGeomMap;   ///> Maps from collision to physics geometry
+    bool m_forceModified;
+    Vec3d m_force = Vec3d::Zero();
+    Eigen::Matrix4d transform = Eigen::Matrix4d();
+    //Maps
+    std::shared_ptr<GeometryMap> m_collidingToPhysicsGeomMap;   ///> Maps from collision to physics geometry
 };
 
 

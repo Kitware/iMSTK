@@ -103,18 +103,21 @@ Camera::setViewAngle(const double& angle)
 std::shared_ptr<CameraController>
 Camera::getController() const
 {
-    return m_cameraController;
+    return m_controller;
 }
 
-void
-Camera::setupController(std::shared_ptr<DeviceClient> deviceClient, double scaling)
+std::shared_ptr<CameraController>
+Camera::setupController(std::shared_ptr<DeviceClient> deviceClient)
 {
-    if(m_cameraController == nullptr)
+    if(m_controller == nullptr)
     {
-        m_cameraController = std::make_shared<CameraController>("Camera controller", *this);
+        m_controller = std::make_shared<CameraController>(*this, deviceClient);
     }
-    m_cameraController->setDeviceClient(deviceClient);
-    m_cameraController->setTranslationScaling(scaling);
+    else
+    {
+        m_controller->setDeviceClient(deviceClient);
+    }
+    return m_controller;
 }
 
 } // imstk
