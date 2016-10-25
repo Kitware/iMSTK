@@ -1,6 +1,12 @@
 #include "imstkPbdModel.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
+#include "imstkPbdVolumeConstraint.h"
+#include "imstkPbdDistanceConstraint.h"
+#include "imstkPbdDihedralConstraint.h"
+#include "imstkPbdAreaConstraint.h"
+#include "imstkPbdFETetConstraint.h"
+#include "imstkPbdFEHexConstraint.h"
 
 #include <g3log/g3log.hpp>
 

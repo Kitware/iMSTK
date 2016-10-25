@@ -104,7 +104,7 @@ int main()
 
     //testMultiTextures();
     //testMeshCCD();
-    testPenaltyRigidCollision();
+    //testPenaltyRigidCollision();
     //testTwoFalcons();
     //testObjectController();
     //testCameraController();
@@ -123,7 +123,7 @@ int main()
     //testTwoOmnis();
     //testVectorPlotters();
     //testPbdVolume();
-    //testPbdCloth();
+    testPbdCloth();
 
 //  int n;
 //  std::cout << "testPbdCollision(): 1" << std::endl;
@@ -1266,7 +1266,7 @@ void testPbdCloth()
         /*Constraint configuration*/"Dihedral 0.001",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
-        /*TimeStep*/0.001,
+        /*TimeStep*/0.01,
         /*FixedPoint*/"1 20",
         /*NumberOfIterationInConstraintSolver*/5
         );
@@ -1321,7 +1321,7 @@ void testPbdCollision()
     deformableObj->setCollidingGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
-    deformableObj->setPhysicsToVisualMap(deformMapP2V); 
+    deformableObj->setPhysicsToVisualMap(deformMapP2V);
     deformableObj->setCollidingToVisualMap(deformMapC2V);
     deformableObj->init(/*Number of Constraints*/1,
         /*Constraint configuration*/"FEM NeoHookean 1.0 0.3",
@@ -1446,7 +1446,7 @@ void testPbdCollision()
 
         volTetMesh1->extractSurfaceMesh(surfMesh1);
         volTetMesh1->extractSurfaceMesh(surfMeshVisual1);
-        
+
 
         auto deformMapP2V1 = std::make_shared<imstk::OneToOneMap>();
         deformMapP2V1->setMaster(volTetMesh1);
@@ -1468,7 +1468,7 @@ void testPbdCollision()
         deformableObj1->setCollidingGeometry(surfMesh1);
         deformableObj1->setPhysicsGeometry(volTetMesh1);
         deformableObj1->setPhysicsToCollidingMap(deformMapP2C1);
-        deformableObj1->setPhysicsToVisualMap(deformMapP2V1); 
+        deformableObj1->setPhysicsToVisualMap(deformMapP2V1);
         deformableObj1->setCollidingToVisualMap(deformMapC2V1);
         deformableObj1->init(/*Number of Constraints*/1,
             /*Constraint configuration*/"FEM NeoHookean 10.0 0.5",
@@ -1491,7 +1491,7 @@ void testPbdCollision()
     }
     else{
         // floor
-        
+
         std::vector<imstk::Vec3d> vertList;
         double width = 100.0;
         double height = 100.0;
@@ -1717,7 +1717,7 @@ void testLineMesh()
         scene->addSceneObject(blade);
     }
 
-    
+
 
     if (clothTest){
 

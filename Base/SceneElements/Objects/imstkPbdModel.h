@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 
 #include "imstkPbdConstraint.h"
+#include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
 
 namespace imstk

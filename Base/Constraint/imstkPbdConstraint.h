@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTKPBDCONSTRAINT_H
-#define IMSTKPBDCONSTRAINT_H
+#ifndef IMSTK_PBD_CONSTRAINT_H
+#define IMSTK_PBD_CONSTRAINT_H
 
 #include "imstkMath.h"
 
@@ -32,11 +32,14 @@ namespace imstk
 class PositionBasedModel;
 
 ///
-/// \brief Based Constraint class for Position based dynamics
+/// \brief Base Constraint class for Position based dynamics constraints
 ///
 class PbdConstraint
 {
 public:
+    ///
+    /// \brief Type of the PBD constraint
+    ///
     enum class Type
     {
         Distance,
@@ -95,268 +98,6 @@ public:
     std::vector<unsigned int> m_bodies; // index of points for the constraint
 };
 
-///
-/// \class DistanceConstraint
-///
-/// \brief
-///
-class DistanceConstraint : public PbdConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    DistanceConstraint() : PbdConstraint(2) {}
-
-    ///
-    /// \brief
-    ///
-    Type getType() const { return Type::Distance; }
-
-    ///
-    /// \brief
-    ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const double k = 1e-1);
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-
-public:
-    double m_restLength;
-    double m_stiffness;
-};
-
-///
-/// \class DihedralConstraint
-///
-/// \brief
-///
-class DihedralConstraint : public PbdConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    DihedralConstraint() : PbdConstraint(4) {}
-    ///
-    /// \brief
-    ///
-    Type getType() const { return Type::Dihedral; }
-
-    ///
-    /// \brief initConstraint
-    ///        p3
-    ///       / | \
-    ///      /  |  \
-    ///     p0  |  p1
-    ///      \  |  /
-    ///       \ | /
-    ///         p2
-    /// \param model
-    /// \param pIdx1 index of p0
-    /// \param pIdx2 index of p1
-    /// \param pIdx3 index of p2
-    /// \param pIdx4 index of p3
-    /// \param k stiffness
-    ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-                        const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 1e-3 );
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-
-public:
-    double m_restAngle;
-    double m_stiffness;
-};
-
-///
-/// \class AreaConstraint
-///
-/// \brief
-///
-class AreaConstraint : public PbdConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    AreaConstraint() : PbdConstraint(3)
-    {}
-
-    ///
-    /// \brief
-    ///
-    Type getType() const
-    {
-        return Type::Area;
-    }
-
-    ///
-    /// \brief
-    ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-
-public:
-    double m_restArea;
-    double m_stiffness;
-};
-
-///
-/// \class VolumeConstraint
-///
-/// \brief
-///
-class VolumeConstraint : public PbdConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    VolumeConstraint() : PbdConstraint(4)
-    {}
-
-    ///
-    /// \brief
-    ///
-    Type getType() const
-    {
-        return Type::Volume;
-    }
-
-    ///
-    /// \brief
-    ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-                        const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 2.0 );
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-
-public:
-    double m_restVolume;
-    double m_stiffness;
-};
-
-///
-/// \class FEMConstraint
-///
-/// \brief The FEMConstraint class for constraint as the elastic energy
-/// computed by linear shape functions with tetrahedral mesh.
-/// We provide several model for elastic energy including:
-/// Linear, Corrotation, St Venant-Kirchhof and NeoHookean
-///
-class FEMConstraint : public PbdConstraint
-{
-public:
-    enum class MaterialType
-    {
-        Linear,
-        Corotation,
-        StVK,
-        NeoHookean
-    } m_material;
-
-    ///
-    /// \brief
-    ///
-    explicit FEMConstraint(const unsigned int nP, MaterialType mtype = MaterialType::StVK) :
-        PbdConstraint(nP) , m_material(mtype)
-    {}
-
-public:
-    double m_Volume;
-    Eigen::Matrix3d m_invRestMat;
-};
-
-///
-/// \class FEMTetConstraint
-///
-/// \brief The FEMTetConstraint class class for constraint as the elastic energy
-/// computed by linear shape functions with tetrahedral mesh.
-///
-class FEMTetConstraint : public  FEMConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    explicit FEMTetConstraint( MaterialType mtype = MaterialType::StVK) :
-        FEMConstraint(4, mtype)
-    {}
-
-    ///
-    /// \brief
-    ///
-    Type getType() const
-    {
-        return Type::FEMTet;
-    }
-
-    ///
-    /// \brief
-    ///
-    bool initConstraint(PositionBasedModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-                        const unsigned int& pIdx3, const unsigned int& pIdx4);
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-};
-
-///
-/// \class FEMHexConstraint
-///
-/// \brief The FEMHexConstraint class class for constraint as the elastic energy
-/// computed by linear shape functions with hexahedral mesh.
-///
-class FEMHexConstraint : public  FEMConstraint
-{
-public:
-    ///
-    /// \brief
-    ///
-    explicit FEMHexConstraint( MaterialType mtype = MaterialType::StVK) :
-        FEMConstraint(8, mtype)
-    {}
-
-    ///
-    /// \brief
-    ///
-    Type getType() const
-    {
-        return Type::FEMHex;
-    }
-
-    ///
-    /// \brief
-    ///
-    bool initConstraint(PositionBasedModel& model, const unsigned int& pIdx1,
-                        const unsigned int& pIdx2, const unsigned int& pIdx3,
-                        const unsigned int& pIdx4, const unsigned int& pIdx5,
-                        const unsigned int& pIdx6, const unsigned int& pIdx7,
-                        const unsigned int& pIdx8);
-
-    ///
-    /// \brief
-    ///
-    bool solvePositionConstraint(PositionBasedModel &model);
-};
-
 }
 
-#endif // IMSTKPBDCONSTRAINT_H
+#endif // IMSTK_PBD_CONSTRAINT_H
