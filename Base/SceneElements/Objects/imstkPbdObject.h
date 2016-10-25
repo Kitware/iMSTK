@@ -15,7 +15,8 @@ class GeometryMap;
 ///
 /// \class PbdObject
 ///
-/// \brief Base class for scene objects that move and/or deform
+/// \brief Base class for scene objects that move and/or deform under position
+/// based dynamics formulation
 ///
 class PbdObject : public CollidingObject
 {

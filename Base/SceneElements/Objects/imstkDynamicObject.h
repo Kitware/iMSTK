@@ -23,6 +23,7 @@
 #define imstkDynamicObject_h
 
 #include "imstkSceneObject.h"
+#include "imstkCollidingObject.h"
 #include "imstkDynamicalModel.h"
 
 namespace imstk
@@ -36,7 +37,7 @@ class GeometryMap;
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-class DynamicObject : public SceneObject
+class DynamicObject : public CollidingObject
 {
 public:
 
@@ -84,7 +85,7 @@ protected:
     ///
     /// \brief Constructor
     ///
-    DynamicObject(std::string name) : SceneObject(name){}
+    DynamicObject(std::string name) : CollidingObject(name){}
 
     std::shared_ptr<DynamicalModel> m_dynamicalModel;           ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics

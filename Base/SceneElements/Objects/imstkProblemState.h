@@ -41,72 +41,44 @@ public:
     ///
     /// \brief Constructor
     ///
-    ProblemState(){};
+    ProblemState() = default;
     ProblemState(const size_t size){ initialize(size); };
     //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
-    ~ProblemState(){}
+    ~ProblemState() = default;
 
     ///
     /// \brief Initialize the problem state
     ///
-    void initialize(const size_t numDof)
-    {
-        m_q.resize(numDof);
-        m_qDot.resize(numDof);
-        m_qDotDot.resize(numDof);
-
-        m_q.setZero();
-        m_qDot.setZero();
-        m_qDotDot.setZero();
-    };
+    void initialize(const size_t numDof);
 
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(const Vectord& u, const Vectord& v, const Vectord& a)
-    {
-        m_q = u;
-        m_qDot = v;
-        m_qDotDot = a;
-    }
+    void setState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
-    /// \brief
+    /// \brief Set the current state
     ///
-    void setU(const Vectord& u)
-    {
-        m_q = u;
-    }
+    void setU(const Vectord& u);
 
     ///
-    /// \brief
+    /// \brief Set the time derivative of state
     ///
-    void setV(const Vectord& v)
-    {
-        m_qDot = v;
-    }
+    void setV(const Vectord& v);
 
     ///
-    /// \brief
+    /// \brief Set double time derivative of the state
     ///
-    void setA(const Vectord& a)
-    {
-        m_qDotDot = a;
-    }
+    void setA(const Vectord& a);
 
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<ProblemState> rhs)
-    {
-        m_q = rhs->getQ();
-        m_qDot = rhs->getQDot();
-        m_qDotDot = rhs->getQDotDot();
-    }
+    void setState(std::shared_ptr<ProblemState> rhs);
 
     ///
     /// \brief Get the state
