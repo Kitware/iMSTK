@@ -29,7 +29,7 @@
 #include "imstkLight.h"
 #include "imstkCamera.h"
 #include "imstkCollisionGraph.h"
-#include "imstkNonLinearSolver.h"
+#include "imstkSolverBase.h"
 
 namespace imstk
 {
@@ -117,12 +117,12 @@ public:
     ///
     /// \brief Get the vector of non-linear solvers
     ///
-    const std::vector<std::shared_ptr<NonLinearSolver>> getNonlinearSolvers();
+    const std::vector<std::shared_ptr<SolverBase>> getSolvers();
 
     ///
     /// \brief Add nonlinear solver to the scene
     ///
-    void addNonlinearSolver(std::shared_ptr<NonLinearSolver> solver);
+    void addNonlinearSolver(std::shared_ptr<SolverBase> solver);
 
 protected:
 
@@ -131,7 +131,7 @@ protected:
     NamedMap<Light> m_lightsMap;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
-    std::vector<std::shared_ptr<NonLinearSolver>> m_nonLinearSolvers; ///> List of non-linear solvers
+    std::vector<std::shared_ptr<SolverBase>> m_solvers; ///> List of non-linear solvers
 };
 
 } // imstk

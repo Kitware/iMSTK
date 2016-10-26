@@ -40,11 +40,13 @@ PbdState::initialize(const std::shared_ptr<Mesh>& m)
 void
 PbdState::setUniformMass(const double& val)
 {
-    if (val != 0.0) {
+    if (val != 0.0)
+    {
         std::fill(m_mass.begin(), m_mass.end(), val);
         std::fill(m_invMass.begin(), m_invMass.end(), 1 / val);
     }
-    else {
+    else
+    {
         std::fill(m_invMass.begin(), m_invMass.end(), 0.0);
         std::fill(m_mass.begin(), m_mass.end(), 0.0);
     }
@@ -53,7 +55,8 @@ PbdState::setUniformMass(const double& val)
 void
 PbdState::setParticleMass(const double& val, const unsigned int& idx)
 {
-    if (idx < m_pos.size()) {
+    if (idx < m_pos.size())
+    {
         m_mass[idx] = val;
         m_invMass[idx] = 1 / val;
     }
@@ -63,7 +66,9 @@ void
 PbdState::setFixedPoint(const unsigned int& idx)
 {
     if (idx < m_pos.size())
+    {
         m_invMass[idx] = 0;
+    }
 }
 
 double

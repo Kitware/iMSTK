@@ -38,7 +38,7 @@ NewtonMethod::NewtonMethod():
 
 
 void
-NewtonMethod::solve(Vectord& x)
+NewtonMethod::solveGivenState(Vectord& x)
 {
     if(!this->m_nonLinearSystem)
     {
@@ -83,8 +83,10 @@ NewtonMethod::solve(Vectord& x)
 }
 
 void
-NewtonMethod::solveSimple()
+NewtonMethod::solve()
 {
+    NonLinearSolver::solve();
+
     if (!this->m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";

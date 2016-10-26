@@ -27,6 +27,7 @@
 // imstk includes
 #include "imstkNonlinearSystem.h"
 #include "imstkMath.h"
+#include "imstkSolverBase.h"
 
 namespace imstk
 {
@@ -34,11 +35,11 @@ namespace imstk
 ///
 /// \brief Base class for non-linear solvers
 ///
-class NonLinearSolver
+class NonLinearSolver : public SolverBase
 {
 public:
-    using JacobianType = std::function<const SparseMatrixd&(const Vectord&)>;
-    using UpdateIterateType = std::function<void(const Vectord&,Vectord&)>;
+    using JacobianType = std::function < const SparseMatrixd&(const Vectord&) > ;
+    using UpdateIterateType = std::function < void(const Vectord&, Vectord&) > ;
     using FunctionType = NonLinearSystem::VectorFunctionType;
 
 public:
@@ -51,8 +52,11 @@ public:
     ///
     /// \brief Main solve routine.
     ///
-    virtual void solve(Vectord& x) = 0;
-    virtual void solveSimple() = 0;
+    virtual void solveGivenState(Vectord& x) = 0;
+    virtual void solve()
+    {
+        SolverBase::solve();
+    };
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition

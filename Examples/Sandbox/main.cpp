@@ -23,6 +23,7 @@
 #include "imstkNonlinearSystem.h"
 #include "imstkNewtonMethod.h"
 #include "imstkConjugateGradient.h"
+#include "imstkPbdSolver.h"
 
 // Geometry
 #include "imstkPlane.h"
@@ -66,8 +67,6 @@
 #include <vtkSmartPointer.h>
 #include <string>
 #include <vtkJPEGReader.h>
-
-
 
 using namespace imstk;
 
@@ -1270,6 +1269,10 @@ void testPbdCloth()
         /*FixedPoint*/"1 20",
         /*NumberOfIterationInConstraintSolver*/5
         );
+
+    auto pbdSolver = std::make_shared<PbdSolver>();
+    pbdSolver->setPbdObject(deformableObj);
+    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
     sdk->setCurrentScene("PositionBasedDynamicsTest");

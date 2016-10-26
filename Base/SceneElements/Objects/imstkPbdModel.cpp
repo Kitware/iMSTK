@@ -352,9 +352,9 @@ PositionBasedDynamicsModel::constraintProjection()
     int i = 0;
     while (++i < maxIter)
     {
-        for (int k = 0; k < m_constraints.size(); ++k)
+        for (auto c: m_constraints)
         {
-            m_constraints[k]->solvePositionConstraint(*this);
+            c->solvePositionConstraint(*this);
         }
     }
 }

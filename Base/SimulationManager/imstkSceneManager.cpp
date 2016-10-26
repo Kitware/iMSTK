@@ -95,11 +95,10 @@ SceneManager::runModule()
 
     // Update collision handlers
 
-    // Update the nonlinear solvers
-    for (auto nlSolvers : m_scene->getNonlinearSolvers())
+    // Update the solvers
+    for (auto solvers : m_scene->getSolvers())
     {
-        nlSolvers->solveSimple();
-        std::cout << "stepped" << std::endl;
+        solvers->solve();
     }
 
     // Apply the geometry maps
@@ -108,17 +107,29 @@ SceneManager::runModule()
         if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
         {
             dynaObj->getDynamicalModel()->updatePhysicsGeometry();
-            //dynaObj->getPhysicsToCollidingMap()->apply();
-            dynaObj->getPhysicsToVisualMap()->apply();
+
+            auto mapPC = dynaObj->getPhysicsToCollidingMap();
+            if (mapPC)
+            {
+                mapPC->apply();
+            }
+
+            auto mapPV = dynaObj->getPhysicsToVisualMap();
+            if (mapPV)
+            {
+                mapPV->apply();
+            }
         }
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj)){
+
+        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+        {
             // Skip VirtualCouplingPBDObject from internal constraint projection
             continue;
         }
         else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
         {
-            pbdObj->integratePosition();
-            pbdObj->constraintProjection();
+            //pbdObj->integratePosition();
+            //pbdObj->constraintProjection();
             pbdObj->updateGeometry();
             pbdObj->applyPhysicsToColliding();
         }
