@@ -48,13 +48,13 @@ public:
     ///
     /// \brief Initializes the distance constraint
     ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1,
+    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
         const unsigned int& pIdx2, const double k = 1e-1);
 
     ///
     /// \brief Solves the Distance constraint
     ///
-    bool solvePositionConstraint(PositionBasedModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 
 public:
     double m_restLength; ///> Rest length between the nodes

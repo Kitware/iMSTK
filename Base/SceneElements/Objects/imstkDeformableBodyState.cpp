@@ -19,13 +19,13 @@ limitations under the License.
 
 =========================================================================*/
 
-#include "imstkProblemState.h"
+#include "imstkDeformableBodyState.h"
 
 namespace imstk
 {
 
 void
-ProblemState::initialize(const size_t numDof)
+DeformableBodyState::initialize(const size_t numDof)
 {
     m_q.resize(numDof);
     m_qDot.resize(numDof);
@@ -37,7 +37,7 @@ ProblemState::initialize(const size_t numDof)
 };
 
 void
-ProblemState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
+DeformableBodyState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
 {
     m_q = u;
     m_qDot = v;
@@ -45,25 +45,25 @@ ProblemState::setState(const Vectord& u, const Vectord& v, const Vectord& a)
 }
 
 void
-ProblemState::setU(const Vectord& u)
+DeformableBodyState::setU(const Vectord& u)
 {
     m_q = u;
 }
 
 void
-ProblemState::setV(const Vectord& v)
+DeformableBodyState::setV(const Vectord& v)
 {
     m_qDot = v;
 }
 
 void
-ProblemState::setA(const Vectord& a)
+DeformableBodyState::setA(const Vectord& a)
 {
     m_qDotDot = a;
 }
 
 void
-ProblemState::setState(std::shared_ptr<ProblemState> rhs)
+DeformableBodyState::setState(std::shared_ptr<DeformableBodyState> rhs)
 {
     m_q = rhs->getQ();
     m_qDot = rhs->getQDot();

@@ -51,13 +51,13 @@ public:
     ///
     /// \brief Initializes the volume constraint
     ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
+    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
         const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 2.0);
 
     ///
     /// \brief Solves the volume constraint
     ///
-    bool solvePositionConstraint(PositionBasedModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 
 public:
     double m_restVolume; ///> Rest volume

@@ -1,120 +1,78 @@
-#ifndef IMSTKPBDSTATE_H
-#define IMSTKPBDSTATE_H
-
-#include "imstkMesh.h"
+#ifndef IMSTK_PBD_STATE_H
+#define IMSTK_PBD_STATE_H
 
 #include <Eigen/Dense>
 #include <vector>
 
+#include "imstkProblemState.h"
+#include "imstkMesh.h"
+#include "imstkMath.h"
+
 namespace imstk
 {
-
-using Vec3d = Eigen::Vector3d;
 
 ///
 /// \class PbdState
 ///
-/// \brief
+/// \brief State of the body governed by PBD mathematical model
 ///
-class PbdState
+class PbdState : public ProblemState
 {
 public:
     ///
-    /// \brief
+    /// \brief Default constructor
     ///
     PbdState() = default;
 
     ///
     /// \brief
     ///
-    void initialize(Mesh* m)
-    {
-        m_pos = m->getVerticesPositions(); // share the same data with Mesh
-        const int nP =  m->getNumVertices();
-        m_initPos.assign(m_pos.begin(), m_pos.end());
-        m_vel.resize(nP, Vec3d(0,0,0));
-        m_acc.resize(nP, Vec3d(0,0,0));
-        m_oldPos.resize(nP, Vec3d(0,0,0));
-        m_invMass.resize(nP, 0);
-        m_mass.resize(nP, 0);
-    }
+    void initialize(const std::shared_ptr<Mesh>& m);
 
     ///
     /// \brief
     ///
-    inline void setUniformMass(const double& val)
-    {
-        if (val != 0.0) {
-            std::fill(m_mass.begin(), m_mass.end(), val);
-            std::fill(m_invMass.begin(), m_invMass.end(), 1/val);
-        }
-        else {
-            std::fill(m_invMass.begin(), m_invMass.end(), 0.0);
-            std::fill(m_mass.begin(), m_mass.end(), 0.0);
-        }
-    }
+    void setUniformMass(const double& val);
 
     ///
     /// \brief
     ///
-    inline void setParticleMass(const double& val, const unsigned int& idx)
-    {
-        if ( idx < m_pos.size()) {
-            m_mass[idx] = val;
-            m_invMass[idx] = 1/val;
-        }
-    }
+    void setParticleMass(const double& val, const unsigned int& idx);
 
     ///
     /// \brief
     ///
-    inline void setFixedPoint(const unsigned int& idx)
-    {
-        if ( idx < m_pos.size())
-            m_invMass[idx] = 0;
-    }
+    void setFixedPoint(const unsigned int& idx);
 
     ///
     /// \brief
     ///
-    inline double getInvMass(const unsigned int& idx)
-    {
-        return m_invMass[idx];
-    }
+    double getInvMass(const unsigned int& idx);
 
     ///
     /// \brief
     ///
-    inline Vec3d& getInitialVertexPosition(const unsigned int& idx)
-    {
-        return m_initPos.at(idx);
-    }
+    Vec3d& getInitialVertexPosition(const unsigned int& idx);
 
     ///
     /// \brief
     ///
-    inline void setVertexPosition(const unsigned int& idx, Vec3d& pos)
-    {
-        m_pos.at(idx) = pos;
-    }
+    void setVertexPosition(const unsigned int& idx, Vec3d& pos);
 
     ///
     /// \brief
     ///
-    inline Vec3d& getVertexPosition(const unsigned int& idx)
-    {
-        return m_pos.at(idx);
-    }
+    Vec3d& getVertexPosition(const unsigned int& idx);
 
     ///
     /// \brief
     ///
-    inline void setTimeStep(const double& timeStep) { dt = timeStep; }
+    void setTimeStep(const double& timeStep) { dt = timeStep; };
 
     ///
     /// \brief
     ///
-    inline void setGravity(const Vec3d& g) { gravity = g; }
+    void setGravity(const Vec3d& g) { gravity = g; };
 
     ///
     /// \brief
@@ -142,4 +100,4 @@ private:
 
 } // imstk
 
-#endif // IMSTKPBDSTATE_H
+#endif // IMSTK_PBD_STATE_H

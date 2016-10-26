@@ -90,8 +90,8 @@ public:
     ///
     /// \brief Set/Get dynamical model
     ///
-    std::shared_ptr<PositionBasedModel> getDynamicalModel() const;
-    void setDynamicalModel(std::shared_ptr<PositionBasedModel> dynaModel);
+    std::shared_ptr<PositionBasedDynamicsModel> getDynamicalModel() const;
+    void setDynamicalModel(std::shared_ptr<PositionBasedDynamicsModel> dynaModel);
 
     ///
     /// \brief Returns the number of degree of freedom
@@ -100,7 +100,7 @@ public:
 
 protected:
 
-    std::shared_ptr<PositionBasedModel> m_pbdModel;
+    std::shared_ptr<PositionBasedDynamicsModel> m_pbdModel;
     std::shared_ptr<Geometry> m_physicsGeometry;
 
     //Maps

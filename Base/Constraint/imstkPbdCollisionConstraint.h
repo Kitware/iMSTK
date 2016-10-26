@@ -6,7 +6,7 @@
 namespace imstk
 {
 
-class PositionBasedModel;
+class PositionBasedDynamicsModel;
 
 ///
 /// \class CollisionConstraint
@@ -42,8 +42,8 @@ public:
 public:
     std::vector<unsigned int> m_bodiesFirst;    ///> index of points for the first object
     std::vector<unsigned int> m_bodiesSecond;   ///> index of points for the second object
-    PositionBasedModel* m_model1;
-    PositionBasedModel* m_model2;
+    PositionBasedDynamicsModel* m_model1;
+    PositionBasedDynamicsModel* m_model2;
 };
 
 ///
@@ -69,8 +69,8 @@ public:
     /// \param pIdx4 second point of the edge from object2
     /// \return  true if succeeded
     ///
-    void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1, const unsigned int& pIdx2,
-                         PositionBasedModel* model2, const unsigned int& pIdx3, const unsigned int& pIdx4);
+    void initConstraint( PositionBasedDynamicsModel* model1, const unsigned int& pIdx1, const unsigned int& pIdx2,
+                         PositionBasedDynamicsModel* model2, const unsigned int& pIdx3, const unsigned int& pIdx4);
 
     ///
     /// \brief
@@ -101,8 +101,8 @@ public:
     /// \param pIdx4 third point of the triangle from object2
     /// \return
     ///
-    void initConstraint( PositionBasedModel* model1, const unsigned int& pIdx1,
-                         PositionBasedModel* model2, const unsigned int& pIdx2,  const unsigned int& pIdx3, const unsigned int& pIdx4);
+    void initConstraint( PositionBasedDynamicsModel* model1, const unsigned int& pIdx1,
+                         PositionBasedDynamicsModel* model2, const unsigned int& pIdx2,  const unsigned int& pIdx3, const unsigned int& pIdx4);
 
     ///
     /// \brief

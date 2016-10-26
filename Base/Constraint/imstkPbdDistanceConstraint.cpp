@@ -26,7 +26,7 @@ namespace  imstk
 {
 
 void
-DistanceConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+DistanceConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
                                    const unsigned int &pIdx2, const double k)
 {
     m_bodies[0] = pIdx1;
@@ -41,7 +41,7 @@ DistanceConstraint::initConstraint(PositionBasedModel &model, const unsigned int
 }
 
 bool
-DistanceConstraint::solvePositionConstraint(PositionBasedModel &model)
+DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];

@@ -26,7 +26,7 @@ namespace  imstk
 {
 
 bool
-FEMTetConstraint::initConstraint(PositionBasedModel &model,
+FEMTetConstraint::initConstraint(PositionBasedDynamicsModel &model,
                                  const unsigned int &pIdx1, const unsigned int &pIdx2,
                                  const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
@@ -60,7 +60,7 @@ FEMTetConstraint::initConstraint(PositionBasedModel &model,
 }
 
 bool
-FEMTetConstraint::solvePositionConstraint(PositionBasedModel &model)
+FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];

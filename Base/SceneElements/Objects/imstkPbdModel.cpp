@@ -1,3 +1,24 @@
+/*=========================================================================
+
+Library: iMSTK
+
+Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+& Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0.txt
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=========================================================================*/
+
 #include "imstkPbdModel.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkSurfaceMesh.h"
@@ -14,7 +35,7 @@ namespace imstk
 {
 
 bool
-PositionBasedModel::initFEMConstraints(FEMConstraint::MaterialType type)
+PositionBasedDynamicsModel::initializeFEMConstraints(FEMConstraint::MaterialType type)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
@@ -23,13 +44,14 @@ PositionBasedModel::initFEMConstraints(FEMConstraint::MaterialType type)
         return false;
     }
     // ok, now create constraints
-    auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
+    auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
 
     for (int k = 0; k < elements.size(); ++k)
     {
         TetrahedralMesh::TetraArray& tet = elements[k];
-        FEMTetConstraint* c = new FEMTetConstraint(type);
+
+        auto c = std::make_shared<FEMTetConstraint>(type);
         c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
         m_constraints.push_back(c);
     }
@@ -37,7 +59,7 @@ PositionBasedModel::initFEMConstraints(FEMConstraint::MaterialType type)
 }
 
 bool
-PositionBasedModel::initVolumeConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeVolumeConstraints(const double &stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
@@ -47,13 +69,14 @@ PositionBasedModel::initVolumeConstraints(const double &stiffness)
     }
 
     // ok, now create constraints
-    auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
+    auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
 
     for (int k = 0; k < elements.size(); ++k)
     {
         TetrahedralMesh::TetraArray& tet = elements[k];
-        VolumeConstraint* c = new VolumeConstraint;
+
+        auto c = std::make_shared<VolumeConstraint>();
         c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
         m_constraints.push_back(c);
     }
@@ -61,11 +84,11 @@ PositionBasedModel::initVolumeConstraints(const double &stiffness)
 }
 
 bool
-PositionBasedModel::initDistanceConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeDistanceConstraints(const double &stiffness)
 {
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
-        auto tetMesh = static_cast<TetrahedralMesh*>(m_mesh);
+        auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
         int nV = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
@@ -81,7 +104,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             // check if added or not
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -91,7 +114,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tet[2];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -101,7 +124,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tet[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -111,7 +134,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tet[3];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -121,7 +144,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tet[3];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -131,7 +154,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tet[3];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -140,7 +163,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
     }
     else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
-        auto triMesh = static_cast<SurfaceMesh*>(m_mesh);
+        auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
         int nV = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
@@ -155,7 +178,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tri[1];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -165,7 +188,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tri[2];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -175,7 +198,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
             i2 = tri[0];
             if (E[i1][i2] && E[i2][i1])
             {
-                DistanceConstraint* c = new DistanceConstraint;
+                auto c = std::make_shared<DistanceConstraint>();
                 c->initConstraint(*this, i1, i2, stiffness);
                 m_constraints.push_back(c);
                 E[i1][i2] = 0;
@@ -186,7 +209,7 @@ PositionBasedModel::initDistanceConstraints(const double &stiffness)
 }
 
 bool
-PositionBasedModel::initAreaConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeAreaConstraints(const double &stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
@@ -196,13 +219,14 @@ PositionBasedModel::initAreaConstraints(const double &stiffness)
     }
 
     // ok, now create constraints
-    auto triMesh = static_cast<SurfaceMesh*>(m_mesh);
+    auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
     std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
 
     for (int k = 0; k < elements.size(); ++k)
     {
         SurfaceMesh::TriangleArray& tri = elements[k];
-        AreaConstraint* c = new AreaConstraint;
+
+        auto c = std::make_shared<AreaConstraint>();
         c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
         m_constraints.push_back(c);
     }
@@ -210,7 +234,7 @@ PositionBasedModel::initAreaConstraints(const double &stiffness)
 }
 
 bool
-PositionBasedModel::initDihedralConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeDihedralConstraints(const double &stiffness)
 {
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
@@ -219,7 +243,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
     }
 
     // ok, now create constraints
-    auto triMesh = static_cast<SurfaceMesh*>(m_mesh);
+    auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
     std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
     // following algorithm is terrible, should use half-edge instead
     std::vector<std::vector<unsigned int>> onering(triMesh->getNumVertices());
@@ -244,7 +268,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
         std::sort(r3.begin(), r3.end());
         std::vector<unsigned int> rs;
         std::vector<unsigned int>::iterator it;
-        // check if proccessed or not
+        // check if processed or not
         if (E[tri[0]][tri[1]] && E[tri[1]][tri[0]])
         {
             rs.resize(2);
@@ -262,8 +286,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
                         break;
                     }
                 }
-
-                DihedralConstraint* c = new DihedralConstraint;
+                auto c = std::make_shared<DihedralConstraint>();
                 c->initConstraint(*this, tri[2], t[idx], tri[0], tri[1], stiffness);
                 m_constraints.push_back(c);
             }
@@ -288,7 +311,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
                     }
                 }
 
-                DihedralConstraint* c = new DihedralConstraint;
+                auto c = std::make_shared<DihedralConstraint>();
                 c->initConstraint(*this, tri[0], t[idx], tri[1], tri[2], stiffness);
                 m_constraints.push_back(c);
             }
@@ -313,7 +336,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
                     }
                 }
 
-                DihedralConstraint* c = new DihedralConstraint;
+                auto c = std::make_shared<DihedralConstraint>();
                 c->initConstraint(*this, tri[1], t[idx], tri[2], tri[0], stiffness);
                 m_constraints.push_back(c);
             }
@@ -324,7 +347,7 @@ PositionBasedModel::initDihedralConstraints(const double &stiffness)
 }
 
 void
-PositionBasedModel::constraintProjection()
+PositionBasedDynamicsModel::constraintProjection()
 {
     int i = 0;
     while (++i < maxIter)
@@ -337,7 +360,7 @@ PositionBasedModel::constraintProjection()
 }
 
 void
-PositionBasedModel::updatePhysicsGeometry()
+PositionBasedDynamicsModel::updatePhysicsGeometry()
 {
     for (int i = 0; i < m_mesh->getNumVertices(); ++i)
     {
@@ -346,7 +369,7 @@ PositionBasedModel::updatePhysicsGeometry()
 }
 
 void
-PositionBasedModel::updatePbdStateFromPhysicsGeometry()
+PositionBasedDynamicsModel::updatePbdStateFromPhysicsGeometry()
 {
     Vec3d pos;
     for (int i = 0; i < m_mesh->getNumVertices(); ++i)

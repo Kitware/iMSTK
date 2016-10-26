@@ -26,7 +26,7 @@ namespace  imstk
 {
 
 void
-VolumeConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
                                  const unsigned int &pIdx2, const unsigned int &pIdx3,
                                  const unsigned int &pIdx4, const double k)
 {
@@ -48,7 +48,7 @@ VolumeConstraint::initConstraint(PositionBasedModel &model, const unsigned int &
 }
 
 bool
-VolumeConstraint::solvePositionConstraint(PositionBasedModel &model)
+VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];

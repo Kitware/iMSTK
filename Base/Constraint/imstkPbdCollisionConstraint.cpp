@@ -6,8 +6,8 @@ namespace imstk
 {
 
 void
-EdgeEdgeConstraint::initConstraint( PositionBasedModel* model1, const unsigned int &pIdx1,
-                                    const unsigned int &pIdx2, PositionBasedModel* model2,
+EdgeEdgeConstraint::initConstraint( PositionBasedDynamicsModel* model1, const unsigned int &pIdx1,
+                                    const unsigned int &pIdx2, PositionBasedDynamicsModel* model2,
                                     const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
     m_model1 = model1;
@@ -115,8 +115,8 @@ EdgeEdgeConstraint::solvePositionConstraint()
 }
 
 void
-PointTriangleConstraint::initConstraint(PositionBasedModel* model1, const unsigned int &pIdx1,
-                                        PositionBasedModel* model2, const unsigned int &pIdx2,
+PointTriangleConstraint::initConstraint(PositionBasedDynamicsModel* model1, const unsigned int &pIdx1,
+                                        PositionBasedDynamicsModel* model2, const unsigned int &pIdx2,
                                         const unsigned int &pIdx3, const unsigned int &pIdx4)
 {
     m_model1 = model1;

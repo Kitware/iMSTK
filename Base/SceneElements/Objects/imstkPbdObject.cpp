@@ -17,9 +17,9 @@ void
 PbdObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_physicsGeometry = geometry;
-    m_pbdModel = std::make_shared<PositionBasedModel>();
+    m_pbdModel = std::make_shared<PositionBasedDynamicsModel>();
     auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
-    m_pbdModel->setModelGeometry(mesh.get());
+    m_pbdModel->setModelGeometry(mesh);
 }
 
 std::shared_ptr<GeometryMap>
@@ -46,14 +46,14 @@ PbdObject::setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map)
     m_physicsToVisualGeomMap = map;
 }
 
-std::shared_ptr<PositionBasedModel>
+std::shared_ptr<PositionBasedDynamicsModel>
 PbdObject::getDynamicalModel() const
 {
     return m_pbdModel;
 }
 
 void
-PbdObject::setDynamicalModel(std::shared_ptr<PositionBasedModel> dynaModel)
+PbdObject::setDynamicalModel(std::shared_ptr<PositionBasedDynamicsModel> dynaModel)
 {
     m_pbdModel = dynaModel;
 }
@@ -92,21 +92,21 @@ PbdObject::init(int nCons, ...)
             if (strncmp("Corotation",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating Corotation constraints";
-                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::Corotation);
+                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::Corotation);
             }
             else if (strncmp("NeoHookean",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating Neohookean constraints";
-                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::NeoHookean);
+                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::NeoHookean);
             }
             else if (strncmp("Stvk",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
-                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
+                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::StVK);
             }
             else
             { // default
-                m_pbdModel->initFEMConstraints(FEMConstraint::MaterialType::StVK);
+                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::StVK);
             }
 
             float YoungModulus, PoissonRatio;
@@ -118,28 +118,28 @@ PbdObject::init(int nCons, ...)
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Volume constraints " << stiffness ;
-            m_pbdModel->initVolumeConstraints(stiffness);
+            m_pbdModel->initializeVolumeConstraints(stiffness);
         }
         else if (strncmp("Distance",&s[0],len)==0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Distance constraints " << stiffness;
-            m_pbdModel->initDistanceConstraints(stiffness);
+            m_pbdModel->initializeDistanceConstraints(stiffness);
         }
         else if (strncmp("Area",&s[0],len)==0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Area constraints " << stiffness;
-            m_pbdModel->initAreaConstraints(stiffness);
+            m_pbdModel->initializeAreaConstraints(stiffness);
         }
         else if (strncmp("Dihedral",&s[0],len)==0)
         {
             float stiffness;
             sscanf(&s[len+1], "%f", &stiffness);
             LOG(INFO) << "Creating Dihedral constraints " << stiffness;
-            m_pbdModel->initDihedralConstraints(stiffness);
+            m_pbdModel->initializeDihedralConstraints(stiffness);
         }
         else
         {

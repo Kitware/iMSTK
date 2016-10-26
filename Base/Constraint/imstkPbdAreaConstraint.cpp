@@ -26,7 +26,7 @@ namespace  imstk
 {
 
 void
-AreaConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pIdx1,
+AreaConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
                                const unsigned int &pIdx2, const unsigned int &pIdx3,
                                const double k)
 {
@@ -46,7 +46,7 @@ AreaConstraint::initConstraint(PositionBasedModel &model, const unsigned int &pI
 }
 
 bool
-AreaConstraint::solvePositionConstraint(PositionBasedModel &model)
+AreaConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
     const unsigned int i1 = m_bodies[0];
     const unsigned int i2 = m_bodies[1];

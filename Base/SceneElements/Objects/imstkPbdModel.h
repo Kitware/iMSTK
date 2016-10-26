@@ -1,5 +1,5 @@
-#ifndef IMSTKPBDMODEL_H
-#define IMSTKPBDMODEL_H
+#ifndef IMSTK_PBD_MODEL_H
+#define IMSTK_PBD_MODEL_H
 
 #include <vector>
 #include <Eigen/Dense>
@@ -7,42 +7,38 @@
 #include "imstkPbdConstraint.h"
 #include "imstkPbdFEMConstraint.h"
 #include "imstkPbdState.h"
+#include "imstkMath.h"
 
 namespace imstk
 {
 
-using Vec3d = Eigen::Vector3d;
-
 ///
-/// \class PositionBasedModel
+/// \class PositionBasedDynamicsModel
 ///
-/// \brief
+/// \brief This class implements position based dynamics mathematical model
 ///
-class PositionBasedModel
+class PositionBasedDynamicsModel
 {
 public:
     ///
     /// \brief
     ///
-    PositionBasedModel()
-    {
-
-    }
+    PositionBasedDynamicsModel(){}
 
     ///
     /// \brief
     ///
-    inline void setModelGeometry(Mesh* m)
+    inline void setModelGeometry(const std::shared_ptr<Mesh>& m)
     {
         m_mesh = m;
-        m_state = new PbdState;
+        m_state = std::make_shared<PbdState>();
         m_state->initialize(m_mesh);
     }
 
     ///
     /// \brief
     ///
-    inline Mesh* getGeometry()
+    inline std::shared_ptr<Mesh> getGeometry()
     {
         return m_mesh;
     }
@@ -50,7 +46,7 @@ public:
     ///
     /// \brief
     ///
-    inline PbdState* getState()
+    inline std::shared_ptr<PbdState> getState()
     {
         return m_state;
     }
@@ -125,33 +121,33 @@ public:
     ///
     /// \brief create constraints from the underlying mesh structure
     ///
-    bool initFEMConstraints(FEMConstraint::MaterialType type);
+    bool initializeFEMConstraints(FEMConstraint::MaterialType type);
 
     ///
     /// \brief
     ///
-    bool initVolumeConstraints(const double& stiffness);
+    bool initializeVolumeConstraints(const double& stiffness);
 
     ///
     /// \brief
     ///
-    bool initDistanceConstraints(const double& stiffness);
+    bool initializeDistanceConstraints(const double& stiffness);
 
     ///
     /// \brief
     ///
-    bool initAreaConstraints(const double& stiffness);
+    bool initializeAreaConstraints(const double& stiffness);
 
     ///
     /// \brief
     ///
-    bool initDihedralConstraints(const double& stiffness);
+    bool initializeDihedralConstraints(const double& stiffness);
 
     ///
     /// \brief addConstraint add elastic constraint
     /// \param constraint
     ///
-    inline void addConstraint(PbdConstraint* constraint)
+    inline void addConstraint(std::shared_ptr<PbdConstraint> constraint)
     {
         m_constraints.push_back(constraint);
     }
@@ -180,11 +176,15 @@ public:
     }
 
 private:
-    Mesh*                         m_mesh;
-    PbdState*                     m_state;
-    std::vector<PbdConstraint*>   m_constraints;
-    double mu, lambda;            // Lame's constants
-    unsigned int maxIter;
+    std::shared_ptr<Mesh> m_mesh;
+    std::shared_ptr<PbdState> m_state;
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
+
+    // Lame's constants
+    double mu;
+    double lambda;
+
+    unsigned int maxIter; ///> Max. pbd iterations
     double m_proximity;
     double m_contactStiffness;
 };

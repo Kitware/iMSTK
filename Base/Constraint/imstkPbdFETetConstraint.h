@@ -53,13 +53,13 @@ public:
     ///
     /// \brief Initialize the tetrahedral FEM constraint
     ///
-    bool initConstraint(PositionBasedModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
+    bool initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
         const unsigned int& pIdx3, const unsigned int& pIdx4);
 
     ///
     /// \brief Solve the tetrahedral FEM constraint
     ///
-    bool solvePositionConstraint(PositionBasedModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 };
 
 }

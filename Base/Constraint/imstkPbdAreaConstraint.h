@@ -51,13 +51,13 @@ public:
     ///
     /// \brief Initializes the area constraint
     ///
-    void initConstraint(PositionBasedModel& model, const unsigned int& pIdx1,
+    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
         const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
 
     ///
     /// \brief Solves the area constraint
     ///
-    bool solvePositionConstraint(PositionBasedModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 
 public:
     double m_restArea; ///> Area at the rest position

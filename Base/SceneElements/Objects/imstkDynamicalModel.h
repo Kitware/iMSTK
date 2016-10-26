@@ -24,7 +24,7 @@
 
 #include <string>
 
-#include "imstkProblemState.h"
+#include "imstkDeformableBodyState.h"
 
 namespace imstk
 {
@@ -60,7 +60,7 @@ public:
         none
     };
 
-    using kinematicState = ProblemState;
+    using kinematicState = DeformableBodyState;
 
 public:
     ///
