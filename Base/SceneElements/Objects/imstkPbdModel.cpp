@@ -350,7 +350,7 @@ void
 PositionBasedDynamicsModel::constraintProjection()
 {
     int i = 0;
-    while (++i < maxIter)
+    while (++i < m_maxIter)
     {
         for (auto c: m_constraints)
         {
@@ -378,4 +378,80 @@ PositionBasedDynamicsModel::updatePbdStateFromPhysicsGeometry()
         m_state->setVertexPosition(i, pos);
     }
 }
+
+void
+PositionBasedDynamicsModel::setUniformMass(const double& val)
+{
+    if (val != 0.0)
+    {
+        std::fill(m_mass.begin(), m_mass.end(), val);
+        std::fill(m_invMass.begin(), m_invMass.end(), 1 / val);
+    }
+    else
+    {
+        std::fill(m_invMass.begin(), m_invMass.end(), 0.0);
+        std::fill(m_mass.begin(), m_mass.end(), 0.0);
+    }
+}
+
+void
+PositionBasedDynamicsModel::setParticleMass(const double& val, const unsigned int& idx)
+{
+    if (idx < m_mesh->getNumVertices())
+    {
+        m_mass[idx] = val;
+        m_invMass[idx] = 1 / val;
+    }
+}
+
+void
+PositionBasedDynamicsModel::setFixedPoint(const unsigned int& idx)
+{
+    if (idx < m_mesh->getNumVertices())
+    {
+        m_invMass[idx] = 0;
+    }
+}
+
+double
+PositionBasedDynamicsModel::getInvMass(const unsigned int& idx)
+{
+    return m_invMass[idx];
+}
+
+void
+PositionBasedDynamicsModel::integratePosition()
+{
+    auto& prevPos = m_state->getPreviousPositions();
+    auto& vel = m_state->getVelocities();
+    auto& pos = m_state->getPositions();
+    auto& accn = m_state->getAccelerations();
+
+    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
+    {
+        if (m_invMass[i] != 0.0)
+        {
+            vel[i] += (accn[i] + m_gravity)*m_dt;
+            prevPos[i] = pos[i];
+            pos[i] += vel[i] * m_dt;
+        }
+    }
+}
+
+void
+PositionBasedDynamicsModel::integrateVelocity()
+{
+    auto& prevPos = m_state->getPreviousPositions();
+    auto& vel = m_state->getVelocities();
+    auto& pos = m_state->getPositions();
+
+    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
+    {
+        if (m_invMass[i] != 0.0)
+        {
+            vel[i] = (pos[i] - prevPos[i]) / m_dt;
+        }
+    }
+}
+
 } // imstk

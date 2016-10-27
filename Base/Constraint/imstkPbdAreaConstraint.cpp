@@ -58,9 +58,9 @@ AreaConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     Vec3d &p1 = state->getVertexPosition(i2);
     Vec3d &p2 = state->getVertexPosition(i3);
 
-    const double im0 = state->getInvMass(i1);
-    const double im1 = state->getInvMass(i2);
-    const double im2 = state->getInvMass(i3);
+    const double im0 = model.getInvMass(i1);
+    const double im1 = model.getInvMass(i2);
+    const double im2 = model.getInvMass(i3);
 
     const Vec3d e1 = p0 - p1;
     const Vec3d e2 = p1 - p2;

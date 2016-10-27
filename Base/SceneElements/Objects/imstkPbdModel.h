@@ -33,6 +33,10 @@ public:
         m_mesh = m;
         m_state = std::make_shared<PbdState>();
         m_state->initialize(m_mesh);
+
+        auto nP = m_mesh->getNumVertices();
+        m_invMass.resize(nP, 0);
+        m_mass.resize(nP, 0);
     }
 
     ///
@@ -58,8 +62,8 @@ public:
     ///
     inline void setElasticModulus(const double& E, const double nu)
     {
-        mu = E/(2*(1+nu));
-        lambda = E*nu/((1-2*nu)*(1+nu));
+        m_mu = E/(2*(1+nu));
+        m_lambda = E*nu/((1-2*nu)*(1+nu));
     }
 
     ///
@@ -67,7 +71,7 @@ public:
     ///
     inline const double& getFirstLame() const
     {
-        return mu;
+        return m_mu;
     }
 
     ///
@@ -75,7 +79,7 @@ public:
     ///
     inline const double& getSecondLame() const
     {
-        return lambda;
+        return m_lambda;
     }
 
     ///
@@ -83,7 +87,7 @@ public:
     ///
     inline void setNumberOfInterations(const unsigned int& n)
     {
-        maxIter = n;
+        m_maxIter = n;
     }
 
     ///
@@ -175,18 +179,66 @@ public:
         return !m_constraints.empty();
     }
 
+    ///
+    /// \brief
+    ///
+    void setTimeStep(const double& timeStep) { m_dt = timeStep; };
+
+    ///
+    /// \brief
+    ///
+    void setGravity(const Vec3d& g) { m_gravity = g; };
+
+    ///
+    /// \brief
+    ///
+    void setUniformMass(const double& val);
+
+    ///
+    /// \brief
+    ///
+    void setParticleMass(const double& val, const unsigned int& idx);
+
+    ///
+    /// \brief
+    ///
+    void setFixedPoint(const unsigned int& idx);
+
+    ///
+    /// \brief
+    ///
+    double getInvMass(const unsigned int& idx);
+
+    ///
+    /// \brief
+    ///
+    void integratePosition();
+
+    ///
+    /// \brief
+    ///
+    void integrateVelocity();
+
 private:
     std::shared_ptr<Mesh> m_mesh;
     std::shared_ptr<PbdState> m_state;
     std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
 
     // Lame's constants
-    double mu;
-    double lambda;
+    double m_mu;
+    double m_lambda;
 
-    unsigned int maxIter; ///> Max. pbd iterations
-    double m_proximity;
+    // Mass properties
+    std::vector<double> m_mass;
+    std::vector<double> m_invMass;
+
     double m_contactStiffness;
+    Vec3d m_gravity;
+
+    unsigned int m_maxIter; ///> Max. pbd iterations
+    double m_proximity;
+
+    double m_dt;
 };
 
 } // imstk

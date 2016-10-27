@@ -62,10 +62,10 @@ VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     Vec3d &x3 = state->getVertexPosition(i3);
     Vec3d &x4 = state->getVertexPosition(i4);
 
-    const double im1 = state->getInvMass(i1);
-    const double im2 = state->getInvMass(i2);
-    const double im3 = state->getInvMass(i3);
-    const double im4 = state->getInvMass(i4);
+    const double im1 = model.getInvMass(i1);
+    const double im2 = model.getInvMass(i2);
+    const double im3 = model.getInvMass(i3);
+    const double im4 = model.getInvMass(i4);
 
     const double onesixth = 1.0 / 6.0;
 

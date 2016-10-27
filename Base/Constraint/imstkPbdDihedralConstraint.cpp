@@ -65,10 +65,10 @@ DihedralConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
     Vec3d &p2 = state->getVertexPosition(i3);
     Vec3d &p3 = state->getVertexPosition(i4);
 
-    const double im0 = state->getInvMass(i1);
-    const double im1 = state->getInvMass(i2);
-    const double im2 = state->getInvMass(i3);
-    const double im3 = state->getInvMass(i4);
+    const double im0 = model.getInvMass(i1);
+    const double im1 = model.getInvMass(i2);
+    const double im2 = model.getInvMass(i3);
+    const double im3 = model.getInvMass(i4);
 
     if (im0 == 0.0 && im1 == 0.0)
     {

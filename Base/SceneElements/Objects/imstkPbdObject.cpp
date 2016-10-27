@@ -147,7 +147,7 @@ PbdObject::init(int nCons, ...)
         }
     }
 
-    state->setUniformMass(va_arg(args,double));
+    m_pbdModel->setUniformMass(va_arg(args, double));
 
     if (nCons > 0)
     {
@@ -155,8 +155,8 @@ PbdObject::init(int nCons, ...)
         float x,y,z;
         sscanf(gstring,"%f %f %f", &x, &y, &z);
         Vec3d g(x,y,z);
-        state->setGravity(g);
-        state->setTimeStep(va_arg(args,double));
+        m_pbdModel->setGravity(g);
+        m_pbdModel->setTimeStep(va_arg(args, double));
         char *s = va_arg(args,char*);
 
         if (strlen(s) > 0)
@@ -164,7 +164,7 @@ PbdObject::init(int nCons, ...)
             while (1)
             {
                 int idx = atoi(s);
-                state->setFixedPoint(idx-1);
+                m_pbdModel->setFixedPoint(idx - 1);
                 while (*s != ' ' && *s != '\0')
                 {
                     ++s;
@@ -194,7 +194,7 @@ void PbdObject::integratePosition()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
-        m_pbdModel->getState()->integratePosition();
+        m_pbdModel->integratePosition();
     }
 }
 
@@ -202,7 +202,7 @@ void PbdObject::integrateVelocity()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
-        m_pbdModel->getState()->integrateVelocity();
+        m_pbdModel->integrateVelocity();
     }
 }
 

@@ -504,6 +504,7 @@ DeformableBodyModel::updatePhysicsGeometry()
     volMesh->setVerticesDisplacements(u);
 }
 
+
 void
 DeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
 {

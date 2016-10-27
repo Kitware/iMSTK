@@ -22,10 +22,6 @@
 #ifndef IMSTK_PROBLEM_STATE_H
 #define IMSTK_PROBLEM_STATE_H
 
-#include <memory>
-
-#include "imstkMath.h"
-
 namespace imstk
 {
 

@@ -77,10 +77,10 @@ EdgeEdgeConstraint::solvePositionConstraint()
     Vec3d grad2 = (1-s)*n;
     Vec3d grad3 = (s)*n;
 
-    const double im0 = state1->getInvMass(i0);
-    const double im1 = state1->getInvMass(i1);
-    const double im2 = state2->getInvMass(i2);
-    const double im3 = state2->getInvMass(i3);
+    const double im0 = m_model1->getInvMass(i0);
+    const double im1 = m_model1->getInvMass(i1);
+    const double im2 = m_model2->getInvMass(i2);
+    const double im3 = m_model2->getInvMass(i3);
 
     double lambda = im0*grad0.squaredNorm() +
                     im1*grad1.squaredNorm() +
@@ -175,11 +175,11 @@ PointTriangleConstraint::solvePositionConstraint()
     Vec3d grad2 = -beta*n;
     Vec3d grad3 = -gamma*n;
 
-    const double im0 = state1->getInvMass(i0);
+    const double im0 = m_model1->getInvMass(i0);
 
-    const double im1 = state2->getInvMass(i1);
-    const double im2 = state2->getInvMass(i2);
-    const double im3 = state2->getInvMass(i3);
+    const double im1 = m_model2->getInvMass(i1);
+    const double im2 = m_model2->getInvMass(i2);
+    const double im3 = m_model2->getInvMass(i3);
 
     double lambda = im0*grad0.squaredNorm() +
                     im1*grad1.squaredNorm() +

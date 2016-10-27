@@ -176,10 +176,10 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     }
     }
 
-    const double im1 = state->getInvMass(i1);
-    const double im2 = state->getInvMass(i2);
-    const double im3 = state->getInvMass(i3);
-    const double im4 = state->getInvMass(i4);
+    const double im1 = model.getInvMass(i1);
+    const double im2 = model.getInvMass(i2);
+    const double im3 = model.getInvMass(i3);
+    const double im4 = model.getInvMass(i4);
 
     Mat3d gradC = m_Volume*P*m_invRestMat.transpose();
 

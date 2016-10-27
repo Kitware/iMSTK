@@ -70,8 +70,8 @@ public:
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
     ///     lambda[0] will contain the new value of lambda given by the parabolic model.
     ///
-    /// \param lambda[1] Current steplength
-    ///        lambda[2] Previous steplength
+    /// \param lambda[1] Current step length
+    ///        lambda[2] Previous step length
     /// \param fnorm[0] Value of |F(x)|^2
     ///        fnorm[1] Value of |F(x + lambda[1]*dx)|^2
     ///        fnorm[2] Value of |F(x + lambda[2]*dx)|^2

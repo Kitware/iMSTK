@@ -32,26 +32,6 @@ public:
     ///
     /// \brief
     ///
-    void setUniformMass(const double& val);
-
-    ///
-    /// \brief
-    ///
-    void setParticleMass(const double& val, const unsigned int& idx);
-
-    ///
-    /// \brief
-    ///
-    void setFixedPoint(const unsigned int& idx);
-
-    ///
-    /// \brief
-    ///
-    double getInvMass(const unsigned int& idx);
-
-    ///
-    /// \brief
-    ///
     Vec3d& getInitialVertexPosition(const unsigned int& idx);
 
     ///
@@ -64,25 +44,11 @@ public:
     ///
     Vec3d& getVertexPosition(const unsigned int& idx);
 
-    ///
-    /// \brief
-    ///
-    void setTimeStep(const double& timeStep) { dt = timeStep; };
-
-    ///
-    /// \brief
-    ///
-    void setGravity(const Vec3d& g) { gravity = g; };
-
-    ///
-    /// \brief
-    ///
-    void integratePosition();
-
-    ///
-    /// \brief
-    ///
-    void integrateVelocity();
+    std::vector<Vec3d>& getInitPositions() { return m_initPos; };
+    std::vector<Vec3d>& getPreviousPositions() { return m_oldPos; };
+    std::vector<Vec3d>& getPositions() { return m_pos; };
+    std::vector<Vec3d>& getVelocities() { return m_vel; };
+    std::vector<Vec3d>& getAccelerations() { return m_acc; };
 
 private:
     std::vector<Vec3d> m_pos;
@@ -90,12 +56,6 @@ private:
     std::vector<Vec3d> m_vel;
     std::vector<Vec3d> m_acc;
     std::vector<Vec3d> m_oldPos;
-
-    std::vector<double> m_mass;
-    std::vector<double> m_invMass;
-
-    double dt;
-    Vec3d gravity;
 };
 
 } // imstk

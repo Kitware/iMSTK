@@ -51,8 +51,8 @@ DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     Vec3d &p0 = state->getVertexPosition(i1);
     Vec3d &p1 = state->getVertexPosition(i2);
 
-    const double im1 = state->getInvMass(i1);
-    const double im2 = state->getInvMass(i2);
+    const double im1 = model.getInvMass(i1);
+    const double im2 = model.getInvMass(i2);
 
     const double wsum = im1 + im2;
 
