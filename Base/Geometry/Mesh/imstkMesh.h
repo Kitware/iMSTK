@@ -140,7 +140,7 @@ public:
     ///
     /// \brief Returns the number of total vertices in the mesh
     ///
-    const int getNumVertices() const;
+    const size_t getNumVertices() const;
 
 protected:
 

@@ -1204,7 +1204,7 @@ void testPbdCloth()
 {
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    scene->getCamera()->setPosition(6.0, 2.0, 20.0);
     // a. Construct a sample triangular mesh
 
     // b. Add nodal data
@@ -1266,7 +1266,7 @@ void testPbdCloth()
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
         /*TimeStep*/0.01,
-        /*FixedPoint*/"1 20",
+        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
         /*NumberOfIterationInConstraintSolver*/5
         );
 

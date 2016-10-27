@@ -218,7 +218,7 @@ void PbdObject::constraintProjection()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
-        m_pbdModel->constraintProjection();
+        m_pbdModel->projectConstraints();
     }
 }
 

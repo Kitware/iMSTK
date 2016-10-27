@@ -123,7 +123,7 @@ public:
     }
 
     ///
-    /// \brief create constraints from the underlying mesh structure
+    /// \brief
     ///
     bool initializeFEMConstraints(FEMConstraint::MaterialType type);
 
@@ -159,7 +159,7 @@ public:
     ///
     /// \brief compute delta x and update position
     ///
-    void constraintProjection();
+    void projectConstraints();
 
     ///
     /// \brief
@@ -215,14 +215,14 @@ public:
     void integratePosition();
 
     ///
-    /// \brief
+    /// \brief Integrate the velocity
     ///
     void integrateVelocity();
 
 private:
-    std::shared_ptr<Mesh> m_mesh;
-    std::shared_ptr<PbdState> m_state;
-    std::vector<std::shared_ptr<PbdConstraint>> m_constraints;
+    std::shared_ptr<Mesh> m_mesh;   ///> Mesh on which the pbd model operates on
+    std::shared_ptr<PbdState> m_state;  ///> State of the body
+    std::vector<std::shared_ptr<PbdConstraint>> m_constraints; ///> List of pbd constraints
 
     // Lame's constants
     double m_mu;

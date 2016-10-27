@@ -189,7 +189,7 @@ Mesh::getPointDataArray(const std::string& arrayName) const
     return m_pointDataMap.at(arrayName);
 }
 
-const int
+const size_t
 Mesh::getNumVertices() const
 {
     return m_initialVerticesPositions.size();

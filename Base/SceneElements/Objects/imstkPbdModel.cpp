@@ -47,7 +47,7 @@ PositionBasedDynamicsModel::initializeFEMConstraints(FEMConstraint::MaterialType
     auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
 
-    for (int k = 0; k < elements.size(); ++k)
+    for (size_t k = 0; k < elements.size(); ++k)
     {
         TetrahedralMesh::TetraArray& tet = elements[k];
 
@@ -59,7 +59,7 @@ PositionBasedDynamicsModel::initializeFEMConstraints(FEMConstraint::MaterialType
 }
 
 bool
-PositionBasedDynamicsModel::initializeVolumeConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeVolumeConstraints(const double& stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
@@ -72,7 +72,7 @@ PositionBasedDynamicsModel::initializeVolumeConstraints(const double &stiffness)
     auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
     std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
 
-    for (int k = 0; k < elements.size(); ++k)
+    for (size_t k = 0; k < elements.size(); ++k)
     {
         TetrahedralMesh::TetraArray& tet = elements[k];
 
@@ -84,7 +84,7 @@ PositionBasedDynamicsModel::initializeVolumeConstraints(const double &stiffness)
 }
 
 bool
-PositionBasedDynamicsModel::initializeDistanceConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeDistanceConstraints(const double& stiffness)
 {
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
@@ -93,7 +93,7 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double &stiffnes
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
 
-        for (int k = 0; k < elements.size(); ++k)
+        for (size_t k = 0; k < elements.size(); ++k)
         {
             TetrahedralMesh::TetraArray& tet = elements[k];
             unsigned int i1;
@@ -168,7 +168,7 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double &stiffnes
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
 
-        for (int k = 0; k < elements.size(); ++k)
+        for (size_t k = 0; k < elements.size(); ++k)
         {
             SurfaceMesh::TriangleArray& tri = elements[k];
             unsigned int i1;
@@ -209,7 +209,7 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double &stiffnes
 }
 
 bool
-PositionBasedDynamicsModel::initializeAreaConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeAreaConstraints(const double& stiffness)
 {
     // check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
@@ -222,7 +222,7 @@ PositionBasedDynamicsModel::initializeAreaConstraints(const double &stiffness)
     auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
     std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
 
-    for (int k = 0; k < elements.size(); ++k)
+    for (size_t k = 0; k < elements.size(); ++k)
     {
         SurfaceMesh::TriangleArray& tri = elements[k];
 
@@ -234,7 +234,7 @@ PositionBasedDynamicsModel::initializeAreaConstraints(const double &stiffness)
 }
 
 bool
-PositionBasedDynamicsModel::initializeDihedralConstraints(const double &stiffness)
+PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffness)
 {
     if (m_mesh->getType() != Geometry::Type::SurfaceMesh)
     {
@@ -248,7 +248,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double &stiffnes
     // following algorithm is terrible, should use half-edge instead
     std::vector<std::vector<unsigned int>> onering(triMesh->getNumVertices());
 
-    for (int k = 0; k < elements.size(); ++k)
+    for (size_t k = 0; k < elements.size(); ++k)
     {
         SurfaceMesh::TriangleArray& tri = elements[k];
         onering[tri[0]].push_back(k);
@@ -257,7 +257,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double &stiffnes
     }
 
     std::vector<std::vector<bool>> E(triMesh->getNumVertices(), std::vector<bool>(triMesh->getNumVertices(), 1));
-    for (int k = 0; k < elements.size(); ++k)
+    for (size_t k = 0; k < elements.size(); ++k)
     {
         SurfaceMesh::TriangleArray& tri = elements[k];
         std::vector<unsigned int>& r1 = onering[tri[0]];
@@ -347,7 +347,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double &stiffnes
 }
 
 void
-PositionBasedDynamicsModel::constraintProjection()
+PositionBasedDynamicsModel::projectConstraints()
 {
     int i = 0;
     while (++i < m_maxIter)
@@ -362,7 +362,7 @@ PositionBasedDynamicsModel::constraintProjection()
 void
 PositionBasedDynamicsModel::updatePhysicsGeometry()
 {
-    for (int i = 0; i < m_mesh->getNumVertices(); ++i)
+    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
     {
         m_mesh->setVerticePosition(i, m_state->getVertexPosition(i));
     }
@@ -372,7 +372,7 @@ void
 PositionBasedDynamicsModel::updatePbdStateFromPhysicsGeometry()
 {
     Vec3d pos;
-    for (int i = 0; i < m_mesh->getNumVertices(); ++i)
+    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
     {
         pos = m_mesh->getVertexPosition(i);
         m_state->setVertexPosition(i, pos);
@@ -423,8 +423,8 @@ void
 PositionBasedDynamicsModel::integratePosition()
 {
     auto& prevPos = m_state->getPreviousPositions();
-    auto& vel = m_state->getVelocities();
     auto& pos = m_state->getPositions();
+    auto& vel = m_state->getVelocities();
     auto& accn = m_state->getAccelerations();
 
     for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
@@ -442,8 +442,8 @@ void
 PositionBasedDynamicsModel::integrateVelocity()
 {
     auto& prevPos = m_state->getPreviousPositions();
-    auto& vel = m_state->getVelocities();
     auto& pos = m_state->getPositions();
+    auto& vel = m_state->getVelocities();
 
     for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
     {
