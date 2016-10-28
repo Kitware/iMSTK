@@ -17,14 +17,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #ifndef imstkDynamicalModel_h
 #define imstkDynamicalModel_h
 
 #include <string>
 
-#include "imstkDeformableBodyState.h"
+#include "imstkVectorizedState.h"
 
 namespace imstk
 {
@@ -60,7 +60,7 @@ public:
         none
     };
 
-    using kinematicState = DeformableBodyState;
+    using kinematicState = VectorizedState;
 
 public:
     ///

@@ -51,29 +51,29 @@ public:
     ///
     /// \brief Update state given change in velocity
     ///
-    void updateStateGivenDv(std::shared_ptr<DeformableBodyState> prevState,
-                            std::shared_ptr<DeformableBodyState> currentState,
+    void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
+                            std::shared_ptr<VectorizedState> currentState,
                             Vectord& dV);
 
     ///
     /// \brief Update state given change in displacement
     ///
-    void updateStateGivenDu(std::shared_ptr<DeformableBodyState> prevState,
-                            std::shared_ptr<DeformableBodyState> currentState,
+    void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
+                            std::shared_ptr<VectorizedState> currentState,
                             Vectord& dU);
 
     ///
     /// \brief Update state given updated velocity
     ///
-    void updateStateGivenV(std::shared_ptr<DeformableBodyState> prevState,
-                           std::shared_ptr<DeformableBodyState> currentState,
+    void updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
+                           std::shared_ptr<VectorizedState> currentState,
                            Vectord& v);
 
     ///
     /// \brief Update state given updated displacement
     ///
-    void updateStateGivenU(std::shared_ptr<DeformableBodyState> prevState,
-                           std::shared_ptr<DeformableBodyState> currentState,
+    void updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
+                           std::shared_ptr<VectorizedState> currentState,
                            Vectord& u);
 protected:
 

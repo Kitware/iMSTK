@@ -17,10 +17,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef IMSTK_DEFORMABLE_BODY_STATE_H
-#define IMSTK_DEFORMABLE_BODY_STATE_H
+#ifndef imstkVectorizedState_h
+#define imstkVectorizedState_h
 
 #include <memory>
 
@@ -33,23 +33,23 @@ namespace imstk
 ///
 /// \class DeformableBodyState
 ///
-/// \brief This class stores the state of the unknown field variable of the deformable body
+/// \brief This class stores the state of the unknown field variable in vectorized form
 ///
-class DeformableBodyState : public ProblemState
+class VectorizedState : public ProblemState
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    DeformableBodyState() = default;
-    DeformableBodyState(const size_t size){ initialize(size); };
+    VectorizedState() = default;
+    VectorizedState(const size_t size){ initialize(size); };
     //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
-    ~DeformableBodyState() = default;
+    ~VectorizedState() = default;
 
     ///
     /// \brief Initialize the problem state
@@ -79,7 +79,7 @@ public:
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<DeformableBodyState> rhs);
+    void setState(std::shared_ptr<VectorizedState> rhs);
 
     ///
     /// \brief Get the state
@@ -113,4 +113,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef IMSTK_DEFORMABLE_BODY_STATE_H
+#endif // ifndef imstkVectorizedState_h

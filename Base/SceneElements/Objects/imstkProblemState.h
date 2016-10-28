@@ -17,10 +17,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef IMSTK_PROBLEM_STATE_H
-#define IMSTK_PROBLEM_STATE_H
+#ifndef imstkProblemState_h
+#define imstkProblemState_h
 
 namespace imstk
 {
@@ -39,4 +39,4 @@ public:
 
 } // imstk
 
-#endif // ifndef IMSTK_PROBLEM_STATE_H
+#endif // ifndef imstkProblemState_h

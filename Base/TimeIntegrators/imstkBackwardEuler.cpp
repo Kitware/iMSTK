@@ -25,8 +25,8 @@ namespace imstk
 {
 
 void
-BackwardEuler::updateStateGivenDv(std::shared_ptr<DeformableBodyState> prevState,
-                                  std::shared_ptr<DeformableBodyState> currentState,
+BackwardEuler::updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
+                                  std::shared_ptr<VectorizedState> currentState,
                                   Vectord& dV)
 {
     currentState->getQDot() = prevState->getQDot() + dV;
@@ -34,8 +34,8 @@ BackwardEuler::updateStateGivenDv(std::shared_ptr<DeformableBodyState> prevState
 }
 
 void
-BackwardEuler::updateStateGivenDu(std::shared_ptr<DeformableBodyState> prevState,
-                                  std::shared_ptr<DeformableBodyState> currentState,
+BackwardEuler::updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
+                                  std::shared_ptr<VectorizedState> currentState,
                                   Vectord& dU)
 {
     currentState->getQ() = prevState->getQ() + dU;
@@ -43,8 +43,8 @@ BackwardEuler::updateStateGivenDu(std::shared_ptr<DeformableBodyState> prevState
 }
 
 void
-BackwardEuler::updateStateGivenV(std::shared_ptr<DeformableBodyState> prevState,
-                                 std::shared_ptr<DeformableBodyState> currentState,
+BackwardEuler::updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
+                                 std::shared_ptr<VectorizedState> currentState,
                                  Vectord& v)
 {
     currentState->getQDot() = v;
@@ -52,8 +52,8 @@ BackwardEuler::updateStateGivenV(std::shared_ptr<DeformableBodyState> prevState,
 }
 
 void
-BackwardEuler::updateStateGivenU(std::shared_ptr<DeformableBodyState> prevState,
-                                 std::shared_ptr<DeformableBodyState> currentState,
+BackwardEuler::updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
+                                 std::shared_ptr<VectorizedState> currentState,
                                  Vectord& u)
 {
     currentState->getQ() = u;

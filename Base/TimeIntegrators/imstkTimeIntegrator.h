@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #ifndef imstkTimeIntegrator_h
 #define imstkTimeIntegrator_h
@@ -27,7 +27,7 @@
 
 #include "Eigen/Sparse"
 
-#include "imstkDeformableBodyState.h"
+#include "imstkVectorizedState.h"
 
 namespace imstk
 {
@@ -78,10 +78,10 @@ public:
     ///
     /// \brief Update states given the updates in different forms
     ///
-    virtual void updateStateGivenDv(std::shared_ptr<DeformableBodyState> prevState, std::shared_ptr<DeformableBodyState> currentState, Vectord& dV) = 0;
-    virtual void updateStateGivenDu(std::shared_ptr<DeformableBodyState> prevState, std::shared_ptr<DeformableBodyState> currentState, Vectord& dU) = 0;
-    virtual void updateStateGivenV(std::shared_ptr<DeformableBodyState> prevState, std::shared_ptr<DeformableBodyState> currentState, Vectord& v) = 0;
-    virtual void updateStateGivenU(std::shared_ptr<DeformableBodyState> prevState, std::shared_ptr<DeformableBodyState> currentState, Vectord& u) = 0;
+    virtual void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dV) = 0;
+    virtual void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dU) = 0;
+    virtual void updateStateGivenV(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& v) = 0;
+    virtual void updateStateGivenU(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& u) = 0;
 
 protected:
     Type m_type; ///> Type of the time integrator
