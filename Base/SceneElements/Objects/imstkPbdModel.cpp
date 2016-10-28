@@ -34,22 +34,54 @@ limitations under the License.
 namespace imstk
 {
 
+PositionBasedDynamicsModel::PositionBasedDynamicsModel() :
+DynamicalModel(DynamicalModelType::positionBasedDynamics)
+{
+    m_initialState = std::make_shared<PbdState>();
+    m_previousState = std::make_shared<PbdState>();
+    m_currentState = std::make_shared<PbdState>();
+}
+
+void
+PositionBasedDynamicsModel::setModelGeometry(const std::shared_ptr<Mesh> m)
+{
+    m_mesh = m;
+
+    m_initialState->initialize(m_mesh, 1, 0, 0);
+    m_previousState->initialize(m_mesh, 1, 0, 0);
+    m_currentState->initialize(m_mesh);
+
+    m_initialState->setPositions(m_mesh->getVertexPositions());
+    m_currentState->setPositions(m_mesh->getVertexPositions());
+
+    auto nP = m_mesh->getNumVertices();
+    m_invMass.resize(nP, 0);
+    m_mass.resize(nP, 0);
+}
+
+void PositionBasedDynamicsModel::setElasticModulus(const double& E, const double nu)
+{
+    m_mu = E/(2*(1+nu));
+    m_lambda = E*nu/((1-2*nu)*(1+nu));
+}
+
 bool
 PositionBasedDynamicsModel::initializeFEMConstraints(FEMConstraint::MaterialType type)
 {
-    // check if constraint type matches the mesh type
+    // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
     {
         LOG(WARNING) << "FEM Tetrahedral constraint should come with tetrahedral mesh";
         return false;
     }
-    // ok, now create constraints
+
+    // Create constraints
     auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
+    auto elements = tetMesh->getTetrahedraVertices();
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
-        TetrahedralMesh::TetraArray& tet = elements[k];
+        auto& tet = elements[k];
 
         auto c = std::make_shared<FEMTetConstraint>(type);
         c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3]);
@@ -61,20 +93,20 @@ PositionBasedDynamicsModel::initializeFEMConstraints(FEMConstraint::MaterialType
 bool
 PositionBasedDynamicsModel::initializeVolumeConstraints(const double& stiffness)
 {
-    // check if constraint type matches the mesh type
+    // Check if constraint type matches the mesh type
     if (m_mesh->getType() != Geometry::Type::TetrahedralMesh)
     {
         LOG(WARNING) << "Volume constraint should come with volumetric mesh";
         return false;
     }
 
-    // ok, now create constraints
+    // Create constraints
     auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-    std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
+    auto elements = tetMesh->getTetrahedraVertices();
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
-        TetrahedralMesh::TetraArray& tet = elements[k];
+        auto& tet = elements[k];
 
         auto c = std::make_shared<VolumeConstraint>();
         c->initConstraint(*this, tet[0], tet[1], tet[2], tet[3], stiffness);
@@ -91,11 +123,11 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double& stiffnes
         auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
         int nV = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-        std::vector<TetrahedralMesh::TetraArray> elements = tetMesh->getTetrahedraVertices();
+        auto elements = tetMesh->getTetrahedraVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
-            TetrahedralMesh::TetraArray& tet = elements[k];
+            auto& tet = elements[k];
             unsigned int i1;
             unsigned int i2;
 
@@ -166,11 +198,11 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double& stiffnes
         auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
         int nV = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
-        std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
+        auto elements = triMesh->getTrianglesVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
-            SurfaceMesh::TriangleArray& tri = elements[k];
+            auto& tri = elements[k];
             unsigned int i1;
             unsigned int i2;
 
@@ -224,7 +256,7 @@ PositionBasedDynamicsModel::initializeAreaConstraints(const double& stiffness)
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
-        SurfaceMesh::TriangleArray& tri = elements[k];
+        auto& tri = elements[k];
 
         auto c = std::make_shared<AreaConstraint>();
         c->initConstraint(*this, tri[0], tri[1], tri[2], stiffness);
@@ -242,15 +274,15 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffnes
         return false;
     }
 
-    // ok, now create constraints
+    // Create constraints
     auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-    std::vector<SurfaceMesh::TriangleArray> elements = triMesh->getTrianglesVertices();
+    auto elements = triMesh->getTrianglesVertices();
     // following algorithm is terrible, should use half-edge instead
     std::vector<std::vector<unsigned int>> onering(triMesh->getNumVertices());
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
-        SurfaceMesh::TriangleArray& tri = elements[k];
+        auto& tri = elements[k];
         onering[tri[0]].push_back(k);
         onering[tri[1]].push_back(k);
         onering[tri[2]].push_back(k);
@@ -259,13 +291,16 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffnes
     std::vector<std::vector<bool>> E(triMesh->getNumVertices(), std::vector<bool>(triMesh->getNumVertices(), 1));
     for (size_t k = 0; k < elements.size(); ++k)
     {
-        SurfaceMesh::TriangleArray& tri = elements[k];
-        std::vector<unsigned int>& r1 = onering[tri[0]];
-        std::vector<unsigned int>& r2 = onering[tri[1]];
-        std::vector<unsigned int>& r3 = onering[tri[2]];
+        auto& tri = elements[k];
+
+        auto& r1 = onering[tri[0]];
+        auto& r2 = onering[tri[1]];
+        auto& r3 = onering[tri[2]];
+
         std::sort(r1.begin(), r1.end());
         std::sort(r2.begin(), r2.end());
         std::sort(r3.begin(), r3.end());
+
         std::vector<unsigned int> rs;
         std::vector<unsigned int>::iterator it;
         // check if processed or not
@@ -301,7 +336,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffnes
             if (rs.size() > 1)
             {
                 int idx = (rs[0] == k)?1:0;
-                SurfaceMesh::TriangleArray& t = elements[rs[idx]];
+                auto& t = elements[rs[idx]];
                 for (int i = 0; i < 3; ++i)
                 {
                     if (t[i] != tri[1] && t[i] != tri[2])
@@ -326,7 +361,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffnes
             if (rs.size() > 1)
             {
                 int idx = (rs[0] == k)?1:0;
-                SurfaceMesh::TriangleArray& t = elements[rs[idx]];
+                auto& t = elements[rs[idx]];
                 for (int i = 0; i < 3; ++i)
                 {
                     if (t[i] != tri[2] && t[i] != tri[0])
@@ -362,21 +397,13 @@ PositionBasedDynamicsModel::projectConstraints()
 void
 PositionBasedDynamicsModel::updatePhysicsGeometry()
 {
-    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
-    {
-        m_mesh->setVerticePosition(i, m_state->getVertexPosition(i));
-    }
+    m_mesh->setVerticesPositions(m_currentState->getPositions());
 }
 
 void
 PositionBasedDynamicsModel::updatePbdStateFromPhysicsGeometry()
 {
-    Vec3d pos;
-    for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
-    {
-        pos = m_mesh->getVertexPosition(i);
-        m_state->setVertexPosition(i, pos);
-    }
+    m_currentState->setPositions(m_mesh->getVertexPositions());
 }
 
 void
@@ -414,7 +441,7 @@ PositionBasedDynamicsModel::setFixedPoint(const unsigned int& idx)
 }
 
 double
-PositionBasedDynamicsModel::getInvMass(const unsigned int& idx)
+PositionBasedDynamicsModel::getInvMass(const unsigned int& idx) const
 {
     return m_invMass[idx];
 }
@@ -422,10 +449,10 @@ PositionBasedDynamicsModel::getInvMass(const unsigned int& idx)
 void
 PositionBasedDynamicsModel::integratePosition()
 {
-    auto& prevPos = m_state->getPreviousPositions();
-    auto& pos = m_state->getPositions();
-    auto& vel = m_state->getVelocities();
-    auto& accn = m_state->getAccelerations();
+    auto& prevPos = m_previousState->getPositions();
+    auto& pos = m_currentState->getPositions();
+    auto& vel = m_currentState->getVelocities();
+    auto& accn = m_currentState->getAccelerations();
 
     for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
     {
@@ -441,9 +468,9 @@ PositionBasedDynamicsModel::integratePosition()
 void
 PositionBasedDynamicsModel::integrateVelocity()
 {
-    auto& prevPos = m_state->getPreviousPositions();
-    auto& pos = m_state->getPositions();
-    auto& vel = m_state->getVelocities();
+    auto& prevPos = m_previousState->getPositions();
+    auto& pos = m_currentState->getPositions();
+    auto& vel = m_currentState->getVelocities();
 
     for (size_t i = 0; i < m_mesh->getNumVertices(); ++i)
     {

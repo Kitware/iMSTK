@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_DIHEDRAL_CONSTRAINT_H
-#define IMSTK_PBD_DIHEDRAL_CONSTRAINT_H
+#ifndef imstkPbdDihedralConstraint_h
+#define imstkPbdDihedralConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -73,6 +73,7 @@ public:
     double m_restAngle; ///> Rest angle
     double m_stiffness; ///> Angular stiffness
 };
-}
 
-#endif // IMSTK_PBD_DIHEDRAL_CONSTRAINT_H
+} //imstk
+
+#endif // imstkPbdDihedralConstraint_h

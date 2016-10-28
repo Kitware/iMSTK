@@ -25,34 +25,29 @@ namespace imstk
 {
 
 void
-PbdState::initialize(const std::shared_ptr<Mesh>& m)
+PbdState::initialize(const size_t numNodes, bool p, bool v, bool a)
 {
-    m_pos = m->getVerticesPositions(); // share the same data with Mesh
-    const int nP = m->getNumVertices();
-    m_initPos.assign(m_pos.begin(), m_pos.end());
-    m_vel.resize(nP, Vec3d(0, 0, 0));
-    m_acc.resize(nP, Vec3d(0, 0, 0));
-    m_oldPos.resize(nP, Vec3d(0, 0, 0));
-    //m_oldPos.assign(m_pos.begin(), m_pos.end());
-}
+    // CHECKBACK : m_pos could actually not be another copy
+    if (p)
+    {
+        m_pos.resize(numNodes, Vec3d(0, 0, 0));
+    };
 
+    if (v)
+    {
+        m_vel.resize(numNodes, Vec3d(0, 0, 0));
+    }
 
-Vec3d&
-PbdState::getInitialVertexPosition(const unsigned int& idx)
-{
-    return m_initPos.at(idx);
+    if (a)
+    {
+        m_acc.resize(numNodes, Vec3d(0, 0, 0));
+    }
 }
 
 void
-PbdState::setVertexPosition(const unsigned int& idx, Vec3d& pos)
+PbdState::initialize(const std::shared_ptr<Mesh>& m, bool p, bool v, bool a)
 {
-    m_pos.at(idx) = pos;
-}
-
-Vec3d&
-PbdState::getVertexPosition(const unsigned int& idx)
-{
-    return m_pos.at(idx);
+    this->initialize(m->getNumVertices(), p, v, a);
 }
 
 } // imstk

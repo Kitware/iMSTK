@@ -47,7 +47,7 @@ public:
     ///
     /// \brief
     ///
-    ~CollidingObject() = default;
+    virtual ~CollidingObject() = default;
 
     ///
     /// \brief
@@ -71,6 +71,11 @@ public:
     ///
     const Vec3d& getForce() const;
     void setForce(Vec3d force);
+
+    ///
+    /// \brief
+    ///
+    bool isCollidable() const final { return true; };
 
 protected:
 

@@ -30,23 +30,27 @@ namespace imstk
 {
 
 ///
+/// \brief Type of the time dependent mathematical model
+///
+enum class DynamicalModelType
+{
+    rigidBodyDynamics,
+    elastoDynamics,
+    positionBasedDynamics,
+    NavierStokes,
+    HeatEquation,
+    none
+};
+
+///
 /// \class DynamicalModel
 ///
 /// \brief Base class for mathematical model of the physics governing the dynamic object
 ///
+template <class T>
 class DynamicalModel
 {
 public:
-    ///
-    /// \brief Type of the time dependent mathematical model
-    ///
-    enum class Type
-    {
-        elastoDynamics,
-        NavierStokes,
-        HeatEquation,
-        none
-    };
 
     ///
     /// \brief Type of the update of the state of the body
@@ -60,13 +64,14 @@ public:
         none
     };
 
-    using kinematicState = VectorizedState;
-
 public:
     ///
     /// \brief Constructor
     ///
-    DynamicalModel(DynamicalModel::Type type = Type::none) : m_type(type){}
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type)
+    {
+
+    }
 
     ///
     /// \brief Destructor
@@ -74,45 +79,38 @@ public:
     virtual ~DynamicalModel() = default;
 
     ///
-    /// \brief Return the current state of the body
+    /// \brief Return the initial state of the problem
     ///
-    std::shared_ptr<kinematicState> getInitialState()
-    {
-        return m_initialState;
-    }
+    std::shared_ptr<T> getInitialState() { return m_initialState; }
 
     ///
-    /// \brief Return the current state of the body
+    /// \brief Return the current state of the problem
     ///
-    std::shared_ptr<kinematicState> getCurrentState()
-    {
-        return m_currentState;
-    }
+    std::shared_ptr<T> getCurrentState() { return m_currentState; }
 
     ///
-    /// \brief Return the current state of the body
+    /// \brief Return the previous state of the problem
     ///
-    std::shared_ptr<kinematicState> getPreviousState()
-    {
-        return m_previousState;
-    }
+    std::shared_ptr<T> getPreviousState() { return m_previousState; }
 
     ///
     /// \brief Reset the current state to the initial state
     ///
-    virtual void resetToInitialState()
+    /*virtual void resetToInitialState()
     {
-        m_currentState->setState(m_initialState);
-        m_previousState->setState(m_initialState);
-    }
+    m_currentState->setState(m_initialState);
+    m_previousState->setState(m_initialState);
+    }*/
 
     ///
     /// \brief Returns the number of degrees of freedom
     ///
-    std::size_t getNumDegreeOfFreedom() const
-    {
-        return m_numDOF;
-    }
+    std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
+
+    ///
+    /// \brief Get the type of the object
+    ///
+    const DynamicalModelType& getType() const { return m_type; }
 
     ///
     /// \brief Update states
@@ -120,23 +118,18 @@ public:
     virtual void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) = 0;
 
     ///
-    /// \brief Get the type of the object
+    /// \brief
     ///
-    const Type& getType() const
-    {
-        return m_type;
-    }
-
-    virtual void updatePhysicsGeometry() = 0;
+    virtual void updatePhysicsGeometry(){};
 
 protected:
 
-    Type m_type; ///> Mathematical model type
+    DynamicalModelType m_type; ///> Mathematical model type
 
     // Body states
-    std::shared_ptr<kinematicState> m_initialState;      ///> Initial state
-    std::shared_ptr<kinematicState> m_currentState;      ///> Current state
-    std::shared_ptr<kinematicState> m_previousState;     ///> Previous state
+    std::shared_ptr<T> m_initialState;      ///> Initial state
+    std::shared_ptr<T> m_currentState;      ///> Current state
+    std::shared_ptr<T> m_previousState;     ///> Previous state
 
     std::size_t m_numDOF; ///> Total number of degree of freedom
 };

@@ -31,8 +31,8 @@
 namespace imstk
 {
 
-DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false)
-{}
+DeformableBodyModel::DeformableBodyModel() :
+DynamicalModel(DynamicalModelType::elastoDynamics), m_damped(false){}
 
 void
 DeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)

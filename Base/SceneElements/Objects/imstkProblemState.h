@@ -35,6 +35,11 @@ class ProblemState
 public:
     ProblemState() = default;
     ~ProblemState() = default;
+
+    ///
+    /// \brief Initialize the problem state
+    ///
+    //virtual void initialize(const size_t numDof) = 0;
 };
 
 } // imstk

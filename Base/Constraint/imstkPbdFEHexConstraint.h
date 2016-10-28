@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_FE_HEX_CONSTRAINT_H
-#define IMSTK_PBD_FE_HEX_CONSTRAINT_H
+#ifndef imstkPbdFeHexConstraint_h
+#define imstkPbdFeHexConstraint_h
 
 #include "imstkPbdFEMConstraint.h"
 
@@ -65,6 +65,6 @@ public:
     bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 };
 
-}
+} // imstk
 
-#endif // IMSTK_PBD_FE_HEX_CONSTRAINT_H
+#endif // imstkPbdFeHexConstraint_h

@@ -28,12 +28,15 @@
 namespace imstk
 {
 
+// TODO: Complete this
+class RigidBodyState{};
+
 ///
 /// \class RigidObject
 ///
 /// \brief Base class for scene objects that is rigid and movable
 ///
-class RigidObject : public DynamicObject
+class RigidObject : public DynamicObject<RigidBodyState>
 {
 public:
 

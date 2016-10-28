@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_VOLUME_CONSTRAINT_H
-#define IMSTK_PBD_VOLUME_CONSTRAINT_H
+#ifndef imstkPbdVolumeConstraint_h
+#define imstkPbdVolumeConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -66,4 +66,4 @@ public:
 
 }
 
-#endif // IMSTK_PBD_DISTANCE_CONSTRAINT_H
+#endif // imstkPbdVolumeConstraint_h

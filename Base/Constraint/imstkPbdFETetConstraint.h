@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_FE_TET_CONSTRAINT_H
-#define IMSTK_PBD_FE_TET_CONSTRAINT_H
+#ifndef imstkPbdFeConstraint_h
+#define imstkPbdFeConstraint_h
 
 #include "imstkPbdFEMConstraint.h"
 
@@ -62,6 +62,6 @@ public:
     bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 };
 
-}
+} // imstk
 
-#endif // IMSTK_PBD_FE_TET_CONSTRAINT_H
+#endif // imstkPbdFeConstraint_h

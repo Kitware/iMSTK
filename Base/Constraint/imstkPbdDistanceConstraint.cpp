@@ -29,13 +29,13 @@ void
 DistanceConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
                                    const unsigned int &pIdx2, const double k)
 {
-    m_bodies[0] = pIdx1;
-    m_bodies[1] = pIdx2;
+    m_vertexIds[0] = pIdx1;
+    m_vertexIds[1] = pIdx2;
     m_stiffness = k;
 
-    auto state = model.getState();
-    const Vec3d &p1 = state->getInitialVertexPosition(pIdx1);
-    const Vec3d &p2 = state->getInitialVertexPosition(pIdx2);
+    auto state = model.getInitialState();
+    const Vec3d &p1 = state->getVertexPosition(pIdx1);
+    const Vec3d &p2 = state->getVertexPosition(pIdx2);
 
     m_restLength = (p1 - p2).norm();
 }
@@ -43,10 +43,10 @@ DistanceConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsi
 bool
 DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
-    const unsigned int i1 = m_bodies[0];
-    const unsigned int i2 = m_bodies[1];
+    const unsigned int i1 = m_vertexIds[0];
+    const unsigned int i2 = m_vertexIds[1];
 
-    auto state = model.getState();
+    auto state = model.getCurrentState();
 
     Vec3d &p0 = state->getVertexPosition(i1);
     Vec3d &p1 = state->getVertexPosition(i2);

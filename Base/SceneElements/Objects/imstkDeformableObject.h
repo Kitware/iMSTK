@@ -42,22 +42,25 @@ class GeometryMap;
 ///
 /// \brief Scene objects that can deform
 ///
-class DeformableObject : public DynamicObject
+class DeformableObject : public DynamicObject<VectorizedState>
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    DeformableObject(std::string name) : DynamicObject(name)
-    {
-        m_type = Type::Deformable;
-    }
+    DeformableObject(std::string name) : DynamicObject(name) { m_type = Type::Deformable; }
+    DeformableObject() = delete;
 
     ///
     /// \brief Destructor
     ///
     ~DeformableObject() = default;
+
+    ///
+    /// \brief
+    ///
+    void initialize();
 
     ///
     /// \brief Initialize the kinematic state of the body
@@ -68,7 +71,7 @@ public:
     ///
     /// \brief Set/Get dynamical model
     ///
-    void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel) override;
+    //void setDynamicalModel(std::shared_ptr<DynamicalModel<VectorizedState>> dynaDefModel) override;
 
     ///
     /// \brief Get the vector that holds the contact forces
@@ -106,6 +109,7 @@ public:
     const Vectord& getPrevAccelerations() const;
 
 protected:
+    std::shared_ptr<DeformableBodyModel> m_defModel;
 };
 
 } // imstk

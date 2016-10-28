@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_AREA_CONSTRAINT_H
-#define IMSTK_PBD_AREA_CONSTRAINT_H
+#ifndef imstkPbdAreaConstraint_h
+#define imstkPbdAreaConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -63,6 +63,7 @@ public:
     double m_restArea; ///> Area at the rest position
     double m_stiffness; ///> Stiffness of the area constraint
 };
-}
 
-#endif // IMSTK_PBD_AREA_CONSTRAINT_H
+} // imstk
+
+#endif // imstkPbdAreaConstraint_h

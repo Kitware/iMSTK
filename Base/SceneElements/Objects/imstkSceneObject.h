@@ -46,7 +46,8 @@ public:
         Visual,
         Colliding,
         Rigid,
-        Deformable
+        Deformable,
+        Pbd
     };
 
     ///
@@ -93,6 +94,21 @@ public:
     /// \brief Setup a controller for the object for a given device client
     ///
     std::shared_ptr<SceneObjectController> setupController(std::shared_ptr<DeviceClient> deviceClient);
+
+    ///
+    /// \brief
+    ///
+    bool isVisible() const { return true; };
+
+    ///
+    /// \brief
+    ///
+    virtual bool isCollidable() const { return false; };
+
+    ///
+    /// \brief
+    ///
+    virtual bool isPhysical() const { return false; };
 
 protected:
     ///

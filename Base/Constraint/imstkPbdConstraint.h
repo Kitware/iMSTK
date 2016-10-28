@@ -47,16 +47,14 @@ public:
         Area,
         Volume,
         FEMTet,
-        FEMHex
+        FEMHex,
+        none
     };
 
     ///
     /// \brief Constructor
     ///
-    PbdConstraint(const unsigned int nP)
-    {
-        m_bodies.resize(nP);
-    }
+    PbdConstraint(const unsigned int nP) { m_vertexIds.resize(nP); }
 
     ///
     /// \brief abstract interface to know the type of constraint
@@ -95,7 +93,7 @@ public:
     }
 
 public:
-    std::vector<unsigned int> m_bodies; // index of points for the constraint
+    std::vector<unsigned int> m_vertexIds; // index of points for the constraint
 };
 
 }

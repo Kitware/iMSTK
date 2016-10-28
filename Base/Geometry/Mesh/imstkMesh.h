@@ -39,6 +39,7 @@ public:
     /// \brief Destructor
     ///
     ~Mesh() = default;
+    //Mesh() = default;
 
     ///
     /// \brief Initializes the data structure given vertex positions
@@ -85,7 +86,7 @@ public:
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
-    const std::vector<Vec3d>& getVerticesPositions() const;
+    const std::vector<Vec3d>& getVertexPositions() const;
 
     ///
     /// \brief Set the current position of a vertex given its index to certain position

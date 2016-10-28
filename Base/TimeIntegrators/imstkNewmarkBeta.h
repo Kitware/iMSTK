@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkBackwardEuler_h
-#define imstkBackwardEuler_h
+#ifndef imstkNewmarkBeta_h
+#define imstkNewmarkBeta_h
 
 #include "imstkTimeIntegrator.h"
 

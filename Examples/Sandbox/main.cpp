@@ -305,13 +305,13 @@ void testMeshCCD()
     {
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_1.vtk");
-        mesh2->setVerticesPositions(mesh2_1->getVerticesPositions());
+        mesh2->setVerticesPositions(mesh2_1->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_2.vtk");
-        mesh2->setVerticesPositions(mesh2_2->getVerticesPositions());
+        mesh2->setVerticesPositions(mesh2_2->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_3 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_3.vtk");
-        mesh2->setVerticesPositions(mesh2_3->getVerticesPositions());
+        mesh2->setVerticesPositions(mesh2_3->getVertexPositions());
     });
 
     // Run
@@ -1067,7 +1067,7 @@ void testDeformableBody()
     // e. Scene object 1: Dragon
 
     // Configure dynamic model
-    auto dynaModel = std::make_shared<DeformableBodyModel>(DynamicalModel::Type::elastoDynamics);
+    auto dynaModel = std::make_shared<DeformableBodyModel>();
     dynaModel->configure("asianDragon.config");
     dynaModel->initialize(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
@@ -1080,6 +1080,7 @@ void testDeformableBody()
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
     deformableObj->setDynamicalModel(dynaModel);
+    deformableObj->initialize();
     scene->addSceneObject(deformableObj);
 
     // f. Scene object 2: Plane
@@ -1175,7 +1176,7 @@ void testPbdVolume()
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init(/*Number of Constraints*/1,
+    deformableObj->initialize(/*Number of Constraints*/1,
         /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
@@ -1205,15 +1206,16 @@ void testPbdCloth()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
     scene->getCamera()->setPosition(6.0, 2.0, 20.0);
+
     // a. Construct a sample triangular mesh
 
     // b. Add nodal data
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
     std::vector<imstk::Vec3d> vertList;
-    double width = 10.0;
-    double height = 10.0;
-    int nRows = 20;
-    int nCols = 20;
+    const double width = 10.0;
+    const double height = 10.0;
+    const int nRows = 10;
+    const int nCols = 10;
     vertList.resize(nRows*nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -1221,10 +1223,7 @@ void testPbdCloth()
     {
         for (int j = 0; j < nCols; j++)
         {
-            const double y = (double)dy*j;
-            const double x = (double)dx*i;
-            vertList[i*nCols + j] = Vec3d(x, 1.0, y);
-
+            vertList[i*nCols + j] = Vec3d((double)dx*i, 1.0, (double)dy*j);
         }
     }
     surfMesh->setInitialVerticesPositions(vertList);
@@ -1246,27 +1245,20 @@ void testPbdCloth()
 
     surfMesh->setTrianglesVertices(triangles);
 
-    auto visuMesh = std::make_shared<imstk::SurfaceMesh>();
-    visuMesh->setInitialVerticesPositions(vertList);
-    visuMesh->setVerticesPositions(vertList);
-    visuMesh->setTrianglesVertices(triangles);
-
-    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
-    oneToOneNodalMap->setMaster(surfMesh);
-    oneToOneNodalMap->setSlave(visuMesh);
-    oneToOneNodalMap->compute();
-
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
-    deformableObj->setVisualGeometry(visuMesh);
+    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+
+    deformableObj->setDynamicalModel(pbdModel);
+    deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
-    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
-    deformableObj->init(/*Number of constraints*/2,
+
+    deformableObj->initialize(/*Number of constraints*/2,
         /*Constraint configuration*/"Distance 0.1",
         /*Constraint configuration*/"Dihedral 0.001",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
         /*TimeStep*/0.01,
-        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20",
+        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10",
         /*NumberOfIterationInConstraintSolver*/5
         );
 
@@ -1326,7 +1318,7 @@ void testPbdCollision()
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
     deformableObj->setPhysicsToVisualMap(deformMapP2V);
     deformableObj->setCollidingToVisualMap(deformMapC2V);
-    deformableObj->init(/*Number of Constraints*/1,
+    deformableObj->initialize(/*Number of Constraints*/1,
         /*Constraint configuration*/"FEM NeoHookean 1.0 0.3",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
@@ -1398,7 +1390,7 @@ void testPbdCollision()
         floor->setPhysicsToCollidingMap(oneToOneFloor);
         floor->setPhysicsToVisualMap(oneToOneFloor);
         //floor->setCollidingToVisualMap(oneToOneFloor);
-        floor->init(/*Number of constraints*/2,
+        floor->initialize(/*Number of constraints*/2,
             /*Constraint configuration*/"Distance 0.1",
             /*Constraint configuration*/"Dihedral 0.001",
             /*Mass*/0.1,
@@ -1445,7 +1437,7 @@ void testPbdCollision()
             tmpPos[1] -= 6;
             volTetMesh1->setVerticePosition(i, tmpPos);
         }
-        volTetMesh1->setInitialVerticesPositions(volTetMesh1->getVerticesPositions());
+        volTetMesh1->setInitialVerticesPositions(volTetMesh1->getVertexPositions());
 
         volTetMesh1->extractSurfaceMesh(surfMesh1);
         volTetMesh1->extractSurfaceMesh(surfMeshVisual1);
@@ -1473,7 +1465,7 @@ void testPbdCollision()
         deformableObj1->setPhysicsToCollidingMap(deformMapP2C1);
         deformableObj1->setPhysicsToVisualMap(deformMapP2V1);
         deformableObj1->setCollidingToVisualMap(deformMapC2V1);
-        deformableObj1->init(/*Number of Constraints*/1,
+        deformableObj1->initialize(/*Number of Constraints*/1,
             /*Constraint configuration*/"FEM NeoHookean 10.0 0.5",
             /*Mass*/0.0,
             /*Gravity*/"0 -9.8 0",
@@ -1558,7 +1550,7 @@ void testPbdCollision()
         floor->setPhysicsToCollidingMap(floorMapP2C);
         floor->setPhysicsToVisualMap(floorMapP2V);
         floor->setCollidingToVisualMap(floorMapC2V);
-        floor->init(/*Number of Constraints*/0,
+        floor->initialize(/*Number of Constraints*/0,
             /*Mass*/0.0,
             /*Proximity*/0.1,
             /*Contact stiffness*/1.0);
@@ -1663,7 +1655,7 @@ void testLineMesh()
         linesTool->setCollidingToVisualMap(mapC2V);
         linesTool->setPhysicsToVisualMap(mapP2V);
         linesTool->setColldingToPhysicsMap(mapC2P);
-        linesTool->init(/*Number of constraints*/1,
+        linesTool->initialize(/*Number of constraints*/1,
             /*Constraint configuration*/"Distance 100",
             /*Mass*/0.0,
             /*Gravity*/"0 -9.8 0",
@@ -1708,7 +1700,7 @@ void testLineMesh()
         blade->setCollidingToVisualMap(bladeMapC2V);
         blade->setPhysicsToVisualMap(bladeMapP2V);
         blade->setColldingToPhysicsMap(bladeMapC2P);
-        blade->init(/*Number of constraints*/1,
+        blade->initialize(/*Number of constraints*/1,
             /*Constraint configuration*/"Distance 0.1",
             /*Mass*/0.0,
             /*Gravity*/"0 0 0",
@@ -1795,7 +1787,7 @@ void testLineMesh()
         floor->setPhysicsToCollidingMap(clothMapP2C);
         floor->setPhysicsToVisualMap(clothMapP2V);
         floor->setCollidingToVisualMap(clothMapC2V);
-        floor->init(/*Number of constraints*/2,
+        floor->initialize(/*Number of constraints*/2,
             /*Constraint configuration*/"Distance 0.1",
             /*Constraint configuration*/"Dihedral 0.001",
             /*Mass*/0.1,
@@ -1846,7 +1838,7 @@ void testLineMesh()
             tmpPos[1] -= 15;
             volTetMesh->setVerticePosition(i, tmpPos);
         }
-        volTetMesh->setInitialVerticesPositions(volTetMesh->getVerticesPositions());
+        volTetMesh->setInitialVerticesPositions(volTetMesh->getVertexPositions());
 
         auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
         volTetMesh->extractSurfaceMesh(surfMesh);
@@ -1877,7 +1869,7 @@ void testLineMesh()
         deformableObj->setPhysicsToCollidingMap(dragonMapP2C);
         deformableObj->setPhysicsToVisualMap(dragonMapP2V);
         deformableObj->setCollidingToVisualMap(dragonMapC2V);
-        deformableObj->init(/*Number of Constraints*/1,
+        deformableObj->initialize(/*Number of Constraints*/1,
             /*Constraint configuration*/"FEM NeoHookean 10.0 0.3",
             /*Mass*/0.1,
             /*Gravity*/"0 0 0",

@@ -25,6 +25,7 @@
 #include "imstkSceneObjectController.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdObject.h"
+#include "imstkDeformableObject.h"
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
 
@@ -101,11 +102,15 @@ SceneManager::runModule()
         solvers->solve();
     }
 
-    // Apply the geometry maps
+    // Apply the geometry maps to all the physics objects
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
+        if (obj->isPhysical())
         {
+            //auto dynaObj = std::dynamic_pointer_cast<DynamicObject<ProblemState>>(obj);
+
+            auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj);
+
             dynaObj->getDynamicalModel()->updatePhysicsGeometry();
 
             auto mapPC = dynaObj->getPhysicsToCollidingMap();
@@ -120,19 +125,6 @@ SceneManager::runModule()
                 mapPV->apply();
             }
         }
-
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            // Skip VirtualCouplingPBDObject from internal constraint projection
-            continue;
-        }
-        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
-        {
-            //pbdObj->integratePosition();
-            //pbdObj->constraintProjection();
-            pbdObj->updateGeometry();
-            pbdObj->applyPhysicsToColliding();
-        }
     }
 
     for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
@@ -144,22 +136,6 @@ SceneManager::runModule()
         }
         intPair->doCollision();
     }
-
-    for (auto obj : m_scene->getSceneObjects())
-    {
-        if (auto pbdRigidObj = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            // Skip VirtualCouplingPBDObject from internal constraint projection
-            continue;
-        }
-        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
-        {
-            pbdObj->integrateVelocity();
-            pbdObj->updateGeometry();
-            pbdObj->applyPhysicsToVisual();
-        }
-    }
-
 }
 
 void

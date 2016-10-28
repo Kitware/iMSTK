@@ -30,19 +30,19 @@ VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsign
                                  const unsigned int &pIdx2, const unsigned int &pIdx3,
                                  const unsigned int &pIdx4, const double k)
 {
-    m_bodies[0] = pIdx1;
-    m_bodies[1] = pIdx2;
-    m_bodies[2] = pIdx3;
-    m_bodies[3] = pIdx4;
+    m_vertexIds[0] = pIdx1;
+    m_vertexIds[1] = pIdx2;
+    m_vertexIds[2] = pIdx3;
+    m_vertexIds[3] = pIdx4;
 
     m_stiffness = k;
 
-    auto state = model.getState();
+    auto state = model.getInitialState();
 
-    const Vec3d &p0 = state->getInitialVertexPosition(pIdx1);
-    const Vec3d &p1 = state->getInitialVertexPosition(pIdx2);
-    const Vec3d &p2 = state->getInitialVertexPosition(pIdx3);
-    const Vec3d &p3 = state->getInitialVertexPosition(pIdx4);
+    const Vec3d &p0 = state->getVertexPosition(pIdx1);
+    const Vec3d &p1 = state->getVertexPosition(pIdx2);
+    const Vec3d &p2 = state->getVertexPosition(pIdx3);
+    const Vec3d &p3 = state->getVertexPosition(pIdx4);
 
     m_restVolume = (1.0 / 6.0)*((p1 - p0).cross(p2 - p0)).dot(p3 - p0);
 }
@@ -50,12 +50,12 @@ VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsign
 bool
 VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
-    const unsigned int i1 = m_bodies[0];
-    const unsigned int i2 = m_bodies[1];
-    const unsigned int i3 = m_bodies[2];
-    const unsigned int i4 = m_bodies[3];
+    const unsigned int i1 = m_vertexIds[0];
+    const unsigned int i2 = m_vertexIds[1];
+    const unsigned int i3 = m_vertexIds[2];
+    const unsigned int i4 = m_vertexIds[3];
 
-    auto state = model.getState();
+    auto state = model.getCurrentState();
 
     Vec3d &x1 = state->getVertexPosition(i1);
     Vec3d &x2 = state->getVertexPosition(i2);

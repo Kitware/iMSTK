@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_DISTANCE_CONSTRAINT_H
-#define IMSTK_PBD_DISTANCE_CONSTRAINT_H
+#ifndef imstkPbdDistanceConstraint_h
+#define imstkPbdDistanceConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -61,6 +61,6 @@ public:
     double m_stiffness;  ///> Stiffness of the constaint
 };
 
-}
+} // imstk
 
-#endif // IMSTK_PBD_DISTANCE_CONSTRAINT_H
+#endif // imstkPbdDistanceConstraint_h

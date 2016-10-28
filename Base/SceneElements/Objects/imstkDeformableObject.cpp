@@ -27,60 +27,74 @@ namespace imstk
 Vectord&
 DeformableObject::getContactForce()
 {
-    auto defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
+    //m_defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
 
-    if (!defModel)
+    if (!m_defModel)
     {
         LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::getContactForce()";
     }
 
-    return defModel->getContactForce();
+    return m_defModel->getContactForce();
 }
 
 void
-DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel)
+DeformableObject::initialize()
 {
-    if (!dynaDefModel || dynaDefModel->getType() != DynamicalModel::Type::elastoDynamics)
+    // CHECKBACK
+    if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::elastoDynamics)
     {
-        LOG(WARNING) << "Dynamic model set is not of expected type (elastodynamics)!";
+        LOG(WARNING) << "Dynamic model set is not of expected type (DeformableBodyModel)!";
     }
-    m_dynamicalModel = dynaDefModel;
+    else
+    {
+        m_defModel = std::static_pointer_cast<DeformableBodyModel>(m_dynamicalModel);
+    }
 }
+
+//void
+//DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel<VectorizedState>> dynaDefModel)
+//{
+//    if (!dynaDefModel || dynaDefModel->getType() != DynamicalModelType::elastoDynamics)
+//    {
+//        LOG(WARNING) << "Dynamic model set is not of expected type (elastodynamics)!";
+//    }
+//    m_dynamicalModel = dynaDefModel;
+//}
 
 const Vectord&
 DeformableObject::getDisplacements() const
 {
-    return m_dynamicalModel->getCurrentState()->getQ();
+    return m_defModel->getCurrentState()->getQ();
 }
 
 const Vectord&
 DeformableObject::getPrevDisplacements() const
 {
-    return m_dynamicalModel->getPreviousState()->getQ();
+    return m_defModel->getPreviousState()->getQ();
 }
 
 const Vectord&
 DeformableObject::getVelocities() const
 {
-    return m_dynamicalModel->getCurrentState()->getQDot();
+    return m_defModel->getCurrentState()->getQDot();
 }
 
 const Vectord&
 DeformableObject::getPrevVelocities() const
 {
-    return m_dynamicalModel->getPreviousState()->getQDot();
+    return m_defModel->getPreviousState()->getQDot();
 }
 
 const Vectord&
 DeformableObject::getAccelerations() const
 {
-    return m_dynamicalModel->getCurrentState()->getQDotDot();
+    return m_defModel->getCurrentState()->getQDotDot();
 }
 
 const Vectord&
 DeformableObject::getPrevAccelerations() const
 {
-    return m_dynamicalModel->getPreviousState()->getQDotDot();
+    return m_defModel->getPreviousState()->getQDotDot();
 }
 
 } // imstk

@@ -41,42 +41,43 @@ class PbdState : public ProblemState
 {
 public:
     ///
-    /// \brief Default constructor
+    /// \brief Default constructor/destructor
     ///
     PbdState() = default;
+    ~PbdState() = default;
 
     ///
     /// \brief
     ///
-    void initialize(const std::shared_ptr<Mesh>& m);
+    void initialize(const size_t numNodes, bool p=1, bool v=1, bool a=1);
+    void initialize(const std::shared_ptr<Mesh>& m, bool p=1, bool v=1, bool a=1);
 
     ///
     /// \brief
     ///
-    Vec3d& getInitialVertexPosition(const unsigned int& idx);
+    void setVertexPosition(const unsigned int& idx, Vec3d& pos) { m_pos.at(idx) = pos; };
+    Vec3d& getVertexPosition(const unsigned int& idx) { return m_pos.at(idx); };
 
     ///
     /// \brief
     ///
-    void setVertexPosition(const unsigned int& idx, Vec3d& pos);
-
-    ///
-    /// \brief
-    ///
-    Vec3d& getVertexPosition(const unsigned int& idx);
-
-    std::vector<Vec3d>& getInitPositions() { return m_initPos; };
-    std::vector<Vec3d>& getPreviousPositions() { return m_oldPos; };
     std::vector<Vec3d>& getPositions() { return m_pos; };
+    void setPositions(const std::vector<Vec3d>& p) { m_pos = p; };
+
+    ///
+    /// \brief
+    ///
     std::vector<Vec3d>& getVelocities() { return m_vel; };
+
+    ///
+    /// \brief
+    ///
     std::vector<Vec3d>& getAccelerations() { return m_acc; };
 
 private:
-    std::vector<Vec3d> m_pos;
-    std::vector<Vec3d> m_initPos;
-    std::vector<Vec3d> m_vel;
-    std::vector<Vec3d> m_acc;
-    std::vector<Vec3d> m_oldPos;
+    std::vector<Vec3d> m_pos; ///> Positions
+    std::vector<Vec3d> m_vel; ///> Velocities
+    std::vector<Vec3d> m_acc; ///> Acelerations
 };
 
 } // imstk

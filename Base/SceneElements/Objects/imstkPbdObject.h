@@ -1,7 +1,8 @@
-#ifndef IMSTKPBDOBJECT_H
-#define IMSTKPBDOBJECT_H
+#ifndef imstkPbdObject_h
+#define imstkPbdObject_h
 
-#include "imstkCollidingObject.h"
+#include "imstkDynamicObject.h"
+#include "imstkDynamicalModel.h"
 #include "imstkPbdModel.h"
 
 #include <stdarg.h>
@@ -18,16 +19,17 @@ class GeometryMap;
 /// \brief Base class for scene objects that move and/or deform under position
 /// based dynamics formulation
 ///
-class PbdObject : public CollidingObject
+class PbdObject : public DynamicObject<PbdState>
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
     ///
-    PbdObject(std::string name) : CollidingObject(name)
+    PbdObject(std::string name) : DynamicObject(name)
     {
-        m_type = SceneObject::Type::Deformable;
+        m_type = SceneObject::Type::Pbd;
     }
+    PbdObject() = delete;
 
     ///
     /// \brief Destructor
@@ -35,81 +37,33 @@ public:
     virtual ~PbdObject() = default;
 
     ///
-    /// \brief
+    /// \brief Initialize the pbd configuration
+    /// TODO: Parse from config file
     ///
-    void init(int nCons, ...);
+    void initialize(int nCons, ...);
 
     ///
-    /// \brief
+    /// \brief Update the position based on Verlet time stepping rule
     ///
     virtual void integratePosition();
 
     ///
-    /// \brief
+    /// \brief Update the velocity
     ///
     virtual void integrateVelocity();
 
     ///
-    /// \brief
+    /// \brief Solve the pbd constraints by projection
     ///
-    virtual void updateGeometry();
-
-    ///
-    /// \brief
-    ///
-    virtual void constraintProjection();
-
-    ///
-    /// \brief
-    ///
-    void applyPhysicsToColliding();
-
-    ///
-    /// \brief
-    ///
-    void applyPhysicsToVisual();
-
-    ///
-    /// \brief Set/Get the geometry used for Physics computations
-    ///
-    std::shared_ptr<Geometry> getPhysicsGeometry() const;
-    void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
-
-    ///
-    /// \brief Set/Get the Physics-to-Collision map
-    ///
-    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const;
-    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map);
-
-    ///
-    /// \brief Set/Get the Physics-to-Visual map
-    ///
-    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const;
-    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map);
-
-    ///
-    /// \brief Set/Get dynamical model
-    ///
-    std::shared_ptr<PositionBasedDynamicsModel> getDynamicalModel() const;
-    void setDynamicalModel(std::shared_ptr<PositionBasedDynamicsModel> dynaModel);
-
-    ///
-    /// \brief Returns the number of degree of freedom
-    ///
-    size_t getNumOfDOF() const;
+    virtual void solveConstraints();
 
 protected:
 
-    std::shared_ptr<PositionBasedDynamicsModel> m_pbdModel;
-    std::shared_ptr<Geometry> m_physicsGeometry;
-
-    //Maps
-    std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
-    std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
+    std::shared_ptr<PositionBasedDynamicsModel> m_pbdModel; ///> PBD mathematical model
 
     size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
 } // imstk
 
-#endif // IMSTKPBDOBJECT_H
+#endif // imstkPbdObject_h

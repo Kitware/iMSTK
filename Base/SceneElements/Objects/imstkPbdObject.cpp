@@ -7,67 +7,24 @@
 namespace imstk
 {
 
-std::shared_ptr<Geometry>
-PbdObject::getPhysicsGeometry() const
-{
-    return m_physicsGeometry;
-}
-
 void
-PbdObject::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
+PbdObject::initialize(int nCons, ...)
 {
-    m_physicsGeometry = geometry;
-    m_pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+    //auto state = m_pbdModel->getState();
+
     auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
+    m_pbdModel = std::dynamic_pointer_cast<PositionBasedDynamicsModel>(m_dynamicalModel);
     m_pbdModel->setModelGeometry(mesh);
-}
 
-std::shared_ptr<GeometryMap>
-PbdObject::getPhysicsToCollidingMap() const
-{
-    return m_physicsToCollidingGeomMap;
-}
-
-void
-PbdObject::setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map)
-{
-    m_physicsToCollidingGeomMap = map;
-}
-
-std::shared_ptr<GeometryMap>
-PbdObject::getPhysicsToVisualMap() const
-{
-    return m_physicsToVisualGeomMap;
-}
-
-void
-PbdObject::setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map)
-{
-    m_physicsToVisualGeomMap = map;
-}
-
-std::shared_ptr<PositionBasedDynamicsModel>
-PbdObject::getDynamicalModel() const
-{
-    return m_pbdModel;
-}
-
-void
-PbdObject::setDynamicalModel(std::shared_ptr<PositionBasedDynamicsModel> dynaModel)
-{
-    m_pbdModel = dynaModel;
-}
-
-size_t
-PbdObject::getNumOfDOF() const
-{
-    return numDOF;
-}
-
-void
-PbdObject::init(int nCons, ...)
-{
-    auto state = m_pbdModel->getState();
+    // CHECKBACK
+    if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::positionBasedDynamics)
+    {
+        LOG(WARNING) << "Dynamic model set is not of expected type (PositionBasedDynamicsModel)!";
+    }
+    else
+    {
+        m_pbdModel = std::static_pointer_cast<PositionBasedDynamicsModel>(m_dynamicalModel);
+    }
 
     va_list args;
     va_start(args, nCons);
@@ -180,7 +137,7 @@ PbdObject::init(int nCons, ...)
                 }
             }
         }
-        m_pbdModel->setNumberOfInterations(va_arg(args,int));
+        m_pbdModel->setMaxNumIterations(va_arg(args,int));
     }
 
     if (m_physicsToCollidingGeomMap && m_collidingGeometry)
@@ -206,35 +163,11 @@ void PbdObject::integrateVelocity()
     }
 }
 
-void PbdObject::updateGeometry()
-{
-    if (m_pbdModel && m_pbdModel->hasConstraints())
-    {
-        m_pbdModel->updatePhysicsGeometry();
-    }
-}
-
-void PbdObject::constraintProjection()
+void PbdObject::solveConstraints()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
         m_pbdModel->projectConstraints();
-    }
-}
-
-void PbdObject::applyPhysicsToColliding()
-{
-    if (m_physicsToCollidingGeomMap && m_collidingGeometry)
-    {
-        m_physicsToCollidingGeomMap->apply();
-    }
-}
-
-void PbdObject::applyPhysicsToVisual()
-{
-    if (m_physicsToVisualGeomMap && m_visualGeometry)
-    {
-        m_physicsToVisualGeomMap->apply();
     }
 }
 

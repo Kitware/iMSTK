@@ -86,8 +86,11 @@ PbdInteractionPair::doBroadPhase()
     Vec3d min2, max2;
     mesh2->computeBoundingBox(min2, max2);
 
-    double prox1 = first->getDynamicalModel()->getProximity();
-    double prox2 = second->getDynamicalModel()->getProximity();
+    auto dynaModel1 = std::static_pointer_cast<PositionBasedDynamicsModel>(first->getDynamicalModel());
+    auto dynaModel2 = std::static_pointer_cast<PositionBasedDynamicsModel>(second->getDynamicalModel());
+
+    double prox1 = dynaModel1->getProximity();
+    double prox2 = dynaModel2->getProximity();
 
     return testAABBvsAABB(min1[0] - prox1, max1[0] + prox1, min1[1] - prox1, max1[1] + prox1,
                           min1[2] - prox1, max1[2] + prox1, min2[0] - prox2, max2[0] + prox2,
@@ -103,8 +106,11 @@ PbdInteractionPair::doNarrowPhase()
     auto map1 = first->getPhysicsToCollidingMap();
     auto map2 = second->getPhysicsToCollidingMap();
 
-    double prox1 = first->getDynamicalModel()->getProximity();
-    double prox2 = second->getDynamicalModel()->getProximity();
+    auto dynaModel1 = std::static_pointer_cast<PositionBasedDynamicsModel>(first->getDynamicalModel());
+    auto dynaModel2 = std::static_pointer_cast<PositionBasedDynamicsModel>(second->getDynamicalModel());
+
+    double prox1 = dynaModel1->getProximity();
+    double prox2 = dynaModel2->getProximity();
 
     auto mesh2 = std::static_pointer_cast<SurfaceMesh>(g2);
 
@@ -132,8 +138,8 @@ PbdInteractionPair::doNarrowPhase()
                     p2[0], p2[1], p2[2], prox1, prox2))
                 {
                     PointTriangleConstraint* c = new PointTriangleConstraint;
-                    c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i),
-                        second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
+                    c->initConstraint(dynaModel1.get(), map1->getMapIdx(i),
+                        dynaModel2.get(), map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
                     m_collisionConstraints.push_back(c);
                 }
             }
@@ -168,8 +174,8 @@ PbdInteractionPair::doNarrowPhase()
                         p1[0], p1[1], p1[2], prox1, prox2))
                     {
                         EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                        c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                            second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
+                        c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                            dynaModel2.get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                         m_collisionConstraints.push_back(c);
                     }
                     E2[e[0]][e[1]] = 0;
@@ -182,8 +188,8 @@ PbdInteractionPair::doNarrowPhase()
                         p2[0], p2[1], p2[2], prox1, prox2))
                     {
                         EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                        c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                            second->getDynamicalModel().get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
+                        c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                            dynaModel2.get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                         m_collisionConstraints.push_back(c);
                     }
                     E2[e[1]][e[2]] = 0;
@@ -196,8 +202,8 @@ PbdInteractionPair::doNarrowPhase()
                         p0[0], p0[1], p0[2], prox1, prox2))
                     {
                         EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                        c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                            second->getDynamicalModel().get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
+                        c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                            dynaModel2.get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                         m_collisionConstraints.push_back(c);
                     }
                     E2[e[2]][e[0]] = 0;
@@ -229,8 +235,8 @@ PbdInteractionPair::doNarrowPhase()
                     p2[0], p2[1], p2[2], prox1, prox2))
                 {
                     PointTriangleConstraint* c = new PointTriangleConstraint;
-                    c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i),
-                        second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
+                    c->initConstraint(dynaModel1.get(), map1->getMapIdx(i),
+                        dynaModel2.get(), map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
                     m_collisionConstraints.push_back(c);
                 }
             }
@@ -268,8 +274,8 @@ PbdInteractionPair::doNarrowPhase()
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
                             E2[e[0]][e[1]] = 0;
                         }
@@ -281,8 +287,8 @@ PbdInteractionPair::doNarrowPhase()
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
                             E2[e[1]][e[2]] = 0;
                         }
@@ -294,8 +300,8 @@ PbdInteractionPair::doNarrowPhase()
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);
                             E2[e[2]][e[0]] = 0;
                         }
@@ -325,8 +331,8 @@ PbdInteractionPair::doNarrowPhase()
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
                             E2[e[0]][e[1]] = 0;
                         }
@@ -338,8 +344,8 @@ PbdInteractionPair::doNarrowPhase()
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
                             E2[e[1]][e[2]] = 0;
                         }
@@ -351,8 +357,8 @@ PbdInteractionPair::doNarrowPhase()
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);
                             E2[e[2]][e[0]] = 0;
                         }
@@ -381,8 +387,8 @@ PbdInteractionPair::doNarrowPhase()
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
                             E2[e[0]][e[1]] = 0;
                         }
@@ -394,8 +400,8 @@ PbdInteractionPair::doNarrowPhase()
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
                             E2[e[1]][e[2]] = 0;
                         }
@@ -407,8 +413,8 @@ PbdInteractionPair::doNarrowPhase()
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
                             EdgeEdgeConstraint* c = new EdgeEdgeConstraint;
-                            c->initConstraint(first->getDynamicalModel().get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
-                                second->getDynamicalModel().get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
+                            c->initConstraint(dynaModel1.get(), map1->getMapIdx(i1), map1->getMapIdx(i2),
+                                dynaModel2.get(), map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);
                             E2[e[2]][e[0]] = 0;
                         }

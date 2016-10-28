@@ -56,15 +56,15 @@ namespace imstk
 /// Note: Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
-class DeformableBodyModel : public DynamicalModel
+class DeformableBodyModel : public DynamicalModel<VectorizedState>
 {
 
-
+    using kinematicState = VectorizedState;
 public:
     ///
     /// \brief Constructor
     ///
-    DeformableBodyModel(DynamicalModel::Type type = DynamicalModel::Type::elastoDynamics);
+    DeformableBodyModel();
 
     ///
     /// \brief Destructor
@@ -217,10 +217,7 @@ public:
     ///
     /// \brief
     ///
-    Vectord& getUnknownVec()
-    {
-        return m_qSol;
-    }
+    Vectord& getUnknownVec() { return m_qSol; }
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces

@@ -38,7 +38,7 @@ TetraTriangleMap::compute()
 
     m_verticesEnclosingTetraId.clear();
     m_verticesWeights.clear();
-    for (const Vec3d& surfVertPos : triMesh->getVerticesPositions())
+    for (const Vec3d& surfVertPos : triMesh->getVertexPositions())
     {
         // Find the enclosing or closest tetrahedron
         int closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);

@@ -77,7 +77,8 @@ public:
         SolverBase::solve();
 
         m_pbdObject->integratePosition();
-        m_pbdObject->constraintProjection();
+        m_pbdObject->solveConstraints();
+        m_pbdObject->integrateVelocity();
     }
 
 private:

@@ -26,8 +26,8 @@ EdgeEdgeConstraint::solvePositionConstraint()
     const unsigned int i2 = m_bodiesSecond[0];
     const unsigned int i3 = m_bodiesSecond[1];
 
-    auto state1 = m_model1->getState();
-    auto state2 = m_model2->getState();
+    auto state1 = m_model1->getCurrentState();
+    auto state2 = m_model2->getCurrentState();
 
     Vec3d& x0 = state1->getVertexPosition(i0);
     Vec3d& x1 = state1->getVertexPosition(i1);
@@ -135,8 +135,8 @@ PointTriangleConstraint::solvePositionConstraint()
     const unsigned int i2 = m_bodiesSecond[1];
     const unsigned int i3 = m_bodiesSecond[2];
 
-    auto state1 = m_model1->getState();
-    auto state2 = m_model2->getState();
+    auto state1 = m_model1->getCurrentState();
+    auto state2 = m_model2->getCurrentState();
 
     Vec3d& x0 = state1->getVertexPosition(i0);
 

@@ -37,6 +37,7 @@ class GeometryMap;
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
+template <class T>
 class DynamicObject : public CollidingObject
 {
 public:
@@ -49,36 +50,45 @@ public:
     ///
     /// \brief Set/Get the geometry used for Physics computations
     ///
-    std::shared_ptr<Geometry> getPhysicsGeometry() const;
-    void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
+    std::shared_ptr<Geometry> getPhysicsGeometry() const { return m_physicsGeometry; }
+    virtual void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
 
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return m_physicsGeometry; }
 
     ///
     /// \brief Set/Get the Physics-to-Collision map
     ///
-    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const;
-    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map);
+    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }
+
+    ///
+    /// \brief
+    ///
+    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) {m_physicsToCollidingGeomMap = map; }
 
     ///
     /// \brief Set/Get the Physics-to-Visual map
     ///
-    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const;
-    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map);
+    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const { return m_physicsToVisualGeomMap; }
+    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map) { m_physicsToVisualGeomMap = map; }
 
     ///
     /// \brief Set/Get dynamical model
     ///
-    std::shared_ptr<DynamicalModel> getDynamicalModel() const;
-    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaModel);
+    virtual std::shared_ptr<DynamicalModel<T>> getDynamicalModel() const { return m_dynamicalModel; }
+    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel<T>> dynaModel) { m_dynamicalModel = dynaModel; }
 
     ///
     /// \brief Returns the number of degree of freedom
     ///
-    size_t getNumOfDOF() const;
+    size_t getNumOfDOF() const { return m_numDOF; }
+
+    ///
+    /// \brief
+    ///
+    bool isPhysical() const final { return true; };
 
 protected:
 
@@ -87,14 +97,14 @@ protected:
     ///
     DynamicObject(std::string name) : CollidingObject(name){}
 
-    std::shared_ptr<DynamicalModel> m_dynamicalModel;           ///> Dynamical model
+    std::shared_ptr<DynamicalModel<T>> m_dynamicalModel;        ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
 
-    size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
+    size_t m_numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
 } // imstk

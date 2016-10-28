@@ -104,12 +104,13 @@ Mesh::setVerticesPositions(const std::vector<Vec3d>& vertices)
 }
 
 const std::vector<Vec3d>&
-Mesh::getVerticesPositions() const
+Mesh::getVertexPositions() const
 {
     return m_verticesPositions;
 }
 
-void Mesh::setVerticePosition(const int& vertNum, const Vec3d& pos)
+void
+Mesh::setVerticePosition(const int& vertNum, const Vec3d& pos)
 {
     m_verticesPositions.at(vertNum) = pos;
 }
