@@ -2,12 +2,20 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Scene
+imstk_add_library( DynamicalModels
   DEPENDS
     Core
-    SceneElements
-    DynamicalModels
-    Collision
+    Geometry
+    Constraint
+    TimeIntegrators
+    Solvers
+    VegaFEM::massSpringSystem
+    VegaFEM::corotationalLinearFEM
+    VegaFEM::isotropicHyperelasticFEM
+    VegaFEM::forceModel
+    VegaFEM::stvk
+    VegaFEM::graph
+    VegaFEM::volumetricMesh
   )
 
 #-----------------------------------------------------------------------------

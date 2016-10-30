@@ -8,9 +8,9 @@ imstk_add_library( SceneElements
     Geometry
     Constraint
     Devices
-	TimeIntegrators
-	ForceModel
-	Solvers
+    TimeIntegrators
+    DynamicalModels
+    Solvers
   )
 
 #-----------------------------------------------------------------------------
