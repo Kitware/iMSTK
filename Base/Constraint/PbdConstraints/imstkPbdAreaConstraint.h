@@ -17,53 +17,53 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef imstkPbdVolumeConstraint_h
-#define imstkPbdVolumeConstraint_h
+#ifndef imstkPbdAreaConstraint_h
+#define imstkPbdAreaConstraint_h
 
 #include "imstkPbdConstraint.h"
 
 namespace imstk
 {
 
+////
+/// \class AreaConstraint
 ///
-/// \class VolumeConstraint
+/// \brief Area constraint for triangular face
 ///
-/// \brief Volume constraint for tetrahedral element
-///
-class VolumeConstraint : public PbdConstraint
+class AreaConstraint : public PbdConstraint
 {
 public:
     ///
-    /// \brief constructor
+    /// \brief Constructor
     ///
-    VolumeConstraint() : PbdConstraint(4) {}
+    AreaConstraint() : PbdConstraint(3) {}
 
     ///
-    /// \brief Returns PBD constraint of type Type::Volume
+    /// \brief Returns PBD constraint of type Type::Area
     ///
     Type getType() const
     {
-        return Type::Volume;
+        return Type::Area;
     }
 
     ///
-    /// \brief Initializes the volume constraint
+    /// \brief Initializes the area constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-        const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 2.0);
+    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
+        const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
 
     ///
-    /// \brief Solves the volume constraint
+    /// \brief Solves the area constraint
     ///
     bool solvePositionConstraint(PositionBasedDynamicsModel &model);
 
 public:
-    double m_restVolume; ///> Rest volume
-    double m_stiffness;  ///> Stiffness of the volume constraint
+    double m_restArea; ///> Area at the rest position
+    double m_stiffness; ///> Stiffness of the area constraint
 };
 
-}
+} // imstk
 
-#endif // imstkPbdVolumeConstraint_h
+#endif // imstkPbdAreaConstraint_h

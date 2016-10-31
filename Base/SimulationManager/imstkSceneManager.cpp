@@ -130,11 +130,11 @@ SceneManager::runModule()
     for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
     {
         intPair->resetConstraints();
-        if (intPair->doBroadPhase())
+        if (intPair->doBroadPhaseCollision())
         {
-            intPair->doNarrowPhase();
+            intPair->doNarrowPhaseCollision();
         }
-        intPair->doCollision();
+        intPair->resolveCollision();
     }
 }
 

@@ -69,7 +69,7 @@ TetrahedralMesh::getVolume() const
     double volume = 0.0;
     for (const TetraArray& tetVertices : m_tetrahedraVertices)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 4; ++i)
         {
             v[i] = this->getVertexPosition(tetVertices[i]);
         }
@@ -228,7 +228,7 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
     Vec3d v[4];
     double det;
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
     {
         v[i] = this->getVertexPosition(tetVertices[i]);
     }
@@ -241,7 +241,7 @@ TetrahedralMesh::computeBarycentricWeights(const size_t& tetId, const Vec3d& pos
 
     det = A.determinant();
 
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < 4; ++i)
     {
         Mat4d B = A;
         B(i, 0) = pos[0];

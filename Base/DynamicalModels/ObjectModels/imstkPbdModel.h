@@ -53,17 +53,22 @@ public:
     ~PositionBasedDynamicsModel() = default;
 
     ///
+    /// \brief Initialize the states
+    ///
+    bool initialize();
+
+    ///
     /// \brief Set/Get the geometry (mesh in this case) used by the pbd model
     ///
-    void setModelGeometry(const std::shared_ptr<Mesh> m);
-    std::shared_ptr<Mesh> getModelGeometry(){ return m_mesh; }
+    void setModelGeometry(std::shared_ptr<Mesh> m);
+    std::shared_ptr<Mesh> getModelGeometry() const { return m_mesh; }
 
     ///
     /// \brief setElasticModulus
     /// \param E  Young's modulus
     /// \param nu Poisson's ratio
     ///
-    void setElasticModulus(const double& E, const double nu);
+    void computeLameConstants(const double& E, const double nu);
 
     ///
     /// \brief Returns the first Lame constant
@@ -81,23 +86,15 @@ public:
     void setMaxNumIterations(const unsigned int& n) { m_maxIter = n; }
 
     ///
-    /// \brief
+    /// \brief Get/Set proximity used for collision
     ///
     void setProximity(const double& prox) { m_proximity = prox; }
-
-    ///
-    /// \brief
-    ///
     double getProximity() const { return m_proximity; }
 
     ///
-    /// \brief
+    /// \brief Get/Set contact stiffness that is used for collision constraints
     ///
     void setContactStiffness(const double& stiffness) { m_contactStiffness = stiffness;}
-
-    ///
-    /// \brief
-    ///
     double getContactStiffness() const { return m_contactStiffness; }
 
     ///
@@ -147,7 +144,7 @@ public:
     void updatePbdStateFromPhysicsGeometry();
 
     ///
-    /// \brief
+    /// \brief Returns true if there is atleast one constraint
     ///
     inline bool hasConstraints() const { return !m_constraints.empty(); }
 
@@ -174,17 +171,17 @@ public:
     ///
     /// \brief Set mass to particular node
     ///
-    void setParticleMass(const double& val, const unsigned int& idx);
+    void setParticleMass(const double& val, const size_t& idx);
 
     ///
     /// \brief Se the node as fixed
     ///
-    void setFixedPoint(const unsigned int& idx);
+    void setFixedPoint(const size_t& idx);
 
     ///
     /// \brief Get the inverse of mass of a certain node
     ///
-    double getInvMass(const unsigned int& idx) const;
+    double getInvMass(const size_t& idx) const;
 
     ///
     /// \brief Time integrate the position
@@ -199,7 +196,7 @@ public:
     ///
     /// \brief
     ///
-    virtual void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) override {};
+    void updateBodyStates(const Vectord& q, const stateUpdateType updateType = stateUpdateType::displacement) override {};
 
 protected:
     std::shared_ptr<Mesh> m_mesh;   ///> Mesh on which the pbd model operates on
@@ -213,11 +210,11 @@ protected:
     std::vector<double> m_mass; ///> Mass of nodes
     std::vector<double> m_invMass; ///> Inverse of mass of nodes
 
-    double m_contactStiffness; ///>
+    double m_contactStiffness; ///> Contact stiffness for collisions
     Vec3d m_gravity; ///> Gravity
 
     unsigned int m_maxIter; ///> Max. pbd iterations
-    double m_proximity;
+    double m_proximity; ///> Proximity for collisions
 
     double m_dt; ///> Time step size
 };

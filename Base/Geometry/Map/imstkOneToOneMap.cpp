@@ -93,7 +93,7 @@ OneToOneMap::isValid() const
 }
 
 void
-OneToOneMap::setMap(const std::map<int, int>& sourceMap)
+OneToOneMap::setMap(const std::map<size_t, size_t>& sourceMap)
 {
     this->m_oneToOneMap = sourceMap;
 }

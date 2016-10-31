@@ -25,29 +25,29 @@ namespace imstk
 {
 
 void
-PbdState::initialize(const size_t numNodes, bool p, bool v, bool a)
+PbdState::initialize(const size_t numNodes, const bool(&options)[3])
 {
     // CHECKBACK : m_pos could actually not be another copy
-    if (p)
+    if (options[0])
     {
         m_pos.resize(numNodes, Vec3d(0, 0, 0));
-    };
+    }
 
-    if (v)
+    if (options[1])
     {
         m_vel.resize(numNodes, Vec3d(0, 0, 0));
     }
 
-    if (a)
+    if (options[2])
     {
         m_acc.resize(numNodes, Vec3d(0, 0, 0));
     }
 }
 
 void
-PbdState::initialize(const std::shared_ptr<Mesh>& m, bool p, bool v, bool a)
+PbdState::initialize(const std::shared_ptr<Mesh>& m, const bool (&options)[3])
 {
-    this->initialize(m->getNumVertices(), p, v, a);
+    this->initialize(m->getNumVertices(), options);
 }
 
 } // imstk

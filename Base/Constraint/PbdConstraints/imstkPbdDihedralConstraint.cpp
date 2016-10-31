@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #include "imstkPbdDihedralConstraint.h"
 #include "imstkPbdModel.h"
@@ -27,8 +27,8 @@ namespace  imstk
 
 void
 DihedralConstraint::initConstraint(PositionBasedDynamicsModel &model,
-                                   const unsigned int &pIdx1, const unsigned int &pIdx2,
-                                   const unsigned int &pIdx3, const unsigned int &pIdx4,
+                                   const size_t& pIdx1, const size_t& pIdx2,
+                                   const size_t& pIdx3, const size_t& pIdx4,
                                    const double k)
 {
     m_vertexIds[0] = pIdx1;
@@ -53,10 +53,10 @@ DihedralConstraint::initConstraint(PositionBasedDynamicsModel &model,
 bool
 DihedralConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
 {
-    const unsigned int i1 = m_vertexIds[0];
-    const unsigned int i2 = m_vertexIds[1];
-    const unsigned int i3 = m_vertexIds[2];
-    const unsigned int i4 = m_vertexIds[3];
+    const auto i1 = m_vertexIds[0];
+    const auto i2 = m_vertexIds[1];
+    const auto i3 = m_vertexIds[2];
+    const auto i4 = m_vertexIds[3];
 
     auto state = model.getCurrentState();
 
@@ -65,26 +65,26 @@ DihedralConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
     Vec3d &p2 = state->getVertexPosition(i3);
     Vec3d &p3 = state->getVertexPosition(i4);
 
-    const double im0 = model.getInvMass(i1);
-    const double im1 = model.getInvMass(i2);
-    const double im2 = model.getInvMass(i3);
-    const double im3 = model.getInvMass(i4);
+    const auto im0 = model.getInvMass(i1);
+    const auto im1 = model.getInvMass(i2);
+    const auto im2 = model.getInvMass(i3);
+    const auto im3 = model.getInvMass(i4);
 
     if (im0 == 0.0 && im1 == 0.0)
     {
         return false;
     }
 
-    const Vec3d e = p3 - p2;
-    const Vec3d e1 = p3 - p0;
-    const Vec3d e2 = p0 - p2;
-    const Vec3d e3 = p3 - p1;
-    const Vec3d e4 = p1 - p2;
+    const auto e = p3 - p2;
+    const auto e1 = p3 - p0;
+    const auto e2 = p0 - p2;
+    const auto e3 = p3 - p1;
+    const auto e4 = p1 - p2;
     // To accelerate, all normal (area) vectors and edge length should be precomputed in parallel
-    Vec3d n1 = e1.cross(e);
-    Vec3d n2 = e.cross(e3);
-    const double A1 = n1.norm();
-    const double A2 = n2.norm();
+    auto n1 = e1.cross(e);
+    auto n2 = e.cross(e3);
+    const auto A1 = n1.norm();
+    const auto A2 = n2.norm();
     n1 /= A1;
     n2 /= A2;
 
@@ -94,15 +94,15 @@ DihedralConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
         return false;
     }
 
-    const Vec3d grad0 = -(l / A1)*n1;
-    const Vec3d grad1 = -(l / A2)*n2;
-    const Vec3d grad2 = (e.dot(e1) / (A1*l))*n1 + (e.dot(e3) / (A2*l))*n2;
-    const Vec3d grad3 = (e.dot(e2) / (A1*l))*n1 + (e.dot(e4) / (A2*l))*n2;
+    const auto grad0 = -(l / A1)*n1;
+    const auto grad1 = -(l / A2)*n2;
+    const auto grad2 = (e.dot(e1) / (A1*l))*n1 + (e.dot(e3) / (A2*l))*n2;
+    const auto grad3 = (e.dot(e2) / (A1*l))*n1 + (e.dot(e4) / (A2*l))*n2;
 
-    double lambda = im0*grad0.squaredNorm() +
-        im1*grad1.squaredNorm() +
-        im2*grad2.squaredNorm() +
-        im3*grad3.squaredNorm();
+    auto lambda = im0*grad0.squaredNorm() +
+                im1*grad1.squaredNorm() +
+                im2*grad2.squaredNorm() +
+                im3*grad3.squaredNorm();
 
     // huge difference if use acos instead of atan2
     lambda = (atan2(n1.cross(n2).dot(e), l*n1.dot(n2)) - m_restAngle) / lambda * m_stiffness;

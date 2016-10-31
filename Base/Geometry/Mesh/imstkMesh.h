@@ -76,7 +76,7 @@ public:
     ///
     /// \brief Returns the initial position of a vertex given its index
     ///
-    const Vec3d& getInitialVertexPosition(const int& vertNum) const;
+    const Vec3d& getInitialVertexPosition(const size_t& vertNum) const;
 
     ///
     /// \brief Sets current vertex positions of the mesh from an array
@@ -91,12 +91,12 @@ public:
     ///
     /// \brief Set the current position of a vertex given its index to certain position
     ///
-    void setVerticePosition(const int &vertNum, const Vec3d& pos);
+    void setVerticePosition(const size_t& vertNum, const Vec3d& pos);
 
     ///
     /// \brief Returns the position of a vertex given its index
     ///
-    const Vec3d& getVertexPosition(const int& vertNum) const;
+    const Vec3d& getVertexPosition(const size_t& vertNum) const;
 
     ///
     /// \brief Sets the displacements of mesh vertices from an array
@@ -116,7 +116,7 @@ public:
     ///
     /// \brief Returns the displacement of a given vertex
     ///
-    const Vec3d& getVerticeDisplacement(const int& vertNum) const;
+    const Vec3d& getVerticeDisplacement(const size_t& vertNum) const;
 
     ///
     /// \brief Sets the point data for all arrays at each vertice

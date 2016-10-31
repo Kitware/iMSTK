@@ -43,23 +43,40 @@ DynamicalModel(DynamicalModelType::positionBasedDynamics)
 }
 
 void
-PositionBasedDynamicsModel::setModelGeometry(const std::shared_ptr<Mesh> m)
+PositionBasedDynamicsModel::setModelGeometry(std::shared_ptr<Mesh> m)
 {
     m_mesh = m;
-
-    m_initialState->initialize(m_mesh, 1, 0, 0);
-    m_previousState->initialize(m_mesh, 1, 0, 0);
-    m_currentState->initialize(m_mesh);
-
-    m_initialState->setPositions(m_mesh->getVertexPositions());
-    m_currentState->setPositions(m_mesh->getVertexPositions());
-
-    auto nP = m_mesh->getNumVertices();
-    m_invMass.resize(nP, 0);
-    m_mass.resize(nP, 0);
 }
 
-void PositionBasedDynamicsModel::setElasticModulus(const double& E, const double nu)
+bool
+PositionBasedDynamicsModel::initialize()
+{
+    if (m_mesh)
+    {
+        bool option[3] = { 1, 0, 0 };
+        m_initialState->initialize(m_mesh, option);
+        m_previousState->initialize(m_mesh, option);
+
+        option[1] = option[2] = 1;
+        m_currentState->initialize(m_mesh, option);
+
+        m_initialState->setPositions(m_mesh->getVertexPositions());
+        m_currentState->setPositions(m_mesh->getVertexPositions());
+
+        auto nP = m_mesh->getNumVertices();
+        m_invMass.resize(nP, 0);
+        m_mass.resize(nP, 0);
+
+        return true;
+    }
+    else
+    {
+        LOG(WARNING) << "Model geometry is not yet set! Cannot initialize without model geometry.";
+        return false;
+    }
+}
+
+void PositionBasedDynamicsModel::computeLameConstants(const double& E, const double nu)
 {
     m_mu = E/(2*(1+nu));
     m_lambda = E*nu/((1-2*nu)*(1+nu));
@@ -121,18 +138,17 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double& stiffnes
     if (m_mesh->getType() == Geometry::Type::TetrahedralMesh)
     {
         auto tetMesh = std::static_pointer_cast<TetrahedralMesh>(m_mesh);
-        int nV = tetMesh->getNumVertices();
+        auto nV = tetMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         auto elements = tetMesh->getTetrahedraVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
             auto& tet = elements[k];
-            unsigned int i1;
-            unsigned int i2;
 
-            i1 = tet[0];
-            i2 = tet[1];
+            auto i1 = tet[0];
+            auto i2 = tet[1];
+
             // check if added or not
             if (E[i1][i2] && E[i2][i1])
             {
@@ -196,18 +212,17 @@ PositionBasedDynamicsModel::initializeDistanceConstraints(const double& stiffnes
     else if (m_mesh->getType() == Geometry::Type::SurfaceMesh)
     {
         auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
-        int nV = triMesh->getNumVertices();
+        auto nV = triMesh->getNumVertices();
         std::vector<std::vector<bool>> E(nV, std::vector<bool>(nV, 1));
         auto elements = triMesh->getTrianglesVertices();
 
         for (size_t k = 0; k < elements.size(); ++k)
         {
             auto& tri = elements[k];
-            unsigned int i1;
-            unsigned int i2;
 
-            i1 = tri[0];
-            i2 = tri[1];
+            auto i1 = tri[0];
+            auto i2 = tri[1];
+
             if (E[i1][i2] && E[i2][i1])
             {
                 auto c = std::make_shared<DistanceConstraint>();
@@ -422,7 +437,7 @@ PositionBasedDynamicsModel::setUniformMass(const double& val)
 }
 
 void
-PositionBasedDynamicsModel::setParticleMass(const double& val, const unsigned int& idx)
+PositionBasedDynamicsModel::setParticleMass(const double& val, const size_t& idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -432,7 +447,7 @@ PositionBasedDynamicsModel::setParticleMass(const double& val, const unsigned in
 }
 
 void
-PositionBasedDynamicsModel::setFixedPoint(const unsigned int& idx)
+PositionBasedDynamicsModel::setFixedPoint(const size_t& idx)
 {
     if (idx < m_mesh->getNumVertices())
     {
@@ -441,7 +456,7 @@ PositionBasedDynamicsModel::setFixedPoint(const unsigned int& idx)
 }
 
 double
-PositionBasedDynamicsModel::getInvMass(const unsigned int& idx) const
+PositionBasedDynamicsModel::getInvMass(const size_t& idx) const
 {
     return m_invMass[idx];
 }

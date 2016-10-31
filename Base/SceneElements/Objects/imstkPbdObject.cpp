@@ -1,5 +1,4 @@
 #include "imstkPbdObject.h"
-
 #include "imstkGeometryMap.h"
 
 #include <g3log/g3log.hpp>
@@ -15,6 +14,7 @@ PbdObject::initialize(int nCons, ...)
     auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
     m_pbdModel = std::dynamic_pointer_cast<PositionBasedDynamicsModel>(m_dynamicalModel);
     m_pbdModel->setModelGeometry(mesh);
+    m_pbdModel->initialize();
 
     // CHECKBACK
     if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::positionBasedDynamics)
@@ -68,7 +68,7 @@ PbdObject::initialize(int nCons, ...)
 
             float YoungModulus, PoissonRatio;
             sscanf(&s[pos+len+1], "%f %f", &YoungModulus, &PoissonRatio);
-            m_pbdModel->setElasticModulus(YoungModulus, PoissonRatio);
+            m_pbdModel->computeLameConstants(YoungModulus, PoissonRatio);
         }
         else if (strncmp("Volume",&s[0],len)==0)
         {
@@ -145,9 +145,12 @@ PbdObject::initialize(int nCons, ...)
         m_pbdModel->setProximity(va_arg(args,double));
         m_pbdModel->setContactStiffness(va_arg(args,double));
     }
+
+    m_numDOF = m_pbdModel->getModelGeometry()->getNumVertices() * 3;
 }
 
-void PbdObject::integratePosition()
+void
+PbdObject::integratePosition()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
@@ -155,7 +158,8 @@ void PbdObject::integratePosition()
     }
 }
 
-void PbdObject::integrateVelocity()
+void
+PbdObject::integrateVelocity()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
@@ -163,7 +167,8 @@ void PbdObject::integrateVelocity()
     }
 }
 
-void PbdObject::solveConstraints()
+void
+PbdObject::solveConstraints()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {

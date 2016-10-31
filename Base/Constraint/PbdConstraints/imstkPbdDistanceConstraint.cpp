@@ -26,8 +26,8 @@ namespace  imstk
 {
 
 void
-DistanceConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
-                                   const unsigned int &pIdx2, const double k)
+DistanceConstraint::initConstraint(PositionBasedDynamicsModel& model, const size_t& pIdx1,
+                                   const size_t& pIdx2, const double k)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -43,18 +43,18 @@ DistanceConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsi
 bool
 DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
-    const unsigned int i1 = m_vertexIds[0];
-    const unsigned int i2 = m_vertexIds[1];
+    const auto i1 = m_vertexIds[0];
+    const auto i2 = m_vertexIds[1];
 
     auto state = model.getCurrentState();
 
     Vec3d &p0 = state->getVertexPosition(i1);
     Vec3d &p1 = state->getVertexPosition(i2);
 
-    const double im1 = model.getInvMass(i1);
-    const double im2 = model.getInvMass(i2);
+    const auto im1 = model.getInvMass(i1);
+    const auto im2 = model.getInvMass(i2);
 
-    const double wsum = im1 + im2;
+    const auto wsum = im1 + im2;
 
     if (wsum == 0.0)
     {
@@ -62,10 +62,10 @@ DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     }
 
     Vec3d n = p1 - p0;
-    const double len = n.norm();
+    const auto len = n.norm();
     n /= len;
 
-    Vec3d gradC = m_stiffness*n*(len - m_restLength)/wsum;
+    auto gradC = n*m_stiffness*(len - m_restLength) / wsum;
 
     if (im1 > 0)
     {

@@ -47,39 +47,39 @@ public:
     ~PbdState() = default;
 
     ///
-    /// \brief
+    /// \brief Initialize the pbd state
     ///
-    void initialize(const size_t numNodes, bool p=1, bool v=1, bool a=1);
-    void initialize(const std::shared_ptr<Mesh>& m, bool p=1, bool v=1, bool a=1);
+    void initialize(const size_t numNodes, const bool (&options)[3]);
+    void initialize(const std::shared_ptr<Mesh>& m, const bool(&options)[3]);
 
     ///
-    /// \brief
+    /// \brief Get/Set nodal position given the index
     ///
-    void setVertexPosition(const unsigned int& idx, Vec3d& pos) { m_pos.at(idx) = pos; };
-    Vec3d& getVertexPosition(const unsigned int& idx) { return m_pos.at(idx); };
+    void setVertexPosition(const size_t& idx, const Vec3d& pos) { m_pos.at(idx) = pos; };
+    Vec3d& getVertexPosition(const size_t& idx) { return m_pos.at(idx); };
 
     ///
-    /// \brief
+    /// \brief Returns the vector of current nodal positions
     ///
     std::vector<Vec3d>& getPositions() { return m_pos; };
     void setPositions(const std::vector<Vec3d>& p) { m_pos = p; };
 
     ///
-    /// \brief
+    /// \brief Returns the vector of current nodal velocities
     ///
     std::vector<Vec3d>& getVelocities() { return m_vel; };
 
     ///
-    /// \brief
+    /// \brief Returns the vector of current nodal accelerations
     ///
     std::vector<Vec3d>& getAccelerations() { return m_acc; };
 
 private:
-    std::vector<Vec3d> m_pos; ///> Positions
-    std::vector<Vec3d> m_vel; ///> Velocities
-    std::vector<Vec3d> m_acc; ///> Acelerations
+    std::vector<Vec3d> m_pos; ///> Nodal positions
+    std::vector<Vec3d> m_vel; ///> Nodal velocities
+    std::vector<Vec3d> m_acc; ///> Nodal acelerations
 };
 
 } // imstk
 
-#endif // IMSTK_PBD_STATE_H
+#endif // imstkPbdState_h

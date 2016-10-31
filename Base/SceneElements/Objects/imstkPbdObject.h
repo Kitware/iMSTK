@@ -29,7 +29,6 @@ public:
     {
         m_type = SceneObject::Type::Pbd;
     }
-    PbdObject() = delete;
 
     ///
     /// \brief Destructor
@@ -60,8 +59,6 @@ public:
 protected:
 
     std::shared_ptr<PositionBasedDynamicsModel> m_pbdModel; ///> PBD mathematical model
-
-    size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
 };
 
 } // imstk

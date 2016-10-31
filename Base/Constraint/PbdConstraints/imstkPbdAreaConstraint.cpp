@@ -48,9 +48,9 @@ AreaConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned
 bool
 AreaConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
-    const unsigned int i1 = m_vertexIds[0];
-    const unsigned int i2 = m_vertexIds[1];
-    const unsigned int i3 = m_vertexIds[2];
+    const auto i1 = m_vertexIds[0];
+    const auto i2 = m_vertexIds[1];
+    const auto i3 = m_vertexIds[2];
 
     auto state = model.getCurrentState();
 
@@ -58,16 +58,16 @@ AreaConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     Vec3d &p1 = state->getVertexPosition(i2);
     Vec3d &p2 = state->getVertexPosition(i3);
 
-    const double im0 = model.getInvMass(i1);
-    const double im1 = model.getInvMass(i2);
-    const double im2 = model.getInvMass(i3);
+    const auto im0 = model.getInvMass(i1);
+    const auto im1 = model.getInvMass(i2);
+    const auto im2 = model.getInvMass(i3);
 
-    const Vec3d e1 = p0 - p1;
-    const Vec3d e2 = p1 - p2;
-    const Vec3d e3 = p2 - p0;
+    const auto e1 = p0 - p1;
+    const auto e2 = p1 - p2;
+    const auto e3 = p2 - p0;
 
-    Vec3d n = e1.cross(e2);
-    const double A = 0.5*n.norm();
+    auto n = e1.cross(e2);
+    const auto A = 0.5*n.norm();
 
     if (A < EPS)
     {
@@ -76,11 +76,11 @@ AreaConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 
     n /= 2 * A;
 
-    const Vec3d grad0 = e2.cross(n);
-    const Vec3d grad1 = e3.cross(n);
-    const Vec3d grad2 = e1.cross(n);
+    const auto grad0 = e2.cross(n);
+    const auto grad1 = e3.cross(n);
+    const auto grad2 = e1.cross(n);
 
-    double lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm();
+    auto lambda = im0*grad0.squaredNorm() + im1*grad1.squaredNorm() + im2*grad2.squaredNorm();
 
     lambda = (A - m_restArea) / lambda * m_stiffness;
 

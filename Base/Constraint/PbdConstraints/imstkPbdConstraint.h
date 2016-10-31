@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #ifndef IMSTK_PBD_CONSTRAINT_H
 #define IMSTK_PBD_CONSTRAINT_H
@@ -67,7 +67,7 @@ public:
     /// \param model \class PositionBasedDynamicsModel
     /// \return true if succeeded
     ///
-    virtual bool updateConstraint(PositionBasedDynamicsModel &model)
+    virtual bool updateConstraint(PositionBasedDynamicsModel& model)
     {
         return true;
     }
@@ -77,7 +77,7 @@ public:
     /// \param model \class PositionBasedDynamicsModel
     /// \return true if succeeded
     ///
-    virtual bool solvePositionConstraint(PositionBasedDynamicsModel &model)
+    virtual bool solvePositionConstraint(PositionBasedDynamicsModel& model)
     {
         return true;
     }
@@ -87,13 +87,13 @@ public:
     /// \param model \class PositionBasedDynamicsModel
     /// \return true if succeeded
     ///
-    virtual bool solveVelocityConstraint(PositionBasedDynamicsModel &model)
+    virtual bool solveVelocityConstraint(PositionBasedDynamicsModel& model)
     {
         return true;
     }
 
 public:
-    std::vector<unsigned int> m_vertexIds; // index of points for the constraint
+    std::vector<size_t> m_vertexIds; // index of points for the constraint
 };
 
 }

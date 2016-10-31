@@ -123,6 +123,7 @@ int main()
     //testVectorPlotters();
     //testPbdVolume();
     testPbdCloth();
+    //testPbdCollision();
 
 //  int n;
 //  std::cout << "testPbdCollision(): 1" << std::endl;
@@ -983,7 +984,7 @@ void testSurfaceMeshOptimizer()
     tri[6] = { { 1, 7, 5 } };
     tri[7] = { { 3, 1, 8 } };
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 8; ++i)
     {
         triangles.push_back(tri[i]);
     }
@@ -1173,17 +1174,25 @@ void testPbdVolume()
     oneToOneNodalMap->compute();
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
+    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+
+    deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(volTetMesh);
     deformableObj->setPhysicsToVisualMap(oneToOneNodalMap); //assign the computed map
+
     deformableObj->initialize(/*Number of Constraints*/1,
         /*Constraint configuration*/"FEM NeoHookean 100.0 0.3",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
-        /*TimeStep*/0.001,
+        /*TimeStep*/0.01,
         /*FixedPoint*/"51 127 178",
         /*NumberOfIterationInConstraintSolver*/5
         );
+
+    auto pbdSolver = std::make_shared<PbdSolver>();
+    pbdSolver->setPbdObject(deformableObj);
+    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
 
@@ -1219,7 +1228,7 @@ void testPbdCloth()
     vertList.resize(nRows*nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
-    for (int i = 0; i < nRows; i++)
+    for (int i = 0; i < nRows; ++i)
     {
         for (int j = 0; j < nCols; j++)
         {
@@ -1231,7 +1240,7 @@ void testPbdCloth()
 
     // c. Add connectivity data
     std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-    for (std::size_t i = 0; i < nRows - 1; i++)
+    for (std::size_t i = 0; i < nRows - 1; ++i)
     {
         for (std::size_t j = 0; j < nCols - 1; j++)
         {
@@ -1318,6 +1327,10 @@ void testPbdCollision()
     deformableObj->setPhysicsToCollidingMap(deformMapP2C);
     deformableObj->setPhysicsToVisualMap(deformMapP2V);
     deformableObj->setCollidingToVisualMap(deformMapC2V);
+
+    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+    deformableObj->setDynamicalModel(pbdModel);
+
     deformableObj->initialize(/*Number of Constraints*/1,
         /*Constraint configuration*/"FEM NeoHookean 1.0 0.3",
         /*Mass*/1.0,
@@ -1327,6 +1340,10 @@ void testPbdCollision()
         /*NumberOfIterationInConstraintSolver*/2,
         /*Proximity*/0.1,
         /*Contact stiffness*/0.01);
+
+    auto pbdSolver = std::make_shared<PbdSolver>();
+    pbdSolver->setPbdObject(deformableObj);
+    scene->addNonlinearSolver(pbdSolver);
 
     scene->addSceneObject(deformableObj);
 
@@ -1342,7 +1359,7 @@ void testPbdCollision()
         int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
         char intStr[33];
         std::string fixed_corner;
-        for (unsigned int i = 0; i < 4; i++)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             std::sprintf(intStr, "%d", corner[i]);
             fixed_corner += std::string(intStr) + ' ';
@@ -1350,7 +1367,7 @@ void testPbdCollision()
         vertList.resize(nRows*nCols);
         const double dy = width / (double)(nCols - 1);
         const double dx = height / (double)(nRows - 1);
-        for (int i = 0; i < nRows; i++)
+        for (int i = 0; i < nRows; ++i)
         {
             for (int j = 0; j < nCols; j++)
             {
@@ -1365,7 +1382,7 @@ void testPbdCollision()
 
         // c. Add connectivity data
         std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-        for (std::size_t i = 0; i < nRows - 1; i++)
+        for (std::size_t i = 0; i < nRows - 1; ++i)
         {
             for (std::size_t j = 0; j < nCols - 1; j++)
             {
@@ -1432,7 +1449,7 @@ void testPbdCollision()
 
         auto vs = volTetMesh1->getInitialVerticesPositions();
         Vec3d tmpPos;
-        for (int i = 0; i < volTetMesh1->getNumVertices(); i++){
+        for (int i = 0; i < volTetMesh1->getNumVertices(); ++i){
             tmpPos = volTetMesh1->getVertexPosition(i);
             tmpPos[1] -= 6;
             volTetMesh1->setVerticePosition(i, tmpPos);
@@ -1495,7 +1512,7 @@ void testPbdCollision()
         vertList.resize(nRows*nCols);
         const double dy = width / (double)(nCols - 1);
         const double dx = height / (double)(nRows - 1);
-        for (int i = 0; i < nRows; i++)
+        for (int i = 0; i < nRows; ++i)
         {
             for (int j = 0; j < nCols; j++)
             {
@@ -1508,7 +1525,7 @@ void testPbdCollision()
 
         // c. Add connectivity data
         std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-        for (std::size_t i = 0; i < nRows - 1; i++)
+        for (std::size_t i = 0; i < nRows - 1; ++i)
         {
             for (std::size_t j = 0; j < nCols - 1; j++)
             {
@@ -1550,10 +1567,19 @@ void testPbdCollision()
         floor->setPhysicsToCollidingMap(floorMapP2C);
         floor->setPhysicsToVisualMap(floorMapP2V);
         floor->setCollidingToVisualMap(floorMapC2V);
+
+        auto pbdModel2 = std::make_shared<PositionBasedDynamicsModel>();
+        floor->setDynamicalModel(pbdModel2);
+
         floor->initialize(/*Number of Constraints*/0,
             /*Mass*/0.0,
             /*Proximity*/0.1,
             /*Contact stiffness*/1.0);
+
+        auto pbdSolverfloor = std::make_shared<PbdSolver>();
+        pbdSolverfloor->setPbdObject(floor);
+        scene->addNonlinearSolver(pbdSolverfloor);
+
         scene->addSceneObject(floor);
 
         // Collisions
@@ -1724,7 +1750,7 @@ void testLineMesh()
         int corner[4] = { 1, nRows, nRows*nCols - nCols + 1, nRows*nCols };
         char intStr[33];
         std::string fixed_corner;
-        for (unsigned int i = 0; i < 4; i++)
+        for (unsigned int i = 0; i < 4; ++i)
         {
             std::sprintf(intStr, "%d", corner[i]);
             fixed_corner += std::string(intStr) + ' ';
@@ -1732,7 +1758,7 @@ void testLineMesh()
         vertList.resize(nRows*nCols);
         const double dy = width / (double)(nCols - 1);
         const double dx = height / (double)(nRows - 1);
-        for (int i = 0; i < nRows; i++)
+        for (int i = 0; i < nRows; ++i)
         {
             for (int j = 0; j < nCols; j++)
             {
@@ -1745,7 +1771,7 @@ void testLineMesh()
 
         // c. Add connectivity data
         std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-        for (int i = 0; i < nRows - 1; i++)
+        for (int i = 0; i < nRows - 1; ++i)
         {
             for (int j = 0; j < nCols - 1; j++)
             {
@@ -1833,7 +1859,7 @@ void testLineMesh()
 
         auto vs = volTetMesh->getInitialVerticesPositions();
         Vec3d tmpPos;
-        for (int i = 0; i < volTetMesh->getNumVertices(); i++){
+        for (int i = 0; i < volTetMesh->getNumVertices(); ++i){
             tmpPos = volTetMesh->getVertexPosition(i);
             tmpPos[1] -= 15;
             volTetMesh->setVerticePosition(i, tmpPos);

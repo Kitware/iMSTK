@@ -19,49 +19,48 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdFeConstraint_h
-#define imstkPbdFeConstraint_h
+#ifndef imstkPbdDistanceConstraint_h
+#define imstkPbdDistanceConstraint_h
 
-#include "imstkPbdFEMConstraint.h"
+#include "imstkPbdConstraint.h"
 
 namespace imstk
 {
 
 ///
-/// \class FEMTetConstraint
+/// \class DistanceConstraint
 ///
-/// \brief The FEMTetConstraint class class for constraint as the elastic energy
-/// computed by linear shape functions with tetrahedral mesh.
+/// \brief Distance constraints between two nodal points
 ///
-class FEMTetConstraint : public  FEMConstraint
+class DistanceConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit FEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
-        FEMConstraint(4, mtype) {}
+    DistanceConstraint() : PbdConstraint(2) {}
 
     ///
-    /// \brief Get the type of FEM constraint
+    /// \brief Returns PBD constraint of type Type::Distance
     ///
-    Type getType() const
-    {
-        return Type::FEMTet;
-    }
+    Type getType() const { return Type::Distance; }
 
     ///
-    /// \brief Initialize the tetrahedral FEM constraint
+    /// \brief Initializes the distance constraint
     ///
-    bool initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-        const unsigned int& pIdx3, const unsigned int& pIdx4);
+    void initConstraint(PositionBasedDynamicsModel& model, const size_t& pIdx1,
+                        const size_t& pIdx2, const double k = 1e-1);
 
     ///
-    /// \brief Solve the tetrahedral FEM constraint
+    /// \brief Solves the Distance constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
+
+public:
+    double m_restLength; ///> Rest length between the nodes
+    double m_stiffness;  ///> Stiffness of the constaint
 };
 
 } // imstk
 
-#endif // imstkPbdFeConstraint_h
+#endif // imstkPbdDistanceConstraint_h

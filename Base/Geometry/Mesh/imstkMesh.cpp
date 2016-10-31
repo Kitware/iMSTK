@@ -92,7 +92,7 @@ Mesh::getInitialVerticesPositions() const
 }
 
 const Vec3d&
-Mesh::getInitialVertexPosition(const int& vertNum) const
+Mesh::getInitialVertexPosition(const size_t& vertNum) const
 {
     return m_initialVerticesPositions.at(vertNum);
 }
@@ -110,13 +110,13 @@ Mesh::getVertexPositions() const
 }
 
 void
-Mesh::setVerticePosition(const int& vertNum, const Vec3d& pos)
+Mesh::setVerticePosition(const size_t& vertNum, const Vec3d& pos)
 {
     m_verticesPositions.at(vertNum) = pos;
 }
 
 const Vec3d&
-Mesh::getVertexPosition(const int& vertNum) const
+Mesh::getVertexPosition(const size_t& vertNum) const
 {
     return m_verticesPositions.at(vertNum);
 }
@@ -137,7 +137,7 @@ Mesh::setVerticesDisplacements(const Vectord& u)
         dofId += 3;
     }
 
-    for (auto i = 0; i < m_verticesPositions.size(); i++)
+    for (size_t i = 0; i < m_verticesPositions.size(); ++i)
     {
         m_verticesPositions[i] = m_initialVerticesPositions[i] + m_verticesDisplacements[i];
     }
@@ -150,7 +150,7 @@ Mesh::getVerticesDisplacements() const
 }
 
 const Vec3d&
-Mesh::getVerticeDisplacement(const int& vertNum) const
+Mesh::getVerticeDisplacement(const size_t& vertNum) const
 {
     return m_verticesDisplacements.at(vertNum);
 }

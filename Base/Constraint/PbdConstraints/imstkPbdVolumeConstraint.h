@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdDistanceConstraint_h
-#define imstkPbdDistanceConstraint_h
+#ifndef imstkPbdVolumeConstraint_h
+#define imstkPbdVolumeConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -28,39 +28,39 @@ namespace imstk
 {
 
 ///
-/// \class DistanceConstraint
+/// \class VolumeConstraint
 ///
-/// \brief Distance constraints between two nodal points
+/// \brief Volume constraint for tetrahedral element
 ///
-class DistanceConstraint : public PbdConstraint
+class VolumeConstraint : public PbdConstraint
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief constructor
     ///
-    DistanceConstraint() : PbdConstraint(2) {}
+    VolumeConstraint() : PbdConstraint(4) {}
 
     ///
-    /// \brief Returns PBD constraint of type Type::Distance
+    /// \brief Returns PBD constraint of type Type::Volume
     ///
-    Type getType() const { return Type::Distance; }
+    Type getType() const { return Type::Volume; }
 
     ///
-    /// \brief Initializes the distance constraint
+    /// \brief Initializes the volume constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const double k = 1e-1);
+    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
+        const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 2.0);
 
     ///
-    /// \brief Solves the Distance constraint
+    /// \brief Solves the volume constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
 
 public:
-    double m_restLength; ///> Rest length between the nodes
-    double m_stiffness;  ///> Stiffness of the constaint
+    double m_restVolume; ///> Rest volume
+    double m_stiffness;  ///> Stiffness of the volume constraint
 };
 
-} // imstk
+}
 
-#endif // imstkPbdDistanceConstraint_h
+#endif // imstkPbdVolumeConstraint_h

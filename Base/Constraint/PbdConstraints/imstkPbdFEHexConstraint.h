@@ -45,10 +45,7 @@ public:
     ///
     /// \brief Get the type of FEM constraint
     ///
-    Type getType() const
-    {
-        return Type::FEMHex;
-    }
+    Type getType() const { return Type::FEMHex; }
 
     ///
     /// \brief Initializes the FEM hexahedral element constraint
@@ -62,7 +59,7 @@ public:
     ///
     /// \brief Solves the FEM hexahedral element constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
 };
 
 } // imstk

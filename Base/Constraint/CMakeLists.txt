@@ -2,7 +2,7 @@
 # Create target
 #-----------------------------------------------------------------------------
 include(imstkAddLibrary)
-imstk_add_library( Constraint
+imstk_add_library( Constraints
   DEPENDS
     Core
     Geometry

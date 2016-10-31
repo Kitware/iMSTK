@@ -61,13 +61,15 @@ public:
     /// \param pIdx4 index of p3
     /// \param k stiffness
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1, const unsigned int& pIdx2,
-        const unsigned int& pIdx3, const unsigned int& pIdx4, const double k = 1e-3);
+    void initConstraint(PositionBasedDynamicsModel &model,
+                        const size_t& pIdx1, const size_t& pIdx2,
+                        const size_t& pIdx3, const size_t& pIdx4,
+                        const double k);
 
     ///
     /// \brief Solves the dihedral angular constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
+    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
 
 public:
     double m_restAngle; ///> Rest angle

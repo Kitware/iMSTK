@@ -6,9 +6,9 @@ imstk_add_library( DynamicalModels
   DEPENDS
     Core
     Geometry
-    Constraint
     TimeIntegrators
     Solvers
+    Constraints
     VegaFEM::massSpringSystem
     VegaFEM::corotationalLinearFEM
     VegaFEM::isotropicHyperelasticFEM

@@ -19,51 +19,47 @@
 
    =========================================================================*/
 
-#ifndef imstkPbdAreaConstraint_h
-#define imstkPbdAreaConstraint_h
+#ifndef imstkPbdFeConstraint_h
+#define imstkPbdFeConstraint_h
 
-#include "imstkPbdConstraint.h"
+#include "imstkPbdFEMConstraint.h"
 
 namespace imstk
 {
 
-////
-/// \class AreaConstraint
 ///
-/// \brief Area constraint for triangular face
+/// \class FEMTetConstraint
 ///
-class AreaConstraint : public PbdConstraint
+/// \brief The FEMTetConstraint class class for constraint as the elastic energy
+/// computed by linear shape functions with tetrahedral mesh.
+///
+class FEMTetConstraint : public  FEMConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    AreaConstraint() : PbdConstraint(3) {}
+    explicit FEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
+        FEMConstraint(4, mtype) {}
 
     ///
-    /// \brief Returns PBD constraint of type Type::Area
+    /// \brief Get the type of FEM constraint
     ///
-    Type getType() const
-    {
-        return Type::Area;
-    }
+    Type getType() const { return Type::FEMTet; }
 
     ///
-    /// \brief Initializes the area constraint
+    /// \brief Initialize the tetrahedral FEM constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
+    bool initConstraint(PositionBasedDynamicsModel &model,
+                        const size_t& pIdx1, const size_t& pIdx2,
+                        const size_t& pIdx3, const size_t& pIdx4);
 
     ///
-    /// \brief Solves the area constraint
+    /// \brief Solve the tetrahedral FEM constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
-
-public:
-    double m_restArea; ///> Area at the rest position
-    double m_stiffness; ///> Stiffness of the area constraint
+    bool solvePositionConstraint(PositionBasedDynamicsModel& model) override;
 };
 
 } // imstk
 
-#endif // imstkPbdAreaConstraint_h
+#endif // imstkPbdFeConstraint_h

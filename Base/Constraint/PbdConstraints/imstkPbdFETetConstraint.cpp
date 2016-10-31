@@ -27,8 +27,8 @@ namespace  imstk
 
 bool
 FEMTetConstraint::initConstraint(PositionBasedDynamicsModel &model,
-                                 const unsigned int &pIdx1, const unsigned int &pIdx2,
-                                 const unsigned int &pIdx3, const unsigned int &pIdx4)
+                                 const size_t& pIdx1, const size_t& pIdx2,
+                                 const size_t& pIdx3, const size_t& pIdx4)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -60,12 +60,12 @@ FEMTetConstraint::initConstraint(PositionBasedDynamicsModel &model,
 }
 
 bool
-FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
+FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
 {
-    const unsigned int i1 = m_vertexIds[0];
-    const unsigned int i2 = m_vertexIds[1];
-    const unsigned int i3 = m_vertexIds[2];
-    const unsigned int i4 = m_vertexIds[3];
+    const auto i1 = m_vertexIds[0];
+    const auto i2 = m_vertexIds[1];
+    const auto i3 = m_vertexIds[2];
+    const auto i4 = m_vertexIds[3];
 
     auto state = model.getCurrentState();
 
@@ -88,8 +88,8 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     // energy constraint
     double C = 0;
 
-    const double mu = model.getFirstLame();
-    const double lambda = model.getSecondLame();
+    const auto mu = model.getFirstLame();
+    const auto lambda = model.getSecondLame();
 
     switch (m_material)
     {
