@@ -26,9 +26,9 @@ namespace  imstk
 {
 
 void
-VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsigned int &pIdx1,
-                                 const unsigned int &pIdx2, const unsigned int &pIdx3,
-                                 const unsigned int &pIdx4, const double k)
+VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const size_t &pIdx1,
+                                 const size_t &pIdx2, const size_t &pIdx3,
+                                 const size_t &pIdx4, const double k)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -50,10 +50,10 @@ VolumeConstraint::initConstraint(PositionBasedDynamicsModel &model, const unsign
 bool
 VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
 {
-    const unsigned int i1 = m_vertexIds[0];
-    const unsigned int i2 = m_vertexIds[1];
-    const unsigned int i3 = m_vertexIds[2];
-    const unsigned int i4 = m_vertexIds[3];
+    const auto i1 = m_vertexIds[0];
+    const auto i2 = m_vertexIds[1];
+    const auto i3 = m_vertexIds[2];
+    const auto i4 = m_vertexIds[3];
 
     auto state = model.getCurrentState();
 
@@ -62,10 +62,10 @@ VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     Vec3d &x3 = state->getVertexPosition(i3);
     Vec3d &x4 = state->getVertexPosition(i4);
 
-    const double im1 = model.getInvMass(i1);
-    const double im2 = model.getInvMass(i2);
-    const double im3 = model.getInvMass(i3);
-    const double im4 = model.getInvMass(i4);
+    const auto im1 = model.getInvMass(i1);
+    const auto im2 = model.getInvMass(i2);
+    const auto im3 = model.getInvMass(i3);
+    const auto im4 = model.getInvMass(i4);
 
     const double onesixth = 1.0 / 6.0;
 
@@ -74,12 +74,12 @@ VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
     const Vec3d grad3 = onesixth*(x4 - x1).cross(x2 - x1);
     const Vec3d grad4 = onesixth*(x2 - x1).cross(x3 - x1);
 
-    const double V = grad4.dot(x4 - x1);
+    const auto V = grad4.dot(x4 - x1);
 
     double lambda = im1*grad1.squaredNorm() +
-        im2*grad2.squaredNorm() +
-        im3*grad3.squaredNorm() +
-        im4*grad4.squaredNorm();
+                    im2*grad2.squaredNorm() +
+                    im3*grad3.squaredNorm() +
+                    im4*grad4.squaredNorm();
 
     lambda = (V - m_restVolume) / lambda * m_stiffness;
 
@@ -88,7 +88,7 @@ VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
         x1 += -im1*lambda*grad1;
     }
 
-    if (im1 > 0)
+    if (im1 > 0) //CHECK: SHOULD THIS BE im2
     {
         x2 += -im2*lambda*grad2;
     }

@@ -168,7 +168,7 @@ DeformableBodyModel::loadBoundaryConditions()
 void
 DeformableBodyModel::initializeForceModel()
 {
-    const float g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
     const bool isGravityPresent = (g > 0) ? true : false;
 
     m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
@@ -324,7 +324,7 @@ DeformableBodyModel::initializeGravityForce()
 {
     m_gravityForce.resize(m_numDOF);
     m_gravityForce.setZero();
-    const float gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
 
     m_vegaPhysicsMesh->computeGravity(m_gravityForce.data(), gravity);
 }

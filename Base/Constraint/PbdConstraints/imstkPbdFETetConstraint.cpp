@@ -42,7 +42,7 @@ FEMTetConstraint::initConstraint(PositionBasedDynamicsModel &model,
     const Vec3d &p2 = state->getVertexPosition(pIdx3);
     const Vec3d &p3 = state->getVertexPosition(pIdx4);
 
-    m_Volume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
+    m_elementVolume = (1.0 / 6.0) * (p3 - p0).dot((p1 - p0).cross(p2 - p0));
 
     Mat3d m;
     m.col(0) = p0 - p3;
@@ -181,7 +181,7 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
     const double im3 = model.getInvMass(i3);
     const double im4 = model.getInvMass(i4);
 
-    Mat3d gradC = m_Volume*P*m_invRestMat.transpose();
+    Mat3d gradC = m_elementVolume*P*m_invRestMat.transpose();
 
     double sum = im1*gradC.col(0).squaredNorm()
         + im2*gradC.col(1).squaredNorm()
@@ -193,7 +193,7 @@ FEMTetConstraint::solvePositionConstraint(PositionBasedDynamicsModel& model)
         return false;
     }
 
-    C = C*m_Volume;
+    C = C*m_elementVolume;
 
     const double s = C / sum;
 

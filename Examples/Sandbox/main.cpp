@@ -122,17 +122,9 @@ int main()
     //testTwoOmnis();
     //testVectorPlotters();
     //testPbdVolume();
-    testPbdCloth();
-    //testPbdCollision();
-
-//  int n;
-//  std::cout << "testPbdCollision(): 1" << std::endl;
-//  std::cout << "testLineMesh(): 2 " << std::endl;
-//  std::cin >> n;
-//  if (n == 1)
-//      testPbdCollision();
-//  else if (n == 2)
-//      testLineMesh();
+    //testPbdCloth();
+    testPbdCollision();
+    //testLineMesh();
 
     return 0;
 }
@@ -1283,7 +1275,7 @@ void testPbdCloth()
 void testPbdCollision()
 {
     auto sdk = std::make_shared<SimulationManager>();
-    auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
+    auto scene = sdk->createNewScene("PbdCollisionTest");
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon
@@ -1589,7 +1581,7 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
-    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->setCurrentScene("PbdCollisionTest");
     sdk->startSimulation(true);
 }
 
@@ -1598,7 +1590,7 @@ void testLineMesh()
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
-    auto scene = sdk->createNewScene("SceneTestMesh");
+    auto scene = sdk->createNewScene("TestLineMesh");
 
     // Device clients
     auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
@@ -1859,7 +1851,8 @@ void testLineMesh()
 
         auto vs = volTetMesh->getInitialVerticesPositions();
         Vec3d tmpPos;
-        for (int i = 0; i < volTetMesh->getNumVertices(); ++i){
+        for (int i = 0; i < volTetMesh->getNumVertices(); ++i)
+        {
             tmpPos = volTetMesh->getVertexPosition(i);
             tmpPos[1] -= 15;
             volTetMesh->setVerticePosition(i, tmpPos);
@@ -1910,10 +1903,7 @@ void testLineMesh()
 
         // Collisions
         auto deformableColGraph = scene->getCollisionGraph();
-        if (line)
-            tool = linesTool;
-        else
-            tool = blade;
+        tool = line ? linesTool : blade;
 
         auto pair1 = std::make_shared<PbdInteractionPair>(PbdInteractionPair(tool, deformableObj));
         pair1->setNumberOfInterations(10);
@@ -1923,7 +1913,7 @@ void testLineMesh()
         scene->getCamera()->setFocalPoint(surfMesh.get()->getInitialVertexPosition(20));
     }
     // Run
-    sdk->setCurrentScene("SceneTestMesh");
+    sdk->setCurrentScene("TestLineMesh");
     sdk->startSimulation(true);
 #endif
 }

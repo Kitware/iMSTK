@@ -110,6 +110,11 @@ public:
     ///
     virtual bool isPhysical() const { return false; };
 
+    ///
+    /// \brief
+    ///
+    virtual void updateSelf() {};
+
 protected:
     ///
     /// \brief Assigns the type of the object

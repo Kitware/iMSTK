@@ -399,7 +399,7 @@ PositionBasedDynamicsModel::initializeDihedralConstraints(const double& stiffnes
 void
 PositionBasedDynamicsModel::projectConstraints()
 {
-    int i = 0;
+    unsigned int i = 0;
     while (++i < m_maxIter)
     {
         for (auto c: m_constraints)

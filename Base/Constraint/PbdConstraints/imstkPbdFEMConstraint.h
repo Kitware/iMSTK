@@ -48,15 +48,15 @@ public:
     };
 
     ///
-    /// \brief
+    /// \brief Constructor
     ///
     explicit FEMConstraint(const unsigned int nP, MaterialType mtype = MaterialType::StVK) :
         PbdConstraint(nP), m_material(mtype) {}
 
 public:
-    double m_Volume;
-    MaterialType m_material;
-    Mat3d m_invRestMat;
+    double m_elementVolume;     ///> Volume of the element
+    MaterialType m_material;    ///> Material type
+    Mat3d m_invRestMat;         ///>
 };
 
 }

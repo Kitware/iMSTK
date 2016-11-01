@@ -147,7 +147,7 @@ public:
     ///     for the entire iteration.
     /// \see updateForcingTerm()
     ///
-    void setEtaMax(const size_t newEtaMax)
+    void setEtaMax(const double newEtaMax)
     {
         this->etaMax = newEtaMax;
     }
@@ -155,7 +155,7 @@ public:
     ///
     /// \brief Get EtaMax. Returns current etaMax value.
     ///
-    size_t getEtaMax() const
+    double getEtaMax() const
     {
         return this->etaMax;
     }

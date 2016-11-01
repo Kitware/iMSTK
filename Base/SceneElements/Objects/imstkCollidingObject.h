@@ -25,13 +25,13 @@
 #include <memory>
 
 #include "imstkSceneObject.h"
+#include "imstkGeometryMap.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 
 class Geometry;
-class GeometryMap;
 
 class CollidingObject : public SceneObject
 {
@@ -76,6 +76,17 @@ public:
     /// \brief
     ///
     bool isCollidable() const final { return true; };
+
+    ///
+    /// \brief Updates the geometries from the maps (if defined)
+    ///
+    virtual void updateSelf() override
+    {
+        if (m_collidingToVisualMap)
+        {
+            m_collidingToVisualMap->apply();
+        }
+    };
 
 protected:
 

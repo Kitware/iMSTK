@@ -102,31 +102,13 @@ SceneManager::runModule()
         solvers->solve();
     }
 
-    // Apply the geometry maps to all the physics objects
+    // Apply the geometry and apply maps to all the objects
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (obj->isPhysical())
-        {
-            //auto dynaObj = std::dynamic_pointer_cast<DynamicObject<ProblemState>>(obj);
-
-            auto dynaObj = std::dynamic_pointer_cast<PbdObject>(obj);
-
-            dynaObj->getDynamicalModel()->updatePhysicsGeometry();
-
-            auto mapPC = dynaObj->getPhysicsToCollidingMap();
-            if (mapPC)
-            {
-                mapPC->apply();
-            }
-
-            auto mapPV = dynaObj->getPhysicsToVisualMap();
-            if (mapPV)
-            {
-                mapPV->apply();
-            }
-        }
+        obj->updateSelf();
     }
 
+    // Do collision detection and response for pbd objects
     for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
     {
         intPair->resetConstraints();

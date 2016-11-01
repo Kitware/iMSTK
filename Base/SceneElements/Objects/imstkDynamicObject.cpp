@@ -17,71 +17,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+ =========================================================================*/
 
 #include "imstkDynamicObject.h"
 
 namespace imstk
 {
-
-//template <class T> std::shared_ptr<Geometry>
-//DynamicObject<T>::getPhysicsGeometry() const
-//{
-//    return m_physicsGeometry;
-//}
-
-//template <class T> void
-//DynamicObject<T>::setPhysicsGeometry(std::shared_ptr<Geometry> geometry)
-//{
-//    m_physicsGeometry = geometry;
-//}
-
-//template <class T> std::shared_ptr<Geometry>
-//DynamicObject<T>::getMasterGeometry() const
-//{
-//    return m_physicsGeometry;
-//}
-
-//template <class T> std::shared_ptr<GeometryMap>
-//DynamicObject<T>::getPhysicsToCollidingMap() const
-//{
-//    return m_physicsToCollidingGeomMap;
-//}
-
-//template <class T> void
-//DynamicObject<T>::setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map)
-//{
-//    m_physicsToCollidingGeomMap = map;
-//}
-
-//template <class T> std::shared_ptr<GeometryMap>
-//DynamicObject<T>::getPhysicsToVisualMap() const
-//{
-//    return m_physicsToVisualGeomMap;
-//}
-//
-//template <class T> void
-//DynamicObject<T>::setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map)
-//{
-//    m_physicsToVisualGeomMap = map;
-//}
-
-//template <class T> std::shared_ptr<DynamicalModel<T>>
-//DynamicObject<T>::getDynamicalModel() const
-//{
-//    return m_dynamicalModel;
-//}
-//
-//template <class T> void
-//DynamicObject<T>::setDynamicalModel(std::shared_ptr<DynamicalModel<T>> dynaModel)
-//{
-//    m_dynamicalModel = dynaModel;
-//}
-
-//template <class T> size_t
-//DynamicObject<T>::getNumOfDOF() const
-//{
-//    return m_numDOF;
-//}
-
 } // imstk
