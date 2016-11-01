@@ -88,7 +88,7 @@ VolumeConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
         x1 += -im1*lambda*grad1;
     }
 
-    if (im1 > 0) //CHECK: SHOULD THIS BE im2
+    if (im2 > 0)
     {
         x2 += -im2*lambda*grad2;
     }
