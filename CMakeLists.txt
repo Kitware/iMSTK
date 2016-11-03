@@ -203,3 +203,11 @@ install(
 # Add Examples subdirectories
 #--------------------------------------------------------------------------
 add_subdirectory(Examples)
+
+#--------------------------------------------------------------------------
+# Innerbuild dummy test
+#--------------------------------------------------------------------------
+add_test(
+  NAME imstkDummyTest
+  COMMAND ${CMAKE_COMMAND} -E echo "Success"
+)
