@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef IMSTK_PBD_FEM_CONSTRAINT_H
-#define IMSTK_PBD_FEM_CONSTRAINT_H
+#ifndef imstkPbdFEMConstraint_h
+#define imstkPbdFEMConstraint_h
 
 #include "imstkPbdConstraint.h"
 
@@ -61,4 +61,4 @@ public:
 
 }
 
-#endif // IMSTK_PBD_FEM_CONSTRAINT_H
+#endif // imstkPbdFEMConstraint_h

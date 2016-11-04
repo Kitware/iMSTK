@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#ifndef IMSTK_PBD_CONSTRAINT_H
-#define IMSTK_PBD_CONSTRAINT_H
+#ifndef imstkPbdConstraint_h
+#define imstkPbdConstraint_h
 
 #include "imstkMath.h"
 
@@ -98,4 +98,4 @@ public:
 
 }
 
-#endif // IMSTK_PBD_CONSTRAINT_H
+#endif // imstkPbdConstraint_h
