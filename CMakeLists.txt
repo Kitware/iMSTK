@@ -63,49 +63,67 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 #-----------------------------------------------------------------------------
-# Define External dependencies
-#-----------------------------------------------------------------------------
-macro(imstk_define_dependency extProj)
-  list(APPEND ${PROJECT_NAME}_DEPENDENCIES ${extProj})
-  option(USE_SYSTEM_${extProj} "Exclude ${extProj} from superbuild and use an existing build." OFF)
-  mark_as_advanced(USE_SYSTEM_${extProj})
-endmacro()
-
-option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." OFF)
-if(${PROJECT_NAME}_USE_Uncrustify)
-  imstk_define_dependency(Uncrustify)
-endif()
-
-if(WIN32)
-  imstk_define_dependency(PThreads)
-  imstk_define_dependency(Libusb) #for VRPN
-  imstk_define_dependency(FTD2XX) #for LibNiFalcon
-endif()
-
-imstk_define_dependency(g3log)
-imstk_define_dependency(Eigen)
-imstk_define_dependency(SCCD)
-imstk_define_dependency(VegaFEM)
-imstk_define_dependency(VTK)
-imstk_define_dependency(VRPN)
-imstk_define_dependency(LibNiFalcon)
-
-if(BUILD_TESTING)
-  imstk_define_dependency(GoogleTest)
-endif()
-
-#-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
 option(${PROJECT_NAME}_SUPERBUILD "Build ${PROJECT_NAME} and the projects it depends on." ON)
 
 if(${PROJECT_NAME}_SUPERBUILD)
+
+  #-----------------------------------------------------------------------------
+  # Define External dependencies
+  #-----------------------------------------------------------------------------
+  macro(imstk_define_dependency extProj)
+    list(APPEND ${PROJECT_NAME}_DEPENDENCIES ${extProj})
+    option(USE_SYSTEM_${extProj} "Exclude ${extProj} from superbuild and use an existing build." OFF)
+    mark_as_advanced(USE_SYSTEM_${extProj})
+  endmacro()
+
+  option(${PROJECT_NAME}_USE_Uncrustify "Use Uncrustify as a code style beautifier." OFF)
+  if(${PROJECT_NAME}_USE_Uncrustify)
+    imstk_define_dependency(Uncrustify)
+  endif()
+
+  if(WIN32)
+    imstk_define_dependency(PThreads)
+    imstk_define_dependency(Libusb) #for VRPN
+    imstk_define_dependency(FTD2XX) #for LibNiFalcon
+  endif()
+
+  imstk_define_dependency(g3log)
+  imstk_define_dependency(Eigen)
+  imstk_define_dependency(SCCD)
+  imstk_define_dependency(VegaFEM)
+  imstk_define_dependency(VTK)
+  imstk_define_dependency(VRPN)
+  imstk_define_dependency(LibNiFalcon)
+
+  if(BUILD_TESTING)
+    imstk_define_dependency(GoogleTest)
+
+    #-----------------------------------------------------------------------------
+    # Allow CTest to cover Innerbuild
+    #-----------------------------------------------------------------------------
+    configure_file(
+      "${CMAKE_CURRENT_LIST_DIR}/CMake/Utilities/imstkCTestAddInnerbuild.cmake.in"
+      "${CMAKE_CURRENT_BINARY_DIR}/imstkCTestAddInnerbuild.cmake"
+      @ONLY
+    )
+    set_directory_properties(PROPERTIES TEST_INCLUDE_FILE
+      "${CMAKE_CURRENT_BINARY_DIR}/imstkCTestAddInnerbuild.cmake"
+    )
+  endif()
+
+  #-----------------------------------------------------------------------------
+  # Solve project dependencies
+  #-----------------------------------------------------------------------------
   # Call CMakeLists.txt in CMake/External which will solve the dependencies
   # and add the External projects, including this one: this top-level
   # CMakeLists.txt will be called back with SUPERBUILD=OFF, to execute
   # the rest of the code below (INNERBUILD), which explains the `return`
   add_subdirectory(CMake/External)
+
   return()
+
 endif()
 
 #-----------------------------------------------------------------------------

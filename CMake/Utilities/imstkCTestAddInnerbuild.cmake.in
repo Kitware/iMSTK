@@ -1,0 +1,15 @@
+# This file needs to be configured then included in the top level
+# CTestTestfile.cmake of your project in order to expand ctest
+# to cover the Innerbuild.
+#
+# To do so, set the TEST_INCLUDE_FILE property of your top level
+# build directory to the configured version of this file with the
+# function `set_directory_properties()`.
+
+set(innerbuild_dir "@CMAKE_CURRENT_BINARY_DIR@/Innerbuild")
+
+if(EXISTS "${innerbuild_dir}/CTestTestfile.cmake")
+  subdirs(${innerbuild_dir})
+else()
+  message(WARNING "No CTestTestfile.cmake found in ${innerbuild_dir}. Can not add innerbuild tests.")
+endif()
