@@ -1,3 +1,48 @@
+# gtest_add_tests
+#
+# Taken from https://github.com/Kitware/CMake/blob/master/Modules/FindGTest.cmake
+#
+# Only changed the 'add_test' line to add 'extra_args' before the 'gtest_filter' flag.
+# Doing so allows to use gtest with a ctest driver created after create_test_sourcelist,
+# by providing the test file name as the first argument to the driver.
+#
+# Changes should become a part of CMake. Better improvements could be made to bring
+# ctest and gtest together.
+#
+function(GTEST_ADD_TESTS executable extra_args)
+    if(NOT ARGN)
+        message(FATAL_ERROR "Missing ARGN: Read the documentation for GTEST_ADD_TESTS")
+    endif()
+    if(ARGN STREQUAL "AUTO")
+        # obtain sources used for building that executable
+        get_property(ARGN TARGET ${executable} PROPERTY SOURCES)
+    endif()
+    set(gtest_case_name_regex ".*\\( *([A-Za-z_0-9]+) *, *([A-Za-z_0-9]+) *\\).*")
+    set(gtest_test_type_regex "(TYPED_TEST|TEST_?[FP]?)")
+    foreach(source ${ARGN})
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${source})
+        file(READ "${source}" contents)
+        string(REGEX MATCHALL "${gtest_test_type_regex} *\\(([A-Za-z_0-9 ,]+)\\)" found_tests ${contents})
+        foreach(hit ${found_tests})
+          string(REGEX MATCH "${gtest_test_type_regex}" test_type ${hit})
+
+          # Parameterized tests have a different signature for the filter
+          if("x${test_type}" STREQUAL "xTEST_P")
+            string(REGEX REPLACE ${gtest_case_name_regex}  "*/\\1.\\2/*" test_name ${hit})
+          elseif("x${test_type}" STREQUAL "xTEST_F" OR "x${test_type}" STREQUAL "xTEST")
+            string(REGEX REPLACE ${gtest_case_name_regex} "\\1.\\2" test_name ${hit})
+          elseif("x${test_type}" STREQUAL "xTYPED_TEST")
+            string(REGEX REPLACE ${gtest_case_name_regex} "\\1/*.\\2" test_name ${hit})
+          else()
+            message(WARNING "Could not parse GTest ${hit} for adding to CTest.")
+            continue()
+          endif()
+          add_test(NAME ${test_name} COMMAND ${executable} ${extra_args} --gtest_filter=${test_name}) # changed here
+        endforeach()
+    endforeach()
+endfunction()
+
+
 # imstk_add_test
 #
 # Description: Will create tests for the given iMSTK target.
@@ -82,11 +127,19 @@ function(imstk_add_test target)
   foreach(test_file ${test_files})
     get_filename_component(test_name ${test_file} NAME_WE)
 
-    include(ExternalData)
-    ExternalData_add_test( ${PROJECT_NAME}Data
-      NAME ${test_name}
-      COMMAND $<TARGET_FILE:${test_driver_executable}> ${test_name} --gtest_filter=${test_name}.*
-    )
+    # A. Registers tests per gTests
+    # [aka] a lot of tests - Google Testing standards
+    gtest_add_tests(${test_driver_executable} ${test_name} ${test_file})
+
+    # ... or ...
+
+    # B. Registers tests per test files
+    # [aka] less tests - CTest standards
+#    include(ExternalData)
+#    ExternalData_add_test( ${PROJECT_NAME}Data
+#      NAME ${test_name}
+#      COMMAND $<TARGET_FILE:${test_driver_executable}> ${test_name} --gtest_filter=${test_name}.*
+#    )
 
   endforeach()
 
