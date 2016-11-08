@@ -32,8 +32,13 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Get files and directories
   #-----------------------------------------------------------------------------
-  file(GLOB_RECURSE target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-  file(GLOB_RECURSE target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+  file(GLOB_RECURSE target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.h")
+  file(GLOB_RECURSE target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.cpp")
+  file(GLOB_RECURSE testing_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Testing/*")
+  if(testing_CPP_FILES)
+    list(REMOVE_ITEM target_H_FILES ${testing_FILES})
+    list(REMOVE_ITEM target_CPP_FILES ${testing_FILES})
+  endif()
   imstk_subdir_list(target_SUBDIR_LIST ${CMAKE_CURRENT_SOURCE_DIR})
 
   #-----------------------------------------------------------------------------
