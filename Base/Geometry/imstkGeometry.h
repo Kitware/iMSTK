@@ -51,6 +51,16 @@ public:
     };
 
     ///
+    /// \brief Constructor
+    ///
+    Geometry(Type type,
+             const Vec3d& position = WORLD_ORIGIN,
+             const Quatd& orientation = Quatd::Identity()) :
+        m_type(type),
+        m_position(position),
+        m_orientation(orientation){}
+
+    ///
     /// \brief Destructor
     ///
     virtual ~Geometry() {}
@@ -130,17 +140,8 @@ public:
     /// \brief Returns the string representing the type name of the geometry
     ///
     const std::string getTypeName() const;
-protected:
 
-    ///
-    /// \brief Constructor
-    ///
-    Geometry(Type type,
-             const Vec3d& position = WORLD_ORIGIN,
-             const Quatd& orientation = Quatd::Identity()) :
-        m_type(type),
-        m_position(position),
-        m_orientation(orientation){}
+protected:
 
     Type m_type; ///> Geometry type
     Vec3d  m_position; ///> position

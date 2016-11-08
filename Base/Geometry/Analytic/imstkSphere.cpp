@@ -21,6 +21,8 @@
 
 #include "imstkSphere.h"
 
+#include "g3log/g3log.hpp"
+
 namespace imstk
 {
 
@@ -46,6 +48,11 @@ Sphere::getRadius() const
 void
 Sphere::setRadius(const double& radius)
 {
+    if(radius <= 0)
+    {
+        LOG(WARNING) << "Sphere::setRadius error: radius should be positive.";
+        return;
+    }
     m_radius = radius;
 }
 
