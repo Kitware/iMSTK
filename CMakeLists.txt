@@ -90,6 +90,10 @@ imstk_define_dependency(VTK)
 imstk_define_dependency(VRPN)
 imstk_define_dependency(LibNiFalcon)
 
+if(BUILD_TESTING)
+  imstk_define_dependency(GoogleTest)
+endif()
+
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------
@@ -145,6 +149,14 @@ else()
   remove_definitions( -DVRPN_USE_PHANTOM_SERVER )
 endif()
 
+# Google Test
+if(BUILD_TESTING)
+  find_package( GoogleTest REQUIRED )
+  include_directories(${GoogleTest_INCLUDE_DIRS})
+  find_package( GoogleMock REQUIRED )
+  include_directories(${GoogleMock_INCLUDE_DIRS})
+endif()
+
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------
@@ -160,6 +172,7 @@ add_subdirectory(Base/Collision)
 add_subdirectory(Base/Scene)
 add_subdirectory(Base/SimulationManager)
 add_subdirectory(Base/Constraint)
+
 #--------------------------------------------------------------------------
 # Export Targets
 #--------------------------------------------------------------------------
