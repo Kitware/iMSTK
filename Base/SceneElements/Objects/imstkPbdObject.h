@@ -58,7 +58,7 @@ public:
 
 protected:
 
-    std::shared_ptr<PositionBasedDynamicsModel> m_pbdModel; ///> PBD mathematical model
+    std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
 
 } // imstk

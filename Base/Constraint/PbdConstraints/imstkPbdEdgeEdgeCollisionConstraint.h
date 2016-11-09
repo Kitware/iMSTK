@@ -28,13 +28,13 @@ namespace imstk
 {
 
 ///
-/// \brief The EdgeEdgeConstraint class for edge-edge collision response
+/// \brief The PbdEdgeEdgeConstraint class for edge-edge collision response
 ///
-class EdgeEdgeConstraint : public PbdCollisionConstraint
+class PbdEdgeEdgeConstraint : public PbdCollisionConstraint
 {
 
 public:
-    EdgeEdgeConstraint() : PbdCollisionConstraint(2,2) {}
+    PbdEdgeEdgeConstraint() : PbdCollisionConstraint(2,2) {}
 
     ///
     /// \brief Get the type of pbd constraint
@@ -49,9 +49,9 @@ public:
     /// \param pIdx4 second point of the edge from object2
     /// \return  true if succeeded
     ///
-    void initConstraint(std::shared_ptr<PositionBasedDynamicsModel> model1,
+    void initConstraint(std::shared_ptr<PbdModel> model1,
                         const size_t& pIdx1, const size_t& pIdx2,
-                        std::shared_ptr<PositionBasedDynamicsModel> model2,
+                        std::shared_ptr<PbdModel> model2,
                         const size_t& pIdx3, const size_t& pIdx4);
 
     ///

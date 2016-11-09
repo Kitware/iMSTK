@@ -89,7 +89,7 @@ public:
     ///
     /// \brief Update the physics geometry and the apply the maps (if defined)
     ///
-    void updateSelf() final
+    void updateGeometries() final
     {
         m_dynamicalModel->updatePhysicsGeometry();
 
@@ -97,7 +97,7 @@ public:
         {
             m_physicsToCollidingGeomMap->apply();
         }
-        CollidingObject::updateSelf();
+        CollidingObject::updateGeometries();
 
         if (m_physicsToVisualGeomMap)
         {

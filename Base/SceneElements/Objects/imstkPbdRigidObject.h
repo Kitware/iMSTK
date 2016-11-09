@@ -76,4 +76,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkVirtualCouplingObject_h
+#endif // ifndef imstkPbdRigidObject_h

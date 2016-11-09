@@ -28,17 +28,17 @@ namespace imstk
 {
 
 ///
-/// \class DihedralConstraint
+/// \class PbdDihedralConstraint
 ///
 /// \brief Angular constraint between two triangular faces
 ///
-class DihedralConstraint : public PbdConstraint
+class PbdDihedralConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    DihedralConstraint() : PbdConstraint(4) {}
+    PbdDihedralConstraint() : PbdConstraint(4) {}
 
     ///
     /// \brief Returns PBD constraint of type Type::Dihedral
@@ -61,7 +61,7 @@ public:
     /// \param pIdx4 index of p3
     /// \param k stiffness
     ///
-    void initConstraint(PositionBasedDynamicsModel &model,
+    void initConstraint(PbdModel &model,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4,
                         const double k);
@@ -69,7 +69,7 @@ public:
     ///
     /// \brief Solves the dihedral angular constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
+    bool solvePositionConstraint(PbdModel &model) override;
 
 public:
     double m_restAngle; ///> Rest angle

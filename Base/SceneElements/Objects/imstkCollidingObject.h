@@ -80,7 +80,7 @@ public:
     ///
     /// \brief Updates the geometries from the maps (if defined)
     ///
-    virtual void updateSelf() override
+    virtual void updateGeometries() override
     {
         if (m_collidingToVisualMap)
         {

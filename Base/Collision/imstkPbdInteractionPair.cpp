@@ -42,8 +42,8 @@ PbdInteractionPair::doBroadPhaseCollision()
     Vec3d min2, max2;
     mesh2->computeBoundingBox(min2, max2);
 
-    auto dynaModel1 = std::static_pointer_cast<PositionBasedDynamicsModel>(first->getDynamicalModel());
-    auto dynaModel2 = std::static_pointer_cast<PositionBasedDynamicsModel>(second->getDynamicalModel());
+    auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
+    auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
 
     auto prox1 = dynaModel1->getProximity();
     auto prox2 = dynaModel2->getProximity();
@@ -62,8 +62,8 @@ PbdInteractionPair::doNarrowPhaseCollision()
     auto map1 = first->getPhysicsToCollidingMap();
     auto map2 = second->getPhysicsToCollidingMap();
 
-    auto dynaModel1 = std::static_pointer_cast<PositionBasedDynamicsModel>(first->getDynamicalModel());
-    auto dynaModel2 = std::static_pointer_cast<PositionBasedDynamicsModel>(second->getDynamicalModel());
+    auto dynaModel1 = std::static_pointer_cast<PbdModel>(first->getDynamicalModel());
+    auto dynaModel2 = std::static_pointer_cast<PbdModel>(second->getDynamicalModel());
 
     auto prox1 = dynaModel1->getProximity();
     auto prox2 = dynaModel2->getProximity();
@@ -93,7 +93,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], prox1, prox2))
                 {
-                    auto c = std::make_shared<PointTriangleConstraint>();
+                    auto c = std::make_shared<PbdPointTriangleConstraint>();
                     c->initConstraint(dynaModel1, map1->getMapIdx(i),
                         dynaModel2, map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
                     m_collisionConstraints.push_back(c);
@@ -129,7 +129,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                         p0[0], p0[1], p0[2],
                         p1[0], p1[1], p1[2], prox1, prox2))
                     {
-                        auto c = std::make_shared<EdgeEdgeConstraint>();
+                        auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                         c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                             dynaModel2, map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                         m_collisionConstraints.push_back(c);
@@ -143,7 +143,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                         p1[0], p1[1], p1[2],
                         p2[0], p2[1], p2[2], prox1, prox2))
                     {
-                        auto c = std::make_shared<EdgeEdgeConstraint>();
+                        auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                         c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                             dynaModel2, map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                         m_collisionConstraints.push_back(c);
@@ -157,7 +157,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                         p2[0], p2[1], p2[2],
                         p0[0], p0[1], p0[2], prox1, prox2))
                     {
-                        auto c = std::make_shared<EdgeEdgeConstraint>();
+                        auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                         c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                             dynaModel2, map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                         m_collisionConstraints.push_back(c);
@@ -190,7 +190,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                     p1[0], p1[1], p1[2],
                     p2[0], p2[1], p2[2], prox1, prox2))
                 {
-                    auto c = std::make_shared<PointTriangleConstraint>();
+                    auto c = std::make_shared<PbdPointTriangleConstraint>();
                     c->initConstraint(dynaModel1, map1->getMapIdx(i),
                         dynaModel2, map2->getMapIdx(e[0]), map2->getMapIdx(e[1]), map2->getMapIdx(e[2]));
                     m_collisionConstraints.push_back(c);
@@ -231,7 +231,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
@@ -245,7 +245,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
@@ -259,7 +259,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);
@@ -291,7 +291,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
@@ -305,7 +305,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
@@ -319,7 +319,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);
@@ -350,7 +350,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p0[0], p0[1], p0[2],
                             p1[0], p1[1], p1[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[0]), map1->getMapIdx(e[1]));
                             m_collisionConstraints.push_back(c);
@@ -364,7 +364,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p1[0], p1[1], p1[2],
                             p2[0], p2[1], p2[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[1]), map1->getMapIdx(e[2]));
                             m_collisionConstraints.push_back(c);
@@ -378,7 +378,7 @@ PbdInteractionPair::doNarrowPhaseCollision()
                             p2[0], p2[1], p2[2],
                             p0[0], p0[1], p0[2], prox1, prox2))
                         {
-                            auto c = std::make_shared<EdgeEdgeConstraint>();
+                            auto c = std::make_shared<PbdEdgeEdgeConstraint>();
                             c->initConstraint(dynaModel1, map1->getMapIdx(i1), map1->getMapIdx(i2),
                                 dynaModel2, map2->getMapIdx(e[2]), map1->getMapIdx(e[0]));
                             m_collisionConstraints.push_back(c);

@@ -32,13 +32,13 @@ namespace imstk
 ///
 /// \brief Area constraint for triangular face
 ///
-class AreaConstraint : public PbdConstraint
+class PbdAreaConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    AreaConstraint() : PbdConstraint(3) {}
+    PbdAreaConstraint() : PbdConstraint(3) {}
 
     ///
     /// \brief Returns PBD constraint of type Type::Area
@@ -51,13 +51,13 @@ public:
     ///
     /// \brief Initializes the area constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const unsigned int& pIdx1,
+    void initConstraint(PbdModel& model, const unsigned int& pIdx1,
         const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
 
     ///
     /// \brief Solves the area constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model);
+    bool solvePositionConstraint(PbdModel &model);
 
 public:
     double m_restArea; ///> Area at the rest position

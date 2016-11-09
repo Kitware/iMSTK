@@ -28,13 +28,13 @@ namespace imstk
 {
 
 ///
-/// \brief The PointTriangleConstraint class for point-triangle collision response
+/// \brief The PbdPointTriangleConstraint class for point-triangle collision response
 ///
-class PointTriangleConstraint : public PbdCollisionConstraint
+class PbdPointTriangleConstraint : public PbdCollisionConstraint
 {
 
 public:
-    PointTriangleConstraint() : PbdCollisionConstraint(1,3)
+    PbdPointTriangleConstraint() : PbdCollisionConstraint(1,3)
     {}
 
     ///
@@ -53,8 +53,8 @@ public:
     /// \param pIdx4 third point of the triangle from object2
     /// \return
     ///
-    void initConstraint(std::shared_ptr<PositionBasedDynamicsModel> model1, const size_t& pIdx1,
-                        std::shared_ptr<PositionBasedDynamicsModel> model2, const size_t& pIdx2,
+    void initConstraint(std::shared_ptr<PbdModel> model1, const size_t& pIdx1,
+                        std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4);
 
     ///

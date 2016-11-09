@@ -105,7 +105,7 @@ SceneManager::runModule()
     // Apply the geometry and apply maps to all the objects
     for (auto obj : m_scene->getSceneObjects())
     {
-        obj->updateSelf();
+        obj->updateGeometries();
     }
 
     // Do collision detection and response for pbd objects

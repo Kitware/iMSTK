@@ -122,8 +122,8 @@ int main()
     //testTwoOmnis();
     //testVectorPlotters();
     //testPbdVolume();
-    //testPbdCloth();
-    testPbdCollision();
+    testPbdCloth();
+    //testPbdCollision();
     //testLineMesh();
 
     return 0;
@@ -1166,7 +1166,7 @@ void testPbdVolume()
     oneToOneNodalMap->compute();
 
     auto deformableObj = std::make_shared<PbdObject>("Beam");
-    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+    auto pbdModel = std::make_shared<PbdModel>();
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
@@ -1247,7 +1247,7 @@ void testPbdCloth()
     surfMesh->setTrianglesVertices(triangles);
 
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
-    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+    auto pbdModel = std::make_shared<PbdModel>();
 
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
@@ -1320,7 +1320,7 @@ void testPbdCollision()
     deformableObj->setPhysicsToVisualMap(deformMapP2V);
     deformableObj->setCollidingToVisualMap(deformMapC2V);
 
-    auto pbdModel = std::make_shared<PositionBasedDynamicsModel>();
+    auto pbdModel = std::make_shared<PbdModel>();
     deformableObj->setDynamicalModel(pbdModel);
 
     deformableObj->initialize(/*Number of Constraints*/1,
@@ -1560,7 +1560,7 @@ void testPbdCollision()
         floor->setPhysicsToVisualMap(floorMapP2V);
         floor->setCollidingToVisualMap(floorMapC2V);
 
-        auto pbdModel2 = std::make_shared<PositionBasedDynamicsModel>();
+        auto pbdModel2 = std::make_shared<PbdModel>();
         floor->setDynamicalModel(pbdModel2);
 
         floor->initialize(/*Number of Constraints*/0,

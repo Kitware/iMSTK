@@ -28,14 +28,14 @@ namespace imstk
 {
 
 ///
-/// \class FEMConstraint
+/// \class PbdFEMConstraint
 ///
-/// \brief The FEMConstraint class for constraint as the elastic energy
+/// \brief The PbdFEMConstraint class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 /// We provide several model for elastic energy including:
 /// Linear, Co-rotation, St Venant-Kirchhof and NeoHookean
 ///
-class FEMConstraint : public PbdConstraint
+class PbdFEMConstraint : public PbdConstraint
 {
 public:
     // Material type
@@ -50,7 +50,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    explicit FEMConstraint(const unsigned int nP, MaterialType mtype = MaterialType::StVK) :
+    explicit PbdFEMConstraint(const unsigned int nP, MaterialType mtype = MaterialType::StVK) :
         PbdConstraint(nP), m_material(mtype) {}
 
 public:

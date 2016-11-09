@@ -33,14 +33,14 @@ namespace imstk
 /// \brief The FEMTetConstraint class class for constraint as the elastic energy
 /// computed by linear shape functions with tetrahedral mesh.
 ///
-class FEMTetConstraint : public  FEMConstraint
+class PbdFEMTetConstraint : public  PbdFEMConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    explicit FEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
-        FEMConstraint(4, mtype) {}
+    explicit PbdFEMTetConstraint(MaterialType mtype = MaterialType::StVK) :
+        PbdFEMConstraint(4, mtype) {}
 
     ///
     /// \brief Get the type of FEM constraint
@@ -50,14 +50,14 @@ public:
     ///
     /// \brief Initialize the tetrahedral FEM constraint
     ///
-    bool initConstraint(PositionBasedDynamicsModel &model,
+    bool initConstraint(PbdModel &model,
                         const size_t& pIdx1, const size_t& pIdx2,
                         const size_t& pIdx3, const size_t& pIdx4);
 
     ///
     /// \brief Solve the tetrahedral FEM constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel& model) override;
+    bool solvePositionConstraint(PbdModel& model) override;
 };
 
 } // imstk

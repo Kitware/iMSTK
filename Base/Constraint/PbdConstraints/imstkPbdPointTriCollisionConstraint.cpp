@@ -26,9 +26,9 @@ namespace imstk
 {
 
 void
-PointTriangleConstraint::initConstraint(std::shared_ptr<PositionBasedDynamicsModel> model1, const size_t& pIdx1,
-                                        std::shared_ptr<PositionBasedDynamicsModel> model2, const size_t& pIdx2,
-                                        const size_t& pIdx3, const size_t& pIdx4)
+PbdPointTriangleConstraint::initConstraint(std::shared_ptr<PbdModel> model1, const size_t& pIdx1,
+                                           std::shared_ptr<PbdModel> model2, const size_t& pIdx2,
+                                           const size_t& pIdx3, const size_t& pIdx4)
 {
     m_model1 = model1;
     m_model2 = model2;
@@ -39,7 +39,7 @@ PointTriangleConstraint::initConstraint(std::shared_ptr<PositionBasedDynamicsMod
 }
 
 bool
-PointTriangleConstraint::solvePositionConstraint()
+PbdPointTriangleConstraint::solvePositionConstraint()
 {
     const auto i0 = m_bodiesFirst[0];
     const auto i1 = m_bodiesSecond[0];

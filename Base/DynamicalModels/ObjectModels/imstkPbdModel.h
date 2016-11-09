@@ -35,22 +35,22 @@ namespace imstk
 {
 
 ///
-/// \class PositionBasedDynamicsModel
+/// \class PbdModel
 ///
 /// \brief This class implements position based dynamics mathematical model
 ///
-class PositionBasedDynamicsModel : public DynamicalModel<PbdState>
+class PbdModel : public DynamicalModel<PbdState>
 {
 public:
     ///
     /// \brief Constructor
     ///
-    PositionBasedDynamicsModel();
+    PbdModel();
 
     ///
     /// \brief Destructor
     ///
-    ~PositionBasedDynamicsModel() = default;
+    ~PbdModel() = default;
 
     ///
     /// \brief Initialize the states
@@ -100,7 +100,7 @@ public:
     ///
     /// \brief Initialize FEM constraints
     ///
-    bool initializeFEMConstraints(FEMConstraint::MaterialType type);
+    bool initializeFEMConstraints(PbdFEMConstraint::MaterialType type);
 
     ///
     /// \brief Initialize volume constraints

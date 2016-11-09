@@ -26,8 +26,8 @@ namespace  imstk
 {
 
 void
-DistanceConstraint::initConstraint(PositionBasedDynamicsModel& model, const size_t& pIdx1,
-                                   const size_t& pIdx2, const double k)
+PbdDistanceConstraint::initConstraint(PbdModel& model, const size_t& pIdx1,
+                                      const size_t& pIdx2, const double k)
 {
     m_vertexIds[0] = pIdx1;
     m_vertexIds[1] = pIdx2;
@@ -41,7 +41,7 @@ DistanceConstraint::initConstraint(PositionBasedDynamicsModel& model, const size
 }
 
 bool
-DistanceConstraint::solvePositionConstraint(PositionBasedDynamicsModel &model)
+PbdDistanceConstraint::solvePositionConstraint(PbdModel &model)
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];

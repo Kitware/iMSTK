@@ -12,18 +12,18 @@ PbdObject::initialize(int nCons, ...)
     //auto state = m_pbdModel->getState();
 
     auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
-    m_pbdModel = std::dynamic_pointer_cast<PositionBasedDynamicsModel>(m_dynamicalModel);
+    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
     m_pbdModel->setModelGeometry(mesh);
     m_pbdModel->initialize();
 
     // CHECKBACK
     if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::positionBasedDynamics)
     {
-        LOG(WARNING) << "Dynamic model set is not of expected type (PositionBasedDynamicsModel)!";
+        LOG(WARNING) << "Dynamic model set is not of expected type (PbdModel)!";
     }
     else
     {
-        m_pbdModel = std::static_pointer_cast<PositionBasedDynamicsModel>(m_dynamicalModel);
+        m_pbdModel = std::static_pointer_cast<PbdModel>(m_dynamicalModel);
     }
 
     va_list args;
@@ -49,21 +49,21 @@ PbdObject::initialize(int nCons, ...)
             if (strncmp("Corotation",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating Corotation constraints";
-                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::Corotation);
+                m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::Corotation);
             }
             else if (strncmp("NeoHookean",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating Neohookean constraints";
-                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::NeoHookean);
+                m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::NeoHookean);
             }
             else if (strncmp("Stvk",&s[pos],len)==0)
             {
                 LOG(INFO) << "Creating StVenant-Kirchhoff constraints";
-                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::StVK);
+                m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
             }
             else
             { // default
-                m_pbdModel->initializeFEMConstraints(FEMConstraint::MaterialType::StVK);
+                m_pbdModel->initializeFEMConstraints(PbdFEMConstraint::MaterialType::StVK);
             }
 
             float YoungModulus, PoissonRatio;

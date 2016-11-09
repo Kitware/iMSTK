@@ -26,9 +26,9 @@ namespace imstk
 {
 
 void
-EdgeEdgeConstraint::initConstraint( std::shared_ptr<PositionBasedDynamicsModel> model1,
+PbdEdgeEdgeConstraint::initConstraint(std::shared_ptr<PbdModel> model1,
                                     const size_t& pIdx1, const size_t& pIdx2,
-                                    std::shared_ptr<PositionBasedDynamicsModel> model2,
+                                    std::shared_ptr<PbdModel> model2,
                                     const size_t& pIdx3, const size_t& pIdx4)
 {
     m_model1 = model1;
@@ -40,7 +40,7 @@ EdgeEdgeConstraint::initConstraint( std::shared_ptr<PositionBasedDynamicsModel> 
 }
 
 bool
-EdgeEdgeConstraint::solvePositionConstraint()
+PbdEdgeEdgeConstraint::solvePositionConstraint()
 {
     const auto i0 = m_bodiesFirst[0];
     const auto i1 = m_bodiesFirst[1];

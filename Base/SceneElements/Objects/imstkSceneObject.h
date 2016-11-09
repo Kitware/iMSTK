@@ -113,7 +113,7 @@ public:
     ///
     /// \brief
     ///
-    virtual void updateSelf() {};
+    virtual void updateGeometries() {};
 
 protected:
     ///

@@ -32,13 +32,13 @@ namespace imstk
 ///
 /// \brief Volume constraint for tetrahedral element
 ///
-class VolumeConstraint : public PbdConstraint
+class PbdVolumeConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief constructor
     ///
-    VolumeConstraint() : PbdConstraint(4) {}
+    PbdVolumeConstraint() : PbdConstraint(4) {}
 
     ///
     /// \brief Returns PBD constraint of type Type::Volume
@@ -48,14 +48,14 @@ public:
     ///
     /// \brief Initializes the volume constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel &model, const size_t &pIdx1,
+    void initConstraint(PbdModel &model, const size_t &pIdx1,
                         const size_t &pIdx2, const size_t &pIdx3,
                         const size_t &pIdx4, const double k = 2.0);
 
     ///
     /// \brief Solves the volume constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
+    bool solvePositionConstraint(PbdModel &model) override;
 
 public:
     double m_restVolume; ///> Rest volume

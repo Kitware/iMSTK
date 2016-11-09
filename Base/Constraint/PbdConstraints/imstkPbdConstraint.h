@@ -29,7 +29,7 @@ const double EPS = 1e-6;
 namespace imstk
 {
 
-class PositionBasedDynamicsModel;
+class PbdModel;
 
 ///
 /// \brief Base Constraint class for Position based dynamics constraints
@@ -64,30 +64,30 @@ public:
 
     ///
     /// \brief update constraint
-    /// \param model \class PositionBasedDynamicsModel
+    /// \param model \class PbdModel
     /// \return true if succeeded
     ///
-    virtual bool updateConstraint(PositionBasedDynamicsModel& model)
+    virtual bool updateConstraint(PbdModel& model)
     {
         return true;
     }
 
     ///
     /// \brief compute delta position from the constraint function
-    /// \param model \class PositionBasedDynamicsModel
+    /// \param model \class PbdModel
     /// \return true if succeeded
     ///
-    virtual bool solvePositionConstraint(PositionBasedDynamicsModel& model)
+    virtual bool solvePositionConstraint(PbdModel& model)
     {
         return true;
     }
 
     ///
     /// \brief compute delta velocity, specifically for rigid bodies
-    /// \param model \class PositionBasedDynamicsModel
+    /// \param model \class PbdModel
     /// \return true if succeeded
     ///
-    virtual bool solveVelocityConstraint(PositionBasedDynamicsModel& model)
+    virtual bool solveVelocityConstraint(PbdModel& model)
     {
         return true;
     }

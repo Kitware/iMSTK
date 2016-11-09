@@ -28,17 +28,17 @@ namespace imstk
 {
 
 ///
-/// \class DistanceConstraint
+/// \class PbdDistanceConstraint
 ///
 /// \brief Distance constraints between two nodal points
 ///
-class DistanceConstraint : public PbdConstraint
+class PbdDistanceConstraint : public PbdConstraint
 {
 public:
     ///
     /// \brief Constructor
     ///
-    DistanceConstraint() : PbdConstraint(2) {}
+    PbdDistanceConstraint() : PbdConstraint(2) {}
 
     ///
     /// \brief Returns PBD constraint of type Type::Distance
@@ -48,13 +48,13 @@ public:
     ///
     /// \brief Initializes the distance constraint
     ///
-    void initConstraint(PositionBasedDynamicsModel& model, const size_t& pIdx1,
+    void initConstraint(PbdModel& model, const size_t& pIdx1,
                         const size_t& pIdx2, const double k = 1e-1);
 
     ///
     /// \brief Solves the Distance constraint
     ///
-    bool solvePositionConstraint(PositionBasedDynamicsModel &model) override;
+    bool solvePositionConstraint(PbdModel &model) override;
 
 public:
     double m_restLength; ///> Rest length between the nodes

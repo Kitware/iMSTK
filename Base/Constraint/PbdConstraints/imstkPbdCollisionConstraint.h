@@ -29,7 +29,7 @@ limitations under the License.
 namespace imstk
 {
 
-class PositionBasedDynamicsModel;
+class PbdModel;
 
 ///
 /// \class PbdCollisionConstraint
@@ -66,8 +66,8 @@ public:
     std::vector<size_t> m_bodiesFirst;    ///> index of points for the first object
     std::vector<size_t> m_bodiesSecond;   ///> index of points for the second object
 
-    std::shared_ptr<PositionBasedDynamicsModel> m_model1;
-    std::shared_ptr<PositionBasedDynamicsModel> m_model2;
+    std::shared_ptr<PbdModel> m_model1;
+    std::shared_ptr<PbdModel> m_model2;
 };
 
 }

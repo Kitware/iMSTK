@@ -51,16 +51,6 @@ DeformableObject::initialize()
     }
 }
 
-//void
-//DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel<VectorizedState>> dynaDefModel)
-//{
-//    if (!dynaDefModel || dynaDefModel->getType() != DynamicalModelType::elastoDynamics)
-//    {
-//        LOG(WARNING) << "Dynamic model set is not of expected type (elastodynamics)!";
-//    }
-//    m_dynamicalModel = dynaDefModel;
-//}
-
 const Vectord&
 DeformableObject::getDisplacements() const
 {
