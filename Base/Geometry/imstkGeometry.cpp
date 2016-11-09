@@ -68,6 +68,11 @@ Geometry::rotate(const Vec3d& axis, const double& angle)
 void
 Geometry::scale(const double& scaling)
 {
+    if(scaling <= 0)
+    {
+        LOG(WARNING) << "Geometry::scale error: scaling should be positive.";
+        return;
+    }
     m_scaling *= scaling;
 }
 
@@ -141,6 +146,11 @@ Geometry::getScaling() const
 void
 Geometry::setScaling(const double& scaling)
 {
+    if(scaling <= 0)
+    {
+        LOG(WARNING) << "Geometry::setScaling error: scaling should be positive.";
+        return;
+    }
     m_scaling = scaling;
 }
 
