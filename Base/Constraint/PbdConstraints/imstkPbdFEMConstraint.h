@@ -51,7 +51,10 @@ public:
     /// \brief Constructor
     ///
     explicit PbdFEMConstraint(const unsigned int cardinality, MaterialType mtype = MaterialType::StVK) :
-        PbdConstraint(cardinality), m_material(mtype) {}
+        PbdConstraint(), m_material(mtype)
+    {
+        m_vertexIds.resize(cardinality);
+    }
 
 public:
     double m_elementVolume;     ///> Volume of the element

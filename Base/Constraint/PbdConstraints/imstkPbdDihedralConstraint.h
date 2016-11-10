@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDihedralConstraint() : PbdConstraint(4) {}
+    PbdDihedralConstraint() : PbdConstraint()  { m_vertexIds.resize(4); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Dihedral

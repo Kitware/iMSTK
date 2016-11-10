@@ -38,7 +38,7 @@ public:
     ///
     /// \brief constructor
     ///
-    PbdVolumeConstraint() : PbdConstraint(4) {}
+    PbdVolumeConstraint() : PbdConstraint() { m_vertexIds.resize(4); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Volume

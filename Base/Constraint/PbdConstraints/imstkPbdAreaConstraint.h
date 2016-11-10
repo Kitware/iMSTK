@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdAreaConstraint() : PbdConstraint(3) {}
+    PbdAreaConstraint() : PbdConstraint() { m_vertexIds.resize(3); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Area

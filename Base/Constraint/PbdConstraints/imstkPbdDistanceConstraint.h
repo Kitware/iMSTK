@@ -38,7 +38,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdDistanceConstraint() : PbdConstraint(2) {}
+    PbdDistanceConstraint() : PbdConstraint()  { m_vertexIds.resize(2); }
 
     ///
     /// \brief Returns PBD constraint of type Type::Distance
