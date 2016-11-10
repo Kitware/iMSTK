@@ -24,7 +24,6 @@
 
 #include <memory>
 
-#include "imstkProblemState.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -35,7 +34,7 @@ namespace imstk
 ///
 /// \brief This class stores the state of the unknown field variable in vectorized form
 ///
-class VectorizedState : public ProblemState
+class VectorizedState
 {
 public:
 

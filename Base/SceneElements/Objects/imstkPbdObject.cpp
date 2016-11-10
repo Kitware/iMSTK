@@ -6,24 +6,33 @@
 namespace imstk
 {
 
-void
+bool
 PbdObject::initialize(int nCons, ...)
 {
-    //auto state = m_pbdModel->getState();
+    std::shared_ptr<Mesh> mesh;
+    if (!m_physicsGeometry ||
+        !(m_physicsGeometry->getType() == Geometry::Type::TetrahedralMesh ||
+        m_physicsGeometry->getType() == Geometry::Type::SurfaceMesh||
+        m_physicsGeometry->getType() == Geometry::Type::HexahedralMesh))
+    {
+        LOG(WARNING) << "Physics geometry is not a mesh!";
+        return false;
+    }
+    else
+    {
+        mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
+    }
 
-    auto mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
-    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
-    m_pbdModel->setModelGeometry(mesh);
-    m_pbdModel->initialize();
-
-    // CHECKBACK
     if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::positionBasedDynamics)
     {
         LOG(WARNING) << "Dynamic model set is not of expected type (PbdModel)!";
+        return false;
     }
     else
     {
         m_pbdModel = std::static_pointer_cast<PbdModel>(m_dynamicalModel);
+        m_pbdModel->setModelGeometry(mesh);
+        m_pbdModel->initialize();
     }
 
     va_list args;
@@ -147,6 +156,8 @@ PbdObject::initialize(int nCons, ...)
     }
 
     m_pbdModel->setNumDegreeOfFreedom(m_pbdModel->getModelGeometry()->getNumVertices() * 3);
+
+    return true;
 }
 
 void

@@ -18,9 +18,3 @@
    limitations under the License.
 
  =========================================================================*/
-
-#include "imstkDynamicObject.h"
-
-namespace imstk
-{
-} // imstk

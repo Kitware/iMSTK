@@ -28,7 +28,6 @@
 // imstk
 #include "imstkDynamicObject.h"
 #include "imstkDeformableBodyModel.h"
-#include "imstkProblemState.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -60,7 +59,7 @@ public:
     ///
     /// \brief
     ///
-    void initialize();
+    bool initialize();
 
     ///
     /// \brief Initialize the kinematic state of the body

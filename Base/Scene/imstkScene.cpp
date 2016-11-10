@@ -173,7 +173,7 @@ Scene::getCollisionGraph() const
     return m_collisionGraph;
 }
 
-const std::vector<std::shared_ptr<imstk::SolverBase>>
+const std::vector<std::shared_ptr<SolverBase>>
 Scene::getSolvers()
 {
     return m_solvers;

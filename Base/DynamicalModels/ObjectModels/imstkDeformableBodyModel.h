@@ -31,7 +31,6 @@
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
-#include "imstkProblemState.h"
 #include "imstkNonlinearSystem.h"
 #include "imstkVegaMeshReader.h"
 #include "imstkNewtonMethod.h"

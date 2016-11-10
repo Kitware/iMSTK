@@ -75,13 +75,7 @@ public:
     ///
     /// \brief Updates the geometries from the maps (if defined)
     ///
-    virtual void updateGeometries() override
-    {
-        if (m_collidingToVisualMap)
-        {
-            m_collidingToVisualMap->apply();
-        }
-    };
+    virtual void updateGeometries() override;
 
 protected:
 

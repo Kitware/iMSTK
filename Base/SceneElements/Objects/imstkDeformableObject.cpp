@@ -37,17 +37,19 @@ DeformableObject::getContactForce()
     return m_defModel->getContactForce();
 }
 
-void
+bool
 DeformableObject::initialize()
 {
     // CHECKBACK
     if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::elastoDynamics)
     {
         LOG(WARNING) << "Dynamic model set is not of expected type (DeformableBodyModel)!";
+        return false;
     }
     else
     {
         m_defModel = std::static_pointer_cast<DeformableBodyModel>(m_dynamicalModel);
+        return true;
     }
 }
 

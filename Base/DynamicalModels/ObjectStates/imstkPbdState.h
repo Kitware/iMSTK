@@ -25,7 +25,6 @@ limitations under the License.
 #include <Eigen/Dense>
 #include <vector>
 
-#include "imstkProblemState.h"
 #include "imstkMesh.h"
 #include "imstkMath.h"
 
@@ -37,7 +36,7 @@ namespace imstk
 ///
 /// \brief State of the body governed by PBD mathematical model
 ///
-class PbdState : public ProblemState
+class PbdState
 {
 public:
     ///

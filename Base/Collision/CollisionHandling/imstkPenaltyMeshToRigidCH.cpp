@@ -27,12 +27,13 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk 
+{
 
 void
 PenaltyMeshToRigidCH::computeContactForces()
 {
-    auto deformableObj = std::dynamic_pointer_cast<imstk::DeformableObject>(m_object);
+    auto deformableObj = std::dynamic_pointer_cast<DeformableObject>(m_object);
 
     if (deformableObj == nullptr)
     {

@@ -39,7 +39,7 @@ public:
     /// \brief Initialize the pbd configuration
     /// TODO: Parse from config file
     ///
-    void initialize(int nCons, ...);
+    bool initialize(int nCons, ...);
 
     ///
     /// \brief Update the position based on Verlet time stepping rule

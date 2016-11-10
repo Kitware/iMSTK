@@ -79,7 +79,19 @@ public:
     ///
     /// \brief Returns the number of degree of freedom
     ///
-    size_t getNumOfDOF() const { return m_dynamicalModel->getNumDegreeOfFreedom(); }
+    size_t getNumOfDOF() const
+    {
+        if (m_dynamicalModel)
+        {
+            return m_dynamicalModel->getNumDegreeOfFreedom();
+        }
+        else
+        {
+            LOG(WARNING) << "Cannot get the degree of freedom since the dynamical model is not initialized! returning 0";
+            return 0;
+        }
+
+    }
 
     ///
     /// \brief Update the physics geometry and the apply the maps (if defined)
