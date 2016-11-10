@@ -33,7 +33,7 @@
 #include "imstkForceModelConfig.h"
 #include "imstkNonlinearSystem.h"
 #include "imstkVegaMeshReader.h"
-#include "imstkNewtonMethod.h"
+#include "imstkNewtonSolver.h"
 
 //force models
 #include "imstkStVKForceModel.h"

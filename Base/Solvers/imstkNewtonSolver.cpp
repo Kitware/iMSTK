@@ -21,14 +21,14 @@ limitations under the License.
 
 #include <iostream>
 
-#include "imstkNewtonMethod.h"
+#include "imstkNewtonSolver.h"
 #include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
 
 namespace imstk
 {
 
-NewtonMethod::NewtonMethod():
+NewtonSolver::NewtonSolver():
     linearSolver(std::make_shared<ConjugateGradient>()),
     forcingTerm(0.9),
     absoluteTolerance(1e-3),
@@ -40,7 +40,7 @@ NewtonMethod::NewtonMethod():
 
 
 void
-NewtonMethod::solveGivenState(Vectord& x)
+NewtonSolver::solveGivenState(Vectord& x)
 {
     if(!this->m_nonLinearSystem)
     {
@@ -85,7 +85,7 @@ NewtonMethod::solveGivenState(Vectord& x)
 }
 
 void
-NewtonMethod::solve()
+NewtonSolver::solve()
 {
     if (!this->m_nonLinearSystem)
     {
@@ -108,7 +108,7 @@ NewtonMethod::solve()
 }
 
 void
-NewtonMethod::updateJacobian(const Vectord& x)
+NewtonSolver::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
     if (!this->m_nonLinearSystem)
@@ -131,7 +131,7 @@ NewtonMethod::updateJacobian(const Vectord& x)
 }
 
 void
-NewtonMethod::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
+NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
     double eta = this->gamma * ratio * ratio;
     double forcingTermSqr = this->forcingTerm * this->forcingTerm;
@@ -148,28 +148,28 @@ NewtonMethod::updateForcingTerm(const double ratio, const double stopTolerance, 
 
 
 void
-NewtonMethod::setLinearSolver(std::shared_ptr< NewtonMethod::LinearSolverType > newLinearSolver)
+NewtonSolver::setLinearSolver(std::shared_ptr< NewtonSolver::LinearSolverType > newLinearSolver)
 {
     this->linearSolver = newLinearSolver;
 }
 
 
-std::shared_ptr<NewtonMethod::LinearSolverType>
-NewtonMethod::getLinearSolver() const
+std::shared_ptr<NewtonSolver::LinearSolverType>
+NewtonSolver::getLinearSolver() const
 {
     return this->linearSolver;
 }
 
 
 void
-NewtonMethod::setAbsoluteTolerance(const double aTolerance)
+NewtonSolver::setAbsoluteTolerance(const double aTolerance)
 {
     this->absoluteTolerance = aTolerance;
 }
 
 
 double
-NewtonMethod::getAbsoluteTolerance() const
+NewtonSolver::getAbsoluteTolerance() const
 {
     return this->absoluteTolerance;
 }

@@ -32,7 +32,7 @@ namespace imstk {
 ///     root of F or fails. Global convergence is achieved using a line search sub-process
 ///     and the Armijo rule.
 ///
-class NewtonMethod : public NonLinearSolver
+class NewtonSolver : public NonLinearSolver
 {
 public:
     using LinearSolverType = LinearSolver<SparseMatrixd>;
@@ -41,11 +41,11 @@ public:
     ///
     /// \brief Constructors/Destructors.
     ///
-    NewtonMethod();
-    ~NewtonMethod() = default;
-    NewtonMethod(const NewtonMethod &other) = delete;
+    NewtonSolver();
+    ~NewtonSolver() = default;
+    NewtonSolver(const NewtonSolver &other) = delete;
 
-    NewtonMethod &operator=(const NewtonMethod &other) = delete;
+    NewtonSolver &operator=(const NewtonSolver &other) = delete;
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.

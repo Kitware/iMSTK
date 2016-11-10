@@ -21,7 +21,7 @@
 
 // Solvers
 #include "imstkNonlinearSystem.h"
-#include "imstkNewtonMethod.h"
+#include "imstkNewtonSolver.h"
 #include "imstkConjugateGradient.h"
 #include "imstkPbdSolver.h"
 
@@ -1102,7 +1102,7 @@ void testDeformableBody()
     auto cgLinSolver = std::make_shared<ConjugateGradient>();
 
     // create a non-linear solver and add to the scene
-    auto nlSolver = std::make_shared<NewtonMethod>();
+    auto nlSolver = std::make_shared<NewtonSolver>();
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
     scene->addNonlinearSolver(nlSolver);
