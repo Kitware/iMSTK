@@ -65,11 +65,6 @@ public:
     ///
     virtual void updatePbdStates();
 
-    ///
-    /// \brief
-    ///
-    virtual void constraintProjection(){ return; }
-
 protected:
 
 };

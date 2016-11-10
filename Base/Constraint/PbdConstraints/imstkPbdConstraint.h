@@ -54,7 +54,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    PbdConstraint(const unsigned int nP) { m_vertexIds.resize(nP); }
+    PbdConstraint(const unsigned int cardinality) { m_vertexIds.resize(cardinality); }
 
     ///
     /// \brief abstract interface to know the type of constraint

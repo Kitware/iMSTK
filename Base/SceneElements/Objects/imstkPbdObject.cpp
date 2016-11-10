@@ -146,7 +146,7 @@ PbdObject::initialize(int nCons, ...)
         m_pbdModel->setContactStiffness(va_arg(args,double));
     }
 
-    m_numDOF = m_pbdModel->getModelGeometry()->getNumVertices() * 3;
+    m_pbdModel->setNumDegreeOfFreedom(m_pbdModel->getModelGeometry()->getNumVertices() * 3);
 }
 
 void

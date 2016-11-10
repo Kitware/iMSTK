@@ -98,21 +98,6 @@ public:
     ///
     /// \brief
     ///
-    bool isVisible() const { return true; };
-
-    ///
-    /// \brief
-    ///
-    virtual bool isCollidable() const { return false; };
-
-    ///
-    /// \brief
-    ///
-    virtual bool isPhysical() const { return false; };
-
-    ///
-    /// \brief
-    ///
     virtual void updateGeometries() {};
 
 protected:

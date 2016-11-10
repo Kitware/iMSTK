@@ -73,11 +73,6 @@ public:
     void setForce(Vec3d force);
 
     ///
-    /// \brief
-    ///
-    bool isCollidable() const final { return true; };
-
-    ///
     /// \brief Updates the geometries from the maps (if defined)
     ///
     virtual void updateGeometries() override

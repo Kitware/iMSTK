@@ -47,7 +47,7 @@ enum class DynamicalModelType
 ///
 /// \brief Base class for mathematical model of the physics governing the dynamic object
 ///
-template <class T>
+template <class StateType>
 class DynamicalModel
 {
 public:
@@ -68,10 +68,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type)
-    {
-
-    }
+    DynamicalModel(DynamicalModelType type = DynamicalModelType::none) : m_type(type){}
 
     ///
     /// \brief Destructor
@@ -81,17 +78,17 @@ public:
     ///
     /// \brief Return the initial state of the problem
     ///
-    std::shared_ptr<T> getInitialState() { return m_initialState; }
+    std::shared_ptr<StateType> getInitialState() { return m_initialState; }
 
     ///
     /// \brief Return the current state of the problem
     ///
-    std::shared_ptr<T> getCurrentState() { return m_currentState; }
+    std::shared_ptr<StateType> getCurrentState() { return m_currentState; }
 
     ///
     /// \brief Return the previous state of the problem
     ///
-    std::shared_ptr<T> getPreviousState() { return m_previousState; }
+    std::shared_ptr<StateType> getPreviousState() { return m_previousState; }
 
     ///
     /// \brief Reset the current state to the initial state
@@ -106,6 +103,7 @@ public:
     /// \brief Returns the number of degrees of freedom
     ///
     std::size_t getNumDegreeOfFreedom() const { return m_numDOF; }
+    void setNumDegreeOfFreedom(const size_t nDof) { m_numDOF = nDof; }
 
     ///
     /// \brief Get the type of the object
@@ -127,9 +125,9 @@ protected:
     DynamicalModelType m_type; ///> Mathematical model type
 
     // Body states
-    std::shared_ptr<T> m_initialState;      ///> Initial state
-    std::shared_ptr<T> m_currentState;      ///> Current state
-    std::shared_ptr<T> m_previousState;     ///> Previous state
+    std::shared_ptr<StateType> m_initialState;      ///> Initial state
+    std::shared_ptr<StateType> m_currentState;      ///> Current state
+    std::shared_ptr<StateType> m_previousState;     ///> Previous state
 
     std::size_t m_numDOF; ///> Total number of degree of freedom
 };
