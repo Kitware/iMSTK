@@ -63,33 +63,11 @@ public:
     virtual Type getType() const = 0;
 
     ///
-    /// \brief update constraint
-    /// \param model \class PbdModel
-    /// \return true if succeeded
-    /// TODO: Remove this or implement for child classes in future
-    ///
-    virtual bool updateConstraint(PbdModel& model)
-    {
-        return true;
-    }
-
-    ///
     /// \brief compute delta position from the constraint function
     /// \param model \class PbdModel
     /// \return true if succeeded
     ///
     virtual bool solvePositionConstraint(PbdModel& model) = 0;
-
-    ///
-    /// \brief compute delta velocity, specifically for rigid bodies
-    /// \param model \class PbdModel
-    /// \return true if succeeded
-    /// TODO: Remove this or implement for child classes in future
-    ///
-    virtual bool solveVelocityConstraint(PbdModel& model)
-    {
-        return true;
-    }
 
 public:
     std::vector<size_t> m_vertexIds; ///> index of points for the constraint

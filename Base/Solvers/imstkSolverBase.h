@@ -36,7 +36,7 @@ public:
     SolverBase() = default;
     virtual ~SolverBase() = default;
 
-    virtual void solve() {};
+    virtual void solve() =0;
 
 };
 

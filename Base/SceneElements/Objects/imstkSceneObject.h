@@ -46,7 +46,7 @@ public:
         Visual,
         Colliding,
         Rigid,
-        Deformable,
+        FEMDeformable,
         Pbd
     };
 

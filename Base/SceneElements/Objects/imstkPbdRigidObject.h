@@ -42,7 +42,7 @@ public:
     ///
     PbdRigidObject(std::string name) : PbdObject(name)
     {
-        m_type = SceneObject::Type::Deformable;
+        m_type = SceneObject::Type::Pbd;
     }
 
     ///

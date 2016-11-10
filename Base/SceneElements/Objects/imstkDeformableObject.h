@@ -27,7 +27,7 @@
 
 // imstk
 #include "imstkDynamicObject.h"
-#include "imstkDeformableBodyModel.h"
+#include "imstkFEMDeformableBodyModel.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeformableObject(std::string name) : DynamicObject(name) { m_type = Type::Deformable; }
+    DeformableObject(std::string name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
     DeformableObject() = delete;
 
     ///
@@ -108,7 +108,7 @@ public:
     const Vectord& getPrevAccelerations() const;
 
 protected:
-    std::shared_ptr<DeformableBodyModel> m_defModel;
+    std::shared_ptr<FEMDeformableBodyModel> m_defModel;
 };
 
 } // imstk

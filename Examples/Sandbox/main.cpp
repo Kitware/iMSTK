@@ -10,7 +10,7 @@
 
 // Objects
 #include "imstkForceModelConfig.h"
-#include "imstkDeformableBodyModel.h"
+#include "imstkFEMDeformableBodyModel.h"
 #include "imstkDeformableObject.h"
 #include "imstkSceneObject.h"
 #include "imstkLight.h"
@@ -1060,7 +1060,7 @@ void testDeformableBody()
     // e. Scene object 1: Dragon
 
     // Configure dynamic model
-    auto dynaModel = std::make_shared<DeformableBodyModel>();
+    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
     dynaModel->configure("asianDragon.config");
     dynaModel->initialize(volTetMesh);
     auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator

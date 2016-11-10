@@ -9,31 +9,22 @@ namespace imstk
 bool
 PbdObject::initialize(int nCons, ...)
 {
-    std::shared_ptr<Mesh> mesh;
-    if (!m_physicsGeometry ||
-        !(m_physicsGeometry->getType() == Geometry::Type::TetrahedralMesh ||
-        m_physicsGeometry->getType() == Geometry::Type::SurfaceMesh||
-        m_physicsGeometry->getType() == Geometry::Type::HexahedralMesh))
+    std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(m_physicsGeometry);
+    if (mesh == nullptr)
     {
         LOG(WARNING) << "Physics geometry is not a mesh!";
         return false;
     }
-    else
-    {
-        mesh = std::static_pointer_cast<Mesh>(m_physicsGeometry);
-    }
 
-    if (!m_dynamicalModel || m_dynamicalModel->getType() != DynamicalModelType::positionBasedDynamics)
+    m_pbdModel = std::dynamic_pointer_cast<PbdModel>(m_dynamicalModel);
+    if (m_pbdModel == nullptr)
     {
         LOG(WARNING) << "Dynamic model set is not of expected type (PbdModel)!";
         return false;
     }
-    else
-    {
-        m_pbdModel = std::static_pointer_cast<PbdModel>(m_dynamicalModel);
-        m_pbdModel->setModelGeometry(mesh);
-        m_pbdModel->initialize();
-    }
+
+    m_pbdModel->setModelGeometry(mesh);
+    m_pbdModel->initialize();
 
     va_list args;
     va_start(args, nCons);

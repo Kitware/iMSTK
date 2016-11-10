@@ -81,16 +81,13 @@ public:
     ///
     size_t getNumOfDOF() const
     {
-        if (m_dynamicalModel)
-        {
-            return m_dynamicalModel->getNumDegreeOfFreedom();
-        }
-        else
+        if (!m_dynamicalModel)
         {
             LOG(WARNING) << "Cannot get the degree of freedom since the dynamical model is not initialized! returning 0";
             return 0;
         }
 
+        return m_dynamicalModel->getNumDegreeOfFreedom();
     }
 
     ///
@@ -104,11 +101,17 @@ public:
         {
             m_physicsToCollidingGeomMap->apply();
         }
-        CollidingObject::updateGeometries();
 
-        if (m_physicsToVisualGeomMap)
+        if (m_updateVisualFromPhysicsGeometry)
         {
-            m_physicsToVisualGeomMap->apply();
+            if (m_physicsToVisualGeomMap)
+            {
+                m_physicsToVisualGeomMap->apply();
+            }
+        }
+        else
+        {
+            CollidingObject::updateGeometries();
         }
     }
 
@@ -125,6 +128,7 @@ protected:
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
+    bool m_updateVisualFromPhysicsGeometry = true; ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 
 } // imstk

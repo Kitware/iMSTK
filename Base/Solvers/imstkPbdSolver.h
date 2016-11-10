@@ -74,8 +74,6 @@ public:
     ///
     void solve()
     {
-        SolverBase::solve();
-
         m_pbdObject->integratePosition();
         m_pbdObject->solveConstraints();
         m_pbdObject->integrateVelocity();

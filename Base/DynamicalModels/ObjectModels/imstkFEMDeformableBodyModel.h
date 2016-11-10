@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkDeformableBodyModel_h
-#define imstkDeformableBodyModel_h
+#ifndef imstkFEMDeformableBodyModel_h
+#define imstkFEMDeformableBodyModel_h
 
 #include <memory>
 
@@ -49,13 +49,13 @@ namespace imstk
 {
 
 ///
-/// \class DeformableBodyModel
+/// \class FEMDeformableBodyModel
 ///
 /// \brief Mathematical model of the physics governing the dynamic deformable object
 /// Note: Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
-class DeformableBodyModel : public DynamicalModel<VectorizedState>
+class FEMDeformableBodyModel : public DynamicalModel<VectorizedState>
 {
 
     using kinematicState = VectorizedState;
@@ -63,12 +63,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    DeformableBodyModel();
+    FEMDeformableBodyModel();
 
     ///
     /// \brief Destructor
     ///
-    ~DeformableBodyModel() = default;
+    ~FEMDeformableBodyModel() = default;
 
     ///
     /// \brief Set/Get force model configuration
@@ -258,4 +258,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkDeformableBodyModel_h
+#endif // ifndef imstkFEMDeformableBodyModel_h
