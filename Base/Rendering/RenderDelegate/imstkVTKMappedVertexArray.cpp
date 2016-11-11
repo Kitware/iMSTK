@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkMappedVertexArray.h"
+#include "imstkVTKMappedVertexArray.h"
 
 #include "vtkIdList.h"
 #include "vtkObjectFactory.h"
@@ -29,12 +29,12 @@
 namespace imstk
 {
 
-vtkStandardNewMacro(MappedVertexArray);
+vtkStandardNewMacro(VTKMappedVertexArray);
 
 void
-MappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
+VTKMappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
 {
-    this->MappedVertexArray::Superclass::PrintSelf(
+    this->VTKMappedVertexArray::Superclass::PrintSelf(
         os, indent);
 
     os << indent << "vertexArray : " << this->vertexArray << std::endl;
@@ -42,7 +42,7 @@ MappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
 }
 
 void
-MappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
+VTKMappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
 {
     this->Initialize();
     this->NumberOfComponents = 3;
@@ -53,7 +53,7 @@ MappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
 }
 
 void
-MappedVertexArray::Initialize()
+VTKMappedVertexArray::Initialize()
 {
     this->vertexArray = nullptr;
     this->MaxId = -1;
@@ -62,7 +62,7 @@ MappedVertexArray::Initialize()
 }
 
 void
-MappedVertexArray::GetTuples(vtkIdList *ptIds, vtkAbstractArray *output)
+VTKMappedVertexArray::GetTuples(vtkIdList *ptIds, vtkAbstractArray *output)
 {
     vtkDataArray *outArray = vtkDataArray::FastDownCast(output);
     if(!outArray)
@@ -84,7 +84,7 @@ MappedVertexArray::GetTuples(vtkIdList *ptIds, vtkAbstractArray *output)
 }
 
 void
-MappedVertexArray::GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *output)
+VTKMappedVertexArray::GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *output)
 {
     vtkDataArray *outArray = vtkDataArray::FastDownCast(output);
     if(!outArray)
@@ -106,20 +106,20 @@ MappedVertexArray::GetTuples(vtkIdType p1, vtkIdType p2, vtkAbstractArray *outpu
 }
 
 void
-MappedVertexArray::Squeeze()
+VTKMappedVertexArray::Squeeze()
 {
     // noop
 }
 
 vtkArrayIterator*
-MappedVertexArray::NewIterator()
+VTKMappedVertexArray::NewIterator()
 {
     vtkErrorMacro( << "Not implemented.");
     return NULL;
 }
 
 vtkIdType
-MappedVertexArray::LookupValue(vtkVariant value)
+VTKMappedVertexArray::LookupValue(vtkVariant value)
 {
     bool valid = true;
     double val = vtkVariantCast<double>(value, &valid);
@@ -131,7 +131,7 @@ MappedVertexArray::LookupValue(vtkVariant value)
 }
 
 void
-MappedVertexArray::LookupValue(vtkVariant value, vtkIdList *ids)
+VTKMappedVertexArray::LookupValue(vtkVariant value, vtkIdList *ids)
 {
     bool valid = true;
     double val = vtkVariantCast<double>(value, &valid);
@@ -147,26 +147,26 @@ MappedVertexArray::LookupValue(vtkVariant value, vtkIdList *ids)
 }
 
 vtkVariant
-MappedVertexArray::GetVariantValue(vtkIdType idx)
+VTKMappedVertexArray::GetVariantValue(vtkIdType idx)
 {
     return vtkVariant(this->GetValueReference(idx));
 }
 
 void
-MappedVertexArray::ClearLookup()
+VTKMappedVertexArray::ClearLookup()
 {
     // no-op, no fast lookup implemented.
 }
 
 double*
-MappedVertexArray::GetTuple(vtkIdType i)
+VTKMappedVertexArray::GetTuple(vtkIdType i)
 {
     this->TempDoubleArray = (*this->vertexArray)[i];
     return this->TempDoubleArray.data();
 }
 
 void
-MappedVertexArray::GetTuple(vtkIdType i, double *tuple)
+VTKMappedVertexArray::GetTuple(vtkIdType i, double *tuple)
 {
     tuple[0] = static_cast<double>((*this->vertexArray)[i][0]);
     tuple[1] = static_cast<double>((*this->vertexArray)[i][1]);
@@ -174,13 +174,13 @@ MappedVertexArray::GetTuple(vtkIdType i, double *tuple)
 }
 
 vtkIdType
-MappedVertexArray::LookupTypedValue(double value)
+VTKMappedVertexArray::LookupTypedValue(double value)
 {
     return this->Lookup(value, 0);
 }
 
 void
-MappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
+VTKMappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
 {
     ids->Reset();
     vtkIdType index = 0;
@@ -191,7 +191,7 @@ MappedVertexArray::LookupTypedValue(double value, vtkIdList *ids)
 }
 
 double
-MappedVertexArray::GetValue(vtkIdType idx) const
+VTKMappedVertexArray::GetValue(vtkIdType idx) const
 {
     const vtkIdType tuple = idx / this->NumberOfComponents;
     const vtkIdType comp = idx % this->NumberOfComponents;
@@ -209,7 +209,7 @@ MappedVertexArray::GetValue(vtkIdType idx) const
 }
 
 double&
-MappedVertexArray::GetValueReference(vtkIdType idx)
+VTKMappedVertexArray::GetValueReference(vtkIdType idx)
 {
     const vtkIdType tuple = idx / this->NumberOfComponents;
     const vtkIdType comp = idx % this->NumberOfComponents;
@@ -229,7 +229,7 @@ MappedVertexArray::GetValueReference(vtkIdType idx)
 }
 
 void
-MappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
+VTKMappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
 {
   tuple[0] = (*this->vertexArray)[tupleId](0);
   tuple[1] = (*this->vertexArray)[tupleId](1);
@@ -237,7 +237,7 @@ MappedVertexArray::GetTypedTuple(vtkIdType tupleId, ValueType *tuple) const
 }
 
 void
-MappedVertexArray::GetTupleValue(vtkIdType tupleId, double *tuple)
+VTKMappedVertexArray::GetTupleValue(vtkIdType tupleId, double *tuple)
 {
     tuple[0] = (*this->vertexArray)[tupleId](0);
     tuple[1] = (*this->vertexArray)[tupleId](1);
@@ -245,91 +245,91 @@ MappedVertexArray::GetTupleValue(vtkIdType tupleId, double *tuple)
 }
 
 int
-MappedVertexArray::Allocate(vtkIdType, vtkIdType)
+VTKMappedVertexArray::Allocate(vtkIdType, vtkIdType)
 {
     vtkErrorMacro("Read only container.")
     return 0;
 }
 
 int
-MappedVertexArray::Resize(vtkIdType)
+VTKMappedVertexArray::Resize(vtkIdType)
 {
     vtkErrorMacro("Read only container.")
     return 0;
 }
 
 void
-MappedVertexArray::SetNumberOfTuples(vtkIdType)
+VTKMappedVertexArray::SetNumberOfTuples(vtkIdType)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::SetTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
+VTKMappedVertexArray::SetTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::SetTuple(vtkIdType, const float *)
+VTKMappedVertexArray::SetTuple(vtkIdType, const float *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::SetTuple(vtkIdType, const double *)
+VTKMappedVertexArray::SetTuple(vtkIdType, const double *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
+VTKMappedVertexArray::InsertTuple(vtkIdType, vtkIdType, vtkAbstractArray *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTuple(vtkIdType, const float *)
+VTKMappedVertexArray::InsertTuple(vtkIdType, const float *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTuple(vtkIdType, const double *)
+VTKMappedVertexArray::InsertTuple(vtkIdType, const double *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTuples(vtkIdList *, vtkIdList *, vtkAbstractArray *)
+VTKMappedVertexArray::InsertTuples(vtkIdList *, vtkIdList *, vtkAbstractArray *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTuples(vtkIdType,vtkIdType,vtkIdType,vtkAbstractArray*)
+VTKMappedVertexArray::InsertTuples(vtkIdType, vtkIdType, vtkIdType, vtkAbstractArray*)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 vtkIdType
-MappedVertexArray::InsertNextTuple(vtkIdType, vtkAbstractArray *)
+VTKMappedVertexArray::InsertNextTuple(vtkIdType, vtkAbstractArray *)
 {
     vtkErrorMacro("Read only container.")
     return -1;
 }
 
 vtkIdType
-MappedVertexArray::InsertNextTuple(const float *)
+VTKMappedVertexArray::InsertNextTuple(const float *)
 {
 
     vtkErrorMacro("Read only container.")
@@ -337,28 +337,28 @@ MappedVertexArray::InsertNextTuple(const float *)
 }
 
 vtkIdType
-MappedVertexArray::InsertNextTuple(const double *)
+VTKMappedVertexArray::InsertNextTuple(const double *)
 {
     vtkErrorMacro("Read only container.")
     return -1;
 }
 
 void
-MappedVertexArray::DeepCopy(vtkAbstractArray *)
+VTKMappedVertexArray::DeepCopy(vtkAbstractArray *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::DeepCopy(vtkDataArray *)
+VTKMappedVertexArray::DeepCopy(vtkDataArray *)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdList *, vtkAbstractArray *,
+VTKMappedVertexArray::InterpolateTuple(vtkIdType, vtkIdList *, vtkAbstractArray *,
                                     double *)
 {
     vtkErrorMacro("Read only container.")
@@ -366,7 +366,7 @@ MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdList *, vtkAbstractArray *,
 }
 
 void
-MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdType, vtkAbstractArray*,
+VTKMappedVertexArray::InterpolateTuple(vtkIdType, vtkIdType, vtkAbstractArray*,
                                     vtkIdType, vtkAbstractArray*, double)
 {
     vtkErrorMacro("Read only container.")
@@ -374,84 +374,84 @@ MappedVertexArray::InterpolateTuple(vtkIdType, vtkIdType, vtkAbstractArray*,
 }
 
 void
-MappedVertexArray::SetVariantValue(vtkIdType, vtkVariant)
+VTKMappedVertexArray::SetVariantValue(vtkIdType, vtkVariant)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::RemoveTuple(vtkIdType)
+VTKMappedVertexArray::RemoveTuple(vtkIdType)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::RemoveFirstTuple()
+VTKMappedVertexArray::RemoveFirstTuple()
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::RemoveLastTuple()
+VTKMappedVertexArray::RemoveLastTuple()
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::SetTupleValue(vtkIdType, const double*)
+VTKMappedVertexArray::SetTupleValue(vtkIdType, const double*)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertTupleValue(vtkIdType, const double*)
+VTKMappedVertexArray::InsertTupleValue(vtkIdType, const double*)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 vtkIdType
-MappedVertexArray::InsertNextTupleValue(const double *)
+VTKMappedVertexArray::InsertNextTupleValue(const double *)
 {
     vtkErrorMacro("Read only container.")
     return -1;
 }
 
 void
-MappedVertexArray::SetValue(vtkIdType, double)
+VTKMappedVertexArray::SetValue(vtkIdType, double)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 vtkIdType
-MappedVertexArray::InsertNextValue(double)
+VTKMappedVertexArray::InsertNextValue(double)
 {
     vtkErrorMacro("Read only container.")
     return -1;
 }
 
 void
-MappedVertexArray::InsertValue(vtkIdType, double)
+VTKMappedVertexArray::InsertValue(vtkIdType, double)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 void
-MappedVertexArray::InsertVariantValue(vtkIdType, vtkVariant)
+VTKMappedVertexArray::InsertVariantValue(vtkIdType, vtkVariant)
 {
     vtkErrorMacro("Read only container.")
     return;
 }
 
 vtkIdType
-MappedVertexArray::Lookup(const double &val, vtkIdType index)
+VTKMappedVertexArray::Lookup(const double &val, vtkIdType index)
 {
     while(index <= this->MaxId)
     {

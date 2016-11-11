@@ -19,46 +19,29 @@
 
    =========================================================================*/
 
-#ifndef imstkSphereRenderDelegate_h
-#define imstkSphereRenderDelegate_h
+#include "imstkVTKPlaneRenderDelegate.h"
 
-#include <memory>
-
-#include "imstkRenderDelegate.h"
-#include "imstkSphere.h"
-
-#include "vtkSphereSource.h"
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
 
-///
-/// \class SphereRenderDelegate
-///
-/// \brief
-///
-class SphereRenderDelegate : public RenderDelegate
+VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
+    m_geometry(plane)
 {
-public:
-    ///
-    /// \brief
-    ///
-    ~SphereRenderDelegate() = default;
+    auto source = vtkSmartPointer<vtkPlaneSource>::New();
 
-    ///
-    /// \brief
-    ///
-    SphereRenderDelegate(std::shared_ptr<Sphere>sphere);
+    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
+    source->SetNormal(UP_VECTOR[0], UP_VECTOR[1], UP_VECTOR[2]);
 
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    this->setActorMapper(source->GetOutputPort());
+    this->updateActorTransform();
+}
 
-protected:
-    std::shared_ptr<Sphere> m_geometry; ///>
-};
+std::shared_ptr<Geometry>
+VTKPlaneRenderDelegate::getGeometry() const
+{
+    return m_geometry;
+}
 
 } // imstk
-
-#endif // ifndef imstkSphereRenderDelegate_h

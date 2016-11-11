@@ -797,7 +797,7 @@ void testIsometricMap()
 
     // Start simulation
     sdk->setCurrentScene("geometryMapTest");
-    sdk->startSimulation(imstk::Renderer::Mode::DEBUG);
+    sdk->startSimulation(imstk::VTKRenderer::Mode::DEBUG);
 }
 
 void testTetraTriangleMap()
@@ -1276,6 +1276,7 @@ void testPbdCollision()
 {
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("PbdCollisionTest");
+
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon

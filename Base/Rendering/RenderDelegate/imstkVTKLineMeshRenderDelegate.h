@@ -19,46 +19,60 @@
 
    =========================================================================*/
 
-#ifndef imstkCubeRenderDelegate_h
-#define imstkCubeRenderDelegate_h
+#ifndef imstkVTKLineMeshRenderDelegate_h
+#define imstkVTKLineMeshRenderDelegate_h
 
 #include <memory>
 
-#include "imstkRenderDelegate.h"
-#include "imstkCube.h"
-
-#include "vtkCubeSource.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkLineMesh.h"
+#include <vtkLineSource.h>
+#include "vtkPolyData.h"
+#include "imstkVTKMappedVertexArray.h"
 
 namespace imstk
 {
 
 ///
-/// \class CubeRenderDelegate
+/// \class LineMeshRenderDelegate
 ///
-/// \brief Cube render delegate
+/// \brief
 ///
-class CubeRenderDelegate : public RenderDelegate
+class VTKLineMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
-    /// \brief Constructor
+    /// \brief
     ///
-    CubeRenderDelegate(std::shared_ptr<Cube>cube);
+    ~VTKLineMeshRenderDelegate() = default;
 
     ///
-    /// \brief Destructor
+    /// \brief
     ///
-    ~CubeRenderDelegate() = default;
+    VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
 
     ///
-    /// \brief Get the geometry
+    /// \brief
+    ///
+    void mapVertices();
+
+    ///
+    /// \brief
+    ///
+    void update();
+
+    ///
+    /// \brief
     ///
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-    std::shared_ptr<Cube> m_geometry;   ///> Geometry
+    vtkSmartPointer<vtkLineSource> m_lines;
+    std::shared_ptr<LineMesh> m_geometry;
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+
 };
 
-} // imstk
+}
 
-#endif // ifndef imstkCubeRenderDelegate_h
+#endif // ifndef imstkLineMeshRenderDelegate_h

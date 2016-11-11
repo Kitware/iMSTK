@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkRenderDelegate.h"
+#include "imstkVTKRenderDelegate.h"
 
 #include "g3log/g3log.hpp"
 
@@ -30,12 +30,12 @@
 #include "imstkLineMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
-#include "imstkPlaneRenderDelegate.h"
-#include "imstkSphereRenderDelegate.h"
-#include "imstkCubeRenderDelegate.h"
-#include "imstkSurfaceMeshRenderDelegate.h"
-#include "imstkLineMeshRenderDelegate.h"
-#include "imstkTetrahedralMeshRenderDelegate.h"
+#include "imstkVTKPlaneRenderDelegate.h"
+#include "imstkVTKSphereRenderDelegate.h"
+#include "imstkVTKCubeRenderDelegate.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
+#include "imstkVTKLineMeshRenderDelegate.h"
+#include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
 #include "vtkPolyDataMapper.h"
 #include "vtkPolyDataNormals.h"
@@ -44,40 +44,40 @@
 namespace imstk
 {
 
-std::shared_ptr<RenderDelegate>
-RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
+std::shared_ptr<VTKRenderDelegate>
+VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 {
     switch (geom->getType())
     {
     case Geometry::Type::Plane:
     {
         auto plane = std::dynamic_pointer_cast<Plane>(geom);
-        return std::make_shared<PlaneRenderDelegate>(plane);
+        return std::make_shared<VTKPlaneRenderDelegate>(plane);
     }
     case Geometry::Type::Sphere:
     {
         auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
-        return std::make_shared<SphereRenderDelegate>(sphere);
+        return std::make_shared<VTKSphereRenderDelegate>(sphere);
     }
     case Geometry::Type::Cube:
     {
         auto cube = std::dynamic_pointer_cast<Cube>(geom);
-        return std::make_shared<CubeRenderDelegate>(cube);
+        return std::make_shared<VTKCubeRenderDelegate>(cube);
     }
     case Geometry::Type::SurfaceMesh:
     {
         auto surface = std::dynamic_pointer_cast<SurfaceMesh>(geom);
-        return std::make_shared<SurfaceMeshRenderDelegate>(surface);
+        return std::make_shared<VTKSurfaceMeshRenderDelegate>(surface);
     }
     case Geometry::Type::TetrahedralMesh:
     {
         auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
-        return std::make_shared<TetrahedralMeshRenderDelegate>(mesh);
+        return std::make_shared<VTKTetrahedralMeshRenderDelegate>(mesh);
     }
     case Geometry::Type::LineMesh:
     {
         auto mesh = std::dynamic_pointer_cast<LineMesh>(geom);
-        return std::make_shared<LineMeshRenderDelegate>(mesh);
+        return std::make_shared<VTKLineMeshRenderDelegate>(mesh);
     }
     case Geometry::Type::HexahedralMesh:
     {
@@ -94,7 +94,7 @@ RenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 }
 
 void
-RenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
+VTKRenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
 {
 
     auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
@@ -108,20 +108,20 @@ RenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
 }
 
 vtkSmartPointer<vtkActor>
-RenderDelegate::getVtkActor() const
+VTKRenderDelegate::getVtkActor() const
 {
     return m_actor;
 }
 
 void
-RenderDelegate::update()
+VTKRenderDelegate::update()
 {
     // TODO : only when rigid transform applied
     this->updateActorTransform();
 }
 
 void
-RenderDelegate::updateActorTransform()
+VTKRenderDelegate::updateActorTransform()
 {
     auto scaling   = this->getGeometry()->getScaling();
     auto pos       = this->getGeometry()->getPosition();

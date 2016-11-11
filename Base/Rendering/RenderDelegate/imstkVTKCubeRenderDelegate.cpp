@@ -19,47 +19,33 @@
 
    =========================================================================*/
 
-#ifndef imstkPlaneRenderDelegate_h
-#define imstkPlaneRenderDelegate_h
+#include "imstkVTKCubeRenderDelegate.h"
 
-#include <memory>
-
-#include "imstkRenderDelegate.h"
-#include "imstkPlane.h"
-
-#include "vtkPlaneSource.h"
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
 
-///
-/// \class PlaneRenderDelegate
-///
-/// \brief
-///
-class PlaneRenderDelegate : public RenderDelegate
+VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube>cube) :
+    m_geometry(cube)
 {
-public:
-    ///
-    /// \brief
-    ///
-    PlaneRenderDelegate(std::shared_ptr<Plane>plane);
+    auto width = m_geometry->getWidth();
 
-    ///
-    /// \brief
-    ///
-    ~PlaneRenderDelegate() = default;
+    auto source = vtkSmartPointer<vtkCubeSource>::New();
 
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
+    source->SetXLength(width);
+    source->SetYLength(width);
+    source->SetZLength(width);
 
-protected:
+    this->setActorMapper(source->GetOutputPort());
+    this->updateActorTransform();
+}
 
-    std::shared_ptr<Plane> m_geometry;  ///> Geometry
-};
+std::shared_ptr<Geometry>
+VTKCubeRenderDelegate::getGeometry() const
+{
+    return m_geometry;
+}
 
 } // imstk
-
-#endif // ifndef imstkPlaneRenderDelegate_h

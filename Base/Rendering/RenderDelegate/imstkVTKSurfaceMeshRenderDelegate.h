@@ -19,74 +19,61 @@
 
    =========================================================================*/
 
-#ifndef imstkRenderDelegate_h
-#define imstkRenderDelegate_h
+#ifndef imstkVTKSurfaceMeshRenderDelegate_h
+#define imstkVTKSurfaceMeshRenderDelegate_h
 
 #include <memory>
 
-#include "imstkGeometry.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkSurfaceMesh.h"
 
-#include "vtkSmartPointer.h"
-#include "vtkAlgorithmOutput.h"
-#include "vtkActor.h"
-#include "vtkTransform.h"
+#include "vtkPolyData.h"
+#include "imstkVTKMappedVertexArray.h"
 
 namespace imstk
 {
 
 ///
-/// \class RenderDelegate
+/// \class SurfaceMeshRenderDelegate
 ///
-/// \brief Base class for render delegates
+/// \brief
 ///
-class RenderDelegate
+class VTKSurfaceMeshRenderDelegate : public VTKRenderDelegate
 {
 public:
-
     ///
-    /// \brief Default destructor
+    /// \brief
     ///
-    ~RenderDelegate() = default;
+    ~VTKSurfaceMeshRenderDelegate() = default;
 
     ///
     /// \brief
     ///
-    static std::shared_ptr<RenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
+    VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
 
     ///
     /// \brief
     ///
-    void setActorMapper(vtkAlgorithmOutput *source);
+    void mapVertices();
+
 
     ///
     /// \brief
     ///
-    virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+    void update();
 
     ///
     /// \brief
     ///
-    vtkSmartPointer<vtkActor> getVtkActor() const;
-
-    ///
-    /// \brief
-    ///
-    virtual void update();
-
-    ///
-    /// \brief
-    ///
-    void updateActorTransform();
+    std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-    ///
-    /// \brief Default constructor (protected)
-    ///
-    RenderDelegate() {}
 
-    vtkSmartPointer<vtkActor> m_actor = vtkSmartPointer<vtkActor>::New();
-    vtkSmartPointer<vtkTransform> m_transform = vtkSmartPointer<vtkTransform>::New();
+    std::shared_ptr<SurfaceMesh> m_geometry;
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+
 };
+
 }
 
-#endif // ifndef imstkRenderDelegate_h
+#endif // ifndef imstkSurfaceMeshRenderDelegate_h

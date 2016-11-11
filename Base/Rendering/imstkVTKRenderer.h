@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkRenderer_h
-#define imstkRenderer_h
+#ifndef imstkVTKRenderer_h
+#define imstkVTKRenderer_h
 
 #include <memory>
 #include <vector>
@@ -36,14 +36,14 @@ namespace imstk
 
 class Scene;
 class Camera;
-class RenderDelegate;
+class VTKRenderDelegate;
 
 ///
 /// \class Renderer
 ///
 /// \brief
 ///
-class Renderer
+class VTKRenderer
 {
 public:
     ///
@@ -59,12 +59,12 @@ public:
     ///
     /// \brief Constructor
     ///
-    Renderer(std::shared_ptr<Scene> scene);
+    VTKRenderer(std::shared_ptr<Scene> scene);
 
     ///
     /// \brief Default destructor
     ///
-    ~ Renderer() = default;
+    ~VTKRenderer() = default;
 
     ///
     /// \brief
@@ -104,7 +104,7 @@ protected:
     std::vector<vtkSmartPointer<vtkProp>> m_objectVtkActors;
     std::vector<vtkSmartPointer<vtkProp>> m_debugVtkActors;
 
-    std::vector<std::shared_ptr<RenderDelegate>> m_renderDelegates;
+    std::vector<std::shared_ptr<VTKRenderDelegate>> m_renderDelegates;
 
     Mode m_currentMode = Mode::EMPTY;
 };

@@ -19,61 +19,74 @@
 
    =========================================================================*/
 
-#ifndef imstkSurfaceMeshRenderDelegate_h
-#define imstkSurfaceMeshRenderDelegate_h
+#ifndef imstkVTKRenderDelegate_h
+#define imstkVTKRenderDelegate_h
 
 #include <memory>
 
-#include "imstkRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
+#include "imstkGeometry.h"
 
-#include "vtkPolyData.h"
-#include "imstkMappedVertexArray.h"
+#include "vtkSmartPointer.h"
+#include "vtkAlgorithmOutput.h"
+#include "vtkActor.h"
+#include "vtkTransform.h"
 
 namespace imstk
 {
 
 ///
-/// \class SurfaceMeshRenderDelegate
+/// \class RenderDelegate
 ///
-/// \brief
+/// \brief Base class for render delegates
 ///
-class SurfaceMeshRenderDelegate : public RenderDelegate
+class VTKRenderDelegate
 {
 public:
+
     ///
-    /// \brief
+    /// \brief Default destructor
     ///
-    ~SurfaceMeshRenderDelegate() = default;
+    ~VTKRenderDelegate() = default;
 
     ///
     /// \brief
     ///
-    SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
+    static std::shared_ptr<VTKRenderDelegate> make_delegate(std::shared_ptr<Geometry>geom);
 
     ///
     /// \brief
     ///
-    void mapVertices();
-
-
-    ///
-    /// \brief
-    ///
-    void update();
+    void setActorMapper(vtkAlgorithmOutput *source);
 
     ///
     /// \brief
     ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    virtual std::shared_ptr<Geometry> getGeometry() const = 0;
+
+    ///
+    /// \brief
+    ///
+    vtkSmartPointer<vtkActor> getVtkActor() const;
+
+    ///
+    /// \brief
+    ///
+    virtual void update();
+
+    ///
+    /// \brief
+    ///
+    void updateActorTransform();
 
 protected:
+    ///
+    /// \brief Default constructor (protected)
+    ///
+    VTKRenderDelegate() {}
 
-    std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
-
+    vtkSmartPointer<vtkActor> m_actor = vtkSmartPointer<vtkActor>::New();
+    vtkSmartPointer<vtkTransform> m_transform = vtkSmartPointer<vtkTransform>::New();
 };
-
 }
 
-#endif // ifndef imstkSurfaceMeshRenderDelegate_h
+#endif // ifndef imstkRenderDelegate_h

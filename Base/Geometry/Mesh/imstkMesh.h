@@ -150,9 +150,9 @@ protected:
     ///
     Mesh(Geometry::Type type) : Geometry(type) {}
 
-    friend class SurfaceMeshRenderDelegate;
-    friend class TetrahedralMeshRenderDelegate;
-    friend class LineMeshRenderDelegate;
+    friend class VTKSurfaceMeshRenderDelegate;
+    friend class VTKTetrahedralMeshRenderDelegate;
+    friend class VTKLineMeshRenderDelegate;
 
     ///
     /// \brief Get vertices positions

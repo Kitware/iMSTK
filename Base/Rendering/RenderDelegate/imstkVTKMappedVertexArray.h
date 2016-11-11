@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkMappedVertexArray_h
-#define imstkMappedVertexArray_h
+#ifndef imstkVTKMappedVertexArray_h
+#define imstkVTKMappedVertexArray_h
 
 #include "vtkMappedDataArray.h"
 #include "vtkObjectFactory.h" // for vtkStandardNewMacro
@@ -39,11 +39,11 @@ namespace imstk
 ///
 /// \brief
 ///
-class MappedVertexArray: public vtkMappedDataArray<double>
+class VTKMappedVertexArray: public vtkMappedDataArray<double>
 {
 public:
-    static MappedVertexArray *New();
-    vtkTypeMacro(MappedVertexArray,vtkMappedDataArray);
+    static VTKMappedVertexArray *New();
+    vtkTypeMacro(VTKMappedVertexArray,vtkMappedDataArray);
     virtual void PrintSelf(ostream &os, vtkIndent indent);
 
     // Description:
@@ -114,18 +114,18 @@ protected:
     ///
     /// \brief Constructor
     ///
-    MappedVertexArray() {}
+    VTKMappedVertexArray() {}
 
     ///
     /// \brief Destructor
     ///
-    ~MappedVertexArray() {}
+    ~VTKMappedVertexArray() {}
 
     std::vector<Vec3d> *vertexArray;    ///>
 
 private:
-    MappedVertexArray(const MappedVertexArray &); // Not implemented.
-    void operator=(const MappedVertexArray &); // Not implemented.
+    VTKMappedVertexArray(const VTKMappedVertexArray &); // Not implemented.
+    void operator=(const VTKMappedVertexArray &); // Not implemented.
 
     ///
     /// \brief

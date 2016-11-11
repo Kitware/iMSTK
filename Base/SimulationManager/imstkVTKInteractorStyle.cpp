@@ -20,7 +20,7 @@
    =========================================================================*/
 
 // imstk
-#include "imstkInteractorStyle.h"
+#include "imstkVTKInteractorStyle.h"
 #include "imstkSimulationManager.h"
 
 // vtk
@@ -35,10 +35,10 @@
 namespace imstk
 {
 
-vtkStandardNewMacro(InteractorStyle);
+vtkStandardNewMacro(VTKInteractorStyle);
 
 void
-InteractorStyle::OnTimer()
+VTKInteractorStyle::OnTimer()
 {
     if (m_simManager->getStatus() != SimulationStatus::RUNNING)
     {
@@ -63,7 +63,7 @@ InteractorStyle::OnTimer()
 }
 
 void
-InteractorStyle::OnChar()
+VTKInteractorStyle::OnChar()
 {
     vtkRenderWindowInteractor *rwi = this->Interactor;
 
@@ -211,7 +211,7 @@ InteractorStyle::OnChar()
 }
 
 void
-InteractorStyle::OnMouseMove()
+VTKInteractorStyle::OnMouseMove()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -222,7 +222,7 @@ InteractorStyle::OnMouseMove()
 }
 
 void
-InteractorStyle::OnLeftButtonDown()
+VTKInteractorStyle::OnLeftButtonDown()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -233,7 +233,7 @@ InteractorStyle::OnLeftButtonDown()
 }
 
 void
-InteractorStyle::OnLeftButtonUp()
+VTKInteractorStyle::OnLeftButtonUp()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -244,7 +244,7 @@ InteractorStyle::OnLeftButtonUp()
 }
 
 void
-InteractorStyle::OnMiddleButtonDown()
+VTKInteractorStyle::OnMiddleButtonDown()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -255,7 +255,7 @@ InteractorStyle::OnMiddleButtonDown()
 }
 
 void
-InteractorStyle::OnMiddleButtonUp()
+VTKInteractorStyle::OnMiddleButtonUp()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -266,7 +266,7 @@ InteractorStyle::OnMiddleButtonUp()
 }
 
 void
-InteractorStyle::OnRightButtonDown()
+VTKInteractorStyle::OnRightButtonDown()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -277,7 +277,7 @@ InteractorStyle::OnRightButtonDown()
 }
 
 void
-InteractorStyle::OnRightButtonUp()
+VTKInteractorStyle::OnRightButtonUp()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -288,7 +288,7 @@ InteractorStyle::OnRightButtonUp()
 }
 
 void
-InteractorStyle::OnMouseWheelForward()
+VTKInteractorStyle::OnMouseWheelForward()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -299,7 +299,7 @@ InteractorStyle::OnMouseWheelForward()
 }
 
 void
-InteractorStyle::OnMouseWheelBackward()
+VTKInteractorStyle::OnMouseWheelBackward()
 {
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
@@ -310,7 +310,7 @@ InteractorStyle::OnMouseWheelBackward()
 }
 
 void
-InteractorStyle::setSimulationManager(SimulationManager *simManager)
+VTKInteractorStyle::setSimulationManager(SimulationManager *simManager)
 {
     m_simManager = simManager;
 }

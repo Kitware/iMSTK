@@ -19,11 +19,11 @@
 
    =========================================================================*/
 
-#include "imstkRenderer.h"
+#include "imstkVTKRenderer.h"
 
 #include "imstkScene.h"
 #include "imstkCamera.h"
-#include "imstkRenderDelegate.h"
+#include "imstkVTKRenderDelegate.h"
 
 #include "vtkLightActor.h"
 #include "vtkCameraActor.h"
@@ -34,7 +34,7 @@
 namespace imstk
 {
 
-Renderer::Renderer(std::shared_ptr<Scene> scene)
+VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
 {
     // Object actors
     for ( const auto& obj : scene->getSceneObjects() )
@@ -47,7 +47,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
             continue;
         }
 
-        auto delegate = RenderDelegate::make_delegate( geom );
+        auto delegate = VTKRenderDelegate::make_delegate( geom );
         if (delegate == nullptr)
         {
             LOG(WARNING) << "Renderer::Renderer error: Could not create render delegate for '"
@@ -96,13 +96,13 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
 }
 
 vtkSmartPointer<vtkRenderer>
-Renderer::getVtkRenderer() const
+VTKRenderer::getVtkRenderer() const
 {
     return m_vtkRenderer;
 }
 
 void
-Renderer::setup(Mode mode)
+VTKRenderer::setup(Mode mode)
 {
     if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
     {
@@ -155,7 +155,7 @@ Renderer::setup(Mode mode)
 }
 
 void
-Renderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
+VTKRenderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
 {
     // Get imstk Camera info
     auto p = imstkCam->getPosition();
@@ -170,7 +170,7 @@ Renderer::updateSceneCamera(std::shared_ptr<Camera> imstkCam)
 }
 
 void
-Renderer::updateRenderDelegates()
+VTKRenderer::updateRenderDelegates()
 {
     for (auto delegate : m_renderDelegates)
     {
@@ -179,7 +179,7 @@ Renderer::updateRenderDelegates()
 }
 
 void
-Renderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
+VTKRenderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 {
     for ( const auto& actor : actorList )
     {
@@ -188,7 +188,7 @@ Renderer::removeActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 }
 
 void
-Renderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
+VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
 {
     for ( const auto& actor : actorList )
     {

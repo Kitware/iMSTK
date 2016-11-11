@@ -164,7 +164,7 @@ SimulationManager::removeModule(std::string moduleName)
     LOG(INFO) << "Module removed: " << moduleName;
 }
 
-std::shared_ptr<Viewer>
+std::shared_ptr<VTKViewer>
 SimulationManager::getViewer() const
 {
     return m_viewer;
@@ -202,14 +202,14 @@ SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentS
     // render scene in debug, update current scene, and return
     if (m_status == SimulationStatus::INACTIVE)
     {
-        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+        m_viewer->setRenderingMode(VTKRenderer::Mode::DEBUG);
         m_currentSceneName = newSceneName;
         return;
     }
 
     // If rendering and simulation active:
     // render scene in simulation mode, and update simulation
-    m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+    m_viewer->setRenderingMode(VTKRenderer::Mode::SIMULATION);
 
     // Stop/Pause running scene
     auto oldSceneManager = m_sceneManagerMap.at(m_currentSceneName);
@@ -264,7 +264,7 @@ SimulationManager::startSimulation(bool debug)
     if( !debug )
     {
         LOG(INFO) << "Starting simulation";
-        m_viewer->setRenderingMode(Renderer::Mode::SIMULATION);
+        m_viewer->setRenderingMode(VTKRenderer::Mode::SIMULATION);
 
         // Start modules
         for(const auto& pair : m_modulesMap)
@@ -280,7 +280,7 @@ SimulationManager::startSimulation(bool debug)
     // Debug
     else
     {
-        m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+        m_viewer->setRenderingMode(VTKRenderer::Mode::DEBUG);
     }
 
     // Start Rendering
@@ -359,7 +359,7 @@ SimulationManager::endSimulation()
     }
 
     // Update Renderer
-    m_viewer->setRenderingMode(Renderer::Mode::DEBUG);
+    m_viewer->setRenderingMode(VTKRenderer::Mode::DEBUG);
 
     // End modules
     for(const auto& pair : m_modulesMap)
