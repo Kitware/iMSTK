@@ -19,46 +19,31 @@
 
    =========================================================================*/
 
-#ifndef imstkTetrahedralMeshRenderDelegate_h
-#define imstkTetrahedralMeshRenderDelegate_h
+#include "imstkVTKSphereRenderDelegate.h"
 
-#include <memory>
-
-#include "imstkRenderDelegate.h"
-#include "imstkTetrahedralMesh.h"
-
-#include "vtkUnstructuredGrid.h"
+#include "g3log/g3log.hpp"
 
 namespace imstk
 {
 
-///
-/// \class TetrahedralMeshRenderDelegate
-///
-/// \brief
-///
-class TetrahedralMeshRenderDelegate : public RenderDelegate
+VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) :
+    m_geometry(sphere)
 {
-public:
-    ///
-    /// \brief
-    ///
-    ~TetrahedralMeshRenderDelegate() = default;
+    auto source = vtkSmartPointer<vtkSphereSource>::New();
 
-    ///
-    /// \brief
-    ///
-    TetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh);
+    source->SetCenter(WORLD_ORIGIN[0], WORLD_ORIGIN[1], WORLD_ORIGIN[2]);
+    source->SetRadius(m_geometry->getRadius());
+    source->SetPhiResolution(20);
+    source->SetThetaResolution(20);
 
-    ///
-    /// \brief
-    ///
-    std::shared_ptr<Geometry> getGeometry() const override;
+    this->setActorMapper(source->GetOutputPort());
+    this->updateActorTransform();
+}
 
-protected:
-    std::shared_ptr<TetrahedralMesh> m_geometry;    ///>
-};
+std::shared_ptr<Geometry>
+VTKSphereRenderDelegate::getGeometry() const
+{
+    return m_geometry;
+}
 
 } // imstk
-
-#endif // ifndef imstkTetrahedralMeshRenderDelegate_h

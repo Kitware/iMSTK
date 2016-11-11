@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkLineMeshRenderDelegate.h"
+#include "imstkVTKLineMeshRenderDelegate.h"
 
 #include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
@@ -37,7 +37,7 @@
 namespace imstk
 {
 
-LineMeshRenderDelegate::LineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh) :
+VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh) :
     m_geometry(lineMesh)
 {
     // Map vertices
@@ -70,7 +70,7 @@ LineMeshRenderDelegate::LineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMes
 }
 
 void
-LineMeshRenderDelegate::mapVertices()
+VTKLineMeshRenderDelegate::mapVertices()
 {
     auto vertices = m_geometry->getVerticesPositionsNotConst();
 
@@ -83,17 +83,17 @@ LineMeshRenderDelegate::mapVertices()
 }
 
 void
-LineMeshRenderDelegate::update()
+VTKLineMeshRenderDelegate::update()
 {
     // Base class update
-    RenderDelegate::update();
+    VTKRenderDelegate::update();
 
     this->mapVertices();
     m_lines->Update();
 }
 
 std::shared_ptr<Geometry>
-LineMeshRenderDelegate::getGeometry() const
+VTKLineMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }

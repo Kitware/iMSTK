@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkInteractorStyle_h
-#define imstkInteractorStyle_h
+#ifndef imstkVTKInteractorStyle_h
+#define imstkVTKInteractorStyle_h
 
 #include <memory>
 
@@ -38,12 +38,12 @@ using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
 ///
 /// \brief
 ///
-class InteractorStyle : public vtkBaseInteractorStyle
+class VTKInteractorStyle : public vtkBaseInteractorStyle
 {
 public:
 
-    static InteractorStyle *New();
-    vtkTypeMacro(InteractorStyle, vtkBaseInteractorStyle);
+    static VTKInteractorStyle *New();
+    vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle);
 
     ///
     /// \brief

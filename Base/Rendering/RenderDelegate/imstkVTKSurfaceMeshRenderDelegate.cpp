@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkSurfaceMeshRenderDelegate.h"
+#include "imstkVTKSurfaceMeshRenderDelegate.h"
 
 #include <vtkTrivialProducer.h>
 #include <vtkPolyDataMapper.h>
@@ -36,7 +36,7 @@
 namespace imstk
 {
 
-SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
+VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh) :
     m_geometry(surfaceMesh)
 {
     // Map vertices
@@ -134,7 +134,7 @@ SurfaceMeshRenderDelegate::SurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh
 }
 
 void
-SurfaceMeshRenderDelegate::mapVertices()
+VTKSurfaceMeshRenderDelegate::mapVertices()
 {
     auto vertices = m_geometry->getVerticesPositionsNotConst();
 
@@ -147,16 +147,16 @@ SurfaceMeshRenderDelegate::mapVertices()
 }
 
 void
-SurfaceMeshRenderDelegate::update()
+VTKSurfaceMeshRenderDelegate::update()
 {
     // Base class update
-    RenderDelegate::update();
+    VTKRenderDelegate::update();
 
     this->mapVertices();
 }
 
 std::shared_ptr<Geometry>
-SurfaceMeshRenderDelegate::getGeometry() const
+VTKSurfaceMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }

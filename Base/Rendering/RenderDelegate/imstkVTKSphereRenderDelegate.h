@@ -19,47 +19,36 @@
 
    =========================================================================*/
 
-#ifndef imstkLineMeshRenderDelegate_h
-#define imstkLineMeshRenderDelegate_h
+#ifndef imstkVTKSphereRenderDelegate_h
+#define imstkVTKSphereRenderDelegate_h
 
 #include <memory>
 
-#include "imstkRenderDelegate.h"
-#include "imstkLineMesh.h"
-#include <vtkLineSource.h>
-#include "vtkPolyData.h"
-#include "imstkMappedVertexArray.h"
+#include "imstkVTKRenderDelegate.h"
+#include "imstkSphere.h"
+
+#include "vtkSphereSource.h"
 
 namespace imstk
 {
 
 ///
-/// \class LineMeshRenderDelegate
+/// \class SphereRenderDelegate
 ///
 /// \brief
 ///
-class LineMeshRenderDelegate : public RenderDelegate
+class VTKSphereRenderDelegate : public VTKRenderDelegate
 {
 public:
     ///
     /// \brief
     ///
-    ~LineMeshRenderDelegate() = default;
+    ~VTKSphereRenderDelegate() = default;
 
     ///
     /// \brief
     ///
-    LineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
-
-    ///
-    /// \brief
-    ///
-    void mapVertices();
-
-    ///
-    /// \brief
-    ///
-    void update();
+    VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere);
 
     ///
     /// \brief
@@ -67,12 +56,9 @@ public:
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-    vtkSmartPointer<vtkLineSource> m_lines;
-    std::shared_ptr<LineMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
-
+    std::shared_ptr<Sphere> m_geometry; ///>
 };
 
-}
+} // imstk
 
-#endif // ifndef imstkLineMeshRenderDelegate_h
+#endif // ifndef imstkSphereRenderDelegate_h

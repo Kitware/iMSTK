@@ -19,23 +19,23 @@
 
    =========================================================================*/
 
-#include "imstkViewer.h"
+#include "imstkVTKViewer.h"
 
 #include "g3log/g3log.hpp"
 
-#include "imstkRenderDelegate.h"
+#include "imstkVTKRenderDelegate.h"
 
 namespace imstk
 {
 
 std::shared_ptr<Scene>
-Viewer::getCurrentScene() const
+VTKViewer::getCurrentScene() const
 {
     return m_currentScene;
 }
 
 void
-Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
+VTKViewer::setCurrentScene(std::shared_ptr<Scene>scene)
 {
     // If already current scene
     if( scene == m_currentScene )
@@ -60,7 +60,7 @@ Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
     // Create renderer if it doesn't exist
     if (!m_rendererMap.count(m_currentScene))
     {
-        m_rendererMap[m_currentScene] = std::make_shared<Renderer>(m_currentScene);
+        m_rendererMap[m_currentScene] = std::make_shared<VTKRenderer>(m_currentScene);
     }
 
     // Set renderer to renderWindow
@@ -70,14 +70,14 @@ Viewer::setCurrentScene(std::shared_ptr<Scene>scene)
     m_vtkRenderWindow->SetWindowName(m_currentScene->getName().data());
 }
 
-std::shared_ptr<Renderer>
-Viewer::getCurrentRenderer() const
+std::shared_ptr<VTKRenderer>
+VTKViewer::getCurrentRenderer() const
 {
     return m_rendererMap.at(m_currentScene);
 }
 
 void
-Viewer::setRenderingMode(Renderer::Mode mode)
+VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
 {
     if( !m_currentScene )
     {
@@ -97,7 +97,7 @@ Viewer::setRenderingMode(Renderer::Mode mode)
     m_vtkRenderWindow->Render();
 
     // Setup render window
-    if( mode == Renderer::Mode::SIMULATION )
+    if (mode == VTKRenderer::Mode::SIMULATION)
     {
         m_interactorStyle->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();
@@ -113,7 +113,7 @@ Viewer::setRenderingMode(Renderer::Mode mode)
 }
 
 void
-Viewer::startRenderingLoop()
+VTKViewer::startRenderingLoop()
 {
     m_running = true;
     m_vtkRenderWindow->GetInteractor()->Initialize();
@@ -124,19 +124,19 @@ Viewer::startRenderingLoop()
 }
 
 void
-Viewer::endRenderingLoop()
+VTKViewer::endRenderingLoop()
 {
     m_vtkRenderWindow->GetInteractor()->TerminateApp();
 }
 
 vtkSmartPointer<vtkRenderWindow>
-Viewer::getVtkRenderWindow() const
+VTKViewer::getVtkRenderWindow() const
 {
     return m_vtkRenderWindow;
 }
 
 const bool&
-Viewer::isRendering() const
+VTKViewer::isRendering() const
 {
     return m_running;
 }

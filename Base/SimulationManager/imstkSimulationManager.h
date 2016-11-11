@@ -27,10 +27,11 @@
 #include <thread>
 #include <memory>
 
+#include "imstkVTKRenderer.h"
 #include "imstkScene.h"
 #include "imstkModule.h"
 #include "imstkSceneManager.h"
-#include "imstkViewer.h"
+#include "imstkVTKViewer.h"
 #include "imstkLogger.h"
 
 namespace imstk
@@ -125,7 +126,7 @@ public:
     void removeModule(std::string moduleName);
 
     // Viewer
-    std::shared_ptr<Viewer> getViewer() const;
+    std::shared_ptr<VTKViewer> getViewer() const;
 
     // Simulation
     ///
@@ -166,7 +167,7 @@ private:
 
     std::unordered_map<std::string, std::thread> m_threadMap;
 
-    std::shared_ptr<Viewer> m_viewer = std::make_shared<Viewer>(this);
+    std::shared_ptr<VTKViewer> m_viewer = std::make_shared<VTKViewer>(this);
     std::shared_ptr<LogUtility> m_logUtil = std::make_shared<LogUtility>();
 };
 

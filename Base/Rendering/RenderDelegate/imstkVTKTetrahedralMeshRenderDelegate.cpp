@@ -19,9 +19,9 @@
 
    =========================================================================*/
 
-#include "imstkTetrahedralMeshRenderDelegate.h"
+#include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
-#include "imstkMappedVertexArray.h"
+#include "imstkVTKMappedVertexArray.h"
 
 #include <vtkCellArray.h>
 #include <vtkTrivialProducer.h>
@@ -32,13 +32,13 @@
 namespace imstk
 {
 
-TetrahedralMeshRenderDelegate::TetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
+VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
     m_geometry(tetrahedralMesh)
 {
     const size_t dim = 4;
 
     // Map vertices
-    auto mappedVertexArray = vtkSmartPointer<MappedVertexArray>::New();
+    auto mappedVertexArray = vtkSmartPointer<VTKMappedVertexArray>::New();
     mappedVertexArray->SetVertexArray(m_geometry->getVerticesPositionsNotConst());
 
     // Create points
@@ -76,7 +76,7 @@ TetrahedralMeshRenderDelegate::TetrahedralMeshRenderDelegate(std::shared_ptr<Tet
 }
 
 std::shared_ptr<Geometry>
-TetrahedralMeshRenderDelegate::getGeometry() const
+VTKTetrahedralMeshRenderDelegate::getGeometry() const
 {
     return m_geometry;
 }

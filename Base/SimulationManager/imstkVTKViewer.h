@@ -19,15 +19,15 @@
 
    =========================================================================*/
 
-#ifndef imstkViewer_h
-#define imstkViewer_h
+#ifndef imsktVTKViewer_h
+#define imstkVTKViewer_h
 
 #include <memory>
 #include <unordered_map>
 
 #include "imstkScene.h"
-#include "imstkRenderer.h"
-#include "imstkInteractorStyle.h"
+#include "imstkVTKRenderer.h"
+#include "imstkVTKInteractorStyle.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
@@ -43,13 +43,13 @@ class SimulationManager;
 ///
 /// \brief Viewer
 ///
-class Viewer
+class VTKViewer
 {
 public:
     ///
     /// \brief
     ///
-    Viewer(SimulationManager* manager = nullptr)
+    VTKViewer(SimulationManager* manager = nullptr)
     {
         m_interactorStyle->setSimulationManager(manager);
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
@@ -60,7 +60,7 @@ public:
     ///
     /// \brief
     ///
-    ~Viewer() = default;
+    ~VTKViewer() = default;
 
     ///
     /// \brief
@@ -75,12 +75,12 @@ public:
     ///
     /// \brief
     ///
-    std::shared_ptr<Renderer> getCurrentRenderer() const;
+    std::shared_ptr<VTKRenderer> getCurrentRenderer() const;
 
     ///
     /// \brief
     ///
-    void setRenderingMode(Renderer::Mode mode);
+    void setRenderingMode(VTKRenderer::Mode mode);
 
     ///
     /// \brief
@@ -105,9 +105,9 @@ public:
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
-    vtkSmartPointer<InteractorStyle> m_interactorStyle = vtkSmartPointer<InteractorStyle>::New();
+    vtkSmartPointer<VTKInteractorStyle> m_interactorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
     std::shared_ptr<Scene> m_currentScene;
-    std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<Renderer>> m_rendererMap;
+    std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<VTKRenderer>> m_rendererMap;
     bool m_running = false;
 };
 
