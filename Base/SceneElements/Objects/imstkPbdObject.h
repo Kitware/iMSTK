@@ -58,7 +58,6 @@ public:
 
 protected:
 
-    std::shared_ptr<Mesh> m_physicsGeometry;                ///> Geometry used for Physics
     std::shared_ptr<PbdModel> m_pbdModel; ///> PBD mathematical model
 };
 
