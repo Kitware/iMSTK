@@ -27,24 +27,62 @@ namespace imstk
 Vectord&
 DeformableObject::getContactForce()
 {
-    auto defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
+    //m_defModel = std::dynamic_pointer_cast<imstk::DeformableBodyModel>(m_dynamicalModel);
 
-    if (!defModel)
+    if (!m_defModel)
     {
         LOG(WARNING) << "Dynamics pointer cast failure in DeformableObject::getContactForce()";
     }
 
-    return defModel->getContactForce();
+    return m_defModel->getContactForce();
 }
 
-void
-DeformableObject::setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel)
+bool
+DeformableObject::initialize()
 {
-    if (!dynaDefModel || dynaDefModel->getType() != DynamicalModel::Type::elastoDynamics)
+    m_defModel = std::dynamic_pointer_cast<FEMDeformableBodyModel>(m_dynamicalModel);
+    if (m_defModel == nullptr)
     {
-        LOG(WARNING) << "Dynamic model set is not of expected type (elastodynamics)!";
+        LOG(WARNING) << "Dynamic model set is not of expected type (DeformableBodyModel)!";
+        return false;
     }
-    m_dynamicalModel = dynaDefModel;
+    return true;
+}
+
+const Vectord&
+DeformableObject::getDisplacements() const
+{
+    return m_defModel->getCurrentState()->getQ();
+}
+
+const Vectord&
+DeformableObject::getPrevDisplacements() const
+{
+    return m_defModel->getPreviousState()->getQ();
+}
+
+const Vectord&
+DeformableObject::getVelocities() const
+{
+    return m_defModel->getCurrentState()->getQDot();
+}
+
+const Vectord&
+DeformableObject::getPrevVelocities() const
+{
+    return m_defModel->getPreviousState()->getQDot();
+}
+
+const Vectord&
+DeformableObject::getAccelerations() const
+{
+    return m_defModel->getCurrentState()->getQDotDot();
+}
+
+const Vectord&
+DeformableObject::getPrevAccelerations() const
+{
+    return m_defModel->getPreviousState()->getQDotDot();
 }
 
 } // imstk

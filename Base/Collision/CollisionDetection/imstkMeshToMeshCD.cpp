@@ -35,8 +35,8 @@ MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
     m_meshA(meshA),
     m_meshB(meshB)
 {
-    m_modelA = std::make_shared<DeformModel>(meshA->getVerticesPositions(), meshA->getTrianglesVertices());
-    m_modelB = std::make_shared<DeformModel>(meshB->getVerticesPositions(), meshB->getTrianglesVertices());
+    m_modelA = std::make_shared<DeformModel>(meshA->getVertexPositions(), meshA->getTrianglesVertices());
+    m_modelB = std::make_shared<DeformModel>(meshB->getVertexPositions(), meshB->getTrianglesVertices());
 
     // Setup Callbacks
     m_modelA->SetEECallBack(MeshToMeshCD::EECallback, this);
@@ -52,8 +52,8 @@ void
 MeshToMeshCD::computeCollisionData()
 {
     // Update model
-    m_modelA->UpdateVert(m_meshA->getVerticesPositions());
-    m_modelB->UpdateVert(m_meshB->getVerticesPositions());
+    m_modelA->UpdateVert(m_meshA->getVertexPositions());
+    m_modelB->UpdateVert(m_meshB->getVertexPositions());
     m_modelB->UpdateBoxes();
     m_modelB->UpdateBoxes();
 

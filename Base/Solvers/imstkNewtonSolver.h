@@ -32,7 +32,7 @@ namespace imstk {
 ///     root of F or fails. Global convergence is achieved using a line search sub-process
 ///     and the Armijo rule.
 ///
-class NewtonMethod : public NonLinearSolver
+class NewtonSolver : public NonLinearSolver
 {
 public:
     using LinearSolverType = LinearSolver<SparseMatrixd>;
@@ -41,19 +41,19 @@ public:
     ///
     /// \brief Constructors/Destructors.
     ///
-    NewtonMethod();
-    ~NewtonMethod() = default;
-    NewtonMethod(const NewtonMethod &other) = delete;
+    NewtonSolver();
+    ~NewtonSolver() = default;
+    NewtonSolver(const NewtonSolver &other) = delete;
 
-    NewtonMethod &operator=(const NewtonMethod &other) = delete;
+    NewtonSolver &operator=(const NewtonSolver &other) = delete;
 
     ///
     /// \brief Solve the non linear system of equations G(x)=0 using Newton's method.
     ///
     /// \param x Current iterate.
     ///
-    void solve(Vectord &x) override;
-    void solveSimple() override;
+    void solveGivenState(Vectord &x) override;
+    void solve();
 
     ///
     /// \brief Update forcing term according to Eisenstat-Walker criteria.
@@ -147,7 +147,7 @@ public:
     ///     for the entire iteration.
     /// \see updateForcingTerm()
     ///
-    void setEtaMax(const size_t newEtaMax)
+    void setEtaMax(const double newEtaMax)
     {
         this->etaMax = newEtaMax;
     }
@@ -155,7 +155,7 @@ public:
     ///
     /// \brief Get EtaMax. Returns current etaMax value.
     ///
-    size_t getEtaMax() const
+    double getEtaMax() const
     {
         return this->etaMax;
     }

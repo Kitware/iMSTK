@@ -17,12 +17,12 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #include <fstream>
 
 //imstk
-#include "imstkDeformableBodyModel.h"
+#include "imstkFEMDeformableBodyModel.h"
 
 // vega
 #include "generateMassMatrix.h"
@@ -31,65 +31,65 @@
 namespace imstk
 {
 
-DeformableBodyModel::DeformableBodyModel(DynamicalModel::Type type) : DynamicalModel(type), m_damped(false)
-{}
+FEMDeformableBodyModel::FEMDeformableBodyModel() :
+DynamicalModel(DynamicalModelType::elastoDynamics), m_damped(false){}
 
 void
-DeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
+FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
 {
     m_forceModelConfiguration = fmConfig;
 }
 
 std::shared_ptr<imstk::ForceModelConfig>
-DeformableBodyModel::getForceModelConfiguration() const
+FEMDeformableBodyModel::getForceModelConfiguration() const
 {
     return m_forceModelConfiguration;
 }
 
 void
-DeformableBodyModel::setInternalForceModel(std::shared_ptr<InternalForceModel> fm)
+FEMDeformableBodyModel::setInternalForceModel(std::shared_ptr<InternalForceModel> fm)
 {
     m_internalForceModel = fm;
 }
 
 std::shared_ptr<imstk::InternalForceModel>
-DeformableBodyModel::getInternalForceModel() const
+FEMDeformableBodyModel::getInternalForceModel() const
 {
     return m_internalForceModel;
 }
 
 void
-DeformableBodyModel::setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator)
+FEMDeformableBodyModel::setTimeIntegrator(std::shared_ptr<TimeIntegrator> timeIntegrator)
 {
     m_timeIntegrator = timeIntegrator;
 }
 
 std::shared_ptr<imstk::TimeIntegrator>
-DeformableBodyModel::getTimeIntegrator() const
+FEMDeformableBodyModel::getTimeIntegrator() const
 {
     return m_timeIntegrator;
 }
 
 void
-DeformableBodyModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
+FEMDeformableBodyModel::setModelGeometry(std::shared_ptr<Geometry> geometry)
 {
     m_forceModelGeometry = geometry;
 }
 
 std::shared_ptr<imstk::Geometry>
-DeformableBodyModel::getModelGeometry()
+FEMDeformableBodyModel::getModelGeometry()
 {
     return m_forceModelGeometry;
 }
 
 void
-DeformableBodyModel::configure(const std::string& configFileName)
+FEMDeformableBodyModel::configure(const std::string& configFileName)
 {
     m_forceModelConfiguration = std::make_shared<ForceModelConfig>(configFileName);
 }
 
 void
-DeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
+FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
 {
     this->setModelGeometry(physicsMesh);
 
@@ -122,7 +122,7 @@ DeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
 }
 
 void
-DeformableBodyModel::loadInitialStates()
+FEMDeformableBodyModel::loadInitialStates()
 {
     // For now the initial states are set to zero
     m_initialState = std::make_shared<kinematicState>(m_numDOF);
@@ -131,7 +131,7 @@ DeformableBodyModel::loadInitialStates()
 }
 
 void
-DeformableBodyModel::loadBoundaryConditions()
+FEMDeformableBodyModel::loadBoundaryConditions()
 {
     auto fileName = m_forceModelConfiguration->getStringOptionsMap().at("fixedDOFFilename");
 
@@ -166,9 +166,9 @@ DeformableBodyModel::loadBoundaryConditions()
 }
 
 void
-DeformableBodyModel::initializeForceModel()
+FEMDeformableBodyModel::initializeForceModel()
 {
-    const float g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double g = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
     const bool isGravityPresent = (g > 0) ? true : false;
 
     m_numDOF = m_vegaPhysicsMesh->getNumVertices() * 3;
@@ -207,7 +207,7 @@ DeformableBodyModel::initializeForceModel()
 }
 
 void
-DeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
+FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 {
     if (!this->m_forceModelGeometry)
     {
@@ -226,7 +226,7 @@ DeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 }
 
 void
-DeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
+FEMDeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
 {
     auto dampingLaplacianCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
     auto dampingMassCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
@@ -272,7 +272,7 @@ DeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::VolumetricMes
 }
 
 void
-DeformableBodyModel::initializeTangentStiffness()
+FEMDeformableBodyModel::initializeTangentStiffness()
 {
     if (!m_internalForceModel)
     {
@@ -320,17 +320,17 @@ DeformableBodyModel::initializeTangentStiffness()
 }
 
 void
-DeformableBodyModel::initializeGravityForce()
+FEMDeformableBodyModel::initializeGravityForce()
 {
     m_gravityForce.resize(m_numDOF);
     m_gravityForce.setZero();
-    const float gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
+    const double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
 
     m_vegaPhysicsMesh->computeGravity(m_gravityForce.data(), gravity);
 }
 
 void
-DeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
+FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
                                               kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
@@ -367,7 +367,7 @@ DeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
 }
 
 void
-DeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
+FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
 kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
@@ -394,7 +394,7 @@ kinematicState& newState)
 }
 
 void
-DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
+FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
                                               kinematicState& newState)
 {
     // Do checks if there are uninitialized matrices
@@ -421,7 +421,7 @@ DeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
 }
 
 void
-DeformableBodyModel::initializeExplicitExternalForces()
+FEMDeformableBodyModel::initializeExplicitExternalForces()
 {
     m_explicitExternalForce.resize(m_numDOF);
     m_explicitExternalForce.setZero();
@@ -430,7 +430,7 @@ DeformableBodyModel::initializeExplicitExternalForces()
 }
 
 void
-DeformableBodyModel::updateDampingMatrix()
+FEMDeformableBodyModel::updateDampingMatrix()
 {
     if (m_damped)
     {
@@ -454,7 +454,7 @@ DeformableBodyModel::updateDampingMatrix()
 }
 
 void
-DeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool withCompliance) const
+FEMDeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool withCompliance) const
 {
     double compliance = withCompliance ? 1.0 : 0.0;
 
@@ -482,7 +482,7 @@ DeformableBodyModel::applyBoundaryConditions(SparseMatrixd &M, const bool withCo
 }
 
 void
-DeformableBodyModel::applyBoundaryConditions(Vectord &x) const
+FEMDeformableBodyModel::applyBoundaryConditions(Vectord &x) const
 {
     for (auto & index : m_fixedNodeIds)
     {
@@ -491,21 +491,22 @@ DeformableBodyModel::applyBoundaryConditions(Vectord &x) const
 }
 
 void
-DeformableBodyModel::updateMassMatrix()
+FEMDeformableBodyModel::updateMassMatrix()
 {
     // Do nothing for now as topology changes are not supported yet!
 }
 
 void
-DeformableBodyModel::updatePhysicsGeometry()
+FEMDeformableBodyModel::updatePhysicsGeometry()
 {
     auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
     auto u = m_currentState->getQ();
     volMesh->setVerticesDisplacements(u);
 }
 
+
 void
-DeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
+FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
 {
     auto uPrev = m_previousState->getQ();
     auto u = m_currentState->getQ();
@@ -540,7 +541,7 @@ DeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdate
 }
 
 NonLinearSystem::VectorFunctionType
-DeformableBodyModel::getFunction(const bool semiImplicit)
+FEMDeformableBodyModel::getFunction(const bool semiImplicit)
 {
     // Function to evaluate the nonlinear objective function given the current state
     return [&, this](const Vectord& q) -> const Vectord&
@@ -560,7 +561,7 @@ DeformableBodyModel::getFunction(const bool semiImplicit)
 }
 
 NonLinearSystem::MatrixFunctionType
-DeformableBodyModel::getFunctionGradient()
+FEMDeformableBodyModel::getFunctionGradient()
 {
     //const Vectord& q
     // Gradient of the nonlinear objective function given the current state
@@ -573,7 +574,7 @@ DeformableBodyModel::getFunctionGradient()
 }
 
 NonLinearSystem::UpdateFunctionType
-DeformableBodyModel::getUpdateFunction()
+FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
     return[&, this](const Vectord& q) -> void
@@ -583,7 +584,7 @@ DeformableBodyModel::getUpdateFunction()
 }
 
 void
-DeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix)
+FEMDeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix)
 {
     auto rowLengths = vegaMatrix.GetRowLengths();
     auto nonZeroValues = vegaMatrix.GetEntries();
@@ -604,7 +605,7 @@ DeformableBodyModel::initializeEigenMatrixFromVegaMatrix(const vega::SparseMatri
 }
 
 Vectord&
-DeformableBodyModel::getContactForce()
+FEMDeformableBodyModel::getContactForce()
 {
     return m_Fcontact;
 }

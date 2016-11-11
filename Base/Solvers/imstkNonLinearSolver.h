@@ -27,6 +27,7 @@
 // imstk includes
 #include "imstkNonlinearSystem.h"
 #include "imstkMath.h"
+#include "imstkSolverBase.h"
 
 namespace imstk
 {
@@ -34,11 +35,11 @@ namespace imstk
 ///
 /// \brief Base class for non-linear solvers
 ///
-class NonLinearSolver
+class NonLinearSolver : public SolverBase
 {
 public:
-    using JacobianType = std::function<const SparseMatrixd&(const Vectord&)>;
-    using UpdateIterateType = std::function<void(const Vectord&,Vectord&)>;
+    using JacobianType = std::function < const SparseMatrixd&(const Vectord&) > ;
+    using UpdateIterateType = std::function < void(const Vectord&, Vectord&) > ;
     using FunctionType = NonLinearSystem::VectorFunctionType;
 
 public:
@@ -51,8 +52,8 @@ public:
     ///
     /// \brief Main solve routine.
     ///
-    virtual void solve(Vectord& x) = 0;
-    virtual void solveSimple() = 0;
+    virtual void solveGivenState(Vectord& x) = 0;
+    virtual void solve() = 0;
 
     ///
     /// \brief Backtracking line search method based on the Armijo-Goldstein condition
@@ -66,8 +67,8 @@ public:
     /// \brief Three-point safeguarded parabolic model for a line search. Upon return
     ///     lambda[0] will contain the new value of lambda given by the parabolic model.
     ///
-    /// \param lambda[1] Current steplength
-    ///        lambda[2] Previous steplength
+    /// \param lambda[1] Current step length
+    ///        lambda[2] Previous step length
     /// \param fnorm[0] Value of |F(x)|^2
     ///        fnorm[1] Value of |F(x + lambda[1]*dx)|^2
     ///        fnorm[2] Value of |F(x + lambda[2]*dx)|^2

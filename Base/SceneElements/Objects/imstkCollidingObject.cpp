@@ -66,4 +66,13 @@ CollidingObject::setForce(Vec3d force)
     m_force = force;
 }
 
+void
+CollidingObject::updateGeometries()
+{
+    if (m_collidingToVisualMap)
+    {
+        m_collidingToVisualMap->apply();
+    }
+}
+
 } // imstk

@@ -72,7 +72,7 @@ public:
     ///
     /// \brief
     ///
-    int getNumLines();
+    size_t getNumLines();
 
     ///
     /// \brief

@@ -47,7 +47,7 @@ LineMesh::setConnectivity(const std::vector<std::vector<int> >& lines)
     m_lines = lines;
 }
 
-int
+size_t
 LineMesh::getNumLines()
 {
     return m_lines.size();

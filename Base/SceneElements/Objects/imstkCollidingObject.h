@@ -25,13 +25,13 @@
 #include <memory>
 
 #include "imstkSceneObject.h"
+#include "imstkGeometryMap.h"
 #include "imstkMath.h"
 
 namespace imstk
 {
 
 class Geometry;
-class GeometryMap;
 
 class CollidingObject : public SceneObject
 {
@@ -47,7 +47,7 @@ public:
     ///
     /// \brief
     ///
-    ~CollidingObject() = default;
+    virtual ~CollidingObject() = default;
 
     ///
     /// \brief
@@ -71,6 +71,11 @@ public:
     ///
     const Vec3d& getForce() const;
     void setForce(Vec3d force);
+
+    ///
+    /// \brief Updates the geometries from the maps (if defined)
+    ///
+    virtual void updateGeometries() override;
 
 protected:
 

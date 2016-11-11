@@ -44,7 +44,7 @@ LineMeshRenderDelegate::LineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMes
     m_mappedVertexArray = vtkDoubleArray::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
     auto vertices = m_geometry->getVerticesPositionsNotConst();
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); ++i) {
         m_mappedVertexArray->InsertNextTuple3(vertices[i][0], vertices[i][1], vertices[i][2]);
     }
     this->mapVertices();
@@ -74,7 +74,7 @@ LineMeshRenderDelegate::mapVertices()
 {
     auto vertices = m_geometry->getVerticesPositionsNotConst();
 
-    for (int i = 0; i < vertices.size(); i++) {
+    for (size_t i = 0; i < vertices.size(); ++i) {
         m_mappedVertexArray->SetTuple3(i, vertices[i][0], vertices[i][1], vertices[i][2]);
     }
 

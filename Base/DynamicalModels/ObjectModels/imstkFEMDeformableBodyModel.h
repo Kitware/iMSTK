@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkDeformableBodyModel_h
-#define imstkDeformableBodyModel_h
+#ifndef imstkFEMDeformableBodyModel_h
+#define imstkFEMDeformableBodyModel_h
 
 #include <memory>
 
@@ -31,10 +31,9 @@
 #include "imstkTimeIntegrator.h"
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
-#include "imstkProblemState.h"
 #include "imstkNonlinearSystem.h"
 #include "imstkVegaMeshReader.h"
-#include "imstkNewtonMethod.h"
+#include "imstkNewtonSolver.h"
 
 //force models
 #include "imstkStVKForceModel.h"
@@ -50,26 +49,26 @@ namespace imstk
 {
 
 ///
-/// \class DeformableBodyModel
+/// \class FEMDeformableBodyModel
 ///
 /// \brief Mathematical model of the physics governing the dynamic deformable object
 /// Note: Vega specifics will removed in future when the inertial and damping calculations
 /// are done with in-house code
 ///
-class DeformableBodyModel : public DynamicalModel
+class FEMDeformableBodyModel : public DynamicalModel<VectorizedState>
 {
 
-
+    using kinematicState = VectorizedState;
 public:
     ///
     /// \brief Constructor
     ///
-    DeformableBodyModel(DynamicalModel::Type type = DynamicalModel::Type::elastoDynamics);
+    FEMDeformableBodyModel();
 
     ///
     /// \brief Destructor
     ///
-    ~DeformableBodyModel() = default;
+    ~FEMDeformableBodyModel() = default;
 
     ///
     /// \brief Set/Get force model configuration
@@ -217,10 +216,7 @@ public:
     ///
     /// \brief
     ///
-    Vectord& getUnknownVec()
-    {
-        return m_qSol;
-    }
+    Vectord& getUnknownVec() { return m_qSol; }
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
@@ -262,4 +258,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkDeformableBodyModel_h
+#endif // ifndef imstkFEMDeformableBodyModel_h

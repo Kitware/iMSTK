@@ -17,10 +17,10 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
-#ifndef imstkProblemState_h
-#define imstkProblemState_h
+#ifndef imstkVectorizedState_h
+#define imstkVectorizedState_h
 
 #include <memory>
 
@@ -30,83 +30,55 @@ namespace imstk
 {
 
 ///
-/// \class ProblemState
+/// \class DeformableBodyState
 ///
-/// \brief This class stores the state of the unknown field variable of the problem
+/// \brief This class stores the state of the unknown field variable in vectorized form
 ///
-class ProblemState
+class VectorizedState
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    ProblemState(){};
-    ProblemState(const size_t size){ initialize(size); };
+    VectorizedState() = default;
+    VectorizedState(const size_t size){ initialize(size); };
     //ProblemState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
     /// \brief Destructor
     ///
-    ~ProblemState(){}
+    ~VectorizedState() = default;
 
     ///
     /// \brief Initialize the problem state
     ///
-    void initialize(const size_t numDof)
-    {
-        m_q.resize(numDof);
-        m_qDot.resize(numDof);
-        m_qDotDot.resize(numDof);
-
-        m_q.setZero();
-        m_qDot.setZero();
-        m_qDotDot.setZero();
-    };
+    void initialize(const size_t numDof);
 
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(const Vectord& u, const Vectord& v, const Vectord& a)
-    {
-        m_q = u;
-        m_qDot = v;
-        m_qDotDot = a;
-    }
+    void setState(const Vectord& u, const Vectord& v, const Vectord& a);
 
     ///
-    /// \brief
+    /// \brief Set the current state
     ///
-    void setU(const Vectord& u)
-    {
-        m_q = u;
-    }
+    void setU(const Vectord& u);
 
     ///
-    /// \brief
+    /// \brief Set the time derivative of state
     ///
-    void setV(const Vectord& v)
-    {
-        m_qDot = v;
-    }
+    void setV(const Vectord& v);
 
     ///
-    /// \brief
+    /// \brief Set double time derivative of the state
     ///
-    void setA(const Vectord& a)
-    {
-        m_qDotDot = a;
-    }
+    void setA(const Vectord& a);
 
     ///
     /// \brief Set the state to a given one
     ///
-    void setState(std::shared_ptr<ProblemState> rhs)
-    {
-        m_q = rhs->getQ();
-        m_qDot = rhs->getQDot();
-        m_qDotDot = rhs->getQDotDot();
-    }
+    void setState(std::shared_ptr<VectorizedState> rhs);
 
     ///
     /// \brief Get the state
@@ -140,4 +112,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkProblemState_h
+#endif // ifndef imstkVectorizedState_h

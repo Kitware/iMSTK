@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 // imstk
 #include "imstkSceneManager.h"
@@ -25,6 +25,7 @@
 #include "imstkSceneObjectController.h"
 #include "imstkDynamicObject.h"
 #include "imstkPbdObject.h"
+#include "imstkDeformableObject.h"
 #include "imstkVirtualCouplingPBDObject.h"
 #include "imstkGeometryMap.h"
 
@@ -95,60 +96,28 @@ SceneManager::runModule()
 
     // Update collision handlers
 
-    // Update the nonlinear solvers
-    for (auto nlSolvers : m_scene->getNonlinearSolvers())
+    // Update the solvers
+    for (auto solvers : m_scene->getSolvers())
     {
-        nlSolvers->solveSimple();
-        std::cout << "stepped" << std::endl;
+        solvers->solve();
     }
 
-    // Apply the geometry maps
+    // Apply the geometry and apply maps to all the objects
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto dynaObj = std::dynamic_pointer_cast<DynamicObject>(obj))
-        {
-            dynaObj->getDynamicalModel()->updatePhysicsGeometry();
-            //dynaObj->getPhysicsToCollidingMap()->apply();
-            dynaObj->getPhysicsToVisualMap()->apply();
-        }
-        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj)){
-            // Skip VirtualCouplingPBDObject from internal constraint projection
-            continue;
-        }
-        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
-        {
-            pbdObj->integratePosition();
-            pbdObj->constraintProjection();
-            pbdObj->updateGeometry();
-            pbdObj->applyPhysicsToColliding();
-        }
+        obj->updateGeometries();
     }
 
+    // Do collision detection and response for pbd objects
     for (auto intPair : m_scene->getCollisionGraph()->getPbdPairList())
     {
         intPair->resetConstraints();
-        if (intPair->doBroadPhase())
+        if (intPair->doBroadPhaseCollision())
         {
-            intPair->doNarrowPhase();
+            intPair->doNarrowPhaseCollision();
         }
-        intPair->doCollision();
+        intPair->resolveCollision();
     }
-
-    for (auto obj : m_scene->getSceneObjects())
-    {
-        if (auto pbdRigidObj = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
-        {
-            // Skip VirtualCouplingPBDObject from internal constraint projection
-            continue;
-        }
-        else if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
-        {
-            pbdObj->integrateVelocity();
-            pbdObj->updateGeometry();
-            pbdObj->applyPhysicsToVisual();
-        }
-    }
-
 }
 
 void

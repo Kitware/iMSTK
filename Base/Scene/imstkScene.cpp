@@ -173,15 +173,15 @@ Scene::getCollisionGraph() const
     return m_collisionGraph;
 }
 
-const std::vector<std::shared_ptr<imstk::NonLinearSolver>>
-Scene::getNonlinearSolvers()
+const std::vector<std::shared_ptr<SolverBase>>
+Scene::getSolvers()
 {
-    return m_nonLinearSolvers;
+    return m_solvers;
 }
 
-void Scene::addNonlinearSolver(std::shared_ptr<NonLinearSolver> solver)
+void Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
 {
-    m_nonLinearSolvers.push_back(solver);
+    m_solvers.push_back(solver);
 }
 
 } // imstk

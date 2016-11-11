@@ -17,26 +17,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+ =========================================================================*/
 
 #ifndef imstkDynamicObject_h
 #define imstkDynamicObject_h
 
 #include "imstkSceneObject.h"
+#include "imstkCollidingObject.h"
 #include "imstkDynamicalModel.h"
+#include "imstkGeometryMap.h"
 
 namespace imstk
 {
 
 class Geometry;
-class GeometryMap;
 
 ///
 /// \class DynamicObject
 ///
 /// \brief Base class for scene objects that move and/or deform
 ///
-class DynamicObject : public SceneObject
+template <class StateType>
+class DynamicObject : public CollidingObject
 {
 public:
 
@@ -48,52 +50,85 @@ public:
     ///
     /// \brief Set/Get the geometry used for Physics computations
     ///
-    std::shared_ptr<Geometry> getPhysicsGeometry() const;
-    void setPhysicsGeometry(std::shared_ptr<Geometry> geometry);
+    std::shared_ptr<Geometry> getPhysicsGeometry() const { return m_physicsGeometry; }
+    virtual void setPhysicsGeometry(std::shared_ptr<Geometry> geometry) { m_physicsGeometry = geometry; }
 
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const { return m_physicsGeometry; }
 
     ///
     /// \brief Set/Get the Physics-to-Collision map
     ///
-    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const;
-    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map);
+    std::shared_ptr<GeometryMap> getPhysicsToCollidingMap() const { return m_physicsToCollidingGeomMap; }
+    void setPhysicsToCollidingMap(std::shared_ptr<GeometryMap> map) {m_physicsToCollidingGeomMap = map; }
 
     ///
     /// \brief Set/Get the Physics-to-Visual map
     ///
-    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const;
-    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map);
+    std::shared_ptr<GeometryMap> getPhysicsToVisualMap() const { return m_physicsToVisualGeomMap; }
+    void setPhysicsToVisualMap(std::shared_ptr<GeometryMap> map) { m_physicsToVisualGeomMap = map; }
 
     ///
     /// \brief Set/Get dynamical model
     ///
-    std::shared_ptr<DynamicalModel> getDynamicalModel() const;
-    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaModel);
+    virtual std::shared_ptr<DynamicalModel<StateType>> getDynamicalModel() const { return m_dynamicalModel; }
+    virtual void setDynamicalModel(std::shared_ptr<DynamicalModel<StateType>> dynaModel) { m_dynamicalModel = dynaModel; }
 
     ///
     /// \brief Returns the number of degree of freedom
     ///
-    size_t getNumOfDOF() const;
+    size_t getNumOfDOF() const
+    {
+        if (!m_dynamicalModel)
+        {
+            LOG(WARNING) << "Cannot get the degree of freedom since the dynamical model is not initialized! returning 0";
+            return 0;
+        }
+
+        return m_dynamicalModel->getNumDegreeOfFreedom();
+    }
+
+    ///
+    /// \brief Update the physics geometry and the apply the maps (if defined)
+    ///
+    void updateGeometries() final
+    {
+        m_dynamicalModel->updatePhysicsGeometry();
+
+        if (m_physicsToCollidingGeomMap)
+        {
+            m_physicsToCollidingGeomMap->apply();
+        }
+
+        if (m_updateVisualFromPhysicsGeometry)
+        {
+            if (m_physicsToVisualGeomMap)
+            {
+                m_physicsToVisualGeomMap->apply();
+            }
+        }
+        else
+        {
+            CollidingObject::updateGeometries();
+        }
+    }
 
 protected:
 
     ///
     /// \brief Constructor
     ///
-    DynamicObject(std::string name) : SceneObject(name){}
+    DynamicObject(std::string name) : CollidingObject(name){}
 
-    std::shared_ptr<DynamicalModel> m_dynamicalModel;           ///> Dynamical model
+    std::shared_ptr<DynamicalModel<StateType>> m_dynamicalModel;        ///> Dynamical model
     std::shared_ptr<Geometry> m_physicsGeometry;                ///> Geometry used for Physics
 
     //Maps
     std::shared_ptr<GeometryMap> m_physicsToCollidingGeomMap;   ///> Maps from Physics to collision geometry
     std::shared_ptr<GeometryMap> m_physicsToVisualGeomMap;      ///> Maps from Physics to visual geometry
-
-    size_t numDOF; ///> Number of degree of freedom of the body in the discretized model
+    bool m_updateVisualFromPhysicsGeometry = true; ///> Defines if visual is updated from colliding mapping or physics mapping
 };
 
 } // imstk

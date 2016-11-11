@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkBackwardEuler_h
-#define imstkBackwardEuler_h
+#ifndef imstkNewmarkBeta_h
+#define imstkNewmarkBeta_h
 
 #include "imstkTimeIntegrator.h"
 
@@ -48,26 +48,26 @@ public:
     ///
     ~NewmarkBeta() = default;
 
-    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dV)
+    void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dV)
     {
         currentState->getQDot() = prevState->getQDot() + dV;
         currentState->getQDotDot() = (currentState->getQDot() - prevState->getQDot()) / (m_gamma*m_dT) - (1.0 / m_gamma - 1)*prevState->getQDotDot();
         currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot() + 0.5*m_dT*m_dT*((1 - 2 * m_beta)*prevState->getQDotDot() + 2 * m_beta*currentState->getQDotDot());
     }
 
-    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& dU)
+    void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& dU)
     {
 
     }
 
-    void updateStateGivenV(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& v)
+    void updateStateGivenV(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& v)
     {
         currentState->getQDot() = v;
         currentState->getQDotDot() = (currentState->getQDot() - prevState->getQDot()) / (m_gamma*m_dT) - (1.0 / m_gamma - 1)*prevState->getQDotDot();
         currentState->getQ() = prevState->getQ() + m_dT*currentState->getQDot() + 0.5*m_dT*m_dT*((1 - 2 * m_beta)*prevState->getQDotDot() + 2 * m_beta*currentState->getQDotDot());
     }
 
-    void updateStateGivenU(std::shared_ptr<ProblemState> prevState, std::shared_ptr<ProblemState> currentState, Vectord& u)
+    void updateStateGivenU(std::shared_ptr<VectorizedState> prevState, std::shared_ptr<VectorizedState> currentState, Vectord& u)
     {
 
     }

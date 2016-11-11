@@ -1,32 +1,34 @@
-// This file is part of the iMSTK project.
-//
-// Copyright (c) Kitware, Inc.
-//
-// Copyright (c) Center for Modeling, Simulation, and Imaging in Medicine,
-//                        Rensselaer Polytechnic Institute
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+/*=========================================================================
+
+Library: iMSTK
+
+Copyright (c) Kitware, Inc. & Center for Modeling, Simulation,
+& Imaging in Medicine, Rensselaer Polytechnic Institute.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0.txt
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+=========================================================================*/
 
 #include <iostream>
 
-#include "imstkNewtonMethod.h"
+#include "imstkNewtonSolver.h"
 #include "imstkIterativeLinearSolver.h"
 #include "imstkConjugateGradient.h"
 
 namespace imstk
 {
 
-NewtonMethod::NewtonMethod():
+NewtonSolver::NewtonSolver():
     linearSolver(std::make_shared<ConjugateGradient>()),
     forcingTerm(0.9),
     absoluteTolerance(1e-3),
@@ -38,7 +40,7 @@ NewtonMethod::NewtonMethod():
 
 
 void
-NewtonMethod::solve(Vectord& x)
+NewtonSolver::solveGivenState(Vectord& x)
 {
     if(!this->m_nonLinearSystem)
     {
@@ -83,7 +85,7 @@ NewtonMethod::solve(Vectord& x)
 }
 
 void
-NewtonMethod::solveSimple()
+NewtonSolver::solve()
 {
     if (!this->m_nonLinearSystem)
     {
@@ -106,7 +108,7 @@ NewtonMethod::solveSimple()
 }
 
 void
-NewtonMethod::updateJacobian(const Vectord& x)
+NewtonSolver::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
     if (!this->m_nonLinearSystem)
@@ -129,7 +131,7 @@ NewtonMethod::updateJacobian(const Vectord& x)
 }
 
 void
-NewtonMethod::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
+NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
     double eta = this->gamma * ratio * ratio;
     double forcingTermSqr = this->forcingTerm * this->forcingTerm;
@@ -146,28 +148,28 @@ NewtonMethod::updateForcingTerm(const double ratio, const double stopTolerance, 
 
 
 void
-NewtonMethod::setLinearSolver(std::shared_ptr< NewtonMethod::LinearSolverType > newLinearSolver)
+NewtonSolver::setLinearSolver(std::shared_ptr< NewtonSolver::LinearSolverType > newLinearSolver)
 {
     this->linearSolver = newLinearSolver;
 }
 
 
-std::shared_ptr<NewtonMethod::LinearSolverType>
-NewtonMethod::getLinearSolver() const
+std::shared_ptr<NewtonSolver::LinearSolverType>
+NewtonSolver::getLinearSolver() const
 {
     return this->linearSolver;
 }
 
 
 void
-NewtonMethod::setAbsoluteTolerance(const double aTolerance)
+NewtonSolver::setAbsoluteTolerance(const double aTolerance)
 {
     this->absoluteTolerance = aTolerance;
 }
 
 
 double
-NewtonMethod::getAbsoluteTolerance() const
+NewtonSolver::getAbsoluteTolerance() const
 {
     return this->absoluteTolerance;
 }

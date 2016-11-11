@@ -4,8 +4,8 @@
 include(imstkAddLibrary)
 imstk_add_library( TimeIntegrators
   DEPENDS
-    Core
-	SceneElements
+    Core   
+    DynamicalModels
   )
 
 #-----------------------------------------------------------------------------

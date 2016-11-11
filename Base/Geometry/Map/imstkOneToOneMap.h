@@ -64,7 +64,7 @@ public:
     ///
     /// \brief Sets the one-to-one correspondence directly
     ///
-    void setMap(const std::map<int, int>& sourceMap);
+    void setMap(const std::map<size_t, size_t>& sourceMap);
 
     ///
     /// \brief Apply (if active) the tetra-triangle mesh map
@@ -86,12 +86,13 @@ public:
     ///
     void setSlave(std::shared_ptr<Geometry> slave) override;
 
-    unsigned int getMapIdx(const unsigned int& idx)
-    {
-        return m_oneToOneMap[idx];
-    }
+    ///
+    /// \brief
+    ///
+    size_t getMapIdx(const size_t& idx) { return m_oneToOneMap[idx]; }
+
 protected:
-    std::map<int, int> m_oneToOneMap; ///> One to one mapping data
+    std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data
 };
 
 } // imstk

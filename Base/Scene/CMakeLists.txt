@@ -6,6 +6,7 @@ imstk_add_library( Scene
   DEPENDS
     Core
     SceneElements
+    DynamicalModels
     Collision
   )
 

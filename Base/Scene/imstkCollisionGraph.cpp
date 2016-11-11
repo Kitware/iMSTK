@@ -117,7 +117,8 @@ CollisionGraph::removeInteractionPair(InteractionPairPtr intPair)
                                        intPair->getObjectsPair().second);
 }
 
-const std::vector<std::shared_ptr<PbdInteractionPair> > &CollisionGraph::getPbdPairList() const
+const std::vector<std::shared_ptr<PbdInteractionPair> > &
+CollisionGraph::getPbdPairList() const
 {
     return m_interactionPbdPairList;
 }

@@ -27,8 +27,7 @@
 
 // imstk
 #include "imstkDynamicObject.h"
-#include "imstkDeformableBodyModel.h"
-#include "imstkProblemState.h"
+#include "imstkFEMDeformableBodyModel.h"
 #include "imstkMath.h"
 
 namespace imstk
@@ -42,22 +41,25 @@ class GeometryMap;
 ///
 /// \brief Scene objects that can deform
 ///
-class DeformableObject : public DynamicObject
+class DeformableObject : public DynamicObject<VectorizedState>
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    DeformableObject(std::string name) : DynamicObject(name)
-    {
-        m_type = Type::Deformable;
-    }
+    DeformableObject(std::string name) : DynamicObject(name) { m_type = Type::FEMDeformable; }
+    DeformableObject() = delete;
 
     ///
     /// \brief Destructor
     ///
     ~DeformableObject() = default;
+
+    ///
+    /// \brief
+    ///
+    bool initialize();
 
     ///
     /// \brief Initialize the kinematic state of the body
@@ -68,7 +70,7 @@ public:
     ///
     /// \brief Set/Get dynamical model
     ///
-    void setDynamicalModel(std::shared_ptr<DynamicalModel> dynaDefModel) override;
+    //void setDynamicalModel(std::shared_ptr<DynamicalModel<VectorizedState>> dynaDefModel) override;
 
     ///
     /// \brief Get the vector that holds the contact forces
@@ -78,52 +80,35 @@ public:
     ///
     ///  \brief Get the vector of current displacements
     ///
-    const Vectord& getDisplacements() const
-    {
-        return m_dynamicalModel->getCurrentState()->getQ();
-    }
+    const Vectord& getDisplacements() const;
 
     ///
     /// \brief Get the vector of displacements from previous time step
     ///
-    const Vectord& getPrevDisplacements() const
-    {
-        return m_dynamicalModel->getPreviousState()->getQ();
-    }
+    const Vectord& getPrevDisplacements() const;
 
     ///
     /// \brief Get the vector of current velocities
     ///
-    const Vectord& getVelocities() const
-    {
-        return m_dynamicalModel->getCurrentState()->getQDot();
-    }
+    const Vectord& getVelocities() const;
 
     ///
     /// \brief Get the vector of velocities from previous time step
     ///
-    const Vectord& getPrevVelocities() const
-    {
-        return m_dynamicalModel->getPreviousState()->getQDot();
-    }
+    const Vectord& getPrevVelocities() const;
 
     ///
     /// \brief Get the vector of current accelerations
     ///
-    const Vectord& getAccelerations() const
-    {
-        return m_dynamicalModel->getCurrentState()->getQDotDot();
-    }
+    const Vectord& getAccelerations() const;
 
     ///
     /// \brief Get the vector of accelerations from previous time step
     ///
-    const Vectord& getPrevAccelerations() const
-    {
-        return m_dynamicalModel->getPreviousState()->getQDotDot();
-    }
+    const Vectord& getPrevAccelerations() const;
 
 protected:
+    std::shared_ptr<FEMDeformableBodyModel> m_defModel;
 };
 
 } // imstk

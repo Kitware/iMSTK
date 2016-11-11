@@ -51,29 +51,29 @@ public:
     ///
     /// \brief Update state given change in velocity
     ///
-    void updateStateGivenDv(std::shared_ptr<ProblemState> prevState,
-                            std::shared_ptr<ProblemState> currentState,
+    void updateStateGivenDv(std::shared_ptr<VectorizedState> prevState,
+                            std::shared_ptr<VectorizedState> currentState,
                             Vectord& dV);
 
     ///
     /// \brief Update state given change in displacement
     ///
-    void updateStateGivenDu(std::shared_ptr<ProblemState> prevState,
-                            std::shared_ptr<ProblemState> currentState,
+    void updateStateGivenDu(std::shared_ptr<VectorizedState> prevState,
+                            std::shared_ptr<VectorizedState> currentState,
                             Vectord& dU);
 
     ///
     /// \brief Update state given updated velocity
     ///
-    void updateStateGivenV(std::shared_ptr<ProblemState> prevState,
-                           std::shared_ptr<ProblemState> currentState,
+    void updateStateGivenV(std::shared_ptr<VectorizedState> prevState,
+                           std::shared_ptr<VectorizedState> currentState,
                            Vectord& v);
 
     ///
     /// \brief Update state given updated displacement
     ///
-    void updateStateGivenU(std::shared_ptr<ProblemState> prevState,
-                           std::shared_ptr<ProblemState> currentState,
+    void updateStateGivenU(std::shared_ptr<VectorizedState> prevState,
+                           std::shared_ptr<VectorizedState> currentState,
                            Vectord& u);
 protected:
 

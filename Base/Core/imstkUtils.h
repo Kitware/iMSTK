@@ -51,7 +51,7 @@ static void writePlotterVectorMatlab(Vectord& x, char* fileName)
 
     // print x
     scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); i++)
+    for (auto i = 0; i < x.size(); ++i)
     {
         scriptFile << x[i] << "\n";
     }
@@ -84,7 +84,7 @@ static void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, char* fileName)
 
     // print x
     scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); i++)
+    for (auto i = 0; i < x.size(); ++i)
     {
         scriptFile << x[i] << "\n";
     }
@@ -92,7 +92,7 @@ static void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, char* fileName)
 
     // print y
     scriptFile << "Y=[\n";
-    for (auto i = 0; i < y.size(); i++)
+    for (auto i = 0; i < y.size(); ++i)
     {
         scriptFile << y[i] << "\n";
     }
@@ -122,7 +122,7 @@ static void writePlotterVectorMatPlotlib(Vectord& x, char* fileName)
 
     // print x
     scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); i++)
+    for (auto i = 0; i < x.size(); ++i)
     {
         scriptFile << x[i] << ",\n";
     }
@@ -162,7 +162,7 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, char* fileNam
 
     // print x
     scriptFile << "X=[\n";
-    for (auto i = 0; i < x.size(); i++)
+    for (auto i = 0; i < x.size(); ++i)
     {
         scriptFile << x[i] << ",\n";
     }
@@ -170,7 +170,7 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, char* fileNam
 
     // print y
     scriptFile << "Y=[\n";
-    for (auto i = 0; i < y.size(); i++)
+    for (auto i = 0; i < y.size(); ++i)
     {
         scriptFile << y[i] << ",\n";
     }

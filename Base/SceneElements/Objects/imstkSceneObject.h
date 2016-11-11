@@ -46,7 +46,8 @@ public:
         Visual,
         Colliding,
         Rigid,
-        Deformable
+        FEMDeformable,
+        Pbd
     };
 
     ///
@@ -93,6 +94,11 @@ public:
     /// \brief Setup a controller for the object for a given device client
     ///
     std::shared_ptr<SceneObjectController> setupController(std::shared_ptr<DeviceClient> deviceClient);
+
+    ///
+    /// \brief
+    ///
+    virtual void updateGeometries() {};
 
 protected:
     ///
