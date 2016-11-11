@@ -50,7 +50,7 @@ PbdFEMTetConstraint::initConstraint(PbdModel &model,
     m.col(2) = p2 - p3;
 
     const double det = m.determinant();
-    if (fabs(det) > EPS)
+    if (fabs(det) > m_epsilon)
     {
         m_invRestMat = m.inverse();
         return true;
@@ -188,7 +188,7 @@ PbdFEMTetConstraint::solvePositionConstraint(PbdModel& model)
         + im3*gradC.col(2).squaredNorm()
         + im4*(gradC.col(0) + gradC.col(1) + gradC.col(2)).squaredNorm();
 
-    if (sum < EPS)
+    if (sum < m_epsilon)
     {
         return false;
     }

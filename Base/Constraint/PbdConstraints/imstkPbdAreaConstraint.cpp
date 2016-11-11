@@ -26,8 +26,8 @@ namespace  imstk
 {
 
 void
-PbdAreaConstraint::initConstraint(PbdModel &model, const unsigned int &pIdx1,
-                                  const unsigned int &pIdx2, const unsigned int &pIdx3,
+PbdAreaConstraint::initConstraint(PbdModel &model, const size_t& pIdx1,
+                                  const size_t& pIdx2, const size_t& pIdx3,
                                   const double k)
 {
     m_vertexIds[0] = pIdx1;
@@ -46,7 +46,7 @@ PbdAreaConstraint::initConstraint(PbdModel &model, const unsigned int &pIdx1,
 }
 
 bool
-PbdAreaConstraint::solvePositionConstraint(PbdModel &model)
+PbdAreaConstraint::solvePositionConstraint(PbdModel& model)
 {
     const auto i1 = m_vertexIds[0];
     const auto i2 = m_vertexIds[1];
@@ -69,7 +69,7 @@ PbdAreaConstraint::solvePositionConstraint(PbdModel &model)
     auto n = e1.cross(e2);
     const auto A = 0.5*n.norm();
 
-    if (A < EPS)
+    if (A < m_epsilon)
     {
         return false;
     }

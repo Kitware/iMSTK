@@ -24,8 +24,6 @@
 
 #include "imstkMath.h"
 
-const double EPS = 1e-6;
-
 namespace imstk
 {
 
@@ -69,10 +67,15 @@ public:
     ///
     virtual bool solvePositionConstraint(PbdModel& model) = 0;
 
+    ///
+    /// \brief Set the tolerance used for pbd constraints
+    ///
+    void setTolerance(const double eps) { m_epsilon = eps; }
+
 public:
     std::vector<size_t> m_vertexIds; ///> index of points for the constraint
+    double m_epsilon = 1.0e6;         ///> Tolerance used for the costraints
 };
-
 }
 
 #endif // imstkPbdConstraint_h

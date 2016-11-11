@@ -48,19 +48,12 @@ public:
     ///
     /// \brief
     ///
-    PbdCollisionConstraint(const unsigned int& n1, const unsigned int& n2)
-    {
-        m_bodiesFirst.resize(n1);
-        m_bodiesSecond.resize(n2);
-    }
+    PbdCollisionConstraint(const unsigned int& n1, const unsigned int& n2);
 
     ///
     /// \brief
     ///
-    virtual bool solvePositionConstraint()
-    {
-        return true;
-    }
+    virtual bool solvePositionConstraint() = 0;
 
 public:
     std::vector<size_t> m_bodiesFirst;    ///> index of points for the first object

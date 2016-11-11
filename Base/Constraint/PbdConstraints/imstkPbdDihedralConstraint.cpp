@@ -89,7 +89,7 @@ PbdDihedralConstraint::solvePositionConstraint(PbdModel& model)
     n2 /= A2;
 
     const double l = e.norm();
-    if (l < EPS)
+    if (l < m_epsilon)
     {
         return false;
     }

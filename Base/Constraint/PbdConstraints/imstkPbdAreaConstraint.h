@@ -43,16 +43,14 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Area
     ///
-    Type getType() const
-    {
-        return Type::Area;
-    }
+    Type getType() const { return Type::Area; }
 
     ///
     /// \brief Initializes the area constraint
     ///
-    void initConstraint(PbdModel& model, const unsigned int& pIdx1,
-        const unsigned int& pIdx2, const unsigned int& pIdx3, const double k = 2.5);
+    void initConstraint(PbdModel& model, const size_t& pIdx1,
+                        const size_t& pIdx2, const size_t& pIdx3,
+                        const double k = 2.5);
 
     ///
     /// \brief Solves the area constraint
