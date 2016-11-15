@@ -134,7 +134,7 @@ VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
         return nullptr;
     }
 
-    std::vector<Vec3d> vertices;
+    StdVectorOfVec3d vertices;
     VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
 
     std::vector<SurfaceMesh::TriangleArray> triangles;
@@ -144,7 +144,7 @@ VTKMeshReader::convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh)
     mesh->initialize(vertices, triangles, true);
 
     // Point Data
-    std::map<std::string, std::vector<Vectorf>> dataMap;
+    std::map<std::string, StdVectorOfVectorf> dataMap;
     VTKMeshReader::copyPointData(vtkMesh->GetPointData(), dataMap);
     if (!dataMap.empty())
     {
@@ -170,7 +170,7 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
         return nullptr;
     }
 
-    std::vector<Vec3d> vertices;
+    StdVectorOfVec3d vertices;
     VTKMeshReader::copyVertices(vtkMesh->GetPoints(), vertices);
 
     int cellType = vtkMesh->GetCellType(vtkMesh->GetNumberOfCells()-1);
@@ -201,7 +201,7 @@ VTKMeshReader::convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* v
 }
 
 void
-VTKMeshReader::copyVertices(vtkPoints* points, std::vector<Vec3d>& vertices)
+VTKMeshReader::copyVertices(vtkPoints* points, StdVectorOfVec3d& vertices)
 {
     if(!points)
     {
@@ -245,7 +245,7 @@ VTKMeshReader::copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,d
 }
 
 void
-VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap)
+VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap)
 {
     if(!pointData)
     {
@@ -258,7 +258,7 @@ VTKMeshReader::copyPointData(vtkPointData* pointData, std::map<std::string, std:
         std::string name = array->GetName();
         int nbrOfComp = array->GetNumberOfComponents();
         int nbrOfTuples = array->GetNumberOfTuples();
-        std::vector<Vectorf> data;
+        StdVectorOfVectorf data;
         for(unsigned int j = 0; j < nbrOfTuples; ++j)
         {
             double* tupleData = new double [nbrOfComp];

@@ -58,7 +58,7 @@ std::shared_ptr<imstk::VolumetricMesh>
 VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
 {
     // Copy vertices
-    std::vector<Vec3d> vertices;
+    StdVectorOfVec3d vertices;
     VegaMeshReader::copyVertices(vegaMesh, vertices);
 
     // Copy cells
@@ -96,7 +96,7 @@ VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::Volumetric
 
 void
 VegaMeshReader::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
-                             std::vector<Vec3d>& vertices)
+                             StdVectorOfVec3d& vertices)
 {
     for(size_t i = 0; i < vegaMesh->getNumVertices(); ++i)
     {

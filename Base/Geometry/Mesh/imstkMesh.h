@@ -44,7 +44,7 @@ public:
     ///
     /// \brief Initializes the data structure given vertex positions
     ///
-    void initialize(const std::vector<Vec3d>& vertices);
+    void initialize(const StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Clears all the mesh data
@@ -66,12 +66,12 @@ public:
     ///
     /// \brief Sets initial positions from an array
     ///
-    void setInitialVerticesPositions(const std::vector<Vec3d>& vertices);
+    void setInitialVerticesPositions(const StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Returns the vector of initial positions of the mesh vertices
     ///
-    const std::vector<Vec3d>& getInitialVerticesPositions() const;
+    const StdVectorOfVec3d& getInitialVerticesPositions() const;
 
     ///
     /// \brief Returns the initial position of a vertex given its index
@@ -81,12 +81,12 @@ public:
     ///
     /// \brief Sets current vertex positions of the mesh from an array
     ///
-    void setVerticesPositions(const std::vector<Vec3d>& vertices);
+    void setVerticesPositions(const StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
     ///
-    const std::vector<Vec3d>& getVertexPositions() const;
+    const StdVectorOfVec3d& getVertexPositions() const;
 
     ///
     /// \brief Set the current position of a vertex given its index to certain position
@@ -101,7 +101,7 @@ public:
     ///
     /// \brief Sets the displacements of mesh vertices from an array
     ///
-    void setVerticesDisplacements(const std::vector<Vec3d>& diff);
+    void setVerticesDisplacements(const StdVectorOfVec3d& diff);
 
     ///
     /// \brief Sets the displacements of mesh vertices from a linearized displacement vector
@@ -111,7 +111,7 @@ public:
     ///
     /// \brief Returns the vector displacements of mesh vertices
     ///
-    const std::vector<Vec3d>& getVerticesDisplacements() const;
+    const StdVectorOfVec3d& getVerticesDisplacements() const;
 
     ///
     /// \brief Returns the displacement of a given vertex
@@ -121,22 +121,22 @@ public:
     ///
     /// \brief Sets the point data for all arrays at each vertice
     ///
-    void setPointDataMap(const std::map<std::string, std::vector<Vectorf>>& pointData);
+    void setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData);
 
     ///
     /// \brief Get the map of the point data for all arrays at each vertice
     ///
-    const std::map<std::string, std::vector<Vectorf>>& getPointDataMap() const;
+    const std::map<std::string, StdVectorOfVectorf>& getPointDataMap() const;
 
     ///
     /// \brief Set a data array holding some point data
     ///
-    void setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>& arrayData);
+    void setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData);
 
     ///
     /// \brief Get a specific data array
     ///
-    const std::vector<Vectorf>& getPointDataArray(const std::string& arrayName) const;
+    const StdVectorOfVectorf& getPointDataArray(const std::string& arrayName) const;
 
     ///
     /// \brief Returns the number of total vertices in the mesh
@@ -157,7 +157,7 @@ protected:
     ///
     /// \brief Get vertices positions
     ///
-    std::vector<Vec3d>& getVerticesPositionsNotConst()
+    StdVectorOfVec3d& getVerticesPositionsNotConst()
     {
         return m_verticesPositions;
     }
@@ -166,11 +166,11 @@ protected:
     // + Position (Initial translation)
     // + verticesDisplacements
     // = verticesPositions
-    std::vector<Vec3d> m_initialVerticesPositions; //> Initial positions of vertices
-    std::vector<Vec3d> m_verticesPositions; //> Current positions of vertices
-    std::vector<Vec3d> m_verticesDisplacements; //> Displacements of vertices
+    StdVectorOfVec3d m_initialVerticesPositions; //> Initial positions of vertices
+    StdVectorOfVec3d m_verticesPositions; //> Current positions of vertices
+    StdVectorOfVec3d m_verticesDisplacements; //> Displacements of vertices
 
-    std::map<std::string, std::vector<Vectorf>> m_pointDataMap; ///> vector of data arrays per vertice
+    std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 };
 
 } // imstk

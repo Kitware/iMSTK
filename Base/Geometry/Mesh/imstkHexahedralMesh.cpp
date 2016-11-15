@@ -25,7 +25,7 @@ namespace imstk
 {
 
 void
-HexahedralMesh::initialize(const std::vector<Vec3d>& vertices,
+HexahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                            const std::vector<HexaArray>& hexahedra,
                            bool computeAttachedSurfaceMesh)
 {

@@ -25,7 +25,7 @@ namespace imstk
 {
 
 void
-Mesh::initialize(const std::vector<Vec3d>& vertices)
+Mesh::initialize(const StdVectorOfVec3d& vertices)
 {
     this->setInitialVerticesPositions(vertices);
     this->setVerticesPositions(vertices);
@@ -79,13 +79,13 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 }
 
 void
-Mesh::setInitialVerticesPositions(const std::vector<Vec3d>& vertices)
+Mesh::setInitialVerticesPositions(const StdVectorOfVec3d& vertices)
 {
     m_initialVerticesPositions = vertices;
     m_verticesDisplacements= vertices;
 }
 
-const std::vector<Vec3d>&
+const StdVectorOfVec3d&
 Mesh::getInitialVerticesPositions() const
 {
     return m_initialVerticesPositions;
@@ -98,12 +98,12 @@ Mesh::getInitialVertexPosition(const size_t& vertNum) const
 }
 
 void
-Mesh::setVerticesPositions(const std::vector<Vec3d>& vertices)
+Mesh::setVerticesPositions(const StdVectorOfVec3d& vertices)
 {
     m_verticesPositions = vertices;
 }
 
-const std::vector<Vec3d>&
+const StdVectorOfVec3d&
 Mesh::getVertexPositions() const
 {
     return m_verticesPositions;
@@ -122,7 +122,7 @@ Mesh::getVertexPosition(const size_t& vertNum) const
 }
 
 void
-Mesh::setVerticesDisplacements(const std::vector<Vec3d>& diff)
+Mesh::setVerticesDisplacements(const StdVectorOfVec3d& diff)
 {
     m_verticesDisplacements = diff;
 }
@@ -143,7 +143,7 @@ Mesh::setVerticesDisplacements(const Vectord& u)
     }
 }
 
-const std::vector<Vec3d>&
+const StdVectorOfVec3d&
 Mesh::getVerticesDisplacements() const
 {
     return m_verticesDisplacements;
@@ -156,19 +156,19 @@ Mesh::getVerticeDisplacement(const size_t& vertNum) const
 }
 
 void
-Mesh::setPointDataMap(const std::map<std::string, std::vector<Vectorf>>& pointData)
+Mesh::setPointDataMap(const std::map<std::string, StdVectorOfVectorf>& pointData)
 {
     m_pointDataMap = pointData;
 }
 
-const std::map<std::string, std::vector<Vectorf>>&
+const std::map<std::string, StdVectorOfVectorf>&
 Mesh::getPointDataMap() const
 {
     return m_pointDataMap;
 }
 
 void
-Mesh::setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>& arrayData)
+Mesh::setPointDataArray(const std::string& arrayName, const StdVectorOfVectorf& arrayData)
 {
     if ( arrayData.size() != this->getNumVertices())
     {
@@ -179,13 +179,13 @@ Mesh::setPointDataArray(const std::string& arrayName, const std::vector<Vectorf>
     m_pointDataMap[arrayName] = arrayData;
 }
 
-const std::vector<Vectorf>&
+const StdVectorOfVectorf&
 Mesh::getPointDataArray(const std::string& arrayName) const
 {
     if (!m_pointDataMap.count(arrayName))
     {
         LOG(WARNING) << "No array with such name holds any point data.";
-        return std::vector<Vectorf>();
+        return StdVectorOfVectorf();
     }
     return m_pointDataMap.at(arrayName);
 }

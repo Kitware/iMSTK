@@ -25,7 +25,7 @@ namespace imstk
 {
 
 void
-TetrahedralMesh::initialize(const std::vector<Vec3d>& vertices,
+TetrahedralMesh::initialize(const StdVectorOfVec3d& vertices,
                             const std::vector<TetraArray>& tetrahedra,
                             bool computeAttachedSurfaceMesh)
 {
@@ -198,7 +198,7 @@ TetrahedralMesh::extractSurfaceMesh(std::shared_ptr<SurfaceMesh> surfaceMesh)
 
     size_t vertId;
     std::list<size_t>::iterator it;
-    std::vector<Vec3d> vertPositions;
+    StdVectorOfVec3d vertPositions;
     for (vertId = 0, it = uniqueVertIdList.begin(); it != uniqueVertIdList.end(); ++vertId, it++)
     {
         vertPositions.push_back(this->getVertexPosition(*it));

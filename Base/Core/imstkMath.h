@@ -26,6 +26,7 @@
 
 #include <Eigen/Geometry>
 #include <Eigen/Sparse>
+#include <Eigen/StdVector>
 
 namespace imstk
 {
@@ -33,18 +34,26 @@ namespace imstk
 // 2D vector
 using Vec2f = Eigen::Vector2f;
 using Vec2d = Eigen::Vector2d;
+using StdVectorOfVec2f = std::vector<Vec2f, Eigen::aligned_allocator<Vec2f>>;
+using StdVectorOfVec2d = std::vector<Vec2d, Eigen::aligned_allocator<Vec2d>>;
 
 // 3D vector
 using Vec3f = Eigen::Vector3f;
 using Vec3d = Eigen::Vector3d;
+using StdVectorOfVec3f = std::vector<Vec3f, Eigen::aligned_allocator<Vec3f>>;
+using StdVectorOfVec3d = std::vector<Vec3d, Eigen::aligned_allocator<Vec3d>>;
 
 // 4D vector
 using Vec4f = Eigen::Vector4f;
 using Vec4d = Eigen::Vector4d;
+using StdVectorOfVec4f = std::vector<Vec4f, Eigen::aligned_allocator<Vec4f>>;
+using StdVectorOfVec4d = std::vector<Vec4d, Eigen::aligned_allocator<Vec4d>>;
 
 // Dynamic size vector
 using Vectorf = Eigen::VectorXf;
 using Vectord = Eigen::VectorXd;
+using StdVectorOfVectorf = std::vector<Vectorf, Eigen::aligned_allocator<Vectorf>>;
+using StdVectorOfVectord = std::vector<Vectord, Eigen::aligned_allocator<Vectord>>;
 
 // Quaternion
 using Quatf = Eigen::Quaternion<float,Eigen::DontAlign>;

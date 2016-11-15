@@ -806,7 +806,7 @@ void testTetraTriangleMap()
 
     // Tetrahedral mesh
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -821,7 +821,7 @@ void testTetraTriangleMap()
 
     // Triangular mesh
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> SurfVertList;
+    imstk::StdVectorOfVec3d SurfVertList;
     SurfVertList.push_back(imstk::Vec3d(0, 0, 1));// coincides with one vertex
     SurfVertList.push_back(imstk::Vec3d(0.25, 0.25, 0.25));// centroid
     SurfVertList.push_back(imstk::Vec3d(1.05, 0, 0));
@@ -847,7 +847,7 @@ void testExtractSurfaceMesh()
 
     // a.1 add vertex positions
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -890,7 +890,7 @@ void testOneToOneNodalMap()
 
     // a.1 add vertex positions
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -905,7 +905,7 @@ void testOneToOneNodalMap()
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
 
     // b.1 Add vertex positions
-    std::vector<imstk::Vec3d> SurfVertList;
+    imstk::StdVectorOfVec3d SurfVertList;
     SurfVertList.push_back(imstk::Vec3d(0, 0, 0));
     SurfVertList.push_back(imstk::Vec3d(1.0, 0, 0));
     SurfVertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -951,7 +951,7 @@ void testSurfaceMeshOptimizer()
 
     // b. Add nodal data
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(0.5, 0.5, 0));
     vertList.push_back(imstk::Vec3d(1, 1, 0));
@@ -1212,7 +1212,7 @@ void testPbdCloth()
 
     // b. Add nodal data
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     const double width = 10.0;
     const double height = 10.0;
     const int nRows = 10;
@@ -1344,7 +1344,7 @@ void testPbdCollision()
     bool volumetric = !clothTest;
     if (clothTest){
         auto clothMesh = std::make_shared<imstk::SurfaceMesh>();
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
         double height = 60.0;
         int nRows = 10;
@@ -1497,7 +1497,7 @@ void testPbdCollision()
     else{
         // floor
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 100.0;
         double height = 100.0;
         int nRows = 2;
@@ -1619,7 +1619,7 @@ void testLineMesh()
         auto lineMeshVisual = std::make_shared<imstk::LineMesh>();
         auto lineMeshPhysics = std::make_shared<imstk::LineMesh>();
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         vertList.resize(3);
         vertList[0] = Vec3d(0.0, -10.0, -10.0);
         vertList[1] = Vec3d(0.0, 0.0, -10.0);
@@ -1735,7 +1735,7 @@ void testLineMesh()
 
     if (clothTest){
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
         double height = 60.0;
         int nRows = 20;

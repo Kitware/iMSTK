@@ -49,7 +49,7 @@ public:
     // Description:
     // Set the raw scalar arrays for the coordinate set. This class takes
     // ownership of the arrays and deletes them with delete[].
-    void SetVertexArray(std::vector<Vec3d> &vertices);
+    void SetVertexArray(StdVectorOfVec3d &vertices);
 
     // Reimplemented virtuals -- see superclasses for descriptions:
     void Initialize();
@@ -121,7 +121,7 @@ protected:
     ///
     ~VTKMappedVertexArray() {}
 
-    std::vector<Vec3d> *vertexArray;    ///>
+    StdVectorOfVec3d *vertexArray;    ///>
 
 private:
     VTKMappedVertexArray(const VTKMappedVertexArray &); // Not implemented.

@@ -54,7 +54,7 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  hexahedra connectivity
     ///
-    void initialize(const std::vector<Vec3d>& vertices,
+    void initialize(const StdVectorOfVec3d& vertices,
                     const std::vector<HexaArray>& hexahedra,
                     bool computeAttachedSurfaceMesh = false);
 

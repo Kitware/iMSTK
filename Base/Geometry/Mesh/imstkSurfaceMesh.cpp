@@ -25,7 +25,7 @@ namespace imstk
 {
 
 void
-SurfaceMesh::initialize(const std::vector<Vec3d>& vertices,
+SurfaceMesh::initialize(const StdVectorOfVec3d& vertices,
                         const std::vector<TriangleArray>& triangles,
                         const bool computeDerivedData)
 {
@@ -236,7 +236,7 @@ SurfaceMesh::optimizeForDataLocality()
     }
 
     // C. Initialize this mesh with the newly computed ones
-    std::vector<Vec3d> optimallyOrderedNodalPos;
+    StdVectorOfVec3d optimallyOrderedNodalPos;
     std::vector<TriangleArray> optConnectivityRenumbered;
 
     // C.1 Get the positions
@@ -276,7 +276,7 @@ SurfaceMesh::setTrianglesVertices(const std::vector<TriangleArray>& triangles)
     m_trianglesVertices = triangles;
 }
 
-const std::vector<Vec3d>&
+const StdVectorOfVec3d&
 SurfaceMesh::getTrianglesNormals() const
 {
     return m_trianglesNormals;
@@ -288,7 +288,7 @@ SurfaceMesh::getTriangleNormal(size_t i) const
     return m_trianglesNormals.at(i);
 }
 
-const std::vector<Vec3d>&
+const StdVectorOfVec3d&
 SurfaceMesh::getVerticesNormals() const
 {
     return m_verticesNormals;

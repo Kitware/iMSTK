@@ -95,7 +95,7 @@ protected:
     ///
     /// \brief
     ///
-    static void copyVertices(vtkPoints* points, std::vector<Vec3d>& vertices);
+    static void copyVertices(vtkPoints* points, StdVectorOfVec3d& vertices);
 
     ///
     /// \brief
@@ -106,7 +106,7 @@ protected:
     ///
     /// \brief
     ///
-    static void copyPointData(vtkPointData* pointData, std::map<std::string, std::vector<Vectorf>>& dataMap);
+    static void copyPointData(vtkPointData* pointData, std::map<std::string, StdVectorOfVectorf>& dataMap);
 
 };
 

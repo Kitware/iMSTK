@@ -42,7 +42,7 @@ VTKMappedVertexArray::PrintSelf(ostream &os, vtkIndent indent)
 }
 
 void
-VTKMappedVertexArray::SetVertexArray(std::vector<Vec3d>& vertices)
+VTKMappedVertexArray::SetVertexArray(StdVectorOfVec3d& vertices)
 {
     this->Initialize();
     this->NumberOfComponents = 3;
