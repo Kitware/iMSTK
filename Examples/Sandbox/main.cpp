@@ -1207,6 +1207,7 @@ void testPbdCloth()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
     scene->getCamera()->setPosition(6.0, 2.0, 20.0);
+    scene->getCamera()->setFocalPoint(0, -5, 5);
 
     // a. Construct a sample triangular mesh
 
@@ -1215,8 +1216,8 @@ void testPbdCloth()
     imstk::StdVectorOfVec3d vertList;
     const double width = 10.0;
     const double height = 10.0;
-    const int nRows = 10;
-    const int nCols = 10;
+    const int nRows = 11;
+    const int nCols = 11;
     vertList.resize(nRows*nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -1246,28 +1247,46 @@ void testPbdCloth()
 
     surfMesh->setTrianglesVertices(triangles);
 
+    // Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
-
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
-
     deformableObj->initialize(/*Number of constraints*/2,
         /*Constraint configuration*/"Distance 0.1",
         /*Constraint configuration*/"Dihedral 0.001",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
         /*TimeStep*/0.01,
-        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10",
+        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10 11",
         /*NumberOfIterationInConstraintSolver*/5
         );
 
+    // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
     scene->addNonlinearSolver(pbdSolver);
 
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(imstk::Vec3d(10, 2, 10));
+    whiteLight->setFocalPoint(imstk::Vec3d(0, -2, 0));
+    whiteLight->setPositional();
+
+    // Light (red)
+    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    colorLight->setPosition(imstk::Vec3d(5, -3, 5));
+    colorLight->setFocalPoint(imstk::Vec3d(-5, -5, 0));
+    colorLight->setColor(imstk::Color::Red);
+    colorLight->setPositional();
+    colorLight->setSpotAngle(15);
+
+    // Add in scene
+    scene->addLight(whiteLight);
+    scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
+
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
 }

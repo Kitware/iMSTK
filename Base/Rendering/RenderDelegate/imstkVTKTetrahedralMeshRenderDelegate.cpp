@@ -21,11 +21,13 @@
 
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
-#include "imstkVTKMappedVertexArray.h"
+#include "imstkTetrahedralMesh.h"
 
-#include <vtkCellArray.h>
-#include <vtkTrivialProducer.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkDataSetMapper.h>
+#include <vtkPoints.h>
+#include <vtkDoubleArray.h>
+#include <vtkCellArray.h>
 
 #include "g3log/g3log.hpp"
 
@@ -35,45 +37,55 @@ namespace imstk
 VTKTetrahedralMeshRenderDelegate::VTKTetrahedralMeshRenderDelegate(std::shared_ptr<TetrahedralMesh> tetrahedralMesh) :
     m_geometry(tetrahedralMesh)
 {
-    const size_t dim = 4;
-
     // Map vertices
-    auto mappedVertexArray = vtkSmartPointer<VTKMappedVertexArray>::New();
-    mappedVertexArray->SetVertexArray(m_geometry->getVerticesPositionsNotConst());
+    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    double* vertData = reinterpret_cast<double*>(vertices.data());
+    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
+    m_mappedVertexArray->SetNumberOfComponents(3);
+    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_geometry->getNumVertices());
-    points->SetData(mappedVertexArray);
+    points->SetData(m_mappedVertexArray);
 
     // Copy cells
     auto cells = vtkSmartPointer<vtkCellArray>::New();
-    vtkIdType cell[dim];
+    vtkIdType cell[4];
     for(const auto &t : m_geometry->getTetrahedraVertices())
     {
-        for(size_t i = 0; i < dim; ++i)
+        for(size_t i = 0; i < 4; ++i)
         {
             cell[i] = t[i];
         }
-        cells->InsertNextCell(dim,cell);
+        cells->InsertNextCell(4,cell);
     }
 
-    // Create PolyData
+    // Create Unstructured Grid
     auto unstructuredGrid = vtkSmartPointer<vtkUnstructuredGrid>::New();
     unstructuredGrid->SetPoints(points);
     unstructuredGrid->SetCells(VTK_TETRA, cells);
 
-    // Create Source
-    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
-    source->SetOutput(unstructuredGrid);
-
-    // Set up mapper
+    // Mapper
     auto mapper = vtkSmartPointer<vtkDataSetMapper>::New();
-    mapper->SetInputConnection(source->GetOutputPort());
+    mapper->SetInputData(unstructuredGrid);
+
+    // Actor
     m_actor->SetMapper(mapper);
 
+    // Transform
     this->updateActorTransform();
 }
+
+void
+VTKTetrahedralMeshRenderDelegate::update()
+{
+    // Base class update
+    VTKRenderDelegate::update();
+
+    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
+}
+
 
 std::shared_ptr<Geometry>
 VTKTetrahedralMeshRenderDelegate::getGeometry() const

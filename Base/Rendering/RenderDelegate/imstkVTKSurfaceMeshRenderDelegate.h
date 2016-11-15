@@ -25,13 +25,13 @@
 #include <memory>
 
 #include "imstkVTKRenderDelegate.h"
-#include "imstkSurfaceMesh.h"
 
-#include "vtkPolyData.h"
-#include "imstkVTKMappedVertexArray.h"
+class vtkDoubleArray;
 
 namespace imstk
 {
+
+class SurfaceMesh;
 
 ///
 /// \class SurfaceMeshRenderDelegate
@@ -49,13 +49,7 @@ public:
     ///
     /// \brief
     ///
-    VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh>SurfaceMesh);
-
-    ///
-    /// \brief
-    ///
-    void mapVertices();
-
+    VTKSurfaceMeshRenderDelegate(std::shared_ptr<SurfaceMesh> surfaceMesh);
 
     ///
     /// \brief
@@ -65,12 +59,12 @@ public:
     ///
     /// \brief
     ///
-    std::shared_ptr<Geometry>getGeometry() const override;
+    std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
 
-    std::shared_ptr<SurfaceMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+    std::shared_ptr<SurfaceMesh> m_geometry; ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
 
 };
 

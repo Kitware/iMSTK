@@ -21,16 +21,12 @@
 
 #include "imstkVTKLineMeshRenderDelegate.h"
 
-#include <vtkTrivialProducer.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkPointData.h>
-#include <vtkFloatArray.h>
-#include <vtkDoubleArray.h>
-#include <vtkImageReader2Factory.h>
-#include <vtkImageReader2.h>
-#include <vtkTexture.h>
-#include <vtkProperty.h>
+#include "imstkLineMesh.h"
 
+#include <vtkLineSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkPoints.h>
+#include <vtkDoubleArray.h>
 
 #include "g3log/g3log.hpp"
 
@@ -41,45 +37,30 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     m_geometry(lineMesh)
 {
     // Map vertices
-    m_mappedVertexArray = vtkDoubleArray::New();
+    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    double* vertData = reinterpret_cast<double*>(vertices.data());
+    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
-    auto vertices = m_geometry->getVerticesPositionsNotConst();
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        m_mappedVertexArray->InsertNextTuple3(vertices[i][0], vertices[i][1], vertices[i][2]);
-    }
-    this->mapVertices();
+    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
-    m_lines = vtkSmartPointer<vtkLineSource>::New();
-    m_lines->SetPoints(points);
-    m_lines->Update();
+    // Create line
+    auto lines = vtkSmartPointer<vtkLineSource>::New();
+    lines->SetPoints(points);
 
     //Create a mapper and actor
-    vtkSmartPointer<vtkPolyDataMapper> mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+    mapper->SetInputConnection(lines->GetOutputPort());
 
-    mapper->SetInputConnection(m_lines->GetOutputPort());
-
+    // Actor
     m_actor->SetMapper(mapper);
 
     // Transform
     this->updateActorTransform();
-}
-
-void
-VTKLineMeshRenderDelegate::mapVertices()
-{
-    auto vertices = m_geometry->getVerticesPositionsNotConst();
-
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        m_mappedVertexArray->SetTuple3(i, vertices[i][0], vertices[i][1], vertices[i][2]);
-    }
-
-    // TODO: only when vertices modified
-    m_mappedVertexArray->Modified();
 }
 
 void
@@ -88,8 +69,7 @@ VTKLineMeshRenderDelegate::update()
     // Base class update
     VTKRenderDelegate::update();
 
-    this->mapVertices();
-    m_lines->Update();
+    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
 }
 
 std::shared_ptr<Geometry>
