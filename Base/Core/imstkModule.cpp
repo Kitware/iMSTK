@@ -21,8 +21,6 @@
 
 #include "imstkModule.h"
 
-#include <iostream>
-
 #include "g3log/g3log.hpp"
 
 namespace imstk
@@ -44,8 +42,9 @@ Module::start()
     m_status = ModuleStatus::RUNNING;
 
     // Keep active, wait for terminating call
-    std::chrono::steady_clock::time_point pre_t;
-    std::chrono::steady_clock::time_point post_t;
+    std::chrono::steady_clock::time_point previous_t = std::chrono::steady_clock::now() - std::chrono::minutes(1);
+    std::chrono::steady_clock::time_point current_t;
+    int elapsed;
     while (m_status !=  ModuleStatus::TERMINATING)
     {
         if (m_status == ModuleStatus::PAUSING)
@@ -54,11 +53,18 @@ Module::start()
         }
         else if (m_status == ModuleStatus::RUNNING)
         {
-            pre_t = std::chrono::steady_clock::now();
-            this->runModule();
-            post_t = std::chrono::steady_clock::now();
-            auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(post_t - pre_t);
-            std::this_thread::sleep_for(std::chrono::milliseconds(m_loopDelay) - elapsed);
+            if(m_loopDelay == 0)
+            {
+                this->runModule();
+                continue;
+            }
+            current_t = std::chrono::steady_clock::now();
+            elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
+            if(elapsed >= m_loopDelay)
+            {
+                this->runModule();
+                previous_t = current_t;
+            }
         }
     }
 
