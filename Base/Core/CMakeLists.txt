@@ -10,6 +10,7 @@ imstk_add_library( Core
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
+if( BUILD_TESTING )
+  include(imstkAddTest)
+  imstk_add_test( Core )
 endif()
