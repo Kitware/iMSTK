@@ -23,7 +23,6 @@
 #define imstkModule_h
 
 #include <iostream>
-#include <thread>
 #include <atomic>
 
 namespace imstk
@@ -50,6 +49,14 @@ enum class ModuleStatus
 class Module
 {
 public:
+    ///
+    /// \brief Constructor
+    ///
+    Module(std::string name, int loopDelay = 0) :
+        m_name(name),
+        m_loopDelay(loopDelay)
+    {}
+
     ///
     /// \brief Destructor
     ///
@@ -88,31 +95,34 @@ public:
     ///
     /// \brief Get loop delay
     ///
-    const int& getLoopDelay() const;
+    double getLoopDelay() const;
 
     ///
     /// \brief Set the loop delay
     ///
-    void setLoopDelay(int milliseconds);
+    void setLoopDelay(double milliseconds);
+
+    ///
+    /// \brief Get loop delay
+    ///
+    double getFrequency() const;
+
+    ///
+    /// \brief Set the loop delay
+    ///
+    void setFrequency(double f);
 
 protected:
-    ///
-    /// \brief Protected constructor
-    ///
-    Module(std::string name, int loopDelay = 0) :
-        m_name(name),
-        m_loopDelay(loopDelay)
-    {}
 
     ///
     /// \brief Initialize module
     ///
-    virtual void initModule()    = 0;
+    virtual void initModule() = 0;
 
     ///
     /// \brief Run the module
     ///
-    virtual void runModule()     = 0;
+    virtual void runModule() = 0;
 
     ///
     /// \brief Clean the module
@@ -122,7 +132,7 @@ protected:
     std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};///> Module status
 
     std::string  m_name;    ///> Name of the module
-    int m_loopDelay;        ///> Loop delay
+    double m_loopDelay;        ///> Loop delay
 };
 
 }
