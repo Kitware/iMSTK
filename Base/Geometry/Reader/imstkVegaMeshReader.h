@@ -77,7 +77,7 @@ protected:
     ///
     /// \brief
     ///
-    static void copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh, std::vector<Vec3d>& vertices);
+    static void copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh, StdVectorOfVec3d& vertices);
 
     ///
     /// \brief

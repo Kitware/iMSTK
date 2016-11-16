@@ -59,7 +59,7 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  triangle connectivity and texture coordinates
     ///
-    void initialize(const std::vector<Vec3d>& vertices,
+    void initialize(const StdVectorOfVec3d& vertices,
                     const std::vector<TriangleArray>& triangles,
                     const bool computeDerivedData = false);
 
@@ -116,7 +116,7 @@ public:
     ///
     /// \brief Get vector of normals of all the triangles
     ///
-    const std::vector<Vec3d>& getTrianglesNormals() const;
+    const StdVectorOfVec3d& getTrianglesNormals() const;
 
     ///
     /// \brief Get normal of a triangle given its index
@@ -126,7 +126,7 @@ public:
     ///
     /// \brief Get vector of normals of all the vertices
     ///
-    const std::vector<Vec3d>& getVerticesNormals() const;
+    const StdVectorOfVec3d& getVerticesNormals() const;
 
     ///
     /// \brief Get normal of a vertex given its index
@@ -158,8 +158,8 @@ protected:
     std::vector<NeighborsType> m_verticesNeighborTriangles; ///> Neighbor triangles to vertices
     std::vector<NeighborsType> m_verticesNeighborVertices; ///> Neighbor vertices to vertices
 
-    std::vector<Vec3d> m_trianglesNormals; ///> Normals to the triangles
-    std::vector<Vec3d> m_verticesNormals; ///> Normals of the vertices
+    StdVectorOfVec3d m_trianglesNormals; ///> Normals to the triangles
+    StdVectorOfVec3d m_verticesNormals; ///> Normals of the vertices
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
     std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture

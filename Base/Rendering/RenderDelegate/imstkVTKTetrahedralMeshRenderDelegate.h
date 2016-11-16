@@ -25,12 +25,13 @@
 #include <memory>
 
 #include "imstkVTKRenderDelegate.h"
-#include "imstkTetrahedralMesh.h"
 
-#include "vtkUnstructuredGrid.h"
+class vtkDoubleArray;
 
 namespace imstk
 {
+
+class TetrahedralMesh;
 
 ///
 /// \class TetrahedralMeshRenderDelegate
@@ -53,10 +54,17 @@ public:
     ///
     /// \brief
     ///
+    void update();
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Geometry> getGeometry() const override;
 
 protected:
-    std::shared_ptr<TetrahedralMesh> m_geometry;    ///>
+
+    std::shared_ptr<TetrahedralMesh> m_geometry; ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
 };
 
 } // imstk

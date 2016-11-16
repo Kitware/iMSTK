@@ -25,13 +25,13 @@
 #include <memory>
 
 #include "imstkVTKRenderDelegate.h"
-#include "imstkLineMesh.h"
-#include <vtkLineSource.h>
-#include "vtkPolyData.h"
-#include "imstkVTKMappedVertexArray.h"
+
+class vtkDoubleArray;
 
 namespace imstk
 {
+
+class LineMesh;
 
 ///
 /// \class LineMeshRenderDelegate
@@ -49,12 +49,7 @@ public:
     ///
     /// \brief
     ///
-    VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh>LineMesh);
-
-    ///
-    /// \brief
-    ///
-    void mapVertices();
+    VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> lineMesh);
 
     ///
     /// \brief
@@ -67,9 +62,9 @@ public:
     std::shared_ptr<Geometry>getGeometry() const override;
 
 protected:
-    vtkSmartPointer<vtkLineSource> m_lines;
-    std::shared_ptr<LineMesh> m_geometry;
-    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray;
+
+    std::shared_ptr<LineMesh>  m_geometry; ///> Geometry to render
+    vtkSmartPointer<vtkDoubleArray> m_mappedVertexArray; ///> Mapped array of vertices
 
 };
 

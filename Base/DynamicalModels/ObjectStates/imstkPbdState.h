@@ -60,23 +60,23 @@ public:
     ///
     /// \brief Returns the vector of current nodal positions
     ///
-    std::vector<Vec3d>& getPositions() { return m_pos; };
-    void setPositions(const std::vector<Vec3d>& p) { m_pos = p; };
+    StdVectorOfVec3d& getPositions() { return m_pos; };
+    void setPositions(const StdVectorOfVec3d& p) { m_pos = p; };
 
     ///
     /// \brief Returns the vector of current nodal velocities
     ///
-    std::vector<Vec3d>& getVelocities() { return m_vel; };
+    StdVectorOfVec3d& getVelocities() { return m_vel; };
 
     ///
     /// \brief Returns the vector of current nodal accelerations
     ///
-    std::vector<Vec3d>& getAccelerations() { return m_acc; };
+    StdVectorOfVec3d& getAccelerations() { return m_acc; };
 
 private:
-    std::vector<Vec3d> m_pos; ///> Nodal positions
-    std::vector<Vec3d> m_vel; ///> Nodal velocities
-    std::vector<Vec3d> m_acc; ///> Nodal acelerations
+    StdVectorOfVec3d m_pos; ///> Nodal positions
+    StdVectorOfVec3d m_vel; ///> Nodal velocities
+    StdVectorOfVec3d m_acc; ///> Nodal acelerations
 };
 
 } // imstk

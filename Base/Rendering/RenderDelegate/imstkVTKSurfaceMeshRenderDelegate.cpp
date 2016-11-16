@@ -21,11 +21,16 @@
 
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 
-#include <vtkTrivialProducer.h>
+#include "imstkSurfaceMesh.h"
+
+#include <vtkPolyData.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkPointData.h>
-#include <vtkFloatArray.h>
+#include <vtkPoints.h>
 #include <vtkDoubleArray.h>
+#include <vtkCellArray.h>
+#include <vtkFloatArray.h>
+#include <vtkPointData.h>
 #include <vtkImageReader2Factory.h>
 #include <vtkImageReader2.h>
 #include <vtkTexture.h>
@@ -40,38 +45,42 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     m_geometry(surfaceMesh)
 {
     // Map vertices
-    m_mappedVertexArray = vtkDoubleArray::New();
+    StdVectorOfVec3d& vertices = m_geometry->getVerticesPositionsNotConst();
+    double* vertData = reinterpret_cast<double*>(vertices.data());
+    m_mappedVertexArray = vtkSmartPointer<vtkDoubleArray>::New();
     m_mappedVertexArray->SetNumberOfComponents(3);
-    auto vertices = m_geometry->getVerticesPositionsNotConst();
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        m_mappedVertexArray->InsertNextTuple3(vertices[i][0], vertices[i][1], vertices[i][2]);
-    }
-    this->mapVertices();
+    m_mappedVertexArray->SetArray(vertData, vertices.size()*3, 1);
 
     // Create points
     auto points = vtkSmartPointer<vtkPoints>::New();
     points->SetNumberOfPoints(m_geometry->getNumVertices());
     points->SetData(m_mappedVertexArray);
 
-    // Copy triangles
-    auto triangles = vtkSmartPointer<vtkCellArray>::New();
+    // Copy cells
+    auto cells = vtkSmartPointer<vtkCellArray>::New();
     vtkIdType cell[3];
     for(const auto &t : m_geometry->getTrianglesVertices())
     {
-        cell[0] = t[0];
-        cell[1] = t[1];
-        cell[2] = t[2];
-        triangles->InsertNextCell(3,cell);
+        for(size_t i = 0; i < 3; ++i)
+        {
+            cell[i] = t[i];
+        }
+        cells->InsertNextCell(3,cell);
     }
 
     // Create PolyData
     auto polydata = vtkSmartPointer<vtkPolyData>::New();
     polydata->SetPoints(points);
-    polydata->SetPolys(triangles);
+    polydata->SetPolys(cells);
+
+    // Compute Normals
+    auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
+    normalGen->SetInputData(polydata);
+    normalGen->SplittingOff();
 
     // Mapper
     auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputData(polydata);
+    mapper->SetInputConnection(normalGen->GetOutputPort());
 
     // Copy textures
     int unit = 0;
@@ -114,18 +123,6 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
         unit++;
     }
 
-    //// Update normals
-    //auto normals = surfaceMesh->getPointDataArray("Normals");
-    //auto vtkNormals = vtkSmartPointer<vtkFloatArray>::New();
-    //vtkNormals->SetNumberOfComponents(3);
-    //vtkNormals->SetName("Normals");
-    //for (auto const normal : normals)
-    //{
-    //  double triple[3] = { normal[0], normal[1], normal[2] };
-    //  vtkNormals->InsertNextTuple(triple);
-    //}
-    //polydata->GetPointData()->SetNormals(vtkNormals);
-
     // Actor
     m_actor->SetMapper(mapper);
 
@@ -134,25 +131,12 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
 }
 
 void
-VTKSurfaceMeshRenderDelegate::mapVertices()
-{
-    auto vertices = m_geometry->getVerticesPositionsNotConst();
-
-    for (size_t i = 0; i < vertices.size(); ++i) {
-        m_mappedVertexArray->SetTuple3(i, vertices[i][0], vertices[i][1], vertices[i][2]);
-    }
-
-    // TODO: only when vertices modified
-    m_mappedVertexArray->Modified();
-}
-
-void
 VTKSurfaceMeshRenderDelegate::update()
 {
     // Base class update
     VTKRenderDelegate::update();
 
-    this->mapVertices();
+    m_mappedVertexArray->Modified(); // TODO: only modify if vertices change
 }
 
 std::shared_ptr<Geometry>

@@ -806,7 +806,7 @@ void testTetraTriangleMap()
 
     // Tetrahedral mesh
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -821,7 +821,7 @@ void testTetraTriangleMap()
 
     // Triangular mesh
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> SurfVertList;
+    imstk::StdVectorOfVec3d SurfVertList;
     SurfVertList.push_back(imstk::Vec3d(0, 0, 1));// coincides with one vertex
     SurfVertList.push_back(imstk::Vec3d(0.25, 0.25, 0.25));// centroid
     SurfVertList.push_back(imstk::Vec3d(1.05, 0, 0));
@@ -847,7 +847,7 @@ void testExtractSurfaceMesh()
 
     // a.1 add vertex positions
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -890,7 +890,7 @@ void testOneToOneNodalMap()
 
     // a.1 add vertex positions
     auto tetMesh = std::make_shared<imstk::TetrahedralMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -905,7 +905,7 @@ void testOneToOneNodalMap()
     auto triMesh = std::make_shared<imstk::SurfaceMesh>();
 
     // b.1 Add vertex positions
-    std::vector<imstk::Vec3d> SurfVertList;
+    imstk::StdVectorOfVec3d SurfVertList;
     SurfVertList.push_back(imstk::Vec3d(0, 0, 0));
     SurfVertList.push_back(imstk::Vec3d(1.0, 0, 0));
     SurfVertList.push_back(imstk::Vec3d(0, 1.0, 0));
@@ -951,7 +951,7 @@ void testSurfaceMeshOptimizer()
 
     // b. Add nodal data
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     vertList.push_back(imstk::Vec3d(0, 0, 0));
     vertList.push_back(imstk::Vec3d(0.5, 0.5, 0));
     vertList.push_back(imstk::Vec3d(1, 1, 0));
@@ -1207,16 +1207,17 @@ void testPbdCloth()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("PositionBasedDynamicsTest");
     scene->getCamera()->setPosition(6.0, 2.0, 20.0);
+    scene->getCamera()->setFocalPoint(0, -5, 5);
 
     // a. Construct a sample triangular mesh
 
     // b. Add nodal data
     auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
-    std::vector<imstk::Vec3d> vertList;
+    imstk::StdVectorOfVec3d vertList;
     const double width = 10.0;
     const double height = 10.0;
-    const int nRows = 10;
-    const int nCols = 10;
+    const int nRows = 11;
+    const int nCols = 11;
     vertList.resize(nRows*nCols);
     const double dy = width / (double)(nCols - 1);
     const double dx = height / (double)(nRows - 1);
@@ -1246,28 +1247,46 @@ void testPbdCloth()
 
     surfMesh->setTrianglesVertices(triangles);
 
+    // Object & Model
     auto deformableObj = std::make_shared<PbdObject>("Cloth");
     auto pbdModel = std::make_shared<PbdModel>();
-
     deformableObj->setDynamicalModel(pbdModel);
     deformableObj->setVisualGeometry(surfMesh);
     deformableObj->setPhysicsGeometry(surfMesh);
-
     deformableObj->initialize(/*Number of constraints*/2,
         /*Constraint configuration*/"Distance 0.1",
         /*Constraint configuration*/"Dihedral 0.001",
         /*Mass*/1.0,
         /*Gravity*/"0 -9.8 0",
         /*TimeStep*/0.01,
-        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10",
+        /*FixedPoint*/"1 2 3 4 5 6 7 8 9 10 11",
         /*NumberOfIterationInConstraintSolver*/5
         );
 
+    // Solver
     auto pbdSolver = std::make_shared<PbdSolver>();
     pbdSolver->setPbdObject(deformableObj);
     scene->addNonlinearSolver(pbdSolver);
 
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(imstk::Vec3d(10, 2, 10));
+    whiteLight->setFocalPoint(imstk::Vec3d(0, -2, 0));
+    whiteLight->setPositional();
+
+    // Light (red)
+    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    colorLight->setPosition(imstk::Vec3d(5, -3, 5));
+    colorLight->setFocalPoint(imstk::Vec3d(-5, -5, 0));
+    colorLight->setColor(imstk::Color::Red);
+    colorLight->setPositional();
+    colorLight->setSpotAngle(15);
+
+    // Add in scene
+    scene->addLight(whiteLight);
+    scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
+
     sdk->setCurrentScene("PositionBasedDynamicsTest");
     sdk->startSimulation(true);
 }
@@ -1344,7 +1363,7 @@ void testPbdCollision()
     bool volumetric = !clothTest;
     if (clothTest){
         auto clothMesh = std::make_shared<imstk::SurfaceMesh>();
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
         double height = 60.0;
         int nRows = 10;
@@ -1497,7 +1516,7 @@ void testPbdCollision()
     else{
         // floor
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 100.0;
         double height = 100.0;
         int nRows = 2;
@@ -1619,7 +1638,7 @@ void testLineMesh()
         auto lineMeshVisual = std::make_shared<imstk::LineMesh>();
         auto lineMeshPhysics = std::make_shared<imstk::LineMesh>();
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         vertList.resize(3);
         vertList[0] = Vec3d(0.0, -10.0, -10.0);
         vertList[1] = Vec3d(0.0, 0.0, -10.0);
@@ -1735,7 +1754,7 @@ void testLineMesh()
 
     if (clothTest){
 
-        std::vector<imstk::Vec3d> vertList;
+        imstk::StdVectorOfVec3d vertList;
         double width = 60.0;
         double height = 60.0;
         int nRows = 20;

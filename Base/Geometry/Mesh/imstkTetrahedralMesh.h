@@ -58,7 +58,7 @@ public:
     /// \brief Initializes the rest of the data structures given vertex positions and
     ///  tetrahedra connectivity
     ///
-    void initialize(const std::vector<Vec3d>& vertices,
+    void initialize(const StdVectorOfVec3d& vertices,
                     const std::vector<TetraArray>& tetrahedra,
                     bool computeAttachedSurfaceMesh = false);
 
