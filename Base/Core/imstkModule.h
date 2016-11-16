@@ -95,12 +95,22 @@ public:
     ///
     /// \brief Get loop delay
     ///
-    const int& getLoopDelay() const;
+    double getLoopDelay() const;
 
     ///
     /// \brief Set the loop delay
     ///
-    void setLoopDelay(int milliseconds);
+    void setLoopDelay(double milliseconds);
+
+    ///
+    /// \brief Get loop delay
+    ///
+    double getFrequency() const;
+
+    ///
+    /// \brief Set the loop delay
+    ///
+    void setFrequency(double f);
 
 protected:
 
@@ -122,7 +132,7 @@ protected:
     std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};///> Module status
 
     std::string  m_name;    ///> Name of the module
-    int m_loopDelay;        ///> Loop delay
+    double m_loopDelay;        ///> Loop delay
 };
 
 }

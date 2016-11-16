@@ -129,16 +129,48 @@ Module::getName() const
     return m_name;
 }
 
-const int&
-Module::getLoopDelay() const
+double Module::getLoopDelay() const
 {
     return m_loopDelay;
 }
 
 void
-Module::setLoopDelay(int milliseconds)
+Module::setLoopDelay(double milliseconds)
 {
+    if(milliseconds < 0)
+    {
+        LOG(WARNING) << "Module::setLoopDelay error: delay must be positive.";
+        return;
+    }
     m_loopDelay = milliseconds;
+}
+
+double Module::getFrequency() const
+{
+    if(m_loopDelay == 0)
+    {
+        LOG(WARNING) << "Module::getFrequency warning: loop delay is set to 0ms, "
+                     << "therefore not regulated by a frequency. Returning 0.";
+        return 0;
+    }
+    return 1000.0/m_loopDelay;
+}
+
+void
+Module::setFrequency(double f)
+{
+    if(f < 0)
+    {
+        LOG(WARNING) << "Module::setFrequency error: f must be positive, "
+                     << "or equal to 0 to run the module in a closed loop.";
+        return;
+    }
+    if(f == 0)
+    {
+        m_loopDelay = 0;
+        return;
+    }
+    m_loopDelay = 1000.0/f;
 }
 
 }
