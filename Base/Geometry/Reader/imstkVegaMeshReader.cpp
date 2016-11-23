@@ -26,6 +26,8 @@
 
 #include "g3log/g3log.hpp"
 
+#include "tetMesh.h"
+
 namespace imstk
 {
 
@@ -44,7 +46,6 @@ VegaMeshReader::read(const std::string& filePath, MeshFileType meshType)
     // Convert to Volumetric Mesh
     return VegaMeshReader::convertVegaMeshToVolumetricMesh(vegaMesh);
 }
-
 
 std::shared_ptr<vega::VolumetricMesh>
 VegaMeshReader::readVegaMesh(const std::string& filePath)
@@ -118,6 +119,56 @@ VegaMeshReader::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
             cell[i] = vegaMesh->getVertexIndex(cellId,i);
         }
         cells.emplace_back(cell);
+    }
+}
+
+std::shared_ptr<vega::VolumetricMesh>
+VegaMeshReader::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> imstkVolMesh)
+{
+     // as of now, only works for TET elements
+	if (imstkVolMesh->getType() == Geometry::Type::TetrahedralMesh)
+    {
+        // Using default material properties to append to the .veg file
+        const double E=1E6;
+        const double nu=0.45;
+        const double density=1000.0;
+
+        auto imstkVolTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(imstkVolMesh);
+
+        auto vertexArray = imstkVolMesh->getVertexPositions();
+        std::vector<double> vertices;
+        for (const auto & node : vertexArray)
+        {
+            vertices.emplace_back(node(0));
+            vertices.emplace_back(node(1));
+            vertices.emplace_back(node(2));
+        }
+
+        auto tetArray = imstkVolTetMesh->getTetrahedraVertices();
+        std::vector<int> elements;
+        for (const auto & tet : tetArray)
+        {
+            elements.emplace_back(tet[0]);
+            elements.emplace_back(tet[1]);
+            elements.emplace_back(tet[2]);
+            elements.emplace_back(tet[3]);
+        }
+
+        std::shared_ptr<vega::VolumetricMesh> vegaMesh(new vega::TetMesh(imstkVolTetMesh->getNumVertices(), &vertices[0], imstkVolTetMesh->getNumTetrahedra(), &elements[0], E, nu, density));
+        if (!vegaMesh)
+        {
+            LOG(WARNING) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Failed to create vega mesh";
+            return nullptr;
+        }
+        else
+        {
+            return vegaMesh;
+        }
+    }
+    else
+    {
+        LOG(WARNING) << "VegaMeshIO::convertVolumetricMeshToVegaMesh error: Geometry type not supported";
+        return nullptr;
     }
 }
 

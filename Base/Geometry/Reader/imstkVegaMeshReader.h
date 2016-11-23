@@ -42,6 +42,7 @@ namespace imstk
 ///
 class VegaMeshReader
 {
+
 public:
     ///
     /// \brief Default constructor
@@ -72,7 +73,7 @@ protected:
     ///
     /// \brief Generate a vega volume mesh given volumetric mesh
     ///
-    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
+    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> volumeMesh);
 
     ///
     /// \brief
