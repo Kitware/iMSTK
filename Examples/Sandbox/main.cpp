@@ -1,4 +1,4 @@
-#define DATA_ROOT_PATH "." // Change to your data ressource directory
+#define DATA_ROOT_PATH "M:/Mohit Tyagi/iMSTK/build/Innerbuild/Examples/Sandbox/Resources" // Change to your data ressource directory
 
 #include <cstring>
 #include <iostream>
@@ -96,6 +96,7 @@ void testPbdVolume();
 void testPbdCloth();
 void testPbdCollision();
 void testLineMesh();
+void testMshAndVegaIO();
 
 int main()
 {
@@ -124,11 +125,72 @@ int main()
     //testTwoOmnis();
     //testVectorPlotters();
     //testPbdVolume();
-    testPbdCloth();
+    //testPbdCloth();
     //testPbdCollision();
     //testLineMesh();
+    testMshAndVegaIO();
 
     return 0;
+}
+
+void testMshAndVegaIO()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("SceneTestMesh");
+
+    // Load a volumetric mesh (from .msh file)
+    std::string ifile = DATA_ROOT_PATH"/sofa_msh_files/liver2.msh";
+    auto volMeshA = imstk::MeshIO::read(ifile);
+    if (!volMeshA)
+    {
+        LOG(WARNING) << "Failed to read msh file : " << ifile;
+        return;
+    }
+
+    // Extract surface mesh
+    auto volumeMeshA = std::dynamic_pointer_cast<imstk::VolumetricMesh>(volMeshA); // change to any volumetric mesh above
+    volumeMeshA->computeAttachedSurfaceMesh();
+    auto surfaceMeshA = volumeMeshA->getAttachedSurfaceMesh();
+
+    // Create object A
+    auto objectA = std::make_shared<imstk::VisualObject>("meshObjectMSH");
+    objectA->setVisualGeometry(surfaceMeshA);
+
+    // Write a .veg file
+    std::string ofile = DATA_ROOT_PATH"/VEGA_veg_files/liver2.veg";
+    auto writeStatus = imstk::MeshIO::write(volMeshA, ofile);
+    std::cout << "------------------------------Summary----------------------------------------------------\n";
+    std::cout << "Following file converion: " << ((writeStatus) ? "Success \n" : "Failure \n");
+    std::cout << "\n Input mesh file : \n" << ifile << std::endl;
+    std::cout << "\n Output mesh file: \n" << ofile << std::endl;
+
+    // Read the above written veg file
+    auto volMeshB = imstk::MeshIO::read(ofile);
+    if (!volMeshB)
+    {
+        LOG(WARNING) << "Failed to extract topology/geometry from the veg file : " << ofile;
+        return;
+    }
+
+    // Extract surface mesh
+    auto volumeMeshB = std::dynamic_pointer_cast<imstk::VolumetricMesh>(volMeshB); // change to any volumetric mesh above
+    volumeMeshB->computeAttachedSurfaceMesh();
+    auto surfaceMeshB = volumeMeshB->getAttachedSurfaceMesh();
+
+    // Create object B
+    auto objectB = std::make_shared<imstk::VisualObject>("meshObjectVEGA");
+    surfaceMeshB->translate(Vec3d(3, 0, 0));
+    objectB->setVisualGeometry(surfaceMeshB);
+
+    // Add objects to the scene
+    scene->addSceneObject(objectA);
+    scene->addSceneObject(objectB);
+
+    // Run
+    sdk->setCurrentScene("SceneTestMesh");
+    sdk->startSimulation(true);
+
 }
 
 void testVTKTexture()
