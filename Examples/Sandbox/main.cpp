@@ -1,3 +1,5 @@
+#define DATA_ROOT_PATH "." // Change to your data ressource directory
+
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -129,16 +131,15 @@ int main()
     return 0;
 }
 
-
 void testVTKTexture()
 {
     // Parse command line arguments
 
-    std::string inputFilename = "../ETI/resources/OperatingRoom/cloth.obj";
-    std::string texturename = "../ETI/resources/TextureOR/cloth.jpg";
+    std::string inputFilename = DATA_ROOT_PATH"/ETI/resources/OperatingRoom/cloth.obj";
+    std::string texturename = DATA_ROOT_PATH"/ETI/resources/TextureOR/cloth.jpg";
 
-    std::string inputFilename1 = "../ETI/resources/OperatingRoom/bed1.obj";
-    std::string texturename1 = "../ETI/resources/TextureOR/bed-1.jpg";
+    std::string inputFilename1 = DATA_ROOT_PATH"/ETI/resources/OperatingRoom/bed1.obj";
+    std::string texturename1 = DATA_ROOT_PATH"/ETI/resources/TextureOR/bed-1.jpg";
 
     vtkSmartPointer<vtkOBJReader> reader =
         vtkSmartPointer<vtkOBJReader>::New();
@@ -212,9 +213,9 @@ void testMultiObjectWithTextures()
     auto scene = sdk->createNewScene("multiObjectWithTexturesTest");
 
     // Read surface mesh
-    auto objMesh = imstk::MeshReader::read("../ETI/resources/OperatingRoom/cloth.obj");
+    auto objMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/ETI/resources/OperatingRoom/cloth.obj");
     auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
-    surfaceMesh->addTexture("../ETI/resources/TextureOR/cloth.jpg");
+    surfaceMesh->addTexture(DATA_ROOT_PATH"/ETI/resources/TextureOR/cloth.jpg");
 
     // Create object and add to scene
     auto object = std::make_shared<imstk::VisualObject>("meshObject");
@@ -226,10 +227,10 @@ void testMultiObjectWithTextures()
 
     if (secondObject){
         // Read surface mesh1
-        auto objMesh1 = imstk::MeshReader::read("../ETI/resources/OperatingRoom/bed1.obj");
+        auto objMesh1 = imstk::MeshReader::read(DATA_ROOT_PATH"/ETI/resources/OperatingRoom/bed1.obj");
         auto surfaceMesh1 = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh1);
         if (secondObjectTexture)
-            surfaceMesh1->addTexture("../ETI/resources/TextureOR/bed-1.jpg");
+            surfaceMesh1->addTexture(DATA_ROOT_PATH"/ETI/resources/TextureOR/bed-1.jpg");
 
         // Create object and add to scene
         auto object1 = std::make_shared<imstk::VisualObject>("meshObject1");
@@ -249,11 +250,11 @@ void testMultiTextures()
     auto scene = sdk->createNewScene("multitexturestest");
 
     // Read surface mesh
-    auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull.obj");
+    auto objMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/textures/Fox skull OBJ/fox_skull.obj");
     auto surfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(objMesh);
-    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_0.jpg",
+    surfaceMesh->addTexture(DATA_ROOT_PATH"/textures/Fox skull OBJ/fox_skull_0.jpg",
         "material_0");
-    surfaceMesh->addTexture("/home/virtualfls/Projects/IMSTK/resources/textures/Fox skull OBJ/fox_skull_1.jpg",
+    surfaceMesh->addTexture(DATA_ROOT_PATH"/textures/Fox skull OBJ/fox_skull_1.jpg",
         "material_1");
 
     // Create object and add to scene
@@ -272,8 +273,8 @@ void testMeshCCD()
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("MeshCCDTest");
 
-    auto mesh1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/big.vtk");
-    auto mesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_0.vtk");
+    auto mesh1 = imstk::MeshReader::read(DATA_ROOT_PATH"/Spheres/big.vtk");
+    auto mesh2 = imstk::MeshReader::read(DATA_ROOT_PATH"/Spheres/small_0.vtk");
 
     // Obj1
     auto obj1 = std::make_shared<CollidingObject>("obj1");
@@ -297,13 +298,13 @@ void testMeshCCD()
     auto t = std::thread([mesh2]
     {
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_1 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_1.vtk");
+        auto mesh2_1 = imstk::MeshReader::read(DATA_ROOT_PATH"/Spheres/small_1.vtk");
         mesh2->setVerticesPositions(mesh2_1->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_2.vtk");
+        auto mesh2_2 = imstk::MeshReader::read(DATA_ROOT_PATH"/Spheres/small_2.vtk");
         mesh2->setVerticesPositions(mesh2_2->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        auto mesh2_3 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Spheres/small_3.vtk");
+        auto mesh2_3 = imstk::MeshReader::read(DATA_ROOT_PATH"/Spheres/small_3.vtk");
         mesh2->setVerticesPositions(mesh2_3->getVertexPositions());
     });
 
@@ -560,7 +561,7 @@ void testCameraController()
     sdk->addModule(client);
 
     // Mesh
-    auto mesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
+    auto mesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.obj");
     auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
     meshObject->setVisualGeometry(mesh);
     scene->addSceneObject(meshObject);
@@ -588,15 +589,15 @@ void testReadMesh()
     auto scene = sdk->createNewScene("SceneTestMesh");
 
     // Read surface mesh
-    /*auto objMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/asianDragon/asianDragon.obj");
-    auto plyMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.ply");
-    auto stlMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.stl");
-    auto vtkMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtk");
-    auto vtpMesh = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/Cube/models/cube.vtp");*/
+    /*auto objMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.obj");
+    auto plyMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/Cube/models/cube.ply");
+    auto stlMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/Cube/models/cube.stl");
+    auto vtkMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/Cube/models/cube.vtk");
+    auto vtpMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/Cube/models/cube.vtp");*/
 
     // Read volumetricMesh
-    //auto vtkMesh2 = imstk::MeshReader::read("/home/virtualfls/Projects/IMSTK/resources/AVM/nidus-model/nidus10KTet.vtk");
-    auto vegaMesh = imstk::MeshReader::read("asianDragon.veg");
+    //auto vtkMesh2 = imstk::MeshReader::read(DATA_ROOT_PATH"/AVM/nidus-model/nidus10KTet.vtk");
+    auto vegaMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
 
     // Extract surface mesh
     auto volumeMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(vegaMesh); // change to any volumetric mesh above
@@ -1021,7 +1022,7 @@ void testDeformableBody()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1138,7 +1139,7 @@ void testPbdVolume()
     scene->getCamera()->setPosition(0, 2.0, 15.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1299,7 +1300,7 @@ void testPbdCollision()
     scene->getCamera()->setPosition(0, 10.0, 25.0);
 
     // dragon
-    auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1443,7 +1444,7 @@ void testPbdCollision()
         scene->getCamera()->setPosition(0, 0, 50);
     }
     else if (0){
-        auto tetMesh1 = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+        auto tetMesh1 = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
         if (!tetMesh1)
         {
             LOG(WARNING) << "Could not read mesh from file.";
@@ -1705,7 +1706,7 @@ void testLineMesh()
         scene->addSceneObject(linesTool);
     }
     else{
-        std::string path2obj = "../ETI/resources/Tools/blade2.obj";
+        std::string path2obj = DATA_ROOT_PATH"/ETI/resources/Tools/blade2.obj";
 
         auto collidingMesh = imstk::MeshReader::read(path2obj);
         auto viusalMesh = imstk::MeshReader::read(path2obj);
@@ -1854,8 +1855,8 @@ void testLineMesh()
         scene->getCamera()->setPosition(0, 0, 50);
     }
     else{
-        //auto tetMesh = imstk::MeshReader::read("../ETI/resources/Human/tongue.veg");
-        auto tetMesh = imstk::MeshReader::read("asianDragon/asianDragon.veg");
+        //auto tetMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/ETI/resources/Human/tongue.veg");
+        auto tetMesh = imstk::MeshReader::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
         if (!tetMesh)
         {
             LOG(WARNING) << "Could not read mesh from file.";
