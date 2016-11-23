@@ -19,12 +19,12 @@
 
    =========================================================================*/
 
-#include "imstkMeshReader.h"
-
 #include <sys/stat.h>
 
+#include "imstkMeshReader.h"
 #include "imstkVTKMeshReader.h"
 #include "imstkVegaMeshReader.h"
+#include "imstkMSHMeshReader.h"
 
 #include "g3log/g3log.hpp"
 
@@ -53,6 +53,9 @@ MeshReader::read(const std::string& filePath)
         break;
     case MeshFileType::VEG :
         return VegaMeshReader::read(filePath, meshType);
+        break;
+    case MeshFileType::MSH:
+        return MSHMeshReader::read(filePath, meshType);
         break;
     }
 
@@ -106,6 +109,10 @@ MeshReader::getFileType(const std::string& filePath)
     else if (extString == "veg" || extString == "VEG")
     {
         meshType = MeshFileType::VEG;
+    }
+    else if (extString == "msh" || extString == "MSH")
+    {
+        meshType = MeshFileType::MSH;
     }
     else
     {
