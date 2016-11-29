@@ -102,6 +102,16 @@ public:
     ///
     const bool& isRendering() const;
 
+    ///
+    /// \brief
+    ///
+    double getTargetFrameRate() const;
+
+    ///
+    /// \brief
+    ///
+    void setTargetFrameRate(const double &fps);
+
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();

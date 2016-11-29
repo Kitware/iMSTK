@@ -23,6 +23,7 @@
 #define imstkVTKInteractorStyle_h
 
 #include <memory>
+#include <chrono>
 
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -105,9 +106,26 @@ public:
     ///
     void setSimulationManager(SimulationManager* simManager);
 
+protected:
+
+    friend class VTKViewer;
+
+    ///
+    /// \brief
+    ///
+    double getTargetFrameRate() const;
+
+    ///
+    /// \brief
+    ///
+    void setTargetFrameRate(const double& fps);
+
 private:
 
-    SimulationManager* m_simManager;    ///>
+    SimulationManager* m_simManager;
+    double m_targetMS = 0.0;
+    std::chrono::high_resolution_clock::time_point m_pre;
+    std::chrono::high_resolution_clock::time_point m_post;
 
 };
 
