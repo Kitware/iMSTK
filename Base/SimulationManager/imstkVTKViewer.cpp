@@ -66,6 +66,9 @@ VTKViewer::setCurrentScene(std::shared_ptr<Scene>scene)
     // Set renderer to renderWindow
     m_vtkRenderWindow->AddRenderer(this->getCurrentRenderer()->getVtkRenderer());
 
+    // Set renderer to interactorStyle
+    m_interactorStyle->SetCurrentRenderer(this->getCurrentRenderer()->getVtkRenderer());
+
     // Set name to renderWindow
     m_vtkRenderWindow->SetWindowName(m_currentScene->getName().data());
 }
@@ -117,7 +120,7 @@ VTKViewer::startRenderingLoop()
 {
     m_running = true;
     m_vtkRenderWindow->GetInteractor()->Initialize();
-    m_vtkRenderWindow->GetInteractor()->CreateRepeatingTimer(1000.0/60);
+    m_vtkRenderWindow->GetInteractor()->CreateOneShotTimer(0);
     m_vtkRenderWindow->GetInteractor()->Start();
     m_vtkRenderWindow->GetInteractor()->DestroyTimer();
     m_running = false;
@@ -141,4 +144,16 @@ VTKViewer::isRendering() const
     return m_running;
 }
 
-} //
+double
+VTKViewer::getTargetFrameRate() const
+{
+    return m_interactorStyle->getTargetFrameRate();
+}
+
+void
+VTKViewer::setTargetFrameRate(const double& fps)
+{
+    m_interactorStyle->setTargetFrameRate(fps);
+}
+
+} // imstk

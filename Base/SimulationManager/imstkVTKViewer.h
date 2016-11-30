@@ -47,7 +47,7 @@ class VTKViewer
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor
     ///
     VTKViewer(SimulationManager* manager = nullptr)
     {
@@ -58,49 +58,60 @@ public:
     }
 
     ///
-    /// \brief
+    /// \brief Destructor
     ///
     ~VTKViewer() = default;
 
     ///
-    /// \brief
+    /// \brief Get scene currently being rendered
     ///
     std::shared_ptr<Scene> getCurrentScene() const;
 
     ///
-    /// \brief
+    /// \brief Set scene to be rendered
     ///
     void setCurrentScene(std::shared_ptr<Scene>scene);
 
     ///
-    /// \brief
+    /// \brief Retrieve the renderer associated with the current scene
     ///
     std::shared_ptr<VTKRenderer> getCurrentRenderer() const;
 
     ///
-    /// \brief
+    /// \brief Setup the current renderer to render what's needed
+    /// based on the mode chosen
     ///
     void setRenderingMode(VTKRenderer::Mode mode);
 
     ///
-    /// \brief
+    /// \brief Start rendering
     ///
     void startRenderingLoop();
 
     ///
-    /// \brief
+    /// \brief Terminate rendering
     ///
     void endRenderingLoop();
 
     ///
-    /// \brief
+    /// \brief Get pointer to the vtkRenderWindow rendering
     ///
     vtkSmartPointer<vtkRenderWindow>getVtkRenderWindow() const;
 
     ///
-    /// \brief
+    /// \brief Returns true if the Viewer is rendering
     ///
     const bool& isRendering() const;
+
+    ///
+    /// \brief Get the target FPS for rendering
+    ///
+    double getTargetFrameRate() const;
+
+    ///
+    /// \brief Set the target FPS for rendering
+    ///
+    void setTargetFrameRate(const double& fps);
 
 protected:
 

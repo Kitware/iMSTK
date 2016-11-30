@@ -42,24 +42,42 @@ VTKInteractorStyle::OnTimer()
 {
     if (m_simManager->getStatus() != SimulationStatus::RUNNING)
     {
+        this->Interactor->CreateOneShotTimer(m_targetMS);
         return;
     }
 
     // Update Camera
-    auto scene = m_simManager->getCurrentScene();
-    m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(scene->getCamera());
+    m_simManager->getViewer()->getCurrentRenderer()->updateSceneCamera(m_simManager->getCurrentScene()->getCamera());
 
     // Update render delegates
     m_simManager->getViewer()->getCurrentRenderer()->updateRenderDelegates();
 
     // Reset camera clipping range
-    if(this->CurrentRenderer != nullptr)
-    {
-        this->CurrentRenderer->ResetCameraClippingRange();
-    }
+    this->CurrentRenderer->ResetCameraClippingRange();
+
+    // Retrieve actual framerate
+    auto t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-m_pre).count();
+    auto fps = 1000.0/(double)t;
+    auto fpsStr = std::to_string((int)fps)+ " fps";
 
     // Render
+    m_pre = std::chrono::high_resolution_clock::now();
     this->Interactor->Render();
+    m_post = std::chrono::high_resolution_clock::now();
+
+    // Plan next render
+    auto dt = std::chrono::duration_cast<std::chrono::milliseconds>(m_post-m_pre).count();
+    if (dt < m_targetMS)
+    {
+        this->Interactor->CreateOneShotTimer(m_targetMS - dt);
+    }
+    else
+    {
+        this->Interactor->CreateOneShotTimer(0);
+    }
+
+    // Timing info
+    std::cout << "\rActual framerate: " << fpsStr << " (" << dt << " ms)             "<< std::flush;
 }
 
 void
@@ -315,4 +333,33 @@ VTKInteractorStyle::setSimulationManager(SimulationManager *simManager)
     m_simManager = simManager;
 }
 
+double
+VTKInteractorStyle::getTargetFrameRate() const
+{
+    if(m_targetMS == 0)
+    {
+        LOG(WARNING) << "VTKInteractorStyle::getTargetFrameRate warning: render target period is set to 0ms, "
+                     << "therefore not regulated by a framerate. Returning 0.";
+        return 0;
+    }
+    return 1000.0/m_targetMS;
+}
+
+void
+VTKInteractorStyle::setTargetFrameRate(const double &fps)
+{
+    if(fps < 0)
+    {
+        LOG(WARNING) << "VTKInteractorStyle::setTargetFrameRate error: framerate must be positive, "
+                     << "or equal to 0 to render as fast as possible.";
+        return;
+    }
+    if(fps == 0)
+    {
+        m_targetMS = 0;
+        return;
+    }
+    m_targetMS = 1000.0/fps;
+    std::cout << "Target framerate: " << fps << " (" << m_targetMS << " ms)"<< std::endl;
+}
 } // imstk

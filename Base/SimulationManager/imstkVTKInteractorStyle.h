@@ -23,6 +23,7 @@
 #define imstkVTKInteractorStyle_h
 
 #include <memory>
+#include <chrono>
 
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -46,68 +47,86 @@ public:
     vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle);
 
     ///
-    /// \brief
+    /// \brief Slot for timer tick
     ///
     virtual void OnTimer() override;
 
     ///
-    /// \brief
+    /// \brief Slot for key pressed
     ///
     virtual void OnChar() override;
 
     ///
-    /// \brief
+    /// \brief Slot for moved mouse cursor
     ///
     virtual void OnMouseMove() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse left button clicked
     ///
     virtual void OnLeftButtonDown() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse left button released
     ///
     virtual void OnLeftButtonUp() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse middle button clicked
     ///
     virtual void OnMiddleButtonDown() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse middle button released
     ///
     virtual void OnMiddleButtonUp() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse right button clicked
     ///
     virtual void OnRightButtonDown() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse right button released
     ///
     virtual void OnRightButtonUp() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse wheel rolled forward
     ///
     virtual void OnMouseWheelForward() override;
 
     ///
-    /// \brief
+    /// \brief Slot for mouse wheel rolled backward
     ///
     virtual void OnMouseWheelBackward() override;
 
+protected:
+
+    friend class VTKViewer;
+
     ///
-    /// \brief
+    /// \brief Define SimulationManager that owns this viewer/interactorStyle
+    /// to be able to control the simulation through user interaction
     ///
     void setSimulationManager(SimulationManager* simManager);
 
+    ///
+    /// \brief Get the target FPS for rendering
+    ///
+    double getTargetFrameRate() const;
+
+    ///
+    /// \brief Set the target FPS for rendering
+    ///
+    void setTargetFrameRate(const double& fps);
+
 private:
 
-    SimulationManager* m_simManager;    ///>
+    SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
+    double m_targetMS = 0.0; ///> expected time between each render frame (in ms)
+    std::chrono::high_resolution_clock::time_point m_pre; ///> time point pre-rendering
+    std::chrono::high_resolution_clock::time_point m_post; ///> time point post-rendering
 
 };
 
