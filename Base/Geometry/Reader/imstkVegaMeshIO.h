@@ -64,6 +64,11 @@ public:
     ///
     static std::shared_ptr<vega::VolumetricMesh> readVegaMesh(const std::string& filePath);
 
+    ///
+    /// \brief Write a volumetric mesh in vega file format
+    ///
+    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType);
+
 protected:
     ///
     /// \brief Generate volumetric mesh given a vega volume mesh

@@ -74,6 +74,11 @@ public:
     static std::shared_ptr<Mesh> read(const std::string& filePath);
 
     ///
+    /// \brief Write external file
+    ///
+    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath);
+
+    ///
     /// \brief Returns true if the file exists, else false
     ///
     static bool fileExists(const std::string& file);

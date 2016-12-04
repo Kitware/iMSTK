@@ -47,6 +47,47 @@ VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
     return VegaMeshIO::convertVegaMeshToVolumetricMesh(vegaMesh);
 }
 
+bool
+VegaMeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType)
+{
+    if (meshType != MeshFileType::VEG)
+    {
+        LOG(WARNING) << "VegaMeshIO::write error: file type is not veg";
+        return false;
+    }
+    // extract volumetric mesh
+    const auto imstkVolMesh = std::dynamic_pointer_cast<imstk::VolumetricMesh>(imstkMesh);
+    if (!imstkVolMesh)
+    {
+        LOG(WARNING) << "VegaMeshIO::write error: imstk::Mesh is not a volumetric mesh";
+        return false;
+    }
+
+    switch (imstkVolMesh->getType())
+    {
+        case Geometry::Type::TetrahedralMesh:
+        case Geometry::Type::HexahedralMesh:
+            auto vegaMesh = convertVolumetricMeshToVegaMesh(imstkVolMesh);
+            if (vegaMesh==nullptr)
+            {
+                LOG(WARNING) << "VegaMeshIO::write error: failed to convert volumetric mesh to vega mesh";
+                return false;
+            }
+            const auto fileName = const_cast<char *>(filePath.c_str());
+            const int write_status = vegaMesh->save(fileName);
+            if (write_status != 0)
+            {
+                LOG(WARNING) << "VegaMeshIO::write error: failed to write .veg file";
+                return false;
+            }
+            return true;
+            break;
+    }
+
+    LOG(WARNING) << "VegaMeshIO::write error: this element type not supported in vega";
+    return false;
+}
+
 std::shared_ptr<vega::VolumetricMesh>
 VegaMeshIO::readVegaMesh(const std::string& filePath)
 {

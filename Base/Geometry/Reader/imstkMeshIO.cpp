@@ -122,4 +122,19 @@ MeshIO::getFileType(const std::string& filePath)
     return meshType;
 }
 
+bool
+MeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath)
+{
+    MeshFileType meshType = MeshIO::getFileType(filePath);
+    switch (meshType)
+    {
+        case MeshFileType::VEG:
+            return VegaMeshIO::write(imstkMesh, filePath, meshType);
+            break;
+    }
+
+    LOG(WARNING) << "MeshIO::write error: file type not supported";
+    return nullptr;
+}
+
 } // imstk
