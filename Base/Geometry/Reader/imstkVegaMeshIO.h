@@ -19,12 +19,12 @@
 
    =========================================================================*/
 
-#ifndef imstkVegaMeshReader_h
-#define imstkVegaMeshReader_h
+#ifndef imstkVegaMeshIO_h
+#define imstkVegaMeshIO_h
 
 #include <memory>
 
-#include "imstkMeshReader.h"
+#include "imstkMeshIO.h"
 #include "imstkVolumetricMesh.h"
 
 // Vega
@@ -35,24 +35,24 @@ namespace imstk
 {
 
 ///
-/// \class VegaMeshReader
+/// \class VegaMeshIO
 ///
 /// \brief Contains utility classes that convert vega volume mesh to volume mesh and
 /// vice-versa
 ///
-class VegaMeshReader
+class VegaMeshIO
 {
 
 public:
     ///
     /// \brief Default constructor
     ///
-    VegaMeshReader() = default;
+    VegaMeshIO() = default;
 
     ///
     /// \brief Default destructor
     ///
-    ~VegaMeshReader() = default;
+    ~VegaMeshIO() = default;
 
     ///
     /// \brief Read and generate volumetric mesh given a external vega mesh file
@@ -89,4 +89,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkVegaMeshReader_h
+#endif // ifndef imstkVegaMeshIO_h

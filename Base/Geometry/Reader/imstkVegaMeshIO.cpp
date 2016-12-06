@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#include "imstkVegaMeshReader.h"
-#include "imstkMeshReader.h"
+#include "imstkVegaMeshIO.h"
+#include "imstkMeshIO.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
 
@@ -32,23 +32,23 @@ namespace imstk
 {
 
 std::shared_ptr<VolumetricMesh>
-VegaMeshReader::read(const std::string& filePath, MeshFileType meshType)
+VegaMeshIO::read(const std::string& filePath, MeshFileType meshType)
 {
     if (meshType != MeshFileType::VEG)
     {
-        LOG(WARNING) << "VegaMeshReader::read error: file type not supported";
+        LOG(WARNING) << "VegaMeshIO::read error: file type not supported";
         return nullptr;
     }
 
     // Read Vega Mesh
-    std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::readVegaMesh(filePath);
+    std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshIO::readVegaMesh(filePath);
 
     // Convert to Volumetric Mesh
-    return VegaMeshReader::convertVegaMeshToVolumetricMesh(vegaMesh);
+    return VegaMeshIO::convertVegaMeshToVolumetricMesh(vegaMesh);
 }
 
 std::shared_ptr<vega::VolumetricMesh>
-VegaMeshReader::readVegaMesh(const std::string& filePath)
+VegaMeshIO::readVegaMesh(const std::string& filePath)
 {
     auto fileName = const_cast<char*>(filePath.c_str());
     std::shared_ptr<vega::VolumetricMesh> vegaMesh(vega::VolumetricMeshLoader::load(fileName));
@@ -56,11 +56,11 @@ VegaMeshReader::readVegaMesh(const std::string& filePath)
 }
 
 std::shared_ptr<imstk::VolumetricMesh>
-VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
+VegaMeshIO::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
 {
     // Copy vertices
     StdVectorOfVec3d vertices;
-    VegaMeshReader::copyVertices(vegaMesh, vertices);
+    VegaMeshIO::copyVertices(vegaMesh, vertices);
 
     // Copy cells
     auto cellType = vegaMesh->getElementType();
@@ -68,7 +68,7 @@ VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::Volumetric
     if(cellType == vega::VolumetricMesh::TET)
     {
         std::vector<TetrahedralMesh::TetraArray> cells;
-        VegaMeshReader::copyCells<4>(vegaMesh, cells);
+        VegaMeshIO::copyCells<4>(vegaMesh, cells);
 
         auto tetMesh = std::make_shared<TetrahedralMesh>();
         tetMesh->initialize(vertices, cells, false);
@@ -77,7 +77,7 @@ VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::Volumetric
     else if(cellType == vega::VolumetricMesh::CUBIC)
     {
         std::vector<HexahedralMesh::HexaArray> cells;
-        VegaMeshReader::copyCells<8>(vegaMesh, cells);
+        VegaMeshIO::copyCells<8>(vegaMesh, cells);
 
         auto hexMesh = std::make_shared<HexahedralMesh>();
         hexMesh->initialize(vertices, cells, false);
@@ -86,7 +86,7 @@ VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::Volumetric
     else
     {
         vegaMesh.reset();
-        LOG(WARNING) << "VegaMeshReader::read error: invalid cell type.";
+        LOG(WARNING) << "VegaMeshIO::read error: invalid cell type.";
         return nullptr;
     }
 
@@ -96,7 +96,7 @@ VegaMeshReader::convertVegaMeshToVolumetricMesh(std::shared_ptr<vega::Volumetric
 }
 
 void
-VegaMeshReader::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
+VegaMeshIO::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
                              StdVectorOfVec3d& vertices)
 {
     for(size_t i = 0; i < vegaMesh->getNumVertices(); ++i)
@@ -108,7 +108,7 @@ VegaMeshReader::copyVertices(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
 
 template<size_t dim>
 void
-VegaMeshReader::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
+VegaMeshIO::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
                           std::vector<std::array<size_t,dim>>& cells)
 {
     std::array<size_t,dim> cell;
@@ -123,7 +123,7 @@ VegaMeshReader::copyCells(std::shared_ptr<vega::VolumetricMesh> vegaMesh,
 }
 
 std::shared_ptr<vega::VolumetricMesh>
-VegaMeshReader::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> imstkVolMesh)
+VegaMeshIO::convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> imstkVolMesh)
 {
      // as of now, only works for TET elements
 	if (imstkVolMesh->getType() == Geometry::Type::TetrahedralMesh)

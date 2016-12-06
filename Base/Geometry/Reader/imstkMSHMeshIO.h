@@ -9,7 +9,7 @@
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0.txt
+       http://www.apache.org/licenses/LICENSE-2.0.txt
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,37 +19,37 @@
 
     =========================================================================*/
 
-#ifndef imstkMSHMeshReader_h
-#define imstkMSHMeshReader_h
+#ifndef imstkMSHMeshIO_h
+#define imstkMSHMeshIO_h
 
 #include <memory>
 #include <vector>
 #include <array>
 
-#include "imstkMeshReader.h"
+#include "imstkMeshIO.h"
 #include "imstkVolumetricMesh.h"
 
 namespace imstk
 {
 
 ///
-/// \class MSHMeshReader
+/// \class MSHMeshIO
 ///
 /// \brief Contains utility to generate imstk::VolumetricMesh from mesh given in msh
 /// file format. Only works for tet meshes.
 ///
-class MSHMeshReader
+class MSHMeshIO
 {
 public:
     ///
     /// \brief Defualt Constructor
     ///
-    MSHMeshReader() = default;
+    MSHMeshIO() = default;
 
     ///
     /// \brief Default Destructor
     ///
-    ~MSHMeshReader() = default;
+    ~MSHMeshIO() = default;
 
     ///
     /// \brief Read and generate a volumetric mesh given a external msh file
@@ -60,4 +60,4 @@ public:
 
 }
 
-#endif// imstkMSHMeshReader_h
+#endif// imstkMSHMeshIO_h

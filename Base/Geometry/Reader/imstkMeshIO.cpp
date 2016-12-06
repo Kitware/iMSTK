@@ -21,10 +21,10 @@
 
 #include <sys/stat.h>
 
-#include "imstkMeshReader.h"
-#include "imstkVTKMeshReader.h"
-#include "imstkVegaMeshReader.h"
-#include "imstkMSHMeshReader.h"
+#include "imstkMeshIO.h"
+#include "imstkVTKMeshIO.h"
+#include "imstkVegaMeshIO.h"
+#include "imstkMSHMeshIO.h"
 
 #include "g3log/g3log.hpp"
 
@@ -32,15 +32,15 @@ namespace imstk
 {
 
 std::shared_ptr<Mesh>
-MeshReader::read(const std::string& filePath)
+MeshIO::read(const std::string& filePath)
 {
-    if (!MeshReader::fileExists(filePath))
+    if (!MeshIO::fileExists(filePath))
     {
-        LOG(WARNING) << "MeshReader::read error: file not found: " << filePath;
+        LOG(WARNING) << "MeshIO::read error: file not found: " << filePath;
         return nullptr;
     }
 
-    MeshFileType meshType = MeshReader::getFileType(filePath);
+    MeshFileType meshType = MeshIO::getFileType(filePath);
     switch (meshType)
     {
     case MeshFileType::VTK :
@@ -49,36 +49,36 @@ MeshReader::read(const std::string& filePath)
     case MeshFileType::STL :
     case MeshFileType::PLY :
     case MeshFileType::OBJ :
-        return VTKMeshReader::read(filePath, meshType);
+        return VTKMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::VEG :
-        return VegaMeshReader::read(filePath, meshType);
+        return VegaMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::MSH:
-        return MSHMeshReader::read(filePath, meshType);
+        return MSHMeshIO::read(filePath, meshType);
         break;
     }
 
-    LOG(WARNING) << "MeshReader::read error: file type not supported";
+    LOG(WARNING) << "MeshIO::read error: file type not supported";
     return nullptr;
 }
 
 bool
-MeshReader::fileExists(const std::string& file)
+MeshIO::fileExists(const std::string& file)
 {
     struct stat buf;
     return (stat(file.c_str(), &buf) == 0);
 }
 
 const MeshFileType
-MeshReader::getFileType(const std::string& filePath)
+MeshIO::getFileType(const std::string& filePath)
 {
     MeshFileType meshType = MeshFileType::UNKNOWN;
 
     std::string extString = filePath.substr(filePath.find_last_of(".") + 1);
     if (extString.empty())
     {
-        LOG(WARNING) << "MeshReader::getFileType error: invalid file name";
+        LOG(WARNING) << "MeshIO::getFileType error: invalid file name";
         return meshType;
     }
 
@@ -116,7 +116,7 @@ MeshReader::getFileType(const std::string& filePath)
     }
     else
     {
-        LOG(WARNING) << "MeshReader::getFileType error: unknown file extension";
+        LOG(WARNING) << "MeshIO::getFileType error: unknown file extension";
     }
 
     return meshType;

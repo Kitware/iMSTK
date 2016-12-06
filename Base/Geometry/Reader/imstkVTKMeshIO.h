@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkVTKMeshReader_h
-#define imstkVTKMeshReader_h
+#ifndef imstkVTKMeshIO_h
+#define imstkVTKMeshIO_h
 
 #include <memory>
 
@@ -30,7 +30,7 @@
 #include "vtkCellArray.h"
 #include "vtkPointData.h"
 
-#include "imstkMeshReader.h"
+#include "imstkMeshIO.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkTetrahedralMesh.h"
 #include "imstkHexahedralMesh.h"
@@ -39,23 +39,23 @@ namespace imstk
 {
 
 ///
-/// \class VTKMeshReader
+/// \class VTKMeshIO
 ///
 /// \brief
 ///
-class VTKMeshReader
+class VTKMeshIO
 {
 public:
 
     ///
     /// \brief Default constructor
     ///
-    VTKMeshReader() = default;
+    VTKMeshIO() = default;
 
     ///
     /// \brief Default destructor
     ///
-    ~VTKMeshReader() = default;
+    ~VTKMeshIO() = default;
 
     ///
     /// \brief
@@ -112,4 +112,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkVTKMeshReader_h
+#endif // ifndef imstkVTKMeshIO_h
