@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkMeshReader_h
-#define imstkMeshReader_h
+#ifndef imstkMeshIO_h
+#define imstkMeshIO_h
 
 // std library
 #include <memory>
@@ -45,27 +45,28 @@ enum MeshFileType
     STL,
     PLY,
     OBJ,
-    VEG
+    VEG,
+    MSH
 };
 
 ///
-/// \class MeshReader
+/// \class MeshIO
 ///
-/// \brief Mesh data reader
+/// \brief Mesh data IO
 ///
-class MeshReader
+class MeshIO
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    MeshReader() = default;
+    MeshIO() = default;
 
     ///
     /// \brief Destructor
     ///
-    ~MeshReader() = default;
+    ~MeshIO() = default;
 
     ///
     /// \brief Read external file
@@ -73,11 +74,17 @@ public:
     static std::shared_ptr<Mesh> read(const std::string& filePath);
 
     ///
+    /// \brief Write external file
+    ///
+    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath);
+
+    ///
     /// \brief Returns true if the file exists, else false
     ///
     static bool fileExists(const std::string& file);
 
 protected:
+
     ///
     /// \brief Returns the type of the file
     ///
@@ -87,4 +94,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkMeshReader_h
+#endif // ifndef imstkMeshIO_h

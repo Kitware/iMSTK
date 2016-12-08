@@ -32,7 +32,7 @@
 #include "imstkInternalForceModel.h"
 #include "imstkForceModelConfig.h"
 #include "imstkNonlinearSystem.h"
-#include "imstkVegaMeshReader.h"
+#include "imstkVegaMeshIO.h"
 #include "imstkNewtonSolver.h"
 
 //force models
@@ -40,7 +40,7 @@
 #include "imstkLinearFEMForceModel.h"
 #include "imstkCorotationalFEMForceModel.h"
 #include "imstkIsotropicHyperelasticFEMForceModel.h"
-#include "imstkVegaMeshReader.h"
+#include "imstkVegaMeshIO.h"
 
 //vega
 #include "sparseMatrix.h"

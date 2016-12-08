@@ -19,12 +19,12 @@
 
    =========================================================================*/
 
-#ifndef imstkVegaMeshReader_h
-#define imstkVegaMeshReader_h
+#ifndef imstkVegaMeshIO_h
+#define imstkVegaMeshIO_h
 
 #include <memory>
 
-#include "imstkMeshReader.h"
+#include "imstkMeshIO.h"
 #include "imstkVolumetricMesh.h"
 
 // Vega
@@ -35,23 +35,24 @@ namespace imstk
 {
 
 ///
-/// \class VegaMeshReader
+/// \class VegaMeshIO
 ///
 /// \brief Contains utility classes that convert vega volume mesh to volume mesh and
 /// vice-versa
 ///
-class VegaMeshReader
+class VegaMeshIO
 {
+
 public:
     ///
     /// \brief Default constructor
     ///
-    VegaMeshReader() = default;
+    VegaMeshIO() = default;
 
     ///
     /// \brief Default destructor
     ///
-    ~VegaMeshReader() = default;
+    ~VegaMeshIO() = default;
 
     ///
     /// \brief Read and generate volumetric mesh given a external vega mesh file
@@ -63,6 +64,11 @@ public:
     ///
     static std::shared_ptr<vega::VolumetricMesh> readVegaMesh(const std::string& filePath);
 
+    ///
+    /// \brief Write a volumetric mesh in vega file format
+    ///
+    static bool write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType);
+
 protected:
     ///
     /// \brief Generate volumetric mesh given a vega volume mesh
@@ -72,7 +78,7 @@ protected:
     ///
     /// \brief Generate a vega volume mesh given volumetric mesh
     ///
-    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(std::shared_ptr<VolumetricMesh> volumeMesh);
+    static std::shared_ptr<vega::VolumetricMesh> convertVolumetricMeshToVegaMesh(const std::shared_ptr<imstk::VolumetricMesh> volumeMesh);
 
     ///
     /// \brief
@@ -88,4 +94,4 @@ protected:
 
 } // imstk
 
-#endif // ifndef imstkVegaMeshReader_h
+#endif // ifndef imstkVegaMeshIO_h
