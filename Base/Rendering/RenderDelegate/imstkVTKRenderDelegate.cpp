@@ -37,7 +37,8 @@
 #include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
 
-#include "vtkPolyDataMapper.h"
+#include "vtkOpenGLPolyDataMapper.h"
+#include "vtkOpenGLVertexBufferObject.h"
 #include "vtkPolyDataNormals.h"
 #include "vtkTransform.h"
 
@@ -94,17 +95,24 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 }
 
 void
-VTKRenderDelegate::setActorMapper(vtkAlgorithmOutput *source)
+VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source)
 {
-
+    // Add normals
+    /// TODO : replace by vtkTrianglePointsNormals when available
     auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
     normalGen->SetInputConnection(source);
     normalGen->SplittingOff();
+    normalGen->ConsistencyOff();
 
-    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(normalGen->GetOutputPort());
+    m_mapper->SetInputConnection(normalGen->GetOutputPort());
 
-    m_actor->SetMapper(mapper);
+    // Disable auto Shift & Scale which is slow for deformable objects
+    // as it needs to compute a bounding box at every frame
+    auto mapper = dynamic_cast<vtkOpenGLPolyDataMapper*>(m_mapper.GetPointer());
+    if(mapper)
+    {
+        mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
+    }
 }
 
 vtkSmartPointer<vtkActor>
@@ -136,8 +144,6 @@ VTKRenderDelegate::updateActorTransform()
                           angleAxis.axis()[1],
                           angleAxis.axis()[2]);
     m_transform->Translate(pos[0], pos[1], pos[2]);
-
-    m_actor->SetUserTransform(m_transform);
 }
 
 } // imstk

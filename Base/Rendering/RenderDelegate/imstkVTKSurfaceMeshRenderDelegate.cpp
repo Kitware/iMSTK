@@ -27,6 +27,7 @@
 #include <vtkPolyDataNormals.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPoints.h>
+#include <vtkTrivialProducer.h>
 #include <vtkDoubleArray.h>
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
@@ -73,14 +74,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
 
-    // Compute Normals
-    auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
-    normalGen->SetInputData(polydata);
-    normalGen->SplittingOff();
+    // Create connection source
+    auto source = vtkSmartPointer<vtkTrivialProducer>::New();
+    source->SetOutput(polydata);
 
-    // Mapper
-    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(normalGen->GetOutputPort());
+    // Setup Mapper & Actor
+    this->setUpMapper(source->GetOutputPort());
+    this->updateActorTransform();
 
     // Copy textures
     int unit = 0;
@@ -117,17 +117,11 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
         texture->SetWrapMode(vtkTexture::VTKTextureWrapMode::ClampToBorder);
 
         // Link textures
-        mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
+        m_mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
                     vtkDataObject::FIELD_ASSOCIATION_POINTS);
         m_actor->GetProperty()->SetTexture(unit, texture);
         unit++;
     }
-
-    // Actor
-    m_actor->SetMapper(mapper);
-
-    // Transform
-    this->updateActorTransform();
 }
 
 void

@@ -52,14 +52,8 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     auto lines = vtkSmartPointer<vtkLineSource>::New();
     lines->SetPoints(points);
 
-    //Create a mapper and actor
-    auto mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-    mapper->SetInputConnection(lines->GetOutputPort());
-
-    // Actor
-    m_actor->SetMapper(mapper);
-
-    // Transform
+    // Setup Mapper & Actor
+    this->setUpMapper(lines->GetOutputPort());
     this->updateActorTransform();
 }
 
