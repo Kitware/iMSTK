@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Get the type of FEM constraint
     ///
-    Type getType() const { return Type::FEMHex; }
+    inline Type getType() const override { return Type::FEMHex; }
 
     ///
     /// \brief Initializes the FEM hexahedral element constraint

@@ -69,7 +69,7 @@ public:
     ///
     /// \brief Check the validity of the map
     ///
-    bool isValid() const;
+    bool isValid() const override;
 
     ///
     /// \brief Set the geometry that dictates the map

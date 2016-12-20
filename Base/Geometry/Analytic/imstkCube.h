@@ -48,7 +48,7 @@ public:
     ///
     /// \brief Print the cube info
     ///
-    void print() const;
+    void print() const override;
 
     ///
     /// \brief Returns the volume of the cube

@@ -184,7 +184,8 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& delataV, const stateUpdateType updateType = stateUpdateType::displacement);
+    void updateBodyStates(const Vectord& deltaV,
+                          const stateUpdateType updateType = stateUpdateType::displacement) override;
 
     ///
     /// \brief Returns the "function" that evaluates the nonlinear function given

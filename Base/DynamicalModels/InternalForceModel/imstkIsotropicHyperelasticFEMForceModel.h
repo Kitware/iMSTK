@@ -107,7 +107,7 @@ public:
     ///
     /// \brief Get the internal force
     ///
-    void getInternalForce(const Vectord& u, Vectord& internalForce)
+    inline void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
         double *data = const_cast<double*>(u.data());
         m_isotropicHyperelasticFEM->ComputeForces(data, internalForce.data());
@@ -116,7 +116,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix
     ///
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    inline void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
         double *data = const_cast<double*>(u.data());
         m_isotropicHyperelasticFEM->GetTangentStiffnessMatrix(data, m_vegaTangentStiffnessMatrix.get());
@@ -126,7 +126,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix topology
     ///
-    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    inline void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) override
     {
         m_isotropicHyperelasticFEM->GetStiffnessMatrixTopology(tangentStiffnessMatrix);
     }
@@ -134,7 +134,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix and internal force
     ///
-    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    inline void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) override
     {
         double *data = const_cast<double*>(u.data());
         m_isotropicHyperelasticFEM->GetForceAndTangentStiffnessMatrix(data, internalForce.data(), m_vegaTangentStiffnessMatrix.get());
@@ -144,7 +144,7 @@ public:
     ///
     /// \brief Set the tangent stiffness matrix
     ///
-    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
+    inline void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
     {
         m_vegaTangentStiffnessMatrix = K;
     }

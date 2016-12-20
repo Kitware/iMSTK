@@ -53,7 +53,7 @@ public:
     /// \param x Current iterate.
     ///
     void solveGivenState(Vectord &x) override;
-    void solve();
+    void solve() override;
 
     ///
     /// \brief Update forcing term according to Eisenstat-Walker criteria.

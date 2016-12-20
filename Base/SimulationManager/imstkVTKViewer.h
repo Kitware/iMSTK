@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#ifndef imsktVTKViewer_h
+#ifndef imstkVTKViewer_h
 #define imstkVTKViewer_h
 
 #include <memory>

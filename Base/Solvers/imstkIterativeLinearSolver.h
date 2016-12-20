@@ -73,7 +73,7 @@ public:
     ///
     /// \brief Returns true if the solver is iterative
     ///
-    bool isIterative() const
+    bool isIterative() const override
     {
         return true;
     };

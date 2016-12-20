@@ -45,7 +45,7 @@ public:
     ///
     /// \brief Get the type of FEM constraint
     ///
-    Type getType() const { return Type::FEMTet; }
+    inline Type getType() const override { return Type::FEMTet; }
 
     ///
     /// \brief Initialize the tetrahedral FEM constraint

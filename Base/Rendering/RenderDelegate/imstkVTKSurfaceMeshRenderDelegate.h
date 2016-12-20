@@ -54,7 +54,7 @@ public:
     ///
     /// \brief
     ///
-    void update();
+    void update() override;
 
     ///
     /// \brief

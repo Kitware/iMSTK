@@ -59,7 +59,7 @@ public:
     ///
     /// \brief Check the validity of the map
     ///
-    bool isValid() const;
+    bool isValid() const override;
 
     ///
     /// \brief Sets the one-to-one correspondence directly
@@ -89,7 +89,10 @@ public:
     ///
     /// \brief
     ///
-    size_t getMapIdx(const size_t& idx) { return m_oneToOneMap[idx]; }
+    inline size_t getMapIdx(const size_t& idx) override
+    {
+        return m_oneToOneMap[idx];
+    }
 
 protected:
     std::map<size_t, size_t> m_oneToOneMap; ///> One to one mapping data

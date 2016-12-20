@@ -73,6 +73,7 @@ VTKMeshIO::read(const std::string& filePath, MeshFileType meshType)
     default :
     {
         LOG(WARNING) << "VTKMeshIO::read error: file type not supported";
+        return nullptr;
         break;
     }
     }
