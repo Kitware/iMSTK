@@ -24,6 +24,7 @@
 
 #include <memory>
 #include <chrono>
+#include <unordered_map>
 
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -31,8 +32,14 @@ namespace imstk
 {
 
 class SimulationManager;
+class VTKInteractorStyle; // pre-define class needed for VTKEventHandlerFunction
 
+/// Base class of the vtk interactor style used
 using vtkBaseInteractorStyle = vtkInteractorStyleTrackballCamera;
+
+/// Signature of custom function called in each even callback.
+/// Return true to override base class behavior, or false to maintain it.
+using VTKEventHandlerFunction = std::function< bool(VTKInteractorStyle* iStyle) >;
 
 ///
 /// \class classname
@@ -101,27 +108,22 @@ public:
     ///
     virtual void OnMouseWheelBackward() override;
 
-protected:
+private:
 
     friend class VTKViewer;
 
-    ///
-    /// \brief Define SimulationManager that owns this viewer/interactorStyle
-    /// to be able to control the simulation through user interaction
-    ///
-    void setSimulationManager(SimulationManager* simManager);
-
-    ///
-    /// \brief Get the target FPS for rendering
-    ///
-    double getTargetFrameRate() const;
-
-    ///
-    /// \brief Set the target FPS for rendering
-    ///
-    void setTargetFrameRate(const double& fps);
-
-private:
+    /// Custom event handlers
+    /// Return true to override default event slot
+    std::unordered_map<char, VTKEventHandlerFunction> m_onCharFunctionMap;
+    VTKEventHandlerFunction m_onMouseMoveFunction;
+    VTKEventHandlerFunction m_onLeftButtonDownFunction;
+    VTKEventHandlerFunction m_onLeftButtonUpFunction;
+    VTKEventHandlerFunction m_onMiddleButtonDownFunction;
+    VTKEventHandlerFunction m_onMiddleButtonUpFunction;
+    VTKEventHandlerFunction m_onRightButtonDownFunction;
+    VTKEventHandlerFunction m_onRightButtonUpFunction;
+    VTKEventHandlerFunction m_onMouseWheelForwardFunction;
+    VTKEventHandlerFunction m_onMouseWheelBackwardFunction;
 
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
     double m_targetMS = 0.0; ///> expected time between each render frame (in ms)
@@ -129,6 +131,7 @@ private:
     std::chrono::high_resolution_clock::time_point m_post; ///> time point post-rendering
 
 };
+
 
 } // imstk
 

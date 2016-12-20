@@ -83,283 +83,237 @@ VTKInteractorStyle::OnTimer()
 void
 VTKInteractorStyle::OnChar()
 {
-    vtkRenderWindowInteractor *rwi = this->Interactor;
+    char key = this->Interactor->GetKeyCode();
 
-    switch (rwi->GetKeyCode())
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onCharFunctionMap.count(key) &&
+       m_onCharFunctionMap.at(key) &&
+       m_onCharFunctionMap.at(key)(this))
     {
-    // Highlight picked actor
-    case 'p' :
-    case 'P' :
-    {
-        if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
-        {
-            return;
-        }
-
-        if(this->CurrentRenderer != 0)
-        {
-            if (this->State == VTKIS_NONE)
-            {
-                vtkAssemblyPath *path = nullptr;
-                int *eventPos = rwi->GetEventPosition();
-                this->FindPokedRenderer(eventPos[0], eventPos[1]);
-                rwi->StartPickCallback();
-                auto picker = vtkAbstractPropPicker::SafeDownCast(rwi->GetPicker());
-                if ( picker != nullptr )
-                {
-                    picker->Pick(eventPos[0], eventPos[1], 0.0, this->CurrentRenderer);
-                    path = picker->GetPath();
-                }
-                if ( path == nullptr )
-                {
-                    this->HighlightProp(nullptr);
-                    this->PropPicked = 0;
-                }
-                else
-                {
-                    this->HighlightProp(path->GetFirstNode()->GetViewProp());
-                    this->PropPicked = 1;
-                }
-                rwi->EndPickCallback();
-            }
-        }
-        else
-        {
-            vtkWarningMacro(<<"no current renderer on the interactor style.");
-        }
+      return;
     }
-    break;
 
-    // Fly To picked actor
-    case 'f' :
-    case 'F' :
-    {
-        if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
-        {
-            return;
-        }
+    SimulationStatus status = m_simManager->getStatus();
 
-        if(this->CurrentRenderer != 0)
-        {
-            this->AnimState = VTKIS_ANIM_ON;
-            vtkAssemblyPath *path = nullptr;
-            int *eventPos = rwi->GetEventPosition();
-            this->FindPokedRenderer(eventPos[0], eventPos[1]);
-            rwi->StartPickCallback();
-            auto picker = vtkAbstractPropPicker::SafeDownCast(rwi->GetPicker());
-            if ( picker != nullptr )
-            {
-                picker->Pick(eventPos[0], eventPos[1], 0.0, this->CurrentRenderer);
-                path = picker->GetPath();
-            }
-            if (path != nullptr)
-            {
-                rwi->FlyTo(this->CurrentRenderer, picker->GetPickPosition());
-            }
-            this->AnimState = VTKIS_ANIM_OFF;
-        }
-        else
-        {
-            vtkWarningMacro(<<"no current renderer on the interactor style.");
-        }
-    }
-    break;
-
-    // Reset Camera
-    case 'r' :
-    case 'R' :
-    {
-        if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
-        {
-            return;
-        }
-
-        if(this->CurrentRenderer!=0)
-        {
-            this->CurrentRenderer->ResetCamera();
-            this->CurrentRenderer->GetActiveCamera()->SetFocalPoint(0,0,0);
-        }
-        else
-        {
-            vtkWarningMacro(<<"no current renderer on the interactor style.");
-        }
-        rwi->Render();
-    }
-    break;
-
-    // Stop Simulation
-    case 's' :
-    case 'S' :
+    // start simulation
+    if (status == SimulationStatus::INACTIVE && (key == 's' || key == 'S'))
     {
         m_simManager->startSimulation();
     }
-    break;
-
-    // End Simulation
-    case 'q' :
-    case 'Q' :
-    case 'e' :
-    case 'E' :
+    // end Simulation
+    else if (status != SimulationStatus::INACTIVE &&
+             (key == 'q' || key == 'Q' || key == 'e' || key == 'E'))
     {
         m_simManager->endSimulation();
     }
-    break;
-
-    // Play/Pause Simulation
-    case ' ' :
+    else if (key == ' ')
     {
-        if (m_simManager->getStatus() == SimulationStatus::RUNNING)
+        // pause simulation
+        if (status == SimulationStatus::RUNNING)
         {
             m_simManager->pauseSimulation();
         }
-        else if (m_simManager->getStatus() == SimulationStatus::PAUSED)
+        // play simulation
+        else if (status == SimulationStatus::PAUSED)
         {
             m_simManager->runSimulation();
         }
     }
-    break;
-
-    // Quit Viewer
-    case '\u001B':
+    // quit viewer
+    else if (key == '\u001B')
     {
         m_simManager->getViewer()->endRenderingLoop();
-    }break;
-
     }
 }
 
 void
 VTKInteractorStyle::OnMouseMove()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onMouseMoveFunction &&
+       m_onMouseMoveFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnMouseMove();
 }
 
 void
 VTKInteractorStyle::OnLeftButtonDown()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onLeftButtonDownFunction &&
+       m_onLeftButtonDownFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnLeftButtonDown();
 }
 
 void
 VTKInteractorStyle::OnLeftButtonUp()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onLeftButtonUpFunction &&
+       m_onLeftButtonUpFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnLeftButtonUp();
 }
 
 void
 VTKInteractorStyle::OnMiddleButtonDown()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onMiddleButtonDownFunction &&
+       m_onMiddleButtonDownFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnMiddleButtonDown();
 }
 
 void
 VTKInteractorStyle::OnMiddleButtonUp()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onMiddleButtonUpFunction &&
+       m_onMiddleButtonUpFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnMiddleButtonUp();
 }
 
 void
 VTKInteractorStyle::OnRightButtonDown()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onRightButtonDownFunction &&
+       m_onRightButtonDownFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnRightButtonDown();
 }
 
 void
 VTKInteractorStyle::OnRightButtonUp()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onRightButtonUpFunction &&
+       m_onRightButtonUpFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnRightButtonUp();
 }
 
 void
 VTKInteractorStyle::OnMouseWheelForward()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onMouseWheelForwardFunction &&
+       m_onMouseWheelForwardFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnMouseWheelForward();
 }
 
 void
 VTKInteractorStyle::OnMouseWheelBackward()
 {
+    // Call custom function if exists, and return
+    // if it returned `override=true`
+    if(m_onMouseWheelBackwardFunction &&
+       m_onMouseWheelBackwardFunction(this))
+    {
+      return;
+    }
+
+    // Default behavior : ignore mouse if simulation active
     if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
     {
         return;
     }
 
+    // Else : use base class interaction
     vtkBaseInteractorStyle::OnMouseWheelBackward();
 }
 
-void
-VTKInteractorStyle::setSimulationManager(SimulationManager *simManager)
-{
-    m_simManager = simManager;
-}
-
-double
-VTKInteractorStyle::getTargetFrameRate() const
-{
-    if(m_targetMS == 0)
-    {
-        LOG(WARNING) << "VTKInteractorStyle::getTargetFrameRate warning: render target period is set to 0ms, "
-                     << "therefore not regulated by a framerate. Returning 0.";
-        return 0;
-    }
-    return 1000.0/m_targetMS;
-}
-
-void
-VTKInteractorStyle::setTargetFrameRate(const double &fps)
-{
-    if(fps < 0)
-    {
-        LOG(WARNING) << "VTKInteractorStyle::setTargetFrameRate error: framerate must be positive, "
-                     << "or equal to 0 to render as fast as possible.";
-        return;
-    }
-    if(fps == 0)
-    {
-        m_targetMS = 0;
-        return;
-    }
-    m_targetMS = 1000.0/fps;
-    std::cout << "Target framerate: " << fps << " (" << m_targetMS << " ms)"<< std::endl;
-}
 } // imstk
