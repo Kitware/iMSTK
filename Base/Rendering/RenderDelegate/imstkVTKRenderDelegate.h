@@ -29,6 +29,7 @@
 #include "vtkSmartPointer.h"
 #include "vtkAlgorithmOutput.h"
 #include "vtkActor.h"
+#include "vtkPolyDataMapper.h"
 #include "vtkTransform.h"
 
 namespace imstk
@@ -56,7 +57,7 @@ public:
     ///
     /// \brief
     ///
-    void setActorMapper(vtkAlgorithmOutput *source);
+    void setUpMapper(vtkAlgorithmOutput *source);
 
     ///
     /// \brief
@@ -82,10 +83,18 @@ protected:
     ///
     /// \brief Default constructor (protected)
     ///
-    VTKRenderDelegate() {}
+    VTKRenderDelegate()
+    {
+        m_actor = vtkSmartPointer<vtkActor>::New();
+        m_mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        m_transform = vtkSmartPointer<vtkTransform>::New();
+        m_actor->SetMapper(m_mapper);
+        m_actor->SetUserTransform(m_transform);
+    }
 
-    vtkSmartPointer<vtkActor> m_actor = vtkSmartPointer<vtkActor>::New();
-    vtkSmartPointer<vtkTransform> m_transform = vtkSmartPointer<vtkTransform>::New();
+    vtkSmartPointer<vtkActor> m_actor;
+    vtkSmartPointer<vtkPolyDataMapper> m_mapper;
+    vtkSmartPointer<vtkTransform> m_transform;
 };
 }
 

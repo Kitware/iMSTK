@@ -38,7 +38,8 @@ VTKCubeRenderDelegate::VTKCubeRenderDelegate(std::shared_ptr<Cube>cube) :
     source->SetYLength(width);
     source->SetZLength(width);
 
-    this->setActorMapper(source->GetOutputPort());
+    // Setup Mapper & Actor
+    this->setUpMapper(source->GetOutputPort());
     this->updateActorTransform();
 }
 

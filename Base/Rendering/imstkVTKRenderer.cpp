@@ -28,6 +28,7 @@
 #include "vtkLightActor.h"
 #include "vtkCameraActor.h"
 #include "vtkAxesActor.h"
+#include "vtkCullerCollection.h"
 
 #include "g3log/g3log.hpp"
 
@@ -90,6 +91,13 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
     m_vtkRenderer->SetBackground(0.66,0.66,0.66);
     m_vtkRenderer->SetBackground2(157.0/255.0*0.66, 186/255.0*0.66, 192.0/255.0*0.66);
     m_vtkRenderer->GradientBackgroundOn();
+
+    ///TODO : only on deformable objects with UseBounds (need vtk update)
+    // Remove culling
+    if (auto culler = m_vtkRenderer->GetCullers()->GetLastItem())
+    {
+        m_vtkRenderer->RemoveCuller(culler);
+    }
 
     this->setup(Mode::SIMULATION);
 
