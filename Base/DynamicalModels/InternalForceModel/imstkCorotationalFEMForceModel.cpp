@@ -52,7 +52,7 @@ CorotationalFEMForceModel::getTangentStiffnessMatrixTopology(vega::SparseMatrix*
 }
 
 void
-CorotationalFEMForceModel::GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+CorotationalFEMForceModel::getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
 {
     double *data = const_cast<double*>(u.data());
     m_corotationalLinearFEM->ComputeForceAndStiffnessMatrix(data, internalForce.data(), m_vegaTangentStiffnessMatrix.get(), m_warp);
@@ -60,7 +60,7 @@ CorotationalFEMForceModel::GetForceAndMatrix(const Vectord& u, Vectord& internal
 }
 
 void
-CorotationalFEMForceModel::SetWarp(const int warp)
+CorotationalFEMForceModel::setWarp(const int warp)
 {
     this->m_warp = warp;
 }

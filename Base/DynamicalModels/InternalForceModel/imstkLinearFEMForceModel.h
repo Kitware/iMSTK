@@ -72,7 +72,7 @@ public:
     ///
     /// \brief Get the internal force
     ///
-    void getInternalForce(const Vectord& u, Vectord& internalForce)
+    inline void getInternalForce(const Vectord& u, Vectord& internalForce) override
     {
         double *data = const_cast<double*>(u.data());
         m_stiffnessMatrix->MultiplyVector(data, internalForce.data());
@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix
     ///
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix)
+    inline void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override
     {
         InternalForceModel::updateValuesFromMatrix(m_stiffnessMatrix, tangentStiffnessMatrix.valuePtr());
     }
@@ -89,7 +89,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix topology
     ///
-    void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix)
+    inline void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) override
     {
         *tangentStiffnessMatrix = new vega::SparseMatrix(*m_stiffnessMatrix.get());
     }
@@ -97,7 +97,7 @@ public:
     ///
     /// \brief Get the tangent stiffness matrix and internal force
     ///
-    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix)
+    inline void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) override
     {
         getInternalForce(u, internalForce);
         getTangentStiffnessMatrix(u, tangentStiffnessMatrix);
@@ -106,7 +106,7 @@ public:
     ///
     /// \brief Set the tangent stiffness matrix
     ///
-    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
+    inline void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override
     {
         m_stiffnessMatrix = K;
     }

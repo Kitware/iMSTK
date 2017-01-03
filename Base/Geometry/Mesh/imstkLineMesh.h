@@ -52,17 +52,17 @@ public:
     ///
     /// \brief
     ///
-    virtual void clear();
+    void clear() override;
 
     ///
     /// \brief
     ///
-    virtual void print() const override;
+    void print() const override;
 
     ///
     /// \brief
     ///
-    virtual double getVolume() const;
+    double getVolume() const override;
 
     ///
     /// \brief

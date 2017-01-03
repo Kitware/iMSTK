@@ -58,7 +58,7 @@ public:
     ///
     /// \brief Get the master geometry
     ///
-    virtual std::shared_ptr<Geometry> getMasterGeometry() const;
+    virtual std::shared_ptr<Geometry> getMasterGeometry() const override;
 
     ///
     /// \brief

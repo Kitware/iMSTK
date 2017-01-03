@@ -57,32 +57,32 @@ public:
     ///
     /// \brief
     ///
-    void getInternalForce(const Vectord& u, Vectord& internalForce);
+    void getInternalForce(const Vectord& u, Vectord& internalForce) override;
 
     ///
     /// \brief
     ///
-    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix);
+    void getTangentStiffnessMatrix(const Vectord& u, SparseMatrixd& tangentStiffnessMatrix) override;
 
     ///
     /// \brief
     ///
-    virtual void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix);
+    void getTangentStiffnessMatrixTopology(vega::SparseMatrix** tangentStiffnessMatrix) override;
 
     ///
     /// \brief
     ///
-    void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix);
+    void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) override;
 
     ///
     /// \brief
     ///
-    void SetWarp(const int warp);
+    void setWarp(const int warp);
 
     ///
     /// \brief
     ///
-    virtual void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override;
+    void setTangentStiffness(std::shared_ptr<vega::SparseMatrix> K) override;
 
 protected:
     std::shared_ptr<vega::CorotationalLinearFEM> m_corotationalLinearFEM;

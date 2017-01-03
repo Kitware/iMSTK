@@ -43,7 +43,7 @@ public:
     ///
     /// \brief Returns PBD constraint of type Type::Dihedral
     ///
-    Type getType() const { return Type::Dihedral; }
+    inline Type getType() const override { return Type::Dihedral; }
 
     ///
     /// \brief initConstraint

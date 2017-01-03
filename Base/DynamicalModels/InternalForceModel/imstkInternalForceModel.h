@@ -70,7 +70,7 @@ public:
     ///
     /// \brief Return both internal force and tangent stiffness matrix given the present state
     ///
-    virtual void GetForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
+    virtual void getForceAndMatrix(const Vectord& u, Vectord& internalForce, SparseMatrixd& tangentStiffnessMatrix) = 0;
 
     ///
     /// \brief Update the values of the Eigen sparse matrix given the linearized array of data from the Vega matrix

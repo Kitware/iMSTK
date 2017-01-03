@@ -506,7 +506,7 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
 
 
 void
-FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
+FEMDeformableBodyModel::updateBodyStates(const Vectord& deltaV, const stateUpdateType updateType)
 {
     auto uPrev = m_previousState->getQ();
     auto u = m_currentState->getQ();
@@ -517,7 +517,7 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
     switch(updateType)
     {
     case stateUpdateType::deltaVelocity:
-        m_currentState->setV(v + solution);
+        m_currentState->setV(v + deltaV);
         m_previousState->setV(m_tmpStorage);
 
         m_tmpStorage = u;
@@ -526,7 +526,7 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
         break;
 
     case stateUpdateType::velocity:
-        m_currentState->setV(solution);
+        m_currentState->setV(deltaV);
         m_previousState->setV(m_tmpStorage);
 
         m_tmpStorage = u;

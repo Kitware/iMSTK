@@ -61,7 +61,7 @@ public:
     ///
     /// \brief Clear all the mesh data
     ///
-    void clear();
+    void clear() override;
 
     ///
     /// \brief Print the hexahedral mesh
