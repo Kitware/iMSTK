@@ -333,10 +333,10 @@ void
 FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
                                               kinematicState& newState)
 {
-    auto uPrev = stateAtT.getQ();
-    auto vPrev = stateAtT.getQDot();
-    auto u = newState.getQ();
-    auto v = newState.getQDot();
+    auto &uPrev = stateAtT.getQ();
+    auto &vPrev = stateAtT.getQDot();
+    auto &u = newState.getQ();
+    auto &v = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
@@ -361,10 +361,10 @@ void
 FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
 kinematicState& newState)
 {
-    auto uPrev = stateAtT.getQ();
-    auto vPrev = stateAtT.getQDot();
-    auto u = newState.getQ();
-    auto v = newState.getQDot();
+    auto &uPrev = stateAtT.getQ();
+    auto &vPrev = stateAtT.getQDot();
+    auto &u = newState.getQ();
+    auto &v = newState.getQDot();
 
     // Do checks if there are uninitialized matrices
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
@@ -491,7 +491,7 @@ void
 FEMDeformableBodyModel::updatePhysicsGeometry()
 {
     auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
-    auto u = m_currentState->getQ();
+    auto &u = m_currentState->getQ();
     volMesh->setVerticesDisplacements(u);
 }
 
@@ -499,9 +499,9 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
 void
 FEMDeformableBodyModel::updateBodyStates(const Vectord& deltaV, const stateUpdateType updateType)
 {
-    auto uPrev = m_previousState->getQ();
-    auto u = m_currentState->getQ();
-    auto v = m_currentState->getQDot();
+    auto &uPrev = m_previousState->getQ();
+    auto &u = m_currentState->getQ();
+    auto &v = m_currentState->getQDot();
 
     m_tmpStorage = v;
 
