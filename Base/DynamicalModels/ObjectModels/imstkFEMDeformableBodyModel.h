@@ -184,19 +184,21 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& deltaV,
-                          const stateUpdateType updateType = stateUpdateType::displacement) override;
+    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType = stateUpdateType::displacement);
+    void updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType = stateUpdateType::displacement);
+    void updateBodyPreviousStates();
 
     ///
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType getFunction(const bool semiImplicit = true);
+    NonLinearSystem::VectorFunctionType getFunction();
 
     ///
     /// \brief Get the function that updates the model given the solution
     ///
     NonLinearSystem::UpdateFunctionType getUpdateFunction();
+    NonLinearSystem::UpdatePrevStateFunctionType getUpdatePrevStateFunction();
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear

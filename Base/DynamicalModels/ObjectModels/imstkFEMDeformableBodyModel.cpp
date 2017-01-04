@@ -494,9 +494,22 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
     volMesh->setVerticesDisplacements(u);
 }
 
+void
+FEMDeformableBodyModel::updateBodyPreviousStates()
+{
+    m_previousState->setU(m_currentState->getQ());
+    m_previousState->setV(m_currentState->getQDot());
+}
 
 void
 FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
+{
+    updateBodyPreviousStates();
+    updateBodyIntermediateStates(solution, updateType);
+}
+
+void
+FEMDeformableBodyModel::updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType /*= stateUpdateType::displacement*/)
 {
     auto &uPrev = m_previousState->getQ();
     auto &u = m_currentState->getQ();
@@ -524,10 +537,10 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
 }
 
 NonLinearSystem::VectorFunctionType
-FEMDeformableBodyModel::getFunction(const bool semiImplicit)
+FEMDeformableBodyModel::getFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return [&, this](const Vectord& q) -> const Vectord&
+    return[&, this](const Vectord& q, const bool semiImplicit) -> const Vectord&
     {
         //updateBodyStates(-q, stateUpdateType::deltaVelocity);
         if (semiImplicit)
@@ -560,9 +573,21 @@ NonLinearSystem::UpdateFunctionType
 FEMDeformableBodyModel::getUpdateFunction()
 {
     // Function to evaluate the nonlinear objective function given the current state
-    return[&, this](const Vectord& q) -> void
+    return[&, this](const Vectord& q, const bool fullyImplicit) -> void
     {
+        (fullyImplicit) ?
+        updateBodyIntermediateStates(q, stateUpdateType::deltaVelocity) :
         updateBodyStates(q, stateUpdateType::deltaVelocity);
+    };
+}
+
+NonLinearSystem::UpdatePrevStateFunctionType
+FEMDeformableBodyModel::getUpdatePrevStateFunction()
+{
+    // Function to evaluate the nonlinear objective function given the current state
+    return[&, this]() -> void
+    {
+        updateBodyPreviousStates();
     };
 }
 

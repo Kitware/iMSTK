@@ -35,7 +35,7 @@ NewtonSolver::NewtonSolver():
     relativeTolerance(1e-6),
     gamma(0.9),
     etaMax(0.9),
-    maxIterations(50),
+    maxIterations(1),
     useArmijo(true) {}
 
 
@@ -49,7 +49,7 @@ NewtonSolver::solveGivenState(Vectord& x)
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm = this->m_nonLinearSystem->evaluateF(x).norm();
+    double fnorm = this->m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
     double stopTolerance = this->absoluteTolerance + this->relativeTolerance * fnorm;
 
     this->linearSolver->setTolerance(stopTolerance);
@@ -93,41 +93,60 @@ NewtonSolver::solve()
         return;
     }
 
+    size_t iterNum;
     auto &u = this->m_nonLinearSystem->getUnknownVector();
-    Vectord du = u;
-    du.setZero();
+    Vectord du = u; // make this a class member in future
 
-    for (size_t i = 0; i < 1; ++i)
+    double error0, error;
+    for (iterNum = 0; iterNum < maxIterations; ++iterNum)
     {
-        du.setZero();
-        this->updateJacobian(u);
-        this->linearSolver->solve(du);
-        u -= du;
-        this->m_nonLinearSystem->m_FUpdate(u);
+        error = updateJacobian(u);
+
+        if (iterNum == 0)
+        {
+            error0 = error;
+        }
+
+        if (error / error0 < relativeTolerance && iterNum>0)
+        {
+            //std::cout << "Num. of Newton Iterations: " << i << "\tError ratio: " << error/error0 << std::endl;
+            break;
+        }
+
+        linearSolver->solve(du);
+        m_nonLinearSystem->m_FUpdate(du, m_isSemiImplicit);
+    }
+    m_nonLinearSystem->m_FUpdatePrevState();
+
+    if (iterNum == maxIterations && !m_isSemiImplicit)
+    {
+        LOG(WARNING) << "NewtonMethod::solve - The solver did not converge after max. iterations";
     }
 }
 
-void
+double
 NewtonSolver::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
     if (!this->m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - nonlinear system is not set to the nonlinear solver";
-        return;
+        return -1;
     }
 
-    auto &b = this->m_nonLinearSystem->m_F(x);
+    auto &b = this->m_nonLinearSystem->m_F(x, m_isSemiImplicit);
     auto &A = this->m_nonLinearSystem->m_dF(x);
 
     if (A.innerSize() == 0)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
-        return;
+        return -1;
     }
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
     this->linearSolver->setSystem(linearSystem);
+
+    return b.norm();
 }
 
 void

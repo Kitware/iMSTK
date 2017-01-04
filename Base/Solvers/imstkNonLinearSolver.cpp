@@ -46,7 +46,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         return previousFnorm;
     }
 
-    double currentFnorm = this->m_nonLinearSystem->m_F(x).norm();
+    double currentFnorm = this->m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
     // Exit if the function norm satisfies the Armijo-Goldstein condition
     if(currentFnorm < (1.0 - this->m_alpha * lambda[0])*previousFnorm)
@@ -67,7 +67,7 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
-        currentFnorm = this->m_nonLinearSystem->m_F(x).norm();
+        currentFnorm = this->m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
         // Exit if the function norm satisfies the Armijo-Goldstein condition
         if(currentFnorm < (1.0 - this->m_alpha * lambda[0])*previousFnorm)

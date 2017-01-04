@@ -45,9 +45,9 @@ NonLinearSystem::setJacobian(const MatrixFunctionType& function)
 }
 
 const Vectord&
-NonLinearSystem::evaluateF(const Vectord& x)
+NonLinearSystem::evaluateF(const Vectord& x, const bool isSemiImplicit)
 {
-    return this->m_F(x);
+    return this->m_F(x, isSemiImplicit);
 }
 
 const SparseMatrixd&

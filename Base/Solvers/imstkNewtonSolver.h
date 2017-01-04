@@ -84,7 +84,7 @@ public:
     ///
     /// \param x Current iterate.
     ///
-    void updateJacobian(const Vectord &x);
+    double updateJacobian(const Vectord &x);
 
     ///
     /// \brief Get JacobianMatrix. Returns jacobian matrix.
@@ -216,6 +216,24 @@ public:
     double getForcingTerm() const
     {
         return this->forcingTerm;
+    }
+
+    ///
+    /// \brief Set the Newton solver to be fully implicit
+    ///
+    virtual void setToFullyImplicit(const int maxNumIter = 50) override
+    {
+        m_isSemiImplicit = false;
+        maxIterations = maxNumIter;
+    }
+
+    ///
+    /// \brief Set the Newton solver to be fully implicit
+    ///
+    virtual void setToSemiImplicit() override
+    {
+        m_isSemiImplicit = true;
+        maxIterations = 1;
     }
 
 private:
