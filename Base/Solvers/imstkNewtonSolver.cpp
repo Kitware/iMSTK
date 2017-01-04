@@ -93,7 +93,7 @@ NewtonSolver::solve()
         return;
     }
 
-    auto u = this->m_nonLinearSystem->getUnknownVector();
+    auto &u = this->m_nonLinearSystem->getUnknownVector();
     Vectord du = u;
     du.setZero();
 
