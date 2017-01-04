@@ -31,6 +31,8 @@
 //vega
 #include "StVKInternalForces.h"
 #include "StVKStiffnessMatrix.h"
+#include "StVKElementABCDLoader.h"
+
 #include "tetMesh.h"
 
 namespace imstk
@@ -47,7 +49,8 @@ public:
         const double gravity = 10.0) : InternalForceModel()
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), nullptr, withGravity, gravity);
+        vega::StVKElementABCD *precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
         m_vegaStVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
     }
 
