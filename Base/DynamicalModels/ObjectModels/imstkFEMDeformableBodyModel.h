@@ -127,7 +127,7 @@ public:
     ///
     /// \brief Initialize the damping (combines structural and viscous damping) matrix
     ///
-    void initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh);
+    void initializeDampingMatrix();
 
     ///
     /// \brief Initialize the tangent stiffness matrix

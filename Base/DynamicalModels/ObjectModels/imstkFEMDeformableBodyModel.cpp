@@ -104,7 +104,7 @@ FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
 
     initializeForceModel();
     initializeMassMatrix();
-    //initializeDampingMatrix();
+    initializeDampingMatrix();
     initializeTangentStiffness();
     loadInitialStates();
     loadBoundaryConditions();
@@ -226,12 +226,13 @@ FEMDeformableBodyModel::initializeMassMatrix(const bool saveToDisk /*= false*/)
 }
 
 void
-FEMDeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh)
+FEMDeformableBodyModel::initializeDampingMatrix()
 {
-    auto dampingLaplacianCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
-    auto dampingMassCoefficient = this->m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+    auto dampingLaplacianCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingLaplacianCoefficient");
+    auto dampingMassCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingMassCoefficient");
+    auto dampingStiffnessCoefficient = m_forceModelConfiguration->getFloatsOptionsMap().at("dampingStiffnessCoefficient");
 
-    m_damped = (dampingLaplacianCoefficient == 0.0 || dampingMassCoefficient == 0.0) ? false : true;
+    m_damped = (dampingStiffnessCoefficient == 0.0 && dampingLaplacianCoefficient == 0.0 && dampingMassCoefficient == 0.0) ? false : true;
 
     if (!m_damped)
     {
@@ -247,7 +248,7 @@ FEMDeformableBodyModel::initializeDampingMatrix(std::shared_ptr<vega::Volumetric
     auto imstkVolMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
     //std::shared_ptr<vega::VolumetricMesh> vegaMesh = VegaMeshReader::getVegaVolumeMeshFromVolumeMesh(imstkVolMesh);
 
-    auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(vegaMesh.get()));
+    auto meshGraph = std::make_shared<vega::Graph>(*vega::GenerateMeshGraph::Generate(m_vegaPhysicsMesh.get()));
 
     if (!meshGraph)
     {
