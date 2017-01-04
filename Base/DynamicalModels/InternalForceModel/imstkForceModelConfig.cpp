@@ -99,7 +99,7 @@ ForceModelConfig::getForceModelType()
     {
         return ForceModelType::StVK;
     }
-    else if (this->m_stringsOptionMap["femMethod"] == "Corotational")
+    else if (this->m_stringsOptionMap["femMethod"] == "CLFEM")
     {
         return ForceModelType::Corotational;
     }
