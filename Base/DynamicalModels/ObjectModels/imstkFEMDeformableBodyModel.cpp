@@ -142,25 +142,38 @@ FEMDeformableBodyModel::loadBoundaryConditions()
     {
         std::ifstream file(fileName.data());
 
-        if (file.is_open())
+        if (file.peek() == std::ifstream::traits_type::eof())
         {
-            size_t index;
-            while (!file.eof())
-            {
-                file >> index;
-                m_fixedNodeIds.emplace_back(index);
-            }
-        }
-        else
-        {
-            LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: Could not open external file with boundary conditions";
+            LOG(INFO) << "DeformableBodyModel::loadBoundaryConditions: The external boundary conditions file is empty";
             return;
         }
 
-        file.close();
-        return;
-    }
+        if (file.is_open())
+        {
+            size_t index;
+            auto maxAllowed = m_vegaPhysicsMesh->getNumVertices();
+            while (!file.eof())
+            {
+                file >> index;
+                if (index < maxAllowed)
+                {
+                    m_fixedNodeIds.emplace_back(index);
+                }
+                else
+                {
+                    LOG(WARNING) << "FEMDeformableBodyModel::loadBoundaryConditions(): " <<
+                        "The boundary condition node id provided is greater than number of nodes and hence excluded!!";
+                }
+            }
 
+            file.close();
+            std::sort(m_fixedNodeIds.begin(), m_fixedNodeIds.end());// for efficiency
+        }
+        else
+        {
+            LOG(WARNING) << "DeformableBodyModel::loadBoundaryConditions: Could not open boundary conditions file!";
+        }
+    }
 }
 
 void
