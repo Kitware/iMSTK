@@ -333,64 +333,55 @@ void
 FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
                                               kinematicState& newState)
 {
-    // Do checks if there are uninitialized matrices
-
-    /*auto &M = this->evalMass(newState);
-    auto &K = this->evalDFx(newState);
-    auto &f = this->evalRHS(newState);*/
-
-    m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
-
     auto uPrev = stateAtT.getQ();
     auto vPrev = stateAtT.getQDot();
     auto u = newState.getQ();
     auto v = newState.getQDot();
 
+    // Do checks if there are uninitialized matrices
+    m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
-    //m_Feff = m_M * (v - vPrev) / dT;
-    //m_Feff -= m_K * (u - uPrev - vPrev * dT);
-
-    m_Feff = m_K * (vPrev * -dT * dT);
+    m_Feff = m_K * -(uPrev - u + v* dT);
 
     if (m_damped)
     {
-        m_Feff -= dT*m_C*newState.getQDot();
+        m_Feff -= m_C*v;
     }
 
-    m_internalForceModel->getInternalForce(m_Finternal, newState.getQ());
+    m_internalForceModel->getInternalForce(u, m_Finternal);
     m_Feff -= m_Finternal;
     m_Feff += m_explicitExternalForce;
     m_Feff += m_gravityForce;
-
-    //state.applyBoundaryConditions(this->rhs);
+    m_Feff *= dT;
+    m_Feff += m_M * (vPrev - v);
 }
 
 void
 FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
 kinematicState& newState)
 {
-    // Do checks if there are uninitialized matrices
-    m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
-
     auto uPrev = stateAtT.getQ();
     auto vPrev = stateAtT.getQDot();
     auto u = newState.getQ();
     auto v = newState.getQDot();
 
+    // Do checks if there are uninitialized matrices
+    m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Feff = m_K * (vPrev * -dT * dT);
+    m_Feff = m_K * (vPrev * -dT);
 
     if (m_damped)
     {
-        m_Feff -= dT*m_C*newState.getQDot();
+        m_Feff -= m_C*vPrev;
     }
 
-    m_internalForceModel->getInternalForce(m_Finternal, newState.getQ());
+    m_internalForceModel->getInternalForce(u, m_Finternal);
     m_Feff -= m_Finternal;
     m_Feff += m_explicitExternalForce;
     m_Feff += m_gravityForce;
+    m_Feff *= dT;
 }
 
 void
