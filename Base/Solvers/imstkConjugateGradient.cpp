@@ -24,9 +24,6 @@ namespace imstk
 
 ConjugateGradient::ConjugateGradient()
 {
-    m_maxIterations = 100;
-    m_tolerance = 1.0e-4;
-
     m_cgSolver.setMaxIterations(m_maxIterations);
     m_cgSolver.setTolerance(m_tolerance);
 }

@@ -221,7 +221,7 @@ public:
     Vectord& getContactForce();
 
     ///
-    /// \brief
+    /// \brief Returns the unknown vectors
     ///
     Vectord& getUnknownVec() { return m_qSol; }
 

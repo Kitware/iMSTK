@@ -35,25 +35,25 @@ NonLinearSystem::NonLinearSystem(const VectorFunctionType& F, const MatrixFuncti
 void
 NonLinearSystem::setFunction(const VectorFunctionType& function)
 {
-    this->m_F = function;
+    m_F = function;
 }
 
 void
 NonLinearSystem::setJacobian(const MatrixFunctionType& function)
 {
-    this->m_dF = function;
+    m_dF = function;
 }
 
 const Vectord&
 NonLinearSystem::evaluateF(const Vectord& x, const bool isSemiImplicit)
 {
-    return this->m_F(x, isSemiImplicit);
+    return m_F(x, isSemiImplicit);
 }
 
 const SparseMatrixd&
 NonLinearSystem::evaluateJacobian(const Vectord& x)
 {
-    return this->m_dF(x);
+    return m_dF(x);
 }
 
 } //imstk

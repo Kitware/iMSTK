@@ -29,55 +29,54 @@ namespace imstk
 {
 
 NewtonSolver::NewtonSolver():
-    linearSolver(std::make_shared<ConjugateGradient>()),
-    forcingTerm(0.9),
-    absoluteTolerance(1e-3),
-    relativeTolerance(1e-6),
-    gamma(0.9),
-    etaMax(0.9),
-    maxIterations(1),
-    useArmijo(true) {}
-
+    m_linearSolver(std::make_shared<ConjugateGradient>()),
+    m_forcingTerm(0.9),
+    m_absoluteTolerance(1e-3),
+    m_relativeTolerance(1e-6),
+    m_gamma(0.9),
+    m_etaMax(0.9),
+    m_maxIterations(1),
+    m_useArmijo(true){}
 
 void
 NewtonSolver::solveGivenState(Vectord& x)
 {
-    if(!this->m_nonLinearSystem)
+    if(!m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
     // Compute norms, set tolerances and other temporaries
-    double fnorm = this->m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
-    double stopTolerance = this->absoluteTolerance + this->relativeTolerance * fnorm;
+    double fnorm = m_nonLinearSystem->evaluateF(x, m_isSemiImplicit).norm();
+    double stopTolerance = m_absoluteTolerance + m_relativeTolerance * fnorm;
 
-    this->linearSolver->setTolerance(stopTolerance);
+    m_linearSolver->setTolerance(stopTolerance);
 
     Vectord dx = x;
 
-    for(size_t i = 0; i < this->maxIterations; ++i)
+    for(size_t i = 0; i < m_maxIterations; ++i)
     {
         if(fnorm < stopTolerance)
         {
             return;
         }
         this->updateJacobian(x);
-        this->linearSolver->solve(dx);
-        this->m_updateIterate(-dx,x);
+        m_linearSolver->solve(dx);
+        m_updateIterate(-dx,x);
 
         double newNorm = fnorm;
 
         newNorm = this->armijo(dx, x, fnorm);
 
-        if(this->forcingTerm > 0.0 && newNorm > stopTolerance)
+        if(m_forcingTerm > 0.0 && newNorm > stopTolerance)
         {
             double ratio = newNorm / fnorm; // Ratio of successive residual norms
             this->updateForcingTerm(ratio, stopTolerance, fnorm);
 
             // Reset tolerance in the linear solver according to the new forcing term
             // to avoid over solving of the system.
-            this->linearSolver->setTolerance(this->forcingTerm);
+            m_linearSolver->setTolerance(m_forcingTerm);
         }
 
         fnorm = newNorm;
@@ -87,18 +86,19 @@ NewtonSolver::solveGivenState(Vectord& x)
 void
 NewtonSolver::solve()
 {
-    if (!this->m_nonLinearSystem)
+    if (!m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::solve - nonlinear system is not set to the nonlinear solver";
         return;
     }
 
     size_t iterNum;
-    auto &u = this->m_nonLinearSystem->getUnknownVector();
+    auto &u = m_nonLinearSystem->getUnknownVector();
     Vectord du = u; // make this a class member in future
 
     double error0, error;
-    for (iterNum = 0; iterNum < maxIterations; ++iterNum)
+    double epsilon = m_relativeTolerance*m_relativeTolerance;
+    for (iterNum = 0; iterNum < m_maxIterations; ++iterNum)
     {
         error = updateJacobian(u);
 
@@ -107,18 +107,18 @@ NewtonSolver::solve()
             error0 = error;
         }
 
-        if (error / error0 < relativeTolerance && iterNum>0)
+        if (error / error0 < epsilon && iterNum>0)
         {
             //std::cout << "Num. of Newton Iterations: " << i << "\tError ratio: " << error/error0 << std::endl;
             break;
         }
 
-        linearSolver->solve(du);
+        m_linearSolver->solve(du);
         m_nonLinearSystem->m_FUpdate(du, m_isSemiImplicit);
     }
     m_nonLinearSystem->m_FUpdatePrevState();
 
-    if (iterNum == maxIterations && !m_isSemiImplicit)
+    if (iterNum == m_maxIterations && !m_isSemiImplicit)
     {
         LOG(WARNING) << "NewtonMethod::solve - The solver did not converge after max. iterations";
     }
@@ -128,20 +128,20 @@ double
 NewtonSolver::updateJacobian(const Vectord& x)
 {
     // Evaluate the Jacobian and sets the matrix
-    if (!this->m_nonLinearSystem)
+    if (!m_nonLinearSystem)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - nonlinear system is not set to the nonlinear solver";
         return -1;
     }
 
-    auto &b = this->m_nonLinearSystem->m_F(x, m_isSemiImplicit);
-    auto &A = this->m_nonLinearSystem->m_dF(x);
-
+    auto &A = m_nonLinearSystem->m_dF(x);
     if (A.innerSize() == 0)
     {
         LOG(WARNING) << "NewtonMethod::updateJacobian - Size of matrix is 0!";
         return -1;
     }
+
+    auto &b = m_nonLinearSystem->m_F(x, m_isSemiImplicit);
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
     linearSystem->setFilter(m_nonLinearSystem->getFilter());
@@ -153,45 +153,41 @@ NewtonSolver::updateJacobian(const Vectord& x)
 void
 NewtonSolver::updateForcingTerm(const double ratio, const double stopTolerance, const double fnorm)
 {
-    double eta = this->gamma * ratio * ratio;
-    double forcingTermSqr = this->forcingTerm * this->forcingTerm;
+    double eta = m_gamma * ratio * ratio;
+    double forcingTermSqr = m_forcingTerm * m_forcingTerm;
 
     // Save guard to prevent the forcing term to become too small for far away iterates
-    if(this->gamma * forcingTermSqr > .1)
+    if(m_gamma * forcingTermSqr > 0.1)
     {
         // TODO: Log this
-        eta = std::max(eta, this->gamma * forcingTermSqr);
+        eta = std::max(eta, m_gamma * forcingTermSqr);
     }
 
-    this->forcingTerm = std::max(std::min(eta, this->etaMax), 0.5 * stopTolerance / fnorm);
+    m_forcingTerm = std::max(std::min(eta, m_etaMax), 0.5 * stopTolerance / fnorm);
 }
-
 
 void
 NewtonSolver::setLinearSolver(std::shared_ptr< NewtonSolver::LinearSolverType > newLinearSolver)
 {
-    this->linearSolver = newLinearSolver;
+    m_linearSolver = newLinearSolver;
 }
-
 
 std::shared_ptr<NewtonSolver::LinearSolverType>
 NewtonSolver::getLinearSolver() const
 {
-    return this->linearSolver;
+    return m_linearSolver;
 }
-
 
 void
 NewtonSolver::setAbsoluteTolerance(const double aTolerance)
 {
-    this->absoluteTolerance = aTolerance;
+    m_absoluteTolerance = aTolerance;
 }
-
 
 double
 NewtonSolver::getAbsoluteTolerance() const
 {
-    return this->absoluteTolerance;
+    return m_absoluteTolerance;
 }
 
 } // imstk

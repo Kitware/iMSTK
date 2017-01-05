@@ -62,7 +62,7 @@ CorotationalFEMForceModel::getForceAndMatrix(const Vectord& u, Vectord& internal
 void
 CorotationalFEMForceModel::setWarp(const int warp)
 {
-    this->m_warp = warp;
+    m_warp = warp;
 }
 
 void

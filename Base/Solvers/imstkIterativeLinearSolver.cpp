@@ -22,41 +22,36 @@
 namespace imstk
 {
 
-IterativeLinearSolver::IterativeLinearSolver()
-    : m_maxIterations(100)
-{
-}
-
 void
 IterativeLinearSolver::setMaxNumIterations(const size_t maxIter)
 {
-    this->m_maxIterations = maxIter;
+    m_maxIterations = maxIter;
 }
 
 size_t
 IterativeLinearSolver::getMaxNumIterations() const
 {
-    return this->m_maxIterations;
+    return m_maxIterations;
 }
 
 const Vectord&
 IterativeLinearSolver::getResidualVector()
 {
-    return this->m_residual;
+    return m_residual;
 }
 
 const Vectord&
 IterativeLinearSolver::getResidualVector(const Vectord& x)
 {
-    this->m_linearSystem->computeResidual(x, this->m_residual);
-    return this->m_residual;
+    m_linearSystem->computeResidual(x, this->m_residual);
+    return m_residual;
 }
 
 double
 IterativeLinearSolver::getResidual(const Vectord& x)
 {
-    this->m_linearSystem->computeResidual(x, this->m_residual);
-    return this->m_residual.squaredNorm();
+    m_linearSystem->computeResidual(x, this->m_residual);
+    return m_residual.squaredNorm();
 }
 
 void
@@ -71,7 +66,7 @@ IterativeLinearSolver::print() const
 void
 IterativeLinearSolver::solve(Vectord& x)
 {
-    if (!this->m_linearSystem)
+    if (!m_linearSystem)
     {
         LOG(WARNING) << "IterativeLinearSolver::solve: The linear system should be assigned before solving!";
         return;
