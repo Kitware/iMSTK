@@ -21,6 +21,7 @@
 #define imstkNonlinearSystem_h
 
 #include <memory>
+#include <stdio.h>
 
 #include "imstkMath.h"
 
@@ -46,6 +47,7 @@ namespace imstk
         ///
         NonLinearSystem(){};
         NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+
         virtual ~NonLinearSystem(){};
 
 
@@ -85,6 +87,20 @@ namespace imstk
             return *m_unknown;
         }
 
+        /// \brief Get the vector denoting the filter
+        ///
+        void setFilter(std::vector<size_t> & f)
+        {
+            m_Filter = &f;
+        }
+
+        /// \brief Get the vector denoting the filter
+        ///
+        std::vector<size_t>& getFilter()
+        {
+            return *m_Filter;
+        }
+
         ///
         /// \brief Set the update function
         ///
@@ -108,6 +124,7 @@ public:
 
     UpdateFunctionType m_FUpdate;
     UpdatePrevStateFunctionType m_FUpdatePrevState;
+    std::vector<size_t>  *m_Filter;
 };
 
 } // imstk

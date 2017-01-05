@@ -144,9 +144,10 @@ NewtonSolver::updateJacobian(const Vectord& x)
     }
 
     auto linearSystem = std::make_shared<LinearSolverType::LinearSystemType>(A, b);
-    this->linearSolver->setSystem(linearSystem);
+    linearSystem->setFilter(m_nonLinearSystem->getFilter());
+    m_linearSolver->setSystem(linearSystem);
 
-    return b.norm();
+    return b.dot(b);
 }
 
 void

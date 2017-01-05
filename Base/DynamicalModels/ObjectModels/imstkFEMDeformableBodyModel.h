@@ -231,6 +231,10 @@ public:
     void setUpdateType(const stateUpdateType& updateType) { m_updateType = updateType; }
     const stateUpdateType& getUpdateType() const { return m_updateType; }
 
+    /// \brief Returns the unknown vectors
+    ///
+    std::vector<std::size_t>& getFixNodeIds() { return m_fixedNodeIds; }
+
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
