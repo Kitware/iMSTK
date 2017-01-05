@@ -32,7 +32,7 @@ namespace imstk
 {
 
 FEMDeformableBodyModel::FEMDeformableBodyModel() :
-DynamicalModel(DynamicalModelType::elastoDynamics), m_damped(false){}
+DynamicalModel(DynamicalModelType::elastoDynamics){}
 
 void
 FEMDeformableBodyModel::setForceModelConfiguration(std::shared_ptr<ForceModelConfig> fmConfig)
@@ -321,16 +321,17 @@ FEMDeformableBodyModel::initializeTangentStiffness()
 void
 FEMDeformableBodyModel::initializeGravityForce()
 {
-    m_gravityForce.resize(m_numDOF);
-    m_gravityForce.setZero();
+    m_Fgravity.resize(m_numDOF);
+    m_Fgravity.setZero();
     const double gravity = m_forceModelConfiguration->getFloatsOptionsMap().at("gravity");
 
-    m_vegaPhysicsMesh->computeGravity(m_gravityForce.data(), gravity);
+    m_vegaPhysicsMesh->computeGravity(m_Fgravity.data(), gravity);
 }
 
 void
 FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
-                                              kinematicState& newState)
+                                                 kinematicState& newState,
+                                                 const stateUpdateType updateType)
 {
     auto &uPrev = stateAtT.getQ();
     auto &vPrev = stateAtT.getQDot();
@@ -341,24 +342,34 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Feff = m_K * -(uPrev - u + v* dT);
-
-    if (m_damped)
+    switch (updateType)
     {
-        m_Feff -= m_C*v;
-    }
+    case stateUpdateType::deltaVelocity:
 
-    m_internalForceModel->getInternalForce(u, m_Finternal);
-    m_Feff -= m_Finternal;
-    m_Feff += m_explicitExternalForce;
-    m_Feff += m_gravityForce;
-    m_Feff *= dT;
-    m_Feff += m_M * (vPrev - v);
+        m_Feff = m_K * -(uPrev - u + v* dT);
+
+        if (m_damped)
+        {
+            m_Feff -= m_C*v;
+        }
+
+        m_internalForceModel->getInternalForce(u, m_Finternal);
+        m_Feff -= m_Finternal;
+        m_Feff += m_FexplicitExternal;
+        m_Feff += m_Fgravity;
+        m_Feff *= dT;
+        m_Feff += m_M * (vPrev - v);
+
+        break;
+    default:
+        LOG(WARNING) << "FEMDeformableBodyModel::computeImplicitSystemRHS: Update type not supported";
+    }
 }
 
 void
 FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
-kinematicState& newState)
+                                                     kinematicState& newState,
+                                                     const stateUpdateType updateType)
 {
     auto &uPrev = stateAtT.getQ();
     auto &vPrev = stateAtT.getQDot();
@@ -369,54 +380,64 @@ kinematicState& newState)
     m_internalForceModel->getTangentStiffnessMatrix(u, m_K);
     const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Feff = m_K * (vPrev * -dT);
-
-    if (m_damped)
+    switch (updateType)
     {
-        m_Feff -= m_C*vPrev;
-    }
+    case stateUpdateType::deltaVelocity:
 
-    m_internalForceModel->getInternalForce(u, m_Finternal);
-    m_Feff -= m_Finternal;
-    m_Feff += m_explicitExternalForce;
-    m_Feff += m_gravityForce;
-    m_Feff *= dT;
+        m_Feff = m_K * (vPrev * -dT);
+
+        if (m_damped)
+        {
+            m_Feff -= m_C*vPrev;
+        }
+
+        m_internalForceModel->getInternalForce(u, m_Finternal);
+        m_Feff -= m_Finternal;
+        m_Feff += m_FexplicitExternal;
+        m_Feff += m_Fgravity;
+        m_Feff *= dT;
+
+        break;
+
+    default:
+        LOG(WARNING) << "FEMDeformableBodyModel::computeSemiImplicitSystemRHS: Update type not supported";
+    }
 }
 
 void
 FEMDeformableBodyModel::computeImplicitSystemLHS(const kinematicState& stateAtT,
-                                              kinematicState& newState)
+                                                 kinematicState& newState,
+                                                 const stateUpdateType updateType)
 {
-    // Do checks if there are uninitialized matrices
-
-
-    /*auto &M = this->evalMass(newState);
-    auto &K = this->evalDFx(newState);
-    auto &C = this->evalDFv(newState);*/
-
-    updateMassMatrix();
-    m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
-    updateDampingMatrix();
-
     const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_Keff = m_M;
-    if (m_damped)
+    switch (updateType)
     {
-        m_Keff += dT*m_C;
-    }
-    m_Keff += (dT*dT) * m_K;
+    case stateUpdateType::deltaVelocity:
 
-    //previousState.applyBoundaryConditions(this->systemMatrix);
+        updateMassMatrix();
+        m_internalForceModel->getTangentStiffnessMatrix(newState.getQ(), m_K);
+        updateDampingMatrix();
+
+        m_Keff = m_M;
+        if (m_damped)
+        {
+            m_Keff += dT*m_C;
+        }
+        m_Keff += (dT*dT) * m_K;
+
+        break;
+
+    default:
+        LOG(WARNING) << "FEMDeformableBodyModel::computeImplicitSystemLHS: Update type not supported";
+    }
 }
 
 void
 FEMDeformableBodyModel::initializeExplicitExternalForces()
 {
-    m_explicitExternalForce.resize(m_numDOF);
-    m_explicitExternalForce.setZero();
-
-    // Not supported for now
+    m_FexplicitExternal.resize(m_numDOF);
+    m_FexplicitExternal.setZero();
 }
 
 void
@@ -509,7 +530,9 @@ FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpd
 }
 
 void
-FEMDeformableBodyModel::updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType /*= stateUpdateType::displacement*/)
+FEMDeformableBodyModel::updateBodyIntermediateStates(
+                        const Vectord& solution,
+                        const stateUpdateType updateType)
 {
     auto &uPrev = m_previousState->getQ();
     auto &u = m_currentState->getQ();
@@ -531,7 +554,7 @@ FEMDeformableBodyModel::updateBodyIntermediateStates(const Vectord& solution, co
         break;
 
     default:
-        LOG(WARNING) << "DeformableBodyModel::updateBodyStates: Unknown state update type";
+        LOG(WARNING) << "DeformableBodyModel::updateBodyIntermediateStates: Unknown state update type";
     }
     this->m_qSol = m_currentState->getQ();
 }
@@ -542,16 +565,10 @@ FEMDeformableBodyModel::getFunction()
     // Function to evaluate the nonlinear objective function given the current state
     return[&, this](const Vectord& q, const bool semiImplicit) -> const Vectord&
     {
-        //updateBodyStates(-q, stateUpdateType::deltaVelocity);
-        if (semiImplicit)
-        {
-            computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get());
-        }
-        else
-        {
-            computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get());
-        }
-        //applyBoundaryConditions(m_Feff);
+        (semiImplicit) ?
+        computeSemiImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType) :
+        computeImplicitSystemRHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+
         return m_Feff;
     };
 }
@@ -563,8 +580,8 @@ FEMDeformableBodyModel::getFunctionGradient()
     // Gradient of the nonlinear objective function given the current state
     return [&, this](const Vectord& q) -> const SparseMatrixd&
     {
-        computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get());
-        //applyBoundaryConditions(m_Keff);
+        computeImplicitSystemLHS(*m_previousState.get(), *m_currentState.get(), m_updateType);
+
         return m_Keff;
     };
 }
@@ -576,8 +593,8 @@ FEMDeformableBodyModel::getUpdateFunction()
     return[&, this](const Vectord& q, const bool fullyImplicit) -> void
     {
         (fullyImplicit) ?
-        updateBodyIntermediateStates(q, stateUpdateType::deltaVelocity) :
-        updateBodyStates(q, stateUpdateType::deltaVelocity);
+        this->updateBodyIntermediateStates(q, m_updateType) :
+        this->updateBodyStates(q, m_updateType);
     };
 }
 
@@ -587,7 +604,7 @@ FEMDeformableBodyModel::getUpdatePrevStateFunction()
     // Function to evaluate the nonlinear objective function given the current state
     return[&, this]() -> void
     {
-        updateBodyPreviousStates();
+        this->updateBodyPreviousStates();
     };
 }
 
