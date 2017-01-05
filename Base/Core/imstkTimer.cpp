@@ -41,7 +41,7 @@ CpuTimer::cpuTimerConstants[] = {
 void
 StopWatch::start()
 {
-//    wallClockTimeKeeper = std::chrono::high_resolution_clock::now();
+    wallClockTimeKeeper = std::chrono::high_resolution_clock::now();
     this->state = TimerState::started;
 }
 
@@ -148,10 +148,10 @@ StopWatch::printTimeElapsed(std::string const& name /* = std::string("noName")*/
 double
 StopWatch::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
-    return 0;
-//    return std::chrono::duration<double, std::milli>
-//        (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
-//        wcTimerConstants[(int)unitType];
+    //return 0;
+    return std::chrono::duration<double, std::milli>
+        (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
+        wcTimerConstants[(int)unitType];
 }
 
 double
