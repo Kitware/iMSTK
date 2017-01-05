@@ -75,7 +75,7 @@ public:
     };
 
 private:
-    Eigen::LDLT<Matrixd> solver;
+    Eigen::LDLT<Matrixd> m_solver;
 };
 
 ///
@@ -113,7 +113,7 @@ public:
     void solve(const Vectord &rhs, Vectord &x);
 
 private:
-    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::Index>> solver;//?
+    Eigen::SparseLU<SparseMatrixd, Eigen::COLAMDOrdering<MatrixType::Index>> m_solver;//?
 };
 
 } // imstk

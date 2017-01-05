@@ -32,6 +32,7 @@
 //vega
 #include "StVKInternalForces.h"
 #include "StVKStiffnessMatrix.h"
+#include "StVKElementABCDLoader.h"
 
 namespace imstk
 {
@@ -53,21 +54,32 @@ public:
     {
         auto tetMesh = std::dynamic_pointer_cast<vega::TetMesh>(mesh);
 
-        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), nullptr, withGravity, gravity);
+        vega::StVKElementABCD *precomputedIntegrals = vega::StVKElementABCDLoader::load(tetMesh.get());
+        m_stVKInternalForces = std::make_shared<vega::StVKInternalForces>(tetMesh.get(), precomputedIntegrals, withGravity, gravity);
 
         auto stVKStiffnessMatrix = std::make_shared<vega::StVKStiffnessMatrix>(m_stVKInternalForces.get());
-        auto s = m_stiffnessMatrix.get();
-        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&s);
-        double * zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
+
+        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&m_stiffnessMatrixRawPtr);
+        std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix2(m_stiffnessMatrixRawPtr);
+        m_stiffnessMatrix = m_stiffnessMatrix2;
+
+        auto K = m_stiffnessMatrix.get();
+        stVKStiffnessMatrix->GetStiffnessMatrixTopology(&K);
+        double *zero = (double*)calloc(m_stiffnessMatrix->GetNumRows(), sizeof(double));
         stVKStiffnessMatrix->ComputeStiffnessMatrix(zero, m_stiffnessMatrix.get());
         free(zero);
-        //delete(stVKStiffnessMatrix);
     };
 
     ///
     /// \brief Destructor
     ///
-    virtual ~LinearFEMForceModel() = default;
+    virtual ~LinearFEMForceModel()
+    {
+        if (m_stiffnessMatrixRawPtr)
+        {
+            delete m_stiffnessMatrixRawPtr;
+        }
+    };
 
     ///
     /// \brief Get the internal force
@@ -114,6 +126,9 @@ public:
 protected:
     std::shared_ptr<vega::SparseMatrix> m_stiffnessMatrix;
     std::shared_ptr<vega::StVKInternalForces> m_stVKInternalForces;
+
+    // tmp
+    vega::SparseMatrix *m_stiffnessMatrixRawPtr;
 };
 
 } // imstk

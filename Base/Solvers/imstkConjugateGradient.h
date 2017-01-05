@@ -41,20 +41,20 @@ public:
     ///
     /// \brief Constructors/Destructor
     ///
-    ConjugateGradient() = default;
+    ConjugateGradient();
+    ConjugateGradient(const SparseMatrixd &A, const Vectord& rhs);
     ~ConjugateGradient() = default;
 
     ///
-    /// \brief Constructor
+    /// \brief Remove specific constructor signatures
     ///
-    ConjugateGradient(const SparseMatrixd &A, const Vectord& rhs);
     ConjugateGradient(const ConjugateGradient &) = delete;
     ConjugateGradient &operator=(const ConjugateGradient &) = delete;
 
     ///
     /// \brief Do one iteration of the method.
     ///
-    void iterate(Vectord& x, bool updateResidual = true) override;
+    void iterate(Vectord& x, bool updateResidual = true) override{};
 
     ///
     /// \brief Solve the system of equations.
@@ -92,9 +92,20 @@ public:
     ///
     void print() const override;
 
+    ///
+    /// \brief Apply a filter to the vector supplied
+    ///
+    void filter(Vectord& x, const std::vector<size_t>& filter);
+
 private:
+
+    ///
+    /// \brief Modified Conjugate gradient solver
+    ///
+    void modifiedCGSolve(Vectord& x);
+
     ///> Pointer to the Eigen's Conjugate gradient solver
-    Eigen::ConjugateGradient<SparseMatrixd> cgSolver;
+    Eigen::ConjugateGradient<SparseMatrixd> m_cgSolver;
 };
 
 } // imstk

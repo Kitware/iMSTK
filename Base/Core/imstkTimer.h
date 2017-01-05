@@ -113,7 +113,7 @@ private:
     TimerState state;
     std::vector<double> lapTimes;
     std::vector<std::string> lapNames;
-    std::chrono::steady_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
+    std::chrono::high_resolution_clock::time_point wallClockTimeKeeper; ///> time keeper for wall clock time
 };
 
 ///

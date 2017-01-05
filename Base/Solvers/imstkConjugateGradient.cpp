@@ -22,61 +22,123 @@
 namespace imstk
 {
 
-ConjugateGradient::ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs) : cgSolver(A)
+ConjugateGradient::ConjugateGradient()
 {
-    m_linearSystem = std::make_shared<LinearSystem<SparseMatrixd>>(A, rhs);
-    m_maxIterations = rhs.size();
-    m_tolerance = 1.0e-6;
+    m_cgSolver.setMaxIterations(m_maxIterations);
+    m_cgSolver.setTolerance(m_tolerance);
+}
 
-    cgSolver.setMaxIterations(m_maxIterations);
-    cgSolver.setTolerance(m_tolerance);
-    cgSolver.compute(A);
+ConjugateGradient::ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs) : ConjugateGradient()
+{
+    this->setSystem(std::make_shared<LinearSystem<SparseMatrixd>>(A, rhs));
 }
 
 void
-ConjugateGradient::iterate(Vectord& , bool)
+ConjugateGradient::filter(Vectord& x, const std::vector<size_t>& filter)
 {
-    // Nothing to do
+    size_t threeI;
+    for (auto &i: filter)
+    {
+        threeI = 3 * i;
+        x(threeI) = x(threeI + 1) = x(threeI + 2) = 0.0;
+    }
 }
 
 void
 ConjugateGradient::solve(Vectord& x)
 {
-    if(!this->m_linearSystem)
+    if(!m_linearSystem)
     {
-        // TODO: Log this
+        LOG(WARNING) << "ConjugateGradient::solve: Linear system is not supplied for CG solver!";
         return;
     }
-    cgSolver.setMaxIterations(1000);
-    cgSolver.setTolerance(1.0e-5);
-    x = cgSolver.solve(m_linearSystem->getRHSVector());
+
+    if (m_linearSystem->getFilter().size() == 0)
+    {
+        x = m_cgSolver.solve(m_linearSystem->getRHSVector());
+    }
+    else
+    {
+        this->modifiedCGSolve(x);
+    }
+}
+
+void
+ConjugateGradient::modifiedCGSolve(Vectord& x)
+{
+    const auto &fixedNodes = m_linearSystem->getFilter();
+    const auto &b = m_linearSystem->getRHSVector();
+    const auto &A = m_linearSystem->getMatrix();
+
+    // Set the initial guess to zero
+    x.setZero();
+
+    auto res = b;
+    filter(res, fixedNodes);
+    auto c = res;
+    auto delta = res.dot(res);
+    auto deltaPrev = delta;
+    const auto eps = m_tolerance*m_tolerance*delta;
+    double alpha = 0.0;
+    double dotval;
+    auto q = Vectord(b.size()).setZero();
+    size_t iterNum = 0;
+
+    while (delta > eps)
+    {
+        q = A * c;
+        filter(q, fixedNodes);
+        dotval = c.dot(q);
+        if (dotval != 0.0)
+        {
+            alpha = delta / dotval;
+        }
+        else
+        {
+            LOG(WARNING) << "ConjugateGradient::modifiedCGSolve: deniminator zero. Terminating MCG iteation!";
+            return;
+        }
+        x += alpha * c;
+        res -= alpha * q;
+        deltaPrev = delta;
+        delta = res.dot(res);
+        c *= delta / deltaPrev;
+        c += res;
+        filter(c, fixedNodes);
+
+        if (++iterNum >= m_maxIterations)
+        {
+            LOG(WARNING) << "ConjugateGradient::modifiedCGSolve - The solver did not converge after max. iterations";
+            break;
+        }
+    }
 }
 
 double
 ConjugateGradient::getResidual(const Vectord& )
 {
-    return cgSolver.error();
+    return m_cgSolver.error();
 }
 
 void
 ConjugateGradient::setTolerance(const double epsilon)
 {
     IterativeLinearSolver::setTolerance(epsilon);
-    cgSolver.setTolerance(epsilon);
+    m_cgSolver.setTolerance(epsilon);
 }
 
 void
 ConjugateGradient::setMaxNumIterations(const size_t maxIter)
 {
     IterativeLinearSolver::setMaxNumIterations(maxIter);
-    cgSolver.setMaxIterations(maxIter);
+    m_cgSolver.setMaxIterations(maxIter);
 }
 
 void
 ConjugateGradient::setSystem(std::shared_ptr<LinearSystem<SparseMatrixd>> newSystem)
 {
     LinearSolver<SparseMatrixd>::setSystem(newSystem);
-    this->cgSolver.compute(this->m_linearSystem->getMatrix());
+    m_cgSolver.compute(m_linearSystem->getMatrix());
 }
 
 void
@@ -92,8 +154,8 @@ ConjugateGradient::print() const
 void
 ConjugateGradient::solve(Vectord& x, const double tolerance)
 {
-    setTolerance(tolerance);
-    solve(x);
+    this->setTolerance(tolerance);
+    this->solve(x);
 }
 
 } // imstk

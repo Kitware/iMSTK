@@ -21,6 +21,7 @@
 #define imstkNonlinearSystem_h
 
 #include <memory>
+#include <stdio.h>
 
 #include "imstkMath.h"
 
@@ -35,9 +36,10 @@ namespace imstk
     class NonLinearSystem
     {
     public:
-        using VectorFunctionType = std::function < const Vectord&(const Vectord&) > ;
+        using VectorFunctionType = std::function < const Vectord&(const Vectord&, const bool) >;
         using MatrixFunctionType = std::function < const SparseMatrixd&(const Vectord&) > ;
-        using UpdateFunctionType = std::function < void(const Vectord&) > ;
+        using UpdateFunctionType = std::function < void(const Vectord&, const bool) > ;
+        using UpdatePrevStateFunctionType = std::function <void()>;
 
     public:
         ///
@@ -45,6 +47,7 @@ namespace imstk
         ///
         NonLinearSystem(){};
         NonLinearSystem(const VectorFunctionType& F, const MatrixFunctionType& dF);
+
         virtual ~NonLinearSystem(){};
 
 
@@ -61,7 +64,7 @@ namespace imstk
         ///
         /// \brief Evaluate function at a given state
         ///
-        virtual const Vectord& evaluateF(const Vectord& x);
+        virtual const Vectord& evaluateF(const Vectord& x, const bool isSemiImplicit);
 
         ///
         /// \brief Evaluate gradient of the function at a given state
@@ -73,7 +76,7 @@ namespace imstk
         ///
         void setUnknownVector(Vectord& v)
         {
-            m_unknown = v;
+            m_unknown = &v;
         }
 
         ///
@@ -81,7 +84,21 @@ namespace imstk
         ///
         Vectord& getUnknownVector()
         {
-            return m_unknown;
+            return *m_unknown;
+        }
+
+        /// \brief Get the vector denoting the filter
+        ///
+        void setFilter(std::vector<size_t> & f)
+        {
+            m_Filter = &f;
+        }
+
+        /// \brief Get the vector denoting the filter
+        ///
+        std::vector<size_t>& getFilter()
+        {
+            return *m_Filter;
         }
 
         ///
@@ -92,12 +109,22 @@ namespace imstk
             m_FUpdate = updateFunc;
         }
 
+        ///
+        /// \brief Set the update function
+        ///
+        void setUpdatePreviousStatesFunction(const UpdatePrevStateFunctionType& updateFunc)
+        {
+            m_FUpdatePrevState = updateFunc;
+        }
+
 public:
     VectorFunctionType m_F;  ///> Nonlinear function
     MatrixFunctionType m_dF; ///> Gradient of the Nonlinear function with respect to the unknown vector
-    Vectord m_unknown;
+    Vectord *m_unknown;
 
     UpdateFunctionType m_FUpdate;
+    UpdatePrevStateFunctionType m_FUpdatePrevState;
+    std::vector<size_t>  *m_Filter;
 };
 
 } // imstk

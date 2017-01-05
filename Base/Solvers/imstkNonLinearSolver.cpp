@@ -26,7 +26,7 @@ NonLinearSolver::NonLinearSolver(): m_sigma(std::array < double, 2 > {{0.1, 0.5}
                                     m_alpha(1e-4),
                                     m_armijoMax(30)
 {
-    this->m_updateIterate = [](const Vectord& dx, Vectord& x)
+    m_updateIterate = [](const Vectord& dx, Vectord& x)
     {
         x += dx;
     };
@@ -37,19 +37,19 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 {
     /// Temporaries used in the line search
     std::array<double, 3> fnormSqr  = {previousFnorm*previousFnorm, 0.0, 0.0};
-    std::array<double, 3> lambda    = {this->m_sigma[0]*this->m_sigma[1], 1.0, 1.0};
+    std::array<double, 3> lambda    = {m_sigma[0]*m_sigma[1], 1.0, 1.0};
 
     /// Initialize temporaries
-    if(!this->m_nonLinearSystem)
+    if(!m_nonLinearSystem)
     {
         // TODO: log this
         return previousFnorm;
     }
 
-    double currentFnorm = this->m_nonLinearSystem->m_F(x).norm();
+    double currentFnorm = m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
     // Exit if the function norm satisfies the Armijo-Goldstein condition
-    if(currentFnorm < (1.0 - this->m_alpha * lambda[0])*previousFnorm)
+    if(currentFnorm < (1.0 - m_alpha * lambda[0])*previousFnorm)
     {
         // TODO: Log this
         return currentFnorm;
@@ -60,17 +60,17 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
 
     // Starts Armijo line search loop
     size_t i;
-    for(i = 0; i < this->m_armijoMax; ++i)
+    for(i = 0; i < m_armijoMax; ++i)
     {
         /// Update x and keep books on lambda
-        this->m_updateIterate(-lambda[0]*dx,x);
+        m_updateIterate(-lambda[0]*dx,x);
         lambda[2] = lambda[1];
         lambda[1] = lambda[0];
 
-        currentFnorm = this->m_nonLinearSystem->m_F(x).norm();
+        currentFnorm = m_nonLinearSystem->m_F(x, !m_isSemiImplicit).norm();
 
         // Exit if the function norm satisfies the Armijo-Goldstein condition
-        if(currentFnorm < (1.0 - this->m_alpha * lambda[0])*previousFnorm)
+        if(currentFnorm < (1.0 - m_alpha * lambda[0])*previousFnorm)
         {
         // TODO: Log this
             return currentFnorm;
@@ -84,13 +84,11 @@ NonLinearSolver::armijo(const Vectord& dx, Vectord& x, const double previousFnor
         this->parabolicModel(fnormSqr, lambda);
     }
 
-    if(i == this->m_armijoMax)
+    if(i == m_armijoMax)
     {
         // TODO: Add to logger
 //         std::cout << "Maximum number of Armijo iterations reached." << std::endl;
     }
-
-
     return currentFnorm;
 }
 
@@ -108,21 +106,21 @@ NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<do
 
     if(a >= 0)
     {
-        lambda[0] = this->m_sigma[0] * lambda[1];
+        lambda[0] = m_sigma[0] * lambda[1];
         return;
     }
 
     double b = lambda[1] * a2 - lambda[2] * a1;
     double newLambda = -.5 * b / a;
 
-    if(newLambda < this->m_sigma[0] * lambda[1])
+    if(newLambda < m_sigma[0] * lambda[1])
     {
-        newLambda = this->m_sigma[0] * lambda[1];
+        newLambda = m_sigma[0] * lambda[1];
     }
 
-    if(newLambda > this->m_sigma[1] * lambda[1])
+    if(newLambda > m_sigma[1] * lambda[1])
     {
-        newLambda = this->m_sigma[1] * lambda[1];
+        newLambda = m_sigma[1] * lambda[1];
     }
 
     lambda[0] = newLambda;
@@ -131,55 +129,55 @@ NonLinearSolver::parabolicModel(const std::array<double,3> &fnorm, std::array<do
 void
 NonLinearSolver::setSigma(const std::array<double,2> &newSigma)
 {
-    this->m_sigma = newSigma;
+    m_sigma = newSigma;
 }
 
 const std::array<double,2> &
 NonLinearSolver::getSigma() const
 {
-    return this->m_sigma;
+    return m_sigma;
 }
 
 void
 NonLinearSolver::setAlpha(const double newAlpha)
 {
-    this->m_alpha = newAlpha;
+    m_alpha = newAlpha;
 }
 
 double
 NonLinearSolver::getAlpha() const
 {
-    return this->m_alpha;
+    return m_alpha;
 }
 
 void
 NonLinearSolver::setArmijoMax(const size_t newArmijoMax)
 {
-    this->m_armijoMax = newArmijoMax;
+    m_armijoMax = newArmijoMax;
 }
 
 size_t
 NonLinearSolver::getArmijoMax() const
 {
-    return this->m_armijoMax;
+    return m_armijoMax;
 }
 
 void
 NonLinearSolver::setSystem(std::shared_ptr<NonLinearSystem> newSystem)
 {
-    this->m_nonLinearSystem = newSystem;
+    m_nonLinearSystem = newSystem;
 }
 
 std::shared_ptr<NonLinearSystem>
 NonLinearSolver::getSystem() const
 {
-    return this->m_nonLinearSystem;
+    return m_nonLinearSystem;
 }
 
 void
 NonLinearSolver::setUpdateIterate(const NonLinearSolver::UpdateIterateType& newUpdateIterate)
 {
-    this->m_updateIterate = newUpdateIterate;
+    m_updateIterate = newUpdateIterate;
 }
 
 } // imstk

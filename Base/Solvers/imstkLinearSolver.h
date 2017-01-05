@@ -54,8 +54,8 @@ public:
     ///
     /// \brief Default constructor/destructor
     ///
-    LinearSolver() : m_linearSystem(nullptr){};
-    virtual ~LinearSolver(){};
+    LinearSolver() {};
+    virtual ~LinearSolver() {};
 
     ///
     /// \brief Main solve routine
@@ -107,7 +107,7 @@ public:
 
 protected:
     Type m_Type;                                        ///> Type of the scene object
-    double m_tolerance = MACHINE_PRECISION;             ///> default tolerance
+    double m_tolerance = 1.0e-4;                        ///> default tolerance
     std::shared_ptr<LinearSystemType> m_linearSystem;   ///> Linear system of equations
 };
 

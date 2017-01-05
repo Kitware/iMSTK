@@ -115,6 +115,22 @@ public:
     ///
     void setUpdateIterate(const UpdateIterateType& newUpdateIterate);
 
+    ///
+    /// \brief Set the Newton solver to be fully implicit
+    ///
+    virtual void setToFullyImplicit(const int maxNumIter = 50)
+    {
+        m_isSemiImplicit = false;
+    }
+
+    ///
+    /// \brief Set the Newton solver to be fully implicit
+    ///
+    virtual void setToSemiImplicit()
+    {
+        m_isSemiImplicit = true;
+    }
+
 protected:
     std::array<double, 2> m_sigma;      ///< Safeguarding bounds for the line search
     double m_alpha;                     ///< Parameter to measure decrease
@@ -122,6 +138,7 @@ protected:
 
     std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///< System of non-linear equations
     UpdateIterateType m_updateIterate;                  ///< Update iteration function
+    bool m_isSemiImplicit = true;                       ///> Semi-Implicit solver
 };
 
 } // imstk

@@ -127,7 +127,7 @@ public:
     ///
     /// \brief Initialize the damping (combines structural and viscous damping) matrix
     ///
-    void initializeDampingMatrix(std::shared_ptr<vega::VolumetricMesh> vegaMesh);
+    void initializeDampingMatrix();
 
     ///
     /// \brief Initialize the tangent stiffness matrix
@@ -140,24 +140,29 @@ public:
     void initializeGravityForce();
 
     ///
+    /// \brief Initialize explicit external forces
+    ///
+    void initializeExplicitExternalForces();
+
+    ///
+    /// \brief Initialize the Eigen matrix with data inside vega sparse matrix
+    ///
+    static void initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix);
+
+    ///
     /// \brief Compute the RHS of the resulting linear system
     ///
-    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState);
+    void computeImplicitSystemRHS(kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
 
     ///
     /// \brief Compute the RHS of the resulting linear system using semi-implicit scheme
     ///
-    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState);
+    void computeSemiImplicitSystemRHS(kinematicState& stateAtT, kinematicState& newState, const stateUpdateType updateType);
 
     ///
     /// \brief Compute the LHS of the resulting linear system
     ///
-    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState);
-
-    ///
-    /// \brief Initialize explicit external forces
-    ///
-    void initializeExplicitExternalForces();
+    void computeImplicitSystemLHS(const kinematicState& prevState, kinematicState& newState, const stateUpdateType updateType);
 
     ///
     /// \brief Update damping Matrix
@@ -184,19 +189,25 @@ public:
     ///
     /// \brief Update states
     ///
-    void updateBodyStates(const Vectord& deltaV,
-                          const stateUpdateType updateType = stateUpdateType::displacement) override;
+    void updateBodyStates(const Vectord& solution, const stateUpdateType updateType);
+    void updateBodyIntermediateStates(const Vectord& solution, const stateUpdateType updateType);
+
+    ///
+    /// \brief Update the previous states given the current state
+    ///
+    void updateBodyPreviousStates();
 
     ///
     /// \brief Returns the "function" that evaluates the nonlinear function given
     /// the state vector
     ///
-    NonLinearSystem::VectorFunctionType getFunction(const bool semiImplicit = true);
+    NonLinearSystem::VectorFunctionType getFunction();
 
     ///
     /// \brief Get the function that updates the model given the solution
     ///
     NonLinearSystem::UpdateFunctionType getUpdateFunction();
+    NonLinearSystem::UpdatePrevStateFunctionType getUpdatePrevStateFunction();
 
     ///
     /// \brief Returns the "function" that evaluates the gradient of the nonlinear
@@ -205,56 +216,55 @@ public:
     NonLinearSystem::MatrixFunctionType getFunctionGradient();
 
     ///
-    /// \brief Initialize the Eigen matrix with data inside vega sparse matrix
-    ///
-    static void initializeEigenMatrixFromVegaMatrix(const vega::SparseMatrix& vegaMatrix, SparseMatrixd& eigenMatrix);
-
-    ///
     /// \brief Get the contact force vector
     ///
     Vectord& getContactForce();
 
     ///
-    /// \brief
+    /// \brief Returns the unknown vectors
     ///
     Vectord& getUnknownVec() { return m_qSol; }
+
+    ///
+    /// \brief Set/Get the update type
+    ///
+    void setUpdateType(const stateUpdateType& updateType) { m_updateType = updateType; }
+    const stateUpdateType& getUpdateType() const { return m_updateType; }
+
+    /// \brief Returns the unknown vectors
+    ///
+    std::vector<std::size_t>& getFixNodeIds() { return m_fixedNodeIds; }
 
 protected:
     std::shared_ptr<InternalForceModel> m_internalForceModel;       ///> Mathematical model for intenal forces
     std::shared_ptr<TimeIntegrator>     m_timeIntegrator;           ///> Time integrator
-
     std::shared_ptr<ForceModelConfig>   m_forceModelConfiguration;  ///> Store the configuration here
     std::shared_ptr<Geometry>           m_forceModelGeometry;       ///> Geometry used by force model
-
-    bool m_damped;      ///> Viscous or structurally damped system
+    std::shared_ptr<NonLinearSystem>    m_nonLinearSystem;          ///> Nonlinear system resulting from TI and force model
 
     /// Matrices typical to a elastodynamics and 2nd order analogous systems
-    SparseMatrixd m_M;    ///> Mass matrix
-    SparseMatrixd m_C;    ///> Damping coefficient matrix
-    SparseMatrixd m_K;    ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
-    SparseMatrixd m_Keff; ///> Effective stiffness matrix (dependent on internal force model and time integrator)
+    SparseMatrixd m_M;      ///> Mass matrix
+    SparseMatrixd m_C;      ///> Damping coefficient matrix
+    SparseMatrixd m_K;      ///> Tangent (derivative of internal force w.r.t displacements) stiffness matrix
+    SparseMatrixd m_Keff;   ///> Effective stiffness matrix (dependent on internal force model and time integrator)
 
-    std::shared_ptr<NonLinearSystem> m_nonLinearSystem; ///> Nonlinear system resulting from TI and force model
+    Vectord m_Finternal;            ///> Vector of internal forces
+    Vectord m_Feff;                 ///> Vector of effective forces
+    Vectord m_Fcontact;             ///> Vector of contact forces
+    Vectord m_Fgravity;             ///> Vector of gravity forces
+    Vectord m_FexplicitExternal;    ///> Vector of explicitly defined external forces
+    Vectord m_qSol;                 ///> Vector to maintain solution at each iteration of nonlinear solver
 
-    Vectord m_Finternal;    ///> Vector of gravity forces
-    Vectord m_Feff;         ///> Vector of effective forces
-    Vectord m_Fcontact;     ///> Vector of contact forces
-    Vectord m_qSol;         ///> Vector to maintain solution at each iteration of nonlinear solver
-    Vectord m_tmpStorage;
+    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;              ///> Mesh used for Physics
+    std::shared_ptr<vega::SparseMatrix>   m_vegaMassMatrix;               ///> Vega mass matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaTangentStiffnessMatrix;   ///> Vega Tangent stiffness matrix
+    std::shared_ptr<vega::SparseMatrix>   m_vegaDampingMatrix;            ///> Vega Laplacian damping matrix
 
-    // External field forces
-    Vectord m_gravityForce;   ///> Vector of gravity forces
+    std::vector<std::size_t> m_fixedNodeIds;                              ///> Nodal IDs of the nodes that are fixed
 
-    // Explicit external forces
-    Vectord m_explicitExternalForce;   ///> Vector of explicitly defined external forces
+    stateUpdateType m_updateType = stateUpdateType::deltaVelocity;        ///> Update type of the model
 
-    // Dirichlet boundary conditions
-    std::vector<std::size_t> m_fixedNodeIds;    ///> Nodal IDs of the nodes that are fixed
-
-    std::shared_ptr<vega::VolumetricMesh> m_vegaPhysicsMesh;            ///> Mesh used for Physics
-    std::shared_ptr<vega::SparseMatrix> m_vegaMassMatrix;               ///> Vega mass matrix
-    std::shared_ptr<vega::SparseMatrix> m_vegaTangentStiffnessMatrix;   ///> Vega Tangent stiffness matrix
-    std::shared_ptr<vega::SparseMatrix> m_vegaDampingMatrix;            ///> Vega Laplacian damping matrix
+    bool m_damped = false;                                                ///> Viscous or structurally damped system
 };
 
 } // imstk

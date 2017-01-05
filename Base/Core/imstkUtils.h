@@ -39,7 +39,7 @@ namespace plotters
 ///
 /// \brief Write a Matlab script to plot a given vector
 ///
-static void writePlotterVectorMatlab(Vectord& x, char* fileName)
+static void writePlotterVectorMatlab(Vectord& x, const char* fileName)
 {
     std::ofstream scriptFile(fileName);
 
@@ -65,7 +65,7 @@ static void writePlotterVectorMatlab(Vectord& x, char* fileName)
 ///
 /// \brief Write a Matlab script to plot X vs Y where X, Y are input vectors of same size
 ///
-static void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, char* fileName)
+static void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, const char* fileName)
 {
     // check if the vectors are of the same size
     if (x.size() != y.size())
@@ -106,7 +106,7 @@ static void writePlotterVecVsVecMatlab(Vectord& x, Vectord& y, char* fileName)
 ///
 /// \brief Write a MatPlotlib script to plot a given vector
 ///
-static void writePlotterVectorMatPlotlib(Vectord& x, char* fileName)
+static void writePlotterVectorMatPlotlib(Vectord& x, const char* fileName)
 {
     std::ofstream scriptFile(fileName);
 
@@ -139,7 +139,7 @@ static void writePlotterVectorMatPlotlib(Vectord& x, char* fileName)
 /// \brief Write a MatPlotlib script to plot X vs Y where X, Y are input vectors of same
 /// size
 ///
-static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, char* fileName)
+static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* fileName)
 {
     // check if the vectors are of the same size
     if (x.size() != y.size())

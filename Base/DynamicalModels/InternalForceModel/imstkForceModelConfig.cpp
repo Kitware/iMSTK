@@ -33,7 +33,7 @@ ForceModelConfig::ForceModelConfig(const std::string &configFileName) : m_loadSu
     }
     else
     {
-        parseConfig(configFileName);
+        this->parseConfig(configFileName);
     }
 };
 
@@ -72,21 +72,21 @@ ForceModelConfig::parseConfig(const std::string &configFileName)
     }
 
     // Store parsed string values
-    this->m_stringsOptionMap.emplace(optNameList.femMethodName, optList.femMethod);
-    this->m_stringsOptionMap.emplace(optNameList.invertibleMaterialName, optList.invertibleMaterial);
-    this->m_stringsOptionMap.emplace(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename);
+    m_stringsOptionMap.emplace(optNameList.femMethodName, optList.femMethod);
+    m_stringsOptionMap.emplace(optNameList.invertibleMaterialName, optList.invertibleMaterial);
+    m_stringsOptionMap.emplace(optNameList.fixedDOFFilenameName, optList.fixedDOFFilename);
 
     // Store parsed floating point values
-    this->m_floatsOptionMap.emplace(optNameList.dampingMassCoefficientName, optList.dampingMassCoefficient);
-    this->m_floatsOptionMap.emplace(optNameList.dampingLaplacianCoefficientName, optList.dampingLaplacianCoefficient);
-    this->m_floatsOptionMap.emplace(optNameList.dampingStiffnessCoefficientName, optList.dampingStiffnessCoefficient);
-    this->m_floatsOptionMap.emplace(optNameList.deformationComplianceName, optList.deformationCompliance);
-    this->m_floatsOptionMap.emplace(optNameList.gravityName, optList.gravity);
-    this->m_floatsOptionMap.emplace(optNameList.compressionResistanceName, optList.compressionResistance);
-    this->m_floatsOptionMap.emplace(optNameList.inversionThresholdName, optList.inversionThreshold);
+    m_floatsOptionMap.emplace(optNameList.dampingMassCoefficientName, optList.dampingMassCoefficient);
+    m_floatsOptionMap.emplace(optNameList.dampingLaplacianCoefficientName, optList.dampingLaplacianCoefficient);
+    m_floatsOptionMap.emplace(optNameList.dampingStiffnessCoefficientName, optList.dampingStiffnessCoefficient);
+    m_floatsOptionMap.emplace(optNameList.deformationComplianceName, optList.deformationCompliance);
+    m_floatsOptionMap.emplace(optNameList.gravityName, optList.gravity);
+    m_floatsOptionMap.emplace(optNameList.compressionResistanceName, optList.compressionResistance);
+    m_floatsOptionMap.emplace(optNameList.inversionThresholdName, optList.inversionThreshold);
 
     // Store parsed int values
-    this->m_intsOptionMap.emplace(optNameList.numberOfThreadsName, optList.numberOfThreads);
+    m_intsOptionMap.emplace(optNameList.numberOfThreadsName, optList.numberOfThreads);
 
     return true;
 }
@@ -95,19 +95,19 @@ ForceModelType
 ForceModelConfig::getForceModelType()
 {
     // Set up some variables
-    if (this->m_stringsOptionMap["femMethod"] == "StVK")
+    if (m_stringsOptionMap["femMethod"] == "StVK")
     {
         return ForceModelType::StVK;
     }
-    else if (this->m_stringsOptionMap["femMethod"] == "Corotational")
+    else if (m_stringsOptionMap["femMethod"] == "CLFEM")
     {
         return ForceModelType::Corotational;
     }
-    else if (this->m_stringsOptionMap["femMethod"] == "Linear")
+    else if (m_stringsOptionMap["femMethod"] == "Linear")
     {
         return ForceModelType::Linear;
     }
-    else if (this->m_stringsOptionMap["femMethod"] == "InvertibleFEM")
+    else if (m_stringsOptionMap["femMethod"] == "InvertibleFEM")
     {
         return ForceModelType::Invertible;
     }
@@ -122,15 +122,15 @@ HyperElasticMaterialType
 ForceModelConfig::getHyperelasticMaterialType()
 {
     // Set up some variables
-    if (this->m_stringsOptionMap["invertibleMaterial"] == "StVK")
+    if (m_stringsOptionMap["invertibleMaterial"] == "StVK")
     {
         return HyperElasticMaterialType::StVK;
     }
-    else if (this->m_stringsOptionMap["invertibleMaterial"] == "NeoHookean")
+    else if (m_stringsOptionMap["invertibleMaterial"] == "NeoHookean")
     {
         return HyperElasticMaterialType::NeoHookean;
     }
-    else if (this->m_stringsOptionMap["invertibleMaterial"] == "MooneyRivlin")
+    else if (m_stringsOptionMap["invertibleMaterial"] == "MooneyRivlin")
     {
         return HyperElasticMaterialType::MooneyRivlin;
     }

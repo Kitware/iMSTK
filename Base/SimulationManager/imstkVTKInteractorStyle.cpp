@@ -77,7 +77,7 @@ VTKInteractorStyle::OnTimer()
     }
 
     // Timing info
-    std::cout << "\rActual framerate: " << fpsStr << " (" << dt << " ms)             "<< std::flush;
+    //std::cout << "\rActual framerate: " << fpsStr << " (" << dt << " ms)             "<< std::flush;
 }
 
 void
