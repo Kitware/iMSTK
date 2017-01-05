@@ -1,4 +1,4 @@
-#define DATA_ROOT_PATH "M:/Mohit Tyagi/iMSTK/build/Innerbuild/Examples/Sandbox/Resources" // Change to your data ressource directory
+#define DATA_ROOT_PATH "E:/iMSTK/debug-build/Innerbuild/Examples/Sandbox" // Change to your data ressource directory
 
 #include <cstring>
 #include <iostream>
@@ -119,7 +119,7 @@ int main()
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    //testDeformableBody();
+    testDeformableBody();
     //testVTKTexture();
     //testMultiObjectWithTextures();
     //testTwoOmnis();
@@ -128,7 +128,7 @@ int main()
     //testPbdCloth();
     //testPbdCollision();
     //testLineMesh();
-    testMshAndVegaIO();
+    //testMshAndVegaIO();
 
     return 0;
 }
@@ -1081,10 +1081,13 @@ void testDeformableBody()
     // a. SDK and Scene
     auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("DeformableBodyTest");
-    scene->getCamera()->setPosition(0, 2.0, 15.0);
+    scene->getCamera()->setPosition(0, 2.0, 40.0);
 
     // b. Load a tetrahedral mesh
-    auto tetMesh = imstk::MeshIO::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
+    auto tetMesh = imstk::MeshIO::read(DATA_ROOT_PATH"/oneTet/oneTet.veg");
+    //auto tetMesh = imstk::MeshIO::read(DATA_ROOT_PATH"/asianDragon/asianDragon.veg");
+    //auto tetMesh = imstk::MeshIO::read(DATA_ROOT_PATH"/liver3/liver.veg");
+    //auto tetMesh = imstk::MeshIO::read(DATA_ROOT_PATH"/oneTet/oneTet-MooneyRevlin.veg");
     if (!tetMesh)
     {
         LOG(WARNING) << "Could not read mesh from file.";
@@ -1124,9 +1127,11 @@ void testDeformableBody()
 
     // Configure dynamic model
     auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
-    dynaModel->configure(DATA_ROOT_PATH"/asianDragon/asianDragon.config");
+    dynaModel->configure(DATA_ROOT_PATH"/oneTet/oneTet.config");
+    //dynaModel->configure(DATA_ROOT_PATH"/asianDragon/asianDragon.config");
+    //dynaModel->configure(DATA_ROOT_PATH"/liver3/liver.config");
     dynaModel->initialize(volTetMesh);
-    auto timeIntegrator = std::make_shared<BackwardEuler>(0.01);// Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);// Create and add Backward Euler time integrator
     dynaModel->setTimeIntegrator(timeIntegrator);
 
     // Scene Object
@@ -1157,9 +1162,10 @@ void testDeformableBody()
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
         dynaModel->getFunctionGradient());
-
+    nlSystem->setFilter(dynaModel->getFixNodeIds());
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
+    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
 
     // create a linear solver
     auto cgLinSolver = std::make_shared<ConjugateGradient>();
@@ -1168,6 +1174,7 @@ void testDeformableBody()
     auto nlSolver = std::make_shared<NewtonSolver>();
     nlSolver->setLinearSolver(cgLinSolver);
     nlSolver->setSystem(nlSystem);
+    //nlSolver->setToFullyImplicit();
     scene->addNonlinearSolver(nlSolver);
 
     // Run the simulation
