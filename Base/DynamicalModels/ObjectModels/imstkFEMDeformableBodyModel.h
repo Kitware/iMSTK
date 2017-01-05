@@ -240,7 +240,6 @@ protected:
     Vectord m_Feff;         ///> Vector of effective forces
     Vectord m_Fcontact;     ///> Vector of contact forces
     Vectord m_qSol;         ///> Vector to maintain solution at each iteration of nonlinear solver
-    Vectord m_tmpStorage;
 
     // External field forces
     Vectord m_gravityForce;   ///> Vector of gravity forces

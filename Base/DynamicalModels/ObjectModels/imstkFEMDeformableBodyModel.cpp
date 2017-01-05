@@ -115,8 +115,6 @@ FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
     m_Finternal.resize(m_numDOF);
     m_Finternal.setConstant(0.0);//?
     m_Fcontact.resize(m_numDOF);
-    m_tmpStorage.resize(m_numDOF);
-
     m_qSol.resize(m_numDOF);
     m_qSol.setConstant(0.0);
 }
@@ -498,32 +496,25 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
 
 
 void
-FEMDeformableBodyModel::updateBodyStates(const Vectord& deltaV, const stateUpdateType updateType)
+FEMDeformableBodyModel::updateBodyStates(const Vectord& solution, const stateUpdateType updateType)
 {
     auto &uPrev = m_previousState->getQ();
     auto &u = m_currentState->getQ();
     auto &v = m_currentState->getQDot();
+    const double dT = m_timeIntegrator->getTimestepSize();
 
-    m_tmpStorage = v;
-
-    switch(updateType)
+    switch (updateType)
     {
     case stateUpdateType::deltaVelocity:
-        m_currentState->setV(v + deltaV);
-        m_previousState->setV(m_tmpStorage);
+        m_currentState->setV(v + solution);
+        m_currentState->setU(uPrev + dT*v);
 
-        m_tmpStorage = u;
-        m_currentState->setU(uPrev + m_timeIntegrator->getTimestepSize()*v);
-        m_previousState->setU(m_tmpStorage);
         break;
 
     case stateUpdateType::velocity:
-        m_currentState->setV(deltaV);
-        m_previousState->setV(m_tmpStorage);
+        m_currentState->setV(solution);
+        m_currentState->setU(uPrev + dT*v);
 
-        m_tmpStorage = u;
-        m_currentState->setU(uPrev + m_timeIntegrator->getTimestepSize()*v);
-        m_previousState->setU(m_tmpStorage);
         break;
 
     default:
