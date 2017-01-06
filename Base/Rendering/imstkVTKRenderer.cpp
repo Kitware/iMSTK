@@ -99,7 +99,7 @@ VTKRenderer::VTKRenderer(std::shared_ptr<Scene> scene)
         m_vtkRenderer->RemoveCuller(culler);
     }
 
-    this->setup(Mode::SIMULATION);
+    this->setMode(Mode::SIMULATION);
 
 }
 
@@ -110,7 +110,7 @@ VTKRenderer::getVtkRenderer() const
 }
 
 void
-VTKRenderer::setup(Mode mode)
+VTKRenderer::setMode(Mode mode)
 {
     if( mode == Mode::EMPTY && m_currentMode != Mode::EMPTY )
     {
@@ -160,6 +160,12 @@ VTKRenderer::setup(Mode mode)
     }
 
     m_currentMode = mode;
+}
+
+const VTKRenderer::Mode&
+VTKRenderer::getMode()
+{
+    return m_currentMode;
 }
 
 void

@@ -67,9 +67,11 @@ public:
     ~VTKRenderer() = default;
 
     ///
-    /// \brief
+    /// \brief Set/Get the rendering mode which defined the
+    /// visibility of the renderer actors and the default camera
     ///
-    void setup(Mode mode);
+    void setMode(Mode mode);
+    const Mode& getMode();
 
     ///
     /// \brief
