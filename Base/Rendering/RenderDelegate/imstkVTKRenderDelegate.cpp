@@ -39,7 +39,7 @@
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
-#include "vtkPolyDataNormals.h"
+#include "vtkTriangleMeshPointNormals.h"
 #include "vtkTransform.h"
 
 namespace imstk
@@ -98,11 +98,8 @@ void
 VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source)
 {
     // Add normals
-    /// TODO : replace by vtkTrianglePointsNormals when available
-    auto normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
+    auto normalGen = vtkSmartPointer<vtkTriangleMeshPointNormals>::New();
     normalGen->SetInputConnection(source);
-    normalGen->SplittingOff();
-    normalGen->ConsistencyOff();
 
     m_mapper->SetInputConnection(normalGen->GetOutputPort());
 
