@@ -73,7 +73,7 @@ VTKInteractorStyle::OnTimer()
     }
     else
     {
-        this->Interactor->CreateOneShotTimer(0);
+        this->Interactor->CreateOneShotTimer(1);
     }
 
     // Timing info
