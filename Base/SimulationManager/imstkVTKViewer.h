@@ -51,7 +51,7 @@ public:
     ///
     VTKViewer(SimulationManager* manager = nullptr)
     {
-        m_interactorStyle->setSimulationManager(manager);
+        m_interactorStyle->m_simManager = manager;
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
         m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
         m_vtkRenderWindow->SetSize(1000,800);
@@ -112,6 +112,20 @@ public:
     /// \brief Set the target FPS for rendering
     ///
     void setTargetFrameRate(const double& fps);
+
+    ///
+    /// \brief Set custom event handlers on interactor style
+    ///
+    void setOnCharFunction(char c, VTKEventHandlerFunction func);
+    void setOnMouseMoveFunction(VTKEventHandlerFunction func);
+    void setOnLeftButtonDownFunction(VTKEventHandlerFunction func);
+    void setOnLeftButtonUpFunction(VTKEventHandlerFunction func);
+    void setOnMiddleButtonDownFunction(VTKEventHandlerFunction func);
+    void setOnMiddleButtonUpFunction(VTKEventHandlerFunction func);
+    void setOnRightButtonDownFunction(VTKEventHandlerFunction func);
+    void setOnRightButtonUpFunction(VTKEventHandlerFunction func);
+    void setOnMouseWheelForwardFunction(VTKEventHandlerFunction func);
+    void setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func);
 
 protected:
 

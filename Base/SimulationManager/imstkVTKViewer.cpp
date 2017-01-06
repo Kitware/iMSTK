@@ -147,13 +147,91 @@ VTKViewer::isRendering() const
 double
 VTKViewer::getTargetFrameRate() const
 {
-    return m_interactorStyle->getTargetFrameRate();
+    if(m_interactorStyle->m_targetMS == 0)
+    {
+        LOG(WARNING) << "VTKViewer::getTargetFrameRate warning: render target period is set to 0ms, "
+                     << "therefore not regulated by a framerate. Returning 0.";
+        return 0;
+    }
+    return 1000.0/m_interactorStyle->m_targetMS;
 }
 
 void
 VTKViewer::setTargetFrameRate(const double& fps)
 {
-    m_interactorStyle->setTargetFrameRate(fps);
+    if(fps < 0)
+    {
+        LOG(WARNING) << "VTKViewer::setTargetFrameRate error: framerate must be positive, "
+                     << "or equal to 0 to render as fast as possible.";
+        return;
+    }
+    if(fps == 0)
+    {
+        m_interactorStyle->m_targetMS = 0;
+        return;
+    }
+    m_interactorStyle->m_targetMS = 1000.0/fps;
+    std::cout << "Target framerate: " << fps << " (" << m_interactorStyle->m_targetMS << " ms)"<< std::endl;
+}
+
+void
+VTKViewer::setOnCharFunction(char c, VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onCharFunctionMap[c] = func;
+}
+
+void
+VTKViewer::setOnMouseMoveFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseMoveFunction = func;
+}
+
+void
+VTKViewer::setOnLeftButtonDownFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onLeftButtonDownFunction = func;
+}
+
+void
+VTKViewer::setOnLeftButtonUpFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onLeftButtonUpFunction = func;
+}
+
+void
+VTKViewer::setOnMiddleButtonDownFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onMiddleButtonDownFunction = func;
+}
+
+void
+VTKViewer::setOnMiddleButtonUpFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onMiddleButtonUpFunction = func;
+}
+
+void
+VTKViewer::setOnRightButtonDownFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onRightButtonDownFunction = func;
+}
+
+void
+VTKViewer::setOnRightButtonUpFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onRightButtonUpFunction = func;
+}
+
+void
+VTKViewer::setOnMouseWheelForwardFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseWheelForwardFunction = func;
+}
+
+void
+VTKViewer::setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onMouseWheelBackwardFunction = func;
 }
 
 } // imstk
