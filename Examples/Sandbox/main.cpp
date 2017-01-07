@@ -1,4 +1,9 @@
-#define DATA_ROOT_PATH "E:/iMSTK/debug-build/Innerbuild/Examples/Sandbox" // Change to your data ressource directory
+/*
+ * DO NOT COMMIT CHANGES TO THE LINE BELOW !!!
+ * Keep your change local. You can use `git gui`
+ * to stage or unstage part of a file diff.
+ */
+#define DATA_ROOT_PATH "/path/to/your/data/dir"
 
 #include <cstring>
 #include <iostream>
@@ -100,6 +105,14 @@ void testMshAndVegaIO();
 
 int main()
 {
+    if (std::string(DATA_ROOT_PATH) == "/path/to/your/data/dir")
+    {
+        std::cerr << "Error: DATA_ROOT_PATH not set. Define your resources directory "
+                  << "on top of main.cpp in the Sandbox example to run a test."
+                  << std::endl;
+        return 1;
+    }
+
     std::cout << "****************\n"
         << "Starting Sandbox\n"
         << "****************\n";
