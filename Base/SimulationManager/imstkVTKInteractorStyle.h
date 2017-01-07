@@ -28,6 +28,7 @@
 #include <functional>
 
 #include "vtkInteractorStyleTrackballCamera.h"
+class vtkTextActor;
 
 namespace imstk
 {
@@ -53,6 +54,11 @@ public:
 
     static VTKInteractorStyle *New();
     vtkTypeMacro(VTKInteractorStyle, vtkBaseInteractorStyle);
+
+    ///
+    /// \brief Set current renderer
+    ///
+    virtual void SetCurrentRenderer(vtkRenderer* ren) override;
 
     ///
     /// \brief Slot for timer tick
@@ -111,6 +117,9 @@ public:
 
 private:
 
+    VTKInteractorStyle();
+    ~VTKInteractorStyle();
+
     friend class VTKViewer;
 
     /// Custom event handlers
@@ -127,10 +136,13 @@ private:
     VTKEventHandlerFunction m_onMouseWheelBackwardFunction;
 
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
-    double m_targetMS = 0.0; ///> expected time between each render frame (in ms)
+    double m_targetMS; ///> expected time between each render frame (in ms)
     std::chrono::high_resolution_clock::time_point m_pre; ///> time point pre-rendering
     std::chrono::high_resolution_clock::time_point m_post; ///> time point post-rendering
-
+    bool m_displayFps; ///> hide or display framerate
+    vtkTextActor* m_fpsActor; ///> text holding framerate to display
+    std::chrono::high_resolution_clock::time_point m_lastFpsUpdate; ///> time point for last framerate display update
+    double m_lastFps; ///> last framerate value used for moving average estimate
 };
 
 
