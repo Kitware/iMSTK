@@ -1853,9 +1853,9 @@ void testLineMesh()
 
         // c. Add connectivity data
         std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
-        for (int i = 0; i < nRows - 1; ++i)
+        for (size_t i = 0; i < nRows - 1; ++i)
         {
-            for (int j = 0; j < nCols - 1; j++)
+            for (size_t j = 0; j < nCols - 1; j++)
             {
                 imstk::SurfaceMesh::TriangleArray tri[2];
                 tri[0] = { { i*nCols + j, i*nCols + j + 1, (i + 1)*nCols + j } };

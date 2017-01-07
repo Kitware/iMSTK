@@ -79,7 +79,7 @@ SimulationManager::createNewScene(std::string newSceneName)
 std::shared_ptr<Scene>
 SimulationManager::createNewScene()
 {
-    int id                   = m_sceneManagerMap.size() + 1;
+    int id = (int)m_sceneManagerMap.size() + 1;
     std::string newSceneName = "Scene_" + std::to_string(id);
 
     return this->createNewScene(newSceneName);
