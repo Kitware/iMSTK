@@ -29,6 +29,7 @@
 #include "vtkOBJReader.h"
 #include "vtkSTLReader.h"
 #include "vtkFloatArray.h"
+#include "vtkTriangleFilter.h"
 
 #include "g3log/g3log.hpp"
 
@@ -110,7 +111,11 @@ VTKMeshIO::readVtkPolyData(const std::string& filePath)
     reader->SetFileName(filePath.c_str());
     reader->Update();
 
-    vtkPolyData* vtkMesh = reader->GetOutput();
+    auto triFilter = vtkSmartPointer<vtkTriangleFilter>::New();
+    triFilter->SetInputData(reader->GetOutput());
+    triFilter->Update();
+
+    vtkPolyData* vtkMesh = triFilter->GetOutput();
     return VTKMeshIO::convertVtkPolyDataToSurfaceMesh(vtkMesh);
 }
 
