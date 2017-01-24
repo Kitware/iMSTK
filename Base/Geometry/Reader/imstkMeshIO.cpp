@@ -134,7 +134,7 @@ MeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& f
     }
 
     LOG(WARNING) << "MeshIO::write error: file type not supported";
-    return nullptr;
+    return false;
 }
 
 } // imstk
