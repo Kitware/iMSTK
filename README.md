@@ -12,10 +12,6 @@
  * [Setting up your SSH key](#2-setting-up-your-ssh-key)
  * [Building iMSTK](#3-building-imstk)
 * [Using iMSTK in your application](#using-imstk-in-your-application)
-* [Contributing to iMSTK](#contributing-to-imstk)
- * [Coding guidelines](#coding-guidelines)
- * [Forking workflow](#forking-workflow)
- * [Dashboards](#dashboards)
 
 
 ## About
@@ -99,60 +95,6 @@ To support the [Geomagic Touch (formerly Sensable Phantom Omni)](http://www.geom
 ## Using iMSTK in your application
 *Coming soon*
 
-
-## Contributing to iMSTK
-### Coding guidelines
-* ##### Code style
-*Coming soon*
-
-* ##### Documenting your code
-*Coming soon*
-
-* ##### Commit messages
-*Coming soon*
-
-### Forking workflow
-To contribute your changes to iMSTK, you will need to follow the [Gitlab forking workflow].
-1. Fork the iMSTK project to your own namespace
->
-> https://docs.gitlab.com/ce/workflow/forking_workflow.html#creating-a-fork.
-
-2. Add the forked remote repository to your git source directory
-```sh
-git remote add myremote git@gitlab.kitware.com:{mynamespace}/iMSTK.git
-```
-
-3. Create a new branch where you will commit your changes, and name it based on the feature or fix you are implementing
-```sh
-git checkout -b new-feature
-```
-
-4. Once you have committed your changes, push your branch to your namespace
-```sh
-git push myremote new-feature
-```
-
-5. Once your branch is ready for merging, create a merge request
->
-> https://docs.gitlab.com/ce/workflow/forking_workflow.html#merging-upstream
-
-6. Once your changes have been reviewed and merged into the `master` branch of iMSTK, you may get rid of your development branch and pull the latest commits from the master branch, then repeat from step 3 for further development
-```sh
-git branch -d new-feature
-git checkout master
-git pull origin master
-```
-
-### Dashboards
-Dashboards - powered by [CDash] - help to visualize the latest state of iMSTK builds on Windows, MacOSx, and Linux, to ensure that any changes to the code will not downgrade the current state of the platform:
->http://my.cdash.org/index.php?project=iMSTK
-
-**Name** | CDash Build Group Description
---- | ---
-**Nightly** | Builds running every night
-**Continuous** | Builds running every time there is a change to the master branch
-**Experimental** | Builds running after calling `@buildbot test` in the comment section of a Merge Request
-
 ---
 [NIH-OD]: <https://www.nih.gov/about-nih/what-we-do/nih-almanac/office-director-nih>
 [NIH-NIBIB]: <https://www.nibib.nih.gov/>
@@ -163,5 +105,3 @@ Dashboards - powered by [CDash] - help to visualize the latest state of iMSTK bu
 [CMake]: <https://cmake.org>
 [Ninja]: <https://ninja-build.org/>
 [OpenHaptics]: <http://www.geomagic.com/en/products/open-haptics/overview/>
-[Gitlab forking workflow]: <https://docs.gitlab.com/ce/workflow/forking_workflow.html>
-[CDash]: <http://www.cdash.org/>
