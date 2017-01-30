@@ -29,13 +29,45 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
-#include "vtkAssemblyPath.h"
-#include "vtkAbstractPropPicker.h"
+#include "vtkTextActor.h"
+#include "vtkTextProperty.h"
 
 namespace imstk
 {
 
 vtkStandardNewMacro(VTKInteractorStyle);
+
+VTKInteractorStyle::VTKInteractorStyle()
+{
+    m_targetMS = 0.0; // 0 for no wait time
+    m_displayFps = false;
+    m_lastFpsUpdate = std::chrono::high_resolution_clock::now();
+    m_lastFps = 60.0;
+    m_fpsActor = vtkTextActor::New();
+    m_fpsActor->GetTextProperty()->SetFontSize(60);
+    m_fpsActor->SetVisibility(m_displayFps);
+}
+
+VTKInteractorStyle::~VTKInteractorStyle()
+{
+    m_fpsActor->Delete();
+}
+
+void
+VTKInteractorStyle::SetCurrentRenderer(vtkRenderer* ren)
+{
+    // Remove actor if previous renderer
+    if(this->CurrentRenderer)
+    {
+        this->CurrentRenderer->RemoveActor2D(m_fpsActor);
+    }
+
+    // Set new current renderer
+    vtkBaseInteractorStyle::SetCurrentRenderer(ren);
+
+    // Add actor to current renderer
+    this->CurrentRenderer->AddActor2D(m_fpsActor);
+}
 
 void
 VTKInteractorStyle::OnTimer()
@@ -55,13 +87,21 @@ VTKInteractorStyle::OnTimer()
     // Reset camera clipping range
     this->CurrentRenderer->ResetCameraClippingRange();
 
-    // Retrieve actual framerate
-    auto t = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()-m_pre).count();
-    auto fps = 1000.0/(double)t;
-    auto fpsStr = std::to_string((int)fps)+ " fps";
+    // Update framerate value display
+    auto now = std::chrono::high_resolution_clock::now();
+    double fps = 1e6/(double)std::chrono::duration_cast<std::chrono::microseconds>(now - m_pre).count();
+    fps = 0.1 * fps + 0.9 * m_lastFps;
+    m_lastFps = fps;
+    int t = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_lastFpsUpdate).count();
+    if (t > 100) //wait 100ms before updating displayed value
+    {
+        std::string fpsStr = std::to_string((int)fps) + " fps";
+        m_fpsActor->SetInput(fpsStr.c_str());
+        m_lastFpsUpdate = now;
+    }
+    m_pre = now;
 
     // Render
-    m_pre = std::chrono::high_resolution_clock::now();
     this->Interactor->Render();
     m_post = std::chrono::high_resolution_clock::now();
 
@@ -73,11 +113,8 @@ VTKInteractorStyle::OnTimer()
     }
     else
     {
-        this->Interactor->CreateOneShotTimer(0);
+        this->Interactor->CreateOneShotTimer(1);
     }
-
-    // Timing info
-    //std::cout << "\rActual framerate: " << fpsStr << " (" << dt << " ms)             "<< std::flush;
 }
 
 void
@@ -99,12 +136,14 @@ VTKInteractorStyle::OnChar()
     // start simulation
     if (status == SimulationStatus::INACTIVE && (key == 's' || key == 'S'))
     {
+        m_fpsActor->SetVisibility(m_displayFps);
         m_simManager->startSimulation();
     }
     // end Simulation
     else if (status != SimulationStatus::INACTIVE &&
              (key == 'q' || key == 'Q' || key == 'e' || key == 'E'))
     {
+        m_fpsActor->VisibilityOff();
         m_simManager->endSimulation();
     }
     else if (key == ' ')
@@ -120,10 +159,29 @@ VTKInteractorStyle::OnChar()
             m_simManager->runSimulation();
         }
     }
+    // switch rendering mode
+    else if (key == 'd' || key == 'D')
+    {
+        if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::SIMULATION)
+        {
+            m_simManager->getViewer()->setRenderingMode(VTKRenderer::Mode::SIMULATION);
+        }
+        else
+        {
+            m_simManager->getViewer()->setRenderingMode(VTKRenderer::Mode::DEBUG);
+        }
+    }
     // quit viewer
     else if (key == '\u001B')
     {
         m_simManager->getViewer()->endRenderingLoop();
+    }
+    // switch framerate display
+    else if (key == 'p' || key == 'P')
+    {
+        m_displayFps = !m_displayFps;
+        m_fpsActor->SetVisibility(m_displayFps);
+        this->Interactor->Render();
     }
 }
 
@@ -139,7 +197,7 @@ VTKInteractorStyle::OnMouseMove()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -160,7 +218,7 @@ VTKInteractorStyle::OnLeftButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -181,7 +239,7 @@ VTKInteractorStyle::OnLeftButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -202,7 +260,7 @@ VTKInteractorStyle::OnMiddleButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -223,7 +281,7 @@ VTKInteractorStyle::OnMiddleButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -244,7 +302,7 @@ VTKInteractorStyle::OnRightButtonDown()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -265,7 +323,7 @@ VTKInteractorStyle::OnRightButtonUp()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -286,7 +344,7 @@ VTKInteractorStyle::OnMouseWheelForward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }
@@ -307,7 +365,7 @@ VTKInteractorStyle::OnMouseWheelBackward()
     }
 
     // Default behavior : ignore mouse if simulation active
-    if (m_simManager->getStatus() != SimulationStatus::INACTIVE)
+    if (m_simManager->getViewer()->getRenderingMode() != VTKRenderer::Mode::DEBUG)
     {
         return;
     }

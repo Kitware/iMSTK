@@ -84,6 +84,11 @@ public:
     void setRenderingMode(VTKRenderer::Mode mode);
 
     ///
+    /// \brief Get the current renderer mode
+    ///
+    const VTKRenderer::Mode& getRenderingMode();
+
+    ///
     /// \brief Start rendering
     ///
     void startRenderingLoop();

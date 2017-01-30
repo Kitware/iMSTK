@@ -90,7 +90,7 @@ VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
     }
 
     // Setup renderer
-    this->getCurrentRenderer()->setup(mode);
+    this->getCurrentRenderer()->setMode(mode);
     if( !m_running )
     {
         return;
@@ -102,7 +102,6 @@ VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
     // Setup render window
     if (mode == VTKRenderer::Mode::SIMULATION)
     {
-        m_interactorStyle->HighlightProp(nullptr);
         m_vtkRenderWindow->HideCursor();
         //m_vtkRenderWindow->BordersOff();
         //m_vtkRenderWindow->FullScreenOn(1);
@@ -113,6 +112,12 @@ VTKViewer::setRenderingMode(VTKRenderer::Mode mode)
         //m_vtkRenderWindow->BordersOn();
         //m_vtkRenderWindow->FullScreenOff(1);
     }
+}
+
+const VTKRenderer::Mode&
+VTKViewer::getRenderingMode()
+{
+    return this->getCurrentRenderer()->getMode();
 }
 
 void

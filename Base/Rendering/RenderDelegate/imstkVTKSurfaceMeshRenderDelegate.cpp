@@ -74,6 +74,13 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     polydata->SetPoints(points);
     polydata->SetPolys(cells);
 
+    // Check for cell consistency
+    auto consistentCellsFilter = vtkSmartPointer<vtkPolyDataNormals>::New();
+    consistentCellsFilter->SplittingOff();
+    consistentCellsFilter->SetInputData(polydata);
+    consistentCellsFilter->Update();
+    polydata->SetPolys(consistentCellsFilter->GetOutput()->GetPolys());
+
     // Create connection source
     auto source = vtkSmartPointer<vtkTrivialProducer>::New();
     source->SetOutput(polydata);
@@ -114,12 +121,24 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
         auto texture = vtkSmartPointer<vtkTexture>::New();
         texture->SetInputConnection(imgReader->GetOutputPort());
         texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+        /* /!\ VTKTextureWrapMode not yet supported in VTK 7
+         * See here for some work that needs to be imported back to upstream:
+         * https://gitlab.kitware.com/iMSTK/vtk/commit/62a7ecd8a5f54e243c26960de22d5d1d23ef932b
+         *
         texture->SetWrapMode(vtkTexture::VTKTextureWrapMode::ClampToBorder);
 
-        // Link textures
+         * /!\ MultiTextureAttribute not yet supported in VTK 7
+         * See here for some work that needs to be imported back to upstream:
+         * https://gitlab.kitware.com/iMSTK/vtk/commit/ae373026755db42b6fdce5093109ef1a39a76340
+         *
+        // Link texture unit to texture attribute
         m_mapper->MapDataArrayToMultiTextureAttribute(unit, tCoordsName.c_str(),
-                    vtkDataObject::FIELD_ASSOCIATION_POINTS);
+                                                      vtkDataObject::FIELD_ASSOCIATION_POINTS);
+        */
+
+        // Set texture
         m_actor->GetProperty()->SetTexture(unit, texture);
+
         unit++;
     }
 }
