@@ -201,7 +201,7 @@ void testMshAndVegaIO()
     scene->addSceneObject(objectB);
 
     // Run
-    sdk->setCurrentScene("SceneTestMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 
 }
@@ -313,7 +313,7 @@ void testMultiObjectWithTextures()
         scene->addSceneObject(object1);
     }
     // Run
-    sdk->setCurrentScene("multiObjectWithTexturesTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -338,7 +338,7 @@ void testMultiTextures()
     scene->addSceneObject(object);
 
     // Run
-    sdk->setCurrentScene("multitexturestest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -384,7 +384,7 @@ void testMeshCCD()
     });
 
     // Run
-    sdk->setCurrentScene("MeshCCDTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
     t.join();
 }
@@ -459,7 +459,7 @@ void testPenaltyRigidCollision()
         CollisionHandling::Type::Penalty);
 
     // Run
-    sdk->setCurrentScene("InteractionPairTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -529,7 +529,7 @@ void testTwoFalcons()
                                      imstk::CameraController::InvertFlag::rotZ);
 
     // Run
-    sdk->setCurrentScene("FalconsTestScene");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -591,7 +591,7 @@ void testTwoOmnis(){
     cam->setFocalPoint(sphere0Geom->getPosition());
 
     // Run
-    sdk->setCurrentScene("OmnisTestScene");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -631,7 +631,7 @@ void testObjectController()
     cam->setFocalPoint(geom->getPosition());
 
     // Run
-    sdk->setCurrentScene("SceneTestDevice");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -670,7 +670,7 @@ void testCameraController()
                                      imstk::CameraController::InvertFlag::rotZ);
 
     // Run
-    sdk->setCurrentScene("SceneTestDevice");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -702,7 +702,7 @@ void testReadMesh()
     scene->addSceneObject(object);
 
     // Run
-    sdk->setCurrentScene("SceneTestMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -760,7 +760,7 @@ void testViewer()
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
     // Run
-    sdk->setCurrentScene("SceneTest");
+    sdk->setCurrentScene(sceneTest);
     sdk->startSimulation(true);
 }
 
@@ -820,18 +820,18 @@ void testScenesManagement()
     // switch
     LOG(INFO) << "-- Test scene switch";
     int delay = 5;
-    sdk->setCurrentScene("scene1");
+    sdk->setCurrentScene(scene1);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene("scene2", false);
+    sdk->setCurrentScene(scene2, false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene("scene1", true);
+    sdk->setCurrentScene(scene1, true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->endSimulation();
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
-    sdk->setCurrentScene("scene2");
+    sdk->setCurrentScene(scene2);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->pauseSimulation();
@@ -889,7 +889,7 @@ void testIsometricMap()
     LOG(INFO) << cubeGeom->getPosition();
 
     // Start simulation
-    sdk->setCurrentScene("geometryMapTest");
+    sdk->setCurrentScene(geometryMapTest);
     sdk->startSimulation(imstk::VTKRenderer::Mode::DEBUG);
 }
 
@@ -1208,7 +1208,7 @@ void testDeformableBody()
     scene->addNonlinearSolver(nlSolver);
 
     // Run the simulation
-    sdk->setCurrentScene("DeformableBodyTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1297,7 +1297,7 @@ void testPbdVolume()
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
-    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 
 }
@@ -1387,7 +1387,7 @@ void testPbdCloth()
     scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
 
-    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1701,7 +1701,7 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
-    sdk->setCurrentScene("PbdCollisionTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2033,7 +2033,7 @@ void testLineMesh()
         scene->getCamera()->setFocalPoint(surfMesh.get()->getInitialVertexPosition(20));
     }
     // Run
-    sdk->setCurrentScene("TestLineMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 #endif
 }
