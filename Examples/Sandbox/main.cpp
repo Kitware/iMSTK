@@ -53,6 +53,7 @@
 #include "imstkVRPNDeviceServer.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectController.h"
+#include "imstkLaparoscopicToolController.h"
 
 // Collisions
 #include "imstkInteractionPair.h"
@@ -102,6 +103,7 @@ void testPbdCloth();
 void testPbdCollision();
 void testLineMesh();
 void testMshAndVegaIO();
+void testLapToolController();
 
 int main()
 {
@@ -142,8 +144,72 @@ int main()
     //testPbdCollision();
     //testLineMesh();
     //testMshAndVegaIO();
+    testLapToolController();
 
     return 0;
+}
+
+void testLapToolController()
+{
+
+#ifdef iMSTK_USE_OPENHAPTICS
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("TestLapToolController");
+
+    // Device clients
+    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client0);
+    sdk->addModule(server);
+
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(100);
+    planeGeom->translate(Vec3d(0., -20., 0.));
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    auto createAndAddVisualSceneObject =
+        [](std::shared_ptr<imstk::Scene> scene,
+        const std::string& fileName,
+        const std::string& objectName) ->
+        std::shared_ptr<imstk::SceneObject>
+    {
+        auto mesh = imstk::MeshIO::read(fileName);
+        auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
+
+        // Create object and add to scene
+        auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
+        meshObject->setVisualGeometry(SurfaceMesh);
+        meshObject->setName(objectName);
+        scene->addSceneObject(meshObject);
+        return meshObject;
+    };
+
+    // laparoscopic tool
+    auto pivot = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/pivot.obj", "pivot");
+    auto upperJaw = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/upper.obj", "upperJaw");
+    auto lowerJaw = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/lower.obj", "lowerJaw");
+
+    auto trackingCtrl = std::make_shared<imstk::DeviceTracker>(client0);
+    trackingCtrl->setTranslationScaling(0.5);
+    auto lapToolController = std::make_shared<imstk::LaparoscopicToolController>(pivot, upperJaw, lowerJaw, trackingCtrl);
+    lapToolController->setJawRotationAxis(imstk::Vec3d(1.0, 0, 0));
+    scene->addObjectController(lapToolController);
+
+    // Set Camera
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 30, 60));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(true);
+#endif
 }
 
 void testMshAndVegaIO()
