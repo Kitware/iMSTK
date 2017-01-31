@@ -69,24 +69,4 @@ SceneObject::setName(const std::string& name)
     m_name = name;
 }
 
-std::shared_ptr<SceneObjectController>
-SceneObject::getController() const
-{
-    return m_controller;
-}
-
-std::shared_ptr<SceneObjectController>
-SceneObject::setupController(std::shared_ptr<DeviceClient> deviceClient)
-{
-    if(m_controller == nullptr)
-    {
-        m_controller = std::make_shared<SceneObjectController>(*this, deviceClient);
-    }
-    else
-    {
-        m_controller->setDeviceClient(deviceClient);
-    }
-    return m_controller;
-}
-
 } // imstk

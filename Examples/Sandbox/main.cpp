@@ -424,9 +424,11 @@ void testPenaltyRigidCollision()
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(client0);
-    sphere0Controller->setTranslationScaling(40);
     scene->addSceneObject(sphere0Obj);
+
+    auto sphere0Controller = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), client0);
+    sphere0Controller->setTranslationScaling(40);
+    scene->addObjectController(sphere0Controller);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<Sphere>();
@@ -435,9 +437,11 @@ void testPenaltyRigidCollision()
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(client1);
-    sphere1Controller->setTranslationScaling(40);
     scene->addSceneObject(sphere1Obj);
+
+    auto sphere1Controller = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), client1);
+    sphere1Controller->setTranslationScaling(40);
+    scene->addObjectController(sphere1Controller);
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
@@ -497,9 +501,11 @@ void testTwoFalcons()
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(falcon0);
-    sphere0Controller->setTranslationScaling(30);
     scene->addSceneObject(sphere0Obj);
+
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), falcon0);
+    controller0->setTranslationScaling(30);
+    scene->addObjectController(controller0);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
@@ -508,9 +514,11 @@ void testTwoFalcons()
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(falcon1);
-    sphere1Controller->setTranslationScaling(30);
     scene->addSceneObject(sphere1Obj);
+
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), falcon1);
+    controller1->setTranslationScaling(30);
+    scene->addObjectController(controller1);
 
     // Camera
     auto cam = scene->getCamera();
@@ -553,23 +561,29 @@ void testTwoOmnis(){
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
     sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
     sphere0Geom->scale(1);
+
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(client0);
-    sphere0Controller->setTranslationScaling(0.05);
     scene->addSceneObject(sphere0Obj);
+
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), client0);
+    controller0->setTranslationScaling(0.05);
+    scene->addObjectController(controller0);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
     sphere1Geom->setPosition(imstk::Vec3d(-2, 2.5, 0));
     sphere1Geom->scale(1);
+
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(client1);
-    sphere1Controller->setTranslationScaling(0.05);
     scene->addSceneObject(sphere1Obj);
+
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), client1);
+    controller1->setTranslationScaling(0.05);
+    scene->addObjectController(controller1);
 
     // Update Camera position
     auto cam = scene->getCamera();
@@ -601,12 +615,15 @@ void testObjectController()
     auto geom = std::make_shared<imstk::Cube>();
     geom->setPosition(imstk::UP_VECTOR);
     geom->scale(2);
+
     auto object = std::make_shared<imstk::CollidingObject>("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
-    auto controller = object->setupController(client);
-    controller->setTranslationScaling(0.1);
     scene->addSceneObject(object);
+
+    auto controller = std::make_shared<imstk::SceneObjectController>(*object.get(), client);
+    controller->setTranslationScaling(0.1);
+    scene->addObjectController(controller);
 
     // Update Camera position
     auto cam = scene->getCamera();

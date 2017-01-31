@@ -49,13 +49,15 @@ SceneManager::initModule()
         this->startModuleInNewThread(camController);
     }
 
+    // Update objects controlled by the device controllers
+    for (auto controller : m_scene->getSceneObjectControllers())
+    {
+        controller->initOffsets();
+    }
+
     // Init virtual coupling objects offsets
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto controller = obj->getController())
-        {
-            controller->initOffsets();
-        }
         if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
         {
             virtualCouplingPBD->initOffsets();
@@ -66,25 +68,24 @@ SceneManager::initModule()
 void
 SceneManager::runModule()
 {
-    // Update virtualCoupling objects based on devices
+    // Reset Colliding Geometry so that the transform obtained from device can be applied
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto controller = obj->getController())
+        if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
         {
-            controller->updateFromDevice();
-            if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
-            {
-                controller->applyForces();
-                collidingObj->setForce(Vec3d(0,0,0));
-            }
+            collidingObj->setForce(Vec3d(0,0,0));
         }
-        else if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
         {
-            // reset Colliding Geometry so that the transform obtained from device can be applied
             virtualCouplingPBD->resetCollidingGeometry();
-            virtualCouplingPBD->updateFromDevice();
-            virtualCouplingPBD->applyForces();
         }
+    }
+
+    // Update objects controlled by the device controllers
+    for (auto controller : m_scene->getSceneObjectControllers())
+    {
+        controller->updateFromDevice();
+        controller->applyForces();
     }
 
     // Compute collision data per interaction pair

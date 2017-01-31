@@ -48,6 +48,12 @@ Scene::getSceneObjects() const
     return v;
 }
 
+const std::vector<std::shared_ptr<SceneObjectController>>
+Scene::getSceneObjectControllers() const
+{
+    return m_objectControllers;
+}
+
 std::shared_ptr<SceneObject>
 Scene::getSceneObject(std::string sceneObjectName) const
 {
@@ -182,6 +188,11 @@ Scene::getSolvers()
 void Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
 {
     m_solvers.push_back(solver);
+}
+
+void Scene::addObjectController(std::shared_ptr<SceneObjectController> controller)
+{
+    m_objectControllers.push_back(controller);
 }
 
 } // imstk
