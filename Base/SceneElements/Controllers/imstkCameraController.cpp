@@ -50,14 +50,17 @@ CameraController::initModule()
 void
 CameraController::runModule()
 {
-    Vec3d p;
-    Quatd r;
-
-    if (!this->computeTrackingData(p, r))
+    if (!m_trackingDataUptoDate)
     {
-        LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
-        return;
+        if (!updateTrackingData())
+        {
+            LOG(WARNING) << "CameraController::runModule warning: could not update tracking info.";
+            return;
+        }
     }
+
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
 
     // Set camera info
     m_camera.setPosition(p);

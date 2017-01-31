@@ -22,7 +22,7 @@
 #ifndef imstkVirtualCouplingPBDObject_h
 #define imstkVirtualCouplingPBDObject_h
 
-#include "imstkTrackingController.h"
+#include "imstkDeviceTracker.h"
 #include "imstkPbdRigidObject.h"
 namespace imstk
 {
@@ -35,7 +35,7 @@ class GeometryMap;
 ///
 /// \brief
 ///
-class VirtualCouplingPBDObject : public TrackingController, public PbdRigidObject
+class VirtualCouplingPBDObject : public DeviceTracker, public PbdRigidObject
 {
 public:
     ///
@@ -43,7 +43,7 @@ public:
     ///
     VirtualCouplingPBDObject(std::string name,
                              std::shared_ptr<DeviceClient> deviceClient) :
-        TrackingController(deviceClient),
+        DeviceTracker(deviceClient),
         PbdRigidObject(name)
     {
     }
@@ -95,6 +95,11 @@ public:
     void setColldingToPhysicsMap(std::shared_ptr<GeometryMap> map);
 
     void applyCollidingToPhysics();
+
+    ///
+    /// \brief Set the virtual coupling tracker to out-of-date
+    ///
+    void setTrackerToOutOfDate() { DeviceTracker::setTrackerToOutOfDate(); };
 
 protected:
 

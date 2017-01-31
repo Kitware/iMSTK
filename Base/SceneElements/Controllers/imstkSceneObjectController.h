@@ -22,7 +22,8 @@
 #ifndef imstkSceneObjectController_h
 #define imstkSceneObjectController_h
 
-#include "imstkTrackingController.h"
+#include "imstkSceneObjectControllerBase.h"
+#include "imstkDeviceTracker.h"
 #include "imstkSceneObject.h"
 
 #include <memory>
@@ -33,19 +34,18 @@ namespace imstk
 ///
 /// \class SceneObjectController
 ///
-/// \brief
+/// \brief This class implements once tracking controller controlling one scnene object
 ///
-class SceneObjectController : public TrackingController
+class SceneObjectController : public SceneObjectControllerBase
 {
 public:
     ///
     /// \brief Constructor
     ///
-    SceneObjectController(SceneObject& sceneObject,
-                          std::shared_ptr<DeviceClient> deviceClient) :
-        TrackingController(deviceClient),
-        m_sceneObject(sceneObject)
-    {}
+    SceneObjectController(std::shared_ptr<SceneObject> sceneObject, std::shared_ptr<DeviceTracker> trackingController) :
+        m_trackingController(trackingController), m_sceneObject(sceneObject) {}
+
+    SceneObjectController() = delete;
 
     ///
     /// \brief Destructor
@@ -55,22 +55,38 @@ public:
     ///
     /// \brief Initialize offset based on object geometry
     ///
-    void initOffsets();
+    void initOffsets() override;
 
     ///
-    /// \brief Update geometries transformations
+    /// \brief Update controlled scene object using latest tracking information
     ///
-    void updateFromDevice();
+    void updateControlledObjects() override;
 
     ///
     /// \brief Apply forces to the haptic device
     ///
-    void applyForces();
+    void applyForces() override;
+
+    ///
+    /// \brief Sets the tracker to out-of-date
+    ///
+    inline void setTrackerToOutOfDate() override { m_trackingController->setTrackerToOutOfDate(); }
+
+    ///
+    /// \brief Get/Set controlled scene object
+    ///
+    inline std::shared_ptr<SceneObject> getControlledSceneObject() const { return m_sceneObject; }
+    inline void setControlledSceneObject(std::shared_ptr<SceneObject> so) { m_sceneObject = so; }
+
+    ///
+    /// \brief Get/Set tracking controller
+    ///
+    inline std::shared_ptr<DeviceTracker> getTrackingController() const { return m_trackingController; }
+    inline void setTrackingController(std::shared_ptr<DeviceTracker> controller) { m_trackingController = controller; }
 
 protected:
-
-    SceneObject& m_sceneObject; ///< SceneObject controlled by the external device
-
+    std::shared_ptr<DeviceTracker> m_trackingController; ///< Device tracker
+    std::shared_ptr<SceneObject> m_sceneObject;          ///< SceneObject controlled by the Tracker
 };
 
 } // imstk

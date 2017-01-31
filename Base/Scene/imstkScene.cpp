@@ -21,6 +21,7 @@
 
 #include "imstkScene.h"
 #include "imstkCameraController.h"
+#include "imstkSceneObjectControllerBase.h"
 
 #include <g3log/g3log.hpp>
 
@@ -48,7 +49,7 @@ Scene::getSceneObjects() const
     return v;
 }
 
-const std::vector<std::shared_ptr<SceneObjectController>>
+const std::vector<std::shared_ptr<SceneObjectControllerBase>>
 Scene::getSceneObjectControllers() const
 {
     return m_objectControllers;
@@ -68,7 +69,7 @@ Scene::getSceneObject(std::string sceneObjectName) const
 }
 
 void
-Scene::addSceneObject(std::shared_ptr<SceneObject>newSceneObject)
+Scene::addSceneObject(std::shared_ptr<SceneObject> newSceneObject)
 {
     std::string newSceneObjectName = newSceneObject->getName();
 
@@ -190,7 +191,7 @@ void Scene::addNonlinearSolver(std::shared_ptr<SolverBase> solver)
     m_solvers.push_back(solver);
 }
 
-void Scene::addObjectController(std::shared_ptr<SceneObjectController> controller)
+void Scene::addObjectController(std::shared_ptr<SceneObjectControllerBase> controller)
 {
     m_objectControllers.push_back(controller);
 }

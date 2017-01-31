@@ -19,60 +19,47 @@
 
    =========================================================================*/
 
-#ifndef imstkCameraController_h
-#define imstkCameraController_h
-
-#include "imstkModule.h"
-#include "imstkDeviceTracker.h"
-#include "imstkCamera.h"
-
-#include <memory>
+#ifndef imstkSceneObjectControllerBase_h
+#define imstkSceneObjectControllerBase_h
 
 namespace imstk
 {
 
 ///
-/// \class CameraController
+/// \class SceneObjectControllerBase
 ///
-/// \brief
+/// \brief Base class for all the scene object controllers
 ///
-class CameraController : public Module, public DeviceTracker
+class SceneObjectControllerBase
 {
 public:
     ///
-    /// \brief
+    /// \brief Constructor/Destructor
     ///
-    CameraController(Camera& camera,
-                     std::shared_ptr<DeviceClient> deviceClient) :
-        Module("Camera controller"),
-        m_camera(camera),
-        DeviceTracker(deviceClient)
-    {}
+    SceneObjectControllerBase() = default;
+    ~SceneObjectControllerBase() = default;
+
+    ///
+    /// \brief Initialize offset based on object geometry
+    ///
+    virtual void initOffsets() = 0;
+
+    ///
+    /// \brief Update controlled scene objects using latest tracking information
+    ///
+    virtual void updateControlledObjects() = 0;
+
+    ///
+    /// \brief Apply forces to the haptic device
+    ///
+    virtual void applyForces() = 0;
 
     ///
     /// \brief
     ///
-    ~CameraController() = default;
-
-protected:
-    ///
-    /// \brief
-    ///
-    void initModule() override;
-
-    ///
-    /// \brief
-    ///
-    void runModule() override;
-
-    ///
-    /// \brief
-    ///
-    void cleanUpModule() override;
-
-    Camera& m_camera; ///< Camera controlled by the external device
-
+    virtual void setTrackerToOutOfDate() = 0;
 };
 
 } // imstk
-#endif // ifndef imstkCameraController_h
+
+#endif // ifndef imstkSceneObjectControllerBase_h

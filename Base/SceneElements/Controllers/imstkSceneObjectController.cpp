@@ -34,33 +34,33 @@ namespace imstk
 void
 SceneObjectController::initOffsets()
 {
-    m_translationOffset = m_sceneObject.getMasterGeometry()->getPosition();
-    m_rotationOffset = m_sceneObject.getMasterGeometry()->getOrientation();
+    m_trackingController->setTranslationOffset(m_sceneObject->getMasterGeometry()->getPosition());
+    m_trackingController->setRotationOffset(m_sceneObject->getMasterGeometry()->getOrientation());
 }
 
 void
-SceneObjectController::updateFromDevice()
+SceneObjectController::updateControlledObjects()
 {
-    Vec3d p;
-    Quatd r;
-
-    if (!this->computeTrackingData(p, r))
+    if (!m_trackingController->isTrackerUpToDate())
     {
-        LOG(WARNING) << "SceneObjectController::updateFromDevice warning: could not update tracking info.";
-        return;
+        if (!m_trackingController->updateTrackingData())
+        {
+            LOG(WARNING) << "SceneObjectController::updateControlledObjects warning: could not update tracking info.";
+            return;
+        }
     }
 
     // Update colliding geometry
-    m_sceneObject.getMasterGeometry()->setPosition(p);
-    m_sceneObject.getMasterGeometry()->setOrientation(r);
+    m_sceneObject->getMasterGeometry()->setPosition(m_trackingController->getPosition());
+    m_sceneObject->getMasterGeometry()->setOrientation(m_trackingController->getRotation());
 }
 
 void
 SceneObjectController::applyForces()
 {
-    if(auto collidingObject = dynamic_cast<CollidingObject*>(&m_sceneObject))
+    if(auto collidingObject = dynamic_cast<CollidingObject*>(m_sceneObject.get()))
     {
-        m_deviceClient->setForce(collidingObject->getForce());
+        m_trackingController->getDeviceClient()->setForce(collidingObject->getForce());
     }
 }
 

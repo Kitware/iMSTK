@@ -426,8 +426,9 @@ void testPenaltyRigidCollision()
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
 
-    auto sphere0Controller = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), client0);
-    sphere0Controller->setTranslationScaling(40);
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(client0);
+    trackCtrl0->setTranslationScaling(40);
+    auto sphere0Controller = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
     scene->addObjectController(sphere0Controller);
 
     // Sphere1
@@ -439,8 +440,9 @@ void testPenaltyRigidCollision()
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
 
-    auto sphere1Controller = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), client1);
-    sphere1Controller->setTranslationScaling(40);
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(client1);
+    trackCtrl1->setTranslationScaling(40);
+    auto sphere1Controller = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
     scene->addObjectController(sphere1Controller);
 
     // Collisions
@@ -503,8 +505,9 @@ void testTwoFalcons()
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
 
-    auto controller0 = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), falcon0);
-    controller0->setTranslationScaling(30);
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(falcon0);
+    trackCtrl0->setTranslationScaling(30);
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
     scene->addObjectController(controller0);
 
     // Sphere1
@@ -516,8 +519,9 @@ void testTwoFalcons()
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
 
-    auto controller1 = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), falcon1);
-    controller1->setTranslationScaling(30);
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(falcon1);
+    trackCtrl1->setTranslationScaling(30);
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
     scene->addObjectController(controller1);
 
     // Camera
@@ -533,7 +537,8 @@ void testTwoFalcons()
     sdk->startSimulation(true);
 }
 
-void testTwoOmnis(){
+void testTwoOmnis()
+{
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
@@ -567,8 +572,9 @@ void testTwoOmnis(){
     sphere0Obj->setCollidingGeometry(sphere0Geom);
     scene->addSceneObject(sphere0Obj);
 
-    auto controller0 = std::make_shared<imstk::SceneObjectController>(*sphere0Obj.get(), client0);
-    controller0->setTranslationScaling(0.05);
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(client0);
+    trackCtrl0->setTranslationScaling(0.05);
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
     scene->addObjectController(controller0);
 
     // Sphere1
@@ -581,8 +587,9 @@ void testTwoOmnis(){
     sphere1Obj->setCollidingGeometry(sphere1Geom);
     scene->addSceneObject(sphere1Obj);
 
-    auto controller1 = std::make_shared<imstk::SceneObjectController>(*sphere1Obj.get(), client1);
-    controller1->setTranslationScaling(0.05);
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(client1);
+    trackCtrl1->setTranslationScaling(0.05);
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
     scene->addObjectController(controller1);
 
     // Update Camera position
@@ -621,8 +628,9 @@ void testObjectController()
     object->setCollidingGeometry(geom);
     scene->addSceneObject(object);
 
-    auto controller = std::make_shared<imstk::SceneObjectController>(*object.get(), client);
-    controller->setTranslationScaling(0.1);
+    auto trackCtrl = std::make_shared<imstk::DeviceTracker>(client);
+    trackCtrl->setTranslationScaling(0.1);
+    auto controller = std::make_shared<imstk::SceneObjectController>(object, trackCtrl);
     scene->addObjectController(controller);
 
     // Update Camera position

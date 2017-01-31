@@ -40,13 +40,17 @@ VirtualCouplingPBDObject::initOffsets()
 void
 VirtualCouplingPBDObject::updateFromDevice()
 {
-    Vec3d p;
-    Quatd r;
-    if (!this->computeTrackingData(p, r))
+    if (!m_trackingDataUptoDate)
     {
-        LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
-        return;
+        if (!updateTrackingData())
+        {
+            LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
+            return;
+        }
     }
+
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
 
     // Update colliding geometry
     m_visualGeometry->setPosition(p);

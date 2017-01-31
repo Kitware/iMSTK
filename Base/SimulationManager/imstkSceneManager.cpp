@@ -84,7 +84,7 @@ SceneManager::runModule()
     // Update objects controlled by the device controllers
     for (auto controller : m_scene->getSceneObjectControllers())
     {
-        controller->updateFromDevice();
+        controller->updateControlledObjects();
         controller->applyForces();
     }
 
@@ -118,6 +118,21 @@ SceneManager::runModule()
             intPair->doNarrowPhaseCollision();
         }
         intPair->resolveCollision();
+    }
+
+    // Set the trackers of virtual coupling PBD objects to out-of-date
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
+        {
+            virtualCouplingPBD->setTrackerToOutOfDate();
+        }
+    }
+
+    // Set the trackers of the scene object controllers to out-of-date
+    for (auto controller : m_scene->getSceneObjectControllers())
+    {
+        controller->setTrackerToOutOfDate();
     }
 }
 
