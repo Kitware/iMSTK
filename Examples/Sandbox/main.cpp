@@ -119,32 +119,66 @@ int main()
         << "Starting Sandbox\n"
         << "****************\n";
 
+    /*------------------
+    Test rendering
+    ------------------*/
     //testMultiTextures();
+    //testVTKTexture();
+    //testMultiObjectWithTextures();
+    //testViewer();
+
+
+    /*------------------
+    Test CD and CR
+    ------------------*/
     //testMeshCCD();
     //testPenaltyRigidCollision();
-    //testTwoFalcons();
-    //testObjectController();
-    //testCameraController();
-    //testViewer();
-    //testReadMesh();
-    //testAnalyticalGeometry();
-    //testScenesManagement();
+
+
+    /*------------------
+    Test geometry, maps
+    ------------------*/
     //testIsometricMap();
     //testTetraTriangleMap();
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    testDeformableBody();
-    //testVTKTexture();
-    //testMultiObjectWithTextures();
-    //testTwoOmnis();
-    //testVectorPlotters();
+    //testAnalyticalGeometry();
+
+
+    /*------------------
+    Test physics
+    ------------------*/
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
+    //testDeformableBody();
+
+
+    /*------------------
+    Test mesh I/O
+    ------------------*/
     //testLineMesh();
     //testMshAndVegaIO();
+    //testReadMesh();
+
+
+    /*------------------
+    Test devices, controllers
+    ------------------*/
+    //testObjectController();
+    //testTwoFalcons();
+    //testCameraController();
+    //testTwoOmnis();
     testLapToolController();
+
+
+    /*------------------
+    Test Misc.
+    ------------------*/
+    //testScenesManagement();
+    //testVectorPlotters();
+
 
     return 0;
 }
