@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkTrackingController.h"
+#include "imstkDeviceTracker.h"
 
 #include <utility>
 
@@ -29,89 +29,91 @@ namespace imstk
 {
 
 bool
-TrackingController::computeTrackingData(Vec3d& p, Quatd& r)
+DeviceTracker::updateTrackingData()
 {
     if (m_deviceClient == nullptr)
     {
-        LOG(WARNING) << "TrackingController::getTrackingData warning: no controlling device set.";
+        LOG(WARNING) << "DeviceTracker::getTrackingData warning: no controlling device set.";
         return false;
     }
 
     // Retrieve device info
-    p = m_deviceClient->getPosition();
-    r = m_deviceClient->getOrientation();
+    m_currentPos = m_deviceClient->getPosition();
+    m_currentRot = m_deviceClient->getOrientation();
 
     // Apply inverse if needed
-    if(m_invertFlags & InvertFlag::transX) p[0] = -p[0];
-    if(m_invertFlags & InvertFlag::transY) p[1] = -p[1];
-    if(m_invertFlags & InvertFlag::transZ) p[2] = -p[2];
-    if(m_invertFlags & InvertFlag::rotX) r.x() = -r.x();
-    if(m_invertFlags & InvertFlag::rotY) r.y() = -r.y();
-    if(m_invertFlags & InvertFlag::rotZ) r.z() = -r.z();
+    if (m_invertFlags & InvertFlag::transX) m_currentPos[0] = -m_currentPos[0];
+    if (m_invertFlags & InvertFlag::transY) m_currentPos[1] = -m_currentPos[1];
+    if (m_invertFlags & InvertFlag::transZ) m_currentPos[2] = -m_currentPos[2];
+    if (m_invertFlags & InvertFlag::rotX) m_currentRot.x() = -m_currentRot.x();
+    if (m_invertFlags & InvertFlag::rotY) m_currentRot.y() = -m_currentRot.y();
+    if (m_invertFlags & InvertFlag::rotZ) m_currentRot.z() = -m_currentRot.z();
 
     // Apply Offsets
-    p = m_rotationOffset * p * m_scaling + m_translationOffset;
-    r *= m_rotationOffset;
+    m_currentPos = m_rotationOffset * m_currentPos * m_scaling + m_translationOffset;
+    m_currentRot *= m_rotationOffset;
+
+    m_trackingDataUptoDate = true;
 
     return true;
 }
 
 std::shared_ptr<DeviceClient>
-TrackingController::getDeviceClient() const
+DeviceTracker::getDeviceClient() const
 {
     return m_deviceClient;
 }
 
 void
-TrackingController::setDeviceClient(std::shared_ptr<DeviceClient> deviceClient)
+DeviceTracker::setDeviceClient(std::shared_ptr<DeviceClient> deviceClient)
 {
     m_deviceClient = deviceClient;
 }
 
 double
-TrackingController::getTranslationScaling() const
+DeviceTracker::getTranslationScaling() const
 {
     return m_scaling;
 }
 
 void
-TrackingController::setTranslationScaling(double scaling)
+DeviceTracker::setTranslationScaling(double scaling)
 {
     m_scaling = scaling;
 }
 
 const Vec3d&
-TrackingController::getTranslationOffset() const
+DeviceTracker::getTranslationOffset() const
 {
     return m_translationOffset;
 }
 
 void
-TrackingController::setTranslationOffset(const Vec3d& t)
+DeviceTracker::setTranslationOffset(const Vec3d& t)
 {
     m_translationOffset = t;
 }
 
 const Quatd&
-TrackingController::getRotationOffset()
+DeviceTracker::getRotationOffset()
 {
     return m_rotationOffset;
 }
 
 void
-TrackingController::setRotationOffset(const Quatd& r)
+DeviceTracker::setRotationOffset(const Quatd& r)
 {
     m_rotationOffset = r;
 }
 
 unsigned char
-TrackingController::getInversionFlags()
+DeviceTracker::getInversionFlags()
 {
     return m_invertFlags;
 }
 
 void
-TrackingController::setInversionFlags(unsigned char f)
+DeviceTracker::setInversionFlags(unsigned char f)
 {
     m_invertFlags = f;
 }

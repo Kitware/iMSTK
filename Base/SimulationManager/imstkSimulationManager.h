@@ -133,6 +133,7 @@ public:
     /// \brief
     ///
     void setCurrentScene(std::string newSceneName, bool unloadCurrentScene = false);
+    void setCurrentScene(std::shared_ptr<Scene> scene, bool unloadCurrentScene = false);
 
     ///
     /// \brief

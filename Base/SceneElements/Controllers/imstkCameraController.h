@@ -23,7 +23,7 @@
 #define imstkCameraController_h
 
 #include "imstkModule.h"
-#include "imstkTrackingController.h"
+#include "imstkDeviceTracker.h"
 #include "imstkCamera.h"
 
 #include <memory>
@@ -36,7 +36,7 @@ namespace imstk
 ///
 /// \brief
 ///
-class CameraController : public Module, public TrackingController
+class CameraController : public Module, public DeviceTracker
 {
 public:
     ///
@@ -46,7 +46,7 @@ public:
                      std::shared_ptr<DeviceClient> deviceClient) :
         Module("Camera controller"),
         m_camera(camera),
-        TrackingController(deviceClient)
+        DeviceTracker(deviceClient)
     {}
 
     ///

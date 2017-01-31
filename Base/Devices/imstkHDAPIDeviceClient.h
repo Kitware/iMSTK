@@ -32,7 +32,8 @@
 
 #include <memory>
 
-namespace imstk {
+namespace imstk
+{
 
 struct HD_state
 {
@@ -50,25 +51,39 @@ class HDAPIDeviceClient : public DeviceClient
 {
 public:
 
-    HDAPIDeviceClient(std::string name):
-        DeviceClient(name, "localhost")
-    {}
-
-    virtual ~HDAPIDeviceClient() {}
+    ///
+    /// \brief Constructor/Destructor
+    ///
+    HDAPIDeviceClient(std::string name): DeviceClient(name, "localhost"){}
+    virtual ~HDAPIDeviceClient(){}
 
 protected:
 
     friend class HDAPIDeviceServer;
+
+    ///
+    /// \brief Initialize the phantom omni device
+    ///
     void init();
+
+    ///
+    /// \brief Use callback to get tracking data from phantom omni
+    ///
     void run();
+
+    ///
+    /// \brief Closes the phantom omni device
+    ///
     void cleanUp();
 
 private:
-
+    ///
+    /// \brief Phantom omni device api callback
+    ///
     static HDCallbackCode HDCALLBACK hapticCallback(void* pData);
 
-    HHD m_handle; //!< device handle
-    HD_state m_state; //!< device reading state
+    HHD m_handle;     ///< device handle
+    HD_state m_state; ///< device reading state
 
 };
 }

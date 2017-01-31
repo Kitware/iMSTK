@@ -171,6 +171,12 @@ SimulationManager::getViewer() const
 }
 
 void
+SimulationManager::setCurrentScene(std::shared_ptr<Scene> scene, bool unloadCurrentScene)
+{
+    setCurrentScene(scene->getName(), unloadCurrentScene);
+}
+
+void
 SimulationManager::setCurrentScene(std::string newSceneName, bool unloadCurrentScene)
 {
     LOG(INFO) << "Setting current scene";

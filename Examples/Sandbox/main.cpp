@@ -53,6 +53,7 @@
 #include "imstkVRPNDeviceServer.h"
 #include "imstkCameraController.h"
 #include "imstkSceneObjectController.h"
+#include "imstkLaparoscopicToolController.h"
 
 // Collisions
 #include "imstkInteractionPair.h"
@@ -102,6 +103,7 @@ void testPbdCloth();
 void testPbdCollision();
 void testLineMesh();
 void testMshAndVegaIO();
+void testLapToolController();
 
 int main()
 {
@@ -117,33 +119,131 @@ int main()
         << "Starting Sandbox\n"
         << "****************\n";
 
+    /*------------------
+    Test rendering
+    ------------------*/
     //testMultiTextures();
+    //testVTKTexture();
+    //testMultiObjectWithTextures();
+    //testViewer();
+
+
+    /*------------------
+    Test CD and CR
+    ------------------*/
     //testMeshCCD();
     //testPenaltyRigidCollision();
-    //testTwoFalcons();
-    //testObjectController();
-    //testCameraController();
-    //testViewer();
-    //testReadMesh();
-    //testAnalyticalGeometry();
-    //testScenesManagement();
+
+
+    /*------------------
+    Test geometry, maps
+    ------------------*/
     //testIsometricMap();
     //testTetraTriangleMap();
     //testExtractSurfaceMesh();
     //testOneToOneNodalMap();
     //testSurfaceMeshOptimizer();
-    testDeformableBody();
-    //testVTKTexture();
-    //testMultiObjectWithTextures();
-    //testTwoOmnis();
-    //testVectorPlotters();
+    //testAnalyticalGeometry();
+
+
+    /*------------------
+    Test physics
+    ------------------*/
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
+    //testDeformableBody();
+
+
+    /*------------------
+    Test mesh I/O
+    ------------------*/
     //testLineMesh();
     //testMshAndVegaIO();
+    //testReadMesh();
+
+
+    /*------------------
+    Test devices, controllers
+    ------------------*/
+    //testObjectController();
+    //testTwoFalcons();
+    //testCameraController();
+    //testTwoOmnis();
+    testLapToolController();
+
+
+    /*------------------
+    Test Misc.
+    ------------------*/
+    //testScenesManagement();
+    //testVectorPlotters();
+
 
     return 0;
+}
+
+void testLapToolController()
+{
+
+#ifdef iMSTK_USE_OPENHAPTICS
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("TestLapToolController");
+
+    // Device clients
+    auto client0 = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client0);
+    sdk->addModule(server);
+
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(100);
+    planeGeom->translate(Vec3d(0., -20., 0.));
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+    scene->addSceneObject(planeObj);
+
+    auto createAndAddVisualSceneObject =
+        [](std::shared_ptr<imstk::Scene> scene,
+        const std::string& fileName,
+        const std::string& objectName) ->
+        std::shared_ptr<imstk::SceneObject>
+    {
+        auto mesh = imstk::MeshIO::read(fileName);
+        auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
+
+        // Create object and add to scene
+        auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
+        meshObject->setVisualGeometry(SurfaceMesh);
+        meshObject->setName(objectName);
+        scene->addSceneObject(meshObject);
+        return meshObject;
+    };
+
+    // laparoscopic tool
+    auto pivot = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/pivot.obj", "pivot");
+    auto upperJaw = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/upper.obj", "upperJaw");
+    auto lowerJaw = createAndAddVisualSceneObject(scene, DATA_ROOT_PATH"/laptool/lower.obj", "lowerJaw");
+
+    auto trackingCtrl = std::make_shared<imstk::DeviceTracker>(client0);
+    trackingCtrl->setTranslationScaling(0.5);
+    auto lapToolController = std::make_shared<imstk::LaparoscopicToolController>(pivot, upperJaw, lowerJaw, trackingCtrl);
+    lapToolController->setJawRotationAxis(imstk::Vec3d(1.0, 0, 0));
+    scene->addObjectController(lapToolController);
+
+    // Set Camera
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 30, 60));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(true);
+#endif
 }
 
 void testMshAndVegaIO()
@@ -201,7 +301,7 @@ void testMshAndVegaIO()
     scene->addSceneObject(objectB);
 
     // Run
-    sdk->setCurrentScene("SceneTestMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 
 }
@@ -313,7 +413,7 @@ void testMultiObjectWithTextures()
         scene->addSceneObject(object1);
     }
     // Run
-    sdk->setCurrentScene("multiObjectWithTexturesTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -338,7 +438,7 @@ void testMultiTextures()
     scene->addSceneObject(object);
 
     // Run
-    sdk->setCurrentScene("multitexturestest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -384,7 +484,7 @@ void testMeshCCD()
     });
 
     // Run
-    sdk->setCurrentScene("MeshCCDTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
     t.join();
 }
@@ -424,9 +524,12 @@ void testPenaltyRigidCollision()
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(client0);
-    sphere0Controller->setTranslationScaling(40);
     scene->addSceneObject(sphere0Obj);
+
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(client0);
+    trackCtrl0->setTranslationScaling(40);
+    auto sphere0Controller = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
+    scene->addObjectController(sphere0Controller);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<Sphere>();
@@ -435,9 +538,12 @@ void testPenaltyRigidCollision()
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(client1);
-    sphere1Controller->setTranslationScaling(40);
     scene->addSceneObject(sphere1Obj);
+
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(client1);
+    trackCtrl1->setTranslationScaling(40);
+    auto sphere1Controller = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
+    scene->addObjectController(sphere1Controller);
 
     // Collisions
     auto colGraph = scene->getCollisionGraph();
@@ -455,7 +561,7 @@ void testPenaltyRigidCollision()
         CollisionHandling::Type::Penalty);
 
     // Run
-    sdk->setCurrentScene("InteractionPairTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -497,9 +603,12 @@ void testTwoFalcons()
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(falcon0);
-    sphere0Controller->setTranslationScaling(30);
     scene->addSceneObject(sphere0Obj);
+
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(falcon0);
+    trackCtrl0->setTranslationScaling(30);
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
+    scene->addObjectController(controller0);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
@@ -508,9 +617,12 @@ void testTwoFalcons()
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(falcon1);
-    sphere1Controller->setTranslationScaling(30);
     scene->addSceneObject(sphere1Obj);
+
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(falcon1);
+    trackCtrl1->setTranslationScaling(30);
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
+    scene->addObjectController(controller1);
 
     // Camera
     auto cam = scene->getCamera();
@@ -521,11 +633,12 @@ void testTwoFalcons()
                                      imstk::CameraController::InvertFlag::rotZ);
 
     // Run
-    sdk->setCurrentScene("FalconsTestScene");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
-void testTwoOmnis(){
+void testTwoOmnis()
+{
 #ifdef iMSTK_USE_OPENHAPTICS
     // SDK and Scene
     auto sdk = std::make_shared<imstk::SimulationManager>();
@@ -553,23 +666,31 @@ void testTwoOmnis(){
     auto sphere0Geom = std::make_shared<imstk::Sphere>();
     sphere0Geom->setPosition(imstk::Vec3d(2, 2.5, 0));
     sphere0Geom->scale(1);
+
     auto sphere0Obj = std::make_shared<imstk::CollidingObject>("Sphere0");
     sphere0Obj->setVisualGeometry(sphere0Geom);
     sphere0Obj->setCollidingGeometry(sphere0Geom);
-    auto sphere0Controller = sphere0Obj->setupController(client0);
-    sphere0Controller->setTranslationScaling(0.05);
     scene->addSceneObject(sphere0Obj);
+
+    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(client0);
+    trackCtrl0->setTranslationScaling(0.05);
+    auto controller0 = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
+    scene->addObjectController(controller0);
 
     // Sphere1
     auto sphere1Geom = std::make_shared<imstk::Sphere>();
     sphere1Geom->setPosition(imstk::Vec3d(-2, 2.5, 0));
     sphere1Geom->scale(1);
+
     auto sphere1Obj = std::make_shared<imstk::CollidingObject>("Sphere1");
     sphere1Obj->setVisualGeometry(sphere1Geom);
     sphere1Obj->setCollidingGeometry(sphere1Geom);
-    auto sphere1Controller = sphere1Obj->setupController(client1);
-    sphere1Controller->setTranslationScaling(0.05);
     scene->addSceneObject(sphere1Obj);
+
+    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(client1);
+    trackCtrl1->setTranslationScaling(0.05);
+    auto controller1 = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
+    scene->addObjectController(controller1);
 
     // Update Camera position
     auto cam = scene->getCamera();
@@ -577,7 +698,7 @@ void testTwoOmnis(){
     cam->setFocalPoint(sphere0Geom->getPosition());
 
     // Run
-    sdk->setCurrentScene("OmnisTestScene");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -601,12 +722,16 @@ void testObjectController()
     auto geom = std::make_shared<imstk::Cube>();
     geom->setPosition(imstk::UP_VECTOR);
     geom->scale(2);
+
     auto object = std::make_shared<imstk::CollidingObject>("VirtualObject");
     object->setVisualGeometry(geom);
     object->setCollidingGeometry(geom);
-    auto controller = object->setupController(client);
-    controller->setTranslationScaling(0.1);
     scene->addSceneObject(object);
+
+    auto trackCtrl = std::make_shared<imstk::DeviceTracker>(client);
+    trackCtrl->setTranslationScaling(0.1);
+    auto controller = std::make_shared<imstk::SceneObjectController>(object, trackCtrl);
+    scene->addObjectController(controller);
 
     // Update Camera position
     auto cam = scene->getCamera();
@@ -614,7 +739,7 @@ void testObjectController()
     cam->setFocalPoint(geom->getPosition());
 
     // Run
-    sdk->setCurrentScene("SceneTestDevice");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(false);
 #endif
 }
@@ -653,7 +778,7 @@ void testCameraController()
                                      imstk::CameraController::InvertFlag::rotZ);
 
     // Run
-    sdk->setCurrentScene("SceneTestDevice");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -685,7 +810,7 @@ void testReadMesh()
     scene->addSceneObject(object);
 
     // Run
-    sdk->setCurrentScene("SceneTestMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -743,7 +868,7 @@ void testViewer()
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
     // Run
-    sdk->setCurrentScene("SceneTest");
+    sdk->setCurrentScene(sceneTest);
     sdk->startSimulation(true);
 }
 
@@ -803,18 +928,18 @@ void testScenesManagement()
     // switch
     LOG(INFO) << "-- Test scene switch";
     int delay = 5;
-    sdk->setCurrentScene("scene1");
+    sdk->setCurrentScene(scene1);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene("scene2", false);
+    sdk->setCurrentScene(scene2, false);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
-    sdk->setCurrentScene("scene1", true);
+    sdk->setCurrentScene(scene1, true);
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->endSimulation();
 
     // pause/run
     LOG(INFO) << "-- Test simulation pause/run";
-    sdk->setCurrentScene("scene2");
+    sdk->setCurrentScene(scene2);
     sdk->startSimulation();
     std::this_thread::sleep_for(std::chrono::seconds(delay));
     sdk->pauseSimulation();
@@ -872,7 +997,7 @@ void testIsometricMap()
     LOG(INFO) << cubeGeom->getPosition();
 
     // Start simulation
-    sdk->setCurrentScene("geometryMapTest");
+    sdk->setCurrentScene(geometryMapTest);
     sdk->startSimulation(imstk::VTKRenderer::Mode::DEBUG);
 }
 
@@ -1191,7 +1316,7 @@ void testDeformableBody()
     scene->addNonlinearSolver(nlSolver);
 
     // Run the simulation
-    sdk->setCurrentScene("DeformableBodyTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1280,7 +1405,7 @@ void testPbdVolume()
     planeObj->setCollidingGeometry(planeGeom);
     scene->addSceneObject(planeObj);
 
-    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 
 }
@@ -1370,7 +1495,7 @@ void testPbdCloth()
     scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
 
-    sdk->setCurrentScene("PositionBasedDynamicsTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -1684,7 +1809,7 @@ void testPbdCollision()
 
         colGraph->addInteractionPair(pair);
     }
-    sdk->setCurrentScene("PbdCollisionTest");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 
@@ -2016,7 +2141,7 @@ void testLineMesh()
         scene->getCamera()->setFocalPoint(surfMesh.get()->getInitialVertexPosition(20));
     }
     // Run
-    sdk->setCurrentScene("TestLineMesh");
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 #endif
 }

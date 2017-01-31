@@ -19,54 +19,47 @@
 
    =========================================================================*/
 
-#include "imstkSceneObject.h"
-
-#include "imstkSceneObjectController.h"
-#include "imstkDeviceClient.h"
+#ifndef imstkSceneObjectControllerBase_h
+#define imstkSceneObjectControllerBase_h
 
 namespace imstk
 {
 
-std::shared_ptr<Geometry>
-SceneObject::getVisualGeometry() const
+///
+/// \class SceneObjectControllerBase
+///
+/// \brief Base class for all the scene object controllers
+///
+class SceneObjectControllerBase
 {
-    return m_visualGeometry;
-}
+public:
+    ///
+    /// \brief Constructor/Destructor
+    ///
+    SceneObjectControllerBase() = default;
+    ~SceneObjectControllerBase() = default;
 
-void
-SceneObject::setVisualGeometry(std::shared_ptr<Geometry> geometry)
-{
-    m_visualGeometry = geometry;
-}
+    ///
+    /// \brief Initialize offset based on object geometry
+    ///
+    virtual void initOffsets() = 0;
 
-std::shared_ptr<Geometry>
-SceneObject::getMasterGeometry() const
-{
-    return m_visualGeometry;
-}
+    ///
+    /// \brief Update controlled scene objects using latest tracking information
+    ///
+    virtual void updateControlledObjects() = 0;
 
-const SceneObject::Type&
-SceneObject::getType() const
-{
-    return m_type;
-}
+    ///
+    /// \brief Apply forces to the haptic device
+    ///
+    virtual void applyForces() = 0;
 
-void
-SceneObject::setType(SceneObject::Type type)
-{
-    m_type = type;
-}
-
-const std::string&
-SceneObject::getName() const
-{
-    return m_name;
-}
-
-void
-SceneObject::setName(const std::string& name)
-{
-    m_name = name;
-}
+    ///
+    /// \brief
+    ///
+    virtual void setTrackerToOutOfDate() = 0;
+};
 
 } // imstk
+
+#endif // ifndef imstkSceneObjectControllerBase_h

@@ -40,13 +40,17 @@ VirtualCouplingPBDObject::initOffsets()
 void
 VirtualCouplingPBDObject::updateFromDevice()
 {
-    Vec3d p;
-    Quatd r;
-    if (!this->computeTrackingData(p, r))
+    if (!m_trackingDataUptoDate)
     {
-        LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
-        return;
+        if (!updateTrackingData())
+        {
+            LOG(WARNING) << "VirtualCouplingPBDObject::updateFromDevice warning: could not update tracking info.";
+            return;
+        }
     }
+
+    Vec3d p = getPosition();
+    Quatd r = getRotation();
 
     // Update colliding geometry
     m_visualGeometry->setPosition(p);
@@ -54,31 +58,31 @@ VirtualCouplingPBDObject::updateFromDevice()
 
     computeTransform(p, r, transform);
 
-   auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
+    auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
 
-   Vec4d vertexPos4;
-   vertexPos4.w() = 1;
-   Vec3d vertexPos3;
+    Vec4d vertexPos4;
+    vertexPos4.w() = 1;
+    Vec3d vertexPos3;
 
     for (int i = 0; i < collidingMesh->getNumVertices(); ++i)
-   {
-       vertexPos3 = collidingMesh->getVertexPosition(i);
-       vertexPos4.x() = vertexPos3.x();
-       vertexPos4.y() = vertexPos3.y();
-       vertexPos4.z() = vertexPos3.z();
+    {
+        vertexPos3 = collidingMesh->getVertexPosition(i);
+        vertexPos4.x() = vertexPos3.x();
+        vertexPos4.y() = vertexPos3.y();
+        vertexPos4.z() = vertexPos3.z();
 
-       vertexPos4.applyOnTheLeft(transform);
-       vertexPos3.x() = vertexPos4.x();
-       vertexPos3.y() = vertexPos4.y();
-       vertexPos3.z() = vertexPos4.z();
+        vertexPos4.applyOnTheLeft(transform);
+        vertexPos3.x() = vertexPos4.x();
+        vertexPos3.y() = vertexPos4.y();
+        vertexPos3.z() = vertexPos4.z();
 
-       collidingMesh->setVerticePosition(i, vertexPos3);
+        collidingMesh->setVerticePosition(i, vertexPos3);
     }
     applyCollidingToPhysics();
     updatePbdStates();
 }
 
-void 
+void
 VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matrix4d& t){
     auto scaling = m_collidingGeometry->getScaling();
     auto angleAxis = Rotd(quat);

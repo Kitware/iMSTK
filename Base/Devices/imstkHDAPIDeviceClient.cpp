@@ -34,6 +34,8 @@ namespace imstk
 void
 HDAPIDeviceClient::init()
 {
+    m_buttons = std::map < size_t, bool > { { 0, false }, { 1, false }, { 2, false }, { 3, false }};
+
     // Open Device
     m_handle = hdInitDevice(this->getDeviceName().c_str());
 

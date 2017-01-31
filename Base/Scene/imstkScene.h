@@ -34,6 +34,8 @@
 namespace imstk
 {
 
+class SceneObjectControllerBase;
+
 ///
 /// \class Scene
 ///
@@ -66,6 +68,11 @@ public:
     /// NOTE: A separate list might be efficient as this is called runtime
     ///
     const std::vector<std::shared_ptr<SceneObject>> getSceneObjects() const;
+
+    ///
+    /// \brief Get the scene object controllers
+    ///
+    const std::vector <std::shared_ptr<SceneObjectControllerBase>> getSceneObjectControllers() const;
 
     ///
     /// \brief Get a scene object of a specific name
@@ -124,6 +131,11 @@ public:
     ///
     void addNonlinearSolver(std::shared_ptr<SolverBase> solver);
 
+    ///
+    /// \brief Add objects controllers
+    ///
+    void addObjectController(std::shared_ptr<SceneObjectControllerBase> controller);
+
 protected:
 
     std::string m_name; ///> Name of the scene
@@ -131,7 +143,8 @@ protected:
     NamedMap<Light> m_lightsMap;
     std::shared_ptr<Camera> m_camera = std::make_shared<Camera>();
     std::shared_ptr<CollisionGraph> m_collisionGraph = std::make_shared<CollisionGraph>();
-    std::vector<std::shared_ptr<SolverBase>> m_solvers; ///> List of non-linear solvers
+    std::vector<std::shared_ptr<SolverBase>> m_solvers;     ///> List of non-linear solvers
+    std::vector<std::shared_ptr<SceneObjectControllerBase>> m_objectControllers; ///> List of controllers
 };
 
 } // imstk
