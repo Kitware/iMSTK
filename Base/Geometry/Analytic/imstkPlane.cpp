@@ -40,13 +40,18 @@ Plane::getVolume() const
 Vec3d
 Plane::getNormal() const
 {
-    return m_orientation._transformVector(UP_VECTOR);
+    return m_normal;
 }
 
 void
 Plane::setNormal(const Vec3d& normal)
 {
-    this->setOrientation(Quatd::FromTwoVectors(UP_VECTOR, normal));
+    if(normal == Vec3d::Zero())
+    {
+        LOG(WARNING) << "Plane::setNormal: can't set normal to zero vector";
+        return;
+    }
+    m_normal = normal;
 }
 
 const double&
@@ -58,6 +63,11 @@ Plane::getWidth() const
 void
 Plane::setWidth(const double& width)
 {
+    if(width <= 0)
+    {
+        LOG(WARNING) << "Plane::setWidth error: width should be positive.";
+        return;
+    }
     m_width = width;
 }
 

@@ -45,7 +45,8 @@ public:
         Geometry(Geometry::Type::Plane,
                  position,
                  Quatd::FromTwoVectors(UP_VECTOR, normal)),
-        m_width(width)
+        m_width(width),
+        m_normal(normal)
     {}
 
     ///
@@ -86,6 +87,7 @@ public:
 
 protected:
     double m_width; ///> Width of the plane (for display)
+    Vec3d m_normal; ///> Normal of the plane
 };
 
 } // imstk
