@@ -36,7 +36,7 @@ Sphere::print() const
 double
 Sphere::getVolume() const
 {
-    return 0.75*PI*m_radius*m_radius*m_radius;
+    return 4.0 / 3.0 * PI * m_radius * m_radius * m_radius;
 }
 
 const double&
