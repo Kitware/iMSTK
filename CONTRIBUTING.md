@@ -13,6 +13,11 @@
   * [Removing previous commit changes](#removing-previous-commit-changes)
   * [Editing older commits](#editing-older-commits)
   * [Syncing repositories](#syncing-repositories)
+* [Data Management](#data-management)
+ * [Add Data](#add-data)
+ * [Fetch Data for your examples](#fetch-data-for-your-examples)
+ * [Use external data in your examples](#use-external-data-in-your-examples)
+ * [Update your Data](#update-your-data)
 * [Dashboards](#dashboards)
 
 
@@ -270,6 +275,38 @@ This process consists of rewriting the branch history, therefore re-syncing it w
     git fetch myremote
     git reset --hard myremote/branch-name
     ```
+
+
+## Data Management
+------
+
+* ### Add Data
+The proper way to add data to iMSTK, is to:
+    - Contact a project manager to upload your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
+    - Add the key file to `iMSTK-Source/Data` (Download the key file from girder as shown on the following picture).
+      ![Download Key File](https://data.kitware.com/api/v1/item/58acc5588d777f0aef5cff96/download?contentDisposition=inline)
+
+* ### Fetch Data for your examples
+To fetch the external data before building your example, you will need to list it using `imstk_add_data` in your example CMakeLists.txt:
+
+    ```cmake
+    imstk_add_data(exampleExecutableName dataList)
+    ```
+    > * `exampleExecutableName` is usually `${PROJECT_NAME}` in an example CMakeLists.txt.
+    > * `dataList` need to contain the list of data names which are needed in the example. Those names are relative to `iMSTK-Source/Data`.
+    > * Regular expressions can be used to populate the file list using [REGEX](https://cmake.org/cmake/help/v3.8/module/ExternalData.html#referencing-associated-files).
+
+    The data will be downloaded from Girder to `iMSTK-build/Innerbuild/ExternalData/Data`: the `Objects` directory is the datastore, and the `Data` directory holds symbolic links to that data with expected file names.
+
+* ### Use external data in your examples
+The path to the data directory is defined by iMSTK_DATA_ROOT which can be used in your C++ code as shown below :
+```c++
+imstk::MeshIO::read(iMSTK_DATA_ROOT"/relative/path/to/mesh.vtk");
+```
+
+* ### Update your Data
+    - Contact a project manager to update your data in the [Girder iMSTK collection](https://data.kitware.com/#collection/58ab34918d777f073240dc02).
+    - Update the key file to `iMSTK-Source/Data` as described in the [Add Data section](#add-data).
 
 
 ## Dashboards

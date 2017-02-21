@@ -1,0 +1,5 @@
+if(EXISTS ${FileToCheck})
+  message(STATUS "${FileToCheck} exists.")
+else()
+  message(SEND_ERROR "${FileToCheck} doesn't exist.")
+endif()
