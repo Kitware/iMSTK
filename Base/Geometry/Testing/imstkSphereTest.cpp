@@ -32,14 +32,14 @@ TEST_F(imstkSphereTest, SetGetRadius)
 TEST_F(imstkSphereTest, GetVolume)
 {
     m_sphere.setRadius(2);
-    EXPECT_EQ(m_sphere.getVolume(), 8*0.75*PI);
+    EXPECT_EQ(m_sphere.getVolume(), 4.0/3.0*8*PI);
 
     m_sphere.setRadius(0.003);
-    EXPECT_EQ(m_sphere.getVolume(), 0.003*0.003*0.003*0.75*PI);
+    EXPECT_EQ(m_sphere.getVolume(), 4.0 / 3.0 * PI * 0.003 * 0.003 * 0.003);
 
     double r = 400000000;
     m_sphere.setRadius(400000000);
-    EXPECT_EQ(m_sphere.getVolume(), r*r*r*0.75*PI);
+    EXPECT_EQ(m_sphere.getVolume(), 4.0 / 3.0 * PI * r * r * r);
 }
 
 int imstkSphereTest(int argc, char* argv[])

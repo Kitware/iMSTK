@@ -34,7 +34,7 @@ Cube::print() const
 double
 Cube::getVolume() const
 {
-    return m_width*m_width;
+    return m_width*m_width*m_width;
 }
 
 const double&
@@ -46,6 +46,11 @@ Cube::getWidth() const
 void
 Cube::setWidth(const double& width)
 {
+    if(width <= 0)
+    {
+        LOG(WARNING) << "Cube::setWidth error: width should be positive.";
+        return;
+    }
     m_width = width;
 }
 
