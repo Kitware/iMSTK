@@ -210,4 +210,19 @@ VTKRenderer::addActors(const std::vector<vtkSmartPointer<vtkProp>>& actorList)
     }
 }
 
+void
+VTKRenderer::updateBackground(Vec3d backgroundOne, Vec3d backgroundTwo /*= Vec3d::Zero()*/, bool gradientBackground /*= false*/)
+{
+    m_vtkRenderer->SetBackground(backgroundOne.x(), backgroundOne.y(), backgroundOne.z());
+    if (gradientBackground)
+    {
+        m_vtkRenderer->SetBackground2(backgroundTwo.x(), backgroundTwo.y(), backgroundTwo.z());
+        m_vtkRenderer->GradientBackgroundOn();
+    }
+    else
+    {
+        m_vtkRenderer->GradientBackgroundOff();
+    }
+}
+
 } // imstk
