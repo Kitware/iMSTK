@@ -134,6 +134,10 @@ VTKViewer::startRenderingLoop()
 void
 VTKViewer::endRenderingLoop()
 {
+    // close the rendering window
+    m_vtkRenderWindow->Finalize();
+
+    // Terminate the interactor
     m_vtkRenderWindow->GetInteractor()->TerminateApp();
 }
 
