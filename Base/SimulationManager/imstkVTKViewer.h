@@ -33,6 +33,9 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
+//Screenshot utility
+#include "imstkVTKScreenCaptureUtility.h"
+
 namespace imstk
 {
 
@@ -131,7 +134,25 @@ public:
     void setOnRightButtonUpFunction(VTKEventHandlerFunction func);
     void setOnMouseWheelForwardFunction(VTKEventHandlerFunction func);
     void setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func);
+    // Set custom behaviour to be run on every frame.
+    // The return of the function will not have any  effect.
+    void setOnTimerFunction(VTKEventHandlerFunction func);
 
+    ///
+    /// \brief set the screen capture prefix
+    ///
+    void setScreenCapturePrefix(const std::string newPrefix);
+    
+    ///
+    /// \brief Call capture screen 
+    ///
+    void captureScreen() const;
+
+    ///
+    ///\brief reset the screen capture count
+    ///
+    void resetScreenShotNumber() const;
+    
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();

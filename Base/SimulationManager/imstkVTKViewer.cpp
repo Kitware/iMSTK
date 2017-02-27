@@ -243,4 +243,28 @@ VTKViewer::setOnMouseWheelBackwardFunction(VTKEventHandlerFunction func)
     m_interactorStyle->m_onMouseWheelBackwardFunction = func;
 }
 
+void
+VTKViewer::setOnTimerFunction(VTKEventHandlerFunction func)
+{
+    m_interactorStyle->m_onTimerFunction = func;
+}
+
+void
+VTKViewer::setScreenCapturePrefix(const std::string newPrefix)
+{
+    m_interactorStyle->m_screenCapturer->setScreenShotPrefix(newPrefix);
+}
+
+void
+VTKViewer::captureScreen() const
+{
+    m_interactorStyle->m_screenCapturer->saveScreenShot();
+}
+
+void
+VTKViewer::resetScreenShotNumber() const
+{
+    m_interactorStyle->m_screenCapturer->resetScreenShotNumber();
+}
+
 } // imstk
