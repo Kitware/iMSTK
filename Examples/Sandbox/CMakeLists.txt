@@ -29,3 +29,23 @@ add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME}
   SimulationManager
 )
+
+#-----------------------------------------------------------------------------
+# Associate external data
+#-----------------------------------------------------------------------------
+list(APPEND FILE_LIST
+    artery/,REGEX:.*
+    asianDragon/,REGEX:.*
+    biceps_zones/,REGEX:.*
+    cylinder/,REGEX:.*
+    human/,REGEX:.*
+    laptool/,REGEX:.*
+    liver/,REGEX:.*
+    nidus/,REGEX:.*
+    octopus/,REGEX:.*
+    oneTet/,REGEX:.*
+    Spheres/,REGEX:.*
+    spring/,REGEX:.*
+    tetBeads/,REGEX:.*)
+
+imstk_add_data(${PROJECT_NAME} ${FILE_LIST})
