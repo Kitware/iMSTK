@@ -37,6 +37,7 @@ list(APPEND FILE_LIST
     artery/,REGEX:.*
     asianDragon/,REGEX:.*
     biceps_zones/,REGEX:.*
+    cube/,REGEX:*
     cylinder/,REGEX:.*
     human/,REGEX:.*
     laptool/,REGEX:.*
@@ -44,7 +45,7 @@ list(APPEND FILE_LIST
     nidus/,REGEX:.*
     octopus/,REGEX:.*
     oneTet/,REGEX:.*
-    Spheres/,REGEX:.*
+    spheres/,REGEX:.*
     spring/,REGEX:.*
     tetBeads/,REGEX:.*)
 
