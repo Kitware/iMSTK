@@ -120,14 +120,14 @@ public:
 protected:
 
     std::shared_ptr<DeviceClient> m_deviceClient; ///< Reports device tracking information
-    double m_scaling;                             ///< Scaling factor for physical to virtual translations
+    double m_scaling = 1.0;                       ///< Scaling factor for physical to virtual translations
     Vec3d m_translationOffset = WORLD_ORIGIN;     ///< Translation concatenated to the device translation
     Quatd m_rotationOffset = Quatd::Identity();   ///< Rotation concatenated to the device rotation
     unsigned char m_invertFlags = 0x00;           ///< Invert flags to be masked with DeviceTracker::InvertFlag
 
     Vec3d m_currentPos;
     Quatd m_currentRot;
-    bool m_trackingDataUptoDate = false;
+    bool m_trackingDataUptoDate = false; ///< Keeps track of the device update in a given frame
 };
 
 } // imstk

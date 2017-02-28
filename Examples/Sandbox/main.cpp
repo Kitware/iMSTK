@@ -153,9 +153,9 @@ int main()
     ------------------*/
     //testObjectController();
     //testTwoFalcons();
-    //testCameraController();
+    testCameraController();
     //testTwoOmnis();
-    testLapToolController();
+    //testLapToolController();
 
 
     /*------------------
@@ -735,15 +735,18 @@ void testCameraController()
     auto sdk = std::make_shared<imstk::SimulationManager>();
     auto scene = sdk->createNewScene("SceneTestDevice");
 
-    // Device server
-    auto server = std::make_shared<imstk::VRPNDeviceServer>("127.0.0.1");
-    server->addDevice("device0", imstk::DeviceType::OSVR_HDK);
-    sdk->addModule(server);
+#ifdef iMSTK_USE_OPENHAPTICS
 
-    // Device Client
-    auto client = std::make_shared<imstk::VRPNDeviceClient>("device0", "localhost"); // localhost = 127.0.0.1
-    //client->setLoopDelay(1000);
-    sdk->addModule(client);
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("PHANToM 1");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+#else if
+	LOG(WARNING) << "Phantom device option not enabled during build!";
+#endif
+
 
     // Mesh
     auto mesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/asianDragon/asianDragon.obj");
@@ -755,12 +758,15 @@ void testCameraController()
     auto cam = scene->getCamera();
     cam->setPosition(imstk::Vec3d(0, 0, 10));
 
+#ifdef iMSTK_USE_OPENHAPTICS
+
     // Set camera controller
     auto camController = cam->setupController(client);
-    camController->setTranslationScaling(100);
+    //camController->setTranslationScaling(100);
     //LOG(INFO) << camController->getTranslationOffset(); // should be the same than initial cam position
     camController->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
                                      imstk::CameraController::InvertFlag::rotZ);
+#endif
 
     // Run
     sdk->setCurrentScene(scene);

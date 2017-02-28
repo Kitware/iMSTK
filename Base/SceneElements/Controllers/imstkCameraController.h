@@ -75,4 +75,5 @@ protected:
 };
 
 } // imstk
+
 #endif // ifndef imstkCameraController_h
