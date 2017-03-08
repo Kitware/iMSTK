@@ -135,6 +135,7 @@ private:
     VTKEventHandlerFunction m_onRightButtonUpFunction;
     VTKEventHandlerFunction m_onMouseWheelForwardFunction;
     VTKEventHandlerFunction m_onMouseWheelBackwardFunction;
+    VTKEventHandlerFunction m_onTimerFunction;
 
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
     std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility

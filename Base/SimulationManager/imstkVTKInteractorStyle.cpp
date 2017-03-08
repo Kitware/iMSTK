@@ -116,6 +116,13 @@ VTKInteractorStyle::OnTimer()
     {
         this->Interactor->CreateOneShotTimer(1);
     }
+
+    // Call custom behaviour
+    if (m_onTimerFunction)
+    {
+        // Call the custom behaviour to run on every frame
+        m_onTimerFunction(this);
+    }
 }
 
 void
