@@ -27,6 +27,7 @@
 #include <unordered_map>
 #include <functional>
 
+#include "imstkVTKScreenCaptureUtility.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 class vtkTextActor;
 
@@ -134,8 +135,10 @@ private:
     VTKEventHandlerFunction m_onRightButtonUpFunction;
     VTKEventHandlerFunction m_onMouseWheelForwardFunction;
     VTKEventHandlerFunction m_onMouseWheelBackwardFunction;
+    VTKEventHandlerFunction m_onTimerFunction;
 
     SimulationManager* m_simManager; ///> SimulationManager owning the current simulation being interacted with
+    std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
     double m_targetMS; ///> expected time between each render frame (in ms)
     std::chrono::high_resolution_clock::time_point m_pre; ///> time point pre-rendering
     std::chrono::high_resolution_clock::time_point m_post; ///> time point post-rendering

@@ -46,6 +46,7 @@ VTKInteractorStyle::VTKInteractorStyle()
     m_fpsActor = vtkTextActor::New();
     m_fpsActor->GetTextProperty()->SetFontSize(60);
     m_fpsActor->SetVisibility(m_displayFps);
+    m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(this->Interactor->GetRenderWindow());
 }
 
 VTKInteractorStyle::~VTKInteractorStyle()
@@ -114,6 +115,13 @@ VTKInteractorStyle::OnTimer()
     else
     {
         this->Interactor->CreateOneShotTimer(1);
+    }
+
+    // Call custom behaviour
+    if (m_onTimerFunction)
+    {
+        // Call the custom behaviour to run on every frame
+        m_onTimerFunction(this);
     }
 }
 
