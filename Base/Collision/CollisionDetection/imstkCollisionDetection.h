@@ -33,7 +33,7 @@ class CollisionData;
 ///
 /// \class CollisionDetection
 ///
-/// \brief Base class for all collsion detection classes
+/// \brief Base class for all collision detection classes
 ///
 class CollisionDetection
 {
@@ -46,6 +46,8 @@ public:
     {
         PlaneToSphere,
         SphereToSphere,
+        MeshToSphere,
+        MeshToPlane,
         MeshToMesh
     };
 
@@ -64,6 +66,7 @@ public:
         m_type(type),
         m_colData(colData)
     {}
+    CollisionDetection() = delete;
 
     ///
     /// \brief Destructor

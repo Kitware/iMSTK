@@ -42,13 +42,13 @@ struct PositionDirectionCollisionData
 };
 
 ///
-/// \struct MeshToAnalyticalPointDepthCollisionData
+/// \struct MeshToAnalyticalCollisionData
 ///
 /// \brief Mesh to analytical point-penetration depth collision data
 ///
-struct MeshToAnalyticalPointDepthCollisionData
+struct MeshToAnalyticalCollisionData
 {
-    int nodeId;
+    size_t nodeId;
     Vec3d penetrationVector;
 };
 
@@ -126,12 +126,12 @@ public:
         EEColData.clear();
     }
 
-    std::vector<PositionDirectionCollisionData> PDColData; //!< Position Direction collision data
-    std::vector<VertexTriangleCollisionData> VTColData;    //!< Vertex Triangle collision data
-    std::vector<TriangleVertexCollisionData> TVColData;    //!< Triangle Vertex collision data
-    std::vector<EdgeEdgeCollisionData> EEColData;          //!< Edge Edge collision data
+    std::vector<PositionDirectionCollisionData> PDColData; ///< Position Direction collision data
+    std::vector<VertexTriangleCollisionData> VTColData;    ///< Vertex Triangle collision data
+    std::vector<TriangleVertexCollisionData> TVColData;    ///< Triangle Vertex collision data
+    std::vector<EdgeEdgeCollisionData> EEColData;          ///< Edge Edge collision data
 
-    std::vector<MeshToAnalyticalPointDepthCollisionData> PDMeshAnaColData;
+    std::vector<MeshToAnalyticalCollisionData> MAColData;  ///< Mesh to analytical collision data
 };
 
 }

@@ -23,6 +23,8 @@
 
 #include "imstkPlaneToSphereCD.h"
 #include "imstkSphereToSphereCD.h"
+#include "imstkMeshToSphereCD.h"
+#include "imstkMeshToPlaneCD.h"
 #include "imstkMeshToMeshCD.h"
 
 #include "imstkCollidingObject.h"
@@ -32,7 +34,8 @@
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 std::shared_ptr<CollisionDetection>
 CollisionDetection::make_collision_detection(const Type& type,
@@ -55,7 +58,8 @@ CollisionDetection::make_collision_detection(const Type& type,
             return nullptr;
         }
         return std::make_shared<PlaneToSphereCD>(plane, sphere, colData);
-    }break;
+    }
+    break;
     case Type::SphereToSphere:
     {
         auto sphereA = std::dynamic_pointer_cast<Sphere>(objA->getCollidingGeometry());
@@ -69,7 +73,38 @@ CollisionDetection::make_collision_detection(const Type& type,
             return nullptr;
         }
         return std::make_shared<SphereToSphereCD>(sphereA, sphereB, colData);
-    }break;
+    }
+    break;
+    case Type::MeshToSphere:
+    {
+        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (mesh == nullptr || sphere == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                << "invalid object geometries for SphereToSphere collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToSphereCD>(mesh, sphere, colData);
+    }
+    break;
+    case Type::MeshToPlane:
+    {
+        auto mesh = std::dynamic_pointer_cast<Mesh>(objA->getCollidingGeometry());
+        auto plane = std::dynamic_pointer_cast<Plane>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (mesh == nullptr || plane == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                << "invalid object geometries for SphereToSphere collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<MeshToPlaneCD>(mesh, plane, colData);
+    }
+    break;
     case Type::MeshToMesh:
     {
         auto meshA = std::dynamic_pointer_cast<SurfaceMesh>(objA->getCollidingGeometry());
@@ -83,7 +118,8 @@ CollisionDetection::make_collision_detection(const Type& type,
             return nullptr;
         }
         return std::make_shared<MeshToMeshCD>(meshA, meshB, colData);
-    }break;
+    }
+    break;
     default:
     {
         LOG(WARNING) << "CollisionDetection::make_collision_detection error: type not implemented.";
