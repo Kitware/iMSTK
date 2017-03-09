@@ -249,22 +249,10 @@ VTKViewer::setOnTimerFunction(VTKEventHandlerFunction func)
     m_interactorStyle->m_onTimerFunction = func;
 }
 
-void
-VTKViewer::setScreenCapturePrefix(const std::string newPrefix)
+std::shared_ptr<VTKScreenCaptureUtility>
+VTKViewer::getScreenCaptureUtility() const
 {
-    m_interactorStyle->m_screenCapturer->setScreenShotPrefix(newPrefix);
-}
-
-void
-VTKViewer::captureScreen() const
-{
-    m_interactorStyle->m_screenCapturer->saveScreenShot();
-}
-
-void
-VTKViewer::resetScreenShotNumber() const
-{
-    m_interactorStyle->m_screenCapturer->resetScreenShotNumber();
+    return m_screenCapturer;
 }
 
 } // imstk

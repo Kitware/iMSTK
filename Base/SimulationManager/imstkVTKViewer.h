@@ -28,6 +28,7 @@
 #include "imstkScene.h"
 #include "imstkVTKRenderer.h"
 #include "imstkVTKInteractorStyle.h"
+#include "imstkVTKScreenCaptureUtility.h"
 
 #include "vtkSmartPointer.h"
 #include "vtkRenderWindow.h"
@@ -58,6 +59,7 @@ public:
         m_vtkRenderWindow->SetInteractor(m_vtkRenderWindow->MakeRenderWindowInteractor());
         m_vtkRenderWindow->GetInteractor()->SetInteractorStyle( m_interactorStyle );
         m_vtkRenderWindow->SetSize(1000,800);
+        m_screenCapturer = std::make_shared<VTKScreenCaptureUtility>(m_vtkRenderWindow);
     }
 
     ///
@@ -137,28 +139,19 @@ public:
     // Set custom behaviour to be run on every frame.
     // The return of the function will not have any  effect.
     void setOnTimerFunction(VTKEventHandlerFunction func);
-
-    ///
-    /// \brief set the screen capture prefix
-    ///
-    void setScreenCapturePrefix(const std::string newPrefix);
     
     ///
-    /// \brief Call capture screen 
+    /// \brief access screen shot utility
     ///
-    void captureScreen() const;
+    std::shared_ptr<VTKScreenCaptureUtility> getScreenCaptureUtility() const;
 
-    ///
-    ///\brief reset the screen capture count
-    ///
-    void resetScreenShotNumber() const;
-    
 protected:
 
     vtkSmartPointer<vtkRenderWindow> m_vtkRenderWindow = vtkSmartPointer<vtkRenderWindow>::New();
     vtkSmartPointer<VTKInteractorStyle> m_interactorStyle = vtkSmartPointer<VTKInteractorStyle>::New();
     std::shared_ptr<Scene> m_currentScene;
     std::unordered_map<std::shared_ptr<Scene>, std::shared_ptr<VTKRenderer>> m_rendererMap;
+    std::shared_ptr<VTKScreenCaptureUtility> m_screenCapturer; ///> Screen shot utility
     bool m_running = false;
 };
 
