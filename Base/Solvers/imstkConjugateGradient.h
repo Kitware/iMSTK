@@ -95,8 +95,7 @@ public:
     ///
     /// \brief Apply a filter to the vector supplied
     ///
-    void filter(Vectord& x, const std::vector<size_t>& filter);
-
+    void applyLinearProjectionFilter(Vectord& x, const std::vector<LinearProjectionConstraint>& linProj, const bool setVal);
 private:
 
     ///
