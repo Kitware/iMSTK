@@ -288,10 +288,40 @@ SurfaceMesh::getTriangleNormal(size_t i) const
     return m_trianglesNormals.at(i);
 }
 
+void
+SurfaceMesh::setVerticesNormals(const StdVectorOfVec3d& normals)
+{
+    m_verticesNormals = normals;
+}
+
 const StdVectorOfVec3d&
 SurfaceMesh::getVerticesNormals() const
 {
     return m_verticesNormals;
+}
+
+void
+SurfaceMesh::setVerticesTangents(const StdVectorOfVec3d& tangents)
+{
+    m_verticesTangents = tangents;
+}
+
+const StdVectorOfVec3d&
+SurfaceMesh::getVerticesTangents() const
+{
+    return m_verticesTangents;
+}
+
+void
+SurfaceMesh::setVerticesBitangents(const StdVectorOfVec3d& bitangents)
+{
+    m_verticesBitangents = bitangents;
+}
+
+const StdVectorOfVec3d&
+SurfaceMesh::getVerticesBitangents() const
+{
+    return m_verticesBitangents;
 }
 
 const Vec3d&

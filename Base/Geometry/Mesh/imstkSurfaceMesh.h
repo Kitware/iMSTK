@@ -124,9 +124,22 @@ public:
     const Vec3d& getTriangleNormal(size_t i) const;
 
     ///
-    /// \brief Get vector of normals of all the vertices
+    /// \brief Set/Get vector of normals of all the vertices
     ///
+    void setVerticesNormals(const StdVectorOfVec3d& normals);
     const StdVectorOfVec3d& getVerticesNormals() const;
+
+    ///
+    /// \brief Set/Get vector of tangents of all the vertices
+    ///
+    void setVerticesTangents(const StdVectorOfVec3d& tangents);
+    const StdVectorOfVec3d& getVerticesTangents() const;
+
+    ///
+    /// \brief Set/Get vector of bitangents of all the vertices
+    ///
+    void setVerticesBitangents(const StdVectorOfVec3d& bitangents);
+    const StdVectorOfVec3d& getVerticesBitangents() const;
 
     ///
     /// \brief Get normal of a vertex given its index
@@ -160,6 +173,8 @@ protected:
 
     StdVectorOfVec3d m_trianglesNormals; ///> Normals to the triangles
     StdVectorOfVec3d m_verticesNormals; ///> Normals of the vertices
+    StdVectorOfVec3d m_verticesTangents; ///> Tangents of the vertices
+    StdVectorOfVec3d m_verticesBitangents; ///> Bitangents of the vertices
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
     std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture
