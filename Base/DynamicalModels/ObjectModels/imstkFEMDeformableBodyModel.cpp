@@ -527,7 +527,7 @@ FEMDeformableBodyModel::updatePhysicsGeometry()
 {
     auto volMesh = std::static_pointer_cast<VolumetricMesh>(m_forceModelGeometry);
     auto &u = m_currentState->getQ();
-    volMesh->setVerticesDisplacements(u);
+    volMesh->setVertexDisplacements(u);
 }
 
 void

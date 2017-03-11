@@ -27,16 +27,16 @@ namespace imstk
 void
 Mesh::initialize(const StdVectorOfVec3d& vertices)
 {
-    this->setInitialVerticesPositions(vertices);
-    this->setVerticesPositions(vertices);
+    this->setInitialVertexPositions(vertices);
+    this->setVertexPositions(vertices);
 }
 
 void
 Mesh::clear()
 {
-    m_initialVerticesPositions.clear();
-    m_verticesPositions.clear();
-    m_verticesDisplacements.clear();
+    m_initialVertexPositions.clear();
+    m_vertexPositions.clear();
+    m_vertexDisplacements.clear();
 }
 
 void
@@ -45,7 +45,7 @@ Mesh::print() const
     Geometry::print();
     LOG(INFO) << "Number of vertices: " << this->getNumVertices();
     LOG(INFO) << "Vertex positions:";
-    for (auto &verts : m_verticesPositions)
+    for (auto &verts : m_vertexPositions)
     {
         LOG(INFO) << verts.x() << ", " << verts.y() << ", " << verts.z();
     }
@@ -57,7 +57,7 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
     min = Vec3d(MAX_D, MAX_D, MAX_D);
     max = Vec3d(-MAX_D, -MAX_D, -MAX_D);
 
-    for (auto& pos : m_verticesPositions)
+    for (auto& pos : m_vertexPositions)
     {
         for (int i = 0; i < 3; ++i)
         {
@@ -79,80 +79,80 @@ Mesh::computeBoundingBox(Vec3d& min, Vec3d& max, const double percent) const
 }
 
 void
-Mesh::setInitialVerticesPositions(const StdVectorOfVec3d& vertices)
+Mesh::setInitialVertexPositions(const StdVectorOfVec3d& vertices)
 {
-    m_initialVerticesPositions = vertices;
-    m_verticesDisplacements= vertices;
+    m_initialVertexPositions = vertices;
+    m_vertexDisplacements= vertices;
 }
 
 const StdVectorOfVec3d&
-Mesh::getInitialVerticesPositions() const
+Mesh::getInitialVertexPositions() const
 {
-    return m_initialVerticesPositions;
+    return m_initialVertexPositions;
 }
 
 const Vec3d&
 Mesh::getInitialVertexPosition(const size_t& vertNum) const
 {
-    return m_initialVerticesPositions.at(vertNum);
+    return m_initialVertexPositions.at(vertNum);
 }
 
 void
-Mesh::setVerticesPositions(const StdVectorOfVec3d& vertices)
+Mesh::setVertexPositions(const StdVectorOfVec3d& vertices)
 {
-    m_verticesPositions = vertices;
+    m_vertexPositions = vertices;
 }
 
 const StdVectorOfVec3d&
 Mesh::getVertexPositions() const
 {
-    return m_verticesPositions;
+    return m_vertexPositions;
 }
 
 void
-Mesh::setVerticePosition(const size_t& vertNum, const Vec3d& pos)
+Mesh::setVertexPosition(const size_t& vertNum, const Vec3d& pos)
 {
-    m_verticesPositions.at(vertNum) = pos;
+    m_vertexPositions.at(vertNum) = pos;
 }
 
 const Vec3d&
 Mesh::getVertexPosition(const size_t& vertNum) const
 {
-    return m_verticesPositions.at(vertNum);
+    return m_vertexPositions.at(vertNum);
 }
 
 void
-Mesh::setVerticesDisplacements(const StdVectorOfVec3d& diff)
+Mesh::setVertexDisplacements(const StdVectorOfVec3d& diff)
 {
-    m_verticesDisplacements = diff;
+    m_vertexDisplacements = diff;
 }
 
 void
-Mesh::setVerticesDisplacements(const Vectord& u)
+Mesh::setVertexDisplacements(const Vectord& u)
 {
     size_t dofId = 0;
-    for (auto &vDisp : m_verticesDisplacements)
+    for (auto &vDisp : m_vertexDisplacements)
     {
         vDisp = Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
         dofId += 3;
     }
 
-    for (size_t i = 0; i < m_verticesPositions.size(); ++i)
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
     {
-        m_verticesPositions[i] = m_initialVerticesPositions[i] + m_verticesDisplacements[i];
+        m_vertexPositions[i] = m_initialVertexPositions[i] + m_vertexDisplacements[i];
     }
 }
 
 const StdVectorOfVec3d&
-Mesh::getVerticesDisplacements() const
+Mesh::getVertexDisplacements() const
 {
-    return m_verticesDisplacements;
+    return m_vertexDisplacements;
 }
 
 const Vec3d&
-Mesh::getVerticeDisplacement(const size_t& vertNum) const
+Mesh::getVertexDisplacement(const size_t& vertNum) const
 {
-    return m_verticesDisplacements.at(vertNum);
+    return m_vertexDisplacements.at(vertNum);
 }
 
 void
@@ -193,7 +193,7 @@ Mesh::getPointDataArray(const std::string& arrayName) const
 const size_t
 Mesh::getNumVertices() const
 {
-    return m_initialVerticesPositions.size();
+    return m_initialVertexPositions.size();
 }
 
 } // imstk

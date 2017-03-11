@@ -412,7 +412,7 @@ PbdModel::projectConstraints()
 void
 PbdModel::updatePhysicsGeometry()
 {
-    m_mesh->setVerticesPositions(m_currentState->getPositions());
+    m_mesh->setVertexPositions(m_currentState->getPositions());
 }
 
 void
