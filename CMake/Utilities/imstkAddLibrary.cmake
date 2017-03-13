@@ -14,7 +14,7 @@ function(imstk_add_library target)
 
   set(options VERBOSE)
   set(oneValueArgs)
-  set(multiValueArgs H_FILES CPP_FILES DEPENDS)
+  set(multiValueArgs H_FILES CPP_FILES SUBDIR_LIST DEPENDS)
   include(CMakeParseArguments)
   cmake_parse_arguments(target "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
@@ -32,14 +32,26 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Get files and directories
   #-----------------------------------------------------------------------------
-  file(GLOB_RECURSE target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.h")
-  file(GLOB_RECURSE target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.cpp")
-  file(GLOB_RECURSE testing_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Testing/*")
-  if(testing_CPP_FILES)
-    list(REMOVE_ITEM target_H_FILES ${testing_FILES})
-    list(REMOVE_ITEM target_CPP_FILES ${testing_FILES})
+  if( NOT target_H_FILES AND NOT target_CPP_FILES )
+    file(GLOB_RECURSE target_H_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.h")
+    file(GLOB_RECURSE target_CPP_FILES "${CMAKE_CURRENT_SOURCE_DIR}/imstk*.cpp")
+    file(GLOB_RECURSE testing_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Testing/*")
+    if(testing_CPP_FILES)
+      list(REMOVE_ITEM target_H_FILES ${testing_FILES})
+      list(REMOVE_ITEM target_CPP_FILES ${testing_FILES})
+    endif()
   endif()
-  imstk_subdir_list(target_SUBDIR_LIST ${CMAKE_CURRENT_SOURCE_DIR})
+
+  if( NOT target_SUBDIR_LIST )
+    imstk_subdir_list(target_SUBDIR_LIST ${CMAKE_CURRENT_SOURCE_DIR})
+  endif()
+
+  list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
+  foreach(subdir ${target_SUBDIR_LIST})
+    if( NOT ${subdir} STREQUAL "Testing")
+      list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${subdir}>")
+    endif()
+  endforeach()
 
   #-----------------------------------------------------------------------------
   # Create target (library)
@@ -59,11 +71,6 @@ function(imstk_add_library target)
   #-----------------------------------------------------------------------------
   # Include directories
   #-----------------------------------------------------------------------------
-  list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>")
-  foreach(subdir ${target_SUBDIR_LIST})
-    list(APPEND target_BUILD_INTERFACE_LIST "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/${subdir}>")
-  endforeach()
-
   target_include_directories( ${target} PUBLIC
     ${target_BUILD_INTERFACE_LIST}
     $<INSTALL_INTERFACE:${iMSTK_INSTALL_INCLUDE_DIR}>
