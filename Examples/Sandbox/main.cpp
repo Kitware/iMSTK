@@ -97,6 +97,7 @@ void testPbdCollision();
 void testLineMesh();
 void testMshAndVegaIO();
 void testLapToolController();
+void testScreenShotUtility();
 
 int main()
 {
@@ -111,6 +112,7 @@ int main()
     //testVTKTexture();
     //testMultiObjectWithTextures();
     //testViewer();
+    testScreenShotUtility();
 
 
     /*------------------
@@ -2135,4 +2137,71 @@ void testLineMesh()
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 #endif
+}
+
+void testScreenShotUtility()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto sceneTest = sdk->createNewScene("SceneTest");
+
+    // Plane
+    auto planeGeom = std::make_shared<imstk::Plane>();
+    planeGeom->scale(10);
+    auto planeObj = std::make_shared<imstk::VisualObject>("VisualPlane");
+    planeObj->setVisualGeometry(planeGeom);
+
+    // Cube
+    auto cubeGeom = std::make_shared<imstk::Cube>();
+    cubeGeom->scale(0.5);
+    cubeGeom->rotate(imstk::UP_VECTOR, imstk::PI_4);
+    cubeGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
+    cubeGeom->translate(1.0, -1.0, 0.5);
+    auto cubeObj = std::make_shared<imstk::VisualObject>("VisualCube");
+    cubeObj->setVisualGeometry(cubeGeom);
+
+    // Sphere
+    auto sphereGeom = std::make_shared<imstk::Sphere>();
+    sphereGeom->scale(0.3);
+    sphereGeom->translate(0, 2, 0);
+    auto sphereObj = std::make_shared<imstk::VisualObject>("VisualSphere");
+    sphereObj->setVisualGeometry(sphereGeom);
+
+    // Light (white)
+    auto whiteLight = std::make_shared<imstk::Light>("whiteLight");
+    whiteLight->setPosition(imstk::Vec3d(5, 8, 5));
+    whiteLight->setPositional();
+
+    // Light (red)
+    auto colorLight = std::make_shared<imstk::Light>("colorLight");
+    colorLight->setPosition(imstk::Vec3d(4, -3, 1));
+    colorLight->setFocalPoint(imstk::Vec3d(0, 0, 0));
+    colorLight->setColor(imstk::Color::Red);
+    colorLight->setPositional();
+    colorLight->setSpotAngle(15);
+
+    // Add in scene
+    sceneTest->addSceneObject(planeObj);
+    sceneTest->addSceneObject(cubeObj);
+    sceneTest->addSceneObject(sphereObj);
+    sceneTest->addLight(whiteLight);
+    sceneTest->addLight(colorLight);
+
+    // Update Camera
+    auto cam1 = sceneTest->getCamera();
+    cam1->setPosition(imstk::Vec3d(-5.5, 2.5, 32));
+    cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
+
+    // Set up for screen shot
+    sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix(DATA_ROOT_PATH"/screenShot_");
+    // Create a call back on key press of 'b' to take the screen shot
+    sdk->getViewer()->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
+    {
+        sdk->getViewer()->getScreenCaptureUtility()->saveScreenShot();
+        return false;
+    });
+
+    // Run
+    sdk->setCurrentScene(sceneTest);
+    sdk->startSimulation(true);
 }
