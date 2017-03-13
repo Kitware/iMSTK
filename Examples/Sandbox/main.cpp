@@ -745,7 +745,7 @@ void testCameraController()
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
     server->addDeviceClient(client);
     sdk->addModule(server);
-#else if
+#else
 	LOG(WARNING) << "Phantom device option not enabled during build!";
 #endif
 
@@ -2193,7 +2193,7 @@ void testScreenShotUtility()
     cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
 
     // Set up for screen shot
-    sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix(DATA_ROOT_PATH"/screenShot_");
+    sdk->getViewer()->getScreenCaptureUtility()->setScreenShotPrefix("screenShot_");
     // Create a call back on key press of 'b' to take the screen shot
     sdk->getViewer()->setOnCharFunction('b', [&](VTKInteractorStyle* c) -> bool
     {
