@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include "imstkMath.h"
+#include "imstkLinearProjectionConstraint.h"
 
 namespace imstk
 {
@@ -89,16 +90,16 @@ namespace imstk
 
         /// \brief Get the vector denoting the filter
         ///
-        void setFilter(std::vector<size_t> & f)
+        void setLinearProjectors(std::vector<LinearProjectionConstraint>& f)
         {
-            m_Filter = &f;
+            m_LinearProjConstraints = &f;
         }
 
         /// \brief Get the vector denoting the filter
         ///
-        std::vector<size_t>& getFilter()
+        std::vector<LinearProjectionConstraint>& getLinearProjectors()
         {
-            return *m_Filter;
+            return *m_LinearProjConstraints;
         }
 
         ///
@@ -124,7 +125,7 @@ public:
 
     UpdateFunctionType m_FUpdate;
     UpdatePrevStateFunctionType m_FUpdatePrevState;
-    std::vector<size_t>  *m_Filter;
+    std::vector<LinearProjectionConstraint>  *m_LinearProjConstraints;
 };
 
 } // imstk

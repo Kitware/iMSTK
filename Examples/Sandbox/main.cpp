@@ -139,7 +139,7 @@ int main()
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
-    //testDeformableBody();
+    testDeformableBody();
 
 
     /*------------------
@@ -155,7 +155,7 @@ int main()
     ------------------*/
     //testObjectController();
     //testTwoFalcons();
-    testCameraController();
+    //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
 
@@ -1293,7 +1293,17 @@ void testDeformableBody()
     auto nlSystem = std::make_shared<NonLinearSystem>(
         dynaModel->getFunction(),
         dynaModel->getFunctionGradient());
-    nlSystem->setFilter(dynaModel->getFixNodeIds());
+
+    std::vector<LinearProjectionConstraint> projList;
+    for (auto i : dynaModel->getFixNodeIds())
+    {
+        auto s = LinearProjectionConstraint(i, false);
+        s.setProjectorToDirichlet(i);
+        s.setValue(Vec3d(0.001, 0, 0));
+        projList.push_back(s);
+    }
+    nlSystem->setLinearProjectors(projList);
+
     nlSystem->setUnknownVector(dynaModel->getUnknownVec());
     nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
     nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());

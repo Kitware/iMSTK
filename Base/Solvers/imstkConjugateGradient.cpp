@@ -34,13 +34,26 @@ ConjugateGradient::ConjugateGradient(const SparseMatrixd& A, const Vectord& rhs)
 }
 
 void
-ConjugateGradient::filter(Vectord& x, const std::vector<size_t>& filter)
+ConjugateGradient::applyLinearProjectionFilter(Vectord& x, const std::vector<LinearProjectionConstraint>& linProj, const bool setVal)
 {
-    size_t threeI;
-    for (auto &i: filter)
+    Vec3d p;
+    for (auto &localProjector : linProj)
     {
-        threeI = 3 * i;
-        x(threeI) = x(threeI + 1) = x(threeI + 2) = 0.0;
+        const auto threeI = 3 * localProjector.getNodeId();
+        p = Vec3d(x(threeI), x(threeI + 1), x(threeI + 2));
+
+        if (!setVal)
+        {
+            p = localProjector.getProjector()*p;
+        }
+        else
+        {
+            p = (Mat3d::Identity() - localProjector.getProjector())*localProjector.getValue();
+        }
+
+        x(threeI) = p.x();
+        x(threeI + 1) = p.y();
+        x(threeI + 2) = p.z();
     }
 }
 
@@ -53,7 +66,7 @@ ConjugateGradient::solve(Vectord& x)
         return;
     }
 
-    if (m_linearSystem->getFilter().size() == 0)
+    if (m_linearSystem->getLinearProjectors().size() == 0)
     {
         x = m_cgSolver.solve(m_linearSystem->getRHSVector());
     }
@@ -66,15 +79,16 @@ ConjugateGradient::solve(Vectord& x)
 void
 ConjugateGradient::modifiedCGSolve(Vectord& x)
 {
-    const auto &fixedNodes = m_linearSystem->getFilter();
+    const auto &linearProjectors = m_linearSystem->getLinearProjectors();
     const auto &b = m_linearSystem->getRHSVector();
     const auto &A = m_linearSystem->getMatrix();
 
     // Set the initial guess to zero
     x.setZero();
+    applyLinearProjectionFilter(x, linearProjectors, true);
 
     auto res = b;
-    filter(res, fixedNodes);
+    applyLinearProjectionFilter(res, linearProjectors, false);
     auto c = res;
     auto delta = res.dot(res);
     auto deltaPrev = delta;
@@ -87,7 +101,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
     while (delta > eps)
     {
         q = A * c;
-        filter(q, fixedNodes);
+        applyLinearProjectionFilter(q, linearProjectors, false);
         dotval = c.dot(q);
         if (dotval != 0.0)
         {
@@ -104,7 +118,7 @@ ConjugateGradient::modifiedCGSolve(Vectord& x)
         delta = res.dot(res);
         c *= delta / deltaPrev;
         c += res;
-        filter(c, fixedNodes);
+        applyLinearProjectionFilter(c, linearProjectors, false);
 
         if (++iterNum >= m_maxIterations)
         {
