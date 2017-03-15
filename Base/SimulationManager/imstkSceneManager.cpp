@@ -68,13 +68,19 @@ SceneManager::initModule()
 void
 SceneManager::runModule()
 {
-    // Reset Colliding Geometry so that the transform obtained from device can be applied
+    // Reset Contact forces to 0
     for (auto obj : m_scene->getSceneObjects())
     {
-        if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
+        if (auto defObj = std::dynamic_pointer_cast<DeformableObject>(obj))
         {
-            collidingObj->setForce(Vec3d(0,0,0));
+            defObj->getContactForce().setConstant(0.0);
         }
+        else if (auto collidingObj = std::dynamic_pointer_cast<CollidingObject>(obj))
+        {
+            collidingObj->resetForce();
+        }
+        // todo: refactor pbd
+        // description: so that the transform obtained from device can be applied
         if (auto virtualCouplingPBD = std::dynamic_pointer_cast<VirtualCouplingPBDObject>(obj))
         {
             virtualCouplingPBD->resetCollidingGeometry();
@@ -94,8 +100,6 @@ SceneManager::runModule()
         intPair->computeCollisionData();
         intPair->computeContactForces();
     }
-
-    // Update collision handlers
 
     // Update the solvers
     for (auto solvers : m_scene->getSolvers())

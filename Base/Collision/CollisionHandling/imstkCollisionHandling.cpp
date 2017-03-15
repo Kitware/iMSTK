@@ -21,11 +21,12 @@
 
 #include "imstkCollisionHandling.h"
 
-#include "imstkPenaltyRigidCH.h"
+#include "imstkPenaltyCH.h"
 
 #include <g3log/g3log.hpp>
 
-namespace imstk {
+namespace imstk
+{
 
 std::shared_ptr<CollisionHandling>
 CollisionHandling::make_collision_handling(const Type& type,
@@ -36,22 +37,19 @@ CollisionHandling::make_collision_handling(const Type& type,
 {
     switch (type)
     {
+    case Type::None:
+        return nullptr;
     case Type::Penalty:
-    {
         if (objA->getType() == SceneObject::Type::Visual)
         {
             LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
                          << "penalty collision handling only implemented for colliding objects.";
             return nullptr;
         }
-        return std::make_shared<PenaltyRigidCH>(side, colData, objA);
-    }break;
-
+        return std::make_shared<PenaltyCH>(side, colData, objA);
     default:
-    {
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";
         return nullptr;
-    }
     }
 }
 

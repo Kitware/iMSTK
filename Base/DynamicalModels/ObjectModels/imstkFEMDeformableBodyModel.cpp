@@ -115,6 +115,7 @@ FEMDeformableBodyModel::initialize(std::shared_ptr<VolumetricMesh> physicsMesh)
     m_Finternal.resize(m_numDOF);
     m_Finternal.setConstant(0.0);
     m_Fcontact.resize(m_numDOF);
+    m_Fcontact.setConstant(0.0);
     m_qSol.resize(m_numDOF);
     m_qSol.setConstant(0.0);
 }
@@ -369,6 +370,7 @@ FEMDeformableBodyModel::computeImplicitSystemRHS(kinematicState& stateAtT,
         m_Feff -= m_Finternal;
         m_Feff += m_FexplicitExternal;
         m_Feff += m_Fgravity;
+        m_Feff += m_Fcontact;
         m_Feff *= dT;
         m_Feff += m_M * (vPrev - v);
 
@@ -407,6 +409,7 @@ FEMDeformableBodyModel::computeSemiImplicitSystemRHS(kinematicState& stateAtT,
         m_Feff -= m_Finternal;
         m_Feff += m_FexplicitExternal;
         m_Feff += m_Fgravity;
+        m_Feff += m_Fcontact;
         m_Feff *= dT;
 
         break;

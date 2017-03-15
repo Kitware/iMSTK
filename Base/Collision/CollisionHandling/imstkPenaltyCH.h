@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkPenaltyRigidCH_h
-#define imstkPenaltyRigidCH_h
+#ifndef imstkPenaltyCH_h
+#define imstkPenaltyCH_h
 
 // std library
 #include <memory>
@@ -32,45 +32,66 @@ namespace imstk
 {
 
 class CollidingObject;
+class DeformableObject;
 class CollisionData;
 
 ///
-/// \class PenaltyRigidCH
+/// \class PenaltyCH
 ///
-/// \brief Penalty-to-rigid collision handling
+/// \brief Implements penalty collision handling
 ///
-class PenaltyRigidCH : public CollisionHandling
+class PenaltyCH : public CollisionHandling
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    PenaltyRigidCH(const Side& side,
-                   const CollisionData& colData,
-                   std::shared_ptr<CollidingObject> obj) :
-        CollisionHandling(CollisionHandling::Type::Penalty,
-                          side,
-                          colData),
-        m_obj(obj)
-    {}
+    PenaltyCH(const Side& side,
+              const CollisionData& colData,
+              std::shared_ptr<CollidingObject> obj) :
+        CollisionHandling(Type::Penalty, side, colData),
+        m_object(obj){}
+
+    PenaltyCH() = delete;
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyRigidCH() = default;
+    ~PenaltyCH() = default;
 
     ///
     /// \brief Compute forces based on collision data
     ///
     void computeContactForces() override;
+    void computeContactForcesAnalyticRigid(std::shared_ptr<CollidingObject> analyticObj);
+    void computeContactForcesDiscreteDeformable(std::shared_ptr<DeformableObject> deformableObj);
+
+    ///
+    /// \brief Set the contact stiffness
+    ///
+    void setContactStiffness(const double stiffness)
+    {
+        m_stiffness = stiffness;
+    }
+
+    ///
+    /// \brief Set the contact velocity damping
+    ///
+    void setContactVelocityDamping(const double damping)
+    {
+        m_damping = damping;
+    }
 
 private:
 
-    std::shared_ptr<CollidingObject> m_obj;    ///>
+    std::shared_ptr<CollidingObject> m_object;    ///>
+
+    double m_stiffness = 5.0e5; ///> Stiffness of contact
+    double m_damping = 0.5;     ///> Damping of the contact
 
 };
 
 }
 
-#endif // ifndef imstkPenaltyRigidCH_h
+#endif // ifndef imstkPenaltyCH_h

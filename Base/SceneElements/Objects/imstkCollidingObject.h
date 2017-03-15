@@ -71,6 +71,8 @@ public:
     ///
     const Vec3d& getForce() const;
     void setForce(Vec3d force);
+    void resetForce();
+    void appendForce(Vec3d force);
 
     ///
     /// \brief Updates the geometries from the maps (if defined)
