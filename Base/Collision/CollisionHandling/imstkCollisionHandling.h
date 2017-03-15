@@ -77,10 +77,10 @@ public:
     CollisionHandling(const Type& type,
                       const Side& side,
                       const CollisionData& colData) :
-        m_type(type),
-        m_side(side),
-        m_colData(colData)
-    {}
+                      m_type(type),
+                      m_side(side),
+                      m_colData(colData){}
+    CollisionHandling() = delete;
 
     ///
     /// \brief Destructor
@@ -99,9 +99,9 @@ public:
 
 protected:
 
-    Type m_type;                    //!< Collision handling algorithm type
-    Side m_side;                    //!< Direction of the collisionData
-    const CollisionData& m_colData; //!< Collision data
+    Type m_type;                    ///< Collision handling algorithm type
+    Side m_side;                    ///< Direction of the collisionData
+    const CollisionData& m_colData; ///< Collision data
 
 };
 

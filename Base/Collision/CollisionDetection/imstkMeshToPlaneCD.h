@@ -19,58 +19,56 @@
 
    =========================================================================*/
 
-#ifndef imstkPenaltyRigidCH_h
-#define imstkPenaltyRigidCH_h
+#ifndef imstkMeshToPlaneCD_h
+#define imstkMeshToPlaneCD_h
 
-// std library
 #include <memory>
 
-// imstk
-#include "imstkCollisionHandling.h"
+#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
 
-class CollidingObject;
+class Mesh;
+class Plane;
 class CollisionData;
 
 ///
-/// \class PenaltyRigidCH
+/// \class MeshToPlaneCD
 ///
-/// \brief Penalty-to-rigid collision handling
+/// \brief Mesh to plane collision detection
 ///
-class PenaltyRigidCH : public CollisionHandling
+class MeshToPlaneCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    PenaltyRigidCH(const Side& side,
-                   const CollisionData& colData,
-                   std::shared_ptr<CollidingObject> obj) :
-        CollisionHandling(CollisionHandling::Type::Penalty,
-                          side,
-                          colData),
-        m_obj(obj)
-    {}
+    MeshToPlaneCD(std::shared_ptr<Mesh> mesh,
+                  std::shared_ptr<Plane> plane,
+                  CollisionData& colData) :
+				  CollisionDetection(CollisionDetection::Type::MeshToSphere,
+                  colData),
+				  m_mesh(mesh),
+				  m_plane(plane){}
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyRigidCH() = default;
+    ~MeshToPlaneCD() = default;
 
     ///
-    /// \brief Compute forces based on collision data
+    /// \brief Detect collision and compute collision data
     ///
-    void computeContactForces() override;
+    void computeCollisionData() override;
 
 private:
 
-    std::shared_ptr<CollidingObject> m_obj;    ///>
-
+    std::shared_ptr<Mesh> m_mesh;      ///> Mesh
+    std::shared_ptr<Plane> m_plane;    ///> Plane
 };
 
 }
 
-#endif // ifndef imstkPenaltyRigidCH_h
+#endif // ifndef imstkMeshToPlaneCD_h

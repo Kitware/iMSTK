@@ -19,57 +19,56 @@
 
    =========================================================================*/
 
-#ifndef imstkPenaltyMeshToRigidCH_h
-#define imstkPenaltyMeshToRigidCH_h
+#ifndef imstkMeshToSphereCD_h
+#define imstkMeshToSphereCD_h
 
-// std library
 #include <memory>
 
-// imstk
-#include "imstkCollisionHandling.h"
+#include "imstkCollisionDetection.h"
 
 namespace imstk
 {
 
-class CollidingObject;
+class Mesh;
+class Sphere;
 class CollisionData;
 
 ///
-/// \class PenaltyMeshToRigidCH
+/// \class MeshToSphereCD
 ///
-/// \brief Mesh-to-Rigid collision handling based on penalty approach
+/// \brief Mesh to sphere collision detection
 ///
-class PenaltyMeshToRigidCH : public CollisionHandling
+class MeshToSphereCD : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    PenaltyMeshToRigidCH(const Side& side, const CollisionData& colData, std::shared_ptr<CollidingObject> obj) :
-        CollisionHandling(CollisionHandling::Type::Penalty, side, colData), m_object(obj)
-    {
-        m_stiffness = 1000;
-        m_damping = 0.5;
-    }
+    MeshToSphereCD(std::shared_ptr<Mesh> mesh,
+				   std::shared_ptr<Sphere> sphere,
+				   CollisionData& colData) :
+				   CollisionDetection(CollisionDetection::Type::MeshToSphere,
+                   colData),
+				   m_mesh(mesh),
+				   m_sphere(sphere){}
 
     ///
     /// \brief Destructor
     ///
-    ~PenaltyMeshToRigidCH() = default;
+    ~MeshToSphereCD() = default;
 
     ///
-    /// \brief Compute forces based on collision data
+    /// \brief Detect collision and compute collision data
     ///
-    void computeContactForces() override;
+    void computeCollisionData() override;
 
 private:
-    std::shared_ptr<CollidingObject> m_object; ///> The mesh object under collision
 
-    double m_stiffness; ///> Stiffness of contact
-    double m_damping;   ///> Damping of the contact
+    std::shared_ptr<Mesh> m_mesh;       ///> Mesh
+    std::shared_ptr<Sphere> m_sphere;  ///> Sphere
 };
 
 }
 
-#endif // ifndef imstkPenaltyMeshToRigidCH_h
+#endif // ifndef imstkMeshToSphereCD_h

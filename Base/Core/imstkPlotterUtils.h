@@ -19,8 +19,8 @@ limitations under the License.
 
 =========================================================================*/
 
-#ifndef imstkUtils_h
-#define imstkUtils_h
+#ifndef imstkPlotterUtils_h
+#define imstkPlotterUtils_h
 
 // STL includes
 #include <iostream>
@@ -33,7 +33,7 @@ limitations under the License.
 namespace imstk
 {
 
-namespace plotters
+namespace plotterutils
 {
 
 ///
@@ -187,4 +187,4 @@ static void writePlotterVecVsVecMatPlotlib(Vectord& x, Vectord& y, const char* f
 
 } // imstk
 
-#endif // ifndef imstkUtils_h
+#endif // ifndef imstkPlotterUtils_h
