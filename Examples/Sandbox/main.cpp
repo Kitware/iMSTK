@@ -50,6 +50,8 @@
 
 // Collisions
 #include "imstkInteractionPair.h"
+#include "imstkMeshToPlaneCD.h"
+#include "imstkMeshToSphereCD.h"
 
 // logger
 #include "g3log/g3log.hpp"
@@ -101,6 +103,8 @@ void testLineMesh();
 void testMshAndVegaIO();
 void testLapToolController();
 void testScreenShotUtility();
+void testDeformableBodyCollision();
+void liverToolInteraction();
 
 int main()
 {
@@ -115,7 +119,7 @@ int main()
     //testVTKTexture();
     //testMultiObjectWithTextures();
     //testViewer();
-    testScreenShotUtility();
+    //testScreenShotUtility();
 
 
     /*------------------
@@ -142,7 +146,9 @@ int main()
     //testPbdVolume();
     //testPbdCloth();
     //testPbdCollision();
-    testDeformableBody();
+    //testDeformableBody();
+    //testDeformableBodyCollision();
+    liverToolInteraction();
 
 
     /*------------------
@@ -2142,5 +2148,242 @@ void testScreenShotUtility()
 
     // Run
     sdk->setCurrentScene(sceneTest);
+    sdk->startSimulation(true);
+}
+
+void testDeformableBodyCollision()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("OneTetraCH");
+
+    auto geom = std::make_shared<imstk::Plane>(WORLD_ORIGIN, -UP_VECTOR, 1.);
+
+    geom->scale(100);
+    geom->translate(Vec3d(0., -20., 0.));
+
+    auto planeObj = std::make_shared<imstk::CollidingObject>("VisualPlane");
+    planeObj->setVisualGeometry(geom);
+    planeObj->setCollidingGeometry(geom);
+    scene->addSceneObject(planeObj);
+
+    // Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    // Extract the surface mesh
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    // Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+    oneToOneNodalMap->compute();
+
+    // Configure the dynamic model
+    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
+    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->initialize(volTetMesh);
+
+    // Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    // Configure Scene Object
+    auto deformableObj = std::make_shared<DeformableObject>("Liver");
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setCollidingGeometry(volTetMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap);
+    deformableObj->setDynamicalModel(dynaModel);
+    deformableObj->initialize();
+    scene->addSceneObject(deformableObj);
+
+    // Create a nonlinear system and solver
+    auto nlSystem = std::make_shared<NonLinearSystem>(dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    std::vector<LinearProjectionConstraint> linProj;
+    for (auto id : dynaModel->getFixNodeIds())
+    {
+        linProj.push_back(LinearProjectionConstraint(id, true));
+    }
+    nlSystem->setLinearProjectors(linProj);
+    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
+    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
+    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
+
+    // create a non-linear solver and add to the scene
+    auto nlSolver = std::make_shared<NewtonSolver>();
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
+    scene->addNonlinearSolver(nlSolver);
+
+    // Create collision detection and handling
+    scene->getCollisionGraph()->addInteractionPair(deformableObj,
+        planeObj,
+        CollisionDetection::Type::MeshToPlane,
+        CollisionHandling::Type::Penalty,
+        CollisionHandling::Type::None);
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 20, 20));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(true);
+}
+
+void liverToolInteraction()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("LiverToolInteraction");
+
+    //----------------------------------------------------------
+    // Create plane visual scene object
+    //----------------------------------------------------------
+    auto planeObj = apiutils::createVisualAnalyticalSceneObject(
+        imstk::Geometry::Type::Plane, scene, "VisualPlane", 100, Vec3d(0., -20., 0.));
+
+    //----------------------------------------------------------
+    // Create liver FE deformable scene object
+    //----------------------------------------------------------
+
+    // Load a tetrahedral mesh
+    auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/oneTet/oneTet.veg");
+    //auto tetMesh = imstk::MeshIO::read(iMSTK_DATA_ROOT"/liver/liver.veg");
+
+    if (!tetMesh)
+    {
+        LOG(WARNING) << "Could not read mesh from file.";
+        return;
+    }
+
+    // Extract the surface mesh
+    auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
+    auto volTetMesh = std::dynamic_pointer_cast<imstk::TetrahedralMesh>(tetMesh);
+    if (!volTetMesh)
+    {
+        LOG(WARNING) << "Dynamic pointer cast from imstk::Mesh to imstk::TetrahedralMesh failed!";
+        return;
+    }
+    volTetMesh->extractSurfaceMesh(surfMesh);
+
+    // Construct one to one nodal map based on the above meshes
+    auto oneToOneNodalMap = std::make_shared<imstk::OneToOneMap>();
+    oneToOneNodalMap->setMaster(tetMesh);
+    oneToOneNodalMap->setSlave(surfMesh);
+    oneToOneNodalMap->compute();
+
+    // Configure the dynamic model
+    auto dynaModel = std::make_shared<FEMDeformableBodyModel>();
+    //dynaModel->configure(iMSTK_DATA_ROOT"/liver/liver.config");
+    dynaModel->configure(iMSTK_DATA_ROOT"/oneTet/oneTet.config");
+    dynaModel->initialize(volTetMesh);
+
+    // Create and add Backward Euler time integrator
+    auto timeIntegrator = std::make_shared<BackwardEuler>(0.001);
+    dynaModel->setTimeIntegrator(timeIntegrator);
+
+    // Configure Scene Object
+    auto deformableObj = std::make_shared<DeformableObject>("Liver");
+    deformableObj->setVisualGeometry(surfMesh);
+    deformableObj->setCollidingGeometry(volTetMesh);
+    deformableObj->setPhysicsGeometry(volTetMesh);
+    deformableObj->setPhysicsToVisualMap(oneToOneNodalMap);
+    deformableObj->setDynamicalModel(dynaModel);
+    deformableObj->initialize();
+    scene->addSceneObject(deformableObj);
+
+    //----------------------------------------------------------
+    // Create a nonlinear system and its solver
+    //----------------------------------------------------------
+    auto nlSystem = std::make_shared<NonLinearSystem>( dynaModel->getFunction(), dynaModel->getFunctionGradient());
+    std::vector<LinearProjectionConstraint> linProj;
+    for (auto id : dynaModel->getFixNodeIds())
+    {
+        linProj.push_back(LinearProjectionConstraint(id, true));
+    }
+    nlSystem->setLinearProjectors(linProj);
+    nlSystem->setUnknownVector(dynaModel->getUnknownVec());
+    nlSystem->setUpdateFunction(dynaModel->getUpdateFunction());
+    nlSystem->setUpdatePreviousStatesFunction(dynaModel->getUpdatePrevStateFunction());
+
+    // create a non-linear solver and add to the scene
+    auto nlSolver = std::make_shared<NewtonSolver>();
+    auto cgLinSolver = std::make_shared<ConjugateGradient>();// create a linear solver to be used in the NL solver
+    nlSolver->setLinearSolver(cgLinSolver);
+    nlSolver->setSystem(nlSystem);
+    //nlSolver->setToFullyImplicit();
+    scene->addNonlinearSolver(nlSolver);
+
+    //----------------------------------------------------------
+    // Create collision detection and handling
+    //----------------------------------------------------------
+    //auto collData = std::make_shared<imstk::CollisionData>();
+    /*auto collisioDet = std::make_shared<imstk::MeshToPlaneCD>(volTetMesh,
+                                                              std::dynamic_pointer_cast<imstk::Plane>(planeObj->getCollidingGeometry()),
+                                                              *collData.get());
+    auto collHandling = std::make_shared<imstk::PenaltyMeshToRigidCH>(imstk::CollisionHandling::Side::A, *collData.get(), deformableObj);*/
+
+
+
+    //----------------------------------------------------------
+    // Create laparoscopic tool controller
+    //----------------------------------------------------------
+#ifdef iMSTK_USE_OPENHAPTICS
+
+    // Device clients
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+
+    // Create laparoscopic tool related scene objects
+    /*auto pivot = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/pivot.obj", "pivot");
+    auto upperJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/upper.obj", "upperJaw");
+    auto lowerJaw = apiutils::createAndAddVisualSceneObject(scene, iMSTK_DATA_ROOT"/laptool/lower.obj", "lowerJaw");*/
+
+    // Sphere0
+    auto sphere0Obj = apiutils::createCollidingAnalyticalSceneObject(
+        imstk::Geometry::Type::Sphere, scene, "Sphere0", 3, Vec3d(1, 0.5, 0));
+
+    auto trackingCtrl = std::make_shared<imstk::DeviceTracker>(client);
+    //trackingCtrl->setTranslationScaling(100);
+    auto lapToolController = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackingCtrl);
+    /*auto lapToolController = std::make_shared<imstk::LaparoscopicToolController>(pivot, upperJaw, lowerJaw, trackingCtrl);
+    lapToolController->setJawRotationAxis(imstk::Vec3d(1.0, 0, 0));*/
+    scene->addObjectController(lapToolController);
+
+    scene->getCollisionGraph()->addInteractionPair(deformableObj,
+                                                   sphere0Obj,
+                                                   CollisionDetection::Type::MeshToSphere,
+                                                   CollisionHandling::Type::Penalty,
+                                                   CollisionHandling::Type::None);
+
+#endif
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0, 20, 20));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    // Run
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
