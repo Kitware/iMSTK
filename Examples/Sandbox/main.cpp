@@ -30,6 +30,7 @@
 #include "imstkSphere.h"
 #include "imstkCube.h"
 #include "imstkTetrahedralMesh.h"
+#include "imstkHexahedralMesh.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
 #include "imstkLineMesh.h"
@@ -105,6 +106,7 @@ void testLapToolController();
 void testScreenShotUtility();
 void testDeformableBodyCollision();
 void liverToolInteraction();
+void testBoneDrilling();
 
 int main()
 {
@@ -148,7 +150,7 @@ int main()
     //testPbdCollision();
     //testDeformableBody();
     //testDeformableBodyCollision();
-    liverToolInteraction();
+    //liverToolInteraction();
 
 
     /*------------------
@@ -174,6 +176,7 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
+    testBoneDrilling();
 
 
     return 0;
@@ -2386,4 +2389,57 @@ void liverToolInteraction()
     // Run
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
+}
+
+void testBoneDrilling()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("BoneDrilling");
+
+    //Read the cube hex mesh files (bunch of points in the space)
+    //std::string iFile = iMSTK_DATA_ROOT"/cube-hexMesh-60002/hexCube.msh";
+    std::string iFile = iMSTK_DATA_ROOT"/cube-hexMesh/hexCube.msh";
+    auto mesh = MeshIO::read(iFile);
+    if (!mesh)
+    {
+        LOG(WARNING) << "testBoneDrilling::Failed to read the MSH file: " << iFile;
+    }
+    auto volHexMesh = std::dynamic_pointer_cast<imstk::HexahedralMesh>(mesh);
+
+    // Create and add cube in the scene
+    auto visualObject = std::make_shared<imstk::VisualObject>("cube");
+    visualObject->setVisualGeometry(volHexMesh);
+    scene->addSceneObject(visualObject);
+
+    // Create and add burr-tool object in the scene
+    auto createAndAddVisualSceneObject =
+        [](std::shared_ptr<imstk::Scene> scene,
+        const std::string& fileName,
+        const std::string& objectName) ->
+        std::shared_ptr<imstk::SceneObject>
+    {
+        auto mesh = imstk::MeshIO::read(fileName);
+        auto SurfaceMesh = std::dynamic_pointer_cast<imstk::SurfaceMesh>(mesh);
+        SurfaceMesh->translate(Vec3d(0.2,0.2,0.2));
+        SurfaceMesh->rotate(Vec3d(1.0,0.0,0.0), 90);
+        // Create object and add to scene
+        auto meshObject = std::make_shared<imstk::VisualObject>("meshObject");
+        meshObject->setVisualGeometry(SurfaceMesh);
+        meshObject->setName(objectName);
+        scene->addSceneObject(meshObject);
+        return meshObject;
+    };
+   auto burrTool = createAndAddVisualSceneObject(scene,iMSTK_DATA_ROOT"/sceneObjects/burr-tool2.obj","burrTool");
+
+    // Get spherical burr tool in the scene.
+
+    // Set Camera configuration
+    auto cam = scene->getCamera();
+    cam->setPosition(imstk::Vec3d(0.5, 0.5, 0.5));
+    cam->setFocalPoint(imstk::Vec3d(0, 0, 0));
+
+    //Run
+    sdk->setCurrentScene(scene);
+    sdk->startSimulation(false);
 }
