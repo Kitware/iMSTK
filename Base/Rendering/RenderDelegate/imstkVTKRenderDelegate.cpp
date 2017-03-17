@@ -36,6 +36,7 @@
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
 #include "imstkVTKTetrahedralMeshRenderDelegate.h"
+#include "imstkVTKHexahedralMeshRenderDelegate.h"
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
@@ -82,9 +83,8 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
     }
     case Geometry::Type::HexahedralMesh:
     {
-        auto mesh = std::dynamic_pointer_cast<TetrahedralMesh>(geom);
-        LOG(WARNING) << "RenderDelegate::make_delegate error: HexahedralMeshRenderDelegate not yet implemented";
-        return nullptr;
+        auto mesh = std::dynamic_pointer_cast<HexahedralMesh>(geom);
+        return std::make_shared<VTKHexahedralMeshRenderDelegate>(mesh);
     }
     default:
     {
