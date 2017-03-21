@@ -43,8 +43,8 @@ set(copy_libusb_pdb_command
 #-----------------------------------------------------------------------------
 include(imstkAddExternalProject)
 imstk_add_external_project( Libusb
-  URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.20/libusb-1.0.20.7z
-  URL_MD5 a84466c2b8f88e1190c63ec271d4f46b
+  URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z
+  URL_MD5 7FBCF5580B8FFC88F3AF6EDDD638DE9F
   DOWNLOAD_DIR ${Libusb_PREFIX}
   SOURCE_DIR ${Libusb_EXTRACT_DIR}
   BINARY_DIR ${Libusb_EXTRACT_DIR}
