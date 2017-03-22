@@ -48,7 +48,8 @@ public:
     enum class Type
     {
         None,
-        Penalty
+        Penalty,
+        VirtualCoupling
     };
 
     ///

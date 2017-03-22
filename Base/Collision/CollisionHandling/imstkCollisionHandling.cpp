@@ -22,6 +22,7 @@
 #include "imstkCollisionHandling.h"
 
 #include "imstkPenaltyCH.h"
+#include "imstkVirtualCouplingCH.h"
 
 #include <g3log/g3log.hpp>
 
@@ -35,18 +36,22 @@ CollisionHandling::make_collision_handling(const Type& type,
                                            std::shared_ptr<CollidingObject> objA,
                                            std::shared_ptr<CollidingObject> objB)
 {
+    if (type != Type::None &&
+        objA->getType() == SceneObject::Type::Visual)
+    {
+        LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
+                     << "penalty collision handling only implemented for colliding objects.";
+        return nullptr;
+    }
+
     switch (type)
     {
     case Type::None:
         return nullptr;
     case Type::Penalty:
-        if (objA->getType() == SceneObject::Type::Visual)
-        {
-            LOG(WARNING) << "CollisionHandling::make_collision_handling error: "
-                         << "penalty collision handling only implemented for colliding objects.";
-            return nullptr;
-        }
         return std::make_shared<PenaltyCH>(side, colData, objA);
+    case Type::VirtualCoupling:
+        return std::make_shared<VirtualCouplingCH>(side, colData, objA );
     default:
         LOG(WARNING) << "CollisionHandling::make_collision_handling error: type not implemented.";
         return nullptr;
