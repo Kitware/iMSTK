@@ -56,6 +56,49 @@ public:
     ///
     static std::shared_ptr<imstk::VolumetricMesh> read(const std::string &filePath,const MeshFileType meshType);
 
+protected:
+    //
+    // \brief Possible element types in a MSH file format as mentioned at http://www.manpagez.com/info/gmsh/gmsh-2.2.6/gmsh_63.php
+    //
+    enum ElemType
+    {
+        line=1,
+        triangle,
+        quadrangle,
+        tetrahedron,
+        hexahedron,
+        prism,
+        pyramid,
+        lineSecondOrder,
+        triangleSecondOrder,
+        quadrangleSecondOrderType1,
+        tetrahedronSecondOrder,
+        hexahedronSecondOrderType1,
+        prismSecondOrderType1,
+        pyramidSecondOrderType1,
+        point,
+        quadrangleSecondOrderType2,
+        hexahedronSecondOrderType2,
+        prismSecondOrderType2,
+        pyramidSecondOrderType2,
+        triangleThirdOrderIncomplete,
+        triangleThirdOrder,
+        triangleFourthOrderIncomplete,
+        triangleFourthOrder,
+        triangleFifthOrderIncomplete,
+        triangleFifthOrder,
+        edgeThirdOrder,
+        edgeFourthOrder,
+        edgeFifthOrder,
+        tetrahedronThirdOrder,
+        tetrahedronFourthOrder,
+        tetrahedronFifthOrder,
+    };
+
+    //
+    // \brief Returns the number of nodes in an element of a given type
+    //
+    static size_t numElemNodes(const ElemType& elType);
 };
 
 }
