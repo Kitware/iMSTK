@@ -153,6 +153,7 @@ protected:
     friend class VTKSurfaceMeshRenderDelegate;
     friend class VTKTetrahedralMeshRenderDelegate;
     friend class VTKLineMeshRenderDelegate;
+    friend class VTKHexahedralMeshRenderDelegate;
 
     ///
     /// \brief Get vertices positions
