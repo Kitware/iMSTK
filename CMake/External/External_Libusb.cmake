@@ -25,7 +25,7 @@ set(copy_libusb_lib_command
   ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.lib
   ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${CMAKE_CFG_INTDIR}/libusb-1.0.lib
   )
-  
+
 set(copy_libusb_dll_command
   ${CMAKE_COMMAND} -E copy
   ${Libusb_EXTRACT_DIR}/${libusb_libdir}/dll/libusb-1.0.dll
@@ -44,7 +44,7 @@ set(copy_libusb_pdb_command
 include(imstkAddExternalProject)
 imstk_add_external_project( Libusb
   URL http://downloads.sourceforge.net/project/libusb/libusb-1.0/libusb-1.0.21/libusb-1.0.21.7z
-  URL_MD5 7FBCF5580B8FFC88F3AF6EDDD638DE9F
+  URL_MD5 7fbcf5580b8ffc88f3af6eddd638de9f
   DOWNLOAD_DIR ${Libusb_PREFIX}
   SOURCE_DIR ${Libusb_EXTRACT_DIR}
   BINARY_DIR ${Libusb_EXTRACT_DIR}
