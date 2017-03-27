@@ -25,6 +25,7 @@
 
 #include "imstkPlane.h"
 #include "imstkSphere.h"
+#include "imstkCapsule.h"
 #include "imstkCube.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
@@ -32,6 +33,7 @@
 #include "imstkHexahedralMesh.h"
 #include "imstkVTKPlaneRenderDelegate.h"
 #include "imstkVTKSphereRenderDelegate.h"
+#include "imstkVTKCapsuleRenderDelegate.h"
 #include "imstkVTKCubeRenderDelegate.h"
 #include "imstkVTKSurfaceMeshRenderDelegate.h"
 #include "imstkVTKLineMeshRenderDelegate.h"
@@ -60,6 +62,11 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
     {
         auto sphere = std::dynamic_pointer_cast<Sphere>(geom);
         return std::make_shared<VTKSphereRenderDelegate>(sphere);
+    }
+    case Geometry::Type::Capsule:
+    {
+        auto sphere = std::dynamic_pointer_cast<Capsule>(geom);
+        return std::make_shared<VTKCapsuleRenderDelegate>(sphere);
     }
     case Geometry::Type::Cube:
     {

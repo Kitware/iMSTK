@@ -48,7 +48,8 @@ public:
         SphereToSphere,
         MeshToSphere,
         MeshToPlane,
-        MeshToMesh
+        MeshToMesh,
+        MeshToCapsule
     };
 
     ///

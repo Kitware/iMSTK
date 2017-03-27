@@ -8,21 +8,27 @@ imstk_add_library( Rendering
     RenderDelegate/imstkVTKCubeRenderDelegate.h
     RenderDelegate/imstkVTKLineMeshRenderDelegate.h
     RenderDelegate/imstkVTKPlaneRenderDelegate.h
+    RenderDelegate/imstkVTKCapsuleRenderDelegate.h
     RenderDelegate/imstkVTKRenderDelegate.h
     RenderDelegate/imstkVTKSphereRenderDelegate.h
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.h
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.h
     RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.h
+    RenderDelegate/vtkCapsuleSource.h
+
   CPP_FILES
     imstkVTKRenderer.cpp
     RenderDelegate/imstkVTKCubeRenderDelegate.cpp
     RenderDelegate/imstkVTKLineMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKPlaneRenderDelegate.cpp
+    RenderDelegate/imstkVTKCapsuleRenderDelegate.cpp
     RenderDelegate/imstkVTKRenderDelegate.cpp
     RenderDelegate/imstkVTKSphereRenderDelegate.cpp
     RenderDelegate/imstkVTKSurfaceMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKTetrahedralMeshRenderDelegate.cpp
     RenderDelegate/imstkVTKHexahedralMeshRenderDelegate.cpp
+    RenderDelegate/vtkCapsuleSource.cpp
+
   SUBDIR_LIST
     RenderDelegate
   DEPENDS

@@ -107,6 +107,7 @@ void testScreenShotUtility();
 void testDeformableBodyCollision();
 void liverToolInteraction();
 void testBoneDrilling();
+void testCapsule();
 
 int main()
 {
@@ -122,6 +123,7 @@ int main()
     //testMultiObjectWithTextures();
     //testViewer();
     //testScreenShotUtility();
+    testCapsule();
 
 
     /*------------------
@@ -176,7 +178,7 @@ int main()
     ------------------*/
     //testScenesManagement();
     //testVectorPlotters();
-    testBoneDrilling();
+    //testBoneDrilling();
 
 
     return 0;
@@ -644,7 +646,7 @@ void testObjectController()
     auto scene = sdk->createNewScene("SceneTestDevice");
 
     // Device Client
-    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default PHANToM");
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
 
     // Device Server
     auto server = std::make_shared<imstk::HDAPIDeviceServer>();
@@ -800,6 +802,50 @@ void testViewer()
 
     // Run
     sdk->setCurrentScene(sceneTest);
+    sdk->startSimulation(true);
+}
+
+void testCapsule()
+{
+    // SDK and Scene
+    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto scene = sdk->createNewScene("CapsuleTest");
+
+    // Plane
+    auto planeObj = apiutils::createVisualAnalyticalSceneObject(imstk::Geometry::Type::Plane, scene, "VisualPlane", 10);
+
+    // Capsule
+    auto capsuleObj = apiutils::createVisualAnalyticalSceneObject(
+        imstk::Geometry::Type::Capsule, scene, "VisualCapsule", 2., Vec3d(0., 1., 0.));
+    auto capsuleGeom = capsuleObj->getVisualGeometry();
+    capsuleGeom->rotate(imstk::RIGHT_VECTOR, imstk::PI_4);
+
+#ifdef iMSTK_USE_OPENHAPTICS
+    // Device Client
+    auto client = std::make_shared<imstk::HDAPIDeviceClient>("Default Device");
+
+    // Device Server
+    auto server = std::make_shared<imstk::HDAPIDeviceServer>();
+    server->addDeviceClient(client);
+    sdk->addModule(server);
+
+    auto trackCtrl = std::make_shared<imstk::DeviceTracker>(client);
+    trackCtrl->setTranslationScaling(0.1);
+    auto controller = std::make_shared<imstk::SceneObjectController>(capsuleObj, trackCtrl);
+    scene->addObjectController(controller);
+#endif
+
+    // Add objects and light to scene
+    scene->addSceneObject(planeObj);
+    scene->addSceneObject(capsuleObj);
+
+    // Update Camera
+    auto cam1 = scene->getCamera();
+    cam1->setPosition(imstk::Vec3d(5., 5., 5.));
+    cam1->setFocalPoint(imstk::Vec3d(1, 1, 0));
+
+    // Run
+    sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
 

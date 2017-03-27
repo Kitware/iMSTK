@@ -32,6 +32,7 @@ limitations under the License.
 // Geometry
 #include "imstkPlane.h"
 #include "imstkSphere.h"
+#include "imstkCapsule.h"
 #include "imstkCube.h"
 #include "imstkSurfaceMesh.h"
 #include "imstkMeshIO.h"
@@ -82,8 +83,12 @@ createVisualAnalyticalSceneObject(imstk::Geometry::Type type,
         geom = std::make_shared<imstk::Cube>();
         break;
 
+    case imstk::Geometry::Type::Capsule:
+        geom = std::make_shared<imstk::Capsule>();
+        break;
+
     default:
-        LOG(WARNING) << "createVisualgAnalyticalSceneObject: Scene object geometry type is not analytical!";
+        LOG(WARNING) << "createVisualAnalyticalSceneObject: Scene object geometry type is not analytical!";
         return nullptr;
     }
 

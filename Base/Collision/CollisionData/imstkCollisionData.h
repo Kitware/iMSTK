@@ -130,7 +130,6 @@ public:
     std::vector<VertexTriangleCollisionData> VTColData;    ///< Vertex Triangle collision data
     std::vector<TriangleVertexCollisionData> TVColData;    ///< Triangle Vertex collision data
     std::vector<EdgeEdgeCollisionData> EEColData;          ///< Edge Edge collision data
-
     std::vector<MeshToAnalyticalCollisionData> MAColData;  ///< Mesh to analytical collision data
 };
 
