@@ -42,6 +42,7 @@ MeshToCapsuleCD::computeCollisionData()
     auto radius = m_capsule->getRadius() * m_capsule->getScaling();
 
     // Get position of end points of the capsule
+    // TODO: Fix this issue of extra computation in future
     auto p0 = capsulePos;
     auto p1 = m_capsule->getOrientation()*Vec3d(0., height, 0.) + capsulePos;
     auto mid = 0.5*(p0 + p1);
