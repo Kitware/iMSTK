@@ -47,8 +47,8 @@ public:
     ///
     /// \brief Constructor
     ///
-    MeshToMeshCD(std::shared_ptr<SurfaceMesh> planeA,
-                 std::shared_ptr<SurfaceMesh> sphereB,
+    MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
+                 std::shared_ptr<SurfaceMesh> meshB,
                  CollisionData& colData);
 
     ///
