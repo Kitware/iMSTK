@@ -32,7 +32,7 @@ SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining()
 }
 
 void
-SpatialHashTableSeparateChaining::insertPoints(StdVectorOfVec3d points)
+SpatialHashTableSeparateChaining::insertPoints(const StdVectorOfVec3d& points)
 {
     // TODO: make more efficient
     for (auto i = 0; i < points.size(); i++)
@@ -42,7 +42,7 @@ SpatialHashTableSeparateChaining::insertPoints(StdVectorOfVec3d points)
 }
 
 void
-SpatialHashTableSeparateChaining::insertPoint(Vec3d point)
+SpatialHashTableSeparateChaining::insertPoint(const Vec3d& point)
 {
     PointEntry entry;
     entry.point = point;
@@ -55,14 +55,14 @@ SpatialHashTableSeparateChaining::insertPoint(Vec3d point)
 }
 
 void
-SpatialHashTableSeparateChaining::clearTable()
+SpatialHashTableSeparateChaining::clear()
 {
     m_table->clear();
     m_currentID = 0;
 }
 
 std::vector<Vec3d>
-SpatialHashTableSeparateChaining::getPointsInAABB(Vec3d corner1, Vec3d corner2)
+SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2)
 {
     auto min_x = std::fmin(corner1.x(), corner2.x());
     auto max_x = std::fmax(corner1.x(), corner2.x());

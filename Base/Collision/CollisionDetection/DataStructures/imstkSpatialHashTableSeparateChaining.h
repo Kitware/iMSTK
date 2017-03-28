@@ -95,13 +95,13 @@ public:
     /// \brief Insert an array of points
     /// \param points An array of point
     ///
-    void insertPoints(StdVectorOfVec3d points);
+    void insertPoints(const StdVectorOfVec3d& points);
 
     ///
     /// \brief Insert an array of points
     /// \param point A point
     ///
-    void insertPoint(Vec3d point);
+    void insertPoint(const Vec3d& point);
 
     ///
     /// \brief Sets the max load factor
@@ -114,12 +114,12 @@ public:
     /// \param corner1 One corner to the box
     /// \param corner2 The other corner to the box
     ///
-    std::vector<Vec3d> getPointsInAABB(Vec3d corner1, Vec3d corner2);
+    std::vector<Vec3d> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
 
     ///
     /// \brief Clears the table
     ///
-    void clearTable();
+    void clear();
 
     ///
     /// \brief Protected constructor
