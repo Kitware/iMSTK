@@ -28,7 +28,7 @@ SpatialHashTableSeparateChaining::SpatialHashTableSeparateChaining()
     : SpatialHashTable()
 {
     m_table = std::make_shared<std::unordered_set<PointEntry>>();
-    this->clearTable();
+    this->clear();
 }
 
 void
