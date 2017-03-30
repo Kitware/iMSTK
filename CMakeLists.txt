@@ -180,6 +180,11 @@ if(BUILD_TESTING)
   include_directories(${GoogleMock_INCLUDE_DIRS})
 endif()
 
+# External data
+if(BUILD_TESTING OR BUILD_EXAMPLES )
+  include(imstkExternalData)
+endif()
+
 #--------------------------------------------------------------------------
 # Add Source code subdirectories
 #--------------------------------------------------------------------------

@@ -109,10 +109,6 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
         }
     }
 
-    //there is little need to waste time on this reallocation,
-    //as this is a temporary return array
-    //points.shrink_to_fit();
-
     return points;
 }
 

@@ -59,12 +59,12 @@ template<> struct equal_to<imstk::PointEntry>
 {
     size_t operator()(const imstk::PointEntry& point1, const imstk::PointEntry& point2) const
     {
-        if (point1.point != point2.point)
+        if (point1.ID != point2.ID)
         {
             return false;
         }
 
-        if (point1.ID != point2.ID)
+        if (point1.point != point2.point)
         {
             return false;
         }
@@ -125,19 +125,13 @@ public:
     /// \brief Protected constructor
     /// \param x,y,z Dimensions for each cell
     ///
-    virtual void setCellSize(double x, double y, double z);
+    virtual void setCellSize(double x, double y, double z) override;
 
 protected:
     ///
     /// \brief Rehash the hash table
     ///
-    virtual void rehash();
-
-    ///
-    /// \brief Hash function
-    /// \param point A point
-    ///
-    inline unsigned int generateHash(Vec3d point);
+    virtual void rehash() override;
 
     float m_loadFactorMax = 10.0f;
 
