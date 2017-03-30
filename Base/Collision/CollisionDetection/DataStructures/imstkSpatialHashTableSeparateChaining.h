@@ -110,11 +110,11 @@ public:
     void setLoadFactorMax(float loadFactorMax);
 
     ///
-    /// \brief Finds all points in an AABB
+    /// \brief Finds IDs of all points in an AABB
     /// \param corner1 One corner to the box
     /// \param corner2 The other corner to the box
     ///
-    std::vector<Vec3d> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
+    std::vector<size_t> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
 
     ///
     /// \brief Clears the table
