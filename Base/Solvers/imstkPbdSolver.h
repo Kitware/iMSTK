@@ -76,7 +76,6 @@ public:
     {
         m_pbdObject->integratePosition();
         m_pbdObject->solveConstraints();
-        m_pbdObject->integrateVelocity();
     }
 
 private:

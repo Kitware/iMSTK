@@ -124,6 +124,15 @@ SceneManager::runModule()
         intPair->resolveCollision();
     }
 
+    // Update velocity of PBD objects
+    for (auto obj : m_scene->getSceneObjects())
+    {
+        if (auto pbdObj = std::dynamic_pointer_cast<PbdObject>(obj))
+        {
+            pbdObj->updateVelocity();
+        }
+    }
+
     // Set the trackers of virtual coupling PBD objects to out-of-date
     for (auto obj : m_scene->getSceneObjects())
     {

@@ -481,7 +481,7 @@ PbdModel::integratePosition()
 }
 
 void
-PbdModel::integrateVelocity()
+PbdModel::updateVelocity()
 {
     auto& prevPos = m_previousState->getPositions();
     auto& pos = m_currentState->getPositions();

@@ -161,11 +161,11 @@ PbdObject::integratePosition()
 }
 
 void
-PbdObject::integrateVelocity()
+PbdObject::updateVelocity()
 {
     if (m_pbdModel && m_pbdModel->hasConstraints())
     {
-        m_pbdModel->integrateVelocity();
+        m_pbdModel->updateVelocity();
     }
 }
 
