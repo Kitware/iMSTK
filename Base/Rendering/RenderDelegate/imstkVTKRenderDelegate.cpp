@@ -143,7 +143,7 @@ VTKRenderDelegate::updateActorTransform()
     m_transform->Identity();
     m_transform->PostMultiply();
     m_transform->Scale(scaling, scaling, scaling);
-    m_transform->RotateWXYZ(angleAxis.angle() * 180 / M_PI,
+    m_transform->RotateWXYZ(angleAxis.angle() * 180 / PI,
                           angleAxis.axis()[0],
                           angleAxis.axis()[1],
                           angleAxis.axis()[2]);

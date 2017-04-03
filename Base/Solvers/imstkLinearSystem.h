@@ -108,25 +108,25 @@ public:
     ///
     /// \brief Returns template expression for the lower triangular part of A.
     ///
-    Eigen::SparseTriangularView < SystemMatrixType, Eigen::Lower >
+    Eigen::TriangularView < SystemMatrixType, Eigen::Lower >
         getLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the strict lower triangular part of A.
     ///
-    Eigen::SparseTriangularView < SystemMatrixType, Eigen::StrictlyLower >
+    Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyLower >
         getStrictLowerTriangular() const;
 
     ///
     /// \brief Returns template expression for the upper triangular part of A.
     ///
-    Eigen::SparseTriangularView < SystemMatrixType, Eigen::Upper >
+    Eigen::TriangularView < SystemMatrixType, Eigen::Upper >
         getUpperTrianglular() const;
 
     ///
     /// \brief Returns template expression for the strict upper triangular part of A.
     ///
-    Eigen::SparseTriangularView < SystemMatrixType, Eigen::StrictlyUpper >
+    Eigen::TriangularView < SystemMatrixType, Eigen::StrictlyUpper >
         getStrictUpperTriangular() const;
 
     ///

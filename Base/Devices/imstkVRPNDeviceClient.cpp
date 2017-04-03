@@ -117,9 +117,9 @@ VRPNDeviceClient::analogChangeHandler(void *userData, const _vrpn_ANALOGCB a)
     if (a.num_channel >= 6)
     {
         deviceClient->m_orientation =
-                Rotd(a.channel[3]*M_PI,Vec3d::UnitX())*
-                Rotd(a.channel[4]*M_PI,Vec3d::UnitY())*
-                Rotd(a.channel[5]*M_PI,Vec3d::UnitZ());
+                Rotd(a.channel[3]*PI,Vec3d::UnitX())*
+                Rotd(a.channel[4]*PI,Vec3d::UnitY())*
+                Rotd(a.channel[5]*PI,Vec3d::UnitZ());
         //LOG(DEBUG) << "analog: orientation = " << deviceClient->m_orientation.matrix();
     }
 }

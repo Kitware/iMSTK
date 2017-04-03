@@ -95,7 +95,7 @@ VirtualCouplingPBDObject::computeTransform(Vec3d& pos, Quatd& quat, Eigen::Matri
     Eigen::Affine3d rot =
             Eigen::Affine3d(
                 Eigen::AngleAxisd(
-                    angleAxis.angle() * 180 / M_PI,
+                    angleAxis.angle() * 180 / PI,
                     Eigen::Vector3d(angleAxis.axis()[0],angleAxis.axis()[1],angleAxis.axis()[2])
                 )
             );

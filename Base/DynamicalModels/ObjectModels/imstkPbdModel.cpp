@@ -293,7 +293,7 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
     auto triMesh = std::static_pointer_cast<SurfaceMesh>(m_mesh);
     auto elements = triMesh->getTrianglesVertices();
     // following algorithm is terrible, should use half-edge instead
-    std::vector<std::vector<unsigned int>> onering(triMesh->getNumVertices());
+    std::vector<std::vector<size_t>> onering(triMesh->getNumVertices());
 
     for (size_t k = 0; k < elements.size(); ++k)
     {
