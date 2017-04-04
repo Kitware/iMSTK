@@ -191,7 +191,7 @@ public:
     ///
     /// \brief Time integrate the velocity
     ///
-    void integrateVelocity();
+    void updateVelocity();
 
     ///
     /// \brief

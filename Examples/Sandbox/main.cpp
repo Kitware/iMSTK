@@ -123,7 +123,7 @@ int main()
     //testMultiObjectWithTextures();
     //testViewer();
     //testScreenShotUtility();
-    testCapsule();
+    //testCapsule();
 
 
     /*------------------
@@ -149,7 +149,7 @@ int main()
     ------------------*/
     //testPbdVolume();
     //testPbdCloth();
-    //testPbdCollision();
+    testPbdCollision();
     //testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();

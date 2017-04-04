@@ -49,7 +49,7 @@ public:
     ///
     /// \brief Update the velocity
     ///
-    virtual void integrateVelocity();
+    virtual void updateVelocity();
 
     ///
     /// \brief Solve the pbd constraints by projection
