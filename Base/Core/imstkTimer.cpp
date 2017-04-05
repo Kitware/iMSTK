@@ -148,7 +148,6 @@ StopWatch::printTimeElapsed(std::string const& name /* = std::string("noName")*/
 double
 StopWatch::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
-    //return 0;
     return std::chrono::duration<double, std::milli>
         (std::chrono::high_resolution_clock::now() - wallClockTimeKeeper).count()*
         wcTimerConstants[(int)unitType];
@@ -158,6 +157,29 @@ double
 CpuTimer::getTimeElapsed(const TimeUnitType unitType /*= TimeUnitType::milliSeconds*/)
 {
     return (std::clock() - cpuTimeKeeper)*cpuTimerConstants[(int)unitType];
+}
+
+void
+UPSCounter::reset()
+{
+    m_timer->reset();
+    m_accumulatedTimer = 0.;
+    m_ups = 0;
+    m_updateCount = 0;
+}
+
+void
+UPSCounter::setEndPointOfUpdate()
+{
+    m_accumulatedTimer += m_timer->getTimeElapsed(StopWatch::TimeUnitType::milliSeconds);
+    m_updateCount++;
+
+    if (m_accumulatedTimer > 1000.)
+    {
+        m_ups = m_updateCount;
+        m_updateCount = 0;
+        m_accumulatedTimer = 0.;
+    }
 }
 
 }

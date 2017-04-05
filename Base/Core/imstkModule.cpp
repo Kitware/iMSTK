@@ -53,9 +53,22 @@ Module::start()
         }
         else if (m_status == ModuleStatus::RUNNING)
         {
+            if (m_UPSTrackerEnabled)
+            {
+                // Set the start point for update counter
+                m_UPSTracker->setStartPointOfUpdate();
+            }
+
             if(m_loopDelay == 0)
             {
                 this->runModule();
+
+                if (m_UPSTrackerEnabled)
+                {
+                    // Set the end point for update counter
+                    m_UPSTracker->setEndPointOfUpdate();
+                }
+
                 continue;
             }
             current_t = std::chrono::steady_clock::now();
@@ -64,6 +77,12 @@ Module::start()
             {
                 this->runModule();
                 previous_t = current_t;
+            }
+
+            if (m_UPSTrackerEnabled)
+            {
+                // Set the end point for update counter
+                m_UPSTracker->setEndPointOfUpdate();
             }
         }
     }
@@ -96,6 +115,7 @@ Module::pause()
         return;
     }
 
+    m_UPSTracker->reset();
     m_status = ModuleStatus::PAUSING;
 
     while (m_status != ModuleStatus::PAUSED) {}
@@ -108,7 +128,7 @@ Module::end()
         (m_status == ModuleStatus::TERMINATING))
     {
         LOG(WARNING) << "Can not end '" << m_name << "'.\n"
-                     << "Module alreading inactive or terminating.";
+                     << "Module already inactive or terminating.";
         return;
     }
 
@@ -135,7 +155,7 @@ double Module::getLoopDelay() const
 }
 
 void
-Module::setLoopDelay(double milliseconds)
+Module::setLoopDelay(const double milliseconds)
 {
     if(milliseconds < 0)
     {
@@ -157,7 +177,7 @@ double Module::getFrequency() const
 }
 
 void
-Module::setFrequency(double f)
+Module::setFrequency(const double f)
 {
     if(f < 0)
     {
@@ -171,6 +191,22 @@ Module::setFrequency(double f)
         return;
     }
     m_loopDelay = 1000.0/f;
+}
+
+unsigned int
+Module::getUPS() const
+{
+    return m_UPSTracker->getUPS();
+}
+
+void
+Module::setUPSTrackerEnabled(const bool enable)
+{
+    m_UPSTrackerEnabled = enable;
+    if (!enable)
+    {
+        m_UPSTracker->reset();
+    }
 }
 
 }
