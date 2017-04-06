@@ -62,6 +62,11 @@ public:
     ///
     static std::shared_ptr<Mesh> read(const std::string& filePath, MeshFileType meshType);
 
+    ///
+    /// \brief Writes the given mesh to the specified file path.
+    ///
+    static bool write(const std::shared_ptr<Mesh> imstkMesh, const std::string& filePath, const MeshFileType meshType);
+
 protected:
 
     ///
@@ -77,6 +82,17 @@ protected:
     static std::shared_ptr<SurfaceMesh> readVtkPolyData(const std::string& filePath);
 
     ///
+    /// \brief Writes the given surfase mesh to given file path using the provided writer type
+    ///
+    template<typename WriterType>
+    static bool writeVtkPolyData(const std::shared_ptr<SurfaceMesh> imstkMesh, const std::string& filePath);
+
+    ///
+    /// \brief Writes the given volumetric mesh to given file path
+    ///
+    static bool writeVtkUnstructuredGrid(const std::shared_ptr<VolumetricMesh> imstkMesh, const std::string& filePath);
+
+    ///
     /// \brief
     ///
     template<typename ReaderType>
@@ -88,6 +104,21 @@ protected:
     static std::shared_ptr<SurfaceMesh> convertVtkPolyDataToSurfaceMesh(vtkPolyData* vtkMesh);
 
     ///
+    /// \brief Converts imstk surface mesh into a vtk polydata suitable for writing to file
+    ///
+    static vtkPolyData* convertSurfaceMeshToVtkPolyData(std::shared_ptr<SurfaceMesh> imstkMesh);
+
+    ///
+    /// \brief Converts imstk tetrahedral mesh into a vtk unstructured grid suitable for writing to file
+    ///
+    static vtkUnstructuredGrid* convertTetrahedralMeshToVtkUnstructuredGrid(std::shared_ptr<TetrahedralMesh> imstkMesh);
+
+    ///
+    /// \brief Converts imstk hexahedral mesh into a vtk unstructured grid suitable for writing to file
+    ///
+    static vtkUnstructuredGrid * convertHexahedralMeshToVtkUnstructuredGrid(std::shared_ptr<HexahedralMesh> imstkMesh);
+
+    ///
     /// \brief
     ///
     static std::shared_ptr<VolumetricMesh> convertVtkUnstructuredGridToVolumetricMesh(vtkUnstructuredGrid* vtkMesh);
@@ -95,13 +126,24 @@ protected:
     ///
     /// \brief
     ///
-    static void copyVertices(vtkPoints* points, StdVectorOfVec3d& vertices);
+    static void copyVerticesFromVtk(vtkPoints* points, StdVectorOfVec3d& vertices);
+
+    ///
+    /// \brief Copies vertices from imstk structure to VTK one
+    ///
+    static void copyVerticesToVtk(const StdVectorOfVec3d& vertices, vtkPoints* points);
+
+    ///
+    /// \brief Copies cells of the given dimension from imstk structure to VTK one
+    ///
+    template<size_t dim>
+    static void copyCellsToVtk(const std::vector<std::array<size_t, dim>>& cells, vtkCellArray* vtkCells);
 
     ///
     /// \brief
     ///
     template<size_t dim>
-    static void copyCells(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells);
+    static void copyCellsFromVtk(vtkCellArray* vtkCells, std::vector<std::array<size_t,dim>>& cells);
 
     ///
     /// \brief
