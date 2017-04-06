@@ -57,7 +57,7 @@ public:
     ///
     /// \brief
     ///
-    void setUpMapper(vtkAlgorithmOutput *source);
+    void setUpMapper(vtkAlgorithmOutput *source, const bool rigid);
 
     ///
     /// \brief

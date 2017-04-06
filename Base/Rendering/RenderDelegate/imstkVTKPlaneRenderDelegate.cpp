@@ -35,7 +35,7 @@ VTKPlaneRenderDelegate::VTKPlaneRenderDelegate(std::shared_ptr<Plane>plane) :
     source->SetNormal(m_geometry->getNormal().data());
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort());
+    this->setUpMapper(source->GetOutputPort(), true);
     this->updateActorTransform();
 }
 

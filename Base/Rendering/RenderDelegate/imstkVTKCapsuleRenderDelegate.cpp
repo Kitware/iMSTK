@@ -39,7 +39,7 @@ m_capsuleGeometry(capsule)
     source->SetThetaResolution(10);
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort());
+    this->setUpMapper(source->GetOutputPort(), true);
     this->updateActorTransform();
 }
 
