@@ -23,6 +23,7 @@
 
 #include "imstkMeshIO.h"
 #include "imstkVTKMeshIO.h"
+#include "imstkAssimpMeshIO.h"
 #include "imstkVegaMeshIO.h"
 #include "imstkMSHMeshIO.h"
 
@@ -48,8 +49,13 @@ MeshIO::read(const std::string& filePath)
     case MeshFileType::VTP :
     case MeshFileType::STL :
     case MeshFileType::PLY :
-    case MeshFileType::OBJ :
         return VTKMeshIO::read(filePath, meshType);
+        break;
+    case MeshFileType::OBJ :
+    case MeshFileType::DAE :
+    case MeshFileType::FBX :
+    case MeshFileType::_3DS :
+        return AssimpMeshIO::read(filePath, meshType);
         break;
     case MeshFileType::VEG :
         return VegaMeshIO::read(filePath, meshType);
@@ -105,6 +111,18 @@ MeshIO::getFileType(const std::string& filePath)
     else if (extString == "ply" || extString == "PLY")
     {
         meshType = MeshFileType::PLY;
+    }
+    else if (extString == "dae" || extString == "DAE")
+    {
+        meshType = MeshFileType::DAE;
+    }
+    else if (extString == "fbx" || extString == "FBX")
+    {
+        meshType = MeshFileType::FBX;
+    }
+    else if (extString == "3ds" || extString == "3DS")
+    {
+        meshType = MeshFileType::_3DS;
     }
     else if (extString == "veg" || extString == "VEG")
     {
