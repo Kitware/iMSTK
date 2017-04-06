@@ -91,7 +91,6 @@ SceneManager::runModule()
     for (auto controller : m_scene->getSceneObjectControllers())
     {
         controller->updateControlledObjects();
-        controller->applyForces();
     }
 
     // Compute collision data per interaction pair
@@ -99,6 +98,12 @@ SceneManager::runModule()
     {
         intPair->computeCollisionData();
         intPair->computeContactForces();
+    }
+
+    // Apply forces on device
+    for (auto controller : m_scene->getSceneObjectControllers())
+    {
+        controller->applyForces();
     }
 
     // Update the solvers
