@@ -86,7 +86,7 @@ VTKSurfaceMeshRenderDelegate::VTKSurfaceMeshRenderDelegate(std::shared_ptr<Surfa
     source->SetOutput(polydata);
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort());
+    this->setUpMapper(source->GetOutputPort(), false);
     this->updateActorTransform();
 
     // Copy textures

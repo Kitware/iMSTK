@@ -53,7 +53,7 @@ VTKLineMeshRenderDelegate::VTKLineMeshRenderDelegate(std::shared_ptr<LineMesh> l
     lines->SetPoints(points);
 
     // Setup Mapper & Actor
-    this->setUpMapper(lines->GetOutputPort());
+    this->setUpMapper(lines->GetOutputPort(), true);
     this->updateActorTransform();
 }
 

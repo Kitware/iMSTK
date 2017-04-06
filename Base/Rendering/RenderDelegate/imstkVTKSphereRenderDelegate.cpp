@@ -37,7 +37,7 @@ VTKSphereRenderDelegate::VTKSphereRenderDelegate(std::shared_ptr<Sphere>sphere) 
     source->SetThetaResolution(20);
 
     // Setup Mapper & Actor
-    this->setUpMapper(source->GetOutputPort());
+    this->setUpMapper(source->GetOutputPort(), true);
     this->updateActorTransform();
 }
 

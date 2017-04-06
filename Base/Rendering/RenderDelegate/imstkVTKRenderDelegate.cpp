@@ -42,6 +42,7 @@
 
 #include "vtkOpenGLPolyDataMapper.h"
 #include "vtkOpenGLVertexBufferObject.h"
+#include "vtkPolyDataNormals.h"
 #include "vtkTriangleMeshPointNormals.h"
 #include "vtkTransform.h"
 
@@ -102,18 +103,26 @@ VTKRenderDelegate::make_delegate(std::shared_ptr<Geometry>geom)
 }
 
 void
-VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source)
+VTKRenderDelegate::setUpMapper(vtkAlgorithmOutput *source, const bool rigid)
 {
     // Add normals
-    auto normalGen = vtkSmartPointer<vtkTriangleMeshPointNormals>::New();
+    vtkSmartPointer<vtkPolyDataAlgorithm> normalGen;
+    if (rigid)
+    {
+        normalGen = vtkSmartPointer<vtkPolyDataNormals>::New();
+        vtkPolyDataNormals::SafeDownCast(normalGen)->SplittingOff();
+    }
+    else
+    {
+        normalGen = vtkSmartPointer<vtkTriangleMeshPointNormals>::New();
+    }
     normalGen->SetInputConnection(source);
 
     m_mapper->SetInputConnection(normalGen->GetOutputPort());
 
     // Disable auto Shift & Scale which is slow for deformable objects
     // as it needs to compute a bounding box at every frame
-    auto mapper = dynamic_cast<vtkOpenGLPolyDataMapper*>(m_mapper.GetPointer());
-    if(mapper)
+    if(auto mapper = vtkOpenGLPolyDataMapper::SafeDownCast(m_mapper.GetPointer()))
     {
         mapper->SetVBOShiftScaleMethod(vtkOpenGLVertexBufferObject::DISABLE_SHIFT_SCALE);
     }
