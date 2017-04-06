@@ -313,7 +313,7 @@ imstk::MeshIO::read(iMSTK_DATA_ROOT"/relative/path/to/mesh.vtk");
 ------
 
 Dashboards - powered by [CDash] - helps visualizing the latest state of iMSTK builds on Windows, MacOSx, and Linux, to avoid introducing regressions when offering changes to the toolkit:
->http://my.cdash.org/index.php?project=iMSTK
+>http://open.cdash.org/index.php?project=iMSTK
 
 **Name** | CDash Build Group Description
 --- | ---
