@@ -160,7 +160,7 @@ int main()
     ------------------*/
     //testLineMesh();
     //testMshAndVegaIO();
-    //testReadMesh();
+    testReadMesh();
 
 
     /*------------------
@@ -453,13 +453,13 @@ void testMeshCCD()
     {
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_1 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_1.vtk");
-        mesh2->setVerticesPositions(mesh2_1->getVertexPositions());
+        mesh2->setVertexPositions(mesh2_1->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_2 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_2.vtk");
-        mesh2->setVerticesPositions(mesh2_2->getVertexPositions());
+        mesh2->setVertexPositions(mesh2_2->getVertexPositions());
         std::this_thread::sleep_for(std::chrono::seconds(5));
         auto mesh2_3 = imstk::MeshIO::read(iMSTK_DATA_ROOT"/spheres/small_3.vtk");
-        mesh2->setVerticesPositions(mesh2_3->getVertexPositions());
+        mesh2->setVertexPositions(mesh2_3->getVertexPositions());
     });
 
     // Run
@@ -989,8 +989,8 @@ void testTetraTriangleMap()
     vertList.push_back(imstk::Vec3d(1.0, 0, 0));
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
     vertList.push_back(imstk::Vec3d(0, 0, 1.0));
-    tetMesh->setInitialVerticesPositions(vertList);
-    tetMesh->setVerticesPositions(vertList);
+    tetMesh->setInitialVertexPositions(vertList);
+    tetMesh->setVertexPositions(vertList);
 
     std::vector<imstk::TetrahedralMesh::TetraArray> tetConnectivity;
     imstk::TetrahedralMesh::TetraArray tet1 = { 0, 1, 2, 3 };
@@ -1003,8 +1003,8 @@ void testTetraTriangleMap()
     SurfVertList.push_back(imstk::Vec3d(0, 0, 1));// coincides with one vertex
     SurfVertList.push_back(imstk::Vec3d(0.25, 0.25, 0.25));// centroid
     SurfVertList.push_back(imstk::Vec3d(1.05, 0, 0));
-    triMesh->setInitialVerticesPositions(SurfVertList);
-    triMesh->setVerticesPositions(SurfVertList);
+    triMesh->setInitialVertexPositions(SurfVertList);
+    triMesh->setVertexPositions(SurfVertList);
 
     // Construct a map
     auto tetTriMap = std::make_shared<imstk::TetraTriangleMap>();
@@ -1031,8 +1031,8 @@ void testExtractSurfaceMesh()
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
     vertList.push_back(imstk::Vec3d(0, 0, 1.0));
     vertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
-    tetMesh->setInitialVerticesPositions(vertList);
-    tetMesh->setVerticesPositions(vertList);
+    tetMesh->setInitialVertexPositions(vertList);
+    tetMesh->setVertexPositions(vertList);
 
     // a.2 add connectivity
     std::vector<imstk::TetrahedralMesh::TetraArray> tetConnectivity;
@@ -1074,8 +1074,8 @@ void testOneToOneNodalMap()
     vertList.push_back(imstk::Vec3d(0, 1.0, 0));
     vertList.push_back(imstk::Vec3d(0, 0, 1.0));
     vertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
-    tetMesh->setInitialVerticesPositions(vertList);
-    tetMesh->setVerticesPositions(vertList);
+    tetMesh->setInitialVertexPositions(vertList);
+    tetMesh->setVertexPositions(vertList);
 
     tetMesh->print();
 
@@ -1089,8 +1089,8 @@ void testOneToOneNodalMap()
     SurfVertList.push_back(imstk::Vec3d(0, 1.0, 0));
     SurfVertList.push_back(imstk::Vec3d(0, 0, 1.0));
     SurfVertList.push_back(imstk::Vec3d(1.0, 1.0, 1.0));
-    triMesh->setInitialVerticesPositions(SurfVertList);
-    triMesh->setVerticesPositions(SurfVertList);
+    triMesh->setInitialVertexPositions(SurfVertList);
+    triMesh->setVertexPositions(SurfVertList);
 
     // b.2 Add vertex connectivity
     std::vector<imstk::SurfaceMesh::TriangleArray> triConnectivity;
@@ -1139,8 +1139,8 @@ void testSurfaceMeshOptimizer()
     vertList.push_back(imstk::Vec3d(0, 0.5, 0));
     vertList.push_back(imstk::Vec3d(1, 0.5, 0));
     vertList.push_back(imstk::Vec3d(0.5, 0, 0));
-    surfMesh->setInitialVerticesPositions(vertList);
-    surfMesh->setVerticesPositions(vertList);
+    surfMesh->setInitialVertexPositions(vertList);
+    surfMesh->setVertexPositions(vertList);
 
     // c. Add connectivity data
     std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
@@ -1423,8 +1423,8 @@ void testPbdCloth()
             vertList[i*nCols + j] = Vec3d((double)dx*i, 1.0, (double)dy*j);
         }
     }
-    surfMesh->setInitialVerticesPositions(vertList);
-    surfMesh->setVerticesPositions(vertList);
+    surfMesh->setInitialVertexPositions(vertList);
+    surfMesh->setVertexPositions(vertList);
 
     // c. Add connectivity data
     std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
@@ -1584,8 +1584,8 @@ void testPbdCollision()
 
             }
         }
-        clothMesh->setInitialVerticesPositions(vertList);
-        clothMesh->setVerticesPositions(vertList);
+        clothMesh->setInitialVertexPositions(vertList);
+        clothMesh->setVertexPositions(vertList);
 
         // c. Add connectivity data
         std::vector<imstk::SurfaceMesh::TriangleArray> triangles;
@@ -1654,14 +1654,14 @@ void testPbdCollision()
             return;
         }
 
-        auto vs = volTetMesh1->getInitialVerticesPositions();
+        auto vs = volTetMesh1->getInitialVertexPositions();
         Vec3d tmpPos;
         for (int i = 0; i < volTetMesh1->getNumVertices(); ++i){
             tmpPos = volTetMesh1->getVertexPosition(i);
             tmpPos[1] -= 6;
-            volTetMesh1->setVerticePosition(i, tmpPos);
+            volTetMesh1->setVertexPosition(i, tmpPos);
         }
-        volTetMesh1->setInitialVerticesPositions(volTetMesh1->getVertexPositions());
+        volTetMesh1->setInitialVertexPositions(volTetMesh1->getVertexPositions());
 
         volTetMesh1->extractSurfaceMesh(surfMesh1);
         volTetMesh1->extractSurfaceMesh(surfMeshVisual1);
@@ -1848,16 +1848,16 @@ void testLineMesh()
             connectivity.push_back(line);
         }
 
-        lineMeshColliding->setInitialVerticesPositions(vertList);
-        lineMeshColliding->setVerticesPositions(vertList);
+        lineMeshColliding->setInitialVertexPositions(vertList);
+        lineMeshColliding->setVertexPositions(vertList);
         lineMeshColliding->setConnectivity(connectivity);
 
-        lineMeshPhysics->setInitialVerticesPositions(vertList);
-        lineMeshPhysics->setVerticesPositions(vertList);
+        lineMeshPhysics->setInitialVertexPositions(vertList);
+        lineMeshPhysics->setVertexPositions(vertList);
         lineMeshPhysics->setConnectivity(connectivity);
 
-        lineMeshVisual->setInitialVerticesPositions(vertList);
-        lineMeshVisual->setVerticesPositions(vertList);
+        lineMeshVisual->setInitialVertexPositions(vertList);
+        lineMeshVisual->setVertexPositions(vertList);
         lineMeshVisual->setConnectivity(connectivity);
 
 
@@ -2064,15 +2064,15 @@ void testLineMesh()
             return;
         }
 
-        auto vs = volTetMesh->getInitialVerticesPositions();
+        auto vs = volTetMesh->getInitialVertexPositions();
         Vec3d tmpPos;
         for (int i = 0; i < volTetMesh->getNumVertices(); ++i)
         {
             tmpPos = volTetMesh->getVertexPosition(i);
             tmpPos[1] -= 15;
-            volTetMesh->setVerticePosition(i, tmpPos);
+            volTetMesh->setVertexPosition(i, tmpPos);
         }
-        volTetMesh->setInitialVerticesPositions(volTetMesh->getVertexPositions());
+        volTetMesh->setInitialVertexPositions(volTetMesh->getVertexPositions());
 
         auto surfMesh = std::make_shared<imstk::SurfaceMesh>();
         volTetMesh->extractSurfaceMesh(surfMesh);

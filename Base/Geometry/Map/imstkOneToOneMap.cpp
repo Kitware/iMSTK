@@ -120,7 +120,7 @@ OneToOneMap::apply()
 
     for (auto const& mapValue : m_oneToOneMap)
     {
-        meshSlave->setVerticePosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
+        meshSlave->setVertexPosition(mapValue.first, meshMaster->getVertexPosition(mapValue.second));
     }
 }
 

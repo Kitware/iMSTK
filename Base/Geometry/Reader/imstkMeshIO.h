@@ -45,6 +45,9 @@ enum MeshFileType
     STL,
     PLY,
     OBJ,
+    DAE,
+    FBX,
+    _3DS,
     VEG,
     MSH
 };

@@ -76,7 +76,7 @@ VirtualCouplingPBDObject::updateFromDevice()
         vertexPos3.y() = vertexPos4.y();
         vertexPos3.z() = vertexPos4.z();
 
-        collidingMesh->setVerticePosition(i, vertexPos3);
+        collidingMesh->setVertexPosition(i, vertexPos3);
     }
     applyCollidingToPhysics();
     updatePbdStates();
@@ -129,7 +129,7 @@ VirtualCouplingPBDObject::resetCollidingGeometry(){
 
     if (m_collidingGeometry->isMesh()){
         auto collidingMesh = std::dynamic_pointer_cast<Mesh>(m_collidingGeometry);
-        collidingMesh->setVerticesPositions(collidingMesh->getInitialVerticesPositions());
+        collidingMesh->setVertexPositions(collidingMesh->getInitialVertexPositions());
     }
     else{
         std::cout << "Not a mesh." << std::endl;

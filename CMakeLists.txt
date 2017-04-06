@@ -89,6 +89,7 @@ if(${PROJECT_NAME}_SUPERBUILD)
     imstk_define_dependency(FTD2XX) #for LibNiFalcon
   endif()
 
+  imstk_define_dependency(Assimp)
   imstk_define_dependency(g3log)
   imstk_define_dependency(Eigen)
   imstk_define_dependency(SCCD)
@@ -135,6 +136,10 @@ endif()
 # Uncrustify
 find_program(Uncrustify_EXECUTABLE Uncrustify)
 include(SetupUncrustifyConfig)
+
+# Assimp
+find_package( Assimp REQUIRED )
+include_directories( ${Assimp_INCLUDE_DIRS} )
 
 # g3log
 find_package( g3log REQUIRED )

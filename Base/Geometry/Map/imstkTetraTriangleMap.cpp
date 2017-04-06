@@ -92,7 +92,7 @@ TetraTriangleMap::apply()
         {
             newPos += tetMesh->getVertexPosition(tetVerts[i]) * weights[i];
         }
-        triMesh->setVerticePosition(vertexId, newPos);
+        triMesh->setVertexPosition(vertexId, newPos);
     }
 }
 

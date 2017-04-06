@@ -81,12 +81,12 @@ public:
     ///
     /// \brief Computes neighboring triangles for all vertices
     ///
-    void computeVerticesNeighborTriangles();
+    void computeVertexNeighborTriangles();
 
     ///
     /// \brief Computes neighboring vertices for all vertices
     ///
-    void computeVerticesNeighborVertices();
+    void computeVertexNeighborVertices();
 
     ///
     /// \brief Compute the normals to the triangles
@@ -116,7 +116,7 @@ public:
     ///
     /// \brief Get vector of normals of all the triangles
     ///
-    const StdVectorOfVec3d& getTrianglesNormals() const;
+    const StdVectorOfVec3d& getTriangleNormals() const;
 
     ///
     /// \brief Get normal of a triangle given its index
@@ -124,14 +124,22 @@ public:
     const Vec3d& getTriangleNormal(size_t i) const;
 
     ///
-    /// \brief Get vector of normals of all the vertices
+    /// \brief Set/Get vector of normals of all the vertices
     ///
-    const StdVectorOfVec3d& getVerticesNormals() const;
+    void setVertexNormals(const StdVectorOfVec3d& normals);
+    const StdVectorOfVec3d& getVertexNormals() const;
 
     ///
-    /// \brief Get normal of a vertex given its index
+    /// \brief Set/Get vector of tangents of all the vertices
     ///
-    const Vec3d& getVerticeNormal(size_t i) const;
+    void setVertexTangents(const StdVectorOfVec3d& tangents);
+    const StdVectorOfVec3d& getVertexTangents() const;
+
+    ///
+    /// \brief Set/Get vector of bitangents of all the vertices
+    ///
+    void setVertexBitangents(const StdVectorOfVec3d& bitangents);
+    const StdVectorOfVec3d& getVertexBitangents() const;
 
     ///
     /// \brief Returns the number of triangles
@@ -155,11 +163,13 @@ protected:
 
     std::vector<TriangleArray> m_trianglesVertices; ///> Triangle connectivity
 
-    std::vector<NeighborsType> m_verticesNeighborTriangles; ///> Neighbor triangles to vertices
-    std::vector<NeighborsType> m_verticesNeighborVertices; ///> Neighbor vertices to vertices
+    std::vector<NeighborsType> m_vertexNeighborTriangles; ///> Neighbor triangles to vertices
+    std::vector<NeighborsType> m_vertexNeighborVertices; ///> Neighbor vertices to vertices
 
-    StdVectorOfVec3d m_trianglesNormals; ///> Normals to the triangles
-    StdVectorOfVec3d m_verticesNormals; ///> Normals of the vertices
+    StdVectorOfVec3d m_triangleNormals; ///> Normals to the triangles
+    StdVectorOfVec3d m_vertexNormals; ///> Normals of the vertices
+    StdVectorOfVec3d m_vertexTangents; ///> Tangents of the vertices
+    StdVectorOfVec3d m_vertexBitangents; ///> Bitangents of the vertices
 
     std::string m_defaultTCoords = ""; ///> Name of the array used as default texture coordinates
     std::map<std::string, std::string> m_textureMap; ///> Mapping texture coordinates to texture

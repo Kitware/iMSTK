@@ -66,12 +66,12 @@ public:
     ///
     /// \brief Sets initial positions from an array
     ///
-    void setInitialVerticesPositions(const StdVectorOfVec3d& vertices);
+    void setInitialVertexPositions(const StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Returns the vector of initial positions of the mesh vertices
     ///
-    const StdVectorOfVec3d& getInitialVerticesPositions() const;
+    const StdVectorOfVec3d& getInitialVertexPositions() const;
 
     ///
     /// \brief Returns the initial position of a vertex given its index
@@ -81,7 +81,7 @@ public:
     ///
     /// \brief Sets current vertex positions of the mesh from an array
     ///
-    void setVerticesPositions(const StdVectorOfVec3d& vertices);
+    void setVertexPositions(const StdVectorOfVec3d& vertices);
 
     ///
     /// \brief Returns the vector of current positions of the mesh vertices
@@ -91,7 +91,7 @@ public:
     ///
     /// \brief Set the current position of a vertex given its index to certain position
     ///
-    void setVerticePosition(const size_t& vertNum, const Vec3d& pos);
+    void setVertexPosition(const size_t& vertNum, const Vec3d& pos);
 
     ///
     /// \brief Returns the position of a vertex given its index
@@ -101,22 +101,22 @@ public:
     ///
     /// \brief Sets the displacements of mesh vertices from an array
     ///
-    void setVerticesDisplacements(const StdVectorOfVec3d& diff);
+    void setVertexDisplacements(const StdVectorOfVec3d& diff);
 
     ///
     /// \brief Sets the displacements of mesh vertices from a linearized displacement vector
     ///
-    void setVerticesDisplacements(const Vectord& u);
+    void setVertexDisplacements(const Vectord& u);
 
     ///
     /// \brief Returns the vector displacements of mesh vertices
     ///
-    const StdVectorOfVec3d& getVerticesDisplacements() const;
+    const StdVectorOfVec3d& getVertexDisplacements() const;
 
     ///
     /// \brief Returns the displacement of a given vertex
     ///
-    const Vec3d& getVerticeDisplacement(const size_t& vertNum) const;
+    const Vec3d& getVertexDisplacement(const size_t& vertNum) const;
 
     ///
     /// \brief Sets the point data for all arrays at each vertice
@@ -160,16 +160,16 @@ protected:
     ///
     StdVectorOfVec3d& getVerticesPositionsNotConst()
     {
-        return m_verticesPositions;
+        return m_vertexPositions;
     }
 
     //   Orientation * Scaling * initialVerticesPositions
     // + Position (Initial translation)
     // + verticesDisplacements
     // = verticesPositions
-    StdVectorOfVec3d m_initialVerticesPositions; //> Initial positions of vertices
-    StdVectorOfVec3d m_verticesPositions; //> Current positions of vertices
-    StdVectorOfVec3d m_verticesDisplacements; //> Displacements of vertices
+    StdVectorOfVec3d m_initialVertexPositions; //> Initial positions of vertices
+    StdVectorOfVec3d m_vertexPositions; //> Current positions of vertices
+    StdVectorOfVec3d m_vertexDisplacements; //> Displacements of vertices
 
     std::map<std::string, StdVectorOfVectorf> m_pointDataMap; ///> vector of data arrays per vertice
 };
