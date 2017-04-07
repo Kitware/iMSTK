@@ -45,7 +45,7 @@ public:
     enum class Type
     {
         UnidirectionalPlaneToSphere,
-        PlaneToSphere,
+        BidirectionalPlaneToSphere,
         SphereToSphere,
         MeshToSphere,
         MeshToPlane,

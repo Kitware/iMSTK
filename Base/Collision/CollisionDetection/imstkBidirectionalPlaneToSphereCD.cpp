@@ -19,7 +19,7 @@
 
    =========================================================================*/
 
-#include "imstkPlaneToSphereCD.h"
+#include "imstkBidirectionalPlaneToSphereCD.h"
 
 #include "imstkCollidingObject.h"
 #include "imstkCollisionData.h"
@@ -31,7 +31,7 @@
 namespace imstk {
 
 void
-PlaneToSphereCD::computeCollisionData()
+BidirectionalPlaneToSphere::computeCollisionData()
 {
     // Clear collisionData
     m_colData.clearAll();
