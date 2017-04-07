@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #ifndef imstkPbdVolumeConstraint_h
 #define imstkPbdVolumeConstraint_h
