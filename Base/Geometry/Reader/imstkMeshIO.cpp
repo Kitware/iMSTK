@@ -149,6 +149,12 @@ MeshIO::write(const std::shared_ptr<imstk::Mesh> imstkMesh, const std::string& f
         case MeshFileType::VEG:
             return VegaMeshIO::write(imstkMesh, filePath, meshType);
             break;
+        case MeshFileType::VTU:
+        case MeshFileType::VTP:
+        case MeshFileType::STL:
+        case MeshFileType::PLY:
+            return VTKMeshIO::write(imstkMesh, filePath, meshType);
+            break;
     }
 
     LOG(WARNING) << "MeshIO::write error: file type not supported";
