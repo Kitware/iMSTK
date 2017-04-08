@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkTimerUtility_h
-#define imstkTimerUtility_h
+#ifndef imstkTimer_h
+#define imstkTimer_h
 
 #include "g3log/g3log.hpp"
 
@@ -150,6 +150,51 @@ private:
     std::clock_t cpuTimeKeeper; ///> time keeper for cpu time
 };
 
+///
+/// \class UPSCounter
+///
+/// \brief Utility class to count updates per second
+///
+class UPSCounter
+{
+
+public:
+    ///
+    /// \brief Constructor/Destructor
+    ///
+    UPSCounter() = default;
+    ~UPSCounter() = default;
+
+    ///
+    /// \brief Reset the variable that keep track of ups
+    ///
+    void reset();
+
+    ///
+    /// \brief Set the start point to the update
+    ///
+    void setStartPointOfUpdate() { m_timer->start(); }
+
+
+    ///
+    /// \brief Set the end point to the update
+    ///
+    void setEndPointOfUpdate();
+
+    ///
+    /// \brief Get the updates per second
+    ///
+    unsigned int getUPS() const { return m_ups; }
+
+protected:
+
+    std::shared_ptr<StopWatch> m_timer = std::make_shared<StopWatch>(); ///> Timer
+
+    double m_accumulatedTimer = 0.; ///> Accumulated time (always < 1 sec)
+    unsigned int m_ups = 0;         ///> Most up-to-date ups
+    unsigned int m_updateCount = 0; ///> Current update count
+};
+
 }
 
-#endif // ifndef imstkLogUtility_h
+#endif // ifndef imstkTimer_h
