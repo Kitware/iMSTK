@@ -21,7 +21,8 @@
 
 #include "imstkCollisionDetection.h"
 
-#include "imstkPlaneToSphereCD.h"
+#include "imstkUnidirectionalPlaneToSphereCD.h"
+#include "imstkBidirectionalPlaneToSphereCD.h"
 #include "imstkSphereToSphereCD.h"
 #include "imstkMeshToSphereCD.h"
 #include "imstkMeshToPlaneCD.h"
@@ -45,7 +46,7 @@ CollisionDetection::make_collision_detection(const Type& type,
 {
     switch (type)
     {
-    case Type::PlaneToSphere:
+    case Type::UnidirectionalPlaneToSphere:
     {
         auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
         auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
@@ -54,10 +55,25 @@ CollisionDetection::make_collision_detection(const Type& type,
         if (plane == nullptr || sphere == nullptr)
         {
             LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
-                         << "invalid object geometries for PlaneToSphere collision detection.";
+                         << "invalid object geometries for UnidirectionalPlaneToSphere collision detection.";
             return nullptr;
         }
-        return std::make_shared<PlaneToSphereCD>(plane, sphere, colData);
+        return std::make_shared<UnidirectionalPlaneToSphereCD>(plane, sphere, colData);
+    }
+    break;
+    case Type::BidirectionalPlaneToSphere:
+    {
+        auto plane = std::dynamic_pointer_cast<Plane>(objA->getCollidingGeometry());
+        auto sphere = std::dynamic_pointer_cast<Sphere>(objB->getCollidingGeometry());
+
+        // Geometries check
+        if (plane == nullptr || sphere == nullptr)
+        {
+            LOG(WARNING) << "CollisionDetection::make_collision_detection error: "
+                         << "invalid object geometries for BidirectionalPlaneToSphere collision detection.";
+            return nullptr;
+        }
+        return std::make_shared<BidirectionalPlaneToSphere>(plane, sphere, colData);
     }
     break;
     case Type::SphereToSphere:

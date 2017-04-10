@@ -512,11 +512,11 @@ void testPenaltyRigidCollision()
     // Collisions
     auto colGraph = scene->getCollisionGraph();
     colGraph->addInteractionPair(planeObj, sphere0Obj,
-        CollisionDetection::Type::PlaneToSphere,
+        CollisionDetection::Type::BidirectionalPlaneToSphere,
         CollisionHandling::Type::None,
         CollisionHandling::Type::Penalty);
     colGraph->addInteractionPair(planeObj, sphere1Obj,
-        CollisionDetection::Type::PlaneToSphere,
+        CollisionDetection::Type::BidirectionalPlaneToSphere,
         CollisionHandling::Type::None,
         CollisionHandling::Type::Penalty);
     colGraph->addInteractionPair(sphere0Obj, sphere1Obj,

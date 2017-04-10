@@ -19,8 +19,8 @@
 
    =========================================================================*/
 
-#ifndef imstkPlaneToSphereCD_h
-#define imstkPlaneToSphereCD_h
+#ifndef imstkBidirectionalPlaneToSphereCD_h
+#define imstkBidirectionalPlaneToSphereCD_h
 
 #include <memory>
 
@@ -38,17 +38,17 @@ class CollisionData;
 ///
 /// \brief Plane to sphere collision detection
 ///
-class PlaneToSphereCD : public CollisionDetection
+class BidirectionalPlaneToSphere : public CollisionDetection
 {
 public:
 
     ///
     /// \brief Constructor
     ///
-    PlaneToSphereCD(std::shared_ptr<Plane> planeA,
+    BidirectionalPlaneToSphere(std::shared_ptr<Plane> planeA,
                     std::shared_ptr<Sphere> sphereB,
                     CollisionData& colData) :
-        CollisionDetection(CollisionDetection::Type::PlaneToSphere, colData),
+        CollisionDetection(CollisionDetection::Type::BidirectionalPlaneToSphere, colData),
         m_planeA(planeA),
         m_sphereB(sphereB)
     {}
@@ -56,7 +56,7 @@ public:
     ///
     /// \brief Destructor
     ///
-    ~PlaneToSphereCD() = default;
+    ~BidirectionalPlaneToSphere() = default;
 
     ///
     /// \brief Detect collision and compute collision data
@@ -71,4 +71,4 @@ private:
 
 }
 
-#endif // ifndef imstkPlaneToSphereCD_h
+#endif // ifndef imstkBidirectionalPlaneToSphereCD_h

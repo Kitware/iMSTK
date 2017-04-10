@@ -31,7 +31,7 @@ namespace imstk {
 MeshToMeshCD::MeshToMeshCD(std::shared_ptr<SurfaceMesh> meshA,
                            std::shared_ptr<SurfaceMesh> meshB,
                            CollisionData& colData) :
-    CollisionDetection(CollisionDetection::Type::PlaneToSphere, colData),
+    CollisionDetection(CollisionDetection::Type::MeshToMesh, colData),
     m_meshA(meshA),
     m_meshB(meshB)
 {
