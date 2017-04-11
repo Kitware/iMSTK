@@ -17,7 +17,7 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-   =========================================================================*/
+=========================================================================*/
 
 #ifndef imstkCollisionHandling_h
 #define imstkCollisionHandling_h
