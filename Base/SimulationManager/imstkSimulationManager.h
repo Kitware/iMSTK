@@ -76,6 +76,11 @@ public:
     ///
     /// \brief
     ///
+    std::shared_ptr<SceneManager> getSceneManager(std::string sceneName) const;
+
+    ///
+    /// \brief
+    ///
     std::shared_ptr<Scene> getScene(std::string sceneName) const;
 
     ///

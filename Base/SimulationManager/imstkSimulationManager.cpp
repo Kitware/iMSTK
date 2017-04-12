@@ -40,8 +40,8 @@ SimulationManager::isSceneRegistered(std::string sceneName) const
     return m_sceneManagerMap.find(sceneName) != m_sceneManagerMap.end();
 }
 
-std::shared_ptr<Scene>
-SimulationManager::getScene(std::string sceneName) const
+std::shared_ptr<SceneManager>
+SimulationManager::getSceneManager(std::string sceneName) const
 {
     if (!this->isSceneRegistered(sceneName))
     {
@@ -50,7 +50,14 @@ SimulationManager::getScene(std::string sceneName) const
         return nullptr;
     }
 
-    return m_sceneManagerMap.at(sceneName)->getScene();
+    return m_sceneManagerMap.at(sceneName);
+}
+
+std::shared_ptr<Scene>
+SimulationManager::getScene(std::string sceneName) const
+{
+    auto sceneManager = this->getSceneManager(sceneName);
+    return sceneManager ? sceneManager->getScene() : nullptr;
 }
 
 std::shared_ptr<Scene>
@@ -134,6 +141,7 @@ SimulationManager::getModule(std::string moduleName) const
 
     return m_modulesMap.at(moduleName);
 }
+
 void
 SimulationManager::addModule(std::shared_ptr<Module> newModule)
 {
