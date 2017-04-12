@@ -181,14 +181,14 @@ int main()
     ------------------*/
     //testLineMesh();
     //testMshAndVegaIO();
-    testReadMesh();
+    //testReadMesh();
 
 
     /*------------------
     Test devices, controllers
     ------------------*/
     //testObjectController();
-    //testTwoFalcons();
+    testTwoFalcons();
     //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
@@ -593,6 +593,30 @@ void testTwoFalcons()
     // Camera
     auto cam = scene->getCamera();
     cam->setPosition(Vec3d(0, 18, 40));
+
+    // Print device tracking info (callback)
+    unsigned int displayCpt = 0;
+    auto postUpdateFoo = [&displayCpt](Module* module)
+    {
+        // Show every 1000 updates
+        if (++displayCpt < 1000)
+        {
+            return;
+        }
+        displayCpt = 0;
+
+        // Print position & velocity
+        // NB: Could write this in a file, or store it in an array
+        auto client = static_cast<VRPNDeviceClient*>(module);
+        Vec3d p = client->getPosition();
+        Vec3d v = client->getVelocity();
+        std::cout << "\r-- " << module->getName()
+                  << " pos = (" <<  p[0] << ", " << p[1] << ", "  << p[2] << ") "
+                  << " vel = (" <<  v[0] << ", " << v[1] << ", "  << v[2] << ")"
+                  << std::flush;
+    };
+    falcon0->setPostUpdateCallback(postUpdateFoo);
+    //falcon1->setPostUpdateCallback(postUpdateFoo);
 
     // Run
     sdk->setCurrentScene(scene);

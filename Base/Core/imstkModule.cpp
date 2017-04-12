@@ -38,7 +38,15 @@ Module::start()
 
     // Init
     m_status = ModuleStatus::STARTING;
+    if (m_preInitCallback)
+    {
+        m_preInitCallback(this);
+    }
     this->initModule();
+    if (m_postInitCallback)
+    {
+        m_postInitCallback(this);
+    }
     m_status = ModuleStatus::RUNNING;
 
     // Keep active, wait for terminating call
@@ -59,9 +67,19 @@ Module::start()
                 m_UPSTracker->setStartPointOfUpdate();
             }
 
+            // Short path to run module if loop delay = 0
+            // (updating as fast as possible)
             if(m_loopDelay == 0)
             {
+                if (m_preUpdateCallback)
+                {
+                    m_preUpdateCallback(this);
+                }
                 this->runModule();
+                if (m_postUpdateCallback)
+                {
+                    m_postUpdateCallback(this);
+                }
 
                 if (m_UPSTrackerEnabled)
                 {
@@ -71,11 +89,21 @@ Module::start()
 
                 continue;
             }
+
+            // If forcing a frequency, wait until enough time elapsed
             current_t = std::chrono::steady_clock::now();
             elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_t - previous_t).count();
             if(elapsed >= m_loopDelay)
             {
+                if (m_preUpdateCallback)
+                {
+                    m_preUpdateCallback(this);
+                }
                 this->runModule();
+                if (m_postUpdateCallback)
+                {
+                    m_postUpdateCallback(this);
+                }
                 previous_t = current_t;
             }
 
@@ -88,7 +116,15 @@ Module::start()
     }
 
     // Cleanup
+    if (m_preCleanUpCallback)
+    {
+        m_preCleanUpCallback(this);
+    }
     this->cleanUpModule();
+    if (m_postCleanUpCallback)
+    {
+        m_postCleanUpCallback(this);
+    }
     m_status = ModuleStatus::INACTIVE;
 }
 
