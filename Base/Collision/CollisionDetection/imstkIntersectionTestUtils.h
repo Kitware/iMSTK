@@ -19,8 +19,8 @@
 
 =========================================================================*/
 
-#ifndef imstkCollisionDetectionUtils_h
-#define imstkCollisionDetectionUtils_h
+#ifndef imstkIntersectionTestUtils_h
+#define imstkIntersectionTestUtils_h
 
 #include <algorithm>
 
@@ -28,7 +28,7 @@ namespace imstk
 {
 
 ///
-/// \brief
+/// \brief Do ranges [a,b] and [c,d] intersect?
 ///
 inline bool
 isIntersect(const double& a, const double& b, const double& c, const double& d)
@@ -161,4 +161,4 @@ testPointToTriAABB(const double& x1, const double& y1, const double& z1,
 
 }
 
-#endif // ifndef imstkCollisionDetectionUtils_h
+#endif // ifndef imstkIntersectionTestUtils_h

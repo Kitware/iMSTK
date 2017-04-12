@@ -22,6 +22,8 @@
 #ifndef imstkCollisionData_h
 #define imstkCollisionData_h
 
+#include <array>
+
 // imstk
 #include "imstkMath.h"
 
@@ -110,6 +112,25 @@ struct EdgeEdgeCollisionData
 };
 
 ///
+/// \struct PointTetrahedronCollisionData
+///
+/// \brief Point-tetrahedron collision data
+///
+struct PointTetrahedronCollisionData
+{
+    enum CollisionType {
+        aPenetratingA = 0, // A self-penetration
+        aPenetratingB = 1, // vertex is from mesh A, tetrahedron is from mesh B
+        bPenetratingA = 2, // vertex is from mesh B, tetrahedron is from mesh A
+        bPenetratingB = 3  // B self-penetration
+    } collisionType;
+    size_t vertexId;
+    size_t tetreahedronId;
+    using WeightsArray = std::array<double, 4>;
+    WeightsArray BarycentricCoordinates;
+};
+
+///
 /// \struct CollisionData
 ///
 /// \brief Class that is the holder of all types of collision data
@@ -124,6 +145,8 @@ public:
         VTColData.clear();
         TVColData.clear();
         EEColData.clear();
+        MAColData.clear();
+        PTColData.clear();
     }
 
     std::vector<PositionDirectionCollisionData> PDColData; ///< Position Direction collision data
@@ -131,6 +154,7 @@ public:
     std::vector<TriangleVertexCollisionData> TVColData;    ///< Triangle Vertex collision data
     std::vector<EdgeEdgeCollisionData> EEColData;          ///< Edge Edge collision data
     std::vector<MeshToAnalyticalCollisionData> MAColData;  ///< Mesh to analytical collision data
+    std::vector<PointTetrahedronCollisionData> PTColData;  ///< Point Tetrahedron collision data
 };
 
 }

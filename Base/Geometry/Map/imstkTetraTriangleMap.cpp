@@ -160,7 +160,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
                                          const Vec3d& pos)
 {
     double closestDistance = MAX_D;
-    int closestTetrahedron = -1;
+    size_t closestTetrahedron = -1;
     for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
         Vec3d center(0, 0, 0);

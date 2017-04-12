@@ -34,7 +34,7 @@ OneToOneMap::compute()
     }
 
     // returns the first matching vertex
-    auto findMatchingVertex = [](std::shared_ptr<Mesh> masterMesh, const Vec3d& p) -> int
+    auto findMatchingVertex = [](std::shared_ptr<Mesh> masterMesh, const Vec3d& p) -> size_t
     {
         for (size_t nodeId = 0; nodeId < masterMesh->getNumVertices(); ++nodeId)
         {
@@ -53,7 +53,7 @@ OneToOneMap::compute()
     for (size_t nodeId = 0; nodeId < meshSlave->getNumVertices(); ++nodeId)
     {
         // Find the enclosing or closest tetrahedron
-        int matchingNodeId = findMatchingVertex(meshMaster, meshSlave->getVertexPosition(nodeId));
+        size_t matchingNodeId = findMatchingVertex(meshMaster, meshSlave->getVertexPosition(nodeId));
 
         if (matchingNodeId < 0)
         {

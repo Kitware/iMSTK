@@ -59,12 +59,12 @@ template<> struct equal_to<imstk::PointEntry>
 {
     size_t operator()(const imstk::PointEntry& point1, const imstk::PointEntry& point2) const
     {
-        if (point1.point != point2.point)
+        if (point1.ID != point2.ID)
         {
             return false;
         }
 
-        if (point1.ID != point2.ID)
+        if (point1.point != point2.point)
         {
             return false;
         }
@@ -110,11 +110,11 @@ public:
     void setLoadFactorMax(float loadFactorMax);
 
     ///
-    /// \brief Finds all points in an AABB
+    /// \brief Finds IDs of all points in an AABB
     /// \param corner1 One corner to the box
     /// \param corner2 The other corner to the box
     ///
-    std::vector<Vec3d> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
+    std::vector<size_t> getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2);
 
     ///
     /// \brief Clears the table
@@ -125,19 +125,13 @@ public:
     /// \brief Protected constructor
     /// \param x,y,z Dimensions for each cell
     ///
-    virtual void setCellSize(double x, double y, double z);
+    virtual void setCellSize(double x, double y, double z) override;
 
 protected:
     ///
     /// \brief Rehash the hash table
     ///
-    virtual void rehash();
-
-    ///
-    /// \brief Hash function
-    /// \param point A point
-    ///
-    inline unsigned int generateHash(Vec3d point);
+    virtual void rehash() override;
 
     float m_loadFactorMax = 10.0f;
 

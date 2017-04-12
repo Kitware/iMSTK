@@ -39,13 +39,13 @@ public:
     /// \brief Protected constructor
     /// \param x,y,z Dimensions for each cell
     ///
-    virtual void setCellSize(double x, double y, double z);
+    virtual void setCellSize(double x, double y, double z) = 0;
 
 protected:
     ///
     /// \brief Rehash the hash table
     ///
-    virtual void rehash();
+    virtual void rehash() = 0;
 
     ///
     /// \brief Protected constructor

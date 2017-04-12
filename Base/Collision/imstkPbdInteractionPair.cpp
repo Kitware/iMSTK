@@ -23,7 +23,7 @@
 #include "imstkSurfaceMesh.h"
 #include "imstkLineMesh.h"
 #include "imstkGeometryMap.h"
-#include "imstkCollisionDetectionUtils.h"
+#include "imstkIntersectionTestUtils.h"
 
 namespace imstk
 {

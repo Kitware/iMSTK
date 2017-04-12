@@ -29,6 +29,8 @@ Mesh::initialize(const StdVectorOfVec3d& vertices)
 {
     this->setInitialVertexPositions(vertices);
     this->setVertexPositions(vertices);
+    StdVectorOfVec3d disp = StdVectorOfVec3d(vertices.size(), imstk::Vec3d(0.0, 0.0, 0.0));
+    this->setVertexDisplacements(disp);
 }
 
 void
@@ -130,11 +132,25 @@ Mesh::setVertexDisplacements(const StdVectorOfVec3d& diff)
 void
 Mesh::setVertexDisplacements(const Vectord& u)
 {
+    assert(u.size() == 3 * m_vertexDisplacements.size());
     size_t dofId = 0;
     for (auto &vDisp : m_vertexDisplacements)
     {
         vDisp = Vec3d(u(dofId), u(dofId + 1), u(dofId + 2));
         dofId += 3;
+    }
+
+    for (size_t i = 0; i < m_vertexPositions.size(); ++i)
+    {
+        m_vertexPositions[i] = m_initialVertexPositions[i] + m_vertexDisplacements[i];
+    }
+}
+
+void Mesh::translateVertices(const Vec3d& t)
+{
+    for (auto &vDisp : m_vertexDisplacements)
+    {
+        vDisp += t;
     }
 
     for (size_t i = 0; i < m_vertexPositions.size(); ++i)

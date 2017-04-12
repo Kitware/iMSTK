@@ -109,6 +109,11 @@ public:
     void setVertexDisplacements(const Vectord& u);
 
     ///
+    /// \brief Deep translation of vertices using the given 3D vector
+    ///
+    void translateVertices(const Vec3d& t);
+
+    ///
     /// \brief Returns the vector displacements of mesh vertices
     ///
     const StdVectorOfVec3d& getVertexDisplacements() const;

@@ -61,7 +61,7 @@ SpatialHashTableSeparateChaining::clear()
     m_currentID = 0;
 }
 
-std::vector<Vec3d>
+std::vector<size_t>
 SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Vec3d& corner2)
 {
     auto min_x = std::fmin(corner1.x(), corner2.x());
@@ -94,9 +94,8 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
     }
 
     // Allocate beforehand
-    std::vector<Vec3d> points(tempPoints.size());
-
-    unsigned int numPoints = 0;
+    std::vector<size_t> points(0);
+    points.reserve(tempPoints.size());
 
     // Fine iteration
     for (auto p = tempPoints.begin(); p != tempPoints.end(); ++p)
@@ -106,12 +105,9 @@ SpatialHashTableSeparateChaining::getPointsInAABB(const Vec3d& corner1, const Ve
             point.y() >= min_y && point.y() <= max_y &&
             point.z() >= min_z && point.z() <= max_z)
         {
-            points[numPoints] = p->point;
-            numPoints++;
+            points.push_back(p->ID);
         }
     }
-
-    points.resize(numPoints);
 
     return points;
 }

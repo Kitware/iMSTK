@@ -12,6 +12,7 @@ imstk_add_library( Collision
 #-----------------------------------------------------------------------------
 # Testing
 #-----------------------------------------------------------------------------
-if( iMSTK_BUILD_TESTING )
-  add_subdirectory( Testing )
+if( BUILD_TESTING )
+  include(imstkAddTest)
+  imstk_add_test( Collision )
 endif()
