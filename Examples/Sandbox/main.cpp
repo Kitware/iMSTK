@@ -553,55 +553,46 @@ void testPenaltyRigidCollision()
 void testTwoFalcons()
 {
     // SDK and Scene
-    auto sdk = std::make_shared<imstk::SimulationManager>();
+    auto sdk = std::make_shared<SimulationManager>();
     auto scene = sdk->createNewScene("FalconsTestScene");
 
     // Device server
-    auto server = std::make_shared<imstk::VRPNDeviceServer>();
-    server->addDevice("falcon0", imstk::DeviceType::NOVINT_FALCON, 0);
-    server->addDevice("falcon1", imstk::DeviceType::NOVINT_FALCON, 1);
-    server->addDevice("hdk", imstk::DeviceType::OSVR_HDK);
+    auto server = std::make_shared<VRPNDeviceServer>();
+    server->addDevice("falcon0", DeviceType::NOVINT_FALCON, 0);
+    server->addDevice("falcon1", DeviceType::NOVINT_FALCON, 1);
     sdk->addModule(server);
 
     // Falcon clients
-    auto falcon0 = std::make_shared<imstk::VRPNDeviceClient>("falcon0", "localhost");
+    auto falcon0 = std::make_shared<VRPNDeviceClient>("falcon0", "localhost");
     sdk->addModule(falcon0);
-    auto falcon1 = std::make_shared<imstk::VRPNDeviceClient>("falcon1", "localhost");
+    auto falcon1 = std::make_shared<VRPNDeviceClient>("falcon1", "localhost");
     sdk->addModule(falcon1);
-
-    // Cam Client
-    auto hdk = std::make_shared<imstk::VRPNDeviceClient>("hdk", "localhost");
-    sdk->addModule(hdk);
 
     // Plane
     auto planeObj = apiutils::createVisualAnalyticalSceneObject(
-        imstk::Geometry::Type::Plane, scene, "VisualPlane", 50, imstk::FORWARD_VECTOR * 15);
+        Geometry::Type::Plane, scene, "VisualPlane", 50, FORWARD_VECTOR * 15);
 
     // Sphere0
     auto sphere0Obj = apiutils::createCollidingAnalyticalSceneObject(
-        imstk::Geometry::Type::Sphere, scene, "Sphere0", 1., Vec3d(16, 4.5, 0));
+        Geometry::Type::Sphere, scene, "Sphere0", 1., Vec3d(-16, 4.5, 0));
 
-    auto trackCtrl0 = std::make_shared<imstk::DeviceTracker>(falcon0);
-    trackCtrl0->setTranslationScaling(30);
-    auto controller0 = std::make_shared<imstk::SceneObjectController>(sphere0Obj, trackCtrl0);
+    auto trackCtrl0 = std::make_shared<DeviceTracker>(falcon0);
+    trackCtrl0->setTranslationScaling(100);
+    auto controller0 = std::make_shared<SceneObjectController>(sphere0Obj, trackCtrl0);
     scene->addObjectController(controller0);
 
     // Sphere1
     auto sphere1Obj = apiutils::createCollidingAnalyticalSceneObject(
-        imstk::Geometry::Type::Sphere, scene, "Sphere1", 1., Vec3d(-16, 4.5, 0));
+        Geometry::Type::Sphere, scene, "Sphere1", 1., Vec3d(16, 4.5, 0));
 
-    auto trackCtrl1 = std::make_shared<imstk::DeviceTracker>(falcon1);
-    trackCtrl1->setTranslationScaling(30);
-    auto controller1 = std::make_shared<imstk::SceneObjectController>(sphere1Obj, trackCtrl1);
+    auto trackCtrl1 = std::make_shared<DeviceTracker>(falcon1);
+    trackCtrl1->setTranslationScaling(100);
+    auto controller1 = std::make_shared<SceneObjectController>(sphere1Obj, trackCtrl1);
     scene->addObjectController(controller1);
 
     // Camera
     auto cam = scene->getCamera();
-    cam->setPosition(imstk::Vec3d(0, 18, 20));
-    cam->setFocalPoint(imstk::UP_VECTOR * 18);
-    auto camController = cam->setupController(hdk);
-    camController->setInversionFlags(imstk::CameraController::InvertFlag::rotY |
-                                     imstk::CameraController::InvertFlag::rotZ);
+    cam->setPosition(Vec3d(0, 18, 40));
 
     // Run
     sdk->setCurrentScene(scene);
