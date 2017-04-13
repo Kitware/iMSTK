@@ -22,10 +22,9 @@
 #ifndef imstkModule_h
 #define imstkModule_h
 
-#include "imstkTimer.h"
-
 #include <iostream>
 #include <atomic>
+#include <functional>
 
 namespace imstk
 {
@@ -50,6 +49,8 @@ enum class ModuleStatus
 ///
 class Module
 {
+    using CallbackFunction = std::function<void(Module* module)>;
+
 public:
     ///
     /// \brief Constructor
@@ -57,9 +58,7 @@ public:
     Module(std::string name, int loopDelay = 0) :
         m_name(name),
         m_loopDelay(loopDelay)
-    {
-        m_UPSTracker = std::make_shared<UPSCounter>();
-    }
+    {}
 
     ///
     /// \brief Destructor
@@ -85,6 +84,13 @@ public:
     /// \brief End the module
     ///
     void end();
+
+    inline void setPreInitCallback(CallbackFunction foo) { m_preInitCallback = foo; }
+    inline void setPostInitCallback(CallbackFunction foo) { m_postInitCallback = foo; }
+    inline void setPreUpdateCallback(CallbackFunction foo) { m_preUpdateCallback = foo; }
+    inline void setPostUpdateCallback(CallbackFunction foo) { m_postUpdateCallback = foo; }
+    inline void setPreCleanUpCallback(CallbackFunction foo) { m_preCleanUpCallback = foo; }
+    inline void setPostCleanUpCallback(CallbackFunction foo) { m_postCleanUpCallback = foo; }
 
     ///
     /// \brief Get the status of the module
@@ -116,16 +122,6 @@ public:
     ///
     void setFrequency(const double f);
 
-    ///
-    /// \brief Get the updates per second
-    ///
-    unsigned int getUPS() const;
-    ///
-    /// \brief Set/get UPS tracking status
-    ///
-    inline void setUPSTrackerEnabled(const bool enable);
-    inline bool getUPSTrackingStatus() const { return m_UPSTrackerEnabled; }
-
 protected:
 
     ///
@@ -143,13 +139,17 @@ protected:
     ///
     virtual void cleanUpModule() = 0;
 
-    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE};///> Module status
+    CallbackFunction m_preInitCallback;     ///> function callback preceding module initialization
+    CallbackFunction m_postInitCallback;    ///> function callback following module initialization
+    CallbackFunction m_preUpdateCallback;   ///> function callback preceding module update
+    CallbackFunction m_postUpdateCallback;  ///> function callback following module update
+    CallbackFunction m_preCleanUpCallback;  ///> function callback preceding module cleanup
+    CallbackFunction m_postCleanUpCallback; ///> function callback following module cleanup
+
+    std::atomic<ModuleStatus> m_status{ModuleStatus::INACTIVE}; ///> Module status
 
     std::string  m_name;    ///> Name of the module
     double m_loopDelay;     ///> Loop delay
-
-    bool m_UPSTrackerEnabled = false;  ///> Track the ups
-    std::shared_ptr<UPSCounter> m_UPSTracker; ///> Keeps track of UPS
 };
 
 }
