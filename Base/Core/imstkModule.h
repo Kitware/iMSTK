@@ -22,8 +22,6 @@
 #ifndef imstkModule_h
 #define imstkModule_h
 
-#include "imstkTimer.h"
-
 #include <iostream>
 #include <atomic>
 #include <functional>
@@ -60,9 +58,7 @@ public:
     Module(std::string name, int loopDelay = 0) :
         m_name(name),
         m_loopDelay(loopDelay)
-    {
-        m_UPSTracker = std::make_shared<UPSCounter>();
-    }
+    {}
 
     ///
     /// \brief Destructor
@@ -126,17 +122,6 @@ public:
     ///
     void setFrequency(const double f);
 
-    ///
-    /// \brief Get the updates per second
-    ///
-    unsigned int getUPS() const;
-
-    ///
-    /// \brief Set/get UPS tracking status
-    ///
-    inline void setUPSTrackerEnabled(const bool enable);
-    inline bool getUPSTrackingStatus() const { return m_UPSTrackerEnabled; }
-
 protected:
 
     ///
@@ -165,9 +150,6 @@ protected:
 
     std::string  m_name;    ///> Name of the module
     double m_loopDelay;     ///> Loop delay
-
-    bool m_UPSTrackerEnabled = false;  ///> Track the ups
-    std::shared_ptr<UPSCounter> m_UPSTracker; ///> Keeps track of UPS
 };
 
 }

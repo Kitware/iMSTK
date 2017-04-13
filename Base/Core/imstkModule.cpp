@@ -61,12 +61,6 @@ Module::start()
         }
         else if (m_status == ModuleStatus::RUNNING)
         {
-            if (m_UPSTrackerEnabled)
-            {
-                // Set the start point for update counter
-                m_UPSTracker->setStartPointOfUpdate();
-            }
-
             // Short path to run module if loop delay = 0
             // (updating as fast as possible)
             if(m_loopDelay == 0)
@@ -80,13 +74,6 @@ Module::start()
                 {
                     m_postUpdateCallback(this);
                 }
-
-                if (m_UPSTrackerEnabled)
-                {
-                    // Set the end point for update counter
-                    m_UPSTracker->setEndPointOfUpdate();
-                }
-
                 continue;
             }
 
@@ -105,12 +92,6 @@ Module::start()
                     m_postUpdateCallback(this);
                 }
                 previous_t = current_t;
-            }
-
-            if (m_UPSTrackerEnabled)
-            {
-                // Set the end point for update counter
-                m_UPSTracker->setEndPointOfUpdate();
             }
         }
     }
@@ -151,7 +132,6 @@ Module::pause()
         return;
     }
 
-    m_UPSTracker->reset();
     m_status = ModuleStatus::PAUSING;
 
     while (m_status != ModuleStatus::PAUSED) {}
@@ -227,22 +207,6 @@ Module::setFrequency(const double f)
         return;
     }
     m_loopDelay = 1000.0/f;
-}
-
-unsigned int
-Module::getUPS() const
-{
-    return m_UPSTracker->getUPS();
-}
-
-void
-Module::setUPSTrackerEnabled(const bool enable)
-{
-    m_UPSTrackerEnabled = enable;
-    if (!enable)
-    {
-        m_UPSTracker->reset();
-    }
 }
 
 }

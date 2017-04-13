@@ -169,9 +169,9 @@ int main()
     Test physics
     ------------------*/
     //testPbdVolume();
-    //testPbdCloth();
-    testPbdCollision();
-    //testDeformableBody();
+    testPbdCloth();
+    //testPbdCollision();
+    testDeformableBody();
     //testDeformableBodyCollision();
     //liverToolInteraction();
 
@@ -188,7 +188,7 @@ int main()
     Test devices, controllers
     ------------------*/
     //testObjectController();
-    testTwoFalcons();
+    //testTwoFalcons();
     //testCameraController();
     //testTwoOmnis();
     //testLapToolController();
@@ -1338,6 +1338,28 @@ void testDeformableBody()
     //nlSolver->setToFullyImplicit();
     scene->addNonlinearSolver(nlSolver);
 
+    // Display UPS
+    auto ups = std::make_shared<UPSCounter>();
+    auto sceneManager = sdk->getSceneManager("DeformableBodyTest");
+    sceneManager->setPreInitCallback([](Module* module)
+    {
+        LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
+    });
+    sceneManager->setPreUpdateCallback([&ups](Module* module)
+    {
+        ups->setStartPointOfUpdate();
+    });
+    sceneManager->setPostUpdateCallback([&ups](Module* module)
+    {
+        ups->setEndPointOfUpdate();
+        std::cout << "\r-- " << module->getName() << " running at "
+                  << ups->getUPS() << " ups   " << std::flush;
+    });
+    sceneManager->setPostCleanUpCallback([](Module* module)
+    {
+        LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
+    });
+
     // Run the simulation
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
@@ -1518,6 +1540,29 @@ void testPbdCloth()
     scene->addLight(colorLight);
     scene->addSceneObject(deformableObj);
 
+    // Display UPS
+    auto ups = std::make_shared<UPSCounter>();
+    auto sceneManager = sdk->getSceneManager("PositionBasedDynamicsTest");
+    sceneManager->setPreInitCallback([](Module* module)
+    {
+        LOG(INFO) << "-- Pre initialization of " << module->getName() << " module";
+    });
+    sceneManager->setPreUpdateCallback([&ups](Module* module)
+    {
+        ups->setStartPointOfUpdate();
+    });
+    sceneManager->setPostUpdateCallback([&ups](Module* module)
+    {
+        ups->setEndPointOfUpdate();
+        std::cout << "\r-- " << module->getName() << " running at "
+                  << ups->getUPS() << " ups   " << std::flush;
+    });
+    sceneManager->setPostCleanUpCallback([](Module* module)
+    {
+        LOG(INFO) << "\n-- Post cleanup of " << module->getName() << " module";
+    });
+
+    // Start
     sdk->setCurrentScene(scene);
     sdk->startSimulation(true);
 }
