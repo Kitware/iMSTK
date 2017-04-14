@@ -105,6 +105,16 @@ int j;
 char* stringname;
 ```
 
+#### Naming convention
+1. General
+  * Names are constructed by using case change to indicate seperate words. For example TimeStamp
+  * Underscores are not used
+2. Classes
+  * Classes are named beginning with a captial letter
+  * Classes are placed in the appropriate namespace
+3. Class member variables: Class data members are prepended with m as in m_Time.
+4. Local variables: Use lowercase
+5. Files: The filename should be the same as the class
 
 
 ### Documenting your code
