@@ -118,7 +118,20 @@ char* stringname;
 
 
 ### Documenting your code
-*Coming soon - Please refer to the rest of the code in the meantime*
+1. General: When you document your code make sure you use correct English and complete, grammatically correct sentences.Finish your sentences with a period.
+2. Documenting a method. Add a brief comment describing your method in your class implementation files.
+3. Documenting a class. Classes should be documented using the class and brief Doxygen commands,followed by the detailed class description.
+
+```sh
+/** \class SpatialHashTable
+\brief Abstract class for spatial hash tables
+
+The SpatialHashtable class implements a 2D data structure that can map keys to values.
+...
+...
+...
+**/
+```
 
 ### Testing your code
 *Coming soon - Please refer to the rest of the code in the meantime*
