@@ -71,15 +71,15 @@ git pull origin master
 2. Braces must be used to delimit the scope of an if, for, while, switch or other control structure.
 3. Curly braces should go on a seperate line.
 ```sh
-for(unsigned int i=0; i < 3; i++)
+for (unsigned int i=0; i < 3; i++)
    {
        ...   
    }
-if( condition )
+if ( condition )
    {
        ...
    }
-else if( other condition)
+else if ( other condition)
    {
        ...       
    }
