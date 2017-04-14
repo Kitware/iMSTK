@@ -90,7 +90,7 @@ else
 ``` 
 3. Source code in the body of the brackets must be indented
 ```sh
-for(unsigned int i=0; i < 3; i++)
+for (unsigned int i=0; i < 3; i++)
    {
        int z;
        z = i + 4;
@@ -110,7 +110,7 @@ char* stringname;
   * Names are constructed by using case change to indicate seperate words. For example TimeStamp
   * Underscores are not used
 2. Classes
-  * Classes are named beginning with a captial letter
+  * Classes are named beginning with a capital letter
   * Classes are placed in the appropriate namespace
 3. Class member variables: Class data members are prepended with m as in m_Time.
 4. Local variables: Use lowercase
@@ -118,7 +118,7 @@ char* stringname;
 
 
 ### Documenting your code
-1. General: When you document your code make sure you use correct English and complete, grammatically correct sentences.Finish your sentences with a period.
+1. General: When you document your code make sure you use correct English and complete, grammatically correct sentences. Finish your sentences with a period.
 2. Documenting a method. Add a brief comment describing your method in your class implementation files.
 3. Documenting a class. Classes should be documented using the class and brief Doxygen commands,followed by the detailed class description.
 
