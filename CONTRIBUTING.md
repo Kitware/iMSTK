@@ -64,7 +64,48 @@ git pull origin master
 ------
 
 ### Coding style
-*Coming soon - Please refer to the rest of the code in the meantime*
+
+#### Layout
+1. Do not use tabs. Set up your editor to insert spaces. Indentation size should be set to 4.
+
+2. Braces must be used to delimit the scope of an if, for, while, switch or other control structure.
+3. Curly braces should go on a seperate line.
+```sh
+for(unsigned int i=0; i < 3; i++)
+   {
+       ...   
+   }
+if( condition )
+   {
+       ...
+   }
+else if( other condition)
+   {
+       ...       
+   }
+else
+   {
+       ...   
+   }
+``` 
+3. Source code in the body of the brackets must be indented
+```sh
+for(unsigned int i=0; i < 3; i++)
+   {
+       int z;
+       z = i + 4;
+   }
+```
+4. Each line of code should take no more than 200 characters
+4. Use lots of whitespace to separate logical blocks of code
+5. Declaration of variables within classes, methods, and functions should be one declaration per line
+```sh
+int i;
+int j;
+char* stringname;
+```
+
+
 
 ### Documenting your code
 *Coming soon - Please refer to the rest of the code in the meantime*
