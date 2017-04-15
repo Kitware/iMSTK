@@ -25,7 +25,7 @@ namespace  imstk
 {
 
 LinearProjectionConstraint::
-LinearProjectionConstraint(const unsigned int& nodeId, const bool isFixed /*= false*/)
+LinearProjectionConstraint(const size_t& nodeId, const bool isFixed /*= false*/)
 {
     m_nodeId = nodeId;
     if (isFixed)
@@ -36,14 +36,14 @@ LinearProjectionConstraint(const unsigned int& nodeId, const bool isFixed /*= fa
 }
 
 void
-LinearProjectionConstraint::setProjection(const unsigned int& nodeId, const Vec3d& p, const Vec3d& q /*= Vec3d::Zero()*/)
+LinearProjectionConstraint::setProjection(const size_t& nodeId, const Vec3d& p, const Vec3d& q /*= Vec3d::Zero()*/)
 {
     m_nodeId = nodeId;
     m_projection = Mat3d::Identity() - p*p.transpose() - q*q.transpose();
 }
 
 void
-LinearProjectionConstraint::setProjectorToDirichlet(const unsigned int& nodeId)
+LinearProjectionConstraint::setProjectorToDirichlet(const size_t& nodeId)
 {
     m_nodeId = nodeId;
     m_projection = Mat3d::Zero();

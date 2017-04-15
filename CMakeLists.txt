@@ -62,6 +62,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
+if(MSVC)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+  add_definitions(-D_SCL_SECURE_NO_WARNINGS)
+endif()
+
 #-----------------------------------------------------------------------------
 # SUPERBUILD
 #-----------------------------------------------------------------------------

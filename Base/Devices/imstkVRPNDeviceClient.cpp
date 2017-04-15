@@ -64,7 +64,7 @@ VRPNDeviceClient::runModule()
     }
     if (this->getForceEnabled())
     {
-        m_vrpnForceDevice->setFF_Force(m_force[0], m_force[1], m_force[2]);
+        m_vrpnForceDevice->setFF_Force(vrpn_float32(m_force[0]), vrpn_float32(m_force[1]), vrpn_float32(m_force[2]));
         m_vrpnForceDevice->sendForceField();
         m_vrpnForceDevice->mainloop();
     }

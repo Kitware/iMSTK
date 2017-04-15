@@ -41,12 +41,12 @@ TetraTriangleMap::compute()
     for (const Vec3d& surfVertPos : triMesh->getVertexPositions())
     {
         // Find the enclosing or closest tetrahedron
-        int closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
-        if (closestTetId < 0)
+        size_t closestTetId = findEnclosingTetrahedron(tetMesh, surfVertPos);
+        if (closestTetId == std::numeric_limits<size_t>::max())
         {
             closestTetId = findClosestTetrahedron(tetMesh, surfVertPos);
         }
-        if (closestTetId < 0)
+        if (closestTetId == std::numeric_limits<size_t>::max())
         {
             LOG(WARNING) << "Could not find closest tetrahedron";
             return;
@@ -155,12 +155,12 @@ TetraTriangleMap::setSlave(std::shared_ptr<Geometry> slave)
     GeometryMap::setSlave(slave);
 }
 
-int
+size_t
 TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
                                          const Vec3d& pos)
 {
     double closestDistance = MAX_D;
-    size_t closestTetrahedron = -1;
+    size_t closestTetrahedron = std::numeric_limits<size_t>::max();
     for (size_t tetId = 0; tetId < tetraMesh->getNumTetrahedra(); ++tetId)
     {
         Vec3d center(0, 0, 0);
@@ -180,7 +180,7 @@ TetraTriangleMap::findClosestTetrahedron(std::shared_ptr<TetrahedralMesh> tetraM
     return closestTetrahedron;
 }
 
-int
+size_t
 TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetraMesh,
                                            const Vec3d& pos)
 {
@@ -202,7 +202,7 @@ TetraTriangleMap::findEnclosingTetrahedron(std::shared_ptr<TetrahedralMesh> tetr
     }
 
     // Check which probable tetrahedron the point belongs to
-    int enclosingTetrahedron = -1;
+    size_t enclosingTetrahedron = std::numeric_limits<size_t>::max();
     TetrahedralMesh::WeightsArray weights = {0.0, 0.0, 0.0, 0.0};
     for (const size_t& tetId : probablesTetId)
     {

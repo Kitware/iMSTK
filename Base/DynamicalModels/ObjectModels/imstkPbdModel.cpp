@@ -316,8 +316,8 @@ PbdModel::initializeDihedralConstraints(const double& stiffness)
         std::sort(r2.begin(), r2.end());
         std::sort(r3.begin(), r3.end());
 
-        std::vector<unsigned int> rs;
-        std::vector<unsigned int>::iterator it;
+        std::vector<size_t> rs;
+        std::vector<size_t>::iterator it;
         // check if processed or not
         if (E[tri[0]][tri[1]] && E[tri[1]][tri[0]])
         {

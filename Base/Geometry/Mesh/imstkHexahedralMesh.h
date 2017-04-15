@@ -98,7 +98,7 @@ public:
     ///
     /// \brief Returns the number of hexahedra
     ///
-    int getNumHexahedra() const;
+    size_t getNumHexahedra() const;
 
 protected:
 
