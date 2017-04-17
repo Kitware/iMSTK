@@ -80,6 +80,21 @@ public:
     ///
     const ObjectsPair& getObjectsPair() const;
 
+    ///
+    /// \brief Returns collision detection algorithm for A-B
+    ///
+    std::shared_ptr<CollisionDetection> getCollisionDetection() const;
+
+    ///
+    /// \brief Returns collision handling algorithm for object B
+    ///
+    std::shared_ptr<CollisionHandling> getCollisionHandlingA() const;
+
+    ///
+    /// \brief Returns collision handling algorithm for object A
+    ///
+    std::shared_ptr<CollisionHandling> getCollisionHandlingB() const;
+
 protected:
 
     ObjectsPair m_objects;                             ///< Colliding objects

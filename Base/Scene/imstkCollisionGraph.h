@@ -66,6 +66,7 @@ public:
                                           CollisionHandling::Type CHAType,
                                           CollisionHandling::Type CHBType);
 
+    //TODO: Refactor -> PBD only
     void addInteractionPair(std::shared_ptr<PbdInteractionPair> pair);
 
     ///
@@ -92,7 +93,7 @@ public:
     const std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>>& getInteractionPairMap() const;
 
 protected:
-    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList;
+    std::vector<std::shared_ptr<PbdInteractionPair>> m_interactionPbdPairList; //TODO: Refactor -> PBD only
 
     std::vector<InteractionPairPtr> m_interactionPairList; //!< All interaction pairs in the collision graph
     std::unordered_map<CollidingObjectPtr, std::vector<InteractionPairPtr>> m_interactionPairMap; //!< Map of interaction pairs per colliding object
